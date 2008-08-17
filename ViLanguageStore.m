@@ -6,6 +6,10 @@ static ViLanguageStore *defaultStore = nil;
 
 - (void)addBundlesFromBundleDirectory:(NSString *)aPath
 {
+	BOOL isDirectory = NO;
+	if(![[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] || !isDirectory)
+		return;
+
 	NSArray *subdirs = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
 	NSString *subdir;
 	for(subdir in subdirs)
@@ -68,21 +72,11 @@ static ViLanguageStore *defaultStore = nil;
 	languages = [[NSMutableDictionary alloc] init];
 	bundles = [[NSMutableArray alloc] init];
 
-	BOOL isDirectory = NO;
-
 	NSLog(@"start initializing languages");
-	NSString *bundlesPath = @"/Applications/TextMate.app/Contents/SharedSupport";
-	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-		[self addBundlesFromBundleDirectory:bundlesPath];
-
-	bundlesPath = @"/Library/Application Support/TextMate/Bundles";
-	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-		[self addBundlesFromBundleDirectory:bundlesPath];
-
-	bundlesPath = [@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath];
-	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-		[self addBundlesFromBundleDirectory:bundlesPath];
-
+	[self addBundlesFromBundleDirectory:@"/Applications/TextMate.app/Contents/SharedSupport"];
+	[self addBundlesFromBundleDirectory:@"/Library/Application Support/TextMate/Bundles"];
+	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Pristine Copy/Bundles" stringByExpandingTildeInPath]];
+	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
 	NSLog(@"finished initializing languages");
 }
 

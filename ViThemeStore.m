@@ -39,12 +39,16 @@
 
 - (void)addThemesFromBundleDirectory:(NSString *)aPath
 {
-	NSArray *themeFiles = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
-	NSString *themeFile;
-	for(themeFile in themeFiles)
+	BOOL isDirectory = NO;
+	if([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory)
 	{
-		if([themeFile hasSuffix:@".tmTheme"])
-			[self addThemeWithPath:[NSString stringWithFormat:@"%@/%@", aPath, themeFile]];
+		NSArray *themeFiles = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
+		NSString *themeFile;
+		for(themeFile in themeFiles)
+		{
+			if([themeFile hasSuffix:@".tmTheme"])
+				[self addThemeWithPath:[NSString stringWithFormat:@"%@/%@", aPath, themeFile]];
+		}
 	}
 }
 
@@ -53,21 +57,12 @@
 	self = [super init];
 	if(self)
 	{
-		BOOL isDirectory = NO;
-
 		themes = [[NSMutableDictionary alloc] init];
 
-		NSString *bundlesPath = @"/Applications/TextMate.app/Contents/SharedSupport/Themes";
-		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-			[self addThemesFromBundleDirectory:bundlesPath];
-
-		bundlesPath = @"/Library/Application Support/TextMate/Themes";
-		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-			[self addThemesFromBundleDirectory:bundlesPath];
-
-		bundlesPath = [@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath];
-		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
-			[self addThemesFromBundleDirectory:bundlesPath];
+		[self addThemesFromBundleDirectory:@"/Applications/TextMate.app/Contents/SharedSupport/Themes"];
+		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Prinstine Copy/Themes" stringByExpandingTildeInPath]];
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
 	}
 	return self;
 }

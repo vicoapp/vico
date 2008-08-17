@@ -27,17 +27,18 @@
 #if 0
 // FIXME: input keys passed through to the super NSTextView doesn't work yet
 - (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 9); }
+- (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
 #endif
 
 - (void)test020_DeleteForward			{ TEST(@"abcdef", 0, @"x", @"bcdef", 0); }
 - (void)test021_DeleteForwardAtEol		{ TEST(@"abc\ndef", 2, @"x", @"ab\ndef", 1); }
 - (void)test022_DeleteForewardWithCount		{ TEST(@"abcdef", 1, @"3x", @"aef", 1); }
-- (void)test022_DeleteForwardWithLargeCount	{ TEST(@"abcdef\nghi", 4, @"33x", @"abcd\nghi", 4); }
+- (void)test023_DeleteForwardWithLargeCount	{ TEST(@"abcdef\nghi", 4, @"33x", @"abcd\nghi", 4); }
 
 - (void)test030_DeleteBackward			{ TEST(@"abcdef", 3, @"X", @"abdef", 2); }
-- (void)test030_DeleteBackwardAtBol		{ TEST(@"abcdef", 0, @"X", @"abcdef", 0); }
-- (void)test030_DeleteBackwardWithCount		{ TEST(@"abcdef", 5, @"4X", @"af", 1); }
-- (void)test030_DeleteBackwordWithLargeCount	{ TEST(@"abcdef", 2, @"7X", @"cdef", 0); }
+- (void)test031_DeleteBackwardAtBol		{ TEST(@"abcdef", 0, @"X", @"abcdef", 0); }
+- (void)test032_DeleteBackwardWithCount		{ TEST(@"abcdef", 5, @"4X", @"af", 1); }
+- (void)test033_DeleteBackwordWithLargeCount	{ TEST(@"abcdef", 2, @"7X", @"cdef", 0); }
 
 - (void)test040_WordForward			{ MOVE(@"abc def", 0, @"w", 4); }
 - (void)test041_WordForwardFromBlanks		{ MOVE(@"   abc def", 0, @"w", 3); }

@@ -29,9 +29,6 @@ struct vikey
 	int motion_count;
 	char key;
 
-	NSRange start_range;
-	NSRange stop_range;
-
 	struct vikey *dot_command_key;
 	int dot_count;
 	NSString *dot_motion_method;
@@ -47,8 +44,6 @@ struct vikey
 @property(readonly) NSString *motion_method;
 @property(readonly) int count;
 @property(readonly) int motion_count;
-@property NSRange start_range;
-@property NSRange stop_range;
 @property(readonly) char key;
 
 @end

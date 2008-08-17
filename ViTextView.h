@@ -12,12 +12,14 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
 	NSRange affectedRange;
-	NSUInteger final_location;
+	NSUInteger start_location, end_location, final_location;
 }
 
 + (void)initKeymaps;
 - (void)initEditor;
-- (void)gotoColumn:(NSUInteger)column fromRange:(NSRange)aRange;
+- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
+- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
+- (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)setCommandMode;
 - (void)setInsertMode;
 - (void)input:(NSString *)inputString;

@@ -7,26 +7,26 @@
 #define VIF_SETS_DOT	(1 << 2)
 
 static struct vikey vikeys[] = {
-	{@"append",		'a', VIF_SETS_DOT},
-	{@"append_eol",		'A', VIF_SETS_DOT},
-	{@"insert",		'i', VIF_SETS_DOT},
-	{@"insert_bol",		'I', VIF_SETS_DOT},
-	{@"change",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
-	{@"delete",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
-	{@"move_left",		'h', VIF_IS_MOTION},
-	{@"move_down",		'j', VIF_IS_MOTION},
-	{@"move_up",		'k', VIF_IS_MOTION},
-	{@"move_right",		'l', VIF_IS_MOTION},
-	{@"put_before",		'P', VIF_SETS_DOT},
-	{@"put_after",		'p', VIF_SETS_DOT},
-	{@"move_bol",		'0', VIF_IS_MOTION},
-	{@"move_eol",		'$', VIF_IS_MOTION},
-	{@"word_forward",	'w', VIF_IS_MOTION},
-	{@"delete_forward",	'x', VIF_SETS_DOT},
-	{@"delete_backward",	'X', VIF_SETS_DOT},
-	{@"open_line_above",	'O', VIF_SETS_DOT},
-	{@"open_line_below",	'o', VIF_SETS_DOT},
-	{@"yank",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"append:",		'a', VIF_SETS_DOT},
+	{@"append_eol:",	'A', VIF_SETS_DOT},
+	{@"insert:",		'i', VIF_SETS_DOT},
+	{@"insert_bol:",	'I', VIF_SETS_DOT},
+	{@"change:",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"move_left:",		'h', VIF_IS_MOTION},
+	{@"move_down:",		'j', VIF_IS_MOTION},
+	{@"move_up:",		'k', VIF_IS_MOTION},
+	{@"move_right:",	'l', VIF_IS_MOTION},
+	{@"put_before:",	'P', VIF_SETS_DOT},
+	{@"put_after:",		'p', VIF_SETS_DOT},
+	{@"move_bol:",		'0', VIF_IS_MOTION},
+	{@"move_eol:",		'$', VIF_IS_MOTION},
+	{@"word_forward:",	'w', VIF_IS_MOTION},
+	{@"delete_forward:",	'x', VIF_SETS_DOT},
+	{@"delete_backward:",	'X', VIF_SETS_DOT},
+	{@"open_line_above:",	'O', VIF_SETS_DOT},
+	{@"open_line_below:",	'o', VIF_SETS_DOT},
+	{@"yank:",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{nil, -1, 0}
 };
 
@@ -50,8 +50,6 @@ find_command(int key)
 @synthesize motion_method;
 @synthesize count;
 @synthesize motion_count;
-@synthesize start_range;
-@synthesize stop_range;
 @synthesize key;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
@@ -103,7 +101,7 @@ find_command(int key)
 	{
 		if(dot_command_key == nil)
 		{
-			method = @"nodot"; // prints "No command to repeat"
+			method = @"nodot:"; // prints "No command to repeat"
 			[self setComplete];
 			return;
 		}
@@ -121,7 +119,7 @@ find_command(int key)
 	if(vikey == NULL)
 	{
 		// should print "X isn't a vi command"
-		method = @"illegal";
+		method = @"illegal:";
 		key = aKey;
 		[self setComplete];
 		return;
@@ -149,12 +147,12 @@ find_command(int key)
 			 * Commands that have motion components can be doubled to
 			 * imply the current line.
 			 */
-			motion_method = @"current_line";
+			motion_method = @"current_line:";
 		}
 		else
 		{
 			// should print "X may not be used as a motion command"
-			method = @"nonmotion";
+			method = @"nonmotion:";
 		}
 		[self setComplete];
 	}

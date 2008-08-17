@@ -204,6 +204,21 @@
 	return YES;
 }
 
+/* syntax: [buffer][count]s */
+- (BOOL)substitute:(ViCommand *)command
+{
+	NSUInteger eol;
+	[self getLineStart:NULL end:NULL contentsEnd:&eol];
+	NSUInteger c = command.count;
+	if(command.count == 0)
+		c = 1;
+	if(start_location + c >= eol)
+		c = eol - start_location;
+	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, c)];
+	[self setInsertMode];
+	return YES;
+}
+
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {

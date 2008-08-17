@@ -61,6 +61,7 @@
 - (void)test052_DeleteWordForward3		{ TEST(@"abc def", 4, @"dw", @"abc ", 3); }
 - (void)test053_DeleteWordForwardAtEol		{ TEST(@"abc def\nghi", 4, @"dw", @"abc \nghi", 3); }
 - (void)test054_DeleteWordForwardAtEmptyLine	{ TEST(@"\nabc", 0, @"dw", @"abc", 0); }
+- (void)test055_DeleteWordForwardToNonword	{ TEST(@"abc:def", 0, @"dw", @":def", 0); }
 
 - (void)test060_GotoColumnZero			{ MOVE(@"abc def", 4, @"0", 0); }
 - (void)test061_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
@@ -135,5 +136,17 @@
 - (void)test140_BigwordForward			{ MOVE(@"abc=def ghi", 0, @"W", 8); }
 - (void)test141_BigwordForwardSpace		{ MOVE(@"abc     ghi", 3, @"W", 8); }
 - (void)test142_BigwordBackward			{ MOVE(@"abc=def ghi", 8, @"B", 0); }
+- (void)test143_DeleteBigwordBackward		{ TEST(@"abc=def ghi", 8, @"dB", @"ghi", 0); }
+
+- (void)test150_EndOfWord			{ MOVE(@"abc def", 0, @"e", 2); }
+- (void)test151_EndOfWordFromBlanks		{ MOVE(@"   abc def", 0, @"e", 5); }
+- (void)test152_EndOfWordToNonword		{ MOVE(@"a_b() def", 0, @"e", 2); }
+- (void)test153_EndOfWordFromNonword		{ MOVE(@"a_b() def", 3, @"e", 4); }
+- (void)test154_DeleteToEndOfWordToNonword	{ TEST(@"abc:def", 0, @"de", @":def", 0); }
+- (void)test155_EndOfBigword			{ MOVE(@"abc:def ghi", 0, @"E", 6); }
+- (void)test156_EndOfBigwordFromBlanks		{ MOVE(@"   abc:def ghi", 0, @"E", 9); }
+- (void)test156_EndOfBigwordFromNonword		{ MOVE(@"abc:def ghi", 3, @"E", 6); }
+- (void)test157_DeleteToEndOfBigwordToNonword	{ TEST(@"abc:def ghi", 0, @"dE", @" ghi", 0); }
+- (void)test158_DeleteToEndOfWordFromBlanks	{ TEST(@"abc    def", 4, @"de", @"abc ", 3); }
 
 @end

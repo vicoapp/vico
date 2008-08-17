@@ -725,15 +725,18 @@
 	NSString *s = [storage string];
 	unichar ch = [s characterAtIndex:start_location];
 
-	if(command.key == 'w' && [wordSet characterIsMember:ch])
+	BOOL bigword = (command.ismotion ? command.key == 'W' : command.motion_key == 'W');
+
+	if(!bigword && [wordSet characterIsMember:ch])
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
+		NSLog(@"from word char: %u -> %u", start_location, end_location);
 	}
 	else if(![whitespace characterIsMember:ch])
 	{
 		// inside non-word-chars
-		end_location = [self skipCharactersInSet:command.key == 'w' ? nonWordSet : [whitespace invertedSet] fromLocation:start_location backward:NO];
+		end_location = [self skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:start_location backward:NO];
 	}
 	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
 	{
@@ -808,7 +811,9 @@
 	}
 	ch = [s characterAtIndex:end_location];
 
-	if(command.key == 'B')
+	BOOL bigword = (command.ismotion ? command.key == 'B' : command.motion_key == 'B');
+
+	if(bigword)
 	{
 		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:YES];
 		if([whitespace characterIsMember:[s characterAtIndex:end_location]])
@@ -827,6 +832,60 @@
 		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:YES];
 		if([wordSet characterIsMember:[s characterAtIndex:end_location]])
 			end_location++;
+	}
+
+	final_location = end_location;
+	return YES;
+}
+
+- (BOOL)end_of_word:(ViCommand *)command
+{
+	if([storage length] == 0)
+	{
+		[[self delegate] message:@"Empty file"];
+		return NO;
+	}
+	NSString *s = [storage string];
+	end_location = start_location + 1;
+	unichar ch = [s characterAtIndex:end_location];
+
+	/* From nvi:
+         * !!!
+         * If in whitespace, or the next character is whitespace, move past
+         * it.  (This doesn't count as a word move.)  Stay at the character
+         * past the current one, it sets word "state" for the 'e' command.
+         */
+	if([whitespace characterIsMember:ch])
+	{
+		end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
+		if(end_location == [s length])
+		{
+			final_location = end_location;
+			return YES;
+		}
+	}
+
+	BOOL bigword = (command.ismotion ? command.key == 'E' : command.motion_key == 'E');
+
+	ch = [s characterAtIndex:end_location];
+	if(bigword)
+	{
+		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:NO];
+		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+			end_location--;
+	}
+	else if([wordSet characterIsMember:ch])
+	{
+		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:NO];
+		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+			end_location--;
+	}
+	else
+	{
+		// inside non-word-chars
+		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:NO];
+		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+			end_location--;
 	}
 
 	final_location = end_location;

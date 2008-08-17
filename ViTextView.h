@@ -34,6 +34,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	/* syntax highlighting */
 	ViTheme *theme;
+	NSDictionary *bundle;
 	ViLanguage *language;
 
 	NSString *lastSearchPattern;

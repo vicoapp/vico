@@ -4,8 +4,12 @@
 @interface ViLanguageStore : NSObject
 {
 	NSMutableDictionary *languages;
+	NSMutableArray *bundles;
+	NSMutableDictionary *allSmartTypingPairs;
 }
 + (ViLanguageStore *)defaultStore;
-- (ViLanguage *)languageForFilename:(NSString *)aPath;
+- (NSDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
+- (NSMutableDictionary *)allSmartTypingPairs;
+
 @end

@@ -2,6 +2,7 @@
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
 #import "MyDocument.h"  // for declaration of the message: method
+#import "NSString-scopeSelector.h"
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -45,8 +46,6 @@
 			 @"input_newline:", @"\n",
 			 @"input_backspace:", @"\x7f",
 			 @"input_backspace:", @"\x08", // ^h
-			 @"input_smart_pair:", @"(",
-			 @"input_smart_pair:", @")",
 			 nil];
 
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
@@ -66,9 +65,8 @@
 
 - (void)setFilename:(NSURL *)aURL
 {
-	language = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
+	bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
 	[language patterns];
-	// preferences = [ViPreferences preferencesForScope:[language name]];
 }
 
 - (BOOL)illegal:(ViCommand *)command
@@ -1373,6 +1371,38 @@
 	return [self insertNewlineAtLocation:start_location indentForward:YES];
 }
 
+- (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
+{
+	NSMutableArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+							 atCharacterIndex:aLocation
+						    longestEffectiveRange:NULL
+								  inRange:NSMakeRange(aLocation, 1)];
+	NSLog(@"found scopes at location %u: [%@]", aLocation, scopes);
+
+	NSArray *allSmartTypingPairs = [[[ViLanguageStore defaultStore] allSmartTypingPairs] allKeys];
+
+	NSString *foundScopeSelector = nil;
+	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
+	for(scopeSelector in allSmartTypingPairs)
+	{
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if(rank > highest_rank)
+		{
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
+		}
+	}
+
+	if(foundScopeSelector)
+	{
+		NSLog(@"found smart typing pair scope selector %@ at location %i", foundScopeSelector, aLocation);
+		return [[[ViLanguageStore defaultStore] allSmartTypingPairs] objectForKey:foundScopeSelector];
+	}
+
+	return nil;
+}
+
 - (NSUInteger)input_backspace:(NSString *)characters
 {
 	if(start_location == insert_start_location)
@@ -1382,46 +1412,33 @@
 	}
 
 	/* check if we're deleting the first character in a smart pair */
-	if([[storage string] characterAtIndex:start_location - 1] == '(' && [[storage string] characterAtIndex:start_location] == ')')
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
+	NSArray *pair;
+	for(pair in smartTypingPairs)
 	{
-		[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 2)];
-		insert_end_location -= 2;
+		if([[pair objectAtIndex:0] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
+		   [[pair objectAtIndex:1] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)]])
+		{
+			[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 2)];
+			insert_end_location -= 2;
+			return -1;
+		}
 	}
-	else
-	{
-		[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
-		insert_end_location--;
-	}
+
+	/* else a regular character, just delete it */
+	[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
+	insert_end_location--;
 
 	return -1;
-}
-
-- (NSUInteger)input_smart_pair:(NSString *)characters
-{
-	if([characters isEqualToString:@"("])
-	{
-		[self insertString:@"()" atLocation:start_location];
-		insert_end_location += 2;
-		return 1;
-	}
-	else if([characters isEqualToString:@")"])
-	{
-		if([[storage string] characterAtIndex:start_location] == ')')
-			return 1;
-	}
-
-	return 0;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-#if 1
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X (0x%04X)",
-	      [theEvent charactersIgnoringModifiers],
+	      [theEvent characters],
 	      charcode,
-	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask)) >> 17));
-#endif
+	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17));
 
 	if(mode == ViInsertMode)
 	{
@@ -1453,7 +1470,7 @@
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
-		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask)) >> 17) == 0)
+		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17) == 0)
 		{
 			/* handle keys with no modifiers, or with shift, caps lock or control modifier */
 
@@ -1478,9 +1495,41 @@
 				}
 				else
 				{
-					[self insertString:[theEvent characters] atLocation:start_location];
-					insert_end_location += [[theEvent characters] length];
-					num_chars = [[theEvent characters] length];
+					BOOL foundSmartTypingPair = NO;
+					NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
+					if(smartTypingPairs)
+					{
+						NSArray *pair;
+						for(pair in smartTypingPairs)
+						{
+							NSLog(@"checking pair %@ and %@", [pair objectAtIndex:0], [pair objectAtIndex:1]);
+							if([[pair objectAtIndex:0] isEqualToString:[theEvent characters]])
+							{
+								foundSmartTypingPair = YES;
+								[self insertString:[pair objectAtIndex:0] atLocation:start_location];
+								[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+								insert_end_location += 2;
+								num_chars = 1;
+								break;
+							}
+							else if([[pair objectAtIndex:1] isEqualToString:[theEvent characters]])
+							{
+								if([[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+								{
+									foundSmartTypingPair = YES;
+									num_chars = 1;
+								}
+								break;
+							}
+						}
+					}
+
+					if(!foundSmartTypingPair)
+					{
+						[self insertString:[theEvent characters] atLocation:start_location];
+						insert_end_location += [[theEvent characters] length];
+						num_chars = [[theEvent characters] length];
+					}
 				}
 			}
 

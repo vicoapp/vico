@@ -1,11 +1,11 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 
-//#define DEBUG(fmt, ...)
-#define DEBUG(fmt, ...) do { \
+#define DEBUG(fmt, ...)
+/*#define DEBUG(fmt, ...) do { \
 	NSString *ws = [@"" stringByPaddingToLength:indent*2 withString:@" " startingAtIndex:0]; \
 	NSLog([NSString stringWithFormat:@"%@%@", ws, fmt], ## __VA_ARGS__); \
-} while(0)
+} while(0)*/
 
 @interface ViSyntaxMatch : NSObject
 {

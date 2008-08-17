@@ -67,7 +67,7 @@
 			[d removeAllObjects];
 			continue;
 		}
-		NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
+		//NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
 		[self compileRegexp:@"match" inPattern:d];
 		[self compileRegexp:@"begin" inPattern:d];
 		[self compileRegexp:@"end" inPattern:d];
@@ -86,11 +86,8 @@
 
 - (void)compile
 {
-	NSLog(@"== compiling base language patterns");
 	[self compilePatterns:languagePatterns];
-	NSLog(@"== compiling repository patterns");
 	[self compilePatterns:[[language objectForKey:@"repository"] allValues]];
-	NSLog(@"== done compiling language");
 	compiled = YES;
 }
 
@@ -167,7 +164,7 @@
 		{
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
-			NSLog(@"including [%@] from repository of language %@", patternName, [self name]);
+			//NSLog(@"including [%@] from repository of language %@", patternName, [self name]);
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
 			if(includePattern)
 			{

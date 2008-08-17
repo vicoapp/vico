@@ -16,7 +16,8 @@
 		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
-		9A1A12240D02CFCF009EABAC /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
+		9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
+		9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
 		9A668DEB0D1088F6003FABD9 /* Mac Classic.tmTheme in Resources */ = {isa = PBXBuildFile; fileRef = 9A668DEA0D1088F6003FABD9 /* Mac Classic.tmTheme */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
@@ -111,6 +112,8 @@
 		9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViCommandParser.m; sourceTree = "<group>"; };
 		9A1A13B60D044131009EABAC /* TestViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViTextView.h; sourceTree = "<group>"; };
 		9A1A13B70D044131009EABAC /* TestViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextView.m; sourceTree = "<group>"; };
+		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
+		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A668DEA0D1088F6003FABD9 /* Mac Classic.tmTheme */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Mac Classic.tmTheme"; sourceTree = "<group>"; };
 		9A668E0F0D1116FC003FABD9 /* ViTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTheme.h; sourceTree = "<group>"; };
 		9A668E100D1116FC003FABD9 /* ViTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTheme.m; sourceTree = "<group>"; };
@@ -285,6 +288,8 @@
 				9A1A13B70D044131009EABAC /* TestViTextView.m */,
 				9A8CC8D50D24EBA1001EE32A /* TestScopeSelectors.h */,
 				9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */,
+				9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */,
+				9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */,
 			);
 			name = "Test Cases";
 			sourceTree = "<group>";
@@ -504,9 +509,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A1A12240D02CFCF009EABAC /* TestViCommandParser.m in Sources */,
 				9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */,
 				9A8CC8E40D24ED47001EE32A /* TestScopeSelectors.m in Sources */,
+				9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */,
+				9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

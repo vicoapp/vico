@@ -12,10 +12,12 @@
 @interface ExCommand : NSObject
 {
 	NSString *command;
+	NSString *method;
 }
 
 - (ExCommand *)initWithString:(NSString *)string;
 
 @property(readonly) NSString *command;
+@property(readonly) NSString *method;
 
 @end

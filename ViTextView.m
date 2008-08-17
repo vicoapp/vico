@@ -678,7 +678,10 @@
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(start_location < eol)
-		final_location = end_location = start_location + 1;
+	{
+		start_location += 1;
+		final_location = end_location = start_location;
+	}
 	return [self insert:command];
 }
 
@@ -1264,7 +1267,7 @@
 {
 	if(command.text)
 	{
-		NSLog(@"replaying inserted text [%@]", command.text);
+		NSLog(@"replaying inserted text [%@] at %u", command.text, end_location);
 		[self insertString:command.text atLocation:end_location];
 		final_location = end_location + [command.text length];
 		[self recordInsertInRange:NSMakeRange(end_location, [command.text length])];
@@ -1275,9 +1278,9 @@
 	}
 	else
 	{
-		NSLog(@"entering insert mode");
+		NSLog(@"entering insert mode at location %u", end_location);
 		mode = ViInsertMode;
-		insert_start_location = insert_end_location = [self caret];
+		insert_start_location = insert_end_location = end_location;
 	}
 }
 
@@ -1366,9 +1369,10 @@
 	}
 }
 
-- (NSUInteger)input_newline:(NSString *)characters
+- (void)input_newline:(NSString *)characters
 {
-	return [self insertNewlineAtLocation:start_location indentForward:YES];
+	[self insertNewlineAtLocation:start_location indentForward:YES];
+	[self setCaret:start_location + 1];
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
@@ -1403,12 +1407,12 @@
 	return nil;
 }
 
-- (NSUInteger)input_backspace:(NSString *)characters
+- (void)input_backspace:(NSString *)characters
 {
 	if(start_location == insert_start_location)
 	{
 		[[self delegate] message:@"No more characters to erase"];
-		return 0;
+		return;
 	}
 
 	/* check if we're deleting the first character in a smart pair */
@@ -1421,7 +1425,8 @@
 		{
 			[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 2)];
 			insert_end_location -= 2;
-			return -1;
+			[self setCaret:start_location - 1];
+			return;
 		}
 	}
 
@@ -1429,7 +1434,48 @@
 	[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
 	insert_end_location--;
 
-	return -1;
+	[self setCaret:start_location - 1];
+}
+
+/* Input a character from the user (in insert mode). Handle smart typing pairs.
+ * FIXME: assumes smart typing pairs are single characters.
+ */
+- (void)inputCharacters:(NSString *)characters
+{
+	BOOL foundSmartTypingPair = NO;
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
+	if(smartTypingPairs)
+	{
+		NSArray *pair;
+		for(pair in smartTypingPairs)
+		{
+			// NSLog(@"checking pair %@ and %@", [pair objectAtIndex:0], [pair objectAtIndex:1]);
+			if([[pair objectAtIndex:1] isEqualToString:characters] &&
+			   [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+			{
+				foundSmartTypingPair = YES;
+				[self setCaret:start_location + 1];
+				break;
+			}
+			else if([[pair objectAtIndex:0] isEqualToString:characters])
+			{
+				foundSmartTypingPair = YES;
+				[self insertString:[pair objectAtIndex:0] atLocation:start_location];
+				[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+
+				insert_end_location += 2;
+				[self setCaret:start_location + 1];
+				break;
+			}
+		}
+	}
+	
+	if(!foundSmartTypingPair)
+	{
+		[self insertString:characters atLocation:start_location];
+		insert_end_location += [characters length];
+		[self setCaret:start_location + [characters length]];
+	}
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1472,18 +1518,16 @@
 		}
 		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17) == 0)
 		{
-			/* handle keys with no modifiers, or with shift, caps lock or control modifier */
+			/* handle keys with no modifiers, or with shift, caps lock, control or alt modifier */
 
 			NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
 			start_location = [self caret];
 
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
 			NSString *inputCommand = [inputCommands objectForKey:[theEvent characters]];
-			int num_chars = 0;
 			if(inputCommand)
 			{
-				num_chars = (NSInteger)[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
-				// FIXME: insertNewlineAtLocation: adds the newline and autoindented whitespace to insertedText itself...
+				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
 			}
 			else
 			{
@@ -1495,49 +1539,13 @@
 				}
 				else
 				{
-					BOOL foundSmartTypingPair = NO;
-					NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
-					if(smartTypingPairs)
-					{
-						NSArray *pair;
-						for(pair in smartTypingPairs)
-						{
-							NSLog(@"checking pair %@ and %@", [pair objectAtIndex:0], [pair objectAtIndex:1]);
-							if([[pair objectAtIndex:0] isEqualToString:[theEvent characters]])
-							{
-								foundSmartTypingPair = YES;
-								[self insertString:[pair objectAtIndex:0] atLocation:start_location];
-								[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
-								insert_end_location += 2;
-								num_chars = 1;
-								break;
-							}
-							else if([[pair objectAtIndex:1] isEqualToString:[theEvent characters]])
-							{
-								if([[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
-								{
-									foundSmartTypingPair = YES;
-									num_chars = 1;
-								}
-								break;
-							}
-						}
-					}
-
-					if(!foundSmartTypingPair)
-					{
-						[self insertString:[theEvent characters] atLocation:start_location];
-						insert_end_location += [[theEvent characters] length];
-						num_chars = [[theEvent characters] length];
-					}
+					[self inputCharacters:[theEvent characters]];
 				}
 			}
-
-			[self setCaret:start_location + num_chars];
 		}
 		else
 		{
-			/* command, option (alt) or function modifier keys */
+			/* command or other function keys */
 			[super keyDown:theEvent];
 		}
 	}
@@ -1550,9 +1558,9 @@
 		if(parser.complete)
 		{
 			[[self delegate] message:@""]; // erase any previous message
-			[[self textStorage] beginEditing];
+			[storage beginEditing];
 			[self evaluateCommand:parser];
-			[[self textStorage] endEditing];
+			[storage endEditing];
 			[self setCaret:final_location];
 			if(need_scroll)
 				[self scrollRangeToVisible:NSMakeRange(final_location, 0)];

@@ -104,4 +104,16 @@
 - (void)test110_MoveDown			{ MOVE(@"abc\ndef", 1, @"j", 5); }
 //- (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
 
+// The Join command is a mess of special cases...
+- (void)test120_JoinLines			{ TEST(@"abc\ndef", 0, @"J", @"abc def", 3); }
+- (void)test121_JoinLinesWithWhitespace		{ TEST(@"abc\n\t  def", 0, @"J", @"abc def", 3); }
+- (void)test122_JoinEmptyLine			{ TEST(@"abc\n\ndef", 0, @"J", @"abc\ndef", 2); }
+- (void)test123_JoinFromEmptyLine		{ TEST(@"\ndef", 0, @"J", @"def", 2); }
+- (void)test123_JoinFromEmptyLine2		{ TEST(@"\r\ndefghi", 0, @"J", @"defghi", 5); }
+- (void)test124_JoinFromLineEndingWithSpaces	{ TEST(@"abc   \ndef", 0, @"J", @"abc   def", 5); }
+- (void)test125_JoinFromFinishedSentence	{ TEST(@"abc.\ndef", 0, @"J", @"abc.  def", 4); }
+- (void)test125_JoinFromFinishedSentence2	{ TEST(@"abc!\n  def", 0, @"J", @"abc!  def", 4); }
+- (void)test125_JoinFromFinishedSentence3	{ TEST(@"abc?\n   def", 0, @"J", @"abc?  def", 4); }
+- (void)test126_JoinLineStartingWithParen	{ TEST(@"abc\n)def", 0, @"J", @"abc)def", 2); }
+
 @end

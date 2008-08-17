@@ -5,6 +5,7 @@
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
 - (void)disableWrapping;
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 @end
 
 @implementation ViTextView
@@ -205,6 +206,83 @@
 - (BOOL)insert:(ViCommand *)command
 {
 	[self setInsertMode];
+	return YES;
+}
+
+/* syntax: [count]J */
+- (BOOL)join:(ViCommand *)command
+{
+	NSUInteger bol, eol, end;
+	[self getLineStart:&bol end:&end contentsEnd:&eol];
+	if(end == eol)
+	{
+		NSLog(@"No following lines to join");
+		return NO;
+	}
+
+	/* From nvi:
+	 * Historic practice:
+	 *
+	 * If force specified, join without modification.
+	 * If the current line ends with whitespace, strip leading
+	 *    whitespace from the joined line.
+	 * If the next line starts with a ), do nothing.
+	 * If the current line ends with ., insert two spaces.
+	 * Else, insert one space.
+	 *
+	 * One change -- add ? and ! to the list of characters for
+	 * which we insert two spaces.  I expect that POSIX 1003.2
+	 * will require this as well.
+	 */
+
+	/* From nvi:
+	 * Historic practice for vi was to put the cursor at the first
+	 * inserted whitespace character, if there was one, or the
+	 * first character of the joined line, if there wasn't, or the
+	 * last character of the line if joined to an empty line.  If
+	 * a count was specified, the cursor was moved as described
+	 * for the first line joined, ignoring subsequent lines.  If
+	 * the join was a ':' command, the cursor was placed at the
+	 * first non-blank character of the line unless the cursor was
+	 * "attracted" to the end of line when the command was executed
+	 * in which case it moved to the new end of line.  There are
+	 * probably several more special cases, but frankly, my dear,
+	 * I don't give a damn.  This implementation puts the cursor
+	 * on the first inserted whitespace character, the first
+	 * character of the joined line, or the last character of the
+	 * line regardless.  Note, if the cursor isn't on the joined
+	 * line (possible with : commands), it is reset to the starting
+	 * line.
+	 */
+
+	NSUInteger end2, eol2;
+	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
+	NSLog(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
+
+	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[storage string] characterAtIndex:eol-1]])
+	{
+		/* From nvi: Empty lines just go away. */
+		[[storage mutableString] deleteCharactersInRange:NSMakeRange(eol, end - eol) ];
+		if(bol == eol)
+			final_location = IMAX(bol, eol2 - 1 - (end - eol));
+		else
+			final_location = IMAX(bol, eol - 1);
+	}
+	else
+	{
+		final_location = eol;
+		NSString *joinPadding = @" ";
+		if([[NSCharacterSet characterSetWithCharactersInString:@".!?"] characterIsMember:[[storage string] characterAtIndex:eol-1]])
+			joinPadding = @"  ";
+		else if([[storage string] characterAtIndex:end] == ')')
+		{
+			final_location = eol - 1;
+			joinPadding = @"";
+		}
+		NSUInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
+		[[storage mutableString] replaceCharactersInRange:NSMakeRange(eol, sol2 - eol) withString:joinPadding];
+	}
+
 	return YES;
 }
 
@@ -441,15 +519,31 @@
 	return YES;
 }
 
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
 {
 	NSString *s = [storage string];
 	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
 				       options:backwardFlag ? NSBackwardsSearch : 0
-					 range:backwardFlag ? NSMakeRange(0, startLocation + 1) : NSMakeRange(startLocation, [s length] - startLocation)];
-	if(backwardFlag && r.location == NSNotFound)
-		return 0;
+					 range:backwardFlag ? NSMakeRange(toLocation, startLocation - toLocation + 1) : NSMakeRange(startLocation, toLocation - startLocation)];
+	if(r.location == NSNotFound)
+		return backwardFlag ? toLocation : toLocation; // FIXME: this is strange...
 	return r.location;
+}
+
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag
+{
+	return [self skipCharactersInSet:characterSet
+				    from:startLocation
+				      to:backwardFlag ? 0 : [storage length]
+				backward:backwardFlag];
+}
+
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation
+{
+	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
+				    from:startLocation
+				      to:toLocation
+				backward:NO];
 }
 
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation
@@ -596,15 +690,7 @@
 	if([whitespace characterIsMember:ch])
 	{
 		// skip leading whitespace
-		// FIXME: refactor, new method skipWhitespaceFrom:to:
-		NSCharacterSet *nonWhitespace = [whitespace invertedSet];
-		NSRange r = [s rangeOfCharacterFromSet:nonWhitespace
-					       options:0
-						 range:NSMakeRange(bol, eol - bol)];
-		if(r.location == NSNotFound)
-			end_location = eol;
-		else
-			end_location = r.location;
+		end_location = [self skipWhitespaceFrom:bol toLocation:eol];
 	}
 	else
 		end_location = bol;

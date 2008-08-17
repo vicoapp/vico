@@ -14,6 +14,9 @@
 - (void)setEndMatch:(OGRegularExpressionMatch *)aMatch;
 - (NSString *)scope;
 - (NSRange)matchedRange;
+- (NSDictionary *)pattern;
+- (OGRegularExpressionMatch *)beginMatch;
+- (OGRegularExpressionMatch *)endMatch;
 @end
 
 @implementation ViSyntaxMatch
@@ -65,6 +68,18 @@
 	}
 	return range;
 }
+- (NSDictionary *)pattern
+{
+	return pattern;
+}
+- (OGRegularExpressionMatch *)beginMatch
+{
+	return beginMatch;
+}
+- (OGRegularExpressionMatch *)endMatch
+{
+	return endMatch;
+}
 @end
 
 @implementation ViTextView (syntax)
@@ -75,72 +90,17 @@
 	{
 		syntax_initialized = YES;
 
-		NSString *path = [[NSBundle mainBundle] pathForResource:@"Objective-C" ofType:@"tmLanguage"];
-		language = [NSMutableDictionary dictionaryWithContentsOfFile:path];
-		// NSLog(@"%s language = %@", _cmd, language);
+		theme = [[ViTheme alloc] initWithBundle:@"Mac Classic"];
+		NSLog(@"theme = %@", theme);
 
-		languagePatterns = [language objectForKey:@"patterns"];
-		NSLog(@"%s got %i patterns", _cmd, [languagePatterns count]);
-		NSMutableDictionary *d;
-		for(d in languagePatterns)
-		{
-			NSLog(@"%s got pattern for scope [%@]", _cmd, [d objectForKey:@"name"]);
-			if([d objectForKey:@"match"])
-				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"match"]] forKey:@"matchRegexp"];
-			if([d objectForKey:@"begin"])
-				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"begin"]] forKey:@"beginRegexp"];
-			if([d objectForKey:@"end"])
-				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"end"]] forKey:@"endRegexp"];
-			//NSLog(@"%s %@", _cmd, d);
-		}
-
-		path = [[NSBundle mainBundle] pathForResource:@"Mac Classic" ofType:@"tmTheme"];
-		theme = [NSDictionary dictionaryWithContentsOfFile:path];
-		//NSLog(@"%s theme = %@", _cmd, theme);
-		
-		
-		
-		themeAttributes = [[NSMutableDictionary alloc] init];
-		NSArray *settings = [theme objectForKey:@"settings"];
-		NSDictionary *setting;
-		for(setting in settings)
-		{
-			NSString *scope = [setting objectForKey:@"scope"];
-			NSArray *scope_selectors = [scope componentsSeparatedByString:@", "];
-			NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
-			if(foreground == nil)
-				continue;
-			//NSLog(@"%s saving foreground color %@", _cmd, foreground);
-			int r, g, b;
-			if(sscanf([foreground UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
-				continue;
-			NSColor *fgColor = [NSColor colorWithDeviceRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
-			NSDictionary *attrs = [NSDictionary dictionaryWithObject:fgColor forKey:NSForegroundColorAttributeName];
-			for(scope in scope_selectors)
-			{
-				[themeAttributes setObject:attrs forKey:scope];
-				NSLog(@"%s  %@ = %@", _cmd, scope, fgColor);
-			}
-		}
+		language = [[ViLanguage alloc] initWithBundle:@"HTML"];
+		NSLog(@"ViLanguage = %@", language);
 	}
-}
-
-- (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector
-{
-	NSString *scope;
-	for(scope in [themeAttributes allKeys])
-	{
-		if([aScopeSelector hasPrefix:scope])
-		{
-			return [themeAttributes objectForKey:scope];
-		}
-	}
-	return nil;
 }
 
 - (void)highlightMatches:(NSArray *)matches forScope:(NSString *)aScopeSelector
 {
-	NSDictionary *attributes = [self attributeForScopeSelector:aScopeSelector];
+	NSDictionary *attributes = [theme attributeForScopeSelector:aScopeSelector];
 	OGRegularExpressionMatch *match;
 	for(match in matches)
 	{
@@ -151,13 +111,13 @@
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch toEnd:(NSUInteger)aLocation
 {
-	[[self layoutManager] addTemporaryAttributes:[self attributeForScopeSelector:[aMatch scope]]
-				   forCharacterRange:NSMakeRange([aMatch beginLocation], aLocation)];
+	[[self layoutManager] addTemporaryAttributes:[theme attributeForScopeSelector:[aMatch scope]]
+				   forCharacterRange:NSMakeRange([aMatch beginLocation], aLocation - [aMatch beginLocation])];
 }
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch
 {
-	[[self layoutManager] addTemporaryAttributes:[self attributeForScopeSelector:[aMatch scope]]
+	[[self layoutManager] addTemporaryAttributes:[theme attributeForScopeSelector:[aMatch scope]]
 				   forCharacterRange:[aMatch matchedRange]];
 }
 
@@ -166,7 +126,7 @@
 	//NSLog(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
 
 	NSDictionary *pattern;
-	for(pattern in languagePatterns)
+	for(pattern in [language patterns])
 	{
 		if([pattern objectForKey:@"matchRegexp"])
 		{
@@ -177,18 +137,45 @@
 	}
 }
 
+- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch
+{
+	NSDictionary *beginCaptures = [[aMatch pattern] objectForKey:@"beginCaptures"];
+	if(beginCaptures == nil)
+		beginCaptures = [[aMatch pattern] objectForKey:@"captures"];
+	if(beginCaptures)
+	{
+		//NSLog(@"captures = %@", beginCaptures);
+		NSString *key;
+		OGRegularExpressionMatch *beginMatch = [aMatch beginMatch];
+		for(key in [beginCaptures allKeys])
+		{
+			NSLog(@"  found begin capture %i [%@]", [key intValue], [beginMatch substringAtIndex:[key intValue]]);
+			NSDictionary *capture = [beginCaptures objectForKey:key];
+			NSDictionary *attributes = [theme attributeForScopeSelector:[capture objectForKey:@"name"]];
+			if(attributes)
+			{
+				NSLog(@"  highlighting begin capture [%@] as [%@]", [beginMatch substringAtIndex:[key intValue]], [capture objectForKey:@"name"]);
+				[[self layoutManager] addTemporaryAttributes:attributes
+							   forCharacterRange:[beginMatch rangeOfSubstringAtIndex:[key intValue]]];
+			}
+		}
+	}
+}
+
 - (NSUInteger)highlightLineInRange:(NSRange)aRange
 {
-	//NSLog(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
+	NSString *line = [[storage string] substringWithRange:aRange];
+	NSLog(@"%s range = %u + %u => (%@)", _cmd, aRange.location, aRange.length, line);
 
 	NSMutableArray *matchingMultilinePatterns = [[NSMutableArray alloc] init];
 	NSDictionary *pattern;
-	for(pattern in languagePatterns)
+	for(pattern in [language patterns])
 	{
-		if([pattern objectForKey:@"beginRegexp"] && [pattern objectForKey:@"scope"])
+		if([pattern objectForKey:@"beginRegexp"])
 		{
 			OGRegularExpression *beginRegexp = [pattern objectForKey:@"beginRegexp"];
 			NSArray *matches = [beginRegexp allMatchesInString:[storage string] range:aRange];
+			NSLog(@"%i matches for begin regexp [%@]", [matches count], [pattern objectForKey:@"begin"]);
 			OGRegularExpressionMatch *match;
 			for(match in matches)
 			{
@@ -197,6 +184,7 @@
 			}
 		}
 	}
+	NSLog(@"%s sorting %u begin matches", _cmd, [matchingMultilinePatterns count]);
 	[matchingMultilinePatterns sortUsingSelector:@selector(sortByLocation:)];
 
 	ViSyntaxMatch *viMatch;
@@ -204,22 +192,23 @@
 	for(viMatch in matchingMultilinePatterns)
 	{
 		OGRegularExpression *endRegexp = [viMatch endRegexp];
-		if(endRegexp && [viMatch beginLocation] > lastLocation)
+		if(endRegexp && [viMatch beginLocation] >= lastLocation)
 		{
 			// highlight keywords between end of last match and start of this match
 			[self highlightSingleLineMatchesInRange:NSMakeRange(lastLocation, [viMatch beginLocation] - lastLocation)];
+			[self highlightBeginCapturesInMatch:viMatch];
 
 			NSRange range = aRange;
 			range.location = [viMatch beginLocation] + 1;
-			range.length = [storage length] - range.location;
+			range.length = NSMaxRange(aRange) - range.location;
 			// just get the first match
-			OGRegularExpressionMatch *endMatch = [endRegexp matchInString:[storage string] options:OgreMultilineOption range:range];
+			OGRegularExpressionMatch *endMatch = [endRegexp matchInString:[storage string] range:range];
 			[viMatch setEndMatch:endMatch];
 			if(endMatch == nil)
 			{
-				NSLog(@"%s got infinite match from %u", _cmd, [viMatch beginLocation]);
-				[self highlightMatch:viMatch toEnd:[storage length] - 1];
-				return [storage length];
+				NSLog(@"%s got match from %u to EOL (%u)", _cmd, [viMatch beginLocation], NSMaxRange(range));
+				[self highlightMatch:viMatch toEnd:NSMaxRange(range)];
+				return NSMaxRange(range);
 			}
 			else
 			{

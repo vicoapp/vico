@@ -1,6 +1,8 @@
 #import <Cocoa/Cocoa.h>
 #import <OgreKit/OgreKit.h>
 #import "ViCommand.h"
+#import "ViTheme.h"
+#import "ViLanguage.h"
 
 typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
@@ -17,10 +19,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	BOOL need_scroll;
 
 	/* syntax highlighting */
-	NSMutableDictionary *language;
-	NSMutableArray *languagePatterns;
-	NSDictionary *theme;
-	NSMutableDictionary *themeAttributes;
+	ViTheme *theme;
+	ViLanguage *language;
 	BOOL syntax_initialized;
 
 	CGFloat pageGuideX;

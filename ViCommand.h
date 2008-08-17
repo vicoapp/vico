@@ -34,6 +34,9 @@ struct vikey
 	struct vikey *dot_motion_key;
 	int dot_count;
 	int dot_motion_count;
+
+	struct vikey *last_ftFT_key;
+	unichar last_ftFT_character;
 }
 
 - (void)pushKey:(unichar)key;

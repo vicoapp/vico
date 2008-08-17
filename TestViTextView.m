@@ -83,6 +83,8 @@
 - (void)test093_MoveToCharWithCount		{ MOVE(@"abc abc abc", 0, @"2fa", 8); }
 - (void)test094_DeleteToCharWithCount		{ TEST(@"abc abc abc", 0, @"d2fa", @"bc", 0); }
 - (void)test095_DeleteTilCharWithCount		{ TEST(@"abc abc abc", 0, @"d2ta", @"abc", 0); }
+- (void)test096_RepeatMoveTilChar		{ MOVE(@"abc abc abc", 2, @"ta;", 3); }
+- (void)test097_RepeatMoveToChar		{ MOVE(@"abc abc abc", 2, @"fa;", 8); }
 
 @end
 

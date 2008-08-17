@@ -72,6 +72,19 @@ find_command(int key)
 		dot_motion_count = motion_count;
 	}
 	
+	if(command_key && (command_key->key == 't' || command_key->key == 'f' ||
+			   command_key->key == 'T' || command_key->key == 'F'))
+	{
+		last_ftFT_key = command_key;
+		last_ftFT_character = character;
+	}
+	else if(motion_key && (motion_key->key == 't' || motion_key->key == 'f' ||
+			       motion_key->key == 'T' || motion_key->key == 'F'))
+	{
+		last_ftFT_key = motion_key;
+		last_ftFT_character = character;
+	}
+	
 	if(count > 0 && motion_count > 0)
 	{
 		/* From nvi:
@@ -91,6 +104,7 @@ find_command(int key)
 	{
 		character = aKey;
 		[self setComplete];
+
 		return;
 	}
 	
@@ -123,6 +137,23 @@ find_command(int key)
 		motion_key = dot_motion_key;
 		motion_count = dot_motion_count;
 		key = dot_command_key->key;
+		[self setComplete];
+		return;
+	}
+	else if(aKey == ';' || aKey == ',')
+	{
+		if(last_ftFT_key == nil)
+		{
+			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
+		}
+		else
+		{
+			NSLog(@"repeating '%c' command for char '%c'", last_ftFT_key->key, last_ftFT_character);
+			command_key = last_ftFT_key;
+			method = last_ftFT_key->method;
+			character = last_ftFT_character;
+			key = last_ftFT_key->key;
+		}
 		[self setComplete];
 		return;
 	}

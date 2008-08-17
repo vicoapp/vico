@@ -63,6 +63,12 @@
 	return NO;
 }
 
+- (BOOL)no_previous_ftFT:(ViCommand *)command
+{
+	NSLog(@"No previous F, f, T or t search");
+	return NO;
+}
+
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
 {
 	[[storage string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];

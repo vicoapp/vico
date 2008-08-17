@@ -17,7 +17,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	BOOL need_scroll;
 
 	/* syntax highlighting */
-	NSArray *languagePatterns;
+	NSMutableDictionary *language;
+	NSMutableArray *languagePatterns;
 	NSDictionary *theme;
 	NSMutableDictionary *themeAttributes;
 	BOOL syntax_initialized;

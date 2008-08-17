@@ -37,7 +37,7 @@
 }
 - (OGRegularExpression *)endRegexp
 {
-	return [OGRegularExpression regularExpressionWithString:[pattern objectForKey:@"end"]];
+	return [pattern objectForKey:@"endRegexp"];
 }
 - (NSUInteger)beginLocation
 {
@@ -76,16 +76,22 @@
 		syntax_initialized = YES;
 
 		NSString *path = [[NSBundle mainBundle] pathForResource:@"Objective-C" ofType:@"tmLanguage"];
-		NSDictionary *language = [NSDictionary dictionaryWithContentsOfFile:path];
+		language = [NSMutableDictionary dictionaryWithContentsOfFile:path];
 		// NSLog(@"%s language = %@", _cmd, language);
 
 		languagePatterns = [language objectForKey:@"patterns"];
 		NSLog(@"%s got %i patterns", _cmd, [languagePatterns count]);
-		NSDictionary *d;
+		NSMutableDictionary *d;
 		for(d in languagePatterns)
 		{
 			NSLog(@"%s got pattern for scope [%@]", _cmd, [d objectForKey:@"name"]);
-			NSLog(@"%s %@", _cmd, d);
+			if([d objectForKey:@"match"])
+				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"match"]] forKey:@"matchRegexp"];
+			if([d objectForKey:@"begin"])
+				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"begin"]] forKey:@"beginRegexp"];
+			if([d objectForKey:@"end"])
+				[d setObject:[OGRegularExpression regularExpressionWithString:[d objectForKey:@"end"]] forKey:@"endRegexp"];
+			//NSLog(@"%s %@", _cmd, d);
 		}
 
 		path = [[NSBundle mainBundle] pathForResource:@"Mac Classic" ofType:@"tmTheme"];
@@ -104,7 +110,7 @@
 			NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
 			if(foreground == nil)
 				continue;
-			NSLog(@"%s saving foreground color %@", _cmd, foreground);
+			//NSLog(@"%s saving foreground color %@", _cmd, foreground);
 			int r, g, b;
 			if(sscanf([foreground UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
 				continue;
@@ -162,9 +168,9 @@
 	NSDictionary *pattern;
 	for(pattern in languagePatterns)
 	{
-		if([pattern objectForKey:@"match"])
+		if([pattern objectForKey:@"matchRegexp"])
 		{
-			OGRegularExpression *matchRegexp = [OGRegularExpression regularExpressionWithString:[pattern objectForKey:@"match"]];
+			OGRegularExpression *matchRegexp = [pattern objectForKey:@"matchRegexp"];
 			NSArray *matches = [matchRegexp allMatchesInString:[storage string] range:aRange];
 			[self highlightMatches:matches forScope:[pattern objectForKey:@"name"]];
 		}
@@ -179,9 +185,9 @@
 	NSDictionary *pattern;
 	for(pattern in languagePatterns)
 	{
-		if([pattern objectForKey:@"begin"] && [pattern objectForKey:@"scope"])
+		if([pattern objectForKey:@"beginRegexp"] && [pattern objectForKey:@"scope"])
 		{
-			OGRegularExpression *beginRegexp = [OGRegularExpression regularExpressionWithString:[pattern objectForKey:@"begin"]];
+			OGRegularExpression *beginRegexp = [pattern objectForKey:@"beginRegexp"];
 			NSArray *matches = [beginRegexp allMatchesInString:[storage string] range:aRange];
 			OGRegularExpressionMatch *match;
 			for(match in matches)
@@ -285,9 +291,11 @@
 
 - (void)highlightEverything
 {
-	//[storage beginEditing];
+	NSLog(@"%s begin highlighting", _cmd);
+	[storage beginEditing];
 	[self highlightInRange:NSMakeRange(0, [[storage string] length])];
-	//[storage endEditing];
+	[storage endEditing];
+	NSLog(@"%s end highlighting", _cmd);
 }
 
 @end

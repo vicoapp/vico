@@ -8,9 +8,9 @@
 	if(defaultTheme == nil)
 	{
 		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
-		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Blackboard.tmTheme"];
-		defaultTheme = [[ViTheme alloc] initWithPath:@"/Library/Application Support/TextMate/Themes/Blackboard.tmTheme"];
-		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
+		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Blackboard.tmTheme"];
+		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Library/Application Support/TextMate/Themes/Blackboard.tmTheme"];
+		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
 	}
 	return defaultTheme;
 }
@@ -83,6 +83,9 @@
 
 - (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector
 {
+	if(aScopeSelector == nil)
+		return nil;
+
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:aScopeSelector];
 	if(attributes)
 	{

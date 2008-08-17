@@ -7,4 +7,5 @@
 }
 + (ViLanguageStore *)defaultStore;
 - (ViLanguage *)languageForFilename:(NSString *)aPath;
+- (ViLanguage *)languageWithScope:(NSString *)scopeName;
 @end

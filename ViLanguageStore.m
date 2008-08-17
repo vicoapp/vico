@@ -75,4 +75,9 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
+- (ViLanguage *)languageWithScope:(NSString *)scopeName
+{
+	return [languages objectForKey:scopeName];
+}
+
 @end

@@ -1,5 +1,6 @@
 #import <OgreKit/OgreKit.h>
 #import "ViLanguage.h"
+#import "ViLanguageStore.h"
 
 @implementation ViLanguage
 
@@ -29,14 +30,12 @@
 	NSMutableDictionary *d;
 	for(d in patterns)
 	{
-		if([d objectForKey:@"name"])
-		{
-			NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
-			[self compileRegexp:@"match" inPattern:d];
-			[self compileRegexp:@"begin" inPattern:d];
-			[self compileRegexp:@"end" inPattern:d];
-			n++;
-		}
+		//NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
+		[self compileRegexp:@"match" inPattern:d];
+		[self compileRegexp:@"begin" inPattern:d];
+		[self compileRegexp:@"end" inPattern:d];
+		n++;
+
 		// recursively compile sub-patterns, if any
 		NSArray *subPatterns = [d objectForKey:@"patterns"];
 		if(subPatterns)
@@ -121,7 +120,7 @@
 
 - (NSString *)name
 {
-	return [language objectForKey:@"name"];
+	return [language objectForKey:@"scopeName"];
 }
 
 - (NSMutableDictionary *)patternForScope:(NSString *)aScopeSelector
@@ -156,20 +155,37 @@
 			if([include hasPrefix:@"#"])
 			{
 				/* fetch pattern from repository */
-				NSLog(@"including [%@] from repository", [include substringFromIndex:1]);
-				NSDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:[include substringFromIndex:1]];
+				NSString *patternName = [include substringFromIndex:1];
+				NSLog(@"including [%@] from repository", patternName);
+				NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
 				if(includePattern)
 				{
 					if([includePattern count] == 1 && [includePattern objectForKey:@"patterns"])
 					{
-						// FIXME: possible endless recursion!
-						[expandedPatterns addObjectsFromArray:[self expandedPatterns:[includePattern objectForKey:@"patterns"]]];
+						// no endless loop because expandedPatternsForPattern caches the first recursion
+						[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern]];
 					}
 					else
 						[expandedPatterns addObject:includePattern];
 				}
 				else
-					NSLog(@"pattern [%@] NOT FOUND in repository", [include substringFromIndex:1]);
+					NSLog(@"pattern [%@] NOT FOUND in repository", patternName);
+			}
+			else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
+			{
+				// no endless loop because expandedPatternsForPattern caches the first recursion
+				[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:language]];
+			}
+			else
+			{
+				/* include an external language grammar */
+				NSString *scope = include;
+				NSLog(@"including external language [%@]", scope);
+				ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:scope];
+				if(externalLanguage)
+					[expandedPatterns addObjectsFromArray:[externalLanguage patternsForScope:nil]];
+				else
+					NSLog(@"language [%@] NOT FOUND", scope);
 			}
 		}
 		else

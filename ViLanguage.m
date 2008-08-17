@@ -131,7 +131,7 @@
 		return d;
 
 	// walk through all patterns and match the scope selector
-	for(d in languagePatterns)
+	for(d in [self expandedPatternsForPattern:language])
 	{
 		if([[d objectForKey:@"name"] isEqualToString:aScopeSelector])
 		{

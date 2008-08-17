@@ -1,6 +1,9 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 
+//#define DEBUG(...)
+#define DEBUG NSLog
+
 @interface ViSyntaxMatch : NSObject
 {
 	OGRegularExpressionMatch *beginMatch;
@@ -142,7 +145,7 @@
 	if(!syntax_initialized)
 	{
 		syntax_initialized = YES;
-		NSLog(@"ViLanguage = %@", language);
+		DEBUG(@"ViLanguage = %@", language);
 	}
 }
 
@@ -151,7 +154,7 @@
 	NSDictionary *attributes = [theme attributeForScopeSelector:[aMatch scope]];
 	if(attributes)
 	{
-		NSLog(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
+		DEBUG(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
 		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aRange];
 	}
 }
@@ -173,15 +176,13 @@
 	for(key in [captures allKeys])
 	{
 		NSDictionary *capture = [captures objectForKey:key];
-		//NSLog(@"  found %@ %i [%@] with scope [%@]",
-		//	captureType, [key intValue], [aMatch substringAtIndex:[key intValue]], [capture objectForKey:@"name"]);
 		NSDictionary *attributes = [theme attributeForScopeSelector:[capture objectForKey:@"name"]];
 		if(attributes)
 		{
 			NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
 			if(r.length > 0)
 			{
-				NSLog(@" highlighting %@ [%@] in range %u + %u", captureType, [capture objectForKey:@"name"], r.location, r.length);
+				DEBUG(@" highlighting %@ [%@] in range %u + %u", captureType, [capture objectForKey:@"name"], r.location, r.length);
 				[[self layoutManager] addTemporaryAttributes:attributes
 							   forCharacterRange:r];
 			}
@@ -211,8 +212,7 @@
 	NSArray *subPatterns = [language expandedPatternsForPattern:pattern];
 	if(subPatterns)
 	{
-		NSLog(@"  higlighting (%i) subpatterns inside [%@]", [subPatterns count], [pattern objectForKey:@"name"]);
-		//NSLog(@" subPatterns = %@", subPatterns);
+		DEBUG(@"  higlighting (%i) subpatterns inside [%@] in range %u + %u", [subPatterns count], [pattern objectForKey:@"name"], range.location, range.length);
 		return [self highlightLineInRange:range continueWithMatch:nil inScope:subPatterns];
 	}
 	return nil;
@@ -233,7 +233,7 @@
 			NSRange range;
 			range.location = [viMatch beginLocation];
 			range.length = NSMaxRange(aRange) - range.location;
-			NSLog(@"got match on [%@] from %u to EOL (%u)",
+			DEBUG(@"got match on [%@] from %u to EOL (%u)",
 			      [[viMatch pattern] objectForKey:@"name"], [viMatch beginLocation], NSMaxRange(aRange));
 			[self highlightMatch:viMatch inRange:range];
 
@@ -246,7 +246,6 @@
 		}
 		else
 		{
-			//NSLog(@"got end match for beginning [%@], endregexp=[%@]", [[viMatch beginMatch] matchedString], [[viMatch pattern] objectForKey:@"end"]);
 			[self highlightMatch:viMatch];
 			[self highlightEndCapturesInMatch:viMatch];
 			
@@ -260,16 +259,16 @@
 
 - (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch inScope:(NSArray *)patterns
 {
-	NSLog(@"-----> line range = %u + %u", aRange.location, aRange.length);
+	DEBUG(@"-----> line range = %u + %u", aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
 	// should we continue on a multi-line match?
 	if(continuedMatch)
 	{
-		NSLog(@"continuing with match [%@]", [continuedMatch scope]);
+		DEBUG(@"continuing with match [%@]", [continuedMatch scope]);
 		if([self searchEndForMatch:continuedMatch inRange:aRange] == YES)
 			return continuedMatch;
-		lastLocation = [continuedMatch endLocation] + 1; // FIXME! exclusive != 1!
+		lastLocation = [continuedMatch endLocation];
 
 		// adjust the line range
 		if(lastLocation >= NSMaxRange(aRange))
@@ -349,13 +348,20 @@
 	NSString *previousScope = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
 							  atCharacterIndex:IMAX(0, location - 1)
 							    effectiveRange:NULL];
-	NSLog(@"detected previous scope [%@] at location %u", previousScope, location);
 	if(previousScope)
 	{
 		continuedMatch = [[ViSyntaxMatch alloc] initWithMatch:nil
 							   andPattern:[language patternForScope:previousScope]
 							      atIndex:0];
+		if([continuedMatch endRegexp] == nil)
+		{
+			/* skip single-line patterns */
+			DEBUG(@"skipping previous scope [%@] (single-line) at location %u", previousScope, location);
+			DEBUG(@"continued pattern = %@", [continuedMatch pattern]);
+			return nil;
+		}
 		[continuedMatch setBeginLocation:location];
+		DEBUG(@"detected previous scope [%@] at location %u", previousScope, location);
 	}
 
 	return continuedMatch;
@@ -363,7 +369,7 @@
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
 {
-	NSLog(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
+	//DEBUG(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
 
 	if(!syntax_initialized)
 		[self initHighlighting];
@@ -427,11 +433,11 @@
 {
 	if(language == nil)
 		return;
-	NSLog(@"%s begin highlighting", _cmd);
+	DEBUG(@"%s begin highlighting", _cmd);
 	[storage beginEditing];
 	[self highlightInRange:NSMakeRange(0, [[storage string] length]) restarting:NO];
 	[storage endEditing];
-	NSLog(@"%s end highlighting", _cmd);
+	DEBUG(@"%s end highlighting", _cmd);
 }
 
 @end

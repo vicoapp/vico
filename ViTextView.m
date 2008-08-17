@@ -731,8 +731,7 @@
 - (void)setPageGuideValues
 {
 	NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[self font], NSFontAttributeName, nil];
-	NSString *sizeString = [NSString stringWithString:@" "];
-	CGFloat sizeOfCharacter = [sizeString sizeWithAttributes:sizeAttribute].width;
+	CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
 	pageGuideX = (sizeOfCharacter * (80 + 1)) - 1.5;
 	// -1.5 to put it between the two characters and draw only on one pixel and
 	// not two (as the system draws it in a special way), and that's also why the

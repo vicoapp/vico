@@ -58,6 +58,8 @@
 	if(patterns == nil)
 		return;
 
+	OGRegularExpression *hasBackRefs = [OGRegularExpression regularExpressionWithString:@"\\\\([1-9]|k<.*?>)"];
+
 	int n = 0;
 	NSMutableDictionary *d;
 	for(d in patterns)
@@ -70,7 +72,9 @@
 		//NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
 		[self compileRegexp:@"match" inPattern:d];
 		[self compileRegexp:@"begin" inPattern:d];
-		[self compileRegexp:@"end" inPattern:d];
+		if([d objectForKey:@"end"] && ![hasBackRefs matchInString:[d objectForKey:@"end"]])
+			[self compileRegexp:@"end" inPattern:d];
+		// else we must first substitute back references from the begin match before compiling end regexp
 		n++;
 
 		// recursively compile sub-patterns, if any

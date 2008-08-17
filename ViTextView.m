@@ -3,6 +3,7 @@
 #import "ViThemeStore.h"
 #import "ViEditController.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
+#import "ExCommand.h"
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -174,19 +175,19 @@
 - (void)recordInsertInRange:(NSRange)aRange
 {
 	NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
-	[[[self undoManager] prepareWithInvocationTarget:self] undoInsertInRange:aRange];
-	[[self undoManager] setActionName:@"insert text"];
+	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
+	[undoManager setActionName:@"insert text"];
 
 	if(hasBeginUndoGroup)
-		[[self undoManager] endUndoGrouping];
+		[undoManager endUndoGrouping];
 	hasBeginUndoGroup = NO;
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	NSLog(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
-	[[[self undoManager] prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
-	[[self undoManager] setActionName:@"delete text"];
+	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
+	[undoManager setActionName:@"delete text"];
 }
 
 - (void)recordDeleteOfRange:(NSRange)aRange
@@ -197,10 +198,10 @@
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
-	[[self undoManager] beginUndoGrouping];
+	[undoManager beginUndoGrouping];
 	[self recordDeleteOfRange:aRange];
 	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
-	[[self undoManager] endUndoGrouping];
+	[undoManager endUndoGrouping];
 }
 
 
@@ -340,7 +341,7 @@
 	 * as a single operation, so we begin an undo group here and end it when recording
 	 * the insert operation.
 	 */
-	[[self undoManager] beginUndoGrouping];
+	[undoManager beginUndoGrouping];
 	hasBeginUndoGroup = YES;
 	if([self delete:command])
 	{
@@ -726,7 +727,6 @@
 /* syntax: u */
 - (BOOL)vi_undo:(ViCommand *)command
 {
-	NSUndoManager *undoManager = [self undoManager];
 	if(![undoManager canUndo])
 	{
 		[[self delegate] message:@"Can't undo"];
@@ -1063,7 +1063,7 @@
 	if(lines == 0)
 		lines = 1;
 
-	[[self undoManager] beginUndoGrouping];
+	[undoManager beginUndoGrouping];
 
 	// process each line separately (remember that line mode is set)
 	NSUInteger nextLocation = affectedRange.location;
@@ -1079,7 +1079,7 @@
 			break;
 		nextLocation = end;
 	}
-	[[self undoManager] endUndoGrouping];
+	[undoManager endUndoGrouping];
 
 	end_location = final_location = start_location + 1;
 
@@ -1112,7 +1112,7 @@
 		{
 			if(!hasUndoGrouping)
 			{
-				[[self undoManager] beginUndoGrouping];
+				[undoManager beginUndoGrouping];
 				hasUndoGrouping = YES;
 			}
 			[self recordDeleteOfRange:NSMakeRange(line.location, 1)];
@@ -1126,7 +1126,7 @@
 	}
 
 	if(hasUndoGrouping)
-		[[self undoManager] endUndoGrouping];
+		[undoManager endUndoGrouping];
 
 	return YES;
 }
@@ -1134,7 +1134,12 @@
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
 	NSLog(@"should parse and execute ex command: [%@]", exCommandString);
-	//[ExCommand evaluateString:exCommandString viTextView:self];
+	if([exCommandString length] > 0)
+	{
+		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
+		NSLog(@"got ex [%@], command = [%@]", ex, [ex command]);
+		[[self delegate] message:@"The %@ command is unknown.", [ex command]];
+	}
 }
 
 - (BOOL)ex_command:(ViCommand *)command

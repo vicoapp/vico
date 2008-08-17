@@ -25,6 +25,11 @@
 	return self;
 }
 
+- (void)setDelegate:(id)aDelegate
+{
+	delegate = aDelegate;
+}
+
 - (NSView *)view
 {
 	return view;
@@ -52,17 +57,19 @@
 	va_start(ap, fmt);
 	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
 	va_end(ap);
-	
+
+	NSLog(@"message: [%@]", msg);
 	[statusbar setStringValue:msg];
 }
 
 - (IBAction)finishedExCommand:(id)sender
 {
-	NSLog(@"got ex command? [%@]", [statusbar stringValue]);
-	[textView performSelector:exCommandSelector withObject:[statusbar stringValue]];
+	NSString *exCommand = [statusbar stringValue];
+	NSLog(@"got ex command? [%@]", exCommand);
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
-	// [editWindow makeFirstResponder:textView];
+	[[delegate window] makeFirstResponder:textView];
+	[textView performSelector:exCommandSelector withObject:exCommand];
 }
 
 /* FIXME: should probably subclass NSTextField to disallow losing focus due to tabbing or clicking outside.
@@ -74,12 +81,7 @@
 	[statusbar setEditable:YES];
 	[statusbar setDelegate:self];
 	exCommandSelector = aSelector;
-	// [editWindow makeFirstResponder:statusbar];
-}
-
-- (BOOL)tabView:(NSTabView *)tabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
-{
-	return NO;
+	[[delegate window] makeFirstResponder:statusbar];
 }
 
 - (NSUndoManager *)undoManager

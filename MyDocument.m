@@ -34,6 +34,7 @@
 	// add the first editor view
 	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
 	[editor setFilename:[self fileURL]];
+	[editor setDelegate:self];
 
 	// create a new tab
 	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
@@ -89,6 +90,7 @@
 	NSTabViewItem *item;
 	for(item in [tabView tabViewItems])
 	{
+		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
 		[[item identifier] changeTheme:theme];
 	}
 }
@@ -97,6 +99,11 @@
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
 	return [[self currentEditor] undoManager];
+}
+
+- (NSWindow *)window
+{
+	return documentWindow;
 }
 
 @end

@@ -15,9 +15,11 @@
 	IBOutlet ViTextView *textView;
 	IBOutlet NSTextField *statusbar;
 	SEL exCommandSelector;
+	id delegate;
 }
 
 - (NSView *)view;
+- (void)setDelegate:(id)aDelegate;
 - (void)setFilename:(NSURL *)aURL;
 - (void)setString:(NSString *)aString;
 - (IBAction)finishedExCommand:(id)sender;

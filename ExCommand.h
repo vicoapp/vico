@@ -11,7 +11,11 @@
 
 @interface ExCommand : NSObject
 {
-
+	NSString *command;
 }
+
+- (ExCommand *)initWithString:(NSString *)string;
+
+@property(readonly) NSString *command;
 
 @end

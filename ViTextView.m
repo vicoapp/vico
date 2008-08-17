@@ -176,9 +176,22 @@
 	[[self undoManager] setActionName:@"delete text"];
 }
 
+- (void)recordDeleteOfRange:(NSRange)aRange
+{
+	NSString *s = [[storage string] substringWithRange:aRange];
+	[self recordDeleteOfString:s atLocation:aRange.location];
+}
+
+- (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
+{
+	[[self undoManager] beginUndoGrouping];
+	[self recordDeleteOfRange:aRange];
+	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
+	[[self undoManager] endUndoGrouping];
+}
 
 
-- (NSString *)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
+- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
@@ -188,21 +201,13 @@
 		[buffers setObject:buffer forKey:@"unnamed"];
 	}
 
-	NSString *s = [storage string];
-	NSString *yankedString = [s substringWithRange:yankRange];
-	[buffer setString:yankedString];
-
-	return yankedString;
+	[buffer setString:[[storage string] substringWithRange:yankRange]];
 }
 
-- (NSString *)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
+- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
 {
-	NSString *yankedString = [self yankToBuffer:bufferName append:appendFlag range:cutRange];
+	[self recordDeleteOfRange:cutRange];
 	[storage deleteCharactersInRange:cutRange];
-	
-	[self recordDeleteOfString:yankedString atLocation:cutRange.location];
-
-	return yankedString;
 }
 
 /* syntax: [buffer][count]d[count]motion */
@@ -306,10 +311,7 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
-	[[self undoManager] beginUndoGrouping];
-	[self recordDeleteOfString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)] atLocation:start_location];
-	[self recordInsertInRange:NSMakeRange(start_location, 1)];
-	[[self undoManager] endUndoGrouping];
+	[self recordReplacementOfRange:NSMakeRange(start_location, 1) withLength:1];
 
 	[[storage mutableString] replaceCharactersInRange:NSMakeRange(start_location, 1)
 					withString:[NSString stringWithFormat:@"%C", command.argument]];
@@ -404,7 +406,9 @@
 	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[storage string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
-		[[storage mutableString] deleteCharactersInRange:NSMakeRange(eol, end - eol) ];
+		NSRange r = NSMakeRange(eol, end - eol);
+		[self recordDeleteOfRange:r];
+		[[storage mutableString] deleteCharactersInRange:r];
 		if(bol == eol)
 			final_location = IMAX(bol, eol2 - 1 - (end - eol));
 		else
@@ -422,7 +426,9 @@
 			joinPadding = @"";
 		}
 		NSUInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
-		[[storage mutableString] replaceCharactersInRange:NSMakeRange(eol, sol2 - eol) withString:joinPadding];
+		NSRange r = NSMakeRange(eol, sol2 - eol);
+		[self recordReplacementOfRange:r withLength:[joinPadding length]];
+		[[storage mutableString] replaceCharactersInRange:r withString:joinPadding];
 	}
 
 	return YES;

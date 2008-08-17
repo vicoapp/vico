@@ -418,22 +418,14 @@
 	
 	if(count > 0)
 	{
-		int line = 1;
-		final_location = end_location = 0;
-		while(line < count)
+		NSInteger location = [self locationForStartOfLine:count];
+		if(location == -1)
 		{
-			//NSLog(@"%s got line %i at location %u", _cmd, line, end_location);
-			NSUInteger end;
-			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end_location];
-			if(end_location == end)
-			{
-				[[self delegate] message:@"Movement past the end-of-file"];
-				final_location = end_location = start_location;
-				return NO;
-			}
-			final_location = end_location = end;
-			line++;
+			[[self delegate] message:@"Movement past the end-of-file"];
+			final_location = end_location = start_location;
+			return NO;
 		}
+		final_location = end_location = location;
 	}
 	else
 	{
@@ -860,4 +852,51 @@
 	return YES;
 }
 
+// syntax: ^]
+- (BOOL)jump_tag:(ViCommand *)command
+{
+	if(tags == nil)
+		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+	if(tags == nil)
+		return YES;
+	
+	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
+	if(word_end > start_location)
+	{
+		NSString *word = [[storage string] substringWithRange:NSMakeRange(start_location, word_end - start_location)];
+		NSLog(@"jump_tag: got word [%@]", word);
+		NSArray *tag = [tags lookup:word];
+		if(tag)
+		{
+			[[self delegate] pushLine:[self currentLine] column:[self currentColumn]];
+
+			NSString *file = [tag objectAtIndex:0];
+			NSString *ex_command = [tag objectAtIndex:1];
+			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
+			ViEditController *editor = [[self delegate] openFileInTab:file];
+			
+			if(editor)
+			{
+				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
+				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+				NSLog(@"searching for pattern [%@]", pattern);
+				[editor findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
+			}
+		}
+		else
+		{
+			[[self delegate] message:@"%@: tag not found", word];
+		}
+	}
+	
+	return YES;
+}
+
+// syntax: ^T
+- (BOOL)pop_tag:(ViCommand *)command
+{
+	[[self delegate] popTag];
+	return YES;
+}
+	
 @end

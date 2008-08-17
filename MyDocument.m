@@ -192,6 +192,7 @@
 			if([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
 				[tabView selectTabViewItem:item];
+				[self setFileURL:[editor fileURL]];
 				return editor;
 			}
 		}
@@ -212,6 +213,13 @@
 	}
 	
 	return nil;
+}
+
+- (ViTagStack *)sharedTagStack
+{
+	if(tagStack == nil)
+		tagStack = [[ViTagStack alloc] init];
+	return tagStack;
 }
 
 @end

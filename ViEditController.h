@@ -36,5 +36,10 @@
 	    options:(unsigned)find_options
          regexpType:(OgreSyntax)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp;
+- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
+- (void)popTag;
+
+
+- (ViTextView *)textView;
 
 @end

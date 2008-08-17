@@ -96,7 +96,7 @@
 		   ![scan isAtEnd])
 		{
 			NSString *path = [prefixPath stringByAppendingPathComponent:file];
-			NSMutableString *command = [[NSString alloc] initWithString:[[scan string] substringFromIndex:[scan scanLocation]]];
+			NSString *command = [[scan string] substringFromIndex:[scan scanLocation]];
 			// NSLog(@"got symbol [%@] in file [%@]", symbol, path);
 			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
 			command = [command stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];

@@ -7,6 +7,7 @@
 //
 
 #import "ViEditController.h"
+#import "MyDocument.h"
 
 @implementation ViEditController
 
@@ -115,6 +116,39 @@
    ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
 	return [textView findPattern:pattern options:find_options regexpType:regexpSyntax ignoreLastRegexp:ignoreLastRegexp];
+}
+
+// tag push
+- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn
+{
+	[[delegate sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
+}
+
+- (void)popTag
+{
+	NSDictionary *location = [[delegate sharedTagStack] pop];
+	if(location == nil)
+	{
+		[self message:@"The tags stack is empty"];
+		return;
+	}
+
+	NSLog(@"Jump to [%@] at line %u, col %u",
+	      [location objectForKey:@"file"],
+	      [[location objectForKey:@"line"] unsignedIntegerValue],
+	      [[location objectForKey:@"column"] unsignedIntegerValue]);
+
+	ViEditController *editor = [self openFileInTab:[location objectForKey:@"file"]];
+	if(editor)
+	{
+		[[editor textView] gotoLine:[[location objectForKey:@"line"] unsignedIntegerValue]
+				     column:[[location objectForKey:@"column"] unsignedIntegerValue]];
+	}
+}
+
+- (ViTextView *)textView
+{
+	return textView;
 }
 
 @end

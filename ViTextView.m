@@ -248,6 +248,16 @@
 		final_location = end_location = bol;
 }
 
+- (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
+{
+	NSInteger bol = [self locationForStartOfLine:line];
+	if(bol != -1)
+	{
+		[self gotoColumn:column fromLocation:bol];
+		[self setCaret:final_location];
+		[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
+	}
+}
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
 {
@@ -436,43 +446,6 @@
 	}
 
 	return [self findPattern:lastSearchPattern options:1];
-}
-
-- (BOOL)jump_tag:(ViCommand *)command
-{
-	if(tags == nil)
-		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
-	if(tags == nil)
-		return YES;
-
-	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
-	if(word_end > start_location)
-	{
-		NSString *word = [[storage string] substringWithRange:NSMakeRange(start_location, word_end - start_location)];
-		NSLog(@"jump_tag: got word [%@]", word);
-		NSArray *tag = [tags lookup:word];
-		if(tag)
-		{
-			NSString *file = [tag objectAtIndex:0];
-			NSString *ex_command = [tag objectAtIndex:1];
-			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
-			ViEditController *editor = [[self delegate] openFileInTab:file];
-
-			if(editor)
-			{
-				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
-				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				NSLog(@"searching for pattern [%@]", pattern);
-				[editor findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
-			}
-		}
-		else
-		{
-			[[self delegate] message:@"%@: tag not found", word];
-		}
-	}
-	
-	return YES;
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
@@ -977,6 +950,52 @@
 - (NSUndoManager *)undoManager
 {
 	return undoManager;
+}
+
+- (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber
+{
+	int line = 1;
+	NSInteger location = 0;
+	while(line < aLineNumber)
+	{
+		NSUInteger end;
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:location];
+		if(location == end)
+		{
+			return -1;
+		}
+		location = end;
+		line++;
+	}
+	
+	return location;
+}
+
+- (NSUInteger)currentLine
+{
+	int line = 1;
+	NSUInteger location = 0;
+	NSUInteger caret = [self caret];
+	while(location < caret)
+	{
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
+		if(end > caret)
+		{
+			break;
+		}
+		location = end;
+		line++;
+	}
+	
+	return line;
+}
+
+- (NSUInteger)currentColumn
+{
+	NSUInteger bol, end;
+	[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:[self caret]];
+	return [self caret] - bol;
 }
 
 @end

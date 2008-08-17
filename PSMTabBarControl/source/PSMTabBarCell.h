@@ -36,7 +36,7 @@
 // creation/destruction
 - (id)initWithControlView:(PSMTabBarControl *)controlView;
 - (id)initPlaceholderWithFrame:(NSRect)frame expanded:(BOOL)value inControlView:(PSMTabBarControl *)controlView;
-- (void)dealloc;
+// - (void)dealloc;
 
 // accessors
 - (id)controlView;

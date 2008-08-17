@@ -58,6 +58,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
+- (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)setCommandMode;
 - (void)setInsertMode:(ViCommand *)command;
 - (void)input:(NSString *)inputString;
@@ -94,6 +95,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 
+- (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
+- (NSUInteger)currentLine;
+- (NSUInteger)currentColumn;
 
 @end
 

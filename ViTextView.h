@@ -26,7 +26,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	/* syntax highlighting */
 	ViTheme *theme;
 	ViLanguage *language;
-	BOOL syntax_initialized;
 
 	CGFloat pageGuideX;
 }

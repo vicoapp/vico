@@ -140,15 +140,6 @@
 
 @implementation ViTextView (syntax)
 
-- (void)initHighlighting
-{
-	if(!syntax_initialized)
-	{
-		syntax_initialized = YES;
-		DEBUG(@"ViLanguage = %@", language);
-	}
-}
-
 - (void)applyScope:(NSString *)aScope inRange:(NSRange)aRange
 {
 	if(aScope == nil)
@@ -401,10 +392,7 @@
 								atCharacterIndex:IMAX(0, location - 1)
 								  effectiveRange:NULL];
 	if(continuedMatch)
-	{
-		[continuedMatch setBeginLocation:location];
 		DEBUG(@"detected previous scope [%@] at location %u", [continuedMatch scope], location);
-	}
 	return continuedMatch;
 }
 
@@ -412,21 +400,22 @@
 {
 	NSDictionary *defaultAttributes = nil;
 	if(language)
+	{
 		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					  [theme foregroundColor], NSForegroundColorAttributeName,
 					  [NSArray arrayWithObject:[language name]], ViScopeAttributeName,
 					  nil];
+	}
 	else
+	{
 		defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
+	}
 	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
 {
 	//DEBUG(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
-
-	if(!syntax_initialized)
-		[self initHighlighting];
 
 	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
 	ViSyntaxMatch *continuedMatch = nil;

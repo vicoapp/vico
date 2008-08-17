@@ -1286,6 +1286,33 @@
 	return [self findPattern:lastSearchPattern options:1];
 }
 
+- (BOOL)jump_tag:(ViCommand *)command
+{
+	if(tags == nil)
+		tags = [[ViTagsDatabase alloc] initWithFile:@"tags"];
+	if(tags == nil)
+		return YES;
+
+	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
+	if(word_end > start_location)
+	{
+		NSString *word = [[storage string] substringWithRange:NSMakeRange(start_location, word_end - start_location)];
+		NSLog(@"jump_tag: got word [%@]", word);
+		NSArray *tag = [tags lookup:word];
+		if(tag)
+		{
+			NSString *file = [tag objectAtIndex:0];
+			NSString *ex_command = [tag objectAtIndex:1];
+			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
+		}
+		else
+		{
+			[[self delegate] message:@"%@: tag not found", word];
+		}
+	}
+	
+	return YES;
+}
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
@@ -1582,6 +1609,8 @@
 	if([[theEvent characters] length] == 0)
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
+
+	NSLog(@"keyDown event charcode = %04X", charcode);
 
 	if(mode == ViInsertMode)
 	{

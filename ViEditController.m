@@ -64,14 +64,12 @@
 	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
 	va_end(ap);
 
-	NSLog(@"message: [%@]", msg);
 	[statusbar setStringValue:msg];
 }
 
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [statusbar stringValue];
-	NSLog(@"got ex command? [%@]", exCommand);
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
 	[[delegate window] makeFirstResponder:textView];

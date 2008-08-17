@@ -3,6 +3,7 @@
 #import "ViCommand.h"
 #import "ViTheme.h"
 #import "ViLanguage.h"
+#import "ViTagsDatabase.h"
 
 #ifdef IMAX
 # undef IMAX
@@ -17,6 +18,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViCommand *parser;
 	NSTextStorage *storage;
 	NSUndoManager *undoManager;
+	ViTagsDatabase *tags;
 
 	//NSMutableString *insertedText;
 	NSUInteger insert_start_location, insert_end_location;

@@ -15,6 +15,7 @@
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
+		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
 		9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
 		9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
@@ -105,6 +106,8 @@
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* vizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OgreKit.xcodeproj; path = OgreKit/OgreKit.xcodeproj; sourceTree = "<group>"; };
+		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
+		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
 		9A1A11FE0D02C65A009EABAC /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
 		9A1A11FF0D02C65A009EABAC /* ViCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommand.m; sourceTree = "<group>"; };
 		9A1A12150D02CDE6009EABAC /* Unit Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -236,6 +239,8 @@
 				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
 				9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */,
 				9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */,
+				9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */,
+				9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -504,6 +509,7 @@
 				9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */,
 				9AC16DA40D93D14A00AE45E0 /* ViEditController.m in Sources */,
 				9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */,
+				9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

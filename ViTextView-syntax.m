@@ -225,8 +225,6 @@
 	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
 }
 
-//- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL
-
 - (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange
 {
 	DEBUG(@"searching for end match to [%@] in range %u + %u",
@@ -327,7 +325,11 @@
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
 			      [[aMatch beginMatch] rangeOfMatchedString].length);
-			[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange]];
+			if([aMatch scope])
+			{
+				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
+				[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange]];
+			}
 			[self highlightCapturesInMatch:aMatch];
 		}
 		else if([aMatch endMatch])
@@ -494,6 +496,8 @@
 	// reset attributes in the affected range
 	[self resetAttributesInRange:aRange];
 
+	NSUInteger lineno = 1;
+	
 	// highlight each line separately
 	NSUInteger nextRange = aRange.location;
 	while(nextRange < NSMaxRange(aRange))
@@ -503,6 +507,8 @@
 		if(end == nextRange || end == NSNotFound)
 			break;
 		NSRange line = NSMakeRange(nextRange, end - nextRange);
+
+		DEBUG(@"---> line number %i", lineno);
 
 		if(extendedRange)
 		{
@@ -538,6 +544,8 @@
 				break;
 			}
 		}
+		
+		lineno++;
 	}
 	[[NSGarbageCollector defaultCollector] enable];
 	DEBUG(@"tried regexps: %u", regexps_tried);

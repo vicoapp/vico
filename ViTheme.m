@@ -51,9 +51,12 @@
 		if(foreground)
 			[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
 
+		// disable background colors for now, see comment below about alpha channels in backgrounds
+#if 0
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
 		if(background)
 			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
+#endif
 
 		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
 		if(fontStyle)
@@ -127,12 +130,16 @@
 		//NSLog(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
 		attributes = [themeAttributes objectForKey:foundScopeSelector];
 
+		// FIXME: backgrounds with alpha is not supported, and blended colors doesn't look good
+		// disable background colors for now
+#if 0
 		NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
 		if(bg)
 		{
 			NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
 			[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
 		}
+#endif
 		
 		// cache it
 		[scopeSelectorCache setObject:attributes forKey:scopes];

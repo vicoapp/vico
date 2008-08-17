@@ -9,8 +9,12 @@
 #define VIF_NEED_CHAR	(1 << 4)
 
 static struct vikey vikeys[] = {
-	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
+	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
+	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
+	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
+	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
+	{@"move_right:",	' ', VIF_IS_MOTION},
 	{@"append_eol:",	'A', VIF_SETS_DOT},
 	{@"word_backward:",	'B', VIF_IS_MOTION},
 	{@"change_eol:",	'C', VIF_SETS_DOT},

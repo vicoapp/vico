@@ -31,6 +31,10 @@
 - (NSData *)saveData;
 - (void)changeTheme:(ViTheme *)theme;
 - (void)save;
-- (void)open:(NSString *)path;
+- (ViEditController *)openFileInTab:(NSString *)path;
+- (BOOL)findPattern:(NSString *)pattern
+	    options:(unsigned)find_options
+         regexpType:(OgreSyntax)regexpSyntax
+   ignoreLastRegexp:(BOOL)ignoreLastRegexp;
 
 @end

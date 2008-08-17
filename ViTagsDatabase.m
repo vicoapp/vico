@@ -7,6 +7,7 @@
 //
 
 #import "ViTagsDatabase.h"
+#import <OgreKit/OgreKit.h>
 
 @interface ViTagsDatabase (private)
 - (void)parseData:(NSString *)data;
@@ -14,7 +15,7 @@
 
 @implementation ViTagsDatabase
 
-- (ViTagsDatabase *)initWithFile:(NSString *)aFile
+- (ViTagsDatabase *)initWithFile:(NSString *)aFile inDirectory:(NSString *)aDirectory
 {
 	self = [super init];
 	if(self)
@@ -25,7 +26,8 @@
 		 * Look in parent directories if not found.
 		 */
 		NSFileManager *fm = [NSFileManager defaultManager];
-		prefixPath = [[fm currentDirectoryPath] copy];
+		prefixPath = [aDirectory copy];
+		NSLog(@"prefix path = [%@]", prefixPath);
 		NSString *path = nil;
 		if(![aFile isAbsolutePath])
 		{
@@ -55,6 +57,9 @@
 			path = aFile;
 		}
 
+		if(path == nil)
+			return nil;
+
 		NSLog(@"opening tags file [%@]", path);
 
 		NSStringEncoding encoding;
@@ -83,7 +88,6 @@
 
 		NSString *symbol;
 		NSString *file;
-		NSString *command;
 
 		if([scan scanUpToString:@"\t" intoString:&symbol] &&
 		   [scan scanCharactersFromSet:tabSet intoString:nil] &&
@@ -92,8 +96,12 @@
 		   ![scan isAtEnd])
 		{
 			NSString *path = [prefixPath stringByAppendingPathComponent:file];
-			command = [[scan string] substringFromIndex:[scan scanLocation]];
+			NSMutableString *command = [[NSString alloc] initWithString:[[scan string] substringFromIndex:[scan scanLocation]]];
 			// NSLog(@"got symbol [%@] in file [%@]", symbol, path);
+			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
+			command = [command stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
+	 		command = [command stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
+			// [command replaceOccurrencesOfRegularExpressionString:@"[\\*\\(\\)]" withString:@"\\&" options:OgreRubySyntax range:NSMakeRange(0, [command length])];
 			[tags setObject:[NSArray arrayWithObjects:path, command, nil] forKey:symbol];
 		}
 		else

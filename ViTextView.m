@@ -20,7 +20,7 @@
 
 - (id)initWithFrame:(NSRect)frame textContainer:(NSTextContainer *)aTextContainer
 {
-	NSLog(@"%s initializing", _cmd);
+	// NSLog(@"%s initializing", _cmd);
 	self = [super initWithFrame:frame textContainer:aTextContainer];
 	if(self)
 	{
@@ -74,7 +74,7 @@
 		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
 		[language patterns];
 	}
-	
+	[self setCaret:0];
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
@@ -128,7 +128,7 @@
 	NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
 						      options:0
 							range:lineRange];
-	NSLog(@"leadingWhitespaceForLineAtLocation(%u): r = %u + %u", aLocation, r.location, r.length);
+	// NSLog(@"leadingWhitespaceForLineAtLocation(%u): r = %u + %u", aLocation, r.location, r.length);
 	if(r.location != NSNotFound)
 	{
 		return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
@@ -139,7 +139,7 @@
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
-	NSLog(@"inserting newline at %u", aLocation);
+	// NSLog(@"inserting newline at %u", aLocation);
 	[self insertString:@"\n" atLocation:aLocation];
 	insert_end_location++;
 
@@ -186,7 +186,7 @@
 
 - (void)recordInsertInRange:(NSRange)aRange
 {
-	NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
+	// NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
 	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
 	[undoManager setActionName:@"insert text"];
 
@@ -197,7 +197,7 @@
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	NSLog(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
+	// NSLog(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
 	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
 	[undoManager setActionName:@"delete text"];
 }
@@ -434,7 +434,7 @@
 
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
-	NSLog(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
+	// NSLog(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
 
 	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[storage string] characterAtIndex:eol-1]])
 	{
@@ -810,7 +810,7 @@
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
-		NSLog(@"from word char: %u -> %u", start_location, end_location);
+		// NSLog(@"from word char: %u -> %u", start_location, end_location);
 	}
 	else if(![whitespace characterIsMember:ch])
 	{
@@ -844,7 +844,7 @@
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		if(end_location > eol && bol != eol)
 		{
-			NSLog(@"adjusting location from %lu to %lu at EOL", end_location, eol);
+			// NSLog(@"adjusting location from %lu to %lu at EOL", end_location, eol);
 			end_location = eol;
 		}
 	}
@@ -1053,7 +1053,6 @@
 /* syntax: ^F */
 - (BOOL)forward_screen:(ViCommand *)command
 {
-	NSLog(@"forward_screen");
 	[self pageDown:self];
 	end_location = final_location = [self caret];
 	return YES;
@@ -1062,7 +1061,6 @@
 /* syntax: ^B */
 - (BOOL)backward_screen:(ViCommand *)command
 {
-	NSLog(@"backward_screen");
 	[self pageUp:self];
 	end_location = final_location = [self caret];
 	return YES;
@@ -1148,7 +1146,7 @@
 	if([exCommandString length] > 0)
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
-		NSLog(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
+		// NSLog(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
 		if(ex.method == nil)
 			[[self delegate] message:@"The %@ command is unknown.", ex.command];
 		else
@@ -1240,6 +1238,7 @@
 			NSRange r = [nextMatch rangeOfMatchedString];
 			[self scrollRangeToVisible:r];
 			final_location = end_location = r.location;
+			[self setCaret:final_location];
 			[self performSelector:@selector(highlightFindMatch:) withObject:nextMatch afterDelay:0];
 		}
 
@@ -1300,7 +1299,7 @@
 - (BOOL)jump_tag:(ViCommand *)command
 {
 	if(tags == nil)
-		tags = [[ViTagsDatabase alloc] initWithFile:@"tags"];
+		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
 	if(tags == nil)
 		return YES;
 
@@ -1315,12 +1314,15 @@
 			NSString *file = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
 			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
-			[[self delegate] open:file];
+			ViEditController *editor = [[self delegate] openFileInTab:file];
 
-			NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
-			NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-			NSLog(@"searching for pattern [%@]", pattern);
-			[self findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
+			if(editor)
+			{
+				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
+				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+				NSLog(@"searching for pattern [%@]", pattern);
+				[editor findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
+			}
 		}
 		else
 		{
@@ -1338,15 +1340,17 @@
 
 	if([theEvent type] == NSKeyUp)
 	{
+#if 0
 		unichar charcode = [[theEvent characters] characterAtIndex:0];
 		NSLog(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 		      [theEvent charactersIgnoringModifiers],
 		      charcode,
 		      [theEvent modifierFlags]);
+#endif
 		return YES;
 	}
 
-	NSLog(@"Letting super handle unknown performKeyEquivalent event, keycode = %04X", [theEvent keyCode]);
+	// NSLog(@"Letting super handle unknown performKeyEquivalent event, keycode = %04X", [theEvent keyCode]);
 	return [super performKeyEquivalent:theEvent];
 }
 
@@ -1392,7 +1396,7 @@
 	}
 	else
 	{
-		NSLog(@"entering insert mode at location %u", end_location);
+		// NSLog(@"entering insert mode at location %u", end_location);
 		mode = ViInsertMode;
 		insert_start_location = insert_end_location = end_location;
 	}
@@ -1496,7 +1500,7 @@
 							 atCharacterIndex:aLocation
 						    longestEffectiveRange:NULL
 								  inRange:NSMakeRange(aLocation, 1)];
-	NSLog(@"found scopes at location %u: [%@]", aLocation, scopes);
+	// NSLog(@"found scopes at location %u: [%@]", aLocation, scopes);
 
 	NSArray *allSmartTypingPairs = [[[ViLanguageStore defaultStore] allSmartTypingPairs] allKeys];
 
@@ -1617,17 +1621,19 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+#if 0
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, modifiers = 0x%08X (0x%08X)",
 	      [theEvent characters],
 	      [theEvent keyCode],
 	      [theEvent modifierFlags],
 	      ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask));
+#endif
 
 	if([[theEvent characters] length] == 0)
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
 
-	NSLog(@"keyDown event charcode = %04X", charcode);
+	// NSLog(@"keyDown event charcode = %04X", charcode);
 
 	if(mode == ViInsertMode)
 	{
@@ -1635,7 +1641,7 @@
 		{
 			/* escape, return to command mode */
 			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
-			NSLog(@"registering replay text: [%@] at %u + %u, count = %i", insertedText, insert_start_location, insert_end_location, parser.count);
+			// NSLog(@"registering replay text: [%@] at %u + %u, count = %i", insertedText, insert_start_location, insert_end_location, parser.count);
 
 			/* handle counts for inserted text here */
 			NSString *t = insertedText;
@@ -1663,7 +1669,7 @@
 		{
 			/* handle keys with no modifiers, or with shift, caps lock, control or alt modifier */
 
-			NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
+			// NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
 			start_location = [self caret];
 
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */

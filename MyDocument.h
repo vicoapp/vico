@@ -13,6 +13,6 @@
 - (ViEditController *)currentEditor;
 - (NSWindow *)window;
 - (void)closeCurrentTab;
-- (void)openFile:(NSString *)path;
+- (ViEditController *)openFileInTab:(NSString *)path;
 
 @end

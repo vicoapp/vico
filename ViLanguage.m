@@ -12,22 +12,22 @@
 		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
 		if(beginMatch)
 		{
-			NSLog(@"*************** expanding pattern with %i captures:", [beginMatch count]);
-			NSLog(@"** original pattern = [%@]", pattern);
+			// NSLog(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+			// NSLog(@"** original pattern = [%@]", pattern);
 			int i;
 			for(i = 1; i <= [beginMatch count]; i++)
 			{
 				NSString *backref = [NSString stringWithFormat:@"\\%i", i];
 				if([beginMatch substringAtIndex:i])
 				{
-					NSLog(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
+					// NSLog(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
 					[expandedPattern replaceOccurrencesOfString:backref
 									 withString:[beginMatch substringAtIndex:i]
 									    options:0
 									      range:NSMakeRange(0, [expandedPattern length])];
 				}
 			}
-			NSLog(@"** expanded pattern = [%@]", expandedPattern);
+			// NSLog(@"** expanded pattern = [%@]", expandedPattern);
 		}
 
 		regexp = [OGRegularExpression regularExpressionWithString:expandedPattern options:OgreCaptureGroupOption];
@@ -48,8 +48,6 @@
 		OGRegularExpression *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
 		if(regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
-		else
-			NSLog(@"Failed to compile '%@' pattern", rule);
 	}
 }
 
@@ -115,7 +113,7 @@
 
 - (id)initWithBundle:(NSString *)bundleName
 {
-	NSLog(@"Initializing language from bundle %@", bundleName);
+	// NSLog(@"Initializing language from bundle %@", bundleName);
 
 	NSString *path = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"tmLanguage"];
 	if(![[NSFileManager defaultManager] fileExistsAtPath:path])
@@ -188,7 +186,7 @@
 				}
 			}
 			else
-				NSLog(@"pattern [%@] NOT FOUND in repository for language [%@]", patternName, [self name]);
+				NSLog(@"***** pattern [%@] NOT FOUND in repository for language [%@] *****", patternName, [self name]);
 		}
 		else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
 		{
@@ -204,7 +202,7 @@
 			if(externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
 			else
-				NSLog(@"language [%@] NOT FOUND", include);
+				NSLog(@"***** language [%@] NOT FOUND *****", include);
 		}
 	}
 	return expandedPatterns;

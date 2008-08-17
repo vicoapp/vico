@@ -66,6 +66,10 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setTabSize:(int)tabSize;
 - (NSUndoManager *)undoManager;
+- (BOOL)findPattern:(NSString *)pattern
+	    options:(unsigned)find_options
+         regexpType:(OgreSyntax)regexpSyntax
+   ignoreLastRegexp:(BOOL)ignoreLastRegexp;
 @end
 
 @interface ViTextView (cursor)

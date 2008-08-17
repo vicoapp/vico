@@ -14,7 +14,7 @@
 	NSString *prefixPath;
 }
 
-- (ViTagsDatabase *)initWithFile:(NSString *)aFile;
+- (ViTagsDatabase *)initWithFile:(NSString *)aFile inDirectory:(NSString *)aDirectory;
 - (NSArray *)lookup:(NSString *)symbol;
 
 @end

@@ -104,9 +104,17 @@
 	[delegate saveDocument:self];
 }
 
-- (void)open:(NSString *)path
+- (ViEditController *)openFileInTab:(NSString *)path
 {
-	[delegate openFile:path];
+	return [delegate openFileInTab:path];
+}
+
+- (BOOL)findPattern:(NSString *)pattern
+	    options:(unsigned)find_options
+         regexpType:(OgreSyntax)regexpSyntax
+   ignoreLastRegexp:(BOOL)ignoreLastRegexp
+{
+	return [textView findPattern:pattern options:find_options regexpType:regexpSyntax ignoreLastRegexp:ignoreLastRegexp];
 }
 
 @end

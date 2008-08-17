@@ -165,7 +165,7 @@
 {
 	NSLog(@"selected tab view item [%@]", tabViewItem);
 	[documentWindow setTitle:[self displayName]];
-	[self setFileURL:[self fileURL]];
+	// [self setFileURL:[self fileURL]];
 	[self setUndoManager:[[self currentEditor] undoManager]];
 }
 
@@ -175,7 +175,7 @@
 	return NO;
 }
 
-- (void)openFile:(NSString *)path
+- (ViEditController *)openFileInTab:(NSString *)path
 {
 	NSString *standardizedPath = [path stringByStandardizingPath];
 
@@ -192,7 +192,7 @@
 			if([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
 				[tabView selectTabViewItem:item];
-				return;
+				return editor;
 			}
 		}
 	}
@@ -206,10 +206,12 @@
 		[self readFromURL:url ofType:nil error:&error];
 		[self setFileURL:url];
 		if(error)
-		{
 			[NSApp presentError:error];
-		}
+		else
+			return [self currentEditor];
 	}
+	
+	return nil;
 }
 
 @end

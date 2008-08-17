@@ -14,4 +14,17 @@
 	[NSApp terminate:self];
 }
 
+- (void)ex_wq:(ExCommand *)command
+{
+	[self ex_write:command];
+	[self ex_quit:command];
+}
+
+- (void)ex_xit:(ExCommand *)command
+{
+	[self ex_write:command];
+	[self ex_quit:command];
+}
+
+
 @end

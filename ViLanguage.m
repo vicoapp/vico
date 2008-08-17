@@ -62,6 +62,11 @@
 	NSMutableDictionary *d;
 	for(d in patterns)
 	{
+		if([[d objectForKey:@"disabled"] intValue] == 1)
+		{
+			[d removeAllObjects];
+			continue;
+		}
 		NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
 		[self compileRegexp:@"match" inPattern:d];
 		[self compileRegexp:@"begin" inPattern:d];

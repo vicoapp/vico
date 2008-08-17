@@ -80,36 +80,43 @@
 	return [theme objectForKey:@"name"];
 }
 
-- (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector
+- (BOOL)scopeSelector:(NSString *)aScopeSelector matchesScopes:(NSArray *)scopes
 {
-	if(aScopeSelector == nil)
-		return nil;
+	// FIXME: handle multi-level scope selectors!
+	if([[scopes lastObject] hasPrefix:aScopeSelector])
+		return YES;
+	return NO;
+}
 
-	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:aScopeSelector];
+- (NSDictionary *)attributesForScopeSelectors:(NSArray *)scopes
+{
+	// FIXME: is it ok to key on an NSArray ?
+	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:scopes];
 	if(attributes)
 		return attributes;
 
 	BOOL found = NO;
-	NSString *scope;
-	for(scope in [themeAttributes allKeys])
+	NSString *scopeSelector;
+	for(scopeSelector in [themeAttributes allKeys])
 	{
-		if([aScopeSelector hasPrefix:scope])
+		if([self scopeSelector:scopeSelector matchesScopes:scopes])
 		{
 			found = YES;
 			break;
 		}
 	}
 
-	// merge scope selector attribute with theme (color) attributes
-	attributes = [[NSMutableDictionary alloc] init];
-	[attributes setObject:aScopeSelector forKey:ViScopeAttributeName];
-	if(found && scope)
-		[attributes addEntriesFromDictionary:[themeAttributes objectForKey:scope]];
+	if(found && scopeSelector)
+	{
+		attributes = [themeAttributes objectForKey:scopeSelector];
+		// cache it
+		[scopeSelectorCache setObject:attributes forKey:scopes];
+	}
 	else
-		NSLog(@"scope [%@] has no attributes", aScopeSelector);
-
-	// cache it
-	[scopeSelectorCache setObject:attributes forKey:aScopeSelector];
+	{
+		// FIXME: cache non-hits
+		NSLog(@"scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
+	}
 
 	return attributes;
 }

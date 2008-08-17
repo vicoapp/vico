@@ -149,14 +149,54 @@
 	}
 }
 
+- (void)applyScopeSelector:(NSString *)aScopeSelector inRange:(NSRange)aRange
+{
+	if(aScopeSelector == nil)
+		return;
+
+	NSUInteger l = aRange.location;
+	while(l < NSMaxRange(aRange))
+	{
+		NSRange scopeRange;
+		NSMutableArray *oldScopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+								 atCharacterIndex:l
+							    longestEffectiveRange:&scopeRange
+									  inRange:NSMakeRange(l, NSMaxRange(aRange) - l)];
+		NSMutableArray *scopes = [[NSMutableArray alloc] init];
+		if(oldScopes)
+		{
+			DEBUG(@"     scopes [%@] previously applied to range %u + %u",
+			      [oldScopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);
+			[scopes addObjectsFromArray:oldScopes];
+		}
+		// append the new scope selector
+		[scopes addObject:aScopeSelector];
+
+		
+		// apply (merge) the scope selector in the maximum range
+		if(scopeRange.location < l)
+		{
+			scopeRange.length -= l - scopeRange.location;
+			scopeRange.location = l;
+		}
+		if(NSMaxRange(scopeRange) > NSMaxRange(aRange))
+			scopeRange.length = NSMaxRange(aRange) - l;
+
+		DEBUG(@"     applying [%@] in range %u + %u", [scopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);		
+		[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:scopeRange];
+
+		// get the theme attributes for this collection of scopes
+		NSDictionary *attributes = [theme attributesForScopeSelectors:scopes];
+		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:scopeRange];
+
+		l = NSMaxRange(scopeRange);
+	}
+}
+
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch inRange:(NSRange)aRange
 {
-	NSDictionary *attributes = [theme attributeForScopeSelector:[aMatch scope]];
 	DEBUG(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
-	if(attributes)
-	{
-		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aRange];
-	}
+	[self applyScopeSelector:[aMatch scope] inRange:aRange];
 }
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch
@@ -176,17 +216,12 @@
 	for(key in [captures allKeys])
 	{
 		NSDictionary *capture = [captures objectForKey:key];
-		NSDictionary *attributes = [theme attributeForScopeSelector:[capture objectForKey:@"name"]];
 		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
 		if(r.length > 0)
 		{
 			DEBUG(@" highlighting %@ [%@] in range %u + %u",
 			      captureType, [capture objectForKey:@"name"], r.location, r.length);
-			if(attributes)
-			{
-				[[self layoutManager] addTemporaryAttributes:attributes
-							   forCharacterRange:r];
-			}
+			[self applyScopeSelector:[capture objectForKey:@"name"] inRange:r];
 		}
 	}
 }
@@ -420,8 +455,7 @@
 		{
 			/* Mark the EOL character with the continuation pattern */
 			// FIXME: maybe just store the pattern (pointer) instead?
-			NSDictionary *continuationMarker = [NSDictionary dictionaryWithObject:continuedMatch forKey:ViContinuationAttributeName];
-			[[self layoutManager] addTemporaryAttributes:continuationMarker forCharacterRange:NSMakeRange(end - 1, 1)];
+			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatch forCharacterRange:NSMakeRange(end - 1, 1)];
 		}
 	}
 }

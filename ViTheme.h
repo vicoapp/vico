@@ -17,7 +17,7 @@
 - (id)initWithPath:(NSString *)aPath;
 - (id)initWithBundle:(NSString *)aBundleName;
 - (NSString *)name;
-- (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector;
+- (NSDictionary *)attributesForScopeSelectors:(NSArray *)scopes;
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;

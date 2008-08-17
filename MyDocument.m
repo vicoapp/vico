@@ -56,15 +56,12 @@
 	// when returning NO.
 	
 	// You can also choose to override -readFromFileWrapper:ofType:error: or -readFromURL:ofType:error: instead. 
-	NSLog(@"reading data of type [%@]", typeName);
-	NSLog(@"got %u bytes", [data length]);
 
 	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	if(textView)
 	{
 		[[[textView textStorage] mutableString] setString:readContent];
 		readContent = nil;
-		[textView highlightEverything];
 	}
 
 	return YES;

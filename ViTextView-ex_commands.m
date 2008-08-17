@@ -28,7 +28,11 @@
 
 - (void)ex_edit:(ExCommand *)command
 {
-	[[self delegate] newTab];
+	NSString *file = [command.arguments objectAtIndex:0];
+	if(file)
+		[[self delegate] newTabWithURL:[NSURL fileURLWithPath:file]];
+	else
+		[[self delegate] newTabWithURL:nil];
 }
 
 @end

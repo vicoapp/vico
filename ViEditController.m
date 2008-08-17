@@ -106,9 +106,9 @@
 	[delegate saveDocument:self];
 }
 
-- (void)newTab
+- (void)newTabWithURL:(NSURL *)aURL
 {
-	[delegate newTabWithURL:nil];
+	[delegate newTabWithURL:aURL];
 }
 
 @end

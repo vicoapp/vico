@@ -30,18 +30,10 @@
 	// configure the tab bar control
 	PSMTabBarControl *tabBar = [tabView delegate];
 	[tabBar setStyleNamed:@"Unified"];
+	[tabBar setCanCloseOnlyTab:YES];
 
 	// add the first editor view
-	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
-	[editor setFilename:[self fileURL]];
-	[editor setDelegate:self];
-
-	// create a new tab
-	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
-	[item setView:[editor view]];
-	[item setLabel:[[[self fileURL] path] lastPathComponent]];
-	[tabView addTabViewItem:item];
-	[tabView selectTabViewItem:item];
+	[self newTabWithURL:[self fileURL]];
 
 	readContent = nil;
 
@@ -74,10 +66,9 @@
 	// when returning NO.
 
 	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	NSTabViewItem *item = [tabView selectedTabViewItem];
-	if(item)
+	if([self currentEditor])
 	{
-		[[item identifier] setString:readContent];
+		[[self currentEditor] setString:readContent];
 		readContent = nil;
 	}
 
@@ -109,16 +100,11 @@
 - (void)newTabWithURL:(NSURL *)aURL
 {
 	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
-	[editor setFilename:aURL];
 	[editor setDelegate:self];
 	
 	// create a new tab
 	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
 	[item setView:[editor view]];
-	if(aURL)
-		[item setLabel:[[aURL path] lastPathComponent]];
-	else
-		[item setLabel:@"New file"];
 	[tabView addTabViewItem:item];
 	[tabView selectTabViewItem:item];
 
@@ -134,6 +120,8 @@
 		[[self currentEditor] setFilename:aURL];
 		[[tabView selectedTabViewItem] setLabel:[[aURL path] lastPathComponent]];
 	}
+	else
+		[[tabView selectedTabViewItem] setLabel:@"New file"];
 }
 
 - (NSURL *)fileURL
@@ -145,13 +133,46 @@
 	return url;
 }
 
+- (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose  contextInfo:(void  *)contextInfo
+{
+	if(shouldClose)
+	{
+		if([tabView numberOfTabViewItems] <= 1)
+			[self close];
+		else
+			[tabView removeTabViewItem:[tabView selectedTabViewItem]];
+	}
+}
+
+- (void)canCloseDocumentWithDelegate:(id)delegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
+{
+	NSLog(@"canCloseDocumentWithDelegate?");
+	[super canCloseDocumentWithDelegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
+}
+
 - (void)closeCurrentTab
 {
-	NSLog(@"closing tab");
-	if([tabView numberOfTabViewItems] == 1)
-		[self close];
-	else
-		[tabView removeTabViewItem:[tabView selectedTabViewItem]];
+	NSLog(@"closing tab, window = [%@]", [self window]);
+	[self canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldCloseTab:contextInfo:) contextInfo:nil];
+}
+
+- (NSString *)displayName
+{
+	return [[[self fileURL] path] lastPathComponent];
+}
+
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	NSLog(@"selected tab view item [%@]", tabViewItem);
+	[[self window] setTitle:[self displayName]];
+	[self setFileURL:[self fileURL]];
+	[self setUndoManager:[[self currentEditor] undoManager]];
+}
+
+- (BOOL)tabView:(NSTabView *)tabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	[self closeCurrentTab];
+	return NO;
 }
 
 @end

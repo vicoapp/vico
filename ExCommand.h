@@ -13,11 +13,13 @@
 {
 	NSString *command;
 	NSString *method;
+	NSArray *arguments;
 }
 
 - (ExCommand *)initWithString:(NSString *)string;
 
 @property(readonly) NSString *command;
 @property(readonly) NSString *method;
+@property(readonly) NSArray *arguments;
 
 @end

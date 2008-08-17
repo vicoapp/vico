@@ -473,6 +473,7 @@ static struct ex_command ex_commands[] = {
 
 @synthesize command;
 @synthesize method;
+@synthesize arguments;
 
 - (ExCommand *)initWithString:(NSString *)string
 {
@@ -486,7 +487,9 @@ static struct ex_command ex_commands[] = {
 
 - (BOOL)parseString:(NSString *)string
 {
-	command = [[string componentsSeparatedByString:@" "] objectAtIndex:0];
+	NSArray *args = [string componentsSeparatedByString:@" "];
+	command = [args objectAtIndex:0];
+	arguments = [args subarrayWithRange:NSMakeRange(1, [args count] - 1)];
 
 	const char *c = [command cStringUsingEncoding:NSUTF8StringEncoding];
 	struct ex_command *cmd = NULL;

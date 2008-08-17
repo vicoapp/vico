@@ -1063,6 +1063,7 @@
 - (void)frameDidChange:(NSNotification *)notification
 {
     [self update];
+#if 0
     // trying to address the drawing artifacts for the progress indicators - hackery follows
     // this one fixes the "blanking" effect when the control hides and shows itself
     NSEnumerator *e = [_cells objectEnumerator];
@@ -1071,6 +1072,7 @@
         [[cell indicator] stopAnimation:self];
         [[cell indicator] startAnimation:self];
     }
+#endif
     [self setNeedsDisplay:YES];
 }
 

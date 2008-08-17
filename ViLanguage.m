@@ -56,7 +56,7 @@
 	NSMutableDictionary *d;
 	for(d in patterns)
 	{
-		//NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
+		NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
 		[self compileRegexp:@"match" inPattern:d];
 		[self compileRegexp:@"begin" inPattern:d];
 		[self compileRegexp:@"end" inPattern:d];
@@ -66,11 +66,11 @@
 		NSArray *subPatterns = [d objectForKey:@"patterns"];
 		if(subPatterns)
 		{
-			NSLog(@"compiling sub-patterns");
+			//NSLog(@"compiling sub-patterns for scope [%@]", [d objectForKey:@"name"]);
 			[self compilePatterns:subPatterns];
 		}
 	}
-	NSLog(@"compiled %i patterns", n);
+	//NSLog(@"compiled %i patterns", n);
 }
 
 - (void)compile
@@ -145,6 +145,7 @@
 		if(include == nil)
 		{
 			// just add this pattern directly
+			// set a reference to the language so we can find the correct repository later on
 			[pattern setObject:self forKey:@"language"];
 			[expandedPatterns addObject:pattern];
 			continue;
@@ -159,13 +160,18 @@
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
 			if(includePattern)
 			{
-				if([includePattern count] == 1 && [includePattern objectForKey:@"patterns"])
+				if([includePattern count] == 1 + ([includePattern objectForKey:@"expandedPatterns"] ? 1 : 0) && [includePattern objectForKey:@"patterns"])
 				{
+					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
 					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern]];
 				}
 				else
+				{
+					// this pattern is a real pattern (possibly with sub-patterns)
+					[includePattern setObject:self forKey:@"language"];
 					[expandedPatterns addObject:includePattern];
+				}
 			}
 			else
 				NSLog(@"pattern [%@] NOT FOUND in repository for language [%@]", patternName, [self name]);

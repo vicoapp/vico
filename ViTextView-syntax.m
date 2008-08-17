@@ -224,6 +224,7 @@
  */
 - (BOOL)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange
 {
+	DEBUG(@"searching for end match to [%@] in range %u + %u", [viMatch scope], aRange.location, aRange.length);
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
 	if(endRegexp == nil)
 	{
@@ -255,8 +256,17 @@
 		}
 		else
 		{
-			DEBUG(@"got end match on [%@] from %u to %u",
-			      [[viMatch pattern] objectForKey:@"name"], [viMatch beginLocation], NSMaxRange(aRange));
+			DEBUG(@"got end match on [%@] at %u + %u    (prematch range = %u + %u)",
+			      [[viMatch pattern] objectForKey:@"name"],
+			      [[viMatch endMatch] rangeOfMatchedString].location,
+			      [[viMatch endMatch] rangeOfMatchedString].length,
+			      [[viMatch endMatch] rangeOfPrematchString].location,
+			      [[viMatch endMatch] rangeOfPrematchString].length
+			);
+			if([[viMatch endMatch] rangeOfMatchedString].length == 0)
+			{
+				DEBUG(@"    FIXME: got zero-width match for pattern [%@]", [[viMatch pattern] objectForKey:@"end"]);
+			}
 			[self highlightMatch:viMatch];
 			[self highlightEndCapturesInMatch:viMatch];
 			
@@ -330,12 +340,12 @@
 
 		if([viMatch isSingleLineMatch])
 		{
-			// this is a single-line match
 			[self highlightMatch:viMatch];
 			[self highlightCapturesInMatch:viMatch];
 		}
 		else
 		{
+			DEBUG(@"got begin match on [%@] at %u + %u", [viMatch scope], [viMatch beginLocation], [viMatch beginLength]);
 			NSRange range = aRange;
 			range.location = NSMaxRange([[viMatch beginMatch] rangeOfMatchedString]);
 			range.length = NSMaxRange(aRange) - range.location;

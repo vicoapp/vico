@@ -72,6 +72,10 @@
 		else
 		{
 			[self parseData:data];
+
+			NSDictionary *attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
+			modificationDate = [attributes fileModificationDate];
+			databaseFile = path;
 		}
 	}
 	return self;
@@ -114,6 +118,20 @@
 - (NSArray *)lookup:(NSString *)symbol
 {
 	return [tags objectForKey:symbol];
+}
+
+- (BOOL)databaseHasChanged
+{
+	if(databaseFile)
+	{
+		NSDictionary *attributes = [[NSFileManager defaultManager] fileAttributesAtPath:databaseFile traverseLink:YES];
+		if([modificationDate isEqualToDate:[attributes fileModificationDate]])
+		{
+			NSLog(@"tags file unmodified [%@], [%@]", databaseFile, modificationDate);
+			return NO;
+		}
+	}
+	return YES;
 }
 
 @end

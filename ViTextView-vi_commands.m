@@ -855,7 +855,7 @@
 // syntax: ^]
 - (BOOL)jump_tag:(ViCommand *)command
 {
-	if(tags == nil)
+	if(tags == nil || [tags databaseHasChanged])
 		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
 	if(tags == nil)
 		return YES;

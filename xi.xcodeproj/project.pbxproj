@@ -142,7 +142,6 @@
 		9AC16D970D93CDF200AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MyDocument.xib; sourceTree = "<group>"; };
 		9AC16DA20D93D14A00AE45E0 /* ViEditController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViEditController.h; sourceTree = "<group>"; };
 		9AC16DA30D93D14A00AE45E0 /* ViEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViEditController.m; sourceTree = "<group>"; };
-		9AC16E540D93F3A100AE45E0 /* vizard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = folder; name = vizard; sourceTree = "<group>"; };
 		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
 		9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = Project_DataModel.xcdatamodel; sourceTree = "<group>"; };
 		9AEE8B7C0D929DED00189D7B /* ProjectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDelegate.h; sourceTree = "<group>"; };
@@ -211,7 +210,6 @@
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				9A1A12160D02CDE6009EABAC /* Unit Tests-Info.plist */,
-				9AC16E540D93F3A100AE45E0 /* vizard */,
 			);
 			name = vizard;
 			sourceTree = "<group>";
@@ -480,7 +478,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Removing old OgreKit framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\necho \"Copying new OgreKit framework\"\ncp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+			shellScript = "set -x\necho \"Removing old OgreKit framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\necho \"Copying new OgreKit framework\"\ncp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

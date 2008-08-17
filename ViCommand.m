@@ -17,6 +17,8 @@ static struct vikey vikeys[] = {
 	{@"move_down",		'j', VIF_IS_MOTION},
 	{@"move_up",		'k', VIF_IS_MOTION},
 	{@"move_right",		'l', VIF_IS_MOTION},
+	{@"put_before",		'P', VIF_SETS_DOT},
+	{@"put_after",		'p', VIF_SETS_DOT},
 	{@"move_bol",		'0', VIF_IS_MOTION},
 	{@"move_eol",		'$', VIF_IS_MOTION},
 	{@"word_forward",	'w', VIF_IS_MOTION},
@@ -50,6 +52,7 @@ find_command(int key)
 @synthesize motion_count;
 @synthesize start_range;
 @synthesize stop_range;
+@synthesize key;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
@@ -79,7 +82,7 @@ find_command(int key)
 	}
 }
 
-- (void)pushKey:(unichar)key
+- (void)pushKey:(unichar)aKey
 {
 	// check if it's a repeat count
 	int *countp = nil;
@@ -88,15 +91,15 @@ find_command(int key)
 	else if(state == ViCommandNeedMotion)
 		countp = &motion_count;
 	// conditionally include '0' as a repeat count only if it's not the first digit
-	if(key >= '1' - ((countp && *countp > 0) ? 1 : 0) && key <= '9')
+	if(aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9')
 	{
 		*countp *= 10;
-		*countp += key - '0';
+		*countp += aKey - '0';
 		return;
 	}
 
 	// check for the dot command
-	if(key == '.')
+	if(aKey == '.')
 	{
 		if(dot_command_key == nil)
 		{
@@ -106,18 +109,20 @@ find_command(int key)
 		}
 
 		command_key = dot_command_key;
-		method = command_key->method;
+		method = dot_command_key->method;
 		motion_method = dot_motion_method;
 		motion_count = dot_motion_count;
+		key = dot_command_key->key;
 		[self setComplete];
 		return;
 	}
 
-	struct vikey *vikey = find_command(key);
+	struct vikey *vikey = find_command(aKey);
 	if(vikey == NULL)
 	{
 		// should print "X isn't a vi command"
 		method = @"illegal";
+		key = aKey;
 		[self setComplete];
 		return;
 	}
@@ -126,6 +131,7 @@ find_command(int key)
 	{
 		command_key = vikey;
 		method = command_key->method;
+		key = aKey;
 		if(has_flag(vikey, VIF_NEED_MOTION))
 			state = ViCommandNeedMotion;
 		else
@@ -137,7 +143,7 @@ find_command(int key)
 		{
 			motion_method = vikey->method;
 		}
-		else if(key == command_key->key)
+		else if(aKey == command_key->key)
 		{
 			/* From nvi:
 			 * Commands that have motion components can be doubled to
@@ -163,13 +169,7 @@ find_command(int key)
 	state = ViCommandInitialState;
 	count = 0;
 	motion_count = 0;
-}
-
-- (int)key
-{
-	if(command_key)
-		return command_key->key;
-	return -1;
+	key = -1;
 }
 
 @end

@@ -8,6 +8,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViMode mode;
 	ViCommand *parser;
 
+	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
 }
 

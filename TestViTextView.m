@@ -47,11 +47,15 @@
 
 - (void)test050_DeleteWordForward		{ TEST(@"abc def", 0, @"dw", @"def", 0); }
 - (void)test051_DeleteWordForward2		{ TEST(@"abc def", 1, @"dw", @"adef", 1); }
-- (void)test052_DeleteWordForwardAtEol		{ TEST(@"abc def\nghi", 4, @"dw", @"abc \nghi", 3); }
+- (void)test052_DeleteWordForward3		{ TEST(@"abc def", 4, @"dw", @"abc ", 3); }
+- (void)test053_DeleteWordForwardAtEol		{ TEST(@"abc def\nghi", 4, @"dw", @"abc \nghi", 3); }
 
 - (void)test060_GotoColumnZero			{ MOVE(@"abc def", 4, @"0", 0); }
 - (void)test060_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
 
 - (void)test070_DeleteCurrentLine		{ TEST(@"abc\ndef\nghi", 2, @"dd", @"def\nghi", 0); }
+
+- (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }
+- (void)test081_YankWord2			{ TEST(@"abc def ghi", 8, @"yw0p", @"aghibc def ghi", 1); }
 
 @end

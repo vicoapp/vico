@@ -25,7 +25,7 @@
 	STAssertFalse(parser.complete, @"command shouldn't be complete without any keys");
 	[parser pushKey:'i'];
 	STAssertTrue(parser.complete, @"'i' should be a complete command");
-	STAssertEquals(parser.key, 'i', nil);
+	STAssertTrue(parser.key == 'i', nil);
 	STAssertEqualObjects(parser.method, @"insert", @"'i' should be mapped to the 'insert' method");
 }
 
@@ -52,7 +52,7 @@
 	STAssertTrue(parser.complete, @"(c)hange (w)ord should be a complete command");
 	STAssertEqualObjects(parser.method, @"change", nil);
 	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
-	STAssertEquals(parser.key, 'c', nil);
+	STAssertTrue(parser.key == 'c', nil);
 }
 
 - (void)test052_CommandWithNonMotion
@@ -83,7 +83,7 @@
 	STAssertTrue(parser.complete, nil);
 	STAssertEqualObjects(parser.method, @"word_forward", nil);
 	STAssertNil(parser.motion_method, nil);
-	STAssertEquals(parser.key, 'w', nil);
+	STAssertTrue(parser.key == 'w', nil);
 }
 
 
@@ -93,7 +93,7 @@
 	STAssertFalse(parser.complete, nil);
 	[parser pushKey:'w'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'w', nil);
+	STAssertTrue(parser.key == 'w', nil);
 	STAssertEquals(parser.count, 3, nil);
 }
 
@@ -105,7 +105,7 @@
 	STAssertFalse(parser.complete, nil);
 	[parser pushKey:'w'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'd', nil);
+	STAssertTrue(parser.key == 'd', nil);
 	STAssertEquals(parser.count, 0, nil);
 	STAssertEquals(parser.motion_count, 3, nil);
 }
@@ -168,11 +168,12 @@
 {
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'x', nil);
+	STAssertTrue(parser.key == 'x', nil);
 	[parser reset];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'x', nil);
+	STAssertTrue(parser.key == 'x', nil);
+	STAssertEqualObjects(parser.method, @"delete_forward", nil);
 }
 
 - (void)test072_MotionDoesntSetDot
@@ -217,7 +218,7 @@
 	[parser reset];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'd', nil);	
+	STAssertTrue(parser.key == 'd', nil);
 	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
 	STAssertEquals(parser.motion_count, 2, nil);
 }
@@ -233,7 +234,7 @@
 	[parser pushKey:'3'];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'd', nil);	
+	STAssertTrue(parser.key == 'd', nil);
 	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
 	STAssertEquals(parser.count, 3, nil);
 	STAssertEquals(parser.motion_count, 0, nil);
@@ -252,7 +253,7 @@
 	[parser pushKey:'3'];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.key, 'd', nil);	
+	STAssertTrue(parser.key == 'd', nil);
 	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
 	STAssertEquals(parser.count, 0, nil);
 	STAssertEquals(parser.motion_count, 12, nil);

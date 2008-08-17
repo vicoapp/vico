@@ -27,6 +27,7 @@ struct vikey
 	struct vikey *command_key;
 	int count;
 	int motion_count;
+	char key;
 
 	NSRange start_range;
 	NSRange stop_range;
@@ -39,7 +40,6 @@ struct vikey
 
 - (void)pushKey:(unichar)key;
 - (void)reset;
-- (int)key;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;
@@ -48,5 +48,6 @@ struct vikey
 @property(readonly) int motion_count;
 @property NSRange start_range;
 @property NSRange stop_range;
+@property(readonly) char key;
 
 @end

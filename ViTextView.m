@@ -5,6 +5,10 @@
 #endif
 #define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
 
+@interface ViTextView (private)
+- (void)move_right:(ViCommand *)command;
+@end
+
 @implementation ViTextView
 
 + (void)initKeymaps
@@ -24,16 +28,17 @@
 	[[self textStorage] setDelegate:self];
 
 	parser = [[ViCommand alloc] init];
+	buffers = [[NSMutableDictionary alloc] init];
 }
 
 - (void)illegal:(ViCommand *)command
 {
-	NSLog(@"? is not a vi command");
+	NSLog(@"%c is not a vi command", command.key);
 }
 
 - (void)nonmotion:(ViCommand *)command
 {
-	NSLog(@"X may not be used as a motion command");
+	NSLog(@"%c may not be used as a motion command", command.key);
 }
 
 - (void)nodot:(ViCommand *)command
@@ -73,6 +78,69 @@
 	}
 }
 
+/* syntax: [buffer][count]y[count][motion] */
+- (void)yank:(ViCommand *)command
+{
+	// get the unnamed buffer
+	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
+	if(buffer == nil)
+	{
+		buffer = [[NSMutableString alloc] init];
+		[buffers setObject:buffer forKey:@"unnamed"];
+	}
+
+	NSTextStorage *text = [self textStorage];
+	NSString *s = [text string];
+	[buffer setString:[s substringWithRange:NSMakeRange(command.start_range.location, command.stop_range.location - command.start_range.location)]];
+
+	/* From nvi:
+	 * !!!
+	 * Historic vi moved the cursor to the from MARK if it was before the current
+	 * cursor and on a different line, e.g., "yk" moves the cursor but "yj" and
+	 * "yl" do not.  Unfortunately, it's too late to change this now.  Matching
+	 * the historic semantics isn't easy.  The line number was always changed and
+	 * column movement was usually relative.  However, "y'a" moved the cursor to
+	 * the first non-blank of the line marked by a, while "y`a" moved the cursor
+	 * to the line and column marked by a.  Hopefully, the motion component code
+	 * got it right...   Unlike delete, we make no adjustments here.
+	 */
+	if(command.stop_range.location < command.start_range.location)
+		[self setSelectedRange:command.stop_range];
+	else
+		[self setSelectedRange:command.start_range];
+}
+
+/* syntax: [buffer][count]P */
+- (void)put_before:(ViCommand *)command
+{
+	// get the unnamed buffer
+	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
+	if([buffer length] == 0)
+	{
+		NSLog(@"The default buffer is empty");
+		return;
+	}
+
+	[self insertText:buffer];
+	[self setSelectedRange:command.start_range];
+}
+
+/* syntax: [buffer][count]p */
+- (void)put_after:(ViCommand *)command
+{
+	// get the unnamed buffer
+	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
+	if([buffer length] == 0)
+	{
+		NSLog(@"The default buffer is empty");
+		return;
+	}
+
+	[self move_right:command];
+	[self insertText:buffer];
+	[self setSelectedRange:command.start_range];
+}
+
 /* syntax: [buffer][count]c[count]motion */
 - (void)change:(ViCommand *)command
 {
@@ -83,7 +151,6 @@
 /* syntax: i */
 - (void)insert:(ViCommand *)command
 {
-	NSLog(@"entering insert mode");
 	[self setInsertMode];
 }
 
@@ -280,7 +347,7 @@
 	else if(command.motion_method && command.key != 'd' && command.key != 'y')
 	{
 		/* We're in whitespace. */
-		/* See command from nvi below. */
+		/* See comment from nvi below. */
 		location++;
 	}
 

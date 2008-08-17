@@ -1173,18 +1173,24 @@
 	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
 }
 
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
+- (BOOL)findPattern:(NSString *)pattern
+	    options:(unsigned)find_options
+         regexpType:(OgreSyntax)regexpSyntax
+   ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
 	unsigned rx_options = OgreNotBOLOption | OgreNotEOLOption;
 	if([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
 		rx_options |= OgreIgnoreCaseOption;
 
-	if(lastSearchRegexp == nil)
+	if(lastSearchRegexp == nil || ignoreLastRegexp)
 	{
 		/* compile the pattern regexp */
 		@try
 		{
-			lastSearchRegexp = [OGRegularExpression regularExpressionWithString:pattern options:rx_options];
+			lastSearchRegexp = [OGRegularExpression regularExpressionWithString:pattern
+										    options:rx_options
+										     syntax:regexpSyntax
+									    escapeCharacter:OgreBackslashCharacter];
 			NSLog(@"compiled find regexp: [%@]", lastSearchRegexp);
 		}
 		@catch(NSException *exception)
@@ -1241,6 +1247,11 @@
 	}
 
 	return NO;
+}
+
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
+{
+	return [self findPattern:pattern options:find_options regexpType:OgreRubySyntax ignoreLastRegexp:NO];
 }
 
 - (void)find_forward_callback:(NSString *)pattern
@@ -1305,6 +1316,11 @@
 			NSString *ex_command = [tag objectAtIndex:1];
 			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
 			[[self delegate] open:file];
+
+			NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
+			NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+			NSLog(@"searching for pattern [%@]", pattern);
+			[self findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
 		}
 		else
 		{

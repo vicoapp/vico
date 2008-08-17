@@ -242,7 +242,7 @@
 			NSRange range;
 			range.location = [viMatch beginLocation];
 			range.length = NSMaxRange(aRange) - range.location;
-			DEBUG(@"got match on [%@] from %u to EOL (%u)",
+			DEBUG(@"got end match on [%@] from %u to EOL (%u)",
 			      [[viMatch pattern] objectForKey:@"name"], [viMatch beginLocation], NSMaxRange(aRange));
 			[self highlightMatch:viMatch inRange:range];
 
@@ -255,6 +255,8 @@
 		}
 		else
 		{
+			DEBUG(@"got end match on [%@] from %u to %u",
+			      [[viMatch pattern] objectForKey:@"name"], [viMatch beginLocation], NSMaxRange(aRange));
 			[self highlightMatch:viMatch];
 			[self highlightEndCapturesInMatch:viMatch];
 			

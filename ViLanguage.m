@@ -138,13 +138,14 @@
 - (NSArray *)expandPatterns:(NSArray *)patterns
 {
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
-	NSDictionary *pattern;
+	NSMutableDictionary *pattern;
 	for(pattern in patterns)
 	{
 		NSString *include = [pattern objectForKey:@"include"];
 		if(include == nil)
 		{
 			// just add this pattern directly
+			[pattern setObject:self forKey:@"language"];
 			[expandedPatterns addObject:pattern];
 			continue;
 		}
@@ -154,8 +155,7 @@
 		{
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
-			NSLog(@"including [%@] from repository", patternName);
-			// FIXME: use correct repository if referenced from an external language
+			NSLog(@"including [%@] from repository of language %@", patternName, [self name]);
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
 			if(includePattern)
 			{
@@ -168,7 +168,7 @@
 					[expandedPatterns addObject:includePattern];
 			}
 			else
-				NSLog(@"pattern [%@] NOT FOUND in repository", patternName);
+				NSLog(@"pattern [%@] NOT FOUND in repository for language [%@]", patternName, [self name]);
 		}
 		else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
 		{
@@ -195,7 +195,11 @@
 	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
 	if(expandedPatterns == nil)
 	{
-		expandedPatterns = [self expandPatterns:[pattern objectForKey:@"patterns"]];
+		ViLanguage *lang = [pattern objectForKey:@"language"];
+		if(lang == nil)
+			lang = self;
+
+		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"]];
 		if(expandedPatterns)
 		{
 			// cache it

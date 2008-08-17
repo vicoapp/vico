@@ -36,4 +36,9 @@
 	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
 }
 
+- (IBAction)closeCurrentTab:(id)sender
+{
+	[[[NSApp keyWindow] delegate] closeCurrentTab];
+}
+
 @end

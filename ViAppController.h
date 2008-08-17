@@ -5,4 +5,6 @@
 	IBOutlet NSMenu *themeMenu;
 }
 
+- (IBAction)closeCurrentTab:(id)sender;
+
 @end

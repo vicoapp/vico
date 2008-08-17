@@ -70,8 +70,11 @@
 
 - (void)setFilename:(NSURL *)aURL
 {
-	bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
-	[language patterns];
+	if(aURL)
+	{
+		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
+		[language patterns];
+	}
 }
 
 - (BOOL)illegal:(ViCommand *)command

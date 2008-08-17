@@ -106,4 +106,52 @@
 	return documentWindow;
 }
 
+- (void)newTabWithURL:(NSURL *)aURL
+{
+	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
+	[editor setFilename:aURL];
+	[editor setDelegate:self];
+	
+	// create a new tab
+	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
+	[item setView:[editor view]];
+	if(aURL)
+		[item setLabel:[[aURL path] lastPathComponent]];
+	else
+		[item setLabel:@"New file"];
+	[tabView addTabViewItem:item];
+	[tabView selectTabViewItem:item];
+
+	[self setFileURL:aURL];
+}
+
+- (void)setFileURL:(NSURL *)aURL
+{
+	NSLog(@"MyDocument: setFileURL: [%@]", aURL);
+	[super setFileURL:aURL];
+	if(aURL)
+	{
+		[[self currentEditor] setFilename:aURL];
+		[[tabView selectedTabViewItem] setLabel:[[aURL path] lastPathComponent]];
+	}
+}
+
+- (NSURL *)fileURL
+{
+	NSURL *url = [[self currentEditor] fileURL];
+	if(url == nil)
+		url = [super fileURL];
+	NSLog(@"MyDocument: fileURL: [%@]", url);
+	return url;
+}
+
+- (void)closeCurrentTab
+{
+	NSLog(@"closing tab");
+	if([tabView numberOfTabViewItems] == 1)
+		[self close];
+	else
+		[tabView removeTabViewItem:[tabView selectedTabViewItem]];
+}
+
 @end

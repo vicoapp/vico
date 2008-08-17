@@ -26,5 +26,9 @@
 	[self ex_quit:command];
 }
 
+- (void)ex_edit:(ExCommand *)command
+{
+	[[self delegate] newTab];
+}
 
 @end

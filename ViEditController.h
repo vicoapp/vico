@@ -16,11 +16,13 @@
 	IBOutlet NSTextField *statusbar;
 	SEL exCommandSelector;
 	id delegate;
+	NSURL *fileURL;
 }
 
 - (NSView *)view;
 - (void)setDelegate:(id)aDelegate;
 - (void)setFilename:(NSURL *)aURL;
+- (NSURL *)fileURL;
 - (void)setString:(NSString *)aString;
 - (IBAction)finishedExCommand:(id)sender;
 - (void)message:(NSString *)fmt, ...;
@@ -29,5 +31,6 @@
 - (NSData *)saveData;
 - (void)changeTheme:(ViTheme *)theme;
 - (void)save;
+- (void)newTab;
 
 @end

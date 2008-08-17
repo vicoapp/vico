@@ -42,8 +42,14 @@
 
 - (void)setFilename:(NSURL *)aURL
 {
+	fileURL = aURL;
 	[textView setFilename:aURL];
 	[textView highlightEverything];
+}
+
+- (NSURL *)fileURL
+{
+	return fileURL;
 }
 
 - (void)changeTheme:(ViTheme *)theme
@@ -98,6 +104,11 @@
 - (void)save
 {
 	[delegate saveDocument:self];
+}
+
+- (void)newTab
+{
+	[delegate newTabWithURL:nil];
 }
 
 @end

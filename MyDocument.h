@@ -12,5 +12,7 @@
 - (void)changeTheme:(ViTheme *)theme;
 - (ViEditController *)currentEditor;
 - (NSWindow *)window;
+- (void)newTabWithURL:(NSURL *)aURL;
+- (void)closeCurrentTab;
 
 @end

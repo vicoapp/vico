@@ -36,6 +36,11 @@
 	NSLog(@"X may not be used as a motion command");
 }
 
+- (void)nodot:(ViCommand *)command
+{
+	NSLog(@"No command to repeat");
+}
+
 - (void)current_line:(ViCommand *)command
 {
 	NSTextStorage *text = [self textStorage];
@@ -462,7 +467,7 @@
 	// NSLog(@"executing method '%@'", command.method);
 	[self performSelector:NSSelectorFromString(methodSignature) withObject:command];
 	
-	NSRange selend = [self selectedRange];
+	// NSRange selend = [self selectedRange];
 	// NSLog(@"sel.location: %i -> %i", command.start_range.location, selend.location);
 
 	[command reset];

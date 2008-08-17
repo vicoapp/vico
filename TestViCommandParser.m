@@ -138,8 +138,124 @@
 	STAssertEquals(parser.count, 987650, nil);
 }
 
-- (void)test064_OverrideRepeatCount
+- (void)test064_DualCountIsMultiplicative
 {
+	/* From nvi:
+         * A count may be provided both to the command and to the motion, in
+         * which case the count is multiplicative.  For example, "3y4y" is the
+         * same as "12yy".  This count is provided to the motion command and 
+         * not to the regular function.
+         */
+	[parser pushKey:'3'];
+	[parser pushKey:'y'];
+	[parser pushKey:'4'];
+	[parser pushKey:'y'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.count, 0, nil);
+	STAssertEquals(parser.motion_count, 12, nil);
+	STAssertEqualObjects(parser.motion_method, @"current_line", nil);
+	STAssertEqualObjects(parser.method, @"yank", nil);
+}
+
+- (void)test070_NoDotCommand
+{
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.method, @"nodot", nil);
+}
+
+- (void)test071_DotCommand
+{
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.key, 'x', nil);
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.key, 'x', nil);
+}
+
+- (void)test072_MotionDoesntSetDot
+{
+	[parser pushKey:'w'];
+	STAssertTrue(parser.complete, nil);
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.method, @"nodot", nil);
+}
+
+- (void)test073_MotionDoesntResetDot
+{
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	[parser reset];
+	[parser pushKey:'w'];
+	STAssertTrue(parser.complete, nil);
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.method, @"delete_forward", nil);
+}
+
+- (void)test074_DotCommandChangesWithCommands
+{
+	[parser pushKey:'x'];
+	[parser reset];
+	[parser pushKey:'X'];
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.method, @"delete_backward", nil);	
+}
+
+- (void)test075_DotCommandInheritsCount
+{
+	[parser pushKey:'d'];
+	[parser pushKey:'2'];
+	[parser pushKey:'w'];
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.key, 'd', nil);	
+	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
+	STAssertEquals(parser.motion_count, 2, nil);
+}
+
+- (void)test076_DotCommandWithCountOverridesOriginal
+{
+	[parser pushKey:'2'];
+	[parser pushKey:'d'];
+	[parser pushKey:'w'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.count, 2, nil);
+	[parser reset];
+	[parser pushKey:'3'];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.key, 'd', nil);	
+	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
+	STAssertEquals(parser.count, 3, nil);
+	STAssertEquals(parser.motion_count, 0, nil);
+}
+
+- (void)test077_DotCommandWithMultiplicativeCountOverridesOriginal
+{
+	[parser pushKey:'2'];
+	[parser pushKey:'d'];
+	[parser pushKey:'4'];
+	[parser pushKey:'w'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.count, 0, nil);
+	STAssertEquals(parser.motion_count, 8, nil);
+	[parser reset];
+	[parser pushKey:'3'];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEquals(parser.key, 'd', nil);	
+	STAssertEqualObjects(parser.motion_method, @"word_forward", nil);
+	STAssertEquals(parser.count, 0, nil);
+	STAssertEquals(parser.motion_count, 12, nil);
 }
 
 @end

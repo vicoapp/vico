@@ -3,15 +3,16 @@
 #define has_flag(key, flag) ((((key)->flags) & flag) == flag)
 
 #define VIF_NEED_MOTION	(1 << 0)
-#define VIF_IS_MOTION	(2 << 0)
+#define VIF_IS_MOTION	(1 << 1)
+#define VIF_SETS_DOT	(1 << 2)
 
 static struct vikey vikeys[] = {
-	{@"append",		'a', 0},
-	{@"append_eol",		'A', 0},
-	{@"insert",		'i', 0},
-	{@"insert_bol",		'I', 0},
-	{@"change",		'c', VIF_NEED_MOTION},
-	{@"delete",		'd', VIF_NEED_MOTION},
+	{@"append",		'a', VIF_SETS_DOT},
+	{@"append_eol",		'A', VIF_SETS_DOT},
+	{@"insert",		'i', VIF_SETS_DOT},
+	{@"insert_bol",		'I', VIF_SETS_DOT},
+	{@"change",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"delete",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"move_left",		'h', VIF_IS_MOTION},
 	{@"move_down",		'j', VIF_IS_MOTION},
 	{@"move_up",		'k', VIF_IS_MOTION},
@@ -19,11 +20,12 @@ static struct vikey vikeys[] = {
 	{@"move_bol",		'0', VIF_IS_MOTION},
 	{@"move_eol",		'$', VIF_IS_MOTION},
 	{@"word_forward",	'w', VIF_IS_MOTION},
-	{@"delete_forward",	'x', 0},
-	{@"delete_backward",	'X', 0},
-	{@"open_line_above",	'O', 0},
-	{@"open_line_below",	'o', 0},
-	{nil, 0, 0}
+	{@"delete_forward",	'x', VIF_SETS_DOT},
+	{@"delete_backward",	'X', VIF_SETS_DOT},
+	{@"open_line_above",	'O', VIF_SETS_DOT},
+	{@"open_line_below",	'o', VIF_SETS_DOT},
+	{@"yank",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{nil, -1, 0}
 };
 
 static struct vikey *
@@ -49,6 +51,34 @@ find_command(int key)
 @synthesize start_range;
 @synthesize stop_range;
 
+/* finalizes the command, sets the dot command and adjusts counts if necessary
+ */
+- (void)setComplete
+{
+	complete = YES;
+
+	if(command_key && has_flag(command_key, VIF_SETS_DOT))
+	{
+		/* set the dot command parameters */
+		dot_command_key = command_key;
+		dot_motion_method = motion_method;
+		dot_count = count;
+		dot_motion_count = motion_count;
+	}
+	
+	if(count > 0 && motion_count > 0)
+	{
+		/* From nvi:
+		 * A count may be provided both to the command and to the motion, in
+		 * which case the count is multiplicative.  For example, "3y4y" is the
+		 * same as "12yy".  This count is provided to the motion command and 
+		 * not to the regular function.
+		 */
+		motion_count *= count;
+		count = 0;
+	}
+}
+
 - (void)pushKey:(unichar)key
 {
 	// check if it's a repeat count
@@ -57,10 +87,29 @@ find_command(int key)
 		countp = &count;
 	else if(state == ViCommandNeedMotion)
 		countp = &motion_count;
+	// conditionally include '0' as a repeat count only if it's not the first digit
 	if(key >= '1' - ((countp && *countp > 0) ? 1 : 0) && key <= '9')
 	{
 		*countp *= 10;
 		*countp += key - '0';
+		return;
+	}
+
+	// check for the dot command
+	if(key == '.')
+	{
+		if(dot_command_key == nil)
+		{
+			method = @"nodot"; // prints "No command to repeat"
+			[self setComplete];
+			return;
+		}
+
+		command_key = dot_command_key;
+		method = command_key->method;
+		motion_method = dot_motion_method;
+		motion_count = dot_motion_count;
+		[self setComplete];
 		return;
 	}
 
@@ -69,18 +118,18 @@ find_command(int key)
 	{
 		// should print "X isn't a vi command"
 		method = @"illegal";
-		complete = YES;
+		[self setComplete];
 		return;
 	}
 
 	if(state == ViCommandInitialState)
 	{
-		method = vikey->method;
 		command_key = vikey;
+		method = command_key->method;
 		if(has_flag(vikey, VIF_NEED_MOTION))
 			state = ViCommandNeedMotion;
 		else
-			complete = YES;
+			[self setComplete];
 	}
 	else if(state == ViCommandNeedMotion)
 	{
@@ -101,9 +150,8 @@ find_command(int key)
 			// should print "X may not be used as a motion command"
 			method = @"nonmotion";
 		}
-		complete = YES;
+		[self setComplete];
 	}
-
 }
 
 - (void)reset

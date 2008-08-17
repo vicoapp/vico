@@ -52,4 +52,6 @@
 - (void)test060_GotoColumnZero			{ MOVE(@"abc def", 4, @"0", 0); }
 - (void)test060_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
 
+- (void)test070_DeleteCurrentLine		{ TEST(@"abc\ndef\nghi", 2, @"dd", @"def\nghi", 0); }
+
 @end

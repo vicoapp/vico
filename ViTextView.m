@@ -773,6 +773,7 @@
 }
 
 /* syntax: [count]b */
+/* syntax: [count]B */
 - (BOOL)word_backward:(ViCommand *)command
 {
 	if([storage length] == 0)
@@ -807,7 +808,13 @@
 	}
 	ch = [s characterAtIndex:end_location];
 
-	if([wordSet characterIsMember:ch])
+	if(command.key == 'B')
+	{
+		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:YES];
+		if([whitespace characterIsMember:[s characterAtIndex:end_location]])
+			end_location++;
+	}
+	else if([wordSet characterIsMember:ch])
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:YES];

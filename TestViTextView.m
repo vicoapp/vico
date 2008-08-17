@@ -134,5 +134,6 @@
 
 - (void)test140_BigwordForward			{ MOVE(@"abc=def ghi", 0, @"W", 8); }
 - (void)test141_BigwordForwardSpace		{ MOVE(@"abc     ghi", 3, @"W", 8); }
+- (void)test142_BigwordBackward			{ MOVE(@"abc=def ghi", 8, @"B", 0); }
 
 @end

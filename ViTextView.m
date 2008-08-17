@@ -995,16 +995,15 @@
 	return location;
 }
 
-- (NSUInteger)currentLine
+- (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation
 {
 	int line = 1;
 	NSUInteger location = 0;
-	NSUInteger caret = [self caret];
-	while(location < caret)
+	while(location < aLocation)
 	{
 		NSUInteger bol, end;
 		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
-		if(end > caret)
+		if(end > aLocation)
 		{
 			break;
 		}
@@ -1013,6 +1012,11 @@
 	}
 	
 	return line;
+}
+
+- (NSUInteger)currentLine
+{
+	return [self lineNumberAtLocation:[self caret]];
 }
 
 - (NSUInteger)currentColumn

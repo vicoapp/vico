@@ -98,6 +98,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
+- (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
 

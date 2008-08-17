@@ -912,4 +912,16 @@
 	return NO;
 }
 
+// syntax: ^G
+- (BOOL)show_info:(ViCommand *)command
+{
+	[[self delegate] message:@"%@: %s: line %u of %u [%.0f%%]",
+	 [[[[self delegate] fileURL] path] stringByAbbreviatingWithTildeInPath],
+	 [[[NSDocumentController sharedDocumentController] currentDocument] isDocumentEdited] ? "modified" : "unmodified",
+	 [self currentLine],
+	 [self lineNumberAtLocation:IMAX(0, [[storage string] length] - 1)],
+	 (float)[self caret]*100.0 / (float)[[storage string] length]];
+	return YES;
+}
+
 @end

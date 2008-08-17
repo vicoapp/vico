@@ -15,6 +15,7 @@ static struct vikey vikeys[] = {
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
+	{@"show_info:",		0x7, 0},  // ^G
 	{@"pop_tag:",		0x14, 0},  // ^T
 	{@"jump_tag:",		0x1D, 0},  // ^]
 	{@"move_right:",	' ', VIF_IS_MOTION},

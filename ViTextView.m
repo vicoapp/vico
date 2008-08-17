@@ -124,7 +124,7 @@
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
 	if(affectedRange.location >= eol)
-		final_location = IMAX(bol, eol - 1);
+		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
 	else
 		final_location = affectedRange.location;
 	return YES;

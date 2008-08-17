@@ -34,11 +34,13 @@
 - (void)test021_DeleteForwardAtEol		{ TEST(@"abc\ndef", 2, @"x", @"ab\ndef", 1); }
 - (void)test022_DeleteForewardWithCount		{ TEST(@"abcdef", 1, @"3x", @"aef", 1); }
 - (void)test023_DeleteForwardWithLargeCount	{ TEST(@"abcdef\nghi", 4, @"33x", @"abcd\nghi", 4); }
+- (void)test024_DeleteForwardAndYank		{ TEST(@"abc", 0, @"xlp", @"bca", 2); }
 
 - (void)test030_DeleteBackward			{ TEST(@"abcdef", 3, @"X", @"abdef", 2); }
 - (void)test031_DeleteBackwardAtBol		{ TEST(@"abcdef", 0, @"X", @"abcdef", 0); }
 - (void)test032_DeleteBackwardWithCount		{ TEST(@"abcdef", 5, @"4X", @"af", 1); }
-- (void)test033_DeleteBackwordWithLargeCount	{ TEST(@"abcdef", 2, @"7X", @"cdef", 0); }
+- (void)test033_DeleteBackwardWithLargeCount	{ TEST(@"abcdef", 2, @"7X", @"cdef", 0); }
+- (void)test034_DeleteBackwardAndYank		{ TEST(@"abc", 1, @"Xlp", @"bca", 2); }
 
 - (void)test040_WordForward			{ MOVE(@"abc def", 0, @"w", 4); }
 - (void)test041_WordForwardFromBlanks		{ MOVE(@"   abc def", 0, @"w", 3); }

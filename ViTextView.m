@@ -614,7 +614,7 @@
 	del.length = IMAX(1, command.count);
 	if(del.location + del.length > eol)
 		del.length = eol - del.location;
-	[storage deleteCharactersInRange:del];
+	[self cutToBuffer:0 append:NO range:del];
 
 	// correct caret position if we deleted the last character(s) on the line
 	end_location = start_location;
@@ -643,7 +643,7 @@
 	NSRange del;
 	del.location = IMAX(bol, start_location - IMAX(1, command.count));
 	del.length = start_location - del.location;
-	[storage deleteCharactersInRange:del];
+	[self cutToBuffer:0 append:NO range:del];
 	end_location = del.location;
 	final_location = end_location;
 	return YES;

@@ -32,6 +32,7 @@
 - (OGRegularExpressionMatch *)endMatch;
 - (int)patternIndex;
 - (BOOL)isSingleLineMatch;
+- (NSString *)description;
 @end
 
 @implementation ViSyntaxMatch
@@ -132,6 +133,10 @@
 - (BOOL)isSingleLineMatch
 {
 	return [pattern objectForKey:@"begin"] == nil;
+}
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"ViSyntaxMatch: scope = %@", [self scope]];
 }
 @end
 

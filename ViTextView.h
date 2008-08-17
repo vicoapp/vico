@@ -47,6 +47,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setCaret:(NSUInteger)location;
 - (NSUInteger)caret;
 - (void)setTheme:(ViTheme *)aTheme;
+- (void)setTabSize:(int)tabSize;
 @end
 
 @interface ViTextView (cursor)

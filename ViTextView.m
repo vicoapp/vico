@@ -153,8 +153,7 @@
  */
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	[storage insertAttributedString:[[NSAttributedString alloc] initWithString:aString]
-				atIndex:aLocation];
+	[[storage mutableString] insertString:aString atIndex:aLocation];
 }
 
 /* syntax: [buffer][count]P */
@@ -897,8 +896,39 @@
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor] forKey:NSBackgroundColorAttributeName]];
 	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
 	[self setFont:font];
+	[self setTabSize:8];
 	[self highlightEverything];
 	[self setNeedsDisplay:YES];
+}
+
+- (void)setTabSize:(int)tabSize
+{
+	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
+
+	NSLog(@"setting tab size %i for font %@", tabSize, [self font]);
+
+	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
+	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
+
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+
+	// remove all previous tab stops
+	NSArray *array = [style tabStops];
+	NSTextTab *tabStop;
+	for(tabStop in array)
+	{
+		[style removeTabStop:tabStop];
+	}
+
+	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
+	[style setDefaultTabInterval:tabSizeInPoints.width];
+
+	NSLog(@"font = %@", [self font]);
+	attrs = [NSDictionary dictionaryWithObjectsAndKeys:style, NSParagraphStyleAttributeName,
+						           [self font], NSFontAttributeName, nil];
+	[self setTypingAttributes:attrs];
+
+	[storage addAttributes:attrs range:NSMakeRange(0, [[storage string] length])];
 }
 
 @end

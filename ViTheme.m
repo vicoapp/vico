@@ -45,11 +45,18 @@
 			continue;
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 		[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
-		
+
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
 		if(background)
-		{
 			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
+
+		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
+		if(fontStyle)
+		{
+			if([fontStyle rangeOfString:@"underline"].location != NSNotFound)
+				[attrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
+			if([fontStyle rangeOfString:@"italic"].location != NSNotFound)
+				[attrs setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
 		}
 
 		for(scope in scope_selectors)

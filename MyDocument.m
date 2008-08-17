@@ -85,7 +85,12 @@
 
 - (void)changeTheme:(ViTheme *)theme
 {
-	// FIXME: loop over each tab and change theme for each delegate
+	// loop over each tab and change theme for each delegate
+	NSTabViewItem *item;
+	for(item in [tabView tabViewItems])
+	{
+		[[item identifier] changeTheme:theme];
+	}
 }
 
 // Each editor in each tab has its own undo manager. Return the current one.

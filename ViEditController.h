@@ -25,5 +25,6 @@
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
 - (NSUndoManager *)undoManager;
 - (NSData *)saveData;
+- (void)changeTheme:(ViTheme *)theme;
 
 @end

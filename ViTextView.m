@@ -62,6 +62,7 @@
 	[self setUsesFindPanel:NO];
 	//[self setPageGuideValues];
 	[self disableWrapping];
+	[self setContinuousSpellCheckingEnabled:NO];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }

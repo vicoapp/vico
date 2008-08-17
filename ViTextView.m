@@ -1551,7 +1551,7 @@
 			{
 				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
 			}
-			else
+			else if((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0)
 			{
 				/* other keys insert themselves */
 				/* but don't input control characters */

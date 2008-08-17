@@ -117,4 +117,6 @@
 - (void)test125_JoinFromFinishedSentence3	{ TEST(@"abc?\n   def", 0, @"J", @"abc?  def", 4); }
 - (void)test126_JoinLineStartingWithParen	{ TEST(@"abc\n)def", 0, @"J", @"abc)def", 2); }
 
+- (void)test130_ReplaceChar			{ TEST(@"abc def", 2, @"rx", @"abx def", 2); }
+
 @end

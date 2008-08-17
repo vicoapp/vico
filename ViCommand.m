@@ -30,6 +30,7 @@ static struct vikey vikeys[] = {
 	{@"move_right:",	'l', VIF_IS_MOTION},
 	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"put_after:",		'p', VIF_SETS_DOT},
+	{@"replace:",		'r', VIF_SETS_DOT | VIF_NEED_CHAR},
 	{@"move_til_char:",	't', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_forward:",	'w', VIF_IS_MOTION},
 	{@"delete_forward:",	'x', VIF_SETS_DOT},

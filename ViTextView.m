@@ -196,6 +196,14 @@
 	return YES;
 }
 
+/* syntax: [count]r<char> */
+- (BOOL)replace:(ViCommand *)command
+{
+	[[storage mutableString] replaceCharactersInRange:NSMakeRange(start_location, 1)
+					withString:[NSString stringWithFormat:@"%C", command.argument]];
+	return YES;
+}
+
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {

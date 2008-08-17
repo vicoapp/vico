@@ -34,6 +34,7 @@
 		9AC16D950D93CD8F00AE45E0 /* EditorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D930D93CD8F00AE45E0 /* EditorView.xib */; };
 		9AC16D980D93CDF200AE45E0 /* MyDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D960D93CDF200AE45E0 /* MyDocument.xib */; };
 		9AC16DA40D93D14A00AE45E0 /* ViEditController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC16DA30D93D14A00AE45E0 /* ViEditController.m */; };
+		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AEE8B5A0D929A2A00189D7B /* Project_DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */; };
 		9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */; };
 /* End PBXBuildFile section */
@@ -142,6 +143,7 @@
 		9AC16DA20D93D14A00AE45E0 /* ViEditController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViEditController.h; sourceTree = "<group>"; };
 		9AC16DA30D93D14A00AE45E0 /* ViEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViEditController.m; sourceTree = "<group>"; };
 		9AC16E540D93F3A100AE45E0 /* vizard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = folder; name = vizard; sourceTree = "<group>"; };
+		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
 		9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = Project_DataModel.xcdatamodel; sourceTree = "<group>"; };
 		9AEE8B7C0D929DED00189D7B /* ProjectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDelegate.h; sourceTree = "<group>"; };
 		9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDelegate.m; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 			children = (
 				9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */,
 				9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */,
+				9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */,
 				9A7B0E720D01601A00040CAC /* ViTextView.m */,
 				9A7B0E730D01601A00040CAC /* ViTextView.h */,
 				9A1A11FE0D02C65A009EABAC /* ViCommand.h */,
@@ -502,6 +505,7 @@
 				9AEE8B5A0D929A2A00189D7B /* Project_DataModel.xcdatamodel in Sources */,
 				9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */,
 				9AC16DA40D93D14A00AE45E0 /* ViEditController.m in Sources */,
+				9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

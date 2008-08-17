@@ -95,4 +95,9 @@
 	return [[[textView textStorage] string] dataUsingEncoding:NSUTF8StringEncoding];
 }
 
+- (void)save
+{
+	[delegate saveDocument:self];
+}
+
 @end

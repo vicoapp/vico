@@ -1133,7 +1133,6 @@
 
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
-	NSLog(@"should parse and execute ex command: [%@]", exCommandString);
 	if([exCommandString length] > 0)
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];

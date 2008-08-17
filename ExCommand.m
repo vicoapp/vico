@@ -493,7 +493,6 @@ static struct ex_command ex_commands[] = {
 	int i;
 	for(i = 0; ex_commands[i].name; i++)
 	{
-		NSLog(@"[%s] ~ [%s] ?", c, ex_commands[i].name);
 		if(strncmp(c, ex_commands[i].name, strlen(c)) == 0)
 		{
 			cmd = &ex_commands[i];

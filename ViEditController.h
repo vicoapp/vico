@@ -28,5 +28,6 @@
 - (NSUndoManager *)undoManager;
 - (NSData *)saveData;
 - (void)changeTheme:(ViTheme *)theme;
+- (void)save;
 
 @end

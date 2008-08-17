@@ -12,7 +12,8 @@
 - (NSArray *)patternsForScope:(NSString *)scope;
 - (NSArray *)fileTypes;
 - (NSString *)name;
-- (NSDictionary *)patternForScope:(NSString *)aScopeSelector;
+- (NSMutableDictionary *)patternForScope:(NSString *)aScopeSelector;
 - (NSArray *)expandedPatterns:(NSArray *)patterns;
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 
 @end

@@ -101,7 +101,7 @@
 		[self compile];
 	if(scope == nil)
 	{
-		return [self expandedPatterns:languagePatterns];
+		return [self expandedPatternsForPattern:language];
 	}
 
 	/* find the pattern for the scope */
@@ -124,7 +124,7 @@
 	return [language objectForKey:@"name"];
 }
 
-- (NSDictionary *)patternForScope:(NSString *)aScopeSelector
+- (NSMutableDictionary *)patternForScope:(NSString *)aScopeSelector
 {
 	// look in cache first
 	NSMutableDictionary *d = [scopeMappingCache objectForKey:aScopeSelector];
@@ -175,6 +175,21 @@
 		else
 		{
 			[expandedPatterns addObject:pattern];
+		}
+	}
+	return expandedPatterns;
+}
+
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern
+{
+	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
+	if(expandedPatterns == nil)
+	{
+		expandedPatterns = [self expandedPatterns:[pattern objectForKey:@"patterns"]];
+		if(expandedPatterns)
+		{
+			// cache it
+			[pattern setObject:expandedPatterns forKey:@"expandedPatterns"];
 		}
 	}
 	return expandedPatterns;

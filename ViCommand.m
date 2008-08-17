@@ -15,9 +15,10 @@ static struct vikey vikeys[] = {
 	{@"change_eol:",	'C', VIF_SETS_DOT},
 	{@"delete_eol:",	'D', VIF_SETS_DOT},
 	{@"end_of_word:",	'E', VIF_IS_MOTION},
+	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"insert_bol:",	'I', VIF_SETS_DOT},
 	{@"join:",		'J', VIF_SETS_DOT},
-	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"repeat_find_backward:",	'N', VIF_IS_MOTION},
 	{@"open_line_above:",	'O', VIF_SETS_DOT},
 	{@"put_before:",	'P', VIF_SETS_DOT},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
@@ -34,6 +35,7 @@ static struct vikey vikeys[] = {
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
+	{@"repeat_find:",	'n', VIF_IS_MOTION},
 	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"put_after:",		'p', VIF_SETS_DOT},
 	{@"replace:",		'r', VIF_SETS_DOT | VIF_NEED_CHAR},
@@ -47,6 +49,9 @@ static struct vikey vikeys[] = {
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
 	{@"ex_command:",	':', 0},
+	{@"shift_right:",	'>', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
+	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
+	{@"find:",		'/', VIF_IS_MOTION},
 	{nil, -1, 0}
 };
 

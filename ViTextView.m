@@ -45,6 +45,8 @@
 			 @"input_newline:", @"\n",
 			 @"input_backspace:", @"\x7f",
 			 @"input_backspace:", @"\x08", // ^h
+			 @"input_smart_pair:", @"(",
+			 @"input_smart_pair:", @")",
 			 nil];
 
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
@@ -55,6 +57,7 @@
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
 	[self setUsesFontPanel:NO];
+	[self setUsesFindPanel:NO];
 	//[self setPageGuideValues];
 	[self disableWrapping];
 
@@ -65,6 +68,7 @@
 {
 	language = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
 	[language patterns];
+	// preferences = [ViPreferences preferencesForScope:[language name]];
 }
 
 - (BOOL)illegal:(ViCommand *)command
@@ -112,7 +116,7 @@
 {
 	NSLog(@"inserting newline at %u", aLocation);
 	[self insertString:@"\n" atLocation:aLocation];
-	[insertedText appendString:@"\n"];
+	insert_end_location++;
 
 	if(aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
 	{
@@ -139,7 +143,7 @@
 		{
 			NSString *leading_whitespace = [[storage string] substringWithRange:NSMakeRange(searchRange.location, r.location - searchRange.location)];
 			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
-			[insertedText appendString:leading_whitespace];
+			insert_end_location += [leading_whitespace length];
 			return 1 + [leading_whitespace length];
 		}
 	}
@@ -580,7 +584,7 @@
 	return YES;
 }
 
-/* syntax: $ */
+/* syntax: [count]$ */
 - (BOOL)move_eol:(ViCommand *)command
 {
 	if([storage length] > 0)
@@ -649,7 +653,7 @@
 			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end_location];
 			if(end_location == end)
 			{
-				[[self delegate] message:@"%s Movement past the end-of-file", _cmd];
+				[[self delegate] message:@"Movement past the end-of-file"];
 				final_location = end_location = start_location;
 				return NO;
 			}
@@ -1031,6 +1035,56 @@
 	return YES;
 }
 
+/* syntax: [count]> */
+- (BOOL)shift_right:(ViCommand *)command
+{
+	int lines = command.count;
+	if(lines == 0)
+		lines = 1;
+
+	// process each line separately (remember that line mode is set)
+	NSRange lineRange = affectedRange;
+	while(lines--)
+	{
+		[self insertString:@"\t" atLocation:lineRange.location];
+
+		// get next line
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:NSMaxRange(lineRange)];
+		lineRange = NSMakeRange(bol, end - bol);
+	}
+
+	end_location = final_location = start_location + 1;
+
+	return YES;
+}
+
+/* syntax: [count]< */
+- (BOOL)shift_left:(ViCommand *)command
+{
+	int lines = command.count;
+	if(lines == 0)
+		lines = 1;
+
+	// process each line separately (remember that line mode is set)
+	NSRange lineRange = affectedRange;
+	while(lines--)
+	{
+		NSString *s = [[storage string] substringWithRange:lineRange];
+		if([s hasPrefix:@"\t"])
+			[storage deleteCharactersInRange:NSMakeRange(lineRange.location, 1)];
+
+		// get next line
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:NSMaxRange(lineRange)];
+		lineRange = NSMakeRange(bol, end - bol);
+	}
+
+	end_location = final_location = start_location - 1;
+
+	return YES;
+}
+
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
 	NSLog(@"should parse and execute ex command: [%@]", exCommandString);
@@ -1043,6 +1097,123 @@
 	return YES;
 }
 
+- (void)highlightFindMatch:(OGRegularExpressionMatch *)match
+{
+	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
+}
+
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
+{
+	unsigned rx_options = OgreNotBOLOption | OgreNotEOLOption;
+	if([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
+		rx_options |= OgreIgnoreCaseOption;
+
+	if(lastSearchRegexp == nil)
+	{
+		/* compile the pattern regexp */
+		@try
+		{
+			lastSearchRegexp = [OGRegularExpression regularExpressionWithString:pattern options:rx_options];
+			NSLog(@"compiled find regexp: [%@]", lastSearchRegexp);
+		}
+		@catch(NSException *exception)
+		{
+			NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
+			[[self delegate] message:@"Invalid search pattern: %@", exception];
+			return NO;
+		}
+	}
+
+	NSArray *foundMatches = [lastSearchRegexp allMatchesInString:[storage string] options:rx_options];
+
+	if([foundMatches count] == 0)
+	{
+		NSLog(@"pattern not found");
+		[[self delegate] message:@"Pattern not found"];
+	}
+	else
+	{
+		OGRegularExpressionMatch *match, *nextMatch = nil;
+		for(match in foundMatches)
+		{
+			NSRange r = [match rangeOfMatchedString];
+			if(find_options == 0)
+			{
+				if(nextMatch == nil && r.location > start_location)
+					nextMatch = match;
+			}
+			else if(r.location < start_location)
+			{
+				nextMatch = match;
+			}
+		}
+
+		if(nextMatch == nil)
+		{
+			if(find_options == 0)
+				nextMatch = [foundMatches objectAtIndex:0];
+			else
+				nextMatch = [foundMatches lastObject];
+
+			[[self delegate] message:@"Search wrapped"];
+		}
+
+		if(nextMatch)
+		{
+			NSRange r = [nextMatch rangeOfMatchedString];
+			[self scrollRangeToVisible:r];
+			final_location = end_location = r.location;
+			[self performSelector:@selector(highlightFindMatch:) withObject:nextMatch afterDelay:0];
+		}
+
+		return YES;
+	}
+
+	return NO;
+}
+
+- (void)find_forward_callback:(NSString *)pattern
+{
+	lastSearchPattern = pattern;
+	if([self findPattern:pattern options:0])
+	{
+		[self setCaret:final_location];
+	}
+}
+
+/* syntax: /regexp */
+- (BOOL)find:(ViCommand *)command
+{
+	lastSearchRegexp = nil;
+	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:)];
+	// FIXME: this won't work as a motion command!
+	// d/pattern will not work!
+	return YES;
+}
+
+/* syntax: n */
+- (BOOL)repeat_find:(ViCommand *)comand
+{
+	if(lastSearchPattern == nil)
+	{
+		[[self delegate] message:@"No previous search pattern"];
+		return NO;
+	}
+
+	return [self findPattern:lastSearchPattern options:0];
+}
+
+/* syntax: N */
+- (BOOL)repeat_find_backward:(ViCommand *)comand
+{
+	if(lastSearchPattern == nil)
+	{
+		[[self delegate] message:@"No previous search pattern"];
+		return NO;
+	}
+
+	return [self findPattern:lastSearchPattern options:1];
+}
 
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
@@ -1108,7 +1279,7 @@
 	{
 		NSLog(@"entering insert mode");
 		mode = ViInsertMode;
-		insertedText = [[NSMutableString alloc] init];
+		insert_start_location = insert_end_location = [self caret];
 	}
 }
 
@@ -1184,10 +1355,13 @@
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y'))
+	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		/* ...well, except for yy :-) */
+		/* ...and > */
+		/* ...and < */
+		// FIXME: this is not a generic case!
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;
@@ -1201,16 +1375,42 @@
 
 - (NSUInteger)input_backspace:(NSString *)characters
 {
-	if([insertedText length] == 0)
+	if(start_location == insert_start_location)
 	{
 		[[self delegate] message:@"No more characters to erase"];
 		return 0;
 	}
 
-	[insertedText deleteCharactersInRange:NSMakeRange([insertedText length] - 1, 1)];
-	[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
+	/* check if we're deleting the first character in a smart pair */
+	if([[storage string] characterAtIndex:start_location - 1] == '(' && [[storage string] characterAtIndex:start_location] == ')')
+	{
+		[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 2)];
+		insert_end_location -= 2;
+	}
+	else
+	{
+		[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
+		insert_end_location--;
+	}
 
 	return -1;
+}
+
+- (NSUInteger)input_smart_pair:(NSString *)characters
+{
+	if([characters isEqualToString:@"("])
+	{
+		[self insertString:@"()" atLocation:start_location];
+		insert_end_location += 2;
+		return 1;
+	}
+	else if([characters isEqualToString:@")"])
+	{
+		if([[storage string] characterAtIndex:start_location] == ')')
+			return 1;
+	}
+
+	return 0;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1228,6 +1428,7 @@
 		if(charcode == 0x1B)
 		{
 			/* escape, return to command mode */
+			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
 			NSLog(@"registering replay text: [%@], count = %i", insertedText, parser.count);
 
 			/* handle counts for inserted text here */
@@ -1278,7 +1479,7 @@
 				else
 				{
 					[self insertString:[theEvent characters] atLocation:start_location];
-					[insertedText appendString:[theEvent characters]];
+					insert_end_location += [[theEvent characters] length];
 					num_chars = [[theEvent characters] length];
 				}
 			}

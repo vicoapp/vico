@@ -149,4 +149,12 @@
 - (void)test157_DeleteToEndOfBigwordToNonword	{ TEST(@"abc:def ghi", 0, @"dE", @" ghi", 0); }
 - (void)test158_DeleteToEndOfWordFromBlanks	{ TEST(@"abc    def", 4, @"de", @"abc ", 3); }
 
+// - (void)test160_DeleteAndUndo			{ TEST(@"abc def", 2, @"xu", @"abc def", 2); }
+// - (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+
+- (void)test170_ShiftLineRight			{ TEST(@"abc\ndef", 0, @">>", @"\tabc\ndef", 1); }
+- (void)test171_ShiftTwoLinesRight		{ TEST(@" abc\n\tdef\nghi", 0, @"2>>", @"\t abc\n\t\tdef\nghi", 1); }
+- (void)test172_ShiftLineLeft			{ TEST(@"\t\tabc\ndef", 3, @"<<", @"\tabc\ndef", 2); }
+- (void)test173_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
+
 @end

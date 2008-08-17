@@ -16,7 +16,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViMode mode;
 	ViCommand *parser;
 	NSTextStorage *storage;
-	NSMutableString *insertedText;
+
+	//NSMutableString *insertedText;
+	NSUInteger insert_start_location, insert_end_location;
 
 	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
@@ -33,6 +35,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	/* syntax highlighting */
 	ViTheme *theme;
 	ViLanguage *language;
+
+	NSString *lastSearchPattern;
+	OGRegularExpression *lastSearchRegexp;
 
 	CGFloat pageGuideX;
 

@@ -589,11 +589,11 @@
 		[self resetAttributesInRange:NSMakeRange(0, [[storage string] length])];
 		return;
 	}
-	DEBUG(@"%s begin highlighting", _cmd);
+	NSLog(@"start highlighting file");
 	[storage beginEditing];
 	[self highlightInRange:NSMakeRange(0, [[storage string] length]) restarting:NO];
 	[storage endEditing];
-	DEBUG(@"%s end highlighting", _cmd);
+	NSLog(@"finished highlighting file");
 }
 
 @end

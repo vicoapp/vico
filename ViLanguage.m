@@ -90,9 +90,11 @@
 
 - (void)compile
 {
+	NSLog(@"start compiling language [%@]", [self name]);
 	[self compilePatterns:languagePatterns];
 	[self compilePatterns:[[language objectForKey:@"repository"] allValues]];
 	compiled = YES;
+	NSLog(@"finished compiling language [%@]", [self name]);
 }
 
 - (id)initWithPath:(NSString *)aPath

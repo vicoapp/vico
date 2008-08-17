@@ -9,6 +9,7 @@
 #define VIF_NEED_CHAR	(1 << 4)
 
 static struct vikey vikeys[] = {
+	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
@@ -60,6 +61,7 @@ static struct vikey vikeys[] = {
 	{@"shift_right:",	'>', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
+	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
 	{nil, -1, 0}
 };
 

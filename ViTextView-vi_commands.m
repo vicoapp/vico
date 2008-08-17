@@ -859,11 +859,10 @@
 		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
 	if(tags == nil)
 		return YES;
-	
-	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
-	if(word_end > start_location)
+
+	NSString *word = [self wordAtLocation:start_location];
+	if(word)
 	{
-		NSString *word = [[storage string] substringWithRange:NSMakeRange(start_location, word_end - start_location)];
 		NSLog(@"jump_tag: got word [%@]", word);
 		NSArray *tag = [tags lookup:word];
 		if(tag)
@@ -898,5 +897,19 @@
 	[[self delegate] popTag];
 	return YES;
 }
-	
+
+// syntax: ^A
+// syntax: * (from vim, incompatible with nvi)
+- (BOOL)find_current_word:(ViCommand *)command
+{
+	NSString *word = [self wordAtLocation:start_location];
+	if(word)
+	{
+		lastSearchRegexp = nil;
+		lastSearchPattern = [NSString stringWithFormat:@"\\b%@\\b", word];
+		return [self findPattern:lastSearchPattern options:OgreNoneOption];
+	}
+	return NO;
+}
+
 @end

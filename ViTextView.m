@@ -998,4 +998,19 @@
 	return [self caret] - bol;
 }
 
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
+	if(word_start < aLocation)
+		word_start += 1;
+
+	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:NO];
+	if(word_end > word_start)
+	{
+		return [[storage string] substringWithRange:NSMakeRange(word_start, word_end - word_start)];
+	}
+
+	return nil;
+}
+
 @end

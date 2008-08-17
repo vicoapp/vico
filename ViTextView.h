@@ -68,12 +68,13 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setTabSize:(int)tabSize;
 - (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
-
+- (NSString *)wordAtLocation:(NSUInteger)aLocation;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(OgreSyntax)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp;
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;

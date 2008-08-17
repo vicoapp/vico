@@ -48,6 +48,7 @@
 - (void)setFilename:(NSURL *)aURL
 {
 	language = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
+	[language patternsForScope:nil];
 }
 
 - (BOOL)illegal:(ViCommand *)command

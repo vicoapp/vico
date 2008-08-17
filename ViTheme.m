@@ -7,7 +7,9 @@
 	static ViTheme *defaultTheme = nil;
 	if(defaultTheme == nil)
 	{
-		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
+		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
+		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Blackboard.tmTheme"];
+		defaultTheme = [[ViTheme alloc] initWithPath:@"/Library/Application Support/TextMate/Themes/Blackboard.tmTheme"];
 		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
 	}
 	return defaultTheme;

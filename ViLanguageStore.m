@@ -32,7 +32,7 @@ static ViLanguageStore *defaultStore = nil;
 	languages = [[NSMutableDictionary alloc] init];
 
 	BOOL isDirectory = NO;
-	
+
 	NSString *bundlesPath = @"/Applications/TextMate.app/Contents/SharedSupport";
 	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
 		[self addLanguagesFromBundleDirectory:bundlesPath];
@@ -59,7 +59,6 @@ static ViLanguageStore *defaultStore = nil;
 	ViLanguage *language;
 	for(language in [languages allValues])
 	{
-		NSLog(@"checking language %@...", [language name]);
 		NSArray *fileTypes = [language fileTypes];
 		NSString *fileType;
 		for(fileType in fileTypes)

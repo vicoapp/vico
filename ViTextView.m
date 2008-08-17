@@ -1,5 +1,6 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
+#import "ViThemeStore.h"
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -36,13 +37,7 @@
 	[self setAutoresizingMask:NSViewWidthSizable];
 	[self setHorizontallyResizable:YES];
 
-	theme = [ViTheme defaultTheme];
-	[self setBackgroundColor:[theme backgroundColor]];
-	[self setDrawsBackground:YES];
-	[self setInsertionPointColor:[theme caretColor]];
-	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor] forKey:NSBackgroundColorAttributeName]];
-	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
-	[self setFont:font];
+	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
 - (void)setFilename:(NSURL *)aURL
@@ -743,6 +738,20 @@
 	// not two (as the system draws it in a special way), and that's also why the
 	// width above is set to zero
 	[self display];
+}
+
+- (void)setTheme:(ViTheme *)aTheme
+{
+	NSLog(@"setting theme %@", [aTheme name]);
+	theme = aTheme;
+	[self setBackgroundColor:[theme backgroundColor]];
+	[self setDrawsBackground:YES];
+	[self setInsertionPointColor:[theme caretColor]];
+	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor] forKey:NSBackgroundColorAttributeName]];
+	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
+	[self setFont:font];
+	[self highlightEverything];
+	[self setNeedsDisplay:YES];
 }
 
 @end

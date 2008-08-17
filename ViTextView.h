@@ -41,6 +41,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
 - (NSUInteger)caret;
+- (void)setTheme:(ViTheme *)aTheme;
 @end
 
 @interface ViTextView (cursor)

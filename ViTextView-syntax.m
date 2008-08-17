@@ -206,6 +206,8 @@
 
 - (ViSyntaxMatch *)highlightSubpatternsForPattern:(NSMutableDictionary *)pattern inRange:(NSRange)range
 {
+	if(range.length == 0)
+		return nil;
 	NSArray *subPatterns = [language expandedPatternsForPattern:pattern];
 	if(subPatterns)
 	{

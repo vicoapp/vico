@@ -63,7 +63,7 @@
 	if(self == nil)
 		return nil;
 
-	NSLog(@"Initializing language from file %@", aPath);
+	//NSLog(@"Initializing language from file %@", aPath);
 	compiled = NO;
 	language = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
 	//NSLog(@"language = [%@]", language);

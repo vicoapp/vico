@@ -2,19 +2,6 @@
 
 @implementation ViTheme
 
-+ (ViTheme *)defaultTheme
-{
-	static ViTheme *defaultTheme = nil;
-	if(defaultTheme == nil)
-	{
-		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
-		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Blackboard.tmTheme"];
-		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Library/Application Support/TextMate/Themes/Blackboard.tmTheme"];
-		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
-	}
-	return defaultTheme;
-}
-
 - (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
 	//NSLog(@"%s saving foreground color %@", _cmd, foreground);
@@ -32,7 +19,7 @@
 
 	scopeSelectorCache = [[NSMutableDictionary alloc] init];	
 	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
-	NSLog(@"theme = %@", theme);
+	//NSLog(@"theme = %@", theme);
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *settings = [theme objectForKey:@"settings"];
@@ -79,6 +66,11 @@
 {
 	NSString *path = [[NSBundle mainBundle] pathForResource:aBundleName ofType:@"tmTheme"];
 	return [self initWithPath:path];
+}
+
+- (NSString *)name
+{
+	return [theme objectForKey:@"name"];
 }
 
 - (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector

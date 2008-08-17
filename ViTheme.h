@@ -15,8 +15,8 @@
 }
 - (id)initWithPath:(NSString *)aPath;
 - (id)initWithBundle:(NSString *)aBundleName;
+- (NSString *)name;
 - (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector;
-+ (ViTheme *)defaultTheme;
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;

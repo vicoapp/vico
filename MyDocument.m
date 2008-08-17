@@ -70,4 +70,9 @@
 	return YES;
 }
 
+- (void)changeTheme:(ViTheme *)theme
+{
+	[textView setTheme:theme];
+}
+
 @end

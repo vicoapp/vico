@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import <OgreKit/OgreKit.h>
 #import "ViCommand.h"
 
 typedef enum { ViCommandMode, ViInsertMode } ViMode;
@@ -16,13 +17,13 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	BOOL need_scroll;
 
 	/* syntax highlighting */
-	NSDictionary *keywords;
+	OGRegularExpression *keywordRegex;
+	OGRegularExpression *storageRegex;
+	OGRegularExpression *storageModifierRegex;
 	NSColor *commentColor;
 	NSColor *stringColor;
 	NSColor *numberColor;
 	NSColor *keywordColor;
-	NSMutableCharacterSet *keywordSet;
-	NSMutableCharacterSet *keywordAndDotSet;
 	BOOL syntax_initialized;
 
 	CGFloat pageGuideX;

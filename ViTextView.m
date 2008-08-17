@@ -605,7 +605,7 @@
 		l2 = l1;
 		l1 = end_location;
 	}
-	NSLog(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	//NSLog(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
 	if(command.line_mode && !command.ismotion)
 	{

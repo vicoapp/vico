@@ -8,6 +8,7 @@
 - (void)disableWrapping;
 - (BOOL)insert:(ViCommand *)command;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 @end
 
 @implementation ViTextView
@@ -447,6 +448,16 @@
 - (BOOL)move_bol:(ViCommand *)command
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
+	final_location = end_location;
+	need_scroll = YES;
+	return YES;
+}
+
+/* syntax: _ or ^ */
+- (BOOL)move_first_char:(ViCommand *)command
+{
+	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
+	end_location = [self skipWhitespaceFrom:end_location];
 	final_location = end_location;
 	need_scroll = YES;
 	return YES;

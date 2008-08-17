@@ -115,6 +115,8 @@
 
 - (void)test110_MoveDown			{ MOVE(@"abc\ndef", 1, @"j", 5); }
 //- (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
+- (void)test112_MoveToFirstNonspace		{ MOVE(@"   abc", 5, @"_", 3); }
+- (void)test112_MoveToFirstNonspace2		{ MOVE(@"   abc", 5, @"^", 3); }
 
 // The Join command is a mess of special cases...
 - (void)test120_JoinLines			{ TEST(@"abc\ndef", 0, @"J", @"abc def", 3); }

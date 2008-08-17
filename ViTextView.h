@@ -17,16 +17,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	BOOL need_scroll;
 
 	/* syntax highlighting */
-	NSMutableArray *languagePatterns;
-	OGRegularExpression *keywordRegex;
-	OGRegularExpression *storageRegex;
-	OGRegularExpression *storageModifierRegex;
-	OGRegularExpression *lineCommentRegex;
-	OGRegularExpression *commentRegex;
-	NSColor *commentColor;
-	NSColor *stringColor;
-	NSColor *numberColor;
-	NSColor *keywordColor;
+	NSArray *languagePatterns;
+	NSDictionary *theme;
+	NSMutableDictionary *themeAttributes;
 	BOOL syntax_initialized;
 
 	CGFloat pageGuideX;

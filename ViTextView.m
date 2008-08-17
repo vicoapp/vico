@@ -101,6 +101,44 @@
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 }
 
+- (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
+{
+	NSLog(@"inserting newline at %u", aLocation);
+	[self insertString:@"\n" atLocation:aLocation];
+	[insertedText appendString:@"\n"];
+
+	if(aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
+	{
+		NSRange searchRange;
+		if(indentForward)
+		{
+			NSUInteger bol;
+			[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aLocation - 1];
+			searchRange = NSMakeRange(bol, aLocation - 1 - bol);
+		}
+		else
+		{
+			NSUInteger eol;
+			[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:aLocation + 1];
+			searchRange = NSMakeRange(aLocation + 1, eol - aLocation + 1);
+		}
+		NSLog(@"doing auto-indentation, search range %u + %u", searchRange.location, searchRange.length);
+
+		NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
+							      options:0
+								range:searchRange];
+		NSLog(@"r = %u + %u", r.location, r.length);
+		if(r.location != NSNotFound)
+		{
+			NSString *leading_whitespace = [[storage string] substringWithRange:NSMakeRange(searchRange.location, r.location - searchRange.location)];
+			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
+			[insertedText appendString:leading_whitespace];
+			return 1 + [leading_whitespace length];
+		}
+	}
+
+	return 1;
+}
 
 /* Undo support
  */
@@ -639,10 +677,10 @@
 /* syntax: o */
 - (BOOL)open_line_below:(ViCommand *)command
 {
-	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
-	[self insertString:@"\n" atLocation:end_location];
-	final_location = end_location;
-	[self recordInsertInRange:NSMakeRange(end_location, 1)];
+	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
+	int num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
+	final_location = end_location + num_chars;
+	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
 	return [self insert:command];
 }
 
@@ -650,9 +688,9 @@
 - (BOOL)open_line_above:(ViCommand *)command
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
-	[self insertString:@"\n" atLocation:end_location];
-	final_location = end_location;
-	[self recordInsertInRange:NSMakeRange(end_location, 1)];
+	int num_chars = [self insertNewlineAtLocation:end_location indentForward:NO];
+	final_location = end_location - 1 + num_chars;
+	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
 	return [self insert:command];
 }
 
@@ -1171,11 +1209,20 @@
 		}
 		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask)) >> 17) == 0)
 		{
-			NSLog(@"insert text [%@]", [theEvent characters]);
+			NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
 			start_location = [self caret];
-			[self insertString:[theEvent characters] atLocation:start_location];
-			[self setCaret:start_location + [[theEvent characters] length]];
-			[insertedText appendString:[theEvent characters]];
+			if([[theEvent characters] isEqualToString:@"\r"])
+			{
+				int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+				// FIXME: insertNewlineAtLocation: adds the newline and autoindented whitespace to insertedText itself...
+				[self setCaret:start_location + num_chars];
+			}
+			else
+			{
+				[self insertString:[theEvent characters] atLocation:start_location];
+				[insertedText appendString:[theEvent characters]];
+				[self setCaret:start_location + [[theEvent characters] length]];
+			}
 		}
 		else
 		{

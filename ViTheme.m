@@ -42,7 +42,8 @@
 			continue;
 
 		// split up grouped selectors
-		NSArray *scopeSelectors = [scopeSelector componentsSeparatedByRegularExpressionString:@"\\s*,\\s*"];
+		//NSArray *scopeSelectors = [scopeSelector componentsSeparatedByRegularExpressionString:@"\\s*,\\s*"];
+		NSArray *scopeSelectors = [scopeSelector componentsSeparatedByString:@", "];
 
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 

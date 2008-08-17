@@ -1004,7 +1004,7 @@
 	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
 	[self setFont:font];
 	[self setTabSize:8];
-	[self highlightEverything];
+	//[self highlightEverything];
 	[self setNeedsDisplay:YES];
 }
 

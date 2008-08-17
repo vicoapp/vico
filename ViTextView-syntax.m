@@ -139,7 +139,6 @@
 
 @interface ViTextView (syntax_private)
 - (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch;
-- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL;
 @end
 
 @implementation ViTextView (syntax)
@@ -190,16 +189,6 @@
 	[self applyScopes:[NSArray arrayWithObject:aScope] inRange:aRange];
 }
 
-- (void)highlightMatch:(ViSyntaxMatch *)aMatch inRange:(NSRange)aRange
-{
-	[self applyScope:[aMatch scope] inRange:aRange];
-}
-
-- (void)highlightMatch:(ViSyntaxMatch *)aMatch
-{
-	[self highlightMatch:aMatch inRange:[aMatch matchedRange]];
-}
-
 - (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(OGRegularExpressionMatch *)aMatch
 {
 	NSDictionary *captures = [pattern objectForKey:captureType];
@@ -236,22 +225,76 @@
 	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
 }
 
-- (void)matchAllPatterns:(NSArray *)patterns inRange:(NSRange)aRange toArray:(NSMutableArray *)matchingPatterns
+//- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL
+
+- (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange
 {
+	DEBUG(@"searching for end match to [%@] in range %u + %u",
+	      [beginMatch scope], aRange.location, aRange.length);
+	
+	OGRegularExpression *endRegexp = [beginMatch endRegexp];
+	if(endRegexp == nil)
+	{
+		DEBUG(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
+		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
+			 withBackreferencesToRegexp:[beginMatch beginMatch]];
+	}
+	
+	if(endRegexp == nil)
+	{
+		DEBUG(@"!!!!!!!!! no end regexp?");
+		return nil;
+	}
+	
+	// get all matches, one might be overlapped by a subpattern
+	regexps_tried++;
+	NSArray *matches = [endRegexp allMatchesInString:[storage string] range:aRange];
+	regexps_matched += [matches count];
+	
+	return matches;
+}
+
+- (NSArray *)applyPatterns:(NSArray *)patterns
+			   inRange:(NSRange)aRange
+			 topScopes:(NSArray *)topScopes
+		       openMatches:(NSArray *)openMatches
+			reachedEOL:(BOOL *)reachedEOL
+{
+	if(reachedEOL)
+		*reachedEOL = NO;
+	
+	// keep an array of matches so we can sort it in order to skip overlapping matches
+	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
+
+	ViSyntaxMatch *topOpenMatch = [openMatches lastObject];
+	if(topOpenMatch)
+	{
+		NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:aRange];
+		DEBUG(@"found %u possible end matches to scope [%@]", [endMatches count], [topOpenMatch scope]);
+		OGRegularExpressionMatch *match;
+		for(match in endMatches)
+		{
+			ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[topOpenMatch pattern] atIndex:0];
+			[m setEndMatch:match];
+			[matchingPatterns addObject:m];
+		}
+	}
+
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
 	for(pattern in patterns)
 	{
-		/* Match all patterns against this line. We can probably do something smarter here,
-		 * like limiting the range after a match.
+		/* Match all patterns against this range.
 		 */
-		
+
 		OGRegularExpression *regexp = [pattern objectForKey:@"matchRegexp"];
 		if(regexp == nil)
 			regexp = [pattern objectForKey:@"beginRegexp"];
 		if(regexp == nil)
 			continue;
+		regexps_tried++;
 		NSArray *matches = [regexp allMatchesInString:[storage string] range:aRange];
+		regexps_matched += [matches count];
 		OGRegularExpressionMatch *match;
 		for(match in matches)
 		{
@@ -261,16 +304,6 @@
 		++i;
 	}
 	[matchingPatterns sortUsingSelector:@selector(sortByLocation:)];
-}
-
-- (NSArray *)applyMatchingPatterns:(NSArray *)matchingPatterns
-			   inRange:(NSRange)aRange
-			 topScopes:(NSArray *)topScopes
-		       openMatches:(NSArray *)openMatches
-			reachedEOL:(BOOL *)reachedEOL
-{
-	if(reachedEOL)
-		*reachedEOL = NO;
 
 	DEBUG(@"applying %u matches in range %u + %u", [matchingPatterns count], aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
@@ -280,6 +313,7 @@
 		if([aMatch beginLocation] < lastLocation)
 		{
 			// skip overlapping matches
+			regexps_overlapped++;
 			DEBUG(@"skipping overlapping match for [%@] at %u + %u", [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			continue;
 		}
@@ -300,15 +334,11 @@
 		{
 			ViSyntaxMatch *openMatch = [openMatches lastObject];
 			[openMatch setEndMatch:[aMatch endMatch]];
-			DEBUG(@"got end match on [%@] at %u + %u (subpattern)",
+			DEBUG(@"got end match on [%@] at %u + %u",
 			      [aMatch scope],
 			      [[aMatch endMatch] rangeOfMatchedString].location,
 			      [[aMatch endMatch] rangeOfMatchedString].length);
 
-			if([[aMatch endMatch] rangeOfMatchedString].length == 0)
-			{
-				DEBUG(@"    NOTE: got zero-width match for pattern [%@]", [[aMatch pattern] objectForKey:@"end"]);
-			}
 			[self applyScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString]];
 			[self highlightEndCapturesInMatch:aMatch];
 
@@ -331,11 +361,15 @@
 			range.length = NSMaxRange(aRange) - range.location;
 			indent++;
 			BOOL tmpEOL = NO;
-			NSArray *continuationMatches = [self searchEndForMatch:[openMatches arrayByAddingObject:aMatch] inRange:range topScopes:newTopScopes reachedEOL:&tmpEOL];
+			NSArray *continuationMatches = [self applyPatterns:[language expandedPatternsForPattern:[aMatch pattern]]
+								   inRange:range
+								 topScopes:newTopScopes
+							       openMatches:[openMatches arrayByAddingObject:aMatch]
+								reachedEOL:&tmpEOL];
 			indent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch];
-			if(tmpEOL)
+			if(tmpEOL == YES)
 			{
 				if(reachedEOL)
 					*reachedEOL = YES;
@@ -366,48 +400,6 @@
 	return nil;
 }
 
-/* returns an array of continuation matches
- */
-- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL
-{
-	ViSyntaxMatch *openMatch = [openMatches lastObject];
-
-	DEBUG(@"searching for end match to [%@] in range %u + %u (%i open matches, topScopes = [%@])",
-	      [openMatch scope], aRange.location, aRange.length, [openMatches count], [topScopes componentsJoinedByString:@" "]);
-
-	OGRegularExpression *endRegexp = [openMatch endRegexp];
-	if(endRegexp == nil)
-	{
-		DEBUG(@"************* => compiling pattern with back references for scope [%@]", [openMatch scope]);
-		endRegexp = [language compileRegexp:[[openMatch pattern] objectForKey:@"end"]
-			 withBackreferencesToRegexp:[openMatch beginMatch]];
-	}
-
-	if(endRegexp == nil)
-	{
-		DEBUG(@"!!!!!!!!! no end regexp?");
-		return nil;
-	}
-
-	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
-
-	// get all matches, one might be overlapped by a subpattern
-	NSArray *matches = [endRegexp allMatchesInString:[storage string] range:aRange];
-
-	NSArray *subPatterns = [language expandedPatternsForPattern:[openMatch pattern]];
-	DEBUG(@"found %u possible end matches to scope [%@]", [matches count], [openMatch scope]);
-	OGRegularExpressionMatch *match;
-	for(match in matches)
-	{
-		ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[openMatch pattern] atIndex:0];
-		[m setEndMatch:match];
-		[matchingPatterns addObject:m];
-	}
-	
-	[self matchAllPatterns:subPatterns inRange:aRange toArray:matchingPatterns];
-	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:topScopes openMatches:openMatches reachedEOL:reachedEOL];
-}
-
 - (NSArray *)highlightLineInRange:(NSRange)aRange continueWithMatches:(NSArray *)continuedMatches
 {
 	DEBUG(@"-----> line range = %u + %u", aRange.location, aRange.length);
@@ -430,7 +422,12 @@
 
 		ViSyntaxMatch *topMatch = [continuedMatches lastObject];
 
-		continuedMatches = [self searchEndForMatch:continuedMatches inRange:aRange topScopes:topScopes reachedEOL:&reachedEOL];
+		continuedMatches = [self applyPatterns:[language expandedPatternsForPattern:[topMatch pattern]]
+					       inRange:aRange
+					     topScopes:topScopes
+					   openMatches:continuedMatches
+					    reachedEOL:&reachedEOL];
+
 		if(reachedEOL)
 			return continuedMatches;
 		lastLocation = [topMatch endLocation];
@@ -442,15 +439,8 @@
 		aRange.location = lastLocation;
 	}
 
-
-	// if we get here, we have no open matches
-
-	// keep an array of matches so we can sort it in order to skip overlapping matches
-	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
-
 	// search top-level patterns
-	[self matchAllPatterns:[language patterns] inRange:aRange toArray:matchingPatterns];
-	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:[NSArray array] openMatches:[NSArray array] reachedEOL:nil];
+	return [self applyPatterns:[language patterns] inRange:aRange topScopes:[NSArray array] openMatches:[NSArray array] reachedEOL:nil];
 }
 
 - (NSArray *)continuedMatchesForLocation:(NSUInteger)location
@@ -482,7 +472,10 @@
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
 {
-	//DEBUG(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
+	[[NSGarbageCollector defaultCollector] disable];
+	regexps_tried = 0;
+	regexps_overlapped = 0;
+	regexps_matched = 0;
 
 	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
 	NSArray *continuedMatches = nil;
@@ -526,7 +519,7 @@
 			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
 		}
 
-		if(isRestarting/* && nextRange >= NSMaxRange(aRange) && nextRange < [storage length]*/)
+		if(isRestarting && (extendedRange || nextRange >= NSMaxRange(aRange)) /*&& nextRange < [storage length]*/)
 		{
 			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:lastContinuedMatches];
 			if(continuationMatchesHaveChanged)
@@ -546,6 +539,10 @@
 			}
 		}
 	}
+	[[NSGarbageCollector defaultCollector] enable];
+	NSLog(@"tried regexps: %u", regexps_tried);
+	NSLog(@"matched regexps: %u", regexps_matched);
+	NSLog(@"overlapped regexps: %u", regexps_overlapped);
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
@@ -562,6 +559,7 @@
 		return;
 
 	NSRange area = [storage editedRange];
+	DEBUG(@"%s highlighting range = %u + %u", _cmd, area.location, area.length);
 
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;

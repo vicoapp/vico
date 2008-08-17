@@ -34,6 +34,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	CGFloat pageGuideX;
 
 	int indent;
+	unsigned regexps_tried;
+	unsigned regexps_overlapped;
+	unsigned regexps_matched;
 }
 
 - (void)initEditor;

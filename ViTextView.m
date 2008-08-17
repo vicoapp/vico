@@ -41,7 +41,10 @@
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
 	[self setUsesFontPanel:NO];
-	[self setPageGuideValues];
+	//[self setPageGuideValues];
+	[self setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+	[self setAutoresizingMask:NSViewWidthSizable];
+	[self setHorizontallyResizable:YES];
 }
 
 - (BOOL)illegal:(ViCommand *)command

@@ -30,14 +30,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 4DC40BFC09150BDB0029A2A6 /* OgreKit.framework */;
+			remoteGlobalIDString = 4DC40BFC09150BDB0029A2A6;
 			remoteInfo = OgreKit;
 		};
 		9A117AE00D0CA8CD007AA524 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 4DC40BF209150BDB0029A2A6 /* OgreKit */;
+			remoteGlobalIDString = 4DC40BF209150BDB0029A2A6;
 			remoteInfo = OgreKit;
 		};
 		9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */ = {

@@ -8,15 +8,54 @@
 	{
 		syntax_initialized = YES;
 
-		commentColor = [[NSColor colorWithCalibratedRed:0 green:102.0/256 blue:1.0 alpha:1.0] retain];
+		commentColor = [[NSColor colorWithCalibratedRed:0 green:102.0/256 blue:102.0/256 alpha:1.0] retain];
 		stringColor = [[NSColor colorWithCalibratedRed:3.0/256 green:106.0/256 blue:7.0/256 alpha:1.0] retain];
 		numberColor = [[NSColor colorWithCalibratedRed:0 green:0 blue:205.0/256 alpha:1.0] retain];
 		keywordColor = [[NSColor colorWithCalibratedRed:0 green:0 blue:1.0 alpha:1.0] retain];
 
-		keywordRegex = [OGRegularExpression regularExpressionWithString:@"\\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while)\\b"];
-		storageRegex = [OGRegularExpression regularExpressionWithString:@"\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b"];
+		languagePatterns = [[NSMutableArray alloc] init];
+		
+		NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+			@"comment.block.c", @"name",
+			@"/\\*", @"begin",
+			@"\\*/", @"end",
+			nil];
+		[languagePatterns addObject:dict];
+		
+		dict = [NSDictionary dictionaryWithObjectsAndKeys:
+			@"comment.line.double-slash.c++", @"name",
+			@"//", @"begin",
+			@"$\\n?", @"end",
+			nil];
+		[languagePatterns addObject:dict];
+
+		dict = [NSDictionary dictionaryWithObjectsAndKeys:
+			@"keyword.control.c", @"name",
+			@"\\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while)\\b", @"match",
+			nil];
+		[languagePatterns addObject:dict];
+
+		dict = [NSDictionary dictionaryWithObjectsAndKeys:
+			@"storage.type.c", @"name",
+			@"\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b", @"match",
+			nil];
+		[languagePatterns addObject:dict];
+
+		dict = [NSDictionary dictionaryWithObjectsAndKeys:
+			@"constant.numeric.c", @"name",
+			@"\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b", @"match",
+			nil];
+		[languagePatterns addObject:dict];
+
+		
+		keywordRegex = [OGRegularExpression regularExpressionWithString:
+			@"\\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while)\\b"];
+		storageRegex = [OGRegularExpression regularExpressionWithString:
+			@"\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b"];
 		storageModifierRegex = [OGRegularExpression regularExpressionWithString:@"\\b(const|extern|register|restrict|static|volatile|inline)\\b"];
-	}	
+		lineCommentRegex = [OGRegularExpression regularExpressionWithString:@"//.*$"];
+		commentRegex = [OGRegularExpression regularExpressionWithString:@"/\\*.*\\*/"];
+	}
 }
 
 - (void)highlightMatches:(NSArray *)matches withAttributes:(NSDictionary *)attributes
@@ -44,6 +83,11 @@
 		@"keyword", @"ViScopeSelector",
 		nil];
 
+	NSDictionary *commentAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+		commentColor, NSForegroundColorAttributeName,
+		@"comment", @"ViScopeSelector",
+		nil];
+
 	NSArray *matches = [keywordRegex allMatchesInString:[storage string] range:aRange];
 	[self highlightMatches:matches withAttributes:keywordAttributes];
 
@@ -52,6 +96,12 @@
 
 	matches = [storageModifierRegex allMatchesInString:[storage string] range:aRange];
 	[self highlightMatches:matches withAttributes:keywordAttributes];
+
+	matches = [lineCommentRegex allMatchesInString:[storage string] range:aRange];
+	[self highlightMatches:matches withAttributes:commentAttributes];
+
+	matches = [commentRegex allMatchesInString:[storage string] options:OgreMultilineOption range:aRange];
+	[self highlightMatches:matches withAttributes:commentAttributes];
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
@@ -75,7 +125,7 @@
 	if(area.length == 0)
 		return;
 
-	// temporary attributes doesn't work right when called from the notification
+	// temporary attributes doesn't work right when called from a notification
 	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0];
 }
 

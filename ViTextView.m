@@ -208,6 +208,27 @@
 	return YES;
 }
 
+/* syntax: [buffer]D */
+- (BOOL)delete_eol:(ViCommand *)command
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	if(bol == eol)
+	{
+		NSLog(@"Already at end-of-line");
+		return NO;
+	}
+
+	NSRange range;
+	range.location = start_location;
+	range.length = eol - start_location;
+
+	[self cutToBuffer:0 append:NO range:range];
+
+	final_location = IMAX(bol, start_location - 1);
+	return YES;
+}
+
 /* syntax: [count]h */
 - (BOOL)move_left:(ViCommand *)command
 {

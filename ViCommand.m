@@ -10,6 +10,7 @@
 
 static struct vikey vikeys[] = {
 	{@"append_eol:",	'A', VIF_SETS_DOT},
+	{@"delete_eol:",	'D', VIF_SETS_DOT},
 	{@"insert_bol:",	'I', VIF_SETS_DOT},
 	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"open_line_above:",	'O', VIF_SETS_DOT},

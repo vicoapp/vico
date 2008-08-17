@@ -30,6 +30,15 @@
 	buffers = [[NSMutableDictionary alloc] init];
 	storage = [self textStorage];
 
+	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
+	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
+	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+
+	nonWordSet = [[NSMutableCharacterSet alloc] init];
+	[nonWordSet formUnionWithCharacterSet:wordSet];
+	[nonWordSet formUnionWithCharacterSet:whitespace];
+	[nonWordSet invert];
+
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
 	[self setUsesFontPanel:NO];
@@ -412,19 +421,22 @@
 	return YES;
 }
 
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag
 {
-	NSString *s = [[self textStorage] string];
+	NSString *s = [storage string];
 	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
-				       options:0
-					 range:NSMakeRange(startLocation, [s length] - startLocation)];
+				       options:backwardFlag ? NSBackwardsSearch : 0
+					 range:backwardFlag ? NSMakeRange(0, startLocation + 1) : NSMakeRange(startLocation, [s length] - startLocation)];
+	if(backwardFlag && r.location == NSNotFound)
+		return 0;
 	return r.location;
 }
 
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation
 {
 	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
-			    fromLocation:startLocation];
+			    fromLocation:startLocation
+				backward:NO];
 }
 
 /* if caret on word-char:
@@ -448,23 +460,15 @@
 	NSString *s = [storage string];
 	unichar ch = [s characterAtIndex:start_location];
 
-	NSMutableCharacterSet *wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
-	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
-	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-
 	if([wordSet characterIsMember:ch])
 	{
 		// skip word-chars and whitespace
-		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location];
+		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
 	}
 	else if(![whitespace characterIsMember:ch])
 	{
 		// inside non-word-chars
-		[wordSet formUnionWithCharacterSet:whitespace];
-		NSRange r = [s rangeOfCharacterFromSet:wordSet
-					       options:0
-						 range:NSMakeRange(start_location, [s length] - start_location)];
-		end_location = r.location;
+		end_location = [self skipCharactersInSet:nonWordSet fromLocation:start_location backward:NO];
 	}
 	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
 	{
@@ -503,6 +507,60 @@
 	return YES;
 }
 
+/* syntax: [count]b */
+- (BOOL)word_backward:(ViCommand *)command
+{
+	if([storage length] == 0)
+	{
+		NSLog(@"Empty file");
+		return NO;
+	}
+	if(start_location == 0)
+	{
+		NSLog(@"Already at the beginning of the file");
+		return NO;
+	}
+	NSString *s = [storage string];
+	end_location = start_location - 1;
+	unichar ch = [s characterAtIndex:end_location];
+
+	/* From nvi:
+         * !!!
+         * If in whitespace, or the previous character is whitespace, move
+         * past it.  (This doesn't count as a word move.)  Stay at the
+         * character before the current one, it sets word "state" for the
+         * 'b' command.
+         */
+	if([whitespace characterIsMember:ch])
+	{
+		end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
+		if(end_location == 0)
+		{
+			final_location = end_location;
+			return YES;
+		}
+	}
+	ch = [s characterAtIndex:end_location];
+
+	if([wordSet characterIsMember:ch])
+	{
+		// skip word-chars and whitespace
+		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:YES];
+		if(![wordSet characterIsMember:[s characterAtIndex:end_location]])
+			end_location++;
+	}
+	else
+	{
+		// inside non-word-chars
+		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:YES];
+		if([wordSet characterIsMember:[s characterAtIndex:end_location]])
+			end_location++;
+	}
+
+	final_location = end_location;
+	return YES;
+}
+
 /* syntax: [count]I */
 - (BOOL)insert_bol:(ViCommand *)command
 {
@@ -515,7 +573,6 @@
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 
 	unichar ch = [s characterAtIndex:bol];
-	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 	if([whitespace characterIsMember:ch])
 	{
 		// skip leading whitespace

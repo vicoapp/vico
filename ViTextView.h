@@ -23,6 +23,10 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSUInteger start_location, end_location, final_location;
 	BOOL need_scroll;
 
+	NSMutableCharacterSet *wordSet;
+	NSMutableCharacterSet *nonWordSet;
+	NSCharacterSet *whitespace;
+
 	/* syntax highlighting */
 	ViTheme *theme;
 	ViLanguage *language;

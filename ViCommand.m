@@ -17,6 +17,7 @@ static struct vikey vikeys[] = {
 	{@"delete_backward:",	'X', VIF_SETS_DOT},
 	{@"move_bol:",		'0', VIF_IS_MOTION},
 	{@"append:",		'a', VIF_SETS_DOT},
+	{@"word_backward:",	'b', VIF_IS_MOTION},
 	{@"change:",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},

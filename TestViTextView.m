@@ -88,5 +88,14 @@
 - (void)test096_RepeatMoveTilChar		{ MOVE(@"abc abc abc", 2, @"ta;", 3); }
 - (void)test097_RepeatMoveToChar		{ MOVE(@"abc abc abc", 2, @"fa;", 8); }
 
-@end
+- (void)test100_WordBackward			{ MOVE(@"abcdef", 4, @"b", 0); }
+- (void)test100_WordBackward2			{ MOVE(@"abc def", 4, @"b", 0); }
+- (void)test100_WordBackward3			{ MOVE(@"abc def ghi", 8, @"b", 4); }
+- (void)test100_WordBackward4			{ MOVE(@"<abc>def", 4, @"b", 1); }
+- (void)test100_WordBackward5			{ MOVE(@"<abc>def", 5, @"b", 4); }
+- (void)test100_WordBackward6			{ MOVE(@"<abc def", 5, @"b", 1); }
+- (void)test100_WordBackward7			{ MOVE(@"<abc", 1, @"b", 0); }
+- (void)test100_WordBackward8			{ MOVE(@"<abc> def", 6, @"b", 4); }
+- (void)test100_WordBackward9			{ MOVE(@"  abc", 2, @"b", 0); }
 
+@end

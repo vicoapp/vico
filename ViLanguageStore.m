@@ -55,7 +55,7 @@ static ViLanguageStore *defaultStore = nil;
 
 - (ViLanguage *)languageForFilename:(NSString *)aPath
 {
-	NSString *extension = [aPath pathExtension];
+	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
 	ViLanguage *language;
 	for(language in [languages allValues])
 	{
@@ -63,7 +63,11 @@ static ViLanguageStore *defaultStore = nil;
 		NSString *fileType;
 		for(fileType in fileTypes)
 		{
-			if([fileType isEqualToString:extension])
+			unsigned path_len = [aPath length];
+			unsigned ftype_len = [fileType length];
+			if([aPath hasSuffix:fileType] &&
+			   (path_len == ftype_len ||
+			    [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]]))
 			{
 				NSLog(@"Using language %@ for file %@", [language name], aPath);
 				return language;

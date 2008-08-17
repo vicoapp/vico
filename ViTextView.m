@@ -4,6 +4,7 @@
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
+- (void)disableWrapping;
 @end
 
 @implementation ViTextView
@@ -33,9 +34,7 @@
 	[self setImportsGraphics:NO];
 	[self setUsesFontPanel:NO];
 	//[self setPageGuideValues];
-	[self setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-	[self setAutoresizingMask:NSViewWidthSizable];
-	[self setHorizontallyResizable:YES];
+	[self disableWrapping];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
@@ -737,6 +736,26 @@
 	// not two (as the system draws it in a special way), and that's also why the
 	// width above is set to zero
 	[self display];
+}
+
+- (void)disableWrapping
+{
+	const float LargeNumberForText = 1.0e7;
+	
+	NSScrollView *scrollView = [self enclosingScrollView];
+	[scrollView setHasVerticalScroller:YES];
+	[scrollView setHasHorizontalScroller:YES];
+	[scrollView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	
+	NSTextContainer *textContainer = [self textContainer];
+	[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[textContainer setWidthTracksTextView:NO];
+	[textContainer setHeightTracksTextView:NO];
+	
+	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[self setHorizontallyResizable:YES];
+	[self setVerticallyResizable:YES];
+	[self setAutoresizingMask:NSViewNotSizable];
 }
 
 - (void)setTheme:(ViTheme *)aTheme

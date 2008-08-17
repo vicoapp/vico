@@ -94,7 +94,9 @@
 	// FIXME: is it ok to key on an NSArray ?
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:scopes];
 	if(attributes)
-		return attributes;
+	{
+		return [attributes count] == 0 ? nil : attributes;
+	}
 
 	NSString *foundScopeSelector = nil;
 	NSString *scopeSelector;
@@ -136,8 +138,9 @@
 	}
 	else
 	{
-		// FIXME: also cache non-hits
 		//NSLog(@"     scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
+		// also cache non-hits
+		[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:scopes];
 	}
 
 	return attributes;

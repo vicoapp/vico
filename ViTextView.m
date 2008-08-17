@@ -40,6 +40,13 @@
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 
+	inputCommands = [NSDictionary dictionaryWithObjectsAndKeys:
+			 @"input_newline:", @"\r",
+			 @"input_newline:", @"\n",
+			 @"input_backspace:", @"\x7f",
+			 @"input_backspace:", @"\x08", // ^h
+			 nil];
+
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[nonWordSet formUnionWithCharacterSet:wordSet];
 	[nonWordSet formUnionWithCharacterSet:whitespace];
@@ -1189,6 +1196,25 @@
 	[command reset];
 }
 
+- (NSUInteger)input_newline:(NSString *)characters
+{
+	return [self insertNewlineAtLocation:start_location indentForward:YES];
+}
+
+- (NSUInteger)input_backspace:(NSString *)characters
+{
+	if([insertedText length] == 0)
+	{
+		[[self delegate] message:@"No more characters to erase"];
+		return 0;
+	}
+
+	[insertedText deleteCharactersInRange:NSMakeRange([insertedText length] - 1, 1)];
+	[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
+
+	return -1;
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
@@ -1196,7 +1222,7 @@
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X (0x%04X)",
 	      [theEvent charactersIgnoringModifiers],
 	      charcode,
-	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask)) >> 17));
+	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask)) >> 17));
 #endif
 
 	if(mode == ViInsertMode)
@@ -1214,25 +1240,42 @@
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
-		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask)) >> 17) == 0)
+		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask)) >> 17) == 0)
 		{
+			/* handle keys with no modifiers, or with shift, caps lock or control modifier */
+
 			NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
 			start_location = [self caret];
-			if([[theEvent characters] isEqualToString:@"\r"])
+
+			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
+			NSString *inputCommand = [inputCommands objectForKey:[theEvent characters]];
+			int num_chars = 0;
+			if(inputCommand)
 			{
-				int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+				num_chars = (NSInteger)[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
 				// FIXME: insertNewlineAtLocation: adds the newline and autoindented whitespace to insertedText itself...
-				[self setCaret:start_location + num_chars];
 			}
 			else
 			{
-				[self insertString:[theEvent characters] atLocation:start_location];
-				[insertedText appendString:[theEvent characters]];
-				[self setCaret:start_location + [[theEvent characters] length]];
+				/* other keys insert themselves */
+				/* but don't input control characters */
+				if(([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
+				{
+					[[self delegate] message:@"Illegal character; quote to enter"];
+				}
+				else
+				{
+					[self insertString:[theEvent characters] atLocation:start_location];
+					[insertedText appendString:[theEvent characters]];
+					num_chars = [[theEvent characters] length];
+				}
 			}
+
+			[self setCaret:start_location + num_chars];
 		}
 		else
 		{
+			/* command, option (alt) or function modifier keys */
 			[super keyDown:theEvent];
 		}
 	}

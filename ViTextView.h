@@ -28,6 +28,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableCharacterSet *nonWordSet;
 	NSCharacterSet *whitespace;
 
+	NSDictionary *inputCommands;
+
 	/* syntax highlighting */
 	ViTheme *theme;
 	ViLanguage *language;

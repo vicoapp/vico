@@ -125,6 +125,10 @@
 	NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
 	[[[self undoManager] prepareWithInvocationTarget:self] undoInsertInRange:aRange];
 	[[self undoManager] setActionName:@"insert text"];
+
+	if(hasBeginUndoGroup)
+		[[self undoManager] endUndoGrouping];
+	hasBeginUndoGroup = NO;
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -264,14 +268,26 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
+	[[self undoManager] beginUndoGrouping];
+	[self recordDeleteOfString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)] atLocation:start_location];
+	[self recordInsertInRange:NSMakeRange(start_location, 1)];
+	[[self undoManager] endUndoGrouping];
+
 	[[storage mutableString] replaceCharactersInRange:NSMakeRange(start_location, 1)
 					withString:[NSString stringWithFormat:@"%C", command.argument]];
+
 	return YES;
 }
 
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {
+	/* The change command is implemented as delete + insert. This should be undone
+	 * as a single operation, so we begin an undo group here and end it when recording
+	 * the insert operation.
+	 */
+	[[self undoManager] beginUndoGrouping];
+	hasBeginUndoGroup = YES;
 	[self setInsertMode:command];
 	return [self delete:command];
 }

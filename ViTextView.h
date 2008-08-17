@@ -38,6 +38,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	unsigned regexps_tried;
 	unsigned regexps_overlapped;
 	unsigned regexps_matched;
+
+	BOOL hasBeginUndoGroup;
 }
 
 - (void)initEditor;

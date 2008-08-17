@@ -19,6 +19,7 @@ static struct vikey vikeys[] = {
 	{@"append:",		'a', VIF_SETS_DOT},
 	{@"change:",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"insert:",		'i', VIF_SETS_DOT},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
@@ -174,7 +175,15 @@ find_command(int key)
 			// should print "X may not be used as a motion command"
 			method = @"nonmotion:";
 		}
-		[self setComplete];
+
+		if(has_flag(vikey, VIF_NEED_CHAR))
+		{
+			state = ViCommandNeedChar;
+		}
+		else
+		{
+			[self setComplete];
+		}
 	}
 }
 

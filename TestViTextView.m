@@ -72,6 +72,13 @@
 - (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }
 - (void)test081_YankWord2			{ TEST(@"abc def ghi", 8, @"yw0p", @"aghibc def ghi", 1); }
 - (void)test082_YankBackwards			{ TEST(@"abcdef", 3, @"y0", @"abcdef", 0); }
-- (void)test082_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 1); }
+- (void)test083_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 1); }
+- (void)test084_YankWordAndPasteAtEOL		{ TEST(@"abc def", 4, @"yw$p", @"abc defdef", 7); }
+
+- (void)test090_MoveTilChar			{ MOVE(@"abc def ghi", 1, @"tf", 5); }
+- (void)test090_MoveTilChar2			{ MOVE(@"abc def abc", 1, @"tc", 1); }
+- (void)test091_MoveToChar			{ MOVE(@"abc def ghi", 1, @"ff", 6); }
+- (void)test091_MoveToChar2			{ MOVE(@"abc def abc", 1, @"fb", 9); }
+- (void)test092_DeleteToChar			{ TEST(@"abc def abc", 1, @"dfe", @"af abc", 1); }
 
 @end

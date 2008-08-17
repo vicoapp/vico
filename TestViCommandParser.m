@@ -291,4 +291,26 @@
 	STAssertEquals(parser.count, 3, nil);
 }
 
+- (void)test081_CommandWithCharacterAsMotionComponent
+{
+	[parser pushKey:'d'];
+	[parser pushKey:'t'];
+	STAssertFalse(parser.complete, nil);
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 'd', nil);
+	STAssertEquals(parser.character, (unichar)'x', nil);
+	STAssertEqualObjects(parser.motion_method, @"move_til_char:", nil);
+}
+
+- (void)test081_UnicharAsArgument
+{
+	[parser pushKey:'t'];
+	STAssertFalse(parser.complete, nil);
+	[parser pushKey:'å'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 't', nil);
+	STAssertTrue(parser.character == 'å', nil);
+}
+
 @end

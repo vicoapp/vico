@@ -27,8 +27,8 @@ struct vikey
 	struct vikey *motion_key;
 	int count;
 	int motion_count;
-	char key;
-	char character;
+	unichar key;
+	unichar character;
 
 	struct vikey *dot_command_key;
 	struct vikey *dot_motion_key;
@@ -46,7 +46,7 @@ struct vikey
 @property(readonly) NSString *method;
 @property(readonly) int count;
 @property(readonly) int motion_count;
-@property(readonly) char key;
-@property(readonly) char character;
+@property(readonly) unichar key;
+@property(readonly) unichar character;
 
 @end

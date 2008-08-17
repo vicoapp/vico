@@ -20,7 +20,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
 	NSRange affectedRange;
-	NSUInteger start_location, end_location;
+	NSUInteger start_location, end_location, final_location;
 	BOOL need_scroll;
 
 	/* syntax highlighting */

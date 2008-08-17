@@ -485,7 +485,7 @@
 	if(area.length == 0)
 		return;
 
-	// temporary attributes doesn't work right when called from a notification
+	// temporary attributes don't work right when called from a notification
 	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0];
 }
 

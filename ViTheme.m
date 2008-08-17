@@ -6,10 +6,14 @@
 
 - (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
-	int r, g, b;
-	if(sscanf([hashRGB UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
+	int r, g, b, a;
+	int rc = sscanf([hashRGB UTF8String], "#%02X%02X%02X%02X", &r, &g, &b, &a);
+	if(rc != 3 && rc != 4)
 		return nil;
-	return [NSColor colorWithCalibratedRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
+	if(rc == 3)
+		a = 255;
+	//NSLog(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
+	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -119,6 +123,14 @@
 	{
 		//NSLog(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
 		attributes = [themeAttributes objectForKey:foundScopeSelector];
+
+		NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
+		if(bg)
+		{
+			NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
+			[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
+		}
+		
 		// cache it
 		[scopeSelectorCache setObject:attributes forKey:scopes];
 	}
@@ -131,7 +143,7 @@
 	return attributes;
 }
 
-- (NSColor *)colorWithName:(NSString *)colorName orDefault:(NSColor *)defaultColor alpha:(float)alpha
+- (NSColor *)colorWithName:(NSString *)colorName orDefault:(NSColor *)defaultColor
 {
 	NSString *rgb = [defaultSettings objectForKey:colorName];
 	NSColor *color;
@@ -139,20 +151,20 @@
 		color = [self hashRGBToColor:rgb];
 	else
 		color = defaultColor;
-	return [color colorWithAlphaComponent:alpha];
+	return color;
 }
 
 - (NSColor *)backgroundColor
 {
 	if(backgroundColor == nil)
-		backgroundColor = [self colorWithName:@"background" orDefault:[NSColor whiteColor] alpha:1.0];
+		backgroundColor = [self colorWithName:@"background" orDefault:[[NSColor whiteColor] colorWithAlphaComponent:1.0]];
 	return backgroundColor;
 }
 
 - (NSColor *)foregroundColor
 {
 	if(foregroundColor == nil)
-		foregroundColor = [self colorWithName:@"foreground" orDefault:[NSColor blackColor] alpha:1.0];
+		foregroundColor = [self colorWithName:@"foreground" orDefault:[[NSColor blackColor] colorWithAlphaComponent:1.0]];
 	return foregroundColor;
 }
 
@@ -164,7 +176,8 @@
 								       green:0.2
 									blue:0.2
 								       alpha:0.5];
-		caretColor = [self colorWithName:@"caret" orDefault:defaultCaretColor alpha:0.6];
+		caretColor = [self colorWithName:@"caret" orDefault:defaultCaretColor];
+		caretColor = [caretColor colorWithAlphaComponent:0.5];
 	}
 	return caretColor;
 }
@@ -172,7 +185,10 @@
 - (NSColor *)selectionColor
 {
 	if(selectionColor == nil)
-		selectionColor = [self colorWithName:@"selection" orDefault:[NSColor blueColor] alpha:0.5];
+	{
+		NSColor *bg = [self colorWithName:@"selection" orDefault:[[NSColor blueColor] colorWithAlphaComponent:0.5]];
+		selectionColor = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
+	}
 	return selectionColor;
 }
 

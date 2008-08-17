@@ -148,7 +148,9 @@
 	 * to the line and column marked by a.  Hopefully, the motion component code
 	 * got it right...   Unlike delete, we make no adjustments here.
 	 */
-	final_location = affectedRange.location;
+	/* yy shouldn't move the cursor */
+	if(command.motion_key != 'y')
+		final_location = affectedRange.location;
 	return YES;
 }
 
@@ -170,6 +172,13 @@
 		return NO;
 	}
 
+	if([buffer hasSuffix:@"\n"])
+	{
+		NSUInteger bol;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL];
+
+		start_location = final_location = bol;
+	}
 	[self insertString:buffer atLocation:start_location];
 	return YES;
 }
@@ -187,7 +196,12 @@
 
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if(start_location < eol)
+	if([buffer hasSuffix:@"\n"])
+	{
+		// puting whole lines
+		final_location = eol + 1;
+	}
+	else if(start_location < eol)
 	{
 		// in contrast to move_right, we are allowed to move to EOL here
 		final_location = start_location + 1;
@@ -666,6 +680,61 @@
 	return YES;
 }
 
+/* syntax: [count]W */
+/* FIXME: this is too similar to the w command, refactor to use the same function */
+- (BOOL)bigword_forward:(ViCommand *)command
+{
+	if([storage length] == 0)
+	{
+		[[self delegate] message:@"Empty file"];
+		return NO;
+	}
+	NSString *s = [storage string];
+	unichar ch = [s characterAtIndex:start_location];
+
+	if(![whitespace characterIsMember:ch])
+	{
+		// inside non-word-chars
+		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:start_location backward:NO];
+		// end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
+	}
+	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
+	{
+		/* We're in whitespace. */
+		/* See comment from nvi below. */
+		end_location = start_location + 1;
+	}
+	
+	/* From nvi:
+	 * Movements associated with commands are different than movement commands.
+	 * For example, in "abc  def", with the cursor on the 'a', "cw" is from
+	 * 'a' to 'c', while "w" is from 'a' to 'd'.  In general, trailing white
+	 * space is discarded from the change movement.  Another example is that,
+	 * in the same string, a "cw" on any white space character replaces that
+	 * single character, and nothing else.  Ain't nothin' in here that's easy. 
+	 */
+	if(command.ismotion || command.key == 'd' || command.key == 'y')
+		end_location = [self skipWhitespaceFrom:end_location];
+	
+	if(!command.ismotion && (command.key == 'd' || command.key == 'y'))
+	{
+		/* Restrict to current line if deleting/yanking last word on line.
+		 * However, an empty line can be deleted as a word.
+		 */
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol];
+		if(end_location > eol && bol != eol)
+		{
+			NSLog(@"adjusting location from %lu to %lu at EOL", end_location, eol);
+			end_location = eol;
+		}
+	}
+	else if(end_location >= [s length])
+		end_location = [s length] - 1;
+	final_location = end_location;
+	return YES;
+}
+
 /* syntax: [count]b */
 - (BOOL)word_backward:(ViCommand *)command
 {
@@ -949,9 +1018,10 @@
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if(ok && command.line_mode && !command.ismotion)
+	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y'))
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
+		/* ...well, except for yy :-) */
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;

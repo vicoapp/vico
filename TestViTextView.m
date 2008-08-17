@@ -88,6 +88,9 @@
 - (void)test082_YankBackwards			{ TEST(@"abcdef", 3, @"y0", @"abcdef", 0); }
 - (void)test083_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 1); }
 - (void)test084_YankWordAndPasteAtEOL		{ TEST(@"abc def", 4, @"yw$p", @"abc defdef", 7); }
+- (void)test085_YankLine			{ TEST(@"abc\ndef", 2, @"yy", @"abc\ndef", 2); }
+- (void)test086_YankAndPasteLine		{ TEST(@"abc\ndef\nghi", 1, @"yyp", @"abc\nabc\ndef\nghi", 4); }
+- (void)test087_YankAndPasteLineBefore		{ TEST(@"abc\ndef\nghi", 5, @"yyP", @"abc\ndef\ndef\nghi", 4); }
 
 - (void)test090_MoveTilChar			{ MOVE(@"abc def ghi", 1, @"tf", 5); }
 - (void)test090_MoveTilChar2			{ MOVE(@"abc def abc", 1, @"tc", 1); }
@@ -126,5 +129,8 @@
 - (void)test126_JoinLineStartingWithParen	{ TEST(@"abc\n)def", 0, @"J", @"abc)def", 2); }
 
 - (void)test130_ReplaceChar			{ TEST(@"abc def", 2, @"rx", @"abx def", 2); }
+
+- (void)test140_BigwordForward			{ MOVE(@"abc=def ghi", 0, @"W", 8); }
+- (void)test141_BigwordForwardSpace		{ MOVE(@"abc     ghi", 3, @"W", 8); }
 
 @end

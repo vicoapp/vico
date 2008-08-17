@@ -212,6 +212,17 @@
 
 - (void)test075_DotCommandInheritsCount
 {
+	[parser pushKey:'3'];
+	[parser pushKey:'x'];
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 'x', nil);
+	STAssertEquals(parser.count, 3, nil);
+}
+
+- (void)test075_DotCommandInheritsMotionCount
+{
 	[parser pushKey:'d'];
 	[parser pushKey:'2'];
 	[parser pushKey:'w'];

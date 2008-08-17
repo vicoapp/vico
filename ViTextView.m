@@ -434,6 +434,7 @@
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	final_location = end_location;
+	need_scroll = YES;
 	return YES;
 }
 
@@ -445,6 +446,7 @@
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		final_location = end_location = IMAX(bol, eol - command.ismotion);
+		need_scroll = YES;
 	}
 	return YES;
 }

@@ -120,7 +120,7 @@ find_command(int key)
 
 		return;
 	}
-	
+
 	// check if it's a repeat count
 	int *countp = nil;
 	if(state == ViCommandInitialState)
@@ -146,6 +146,8 @@ find_command(int key)
 		}
 
 		command = dot_command;
+		if(count == 0)
+			count = dot_count;
 		method = dot_command->method;
 		motion_command = dot_motion_command;
 		motion_count = dot_motion_count;

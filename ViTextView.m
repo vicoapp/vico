@@ -19,7 +19,7 @@
 {
 	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
 	[self setFont:font];
-	[self setSelectedRange:NSMakeRange(0, 0)];	
+	[self setCaret:0];
 	[self setInsertionPointColor:[NSColor colorWithCalibratedRed:0.2
 		green:0.2
 		blue:0.2
@@ -52,7 +52,7 @@
 	NSUInteger bol, end;
 	[[text string] getLineStart:&bol end:&end contentsEnd:NULL forRange:command.start_range];
 	command.start_range = NSMakeRange(bol, 0);
-	[self setSelectedRange:NSMakeRange(end, 0)];
+	[self setCaret:end];
 	NSLog(@"selecting current line: %lu -> %lu", bol, end);
 }
 
@@ -61,21 +61,26 @@
 {
 	NSTextStorage *text = [self textStorage];
 
-	// need beginning of line for correcting cursor position after deletion
+	// need beginning of line for correcting caret position after deletion
 	NSUInteger bol;
 	[[text string] getLineStart:&bol end:NULL contentsEnd:NULL forRange:command.start_range];
 
-	NSRange range = NSMakeRange(command.start_range.location, command.stop_range.location - command.start_range.location);
-	[text deleteCharactersInRange:range];
+	[text deleteCharactersInRange:affectedRange];
 
-	// correct cursor position if we deleted the last character(s) on the line
+#if 0
+	if([command.motion_method isEqualToString:@"current_line"])
+		[self setCaret:affectedRange.location];
+#endif
+
+	// correct caret position if we deleted the last character(s) on the line
 	NSUInteger eol;
 	[[text string] getLineStart:NULL end:NULL contentsEnd:&eol forRange:NSMakeRange(bol, 0)];
-	if(command.start_range.location >= eol)
+	if(affectedRange.location >= eol)
 	{
-		NSRange loc = NSMakeRange(IMAX(bol, eol - 1), 0);
-		[self setSelectedRange:loc];
+		[self setCaret:IMAX(bol, eol - 1)];
 	}
+	else
+		[self setCaret:affectedRange.location];
 }
 
 /* syntax: [buffer][count]y[count][motion] */
@@ -91,7 +96,7 @@
 
 	NSTextStorage *text = [self textStorage];
 	NSString *s = [text string];
-	[buffer setString:[s substringWithRange:NSMakeRange(command.start_range.location, command.stop_range.location - command.start_range.location)]];
+	[buffer setString:[s substringWithRange:affectedRange]];
 
 	/* From nvi:
 	 * !!!
@@ -104,10 +109,15 @@
 	 * to the line and column marked by a.  Hopefully, the motion component code
 	 * got it right...   Unlike delete, we make no adjustments here.
 	 */
-	if(command.stop_range.location < command.start_range.location)
-		[self setSelectedRange:command.stop_range];
-	else
-		[self setSelectedRange:command.start_range];
+	[self setCaret:affectedRange.location];
+}
+
+/* Like insertText:, but works within beginEditing/endEditing
+ */
+- (void)insertString:(NSString *)aString
+{
+	[[self textStorage] insertAttributedString:[[NSAttributedString alloc] initWithString:aString]
+					   atIndex:[self caret]];
 }
 
 /* syntax: [buffer][count]P */
@@ -121,8 +131,9 @@
 		return;
 	}
 
-	[self insertText:buffer];
-	[self setSelectedRange:command.start_range];
+	[self insertString:buffer];
+	NSLog(@"put_before: adjusting caret to location %lu", command.start_range.location);
+	[self setCaret:command.start_range.location];
 }
 
 /* syntax: [buffer][count]p */
@@ -137,8 +148,10 @@
 	}
 
 	[self move_right:command];
-	[self insertText:buffer];
-	[self setSelectedRange:command.start_range];
+	NSUInteger loc = [self caret];
+	[self insertString:buffer];
+	// reset caret position
+	[self setCaret:loc];
 }
 
 /* syntax: [buffer][count]c[count]motion */
@@ -158,22 +171,22 @@
 - (void)move_left:(ViCommand *)command
 {
 	NSTextStorage *text = [self textStorage];
-	NSRange sel = [self selectedRange];
+	NSUInteger caret = [self caret];
 	NSUInteger bol;
-	[[text string] getLineStart:&bol end:NULL contentsEnd:NULL forRange:sel];
-	if(sel.location > bol)
-		[self setSelectedRange:NSMakeRange(sel.location - 1, 0)];
+	[[text string] getLineStart:&bol end:NULL contentsEnd:NULL forRange:NSMakeRange(caret, 0)];
+	if(caret > bol)
+		[self setCaret:caret - 1];
 }
 
 /* syntax: [count]l */
 - (void)move_right:(ViCommand *)command
 {
 	NSTextStorage *text = [self textStorage];
-	NSRange sel = [self selectedRange];
+	NSUInteger caret = [self caret];
 	NSUInteger bol, eol;
-	[[text string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:sel];
-	if(sel.location + 1 < eol)
-		[self setSelectedRange:NSMakeRange(sel.location + 1, 0)];
+	[[text string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(caret ,0)];
+	if(caret + 1 < eol)
+		[self setCaret:caret + 1];
 }
 
 - (void)gotoColumn:(NSUInteger)column fromRange:(NSRange)aRange
@@ -187,7 +200,7 @@
 		aRange.location = eol - 1;
 	else
 		aRange.location = bol;
-	[self setSelectedRange:NSMakeRange(aRange.location, 0)];
+	[self setCaret:aRange.location];
 }
 
 /* syntax: [count]k */
@@ -231,7 +244,7 @@
 	NSRange sel = [self selectedRange];
 	NSUInteger bol;
 	[[text string] getLineStart:&bol end:NULL contentsEnd:NULL forRange:sel];
-	[self setSelectedRange:NSMakeRange(bol, 0)];
+	[self setCaret:bol];
 }
 
 /* syntax: $ */
@@ -243,18 +256,18 @@
 	NSRange sel = [self selectedRange];
 	NSUInteger bol, eol;
 	[[text string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:sel];
-	[self setSelectedRange:NSMakeRange(IMAX(bol, eol - 1), 0)];
+	[self setCaret:IMAX(bol, eol - command.ismotion)];
 }
 
 /* syntax: [count]a */
 - (void)append:(ViCommand *)command
 {
 	NSTextStorage *text = [self textStorage];
-	NSRange sel = [self selectedRange];
+	NSUInteger caret = [self caret];
 	NSUInteger bol, eol;
-	[[text string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:sel];
-	if(sel.location < eol)
-		[self setSelectedRange:NSMakeRange(sel.location + 1, 0)];
+	[[text string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(caret, 0)];
+	if(caret < eol)
+		[self setCaret:caret + 1];
 	[self setInsertMode];
 }
 
@@ -273,9 +286,9 @@
 	NSRange sel = [self selectedRange];
 	NSUInteger end;
 	[[text string] getLineStart:NULL end:&end contentsEnd:NULL forRange:sel];
-	[self setSelectedRange:NSMakeRange(end, 0)];
+	[self setCaret:end];
 	[self insertNewline:self];
-	[self setSelectedRange:NSMakeRange(end, 0)];
+	[self setCaret:end];
 }
 
 /* syntax: O */
@@ -286,9 +299,9 @@
 	NSRange sel = [self selectedRange];
 	NSUInteger bol;
 	[[text string] getLineStart:&bol end:NULL contentsEnd:NULL forRange:sel];
-	[self setSelectedRange:NSMakeRange(bol, 0)];
+	[self setCaret:bol];
 	[self insertNewline:self];
-	[self setSelectedRange:NSMakeRange(bol, 0)];
+	[self setCaret:bol];
 }
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation
@@ -306,10 +319,10 @@
 			    fromLocation:startLocation];
 }
 
-/* if cursor on word-char:
+/* if caret on word-char:
  *      skip word-chars
  *      skip whitespace
- * else if cursor on whitespace:
+ * else if caret on whitespace:
  *      skip whitespace
  * else:
  *      skip to first word-char-or-space
@@ -344,7 +357,7 @@
 						 range:NSMakeRange(location, [s length] - location)];
 		location = r.location;
 	}
-	else if(command.motion_method && command.key != 'd' && command.key != 'y')
+	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
 	{
 		/* We're in whitespace. */
 		/* See comment from nvi below. */
@@ -359,21 +372,25 @@
 	 * in the same string, a "cw" on any white space character replaces that
 	 * single character, and nothing else.  Ain't nothin' in here that's easy. 
 	 */
-	if(command.motion_method == nil || command.key == 'd' || command.key == 'y')
+	if(command.ismotion || command.key == 'd' || command.key == 'y')
 		location = [self skipWhitespaceFrom:location];
 
-	if(command.motion_method && (command.key == 'd' || command.key == 'y'))
+	if(!command.ismotion && (command.key == 'd' || command.key == 'y'))
 	{
-		/* restrict to current line if deleting/yanking last word on line */
-		NSUInteger eol;
-		[s getLineStart:NULL end:NULL contentsEnd:&eol forRange:command.start_range];
-		if(location > eol)
+		/* Restrict to current line if deleting/yanking last word on line.
+		 * However, an empty line can be deleted as a word.
+		 */
+		NSUInteger bol, eol;
+		[s getLineStart:&bol end:NULL contentsEnd:&eol forRange:command.start_range];
+		if(location > eol && bol != eol)
+		{
+			NSLog(@"adjusting location from %lu to %lu at EOL", location, eol);
 			location = eol;
+		}
 	}
-
-	if(location >= [s length])
+	else if(location >= [s length])
 		location = [s length] - 1;
-	[self setSelectedRange:NSMakeRange(location, 0)];
+	[self setCaret:location];
 }
 
 /* syntax: [count]I */
@@ -406,7 +423,7 @@
 	}
 	else
 		sel.location = bol;
-	[self setSelectedRange:sel];
+	[self setCaret:sel.location];
 }
 
 /* syntax: [count]x */
@@ -416,9 +433,9 @@
 	NSString *s = [text string];
 	if([s length] == 0)
 		return;
-	NSRange sel = [self selectedRange];
+	NSUInteger caret = [self caret];
 	NSUInteger bol, eol;
-	[s getLineStart:&bol end:NULL contentsEnd:&eol forRange:sel];
+	[s getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(caret, 0)];
 	if(bol == eol)
 	{
 		NSLog(@"no characters to delete");
@@ -426,19 +443,18 @@
 	}
 
 	NSRange del;
-	del.location = sel.location;
+	del.location = caret;
 	del.length = IMAX(1, command.count);
 	if(del.location + del.length > eol)
 		del.length = eol - del.location;
 	[text deleteCharactersInRange:del];
 
-	// correct cursor position if we deleted the last character on the line
+	// correct caret position if we deleted the last character on the line
 	--eol;
-	if(sel.location == eol && eol > bol)
+	if(caret == eol && eol > bol)
 	{
-		--sel.location;
-		sel.length = 0;
-		[self setSelectedRange:sel];
+		--caret;
+		[self setCaret:caret];
 	}
 }
 
@@ -449,18 +465,19 @@
 	NSString *s = [text string];
 	if([s length] == 0)
 		return;
-	NSRange sel = [self selectedRange];
+	NSUInteger caret = [self caret];
 	NSUInteger bol;
-	[s getLineStart:&bol end:NULL contentsEnd:NULL forRange:sel];
-	if(sel.location == bol)
+	[s getLineStart:&bol end:NULL contentsEnd:NULL forRange:NSMakeRange(caret, 0)];
+	if(caret == bol)
 	{
 		NSLog(@"Already in the first column");
 		return;
 	}
 	NSRange del;
-	del.location = IMAX(bol, sel.location - IMAX(1, command.count));
-	del.length = sel.location - del.location;
+	del.location = IMAX(bol, caret - IMAX(1, command.count));
+	del.length = caret - del.location;
 	[text deleteCharactersInRange:del];
+	[self setCaret:del.location];
 }
 
 
@@ -498,6 +515,16 @@
  * NSDeviceIndependentModifierFlagsMask = 0xffff0000U
  */
 
+- (void)setCaret:(NSUInteger)location
+{
+	[self setSelectedRange:NSMakeRange(location, 0)];
+}
+
+- (NSUInteger)caret
+{
+	return [self selectedRange].location;
+}
+
 - (void)setCommandMode
 {
 	mode = ViCommandMode;
@@ -514,7 +541,7 @@
 {
 	/* default start-range is the current location */
 	command.start_range = [self selectedRange];
-	
+
 	if(command.motion_method)
 	{
 		/* The command has an associated motion component.
@@ -528,14 +555,24 @@
 		// NSLog(@"executing motion-method '%@'", command.motion_method);
 		[self performSelector:NSSelectorFromString(motionMethodSignature) withObject:command];
 		command.stop_range = [self selectedRange];
+
+		NSUInteger l1 = command.start_range.location, l2 = command.stop_range.location;
+		if(l2 < l1)
+		{
+			l2 = l1;
+			l1 = command.stop_range.location;
+		}
+		affectedRange = NSMakeRange(l1, l2 - l1);
 	}
-	
+
 	NSString *methodSignature = [NSString stringWithFormat:@"%@:", command.method];
 	// NSLog(@"executing method '%@'", command.method);
 	[self performSelector:NSSelectorFromString(methodSignature) withObject:command];
-	
+
 	// NSRange selend = [self selectedRange];
 	// NSLog(@"sel.location: %i -> %i", command.start_range.location, selend.location);
+
+	final_location = [self caret];
 
 	[command reset];
 }
@@ -543,7 +580,7 @@
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-#if 0
+#if 1
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 	      [theEvent charactersIgnoringModifiers],
 	      charcode,
@@ -569,7 +606,10 @@
 		[parser pushKey:charcode];
 		if(parser.complete)
 		{
+			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
+			[[self textStorage] endEditing];
+			[self setCaret:final_location];
 		}
 	}
 }

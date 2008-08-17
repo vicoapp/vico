@@ -40,6 +40,7 @@ struct vikey
 
 - (void)pushKey:(unichar)key;
 - (void)reset;
+- (int)ismotion;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;

@@ -10,6 +10,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
+	NSRange affectedRange;
+	NSUInteger final_location;
 }
 
 + (void)initKeymaps;
@@ -18,6 +20,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setCommandMode;
 - (void)setInsertMode;
 - (void)input:(NSString *)inputString;
+- (void)setCaret:(NSUInteger)location;
+- (NSUInteger)caret;
 @end
 
 @interface ViTextView (cursor)

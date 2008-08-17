@@ -172,4 +172,11 @@ find_command(int key)
 	key = -1;
 }
 
+- (int)ismotion
+{
+	if(command_key && has_flag(command_key, VIF_IS_MOTION))
+	   return 1;
+	return 0;
+}
+
 @end

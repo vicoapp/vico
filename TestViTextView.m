@@ -41,21 +41,29 @@
 
 - (void)test040_WordForward			{ MOVE(@"abc def", 0, @"w", 4); }
 - (void)test041_WordForwardFromBlanks		{ MOVE(@"   abc def", 0, @"w", 3); }
-- (void)test041_WordForwardToNonword		{ MOVE(@"abc() def", 0, @"w", 3); }
-- (void)test041_WordForwardFromNonword		{ MOVE(@"abc() def", 3, @"w", 6); }
-- (void)test041_WordForwardAcrossLines		{ MOVE(@"abc\n def", 2, @"w", 5); }
+- (void)test042_WordForwardToNonword		{ MOVE(@"abc() def", 0, @"w", 3); }
+- (void)test043_WordForwardFromNonword		{ MOVE(@"abc() def", 3, @"w", 6); }
+- (void)test044_WordForwardAcrossLines		{ MOVE(@"abc\n def", 2, @"w", 5); }
+- (void)test045_WordForwardAtEOL		{ MOVE(@"abc def", 4, @"w", 6); }
 
 - (void)test050_DeleteWordForward		{ TEST(@"abc def", 0, @"dw", @"def", 0); }
 - (void)test051_DeleteWordForward2		{ TEST(@"abc def", 1, @"dw", @"adef", 1); }
 - (void)test052_DeleteWordForward3		{ TEST(@"abc def", 4, @"dw", @"abc ", 3); }
 - (void)test053_DeleteWordForwardAtEol		{ TEST(@"abc def\nghi", 4, @"dw", @"abc \nghi", 3); }
+- (void)test054_DeleteWordForwardAtEmptyLine	{ TEST(@"\nabc", 0, @"dw", @"abc", 0); }
 
 - (void)test060_GotoColumnZero			{ MOVE(@"abc def", 4, @"0", 0); }
 - (void)test060_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
 
 - (void)test070_DeleteCurrentLine		{ TEST(@"abc\ndef\nghi", 2, @"dd", @"def\nghi", 0); }
+- (void)test071_DeleteToColumnZero		{ TEST(@"abc def", 4, @"d0", @"def", 0); }
+- (void)test072_DeleteToEOL			{ TEST(@"abc def", 0, @"d$", @"", 0); }
+//- (void)test070_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
 
-- (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }
+- (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"yw", @"abc def ghi", 4); }
+- (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }
 - (void)test081_YankWord2			{ TEST(@"abc def ghi", 8, @"yw0p", @"aghibc def ghi", 1); }
+- (void)test082_YankBackwards			{ TEST(@"abcdef", 3, @"y0", @"abcdef", 0); }
+- (void)test082_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 1); }
 
 @end

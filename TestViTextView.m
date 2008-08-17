@@ -32,7 +32,9 @@
 - (void)test015_RepeatAppendText		{ TEST(@"abc", 1, @"adef\x1b.", @"abdefdefc", 7); }
 - (void)test016_RepeatInsertText		{ TEST(@"abc", 2, @"idef\x1b.", @"abdedeffc", 6); }
 - (void)test017_InsertAtBOLAndRepeat		{ TEST(@"abc", 2, @"I+\x1bll.", @"++abc", 0); }
+- (void)test017_InsertAtBOLAndRepeat2		{ TEST(@"abc", 2, @"I#\x1bll.", @"##abc", 0); }
 - (void)test018_AppendAtEOLAndRepeat		{ TEST(@"abc", 0, @"A!\x1bhh.", @"abc!!", 4); }
+- (void)test019_InsertEmptyTextAndRepeat	{ TEST(@"abc", 2, @"i\x1b.i", @"abc", 0); }
 
 - (void)test020_DeleteForward			{ TEST(@"abcdef", 0, @"x", @"bcdef", 0); }
 - (void)test021_DeleteForwardAtEol		{ TEST(@"abc\ndef", 2, @"x", @"ab\ndef", 1); }

@@ -6,6 +6,7 @@
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
 - (void)disableWrapping;
+- (BOOL)insert:(ViCommand *)command;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 @end
 
@@ -344,8 +345,7 @@
 		[self cutToBuffer:0 append:NO range:range];
 	}
 
-	[self setInsertMode:command];
-	return YES;
+	return [self insert:command];
 }
 
 /* syntax: [count]h */
@@ -355,7 +355,13 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if(start_location == bol)
 	{
-		[[self delegate] message:@"Already in the first column"];
+		if(command)
+		{
+			/* XXX: this command is also used outside the scope of an explicit 'h' command.
+			 * In such cases, we shouldn't issue an error message.
+			 */
+			[[self delegate] message:@"Already in the first column"];
+		}
 		return NO;
 	}
 	final_location = end_location = start_location - 1;
@@ -527,8 +533,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(start_location < eol)
 		final_location = end_location = start_location + 1;
-	[self setInsertMode:command];
-	return YES;
+	return [self insert:command];
 }
 
 /* syntax: [count]A */
@@ -544,19 +549,17 @@
 {
 	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
-	[self setInsertMode:command];
 	final_location = end_location;
-	return YES;
+	return [self insert:command];
 }
 
 /* syntax: O */
 - (BOOL)open_line_above:(ViCommand *)command
 {
-	[self setInsertMode:command];
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
 	final_location = end_location;
-	return YES;
+	return [self insert:command];
 }
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
@@ -847,9 +850,13 @@
 {
 	if(command.text)
 	{
-		NSLog(@"replaying inserting text [%@]", command.text);
+		NSLog(@"replaying inserted text [%@]", command.text);
 		[self insertString:command.text atLocation:end_location];
-		final_location = end_location + [command.text length] - 1; // -1 is for 'escape' (back to command mode)
+		final_location = end_location + [command.text length];
+
+		 // simulate 'escape' (back to command mode)
+		start_location = final_location;
+		[self move_left:nil];
 	}
 	else
 	{
@@ -925,11 +932,11 @@
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-#if 0
-	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X",
+#if 1
+	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X (0x%04X)",
 	      [theEvent charactersIgnoringModifiers],
 	      charcode,
-	      [theEvent modifierFlags] & ~0xFF);
+	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask)) >> 17));
 #endif
 
 	if(mode == ViInsertMode)
@@ -945,7 +952,7 @@
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
-		else if(([theEvent modifierFlags] >> 17) == 0)
+		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask)) >> 17) == 0)
 		{
 			NSLog(@"insert text [%@]", [theEvent characters]);
 			start_location = [self caret];
@@ -976,11 +983,10 @@
 
 /* Takes a string of characters and creates key events for each one.
  * Then feeds them into the keyDown method to simulate key presses.
- * Mainly used for unit testing.
+ * Only used for unit testing.
  */
 - (void)input:(NSString *)inputString
 {
-	//NSLog(@"feeding input string [%@]", inputString);
 	int i;
 	for(i = 0; i < [inputString length]; i++)
 	{
@@ -995,9 +1001,6 @@
 					      isARepeat:NO
 						keyCode:[inputString characterAtIndex:i]];
 		[self keyDown:ev];
-		//[NSApp postEvent:ev atStart:NO];
-		//BOOL r = [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:1]];
-		//NSLog(@"runloop returned %i", r);
 	}
 }
 

@@ -159,6 +159,7 @@
 // - (void)test174_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
 
 - (void)test180_OpenLineAbove			{ TEST(@"abc\ndef", 4, @"Oxxx\x1b", @"abc\nxxx\ndef", 6); }
-
+- (void)test181_DeleteToChar			{ TEST(@"abc def ghi", 0, @"df ", @"def ghi", 0); }
+- (void)test182_DeleteToCharAndRepeat		{ TEST(@"abc def ghi", 0, @"df .", @"ghi", 0); }
 
 @end

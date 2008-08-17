@@ -35,6 +35,7 @@ struct vikey
 	struct vikey *dot_motion_command;
 	int dot_count;
 	int dot_motion_count;
+	unichar dot_argument;
 
 	struct vikey *last_ftFT_command;
 	unichar last_ftFT_argument;

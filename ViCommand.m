@@ -99,7 +99,8 @@ find_command(int key)
 		dot_motion_command = motion_command;
 		dot_count = count;
 		dot_motion_count = motion_count;
-		
+		dot_argument = argument;
+
 		/* new (real) commands reset the associated text */
 		if(!is_dot)
 			[self setText:nil];
@@ -172,6 +173,7 @@ find_command(int key)
 		motion_command = dot_motion_command;
 		motion_count = dot_motion_count;
 		key = dot_command->key;
+		argument = dot_argument;
 		if(dot_motion_command)
 			motion_key = dot_motion_command->key;
 		[self setComplete:YES];

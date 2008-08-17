@@ -318,10 +318,10 @@
 {
 	[parser pushKey:'t'];
 	STAssertFalse(parser.complete, nil);
-	[parser pushKey:'å'];
+	[parser pushKey:'z'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 't', nil);
-	STAssertTrue(parser.argument == 'å', nil);
+	STAssertTrue(parser.argument == 'z', nil);
 }
 
 - (void)test090_DotCommandWithInsertedText
@@ -361,6 +361,20 @@
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 'i', nil);
 	STAssertEqualObjects(parser.text, @"apa", nil);
+}
+
+- (void)test092_CommandsWithArgumentRememberArgument
+{
+	[parser pushKey:'d'];
+	[parser pushKey:'f'];
+	[parser pushKey:'a'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.argument == 'a', nil);
+
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.argument == 'a', nil);
 }
 
 @end

@@ -54,7 +54,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 }
 
 - (void)initEditor;
-- (void)setFilename:(NSURL *)aURL;
+- (void)configureForURL:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
@@ -66,10 +66,35 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setTabSize:(int)tabSize;
 - (NSUndoManager *)undoManager;
+- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
+
+
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(OgreSyntax)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp;
+
+- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
+
+- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (void)undoInsertInRange:(NSRange)aRange;
+- (void)recordInsertInRange:(NSRange)aRange;
+- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (void)recordDeleteOfRange:(NSRange)aRange;
+- (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
+
+- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange;
+- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
+
+- (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
+
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag;
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag;
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
+
+
 @end
 
 @interface ViTextView (cursor)
@@ -78,4 +103,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView (syntax)
 - (void)highlightEverything;
+@end
+
+@interface ViTextView (vi_commands)
+- (BOOL)move_left:(ViCommand *)command;
 @end

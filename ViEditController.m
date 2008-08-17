@@ -43,8 +43,8 @@
 - (void)setFilename:(NSURL *)aURL
 {
 	fileURL = aURL;
-	[textView setFilename:aURL];
-	[textView highlightEverything];
+	[textView configureForURL:aURL];
+	// [textView highlightEverything];
 }
 
 - (NSURL *)fileURL

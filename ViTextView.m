@@ -971,6 +971,14 @@
 	return YES;
 }
 
+/* syntax: ^F */
+- (BOOL)forward_screen:(ViCommand *)command
+{
+	NSLog(@"forward_screen");
+	[self scrollPageDown:self];
+	return YES;
+}
+
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
 	NSLog(@"should parse and execute ex command: [%@]", exCommandString);

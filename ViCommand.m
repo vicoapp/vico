@@ -9,6 +9,7 @@
 #define VIF_NEED_CHAR	(1 << 4)
 
 static struct vikey vikeys[] = {
+	{@"forward_screen:",	  6, VIF_IS_MOTION}, // ^F
 	{@"append_eol:",	'A', VIF_SETS_DOT},
 	{@"word_backward:",	'B', VIF_IS_MOTION},
 	{@"change_eol:",	'C', VIF_SETS_DOT},

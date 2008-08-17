@@ -17,7 +17,7 @@
 	//	if(NSIntersectsRect(aRect, gr) ) 
 	//if(NSPointInRect(caret, aRect))
 	{
-		[self drawInsertionPointInRect:gr color:[self insertionPointColor] turnedOn:YES];
+		[self drawInsertionPointInRect:gr color:[theme caretColor] turnedOn:YES];
 	}
 }
 
@@ -53,10 +53,10 @@
 #endif
 
 		[color set];
-		//[[NSBezierPath bezierPathWithRect:rect] fill];
+		[[NSBezierPath bezierPathWithRect:rect] fill];
 		//[NSBezierPath fillRect:rect];
 		//		NSRectFillUsingOperation(rect, NSCompositeXOR);
-		NSRectFillUsingOperation(rect, NSCompositePlusDarker);
+		//NSRectFillUsingOperation(rect, NSCompositePlusDarker);
 
 		oldCaretRect = rect;
         }

@@ -20,13 +20,7 @@
 
 - (void)initEditor
 {
-	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
-	[self setFont:font];
 	[self setCaret:0];
-	[self setInsertionPointColor:[NSColor colorWithCalibratedRed:0.2
-		green:0.2
-		blue:0.2
-		alpha:0.5]];
 
 	[[self textStorage] setDelegate:self];
 
@@ -41,6 +35,13 @@
 	[self setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 	[self setAutoresizingMask:NSViewWidthSizable];
 	[self setHorizontallyResizable:YES];
+
+	theme = [ViTheme defaultTheme];
+	[self setBackgroundColor:[theme backgroundColor]];
+	[self setDrawsBackground:YES];
+	[self setInsertionPointColor:[theme caretColor]];
+	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
+	[self setFont:font];
 }
 
 - (void)setFilename:(NSURL *)aURL

@@ -97,7 +97,7 @@
 	if(d)
 		return d;
 
-	// walk through all patterns a match the scope selector
+	// walk through all patterns and match the scope selector
 	for(d in languagePatterns)
 	{
 		if([[d objectForKey:@"name"] isEqualToString:aScopeSelector])

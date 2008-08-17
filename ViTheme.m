@@ -2,6 +2,17 @@
 
 @implementation ViTheme
 
++ (ViTheme *)defaultTheme
+{
+	static ViTheme *defaultTheme = nil;
+	if(defaultTheme == nil)
+	{
+		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
+		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
+	}
+	return defaultTheme;
+}
+
 - (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
 	//NSLog(@"%s saving foreground color %@", _cmd, foreground);
@@ -11,28 +22,41 @@
 	return [NSColor colorWithDeviceRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
 }
 
-- (id)initWithBundle:(NSString *)aBundleName
+- (id)initWithPath:(NSString *)aPath
 {
 	self = [super init];
 	if(self == nil)
 		return nil;
 
-	NSString *path = [[NSBundle mainBundle] pathForResource:aBundleName ofType:@"tmTheme"];
-	theme = [NSDictionary dictionaryWithContentsOfFile:path];
+	scopeSelectorCache = [[NSMutableDictionary alloc] init];	
+	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
+	NSLog(@"theme = %@", theme);
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *settings = [theme objectForKey:@"settings"];
 	NSDictionary *setting;
 	for(setting in settings)
 	{
+		if([setting objectForKey:@"name"] == nil)
+		{
+			/* settings for the default scope */
+			defaultSettings = [setting objectForKey:@"settings"];
+			continue;
+		}
+
 		NSString *scope = [setting objectForKey:@"scope"];
+		if(scope == nil)
+			continue;
+
+		// FIXME: should parse the scope selector appropriately:
 		NSArray *scope_selectors = [scope componentsSeparatedByString:@", "];
+
 		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
 		if(foreground == nil)
 			continue;
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 		[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
-
+		
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
 		if(background)
 		{
@@ -46,9 +70,13 @@
 		}
 	}
 
-	scopeSelectorCache = [[NSMutableDictionary alloc] init];
-
 	return self;
+}
+
+- (id)initWithBundle:(NSString *)aBundleName
+{
+	NSString *path = [[NSBundle mainBundle] pathForResource:aBundleName ofType:@"tmTheme"];
+	return [self initWithPath:path];
 }
 
 - (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector
@@ -79,6 +107,45 @@
 	// cache this non-hit
 	[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:aScopeSelector];
 	return nil;
+}
+
+- (NSColor *)colorWithName:(NSString *)colorName orDefault:(NSColor *)defaultColor alpha:(float)alpha
+{
+	NSString *rgb = [defaultSettings objectForKey:colorName];
+	NSLog(@"%@ rgb = %@", colorName, rgb);
+	NSColor *color;
+	if(rgb)
+		color = [self hashRGBToColor:rgb];
+	else
+		color = defaultColor;
+	return [color colorWithAlphaComponent:alpha];
+}
+
+- (NSColor *)backgroundColor
+{
+	if(backgroundColor == nil)
+		backgroundColor = [self colorWithName:@"background" orDefault:[NSColor whiteColor] alpha:1.0];
+	return backgroundColor;
+}
+
+- (NSColor *)foregroundColor
+{
+	if(foregroundColor == nil)
+		foregroundColor = [self colorWithName:@"foreground" orDefault:[NSColor blackColor] alpha:1.0];
+	return foregroundColor;
+}
+
+- (NSColor *)caretColor
+{
+	if(caretColor == nil)
+	{
+		NSColor *defaultCaretColor = [NSColor colorWithCalibratedRed:0.2
+								       green:0.2
+									blue:0.2
+								       alpha:0.5];
+		caretColor = [self colorWithName:@"caret" orDefault:defaultCaretColor alpha:0.6];
+	}
+	return caretColor;
 }
 
 @end

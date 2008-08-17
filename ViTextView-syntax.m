@@ -112,9 +112,6 @@
 	{
 		syntax_initialized = YES;
 
-		theme = [[ViTheme alloc] initWithBundle:@"Mac Classic"];
-		NSLog(@"theme = %@", theme);
-
 		//language = [[ViLanguageStore defaultStore] languageForFilename:filename];
 		NSLog(@"ViLanguage = %@", language);
 	}
@@ -338,9 +335,11 @@
 		}
 	}
 
-	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
+	//[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
+	//[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
+	//[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
+	NSDictionary *defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
+	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 
 	// highlight each line separately
 	NSUInteger nextRange = aRange.location;

@@ -113,7 +113,6 @@
 
 - (void)setFileURL:(NSURL *)aURL
 {
-	NSLog(@"MyDocument: setFileURL: [%@]", aURL);
 	[super setFileURL:aURL];
 	if(aURL)
 	{
@@ -129,7 +128,6 @@
 	NSURL *url = [[self currentEditor] fileURL];
 	if(url == nil)
 		url = [super fileURL];
-	NSLog(@"MyDocument: fileURL: [%@]", url);
 	return url;
 }
 
@@ -152,7 +150,6 @@
 
 - (void)closeCurrentTab
 {
-	NSLog(@"closing tab, window = [%@]", [self window]);
 	[self canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldCloseTab:contextInfo:) contextInfo:nil];
 }
 
@@ -164,7 +161,7 @@
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	NSLog(@"selected tab view item [%@]", tabViewItem);
-	[[self window] setTitle:[self displayName]];
+	[documentWindow setTitle:[self displayName]];
 	[self setFileURL:[self fileURL]];
 	[self setUndoManager:[[self currentEditor] undoManager]];
 }

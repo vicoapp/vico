@@ -13,6 +13,7 @@
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 - (void)recordInsertInRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView
@@ -118,6 +119,24 @@
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 }
 
+- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	NSRange lineRange = NSMakeRange(bol, eol - bol);
+
+	NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
+						      options:0
+							range:lineRange];
+	NSLog(@"leadingWhitespaceForLineAtLocation(%u): r = %u + %u", aLocation, r.location, r.length);
+	if(r.location != NSNotFound)
+	{
+		return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
+	}
+
+	return nil;
+}
+
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
 	NSLog(@"inserting newline at %u", aLocation);
@@ -126,28 +145,18 @@
 
 	if(aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
 	{
-		NSRange searchRange;
+		NSString *leading_whitespace = nil;
 		if(indentForward)
 		{
-			NSUInteger bol;
-			[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aLocation - 1];
-			searchRange = NSMakeRange(bol, aLocation - 1 - bol);
+			leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation - 1];
 		}
 		else
 		{
-			NSUInteger eol;
-			[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:aLocation + 1];
-			searchRange = NSMakeRange(aLocation + 1, eol - aLocation + 1);
+			leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
 		}
-		NSLog(@"doing auto-indentation, search range %u + %u", searchRange.location, searchRange.length);
 
-		NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
-							      options:0
-								range:searchRange];
-		NSLog(@"r = %u + %u", r.location, r.length);
-		if(r.location != NSNotFound)
+		if(leading_whitespace)
 		{
-			NSString *leading_whitespace = [[storage string] substringWithRange:NSMakeRange(searchRange.location, r.location - searchRange.location)];
 			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
 			insert_end_location += [leading_whitespace length];
 			return 1 + [leading_whitespace length];
@@ -1432,8 +1441,9 @@
 
 - (void)input_newline:(NSString *)characters
 {
-	[self insertNewlineAtLocation:start_location indentForward:YES];
-	[self setCaret:start_location + 1];
+	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+	[self setCaret:start_location + num_chars];
+	[self scrollRangeToVisible:NSMakeRange(start_location + num_chars, 0)];
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation

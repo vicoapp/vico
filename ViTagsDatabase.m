@@ -26,25 +26,28 @@
 		 */
 		NSFileManager *fm = [NSFileManager defaultManager];
 		prefixPath = [[fm currentDirectoryPath] copy];
-		NSString *path;
+		NSString *path = nil;
 		if(![aFile isAbsolutePath])
 		{
-			while(true)
+			NSString *component;
+			NSString *p = nil;
+			for(component in [prefixPath pathComponents])
 			{
-				path = [prefixPath stringByAppendingPathComponent:aFile];
-				NSLog(@"checking for tags file [%@]", path);
-				if([fm fileExistsAtPath:path])
+				if(p)
+					p = [p stringByAppendingPathComponent:component];
+				else
+					p = component;
+
+				NSString *check = [p stringByAppendingPathComponent:aFile];
+				NSLog(@"checking for tags file [%@]", check);
+				if([fm fileExistsAtPath:check])
 				{
-					break;
+					/* We found a tags file. There might be more files
+					 * closer to the current directory so we continue looking.
+					 */
+					path = check;
+					prefixPath = p;
 				}
-				NSString *parent = [prefixPath stringByAppendingPathComponent:@".."];
-				if([parent isEqualToString:prefixPath])
-				{
-					/* file not found, continuing will show an error message */
-					path = aFile;
-					break;
-				}
-				prefixPath = parent;
 			}
 		}
 		else

@@ -18,12 +18,28 @@
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A1176310D0C3410007AA524 /* c.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A1176240D0C148E007AA524 /* c.plist */; };
 		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
+		9A1178CD0D0C8B03007AA524 /* objc.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A1178CC0D0C8B03007AA524 /* objc.plist */; };
+		9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
 		9A1A12240D02CFCF009EABAC /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9A117ACC0D0CA87D007AA524 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4DC40BFC09150BDB0029A2A6 /* OgreKit.framework */;
+			remoteInfo = OgreKit;
+		};
+		9A117AE00D0CA8CD007AA524 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 4DC40BF209150BDB0029A2A6 /* OgreKit */;
+			remoteInfo = OgreKit;
+		};
 		9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -49,6 +65,8 @@
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* vizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A1176240D0C148E007AA524 /* c.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = c.plist; sourceTree = "<group>"; };
+		9A1178CC0D0C8B03007AA524 /* objc.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = objc.plist; sourceTree = "<group>"; };
+		9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OgreKit.xcodeproj; path = OgreKit/OgreKit.xcodeproj; sourceTree = "<group>"; };
 		9A1A11FE0D02C65A009EABAC /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
 		9A1A11FF0D02C65A009EABAC /* ViCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommand.m; sourceTree = "<group>"; };
 		9A1A12150D02CDE6009EABAC /* Unit Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -112,6 +131,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* vizard */ = {
 			isa = PBXGroup;
 			children = (
+				9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
@@ -150,6 +170,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9A1178CC0D0C8B03007AA524 /* objc.plist */,
 				9A1176240D0C148E007AA524 /* c.plist */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
@@ -167,6 +188,14 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9A117AC70D0CA87D007AA524 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9A117ACD0D0CA87D007AA524 /* OgreKit.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		9A1A121B0D02CE29009EABAC /* Test Cases */ = {
@@ -194,6 +223,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				9A117AE10D0CA8CD007AA524 /* PBXTargetDependency */,
 			);
 			name = vizard;
 			productInstallPath = "$(HOME)/Applications";
@@ -230,6 +260,12 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* vizard */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 9A117AC70D0CA87D007AA524 /* Products */;
+					ProjectRef = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* vizard */,
@@ -237,6 +273,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		9A117ACD0D0CA87D007AA524 /* OgreKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = OgreKit.framework;
+			remoteRef = 9A117ACC0D0CA87D007AA524 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D15AC2B0486D014006FF6A4 /* Resources */ = {
@@ -248,6 +294,7 @@
 				8D15AC2E0486D014006FF6A4 /* MyDocument.nib in Resources */,
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				9A1176310D0C3410007AA524 /* c.plist in Resources */,
+				9A1178CD0D0C8B03007AA524 /* objc.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +349,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9A117AE10D0CA8CD007AA524 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OgreKit;
+			targetProxy = 9A117AE00D0CA8CD007AA524 /* PBXContainerItemProxy */;
+		};
 		9A1A12830D02EB86009EABAC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* vizard */;
@@ -403,6 +455,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -421,6 +477,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = vizard_Prefix.pch;
@@ -434,7 +494,7 @@
 		C05733CC08A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
+				ARCHS = i386;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = supported;
@@ -456,7 +516,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};

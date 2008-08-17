@@ -80,5 +80,9 @@
 - (void)test091_MoveToChar			{ MOVE(@"abc def ghi", 1, @"ff", 6); }
 - (void)test091_MoveToChar2			{ MOVE(@"abc def abc", 1, @"fb", 9); }
 - (void)test092_DeleteToChar			{ TEST(@"abc def abc", 1, @"dfe", @"af abc", 1); }
+- (void)test093_MoveToCharWithCount		{ MOVE(@"abc abc abc", 0, @"2fa", 8); }
+- (void)test094_DeleteToCharWithCount		{ TEST(@"abc abc abc", 0, @"d2fa", @"bc", 0); }
+- (void)test095_DeleteTilCharWithCount		{ TEST(@"abc abc abc", 0, @"d2ta", @"abc", 0); }
 
 @end
+

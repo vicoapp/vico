@@ -283,20 +283,25 @@
 {
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	NSUInteger i = start_location + 1;
-	while(i < eol)
+	NSUInteger i = start_location;
+	int count = IMAX(command.count, 1);
+	if(!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+	while(count--)
 	{
-		if([[storage string] characterAtIndex:i] == command.character)
+		while(++i < eol && [[storage string] characterAtIndex:i] != command.character)
+			/* do nothing */ ;
+		if(i == eol)
 		{
-			final_location = command.ismotion ? i : start_location;
-			end_location = i + 1;
-			NSLog(@"start_location = %i, end_location = %i, len = %i", start_location, end_location, end_location - start_location);
-			return YES;
+			NSLog(@"%c not found", command.character);
+			return NO;
 		}
-		++i;
 	}
-	NSLog(@"%c not found", command.character);
-	return NO;
+
+	final_location = command.ismotion ? i : start_location;
+	end_location = i + 1;
+	return YES;
+
 }
 
 /* syntax: [count]t<char> */

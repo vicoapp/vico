@@ -58,7 +58,8 @@ find_command(int key)
 @synthesize count;
 @synthesize motion_count;
 @synthesize key;
-@synthesize character;
+@synthesize motion_key;
+@synthesize argument;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
@@ -66,26 +67,26 @@ find_command(int key)
 {
 	complete = YES;
 
-	if(command_key && has_flag(command_key, VIF_SETS_DOT))
+	if(command && has_flag(command, VIF_SETS_DOT))
 	{
 		/* set the dot command parameters */
-		dot_command_key = command_key;
-		dot_motion_key = motion_key;
+		dot_command = command;
+		dot_motion_command = motion_command;
 		dot_count = count;
 		dot_motion_count = motion_count;
 	}
 	
-	if(command_key && (command_key->key == 't' || command_key->key == 'f' ||
-			   command_key->key == 'T' || command_key->key == 'F'))
+	if(command && (command->key == 't' || command->key == 'f' ||
+			   command->key == 'T' || command->key == 'F'))
 	{
-		last_ftFT_key = command_key;
-		last_ftFT_character = character;
+		last_ftFT_command = command;
+		last_ftFT_argument = argument;
 	}
-	else if(motion_key && (motion_key->key == 't' || motion_key->key == 'f' ||
-			       motion_key->key == 'T' || motion_key->key == 'F'))
+	else if(motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
+			       motion_command->key == 'T' || motion_command->key == 'F'))
 	{
-		last_ftFT_key = motion_key;
-		last_ftFT_character = character;
+		last_ftFT_command = motion_command;
+		last_ftFT_argument = argument;
 	}
 	
 	if(count > 0 && motion_count > 0)
@@ -105,7 +106,7 @@ find_command(int key)
 {
 	if(state == ViCommandNeedChar)
 	{
-		character = aKey;
+		argument = aKey;
 		[self setComplete];
 
 		return;
@@ -128,34 +129,36 @@ find_command(int key)
 	// check for the dot command
 	if(aKey == '.')
 	{
-		if(dot_command_key == nil)
+		if(dot_command == nil)
 		{
 			method = @"nodot:"; // prints "No command to repeat"
 			[self setComplete];
 			return;
 		}
 
-		command_key = dot_command_key;
-		method = dot_command_key->method;
-		motion_key = dot_motion_key;
+		command = dot_command;
+		method = dot_command->method;
+		motion_command = dot_motion_command;
 		motion_count = dot_motion_count;
-		key = dot_command_key->key;
+		key = dot_command->key;
+		if(dot_motion_command)
+			motion_key = dot_motion_command->key;
 		[self setComplete];
 		return;
 	}
 	else if(aKey == ';' || aKey == ',')
 	{
-		if(last_ftFT_key == nil)
+		if(last_ftFT_command == nil)
 		{
 			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
 		}
 		else
 		{
-			NSLog(@"repeating '%c' command for char '%c'", last_ftFT_key->key, last_ftFT_character);
-			command_key = last_ftFT_key;
-			method = last_ftFT_key->method;
-			character = last_ftFT_character;
-			key = last_ftFT_key->key;
+			NSLog(@"repeating '%c' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
+			command = last_ftFT_command;
+			method = last_ftFT_command->method;
+			argument = last_ftFT_argument;
+			key = last_ftFT_command->key;
 		}
 		[self setComplete];
 		return;
@@ -173,8 +176,8 @@ find_command(int key)
 
 	if(state == ViCommandInitialState)
 	{
-		command_key = vikey;
-		method = command_key->method;
+		command = vikey;
+		method = command->method;
 		key = aKey;
 		if(has_flag(vikey, VIF_NEED_MOTION))
 		{
@@ -190,11 +193,13 @@ find_command(int key)
 	}
 	else if(state == ViCommandNeedMotion)
 	{
+		motion_key = aKey;
+
 		if(has_flag(vikey, VIF_IS_MOTION))
 		{
-			motion_key = vikey;
+			motion_command = vikey;
 		}
-		else if(aKey == command_key->key)
+		else if(aKey == command->key)
 		{
 			/* From nvi:
 			 * Commands that have motion components can be doubled to
@@ -202,7 +207,7 @@ find_command(int key)
 			 *
 			 * Do this by setting the line mode flag.
 			 */
-			motion_key = command_key;
+			motion_command = command;
 		}
 		else
 		{
@@ -225,37 +230,37 @@ find_command(int key)
 {
 	complete = NO;
 	method = nil;
-	command_key = NULL;
-	motion_key = NULL;
+	command = NULL;
+	motion_command = NULL;
 	state = ViCommandInitialState;
 	count = 0;
 	motion_count = 0;
 	key = -1;
-	character = -1;
+	argument = -1;
 }
 
 - (int)ismotion
 {
-	if(command_key && has_flag(command_key, VIF_IS_MOTION))
+	if(command && has_flag(command, VIF_IS_MOTION))
 		return 1;
 	return 0;
 }
 
 - (BOOL)line_mode
 {
-	if(motion_key)
+	if(motion_command)
 	{
-		if(motion_key == command_key)
+		if(motion_command == command)
 			return YES;
-		return has_flag(motion_key, VIF_LINE_MODE);
+		return has_flag(motion_command, VIF_LINE_MODE);
 	}
-	return command_key && has_flag(command_key, VIF_LINE_MODE);
+	return command && has_flag(command, VIF_LINE_MODE);
 }
 
 - (NSString *)motion_method
 {
-	if(motion_key && has_flag(motion_key, VIF_IS_MOTION))
-		return motion_key->method;
+	if(motion_command && has_flag(motion_command, VIF_IS_MOTION))
+		return motion_command->method;
 	return nil;
 }
 

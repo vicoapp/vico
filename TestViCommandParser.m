@@ -269,14 +269,14 @@
 }
 
 
-- (void)test080_tCommandRequiresCharacter
+- (void)test080_tCommandRequiresArgument
 {
 	[parser pushKey:'t'];
 	STAssertFalse(parser.complete, nil);
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 't', nil);
-	STAssertTrue(parser.character == 'x', nil);
+	STAssertTrue(parser.argument == 'x', nil);
 }
 
 - (void)test081_tCommandRequiresCharacterWithRepeatCount
@@ -287,11 +287,11 @@
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 't', nil);
-	STAssertTrue(parser.character == 'x', nil);
+	STAssertTrue(parser.argument == 'x', nil);
 	STAssertEquals(parser.count, 3, nil);
 }
 
-- (void)test081_CommandWithCharacterAsMotionComponent
+- (void)test081_CommandWithArgumentAsMotionComponent
 {
 	[parser pushKey:'d'];
 	[parser pushKey:'t'];
@@ -299,7 +299,7 @@
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 'd', nil);
-	STAssertEquals(parser.character, (unichar)'x', nil);
+	STAssertEquals(parser.argument, (unichar)'x', nil);
 	STAssertEqualObjects(parser.motion_method, @"move_til_char:", nil);
 }
 
@@ -310,7 +310,7 @@
 	[parser pushKey:'å'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 't', nil);
-	STAssertTrue(parser.character == 'å', nil);
+	STAssertTrue(parser.argument == 'å', nil);
 }
 
 @end

@@ -22,21 +22,22 @@ struct vikey
 	ViCommandState state;
 
 	NSString *method;
-	
-	struct vikey *command_key;
-	struct vikey *motion_key;
+
+	struct vikey *command;
+	struct vikey *motion_command;
 	int count;
 	int motion_count;
 	unichar key;
-	unichar character;
+	unichar motion_key;
+	unichar argument; // extra character argument for f, t, r etc.
 
-	struct vikey *dot_command_key;
-	struct vikey *dot_motion_key;
+	struct vikey *dot_command;
+	struct vikey *dot_motion_command;
 	int dot_count;
 	int dot_motion_count;
 
-	struct vikey *last_ftFT_key;
-	unichar last_ftFT_character;
+	struct vikey *last_ftFT_command;
+	unichar last_ftFT_argument;
 }
 
 - (void)pushKey:(unichar)key;
@@ -50,6 +51,7 @@ struct vikey
 @property(readonly) int count;
 @property(readonly) int motion_count;
 @property(readonly) unichar key;
-@property(readonly) unichar character;
+@property(readonly) unichar motion_key;
+@property(readonly) unichar argument;
 
 @end

@@ -7,7 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef enum { ViCommandInitialState, ViCommandNeedMotion } ViCommandState;
+typedef enum { ViCommandInitialState, ViCommandNeedMotion, ViCommandNeedChar } ViCommandState;
 
 struct vikey
 {
@@ -28,6 +28,7 @@ struct vikey
 	int count;
 	int motion_count;
 	char key;
+	char character;
 
 	struct vikey *dot_command_key;
 	struct vikey *dot_motion_key;
@@ -46,5 +47,6 @@ struct vikey
 @property(readonly) int count;
 @property(readonly) int motion_count;
 @property(readonly) char key;
+@property(readonly) char character;
 
 @end

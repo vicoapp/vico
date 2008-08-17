@@ -268,4 +268,27 @@
 	STAssertTrue(parser.line_mode, nil);	
 }
 
+
+- (void)test080_tCommandRequiresCharacter
+{
+	[parser pushKey:'t'];
+	STAssertFalse(parser.complete, nil);
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 't', nil);
+	STAssertTrue(parser.character == 'x', nil);
+}
+
+- (void)test081_tCommandRequiresCharacterWithRepeatCount
+{
+	[parser pushKey:'3'];
+	[parser pushKey:'t'];
+	STAssertFalse(parser.complete, nil);
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 't', nil);
+	STAssertTrue(parser.character == 'x', nil);
+	STAssertEquals(parser.count, 3, nil);
+}
+
 @end

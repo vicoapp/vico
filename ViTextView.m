@@ -663,7 +663,6 @@
 		}
 		else
 		{
-			NSLog(@"passing key to super: %C", charcode);
 			[super keyDown:theEvent];
 		}
 	}
@@ -738,6 +737,8 @@
 	[self display];
 }
 
+/* This one is from CocoaDev.
+ */
 - (void)disableWrapping
 {
 	const float LargeNumberForText = 1.0e7;

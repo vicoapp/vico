@@ -6,29 +6,31 @@
 #define VIF_IS_MOTION	(1 << 1)
 #define VIF_SETS_DOT	(1 << 2)
 #define VIF_LINE_MODE	(1 << 3)
+#define VIF_NEED_CHAR	(1 << 4)
 
 static struct vikey vikeys[] = {
-	{@"append:",		'a', VIF_SETS_DOT},
 	{@"append_eol:",	'A', VIF_SETS_DOT},
-	{@"insert:",		'i', VIF_SETS_DOT},
 	{@"insert_bol:",	'I', VIF_SETS_DOT},
+	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"open_line_above:",	'O', VIF_SETS_DOT},
+	{@"put_before:",	'P', VIF_SETS_DOT},
+	{@"delete_backward:",	'X', VIF_SETS_DOT},
+	{@"move_bol:",		'0', VIF_IS_MOTION},
+	{@"append:",		'a', VIF_SETS_DOT},
 	{@"change:",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"move_left:",		'h', VIF_IS_MOTION},
+	{@"insert:",		'i', VIF_SETS_DOT},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
-	{@"put_before:",	'P', VIF_SETS_DOT},
+	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"put_after:",		'p', VIF_SETS_DOT},
-	{@"move_bol:",		'0', VIF_IS_MOTION},
-	{@"move_eol:",		'$', VIF_IS_MOTION},
+	{@"move_til_char:",	't', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_forward:",	'w', VIF_IS_MOTION},
 	{@"delete_forward:",	'x', VIF_SETS_DOT},
-	{@"delete_backward:",	'X', VIF_SETS_DOT},
-	{@"open_line_above:",	'O', VIF_SETS_DOT},
-	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"yank:",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
-	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_eol:",		'$', VIF_IS_MOTION},
 	{nil, -1, 0}
 };
 
@@ -52,6 +54,7 @@ find_command(int key)
 @synthesize count;
 @synthesize motion_count;
 @synthesize key;
+@synthesize character;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
@@ -83,6 +86,13 @@ find_command(int key)
 
 - (void)pushKey:(unichar)aKey
 {
+	if(state == ViCommandNeedChar)
+	{
+		character = aKey;
+		[self setComplete];
+		return;
+	}
+	
 	// check if it's a repeat count
 	int *countp = nil;
 	if(state == ViCommandInitialState)
@@ -132,7 +142,14 @@ find_command(int key)
 		method = command_key->method;
 		key = aKey;
 		if(has_flag(vikey, VIF_NEED_MOTION))
+		{
 			state = ViCommandNeedMotion;
+		}
+		else if(has_flag(vikey, VIF_NEED_CHAR))
+		{
+			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
+			state = ViCommandNeedChar;
+		}
 		else
 			[self setComplete];
 	}
@@ -171,6 +188,7 @@ find_command(int key)
 	count = 0;
 	motion_count = 0;
 	key = -1;
+	character = -1;
 }
 
 - (int)ismotion

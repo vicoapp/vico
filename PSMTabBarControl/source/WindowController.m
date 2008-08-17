@@ -54,11 +54,10 @@
 - (IBAction)addNewTab:(id)sender
 {
     FakeModel *newModel = [[FakeModel alloc] init];
-    NSTabViewItem *newItem = [[[NSTabViewItem alloc] initWithIdentifier:[newModel controller]] autorelease];
+    NSTabViewItem *newItem = [[NSTabViewItem alloc] initWithIdentifier:[newModel controller]];
     [newItem setLabel:@"Untitled"];
     [tabView addTabViewItem:newItem];
     [tabView selectTabViewItem:newItem]; // this is optional, but expected behavior
-    [newModel release];
 }
 
 - (IBAction)closeTab:(id)sender
@@ -247,8 +246,8 @@
         [item setAction:@selector(toggle:)];
         
     }
-    
-    return [item autorelease];
+
+    return item;
 }
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar 

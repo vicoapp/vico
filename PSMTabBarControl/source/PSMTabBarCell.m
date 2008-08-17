@@ -66,14 +66,6 @@
     return self;
 }
 
-#if 0
-- (void)dealloc
-{
-    [_indicator release];
-    [super dealloc];
-}
-#endif
-
 #pragma mark -
 #pragma mark Accessors
 
@@ -328,9 +320,9 @@
     [_controlView lockFocus];
     NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame];
     [_controlView unlockFocus];
-    NSImage *image = [[[NSImage alloc] initWithSize:[rep size]] autorelease];
+    NSImage *image = [[NSImage alloc] initWithSize:[rep size]];
     [image addRepresentation:rep];
-    NSImage *returnImage = [[[NSImage alloc] initWithSize:[rep size]] autorelease];
+    NSImage *returnImage = [[NSImage alloc] initWithSize:[rep size]];
     [returnImage lockFocus];
     [image compositeToPoint:NSMakePoint(0.0, 0.0) operation:NSCompositeSourceOver fraction:0.7];
     [returnImage unlockFocus];
@@ -342,7 +334,6 @@
             indicatorPoint.y += 1.0;
         [pi compositeToPoint:indicatorPoint operation:NSCompositeSourceOver fraction:0.7];
         [returnImage unlockFocus];
-        [pi release];
     }
     return returnImage;
 }

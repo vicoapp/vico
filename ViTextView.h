@@ -24,6 +24,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableCharacterSet *keywordSet;
 	NSMutableCharacterSet *keywordAndDotSet;
 	BOOL syntax_initialized;
+
+	CGFloat pageGuideX;
 }
 
 - (void)initEditor;

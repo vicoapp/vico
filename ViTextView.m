@@ -6,7 +6,7 @@
 #define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
 
 @interface ViTextView (private)
-- (void)move_right:(ViCommand *)command;
+- (BOOL)move_right:(ViCommand *)command;
 @end
 
 @implementation ViTextView
@@ -32,19 +32,22 @@
 	storage = [self textStorage];
 }
 
-- (void)illegal:(ViCommand *)command
+- (BOOL)illegal:(ViCommand *)command
 {
 	NSLog(@"%c is not a vi command", command.key);
+	return NO;
 }
 
-- (void)nonmotion:(ViCommand *)command
+- (BOOL)nonmotion:(ViCommand *)command
 {
 	NSLog(@"%c may not be used as a motion command", command.key);
+	return NO;
 }
 
-- (void)nodot:(ViCommand *)command
+- (BOOL)nodot:(ViCommand *)command
 {
 	NSLog(@"No command to repeat");
+	return NO;
 }
 
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
@@ -57,13 +60,8 @@
 	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
 }
 
-- (void)current_line:(ViCommand *)command
-{
-	[self getLineStart:&start_location end:&end_location contentsEnd:NULL];
-}
-
 /* syntax: [buffer][count]d[count]motion */
-- (void)delete:(ViCommand *)command
+- (BOOL)delete:(ViCommand *)command
 {
 	// need beginning of line for correcting caret position after deletion
 	NSUInteger bol;
@@ -71,22 +69,20 @@
 
 	[storage deleteCharactersInRange:affectedRange];
 
-#if 0
-	if([command.motion_method isEqualToString:@"current_line"])
-		end_location = affectedRange.location;
-#endif
-
 	// correct caret position if we deleted the last character(s) on the line
+	if(bol > [[storage string] length])
+		bol = IMAX(0, [[storage string] length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
 	if(affectedRange.location >= eol)
 		end_location = IMAX(bol, eol - 1);
 	else
 		end_location = affectedRange.location;
+	return YES;
 }
 
 /* syntax: [buffer][count]y[count][motion] */
-- (void)yank:(ViCommand *)command
+- (BOOL)yank:(ViCommand *)command
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
@@ -111,6 +107,7 @@
 	 * got it right...   Unlike delete, we make no adjustments here.
 	 */
 	end_location = affectedRange.location;
+	return YES;
 }
 
 /* Like insertText:, but works within beginEditing/endEditing
@@ -122,63 +119,76 @@
 }
 
 /* syntax: [buffer][count]P */
-- (void)put_before:(ViCommand *)command
+- (BOOL)put_before:(ViCommand *)command
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
 	if([buffer length] == 0)
 	{
 		NSLog(@"The default buffer is empty");
-		return;
+		return NO;
 	}
 
 	[self insertString:buffer atLocation:start_location];
+	return YES;
 }
 
 /* syntax: [buffer][count]p */
-- (void)put_after:(ViCommand *)command
+- (BOOL)put_after:(ViCommand *)command
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
 	if([buffer length] == 0)
 	{
 		NSLog(@"The default buffer is empty");
-		return;
+		return NO;
 	}
 
 	[self move_right:command]; // sets end_location
 	[self insertString:buffer atLocation:end_location];
+	return YES;
 }
 
 /* syntax: [buffer][count]c[count]motion */
-- (void)change:(ViCommand *)command
+- (BOOL)change:(ViCommand *)command
 {
-	[self delete:command];
 	[self setInsertMode];
+	return [self delete:command];
 }
 
 /* syntax: i */
-- (void)insert:(ViCommand *)command
+- (BOOL)insert:(ViCommand *)command
 {
 	[self setInsertMode];
+	return YES;
 }
 
 /* syntax: [count]h */
-- (void)move_left:(ViCommand *)command
+- (BOOL)move_left:(ViCommand *)command
 {
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if(start_location > bol)
-		end_location = start_location - 1;
+	if(start_location == bol)
+	{
+		NSLog(@"Already in the first column");
+		return NO;
+	}
+	end_location = start_location - 1;
+	return YES;
 }
 
 /* syntax: [count]l */
-- (void)move_right:(ViCommand *)command
+- (BOOL)move_right:(ViCommand *)command
 {
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if(start_location + 1 < eol)
-		end_location = start_location + 1;
+	if(start_location + 1 >= eol)
+	{
+		NSLog(@"Already at end-of-line");
+		return NO;
+	}
+	end_location = start_location + 1;
+	return YES;
 }
 
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
@@ -194,81 +204,133 @@
 }
 
 /* syntax: [count]k */
-- (void)move_up:(ViCommand *)command
+- (BOOL)move_up:(ViCommand *)command
 {
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if(bol > 0)
+	if(bol == 0)
 	{
-		NSUInteger column = start_location - bol;
-		end_location = bol - 1; // previous line
-		[self gotoColumn:column fromLocation:end_location];
-		[self scrollRangeToVisible:NSMakeRange(end_location, 0)];
+		NSLog(@"Already at the beginning of the file");
+		return NO;
 	}
+		
+	NSUInteger column = start_location - bol;
+	end_location = bol - 1; // previous line
+	[self gotoColumn:column fromLocation:end_location];
+	need_scroll = YES;
+	return YES;
 }
 
 /* syntax: [count]j */
-- (void)move_down:(ViCommand *)command
+- (BOOL)move_down:(ViCommand *)command
 {
 	NSUInteger bol, end;
 	[self getLineStart:&bol end:&end contentsEnd:NULL];
-	if(end < [[storage string] length])
+	if(end >= [storage length])
 	{
-		NSUInteger column = start_location - bol;
-		end_location = end; // next line
-		[self gotoColumn:column fromLocation:end_location];
-		[self scrollRangeToVisible:NSMakeRange(end_location, 0)];
+		NSLog(@"Already at end-of-file");
+		return NO;
 	}
+	NSUInteger column = start_location - bol;
+	end_location = end; // next line
+	[self gotoColumn:column fromLocation:end_location];
+	need_scroll = YES;
+	return YES;
 }
 
 /* syntax: 0 */
-- (void)move_bol:(ViCommand *)command
+- (BOOL)move_bol:(ViCommand *)command
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
+	return YES;
 }
 
 /* syntax: $ */
-- (void)move_eol:(ViCommand *)command
+- (BOOL)move_eol:(ViCommand *)command
 {
-	if([[storage string] length] == 0)
-		return;
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	end_location = IMAX(bol, eol - command.ismotion);
+	if([storage length] > 0)
+	{
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol];
+		end_location = IMAX(bol, eol - command.ismotion);
+	}
+	return YES;
+}
+
+/* syntax: [count]G */
+- (BOOL)goto_line:(ViCommand *)command
+{
+	int count = command.count;
+	if(!command.ismotion)
+		count = command.motion_count;
+
+	if(count > 0)
+	{
+		int line = 1;
+		end_location = 0;
+		while(line < count)
+		{
+			//NSLog(@"%s got line %i at location %u", _cmd, line, end_location);
+			NSUInteger end;
+			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end_location];
+			if(end_location == end)
+			{
+				NSLog(@"%s Movement past the end-of-file", _cmd);
+				end_location = start_location;
+				return NO;
+			}
+			end_location = end;
+			line++;
+		}
+	}
+	else
+	{
+		/* goto last line */
+		NSUInteger last_location = [[storage string] length];
+		if(last_location > 0)
+			--last_location;
+		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
+	}
+	need_scroll = YES;
+	return YES;
 }
 
 /* syntax: [count]a */
-- (void)append:(ViCommand *)command
+- (BOOL)append:(ViCommand *)command
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(start_location < eol)
 		end_location = start_location + 1;
 	[self setInsertMode];
+	return YES;
 }
 
 /* syntax: [count]A */
-- (void)append_eol:(ViCommand *)command
+- (BOOL)append_eol:(ViCommand *)command
 {
 	[self move_eol:command];
 	start_location = end_location;
 	[self append:command];
+	return YES;
 }
 
 /* syntax: o */
-- (void)open_line_below:(ViCommand *)command
+- (BOOL)open_line_below:(ViCommand *)command
 {
 	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
 	[self setInsertMode];
+	return YES;
 }
 
 /* syntax: O */
-- (void)open_line_above:(ViCommand *)command
+- (BOOL)open_line_above:(ViCommand *)command
 {
 	[self setInsertMode];
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
+	return YES;
 }
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation
@@ -297,11 +359,14 @@
  */
 
 /* syntax: [count]w */
-- (void)word_forward:(ViCommand *)command
+- (BOOL)word_forward:(ViCommand *)command
 {
+	if([storage length] == 0)
+	{
+		NSLog(@"Empty file");
+		return NO;
+	}
 	NSString *s = [storage string];
-	if([s length] == 0)
-		return;
 	unichar ch = [s characterAtIndex:start_location];
 
 	NSMutableCharacterSet *wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
@@ -355,16 +420,17 @@
 	}
 	else if(end_location >= [s length])
 		end_location = [s length] - 1;
+	return YES;
 }
 
 /* syntax: [count]I */
-- (void)insert_bol:(ViCommand *)command
+- (BOOL)insert_bol:(ViCommand *)command
 {
 	[self insert:command];
 
 	NSString *s = [storage string];
 	if([s length] == 0)
-		return;
+		return YES;
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 
@@ -385,20 +451,24 @@
 	}
 	else
 		end_location = bol;
+	return YES;
 }
 
 /* syntax: [count]x */
-- (void)delete_forward:(ViCommand *)command
+- (BOOL)delete_forward:(ViCommand *)command
 {
 	NSString *s = [storage string];
 	if([s length] == 0)
-		return;
+	{
+		NSLog(@"No characters to delete");
+		return NO;
+	}
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(bol == eol)
 	{
 		NSLog(@"no characters to delete");
-		return;
+		return NO;
 	}
 
 	NSRange del;
@@ -413,26 +483,30 @@
 	--eol;
 	if(end_location == eol && eol > bol)
 		--end_location;
+	return YES;
 }
 
 /* syntax: [count]X */
-- (void)delete_backward:(ViCommand *)command
+- (BOOL)delete_backward:(ViCommand *)command
 {
-	NSString *s = [storage string];
-	if([s length] == 0)
-		return;
+	if([storage length] == 0)
+	{
+		NSLog(@"Already in the first column");
+		return NO;
+	}
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if(start_location == bol)
 	{
 		NSLog(@"Already in the first column");
-		return;
+		return NO;
 	}
 	NSRange del;
 	del.location = IMAX(bol, start_location - IMAX(1, command.count));
 	del.length = start_location - del.location;
 	[storage deleteCharactersInRange:del];
 	end_location = del.location;
+	return YES;
 }
 
 
@@ -494,40 +568,70 @@
 
 - (void)evaluateCommand:(ViCommand *)command
 {
-	/* default start-range is the current location */
+	/* Default start- and end-location is the current location. */
 	start_location = [self caret];
 	end_location = start_location;
-	final_location = NSNotFound;
 
 	if(command.motion_method)
 	{
 		/* The command has an associated motion component.
-		 * Run the motion method and record the start and
-		 * stop ranges.
+		 * Run the motion method and record the start and end locations.
 		 */
-		/* if no count is given, act as if it were 1 */
-		//if(parser.motion_count == 0)
-		//	parser.motion_count = 1;
-		[self performSelector:NSSelectorFromString(command.motion_method) withObject:command];
-
-		NSUInteger l1 = start_location, l2 = end_location;
-		if(l2 < l1)
+		if([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
 		{
-			l2 = l1;
-			l1 = end_location;
+			/* the command failed */
+			[command reset];
+			end_location = start_location;
+			return;
 		}
-		affectedRange = NSMakeRange(l1, l2 - l1);
 	}
 
-	[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	final_location = end_location;
+	/* Find out the affected range for this command */
+	NSUInteger l1 = start_location, l2 = end_location;
+	if(l2 < l1)
+	{	/* swap if end < start */
+		l2 = l1;
+		l1 = end_location;
+	}
+	NSLog(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+
+	if(command.line_mode)
+	{
+		/* if this command is line oriented, extend the affectedRange to whole lines */
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+		l1 = bol;
+		l2 = end;
+		NSLog(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+
+		/* If a line mode range includes the last line, also include the newline before the first line.
+		 * This way delete doesn't leave an empty line.
+		 */
+		if(l2 == [storage length])
+		{
+			l1 = IMAX(0, l1 - 1);	// FIXME: what about using CRLF at end-of-lines?
+			NSLog(@"after including newline before first line: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		}
+	}
+	affectedRange = NSMakeRange(l1, l2 - l1);
+
+	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
+	if(ok && command.line_mode)
+	{
+		/* For line mode operations, we always end up at the beginning of the line. */
+		NSUInteger bol;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:end_location];
+		end_location = bol;
+	}
+
 	[command reset];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-#if 1
+#if 0
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 	      [theEvent charactersIgnoringModifiers],
 	      charcode,
@@ -540,7 +644,7 @@
 		{
 			/* escape, return to command mode */
 			[self setCommandMode];
-			start_location = [self caret];
+			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
@@ -558,7 +662,9 @@
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			[[self textStorage] endEditing];
-			[self setCaret:final_location];
+			[self setCaret:end_location];
+			if(need_scroll)
+				[self scrollRangeToVisible:NSMakeRange(end_location, 0)];
 		}
 	}
 }

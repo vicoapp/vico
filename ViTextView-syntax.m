@@ -2,33 +2,15 @@
 
 @implementation ViTextView (syntax)
 
-/*
- * Update syntax colors.
- */
-- (void)textStorageDidProcessEditing:(NSNotification *)notification
+- (void)initHighlighting
 {
-	NSLog(@"textStorageDidProcessEditing");
-	
-	NSTextStorage *textStorage = [notification object];
-	NSString *string = [textStorage string];
-	NSRange area = [textStorage editedRange];
-	NSUInteger length = [string length];
-	
-	static NSDictionary *keywords = nil;
-	static NSColor *commentColor = nil;
-	static NSColor *stringColor = nil;
-	static NSColor *numberColor = nil;
-	static NSColor *keywordColor = nil;
-	static NSMutableCharacterSet *keywordSet = nil;
-	static NSMutableCharacterSet *keywordAndDotSet = nil;
-	static BOOL syntax_initialized = NO;
 	if(!syntax_initialized)
 	{
 		syntax_initialized = YES;
 		
 		NSString *plist = [[NSBundle mainBundle] pathForResource:@"c" ofType:@"plist" inDirectory:nil];
 		keywords = [NSDictionary dictionaryWithContentsOfFile:plist];
-		[keywords retain];
+		//NSLog(@"got %i keywords", [keywords count]);
 		
 		commentColor = [[NSColor colorWithCalibratedRed:0 green:102.0/256 blue:1.0 alpha:1.0] retain];
 		stringColor = [[NSColor colorWithCalibratedRed:3.0/256 green:106.0/256 blue:7.0/256 alpha:1.0] retain];
@@ -41,36 +23,20 @@
 		
 		keywordAndDotSet = [keywordSet copy];
 		[keywordAndDotSet addCharactersInString:@"."];
-	}
-	
-	// extend our range along line boundaries.
-	NSInteger head = area.location;
-	if(head > 0)
-		// includes previous line if we're deleting from EOL
-		head--;
-	for(; head > 0; --head)
-	{
-		if([string characterAtIndex:head] == '\n')
-			break;
-	}
-	
-	NSInteger tail;
-	for(tail = NSMaxRange(area); tail < length; tail++)
-	{
-		if([string characterAtIndex:tail] == '\n')
-			break;
-	}
-	
-	area = NSMakeRange(head, tail - head);
-	
-	if(area.length == 0)
-		return;
-	
-	// remove the old colors
-	[textStorage removeAttribute:NSForegroundColorAttributeName range:area];
+	}	
+}
 
-	NSInteger i;
-	for(i = head; i < tail;)
+- (void)highlightInRange:(NSRange)aRange
+{
+	// NSLog(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
+
+	if(!syntax_initialized)
+		[self initHighlighting];
+
+	NSString *string = [storage string];
+	NSUInteger tail = aRange.location + aRange.length;
+	NSUInteger i;
+	for(i = aRange.location; i < tail; )
 	{
 		NSInteger j;
 		unichar c = [string characterAtIndex:i];
@@ -82,7 +48,7 @@
 				if([string characterAtIndex:j] == '\n')
 					break;
 			}
-			[textStorage addAttribute:NSForegroundColorAttributeName 
+			[storage addAttribute:NSForegroundColorAttributeName 
 					    value:commentColor
 					    range:NSMakeRange(i, j - i)];
 			i = j + 1;
@@ -98,9 +64,9 @@
 					break;
 				}
 			}
-			[textStorage addAttribute:NSForegroundColorAttributeName 
-					    value:commentColor
-					    range:NSMakeRange(i, j - i)];
+			[storage addAttribute:NSForegroundColorAttributeName 
+					value:commentColor
+					range:NSMakeRange(i, j - i)];
 			i = j + 1;
 		}
 		else if(c == '"' || c == '\'')
@@ -119,9 +85,9 @@
 					break;
 				}
 			}
-			[textStorage addAttribute:NSForegroundColorAttributeName 
-					    value:stringColor
-					    range:NSMakeRange(i, j - i)];
+			[storage addAttribute:NSForegroundColorAttributeName 
+					value:stringColor
+					range:NSMakeRange(i, j - i)];
 			i = j;
 		}
 		else if([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:c])
@@ -140,9 +106,9 @@
 				if(![numberSet characterIsMember:[string characterAtIndex:j]])
 					break;
 			}
-			[textStorage addAttribute:NSForegroundColorAttributeName 
-					    value:numberColor
-					    range:NSMakeRange(i, j - i)];
+			[storage addAttribute:NSForegroundColorAttributeName 
+				        value:numberColor
+				        range:NSMakeRange(i, j - i)];
 			i = j;
 		}
 		else if([keywordSet characterIsMember:c])
@@ -157,7 +123,7 @@
 			NSString *keyword = [string substringWithRange:found];
 			if([keywords objectForKey:keyword])
 			{
-				[textStorage addAttribute:NSForegroundColorAttributeName 
+				[storage addAttribute:NSForegroundColorAttributeName 
 						    value:keywordColor
 						    range:found];
 			}
@@ -166,6 +132,35 @@
 		else
 			i++;
 	}
+}
+
+/*
+ * Update syntax colors.
+ */
+- (void)textStorageDidProcessEditing:(NSNotification *)notification
+{
+	NSRange area = [storage editedRange];
+	
+	// extend our range along line boundaries.
+	NSUInteger bol, eol;
+	[[storage string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:area];
+	area.location = bol;
+	area.length = eol - bol;
+
+	// NSLog(@"%s area = %u + %u", _cmd, area.location, area.length);
+	if(area.length == 0)
+		return;
+	
+	// remove the old colors
+	[storage removeAttribute:NSForegroundColorAttributeName range:area];
+	[self highlightInRange:area];
+}
+
+- (void)highlightEverything
+{
+	[storage beginEditing];
+	[self highlightInRange:NSMakeRange(0, [[storage string] length])];
+	[storage endEditing];
 }
 
 @end

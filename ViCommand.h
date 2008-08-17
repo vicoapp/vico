@@ -22,26 +22,27 @@ struct vikey
 	ViCommandState state;
 
 	NSString *method;
-	NSString *motion_method;
 	
 	struct vikey *command_key;
+	struct vikey *motion_key;
 	int count;
 	int motion_count;
 	char key;
 
 	struct vikey *dot_command_key;
+	struct vikey *dot_motion_key;
 	int dot_count;
-	NSString *dot_motion_method;
 	int dot_motion_count;
 }
 
 - (void)pushKey:(unichar)key;
 - (void)reset;
 - (int)ismotion;
+- (BOOL)line_mode;
+- (NSString *)motion_method;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;
-@property(readonly) NSString *motion_method;
 @property(readonly) int count;
 @property(readonly) int motion_count;
 @property(readonly) char key;

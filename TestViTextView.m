@@ -54,12 +54,20 @@
 - (void)test054_DeleteWordForwardAtEmptyLine	{ TEST(@"\nabc", 0, @"dw", @"abc", 0); }
 
 - (void)test060_GotoColumnZero			{ MOVE(@"abc def", 4, @"0", 0); }
-- (void)test060_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
+- (void)test061_GotoColumnZeroWthLeadingBlanks	{ MOVE(@"    def", 4, @"0", 0); }
+- (void)test062_GotoLastLine			{ MOVE(@"abc\ndef\nghi", 5, @"G", 8); }
+- (void)test062_GotoLastLine2			{ MOVE(@"abc\ndef\nghi\n", 5, @"G", 8); }
+- (void)test062_GotoLastLine3			{ MOVE(@"abc\ndef\nghi\n\n", 5, @"G", 12); }
+- (void)test063_GotoFirstLine			{ MOVE(@"abc\ndef\nghi", 5, @"1G", 0); }
+- (void)test064_GotoSecondLine			{ MOVE(@"abc\ndef\nghi", 7, @"2G", 4); }
+- (void)test065_GotoBeyondLastLine		{ MOVE(@"abc\ndef\nghi", 2, @"220G", 2); }
 
 - (void)test070_DeleteCurrentLine		{ TEST(@"abc\ndef\nghi", 2, @"dd", @"def\nghi", 0); }
 - (void)test071_DeleteToColumnZero		{ TEST(@"abc def", 4, @"d0", @"def", 0); }
 - (void)test072_DeleteToEOL			{ TEST(@"abc def", 0, @"d$", @"", 0); }
-//- (void)test070_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
+- (void)test073_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
+- (void)test074_DeleteToFirstLine		{ TEST(@"abc\ndef\nghi", 5, @"d1G", @"ghi", 0); }
+- (void)test075_DeleteToLastLine		{ TEST(@"abc\ndef\nghi", 5, @"dG", @"abc", 0); }
 
 - (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"yw", @"abc def ghi", 4); }
 - (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }

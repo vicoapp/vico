@@ -69,7 +69,7 @@
 	[parser pushKey:'c'];
 	STAssertTrue(parser.complete, nil);
 	STAssertEqualObjects(parser.method, @"change:", nil);
-	STAssertEqualObjects(parser.motion_method, @"current_line:", nil);
+	STAssertTrue(parser.line_mode, nil);
 }
 
 - (void)test054_ResetCommandWithMotion
@@ -153,7 +153,7 @@
 	STAssertTrue(parser.complete, nil);
 	STAssertEquals(parser.count, 0, nil);
 	STAssertEquals(parser.motion_count, 12, nil);
-	STAssertEqualObjects(parser.motion_method, @"current_line:", nil);
+	STAssertTrue(parser.line_mode, nil);
 	STAssertEqualObjects(parser.method, @"yank:", nil);
 }
 
@@ -257,6 +257,15 @@
 	STAssertEqualObjects(parser.motion_method, @"word_forward:", nil);
 	STAssertEquals(parser.count, 0, nil);
 	STAssertEquals(parser.motion_count, 12, nil);
+}
+
+- (void)test078_GCommandSetsLineMode
+{
+	[parser pushKey:'d'];
+	STAssertFalse(parser.line_mode, nil);
+	[parser pushKey:'G'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.line_mode, nil);	
 }
 
 @end

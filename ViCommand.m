@@ -5,6 +5,7 @@
 #define VIF_NEED_MOTION	(1 << 0)
 #define VIF_IS_MOTION	(1 << 1)
 #define VIF_SETS_DOT	(1 << 2)
+#define VIF_LINE_MODE	(1 << 3)
 
 static struct vikey vikeys[] = {
 	{@"append:",		'a', VIF_SETS_DOT},
@@ -14,8 +15,8 @@ static struct vikey vikeys[] = {
 	{@"change:",		'c', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"move_left:",		'h', VIF_IS_MOTION},
-	{@"move_down:",		'j', VIF_IS_MOTION},
-	{@"move_up:",		'k', VIF_IS_MOTION},
+	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
 	{@"put_before:",	'P', VIF_SETS_DOT},
 	{@"put_after:",		'p', VIF_SETS_DOT},
@@ -27,6 +28,7 @@ static struct vikey vikeys[] = {
 	{@"open_line_above:",	'O', VIF_SETS_DOT},
 	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"yank:",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
 	{nil, -1, 0}
 };
 
@@ -47,7 +49,6 @@ find_command(int key)
 
 @synthesize complete;
 @synthesize method;
-@synthesize motion_method;
 @synthesize count;
 @synthesize motion_count;
 @synthesize key;
@@ -62,7 +63,7 @@ find_command(int key)
 	{
 		/* set the dot command parameters */
 		dot_command_key = command_key;
-		dot_motion_method = motion_method;
+		dot_motion_key = motion_key;
 		dot_count = count;
 		dot_motion_count = motion_count;
 	}
@@ -108,7 +109,7 @@ find_command(int key)
 
 		command_key = dot_command_key;
 		method = dot_command_key->method;
-		motion_method = dot_motion_method;
+		motion_key = dot_motion_key;
 		motion_count = dot_motion_count;
 		key = dot_command_key->key;
 		[self setComplete];
@@ -139,15 +140,17 @@ find_command(int key)
 	{
 		if(has_flag(vikey, VIF_IS_MOTION))
 		{
-			motion_method = vikey->method;
+			motion_key = vikey;
 		}
 		else if(aKey == command_key->key)
 		{
 			/* From nvi:
 			 * Commands that have motion components can be doubled to
 			 * imply the current line.
+			 *
+			 * Do this by setting the line mode flag.
 			 */
-			motion_method = @"current_line:";
+			motion_key = command_key;
 		}
 		else
 		{
@@ -162,8 +165,8 @@ find_command(int key)
 {
 	complete = NO;
 	method = nil;
-	motion_method = nil;
 	command_key = NULL;
+	motion_key = NULL;
 	state = ViCommandInitialState;
 	count = 0;
 	motion_count = 0;
@@ -173,8 +176,26 @@ find_command(int key)
 - (int)ismotion
 {
 	if(command_key && has_flag(command_key, VIF_IS_MOTION))
-	   return 1;
+		return 1;
 	return 0;
+}
+
+- (BOOL)line_mode
+{
+	if(motion_key)
+	{
+		if(motion_key == command_key)
+			return YES;
+		return has_flag(motion_key, VIF_LINE_MODE);
+	}
+	return command_key && has_flag(command_key, VIF_LINE_MODE);
+}
+
+- (NSString *)motion_method
+{
+	if(motion_key && has_flag(motion_key, VIF_IS_MOTION))
+		return motion_key->method;
+	return nil;
 }
 
 @end

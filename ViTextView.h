@@ -12,7 +12,18 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableDictionary *buffers;
 	NSRect oldCaretRect;
 	NSRange affectedRange;
-	NSUInteger start_location, end_location, final_location;
+	NSUInteger start_location, end_location;
+  BOOL need_scroll;
+
+  /* syntax highlighting */
+	NSDictionary *keywords;
+	NSColor *commentColor;
+	NSColor *stringColor;
+	NSColor *numberColor;
+	NSColor *keywordColor;
+	NSMutableCharacterSet *keywordSet;
+	NSMutableCharacterSet *keywordAndDotSet;
+	BOOL syntax_initialized;
 }
 
 + (void)initKeymaps;
@@ -29,4 +40,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView (cursor)
 - (void)updateInsertionPoint;
+@end
+
+@interface ViTextView (syntax)
+- (void)highlightInRange:(NSRange)aRange;
+- (void)highlightEverything;
 @end

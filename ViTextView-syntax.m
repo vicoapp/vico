@@ -220,9 +220,9 @@
 	return nil;
 }
 
-/* returns YES if matches to EOL (ie, incomplete multi-line match)
+/* returns a continuation match if matches to EOL (ie, incomplete multi-line match)
  */
-- (BOOL)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange
+- (ViSyntaxMatch *)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange
 {
 	DEBUG(@"searching for end match to [%@] in range %u + %u", [viMatch scope], aRange.location, aRange.length);
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
@@ -250,9 +250,10 @@
 			// adjust aRange to be exclusive to a begin match
 			range.location = [viMatch beginLocation] + [viMatch beginLength];
 			range.length = NSMaxRange(aRange) - range.location;
-			[self highlightSubpatternsForPattern:[viMatch pattern] inRange:range];
-
-			return YES;
+			ViSyntaxMatch *cMatch = [self highlightSubpatternsForPattern:[viMatch pattern] inRange:range];
+			if(cMatch)
+				return cMatch;
+			return viMatch;
 		}
 		else
 		{
@@ -275,7 +276,7 @@
 		}
 	}
 
-	return NO;
+	return nil;
 }
 
 - (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch inScope:(NSArray *)patterns
@@ -287,13 +288,15 @@
 	if(continuedMatch)
 	{
 		DEBUG(@"continuing with match [%@]", [continuedMatch scope]);
-		if([self searchEndForMatch:continuedMatch inRange:aRange] == YES)
-			return continuedMatch;
+		ViSyntaxMatch *cMatch = nil;
+		cMatch = [self searchEndForMatch:continuedMatch inRange:aRange];
+		if(cMatch)
+			return cMatch;
 		lastLocation = [continuedMatch endLocation];
 
 		// adjust the line range
 		if(lastLocation >= NSMaxRange(aRange))
-			return NO;
+			return nil;
 		aRange.length = NSMaxRange(aRange) - lastLocation;
 		aRange.location = lastLocation;
 	}
@@ -349,10 +352,10 @@
 			NSRange range = aRange;
 			range.location = NSMaxRange([[viMatch beginMatch] rangeOfMatchedString]);
 			range.length = NSMaxRange(aRange) - range.location;
-			BOOL incompleteMatch = [self searchEndForMatch:viMatch inRange:range];
+			ViSyntaxMatch *cMatch = [self searchEndForMatch:viMatch inRange:range];
 			[self highlightBeginCapturesInMatch:viMatch];				
-			if(incompleteMatch == YES)
-				return viMatch;
+			if(cMatch)
+				return cMatch;
 		}
 		lastLocation = [viMatch endLocation];
 		// just return if we passed our line range

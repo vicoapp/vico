@@ -344,27 +344,21 @@
 
 - (ViSyntaxMatch *)continuedMatchForLocation:(NSUInteger)location
 {
-	ViSyntaxMatch *continuedMatch = nil;
-	NSString *previousScope = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-							  atCharacterIndex:IMAX(0, location - 1)
-							    effectiveRange:NULL];
-	if(previousScope)
+	ViSyntaxMatch *continuedMatch = [[self layoutManager] temporaryAttribute:ViContinuationAttributeName
+								atCharacterIndex:IMAX(0, location - 1)
+								  effectiveRange:NULL];
+	if(continuedMatch)
 	{
-		continuedMatch = [[ViSyntaxMatch alloc] initWithMatch:nil
-							   andPattern:[language patternForScope:previousScope]
-							      atIndex:0];
-		if([continuedMatch endRegexp] == nil)
-		{
-			/* skip single-line patterns */
-			DEBUG(@"skipping previous scope [%@] (single-line) at location %u", previousScope, location);
-			DEBUG(@"continued pattern = %@", [continuedMatch pattern]);
-			return nil;
-		}
 		[continuedMatch setBeginLocation:location];
-		DEBUG(@"detected previous scope [%@] at location %u", previousScope, location);
+		DEBUG(@"detected previous scope [%@] at location %u", [continuedMatch scope], location);
 	}
-
 	return continuedMatch;
+}
+
+- (void)resetAttributesInRange:(NSRange)aRange
+{
+	NSDictionary *defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
+	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
@@ -382,8 +376,7 @@
 	}
 
 	// reset attributes in the affected range
-	NSDictionary *defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
-	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
+	[self resetAttributesInRange:aRange];
 
 	// highlight each line separately
 	NSUInteger nextRange = aRange.location;
@@ -398,6 +391,14 @@
 		[continuedMatch setBeginLocation:nextRange];
 		continuedMatch = [self highlightLineInRange:line continueWithMatch:continuedMatch inScope:nil];
 		nextRange = end;
+
+		if(continuedMatch)
+		{
+			/* Mark the EOL character with the continuation pattern */
+			// FIXME: maybe just store the pattern (pointer) instead?
+			NSDictionary *continuationMarker = [NSDictionary dictionaryWithObject:continuedMatch forKey:ViContinuationAttributeName];
+			[[self layoutManager] addTemporaryAttributes:continuationMarker forCharacterRange:NSMakeRange(end - 1, 1)];
+		}
 	}
 }
 
@@ -432,7 +433,10 @@
 - (void)highlightEverything
 {
 	if(language == nil)
+	{
+		[self resetAttributesInRange:NSMakeRange(0, [[storage string] length])];
 		return;
+	}
 	DEBUG(@"%s begin highlighting", _cmd);
 	[storage beginEditing];
 	[self highlightInRange:NSMakeRange(0, [[storage string] length]) restarting:NO];

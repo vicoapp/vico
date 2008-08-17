@@ -7,8 +7,8 @@ VERSION=0.001
 echo "Building vizard version $VERSION"
 
 # fix version in info.plist
-#sed -E -i.bak \
-#  "/CFBundleVersion/ { n; s/(.*>)[^<]*(<.*)/\1${VERSION}\2/; }" Info.plist
+sed -E -i.bak \
+  "/CFBundleVersion/ { n; s/(.*>)[^<]*(<.*)/\1${VERSION}\2/; }" Info.plist
 
 # xcodebuild -project vizard.xcodeproj -target vizard -configuration Release clean || exit
 xcodebuild -project vizard.xcodeproj -target vizard -configuration Release || exit

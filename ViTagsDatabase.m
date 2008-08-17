@@ -22,7 +22,7 @@
 		tags = [[NSMutableDictionary alloc] init];
 
 		/* If the file is not an absolute path, try to find it in the current directory.
-		 * Look in parent directory if not found.
+		 * Look in parent directories if not found.
 		 */
 		NSFileManager *fm = [NSFileManager defaultManager];
 		prefixPath = [[fm currentDirectoryPath] copy];

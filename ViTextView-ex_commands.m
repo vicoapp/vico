@@ -32,9 +32,9 @@
 	if([command.arguments count] > 0)
 		file = [command.arguments objectAtIndex:0];
 	if(file)
-		[[self delegate] newTabWithURL:[NSURL fileURLWithPath:file]];
+		[[self delegate] open:[NSURL fileURLWithPath:file]];
 	else
-		[[self delegate] newTabWithURL:nil];
+		[[self delegate] open:nil];
 }
 
 @end

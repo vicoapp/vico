@@ -31,6 +31,6 @@
 - (NSData *)saveData;
 - (void)changeTheme:(ViTheme *)theme;
 - (void)save;
-- (void)newTabWithURL:(NSURL *)aURL;
+- (void)open:(NSString *)path;
 
 @end

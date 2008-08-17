@@ -65,8 +65,6 @@
 	//[self setPageGuideValues];
 	[self disableWrapping];
 	[self setContinuousSpellCheckingEnabled:NO];
-
-	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
 - (void)setFilename:(NSURL *)aURL
@@ -76,6 +74,8 @@
 		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
 		[language patterns];
 	}
+	
+	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
 - (BOOL)illegal:(ViCommand *)command
@@ -1304,6 +1304,7 @@
 			NSString *file = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
 			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
+			[[self delegate] open:file];
 		}
 		else
 		{

@@ -104,9 +104,9 @@
 	[delegate saveDocument:self];
 }
 
-- (void)newTabWithURL:(NSURL *)aURL
+- (void)open:(NSString *)path
 {
-	[delegate newTabWithURL:aURL];
+	[delegate openFile:path];
 }
 
 @end

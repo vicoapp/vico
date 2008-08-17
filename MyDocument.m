@@ -1,6 +1,10 @@
 #import "MyDocument.h"
 #import "PSMTabBarControl/PSMTabBarControl.h"
 
+@interface MyDocument (private)
+- (void)newTab;
+@end
+
 @implementation MyDocument
 
 - (id)init
@@ -33,7 +37,8 @@
 	[tabBar setCanCloseOnlyTab:YES];
 
 	// add the first editor view
-	[self newTabWithURL:[self fileURL]];
+	[self newTab];
+	[self setFileURL:[self fileURL]];
 
 	readContent = nil;
 
@@ -97,7 +102,7 @@
 	return documentWindow;
 }
 
-- (void)newTabWithURL:(NSURL *)aURL
+- (void)newTab
 {
 	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
 	[editor setDelegate:self];
@@ -107,8 +112,6 @@
 	[item setView:[editor view]];
 	[tabView addTabViewItem:item];
 	[tabView selectTabViewItem:item];
-
-	[self setFileURL:aURL];
 }
 
 - (void)setFileURL:(NSURL *)aURL
@@ -170,6 +173,43 @@
 {
 	[self closeCurrentTab];
 	return NO;
+}
+
+- (void)openFile:(NSString *)path
+{
+	NSString *standardizedPath = [path stringByStandardizingPath];
+
+	if(path)
+	{
+		NSLog(@"looking for [%@] = [%@]", path, standardizedPath);
+		
+		/* first check if the file is already opened */
+		NSTabViewItem *item;
+		for(item in [tabView tabViewItems])
+		{
+			ViEditController *editor = [item identifier];
+			NSLog(@"  checking [%@]", [[editor fileURL] path]);
+			if([standardizedPath isEqualToString:[[editor fileURL] path]])
+			{
+				[tabView selectTabViewItem:item];
+				return;
+			}
+		}
+	}
+
+	[self newTab];
+
+	if(path)
+	{
+		NSURL *url = [NSURL fileURLWithPath:standardizedPath];
+		NSError *error = nil;
+		[self readFromURL:url ofType:nil error:&error];
+		[self setFileURL:url];
+		if(error)
+		{
+			[NSApp presentError:error];
+		}
+	}
 }
 
 @end

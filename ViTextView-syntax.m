@@ -136,6 +136,26 @@
 @end
 
 
+@interface NSArray (patternArray)
+- (BOOL)isEqualToPatternArray:(NSArray *)otherArray;
+@end
+@implementation NSArray (patternArray)
+- (BOOL)isEqualToPatternArray:(NSArray *)otherArray
+{
+	int i, c = [self count];
+	if(otherArray == self)
+		return YES;
+	if(c != [otherArray count])
+		return NO;
+	for(i = 0; i < c; i++)
+	{
+		if([[self objectAtIndex:i] pattern] != [[otherArray objectAtIndex:i] pattern])
+			return NO;
+	}
+	return YES;
+}
+@end
+
 
 @interface ViTextView (syntax_private)
 - (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch;
@@ -491,6 +511,12 @@
 		continuedMatches = [self continuedMatchesForLocation:aRange.location];
 	}
 
+	NSArray *lastContinuedMatches = nil;
+	if(isRestarting)
+	{
+		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
+	}
+
 	// reset attributes in the affected range
 	[self resetAttributesInRange:aRange];
 
@@ -510,6 +536,13 @@
 		{
 			/* Mark the EOL character with the continuation patterns */
 			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
+		}
+
+		if(isRestarting && nextRange >= NSMaxRange(aRange) && nextRange < [storage length] && ![continuedMatches isEqualToPatternArray:lastContinuedMatches])
+		{
+			DEBUG(@"continuation matches at location %u have changed, and this is an incremental update", end);
+			[self resetAttributesInRange:NSMakeRange(nextRange, [storage length] - nextRange)];
+			aRange.length = [storage length] - aRange.location;
 		}
 	}
 }

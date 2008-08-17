@@ -60,8 +60,12 @@
 		NSString *bundlesPath = @"/Applications/TextMate.app/Contents/SharedSupport/Themes";
 		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
 			[self addThemesFromBundleDirectory:bundlesPath];
-		
-		bundlesPath = @"/Library/Application Support/TextMate/Bundles/Themes";
+
+		bundlesPath = @"/Library/Application Support/TextMate/Themes";
+		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
+			[self addThemesFromBundleDirectory:bundlesPath];
+
+		bundlesPath = [@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath];
 		if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
 			[self addThemesFromBundleDirectory:bundlesPath];
 	}

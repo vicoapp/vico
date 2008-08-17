@@ -79,6 +79,10 @@ static ViLanguageStore *defaultStore = nil;
 	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
 		[self addBundlesFromBundleDirectory:bundlesPath];
 
+	bundlesPath = [@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath];
+	if([[NSFileManager defaultManager] fileExistsAtPath:bundlesPath isDirectory:&isDirectory] && isDirectory)
+		[self addBundlesFromBundleDirectory:bundlesPath];
+
 	NSLog(@"finished initializing languages");
 }
 

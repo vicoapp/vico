@@ -1,7 +1,7 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 
-//#define DEBUG(...)
+//#define DEBUG(fmt, ...)
 #define DEBUG(fmt, ...) do { \
 	NSString *ws = [@"" stringByPaddingToLength:indent*2 withString:@" " startingAtIndex:0]; \
 	NSLog([NSString stringWithFormat:@"%@%@", ws, fmt], ## __VA_ARGS__); \
@@ -138,8 +138,8 @@
 
 
 @interface ViTextView (syntax_private)
-- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch inScope:(NSArray *)patterns;
-- (ViSyntaxMatch *)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange topScopes:(NSArray *)topScopes;
+- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch;
+- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL;
 @end
 
 @implementation ViTextView (syntax)
@@ -263,8 +263,15 @@
 	[matchingPatterns sortUsingSelector:@selector(sortByLocation:)];
 }
 
-- (ViSyntaxMatch *)applyMatchingPatterns:(NSArray *)matchingPatterns inRange:(NSRange)aRange topScopes:(NSArray *)topScopes openMatch:(ViSyntaxMatch *)openMatch
+- (NSArray *)applyMatchingPatterns:(NSArray *)matchingPatterns
+			   inRange:(NSRange)aRange
+			 topScopes:(NSArray *)topScopes
+		       openMatches:(NSArray *)openMatches
+			reachedEOL:(BOOL *)reachedEOL
 {
+	if(reachedEOL)
+		*reachedEOL = NO;
+
 	DEBUG(@"applying %u matches in range %u + %u", [matchingPatterns count], aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 	ViSyntaxMatch *aMatch;
@@ -291,6 +298,7 @@
 		}
 		else if([aMatch endMatch])
 		{
+			ViSyntaxMatch *openMatch = [openMatches lastObject];
 			[openMatch setEndMatch:[aMatch endMatch]];
 			DEBUG(@"got end match on [%@] at %u + %u (subpattern)",
 			      [aMatch scope],
@@ -299,10 +307,17 @@
 
 			if([[aMatch endMatch] rangeOfMatchedString].length == 0)
 			{
-				DEBUG(@"    FIXME: got zero-width match for pattern [%@]", [[aMatch pattern] objectForKey:@"end"]);
+				DEBUG(@"    NOTE: got zero-width match for pattern [%@]", [[aMatch pattern] objectForKey:@"end"]);
 			}
 			[self applyScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString]];
 			[self highlightEndCapturesInMatch:aMatch];
+
+			// pop one open match off the stack and return the rest
+			if([openMatches count] > 1)
+			{
+				DEBUG(@"returning %i continuation matches", [openMatches count] - 1);
+				return [openMatches subarrayWithRange:NSMakeRange(0, [openMatches count] - 1)];
+			}
 			return nil;
 		}
 		else
@@ -315,14 +330,17 @@
 			range.location = NSMaxRange([[aMatch beginMatch] rangeOfMatchedString]);
 			range.length = NSMaxRange(aRange) - range.location;
 			indent++;
-			ViSyntaxMatch *cMatch = [self searchEndForMatch:aMatch inRange:range topScopes:newTopScopes];
+			BOOL tmpEOL = NO;
+			NSArray *continuationMatches = [self searchEndForMatch:[openMatches arrayByAddingObject:aMatch] inRange:range topScopes:newTopScopes reachedEOL:&tmpEOL];
 			indent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch];
-			if(cMatch)
+			if(tmpEOL)
 			{
-				DEBUG(@"returning continuation match for scope [%@]", [cMatch scope]);
-				return cMatch;
+				if(reachedEOL)
+					*reachedEOL = YES;
+				DEBUG(@"returning %i continuation matches", [continuationMatches count]);
+				return continuationMatches;
 			}
 		}
 		lastLocation = [aMatch endLocation];
@@ -337,16 +355,26 @@
 	if(lastLocation < NSMaxRange(aRange))
 		[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation)];
 
-	if(openMatch)
-		DEBUG(@"returning continuation match for scope [%@]", [openMatch scope]);
-	return openMatch;
+	if(reachedEOL)
+		*reachedEOL = YES;
+
+	if(openMatches)
+	{
+		DEBUG(@"returning %i continuation matches", [openMatches count]);
+		return openMatches;
+	}
+	return nil;
 }
 
-/* returns a continuation match if matches to EOL (ie, incomplete multi-line match)
+/* returns an array of continuation matches
  */
-- (ViSyntaxMatch *)searchEndForMatch:(ViSyntaxMatch *)openMatch inRange:(NSRange)aRange topScopes:(NSArray *)topScopes
+- (NSArray *)searchEndForMatch:(NSArray *)openMatches inRange:(NSRange)aRange topScopes:(NSArray *)topScopes reachedEOL:(BOOL *)reachedEOL
 {
-	DEBUG(@"searching for end match to [%@] in range %u + %u (topScopes = [%@])", [openMatch scope], aRange.location, aRange.length, [topScopes componentsJoinedByString:@" "]);
+	ViSyntaxMatch *openMatch = [openMatches lastObject];
+
+	DEBUG(@"searching for end match to [%@] in range %u + %u (%i open matches, topScopes = [%@])",
+	      [openMatch scope], aRange.location, aRange.length, [openMatches count], [topScopes componentsJoinedByString:@" "]);
+
 	OGRegularExpression *endRegexp = [openMatch endRegexp];
 	if(endRegexp == nil)
 	{
@@ -367,7 +395,7 @@
 	NSArray *matches = [endRegexp allMatchesInString:[storage string] range:aRange];
 
 	NSArray *subPatterns = [language expandedPatternsForPattern:[openMatch pattern]];
-	DEBUG(@"found %u possible end matches", [matches count]);
+	DEBUG(@"found %u possible end matches to scope [%@]", [matches count], [openMatch scope]);
 	OGRegularExpressionMatch *match;
 	for(match in matches)
 	{
@@ -377,23 +405,35 @@
 	}
 	
 	[self matchAllPatterns:subPatterns inRange:aRange toArray:matchingPatterns];
-	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:topScopes openMatch:openMatch];
+	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:topScopes openMatches:openMatches reachedEOL:reachedEOL];
 }
 
-- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch inScope:(NSArray *)patterns
+- (NSArray *)highlightLineInRange:(NSRange)aRange continueWithMatches:(NSArray *)continuedMatches
 {
 	DEBUG(@"-----> line range = %u + %u", aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
-	// should we continue on a multi-line match?
-	if(continuedMatch)
+	// should we continue on multi-line matches?
+	BOOL reachedEOL = NO;
+	while([continuedMatches count] > 0)
 	{
-		DEBUG(@"continuing with match [%@]", [continuedMatch scope]);
-		ViSyntaxMatch *cMatch = nil;
-		cMatch = [self searchEndForMatch:continuedMatch inRange:aRange topScopes:[continuedMatch scope] ? [NSArray arrayWithObject:[continuedMatch scope]] : [NSArray array]];
-		if(cMatch)
-			return cMatch;
-		lastLocation = [continuedMatch endLocation];
+		DEBUG(@"continuing with match [%@] (of %i total)", [[continuedMatches lastObject] scope], [continuedMatches count]);
+
+		NSMutableArray *topScopes = [[NSMutableArray alloc] init];
+		ViSyntaxMatch *m;
+		for(m in continuedMatches)
+		{
+			[m setBeginLocation:aRange.location];
+			if([m scope])
+				[topScopes addObject:[m scope]];
+		}
+
+		ViSyntaxMatch *topMatch = [continuedMatches lastObject];
+
+		continuedMatches = [self searchEndForMatch:continuedMatches inRange:aRange topScopes:topScopes reachedEOL:&reachedEOL];
+		if(reachedEOL)
+			return continuedMatches;
+		lastLocation = [topMatch endLocation];
 
 		// adjust the line range
 		if(lastLocation >= NSMaxRange(aRange))
@@ -402,26 +442,25 @@
 		aRange.location = lastLocation;
 	}
 
+
+	// if we get here, we have no open matches
+
 	// keep an array of matches so we can sort it in order to skip overlapping matches
 	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
-	if(patterns == nil)
-	{
-		// default to top-level patterns
-		patterns = [language patterns];
-	}
 
-	[self matchAllPatterns:patterns inRange:aRange toArray:matchingPatterns];
-	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:[NSArray array] openMatch:nil];
+	// search top-level patterns
+	[self matchAllPatterns:[language patterns] inRange:aRange toArray:matchingPatterns];
+	return [self applyMatchingPatterns:matchingPatterns inRange:aRange topScopes:[NSArray array] openMatches:[NSArray array] reachedEOL:nil];
 }
 
-- (ViSyntaxMatch *)continuedMatchForLocation:(NSUInteger)location
+- (NSArray *)continuedMatchesForLocation:(NSUInteger)location
 {
-	ViSyntaxMatch *continuedMatch = [[self layoutManager] temporaryAttribute:ViContinuationAttributeName
-								atCharacterIndex:IMAX(0, location - 1)
-								  effectiveRange:NULL];
-	if(continuedMatch)
-		DEBUG(@"detected previous scope [%@] at location %u", [continuedMatch scope], location);
-	return continuedMatch;
+	NSArray *continuedMatches = [[self layoutManager] temporaryAttribute:ViContinuationAttributeName
+							    atCharacterIndex:IMAX(0, location - 1)
+							      effectiveRange:NULL];
+	if(continuedMatches)
+		DEBUG(@"detected %i previous scopes at location %u", [continuedMatches count], location);
+	return continuedMatches;
 }
 
 - (void)resetAttributesInRange:(NSRange)aRange
@@ -446,10 +485,10 @@
 	//DEBUG(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
 
 	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
-	ViSyntaxMatch *continuedMatch = nil;
+	NSArray *continuedMatches = nil;
 	if(isRestarting && aRange.location > 0)
 	{
-		continuedMatch = [self continuedMatchForLocation:aRange.location];
+		continuedMatches = [self continuedMatchesForLocation:aRange.location];
 	}
 
 	// reset attributes in the affected range
@@ -464,17 +503,13 @@
 		if(end == nextRange || end == NSNotFound)
 			break;
 		NSRange line = NSMakeRange(nextRange, end - nextRange);
-		// force begin location to start of line for continued matches
-		[continuedMatch setBeginLocation:nextRange];
-		continuedMatch = [self highlightLineInRange:line continueWithMatch:continuedMatch inScope:nil];
+		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;
 
-		if(continuedMatch)
+		if(continuedMatches)
 		{
-			/* Mark the EOL character with the continuation pattern */
-			// FIXME: maybe just store the pattern (pointer) instead?
- 			// FIXME: store complete scope stack, not just the last scope
-			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatch forCharacterRange:NSMakeRange(end - 1, 1)];
+			/* Mark the EOL character with the continuation patterns */
+			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
 		}
 	}
 }

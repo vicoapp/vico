@@ -7,8 +7,8 @@
 	static ViTheme *defaultTheme = nil;
 	if(defaultTheme == nil)
 	{
-		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
-		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
+		defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Amy.tmTheme"];
+		//defaultTheme = [[ViTheme alloc] initWithPath:@"/Applications/TextMate.app/Contents/SharedSupport/Themes/Mac Classic.tmTheme"];
 	}
 	return defaultTheme;
 }
@@ -146,6 +146,13 @@
 		caretColor = [self colorWithName:@"caret" orDefault:defaultCaretColor alpha:0.6];
 	}
 	return caretColor;
+}
+
+- (NSColor *)selectionColor
+{
+	if(selectionColor == nil)
+		selectionColor = [self colorWithName:@"selection" orDefault:[NSColor blueColor] alpha:0.5];
+	return selectionColor;
 }
 
 @end

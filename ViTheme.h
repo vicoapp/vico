@@ -11,6 +11,7 @@
 	NSColor *backgroundColor;
 	NSColor *foregroundColor;
 	NSColor *caretColor;
+	NSColor *selectionColor;
 }
 - (id)initWithPath:(NSString *)aPath;
 - (id)initWithBundle:(NSString *)aBundleName;
@@ -19,5 +20,6 @@
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;
+- (NSColor *)selectionColor;
 
 @end

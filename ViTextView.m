@@ -40,6 +40,7 @@
 	[self setBackgroundColor:[theme backgroundColor]];
 	[self setDrawsBackground:YES];
 	[self setInsertionPointColor:[theme caretColor]];
+	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor] forKey:NSBackgroundColorAttributeName]];
 	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
 	[self setFont:font];
 }

@@ -1034,7 +1034,17 @@
 - (BOOL)forward_screen:(ViCommand *)command
 {
 	NSLog(@"forward_screen");
-	[self scrollPageDown:self];
+	[self pageDown:self];
+	end_location = final_location = [self caret];
+	return YES;
+}
+
+/* syntax: ^B */
+- (BOOL)backward_screen:(ViCommand *)command
+{
+	NSLog(@"backward_screen");
+	[self pageUp:self];
+	end_location = final_location = [self caret];
 	return YES;
 }
 

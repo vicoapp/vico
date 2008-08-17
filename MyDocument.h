@@ -8,4 +8,5 @@
 	NSString *readContent;
 }
 - (void)changeTheme:(ViTheme *)theme;
+- (void)message:(NSString *)fmt, ...;
 @end

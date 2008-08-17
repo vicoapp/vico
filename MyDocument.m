@@ -32,6 +32,7 @@
 	[textView initEditor];
 	[textView setFilename:[self fileURL]];
 	[textView highlightEverything];
+	[textView setDelegate:self];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -70,6 +71,16 @@
 - (void)changeTheme:(ViTheme *)theme
 {
 	[textView setTheme:theme];
+}
+
+- (void)message:(NSString *)fmt, ...
+{
+	va_list ap;
+	va_start(ap, fmt);
+	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
+	va_end(ap);
+
+	[statusbar setStringValue:msg];
 }
 
 @end

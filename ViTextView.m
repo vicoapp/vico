@@ -1,6 +1,7 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
+#import "MyDocument.h"  // for declaration of the message: method
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -57,25 +58,25 @@
 
 - (BOOL)illegal:(ViCommand *)command
 {
-	NSLog(@"%c is not a vi command", command.key);
+	[[self delegate] message:@"%C isn't a vi command", command.key];
 	return NO;
 }
 
 - (BOOL)nonmotion:(ViCommand *)command
 {
-	NSLog(@"%c may not be used as a motion command", command.key);
+	[[self delegate] message:@"%C may not be used as a motion command", command.motion_key];
 	return NO;
 }
 
 - (BOOL)nodot:(ViCommand *)command
 {
-	NSLog(@"No command to repeat");
+	[[self delegate] message:@"No command to repeat"];
 	return NO;
 }
 
 - (BOOL)no_previous_ftFT:(ViCommand *)command
 {
-	NSLog(@"No previous F, f, T or t search");
+	[[self delegate] message:@"No previous F, f, T or t search"];
 	return NO;
 }
 
@@ -164,7 +165,7 @@
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
 	if([buffer length] == 0)
 	{
-		NSLog(@"The default buffer is empty");
+		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
 	}
 
@@ -179,7 +180,7 @@
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
 	if([buffer length] == 0)
 	{
-		NSLog(@"The default buffer is empty");
+		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
 	}
 
@@ -216,7 +217,7 @@
 	[self getLineStart:&bol end:&end contentsEnd:&eol];
 	if(end == eol)
 	{
-		NSLog(@"No following lines to join");
+		[[self delegate] message:@"No following lines to join"];
 		return NO;
 	}
 
@@ -293,7 +294,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(bol == eol)
 	{
-		NSLog(@"Already at end-of-line");
+		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
 
@@ -314,7 +315,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if(start_location == bol)
 	{
-		NSLog(@"Already in the first column");
+		[[self delegate] message:@"Already in the first column"];
 		return NO;
 	}
 	final_location = end_location = start_location - 1;
@@ -328,7 +329,7 @@
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	if(start_location + 1 >= eol)
 	{
-		NSLog(@"Already at end-of-line");
+		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
 	final_location = end_location = start_location + 1;
@@ -354,7 +355,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if(bol == 0)
 	{
-		NSLog(@"Already at the beginning of the file");
+		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
 		
@@ -372,7 +373,7 @@
 	[self getLineStart:&bol end:&end contentsEnd:NULL];
 	if(end >= [storage length])
 	{
-		NSLog(@"Already at end-of-file");
+		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
 	}
 	NSUInteger column = start_location - bol;
@@ -413,11 +414,11 @@
 		count = IMAX(command.motion_count, 1);
 	while(count--)
 	{
-		while(++i < eol && [[storage string] characterAtIndex:i] != command.character)
+		while(++i < eol && [[storage string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
 		if(i == eol)
 		{
-			NSLog(@"%c not found", command.character);
+			[[self delegate] message:@"%C not found", command.argument];
 			return NO;
 		}
 	}
@@ -458,7 +459,7 @@
 			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end_location];
 			if(end_location == end)
 			{
-				NSLog(@"%s Movement past the end-of-file", _cmd);
+				[[self delegate] message:@"%s Movement past the end-of-file", _cmd];
 				final_location = end_location = start_location;
 				return NO;
 			}
@@ -568,7 +569,7 @@
 {
 	if([storage length] == 0)
 	{
-		NSLog(@"Empty file");
+		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
 	NSString *s = [storage string];
@@ -626,12 +627,12 @@
 {
 	if([storage length] == 0)
 	{
-		NSLog(@"Empty file");
+		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
 	if(start_location == 0)
 	{
-		NSLog(@"Already at the beginning of the file");
+		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
 	NSString *s = [storage string];
@@ -704,14 +705,14 @@
 	NSString *s = [storage string];
 	if([s length] == 0)
 	{
-		NSLog(@"No characters to delete");
+		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(bol == eol)
 	{
-		NSLog(@"no characters to delete");
+		[[self delegate] message:@"no characters to delete"];
 		return NO;
 	}
 
@@ -736,14 +737,14 @@
 {
 	if([storage length] == 0)
 	{
-		NSLog(@"Already in the first column");
+		[[self delegate] message:@"Already in the first column"];
 		return NO;
 	}
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if(start_location == bol)
 	{
-		NSLog(@"Already in the first column");
+		[[self delegate] message:@"Already in the first column"];
 		return NO;
 	}
 	NSRange del;
@@ -905,6 +906,7 @@
 		[parser pushKey:charcode];
 		if(parser.complete)
 		{
+			[[self delegate] message:@""];
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			[[self textStorage] endEditing];

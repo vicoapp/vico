@@ -2,6 +2,15 @@
 
 @implementation ViTheme
 
+- (NSColor *)hashRGBToColor:(NSString *)hashRGB
+{
+	//NSLog(@"%s saving foreground color %@", _cmd, foreground);
+	int r, g, b;
+	if(sscanf([hashRGB UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
+		return nil;
+	return [NSColor colorWithDeviceRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
+}
+
 - (id)initWithBundle:(NSString *)aBundleName
 {
 	self = [super init];
@@ -21,16 +30,19 @@
 		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
 		if(foreground == nil)
 			continue;
-		//NSLog(@"%s saving foreground color %@", _cmd, foreground);
-		int r, g, b;
-		if(sscanf([foreground UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
-			continue;
-		NSColor *fgColor = [NSColor colorWithDeviceRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
-		NSDictionary *attrs = [NSDictionary dictionaryWithObject:fgColor forKey:NSForegroundColorAttributeName];
+		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
+		[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
+
+		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
+		if(background)
+		{
+			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
+		}
+
 		for(scope in scope_selectors)
 		{
 			[themeAttributes setObject:attrs forKey:scope];
-			NSLog(@"%s  %@ = %@", _cmd, scope, fgColor);
+			NSLog(@"%s  %@ = %@", _cmd, scope, attrs);
 		}
 	}
 
@@ -48,6 +60,7 @@
 		}
 	}
 
+	NSLog(@"scope [%@] has no attributes", aScopeSelector);
 	return nil;
 }
 

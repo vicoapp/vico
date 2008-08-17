@@ -572,13 +572,13 @@
 - (void)setCommandMode
 {
 	mode = ViCommandMode;
-	[self updateInsertionPoint];
+	//[self updateInsertionPoint];
 }
 
 - (void)setInsertMode
 {
 	mode = ViInsertMode;
-	[self updateInsertionPoint];
+	//[self updateInsertionPoint];
 }
 
 - (void)evaluateCommand:(ViCommand *)command

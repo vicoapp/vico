@@ -14,7 +14,6 @@
 		8D15AC310486D014006FF6A4 /* MyDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
-		9A1175490D0728D2007AA524 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
@@ -28,6 +27,7 @@
 		9A668E9C0D1547C5003FABD9 /* HTML.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A668E9B0D1547C5003FABD9 /* HTML.plist */; };
 		9A668EA70D154CEF003FABD9 /* C.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A668EA60D154CEF003FABD9 /* C.plist */; };
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
+		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -355,11 +355,11 @@
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */,
 				9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */,
-				9A1175490D0728D2007AA524 /* ViTextView-cursor.m in Sources */,
 				9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */,
 				9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */,
 				9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */,
 				9A668E170D11174A003FABD9 /* ViLanguageStore.m in Sources */,
+				9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

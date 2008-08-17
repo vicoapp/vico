@@ -83,4 +83,25 @@
 	[statusbar setStringValue:msg];
 }
 
+- (IBAction)finishedExCommand:(id)sender
+{
+	NSLog(@"got ex command? [%@]", [statusbar stringValue]);
+	[textView performSelector:exCommandSelector withObject:[statusbar stringValue]];
+	[statusbar setStringValue:@""];
+	[statusbar setEditable:NO];
+	[editWindow makeFirstResponder:textView];
+}
+
+/* FIXME: should probably subclass NSTextField to disallow losing focus due to tabbing or clicking outside.
+ * Should handle escape and ctrl-c.
+ */
+- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
+{
+	[statusbar setStringValue:@":"]; // FIXME: should not select the colon
+	[statusbar setEditable:YES];
+	[statusbar setDelegate:self];
+	exCommandSelector = aSelector;
+	[editWindow makeFirstResponder:statusbar];
+}
+
 @end

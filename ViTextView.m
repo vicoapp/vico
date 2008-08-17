@@ -796,7 +796,16 @@
 	return YES;
 }
 
+- (void)parseAndExecuteExCommand:(NSString *)exCommandString
+{
+	NSLog(@"should parse and execute ex command: [%@]", exCommandString);
+}
 
+- (BOOL)ex_command:(ViCommand *)command
+{
+	[[self delegate] getExCommandForTextView:self selector:@selector(parseAndExecuteExCommand:)];
+	return YES;
+}
 
 
 

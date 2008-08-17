@@ -9,6 +9,8 @@
 - (BOOL)insert:(ViCommand *)command;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
+- (void)recordInsertInRange:(NSRange)aRange;
+- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView
@@ -92,7 +94,49 @@
 	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
 }
 
-- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
+/* Like insertText:, but works within beginEditing/endEditing
+ */
+- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
+{
+	[[storage mutableString] insertString:aString atIndex:aLocation];
+}
+
+
+/* Undo support
+ */
+- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
+{
+	NSLog(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
+	[self insertString:aString atLocation:aLocation];
+	final_location = aLocation;
+	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
+}
+
+- (void)undoInsertInRange:(NSRange)aRange
+{
+	NSString *deletedString = [[storage string] substringWithRange:aRange];
+	[storage deleteCharactersInRange:aRange];
+	final_location = aRange.location;
+	[self recordDeleteOfString:deletedString atLocation:aRange.location];
+}
+
+- (void)recordInsertInRange:(NSRange)aRange
+{
+	NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
+	[[[self undoManager] prepareWithInvocationTarget:self] undoInsertInRange:aRange];
+	[[self undoManager] setActionName:@"insert text"];
+}
+
+- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
+{
+	NSLog(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
+	[[[self undoManager] prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
+	[[self undoManager] setActionName:@"delete text"];
+}
+
+
+
+- (NSString *)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
@@ -103,13 +147,20 @@
 	}
 
 	NSString *s = [storage string];
-	[buffer setString:[s substringWithRange:yankRange]];
+	NSString *yankedString = [s substringWithRange:yankRange];
+	[buffer setString:yankedString];
+
+	return yankedString;
 }
 
-- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
+- (NSString *)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
 {
-	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
+	NSString *yankedString = [self yankToBuffer:bufferName append:appendFlag range:cutRange];
 	[storage deleteCharactersInRange:cutRange];
+	
+	[self recordDeleteOfString:yankedString atLocation:cutRange.location];
+
+	return yankedString;
 }
 
 /* syntax: [buffer][count]d[count]motion */
@@ -130,6 +181,7 @@
 		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
 	else
 		final_location = affectedRange.location;
+
 	return YES;
 }
 
@@ -155,13 +207,6 @@
 	return YES;
 }
 
-/* Like insertText:, but works within beginEditing/endEditing
- */
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
-{
-	[[storage mutableString] insertString:aString atIndex:aLocation];
-}
-
 /* syntax: [buffer][count]P */
 - (BOOL)put_before:(ViCommand *)command
 {
@@ -181,6 +226,8 @@
 		start_location = final_location = bol;
 	}
 	[self insertString:buffer atLocation:start_location];
+	[self recordInsertInRange:NSMakeRange(start_location, [buffer length])];
+
 	return YES;
 }
 
@@ -209,6 +256,8 @@
 	}
 
 	[self insertString:buffer atLocation:final_location];
+	[self recordInsertInRange:NSMakeRange(final_location, [buffer length])];
+
 	return YES;
 }
 
@@ -577,6 +626,7 @@
 	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
 	final_location = end_location;
+	[self recordInsertInRange:NSMakeRange(end_location, 1)];
 	return [self insert:command];
 }
 
@@ -586,7 +636,21 @@
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
 	final_location = end_location;
+	[self recordInsertInRange:NSMakeRange(end_location, 1)];
 	return [self insert:command];
+}
+
+/* syntax: u */
+- (BOOL)vi_undo:(ViCommand *)command
+{
+	NSUndoManager *undoManager = [self undoManager];
+	if(![undoManager canUndo])
+	{
+		[[self delegate] message:@"Can't undo"];
+		return NO;
+	}
+	[undoManager undo];
+	return YES;
 }
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
@@ -875,6 +939,7 @@
 	[self cutToBuffer:0 append:NO range:del];
 	end_location = del.location;
 	final_location = end_location;
+	
 	return YES;
 }
 
@@ -944,6 +1009,7 @@
 		NSLog(@"replaying inserted text [%@]", command.text);
 		[self insertString:command.text atLocation:end_location];
 		final_location = end_location + [command.text length];
+		[self recordInsertInRange:NSMakeRange(end_location, [command.text length])];
 
 		 // simulate 'escape' (back to command mode)
 		start_location = final_location;
@@ -1058,6 +1124,8 @@
 			/* escape, return to command mode */
 			NSLog(@"registering replay text: [%@]", insertedText);
 			[parser setText:insertedText];
+			if([insertedText length] > 0)
+				[self recordInsertInRange:NSMakeRange([self caret] - [insertedText length], [insertedText length])];
 			insertedText = nil;
 			[self setCommandMode];
 			start_location = end_location = [self caret];

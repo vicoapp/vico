@@ -27,6 +27,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 }
 
 - (void)initEditor;
+- (void)setFilename:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;

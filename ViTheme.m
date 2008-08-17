@@ -42,7 +42,7 @@
 		for(scope in scope_selectors)
 		{
 			[themeAttributes setObject:attrs forKey:scope];
-			NSLog(@"%s  %@ = %@", _cmd, scope, attrs);
+			//NSLog(@"%s  %@ = %@", _cmd, scope, attrs);
 		}
 	}
 
@@ -60,7 +60,7 @@
 		}
 	}
 
-	NSLog(@"scope [%@] has no attributes", aScopeSelector);
+	//NSLog(@"scope [%@] has no attributes", aScopeSelector);
 	return nil;
 }
 

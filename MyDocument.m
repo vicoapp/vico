@@ -30,6 +30,7 @@
 		[[[textView textStorage] mutableString] setString:readContent];
 	readContent = nil;
 	[textView initEditor];
+	[textView setFilename:[self fileURL]];
 	[textView highlightEverything];
 }
 

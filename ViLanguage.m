@@ -7,8 +7,16 @@
 {
 	if([d objectForKey:rule])
 	{
-		OGRegularExpression *regexp = [OGRegularExpression regularExpressionWithString:[d objectForKey:rule]];
-		[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];		
+		NSLog(@"  compiling regexp %@ [%@]", rule, [d objectForKey:rule]);
+		@try
+		{
+			OGRegularExpression *regexp = [OGRegularExpression regularExpressionWithString:[d objectForKey:rule]];
+			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
+		}
+		@catch(NSException *exception)
+		{
+			NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@]", [d objectForKey:rule]);			
+		}
 	}
 }
 
@@ -18,11 +26,19 @@
 	if(self == nil)
 		return nil;
 
+	NSLog(@"Initializing language %@", bundleName);
+
 	NSString *path = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"tmLanguage"];
 	if(![[NSFileManager defaultManager] fileExistsAtPath:path])
+	{
+		NSLog(@"%@.tmLanguage not found, trying %@.plist", bundleName, bundleName);
 		path = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"plist"];
+	}
 	if(path == nil)
+	{
+		NSLog(@"%@.plist not found, giving up", bundleName);
 		return nil;
+	}
 	language = [NSMutableDictionary dictionaryWithContentsOfFile:path];
 	NSLog(@"language = [%@]", language);
 
@@ -46,6 +62,16 @@
 - (NSArray *)patterns;
 {
 	return languagePatterns;
+}
+
+- (NSArray *)fileTypes
+{
+	return [language objectForKey:@"fileTypes"];
+}
+
+- (NSString *)name
+{
+	return [language objectForKey:@"name"];
 }
 
 @end

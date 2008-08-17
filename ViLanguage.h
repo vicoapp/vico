@@ -8,5 +8,7 @@
 }
 - (id)initWithBundle:(NSString *)bundleName;
 - (NSArray *)patterns;
+- (NSArray *)fileTypes;
+- (NSString *)name;
 
 @end

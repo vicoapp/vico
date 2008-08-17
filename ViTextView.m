@@ -1,4 +1,5 @@
 #import "ViTextView.h"
+#import "ViLanguageStore.h"
 
 #ifdef IMAX
 # undef IMAX
@@ -45,6 +46,11 @@
 	[self setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 	[self setAutoresizingMask:NSViewWidthSizable];
 	[self setHorizontallyResizable:YES];
+}
+
+- (void)setFilename:(NSURL *)aURL
+{
+	language = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
 }
 
 - (BOOL)illegal:(ViCommand *)command

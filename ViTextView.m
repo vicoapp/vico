@@ -331,6 +331,24 @@
 	return YES;
 }
 
+/* syntax: [buffer][count]C */
+- (BOOL)change_eol:(ViCommand *)command
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	if(eol > bol)
+	{
+		NSRange range;
+		range.location = start_location;
+		range.length = eol - start_location;
+
+		[self cutToBuffer:0 append:NO range:range];
+	}
+
+	[self setInsertMode];
+	return YES;
+}
+
 /* syntax: [count]h */
 - (BOOL)move_left:(ViCommand *)command
 {

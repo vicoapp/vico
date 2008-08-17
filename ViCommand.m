@@ -10,6 +10,7 @@
 
 static struct vikey vikeys[] = {
 	{@"append_eol:",	'A', VIF_SETS_DOT},
+	{@"change_eol:",	'C', VIF_SETS_DOT},
 	{@"delete_eol:",	'D', VIF_SETS_DOT},
 	{@"insert_bol:",	'I', VIF_SETS_DOT},
 	{@"join:",		'J', VIF_SETS_DOT},

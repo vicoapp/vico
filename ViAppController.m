@@ -33,7 +33,8 @@
 	ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:themeName];
 	NSLog(@"should change theme to %@", themeName);
 	NSWindow *window;
-	for(window in [NSApp windows])
+	NSArray *windows = [NSApp windows];
+	for(window in windows)
 	{
 		NSLog(@"changing theme for window %@ with title [%@]", window, [window title]);
 		[[window delegate] changeTheme:theme];

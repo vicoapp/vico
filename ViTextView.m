@@ -911,8 +911,28 @@
 	{
 		/* if this command is line oriented, extend the affectedRange to whole lines */
 		NSUInteger bol, end;
-		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:l1];
+
+		if(!command.motion_method)
+		{
+			/* This is a "doubled" command (like dd or yy).
+			 * A count, or motion-count, affects that number of whole lines.
+			 */
+			int line_count = command.count;
+			if(line_count == 0)
+				line_count = command.motion_count;
+			while(--line_count > 0)
+			{
+				l2 = end;
+				[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+			}
+		}
+		else
+		{
+			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+		}
+
 		l1 = bol;
 		l2 = end;
 		NSLog(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);

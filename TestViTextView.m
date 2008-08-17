@@ -76,9 +76,11 @@
 - (void)test072_DeleteToEOL			{ TEST(@"abc def", 0, @"d$", @"", 0); }
 - (void)test073_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
 - (void)test074_DeleteToFirstLine		{ TEST(@"abc\ndef\nghi", 5, @"d1G", @"ghi", 0); }
-- (void)test075_DeleteToLastLine		{ TEST(@"abc\ndef\nghi", 5, @"dG", @"abc", 0); }
+- (void)test075_DeleteToLastLine		{ TEST(@"abc\ndef\nghi\njkl", 5, @"dG", @"abc", 0); }
 - (void)test076_DeleteAndYank			{ TEST(@"abc def", 0, @"dw$p", @"defabc ", 3); }
 - (void)test077_DeleteToEOL2			{ TEST(@"abc def", 2, @"D", @"ab", 1); }
+- (void)test078_DeleteTwoLines			{ TEST(@"abc\ndef\nghi", 1, @"2dd", @"ghi", 0); }
+- (void)test078_DeleteTwoLines2			{ TEST(@"abc\ndef\nghi", 1, @"d2d", @"ghi", 0); }
 
 - (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"yw", @"abc def ghi", 4); }
 - (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }

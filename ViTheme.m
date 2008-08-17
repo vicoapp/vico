@@ -69,7 +69,7 @@
 			[attributes setObject:aScopeSelector forKey:ViScopeAttributeName];
 			[attributes addEntriesFromDictionary:[themeAttributes objectForKey:scope]];
 			// cache this hit
-			NSLog(@"caching attributes for scope [%@]: [%@]", aScopeSelector, attributes);
+			//NSLog(@"caching attributes for scope [%@]: [%@]", aScopeSelector, attributes);
 			[scopeSelectorCache setObject:attributes forKey:aScopeSelector];
 			return attributes;
 		}

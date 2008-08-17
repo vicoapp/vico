@@ -3,7 +3,7 @@
 
 @interface ViLanguageStore : NSObject
 {
-	NSMutableArray *languages;
+	NSMutableDictionary *languages;
 }
 + (ViLanguageStore *)defaultStore;
 - (ViLanguage *)languageForFilename:(NSString *)aPath;

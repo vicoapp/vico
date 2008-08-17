@@ -6,6 +6,7 @@
 	NSMutableDictionary *language;
 	NSMutableArray *languagePatterns;
 	NSMutableDictionary *scopeMappingCache;
+	BOOL compiled;
 }
 - (id)initWithBundle:(NSString *)bundleName;
 - (NSArray *)patterns;

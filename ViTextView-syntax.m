@@ -212,7 +212,7 @@
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
 	if(endRegexp)
 	{
-		NSLog(@"  searching for end match in range %u + %u", aRange.location, aRange.length);
+		//NSLog(@"  searching for end match in range %u + %u", aRange.location, aRange.length);
 		// just get the first match
 		OGRegularExpressionMatch *endMatch = [endRegexp matchInString:[storage string] range:aRange];
 		[viMatch setEndMatch:endMatch];

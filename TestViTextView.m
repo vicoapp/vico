@@ -101,4 +101,7 @@
 - (void)test100_WordBackward8			{ MOVE(@"<abc> def", 6, @"b", 4); }
 - (void)test100_WordBackward9			{ MOVE(@"  abc", 2, @"b", 0); }
 
+- (void)test110_MoveDown			{ MOVE(@"abc\ndef", 1, @"j", 5); }
+//- (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
+
 @end

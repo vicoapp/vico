@@ -778,7 +778,7 @@
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if(ok && command.line_mode)
+	if(ok && command.line_mode && !command.ismotion)
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		NSUInteger bol;

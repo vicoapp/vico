@@ -1,11 +1,6 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 
-#ifdef IMAX
-# undef IMAX
-#endif
-#define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
-
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
 @end

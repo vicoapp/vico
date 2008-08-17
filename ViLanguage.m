@@ -56,6 +56,9 @@
 		[self compileRegexp:@"begin" inPattern:d];
 		[self compileRegexp:@"end" inPattern:d];
 	}
+
+	scopeMappingCache = [[NSMutableDictionary alloc] init];
+	
 	return self;
 }
 
@@ -72,6 +75,26 @@
 - (NSString *)name
 {
 	return [language objectForKey:@"name"];
+}
+
+- (NSDictionary *)patternForScope:(NSString *)aScopeSelector
+{
+	// look in cache first
+	NSMutableDictionary *d = [scopeMappingCache objectForKey:aScopeSelector];
+	if(d)
+		return d;
+
+	// walk through all patterns a match the scope selector
+	for(d in languagePatterns)
+	{
+		if([[d objectForKey:@"name"] isEqualToString:aScopeSelector])
+		{
+			// add to cache
+			[scopeMappingCache setObject:d forKey:aScopeSelector];
+			return d;
+		}
+	}
+	return nil;
 }
 
 @end

@@ -46,21 +46,38 @@
 		}
 	}
 
+	scopeSelectorCache = [[NSMutableDictionary alloc] init];
+
 	return self;
 }
 
 - (NSDictionary *)attributeForScopeSelector:(NSString *)aScopeSelector
 {
+	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:aScopeSelector];
+	if(attributes)
+	{
+		return [attributes count] == 0 ? nil : attributes;
+	}
+
 	NSString *scope;
 	for(scope in [themeAttributes allKeys])
 	{
 		if([aScopeSelector hasPrefix:scope])
 		{
-			return [themeAttributes objectForKey:scope];
+			// merge scope selector attribute with theme (color) attributes
+			attributes = [[NSMutableDictionary alloc] init];
+			[attributes setObject:aScopeSelector forKey:ViScopeAttributeName];
+			[attributes addEntriesFromDictionary:[themeAttributes objectForKey:scope]];
+			// cache this hit
+			NSLog(@"caching attributes for scope [%@]: [%@]", aScopeSelector, attributes);
+			[scopeSelectorCache setObject:attributes forKey:aScopeSelector];
+			return attributes;
 		}
 	}
 
 	//NSLog(@"scope [%@] has no attributes", aScopeSelector);
+	// cache this non-hit
+	[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:aScopeSelector];
 	return nil;
 }
 

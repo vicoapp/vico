@@ -7,11 +7,13 @@
 	OGRegularExpressionMatch *endMatch;
 	NSDictionary *pattern;
 	int patternIndex;
+	NSUInteger beginLocation;
 }
 - (id)initWithMatch:(OGRegularExpressionMatch *)aMatch andPattern:(NSDictionary *)aPattern atIndex:(int)i;
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)match;
 - (OGRegularExpression *)endRegexp;
 - (NSUInteger)beginLocation;
+- (void)setBeginLocation:(NSUInteger)aLocation;
 - (NSUInteger)endLocation;
 - (void)setEndMatch:(OGRegularExpressionMatch *)aMatch;
 - (NSString *)scope;
@@ -31,6 +33,8 @@
 		beginMatch = aMatch;
 		pattern = aPattern;
 		patternIndex = i;
+		if(aMatch)
+			beginLocation = [aMatch rangeOfMatchedString].location;
 	}
 	return self;
 }
@@ -52,11 +56,15 @@
 }
 - (NSUInteger)beginLocation
 {
-	return [beginMatch rangeOfMatchedString].location;
+	return beginLocation;
+}
+- (void)setBeginLocation:(NSUInteger)aLocation
+{
+	beginLocation = aLocation;
 }
 - (NSUInteger)endLocation
 {
-	NSRange r = [endMatch rangeOfMatchedString];
+	//NSRange r = [endMatch rangeOfMatchedString];
 	//NSLog(@"    endLocation = %u = max range of %u + %u", NSMaxRange(r), r.location, r.length);
 	return NSMaxRange([endMatch rangeOfMatchedString]);
 }
@@ -128,22 +136,22 @@
 	}
 }
 
-- (void)highlightMatch:(ViSyntaxMatch *)aMatch toEnd:(NSUInteger)aLocation
+- (void)highlightMatch:(ViSyntaxMatch *)aMatch inRange:(NSRange)aRange
 {
 	NSDictionary *attributes = [theme attributeForScopeSelector:[aMatch scope]];
-	NSRange range = NSMakeRange([aMatch beginLocation], aLocation - [aMatch beginLocation]);
-	NSString *matchedString = [[storage string] substringWithRange:range];
+	//NSRange range = NSMakeRange([aMatch beginLocation], aLocation - [aMatch beginLocation]);
+	//NSString *matchedString = [[storage string] substringWithRange:range];
 	if(attributes)
 	{
 		//NSLog(@"! highlighting multi-line match [%@] with scope [%@] at location %u, length %u",
 		//      matchedString, [aMatch scope], range.location, range.length);
-		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
+		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aRange];
 	}
 }
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch
 {
-	[self highlightMatch:aMatch toEnd:NSMaxRange([aMatch matchedRange])];
+	[self highlightMatch:aMatch inRange:[aMatch matchedRange]];
 }
 
 - (void)highlightSingleLineMatchesInRange:(NSRange)aRange
@@ -199,28 +207,25 @@
 
 /* returns YES if matches to EOL (ie, incomplete match)
  */
-- (BOOL)searchEndForMatch:(ViSyntaxMatch *)viMatch fromLocation:(NSUInteger)lastLocation inRange:(NSRange)aRange
+- (BOOL)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange
 {
-	NSLog(@"  searching for end match for beginning [%@] in range %u + %u, lastLocation = %u",
-	      [[viMatch beginMatch] matchedString], aRange.location, aRange.length, lastLocation);
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
 	if(endRegexp)
 	{
-		NSRange range = aRange;
-		range.location = [viMatch beginLocation] + 1;
-		range.length = NSMaxRange(aRange) - range.location;
+		NSLog(@"  searching for end match in range %u + %u", aRange.location, aRange.length);
 		// just get the first match
-		OGRegularExpressionMatch *endMatch = [endRegexp matchInString:[storage string] range:range];
+		OGRegularExpressionMatch *endMatch = [endRegexp matchInString:[storage string] range:aRange];
 		[viMatch setEndMatch:endMatch];
 		if(endMatch == nil)
 		{
 			//NSLog(@"%s got match from %u to EOL (%u)", _cmd, [viMatch beginLocation], NSMaxRange(range));
-			[self highlightMatch:viMatch toEnd:NSMaxRange(range)];
+			[self highlightMatch:viMatch inRange:aRange];
 			return YES;
 		}
 		else
 		{
 			//NSLog(@"got end match for beginning [%@], endregexp=[%@]", [[viMatch beginMatch] matchedString], [[viMatch pattern] objectForKey:@"end"]);
+			//[self highlightMatch:viMatch inRange:NSMakeRange(aRange.location, [viMatch endLocation] - aRange.location)];
 			[self highlightMatch:viMatch];
 			[self highlightEndCapturesInMatch:viMatch];
 		}
@@ -231,13 +236,13 @@
 
 - (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch
 {
-	NSString *line = [[storage string] substringWithRange:aRange];
-	NSLog(@"%s range = %u + %u => (%@)", _cmd, aRange.location, aRange.length, line);
+	//NSString *line = [[storage string] substringWithRange:aRange];
+	//NSLog(@"%s range = %u + %u => (%@)", _cmd, aRange.location, aRange.length, line);
 	NSUInteger lastLocation = aRange.location;
 
 	if(continuedMatch)
 	{
-		if([self searchEndForMatch:continuedMatch fromLocation:aRange.location inRange:aRange] == YES)
+		if([self searchEndForMatch:continuedMatch inRange:aRange] == YES)
 			return continuedMatch;
 		lastLocation = [continuedMatch endLocation] + 1;
 
@@ -283,8 +288,11 @@
 			// highlight keywords between end of last match and start of this match
 			[self highlightSingleLineMatchesInRange:NSMakeRange(lastLocation, [viMatch beginLocation] - lastLocation)];
 			[self highlightBeginCapturesInMatch:viMatch];
-			
-			if([self searchEndForMatch:viMatch fromLocation:lastLocation inRange:aRange] == YES)
+
+			NSRange range = aRange;
+			range.location = [viMatch beginLocation] + 1;
+			range.length = NSMaxRange(aRange) - range.location;
+			if([self searchEndForMatch:viMatch inRange:range] == YES)
 				return viMatch;
 
 			lastLocation = [viMatch endLocation] + 1;
@@ -294,7 +302,7 @@
 		}
 		else
 		{
-			NSLog(@"skipping embedded begin-match [%@]", [[viMatch beginMatch] matchedString]);
+			//NSLog(@"skipping embedded begin-match [%@]", [[viMatch beginMatch] matchedString]);
 		}
 	}
 
@@ -307,18 +315,35 @@
 	return nil;
 }
 
-- (void)highlightInRange:(NSRange)aRange
+- (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
 {
 	NSLog(@"%s range = %u + %u", _cmd, aRange.location, aRange.length);
 
 	if(!syntax_initialized)
 		[self initHighlighting];
 
+	ViSyntaxMatch *continuedMatch = nil;
+	if(isRestarting)
+	{
+		NSString *previousScope = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+								  atCharacterIndex:IMAX(0, aRange.location - 1)
+								    effectiveRange:NULL];
+		NSLog(@"detected previous scope [%@] at location %u", previousScope, aRange.location);
+		if(previousScope)
+		{
+			continuedMatch = [[ViSyntaxMatch alloc] initWithMatch:nil
+								   andPattern:[language patternForScope:previousScope]
+								      atIndex:0];
+			[continuedMatch setBeginLocation:aRange.location];
+		}
+	}
+
 	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
 
 	// highlight each line separately
 	NSUInteger nextRange = aRange.location;
-	ViSyntaxMatch *continuedMatch = nil;
 	while(nextRange < NSMaxRange(aRange))
 	{
 		NSUInteger end;
@@ -333,7 +358,7 @@
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
 {
-	[self highlightInRange:[wrappedRange rangeValue]];
+	[self highlightInRange:[wrappedRange rangeValue] restarting:YES];
 }
 
 /*
@@ -345,7 +370,7 @@
 		return;
 
 	NSRange area = [storage editedRange];
-	
+
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;
 	[[storage string] getLineStart:&bol end:&eol contentsEnd:NULL forRange:area];
@@ -365,7 +390,7 @@
 		return;
 	NSLog(@"%s begin highlighting", _cmd);
 	[storage beginEditing];
-	[self highlightInRange:NSMakeRange(0, [[storage string] length])];
+	[self highlightInRange:NSMakeRange(0, [[storage string] length]) restarting:NO];
 	[storage endEditing];
 	NSLog(@"%s end highlighting", _cmd);
 }

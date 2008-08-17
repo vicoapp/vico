@@ -4,6 +4,11 @@
 #import "ViTheme.h"
 #import "ViLanguage.h"
 
+#ifdef IMAX
+# undef IMAX
+#endif
+#define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
+
 typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView : NSTextView
@@ -43,6 +48,5 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 @end
 
 @interface ViTextView (syntax)
-- (void)highlightInRange:(NSRange)aRange;
 - (void)highlightEverything;
 @end

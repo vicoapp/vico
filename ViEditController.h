@@ -23,5 +23,7 @@
 - (IBAction)finishedExCommand:(id)sender;
 - (void)message:(NSString *)fmt, ...;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
+- (NSUndoManager *)undoManager;
+- (NSData *)saveData;
 
 @end

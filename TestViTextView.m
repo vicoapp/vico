@@ -154,7 +154,8 @@
 
 - (void)test170_ShiftLineRight			{ TEST(@"abc\ndef", 0, @">>", @"\tabc\ndef", 1); }
 - (void)test171_ShiftTwoLinesRight		{ TEST(@" abc\n\tdef\nghi", 0, @"2>>", @"\t abc\n\t\tdef\nghi", 1); }
-- (void)test172_ShiftLineLeft			{ TEST(@"\t\tabc\ndef", 3, @"<<", @"\tabc\ndef", 2); }
-- (void)test173_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
+- (void)test172_ShiftThreeLinesRight		{ TEST(@" abc\n\tdef\nghi\njkl", 0, @"3>>", @"\t abc\n\t\tdef\n\tghi\njkl", 1); }
+- (void)test173_ShiftLineLeft			{ TEST(@"\t\tabc\ndef", 3, @"<<", @"\tabc\ndef", 2); }
+- (void)test174_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
 
 @end

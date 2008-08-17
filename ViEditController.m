@@ -82,4 +82,15 @@
 	return NO;
 }
 
+- (NSUndoManager *)undoManager
+{
+	return [textView undoManager];
+}
+
+// returns the data to save
+- (NSData *)saveData
+{
+	return [[[textView textStorage] string] dataUsingEncoding:NSUTF8StringEncoding];
+}
+
 @end

@@ -16,6 +16,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViMode mode;
 	ViCommand *parser;
 	NSTextStorage *storage;
+	NSUndoManager *undoManager;
 
 	//NSMutableString *insertedText;
 	NSUInteger insert_start_location, insert_end_location;
@@ -62,6 +63,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)caret;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setTabSize:(int)tabSize;
+- (NSUndoManager *)undoManager;
 @end
 
 @interface ViTextView (cursor)

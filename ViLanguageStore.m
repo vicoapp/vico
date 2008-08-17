@@ -20,7 +20,7 @@ static ViLanguageStore *defaultStore = nil;
 		
 		NSMutableDictionary *bundle = [[NSMutableDictionary alloc] init];
 		[bundle setObject:[NSDictionary dictionaryWithContentsOfFile:infoPath] forKey:@"info"];
-		NSLog(@"=== parsing bundle [%@]", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
+		// NSLog(@"=== parsing bundle [%@]", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
 
 		[bundle setObject:[NSString stringWithFormat:@"%@/%@", aPath, subdir] forKey:@"path"];
 
@@ -38,7 +38,7 @@ static ViLanguageStore *defaultStore = nil;
 					languageList = [[NSMutableArray alloc] init];
 					[bundle setObject:languageList forKey:@"languages"];
 				}
-				NSLog(@"  adding syntax for language [%@]", [language name]);
+				// NSLog(@"  adding syntax for language [%@]", [language name]);
 				[languages setObject:language forKey:[language name]];
 				[languageList addObject:language];
 			}
@@ -58,7 +58,7 @@ static ViLanguageStore *defaultStore = nil;
 					prefsList = [[NSMutableArray alloc] init];
 					[bundle setObject:prefsList forKey:@"preferences"];
 				}
-				NSLog(@"  adding preferences for [%@]", [prefs objectForKey:@"name"]);
+				// NSLog(@"  adding preferences for [%@]", [prefs objectForKey:@"name"]);
 				[prefsList addObject:prefs];
 			}
 		}

@@ -1,5 +1,5 @@
 #import "MyDocument.h"
-#import "ViTextView.h"
+#import "PSMTabBarControl/PSMTabBarControl.h"
 
 @implementation MyDocument
 
@@ -16,23 +16,40 @@
 
 - (NSString *)windowNibName
 {
-	// Override returning the nib file name of the document
-	// If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
 	return @"MyDocument";
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
 	[super windowControllerDidLoadNib:aController];
-	
-	// Add any code here that needs to be executed once the windowController has loaded the document's window.
-	if(readContent)
-		[[[textView textStorage] mutableString] setString:readContent];
+
+	// remove all tabs from the tab view
+	while([tabView numberOfTabViewItems] > 0)
+		[tabView removeTabViewItem:[tabView tabViewItemAtIndex:0]];
+
+	// configure the tab bar control
+	PSMTabBarControl *tabBar = [tabView delegate];
+	[tabBar setStyleNamed:@"Unified"];
+
+	// add the first editor view
+	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
+	[editor setFilename:[self fileURL]];
+
+	// create a new tab
+	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
+	[item setView:[editor view]];
+	[item setLabel:[[[self fileURL] path] lastPathComponent]];
+	[tabView addTabViewItem:item];
+	[tabView selectTabViewItem:item];
+
 	readContent = nil;
-	[textView initEditor];
-	[textView setFilename:[self fileURL]];
-	[textView highlightEverything];
-	[textView setDelegate:self];
+
+	//[projectDrawer open];
+}
+
+- (ViEditController *)currentEditor
+{
+	return [[tabView selectedTabViewItem] identifier];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -40,8 +57,7 @@
 	// Insert code here to write your document to data of the specified type. If
 	// the given outError != NULL, ensure that you set *outError when returning nil.
 
-	return [[[textView textStorage] string] dataUsingEncoding:NSUTF8StringEncoding];
-	// You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
+	return [[self currentEditor] saveData];
 
 #if 0
 	if ( outError != NULL )
@@ -55,13 +71,12 @@
 	// Insert code here to read your document from the given data of the
 	// specified type. If the given outError != NULL, ensure that you set *outError
 	// when returning NO.
-	
-	// You can also choose to override -readFromFileWrapper:ofType:error: or -readFromURL:ofType:error: instead. 
 
 	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	if(textView)
+	NSTabViewItem *item = [tabView selectedTabViewItem];
+	if(item)
 	{
-		[[[textView textStorage] mutableString] setString:readContent];
+		[[item identifier] setString:readContent];
 		readContent = nil;
 	}
 
@@ -70,38 +85,13 @@
 
 - (void)changeTheme:(ViTheme *)theme
 {
-	[textView setTheme:theme];
+	// FIXME: loop over each tab and change theme for each delegate
 }
 
-- (void)message:(NSString *)fmt, ...
+// Each editor in each tab has its own undo manager. Return the current one.
+- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
-	va_list ap;
-	va_start(ap, fmt);
-	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
-	va_end(ap);
-
-	[statusbar setStringValue:msg];
-}
-
-- (IBAction)finishedExCommand:(id)sender
-{
-	NSLog(@"got ex command? [%@]", [statusbar stringValue]);
-	[textView performSelector:exCommandSelector withObject:[statusbar stringValue]];
-	[statusbar setStringValue:@""];
-	[statusbar setEditable:NO];
-	[editWindow makeFirstResponder:textView];
-}
-
-/* FIXME: should probably subclass NSTextField to disallow losing focus due to tabbing or clicking outside.
- * Should handle escape and ctrl-c.
- */
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
-{
-	[statusbar setStringValue:@":"]; // FIXME: should not select the colon
-	[statusbar setEditable:YES];
-	[statusbar setDelegate:self];
-	exCommandSelector = aSelector;
-	[editWindow makeFirstResponder:statusbar];
+	return [[self currentEditor] undoManager];
 }
 
 @end

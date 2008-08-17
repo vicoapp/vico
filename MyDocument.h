@@ -1,16 +1,13 @@
 #import <Cocoa/Cocoa.h>
 #import "ViTextView.h"
+#import "ViEditController.h"
 
 @interface MyDocument : NSDocument
 {
-	IBOutlet ViTextView *textView;
-	IBOutlet NSTextField *statusbar;
-	IBOutlet NSWindow *editWindow;
+	IBOutlet NSDrawer *projectDrawer;
+	IBOutlet NSTabView *tabView;
 	NSString *readContent;
-	SEL exCommandSelector;
 }
-- (IBAction)finishedExCommand:(id)sender;
 - (void)changeTheme:(ViTheme *)theme;
-- (void)message:(NSString *)fmt, ...;
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
+- (ViEditController *)currentEditor;
 @end

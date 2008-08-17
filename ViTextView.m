@@ -1,7 +1,7 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
-#import "MyDocument.h"  // for declaration of the message: method
+#import "ViEditController.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
 
 @interface ViTextView (private)
@@ -33,6 +33,7 @@
 
 	[[self textStorage] setDelegate:self];
 
+	undoManager = [[NSUndoManager alloc] init];
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSMutableDictionary alloc] init];
 	storage = [self textStorage];
@@ -340,8 +341,14 @@
 	 */
 	[[self undoManager] beginUndoGrouping];
 	hasBeginUndoGroup = YES;
-	[self setInsertMode:command];
-	return [self delete:command];
+	if([self delete:command])
+	{
+		end_location = final_location;
+		[self setInsertMode:command];
+		return YES;
+	}
+	else
+		return NO;
 }
 
 /* syntax: i */
@@ -1055,17 +1062,23 @@
 	if(lines == 0)
 		lines = 1;
 
+	[[self undoManager] beginUndoGrouping];
+
 	// process each line separately (remember that line mode is set)
-	NSRange lineRange = affectedRange;
+	NSUInteger nextLocation = affectedRange.location;
 	while(lines--)
 	{
-		[self insertString:@"\t" atLocation:lineRange.location];
+		[self insertString:@"\t" atLocation:nextLocation];
+		[self recordInsertInRange:NSMakeRange(nextLocation, 1)];
 
 		// get next line
-		NSUInteger bol, end;
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:NSMaxRange(lineRange)];
-		lineRange = NSMakeRange(bol, end - bol);
+		NSUInteger end;
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextLocation];
+		if(end == nextLocation || end == NSNotFound)
+			break;
+		nextLocation = end;
 	}
+	[[self undoManager] endUndoGrouping];
 
 	end_location = final_location = start_location + 1;
 
@@ -1079,21 +1092,40 @@
 	if(lines == 0)
 		lines = 1;
 
+	BOOL hasUndoGrouping = NO;
+	BOOL gotEndLocation = NO;
+
 	// process each line separately (remember that line mode is set)
-	NSRange lineRange = affectedRange;
+	NSUInteger nextLocation = affectedRange.location;
 	while(lines--)
 	{
-		NSString *s = [[storage string] substringWithRange:lineRange];
-		if([s hasPrefix:@"\t"])
-			[storage deleteCharactersInRange:NSMakeRange(lineRange.location, 1)];
+		NSUInteger end;
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextLocation];
+		if(end == nextLocation || end == NSNotFound)
+			break;
+		NSRange line = NSMakeRange(nextLocation, end - nextLocation);
+		nextLocation = end;
 
-		// get next line
-		NSUInteger bol, end;
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:NSMaxRange(lineRange)];
-		lineRange = NSMakeRange(bol, end - bol);
+		NSString *s = [[storage string] substringWithRange:line];
+		if([s hasPrefix:@"\t"])
+		{
+			if(!hasUndoGrouping)
+			{
+				[[self undoManager] beginUndoGrouping];
+				hasUndoGrouping = YES;
+			}
+			[self recordDeleteOfRange:NSMakeRange(line.location, 1)];
+			[storage deleteCharactersInRange:NSMakeRange(line.location, 1)];
+			nextLocation--;
+
+			if(!gotEndLocation && start_location > affectedRange.location)
+				end_location = final_location = start_location - 1;
+		}
+		gotEndLocation = YES;
 	}
 
-	end_location = final_location = start_location - 1;
+	if(hasUndoGrouping)
+		[[self undoManager] endUndoGrouping];
 
 	return YES;
 }
@@ -1514,12 +1546,15 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	unichar charcode = [[theEvent characters] characterAtIndex:0];
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, modifiers = 0x%08X (0x%08X)",
 	      [theEvent characters],
 	      [theEvent keyCode],
 	      [theEvent modifierFlags],
 	      ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask));
+
+	if([[theEvent characters] length] == 0)
+		return [super keyDown:theEvent];
+	unichar charcode = [[theEvent characters] characterAtIndex:0];
 
 	if(mode == ViInsertMode)
 	{
@@ -1543,7 +1578,7 @@
 			}
 
 			[parser setText:t];
-			if([t length] > 0)
+			if([t length] > 0 || hasBeginUndoGroup)
 				[self recordInsertInRange:NSMakeRange(insert_start_location, [t length])];
 			insertedText = nil;
 			[self setCommandMode];
@@ -1661,12 +1696,12 @@
 	[scrollView setHasVerticalScroller:YES];
 	[scrollView setHasHorizontalScroller:YES];
 	[scrollView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-	
+
 	NSTextContainer *textContainer = [self textContainer];
 	[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[textContainer setWidthTracksTextView:NO];
 	[textContainer setHeightTracksTextView:NO];
-	
+
 	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[self setHorizontallyResizable:YES];
 	[self setVerticallyResizable:YES];
@@ -1716,6 +1751,11 @@
 	[self setTypingAttributes:attrs];
 
 	[storage addAttributes:attrs range:NSMakeRange(0, [[storage string] length])];
+}
+
+- (NSUndoManager *)undoManager
+{
+	return undoManager;
 }
 
 @end

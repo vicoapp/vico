@@ -521,6 +521,7 @@
 	{
 		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
 	}
+	BOOL extendedRange = NO;
 
 	// reset attributes in the affected range
 	[self resetAttributesInRange:aRange];
@@ -534,6 +535,13 @@
 		if(end == nextRange || end == NSNotFound)
 			break;
 		NSRange line = NSMakeRange(nextRange, end - nextRange);
+
+		if(extendedRange)
+		{
+			lastContinuedMatches = [self continuedMatchesForLocation:end];
+			[self resetAttributesInRange:line];
+		}
+
 		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;
 
@@ -543,11 +551,24 @@
 			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
 		}
 
-		if(isRestarting && nextRange >= NSMaxRange(aRange) && nextRange < [storage length] && ![continuedMatches isEqualToPatternArray:lastContinuedMatches])
+		if(isRestarting/* && nextRange >= NSMaxRange(aRange) && nextRange < [storage length]*/)
 		{
-			DEBUG(@"continuation matches at location %u have changed, and this is an incremental update", end);
-			[self resetAttributesInRange:NSMakeRange(nextRange, [storage length] - nextRange)];
-			aRange.length = [storage length] - aRange.location;
+			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:lastContinuedMatches];
+			if(continuationMatchesHaveChanged)
+			{
+				if(!extendedRange)
+				{
+					DEBUG(@"continuation matches at location %u have changed, and this is an incremental update", end);
+					aRange.length = [storage length] - aRange.location;
+					extendedRange = YES;
+				}
+			}
+			else if(extendedRange)
+			{
+				NSLog(@"extended range and continuation matches are UNchanged, we're done at location %i (EOF = %i)",
+				      nextRange, [storage length]);
+				break;
+			}
 		}
 	}
 }

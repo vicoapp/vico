@@ -714,6 +714,7 @@
  */
 
 /* syntax: [count]w */
+/* syntax: [count]W */
 - (BOOL)word_forward:(ViCommand *)command
 {
 	if([storage length] == 0)
@@ -724,7 +725,7 @@
 	NSString *s = [storage string];
 	unichar ch = [s characterAtIndex:start_location];
 
-	if([wordSet characterIsMember:ch])
+	if(command.key == 'w' && [wordSet characterIsMember:ch])
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
@@ -732,62 +733,7 @@
 	else if(![whitespace characterIsMember:ch])
 	{
 		// inside non-word-chars
-		end_location = [self skipCharactersInSet:nonWordSet fromLocation:start_location backward:NO];
-	}
-	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
-	{
-		/* We're in whitespace. */
-		/* See comment from nvi below. */
-		end_location = start_location + 1;
-	}
-
-	/* From nvi:
-	 * Movements associated with commands are different than movement commands.
-	 * For example, in "abc  def", with the cursor on the 'a', "cw" is from
-	 * 'a' to 'c', while "w" is from 'a' to 'd'.  In general, trailing white
-	 * space is discarded from the change movement.  Another example is that,
-	 * in the same string, a "cw" on any white space character replaces that
-	 * single character, and nothing else.  Ain't nothin' in here that's easy. 
-	 */
-	if(command.ismotion || command.key == 'd' || command.key == 'y')
-		end_location = [self skipWhitespaceFrom:end_location];
-
-	if(!command.ismotion && (command.key == 'd' || command.key == 'y'))
-	{
-		/* Restrict to current line if deleting/yanking last word on line.
-		 * However, an empty line can be deleted as a word.
-		 */
-		NSUInteger bol, eol;
-		[self getLineStart:&bol end:NULL contentsEnd:&eol];
-		if(end_location > eol && bol != eol)
-		{
-			NSLog(@"adjusting location from %lu to %lu at EOL", end_location, eol);
-			end_location = eol;
-		}
-	}
-	else if(end_location >= [s length])
-		end_location = [s length] - 1;
-	final_location = end_location;
-	return YES;
-}
-
-/* syntax: [count]W */
-/* FIXME: this is too similar to the w command, refactor to use the same function */
-- (BOOL)bigword_forward:(ViCommand *)command
-{
-	if([storage length] == 0)
-	{
-		[[self delegate] message:@"Empty file"];
-		return NO;
-	}
-	NSString *s = [storage string];
-	unichar ch = [s characterAtIndex:start_location];
-
-	if(![whitespace characterIsMember:ch])
-	{
-		// inside non-word-chars
-		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:start_location backward:NO];
-		// end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
+		end_location = [self skipCharactersInSet:command.key == 'w' ? nonWordSet : [whitespace invertedSet] fromLocation:start_location backward:NO];
 	}
 	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
 	{
@@ -806,7 +752,7 @@
 	 */
 	if(command.ismotion || command.key == 'd' || command.key == 'y')
 		end_location = [self skipWhitespaceFrom:end_location];
-	
+
 	if(!command.ismotion && (command.key == 'd' || command.key == 'y'))
 	{
 		/* Restrict to current line if deleting/yanking last word on line.

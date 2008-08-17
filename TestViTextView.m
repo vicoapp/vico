@@ -19,7 +19,6 @@
 - (void)setUp
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
-	[vi initEditor];
 }
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }

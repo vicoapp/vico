@@ -13,9 +13,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSRect oldCaretRect;
 	NSRange affectedRange;
 	NSUInteger start_location, end_location;
-  BOOL need_scroll;
+	BOOL need_scroll;
 
-  /* syntax highlighting */
+	/* syntax highlighting */
 	NSDictionary *keywords;
 	NSColor *commentColor;
 	NSColor *stringColor;
@@ -26,7 +26,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	BOOL syntax_initialized;
 }
 
-+ (void)initKeymaps;
 - (void)initEditor;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;

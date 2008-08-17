@@ -11,8 +11,15 @@
 
 @implementation ViTextView
 
-+ (void)initKeymaps
+- (id)initWithFrame:(NSRect)frame textContainer:(NSTextContainer *)aTextContainer
 {
+	NSLog(@"%s initializing", _cmd);
+	self = [super initWithFrame:frame textContainer:aTextContainer];
+	if(self)
+	{
+		[self initEditor];
+	}
+	return self;
 }
 
 - (void)initEditor
@@ -30,6 +37,11 @@
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSMutableDictionary alloc] init];
 	storage = [self textStorage];
+
+	[self setRichText:NO];
+	[self setImportsGraphics:NO];
+	[self setUsesFontPanel:NO];
+	[self setPageGuideValues];
 }
 
 - (BOOL)illegal:(ViCommand *)command
@@ -595,7 +607,7 @@
 	}
 	NSLog(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
-	if(command.line_mode)
+	if(command.line_mode && !command.ismotion)
 	{
 		/* if this command is line oriented, extend the affectedRange to whole lines */
 		NSUInteger bol, end;

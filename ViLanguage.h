@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-
+#import <OgreKit/OgreKit.h>
 
 @interface ViLanguage : NSObject
 {
@@ -9,11 +9,10 @@
 	BOOL compiled;
 }
 - (id)initWithBundle:(NSString *)bundleName;
-- (NSArray *)patternsForScope:(NSString *)scope;
 - (NSArray *)fileTypes;
 - (NSString *)name;
-- (NSMutableDictionary *)patternForScope:(NSString *)aScopeSelector;
-- (NSArray *)expandedPatterns:(NSArray *)patterns;
+- (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
+- (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch;
 
 @end

@@ -152,9 +152,9 @@
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch inRange:(NSRange)aRange
 {
 	NSDictionary *attributes = [theme attributeForScopeSelector:[aMatch scope]];
+	DEBUG(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
 	if(attributes)
 	{
-		DEBUG(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
 		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aRange];
 	}
 }
@@ -177,12 +177,13 @@
 	{
 		NSDictionary *capture = [captures objectForKey:key];
 		NSDictionary *attributes = [theme attributeForScopeSelector:[capture objectForKey:@"name"]];
-		if(attributes)
+		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
+		if(r.length > 0)
 		{
-			NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
-			if(r.length > 0)
+			DEBUG(@" highlighting %@ [%@] in range %u + %u",
+			      captureType, [capture objectForKey:@"name"], r.location, r.length);
+			if(attributes)
 			{
-				DEBUG(@" highlighting %@ [%@] in range %u + %u", captureType, [capture objectForKey:@"name"], r.location, r.length);
 				[[self layoutManager] addTemporaryAttributes:attributes
 							   forCharacterRange:r];
 			}
@@ -212,7 +213,8 @@
 	NSArray *subPatterns = [language expandedPatternsForPattern:pattern];
 	if(subPatterns)
 	{
-		DEBUG(@"  higlighting (%i) subpatterns inside [%@] in range %u + %u", [subPatterns count], [pattern objectForKey:@"name"], range.location, range.length);
+		DEBUG(@"  higlighting (%i) subpatterns inside [%@] in range %u + %u",
+		      [subPatterns count], [pattern objectForKey:@"name"], range.location, range.length);
 		return [self highlightLineInRange:range continueWithMatch:nil inScope:subPatterns];
 	}
 	return nil;
@@ -223,6 +225,13 @@
 - (BOOL)searchEndForMatch:(ViSyntaxMatch *)viMatch inRange:(NSRange)aRange
 {
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
+	if(endRegexp == nil)
+	{
+		NSLog(@"************* => compiling pattern with back references");
+		endRegexp = [language compileRegexp:[[viMatch pattern] objectForKey:@"end"]
+			 withBackreferencesToRegexp:[viMatch beginMatch]];
+	}
+
 	if(endRegexp)
 	{
 		// just get the first match
@@ -283,7 +292,7 @@
 	if(patterns == nil)
 	{
 		// default to top-level patterns
-		patterns = [language patternsForScope:nil];
+		patterns = [language patterns];
 	}
 	int i = 0; // seems the patterns in textmate bundles are ordered
 	for(pattern in patterns)

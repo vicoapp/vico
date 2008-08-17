@@ -1,23 +1,49 @@
-#import <OgreKit/OgreKit.h>
 #import "ViLanguage.h"
 #import "ViLanguageStore.h"
 
 @implementation ViLanguage
 
+- (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch
+{
+	OGRegularExpression *regexp = nil;
+	//NSLog(@" compiling regexp [%@]", pattern);
+	@try
+	{
+		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
+		if(beginMatch)
+		{
+			NSLog(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+			NSLog(@"** original pattern = [%@]", pattern);
+			int i;
+			for(i = 1; i < [beginMatch count]; i++)
+			{
+				NSString *backref = [NSString stringWithFormat:@"\\%i", i];
+				[expandedPattern replaceOccurrencesOfString:backref
+								 withString:[beginMatch substringAtIndex:i]
+								    options:0
+								      range:NSMakeRange(1, [expandedPattern length])];
+			}
+			NSLog(@"** expanded pattern = [%@]", expandedPattern);
+		}
+
+		regexp = [OGRegularExpression regularExpressionWithString:expandedPattern options:OgreCaptureGroupOption];
+	}
+	@catch(NSException *exception)
+	{
+		NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@]", pattern);
+		regexp = nil;
+	}
+
+	return regexp;
+}
+
 - (void)compileRegexp:(NSString *)rule inPattern:(NSMutableDictionary *)d
 {
 	if([d objectForKey:rule])
 	{
-		//NSLog(@"  compiling regexp %@ [%@]", rule, [d objectForKey:rule]);
-		@try
-		{
-			OGRegularExpression *regexp = [OGRegularExpression regularExpressionWithString:[d objectForKey:rule]];
+		OGRegularExpression *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
+		if(regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
-		}
-		@catch(NSException *exception)
-		{
-			NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@]", [d objectForKey:rule]);			
-		}
 	}
 }
 
@@ -68,7 +94,6 @@
 	language = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
 	//NSLog(@"language = [%@]", language);
 	languagePatterns = [language objectForKey:@"patterns"];	
-	//NSLog(@"%s got %i patterns", _cmd, [languagePatterns count]);
 	scopeMappingCache = [[NSMutableDictionary alloc] init];
 
 	return self;
@@ -93,24 +118,11 @@
 	return [self initWithPath:path];
 }
 
-// FIXME: unused, obsolete(?)
-- (NSArray *)patternsForScope:(NSString *)scope
+- (NSArray *)patterns
 {
 	if(!compiled)
 		[self compile];
-	if(scope == nil)
-	{
-		return [self expandedPatternsForPattern:language];
-	}
-
-	/* find the pattern for the scope */
-	NSDictionary *pattern = [self patternForScope:scope];
-	if(pattern)
-	{
-		return [pattern objectForKey:@"patterns"];
-	}
-
-	return nil;
+	return [self expandedPatternsForPattern:language];
 }
 
 - (NSArray *)fileTypes
@@ -123,74 +135,56 @@
 	return [language objectForKey:@"scopeName"];
 }
 
-- (NSMutableDictionary *)patternForScope:(NSString *)aScopeSelector
-{
-	// look in cache first
-	NSMutableDictionary *d = [scopeMappingCache objectForKey:aScopeSelector];
-	if(d)
-		return d;
-
-	// walk through all patterns and match the scope selector
-	for(d in [self expandedPatternsForPattern:language])
-	{
-		if([[d objectForKey:@"name"] isEqualToString:aScopeSelector])
-		{
-			// add to cache
-			[scopeMappingCache setObject:d forKey:aScopeSelector];
-			return d;
-		}
-	}
-	return nil;
-}
-
-- (NSArray *)expandedPatterns:(NSArray *)patterns
+- (NSArray *)expandPatterns:(NSArray *)patterns
 {
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
 	NSDictionary *pattern;
 	for(pattern in patterns)
 	{
 		NSString *include = [pattern objectForKey:@"include"];
-		if(include)
+		if(include == nil)
 		{
-			if([include hasPrefix:@"#"])
+			// just add this pattern directly
+			[expandedPatterns addObject:pattern];
+			continue;
+		}
+
+		// expand this pattern
+		if([include hasPrefix:@"#"])
+		{
+			// fetch pattern from repository
+			NSString *patternName = [include substringFromIndex:1];
+			NSLog(@"including [%@] from repository", patternName);
+			// FIXME: use correct repository if referenced from an external language
+			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
+			if(includePattern)
 			{
-				/* fetch pattern from repository */
-				NSString *patternName = [include substringFromIndex:1];
-				NSLog(@"including [%@] from repository", patternName);
-				NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
-				if(includePattern)
+				if([includePattern count] == 1 && [includePattern objectForKey:@"patterns"])
 				{
-					if([includePattern count] == 1 && [includePattern objectForKey:@"patterns"])
-					{
-						// no endless loop because expandedPatternsForPattern caches the first recursion
-						[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern]];
-					}
-					else
-						[expandedPatterns addObject:includePattern];
+					// no endless loop because expandedPatternsForPattern caches the first recursion
+					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern]];
 				}
 				else
-					NSLog(@"pattern [%@] NOT FOUND in repository", patternName);
-			}
-			else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
-			{
-				// no endless loop because expandedPatternsForPattern caches the first recursion
-				[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:language]];
+					[expandedPatterns addObject:includePattern];
 			}
 			else
-			{
-				/* include an external language grammar */
-				NSString *scope = include;
-				NSLog(@"including external language [%@]", scope);
-				ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:scope];
-				if(externalLanguage)
-					[expandedPatterns addObjectsFromArray:[externalLanguage patternsForScope:nil]];
-				else
-					NSLog(@"language [%@] NOT FOUND", scope);
-			}
+				NSLog(@"pattern [%@] NOT FOUND in repository", patternName);
+		}
+		else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
+		{
+			// FIXME: $base vs. $self !?
+			// no endless loop because expandedPatternsForPattern caches the first recursion
+			[expandedPatterns addObjectsFromArray:[self patterns]];
 		}
 		else
 		{
-			[expandedPatterns addObject:pattern];
+			// include an external language grammar
+			NSLog(@"including external language [%@]", include);
+			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
+			if(externalLanguage)
+				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
+			else
+				NSLog(@"language [%@] NOT FOUND", include);
 		}
 	}
 	return expandedPatterns;
@@ -201,7 +195,7 @@
 	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
 	if(expandedPatterns == nil)
 	{
-		expandedPatterns = [self expandedPatterns:[pattern objectForKey:@"patterns"]];
+		expandedPatterns = [self expandPatterns:[pattern objectForKey:@"patterns"]];
 		if(expandedPatterns)
 		{
 			// cache it

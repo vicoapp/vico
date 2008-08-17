@@ -207,7 +207,7 @@
 	[parser reset];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEqualObjects(parser.method, @"delete_backward:", nil);	
+	STAssertEqualObjects(parser.method, @"delete_backward:", nil);
 }
 
 - (void)test075_DotCommandInheritsCount

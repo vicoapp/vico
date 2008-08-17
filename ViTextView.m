@@ -974,6 +974,7 @@
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
 	NSLog(@"should parse and execute ex command: [%@]", exCommandString);
+	//[ExCommand evaluateString:exCommandString viTextView:self];
 }
 
 - (BOOL)ex_command:(ViCommand *)command
@@ -1215,7 +1216,7 @@
 
 
 
-/* This is SO stolen from Smultron.
+/* This is stolen from Smultron.
  */
 - (void)drawRect:(NSRect)rect
 {

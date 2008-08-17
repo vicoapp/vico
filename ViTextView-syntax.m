@@ -149,9 +149,9 @@
 	}
 }
 
-- (void)applyScopeSelector:(NSString *)aScopeSelector inRange:(NSRange)aRange
+- (void)applyScope:(NSString *)aScope inRange:(NSRange)aRange
 {
-	if(aScopeSelector == nil)
+	if(aScope == nil)
 		return;
 
 	NSUInteger l = aRange.location;
@@ -165,13 +165,10 @@
 		NSMutableArray *scopes = [[NSMutableArray alloc] init];
 		if(oldScopes)
 		{
-			DEBUG(@"     scopes [%@] previously applied to range %u + %u",
-			      [oldScopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);
 			[scopes addObjectsFromArray:oldScopes];
 		}
 		// append the new scope selector
-		[scopes addObject:aScopeSelector];
-
+		[scopes addObject:aScope];
 		
 		// apply (merge) the scope selector in the maximum range
 		if(scopeRange.location < l)
@@ -182,11 +179,11 @@
 		if(NSMaxRange(scopeRange) > NSMaxRange(aRange))
 			scopeRange.length = NSMaxRange(aRange) - l;
 
-		DEBUG(@"     applying [%@] in range %u + %u", [scopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);		
+		DEBUG(@"   applying scopes [%@] to range %u + %u", [scopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);		
 		[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:scopeRange];
 
 		// get the theme attributes for this collection of scopes
-		NSDictionary *attributes = [theme attributesForScopeSelectors:scopes];
+		NSDictionary *attributes = [theme attributesForScopes:scopes];
 		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:scopeRange];
 
 		l = NSMaxRange(scopeRange);
@@ -195,8 +192,7 @@
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch inRange:(NSRange)aRange
 {
-	DEBUG(@"highlighting [%@] in range %u + %u", [aMatch scope], aRange.location, aRange.length);
-	[self applyScopeSelector:[aMatch scope] inRange:aRange];
+	[self applyScope:[aMatch scope] inRange:aRange];
 }
 
 - (void)highlightMatch:(ViSyntaxMatch *)aMatch
@@ -219,9 +215,7 @@
 		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
 		if(r.length > 0)
 		{
-			DEBUG(@" highlighting %@ [%@] in range %u + %u",
-			      captureType, [capture objectForKey:@"name"], r.location, r.length);
-			[self applyScopeSelector:[capture objectForKey:@"name"] inRange:r];
+			[self applyScope:[capture objectForKey:@"name"] inRange:r];
 		}
 	}
 }

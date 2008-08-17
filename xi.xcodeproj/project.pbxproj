@@ -26,6 +26,8 @@
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
 		9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */; };
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
+		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
+		9A8CC8E40D24ED47001EE32A /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +94,10 @@
 		9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViThemeStore.m; sourceTree = "<group>"; };
 		9A8CC2180D1C3E62001EE32A /* ViAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViAppController.h; sourceTree = "<group>"; };
 		9A8CC2190D1C3E62001EE32A /* ViAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViAppController.m; sourceTree = "<group>"; };
+		9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString-scopeSelector.h"; sourceTree = "<group>"; };
+		9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-scopeSelector.m"; sourceTree = "<group>"; };
+		9A8CC8D50D24EBA1001EE32A /* TestScopeSelectors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestScopeSelectors.h; sourceTree = "<group>"; };
+		9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +183,8 @@
 				9A668E160D11174A003FABD9 /* ViLanguageStore.m */,
 				9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */,
 				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
+				9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */,
+				9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -227,6 +235,8 @@
 				9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */,
 				9A1A13B60D044131009EABAC /* TestViTextView.h */,
 				9A1A13B70D044131009EABAC /* TestViTextView.m */,
+				9A8CC8D50D24EBA1001EE32A /* TestScopeSelectors.h */,
+				9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */,
 			);
 			name = "Test Cases";
 			sourceTree = "<group>";
@@ -360,6 +370,7 @@
 				9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */,
 				9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */,
 				9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */,
+				9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +380,7 @@
 			files = (
 				9A1A12240D02CFCF009EABAC /* TestViCommandParser.m in Sources */,
 				9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */,
+				9A8CC8E40D24ED47001EE32A /* TestScopeSelectors.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

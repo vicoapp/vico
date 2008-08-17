@@ -1,14 +1,15 @@
 #import "ViTheme.h"
+#import "NSString-scopeSelector.h"
+#import <OgreKit/OgreKit.h>
 
 @implementation ViTheme
 
 - (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
-	//NSLog(@"%s saving foreground color %@", _cmd, foreground);
 	int r, g, b;
 	if(sscanf([hashRGB UTF8String], "#%02X%02X%02X", &r, &g, &b) != 3)
 		return nil;
-	return [NSColor colorWithDeviceRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
+	return [NSColor colorWithCalibratedRed:(float)r/256.0 green:(float)g/256.0 blue:(float)b/256.0 alpha:1.0];
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -33,12 +34,12 @@
 			continue;
 		}
 
-		NSString *scope = [setting objectForKey:@"scope"];
-		if(scope == nil)
+		NSString *scopeSelector = [setting objectForKey:@"scope"];
+		if(scopeSelector == nil)
 			continue;
 
-		// FIXME: should parse the scope selector appropriately:
-		NSArray *scope_selectors = [scope componentsSeparatedByString:@", "];
+		// split up grouped selectors
+		NSArray *scopeSelectors = [scopeSelector componentsSeparatedByRegularExpressionString:@"\\s*,\\s*"];
 
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 
@@ -58,10 +59,10 @@
 			if([fontStyle rangeOfString:@"italic"].location != NSNotFound)
 				[attrs setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
 		}
-
-		for(scope in scope_selectors)
+		
+		for(scopeSelector in scopeSelectors)
 		{
-			[themeAttributes setObject:attrs forKey:scope];
+			[themeAttributes setObject:attrs forKey:scopeSelector];
 			//NSLog(@"%s  %@ = %@", _cmd, scope, attrs);
 		}
 	}
@@ -80,42 +81,52 @@
 	return [theme objectForKey:@"name"];
 }
 
-- (BOOL)scopeSelector:(NSString *)aScopeSelector matchesScopes:(NSArray *)scopes
-{
-	// FIXME: handle multi-level scope selectors!
-	if([[scopes lastObject] hasPrefix:aScopeSelector])
-		return YES;
-	return NO;
-}
-
-- (NSDictionary *)attributesForScopeSelectors:(NSArray *)scopes
+/* Return attributes (fore/background colors, underline, oblique) that are specified
+ * by the theme by matching against the scope selectors.
+ *
+ * Returns nil if no attributes are applicable.
+ */
+- (NSDictionary *)attributesForScopes:(NSArray *)scopes
 {
 	// FIXME: is it ok to key on an NSArray ?
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:scopes];
 	if(attributes)
 		return attributes;
 
-	BOOL found = NO;
+	NSString *foundScopeSelector = nil;
 	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
 	for(scopeSelector in [themeAttributes allKeys])
 	{
-		if([self scopeSelector:scopeSelector matchesScopes:scopes])
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if(rank > highest_rank)
 		{
-			found = YES;
-			break;
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
 		}
 	}
 
-	if(found && scopeSelector)
+	// FIXME: merge multiple attributes using the same scope selector
+	// From the textmate manual:
+	// "For themes and preference items, the winner is undefined when
+	//  multiple items use the same scope selector, though this is on
+	//  a per-property basis. So for example if one theme item sets the
+	//  background to blue for string.quoted and another theme item sets
+	//  the foreground to white, again for string.quoted, the result
+	//  would be that the foreground was taken from the latter item and
+	//  background from the former."
+
+	if(foundScopeSelector)
 	{
-		attributes = [themeAttributes objectForKey:scopeSelector];
+		//NSLog(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
+		attributes = [themeAttributes objectForKey:foundScopeSelector];
 		// cache it
 		[scopeSelectorCache setObject:attributes forKey:scopes];
 	}
 	else
 	{
-		// FIXME: cache non-hits
-		NSLog(@"scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
+		// FIXME: also cache non-hits
+		//NSLog(@"     scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
 	}
 
 	return attributes;

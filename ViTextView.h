@@ -28,6 +28,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViLanguage *language;
 
 	CGFloat pageGuideX;
+
+	int indent;
 }
 
 - (void)initEditor;

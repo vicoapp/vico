@@ -313,4 +313,43 @@
 	STAssertTrue(parser.argument == 'å', nil);
 }
 
+- (void)test090_DotCommandWithInsertedText
+{
+	[parser pushKey:'a'];
+	STAssertTrue(parser.complete, nil);
+	// input text
+	[parser setText:@"apa"];
+
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 'a', nil);
+	STAssertEqualObjects(parser.text, @"apa", nil);
+	
+	[parser reset];
+	[parser pushKey:'x'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 'x', nil);
+	STAssertNil(parser.text, nil);
+}
+
+- (void)test091_MotionCommandsDontResetRepeatText
+{
+	[parser pushKey:'i'];
+	STAssertTrue(parser.complete, nil);
+	// input text
+	[parser setText:@"apa"];
+
+	[parser reset];
+	[parser pushKey:'j'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.text, @"apa", nil);
+
+	[parser reset];
+	[parser pushKey:'.'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.key == 'i', nil);
+	STAssertEqualObjects(parser.text, @"apa", nil);
+}
+
 @end

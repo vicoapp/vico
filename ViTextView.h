@@ -46,7 +46,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)setCommandMode;
-- (void)setInsertMode;
+- (void)setInsertMode:(ViCommand *)command;
 - (void)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
 - (NSUInteger)caret;

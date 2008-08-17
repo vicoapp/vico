@@ -63,10 +63,11 @@ find_command(int key)
 @synthesize key;
 @synthesize motion_key;
 @synthesize argument;
+@synthesize text;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
-- (void)setComplete
+- (void)setComplete:(BOOL)is_dot
 {
 	complete = YES;
 
@@ -77,6 +78,10 @@ find_command(int key)
 		dot_motion_command = motion_command;
 		dot_count = count;
 		dot_motion_count = motion_count;
+		
+		/* new (real) commands reset the associated text */
+		if(!is_dot)
+			[self setText:nil];
 	}
 	
 	if(command && (command->key == 't' || command->key == 'f' ||
@@ -110,7 +115,7 @@ find_command(int key)
 	if(state == ViCommandNeedChar)
 	{
 		argument = aKey;
-		[self setComplete];
+		[self setComplete:NO];
 
 		return;
 	}
@@ -135,7 +140,7 @@ find_command(int key)
 		if(dot_command == nil)
 		{
 			method = @"nodot:"; // prints "No command to repeat"
-			[self setComplete];
+			[self setComplete:YES];
 			return;
 		}
 
@@ -146,7 +151,7 @@ find_command(int key)
 		key = dot_command->key;
 		if(dot_motion_command)
 			motion_key = dot_motion_command->key;
-		[self setComplete];
+		[self setComplete:YES];
 		return;
 	}
 	else if(aKey == ';' || aKey == ',')
@@ -163,7 +168,7 @@ find_command(int key)
 			argument = last_ftFT_argument;
 			key = last_ftFT_command->key;
 		}
-		[self setComplete];
+		[self setComplete:NO];
 		return;
 	}
 
@@ -173,7 +178,7 @@ find_command(int key)
 		// should print "X isn't a vi command"
 		method = @"illegal:";
 		key = aKey;
-		[self setComplete];
+		[self setComplete:NO];
 		return;
 	}
 
@@ -192,7 +197,7 @@ find_command(int key)
 			state = ViCommandNeedChar;
 		}
 		else
-			[self setComplete];
+			[self setComplete:NO];
 	}
 	else if(state == ViCommandNeedMotion)
 	{
@@ -224,7 +229,7 @@ find_command(int key)
 		}
 		else
 		{
-			[self setComplete];
+			[self setComplete:NO];
 		}
 	}
 }

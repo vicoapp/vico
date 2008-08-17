@@ -28,12 +28,18 @@
 - (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
 - (void)test012_ChangeWordAndYank		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 7); }
 - (void)test013_ChangeWord			{ TEST(@"abc\ndef", 1, @"cw", @"a\ndef", 1); }
+- (void)test014_AppendText			{ TEST(@"abc", 2, @"adef\x1b", @"abcdef", 5); }
+- (void)test015_RepeatAppendText		{ TEST(@"abc", 1, @"adef\x1b.", @"abdefdefc", 7); }
+- (void)test016_RepeatInsertText		{ TEST(@"abc", 2, @"idef\x1b.", @"abdedeffc", 6); }
+- (void)test017_InsertAtBOLAndRepeat		{ TEST(@"abc", 2, @"I+\x1bll.", @"++abc", 0); }
+- (void)test018_AppendAtEOLAndRepeat		{ TEST(@"abc", 0, @"A!\x1bhh.", @"abc!!", 4); }
 
 - (void)test020_DeleteForward			{ TEST(@"abcdef", 0, @"x", @"bcdef", 0); }
 - (void)test021_DeleteForwardAtEol		{ TEST(@"abc\ndef", 2, @"x", @"ab\ndef", 1); }
 - (void)test022_DeleteForewardWithCount		{ TEST(@"abcdef", 1, @"3x", @"aef", 1); }
 - (void)test023_DeleteForwardWithLargeCount	{ TEST(@"abcdef\nghi", 4, @"33x", @"abcd\nghi", 4); }
 - (void)test024_DeleteForwardAndYank		{ TEST(@"abc", 0, @"xlp", @"bca", 2); }
+- (void)test025_RepeatDeleteForward		{ TEST(@"abcdef", 0, @"x..", @"def", 0); }
 
 - (void)test030_DeleteBackward			{ TEST(@"abcdef", 3, @"X", @"abdef", 2); }
 - (void)test031_DeleteBackwardAtBol		{ TEST(@"abcdef", 0, @"X", @"abcdef", 0); }

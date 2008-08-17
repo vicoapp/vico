@@ -204,6 +204,20 @@
 	return YES;
 }
 
+/* syntax: [buffer][count]c[count]motion */
+- (BOOL)change:(ViCommand *)command
+{
+	[self setInsertMode:command];
+	return [self delete:command];
+}
+
+/* syntax: i */
+- (BOOL)insert:(ViCommand *)command
+{
+	[self setInsertMode:command];
+	return YES;
+}
+
 /* syntax: [buffer][count]s */
 - (BOOL)substitute:(ViCommand *)command
 {
@@ -215,22 +229,7 @@
 	if(start_location + c >= eol)
 		c = eol - start_location;
 	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, c)];
-	[self setInsertMode];
-	return YES;
-}
-
-/* syntax: [buffer][count]c[count]motion */
-- (BOOL)change:(ViCommand *)command
-{
-	[self setInsertMode];
-	return [self delete:command];
-}
-
-/* syntax: i */
-- (BOOL)insert:(ViCommand *)command
-{
-	[self setInsertMode];
-	return YES;
+	return [self insert:command];
 }
 
 /* syntax: [count]J */
@@ -345,7 +344,7 @@
 		[self cutToBuffer:0 append:NO range:range];
 	}
 
-	[self setInsertMode];
+	[self setInsertMode:command];
 	return YES;
 }
 
@@ -528,7 +527,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if(start_location < eol)
 		final_location = end_location = start_location + 1;
-	[self setInsertMode];
+	[self setInsertMode:command];
 	return YES;
 }
 
@@ -537,8 +536,7 @@
 {
 	[self move_eol:command];
 	start_location = end_location;
-	[self append:command];
-	return YES;
+	return [self append:command];
 }
 
 /* syntax: o */
@@ -546,7 +544,7 @@
 {
 	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
-	[self setInsertMode];
+	[self setInsertMode:command];
 	final_location = end_location;
 	return YES;
 }
@@ -554,7 +552,7 @@
 /* syntax: O */
 - (BOOL)open_line_above:(ViCommand *)command
 {
-	[self setInsertMode];
+	[self setInsertMode:command];
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	[self insertString:@"\n" atLocation:end_location];
 	final_location = end_location;
@@ -720,8 +718,6 @@
 /* syntax: [count]I */
 - (BOOL)insert_bol:(ViCommand *)command
 {
-	[self insert:command];
-
 	NSString *s = [storage string];
 	if([s length] == 0)
 		return YES;
@@ -737,7 +733,7 @@
 	else
 		end_location = bol;
 	final_location = end_location;
-	return YES;
+	return [self insert:command];
 }
 
 /* syntax: [count]x */
@@ -845,13 +841,22 @@
 - (void)setCommandMode
 {
 	mode = ViCommandMode;
-	//[self updateInsertionPoint];
 }
 
-- (void)setInsertMode
+- (void)setInsertMode:(ViCommand *)command
 {
-	mode = ViInsertMode;
-	//[self updateInsertionPoint];
+	if(command.text)
+	{
+		NSLog(@"replaying inserting text [%@]", command.text);
+		[self insertString:command.text atLocation:end_location];
+		final_location = end_location + [command.text length] - 1; // -1 is for 'escape' (back to command mode)
+	}
+	else
+	{
+		NSLog(@"entering insert mode");
+		mode = ViInsertMode;
+		insertedText = [[NSMutableString alloc] init];
+	}
 }
 
 - (void)evaluateCommand:(ViCommand *)command
@@ -932,11 +937,13 @@
 		if(charcode == 0x1B)
 		{
 			/* escape, return to command mode */
+			NSLog(@"registering replay text: [%@]", insertedText);
+			[parser setText:insertedText];
+			insertedText = nil;
 			[self setCommandMode];
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
-			NSLog(@"replay inserted text: [%@]", insertedText);
 		}
 		else if(([theEvent modifierFlags] >> 17) == 0)
 		{
@@ -956,21 +963,14 @@
 		[parser pushKey:charcode];
 		if(parser.complete)
 		{
-			[[self delegate] message:@""];
+			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			[[self textStorage] endEditing];
 			[self setCaret:final_location];
 			if(need_scroll)
 				[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
-
-			if(mode == ViInsertMode)
-			{
-				// The command has put us in insert mode.
-				// Prepare to capture the entered text for the dot command.
-				insertedText = [[NSMutableString alloc] init];
-			}
-		}
+ 		}
 	}
 }
 

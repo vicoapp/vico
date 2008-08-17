@@ -42,10 +42,12 @@
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 
 	inputCommands = [NSDictionary dictionaryWithObjectsAndKeys:
-			 @"input_newline:", @"\r",
-			 @"input_newline:", @"\n",
-			 @"input_backspace:", @"\x7f",
-			 @"input_backspace:", @"\x08", // ^h
+			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00000024], // enter
+			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x0004002e], // ctrl-m
+			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00040026], // ctrl-j
+			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00000033], // backspace
+			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
+			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
 			 nil];
 
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
@@ -1400,7 +1402,7 @@
 
 	if(foundScopeSelector)
 	{
-		NSLog(@"found smart typing pair scope selector %@ at location %i", foundScopeSelector, aLocation);
+		NSLog(@"found smart typing pair scope selector [%@] at location %i", foundScopeSelector, aLocation);
 		return [[[ViLanguageStore defaultStore] allSmartTypingPairs] objectForKey:foundScopeSelector];
 	}
 
@@ -1437,6 +1439,21 @@
 	[self setCaret:start_location - 1];
 }
 
+- (void)input_forward_delete:(NSString *)characters
+{
+	if(start_location >= insert_end_location)
+	{
+		[[self delegate] message:@"No more characters to erase"];
+		return;
+	}
+
+	/* FIXME: should handle smart typing pairs here when we support arrow keys(?) in input mode
+	 */
+
+	[storage deleteCharactersInRange:NSMakeRange(start_location, 1)];
+	insert_end_location--;
+}
+
 /* Input a character from the user (in insert mode). Handle smart typing pairs.
  * FIXME: assumes smart typing pairs are single characters.
  */
@@ -1449,7 +1466,9 @@
 		NSArray *pair;
 		for(pair in smartTypingPairs)
 		{
-			// NSLog(@"checking pair %@ and %@", [pair objectAtIndex:0], [pair objectAtIndex:1]);
+			// check if we're inserting the end character of a smart typing pair
+			// if so, just overwrite the end character
+			// FIXME: should check that this really is from a smart pair!
 			if([[pair objectAtIndex:1] isEqualToString:characters] &&
 			   [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 			{
@@ -1457,6 +1476,7 @@
 				[self setCaret:start_location + 1];
 				break;
 			}
+			// check for the start character of a smart typing pair
 			else if([[pair objectAtIndex:0] isEqualToString:characters])
 			{
 				foundSmartTypingPair = YES;
@@ -1481,10 +1501,11 @@
 - (void)keyDown:(NSEvent *)theEvent
 {
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X (0x%04X)",
+	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, modifiers = 0x%08X (0x%08X)",
 	      [theEvent characters],
-	      charcode,
-	      [theEvent modifierFlags], (([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17));
+	      [theEvent keyCode],
+	      [theEvent modifierFlags],
+	      ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask));
 
 	if(mode == ViInsertMode)
 	{
@@ -1492,7 +1513,7 @@
 		{
 			/* escape, return to command mode */
 			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
-			NSLog(@"registering replay text: [%@], count = %i", insertedText, parser.count);
+			NSLog(@"registering replay text: [%@] at %u + %u, count = %i", insertedText, insert_start_location, insert_end_location, parser.count);
 
 			/* handle counts for inserted text here */
 			NSString *t = insertedText;
@@ -1509,14 +1530,14 @@
 
 			[parser setText:t];
 			if([t length] > 0)
-				[self recordInsertInRange:NSMakeRange([self caret] - [t length], [t length])];
+				[self recordInsertInRange:NSMakeRange(insert_start_location, [t length])];
 			insertedText = nil;
 			[self setCommandMode];
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
-		else if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17) == 0)
+		else /* if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17) == 0) */
 		{
 			/* handle keys with no modifiers, or with shift, caps lock, control or alt modifier */
 
@@ -1524,7 +1545,8 @@
 			start_location = [self caret];
 
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
-			NSString *inputCommand = [inputCommands objectForKey:[theEvent characters]];
+			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+			NSString *inputCommand = [inputCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
 			if(inputCommand)
 			{
 				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
@@ -1542,11 +1564,6 @@
 					[self inputCharacters:[theEvent characters]];
 				}
 			}
-		}
-		else
-		{
-			/* command or other function keys */
-			[super keyDown:theEvent];
 		}
 	}
 	else if(mode == ViCommandMode)

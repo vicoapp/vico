@@ -40,11 +40,11 @@
 		// FIXME: should parse the scope selector appropriately:
 		NSArray *scope_selectors = [scope componentsSeparatedByString:@", "];
 
-		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
-		if(foreground == nil)
-			continue;
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
-		[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
+
+		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
+		if(foreground)
+			[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
 
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
 		if(background)
@@ -87,30 +87,31 @@
 
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:aScopeSelector];
 	if(attributes)
-	{
-		return [attributes count] == 0 ? nil : attributes;
-	}
+		return attributes;
 
+	BOOL found = NO;
 	NSString *scope;
 	for(scope in [themeAttributes allKeys])
 	{
 		if([aScopeSelector hasPrefix:scope])
 		{
-			// merge scope selector attribute with theme (color) attributes
-			attributes = [[NSMutableDictionary alloc] init];
-			[attributes setObject:aScopeSelector forKey:ViScopeAttributeName];
-			[attributes addEntriesFromDictionary:[themeAttributes objectForKey:scope]];
-			// cache this hit
-			//NSLog(@"caching attributes for scope [%@]: [%@]", aScopeSelector, attributes);
-			[scopeSelectorCache setObject:attributes forKey:aScopeSelector];
-			return attributes;
+			found = YES;
+			break;
 		}
 	}
 
-	//NSLog(@"scope [%@] has no attributes", aScopeSelector);
-	// cache this non-hit
-	[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:aScopeSelector];
-	return nil;
+	// merge scope selector attribute with theme (color) attributes
+	attributes = [[NSMutableDictionary alloc] init];
+	[attributes setObject:aScopeSelector forKey:ViScopeAttributeName];
+	if(found && scope)
+		[attributes addEntriesFromDictionary:[themeAttributes objectForKey:scope]];
+	else
+		NSLog(@"scope [%@] has no attributes", aScopeSelector);
+
+	// cache it
+	[scopeSelectorCache setObject:attributes forKey:aScopeSelector];
+
+	return attributes;
 }
 
 - (NSColor *)colorWithName:(NSString *)colorName orDefault:(NSColor *)defaultColor alpha:(float)alpha

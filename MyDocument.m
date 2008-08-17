@@ -191,8 +191,7 @@
 			NSLog(@"  checking [%@]", [[editor fileURL] path]);
 			if([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
-				[tabView selectTabViewItem:item];
-				[self setFileURL:[editor fileURL]];
+				[self selectTabViewItem:item];
 				return editor;
 			}
 		}
@@ -220,6 +219,43 @@
 	if(tagStack == nil)
 		tagStack = [[ViTagStack alloc] init];
 	return tagStack;
+}
+
+- (void)selectNextTab
+{
+	int num = [tabView numberOfTabViewItems];
+	if(num <= 1)
+		return;
+
+	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
+	if(++ndx >= num)
+		ndx = 0;
+	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+}
+
+- (void)selectPreviousTab
+{
+	int num = [tabView numberOfTabViewItems];
+	if(num <= 1)
+		return;
+
+	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
+	if(--ndx < 0)
+		ndx = num - 1;
+	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+}
+
+- (void)selectTab:(int)tab
+{
+	if(tab < [tabView numberOfTabViewItems])
+		[self selectTabViewItem:[tabView tabViewItemAtIndex:tab]];
+}
+
+
+- (void)selectTabViewItem:(NSTabViewItem *)anItem
+{
+	[tabView selectTabViewItem:anItem];
+	[self setFileURL:[[anItem identifier] fileURL]];
 }
 
 @end

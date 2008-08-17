@@ -17,5 +17,9 @@
 - (void)closeCurrentTab;
 - (ViEditController *)openFileInTab:(NSString *)path;
 - (ViTagStack *)sharedTagStack;
+- (void)selectNextTab;
+- (void)selectPreviousTab;
+- (void)selectTab:(int)tab;
+- (void)selectTabViewItem:(NSTabViewItem *)anItem;
 
 @end

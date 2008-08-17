@@ -17,6 +17,7 @@
 	SEL exCommandSelector;
 	id delegate;
 	NSURL *fileURL;
+	BOOL textViewConfigured;
 }
 
 - (NSView *)view;
@@ -41,5 +42,9 @@
 
 
 - (ViTextView *)textView;
+
+- (void)selectNextTab;
+- (void)selectPreviousTab;
+- (void)selectTab:(int)tab;
 
 @end

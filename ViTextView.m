@@ -51,7 +51,21 @@
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
 			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
 			 nil];
-
+	
+	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
+			  @"next_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007C], // command-right
+			  @"prev_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007B], // command-left
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100013], // command-2
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100014], // command-3
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100015], // command-4
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100017], // command-5
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100016], // command-6
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001A], // command-7
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
+			 nil];
+	
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[nonWordSet formUnionWithCharacterSet:wordSet];
 	[nonWordSet formUnionWithCharacterSet:whitespace];
@@ -748,8 +762,8 @@
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
 
-	// NSLog(@"keyDown event charcode = %04X", charcode);
-
+	//NSLog(@"keyDown event charcode = %04X", charcode);
+	
 	if(mode == ViInsertMode)
 	{
 		if(charcode == 0x1B)
@@ -809,22 +823,32 @@
 			}
 		}
 	}
-	else if(mode == ViCommandMode)
+	else if(mode == ViCommandMode) // or normal mode
 	{
-		if(parser.complete)
-			[parser reset];
-
-		[parser pushKey:charcode];
-		if(parser.complete)
+		// check for a special key bound to a function
+		NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+		NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
+		if(normalCommand)
 		{
-			[[self delegate] message:@""]; // erase any previous message
-			[storage beginEditing];
-			[self evaluateCommand:parser];
-			[storage endEditing];
-			[self setCaret:final_location];
-			if(need_scroll)
-				[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
- 		}
+			[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
+		}
+		else
+		{
+			if(parser.complete)
+				[parser reset];
+
+			[parser pushKey:charcode];
+			if(parser.complete)
+			{
+				[[self delegate] message:@""]; // erase any previous message
+				[storage beginEditing];
+				[self evaluateCommand:parser];
+				[storage endEditing];
+				[self setCaret:final_location];
+				if(need_scroll)
+					[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
+			}
+		}
 	}
 }
 
@@ -1011,6 +1035,21 @@
 	}
 
 	return nil;
+}
+
+- (void)next_tab:(NSString *)characters
+{
+	[[self delegate] selectNextTab];
+}
+
+- (void)prev_tab:(NSString *)characters
+{
+	[[self delegate] selectPreviousTab];
+}
+
+- (void)switch_tab:(NSString *)characters
+{
+	[[self delegate] selectTab:[characters characterAtIndex:0] - '1'];
 }
 
 @end

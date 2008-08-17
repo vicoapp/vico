@@ -44,8 +44,11 @@
 - (void)setFilename:(NSURL *)aURL
 {
 	fileURL = aURL;
-	[textView configureForURL:aURL];
-	// [textView highlightEverything];
+	if(!textViewConfigured)
+	{
+		[textView configureForURL:aURL];
+		textViewConfigured = YES;
+	}
 }
 
 - (NSURL *)fileURL
@@ -149,6 +152,21 @@
 - (ViTextView *)textView
 {
 	return textView;
+}
+
+- (void)selectNextTab
+{
+	[delegate selectNextTab];
+}
+
+- (void)selectPreviousTab
+{
+	[delegate selectPreviousTab];
+}
+
+- (void)selectTab:(int)tab
+{
+	[delegate selectTab:tab];
 }
 
 @end

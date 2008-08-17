@@ -38,6 +38,7 @@
     return self;
 }
 
+#if 0
 - (void)dealloc
 {
     [metalCloseButton release];
@@ -49,6 +50,7 @@
     
     [super dealloc];
 }
+#endif
 
 #pragma mark -
 #pragma mark Control Specific

@@ -43,6 +43,7 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
     return self;
 }
 
+#if 0
 - (void)dealloc
 {
     [_sourceTabBar release];
@@ -54,6 +55,7 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
     [_targetCell release];
     [super dealloc];
 }
+#endif
 
 #pragma mark -
 #pragma mark Accessors

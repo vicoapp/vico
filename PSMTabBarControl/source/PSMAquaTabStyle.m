@@ -62,6 +62,7 @@
     _addTabButtonRolloverImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"AquaTabNewRollover"]];
 }
 
+#if 0
 - (void)dealloc
 {
     [aquaTabBg release];
@@ -77,6 +78,7 @@
     
     [super dealloc];
 }
+#endif
 
 #pragma mark -
 #pragma mark Control Specifics

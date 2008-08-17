@@ -157,6 +157,7 @@
     return self;
 }
 
+#if 0
 - (void)dealloc
 {
     [_overflowPopUpButton release];
@@ -171,6 +172,12 @@
     [self unregisterDraggedTypes];
     
     [super dealloc];
+}
+#endif
+- (void)finalize
+{
+	[self unregisterDraggedTypes];
+	[super finalize];
 }
 
 - (void)awakeFromNib

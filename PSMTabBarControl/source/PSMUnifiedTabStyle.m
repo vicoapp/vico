@@ -45,6 +45,7 @@
     return self;
 }
 
+#if 0
 - (void)dealloc
 {
     [unifiedCloseButton release];
@@ -56,6 +57,7 @@
     
     [super dealloc];
 }
+#endif
 
 #pragma mark -
 #pragma mark Control Specific

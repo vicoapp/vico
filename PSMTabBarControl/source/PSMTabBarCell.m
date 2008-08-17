@@ -66,11 +66,13 @@
     return self;
 }
 
+#if 0
 - (void)dealloc
 {
     [_indicator release];
     [super dealloc];
 }
+#endif
 
 #pragma mark -
 #pragma mark Accessors

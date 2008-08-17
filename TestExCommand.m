@@ -24,8 +24,8 @@
 {
 	ExCommand *ex = [[ExCommand alloc] initWithString:@"foo bar baz"];
 	STAssertNotNil(ex, nil);
-	STAssertEqualObjects([ex command], @"foo", nil);
-	STAssertNil([ex method], nil);
+	STAssertEqualObjects(ex.command, @"foo", nil);
+	STAssertNil(ex.method, nil);
 }
 
 @end

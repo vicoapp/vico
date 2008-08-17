@@ -4,9 +4,15 @@
 
 - (ViTheme *)defaultTheme
 {
-	static ViTheme *defaultTheme = nil;
+	ViTheme *defaultTheme = nil;
+
+	NSString *themeName = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+	if(themeName)
+		defaultTheme = [self themeWithName:themeName];
+
 	if(defaultTheme == nil)
 	{
+
 		defaultTheme = [self themeWithName:@"Mac Classic"];
 		if(defaultTheme == nil)
 			defaultTheme = [[themes allValues] objectAtIndex:0];

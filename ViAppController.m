@@ -38,6 +38,8 @@
 		NSLog(@"changing theme for window %@ with title [%@]", window, [window title]);
 		[[window delegate] changeTheme:theme];
 	}
+
+	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
 }
 
 @end

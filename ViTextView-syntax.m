@@ -19,23 +19,29 @@
 - (id)initWithMatch:(OGRegularExpressionMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i;
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)match;
 - (OGRegularExpression *)endRegexp;
-- (NSUInteger)beginLocation;
-- (NSUInteger)beginLength;
-- (void)setBeginLocation:(NSUInteger)aLocation;
 - (NSUInteger)endLocation;
-- (void)setEndMatch:(OGRegularExpressionMatch *)aMatch;
 - (NSString *)scope;
 - (NSRange)matchedRange;
-- (NSRange)matchedRangeExclusive;
-- (NSMutableDictionary *)pattern;
-- (OGRegularExpressionMatch *)beginMatch;
-- (OGRegularExpressionMatch *)endMatch;
-- (int)patternIndex;
 - (BOOL)isSingleLineMatch;
 - (NSString *)description;
+
+@property(readonly) int patternIndex;
+@property(readonly) NSMutableDictionary *pattern;
+@property(readonly) NSUInteger beginLocation;
+@property(readonly) NSUInteger beginLength;
+@property(readonly) OGRegularExpressionMatch *beginMatch;
+@property(readonly) OGRegularExpressionMatch *endMatch;
 @end
 
 @implementation ViSyntaxMatch
+
+@synthesize patternIndex;
+@synthesize pattern;
+@synthesize beginLocation;
+@synthesize beginLength;
+@synthesize beginMatch;
+@synthesize endMatch;
+
 - (id)initWithMatch:(OGRegularExpressionMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i
 {
 	self = [super init];
@@ -68,13 +74,9 @@
 {
 	return [pattern objectForKey:@"endRegexp"];
 }
-- (NSUInteger)beginLocation
+- (void)setEndMatch:(OGRegularExpressionMatch *)aMatch
 {
-	return beginLocation;
-}
-- (NSUInteger)beginLength
-{
-	return beginLength;
+	endMatch = aMatch;
 }
 - (void)setBeginLocation:(NSUInteger)aLocation
 {
@@ -89,10 +91,6 @@
 	else
 		return NSMaxRange([beginMatch rangeOfMatchedString]); // FIXME: ???
 }
-- (void)setEndMatch:(OGRegularExpressionMatch *)aMatch
-{
-	endMatch = aMatch;
-}
 - (NSString *)scope
 {
 	return [pattern objectForKey:@"name"];
@@ -106,29 +104,6 @@
 		range.length = 0;
 	}
 	return range;
-}
-- (NSRange)matchedRangeExclusive
-{
-	NSRange range;
-	range.location = [self beginLocation] + [self beginLength];
-	range.length = [[self endMatch] rangeOfMatchedString].location - range.location;
-	return range;
-}
-- (NSMutableDictionary *)pattern;
-{
-	return pattern;
-}
-- (OGRegularExpressionMatch *)beginMatch
-{
-	return beginMatch;
-}
-- (OGRegularExpressionMatch *)endMatch
-{
-	return endMatch;
-}
-- (int)patternIndex
-{
-	return patternIndex;
 }
 - (BOOL)isSingleLineMatch
 {

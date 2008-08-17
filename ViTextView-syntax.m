@@ -228,7 +228,7 @@
 	OGRegularExpression *endRegexp = [viMatch endRegexp];
 	if(endRegexp == nil)
 	{
-		NSLog(@"************* => compiling pattern with back references");
+		NSLog(@"************* => compiling pattern with back references for scope [%@]", [viMatch scope]);
 		endRegexp = [language compileRegexp:[[viMatch pattern] objectForKey:@"end"]
 			 withBackreferencesToRegexp:[viMatch beginMatch]];
 	}

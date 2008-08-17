@@ -15,13 +15,17 @@
 			NSLog(@"*************** expanding pattern with %i captures:", [beginMatch count]);
 			NSLog(@"** original pattern = [%@]", pattern);
 			int i;
-			for(i = 1; i < [beginMatch count]; i++)
+			for(i = 1; i <= [beginMatch count]; i++)
 			{
 				NSString *backref = [NSString stringWithFormat:@"\\%i", i];
-				[expandedPattern replaceOccurrencesOfString:backref
-								 withString:[beginMatch substringAtIndex:i]
-								    options:0
-								      range:NSMakeRange(1, [expandedPattern length])];
+				if([beginMatch substringAtIndex:i])
+				{
+					NSLog(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
+					[expandedPattern replaceOccurrencesOfString:backref
+									 withString:[beginMatch substringAtIndex:i]
+									    options:0
+									      range:NSMakeRange(0, [expandedPattern length])];
+				}
 			}
 			NSLog(@"** expanded pattern = [%@]", expandedPattern);
 		}
@@ -30,7 +34,7 @@
 	}
 	@catch(NSException *exception)
 	{
-		NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@]", pattern);
+		NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
 		regexp = nil;
 	}
 
@@ -44,6 +48,8 @@
 		OGRegularExpression *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
 		if(regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
+		else
+			NSLog(@"Failed to compile '%@' pattern", rule);
 	}
 }
 

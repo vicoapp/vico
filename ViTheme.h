@@ -22,5 +22,6 @@
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;
 - (NSColor *)selectionColor;
+- (NSString *)description;
 
 @end

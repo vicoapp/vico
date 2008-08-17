@@ -17,6 +17,7 @@
 		if(defaultTheme == nil)
 			defaultTheme = [[themes allValues] objectAtIndex:0];
 	}
+	NSLog(@"theme = %@", defaultTheme);
 	return defaultTheme;
 }
 

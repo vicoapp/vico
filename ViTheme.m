@@ -20,7 +20,6 @@
 
 	scopeSelectorCache = [[NSMutableDictionary alloc] init];	
 	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
-	//NSLog(@"theme = %@", theme);
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *settings = [theme objectForKey:@"settings"];
@@ -135,7 +134,6 @@
 - (NSColor *)colorWithName:(NSString *)colorName orDefault:(NSColor *)defaultColor alpha:(float)alpha
 {
 	NSString *rgb = [defaultSettings objectForKey:colorName];
-	NSLog(@"%@ rgb = %@", colorName, rgb);
 	NSColor *color;
 	if(rgb)
 		color = [self hashRGBToColor:rgb];
@@ -176,6 +174,11 @@
 	if(selectionColor == nil)
 		selectionColor = [self colorWithName:@"selection" orDefault:[NSColor blueColor] alpha:0.5];
 	return selectionColor;
+}
+
+- (NSString *)description
+{
+	return [theme description];
 }
 
 @end

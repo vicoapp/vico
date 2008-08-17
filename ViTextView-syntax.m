@@ -410,7 +410,14 @@
 
 - (void)resetAttributesInRange:(NSRange)aRange
 {
-	NSDictionary *defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
+	NSDictionary *defaultAttributes = nil;
+	if(language)
+		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+					  [theme foregroundColor], NSForegroundColorAttributeName,
+					  [NSArray arrayWithObject:[language name]], ViScopeAttributeName,
+					  nil];
+	else
+		defaultAttributes = [NSDictionary dictionaryWithObject:[theme foregroundColor] forKey:NSForegroundColorAttributeName];
 	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 

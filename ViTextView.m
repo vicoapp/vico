@@ -207,6 +207,7 @@
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
 {
 	[self recordDeleteOfRange:cutRange];
+	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
 	[storage deleteCharactersInRange:cutRange];
 }
 

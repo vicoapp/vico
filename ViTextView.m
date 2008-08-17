@@ -1489,13 +1489,17 @@
 			// check for the start character of a smart typing pair
 			else if([[pair objectAtIndex:0] isEqualToString:characters])
 			{
-				foundSmartTypingPair = YES;
-				[self insertString:[pair objectAtIndex:0] atLocation:start_location];
-				[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+				// don't use it if next character is alphanumeric
+				if(!(start_location >= [storage length] || [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
+				{
+					foundSmartTypingPair = YES;
+					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
+					[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
 
-				insert_end_location += 2;
-				[self setCaret:start_location + 1];
-				break;
+					insert_end_location += 2;
+					[self setCaret:start_location + 1];
+					break;
+				}
 			}
 		}
 	}

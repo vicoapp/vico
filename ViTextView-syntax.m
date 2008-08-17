@@ -540,9 +540,9 @@
 		}
 	}
 	[[NSGarbageCollector defaultCollector] enable];
-	NSLog(@"tried regexps: %u", regexps_tried);
-	NSLog(@"matched regexps: %u", regexps_matched);
-	NSLog(@"overlapped regexps: %u", regexps_overlapped);
+	DEBUG(@"tried regexps: %u", regexps_tried);
+	DEBUG(@"matched regexps: %u", regexps_matched);
+	DEBUG(@"overlapped regexps: %u", regexps_overlapped);
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange

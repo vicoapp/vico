@@ -924,7 +924,7 @@
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 	      [theEvent charactersIgnoringModifiers],
 	      charcode,
-	      [theEvent modifierFlags]);
+	      [theEvent modifierFlags] & ~0xFF);
 #endif
 
 	if(mode == ViInsertMode)
@@ -936,6 +936,15 @@
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
+			NSLog(@"replay inserted text: [%@]", insertedText);
+		}
+		else if(([theEvent modifierFlags] >> 17) == 0)
+		{
+			NSLog(@"insert text [%@]", [theEvent characters]);
+			start_location = [self caret];
+			[self insertString:[theEvent characters] atLocation:start_location];
+			[self setCaret:start_location + [[theEvent characters] length]];
+			[insertedText appendString:[theEvent characters]];
 		}
 		else
 		{
@@ -954,6 +963,13 @@
 			[self setCaret:final_location];
 			if(need_scroll)
 				[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
+
+			if(mode == ViInsertMode)
+			{
+				// The command has put us in insert mode.
+				// Prepare to capture the entered text for the dot command.
+				insertedText = [[NSMutableString alloc] init];
+			}
 		}
 	}
 }

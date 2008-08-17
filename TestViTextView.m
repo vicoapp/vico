@@ -23,12 +23,10 @@
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }
 
-#if 0
-// FIXME: input keys passed through to the super NSTextView doesn't work yet
-- (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 9); }
+- (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 10); }
+- (void)test010_InsertTextAndEscape		{ TEST(@"abc def", 3, @"i qwerty\x1b", @"abc qwerty def", 9); }
 - (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
-- (void)test012_ChangeWordAndYank		{ TEST(@"abc def", 0, @"cwapa$p", @"apa abcdef", 7); }
-#endif
+- (void)test012_ChangeWordAndYank		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 7); }
 - (void)test013_ChangeWord			{ TEST(@"abc\ndef", 1, @"cw", @"a\ndef", 1); }
 
 - (void)test020_DeleteForward			{ TEST(@"abcdef", 0, @"x", @"bcdef", 0); }

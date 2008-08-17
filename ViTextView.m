@@ -79,6 +79,26 @@
 	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
 }
 
+- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
+{
+	// get the unnamed buffer
+	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
+	if(buffer == nil)
+	{
+		buffer = [[NSMutableString alloc] init];
+		[buffers setObject:buffer forKey:@"unnamed"];
+	}
+
+	NSString *s = [storage string];
+	[buffer setString:[s substringWithRange:yankRange]];
+}
+
+- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
+{
+	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
+	[storage deleteCharactersInRange:cutRange];
+}
+
 /* syntax: [buffer][count]d[count]motion */
 - (BOOL)delete:(ViCommand *)command
 {
@@ -86,7 +106,7 @@
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 
-	[storage deleteCharactersInRange:affectedRange];
+	[self cutToBuffer:0 append:NO range:affectedRange];
 
 	// correct caret position if we deleted the last character(s) on the line
 	if(bol > [[storage string] length])
@@ -103,16 +123,7 @@
 /* syntax: [buffer][count]y[count][motion] */
 - (BOOL)yank:(ViCommand *)command
 {
-	// get the unnamed buffer
-	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if(buffer == nil)
-	{
-		buffer = [[NSMutableString alloc] init];
-		[buffers setObject:buffer forKey:@"unnamed"];
-	}
-
-	NSString *s = [storage string];
-	[buffer setString:[s substringWithRange:affectedRange]];
+	[self yankToBuffer:0 append:NO range:affectedRange];
 
 	/* From nvi:
 	 * !!!

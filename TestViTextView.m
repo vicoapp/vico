@@ -27,6 +27,7 @@
 // FIXME: input keys passed through to the super NSTextView doesn't work yet
 - (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 9); }
 - (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
+- (void)test012_ChangeWordAndYank		{ TEST(@"abc def", 0, @"cwapa$p", @"apa abcdef", 7); }
 #endif
 
 - (void)test020_DeleteForward			{ TEST(@"abcdef", 0, @"x", @"bcdef", 0); }
@@ -67,6 +68,7 @@
 - (void)test073_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
 - (void)test074_DeleteToFirstLine		{ TEST(@"abc\ndef\nghi", 5, @"d1G", @"ghi", 0); }
 - (void)test075_DeleteToLastLine		{ TEST(@"abc\ndef\nghi", 5, @"dG", @"abc", 0); }
+- (void)test076_DeleteAndYank			{ TEST(@"abc def", 0, @"dw$p", @"defabc ", 3); }
 
 - (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"yw", @"abc def ghi", 4); }
 - (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }

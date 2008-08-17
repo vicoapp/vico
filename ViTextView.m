@@ -1192,8 +1192,6 @@
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;
 	}
-
-	[command reset];
 }
 
 - (NSUInteger)input_newline:(NSString *)characters
@@ -1230,10 +1228,24 @@
 		if(charcode == 0x1B)
 		{
 			/* escape, return to command mode */
-			NSLog(@"registering replay text: [%@]", insertedText);
-			[parser setText:insertedText];
-			if([insertedText length] > 0)
-				[self recordInsertInRange:NSMakeRange([self caret] - [insertedText length], [insertedText length])];
+			NSLog(@"registering replay text: [%@], count = %i", insertedText, parser.count);
+
+			/* handle counts for inserted text here */
+			NSString *t = insertedText;
+			if(parser.count > 1)
+			{
+				t = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
+							       withString:insertedText
+							  startingAtIndex:0];
+				[self insertString:t atLocation:[self caret]];
+				t = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
+							       withString:insertedText
+							  startingAtIndex:0];
+			}
+
+			[parser setText:t];
+			if([t length] > 0)
+				[self recordInsertInRange:NSMakeRange([self caret] - [t length], [t length])];
 			insertedText = nil;
 			[self setCommandMode];
 			start_location = end_location = [self caret];
@@ -1281,6 +1293,9 @@
 	}
 	else if(mode == ViCommandMode)
 	{
+		if(parser.complete)
+			[parser reset];
+
 		[parser pushKey:charcode];
 		if(parser.complete)
 		{

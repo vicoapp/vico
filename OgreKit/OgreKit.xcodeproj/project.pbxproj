@@ -27,7 +27,6 @@
 		4D82DCF909BA0CCF007F03B0 /* RE in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D82DCED09BA0CCE007F03B0 /* RE */; };
 		4D82DCFD09BA0CEF007F03B0 /* HISTORY in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D82DCFB09BA0CEF007F03B0 /* HISTORY */; };
 		4D82DD0009BA0CFC007F03B0 /* README in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D82DCFE09BA0CFC007F03B0 /* README */; };
-		4D9DBE2D09BAB999003DD4A8 /* libonig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9DBE2B09BAB999003DD4A8 /* libonig.a */; };
 		4DC40F4F09150CF50029A2A6 /* OGRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC40D5009150CEB0029A2A6 /* OGRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DC40F5009150CF50029A2A6 /* OGRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC40D5109150CEB0029A2A6 /* OGRegularExpression.m */; };
 		4DC40F5109150CF50029A2A6 /* OGRegularExpressionPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC40D5209150CEB0029A2A6 /* OGRegularExpressionPrivate.h */; };
@@ -69,6 +68,7 @@
 		4DC410F2091512CA0029A2A6 /* OGAttributedString.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC40D7009150CEB0029A2A6 /* OGAttributedString.h */; };
 		4DC411D70915159A0029A2A6 /* ReadMe.rtf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DC40D4B09150CEA0029A2A6 /* ReadMe.rtf */; };
 		4DC411D80915159A0029A2A6 /* License.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DC40D4C09150CEA0029A2A6 /* License.txt */; };
+		9ADEECCF0E58B7F700DC8D5D /* libonig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ADEECCE0E58B7F700DC8D5D /* libonig.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,14 +114,13 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		4D82DCE209BA0CAF007F03B0 /* oniguruma.h */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = sourcecode.c.h; name = oniguruma.h; path = intel/oniguruma.h; sourceTree = "<group>"; };
-		4D82DCE509BA0CBF007F03B0 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = COPYING; path = intel/COPYING; sourceTree = "<group>"; };
+		4D82DCE209BA0CAF007F03B0 /* oniguruma.h */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = sourcecode.c.h; name = oniguruma.h; path = "onig-5.9.0/oniguruma.h"; sourceTree = "<group>"; };
+		4D82DCE509BA0CBF007F03B0 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = COPYING; path = "onig-5.9.0/COPYING"; sourceTree = "<group>"; };
 		4D82DCE909BA0CCE007F03B0 /* API */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; path = API; sourceTree = "<group>"; };
 		4D82DCEB09BA0CCE007F03B0 /* FAQ */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; path = FAQ; sourceTree = "<group>"; };
 		4D82DCED09BA0CCE007F03B0 /* RE */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; path = RE; sourceTree = "<group>"; };
-		4D82DCFB09BA0CEF007F03B0 /* HISTORY */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = HISTORY; path = intel/HISTORY; sourceTree = "<group>"; };
-		4D82DCFE09BA0CFC007F03B0 /* README */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = README; path = intel/README; sourceTree = "<group>"; };
-		4D9DBE2B09BAB999003DD4A8 /* libonig.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonig.a; path = RegularExpression/oniguruma/universal/libonig.a; sourceTree = "<group>"; };
+		4D82DCFB09BA0CEF007F03B0 /* HISTORY */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = HISTORY; path = "onig-5.9.0/HISTORY"; sourceTree = "<group>"; };
+		4D82DCFE09BA0CFC007F03B0 /* README */ = {isa = PBXFileReference; fileEncoding = 0; lastKnownFileType = text; name = README; path = "onig-5.9.0/README"; sourceTree = "<group>"; };
 		4DC40BFC09150BDB0029A2A6 /* OgreKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OgreKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DC40D4B09150CEA0029A2A6 /* ReadMe.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ReadMe.rtf; path = RegularExpression/Documentation/ReadMe.rtf; sourceTree = SOURCE_ROOT; };
 		4DC40D4C09150CEA0029A2A6 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = License.txt; path = RegularExpression/Documentation/License.txt; sourceTree = SOURCE_ROOT; };
@@ -166,6 +165,7 @@
 		4DC40E5709150CF30029A2A6 /* OgreKit_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreKit_Prefix.pch; path = RegularExpression/OgreKit_Prefix.pch; sourceTree = SOURCE_ROOT; };
 		4DC40E5809150CF40029A2A6 /* version.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = version.plist; path = RegularExpression/version.plist; sourceTree = SOURCE_ROOT; };
 		4DC411C8091514D70029A2A6 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = RegularExpression/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9ADEECCE0E58B7F700DC8D5D /* libonig.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonig.a; path = RegularExpression/oniguruma/libonig.a; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -176,7 +176,7 @@
 			files = (
 				4DC410A7091511C80029A2A6 /* Foundation.framework in Frameworks */,
 				4DC410A8091511CA0029A2A6 /* AppKit.framework in Frameworks */,
-				4D9DBE2D09BAB999003DD4A8 /* libonig.a in Frameworks */,
+				9ADEECCF0E58B7F700DC8D5D /* libonig.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,7 +232,7 @@
 		4D82DCC109B9EC15007F03B0 /* Linked Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				4D9DBE2B09BAB999003DD4A8 /* libonig.a */,
+				9ADEECCE0E58B7F700DC8D5D /* libonig.a */,
 			);
 			name = "Linked Libraries";
 			sourceTree = "<group>";
@@ -245,7 +245,7 @@
 				4D82DCED09BA0CCE007F03B0 /* RE */,
 			);
 			name = doc;
-			path = intel/doc;
+			path = "onig-5.9.0/doc";
 			sourceTree = "<group>";
 		};
 		4DC40D4909150CEA0029A2A6 /* OgreKit */ = {
@@ -599,6 +599,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS)",
 					"$(SRCROOT)/RegularExpression/oniguruma/universal",
+					"\"$(SRCROOT)/RegularExpression/oniguruma\"",
 				);
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -646,6 +647,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS)",
 					"$(SRCROOT)/RegularExpression/oniguruma/universal",
+					"\"$(SRCROOT)/RegularExpression/oniguruma\"",
 				);
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -687,6 +689,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS)",
 					"$(SRCROOT)/RegularExpression/oniguruma/universal",
+					"\"$(SRCROOT)/RegularExpression/oniguruma\"",
 				);
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;

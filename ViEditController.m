@@ -61,6 +61,11 @@
 	[textView setTheme:theme];
 }
 
+- (void)setPageGuide:(int)pageGuideValue
+{
+	[textView setPageGuide:pageGuideValue];
+}
+
 - (void)message:(NSString *)fmt, ...
 {
 	va_list ap;

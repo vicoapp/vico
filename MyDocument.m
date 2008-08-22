@@ -91,6 +91,17 @@
 	}
 }
 
+- (void)setPageGuide:(int)pageGuideValue
+{
+	// loop over each tab and change the value for each delegate
+	NSTabViewItem *item;
+	for(item in [tabView tabViewItems])
+	{
+		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
+		[[item identifier] setPageGuide:pageGuideValue];
+	}
+}
+
 // Each editor in each tab has its own undo manager. Return the current one.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {

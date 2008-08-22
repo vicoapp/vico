@@ -38,7 +38,6 @@
 		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
-		9AEE8B5A0D929A2A00189D7B /* Project_DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */; };
 		9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */; };
 /* End PBXBuildFile section */
 
@@ -151,7 +150,6 @@
 		9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-vi_commands.m"; sourceTree = "<group>"; };
 		9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
 		9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagStack.m; sourceTree = "<group>"; };
-		9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = Project_DataModel.xcdatamodel; sourceTree = "<group>"; };
 		9AEE8B7C0D929DED00189D7B /* ProjectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDelegate.h; sourceTree = "<group>"; };
 		9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDelegate.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -209,7 +207,6 @@
 			children = (
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
 				9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */,
-				9AEE8B580D929A1700189D7B /* Models */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				9AC16DA00D93CF9C00AE45E0 /* Controllers */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
@@ -331,14 +328,6 @@
 				9AC16DA30D93D14A00AE45E0 /* ViEditController.m */,
 			);
 			name = Controllers;
-			sourceTree = "<group>";
-		};
-		9AEE8B580D929A1700189D7B /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				9AEE8B590D929A2A00189D7B /* Project_DataModel.xcdatamodel */,
-			);
-			name = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -513,7 +502,6 @@
 				9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */,
 				9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */,
 				9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */,
-				9AEE8B5A0D929A2A00189D7B /* Project_DataModel.xcdatamodel in Sources */,
 				9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */,
 				9AC16DA40D93D14A00AE45E0 /* ViEditController.m in Sources */,
 				9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */,

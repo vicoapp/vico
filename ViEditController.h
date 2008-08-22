@@ -31,6 +31,7 @@
 - (NSUndoManager *)undoManager;
 - (NSData *)saveData;
 - (void)changeTheme:(ViTheme *)theme;
+- (void)setPageGuide:(int)pageGuideValue;
 - (void)save;
 - (ViEditController *)openFileInTab:(NSString *)path;
 - (BOOL)findPattern:(NSString *)pattern

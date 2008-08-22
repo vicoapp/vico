@@ -12,6 +12,7 @@
 	ViTagStack *tagStack;
 }
 - (void)changeTheme:(ViTheme *)theme;
+- (void)setPageGuide:(int)pageGuideValue;
 - (ViEditController *)currentEditor;
 - (NSWindow *)window;
 - (void)closeCurrentTab;

@@ -884,23 +884,33 @@
 {
 	[super drawRect:rect];
 
-	NSRect bounds = [self bounds];
-	if([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES)
-	{ // So that it doesn't draw the line if only e.g. the cursor updates
-		[[self insertionPointColor] set];
-		// pageGuideColour = [color colorWithAlphaComponent:([color alphaComponent] / 4)];
-		[NSBezierPath strokeRect:NSMakeRect(pageGuideX, 0, 0, bounds.size.height)];
+	if (pageGuideX > 0)
+	{
+		NSRect bounds = [self bounds];
+		if([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES)
+		{ // So that it doesn't draw the line if only e.g. the cursor updates
+			[[self insertionPointColor] set];
+			// pageGuideColour = [color colorWithAlphaComponent:([color alphaComponent] / 4)];
+			[NSBezierPath strokeRect:NSMakeRect(pageGuideX, 0, 0, bounds.size.height)];
+		}
 	}
 }
 
-- (void)setPageGuideValues
+- (void)setPageGuide:(int)pageGuideValue
 {
-	NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[self font], NSFontAttributeName, nil];
-	CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
-	pageGuideX = (sizeOfCharacter * (80 + 1)) - 1.5;
-	// -1.5 to put it between the two characters and draw only on one pixel and
-	// not two (as the system draws it in a special way), and that's also why the
-	// width above is set to zero
+	if (pageGuideValue == 0)
+	{
+		pageGuideX = 0;
+	}
+	else
+	{
+		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[self font], NSFontAttributeName, nil];
+		CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
+		pageGuideX = (sizeOfCharacter * (pageGuideValue + 1)) - 1.5;
+		// -1.5 to put it between the two characters and draw only on one pixel and
+		// not two (as the system draws it in a special way), and that's also why the
+		// width above is set to zero
+	}
 	[self display];
 }
 

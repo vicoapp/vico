@@ -36,6 +36,20 @@
 	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
 }
 
+- (IBAction)setPageGuide:(id)sender
+{
+	int page_guide_column = [sender tag];
+
+	NSWindow *window;
+	NSArray *windows = [NSApp windows];
+	for(window in windows)
+	{
+		[[window delegate] setPageGuide:page_guide_column];
+	}
+
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:page_guide_column] forKey:@"pageGuide"];
+}
+
 - (IBAction)closeCurrentTab:(id)sender
 {
 	[[[NSApp keyWindow] delegate] closeCurrentTab];

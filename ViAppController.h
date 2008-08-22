@@ -6,5 +6,6 @@
 }
 
 - (IBAction)closeCurrentTab:(id)sender;
+- (IBAction)setPageGuide:(id)sender;
 
 @end

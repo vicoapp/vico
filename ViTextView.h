@@ -70,6 +70,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;
+- (void)setPageGuide:(int)pageGuideValue;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options

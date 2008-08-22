@@ -22,5 +22,6 @@
 - (void)selectPreviousTab;
 - (void)selectTab:(int)tab;
 - (void)selectTabViewItem:(NSTabViewItem *)anItem;
+- (IBAction)toggleProjectDrawer:(id)sender;
 
 @end

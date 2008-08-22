@@ -10,7 +10,7 @@
 - (id)init
 {
 	self = [super init];
-	if(self)
+	if (self)
 	{
 		// Add your subclass-specific initialization here.
 		// If an error occurs here, send a [self release] message and return nil.
@@ -28,7 +28,7 @@
 	[super windowControllerDidLoadNib:aController];
 
 	// remove all tabs from the tab view
-	while([tabView numberOfTabViewItems] > 0)
+	while ([tabView numberOfTabViewItems] > 0)
 		[tabView removeTabViewItem:[tabView tabViewItemAtIndex:0]];
 
 	// configure the tab bar control
@@ -58,7 +58,7 @@
 	return [[self currentEditor] saveData];
 
 #if 0
-	if ( outError != NULL )
+	if (outError != NULL)
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	return nil;
 #endif
@@ -71,7 +71,7 @@
 	// when returning NO.
 
 	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	if([self currentEditor])
+	if ([self currentEditor])
 	{
 		[[self currentEditor] setString:readContent];
 		readContent = nil;
@@ -84,7 +84,7 @@
 {
 	// loop over each tab and change theme for each delegate
 	NSTabViewItem *item;
-	for(item in [tabView tabViewItems])
+	for (item in [tabView tabViewItems])
 	{
 		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
 		[[item identifier] changeTheme:theme];
@@ -95,7 +95,7 @@
 {
 	// loop over each tab and change the value for each delegate
 	NSTabViewItem *item;
-	for(item in [tabView tabViewItems])
+	for (item in [tabView tabViewItems])
 	{
 		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
 		[[item identifier] setPageGuide:pageGuideValue];
@@ -128,7 +128,7 @@
 - (void)setFileURL:(NSURL *)aURL
 {
 	[super setFileURL:aURL];
-	if(aURL)
+	if (aURL)
 	{
 		[[self currentEditor] setFilename:aURL];
 		[[tabView selectedTabViewItem] setLabel:[[aURL path] lastPathComponent]];
@@ -140,16 +140,16 @@
 - (NSURL *)fileURL
 {
 	NSURL *url = [[self currentEditor] fileURL];
-	if(url == nil)
+	if (url == nil)
 		url = [super fileURL];
 	return url;
 }
 
 - (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose  contextInfo:(void  *)contextInfo
 {
-	if(shouldClose)
+	if (shouldClose)
 	{
-		if([tabView numberOfTabViewItems] <= 1)
+		if ([tabView numberOfTabViewItems] <= 1)
 			[self close];
 		else
 			[tabView removeTabViewItem:[tabView selectedTabViewItem]];
@@ -190,17 +190,17 @@
 {
 	NSString *standardizedPath = [path stringByStandardizingPath];
 
-	if(path)
+	if (path)
 	{
 		NSLog(@"looking for [%@] = [%@]", path, standardizedPath);
 		
 		/* first check if the file is already opened */
 		NSTabViewItem *item;
-		for(item in [tabView tabViewItems])
+		for (item in [tabView tabViewItems])
 		{
 			ViEditController *editor = [item identifier];
 			NSLog(@"  checking [%@]", [[editor fileURL] path]);
-			if([standardizedPath isEqualToString:[[editor fileURL] path]])
+			if ([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
 				[self selectTabViewItem:item];
 				return editor;
@@ -210,13 +210,13 @@
 
 	[self newTab];
 
-	if(path)
+	if (path)
 	{
 		NSURL *url = [NSURL fileURLWithPath:standardizedPath];
 		NSError *error = nil;
 		[self readFromURL:url ofType:nil error:&error];
 		[self setFileURL:url];
-		if(error)
+		if (error)
 			[NSApp presentError:error];
 		else
 			return [self currentEditor];
@@ -227,7 +227,7 @@
 
 - (ViTagStack *)sharedTagStack
 {
-	if(tagStack == nil)
+	if (tagStack == nil)
 		tagStack = [[ViTagStack alloc] init];
 	return tagStack;
 }
@@ -235,11 +235,11 @@
 - (void)selectNextTab
 {
 	int num = [tabView numberOfTabViewItems];
-	if(num <= 1)
+	if (num <= 1)
 		return;
 
 	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
-	if(++ndx >= num)
+	if (++ndx >= num)
 		ndx = 0;
 	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
 }
@@ -247,18 +247,18 @@
 - (void)selectPreviousTab
 {
 	int num = [tabView numberOfTabViewItems];
-	if(num <= 1)
+	if (num <= 1)
 		return;
 
 	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
-	if(--ndx < 0)
+	if (--ndx < 0)
 		ndx = num - 1;
 	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
 }
 
 - (void)selectTab:(int)tab
 {
-	if(tab < [tabView numberOfTabViewItems])
+	if (tab < [tabView numberOfTabViewItems])
 		[self selectTabViewItem:[tabView tabViewItemAtIndex:tab]];
 }
 
@@ -267,6 +267,11 @@
 {
 	[tabView selectTabViewItem:anItem];
 	[self setFileURL:[[anItem identifier] fileURL]];
+}
+
+- (IBAction)toggleProjectDrawer:(id)sender
+{
+	[projectDrawer toggle:sender];
 }
 
 @end

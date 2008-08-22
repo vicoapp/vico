@@ -55,4 +55,9 @@
 	[[[NSApp keyWindow] delegate] closeCurrentTab];
 }
 
+- (IBAction)toggleProjectDrawer:(id)sender
+{
+	[[[NSApp keyWindow] delegate] toggleProjectDrawer:sender];
+}
+
 @end

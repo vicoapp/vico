@@ -7,5 +7,6 @@
 
 - (IBAction)closeCurrentTab:(id)sender;
 - (IBAction)setPageGuide:(id)sender;
+- (IBAction)toggleProjectDrawer:(id)sender;
 
 @end

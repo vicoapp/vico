@@ -28,19 +28,6 @@
 	STAssertTrue(ex.command == NULL, nil);
 }
 
-#if 0
-- (void)test012_SimpleCommandWithSimpleParameter
-{
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"edit /path/to/file.txt"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"edit", nil);
-	STAssertEqualObjects(ex.method, @"ex_edit", nil);
-	STAssertNotNil(ex.arguments, nil);
-	STAssertTrue([ex.arguments count] == 1, nil);
-	STAssertEqualObjects([ex.arguments objectAtIndex:0], @"/path/to/file.txt", nil);
-}
-#endif
-
 - (void)test20_AbsoluteAddress
 {
 	struct ex_address addr;

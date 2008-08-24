@@ -41,7 +41,7 @@ struct ex_command
 	NSString *name;
 	NSString *method;
 	unsigned flags;
-	NSString *syntax;
+	const char *syntax;
 	NSString *usage;
 	NSString *help;
 };

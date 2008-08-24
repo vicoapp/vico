@@ -13,31 +13,6 @@
 @end
 
 /* From nvi:
- */
-#define EX_ADDR1         0x00000001      /* One address. */
-#define EX_ADDR2         0x00000002      /* Two addresses. */
-#define EX_ADDR2_ALL     0x00000004      /* Zero/two addresses; zero == all. */
-#define EX_ADDR2_NONE    0x00000008      /* Zero/two addresses; zero == none. */
-#define EX_ADDR_ZERO     0x00000010      /* 0 is a legal addr1. */
-#define EX_ADDR_ZERODEF  0x00000020      /* 0 is default addr1 of empty files. */
-#define EX_AUTOPRINT     0x00000040      /* Command always sets autoprint. */
-#define EX_CLRFLAG       0x00000080      /* Clear the print (#, l, p) flags. */
-#define EX_NEWSCREEN     0x00000100      /* Create a new screen. */
-#define EX_SECURE        0x00000200      /* Permission denied if O_SECURE set. */
-#define EX_VIONLY        0x00000400      /* Meaningful only in vi. */
-#define EC_INUSE1        0xfffff800      /* Same name space as EX_PRIVATE. */
-
-struct ex_command
-{
-	const char *name;
-	const char *method;
-	unsigned flags;
-	const char *syntax;
-	const char *usage;
-	const char *help;
-};
-
-/* From nvi:
  *
  * This array maps ex command names to command functions.
  *
@@ -471,6 +446,7 @@ static struct ex_command ex_commands[] = {
 
 @implementation ExCommand
 
+@synthesize flags;
 @synthesize command;
 @synthesize method;
 @synthesize arguments;
@@ -485,14 +461,260 @@ static struct ex_command ex_commands[] = {
 	return self;
 }
 
++ (BOOL)parseRange:(NSScanner *)scan
+       intoAddress:(struct ex_address *)addr
+{
+	addr->type = EX_ADDR_NONE;
+	addr->offset = 0;
+
+	[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
+	NSLog(@"%s: parsing [%@]", __func__, [[scan string] substringFromIndex:[scan scanLocation]]);
+
+	NSCharacterSet *signSet = [NSCharacterSet characterSetWithCharactersInString:@"+-^"];
+
+	if (![signSet characterIsMember:[[scan string] characterAtIndex:[scan scanLocation]]] &&
+	    [scan scanInt:&addr->addr.abs.line])
+	{
+		addr->addr.abs.column = 1;
+		addr->type = EX_ADDR_ABS;
+	}
+	else if ([scan scanString:@"$" intoString:nil])
+	{
+		addr->addr.abs.line = -1;
+		addr->addr.abs.column = 1;
+		addr->type = EX_ADDR_ABS;
+	}
+	else if ([scan scanString:@"'" intoString:nil] && ![scan isAtEnd])
+	{
+		addr->addr.mark = [[scan string] characterAtIndex:[scan scanLocation]];
+		[scan setScanLocation:[scan scanLocation] + 1];
+		addr->type = EX_ADDR_MARK;
+	}
+	else if ([scan scanString:@"/" intoString:nil])
+	{
+		// FIXME: doesn't handle escaped '/'
+		[scan scanUpToString:@"/" intoString:&addr->addr.search.pattern];
+		if (![scan isAtEnd] &&
+		    [[scan string] characterAtIndex:[scan scanLocation]] == '/')
+		{
+			/* skip past the terminating '/' */
+			[scan setScanLocation:[scan scanLocation] + 1];
+		}
+		addr->type = EX_ADDR_SEARCH;
+		addr->addr.search.backwards = NO;
+	}
+	else if ([scan scanString:@"?" intoString:nil])
+	{
+		// FIXME: doesn't handle escaped '?'
+		[scan scanUpToString:@"?" intoString:&addr->addr.search.pattern];
+		if (![scan isAtEnd] &&
+		    [[scan string] characterAtIndex:[scan scanLocation]] == '?')
+		{
+			/* skip past the terminating '?' */
+			[scan setScanLocation:[scan scanLocation] + 1];
+		}
+		addr->addr.search.backwards = YES;
+		addr->type = EX_ADDR_SEARCH;
+	}
+	else if ([scan scanString:@"." intoString:nil])
+	{
+		addr->type = EX_ADDR_CURRENT;
+	}
+
+        /* Skip whitespace. */
+	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+
+	/* From nvi:
+	 * Evaluate any offset.  If no address yet found, the offset
+	 * is relative to ".".
+	 */
+
+	NSCharacterSet *offsetSet = [NSCharacterSet characterSetWithCharactersInString:@"+-^0123456789"];
+	while (![scan isAtEnd] &&
+	       [offsetSet characterIsMember:[[scan string] characterAtIndex:[scan scanLocation]]])
+	{
+		if (addr->type == EX_ADDR_NONE)
+		{
+			addr->type = EX_ADDR_CURRENT;
+		}
+
+		/* From nvi
+		 * Evaluate an offset, defined as:
+		 *
+		 *		[+-^<blank>]*[<blank>]*[0-9]*
+		 *
+		 * The rough translation is any number of signs, optionally
+		 * followed by numbers, or a number by itself, all <blank>
+		 * separated.
+		 *
+		 * !!!
+		 * All address offsets were additive, e.g. "2 2 3p" was the
+		 * same as "7p", or, "/ZZZ/ 2" was the same as "/ZZZ/+2".
+		 * Note, however, "2 /ZZZ/" was an error.  It was also legal
+		 * to insert signs without numbers, so "3 - 2" was legal, and
+		 * equal to 4.
+		 *
+		 * !!!
+		 * Offsets were historically permitted for any line address,
+		 * e.g. the command "1,2 copy 2 2 2 2" copied lines 1,2 after
+		 * line 8.
+		 *
+		 * !!!
+		 * Offsets were historically permitted for search commands,
+		 * and handled as addresses: "/pattern/2 2 2" was legal, and
+		 * referenced the 6th line after pattern.
+		 */
+
+		BOOL has_sign = NO;
+		unichar sign = [[scan string] characterAtIndex:[scan scanLocation]];
+		if ([signSet characterIsMember:sign])
+		{
+			[scan setScanLocation:[scan scanLocation] + 1];
+			has_sign = YES;
+		}
+		else
+			sign = '+';
+
+		int offset = 0;
+		if (![scan scanInt:&offset])
+		{
+			if (!has_sign)
+				break;
+			offset = 1;
+		}
+
+		if (sign != '+')
+			offset = -offset;
+		NSLog(@"accumulating offset %i, rest = [%@]", offset, [[scan string] substringFromIndex:[scan scanLocation]]);
+		addr->offset += offset;
+
+		/* Skip whitespace. */
+		if ([scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil])
+			NSLog(@"%s: skipped whitespace", __func__);
+	}
+
+	return addr->type != EX_ADDR_NONE;
+}
+
+- (BOOL)parseRange:(NSScanner *)scan
+       intoAddress:(struct ex_address *)addr1
+      otherAddress:(struct ex_address *)addr2
+{
+        /* From nvi:
+         * Parse comma or semi-colon delimited line specs.
+         *
+         * Semi-colon delimiters update the current address to be the last
+         * address.  For example, the command
+         *
+         *      :3;/pattern/ecp->cp
+         *
+         * will search for pattern from line 3.  In addition, if ecp->cp
+         * is not a valid command, the current line will be left at 3, not
+         * at the original address.
+         *
+         * Extra addresses are discarded, starting with the first.
+         *
+         * !!!
+         * If any addresses are missing, they default to the current line.
+         * This was historically true for both leading and trailing comma
+         * delimited addresses as well as for trailing semicolon delimited
+         * addresses.  For consistency, we make it true for leading semicolon
+         * addresses as well.
+         */
+
+        enum { ADDR_FOUND, ADDR_FOUND2, ADDR_NEED, ADDR_NONE } state;
+	int naddr = 0;
+	state = ADDR_NONE;
+
+	switch ([[scan string] characterAtIndex:[scan scanLocation]])
+	{
+	case '%':
+		/* From nvi:
+		 * !!!
+		 * A percent character addresses all of the lines in
+		 * the file.  Historically, it couldn't be followed by
+		 * any other address.  We do it as a text substitution
+		 * for simplicity.  POSIX 1003.2 is expected to follow
+		 * this practice.
+		 *
+		 * If it's an empty file, the first line is 0, not 1.
+		 */
+		 
+		if (state != ADDR_NONE)
+		{
+			NSLog(@"bad address");
+			return -1;
+		}
+
+
+		addr1->addr.abs.line = 1;
+		addr1->addr.abs.column = 1;
+		addr2->addr.abs.line = -1;
+		addr2->addr.abs.column = -1;
+		break;
+	case ',':
+		/* FALL-THROUGH */
+	case ';':
+		
+		break;
+	}
+
+	return naddr;
+}
+
 - (BOOL)parseString:(NSString *)string
 {
+	NSScanner *scan = [NSScanner scannerWithString:string];
+
+        /* From nvi:
+         * !!!
+         * Permit extra colons at the start of the line.  Historically,
+         * ex/vi allowed a single extra one.  It's simpler not to count.
+         * The stripping is done here because, historically, any command
+         * could have preceding colons, e.g. ":g/pattern/:p" worked.
+         */
+	[scan scanCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]
+			intoString:nil];
+
+        /* From nvi:
+         * Command lines that start with a double-quote are comments.
+         *
+         * !!!
+         * Historically, there was no escape or delimiter for a comment, e.g.
+         * :"foo|set was a single comment and nothing was output.  Since nvi
+         * permits users to escape <newline> characters into command lines, we
+         * have to check for that case.
+         */
+	if (![scan isAtEnd] && [string characterAtIndex:[scan scanLocation]] == '"')
+	{
+		[scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
+			intoString:nil];
+		return [self parseString:[string substringFromIndex:[scan scanLocation]]];
+	}
+
+        /* Skip whitespace. */
+	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]
+			intoString:nil];
+
+	if ([scan isAtEnd])
+		return NO;
+
+	struct ex_address addr1, addr2;
+	bzero(&addr1, sizeof(addr1));
+	bzero(&addr2, sizeof(addr2));
+
+	int naddr = [self parseRange:scan intoAddress:&addr1 otherAddress:&addr2];
+	NSLog(@"parsed %i addresses", naddr);
+	
+	if (naddr < 0)
+		return NO;
+
 	NSArray *args = [string componentsSeparatedByString:@" "];
 	command = [args objectAtIndex:0];
 	arguments = [args subarrayWithRange:NSMakeRange(1, [args count] - 1)];
 
 	const char *c = [command cStringUsingEncoding:NSUTF8StringEncoding];
-	struct ex_command *cmd = NULL;
+	cmd = NULL;
 	int i;
 	for(i = 0; ex_commands[i].name; i++)
 	{

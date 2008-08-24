@@ -21,7 +21,6 @@
 #define EX_NEWSCREEN     0x00000100      /* Create a new screen. */
 #define EX_SECURE        0x00000200      /* Permission denied if O_SECURE set. */
 #define EX_VIONLY        0x00000400      /* Meaningful only in vi. */
-#define EC_INUSE1        0xfffff800      /* Same name space as EX_PRIVATE. */
 
 #define E_C_BUFFER      0x00001         /* Buffer name specified. */
 #define E_C_CARAT       0x00002         /*  ^ flag. */
@@ -39,12 +38,12 @@
 
 struct ex_command
 {
-	const char *name;
-	const char *method;
+	NSString *name;
+	NSString *method;
 	unsigned flags;
-	const char *syntax;
-	const char *usage;
-	const char *help;
+	NSString *syntax;
+	NSString *usage;
+	NSString *help;
 };
 
 #define EX_ADDR_NONE	0
@@ -77,19 +76,31 @@ struct ex_address
 
 @interface ExCommand : NSObject
 {
-	struct ex_command *cmd;
+	struct ex_command *command;
+	unsigned naddr;
+	struct ex_address addr1;
+	BOOL addr2_relative_addr1; // true if semicolon used between addr1 and addr2
+	struct ex_address addr2;
+	struct ex_address line;
 	unsigned flags;
-	NSString *command;
-	NSString *method;
+	NSString *name;
 	NSArray *arguments;
 }
 
 - (ExCommand *)initWithString:(NSString *)string;
 + (BOOL)parseRange:(NSScanner *)scan
-       intoAddress:(struct ex_address *)addr1;
+       intoAddress:(struct ex_address *)addr;
++ (int)parseRange:(NSScanner *)scan
+      intoAddress:(struct ex_address *)addr1
+     otherAddress:(struct ex_address *)addr2;
 
+@property(readonly) unsigned naddr;
+@property(readonly) struct ex_address *addr1;
+@property(readonly) struct ex_address *addr2;
+@property(readonly) struct ex_address *line;
+@property(readonly) struct ex_command *command;
 @property(readonly) unsigned flags;
-@property(readonly) NSString *command;
+@property(readonly) NSString *name;
 @property(readonly) NSString *method;
 @property(readonly) NSArray *arguments;
 

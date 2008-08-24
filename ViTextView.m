@@ -313,15 +313,15 @@
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
 		// NSLog(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
-		if(ex.method == nil)
-			[[self delegate] message:@"The %@ command is unknown.", ex.command];
+		if(ex.command == NULL)
+			[[self delegate] message:@"The %@ command is unknown.", ex.name];
 		else
 		{
-			SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.method]);
+			SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
 			if([self respondsToSelector:selector])
 				[self performSelector:selector withObject:ex];
 			else
-				[[self delegate] message:@"The %@ command is not implemented.", ex.command];
+				[[self delegate] message:@"The %@ command is not implemented.", ex.name];
 		}
 	}
 }

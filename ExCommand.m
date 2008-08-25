@@ -473,7 +473,9 @@ ex_cmd_find(NSString *cmd)
 @synthesize name;
 @synthesize command;
 @synthesize method;
-@synthesize arguments;
+@synthesize filename;
+@synthesize regexp;
+@synthesize plus_command;
 
 - (struct ex_address *)addr1
 {
@@ -512,7 +514,6 @@ ex_cmd_find(NSString *cmd)
 	addr->offset = 0;
 
 	[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
-
 	NSCharacterSet *signSet = [NSCharacterSet characterSetWithCharactersInString:@"+-^"];
 
 	if (![signSet characterIsMember:[[scan string] characterAtIndex:[scan scanLocation]]] &&
@@ -537,12 +538,7 @@ ex_cmd_find(NSString *cmd)
 	{
 		// FIXME: doesn't handle escaped '/'
 		[scan scanUpToString:@"/" intoString:&addr->addr.search.pattern];
-		if (![scan isAtEnd] &&
-		    [[scan string] characterAtIndex:[scan scanLocation]] == '/')
-		{
-			/* skip past the terminating '/' */
-			[scan setScanLocation:[scan scanLocation] + 1];
-		}
+		[scan scanString:@"/" intoString:nil];
 		addr->type = EX_ADDR_SEARCH;
 		addr->addr.search.backwards = NO;
 	}
@@ -550,12 +546,7 @@ ex_cmd_find(NSString *cmd)
 	{
 		// FIXME: doesn't handle escaped '?'
 		[scan scanUpToString:@"?" intoString:&addr->addr.search.pattern];
-		if (![scan isAtEnd] &&
-		    [[scan string] characterAtIndex:[scan scanLocation]] == '?')
-		{
-			/* skip past the terminating '?' */
-			[scan setScanLocation:[scan scanLocation] + 1];
-		}
+		[scan scanString:@"?" intoString:nil];
 		addr->addr.search.backwards = YES;
 		addr->type = EX_ADDR_SEARCH;
 	}
@@ -739,16 +730,14 @@ ex_cmd_find(NSString *cmd)
          * permits users to escape <newline> characters into command lines, we
          * have to check for that case.
          */
-	if (![scan isAtEnd] && [string characterAtIndex:[scan scanLocation]] == '"')
+	if ([scan scanString:@"\"" intoString:nil])
 	{
-		[scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
-			intoString:nil];
+		[scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:nil];
 		return [self parseString:[string substringFromIndex:[scan scanLocation]]];
 	}
 
         /* Skip whitespace. */
-	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]
-			intoString:nil];
+	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
 	if ([scan isAtEnd])
 		return NO;
@@ -761,8 +750,7 @@ ex_cmd_find(NSString *cmd)
 		return NO;
 
         /* Skip whitespace and colons. */
-	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]
-			intoString:nil];
+	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 	[scan scanCharactersFromSet:colonSet intoString:nil];
 
 
@@ -805,16 +793,82 @@ ex_cmd_find(NSString *cmd)
 	}
 	else
 	{
-		[scan scanCharactersFromSet:[NSCharacterSet letterCharacterSet]
-				 intoString:&name];
+		[scan scanCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:&name];
 	}
 
 	command = ex_cmd_find(name);
-
 	if (command == NULL)
-	{
 		return NO;
+
+	/*
+	 * There are three normal termination cases for an ex command.  They
+	 * are the end of the string (ecp->clen), or unescaped (by <literal
+	 * next> characters) <newline> or '|' characters.  As we're now past
+	 * possible addresses, we can determine how long the command is, so we
+	 * don't have to look for all the possible terminations.  Naturally,
+	 * there are some exciting special cases:
+	 *
+	 * 1: The bang, global, v and the filter versions of the read and
+	 *    write commands are delimited by <newline>s (they can contain
+	 *    shell pipes).
+	 * 2: The ex, edit, next and visual in vi mode commands all take ex
+	 *    commands as their first arguments.
+	 * 3: The s command takes an RE as its first argument, and wants it
+	 *    to be specially delimited.
+	 *
+	 * Historically, '|' characters in the first argument of the ex, edit,
+	 * next, vi visual, and s commands didn't delimit the command.  And,
+	 * in the filter cases for read and write, and the bang, global and v
+	 * commands, they did not delimit the command at all.
+	 *
+	 * For example, the following commands were legal:
+	 *
+	 *	:edit +25|s/abc/ABC/ file.c
+	 *	:s/|/PIPE/
+	 *	:read !spell % | columnate
+	 *	:global/pattern/p|l
+	 *
+	 * It's not quite as simple as it sounds, however.  The command:
+	 *
+	 *	:s/a/b/|s/c/d|set
+	 *
+	 * was also legal, i.e. the historic ex parser (using the word loosely,
+	 * since "parser" implies some regularity of syntax) delimited the RE's
+	 * based on its delimiter and not anything so irretrievably vulgar as a
+	 * command syntax.
+	 *
+	 * Anyhow, the following code makes this all work.  First, for the
+	 * special cases we move past their special argument(s).  Then, we
+	 * do normal command processing on whatever is left.  Barf-O-Rama.
+	 */
+	if ([command->name isEqualToString:@"edit"] ||
+	    [command->name isEqualToString:@"ex"] ||
+	    [command->name isEqualToString:@"next"] ||
+	    [command->name isEqualToString:@"vi"])
+	{
+		/*
+		 * Move to the next non-whitespace character.  A '!'
+		 * immediately following the command is eaten as a
+		 * force flag.
+		 */
+		if ([scan scanString:@"!" intoString:nil])
+			flags |= E_C_FORCE;
+		[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+
+		if ([scan scanString:@"+" intoString:nil])
+		{
+			// FIXME: doesn't handle escaped whitespace
+			[scan scanCharactersFromSet:[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet]
+					 intoString:&plus_command];
+		}
 	}
+	else if ([command->name isEqualToString:@"!"] ||
+		 [command->name isEqualToString:@"global"] ||
+		 [command->name isEqualToString:@"v"])
+	{
+		
+	}
+
 
 	/*
 	 * Set the default addresses.  It's an error to specify an address for
@@ -951,6 +1005,9 @@ end_case1:		break;
 		case 'c':				/* count [01+a] */
 			break;
 		case 'f':				/* file */
+			if (![scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
+						  intoString:&filename])
+				goto usage;
 			break;
 		case 'l':				/* line */
 			if (![ExCommand parseRange:scan intoAddress:&line])

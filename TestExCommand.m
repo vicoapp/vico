@@ -297,6 +297,7 @@
 	STAssertNotNil(ex, nil);
 	STAssertEqualObjects(ex.name, @"g", nil);
 	STAssertEqualObjects(ex.method, @"ex_global", nil);
+	STAssertEqualObjects(ex.regexp, @"pattern", nil);
 	STAssertEquals(ex.flags, (unsigned)E_C_PRINT, nil);
 }
 
@@ -338,6 +339,16 @@
 	STAssertEquals(ex.addr2->type, EX_ADDR_ABS, nil);
 	STAssertEquals(ex.line->type, EX_ADDR_CURRENT, nil);
 	STAssertEquals(ex.line->offset, -2, nil);
+}
+
+- (void)test70_EditCommandWithPlusCommand
+{
+	ExCommand *ex = [[ExCommand alloc] initWithString:@"edit +25|s/abc/ABC/ file.c"];
+	STAssertNotNil(ex, nil);
+	STAssertEqualObjects(ex.name, @"edit", nil);
+	STAssertEqualObjects(ex.method, @"ex_edit", nil);
+	STAssertEqualObjects(ex.plus_command, @"25|s/abc/ABC/", nil);
+	STAssertEqualObjects(ex.filename, @"file.c", nil);
 }
 
 @end

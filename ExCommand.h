@@ -84,7 +84,13 @@ struct ex_address
 	struct ex_address line;
 	unsigned flags;
 	NSString *name;
-	NSArray *arguments;
+
+	// arguments (depending on the command)
+	NSString *filename;
+	NSString *filter;
+	NSString *regexp;
+	NSString *replacement;
+	NSString *plus_command;
 }
 
 - (ExCommand *)initWithString:(NSString *)string;
@@ -102,6 +108,8 @@ struct ex_address
 @property(readonly) unsigned flags;
 @property(readonly) NSString *name;
 @property(readonly) NSString *method;
-@property(readonly) NSArray *arguments;
+@property(readonly) NSString *filename;
+@property(readonly) NSString *regexp;
+@property(readonly) NSString *plus_command;
 
 @end

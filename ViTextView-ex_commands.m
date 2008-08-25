@@ -28,11 +28,8 @@
 
 - (void)ex_edit:(ExCommand *)command
 {
-	NSString *file = nil;
-	if([command.arguments count] > 0)
-		file = [command.arguments objectAtIndex:0];
-	if(file)
-		[[self delegate] open:[NSURL fileURLWithPath:file]];
+	if(command.filename)
+		[[self delegate] open:[NSURL fileURLWithPath:command.filename]];
 	else
 		[[self delegate] open:nil];
 }

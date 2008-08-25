@@ -18,11 +18,12 @@
 	id delegate;
 	NSURL *fileURL;
 	BOOL textViewConfigured;
+	NSDate *last_mtime;
 }
 
 - (NSView *)view;
 - (void)setDelegate:(id)aDelegate;
-- (void)setFilename:(NSURL *)aURL;
+- (void)setFileURL:(NSURL *)aURL;
 - (NSURL *)fileURL;
 - (void)setString:(NSString *)aString;
 - (IBAction)finishedExCommand:(id)sender;
@@ -47,5 +48,9 @@
 - (void)selectNextTab;
 - (void)selectPreviousTab;
 - (void)selectTab:(int)tab;
+
+- (NSDate *)fileModificationDate;
+- (void)setFileModificationDate:(NSDate *)modificationDate;
+
 
 @end

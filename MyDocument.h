@@ -10,6 +10,9 @@
 	IBOutlet NSTabView *tabView;
 	NSString *readContent;
 	ViTagStack *tagStack;
+
+	NSURL *initialFileURL;
+	NSDate *initialFileModificationDate;
 }
 - (void)changeTheme:(ViTheme *)theme;
 - (void)setPageGuide:(int)pageGuideValue;

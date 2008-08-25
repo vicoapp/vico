@@ -37,12 +37,14 @@
 	[tabBar setCanCloseOnlyTab:YES];
 
 	// add the first editor view
+	NSLog(@"%s: adding the first tab", __func__);
 	[self newTab];
-	[self setFileURL:[self fileURL]];
+	[self setFileURL:initialFileURL];
+	initialFileURL = nil;
+	[self setFileModificationDate:initialFileModificationDate];
+	initialFileModificationDate = nil;
 
 	readContent = nil;
-
-	//[projectDrawer open];
 }
 
 - (ViEditController *)currentEditor
@@ -55,13 +57,9 @@
 	// Insert code here to write your document to data of the specified type. If
 	// the given outError != NULL, ensure that you set *outError when returning nil.
 
+	NSLog(@"file modification date = %@", [self fileModificationDate]);
+	NSLog(@"saving file [%@] in tab %@", [self fileURL], [tabView selectedTabViewItem]);
 	return [[self currentEditor] saveData];
-
-#if 0
-	if (outError != NULL)
-		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
-	return nil;
-#endif
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
@@ -119,33 +117,41 @@
 	[editor setDelegate:self];
 	
 	// create a new tab
-	NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:editor];
-	[item setView:[editor view]];
-	[tabView addTabViewItem:item];
-	[tabView selectTabViewItem:item];
+	NSTabViewItem *tab = [[NSTabViewItem alloc] initWithIdentifier:editor];
+	[tab setView:[editor view]];
+	[tabView addTabViewItem:tab];
+	[tabView selectTabViewItem:tab];
 }
 
 - (void)setFileURL:(NSURL *)aURL
 {
-	[super setFileURL:aURL];
+	NSLog(@"setting URL [%@] in tab %@", aURL, [tabView selectedTabViewItem]);
 	if (aURL)
 	{
-		[[self currentEditor] setFilename:aURL];
-		[[tabView selectedTabViewItem] setLabel:[[aURL path] lastPathComponent]];
+		if ([self currentEditor])
+			[[self currentEditor] setFileURL:aURL];
+		else
+			initialFileURL = aURL;
 	}
-	else
-		[[tabView selectedTabViewItem] setLabel:@"New file"];
+
+	[[tabView selectedTabViewItem] setLabel:[self displayName]];
 }
 
 - (NSURL *)fileURL
 {
-	NSURL *url = [[self currentEditor] fileURL];
-	if (url == nil)
-		url = [super fileURL];
-	return url;
+	if ([self currentEditor])
+	{
+		NSLog(@"%s: returning %@", __func__, [[self currentEditor] fileURL]);
+		return [[self currentEditor] fileURL];
+	}
+	else
+	{
+		NSLog(@"%s: returning %@", __func__, initialFileURL);
+		return initialFileURL;
+	}
 }
 
-- (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose  contextInfo:(void  *)contextInfo
+- (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose contextInfo:(void *)contextInfo
 {
 	if (shouldClose)
 	{
@@ -169,14 +175,15 @@
 
 - (NSString *)displayName
 {
-	return [[[self fileURL] path] lastPathComponent];
+	if ([self fileURL])
+		return [[[self fileURL] path] lastPathComponent];
+	return @"New file";
 }
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	NSLog(@"selected tab view item [%@]", tabViewItem);
+	NSLog(@"selected tab view item [%@], fileUrl = [%@]", tabViewItem, [self fileURL]);
 	[documentWindow setTitle:[self displayName]];
-	// [self setFileURL:[self fileURL]];
 	[self setUndoManager:[[self currentEditor] undoManager]];
 }
 
@@ -202,7 +209,7 @@
 			NSLog(@"  checking [%@]", [[editor fileURL] path]);
 			if ([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
-				[self selectTabViewItem:item];
+				[tabView selectTabViewItem:item];
 				return editor;
 			}
 		}
@@ -241,7 +248,7 @@
 	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
 	if (++ndx >= num)
 		ndx = 0;
-	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+	[tabView selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
 }
 
 - (void)selectPreviousTab
@@ -253,25 +260,44 @@
 	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
 	if (--ndx < 0)
 		ndx = num - 1;
-	[self selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+	[tabView selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
 }
 
 - (void)selectTab:(int)tab
 {
 	if (tab < [tabView numberOfTabViewItems])
-		[self selectTabViewItem:[tabView tabViewItemAtIndex:tab]];
+		[tabView selectTabViewItem:[tabView tabViewItemAtIndex:tab]];
 }
 
 
 - (void)selectTabViewItem:(NSTabViewItem *)anItem
 {
+	NSLog(@"%s: WHY?", __func__);
 	[tabView selectTabViewItem:anItem];
-	[self setFileURL:[[anItem identifier] fileURL]];
 }
 
 - (IBAction)toggleProjectDrawer:(id)sender
 {
 	[projectDrawer toggle:sender];
+}
+
+- (NSDate *)fileModificationDate
+{
+	return [[self currentEditor] fileModificationDate];
+}
+
+- (void)setFileModificationDate:(NSDate *)modificationDate
+{
+	if ([self currentEditor])
+		return [[self currentEditor] setFileModificationDate:modificationDate];
+	else
+		initialFileModificationDate = modificationDate;
+}
+
+- (NSString *)autosavingFileType
+{
+	/* disable autosaving */
+	return nil;
 }
 
 @end

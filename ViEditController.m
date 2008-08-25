@@ -41,7 +41,7 @@
 	[[[textView textStorage] mutableString] setString:aString];
 }
 
-- (void)setFilename:(NSURL *)aURL
+- (void)setFileURL:(NSURL *)aURL
 {
 	fileURL = aURL;
 	if(!textViewConfigured)
@@ -172,6 +172,16 @@
 - (void)selectTab:(int)tab
 {
 	[delegate selectTab:tab];
+}
+
+- (NSDate *)fileModificationDate
+{
+	return last_mtime;
+}
+
+- (void)setFileModificationDate:(NSDate *)modificationDate
+{
+	last_mtime = modificationDate;
 }
 
 @end

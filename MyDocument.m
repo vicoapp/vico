@@ -134,6 +134,8 @@
 			initialFileURL = aURL;
 	}
 
+	[super setFileURL:aURL];
+
 	[[tabView selectedTabViewItem] setLabel:[self displayName]];
 }
 
@@ -185,6 +187,7 @@
 	NSLog(@"selected tab view item [%@], fileUrl = [%@]", tabViewItem, [self fileURL]);
 	[documentWindow setTitle:[self displayName]];
 	[self setUndoManager:[[self currentEditor] undoManager]];
+	[super setFileURL:[self fileURL]];
 }
 
 - (BOOL)tabView:(NSTabView *)tabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem

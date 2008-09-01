@@ -28,10 +28,19 @@
 
 - (void)ex_edit:(ExCommand *)command
 {
-	if(command.filename)
-		[[self delegate] open:[NSURL fileURLWithPath:command.filename]];
+	if (command.filename == nil)
+	{
+		[[self delegate] openFileInTab:nil];
+	}
 	else
-		[[self delegate] open:nil];
+	{
+		NSString *path = command.filename;
+		if ([command.filename hasPrefix:@"~"])
+			path = [command.filename stringByExpandingTildeInPath];
+		else if (![command.filename hasPrefix:@"/"])
+			path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:command.filename];
+		[[self delegate] openFileInTab:path];
+	}
 }
 
 @end

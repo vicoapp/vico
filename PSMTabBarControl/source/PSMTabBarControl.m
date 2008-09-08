@@ -157,12 +157,6 @@
     return self;
 }
 
-- (void)finalize
-{
-	[self unregisterDraggedTypes];
-	[super finalize];
-}
-
 - (void)awakeFromNib
 {
     // build cells from existing tab view items

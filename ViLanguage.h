@@ -13,6 +13,7 @@
 - (NSString *)name;
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;
 - (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch;
 
 @end

@@ -1,6 +1,7 @@
 #import "ViAppController.h"
 #import "ViThemeStore.h"
 #import "MyDocument.h"
+#import "ViLanguageStore.h"
 
 @implementation ViAppController
 
@@ -15,20 +16,23 @@
 {
 	NSArray *themes = [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(compare:)];
 	NSString *theme;
-	for(theme in themes)
+	for (theme in themes)
 	{
 		NSMenuItem *item = [themeMenu addItemWithTitle:theme action:@selector(setTheme:) keyEquivalent:@""];
 		[item setTarget:self];
 	}
+
+	/* initialize languages */
+	[ViLanguageStore defaultStore];
 }
 
-- (void)setTheme:(id)sender
+- (IBAction)setTheme:(id)sender
 {
 	NSString *themeName = [sender title];
 	ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:themeName];
 	NSWindow *window;
 	NSArray *windows = [NSApp windows];
-	for(window in windows)
+	for (window in windows)
 	{
 		[[window delegate] changeTheme:theme];
 	}
@@ -42,22 +46,12 @@
 
 	NSWindow *window;
 	NSArray *windows = [NSApp windows];
-	for(window in windows)
+	for (window in windows)
 	{
 		[[window delegate] setPageGuide:page_guide_column];
 	}
 
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:page_guide_column] forKey:@"pageGuide"];
-}
-
-- (IBAction)closeCurrentTab:(id)sender
-{
-	[[[NSApp keyWindow] delegate] closeCurrentTab];
-}
-
-- (IBAction)toggleProjectDrawer:(id)sender
-{
-	[[[NSApp keyWindow] delegate] toggleProjectDrawer:sender];
 }
 
 @end

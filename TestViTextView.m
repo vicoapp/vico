@@ -162,4 +162,7 @@
 - (void)test181_DeleteToChar			{ TEST(@"abc def ghi", 0, @"df ", @"def ghi", 0); }
 - (void)test182_DeleteToCharAndRepeat		{ TEST(@"abc def ghi", 0, @"df .", @"ghi", 0); }
 
+- (void)test190_SubstLine			{ TEST(@"abc\ndef\nghi", 5, @"Sapa\x1b", @"abc\napa\nghi", 6); }
+- (void)test191_SubstLastLine			{ TEST(@"abc\ndef\nghi", 8, @"Sapa\x1b", @"abc\ndef\napa", 10); }
+
 @end

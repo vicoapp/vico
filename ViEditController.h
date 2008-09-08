@@ -23,6 +23,7 @@
 
 - (NSView *)view;
 - (void)setDelegate:(id)aDelegate;
+- (id)delegate;
 - (void)setFileURL:(NSURL *)aURL;
 - (NSURL *)fileURL;
 - (void)setString:(NSString *)aString;

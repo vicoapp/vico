@@ -64,6 +64,7 @@
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001A], // command-7
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
+			  @"show_scope:", [NSNumber numberWithUnsignedInteger: 0x00060023], // ctrl-shift-p
 			 nil];
 	
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
@@ -78,16 +79,24 @@
 	//[self setPageGuideValues];
 	[self disableWrapping];
 	[self setContinuousSpellCheckingEnabled:NO];
+
+	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
 - (void)configureForURL:(NSURL *)aURL
 {
-	if(aURL)
+	INFO(@"path = %@, length = %i", [aURL path], [storage length]);
+	if (aURL)
 	{
-		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&language];
-		[language patterns];
+		ViLanguage *newLanguage = nil;
+		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
+		[newLanguage patterns];
+		if (newLanguage != language)
+		{
+			language = newLanguage;
+			[self highlightEverything];
+		}
 	}
-	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
 - (BOOL)illegal:(ViCommand *)command
@@ -182,7 +191,7 @@
  */
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	NSLog(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
+	DEBUG(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
 	[self insertString:aString atLocation:aLocation];
 	final_location = aLocation;
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
@@ -355,11 +364,11 @@
 										    options:rx_options
 										     syntax:regexpSyntax
 									    escapeCharacter:OgreBackslashCharacter];
-			NSLog(@"compiled find regexp: [%@]", lastSearchRegexp);
+			INFO(@"compiled find regexp: [%@]", lastSearchRegexp);
 		}
 		@catch(NSException *exception)
 		{
-			NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
+			INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
 			[[self delegate] message:@"Invalid search pattern: %@", exception];
 			return NO;
 		}
@@ -369,7 +378,6 @@
 
 	if([foundMatches count] == 0)
 	{
-		NSLog(@"pattern not found");
 		[[self delegate] message:@"Pattern not found"];
 	}
 	else
@@ -469,17 +477,13 @@
 
 	if([theEvent type] == NSKeyUp)
 	{
-#if 0
-		unichar charcode = [[theEvent characters] characterAtIndex:0];
-		NSLog(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
+		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 		      [theEvent charactersIgnoringModifiers],
-		      charcode,
+		      [[theEvent characters] characterAtIndex:0],
 		      [theEvent modifierFlags]);
-#endif
 		return YES;
 	}
 
-	// NSLog(@"Letting super handle unknown performKeyEquivalent event, keycode = %04X", [theEvent keyCode]);
 	return [super performKeyEquivalent:theEvent];
 }
 
@@ -514,7 +518,6 @@
 {
 	if(command.text)
 	{
-		NSLog(@"replaying inserted text [%@] at %u", command.text, end_location);
 		[self insertString:command.text atLocation:end_location];
 		final_location = end_location + [command.text length];
 		[self recordInsertInRange:NSMakeRange(end_location, [command.text length])];
@@ -589,16 +592,18 @@
 
 		l1 = bol;
 		l2 = end;
-		NSLog(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
+#if 0
 		/* If a line mode range includes the last line, also include the newline before the first line.
 		 * This way delete doesn't leave an empty line.
 		 */
 		if(l2 == [storage length])
 		{
 			l1 = IMAX(0, l1 - 1);	// FIXME: what about using CRLF at end-of-lines?
-			NSLog(@"after including newline before first line: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+			DEBUG(@"after including newline before first line: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 		}
+#endif
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
@@ -629,26 +634,25 @@
 							 atCharacterIndex:aLocation
 						    longestEffectiveRange:NULL
 								  inRange:NSMakeRange(aLocation, 1)];
-	// NSLog(@"found scopes at location %u: [%@]", aLocation, scopes);
 
 	NSArray *allSmartTypingPairs = [[[ViLanguageStore defaultStore] allSmartTypingPairs] allKeys];
 
 	NSString *foundScopeSelector = nil;
 	NSString *scopeSelector;
 	u_int64_t highest_rank = 0;
-	for(scopeSelector in allSmartTypingPairs)
+	for (scopeSelector in allSmartTypingPairs)
 	{
 		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if(rank > highest_rank)
+		if (rank > highest_rank)
 		{
 			foundScopeSelector = scopeSelector;
 			highest_rank = rank;
 		}
 	}
 
-	if(foundScopeSelector)
+	if (foundScopeSelector)
 	{
-		NSLog(@"found smart typing pair scope selector [%@] at location %i", foundScopeSelector, aLocation);
+		DEBUG(@"found smart typing pair scope selector [%@] at location %i", foundScopeSelector, aLocation);
 		return [[[ViLanguageStore defaultStore] allSmartTypingPairs] objectForKey:foundScopeSelector];
 	}
 
@@ -938,24 +942,23 @@
 
 - (void)setTheme:(ViTheme *)aTheme
 {
-	NSLog(@"setting theme %@", [aTheme name]);
 	theme = aTheme;
 	[self setBackgroundColor:[theme backgroundColor]];
 	[self setDrawsBackground:YES];
 	[self setInsertionPointColor:[theme caretColor]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
-	NSFont *font = [NSFont userFixedPitchFontOfSize:12.0];
-	[self setFont:font];
 	[self setTabSize:8];
-	// [self setNeedsDisplay:YES];
+}
+
+- (NSFont *)font
+{
+	return [NSFont userFixedPitchFontOfSize:12.0];
 }
 
 - (void)setTabSize:(int)tabSize
 {
 	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
-
-	NSLog(@"setting tab size %i for font %@", tabSize, [self font]);
 
 	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
@@ -963,9 +966,8 @@
 	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 
 	// remove all previous tab stops
-	NSArray *array = [style tabStops];
 	NSTextTab *tabStop;
-	for(tabStop in array)
+	for (tabStop in [style tabStops])
 	{
 		[style removeTabStop:tabStop];
 	}
@@ -973,11 +975,8 @@
 	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
 	[style setDefaultTabInterval:tabSizeInPoints.width];
 
-	// NSLog(@"font = %@", [self font]);
-	attrs = [NSDictionary dictionaryWithObjectsAndKeys:style, NSParagraphStyleAttributeName,
-						           [self font], NSFontAttributeName, nil];
+	attrs = [NSDictionary dictionaryWithObject:style forKey:NSParagraphStyleAttributeName];
 	[self setTypingAttributes:attrs];
-
 	[storage addAttributes:attrs range:NSMakeRange(0, [[storage string] length])];
 }
 
@@ -1064,6 +1063,14 @@
 - (void)switch_tab:(NSString *)characters
 {
 	[[self delegate] selectTab:[characters characterAtIndex:0] - '1'];
+}
+
+- (void)show_scope:(NSString *)characters
+{
+	NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+							    atCharacterIndex:[self caret]
+							      effectiveRange:NULL];
+	[[self delegate] message:[scopes componentsJoinedByString:@" "]];
 }
 
 @end

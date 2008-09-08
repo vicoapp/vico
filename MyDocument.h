@@ -18,7 +18,7 @@
 - (void)setPageGuide:(int)pageGuideValue;
 - (ViEditController *)currentEditor;
 - (NSWindow *)window;
-- (void)closeCurrentTab;
+- (IBAction)closeCurrentTab:(id)sender;
 - (ViEditController *)openFileInTab:(NSString *)path;
 - (ViTagStack *)sharedTagStack;
 - (void)selectNextTab;

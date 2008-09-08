@@ -4,6 +4,7 @@
 #import "ViTheme.h"
 #import "ViLanguage.h"
 #import "ViTagsDatabase.h"
+#import "logging.h"
 
 #ifdef IMAX
 # undef IMAX
@@ -46,7 +47,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	CGFloat pageGuideX;
 
-	int indent;
 	unsigned regexps_tried;
 	unsigned regexps_overlapped;
 	unsigned regexps_matched;

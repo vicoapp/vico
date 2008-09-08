@@ -31,6 +31,11 @@
 	delegate = aDelegate;
 }
 
+- (id)delegate
+{
+	return delegate;
+}
+
 - (NSView *)view
 {
 	return view;
@@ -39,15 +44,16 @@
 - (void)setString:(NSString *)aString
 {
 	[[[textView textStorage] mutableString] setString:aString];
+	[textView setCaret:0];
 }
 
 - (void)setFileURL:(NSURL *)aURL
 {
-	fileURL = aURL;
-	if(!textViewConfigured)
+	if (aURL != fileURL)
 	{
+		INFO(@"changed from %@ to %@", [fileURL path], [aURL path]);
+		fileURL = aURL;
 		[textView configureForURL:aURL];
-		textViewConfigured = YES;
 	}
 }
 

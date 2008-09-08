@@ -1,5 +1,6 @@
 #import "ViLanguage.h"
 #import "ViLanguageStore.h"
+#import "logging.h"
 
 @implementation ViLanguage
 
@@ -147,8 +148,11 @@
 	return [language objectForKey:@"scopeName"];
 }
 
-- (NSArray *)expandPatterns:(NSArray *)patterns
+- (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage canCache:(BOOL *)canCache
 {
+	DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
+	*canCache = YES;
+
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
 	for(pattern in patterns)
@@ -168,7 +172,7 @@
 		{
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
-			//NSLog(@"including [%@] from repository of language %@", patternName, [self name]);
+			DEBUG(@"including [%@] from repository of language %@", patternName, [self name]);
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
 			if(includePattern)
 			{
@@ -176,7 +180,8 @@
 				{
 					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
-					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern]];
+					DEBUG(@"expanding pattern collection %@", patternName);
+					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern baseLanguage:baseLanguage]];
 				}
 				else
 				{
@@ -188,16 +193,23 @@
 			else
 				NSLog(@"***** pattern [%@] NOT FOUND in repository for language [%@] *****", patternName, [self name]);
 		}
-		else if([include isEqualToString:@"$base"] || [include isEqualToString:@"$self"])
+		else if([include isEqualToString:@"$base"])
 		{
-			// FIXME: $base vs. $self !?
 			// no endless loop because expandedPatternsForPattern caches the first recursion
+			DEBUG(@"including %@: baseLanguage.name = %@", include, [baseLanguage name]);
+			*canCache = NO;
+			[expandedPatterns addObjectsFromArray:[baseLanguage patterns]];
+		}
+		else if([include isEqualToString:@"$self"])
+		{
+			// no endless loop because expandedPatternsForPattern caches the first recursion
+			DEBUG(@"including %@: self.name = %@", include, [self name]);
 			[expandedPatterns addObjectsFromArray:[self patterns]];
 		}
 		else
 		{
 			// include an external language grammar
-			NSLog(@"including external language [%@]", include);
+			DEBUG(@"including external language [%@]", include);
 			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
 			if(externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
@@ -208,7 +220,7 @@
 	return expandedPatterns;
 }
 
-- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage
 {
 	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
 	if(expandedPatterns == nil)
@@ -217,14 +229,20 @@
 		if(lang == nil)
 			lang = self;
 
-		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"]];
-		if(expandedPatterns)
+		BOOL canCache = YES;
+		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"] baseLanguage:baseLanguage canCache:&canCache];
+		if(expandedPatterns && canCache)
 		{
 			// cache it
 			[pattern setObject:expandedPatterns forKey:@"expandedPatterns"];
 		}
 	}
 	return expandedPatterns;
+}
+
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern
+{
+	return [self expandedPatternsForPattern:pattern baseLanguage:self];
 }
 
 @end

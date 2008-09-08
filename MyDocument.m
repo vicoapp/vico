@@ -35,9 +35,14 @@
 	PSMTabBarControl *tabBar = [tabView delegate];
 	[tabBar setStyleNamed:@"Unified"];
 	[tabBar setCanCloseOnlyTab:YES];
+	[tabBar setAllowsDragBetweenWindows:YES];
 
+	// hook up add tab button
+	[tabBar setShowAddTabButton:YES];
+	[[tabBar addTabButton] setTarget:self];
+	[[tabBar addTabButton] setAction:@selector(addNewTab:)];
+	
 	// add the first editor view
-	NSLog(@"%s: adding the first tab", __func__);
 	[self newTab];
 	[self setFileURL:initialFileURL];
 	initialFileURL = nil;
@@ -57,8 +62,6 @@
 	// Insert code here to write your document to data of the specified type. If
 	// the given outError != NULL, ensure that you set *outError when returning nil.
 
-	NSLog(@"file modification date = %@", [self fileModificationDate]);
-	NSLog(@"saving file [%@] in tab %@", [self fileURL], [tabView selectedTabViewItem]);
 	return [[self currentEditor] saveData];
 }
 
@@ -84,7 +87,6 @@
 	NSTabViewItem *item;
 	for (item in [tabView tabViewItems])
 	{
-		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
 		[[item identifier] changeTheme:theme];
 	}
 }
@@ -95,7 +97,6 @@
 	NSTabViewItem *item;
 	for (item in [tabView tabViewItems])
 	{
-		NSLog(@"got tab view item [%@], identifier = [%@]", item, [item identifier]);
 		[[item identifier] setPageGuide:pageGuideValue];
 	}
 }
@@ -111,21 +112,8 @@
 	return documentWindow;
 }
 
-- (void)newTab
-{
-	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
-	[editor setDelegate:self];
-	
-	// create a new tab
-	NSTabViewItem *tab = [[NSTabViewItem alloc] initWithIdentifier:editor];
-	[tab setView:[editor view]];
-	[tabView addTabViewItem:tab];
-	[tabView selectTabViewItem:tab];
-}
-
 - (void)setFileURL:(NSURL *)aURL
 {
-	NSLog(@"setting URL [%@] in tab %@", aURL, [tabView selectedTabViewItem]);
 	if (aURL)
 	{
 		if ([self currentEditor])
@@ -135,7 +123,6 @@
 	}
 
 	[super setFileURL:aURL];
-
 	[[tabView selectedTabViewItem] setLabel:[self displayName]];
 }
 
@@ -143,36 +130,17 @@
 {
 	if ([self currentEditor])
 	{
-		NSLog(@"%s: returning %@", __func__, [[self currentEditor] fileURL]);
 		return [[self currentEditor] fileURL];
 	}
 	else
 	{
-		NSLog(@"%s: returning %@", __func__, initialFileURL);
 		return initialFileURL;
-	}
-}
-
-- (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose contextInfo:(void *)contextInfo
-{
-	if (shouldClose)
-	{
-		if ([tabView numberOfTabViewItems] <= 1)
-			[self close];
-		else
-			[tabView removeTabViewItem:[tabView selectedTabViewItem]];
 	}
 }
 
 - (void)canCloseDocumentWithDelegate:(id)delegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
 {
-	NSLog(@"canCloseDocumentWithDelegate?");
 	[super canCloseDocumentWithDelegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
-}
-
-- (void)closeCurrentTab
-{
-	[self canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldCloseTab:contextInfo:) contextInfo:nil];
 }
 
 - (NSString *)displayName
@@ -182,34 +150,17 @@
 	return @"New file";
 }
 
-- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-	NSLog(@"selected tab view item [%@], fileUrl = [%@]", tabViewItem, [self fileURL]);
-	[documentWindow setTitle:[self displayName]];
-	[self setUndoManager:[[self currentEditor] undoManager]];
-	[super setFileURL:[self fileURL]];
-}
-
-- (BOOL)tabView:(NSTabView *)tabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
-{
-	[self closeCurrentTab];
-	return NO;
-}
-
 - (ViEditController *)openFileInTab:(NSString *)path
 {
 	NSString *standardizedPath = [path stringByStandardizingPath];
 
 	if (path)
 	{
-		NSLog(@"looking for [%@] = [%@]", path, standardizedPath);
-		
 		/* first check if the file is already opened */
 		NSTabViewItem *item;
 		for (item in [tabView tabViewItems])
 		{
 			ViEditController *editor = [item identifier];
-			NSLog(@"  checking [%@]", [[editor fileURL] path]);
 			if ([standardizedPath isEqualToString:[[editor fileURL] path]])
 			{
 				[tabView selectTabViewItem:item];
@@ -242,6 +193,73 @@
 	return tagStack;
 }
 
+- (IBAction)toggleProjectDrawer:(id)sender
+{
+	[projectDrawer toggle:sender];
+}
+
+- (NSDate *)fileModificationDate
+{
+	return [[self currentEditor] fileModificationDate];
+}
+
+- (void)setFileModificationDate:(NSDate *)modificationDate
+{
+	if ([self currentEditor])
+		return [[self currentEditor] setFileModificationDate:modificationDate];
+	else
+		initialFileModificationDate = modificationDate;
+}
+
+- (NSString *)autosavingFileType
+{
+	/* disable autosaving */
+	return nil;
+}
+
+#pragma mark -
+#pragma mark TabView helper methods
+
+- (void)newTab
+{
+	ViEditController *editor = [[ViEditController alloc] initWithString:readContent];
+	[editor setDelegate:self];
+
+	// create a new tab
+	NSTabViewItem *tab = [[NSTabViewItem alloc] initWithIdentifier:editor];
+	[tab setView:[editor view]];
+	[tabView addTabViewItem:tab];
+	[tabView selectTabViewItem:tab];
+}
+
+- (void)addNewTab:(id)sender
+{
+	[self newTab];
+}
+
+- (void)document:(NSDocument *)doc shouldCloseTab:(BOOL)shouldClose contextInfo:(void *)contextInfo
+{
+	if (shouldClose)
+	{
+		if ([tabView numberOfTabViewItems] <= 1)
+			[self close];
+		else
+			[tabView removeTabViewItem:[tabView selectedTabViewItem]];
+	}
+}
+
+- (IBAction)closeCurrentTab:(id)sender
+{
+	INFO(@"closing current tab");
+	[self canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldCloseTab:contextInfo:) contextInfo:nil];
+}
+
+- (void)selectTab:(int)tab
+{
+	if (tab < [tabView numberOfTabViewItems])
+		[tabView selectTabViewItem:[[[tabView delegate] representedTabViewItems] objectAtIndex:tab]];
+}
+
 - (void)selectNextTab
 {
 	int num = [tabView numberOfTabViewItems];
@@ -266,41 +284,37 @@
 	[tabView selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
 }
 
-- (void)selectTab:(int)tab
+#pragma mark -
+#pragma mark TabView delegate methods
+
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	if (tab < [tabView numberOfTabViewItems])
-		[tabView selectTabViewItem:[tabView tabViewItemAtIndex:tab]];
+	[documentWindow setTitle:[self displayName]];
+	[self setUndoManager:[[self currentEditor] undoManager]];
+	[super setFileURL:[self fileURL]];
 }
 
-
-- (void)selectTabViewItem:(NSTabViewItem *)anItem
+- (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	NSLog(@"%s: WHY?", __func__);
-	[tabView selectTabViewItem:anItem];
+	[tabView selectTabViewItem:tabViewItem];
+	[self closeCurrentTab:self];
+	return NO;
 }
 
-- (IBAction)toggleProjectDrawer:(id)sender
+- (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)aTabView
 {
-	[projectDrawer toggle:sender];
-}
+	/* Go through all tabs and reset all edit controllers delegates to self.
+	 * Needed after a tab drag from another document window.
+	 */
 
-- (NSDate *)fileModificationDate
-{
-	return [[self currentEditor] fileModificationDate];
-}
-
-- (void)setFileModificationDate:(NSDate *)modificationDate
-{
-	if ([self currentEditor])
-		return [[self currentEditor] setFileModificationDate:modificationDate];
-	else
-		initialFileModificationDate = modificationDate;
-}
-
-- (NSString *)autosavingFileType
-{
-	/* disable autosaving */
-	return nil;
+	NSTabViewItem *item;
+	for (item in [aTabView tabViewItems])
+	{
+		id oldDelegate = [[item identifier] delegate];
+		INFO(@"old delegate for %@ = %@", [self displayName], oldDelegate);
+		INFO(@"new delegate for %@ = %@", [self displayName], self);
+		[[item identifier] setDelegate:self];
+	}
 }
 
 @end

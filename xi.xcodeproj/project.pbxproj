@@ -143,6 +143,7 @@
 		9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-scopeSelector.m"; sourceTree = "<group>"; };
 		9A8CC8D50D24EBA1001EE32A /* TestScopeSelectors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestScopeSelectors.h; sourceTree = "<group>"; };
 		9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
+		9AB514DA0E6E7BE100DA75F1 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
 		9AC16D940D93CD8F00AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EditorView.xib; sourceTree = "<group>"; };
 		9AC16D970D93CDF200AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MyDocument.xib; sourceTree = "<group>"; };
 		9AC16DA20D93D14A00AE45E0 /* ViEditController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViEditController.h; sourceTree = "<group>"; };
@@ -257,6 +258,7 @@
 			children = (
 				32DBCF750370BD2300C91783 /* vizard_Prefix.pch */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
+				9AB514DA0E6E7BE100DA75F1 /* logging.h */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";

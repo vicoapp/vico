@@ -121,6 +121,22 @@
 	 */
 	[undoManager beginUndoGrouping];
 	hasBeginUndoGroup = YES;
+
+	if (command.line_mode)
+	{
+		/* adjust the range to exclude the last newline */
+		NSUInteger bol;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:end_location];
+		if (end_location == bol)
+		{
+			INFO(@"adjusting last newline in line-mode change command");
+			end_location--;
+			affectedRange.length--;
+		}
+	}
+
+	INFO(@"range = %u.%u", affectedRange.location, affectedRange.length);
+	
 	if([self delete:command])
 	{
 		end_location = final_location;
@@ -141,6 +157,13 @@
 /* syntax: [buffer][count]s */
 - (BOOL)substitute:(ViCommand *)command
 {
+	/* The substitute command is implemented as delete + insert. This should be undone
+	 * as a single operation, so we begin an undo group here and end it when recording
+	 * the insert operation.
+	 */
+	[undoManager beginUndoGrouping];
+	hasBeginUndoGroup = YES;
+	
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	NSUInteger c = command.count;
@@ -200,7 +223,7 @@
 	
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
-	// NSLog(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
+	// INFO(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
 	
 	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[storage string] characterAtIndex:eol-1]])
 	{
@@ -521,7 +544,7 @@
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
-		// NSLog(@"from word char: %u -> %u", start_location, end_location);
+		// INFO(@"from word char: %u -> %u", start_location, end_location);
 	}
 	else if(![whitespace characterIsMember:ch])
 	{
@@ -555,7 +578,7 @@
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		if(end_location > eol && bol != eol)
 		{
-			// NSLog(@"adjusting location from %lu to %lu at EOL", end_location, eol);
+			// INFO(@"adjusting location from %lu to %lu at EOL", end_location, eol);
 			end_location = eol;
 		}
 	}
@@ -863,7 +886,6 @@
 	NSString *word = [self wordAtLocation:start_location];
 	if(word)
 	{
-		NSLog(@"jump_tag: got word [%@]", word);
 		NSArray *tag = [tags lookup:word];
 		if(tag)
 		{
@@ -871,14 +893,12 @@
 
 			NSString *file = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
-			NSLog(@"should jump to file [%@] and execute [%@]", file, ex_command);
 			ViEditController *editor = [[self delegate] openFileInTab:file];
 			
 			if(editor)
 			{
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				NSLog(@"searching for pattern [%@]", pattern);
 				[editor findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
 			}
 		}

@@ -5,8 +5,7 @@
 	IBOutlet NSMenu *themeMenu;
 }
 
-- (IBAction)closeCurrentTab:(id)sender;
+- (IBAction)setTheme:(id)sender;
 - (IBAction)setPageGuide:(id)sender;
-- (IBAction)toggleProjectDrawer:(id)sender;
 
 @end

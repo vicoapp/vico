@@ -182,7 +182,8 @@
 		}
 	}
 
-	[self newTab];
+	if ([self fileURL] || [[[self currentEditor] saveData] length] > 0)
+		[self newTab];
 
 	if (path)
 	{

@@ -1,5 +1,6 @@
 #import "MyDocument.h"
 #import "PSMTabBarControl/PSMTabBarControl.h"
+#import "ExTextView.h"
 
 @interface MyDocument (private)
 - (void)newTab;
@@ -54,7 +55,10 @@
 
 - (ViEditController *)currentEditor
 {
-	return [[tabView selectedTabViewItem] identifier];
+	id e = [[tabView selectedTabViewItem] identifier];
+	if ([e isKindOfClass:[ViEditController class]])
+		return e;
+	return nil;
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -105,6 +109,15 @@
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
 	return [[self currentEditor] undoManager];
+}
+
+- (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
+{
+	if ([anObject isKindOfClass:[NSTextField class]])
+	{
+		return [ExTextView defaultEditor];
+	}
+	return nil;
 }
 
 - (NSWindow *)window

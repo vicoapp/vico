@@ -43,14 +43,14 @@ static id defaultEditor = nil;
 	{
 		NSUInteger caret = [self selectedRange].location;
 		NSRange range;
-		NSString *word = [self filenameAtLocation:caret range:&range];
-		
-		if ([word length] == 0)
-			word = @"./";
+		NSString *filename = [self filenameAtLocation:caret range:&range];
+
+		if (![filename isAbsolutePath])
+			filename = [[[[NSFileManager defaultManager] currentDirectoryPath] stringByAbbreviatingWithTildeInPath] stringByAppendingPathComponent:filename];
 
 		NSArray *completions = nil;
 		NSString *completion = nil;
-		NSUInteger n = [word completePathIntoString:&completion caseSensitive:NO matchesIntoArray:&completions filterTypes:nil];
+		NSUInteger n = [filename completePathIntoString:&completion caseSensitive:NO matchesIntoArray:&completions filterTypes:nil];
 
 		if (completion)
 		{

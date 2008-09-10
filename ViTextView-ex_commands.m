@@ -30,8 +30,8 @@
 {
 	NSString *path = command.filename;
 	if (path == nil)
-		path = [@"~" stringByExpandingTildeInPath];
-	if (![[NSFileManager defaultManager] changeCurrentDirectoryPath:path])
+		path = @"~";
+	if (![[NSFileManager defaultManager] changeCurrentDirectoryPath:[path stringByExpandingTildeInPath]])
 	{
 		[[self delegate] message:@"Error: %@: Failed to change directory.", path];
 	}

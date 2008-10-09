@@ -1,7 +1,7 @@
 #import "ViAppController.h"
 #import "ViThemeStore.h"
-#import "MyDocument.h"
 #import "ViLanguageStore.h"
+#import "ViDocument.h"
 
 @implementation ViAppController
 
@@ -10,6 +10,13 @@
 	self = [super init];
 	[NSApp setDelegate:self];
 	return self;
+}
+
+// Application Delegate method
+// stops the application from creating an untitled document on load
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
+{
+	return YES;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
@@ -30,11 +37,11 @@
 {
 	NSString *themeName = [sender title];
 	ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:themeName];
-	NSWindow *window;
-	NSArray *windows = [NSApp windows];
-	for (window in windows)
+
+	ViDocument *doc;
+	for (doc in [[NSDocumentController sharedDocumentController] documents])
 	{
-		[[window delegate] changeTheme:theme];
+		[doc changeTheme:theme];
 	}
 
 	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
@@ -44,11 +51,10 @@
 {
 	int page_guide_column = [sender tag];
 
-	NSWindow *window;
-	NSArray *windows = [NSApp windows];
-	for (window in windows)
+	ViDocument *doc;
+	for (doc in [[NSDocumentController sharedDocumentController] documents])
 	{
-		[[window delegate] setPageGuide:page_guide_column];
+		[doc setPageGuide:page_guide_column];
 	}
 
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:page_guide_column] forKey:@"pageGuide"];

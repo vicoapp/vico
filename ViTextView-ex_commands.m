@@ -1,12 +1,12 @@
 #import "ViTextView.h"
-#import "ViEditController.h"
+#import "ViDocument.h"
 #import "ExCommand.h"
 
 @implementation ViTextView (ex_commands)
 
 - (void)ex_write:(ExCommand *)command
 {
-	[[self delegate] save];
+	[[self delegate] saveDocument:self];
 }
 
 - (void)ex_quit:(ExCommand *)command
@@ -41,7 +41,7 @@
 {
 	if (command.filename == nil)
 	{
-		[[self delegate] openFileInTab:nil];
+		[[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
 	}
 	else
 	{
@@ -50,7 +50,7 @@
 			path = [command.filename stringByExpandingTildeInPath];
 		else if (![command.filename hasPrefix:@"/"])
 			path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:command.filename];
-		[[self delegate] openFileInTab:path];
+		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path] display:YES];
 	}
 }
 

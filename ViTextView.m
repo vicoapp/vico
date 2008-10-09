@@ -1,7 +1,7 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
-#import "ViEditController.h"  // for declaration of the message: method
+#import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
 #import "ExCommand.h"
 

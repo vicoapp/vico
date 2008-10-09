@@ -1,5 +1,5 @@
 #import "ViTextView.h"
-#import "ViEditController.h"
+#import "ViDocument.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -878,28 +878,34 @@
 // syntax: ^]
 - (BOOL)jump_tag:(ViCommand *)command
 {
-	if(tags == nil || [tags databaseHasChanged])
-		tags = [[ViTagsDatabase alloc] initWithFile:@"tags" inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
-	if(tags == nil)
+	if (tags == nil || [tags databaseHasChanged])
+	{
+		tags = [[ViTagsDatabase alloc] initWithFile:@"tags"
+						inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+	}
+
+	if (tags == nil)
 		return YES;
 
 	NSString *word = [self wordAtLocation:start_location];
-	if(word)
+	if (word)
 	{
 		NSArray *tag = [tags lookup:word];
-		if(tag)
+		if (tag)
 		{
 			[[self delegate] pushLine:[self currentLine] column:[self currentColumn]];
 
 			NSString *file = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
-			ViEditController *editor = [[self delegate] openFileInTab:file];
+
+			ViDocument *document = [[NSDocumentController sharedDocumentController]
+				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
 			
-			if(editor)
+			if (document)
 			{
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				[editor findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
+				[document findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
 			}
 		}
 		else

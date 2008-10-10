@@ -81,7 +81,18 @@
 	if (aURL)
 	{
 		ViLanguage *newLanguage = nil;
-		bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
+
+		NSString *firstLine = nil;
+		NSUInteger eol;
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:0];
+		if (eol > 0)
+			firstLine = [[storage string] substringWithRange:NSMakeRange(0, eol)];
+
+		bundle = nil;
+		if ([firstLine length] > 0)
+			bundle = [[ViLanguageStore defaultStore] bundleForFirstLine:firstLine language:&newLanguage];
+		if (bundle == nil)
+			bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
 		[newLanguage patterns];
 		if (newLanguage != language)
 		{

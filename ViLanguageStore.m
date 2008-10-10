@@ -95,6 +95,32 @@ static ViLanguageStore *defaultStore = nil;
 	return defaultStore;
 }
 
+- (NSDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
+{
+	NSMutableDictionary *bundle;
+	for (bundle in bundles)
+	{
+		ViLanguage *language;
+		for (language in [bundle objectForKey:@"languages"])
+		{
+			NSString *firstLineMatch = [language firstLineMatch];
+			if (firstLineMatch == nil)
+				continue;
+
+			if ([firstLine rangeOfRegularExpressionString:firstLineMatch].location != NSNotFound)
+			{
+				NSLog(@"Using language %@ for first line [%@]", [language name], firstLine);
+				if (languagePtr)
+					*languagePtr = language;
+				NSLog(@"Using bundle %@", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
+				return bundle;
+			}
+		}
+	}
+	NSLog(@"No language matching first line [%@]", firstLine);
+	return nil;
+}
+
 - (NSDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];

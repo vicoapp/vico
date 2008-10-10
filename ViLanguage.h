@@ -10,6 +10,7 @@
 }
 - (id)initWithBundle:(NSString *)bundleName;
 - (NSArray *)fileTypes;
+- (NSString *)firstLineMatch;
 - (NSString *)name;
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;

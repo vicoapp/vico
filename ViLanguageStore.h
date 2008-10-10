@@ -9,6 +9,7 @@
 }
 + (ViLanguageStore *)defaultStore;
 - (NSDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
+- (NSDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
 - (NSMutableDictionary *)allSmartTypingPairs;
 

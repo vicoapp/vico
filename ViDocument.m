@@ -1,5 +1,4 @@
 #import "ViDocument.h"
-#import "ViDocumentManager.h"
 #import "ExTextView.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;

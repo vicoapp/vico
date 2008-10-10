@@ -143,6 +143,11 @@
 	return [language objectForKey:@"fileTypes"];
 }
 
+- (NSString *)firstLineMatch
+{
+	return [language objectForKey:@"firstLineMatch"];
+}
+
 - (NSString *)name
 {
 	return [language objectForKey:@"scopeName"];

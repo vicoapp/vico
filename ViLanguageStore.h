@@ -8,8 +8,8 @@
 	NSMutableDictionary *allSmartTypingPairs;
 }
 + (ViLanguageStore *)defaultStore;
-- (NSDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
-- (NSDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
+- (NSMutableDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
+- (NSMutableDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
 - (NSMutableDictionary *)allSmartTypingPairs;
 

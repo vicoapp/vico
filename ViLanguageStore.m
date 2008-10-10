@@ -95,7 +95,7 @@ static ViLanguageStore *defaultStore = nil;
 	return defaultStore;
 }
 
-- (NSDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
+- (NSMutableDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
 {
 	NSMutableDictionary *bundle;
 	for (bundle in bundles)
@@ -121,7 +121,7 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
-- (NSDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
+- (NSMutableDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
 	NSMutableDictionary *bundle;

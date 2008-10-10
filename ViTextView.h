@@ -39,7 +39,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	/* syntax highlighting */
 	ViTheme *theme;
-	NSDictionary *bundle;
+	NSMutableDictionary *bundle;
 	ViLanguage *language;
 
 	NSString *lastSearchPattern;
@@ -47,6 +47,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	CGFloat pageGuideX;
 
+	// statistics
 	unsigned regexps_tried;
 	unsigned regexps_overlapped;
 	unsigned regexps_matched;

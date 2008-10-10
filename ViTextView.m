@@ -161,25 +161,58 @@
 	return nil;
 }
 
+- (NSString *)lineForLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
+}
+
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
 	// NSLog(@"inserting newline at %u", aLocation);
 	[self insertString:@"\n" atLocation:aLocation];
 	insert_end_location++;
 
-	if(aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
+	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
 	{
+		NSUInteger checkLocation = aLocation;
 		NSString *leading_whitespace = nil;
-		if(indentForward)
+		if (indentForward)
+			checkLocation = aLocation - 1;
+
+		leading_whitespace = [self leadingWhitespaceForLineAtLocation:checkLocation];
+
+		// FIXME: should encapsulate this!
+		NSString *increaseIndentPattern = [bundle objectForKey:@"increaseIndentPattern"];
+		if (increaseIndentPattern == nil)
 		{
-			leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation - 1];
+			NSDictionary *prefs;
+			for (prefs in [bundle objectForKey:@"preferences"])
+			{
+				increaseIndentPattern = [[prefs objectForKey:@"settings"] objectForKey:@"increaseIndentPattern"];
+				if (increaseIndentPattern)
+				{
+					// cache it
+					[bundle setObject:increaseIndentPattern forKey:@"increaseIndentPattern"];
+					break;
+				}
+			}
 		}
-		else
+	
+		if (increaseIndentPattern)
 		{
-			leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
+			NSString *checkLine = [self lineForLocation:checkLocation];
+			INFO(@"checking line [%@] for indentation", checkLine);
+			INFO(@"increase pattern = [%@]", increaseIndentPattern);
+	
+			if ([checkLine rangeOfRegularExpressionString:increaseIndentPattern].location != NSNotFound)
+			{
+				leading_whitespace = [NSString stringWithFormat:@"%@	", leading_whitespace ?: @""];
+			}
 		}
 
-		if(leading_whitespace)
+		if (leading_whitespace)
 		{
 			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
 			insert_end_location += [leading_whitespace length];
@@ -733,7 +766,8 @@
 			else if([[pair objectAtIndex:0] isEqualToString:characters])
 			{
 				// don't use it if next character is alphanumeric
-				if(!(start_location >= [storage length] || [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
+				if (!(start_location >= [storage length] ||
+				    [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
 				{
 					foundSmartTypingPair = YES;
 					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
@@ -1052,23 +1086,6 @@
 
 	return nil;
 }
-
-#if 0
-- (void)next_tab:(NSString *)characters
-{
-	[[self delegate] selectNextTab];
-}
-
-- (void)prev_tab:(NSString *)characters
-{
-	[[self delegate] selectPreviousTab];
-}
-
-- (void)switch_tab:(NSString *)characters
-{
-	[[self delegate] selectTab:[characters characterAtIndex:0] - '1'];
-}
-#endif
 
 - (void)show_scope:(NSString *)characters
 {

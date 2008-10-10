@@ -18,11 +18,12 @@
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
 		9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
 		9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
-		9A668DEB0D1088F6003FABD9 /* Mac Classic.tmTheme in Resources */ = {isa = PBXBuildFile; fileRef = 9A668DEA0D1088F6003FABD9 /* Mac Classic.tmTheme */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
 		9A668E170D11174A003FABD9 /* ViLanguageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E160D11174A003FABD9 /* ViLanguageStore.m */; };
 		9A70D93D0E9E76D70013AA1D /* ViWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A70D93C0E9E76D70013AA1D /* ViWindowController.m */; };
+		9A70E9890E9F67B80013AA1D /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A70E9720E9F67B80013AA1D /* Themes */; };
+		9A70F2DA0E9F68100013AA1D /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A70E98D0E9F68100013AA1D /* Bundles */; };
 		9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A73E2800D8ECA4C00859053 /* ExCommand.m */; };
 		9A7AF1550D9982EB00F08222 /* PSMTabBarControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
 		9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */; };
@@ -119,7 +120,6 @@
 		9A1A13B70D044131009EABAC /* TestViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextView.m; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
-		9A668DEA0D1088F6003FABD9 /* Mac Classic.tmTheme */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Mac Classic.tmTheme"; sourceTree = "<group>"; };
 		9A668E0F0D1116FC003FABD9 /* ViTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTheme.h; sourceTree = "<group>"; };
 		9A668E100D1116FC003FABD9 /* ViTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTheme.m; sourceTree = "<group>"; };
 		9A668E120D11172C003FABD9 /* ViLanguage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLanguage.h; sourceTree = "<group>"; };
@@ -128,6 +128,8 @@
 		9A668E160D11174A003FABD9 /* ViLanguageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViLanguageStore.m; sourceTree = "<group>"; };
 		9A70D93B0E9E76D70013AA1D /* ViWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWindowController.h; sourceTree = "<group>"; };
 		9A70D93C0E9E76D70013AA1D /* ViWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWindowController.m; sourceTree = "<group>"; };
+		9A70E9720E9F67B80013AA1D /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = "<group>"; };
+		9A70E98D0E9F68100013AA1D /* Bundles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Bundles; sourceTree = "<group>"; };
 		9A73E27F0D8ECA4C00859053 /* ExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommand.h; sourceTree = "<group>"; };
 		9A73E2800D8ECA4C00859053 /* ExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommand.m; sourceTree = "<group>"; };
 		9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PSMTabBarControl.xcodeproj; path = PSMTabBarControl/PSMTabBarControl.xcodeproj; sourceTree = "<group>"; };
@@ -271,10 +273,11 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9A70E98D0E9F68100013AA1D /* Bundles */,
+				9A70E9720E9F67B80013AA1D /* Themes */,
 				9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */,
 				9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */,
 				9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */,
-				9A668DEA0D1088F6003FABD9 /* Mac Classic.tmTheme */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
@@ -448,10 +451,11 @@
 			files = (
 				8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */,
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
-				9A668DEB0D1088F6003FABD9 /* Mac Classic.tmTheme in Resources */,
 				9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */,
 				9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */,
 				9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */,
+				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
+				9A70F2DA0E9F68100013AA1D /* Bundles in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

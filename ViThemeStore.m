@@ -1,4 +1,5 @@
 #import "ViThemeStore.h"
+#import "logging.h"
 
 @implementation ViThemeStore
 
@@ -7,24 +8,24 @@
 	ViTheme *defaultTheme = nil;
 
 	NSString *themeName = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
-	if(themeName)
+	if (themeName)
 		defaultTheme = [self themeWithName:themeName];
 
-	if(defaultTheme == nil)
+	if (defaultTheme == nil)
 	{
 
 		defaultTheme = [self themeWithName:@"Mac Classic"];
-		if(defaultTheme == nil)
+		if (defaultTheme == nil)
 			defaultTheme = [[themes allValues] objectAtIndex:0];
 	}
-	//NSLog(@"theme = %@", defaultTheme);
+
 	return defaultTheme;
 }
 
 + (ViThemeStore *)defaultStore
 {
 	static ViThemeStore *defaultStore = nil;
-	if(defaultStore == nil)
+	if (defaultStore == nil)
 	{
 		defaultStore = [[ViThemeStore alloc] init];
 	}
@@ -39,14 +40,15 @@
 
 - (void)addThemesFromBundleDirectory:(NSString *)aPath
 {
+	INFO(@"checking directory %@", aPath);
 	BOOL isDirectory = NO;
-	if([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory)
+	if ([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory)
 	{
 		NSArray *themeFiles = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
 		NSString *themeFile;
-		for(themeFile in themeFiles)
+		for (themeFile in themeFiles)
 		{
-			if([themeFile hasSuffix:@".tmTheme"])
+			if ([themeFile hasSuffix:@".tmTheme"])
 				[self addThemeWithPath:[NSString stringWithFormat:@"%@/%@", aPath, themeFile]];
 		}
 	}
@@ -55,14 +57,17 @@
 - (id)init
 {
 	self = [super init];
-	if(self)
+	if (self)
 	{
 		themes = [[NSMutableDictionary alloc] init];
 
-		[self addThemesFromBundleDirectory:@"/Applications/TextMate.app/Contents/SharedSupport/Themes"];
+		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
+#if 0
 		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Prinstine Copy/Themes" stringByExpandingTildeInPath]];
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Pristine Copy/Themes" stringByExpandingTildeInPath]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
+#endif
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/Vizard/Themes" stringByExpandingTildeInPath]];
 	}
 	return self;
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if [[ -f "$TM_FILEPATH" ]]
+	then
+		first_line=$(head -n1 "$TM_FILEPATH")
+		if [[ ${first_line:0:6} == "bplist" ]]
+			then
+				plutil -convert xml1 -o /tmp/textmate_converted_plist.xml "$TM_FILEPATH"
+				cat /tmp/textmate_converted_plist.xml
+			else exit_show_tool_tip "File does not appear to be a binary property list."
+		fi
+	else exit_show_tool_tip "File must be saved before conversion."
+fi
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Convert Binary to XML</string>
+	<key>output</key>
+	<string>replaceDocument</string>
+	<key>scope</key>
+	<string>source.plist.binary</string>
+	<key>uuid</key>
+	<string>000A245B-4BDD-4544-8200-C5BE3EFEDC20</string>
+</dict>
+</plist>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string># Xcode 2.1 supports preprocessed plist files
+# CPP's authors couldn't be bothered to support stdin
+TEMP_FILE1=`mktemp /tmp/TextMate_plist.XXXXXX`
+TEMP_FILE2=`mktemp /tmp/TextMate_plist_pre.XXXXXX`
+if [[ -n $TEMP_FILE1 ]]; then
+	cat &gt; "$TEMP_FILE1"
+	cpp -P "$TEMP_FILE1" "$TEMP_FILE2"
+	plutil -lint "$TEMP_FILE2"
+	rm "$TEMP_FILE1"
+	rm "$TEMP_FILE2"
+else
+	echo "Error: Temporary file could not be created"
+fi</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^V</string>
+	<key>name</key>
+	<string>Preprocess and Validate Syntax</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.plist -source.plist.binary</string>
+	<key>uuid</key>
+	<string>A7240D98-3452-42FC-A3D8-960F1E992AD2</string>
+</dict>
+</plist>

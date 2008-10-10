@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require ENV["TM_SUPPORT_PATH"] + "/lib/exit_codes.rb"
+require ENV["TM_SUPPORT_PATH"] + "/lib/ui.rb"
+require ENV["TM_BUNDLE_SUPPORT"] + "/lib/LaTeXUtils.rb"
+phrase = STDIN.read.chomp
+include LaTeX
+begin
+	items = LaTeX.get_citations.map{|i| i.citekey + "   % "+i.description}
+  items = items.grep(/#{phrase}/) if phrase != ""
+  TextMate.exit_discard if items.empty?
+  if items.length &gt; 1
+  	choice = TextMate::UI.menu(items)
+  	TextMate.exit_discard if choice.nil?
+  	choice = items[choice]
+  else
+    choice = items[0]
+  end
+  selection = choice.slice(/^[^%]+/).strip
+  if ENV['TM_SCOPE'].match(/citation/) then
+    print selection
+  else
+    TextMate.exit_insert_snippet("\\\\${1:cite}\{#{selection}\}")
+  end
+rescue RuntimeError =&gt; e
+  TextMate.exit_show_tool_tip(e.message)
+end
+</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>~</string>
+	<key>name</key>
+	<string>Citation Based on Current Word / Selection…</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>text.tex.latex, meta.citation.latex</string>
+	<key>uuid</key>
+	<string>65E2109C-4309-4079-BD25-17D8B31F03CD</string>
+</dict>
+</plist>

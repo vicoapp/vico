@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>[self lockFocus];
+$0
+[self unlockFocus];</string>
+	<key>name</key>
+	<string>Lock Focus</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>focus</string>
+	<key>uuid</key>
+	<string>3F57DB1B-9373-46A6-9B6E-19F2D25658DE</string>
+</dict>
+</plist>

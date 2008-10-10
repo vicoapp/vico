@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby -wKU
+#
+#  Possible improvements:
+#   • Show helpful tool tip if we do not extract any methods from the clipboard
+#   • Insert return-statement in methods that have non-void/IBAction return type
+#   • Preserve empty lines between methods taken from the clipboard
+#   • Make the “parser” conform to the actual Objective-C spec
+#   • Avoid printing extra empty line after last method
+#
+
+methods = []
+
+%x{ pbpaste }.scan(/^
+
+  ([-+])                    # Class or object method
+  (\s* \( [^\)]+ \))?       # Optional return type
+  (\s* [a-z0-9_]+)          # Method name
+
+  # Zero or more parameters:
+
+  ( (\s* [a-z0-9_]*)        # Optional name of parameter
+    :                       # Mandatory colon
+    (\s* \( [^\)]+ \))?     # Optional type of parameter
+    (\s* [a-z0-9_]+)        # Parameter name (might be optional)
+    (\s* , \s* ...)?        # Optional var-args notation
+  )*
+
+  (?=\s* ;?)                # Optional semicolon
+
+/ix) { methods &lt;&lt; $&amp;.strip }
+
+if ENV['TM_SCOPE'] =~ /meta.scope.interface.objc/
+  methods.each { |e| puts "#{e};" }
+else
+  methods.each { |e| puts "#{e}\n{\n}\n\n" }
+end
+</string>
+	<key>fallbackInput</key>
+	<string>line</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^V</string>
+	<key>name</key>
+	<string>Paste Implementation / Interface</string>
+	<key>output</key>
+	<string>afterSelectedText</string>
+	<key>scope</key>
+	<string>meta.scope.implementation.objc, meta.scope.interface.objc</string>
+	<key>uuid</key>
+	<string>CB5EC7EC-35B7-4FD8-9045-31CCC379D474</string>
+</dict>
+</plist>

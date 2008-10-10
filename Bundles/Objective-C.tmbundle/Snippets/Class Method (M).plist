@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>+ (${1:id})${2:method}${3::(${4:id})${5:${4/(NS([AEIOQUY])?(\w+).*)|(.)?.*/(?1:a(?2:n$2)$3:(?4:anArgument))/}}}
+{$0${1/^(void|IBAction)$|(.*)/(?2:
+	return nil;)/}
+}</string>
+	<key>name</key>
+	<string>Class Method</string>
+	<key>scope</key>
+	<string>(source.objc | source.objc++) &amp; meta.scope.implementation.objc - meta.function-with-body</string>
+	<key>tabTrigger</key>
+	<string>M</string>
+	<key>uuid</key>
+	<string>1251B9E2-6BF0-11D9-8384-000D93589AF6</string>
+</dict>
+</plist>

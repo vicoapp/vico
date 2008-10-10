@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>commands</key>
+	<array>
+		<dict>
+			<key>command</key>
+			<string>moveRight:</string>
+		</dict>
+		<dict>
+			<key>command</key>
+			<string>moveRight:</string>
+		</dict>
+	</array>
+	<key>keyEquivalent</key>
+	<string>)</string>
+	<key>name</key>
+	<string>Inside Inheritance List: Overtype Closing ):</string>
+	<key>scope</key>
+	<string>source.python meta.class.python punctuation.definition.inheritance.end.python</string>
+	<key>uuid</key>
+	<string>6CBFE583-039F-4C91-B532-FF1148DC1A6E</string>
+</dict>
+</plist>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>- (void)add${1:Thing}:(${2:id})${3:a$1}
+{
+	[${4:array} addObject:$3];
+}
+
+- (void)insert$1:($2)$3 atIndex:(unsigned int)i 
+{
+	[$4 insertObject:$3 atIndex:i];
+}
+
+- ($2)${1/./\l$0/}AtIndex:(unsigned int)i
+{
+	return [$4 objectAtIndex:i];
+}
+
+- (unsigned int)indexOf$1:($2)$3
+{
+	return [$4 indexOfObject:$3];
+}
+
+- (void)remove$1AtIndex:(unsigned int)i
+{
+	[$4 removeObjectAtIndex:i];
+}
+
+- (void)remove$1:($2)$3
+{
+	[$4 removeObject:$3];
+}
+
+- (unsigned int)countOf$1s
+{
+	return [$4 count];
+}
+
+- (NSArray *)${1/./\l$0/}s
+{
+	return $4;
+}
+
+- (void)set$1s:(NSArray *)new$1s
+{
+	[$4 setArray:new$1s];
+}</string>
+	<key>name</key>
+	<string>KVC Array</string>
+	<key>scope</key>
+	<string>(source.objc | source.objc++) &amp; meta.scope.implementation.objc - meta.function-with-body</string>
+	<key>tabTrigger</key>
+	<string>arracc</string>
+	<key>uuid</key>
+	<string>DECC6BAC-94AF-429A-8609-D101C940D18D</string>
+</dict>
+</plist>

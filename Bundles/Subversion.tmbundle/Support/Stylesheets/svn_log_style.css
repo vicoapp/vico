@@ -1,0 +1,92 @@
+/* helps with the implementation of the changed
+   files list.. */
+.hidden {
+   display: none;
+}
+
+
+table.log {
+   font-size: inherit;
+   width: 100%;
+   margin-bottom: 5px;
+}
+
+
+table.log th {
+   text-align: right;
+   padding-left: 5px;
+   vertical-align: top;
+   white-space: nowrap;
+}
+
+table.log td {
+   vertical-align: top;
+   width: 100%;
+}
+
+
+td.msg_field {
+   font-family: "Bitstream Vera Sans Mono", monospace;
+   font-size: 12px;
+}
+
+
+table.log td ul {
+   list-style-type: none;
+   padding-left: 4px;
+}
+
+/* this the list of changed files: */
+table.log td ul li {
+   font-size: 12px;
+   margin-bottom: 2px;
+   padding: 1px;
+}
+
+
+li.added:before, li.modified:before, li.deleted:before, li.replaced:before {
+   font-family: "Bitstream Vera Sans Mono", monospace;
+   font-weight: bold;
+}
+
+li.added:before {
+   content: 'A ';
+   color: green;
+}
+li.added {
+   background-color: #bbffb3;
+}
+
+li.deleted:before {
+   content: 'D ';
+   color: red;
+}
+li.deleted {
+   background-color: #f59696;
+}
+
+li.modified:before {
+   content: 'M ';
+   color: #eb6400;
+}
+li.modified {
+   background-color: #f7e1ad;
+}
+li.replaced:before {
+   content: 'R ';
+   color: red;
+}
+li.replaced {
+   background-color: #f59696;
+}
+
+div.bad_line {
+   font-family: "Bitstream Vera Sans Mono", monospace;
+   font-size: 11px;
+   color: #eb6400;
+   background-color: #F7F4CE;
+   border-left: 4px solid #E5A33F;
+   padding: 2px;
+   padding-left: 4px;
+   margin-top: 1px;
+}

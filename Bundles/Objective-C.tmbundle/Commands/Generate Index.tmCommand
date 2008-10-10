@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>4679484F-6227-11D9-BFB1-000D93589AF6</string>
+	<key>command</key>
+	<string>if [[ -d "$TM_PROJECT_DIRECTORY" ]]; then
+    find -E "$TM_PROJECT_DIRECTORY" -regex '.*/(_darcs|CVS|\..*)' -prune -or -name '*.h' -print0 | ruby "$TM_BUNDLE_SUPPORT/generateMethodList.rb" -c "$TM_PROJECT_DIRECTORY/.classes.TM_Completions.txt" -m "$TM_PROJECT_DIRECTORY/.methods.TM_Completions.txt" -w "$TM_BUNDLE_SUPPORT/CocoaClassesWithFramework.txt.gz";
+  gzip -f "$TM_PROJECT_DIRECTORY/.methods.TM_Completions.txt";
+  gzip -f "$TM_PROJECT_DIRECTORY/.classes.TM_Completions.txt";
+    echo "indexing complete";
+  else
+    echo "no Project Path found";
+fi</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>Index Headers for Completion</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>uuid</key>
+	<string>42B1691B-DC28-4743-9B18-C8D51B70722C</string>
+</dict>
+</plist>

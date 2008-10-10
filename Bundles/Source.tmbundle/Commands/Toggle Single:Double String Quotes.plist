@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+print case str = STDIN.read
+  when /\A"(.*)"\z/m; "'" + $1 + "'"
+  when /\A'(.*)'\z/m; '"' + $1 + '"'
+  else str
+end
+</string>
+	<key>fallbackInput</key>
+	<string>scope</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^"</string>
+	<key>name</key>
+	<string>Toggle Single / Double String Quotes</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>string.quoted.single, string.quoted.double</string>
+	<key>uuid</key>
+	<string>70A0BC8E-98E0-4D14-B004-7ACA9162B496</string>
+</dict>
+</plist>

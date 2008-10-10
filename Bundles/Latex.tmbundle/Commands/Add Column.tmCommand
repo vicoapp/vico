@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require 'pp'
+require ENV["TM_SUPPORT_PATH"] + "/lib/escape.rb"
+data=STDIN.readlines
+l,c = ENV['TM_LINE_NUMBER'].to_i-ENV['TM_INPUT_START_LINE'].to_i, ENV['TM_LINE_INDEX'].to_i
+# pp [l,c]
+col_no = data[l].slice(/^.{#{c}}/).scan("&amp;").length
+if col_no == 0 then
+  data.each do |line|
+    if line =~ /&amp;/ then
+      print " &amp; " + line
+    else
+      print line
+    end
+  end
+else
+  data.each do |line|
+    if line =~ /^(?:[^&amp;]*&amp;){#{col_no}}/ then
+      print $&amp; + " &amp;" + $'
+    else
+      print line
+    end
+  end
+end</string>
+	<key>fallbackInput</key>
+	<string>scope</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^~</string>
+	<key>name</key>
+	<string>Add Column</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>text.tex.latex  meta.data.environment.tabular.latex</string>
+	<key>uuid</key>
+	<string>E70BB4A8-2654-4ED3-A187-9BFD024870E7</string>
+</dict>
+</plist>

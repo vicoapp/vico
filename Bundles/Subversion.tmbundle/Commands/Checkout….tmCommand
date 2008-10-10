@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+# Setup Dialog asking for host
+url=$(CocoaDialog inputbox --float \
+    --title "Subversion Checkout" \
+    --informative-text "URL:" \
+    --text "svn+ssh://" \
+    --button1 "Checkout" \
+    --button2 "Cancel")
+
+# If user canceled exit.
+[[ "${url:0:1}" == "2" ]] &amp;&amp; exit_discard
+
+# skip the return code so we are left with just the url
+url="${url:2}"
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+
+# Setup Dialog asking where to save
+location=$(CocoaDialog filesave --float \
+    --text "Checking out $url" \
+    --with-file "$(basename "$url")" )
+
+# If user canceled exit.
+[[ -z "$location" ]] &amp;&amp; exit_discard
+
+# format the checkout output
+export WorkPath="$location" # format_status will show paths as relative to this value
+"$TM_SVN" checkout "$url" "$location" 2&gt;&amp;1 |"${TM_RUBY:-ruby}" -KU -- "${TM_BUNDLE_SUPPORT}/format_status.rb" --checkout
+
+open -b com.macromates.textmate "$location"
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string> Check Out…</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>uuid</key>
+	<string>03E4CAA8-0F74-4394-8709-4EF0E22F908B</string>
+</dict>
+</plist>

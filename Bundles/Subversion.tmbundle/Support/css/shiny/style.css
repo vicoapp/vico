@@ -1,0 +1,142 @@
+/* ===================== */
+/* = Subversion Styles = */
+/* ===================== */
+
+.shiny div.subversion {
+	color: #FFF;
+}
+
+/* INFO */
+
+.shiny div.subversion dl.info.alternate dt {
+   border-top: 1px dashed #444;
+}
+
+/* BLAME */
+
+/* some adds for the links in the table (clickable lines)..*/
+.shiny div.subversion table.blame a:hover, div.subversion table.blame a:active {
+/*   background-color: #2F3845;*/
+   color: inherit;
+   text-decoration: none;
+}
+
+
+/* formating the table.. */
+.shiny div.subversion table.blame {
+	background-color: #111;
+	border: 1px solid #555;
+}
+
+.shiny div.subversion table.blame th {
+   text-align: left;
+   background-color: #333;
+   border-bottom: 1px solid #555;
+   padding: 3px;
+   padding-bottom: 1px;
+   padding-top: 1px;
+   color: #AAA;
+}
+
+/* i have to format just these 2, because i just want
+   borders beween the headers and not at their sides.. */
+.shiny div.subversion table.blame th.revhead {
+   border-left: 1px solid #444;
+   border-right: 1px solid #444;
+}
+
+.shiny div.subversion table.blame th.codehead {
+   border-left: 1px solid #444;
+}
+
+/* to make it look good if a line gets wrapped: */
+/* about the several column classes.. */
+.shiny div.subversion table.blame td.linecol {
+   background-color: #333;
+   border-right: 1px solid #666;
+   color: #888;
+   text-align: right;
+}
+
+.shiny div.subversion table.blame td.revcol, .shiny div.subversion table.blame td.namecol {
+   text-align: right;
+   background-color: #111;
+   color: #888;
+   border-right: 1px solid #333;
+   padding-right: 2px;
+   padding-left: 2px;
+}
+
+.shiny div.subversion table.blame td.namecol {
+   border-right: 1px solid #444;
+}
+
+.shiny div.subversion table.blame td.alternate {
+	background-color: #1D1D1D;
+}
+
+/* maybe this should be implemented as id but its
+   an optimisation for less ruby code. :) */
+.shiny div.subversion table.blame td.current_line {
+   background-color: #210020;
+	border-width: 1px 0 1px 0;
+	border-style: solid;
+	border-color: #AAA;
+}
+
+/* Status */
+
+.shiny table.status {
+	border-color: #222;
+}
+
+.shiny table.status th {
+	background-color: #111;
+	border: 1px solid #222;
+	color: #FFF;
+	font-weight: normal;
+}
+
+.shiny table.status tr.alternate {
+	background-color: #0F0F0F;
+	
+}
+
+.shiny #commandOutput {
+	border: 1px solid #555;
+	background-color: #222;
+}
+
+
+/* A */
+.shiny table.status td.added {
+	color:      #bbffb3;
+	background: green;
+}
+/* M */
+.shiny table.status td.modified,
+.shiny table.status td.updated,
+.shiny table.status td.merged {
+	color:      #f7e1ad;
+	background: #eb6400;
+}
+/* D */
+.shiny table.status td.deleted,
+.shiny table.status td.replaced {
+	color:      #f59696;
+	background: red;
+}
+/* C, !, " */
+.shiny table.status td.conflict,
+.shiny table.status td.missing,
+.shiny table.status td.typeconflict {
+	color:      #A3CED0;
+	background: teal;
+}
+/* ?, I, X */
+.shiny table.status td.unknown,
+.shiny table.status td.ignored,
+.shiny table.status td.external {
+	color:      #edaef5;
+	background: purple;
+}

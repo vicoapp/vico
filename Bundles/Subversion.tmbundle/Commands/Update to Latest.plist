@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>saveModifiedFiles</string>
+	<key>command</key>
+	<string>require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+"${TM_RUBY:-ruby}" -r "$TM_SUPPORT_PATH/lib/shelltokenize.rb" &lt;&lt;END
+	svn = ENV['TM_SVN'] || "svn"
+	ruby = ENV['TM_RUBY'] || "ruby"
+	support = ENV['TM_BUNDLE_SUPPORT']
+	paths = TextMate.selected_paths_array
+	
+	# TODO: Ideally, we'd like to use a tooltip for one and not others, but we can't switch from a tooltip
+	# to dynamic HTML output (or maybe we could double-fork a process?)
+	# if ((paths.size == 1) and not (File.directory? paths[0]))
+	#	puts %x{#{svn} update #{TextMate.selected_paths_for_shell}}
+	# else
+		update = IO.popen("'#{svn}' update #{TextMate.selected_paths_for_shell}", 'r')
+		format = IO.popen("'#{ruby}' -- '#{support}/format_status.rb'", 'w')
+		update.each_line { |line| format.puts(line) }
+	# end	
+END
+
+# force TM to refresh the current file..
+rescan_project
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string>Update to Newest (HEAD)</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>uuid</key>
+	<string>175D3D76-74CE-11D9-813D-000A95A89C98</string>
+</dict>
+</plist>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Typing Pairs: Protocol Specifier</string>
+	<key>scope</key>
+	<string>(meta.interface-or-protocol.objc | meta.return-type.objc | meta.argument-type.objc) - meta.protocol-list.objc</string>
+	<key>settings</key>
+	<dict>
+		<key>smartTypingPairs</key>
+		<array>
+			<array>
+				<string>&lt;</string>
+				<string>&gt;</string>
+			</array>
+			<array>
+				<string>(</string>
+				<string>)</string>
+			</array>
+		</array>
+	</dict>
+	<key>uuid</key>
+	<string>C41409C1-97FD-4326-A8E9-7BF89ED6BEAF</string>
+</dict>
+</plist>

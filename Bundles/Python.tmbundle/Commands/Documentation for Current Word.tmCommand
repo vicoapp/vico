@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string># set up TM_FIRST_LINE containing the first line of the script.
+read first_line
+0&lt;&amp;- # close STDIN
+export TM_FIRST_LINE="$first_line"
+
+export PYTHONPATH="$TM_BUNDLE_SUPPORT/DocMate"
+export PYTHONPATH="$TM_SUPPORT_PATH/lib:$PYTHONPATH"
+
+/usr/bin/env python -S - &lt;&lt;PYTHON
+# coding: UTF-8
+import sys
+from sys import exit
+
+import tm_helpers
+import webpreview
+import docmate
+import dialog
+
+docmate.launch_pydoc_server()
+
+# get current dotted word from the env
+word = tm_helpers.current_word(r"[A-Za-z0-9_\.]*")
+
+if not word:
+    print "&lt;meta http-equiv='Refresh' content='0;URL=%s'&gt;" % docmate.pydoc_url()[0]
+else:
+    library_docs = docmate.library_docs(word)
+    local_docs = docmate.local_docs(word)
+    if library_docs:
+        print webpreview.html_header("DocMate", "Python")
+        print "&lt;h3&gt;Python Library Documentation&lt;/h3&gt;\n"
+        print "&lt;ol style='list-style-type: lower-alpha;'&gt;\n"
+        for n, opt in enumerate(library_docs):
+            desc, url = opt
+            accesskey = chr(ord("a") + n)
+            print '\t&lt;li&gt;&lt;a href="%s" accesskey="%s"&gt;%s&lt;/a&gt;&lt;/li&gt;\n' % (url, accesskey, desc)
+        print "&lt;/ol&gt;\n"
+    if local_docs and library_docs:
+        print "&lt;h3&gt;Pydoc Documentation&lt;/h3&gt;"
+        print "&lt;ol style='list-style-type: decimal;'&gt;\n"
+        for n, opt in enumerate(local_docs):
+            desc, url = opt
+            accesskey = chr(ord("1") + n)
+            print '\t&lt;li&gt;&lt;a href="%s" accesskey="%s"&gt;%s&lt;/a&gt;&lt;/li&gt;\n' % (url, accesskey, desc)
+        print "&lt;/ol&gt;\n"
+        print webpreview.html_footer()
+    elif local_docs and not library_docs:
+        print "&lt;meta http-equiv='Refresh' content='0;URL=%s'&gt;" % local_docs[0][1]
+    else:
+        print "&lt;meta http-equiv='Refresh' content='0;URL=%s'&gt;" % docmate.pydoc_url()[0]
+PYTHON
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Current Word</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.python</string>
+	<key>uuid</key>
+	<string>443BBF21-6124-4486-BFCA-D18606465885</string>
+</dict>
+</plist>

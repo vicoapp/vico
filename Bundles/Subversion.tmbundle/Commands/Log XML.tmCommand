@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+: ${TM_RUBY:=ruby}
+: ${TM_SVN_LOG_RANGE:=HEAD:1}
+: ${TM_SVN_LOG_LIMIT:=15}
+FORMAT_LOG="${TM_BUNDLE_SUPPORT}/format_log_xml.rb"
+
+if [[ $TM_SVN_LOG_LIMIT -eq 0 ]]; then
+	LIMIT=""
+else
+	LIMIT="--limit $TM_SVN_LOG_LIMIT"
+fi
+
+if [[ -z $TM_SELECTED_FILES ]]; then
+   "$TM_SVN" log --xml $LIMIT -vr "$TM_SVN_LOG_RANGE" \
+   "$TM_FILEPATH" 2&gt;&amp;1 | "$TM_RUBY" -- "$FORMAT_LOG"
+else
+   eval "$TM_SVN" log --xml $LIMIT -vr "$TM_SVN_LOG_RANGE" \
+   "$TM_SELECTED_FILES" 2&gt;&amp;1 | "$TM_RUBY" -- "$FORMAT_LOG"
+fi</string>
+	<key>dontFollowNewOutput</key>
+	<true/>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string>Log</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>uuid</key>
+	<string>55048B05-38AA-4B6C-A83C-7F6190F53B6C</string>
+</dict>
+</plist>

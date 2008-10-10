@@ -1,0 +1,44 @@
+<%= require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview.rb' 
+		html_header("Log", "Subversion", <<-HTML)
+		<style type="text/css">
+			@import 'file://#{$bundle}/Stylesheets/svn_style.css';
+			@import 'file://#{$bundle}/Stylesheets/svn_log_style.css';
+		</style>
+		<script src='file://#{$bundle}/svn_log_helper.js' type='text/javascript' charset='utf-8'></script>
+HTML
+
+%>
+
+<% include SVNLogHelpers %>
+<% unless no_xml.empty?
+   no_xml.each_line do |line| %>
+      <div class="bad_line"><%= line %>&nbsp;</div>
+<% end
+   end %>
+
+<% unless log.nil? %>
+	<% log.each_entry do |e| %>
+	<table class="log <%= odd_or_even %>">
+	   <% r = e.rev %>
+	   <tr><th>Revision:</th><td><%= r %></td></tr>
+	   <tr><th>Author:</th>  <td><%= e.author %></td></tr>
+	   <tr><th>Date:</th>    <td><%= e.date %></td></tr>
+	   <tr><th>Changed Files:</th>
+	   <td>
+	      <a id="r<%= r %>_show" href="javascript:show_files('r<%= r %>');">show (<%= e.num_paths %>)</a>
+	      <a id="r<%= r %>_hide" href="javascript:hide_files('r<%= r %>');" class="hidden">hide</a>
+	      <ul id="r<%= r %>" class="hidden">
+	         <% e.each_path do |path| %>
+	         <li class="<%= path.action %>">
+	            <%= link_for path, r.to_i %>
+	         </li>
+	         <% end %>
+	      </ul>
+	   </td></tr>
+	   <tr><th>Message:</th><td class="msg_field">
+	      <%= e.message %>
+	   </td></tr>
+	</table>
+	<% end %>
+<% end %>
+</body></html>

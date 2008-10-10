@@ -1,0 +1,143 @@
+
+PKG_REVISION = ".0"
+
+$:.unshift "lib" if File.directory? "lib"
+require 'rcodetools/xmpfilter'
+require 'rake/testtask'
+include Rcodetools
+RCT_VERSION  = XMPFilter::VERSION
+
+desc "Run the unit tests in pure-Ruby mode ."
+Rake::TestTask.new(:test) do |t|
+  t.libs << "ext/rcovrt"
+  t.test_files = FileList['test/test*.rb']
+  t.verbose = true
+end
+
+require 'rcov/rcovtask'
+desc "Run rcov."
+Rcov::RcovTask.new do |t|
+  t.rcov_opts << "--xrefs"  # comment to disable cross-references
+  t.test_files = FileList['test/test_*.rb'].to_a - ["test/test_functional.rb"]
+  t.verbose = true
+end
+
+desc "Save current coverage state for later comparisons."
+Rcov::RcovTask.new(:rcovsave) do |t|
+  t.rcov_opts << "--save"
+  t.test_files = FileList['test/test_*.rb'].to_a - ["test/test_functional.rb"]
+  t.verbose = true
+end
+
+task :default => :test
+
+## test data file dependency
+basetestfiles = []
+copy = lambda do |t|
+  cp t.prerequisites.first, t.name
+end
+
+#  DO NOT EDIT!!                         EDITABLE
+[ ["test/data/rspec_poetry-input.rb", "test/data/rspec-input.rb"],
+  ["test/data/unit_test_poetry-input.rb", "test/data/unit_test-input.rb"],
+  ["test/data/completion_emacs-input.rb", "test/data/completion-input.rb"],
+  ["test/data/unit_test_detect_rbtest-input.rb", "test/data/unit_test-input.rb"],
+  ["test/data/unit_test_detect_rbtest-output.rb", "test/data/unit_test-output.rb"],
+  ["test/data/unit_test_detect_rbtest2-input.rb", "test/data/unit_test_rbtest-input.rb"],
+  ["test/data/unit_test_detect_rbtest2-output.rb", "test/data/unit_test_rbtest-output.rb"],
+  ["test/data/completion_detect_rbtest-input.rb", "test/data/completion_rbtest-input.rb"],
+  ["test/data/completion_detect_rbtest-output.rb", "test/data/completion_rbtest-output.rb"],
+  ["test/data/completion_detect_rbtest2-input.rb", "test/data/completion-input.rb"],
+  ["test/data/completion_detect_rbtest2-output.rb", "test/data/completion-output.rb"],
+  ["test/data/doc_detect_rbtest-input.rb", "test/data/doc-input.rb"],
+  ["test/data/doc_detect_rbtest-output.rb", "test/data/doc-output.rb"],
+  ["test/data/doc_detect_rbtest2-input.rb", "test/data/doc_rbtest-input.rb"],
+  ["test/data/doc_detect_rbtest2-output.rb", "test/data/doc_rbtest-output.rb"],
+
+].each do |outfile, infile|
+  basetestfiles << outfile
+  file(outfile => infile, &copy)
+end
+for test in %w[refe ri ri_emacs ri_vim]
+  outfile = "test/data/#{test}-input.rb"
+  basetestfiles << outfile
+  file(outfile => "test/data/doc-input.rb", &copy)
+end
+task :base_update => basetestfiles
+task :test => :base_update
+task :rcov => :base_update
+
+#{{{ Package tasks
+PKG_FILES = FileList[
+"bin/rct-complete", "bin/rct-doc", "bin/xmpfilter", "bin/rct-meth-args",
+"lib/**/*.rb",
+"CHANGES", "rcodetools.*", "icicles-rcodetools.el", "README", "README.*", "THANKS", 
+"Rakefile", "Rakefile.method_analysis",
+"setup.rb",
+"test/**/*.rb",
+]
+
+begin
+  require 'rake/gempackagetask'
+  Spec = Gem::Specification.new do |s|
+    s.name = "rcodetools"
+    s.version = RCT_VERSION + PKG_REVISION
+    s.summary = "rcodetools is a collection of Ruby code manipulation tools"
+    s.description = <<EOF
+rcodetools is a collection of Ruby code manipulation tools. 
+It includes xmpfilter and editor-independent Ruby development helper tools,
+as well as emacs and vim interfaces.
+
+Currently, rcodetools comprises:
+* xmpfilter: Automagic Test::Unit assertions/RSpec expectations and code annotations
+* rct-complete: Accurate method/class/constant etc. completions
+* rct-doc: Document browsing and code navigator
+* rct-meth-args: Precise method info (meta-prog. aware) and TAGS generation
+EOF
+    s.files = PKG_FILES.to_a
+    s.require_path = 'lib'
+    s.author = "rubikitch and Mauricio Fernandez"
+    s.email = %{"rubikitch" <rubikitch@ruby-lang.org>, "Mauricio Fernandez" <mfp@acm.org>}
+    s.homepage = "http://eigenclass.org/hiki.rb?rcodetools"
+    s.bindir = "bin"
+    s.executables = %w[rct-complete rct-doc xmpfilter rct-meth-args]
+    s.has_rdoc = true
+    s.extra_rdoc_files = %w[README]
+    s.rdoc_options << "--main" << "README" << "--title" << 'rcodetools'
+    s.test_files = Dir["test/test_*.rb"]
+    s.post_install_message = <<EOF
+
+==============================================================================
+
+rcodetools will work better if you use it along with FastRI, an alternative to
+the standard 'ri' documentation browser which features intelligent searching,
+better RubyGems integration, vastly improved performance, remote queries via
+DRb... You can find it at http://eigenclass.org/hiki.rb?fastri and it is also
+available in RubyGems format:
+
+    gem install fastri
+
+Read README.emacs and README.vim for information on how to integrate
+rcodetools in your editor.
+
+==============================================================================
+
+EOF
+
+  end
+
+  task :gem => [:test]
+  Rake::GemPackageTask.new(Spec) do |p|
+    #p.need_tar = true
+  end
+
+rescue LoadError
+  # RubyGems not installed
+end
+
+desc "install by setup.rb"
+task :install do
+  sh "sudo ruby setup.rb install"
+end
+
+# vim: set sw=2 ft=ruby:

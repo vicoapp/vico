@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>AAB4CBF7-73F9-11D9-B89A-000D93589AF6</string>
+	<key>command</key>
+	<string>#!/usr/bin/env bash
+
+. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "SQL Bundle Help" "SQL"
+
+"$TM_SUPPORT_PATH/lib/markdown_to_help.rb" &lt;&lt;'MARKDOWN'
+&lt;script type="text/javascript" charset="utf-8"&gt;
+	function launchConfig() {
+	    TextMate.system('"$TM_BUNDLE_SUPPORT"/bin/configure.sh 2&gt;&amp;1', null);
+	    window.close();
+	}
+&lt;/script&gt;
+The SQL bundle allows you to browse MySQL/PostgreSQL databases and execute queries.
+
+# Configuration
+
+Before you can use the SQL bundle you must configure at least one SQL connection using the &lt;a href="javascript:launchConfig()"&gt;*Configure*&lt;/a&gt; command.
+You must provide at least a username and a hostname (note that if you wish to connect locally bypassing a socket, you must use `127.0.0.1` rather than `localhost`).
+
+You can store multiple connections – use the ‘+’ button to add another connection. Whichever profile is selected when you close the dialog will be used when connecting.
+
+Alternatively you can set `TM_SQL_CONNECTION` to the title of a connection and it will take precedence. This is useful for setting connections on a per-project basis.
+
+# Execute Line / Selection as Query
+
+The _Execute Line / Selection as Query_ command takes the selected text or current line and submits it as a query to either MySQL or PostgreSQL.
+
+You will need to setup a database connection via the &lt;a href="javascript:launchConfig()"&gt;*Configure*&lt;/a&gt; command. Pressing ⌃⇧Q on an empty line will open the database browser.
+
+# Database Browser
+
+The database browser command displays a list of tables in whatever database you are currently working in using either PostgreSQL or MySQL. Click on the name of a database on the left to view the tables in that database.
+
+The connection to your server is setup with the &lt;a href="javascript:launchConfig()"&gt;*Configure*&lt;/a&gt; command.
+
+MARKDOWN
+
+html_footer
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>Help</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.sql</string>
+	<key>uuid</key>
+	<string>FE9FF936-7E32-11D9-B7C6-000D93B6E43C</string>
+</dict>
+</plist>

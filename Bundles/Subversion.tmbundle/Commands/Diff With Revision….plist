@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+ruby &gt;&amp; /tmp/tm_svn_debug &lt;&lt;END &amp;
+begin
+	require 'tempfile'
+	require "$TM_BUNDLE_SUPPORT/svn_revision_chooser"
+	require "$TM_BUNDLE_SUPPORT/svn_diff"
+
+	file = ENV['TM_FILEPATH']
+	revisions = Subversion::choose_revision(file, "Diff #{File.basename(file)} working copy?")
+	
+	unless revisions.nil?
+		diff_text = Subversion::diff_working_copy_with_revision(:paths =&gt; [file], :revision =&gt; revisions[0], :command_name =&gt; "Diff With Revision…")
+		Tempfile.open("svndiff #{File.basename(file)}") do |tempfile|
+			tempfile.write(diff_text)
+			tempfile.flush
+			%x{"#{ENV['TM_SUPPORT_PATH']}/bin/mate" -w #{e_sh(tempfile.path)}}
+		end
+	end
+
+rescue Exception =&gt; error
+	TextMate::UI.alert(:warning, "You’ve discovered a bug", "Please report the following text: #{error}\n\n#{error.backtrace.join(%Q{\n})}")
+end
+END
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string> Diff With Revision…</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>uuid</key>
+	<string>32E15B26-B444-11D9-8D63-000A95A89C98</string>
+</dict>
+</plist>

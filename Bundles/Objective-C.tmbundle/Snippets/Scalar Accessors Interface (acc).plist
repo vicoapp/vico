@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>- (${1:unsigned int})${2:thing};
+- (void)set${2/./\u$0/}:($1)new${2/./\u$0/};</string>
+	<key>name</key>
+	<string>Interface: Accessors for Primitive Type</string>
+	<key>scope</key>
+	<string>source.objc meta.scope.interface, source.objc++ meta.scope.interface</string>
+	<key>tabTrigger</key>
+	<string>acc</string>
+	<key>uuid</key>
+	<string>BA432891-294B-47A4-BECF-F3C95B3766C1</string>
+</dict>
+</plist>

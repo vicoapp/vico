@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>export PATCH_GET=0
+export __CF_USER_TEXT_ENCODING=$UID:0x8000100:0x8000100
+
+if [[ -z $TM_FILEPATH ]]
+  then exit_discard
+  else pbpaste | patch "$TM_FILEPATH" -p0
+fi
+
+# Reload patched file
+rescan_project
+</string>
+	<key>fallbackInput</key>
+	<string>none</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^@D</string>
+	<key>name</key>
+	<string>Apply Patch From Clipboard to Current Document</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>uuid</key>
+	<string>46842464-574C-477F-9DFB-BB38EA3C85BE</string>
+</dict>
+</plist>

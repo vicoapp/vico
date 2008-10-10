@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>4679B572-6227-11D9-BFB1-000D93589AF6</string>
+	<key>command</key>
+	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "Perl Bundle Help" "Perl"
+
+Markdown.pl &lt;&lt;'EOF'
+by Eric Hsu, Noah Daniels, Martin Vetter and Brad Choate
+
+&lt;textmate@betterfilecabinet.com&gt; | &lt;http://math.sfsu.edu/hsu/textmate&gt;
+
+## Release Notes
+
+The package consists of a syntax highlighting file and a few handy commands:
+
+- Documentation for Word (using perldoc)
+- Perl Validate Syntax
+- Run Script
+- Send to [Affrus](http://www.latenightsw.com/affrus/) (requires Affrus, obviously)
+- Tidy (requires [PerlTidy](http://perltidy.sourceforge.net/), may need to tweak path)
+- Perl to One-liner (strips comments &amp; extra whitespace, requires perltidy)
+- Help (show this file)
+
+Removed
+
+- Perl Comment Toggle (removed in favor of Source / Toggle Comment)
+- List Subroutines (removed in favor of native function pop-up)
+
+
+To Do. Fix q, qq to deal with different matched delimiters. 
+	
+- `$i++` coloring. 
+- `/dsds/g &lt; /asdfd/g` coloring.
+
+
+## History
+
+- (12-23-05)
+	- Brad Choate fancied up Validate Syntax command.
+    - Added Run Script command.
+    - Improved documentation lookup (internal links are converted to refer to perldoc.perl.org queries)
+    - Added several snippets for various language constructs.
+	- "last" colored as a control structure.
+	
+- (12-20-04) 
+    - Martin Vetter added [] and () to the Perl folding syntax.
+    - `__DATA__` now highlights to the end
+    - `q` `qq` `qw` `qx` quoting is nicer
+    - Known problems: here-docs not quoted, many autoquotes not highlighted right, e.g. hashkeys in =&gt; notation.
+    - Noah Daniels submitted bug fix to color POD starting with `^=` and not just `^=head1`
+    - Noah Daniels also submitted bug fix for `$#foo` being counted as a comment.
+	
+- (12-8-04) 
+    - recognizes more syntax (thanks to Xavier Noria for bug report)
+    - adjusted `$foo{bar}` so the first brace isn't highlighted
+    - `q` `qq` `qw` `qx` quoting recognized
+    - POD recognized (from `=head1` to `=cut`)
+    - `__END__` `__DATA__`, `__FOO__` all recognized
+added Perl to One-liner
+
+- (11-25-04)
+    - added auto-indent
+    - added file test operator syntax highlighting
+
+- (11-5-04)
+    - added Perl Error Check, Perl Tidy, and Find Subroutines commands. 
+    - you can get source for [Perl Tidy](http://perltidy.sourceforge.net/)
+
+- (10-17-04)
+    - added "Perl Comment Toggle"
+    - highlight text and it will toggle the comment status of the line. if there are multiple lines, if will comment or uncomment all of them depending on the first line.
+    - removed `//` as comment marker
+    - made comments slightly darker
+
+- (10-14-04)
+    - added "Send to Affrus" command
+    - added "Perldoc Search" command: highlight a word and get a window of perldoc
+    - added .pm to recognized filetypes.
+
+- (0.2)
+    - Just a quick hack
+    - based on PHP S.D. by (Justin French, Sune Foldager, Allan Odgaard)
+    - Doesn't recognize all special variables, just `$1`, `...`, `$9` and `$_`, `@_`.  
+
+EOF
+
+html_footer</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>Help</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.perl</string>
+	<key>uuid</key>
+	<string>EC48C79A-82AA-11D9-8753-000D9332809C</string>
+</dict>
+</plist>

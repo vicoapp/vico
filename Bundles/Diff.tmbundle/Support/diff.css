@@ -1,0 +1,6 @@
+body{font-family: "Bitstream Vera Sans Mono", monospace;}
+a, a:visited, a:link {text-decoration: none;color:inherit;font-family: inherit;}
+a:hover,a:active {background-color: #a3c8ff; color:inherit;font-family: inherit;text-decoration: none;}
+.old{font-weight: bold;color:red;}
+.new{font-weight: bold;color:green;}
+.both{color:black;font-family: inherit;}

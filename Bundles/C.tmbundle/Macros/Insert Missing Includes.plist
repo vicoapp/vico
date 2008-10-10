@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>commands</key>
+	<array>
+		<dict>
+			<key>argument</key>
+			<string>￼</string>
+			<key>command</key>
+			<string>insertText:</string>
+		</dict>
+		<dict>
+			<key>command</key>
+			<string>selectAll:</string>
+		</dict>
+		<dict>
+			<key>argument</key>
+			<dict>
+				<key>command</key>
+				<string>insert_missing_includes.rb</string>
+				<key>input</key>
+				<string>document</string>
+				<key>output</key>
+				<string>insertAsSnippet</string>
+			</dict>
+			<key>command</key>
+			<string>executeCommandWithOptions:</string>
+		</dict>
+	</array>
+	<key>keyEquivalent</key>
+	<string>^#</string>
+	<key>name</key>
+	<string>Insert Missing Includes</string>
+	<key>scope</key>
+	<string>source.c, source.c++, source.objc, source.objc++</string>
+	<key>scopeType</key>
+	<string>local</string>
+	<key>uuid</key>
+	<string>0DABAE22-81C5-4ADF-8BCC-9B343A51CCB9</string>
+</dict>
+</plist>

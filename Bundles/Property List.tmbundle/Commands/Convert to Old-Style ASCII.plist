@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if [[ -f "$TM_FILEPATH" ]] &amp;&amp; [ $(grep -ao "^......" "$TM_FILEPATH"|head -n1) == "bplist" ]
+   then plutil -convert xml1 -o &gt;(cat) "$TM_FILEPATH"|pl
+   else pl
+fi</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Convert to Old-Style ASCII</string>
+	<key>output</key>
+	<string>openAsNewDocument</string>
+	<key>scope</key>
+	<string>text.xml.plist, source.plist.binary</string>
+	<key>uuid</key>
+	<string>827E8A23-2C7A-4BDD-987F-A3B67B51F239</string>
+</dict>
+</plist>

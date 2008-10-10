@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>int choice = NSRunAlertPanel(@"${1:Something important!}", @"${2:Something important just happend, and now I need to ask you, do you want to continue?}", @"${3:Continue}", @"${4:Cancel}", nil);
+if(choice == NSAlertDefaultReturn) // "${3:Continue}"
+{
+	$0;
+}
+else if(choice == NSAlertAlternateReturn) // "${4:Cancel}"
+{
+	
+}</string>
+	<key>name</key>
+	<string>NSRunAlertPanel</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>alert</string>
+	<key>uuid</key>
+	<string>9EF84198-BDAF-11D9-9140-000D93589AF6</string>
+</dict>
+</plist>

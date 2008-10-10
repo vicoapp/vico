@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+require "#{ENV['TM_SUPPORT_PATH']}/lib/exit_codes.rb"
+require "#{ENV['TM_SUPPORT_PATH']}/lib/ui.rb"
+
+if ENV.has_key?('TM_SELECTED_TEXT') then
+  result=ENV['TM_SELECTED_TEXT']
+else
+  result = TextMate::UI.request_string(
+    :title =&gt; 'LaTeX Array Creation', 
+    :prompt =&gt; 'Number of rows and columns:',
+    :default =&gt; '6 4',
+    :button1 =&gt; 'Create'
+  )
+  TextMate.exit_discard if result.nil?
+end
+# print "Result: #{result}"
+m = /(\d+)\D+(\d+)/.match(result.to_s)
+exit if m.nil?
+rows, columns = m[1].to_i, m[2].to_i
+# print "Rows: #{rows}"
+# print "Columns: #{columns}"
+print "\\begin{tabular}{"
+columns.times {print("c")}
+puts "}"
+puts "\\hline\n"
+n=0
+rows.times do |r|
+  (columns-1).times do |c|
+    n+=1
+    print "${#{n}:r#{r+1}c#{c+1}} &amp; "
+  end
+  n+=1
+  print "${#{n}:r#{r+1}c#{columns}}\\\\\\\\\n"
+  puts "\\hline\n"
+end
+puts "\\end{tabular}"
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^@T</string>
+	<key>name</key>
+	<string>Create Table</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>7190DABA-FE8B-4DC7-9D31-3A727A8647CD</string>
+</dict>
+</plist>

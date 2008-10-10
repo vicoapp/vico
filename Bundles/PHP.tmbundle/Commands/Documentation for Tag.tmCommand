@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if grep &lt;&lt;&lt;${TM_CURRENT_WORD:-!} -Esq '[@a-zA-Z]+'
+	then exit_show_html "&lt;meta http-equiv='Refresh' content='0;URL=http://manual.phpdoc.org/HTMLframesConverter/earthli/phpDocumentor/tutorial_tags.${TM_CURRENT_WORD#@}.pkg.html'&gt;"
+	else echo "Nothing to lookup (hint: place the caret on a tag)"
+fi</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Tag</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>comment.block.documentation.phpdoc.php</string>
+	<key>uuid</key>
+	<string>42F50AE3-4F1C-43EB-9722-D80261A19625</string>
+</dict>
+</plist>

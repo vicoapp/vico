@@ -1,0 +1,122 @@
+#tm_webpreview_content {
+	padding: 0;
+	margin-top: 6em;
+}
+
+
+#sql_browser {
+/*    position: absolute;
+    top: 0;
+    left: 27%;
+    width: 73%;*/
+/*    min-width: 450px;*/
+/*    height: 100%;*/
+/*    padding-right: 0px;*/
+/*    overflow: auto;*/
+/*    background: #fff;*/
+
+/*    margin: 0 1ex;*/
+    overflow: auto;
+    height: 90%;
+}
+
+#sql_browser table {
+/*    width: 100%;*/
+    border-collapse: collapse;
+}
+
+#sql_browser h2 {
+/*    font-size: 120%;*/
+/*    text-decoration: none;*/
+}
+
+
+#sql_browser hr {
+    clear: both;
+    visibility: hidden;
+}
+
+#sql_browser table {
+/*    width: 90%;*/
+/*    margin-bottom: 30px;*/
+}
+#sql_browser table td, #sql_browser table th {
+    border-left:  1px solid #808080;
+    border-right: 1px solid #808080;
+/*    text-align: center;*/
+}
+
+#sql_browser table th {
+    border-bottom: 1px solid #444;
+
+	vertical-align: top;
+
+    font-family: "Monaco", monospace;
+    font-size: 90%;
+    text-align: left;
+	white-space: nowrap;
+}
+
+#sql_browser table th a {
+    text-decoration: none;
+/*    color: #000;*/
+}
+
+#sql_browser table td {
+    font-family: "Monaco", monospace;
+    font-size: 80%;
+/*    background-color: white;*/
+}
+
+#sql_browser .datatype {
+    text-transform: uppercase;
+}
+
+
+#sql_browser .query {
+/*    font-size: smaller;*/
+    font-family: "Monaco", monospace;
+}
+
+#sql_browser table {
+/*    font-size: 80%;*/
+}
+
+#sql_browser td {
+/*    text-align: right;*/
+}
+
+#sql_browser table.table_schema th {
+    padding: 2px 1ex;
+    margin: 0;
+    font-family: "Monaco", monospace;
+    font-size: 90%;
+}
+
+#sql_browser table.table_schema td {
+    padding: 2px 1ex;
+    margin: 0;
+}
+
+#dbbar {
+    float: left;
+
+    width: 15em;
+
+    padding: 0 1ex;
+    margin-right: 1ex;
+
+    height: 90%;
+    overflow: auto;
+}
+
+#dbbar #database_list {
+    padding-left: 0;
+/*    list-style: url('database.png');*/
+}
+
+#dbbar .table_list {
+    padding-left: 2`5px;
+    list-style: url('database_table.png');
+}
+

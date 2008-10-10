@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require "#{ENV['TM_SUPPORT_PATH']}/lib/exit_codes"
+require "#{ENV['TM_BUNDLE_SUPPORT']}/lib/config_helper.rb"
+@plist = Config.load
+shortcutHash = @plist['symbols']
+currentWord = STDIN.read
+if (shortcutHash.has_key?(currentWord)) then
+  print shortcutHash[currentWord]
+else
+  TextMate.exit_discard
+end</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>@\</string>
+	<key>name</key>
+	<string>LaTeX Symbol Based on Current Word / Selection</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>text.tex.latex, text.bibtex</string>
+	<key>uuid</key>
+	<string>A7D549C1-055E-4181-84F2-BA713EB66341</string>
+</dict>
+</plist>

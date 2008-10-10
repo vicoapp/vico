@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>4679484F-6227-11D9-BFB1-000D93589AF6</string>
+	<key>command</key>
+	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "Objective-C Bundle Help" "Objective-C"
+"$TM_SUPPORT_PATH/lib/markdown_to_help.rb" &lt;&lt;'MARKDOWN'
+
+# Introduction
+
+This document describes the commands of the Objective-C bundle and is a recommended read, since not all features are easy to discover.
+
+In addition to this help file there are also 3 screencasts dedicated to showing Objective-C features (the links below are to more info about the screencast):
+
+ 1. The [most recent][SC1] is by Joachim Mårtensson and shows completion, bracket matching, reformatting methods, and documentation lookup.
+ 2. [Objective-C Part 2][SC2] by Allan Odgaard.
+ 3. [Graceful Objective-C Snippets][SC3] by Allan Odgaard.
+
+You can see [all screencasts here][AllCasts].
+
+[SC1]: http://macromates.com/screencast/TextMateObjCScreenCast.mov
+[SC2]: http://macromates.com/blog/archives/2006/04/29/objective-c-part-2-screencast/
+[SC3]: http://macromates.com/blog/archives/2006/03/17/graceful-objective-c-snippets/
+[AllCasts]: http://macromates.com/screencasts
+
+# Code Completion
+
+Code Completion is activated using the ⌥⎋ key equivalent. Code completion is available in several places which will be the topic of the next few sections.
+
+## Within Brackets
+
+A method call in Objective-C consists of three different types (though not all method calls take arguments):
+
+	[«receiver» «selector»:«argument»]
+
+The completion support can help you with all three parts, which will be explained in the following three sections.
+
+### Receiver
+
+A partially typed receiver can be completed, here candidates are all Cocoa classes (class objects). For example if we have:
+
+	[NSObje‸ ]
+
+Then the list of possible completions will contain `NSObject` and `NSObjectController`.
+
+### Selector
+
+When the receiver is a class object, like in the following example:
+
+	[NSString ‸]
+
+Then the candidates are all methods implemented by that class, in the above example, that would be all `NSString` class methods.
+
+If the selector is partially typed, and the receiver is not a known class object, as is the case below:
+
+	[object setV‸]
+
+Then a list is shown with all Cocoa methods starting with `setV`.
+
+Currently the list of completion candidates are only filtered to those implemented by `object`, when object is a method local variable of a type that has been indexed.
+
+One exception is when the receiver is itself a method call, for example in the following case:
+
+	[[object string] ‸]
+
+Here only methods implemented by `NSString` are suggested, since it is know that the result of the `string` selector is an `NSString` object.
+
+For selectors with multiple arguments, it is possible to activate completion when entering the name of a later argument, for example:
+
+	[object setObject:name forK‸]
+
+Will list all methods starting with `setObject:forK`.
+
+### Argument
+
+When at the argument position, like here:
+
+    [NSString stringWithCString:"foo" encoding:‸]
+
+The completion command will check the argument type and find all constants which match that type. In the above example that would be all string encoding constants.
+
+## Outside of Brackets
+
+The completion command will give different suggestions based on the caret’s scope. To see the current scope you can press ⌃⇧P. The 6 different scopes are marked below:
+
+	@interface MyClass : NSO‸₁ &lt;NSObj‸₂&gt;
+	{
+		NSSt‸₃
+	}
+	@end
+	
+	@implementation MyClass
+	- (id)init
+	{
+		if(self = [super init])
+		{
+			NSArr‸₄
+		}
+		return self;
+	}
+	- windowW‸₅
+	- (NSStr‸₆)stringFromString(NSSt‸₆&lt;NSCod‸₂&gt;)
+	@end
+
+The candidates suggested for the 6 different scopes are:
+
+ 1. Known Cocoa classes.
+ 2. Known Cocoa protocols.
+ 3. Same as 1, but a variable name will also be inserted. For example the above will suggest `NSString` and `NSStream`. If we pick the former, it will insert `NSString *aString`.
+ 4. Same as 3, but completion of known (C, C++, and Cocoa) functions is also suggested.
+ 5. Here completion candidates are known Cocoa methods, but inserted as when implementing the method. For example in the above, one of the suggestions is `windowWillClose`, which when selected, will have the line changed to: `- (void)windowWillClose:(NSNotification *)aNotification`.
+ 6. Same as 1, but an asterisk (`*`) is inserted.
+
+## Completing User Methods
+
+By default completion candidates comes from the various Apple frameworks (mostly under the Cocoa umbrella).
+
+If you wish to have your own methods and classes shown as completion candidates, you can invoke the *Index Headers for Completion* command.
+
+This scans all headers in the current project folder and saves the result as `.methods.TM_Completions.txt.gz` and `.classes.TM_Completions.txt.gz` in your project folder.
+
+You can later re-run the command to update the index.
+
+# Bracket Matching
+
+## Wrapping Selectors
+
+When you want to send a message (selector) to an object, you need to wrap both the object and message in square brackets (`[object message]`). Even if you did not put an opening bracket at the start of the expression, there is no need to go back and place it, since TextMate is smart enough to figure out where to place the start bracket, when typing an unmatched close bracket.
+
+Here are two simple examples:
+
+    obj message‸     → [obj message]
+    
+    obj message:arg‸ → [obj message:arg]
+
+An ambiguity exists when sending multi-argument messages to the object. For example if we have:
+
+    obj message:arg otherMessage:arg2‸
+
+Then there are two candidates for the outcome:
+
+    1. [obj message:arg otherMessage:arg2]
+    2. obj message:[arg otherMessage:arg2]
+
+If `message:otherMessage:` is a known Cocoa method or one of your indexed methods, then the first one is picked, otherwise the second one.
+
+## Wrapping Objects
+
+If you type a closing bracket after a single word, it is assumed that this word is an object to which you want to send a message, e.g.:
+
+    obj‸ → [obj ‸]
+
+The space is only inserted if there is not already a space after the object.
+
+## General
+
+The bracket completion is aware of quite a few C and Objective-C constructs and will not wrap when it does not make (much) sense.
+
+	nil‸         → nil] // no messaging nil
+	return self‸ → return [self ‸]
+	NSArray arrayWithObjects:names, urls, nil‸
+	             → [NSArray arrayWithObjects:names, urls, nil]
+
+Here is how the bracket matcher (basically) works:
+
+ 1. If there is a word to the left of the caret, try to find an object to the left of it.
+ 2. If the above failed, look for a message that takes an argument. If found, try to find even more such messages compare them with known Cocoa methods as we go, if no known Cocoa methods are found we use only the first matched message. try to find an object to the left of the message.
+ 3. If neither 1 or 2, we have a single object, wrap it and insert the caret between the brackets.
+    
+# Reformatting
+
+## Method Calls
+
+Pressing ⌃Q when the caret is inside a multi-part method call will align the method-parts around the colon (`:`). For example the following:
+
+	[NSEvent enterExitEventWithType:anEventType location:aPoint
+		modifierFlags:flags timestamp:aTimeInterval
+		windowNumber:number context:aGraphicsContext
+		eventNumber:x trackingNumber:tracker userData:data]
+
+Will be reformatted as:
+
+	[NSEvent enterExitEventWithType:anEventType
+	                       location:aPoint
+	                  modifierFlags:flags
+	                      timestamp:aTimeInterval
+	                   windowNumber:number
+	                        context:aGraphicsContext
+	                    eventNumber:x
+	                 trackingNumber:tracker
+	                       userData:data]
+
+By default the inner brackets will be reformatted if the brackets are nested, move the caret to a non nested area to get the outer methods reformatted.
+
+## Method Implementations
+
+Like with method calls, we can reformat method implementations using ⌃Q. If for example we implemented the method above, and our source looks like this:
+
+	+ (NSEvent *)enterExitEventWithType:(NSEventType)type
+	location:(NSPoint)location modifierFlags:(unsigned int)flags
+	timestamp:(NSTimeInterval)time windowNumber:(int)windowNumber
+	context:(NSGraphicsContext *)context eventNumber:(int)eventNumber
+	trackingNumber:(int)trackingNumber userData:(void *)userData
+	{
+	
+	}
+
+Then we can reformat it easily using ⌃Q on the first line, and we get:
+
+	+ (NSEvent *)enterExitEventWithType:(NSEventType)type
+	                           location:(NSPoint)location
+	                      modifierFlags:(unsigned int)flags
+	                          timestamp:(NSTimeInterval)time
+	                       windowNumber:(int)windowNumber
+	                            context:(NSGraphicsContext *)context
+	                        eventNumber:(int)eventNumber
+	                     trackingNumber:(int)trackingNumber
+	                           userData:(void*)userData
+	{
+	
+	}
+
+# Documentation Look-up
+
+Pressing ⌃H when the caret is on a class name, method call, function name, constant, or similar, will (for most known Cocoa stuff) find the appropriate spot in the documentation.
+
+There are actually two documentation look-up commands (for two different scopes), so generally use the ⌃H key equivalent rather than the menu item.
+
+# Snippets
+
+The Objective-C bundle has specialized several of the snippets for different scopes.
+
+An example is shown below:
+
+	@interface MyClass : NSObject
+	{
+	}
+	m‸
+	@end
+	
+	@implementation MyClass
+	m‸
+	
+	- (void)myMethod
+	{
+		log‸
+	}
+	@end
+	
+	void MyFunction ()
+	{
+		log‸
+	}
+
+Here we have entered both the tab trigger `m` and `log` in two different scopes. If we press tab (⇥) to expand all four tab triggers, then the resulting code becomes:
+
+	@interface MyClass : NSObject
+	{
+	}
+	- (id‸)method:(id)anArgument;
+	@end
+	
+	@implementation MyClass
+	- (id‸)method:(id)anArgument
+	{
+		return nil;
+	}
+	
+	- (void)myMethod
+	{
+		NSLog(@"%s‸", _cmd);
+	}
+	@end
+	
+	void MyFunction ()
+	{
+		NSLog(@"‸");
+	}
+
+What’s interesting here is that the `m` tab trigger expands to a full method implementation inside `@implementation…@end`, but only a prototype when inside `@interface…@end`. Likewise the `log` tab trigger will only output the `_cmd` variable when called from inside a method (where it is available).
+
+All the accessor snippets are likewise specialized for `@implementation` and `@interface`, though only one set appears in the menu (so use the tab trigger to get the proper one).
+
+In addition to specializing the snippets for different scopes, a lot of other magic has also been put into them. If for example you add `%d` to the format string of the `NSLog` snippet, then an argument placeholder is automatically inserted. The method snippet will remove the `return nil;` line if you change the return type to `void`, and it will let the argument variable’s name match its type, for example if you change the type from `id` to `NSString*` then the variable becomes `aString`.
+
+# Credits
+
+The cool stuff in this bundle is done by Joachim Mårtensson.
+
+Additional work by Chris Thomas and Allan Odgaard. The initial bracket matcher (which served us well for a long time) was done by Rob Rix.
+
+MARKDOWN
+html_footer</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>Help</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>uuid</key>
+	<string>AFB40870-6F83-4211-9362-0538287B52A9</string>
+</dict>
+</plist>

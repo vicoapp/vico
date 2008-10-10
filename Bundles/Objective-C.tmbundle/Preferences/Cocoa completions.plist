@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Completions: Cocoa</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>settings</key>
+	<dict>
+		<key>completions</key>
+		<array>
+			<string>retain</string>
+			<string>release</string>
+			<string>autorelease</string>
+			<string>description</string>
+			<string>stringWithFormat:</string>
+			<string>componentsSeparatedByString:</string>
+			<string>componentsJoinedByString:</string>
+			<string>isEqualToString:</string>
+			<string>UTF8String</string>
+			<string>lastPathComponent</string>
+			<string>pathExtension</string>
+			<string>stringByAbbreviatingWithTildeInPath</string>
+			<string>stringByAppendingPathComponent:</string>
+			<string>stringByAppendingPathExtension:</string>
+			<string>stringByDeletingLastPathComponent</string>
+			<string>stringByDeletingPathExtension</string>
+			<string>stringByExpandingTildeInPath</string>
+			<string>stringByResolvingSymlinksInPath</string>
+			<string>stringByStandardizingPath</string>
+			<string>valueForKey:</string>
+			<string>valueForKeyPath:</string>
+			<string>setValue:</string>
+			<string>forKey:</string>
+			<string>forKeyPath:</string>
+			<string>NSArray</string>
+			<string>NSDictionary</string>
+			<string>NSMutableArray</string>
+			<string>NSMutableDictionary</string>
+			<string>NSMutableString</string>
+			<string>NSString</string>
+		</array>
+	</dict>
+	<key>uuid</key>
+	<string>512175CE-933E-4312-BBF2-D744700CB4CA</string>
+</dict>
+</plist>

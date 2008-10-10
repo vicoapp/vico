@@ -1,0 +1,15 @@
+<div id="dbbar">
+    <h2 align="center">Databases</h2>
+    <ul id="database_list">
+        <% @databases.each do |database| %>
+        <li>
+            <a href="#" onclick="toggleDatabases(this)"><%= database %></a>
+            <ul id="db_<%= database %>" class="table_list" <%= "style='display: none'" unless @options.database.name == database %>>
+                <% if database == @options.database.name %>
+                    <%= @tables = @connection.table_list(@options.database.name); render('tables') %>
+                <% end %>
+            </ul>
+        </li>
+        <% end %>
+    </ul>
+</div>

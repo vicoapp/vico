@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/bin/bash
+#
+# Wrapper script to use FileMerge to resolve Subversion conflicts
+# [modified slightly from http://ssel.vub.ac.be/svn-gen/bdefrain/fmscripts/fmresolve]
+#
+
+conflictfile="$TM_FILEPATH"
+FM="/Developer/Applications/Utilities/FileMerge.app/Contents/MacOS/FileMerge"
+
+require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+require_cmd "$FM" "You must install the Apple developer tools to run FileMerge"
+
+function lookup {
+	local info=$1
+	local wantedkey=$2
+	local key
+	local value
+	# Split lines in info through word splitting
+	local IFS=$'\n'
+	for line in $info; do
+		key=${line%%: *}
+		value=${line#*: }
+		if [ $key == $wantedkey ]; then
+			RETVAL=$value
+			return 0
+		fi
+	done
+	return 1
+}
+
+filedir=`dirname "$conflictfile"`
+info=`"$TM_SVN" info "$conflictfile"`
+lookup "$info" "Conflict Current Base File" &amp;&amp; leftfile=$RETVAL
+lookup "$info" "Conflict Previous Working File" &amp;&amp; rightfile=$RETVAL
+lookup "$info" "Conflict Previous Base File" &amp;&amp; ancestorfile=$RETVAL
+mergefile=`basename "$conflictfile"`
+
+if [ -z "$leftfile" ] || [ -z "$rightfile" ] || [ -z "$ancestorfile" ]; then
+	echo "Can't obtain conflict info for $conflictfile" 1&gt;&amp;2
+	exit 2
+fi
+
+#echo Starting FileMerge... 1&gt;&amp;2
+"$FM" -left "${filedir}/${leftfile}" -right "${filedir}/${rightfile}" -ancestor "${filedir}/${ancestorfile}" -merge "${filedir}/${mergefile}" &amp;&gt;/dev/null &amp;
+
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string>Resolve Conflicts With FileMerge…</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>uuid</key>
+	<string>E8EE6110-2DBA-4FC1-807B-9B19B5DE6737</string>
+</dict>
+</plist>

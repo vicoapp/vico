@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby -wKU
+
+SUPPORT = ENV['TM_SUPPORT_PATH']
+DIALOG = SUPPORT + '/bin/tm_dialog'
+
+require SUPPORT + '/lib/escape'
+require SUPPORT + '/lib/osx/plist'
+
+# ENV['TM_BUNDLE_SUPPORT'] = '/Library/Application Support/TextMate/Bundles/PHP.tmbundle/Support/'
+# ENV['TM_CURRENT_LINE']   = 'dummy(array_merge(array("array", "number", "one"), array("array2")))'
+# ENV['TM_LINE_INDEX']     = '53'
+# 
+# ENV['TM_CURRENT_LINE']   = "date('Y-m-d', time() + ONE_MONTH)"
+# ENV['TM_LINE_INDEX']     = '23'
+
+class PHPFunction
+  def initialize(prototype)
+    @parts = prototype.strip.match(/^\s*(?:([0-9A-Za-z|_]+)\s+)?(\w+)\s*\((.*)\).*$/)
+  end
+  
+  def params
+    params = @parts[3] rescue ''
+
+    params.scan(/(\w+ )?([\w.|]+)(?:\s*=\s*(.+))?(\])?,?/).map do |(type, name, default, optional_bracket)|
+      param = type.to_s + name
+      optional = false
+      if optional_bracket
+        # Optional
+        param = '[' + param + ']'
+        optional = true
+      elsif default
+        # Optional with default
+        param = '[' + param + ' = ' + default + ']'
+        optional = true
+      end
+      {
+        :param =&gt; param,
+        :type =&gt; type.to_s.strip,
+        :name =&gt; name.to_s,
+        :optional =&gt; optional,
+        :default =&gt; default
+      }
+    end
+  end
+  
+  def name
+    @parts[2]
+  end
+  
+  def type
+    @parts[1]
+  end
+end
+
+def show_function_and_exit(function, line = nil)
+  return unless function =~ /^[A-Za-z_][A-Za-z0-9_]*$/
+  functions = `grep -i '^#{function}%' "$TM_BUNDLE_SUPPORT"/functions.txt`.split("\n")
+  if functions.size == 1
+    function, prototype, description = functions.pop.split('%')
+
+    if line
+      arg = 0
+      depth = 0
+      line.reverse.each_byte do |char|
+        if char == ?, and depth == 0
+          arg += 1
+        elsif char == ?(
+          depth -= 1 if depth &gt; 0
+        elsif char == ?)
+          depth += 1
+        end
+      end
+
+      function = PHPFunction.new(prototype)
+      params = function.params.map { |func| func[:param] }
+      if arg &lt; params.size
+        params[arg] = '&lt;' + params[arg] + '&gt;'
+      elsif not params.empty?
+        params[-1] = '&lt;' + params[-1] + '&gt;'
+      end
+      puts function.type + ' ' + function.name + '(' + params.join(', ') + ')'
+    else
+      puts prototype
+    end
+    puts description
+    
+    exit
+  end
+end
+
+function = nil
+
+show_function_and_exit(function = ENV['TM_CURRENT_WORD'].to_s)
+
+prefix = ENV['TM_CURRENT_LINE'][0..ENV['TM_LINE_INDEX'].to_i].reverse
+
+# Keep moving back a function call until we get a match and exit
+while prefix =~ /\(\s*(\w+)/
+  show_function_and_exit(function = $1.reverse, ENV['TM_CURRENT_LINE'][($' + $&amp;).length..ENV['TM_LINE_INDEX'].to_i - 1])
+  prefix = prefix[$&amp;.length..-1]
+end
+
+show_function_and_exit(function = $1) while ENV['TM_CURRENT_LINE'][0..ENV['TM_LINE_INDEX'].to_i] =~ /(\w+)\($/
+
+puts "Function not found: " + function.to_s
+</string>
+	<key>fallbackInput</key>
+	<string>line</string>
+	<key>input</key>
+	<string>none</string>
+	<key>inputFormat</key>
+	<string>xml</string>
+	<key>keyEquivalent</key>
+	<string>~</string>
+	<key>name</key>
+	<string>Documentation for Function Call (tool tip)</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.php</string>
+	<key>uuid</key>
+	<string>19A164B7-4A3C-421B-9866-85FB9077A983</string>
+</dict>
+</plist>

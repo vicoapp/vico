@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>autoScrollOutput</key>
+	<true/>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>$(type -p "${TM_RUBY:-ruby}") -e'
+require ENV["TM_SUPPORT_PATH"] + "/lib/tm/executor"
+require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
+
+TextMate.save_current_document
+TextMate::Executor.make_project_master_current_document
+
+ENV["PYTHONPATH"] = ENV["TM_BUNDLE_SUPPORT"] + (ENV.has_key?("PYTHONPATH") ? ":" + ENV["PYTHONPATH"] : "")
+
+is_test_script = ENV["TM_FILEPATH"] =~ /(?:\b|_)(?:test)(?:\b|_)/ or
+                 File.read(ENV["TM_FILEPATH"]) =~ /\bimport\b.+(?:unittest)/
+
+TextMate::Executor.run(ENV["TM_PYTHON"] || "python", "-u", ENV["TM_FILEPATH"]) do |str, type|
+  if is_test_script and type == :err
+    if str =~ /\A[\.F]*\Z/
+      str.gsub!(/(\.|F)/, "&lt;span class=\"test ok\"&gt;\\1&lt;/span&gt;")
+      str + "&lt;br/&gt;\n"
+    elsif str =~ /\A(FAILED.*)\Z/
+      "&lt;div class=\"test fail\"&gt;#{htmlize $1}&lt;/div&gt;\n"
+    elsif str =~ /\A(OK.*)\Z/
+      "&lt;div class=\"test ok\"&gt;#{htmlize $1}&lt;/div&gt;\n"
+    elsif str =~ /^(\s+)File "(.+)", line (\d+), in (.*)/
+      indent = $1
+      file   = $2
+      line   = $3
+      method = $4
+      indent += " " if file.sub!(/^\"(.*)\"/,"\1")
+      url = "&amp;amp;url=file://" + e_url(file)
+      display_name = ENV["TM_DISPLAYNAME"]
+      "#{htmlize(indent)}&lt;a class=\"near\" href=\"txmt://open?line=#{line + url}\"&gt;" +
+        (method ? "method #{CGI::escapeHTML method}" : "&lt;em&gt;at top level&lt;/em&gt;") +
+        "&lt;/a&gt; in &lt;strong&gt;#{CGI::escapeHTML display_name}&lt;/strong&gt; at line #{line}&lt;br/&gt;\n"
+    end
+  end
+end'</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>@r</string>
+	<key>name</key>
+	<string>Run Script</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.python</string>
+	<key>uuid</key>
+	<string>D1C3D420-2DC5-4C61-9586-00E76A6C054B</string>
+</dict>
+</plist>

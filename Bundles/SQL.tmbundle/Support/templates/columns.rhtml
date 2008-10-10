@@ -1,0 +1,25 @@
+<h2>Columns in table: <%= @table %></h2>
+<form accept-charset="utf-8" onsubmit="doSearch('<%= @options.database.name %>', '<%= @table %>', this.getElementsByTagName('input'));return false">
+<table class="graybox table_schema">
+  <tr>
+    <th align="left">Name</th>
+    <th align="left">Type</th>
+    <th align="left">Nullable</th>
+    <th align="left">Default</th>
+    <th align="right">Search</th>
+  </tr>
+  <% $row_counter = 0 %>
+  <% @fields.each do |field| %>
+    <tr class="<%= "alternate" if ($row_counter += 1) & 1 == 0 %>">
+      <td><%= field[:name] %></td>
+      <td><%= field[:type] %></td>
+      <td><%= field[:nullable] %></td>
+      <td><%= field[:default].nil? ? 'NULL' : field[:default] %></td>
+      <td>
+          <input type="search" name="<%= field[:name] %>" />
+          <input type="submit" value="go" />
+      </td>
+    </tr>
+  <% end %>
+</table>
+</form>

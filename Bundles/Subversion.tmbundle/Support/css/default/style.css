@@ -1,0 +1,151 @@
+/* ===================== */
+/* = Subversion Styles = */
+/* ===================== */
+
+div.subversion {
+	margin-top: 10px;
+}
+
+/* INFO */
+
+div.subversion dl.info dt {
+   font-weight: bold;
+   padding: 4px;
+   padding-bottom: 0;
+   margin: 0;
+   border-top: 1px dashed #ddd;
+}
+
+div.subversion dl.info dt:first-child {
+   border-top: 0;
+}
+
+div.subversion dl.info dt:after {
+   content: ":";
+}
+
+div.subversion dl.info dd {
+   margin: 0;
+   padding: 4px;
+   padding-top: 0;
+   padding-left: 24px;
+}
+
+/* BLAME */
+
+/* some adds for the links in the table (clickable lines)..*/
+div.subversion table.blame a, div.subversion table.blame a:visited, div.subversion table.blame a:link {
+   text-decoration: none;
+   color: inherit;
+}
+
+
+/* formating the table.. */
+div.subversion table.blame {
+   font-size: 12px;
+   padding: 1px;
+   border-collapse: collapse;
+   width: 100%;
+}
+
+
+/* to make it look good if a line gets wrapped: */
+div.subversion table.blame td {
+   vertical-align: top;
+}
+
+/* bitstream vera sans looks really _very_ good. But I like Luxi Mono better :p */
+div.subversion table.blame td.codecol {
+/*   font-size: 12px;*/
+	font-family: "LuxiMono", "Bitstream Vera Sans Mono", monospace;
+	padding-left: 4px;
+	width: 100%;
+}
+
+/* Status */
+table.status {
+	font-size: 90%;
+	border-collapse: collapse;
+	border: 1px solid #808080;
+	empty-cells: show;
+}
+table.status th {
+	padding: 0.5ex 1ex 0.5ex 1ex;
+	border: 1px solid #808080;
+	text-align: left;
+}
+
+table.status td {
+	padding: 0.3ex 0.6ex 0.3ex 0.6ex;
+/*	border-bottom: 1px solid #808080;*/
+}
+
+/* console is invisible by default */
+#console{
+	display: none;
+}
+
+h3.console {
+	margin-bottom: 0;
+}
+
+#commandOutput {
+	width: 95%;
+	min-height: 2em;
+	
+	margin: 0 1em 1em 0;
+	padding-left: 1em;
+	
+	border: 1px solid #808080;
+
+	font-family: monospace;
+	font-size: 85%;
+}
+
+table.status {
+	border: 0px;
+}
+
+table.status th {
+	border: 0px;
+}
+
+table.status td {
+	padding: 3px;
+}
+
+/* center the status characters */
+table.status td.status_col {
+	text-align: center;
+}
+
+/* stretch the file column the length of the window */
+table.status td.file_col {
+	padding: 0 1ex 0 2ex;
+	width: 100%;
+}
+
+/* Status ction buttons */
+table.status td.action_button {
+/*	vertical-align: bottom;*/
+}
+
+table.status td.action_button a:link {
+	padding: 1px;
+	border: 1px solid;
+	text-decoration: none;
+	font-size: 80%;
+	text-align: center;
+}
+
+table.status td.action_button a:hover {
+  background: #BBB;
+}
+
+table.status td.action_button a:active{
+  background: #555;
+}
+
+div#actions {
+	margin-top: 1em;
+}

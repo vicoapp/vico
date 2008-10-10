@@ -1,0 +1,139 @@
+<% require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview.rb' %>
+
+<% # raise 'No JavaScript' if not File.exist?("#{bundle}/Template/Status.js") %>
+
+<%# TODO: openWithFinder for image files instead of Diff %>
+
+<%=
+prefix_js =<<END_JS # javascript
+// Set up globals
+var ENV = new Object
+
+ENV['PATH']					= "#{e_sh_js ENV['PATH']}"
+ENV['TM_SVN']				= "#{e_sh_js ENV['TM_SVN']}"
+ENV['TM_SUPPORT_PATH']		= "#{e_sh_js ENV['TM_SUPPORT_PATH']}"
+ENV['TM_BUNDLE_SUPPORT']	= "#{e_sh_js ENV['TM_BUNDLE_SUPPORT']}"
+ENV['CommitWindow']			= "#{e_sh_js ENV['CommitWindow']}"
+ENV['TM_RUBY']				= "#{e_sh_js ENV['TM_RUBY'] || '/usr/bin/ruby' }"
+
+// Status class map
+var StatusMap = new Object
+#{StatusMap.keys.inject("") {|string, key| string + "StatusMap['#{key}'] = '#{StatusMap[key]}'\n" }}
+
+WorkPaths = ["#{work_paths.join('","')}"]
+
+END_JS
+
+status_js = IO.read("#{bundle}/Templates/Status.js")
+
+html_header("#{command_name.capitalize} for &ldquo;#{File.basename(display_title)}&rdquo;",
+			"Subversion",
+			%Q{	<script  type="text/javascript" language="javascript" charset="utf-8">#{prefix_js}\n\n#{status_js}</script>})
+
+#<style type="text/css" media="screen"> @import 'file://#{bundle}/Stylesheets/svn_status_style.css'; </style>\n
+%>
+
+<% STDOUT.flush %>
+
+<%
+	button_strip = [	{:status => /\?/,			:name =>	'Add',		:onclick => 'svnAddFile'},
+						{:status => /(A|D|M|C)/,	:name =>	'Revert',	:onclick => 'svnRevertFile'},
+						{:status => /!/,		:name =>	'Remove',	:onclick => 'svnRemoveFile'},
+						{:status => /(A|M|C)/,		:name =>	'Diff',		:onclick => 'sendDiffToTextMate'}]		# should be openWithFinder for image files
+%>
+
+<!-- <div class="section"> -->
+<table class="status" border="0">
+	<tr>
+		<th colspan="<%= status_column_count %>">Status</th>
+		<% if $is_status %>
+		<th colspan="<%= button_strip.size %>">Actions</th>
+		<% end %>
+		<th>File</th>
+	</tr>
+	<% match_columns       = '.' * status_column_count %>
+
+	<% stdin_line_count = 1
+	 STDIN.each_line do |line| %>
+		<tr class="<%= stdin_line_count % 2 == 0 ? 'alternate' : '' %>">
+			<%# Check for error first %>
+			<% if not /^svn:/.match( line ).nil? then %>
+				<td><div class="error"><%= line %></div></td>
+			<% else %>
+			
+				<%# Nope, should have good status %>
+				<% match = /^(#{match_columns})(?:\s+)(.*)\n/.match( line ) %>
+				<% if match.nil? then %>
+				
+					<%# Informational text, not status. colspan=0 doesn't seem to work. Wrong DOCTYPE, maybe? %>
+					<td colspan="<%= status_colspan %>"><div class="info"><%= line %></div></td>
+				<% else %>
+					<%
+					status          = match[1]
+					file            = match[2]
+					esc_file        = '&quot;' + CGI.escapeHTML(file.gsub(/(?=")/, '\\')) + '&quot;'
+					esc_displayname = '&quot;' + CGI.escapeHTML(shorten_path(file).gsub(/(?=")/, '\\')) + '&quot;'
+
+					# Skip files that we don't want to know about
+					next if (status.strip == '?' and ignore_file_pattern =~ file)
+					%>
+					<%# Status columns %>
+					<% status_column_count.times do |i| %>
+
+						<% c = status[i].chr %>
+						<% status_class = StatusMap[c] || 'dunno' %> 
+						<td class="status_col <%= status_class %>" title="<%= StatusColumnNames[i] + " " + status_class.capitalize %>" id="status<%= stdin_line_count %>">
+							<%= c %>
+						</td>
+					<% end %>
+					<%# End status columns %>
+					
+					<%# Action buttons for status %>
+					<% if $is_status %>
+						<% button_strip.each do |button| %>
+							<% match_status = button[:status]
+							button_name = button[:name]
+							show_button = (not status.scan(match_status).empty?)
+							
+							# Make sure we ask for confirmation if we're going to lose changes using Revert
+#							if show_button and button_name == 'Revert' then
+#								button[:onclick] = 'svnRevertFile' + (status.scan(/A|D/).empty? ? 'Confirm' : '')
+#							end %>
+								<td class="action_button <%= button_name.downcase + '_col' %>">
+									<a id="button_<%= button_name.downcase + stdin_line_count.to_s %>"
+										class="<%= button_name.downcase + '_button' %>"
+										style="display: <%= show_button ? 'inline' : 'none' %>;"
+										href="#"
+										onclick="<%= "#{button[:onclick]}('#{esc_file}', #{stdin_line_count}, '#{esc_displayname}')" %>; return false"><%= button_name %></a>
+								</td>
+						<% end %>
+					<% end %>
+					<%# End action buttons %>
+					
+					<td class="file_col"> <a href="<%= 'txmt://open?url=file://' + (e_url file) %>" class="pathname"><%= shorten_path(file) %></a> </td>
+					
+				<% end %>
+			<% end %>
+		</tr>
+		<% stdin_line_count += 1 %>
+		<%= STDOUT.flush; "\n" %>
+	<% end %>
+</table>
+
+<% if $is_status then %>
+	<div id="actions">
+		<input type="button" value="Commit" onclick="svnCommit(); return false" />
+	</div>
+<% end %>
+
+<div id="console">
+	<hr>
+	<h3 class="console">Console</h3>
+	<div id="commandOutput"></div>
+</div>
+
+<!-- FIXME: why would this close the document _above_ the table tag? -->
+<%#= html_footer %>
+</div>
+</body>
+</html>

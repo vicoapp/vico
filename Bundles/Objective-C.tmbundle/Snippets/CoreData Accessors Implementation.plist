@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>- (${1:id})${2:attribute}
+{
+	[self willAccessValueForKey:@"${2: attribute}"];
+	${1:id} value = [self primitiveValueForKey:@"${2: attribute}"];
+	[self didAccessValueForKey:@"${2: attribute}"];
+	return value;
+}
+
+- (void)set${2/./\u$0/}:($1)aValue
+{
+	[self willChangeValueForKey:@"${2: attribute}"];
+	[self setPrimitiveValue:aValue forKey:@"${2: attribute}"];
+	[self didChangeValueForKey:@"${2: attribute}"];
+}</string>
+	<key>name</key>
+	<string>CoreData</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>cdacc</string>
+	<key>uuid</key>
+	<string>563B2FDB-A163-46FE-9380-4178EFC1AD14</string>
+</dict>
+</plist>

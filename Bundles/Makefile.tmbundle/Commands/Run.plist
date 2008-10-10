@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>saveModifiedFiles</string>
+	<key>command</key>
+	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "Running make"
+
+make ${TM_MAKE_FLAGS} 2&gt;&amp;1|"${TM_RUBY:-ruby}" -rtm_parser -eTextMate.parse_errors
+
+echo "Done."
+html_footer
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>@r</string>
+	<key>name</key>
+	<string>Run</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.makefile</string>
+	<key>uuid</key>
+	<string>19F9C045-7BCC-429B-8C68-967B6BD15B84</string>
+</dict>
+</plist>

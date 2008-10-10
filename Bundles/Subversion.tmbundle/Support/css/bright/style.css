@@ -1,0 +1,131 @@
+/* ===================== */
+/* = Subversion Styles = */
+/* ===================== */
+
+/* INFO */
+
+.bright div.subversion dl.info.alternate dt {
+   border-top: 1px dashed #ccc;
+}
+
+/* BLAME */
+
+/* some adds for the links in the table (clickable lines)..*/
+.bright div.subversion table.blame a:hover, div.subversion table.blame a:active {
+/*   background-color: #a3c8ff;*/
+   color: inherit;
+   text-decoration: none;
+}
+
+/* formating the table.. */
+.bright div.subversion table.blame {
+	background-color: #F8F8F8;
+	border: 1px solid #cccbba;
+}
+
+.bright div.subversion table.blame th {
+   text-align: left;
+   background-color: #eee;
+   border-bottom: 1px solid #999;
+   padding: 3px;
+   padding-bottom: 1px;
+   padding-top: 1px;
+   color: #666;
+}
+
+/* i have to format just these 2, because i just want
+   borders beween the headers and not at their sides.. */
+.bright div.subversion  table.blame th.revhead {
+   border-left: 1px solid #bbb;
+   border-right: 1px solid #bbb;
+}
+
+.bright div.subversion table.blame th.codehead {
+   border-left: 1px solid #bbb;
+}
+
+/* to make it look good if a line gets wrapped: */
+/* about the several column classes.. */
+.bright div.subversion table.blame td.linecol {
+   background-color: #ddd;
+   border-right: 1px solid #999;
+   color: #888;
+   text-align: right;
+}
+
+.bright div.subversion table.blame td.revcol, .bright div.subversion table.blame td.namecol {
+   text-align: right;
+   background-color: #f8f8f8;
+   color: #888;
+   border-right: 1px solid #ddd;
+   padding-right: 2px;
+   padding-left: 2px;
+}
+
+.bright div.subversion table.blame td.namecol {
+   border-right: 1px solid #aaa;
+}
+
+/* maybe this should be implemented as id but its
+   an optimisation for less ruby code. :) */
+.bright div.subversion table.blame td.current_line {
+   background-color: #F1D8F0;
+	border-width: 1px 0 1px 0;
+	border-style: solid;
+	border-color: #555;
+}
+
+
+/* STATUS */
+.bright table.status {
+	border: 0px;
+}
+
+.bright table.status th {
+	background-color: #E2E2E2;
+	font-weight: normal;
+}
+
+.bright table.status td {
+}
+
+table.status td.status_col {
+	color: #505050;
+}
+#commandOutput {
+	border: 1px solid #AAA;
+	background-color: #DDD;
+}
+
+/* A */
+.bright table.status td.added {
+	color:      green;
+	background: #bbffb3;
+}
+/* M */
+.bright table.status td.modified,
+.bright table.status td.updated,
+.bright table.status td.merged {
+	color:      #eb6400;
+	background: #f7e1ad;
+}
+/* D */
+.bright table.status td.deleted,
+.bright table.status td.replaced {
+	color:      red;
+	background: #f59696;
+}
+/* C, !, " */
+.bright table.status td.conflict,
+.bright table.status td.missing,
+.bright table.status td.typeconflict {
+	color:      teal;
+	background: #A3CED0;
+}
+/* ?, I, X */
+.bright table.status td.unknown,
+.bright table.status td.ignored,
+.bright table.status td.external {
+	color:      purple;
+	background: #edaef5;
+}

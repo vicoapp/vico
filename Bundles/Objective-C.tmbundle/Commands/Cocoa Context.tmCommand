@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>bundleUUID</key>
+	<string>4679484F-6227-11D9-BFB1-000D93589AF6</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+
+
+require ENV['TM_SUPPORT_PATH'] + "/lib/exit_codes"
+require "#{ENV['TM_SUPPORT_PATH']}/lib/escape"
+if ENV['DIALOG'] =~ /2$/
+  require "#{ENV['TM_BUNDLE_SUPPORT']}/objc_completion2"
+else
+  require "#{ENV['TM_BUNDLE_SUPPORT']}/objc_completion"
+end
+
+def stripComments(line)
+  line.gsub(/((['"])(?:\\.|.)*?\2)|\/\*.*?\*\/|\/\/[^\n\r]*/m) do |s| 
+    if $1
+      s
+    else
+      s.split("\n").map{|e| ' ' * e.length() }.join("\n")
+    end
+  end
+end
+
+class String
+  def index_of_nth_occurrence_of(n, ch)
+    self.unpack("U*").each_with_index do |e, i|
+      return i if e == ch &amp;&amp; (n -= 1) == 0
+    end
+    return -1
+  end
+end
+
+def caret_position(line)
+  tmp = ENV['TM_LINE_NUMBER'].to_i - ENV['TM_INPUT_START_LINE'].to_i
+  if tmp &gt; 0
+    caret_placement = line.index_of_nth_occurrence_of(tmp,?\n) + ENV['TM_LINE_INDEX'].to_i
+  else
+    caret_placement =ENV['TM_LINE_INDEX'].to_i-ENV['TM_INPUT_START_LINE_INDEX'].to_i - 1
+  end
+end
+
+if ENV['TERMINAL_MATE_NEW']
+  class ObjCMethodCompletion
+    def show_dialog(prettyCandidates,start,&amp;snip_gen)
+      require "#{ENV['TM_SUPPORT_PATH']}/lib/osx/plist"
+      pl = {'menuItems' =&gt; prettyCandidates.map { |pretty, junk, full | { 'title' =&gt; pretty, 'cand' =&gt; full} }}
+      pl.to_plist
+      res = pl['menuItems'][0]
+      snip_gen.call( res['cand'], start )
+    end
+  end
+  
+  class TextMateEarlyExitException &lt; RuntimeError
+  end
+  
+  module TextMate
+    module_function
+    def exit_show_tool_tip(out = nil)
+      print out if out
+      raise TextMateEarlyExitException, "show tool kit"
+    end
+    
+    def exit_discard(out = nil)
+      print out if out
+      raise TextMateEarlyExitException, "exit discard"
+    end
+  end
+  
+  
+  
+  tc = [
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '19', 'TM_INPUT_START_LINE' =&gt; '19', 'TM_LINE_INDEX' =&gt; '8', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[self ad]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '20', 'TM_INPUT_START_LINE' =&gt; '20', 'TM_LINE_INDEX' =&gt; '20', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[[NSStrig alloc] ini]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '19', 'TM_INPUT_START_LINE' =&gt; '19', 'TM_LINE_INDEX' =&gt; '8', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[self adbl]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '21', 'TM_INPUT_START_LINE' =&gt; '21', 'TM_LINE_INDEX' =&gt; '26', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[NSObject isKindOfClass:NS]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '22', 'TM_INPUT_START_LINE' =&gt; '22', 'TM_LINE_INDEX' =&gt; '18', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[sto setObject:for]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '23', 'TM_INPUT_START_LINE' =&gt; '23', 'TM_LINE_INDEX' =&gt; '22', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[sto setObject:for for]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '24', 'TM_INPUT_START_LINE' =&gt; '24', 'TM_LINE_INDEX' =&gt; '21', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[sto setObject:for + ]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '25', 'TM_INPUT_START_LINE' =&gt; '25', 'TM_LINE_INDEX' =&gt; '5', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj ]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '26', 'TM_INPUT_START_LINE' =&gt; '26', 'TM_LINE_INDEX' =&gt; '7', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[NSObje]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '27', 'TM_INPUT_START_LINE' =&gt; '27', 'TM_LINE_INDEX' =&gt; '5', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj ]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '28', 'TM_INPUT_START_LINE' =&gt; '28', 'TM_LINE_INDEX' =&gt; '6', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj t]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '11','TM_INPUT_START_LINE' =&gt; '11','TM_LINE_INDEX' =&gt; '11','TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj t:b:av]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '30', 'TM_INPUT_START_LINE' =&gt; '30', 'TM_LINE_INDEX' =&gt; '19', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj set:[NSString ]]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '31', 'TM_INPUT_START_LINE' =&gt; '31', 'TM_LINE_INDEX' =&gt; '30', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj set:[NSString role:@"eu" ]]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '32', 'TM_INPUT_START_LINE' =&gt; '32', 'TM_LINE_INDEX' =&gt; '35', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj set:[NSString role:@"eu" forYo]]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '33', 'TM_INPUT_START_LINE' =&gt; '33', 'TM_LINE_INDEX' =&gt; '40', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj set:[NSString role:@"eu" forYou:sel]]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER' =&gt; '34', 'TM_INPUT_START_LINE' =&gt; '34', 'TM_LINE_INDEX' =&gt; '26', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; '[obj postNotificationName: object:NSString *]'},
+  {:tmVars =&gt; {'TM_LINE_NUMBER'=&gt; '7','TM_INPUT_START_LINE'=&gt; '6','TM_LINE_INDEX'=&gt; '55', 'TM_INPUT_START_LINE_INDEX' =&gt; '0'}, :line =&gt; "[[NSNotificationCenter defaultCenter] addObserver:self\n                        selector:@selector(colorPicker:) ]"}]
+
+  
+  ENV['TM_BUNDLE_SUPPORT'] = "/Library/Application Support/TextMate/Bundles/Objective-C.tmbundle/Support"
+  tc.each do |element|
+    element[:tmVars].each do |key,value|
+      ENV[key] = value
+    end
+    caret_placement = caret_position(element[:line])
+begin
+    res = ObjCMethodCompletion.new(element[:line] , caret_placement).print
+rescue NoMethodError =&gt; boom
+
+  puts "error in:" + element.inspect
+
+  puts boom
+  
+rescue TextMateEarlyExitException =&gt; boom
+  puts "Early Exit"
+end
+  
+  end
+  
+else
+line = STDIN.read
+caret_placement = caret_position(line)
+if ENV['TM_SCOPE'].include? "meta.bracketed.objc"
+  res, os = ObjCMethodCompletion.new(stripComments(line) , caret_placement).print
+else
+  res = ObjCFallbackCompletion.new(stripComments(line) , caret_placement).print
+  os = 0
+end
+if res
+  print e_sn(line[0..caret_placement]) + res + e_sn(line[caret_placement + 1 + os..-1]) 
+else
+  TextMate.exit_discard
+end
+end
+</string>
+	<key>disableOutputAutoIndent</key>
+	<true/>
+	<key>fallbackInput</key>
+	<string>scope</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>~</string>
+	<key>name</key>
+	<string>Completion: Inside Brackets</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>meta.function-with-body.objc | meta.bracketed.objc</string>
+	<key>uuid</key>
+	<string>478FBA1D-C11C-4D53-BE95-8B8ABB5F15DC</string>
+</dict>
+</plist>

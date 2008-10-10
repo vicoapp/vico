@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string># View documentation for Latex package
+# take advantage of the texdoctk index as well as the texdoc catalog directory.
+. "${TM_SUPPORT_PATH}/lib/html.sh"
+. "${TM_SUPPORT_PATH}/lib/webpreview.sh"
+
+M=${TM_LATEX_MASTER:=$TM_FILEPATH}
+DIR=`dirname "$M"`
+FILE=`basename "$M"`
+
+TEXDOCTKDB=`kpsewhich --progname=texdoctk --format='other text files' texdoctk.dat`
+export TEXDOCTKDB
+
+TMTEXMAIN=`kpsewhich --expand-path '$TEXMFMAIN'`
+export TMTEXMAIN
+
+# May need to add more lines to accomodate different tex distros.
+[ -z $TM_LATEX_DOCBASE ] &amp;&amp; TM_LATEX_DOCBASE=`kpsewhich --expand-path '$TEXMFTE'`   # teTeX
+[ -z $TM_LATEX_DOCBASE ] &amp;&amp; TM_LATEX_DOCBASE=`kpsewhich --expand-path '$TEXMFTL'`   # gwTeX 
+[ -z $TM_LATEX_DOCBASE ] &amp;&amp; TM_LATEX_DOCBASE=`kpsewhich --expand-path '$TEXMFDOCDIR'`  # TeXLive
+export TM_LATEX_DOCBASE
+
+TM_LATEX_HELP_CATALOG=`find $TMTEXMAIN/../ -name entries -print`
+export TM_LATEX_HELP_CATALOG
+
+TMTEXDOCDIRS=`kpsewhich --expand-path '$TEXDOCS'`
+export TMTEXDOCDIRS
+
+# Switch to the right directory.
+cd "$TM_PROJECT_DIRECTORY"
+cd "$DIR"
+
+html_header 'Package Documentation'
+echo '&lt;p&gt;&lt;small&gt;Hint: Cursor on package name shows doc for package.  Otherwise show package doc browser.&lt;/small&gt;&lt;/p&gt;'
+PyTeXdoc.py</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Package</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>1A12B844-4074-4655-A45C-18AC8D943267</string>
+</dict>
+</plist>

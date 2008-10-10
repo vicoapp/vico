@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+# A reftex-style citation command
+
+require ENV["TM_SUPPORT_PATH"] + "/lib/exit_codes.rb"
+require ENV["TM_SUPPORT_PATH"] + "/lib/ui.rb"
+require ENV["TM_BUNDLE_SUPPORT"] + "/lib/LaTeXUtils.rb"
+include LaTeX
+phrase = STDIN.read
+scope = String.new(ENV["TM_SCOPE"])
+
+if !(scope.include? "meta.citation.latex")
+items = ["c:  \\cite",
+		"t:  \\citet",
+		"    \\citet*",
+		"p:  \\citep",
+		"    \\citep*",
+		"e:  \\citep[e.g.]",
+		"s:  \\citep[see]",
+		"a:  \\citeauthor",
+		"    \\citeauthor*",
+		"y:  \\citeyear",
+		"r:  \\citeyearpar",
+		"f:  \\footcite"]
+
+if items.length &gt; 1
+	choice = TextMate::UI.menu(items)
+	TextMate.exit_discard if choice.nil?
+	choice = items[choice]
+end
+cphrase = choice.slice(/^[^%]+/).strip
+#cphrase = cphrase[4..-1]
+cphrase.gsub! %r{.*\\}, ""
+end
+
+begin
+  items = LaTeX.get_citations.map{|i| i.citekey + "   % "+i.description}
+  items = items.grep(/#{phrase}/i) if phrase != ""
+  TextMate.exit_discard if items.empty?
+  if items.length &gt; 1
+  	choice = TextMate::UI.menu(items)
+  	TextMate.exit_discard if choice.nil?
+  	choice = items[choice]
+  else
+    choice = items[0]
+  end
+  selection = choice.slice(/^[^%]+/).strip
+  if ENV['TM_SCOPE'].match(/citation/) then
+    TextMate.exit_insert_snippet("#{selection}$0")
+  else
+    TextMate.exit_insert_snippet("\\#{cphrase}${1:[$2]}\{#{selection}$3\}$0")
+  end
+rescue RuntimeError =&gt; e
+  TextMate.exit_insert_text(e.message)
+end
+
+</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^{</string>
+	<key>name</key>
+	<string>Citation (Ref-TeX Style)</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>0E51AD42-17AD-4507-950B-AB114408B58D</string>
+</dict>
+</plist>

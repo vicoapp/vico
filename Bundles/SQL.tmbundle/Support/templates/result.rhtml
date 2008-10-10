@@ -1,0 +1,30 @@
+<h2><%= escape @query %></h2>
+<% if @message %>
+    <p class="message"><%= @message %></p>
+<% end %>
+
+<% if @result and @result.is_a? Result and @result.num_rows > 0 %>
+    <% if not @limited %>
+      <p>
+        <%= @pager if @pager %>
+        <%= get_data_link('&laquo;&nbsp;Prev', :query => @query, :offset => [@options.offset - @page_size, 0].max) if @options.offset > 0 %>
+        <%= get_data_link('Next&nbsp;&raquo;', :query => @query, :offset => @options.offset + @page_size) if @result.num_rows >= @page_size %>
+      </p>
+    <% end %>
+    <table class="sortable graybox" id="results" cellspacing="0" cellpadding="5">
+        <tr>
+            <% (@fields = @result.fields).each do |field| %>
+                <th><%= field[:name] %></th>
+            <% end %>
+        </tr>
+        <% $row_counter = 0 %>
+        <% @result.rows.each do |row| %>
+            <tr class="<% $row_counter += 1; if $row_counter % 2 == 0 then %>alternate<% end %>">
+                <% row.each_with_index do |col, index| %>
+                    <td <%= 'style="text-align: right"' if @fields[index][:type] == :number %>><%= format col, @fields[index][:type] %></td>
+                <% end %>
+            </tr>
+        <% end %>
+    </table>
+<% end %>
+<br>

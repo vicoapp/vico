@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "Subversion Help" "Subversion"
+
+"$TM_SUPPORT_PATH/lib/markdown_to_help.rb" &lt;&lt;'EOF'
+
+This document describes the commands of the TextMate Subversion bundle and how you can fine-tune their behavior. For general Subversion help and tutorial, you should read the [Subversion book](http://svnbook.red-bean.com/ "Version Control with Subversion").
+
+# Command Reference
+
+## Adding, Removing, Updating, Committing
+
+These commmands operate on the selected files/folders in the project, or the active file if it doesn't belong to a project.
+
+*	__Add to Repository__
+
+	Schedules the targets for addition to the repository.
+
+*	__Remove From Repository&amp;hellip;__
+
+	Schedules the targets for removal from the repository.
+
+*	__Revert__
+
+	Reverts the file to the base revision. Any modifications to the file will be lost.
+
+*	__Update to Newest__
+
+	Updates the targets with the newest changes from the repository.
+
+*	__Commit__
+
+	Commits your changed files to the repository. A dialog asks you for the description of
+	your changes; you may also choose to exclude files from the commit by unchecking them.
+	If no files are selected or active, this command does nothing. If the target files
+	have no local changes, nothing happens.
+
+## Information, Logs, Status
+
+*	__Blame__
+
+	Displays a line-by-line history of the active file, showing you who wrote which line in what revision.	 Click a line to jump to it in an editor window.  Hover over a revision number or author name to see when the corresponding line was last changed. The date format is [adjustable](#tm_svn_date_format). Requires access to the repository.
+
+*	__Info__
+
+	Displays detailed information about the selected files, including the type of file, who last changed the file, the date file was last changed, the repository URL to the file, and other information. Does not require access to the repository.
+
+	Some parameters are configurable via shell variables; see the [Configuration Options](#tm_svn_info) section below.
+
+*	__Log__
+	
+	Displays the commit message history for the selected files.
+	Some parameters are configurable via shell variables; see the [Configuration Options](#tm_svn_log) section below.
+	
+*	__View Revision&amp;hellip;__
+
+	Displays a different revision of the active file. This command presents you with a list of revisions to choose from.
+
+*	__Status__
+
+	Displays the modification status for each of the selected files/folders, or for the active file's directory if there is no project.
+	Does not access the repository.
+
+## Comparing Revisions
+
+These commands operate on the active file.
+
+*	__Diff Revisions&amp;hellip;__
+	
+	Displays the differences between two specific revisions of the active file. You will be presented with a list of revisions; please select two.
+	
+*	__Diff With Newest (HEAD)__
+	
+	Displays the differences between the active file and the newest available revision of the file on the server.
+	Equivalent to `svn diff -rHEAD`.
+	
+*	__Diff With Working Copy (BASE)__
+	
+	Displays the differences between the active file and an unaltered, pristine copy of the file at the same revision.
+	Equivalent to `svn diff -rBASE`.
+	
+*	__Diff With Previous Revision (PREV)__
+	
+	Displays the differences between the active file and the previous revision of the file.
+	Equivalent to `svn diff -rPREV`.
+	
+*	__Diff With Revision&amp;hellip;__
+	
+	Displays the differences between the active file and a different revision of the same file. This command presents you with a list of revisions to choose from.
+	
+## Merging Revisions
+
+*	__Show Available Revisions for Merging__
+
+	Display revisions that can be merged into a selected folder in a project. This command requires the [`svnmerge.py`](http://www.orcaware.com/svn/wiki/Svnmerge.py "svnmerge.py is a tool for automatic branch management") script to be installed and for merge tracking to have been previously initiated.
+
+*	__Resolve Conflicts With FileMerge&amp;hellip;__
+
+	Opens the active file in FileMerge. This command sets up FileMerge to facilitate conflict resolution.
+
+*	__Resolved__
+
+	Removes conflict-related artifact files for the selected file, allowing the file to be committed after you have fixed the conflicts. Does not remove conflict markers or resolve conflicts itself.
+
+## Check Out
+
+*	__Check Out&amp;hellip;__
+	
+	Check out a local working copy of a repository directory. Asks for a path to the repository directory to check out.
+
+# Configuration Options
+
+These shell variables allow you to tweak the behavior of the certain commands if need be. The default values should make sense for normal use. Learn [how to set these variables](?static_variables).
+
+## Tools
+
+*	`$TM_SVN` (default: `svn`)
+	
+	the path to your svn executable. Must be reachable either as an absolute path or as a relative path from the shell PATH environment variable.
+	
+*	`$TM_SVNMERGE` (default: `svnmerge`)
+	
+	the path to your svnmerge.py script.
+	
+*	`$TM_RUBY` (default: `ruby`)
+	
+	Here you can tweak with what Ruby the formatting scripts will be executed.
+	
+*	`$TM_SVN_DIFF_CMD` (default: not set)
+	
+	Allows you to set a command that should be used to present file differences. If you want use Apple’s FileMerge application, use [`fmdiff`](http://ssel.vub.ac.be/ssel/internal:fmdiff).
+
+## Date Format
+
+*	&lt;a name="tm_svn_date_format"&gt;`$TM_SVN_DATE_FORMAT`&lt;/a&gt; (default: not set&amp;mdash;no changes, just show what SVN shows)
+	
+	A date format string that allows you to tweak the format in which Blame, Log and Info show you dates.	 
+	See [strftime(3)](http://developer.apple.com/documentation/Darwin/Reference/ManPages/man3/strftime.3.html "man page for strftime(3)") for what you can enter here.
+
+## Blame, Info, and Log Options
+
+*	`$TM_SVN_CLOSE` (default: false)
+	
+	Adjust whether the windows of Blame and Info close when you click on a link which opens a file in TM.  Set it to `1` or `true` if windows should close or to something else if they should not.
+	
+*	&lt;a name="tm_svn_log"&gt;`$TM_SVN_LOG_RANGE`&lt;/a&gt; (default: `BASE:1`)
+	
+	The default range to query for log messages.
+	
+*	`$TM_SVN_LOG_LIMIT` (default: 15)
+	
+	The number of messages to show.	 0 means no limit.
+
+*	&lt;a name="tm_svn_info"&gt;`$TM_SVN_INFO_HIDE`&lt;/a&gt; (default: nothing)
+
+	Here you can adjust what keys of the info stream you don't want to see, it is case insensitive and a comma (,) separated list.
+	If you enter a `*`, it is assumed that you want to hide all vars, if so, you can make some values visible again with `$TM_SVN_INFO_SHOW`.
+
+*	`$TM_SVN_INFO_SHOW` (default: everything else)
+
+	This is also a comma separated list of keys, it just makes sense if you did hide all with the above var.
+	`*` has no special meaning here. Everything you enter here will be shown if you want to hide everything else.
+
+*	`$TM_SVN_IGNORE_BAD_LINES` (default: not set)
+
+	By setting this variable, Log will not print unexpected text that may appear at the beginning of Subversion's output. This could be useful if you frequently see this output but you deem it safe to ignore.
+
+EOF
+</string>
+	<key>dontFollowNewOutput</key>
+	<true/>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string>Help</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>uuid</key>
+	<string>0CE6FB29-8467-11D9-ABBA-0011242E4184</string>
+</dict>
+</plist>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>${TM_COMMENT_START} ${4:Send $2 to $1, if $1 supports it}${TM_COMMENT_END}
+if ([${1:self} respondsToSelector:@selector(${2:someSelector:})])
+{
+    [$1 ${3:${2/((:\s*$)|(:\s*))/:&lt;&gt;(?3: )/g}}];
+}</string>
+	<key>name</key>
+	<string>Responds to Selector</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>responds</string>
+	<key>uuid</key>
+	<string>171FBCAE-0D6F-4D42-B24F-871E3BB6DFF0</string>
+</dict>
+</plist>

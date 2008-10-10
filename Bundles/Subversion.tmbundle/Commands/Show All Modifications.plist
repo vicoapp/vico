@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if [[ -n "$TM_SELECTED_FILE" &amp;&amp; -d "$TM_SELECTED_FILE" ]]
+   then cd "$TM_SELECTED_FILE"
+   else cd "${TM_PROJECT_DIRECTORY:-$TM_DIRECTORY}"
+fi
+
+"${TM_SVN:-svn}" diff --diff-cmd diff</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>Diff Selected Files With Working Copy (BASE)</string>
+	<key>output</key>
+	<string>openAsNewDocument</string>
+	<key>uuid</key>
+	<string>18D4CF4B-2363-412E-B396-6E33868B2EE4</string>
+</dict>
+</plist>

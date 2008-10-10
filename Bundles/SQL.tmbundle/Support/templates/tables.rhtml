@@ -1,0 +1,7 @@
+<% if @tables.empty? %>
+    <li style="list-style: none">No tables to show</li>
+<% else %>
+    <% @tables.each do |table| %>
+        <li><%= get_data_link(table, :database => @options.database.name, :table => table) %></li>
+    <% end %>
+<% end %>

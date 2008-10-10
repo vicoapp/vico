@@ -18,23 +18,13 @@
 
 @implementation ViTextView
 
-- (id)initWithFrame:(NSRect)frame textContainer:(NSTextContainer *)aTextContainer
+- (void)initEditorWithDelegate:(id)aDelegate
 {
-	// NSLog(@"%s initializing", _cmd);
-	self = [super initWithFrame:frame textContainer:aTextContainer];
-	if(self)
-	{
-		[self initEditor];
-	}
-	return self;
-}
-
-- (void)initEditor
-{
+	[self setDelegate:aDelegate];
 	[self setCaret:0];
 	[[self textStorage] setDelegate:self];
 
-	undoManager = [[NSUndoManager alloc] init];
+	undoManager = [[self delegate] undoManager];
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSMutableDictionary alloc] init];
 	storage = [self textStorage];
@@ -53,6 +43,7 @@
 			 nil];
 	
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
+			  /*
 			  @"next_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007C], // command-right
 			  @"prev_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007B], // command-left
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
@@ -64,6 +55,7 @@
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001A], // command-7
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
+			  */
 			  @"show_scope:", [NSNumber numberWithUnsignedInteger: 0x00060023], // ctrl-shift-p
 			 nil];
 	
@@ -1050,6 +1042,7 @@
 	return nil;
 }
 
+#if 0
 - (void)next_tab:(NSString *)characters
 {
 	[[self delegate] selectNextTab];
@@ -1064,6 +1057,7 @@
 {
 	[[self delegate] selectTab:[characters characterAtIndex:0] - '1'];
 }
+#endif
 
 - (void)show_scope:(NSString *)characters
 {

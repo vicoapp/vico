@@ -12,11 +12,13 @@
 	BOOL textViewConfigured;
 	ViWindowController *windowController;
 	NSString *readContent;
+
+	id								savedDelegate;
+	SEL								savedShouldCloseSelector;
+	BOOL							shouldCloseAll;
 }
 
 - (NSView *)view;
-//- (void)setDelegate:(id)aDelegate;
-//- (id)delegate;
 - (IBAction)finishedExCommand:(id)sender;
 - (void)message:(NSString *)fmt, ...;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
@@ -31,3 +33,4 @@
 - (ViTextView *)textView;
 
 @end
+

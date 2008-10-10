@@ -44,22 +44,17 @@ static NSWindowController	*currentWindowController = nil;
 {
 	INFO(@"window %@ did load", self);
 
-	NSArray *existingItems;
-	NSEnumerator *enumerator;
-	NSTabViewItem *item;
-
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
 	[tabBar setStyleNamed:@"Unified"];
-	[tabBar setCanCloseOnlyTab:NO];
+	[tabBar setCanCloseOnlyTab:YES];
 	[tabBar setHideForSingleTab:NO];
 	[tabBar setPartnerView:tabView];
 	[tabBar setShowAddTabButton:YES];
-	[tabBar setAllowsDragBetweenWindows:NO];
+	[tabBar setAllowsDragBetweenWindows:YES];
 
-	existingItems = [tabView tabViewItems];
-	enumerator = [existingItems objectEnumerator];
-	while ((item = [enumerator nextObject]) != nil)
+	NSTabViewItem *item;
+	for (item in [tabView tabViewItems])
 	{
 		[tabView removeTabViewItem:item];
 	}
@@ -71,11 +66,6 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
 	[[self window] makeKeyAndOrderFront:self];
-}
-
-- (void)setDocument:(NSDocument *)document
-{
-	[super setDocument:document];
 }
 
 - (IBAction)addNewDocumentTab:(id)sender
@@ -101,29 +91,6 @@ static NSWindowController	*currentWindowController = nil;
 	[tabView selectTabViewItem:newItem];
 }
 
-#if 0
-- (IBAction)addNewTab:(id)sender
-{
-	PlainDocumentView	*plainDocView;
-	NSTabViewItem		*newItem;
-	
-	if (!isLoaded) return;
-    plainDocView = [[[PlainDocumentView alloc] initWithFrame:[tabView frame]] autorelease];
-	newItem = [[[NSTabViewItem alloc] initWithIdentifier:[plainDocView controller]] autorelease];
-	[newItem setView:plainDocView];
-	[[plainDocView textView] setString:text withExtension:extension];
-	[text release];
-	[extension release];
-	text = nil;
-	extension = nil;
-	[plainDocView setDocument:[self document]];
-    [newItem setLabel:[[self document] displayName]];
-    [tabView addTabViewItem:newItem];
-    [tabView selectTabViewItem:newItem];
-}
-#endif
-
-
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	if (!isLoaded)
@@ -141,15 +108,34 @@ static NSWindowController	*currentWindowController = nil;
 	
 	tabViewItem = [tabView selectedTabViewItem];
 	INFO(@"close tabview %@", tabViewItem);
-	//[(ViDocument *)[[tabViewItem identifier] valueForKeyPath:@"selection.document"] tryToCloseSingleDocument];
+	[[self window] performClose:self];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	[tabView selectTabViewItem:tabViewItem];
-	INFO(@"close tabview %@", tabViewItem);
-	//[(ViDocument *)[[tabViewItem identifier] valueForKeyPath:@"selection.document"] tryToCloseSingleDocument];
+	INFO(@"should close tabview %@ ?", tabViewItem);
+	[[self window] performClose:[tabViewItem identifier]];
 	return NO;
+}
+
+- (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)aTabView
+{
+	/* Go through all tabs and reset all edit controllers delegates to self.
+	 * Needed after a tab drag from another document window.
+	 */
+
+	INFO(@"changed number of tabs");
+#if 0
+	NSTabViewItem *item;
+	for (item in [aTabView tabViewItems])
+	{
+		id oldDelegate = [[item identifier] delegate];
+		INFO(@"old delegate for %@ = %@", [self displayName], oldDelegate);
+		INFO(@"new delegate for %@ = %@", [self displayName], self);
+		[[item identifier] setDelegate:self];
+	}
+#endif
 }
 
 - (int)numberOfTabViewItems
@@ -160,6 +146,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)removeTabViewItemContainingDocument:(ViDocument *)doc
 {
 	[tabView removeTabViewItem:[self tabViewItemForDocument:doc]];
+	INFO(@"%i tab view items left", [tabView numberOfTabViewItems]);
 }
 
 - (NSTabViewItem *)tabViewItemForDocument:(ViDocument *)doc
@@ -188,6 +175,8 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
+	INFO(@"window will close: %@", aNotification);
+
 	if (currentWindowController == self)
 		currentWindowController = nil;
 	[windowControllers removeObject:self];
@@ -206,34 +195,51 @@ static NSWindowController	*currentWindowController = nil;
 		[tabView selectTabViewItem:item];
 }
 
-- (void)selectTab:(int)tab
+- (IBAction)selectTab:(id)sender
 {
+	int tab = 0; // FIXME
 	if (tab < [tabView numberOfTabViewItems])
 		[tabView selectTabViewItem:[[[tabView delegate] representedTabViewItems] objectAtIndex:tab]];
 }
 
-- (void)selectNextTab
+- (IBAction)selectNextTab:(id)sender
 {
 	int num = [tabView numberOfTabViewItems];
 	if (num <= 1)
 		return;
-	
-	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
-	if (++ndx >= num)
-		ndx = 0;
-	[tabView selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+
+	NSArray *tabs = [tabBar representedTabViewItems];
+	int i;
+	for (i = 0; i < num; i++)
+	{
+		if ([tabs objectAtIndex:i] == [tabView selectedTabViewItem])
+		{
+			if (++i >= num)
+				i = 0;
+			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
+			break;
+		}
+	}
 }
 
-- (void)selectPreviousTab
+- (IBAction)selectPreviousTab:(id)sender
 {
 	int num = [tabView numberOfTabViewItems];
 	if (num <= 1)
 		return;
-	
-	int ndx = [tabView indexOfTabViewItem:[tabView selectedTabViewItem]];
-	if (--ndx < 0)
-		ndx = num - 1;
-	[tabView selectTabViewItem:[tabView tabViewItemAtIndex:ndx]];
+
+	NSArray *tabs = [tabBar representedTabViewItems];
+	int i;
+	for (i = 0; i < num; i++)
+	{
+		if ([tabs objectAtIndex:i] == [tabView selectedTabViewItem])
+		{
+			if (--i < 0)
+				i = num - 1;
+			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
+			break;
+		}
+	}
 }
 
 - (ViTagStack *)sharedTagStack

@@ -6,6 +6,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
 - (ViWindowController *)windowController;
+
+- (void)closeSheetEnded:(NSNotification *)notification;
+- (NSInvocation *)shouldCloseInvocationWithResult:(BOOL)yn;
 @end
 
 @implementation ViDocument
@@ -33,7 +36,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		makeNewWindowInsteadOfTab = NO;
 	}
 	else
+	{
 		windowController = [ViWindowController currentWindowController];
+	}
 
 	[self addWindowController:windowController];
 	[windowController addNewTab:self];
@@ -42,8 +47,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
 	[super windowControllerDidLoadNib:aController];
-	[textView initEditor];
-	[textView setDelegate:self];
+	[textView initEditorWithDelegate:self];
 
 	if (readContent)
 	{
@@ -68,17 +72,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	INFO(@"file url = %@", absoluteURL);
 	[super setFileURL:absoluteURL];
+
+	/* update syntax definition */
 	[textView configureForURL:[self fileURL]];
 }
-
-
-#if 0
-- (NSString *)autosavingFileType
-{
-	/* disable autosaving */
-	return nil;
-}
-#endif
 
 #pragma mark -
 #pragma mark Other stuff
@@ -182,6 +179,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
+#pragma mark -
+
 - (ViTextView *)textView
 {
 	return textView;
@@ -192,19 +191,46 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [[self windowControllers] objectAtIndex:0];
 }
 
-- (void)selectNextTab
+- (void)close
 {
-	[[self windowController] selectNextTab];
+	INFO(@"closing document %@", self);
+	[self removeWindowController:windowController];
+	[super close];
 }
 
-- (void)selectPreviousTab
+- (void)shouldCloseWindowController:(NSWindowController *)aWindowController
+                           delegate:(id)aDelegate
+	        shouldCloseSelector:(SEL)shouldCloseSelector
+			contextInfo:(void *)contextInfo
 {
-	[[self windowController] selectPreviousTab];
+	INFO(@"aWindowController %@, aDelegate %@", aWindowController, aDelegate);
+	[super shouldCloseWindowController:aWindowController delegate:aDelegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
 }
 
-- (void)selectTab:(int)tab
+- (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
 {
-	[[self windowController] selectTab:tab];
+	INFO(@"can we close document %@?", self);
+
+	savedDelegate = aDelegate;
+	savedShouldCloseSelector = shouldCloseSelector;
+	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
+}
+
+- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
+{
+	INFO(@"should close document %@? %s", self, shouldClose ? "YES" : "NO");
+
+	if (shouldClose)
+	{
+		[windowController removeTabViewItemContainingDocument:self];
+		[self close];
+		if ([windowController numberOfTabViewItems] == 0)
+		{
+			/* Close the window after all tabs are gone. */
+			/* [[windowController window] performSelector:@selector(performClose:) withObject:self afterDelay:0]; */
+			[[windowController window] performClose:self];
+		}
+	}
 }
 
 @end

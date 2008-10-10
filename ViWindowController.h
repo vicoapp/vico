@@ -27,9 +27,10 @@
 - (void)selectDocument:(ViDocument *)document;
 
 - (ViTagStack *)sharedTagStack;
-- (void)selectTab:(int)tab;
-- (void)selectNextTab;
-- (void)selectPreviousTab;
+
+- (IBAction)selectTab:(id)sender;
+- (IBAction)selectNextTab:(id)sender;
+- (IBAction)selectPreviousTab:(id)sender;
 - (IBAction)toggleProjectDrawer:(id)sender;
 
 @end

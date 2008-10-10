@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_CVS&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+"${TM_RUBY:-ruby}" &lt;&lt;'END'
+
+ENV['CVS_PATH'] = ENV['TM_CVS']
+$LOAD_PATH &lt;&lt; ENV['TM_BUNDLE_SUPPORT']
+require 'versioned_file'
+
+file = CVS::VersionedFile.new(ENV['TM_FILEPATH'])
+file.update(:reset_tags =&gt; true)
+
+puts "All sticky tags reset"
+
+END
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^Z</string>
+	<key>name</key>
+	<string>Reset sticky tags</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>uuid</key>
+	<string>1FE7E10E-70B4-44D7-924D-879C54F19289</string>
+</dict>
+</plist>

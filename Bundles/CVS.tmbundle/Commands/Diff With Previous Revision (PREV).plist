@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_CVS&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
+
+"${TM_RUBY:-ruby}" &lt;&lt;'END'
+
+ENV['CVS_PATH'] = ENV['TM_CVS']
+$LOAD_PATH &lt;&lt; ENV['TM_BUNDLE_SUPPORT']
+require 'cvs_diff'
+
+CVS::diff_active_file(:prev, "Diff With Previous Revision")
+END
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^Z</string>
+	<key>name</key>
+	<string>Diff With Previous Revision (PREV)</string>
+	<key>output</key>
+	<string>openAsNewDocument</string>
+	<key>uuid</key>
+	<string>E29C9E3B-B7FB-4ED1-94C3-2F702CD090B5</string>
+</dict>
+</plist>

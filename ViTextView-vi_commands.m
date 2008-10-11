@@ -82,12 +82,12 @@
 		return NO;
 	}
 	
-	NSUInteger eol;
-	[self getLineStart:NULL end:NULL contentsEnd:&eol];
+	NSUInteger end, eol;
+	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	if ([buffer hasSuffix:@"\n"])
 	{
 		// putting whole lines
-		final_location = eol + 1;
+		final_location = end;
 	}
 	else if (start_location < eol)
 	{

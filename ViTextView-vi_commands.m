@@ -42,7 +42,7 @@
 	 * got it right...   Unlike delete, we make no adjustments here.
 	 */
 	/* yy shouldn't move the cursor */
-	if(command.motion_key != 'y')
+	if (command.motion_key != 'y')
 		final_location = affectedRange.location;
 	return YES;
 }
@@ -52,13 +52,13 @@
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if([buffer length] == 0)
+	if ([buffer length] == 0)
 	{
 		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
 	}
 	
-	if([buffer hasSuffix:@"\n"])
+	if ([buffer hasSuffix:@"\n"])
 	{
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL];
@@ -76,7 +76,7 @@
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if([buffer length] == 0)
+	if ([buffer length] == 0)
 	{
 		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
@@ -84,12 +84,12 @@
 	
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if([buffer hasSuffix:@"\n"])
+	if ([buffer hasSuffix:@"\n"])
 	{
-		// puting whole lines
+		// putting whole lines
 		final_location = eol + 1;
 	}
-	else if(start_location < eol)
+	else if (start_location < eol)
 	{
 		// in contrast to move_right, we are allowed to move to EOL here
 		final_location = start_location + 1;

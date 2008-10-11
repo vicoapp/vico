@@ -4,6 +4,7 @@
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
 #import "ExCommand.h"
+#import "ViAppController.h"  // for sharedBuffers
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -14,6 +15,8 @@
 - (void)recordInsertInRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
+- (NSString *)lineForLocation:(NSUInteger)aLocation;
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView
@@ -26,7 +29,7 @@
 
 	undoManager = [[self delegate] undoManager];
 	parser = [[ViCommand alloc] init];
-	buffers = [[NSMutableDictionary alloc] init];
+	buffers = [[NSApp delegate] sharedBuffers];
 	storage = [self textStorage];
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
@@ -44,8 +47,6 @@
 	
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
 			  /*
-			  @"next_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007C], // command-right
-			  @"prev_tab:", [NSNumber numberWithUnsignedInteger:0x00B0007B], // command-left
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100013], // command-2
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100014], // command-3
@@ -102,6 +103,9 @@
 	}
 }
 
+#pragma mark -
+#pragma mark Vi error messages
+
 - (BOOL)illegal:(ViCommand *)command
 {
 	[[self delegate] message:@"%C isn't a vi command", command.key];
@@ -126,6 +130,9 @@
 	return NO;
 }
 
+#pragma mark -
+#pragma mark Convenience methods
+
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
 {
 	[[storage string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
@@ -142,6 +149,16 @@
 {
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 }
+
+- (NSString *)lineForLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
+}
+
+#pragma mark -
+#pragma mark Indentation
 
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
 {
@@ -161,11 +178,39 @@
 	return nil;
 }
 
-- (NSString *)lineForLocation:(NSUInteger)aLocation
+- (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
+	// FIXME: should encapsulate this!
+	// FIXME: check scope at aLocation!
+	NSString *increaseIndentPattern = [bundle objectForKey:@"increaseIndentPattern"];
+	if (increaseIndentPattern == nil)
+	{
+		NSDictionary *prefs;
+		for (prefs in [bundle objectForKey:@"preferences"])
+		{
+			increaseIndentPattern = [[prefs objectForKey:@"settings"] objectForKey:@"increaseIndentPattern"];
+			if (increaseIndentPattern)
+			{
+				// cache it
+				[bundle setObject:increaseIndentPattern forKey:@"increaseIndentPattern"];
+				break;
+			}
+		}
+	}
+
+	if (increaseIndentPattern)
+	{
+		NSString *checkLine = [self lineForLocation:aLocation];
+		INFO(@"checking line [%@] for indentation", checkLine);
+		INFO(@"increase pattern = [%@]", increaseIndentPattern);
+
+		if ([checkLine rangeOfRegularExpressionString:increaseIndentPattern].location != NSNotFound)
+		{
+			return YES;
+		}
+	}
+	
+	return NO;
 }
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
@@ -183,34 +228,8 @@
 
 		leading_whitespace = [self leadingWhitespaceForLineAtLocation:checkLocation];
 
-		// FIXME: should encapsulate this!
-		NSString *increaseIndentPattern = [bundle objectForKey:@"increaseIndentPattern"];
-		if (increaseIndentPattern == nil)
-		{
-			NSDictionary *prefs;
-			for (prefs in [bundle objectForKey:@"preferences"])
-			{
-				increaseIndentPattern = [[prefs objectForKey:@"settings"] objectForKey:@"increaseIndentPattern"];
-				if (increaseIndentPattern)
-				{
-					// cache it
-					[bundle setObject:increaseIndentPattern forKey:@"increaseIndentPattern"];
-					break;
-				}
-			}
-		}
-	
-		if (increaseIndentPattern)
-		{
-			NSString *checkLine = [self lineForLocation:checkLocation];
-			INFO(@"checking line [%@] for indentation", checkLine);
-			INFO(@"increase pattern = [%@]", increaseIndentPattern);
-	
-			if ([checkLine rangeOfRegularExpressionString:increaseIndentPattern].location != NSNotFound)
-			{
-				leading_whitespace = [NSString stringWithFormat:@"%@	", leading_whitespace ?: @""];
-			}
-		}
+		if ([self shouldIncreaseIndentAtLocation:checkLocation])
+			leading_whitespace = [NSString stringWithFormat:@"%@	", leading_whitespace ?: @""];
 
 		if (leading_whitespace)
 		{
@@ -223,8 +242,9 @@
 	return 1;
 }
 
-/* Undo support
- */
+#pragma mark -
+#pragma mark Undo support
+
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	DEBUG(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
@@ -273,12 +293,14 @@
 	[undoManager endUndoGrouping];
 }
 
+#pragma mark -
+#pragma mark Buffers
 
 - (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if(buffer == nil)
+	if (buffer == nil)
 	{
 		buffer = [[NSMutableString alloc] init];
 		[buffers setObject:buffer forKey:@"unnamed"];
@@ -294,6 +316,8 @@
 	[storage deleteCharactersInRange:cutRange];
 }
 
+#pragma mark -
+#pragma mark Convenience methods
 
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
@@ -324,7 +348,7 @@
 	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
 				       options:backwardFlag ? NSBackwardsSearch : 0
 					 range:backwardFlag ? NSMakeRange(toLocation, startLocation - toLocation + 1) : NSMakeRange(startLocation, toLocation - startLocation)];
-	if(r.location == NSNotFound)
+	if (r.location == NSNotFound)
 		return backwardFlag ? toLocation : toLocation; // FIXME: this is strange...
 	return r.location;
 }
@@ -352,18 +376,21 @@
 				backward:NO];
 }
 
+#pragma mark -
+#pragma mark - Ex command support
+
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
-	if([exCommandString length] > 0)
+	if ([exCommandString length] > 0)
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
 		// NSLog(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
-		if(ex.command == NULL)
+		if (ex.command == NULL)
 			[[self delegate] message:@"The %@ command is unknown.", ex.name];
 		else
 		{
 			SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
-			if([self respondsToSelector:selector])
+			if ([self respondsToSelector:selector])
 				[self performSelector:selector withObject:ex];
 			else
 				[[self delegate] message:@"The %@ command is not implemented.", ex.name];
@@ -664,13 +691,16 @@
 	[self scrollRangeToVisible:NSMakeRange(start_location + num_chars, 0)];
 }
 
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
+{
+	return [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+				       atCharacterIndex:aLocation
+				         effectiveRange:NULL];
+}
+
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
-	NSMutableArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-							 atCharacterIndex:aLocation
-						    longestEffectiveRange:NULL
-								  inRange:NSMakeRange(aLocation, 1)];
-
+	NSArray *scopes = [self scopesAtLocation:aLocation];
 	NSArray *allSmartTypingPairs = [[[ViLanguageStore defaultStore] allSmartTypingPairs] allKeys];
 
 	NSString *foundScopeSelector = nil;

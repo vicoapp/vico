@@ -8,7 +8,11 @@
 - (id)init
 {
 	self = [super init];
-	[NSApp setDelegate:self];
+	if (self)
+	{
+		[NSApp setDelegate:self];
+		sharedBuffers = [[NSMutableDictionary alloc] init];
+	}
 	return self;
 }
 
@@ -58,6 +62,11 @@
 	}
 
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:page_guide_column] forKey:@"pageGuide"];
+}
+
+- (NSMutableDictionary *)sharedBuffers
+{
+	return sharedBuffers;
 }
 
 @end

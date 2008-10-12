@@ -19,7 +19,6 @@ static ViLanguageStore *defaultStore = nil;
 
 - (void)addBundlesFromBundleDirectory:(NSString *)aPath
 {
-	INFO(@"checking directory %@", aPath);
 	BOOL isDirectory = NO;
 	if (![[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] || !isDirectory)
 		return;

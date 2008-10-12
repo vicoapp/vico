@@ -555,7 +555,7 @@
 
 	NSUInteger lineno = 1;
 
-	INFO(@"highlighting range %u + %u", aRange.location, aRange.length);
+	DEBUG(@"highlighting range %u + %u", aRange.location, aRange.length);
 	
 	// highlight each line separately
 	NSUInteger nextRange = aRange.location;

@@ -13,7 +13,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (id)init
 {
 	self = [super init];
-	INFO(@"new document %@", self);
 	return self;
 }
 
@@ -161,14 +160,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	NSString *file = [location objectForKey:@"file"];
-	INFO(@"Jump to [%@] at line %u, col %u",
-	      file,
-	      [[location objectForKey:@"line"] unsignedIntegerValue],
-	      [[location objectForKey:@"column"] unsignedIntegerValue]);
-
 	ViDocument *document = [[NSDocumentController sharedDocumentController]
 		openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
-	INFO(@"got document %@", document);
 
 	if (document)
 	{
@@ -192,7 +185,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)close
 {
-	INFO(@"closing document %@", self);
 	[self removeWindowController:windowController];
 	[super close];
 }
@@ -214,8 +206,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
 {
-	INFO(@"should close document %@? %s", self, shouldClose ? "YES" : "NO");
-
 	if (shouldClose)
 	{
 		[windowController removeTabViewItemContainingDocument:self];
@@ -230,7 +220,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (IBAction)setLanguage:(id)sender
 {
-	INFO(@"set language %@", [sender title]);
 	[textView setLanguage:[sender title]];
 }
 

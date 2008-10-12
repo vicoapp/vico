@@ -95,7 +95,6 @@
 
 - (void)configureForURL:(NSURL *)aURL
 {
-	INFO(@"path = %@, length = %i", [aURL path], [storage length]);
 	ViLanguage *newLanguage = nil;
 	if (aURL)
 	{
@@ -230,15 +229,12 @@
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"increaseIndentPattern"];
-	INFO(@"got patterns %@", increaseIndentPatterns);
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope)
 	{
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		NSString *checkLine = [self lineForLocation:aLocation];
-		INFO(@"checking line [%@] for indentation", checkLine);
-		INFO(@"increase pattern = [%@]", pattern);
 
 		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
 		{
@@ -463,7 +459,6 @@
 										    options:rx_options
 										     syntax:regexpSyntax
 									    escapeCharacter:OgreBackslashCharacter];
-			INFO(@"compiled find regexp: [%@]", lastSearchRegexp);
 		}
 		@catch(NSException *exception)
 		{
@@ -730,7 +725,6 @@
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
-	INFO(@"got smart typing pairs %@", smartTypingPairs);
 	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope)

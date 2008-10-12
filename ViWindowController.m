@@ -43,8 +43,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowDidLoad
 {
-	INFO(@"window %@ did load", self);
-
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
 	[tabBar setStyleNamed:@"Unified"];
@@ -117,14 +115,12 @@ static NSWindowController	*currentWindowController = nil;
 	NSTabViewItem *tabViewItem;
 	
 	tabViewItem = [tabView selectedTabViewItem];
-	INFO(@"close tabview %@", tabViewItem);
 	[[self window] performClose:self];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	[tabView selectTabViewItem:tabViewItem];
-	INFO(@"should close tabview %@ ?", tabViewItem);
 	[[self window] performClose:[tabViewItem identifier]];
 	return NO;
 }
@@ -135,7 +131,6 @@ static NSWindowController	*currentWindowController = nil;
 	 * Needed after a tab drag from another document window.
 	 */
 
-	INFO(@"changed number of tabs");
 #if 0
 	NSTabViewItem *item;
 	for (item in [aTabView tabViewItems])
@@ -156,7 +151,6 @@ static NSWindowController	*currentWindowController = nil;
 - (void)removeTabViewItemContainingDocument:(ViDocument *)doc
 {
 	[tabView removeTabViewItem:[self tabViewItemForDocument:doc]];
-	INFO(@"%i tab view items left", [tabView numberOfTabViewItems]);
 }
 
 - (NSTabViewItem *)tabViewItemForDocument:(ViDocument *)doc
@@ -185,8 +179,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-	INFO(@"window will close: %@", aNotification);
-
 	if (currentWindowController == self)
 		currentWindowController = nil;
 	[windowControllers removeObject:self];

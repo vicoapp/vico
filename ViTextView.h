@@ -56,6 +56,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 }
 
 - (void)initEditorWithDelegate:(id)aDelegate;
+- (void)setLanguage:(NSString *)aLanguage;
+- (ViLanguage *)language;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;

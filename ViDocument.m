@@ -1,5 +1,6 @@
 #import "ViDocument.h"
 #import "ExTextView.h"
+#import "ViLanguageStore.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -51,6 +52,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[textView setCaret:0];
 	}
 	[textView configureForURL:[self fileURL]];
+
+	[statusbar setFont:[NSFont userFixedPitchFontOfSize:11.0]];
+
+	[symbolsButton removeAllItems];
+	[symbolsButton setEnabled:NO];
+
+	[languageButton removeAllItems];
+	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguages] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
+	[languageButton selectItemWithTitle:[[textView language] displayName]];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -69,7 +79,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super setFileURL:absoluteURL];
 
 	/* update syntax definition */
-	[textView configureForURL:[self fileURL]];
+	[textView configureForURL:absoluteURL];
+	[languageButton selectItemWithTitle:[[textView language] displayName]];
 }
 
 #pragma mark -
@@ -212,6 +223,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[[windowController window] performClose:self];
 		}
 	}
+}
+
+- (IBAction)setLanguage:(id)sender
+{
+	INFO(@"set language %@", [sender title]);
+	[textView setLanguage:[sender title]];
 }
 
 @end

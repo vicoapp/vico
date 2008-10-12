@@ -153,6 +153,33 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
+- (NSMutableDictionary *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr
+{
+	NSMutableDictionary *bundle;
+	for (bundle in bundles)
+	{
+		ViLanguage *language;
+		for (language in [bundle objectForKey:@"languages"])
+		{
+			if ([[language displayName] isEqualToString:languageName])
+			{
+				if (languagePtr)
+					*languagePtr = language;
+	
+				return bundle;
+			}
+		}
+	}
+	
+	INFO(@"language '%@' not found", languageName);
+	return nil;
+}
+
+- (NSMutableDictionary *)defaultBundleLanguage:(ViLanguage **)languagePtr
+{
+	return [self bundleForLanguage:@"Plain Text" language:languagePtr];
+}
+
 - (NSMutableDictionary *)allSmartTypingPairs
 {
 	if (allSmartTypingPairs)
@@ -188,6 +215,17 @@ static ViLanguageStore *defaultStore = nil;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName
 {
 	return [languages objectForKey:scopeName];
+}
+
+- (NSArray *)allLanguages
+{
+	NSMutableArray *langnames = [[NSMutableArray alloc] init];
+	ViLanguage *lang;
+	for (lang in [languages allValues])
+	{
+		[langnames addObject:[lang displayName]];
+	}
+	return langnames;
 }
 
 @end

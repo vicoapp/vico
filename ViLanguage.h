@@ -12,6 +12,7 @@
 - (NSArray *)fileTypes;
 - (NSString *)firstLineMatch;
 - (NSString *)name;
+- (NSString *)displayName;
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;

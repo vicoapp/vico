@@ -153,6 +153,11 @@
 	return [language objectForKey:@"scopeName"];
 }
 
+- (NSString *)displayName
+{
+	return [language objectForKey:@"name"];
+}
+
 - (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage canCache:(BOOL *)canCache
 {
 	DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);

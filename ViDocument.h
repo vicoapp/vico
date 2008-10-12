@@ -7,6 +7,8 @@
 	IBOutlet NSView *view;
 	IBOutlet ViTextView *textView;
 	IBOutlet NSTextField *statusbar;
+	IBOutlet NSPopUpButton *languageButton;
+	IBOutlet NSPopUpButton *symbolsButton;
 	SEL exCommandSelector;
 	ViWindowController *windowController;
 	NSString *readContent;
@@ -14,6 +16,7 @@
 
 - (NSView *)view;
 - (IBAction)finishedExCommand:(id)sender;
+- (IBAction)setLanguage:(id)sender;
 - (void)message:(NSString *)fmt, ...;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
 - (void)changeTheme:(ViTheme *)theme;
@@ -25,6 +28,7 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
+- (NSString *)currentLanguage;
 
 @end
 

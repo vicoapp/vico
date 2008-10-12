@@ -37,7 +37,6 @@ static id defaultEditor = nil;
 		return [super keyDown:theEvent];
 
 	NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-	INFO(@"code = %08X", code);
 
 	if (code == 0x00000030 /* tab */ ||
 	    code == 0x00040002 /* ctrl-d */)

@@ -76,12 +76,29 @@
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
+- (void)setLanguage:(NSString *)aLanguage
+{
+	ViLanguage *newLanguage = nil;
+	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
+	[newLanguage patterns];
+	if (newLanguage != language)
+	{
+		language = newLanguage;
+		[self highlightEverything];
+	}
+}
+
+- (ViLanguage *)language
+{
+	return language;
+}
+
 - (void)configureForURL:(NSURL *)aURL
 {
 	INFO(@"path = %@, length = %i", [aURL path], [storage length]);
+	ViLanguage *newLanguage = nil;
 	if (aURL)
 	{
-		ViLanguage *newLanguage = nil;
 
 		NSString *firstLine = nil;
 		NSUInteger eol;
@@ -94,12 +111,18 @@
 			bundle = [[ViLanguageStore defaultStore] bundleForFirstLine:firstLine language:&newLanguage];
 		if (bundle == nil)
 			bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
-		[newLanguage patterns];
-		if (newLanguage != language)
-		{
-			language = newLanguage;
-			[self highlightEverything];
-		}
+	}
+
+	if (bundle == nil)
+	{
+		bundle = [[ViLanguageStore defaultStore] defaultBundleLanguage:&newLanguage];
+	}
+
+	[newLanguage patterns];
+	if (newLanguage != language)
+	{
+		language = newLanguage;
+		[self highlightEverything];
 	}
 }
 

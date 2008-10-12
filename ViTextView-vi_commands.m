@@ -299,9 +299,9 @@
 {
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if(start_location == bol)
+	if (start_location == bol)
 	{
-		if(command)
+		if (command)
 		{
 			/* XXX: this command is also used outside the scope of an explicit 'h' command.
 			 * In such cases, we shouldn't issue an error message.
@@ -507,7 +507,7 @@
 /* syntax: u */
 - (BOOL)vi_undo:(ViCommand *)command
 {
-	if(![undoManager canUndo])
+	if (![undoManager canUndo])
 	{
 		[[self delegate] message:@"Can't undo"];
 		return NO;
@@ -885,7 +885,10 @@
 	}
 
 	if (tags == nil)
+	{
+		[[self delegate] message:@"tags: No such file or directory."];
 		return YES;
+	}
 
 	NSString *word = [self wordAtLocation:start_location];
 	if (word)

@@ -1,6 +1,7 @@
 #import "ViWindowController.h"
 #import <PSMTabBarControl/PSMTabBarControl.h>
 #import "ViDocument.h"
+#import "ExTextView.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -66,6 +67,15 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
 	[[self window] makeKeyAndOrderFront:self];
+}
+
+- (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
+{
+	if ([anObject isKindOfClass:[NSTextField class]])
+	{
+		return [ExTextView defaultEditor];
+	}
+	return nil;
 }
 
 - (IBAction)addNewDocumentTab:(id)sender

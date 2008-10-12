@@ -8,14 +8,8 @@
 	IBOutlet ViTextView *textView;
 	IBOutlet NSTextField *statusbar;
 	SEL exCommandSelector;
-	id delegate;
-	BOOL textViewConfigured;
 	ViWindowController *windowController;
 	NSString *readContent;
-
-	id								savedDelegate;
-	SEL								savedShouldCloseSelector;
-	BOOL							shouldCloseAll;
 }
 
 - (NSView *)view;

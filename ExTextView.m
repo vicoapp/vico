@@ -37,6 +37,7 @@ static id defaultEditor = nil;
 		return [super keyDown:theEvent];
 
 	NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+	INFO(@"code = %08X", code);
 
 	if (code == 0x00000030 /* tab */ ||
 	    code == 0x00040002 /* ctrl-d */)
@@ -62,8 +63,16 @@ static id defaultEditor = nil;
 			INFO(@"display completions: %@", completions);
 		}
 	}
+	else if (code == 0x00000035 /* escape */ ||
+	         code == 0x00040008 /* ctrl-c */)
+	{
+		[self setString:@""];
+		[[self window] endEditingFor:self];
+	}
 	else
+	{
 		[super keyDown:theEvent];
+	}
 }
 
 @end

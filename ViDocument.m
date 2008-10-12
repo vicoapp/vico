@@ -5,9 +5,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
 - (ViWindowController *)windowController;
-
-- (void)closeSheetEnded:(NSNotification *)notification;
-- (NSInvocation *)shouldCloseInvocationWithResult:(BOOL)yn;
 @end
 
 @implementation ViDocument
@@ -69,7 +66,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setFileURL:(NSURL *)absoluteURL
 {
-	INFO(@"file url = %@", absoluteURL);
 	[super setFileURL:absoluteURL];
 
 	/* update syntax definition */
@@ -78,15 +74,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 #pragma mark -
 #pragma mark Other stuff
-
-- (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
-{
-	if ([anObject isKindOfClass:[NSTextField class]])
-	{
-		return [ExTextView defaultEditor];
-	}
-	return nil;
-}
 
 - (NSView *)view
 {
@@ -119,18 +106,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [statusbar stringValue];
+	INFO(@"ex command finished: sender %@, command = [%@]", sender, exCommand);
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
 	[[[self windowController] window] makeFirstResponder:textView];
-	[textView performSelector:exCommandSelector withObject:exCommand];
+	if ([exCommand length] > 0)
+		[textView performSelector:exCommandSelector withObject:exCommand];
 }
 
-/* FIXME: should probably subclass NSTextField to disallow losing focus due to tabbing or clicking outside.
- * Should handle escape and ctrl-c.
- */
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
 {
-	[statusbar setStringValue:@":"]; // FIXME: should not select the colon
+	[statusbar setStringValue:@":"];
 	[statusbar setEditable:YES];
 	[statusbar setDelegate:self];
 	exCommandSelector = aSelector;
@@ -197,21 +183,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super close];
 }
 
+#if 0
 - (void)shouldCloseWindowController:(NSWindowController *)aWindowController
                            delegate:(id)aDelegate
 	        shouldCloseSelector:(SEL)shouldCloseSelector
 			contextInfo:(void *)contextInfo
 {
-	INFO(@"aWindowController %@, aDelegate %@", aWindowController, aDelegate);
 	[super shouldCloseWindowController:aWindowController delegate:aDelegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
 }
+#endif
 
 - (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
 {
-	INFO(@"can we close document %@?", self);
-
-	savedDelegate = aDelegate;
-	savedShouldCloseSelector = shouldCloseSelector;
 	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
 }
 
@@ -226,7 +209,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		if ([windowController numberOfTabViewItems] == 0)
 		{
 			/* Close the window after all tabs are gone. */
-			/* [[windowController window] performSelector:@selector(performClose:) withObject:self afterDelay:0]; */
 			[[windowController window] performClose:self];
 		}
 	}

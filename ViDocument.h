@@ -28,7 +28,6 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
-- (NSString *)currentLanguage;
 
 @end
 

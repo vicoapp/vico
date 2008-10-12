@@ -41,7 +41,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[windowController addNewTab:self];
 }
 
-- (void)windowControllerDidLoadNib:(NSWindowController *) aController
+- (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
 	[super windowControllerDidLoadNib:aController];
 	[textView initEditorWithDelegate:self];
@@ -53,14 +53,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 	[textView configureForURL:[self fileURL]];
 
-	[statusbar setFont:[NSFont userFixedPitchFontOfSize:11.0]];
+	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
 
 	[symbolsButton removeAllItems];
+	[symbolsButton addItemWithTitle:@"not implemented"];
 	[symbolsButton setEnabled:NO];
+	[symbolsButton setFont:[NSFont controlContentFontOfSize:11.0]];
 
 	[languageButton removeAllItems];
 	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguages] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
+	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError

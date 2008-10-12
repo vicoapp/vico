@@ -61,7 +61,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[symbolsButton setFont:[NSFont controlContentFontOfSize:11.0]];
 
 	[languageButton removeAllItems];
-	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguages] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
+	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
 }

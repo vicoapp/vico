@@ -221,7 +221,7 @@
 			// include an external language grammar
 			DEBUG(@"including external language [%@]", include);
 			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
-			if(externalLanguage)
+			if (externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
 			else
 				NSLog(@"***** language [%@] NOT FOUND *****", include);

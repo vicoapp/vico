@@ -1,9 +1,21 @@
 #import "ViLanguageStore.h"
+#import "ViBundle.h"
 #import "logging.h"
 
 @implementation ViLanguageStore
 
 static ViLanguageStore *defaultStore = nil;
+
+- (id)init
+{
+	self = [super init];
+	if (self)
+	{
+		languages = [[NSMutableDictionary alloc] init];
+		cachedPreferences = [[NSMutableDictionary alloc] init];
+	}
+	return self;
+}
 
 - (void)addBundlesFromBundleDirectory:(NSString *)aPath
 {
@@ -19,12 +31,9 @@ static ViLanguageStore *defaultStore = nil;
 		NSString *infoPath = [NSString stringWithFormat:@"%@/%@/info.plist", aPath, subdir];
 		if (![[NSFileManager defaultManager] fileExistsAtPath:infoPath])
 			continue;
-		
-		NSMutableDictionary *bundle = [[NSMutableDictionary alloc] init];
-		[bundle setObject:[NSDictionary dictionaryWithContentsOfFile:infoPath] forKey:@"info"];
-		// NSLog(@"=== parsing bundle [%@]", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
 
-		[bundle setObject:[NSString stringWithFormat:@"%@/%@", aPath, subdir] forKey:@"path"];
+		ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
+		// [bundle setObject:[NSString stringWithFormat:@"%@/%@", aPath, subdir] forKey:@"path"];
 
 		NSString *syntaxPath = [NSString stringWithFormat:@"%@/%@/Syntaxes", aPath, subdir];
 		NSArray *syntaxfiles = [[NSFileManager defaultManager] directoryContentsAtPath:syntaxPath];
@@ -34,15 +43,8 @@ static ViLanguageStore *defaultStore = nil;
 			if ([syntaxfile hasSuffix:@".tmLanguage"] || [syntaxfile hasSuffix:@".plist"])
 			{
 				ViLanguage *language = [[ViLanguage alloc] initWithPath:[NSString stringWithFormat:@"%@/%@", syntaxPath, syntaxfile]];
-				NSMutableArray *languageList = [bundle objectForKey:@"languages"];
-				if (languageList == nil)
-				{
-					languageList = [[NSMutableArray alloc] init];
-					[bundle setObject:languageList forKey:@"languages"];
-				}
-				// NSLog(@"  adding syntax for language [%@]", [language name]);
+				[bundle addLanguage:language];
 				[languages setObject:language forKey:[language name]];
-				[languageList addObject:language];
 			}
 		}
 
@@ -54,14 +56,7 @@ static ViLanguageStore *defaultStore = nil;
 			if ([prefsfile hasSuffix:@".plist"])
 			{
 				NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", prefsPath, prefsfile]];
-				NSMutableArray *prefsList = [bundle objectForKey:@"preferences"];
-				if (prefsList == nil)
-				{
-					prefsList = [[NSMutableArray alloc] init];
-					[bundle setObject:prefsList forKey:@"preferences"];
-				}
-				// NSLog(@"  adding preferences for [%@]", [prefs objectForKey:@"name"]);
-				[prefsList addObject:prefs];
+				[bundle addPreferences:prefs];
 			}
 		}
 
@@ -95,13 +90,13 @@ static ViLanguageStore *defaultStore = nil;
 	return defaultStore;
 }
 
-- (NSMutableDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
+- (ViBundle *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
 {
-	NSMutableDictionary *bundle;
+	ViBundle *bundle;
 	for (bundle in bundles)
 	{
 		ViLanguage *language;
-		for (language in [bundle objectForKey:@"languages"])
+		for (language in [bundle languages])
 		{
 			NSString *firstLineMatch = [language firstLineMatch];
 			if (firstLineMatch == nil)
@@ -112,7 +107,7 @@ static ViLanguageStore *defaultStore = nil;
 				NSLog(@"Using language %@ for first line [%@]", [language name], firstLine);
 				if (languagePtr)
 					*languagePtr = language;
-				NSLog(@"Using bundle %@", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
+				NSLog(@"Using bundle %@", [bundle name]);
 				return bundle;
 			}
 		}
@@ -121,14 +116,14 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
-- (NSMutableDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
+- (ViBundle *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
-	NSMutableDictionary *bundle;
+	ViBundle *bundle;
 	for (bundle in bundles)
 	{
 		ViLanguage *language;
-		for (language in [bundle objectForKey:@"languages"])
+		for (language in [bundle languages])
 		{
 			NSArray *fileTypes = [language fileTypes];
 			NSString *fileType;
@@ -143,7 +138,7 @@ static ViLanguageStore *defaultStore = nil;
 					NSLog(@"Using language %@ for file %@", [language name], aPath);
 					if (languagePtr)
 						*languagePtr = language;
-					NSLog(@"Using bundle %@", [[bundle objectForKey:@"info"] objectForKey:@"name"]);
+					NSLog(@"Using bundle %@", [bundle name]);
 					return bundle;
 				}
 			}
@@ -153,13 +148,13 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
-- (NSMutableDictionary *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr
+- (ViBundle *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr
 {
-	NSMutableDictionary *bundle;
+	ViBundle *bundle;
 	for (bundle in bundles)
 	{
 		ViLanguage *language;
-		for (language in [bundle objectForKey:@"languages"])
+		for (language in [bundle languages])
 		{
 			if ([[language displayName] isEqualToString:languageName])
 			{
@@ -175,41 +170,9 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
-- (NSMutableDictionary *)defaultBundleLanguage:(ViLanguage **)languagePtr
+- (ViBundle *)defaultBundleLanguage:(ViLanguage **)languagePtr
 {
 	return [self bundleForLanguage:@"Plain Text" language:languagePtr];
-}
-
-- (NSMutableDictionary *)allSmartTypingPairs
-{
-	if (allSmartTypingPairs)
-		return allSmartTypingPairs;
-
-	NSLog(@"begin collecting all smart typing pairs");
-	allSmartTypingPairs = [[NSMutableDictionary alloc] init];
-	NSMutableDictionary *bundle;
-	for (bundle in bundles)
-	{
-		NSDictionary *prefs;
-		for (prefs in [bundle objectForKey:@"preferences"])
-		{
-			NSDictionary *settings = [prefs objectForKey:@"settings"];
-			if (settings == nil)
-				continue;
-			NSArray *smartTypingPairs = [settings objectForKey:@"smartTypingPairs"];
-			if (smartTypingPairs == nil)
-				continue;
-
-			NSString *scope;
-			for (scope in [[prefs objectForKey:@"scope"] componentsSeparatedByString:@", "])
-			{
-				[allSmartTypingPairs setObject:smartTypingPairs forKey:scope];
-			}
-		}
-	}
-	NSLog(@"finished collecting all smart typing pairs, found %i preferences", [allSmartTypingPairs count]);
-
-	return allSmartTypingPairs;
 }
 
 - (ViLanguage *)languageWithScope:(NSString *)scopeName
@@ -217,7 +180,7 @@ static ViLanguageStore *defaultStore = nil;
 	return [languages objectForKey:scopeName];
 }
 
-- (NSArray *)allLanguages
+- (NSArray *)allLanguageNames
 {
 	NSMutableArray *langnames = [[NSMutableArray alloc] init];
 	ViLanguage *lang;
@@ -226,6 +189,26 @@ static ViLanguageStore *defaultStore = nil;
 		[langnames addObject:[lang displayName]];
 	}
 	return langnames;
+}
+
+- (NSDictionary *)preferenceItems:(NSString *)prefsName
+{
+	NSMutableDictionary *result = [cachedPreferences objectForKey:prefsName];
+	if (result)
+		return result;
+
+	result = [[NSMutableDictionary alloc] init];
+	[cachedPreferences setObject:result forKey:prefsName];
+	
+	ViBundle *bundle;
+	for (bundle in bundles)
+	{
+		NSDictionary *p = [bundle preferenceItems:prefsName];
+		if (p)
+			[result addEntriesFromDictionary:p];
+	}
+
+	return result;
 }
 
 @end

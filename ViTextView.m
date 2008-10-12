@@ -180,6 +180,13 @@
 	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
 }
 
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
+{
+	return [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+				       atCharacterIndex:aLocation
+				         effectiveRange:NULL];
+}
+
 #pragma mark -
 #pragma mark Indentation
 
@@ -201,33 +208,39 @@
 	return nil;
 }
 
-- (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation
 {
-	// FIXME: should encapsulate this!
-	// FIXME: check scope at aLocation!
-	NSString *increaseIndentPattern = [bundle objectForKey:@"increaseIndentPattern"];
-	if (increaseIndentPattern == nil)
+	NSArray *scopes = [self scopesAtLocation:aLocation];
+	NSString *foundScopeSelector = nil;
+	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
+	for (scopeSelector in scopeSelectors)
 	{
-		NSDictionary *prefs;
-		for (prefs in [bundle objectForKey:@"preferences"])
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if (rank > highest_rank)
 		{
-			increaseIndentPattern = [[prefs objectForKey:@"settings"] objectForKey:@"increaseIndentPattern"];
-			if (increaseIndentPattern)
-			{
-				// cache it
-				[bundle setObject:increaseIndentPattern forKey:@"increaseIndentPattern"];
-				break;
-			}
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
 		}
 	}
+	
+	return foundScopeSelector;
+}
 
-	if (increaseIndentPattern)
+- (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"increaseIndentPattern"];
+	INFO(@"got patterns %@", increaseIndentPatterns);
+	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
+
+	if (bestMatchingScope)
 	{
+		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		NSString *checkLine = [self lineForLocation:aLocation];
 		INFO(@"checking line [%@] for indentation", checkLine);
-		INFO(@"increase pattern = [%@]", increaseIndentPattern);
+		INFO(@"increase pattern = [%@]", pattern);
 
-		if ([checkLine rangeOfRegularExpressionString:increaseIndentPattern].location != NSNotFound)
+		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
 		{
 			return YES;
 		}
@@ -714,35 +727,16 @@
 	[self scrollRangeToVisible:NSMakeRange(start_location + num_chars, 0)];
 }
 
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
-{
-	return [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-				       atCharacterIndex:aLocation
-				         effectiveRange:NULL];
-}
-
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
-	NSArray *scopes = [self scopesAtLocation:aLocation];
-	NSArray *allSmartTypingPairs = [[[ViLanguageStore defaultStore] allSmartTypingPairs] allKeys];
+	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
+	INFO(@"got smart typing pairs %@", smartTypingPairs);
+	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
-	NSString *foundScopeSelector = nil;
-	NSString *scopeSelector;
-	u_int64_t highest_rank = 0;
-	for (scopeSelector in allSmartTypingPairs)
+	if (bestMatchingScope)
 	{
-		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if (rank > highest_rank)
-		{
-			foundScopeSelector = scopeSelector;
-			highest_rank = rank;
-		}
-	}
-
-	if (foundScopeSelector)
-	{
-		DEBUG(@"found smart typing pair scope selector [%@] at location %i", foundScopeSelector, aLocation);
-		return [[[ViLanguageStore defaultStore] allSmartTypingPairs] objectForKey:foundScopeSelector];
+		DEBUG(@"found smart typing pair scope selector [%@] at location %i", bestMatchingScope, aLocation);
+		return [smartTypingPairs objectForKey:bestMatchingScope];
 	}
 
 	return nil;

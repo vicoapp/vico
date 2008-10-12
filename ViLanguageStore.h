@@ -1,19 +1,20 @@
 #import <Cocoa/Cocoa.h>
 #import "ViLanguage.h"
+#import "ViBundle.h"
 
 @interface ViLanguageStore : NSObject
 {
 	NSMutableDictionary *languages;
 	NSMutableArray *bundles;
-	NSMutableDictionary *allSmartTypingPairs;
+	NSMutableDictionary *cachedPreferences;
 }
 + (ViLanguageStore *)defaultStore;
-- (NSMutableDictionary *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
-- (NSMutableDictionary *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
-- (NSMutableDictionary *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr;
-- (NSMutableDictionary *)defaultBundleLanguage:(ViLanguage **)languagePtr;
+- (ViBundle *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
+- (ViBundle *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
+- (ViBundle *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr;
+- (ViBundle *)defaultBundleLanguage:(ViLanguage **)languagePtr;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
-- (NSMutableDictionary *)allSmartTypingPairs;
-- (NSArray *)allLanguages;
+- (NSArray *)allLanguageNames;
+- (NSDictionary *)preferenceItems:(NSString *)prefsName;
 
 @end

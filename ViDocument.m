@@ -40,6 +40,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[windowController addNewTab:self];
 }
 
+- (void)configureSyntax
+{
+	/* update syntax definition */
+	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
+	INFO(@"syntaxOverride = %@", syntaxOverride);
+	INFO(@"path = %@", [[self fileURL] path]);
+	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] path]];
+	INFO(@"syntax = %@", syntax);
+	if (syntax)
+		[textView setLanguage:syntax];
+	else
+		[textView configureForURL:[self fileURL]];
+	[languageButton selectItemWithTitle:[[textView language] displayName]];
+}
+
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
 	[super windowControllerDidLoadNib:aController];
@@ -50,7 +65,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[[textView textStorage] mutableString] setString:readContent];
 		[textView setCaret:0];
 	}
-	[textView configureForURL:[self fileURL]];
+	[self configureSyntax];
 
 	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
 
@@ -79,10 +94,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)setFileURL:(NSURL *)absoluteURL
 {
 	[super setFileURL:absoluteURL];
-
-	/* update syntax definition */
-	[textView configureForURL:absoluteURL];
-	[languageButton selectItemWithTitle:[[textView language] displayName]];
+	[self configureSyntax];
 }
 
 #pragma mark -
@@ -221,6 +233,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (IBAction)setLanguage:(id)sender
 {
 	[textView setLanguage:[sender title]];
+	ViLanguage *lang = [textView language];
+	if (lang)
+	{
+		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
+		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
+		INFO(@"syntaxOverride = %@", syntaxOverride);
+		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
+	}
 }
 
 @end

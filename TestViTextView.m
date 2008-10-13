@@ -12,7 +12,7 @@
 
 /* motion commands don't alter the text */
 #define MOVE(inText, inLocation, commandKeys, outLocation) \
-	TEST(inText, inLocation, commandKeys, inText, outLocation)
+        TEST(inText, inLocation, commandKeys, inText, outLocation)
 
 @implementation TestViTextView
 
@@ -164,5 +164,16 @@
 
 - (void)test190_SubstLine			{ TEST(@"abc\ndef\nghi", 5, @"Sapa\x1b", @"abc\napa\nghi", 6); }
 - (void)test191_SubstLastLine			{ TEST(@"abc\ndef\nghi", 8, @"Sapa\x1b", @"abc\ndef\napa", 10); }
+
+- (void)test200_MoveBackwardTilChar		{ MOVE(@"abc def ghi", 8, @"Tf", 7); }
+- (void)test200_MoveBackwardTilChar2		{ MOVE(@"abc def abc", 3, @"Tc", 3); }
+- (void)test201_MoveBackwardToChar		{ MOVE(@"abc def ghi", 8, @"Ff", 6); }
+- (void)test201_MoveBackwardToChar2		{ MOVE(@"abc def abc", 9, @"Fb", 1); }
+- (void)test202_DeleteBackwardToChar		{ TEST(@"abc def abc", 9, @"dFe", @"abc dbc", 5); }
+- (void)test203_MoveBackwardToCharWithCount	{ MOVE(@"abc abc abc", 10, @"2Fa", 0); }
+- (void)test204_DeleteBackwardToCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Fa", @"c", 0); }
+- (void)test205_DeleteBackwardTilCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Ta", @"ac", 1); }
+- (void)test206_RepeatMoveBackwardTilChar	{ MOVE(@"abc abc abc", 7, @"Ta;", 1); }
+- (void)test207_RepeatMoveBackwardToChar	{ MOVE(@"abc abc abc", 7, @"Fa;", 0); }
 
 @end

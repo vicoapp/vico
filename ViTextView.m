@@ -6,6 +6,8 @@
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
 
+int indent = 0;
+
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
 - (void)disableWrapping;

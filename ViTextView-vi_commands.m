@@ -394,6 +394,43 @@
 	return YES;
 }
 
+/* syntax: [count]F<char> */
+- (BOOL)move_back_to_char:(ViCommand *)command
+{
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	NSUInteger i = start_location;
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+	while (count--)
+	{
+		while (--i > bol && [[storage string] characterAtIndex:i] != command.argument)
+			/* do nothing */ ;
+		if (i == bol)
+		{
+			[[self delegate] message:@"%C not found", command.argument];
+			return NO;
+		}
+	}
+	
+	final_location = command.ismotion ? i : start_location;
+	end_location = i;
+	return YES;
+}
+
+/* syntax: [count]T<char> */
+- (BOOL)move_back_til_char:(ViCommand *)command
+{
+	if ([self move_back_to_char:command])
+	{
+		end_location++;
+		final_location++;
+		return YES;
+	}
+	return NO;
+}
+
 /* syntax: [count]f<char> */
 - (BOOL)move_to_char:(ViCommand *)command
 {
@@ -401,12 +438,12 @@
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	NSUInteger i = start_location;
 	int count = IMAX(command.count, 1);
-	if(!command.ismotion)
+	if (!command.ismotion)
 		count = IMAX(command.motion_count, 1);
 	while(count--)
 	{
 		while(++i < eol && [[storage string] characterAtIndex:i] != command.argument)
-		/* do nothing */ ;
+			/* do nothing */ ;
 		if(i == eol)
 		{
 			[[self delegate] message:@"%C not found", command.argument];
@@ -417,13 +454,12 @@
 	final_location = command.ismotion ? i : start_location;
 	end_location = i + 1;
 	return YES;
-	
 }
 
 /* syntax: [count]t<char> */
 - (BOOL)move_til_char:(ViCommand *)command
 {
-	if([self move_to_char:command])
+	if ([self move_to_char:command])
 	{
 		end_location--;
 		final_location--;

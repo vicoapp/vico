@@ -44,10 +44,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	/* update syntax definition */
 	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
-	INFO(@"syntaxOverride = %@", syntaxOverride);
-	INFO(@"path = %@", [[self fileURL] path]);
 	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] path]];
-	INFO(@"syntax = %@", syntax);
 	if (syntax)
 		[textView setLanguage:syntax];
 	else

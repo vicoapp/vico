@@ -77,12 +77,6 @@
 	return self;
 }
 
-- (id)initWithBundle:(NSString *)aBundleName
-{
-	NSString *path = [[NSBundle mainBundle] pathForResource:aBundleName ofType:@"tmTheme"];
-	return [self initWithPath:path];
-}
-
 - (NSString *)name
 {
 	return [theme objectForKey:@"name"];

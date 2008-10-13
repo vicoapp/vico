@@ -14,8 +14,8 @@
 	NSColor *caretColor;
 	NSColor *selectionColor;
 }
+
 - (id)initWithPath:(NSString *)aPath;
-- (id)initWithBundle:(NSString *)aBundleName;
 - (NSString *)name;
 - (NSDictionary *)attributesForScopes:(NSArray *)scopes;
 - (NSColor *)backgroundColor;

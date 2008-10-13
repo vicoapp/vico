@@ -128,7 +128,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [statusbar stringValue];
-	INFO(@"ex command finished: sender %@, command = [%@]", sender, exCommand);
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
 	[[[self windowController] window] makeFirstResponder:textView];
@@ -235,7 +234,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
 		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
-		INFO(@"syntaxOverride = %@", syntaxOverride);
 		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
 }

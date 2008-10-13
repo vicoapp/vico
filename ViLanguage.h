@@ -8,7 +8,7 @@
 	NSMutableDictionary *scopeMappingCache;
 	BOOL compiled;
 }
-- (id)initWithBundle:(NSString *)bundleName;
+
 - (NSArray *)fileTypes;
 - (NSString *)firstLineMatch;
 - (NSString *)name;

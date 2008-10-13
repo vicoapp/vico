@@ -395,63 +395,6 @@
 						)?
 						</string>
 				</dict>
-				<dict>
-					<key>begin</key>
-					<string>(?=(?&lt;regex&gt;(?#simple syntax)\$(?&lt;name&gt;[a-zA-Z_\x{7f}-\x{ff}][a-zA-Z0-9_\x{7f}-\x{ff}]*)(?:\[(?&lt;index&gt;[a-zA-Z0-9_\x{7f}-\x{ff}]+|\$\g&lt;name&gt;)\]|-&gt;\g&lt;name&gt;(\(.*?\))?)?|(?#simple syntax with braces)\$\{(?:\g&lt;name&gt;(?&lt;indices&gt;\[(?:\g&lt;index&gt;|'(?:\\.|[^'\\])*'|"(?:\g&lt;regex&gt;|\\.|[^"\\])*")\])?|\g&lt;complex&gt;|\$\{\g&lt;complex&gt;\})\}|(?#complex syntax)\{(?&lt;complex&gt;\$(?&lt;segment&gt;\g&lt;name&gt;(\g&lt;indices&gt;*|\(.*?\))?)(?:-&gt;\g&lt;segment&gt;)*|\$\g&lt;complex&gt;|\$\{\g&lt;complex&gt;\})\}))\{</string>
-					<key>beginCaptures</key>
-					<dict>
-						<key>0</key>
-						<dict>
-							<key>name</key>
-							<string>punctuation.definition.variable.php</string>
-						</dict>
-					</dict>
-					<key>comment</key>
-					<string>Complex syntax. It seems this now supports complex method calls, as of PHP5.
-							   I've put wildcards into the function call parameter lists to handle this, but this may break the pattern.
-							   It also might be better to disable it as I shouldn't imagine it's used often (hopefully) and it may confuse PHP4 users.</string>
-					<key>end</key>
-					<string>\}</string>
-					<key>endCaptures</key>
-					<dict>
-						<key>0</key>
-						<dict>
-							<key>name</key>
-							<string>punctuation.definition.variable.php</string>
-						</dict>
-					</dict>
-					<key>patterns</key>
-					<array>
-						<dict>
-							<key>include</key>
-							<string>#function-call</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#var_basic</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#object</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#numbers</string>
-						</dict>
-						<dict>
-							<key>match</key>
-							<string>\[</string>
-							<key>name</key>
-							<string>keyword.operator.index-start.php</string>
-						</dict>
-						<dict>
-							<key>match</key>
-							<string>\]</string>
-							<key>name</key>
-							<string>keyword.operator.index-end.php</string>
-						</dict>
-					</array>
-				</dict>
 			</array>
 		</dict>
 		<key>language</key>

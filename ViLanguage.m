@@ -7,35 +7,34 @@
 - (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch
 {
 	OGRegularExpression *regexp = nil;
-	//NSLog(@" compiling regexp [%@]", pattern);
 	@try
 	{
 		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
-		if(beginMatch)
+		if (beginMatch)
 		{
-			// NSLog(@"*************** expanding pattern with %i captures:", [beginMatch count]);
-			// NSLog(@"** original pattern = [%@]", pattern);
+			// INFO(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+			// INFO(@"** original pattern = [%@]", pattern);
 			int i;
-			for(i = 1; i <= [beginMatch count]; i++)
+			for (i = 1; i <= [beginMatch count]; i++)
 			{
 				NSString *backref = [NSString stringWithFormat:@"\\%i", i];
-				if([beginMatch substringAtIndex:i])
+				if ([beginMatch substringAtIndex:i])
 				{
-					// NSLog(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
+					// INFO(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
 					[expandedPattern replaceOccurrencesOfString:backref
 									 withString:[beginMatch substringAtIndex:i]
 									    options:0
 									      range:NSMakeRange(0, [expandedPattern length])];
 				}
 			}
-			// NSLog(@"** expanded pattern = [%@]", expandedPattern);
+			// INFO(@"** expanded pattern = [%@]", expandedPattern);
 		}
 
 		regexp = [OGRegularExpression regularExpressionWithString:expandedPattern options:OgreCaptureGroupOption];
 	}
-	@catch(NSException *exception)
+	@catch (NSException *exception)
 	{
-		NSLog(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
+		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
 		regexp = nil;
 	}
 
@@ -44,56 +43,56 @@
 
 - (void)compileRegexp:(NSString *)rule inPattern:(NSMutableDictionary *)d
 {
-	if([d objectForKey:rule])
+	if ([d objectForKey:rule])
 	{
 		OGRegularExpression *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
-		if(regexp)
+		if (regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
 	}
 }
 
 - (void)compilePatterns:(NSArray *)patterns
 {
-	if(patterns == nil)
+	if (patterns == nil)
 		return;
 
 	OGRegularExpression *hasBackRefs = [OGRegularExpression regularExpressionWithString:@"\\\\([1-9]|k<.*?>)"];
 
 	int n = 0;
 	NSMutableDictionary *d;
-	for(d in patterns)
+	for (d in patterns)
 	{
-		if([[d objectForKey:@"disabled"] intValue] == 1)
+		if ([[d objectForKey:@"disabled"] intValue] == 1)
 		{
 			[d removeAllObjects];
 			continue;
 		}
-		//NSLog(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
+		//INFO(@"compiling pattern for scope [%@]", [d objectForKey:@"name"]);
 		[self compileRegexp:@"match" inPattern:d];
 		[self compileRegexp:@"begin" inPattern:d];
-		if([d objectForKey:@"end"] && ![hasBackRefs matchInString:[d objectForKey:@"end"]])
+		if ([d objectForKey:@"end"] && ![hasBackRefs matchInString:[d objectForKey:@"end"]])
 			[self compileRegexp:@"end" inPattern:d];
 		// else we must first substitute back references from the begin match before compiling end regexp
 		n++;
 
 		// recursively compile sub-patterns, if any
 		NSArray *subPatterns = [d objectForKey:@"patterns"];
-		if(subPatterns)
+		if (subPatterns)
 		{
-			//NSLog(@"compiling sub-patterns for scope [%@]", [d objectForKey:@"name"]);
+			//INFO(@"compiling sub-patterns for scope [%@]", [d objectForKey:@"name"]);
 			[self compilePatterns:subPatterns];
 		}
 	}
-	//NSLog(@"compiled %i patterns", n);
+	//INFO(@"compiled %i patterns", n);
 }
 
 - (void)compile
 {
-	NSLog(@"start compiling language [%@]", [self name]);
+	INFO(@"start compiling language [%@]", [self name]);
 	[self compilePatterns:languagePatterns];
 	[self compilePatterns:[[language objectForKey:@"repository"] allValues]];
 	compiled = YES;
-	NSLog(@"finished compiling language [%@]", [self name]);
+	INFO(@"finished compiling language [%@]", [self name]);
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -102,38 +101,17 @@
 	if(self == nil)
 		return nil;
 
-	//NSLog(@"Initializing language from file %@", aPath);
 	compiled = NO;
 	language = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
-	//NSLog(@"language = [%@]", language);
 	languagePatterns = [language objectForKey:@"patterns"];	
 	scopeMappingCache = [[NSMutableDictionary alloc] init];
 
 	return self;
 }
 
-- (id)initWithBundle:(NSString *)bundleName
-{
-	// NSLog(@"Initializing language from bundle %@", bundleName);
-
-	NSString *path = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"tmLanguage"];
-	if(![[NSFileManager defaultManager] fileExistsAtPath:path])
-	{
-		NSLog(@"%@.tmLanguage not found, trying %@.plist", bundleName, bundleName);
-		path = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"plist"];
-	}
-	if(path == nil)
-	{
-		NSLog(@"%@.plist not found, giving up", bundleName);
-		return nil;
-	}
-
-	return [self initWithPath:path];
-}
-
 - (NSArray *)patterns
 {
-	if(!compiled)
+	if (!compiled)
 		[self compile];
 	return [self expandedPatternsForPattern:language];
 }
@@ -165,10 +143,11 @@
 
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
-	for(pattern in patterns)
+	for (pattern in patterns)
 	{
+		DEBUG(@"  expanding pattern %@", pattern);
 		NSString *include = [pattern objectForKey:@"include"];
-		if(include == nil)
+		if (include == nil)
 		{
 			// just add this pattern directly
 			// set a reference to the language so we can find the correct repository later on
@@ -178,15 +157,16 @@
 		}
 
 		// expand this pattern
-		if([include hasPrefix:@"#"])
+		if ([include hasPrefix:@"#"])
 		{
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
-			DEBUG(@"including [%@] from repository of language %@", patternName, [self name]);
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
-			if(includePattern)
+			DEBUG(@"including [%@] with %i patterns from repository of language %@", patternName, [includePattern count], [self name]);
+			if (includePattern)
 			{
-				if([includePattern count] == 1 + ([includePattern objectForKey:@"expandedPatterns"] ? 1 : 0) && [includePattern objectForKey:@"patterns"])
+				DEBUG(@"includePattern = [%@]", includePattern);
+				if ([includePattern count] == 1 + ([includePattern objectForKey:@"expandedPatterns"] ? 1 : 0) + ([includePattern objectForKey:@"comment"] ? 1 : 0) && [includePattern objectForKey:@"patterns"])
 				{
 					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
@@ -201,16 +181,16 @@
 				}
 			}
 			else
-				NSLog(@"***** pattern [%@] NOT FOUND in repository for language [%@] *****", patternName, [self name]);
+				INFO(@"***** pattern [%@] NOT FOUND in repository for language [%@] *****", patternName, [self name]);
 		}
-		else if([include isEqualToString:@"$base"])
+		else if ([include isEqualToString:@"$base"])
 		{
 			// no endless loop because expandedPatternsForPattern caches the first recursion
 			DEBUG(@"including %@: baseLanguage.name = %@", include, [baseLanguage name]);
 			*canCache = NO;
 			[expandedPatterns addObjectsFromArray:[baseLanguage patterns]];
 		}
-		else if([include isEqualToString:@"$self"])
+		else if ([include isEqualToString:@"$self"])
 		{
 			// no endless loop because expandedPatternsForPattern caches the first recursion
 			DEBUG(@"including %@: self.name = %@", include, [self name]);
@@ -224,7 +204,7 @@
 			if (externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
 			else
-				NSLog(@"***** language [%@] NOT FOUND *****", include);
+				INFO(@"***** language [%@] NOT FOUND *****", include);
 		}
 	}
 	return expandedPatterns;

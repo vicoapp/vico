@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string># first figure out a name for the result
+NAME="${TM_FILENAME:-untitled}"
+BASENAME="${NAME%.*}"
+DST="/tmp/$BASENAME"
+
+InsertFormatHeader.rb|MultiMarkdown.pl|SmartyPants.pl &gt;"$DST.html"
+
+# textutil is included with Tiger
+require_cmd textutil
+textutil -convert rtf -extension rtf -font Times -fontsize 11 "$DST.html"
+
+open -a TextEdit.app "$DST.rtf"
+</string>
+	<key>fallbackInput</key>
+	<string>document</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>name</key>
+	<string>Convert Document / Selection to RTF</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>scope</key>
+	<string>text.html.markdown.multimarkdown</string>
+	<key>uuid</key>
+	<string>D9118E94-4E23-4B75-88D7-6BFEBAA70D1B</string>
+</dict>
+</plist>

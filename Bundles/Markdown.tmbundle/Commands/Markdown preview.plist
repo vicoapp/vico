@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
+html_header "Markdown Preview" "${TM_FILENAME:-}"
+
+if [[ -f "$TM_FILEPATH" ]]; then
+  echo "&lt;base href='tm-file://${TM_FILEPATH// /%20}'&gt;"
+fi
+
+# Convert to html then make one of the html tags above caret 
+# into a link that we scroll down to
+Markdown.pl|"${TM_SMARTYPANTS:-SmartyPants.pl}"|${TM_RUBY:-ruby} -e '
+lines = STDIN.read.split("\n")
+n = [ENV["TM_LINE_NUMBER"].to_i, lines.length].min - 7
+
+while n &gt; 0 &amp;&amp; !lines[n].match(/&lt;(h\d|p|ul|li|blockquote|pre|div|img|code|table|tr)&gt;/i)
+  n -= 1
+end
+
+if n &gt; 0 &amp;&amp; m = lines[n].match(/&lt;(h\d|p|ul|li|blockquote|pre|div|img|code|table|tr)&gt;(.*)$/i)
+  lines[n] = "&lt;#{m[1]} id=\"scroll_to_here\" &gt;#{m[2]}"
+end
+
+puts lines.join("\n")
+puts "\n&lt;script&gt;window.location.hash = \"scroll_to_here\";&lt;/script&gt;"
+'
+html_footer</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^~@p</string>
+	<key>name</key>
+	<string>Preview</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>text.html.markdown</string>
+	<key>uuid</key>
+	<string>B52DEA16-8480-11D9-BE59-000D93B3A10E</string>
+</dict>
+</plist>

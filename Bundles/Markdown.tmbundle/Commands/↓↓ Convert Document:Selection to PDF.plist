@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string># first figure out a name for the result
+NAME="${TM_FILENAME:-untitled}"
+BASENAME="${NAME%.*}"
+DST="/tmp/$BASENAME"
+
+InsertFormatHeader.rb|MultiMarkdown.pl|SmartyPants.pl|"${TM_RUBY:-ruby}" &gt;"$DST.html" -KU -pe '$_.gsub!(/[^\x00-\x7F]/) { |ch| "&amp;##{ch.unpack("U")[0]};" }'
+
+# show the generated HTML file
+cat "$DST.html"
+
+# convert to PDF with htmldoc
+require_cmd htmldoc
+htmldoc -f "$DST.pdf" --header "" --footer "" --webpage "$DST.html"
+
+# open in the users PDF viewer (falling back on Preview)
+viewer=$(find_app "${TM_PDF_VIEWER:-Preview.app}")
+if [ $? = 0 ];
+	then open -a "$viewer" "$DST.pdf"
+	else echo "Could not find your PDF viewer: ‘${TM_PDF_VIEWER:-Preview.app}’"
+fi
+</string>
+	<key>fallbackInput</key>
+	<string>document</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>name</key>
+	<string>Convert Document / Selection to PDF</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>text.html.markdown.multimarkdown</string>
+	<key>uuid</key>
+	<string>DB5085DA-3E95-4020-8521-C9702168F160</string>
+</dict>
+</plist>

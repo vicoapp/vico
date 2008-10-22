@@ -4,16 +4,16 @@
 #test -z "$VERSION" && die "can't find version information"
 VERSION=0.001
 
-echo "Building vizard version $VERSION"
+echo "Building xi version $VERSION"
 
 # fix version in info.plist
 sed -E -i.bak \
   "/CFBundleVersion/ { n; s/(.*>)[^<]*(<.*)/\1${VERSION}\2/; }" Info.plist
 
-# xcodebuild -project vizard.xcodeproj -target vizard -configuration Release clean || exit
-xcodebuild -project vizard.xcodeproj -target vizard -configuration Release || exit
+# xcodebuild -project xi.xcodeproj -target xi -configuration Release clean || exit
+xcodebuild -project xi.xcodeproj -target xi -configuration Release || exit
 
-TMPDMG=vizard-tmp.dmg
+TMPDMG=xi-tmp.dmg
 /bin/rm -f $TMPDMG
 
 die()
@@ -24,9 +24,9 @@ die()
     exit 1
 }
 
-APP=build/Release/vizard.app
+APP=build/Release/xi.app
 
-VOL="vizard-$VERSION"
+VOL="xi-$VERSION"
 echo "Creating disk image $VOL"
 
 # clean up if we're interrupted

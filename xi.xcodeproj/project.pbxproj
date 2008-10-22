@@ -65,7 +65,7 @@
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
-			remoteInfo = vizard;
+			remoteInfo = xi;
 		};
 		9A7AF14E0D99820900F08222 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -105,9 +105,9 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		32DBCF750370BD2300C91783 /* vizard_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vizard_Prefix.pch; sourceTree = "<group>"; };
+		32DBCF750370BD2300C91783 /* xi_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xi_Prefix.pch; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8D15AC370486D014006FF6A4 /* vizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D15AC370486D014006FF6A4 /* xi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OgreKit.xcodeproj; path = OgreKit/OgreKit.xcodeproj; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
@@ -207,13 +207,13 @@
 		19C28FB0FE9D524F11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D15AC370486D014006FF6A4 /* vizard.app */,
+				8D15AC370486D014006FF6A4 /* xi.app */,
 				9A1A12150D02CDE6009EABAC /* Unit Tests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2A37F4AAFDCFA73011CA2CEA /* vizard */ = {
+		2A37F4AAFDCFA73011CA2CEA /* xi */ = {
 			isa = PBXGroup;
 			children = (
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
@@ -227,7 +227,7 @@
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				9A1A12160D02CDE6009EABAC /* Unit Tests-Info.plist */,
 			);
-			name = vizard;
+			name = xi;
 			sourceTree = "<group>";
 		};
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
@@ -268,7 +268,7 @@
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				32DBCF750370BD2300C91783 /* vizard_Prefix.pch */,
+				32DBCF750370BD2300C91783 /* xi_Prefix.pch */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 				9AB514DA0E6E7BE100DA75F1 /* logging.h */,
 			);
@@ -350,9 +350,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D15AC270486D014006FF6A4 /* vizard */ = {
+		8D15AC270486D014006FF6A4 /* xi */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "vizard" */;
+			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "xi" */;
 			buildPhases = (
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
@@ -365,10 +365,10 @@
 				9A117AE10D0CA8CD007AA524 /* PBXTargetDependency */,
 				9A7AF1570D99830C00F08222 /* PBXTargetDependency */,
 			);
-			name = vizard;
+			name = xi;
 			productInstallPath = "$(HOME)/Applications";
-			productName = vizard;
-			productReference = 8D15AC370486D014006FF6A4 /* vizard.app */;
+			productName = xi;
+			productReference = 8D15AC370486D014006FF6A4 /* xi.app */;
 			productType = "com.apple.product-type.application";
 		};
 		9A1A12140D02CDE6009EABAC /* Unit Tests */ = {
@@ -395,10 +395,10 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "vizard" */;
+			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */;
 			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 1;
-			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* vizard */;
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* xi */;
 			projectDirPath = "";
 			projectReferences = (
 				{
@@ -412,7 +412,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				8D15AC270486D014006FF6A4 /* vizard */,
+				8D15AC270486D014006FF6A4 /* xi */,
 				9A1A12140D02CDE6009EABAC /* Unit Tests */,
 			);
 		};
@@ -552,7 +552,7 @@
 		};
 		9A1A12830D02EB86009EABAC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8D15AC270486D014006FF6A4 /* vizard */;
+			target = 8D15AC270486D014006FF6A4 /* xi */;
 			targetProxy = 9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */;
 		};
 		9A7AF1570D99830C00F08222 /* PBXTargetDependency */ = {
@@ -609,7 +609,7 @@
 		9A1A12170D02CDE6009EABAC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/vizard.app/Contents/MacOS/vizard";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					OgreKit/build/$BUILD_STYLE,
@@ -680,10 +680,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = vizard_Prefix.pch;
+				GCC_PREFIX_HEADER = xi_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				PRODUCT_NAME = vizard;
+				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -700,10 +700,10 @@
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = vizard_Prefix.pch;
+				GCC_PREFIX_HEADER = xi_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				PRODUCT_NAME = vizard;
+				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -785,7 +785,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "vizard" */ = {
+		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "xi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05733C808A9546B00998B17 /* Debug */,
@@ -794,7 +794,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "vizard" */ = {
+		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05733CC08A9546B00998B17 /* Debug */,

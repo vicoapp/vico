@@ -1,11 +1,3 @@
-//
-//  ExCommand.h
-//  vizard
-//
-//  Created by Martin Hedenfalk on 2008-03-17.
-//  Copyright 2008 Martin Hedenfalk. All rights reserved.
-//
-
 #import <Cocoa/Cocoa.h>
 
 /* From nvi:

@@ -181,6 +181,12 @@ int indent = 0;
 	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
 }
 
+- (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
+{
+	NSString *line = [self lineForLocation:aLocation];
+	return [line rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]].location == NSNotFound;
+}
+
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
 	return [[self layoutManager] temporaryAttribute:ViScopeAttributeName

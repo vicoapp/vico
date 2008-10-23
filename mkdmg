@@ -2,7 +2,7 @@
 
 #. ../version.mk
 #test -z "$VERSION" && die "can't find version information"
-VERSION=0.001
+VERSION=0.1
 
 echo "Building xi version $VERSION"
 
@@ -13,8 +13,7 @@ sed -E -i.bak \
 # xcodebuild -project xi.xcodeproj -target xi -configuration Release clean || exit
 xcodebuild -project xi.xcodeproj -target xi -configuration Release || exit
 
-TMPDMG=xi-tmp.dmg
-/bin/rm -f $TMPDMG
+TMPDMG=xi-tmp.dmg /bin/rm -f $TMPDMG
 
 die()
 {

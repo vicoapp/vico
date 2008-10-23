@@ -3,6 +3,58 @@
 
 @implementation ViTextView (vi_commands)
 
+/* syntax: [count]} */
+- (BOOL)paragraph_forward:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
+	NSUInteger cur;
+	[self getLineStart:NULL end:&cur contentsEnd:NULL];
+		
+	NSUInteger bol = cur, end, eol = 0;
+	for (; eol < [[storage string] length];)
+	{
+		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
+		if ((bol == end || [self isBlankLineAtLocation:bol]) && --count <= 0)
+		{
+			// empty or blank line, we're done
+			break;
+		}
+		cur = eol;
+	}
+
+	end_location = final_location = bol;
+	return YES;
+}
+
+/* syntax: [count]{ */
+- (BOOL)paragraph_backward:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
+	NSUInteger cur;
+	[self getLineStart:&cur end:NULL contentsEnd:NULL];
+		
+	NSUInteger bol = 0, end;
+	for (; cur > 0;)
+	{
+		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:cur - 1];
+		if ((bol == end || [self isBlankLineAtLocation:bol]) && --count <= 0)
+		{
+			// empty or blank line, we're done
+			break;
+		}
+		cur = bol;
+	}
+
+	end_location = final_location = bol;
+	return YES;
+}
+
 /* syntax: [buffer][count]d[count]motion */
 - (BOOL)delete:(ViCommand *)command
 {
@@ -13,11 +65,11 @@
 	[self cutToBuffer:0 append:NO range:affectedRange];
 	
 	// correct caret position if we deleted the last character(s) on the line
-	if(bol > [[storage string] length])
+	if (bol > [[storage string] length])
 		bol = IMAX(0, [[storage string] length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
-	if(affectedRange.location >= eol)
+	if (affectedRange.location >= eol)
 		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
 	else
 		final_location = affectedRange.location;
@@ -167,9 +219,9 @@
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	NSUInteger c = command.count;
-	if(command.count == 0)
+	if (command.count == 0)
 		c = 1;
-	if(start_location + c >= eol)
+	if (start_location + c >= eol)
 		c = eol - start_location;
 	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, c)];
 	return [self insert:command];

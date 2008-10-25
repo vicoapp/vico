@@ -8,17 +8,6 @@
 @synthesize lastSearchPattern;
 @synthesize lastSearchRegexp;
 
-- (void)setLastSearchPattern:(NSString *)pattern
-{
-	lastSearchPattern = [pattern copy];
-}
-
-- (NSString *)lastSearchPattern
-{
-	INFO(@"last search pattern is %@", lastSearchPattern);
-	return lastSearchPattern;
-}
-
 - (id)init
 {
 	self = [super init];

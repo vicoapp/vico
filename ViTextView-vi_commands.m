@@ -1022,9 +1022,8 @@
 	NSString *word = [self wordAtLocation:start_location];
 	if(word)
 	{
-		lastSearchRegexp = nil;
-		lastSearchPattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		return [self findPattern:lastSearchPattern options:OgreNoneOption];
+		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
+		return [self findPattern:pattern options:OgreNoneOption];
 	}
 	return NO;
 }

@@ -43,9 +43,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViBundle *bundle;
 	ViLanguage *language;
 
-	NSString *lastSearchPattern;
-	OGRegularExpression *lastSearchRegexp;
-
 	CGFloat pageGuideX;
 
 	// statistics

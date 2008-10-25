@@ -455,10 +455,17 @@ int indent = 0;
    ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
 	unsigned rx_options = OgreNotBOLOption | OgreNotEOLOption;
-	if([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
 		rx_options |= OgreIgnoreCaseOption;
 
-	if(lastSearchRegexp == nil || ignoreLastRegexp)
+	OGRegularExpression *lastSearchRegexp = [[NSApp delegate] lastSearchRegexp];
+	NSString *lastSearchPattern = [[NSApp delegate] lastSearchPattern];
+	if (![lastSearchPattern isEqualToString:pattern])
+	{
+		lastSearchRegexp = nil;
+	}
+
+	if (lastSearchRegexp == nil || ignoreLastRegexp)
 	{
 		/* compile the pattern regexp */
 		@try
@@ -474,34 +481,37 @@ int indent = 0;
 			[[self delegate] message:@"Invalid search pattern: %@", exception];
 			return NO;
 		}
+
+		[[NSApp delegate] setLastSearchPattern:pattern];
+		[[NSApp delegate] setLastSearchRegexp:lastSearchRegexp];
 	}
 
 	NSArray *foundMatches = [lastSearchRegexp allMatchesInString:[storage string] options:rx_options];
 
-	if([foundMatches count] == 0)
+	if ([foundMatches count] == 0)
 	{
 		[[self delegate] message:@"Pattern not found"];
 	}
 	else
 	{
 		OGRegularExpressionMatch *match, *nextMatch = nil;
-		for(match in foundMatches)
+		for (match in foundMatches)
 		{
 			NSRange r = [match rangeOfMatchedString];
-			if(find_options == 0)
+			if (find_options == 0)
 			{
-				if(nextMatch == nil && r.location > start_location)
+				if (nextMatch == nil && r.location > start_location)
 					nextMatch = match;
 			}
-			else if(r.location < start_location)
+			else if (r.location < start_location)
 			{
 				nextMatch = match;
 			}
 		}
 
-		if(nextMatch == nil)
+		if (nextMatch == nil)
 		{
-			if(find_options == 0)
+			if (find_options == 0)
 				nextMatch = [foundMatches objectAtIndex:0];
 			else
 				nextMatch = [foundMatches lastObject];
@@ -509,7 +519,7 @@ int indent = 0;
 			[[self delegate] message:@"Search wrapped"];
 		}
 
-		if(nextMatch)
+		if (nextMatch)
 		{
 			NSRange r = [nextMatch rangeOfMatchedString];
 			[self scrollRangeToVisible:r];
@@ -531,8 +541,7 @@ int indent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern
 {
-	lastSearchPattern = pattern;
-	if([self findPattern:pattern options:0])
+	if ([self findPattern:pattern options:0])
 	{
 		[self setCaret:final_location];
 	}
@@ -541,7 +550,6 @@ int indent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	lastSearchRegexp = nil;
 	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:)];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
@@ -549,27 +557,29 @@ int indent = 0;
 }
 
 /* syntax: n */
-- (BOOL)repeat_find:(ViCommand *)comand
+- (BOOL)repeat_find:(ViCommand *)command
 {
-	if(lastSearchPattern == nil)
+	NSString *pattern = [[NSApp delegate] lastSearchPattern];
+	if (pattern == nil)
 	{
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	return [self findPattern:lastSearchPattern options:0];
+	return [self findPattern:pattern options:0];
 }
 
 /* syntax: N */
-- (BOOL)repeat_find_backward:(ViCommand *)comand
+- (BOOL)repeat_find_backward:(ViCommand *)command
 {
-	if(lastSearchPattern == nil)
+	NSString *pattern = [[NSApp delegate] lastSearchPattern];
+	if (pattern == nil)
 	{
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	return [self findPattern:lastSearchPattern options:1];
+	return [self findPattern:pattern options:1];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent

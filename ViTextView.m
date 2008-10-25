@@ -6,7 +6,7 @@
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
 
-int indent = 0;
+int logIndent = 0;
 
 @interface ViTextView (private)
 - (BOOL)move_right:(ViCommand *)command;
@@ -197,6 +197,31 @@ int indent = 0;
 #pragma mark -
 #pragma mark Indentation
 
+- (NSString *)indentStringOfLength:(int)length
+{
+	length = IMAX(length, 0);
+	int tabstop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtabs"] == NSOnState)
+	{
+		// length * " "
+		return [@"" stringByPaddingToLength:length withString:@" " startingAtIndex:0];
+	}
+	else
+	{
+		// length / tabstop * "tab" + length % tabstop * " "
+		int ntabs = (length / tabstop);
+		int nspaces = (length % tabstop);
+		NSString *indent = [@"" stringByPaddingToLength:ntabs withString:@"\t" startingAtIndex:0];
+		return [indent stringByPaddingToLength:ntabs + nspaces withString:@" " startingAtIndex:0];
+	}
+}
+
+- (NSString *)indentStringForLevel:(int)level
+{
+	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"] * level;
+	return [self indentStringOfLength:shiftWidth * level];
+}
+
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger bol, eol;
@@ -207,12 +232,34 @@ int indent = 0;
 						      options:0
 							range:lineRange];
 	// NSLog(@"leadingWhitespaceForLineAtLocation(%u): r = %u + %u", aLocation, r.location, r.length);
-	if(r.location != NSNotFound)
+	if (r.location != NSNotFound)
 	{
 		return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
 	}
 
 	return nil;
+}
+
+- (int)lengthOfIndentString:(NSString *)indent
+{
+	int tabStop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	int i;
+	int length = 0;
+	for (i = 0; i < [indent length]; i++)
+	{
+		unichar c = [indent characterAtIndex:i];
+		if (c == ' ')
+			++length;
+		else if (c == '\t')
+			length += tabStop;
+	}
+
+	return length;
+}
+
+- (int)lenghtOfIndentAtLine:(NSUInteger)lineLocation
+{
+	return [self lengthOfIndentString:[self leadingWhitespaceForLineAtLocation:lineLocation]];
 }
 
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation
@@ -255,7 +302,6 @@ int indent = 0;
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
-	// NSLog(@"inserting newline at %u", aLocation);
 	[self insertString:@"\n" atLocation:aLocation];
 	insert_end_location++;
 
@@ -269,7 +315,10 @@ int indent = 0;
 		leading_whitespace = [self leadingWhitespaceForLineAtLocation:checkLocation];
 
 		if ([self shouldIncreaseIndentAtLocation:checkLocation])
-			leading_whitespace = [NSString stringWithFormat:@"%@	", leading_whitespace ?: @""];
+		{
+			int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+			leading_whitespace = [self indentStringOfLength:[leading_whitespace length] + shiftWidth];
+		}
 
 		if (leading_whitespace)
 		{

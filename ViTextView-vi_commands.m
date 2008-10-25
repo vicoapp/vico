@@ -45,7 +45,9 @@
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(filter_through_shell_command:)];
+	[[self delegate] getExCommandForTextView:self
+	                                selector:@selector(filter_through_shell_command:)
+	                                  prompt:@"!"];
 	final_location = start_location;
 	return YES;
 }
@@ -935,78 +937,47 @@
 	return YES;
 }
 
+- (void)changeIndentation:(int)delta inRange:(NSRange)aRange
+{
+	[undoManager beginUndoGrouping];
+
+	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
+	
+	while (bol < NSMaxRange(aRange))
+	{
+		NSString *indent = [self leadingWhitespaceForLineAtLocation:bol];
+		int n = [self lengthOfIndentString:indent];
+		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
+	
+		NSRange indentRange = NSMakeRange(bol, [indent length]);
+		[self recordReplacementOfRange:indentRange withLength:[newIndent length]];
+		[[storage mutableString] replaceCharactersInRange:indentRange withString:newIndent];
+
+		aRange.length += [newIndent length] - [indent length];
+		
+		// get next line
+		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
+		if (bol == NSNotFound)
+			break;
+	}
+	[undoManager endUndoGrouping];
+}
+
 /* syntax: [count]> */
 - (BOOL)shift_right:(ViCommand *)command
 {
-	int lines = command.count;
-	if(lines == 0)
-		lines = 1;
-	
-	[undoManager beginUndoGrouping];
-	
-	// process each line separately (remember that line mode is set)
-	NSUInteger nextLocation = affectedRange.location;
-	while(lines--)
-	{
-		[self insertString:@"\t" atLocation:nextLocation];
-		[self recordInsertInRange:NSMakeRange(nextLocation, 1)];
-		
-		// get next line
-		NSUInteger end;
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextLocation];
-		if(end == nextLocation || end == NSNotFound)
-			break;
-		nextLocation = end;
-	}
-	[undoManager endUndoGrouping];
-	
-	end_location = final_location = start_location + 1;
-	
+	[self changeIndentation:1 inRange:affectedRange];
+	end_location = final_location = start_location;
 	return YES;
 }
 
 /* syntax: [count]< */
 - (BOOL)shift_left:(ViCommand *)command
 {
-	int lines = command.count;
-	if(lines == 0)
-		lines = 1;
-	
-	BOOL hasUndoGrouping = NO;
-	BOOL gotEndLocation = NO;
-	
-	// process each line separately (remember that line mode is set)
-	NSUInteger nextLocation = affectedRange.location;
-	while(lines--)
-	{
-		NSUInteger end;
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextLocation];
-		if(end == nextLocation || end == NSNotFound)
-			break;
-		NSRange line = NSMakeRange(nextLocation, end - nextLocation);
-		nextLocation = end;
-		
-		NSString *s = [[storage string] substringWithRange:line];
-		if([s hasPrefix:@"\t"])
-		{
-			if(!hasUndoGrouping)
-			{
-				[undoManager beginUndoGrouping];
-				hasUndoGrouping = YES;
-			}
-			[self recordDeleteOfRange:NSMakeRange(line.location, 1)];
-			[storage deleteCharactersInRange:NSMakeRange(line.location, 1)];
-			nextLocation--;
-			
-			if(!gotEndLocation && start_location > affectedRange.location)
-				end_location = final_location = start_location - 1;
-		}
-		gotEndLocation = YES;
-	}
-	
-	if(hasUndoGrouping)
-		[undoManager endUndoGrouping];
-	
+	[self changeIndentation:-1 inRange:affectedRange];
+	end_location = final_location = start_location;
 	return YES;
 }
 

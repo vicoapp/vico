@@ -1,4 +1,5 @@
 #import "ExCommand.h"
+#import "logging.h"
 
 @interface ExCommand (private)
 - (BOOL)parseString:(NSString *)string;
@@ -441,12 +442,12 @@ ex_cmd_find(NSString *cmd)
 {
 	NSLog(@"lookup command [%@]", cmd);
 	int i;
-	for(i = 0; ex_commands[i].name; i++)
+	for (i = 0; ex_commands[i].name; i++)
 	{
 		if ([ex_commands[i].name characterAtIndex:0] > [cmd characterAtIndex:0])
 			return NULL;
 
-		if([ex_commands[i].name compare:cmd
+		if ([ex_commands[i].name compare:cmd
 					options:NSLiteralSearch
 					  range:NSMakeRange(0, [cmd length])] == NSOrderedSame)
 		{
@@ -1014,7 +1015,7 @@ end_case1:		break;
 		case 'w':				/* word */
 			break;
 		default:
-			NSLog(@"%s:%i: internal error", __func__, __LINE__);
+			INFO(@"internal error");
 			break;
 		}
 	}
@@ -1028,7 +1029,7 @@ end_case1:		break;
 	 */
 	if (![scan isAtEnd] || strpbrk(p, "lr"))
 	{
-usage:		NSLog(@"Usage: %@", command->usage);
+usage:		INFO(@"Usage: %@", command->usage);
 		return NO;
 	}
 

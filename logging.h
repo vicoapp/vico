@@ -1,4 +1,4 @@
-extern int indent;
+extern int logIndent;
 
 #define NO_DEBUG
 
@@ -6,12 +6,12 @@ extern int indent;
 # define DEBUG(fmt, ...)
 #else
 # define DEBUG(fmt, ...) do { \
-		NSString *ws = [@"" stringByPaddingToLength:indent*2 withString:@" " startingAtIndex:0]; \
+		NSString *ws = [@"" stringByPaddingToLength:logIndent*2 withString:@" " startingAtIndex:0]; \
 		NSLog([NSString stringWithFormat:@"%s: %@%@", __func__, ws, fmt], ## __VA_ARGS__); \
 	} while(0)
 #endif
 
 #define INFO(fmt, ...) do { \
-		NSString *ws = [@"" stringByPaddingToLength:indent*2 withString:@" " startingAtIndex:0]; \
+		NSString *ws = [@"" stringByPaddingToLength:logIndent*2 withString:@" " startingAtIndex:0]; \
 		NSLog([NSString stringWithFormat:@"%s: %@%@", __func__, ws, fmt], ## __VA_ARGS__); \
 	} while(0)

@@ -54,4 +54,8 @@
 	}
 }
 
+- (void)ex_bang:(ExCommand *)command
+{
+}
+
 @end

@@ -135,13 +135,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[textView performSelector:exCommandSelector withObject:exCommand];
 }
 
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
+- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt
 {
-	[statusbar setStringValue:@":"];
+	[statusbar setStringValue:aPrompt];
 	[statusbar setEditable:YES];
 	[statusbar setDelegate:self];
 	exCommandSelector = aSelector;
 	[[[self windowController] window] makeFirstResponder:statusbar];
+}
+
+- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
+{
+	[self getExCommandForTextView:aTextView selector:aSelector prompt:@":"];
 }
 
 - (BOOL)findPattern:(NSString *)pattern

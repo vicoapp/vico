@@ -381,14 +381,14 @@
 			range.length = NSMaxRange(aRange) - range.location;
 		//	if (range.length == 0)
 		//		return openMatches;
-			indent++;
+			logIndent++;
 			BOOL tmpEOL = NO;
 		//	NSArray *continuationMatches = [self applyPatterns:[patterns arrayByAddingObjectsFromArray:[language expandedPatternsForPattern:[aMatch pattern]]]
 			NSArray *continuationMatches = [self applyPatterns:[language expandedPatternsForPattern:[aMatch pattern]]
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL];
-			indent--;
+			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch];
 			if(tmpEOL == YES)

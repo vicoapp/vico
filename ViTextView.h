@@ -22,10 +22,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSUndoManager *undoManager;
 	ViTagsDatabase *tags;
 
-	//NSMutableString *insertedText;
 	NSUInteger insert_start_location, insert_end_location;
 
-	NSMutableDictionary *buffers;
+	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
 	NSRect oldCaretRect;
 	NSRange affectedRange;
 	NSUInteger start_location, end_location, final_location;
@@ -59,6 +58,12 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
+- (NSString *)indentStringOfLength:(int)length;
+- (NSString *)indentStringForLevel:(int)level;
+- (int)lengthOfIndentString:(NSString *)indent;
+- (int)lenghtOfIndentAtLine:(NSUInteger)lineLocation;
+- (NSString *)lineForLocation:(NSUInteger)aLocation;
+- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;

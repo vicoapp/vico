@@ -36,6 +36,16 @@
 		[item setTarget:self];
 	}
 
+	/* initialize default defaults */
+	[[NSUserDefaults standardUserDefaults] registerDefaults:
+		[NSDictionary dictionaryWithObjectsAndKeys:
+			[NSNumber numberWithInt:8], @"shiftwidth",
+			[NSNumber numberWithInt:8], @"tabstop",
+			[NSNumber numberWithBool:YES], @"autoindent",
+			[NSNumber numberWithBool:YES], @"ignorecase",
+			[NSNumber numberWithBool:YES], @"expandtabs",
+			nil]];
+
 	/* initialize languages */
 	[ViLanguageStore defaultStore];
 }

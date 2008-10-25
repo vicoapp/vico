@@ -28,7 +28,7 @@ static struct vikey vikeys[] = {
 	{@"goto_line:",		'G', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"insert_bol:",	'I', VIF_SETS_DOT},
 	{@"join:",		'J', VIF_SETS_DOT},
-	{@"repeat_find_backward:",	'N', VIF_IS_MOTION},
+	{@"repeat_find_backward:",'N', VIF_IS_MOTION},
 	{@"open_line_above:",	'O', VIF_SETS_DOT},
 	{@"put_before:",	'P', VIF_SETS_DOT},
 	{@"change:",		'S', VIF_LINE_MODE | VIF_SETS_DOT},
@@ -67,6 +67,7 @@ static struct vikey vikeys[] = {
 	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
 	{@"paragraph_forward:",	'}', VIF_IS_MOTION},
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},
+	{@"filter:",		'!', VIF_SETS_DOT | VIF_NEED_MOTION},
 	{nil, -1, 0}
 };
 

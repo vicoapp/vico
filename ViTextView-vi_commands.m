@@ -3,6 +3,53 @@
 
 @implementation ViTextView (vi_commands)
 
+- (void)filter_through_shell_command:(NSString *)shellCommand
+{
+	if ([shellCommand length] == 0)
+	{
+		return;
+	}
+
+	NSString *inputText = [[storage string] substringWithRange:affectedRange];
+
+	NSTask *task = [[NSTask alloc] init];
+	[task setLaunchPath:@"/bin/sh"];
+	[task setArguments:[NSArray arrayWithObjects:@"-c", [NSString stringWithFormat:@"%@", shellCommand], nil]];
+
+	NSPipe *shellInput = [NSPipe pipe];
+	NSPipe *shellOutput = [NSPipe pipe];
+
+	[task setStandardInput:shellInput];
+	[task setStandardOutput:shellOutput];
+	/* FIXME: set standard error to standard output? */
+
+	[task launch];
+	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
+	[[shellInput fileHandleForWriting] closeFile];
+	[task waitUntilExit];
+	int status = [task terminationStatus];
+
+	if (status != 0)
+	{
+		[[self delegate] message:@"%@: exited with status %i", shellCommand, status];
+	}
+	else
+	{
+		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
+		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+		[self recordReplacementOfRange:affectedRange withLength:[outputText length]];
+		[[storage mutableString] replaceCharactersInRange:affectedRange withString:outputText];
+	}
+}
+
+/* syntax: [count]!motion command(s) */
+- (BOOL)filter:(ViCommand *)command
+{
+	[[self delegate] getExCommandForTextView:self selector:@selector(filter_through_shell_command:)];
+	final_location = start_location;
+	return YES;
+}
+
 /* syntax: [count]} */
 - (BOOL)paragraph_forward:(ViCommand *)command
 {

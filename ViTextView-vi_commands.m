@@ -3,6 +3,54 @@
 
 @implementation ViTextView (vi_commands)
 
+- (BOOL)move_to_match:(ViCommand *)command
+{
+        // find first paren on current line
+	NSString *parens = @"<>(){}[]";
+        NSCharacterSet *parensSet = [NSCharacterSet characterSetWithCharactersInString:parens];
+
+        NSUInteger end, eol;
+	[self getLineStart:NULL end:&end contentsEnd:&eol];
+	NSRange lineRange = NSMakeRange(start_location, end - start_location);
+        
+        NSRange openingRange = [[storage string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
+        if (openingRange.location == NSNotFound)
+        {
+                [[self delegate] message:@"No match character on this line"];
+                return NO;
+        }
+
+        // lookup the matching character
+        NSString *match = [[storage string] substringWithRange:openingRange];
+	NSString *opposite;
+	NSRange searchRange;
+	NSStringCompareOptions options = 0;
+        NSRange r = [parens rangeOfString:match];
+        if (r.location % 2 == 0)
+        {
+                opposite = [parens substringWithRange:NSMakeRange(r.location + 1, 1)];
+                searchRange = NSMakeRange(openingRange.location + 1, [[storage string] length] - (openingRange.location + 1));
+        }
+	else
+	{
+		options |= NSBackwardsSearch;
+                opposite = [parens substringWithRange:NSMakeRange(r.location - 1, 1)];
+                searchRange = NSMakeRange(0, openingRange.location - 1);
+        }
+        INFO(@"should match char %@ with %@", match, opposite);
+
+        // search for matching character
+	NSRange matchRange = [[storage string] rangeOfString:opposite options:options range:searchRange];
+	if (matchRange.location == NSNotFound)
+	{
+		[[self delegate] message:@"Matching character not found"];
+		return NO;
+        }
+	final_location = end_location = matchRange.location;
+
+        return YES;
+}
+
 - (void)filter_through_shell_command:(NSString *)shellCommand
 {
 	if ([shellCommand length] == 0)

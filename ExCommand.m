@@ -440,7 +440,6 @@ static struct ex_command ex_commands[] = {
 static struct ex_command *
 ex_cmd_find(NSString *cmd)
 {
-	NSLog(@"lookup command [%@]", cmd);
 	int i;
 	for (i = 0; ex_commands[i].name; i++)
 	{
@@ -451,7 +450,6 @@ ex_cmd_find(NSString *cmd)
 					options:NSLiteralSearch
 					  range:NSMakeRange(0, [cmd length])] == NSOrderedSame)
 		{
-			NSLog(@"found command %@", ex_commands[i].method);
 			return &ex_commands[i];
 		}
 	}
@@ -738,7 +736,6 @@ ex_cmd_find(NSString *cmd)
 
 	// FIXME: need to return whether comma or semicolon was used
 	naddr = [ExCommand parseRange:scan intoAddress:&addr1 otherAddress:&addr2];
-	NSLog(@"parsed %i addresses", naddr);
 
 	if (naddr < 0)
 		return NO;

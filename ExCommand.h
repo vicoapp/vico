@@ -83,6 +83,7 @@ struct ex_address
 	NSString *regexp;
 	NSString *replacement;
 	NSString *plus_command;
+	NSArray *words;
 }
 
 - (ExCommand *)initWithString:(NSString *)string;
@@ -103,5 +104,6 @@ struct ex_address
 @property(readonly) NSString *filename;
 @property(readonly) NSString *regexp;
 @property(readonly) NSString *plus_command;
+@property(readonly) NSArray *words;
 
 @end

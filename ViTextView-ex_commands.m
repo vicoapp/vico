@@ -58,4 +58,100 @@
 {
 }
 
+- (void)ex_set:(ExCommand *)command
+{
+	NSDictionary *variables = [NSDictionary dictionaryWithObjectsAndKeys:
+		@"shiftwidth", @"sw",
+		@"autoindent", @"ai",
+		@"expandtab", @"et",
+		@"ignorecase", @"ic",
+		nil];
+
+	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", nil];
+	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
+		
+	NSString *var;
+	for (var in command.words)
+	{
+		NSUInteger equals = [var rangeOfString:@"="].location;
+		NSUInteger qmark = [var rangeOfString:@"?"].location;
+		if (equals == 0 || qmark == 0)
+		{
+			[[self delegate] message:usage];
+			return;
+		}
+		
+		NSString *name;
+		if (equals != NSNotFound)
+			name = [var substringToIndex:equals];
+		else if (qmark != NSNotFound)
+			name = [var substringToIndex:qmark];
+		else
+			name = var;
+
+		BOOL turnoff = NO;
+		if ([name hasPrefix:@"no"])
+		{
+			name = [name substringFromIndex:2];
+			turnoff = YES;
+		}
+
+		if ([name isEqualToString:@"all"])
+		{
+			[[self delegate] message:@"'set all' not implemented."];
+			return;
+		}
+
+		NSString *defaults_name = [variables objectForKey:name];
+		if (defaults_name == nil && [[variables allValues] containsObject:name])
+			defaults_name = name;
+			
+		if (defaults_name == nil)
+		{
+			[[self delegate] message:@"set: no %@ option: 'set all' gives all option values.", name];
+			return;
+		}
+
+		if (qmark != NSNotFound)
+		{
+			if ([booleans containsObject:defaults_name])
+			{
+				int val = [[NSUserDefaults standardUserDefaults] integerForKey:defaults_name];
+				[[self delegate] message:[NSString stringWithFormat:@"%@%@", val == NSOffState ? @"no" : @"", defaults_name]];
+			}
+			else
+			{
+				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
+				[[self delegate] message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
+			}
+			continue;
+		}
+		
+		if ([booleans containsObject:defaults_name])
+		{
+			if (equals != NSNotFound)
+			{
+				[[self delegate] message:@"set: [no]%@ option doesn't take a value", defaults_name];
+				return;
+			}
+			
+			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
+		}
+		else
+		{
+			if (equals == NSNotFound)
+			{
+				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
+				[[self delegate] message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
+			}
+			else
+			{
+				NSString *val = [var substringFromIndex:equals + 1];
+				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
+			}
+		}
+	}
+}
+
 @end
+

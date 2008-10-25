@@ -201,7 +201,7 @@ int logIndent = 0;
 {
 	length = IMAX(length, 0);
 	int tabstop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtabs"] == NSOnState)
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
 	{
 		// length * " "
 		return [@"" stringByPaddingToLength:length withString:@" " startingAtIndex:0];

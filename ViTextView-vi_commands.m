@@ -1004,13 +1004,16 @@
 	return YES;
 }
 
-- (void)changeIndentation:(int)delta inRange:(NSRange)aRange
+- (int)changeIndentation:(int)delta inRange:(NSRange)aRange
 {
 	[undoManager beginUndoGrouping];
 
 	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
+
+	int delta_offset;
+	BOOL has_delta_offset = NO;
 	
 	while (bol < NSMaxRange(aRange))
 	{
@@ -1023,6 +1026,12 @@
 		[[storage mutableString] replaceCharactersInRange:indentRange withString:newIndent];
 
 		aRange.length += [newIndent length] - [indent length];
+
+		if (!has_delta_offset)
+		{
+          		has_delta_offset = YES;
+          		delta_offset = [newIndent length] - [indent length];
+                }
 		
 		// get next line
 		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
@@ -1030,21 +1039,22 @@
 			break;
 	}
 	[undoManager endUndoGrouping];
+	return delta_offset;
 }
 
 /* syntax: [count]> */
 - (BOOL)shift_right:(ViCommand *)command
 {
-	[self changeIndentation:1 inRange:affectedRange];
-	end_location = final_location = start_location;
+	int delta_offset = [self changeIndentation:1 inRange:affectedRange];
+	end_location = final_location = start_location + delta_offset;
 	return YES;
 }
 
 /* syntax: [count]< */
 - (BOOL)shift_left:(ViCommand *)command
 {
-	[self changeIndentation:-1 inRange:affectedRange];
-	end_location = final_location = start_location;
+	int delta_offset = [self changeIndentation:-1 inRange:affectedRange];
+	end_location = final_location = start_location + delta_offset;
 	return YES;
 }
 

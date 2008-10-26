@@ -641,6 +641,7 @@ done:
 		return;
 
 	// temporary attributes don't work right when called from a notification
+	// FIXME: try call this in - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender instead
 	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0];
 }
 

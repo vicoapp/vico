@@ -302,17 +302,26 @@ int logIndent = 0;
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
+        NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
+		
 	[self insertString:@"\n" atLocation:aLocation];
 	insert_end_location++;
+
+        if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+                                    atCharacterIndex:aLocation + 1
+                                      effectiveRange:NULL] && aLocation > 0)
+        {
+		// assume indentForward?
+		NSString *indent = [self leadingWhitespaceForLineAtLocation:aLocation - 1];
+                [self insertString:[NSString stringWithFormat:@"\n%@", indent] atLocation:aLocation + 1];
+                insert_end_location += [indent length] + 1;
+        }
 
 	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
 	{
 		NSUInteger checkLocation = aLocation;
-		NSString *leading_whitespace = nil;
 		if (indentForward)
 			checkLocation = aLocation - 1;
-
-		leading_whitespace = [self leadingWhitespaceForLineAtLocation:checkLocation];
 
 		if ([self shouldIncreaseIndentAtLocation:checkLocation])
 		{
@@ -895,6 +904,13 @@ int logIndent = 0;
 	insert_end_location--;
 }
 
+- (void)addTemporaryAttribute:(NSDictionary *)what
+{
+        [[self layoutManager] addTemporaryAttribute:[what objectForKey:@"attributeName"]
+                                              value:[what objectForKey:@"value"]
+                                  forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
+}
+
 /* Input a character from the user (in insert mode). Handle smart typing pairs.
  * FIXME: assumes smart typing pairs are single characters.
  */
@@ -909,12 +925,16 @@ int logIndent = 0;
 		{
 			// check if we're inserting the end character of a smart typing pair
 			// if so, just overwrite the end character
-			// FIXME: should check that this really is from a smart pair!
 			if ([[pair objectAtIndex:1] isEqualToString:characters] &&
 			    [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 			{
-				foundSmartTypingPair = YES;
-				[self setCaret:start_location + 1];
+                                if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+							    atCharacterIndex:start_location
+							      effectiveRange:NULL])
+				{
+                                        foundSmartTypingPair = YES;
+                                        [self setCaret:start_location + 1];
+                                }
 				break;
 			}
 			// check for the start character of a smart typing pair
@@ -927,6 +947,14 @@ int logIndent = 0;
 					foundSmartTypingPair = YES;
 					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
 					[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+					
+					INFO(@"adding smart pair attr to %u + 2", start_location);
+					// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
+                                        [self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                        	ViSmartPairAttributeName, @"attributeName",
+                                        	characters, @"value",
+                                        	[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
+                                        	nil] afterDelay:0];
 
 					insert_end_location += 2;
 					[self setCaret:start_location + 1];

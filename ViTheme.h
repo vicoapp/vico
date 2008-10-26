@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 
 #define ViScopeAttributeName @"ViScope"
+#define ViSmartPairAttributeName @"ViSmartPair"
 #define ViContinuationAttributeName @"ViContinuation"
 
 @interface ViTheme : NSObject

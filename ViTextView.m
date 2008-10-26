@@ -743,6 +743,12 @@ int logIndent = 0;
 		 // simulate 'escape' (back to command mode)
 		start_location = final_location;
 		[self move_left:nil];
+		
+		if (hasBeginUndoGroup)
+		{
+                        [undoManager endUndoGrouping];
+                        hasBeginUndoGroup = NO;
+		}
 	}
 	else
 	{
@@ -948,7 +954,7 @@ int logIndent = 0;
 					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
 					[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
 					
-					INFO(@"adding smart pair attr to %u + 2", start_location);
+					// INFO(@"adding smart pair attr to %u + 2", start_location);
 					// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
                                         [self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                         	ViSmartPairAttributeName, @"attributeName",

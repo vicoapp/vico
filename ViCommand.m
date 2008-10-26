@@ -64,6 +64,7 @@ static struct vikey vikeys[] = {
 	{@"shift_right:",	'>', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
+	{@"find_backwards:",	'?', VIF_IS_MOTION},
 	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
 	{@"paragraph_forward:",	'}', VIF_IS_MOTION},
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},

@@ -500,6 +500,14 @@
 
 - (void)resetAttributesInRange:(NSRange)aRange
 {
+	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
+	
 	NSDictionary *defaultAttributes = nil;
 	if (language)
 	{
@@ -524,7 +532,7 @@
 				     nil];
  */
 	}
-	[[self layoutManager] setTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
+	[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting

@@ -361,6 +361,11 @@
 	NSUInteger c = command.count;
 	if (command.count == 0)
 		c = 1;
+	
+	/* XXX: treat a command count as motion count */
+	command.motion_count = c;
+	command.count = 0;
+	
 	if (start_location + c >= eol)
 		c = eol - start_location;
 	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, c)];

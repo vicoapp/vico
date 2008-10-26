@@ -51,8 +51,8 @@ struct vikey
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;
-@property(readonly) int count;
-@property(readonly) int motion_count;
+@property(readwrite) int count;
+@property(readwrite) int motion_count;
 @property(readonly) unichar key;
 @property(readonly) unichar motion_key;
 @property(readonly) unichar argument;

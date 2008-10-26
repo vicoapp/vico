@@ -20,33 +20,52 @@
                 return NO;
         }
 
-        // lookup the matching character
+        // lookup the matching character and prepare search
         NSString *match = [[storage string] substringWithRange:openingRange];
-	NSString *opposite;
-	NSRange searchRange;
-	NSStringCompareOptions options = 0;
+        unichar matchChar = [match characterAtIndex:0];
+        unichar otherChar;
+	NSUInteger startOffset, endOffset = 0;
+	int delta = 1;
         NSRange r = [parens rangeOfString:match];
         if (r.location % 2 == 0)
         {
-                opposite = [parens substringWithRange:NSMakeRange(r.location + 1, 1)];
-                searchRange = NSMakeRange(openingRange.location + 1, [[storage string] length] - (openingRange.location + 1));
+		// search forward
+                otherChar = [parens characterAtIndex:r.location + 1];
+                startOffset = openingRange.location + 1;
+                endOffset = [[storage string] length];
         }
 	else
 	{
-		options |= NSBackwardsSearch;
-                opposite = [parens substringWithRange:NSMakeRange(r.location - 1, 1)];
-                searchRange = NSMakeRange(0, openingRange.location - 1);
+		// search backwards
+                otherChar = [parens characterAtIndex:r.location - 1];
+		startOffset = openingRange.location - 1;
+                delta = -1;
         }
-        INFO(@"should match char %@ with %@", match, opposite);
 
         // search for matching character
-	NSRange matchRange = [[storage string] rangeOfString:opposite options:options range:searchRange];
-	if (matchRange.location == NSNotFound)
+	int level = 1;
+	NSUInteger offset;
+	for (offset = startOffset; offset != endOffset; offset += delta)
+	{
+        	unichar c = [[storage string] characterAtIndex:offset];
+        	if (c == matchChar)
+        		level++;
+        	else if (c == otherChar)
+        		level--;
+        	if (level == 0)
+        		break;
+        }
+
+        if (level > 0)
 	{
 		[[self delegate] message:@"Matching character not found"];
 		return NO;
         }
-	final_location = end_location = matchRange.location;
+	final_location = end_location = offset;
+	if (delta == 1)
+                end_location++;
+        else
+        	start_location++;
 
         return YES;
 }

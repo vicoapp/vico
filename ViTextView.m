@@ -413,14 +413,14 @@ int logIndent = 0;
 
 - (void)recordInsertInRange:(NSRange)aRange
 {
-	INFO(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
+	// INFO(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
 	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
 	[undoManager setActionName:@"insert text"];
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	INFO(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
+	// INFO(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
 	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
 	[undoManager setActionName:@"delete text"];
 }
@@ -996,17 +996,22 @@ int logIndent = 0;
 				insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
 
 			/* handle counts for inserted text here */
+			NSString *multipliedText = insertedText;
 			if (parser.count > 1)
 			{
-				NSString *multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
-							                              withString:insertedText
-							                         startingAtIndex:0];
+				multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
+						                            withString:insertedText
+							               startingAtIndex:0];
 				[self insertString:multipliedText atLocation:[self caret]];
+
+				multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
+						                            withString:insertedText
+							               startingAtIndex:0];
 			}
 
-			[parser setText:insertedText];
-			if ([insertedText length] > 0)
-				[self recordInsertInRange:NSMakeRange(insert_start_location, [insertedText length])];
+			[parser setText:multipliedText];
+			if ([multipliedText length] > 0)
+				[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
 			if (hasBeginUndoGroup)
 			{
                                 [undoManager endUndoGrouping];

@@ -404,18 +404,14 @@ int logIndent = 0;
 
 - (void)recordInsertInRange:(NSRange)aRange
 {
-	// NSLog(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
+	INFO(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
 	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
 	[undoManager setActionName:@"insert text"];
-
-	if(hasBeginUndoGroup)
-		[undoManager endUndoGrouping];
-	hasBeginUndoGroup = NO;
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	// NSLog(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
+	INFO(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
 	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
 	[undoManager setActionName:@"delete text"];
 }
@@ -729,7 +725,7 @@ int logIndent = 0;
 
 - (void)setInsertMode:(ViCommand *)command
 {
-	if(command.text)
+	if (command.text)
 	{
 		[self insertString:command.text atLocation:end_location];
 		final_location = end_location + [command.text length];
@@ -838,7 +834,6 @@ int logIndent = 0;
 {
 	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
 	[self setCaret:start_location + num_chars];
-	[self scrollRangeToVisible:NSMakeRange(start_location + num_chars, 0)];
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
@@ -907,27 +902,27 @@ int logIndent = 0;
 {
 	BOOL foundSmartTypingPair = NO;
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
-	if(smartTypingPairs)
+	if (smartTypingPairs)
 	{
 		NSArray *pair;
-		for(pair in smartTypingPairs)
+		for (pair in smartTypingPairs)
 		{
 			// check if we're inserting the end character of a smart typing pair
 			// if so, just overwrite the end character
 			// FIXME: should check that this really is from a smart pair!
-			if([[pair objectAtIndex:1] isEqualToString:characters] &&
-			   [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+			if ([[pair objectAtIndex:1] isEqualToString:characters] &&
+			    [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 			{
 				foundSmartTypingPair = YES;
 				[self setCaret:start_location + 1];
 				break;
 			}
 			// check for the start character of a smart typing pair
-			else if([[pair objectAtIndex:0] isEqualToString:characters])
+			else if ([[pair objectAtIndex:0] isEqualToString:characters])
 			{
 				// don't use it if next character is alphanumeric
 				if (!(start_location >= [storage length] ||
-				    [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
+				      [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
 				{
 					foundSmartTypingPair = YES;
 					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
@@ -941,7 +936,7 @@ int logIndent = 0;
 		}
 	}
 	
-	if(!foundSmartTypingPair)
+	if (!foundSmartTypingPair)
 	{
 		[self insertString:characters atLocation:start_location];
 		insert_end_location += [characters length];
@@ -959,37 +954,36 @@ int logIndent = 0;
 	      
 #endif
 
-	if([[theEvent characters] length] == 0)
+	if ([[theEvent characters] length] == 0)
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-
-	//NSLog(@"keyDown event charcode = %04X", charcode);
 	
-	if(mode == ViInsertMode)
+	if (mode == ViInsertMode)
 	{
-		if(charcode == 0x1B)
+		if (charcode == 0x1B)
 		{
 			/* escape, return to command mode */
 			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
-			// NSLog(@"registering replay text: [%@] at %u + %u, count = %i", insertedText, insert_start_location, insert_end_location, parser.count);
+			INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
+				insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
 
 			/* handle counts for inserted text here */
-			NSString *t = insertedText;
-			if(parser.count > 1)
+			if (parser.count > 1)
 			{
-				t = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
-							       withString:insertedText
-							  startingAtIndex:0];
-				[self insertString:t atLocation:[self caret]];
-				t = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
-							       withString:insertedText
-							  startingAtIndex:0];
+				NSString *multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
+							                              withString:insertedText
+							                         startingAtIndex:0];
+				[self insertString:multipliedText atLocation:[self caret]];
 			}
 
-			[parser setText:t];
-			if([t length] > 0 || hasBeginUndoGroup)
-				[self recordInsertInRange:NSMakeRange(insert_start_location, [t length])];
-			insertedText = nil;
+			[parser setText:insertedText];
+			if ([insertedText length] > 0)
+				[self recordInsertInRange:NSMakeRange(insert_start_location, [insertedText length])];
+			if (hasBeginUndoGroup)
+			{
+                                [undoManager endUndoGrouping];
+                                hasBeginUndoGroup = NO;
+                        }
 			[self setCommandMode];
 			start_location = end_location = [self caret];
 			[self move_left:nil];
@@ -1005,15 +999,15 @@ int logIndent = 0;
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 			NSString *inputCommand = [inputCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-			if(inputCommand)
+			if (inputCommand)
 			{
 				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
 			}
-			else if((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0)
+			else if ((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0)
 			{
 				/* other keys insert themselves */
 				/* but don't input control characters */
-				if(([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
+				if (([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
 				{
 					[[self delegate] message:@"Illegal character; quote to enter"];
 				}
@@ -1024,33 +1018,33 @@ int logIndent = 0;
 			}
 		}
 	}
-	else if(mode == ViCommandMode) // or normal mode
+	else if (mode == ViCommandMode) // or normal mode
 	{
 		// check for a special key bound to a function
 		NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 		NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-		if(normalCommand)
+		if (normalCommand)
 		{
 			[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
 		}
 		else
 		{
-			if(parser.complete)
+			if (parser.complete)
 				[parser reset];
 
 			[parser pushKey:charcode];
-			if(parser.complete)
+			if (parser.complete)
 			{
 				[[self delegate] message:@""]; // erase any previous message
 				[storage beginEditing];
 				[self evaluateCommand:parser];
 				[storage endEditing];
 				[self setCaret:final_location];
-				if(need_scroll)
-					[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
 			}
 		}
 	}
+
+        [self scrollRangeToVisible:NSMakeRange([self caret], 0)];
 }
 
 /* Takes a string of characters and creates key events for each one.

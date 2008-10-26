@@ -329,7 +329,7 @@
 
 	INFO(@"range = %u.%u", affectedRange.location, affectedRange.length);
 	
-	if([self delete:command])
+	if ([self delete:command])
 	{
 		end_location = final_location;
 		[self setInsertMode:command];
@@ -364,7 +364,8 @@
 	if (start_location + c >= eol)
 		c = eol - start_location;
 	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, c)];
-	return [self insert:command];
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: [count]J */
@@ -472,9 +473,12 @@
 /* syntax: [buffer][count]C */
 - (BOOL)change_eol:(ViCommand *)command
 {
+	[undoManager beginUndoGrouping];
+	hasBeginUndoGroup = YES;
+	
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if(eol > bol)
+	if (eol > bol)
 	{
 		NSRange range;
 		range.location = start_location;
@@ -483,7 +487,8 @@
 		[self cutToBuffer:0 append:NO range:range];
 	}
 	
-	return [self insert:command];
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: [count]h */
@@ -696,12 +701,13 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if(start_location < eol)
+	if (start_location < eol)
 	{
 		start_location += 1;
 		final_location = end_location = start_location;
 	}
-	return [self insert:command];
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: [count]A */
@@ -715,21 +721,32 @@
 /* syntax: o */
 - (BOOL)open_line_below:(ViCommand *)command
 {
+	[undoManager beginUndoGrouping];
+	hasBeginUndoGroup = YES;
+	
 	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
 	int num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
  	final_location = end_location + num_chars;
 	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
-	return [self insert:command];
+	end_location += num_chars; // insert mode starts at end_location
+	
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: O */
 - (BOOL)open_line_above:(ViCommand *)command
 {
+	[undoManager beginUndoGrouping];
+	hasBeginUndoGroup = YES;
+	
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	int num_chars = [self insertNewlineAtLocation:end_location indentForward:NO];
 	final_location = end_location - 1 + num_chars;
 	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
-	return [self insert:command];
+
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: u */
@@ -951,7 +968,8 @@
 	else
 		end_location = bol;
 	final_location = end_location;
-	return [self insert:command];
+	[self setInsertMode:command];
+	return YES;
 }
 
 /* syntax: [count]x */

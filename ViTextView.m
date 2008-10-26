@@ -316,7 +316,7 @@ int logIndent = 0;
 		if ([self shouldIncreaseIndentAtLocation:checkLocation])
 		{
 			int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
-			leading_whitespace = [self indentStringOfLength:[leading_whitespace length] + shiftWidth];
+			leading_whitespace = [self indentStringOfLength:[self lengthOfIndentString:leading_whitespace] + shiftWidth];
 		}
 
 		if (leading_whitespace)
@@ -1092,7 +1092,7 @@ int logIndent = 0;
 	[self setInsertionPointColor:[theme caretColor]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
-	[self setTabSize:8];
+	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
 - (NSFont *)font

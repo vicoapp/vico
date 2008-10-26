@@ -65,6 +65,7 @@
 		@"autoindent", @"ai",
 		@"expandtab", @"et",
 		@"ignorecase", @"ic",
+		@"tabstop", @"ts",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", nil];
@@ -148,6 +149,11 @@
 			{
 				NSString *val = [var substringFromIndex:equals + 1];
 				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
+				
+				if ([defaults_name isEqualToString:@"tabstop"])
+				{
+                                        [self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
+                                }
 			}
 		}
 	}

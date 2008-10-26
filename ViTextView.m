@@ -41,6 +41,8 @@ int logIndent = 0;
 			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00000024], // enter
 			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x0004002e], // ctrl-m
 			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00040026], // ctrl-j
+			 @"increase_indent:", [NSNumber numberWithUnsignedInteger:0x00040011], // ctrl-t
+			 @"decrease_indent:", [NSNumber numberWithUnsignedInteger:0x00040002], // ctrl-d
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00000033], // backspace
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
 			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
@@ -99,7 +101,6 @@ int logIndent = 0;
 	ViLanguage *newLanguage = nil;
 	if (aURL)
 	{
-
 		NSString *firstLine = nil;
 		NSUInteger eol;
 		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:0];
@@ -328,6 +329,58 @@ int logIndent = 0;
 	}
 
 	return 1;
+}
+
+- (int)changeIndentation:(int)delta inRange:(NSRange)aRange
+{
+	[undoManager beginUndoGrouping];
+
+	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
+
+	int delta_offset;
+	BOOL has_delta_offset = NO;
+	
+	while (bol < NSMaxRange(aRange))
+	{
+		NSString *indent = [self leadingWhitespaceForLineAtLocation:bol];
+		int n = [self lengthOfIndentString:indent];
+		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
+	
+		NSRange indentRange = NSMakeRange(bol, [indent length]);
+		[self recordReplacementOfRange:indentRange withLength:[newIndent length]];
+		[[storage mutableString] replaceCharactersInRange:indentRange withString:newIndent];
+
+		aRange.length += [newIndent length] - [indent length];
+
+		if (!has_delta_offset)
+		{
+          		has_delta_offset = YES;
+          		delta_offset = [newIndent length] - [indent length];
+                }
+		
+		// get next line
+		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
+		if (bol == NSNotFound)
+			break;
+	}
+	[undoManager endUndoGrouping];
+	return delta_offset;
+}
+
+- (void)increase_indent:(NSString *)characters
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	[self changeIndentation:+1 inRange:NSMakeRange(bol, eol - bol)];
+}
+
+- (void)decrease_indent:(NSString *)characters
+{
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	[self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
 }
 
 #pragma mark -
@@ -899,11 +952,11 @@ int logIndent = 0;
 - (void)keyDown:(NSEvent *)theEvent
 {
 #if 0
-	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, modifiers = 0x%08X (0x%08X)",
+	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
-	      [theEvent modifierFlags],
-	      ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask));
+              ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+	      
 #endif
 
 	if([[theEvent characters] length] == 0)

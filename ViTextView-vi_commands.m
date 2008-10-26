@@ -1028,44 +1028,6 @@
 	return YES;
 }
 
-- (int)changeIndentation:(int)delta inRange:(NSRange)aRange
-{
-	[undoManager beginUndoGrouping];
-
-	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
-	NSUInteger bol;
-	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
-
-	int delta_offset;
-	BOOL has_delta_offset = NO;
-	
-	while (bol < NSMaxRange(aRange))
-	{
-		NSString *indent = [self leadingWhitespaceForLineAtLocation:bol];
-		int n = [self lengthOfIndentString:indent];
-		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-	
-		NSRange indentRange = NSMakeRange(bol, [indent length]);
-		[self recordReplacementOfRange:indentRange withLength:[newIndent length]];
-		[[storage mutableString] replaceCharactersInRange:indentRange withString:newIndent];
-
-		aRange.length += [newIndent length] - [indent length];
-
-		if (!has_delta_offset)
-		{
-          		has_delta_offset = YES;
-          		delta_offset = [newIndent length] - [indent length];
-                }
-		
-		// get next line
-		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
-		if (bol == NSNotFound)
-			break;
-	}
-	[undoManager endUndoGrouping];
-	return delta_offset;
-}
-
 /* syntax: [count]> */
 - (BOOL)shift_right:(ViCommand *)command
 {

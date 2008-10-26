@@ -18,7 +18,6 @@ int logIndent = 0;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView

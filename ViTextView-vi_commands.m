@@ -20,6 +20,13 @@
                 return NO;
         }
 
+        // special case: check if inside a string
+        NSRange scopeRange;
+	NSArray *openingScopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+				                         atCharacterIndex:openingRange.location
+				                           effectiveRange:&scopeRange];
+        BOOL inString = [[openingScopes lastObject] hasPrefix:@"string"];
+
         // lookup the matching character and prepare search
         NSString *match = [[storage string] substringWithRange:openingRange];
         unichar matchChar = [match characterAtIndex:0];
@@ -32,13 +39,18 @@
 		// search forward
                 otherChar = [parens characterAtIndex:r.location + 1];
                 startOffset = openingRange.location + 1;
-                endOffset = [[storage string] length];
+                if (inString)
+                	endOffset = NSMaxRange(scopeRange);
+                else
+                        endOffset = [[storage string] length];
         }
 	else
 	{
 		// search backwards
                 otherChar = [parens characterAtIndex:r.location - 1];
 		startOffset = openingRange.location - 1;
+		if (inString)
+			endOffset = scopeRange.location;
                 delta = -1;
         }
 
@@ -48,12 +60,24 @@
 	for (offset = startOffset; offset != endOffset; offset += delta)
 	{
         	unichar c = [[storage string] characterAtIndex:offset];
-        	if (c == matchChar)
-        		level++;
-        	else if (c == otherChar)
-        		level--;
-        	if (level == 0)
-        		break;
+        	if (c == matchChar || c == otherChar)
+                {
+			// ignore match if scopes doesn't match
+			if (!inString)
+                        {
+                                NSArray *scopes = [self scopesAtLocation:offset];
+                                if ([[scopes lastObject] hasPrefix:@"string"])
+                                        continue;
+                        }
+
+			if (c == matchChar)
+                                level++;
+                        else
+                                level--;
+
+                        if (level == 0)
+                                break;
+                }
         }
 
         if (level > 0)

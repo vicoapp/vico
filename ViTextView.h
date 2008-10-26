@@ -65,6 +65,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)setCommandMode;

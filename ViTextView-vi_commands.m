@@ -1062,8 +1062,11 @@
 /* syntax: [count]< */
 - (BOOL)shift_left:(ViCommand *)command
 {
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	
 	int delta_offset = [self changeIndentation:-1 inRange:affectedRange];
-	end_location = final_location = start_location + delta_offset;
+	end_location = final_location = IMAX(start_location + delta_offset, bol);
 	return YES;
 }
 

@@ -5,6 +5,7 @@
 	NSMutableDictionary *info;
 	NSMutableArray *languages;
 	NSMutableArray *preferences;
+	NSMutableArray *snippets;
 	NSMutableDictionary *cachedPreferences;
 }
 - (id)initWithPath:(NSString *)aPath;
@@ -12,6 +13,8 @@
 - (void)addLanguage:(ViLanguage *)lang;
 - (void)addPreferences:(NSDictionary *)prefs;
 - (NSDictionary *)preferenceItems:(NSString *)prefsName;
+- (void)addSnippet:(NSDictionary *)snippet;
+- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;
 

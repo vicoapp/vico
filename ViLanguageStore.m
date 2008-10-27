@@ -59,6 +59,18 @@ static ViLanguageStore *defaultStore = nil;
 			}
 		}
 
+		NSString *snippetsPath = [NSString stringWithFormat:@"%@/%@/Snippets", aPath, subdir];
+		NSArray *snippetsfiles = [[NSFileManager defaultManager] directoryContentsAtPath:snippetsPath];
+		NSString *snippetsfile;
+		for (snippetsfile in snippetsfiles)
+		{
+			if ([snippetsfile hasSuffix:@".tmSnippet"] || [snippetsfile hasSuffix:@".plist"])
+			{
+				NSDictionary *snippet = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", snippetsPath, snippetsfile]];
+				[bundle addSnippet:snippet];
+			}
+		}
+
 		[bundles addObject:bundle];
 	}
 }
@@ -208,6 +220,21 @@ static ViLanguageStore *defaultStore = nil;
 	}
 
 	return result;
+}
+
+- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+{
+	ViBundle *bundle;
+	for (bundle in bundles)
+	{
+		NSString *s = [bundle tabTrigger:name matchingScopes:scopes];
+		if (s)
+		{
+			return s;
+		}
+	}
+
+	return nil;
 }
 
 @end

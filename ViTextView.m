@@ -46,6 +46,7 @@ int logIndent = 0;
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00000033], // backspace
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
 			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
+			 @"input_tab:", [NSNumber numberWithUnsignedInteger:0x00000030], // tab
 			 nil];
 	
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -380,9 +381,9 @@ int logIndent = 0;
 
 - (void)increase_indent:(NSString *)characters
 {
-	NSUInteger bol, eol;
+        NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	[self changeIndentation:+1 inRange:NSMakeRange(bol, eol - bol)];
+        [self changeIndentation:+1 inRange:NSMakeRange(bol, eol - bol)];
 }
 
 - (void)decrease_indent:(NSString *)characters
@@ -851,6 +852,140 @@ int logIndent = 0;
 	[self setCaret:start_location + num_chars];
 }
 
+- (BOOL)parseSnippetPlaceholder:(NSString *)s length:(size_t *)length_ptr meta:(NSMutableDictionary *)meta
+{
+        NSScanner *scan = [NSScanner scannerWithString:s];
+
+	NSMutableCharacterSet *shellVariableSet = [[NSMutableCharacterSet alloc] init];
+	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
+	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
+	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
+
+	INFO(@"parsing placeholder [%@]", s);
+
+	BOOL bracedExpression = NO;
+	if ([scan scanString:@"{" intoString:nil])
+		bracedExpression = YES;
+                
+        int tabStop;
+        if ([scan scanInt:&tabStop])
+        {
+                [meta setObject:[NSNumber numberWithInt:tabStop] forKey:@"tabStop"];
+        }
+        else
+        {
+                NSString *var;
+                [scan scanCharactersFromSet:shellVariableSet intoString:&var];
+                [meta setObject:var forKey:@"variable"];
+        }
+
+	if (bracedExpression)
+	{
+                if ([scan scanString:@":" intoString:nil])
+                {
+                        // got a default value
+                        NSString *defval;
+                        [scan scanUpToString:@"}" intoString:&defval];
+                        [meta setObject:defval forKey:@"defaultValue"];
+                }
+                else if ([scan scanString:@"/" intoString:nil])
+                {
+                        // got a regular expression transformation
+                        NSString *regexp;
+                        [scan scanUpToString:@"}" intoString:&regexp];
+                        [meta setObject:regexp forKey:@"transformation"];
+                }
+
+                if (![scan scanString:@"}" intoString:nil])
+                {
+                        // parse error
+                        return NO;
+                }
+	}
+
+	*length_ptr = [scan scanLocation];
+	
+	return YES;
+}
+
+- (void)insertSnippet:(NSString *)snippet atLocation:(NSUInteger)aLocation
+{
+        NSMutableString *s = [[NSMutableString alloc] initWithString:snippet];
+
+	BOOL foundMarker;
+	NSUInteger i;
+	do
+        {
+                INFO(@"parsing markers, s = [%@]", s);
+                foundMarker = NO;
+                for (i = 0; i < [s length]; i++)
+                {
+                        // FIXME: handle escapes
+                        if ([s characterAtIndex:i] == '$')
+                        {
+                                size_t len;
+                                NSMutableDictionary *meta = [[NSMutableDictionary alloc] init];
+                                if (![self parseSnippetPlaceholder:[s substringFromIndex:i + 1] length:&len meta:meta])
+                                	break;
+
+                                // fixme: add (relative) location to meta
+                                
+                                if ([meta objectForKey:@"defaultValue"])
+                                        [s replaceCharactersInRange:NSMakeRange(i, len + 1) withString:[meta objectForKey:@"defaultValue"]];
+                                else
+                                        [s deleteCharactersInRange:NSMakeRange(i, len + 1)];
+
+                                foundMarker = YES;
+                                break;
+                        }
+                }
+        } while (foundMarker);
+
+        // FIXME: inefficient(?)
+        for (i = 0; i < [s length]; i++)
+        {
+                if ([s characterAtIndex:i] == '\n')
+                {
+                        aLocation += [self insertNewlineAtLocation:aLocation indentForward:YES];
+                }
+                else
+                {
+                        [self insertString:[s substringWithRange:NSMakeRange(i, 1)] atLocation:aLocation];
+                        insert_end_location++;
+                        aLocation++;
+                }
+        }
+}
+
+- (void)input_tab:(NSString *)characters
+{
+        // check for a tab trigger
+        if (start_location > 0)
+        {
+                // is there a word before the cursor that we just typed?
+                NSString *word = [self wordAtLocation:start_location - 1];
+                if ([word length] > 0 && (insert_end_location - insert_start_location) >= [word length])
+                {
+                        NSArray *scopes = [self scopesAtLocation:start_location];
+                        if (scopes)
+                        {
+                                NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
+                                if (snippetString)
+                                {
+                                        [storage deleteCharactersInRange:NSMakeRange(start_location - [word length], [word length])];
+                                        insert_end_location -= [word length];
+                                        [self insertSnippet:snippetString atLocation:start_location - [word length]];
+                                        return;
+                                }
+                        }
+                }
+        }
+        
+	// otherwise just insert a tab
+	[self insertString:@"\t" atLocation:start_location];
+        insert_end_location += 1;
+}
+
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
@@ -980,7 +1115,7 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 0
+#if 1
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
@@ -1268,11 +1403,11 @@ int logIndent = 0;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
-	if(word_start < aLocation)
+	if (word_start < aLocation && word_start > 0)
 		word_start += 1;
 
 	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:NO];
-	if(word_end > word_start)
+	if (word_end > word_start)
 	{
 		return [[storage string] substringWithRange:NSMakeRange(word_start, word_end - word_start)];
 	}

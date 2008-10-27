@@ -1,3 +1,4 @@
+#import "NSString-scopeSelector.h"
 #import "ViBundle.h"
 #import "logging.h"
 
@@ -13,6 +14,7 @@
 		languages = [[NSMutableArray alloc] init];
 		preferences = [[NSMutableArray alloc] init];
 		cachedPreferences = [[NSMutableDictionary alloc] init];
+		snippets = [[NSMutableArray alloc] init];
 		info = [NSDictionary dictionaryWithContentsOfFile:aPath];
 	}
 	
@@ -60,6 +62,34 @@
 	}
 
 	return prefsForScope;
+}
+
+- (void)addSnippet:(NSDictionary *)snippet
+{
+	[snippets addObject:snippet];
+}
+
+- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes
+{
+        NSDictionary *snippet;
+        for (snippet in snippets)
+        {
+                if ([[snippet objectForKey:@"tabTrigger"] isEqualToString:name])
+                {
+                        // check scopes
+                        NSArray *scopeSelectors = [[snippet objectForKey:@"scope"] componentsSeparatedByString:@", "];
+                        NSString *scopeSelector;
+                        for (scopeSelector in scopeSelectors)
+                        {
+                                if ([scopeSelector matchesScopes:scopes] > 0)
+                                {
+                                        return [snippet objectForKey:@"content"];
+                                }
+                        }
+                }
+        }
+        
+        return nil;
 }
 
 @end

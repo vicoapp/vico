@@ -16,5 +16,6 @@
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
 - (NSArray *)allLanguageNames;
 - (NSDictionary *)preferenceItems:(NSString *)prefsName;
+- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 
 @end

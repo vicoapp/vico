@@ -12,6 +12,7 @@
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
+	ViDocument *lastDocument;
 }
 
 + (id)currentWindowController;
@@ -32,6 +33,8 @@
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
 - (IBAction)toggleProjectDrawer:(id)sender;
+
+- (void)switchToLastFile;
 
 @end
 

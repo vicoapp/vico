@@ -60,7 +60,10 @@ static NSWindowController	*currentWindowController = nil;
 
 	isLoaded = YES;
 	if (initialDocument)
+	{
 		[self addNewTab:initialDocument];
+                lastDocument = initialDocument;
+	}
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
@@ -97,6 +100,11 @@ static NSWindowController	*currentWindowController = nil;
 	[newItem setLabel:[document displayName]];
 	[tabView addTabViewItem:newItem];
 	[tabView selectTabViewItem:newItem];
+}
+
+- (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+        lastDocument = [self currentDocument];
 }
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -254,6 +262,11 @@ static NSWindowController	*currentWindowController = nil;
 - (IBAction)toggleProjectDrawer:(id)sender
 {
 	[projectDrawer toggle:sender];
+}
+
+- (void)switchToLastFile
+{
+        [self selectDocument:lastDocument];
 }
 
 @end

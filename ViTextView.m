@@ -61,7 +61,8 @@ int logIndent = 0;
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
 			  */
-			  @"show_scope:", [NSNumber numberWithUnsignedInteger: 0x00060023], // ctrl-shift-p
+			  @"switch_file:", [NSNumber numberWithUnsignedInteger:0x0004001E], // ctrl-^
+			  @"show_scope:", [NSNumber numberWithUnsignedInteger:0x00060023], // ctrl-shift-p
 			 nil];
 	
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
@@ -236,7 +237,7 @@ int logIndent = 0;
 	if (r.location == NSNotFound)
                 r.location = eol;
 	else if (r.location == bol)
-		return nil;
+		return @"";
 	
         return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
 }
@@ -1152,25 +1153,21 @@ int logIndent = 0;
 
 	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
 	{
-		INFO(@"should decrease indent");
                 int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
 		insert_start_location += n;
 		insert_end_location += n;
 	}
 	else if ([self shouldNotIndentLineAtLocation:insert_end_location])
 	{
-		INFO(@"should remove indent, insert_start_location = %u, insert_end_location = %u", insert_start_location, insert_end_location);
                 int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
-                INFO(@"indentation changed insert_end_location with %i", n);
 		insert_start_location += n;
 		insert_end_location += n;
-		INFO(@"insert_start_location = %u, insert_end_location = %u", insert_start_location, insert_end_location);
 	}
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 0
+#if 1
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
@@ -1475,6 +1472,11 @@ int logIndent = 0;
 							    atCharacterIndex:[self caret]
 							      effectiveRange:NULL];
 	[[self delegate] message:[scopes componentsJoinedByString:@" "]];
+}
+
+- (void)switch_file:(NSString *)character
+{
+        [[[self delegate] windowController] switchToLastFile];
 }
 
 @end

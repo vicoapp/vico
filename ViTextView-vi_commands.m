@@ -321,14 +321,12 @@
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:end_location];
 		if (end_location == bol || command.key == 'S')
 		{
-			INFO(@"adjusting last newline in line-mode change command");
 			end_location--;
 			affectedRange.length--;
 		}
 	}
 
-	INFO(@"range = %u.%u", affectedRange.location, affectedRange.length);
-        NSString *leading_whitespace = @"";
+        NSString *leading_whitespace = nil;
 	if (command.key == 'S' && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
                 leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
 	
@@ -337,7 +335,7 @@
 		if (command.key == 'S')
 		{
 			INFO(@"inserting %u chars of leading whitestuff at %u", [leading_whitespace length], final_location);
-			[self insertString:leading_whitespace atLocation:final_location];
+			[self insertString:leading_whitespace ?: @"" atLocation:final_location];
                         [self recordInsertInRange:NSMakeRange(final_location, [leading_whitespace length])];
                         final_location += [leading_whitespace length];
 

@@ -742,9 +742,9 @@
 	
 	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
 	int num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
- 	final_location = end_location + num_chars;
 	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
 	end_location += num_chars; // insert mode starts at end_location
+ 	final_location = end_location;
 	
 	[self setInsertMode:command];
 	return YES;
@@ -756,10 +756,11 @@
 	[undoManager beginUndoGrouping];
 	hasBeginUndoGroup = YES;
 	
-	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
-	int num_chars = [self insertNewlineAtLocation:end_location indentForward:NO];
-	final_location = end_location - 1 + num_chars;
-	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	int num_chars = [self insertNewlineAtLocation:bol indentForward:NO];
+	[self recordInsertInRange:NSMakeRange(bol, num_chars)];
+	final_location = end_location = bol - 1 + num_chars;
 
 	[self setInsertMode:command];
 	return YES;

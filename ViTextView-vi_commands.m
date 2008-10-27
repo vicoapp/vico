@@ -319,7 +319,7 @@
 		/* adjust the range to exclude the last newline */
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:end_location];
-		if (end_location == bol)
+		if (end_location == bol || command.key == 'S')
 		{
 			INFO(@"adjusting last newline in line-mode change command");
 			end_location--;
@@ -328,9 +328,22 @@
 	}
 
 	INFO(@"range = %u.%u", affectedRange.location, affectedRange.length);
+        NSString *leading_whitespace = @"";
+        if (command.key == 'S')
+                leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
 	
 	if ([self delete:command])
 	{
+		if (command.key == 'S')
+		{
+			INFO(@"inserting %u chars of leading whitestuff at %u", [leading_whitespace length], final_location);
+			[self insertString:leading_whitespace atLocation:final_location];
+                        [self recordInsertInRange:NSMakeRange(final_location, [leading_whitespace length])];
+                        final_location += [leading_whitespace length];
+
+			/* a command count should not be treated as a count for the inserted text */
+                        command.count = 0;
+		}
 		end_location = final_location;
 		[self setInsertMode:command];
 		return YES;

@@ -753,7 +753,7 @@ int logIndent = 0;
 	}
 	else
 	{
-		// NSLog(@"entering insert mode at location %u", end_location);
+		// INFO(@"entering insert mode at location %u (final location is %u)", end_location, final_location);
 		mode = ViInsertMode;
 		insert_start_location = insert_end_location = end_location;
 	}
@@ -833,7 +833,7 @@ int logIndent = 0;
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<')
+	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		/* ...well, except for yy :-) */
@@ -1115,7 +1115,7 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 1
+#if 0
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],

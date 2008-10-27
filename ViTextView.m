@@ -232,13 +232,13 @@ int logIndent = 0;
 	NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
 						      options:0
 							range:lineRange];
-	// NSLog(@"leadingWhitespaceForLineAtLocation(%u): r = %u + %u", aLocation, r.location, r.length);
-	if (r.location != NSNotFound)
-	{
-		return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
-	}
 
-	return nil;
+	if (r.location == NSNotFound)
+                r.location = eol;
+	else if (r.location == bol)
+		return nil;
+	
+        return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
 }
 
 - (int)lengthOfIndentString:(NSString *)indent
@@ -290,6 +290,44 @@ int logIndent = 0;
 	if (bestMatchingScope)
 	{
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
+		NSString *checkLine = [self lineForLocation:aLocation];
+
+		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
+		{
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (BOOL)shouldDecreaseIndentAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *decreaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"decreaseIndentPattern"];
+	NSString *bestMatchingScope = [self bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
+
+	if (bestMatchingScope)
+	{
+		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
+		NSString *checkLine = [self lineForLocation:aLocation];
+
+		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
+		{
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (BOOL)shouldNotIndentLineAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"unIndentedLinePattern"];
+	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
+
+	if (bestMatchingScope)
+	{
+		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
 		NSString *checkLine = [self lineForLocation:aLocation];
 
 		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
@@ -383,7 +421,7 @@ int logIndent = 0;
 {
         NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-        [self changeIndentation:+1 inRange:NSMakeRange(bol, eol - bol)];
+        [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
 }
 
 - (void)decrease_indent:(NSString *)characters
@@ -1111,6 +1149,23 @@ int logIndent = 0;
 		insert_end_location += [characters length];
 		[self setCaret:start_location + [characters length]];
 	}
+
+	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
+	{
+		INFO(@"should decrease indent");
+                int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
+		insert_start_location += n;
+		insert_end_location += n;
+	}
+	else if ([self shouldNotIndentLineAtLocation:insert_end_location])
+	{
+		INFO(@"should remove indent, insert_start_location = %u, insert_end_location = %u", insert_start_location, insert_end_location);
+                int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
+                INFO(@"indentation changed insert_end_location with %i", n);
+		insert_start_location += n;
+		insert_end_location += n;
+		INFO(@"insert_start_location = %u, insert_end_location = %u", insert_start_location, insert_end_location);
+	}
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1120,7 +1175,6 @@ int logIndent = 0;
 	      [theEvent characters],
 	      [theEvent keyCode],
               ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-	      
 #endif
 
 	if ([[theEvent characters] length] == 0)

@@ -329,7 +329,7 @@
 
 	INFO(@"range = %u.%u", affectedRange.location, affectedRange.length);
         NSString *leading_whitespace = @"";
-        if (command.key == 'S')
+	if (command.key == 'S' && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
                 leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
 	
 	if ([self delete:command])

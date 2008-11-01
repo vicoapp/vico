@@ -1183,6 +1183,7 @@ int logIndent = 0;
 		[self setCaret:start_location + [characters length]];
 	}
 
+#if 0
 	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
 	{
                 int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
@@ -1195,6 +1196,7 @@ int logIndent = 0;
 		insert_start_location += n;
 		insert_end_location += n;
 	}
+#endif
 }
 
 - (void)keyDown:(NSEvent *)theEvent

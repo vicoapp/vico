@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import <OgreKit/OgreKit.h>
+#import "ViRegexp.h"
 
 @interface ViLanguage : NSObject
 {
@@ -16,6 +17,6 @@
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;
-- (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch;
+- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(id)beginMatch;
 
 @end

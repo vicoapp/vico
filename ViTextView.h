@@ -47,6 +47,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	unsigned regexps_tried;
 	unsigned regexps_overlapped;
 	unsigned regexps_matched;
+	unsigned regexps_cached;
 
 	BOOL hasUndoGroup;
 }

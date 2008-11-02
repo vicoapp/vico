@@ -2,18 +2,20 @@
 #import "ViLanguageStore.h"
 #import "logging.h"
 
+#include <sys/time.h>
+
 @interface ViSyntaxMatch : NSObject
 {
-	OGRegularExpressionMatch *beginMatch;
-	OGRegularExpressionMatch *endMatch;
+	ViRegexpMatch *beginMatch;
+	ViRegexpMatch *endMatch;
 	NSMutableDictionary *pattern;
 	int patternIndex;
 	NSUInteger beginLocation;
 	NSUInteger beginLength;
 }
-- (id)initWithMatch:(OGRegularExpressionMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i;
+- (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i;
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)match;
-- (OGRegularExpression *)endRegexp;
+- (ViRegexp *)endRegexp;
 - (NSUInteger)endLocation;
 - (NSString *)scope;
 - (NSRange)matchedRange;
@@ -24,8 +26,8 @@
 @property(readonly) NSMutableDictionary *pattern;
 @property(readonly) NSUInteger beginLocation;
 @property(readonly) NSUInteger beginLength;
-@property(readonly) OGRegularExpressionMatch *beginMatch;
-@property(readonly) OGRegularExpressionMatch *endMatch;
+@property(readonly) ViRegexpMatch *beginMatch;
+@property(readonly) ViRegexpMatch *endMatch;
 @end
 
 @implementation ViSyntaxMatch
@@ -37,15 +39,15 @@
 @synthesize beginMatch;
 @synthesize endMatch;
 
-- (id)initWithMatch:(OGRegularExpressionMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i
+- (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i
 {
 	self = [super init];
-	if(self)
+	if (self)
 	{
 		beginMatch = aMatch;
 		pattern = aPattern;
 		patternIndex = i;
-		if(aMatch)
+		if (aMatch)
 		{
 			beginLocation = [aMatch rangeOfMatchedString].location;
 			beginLength = [aMatch rangeOfMatchedString].length;
@@ -55,21 +57,21 @@
 }
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)anotherMatch
 {
-	if([self beginLocation] < [anotherMatch beginLocation])
+	if ([self beginLocation] < [anotherMatch beginLocation])
 		return NSOrderedAscending;
-	if([self beginLocation] > [anotherMatch beginLocation])
+	if ([self beginLocation] > [anotherMatch beginLocation])
 		return NSOrderedDescending;
-	if([self patternIndex] < [anotherMatch patternIndex])
+	if ([self patternIndex] < [anotherMatch patternIndex])
 		return NSOrderedAscending;
-	if([self patternIndex] > [anotherMatch patternIndex])
+	if ([self patternIndex] > [anotherMatch patternIndex])
 		return NSOrderedDescending;
 	return NSOrderedSame;
 }
-- (OGRegularExpression *)endRegexp
+- (ViRegexp *)endRegexp
 {
 	return [pattern objectForKey:@"endRegexp"];
 }
-- (void)setEndMatch:(OGRegularExpressionMatch *)aMatch
+- (void)setEndMatch:(ViRegexpMatch *)aMatch
 {
 	endMatch = aMatch;
 }
@@ -93,7 +95,7 @@
 - (NSRange)matchedRange
 {
 	NSRange range = NSMakeRange([self beginLocation], [self endLocation] - [self beginLocation]);
-	if(range.length < 0)
+	if (range.length < 0)
 	{
 		INFO(@"negative length, beginLocation = %u, endLocation = %u", [self beginLocation], [self endLocation]);
 		range.length = 0;
@@ -118,13 +120,13 @@
 - (BOOL)isEqualToPatternArray:(NSArray *)otherArray
 {
 	int i, c = [self count];
-	if(otherArray == self)
+	if (otherArray == self)
 		return YES;
-	if(c != [otherArray count])
+	if (c != [otherArray count])
 		return NO;
-	for(i = 0; i < c; i++)
+	for (i = 0; i < c; i++)
 	{
-		if([[self objectAtIndex:i] pattern] != [[otherArray objectAtIndex:i] pattern])
+		if ([[self objectAtIndex:i] pattern] != [[otherArray objectAtIndex:i] pattern])
 			return NO;
 	}
 	return YES;
@@ -142,11 +144,11 @@
 
 - (void)applyScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange
 {
-	if(aScopeArray == nil)
+	if (aScopeArray == nil)
 		return;
 
 	NSUInteger l = aRange.location;
-	while(l < NSMaxRange(aRange))
+	while (l < NSMaxRange(aRange))
 	{
 		NSRange scopeRange;
 		NSMutableArray *oldScopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
@@ -154,7 +156,7 @@
 							    longestEffectiveRange:&scopeRange
 									  inRange:NSMakeRange(l, NSMaxRange(aRange) - l)];
 		NSMutableArray *scopes = [[NSMutableArray alloc] init];
-		if(oldScopes)
+		if (oldScopes)
 		{
 			[scopes addObjectsFromArray:oldScopes];
 		}
@@ -162,12 +164,12 @@
 		[scopes addObjectsFromArray:aScopeArray];
 
 		// apply (merge) the scope selector in the maximum range
-		if(scopeRange.location < l)
+		if (scopeRange.location < l)
 		{
 			scopeRange.length -= l - scopeRange.location;
 			scopeRange.location = l;
 		}
-		if(NSMaxRange(scopeRange) > NSMaxRange(aRange))
+		if (NSMaxRange(scopeRange) > NSMaxRange(aRange))
 			scopeRange.length = NSMaxRange(aRange) - l;
 
 		DEBUG(@"applying scopes [%@] to range %u + %u", [scopes componentsJoinedByString:@" "], scopeRange.location, scopeRange.length);		
@@ -186,20 +188,20 @@
 	[self applyScopes:[NSArray arrayWithObject:aScope] inRange:aRange];
 }
 
-- (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(OGRegularExpressionMatch *)aMatch
+- (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(ViRegexpMatch *)aMatch
 {
 	NSDictionary *captures = [pattern objectForKey:captureType];
-	if(captures == nil)
+	if (captures == nil)
 		captures = [pattern objectForKey:@"captures"];
-	if(captures == nil)
+	if (captures == nil)
 		return;
 
 	NSString *key;
-	for(key in [captures allKeys])
+	for (key in [captures allKeys])
 	{
 		NSDictionary *capture = [captures objectForKey:key];
 		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
-		if(r.length > 0)
+		if (r.length > 0)
 		{
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
 			[self applyScope:[capture objectForKey:@"name"] inRange:r];
@@ -227,15 +229,15 @@
 	DEBUG(@"searching for end match to [%@] in range %u + %u",
 	      [beginMatch scope], aRange.location, aRange.length);
 	
-	OGRegularExpression *endRegexp = [beginMatch endRegexp];
-	if(endRegexp == nil)
+	ViRegexp *endRegexp = [beginMatch endRegexp];
+	if (endRegexp == nil)
 	{
 		DEBUG(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
 		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
 			 withBackreferencesToRegexp:[beginMatch beginMatch]];
 	}
 	
-	if(endRegexp == nil)
+	if (endRegexp == nil)
 	{
 		DEBUG(@"!!!!!!!!! no end regexp?");
 		return nil;
@@ -245,7 +247,7 @@
 	regexps_tried++;
 	NSArray *matches = [endRegexp allMatchesInString:[storage string] range:aRange];
 	regexps_matched += [matches count];
-	
+
 	return matches;
 }
 
@@ -253,33 +255,32 @@
 		   inRange:(NSRange)aRange
 	       openMatches:(NSArray *)openMatches
 		reachedEOL:(BOOL *)reachedEOL
+		matchCache:(NSMutableDictionary *)matchCache
 {
-	if(reachedEOL)
+	if (reachedEOL)
 		*reachedEOL = NO;
+
+	if (aRange.length == 0)
+	{
+		DEBUG(@"=============== detected zero-length range %u + %u", aRange.location, aRange.length);
+		goto done;
+	}
 
 	DEBUG(@"searching %i patterns in range %u + %u", [patterns count], aRange.location, aRange.length);
 
 	NSArray *topScopes = [self scopesFromMatches:openMatches];
-
-#if 0
-	if (aRange.length == 0)
-	{
-		DEBUG(@"returning from zero-length range %u + %u", aRange.location, aRange.length);
-		return openMatches;
-	}
-#endif
 	
 	// keep an array of matches so we can sort it in order to skip overlapping matches
 	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
 
 	ViSyntaxMatch *topOpenMatch = [openMatches lastObject];
-	if(topOpenMatch)
+	if (topOpenMatch)
 	{
 		NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:aRange];
 		DEBUG(@"found %u possible end matches to scope [%@]", [endMatches count], [topOpenMatch scope]);
-		OGRegularExpressionMatch *match;
-		for(match in endMatches)
+		ViRegexpMatch *match;
+		for (match in endMatches)
 		{
 			ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[topOpenMatch pattern] atIndex:0];
 			[m setEndMatch:match];
@@ -288,26 +289,40 @@
 	}
 
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
-	for(pattern in patterns)
+	for (pattern in patterns)
 	{
 		/* Match all patterns against this range.
 		 */
-
-		OGRegularExpression *regexp = [pattern objectForKey:@"matchRegexp"];
-		if(regexp == nil)
+		ViRegexp *regexp = [pattern objectForKey:@"matchRegexp"];
+		if (regexp == nil)
 			regexp = [pattern objectForKey:@"beginRegexp"];
-		if(regexp == nil)
+		if (regexp == nil)
 			continue;
-		DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
-		regexps_tried++;
-		NSArray *matches = [regexp allMatchesInString:[storage string] range:aRange];
-		regexps_matched += [matches count];
-		OGRegularExpressionMatch *match;
-		for(match in matches)
+		NSArray *matches;
+		matches = [matchCache objectForKey:pattern];
+		if (matches == nil)
+		{
+			regexps_tried++;
+			matches = [regexp allMatchesInString:[storage string] range:aRange];
+			regexps_matched += [matches count];
+			// INFO(@"caching %i matches for pattern [%@]", [matches count], regexp);
+			[matchCache setObject:matches ?: [NSArray array] forKey:pattern];
+
+			if ([matches count] == 0)
+				DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
+			else
+				DEBUG(@"  matching against pattern %@ = %i matches", [pattern objectForKey:@"name"], [matches count]);
+		}
+		else
+			regexps_cached += [matches count];
+
+		ViRegexpMatch *match;
+		for (match in matches)
 		{
 			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:pattern atIndex:i];
 			[matchingPatterns addObject:viMatch];
 		}
+				
 		++i;
 	}
 	[matchingPatterns sortUsingSelector:@selector(sortByLocation:)];
@@ -315,9 +330,9 @@
 	DEBUG(@"applying %u matches in range %u + %u", [matchingPatterns count], aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 	ViSyntaxMatch *aMatch;
-	for(aMatch in matchingPatterns)
+	for (aMatch in matchingPatterns)
 	{
-		if([aMatch beginLocation] < lastLocation)
+		if ([aMatch beginLocation] < lastLocation)
 		{
 			// skip overlapping matches
 			regexps_overlapped++;
@@ -325,23 +340,23 @@
 			continue;
 		}
 
-		if([aMatch beginLocation] > lastLocation)
+		if ([aMatch beginLocation] > lastLocation)
 			[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation)];
 
-		if([aMatch isSingleLineMatch])
+		if ([aMatch isSingleLineMatch])
 		{
 			DEBUG(@"got match on [%@] at %u + %u (subpattern)",
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
 			      [[aMatch beginMatch] rangeOfMatchedString].length);
-			if([aMatch scope])
+			if ([aMatch scope])
 			{
 				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
 				[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange]];
 			}
 			[self highlightCapturesInMatch:aMatch];
 		}
-		else if([aMatch endMatch])
+		else if ([aMatch endMatch])
 		{
 			[topOpenMatch setEndMatch:[aMatch endMatch]];
 			DEBUG(@"got end match on [%@] at %u + %u",
@@ -379,21 +394,19 @@
 			NSRange range = aRange;
 			range.location = NSMaxRange([[aMatch beginMatch] rangeOfMatchedString]);
 			range.length = NSMaxRange(aRange) - range.location;
-		//	if (range.length == 0)
-		//		return openMatches;
 			logIndent++;
 			BOOL tmpEOL = NO;
-		//	NSArray *continuationMatches = [self applyPatterns:[patterns arrayByAddingObjectsFromArray:[language expandedPatternsForPattern:[aMatch pattern]]]
 			NSArray *continuationMatches = [self applyPatterns:[language expandedPatternsForPattern:[aMatch pattern]]
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
-								reachedEOL:&tmpEOL];
+								reachedEOL:&tmpEOL
+								matchCache:matchCache];
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch];
-			if(tmpEOL == YES)
+			if (tmpEOL == YES)
 			{
-				if(reachedEOL)
+				if (reachedEOL)
 					*reachedEOL = YES;
 				DEBUG(@"returning %i continuation matches", [continuationMatches count]);
 				return continuationMatches;
@@ -401,20 +414,21 @@
 		}
 		lastLocation = [aMatch endLocation];
 		// just stop if we passed our line range
-		if(lastLocation >= NSMaxRange(aRange))
+		if (lastLocation >= NSMaxRange(aRange))
 		{
 			DEBUG(@"skipping further matches as we passed our line range");
 			break;
 		}
 	}
 
-	if(lastLocation < NSMaxRange(aRange))
+	if (lastLocation < NSMaxRange(aRange))
 		[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation)];
 
-	if(reachedEOL)
+done:
+	if (reachedEOL)
 		*reachedEOL = YES;
 
-	if(openMatches)
+	if (openMatches)
 	{
 		DEBUG(@"returning %i continuation matches", [openMatches count]);
 		return openMatches;
@@ -428,7 +442,7 @@
 	ViSyntaxMatch *m;
 	for (m in matches)
 	{
-		if([m scope])
+		if ([m scope])
 			[scopes addObject:[m scope]];
 		if (m != skipContentMatch)
 		{
@@ -454,14 +468,16 @@
 	DEBUG(@"-----> line range = %u + %u", aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
+	NSMutableDictionary *matchCache = nil; //[[NSMutableDictionary alloc] init];
+
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
-	while([continuedMatches count] > 0)
+	while ([continuedMatches count] > 0)
 	{
 		DEBUG(@"continuing with match [%@] (of %i total)", [[continuedMatches lastObject] scope], [continuedMatches count]);
 
 		ViSyntaxMatch *m;
-		for(m in continuedMatches)
+		for (m in continuedMatches)
 		{
 			[m setBeginLocation:aRange.location];
 		}
@@ -471,21 +487,22 @@
 		continuedMatches = [self applyPatterns:[language expandedPatternsForPattern:[topMatch pattern]]
 					       inRange:aRange
 					   openMatches:continuedMatches
-					    reachedEOL:&reachedEOL];
+					    reachedEOL:&reachedEOL
+					    matchCache:matchCache];
 
-		if(reachedEOL)
+		if (reachedEOL)
 			return continuedMatches;
 		lastLocation = [topMatch endLocation];
 
 		// adjust the line range
-		if(lastLocation >= NSMaxRange(aRange))
+		if (lastLocation >= NSMaxRange(aRange))
 			return nil;
 		aRange.length = NSMaxRange(aRange) - lastLocation;
 		aRange.location = lastLocation;
 	}
 
 	// search top-level patterns
-	return [self applyPatterns:[language patterns] inRange:aRange openMatches:[NSArray array] reachedEOL:nil];
+	return [self applyPatterns:[language patterns] inRange:aRange openMatches:[NSArray array] reachedEOL:nil matchCache:matchCache];
 }
 
 - (NSArray *)continuedMatchesForLocation:(NSUInteger)location
@@ -493,7 +510,7 @@
 	NSArray *continuedMatches = [[self layoutManager] temporaryAttribute:ViContinuationAttributeName
 							    atCharacterIndex:IMAX(0, location - 1)
 							      effectiveRange:NULL];
-	if(continuedMatches)
+	if (continuedMatches)
 		DEBUG(@"detected %i previous scopes at location %u", [continuedMatches count], location);
 	return continuedMatches;
 }
@@ -537,20 +554,26 @@
 
 - (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
 {
+	struct timeval start;
+	struct timeval stop_time;
+	struct timeval diff;
+	gettimeofday(&start, NULL);
+
 	[[NSGarbageCollector defaultCollector] disable];
 	regexps_tried = 0;
 	regexps_overlapped = 0;
 	regexps_matched = 0;
+	regexps_cached = 0;
 
 	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
 	NSArray *continuedMatches = nil;
-	if(isRestarting && aRange.location > 0)
+	if (isRestarting && aRange.location > 0)
 	{
 		continuedMatches = [self continuedMatchesForLocation:aRange.location];
 	}
 
 	NSArray *lastContinuedMatches = nil;
-	if(isRestarting)
+	if (isRestarting)
 	{
 		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
 	}
@@ -562,6 +585,7 @@
 		goto done;
 
 	NSUInteger lineno = 1;
+	const NSUInteger threshold = 40;
 
 	DEBUG(@"highlighting range %u + %u", aRange.location, aRange.length);
 	
@@ -613,12 +637,24 @@
 		}
 		
 		lineno++;
+		
+#if 1
+		if (lineno > threshold)
+		{
+			NSRange leftRange = NSMakeRange(nextRange, NSMaxRange(aRange) - nextRange);
+			[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:leftRange] afterDelay:0.1];
+			break;
+		}
+#endif
 	}
 done:
 	[[NSGarbageCollector defaultCollector] enable];
-	DEBUG(@"tried regexps: %u", regexps_tried);
-	DEBUG(@"matched regexps: %u", regexps_matched);
-	DEBUG(@"overlapped regexps: %u", regexps_overlapped);
+
+	gettimeofday(&stop_time, NULL);
+	timersub(&stop_time, &start, &diff);
+	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u    => %.3f s",
+		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, (float)ms / 1000.0);
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
@@ -645,7 +681,7 @@ done:
 	area.location = bol;
 	area.length = eol - bol;
 
-	if(area.length == 0)
+	if (area.length == 0)
 		return;
 
 	// temporary attributes don't work right when called from a notification

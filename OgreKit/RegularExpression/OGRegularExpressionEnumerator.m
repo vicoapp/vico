@@ -87,9 +87,6 @@ NSString	* const OgreEnumeratorException = @"OGRegularExpressionEnumeratorExcept
 	/* 検索 */
 	regex_t*	regexBuffer = [_regex patternBuffer];
 	
-	int	counterOfAutorelease = 0;
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-	
 	if (!findNotEmpty) {
 		/* 空文字列へのマッチを許す場合 */
 		r = onig_search(regexBuffer, (unsigned char *)_UTF16TargetString, (unsigned char *)end, (unsigned char *)start, (unsigned char *)range, region, searchOptions);
@@ -120,20 +117,12 @@ NSString	* const OgreEnumeratorException = @"OGRegularExpressionEnumeratorExcept
 				// これ以上進めない場合・空文字列以外にマッチした場合・マッチに失敗した場合
 				break;
 			}
-		
-			counterOfAutorelease++;
-			if (counterOfAutorelease % 100 == 0) {
-				[pool release];
-				pool = [[NSAutoreleasePool alloc] init];
-			}
 		}
 		if ((r >= 0) && (region->beg[0] == region->end[0]) && (start >= range)) {
 			// 最後に空文字列にマッチした場合。ミスマッチ扱いとする。
 			r = ONIG_MISMATCH;
 		}
 	}
-	
-	[pool release];
 	
 	if (r >= 0) {
 		// マッチした場合
@@ -206,18 +195,12 @@ NSString	* const OgreEnumeratorException = @"OGRegularExpressionEnumeratorExcept
 	_startLocation = 0;
 	_numberOfMatches = 0;
 			
-	NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
 	OGRegularExpressionMatch	*match;
 	int matches = 0;
 	while ( (match = [self nextObject]) != nil ) {
 		[matchArray addObject:match];
 		matches++;
-		if ((matches % 100) == 0) {
-			[pool release];
-			pool = [[NSAutoreleasePool alloc] init];
-		}
 	}
-	[pool release];
 	
 	_terminalOfLastMatch = orgTerminalOfLastMatch;
 	_isLastMatchEmpty = orgIsLastMatchEmpty;

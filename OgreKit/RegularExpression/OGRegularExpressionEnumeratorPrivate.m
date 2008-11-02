@@ -34,7 +34,8 @@
 	if (self) {
 		// ŒŸõ‘ÎÛ•¶š—ñ‚ğ•Û
 		// target string‚ğUTF16•¶š—ñ‚É•ÏŠ·‚·‚éB
-		_targetString = [targetString copy];
+		// _targetString = [targetString copy];
+		_targetString = targetString;
 		NSString	*targetPlainString = [_targetString string];
         _lengthOfTargetString = [_targetString length];
         

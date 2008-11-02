@@ -134,21 +134,21 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 
 + (id)regularExpressionWithString:(NSString*)expressionString
 {
-	return [[[self alloc]
+	return [[self alloc]
 		initWithString: expressionString
 		options: OgreNoneOption
 		syntax: [[self class] defaultSyntax]
-		escapeCharacter: [[self class] defaultEscapeCharacter]] autorelease];
+		escapeCharacter: [[self class] defaultEscapeCharacter]];
 }
 
 + (id)regularExpressionWithString:(NSString*)expressionString 
 	options:(unsigned)options
 {
-	return [[[self alloc]
+	return [[self alloc]
 		initWithString: expressionString
 		options: options
 		syntax: [[self class] defaultSyntax]
-		escapeCharacter: [[self class] defaultEscapeCharacter]] autorelease];
+		escapeCharacter: [[self class] defaultEscapeCharacter]];
 }
 
 + (id)regularExpressionWithString:(NSString*)expressionString 
@@ -156,11 +156,11 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	syntax:(OgreSyntax)syntax 
 	escapeCharacter:(NSString*)character
 {
-	return [[[self alloc] 
+	return [[self alloc] 
 		initWithString: expressionString 
 		options: options 
 		syntax: syntax
-		escapeCharacter: character] autorelease];
+		escapeCharacter: character];
 }
 
 
@@ -195,7 +195,8 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	// 引数を保存
 	// 正規表現を表す文字列をコピーして保持
 	if(expressionString != nil) {
-		_expressionString = [expressionString copy];
+		// _expressionString = [expressionString copy];
+		_expressionString = expressionString;
 	} else {
 		// expressionStringがnilの場合
 		[self release];
@@ -636,11 +637,11 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	}
 	
 	OGRegularExpressionEnumerator	*enumerator;
-	enumerator = [[[OGRegularExpressionEnumerator allocWithZone:[self zone]] 
+	enumerator = [[OGRegularExpressionEnumerator allocWithZone:[self zone]] 
 		initWithOGString:[string substringWithRange:searchRange] 
 		options:OgreSearchTimeOptionMask(options) 
 		range:searchRange 
-		regularExpression: self] autorelease];
+		regularExpression: self];
 		
 	return enumerator;
 }
@@ -949,12 +950,10 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		range:replaceRange];
 	
 	NSObject<OGStringProtocol,OGMutableStringProtocol>	*replacedString;
-	replacedString = [[[[targetString mutableClass] alloc] init] autorelease];
+	replacedString = [[[targetString mutableClass] alloc] init];
 	
 	unsigned					matches = 0;
 	OGRegularExpressionMatch	*match, *lastMatch = nil;
-	
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
 	
 	if (replaceAll) {
 		while ((match = [enumerator nextObject]) != nil) {
@@ -963,12 +962,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 			[replacedString appendOGString:[match ogStringBetweenMatchAndLastMatch]];
 			[replacedString appendOGString:[repex replaceMatchedOGStringOf:match]];
 			lastMatch = match;
-			if (matches % 100 == 0) {
-				[lastMatch retain];
-				[pool release];
-				pool = [[NSAutoreleasePool alloc] init];
-				[lastMatch autorelease];
-			}
 		}
 	} else {
 		if ((match = [enumerator nextObject]) != nil) {
@@ -985,9 +978,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		// 最後のマッチ以降をコピー
 		[replacedString appendOGString:[lastMatch postmatchOGString]];
 	}
-	
-	[pool release];
-	[repex release];
 	
 	if (numberOfReplacement != NULL) *numberOfReplacement = matches;
 	return replacedString;
@@ -1331,8 +1321,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	[replaceInvocation setSelector:aSelector];
 	[replaceInvocation setArgument:&contextInfo atIndex:3];
 	
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-	
 	if (replaceAll) {
 		while ((match = [enumerator nextObject]) != nil) {
 			matches++;
@@ -1352,13 +1340,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 					[replacedString appendAttributedString:(NSAttributedString*)returnedString];
 				}
 				lastMatch = match;
-			}
-			
-			if (matches % 100 == 0) {
-				[lastMatch retain];
-				[pool release];
-				pool = [[NSAutoreleasePool alloc] init];
-				[lastMatch autorelease];
 			}
 		}
 	} else {
@@ -1386,8 +1367,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		// 最後のマッチ以降をコピ
 		[replacedString appendOGString:[lastMatch postmatchOGString]];
 	}
-	
-	[pool release];
 	
 	if (numberOfReplacement != NULL) *numberOfReplacement = matches;
 	return replacedString;
@@ -1696,9 +1675,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 
 	NSMutableString	*regularizedString = [NSMutableString stringWithString:string];
 	
-	unsigned	counterOfAutorelease = 0;
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-	
 	unsigned	strlen;
 	NSRange 	searchRange, matchRange;
 	strlen = [regularizedString length];
@@ -1712,15 +1688,7 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		strlen += 1;
 		searchRange.location = matchRange.location + 2;
 		searchRange.length   = strlen - searchRange.location;
-		
-		/* release autorelease pool */
-		counterOfAutorelease++;
-		if (counterOfAutorelease % 100 == 0) {
-			[pool release];
-			pool = [[NSAutoreleasePool alloc] init];
-		}
 	}
-	[pool release];
 	
 	//NSLog(@"%@", regularizedString);
 	return regularizedString;
@@ -1778,8 +1746,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	OGRegularExpressionMatch	*match, *lastMatch = nil;
 	NSString	*remainingString;
 	
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-	
 	while ((match = [enumerator nextObject]) != nil) {
 		matches++;
 		if ((limit > 0) && (matches == limit)) break; 
@@ -1787,13 +1753,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		// 単語を追加する。
 		[words addObject:[match stringBetweenMatchAndLastMatch]];
 		lastMatch = match;
-		
-		if (matches % 100 == 0) {
-			[lastMatch retain];
-			[pool release];
-			pool = [[NSAutoreleasePool alloc] init];
-			[lastMatch autorelease];
-		}
 	}
 	
 	remainingString = ((lastMatch)? [lastMatch postmatchString] : aString);
@@ -1802,8 +1761,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 		// (一つもマッチしなかった場合はaStringを加える。)
 		[words addObject:remainingString];
 	}
-	
-	[pool release];
 	
 	return words;
 }
@@ -1835,9 +1792,6 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 	}
 	
 	/* 改行コードを置換する */
-	unsigned			counterOfAutorelease = 0;
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-	
 	unsigned	strlen = [aString length], 
 				matchLocation, 
 				copyLocation = 0;
@@ -1865,19 +1819,10 @@ static int namedGroupCallback(const unsigned char *name, const unsigned char *na
 				searchRange.length--;
 			}
 		}
-		
-		/* release autorelease pool */
-		counterOfAutorelease++;
-		if (counterOfAutorelease % 100 == 0) {
-			[pool release];
-			pool = [[NSAutoreleasePool alloc] init];
-		}
 	}
 	// 残りをコピー
 	copyLocation = searchRange.location;
 	[convertedString appendString:[aString substringWithRange:NSMakeRange(copyLocation, strlen - copyLocation)]];
-	
-	[pool release];
 	
 	return convertedString;
 }

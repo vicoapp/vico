@@ -59,11 +59,13 @@ static NSString * const	OgrePlainStringKey = @"OgrePlainString";
 	return [[[[self class] alloc] initWithString:string hasAttributesOfOGString:ogString] autorelease];
 }
 
+#if 0
 - (void)dealloc
 {
 	[_string release];
 	[super dealloc];
 }
+#endif
 
 - (NSString*)_string
 {

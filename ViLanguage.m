@@ -4,12 +4,13 @@
 
 @implementation ViLanguage
 
-- (OGRegularExpression *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(OGRegularExpressionMatch *)beginMatch
+- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(id)beginMatch
 {
-	OGRegularExpression *regexp = nil;
+	ViRegexp *regexp = nil;
 	@try
 	{
 		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
+#if 0
 		if (beginMatch)
 		{
 			// INFO(@"*************** expanding pattern with %i captures:", [beginMatch count]);
@@ -17,9 +18,9 @@
 			int i;
 			for (i = 1; i <= [beginMatch count]; i++)
 			{
-				NSString *backref = [NSString stringWithFormat:@"\\%i", i];
 				if ([beginMatch substringAtIndex:i])
 				{
+					NSString *backref = [NSString stringWithFormat:@"\\%i", i];
 					// INFO(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
 					[expandedPattern replaceOccurrencesOfString:backref
 									 withString:[beginMatch substringAtIndex:i]
@@ -29,8 +30,9 @@
 			}
 			// INFO(@"** expanded pattern = [%@]", expandedPattern);
 		}
+#endif
 
-		regexp = [OGRegularExpression regularExpressionWithString:expandedPattern options:OgreCaptureGroupOption];
+		regexp = [ViRegexp regularExpressionWithString:expandedPattern];
 	}
 	@catch (NSException *exception)
 	{
@@ -45,7 +47,7 @@
 {
 	if ([d objectForKey:rule])
 	{
-		OGRegularExpression *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
+		ViRegexp *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
 		if (regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
 	}
@@ -56,7 +58,7 @@
 	if (patterns == nil)
 		return;
 
-	OGRegularExpression *hasBackRefs = [OGRegularExpression regularExpressionWithString:@"\\\\([1-9]|k<.*?>)"];
+	ViRegexp *hasBackRefs = [ViRegexp regularExpressionWithString:@"\\\\([1-9]|k<.*?>)"];
 
 	int n = 0;
 	NSMutableDictionary *d;

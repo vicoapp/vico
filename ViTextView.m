@@ -15,7 +15,9 @@ int logIndent = 0;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 - (void)recordInsertInRange:(NSRange)aRange;
+- (void)recordDeleteOfRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 @end
 
 @implementation ViTextView
@@ -30,6 +32,7 @@ int logIndent = 0;
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSApp delegate] sharedBuffers];
 	storage = [self textStorage];
+	inputKeys = [[NSMutableArray alloc] init];
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -167,11 +170,52 @@ int logIndent = 0;
 	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
 }
 
-/* Like insertText:, but works within beginEditing/endEditing
+- (void)endUndoGroup
+{
+	if (hasUndoGroup)
+	{
+		[undoManager endUndoGrouping];
+		hasUndoGroup = NO;
+	}
+}
+
+- (void)beginUndoGroup
+{
+	if (!hasUndoGroup)
+	{
+		[undoManager beginUndoGrouping];
+		hasUndoGroup = YES;
+	}
+}
+
+/* Like insertText:, but works within beginEditing/endEditing.
+ * Also begins an undo group.
  */
+- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup
+{
+	if (undoGroup)
+		[self beginUndoGroup];
+	[[storage mutableString] insertString:aString atIndex:aLocation];
+	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
+}
+
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	[[storage mutableString] insertString:aString atIndex:aLocation];
+	[self insertString:aString atLocation:aLocation undoGroup:YES];
+}
+
+- (void)deleteRange:(NSRange)aRange
+{
+	[self beginUndoGroup];
+	[self recordDeleteOfRange:aRange];
+	[storage deleteCharactersInRange:aRange];
+}
+
+- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
+{
+	[self beginUndoGroup];
+	[self recordReplacementOfRange:aRange withLength:[aString length]];
+	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
 }
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation
@@ -343,7 +387,6 @@ int logIndent = 0;
         NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
 		
 	[self insertString:@"\n" atLocation:aLocation];
-	insert_end_location++;
 
         if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
                                     atCharacterIndex:aLocation + 1
@@ -352,7 +395,6 @@ int logIndent = 0;
 		// assume indentForward?
 		NSString *indent = [self leadingWhitespaceForLineAtLocation:aLocation - 1];
                 [self insertString:[NSString stringWithFormat:@"\n%@", indent] atLocation:aLocation + 1];
-                insert_end_location += [indent length] + 1;
         }
 
 	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
@@ -370,7 +412,6 @@ int logIndent = 0;
 		if (leading_whitespace)
 		{
 			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
-			insert_end_location += [leading_whitespace length];
 			return 1 + [leading_whitespace length];
 		}
 	}
@@ -380,8 +421,6 @@ int logIndent = 0;
 
 - (int)changeIndentation:(int)delta inRange:(NSRange)aRange
 {
-	[undoManager beginUndoGrouping];
-
 	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
@@ -396,8 +435,7 @@ int logIndent = 0;
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
 	
 		NSRange indentRange = NSMakeRange(bol, [indent length]);
-		[self recordReplacementOfRange:indentRange withLength:[newIndent length]];
-		[[storage mutableString] replaceCharactersInRange:indentRange withString:newIndent];
+		[self replaceRange:indentRange withString:newIndent];
 
 		aRange.length += [newIndent length] - [indent length];
 
@@ -412,7 +450,7 @@ int logIndent = 0;
 		if (bol == NSNotFound)
 			break;
 	}
-	[undoManager endUndoGrouping];
+
 	return delta_offset;
 }
 
@@ -436,9 +474,8 @@ int logIndent = 0;
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	DEBUG(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
-	[self insertString:aString atLocation:aLocation];
+	[self insertString:aString atLocation:aLocation undoGroup:NO];
 	final_location = aLocation;
-	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
 }
 
 - (void)undoInsertInRange:(NSRange)aRange
@@ -471,7 +508,7 @@ int logIndent = 0;
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
-	[undoManager beginUndoGrouping];
+	[undoManager beginUndoGrouping]; // FIXME: no longer needed?
 	[self recordDeleteOfRange:aRange];
 	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
 	[undoManager endUndoGrouping];
@@ -495,9 +532,8 @@ int logIndent = 0;
 
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
 {
-	[self recordDeleteOfRange:cutRange];
 	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
-	[storage deleteCharactersInRange:cutRange];
+	[self deleteRange:cutRange];
 }
 
 #pragma mark -
@@ -772,27 +808,17 @@ int logIndent = 0;
 
 - (void)setInsertMode:(ViCommand *)command
 {
+	// INFO(@"entering insert mode at location %u (final location is %u)", end_location, final_location);
+	[self setCaret:end_location];
+	mode = ViInsertMode;
+
 	if (command.text)
 	{
-		[self insertString:command.text atLocation:end_location];
-		final_location = end_location + [command.text length];
-		[self recordInsertInRange:NSMakeRange(end_location, [command.text length])];
-
-		 // simulate 'escape' (back to command mode)
-		start_location = final_location;
-		[self move_left:nil];
-		
-		if (hasBeginUndoGroup)
+		NSEvent *ev;
+		for (ev in command.text)
 		{
-                        [undoManager endUndoGrouping];
-                        hasBeginUndoGroup = NO;
+			[self keyDown:ev];
 		}
-	}
-	else
-	{
-		// INFO(@"entering insert mode at location %u (final location is %u)", end_location, final_location);
-		mode = ViInsertMode;
-		insert_start_location = insert_end_location = end_location;
 	}
 }
 
@@ -803,12 +829,12 @@ int logIndent = 0;
 	end_location = start_location;
 	final_location = start_location;
 
-	if(command.motion_method)
+	if (command.motion_method)
 	{
 		/* The command has an associated motion component.
 		 * Run the motion method and record the start and end locations.
 		 */
-		if([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
+		if ([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
 		{
 			/* the command failed */
 			[command reset];
@@ -819,29 +845,29 @@ int logIndent = 0;
 
 	/* Find out the affected range for this command */
 	NSUInteger l1 = start_location, l2 = end_location;
-	if(l2 < l1)
+	if (l2 < l1)
 	{	/* swap if end < start */
 		l2 = l1;
 		l1 = end_location;
 	}
-	//NSLog(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	// INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
-	if(command.line_mode && !command.ismotion)
+	if (command.line_mode && !command.ismotion)
 	{
 		/* if this command is line oriented, extend the affectedRange to whole lines */
 		NSUInteger bol, end;
 
 		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:l1];
 
-		if(!command.motion_method)
+		if (!command.motion_method)
 		{
 			/* This is a "doubled" command (like dd or yy).
 			 * A count, or motion-count, affects that number of whole lines.
 			 */
 			int line_count = command.count;
-			if(line_count == 0)
+			if (line_count == 0)
 				line_count = command.motion_count;
-			while(--line_count > 0)
+			while (--line_count > 0)
 			{
 				l2 = end;
 				[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
@@ -870,7 +896,7 @@ int logIndent = 0;
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if(ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
+	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		/* ...well, except for yy :-) */
@@ -891,12 +917,22 @@ int logIndent = 0;
 
 - (void)input_tab:(NSString *)characters
 {
-        // check for a tab trigger
+        // check if we're inside a tab trigger
+	id snippetState = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
+				                  atCharacterIndex:start_location
+				                    effectiveRange:NULL];
+	if (snippetState)
+	{
+		[self handleSnippetTab:snippetState];
+		return;
+	}
+
+        // check for a new tab trigger
         if (start_location > 0)
         {
                 // is there a word before the cursor that we just typed?
                 NSString *word = [self wordAtLocation:start_location - 1];
-                if ([word length] > 0 && (insert_end_location - insert_start_location) >= [word length])
+                if ([word length] > 0)
                 {
                         NSArray *scopes = [self scopesAtLocation:start_location];
                         if (scopes)
@@ -904,8 +940,7 @@ int logIndent = 0;
                                 NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
                                 if (snippetString)
                                 {
-                                        [storage deleteCharactersInRange:NSMakeRange(start_location - [word length], [word length])];
-                                        insert_end_location -= [word length];
+                                        [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
                                         [self insertSnippet:snippetString atLocation:start_location - [word length]];
                                         return;
                                 }
@@ -915,7 +950,6 @@ int logIndent = 0;
         
 	// otherwise just insert a tab
 	[self insertString:@"\t" atLocation:start_location];
-        insert_end_location += 1;
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
@@ -934,12 +968,6 @@ int logIndent = 0;
 
 - (void)input_backspace:(NSString *)characters
 {
-	if(start_location == insert_start_location)
-	{
-		[[self delegate] message:@"No more characters to erase"];
-		return;
-	}
-
 	/* check if we're deleting the first character in a smart pair */
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
 	NSArray *pair;
@@ -948,33 +976,22 @@ int logIndent = 0;
 		if([[pair objectAtIndex:0] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
 		   [[pair objectAtIndex:1] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)]])
 		{
-			[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 2)];
-			insert_end_location -= 2;
+			[self deleteRange:NSMakeRange(start_location - 1, 2)];
 			[self setCaret:start_location - 1];
 			return;
 		}
 	}
 
 	/* else a regular character, just delete it */
-	[storage deleteCharactersInRange:NSMakeRange(start_location - 1, 1)];
-	insert_end_location--;
-
+	[self deleteRange:NSMakeRange(start_location - 1, 1)];
 	[self setCaret:start_location - 1];
 }
 
 - (void)input_forward_delete:(NSString *)characters
 {
-	if(start_location >= insert_end_location)
-	{
-		[[self delegate] message:@"No more characters to erase"];
-		return;
-	}
-
-	/* FIXME: should handle smart typing pairs here when we support arrow keys(?) in input mode
+	/* FIXME: should handle smart typing pairs here!
 	 */
-
-	[storage deleteCharactersInRange:NSMakeRange(start_location, 1)];
-	insert_end_location--;
+	[self deleteRange:NSMakeRange(start_location, 1)];
 }
 
 - (void)addTemporaryAttribute:(NSDictionary *)what
@@ -993,64 +1010,57 @@ int logIndent = 0;
 	NSRange sel = [self selectedRange];
 	if (sel.length > 0)
 	{
-		// FIXME: can we nest undo actions?
-		[self recordDeleteOfRange:sel];
-		[storage deleteCharactersInRange:sel];
+		[self deleteRange:sel];
 		// [self setCaret:sel.location];
 	}
 
 	BOOL foundSmartTypingPair = NO;
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
-	//if (smartTypingPairs)
-	//{
-		NSArray *pair;
-		for (pair in smartTypingPairs)
+	NSArray *pair;
+	for (pair in smartTypingPairs)
+	{
+		// check if we're inserting the end character of a smart typing pair
+		// if so, just overwrite the end character
+		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
+		    [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 		{
-			// check if we're inserting the end character of a smart typing pair
-			// if so, just overwrite the end character
-			if ([[pair objectAtIndex:1] isEqualToString:characters] &&
-			    [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+						    atCharacterIndex:start_location
+						      effectiveRange:NULL])
 			{
-                                if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-							    atCharacterIndex:start_location
-							      effectiveRange:NULL])
-				{
-                                        foundSmartTypingPair = YES;
-                                        [self setCaret:start_location + 1];
-                                }
+				foundSmartTypingPair = YES;
+				[self setCaret:start_location + 1];
+			}
+			break;
+		}
+		// check for the start character of a smart typing pair
+		else if ([[pair objectAtIndex:0] isEqualToString:characters])
+		{
+			// don't use it if next character is alphanumeric
+			if (!(start_location >= [storage length] ||
+			      [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
+			{
+				foundSmartTypingPair = YES;
+				[self insertString:[pair objectAtIndex:0] atLocation:start_location];
+				[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+				
+				// INFO(@"adding smart pair attr to %u + 2", start_location);
+				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
+				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+					ViSmartPairAttributeName, @"attributeName",
+					characters, @"value",
+					[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
+					nil] afterDelay:0];
+
+				[self setCaret:start_location + 1];
 				break;
 			}
-			// check for the start character of a smart typing pair
-			else if ([[pair objectAtIndex:0] isEqualToString:characters])
-			{
-				// don't use it if next character is alphanumeric
-				if (!(start_location >= [storage length] ||
-				      [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
-				{
-					foundSmartTypingPair = YES;
-					[self insertString:[pair objectAtIndex:0] atLocation:start_location];
-					[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
-					
-					// INFO(@"adding smart pair attr to %u + 2", start_location);
-					// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
-                                        [self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                                        	ViSmartPairAttributeName, @"attributeName",
-                                        	characters, @"value",
-                                        	[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
-                                        	nil] afterDelay:0];
-
-					insert_end_location += 2;
-					[self setCaret:start_location + 1];
-					break;
-				}
-			}
 		}
-	// }
+	}
 	
 	if (!foundSmartTypingPair)
 	{
 		[self insertString:characters atLocation:start_location];
-		insert_end_location += [characters length];
 		[self setCaret:start_location + [characters length]];
 	}
 
@@ -1072,7 +1082,7 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 1
+#if 0
 	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
@@ -1085,9 +1095,13 @@ int logIndent = 0;
 	
 	if (mode == ViInsertMode)
 	{
+		// add the event to the input key replay queue
+		[inputKeys addObject:theEvent];
+
 		if (charcode == 0x1B)
 		{
 			/* escape, return to command mode */
+#if 0
 			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
 			INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
 				insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
@@ -1109,21 +1123,17 @@ int logIndent = 0;
 			[parser setText:multipliedText];
 			if ([multipliedText length] > 0)
 				[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
-			if (hasBeginUndoGroup)
-			{
-                                [undoManager endUndoGrouping];
-                                hasBeginUndoGroup = NO;
-                        }
+#endif
+			[self endUndoGroup];
+			parser.text = inputKeys; // copies the array
+			[inputKeys removeAllObjects];
 			[self setCommandMode];
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
 		}
-		else /* if((([theEvent modifierFlags] & ~(NSShiftKeyMask | NSAlphaShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask)) >> 17) == 0) */
+		else
 		{
-			/* handle keys with no modifiers, or with shift, caps lock, control or alt modifier */
-
-			// NSLog(@"insert text [%@], length = %u", [theEvent characters], [[theEvent characters] length]);
 			start_location = [self caret];
 
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
@@ -1168,6 +1178,11 @@ int logIndent = 0;
 				[[self delegate] message:@""]; // erase any previous message
 				[storage beginEditing];
 				[self evaluateCommand:parser];
+				if (mode == ViCommandMode)
+				{
+					// still in command mode
+					[self endUndoGroup];
+				}
 				[storage endEditing];
 				[self setCaret:final_location];
 			}
@@ -1373,10 +1388,7 @@ int logIndent = 0;
 
 - (void)show_scope:(NSString *)characters
 {
-	NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-							    atCharacterIndex:[self caret]
-							      effectiveRange:NULL];
-	[[self delegate] message:[scopes componentsJoinedByString:@" "]];
+	[[self delegate] message:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
 }
 
 - (void)switch_file:(NSString *)character

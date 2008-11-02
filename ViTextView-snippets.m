@@ -56,6 +56,15 @@
 	return YES;
 }
 
+- (void)gotoTabstop:(NSDictionary *)tabStop inSnippet:(NSMutableDictionary *)state
+{
+	INFO(@"placing cursor at tabstop %@", tabStop);
+	NSUInteger loc = [[tabStop objectForKey:@"location"] integerValue] + [[state objectForKey:@"start"] integerValue];
+	NSUInteger len = [[tabStop objectForKey:@"defaultValue"] length];
+	[self setSelectedRange:NSMakeRange(loc, len)];
+	[state setObject:[NSNumber numberWithInt:1] forKey:@"currentTab"];
+}
+
 - (void)insertSnippet:(NSString *)snippet atLocation:(NSUInteger)aLocation
 {
         NSMutableString *s = [[NSMutableString alloc] initWithString:snippet];
@@ -85,26 +94,21 @@
 				NSNumber *tabStop = [meta objectForKey:@"tabStop"];
 				if (tabStop)
                         	{
-                                       NSMutableDictionary *d = [tabstops objectForKey:tabStop];
-                                       if (d)
-                                       {
-                                                /* merge tabstops, especially default value */
-                                                if ([meta objectForKey:@"defaultValue"])
-                                                        [d setObject:[meta objectForKey:@"defaultValue"] forKey:@"defaultValue"];
-                                                if ([meta objectForKey:@"transformation"])
-                                                        [d setObject:[meta objectForKey:@"transformation"] forKey:@"transformation"];
-                                                // FIXME: sort locations
-                                                [[d objectForKey:@"locations"] addObject:[NSNumber numberWithInteger:i]];
-                                        }
-                                        else
+                                        NSMutableArray *a = [tabstops objectForKey:tabStop];
+                                        if (a == nil)
                                         {
-                                                [tabstops setObject:meta forKey:tabStop];
-                                                NSMutableArray *locations = [[NSMutableArray alloc] init];
-                                                [locations addObject:[NSNumber numberWithInteger:i]];
-                                                [meta setObject:locations forKey:@"locations"];
+					        a = [[NSMutableArray alloc] init];
+                                                [tabstops setObject:a forKey:tabStop];
                                         }
 
+					[a addObject:meta];
+					[meta setObject:[NSNumber numberWithInteger:i] forKey:@"location"];
+
                                         INFO(@"parsed tabstop: %@", [tabstops objectForKey:tabStop]);
+                        	}
+                        	else if ([meta objectForKey:@"variable"])
+                        	{
+					// lookup variable, apply transformation and insert value
                         	}
 
                                 foundMarker = YES;
@@ -124,19 +128,36 @@
                 else
                 {
                         [self insertString:[s substringWithRange:NSMakeRange(i, 1)] atLocation:loc];
-                        insert_end_location++;
                         loc++;
                 }
         }
 
-        NSDictionary *firstTabStop = [tabstops objectForKey:[NSNumber numberWithInt:1]];
+	[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+		ViSnippetAttributeName, @"attributeName",
+		tabstops, @"value",
+		[NSValue valueWithRange:NSMakeRange(aLocation, loc - aLocation)], @"range",
+		nil] afterDelay:0];
+
+	[tabstops setObject:[NSNumber numberWithInteger:aLocation] forKey:@"start"];
+
+        // FIXME: sort tabstops, go to tabstop 1 first, then 2, 3, 4, ... and last to 0
+        NSDictionary *firstTabStop = [[tabstops objectForKey:[NSNumber numberWithInt:1]] objectAtIndex:0];
         if (firstTabStop)
-        {
-                INFO(@"placing cursor at first tabstop %@", firstTabStop);
-                loc = [[[firstTabStop objectForKey:@"locations"] objectAtIndex:0] integerValue] + aLocation;
-                NSUInteger len = [[firstTabStop objectForKey:@"defaultValue"] length];
-                [self setSelectedRange:NSMakeRange(loc, len)];
-        }
+		[self gotoTabstop:firstTabStop inSnippet:tabstops];
+}
+
+- (void)handleSnippetTab:(id)snippetState
+{
+	NSMutableDictionary *state = snippetState;
+	
+	int currentTab = [[state objectForKey:@"currentTab"] intValue];
+	INFO(@"current tab index is %i", currentTab);
+        NSDictionary *tabStop = [[state objectForKey:[NSNumber numberWithInt:currentTab + 1]] objectAtIndex:0];
+	if (tabStop == nil)
+		tabStop = [[state objectForKey:[NSNumber numberWithInt:0]] objectAtIndex:0];
+	
+	if (tabStop)
+		[self gotoTabstop:tabStop inSnippet:state];
 }
 
 @end

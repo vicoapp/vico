@@ -128,8 +128,7 @@
 	{
 		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
 		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
-		[self recordReplacementOfRange:affectedRange withLength:[outputText length]];
-		[[storage mutableString] replaceCharactersInRange:affectedRange withString:outputText];
+		[self replaceRange:affectedRange withString:outputText];
 	}
 }
 
@@ -258,7 +257,6 @@
 		start_location = final_location = bol;
 	}
 	[self insertString:buffer atLocation:start_location];
-	[self recordInsertInRange:NSMakeRange(start_location, [buffer length])];
 	
 	return YES;
 }
@@ -288,7 +286,6 @@
 	}
 	
 	[self insertString:buffer atLocation:final_location];
-	[self recordInsertInRange:NSMakeRange(final_location, [buffer length])];
 	
 	return YES;
 }
@@ -296,10 +293,8 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
-	[self recordReplacementOfRange:NSMakeRange(start_location, 1) withLength:1];
-	
-	[[storage mutableString] replaceCharactersInRange:NSMakeRange(start_location, 1)
-					       withString:[NSString stringWithFormat:@"%C", command.argument]];
+	[self replaceRange:NSMakeRange(start_location, 1)
+	        withString:[NSString stringWithFormat:@"%C", command.argument]];
 	
 	return YES;
 }
@@ -307,13 +302,6 @@
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {
-	/* The change command is implemented as delete + insert. This should be undone
-	 * as a single operation, so we begin an undo group here and end it when recording
-	 * the insert operation.
-	 */
-	[undoManager beginUndoGrouping];
-	hasBeginUndoGroup = YES;
-
 	if (command.line_mode)
 	{
 		/* adjust the range to exclude the last newline */
@@ -336,7 +324,6 @@
 		{
 			INFO(@"inserting %u chars of leading whitestuff at %u", [leading_whitespace length], final_location);
 			[self insertString:leading_whitespace ?: @"" atLocation:final_location];
-                        [self recordInsertInRange:NSMakeRange(final_location, [leading_whitespace length])];
                         final_location += [leading_whitespace length];
 
 			/* a command count should not be treated as a count for the inserted text */
@@ -360,13 +347,6 @@
 /* syntax: [buffer][count]s */
 - (BOOL)substitute:(ViCommand *)command
 {
-	/* The substitute command is implemented as delete + insert. This should be undone
-	 * as a single operation, so we begin an undo group here and end it when recording
-	 * the insert operation.
-	 */
-	[undoManager beginUndoGrouping];
-	hasBeginUndoGroup = YES;
-	
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	NSUInteger c = command.count;
@@ -438,8 +418,7 @@
 	{
 		/* From nvi: Empty lines just go away. */
 		NSRange r = NSMakeRange(eol, end - eol);
-		[self recordDeleteOfRange:r];
-		[[storage mutableString] deleteCharactersInRange:r];
+		[self deleteRange:r];
 		if(bol == eol)
 			final_location = IMAX(bol, eol2 - 1 - (end - eol));
 		else
@@ -458,8 +437,7 @@
 		}
 		NSUInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
 		NSRange r = NSMakeRange(eol, sol2 - eol);
-		[self recordReplacementOfRange:r withLength:[joinPadding length]];
-		[[storage mutableString] replaceCharactersInRange:r withString:joinPadding];
+		[self replaceRange:r withString:joinPadding];
 	}
 	
 	return YES;
@@ -489,9 +467,6 @@
 /* syntax: [buffer][count]C */
 - (BOOL)change_eol:(ViCommand *)command
 {
-	[undoManager beginUndoGrouping];
-	hasBeginUndoGroup = YES;
-	
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if (eol > bol)
@@ -737,12 +712,8 @@
 /* syntax: o */
 - (BOOL)open_line_below:(ViCommand *)command
 {
-	[undoManager beginUndoGrouping];
-	hasBeginUndoGroup = YES;
-	
 	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
 	int num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
-	[self recordInsertInRange:NSMakeRange(end_location, num_chars)];
 	end_location += num_chars; // insert mode starts at end_location
  	final_location = end_location;
 	
@@ -753,13 +724,9 @@
 /* syntax: O */
 - (BOOL)open_line_above:(ViCommand *)command
 {
-	[undoManager beginUndoGrouping];
-	hasBeginUndoGroup = YES;
-	
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	int num_chars = [self insertNewlineAtLocation:bol indentForward:NO];
-	[self recordInsertInRange:NSMakeRange(bol, num_chars)];
 	final_location = end_location = bol - 1 + num_chars;
 
 	[self setInsertMode:command];

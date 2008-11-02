@@ -22,7 +22,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSUndoManager *undoManager;
 	ViTagsDatabase *tags;
 
-	NSUInteger insert_start_location, insert_end_location;
+	NSMutableArray *inputKeys;
 
 	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
 	NSRect oldCaretRect;
@@ -37,7 +37,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSDictionary *inputCommands;
 	NSDictionary *normalCommands;
 
-	/* syntax highlighting */
 	ViTheme *theme;
 	ViBundle *bundle;
 	ViLanguage *language;
@@ -49,10 +48,12 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	unsigned regexps_overlapped;
 	unsigned regexps_matched;
 
-	BOOL hasBeginUndoGroup;
+	BOOL hasUndoGroup;
 }
 
 - (void)initEditorWithDelegate:(id)aDelegate;
+- (void)beginUndoGroup;
+- (void)endUndoGroup;
 - (void)setLanguage:(NSString *)aLanguage;
 - (ViLanguage *)language;
 - (void)configureForURL:(NSURL *)aURL;
@@ -88,14 +89,10 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
+- (void)deleteRange:(NSRange)aRange;
+- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString;
 
-- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (void)undoInsertInRange:(NSRange)aRange;
-- (void)recordInsertInRange:(NSRange)aRange;
-- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (void)recordDeleteOfRange:(NSRange)aRange;
-- (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
+- (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
 
 - (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
@@ -116,6 +113,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView (snippets)
 - (void)insertSnippet:(NSString *)snippet atLocation:(NSUInteger)aLocation;
+- (void)handleSnippetTab:(id)snippetState;
 @end
 
 @interface ViTextView (cursor)

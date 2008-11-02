@@ -40,7 +40,7 @@ struct vikey
 	struct vikey *last_ftFT_command;
 	unichar last_ftFT_argument;
 
-	NSString *text;
+	NSArray *text;
 }
 
 - (void)pushKey:(unichar)key;
@@ -56,6 +56,7 @@ struct vikey
 @property(readonly) unichar key;
 @property(readonly) unichar motion_key;
 @property(readonly) unichar argument;
-@property(copy) NSString *text;
+@property(readwrite, copy) NSArray *text;
 
 @end
+

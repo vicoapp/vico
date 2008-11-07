@@ -34,7 +34,7 @@ static u_int64_t tenpow(unsigned x)
 		return 1ULL;
 
 	// split the scope selector into descendants
-	NSArray *descendants = [self componentsSeparatedByRegularExpressionString:@"\\s+"];
+	NSArray *descendants = [self componentsSeparatedByString:@" "];
 
 	u_int64_t rank = 0ULL;
 

@@ -1,6 +1,6 @@
 //
 //  ViTagStack.m
-//  vizard
+//  xi
 //
 //  Created by Martin Hedenfalk on 2008-04-06.
 //  Copyright 2008 Martin Hedenfalk. All rights reserved.
@@ -14,7 +14,7 @@
 - (id)init
 {
 	self = [super init];
-	if(self)
+	if (self)
 	{
 		stack = [[NSMutableArray alloc] init];
 	}
@@ -33,7 +33,7 @@
 - (NSDictionary *)pop
 {
 	NSDictionary *location = [stack lastObject];
-	if(location)
+	if (location)
 		[stack removeLastObject];
 	return location;
 }

@@ -135,17 +135,27 @@
 
 
 @interface ViTextView (syntax_private)
-- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch;
+- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch characters:(const unichar *)chars;
 - (NSArray *)scopesFromMatches:(NSArray *)matches;
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
+- (void)resetAttributesInRange:(NSRange)aRange;
 @end
 
 @implementation ViTextView (syntax)
 
-- (void)applyScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange
+- (void)addContinuation:(NSArray *)vars
+{
+	NSArray *continuedMatches = [vars objectAtIndex:0];
+	NSRange range = [[vars objectAtIndex:1] rangeValue];
+	[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:range];
+}
+
+- (void)applyScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange withOffset:(NSUInteger)offset
 {
 	if (aScopeArray == nil)
 		return;
+
+	aRange.location += offset;
 
 	NSUInteger l = aRange.location;
 	while (l < NSMaxRange(aRange))
@@ -153,8 +163,10 @@
 		NSRange scopeRange;
 		NSMutableArray *oldScopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
 								 atCharacterIndex:l
-							    longestEffectiveRange:&scopeRange
-									  inRange:NSMakeRange(l, NSMaxRange(aRange) - l)];
+							           effectiveRange:&scopeRange];
+		// FIXME: the reference says effectiveRange: is more efficient than longestEffectiveRange:, why? Do we miss anything?
+							    // longestEffectiveRange:&scopeRange
+									  // inRange:NSMakeRange(l, NSMaxRange(aRange) - l)];
 		NSMutableArray *scopes = [[NSMutableArray alloc] init];
 		if (oldScopes)
 		{
@@ -183,12 +195,56 @@
 	}
 }
 
-- (void)applyScope:(NSString *)aScope inRange:(NSRange)aRange
+- (void)applyContext:(NSMutableArray *)context
 {
-	[self applyScopes:[NSArray arrayWithObject:aScope] inRange:aRange];
+	struct timeval start;
+	struct timeval stop;
+	struct timeval diff;
+	gettimeofday(&start, NULL);
+
+	// [[NSGarbageCollector defaultCollector] disable];
+
+	NSRange wholeRange = [[context objectAtIndex:0] rangeValue];
+	NSUInteger offset = [[context objectAtIndex:1] integerValue];
+
+	DEBUG(@"resetting attributes in range %u + %u", wholeRange.location, wholeRange.length);
+	[self resetAttributesInRange:wholeRange];
+
+	[context removeObjectAtIndex:0];
+	[context removeObjectAtIndex:0];
+
+	NSArray *foo;
+	for (foo in context)
+	{
+		NSArray *scopes = [foo objectAtIndex:0];
+		NSRange range = [[foo objectAtIndex:1] rangeValue];
+		[self applyScopes:scopes inRange:range withOffset:offset];
+	}
+
+	gettimeofday(&stop, NULL);
+	timersub(&stop, &start, &diff);
+	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+	INFO(@"applied %u scopes from context  => %.3f s",
+		[context count], (float)ms / 1000.0);
+
+	// [[NSGarbageCollector defaultCollector] enable];
 }
 
-- (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(ViRegexpMatch *)aMatch
+- (void)applyScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange context:(NSMutableArray *)context
+{
+	if (aScopeArray == nil)
+		return;
+	
+	NSArray *foo = [NSArray arrayWithObjects:aScopeArray, [NSValue valueWithRange:aRange], nil];
+	[context addObject:foo];
+}
+
+- (void)applyScope:(NSString *)aScope inRange:(NSRange)aRange context:(NSMutableArray *)context
+{
+	[self applyScopes:[NSArray arrayWithObject:aScope] inRange:aRange context:context];
+}
+
+- (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(ViRegexpMatch *)aMatch context:(NSMutableArray *)context
 {
 	NSDictionary *captures = [pattern objectForKey:captureType];
 	if (captures == nil)
@@ -204,27 +260,27 @@
 		if (r.length > 0)
 		{
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
-			[self applyScope:[capture objectForKey:@"name"] inRange:r];
+			[self applyScope:[capture objectForKey:@"name"] inRange:r context:context];
 		}
 	}
 }
 
-- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch
+- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
 {
-	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
+	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] context:context];
 }
 
-- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch
+- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
 {
-	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch]];
+	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch] context:context];
 }
 
-- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch
+- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
 {
-	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
+	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] context:context];
 }
 
-- (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange
+- (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange characters:(const unichar *)chars
 {
 	DEBUG(@"searching for end match to [%@] in range %u + %u",
 	      [beginMatch scope], aRange.location, aRange.length);
@@ -232,20 +288,25 @@
 	ViRegexp *endRegexp = [beginMatch endRegexp];
 	if (endRegexp == nil)
 	{
-		DEBUG(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
+		INFO(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
 		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
 			 withBackreferencesToRegexp:[beginMatch beginMatch]];
 	}
 	
 	if (endRegexp == nil)
 	{
-		DEBUG(@"!!!!!!!!! no end regexp?");
+		INFO(@"!!!!!!!!! no end regexp?");
 		return nil;
 	}
 	
 	// get all matches, one might be overlapped by a subpattern
 	regexps_tried++;
-	NSArray *matches = [endRegexp allMatchesInString:[storage string] range:aRange];
+	NSArray *matches = nil;
+	if (chars)
+		matches = [endRegexp allMatchesInCharacters:chars range:aRange start:0];
+	else
+		matches = [endRegexp allMatchesInString:[storage string] range:aRange start:0];
+
 	regexps_matched += [matches count];
 
 	return matches;
@@ -256,6 +317,8 @@
 	       openMatches:(NSArray *)openMatches
 		reachedEOL:(BOOL *)reachedEOL
 		matchCache:(NSMutableDictionary *)matchCache
+		characters:(const unichar *)chars
+	           context:(NSMutableArray *)context
 {
 	if (reachedEOL)
 		*reachedEOL = NO;
@@ -277,7 +340,7 @@
 	ViSyntaxMatch *topOpenMatch = [openMatches lastObject];
 	if (topOpenMatch)
 	{
-		NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:aRange];
+		NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:aRange characters:chars];
 		DEBUG(@"found %u possible end matches to scope [%@]", [endMatches count], [topOpenMatch scope]);
 		ViRegexpMatch *match;
 		for (match in endMatches)
@@ -299,14 +362,18 @@
 		if (regexp == nil)
 			continue;
 		NSArray *matches;
-		matches = [matchCache objectForKey:pattern];
+		matches = [matchCache objectForKey:[NSValue valueWithPointer:pattern]];
 		if (matches == nil)
 		{
 			regexps_tried++;
-			matches = [regexp allMatchesInString:[storage string] range:aRange];
+			if (chars)
+				matches = [regexp allMatchesInCharacters:chars range:aRange start:0];
+			else
+				matches = [regexp allMatchesInString:[storage string] range:aRange start:0];
+
 			regexps_matched += [matches count];
 			// INFO(@"caching %i matches for pattern [%@]", [matches count], regexp);
-			[matchCache setObject:matches ?: [NSArray array] forKey:pattern];
+			[matchCache setObject:matches ?: [NSArray array] forKey:[NSValue valueWithPointer:pattern]];
 
 			if ([matches count] == 0)
 				DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
@@ -341,7 +408,10 @@
 		}
 
 		if ([aMatch beginLocation] > lastLocation)
-			[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation)];
+		{
+			// Apply current scopes before adding the new match
+			[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation) context:context];
+		}
 
 		if ([aMatch isSingleLineMatch])
 		{
@@ -352,9 +422,9 @@
 			if ([aMatch scope])
 			{
 				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
-				[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange]];
+				[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange] context:context];
 			}
-			[self highlightCapturesInMatch:aMatch];
+			[self highlightCapturesInMatch:aMatch context:context];
 		}
 		else if ([aMatch endMatch])
 		{
@@ -365,8 +435,9 @@
 			      [[aMatch endMatch] rangeOfMatchedString].length);
 
 			topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:topOpenMatch];
-			[self applyScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString]];
-			[self highlightEndCapturesInMatch:aMatch];
+			[self applyScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString] context:context];
+			[self highlightEndCapturesInMatch:aMatch context:context];
+			// [self performSelectorOnMainThread:@selector(highlightEndCapturesInMatch:) withObject:aMatch waitUntilDone:NO];
 
 			// pop one or more open matches off the stack and return the rest
 			while ([openMatches count] > 0)
@@ -375,7 +446,7 @@
 				topOpenMatch = [openMatches lastObject];
 				if (topOpenMatch == nil)
 					break;
-				NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:[[aMatch endMatch] rangeOfMatchedString]];
+				NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:[[aMatch endMatch] rangeOfMatchedString] characters:chars];
 				// if the next top open match also matches the end range,
 				// and it is a look-ahead match, keep popping off open matches
 				if (endMatches == nil || [[endMatches objectAtIndex:0] rangeOfMatchedString].length != 0)
@@ -389,7 +460,7 @@
 		{
 			DEBUG(@"got begin match on [%@] at %u + %u", [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			NSArray *newTopScopes = [aMatch scope] ? [topScopes arrayByAddingObject:[aMatch scope]] : topScopes;
-			[self applyScopes:newTopScopes inRange:[[aMatch beginMatch] rangeOfMatchedString]];
+			[self applyScopes:newTopScopes inRange:[[aMatch beginMatch] rangeOfMatchedString] context:context];
 			// search for end match from after the begin match to EOL
 			NSRange range = aRange;
 			range.location = NSMaxRange([[aMatch beginMatch] rangeOfMatchedString]);
@@ -400,10 +471,12 @@
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL
-								matchCache:matchCache];
+								matchCache:matchCache
+								characters:chars
+							           context:context];
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
-			[self highlightBeginCapturesInMatch:aMatch];
+			[self highlightBeginCapturesInMatch:aMatch context:context];
 			if (tmpEOL == YES)
 			{
 				if (reachedEOL)
@@ -422,7 +495,7 @@
 	}
 
 	if (lastLocation < NSMaxRange(aRange))
-		[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation)];
+		[self applyScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation) context:context];
 
 done:
 	if (reachedEOL)
@@ -463,12 +536,15 @@ done:
 	return [self scopesFromMatches:matches withoutContentForMatch:nil];
 }
 
-- (NSArray *)highlightLineInRange:(NSRange)aRange continueWithMatches:(NSArray *)continuedMatches
+- (NSArray *)highlightLineInRange:(NSRange)aRange
+              continueWithMatches:(NSArray *)continuedMatches
+                       characters:(const unichar *)chars
+                          context:(NSMutableArray *)context
 {
-	DEBUG(@"-----> line range = %u + %u", aRange.location, aRange.length);
+	DEBUG(@"-----> line range = %u (%u) + %u", aRange.location, aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
-	NSMutableDictionary *matchCache = nil; //[[NSMutableDictionary alloc] init];
+	NSMutableDictionary *matchCache = [[NSMutableDictionary alloc] init];
 
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
@@ -488,7 +564,9 @@ done:
 					       inRange:aRange
 					   openMatches:continuedMatches
 					    reachedEOL:&reachedEOL
-					    matchCache:matchCache];
+					    matchCache:matchCache
+					    characters:chars
+					       context:context];
 
 		if (reachedEOL)
 			return continuedMatches;
@@ -502,7 +580,13 @@ done:
 	}
 
 	// search top-level patterns
-	return [self applyPatterns:[language patterns] inRange:aRange openMatches:[NSArray array] reachedEOL:nil matchCache:matchCache];
+	return [self applyPatterns:[language patterns]
+	                   inRange:aRange
+	               openMatches:[NSArray array]
+	                reachedEOL:nil
+	                 matchCache:matchCache
+	                 characters:chars
+	                    context:context];
 }
 
 - (NSArray *)continuedMatchesForLocation:(NSUInteger)location
@@ -519,8 +603,8 @@ done:
 {
 	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
+	// [[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
+	// [[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
@@ -549,73 +633,79 @@ done:
 				     nil];
  */
 	}
+
 	[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 
-- (void)highlightInRange:(NSRange)aRange restarting:(BOOL)isRestarting
+- (void)highlightRange:(NSRange)aRange continueWithMatches:(NSArray *)continuedMatches characters:(unichar *)chars startLocation:(NSUInteger)startLocation
 {
 	struct timeval start;
 	struct timeval stop_time;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 
-	[[NSGarbageCollector defaultCollector] disable];
 	regexps_tried = 0;
 	regexps_overlapped = 0;
 	regexps_matched = 0;
 	regexps_cached = 0;
 
-	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
-	NSArray *continuedMatches = nil;
-	if (isRestarting && aRange.location > 0)
-	{
-		continuedMatches = [self continuedMatchesForLocation:aRange.location];
-	}
-
-	NSArray *lastContinuedMatches = nil;
-	if (isRestarting)
-	{
-		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
-	}
 	BOOL extendedRange = NO;
-
-	// reset attributes in the affected range
-	[self resetAttributesInRange:aRange];
-	if (language == nil)
-		goto done;
-
 	NSUInteger lineno = 1;
-	const NSUInteger threshold = 40;
 
-	DEBUG(@"highlighting range %u + %u", aRange.location, aRange.length);
+	[[NSGarbageCollector defaultCollector] disable];
+
+	NSMutableArray *context = [[NSMutableArray alloc] init];
+	[context addObject:[NSValue valueWithRange:aRange]];
+	[context addObject:[NSNumber numberWithUnsignedInteger:startLocation]];
+
+	DEBUG(@"highlighting range %u(%u) + %u", aRange.location, startLocation + aRange.location, aRange.length);
 	
 	// highlight each line separately
+	NSUInteger lastScopeUpdate = aRange.location;
 	NSUInteger nextRange = aRange.location;
 	while (nextRange < NSMaxRange(aRange))
 	{
-		NSUInteger end;
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextRange];
+		NSUInteger end = nextRange;
+		if (chars)
+		{
+			while (end < NSMaxRange(aRange) && chars[end] != '\n')
+				++end;
+			if (end < NSMaxRange(aRange))
+				++end;
+			if (end > NSMaxRange(aRange))
+				end = NSNotFound;
+		}
+		else
+		{
+			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:nextRange];
+		}
 		if (end == nextRange || end == NSNotFound)
 			break;
 		NSRange line = NSMakeRange(nextRange, end - nextRange);
 
 		DEBUG(@"---> line number %i", lineno);
 
+#if 0
 		if (extendedRange)
 		{
 			lastContinuedMatches = [self continuedMatchesForLocation:end];
 			[self resetAttributesInRange:line];
 		}
+#endif
 
-		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
+		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches characters:chars context:context];
 		nextRange = end;
 
 		if (continuedMatches)
 		{
 			/* Mark the EOL character with the continuation patterns */
-			[[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
+			// [[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
+			[self performSelectorOnMainThread:@selector(addContinuation:)
+			                       withObject:[NSArray arrayWithObjects:continuedMatches, [NSValue valueWithRange:NSMakeRange(startLocation + end - 1, 1)], nil]
+			                    waitUntilDone:NO];
 		}
 
+#if 0
 		if (isRestarting && (extendedRange || nextRange >= NSMaxRange(aRange)) /*&& nextRange < [storage length]*/)
 		{
 			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:lastContinuedMatches];
@@ -635,31 +725,84 @@ done:
 				break;
 			}
 		}
+#endif
 		
 		lineno++;
-		
-#if 1
-		if (lineno > threshold)
+		if (lineno % 100 == 0)
 		{
-			NSRange leftRange = NSMakeRange(nextRange, NSMaxRange(aRange) - nextRange);
-			[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:leftRange] afterDelay:0.1];
-			break;
+			NSMutableArray *contextCopy = [NSMutableArray arrayWithArray:context];
+			[contextCopy replaceObjectAtIndex:0 withObject:[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)]];
+			[self performSelectorOnMainThread:@selector(applyContext:) withObject:contextCopy waitUntilDone:NO];
+			[context removeObjectsInRange:NSMakeRange(2, [context count] - 2)];
+			lastScopeUpdate = nextRange;
 		}
-#endif
 	}
-done:
-	[[NSGarbageCollector defaultCollector] enable];
+
+	free(chars);
 
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u    => %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, (float)ms / 1000.0);
+
+	[context replaceObjectAtIndex:0 withObject:[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)]];
+	[self performSelectorOnMainThread:@selector(applyContext:) withObject:context waitUntilDone:NO];
+
+	[[NSGarbageCollector defaultCollector] enable];
+}
+
+- (void)highlightInBackground:(NSArray *)vars
+{
+	NSRange range = [[vars objectAtIndex:0] rangeValue];
+	unichar *chars = [[vars objectAtIndex:1] pointerValue];
+	NSArray *continuedMatches = nil;
+	if ([vars count] > 2)
+		continuedMatches = [vars objectAtIndex:2];
+
+	INFO(@"highlighting in background thread");
+	[self highlightRange:NSMakeRange(0, range.length) continueWithMatches:continuedMatches characters:chars startLocation:0];
+}
+
+- (void)highlightRange:(NSRange)aRange inBackground:(BOOL)inBackground
+{
+	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
+	NSArray *continuedMatches = nil;
+	if (aRange.location > 0)
+	{
+		continuedMatches = [self continuedMatchesForLocation:aRange.location];
+	}
+
+	NSArray *lastContinuedMatches = nil;
+#if 0
+	if (isRestarting)
+	{
+		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
+	}
+#endif
+
+	if (language)
+	{
+	
+		if (inBackground)
+		{
+			INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
+			unichar *chars = malloc([storage length] * sizeof(unichar));
+			[[storage string] getCharacters:chars];
+
+			[self performSelectorInBackground:@selector(highlightInBackground:)
+					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:aRange], [NSValue valueWithPointer:chars], continuedMatches, nil]];
+		}
+		else
+		{
+			[self highlightRange:aRange continueWithMatches:continuedMatches characters:NULL startLocation:0];
+		}
+	}
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
 {
-	[self highlightInRange:[wrappedRange rangeValue] restarting:YES];
+	[self highlightRange:[wrappedRange rangeValue] inBackground:NO];
 }
 
 /*
@@ -686,7 +829,7 @@ done:
 
 	// temporary attributes don't work right when called from a notification
 	// FIXME: try call this in - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender instead
-	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0];
+	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0.0];
 }
 
 - (void)highlightEverything
@@ -698,7 +841,7 @@ done:
 	}
 	DEBUG(@"start highlighting file");
 	[storage beginEditing];
-	[self highlightInRange:NSMakeRange(0, [storage length]) restarting:NO];
+	[self highlightRange:NSMakeRange(0, [storage length]) inBackground:YES];
 	[storage endEditing];
 	DEBUG(@"finished highlighting file");
 }

@@ -529,7 +529,6 @@
 	NSUInteger column = start_location - bol;
 	final_location = end_location = bol - 1; // previous line
 	[self gotoColumn:column fromLocation:end_location];
-	need_scroll = YES;
 	return YES;
 }
 
@@ -546,7 +545,6 @@
 	NSUInteger column = start_location - bol;
 	final_location = end_location = end; // next line
 	[self gotoColumn:column fromLocation:end_location];
-	need_scroll = YES;
 	return YES;
 }
 
@@ -555,7 +553,6 @@
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	final_location = end_location;
-	need_scroll = YES;
 	return YES;
 }
 
@@ -565,7 +562,6 @@
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
 	end_location = [self skipWhitespaceFrom:end_location];
 	final_location = end_location;
-	need_scroll = YES;
 	return YES;
 }
 
@@ -577,7 +573,6 @@
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		final_location = end_location = IMAX(bol, eol - command.ismotion);
-		need_scroll = YES;
 	}
 	return YES;
 }
@@ -683,7 +678,6 @@
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
 		final_location = end_location;
 	}
-	need_scroll = YES;
 	return YES;
 }
 

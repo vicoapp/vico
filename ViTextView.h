@@ -28,7 +28,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSRect oldCaretRect;
 	NSRange affectedRange;
 	NSUInteger start_location, end_location, final_location;
-	BOOL need_scroll;
 
 	NSMutableCharacterSet *wordSet;
 	NSMutableCharacterSet *nonWordSet;

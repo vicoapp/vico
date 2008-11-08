@@ -239,6 +239,7 @@
 - (NSArray *)scopesFromMatches:(NSArray *)matches;
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
 - (void)resetAttributesInRange:(NSRange)aRange;
+- (void)startHighlightingInBackground:(NSArray *)continuedMatches range:(NSRange)range;
 @end
 
 @implementation ViTextView (syntax)
@@ -847,7 +848,7 @@ done:
 	// highlight each line separately
 	NSUInteger lastScopeUpdate = aRange.location;
 	NSUInteger nextRange = aRange.location;
-	while (nextRange < NSMaxRange(aRange))
+	while (nextRange < NSMaxRange(aRange) && ![[NSThread currentThread] isCancelled])
 	{
 		NSUInteger end = nextRange;
 		if (chars)
@@ -893,11 +894,14 @@ done:
 		{
 			// XXX: we know we're in the main thread 'cause otherwise we don't know the end matches
 			INFO(@"detected changed line end matches in incremental mode");
+			[self startHighlightingInBackground:continuedMatches range:NSMakeRange(nextRange, [storage length] - nextRange)];
+			/*
 			INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
 			unichar *morechars = malloc([storage length] * sizeof(unichar));
 			[[storage string] getCharacters:morechars];
 			[self performSelectorInBackground:@selector(highlightInBackground:)
 					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:NSMakeRange(nextRange, [storage length] - nextRange)], [NSValue valueWithPointer:morechars], continuedMatches, nil]];
+			*/
 		}
 #if 0
 		if (endMatches && (extendedRange || nextRange >= NSMaxRange(aRange)))
@@ -942,8 +946,11 @@ done:
 	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u    => %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, (float)ms / 1000.0);
 
-	[context replaceObjectAtIndex:0 withObject:[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)]];
-	[self performSelectorOnMainThread:@selector(applyContext:) withObject:context waitUntilDone:NO];
+	if (![[NSThread currentThread] isCancelled])
+	{
+		[context replaceObjectAtIndex:0 withObject:[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)]];
+		[self performSelectorOnMainThread:@selector(applyContext:) withObject:context waitUntilDone:NO];
+	}
 
 	[[NSGarbageCollector defaultCollector] enable];
 }
@@ -961,6 +968,35 @@ done:
 
 	INFO(@"highlighting in background thread");
 	[self highlightRange:range continueWithMatches:continuedMatches verifyEndMatches:endMatches characters:chars startLocation:0];
+	if ([[NSThread currentThread] isCancelled])
+	{
+		INFO(@"highlight thread %p (%p) got cancelled", [NSThread currentThread], highlightThread);
+	}
+	else
+	{
+		INFO(@"highlight thread %p (%p) finished", [NSThread currentThread], highlightThread);
+		highlightThread = nil; // XXX: race condition?
+	}
+}
+
+- (void)startHighlightingInBackground:(NSArray *)continuedMatches range:(NSRange)range
+{
+	INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
+	unichar *chars = malloc([storage length] * sizeof(unichar));
+	[[storage string] getCharacters:chars];
+
+	if ([highlightThread isExecuting])
+	{
+		INFO(@"cancelling highlighting thread %p", highlightThread);
+		[highlightThread cancel];
+		highlightThread = nil;
+		[[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];
+	}
+
+	highlightThread = [[NSThread alloc] initWithTarget:self selector:@selector(highlightInBackground:)
+		object:[NSArray arrayWithObjects:[NSValue valueWithRange:range], [NSValue valueWithPointer:chars], continuedMatches, nil]];
+	INFO(@"dispatching highlighting thread %p", highlightThread);
+	[highlightThread start];
 }
 
 - (void)highlightRange:(NSRange)aRange isRestarting:(BOOL)isRestarting inBackground:(BOOL)inBackground
@@ -982,14 +1018,10 @@ done:
 
 	if (language)
 	{
-	
+
 		if (inBackground)
 		{
-			INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
-			unichar *chars = malloc([storage length] * sizeof(unichar));
-			[[storage string] getCharacters:chars];
-			[self performSelectorInBackground:@selector(highlightInBackground:)
-					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:aRange], [NSValue valueWithPointer:chars], continuedMatches, endMatches, nil]];
+			[self startHighlightingInBackground:continuedMatches range:aRange];
 		}
 		else
 		{
@@ -1024,6 +1056,14 @@ done:
 
 	if (area.length == 0)
 		return;
+
+	if ([highlightThread isExecuting])
+	{
+		INFO(@"cancelling highlighting thread %p", highlightThread);
+		[highlightThread cancel];
+		highlightThread = nil;
+		[[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];
+	}
 
 	// temporary attributes don't work right when called from a notification
 	// FIXME: try call this in - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender instead

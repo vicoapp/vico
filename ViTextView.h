@@ -5,6 +5,7 @@
 #import "ViLanguage.h"
 #import "ViTagsDatabase.h"
 #import "ViBundle.h"
+#import "MHSysTree.h"
 #import "logging.h"
 
 #ifdef IMAX
@@ -39,6 +40,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	ViTheme *theme;
 	ViBundle *bundle;
 	ViLanguage *language;
+	NSThread *highlightThread;
+	// MHSysTree *continuationMatches;
 
 	CGFloat pageGuideX;
 

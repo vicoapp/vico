@@ -727,18 +727,18 @@ done:
 
 		if (endMatches && nextRange >= NSMaxRange(aRange))
 		{
-			INFO(@"verifying end match in line %u: should be %@, is %@", lineno + 1, endMatches, continuedMatches);
+			DEBUG(@"verifying end match in line %u: should be %@, is %@", lineno + 1, endMatches, continuedMatches);
 			if (![continuedMatches isEqualToPatternArray:endMatches])
 			{
 				// XXX: we know we're in the main thread 'cause otherwise we don't have the end match
-				INFO(@"detected changed line end matches in incremental mode");
+				DEBUG(@"detected changed line end matches in incremental mode");
 				[self startHighlightingInBackground:continuedMatches range:NSMakeRange(nextRange, [storage length] - nextRange) isRestarting:YES];
 			}
 		}
 
-		if (continuations && [continuedMatches isEqualToPatternArray:[continuations objectAtIndex:lineno]])
+		if (continuations && lineno < [continuations count] && [continuedMatches isEqualToPatternArray:[continuations objectAtIndex:lineno]])
 		{
-			INFO(@"detected matching line end matches in thread mode, stopping at lineno %u", lineno);
+			DEBUG(@"detected matching line end matches in thread mode, stopping at lineno %u", lineno);
 			break;
 		}
 
@@ -812,28 +812,28 @@ done:
 	if ([vars count] > 3)
 		continuations = [vars objectAtIndex:3];
 
-	INFO(@"highlighting in background thread %p", [NSThread currentThread]);
+	DEBUG(@"highlighting in background thread %p", [NSThread currentThread]);
 	[self highlightRange:range continueWithMatches:continuedMatches verifyEndMatch:nil continuations:continuations characters:chars startLocation:0];
 	if ([[NSThread currentThread] isCancelled])
 	{
-		INFO(@"highlight thread %p (%p) got cancelled", [NSThread currentThread], highlightThread);
+		DEBUG(@"highlight thread %p (%p) got cancelled", [NSThread currentThread], highlightThread);
 	}
 	else
 	{
-		INFO(@"highlight thread %p (%p) finished", [NSThread currentThread], highlightThread);
+		DEBUG(@"highlight thread %p (%p) finished", [NSThread currentThread], highlightThread);
 		highlightThread = nil; // XXX: race condition?
 	}
 }
 
 - (void)startHighlightingInBackground:(NSArray *)continuedMatches range:(NSRange)range isRestarting:(BOOL)isRestarting
 {
-	INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
+	DEBUG(@"allocating %u bytes", [storage length] * sizeof(unichar));
 	unichar *chars = malloc([storage length] * sizeof(unichar));
 	[[storage string] getCharacters:chars];
 
 	if ([highlightThread isExecuting])
 	{
-		INFO(@"cancelling highlighting thread %p", highlightThread);
+		DEBUG(@"cancelling highlighting thread %p", highlightThread);
 		[highlightThread cancel];
 		highlightThread = nil;
 		[[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];
@@ -856,12 +856,12 @@ done:
 			[continuations addObject:cont];
 			end = nextEnd;
 		}
-		INFO(@"collected %u continuations", [continuations count]);
+		DEBUG(@"collected %u continuations", [continuations count]);
 	}
 
 	highlightThread = [[NSThread alloc] initWithTarget:self selector:@selector(highlightInBackground:)
 		object:[NSArray arrayWithObjects:[NSValue valueWithRange:range], [NSValue valueWithPointer:chars], continuedMatches, continuations, nil]];
-	INFO(@"dispatching highlighting thread %p", highlightThread);
+	DEBUG(@"dispatching highlighting thread %p", highlightThread);
 	[highlightThread start];
 }
 
@@ -917,6 +917,12 @@ done:
 		return;
 	}
 	
+	/* If we're pasting whole lines that changes the continuation, we must include that
+	 * last line ending to detect the change.
+	 */
+	if (area.length > 1 && [[storage string] characterAtIndex:NSMaxRange(area) - 1] == '\n')
+		area.length++;
+	
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;
 	[[storage string] getLineStart:&bol end:&eol contentsEnd:NULL forRange:area];
@@ -928,7 +934,7 @@ done:
 
 	if ([highlightThread isExecuting])
 	{
-		INFO(@"cancelling highlighting thread %p", highlightThread);
+		DEBUG(@"cancelling highlighting thread %p", highlightThread);
 		[highlightThread cancel];
 		highlightThread = nil;
 		[[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];

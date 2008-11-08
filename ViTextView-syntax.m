@@ -1,5 +1,6 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
+#import "MHSysTree.h"
 #import "logging.h"
 
 #include <sys/time.h>
@@ -134,8 +135,107 @@
 @end
 
 
+@interface ViScope : NSObject
+{
+	NSRange range;
+	NSArray *scopes;
+}
+@property(readwrite) NSRange range;
+@property(readwrite,copy) NSArray *scopes;
+- (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
+- (int)compareBegin:(ViScope *)otherContext;
+// - (int)compareEnd:(ViScope *)otherContext;
+@end
+@implementation ViScope
+@synthesize range;
+@synthesize scopes;
+- (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
+{
+	if ((self = [super init]) != nil)
+	{
+		scopes = scopesArray;
+		range = aRange;
+	}
+	return self;
+}
+- (int)compareBegin:(ViScope *)otherContext
+{
+	if (self == otherContext)
+		return 0;
+
+	if (range.location < otherContext.range.location)
+		return -1;
+	if (range.location > otherContext.range.location)
+		return 1;
+
+	if (range.length > otherContext.range.length)
+		return -1;
+	if (range.length < otherContext.range.length)
+		return 1;
+
+/*
+	int c = [scopes count];
+	int oc = [otherContext.scopes count];
+	if (c < oc)
+		return -1;
+	if (c > oc)
+		return 1;
+
+	int i;
+	for (i = 0; i < c; i++)
+	{
+		int r = [[scopes objectAtIndex:i] compare:[otherContext.scopes objectAtIndex:i]];
+		if (r != 0)
+			return r;
+	}
+*/
+	
+	return 0;
+}
+#if 0
+- (int)compareEnd:(ViScope *)otherContext
+{
+	if (self == otherContext)
+		return 0;
+
+	NSUInteger end = range.location + range.length;
+	NSUInteger otherEnd = otherContext.range.location + otherContext.range.length;
+
+	if (end < otherEnd)
+		return -1;
+	if (end > otherEnd)
+		return 1;
+
+/*
+	if (range.length > otherContext.range.length)
+		return -1;
+	if (range.length < otherContext.range.length)
+		return 1;
+*/
+
+	int c = [scopes count];
+	int oc = [otherContext.scopes count];
+	if (c < oc)
+		return -1;
+	if (c > oc)
+		return 1;
+
+	int i;
+	for (i = 0; i < c; i++)
+	{
+		int r = [[scopes objectAtIndex:i] compare:[otherContext.scopes objectAtIndex:i]];
+		if (r != 0)
+			return r;
+	}
+
+	return 0;
+}
+#endif
+@end
+
+
+
 @interface ViTextView (syntax_private)
-- (ViSyntaxMatch *)highlightLineInRange:(NSRange)aRange continueWithMatch:(ViSyntaxMatch *)continuedMatch characters:(const unichar *)chars;
 - (NSArray *)scopesFromMatches:(NSArray *)matches;
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
 - (void)resetAttributesInRange:(NSRange)aRange;
@@ -157,6 +257,14 @@
 
 	aRange.location += offset;
 
+	DEBUG(@"applying scopes [%@] to range %u + %u", [aScopeArray componentsJoinedByString:@" "], aRange.location, aRange.length);		
+	[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:aScopeArray forCharacterRange:aRange];
+
+	// get the theme attributes for this collection of scopes
+	NSDictionary *attributes = [theme attributesForScopes:aScopeArray];
+	[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aRange];
+
+#if 0
 	NSUInteger l = aRange.location;
 	while (l < NSMaxRange(aRange))
 	{
@@ -193,6 +301,22 @@
 
 		l = NSMaxRange(scopeRange);
 	}
+#endif
+}
+
+- (void)applyScopes:(ViScope *)aScope
+{
+	DEBUG(@"applying scopes [%@] to range %u + %u", [aScope.scopes componentsJoinedByString:@" "], aScope.range.location, aScope.range.length);		
+	[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:aScope.scopes forCharacterRange:aScope.range];
+
+	// get the theme attributes for this collection of scopes
+	NSDictionary *attributes = [theme attributesForScopes:aScope.scopes];
+	[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:aScope.range];
+}
+
+- (void)debugScopes:(ViScope *)aScope
+{
+	INFO(@"[%@] (%p) range %u + %u", [aScope.scopes componentsJoinedByString:@" "], aScope.scopes, aScope.range.location, aScope.range.length);
 }
 
 - (void)applyContext:(NSMutableArray *)context
@@ -210,16 +334,20 @@
 	DEBUG(@"resetting attributes in range %u + %u", wholeRange.location, wholeRange.length);
 	[self resetAttributesInRange:wholeRange];
 
-	[context removeObjectAtIndex:0];
-	[context removeObjectAtIndex:0];
-
-	NSArray *foo;
-	for (foo in context)
+	MHSysTree *beginTree = [context objectAtIndex:2];
+	// [beginTree performSelectorWithAllObjects:@selector(debugScopes:) target:self];
+#if 0
+	struct rb_entry *e = [beginTree first];
+	while (e)
 	{
-		NSArray *scopes = [foo objectAtIndex:0];
-		NSRange range = [[foo objectAtIndex:1] rangeValue];
-		[self applyScopes:scopes inRange:range withOffset:offset];
+		ViScope *scope = e->obj;
+		e = [beginTree next:e];
+		// ViScope *nextScope = e->obj;
+
+		[self applyScopes:scope];
 	}
+#endif
+	[beginTree performSelectorWithAllObjects:@selector(applyScopes:) target:self];
 
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
@@ -232,11 +360,54 @@
 
 - (void)applyScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange context:(NSMutableArray *)context
 {
-	if (aScopeArray == nil)
+	int c = [aScopeArray count];
+	if (c == 0 || aRange.length == 0)
 		return;
-	
-	NSArray *foo = [NSArray arrayWithObjects:aScopeArray, [NSValue valueWithRange:aRange], nil];
-	[context addObject:foo];
+
+	ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
+	MHSysTree *beginTree = [context objectAtIndex:2];
+
+	struct rb_entry *e = [beginTree root];
+	while (e)
+	{
+		ViScope *beginScope = e->obj;
+		if (aRange.location < beginScope.range.location)
+		{
+			e = [beginTree left:e];
+		}
+		else if (aRange.location > beginScope.range.location)
+		{
+			if (NSMaxRange(beginScope.range) == aRange.location)
+			{
+				NSString *scopeString = [aScopeArray componentsJoinedByString:@" "];
+				if ([beginScope.scopes count] == c && [[beginScope.scopes componentsJoinedByString:@" "] isEqualToString:scopeString])
+				{
+					NSRange r = beginScope.range;
+					r.length += aRange.length;
+					beginScope.range = r;
+					return;
+				}
+			}
+
+			e = [beginTree right:e];
+		}
+		else
+		{
+			if (aRange.length > beginScope.range.length)
+				e = [beginTree left:e];
+			else if (aRange.length < beginScope.range.length)
+				e = [beginTree right:e];
+			else
+			{
+				// beginScope.scopes = [beginScope.scopes arrayByAddingObjectsFromArray:aScopeArray];
+				beginScope.scopes = aScopeArray;
+				return;
+			}
+		}
+	}
+
+	[beginTree addObject:scope];
+	[context addObject:scope]; // XXX: otherwise garbage collection fucks this up!
 }
 
 - (void)applyScope:(NSString *)aScope inRange:(NSRange)aRange context:(NSMutableArray *)context
@@ -244,7 +415,11 @@
 	[self applyScopes:[NSArray arrayWithObject:aScope] inRange:aRange context:context];
 }
 
-- (void)highlightCaptures:(NSString *)captureType inPattern:(NSDictionary *)pattern withMatch:(ViRegexpMatch *)aMatch context:(NSMutableArray *)context
+- (void)highlightCaptures:(NSString *)captureType
+                inPattern:(NSDictionary *)pattern
+                withMatch:(ViRegexpMatch *)aMatch
+                topScopes:(NSArray *)topScopes
+                  context:(NSMutableArray *)context
 {
 	NSDictionary *captures = [pattern objectForKey:captureType];
 	if (captures == nil)
@@ -260,24 +435,24 @@
 		if (r.length > 0)
 		{
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
-			[self applyScope:[capture objectForKey:@"name"] inRange:r context:context];
+			[self applyScopes:[topScopes arrayByAddingObject:[capture objectForKey:@"name"]] inRange:r context:context];
 		}
 	}
 }
 
-- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
+- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context topScopes:(NSArray *)topScopes
 {
-	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] context:context];
+	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] topScopes:topScopes context:context];
 }
 
-- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
+- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context topScopes:(NSArray *)topScopes
 {
-	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch] context:context];
+	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch] topScopes:topScopes context:context];
 }
 
-- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context
+- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch context:(NSMutableArray *)context topScopes:(NSArray *)topScopes
 {
-	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] context:context];
+	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] topScopes:topScopes context:context];
 }
 
 - (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange characters:(const unichar *)chars
@@ -419,12 +594,15 @@
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
 			      [[aMatch beginMatch] rangeOfMatchedString].length);
+			NSMutableArray *newScopes = [[NSMutableArray alloc] init];
+			[newScopes addObjectsFromArray:topScopes];
 			if ([aMatch scope])
 			{
 				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
-				[self applyScopes:[topScopes arrayByAddingObject:[aMatch scope]] inRange:[aMatch matchedRange] context:context];
+				[newScopes addObject:[aMatch scope]];
+				[self applyScopes:newScopes inRange:[aMatch matchedRange] context:context];
 			}
-			[self highlightCapturesInMatch:aMatch context:context];
+			[self highlightCapturesInMatch:aMatch context:context topScopes:newScopes];
 		}
 		else if ([aMatch endMatch])
 		{
@@ -436,7 +614,7 @@
 
 			topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:topOpenMatch];
 			[self applyScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString] context:context];
-			[self highlightEndCapturesInMatch:aMatch context:context];
+			[self highlightEndCapturesInMatch:aMatch context:context topScopes:topScopes];
 			// [self performSelectorOnMainThread:@selector(highlightEndCapturesInMatch:) withObject:aMatch waitUntilDone:NO];
 
 			// pop one or more open matches off the stack and return the rest
@@ -476,7 +654,7 @@
 							           context:context];
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
-			[self highlightBeginCapturesInMatch:aMatch context:context];
+			[self highlightBeginCapturesInMatch:aMatch context:context topScopes:newTopScopes];
 			if (tmpEOL == YES)
 			{
 				if (reachedEOL)
@@ -512,6 +690,7 @@ done:
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch
 {
 	NSMutableArray *scopes = [[NSMutableArray alloc] init];
+	[scopes addObject:[language name]];
 	ViSyntaxMatch *m;
 	for (m in matches)
 	{
@@ -614,7 +793,7 @@ done:
 	{
 		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					  [theme foregroundColor], NSForegroundColorAttributeName,
-					  [NSArray arrayWithObject:[language name]], ViScopeAttributeName,
+					  // [NSArray arrayWithObject:[language name]], ViScopeAttributeName,
 					  nil];
 	}
 	else
@@ -661,6 +840,7 @@ done:
 	NSMutableArray *context = [[NSMutableArray alloc] init];
 	[context addObject:[NSValue valueWithRange:aRange]];
 	[context addObject:[NSNumber numberWithUnsignedInteger:startLocation]];
+	[context addObject:[[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)]];
 
 	DEBUG(@"highlighting range %u(%u) + %u", aRange.location, startLocation + aRange.location, aRange.length);
 	
@@ -742,6 +922,7 @@ done:
 #endif
 		
 		lineno++;
+#if 0
 		if (lineno % 100 == 0)
 		{
 			NSMutableArray *contextCopy = [NSMutableArray arrayWithArray:context];
@@ -750,6 +931,7 @@ done:
 			[context removeObjectsInRange:NSMakeRange(2, [context count] - 2)];
 			lastScopeUpdate = nextRange;
 		}
+#endif
 	}
 
 	free(chars);

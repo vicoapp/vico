@@ -602,7 +602,7 @@ done:
 - (void)resetAttributesInRange:(NSRange)aRange
 {
 	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
+	// [[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
 	// [[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	// [[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
@@ -637,7 +637,11 @@ done:
 	[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }
 
-- (void)highlightRange:(NSRange)aRange continueWithMatches:(NSArray *)continuedMatches characters:(unichar *)chars startLocation:(NSUInteger)startLocation
+- (void)highlightRange:(NSRange)aRange
+   continueWithMatches:(NSArray *)continuedMatches
+      verifyEndMatches:(NSArray *)endMatches
+            characters:(unichar *)chars
+         startLocation:(NSUInteger)startLocation
 {
 	struct timeval start;
 	struct timeval stop_time;
@@ -689,7 +693,7 @@ done:
 		if (extendedRange)
 		{
 			lastContinuedMatches = [self continuedMatchesForLocation:end];
-			[self resetAttributesInRange:line];
+			// [self resetAttributesInRange:line];
 		}
 #endif
 
@@ -705,10 +709,20 @@ done:
 			                    waitUntilDone:NO];
 		}
 
-#if 0
-		if (isRestarting && (extendedRange || nextRange >= NSMaxRange(aRange)) /*&& nextRange < [storage length]*/)
+		if (endMatches && nextRange >= NSMaxRange(aRange) && ![continuedMatches isEqualToPatternArray:endMatches])
 		{
-			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:lastContinuedMatches];
+			// XXX: we know we're in the main thread 'cause otherwise we don't know the end matches
+			INFO(@"detected changed line end matches in incremental mode");
+			INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
+			unichar *morechars = malloc([storage length] * sizeof(unichar));
+			[[storage string] getCharacters:morechars];
+			[self performSelectorInBackground:@selector(highlightInBackground:)
+					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:NSMakeRange(nextRange, [storage length] - nextRange)], [NSValue valueWithPointer:morechars], continuedMatches, nil]];
+		}
+#if 0
+		if (endMatches && (extendedRange || nextRange >= NSMaxRange(aRange)))
+		{
+			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:endMatches];
 			if (continuationMatchesHaveChanged)
 			{
 				if (!extendedRange)
@@ -757,29 +771,32 @@ done:
 	NSRange range = [[vars objectAtIndex:0] rangeValue];
 	unichar *chars = [[vars objectAtIndex:1] pointerValue];
 	NSArray *continuedMatches = nil;
+	NSArray *endMatches = nil;
 	if ([vars count] > 2)
 		continuedMatches = [vars objectAtIndex:2];
+	if ([vars count] > 3)
+		endMatches = [vars objectAtIndex:3];
 
 	INFO(@"highlighting in background thread");
-	[self highlightRange:NSMakeRange(0, range.length) continueWithMatches:continuedMatches characters:chars startLocation:0];
+	[self highlightRange:range continueWithMatches:continuedMatches verifyEndMatches:endMatches characters:chars startLocation:0];
 }
 
-- (void)highlightRange:(NSRange)aRange inBackground:(BOOL)inBackground
+- (void)highlightRange:(NSRange)aRange isRestarting:(BOOL)isRestarting inBackground:(BOOL)inBackground
 {
 	// if we're restarting, detect the previous scope so we can continue on a multi-line pattern, if any
 	NSArray *continuedMatches = nil;
 	if (aRange.location > 0)
 	{
 		continuedMatches = [self continuedMatchesForLocation:aRange.location];
+		INFO(@"continuedMatches = %@", continuedMatches);
 	}
 
-	NSArray *lastContinuedMatches = nil;
-#if 0
-	if (isRestarting)
+	NSArray *endMatches = nil;
+	if (isRestarting && continuedMatches)
 	{
-		lastContinuedMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
+		endMatches = [self continuedMatchesForLocation:NSMaxRange(aRange)];
+		INFO(@"endMatches = %@", endMatches);
 	}
-#endif
 
 	if (language)
 	{
@@ -789,20 +806,19 @@ done:
 			INFO(@"allocating %u bytes", [storage length] * sizeof(unichar));
 			unichar *chars = malloc([storage length] * sizeof(unichar));
 			[[storage string] getCharacters:chars];
-
 			[self performSelectorInBackground:@selector(highlightInBackground:)
-					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:aRange], [NSValue valueWithPointer:chars], continuedMatches, nil]];
+					       withObject:[NSArray arrayWithObjects:[NSValue valueWithRange:aRange], [NSValue valueWithPointer:chars], continuedMatches, endMatches, nil]];
 		}
 		else
 		{
-			[self highlightRange:aRange continueWithMatches:continuedMatches characters:NULL startLocation:0];
+			[self highlightRange:aRange continueWithMatches:continuedMatches verifyEndMatches:endMatches characters:NULL startLocation:0];
 		}
 	}
 }
 
 - (void)highlightInWrappedRange:(NSValue *)wrappedRange
 {
-	[self highlightRange:[wrappedRange rangeValue] inBackground:NO];
+	[self highlightRange:[wrappedRange rangeValue] isRestarting:YES inBackground:NO];
 }
 
 /*
@@ -841,7 +857,7 @@ done:
 	}
 	DEBUG(@"start highlighting file");
 	[storage beginEditing];
-	[self highlightRange:NSMakeRange(0, [storage length]) inBackground:YES];
+	[self highlightRange:NSMakeRange(0, [storage length]) isRestarting:NO inBackground:YES];
 	[storage endEditing];
 	DEBUG(@"finished highlighting file");
 }

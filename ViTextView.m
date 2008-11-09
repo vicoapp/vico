@@ -80,6 +80,7 @@ int logIndent = 0;
 	[self setContinuousSpellCheckingEnabled:NO];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+	resetFont = YES;
 }
 
 - (void)setLanguage:(NSString *)aLanguage
@@ -1285,6 +1286,7 @@ int logIndent = 0;
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
+	[self highlightEverything]; // highlights in background
 }
 
 - (NSFont *)font
@@ -1311,9 +1313,15 @@ int logIndent = 0;
 	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
 	[style setDefaultTabInterval:tabSizeInPoints.width];
 
-	attrs = [NSDictionary dictionaryWithObject:style forKey:NSParagraphStyleAttributeName];
+	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+			style, NSParagraphStyleAttributeName,
+			[theme foregroundColor], NSForegroundColorAttributeName,
+			nil];
+	INFO(@"setting typing attributes to %@", attrs);
 	[self setTypingAttributes:attrs];
-	[storage addAttributes:attrs range:NSMakeRange(0, [[storage string] length])];
+
+	ignoreEditing = YES; // XXX: don't parse scopes when setting tab size
+	[storage addAttributes:attrs range:NSMakeRange(0, [storage length])];
 }
 
 - (NSUndoManager *)undoManager

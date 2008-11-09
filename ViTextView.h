@@ -12,6 +12,11 @@
 #endif
 #define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
 
+#ifdef IMIN
+# undef IMIN
+#endif
+#define IMIN(a, b)  (((NSInteger)a) < ((NSInteger)b) ? (a) : (b))
+
 typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView : NSTextView
@@ -36,10 +41,12 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSDictionary *inputCommands;
 	NSDictionary *normalCommands;
 
+	BOOL ignoreEditing;
 	ViTheme *theme;
 	ViBundle *bundle;
 	ViLanguage *language;
 	NSThread *highlightThread;
+	BOOL resetFont;
 
 	CGFloat pageGuideX;
 

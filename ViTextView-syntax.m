@@ -1,13 +1,11 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViSyntaxMatch.h"
+#import "ViScope.h"
 #import "MHSysTree.h"
 #import "logging.h"
 
 #include <sys/time.h>
-
-
-
 
 @interface NSArray (patternArray)
 - (BOOL)isEqualToPatternArray:(NSArray *)otherArray;
@@ -29,104 +27,6 @@
 }
 @end
 
-
-@interface ViScope : NSObject
-{
-	NSRange range;
-	NSArray *scopes;
-}
-@property(readwrite) NSRange range;
-@property(readwrite,copy) NSArray *scopes;
-- (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
-- (int)compareBegin:(ViScope *)otherContext;
-// - (int)compareEnd:(ViScope *)otherContext;
-@end
-@implementation ViScope
-@synthesize range;
-@synthesize scopes;
-- (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
-{
-	if ((self = [super init]) != nil)
-	{
-		scopes = scopesArray;
-		range = aRange;
-	}
-	return self;
-}
-- (int)compareBegin:(ViScope *)otherContext
-{
-	if (self == otherContext)
-		return 0;
-
-	if (range.location < otherContext.range.location)
-		return -1;
-	if (range.location > otherContext.range.location)
-		return 1;
-
-	if (range.length > otherContext.range.length)
-		return -1;
-	if (range.length < otherContext.range.length)
-		return 1;
-
-/*
-	int c = [scopes count];
-	int oc = [otherContext.scopes count];
-	if (c < oc)
-		return -1;
-	if (c > oc)
-		return 1;
-
-	int i;
-	for (i = 0; i < c; i++)
-	{
-		int r = [[scopes objectAtIndex:i] compare:[otherContext.scopes objectAtIndex:i]];
-		if (r != 0)
-			return r;
-	}
-*/
-	
-	return 0;
-}
-#if 0
-- (int)compareEnd:(ViScope *)otherContext
-{
-	if (self == otherContext)
-		return 0;
-
-	NSUInteger end = range.location + range.length;
-	NSUInteger otherEnd = otherContext.range.location + otherContext.range.length;
-
-	if (end < otherEnd)
-		return -1;
-	if (end > otherEnd)
-		return 1;
-
-/*
-	if (range.length > otherContext.range.length)
-		return -1;
-	if (range.length < otherContext.range.length)
-		return 1;
-*/
-
-	int c = [scopes count];
-	int oc = [otherContext.scopes count];
-	if (c < oc)
-		return -1;
-	if (c > oc)
-		return 1;
-
-	int i;
-	for (i = 0; i < c; i++)
-	{
-		int r = [[scopes objectAtIndex:i] compare:[otherContext.scopes objectAtIndex:i]];
-		if (r != 0)
-			return r;
-	}
-
-	return 0;
-}
-#endif
-@end
 
 
 
@@ -171,31 +71,19 @@
 	// [[NSGarbageCollector defaultCollector] disable];
 
 	NSRange wholeRange = [[context objectAtIndex:0] rangeValue];
-	// NSUInteger offset = [[context objectAtIndex:1] integerValue];
 
-	DEBUG(@"resetting attributes in range %u + %u", wholeRange.location, wholeRange.length);
+	DEBUG(@"resetting attributes in range %@", NSStringFromRange(wholeRange));
 	[self resetAttributesInRange:wholeRange];
 
-	MHSysTree *beginTree = [context objectAtIndex:2];
+	MHSysTree *beginTree = [context objectAtIndex:1];
 	// [beginTree performSelectorWithAllObjects:@selector(debugScopes:) target:self];
-#if 0
-	struct rb_entry *e = [beginTree first];
-	while (e)
-	{
-		ViScope *scope = e->obj;
-		// [self applyScopes:scope.scopes inRange:scope.range withOffset:0];
-		[self applyScopes:scope];
-		e = [beginTree next:e];
-	}
-#else
 	[beginTree performSelectorWithAllObjects:@selector(applyScopes:) target:self];
-#endif
 
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"applied %u scopes from context in range %u + %u => %.3f s",
-		[beginTree count], wholeRange.location, wholeRange.length, (float)ms / 1000.0);
+	DEBUG(@"applied %u scopes from context in range %@ => %.3f s",
+		[beginTree count], NSStringFromRange(wholeRange), (float)ms / 1000.0);
 
 	// [[NSGarbageCollector defaultCollector] enable];
 }
@@ -206,8 +94,7 @@
 	if (c == 0 || aRange.length == 0)
 		return;
 
-	ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
-	MHSysTree *beginTree = [context objectAtIndex:2];
+	MHSysTree *beginTree = [context objectAtIndex:1];
 
 	struct rb_entry *e = [beginTree root];
 	while (e)
@@ -216,6 +103,7 @@
 		if (aRange.location < beginScope.range.location)
 		{
 			break;
+			// FIXME: need to break partially matching scopes here!
 			// e = [beginTree left:e];
 		}
 		else if (aRange.location > beginScope.range.location)
@@ -248,6 +136,7 @@
 		}
 	}
 
+	ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
 	[beginTree addObject:scope];
 	[context addObject:scope]; // XXX: otherwise garbage collection fucks this up!
 }
@@ -622,40 +511,34 @@ done:
 
 - (void)resetAttributesInRange:(NSRange)aRange
 {
-	[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
+	if (aRange.length == 0)
+		return;
+
 	// [[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
-	// [[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	// [[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
-	[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
+	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
 	
 	NSDictionary *defaultAttributes = nil;
 	if (language)
 	{
+		[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
+		[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
+		[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
+
 		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					  [theme foregroundColor], NSForegroundColorAttributeName,
-					  // [NSArray arrayWithObject:[language name]], ViScopeAttributeName,
-					  nil];
-	}
-	else
-	{
-		// FIXME: shouldn't typing attributes apply when, like, typing!?
-		NSDictionary *typingAttributes = [self typingAttributes];
-		NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-					    [typingAttributes objectForKey:NSParagraphStyleAttributeName], NSParagraphStyleAttributeName,
-					    [theme foregroundColor], NSForegroundColorAttributeName,
 					    [self font], NSFontAttributeName,
-					    nil];
-		[storage addAttributes:attributes range:aRange];
-		return;
-/*		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-				     [theme foregroundColor], NSForegroundColorAttributeName,
-				     nil];
- */
+					  nil];
 	}
 
 	[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
+
+	if (resetFont)
+	{
+		[self setFont:[self font]];
+		resetFont = NO;
+	}
 }
 
 - (void)highlightRange:(NSRange)aRange
@@ -663,7 +546,6 @@ done:
         verifyEndMatch:(NSArray *)endMatches         // nil on highlightThread
          continuations:(NSArray *)continuations      // nil on main thread
             characters:(unichar *)chars              // nil on main thread
-         startLocation:(NSUInteger)startLocation     // obsolete?
 {
 	struct timeval start;
 	struct timeval stop_time;
@@ -681,10 +563,9 @@ done:
 
 	NSMutableArray *context = [[NSMutableArray alloc] init];
 	[context addObject:[NSValue valueWithRange:aRange]];
-	[context addObject:[NSNumber numberWithUnsignedInteger:startLocation]];
 	[context addObject:[[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)]];
 
-	DEBUG(@"highlighting range %u(%u) + %u", aRange.location, startLocation + aRange.location, aRange.length);
+	DEBUG(@"highlighting range %@", NSStringFromRange(aRange));
 	
 	// highlight each line separately
 	NSUInteger lastScopeUpdate = aRange.location;
@@ -717,7 +598,6 @@ done:
 		if (continuedMatches)
 		{
 			/* Mark the EOL character with the continuation patterns */
-			// [[self layoutManager] addTemporaryAttribute:ViContinuationAttributeName value:continuedMatches forCharacterRange:NSMakeRange(end - 1, 1)];
 			[self performSelectorOnMainThread:@selector(addContinuation:)
 			                       withObject:[NSArray arrayWithObjects:continuedMatches,
 			                                  [NSValue valueWithRange:NSMakeRange(end - 1, 1)],
@@ -742,46 +622,19 @@ done:
 			break;
 		}
 
-
-#if 0
-		if (endMatches && (extendedRange || nextRange >= NSMaxRange(aRange)))
-		{
-			BOOL continuationMatchesHaveChanged = ![continuedMatches isEqualToPatternArray:endMatches];
-			if (continuationMatchesHaveChanged)
-			{
-				if (!extendedRange)
-				{
-					DEBUG(@"continuation matches at location %u have changed, and this is an incremental update", end);
-					[self startHighlightingInBackground:continuedMatches range:NSMakeRange(nextRange, [storage length] - nextRange)];
-					aRange.length = [storage length] - aRange.location;
-					extendedRange = YES;
-				}
-			}
-			else if (extendedRange)
-			{
-				DEBUG(@"extended range and continuation matches are UNchanged, we're done at location %i (EOF = %i)",
-				      nextRange, [storage length]);
-				break;
-			}
-		}
-#endif
-		
 		lineno++;
-#if 1
 		if (lineno % 100 == 0)
 		{
-			MHSysTree *tree = [context objectAtIndex:2];
-			[context replaceObjectAtIndex:2 withObject:[[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)]];
+			MHSysTree *tree = [context objectAtIndex:1];
+			[context replaceObjectAtIndex:1 withObject:[[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)]];
 
 			NSArray *contextCopy = [NSArray arrayWithObjects:
 				[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)],
-				[NSNumber numberWithUnsignedInteger:startLocation],
 				tree,
 				nil];
 			[self performSelectorOnMainThread:@selector(applyContext:) withObject:contextCopy waitUntilDone:NO];
 			lastScopeUpdate = nextRange;
 		}
-#endif
 	}
 
 	free(chars);
@@ -789,7 +642,7 @@ done:
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
+	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 
 	if (![[NSThread currentThread] isCancelled])
@@ -813,7 +666,7 @@ done:
 		continuations = [vars objectAtIndex:3];
 
 	DEBUG(@"highlighting in background thread %p", [NSThread currentThread]);
-	[self highlightRange:range continueWithMatches:continuedMatches verifyEndMatch:nil continuations:continuations characters:chars startLocation:0];
+	[self highlightRange:range continueWithMatches:continuedMatches verifyEndMatch:nil continuations:continuations characters:chars];
 	if ([[NSThread currentThread] isCancelled])
 	{
 		DEBUG(@"highlight thread %p (%p) got cancelled", [NSThread currentThread], highlightThread);
@@ -893,8 +746,7 @@ done:
 			 continueWithMatches:continuedMatches
 			      verifyEndMatch:endMatches
 			       continuations:nil
-			          characters:NULL
-			       startLocation:0];
+			          characters:NULL];
 		}
 	}
 }
@@ -911,9 +763,20 @@ done:
 {
 	NSRange area = [storage editedRange];
 	
+	if ([storage length] == 0)
+		resetFont = YES;
+	
+	if (ignoreEditing)
+	{
+		INFO(@"ignoring editing notification");
+		ignoreEditing = NO;
+		return;
+	}
+	
 	if (language == nil)
 	{
-		[self resetAttributesInRange:NSMakeRange(0, [storage length])];
+		// [self resetAttributesInRange:NSMakeRange(0, [storage length])];
+		[self resetAttributesInRange:area];
 		return;
 	}
 	
@@ -921,7 +784,7 @@ done:
 	 * last line ending to detect the change.
 	 */
 	if (area.length > 1 && [[storage string] characterAtIndex:NSMaxRange(area) - 1] == '\n')
-		area.length++;
+		area.length = IMIN(area.length + 1, [storage length]);
 	
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;
@@ -952,11 +815,9 @@ done:
 		[self resetAttributesInRange:NSMakeRange(0, [storage length])];
 		return;
 	}
-	DEBUG(@"start highlighting file");
 	[storage beginEditing];
 	[self highlightRange:NSMakeRange(0, [storage length]) isRestarting:NO inBackground:YES];
 	[storage endEditing];
-	DEBUG(@"finished highlighting file");
 }
 
 @end

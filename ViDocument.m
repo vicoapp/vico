@@ -60,6 +60,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (readContent)
 	{
 		[[[textView textStorage] mutableString] setString:readContent];
+		[[textView textStorage] addAttribute:NSFontAttributeName value:[textView font] range:NSMakeRange(0, [[textView textStorage] length])];
 		[textView setCaret:0];
 	}
 	[self configureSyntax];

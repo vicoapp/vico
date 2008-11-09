@@ -2,10 +2,14 @@
 #import "ViTextView.h"
 #import "ViWindowController.h"
 
+@class NoodleLineNumberView;
+
 @interface ViDocument : NSDocument
 {
 	IBOutlet NSView *view;
+	IBOutlet NSScrollView *scrollView;
 	IBOutlet ViTextView *textView;
+	NoodleLineNumberView *lineNumberView;
 	IBOutlet NSTextField *statusbar;
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *symbolsButton;

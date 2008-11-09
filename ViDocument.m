@@ -2,6 +2,10 @@
 #import "ExTextView.h"
 #import "ViLanguageStore.h"
 
+#import "NoodleLineNumberView.h"
+#import "NoodleLineNumberMarker.h"
+#import "MarkerLineNumberView.h"
+
 BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
@@ -76,6 +80,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
+
+	// workaround strange behaviour with the LineNumberView
+	NSRect frame = [scrollView frame];
+	frame.size.height += 17;
+	[scrollView setFrame:frame];
+
+	lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:scrollView];
+	[scrollView setVerticalRulerView:lineNumberView];
+	[scrollView setHasHorizontalRuler:NO];
+	[scrollView setHasVerticalRuler:YES];
+	[scrollView setRulersVisible:YES];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError

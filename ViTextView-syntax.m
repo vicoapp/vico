@@ -784,7 +784,7 @@ done:
 	 * last line ending to detect the change.
 	 */
 	if (area.length > 1 && [[storage string] characterAtIndex:NSMaxRange(area) - 1] == '\n')
-		area.length = IMIN(area.length + 1, [storage length]);
+		area.length = IMIN(area.length + 1, [storage length] - area.location);
 	
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;

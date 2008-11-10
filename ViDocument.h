@@ -19,6 +19,8 @@
 }
 
 - (NSView *)view;
+- (void)enableLineNumbers:(BOOL)flag;
+- (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
 - (IBAction)setLanguage:(id)sender;
 - (void)message:(NSString *)fmt, ...;

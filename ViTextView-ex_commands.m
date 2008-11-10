@@ -66,9 +66,12 @@
 		@"expandtab", @"et",
 		@"ignorecase", @"ic",
 		@"tabstop", @"ts",
+		@"number", @"nu",
+		@"number", @"num",
+		@"number", @"numb",
 		nil];
 
-	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", nil];
+	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 		
 	NSString *var;
@@ -137,6 +140,11 @@
 			}
 			
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
+
+			if ([defaults_name isEqualToString:@"number"])
+			{
+				[[self delegate] enableLineNumbers:!turnoff];
+			}
 		}
 		else
 		{

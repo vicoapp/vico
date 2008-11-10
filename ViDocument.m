@@ -56,6 +56,28 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 }
 
+- (void)enableLineNumbers:(BOOL)flag
+{
+	if (flag)
+	{
+		if (lineNumberView == nil)
+		{
+			lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:scrollView];
+			[scrollView setVerticalRulerView:lineNumberView];
+			[scrollView setHasHorizontalRuler:NO];
+			[scrollView setHasVerticalRuler:YES];
+		}
+		[scrollView setRulersVisible:YES];
+	}
+	else
+		[scrollView setRulersVisible:NO];
+}
+
+- (IBAction)toggleLineNumbers:(id)sender
+{
+	[self enableLineNumbers:[sender state] == NSOffState];
+}
+
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
 	[super windowControllerDidLoadNib:aController];
@@ -76,11 +98,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
 
-	lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:scrollView];
-	[scrollView setVerticalRulerView:lineNumberView];
-	[scrollView setHasHorizontalRuler:NO];
-	[scrollView setHasVerticalRuler:YES];
-	[scrollView setRulersVisible:YES];
+	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"]];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError

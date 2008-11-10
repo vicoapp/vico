@@ -44,6 +44,7 @@
 			[NSNumber numberWithBool:YES], @"autoindent",
 			[NSNumber numberWithBool:YES], @"ignorecase",
 			[NSNumber numberWithBool:YES], @"expandtabs",
+			[NSNumber numberWithBool:YES], @"number",
 			nil]];
 
 	/* initialize languages */

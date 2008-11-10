@@ -343,9 +343,9 @@ int logIndent = 0;
 	if (bestMatchingScope)
 	{
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
+		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
-
-		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
+		if ([rx matchInString:checkLine])
 		{
 			return YES;
 		}
@@ -362,9 +362,10 @@ int logIndent = 0;
 	if (bestMatchingScope)
 	{
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
+		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
 
-		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
+		if ([rx matchInString:checkLine])
 		{
 			return YES;
 		}
@@ -381,9 +382,10 @@ int logIndent = 0;
 	if (bestMatchingScope)
 	{
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
+		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
 
-		if ([checkLine rangeOfRegularExpressionString:pattern].location != NSNotFound)
+		if ([rx matchInString:checkLine])
 		{
 			return YES;
 		}
@@ -634,21 +636,21 @@ int logIndent = 0;
 	return YES;
 }
 
-- (void)highlightFindMatch:(OGRegularExpressionMatch *)match
+- (void)highlightFindMatch:(ViRegexpMatch *)match
 {
 	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
 }
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(OgreSyntax)regexpSyntax
+         regexpType:(int)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
-	unsigned rx_options = OgreNotBOLOption | OgreNotEOLOption;
+	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
-		rx_options |= OgreIgnoreCaseOption;
+		rx_options |= ONIG_OPTION_IGNORECASE;
 
-	OGRegularExpression *lastSearchRegexp = [[NSApp delegate] lastSearchRegexp];
+	ViRegexp *lastSearchRegexp = [[NSApp delegate] lastSearchRegexp];
 	NSString *lastSearchPattern = [[NSApp delegate] lastSearchPattern];
 	if (![lastSearchPattern isEqualToString:pattern])
 	{
@@ -660,10 +662,9 @@ int logIndent = 0;
 		/* compile the pattern regexp */
 		@try
 		{
-			lastSearchRegexp = [OGRegularExpression regularExpressionWithString:pattern
-										    options:rx_options
-										     syntax:regexpSyntax
-									    escapeCharacter:OgreBackslashCharacter];
+			lastSearchRegexp = [ViRegexp regularExpressionWithString:pattern
+								         options:rx_options
+								          syntax:regexpSyntax];
 		}
 		@catch(NSException *exception)
 		{
@@ -684,7 +685,7 @@ int logIndent = 0;
 	}
 	else
 	{
-		OGRegularExpressionMatch *match, *nextMatch = nil;
+		ViRegexpMatch *match, *nextMatch = nil;
 		for (match in foundMatches)
 		{
 			NSRange r = [match rangeOfMatchedString];
@@ -726,7 +727,7 @@ int logIndent = 0;
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	return [self findPattern:pattern options:find_options regexpType:OgreRubySyntax ignoreLastRegexp:NO];
+	return [self findPattern:pattern options:find_options regexpType:0 ignoreLastRegexp:NO];
 }
 
 - (void)find_forward_callback:(NSString *)pattern

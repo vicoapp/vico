@@ -28,7 +28,7 @@
 - (void)setPageGuide:(int)pageGuideValue;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(OgreSyntax)regexpSyntax
+         regexpType:(int)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;

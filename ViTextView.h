@@ -1,5 +1,4 @@
 #import <Cocoa/Cocoa.h>
-#import <OgreKit/OgreKit.h>
 #import "ViCommand.h"
 #import "ViTheme.h"
 #import "ViLanguage.h"
@@ -97,7 +96,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(OgreSyntax)regexpSyntax
+         regexpType:(int)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 

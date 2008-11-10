@@ -1,6 +1,5 @@
 #import "ViTheme.h"
 #import "NSString-scopeSelector.h"
-#import <OgreKit/OgreKit.h>
 
 @implementation ViTheme
 

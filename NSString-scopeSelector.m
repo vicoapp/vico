@@ -1,5 +1,4 @@
 #import "NSString-scopeSelector.h"
-#import <OgreKit/OgreKit.h>
 
 /* returns 10^x */
 static u_int64_t tenpow(unsigned x)

@@ -7,7 +7,6 @@
 //
 
 #import "ViTagsDatabase.h"
-#import <OgreKit/OgreKit.h>
 
 @interface ViTagsDatabase (private)
 - (void)parseData:(NSString *)data;

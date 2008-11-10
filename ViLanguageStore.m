@@ -113,7 +113,8 @@ static ViLanguageStore *defaultStore = nil;
 			if (firstLineMatch == nil)
 				continue;
 
-			if ([firstLine rangeOfRegularExpressionString:firstLineMatch].location != NSNotFound)
+			ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
+			if ([rx matchInString:firstLine])
 			{
 				NSLog(@"Using language %@ for first line [%@]", [language name], firstLine);
 				if (languagePtr)

@@ -157,7 +157,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(OgreSyntax)regexpSyntax
+         regexpType:(int)regexpSyntax
    ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
 	return [textView findPattern:pattern options:find_options regexpType:regexpSyntax ignoreLastRegexp:ignoreLastRegexp];

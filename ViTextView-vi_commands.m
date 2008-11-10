@@ -1076,7 +1076,7 @@
 			{
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				[document findPattern:pattern options:0 regexpType:OgreRubySyntax ignoreLastRegexp:YES];
+				[document findPattern:pattern options:0 regexpType:0 ignoreLastRegexp:YES];
 			}
 		}
 		else
@@ -1103,7 +1103,7 @@
 	if(word)
 	{
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		return [self findPattern:pattern options:OgreNoneOption];
+		return [self findPattern:pattern options:0];
 	}
 	return NO;
 }

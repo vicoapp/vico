@@ -3,23 +3,29 @@
 
 @implementation ViRegexp
 
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString
++ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options syntax:(int)syntax
 {
-	return [[ViRegexp alloc] initWithString:aString];
+	return [[ViRegexp alloc] initWithString:aString options:options syntax:syntax];
 }
 
-- (ViRegexp *)initWithString:(NSString *)aString
++ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options
+{
+	return [ViRegexp regularExpressionWithString:aString options:options syntax:0];
+}
+
++ (ViRegexp *)regularExpressionWithString:(NSString *)aString
+{
+	return [ViRegexp regularExpressionWithString:aString options:0 syntax:0];
+}
+
+- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax
 {
 	self = [super init];
-
-	// INFO(@"initializing regexp with string [%@]", aString);
 
 	size_t len = [aString length] * sizeof(unichar);
 	unichar *pattern = malloc(len);
 	[aString getCharacters:pattern];
 
-	// const UChar *pattern = (const UChar *)CFStringGetCharactersPtr((CFStringRef)aString);
-	// size_t len  = CFStringGetLength((CFStringRef)aString) * 2;
 	OnigEncoding enc;
 #if defined(__BIG_ENDIAN__)
 	enc = ONIG_ENCODING_UTF16_BE;
@@ -27,7 +33,7 @@
 	enc = ONIG_ENCODING_UTF16_LE;
 #endif
 	OnigErrorInfo einfo;
-	int r = onig_new(&regex, (const UChar *)pattern, (const UChar *)pattern + len, ONIG_OPTION_CAPTURE_GROUP, enc, ONIG_SYNTAX_RUBY, &einfo);
+	int r = onig_new(&regex, (const UChar *)pattern, (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP, enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
 	if (r != ONIG_NORMAL)
 	{
@@ -49,7 +55,7 @@
 	[super finalize];
 }
 
-- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars options:(int)options range:(NSRange)aRange start:(NSUInteger)aLocation
 {
 	OnigRegion *region = onig_region_new();
 
@@ -57,10 +63,15 @@
 	const unsigned char *start = str + aRange.location * sizeof(unichar);
 	const unsigned char *end = start + aRange.length * sizeof(unichar);
 
-	int r = onig_search(regex, str, end, start, end, region, ONIG_OPTION_FIND_NOT_EMPTY);
+	int r = onig_search(regex, str, end, start, end, region, ONIG_OPTION_FIND_NOT_EMPTY | options);
 	if (r >= 0)
 		return [ViRegexpMatch regexpMatchWithRegion:region startLocation:aLocation];
 	return nil;
+}
+
+- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+{
+	return [self matchInCharacters:chars options:0 range:aRange start:aLocation];
 }
 
 - (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange
@@ -82,14 +93,14 @@
 	return [self matchInString:aString range:NSMakeRange(0, [aString length])];
 }
 
-- (NSArray *)allMatchesInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+- (NSArray *)allMatchesInCharacters:(const unichar *)chars options:(int)options range:(NSRange)aRange start:(NSUInteger)aLocation
 {
 	NSMutableArray *matches = nil;
 
 	NSRange range = aRange;
 	while (range.location < NSMaxRange(aRange))
 	{
-		ViRegexpMatch *match = [self matchInCharacters:chars range:range start:aLocation];
+		ViRegexpMatch *match = [self matchInCharacters:chars options:options range:range start:aLocation];
 		if (match == nil)
 			break;
 
@@ -107,13 +118,28 @@
 	return matches;
 }
 
-- (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange
+- (NSArray *)allMatchesInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+{
+	return [self allMatchesInCharacters:chars options:0 range:aRange start:aLocation];
+}
+
+- (NSArray *)allMatchesInString:(NSString *)aString options:(int)options range:(NSRange)aRange
 {
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	[aString getCharacters:chars range:aRange];
-	NSArray *matches = [self allMatchesInCharacters:chars range:NSMakeRange(0, aRange.length) start:aRange.location];
+	NSArray *matches = [self allMatchesInCharacters:chars options:options range:NSMakeRange(0, aRange.length) start:aRange.location];
 	free(chars);
 	return matches;
+}
+
+- (NSArray *)allMatchesInString:(NSString *)aString options:(int)options
+{
+	return [self allMatchesInString:aString options:0 range:NSMakeRange(0, [aString length])];
+}
+
+- (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange
+{
+	return [self allMatchesInString:aString options:0 range:aRange];
 }
 
 - (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange start:(NSUInteger)aLocation

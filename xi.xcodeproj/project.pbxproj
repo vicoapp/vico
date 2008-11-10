@@ -13,7 +13,6 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
-		9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
 		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
@@ -46,7 +45,6 @@
 		9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */; };
 		9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */; };
 		9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC16DA30D93D14A00AE45E0 /* ViDocument.m */; };
-		9AC3CBC20E60B77B00184733 /* OgreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A117ACD0D0CA87D007AA524 /* OgreKit.framework */; };
 		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
@@ -55,20 +53,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9A117ACC0D0CA87D007AA524 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4DC40BFC09150BDB0029A2A6;
-			remoteInfo = OgreKit;
-		};
-		9A117AE00D0CA8CD007AA524 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 4DC40BF209150BDB0029A2A6;
-			remoteInfo = OgreKit;
-		};
 		9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -117,7 +101,6 @@
 		32DBCF750370BD2300C91783 /* xi_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xi_Prefix.pch; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* xi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xi.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OgreKit.xcodeproj; path = OgreKit/OgreKit.xcodeproj; sourceTree = "<group>"; };
 		9A11D6800EB473BE00A016AB /* xi.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = xi.icns; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
@@ -194,7 +177,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A117AD70D0CA8B7007AA524 /* OgreKit.framework in Frameworks */,
 				9A7AF1550D9982EB00F08222 /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
@@ -204,7 +186,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9AC3CBC20E60B77B00184733 /* OgreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,7 +223,6 @@
 			isa = PBXGroup;
 			children = (
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
-				9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				9AC16DA00D93CF9C00AE45E0 /* Controllers */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
@@ -340,14 +320,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		9A117AC70D0CA87D007AA524 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9A117ACD0D0CA87D007AA524 /* OgreKit.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		9A1A121B0D02CE29009EABAC /* Test Cases */ = {
 			isa = PBXGroup;
 			children = (
@@ -395,6 +367,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "xi" */;
 			buildPhases = (
+				9AF41B3D0EC8731B00F1D681 /* ShellScript */,
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
@@ -403,7 +376,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				9A117AE10D0CA8CD007AA524 /* PBXTargetDependency */,
 				9A7AF1570D99830C00F08222 /* PBXTargetDependency */,
 			);
 			name = xi;
@@ -443,10 +415,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 9A117AC70D0CA87D007AA524 /* Products */;
-					ProjectRef = 9A1179E90D0C9E32007AA524 /* OgreKit.xcodeproj */;
-				},
-				{
 					ProductGroup = 9A7AF1440D99820800F08222 /* Products */;
 					ProjectRef = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
 				},
@@ -460,13 +428,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		9A117ACD0D0CA87D007AA524 /* OgreKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = OgreKit.framework;
-			remoteRef = 9A117ACC0D0CA87D007AA524 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		9A7AF14F0D99820900F08222 /* PSMTabBarControl.palette */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -540,7 +501,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\necho \"Removing old OgreKit framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\necho \"Copying new OgreKit framework\"\ncp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+			shellScript = "set -x\n#echo \"Removing old OgreKit framework\"\n#rm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\n#echo \"Copying new OgreKit framework\"\n#cp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+		};
+		9AF41B3D0EC8731B00F1D681 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/onig-5.9.1.tar.gz",
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/oniguruma/lib/libonig.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -x\npwd\nls -l $TARGET_BUILD_DIR/oniguruma/lib\nrm -rf $TARGET_BUILD_DIR/onig-5.9.1\nrm -rf $TARGET_BUILD_DIR/oniguruma\ntar zxvf $SRCROOT/onig-5.9.1.tar.gz -C $TARGET_BUILD_DIR\ncd $TARGET_BUILD_DIR/onig-5.9.1\nCFLAGS=\"-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch ppc -mmacosx-version-min=10.5\" LDFLAGS=\"-Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -mmacosx-version-min=10.5\" ./configure --disable-shared  --disable-dependency-tracking --prefix=$TARGET_BUILD_DIR/oniguruma\nmake install\nls -l $TARGET_BUILD_DIR/oniguruma/lib\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -595,11 +571,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9A117AE10D0CA8CD007AA524 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = OgreKit;
-			targetProxy = 9A117AE00D0CA8CD007AA524 /* PBXContainerItemProxy */;
-		};
 		9A1A12830D02EB86009EABAC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* xi */;
@@ -733,6 +704,10 @@
 				GCC_PREFIX_HEADER = xi_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
+					"-lonig",
+				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
@@ -753,6 +728,10 @@
 				GCC_PREFIX_HEADER = xi_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
+					"-lonig",
+				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
 			};
@@ -762,10 +741,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = i386;
-				FRAMEWORK_SEARCH_PATHS = (
-					PSMTabBarControl/build/$BUILD_STYLE,
-					OgreKit/build/$BUILD_STYLE,
-				);
+				FRAMEWORK_SEARCH_PATHS = PSMTabBarControl/build/$BUILD_STYLE;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
@@ -785,7 +761,10 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "OgreKit/RegularExpression/oniguruma/onig-5.9.0";
+				HEADER_SEARCH_PATHS = "$(TARGET_BUILD_DIR)/oniguruma/include";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				OTHER_LDFLAGS = "-lonig";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				VALID_ARCHS = i386;
@@ -799,10 +778,7 @@
 					i386,
 					ppc,
 				);
-				FRAMEWORK_SEARCH_PATHS = (
-					PSMTabBarControl/build/$BUILD_STYLE,
-					OgreKit/build/$BUILD_STYLE,
-				);
+				FRAMEWORK_SEARCH_PATHS = PSMTabBarControl/build/$BUILD_STYLE;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
@@ -818,7 +794,10 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "OgreKit/RegularExpression/oniguruma/onig-5.9.0";
+				HEADER_SEARCH_PATHS = "$(TARGET_BUILD_DIR)/oniguruma/include";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				OTHER_LDFLAGS = "-lonig";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};

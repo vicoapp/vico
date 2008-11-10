@@ -1,17 +1,17 @@
 #import <Cocoa/Cocoa.h>
 
-@class OGRegularExpression;
+@class ViRegexp;
 
 @interface ViAppController : NSObject
 {
 	IBOutlet NSMenu *themeMenu;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
-	OGRegularExpression *lastSearchRegexp;
+	ViRegexp *lastSearchRegexp;
 }
 
 @property(copy, readwrite) NSString *lastSearchPattern;
-@property(copy, readwrite) OGRegularExpression *lastSearchRegexp;
+@property(copy, readwrite) ViRegexp *lastSearchRegexp;
 
 - (IBAction)setTheme:(id)sender;
 - (IBAction)setPageGuide:(id)sender;

@@ -66,7 +66,7 @@
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Pristine Copy/Themes" stringByExpandingTildeInPath]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
 #endif
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/Vizard/Themes" stringByExpandingTildeInPath]];
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/xi/Themes" stringByExpandingTildeInPath]];
 	}
 	return self;
 }

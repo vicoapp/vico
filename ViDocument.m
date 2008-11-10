@@ -63,9 +63,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	if (readContent)
 	{
-		[[[textView textStorage] mutableString] setString:readContent];
-		[[textView textStorage] addAttribute:NSFontAttributeName value:[textView font] range:NSMakeRange(0, [[textView textStorage] length])];
-		[textView setCaret:0];
+		[textView setString:readContent];
 	}
 	[self configureSyntax];
 
@@ -80,11 +78,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
-
-	// workaround strange behaviour with the LineNumberView
-	NSRect frame = [scrollView frame];
-	frame.size.height += 17;
-	[scrollView setFrame:frame];
 
 	lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:scrollView];
 	[scrollView setVerticalRulerView:lineNumberView];

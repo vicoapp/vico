@@ -61,10 +61,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super windowControllerDidLoadNib:aController];
 	[textView initEditorWithDelegate:self];
 
-	if (readContent)
-	{
-		[textView setString:readContent];
-	}
+	[textView setString:readContent];
 	[self configureSyntax];
 
 	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];

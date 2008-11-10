@@ -86,7 +86,7 @@ int logIndent = 0;
 
 - (void)setString:(NSString *)aString
 {
-	[[storage mutableString] setString:aString];
+	[[storage mutableString] setString:aString ?: @""];
 	[storage addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [storage length])];
 	[self setCaret:0];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];

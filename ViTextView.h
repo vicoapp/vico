@@ -29,8 +29,12 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	NSMutableArray *inputKeys;
 
-	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
+	// block cursor
 	NSRect oldCaretRect;
+	NSInteger lastCursorLocation;
+	NSRect lastCursor;
+
+	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
 	NSRange affectedRange;
 	NSUInteger start_location, end_location, final_location;
 
@@ -60,6 +64,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 }
 
 - (void)initEditorWithDelegate:(id)aDelegate;
+- (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)setLanguage:(NSString *)aLanguage;

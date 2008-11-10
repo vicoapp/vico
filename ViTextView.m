@@ -33,6 +33,7 @@ int logIndent = 0;
 	buffers = [[NSApp delegate] sharedBuffers];
 	storage = [self textStorage];
 	inputKeys = [[NSMutableArray alloc] init];
+	lastCursorLocation = -1;
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -81,6 +82,14 @@ int logIndent = 0;
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	resetFont = YES;
+}
+
+- (void)setString:(NSString *)aString
+{
+	[[storage mutableString] setString:aString];
+	[storage addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [storage length])];
+	[self setCaret:0];
+	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
 - (void)setLanguage:(NSString *)aLanguage
@@ -1218,7 +1227,6 @@ int logIndent = 0;
 
 
 
-
 /* This is stolen from Smultron.
  */
 - (void)drawRect:(NSRect)rect
@@ -1228,10 +1236,10 @@ int logIndent = 0;
 	if (pageGuideX > 0)
 	{
 		NSRect bounds = [self bounds];
-		if([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES)
-		{ // So that it doesn't draw the line if only e.g. the cursor updates
+		if ([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES)
+		{
+			// So that it doesn't draw the line if only e.g. the cursor updates
 			[[self insertionPointColor] set];
-			// pageGuideColour = [color colorWithAlphaComponent:([color alphaComponent] / 4)];
 			[NSBezierPath strokeRect:NSMakeRect(pageGuideX, 0, 0, bounds.size.height)];
 		}
 	}

@@ -5,11 +5,14 @@
 - (void)updateInsertionPoint
 {
 	NSRange rr = [self selectedRange];
-	rr.length = 0; // interested in the beginning of a selection
-	NSTextContainer *tc = [self textContainer];
-	NSLayoutManager *lm = [self layoutManager];
-	rr = [lm glyphRangeForCharacterRange:rr actualCharacterRange:NULL];
-	NSRect gr = [lm boundingRectForGlyphRange:rr inTextContainer:tc];
+	if (rr.location != lastCursorLocation)
+	{
+		rr.length = 0; // interested in the beginning of a selection
+		NSTextContainer *tc = [self textContainer];
+		NSLayoutManager *lm = [self layoutManager];
+		rr = [lm glyphRangeForCharacterRange:rr actualCharacterRange:NULL];
+		lastCursor = [lm boundingRectForGlyphRange:rr inTextContainer:tc];
+	}
 	//	NSPoint caret = [self convertPoint:gr.origin toView:nil];
 	
 	// now draw our insertion point behind the text
@@ -17,7 +20,7 @@
 	//	if(NSIntersectsRect(aRect, gr) ) 
 	//if(NSPointInRect(caret, aRect))
 	{
-		[self drawInsertionPointInRect:gr color:[theme caretColor] turnedOn:YES];
+		[self drawInsertionPointInRect:lastCursor color:[theme caretColor] turnedOn:YES];
 	}
 }
 
@@ -74,4 +77,28 @@
 	return YES;
 }
 
+#if 0
+- (void)drawInsertionPointInRect:(NSRect)rect color:(NSColor *)color turnedOn:(BOOL)flag
+{
+	//Block Cursor
+	if (flag) 
+	{
+		NSPoint aPoint = NSMakePoint(rect.origin.x, rect.origin.y+rect.size.height/2);
+		int glyphIndex = [[self layoutManager] glyphIndexForPoint:aPoint inTextContainer:[self textContainer]];
+		NSRect glyphRect = [[self layoutManager]
+			boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1)  inTextContainer:[self textContainer]];
+		
+		[color set];
+		rect.size.width = rect.size.height / 2;
+		if (glyphRect.size.width > 0 && glyphRect.size.width < rect.size.width) rect.size.width=glyphRect.size.width;
+			NSRectFillUsingOperation(rect, NSCompositePlusDarker);
+	}
+	else
+	{
+		[self setNeedsDisplayInRect:[self visibleRect] avoidAdditionalLayout:NO];
+	}
+}
+#endif
+
 @end
+

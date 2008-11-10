@@ -50,7 +50,7 @@
 {
     if ((self = [super initWithScrollView:aScrollView orientation:NSVerticalRuler]) != nil)
     {
-		linesToMarkers = [[NSMutableDictionary alloc] init];
+	linesToMarkers = [[NSMutableDictionary alloc] init];
 		
         [self setClientView:[aScrollView documentView]];
     }
@@ -212,7 +212,7 @@
 		for (line = 0; line < count; line++)
 		{
 			ndx = [[lines objectAtIndex:line] unsignedIntValue];
-			
+
 			rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(ndx, 0)
 								 withinSelectedCharacterRange:nullRange
 											  inTextContainer:container
@@ -414,7 +414,7 @@
         
         // Fudge the range a tad in case there is an extra new line at end.
         // It doesn't show up in the glyphs so would not be accounted for.
-        // range.length++; // no, not in vi
+        range.length++;
         
         count = [lines count];
         ndx = 0;

@@ -13,7 +13,8 @@ sed -E -i.bak \
 # xcodebuild -project xi.xcodeproj -target xi -configuration Release clean || exit
 xcodebuild -project xi.xcodeproj -target xi -configuration Release || exit
 
-TMPDMG=xi-tmp.dmg /bin/rm -f $TMPDMG
+TMPDMG=xi-tmp.dmg
+/bin/rm -f $TMPDMG
 
 die()
 {
@@ -32,7 +33,7 @@ echo "Creating disk image $VOL"
 trap 'rm -f $TMPDMG; exit 1' 2 3 15
 
 # create a disk image
-hdiutil create -megabytes 4 $TMPDMG -layout NONE
+hdiutil create -megabytes 15 $TMPDMG -layout NONE
 # associate a device with this but don't mount it
 MYDEV=`hdid -nomount $TMPDMG`
 test -n "$MYDEV" || die "failed to attach disk image"

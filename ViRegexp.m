@@ -66,6 +66,7 @@
 	int r = onig_search(regex, str, end, start, end, region, ONIG_OPTION_FIND_NOT_EMPTY | options);
 	if (r >= 0)
 		return [ViRegexpMatch regexpMatchWithRegion:region startLocation:aLocation];
+	onig_region_free(region, 1);
 	return nil;
 }
 
@@ -111,8 +112,8 @@
 		NSRange r = [match rangeOfMatchedString];
 		if (r.length == 0)
 			r.length = 1;
-		range.location += r.length;
-		range.length -= r.length;
+		range.location += NSMaxRange(r);
+		range.length -= NSMaxRange(r);
 	}
 
 	return matches;

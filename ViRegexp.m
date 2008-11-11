@@ -112,8 +112,8 @@
 		NSRange r = [match rangeOfMatchedString];
 		if (r.length == 0)
 			r.length = 1;
-		range.location += NSMaxRange(r);
-		range.length -= NSMaxRange(r);
+		range.location = NSMaxRange(r);
+		range.length = NSMaxRange(aRange) - range.location;
 	}
 
 	return matches;

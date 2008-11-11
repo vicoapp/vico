@@ -854,14 +854,14 @@ int logIndent = 0;
 		l2 = l1;
 		l1 = end_location;
 	}
-	// INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
 	if (command.line_mode && !command.ismotion)
 	{
 		/* if this command is line oriented, extend the affectedRange to whole lines */
-		NSUInteger bol, end;
+		NSUInteger bol, end, eol;
 
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:l1];
+		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
 
 		if (!command.motion_method)
 		{
@@ -884,18 +884,7 @@ int logIndent = 0;
 
 		l1 = bol;
 		l2 = end;
-		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
-
-#if 0
-		/* If a line mode range includes the last line, also include the newline before the first line.
-		 * This way delete doesn't leave an empty line.
-		 */
-		if(l2 == [storage length])
-		{
-			l1 = IMAX(0, l1 - 1);	// FIXME: what about using CRLF at end-of-lines?
-			DEBUG(@"after including newline before first line: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
-		}
-#endif
+		INFO(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 

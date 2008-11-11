@@ -172,10 +172,10 @@
 - (void)test201_MoveBackwardToChar		{ MOVE(@"abc def ghi", 8, @"Ff", 6); }
 - (void)test201_MoveBackwardToChar2		{ MOVE(@"abc def abc", 9, @"Fb", 1); }
 - (void)test202_DeleteBackwardToChar		{ TEST(@"abc def abc", 9, @"dFe", @"abc dbc", 5); }
-- (void)test203_MoveBackwardToCharWithCount	{ MOVE(@"abc abc abc", 10, @"2Fa", 0); }
-- (void)test204_DeleteBackwardToCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Fa", @"c", 0); }
-- (void)test205_DeleteBackwardTilCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Ta", @"ac", 1); }
-- (void)test206_RepeatMoveBackwardTilChar	{ MOVE(@"abc abc abc", 7, @"Ta;", 1); }
+- (void)test203_MoveBackwardToCharWithCount	{ MOVE(@"abc abc abc", 10, @"2Fa", 4); }
+- (void)test204_DeleteBackwardToCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Fa", @"abc c", 4); }
+- (void)test205_DeleteBackwardTilCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Ta", @"abc ac", 5); }
+- (void)test206_RepeatMoveBackwardTilChar	{ MOVE(@"abc abc abc", 7, @"Ta;", 5); }
 - (void)test207_RepeatMoveBackwardToChar	{ MOVE(@"abc abc abc", 7, @"Fa;", 0); }
 
 @end

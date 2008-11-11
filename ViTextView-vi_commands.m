@@ -201,12 +201,22 @@
 	// need beginning of line for correcting caret position after deletion
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+
+	/* If a line mode range includes the last line, also include the newline before the first line.
+	 * This way delete doesn't leave an empty line.
+	 */
+	if (command.line_mode && NSMaxRange(affectedRange) == [storage length] && bol > 0)
+	{
+		affectedRange.location--;	// FIXME: what about using CRLF at end-of-lines?
+		affectedRange.length++;
+		INFO(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
+	}
 	
 	[self cutToBuffer:0 append:NO range:affectedRange];
 	
 	// correct caret position if we deleted the last character(s) on the line
-	if (bol > [[storage string] length])
-		bol = IMAX(0, [[storage string] length] - 1);
+	if (bol > [storage length])
+		bol = IMAX(0, [storage length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
 	if (affectedRange.location >= eol)
@@ -306,36 +316,52 @@
 	if (command.line_mode)
 	{
 		/* adjust the range to exclude the last newline */
-		NSUInteger bol;
-		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:end_location];
-		if (end_location == bol || command.key == 'S')
+		NSUInteger bol, eol, end;
+		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
+		INFO(@"end_location = %u, bol = %u, eol = %u, end = %u", end_location, bol, eol, end);
+		if (end_location == bol)
 		{
 			end_location--;
 			affectedRange.length--;
 		}
 	}
-
-        NSString *leading_whitespace = nil;
-	if (command.key == 'S' && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
-                leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
 	
 	if ([self delete:command])
 	{
-		if (command.key == 'S')
-		{
-			INFO(@"inserting %u chars of leading whitestuff at %u", [leading_whitespace length], final_location);
-			[self insertString:leading_whitespace ?: @"" atLocation:final_location];
-                        final_location += [leading_whitespace length];
-
-			/* a command count should not be treated as a count for the inserted text */
-                        command.count = 0;
-		}
 		end_location = final_location;
 		[self setInsertMode:command];
 		return YES;
 	}
 	else
 		return NO;
+}
+
+/* syntax: [buffer][count]S */
+- (BOOL)subst_lines:(ViCommand *)command
+{
+	/* Adjust the range to exclude the last newline (if there is one). */
+	NSUInteger bol, eol, end;
+	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
+	if (eol < end)
+	{
+		affectedRange.length--;
+	}
+
+        NSString *leading_whitespace = nil;
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
+                leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
+	
+	[self cutToBuffer:0 append:NO range:affectedRange];
+
+	[self insertString:leading_whitespace ?: @"" atLocation:bol];
+
+	/* a command count should not be treated as a count for the inserted text */
+	command.count = 0;
+
+	end_location = final_location = bol + [leading_whitespace length];
+	[self setInsertMode:command];
+
+	return YES;
 }
 
 /* syntax: i */

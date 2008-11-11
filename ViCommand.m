@@ -32,7 +32,7 @@ static struct vikey vikeys[] = {
 	{@"repeat_find_backward:",'N', VIF_IS_MOTION},
 	{@"open_line_above:",	'O', VIF_SETS_DOT},
 	{@"put_before:",	'P', VIF_SETS_DOT},
-	{@"change:",		'S', VIF_LINE_MODE | VIF_SETS_DOT},
+	{@"subst_lines:",	'S', VIF_LINE_MODE | VIF_SETS_DOT},
 	{@"move_back_til_char:",'T', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"delete_backward:",	'X', VIF_SETS_DOT},

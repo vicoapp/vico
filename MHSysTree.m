@@ -126,9 +126,8 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 
 - (void)removeAllObjects
 {
-    struct rb_entry *e, *next;
-    for (e = RB_MIN(id_tree, &root); e; e = next) {
-        next = RB_NEXT(id_tree, &root, e);
+    struct rb_entry *e;
+    while ((e = RB_MIN(id_tree, &root)) != NULL) {
         [self removeEntry:e];
     }
 }

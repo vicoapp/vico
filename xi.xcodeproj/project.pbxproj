@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,12 +12,9 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
-		9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
-		9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
-		9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
 		9A668E170D11174A003FABD9 /* ViLanguageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E160D11174A003FABD9 /* ViLanguageStore.m */; };
@@ -39,7 +36,6 @@
 		9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */; };
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
-		9A8CC8E40D24ED47001EE32A /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */; };
 		9A9C5D470E75962C00F4B596 /* ExTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9C5D460E75962C00F4B596 /* ExTextView.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 		9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */; };
@@ -49,18 +45,14 @@
 		9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD772810EC9A6CB00D05DDE /* ViMark.m */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
-		9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */; };
+		9AF2FE760EC9C8A400C5771B /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
+		9AF2FE9B0EC9C9F600C5771B /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
+		9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */; };
+		9AF2FE9D0EC9C9F600C5771B /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9AF41A560EC6E1CB00F1D681 /* MarkerLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
-			remoteInfo = xi;
-		};
 		9A7AF14E0D99820900F08222 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
@@ -89,6 +81,13 @@
 			remoteGlobalIDString = 53DF68FC067E5B5A0090B5B0;
 			remoteInfo = PSMTabBarControlFramework;
 		};
+		9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D15AC270486D014006FF6A4 /* xi */;
+			remoteInfo = xi;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -107,8 +106,6 @@
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
 		9A1A11FE0D02C65A009EABAC /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
 		9A1A11FF0D02C65A009EABAC /* ViCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommand.m; sourceTree = "<group>"; };
-		9A1A12150D02CDE6009EABAC /* Unit Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A1A12160D02CDE6009EABAC /* Unit Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Unit Tests-Info.plist"; sourceTree = "<group>"; };
 		9A1A12220D02CFCF009EABAC /* TestViCommandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViCommandParser.h; sourceTree = "<group>"; };
 		9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViCommandParser.m; sourceTree = "<group>"; };
 		9A1A13B60D044131009EABAC /* TestViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViTextView.h; sourceTree = "<group>"; };
@@ -169,8 +166,8 @@
 		9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-vi_commands.m"; sourceTree = "<group>"; };
 		9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
 		9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagStack.m; sourceTree = "<group>"; };
-		9AEE8B7C0D929DED00189D7B /* ProjectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDelegate.h; sourceTree = "<group>"; };
-		9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDelegate.m; sourceTree = "<group>"; };
+		9AF2FE700EC9C85900C5771B /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9AF2FE710EC9C85900C5771B /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		9AF41A540EC6E1CB00F1D681 /* MarkerLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarkerLineNumberView.h; sourceTree = "<group>"; };
 		9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MarkerLineNumberView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -185,7 +182,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A1A12120D02CDE6009EABAC /* Frameworks */ = {
+		9AF2FE6D0EC9C85900C5771B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -217,7 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				8D15AC370486D014006FF6A4 /* xi.app */,
-				9A1A12150D02CDE6009EABAC /* Unit Tests.octest */,
+				9AF2FE700EC9C85900C5771B /* Tests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,7 +230,7 @@
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
-				9A1A12160D02CDE6009EABAC /* Unit Tests-Info.plist */,
+				9AF2FE710EC9C85900C5771B /* Tests-Info.plist */,
 			);
 			name = xi;
 			sourceTree = "<group>";
@@ -353,8 +350,6 @@
 		9AC16DA00D93CF9C00AE45E0 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				9AEE8B7C0D929DED00189D7B /* ProjectDelegate.h */,
-				9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */,
 				9A8CC2180D1C3E62001EE32A /* ViAppController.h */,
 				9A8CC2190D1C3E62001EE32A /* ViAppController.m */,
 				9AC16DA20D93D14A00AE45E0 /* ViDocument.h */,
@@ -389,23 +384,23 @@
 			productReference = 8D15AC370486D014006FF6A4 /* xi.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9A1A12140D02CDE6009EABAC /* Unit Tests */ = {
+		9AF2FE6F0EC9C85900C5771B /* Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9A1A12190D02CDE6009EABAC /* Build configuration list for PBXNativeTarget "Unit Tests" */;
+			buildConfigurationList = 9AF2FE740EC9C85A00C5771B /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
-				9A1A12100D02CDE6009EABAC /* Resources */,
-				9A1A12110D02CDE6009EABAC /* Sources */,
-				9A1A12120D02CDE6009EABAC /* Frameworks */,
-				9A1A12130D02CDE6009EABAC /* ShellScript */,
+				9AF2FE6B0EC9C85900C5771B /* Resources */,
+				9AF2FE6C0EC9C85900C5771B /* Sources */,
+				9AF2FE6D0EC9C85900C5771B /* Frameworks */,
+				9AF2FE6E0EC9C85900C5771B /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				9A1A12830D02EB86009EABAC /* PBXTargetDependency */,
+				9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */,
 			);
-			name = "Unit Tests";
-			productName = "Unit Tests";
-			productReference = 9A1A12150D02CDE6009EABAC /* Unit Tests.octest */;
+			name = Tests;
+			productName = Tests;
+			productReference = 9AF2FE700EC9C85900C5771B /* Tests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -414,7 +409,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* xi */;
 			projectDirPath = "";
@@ -427,7 +422,7 @@
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* xi */,
-				9A1A12140D02CDE6009EABAC /* Unit Tests */,
+				9AF2FE6F0EC9C85900C5771B /* Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -472,7 +467,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A1A12100D02CDE6009EABAC /* Resources */ = {
+		9AF2FE6B0EC9C85900C5771B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -482,19 +477,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		9A1A12130D02CDE6009EABAC /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
 		9AC2D8B90D9924C800A26861 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -507,6 +489,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -x\n#echo \"Removing old OgreKit framework\"\n#rm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\n#echo \"Copying new OgreKit framework\"\n#cp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+		};
+		9AF2FE6E0EC9C85900C5771B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
 		9AF41B3D0EC8731B00F1D681 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -542,7 +537,6 @@
 				9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */,
 				9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */,
 				9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */,
-				9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */,
 				9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */,
 				9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */,
 				9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */,
@@ -563,29 +557,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A1A12110D02CDE6009EABAC /* Sources */ = {
+		9AF2FE6C0EC9C85900C5771B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A11765A0D0C4950007AA524 /* TestViTextView.m in Sources */,
-				9A8CC8E40D24ED47001EE32A /* TestScopeSelectors.m in Sources */,
-				9A3A94440D9FDC170071C252 /* TestViCommandParser.m in Sources */,
-				9A3A94450D9FDC1C0071C252 /* TestExCommand.m in Sources */,
+				9AF2FE760EC9C8A400C5771B /* TestViCommandParser.m in Sources */,
+				9AF2FE9B0EC9C9F600C5771B /* TestExCommand.m in Sources */,
+				9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */,
+				9AF2FE9D0EC9C9F600C5771B /* TestViTextView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9A1A12830D02EB86009EABAC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8D15AC270486D014006FF6A4 /* xi */;
-			targetProxy = 9A1A12820D02EB86009EABAC /* PBXContainerItemProxy */;
-		};
 		9A7AF1570D99830C00F08222 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PSMTabBarControlFramework;
 			targetProxy = 9A7AF1560D99830C00F08222 /* PBXContainerItemProxy */;
+		};
+		9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D15AC270486D014006FF6A4 /* xi */;
+			targetProxy = 9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -633,15 +627,13 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		9A1A12170D02CDE6009EABAC /* Debug */ = {
+		9AF2FE720EC9C85A00C5771B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					OgreKit/build/$BUILD_STYLE,
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -649,45 +641,47 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Unit Tests-Info.plist";
+				INFOPLIST_FILE = "Tests-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Cocoa,
 					"-framework",
 					SenTestingKit,
+					"-bundle",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = "Unit Tests";
-				TEST_HOST = "$(BUNDLE_LOADER)";
+				PRODUCT_NAME = Tests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
-		9A1A12180D02CDE6009EABAC /* Release */ = {
+		9AF2FE730EC9C85A00C5771B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					OgreKit/build/$BUILD_STYLE,
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Unit Tests-Info.plist";
+				INFOPLIST_FILE = "Tests-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Cocoa,
 					"-framework",
 					SenTestingKit,
+					"-bundle",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = "Unit Tests";
+				PRODUCT_NAME = Tests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
 				WRAPPER_EXTENSION = octest;
 				ZERO_LINK = NO;
 			};
@@ -774,7 +768,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_LDFLAGS = "-lonig";
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 				VALID_ARCHS = i386;
 			};
 			name = Debug;
@@ -807,18 +801,18 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_LDFLAGS = "-lonig";
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9A1A12190D02CDE6009EABAC /* Build configuration list for PBXNativeTarget "Unit Tests" */ = {
+		9AF2FE740EC9C85A00C5771B /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9A1A12170D02CDE6009EABAC /* Debug */,
-				9A1A12180D02CDE6009EABAC /* Release */,
+				9AF2FE720EC9C85A00C5771B /* Debug */,
+				9AF2FE730EC9C85A00C5771B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

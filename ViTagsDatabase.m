@@ -1,12 +1,5 @@
-//
-//  ViTagsDatabase.m
-//  vizard
-//
-//  Created by Martin Hedenfalk on 2008-03-31.
-//  Copyright 2008 Martin Hedenfalk. All rights reserved.
-//
-
 #import "ViTagsDatabase.h"
+#import "logging.h"
 
 @interface ViTagsDatabase (private)
 - (void)parseData:(NSString *)data;
@@ -26,7 +19,7 @@
 		 */
 		NSFileManager *fm = [NSFileManager defaultManager];
 		prefixPath = [aDirectory copy];
-		NSLog(@"prefix path = [%@]", prefixPath);
+		DEBUG(@"prefix path = [%@]", prefixPath);
 		NSString *path = nil;
 		if(![aFile isAbsolutePath])
 		{
@@ -40,7 +33,7 @@
 					p = component;
 
 				NSString *check = [p stringByAppendingPathComponent:aFile];
-				NSLog(@"checking for tags file [%@]", check);
+				DEBUG(@"checking for tags file [%@]", check);
 				if([fm fileExistsAtPath:check])
 				{
 					/* We found a tags file. There might be more files
@@ -59,7 +52,7 @@
 		if(path == nil)
 			return nil;
 
-		NSLog(@"opening tags file [%@]", path);
+		DEBUG(@"opening tags file [%@]", path);
 
 		NSStringEncoding encoding;
 		NSError *error = nil;
@@ -100,7 +93,7 @@
 		{
 			NSString *path = [prefixPath stringByAppendingPathComponent:file];
 			NSString *command = [[scan string] substringFromIndex:[scan scanLocation]];
-			// NSLog(@"got symbol [%@] in file [%@]", symbol, path);
+			DEBUG(@"got symbol [%@] in file [%@]", symbol, path);
 			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
 			command = [command stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
 	 		command = [command stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
@@ -109,7 +102,7 @@
 		}
 		else
 		{
-			NSLog(@"skipping tags line [%@]", line);
+			DEBUG(@"skipping tags line [%@]", line);
 		}
 	}
 }
@@ -126,7 +119,7 @@
 		NSDictionary *attributes = [[NSFileManager defaultManager] fileAttributesAtPath:databaseFile traverseLink:YES];
 		if([modificationDate isEqualToDate:[attributes fileModificationDate]])
 		{
-			NSLog(@"tags file unmodified [%@], [%@]", databaseFile, modificationDate);
+			DEBUG(@"tags file unmodified [%@], [%@]", databaseFile, modificationDate);
 			return NO;
 		}
 	}

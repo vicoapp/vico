@@ -1076,7 +1076,7 @@
 			{
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				[document findPattern:pattern options:0 regexpType:0 ignoreLastRegexp:YES];
+				[document findPattern:pattern options:0 regexpType:0];
 			}
 		}
 		else
@@ -1117,6 +1117,12 @@
 	 [self currentLine],
 	 [self lineNumberAtLocation:IMAX(0, [[storage string] length] - 1)],
 	 (float)[self caret]*100.0 / (float)[[storage string] length]];
+	return YES;
+}
+
+/* syntax: m<char> */
+- (BOOL)set_mark:(ViCommand *)command
+{
 	return YES;
 }
 

@@ -1,6 +1,7 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
 #import "ExCommand.h"
+#import "ViAppController.h"
 
 @implementation ViTextView (ex_commands)
 

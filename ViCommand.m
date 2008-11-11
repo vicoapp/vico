@@ -1,4 +1,5 @@
 #import "ViCommand.h"
+#import "logging.h"
 
 #define has_flag(key, flag) ((((key)->flags) & flag) == flag)
 
@@ -47,6 +48,7 @@ static struct vikey vikeys[] = {
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
+	{@"set_mark:",		'm', VIF_NEED_CHAR},
 	{@"repeat_find:",	'n', VIF_IS_MOTION},
 	{@"open_line_below:",	'o', VIF_SETS_DOT},
 	{@"put_after:",		'p', VIF_SETS_DOT},
@@ -198,7 +200,7 @@ find_command(int key)
 		}
 		else
 		{
-			NSLog(@"repeating '%c' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
+			DEBUG(@"repeating '%c' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
 			command = last_ftFT_command;
 			method = last_ftFT_command->method;
 			argument = last_ftFT_argument;

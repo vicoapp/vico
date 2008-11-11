@@ -30,8 +30,7 @@
 - (void)setPageGuide:(int)pageGuideValue;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(int)regexpSyntax
-   ignoreLastRegexp:(BOOL)ignoreLastRegexp;
+         regexpType:(int)regexpSyntax;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;

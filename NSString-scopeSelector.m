@@ -1,4 +1,5 @@
 #import "NSString-scopeSelector.h"
+#import "logging.h"
 
 /* returns 10^x */
 static u_int64_t tenpow(unsigned x)
@@ -50,7 +51,7 @@ static u_int64_t tenpow(unsigned x)
 		{
 			NSString *scope = [scopes objectAtIndex:i+j];
 			NSString *selector = [descendants objectAtIndex:j];
-			//NSLog(@"comparing selector [%@] with scope [%@]", selector, scope);
+			DEBUG(@"comparing selector [%@] with scope [%@]", selector, scope);
 			if([scope hasPrefix:selector])
 			{
 				// "Another 10^<depth> points is given for each additional part of the scope that is matched"

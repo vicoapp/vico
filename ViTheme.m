@@ -1,5 +1,6 @@
 #import "ViTheme.h"
 #import "NSString-scopeSelector.h"
+#import "logging.h"
 
 @implementation ViTheme
 
@@ -11,7 +12,7 @@
 		return nil;
 	if(rc == 3)
 		a = 255;
-	//NSLog(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
+	DEBUG(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
 	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
 }
 
@@ -69,7 +70,7 @@
 		for(scopeSelector in scopeSelectors)
 		{
 			[themeAttributes setObject:attrs forKey:scopeSelector];
-			//NSLog(@"%s  %@ = %@", _cmd, scope, attrs);
+			DEBUG(@"%s  %@ = %@", _cmd, scope, attrs);
 		}
 	}
 
@@ -120,7 +121,7 @@
 
 	if(foundScopeSelector)
 	{
-		//NSLog(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
+		DEBUG(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
 		attributes = [themeAttributes objectForKey:foundScopeSelector];
 
 		// FIXME: backgrounds with alpha is not supported, and blended colors doesn't look good
@@ -139,7 +140,7 @@
 	}
 	else
 	{
-		//NSLog(@"     scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
+		DEBUG(@"     scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
 		// also cache non-hits
 		[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:key];
 	}

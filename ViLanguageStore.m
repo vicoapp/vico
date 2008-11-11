@@ -80,7 +80,7 @@ static ViLanguageStore *defaultStore = nil;
 	languages = [[NSMutableDictionary alloc] init];
 	bundles = [[NSMutableArray alloc] init];
 
-	NSLog(@"start initializing languages");
+	DEBUG(@"start initializing languages");
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 #if 0
 	[self addBundlesFromBundleDirectory:@"/Library/Application Support/TextMate/Bundles"];
@@ -88,7 +88,7 @@ static ViLanguageStore *defaultStore = nil;
 	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
 #endif
 	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/Vizard/Bundles" stringByExpandingTildeInPath]];
-	NSLog(@"finished initializing languages");
+	DEBUG(@"finished initializing languages");
 }
 
 + (ViLanguageStore *)defaultStore
@@ -116,15 +116,15 @@ static ViLanguageStore *defaultStore = nil;
 			ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
 			if ([rx matchInString:firstLine])
 			{
-				NSLog(@"Using language %@ for first line [%@]", [language name], firstLine);
+				DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
 				if (languagePtr)
 					*languagePtr = language;
-				NSLog(@"Using bundle %@", [bundle name]);
+				DEBUG(@"Using bundle %@", [bundle name]);
 				return bundle;
 			}
 		}
 	}
-	NSLog(@"No language matching first line [%@]", firstLine);
+	DEBUG(@"No language matching first line [%@]", firstLine);
 	return nil;
 }
 
@@ -147,16 +147,16 @@ static ViLanguageStore *defaultStore = nil;
 				    (path_len == ftype_len ||
 				     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]]))
 				{
-					NSLog(@"Using language %@ for file %@", [language name], aPath);
+					DEBUG(@"Using language %@ for file %@", [language name], aPath);
 					if (languagePtr)
 						*languagePtr = language;
-					NSLog(@"Using bundle %@", [bundle name]);
+					DEBUG(@"Using bundle %@", [bundle name]);
 					return bundle;
 				}
 			}
 		}
 	}
-	NSLog(@"No language found for file %@", aPath);
+	DEBUG(@"No language found for file %@", aPath);
 	return nil;
 }
 

@@ -63,10 +63,12 @@
 
 - (void)applyContext:(NSMutableArray *)context
 {
+#ifndef NO_DEBUG
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
+#endif
 
 	// [[NSGarbageCollector defaultCollector] disable];
 
@@ -79,11 +81,13 @@
 	// [beginTree performSelectorWithAllObjects:@selector(debugScopes:) target:self];
 	[beginTree performSelectorWithAllObjects:@selector(applyScopes:) target:self];
 
+#ifndef NO_DEBUG
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	DEBUG(@"applied %u scopes from context in range %@ => %.3f s",
+	INFO(@"applied %u scopes from context in range %@ => %.3f s",
 		[beginTree count], NSStringFromRange(wholeRange), (float)ms / 1000.0);
+#endif
 
 	// [[NSGarbageCollector defaultCollector] enable];
 }
@@ -642,7 +646,7 @@ done:
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
+	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 
 	if (![[NSThread currentThread] isCancelled])
@@ -652,6 +656,7 @@ done:
 	}
 
 	[[NSGarbageCollector defaultCollector] enable];
+	[[NSGarbageCollector defaultCollector] collectIfNeeded];
 }
 
 - (void)highlightInBackground:(NSArray *)vars
@@ -768,14 +773,12 @@ done:
 	
 	if (ignoreEditing)
 	{
-		INFO(@"ignoring editing notification");
 		ignoreEditing = NO;
 		return;
 	}
 	
 	if (language == nil)
 	{
-		// [self resetAttributesInRange:NSMakeRange(0, [storage length])];
 		[self resetAttributesInRange:area];
 		return;
 	}

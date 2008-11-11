@@ -176,9 +176,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(int)regexpSyntax
-   ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
-	return [textView findPattern:pattern options:find_options regexpType:regexpSyntax ignoreLastRegexp:ignoreLastRegexp];
+	return [textView findPattern:pattern options:find_options regexpType:regexpSyntax];
 }
 
 // tag push

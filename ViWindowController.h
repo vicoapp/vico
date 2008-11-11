@@ -8,7 +8,8 @@
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSTabView *tabView;
-	IBOutlet NSDrawer *projectDrawer;
+	IBOutlet NSSplitView *splitView;
+	IBOutlet NSOutlineView *projectView;
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;

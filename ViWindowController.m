@@ -67,6 +67,9 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
+	// leave the project split view collapsed for now
+	[splitView setPosition:0.0 ofDividerAtIndex:0];
+
 	[[self window] makeKeyAndOrderFront:self];
 }
 
@@ -261,12 +264,53 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)toggleProjectDrawer:(id)sender
 {
-	[projectDrawer toggle:sender];
 }
 
 - (void)switchToLastFile
 {
         [self selectDocument:lastDocument];
+}
+
+- (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview
+{
+	return YES;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
+{
+	return 70;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
+{
+	return 270;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+{
+	return YES;
+}
+
+- (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize
+{
+	NSRect newFrame = [sender frame];
+	float dividerThickness = [sender dividerThickness];
+	
+	NSView *firstView = [[sender subviews] objectAtIndex:0];
+	NSView *secondView = [[sender subviews] objectAtIndex:1];
+	
+	NSRect firstFrame = [firstView frame];
+	NSRect secondFrame = [secondView frame];
+	
+	if (sender == splitView)
+	{
+		/* keep sidebar in constant width */
+		secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + dividerThickness);
+		secondFrame.size.height = newFrame.size.height;
+	}
+	
+	[secondView setFrame:secondFrame];
+	[sender adjustSubviews];
 }
 
 @end

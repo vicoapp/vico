@@ -225,6 +225,7 @@
 - (void)test40_singleComment
 {
 	ExCommand *ex = [[ExCommand alloc] initWithString:@":\"foo|set"];
+	// "
 	STAssertNotNil(ex, nil);
 	STAssertEqualObjects(ex.name, nil, nil);
 	STAssertTrue(ex.command == NULL, nil);
@@ -235,8 +236,8 @@
 	ExCommand *ex = [[ExCommand alloc] initWithString:@":3,5:print"];
 	STAssertNotNil(ex, nil);
 	STAssertEquals(ex.naddr, (unsigned)2, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.addr2->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr2]->type, EX_ADDR_ABS, nil);
 	STAssertEqualObjects(ex.name, @"print", nil);
 	STAssertEqualObjects(ex.method, @"ex_pr", nil);
 }
@@ -249,14 +250,14 @@
 	STAssertEqualObjects(ex.method, @"ex_delete", nil);
 
 	STAssertEquals(ex.naddr, (unsigned)2, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.addr1->addr.abs.line, 3, nil);
-	STAssertEquals(ex.addr1->addr.abs.column, 1, nil);
-	STAssertEquals(ex.addr1->offset, 0, nil);
-	STAssertEquals(ex.addr2->type, EX_ADDR_SEARCH, nil);
-	STAssertEqualObjects(ex.addr2->addr.search.pattern, @"pattern", nil);
-	STAssertEquals(ex.addr2->addr.search.backwards, NO, nil);
-	STAssertEquals(ex.addr2->offset, 0, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr1]->addr.abs.line, 3, nil);
+	STAssertEquals([ex addr1]->addr.abs.column, 1, nil);
+	STAssertEquals([ex addr1]->offset, 0, nil);
+	STAssertEquals([ex addr2]->type, EX_ADDR_SEARCH, nil);
+	STAssertEqualObjects([ex addr2]->addr.search.pattern, @"pattern", nil);
+	STAssertEquals([ex addr2]->addr.search.backwards, NO, nil);
+	STAssertEquals([ex addr2]->offset, 0, nil);
 	
 }
 
@@ -266,9 +267,9 @@
 	STAssertNotNil(ex, nil);
 	STAssertEqualObjects(ex.method, @"ex_put", nil);
 	STAssertEquals(ex.naddr, (unsigned)1, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.addr1->addr.abs.line, 5, nil);
-	STAssertEquals(ex.addr1->addr.abs.column, 1, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr1]->addr.abs.line, 5, nil);
+	STAssertEquals([ex addr1]->addr.abs.column, 1, nil);
 }
 
 - (void)test60_OneAddressCommandWithZeroAddresses
@@ -277,7 +278,7 @@
 	STAssertNotNil(ex, nil);
 	STAssertEqualObjects(ex.method, @"ex_put", nil);
 	STAssertEquals(ex.naddr, (unsigned)1, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_CURRENT, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_CURRENT, nil);
 }
 
 
@@ -299,9 +300,9 @@
 	STAssertEqualObjects(ex.name, @"t", nil);
 	STAssertEqualObjects(ex.method, @"ex_copy", nil);
 	STAssertEquals(ex.naddr, (unsigned)2, nil);
-	STAssertEquals(ex.line->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.line->addr.abs.line, 0, nil);
-	STAssertEquals(ex.line->offset, 0, nil);
+	STAssertEquals([ex line]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex line]->addr.abs.line, 0, nil);
+	STAssertEquals([ex line]->offset, 0, nil);
 }
 
 - (void)test70_MoveCommandWithDestinationAddress
@@ -311,12 +312,12 @@
 	STAssertEqualObjects(ex.name, @"m", nil);
 	STAssertEqualObjects(ex.method, @"ex_move", nil);
 	STAssertEquals(ex.naddr, (unsigned)2, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.addr2->type, EX_ADDR_CURRENT, nil);
-	STAssertEquals(ex.line->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.line->addr.abs.line, -1, nil);
-	STAssertEquals(ex.line->addr.abs.column, 1, nil);
-	STAssertEquals(ex.line->offset, 0, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr2]->type, EX_ADDR_CURRENT, nil);
+	STAssertEquals([ex line]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex line]->addr.abs.line, -1, nil);
+	STAssertEquals([ex line]->addr.abs.column, 1, nil);
+	STAssertEquals([ex line]->offset, 0, nil);
 }
 
 - (void)test70_MoveCommandWithDestinationAddressAndOffset
@@ -326,10 +327,10 @@
 	STAssertEqualObjects(ex.name, @"m", nil);
 	STAssertEqualObjects(ex.method, @"ex_move", nil);
 	STAssertEquals(ex.naddr, (unsigned)2, nil);
-	STAssertEquals(ex.addr1->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.addr2->type, EX_ADDR_ABS, nil);
-	STAssertEquals(ex.line->type, EX_ADDR_CURRENT, nil);
-	STAssertEquals(ex.line->offset, -2, nil);
+	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex addr2]->type, EX_ADDR_ABS, nil);
+	STAssertEquals([ex line]->type, EX_ADDR_CURRENT, nil);
+	STAssertEquals([ex line]->offset, -2, nil);
 }
 
 - (void)test70_EditCommandWithPlusCommand

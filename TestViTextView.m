@@ -19,9 +19,11 @@
 - (void)setUp
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
+	[vi initEditorWithDelegate:nil];
 }
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }
+- (void)test002_SetString			{ [vi setString:@"sample"]; STAssertEqualObjects([[vi textStorage] string], @"sample", nil); }
 
 - (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 10); }
 - (void)test010_InsertTextAndEscape		{ TEST(@"abc def", 3, @"i qwerty\x1b", @"abc qwerty def", 9); }

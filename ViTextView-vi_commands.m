@@ -615,9 +615,9 @@
 		count = IMAX(command.motion_count, 1);
 	while (count--)
 	{
-		while (--i > bol && [[storage string] characterAtIndex:i] != command.argument)
+		while (--i >= bol && [[storage string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
-		if (i == bol)
+		if (i < bol)
 		{
 			[[self delegate] message:@"%C not found", command.argument];
 			return NO;

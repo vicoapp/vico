@@ -6,7 +6,6 @@
 @implementation ViAppController
 
 @synthesize lastSearchPattern;
-@synthesize lastSearchRegexp;
 
 - (id)init
 {

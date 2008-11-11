@@ -44,6 +44,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSDictionary *inputCommands;
 	NSDictionary *normalCommands;
 
+	NSMutableDictionary *marks;
+
+	// language parsing and highlighting
 	BOOL ignoreEditing;
 	ViTheme *theme;
 	ViBundle *bundle;
@@ -96,8 +99,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
-         regexpType:(int)regexpSyntax
-   ignoreLastRegexp:(BOOL)ignoreLastRegexp;
+         regexpType:(int)regexpSyntax;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
@@ -138,4 +140,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView (vi_commands)
 - (BOOL)move_left:(ViCommand *)command;
+- (BOOL)delete:(ViCommand *)command;
+- (BOOL)yank:(ViCommand *)command;
 @end

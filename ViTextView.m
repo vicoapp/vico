@@ -33,6 +33,7 @@ int logIndent = 0;
 	buffers = [[NSApp delegate] sharedBuffers];
 	storage = [self textStorage];
 	inputKeys = [[NSMutableArray alloc] init];
+	marks = [[NSMutableDictionary alloc] init];
 	lastCursorLocation = -1;
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
@@ -616,7 +617,7 @@ int logIndent = 0;
 	if ([exCommandString length] > 0)
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
-		// NSLog(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
+		DEBUG(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
 		if (ex.command == NULL)
 			[[self delegate] message:@"The %@ command is unknown.", ex.name];
 		else
@@ -644,40 +645,30 @@ int logIndent = 0;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(int)regexpSyntax
-   ignoreLastRegexp:(BOOL)ignoreLastRegexp
 {
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
 		rx_options |= ONIG_OPTION_IGNORECASE;
 
-	ViRegexp *lastSearchRegexp = [[NSApp delegate] lastSearchRegexp];
-	NSString *lastSearchPattern = [[NSApp delegate] lastSearchPattern];
-	if (![lastSearchPattern isEqualToString:pattern])
+	ViRegexp *rx = nil;
+
+	/* compile the pattern regexp */
+	@try
 	{
-		lastSearchRegexp = nil;
+		rx = [ViRegexp regularExpressionWithString:pattern
+						   options:rx_options
+						    syntax:regexpSyntax];
+	}
+	@catch(NSException *exception)
+	{
+		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
+		[[self delegate] message:@"Invalid search pattern: %@", exception];
+		return NO;
 	}
 
-	if (lastSearchRegexp == nil || ignoreLastRegexp)
-	{
-		/* compile the pattern regexp */
-		@try
-		{
-			lastSearchRegexp = [ViRegexp regularExpressionWithString:pattern
-								         options:rx_options
-								          syntax:regexpSyntax];
-		}
-		@catch(NSException *exception)
-		{
-			INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
-			[[self delegate] message:@"Invalid search pattern: %@", exception];
-			return NO;
-		}
+	[[NSApp delegate] setLastSearchPattern:pattern];
 
-		[[NSApp delegate] setLastSearchPattern:pattern];
-		[[NSApp delegate] setLastSearchRegexp:lastSearchRegexp];
-	}
-
-	NSArray *foundMatches = [lastSearchRegexp allMatchesInString:[storage string] options:rx_options];
+	NSArray *foundMatches = [rx allMatchesInString:[storage string] options:rx_options];
 
 	if ([foundMatches count] == 0)
 	{
@@ -698,6 +689,8 @@ int logIndent = 0;
 			{
 				nextMatch = match;
 			}
+			if (nextMatch)
+				break;
 		}
 
 		if (nextMatch == nil)
@@ -727,7 +720,7 @@ int logIndent = 0;
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	return [self findPattern:pattern options:find_options regexpType:0 ignoreLastRegexp:NO];
+	return [self findPattern:pattern options:find_options regexpType:0];
 }
 
 - (void)find_forward_callback:(NSString *)pattern
@@ -1094,7 +1087,7 @@ int logIndent = 0;
 - (void)keyDown:(NSEvent *)theEvent
 {
 #if 0
-	NSLog(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
+	INFO(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
               ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
@@ -1326,7 +1319,7 @@ int logIndent = 0;
 			style, NSParagraphStyleAttributeName,
 			[theme foregroundColor], NSForegroundColorAttributeName,
 			nil];
-	INFO(@"setting typing attributes to %@", attrs);
+	DEBUG(@"setting typing attributes to %@", attrs);
 	[self setTypingAttributes:attrs];
 
 	ignoreEditing = YES; // XXX: don't parse scopes when setting tab size

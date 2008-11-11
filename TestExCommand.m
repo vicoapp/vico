@@ -283,14 +283,13 @@
 
 
 
-- (void)test70_GlobalCommandWithColonBeforeFlags
+- (void)test70_GlobalCommandWithStringArgument
 {
 	ExCommand *ex = [[ExCommand alloc] initWithString:@":g/pattern/:p"];
 	STAssertNotNil(ex, nil);
 	STAssertEqualObjects(ex.name, @"g", nil);
 	STAssertEqualObjects(ex.method, @"ex_global", nil);
-	STAssertEqualObjects(ex.regexp, @"pattern", nil);
-	STAssertEquals(ex.flags, (unsigned)E_C_PRINT, nil);
+	STAssertEqualObjects(ex.string, @"/pattern/:p", nil);
 }
 
 - (void)test70_CopyToLineZero

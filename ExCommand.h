@@ -79,8 +79,7 @@ struct ex_address
 
 	// arguments (depending on the command)
 	NSString *filename;
-	NSString *filter;
-	NSString *regexp;
+	NSString *arg_string;
 	NSString *replacement;
 	NSString *plus_command;
 	NSArray *words;
@@ -102,7 +101,7 @@ struct ex_address
 @property(readonly) NSString *name;
 @property(readonly) NSString *method;
 @property(readonly) NSString *filename;
-@property(readonly) NSString *regexp;
+@property(readonly) NSString *string;
 @property(readonly) NSString *plus_command;
 @property(readonly) NSArray *words;
 

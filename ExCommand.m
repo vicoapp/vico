@@ -465,7 +465,7 @@ ex_cmd_find(NSString *cmd)
 @synthesize command;
 @synthesize method;
 @synthesize filename;
-@synthesize regexp;
+@synthesize string = arg_string;
 @synthesize plus_command;
 @synthesize words;
 
@@ -1007,7 +1007,8 @@ end_case1:		break;
 		case 'S':				/* string, file exp. */
 			break;
 		case 's':				/* string */
-			break;
+			arg_string = [[scan string] substringFromIndex:[scan scanLocation]];
+			goto addr_verify;
 		case 'W':				/* word string */
 			break;
 		case 'w':				/* word */

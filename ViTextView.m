@@ -975,9 +975,10 @@ int logIndent = 0;
 	/* check if we're deleting the first character in a smart pair */
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
 	NSArray *pair;
-	for(pair in smartTypingPairs)
+	for (pair in smartTypingPairs)
 	{
 		if([[pair objectAtIndex:0] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
+		   start_location + 1 < [storage length] &&
 		   [[pair objectAtIndex:1] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)]])
 		{
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
@@ -1019,7 +1020,7 @@ int logIndent = 0;
 	}
 
 	BOOL foundSmartTypingPair = NO;
-	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location];
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [storage length] - 1)];
 	NSArray *pair;
 	for (pair in smartTypingPairs)
 	{
@@ -1041,8 +1042,8 @@ int logIndent = 0;
 		else if ([[pair objectAtIndex:0] isEqualToString:characters])
 		{
 			// don't use it if next character is alphanumeric
-			if (!(start_location >= [storage length] ||
-			      [[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]]))
+			if (start_location + 1 >= [storage length] ||
+			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]])
 			{
 				foundSmartTypingPair = YES;
 				[self insertString:[pair objectAtIndex:0] atLocation:start_location];

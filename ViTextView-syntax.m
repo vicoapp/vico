@@ -551,10 +551,12 @@ done:
          continuations:(NSArray *)continuations      // nil on main thread
             characters:(unichar *)chars              // nil on main thread
 {
+#ifndef NO_DEBUG
 	struct timeval start;
 	struct timeval stop_time;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
+#endif
 
 	regexps_tried = 0;
 	regexps_overlapped = 0;
@@ -643,11 +645,13 @@ done:
 
 	free(chars);
 
+#ifndef NO_DEBUG
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
+	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
+#endif
 
 	if (![[NSThread currentThread] isCancelled])
 	{

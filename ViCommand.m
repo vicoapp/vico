@@ -72,6 +72,8 @@ static struct vikey vikeys[] = {
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},
 	{@"filter:",		'!', VIF_SETS_DOT | VIF_NEED_MOTION},
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
+	{@"move_to_mark:",	'\'', VIF_NEED_CHAR | VIF_IS_MOTION},
+	{@"move_to_mark:",	'`', VIF_NEED_CHAR | VIF_IS_MOTION},
 	{nil, -1, 0}
 };
 

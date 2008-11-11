@@ -46,6 +46,7 @@
 		9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */; };
 		9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC16DA30D93D14A00AE45E0 /* ViDocument.m */; };
 		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
+		9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD772810EC9A6CB00D05DDE /* ViMark.m */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
 		9AEE8B7E0D929DED00189D7B /* ProjectDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AEE8B7D0D929DED00189D7B /* ProjectDelegate.m */; };
@@ -163,6 +164,8 @@
 		9AC16DA20D93D14A00AE45E0 /* ViDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocument.h; sourceTree = "<group>"; };
 		9AC16DA30D93D14A00AE45E0 /* ViDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocument.m; sourceTree = "<group>"; };
 		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
+		9AD772800EC9A6CB00D05DDE /* ViMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMark.h; sourceTree = "<group>"; };
+		9AD772810EC9A6CB00D05DDE /* ViMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMark.m; sourceTree = "<group>"; };
 		9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-vi_commands.m"; sourceTree = "<group>"; };
 		9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
 		9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagStack.m; sourceTree = "<group>"; };
@@ -238,6 +241,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9AD772800EC9A6CB00D05DDE /* ViMark.h */,
+				9AD772810EC9A6CB00D05DDE /* ViMark.m */,
 				9AF41A540EC6E1CB00F1D681 /* MarkerLineNumberView.h */,
 				9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */,
 				9A6C152A0EC6D280002D6A22 /* NoodleLineNumberMarker.h */,
@@ -554,6 +559,7 @@
 				9A6C15240EC6D1B2002D6A22 /* NoodleLineNumberView.m in Sources */,
 				9A6C152C0EC6D280002D6A22 /* NoodleLineNumberMarker.m in Sources */,
 				9AF41A560EC6E1CB00F1D681 /* MarkerLineNumberView.m in Sources */,
+				9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

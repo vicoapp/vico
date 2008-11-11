@@ -1,5 +1,6 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
+#import "ViMark.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -1123,6 +1124,38 @@
 /* syntax: m<char> */
 - (BOOL)set_mark:(ViCommand *)command
 {
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	ViMark *m = [[ViMark alloc] initWithLine:[self currentLine] column:start_location - bol];
+	INFO(@"set mark %C at line %u, column %u", command.argument, m.line, m.column);
+	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", command.argument]];
+	return YES;
+}
+
+/* syntax: '<char> */
+/* syntax: `<char> */
+- (BOOL)move_to_mark:(ViCommand *)command
+{
+	ViMark *m = [marks objectForKey:[NSString stringWithFormat:@"%C", command.argument]];
+	if (m == nil)
+	{
+		[[self delegate] message:@"Mark %C: not set", command.argument];
+		return NO;
+	}
+	
+	NSInteger bol = [self locationForStartOfLine:m.line];
+	if (bol == -1)
+	{
+		[[self delegate] message:@"Mark %C: the line was deleted", command.argument];
+		return NO;
+	}
+	final_location = bol;
+
+	if (command.key == '`' || command.motion_key == '`')
+		[self gotoColumn:m.column fromLocation:bol];
+	else
+		final_location = [self skipWhitespaceFrom:final_location];
+
 	return YES;
 }
 

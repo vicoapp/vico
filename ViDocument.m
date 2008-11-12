@@ -258,7 +258,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	[textView setLanguage:[sender title]];
 	ViLanguage *lang = [textView language];
-	if (lang)
+	if (lang && [self fileURL])
 	{
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
 		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];

@@ -12,7 +12,9 @@
 	NoodleLineNumberView *lineNumberView;
 	IBOutlet NSTextField *statusbar;
 	IBOutlet NSPopUpButton *languageButton;
-	IBOutlet NSPopUpButton *symbolsButton;
+	IBOutlet NSTableView *symbolsOutline;
+	IBOutlet NSSplitView *splitView;
+	NSArray *symbols;
 	SEL exCommandSelector;
 	ViWindowController *windowController;
 	NSString *readContent;
@@ -34,6 +36,7 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
+- (void)setSymbols:(NSArray *)symbols;
 
 @end
 

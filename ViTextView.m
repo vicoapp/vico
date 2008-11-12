@@ -854,7 +854,7 @@ int logIndent = 0;
 		l2 = l1;
 		l1 = end_location;
 	}
-	INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	DEBUG(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
 	if (command.line_mode && !command.ismotion)
 	{
@@ -884,7 +884,7 @@ int logIndent = 0;
 
 		l1 = bol;
 		l2 = end;
-		INFO(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
@@ -1394,6 +1394,67 @@ int logIndent = 0;
 - (void)switch_file:(NSString *)character
 {
         [[[self delegate] windowController] switchToLastFile];
+}
+
+- (void)updateSymbolList
+{
+	NSDictionary *symbolsDict = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList"];
+	NSArray *symbolScopes = [symbolsDict allKeys]; // FIXME: only where value = 1
+
+	NSString *lastSelector = nil;
+	NSString *lastSymbol = nil;
+	NSUInteger lastLine = 0;
+
+	NSMutableArray *symbols = [[NSMutableArray alloc] init];
+
+	NSUInteger i;
+	for (i = 0; i < [storage length];)
+	{
+		NSRange range = NSMakeRange(0, 0);
+		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+					                  atCharacterIndex:i
+						            effectiveRange:&range];
+	
+		if (scopes == nil)
+		{
+			break;
+		}
+
+		//range.location -= 1; // XXX: ?
+
+		if ([lastSelector matchesScopes:scopes])
+		{
+			lastSymbol = [lastSymbol stringByAppendingString:[[storage string] substringWithRange:NSMakeRange(i, NSMaxRange(range) - i)]];
+		}
+		else
+		{
+			if (lastSymbol)
+			{
+				[symbols addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+					[NSNumber numberWithUnsignedInteger:lastLine], @"line",
+					lastSymbol, @"symbol",
+					nil]];
+			}
+			lastSelector = nil;
+			lastSymbol = nil;
+
+			NSString *selector;
+			for (selector in symbolScopes)
+			{
+				if ([selector matchesScopes:scopes])
+				{
+					lastSelector = selector;
+					lastSymbol = [[storage string] substringWithRange:range];
+					lastLine = [self lineNumberAtLocation:range.location];
+					break;
+				}
+			}
+		}
+		
+		i += range.length;
+	}
+
+	[[self delegate] setSymbols:symbols];
 }
 
 @end

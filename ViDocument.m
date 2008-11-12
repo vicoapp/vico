@@ -88,17 +88,24 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
 
-	[symbolsButton removeAllItems];
-	[symbolsButton addItemWithTitle:@"not implemented"];
-	[symbolsButton setEnabled:NO];
-	[symbolsButton setFont:[NSFont controlContentFontOfSize:11.0]];
-
 	[languageButton removeAllItems];
 	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
 	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"]];
+
+	[symbolsOutline setDataSource:self];
+	[symbolsOutline setTarget:self];
+	[symbolsOutline setDoubleAction:@selector(goToSymbolAndCloseOutline:)];
+	[symbolsOutline setAction:@selector(goToSymbolAndCloseOutline:)];
+	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
+	[cell setFont:[NSFont systemFontOfSize:10.0]];
+	[symbolsOutline setRowHeight:12.0];
+	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
+	[cell setWraps:NO];
+
+	[splitView setDelegate:self];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -265,5 +272,88 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
 }
+
+#pragma mark -
+#pragma mark Symbol List
+
+- (void)goToSymbolAndCloseOutline:(id)sender
+{
+	NSInteger row = [symbolsOutline clickedRow];
+	if (row >= 0)
+	{
+		NSInteger lineno = [[[symbols objectAtIndex:row] objectForKey:@"line"] integerValue];
+		[textView gotoLine:lineno column:0];
+		[[[self windowController] window] makeFirstResponder:textView];
+	}
+}
+
+- (void)setSymbols:(NSArray *)aSymbolArray
+{
+	symbols = aSymbolArray;
+
+	[symbolsOutline reloadData];
+}
+
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+	return [[symbols objectAtIndex:rowIndex] objectForKey:@"symbol"];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return [symbols count];
+}
+
+#pragma mark -
+#pragma mark Symbol Split View delegate
+
+- (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview
+{
+	return YES;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
+{
+	return 400;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
+{
+	return proposedMax - 100;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+{
+	return YES;
+}
+
+- (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize
+{
+	NSRect newFrame = [sender frame];
+	float dividerThickness = [sender dividerThickness];
+
+	NSView *firstView = [[sender subviews] objectAtIndex:0];
+	NSView *secondView = [[sender subviews] objectAtIndex:1];
+
+	NSRect firstFrame = [firstView frame];
+	NSRect secondFrame = [secondView frame];
+
+	/* Keep symbol list in constant width. */
+	firstFrame.size.width = newFrame.size.width - (secondFrame.size.width + dividerThickness);
+	firstFrame.size.height = newFrame.size.height;
+
+	if (firstFrame.size.width < 0)
+	{
+		firstFrame.size.width = 0;
+		secondFrame.size.width = newFrame.size.width - firstFrame.size.width - dividerThickness;
+	}
+
+	secondFrame.origin.x = firstFrame.size.width + dividerThickness;
+
+	[firstView setFrame:firstFrame];
+	[secondView setFrame:secondFrame];
+	[sender adjustSubviews];
+}
+
 
 @end

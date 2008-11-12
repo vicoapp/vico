@@ -684,6 +684,7 @@ done:
 	{
 		DEBUG(@"highlight thread %p (%p) finished", [NSThread currentThread], highlightThread);
 		highlightThread = nil; // XXX: race condition?
+		[self performSelectorOnMainThread:@selector(updateSymbolList) withObject:nil waitUntilDone:NO];
 	}
 }
 
@@ -813,6 +814,9 @@ done:
 	// temporary attributes don't work right when called from a notification
 	// FIXME: try call this in - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender instead
 	[self performSelector:@selector(highlightInWrappedRange:) withObject:[NSValue valueWithRange:area] afterDelay:0.0];
+
+	// Also update the symbol list.
+	// [self performSelector:@selector(updateSymbolList) withObject:nil afterDelay:0.0];
 }
 
 - (void)highlightEverything

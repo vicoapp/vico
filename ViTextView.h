@@ -123,6 +123,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
 
+- (void)updateSymbolList;
+
 @end
 
 @interface ViTextView (snippets)

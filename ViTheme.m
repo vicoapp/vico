@@ -51,12 +51,9 @@
 		if(foreground)
 			[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
 
-		// disable background colors for now, see comment below about alpha channels in backgrounds
-#if 0
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
 		if(background)
 			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
-#endif
 
 		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
 		if(fontStyle)
@@ -91,25 +88,14 @@
 {
 	NSString *key = [scopes componentsJoinedByString:@""];
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
-	if(attributes)
+	if (attributes)
 	{
 		return [attributes count] == 0 ? nil : attributes;
 	}
 
-	NSString *foundScopeSelector = nil;
-	NSString *scopeSelector;
-	u_int64_t highest_rank = 0;
-	for(scopeSelector in [themeAttributes allKeys])
-	{
-		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if(rank > highest_rank)
-		{
-			foundScopeSelector = scopeSelector;
-			highest_rank = rank;
-		}
-	}
+	attributes = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *attributesRank = [[NSMutableDictionary alloc] init];
 
-	// FIXME: merge multiple attributes using the same scope selector
 	// From the textmate manual:
 	// "For themes and preference items, the winner is undefined when
 	//  multiple items use the same scope selector, though this is on
@@ -119,31 +105,36 @@
 	//  would be that the foreground was taken from the latter item and
 	//  background from the former."
 
-	if(foundScopeSelector)
+	NSString *scopeSelector;
+	for (scopeSelector in [themeAttributes allKeys])
 	{
-		DEBUG(@"     using scope selector [%@] for scopes [%@]", foundScopeSelector, [scopes componentsJoinedByString:@" "]);
-		attributes = [themeAttributes objectForKey:foundScopeSelector];
-
-		// FIXME: backgrounds with alpha is not supported, and blended colors doesn't look good
-		// disable background colors for now
-#if 0
-		NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
-		if(bg)
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if (rank > 0)
 		{
-			NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
-			[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
+			NSDictionary *attrs = [themeAttributes objectForKey:scopeSelector];
+			NSString *attrKey;
+			for (attrKey in attrs)
+			{
+				NSUInteger prevRank = [[attributesRank objectForKey:attrKey] unsignedIntegerValue];
+				if (rank > prevRank)
+				{
+					[attributes setObject:[attrs objectForKey:attrKey] forKey:attrKey];
+					[attributesRank setObject:[NSNumber numberWithUnsignedInteger:rank] forKey:attrKey];
+				}
+			}
 		}
-#endif
-		
-		// cache it
-		[scopeSelectorCache setObject:attributes forKey:key];
 	}
-	else
+
+	// Backgrounds with alpha is not supported, so blend the background colors together.
+	NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
+	if (bg)
 	{
-		DEBUG(@"     scopes [%@] has no attributes", [scopes componentsJoinedByString:@" "]);
-		// also cache non-hits
-		[scopeSelectorCache setObject:[NSDictionary dictionary] forKey:key];
+		NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
+		[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
 	}
+		
+	// cache it
+	[scopeSelectorCache setObject:attributes forKey:key];
 
 	return attributes;
 }

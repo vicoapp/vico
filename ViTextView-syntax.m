@@ -227,7 +227,6 @@
 		   inRange:(NSRange)aRange
 	       openMatches:(NSArray *)openMatches
 		reachedEOL:(BOOL *)reachedEOL
-		matchCache:(NSMutableDictionary *)matchCache
 		characters:(const unichar *)chars
 	           context:(NSMutableArray *)context
 {
@@ -273,26 +272,18 @@
 		if (regexp == nil)
 			continue;
 		NSArray *matches;
-		matches = [matchCache objectForKey:[NSValue valueWithPointer:pattern]];
-		if (matches == nil)
-		{
-			regexps_tried++;
-			if (chars)
-				matches = [regexp allMatchesInCharacters:chars range:aRange start:0];
-			else
-				matches = [regexp allMatchesInString:[storage string] range:aRange start:0];
-
-			regexps_matched += [matches count];
-			// INFO(@"caching %i matches for pattern [%@]", [matches count], regexp);
-			[matchCache setObject:matches ?: [NSArray array] forKey:[NSValue valueWithPointer:pattern]];
-
-			if ([matches count] == 0)
-				DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
-			else
-				DEBUG(@"  matching against pattern %@ = %i matches", [pattern objectForKey:@"name"], [matches count]);
-		}
+		regexps_tried++;
+		if (chars)
+			matches = [regexp allMatchesInCharacters:chars range:aRange start:0];
 		else
-			regexps_cached += [matches count];
+			matches = [regexp allMatchesInString:[storage string] range:aRange start:0];
+
+		regexps_matched += [matches count];
+
+		if ([matches count] == 0)
+			DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
+		else
+			DEBUG(@"  matching against pattern %@ = %i matches", [pattern objectForKey:@"name"], [matches count]);
 
 		ViRegexpMatch *match;
 		for (match in matches)
@@ -385,7 +376,6 @@
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL
-								matchCache:matchCache
 								characters:chars
 							           context:context];
 			logIndent--;
@@ -459,8 +449,6 @@ done:
 	DEBUG(@"-----> line range = %u (%u) + %u", aRange.location, aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
-	NSMutableDictionary *matchCache = nil; // [[NSMutableDictionary alloc] init];
-
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
 	while ([continuedMatches count] > 0)
@@ -479,7 +467,6 @@ done:
 					       inRange:aRange
 					   openMatches:continuedMatches
 					    reachedEOL:&reachedEOL
-					    matchCache:matchCache
 					    characters:chars
 					       context:context];
 
@@ -499,7 +486,6 @@ done:
 	                   inRange:aRange
 	               openMatches:[NSArray array]
 	                reachedEOL:nil
-	                 matchCache:matchCache
 	                 characters:chars
 	                    context:context];
 }

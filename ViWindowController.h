@@ -10,6 +10,7 @@
 	IBOutlet NSTabView *tabView;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSOutlineView *projectView;
+	IBOutlet NSToolbar *toolbar;
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;

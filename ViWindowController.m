@@ -43,6 +43,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowDidLoad
 {
+	[toolbar setDelegate:self];
+	[[self window] setToolbar:toolbar];
+
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
 	[tabBar setStyleNamed:@"Unified"];

@@ -1,3 +1,4 @@
+#import "ViDocument.h"
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViSyntaxMatch.h"

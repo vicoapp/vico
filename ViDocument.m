@@ -289,9 +289,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (IBAction)filterSymbols:(id)sender
 {
-	INFO(@"sender = %@", sender);
 	NSString *filter = [sender stringValue];
-	INFO(@"filter on [%@]", filter);
 
 	NSMutableString *pattern = [NSMutableString string];
 	int i;
@@ -300,7 +298,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
 	}
 	[pattern appendString:@".*"];
-	INFO(@"pattern = %@", pattern);
 
 	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
 

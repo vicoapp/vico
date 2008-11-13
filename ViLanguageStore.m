@@ -203,7 +203,7 @@ static ViLanguageStore *defaultStore = nil;
 	return langnames;
 }
 
-- (NSDictionary *)preferenceItems:(NSString *)prefsName
+- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings
 {
 	NSMutableDictionary *result = [cachedPreferences objectForKey:prefsName];
 	if (result)
@@ -215,12 +215,17 @@ static ViLanguageStore *defaultStore = nil;
 	ViBundle *bundle;
 	for (bundle in bundles)
 	{
-		NSDictionary *p = [bundle preferenceItems:prefsName];
+		NSDictionary *p = [bundle preferenceItems:prefsName includeAllSettings:includeAllSettings];
 		if (p)
 			[result addEntriesFromDictionary:p];
 	}
 
 	return result;
+}
+
+- (NSDictionary *)preferenceItems:(NSString *)prefsName
+{
+	return [self preferenceItems:prefsName includeAllSettings:NO];
 }
 
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;

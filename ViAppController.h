@@ -5,6 +5,7 @@
 @interface ViAppController : NSObject
 {
 	IBOutlet NSMenu *themeMenu;
+	IBOutlet NSMenu *languageMenu;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
 }

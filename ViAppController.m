@@ -48,6 +48,13 @@
 
 	/* initialize languages */
 	[ViLanguageStore defaultStore];
+
+	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+	NSString *language;
+	for (language in languages)
+	{
+		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
+	}
 }
 
 - (IBAction)setTheme:(id)sender

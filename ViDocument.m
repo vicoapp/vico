@@ -50,7 +50,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
 	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] path]];
 	if (syntax)
-		[textView setLanguage:syntax];
+		[textView setLanguageFromString:syntax];
 	else
 		[textView configureForURL:[self fileURL]];
 	[languageButton selectItemWithTitle:[[textView language] displayName]];
@@ -88,17 +88,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
 
-	[languageButton removeAllItems];
-	[languageButton addItemsWithTitles:[[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]];
-	[languageButton selectItemWithTitle:[[textView language] displayName]];
-	[languageButton setFont:[NSFont controlContentFontOfSize:11.0]];
-
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"]];
 
 	[symbolsOutline setDataSource:self];
 	[symbolsOutline setTarget:self];
-	[symbolsOutline setDoubleAction:@selector(goToSymbolAndCloseOutline:)];
-	[symbolsOutline setAction:@selector(goToSymbolAndCloseOutline:)];
+	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
+	[symbolsOutline setAction:@selector(goToSymbol:)];
 	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
 	[cell setFont:[NSFont systemFontOfSize:10.0]];
 	[symbolsOutline setRowHeight:12.0];
@@ -126,7 +121,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 }
 
 #pragma mark -
-#pragma mark Other stuff
+#pragma mark Other interesting stuff
 
 - (NSView *)view
 {
@@ -263,7 +258,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (IBAction)setLanguage:(id)sender
 {
-	[textView setLanguage:[sender title]];
+	INFO(@"sender = %@, title = %@", sender, [sender title]);
+
+	[textView setLanguageFromString:[sender title]];
 	ViLanguage *lang = [textView language];
 	if (lang && [self fileURL])
 	{
@@ -276,32 +273,100 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Symbol List
 
-- (void)goToSymbolAndCloseOutline:(id)sender
+- (void)goToSymbol:(id)sender
 {
 	NSInteger row = [symbolsOutline clickedRow];
 	if (row >= 0)
 	{
-		NSInteger lineno = [[[symbols objectAtIndex:row] objectForKey:@"line"] integerValue];
-		[textView gotoLine:lineno column:0];
+		NSMutableDictionary *d = [filteredSymbols objectAtIndex:row];
+		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		[textView setCaret:range.location];
+		[textView scrollRangeToVisible:range];
 		[[[self windowController] window] makeFirstResponder:textView];
+		[textView showFindIndicatorForRange:range];
 	}
 }
 
-- (void)setSymbols:(NSArray *)aSymbolArray
+- (IBAction)filterSymbols:(id)sender
 {
-	symbols = aSymbolArray;
+	INFO(@"sender = %@", sender);
+	NSString *filter = [sender stringValue];
+	INFO(@"filter on [%@]", filter);
+
+	NSMutableString *pattern = [NSMutableString string];
+	int i;
+	for (i = 0; i < [filter length]; i++)
+	{
+		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
+	}
+	[pattern appendString:@".*"];
+	INFO(@"pattern = %@", pattern);
+
+	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
+
+	filteredSymbols = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
+	NSMutableDictionary *d;
+	for (d in symbols)
+	{
+		if ([rx matchInString:[d objectForKey:@"symbol"]])
+		{
+			[filteredSymbols addObject:d];
+		}
+	}
 
 	[symbolsOutline reloadData];
 }
 
+- (void)setSymbols:(NSMutableArray *)aSymbolArray
+{
+	symbols = aSymbolArray;
+	[self filterSymbols:symbolFilterField];
+}
+
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	return [[symbols objectAtIndex:rowIndex] objectForKey:@"symbol"];
+	return [[filteredSymbols objectAtIndex:rowIndex] objectForKey:@"symbol"];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [symbols count];
+	return [filteredSymbols count];
+}
+
+- (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta
+{
+	NSMutableDictionary *d;
+	for (d in symbols)
+	{
+		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		if (range.location >= aLocation)
+		{
+			range.location += delta;
+			[d setObject:[NSValue valueWithRange:range] forKey:@"range"];
+		}
+	}
+}
+
+- (void)removeSymbolsInRange:(NSRange)removeRange
+{
+	NSMutableDictionary *d;
+	NSMutableIndexSet *removeSet = [[NSMutableIndexSet alloc] init];
+	int i = 0;
+	for (d in symbols)
+	{
+		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		if (NSIntersectionRange(range, removeRange).length > 0)
+		{
+			[removeSet addIndex:i];
+		}
+		++i;
+	}
+	
+	if ([removeSet count] > 0)
+	{
+		[symbols removeObjectsAtIndexes:removeSet];
+		[self filterSymbols:symbolFilterField];
+	}
 }
 
 #pragma mark -

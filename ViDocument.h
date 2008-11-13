@@ -14,7 +14,9 @@
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSTableView *symbolsOutline;
 	IBOutlet NSSplitView *splitView;
-	NSArray *symbols;
+	IBOutlet NSSearchField *symbolFilterField;
+	NSMutableArray *symbols;
+	NSMutableArray *filteredSymbols;
 	SEL exCommandSelector;
 	ViWindowController *windowController;
 	NSString *readContent;
@@ -25,6 +27,7 @@
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
 - (IBAction)setLanguage:(id)sender;
+- (IBAction)filterSymbols:(id)sender;
 - (void)message:(NSString *)fmt, ...;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
@@ -36,7 +39,9 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
-- (void)setSymbols:(NSArray *)symbols;
+- (void)setSymbols:(NSMutableArray *)symbols;
+- (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta;
+- (void)removeSymbolsInRange:(NSRange)range;
 
 @end
 

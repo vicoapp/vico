@@ -458,7 +458,7 @@ done:
 	DEBUG(@"-----> line range = %u (%u) + %u", aRange.location, aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 
-	NSMutableDictionary *matchCache = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *matchCache = nil; // [[NSMutableDictionary alloc] init];
 
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
@@ -745,6 +745,7 @@ done:
 
 	if (language)
 	{
+		[[self delegate] removeSymbolsInRange:aRange];
 
 		if (inBackground)
 		{

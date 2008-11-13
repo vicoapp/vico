@@ -93,7 +93,7 @@ int logIndent = 0;
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
-- (void)setLanguage:(NSString *)aLanguage
+- (void)setLanguageFromString:(NSString *)aLanguage
 {
 	ViLanguage *newLanguage = nil;
 	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
@@ -208,6 +208,7 @@ int logIndent = 0;
 		[self beginUndoGroup];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
+	[[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -220,6 +221,7 @@ int logIndent = 0;
 	[self beginUndoGroup];
 	[self recordDeleteOfRange:aRange];
 	[storage deleteCharactersInRange:aRange];
+	[[self delegate] pushSymbolsFromLocation:aRange.location delta:-aRange.length];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
@@ -227,6 +229,7 @@ int logIndent = 0;
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
+	[[self delegate] pushSymbolsFromLocation:aRange.location delta:[aString length] - aRange.length];
 }
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation
@@ -812,8 +815,8 @@ int logIndent = 0;
 
 - (void)setInsertMode:(ViCommand *)command
 {
-	// INFO(@"entering insert mode at location %u (final location is %u)", end_location, final_location);
-	[self setCaret:end_location];
+	DEBUG(@"entering insert mode at location %lu (final location is %lu), length is %lu",
+		end_location, final_location, [storage length]);
 	mode = ViInsertMode;
 
 	if (command.text)
@@ -1252,7 +1255,7 @@ int logIndent = 0;
 - (void)disableWrapping
 {
 	const float LargeNumberForText = 1.0e7;
-	
+
 	NSScrollView *scrollView = [self enclosingScrollView];
 	[scrollView setHasVerticalScroller:YES];
 	[scrollView setHasHorizontalScroller:YES];
@@ -1265,6 +1268,26 @@ int logIndent = 0;
 
 	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[self setHorizontallyResizable:YES];
+	[self setVerticallyResizable:YES];
+	[self setAutoresizingMask:NSViewNotSizable];
+}
+
+- (void)enableWrapping
+{
+	const float LargeNumberForText = 1.0e7;
+
+	NSScrollView *scrollView = [self enclosingScrollView];
+	[scrollView setHasVerticalScroller:YES];
+	[scrollView setHasHorizontalScroller:NO];
+	[scrollView setAutoresizingMask:NSViewHeightSizable];
+
+	NSTextContainer *textContainer = [self textContainer];
+	[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[textContainer setWidthTracksTextView:YES];
+	[textContainer setHeightTracksTextView:NO];
+
+	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[self setHorizontallyResizable:NO];
 	[self setVerticallyResizable:YES];
 	[self setAutoresizingMask:NSViewNotSizable];
 }
@@ -1398,12 +1421,22 @@ int logIndent = 0;
 
 - (void)updateSymbolList
 {
-	NSDictionary *symbolsDict = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList"];
-	NSArray *symbolScopes = [symbolsDict allKeys]; // FIXME: only where value = 1
+	NSDictionary *symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
+	/* INFO(@"symbolSettings = %@", symbolSettings); */
+	NSString *selector;
+	NSMutableArray *symbolScopes = [[NSMutableArray alloc] init];
+	for (selector in symbolSettings)
+	{
+		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
+			[symbolScopes addObject:selector];
+	}
+
+	INFO(@"symbolScopes = %@", symbolScopes);
 
 	NSString *lastSelector = nil;
 	NSString *lastSymbol = nil;
 	NSUInteger lastLine = 0;
+	NSRange wholeRange;
 
 	NSMutableArray *symbols = [[NSMutableArray alloc] init];
 
@@ -1420,25 +1453,31 @@ int logIndent = 0;
 			break;
 		}
 
-		//range.location -= 1; // XXX: ?
-
 		if ([lastSelector matchesScopes:scopes])
 		{
-			lastSymbol = [lastSymbol stringByAppendingString:[[storage string] substringWithRange:NSMakeRange(i, NSMaxRange(range) - i)]];
+			lastSymbol = [lastSymbol stringByAppendingString:[[storage string] substringWithRange:range]];
+			wholeRange.length += range.length;
 		}
 		else
 		{
 			if (lastSymbol)
 			{
-				[symbols addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+				NSDictionary *d = [symbolSettings objectForKey:lastSelector];
+				NSString *transform = [d objectForKey:@"symbolTransformation"];
+				if (transform)
+				{
+					INFO(@"apply transformation %@ on %@", transform, lastSymbol);
+				}
+
+				[symbols addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 					[NSNumber numberWithUnsignedInteger:lastLine], @"line",
 					lastSymbol, @"symbol",
+					[NSValue valueWithRange:wholeRange], @"range",
 					nil]];
 			}
 			lastSelector = nil;
 			lastSymbol = nil;
 
-			NSString *selector;
 			for (selector in symbolScopes)
 			{
 				if ([selector matchesScopes:scopes])
@@ -1446,6 +1485,7 @@ int logIndent = 0;
 					lastSelector = selector;
 					lastSymbol = [[storage string] substringWithRange:range];
 					lastLine = [self lineNumberAtLocation:range.location];
+					wholeRange = range;
 					break;
 				}
 			}

@@ -69,7 +69,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
-- (void)setLanguage:(NSString *)aLanguage;
+- (void)setLanguageFromString:(NSString *)aLanguage;
 - (ViLanguage *)language;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;

@@ -209,7 +209,7 @@
 	{
 		affectedRange.location--;	// FIXME: what about using CRLF at end-of-lines?
 		affectedRange.length++;
-		INFO(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
+		DEBUG(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
 	}
 	
 	[self cutToBuffer:0 append:NO range:affectedRange];
@@ -318,7 +318,7 @@
 		/* adjust the range to exclude the last newline */
 		NSUInteger bol, eol, end;
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
-		INFO(@"end_location = %u, bol = %u, eol = %u, end = %u", end_location, bol, eol, end);
+		DEBUG(@"end_location = %u, bol = %u, eol = %u, end = %u", end_location, bol, eol, end);
 		if (end_location == bol)
 		{
 			end_location--;

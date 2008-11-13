@@ -13,6 +13,7 @@
 - (void)addLanguage:(ViLanguage *)lang;
 - (void)addPreferences:(NSDictionary *)prefs;
 - (NSDictionary *)preferenceItems:(NSString *)prefsName;
+- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 

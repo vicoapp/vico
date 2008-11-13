@@ -36,7 +36,7 @@
 	[preferences addObject:prefs];
 }
 
-- (NSDictionary *)preferenceItems:(NSString *)prefsName
+- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings
 {
 	NSMutableDictionary *prefsForScope = [cachedPreferences objectForKey:prefsName];
 	if (prefsForScope)
@@ -44,13 +44,13 @@
 
 	prefsForScope = [[NSMutableDictionary alloc] init];
 	[cachedPreferences setObject:prefsForScope forKey:prefsName];
-	
+
 	NSDictionary *prefs;
 	for (prefs in preferences)
 	{
 		NSString *scope = [prefs objectForKey:@"scope"];
 		NSDictionary *settings = [prefs objectForKey:@"settings"];
-		id prefsValue = [settings objectForKey:prefsName];
+		id prefsValue = includeAllSettings ? settings : [settings objectForKey:prefsName];
 		if (prefsValue)
 		{
 			NSString *s;
@@ -62,6 +62,11 @@
 	}
 
 	return prefsForScope;
+}
+
+- (NSDictionary *)preferenceItems:(NSString *)prefsName
+{
+	return [self preferenceItems:prefsName includeAllSettings:NO];
 }
 
 - (void)addSnippet:(NSDictionary *)snippet

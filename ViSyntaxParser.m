@@ -7,6 +7,8 @@
 
 @implementation ViSyntaxParser
 
+@synthesize aborted;
+
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage delegate:(id)aDelegate
 {
 	self = [super init];
@@ -16,7 +18,7 @@
 		delegate = aDelegate;
 		
 		scopeTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
-		continuations = [[NSMutableArray alloc] init];
+		continuationsState = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -192,6 +194,8 @@
 		ViRegexpMatch *match;
 		for (match in endMatches)
 		{
+			if (aborted)
+				return nil;
 			ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[topOpenMatch pattern] atIndex:0];
 			[m setEndMatch:match];
 			[matchingPatterns addObject:m];
@@ -201,6 +205,9 @@
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
 	for (pattern in patterns)
 	{
+		if (aborted)
+			return nil;
+
 		/* Match all patterns against this range.
 		 */
 		ViRegexp *regexp = [pattern objectForKey:@"matchRegexp"];
@@ -222,6 +229,8 @@
 		ViRegexpMatch *match;
 		for (match in matches)
 		{
+			if (aborted)
+				return nil;
 			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:pattern atIndex:i];
 			[matchingPatterns addObject:viMatch];
 		}
@@ -235,6 +244,9 @@
 	ViSyntaxMatch *aMatch;
 	for (aMatch in matchingPatterns)
 	{
+		if (aborted)
+			return nil;
+
 		if ([aMatch beginLocation] < lastLocation)
 		{
 			// skip overlapping matches
@@ -310,6 +322,8 @@
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL];
+			if (aborted)
+				return nil;
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch topScopes:newTopScopes];
@@ -398,6 +412,9 @@ done:
 					   openMatches:continuedMatches
 					    reachedEOL:&reachedEOL];
 
+		if (aborted)
+			return nil;
+
 		if (reachedEOL)
 			return continuedMatches;
 		lastLocation = [topMatch endLocation];
@@ -436,6 +453,20 @@ done:
 	}
 }
 
+- (void)pullContinuations:(NSValue *)rangeValue
+{
+	NSRange range = [rangeValue rangeValue];
+	unsigned lineno = range.location;
+	int n = range.length;
+
+	DEBUG(@"pulling %i continuations at line %i", n, lineno);
+
+	while (n--)
+	{
+		[continuations removeObjectAtIndex:lineno];
+	}
+}
+
 
 - (void)parseContext:(ViSyntaxContext *)context
 {
@@ -451,9 +482,19 @@ done:
 	regexps_matched = 0;
 	regexps_cached = 0;
 
+	INFO(@"parsing range %@", NSStringFromRange(context.range));
+	running = YES;
+	aborted = NO;
+	lineOffset = context.lineOffset;
+
+	/* Since the syntax parsing can be aborted (by setting the aborted
+	 * variable) we must make sure the continuations state is consistent.
+	 * Make a copy so we can discard it if we're aborted.
+	 */
+	continuations = [continuationsState mutableCopy];
+
 	[[NSGarbageCollector defaultCollector] disable];
 
-	lineOffset = context.lineOffset;
 	offset = context.range.location;
 	chars = context.characters;
 
@@ -492,6 +533,9 @@ done:
 
 		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;
+
+		if (aborted)
+			break;
 
 		NSArray *endMatches = [self continuedMatchesForLine:lineno];
 		[self setContinuation:continuedMatches forLine:lineno];
@@ -543,15 +587,40 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	ViSyntaxResult *result = [[ViSyntaxResult alloc] initWithScopes:[scopeTree allObjects] range:actualRange];
-	[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:result waitUntilDone:NO];
+	running = NO;
+	if (aborted)
+	{
+		INFO(@"syntax parsing aborted");
+	}
+	else
+	{
+		// commit the modified continuations state
+		continuationsState = continuations;
+	
+		// ViSyntaxResult *result = [[ViSyntaxResult alloc] initWithScopes:[scopeTree allObjects] range:actualRange];
+		[context setRange:actualRange];
+		[context setScopes:[scopeTree allObjects]];
+		[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
+	}
 
 	chars = NULL;
-	[scopeTree removeAllObjects];
+	[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
 	[uglyHack removeAllObjects];
 
 	[[NSGarbageCollector defaultCollector] enable];
 	[[NSGarbageCollector defaultCollector] collectIfNeeded];
+}
+
+- (BOOL)abortIfRunningFromLine:(unsigned *)aLine
+{
+	if (running)
+	{
+		aborted = YES;
+		*aLine = lineOffset;
+		return YES;
+	}
+	
+	return NO;
 }
 
 @end

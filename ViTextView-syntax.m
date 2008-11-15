@@ -76,9 +76,9 @@
 
 /* Always executed on the main thread.
  */
-- (void)applySyntaxResult:(ViSyntaxResult *)aResult
+- (void)applySyntaxResult:(ViSyntaxContext *)aResult
 {
-#ifndef NO_DEBUG
+#if 1
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
@@ -106,12 +106,12 @@
 		[self applyScope:scope];
 	}
 
-#ifndef NO_DEBUG
+#if 1
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	//INFO(@"applied %u scopes from context in range %@ => %.3f s",
-	//	[beginTree count], NSStringFromRange(wholeRange), (float)ms / 1000.0);
+	INFO(@"applied %u scopes in range %@ => %.3f s",
+		[[aResult scopes] count], NSStringFromRange([aResult range]), (float)ms / 1000.0);
 #endif
 
 	//// [[self delegate] removeSymbolsInRange:wholeRange];
@@ -211,6 +211,9 @@
 
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag
 {
+	if (aRange.length == 0)
+		return;
+
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	DEBUG(@"allocated %u bytes characters %p", aRange.length * sizeof(unichar), chars);
 	[[storage string] getCharacters:chars range:aRange];
@@ -294,7 +297,7 @@
 	INFO(@"run loop for highlight thread %p exits", [NSThread currentThread]);
 }
 
-- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString
+- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag
 {
 	int n = 0;
 	NSInteger i = 0;
@@ -316,7 +319,10 @@
 	if (aLocation > 1)
 		lineno = [self lineNumberAtLocation:aLocation - 1];
 
-	[syntaxParser performSelector:@selector(pushContinuations:) onThread:highlightThread withObject:[NSValue valueWithRange:NSMakeRange(lineno, n)] waitUntilDone:NO];
+	if (flag)
+		[syntaxParser performSelector:@selector(pushContinuations:) onThread:highlightThread withObject:[NSValue valueWithRange:NSMakeRange(lineno, n)] waitUntilDone:NO];
+	else
+		[syntaxParser performSelector:@selector(pullContinuations:) onThread:highlightThread withObject:[NSValue valueWithRange:NSMakeRange(lineno, n)] waitUntilDone:NO];
 }
 
 @end

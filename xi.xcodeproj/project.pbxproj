@@ -49,7 +49,6 @@
 		9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */; };
 		9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */; };
 		9AF2015B0ECDDD7E00C5771B /* ViSyntaxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201580ECDDD7E00C5771B /* ViSyntaxParser.m */; };
-		9AF201720ECDE7CA00C5771B /* ViSyntaxResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201710ECDE7CA00C5771B /* ViSyntaxResult.m */; };
 		9AF2FE760EC9C8A400C5771B /* TestViCommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */; };
 		9AF2FE9B0EC9C9F600C5771B /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */; };
 		9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */; };
@@ -179,8 +178,6 @@
 		9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSyntaxContext.m; sourceTree = "<group>"; };
 		9AF201570ECDDD7E00C5771B /* ViSyntaxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSyntaxParser.h; sourceTree = "<group>"; };
 		9AF201580ECDDD7E00C5771B /* ViSyntaxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSyntaxParser.m; sourceTree = "<group>"; };
-		9AF201700ECDE7CA00C5771B /* ViSyntaxResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSyntaxResult.h; sourceTree = "<group>"; };
-		9AF201710ECDE7CA00C5771B /* ViSyntaxResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSyntaxResult.m; sourceTree = "<group>"; };
 		9AF2FE700EC9C85900C5771B /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AF2FE710EC9C85900C5771B /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		9AF41A540EC6E1CB00F1D681 /* MarkerLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarkerLineNumberView.h; sourceTree = "<group>"; };
@@ -253,8 +250,6 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9AF201700ECDE7CA00C5771B /* ViSyntaxResult.h */,
-				9AF201710ECDE7CA00C5771B /* ViSyntaxResult.m */,
 				9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */,
 				9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */,
 				9AF201550ECDDD7E00C5771B /* ViSyntaxContext.h */,
@@ -583,7 +578,6 @@
 				9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */,
 				9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */,
 				9AF2015B0ECDDD7E00C5771B /* ViSyntaxParser.m in Sources */,
-				9AF201720ECDE7CA00C5771B /* ViSyntaxResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

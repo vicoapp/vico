@@ -1,6 +1,5 @@
 #import <sys/time.h>
 #import "ViSyntaxParser.h"
-#import "ViSyntaxResult.h"
 #import "ViScope.h"
 #import "NSArray-patterns.h"
 #import "logging.h"

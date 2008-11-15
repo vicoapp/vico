@@ -122,10 +122,6 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
-		if (syntaxParser)
-		{
-			// FIXME: should stop syntax parser if running
-		}
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
 		[self highlightEverything];
 	}
@@ -163,10 +159,6 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
-		if (syntaxParser)
-		{
-			// FIXME: should stop syntax parser if running
-		}
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
 		[self highlightEverything];
 	}
@@ -240,7 +232,7 @@ int logIndent = 0;
 
 	if (undoGroup)
 		[self beginUndoGroup];
-	[self pushContinuationsFromLocation:aLocation string:aString];
+	[self pushContinuationsFromLocation:aLocation string:aString forward:YES];
 	[[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
@@ -255,6 +247,7 @@ int logIndent = 0;
 {
 	[self beginUndoGroup];
 	[self recordDeleteOfRange:aRange];
+	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
 	[[self delegate] pushSymbolsFromLocation:aRange.location delta:-aRange.length];
 }

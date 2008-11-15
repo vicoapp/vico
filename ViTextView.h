@@ -5,6 +5,7 @@
 #import "ViTagsDatabase.h"
 #import "ViBundle.h"
 #import "logging.h"
+#import "ViSyntaxParser.h"
 
 #ifdef IMAX
 # undef IMAX
@@ -48,19 +49,22 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	// language parsing and highlighting
 	BOOL ignoreEditing;
+	ViSyntaxParser *syntaxParser;
 	ViTheme *theme;
 	ViBundle *bundle;
 	ViLanguage *language;
 	NSThread *highlightThread;
 	BOOL resetFont;
 
-	CGFloat pageGuideX;
+	// symbol list
+	NSDictionary *symbolSettings;
+	NSMutableArray *symbolScopes;
+	NSString *lastSymbolSelector;
+	NSRange lastSymbolRange; // only valid if lastSymbolSelector != nil
+	BOOL shouldTrackSymbolBackwards;
+	NSMutableArray *pendingSymbols;
 
-	// statistics
-	unsigned regexps_tried;
-	unsigned regexps_overlapped;
-	unsigned regexps_matched;
-	unsigned regexps_cached;
+	CGFloat pageGuideX;
 
 	BOOL hasUndoGroup;
 }
@@ -90,6 +94,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
 - (NSUInteger)caret;
+- (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setTabSize:(int)tabSize;
 - (NSUndoManager *)undoManager;
@@ -123,7 +128,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
 
-- (void)updateSymbolList;
+- (NSString *)selectorForSymbolMatchingScope:(NSArray *)scopes;
+// - (void)updateSymbolList;
 
 @end
 
@@ -138,6 +144,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 @interface ViTextView (syntax)
 - (void)highlightEverything;
+- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString;
+- (void)dispatchSyntaxParserFromLine:(NSNumber *)startLine;
+- (void)highlightMain:(id)arg;
 @end
 
 @interface ViTextView (vi_commands)

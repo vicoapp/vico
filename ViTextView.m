@@ -18,6 +18,7 @@ int logIndent = 0;
 - (void)recordDeleteOfRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
+- (void)setSymbolScopes;
 @end
 
 @implementation ViTextView
@@ -39,6 +40,9 @@ int logIndent = 0;
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	
+	highlightThread = [[NSThread alloc] initWithTarget:self selector:@selector(highlightMain:) object:nil];
+	[highlightThread start];
 
 	inputCommands = [NSDictionary dictionaryWithObjectsAndKeys:
 			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00000024], // enter
@@ -81,6 +85,8 @@ int logIndent = 0;
 	[self disableWrapping];
 	[self setContinuousSpellCheckingEnabled:NO];
 
+	[self setSymbolScopes];
+
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	resetFont = YES;
 }
@@ -93,6 +99,21 @@ int logIndent = 0;
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
+- (void)setSymbolScopes
+{
+	symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
+	/* INFO(@"symbolSettings = %@", symbolSettings); */
+	NSString *selector;
+	symbolScopes = [[NSMutableArray alloc] init];
+	for (selector in symbolSettings)
+	{
+		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
+			[symbolScopes addObject:selector];
+	}
+
+	INFO(@"symbolScopes = %@", symbolScopes);
+}
+
 - (void)setLanguageFromString:(NSString *)aLanguage
 {
 	ViLanguage *newLanguage = nil;
@@ -101,6 +122,11 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
+		if (syntaxParser)
+		{
+			// FIXME: should stop syntax parser if running
+		}
+		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
 		[self highlightEverything];
 	}
 }
@@ -137,6 +163,11 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
+		if (syntaxParser)
+		{
+			// FIXME: should stop syntax parser if running
+		}
+		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
 		[self highlightEverything];
 	}
 }
@@ -204,11 +235,15 @@ int logIndent = 0;
  */
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup
 {
+	if ([aString length] == 0)
+		return;
+
 	if (undoGroup)
 		[self beginUndoGroup];
+	[self pushContinuationsFromLocation:aLocation string:aString];
+	[[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
-	[[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -401,16 +436,15 @@ int logIndent = 0;
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
         NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
-		
-	[self insertString:@"\n" atLocation:aLocation];
+	NSMutableString *newline = [NSMutableString stringWithString:@"\n"];
 
         if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-                                    atCharacterIndex:aLocation + 1
+                                    atCharacterIndex:aLocation
                                       effectiveRange:NULL] && aLocation > 0)
         {
 		// assume indentForward?
-		NSString *indent = [self leadingWhitespaceForLineAtLocation:aLocation - 1];
-                [self insertString:[NSString stringWithFormat:@"\n%@", indent] atLocation:aLocation + 1];
+		NSString *indent = [self leadingWhitespaceForLineAtLocation:aLocation];
+                [newline appendFormat:@"\n%@", indent];
         }
 
 	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
@@ -427,12 +461,15 @@ int logIndent = 0;
 
 		if (leading_whitespace)
 		{
-			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
-			return 1 + [leading_whitespace length];
+			if (indentForward)
+				[newline appendString:leading_whitespace];
+			else
+				[newline insertString:leading_whitespace atIndex:0];
 		}
 	}
 
-	return 1;
+	[self insertString:newline atLocation:aLocation];
+	return [newline length];
 }
 
 - (int)changeIndentation:(int)delta inRange:(NSRange)aRange
@@ -822,6 +859,7 @@ int logIndent = 0;
 	if (command.text)
 	{
 		NSEvent *ev;
+		[self setCaret:end_location];
 		for (ev in command.text)
 		{
 			[self keyDown:ev];
@@ -1038,8 +1076,9 @@ int logIndent = 0;
 			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]])
 			{
 				foundSmartTypingPair = YES;
-				[self insertString:[pair objectAtIndex:0] atLocation:start_location];
-				[self insertString:[pair objectAtIndex:1] atLocation:start_location + 1];
+				[self insertString:[NSString stringWithFormat:@"%@%@",
+					[pair objectAtIndex:0],
+					[pair objectAtIndex:1]] atLocation:start_location];
 				
 				// INFO(@"adding smart pair attr to %u + 2", start_location);
 				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
@@ -1419,20 +1458,23 @@ int logIndent = 0;
         [[[self delegate] windowController] switchToLastFile];
 }
 
+- (NSString *)selectorForSymbolMatchingScope:(NSArray *)scopes
+{
+	NSString *selector;
+	for (selector in symbolScopes)
+	{
+		if ([selector matchesScopes:scopes])
+		{
+			return selector;
+		}
+	}
+	
+	return nil;
+}
+
+#if 0
 - (void)updateSymbolList
 {
-	NSDictionary *symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
-	/* INFO(@"symbolSettings = %@", symbolSettings); */
-	NSString *selector;
-	NSMutableArray *symbolScopes = [[NSMutableArray alloc] init];
-	for (selector in symbolSettings)
-	{
-		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
-			[symbolScopes addObject:selector];
-	}
-
-	INFO(@"symbolScopes = %@", symbolScopes);
-
 	NSString *lastSelector = nil;
 	NSString *lastSymbol = nil;
 	NSUInteger lastLine = 0;
@@ -1478,16 +1520,14 @@ int logIndent = 0;
 			lastSelector = nil;
 			lastSymbol = nil;
 
-			for (selector in symbolScopes)
+			NSString *selector = [self selectorForSymbolMatchingScope:scopes];
+	
+			if (selector)
 			{
-				if ([selector matchesScopes:scopes])
-				{
-					lastSelector = selector;
-					lastSymbol = [[storage string] substringWithRange:range];
-					lastLine = [self lineNumberAtLocation:range.location];
-					wholeRange = range;
-					break;
-				}
+				lastSelector = selector;
+				lastSymbol = [[storage string] substringWithRange:range];
+				lastLine = [self lineNumberAtLocation:range.location];
+				wholeRange = range;
 			}
 		}
 		
@@ -1496,5 +1536,6 @@ int logIndent = 0;
 
 	[[self delegate] setSymbols:symbols];
 }
+#endif
 
 @end

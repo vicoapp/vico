@@ -67,7 +67,6 @@
 		for(scopeSelector in scopeSelectors)
 		{
 			[themeAttributes setObject:attrs forKey:scopeSelector];
-			DEBUG(@"%s  %@ = %@", _cmd, scope, attrs);
 		}
 	}
 

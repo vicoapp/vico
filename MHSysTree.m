@@ -132,7 +132,7 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
     }
 }
 
-- (void)performSelectorWithAllObjects:(SEL)aSelector target:(id)aTarget
+- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget
 {
     struct rb_entry *e;
     RB_FOREACH(e, id_tree, &root) {

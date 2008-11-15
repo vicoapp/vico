@@ -60,7 +60,7 @@
 	OnigRegion *region = onig_region_new();
 
 	const unsigned char *str = (const unsigned char *)chars;
-	const unsigned char *start = str + aRange.location * sizeof(unichar);
+	const unsigned char *start = str + (aRange.location - aLocation) * sizeof(unichar);
 	const unsigned char *end = start + aRange.length * sizeof(unichar);
 
 	int r = onig_search(regex, str, end, start, end, region, ONIG_OPTION_FIND_NOT_EMPTY | options);

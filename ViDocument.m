@@ -1,6 +1,7 @@
 #import "ViDocument.h"
 #import "ExTextView.h"
 #import "ViLanguageStore.h"
+#import "ViSymbol.h"
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
@@ -17,6 +18,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (id)init
 {
 	self = [super init];
+	if (self)
+	{
+		symbols = [[NSMutableArray alloc] init];
+	}
 	return self;
 }
 
@@ -278,8 +283,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSInteger row = [symbolsOutline clickedRow];
 	if (row >= 0)
 	{
-		NSMutableDictionary *d = [filteredSymbols objectAtIndex:row];
-		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		ViSymbol *s = [filteredSymbols objectAtIndex:row];
+		NSRange range = [s range];
 		[textView setCaret:range.location];
 		[textView scrollRangeToVisible:range];
 		[[[self windowController] window] makeFirstResponder:textView];
@@ -302,15 +307,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
 
 	filteredSymbols = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
-	NSMutableDictionary *d;
-	for (d in symbols)
+	ViSymbol *s;
+	for (s in symbols)
 	{
-		if ([rx matchInString:[d objectForKey:@"symbol"]])
+		if ([rx matchInString:[s symbol]])
 		{
-			[filteredSymbols addObject:d];
+			[filteredSymbols addObject:s];
 		}
 	}
 
+	[filteredSymbols sortUsingSelector:@selector(sortOnLocation:)];
 	[symbolsOutline reloadData];
 }
 
@@ -320,9 +326,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self filterSymbols:symbolFilterField];
 }
 
+- (void)addSymbol:(ViSymbol *)aSymbol
+{
+	[symbols addObject:aSymbol];
+	[self filterSymbols:symbolFilterField];
+}
+
+- (void)addSymbolsFromArray:(NSArray *)symbolArray
+{
+	[symbols addObjectsFromArray:symbolArray];
+	[self filterSymbols:symbolFilterField];
+}
+
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	return [[filteredSymbols objectAtIndex:rowIndex] objectForKey:@"symbol"];
+	return [[[filteredSymbols objectAtIndex:rowIndex] symbol] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
@@ -332,28 +350,30 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta
 {
-	NSMutableDictionary *d;
-	for (d in symbols)
+	ViSymbol *s;
+	for (s in symbols)
 	{
-		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		NSRange range = [s range];
 		if (range.location >= aLocation)
 		{
 			range.location += delta;
-			[d setObject:[NSValue valueWithRange:range] forKey:@"range"];
+			[s setRange:range];
 		}
 	}
 }
 
 - (void)removeSymbolsInRange:(NSRange)removeRange
 {
-	NSMutableDictionary *d;
+	INFO(@"removing symbols in range %@", NSStringFromRange(removeRange));
+	ViSymbol *s;
 	NSMutableIndexSet *removeSet = [[NSMutableIndexSet alloc] init];
 	int i = 0;
-	for (d in symbols)
+	for (s in symbols)
 	{
-		NSRange range = [[d objectForKey:@"range"] rangeValue];
+		NSRange range = [s range];
 		if (NSIntersectionRange(range, removeRange).length > 0)
 		{
+			INFO(@"removing symbol [%@] in range %@", s.symbol, NSStringFromRange(range));
 			[removeSet addIndex:i];
 		}
 		++i;
@@ -362,7 +382,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([removeSet count] > 0)
 	{
 		[symbols removeObjectsAtIndexes:removeSet];
-		[self filterSymbols:symbolFilterField];
+		// [self filterSymbols:symbolFilterField];
 	}
 }
 

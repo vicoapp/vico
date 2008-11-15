@@ -63,7 +63,7 @@ RB_PROTOTYPE(id_tree, rb_entry, entry, id_cmp);
 
 - (NSArray *)allObjects;
 - (void)removeEntry:(struct rb_entry *)anEntry;
-- (void)performSelectorWithAllObjects:(SEL)aSelector target:(id)aTarget;
+- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget;
 
 - (struct rb_entry *)root;
 - (struct rb_entry *)first;

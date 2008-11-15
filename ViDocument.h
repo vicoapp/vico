@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ViTextView.h"
 #import "ViWindowController.h"
+#import "ViSymbol.h"
 
 @class NoodleLineNumberView;
 
@@ -39,9 +40,11 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
+
 - (void)setSymbols:(NSMutableArray *)symbols;
+- (void)addSymbol:(ViSymbol *)aSymbol;
+- (void)addSymbolsFromArray:(NSArray *)symbolArray;
 - (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta;
 - (void)removeSymbolsInRange:(NSRange)range;
 
 @end
-

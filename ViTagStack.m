@@ -8,7 +8,6 @@
 
 #import "ViTagStack.h"
 
-
 @implementation ViTagStack
 
 - (id)init
@@ -21,7 +20,9 @@
 	return self;
 }
 
-- (void)pushFile:(NSString *)aFile line:(NSUInteger)aLine column:(NSUInteger)aColumn
+- (void)pushFile:(NSString *)aFile
+            line:(NSUInteger)aLine
+          column:(NSUInteger)aColumn
 {
 	NSDictionary *location = [[NSDictionary alloc] initWithObjectsAndKeys:aFile, @"file",
 				  [NSNumber numberWithUnsignedInteger:aLine], @"line",

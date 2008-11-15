@@ -7,6 +7,7 @@
 @synthesize range;
 @synthesize lineOffset;
 @synthesize restarting;
+@synthesize scopes;
 
 - (ViSyntaxContext *)initWithCharacters:(unichar *)chars range:(NSRange)aRange line:(unsigned)line restarting:(BOOL)flag
 {

@@ -7,12 +7,14 @@
 	NSUInteger offset;
 	unsigned lineOffset;
 	BOOL restarting;
+	NSArray *scopes;
 }
 
 @property(readonly) unichar *characters;
-@property(readonly) NSRange range;
+@property(readwrite) NSRange range;
 @property(readonly) unsigned lineOffset;
 @property(readonly) BOOL restarting;
+@property(readwrite, copy) NSArray *scopes;
 
 - (ViSyntaxContext *)initWithCharacters:(unichar *)chars range:(NSRange)aRange line:(unsigned)line restarting:(BOOL)flag;
 

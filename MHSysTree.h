@@ -50,6 +50,7 @@ RB_PROTOTYPE(id_tree, rb_entry, entry, id_cmp);
 
 - (id)initWithCompareSelector:(SEL)aSelector;
 - (id)init;
+- (MHSysTree *)copy;
 
 - (void)addObject:(id)anObject;
 - (void)addObjectsFromArray:(NSArray *)anArray;

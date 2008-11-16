@@ -132,6 +132,17 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
     }
 }
 
+- (MHSysTree *)copy
+{
+    MHSysTree *cp = [[MHSysTree alloc] initWithCompareSelector:compareSelector];
+    struct rb_entry *e;
+    RB_FOREACH(e, id_tree, &root) {
+        [cp addObject:e->obj];
+    }
+    return cp;
+    
+}
+
 - (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget
 {
     struct rb_entry *e;

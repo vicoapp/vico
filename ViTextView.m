@@ -1,8 +1,10 @@
+#include <sys/time.h>
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
+#import "NSArray-patterns.h"
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
 
@@ -108,7 +110,7 @@ int logIndent = 0;
 	for (selector in symbolSettings)
 	{
 		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
-			[symbolScopes addObject:selector];
+			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
 	}
 
 	INFO(@"symbolScopes = %@", symbolScopes);
@@ -233,7 +235,7 @@ int logIndent = 0;
 	if (undoGroup)
 		[self beginUndoGroup];
 	[self pushContinuationsFromLocation:aLocation string:aString forward:YES];
-	[[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
+	// [[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
 }
@@ -245,11 +247,14 @@ int logIndent = 0;
 
 - (void)deleteRange:(NSRange)aRange
 {
+	if (aRange.length == 0)
+		return;
+
 	[self beginUndoGroup];
 	[self recordDeleteOfRange:aRange];
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
-	[[self delegate] pushSymbolsFromLocation:aRange.location delta:-aRange.length];
+	// [[self delegate] pushSymbolsFromLocation:aRange.location delta:-aRange.length];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
@@ -257,7 +262,7 @@ int logIndent = 0;
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
-	[[self delegate] pushSymbolsFromLocation:aRange.location delta:[aString length] - aRange.length];
+	// [[self delegate] pushSymbolsFromLocation:aRange.location delta:[aString length] - aRange.length];
 }
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation
@@ -1451,34 +1456,24 @@ int logIndent = 0;
         [[[self delegate] windowController] switchToLastFile];
 }
 
-- (NSString *)selectorForSymbolMatchingScope:(NSArray *)scopes
+- (void)updateSymbolList:(NSTimer *)timer
 {
-	NSString *selector;
-	for (selector in symbolScopes)
-	{
-		if ([selector matchesScopes:scopes])
-		{
-			return selector;
-		}
-	}
-	
-	return nil;
-}
-
-#if 0
-- (void)updateSymbolList
-{
-	NSString *lastSelector = nil;
-	NSString *lastSymbol = nil;
-	NSUInteger lastLine = 0;
+	NSArray *lastSelector = nil;
 	NSRange wholeRange;
+
+	struct timeval start;
+	struct timeval stop;
+	struct timeval diff;
+	gettimeofday(&start, NULL);
+
+	INFO(@"updating the symbol list");
 
 	NSMutableArray *symbols = [[NSMutableArray alloc] init];
 
-	NSUInteger i;
-	for (i = 0; i < [storage length];)
+	NSUInteger i, length = [storage length];
+	for (i = 0; i < length;)
 	{
-		NSRange range = NSMakeRange(0, 0);
+		NSRange range;
 		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
 					                  atCharacterIndex:i
 						            effectiveRange:&range];
@@ -1490,37 +1485,33 @@ int logIndent = 0;
 
 		if ([lastSelector matchesScopes:scopes])
 		{
-			lastSymbol = [lastSymbol stringByAppendingString:[[storage string] substringWithRange:range]];
 			wholeRange.length += range.length;
 		}
 		else
 		{
-			if (lastSymbol)
+			if (lastSelector)
 			{
+				NSString *symbol = [[storage string] substringWithRange:wholeRange];
 				NSDictionary *d = [symbolSettings objectForKey:lastSelector];
 				NSString *transform = [d objectForKey:@"symbolTransformation"];
 				if (transform)
 				{
-					INFO(@"apply transformation %@ on %@", transform, lastSymbol);
+					// INFO(@"apply transformation %@ on %@", transform, lastSymbol);
 				}
 
-				[symbols addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-					[NSNumber numberWithUnsignedInteger:lastLine], @"line",
-					lastSymbol, @"symbol",
-					[NSValue valueWithRange:wholeRange], @"range",
-					nil]];
+				[symbols addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange]];
 			}
 			lastSelector = nil;
-			lastSymbol = nil;
 
-			NSString *selector = [self selectorForSymbolMatchingScope:scopes];
-	
-			if (selector)
+			NSArray *descendants;
+			for (descendants in symbolScopes)
 			{
-				lastSelector = selector;
-				lastSymbol = [[storage string] substringWithRange:range];
-				lastLine = [self lineNumberAtLocation:range.location];
-				wholeRange = range;
+				if ([descendants matchesScopes:scopes])
+				{
+					lastSelector = descendants;
+					wholeRange = range;
+					break;
+				}
 			}
 		}
 		
@@ -1528,7 +1519,11 @@ int logIndent = 0;
 	}
 
 	[[self delegate] setSymbols:symbols];
+
+	gettimeofday(&stop, NULL);
+	timersub(&stop, &start, &diff);
+	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
 }
-#endif
 
 @end

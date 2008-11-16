@@ -11,7 +11,7 @@
 
 @interface ViTextView (syntax_private)
 - (void)resetAttributesInRange:(NSRange)aRange;
-- (NSRange)trackSymbolSelector:(NSString *)symbolSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
+// - (NSRange)trackSymbolSelector:(NSString *)symbolSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView (syntax)
@@ -84,8 +84,6 @@
 	gettimeofday(&start, NULL);
 #endif
 
-	// pendingSymbols = [[NSMutableArray alloc] init];
-
 	DEBUG(@"resetting attributes in range %@", NSStringFromRange([aResult range]));
 	[self resetAttributesInRange:[aResult range]];
 
@@ -113,11 +111,17 @@
 		[[aResult scopes] count], NSStringFromRange([aResult range]), (float)ms / 1000.0);
 #endif
 
-	//// [[self delegate] removeSymbolsInRange:wholeRange];
-	//// [[self delegate] addSymbolsFromArray:pendingSymbols];
-	pendingSymbols = nil;
+	[updateSymbolsTimer invalidate];
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:0.6]
+						      interval:0
+							target:self
+						      selector:@selector(updateSymbolList:)
+						      userInfo:nil
+						       repeats:NO];
+	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 }
 
+#if 0
 /* Always executed on the main thread.
  */
 - (NSRange)trackSymbolSelector:(NSString *)symbolSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
@@ -152,7 +156,6 @@
 	return trackedRange;
 }
 
-#if 0
 /* Always executed on the main thread.
  */
 - (void)applyContextAndFinalizeSymbols:(NSMutableArray *)context

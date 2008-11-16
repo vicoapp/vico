@@ -235,7 +235,6 @@ int logIndent = 0;
 	if (undoGroup)
 		[self beginUndoGroup];
 	[self pushContinuationsFromLocation:aLocation string:aString forward:YES];
-	// [[self delegate] pushSymbolsFromLocation:aLocation delta:[aString length]];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
 }
@@ -254,7 +253,6 @@ int logIndent = 0;
 	[self recordDeleteOfRange:aRange];
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
-	// [[self delegate] pushSymbolsFromLocation:aRange.location delta:-aRange.length];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
@@ -262,7 +260,6 @@ int logIndent = 0;
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
-	// [[self delegate] pushSymbolsFromLocation:aRange.location delta:[aString length] - aRange.length];
 }
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation

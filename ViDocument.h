@@ -42,9 +42,5 @@
 - (ViTextView *)textView;
 
 - (void)setSymbols:(NSMutableArray *)symbols;
-- (void)addSymbol:(ViSymbol *)aSymbol;
-- (void)addSymbolsFromArray:(NSArray *)symbolArray;
-- (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta;
-- (void)removeSymbolsInRange:(NSRange)range;
 
 @end

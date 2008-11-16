@@ -326,18 +326,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self filterSymbols:symbolFilterField];
 }
 
-- (void)addSymbol:(ViSymbol *)aSymbol
-{
-	[symbols addObject:aSymbol];
-	[self filterSymbols:symbolFilterField];
-}
-
-- (void)addSymbolsFromArray:(NSArray *)symbolArray
-{
-	[symbols addObjectsFromArray:symbolArray];
-	[self filterSymbols:symbolFilterField];
-}
-
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	return [[[filteredSymbols objectAtIndex:rowIndex] symbol] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
@@ -346,44 +334,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	return [filteredSymbols count];
-}
-
-- (void)pushSymbolsFromLocation:(NSUInteger)aLocation delta:(NSInteger)delta
-{
-	ViSymbol *s;
-	for (s in symbols)
-	{
-		NSRange range = [s range];
-		if (range.location >= aLocation)
-		{
-			range.location += delta;
-			[s setRange:range];
-		}
-	}
-}
-
-- (void)removeSymbolsInRange:(NSRange)removeRange
-{
-	INFO(@"removing symbols in range %@", NSStringFromRange(removeRange));
-	ViSymbol *s;
-	NSMutableIndexSet *removeSet = [[NSMutableIndexSet alloc] init];
-	int i = 0;
-	for (s in symbols)
-	{
-		NSRange range = [s range];
-		if (NSIntersectionRange(range, removeRange).length > 0)
-		{
-			INFO(@"removing symbol [%@] in range %@", s.symbol, NSStringFromRange(range));
-			[removeSet addIndex:i];
-		}
-		++i;
-	}
-	
-	if ([removeSet count] > 0)
-	{
-		[symbols removeObjectsAtIndexes:removeSet];
-		// [self filterSymbols:symbolFilterField];
-	}
 }
 
 #pragma mark -

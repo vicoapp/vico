@@ -2,7 +2,6 @@
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViScope.h"
-#import "ViSymbol.h"
 #import "MHSysTree.h"
 #import "logging.h"
 #import "NSString-scopeSelector.h"
@@ -11,7 +10,6 @@
 
 @interface ViTextView (syntax_private)
 - (void)resetAttributesInRange:(NSRange)aRange;
-// - (NSRange)trackSymbolSelector:(NSString *)symbolSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 @end
 
 @implementation ViTextView (syntax)
@@ -25,48 +23,6 @@
 
 	DEBUG(@"applying scopes [%@] to range %u + %u", [scopes componentsJoinedByString:@" "], range.location, range.length);		
 	[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
-
-#if 0
-
-	BOOL continuedSymbol = NO;
-	if (lastSymbolSelector && (NSMaxRange(lastSymbolRange) == range.location || NSIntersectionRange(lastSymbolRange, range).length > 0))
-	{
-		// This is (possibly) a continuation of the last symbol.
-		if ([lastSymbolSelector matchesScopes:scopes])
-		{
-			// Yes it is, extend the range.
-			lastSymbolRange = NSUnionRange(lastSymbolRange, range);
-			continuedSymbol = YES;
-		}
-	}
-
-	if (!continuedSymbol)
-	{
-		if (lastSymbolSelector)
-		{
-			NSString *symbol = [[storage string] substringWithRange:lastSymbolRange];
-			INFO(@"got complete symbol %@ at range %@", symbol, NSStringFromRange(lastSymbolRange));
-			[pendingSymbols addObject:[[ViSymbol alloc] initWithSymbol:symbol range:lastSymbolRange]];
-			lastSymbolSelector = nil;
-		}
-	
-		lastSymbolSelector = [self selectorForSymbolMatchingScope:scopes];
-		if (lastSymbolSelector)
-		{
-			lastSymbolRange = range;
-			if (shouldTrackSymbolBackwards)
-			{
-				NSRange backwardRange = [self trackSymbolSelector:lastSymbolSelector forward:NO fromLocation:lastSymbolRange.location];
-				lastSymbolRange = NSUnionRange(lastSymbolRange, backwardRange);
-				NSString *symbol = [[storage string] substringWithRange:lastSymbolRange];
-				INFO(@"got partial symbol %@", symbol);
-			}
-		}
-	}
-
-	shouldTrackSymbolBackwards = NO;
-
-#endif
 
 	// Get the theme attributes for this collection of scopes.
 	NSDictionary *attributes = [theme attributesForScopes:scopes];
@@ -87,15 +43,6 @@
 	DEBUG(@"resetting attributes in range %@", NSStringFromRange([aResult range]));
 	[self resetAttributesInRange:[aResult range]];
 
-#if 0
-	if ([context count] > 2 && [[context objectAtIndex:2] boolValue] == YES)
-	{
-		[context removeObjectAtIndex:2];
-		shouldTrackSymbolBackwards = YES;
-	}
-#endif
-
-	// [[aTree tree] performSelectorWithAllObjects:@selector(debugScopes:) target:self];
 	ViScope *scope;
 	for (scope in [aResult scopes])
 	{
@@ -120,63 +67,6 @@
 						       repeats:NO];
 	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 }
-
-#if 0
-/* Always executed on the main thread.
- */
-- (NSRange)trackSymbolSelector:(NSString *)symbolSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
-{
-	NSRange trackedRange = NSMakeRange(aLocation, 0);
-	NSUInteger i = aLocation;
-	for (;;)
-	{
-		if (forward && i >= [storage length])
-			break;
-		else if (!forward && i == 0)
-			break;
-	
-		NSRange range = NSMakeRange(0, 0);
-		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-							  atCharacterIndex:i
-							    effectiveRange:&range];
-		if (scopes == nil)
-			break;
-
-		if ([symbolSelector matchesScopes:scopes])
-			trackedRange = NSUnionRange(trackedRange, range);
-		else
-			break;
-
-		if (forward)
-			i += range.length;
-		else
-			i -= range.length;
-	}
-
-	return trackedRange;
-}
-
-/* Always executed on the main thread.
- */
-- (void)applyContextAndFinalizeSymbols:(NSMutableArray *)context
-{
-	[self applyContext:context];
-
-	if (lastSymbolSelector)
-	{
-		/* roll forward until non-match
-		 */
-		NSRange forwardRange = [self trackSymbolSelector:lastSymbolSelector forward:YES fromLocation:NSMaxRange(lastSymbolRange)];
-		lastSymbolRange = NSUnionRange(lastSymbolRange, forwardRange);
-
-		NSString *symbol = [[storage string] substringWithRange:lastSymbolRange];
-		INFO(@"got complete symbol %@ at range %@", symbol, NSStringFromRange(lastSymbolRange));
-		// [pendingSymbols addObject:[[ViSymbol alloc] initWithSymbol:symbol range:lastSymbolRange]];
-		[[self delegate] addSymbol:[[ViSymbol alloc] initWithSymbol:symbol range:lastSymbolRange]];
-		lastSymbolSelector = nil;
-	}
-}
-#endif
 
 - (void)resetAttributesInRange:(NSRange)aRange
 {

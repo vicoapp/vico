@@ -59,10 +59,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	// symbol list
 	NSDictionary *symbolSettings;
 	NSMutableArray *symbolScopes;
-	// NSString *lastSymbolSelector;
-	// NSRange lastSymbolRange; // only valid if lastSymbolSelector != nil
-	// BOOL shouldTrackSymbolBackwards;
-	// NSMutableArray *pendingSymbols;
 	NSTimer *updateSymbolsTimer;
 
 	CGFloat pageGuideX;

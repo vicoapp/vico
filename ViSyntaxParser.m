@@ -482,7 +482,7 @@ done:
 	regexps_matched = 0;
 	regexps_cached = 0;
 
-	INFO(@"parsing range %@", NSStringFromRange(context.range));
+	DEBUG(@"parsing range %@", NSStringFromRange(context.range));
 	running = YES;
 	aborted = NO;
 	lineOffset = context.lineOffset;

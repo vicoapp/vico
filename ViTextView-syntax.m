@@ -1,7 +1,6 @@
 #import "ViDocument.h"
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
-#import "ViSyntaxResult.h"
 #import "ViScope.h"
 #import "ViSymbol.h"
 #import "MHSysTree.h"

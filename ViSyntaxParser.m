@@ -53,23 +53,24 @@
 	struct rb_entry *e = [scopeTree root];
 	while (e)
 	{
-		ViScope *beginScope = e->obj;
-		if (aRange.location < beginScope.range.location)
+		ViScope *s = e->obj;
+		NSRange r = [s range];
+		if (r.location > aRange.location)
 		{
 			break;
 			// FIXME: need to break partially matching scopes here!
 			// e = [scopeTree left:e];
 		}
-		else if (aRange.location > beginScope.range.location)
+		else if (r.location < aRange.location)
 		{
-			if (NSMaxRange(beginScope.range) == aRange.location)
+			if (NSMaxRange(r) == aRange.location)
 			{
+				NSArray *scopes = [s scopes];
 				NSString *scopeString = [aScopeArray componentsJoinedByString:@" "];
-				if ([beginScope.scopes count] == c && [[beginScope.scopes componentsJoinedByString:@" "] isEqualToString:scopeString])
+				if ([scopes count] == c && [[scopes componentsJoinedByString:@" "] isEqualToString:scopeString])
 				{
-					NSRange r = beginScope.range;
 					r.length += aRange.length;
-					beginScope.range = r;
+					[s setRange:r];
 					return;
 				}
 			}
@@ -78,13 +79,13 @@
 		}
 		else
 		{
-			if (aRange.length > beginScope.range.length)
+			if (aRange.length > r.length)
 				e = [scopeTree left:e];
-			else if (aRange.length < beginScope.range.length)
+			else if (aRange.length < r.length)
 				e = [scopeTree right:e];
 			else
 			{
-				beginScope.scopes = aScopeArray;
+				[s setScopes:aScopeArray];
 				return;
 			}
 		}

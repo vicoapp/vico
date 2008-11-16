@@ -226,22 +226,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [[self windowControllers] objectAtIndex:0];
 }
 
-- (void)close
-{
-	[self removeWindowController:windowController];
-	[super close];
-}
-
-#if 0
-- (void)shouldCloseWindowController:(NSWindowController *)aWindowController
-                           delegate:(id)aDelegate
-	        shouldCloseSelector:(SEL)shouldCloseSelector
-			contextInfo:(void *)contextInfo
-{
-	[super shouldCloseWindowController:aWindowController delegate:aDelegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
-}
-#endif
-
 - (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
 {
 	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
@@ -289,6 +273,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[textView scrollRangeToVisible:range];
 		[[[self windowController] window] makeFirstResponder:textView];
 		[textView showFindIndicatorForRange:range];
+		
+		[symbolFilterField setStringValue:@""];
+		[self filterSymbols:symbolFilterField];
 	}
 }
 

@@ -66,6 +66,7 @@ static NSWindowController	*currentWindowController = nil;
 	{
 		[self addNewTab:initialDocument];
                 lastDocument = initialDocument;
+                initialDocument = nil;
 	}
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
@@ -124,18 +125,13 @@ static NSWindowController	*currentWindowController = nil;
 	[self setDocument:doc];
 }
 
-- (void)closeCurrentTabViewItem
-{
-	NSTabViewItem *tabViewItem;
-	
-	tabViewItem = [tabView selectedTabViewItem];
-	[[self window] performClose:self];
-}
-
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
+	ViDocument *doc = [tabViewItem identifier];
 	[tabView selectTabViewItem:tabViewItem];
-	[[self window] performClose:[tabViewItem identifier]];
+	[[self window] performClose:doc];
+	if (lastDocument == doc)
+		lastDocument = nil;
 	return NO;
 }
 
@@ -268,6 +264,9 @@ static NSWindowController	*currentWindowController = nil;
 - (IBAction)toggleProjectDrawer:(id)sender
 {
 }
+
+#pragma mark -
+#pragma mark Project split view
 
 - (void)switchToLastFile
 {

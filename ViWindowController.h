@@ -25,7 +25,6 @@
 - (int)numberOfTabViewItems;
 - (void)removeTabViewItemContainingDocument:(ViDocument *)doc;
 - (NSTabViewItem *)tabViewItemForDocument:(ViDocument *)doc;
-- (void)closeCurrentTabViewItem;
 - (ViDocument *)currentDocument;
 - (void)selectDocument:(ViDocument *)document;
 

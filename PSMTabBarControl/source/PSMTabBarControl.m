@@ -1145,7 +1145,7 @@
     NSArray *tabItems = [tabView tabViewItems];
     // go through cells, remove any whose representedObjects are not in [tabView tabViewItems]
     PSMTabBarCell *cell;
-    for(cell in _cells)
+    for(cell in [_cells copy])
     {
         if(![tabItems containsObject:[cell representedObject]]){
             [self removeTabForCell:cell];

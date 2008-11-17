@@ -486,6 +486,7 @@ done:
 	running = YES;
 	aborted = NO;
 	lineOffset = context.lineOffset;
+	currentContext = context;
 
 	/* Since the syntax parsing can be aborted (by setting the aborted
 	 * variable) we must make sure the continuations state is consistent.
@@ -500,11 +501,12 @@ done:
 
 	unsigned lineno = lineOffset;
 
-	DEBUG(@"highlighting line %u (%u -> %u) in thread %p",
+	INFO(@"parsing line %u (%u -> %u) in thread %p, context %p",
 		context.lineOffset,
 		context.range.location,
 		NSMaxRange(context.range),
-		[NSThread currentThread]);
+		[NSThread currentThread],
+		context);
 	
 	NSRange actualRange = context.range;
 	
@@ -590,7 +592,7 @@ done:
 	running = NO;
 	if (aborted)
 	{
-		INFO(@"syntax parsing aborted");
+		INFO(@"syntax parsing aborted, context = %p", context);
 	}
 	else
 	{
@@ -603,6 +605,7 @@ done:
 		[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
 	}
 
+	currentContext = nil;
 	chars = NULL;
 	[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
 	[uglyHack removeAllObjects];
@@ -611,12 +614,13 @@ done:
 	[[NSGarbageCollector defaultCollector] collectIfNeeded];
 }
 
-- (BOOL)abortIfRunningFromLine:(unsigned *)aLine
+- (BOOL)abortIfRunningWithRestartingContext:(ViSyntaxContext **)contextPtr
 {
-	if (running)
+	if (running && [currentContext restarting] == YES)
 	{
 		aborted = YES;
-		*aLine = lineOffset;
+		*contextPtr = currentContext;
+		INFO(@"aborted context %p", currentContext);
 		return YES;
 	}
 	

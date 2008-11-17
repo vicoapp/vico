@@ -21,6 +21,7 @@
 	const unichar *chars;
 	NSUInteger offset;
 	unsigned lineOffset;
+	ViSyntaxContext *currentContext;
 	BOOL aborted;
 	BOOL running;
 
@@ -45,6 +46,6 @@
 - (void)pushContinuations:(NSValue *)rangeValue;
 - (void)pullContinuations:(NSValue *)rangeValue;
 
-- (BOOL)abortIfRunningFromLine:(unsigned *)aLine;
+- (BOOL)abortIfRunningWithRestartingContext:(ViSyntaxContext **)contextPtr;
 
 @end

@@ -16,46 +16,41 @@
 
 /* Always executed on the main thread.
  */
-- (void)applyScope:(ViScope *)aScope
+- (void)applySyntaxResult:(ViSyntaxContext *)context
 {
-	NSArray *scopes = [aScope scopes];
-	NSRange range = [aScope range];
-
-	DEBUG(@"applying scopes [%@] to range %u + %u", [scopes componentsJoinedByString:@" "], range.location, range.length);		
-	[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
-
-	// Get the theme attributes for this collection of scopes.
-	NSDictionary *attributes = [theme attributesForScopes:scopes];
-	[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
-}
-
-/* Always executed on the main thread.
- */
-- (void)applySyntaxResult:(ViSyntaxContext *)aResult
-{
-#if 1
+#if 0
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 #endif
 
-	DEBUG(@"resetting attributes in range %@", NSStringFromRange([aResult range]));
-	[self resetAttributesInRange:[aResult range]];
+	INFO(@"applying range %@ context %p", NSStringFromRange([context range]), context);
+
+	DEBUG(@"resetting attributes in range %@", NSStringFromRange([context range]));
+	[self resetAttributesInRange:[context range]];
 
 	ViScope *scope;
-	for (scope in [aResult scopes])
+	for (scope in [context scopes])
 	{
-		DEBUG(@"[%@] (%p) range %@", [scope.scopes componentsJoinedByString:@" "], scope.scopes, NSStringFromRange(scope.range));
-		[self applyScope:scope];
+		NSArray *scopes = [scope scopes];
+		NSRange range = [scope range];
+	
+		DEBUG(@"[%@] (%p) range %@", [scopes componentsJoinedByString:@" "], scopes, NSStringFromRange(range));
+	
+		[[self layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
+	
+		// Get the theme attributes for this collection of scopes.
+		NSDictionary *attributes = [theme attributesForScopes:scopes];
+		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
 	}
 
-#if 1
+#if 0
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"applied %u scopes in range %@ => %.3f s",
-		[[aResult scopes] count], NSStringFromRange([aResult range]), (float)ms / 1000.0);
+		[[context scopes] count], NSStringFromRange([context range]), (float)ms / 1000.0);
 #endif
 
 	[updateSymbolsTimer invalidate];
@@ -73,25 +68,22 @@
 	if (aRange.length == 0)
 		return;
 
-	// [[self layoutManager] removeTemporaryAttribute:ViContinuationAttributeName forCharacterRange:aRange];
-	// [[self layoutManager] removeTemporaryAttribute:NSFontAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
 	
-	NSDictionary *defaultAttributes = nil;
 	if (language)
 	{
 		[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
 		[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
 		[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
 
+		NSDictionary *defaultAttributes = nil;
 		defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					  [theme foregroundColor], NSForegroundColorAttributeName,
-					    [self font], NSFontAttributeName,
+					  [self font], NSFontAttributeName,
 					  nil];
+		[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 	}
-
-	[[self layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 
 	if (resetFont)
 	{
@@ -113,7 +105,18 @@
 	unsigned line = [self lineNumberAtLocation:aRange.location];
 	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithCharacters:chars range:aRange line:line restarting:flag];
 
-	[syntaxParser performSelector:@selector(parseContext:) onThread:highlightThread withObject:ctx waitUntilDone:NO];
+	ViSyntaxContext *oldCtx;
+	if (!flag && [syntaxParser abortIfRunningWithRestartingContext:&oldCtx])
+	{
+		if ([oldCtx lineOffset] < line)
+			line = [oldCtx lineOffset];
+		[self dispatchSyntaxParserFromLine:[NSNumber numberWithUnsignedInt:line]];
+	}
+	else
+	{
+		INFO(@"scheduling parsing of range %@, context = %p", NSStringFromRange(aRange), ctx);
+		[syntaxParser performSelector:@selector(parseContext:) onThread:highlightThread withObject:ctx waitUntilDone:NO];
+	}
 }
 
 - (void)dispatchSyntaxParserFromLine:(NSNumber *)startLine
@@ -127,17 +130,17 @@
  */
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
-	NSRange area = [storage editedRange];
-	DEBUG(@"got notification for changes in area %@, change length = %i", NSStringFromRange(area), [storage changeInLength]);
-	
-	if ([storage length] == 0)
-		resetFont = YES;
-	
 	if (ignoreEditing)
 	{
 		ignoreEditing = NO;
 		return;
 	}
+
+	NSRange area = [storage editedRange];
+	DEBUG(@"got notification for changes in area %@, change length = %i", NSStringFromRange(area), [storage changeInLength]);
+	
+	if ([storage length] == 0)
+		resetFont = YES;
 	
 	if (language == nil)
 	{
@@ -150,18 +153,8 @@
 	[[storage string] getLineStart:&bol end:&eol contentsEnd:NULL forRange:area];
 	area.location = bol;
 	area.length = eol - bol;
-
 	DEBUG(@"extended area to %@", NSStringFromRange(area));
 
-#if 0
-	if ([highlightThread isExecuting])
-	{
-		INFO(@"cancelling highlighting thread %p", highlightThread);
-		[highlightThread cancel];
-		highlightThread = nil;
-		// [[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];
-	}
-#endif
 	[self dispatchSyntaxParserWithRange:area restarting:NO];
 }
 
@@ -181,7 +174,6 @@
 	
 	// dummy timer so we don't exit the run loop
 	[NSTimer scheduledTimerWithTimeInterval:1e8 target:self selector:@selector(doFireTimer:) userInfo:nil repeats:YES];
-	INFO(@"run loop for highlight thread %p starts", [NSThread currentThread]);
 	while (![[NSThread currentThread] isCancelled])
 	{
 		[runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];

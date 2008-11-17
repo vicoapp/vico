@@ -1458,10 +1458,12 @@ int logIndent = 0;
 	NSArray *lastSelector = nil;
 	NSRange wholeRange;
 
+#if 0
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
+#endif
 
 	NSMutableArray *symbols = [[NSMutableArray alloc] init];
 
@@ -1515,10 +1517,12 @@ int logIndent = 0;
 
 	[[self delegate] setSymbols:symbols];
 
+#if 0
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
+#endif
 }
 
 - (void)cancelThread

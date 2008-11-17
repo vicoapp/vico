@@ -140,6 +140,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 @end
 
 @interface ViTextView (syntax)
+- (void)reapplyTheme;
 - (void)highlightEverything;
 - (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag;
 - (void)dispatchSyntaxParserFromLine:(NSNumber *)startLine;

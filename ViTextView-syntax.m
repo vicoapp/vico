@@ -14,6 +14,29 @@
 
 @implementation ViTextView (syntax)
 
+- (void)reapplyTheme
+{
+	NSUInteger i, length = [storage length];
+	[self resetAttributesInRange:NSMakeRange(0, length)];
+	for (i = 0; i < length;)
+	{
+		NSRange range;
+		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+					                  atCharacterIndex:i
+						            effectiveRange:&range];
+	
+		if (scopes == nil)
+		{
+			break;
+		}
+
+		NSDictionary *attributes = [theme attributesForScopes:scopes];
+		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
+		
+		i += range.length;
+	}
+}
+
 /* Always executed on the main thread.
  */
 - (void)applySyntaxResult:(ViSyntaxContext *)context
@@ -54,7 +77,7 @@
 #endif
 
 	[updateSymbolsTimer invalidate];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:0.6]
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
 						      interval:0
 							target:self
 						      selector:@selector(updateSymbolList:)
@@ -73,7 +96,6 @@
 	
 	if (language)
 	{
-		[[self layoutManager] removeTemporaryAttribute:ViScopeAttributeName forCharacterRange:aRange];
 		[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
 		[[self layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
 

@@ -90,6 +90,7 @@ int logIndent = 0;
 	[self setSymbolScopes];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+	[self highlightEverything];
 	resetFont = YES;
 }
 
@@ -1335,7 +1336,7 @@ int logIndent = 0;
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
-	[self highlightEverything]; // highlights in background
+	[self reapplyTheme];
 }
 
 - (NSFont *)font

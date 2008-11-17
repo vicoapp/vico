@@ -1463,8 +1463,6 @@ int logIndent = 0;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 
-	INFO(@"updating the symbol list");
-
 	NSMutableArray *symbols = [[NSMutableArray alloc] init];
 
 	NSUInteger i, length = [storage length];
@@ -1525,7 +1523,6 @@ int logIndent = 0;
 
 - (void)cancelThread
 {
-	INFO(@"cancelling thread %p", highlightThread);
 	[highlightThread cancel];
 	// Send a dummy message to the run loop in the thread to interrupt the loop.
 	[self performSelector:@selector(ping:) onThread:highlightThread withObject:nil waitUntilDone:NO];

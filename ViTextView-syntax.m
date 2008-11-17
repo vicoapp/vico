@@ -162,7 +162,7 @@
 		// [[NSRunLoop mainRunLoop] cancelPerformSelectorsWithTarget:self];
 	}
 #endif
-	[self dispatchSyntaxParserWithRange:area restarting:YES];
+	[self dispatchSyntaxParserWithRange:area restarting:NO];
 }
 
 - (void)highlightEverything

@@ -189,6 +189,12 @@
 	INFO(@"run loop for highlight thread %p exits", [NSThread currentThread]);
 }
 
+/* Dummy message used to interrupt the run loop.
+ */
+- (void)ping:(id)arg
+{
+}
+
 - (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag
 {
 	int n = 0;

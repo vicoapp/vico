@@ -126,6 +126,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)currentColumn;
 
 - (void)updateSymbolList:(NSTimer *)timer;
+- (void)cancelThread;
 
 @end
 

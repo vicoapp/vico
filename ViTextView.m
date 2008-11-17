@@ -113,7 +113,7 @@ int logIndent = 0;
 			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
 	}
 
-	INFO(@"symbolScopes = %@", symbolScopes);
+	// INFO(@"symbolScopes = %@", symbolScopes);
 }
 
 - (void)setLanguageFromString:(NSString *)aLanguage
@@ -1521,6 +1521,14 @@ int logIndent = 0;
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
+}
+
+- (void)cancelThread
+{
+	INFO(@"cancelling thread %p", highlightThread);
+	[highlightThread cancel];
+	// Send a dummy message to the run loop in the thread to interrupt the loop.
+	[self performSelector:@selector(ping:) onThread:highlightThread withObject:nil waitUntilDone:NO];
 }
 
 @end

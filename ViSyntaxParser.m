@@ -470,7 +470,7 @@ done:
 
 - (void)parseContext:(ViSyntaxContext *)context
 {
-#ifndef NO_DEBUG
+#if 1
 	struct timeval start;
 	struct timeval stop_time;
 	struct timeval diff;
@@ -512,7 +512,7 @@ done:
 	
 	NSArray *continuedMatches = [self continuedMatchesForLine:lineno - 1];
 	
-	// NSUInteger lastScopeUpdate = 0;
+	NSUInteger lastScopeUpdate = offset;
 	NSUInteger nextRange = offset;
 	NSUInteger maxRange = NSMaxRange(context.range);
 
@@ -559,33 +559,38 @@ done:
 			if ([continuedMatches isEqualToPatternArray:endMatches])
 			{
 				DEBUG(@"detected matching line end matches, stopping at line %u", lineno);
-				actualRange.length = nextRange - offset;
+				actualRange.length = nextRange - lastScopeUpdate;
 				break;
 			}
 		}
 
 		lineno++;
 #if 0
-		if (lineno % 100 == 0)
+		if ((lineno % 100) == 0)
 		{
-			MHSysTree *tree = [context objectAtIndex:1];
-			[context replaceObjectAtIndex:1 withObject:[[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)]];
+#if 0
+			// commit the modified continuations state so far
+			continuationsState = continuations;
+			continuations = [continuationsState mutableCopy];
+#endif
+	
+			[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
+			[context setScopes:[scopeTree allObjects]];
+			[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
+			[uglyHack removeAllObjects];
 
-			NSArray *contextCopy = [NSArray arrayWithObjects:
-				[NSValue valueWithRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)],
-				tree,
-				nil];
-			[self performSelectorOnMainThread:@selector(applyContext:) withObject:contextCopy waitUntilDone:NO];
+			[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
 			lastScopeUpdate = nextRange;
+			[context setLineOffset:lineno];
 		}
 #endif
 	}
 
-#ifndef NO_DEBUG
+#if 1
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
+	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
@@ -599,8 +604,7 @@ done:
 		// commit the modified continuations state
 		continuationsState = continuations;
 	
-		// ViSyntaxResult *result = [[ViSyntaxResult alloc] initWithScopes:[scopeTree allObjects] range:actualRange];
-		[context setRange:actualRange];
+		[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
 		[context setScopes:[scopeTree allObjects]];
 		[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
 	}
@@ -620,7 +624,6 @@ done:
 	{
 		aborted = YES;
 		*contextPtr = currentContext;
-		INFO(@"aborted context %p", currentContext);
 		return YES;
 	}
 	

@@ -18,14 +18,14 @@
  */
 - (void)applySyntaxResult:(ViSyntaxContext *)context
 {
-#if 0
+#if 1
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 #endif
 
-	INFO(@"applying range %@ context %p", NSStringFromRange([context range]), context);
+	//INFO(@"applying range %@ context %p", NSStringFromRange([context range]), context);
 
 	DEBUG(@"resetting attributes in range %@", NSStringFromRange([context range]));
 	[self resetAttributesInRange:[context range]];
@@ -45,7 +45,7 @@
 		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
 	}
 
-#if 0
+#if 1
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;

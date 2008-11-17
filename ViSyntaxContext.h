@@ -12,7 +12,7 @@
 
 @property(readonly) unichar *characters;
 @property(readwrite) NSRange range;
-@property(readonly) unsigned lineOffset;
+@property(readwrite) unsigned lineOffset;
 @property(readonly) BOOL restarting;
 @property(readwrite, copy) NSArray *scopes;
 

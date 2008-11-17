@@ -65,9 +65,7 @@
 		{
 			if (NSMaxRange(r) == aRange.location)
 			{
-				NSArray *scopes = [s scopes];
-				NSString *scopeString = [aScopeArray componentsJoinedByString:@" "];
-				if ([scopes count] == c && [[scopes componentsJoinedByString:@" "] isEqualToString:scopeString])
+				if ([aScopeArray isEqualToStringArray:[s scopes]])
 				{
 					r.length += aRange.length;
 					[s setRange:r];
@@ -79,10 +77,13 @@
 		}
 		else
 		{
-			if (aRange.length > r.length)
+			if (r.length < aRange.length)
 				e = [scopeTree left:e];
-			else if (aRange.length < r.length)
+			else if (r.length > aRange.length)
+			{
+				
 				e = [scopeTree right:e];
+			}
 			else
 			{
 				[s setScopes:aScopeArray];
@@ -180,7 +181,7 @@
 
 	DEBUG(@"searching %i patterns in range %u + %u", [patterns count], aRange.location, aRange.length);
 
-	NSArray *topScopes = [self scopesFromMatches:openMatches];
+	NSArray *topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:nil];
 
 	// keep an array of matches so we can sort it in order to skip overlapping matches
 	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
@@ -234,7 +235,7 @@
 			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:pattern atIndex:i];
 			[matchingPatterns addObject:viMatch];
 		}
-				
+
 		++i;
 	}
 	[matchingPatterns sortUsingSelector:@selector(sortByLocation:)];
@@ -267,28 +268,28 @@
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
 			      [[aMatch beginMatch] rangeOfMatchedString].length);
-			NSMutableArray *newScopes = [[NSMutableArray alloc] init];
-			[newScopes addObjectsFromArray:topScopes];
 			if ([aMatch scope])
 			{
 				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
-				[newScopes addObject:[aMatch scope]];
+				NSArray *newScopes = [topScopes arrayByAddingObject:[aMatch scope]];
 				[self setScopes:newScopes inRange:[aMatch matchedRange]];
+				[self highlightCapturesInMatch:aMatch topScopes:newScopes];
 			}
-			[self highlightCapturesInMatch:aMatch topScopes:newScopes];
+			else
+				[self highlightCapturesInMatch:aMatch topScopes:topScopes];
 		}
 		else if ([aMatch endMatch])
 		{
-			[topOpenMatch setEndMatch:[aMatch endMatch]];
+			ViRegexpMatch *endMatch = [aMatch endMatch];
+			[topOpenMatch setEndMatch:endMatch];
 			DEBUG(@"got end match on [%@] at %u + %u",
 			      [aMatch scope],
-			      [[aMatch endMatch] rangeOfMatchedString].location,
-			      [[aMatch endMatch] rangeOfMatchedString].length);
+			      [endMatch rangeOfMatchedString].location,
+			      [endMatch rangeOfMatchedString].length);
 
 			topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:topOpenMatch];
-			[self setScopes:topScopes inRange:[[aMatch endMatch] rangeOfMatchedString]];
+			[self setScopes:topScopes inRange:[endMatch rangeOfMatchedString]];
 			[self highlightEndCapturesInMatch:aMatch topScopes:topScopes];
-			// [self performSelectorOnMainThread:@selector(highlightEndCapturesInMatch:) withObject:aMatch waitUntilDone:NO];
 
 			// pop one or more open matches off the stack and return the rest
 			while ([openMatches count] > 0)
@@ -297,7 +298,7 @@
 				topOpenMatch = [openMatches lastObject];
 				if (topOpenMatch == nil)
 					break;
-				NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:[[aMatch endMatch] rangeOfMatchedString]];
+				NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:[endMatch rangeOfMatchedString]];
 				// if the next top open match also matches the end range,
 				// and it is a look-ahead match, keep popping off open matches
 				if (endMatches == nil || [[endMatches objectAtIndex:0] rangeOfMatchedString].length != 0)
@@ -322,9 +323,9 @@
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL];
+			logIndent--;
 			if (aborted)
 				return nil;
-			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch topScopes:newTopScopes];
 			if (tmpEOL == YES)
@@ -361,7 +362,7 @@ done:
 
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch
 {
-	NSMutableArray *scopes = [[NSMutableArray alloc] init];
+	NSMutableArray *scopes = [[NSMutableArray alloc] initWithCapacity:[matches count] + 1];
 	[scopes addObject:[language name]];
 	ViSyntaxMatch *m;
 	for (m in matches)
@@ -380,11 +381,6 @@ done:
 
 	DEBUG(@"got scopes [%@]", [scopes componentsJoinedByString:@" "]);
 	return scopes;
-}
-
-- (NSArray *)scopesFromMatches:(NSArray *)matches
-{
-	return [self scopesFromMatches:matches withoutContentForMatch:nil];
 }
 
 - (NSArray *)highlightLineInRange:(NSRange)aRange

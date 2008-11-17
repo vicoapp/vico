@@ -41,7 +41,6 @@
 - (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange;
 
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
-- (NSArray *)scopesFromMatches:(NSArray *)matches;
 
 - (void)pushContinuations:(NSValue *)rangeValue;
 - (void)pullContinuations:(NSValue *)rangeValue;

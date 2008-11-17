@@ -71,13 +71,7 @@
 
 - (NSRange)matchedRange
 {
-	NSRange range = NSMakeRange([self beginLocation], [self endLocation] - [self beginLocation]);
-	if (range.length < 0)
-	{
-		INFO(@"negative length, beginLocation = %u, endLocation = %u", [self beginLocation], [self endLocation]);
-		range.length = 0;
-	}
-	return range;
+	return NSMakeRange([self beginLocation], [self endLocation] - [self beginLocation]);
 }
 
 - (BOOL)isSingleLineMatch

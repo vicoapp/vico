@@ -67,9 +67,8 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 
 - (void)addObjectsFromArray:(NSArray *)anArray
 {
-    NSEnumerator *e = [anArray objectEnumerator];
     id obj;
-    while ((obj = [e nextObject]) != nil)
+    for (obj in anArray)
         [self addObject:obj];
 }
 

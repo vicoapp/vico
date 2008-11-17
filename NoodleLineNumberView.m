@@ -483,14 +483,12 @@
 
 - (void)setMarkers:(NSArray *)markers
 {
-	NSEnumerator		*enumerator;
 	NSRulerMarker		*marker;
 	
 	[linesToMarkers removeAllObjects];
 	[super setMarkers:nil];
 
-	enumerator = [markers objectEnumerator];
-	while ((marker = [enumerator nextObject]) != nil)
+	for (marker in markers)
 	{
 		[self addMarker:marker];
 	}

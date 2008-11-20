@@ -6,8 +6,6 @@
 
 @implementation ViSyntaxParser
 
-@synthesize aborted;
-
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage
 {
 	self = [super init];
@@ -193,8 +191,6 @@
 		ViRegexpMatch *match;
 		for (match in endMatches)
 		{
-			if (aborted)
-				return nil;
 			ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[topOpenMatch pattern] atIndex:0];
 			[m setEndMatch:match];
 			[matchingPatterns addObject:m];
@@ -204,9 +200,6 @@
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
 	for (pattern in patterns)
 	{
-		if (aborted)
-			return nil;
-
 		/* Match all patterns against this range.
 		 */
 		ViRegexp *regexp = [pattern objectForKey:@"matchRegexp"];
@@ -228,8 +221,6 @@
 		ViRegexpMatch *match;
 		for (match in matches)
 		{
-			if (aborted)
-				return nil;
 			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:pattern atIndex:i];
 			[matchingPatterns addObject:viMatch];
 		}
@@ -243,9 +234,6 @@
 	ViSyntaxMatch *aMatch;
 	for (aMatch in matchingPatterns)
 	{
-		if (aborted)
-			return nil;
-
 		if ([aMatch beginLocation] < lastLocation)
 		{
 			// skip overlapping matches
@@ -322,8 +310,6 @@
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL];
 			logIndent--;
-			if (aborted)
-				return nil;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch topScopes:newTopScopes];
 			if (tmpEOL == YES)
@@ -406,9 +392,6 @@ done:
 					   openMatches:continuedMatches
 					    reachedEOL:&reachedEOL];
 
-		if (aborted)
-			return nil;
-
 		if (reachedEOL)
 			return continuedMatches;
 		lastLocation = [topMatch endLocation];
@@ -478,15 +461,12 @@ done:
 	regexps_cached = 0;
 
 	DEBUG(@"parsing range %@", NSStringFromRange(context.range));
-	aborted = NO;
-	lineOffset = context.lineOffset;
 
 	[[NSGarbageCollector defaultCollector] disable];
 
 	offset = context.range.location;
 	chars = context.characters;
-
-	unsigned lineno = lineOffset;
+	unsigned lineno = context.lineOffset;
 
 	DEBUG(@"parsing line %u (%u -> %u) in thread %p, context %p",
 		context.lineOffset,
@@ -522,9 +502,6 @@ done:
 
 		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;
-
-		if (aborted)
-			break;
 
 		NSArray *endMatches = [self continuedMatchesForLine:lineno];
 		[self setContinuation:continuedMatches forLine:lineno];
@@ -563,15 +540,8 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	if (aborted)
-	{
-		INFO(@"syntax parsing aborted, context = %p", context);
-	}
-	else
-	{
-		[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
-		[context setScopes:[scopeTree allObjects]];
-	}
+	[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
+	[context setScopes:[scopeTree allObjects]];
 
 	chars = NULL;
 	[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?

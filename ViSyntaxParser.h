@@ -21,10 +21,7 @@
 	// per-request state
 	const unichar *chars;
 	NSUInteger offset;
-	unsigned lineOffset;
 	ViSyntaxContext *context;
-
-	BOOL aborted;
 
 	// statistics
 	unsigned regexps_tried;
@@ -32,9 +29,6 @@
 	unsigned regexps_matched;
 	unsigned regexps_cached;
 }
-
-@property(readwrite) BOOL aborted;
-// @property(readonly) NSArray *contextStack;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;

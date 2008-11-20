@@ -50,10 +50,10 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	// language parsing and highlighting
 	BOOL ignoreEditing;
 	ViSyntaxParser *syntaxParser;
+	ViSyntaxContext *nextContext;
 	ViTheme *theme;
 	ViBundle *bundle;
 	ViLanguage *language;
-	NSThread *highlightThread;
 	BOOL resetFont;
 
 	// symbol list
@@ -126,7 +126,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (NSUInteger)currentColumn;
 
 - (void)updateSymbolList:(NSTimer *)timer;
-- (void)cancelThread;
 
 @end
 
@@ -143,8 +142,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)reapplyTheme;
 - (void)highlightEverything;
 - (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag;
-- (void)dispatchSyntaxParserFromLine:(NSNumber *)startLine;
-- (void)highlightMain:(id)arg;
 @end
 
 @interface ViTextView (vi_commands)

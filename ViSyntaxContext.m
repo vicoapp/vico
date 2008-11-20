@@ -8,6 +8,18 @@
 @synthesize lineOffset;
 @synthesize restarting;
 @synthesize scopes;
+@synthesize cancelled;
+
+- (ViSyntaxContext *)initWithLine:(unsigned)line
+{
+	self = [super init];
+	if (self)
+	{
+		lineOffset = line;
+		restarting = YES;
+	}
+	return self;
+}
 
 - (ViSyntaxContext *)initWithCharacters:(unichar *)chars range:(NSRange)aRange line:(unsigned)line restarting:(BOOL)flag
 {

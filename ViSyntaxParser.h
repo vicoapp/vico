@@ -8,7 +8,6 @@
 @interface ViSyntaxParser : NSObject
 {
 	// configuration
-	id delegate;
 	ViLanguage *language;
 
 	// persistent state
@@ -17,13 +16,15 @@
 	MHSysTree *scopeTree;
 	NSMutableArray *uglyHack;
 
+	NSMutableArray *contextStack;
+
 	// per-request state
 	const unichar *chars;
 	NSUInteger offset;
 	unsigned lineOffset;
-	ViSyntaxContext *currentContext;
+	ViSyntaxContext *context;
+
 	BOOL aborted;
-	BOOL running;
 
 	// statistics
 	unsigned regexps_tried;
@@ -33,8 +34,9 @@
 }
 
 @property(readwrite) BOOL aborted;
+// @property(readonly) NSArray *contextStack;
 
-- (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage delegate:(id)aDelegate;
+- (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;
 
 - (void)setContinuation:(NSArray *)continuationMatches forLine:(unsigned)lineno;
@@ -44,7 +46,5 @@
 
 - (void)pushContinuations:(NSValue *)rangeValue;
 - (void)pullContinuations:(NSValue *)rangeValue;
-
-- (BOOL)abortIfRunningWithRestartingContext:(ViSyntaxContext **)contextPtr;
 
 @end

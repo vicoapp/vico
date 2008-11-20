@@ -41,7 +41,7 @@
  */
 - (void)applySyntaxResult:(ViSyntaxContext *)context
 {
-#if 1
+#if 0
 	struct timeval start;
 	struct timeval stop;
 	struct timeval diff;
@@ -68,7 +68,7 @@
 		[[self layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
 	}
 
-#if 1
+#if 0
 	gettimeofday(&stop, NULL);
 	timersub(&stop, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
@@ -93,7 +93,7 @@
 
 	[[self layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
-	
+
 	if (language)
 	{
 		[[self layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
@@ -115,40 +115,73 @@
 	}
 }
 
+- (void)performContext:(ViSyntaxContext *)ctx
+{
+	NSRange range = ctx.range;
+	unichar *chars = malloc(range.length * sizeof(unichar));
+	DEBUG(@"allocated %u bytes characters %p", range.length * sizeof(unichar), chars);
+	[[storage string] getCharacters:chars range:range];
+
+	ctx.characters = chars;
+	unsigned startLine = ctx.lineOffset;
+
+	// unsigned endLine = [self lineNumberAtLocation:NSMaxRange(range) - 1];
+	// INFO(@"parsing line %u -> %u (ctx = %@)", startLine, endLine, ctx);
+
+	[syntaxParser parseContext:ctx];
+	[self performSelector:@selector(applySyntaxResult:) withObject:ctx afterDelay:0.0];
+
+	if (ctx.lineOffset > startLine)
+	{
+		// INFO(@"line endings have changed at line %u", endLine);
+		
+		if (nextContext && nextContext != ctx)
+		{
+			INFO(@"cancelling scheduled parsing from line %u (nextContext = %@)", nextContext.lineOffset, nextContext);
+			[nextContext setCancelled:YES];
+		}
+		
+		nextContext = ctx;
+		[self performSelector:@selector(restartContext:) withObject:ctx afterDelay:0.0025];
+	}
+	// FIXME: probably need a stack here
+}
+
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag
 {
 	if (aRange.length == 0)
 		return;
 
-	unichar *chars = malloc(aRange.length * sizeof(unichar));
-	DEBUG(@"allocated %u bytes characters %p", aRange.length * sizeof(unichar), chars);
-	[[storage string] getCharacters:chars range:aRange];
-
 	unsigned line = [self lineNumberAtLocation:aRange.location];
-	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithCharacters:chars range:aRange line:line restarting:flag];
+	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithLine:line];
+	ctx.range = aRange;
+	ctx.restarting = flag;
 
-	ViSyntaxContext *oldCtx;
-	if (!flag && [syntaxParser abortIfRunningWithRestartingContext:&oldCtx])
-	{
-		if ([oldCtx lineOffset] < line)
-			line = [oldCtx lineOffset];
-		[self dispatchSyntaxParserFromLine:[NSNumber numberWithUnsignedInt:line]];
-	}
-	else
-	{
-		INFO(@"scheduling parsing of range %@, context = %p", NSStringFromRange(aRange), ctx);
-		[syntaxParser performSelector:@selector(parseContext:) onThread:highlightThread withObject:ctx waitUntilDone:NO];
-	}
+	[self performContext:ctx];
 }
 
-- (void)dispatchSyntaxParserFromLine:(NSNumber *)startLine
+- (void)restartContext:(ViSyntaxContext *)context
 {
-	NSUInteger startLocation = [self locationForStartOfLine:[startLine unsignedIntValue]];
-	[self dispatchSyntaxParserWithRange:NSMakeRange(startLocation, [storage length] - startLocation) restarting:YES];
+	nextContext = nil;
+
+	if (context.cancelled)
+	{
+		INFO(@"context %@, from line %u, is cancelled", context, context.lineOffset);
+		return;
+	}
+
+	NSUInteger startLocation = [self locationForStartOfLine:context.lineOffset];
+	NSInteger endLocation = [self locationForStartOfLine:context.lineOffset + 10];
+	if (endLocation == -1)
+		endLocation = [storage length];
+
+	context.range = NSMakeRange(startLocation, endLocation - startLocation);
+	DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
+	[self performContext:context];
 }
 
 /*
- * Update syntax colors.
+ * Update syntax colors for the affected lines.
  */
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
@@ -187,26 +220,12 @@
 		[self resetAttributesInRange:NSMakeRange(0, [storage length])];
 		return;
 	}
-	[self dispatchSyntaxParserWithRange:NSMakeRange(0, [storage length]) restarting:NO];
-}
 
-- (void)highlightMain:(id)arg
-{
-	NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-	
-	// dummy timer so we don't exit the run loop
-	[NSTimer scheduledTimerWithTimeInterval:1e8 target:self selector:@selector(doFireTimer:) userInfo:nil repeats:YES];
-	while (![[NSThread currentThread] isCancelled])
-	{
-		[runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-	}
-	INFO(@"run loop for highlight thread %p exits", [NSThread currentThread]);
-}
+	NSInteger endLocation = [self locationForStartOfLine:10];
+	if (endLocation == -1)
+		endLocation = [storage length];
 
-/* Dummy message used to interrupt the run loop.
- */
-- (void)ping:(id)arg
-{
+	[self dispatchSyntaxParserWithRange:NSMakeRange(0, endLocation) restarting:NO];
 }
 
 - (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag
@@ -232,9 +251,9 @@
 		lineno = [self lineNumberAtLocation:aLocation - 1];
 
 	if (flag)
-		[syntaxParser performSelector:@selector(pushContinuations:) onThread:highlightThread withObject:[NSValue valueWithRange:NSMakeRange(lineno, n)] waitUntilDone:NO];
+		[syntaxParser pushContinuations:[NSValue valueWithRange:NSMakeRange(lineno, n)]];
 	else
-		[syntaxParser performSelector:@selector(pullContinuations:) onThread:highlightThread withObject:[NSValue valueWithRange:NSMakeRange(lineno, n)] waitUntilDone:NO];
+		[syntaxParser pullContinuations:[NSValue valueWithRange:NSMakeRange(lineno, n)]];
 }
 
 @end

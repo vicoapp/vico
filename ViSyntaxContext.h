@@ -8,14 +8,17 @@
 	unsigned lineOffset;
 	BOOL restarting;
 	NSArray *scopes;
+	BOOL cancelled;
 }
 
-@property(readonly) unichar *characters;
+@property(readwrite, assign) unichar *characters;
 @property(readwrite) NSRange range;
 @property(readwrite) unsigned lineOffset;
-@property(readonly) BOOL restarting;
+@property(readwrite) BOOL restarting;
+@property(readwrite) BOOL cancelled;
 @property(readwrite, copy) NSArray *scopes;
 
+- (ViSyntaxContext *)initWithLine:(unsigned)line;
 - (ViSyntaxContext *)initWithCharacters:(unichar *)chars range:(NSRange)aRange line:(unsigned)line restarting:(BOOL)flag;
 
 @end

@@ -8,16 +8,14 @@
 
 @synthesize aborted;
 
-- (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage delegate:(id)aDelegate
+- (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage
 {
 	self = [super init];
 	if (self)
 	{
 		language = aLanguage;
-		delegate = aDelegate;
-		
 		scopeTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
-		continuationsState = [[NSMutableArray alloc] init];
+		continuations = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -463,15 +461,16 @@ done:
 	}
 }
 
-
-- (void)parseContext:(ViSyntaxContext *)context
+- (void)parseContext:(ViSyntaxContext *)aContext
 {
-#if 1
+#if 0
 	struct timeval start;
 	struct timeval stop_time;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 #endif
+
+	context = aContext;
 
 	regexps_tried = 0;
 	regexps_overlapped = 0;
@@ -479,16 +478,8 @@ done:
 	regexps_cached = 0;
 
 	DEBUG(@"parsing range %@", NSStringFromRange(context.range));
-	running = YES;
 	aborted = NO;
 	lineOffset = context.lineOffset;
-	currentContext = context;
-
-	/* Since the syntax parsing can be aborted (by setting the aborted
-	 * variable) we must make sure the continuations state is consistent.
-	 * Make a copy so we can discard it if we're aborted.
-	 */
-	continuations = [continuationsState mutableCopy];
 
 	[[NSGarbageCollector defaultCollector] disable];
 
@@ -497,7 +488,7 @@ done:
 
 	unsigned lineno = lineOffset;
 
-	INFO(@"parsing line %u (%u -> %u) in thread %p, context %p",
+	DEBUG(@"parsing line %u (%u -> %u) in thread %p, context %p",
 		context.lineOffset,
 		context.range.location,
 		NSMaxRange(context.range),
@@ -513,7 +504,7 @@ done:
 	NSUInteger maxRange = NSMaxRange(context.range);
 
 	// highlight each line separately
-	while (nextRange < maxRange)
+	for (;;)
 	{
 		NSUInteger end = nextRange;
 		while (end < maxRange && chars[end - offset] != '\n') // FIXME: need updating for other line endings
@@ -541,13 +532,14 @@ done:
 		if (nextRange >= maxRange)
 		{
 			DEBUG(@"verifying end match in line %u: should be %@, is %@", lineno, endMatches, continuedMatches);
-			if (![continuedMatches isEqualToPatternArray:endMatches])
+			if (endMatches == nil || ![continuedMatches isEqualToPatternArray:endMatches])
 			{
 				DEBUG(@"detected changed line end matches in incremental mode at line %u", lineno);
-				[delegate performSelectorOnMainThread:@selector(dispatchSyntaxParserFromLine:)
-				                           withObject:[NSNumber numberWithUnsignedInt:lineno + 1]
-				                        waitUntilDone:NO];
+				/* Signal that we must continue re-parsing lines following this line.
+				 */
+				context.lineOffset = lineno + 1;
 			}
+			break;
 		}
 		else if (context.restarting)
 		{
@@ -561,28 +553,9 @@ done:
 		}
 
 		lineno++;
-#if 0
-		if ((lineno % 100) == 0)
-		{
-#if 0
-			// commit the modified continuations state so far
-			continuationsState = continuations;
-			continuations = [continuationsState mutableCopy];
-#endif
-	
-			[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
-			[context setScopes:[scopeTree allObjects]];
-			[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
-			[uglyHack removeAllObjects];
-
-			[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
-			lastScopeUpdate = nextRange;
-			[context setLineOffset:lineno];
-		}
-#endif
 	}
 
-#if 1
+#if 0
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
@@ -590,40 +563,22 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	running = NO;
 	if (aborted)
 	{
 		INFO(@"syntax parsing aborted, context = %p", context);
 	}
 	else
 	{
-		// commit the modified continuations state
-		continuationsState = continuations;
-	
 		[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
 		[context setScopes:[scopeTree allObjects]];
-		[delegate performSelectorOnMainThread:@selector(applySyntaxResult:) withObject:context waitUntilDone:NO];
 	}
 
-	currentContext = nil;
 	chars = NULL;
 	[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
 	[uglyHack removeAllObjects];
 
 	[[NSGarbageCollector defaultCollector] enable];
 	[[NSGarbageCollector defaultCollector] collectIfNeeded];
-}
-
-- (BOOL)abortIfRunningWithRestartingContext:(ViSyntaxContext **)contextPtr
-{
-	if (running && [currentContext restarting] == YES)
-	{
-		aborted = YES;
-		*contextPtr = currentContext;
-		return YES;
-	}
-	
-	return NO;
 }
 
 @end

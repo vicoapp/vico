@@ -128,12 +128,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Other interesting stuff
 
-- (void)close
-{
-	[textView cancelThread];
-	[super close];
-}
-
 - (NSView *)view
 {
 	return view;

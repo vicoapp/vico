@@ -42,9 +42,6 @@ int logIndent = 0;
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-	
-	highlightThread = [[NSThread alloc] initWithTarget:self selector:@selector(highlightMain:) object:nil];
-	[highlightThread start];
 
 	inputCommands = [NSDictionary dictionaryWithObjectsAndKeys:
 			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00000024], // enter
@@ -125,7 +122,7 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
+		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
 		[self highlightEverything];
 	}
 }
@@ -162,7 +159,7 @@ int logIndent = 0;
 	if (newLanguage != language)
 	{
 		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language delegate:self];
+		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
 		[self highlightEverything];
 	}
 }
@@ -1383,11 +1380,11 @@ int logIndent = 0;
 {
 	int line = 1;
 	NSInteger location = 0;
-	while(line < aLineNumber)
+	while (line < aLineNumber)
 	{
 		NSUInteger end;
 		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:location];
-		if(location == end)
+		if (location == end)
 		{
 			return -1;
 		}
@@ -1524,13 +1521,6 @@ int logIndent = 0;
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
 #endif
-}
-
-- (void)cancelThread
-{
-	[highlightThread cancel];
-	// Send a dummy message to the run loop in the thread to interrupt the loop.
-	[self performSelector:@selector(ping:) onThread:highlightThread withObject:nil waitUntilDone:NO];
 }
 
 @end

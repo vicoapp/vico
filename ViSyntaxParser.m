@@ -460,8 +460,6 @@ done:
 	regexps_matched = 0;
 	regexps_cached = 0;
 
-	DEBUG(@"parsing range %@", NSStringFromRange(context.range));
-
 	[[NSGarbageCollector defaultCollector] disable];
 
 	offset = context.range.location;
@@ -475,11 +473,8 @@ done:
 		[NSThread currentThread],
 		context);
 	
-	NSRange actualRange = context.range;
-	
 	NSArray *continuedMatches = [self continuedMatchesForLine:lineno - 1];
 	
-	NSUInteger lastScopeUpdate = offset;
 	NSUInteger nextRange = offset;
 	NSUInteger maxRange = NSMaxRange(context.range);
 
@@ -508,7 +503,6 @@ done:
 
 		if (nextRange >= maxRange)
 		{
-			DEBUG(@"verifying end match in line %u: should be %@, is %@", lineno, endMatches, continuedMatches);
 			if (endMatches == nil || ![continuedMatches isEqualToPatternArray:endMatches])
 			{
 				DEBUG(@"detected changed line end matches in incremental mode at line %u", lineno);
@@ -520,11 +514,9 @@ done:
 		}
 		else if (context.restarting)
 		{
-			DEBUG(@"cmp end: actual=%@, expected=%@", continuedMatches, endMatches);
-			if ([continuedMatches isEqualToPatternArray:endMatches])
+			if (endMatches && [continuedMatches isEqualToPatternArray:endMatches])
 			{
 				DEBUG(@"detected matching line end matches, stopping at line %u", lineno);
-				actualRange.length = nextRange - lastScopeUpdate;
 				break;
 			}
 		}
@@ -540,7 +532,7 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	[context setRange:NSMakeRange(lastScopeUpdate, nextRange - lastScopeUpdate)];
+	[context setRange:NSMakeRange(offset, nextRange - offset)];
 	[context setScopes:[scopeTree allObjects]];
 
 	chars = NULL;

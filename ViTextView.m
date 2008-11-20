@@ -7,6 +7,7 @@
 #import "NSArray-patterns.h"
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
+#import "ViSymbolTransform.h"
 
 int logIndent = 0;
 
@@ -242,15 +243,21 @@ int logIndent = 0;
 	[self insertString:aString atLocation:aLocation undoGroup:YES];
 }
 
-- (void)deleteRange:(NSRange)aRange
+- (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
 {
 	if (aRange.length == 0)
 		return;
 
-	[self beginUndoGroup];
+	if (undoGroup)
+		[self beginUndoGroup];
 	[self recordDeleteOfRange:aRange];
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
+}
+
+- (void)deleteRange:(NSRange)aRange
+{
+	[self deleteRange:aRange undoGroup:NO];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
@@ -526,10 +533,8 @@ int logIndent = 0;
 
 - (void)undoInsertInRange:(NSRange)aRange
 {
-	NSString *deletedString = [[storage string] substringWithRange:aRange];
-	[storage deleteCharactersInRange:aRange];
+	[self deleteRange:aRange undoGroup:NO];
 	final_location = aRange.location;
-	[self recordDeleteOfString:deletedString atLocation:aRange.location];
 }
 
 - (void)recordInsertInRange:(NSRange)aRange
@@ -643,7 +648,7 @@ int logIndent = 0;
 }
 
 #pragma mark -
-#pragma mark - Ex command support
+#pragma mark Ex command support
 
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString
 {
@@ -1487,11 +1492,12 @@ int logIndent = 0;
 			if (lastSelector)
 			{
 				NSString *symbol = [[storage string] substringWithRange:wholeRange];
-				NSDictionary *d = [symbolSettings objectForKey:lastSelector];
+				NSDictionary *d = [symbolSettings objectForKey:[lastSelector componentsJoinedByString:@" "]];
 				NSString *transform = [d objectForKey:@"symbolTransformation"];
 				if (transform)
 				{
-					// INFO(@"apply transformation %@ on %@", transform, lastSymbol);
+					ViSymbolTransform *tr = [[ViSymbolTransform alloc] initWithTransformationString:transform];
+					symbol = [tr transformSymbol:symbol];
 				}
 
 				[symbols addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange]];

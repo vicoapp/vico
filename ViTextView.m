@@ -436,15 +436,15 @@ int logIndent = 0;
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
         NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
-	NSMutableString *newline = [NSMutableString stringWithString:@"\n"];
+		
+	[self insertString:@"\n" atLocation:aLocation];
 
         if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-                                    atCharacterIndex:aLocation
+                                    atCharacterIndex:aLocation + 1
                                       effectiveRange:NULL] && aLocation > 0)
         {
-		// assume indentForward?
-		NSString *indent = [self leadingWhitespaceForLineAtLocation:aLocation];
-                [newline appendFormat:@"\n%@", indent];
+		// assumes indentForward
+                [self insertString:[NSString stringWithFormat:@"\n%@", leading_whitespace] atLocation:aLocation + 1];
         }
 
 	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
@@ -461,15 +461,12 @@ int logIndent = 0;
 
 		if (leading_whitespace)
 		{
-			if (indentForward)
-				[newline appendString:leading_whitespace];
-			else
-				[newline insertString:leading_whitespace atIndex:0];
+			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
+			return 1 + [leading_whitespace length];
 		}
 	}
 
-	[self insertString:newline atLocation:aLocation];
-	return [newline length];
+	return 1;
 }
 
 - (int)changeIndentation:(int)delta inRange:(NSRange)aRange

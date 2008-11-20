@@ -1421,11 +1421,16 @@ int logIndent = 0;
 	return [self lineNumberAtLocation:[self caret]];
 }
 
-- (NSUInteger)currentColumn
+- (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger bol, end;
-	[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:[self caret]];
+	[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:aLocation];
 	return [self caret] - bol;
+}
+
+- (NSUInteger)currentColumn
+{
+	return [self columnAtLocation:[self caret]];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
@@ -1452,6 +1457,9 @@ int logIndent = 0;
 {
         [[[self delegate] windowController] switchToLastFile];
 }
+
+#pragma mark -
+#pragma mark Symbol list
 
 - (void)updateSymbolList:(NSTimer *)timer
 {
@@ -1524,6 +1532,234 @@ int logIndent = 0;
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
 #endif
+}
+
+#pragma mark -
+#pragma mark Bundle commands
+
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+{
+	NSRange trackedRange = NSMakeRange(aLocation, 0);
+	NSUInteger i = aLocation;
+	for (;;)
+	{
+		if (forward && i >= [storage length])
+			break;
+		else if (!forward && i == 0)
+			break;
+	
+		NSRange range = NSMakeRange(i, 0);
+		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
+							  atCharacterIndex:i
+							    effectiveRange:&range];
+		if (scopes == nil)
+			break;
+
+		if ([scopeSelector matchesScopes:scopes])
+			trackedRange = NSUnionRange(trackedRange, range);
+		else
+			break;
+
+		if (forward)
+			i += range.length;
+		else
+			i -= range.length;
+	}
+
+	return trackedRange;
+}
+
+- (NSString *)inputOfType:(NSString *)type command:(NSDictionary *)command range:(NSRange *)rangePtr
+{
+	NSString *inputText = nil;
+
+	if ([type isEqualToString:@"selection"])
+	{
+		NSRange sel = [self selectedRange];
+		if (sel.length > 0)
+		{
+			*rangePtr = sel;
+			inputText = [[storage string] substringWithRange:*rangePtr];
+		}
+	}
+	else if ([type isEqualToString:@"document"])
+	{
+		inputText = [storage string];
+		*rangePtr = NSMakeRange(0, [storage length]);
+	}
+	else if ([type isEqualToString:@"scope"])
+	{
+		NSRange rb = [self trackScopeSelector:[command objectForKey:@"scope"] forward:NO fromLocation:[self caret]];
+		INFO(@"tracked back range %@", NSStringFromRange(rb));
+		NSRange rf = [self trackScopeSelector:[command objectForKey:@"scope"] forward:YES fromLocation:[self caret]];
+		INFO(@"tracked forward range %@", NSStringFromRange(rf));
+		*rangePtr = NSUnionRange(rb, rf);
+		INFO(@"union range %@", NSStringFromRange(*rangePtr));
+		inputText = [[storage string] substringWithRange:*rangePtr];
+	}
+	else if ([type isEqualToString:@"none"])
+	{
+		inputText = @"";
+		*rangePtr = NSMakeRange(0, 0);
+	}
+
+	return inputText;
+}
+
+- (NSString*)inputForCommand:(NSDictionary *)command range:(NSRange *)rangePtr
+{
+	NSString *inputText = [self inputOfType:[command objectForKey:@"input"] command:command range:rangePtr];
+	if (inputText == nil)
+		inputText = [self inputOfType:[command objectForKey:@"fallbackInput"] command:command range:rangePtr];
+
+	return inputText;
+}
+
+- (void)setenv:(const char *)var value:(NSString *)value
+{
+	if (value)
+		setenv(var, [value UTF8String], 1);
+}
+
+- (void)setenv:(const char *)var integer:(NSInteger)intValue
+{
+	setenv(var, [[NSString stringWithFormat:@"%li", intValue] UTF8String], 1);
+}
+
+- (void)setupEnvironmentForCommand:(NSDictionary *)command
+{
+	NSString *bundleSupportPath = [[command objectForKey:@"bundle"] supportPath];
+	setenv("TM_BUNDLE_SUPPORT", [bundleSupportPath UTF8String], 1);
+
+	NSString *supportPath = @"/Library/Application Support/TextMate/Support";
+	setenv("TM_SUPPORT_PATH", [supportPath UTF8String], 1);
+
+	char *path = getenv("PATH");
+	setenv("PATH", [[NSString stringWithFormat:@"%s:%@:%@",
+		path,
+		[supportPath stringByAppendingPathComponent:@"bin"],
+		[bundleSupportPath stringByAppendingPathComponent:@"bin"]] UTF8String], 1);
+
+	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
+	[self setenv:"TM_CURRENT_WORD" value:[self wordAtLocation:[self caret]]];
+	[self setenv:"TM_DIRECTORY" value:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];
+	[self setenv:"TM_LINE_INDEX" integer:[self currentColumn]];
+	[self setenv:"TM_LINE_NUMBER" integer:[self currentLine]];
+	[self setenv:"TM_SCOPE" value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
+
+	// FIXME: TM_PROJECT_DIRECTORY
+	// FIXME: TM_SELECTED_FILES
+	// FIXME: TM_SELECTED_FILE
+	[self setenv:"TM_SELECTED_TEXT" value:[[storage string] substringWithRange:[self selectedRange]]];
+
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
+		setenv("TM_SOFT_TABS", "YES", 1);
+	else
+		setenv("TM_SOFT_TABS", "NO", 1);
+
+	setenv("TM_TAB_SIZE", [[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"] UTF8String], 1);
+
+	// FIXME: shellVariables in bundle preferences
+}
+
+- (void)performBundleCommand:(id)sender
+{
+	INFO(@"sender = %@", sender);
+	NSDictionary *command = [sender representedObject];
+	INFO(@"command = %@", command);
+	NSRange inputRange;
+
+	NSString *inputText = [self inputForCommand:command range:&inputRange];
+	[self setenv:"TM_INPUT_START_COLUMN" integer:[self columnAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_COLUMN" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
+	[self setenv:"TM_INPUT_START_LINE_INDEX" integer:[self columnAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_LINE_INDEX" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
+	[self setenv:"TM_INPUT_START_LINE" integer:[self lineNumberAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_LINE" integer:[self lineNumberAtLocation:NSMaxRange(inputRange)]];
+	
+	// FIXME: beforeRunningCommand
+	
+	char *templateFilename = NULL;
+	int fd = -1;
+
+	NSString *shellCommand = [command objectForKey:@"command"];
+	if ([shellCommand hasPrefix:@"#!"])
+	{
+		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_cmd.XXXXXX"] fileSystemRepresentation];
+		INFO(@"using template %s", tmpl);
+		templateFilename = strdup(tmpl);
+		fd = mkstemp(templateFilename);
+		if (fd == -1)
+		{
+			NSLog(@"failed to open temporary file: %s", strerror(errno));
+			return;
+		}
+		const char *data = [shellCommand UTF8String];
+		ssize_t rc = write(fd, data, strlen(data));
+		INFO(@"wrote %i byte", rc);
+		chmod(templateFilename, 0700);
+		shellCommand = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:templateFilename length:strlen(templateFilename)];
+	}
+	
+	INFO(@"input text = [%@]", inputText);
+	
+	NSTask *task = [[NSTask alloc] init];
+	[task setLaunchPath:@"/bin/bash"];
+	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
+
+	id shellInput;
+	if ([inputText length] > 0)
+		shellInput = [NSPipe pipe];
+	else
+		shellInput = [NSFileHandle fileHandleWithNullDevice];
+	NSPipe *shellOutput = [NSPipe pipe];
+
+	[task setStandardInput:shellInput];
+	[task setStandardOutput:shellOutput];
+	/* FIXME: set standard error to standard output? */
+
+	[self setupEnvironmentForCommand:command];
+	[task launch];
+	if ([inputText length] > 0)
+	{
+		[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
+		[[shellInput fileHandleForWriting] closeFile];
+	}
+
+	[task waitUntilExit];
+	int status = [task terminationStatus];
+
+	if (fd != -1)
+	{
+		unlink(templateFilename);
+		close(fd);
+		free(templateFilename);
+	}
+
+	if (status != 0)
+	{
+		[[self delegate] message:@"%@: exited with status %i", [command objectForKey:@"name"], status];
+	}
+	else
+	{
+		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
+		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+		
+		NSString *output = [command objectForKey:@"output"];
+		if ([output isEqualToString:@"replaceSelectedText"])
+			[self replaceRange:inputRange withString:outputText];
+		else if ([output isEqualToString:@"showAsTooltip"])
+			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
+		else if ([output isEqualToString:@"showAsHTML"])
+			INFO(@"show as html: %@", outputText);
+		else if ([output isEqualToString:@"insertAsSnippet"])
+			[self insertSnippet:outputText atLocation:[self caret]];
+		else if ([output isEqualToString:@"discard"])
+			;
+		else
+			INFO(@"unknown output method: %@", output);
+	}
 }
 
 @end

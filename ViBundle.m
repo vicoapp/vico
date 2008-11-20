@@ -5,6 +5,7 @@
 @implementation ViBundle
 
 @synthesize languages;
+@synthesize commands;
 
 - (id)initWithPath:(NSString *)aPath
 {
@@ -15,10 +16,17 @@
 		preferences = [[NSMutableArray alloc] init];
 		cachedPreferences = [[NSMutableDictionary alloc] init];
 		snippets = [[NSMutableArray alloc] init];
+		commands = [[NSMutableArray alloc] init];
+		path = aPath;
 		info = [NSDictionary dictionaryWithContentsOfFile:aPath];
 	}
 	
 	return self;
+}
+
+- (NSString *)supportPath
+{
+	return [path stringByAppendingPathComponent:@"Support"];
 }
 
 - (NSString *)name
@@ -72,6 +80,12 @@
 - (void)addSnippet:(NSDictionary *)snippet
 {
 	[snippets addObject:snippet];
+}
+
+- (void)addCommand:(NSDictionary *)command
+{
+	[command setObject:self forKey:@"bundle"];
+	[commands addObject:command];
 }
 
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes

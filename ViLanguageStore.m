@@ -32,7 +32,6 @@ static ViLanguageStore *defaultStore = nil;
 			continue;
 
 		ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
-		// [bundle setObject:[NSString stringWithFormat:@"%@/%@", aPath, subdir] forKey:@"path"];
 
 		NSString *syntaxPath = [NSString stringWithFormat:@"%@/%@/Syntaxes", aPath, subdir];
 		NSArray *syntaxfiles = [[NSFileManager defaultManager] directoryContentsAtPath:syntaxPath];
@@ -59,15 +58,26 @@ static ViLanguageStore *defaultStore = nil;
 			}
 		}
 
-		NSString *snippetsPath = [NSString stringWithFormat:@"%@/%@/Snippets", aPath, subdir];
-		NSArray *snippetsfiles = [[NSFileManager defaultManager] directoryContentsAtPath:snippetsPath];
-		NSString *snippetsfile;
-		for (snippetsfile in snippetsfiles)
+		NSString *path = [NSString stringWithFormat:@"%@/%@/Snippets", aPath, subdir];
+		NSArray *files = [[NSFileManager defaultManager] directoryContentsAtPath:path];
+		NSString *file;
+		for (file in files)
 		{
-			if ([snippetsfile hasSuffix:@".tmSnippet"] || [snippetsfile hasSuffix:@".plist"])
+			if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])
 			{
-				NSDictionary *snippet = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", snippetsPath, snippetsfile]];
+				NSDictionary *snippet = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
 				[bundle addSnippet:snippet];
+			}
+		}
+
+		path = [NSString stringWithFormat:@"%@/%@/Commands", aPath, subdir];
+		files = [[NSFileManager defaultManager] directoryContentsAtPath:path];
+		for (file in files)
+		{
+			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
+			{
+				NSDictionary *command = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
+				[bundle addCommand:command];
 			}
 		}
 
@@ -201,6 +211,11 @@ static ViLanguageStore *defaultStore = nil;
 		[langnames addObject:[lang displayName]];
 	}
 	return langnames;
+}
+
+- (NSArray *)allBundles
+{
+	return bundles;
 }
 
 - (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings

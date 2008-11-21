@@ -106,7 +106,7 @@
 
 	NSTask *task = [[NSTask alloc] init];
 	[task setLaunchPath:@"/bin/sh"];
-	[task setArguments:[NSArray arrayWithObjects:@"-c", [NSString stringWithFormat:@"%@", shellCommand], nil]];
+	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
 
 	NSPipe *shellInput = [NSPipe pipe];
 	NSPipe *shellOutput = [NSPipe pipe];

@@ -131,6 +131,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 @end
 
 @interface ViTextView (snippets)
+- (void)cancelSnippet:(ViSnippet *)snippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
 - (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
 - (ViSnippet *)snippetAtLocation:(NSUInteger)aLocation;

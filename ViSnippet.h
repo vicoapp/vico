@@ -2,6 +2,7 @@
 
 @interface ViSnippetPlaceholder : NSObject
 {
+	NSString *string;
 	unsigned length;
 	int tabStop;
 	NSRange range;
@@ -41,7 +42,7 @@
 @property(readonly) NSRange range;
 
 - (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (void)deleteRange:(NSRange)affectedRange;
+- (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (BOOL)deleteRange:(NSRange)affectedRange;
 
 @end

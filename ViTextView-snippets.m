@@ -69,6 +69,7 @@
 	return snippet;
 }
 
+#if 0
 - (NSRange)trackSnippet:(ViSnippet *)snippetToTrack forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
 {
 	NSRange trackedRange = NSMakeRange(aLocation, 0);
@@ -100,6 +101,7 @@
 
 	return trackedRange;
 }
+#endif
 
 - (void)handleSnippetTab:(ViSnippet *)snippet atLocation:(NSUInteger)aLocation
 {

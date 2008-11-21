@@ -98,9 +98,17 @@
  * If inside a place holder range, updates the range. Also handles mirror
  * place holders.
  */
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
+- (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	NSRange affectedRange = NSMakeRange(aLocation, [aString length]);
+
+	INFO(@"affectedRange = %@, current placeholder range = %@", NSStringFromRange(affectedRange), NSStringFromRange(currentPlaceholder.range));
+
+	if (aLocation != currentPlaceholder.range.location &&
+	    NSIntersectionRange(affectedRange, currentPlaceholder.range).length == 0)
+	{
+		return NO;
+	}
 
 	NSArray *a;
 	for (a in tabstops)
@@ -114,9 +122,10 @@
 			
 	[lastPlaceholder pushLength:[aString length] ifAffectedByRange:affectedRange];
 	range.length += [aString length];
+	return YES;
 }
 
-- (void)deleteRange:(NSRange)affectedRange
+- (BOOL)deleteRange:(NSRange)affectedRange
 {
 	NSArray *a;
 	for (a in tabstops)
@@ -130,6 +139,7 @@
 	
 	[lastPlaceholder pushLength:-affectedRange.length ifAffectedByRange:affectedRange];
 	range.length -= affectedRange.length;
+	return YES;
 }
 
 @end
@@ -145,7 +155,7 @@
 
 - (void)pushLength:(int)aLength ifAffectedByRange:(NSRange)affectedRange
 {
-	if (range.location > NSMaxRange(affectedRange))
+	if (range.location >= affectedRange.location) //NSMaxRange(affectedRange))
 	{
 		range.location += aLength;
 	}
@@ -194,8 +204,14 @@
 	}
 
 	length = [scan scanLocation];
+	string = [s substringToIndex:length];
 	
 	return self;
+}
+
+- (NSString *)description
+{
+	return string;
 }
 
 @end

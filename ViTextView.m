@@ -251,7 +251,8 @@ int logIndent = 0;
 				[NSValue valueWithRange:NSMakeRange(aLocation, [aString length])], @"range",
 				nil] afterDelay:0];
 
-		[snippet insertString:aString atLocation:aLocation];
+		if ([snippet insertString:aString atLocation:aLocation] == NO)
+			[self cancelSnippet:snippet];
 	}
 }
 
@@ -275,12 +276,8 @@ int logIndent = 0;
 	if (snippet)
 	{
 		INFO(@"found snippet %@ at %u", snippet, aRange.location);
-		[snippet deleteRange:aRange];
-/*
-		NSMutableDictionary *curTab = [snippet objectForKey:[snippet objectForKey:@"currentTab"]];
-		NSRange curTabRange = [[curTab objectForKey:@"range"] rangeValue];
-		if (NSIntersectionRange(curTabRange, NSMakeRange()))
-*/
+		if ([snippet deleteRange:aRange] == NO)
+			[self cancelSnippet:snippet];
 	}
 }
 

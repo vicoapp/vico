@@ -137,7 +137,12 @@
 		
 		if (nextContext && nextContext != ctx)
 		{
-			INFO(@"cancelling scheduled parsing from line %u (nextContext = %@)", nextContext.lineOffset, nextContext);
+			if (nextContext.lineOffset < startLine)
+			{
+				DEBUG(@"letting previous scheduled parsing from line %u continue", nextContext.lineOffset);
+				return;
+			}
+			DEBUG(@"cancelling scheduled parsing from line %u (nextContext = %@)", nextContext.lineOffset, nextContext);
 			[nextContext setCancelled:YES];
 		}
 		
@@ -166,7 +171,7 @@
 
 	if (context.cancelled)
 	{
-		INFO(@"context %@, from line %u, is cancelled", context, context.lineOffset);
+		DEBUG(@"context %@, from line %u, is cancelled", context, context.lineOffset);
 		return;
 	}
 

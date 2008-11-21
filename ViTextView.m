@@ -1770,7 +1770,7 @@ int logIndent = 0;
 			@"replaceSelectedText", 
 			@"replaceDocument", 
 			@"insertAsText", 
-			@"insertAsSnipper", 
+			@"insertAsSnippet", 
 			@"showAsHTML", 
 			@"showAsTooltip", 
 			@"createNewDocument", 

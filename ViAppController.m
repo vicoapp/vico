@@ -55,6 +55,47 @@
 	{
 		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
 	}
+
+	/* initialize commands */
+	NSArray *bundles = [[ViLanguageStore defaultStore] allBundles];
+	ViBundle *bundle;
+	for (bundle in bundles)
+	{
+		NSMenuItem *item = [commandMenu addItemWithTitle:[bundle name] action:nil keyEquivalent:@""];
+		NSMenu *submenu = [[NSMenu alloc] initWithTitle:[bundle name]];
+		[item setSubmenu:submenu];
+		NSDictionary *command;
+		for (command in [bundle commands])
+		{
+			NSString *key = [command objectForKey:@"keyEquivalent"];
+			NSString *keyEquiv = @"";
+			NSUInteger modMask = 0;
+			int i;
+			for (i = 0; i < [key length]; i++)
+			{
+				unichar c = [key characterAtIndex:i];
+				switch (c)
+				{
+					case '^':
+						modMask |= NSControlKeyMask;
+						break;
+					case '@':
+						modMask |= NSCommandKeyMask;
+						break;
+					case '~':
+						modMask |= NSAlternateKeyMask;
+						break;
+					default:
+						keyEquiv = [NSString stringWithFormat:@"%C", c];
+						break;
+				}
+			}
+
+			NSMenuItem *subitem = [submenu addItemWithTitle:[command objectForKey:@"name"] action:@selector(performBundleCommand:) keyEquivalent:keyEquiv];
+			[subitem setKeyEquivalentModifierMask:modMask];
+			[subitem setRepresentedObject:command];
+		}
+	}
 }
 
 - (IBAction)setTheme:(id)sender
@@ -89,4 +130,20 @@
 	return sharedBuffers;
 }
 
+- (IBAction)newProject:(id)sender
+{
+	NSError *error = nil;
+	NSDocument *proj = [[NSDocumentController sharedDocumentController] makeUntitledDocumentOfType:@"Project" error:&error];
+	INFO(@"proj = %@", proj);
+	if (proj)
+	{
+		[[NSDocumentController sharedDocumentController] addDocument:proj];
+		[proj makeWindowControllers];
+		[proj showWindows];
+	}
+	else
+		INFO(@"error = %@", error);
+}
+
 @end
+

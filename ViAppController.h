@@ -6,6 +6,7 @@
 {
 	IBOutlet NSMenu *themeMenu;
 	IBOutlet NSMenu *languageMenu;
+	IBOutlet NSMenu *commandMenu;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
 }

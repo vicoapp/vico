@@ -19,10 +19,11 @@
 - (NSDictionary *)preferenceItems:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings;
 - (void)addSnippet:(NSDictionary *)snippet;
-- (void)addCommand:(NSDictionary *)command;
+- (void)addCommand:(NSMutableDictionary *)command;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;
 @property(readonly) NSMutableArray *commands;
+@property(readonly) NSString *path;
 
 @end

@@ -6,6 +6,7 @@
 
 @synthesize languages;
 @synthesize commands;
+@synthesize path;
 
 - (id)initWithPath:(NSString *)aPath
 {
@@ -17,7 +18,7 @@
 		cachedPreferences = [[NSMutableDictionary alloc] init];
 		snippets = [[NSMutableArray alloc] init];
 		commands = [[NSMutableArray alloc] init];
-		path = aPath;
+		path = [aPath stringByDeletingLastPathComponent];
 		info = [NSDictionary dictionaryWithContentsOfFile:aPath];
 	}
 	
@@ -82,7 +83,7 @@
 	[snippets addObject:snippet];
 }
 
-- (void)addCommand:(NSDictionary *)command
+- (void)addCommand:(NSMutableDictionary *)command
 {
 	[command setObject:self forKey:@"bundle"];
 	[commands addObject:command];

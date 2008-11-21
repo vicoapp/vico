@@ -76,7 +76,7 @@ static ViLanguageStore *defaultStore = nil;
 		{
 			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
 			{
-				NSDictionary *command = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
+				NSMutableDictionary *command = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
 				[bundle addCommand:command];
 			}
 		}

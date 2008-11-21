@@ -113,10 +113,10 @@
 		}
 		else
 		{
-			marker = [[NoodleLineNumberMarker alloc] initWithRulerView:self
-															 lineNumber:line
-																  image:[self markerImageWithSize:NSMakeSize([self ruleThickness], MARKER_HEIGHT)]
-														   imageOrigin:NSMakePoint(0, MARKER_HEIGHT / 2)];
+                        marker = [[NoodleLineNumberMarker alloc] initWithRulerView:self
+								        lineNumber:line
+									     image:[self markerImageWithSize:NSMakeSize([self ruleThickness], MARKER_HEIGHT)]
+								       imageOrigin:NSMakePoint(0, MARKER_HEIGHT / 2)];
 			[self addMarker:marker];
 			[marker release];
 		}

@@ -8,6 +8,7 @@
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViSymbolTransform.h"
+#import "ViCommandOutputController.h"
 
 int logIndent = 0;
 
@@ -84,6 +85,8 @@ int logIndent = 0;
 	//[self setPageGuideValues];
 	[self disableWrapping];
 	[self setContinuousSpellCheckingEnabled:NO];
+	// [[self layoutManager] setShowsInvisibleCharacters:YES];
+	[[self layoutManager] setShowsControlCharacters:YES];
 
 	[self setSymbolScopes];
 
@@ -260,11 +263,22 @@ int logIndent = 0;
 	[self deleteRange:aRange undoGroup:NO];
 }
 
-- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
+- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup
 {
-	[self beginUndoGroup];
+	if (undoGroup)
+		[self beginUndoGroup];
+#if 0
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
+#else
+	[self deleteRange:aRange undoGroup:NO];
+	[self insertString:aString atLocation:aRange.location undoGroup:NO];
+#endif
+}
+
+- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
+{
+	[self replaceRange:aRange withString:aString undoGroup:YES];
 }
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation
@@ -565,7 +579,9 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Buffers
 
-- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange
+- (void)yankToBuffer:(unichar)bufferName
+              append:(BOOL)appendFlag
+               range:(NSRange)yankRange
 {
 	// get the unnamed buffer
 	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
@@ -578,7 +594,9 @@ int logIndent = 0;
 	[buffer setString:[[storage string] substringWithRange:yankRange]];
 }
 
-- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange
+- (void)cutToBuffer:(unichar)bufferName
+             append:(BOOL)appendFlag
+              range:(NSRange)cutRange
 {
 	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
 	[self deleteRange:cutRange];
@@ -1628,22 +1646,26 @@ int logIndent = 0;
 
 - (void)setupEnvironmentForCommand:(NSDictionary *)command
 {
+	[self setenv:"TM_BUNDLE_PATH" value:[[command objectForKey:@"bundle"] path]];
+
 	NSString *bundleSupportPath = [[command objectForKey:@"bundle"] supportPath];
-	setenv("TM_BUNDLE_SUPPORT", [bundleSupportPath UTF8String], 1);
+	[self setenv:"TM_BUNDLE_SUPPORT" value:bundleSupportPath];
 
 	NSString *supportPath = @"/Library/Application Support/TextMate/Support";
-	setenv("TM_SUPPORT_PATH", [supportPath UTF8String], 1);
+	[self setenv:"TM_SUPPORT_PATH" value:supportPath];
 
 	char *path = getenv("PATH");
-	setenv("PATH", [[NSString stringWithFormat:@"%s:%@:%@",
+	[self setenv:"PATH" value:[NSString stringWithFormat:@"%s:%@:%@",
 		path,
 		[supportPath stringByAppendingPathComponent:@"bin"],
-		[bundleSupportPath stringByAppendingPathComponent:@"bin"]] UTF8String], 1);
+		[bundleSupportPath stringByAppendingPathComponent:@"bin"]]];
 
 	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[self wordAtLocation:[self caret]]];
 	[self setenv:"TM_DIRECTORY" value:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];
+	[self setenv:"TM_FULLNAME" value:NSFullUserName()];
 	[self setenv:"TM_LINE_INDEX" integer:[self currentColumn]];
 	[self setenv:"TM_LINE_NUMBER" integer:[self currentLine]];
 	[self setenv:"TM_SCOPE" value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
@@ -1665,11 +1687,13 @@ int logIndent = 0;
 
 - (void)performBundleCommand:(id)sender
 {
-	INFO(@"sender = %@", sender);
 	NSDictionary *command = [sender representedObject];
 	INFO(@"command = %@", command);
 	NSRange inputRange;
 
+	/*  FIXME: need to verify correct behaviour of these env.variables
+	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
+	 */
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
 	[self setenv:"TM_INPUT_START_COLUMN" integer:[self columnAtLocation:inputRange.location]];
 	[self setenv:"TM_INPUT_END_COLUMN" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
@@ -1719,6 +1743,8 @@ int logIndent = 0;
 	[task setStandardOutput:shellOutput];
 	/* FIXME: set standard error to standard output? */
 
+	NSString *outputFormat = [command objectForKey:@"output"];
+
 	[self setupEnvironmentForCommand:command];
 	[task launch];
 	if ([inputText length] > 0)
@@ -1737,6 +1763,22 @@ int logIndent = 0;
 		free(templateFilename);
 	}
 
+	if (status >= 200 && status <= 207)
+	{
+		NSArray *overrideOutputFormat = [NSArray arrayWithObjects:
+			@"discard",
+			@"replaceSelectedText", 
+			@"replaceDocument", 
+			@"insertAsText", 
+			@"insertAsSnipper", 
+			@"showAsHTML", 
+			@"showAsTooltip", 
+			@"createNewDocument", 
+			nil];
+		outputFormat = [overrideOutputFormat objectAtIndex:status - 200];
+		status = 0;
+	}
+
 	if (status != 0)
 	{
 		[[self delegate] message:@"%@: exited with status %i", [command objectForKey:@"name"], status];
@@ -1745,20 +1787,27 @@ int logIndent = 0;
 	{
 		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
 		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+
+		INFO(@"command output: %@", outputText);
 		
-		NSString *output = [command objectForKey:@"output"];
-		if ([output isEqualToString:@"replaceSelectedText"])
-			[self replaceRange:inputRange withString:outputText];
-		else if ([output isEqualToString:@"showAsTooltip"])
+		if ([outputFormat isEqualToString:@"replaceSelectedText"])
+			[self replaceRange:inputRange withString:outputText undoGroup:NO];
+		else if ([outputFormat isEqualToString:@"showAsTooltip"])
+		{
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
-		else if ([output isEqualToString:@"showAsHTML"])
-			INFO(@"show as html: %@", outputText);
-		else if ([output isEqualToString:@"insertAsSnippet"])
+			// [self addToolTipRect: owner:outputText userData:nil];
+		}
+		else if ([outputFormat isEqualToString:@"showAsHTML"])
+		{
+			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
+			[[oc window] makeKeyAndOrderFront:self];
+		}
+		else if ([outputFormat isEqualToString:@"insertAsSnippet"])
 			[self insertSnippet:outputText atLocation:[self caret]];
-		else if ([output isEqualToString:@"discard"])
+		else if ([outputFormat isEqualToString:@"discard"])
 			;
 		else
-			INFO(@"unknown output method: %@", output);
+			INFO(@"unknown output format: %@", outputFormat);
 	}
 }
 

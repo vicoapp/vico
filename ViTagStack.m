@@ -1,11 +1,3 @@
-//
-//  ViTagStack.m
-//  xi
-//
-//  Created by Martin Hedenfalk on 2008-04-06.
-//  Copyright 2008 Martin Hedenfalk. All rights reserved.
-//
-
 #import "ViTagStack.h"
 
 @implementation ViTagStack
@@ -20,7 +12,7 @@
 	return self;
 }
 
-- (void)pushFile:(NSString *)aFile
+- (void)pushFile:(NSString*)aFile
             line:(NSUInteger)aLine
           column:(NSUInteger)aColumn
 {

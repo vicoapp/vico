@@ -466,12 +466,10 @@ done:
 	chars = context.characters;
 	unsigned lineno = context.lineOffset;
 
-	DEBUG(@"parsing line %u (%u -> %u) in thread %p, context %p",
+	DEBUG(@"parsing line %u (%u -> %u)",
 		context.lineOffset,
 		context.range.location,
-		NSMaxRange(context.range),
-		[NSThread currentThread],
-		context);
+		NSMaxRange(context.range));
 	
 	NSArray *continuedMatches = [self continuedMatchesForLine:lineno - 1];
 	

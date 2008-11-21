@@ -178,6 +178,11 @@
 	return NSMakeRange(startLocation + (region->beg[idx] / sizeof(unichar)), (region->end[idx] - region->beg[idx]) / sizeof(unichar));
 }
 
+- (unsigned)count
+{
+	return region->num_regs;
+}
+
 - (void)finalize
 {
 	if (region)

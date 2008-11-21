@@ -12,6 +12,7 @@
 - (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation;
 - (NSRange)rangeOfMatchedString;
 - (NSRange)rangeOfSubstringAtIndex:(unsigned)index;
+- (unsigned)count;
 
 @end
 

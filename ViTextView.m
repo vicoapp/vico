@@ -239,6 +239,20 @@ int logIndent = 0;
 	[self pushContinuationsFromLocation:aLocation string:aString forward:YES];
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
+	
+	ViSnippet *snippet = [self snippetAtLocation:aLocation - 1];
+	if (snippet)
+	{
+		INFO(@"found snippet %@ at %u, extending range", snippet, aLocation - 1);
+		[self performSelector:@selector(addTemporaryAttribute:) withObject:
+			[NSDictionary dictionaryWithObjectsAndKeys:
+				ViSnippetAttributeName, @"attributeName",
+				snippet, @"value",
+				[NSValue valueWithRange:NSMakeRange(aLocation, [aString length])], @"range",
+				nil] afterDelay:0];
+
+		[snippet insertString:aString atLocation:aLocation];
+	}
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -256,6 +270,18 @@ int logIndent = 0;
 	[self recordDeleteOfRange:aRange];
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
+	
+	ViSnippet *snippet = [self snippetAtLocation:aRange.location];
+	if (snippet)
+	{
+		INFO(@"found snippet %@ at %u", snippet, aRange.location);
+		[snippet deleteRange:aRange];
+/*
+		NSMutableDictionary *curTab = [snippet objectForKey:[snippet objectForKey:@"currentTab"]];
+		NSRange curTabRange = [[curTab objectForKey:@"range"] rangeValue];
+		if (NSIntersectionRange(curTabRange, NSMakeRange()))
+*/
+	}
 }
 
 - (void)deleteRange:(NSRange)aRange
@@ -970,7 +996,7 @@ int logIndent = 0;
 				                    effectiveRange:NULL];
 	if (snippetState)
 	{
-		[self handleSnippetTab:snippetState];
+		[self handleSnippetTab:snippetState atLocation:start_location];
 		return;
 	}
 
@@ -1042,6 +1068,9 @@ int logIndent = 0;
 	[self deleteRange:NSMakeRange(start_location, 1)];
 }
 
+/* FIXME: these are nothing but UGLY!!!
+ * Use invocations instead, if it can't be done immediately.
+ */
 - (void)addTemporaryAttribute:(NSDictionary *)what
 {
         [[self layoutManager] addTemporaryAttribute:[what objectForKey:@"attributeName"]
@@ -1049,8 +1078,15 @@ int logIndent = 0;
                                   forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
 }
 
+- (void)removeTemporaryAttribute:(NSDictionary *)what
+{
+        [[self layoutManager] removeTemporaryAttribute:[what objectForKey:@"attributeName"]
+                                     forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
+}
+
 /* Input a character from the user (in insert mode). Handle smart typing pairs.
  * FIXME: assumes smart typing pairs are single characters.
+ * FIXME: need special handling if inside a snippet.
  */
 - (void)inputCharacters:(NSString *)characters
 {
@@ -1059,7 +1095,6 @@ int logIndent = 0;
 	if (sel.length > 0)
 	{
 		[self deleteRange:sel];
-		// [self setCaret:sel.location];
 	}
 
 	BOOL foundSmartTypingPair = NO;
@@ -1608,9 +1643,7 @@ int logIndent = 0;
 	else if ([type isEqualToString:@"scope"])
 	{
 		NSRange rb = [self trackScopeSelector:[command objectForKey:@"scope"] forward:NO fromLocation:[self caret]];
-		INFO(@"tracked back range %@", NSStringFromRange(rb));
 		NSRange rf = [self trackScopeSelector:[command objectForKey:@"scope"] forward:YES fromLocation:[self caret]];
-		INFO(@"tracked forward range %@", NSStringFromRange(rf));
 		*rangePtr = NSUnionRange(rb, rf);
 		INFO(@"union range %@", NSStringFromRange(*rangePtr));
 		inputText = [[storage string] substringWithRange:*rangePtr];

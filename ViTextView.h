@@ -6,6 +6,7 @@
 #import "ViBundle.h"
 #import "logging.h"
 #import "ViSyntaxParser.h"
+#import "ViSnippet.h"
 
 #ifdef IMAX
 # undef IMAX
@@ -130,8 +131,9 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 @end
 
 @interface ViTextView (snippets)
-- (void)insertSnippet:(NSString *)snippet atLocation:(NSUInteger)aLocation;
-- (void)handleSnippetTab:(id)snippetState;
+- (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
+- (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
+- (ViSnippet *)snippetAtLocation:(NSUInteger)aLocation;
 @end
 
 @interface ViTextView (cursor)

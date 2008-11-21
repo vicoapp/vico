@@ -1,163 +1,119 @@
 #import "ViTextView.h"
+#import "ViSnippet.h"
 
 @implementation ViTextView (snippets)
 
-- (BOOL)parseSnippetPlaceholder:(NSString *)s length:(size_t *)length_ptr meta:(NSMutableDictionary *)meta
+- (void)cancelSnippet:(ViSnippet *)snippet
 {
-        NSScanner *scan = [NSScanner scannerWithString:s];
+	// remove the temporary attribute, effectively cancelling the snippet
+	INFO(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
+	[self performSelector:@selector(removeTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+		ViSnippetAttributeName, @"attributeName",
+		[NSValue valueWithRange:snippet.range], @"range",
+		nil] afterDelay:0];
+	
+}
 
-	NSMutableCharacterSet *shellVariableSet = [[NSMutableCharacterSet alloc] init];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
+- (void)gotoTabstop:(int)num inSnippet:(ViSnippet *)snippet
+{
+	// ViSnippetPlaceholder *placeholder = [snippet firstPlaceholderWithIndex:num];
+	ViSnippetPlaceholder *placeholder = nil;
+	if ([[snippet tabstops] count] >= num)
+		placeholder = [[[snippet tabstops] objectAtIndex:num - 1] objectAtIndex:0];
 
-	BOOL bracedExpression = NO;
-	if ([scan scanString:@"{" intoString:nil])
-		bracedExpression = YES;
-                
-        int tabStop;
-        if ([scan scanInt:&tabStop])
-        {
-                [meta setObject:[NSNumber numberWithInt:tabStop] forKey:@"tabStop"];
-        }
-        else
-        {
-                NSString *var;
-                [scan scanCharactersFromSet:shellVariableSet intoString:&var];
-                [meta setObject:var forKey:@"variable"];
-        }
-
-	if (bracedExpression)
+	if (placeholder == nil)
 	{
-                if ([scan scanString:@":" intoString:nil])
-                {
-                        // got a default value
-                        NSString *defval;
-                        [scan scanUpToString:@"}" intoString:&defval];
-                        [meta setObject:defval forKey:@"defaultValue"];
-                }
-                else if ([scan scanString:@"/" intoString:nil])
-                {
-                        // got a regular expression transformation
-                        NSString *regexp;
-                        [scan scanUpToString:@"}" intoString:&regexp];
-                        [meta setObject:regexp forKey:@"transformation"];
-                }
-
-                if (![scan scanString:@"}" intoString:nil])
-                {
-                        // parse error
-                        return NO;
-                }
+		placeholder = snippet.lastPlaceholder;
+		[self cancelSnippet:snippet];
 	}
 
-	*length_ptr = [scan scanLocation];
+	if (placeholder)
+	{
+		INFO(@"placing cursor at tabstop %i, range %@", placeholder.tabStop, NSStringFromRange(placeholder.range));
+		NSRange range = placeholder.range;
+		[self setSelectedRange:range];
+		snippet.currentTab = placeholder.tabStop;
+		snippet.currentPlaceholder = placeholder;
+	}
+}
+
+- (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation
+{
+	// prepend leading whitespace to all newlines in the snippet string
+	NSString *leadingWhiteSpace = [self leadingWhitespaceForLineAtLocation:aLocation];
+	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
+	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
 	
-	return YES;
-}
+	// FIXME: replace tabs with correct shiftwidth/tabstop settings
 
-- (void)gotoTabstop:(NSDictionary *)tabStop inSnippet:(NSMutableDictionary *)state
-{
-	INFO(@"placing cursor at tabstop %@", tabStop);
-	NSUInteger loc = [[tabStop objectForKey:@"location"] integerValue] + [[state objectForKey:@"start"] integerValue];
-	NSUInteger len = [[tabStop objectForKey:@"defaultValue"] length];
-	[self setSelectedRange:NSMakeRange(loc, len)];
-	[state setObject:[NSNumber numberWithInt:1] forKey:@"currentTab"];
-}
+	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString atLocation:aLocation];
+	[self insertString:[snippet string] atLocation:aLocation];
 
-- (void)insertSnippet:(NSString *)snippet atLocation:(NSUInteger)aLocation
-{
-        NSMutableString *s = [[NSMutableString alloc] initWithString:snippet];
-
-	NSMutableDictionary *tabstops = [[NSMutableDictionary alloc] init];
-
-	BOOL foundMarker;
-	NSUInteger i;
-	do
-        {
-                foundMarker = NO;
-                for (i = 0; i < [s length]; i++)
-                {
-                        // FIXME: handle escapes
-                        if ([s characterAtIndex:i] == '$')
-                        {
-                                size_t len;
-                                NSMutableDictionary *meta = [[NSMutableDictionary alloc] init];
-                                if (![self parseSnippetPlaceholder:[s substringFromIndex:i + 1] length:&len meta:meta])
-                                	break;
-                                
-                                if ([meta objectForKey:@"defaultValue"])
-                                        [s replaceCharactersInRange:NSMakeRange(i, len + 1) withString:[meta objectForKey:@"defaultValue"]];
-                                else
-                                        [s deleteCharactersInRange:NSMakeRange(i, len + 1)];
-
-				NSNumber *tabStop = [meta objectForKey:@"tabStop"];
-				if (tabStop)
-                        	{
-                                        NSMutableArray *a = [tabstops objectForKey:tabStop];
-                                        if (a == nil)
-                                        {
-					        a = [[NSMutableArray alloc] init];
-                                                [tabstops setObject:a forKey:tabStop];
-                                        }
-
-					[a addObject:meta];
-					[meta setObject:[NSNumber numberWithInteger:i] forKey:@"location"];
-
-                                        INFO(@"parsed tabstop: %@", [tabstops objectForKey:tabStop]);
-                        	}
-                        	else if ([meta objectForKey:@"variable"])
-                        	{
-					// lookup variable, apply transformation and insert value
-                        	}
-
-                                foundMarker = YES;
-                                break;
-                        }
-                }
-        } while (foundMarker);
-
-        // FIXME: inefficient(?)
-        NSUInteger loc = aLocation;
-        for (i = 0; i < [s length]; i++)
-        {
-                if ([s characterAtIndex:i] == '\n')
-                {
-                        loc += [self insertNewlineAtLocation:loc indentForward:YES];
-                }
-                else
-                {
-                        [self insertString:[s substringWithRange:NSMakeRange(i, 1)] atLocation:loc];
-                        loc++;
-                }
-        }
-
+	// mark the snippet range with a temporary attribute
 	[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
 		ViSnippetAttributeName, @"attributeName",
-		tabstops, @"value",
-		[NSValue valueWithRange:NSMakeRange(aLocation, loc - aLocation)], @"range",
+		snippet, @"value",
+		[NSValue valueWithRange:NSMakeRange(aLocation, [[snippet string] length])], @"range",
 		nil] afterDelay:0];
 
-	[tabstops setObject:[NSNumber numberWithInteger:aLocation] forKey:@"start"];
-
         // FIXME: sort tabstops, go to tabstop 1 first, then 2, 3, 4, ... and last to 0
-        NSDictionary *firstTabStop = [[tabstops objectForKey:[NSNumber numberWithInt:1]] objectAtIndex:0];
-        if (firstTabStop)
-		[self gotoTabstop:firstTabStop inSnippet:tabstops];
+        [self gotoTabstop:1 inSnippet:snippet];
+        return snippet;
 }
 
-- (void)handleSnippetTab:(id)snippetState
+- (ViSnippet *)snippetAtLocation:(NSUInteger)aLocation
 {
-	NSMutableDictionary *state = snippetState;
+	ViSnippet *snippet = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
+						      atCharacterIndex:aLocation
+						        effectiveRange:NULL];
+	return snippet;
+}
+
+- (NSRange)trackSnippet:(ViSnippet *)snippetToTrack forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+{
+	NSRange trackedRange = NSMakeRange(aLocation, 0);
+	NSUInteger i = aLocation;
+	for (;;)
+	{
+		if (forward && i >= [storage length])
+			break;
+		else if (!forward && i == 0)
+			break;
 	
-	int currentTab = [[state objectForKey:@"currentTab"] intValue];
-	INFO(@"current tab index is %i", currentTab);
-        NSDictionary *tabStop = [[state objectForKey:[NSNumber numberWithInt:currentTab + 1]] objectAtIndex:0];
-	if (tabStop == nil)
-		tabStop = [[state objectForKey:[NSNumber numberWithInt:0]] objectAtIndex:0];
-	
-	if (tabStop)
-		[self gotoTabstop:tabStop inSnippet:state];
+		NSRange range = NSMakeRange(i, 0);
+		ViSnippet *snippet = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
+							     atCharacterIndex:i
+							       effectiveRange:&range];
+		if (snippet == nil)
+			break;
+
+		if (snippet == snippetToTrack)
+			trackedRange = NSUnionRange(trackedRange, range);
+		else
+			break;
+
+		if (forward)
+			i += range.length;
+		else
+			i -= range.length;
+	}
+
+	return trackedRange;
+}
+
+- (void)handleSnippetTab:(ViSnippet *)snippet atLocation:(NSUInteger)aLocation
+{
+	INFO(@"current tab index is %i", snippet.currentTab);
+
+#if 0
+	/* Find the total range of the snippet. */
+	/* FIXME: must mark newly inserted characters with the surrounding snippet. */
+	NSRange rb = [self trackSnippet:state forward:NO  fromLocation:[self caret]];
+	NSRange rf = [self trackSnippet:state forward:YES fromLocation:[self caret]];
+	NSRange range = NSUnionRange(rb, rf);
+#endif
+
+	[self gotoTabstop:snippet.currentTab + 1 inSnippet:snippet];
 }
 
 @end

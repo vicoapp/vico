@@ -4,6 +4,50 @@
 
 @implementation ViTextView (vi_commands)
 
+- (BOOL)move_high:(ViCommand *)command
+{
+        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+	end_location = final_location = range.location;
+
+	NSRect highRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphRange.location, 1) inTextContainer:[self textContainer]];
+	[[[[self delegate] scrollView] contentView] scrollToPoint:NSMakePoint(0, highRect.origin.y)];
+	
+	return YES;
+}
+
+- (BOOL)move_middle:(ViCommand *)command
+{
+        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	NSUInteger highLine = [self lineNumberAtLocation:range.location];
+	NSUInteger lowLine = [self lineNumberAtLocation:NSMaxRange(range) - 1];
+	NSUInteger middleLine = highLine + (lowLine - highLine) / 2;
+
+	end_location = final_location = [self locationForStartOfLine:middleLine];
+	return YES;
+}
+
+- (BOOL)move_low:(ViCommand *)command
+{
+        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+	
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
+	end_location = final_location = bol;
+
+	NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
+	NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
+	[[[[self delegate] scrollView] contentView] scrollToPoint:topPoint];
+
+	return YES;
+}
+
 - (BOOL)move_to_match:(ViCommand *)command
 {
         // find first paren on current line

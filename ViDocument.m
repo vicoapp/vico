@@ -15,6 +15,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @implementation ViDocument
 
+@synthesize scrollView;
+
 - (id)init
 {
 	self = [super init];
@@ -237,11 +239,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		[windowController removeTabViewItemContainingDocument:self];
 		[self close];
+#if 0
 		if ([windowController numberOfTabViewItems] == 0)
 		{
 			/* Close the window after all tabs are gone. */
 			[[windowController window] performClose:self];
 		}
+#endif
 	}
 }
 

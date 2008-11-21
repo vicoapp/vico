@@ -23,6 +23,8 @@
 	NSString *readContent;
 }
 
+@property(readonly) NSScrollView *scrollView;
+
 - (NSView *)view;
 - (void)enableLineNumbers:(BOOL)flag;
 - (IBAction)toggleLineNumbers:(id)sender;

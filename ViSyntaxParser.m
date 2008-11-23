@@ -20,12 +20,15 @@
 
 - (void)setContinuation:(NSArray *)continuedMatches forLine:(unsigned)lineno
 {
-	DEBUG(@"setting continuation matches at line %u to %@", lineno, continuedMatches);
-	while ([continuations count] < lineno)
+	if (continuedMatches)
 	{
-		[continuations addObject:[NSArray array]];
+		DEBUG(@"setting continuation matches at line %u to %@", lineno, continuedMatches);
+		while ([continuations count] < lineno)
+		{
+			[continuations addObject:[NSArray array]];
+		}
+		[continuations replaceObjectAtIndex:(lineno - 1) withObject:continuedMatches];
 	}
-	[continuations replaceObjectAtIndex:(lineno - 1) withObject:continuedMatches];
 }
 
 - (NSArray *)continuedMatchesForLine:(NSUInteger)lineno

@@ -71,8 +71,7 @@
 						}
 	
 						// add the placeholder to the array (at index num-1)
-						int ndx = num - 1;
-						[[tabstops objectAtIndex:ndx] addObject:placeHolder];
+						[[tabstops objectAtIndex:num - 1] addObject:placeHolder];
 					}
 					
 					// update the range
@@ -100,16 +99,21 @@
  */
 - (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
+	NSRange currentRange = currentPlaceholder.range;
 	NSRange affectedRange = NSMakeRange(aLocation, [aString length]);
 
-	INFO(@"affectedRange = %@, current placeholder range = %@", NSStringFromRange(affectedRange), NSStringFromRange(currentPlaceholder.range));
-
-	if (aLocation != currentPlaceholder.range.location &&
-	    NSIntersectionRange(affectedRange, currentPlaceholder.range).length == 0)
+	// verify we're inserting inside the current placeholder
+	if (aLocation != NSMaxRange(currentRange) &&
+	    NSIntersectionRange(affectedRange, currentRange).length == 0)
 	{
 		return NO;
 	}
 
+	// update the length of the current placeholder
+	currentRange.length += [aString length];
+	currentPlaceholder.range = currentRange;
+
+	// update the location of all following placeholders
 	NSArray *a;
 	for (a in tabstops)
 	{
@@ -120,13 +124,27 @@
 		}
 	}
 			
-	[lastPlaceholder pushLength:[aString length] ifAffectedByRange:affectedRange];
+	if (currentPlaceholder != lastPlaceholder)
+		[lastPlaceholder pushLength:[aString length] ifAffectedByRange:affectedRange];
 	range.length += [aString length];
+	
 	return YES;
 }
 
 - (BOOL)deleteRange:(NSRange)affectedRange
 {
+	NSRange currentRange = currentPlaceholder.range;
+
+	// verify we're deleting inside the current placeholder
+	if (NSIntersectionRange(affectedRange, currentRange).length == 0)
+	{
+		return NO;
+	}
+
+	// update the length of the current placeholder
+	currentRange.length -= affectedRange.length;
+	currentPlaceholder.range = currentRange;
+
 	NSArray *a;
 	for (a in tabstops)
 	{
@@ -137,8 +155,19 @@
 		}
 	}
 	
-	[lastPlaceholder pushLength:-affectedRange.length ifAffectedByRange:affectedRange];
+	if (currentPlaceholder != lastPlaceholder)
+		[lastPlaceholder pushLength:-affectedRange.length ifAffectedByRange:affectedRange];
 	range.length -= affectedRange.length;
+	
+	return YES;
+}
+
+- (BOOL)activeInRange:(NSRange)aRange
+{
+	if (NSIntersectionRange(aRange, range).length == 0)
+	{
+		return NO;
+	}
 	return YES;
 }
 
@@ -155,7 +184,7 @@
 
 - (void)pushLength:(int)aLength ifAffectedByRange:(NSRange)affectedRange
 {
-	if (range.location >= affectedRange.location) //NSMaxRange(affectedRange))
+	if (range.location > affectedRange.location)
 	{
 		range.location += aLength;
 	}
@@ -188,7 +217,18 @@
                 if ([scan scanString:@":" intoString:nil])
                 {
                         // got a default value
-                        [scan scanUpToString:@"}" intoString:&defaultValue];
+			if ([scan scanString:@"$" intoString:nil])
+			{
+				// default value is a variable
+				bracedExpression = NO;
+				if ([scan scanString:@"{" intoString:nil])
+					bracedExpression = YES;
+			}
+                        else
+                        {
+				// default value is a constant
+				[scan scanUpToString:@"}" intoString:&defaultValue];
+                        }
                 }
                 else if ([scan scanString:@"/" intoString:nil])
                 {
@@ -211,7 +251,7 @@
 
 - (NSString *)description
 {
-	return string;
+	return [NSString stringWithFormat:@"%i : %@ at %@", tabStop, defaultValue, NSStringFromRange(range)];
 }
 
 @end

@@ -240,19 +240,22 @@ int logIndent = 0;
 	[[storage mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
 	
-	ViSnippet *snippet = [self snippetAtLocation:aLocation - 1];
-	if (snippet)
+	if (activeSnippet)
 	{
-		INFO(@"found snippet %@ at %u, extending range", snippet, aLocation - 1);
-		[self performSelector:@selector(addTemporaryAttribute:) withObject:
-			[NSDictionary dictionaryWithObjectsAndKeys:
-				ViSnippetAttributeName, @"attributeName",
-				snippet, @"value",
-				[NSValue valueWithRange:NSMakeRange(aLocation, [aString length])], @"range",
-				nil] afterDelay:0];
-
-		if ([snippet insertString:aString atLocation:aLocation] == NO)
-			[self cancelSnippet:snippet];
+		if ([activeSnippet activeInRange:NSMakeRange(aLocation, [aString length])])
+		{
+			INFO(@"found snippet %@ at %u", activeSnippet, aLocation - 1);
+			if ([activeSnippet insertString:aString atLocation:aLocation] == NO)
+			{
+				INFO(@"insertion failed, cancelling snippet %@", activeSnippet);
+				[self cancelSnippet:activeSnippet];
+			}
+		}
+		else
+		{
+			INFO(@"outside active range, cancelling snippet %@", activeSnippet);
+			[self cancelSnippet:activeSnippet];
+		}
 	}
 }
 
@@ -272,13 +275,24 @@ int logIndent = 0;
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
 	
-	ViSnippet *snippet = [self snippetAtLocation:aRange.location];
-	if (snippet)
+	if (activeSnippet)
 	{
-		INFO(@"found snippet %@ at %u", snippet, aRange.location);
-		if ([snippet deleteRange:aRange] == NO)
-			[self cancelSnippet:snippet];
+		if ([activeSnippet activeInRange:aRange])
+		{
+			INFO(@"found snippet %@ at %u", activeSnippet, aRange.location);
+			if ([activeSnippet deleteRange:aRange] == NO)
+			{
+				INFO(@"deleting failed, cancelling snippet %@", activeSnippet);
+				[self cancelSnippet:activeSnippet];
+			}
+		}
+		else
+		{
+			INFO(@"outside active range, cancelling snippet %@", activeSnippet);
+			[self cancelSnippet:activeSnippet];
+		}
 	}
+
 }
 
 - (void)deleteRange:(NSRange)aRange
@@ -987,17 +1001,14 @@ int logIndent = 0;
 
 - (void)input_tab:(NSString *)characters
 {
-        // check if we're inside a tab trigger
-	id snippetState = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
-				                  atCharacterIndex:start_location
-				                    effectiveRange:NULL];
-	if (snippetState)
+        // check if we're inside a snippet
+        if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)])
 	{
-		[self handleSnippetTab:snippetState atLocation:start_location];
+		[self handleSnippetTab:activeSnippet atLocation:start_location];
 		return;
 	}
 
-        // check for a new tab trigger
+        // check for a new snippet
         if (start_location > 0)
         {
                 // is there a word before the cursor that we just typed?
@@ -1011,7 +1022,7 @@ int logIndent = 0;
                                 if (snippetString)
                                 {
                                         [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
-                                        [self insertSnippet:snippetString atLocation:start_location - [word length]];
+                                        activeSnippet = [self insertSnippet:snippetString atLocation:start_location - [word length]];
                                         return;
                                 }
                         }
@@ -1833,7 +1844,7 @@ int logIndent = 0;
 			[[oc window] makeKeyAndOrderFront:self];
 		}
 		else if ([outputFormat isEqualToString:@"insertAsSnippet"])
-			[self insertSnippet:outputText atLocation:[self caret]];
+			activeSnippet = [self insertSnippet:outputText atLocation:[self caret]];
 		else if ([outputFormat isEqualToString:@"discard"])
 			;
 		else

@@ -48,6 +48,8 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 
 	NSMutableDictionary *marks;
 
+	ViSnippet *activeSnippet;
+
 	// language parsing and highlighting
 	BOOL ignoreEditing;
 	ViSyntaxParser *syntaxParser;

@@ -11,12 +11,11 @@
 		ViSnippetAttributeName, @"attributeName",
 		[NSValue valueWithRange:snippet.range], @"range",
 		nil] afterDelay:0];
-	
+	activeSnippet = nil;
 }
 
 - (void)gotoTabstop:(int)num inSnippet:(ViSnippet *)snippet
 {
-	// ViSnippetPlaceholder *placeholder = [snippet firstPlaceholderWithIndex:num];
 	ViSnippetPlaceholder *placeholder = nil;
 	if ([[snippet tabstops] count] >= num)
 		placeholder = [[[snippet tabstops] objectAtIndex:num - 1] objectAtIndex:0];
@@ -24,6 +23,7 @@
 	if (placeholder == nil)
 	{
 		placeholder = snippet.lastPlaceholder;
+		INFO(@"last placeholder, cancelling snippet");
 		[self cancelSnippet:snippet];
 	}
 
@@ -49,13 +49,6 @@
 	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString atLocation:aLocation];
 	[self insertString:[snippet string] atLocation:aLocation];
 
-	// mark the snippet range with a temporary attribute
-	[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-		ViSnippetAttributeName, @"attributeName",
-		snippet, @"value",
-		[NSValue valueWithRange:NSMakeRange(aLocation, [[snippet string] length])], @"range",
-		nil] afterDelay:0];
-
         // FIXME: sort tabstops, go to tabstop 1 first, then 2, 3, 4, ... and last to 0
         [self gotoTabstop:1 inSnippet:snippet];
         return snippet;
@@ -69,51 +62,9 @@
 	return snippet;
 }
 
-#if 0
-- (NSRange)trackSnippet:(ViSnippet *)snippetToTrack forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
-{
-	NSRange trackedRange = NSMakeRange(aLocation, 0);
-	NSUInteger i = aLocation;
-	for (;;)
-	{
-		if (forward && i >= [storage length])
-			break;
-		else if (!forward && i == 0)
-			break;
-	
-		NSRange range = NSMakeRange(i, 0);
-		ViSnippet *snippet = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
-							     atCharacterIndex:i
-							       effectiveRange:&range];
-		if (snippet == nil)
-			break;
-
-		if (snippet == snippetToTrack)
-			trackedRange = NSUnionRange(trackedRange, range);
-		else
-			break;
-
-		if (forward)
-			i += range.length;
-		else
-			i -= range.length;
-	}
-
-	return trackedRange;
-}
-#endif
-
 - (void)handleSnippetTab:(ViSnippet *)snippet atLocation:(NSUInteger)aLocation
 {
 	INFO(@"current tab index is %i", snippet.currentTab);
-
-#if 0
-	/* Find the total range of the snippet. */
-	/* FIXME: must mark newly inserted characters with the surrounding snippet. */
-	NSRange rb = [self trackSnippet:state forward:NO  fromLocation:[self caret]];
-	NSRange rf = [self trackSnippet:state forward:YES fromLocation:[self caret]];
-	NSRange range = NSUnionRange(rb, rf);
-#endif
 
 	[self gotoTabstop:snippet.currentTab + 1 inSnippet:snippet];
 }

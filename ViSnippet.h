@@ -44,5 +44,7 @@
 - (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (BOOL)deleteRange:(NSRange)affectedRange;
+- (BOOL)activeInRange:(NSRange)aRange;
 
 @end
+

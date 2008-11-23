@@ -33,7 +33,7 @@ echo "Creating disk image $VOL"
 trap 'rm -f $TMPDMG; exit 1' 2 3 15
 
 # create a disk image
-hdiutil create -megabytes 15 $TMPDMG -layout NONE
+hdiutil create -megabytes 20 $TMPDMG -layout NONE
 # associate a device with this but don't mount it
 MYDEV=`hdid -nomount $TMPDMG`
 test -n "$MYDEV" || die "failed to attach disk image"

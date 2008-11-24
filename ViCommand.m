@@ -453,4 +453,9 @@ find_command_in_map(int key, struct vikey map[])
 	map = visual_map;
 }
 
+- (BOOL)isMotion
+{
+	return command && has_flag(command, VIF_IS_MOTION);
+}
+
 @end

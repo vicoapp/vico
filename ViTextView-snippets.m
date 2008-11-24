@@ -7,10 +7,6 @@
 {
 	// remove the temporary attribute, effectively cancelling the snippet
 	INFO(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
-	[self performSelector:@selector(removeTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-		ViSnippetAttributeName, @"attributeName",
-		[NSValue valueWithRange:snippet.range], @"range",
-		nil] afterDelay:0];
 	activeSnippet = nil;
 }
 

@@ -4,7 +4,6 @@
 #define ViScopeAttributeName @"ViScope"
 #define ViSmartPairAttributeName @"ViSmartPair"
 #define ViContinuationAttributeName @"ViContinuation"
-#define ViSnippetAttributeName @"ViSnippet"
 
 @interface ViTheme : NSObject
 {

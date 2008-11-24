@@ -5,10 +5,10 @@
  */
 #define TEST(inText, inLocation, commandKeys, outText, outLocation)          \
 	[vi setString:inText];                                               \
-	[vi setSelectedRange:NSMakeRange(inLocation, 0)];                    \
+	[vi setCaret:inLocation];                                            \
 	[vi input:commandKeys];                                              \
 	STAssertEqualObjects([[vi textStorage] string], outText, nil);       \
-	STAssertEquals([vi selectedRange].location, (NSUInteger)outLocation, nil);
+	STAssertEquals([vi caret], (NSUInteger)outLocation, nil);
 
 /* motion commands don't alter the text */
 #define MOVE(inText, inLocation, commandKeys, outLocation) \

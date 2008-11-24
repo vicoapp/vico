@@ -1101,7 +1101,7 @@
 - (BOOL)forward_screen:(ViCommand *)command
 {
 	[self pageDown:self];
-	end_location = final_location = [self caret];
+	end_location = final_location = [self selectedRange].location;
 	return YES;
 }
 
@@ -1109,7 +1109,7 @@
 - (BOOL)backward_screen:(ViCommand *)command
 {
 	[self pageUp:self];
-	end_location = final_location = [self caret];
+	end_location = final_location = [self selectedRange].location;
 	return YES;
 }
 

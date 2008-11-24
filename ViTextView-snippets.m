@@ -27,6 +27,7 @@
 	{
 		INFO(@"placing cursor at tabstop %i, range %@", placeholder.tabStop, NSStringFromRange(placeholder.range));
 		NSRange range = placeholder.range;
+		[self setCaret:range.location];
 		[self setSelectedRange:range];
 		snippet.currentTab = placeholder.tabStop;
 		snippet.currentPlaceholder = placeholder;

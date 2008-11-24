@@ -41,7 +41,7 @@ static struct vikey normal_map[] = {
 	{@"put_before:",	'P', VIF_SETS_DOT},
 	{@"subst_lines:",	'S', VIF_LINE_MODE | VIF_SETS_DOT},
 	{@"move_back_til_char:",'T', VIF_IS_MOTION | VIF_NEED_CHAR},
-	{@"visual_line:",	'V', VIF_LINE_MODE},
+	{@"visual_line:",	'V', 0},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"delete_backward:",	'X', VIF_SETS_DOT},
 	{@"move_bol:",		'0', VIF_IS_MOTION},

@@ -33,8 +33,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	// block cursor
 	NSUInteger caret;
 	NSRect oldCaretRect;
-	NSInteger lastCursorLocation;
-	NSRect lastCursor;
 
 	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
 	NSRange affectedRange;
@@ -94,7 +92,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
-- (void)setCommandMode;
+- (void)setNormalMode;
+- (void)setVisualMode;
 - (void)setInsertMode:(ViCommand *)command;
 - (void)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
@@ -144,7 +143,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @end
 
 @interface ViTextView (cursor)
-- (void)updateInsertionPoint;
 @end
 
 @interface ViTextView (syntax)

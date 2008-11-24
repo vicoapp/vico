@@ -39,7 +39,6 @@ int logIndent = 0;
 	storage = [self textStorage];
 	inputKeys = [[NSMutableArray alloc] init];
 	marks = [[NSMutableDictionary alloc] init];
-	lastCursorLocation = -1;
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -886,9 +885,14 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location
 {
-	INFO(@"setting caret to %u", location);
 	caret = location;
-	[self setSelectedRange:NSMakeRange(location, 0)];
+
+	NSLayoutManager *lm = [self layoutManager];
+	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
+	NSRect cr = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	[self setNeedsDisplayInRect:oldCaretRect];
+	[self setNeedsDisplayInRect:cr];
+	oldCaretRect = cr;
 }
 
 - (NSUInteger)caret
@@ -896,13 +900,20 @@ int logIndent = 0;
 	return caret;
 }
 
-- (void)setCommandMode
+- (void)setNormalMode
 {
-	mode = ViCommandMode;
+	mode = ViNormalMode;
+	[self setSelectedRange:NSMakeRange(caret, 0)];
+}
+
+- (void)setVisualMode
+{
+	mode = ViVisualMode;
 }
 
 - (void)setInsertMode:(ViCommand *)command
 {
+	[self setSelectedRange:NSMakeRange(caret, 0)];
 	DEBUG(@"entering insert mode at location %lu (final location is %lu), length is %lu",
 		end_location, final_location, [storage length]);
 	mode = ViInsertMode;
@@ -958,12 +969,10 @@ int logIndent = 0;
 	}
 	DEBUG(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
-	if (command.line_mode && !command.ismotion && (!visual_line_mode || l2 == l1))
+	if (command.line_mode && !command.ismotion && mode != ViVisualMode)
 	{
 		/* If this command is line oriented, extend the affectedRange to whole lines.
-		 * However, don't do this for Visual-Line mode, unless this is the first
-		 * line to be selected (this is the l2 == l1 test). In visual-line mode, the
-		 * handling of selection is done in setVisualSelection.
+		 * However, don't do this for Visual-Line mode, this is done in setVisualSelection.
 		 */
 		NSUInteger bol, end, eol;
 
@@ -995,7 +1004,7 @@ int logIndent = 0;
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	if (mode == ViVisualMode && !command.isMotion)
-		mode = ViNormalMode;
+		[self setNormalMode];
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
@@ -1049,6 +1058,7 @@ int logIndent = 0;
         
 	// otherwise just insert a tab
 	[self insertString:@"\t" atLocation:start_location];
+	[self setCaret:start_location + 1];
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
@@ -1192,7 +1202,7 @@ int logIndent = 0;
 
 - (void)setVisualSelection
 {
-	NSUInteger l1 = visual_start_location, l2 = end_location;
+	NSUInteger l1 = visual_start_location, l2 = [self caret];
 	if (l2 < l1)
 	{	/* swap if end < start */
 		l2 = l1;
@@ -1211,7 +1221,6 @@ int logIndent = 0;
 		l2++;
 
 	NSRange sel = NSMakeRange(l1, l2 - l1);
-	INFO(@"setting selection to %@", NSStringFromRange(sel));
 	[self setSelectedRange:sel];
 }
 
@@ -1262,7 +1271,7 @@ int logIndent = 0;
 			[self endUndoGroup];
 			parser.text = inputKeys; // copies the array
 			[inputKeys removeAllObjects];
-			[self setCommandMode];
+			[self setNormalMode];
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
@@ -1308,7 +1317,7 @@ int logIndent = 0;
 		}
 		else if (charcode == 0x1B)
 		{
-			mode = ViNormalMode;
+			[self setNormalMode];
 			[self setCaret:final_location];
 			return;
 		}

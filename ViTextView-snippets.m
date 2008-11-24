@@ -50,14 +50,6 @@
         return snippet;
 }
 
-- (ViSnippet *)snippetAtLocation:(NSUInteger)aLocation
-{
-	ViSnippet *snippet = [[self layoutManager] temporaryAttribute:ViSnippetAttributeName
-						      atCharacterIndex:aLocation
-						        effectiveRange:NULL];
-	return snippet;
-}
-
 - (void)handleSnippetTab:(ViSnippet *)snippet atLocation:(NSUInteger)aLocation
 {
 	INFO(@"current tab index is %i", snippet.currentTab);

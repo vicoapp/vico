@@ -257,9 +257,6 @@ int logIndent = 0;
 			[self cancelSnippet:activeSnippet];
 		}
 	}
-
-	if (mode == ViVisualMode)
-		mode = ViNormalMode;
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -295,9 +292,6 @@ int logIndent = 0;
 			[self cancelSnippet:activeSnippet];
 		}
 	}
-
-	if (mode == ViVisualMode)
-		mode = ViNormalMode;
 }
 
 - (void)deleteRange:(NSRange)aRange
@@ -926,26 +920,8 @@ int logIndent = 0;
 
 - (void)evaluateCommand:(ViCommand *)command
 {
-	if (mode == ViVisualMode)
-	{
-		/* Default start- and end-location is the current selection. */
-		NSRange sel = [self selectedRange];
-		if (NSMaxRange(sel) > visual_start_location + 1)
-		{
-			// we're to the right of the selection
-			start_location = NSMaxRange(sel) - 1;
-		}
-		else
-		{
-			// we're to the left of the selection
-			start_location = sel.location;
-		}
-	}
-	else
-	{
-		/* Default start- and end-location is the current location. */
-		start_location = [self caret];
-	}
+	/* Default start- and end-location is the current location. */
+	start_location = [self caret];
 	end_location = start_location;
 	final_location = start_location;
 
@@ -954,7 +930,6 @@ int logIndent = 0;
 		/* The command has an associated motion component.
 		 * Run the motion method and record the start and end locations.
 		 */
-		INFO(@"performing motion method %@", command.motion_method);
 		if ([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
 		{
 			/* the command failed */
@@ -981,11 +956,15 @@ int logIndent = 0;
 			l1 = end_location;
 		}
 	}
-	INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	DEBUG(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
 	if (command.line_mode && !command.ismotion && (!visual_line_mode || l2 == l1))
 	{
-		/* if this command is line oriented, extend the affectedRange to whole lines */
+		/* If this command is line oriented, extend the affectedRange to whole lines.
+		 * However, don't do this for Visual-Line mode, unless this is the first
+		 * line to be selected (this is the l2 == l1 test). In visual-line mode, the
+		 * handling of selection is done in setVisualSelection.
+		 */
 		NSUInteger bol, end, eol;
 
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
@@ -1011,11 +990,13 @@ int logIndent = 0;
 
 		l1 = bol;
 		l2 = end;
-		INFO(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
-	INFO(@"performing command %@", command.method);
+	if (mode == ViVisualMode && !command.isMotion)
+		mode = ViNormalMode;
+
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
@@ -1350,13 +1331,10 @@ int logIndent = 0;
 				[self endUndoGroup];
 			}
 			[storage endEditing];
+			[self setCaret:final_location];
 			if (mode == ViVisualMode)
 			{
 				[self setVisualSelection];
-			}
-			else
-			{
-				[self setCaret:final_location];
 			}
 		}
 	}

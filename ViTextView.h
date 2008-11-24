@@ -18,7 +18,7 @@
 #endif
 #define IMIN(a, b)  (((NSInteger)a) < ((NSInteger)b) ? (a) : (b))
 
-typedef enum { ViCommandMode, ViInsertMode } ViMode;
+typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisualMode } ViMode;
 
 @interface ViTextView : NSTextView
 {
@@ -31,6 +31,7 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableArray *inputKeys;
 
 	// block cursor
+	NSUInteger caret;
 	NSRect oldCaretRect;
 	NSInteger lastCursorLocation;
 	NSRect lastCursor;
@@ -38,6 +39,10 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
 	NSRange affectedRange;
 	NSUInteger start_location, end_location, final_location;
+
+	// visual mode
+	NSUInteger visual_start_location;
+	BOOL visual_line_mode;
 
 	NSMutableCharacterSet *wordSet;
 	NSMutableCharacterSet *nonWordSet;
@@ -136,7 +141,6 @@ typedef enum { ViCommandMode, ViInsertMode } ViMode;
 - (void)cancelSnippet:(ViSnippet *)snippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
 - (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
-- (ViSnippet *)snippetAtLocation:(NSUInteger)aLocation;
 @end
 
 @interface ViTextView (cursor)

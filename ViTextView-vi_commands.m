@@ -4,6 +4,23 @@
 
 @implementation ViTextView (vi_commands)
 
+- (BOOL)visual:(ViCommand *)command
+{
+	visual_start_location = [self caret];
+	mode = ViVisualMode;
+	visual_line_mode = NO;
+	return TRUE;
+}
+
+- (BOOL)visual_line:(ViCommand *)command
+{
+	[self visual:command];
+	visual_line_mode = YES;
+	if (affectedRange.length > 0)
+		end_location = NSMaxRange(affectedRange) - 1;
+	return TRUE;
+}
+
 - (BOOL)move_high:(ViCommand *)command
 {
         NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
@@ -385,7 +402,8 @@
 {
 	/* Adjust the range to exclude the last newline (if there is one). */
 	NSUInteger bol, eol, end;
-	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:affectedRange.location];
+	[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:NSMaxRange(affectedRange) - 1];
 	if (eol < end)
 	{
 		affectedRange.length--;
@@ -394,7 +412,7 @@
         NSString *leading_whitespace = nil;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
                 leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
-	
+
 	[self cutToBuffer:0 append:NO range:affectedRange];
 
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];

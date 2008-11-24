@@ -23,6 +23,7 @@ struct vikey
 
 	NSString *method;
 
+	struct vikey *map;
 	struct vikey *command;
 	struct vikey *motion_command;
 	int count;
@@ -48,6 +49,7 @@ struct vikey
 - (int)ismotion;
 - (BOOL)line_mode;
 - (NSString *)motion_method;
+- (void)setVisualMap;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;

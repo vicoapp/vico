@@ -257,6 +257,9 @@ int logIndent = 0;
 			[self cancelSnippet:activeSnippet];
 		}
 	}
+
+	if (mode == ViVisualMode)
+		mode = ViNormalMode;
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -293,6 +296,8 @@ int logIndent = 0;
 		}
 	}
 
+	if (mode == ViVisualMode)
+		mode = ViNormalMode;
 }
 
 - (void)deleteRange:(NSRange)aRange
@@ -887,12 +892,14 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location
 {
+	INFO(@"setting caret to %u", location);
+	caret = location;
 	[self setSelectedRange:NSMakeRange(location, 0)];
 }
 
 - (NSUInteger)caret
 {
-	return [self selectedRange].location;
+	return caret;
 }
 
 - (void)setCommandMode
@@ -919,8 +926,26 @@ int logIndent = 0;
 
 - (void)evaluateCommand:(ViCommand *)command
 {
-	/* Default start- and end-location is the current location. */
-	start_location = [self caret];
+	if (mode == ViVisualMode)
+	{
+		/* Default start- and end-location is the current selection. */
+		NSRange sel = [self selectedRange];
+		if (NSMaxRange(sel) > visual_start_location + 1)
+		{
+			// we're to the right of the selection
+			start_location = NSMaxRange(sel) - 1;
+		}
+		else
+		{
+			// we're to the left of the selection
+			start_location = sel.location;
+		}
+	}
+	else
+	{
+		/* Default start- and end-location is the current location. */
+		start_location = [self caret];
+	}
 	end_location = start_location;
 	final_location = start_location;
 
@@ -929,6 +954,7 @@ int logIndent = 0;
 		/* The command has an associated motion component.
 		 * Run the motion method and record the start and end locations.
 		 */
+		INFO(@"performing motion method %@", command.motion_method);
 		if ([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
 		{
 			/* the command failed */
@@ -939,22 +965,32 @@ int logIndent = 0;
 	}
 
 	/* Find out the affected range for this command */
-	NSUInteger l1 = start_location, l2 = end_location;
-	if (l2 < l1)
-	{	/* swap if end < start */
-		l2 = l1;
-		l1 = end_location;
+	NSUInteger l1, l2;
+	if (mode == ViVisualMode)
+	{
+		NSRange sel = [self selectedRange];
+		l1 = sel.location;
+		l2 = NSMaxRange(sel);
 	}
-	DEBUG(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	else
+	{
+		l1 = start_location, l2 = end_location;
+		if (l2 < l1)
+		{	/* swap if end < start */
+			l2 = l1;
+			l1 = end_location;
+		}
+	}
+	INFO(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 
-	if (command.line_mode && !command.ismotion)
+	if (command.line_mode && !command.ismotion && (!visual_line_mode || l2 == l1))
 	{
 		/* if this command is line oriented, extend the affectedRange to whole lines */
 		NSUInteger bol, end, eol;
 
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
 
-		if (!command.motion_method)
+		if (!command.motion_method && mode != ViVisualMode)
 		{
 			/* This is a "doubled" command (like dd or yy).
 			 * A count, or motion-count, affects that number of whole lines.
@@ -975,10 +1011,11 @@ int logIndent = 0;
 
 		l1 = bol;
 		l2 = end;
-		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		INFO(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
+	INFO(@"performing command %@", command.method);
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
@@ -1172,6 +1209,31 @@ int logIndent = 0;
 #endif
 }
 
+- (void)setVisualSelection
+{
+	NSUInteger l1 = visual_start_location, l2 = end_location;
+	if (l2 < l1)
+	{	/* swap if end < start */
+		l2 = l1;
+		l1 = end_location;
+	}
+
+	if (visual_line_mode)
+	{
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+		l1 = bol;
+		l2 = end;
+	}
+	else
+		l2++;
+
+	NSRange sel = NSMakeRange(l1, l2 - l1);
+	INFO(@"setting selection to %@", NSStringFromRange(sel));
+	[self setSelectedRange:sel];
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
 #if 0
@@ -1250,32 +1312,50 @@ int logIndent = 0;
 			}
 		}
 	}
-	else if (mode == ViCommandMode) // or normal mode
+	else if (mode == ViNormalMode || mode == ViVisualMode)
 	{
-		// check for a special key bound to a function
-		NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-		NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-		if (normalCommand)
+		if (mode == ViNormalMode)
 		{
-			[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
-		}
-		else
-		{
-			if (parser.complete)
-				[parser reset];
-
-			[parser pushKey:charcode];
-			if (parser.complete)
+			// check for a special key bound to a function
+			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+			NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
+			if (normalCommand)
 			{
-				[[self delegate] message:@""]; // erase any previous message
-				[storage beginEditing];
-				[self evaluateCommand:parser];
-				if (mode == ViCommandMode)
-				{
-					// still in command mode
-					[self endUndoGroup];
-				}
-				[storage endEditing];
+				[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
+				return;
+			}
+		}
+		else if (charcode == 0x1B)
+		{
+			mode = ViNormalMode;
+			[self setCaret:final_location];
+			return;
+		}
+
+		if (parser.complete)
+			[parser reset];
+
+		if (mode == ViVisualMode)
+			[parser setVisualMap];
+
+		[parser pushKey:charcode];
+		if (parser.complete)
+		{
+			[[self delegate] message:@""]; // erase any previous message
+			[storage beginEditing];
+			[self evaluateCommand:parser];
+			if (mode != ViInsertMode)
+			{
+				// still in command mode
+				[self endUndoGroup];
+			}
+			[storage endEditing];
+			if (mode == ViVisualMode)
+			{
+				[self setVisualSelection];
+			}
+			else
+			{
 				[self setCaret:final_location];
 			}
 		}

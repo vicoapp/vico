@@ -423,11 +423,9 @@ find_command_in_map(int key, struct vikey map[])
 	map = normal_map;
 }
 
-- (int)ismotion
+- (BOOL)ismotion
 {
-	if(command && has_flag(command, VIF_IS_MOTION))
-		return 1;
-	return 0;
+	return command && has_flag(command, VIF_IS_MOTION);
 }
 
 - (BOOL)line_mode
@@ -451,11 +449,6 @@ find_command_in_map(int key, struct vikey map[])
 - (void)setVisualMap
 {
 	map = visual_map;
-}
-
-- (BOOL)isMotion
-{
-	return command && has_flag(command, VIF_IS_MOTION);
 }
 
 @end

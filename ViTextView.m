@@ -1003,7 +1003,7 @@ int logIndent = 0;
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
-	if (mode == ViVisualMode && !command.isMotion)
+	if (mode == ViVisualMode && !command.ismotion)
 		[self setNormalMode];
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];

@@ -50,7 +50,6 @@ struct vikey
 - (BOOL)line_mode;
 - (NSString *)motion_method;
 - (void)setVisualMap;
-- (BOOL)isMotion;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;

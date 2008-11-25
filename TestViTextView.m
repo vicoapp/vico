@@ -57,6 +57,7 @@
 - (void)test043_WordForwardFromNonword		{ MOVE(@"abc() def", 3, @"w", 6); }
 - (void)test044_WordForwardAcrossLines		{ MOVE(@"abc\n def", 2, @"w", 5); }
 - (void)test045_WordForwardAtEOL		{ MOVE(@"abc def", 4, @"w", 6); }
+- (void)test046_TwoWordsForward			{ MOVE(@"abc def ghi", 0, @"2w", 8); }
 
 - (void)test050_DeleteWordForward		{ TEST(@"abc def", 0, @"dw", @"def", 0); }
 - (void)test051_DeleteWordForward2		{ TEST(@"abc def", 1, @"dw", @"adef", 1); }
@@ -140,6 +141,7 @@
 - (void)test141_BigwordForwardSpace		{ MOVE(@"abc     ghi", 3, @"W", 8); }
 - (void)test142_BigwordBackward			{ MOVE(@"abc=def ghi", 8, @"B", 0); }
 - (void)test143_DeleteBigwordBackward		{ TEST(@"abc=def ghi", 8, @"dB", @"ghi", 0); }
+- (void)test144_TwoBigwordsForward		{ MOVE(@"abc=def ghi jkl", 0, @"2W", 12); }
 
 - (void)test150_EndOfWord			{ MOVE(@"abc def", 0, @"e", 2); }
 - (void)test151_EndOfWordFromBlanks		{ MOVE(@"   abc def", 0, @"e", 5); }

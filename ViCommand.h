@@ -46,7 +46,7 @@ struct vikey
 
 - (void)pushKey:(unichar)key;
 - (void)reset;
-- (int)ismotion;
+- (BOOL)ismotion;
 - (BOOL)line_mode;
 - (NSString *)motion_method;
 - (void)setVisualMap;

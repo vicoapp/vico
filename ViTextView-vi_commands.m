@@ -7,7 +7,7 @@
 - (BOOL)visual:(ViCommand *)command
 {
 	visual_start_location = [self caret];
-	mode = ViVisualMode;
+	[self setVisualMode];
 	visual_line_mode = NO;
 	return TRUE;
 }
@@ -16,8 +16,6 @@
 {
 	[self visual:command];
 	visual_line_mode = YES;
-	if (affectedRange.length > 0)
-		end_location = NSMaxRange(affectedRange) - 1;
 	return TRUE;
 }
 
@@ -261,7 +259,7 @@
 {
 	// need beginning of line for correcting caret position after deletion
 	NSUInteger bol;
-	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:affectedRange.location];
 
 	/* If a line mode range includes the last line, also include the newline before the first line.
 	 * This way delete doesn't leave an empty line.
@@ -272,11 +270,11 @@
 		affectedRange.length++;
 		DEBUG(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
 	}
-	
+
 	[self cutToBuffer:0 append:NO range:affectedRange];
-	
+
 	// correct caret position if we deleted the last character(s) on the line
-	if (bol > [storage length])
+	if (bol >= [storage length])
 		bol = IMAX(0, [storage length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
@@ -284,7 +282,7 @@
 		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
 	else
 		final_location = affectedRange.location;
-	
+
 	return YES;
 }
 
@@ -292,7 +290,7 @@
 - (BOOL)yank:(ViCommand *)command
 {
 	[self yankToBuffer:0 append:NO range:affectedRange];
-	
+
 	/* From nvi:
 	 * !!!
 	 * Historic vi moved the cursor to the from MARK if it was before the current
@@ -320,7 +318,7 @@
 		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
 	}
-	
+
 	if ([buffer hasSuffix:@"\n"])
 	{
 		NSUInteger bol;
@@ -329,7 +327,7 @@
 		start_location = final_location = bol;
 	}
 	[self insertString:buffer atLocation:start_location];
-	
+
 	return YES;
 }
 
@@ -343,7 +341,7 @@
 		[[self delegate] message:@"The default buffer is empty"];
 		return NO;
 	}
-	
+
 	NSUInteger end, eol;
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	if ([buffer hasSuffix:@"\n"])
@@ -356,9 +354,9 @@
 		// in contrast to move_right, we are allowed to move to EOL here
 		final_location = start_location + 1;
 	}
-	
+
 	[self insertString:buffer atLocation:final_location];
-	
+
 	return YES;
 }
 
@@ -367,7 +365,7 @@
 {
 	[self replaceRange:NSMakeRange(start_location, 1)
 	        withString:[NSString stringWithFormat:@"%C", command.argument]];
-	
+
 	return YES;
 }
 
@@ -386,10 +384,10 @@
 			affectedRange.length--;
 		}
 	}
-	
+
 	if ([self delete:command])
 	{
-		end_location = final_location;
+		end_location = final_location = start_location;
 		[self setInsertMode:command];
 		return YES;
 	}
@@ -842,34 +840,34 @@
 /* syntax: [count]W */
 - (BOOL)word_forward:(ViCommand *)command
 {
-	if([storage length] == 0)
+	if ([storage length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
 	NSString *s = [storage string];
 	unichar ch = [s characterAtIndex:start_location];
-	
+
 	BOOL bigword = (command.ismotion ? command.key == 'W' : command.motion_key == 'W');
-	
-	if(!bigword && [wordSet characterIsMember:ch])
+
+	if (!bigword && [wordSet characterIsMember:ch])
 	{
 		// skip word-chars and whitespace
 		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
 		// INFO(@"from word char: %u -> %u", start_location, end_location);
 	}
-	else if(![whitespace characterIsMember:ch])
+	else if (![whitespace characterIsMember:ch])
 	{
 		// inside non-word-chars
 		end_location = [self skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:start_location backward:NO];
 	}
-	else if(!command.ismotion && command.key != 'd' && command.key != 'y')
+	else if (!command.ismotion && command.key != 'd' && command.key != 'y')
 	{
 		/* We're in whitespace. */
 		/* See comment from nvi below. */
 		end_location = start_location + 1;
 	}
-	
+
 	/* From nvi:
 	 * Movements associated with commands are different than movement commands.
 	 * For example, in "abc  def", with the cursor on the 'a', "cw" is from
@@ -878,23 +876,23 @@
 	 * in the same string, a "cw" on any white space character replaces that
 	 * single character, and nothing else.  Ain't nothin' in here that's easy. 
 	 */
-	if(command.ismotion || command.key == 'd' || command.key == 'y')
+	if (command.ismotion || command.key == 'd' || command.key == 'y')
 		end_location = [self skipWhitespaceFrom:end_location];
 	
-	if(!command.ismotion && (command.key == 'd' || command.key == 'y'))
+	if (!command.ismotion && (command.key == 'd' || command.key == 'y'))
 	{
 		/* Restrict to current line if deleting/yanking last word on line.
 		 * However, an empty line can be deleted as a word.
 		 */
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
-		if(end_location > eol && bol != eol)
+		if (end_location > eol && bol != eol)
 		{
 			// INFO(@"adjusting location from %lu to %lu at EOL", end_location, eol);
 			end_location = eol;
 		}
 	}
-	else if(end_location >= [s length])
+	else if (end_location >= [s length])
 		end_location = [s length] - 1;
 	final_location = end_location;
 	return YES;
@@ -1100,16 +1098,108 @@
 /* syntax: ^F */
 - (BOOL)forward_screen:(ViCommand *)command
 {
-	[self pageDown:self];
-	end_location = final_location = [self selectedRange].location;
+	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        // get visible character range
+        NSRect visibleRect = [clipView bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// get last line
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:NSMaxRange(range) - 1];
+
+	if (NSMaxRange(range) == [storage length])
+	{
+		/* Already showing last page, place cursor at last line.
+		 * Check if already on last line.
+		 */
+		if ([self caret] >= bol)
+		{
+			[[self delegate] message:@"Already at end-of-file"];
+			return NO;
+		}
+		
+		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		return YES;
+	}
+
+	// get second last line
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:bol - 1];
+
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:bol];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
+
+	NSPoint topPoint;
+	topPoint = NSMakePoint(0, NSMinY(rect));
+
+	[clipView scrollToPoint:topPoint];
+	[scrollView reflectScrolledClipView:clipView];
+
+	end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
 	return YES;
 }
 
 /* syntax: ^B */
 - (BOOL)backward_screen:(ViCommand *)command
 {
-	[self pageUp:self];
-	end_location = final_location = [self selectedRange].location;
+	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        // get visible character range
+        NSRect visibleRect = [clipView bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// get first line
+	NSUInteger bol, eol, end;
+	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:range.location];
+
+	if (range.location == 0)
+	{
+		/* Already showing first page, place cursor at first line.
+		 * Check if already on first line.
+		 */
+		if ([self caret] < eol)
+		{
+			[[self delegate] message:@"Already at the beginning of the file"];
+			return NO;
+		}
+		
+		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		return YES;
+	}
+
+	// count number of lines in the visibleRect
+	unsigned lines = 0;
+	while (end < NSMaxRange(range))
+	{
+		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end];
+		lines++;
+	}
+
+	lines -= 2; // want 2 lines of overlap
+	
+	// now count the same number of lines backwards from top
+	bol = range.location;
+	while (bol > 0)
+	{
+		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:bol - 1];
+		if (--lines <= 0)
+			break;
+	}
+
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:bol];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
+
+	NSPoint topPoint;
+	topPoint = NSMakePoint(0, NSMinY(rect));
+
+	[clipView scrollToPoint:topPoint];
+	[scrollView reflectScrolledClipView:clipView];
+
+	end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
 	return YES;
 }
 

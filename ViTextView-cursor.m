@@ -26,9 +26,9 @@
 	}
 }
 
-- (void)drawViewBackgroundInRect:(NSRect)aRect
+- (void)drawRect:(NSRect)aRect
 {
-	[super drawViewBackgroundInRect:aRect];
+	[super drawRect:aRect];
 	[self updateInsertionPointInRect:aRect];
 }
 

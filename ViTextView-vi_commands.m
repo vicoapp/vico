@@ -51,14 +51,17 @@
         NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
-	
+
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
 	end_location = final_location = bol;
 
-	NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
-	NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
-	[[[[self delegate] scrollView] contentView] scrollToPoint:topPoint];
+	if (NSMaxRange(range) < [storage length])
+	{
+		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
+		NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
+		[[[[self delegate] scrollView] contentView] scrollToPoint:topPoint];
+	}
 
 	return YES;
 }

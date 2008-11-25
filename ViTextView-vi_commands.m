@@ -1171,16 +1171,23 @@
 		return YES;
 	}
 
+	BOOL has_final_location = NO;
+
 	// count number of lines in the visibleRect
 	unsigned lines = 0;
 	while (end < NSMaxRange(range))
 	{
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end];
+		if (!has_final_location)
+		{
+			has_final_location = YES;
+			end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		}
 		lines++;
 	}
 
-	lines -= 2; // want 2 lines of overlap
-	
+	lines -= 1; // want 2 lines of overlap (first line already included)
+
 	// now count the same number of lines backwards from top
 	bol = range.location;
 	while (bol > 0)
@@ -1199,7 +1206,6 @@
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
 
-	end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
 	return YES;
 }
 

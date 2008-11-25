@@ -557,14 +557,16 @@ int logIndent = 0;
 {
         NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-        [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
+        int n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
+        [self setCaret:start_location + n];
 }
 
 - (void)decrease_indent:(NSString *)characters
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	[self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
+	int n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
+        [self setCaret:start_location + n];
 }
 
 #pragma mark -

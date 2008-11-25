@@ -32,6 +32,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 	// block cursor
 	NSUInteger caret;
+	NSRect caretRect;
 	NSRect oldCaretRect;
 
 	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]

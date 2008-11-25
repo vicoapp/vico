@@ -4,15 +4,13 @@
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	NSLayoutManager *lm = [self layoutManager];
-	NSRange rr = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
-	NSRect caretRect = [lm boundingRectForGlyphRange:rr inTextContainer:[self textContainer]];
-
 	if (NSIntersectsRect(caretRect, aRect)) 
 	{
 		if (mode == ViInsertMode)
+		{
 			caretRect.size.width = 2;
-		else
+		}
+		else if (caret < [storage length])
 		{
 			unichar c = [[storage string] characterAtIndex:caret];
 			if (c == '\t')
@@ -40,4 +38,3 @@
 }
 
 @end
-

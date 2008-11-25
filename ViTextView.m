@@ -273,7 +273,7 @@ int logIndent = 0;
 	[self recordDeleteOfRange:aRange];
 	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
 	[storage deleteCharactersInRange:aRange];
-	
+
 	if (activeSnippet)
 	{
 		if ([activeSnippet activeInRange:aRange])
@@ -889,10 +889,10 @@ int logIndent = 0;
 
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
-	NSRect cr = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
 	[self setNeedsDisplayInRect:oldCaretRect];
-	[self setNeedsDisplayInRect:cr];
-	oldCaretRect = cr;
+	[self setNeedsDisplayInRect:caretRect];
+	oldCaretRect = caretRect;
 }
 
 - (NSUInteger)caret
@@ -913,7 +913,6 @@ int logIndent = 0;
 
 - (void)setInsertMode:(ViCommand *)command
 {
-	[self setSelectedRange:NSMakeRange(caret, 0)];
 	DEBUG(@"entering insert mode at location %lu (final location is %lu), length is %lu",
 		end_location, final_location, [storage length]);
 	mode = ViInsertMode;
@@ -1224,6 +1223,29 @@ int logIndent = 0;
 	[self setSelectedRange:sel];
 }
 
+- (void)scrollToCaret
+{
+        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
+
+	NSClipView *clipView = [[[self delegate] scrollView] contentView];
+	NSPoint topPoint;
+	if (NSMinY(rect) < NSMinY(visibleRect))
+	{
+		topPoint = NSMakePoint(0, NSMinY(rect));
+	}
+	else if (NSMaxY(rect) > NSMaxY(visibleRect))
+	{
+		topPoint = NSMakePoint(0, NSMaxY(rect) - NSHeight(visibleRect));
+	}
+	else
+		return;
+
+	[clipView scrollToPoint:topPoint];
+	[[[self delegate] scrollView] reflectScrolledClipView:clipView];
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
 #if 0
@@ -1348,7 +1370,7 @@ int logIndent = 0;
 		}
 	}
 
-        [self scrollRangeToVisible:NSMakeRange([self caret], 0)];
+	[self scrollToCaret];
 }
 
 /* Takes a string of characters and creates key events for each one.

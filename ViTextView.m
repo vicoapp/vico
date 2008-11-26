@@ -105,7 +105,6 @@ int logIndent = 0;
 - (void)setSymbolScopes
 {
 	symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
-	/* INFO(@"symbolSettings = %@", symbolSettings); */
 	NSString *selector;
 	symbolScopes = [[NSMutableArray alloc] init];
 	for (selector in symbolSettings)
@@ -113,8 +112,6 @@ int logIndent = 0;
 		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
 			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
 	}
-
-	// INFO(@"symbolScopes = %@", symbolScopes);
 }
 
 - (void)setLanguageFromString:(NSString *)aLanguage
@@ -646,9 +643,23 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	if(eol - bol > column)
-		final_location = end_location = bol + column;
-	else if(eol - bol > 1)
+	if (eol - bol > column)
+	{
+		NSUInteger c = 0, i;
+		int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+		for (i = bol; i <= eol; i++)
+		{
+			unichar ch = [[storage string] characterAtIndex:i];
+			if (ch == '\t')
+				c += ts - (c % ts);
+			else
+				c++;
+			if (c >= column)
+				break;
+		}
+		final_location = end_location = i;
+	}
+	else if (eol - bol > 1)
 		final_location = end_location = eol - 1;
 	else
 		final_location = end_location = bol;
@@ -888,6 +899,8 @@ int logIndent = 0;
 - (void)setCaret:(NSUInteger)location
 {
 	caret = location;
+	if (mode != ViVisualMode)
+		[self setSelectedRange:NSMakeRange(caret, 0)];
 
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
@@ -1575,9 +1588,19 @@ int logIndent = 0;
 
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
-	NSUInteger bol, end;
-	[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:aLocation];
-	return [self caret] - bol;
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	NSUInteger c = 0, i;
+	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	for (i = bol; i <= [self caret]; i++)
+	{
+		unichar ch = [[storage string] characterAtIndex:i];
+		if (ch == '\t')
+			c += ts - (c % ts);
+		else
+			c++;
+	}
+	return c;
 }
 
 - (NSUInteger)currentColumn

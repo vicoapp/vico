@@ -2,7 +2,7 @@
 
 #. ../version.mk
 #test -z "$VERSION" && die "can't find version information"
-VERSION=0.1
+VERSION=0.2
 
 echo "Building xi version $VERSION"
 

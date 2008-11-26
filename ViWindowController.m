@@ -2,6 +2,7 @@
 #import <PSMTabBarControl/PSMTabBarControl.h>
 #import "ViDocument.h"
 #import "ExTextView.h"
+#import "ProjectDelegate.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -41,6 +42,11 @@ static NSWindowController	*currentWindowController = nil;
 	return self;
 }
 
+- (IBAction)saveProject:(id)sender
+{
+	[projectDelegate saveProject:sender];
+}
+
 - (void)windowDidLoad
 {
 	[toolbar setDelegate:self];
@@ -72,7 +78,12 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
 	// leave the project split view collapsed for now
-	[splitView setPosition:0.0 ofDividerAtIndex:0];
+	// [splitView setPosition:0.0 ofDividerAtIndex:0];
+	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
+	[cell setFont:[NSFont systemFontOfSize:10.0]];
+	[projectOutline setRowHeight:12.0];
+	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
+	[cell setWraps:NO];
 
 	[[self window] makeKeyAndOrderFront:self];
 }
@@ -265,6 +276,14 @@ static NSWindowController	*currentWindowController = nil;
 {
 }
 
+- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
+{
+	NSString *projName = [projectDelegate projectName];
+	if (projName)
+		return [NSString stringWithFormat:@"%@ - %@", displayName, projName];
+	return displayName;
+}
+
 #pragma mark -
 #pragma mark Project split view
 
@@ -280,7 +299,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
-	return 70;
+	return 100;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
@@ -313,6 +332,14 @@ static NSWindowController	*currentWindowController = nil;
 	
 	[secondView setFrame:secondFrame];
 	[sender adjustSubviews];
+}
+
+- (NSRect)splitView:(NSSplitView *)aSplitView additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
+{
+	NSRect frame = [aSplitView frame];
+	NSRect resizeRect = [projectResizeView frame];
+	resizeRect.origin.y = NSHeight(frame) - NSHeight(resizeRect);
+	return resizeRect;
 }
 
 @end

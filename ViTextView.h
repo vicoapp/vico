@@ -131,6 +131,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)currentLine;
+- (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)currentColumn;
 
 - (void)updateSymbolList:(NSTimer *)timer;

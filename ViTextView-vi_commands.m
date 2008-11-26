@@ -21,13 +21,17 @@
 
 - (BOOL)move_high:(ViCommand *)command
 {
-        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        NSRect visibleRect = [clipView bounds];
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 	end_location = final_location = range.location;
 
 	NSRect highRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphRange.location, 1) inTextContainer:[self textContainer]];
-	[[[[self delegate] scrollView] contentView] scrollToPoint:NSMakePoint(0, highRect.origin.y)];
+	[clipView scrollToPoint:NSMakePoint(0, highRect.origin.y)];
+	[scrollView reflectScrolledClipView:clipView];
 	
 	return YES;
 }
@@ -48,7 +52,10 @@
 
 - (BOOL)move_low:(ViCommand *)command
 {
-        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        NSRect visibleRect = [clipView bounds];
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
@@ -60,7 +67,8 @@
 	{
 		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
 		NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
-		[[[[self delegate] scrollView] contentView] scrollToPoint:topPoint];
+		[clipView scrollToPoint:topPoint];
+		[scrollView reflectScrolledClipView:clipView];
 	}
 
 	return YES;
@@ -616,7 +624,7 @@
 		return NO;
 	}
 	
-	NSUInteger column = start_location - bol;
+	NSUInteger column = [self columnAtLocation:start_location];
 	final_location = end_location = bol - 1; // previous line
 	[self gotoColumn:column fromLocation:end_location];
 	return YES;
@@ -625,14 +633,29 @@
 /* syntax: [count]j */
 - (BOOL)move_down:(ViCommand *)command
 {
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
 	NSUInteger bol, end;
 	[self getLineStart:&bol end:&end contentsEnd:NULL];
-	if(end >= [storage length])
+	if (end >= [storage length])
 	{
 		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
 	}
-	NSUInteger column = start_location - bol;
+	
+	while (--count > 0)
+	{
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:end];
+		if (end >= [storage length])
+		{
+			[[self delegate] message:@"Movement past the end-of-file"];
+			return NO;
+		}
+	}
+
+	NSUInteger column = [self columnAtLocation:start_location];
 	final_location = end_location = end; // next line
 	[self gotoColumn:column fromLocation:end_location];
 	return YES;

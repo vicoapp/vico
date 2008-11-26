@@ -3,14 +3,18 @@
 
 @class PSMTabBarControl;
 @class ViDocument;
+@class ProjectDelegate;
+@class ViResizeView;
 
 @interface ViWindowController : NSWindowController
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSTabView *tabView;
 	IBOutlet NSSplitView *splitView;
-	IBOutlet NSOutlineView *projectView;
+	IBOutlet NSOutlineView *projectOutline;
 	IBOutlet NSToolbar *toolbar;
+	IBOutlet ProjectDelegate *projectDelegate;
+	IBOutlet NSImageView *projectResizeView;
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
@@ -19,6 +23,8 @@
 
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;
+
+- (IBAction)saveProject:(id)sender;
 
 - (void)addNewTab:(ViDocument *)document;
 

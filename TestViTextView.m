@@ -119,7 +119,7 @@
 - (void)test100_WordBackward9			{ MOVE(@"  abc", 2, @"b", 0); }
 
 - (void)test110_MoveDown			{ MOVE(@"abc\ndef", 1, @"j", 5); }
-//- (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
+- (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
 - (void)test112_MoveToFirstNonspace		{ MOVE(@"   abc", 5, @"_", 3); }
 - (void)test112_MoveToFirstNonspace2		{ MOVE(@"   abc", 5, @"^", 3); }
 

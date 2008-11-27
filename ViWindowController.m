@@ -3,11 +3,15 @@
 #import "ViDocument.h"
 #import "ExTextView.h"
 #import "ProjectDelegate.h"
+#import "ViSymbol.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
 
 @implementation ViWindowController
+
+@synthesize filteredSymbols;
+@synthesize documents;
 
 + (id)currentWindowController
 {
@@ -37,6 +41,7 @@ static NSWindowController	*currentWindowController = nil;
 			windowControllers = [[NSMutableArray alloc] init];
 		[windowControllers addObject:self];
 		currentWindowController = self;
+		documents = [[NSMutableArray alloc] init];
 	}
 
 	return self;
@@ -77,15 +82,24 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
-	// leave the project split view collapsed for now
-	// [splitView setPosition:0.0 ofDividerAtIndex:0];
 	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
-	[cell setFont:[NSFont systemFontOfSize:10.0]];
-	[projectOutline setRowHeight:12.0];
+	[cell setFont:[NSFont systemFontOfSize:11.0]];
+	[projectOutline setRowHeight:15.0];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
 	[[self window] makeKeyAndOrderFront:self];
+
+	[splitView addSubview:symbolsView];
+
+	[symbolsOutline setTarget:self];
+	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
+	[symbolsOutline setAction:@selector(goToSymbol:)];
+	cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
+	[cell setFont:[NSFont systemFontOfSize:11.0]];
+	[symbolsOutline setRowHeight:15.0];
+	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
+	[cell setWraps:NO];
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
@@ -118,6 +132,22 @@ static NSWindowController	*currentWindowController = nil;
 	[newItem setLabel:[document displayName]];
 	[tabView addTabViewItem:newItem];
 	[tabView selectTabViewItem:newItem];
+
+	[self willChangeValueForKey:@"documents"];
+	[documents addObject:document];
+	[self didChangeValueForKey:@"documents"];
+
+#if 0
+	NSTreeNode *node;
+	for (node in [symbolsController arrangedObjects])
+	{
+		if ([node representedObject] == document)
+		{
+			INFO(@"expanding node %@", node);
+			[symbolsOutline expandItem:node];
+		}
+	}
+#endif
 }
 
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -139,6 +169,11 @@ static NSWindowController	*currentWindowController = nil;
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	ViDocument *doc = [tabViewItem identifier];
+
+	[self willChangeValueForKey:@"documents"];
+	[documents removeObject:doc];
+	[self didChangeValueForKey:@"documents"];
+
 	[tabView selectTabViewItem:tabViewItem];
 	[[self window] performClose:doc];
 	if (lastDocument == doc)
@@ -272,10 +307,6 @@ static NSWindowController	*currentWindowController = nil;
 	return tagStack;
 }
 
-- (IBAction)toggleProjectDrawer:(id)sender
-{
-}
-
 - (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
 {
 	NSString *projName = [projectDelegate projectName];
@@ -285,7 +316,7 @@ static NSWindowController	*currentWindowController = nil;
 }
 
 #pragma mark -
-#pragma mark Project split view
+#pragma mark Split view delegate methods
 
 - (void)switchToLastFile
 {
@@ -299,12 +330,16 @@ static NSWindowController	*currentWindowController = nil;
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
-	return 100;
+	if (offset == 0)
+		return 100;
+	return proposedMin;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
-	return 270;
+	if (offset == 0)
+		return 270;
+	return proposedMax;
 }
 
 - (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
@@ -319,17 +354,22 @@ static NSWindowController	*currentWindowController = nil;
 	
 	NSView *firstView = [[sender subviews] objectAtIndex:0];
 	NSView *secondView = [[sender subviews] objectAtIndex:1];
-	
+	NSView *thirdView = nil;
+	int nsubviews = [[sender subviews] count];
+	if (nsubviews == 3)
+		thirdView = [[sender subviews] objectAtIndex:2];
+
 	NSRect firstFrame = [firstView frame];
 	NSRect secondFrame = [secondView frame];
-	
+	NSRect thirdFrame = [thirdView frame];
+
 	if (sender == splitView)
 	{
 		/* keep sidebar in constant width */
 		secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + dividerThickness);
 		secondFrame.size.height = newFrame.size.height;
 	}
-	
+
 	[secondView setFrame:secondFrame];
 	[sender adjustSubviews];
 }
@@ -337,9 +377,74 @@ static NSWindowController	*currentWindowController = nil;
 - (NSRect)splitView:(NSSplitView *)aSplitView additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
 	NSRect frame = [aSplitView frame];
-	NSRect resizeRect = [projectResizeView frame];
+	NSRect resizeRect;
+	if (dividerIndex == 0)
+	{
+		resizeRect = [projectResizeView frame];
+	}
+	else if (dividerIndex == 1)
+	{
+		resizeRect = [symbolsResizeView frame];
+		resizeRect.origin = [splitView convertPoint:resizeRect.origin fromView:symbolsResizeView];
+	}
+	else
+		return NSMakeRect(0, 0, 0, 0);
+
 	resizeRect.origin.y = NSHeight(frame) - NSHeight(resizeRect);
 	return resizeRect;
+}
+
+#pragma mark -
+#pragma mark Symbol List
+
+- (void)goToSymbol:(id)sender
+{
+	NSTreeNode *node = [symbolsOutline itemAtRow:[symbolsOutline clickedRow]];
+	if ([node isLeaf])
+	{
+		ViDocument *document = [[node parentNode] representedObject];
+		[self selectDocument:document];
+		ViSymbol *symbol = [node representedObject];
+		[document goToSymbol:symbol];
+	}
+	else
+	{
+		[self selectDocument:[node representedObject]];
+	}
+#if 0
+	[symbolFilterField setStringValue:@""];
+	[self filterSymbols:symbolFilterField];
+#endif
+}
+
+- (IBAction)filterSymbols:(id)sender
+{
+#if 0
+	NSString *filter = [sender stringValue];
+
+	NSMutableString *pattern = [NSMutableString string];
+	int i;
+	for (i = 0; i < [filter length]; i++)
+	{
+		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
+	}
+	[pattern appendString:@".*"];
+
+	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
+
+	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
+	ViSymbol *s;
+	for (s in symbols)
+	{
+		if ([rx matchInString:[s symbol]])
+		{
+			[fs addObject:s];
+		}
+	}
+
+	[fs sortUsingSelector:@selector(sortOnLocation:)];
+	[self setFilteredSymbols:fs];
+#endif
 }
 
 @end

@@ -13,24 +13,20 @@
 	NoodleLineNumberView *lineNumberView;
 	IBOutlet NSTextField *statusbar;
 	IBOutlet NSPopUpButton *languageButton;
-	IBOutlet NSTableView *symbolsOutline;
-	IBOutlet NSSplitView *splitView;
-	IBOutlet NSSearchField *symbolFilterField;
-	NSMutableArray *symbols;
-	NSMutableArray *filteredSymbols;
 	SEL exCommandSelector;
 	ViWindowController *windowController;
 	NSString *readContent;
+	NSArray *symbols;
 }
 
 @property(readonly) NSScrollView *scrollView;
+@property(readwrite, assign) NSArray *symbols;
 
 - (NSView *)view;
 - (void)enableLineNumbers:(BOOL)flag;
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
 - (IBAction)setLanguage:(id)sender;
-- (IBAction)filterSymbols:(id)sender;
 - (void)message:(NSString *)fmt, ...;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
@@ -42,7 +38,6 @@
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (ViTextView *)textView;
-
-- (void)setSymbols:(NSMutableArray *)symbols;
+- (void)goToSymbol:(ViSymbol *)aSymbol;
 
 @end

@@ -1,7 +1,6 @@
 #import "ViDocument.h"
 #import "ExTextView.h"
 #import "ViLanguageStore.h"
-#import "ViSymbol.h"
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
@@ -16,13 +15,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @implementation ViDocument
 
 @synthesize scrollView;
+@synthesize symbols;
 
 - (id)init
 {
 	self = [super init];
 	if (self)
 	{
-		symbols = [[NSMutableArray alloc] init];
+		symbols = [NSArray array];
 	}
 	return self;
 }
@@ -96,18 +96,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"]];
-
-	[symbolsOutline setDataSource:self];
-	[symbolsOutline setTarget:self];
-	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
-	[symbolsOutline setAction:@selector(goToSymbol:)];
-	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
-	[cell setFont:[NSFont systemFontOfSize:10.0]];
-	[symbolsOutline setRowHeight:12.0];
-	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
-	[cell setWraps:NO];
-
-	[splitView setDelegate:self];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -263,120 +251,26 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
+#if 0
 #pragma mark -
 #pragma mark Symbol List
 
-- (void)goToSymbol:(id)sender
-{
-	NSInteger row = [symbolsOutline clickedRow];
-	if (row >= 0)
-	{
-		ViSymbol *s = [filteredSymbols objectAtIndex:row];
-		NSRange range = [s range];
-		[textView setCaret:range.location];
-		[textView scrollRangeToVisible:range];
-		[[[self windowController] window] makeFirstResponder:textView];
-		[textView showFindIndicatorForRange:range];
-		
-		[symbolFilterField setStringValue:@""];
-		[self filterSymbols:symbolFilterField];
-	}
-}
-
-- (IBAction)filterSymbols:(id)sender
-{
-	NSString *filter = [sender stringValue];
-
-	NSMutableString *pattern = [NSMutableString string];
-	int i;
-	for (i = 0; i < [filter length]; i++)
-	{
-		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
-	}
-	[pattern appendString:@".*"];
-
-	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
-
-	filteredSymbols = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
-	ViSymbol *s;
-	for (s in symbols)
-	{
-		if ([rx matchInString:[s symbol]])
-		{
-			[filteredSymbols addObject:s];
-		}
-	}
-
-	[filteredSymbols sortUsingSelector:@selector(sortOnLocation:)];
-	[symbolsOutline reloadData];
-}
-
 - (void)setSymbols:(NSMutableArray *)aSymbolArray
 {
+	INFO(@"settings symbols to %@", aSymbolArray);
 	symbols = aSymbolArray;
-	[self filterSymbols:symbolFilterField];
+	// [windowController setSymbols:aSymbolArray];
 }
+#endif
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+- (void)goToSymbol:(ViSymbol *)aSymbol
 {
-	return [[[filteredSymbols objectAtIndex:rowIndex] symbol] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+	NSRange range = [aSymbol range];
+	[textView setCaret:range.location];
+	[textView scrollRangeToVisible:range];
+	[[[self windowController] window] makeFirstResponder:textView];
+	[textView showFindIndicatorForRange:range];
 }
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-	return [filteredSymbols count];
-}
-
-#pragma mark -
-#pragma mark Symbol Split View delegate
-
-- (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview
-{
-	return YES;
-}
-
-- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
-{
-	return 400;
-}
-
-- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
-{
-	return proposedMax - 100;
-}
-
-- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
-{
-	return YES;
-}
-
-- (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize
-{
-	NSRect newFrame = [sender frame];
-	float dividerThickness = [sender dividerThickness];
-
-	NSView *firstView = [[sender subviews] objectAtIndex:0];
-	NSView *secondView = [[sender subviews] objectAtIndex:1];
-
-	NSRect firstFrame = [firstView frame];
-	NSRect secondFrame = [secondView frame];
-
-	/* Keep symbol list in constant width. */
-	firstFrame.size.width = newFrame.size.width - (secondFrame.size.width + dividerThickness);
-	firstFrame.size.height = newFrame.size.height;
-
-	if (firstFrame.size.width < 0)
-	{
-		firstFrame.size.width = 0;
-		secondFrame.size.width = newFrame.size.width - firstFrame.size.width - dividerThickness;
-	}
-
-	secondFrame.origin.x = firstFrame.size.width + dividerThickness;
-
-	[firstView setFrame:firstFrame];
-	[secondView setFrame:secondFrame];
-	[sender adjustSubviews];
-}
-
 
 @end
+

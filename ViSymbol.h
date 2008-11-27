@@ -11,5 +11,7 @@
 
 - (ViSymbol *)initWithSymbol:(NSString *)aSymbol range:(NSRange)aRange;
 - (int)sortOnLocation:(ViSymbol *)anotherSymbol;
+- (NSString *)displayName;
+- (NSArray *)symbols;
 
 @end

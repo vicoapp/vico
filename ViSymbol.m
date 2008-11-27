@@ -26,5 +26,15 @@
 	return 0;
 }
 
+- (NSString *)displayName
+{
+	return symbol;
+}
+
+- (NSArray *)symbols
+{
+	return nil;
+}
+
 @end
 

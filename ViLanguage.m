@@ -4,33 +4,49 @@
 
 @implementation ViLanguage
 
-- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(id)beginMatch
+- (ViRegexp *)compileRegexp:(NSString *)pattern
+{
+	ViRegexp *regexp = nil;
+	@try
+	{
+		regexp = [ViRegexp regularExpressionWithString:pattern];
+	}
+	@catch (NSException *exception)
+	{
+		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
+		regexp = nil;
+	}
+
+	return regexp;
+}
+
+- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch matchText:(const unichar *)matchText
 {
 	ViRegexp *regexp = nil;
 	@try
 	{
 		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
-#if 0
 		if (beginMatch)
 		{
-			// INFO(@"*************** expanding pattern with %i captures:", [beginMatch count]);
-			// INFO(@"** original pattern = [%@]", pattern);
+			INFO(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+			INFO(@"** original pattern = [%@]", pattern);
 			int i;
 			for (i = 1; i <= [beginMatch count]; i++)
 			{
-				if ([beginMatch substringAtIndex:i])
+				NSRange captureRange = [beginMatch rangeOfSubstringAtIndex:i];
+				NSString *capture = [NSString stringWithCharacters:matchText + captureRange.location length:captureRange.length];
+				if (capture)
 				{
 					NSString *backref = [NSString stringWithFormat:@"\\%i", i];
-					// INFO(@"**** replacing [%@] with [%@]", backref, [beginMatch substringAtIndex:i]);
+					INFO(@"**** replacing [%@] with [%@]", backref, capture);
 					[expandedPattern replaceOccurrencesOfString:backref
-									 withString:[beginMatch substringAtIndex:i]
+									 withString:capture
 									    options:0
 									      range:NSMakeRange(0, [expandedPattern length])];
 				}
 			}
-			// INFO(@"** expanded pattern = [%@]", expandedPattern);
+			INFO(@"** expanded pattern = [%@]", expandedPattern);
 		}
-#endif
 
 		regexp = [ViRegexp regularExpressionWithString:expandedPattern];
 	}
@@ -47,7 +63,7 @@
 {
 	if ([d objectForKey:rule])
 	{
-		ViRegexp *regexp = [self compileRegexp:[d objectForKey:rule] withBackreferencesToRegexp:nil];
+		ViRegexp *regexp = [self compileRegexp:[d objectForKey:rule]];
 		if (regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
 	}
@@ -140,14 +156,14 @@
 
 - (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage canCache:(BOOL *)canCache
 {
-	DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
+	// DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
 	*canCache = YES;
 
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
 	for (pattern in patterns)
 	{
-		DEBUG(@"  expanding pattern %@", pattern);
+		// DEBUG(@"  expanding pattern %@", pattern);
 		NSString *include = [pattern objectForKey:@"include"];
 		if (include == nil)
 		{
@@ -164,15 +180,15 @@
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
 			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
-			DEBUG(@"including [%@] with %i patterns from repository of language %@", patternName, [includePattern count], [self name]);
+			// DEBUG(@"including [%@] with %i patterns from repository of language %@", patternName, [includePattern count], [self name]);
 			if (includePattern)
 			{
-				DEBUG(@"includePattern = [%@]", includePattern);
+				// DEBUG(@"includePattern = [%@]", includePattern);
 				if ([includePattern count] == 1 + ([includePattern objectForKey:@"expandedPatterns"] ? 1 : 0) + ([includePattern objectForKey:@"comment"] ? 1 : 0) && [includePattern objectForKey:@"patterns"])
 				{
 					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
-					DEBUG(@"expanding pattern collection %@", patternName);
+					// DEBUG(@"expanding pattern collection %@", patternName);
 					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern baseLanguage:baseLanguage]];
 				}
 				else
@@ -188,20 +204,20 @@
 		else if ([include isEqualToString:@"$base"])
 		{
 			// no endless loop because expandedPatternsForPattern caches the first recursion
-			DEBUG(@"including %@: baseLanguage.name = %@", include, [baseLanguage name]);
+			// DEBUG(@"including %@: baseLanguage.name = %@", include, [baseLanguage name]);
 			*canCache = NO;
 			[expandedPatterns addObjectsFromArray:[baseLanguage patterns]];
 		}
 		else if ([include isEqualToString:@"$self"])
 		{
 			// no endless loop because expandedPatternsForPattern caches the first recursion
-			DEBUG(@"including %@: self.name = %@", include, [self name]);
+			// DEBUG(@"including %@: self.name = %@", include, [self name]);
 			[expandedPatterns addObjectsFromArray:[self patterns]];
 		}
 		else
 		{
 			// include an external language grammar
-			DEBUG(@"including external language [%@]", include);
+			// DEBUG(@"including external language [%@]", include);
 			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
 			if (externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];

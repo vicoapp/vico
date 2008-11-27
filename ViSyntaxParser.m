@@ -145,7 +145,8 @@
 	{
 		INFO(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
 		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
-			 withBackreferencesToRegexp:[beginMatch beginMatch]];
+			 withBackreferencesToRegexp:[beginMatch beginMatch]
+			                  matchText:chars];
 	}
 	
 	if (endRegexp == nil)

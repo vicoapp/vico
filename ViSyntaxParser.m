@@ -43,63 +43,194 @@
 	return continuedMatches;
 }
 
-- (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange
+- (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
 {
 	int c = [aScopeArray count];
 	if (c == 0 || aRange.length == 0)
 		return;
 
+	DEBUG(@"-- got scope [%@] in range %@", [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));
+
+	/* Find the closest node already in the tree.
+	 */
 	struct rb_entry *e = [scopeTree root];
+	struct rb_entry *node = e;
+	ViScope *s = nil;
+	NSRange r;
 	while (e)
 	{
-		ViScope *s = e->obj;
-		NSRange r = [s range];
+		s = e->obj;
+		r = [s range];
+		node = e;
+
 		if (r.location > aRange.location)
 		{
-			break;
-			// FIXME: need to break partially matching scopes here!
-			// e = [scopeTree left:e];
+			e = [scopeTree left:e];
 		}
 		else if (r.location < aRange.location)
 		{
-			if (NSMaxRange(r) == aRange.location)
-			{
-				if ([aScopeArray isEqualToStringArray:[s scopes]])
-				{
-					r.length += aRange.length;
-					[s setRange:r];
-					return;
-				}
-			}
-
 			e = [scopeTree right:e];
 		}
 		else
 		{
-			if (r.length < aRange.length)
-				e = [scopeTree left:e];
-			else if (r.length > aRange.length)
+			break;
+		}
+	}
+
+check_again:
+
+	if (s == nil)
+		goto add_node;
+
+	DEBUG(@"closest node is %p [%@] at %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r));
+			
+	if (r.location == aRange.location)
+	{
+		DEBUG(@" found scope collision [%@] at range %@", [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r));
+		if (r.length < aRange.length)
+		{
+			INFO(@"============================================ MUST modifying scope %p [%@], range %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r));
+		}
+		else if (r.length > aRange.length)
+		{
+			NSRange newRange = NSMakeRange(NSMaxRange(aRange), r.length - aRange.length);
+			DEBUG(@"modifying scope %p [%@], range %@ -> %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+			[scopeTree removeEntry:node];
+			[s setRange:newRange];
+			[scopeTree addObject:s];
+			if (additive)
 			{
-				
-				e = [scopeTree right:e];
+				aScopeArray = [s.scopes arrayByAddingObjectsFromArray:aScopeArray];
 			}
+		}
+		else
+		{
+			DEBUG(@"modifying scope %p [%@] -> [%@]", s, [s.scopes componentsJoinedByString:@" "], [aScopeArray componentsJoinedByString:@" "]);
+			if (additive)
+				[s setScopes:[s.scopes arrayByAddingObjectsFromArray:aScopeArray]];
 			else
-			{
 				[s setScopes:aScopeArray];
+			return;
+		}
+	}
+
+	if (r.location < aRange.location)
+	{
+		if (NSMaxRange(r) == aRange.location)
+		{
+			if ([aScopeArray isEqualToStringArray:[s scopes]])
+			{
+				NSRange newRange = r;
+				newRange.length += aRange.length;
+				DEBUG(@"extending left scope %p [%@], range %@ -> %@",
+					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+				[s setRange:newRange];
 				return;
+			}
+		}
+		else if (NSMaxRange(r) > aRange.location)
+		{
+			// fixme: check if equal scopes...
+			NSRange newRange = r;
+			newRange.length = aRange.location - r.location;
+			DEBUG(@"shortening left scope %p [%@], range %@ -> %@",
+				s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+			[s setRange:newRange];
+			if (additive)
+				aScopeArray = [s.scopes arrayByAddingObjectsFromArray:aScopeArray];
+		
+			if (NSMaxRange(r) > NSMaxRange(aRange))
+			{
+				// new scope cuts old scope range in two, re-add the right part
+				newRange.location = NSMaxRange(aRange);
+				newRange.length = NSMaxRange(r) - newRange.location;
+				ViScope *cutScope = [[ViScope alloc] initWithScopes:s.scopes range:newRange];
+				DEBUG(@"adding cut scope %p [%@], range %@", cutScope, [cutScope.scopes componentsJoinedByString:@" "], NSStringFromRange(cutScope.range));
+				[scopeTree addObject:cutScope];
+				[uglyHack addObject:cutScope]; // XXX: otherwise garbage collection fucks this up!
 			}
 		}
 	}
 
-	ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
-	[scopeTree addObject:scope];
-	[uglyHack addObject:scope]; // XXX: otherwise garbage collection fucks this up!
+	if (r.location > aRange.location)
+	{
+		if (NSMaxRange(aRange) == r.location)
+		{
+			if ([aScopeArray isEqualToStringArray:[s scopes]])
+			{
+				NSRange newRange;
+				newRange = NSMakeRange(aRange.location, aRange.length + r.length);
+				DEBUG(@"extending right scope %p [%@], range %@ -> %@",
+					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+				[scopeTree removeEntry:node];
+				[s setRange:newRange];
+				[scopeTree addObject:s];
+				return;
+			}
+		}
+		else if (NSMaxRange(aRange) > r.location)
+		{
+			BOOL addNewScope = YES;
+			NSRange newRange;
+			if ([aScopeArray isEqualToStringArray:[s scopes]])
+			{
+				newRange = NSMakeRange(aRange.location, aRange.length + r.length);
+				addNewScope = NO;
+				DEBUG(@"extending right scope %p [%@], range %@ -> %@",
+					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+			}
+			else
+			{
+				newRange = NSMakeRange(NSMaxRange(aRange), r.length - NSMaxRange(aRange));
+				DEBUG(@"shortening right scope %p [%@], range %@ -> %@",
+					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
+			}
+			[scopeTree removeEntry:node];
+			[s setRange:newRange];
+			[scopeTree addObject:s];
+			if (!addNewScope)
+				return;
+		}
+		else
+		{
+			// Closest node does not intersect. Check node directly to the left. Full traversal!
+			e = [scopeTree first];
+			node = NULL;
+			while (e)
+			{
+				s = e->obj;
+				r = [s range];
+				if (r.location > aRange.location)
+					break;
+				node = e;
+				e = [scopeTree next:e];
+			}
+
+			if (node)
+			{
+				s = node->obj;
+				r = [s range];
+				DEBUG(@"re-checking left node %p in range %@", s, NSStringFromRange(r));
+				goto check_again;
+			}
+			else
+				DEBUG(@"no left node to check");
+		}
+	}
+
+add_node:
+
+	{
+		ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
+		DEBUG(@"adding scope %p [%@], range %@", scope, [scope.scopes componentsJoinedByString:@" "], NSStringFromRange(aRange));
+		[scopeTree addObject:scope];
+		[uglyHack addObject:scope]; // XXX: otherwise garbage collection fucks this up!
+	}
 }
 
 - (void)highlightCaptures:(NSString *)captureType
                 inPattern:(NSDictionary *)pattern
                 withMatch:(ViRegexpMatch *)aMatch
-                topScopes:(NSArray *)topScopes
 {
 	NSDictionary *captures = [pattern objectForKey:captureType];
 	if (captures == nil)
@@ -115,24 +246,24 @@
 		if (r.length > 0)
 		{
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
-			[self setScopes:[topScopes arrayByAddingObject:[capture objectForKey:@"name"]] inRange:r];
+			[self setScopes:[NSArray arrayWithObject:[capture objectForKey:@"name"]] inRange:r additive:YES];
 		}
 	}
 }
 
-- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch topScopes:(NSArray *)topScopes
+- (void)highlightBeginCapturesInMatch:(ViSyntaxMatch *)aMatch
 {
-	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] topScopes:topScopes];
+	[self highlightCaptures:@"beginCaptures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
 }
 
-- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch topScopes:(NSArray *)topScopes
+- (void)highlightEndCapturesInMatch:(ViSyntaxMatch *)aMatch
 {
-	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch] topScopes:topScopes];
+	[self highlightCaptures:@"endCaptures" inPattern:[aMatch pattern] withMatch:[aMatch endMatch]];
 }
 
-- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch topScopes:(NSArray *)topScopes
+- (void)highlightCapturesInMatch:(ViSyntaxMatch *)aMatch
 {
-	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch] topScopes:topScopes];
+	[self highlightCaptures:@"captures" inPattern:[aMatch pattern] withMatch:[aMatch beginMatch]];
 }
 
 - (NSArray *)endMatchesForBeginMatch:(ViSyntaxMatch *)beginMatch inRange:(NSRange)aRange
@@ -249,7 +380,7 @@
 		if ([aMatch beginLocation] > lastLocation)
 		{
 			// Apply current scopes before adding the new match
-			[self setScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation)];
+			[self setScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation) additive:NO];
 		}
 
 		if ([aMatch isSingleLineMatch])
@@ -258,15 +389,11 @@
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
 			      [[aMatch beginMatch] rangeOfMatchedString].length);
+			[self setScopes:topScopes inRange:[aMatch matchedRange] additive:NO];
 			if ([aMatch scope])
-			{
-				/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
-				NSArray *newScopes = [topScopes arrayByAddingObject:[aMatch scope]];
-				[self setScopes:newScopes inRange:[aMatch matchedRange]];
-				[self highlightCapturesInMatch:aMatch topScopes:newScopes];
-			}
-			else
-				[self highlightCapturesInMatch:aMatch topScopes:topScopes];
+				[self setScopes:[NSArray arrayWithObject:[aMatch scope]] inRange:[aMatch matchedRange] additive:YES];
+			/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
+			[self highlightCapturesInMatch:aMatch];
 		}
 		else if ([aMatch endMatch])
 		{
@@ -278,8 +405,8 @@
 			      [endMatch rangeOfMatchedString].length);
 
 			topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:topOpenMatch];
-			[self setScopes:topScopes inRange:[endMatch rangeOfMatchedString]];
-			[self highlightEndCapturesInMatch:aMatch topScopes:topScopes];
+			[self setScopes:topScopes inRange:[endMatch rangeOfMatchedString] additive:NO];
+			[self highlightEndCapturesInMatch:aMatch];
 
 			// pop one or more open matches off the stack and return the rest
 			while ([openMatches count] > 0)
@@ -302,7 +429,7 @@
 		{
 			DEBUG(@"got begin match on [%@] at %u + %u", [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			NSArray *newTopScopes = [aMatch scope] ? [topScopes arrayByAddingObject:[aMatch scope]] : topScopes;
-			[self setScopes:newTopScopes inRange:[[aMatch beginMatch] rangeOfMatchedString]];
+			[self setScopes:newTopScopes inRange:[[aMatch beginMatch] rangeOfMatchedString] additive:NO];
 			// search for end match from after the begin match to EOL
 			NSRange range = aRange;
 			range.location = NSMaxRange([[aMatch beginMatch] rangeOfMatchedString]);
@@ -315,7 +442,7 @@
 								reachedEOL:&tmpEOL];
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
-			[self highlightBeginCapturesInMatch:aMatch topScopes:newTopScopes];
+			[self highlightBeginCapturesInMatch:aMatch];
 			if (tmpEOL == YES)
 			{
 				if (reachedEOL)
@@ -334,7 +461,7 @@
 	}
 
 	if (lastLocation < NSMaxRange(aRange))
-		[self setScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation)];
+		[self setScopes:topScopes inRange:NSMakeRange(lastLocation, NSMaxRange(aRange) - lastLocation) additive:NO];
 
 done:
 	if (reachedEOL)

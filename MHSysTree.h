@@ -71,6 +71,7 @@ RB_PROTOTYPE(id_tree, rb_entry, entry, id_cmp);
 - (struct rb_entry *)next:(struct rb_entry *)current;
 - (struct rb_entry *)left:(struct rb_entry *)current;
 - (struct rb_entry *)right:(struct rb_entry *)current;
+- (struct rb_entry *)parent:(struct rb_entry *)current;
 
 @end
 

@@ -24,6 +24,7 @@
  */
 
 #import "MHSysTree.h"
+#import "logging.h"
 
 @implementation MHSysTree
 
@@ -61,7 +62,10 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
     struct rb_entry *e = malloc(sizeof(*e));
     e->obj = anObject;
     e->compareSelector = compareSelector;
-    RB_INSERT(id_tree, &root, e);
+    struct rb_entry *duplicate = RB_INSERT(id_tree, &root, e);
+    if (duplicate) {
+	    INFO(@"*********** got duplicate object %p for new object %p", duplicate->obj, anObject);
+    }
     nitems++;
 }
 
@@ -173,6 +177,11 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 - (struct rb_entry *)right:(struct rb_entry *)current
 {
 	return RB_RIGHT(current, entry);
+}
+
+- (struct rb_entry *)parent:(struct rb_entry *)current
+{
+	return RB_PARENT(current, entry);
 }
 
 @end

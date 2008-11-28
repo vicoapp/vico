@@ -83,6 +83,9 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
+	[splitView addSubview:symbolsView];
+	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
+
 	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
 	// [cell setFont:[NSFont systemFontOfSize:11.0]];
 	// [projectOutline setRowHeight:15.0];
@@ -90,8 +93,6 @@ static NSWindowController	*currentWindowController = nil;
 	[cell setWraps:NO];
 
 	[[self window] makeKeyAndOrderFront:self];
-
-	[splitView addSubview:symbolsView];
 
 	[symbolsOutline setTarget:self];
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
@@ -374,19 +375,17 @@ static NSWindowController	*currentWindowController = nil;
 	
 	NSView *firstView = [[sender subviews] objectAtIndex:0];
 	NSView *secondView = [[sender subviews] objectAtIndex:1];
-	/*
 	NSView *thirdView = nil;
 	int nsubviews = [[sender subviews] count];
 	if (nsubviews == 3)
 		thirdView = [[sender subviews] objectAtIndex:2];
-	*/
 
 	NSRect firstFrame = [firstView frame];
 	NSRect secondFrame = [secondView frame];
-	// NSRect thirdFrame = [thirdView frame];
+	NSRect thirdFrame = [thirdView frame];
 
 	/* keep sidebar in constant width */
-	secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + dividerThickness);
+	secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + thirdFrame.size.width + dividerThickness);
 	secondFrame.size.height = newFrame.size.height;
 
 	[secondView setFrame:secondFrame];

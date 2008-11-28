@@ -19,15 +19,16 @@
 	IBOutlet NSView *symbolsView;
 	IBOutlet NSSearchField *symbolFilterField;
 	IBOutlet NSOutlineView *symbolsOutline;
+	NSCell *separatorCell;
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	ViDocument *lastDocument;
-	NSMutableArray *filteredSymbols;
 	NSMutableArray *documents;
+	NSMutableArray *filteredDocuments;
+	NSTextView *symbolFieldEditor;
 }
 
-@property(readwrite, assign) NSMutableArray *filteredSymbols;
 @property(readwrite, assign) NSMutableArray *documents;
 
 + (id)currentWindowController;
@@ -51,8 +52,11 @@
 
 - (void)switchToLastFile;
 
+- (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
+
+- (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector;
 
 @end
 

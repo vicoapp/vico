@@ -16,6 +16,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @synthesize scrollView;
 @synthesize symbols;
+@synthesize filteredSymbols;
 
 - (id)init
 {
@@ -250,17 +251,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
-#if 0
 #pragma mark -
 #pragma mark Symbol List
-
-- (void)setSymbols:(NSMutableArray *)aSymbolArray
-{
-	INFO(@"settings symbols to %@", aSymbolArray);
-	symbols = aSymbolArray;
-	// [windowController setSymbols:aSymbolArray];
-}
-#endif
 
 - (void)goToSymbol:(ViSymbol *)aSymbol
 {
@@ -269,6 +261,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[textView scrollRangeToVisible:range];
 	[[[self windowController] window] makeFirstResponder:textView];
 	[textView showFindIndicatorForRange:range];
+}
+
+- (NSUInteger)filterSymbols:(ViRegexp *)rx
+{
+	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
+	ViSymbol *s;
+	for (s in symbols)
+	{
+		if ([rx matchInString:[s symbol]])
+		{
+			[fs addObject:s];
+		}
+	}
+	[self setFilteredSymbols:fs];
+	return [fs count];
 }
 
 @end

@@ -8,9 +8,9 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="100261"/>
+			<integer value="100250"/>
 			<integer value="100287"/>
-			<integer value="100158"/>
+			<integer value="5"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -415,7 +415,7 @@
 					</object>
 					<object class="NSMutableArray" key="dict.values">
 						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSToolbarItem" id="903075649">
+						<object class="NSToolbarItem" id="702036569">
 							<object class="NSMutableString" key="NSToolbarItemIdentifier">
 								<characters key="NS.bytes">857F0C31-C1EA-4450-BC82-E1E532EA7F56</characters>
 							</object>
@@ -793,7 +793,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<reference ref="430809223"/>
 					<reference ref="856958583"/>
 					<reference ref="589958458"/>
-					<reference ref="903075649"/>
+					<reference ref="702036569"/>
 				</object>
 				<object class="NSMutableArray" key="NSToolbarIBDefaultItems">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1028,12 +1028,12 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<object class="NSSearchField" id="709655854">
 						<reference key="NSNextResponder" ref="342887108"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{0, 23}, {171, 22}}</string>
+						<string key="NSFrame">{{0, 24}, {171, 22}}</string>
 						<reference key="NSSuperview" ref="342887108"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSearchFieldCell" key="NSCell" id="360911782">
-							<int key="NSCellFlags">343014976</int>
-							<int key="NSCellFlags2">268436480</int>
+							<int key="NSCellFlags">343539264</int>
+							<int key="NSCellFlags2">272630784</int>
 							<string key="NSContents"/>
 							<reference key="NSSupport" ref="844670655"/>
 							<reference key="NSControlView" ref="709655854"/>
@@ -1092,6 +1092,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 								<int key="NSPeriodicInterval">75</int>
 							</object>
 							<int key="NSMaximumRecents">255</int>
+							<bytes key="NSSearchFieldFlags">CAAAAA</bytes>
 						</object>
 					</object>
 				</object>
@@ -1339,9 +1340,41 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">toggleSymbolList:</string>
 						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="903075649"/>
+						<reference key="destination" ref="702036569"/>
 					</object>
 					<int key="connectionID">100288</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">filterSymbols:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="709655854"/>
+					</object>
+					<int key="connectionID">100291</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">nextKeyView</string>
+						<reference key="source" ref="709655854"/>
+						<reference key="destination" ref="930741589"/>
+					</object>
+					<int key="connectionID">100292</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">symbolFilterField</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="709655854"/>
+					</object>
+					<int key="connectionID">100293</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="709655854"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100294</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1409,7 +1442,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<reference ref="430809223"/>
 							<reference ref="856958583"/>
 							<reference ref="589958458"/>
-							<reference ref="903075649"/>
+							<reference ref="702036569"/>
 						</object>
 						<reference key="parent" ref="1008169181"/>
 					</object>
@@ -1585,8 +1618,8 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="701209205"/>
 							<reference ref="928033391"/>
-							<reference ref="709866892"/>
 							<reference ref="709655854"/>
+							<reference ref="709866892"/>
 						</object>
 						<reference key="parent" ref="1008169181"/>
 					</object>
@@ -1710,7 +1743,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100287</int>
-						<reference key="object" ref="903075649"/>
+						<reference key="object" ref="702036569"/>
 						<reference key="parent" ref="920475372"/>
 					</object>
 				</object>
@@ -1765,6 +1798,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100264.IBPluginDependency</string>
 					<string>100266.IBPluginDependency</string>
 					<string>100269.IBPluginDependency</string>
+					<string>100275.CustomClassName</string>
 					<string>100275.IBPluginDependency</string>
 					<string>100276.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
@@ -1827,6 +1861,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ViSymbolSearchField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{52, 445}, {636, 411}}</string>
@@ -1862,7 +1897,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100288</int>
+			<int key="maxID">100294</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1927,6 +1962,14 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">ViSymbolSearchField</string>
+					<string key="superclassName">NSSearchField</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViSymbolSearchField.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ViWindowController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
@@ -1935,6 +1978,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>filterSymbols:</string>
 							<string>saveProject:</string>
+							<string>searchSymbol:</string>
 							<string>selectNextTab:</string>
 							<string>selectPreviousTab:</string>
 							<string>selectTab:</string>
@@ -1942,6 +1986,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

@@ -17,10 +17,12 @@
 	ViWindowController *windowController;
 	NSString *readContent;
 	NSArray *symbols;
+	NSArray *filteredSymbols;
 }
 
 @property(readonly) NSScrollView *scrollView;
 @property(readwrite, assign) NSArray *symbols;
+@property(readwrite, assign) NSArray *filteredSymbols;
 
 - (NSView *)view;
 - (void)enableLineNumbers:(BOOL)flag;
@@ -39,5 +41,6 @@
 - (void)popTag;
 - (ViTextView *)textView;
 - (void)goToSymbol:(ViSymbol *)aSymbol;
+- (NSUInteger)filterSymbols:(ViRegexp *)rx;
 
 @end

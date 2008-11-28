@@ -13,6 +13,7 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */; };
+		9A0869100EE0A44300274635 /* ViSymbolSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A08690F0EE0A44300274635 /* ViSymbolSearchField.m */; };
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
@@ -124,6 +125,8 @@
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
 		9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "TB_ViewMenu-Extended.pdf"; path = "Images/TB_ViewMenu-Extended.pdf"; sourceTree = "<group>"; };
+		9A08690E0EE0A44300274635 /* ViSymbolSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolSearchField.h; sourceTree = "<group>"; };
+		9A08690F0EE0A44300274635 /* ViSymbolSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolSearchField.m; sourceTree = "<group>"; };
 		9A11D6800EB473BE00A016AB /* xi.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = xi.icns; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
@@ -291,6 +294,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A08690E0EE0A44300274635 /* ViSymbolSearchField.h */,
+				9A08690F0EE0A44300274635 /* ViSymbolSearchField.m */,
 				9A0868B00EE03A7600274635 /* ViSeparatorCell.h */,
 				9A0868B10EE03A7600274635 /* ViSeparatorCell.m */,
 				9AB015170ED7102200905BED /* ViSnippet.h */,
@@ -670,6 +675,7 @@
 				9AB014B00ED6021B00905BED /* ViCommandOutputController.m in Sources */,
 				9AB015190ED7102200905BED /* ViSnippet.m in Sources */,
 				9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */,
+				9A0869100EE0A44300274635 /* ViSymbolSearchField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

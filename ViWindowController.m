@@ -5,13 +5,13 @@
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
 #import "ViSeparatorCell.h"
+#import "ViSymbolSearchField.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
 
 @implementation ViWindowController
 
-@synthesize filteredSymbols;
 @synthesize documents;
 
 + (id)currentWindowController
@@ -98,16 +98,26 @@ static NSWindowController	*currentWindowController = nil;
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
 	[symbolsOutline setAction:@selector(goToSymbol:)];
 	cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
-	// [cell setFont:[NSFont systemFontOfSize:11.0]];
-	// [symbolsOutline setRowHeight:15.0];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
+
+	separatorCell = [[ViSeparatorCell alloc] init];
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
 {
 	if ([anObject isKindOfClass:[NSTextField class]])
 	{
+		if (anObject == symbolFilterField)
+		{
+			if (symbolFieldEditor == nil)
+			{
+				symbolFieldEditor = [[NSTextView alloc] initWithFrame:NSMakeRect(0,0,0,0)];
+				[symbolFieldEditor setFieldEditor:YES];
+				[symbolFieldEditor setDelegate:self];
+			}
+			return symbolFieldEditor;
+		}
 		return [ExTextView defaultEditor];
 	}
 	return nil;
@@ -122,7 +132,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	if ([keyPath isEqualToString:@"symbols"])
 	{
-		[symbolsOutline reloadData];
+		[self filterSymbols:symbolFilterField];
 		if ([self currentDocument] == object)
 			[symbolsOutline expandItem:object];
 	}
@@ -146,7 +156,7 @@ static NSWindowController	*currentWindowController = nil;
 	[tabView selectTabViewItem:newItem];
 
 	[documents addObject:document];
-	[symbolsOutline reloadData];
+	[self filterSymbols:symbolFilterField];
 	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
         NSInteger row = [symbolsOutline rowForItem:document];
         [symbolsOutline scrollRowToVisible:row];
@@ -189,7 +199,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	[document removeObserver:self forKeyPath:@"symbols"];
 	[documents removeObject:document];
-	[symbolsOutline reloadData];
+	[self filterSymbols:symbolFilterField];
 
 	[tabView selectTabViewItem:tabViewItem];
 	[[self window] performClose:document];
@@ -435,8 +445,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)goToSymbol:(id)sender
 {
-	INFO(@"sender = %@", sender);
-	id item = [symbolsOutline itemAtRow:[symbolsOutline clickedRow]];
+	INFO(@"selected row = %i", [symbolsOutline selectedRow]);
+
+	id item = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
 	if ([item isKindOfClass:[ViDocument class]])
 	{
 		[self selectDocument:item];
@@ -447,15 +458,38 @@ static NSWindowController	*currentWindowController = nil;
 		[self selectDocument:document];
 		[document goToSymbol:item];
 	}
-#if 0
 	[symbolFilterField setStringValue:@""];
 	[self filterSymbols:symbolFilterField];
-#endif
+
+        NSInteger row = [symbolsOutline rowForItem:item];
+        [symbolsOutline scrollRowToVisible:row];
+        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+}
+
+- (IBAction)searchSymbol:(id)sender
+{
+	if ([splitView isSubviewCollapsed:symbolsView])
+		[self toggleSymbolList:nil];
+	[[self window] makeFirstResponder:symbolFilterField];
+}
+
+- (void)selectFirstMatchingSymbol
+{
+	NSUInteger row;
+	for (row = 0; row < [symbolsOutline numberOfRows]; row++)
+	{
+		id item = [symbolsOutline itemAtRow:row];
+		if ([item isKindOfClass:[ViSymbol class]])
+		{
+			[symbolsOutline scrollRowToVisible:row];
+			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+			break;
+		}
+	}
 }
 
 - (IBAction)filterSymbols:(id)sender
 {
-#if 0
 	NSString *filter = [sender stringValue];
 
 	NSMutableString *pattern = [NSMutableString string];
@@ -468,19 +502,49 @@ static NSWindowController	*currentWindowController = nil;
 
 	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
 
-	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
-	ViSymbol *s;
-	for (s in symbols)
+	filteredDocuments = [[NSMutableArray alloc] initWithArray:documents];
+	ViDocument *doc;
+	NSMutableArray *emptyDocuments = [[NSMutableArray alloc] init];
+	for (doc in filteredDocuments)
 	{
-		if ([rx matchInString:[s symbol]])
+		if ([doc filterSymbols:rx] == 0)
+			[emptyDocuments addObject:doc];
+	}
+	[filteredDocuments removeObjectsInArray:emptyDocuments];
+	[symbolsOutline reloadData];
+	[symbolsOutline expandItem:nil expandChildren:YES];
+	[self selectFirstMatchingSymbol];
+}
+
+- (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector
+{
+	INFO(@"selector = %s", aSelector);
+
+	if (aSelector == @selector(insertNewline:)) // enter
+	{
+		[self goToSymbol:self];
+		return YES;
+	}
+	else if (aSelector == @selector(moveUp:)) // up arrow
+	{
+		NSInteger row = [symbolsOutline selectedRow];
+		if (row > 0)
 		{
-			[fs addObject:s];
+			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
 		}
+		return YES;
+	}
+	else if (aSelector == @selector(moveDown:)) // down arrow
+	{
+		NSInteger row = [symbolsOutline selectedRow];
+		if (row + 1 < [symbolsOutline numberOfRows])
+		{
+			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
+		}
+		return YES;
 	}
 
-	[fs sortUsingSelector:@selector(sortOnLocation:)];
-	[self setFilteredSymbols:fs];
-#endif
+	return NO;
 }
 
 #pragma mark -
@@ -489,15 +553,15 @@ static NSWindowController	*currentWindowController = nil;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item
 {
 	if (item == nil)
-		return [documents objectAtIndex:anIndex];
-	return [[(ViDocument *)item symbols] objectAtIndex:anIndex];
+		return [filteredDocuments objectAtIndex:anIndex];
+	return [[(ViDocument *)item filteredSymbols] objectAtIndex:anIndex];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
 	if ([item isKindOfClass:[ViDocument class]])
 	{
-		return [[(ViDocument *)item symbols] count] > 0 ? YES : NO;
+		return [[(ViDocument *)item filteredSymbols] count] > 0 ? YES : NO;
 	}
 	return NO;
 }
@@ -505,10 +569,10 @@ static NSWindowController	*currentWindowController = nil;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
 	if (item == nil)
-		return [documents count];
+		return [filteredDocuments count];
 
 	if ([item isKindOfClass:[ViDocument class]])
-		return [[(ViDocument *)item symbols] count];
+		return [[(ViDocument *)item filteredSymbols] count];
 
 	return 0;
 }
@@ -538,8 +602,7 @@ static NSWindowController	*currentWindowController = nil;
 	NSCell *cell;
 	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
 	{
-		cell = [[ViSeparatorCell alloc] init];
-		[cell setEnabled:NO];
+		cell = separatorCell;
 	}
 	else
 		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];

@@ -152,6 +152,8 @@
 
 @implementation ViRegexpMatch
 
+@synthesize startLocation;
+
 + (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation
 {
 	return [[ViRegexpMatch alloc] initWithRegion:aRegion startLocation:aLocation];

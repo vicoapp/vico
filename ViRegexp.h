@@ -8,6 +8,8 @@
 	NSUInteger startLocation;
 }
 
+@property(readonly) NSUInteger startLocation;
+
 + (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation;
 - (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation;
 - (NSRange)rangeOfMatchedString;

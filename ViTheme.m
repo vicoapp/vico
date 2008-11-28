@@ -12,7 +12,7 @@
 		return nil;
 	if(rc == 3)
 		a = 255;
-	DEBUG(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
+	// DEBUG(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
 	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
 }
 
@@ -85,7 +85,7 @@
  */
 - (NSDictionary *)attributesForScopes:(NSArray *)scopes
 {
-	NSString *key = [scopes componentsJoinedByString:@""];
+	NSString *key = [scopes componentsJoinedByString:@" "];
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
 	if (attributes)
 	{
@@ -114,11 +114,12 @@
 			NSString *attrKey;
 			for (attrKey in attrs)
 			{
-				NSUInteger prevRank = [[attributesRank objectForKey:attrKey] unsignedIntegerValue];
+				u_int64_t prevRank = [[attributesRank objectForKey:attrKey] unsignedLongLongValue];
 				if (rank > prevRank)
 				{
+					DEBUG(@"scope selector [%@] matches scopes %@ with rank %llu > %llu, setting %@", scopeSelector, key, rank, prevRank, attrKey);
 					[attributes setObject:[attrs objectForKey:attrKey] forKey:attrKey];
-					[attributesRank setObject:[NSNumber numberWithUnsignedInteger:rank] forKey:attrKey];
+					[attributesRank setObject:[NSNumber numberWithUnsignedLongLong:rank] forKey:attrKey];
 				}
 			}
 		}

@@ -52,6 +52,7 @@
 - (void)switchToLastFile;
 
 - (IBAction)filterSymbols:(id)sender;
+- (IBAction)toggleSymbolList:(id)sender;
 
 @end
 

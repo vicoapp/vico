@@ -424,6 +424,15 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Symbol List
 
+- (IBAction)toggleSymbolList:(id)sender
+{
+	NSRect frame = [splitView frame];
+	if ([splitView isSubviewCollapsed:symbolsView])
+		[splitView setPosition:NSWidth(frame) - 200 ofDividerAtIndex:1];
+	else
+		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+}
+
 - (void)goToSymbol:(id)sender
 {
 	INFO(@"sender = %@", sender);

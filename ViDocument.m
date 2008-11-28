@@ -93,8 +93,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[textView setString:readContent];
 	[self configureSyntax];
 
-	[statusbar setFont:[NSFont controlContentFontOfSize:11.0]];
-
+	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"]];
 }
 

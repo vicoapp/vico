@@ -12,6 +12,7 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
+		9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */; };
 		9A11760F0D0BFD93007AA524 /* ViTextView-syntax.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B10CF0D01F46800040CAC /* ViTextView-syntax.m */; };
 		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
@@ -122,6 +123,7 @@
 		8D15AC370486D014006FF6A4 /* xi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
+		9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "TB_ViewMenu-Extended.pdf"; path = "Images/TB_ViewMenu-Extended.pdf"; sourceTree = "<group>"; };
 		9A11D6800EB473BE00A016AB /* xi.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = xi.icns; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
@@ -423,6 +425,7 @@
 		9AB0178A0EDDBF8100905BED /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */,
 				9AB017270EDD791500905BED /* Delete.tiff */,
 				9AB017280EDD791500905BED /* Delete_Pressed.tiff */,
 				9AB0171F0EDD78F600905BED /* Add.tiff */,
@@ -565,6 +568,7 @@
 				9AB017260EDD78F600905BED /* DBSourceSplitViewThumb.tiff in Resources */,
 				9AB017290EDD791500905BED /* Delete.tiff in Resources */,
 				9AB0172A0EDD791500905BED /* Delete_Pressed.tiff in Resources */,
+				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

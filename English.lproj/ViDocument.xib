@@ -33,7 +33,7 @@
 					<object class="NSTextField" id="941029700">
 						<reference key="NSNextResponder" ref="868027015"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrameSize">{800, 22}</string>
+						<string key="NSFrame">{{0, 3}, {800, 19}}</string>
 						<reference key="NSSuperview" ref="868027015"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="817205570">
@@ -41,9 +41,9 @@
 							<int key="NSCellFlags2">1346373632</int>
 							<string key="NSContents"/>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">1.300000e+01</double>
-								<int key="NSfFlags">1044</int>
+								<string key="NSName">Monaco</string>
+								<double key="NSSize">1.000000e+01</double>
+								<int key="NSfFlags">16</int>
 							</object>
 							<reference key="NSControlView" ref="941029700"/>
 							<bool key="NSDrawsBackground">YES</bool>
@@ -499,7 +499,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{164, 518}, {800, 466}}</string>
+					<string>{{86, 364}, {800, 466}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{101, 340}, {619, 465}}</string>
 				</object>

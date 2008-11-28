@@ -28,24 +28,25 @@
 		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
 		if (beginMatch)
 		{
-			INFO(@"*************** expanding pattern with %i captures:", [beginMatch count]);
-			INFO(@"** original pattern = [%@]", pattern);
+			DEBUG(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+			DEBUG(@"** original pattern = [%@]", pattern);
 			int i;
 			for (i = 1; i <= [beginMatch count]; i++)
 			{
 				NSRange captureRange = [beginMatch rangeOfSubstringAtIndex:i];
+				captureRange.location -= [beginMatch startLocation];
 				NSString *capture = [NSString stringWithCharacters:matchText + captureRange.location length:captureRange.length];
 				if (capture)
 				{
 					NSString *backref = [NSString stringWithFormat:@"\\%i", i];
-					INFO(@"**** replacing [%@] with [%@]", backref, capture);
+					DEBUG(@"**** replacing [%@] with [%@]", backref, capture);
 					[expandedPattern replaceOccurrencesOfString:backref
 									 withString:capture
 									    options:0
 									      range:NSMakeRange(0, [expandedPattern length])];
 				}
 			}
-			INFO(@"** expanded pattern = [%@]", expandedPattern);
+			DEBUG(@"** expanded pattern = [%@]", expandedPattern);
 		}
 
 		regexp = [ViRegexp regularExpressionWithString:expandedPattern];

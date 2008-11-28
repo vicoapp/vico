@@ -70,11 +70,12 @@
 		@"number", @"nu",
 		@"number", @"num",
 		@"number", @"numb",
+		@"autocollapse", @"ac",
 		nil];
 
-	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", nil];
+	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
-		
+
 	NSString *var;
 	for (var in command.words)
 	{

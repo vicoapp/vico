@@ -4,6 +4,7 @@
 #import "ExTextView.h"
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
+#import "ViSeparatorCell.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -83,8 +84,8 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
 	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
-	[cell setFont:[NSFont systemFontOfSize:11.0]];
-	[projectOutline setRowHeight:15.0];
+	// [cell setFont:[NSFont systemFontOfSize:11.0]];
+	// [projectOutline setRowHeight:15.0];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
@@ -96,8 +97,8 @@ static NSWindowController	*currentWindowController = nil;
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
 	[symbolsOutline setAction:@selector(goToSymbol:)];
 	cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
-	[cell setFont:[NSFont systemFontOfSize:11.0]];
-	[symbolsOutline setRowHeight:15.0];
+	// [cell setFont:[NSFont systemFontOfSize:11.0]];
+	// [symbolsOutline setRowHeight:15.0];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 }
@@ -154,12 +155,20 @@ static NSWindowController	*currentWindowController = nil;
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
         lastDocument = [self currentDocument];
+        ViDocument *document = [tabViewItem identifier];
+
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
 		[symbolsOutline collapseItem:nil collapseChildren:YES];
-        [symbolsOutline expandItem:[tabViewItem identifier]];
-        NSInteger row = [symbolsOutline rowForItem:[tabViewItem identifier]];
-        [symbolsOutline scrollRowToVisible:row];
-        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        [symbolsOutline expandItem:document];
+        
+        // unless current selection is a symbol in the current document, select the document itself
+        id selectedItem = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
+        if (selectedItem != document && [symbolsOutline parentForItem:selectedItem] != document)
+        {
+		NSInteger row = [symbolsOutline rowForItem:[tabViewItem identifier]];
+		[symbolsOutline scrollRowToVisible:row];
+		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        }
 }
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -490,6 +499,45 @@ static NSWindowController	*currentWindowController = nil;
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	return [item displayName];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+	if ([item isKindOfClass:[ViDocument class]])
+		return YES;
+	return NO;
+}
+
+- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
+{
+	if ([item isKindOfClass:[ViDocument class]])
+		return 20;
+	return 15;
+}
+
+
+- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+	NSCell *cell;
+	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+	{
+		cell = [[ViSeparatorCell alloc] init];
+		[cell setEnabled:NO];
+	}
+	else
+		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];
+	if (![item isKindOfClass:[ViDocument class]])
+		[cell setFont:[NSFont systemFontOfSize:11.0]];
+	else
+		[cell setFont:[NSFont systemFontOfSize:13.0]];
+	return cell;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+		return NO;
+	return YES;
 }
 
 @end

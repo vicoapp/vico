@@ -19,7 +19,6 @@
 	IBOutlet NSView *symbolsView;
 	IBOutlet NSSearchField *symbolFilterField;
 	IBOutlet NSOutlineView *symbolsOutline;
-	IBOutlet NSTreeController *symbolsController;
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;

@@ -116,6 +116,12 @@ static NSWindowController	*currentWindowController = nil;
 	[[NSDocumentController sharedDocumentController] newDocument:self];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if ([keyPath isEqualToString:@"symbols"])
+		[symbolsOutline reloadData];
+}
+
 - (void)addNewTab:(ViDocument *)document
 {
 	if (!isLoaded)
@@ -133,9 +139,10 @@ static NSWindowController	*currentWindowController = nil;
 	[tabView addTabViewItem:newItem];
 	[tabView selectTabViewItem:newItem];
 
-	[self willChangeValueForKey:@"documents"];
 	[documents addObject:document];
-	[self didChangeValueForKey:@"documents"];
+	[symbolsOutline reloadData];
+
+	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
 
 #if 0
 	NSTreeNode *node;
@@ -168,15 +175,15 @@ static NSWindowController	*currentWindowController = nil;
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	ViDocument *doc = [tabViewItem identifier];
+	ViDocument *document = [tabViewItem identifier];
 
-	[self willChangeValueForKey:@"documents"];
-	[documents removeObject:doc];
-	[self didChangeValueForKey:@"documents"];
+	[document removeObserver:self forKeyPath:@"symbols"];
+	[documents removeObject:document];
+	[symbolsOutline reloadData];
 
 	[tabView selectTabViewItem:tabViewItem];
-	[[self window] performClose:doc];
-	if (lastDocument == doc)
+	[[self window] performClose:document];
+	if (lastDocument == document)
 		lastDocument = nil;
 	return NO;
 }
@@ -399,17 +406,17 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)goToSymbol:(id)sender
 {
-	NSTreeNode *node = [symbolsOutline itemAtRow:[symbolsOutline clickedRow]];
-	if ([node isLeaf])
+	INFO(@"sender = %@", sender);
+	id item = [symbolsOutline itemAtRow:[symbolsOutline clickedRow]];
+	if ([item isKindOfClass:[ViDocument class]])
 	{
-		ViDocument *document = [[node parentNode] representedObject];
-		[self selectDocument:document];
-		ViSymbol *symbol = [node representedObject];
-		[document goToSymbol:symbol];
+		[self selectDocument:item];
 	}
 	else
 	{
-		[self selectDocument:[node representedObject]];
+		ViDocument *document = [symbolsOutline parentForItem:item];
+		[self selectDocument:document];
+		[document goToSymbol:item];
 	}
 #if 0
 	[symbolFilterField setStringValue:@""];
@@ -445,6 +452,41 @@ static NSWindowController	*currentWindowController = nil;
 	[fs sortUsingSelector:@selector(sortOnLocation:)];
 	[self setFilteredSymbols:fs];
 #endif
+}
+
+#pragma mark -
+#pragma mark Symbol Outline View Data Source
+
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
+{
+	if (item == nil)
+		return [documents objectAtIndex:index];
+	return [[(ViDocument *)item symbols] objectAtIndex:index];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+	if ([item isKindOfClass:[ViDocument class]])
+	{
+		return [[(ViDocument *)item symbols] count] > 0 ? YES : NO;
+	}
+	return NO;
+}
+
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+{
+	if (item == nil)
+		return [documents count];
+
+	if ([item isKindOfClass:[ViDocument class]])
+		return [[(ViDocument *)item symbols] count];
+
+	return 0;
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+	return [item displayName];
 }
 
 @end

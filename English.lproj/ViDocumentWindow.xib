@@ -1074,19 +1074,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
-			<object class="NSTreeController" id="1013893816">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>symbol</string>
-					<string>displayName</string>
-					<string>label</string>
-				</object>
-				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
-				<bool key="NSAvoidsEmptySelection">YES</bool>
-				<bool key="NSPreservesSelection">YES</bool>
-				<bool key="NSSelectsInsertedObjects">YES</bool>
-				<string key="NSTreeContentChildrenKey">symbols</string>
-			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
@@ -1309,43 +1296,19 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">symbolsController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="1013893816"/>
-					</object>
-					<int key="connectionID">100282</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: arrangedObjects.displayName</string>
-						<reference key="source" ref="757683570"/>
-						<reference key="destination" ref="1013893816"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="757683570"/>
-							<reference key="NSDestination" ref="1013893816"/>
-							<string key="NSLabel">value: arrangedObjects.displayName</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">arrangedObjects.displayName</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100283</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentArray: documents</string>
-						<reference key="source" ref="1013893816"/>
+						<string key="label">dataSource</string>
+						<reference key="source" ref="1068059475"/>
 						<reference key="destination" ref="512844837"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="1013893816"/>
-							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">contentArray: documents</string>
-							<string key="NSBinding">contentArray</string>
-							<string key="NSKeyPath">documents</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
 					</object>
-					<int key="connectionID">100284</int>
+					<int key="connectionID">100285</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="1068059475"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100286</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1711,12 +1674,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="object" ref="360911782"/>
 						<reference key="parent" ref="709655854"/>
 					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100277</int>
-						<reference key="object" ref="1013893816"/>
-						<reference key="parent" ref="1008169181"/>
-						<string key="objectName">symbolsController</string>
-					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1771,7 +1728,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100269.IBPluginDependency</string>
 					<string>100275.IBPluginDependency</string>
 					<string>100276.IBPluginDependency</string>
-					<string>100277.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBViewEditorWindowController.showingBoundsRectangles</string>
@@ -1820,8 +1776,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{546, 305}, {171, 489}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{681, 392}, {171, 489}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1868,7 +1823,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100284</int>
+			<int key="maxID">100286</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1944,11 +1899,9 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<string>selectNextTab:</string>
 							<string>selectPreviousTab:</string>
 							<string>selectTab:</string>
-							<string>toggleProjectDrawer:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1965,7 +1918,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<string>projectResizeView</string>
 							<string>splitView</string>
 							<string>symbolFilterField</string>
-							<string>symbolsController</string>
 							<string>symbolsOutline</string>
 							<string>symbolsResizeView</string>
 							<string>symbolsView</string>
@@ -1980,7 +1932,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<string>NSImageView</string>
 							<string>NSSplitView</string>
 							<string>NSSearchField</string>
-							<string>NSTreeController</string>
 							<string>NSOutlineView</string>
 							<string>NSImageView</string>
 							<string>NSView</string>

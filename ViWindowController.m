@@ -349,13 +349,14 @@ static NSWindowController	*currentWindowController = nil;
 {
 	if (offset == 0)
 		return 100;
-	return proposedMin + 100;
+	NSRect frame = [sender frame];
+	return frame.size.width - 300;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
 	if (offset == 0)
-		return 270;
+		return 300;
 	return proposedMax - 100;
 }
 
@@ -384,8 +385,16 @@ static NSWindowController	*currentWindowController = nil;
 	NSRect secondFrame = [secondView frame];
 	NSRect thirdFrame = [thirdView frame];
 
+	NSInteger firstWidth = firstFrame.size.width;
+	if ([splitView isSubviewCollapsed:firstView])
+		firstWidth = 0;
+
+	NSInteger thirdWidth = thirdFrame.size.width;
+	if ([splitView isSubviewCollapsed:thirdView])
+		thirdWidth = 0;
+
 	/* keep sidebar in constant width */
-	secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + thirdFrame.size.width + dividerThickness);
+	secondFrame.size.width = newFrame.size.width - (firstWidth + thirdWidth + dividerThickness);
 	secondFrame.size.height = newFrame.size.height;
 
 	[secondView setFrame:secondFrame];

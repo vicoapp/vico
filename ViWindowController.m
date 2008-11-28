@@ -119,7 +119,11 @@ static NSWindowController	*currentWindowController = nil;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if ([keyPath isEqualToString:@"symbols"])
+	{
 		[symbolsOutline reloadData];
+		if ([self currentDocument] == object)
+			[symbolsOutline expandItem:object];
+	}
 }
 
 - (void)addNewTab:(ViDocument *)document
@@ -141,25 +145,21 @@ static NSWindowController	*currentWindowController = nil;
 
 	[documents addObject:document];
 	[symbolsOutline reloadData];
-
 	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
-
-#if 0
-	NSTreeNode *node;
-	for (node in [symbolsController arrangedObjects])
-	{
-		if ([node representedObject] == document)
-		{
-			INFO(@"expanding node %@", node);
-			[symbolsOutline expandItem:node];
-		}
-	}
-#endif
+        NSInteger row = [symbolsOutline rowForItem:document];
+        [symbolsOutline scrollRowToVisible:row];
+        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 }
 
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
         lastDocument = [self currentDocument];
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
+		[symbolsOutline collapseItem:nil collapseChildren:YES];
+        [symbolsOutline expandItem:[tabViewItem identifier]];
+        NSInteger row = [symbolsOutline rowForItem:[tabViewItem identifier]];
+        [symbolsOutline scrollRowToVisible:row];
+        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 }
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -339,18 +339,22 @@ static NSWindowController	*currentWindowController = nil;
 {
 	if (offset == 0)
 		return 100;
-	return proposedMin;
+	return proposedMin + 100;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
 	if (offset == 0)
 		return 270;
-	return proposedMax;
+	return proposedMax - 100;
 }
 
-- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+- (BOOL)splitView:(NSSplitView *)aSplitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
 {
+	// collapse both side views, but not the edit view
+	NSView *secondView = [[aSplitView subviews] objectAtIndex:1];
+	if (subview == secondView)
+		return NO;
 	return YES;
 }
 
@@ -361,21 +365,20 @@ static NSWindowController	*currentWindowController = nil;
 	
 	NSView *firstView = [[sender subviews] objectAtIndex:0];
 	NSView *secondView = [[sender subviews] objectAtIndex:1];
+	/*
 	NSView *thirdView = nil;
 	int nsubviews = [[sender subviews] count];
 	if (nsubviews == 3)
 		thirdView = [[sender subviews] objectAtIndex:2];
+	*/
 
 	NSRect firstFrame = [firstView frame];
 	NSRect secondFrame = [secondView frame];
-	NSRect thirdFrame = [thirdView frame];
+	// NSRect thirdFrame = [thirdView frame];
 
-	if (sender == splitView)
-	{
-		/* keep sidebar in constant width */
-		secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + dividerThickness);
-		secondFrame.size.height = newFrame.size.height;
-	}
+	/* keep sidebar in constant width */
+	secondFrame.size.width = newFrame.size.width - (firstFrame.size.width + dividerThickness);
+	secondFrame.size.height = newFrame.size.height;
 
 	[secondView setFrame:secondFrame];
 	[sender adjustSubviews];
@@ -457,11 +460,11 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Symbol Outline View Data Source
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item
 {
 	if (item == nil)
-		return [documents objectAtIndex:index];
-	return [[(ViDocument *)item symbols] objectAtIndex:index];
+		return [documents objectAtIndex:anIndex];
+	return [[(ViDocument *)item symbols] objectAtIndex:anIndex];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item

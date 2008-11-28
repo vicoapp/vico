@@ -106,18 +106,8 @@ static NSWindowController	*currentWindowController = nil;
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
 {
-	if ([anObject isKindOfClass:[NSTextField class]])
+	if ([anObject isKindOfClass:[NSTextField class]] && anObject != symbolFilterField)
 	{
-		if (anObject == symbolFilterField)
-		{
-			if (symbolFieldEditor == nil)
-			{
-				symbolFieldEditor = [[NSTextView alloc] initWithFrame:NSMakeRect(0,0,0,0)];
-				[symbolFieldEditor setFieldEditor:YES];
-				[symbolFieldEditor setDelegate:self];
-			}
-			return symbolFieldEditor;
-		}
 		return [ExTextView defaultEditor];
 	}
 	return nil;

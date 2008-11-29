@@ -349,7 +349,10 @@ find_command_in_map(int key, struct vikey map[])
 	{
 		// should print "X isn't a vi command"
 		if (state == ViCommandNeedMotion)
+		{
+			motion_key = aKey; // needed for error reporting
 			method = @"nonmotion:";
+		}
 		else
 			method = @"illegal:";
 		key = aKey;

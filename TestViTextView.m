@@ -117,6 +117,7 @@
 - (void)test100_WordBackward7			{ MOVE(@"<abc", 1, @"b", 0); }
 - (void)test100_WordBackward8			{ MOVE(@"<abc> def", 6, @"b", 4); }
 - (void)test100_WordBackward9			{ MOVE(@"  abc", 2, @"b", 0); }
+- (void)test101_TwoWordsBackward		{ MOVE(@"abc def ghi", 8, @"2b", 0); }
 
 - (void)test110_MoveDown			{ MOVE(@"abc\ndef", 1, @"j", 5); }
 - (void)test111_MoveDownAcrossTab		{ MOVE(@"abcdefghijklmno\n\tabcdef", 10, @"j", 19); }
@@ -142,6 +143,7 @@
 - (void)test142_BigwordBackward			{ MOVE(@"abc=def ghi", 8, @"B", 0); }
 - (void)test143_DeleteBigwordBackward		{ TEST(@"abc=def ghi", 8, @"dB", @"ghi", 0); }
 - (void)test144_TwoBigwordsForward		{ MOVE(@"abc=def ghi jkl", 0, @"2W", 12); }
+- (void)test145_TwoBigwordsBackward		{ MOVE(@"abc=def ghi jkl", 12, @"2B", 0); }
 
 - (void)test150_EndOfWord			{ MOVE(@"abc def", 0, @"e", 2); }
 - (void)test151_EndOfWordFromBlanks		{ MOVE(@"   abc def", 0, @"e", 5); }

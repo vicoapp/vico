@@ -1012,8 +1012,9 @@ int logIndent = 0;
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
+	BOOL resetVisualMode = NO;
 	if (mode == ViVisualMode && !command.ismotion)
-		[self setNormalMode];
+		resetVisualMode = YES;
 
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
@@ -1027,6 +1028,9 @@ int logIndent = 0;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;
 	}
+
+	if (resetVisualMode)
+		[self setNormalMode];
 }
 
 - (void)input_newline:(NSString *)characters

@@ -26,7 +26,7 @@
 	ViDocument *lastDocument;
 	NSMutableArray *documents;
 	NSMutableArray *filteredDocuments;
-	NSTextView *symbolFieldEditor;
+	NSMutableDictionary *symbolFilterCache;
 	BOOL closeSymbolListAfterUse;
 }
 

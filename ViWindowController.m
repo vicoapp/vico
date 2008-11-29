@@ -43,6 +43,7 @@ static NSWindowController	*currentWindowController = nil;
 		[windowControllers addObject:self];
 		currentWindowController = self;
 		documents = [[NSMutableArray alloc] init];
+		symbolFilterCache = [[NSMutableDictionary alloc] init];
 	}
 
 	return self;
@@ -446,7 +447,12 @@ static NSWindowController	*currentWindowController = nil;
 		ViDocument *document = [symbolsOutline parentForItem:item];
 		[self selectDocument:document];
 		[document goToSymbol:item];
+
+		// remember what symbol we selected from the filtered set
+		NSString *filter = [symbolFilterField stringValue];
+		[symbolFilterCache setObject:[item symbol] forKey:filter];
 	}
+
 	[symbolFilterField setStringValue:@""];
 	[self filterSymbols:symbolFilterField];
 
@@ -471,9 +477,27 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] makeFirstResponder:symbolFilterField];
 }
 
-- (void)selectFirstMatchingSymbol
+- (void)selectFirstMatchingSymbolForFilter:(NSString *)filter
 {
 	NSUInteger row;
+
+	NSString *symbol = [symbolFilterCache objectForKey:filter];
+	if (symbol)
+	{
+		// check if the cached symbol is available, then select it
+		for (row = 0; row < [symbolsOutline numberOfRows]; row++)
+		{
+			id item = [symbolsOutline itemAtRow:row];
+			if ([item isKindOfClass:[ViSymbol class]] && [[item symbol] isEqualToString:symbol])
+			{
+				[symbolsOutline scrollRowToVisible:row];
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+				return;
+			}
+		}
+	}
+
+	// skip past all document entries, selecting the first symbol
 	for (row = 0; row < [symbolsOutline numberOfRows]; row++)
 	{
 		id item = [symbolsOutline itemAtRow:row];
@@ -520,7 +544,7 @@ static NSWindowController	*currentWindowController = nil;
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolsOutline reloadData];
 	[symbolsOutline expandItem:nil expandChildren:YES];
-	[self selectFirstMatchingSymbol];
+	[self selectFirstMatchingSymbolForFilter:filter];
 }
 
 - (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector

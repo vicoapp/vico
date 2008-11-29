@@ -441,6 +441,7 @@ static NSWindowController	*currentWindowController = nil;
 	if ([item isKindOfClass:[ViDocument class]])
 	{
 		[self selectDocument:item];
+		[[self window] makeFirstResponder:[item textView]];
 	}
 	else
 	{
@@ -493,6 +494,15 @@ static NSWindowController	*currentWindowController = nil;
 	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
 
 	filteredDocuments = [[NSMutableArray alloc] initWithArray:documents];
+
+	// make sure the current document is displayed first in the symbol list
+	ViDocument *currentDocument = [self currentDocument];
+	if (currentDocument)
+	{
+		[filteredDocuments removeObject:currentDocument];
+		[filteredDocuments insertObject:currentDocument atIndex:0];
+	}
+
 	ViDocument *doc;
 	NSMutableArray *emptyDocuments = [[NSMutableArray alloc] init];
 	for (doc in filteredDocuments)
@@ -531,6 +541,13 @@ static NSWindowController	*currentWindowController = nil;
 		{
 			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
 		}
+		return YES;
+	}
+	else if (aSelector == @selector(cancelOperation:)) // escape
+	{
+		[symbolFilterField setStringValue:@""];
+		[self filterSymbols:symbolFilterField];
+		[[self window] makeFirstResponder:[[self currentDocument] textView]];
 		return YES;
 	}
 

@@ -374,8 +374,29 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
-	[self replaceRange:NSMakeRange(start_location, 1)
-	        withString:[NSString stringWithFormat:@"%C", command.argument]];
+	int count;
+
+	INFO(@"mode == %i", mode);
+	if (mode == ViVisualMode)
+	{
+		INFO(@"affectedRange = %@", NSStringFromRange(affectedRange));
+		count = affectedRange.length;
+	}
+	else
+	{
+		count = IMAX(1, command.count);
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
+		if (start_location + count > eol)
+		{
+			[[self delegate] message:@"Movement past the end-of-line"];
+			return NO;
+		}
+		affectedRange = NSMakeRange(start_location, count);
+	}
+
+	NSString *replacement = [@"" stringByPaddingToLength:count withString:[NSString stringWithFormat:@"%C", command.argument] startingAtIndex:0];
+	[self replaceRange:affectedRange withString:replacement];
 
 	return YES;
 }

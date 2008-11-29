@@ -30,6 +30,7 @@
 {
 	[super drawRect:aRect];
 	[self updateInsertionPointInRect:aRect];
+	[self drawPageGuideInRect:aRect];
 }
 
 - (BOOL)shouldDrawInsertionPoint;

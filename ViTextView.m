@@ -735,6 +735,9 @@ int logIndent = 0;
 	return YES;
 }
 
+#pragma mark -
+#pragma mark Searching
+
 - (void)highlightFindMatch:(ViRegexpMatch *)match
 {
 	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
@@ -864,12 +867,14 @@ int logIndent = 0;
 	return [self findPattern:pattern options:1];
 }
 
+#pragma mark -
+
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
-	if([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
+	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
 		return NO;
 
-	if([theEvent type] == NSKeyUp)
+	if ([theEvent type] == NSKeyUp)
 	{
 		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 		      [theEvent charactersIgnoringModifiers],
@@ -1417,10 +1422,8 @@ int logIndent = 0;
 
 /* This is stolen from Smultron.
  */
-- (void)drawRect:(NSRect)rect
+- (void)drawPageGuideInRect:(NSRect)rect
 {
-	[super drawRect:rect];
-
 	if (pageGuideX > 0)
 	{
 		NSRect bounds = [self bounds];

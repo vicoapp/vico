@@ -24,6 +24,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 {
 	ViMode mode;
 	ViCommand *parser;
+	BOOL replayingInput;  // true when dot command replays input
 	NSTextStorage *storage;
 	NSUndoManager *undoManager;
 	ViTagsDatabase *tags;

@@ -106,7 +106,8 @@
 - (void)test095_DeleteTilCharWithCount		{ TEST(@"abc abc abc", 0, @"d2ta", @"abc", 0); }
 - (void)test096_RepeatMoveTilChar		{ MOVE(@"abc abc abc", 2, @"ta;", 3); }
 - (void)test097_RepeatMoveToChar		{ MOVE(@"abc abc abc", 2, @"fa;", 8); }
-- (void)test098_RepeatChangeToChar		{ TEST(@"abc abc abc", 0, @"ct ABC\x1bw.", @"ABC ABC abc", 6); }
+- (void)test098_ChangeToChar			{ TEST(@"abc abc abc", 0, @"ct ABC\x1bw", @"ABC abc abc", 4); }
+- (void)test099_RepeatChangeToChar		{ TEST(@"abc abc abc", 0, @"ct ABC\x1bw.", @"ABC ABC abc", 6); }
 
 - (void)test100_WordBackward			{ MOVE(@"abcdef", 4, @"b", 0); }
 - (void)test100_WordBackward2			{ MOVE(@"abc def", 4, @"b", 0); }

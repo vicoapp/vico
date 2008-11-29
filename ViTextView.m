@@ -893,9 +893,8 @@ int logIndent = 0;
  * NSDeviceIndependentModifierFlagsMask = 0xffff0000U
  */
 
-- (void)setCaret:(NSUInteger)location
+- (void)updateCaret
 {
-	caret = location;
 	if (mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(caret, 0)];
 
@@ -907,6 +906,13 @@ int logIndent = 0;
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;
+}
+
+- (void)setCaret:(NSUInteger)location
+{
+	caret = location;
+	if (!replayingInput)
+		[self updateCaret];
 }
 
 - (NSUInteger)caret
@@ -927,18 +933,20 @@ int logIndent = 0;
 
 - (void)setInsertMode:(ViCommand *)command
 {
-	DEBUG(@"entering insert mode at location %lu (final location is %lu), length is %lu",
+	DEBUG(@"entering insert mode at location %u (final location is %u), length is %u",
 		end_location, final_location, [storage length]);
 	mode = ViInsertMode;
 
 	if (command.text)
 	{
 		NSEvent *ev;
+		replayingInput = YES;
 		[self setCaret:end_location];
 		for (ev in command.text)
 		{
 			[self keyDown:ev];
 		}
+		replayingInput = NO;
 	}
 }
 
@@ -1272,11 +1280,12 @@ int logIndent = 0;
 	if ([[theEvent characters] length] == 0)
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
-	
+
 	if (mode == ViInsertMode)
 	{
 		// add the event to the input key replay queue
-		[inputKeys addObject:theEvent];
+		if (!replayingInput)
+			[inputKeys addObject:theEvent];
 
 		if (charcode == 0x1B)
 		{
@@ -1305,7 +1314,8 @@ int logIndent = 0;
 				[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
 #endif
 			[self endUndoGroup];
-			parser.text = inputKeys; // copies the array
+			if (!replayingInput)
+				parser.text = inputKeys; // copies the array
 			[inputKeys removeAllObjects];
 			[self setNormalMode];
 			start_location = end_location = [self caret];
@@ -1384,7 +1394,8 @@ int logIndent = 0;
 		}
 	}
 
-	[self scrollToCaret];
+	if (!replayingInput)
+		[self scrollToCaret];
 }
 
 /* Takes a string of characters and creates key events for each one.
@@ -1589,7 +1600,6 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:aLocation];
-	INFO(@"aLocation = %u, bol = %u, end = %u, eol = %u, length = %u", aLocation, bol, end, eol, [self caret], [storage length]);
 	NSUInteger c = 0, i;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	for (i = bol; i <= [self caret] && i < end; i++)

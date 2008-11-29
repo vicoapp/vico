@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -30,7 +30,7 @@
 			<object class="NSWindowTemplate" id="393867425">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, -25}, {626, 535}}</string>
+				<string key="NSWindowRect">{{48, 519}, {558, 321}}</string>
 				<int key="NSWTFlags">603979776</int>
 				<string key="NSWindowTitle">Command output</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -63,7 +63,7 @@
 									<string>public.url-name</string>
 								</object>
 							</object>
-							<string key="NSFrameSize">{626, 535}</string>
+							<string key="NSFrameSize">{558, 321}</string>
 							<reference key="NSSuperview" ref="600488942"/>
 							<reference key="NSNextKeyView"/>
 							<string key="FrameName"/>
@@ -76,21 +76,13 @@
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<string>WebKitDefaultFixedFontSize</string>
 										<string>WebKitDefaultFontSize</string>
-										<string>WebKitFixedFont</string>
 										<string>WebKitMinimumFontSize</string>
-										<string>WebKitSansSerifFont</string>
-										<string>WebKitSerifFont</string>
-										<string>WebKitStandardFont</string>
 									</object>
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<integer value="12" id="724823532"/>
 										<reference ref="724823532"/>
-										<string>Monaco</string>
 										<integer value="1" id="9"/>
-										<string>Helvetica Neue</string>
-										<string>Georgia</string>
-										<string>Georgia</string>
 									</object>
 								</object>
 							</object>
@@ -98,7 +90,7 @@
 							<bool key="AllowsUndo">YES</bool>
 						</object>
 					</object>
-					<string key="NSFrameSize">{626, 535}</string>
+					<string key="NSFrameSize">{558, 321}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -192,9 +184,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilderKit</string>
 					<string>com.apple.InterfaceBuilderKit</string>
-					<string>{{114, 235}, {626, 535}}</string>
+					<string>{{48, 519}, {558, 321}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{114, 235}, {626, 535}}</string>
+					<string>{{48, 519}, {558, 321}}</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.WebKitIBPlugin</string>

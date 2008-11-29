@@ -1,4 +1,7 @@
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
@@ -521,7 +524,7 @@ int logIndent = 0;
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
 
-	int delta_offset;
+	int delta_offset = 0;
 	BOOL has_delta_offset = NO;
 	
 	while (bol < NSMaxRange(aRange))
@@ -534,7 +537,6 @@ int logIndent = 0;
 		[self replaceRange:indentRange withString:newIndent];
 
 		aRange.length += [newIndent length] - [indent length];
-
 		if (!has_delta_offset)
 		{
           		has_delta_offset = YES;

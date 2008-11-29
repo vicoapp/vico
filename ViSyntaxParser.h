@@ -34,7 +34,6 @@
 - (void)parseContext:(ViSyntaxContext *)aContext;
 
 - (void)setContinuation:(NSArray *)continuationMatches forLine:(unsigned)lineno;
-- (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange;
 
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
 

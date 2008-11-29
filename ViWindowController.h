@@ -27,6 +27,7 @@
 	NSMutableArray *documents;
 	NSMutableArray *filteredDocuments;
 	NSTextView *symbolFieldEditor;
+	BOOL closeSymbolListAfterUse;
 }
 
 @property(readwrite, assign) NSMutableArray *documents;

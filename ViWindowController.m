@@ -435,8 +435,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)goToSymbol:(id)sender
 {
-	INFO(@"selected row = %i", [symbolsOutline selectedRow]);
-
 	id item = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
 	if ([item isKindOfClass:[ViDocument class]])
 	{
@@ -455,12 +453,21 @@ static NSWindowController	*currentWindowController = nil;
         NSInteger row = [symbolsOutline rowForItem:item];
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
+	if (closeSymbolListAfterUse)
+	{
+		[self toggleSymbolList:self];
+		closeSymbolListAfterUse = NO;
+	}
 }
 
 - (IBAction)searchSymbol:(id)sender
 {
 	if ([splitView isSubviewCollapsed:symbolsView])
+	{
+		closeSymbolListAfterUse = YES;
 		[self toggleSymbolList:nil];
+	}
 	[[self window] makeFirstResponder:symbolFilterField];
 }
 
@@ -545,6 +552,11 @@ static NSWindowController	*currentWindowController = nil;
 	}
 	else if (aSelector == @selector(cancelOperation:)) // escape
 	{
+		if (closeSymbolListAfterUse)
+		{
+			[self toggleSymbolList:self];
+			closeSymbolListAfterUse = NO;
+		}
 		[symbolFilterField setStringValue:@""];
 		[self filterSymbols:symbolFilterField];
 		[[self window] makeFirstResponder:[[self currentDocument] textView]];

@@ -881,18 +881,6 @@ int logIndent = 0;
 	return [super performKeyEquivalent:theEvent];
 }
 
-/*
- * NSAlphaShiftKeyMask = 1 << 16,  (Caps Lock)
- * NSShiftKeyMask      = 1 << 17,
- * NSControlKeyMask    = 1 << 18,
- * NSAlternateKeyMask  = 1 << 19,
- * NSCommandKeyMask    = 1 << 20,
- * NSNumericPadKeyMask = 1 << 21,
- * NSHelpKeyMask       = 1 << 22,
- * NSFunctionKeyMask   = 1 << 23,
- * NSDeviceIndependentModifierFlagsMask = 0xffff0000U
- */
-
 - (void)updateCaret
 {
 	if (mode != ViVisualMode)

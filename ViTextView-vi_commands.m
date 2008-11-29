@@ -679,10 +679,16 @@
 /* syntax: [count]$ */
 - (BOOL)move_eol:(ViCommand *)command
 {
-	if([storage length] > 0)
+	if ([storage length] > 0)
 	{
-		NSUInteger bol, eol;
-		[self getLineStart:&bol end:NULL contentsEnd:&eol];
+		int count = IMAX(command.count, 1);
+		if (!command.ismotion)
+			count = IMAX(command.motion_count, 1);
+		NSUInteger cur = start_location, bol, eol;
+		while (count--)
+		{
+			[self getLineStart:&bol end:&cur contentsEnd:&eol forLocation:cur];
+		}
 		final_location = end_location = IMAX(bol, eol - command.ismotion);
 	}
 	return YES;

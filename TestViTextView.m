@@ -74,6 +74,8 @@
 - (void)test063_GotoFirstLine			{ MOVE(@"abc\ndef\nghi", 5, @"1G", 0); }
 - (void)test064_GotoSecondLine			{ MOVE(@"abc\ndef\nghi", 7, @"2G", 4); }
 - (void)test065_GotoBeyondLastLine		{ MOVE(@"abc\ndef\nghi", 2, @"220G", 2); }
+- (void)test066_GotoEndOfLine			{ MOVE(@"abc def\nghi\n", 2, @"$", 6); }
+- (void)test066_GotoEndOfLine2			{ MOVE(@"abc def\nghi\n", 2, @"2$", 10); }
 
 - (void)test070_DeleteCurrentLine		{ TEST(@"abc\ndef\nghi", 2, @"dd", @"def\nghi", 0); }
 - (void)test071_DeleteToColumnZero		{ TEST(@"abc def", 4, @"d0", @"def", 0); }

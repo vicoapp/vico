@@ -625,8 +625,7 @@
 	}
 	
 	NSUInteger column = [self columnAtLocation:start_location];
-	final_location = end_location = bol - 1; // previous line
-	[self gotoColumn:column fromLocation:end_location];
+	[self gotoColumn:column fromLocation:bol - 1];
 	return YES;
 }
 
@@ -656,8 +655,7 @@
 	}
 
 	NSUInteger column = [self columnAtLocation:start_location];
-	final_location = end_location = end; // next line
-	[self gotoColumn:column fromLocation:end_location];
+	[self gotoColumn:column fromLocation:end];
 	return YES;
 }
 
@@ -872,26 +870,37 @@
 		return NO;
 	}
 	NSString *s = [storage string];
-	unichar ch = [s characterAtIndex:start_location];
 
 	BOOL bigword = (command.ismotion ? command.key == 'W' : command.motion_key == 'W');
 
-	if (!bigword && [wordSet characterIsMember:ch])
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
+	NSUInteger word_location;
+	while (count--)
 	{
-		// skip word-chars and whitespace
-		end_location = [self skipCharactersInSet:wordSet fromLocation:start_location backward:NO];
-		// INFO(@"from word char: %u -> %u", start_location, end_location);
-	}
-	else if (![whitespace characterIsMember:ch])
-	{
-		// inside non-word-chars
-		end_location = [self skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:start_location backward:NO];
-	}
-	else if (!command.ismotion && command.key != 'd' && command.key != 'y')
-	{
-		/* We're in whitespace. */
-		/* See comment from nvi below. */
-		end_location = start_location + 1;
+		word_location = end_location;
+		unichar ch = [s characterAtIndex:word_location];
+		if (!bigword && [wordSet characterIsMember:ch])
+		{
+			// skip word-chars and whitespace
+			end_location = [self skipCharactersInSet:wordSet fromLocation:word_location backward:NO];
+		}
+		else if (![whitespace characterIsMember:ch])
+		{
+			// inside non-word-chars
+			end_location = [self skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:word_location backward:NO];
+		}
+		else if (!command.ismotion && command.key != 'd' && command.key != 'y')
+		{
+			/* We're in whitespace. */
+			/* See comment from nvi below. */
+			end_location = word_location + 1;
+		}
+
+		if (count > 0)
+			end_location = [self skipWhitespaceFrom:end_location];
 	}
 
 	/* From nvi:

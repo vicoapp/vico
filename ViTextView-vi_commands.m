@@ -937,12 +937,12 @@
 /* syntax: [count]B */
 - (BOOL)word_backward:(ViCommand *)command
 {
-	if([storage length] == 0)
+	if ([storage length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
-	if(start_location == 0)
+	if (start_location == 0)
 	{
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
@@ -950,7 +950,7 @@
 	NSString *s = [storage string];
 	end_location = start_location - 1;
 	unichar ch = [s characterAtIndex:end_location];
-	
+
 	/* From nvi:
          * !!!
          * If in whitespace, or the previous character is whitespace, move
@@ -958,40 +958,52 @@
          * character before the current one, it sets word "state" for the
          * 'b' command.
          */
-	if([whitespace characterIsMember:ch])
+	if ([whitespace characterIsMember:ch])
 	{
 		end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
-		if(end_location == 0)
+		if (end_location == 0)
 		{
 			final_location = end_location;
 			return YES;
 		}
 	}
-	ch = [s characterAtIndex:end_location];
-	
+
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
 	BOOL bigword = (command.ismotion ? command.key == 'B' : command.motion_key == 'B');
-	
-	if(bigword)
+
+	NSUInteger word_location;
+	while (count--)
 	{
-		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:YES];
-		if([whitespace characterIsMember:[s characterAtIndex:end_location]])
-			end_location++;
+		word_location = end_location;
+		ch = [s characterAtIndex:word_location];
+
+		if (bigword)
+		{
+			end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:word_location backward:YES];
+			if (count == 0 && [whitespace characterIsMember:[s characterAtIndex:end_location]])
+				end_location++;
+		}
+		else if ([wordSet characterIsMember:ch])
+		{
+			// skip word-chars and whitespace
+			end_location = [self skipCharactersInSet:wordSet fromLocation:word_location backward:YES];
+			if (count == 0 && ![wordSet characterIsMember:[s characterAtIndex:end_location]])
+				end_location++;
+		}
+		else
+		{
+			// inside non-word-chars
+			end_location = [self skipCharactersInSet:nonWordSet fromLocation:word_location backward:YES];
+			if (count == 0 && [wordSet characterIsMember:[s characterAtIndex:end_location]])
+				end_location++;
+		}
+		if (count > 0)
+			end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
 	}
-	else if([wordSet characterIsMember:ch])
-	{
-		// skip word-chars and whitespace
-		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:YES];
-		if(![wordSet characterIsMember:[s characterAtIndex:end_location]])
-			end_location++;
-	}
-	else
-	{
-		// inside non-word-chars
-		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:YES];
-		if([wordSet characterIsMember:[s characterAtIndex:end_location]])
-			end_location++;
-	}
-	
+
 	final_location = end_location;
 	return YES;
 }

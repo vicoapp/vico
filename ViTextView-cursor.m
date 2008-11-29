@@ -29,13 +29,26 @@
 - (void)drawRect:(NSRect)aRect
 {
 	[super drawRect:aRect];
-	[self updateInsertionPointInRect:aRect];
+	if ([[self window] firstResponder] == self)
+		[self updateInsertionPointInRect:aRect];
 	[self drawPageGuideInRect:aRect];
 }
 
 - (BOOL)shouldDrawInsertionPoint;
 {
 	return NO;
+}
+
+- (BOOL)becomeFirstResponder
+{
+	[self setNeedsDisplayInRect:oldCaretRect];
+	return [super becomeFirstResponder];
+}
+
+- (BOOL)resignFirstResponder
+{
+	[self setNeedsDisplayInRect:oldCaretRect];
+	return [super resignFirstResponder];
 }
 
 @end

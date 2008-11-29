@@ -618,7 +618,7 @@
 {
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if(bol == 0)
+	if (bol == 0)
 	{
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;

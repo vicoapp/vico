@@ -645,26 +645,21 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	if (eol - bol > column)
+	NSUInteger c = 0, i;
+	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	for (i = bol; i < eol; i++)
 	{
-		NSUInteger c = 0, i;
-		int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-		for (i = bol; i <= eol; i++)
-		{
-			unichar ch = [[storage string] characterAtIndex:i];
-			if (ch == '\t')
-				c += ts - (c % ts);
-			else
-				c++;
-			if (c >= column)
-				break;
-		}
-		final_location = end_location = i;
+		unichar ch = [[storage string] characterAtIndex:i];
+		if (ch == '\t')
+			c += ts - (c % ts);
+		else
+			c++;
+		if (c >= column)
+			break;
 	}
-	else if (eol - bol > 1)
-		final_location = end_location = eol - 1;
-	else
-		final_location = end_location = bol;
+	if (mode != ViInsertMode && i == eol)
+		i = IMAX(bol, eol - 1);
+	final_location = end_location = i;
 }
 
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
@@ -907,6 +902,8 @@ int logIndent = 0;
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
 	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	if (NSWidth(caretRect) == 0)
+		caretRect.size.width = 7; // XXX
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;
@@ -1590,11 +1587,12 @@ int logIndent = 0;
 
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	NSUInteger bol, eol, end;
+	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:aLocation];
+	INFO(@"aLocation = %u, bol = %u, end = %u, eol = %u, length = %u", aLocation, bol, end, eol, [self caret], [storage length]);
 	NSUInteger c = 0, i;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	for (i = bol; i <= [self caret]; i++)
+	for (i = bol; i <= [self caret] && i < end; i++)
 	{
 		unichar ch = [[storage string] characterAtIndex:i];
 		if (ch == '\t')

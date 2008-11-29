@@ -274,7 +274,6 @@ add_node:
 	ViRegexp *endRegexp = [beginMatch endRegexp];
 	if (endRegexp == nil)
 	{
-		INFO(@"************* => compiling pattern with back references for scope [%@]", [beginMatch scope]);
 		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
 			 withBackreferencesToRegexp:[beginMatch beginMatch]
 			                  matchText:chars];

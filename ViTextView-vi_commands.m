@@ -1,6 +1,7 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
 #import "ViMark.h"
+#import "NSTextStorage-additions.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -21,7 +22,7 @@
 
 - (BOOL)move_high:(ViCommand *)command
 {
-	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
         NSRect visibleRect = [clipView bounds];
@@ -38,21 +39,22 @@
 
 - (BOOL)move_middle:(ViCommand *)command
 {
-        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+	NSScrollView *scrollView = [self enclosingScrollView];
+        NSRect visibleRect = [[scrollView contentView] bounds];
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
-	NSUInteger highLine = [self lineNumberAtLocation:range.location];
-	NSUInteger lowLine = [self lineNumberAtLocation:NSMaxRange(range) - 1];
+	NSUInteger highLine = [[self textStorage] lineNumberAtLocation:range.location];
+	NSUInteger lowLine = [[self textStorage] lineNumberAtLocation:NSMaxRange(range) - 1];
 	NSUInteger middleLine = highLine + (lowLine - highLine) / 2;
 
-	end_location = final_location = [self locationForStartOfLine:middleLine];
+	end_location = final_location = [[self textStorage] locationForStartOfLine:middleLine];
 	return YES;
 }
 
 - (BOOL)move_low:(ViCommand *)command
 {
-	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
         NSRect visibleRect = [clipView bounds];
@@ -63,7 +65,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
 	end_location = final_location = bol;
 
-	if (NSMaxRange(range) < [storage length])
+	if (NSMaxRange(range) < [[self textStorage] length])
 	{
 		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
 		NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
@@ -84,7 +86,7 @@
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	NSRange lineRange = NSMakeRange(start_location, end - start_location);
         
-        NSRange openingRange = [[storage string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
+        NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
         if (openingRange.location == NSNotFound)
         {
                 [[self delegate] message:@"No match character on this line"];
@@ -99,7 +101,7 @@
         BOOL inString = [[openingScopes lastObject] hasPrefix:@"string"];
 
         // lookup the matching character and prepare search
-        NSString *match = [[storage string] substringWithRange:openingRange];
+        NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
         unichar matchChar = [match characterAtIndex:0];
         unichar otherChar;
 	NSUInteger startOffset, endOffset = 0;
@@ -113,7 +115,7 @@
                 if (inString)
                 	endOffset = NSMaxRange(scopeRange);
                 else
-                        endOffset = [[storage string] length];
+                        endOffset = [[[self textStorage] string] length];
         }
 	else
 	{
@@ -130,7 +132,7 @@
 	NSUInteger offset;
 	for (offset = startOffset; offset != endOffset; offset += delta)
 	{
-        	unichar c = [[storage string] characterAtIndex:offset];
+        	unichar c = [[[self textStorage] string] characterAtIndex:offset];
         	if (c == matchChar || c == otherChar)
                 {
 			// ignore match if scopes doesn't match
@@ -172,7 +174,7 @@
 		return;
 	}
 
-	NSString *inputText = [[storage string] substringWithRange:affectedRange];
+	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
 
 	NSTask *task = [[NSTask alloc] init];
 	[task setLaunchPath:@"/bin/sh"];
@@ -224,7 +226,7 @@
 	[self getLineStart:NULL end:&cur contentsEnd:NULL];
 		
 	NSUInteger bol = cur, end, eol = 0;
-	for (; eol < [[storage string] length];)
+	for (; eol < [[[self textStorage] string] length];)
 	{
 		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
 		if ((bol == end || [self isBlankLineAtLocation:bol]) && --count <= 0)
@@ -275,7 +277,7 @@
 	/* If a line mode range includes the last line, also include the newline before the first line.
 	 * This way delete doesn't leave an empty line.
 	 */
-	if (command.line_mode && NSMaxRange(affectedRange) == [storage length] && bol > 0)
+	if (command.line_mode && NSMaxRange(affectedRange) == [[self textStorage] length] && bol > 0)
 	{
 		affectedRange.location--;	// FIXME: what about using CRLF at end-of-lines?
 		affectedRange.length++;
@@ -285,8 +287,8 @@
 	[self cutToBuffer:0 append:NO range:affectedRange];
 
 	// correct caret position if we deleted the last character(s) on the line
-	if (bol >= [storage length])
-		bol = IMAX(0, [storage length] - 1);
+	if (bol >= [[self textStorage] length])
+		bol = IMAX(0, [[self textStorage] length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
 	if (affectedRange.location >= eol)
@@ -533,7 +535,7 @@
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
 	// INFO(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
 	
-	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[storage string] characterAtIndex:eol-1]])
+	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
 		NSRange r = NSMakeRange(eol, end - eol);
@@ -547,9 +549,9 @@
 	{
 		final_location = eol;
 		NSString *joinPadding = @" ";
-		if([[NSCharacterSet characterSetWithCharactersInString:@".!?"] characterIsMember:[[storage string] characterAtIndex:eol-1]])
+		if([[NSCharacterSet characterSetWithCharactersInString:@".!?"] characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 			joinPadding = @"  ";
-		else if([[storage string] characterAtIndex:end] == ')')
+		else if([[[self textStorage] string] characterAtIndex:end] == ')')
 		{
 			final_location = eol - 1;
 			joinPadding = @"";
@@ -659,7 +661,7 @@
 
 	NSUInteger bol, end;
 	[self getLineStart:&bol end:&end contentsEnd:NULL];
-	if (end >= [storage length])
+	if (end >= [[self textStorage] length])
 	{
 		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
@@ -668,7 +670,7 @@
 	while (--count > 0)
 	{
 		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:end];
-		if (end >= [storage length])
+		if (end >= [[self textStorage] length])
 		{
 			[[self delegate] message:@"Movement past the end-of-file"];
 			return NO;
@@ -700,7 +702,7 @@
 /* syntax: [count]$ */
 - (BOOL)move_eol:(ViCommand *)command
 {
-	if ([storage length] > 0)
+	if ([[self textStorage] length] > 0)
 	{
 		int count = IMAX(command.count, 1);
 		if (!command.ismotion)
@@ -726,7 +728,7 @@
 		count = IMAX(command.motion_count, 1);
 	while (count--)
 	{
-		while (--i >= bol && [[storage string] characterAtIndex:i] != command.argument)
+		while (--i >= bol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
 		if (i < bol)
 		{
@@ -763,7 +765,7 @@
 		count = IMAX(command.motion_count, 1);
 	while(count--)
 	{
-		while(++i < eol && [[storage string] characterAtIndex:i] != command.argument)
+		while(++i < eol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
 		if(i == eol)
 		{
@@ -798,7 +800,7 @@
 	
 	if(count > 0)
 	{
-		NSInteger location = [self locationForStartOfLine:count];
+		NSInteger location = [[self textStorage] locationForStartOfLine:count];
 		if(location == -1)
 		{
 			[[self delegate] message:@"Movement past the end-of-file"];
@@ -810,7 +812,7 @@
 	else
 	{
 		/* goto last line */
-		NSUInteger last_location = [[storage string] length];
+		NSUInteger last_location = [[[self textStorage] string] length];
 		if(last_location > 0)
 			--last_location;
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
@@ -891,12 +893,12 @@
 /* syntax: [count]W */
 - (BOOL)word_forward:(ViCommand *)command
 {
-	if ([storage length] == 0)
+	if ([[self textStorage] length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 
 	BOOL bigword = (command.ismotion ? command.key == 'W' : command.motion_key == 'W');
 
@@ -964,7 +966,7 @@
 /* syntax: [count]B */
 - (BOOL)word_backward:(ViCommand *)command
 {
-	if ([storage length] == 0)
+	if ([[self textStorage] length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
@@ -974,7 +976,7 @@
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 	end_location = start_location - 1;
 	unichar ch = [s characterAtIndex:end_location];
 
@@ -1037,12 +1039,12 @@
 
 - (BOOL)end_of_word:(ViCommand *)command
 {
-	if([storage length] == 0)
+	if([[self textStorage] length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 	end_location = start_location + 1;
 	unichar ch = [s characterAtIndex:end_location];
 	
@@ -1092,7 +1094,7 @@
 /* syntax: [count]I */
 - (BOOL)insert_bol:(ViCommand *)command
 {
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 	if([s length] == 0)
 		return YES;
 	NSUInteger bol, eol;
@@ -1114,7 +1116,7 @@
 /* syntax: [count]x */
 - (BOOL)delete_forward:(ViCommand *)command
 {
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 	if([s length] == 0)
 	{
 		[[self delegate] message:@"No characters to delete"];
@@ -1147,7 +1149,7 @@
 /* syntax: [count]X */
 - (BOOL)delete_backward:(ViCommand *)command
 {
-	if([storage length] == 0)
+	if([[self textStorage] length] == 0)
 	{
 		[[self delegate] message:@"Already in the first column"];
 		return NO;
@@ -1172,7 +1174,7 @@
 /* syntax: ^F */
 - (BOOL)forward_screen:(ViCommand *)command
 {
-	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
         // get visible character range
@@ -1184,7 +1186,7 @@
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:NSMaxRange(range) - 1];
 
-	if (NSMaxRange(range) == [storage length])
+	if (NSMaxRange(range) == [[self textStorage] length])
 	{
 		/* Already showing last page, place cursor at last line.
 		 * Check if already on last line.
@@ -1218,7 +1220,7 @@
 /* syntax: ^B */
 - (BOOL)backward_screen:(ViCommand *)command
 {
-	NSScrollView *scrollView = [[self delegate] scrollView];
+	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
         // get visible character range
@@ -1374,8 +1376,8 @@
 	 [[[[self delegate] fileURL] path] stringByAbbreviatingWithTildeInPath],
 	 [[[NSDocumentController sharedDocumentController] currentDocument] isDocumentEdited] ? "modified" : "unmodified",
 	 [self currentLine],
-	 [self lineNumberAtLocation:IMAX(0, [[storage string] length] - 1)],
-	 (float)[self caret]*100.0 / (float)[[storage string] length]];
+	 [[self textStorage] lineNumberAtLocation:IMAX(0, [[[self textStorage] string] length] - 1)],
+	 (float)[self caret]*100.0 / (float)[[[self textStorage] string] length]];
 	return YES;
 }
 
@@ -1401,7 +1403,7 @@
 		return NO;
 	}
 	
-	NSInteger bol = [self locationForStartOfLine:m.line];
+	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
 	if (bol == -1)
 	{
 		[[self delegate] message:@"Mark %C: the line was deleted", command.argument];

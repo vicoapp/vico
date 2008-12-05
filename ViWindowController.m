@@ -13,6 +13,8 @@ static NSWindowController	*currentWindowController = nil;
 @implementation ViWindowController
 
 @synthesize documents;
+@synthesize selectedDocument;
+@synthesize statusbar;
 
 + (id)currentWindowController
 {
@@ -64,15 +66,15 @@ static NSWindowController	*currentWindowController = nil;
 	[tabBar setStyleNamed:@"Unified"];
 	[tabBar setCanCloseOnlyTab:YES];
 	[tabBar setHideForSingleTab:NO];
-	[tabBar setPartnerView:tabView];
+	[tabBar setPartnerView:splitView];
 	[tabBar setShowAddTabButton:YES];
-	[tabBar setAllowsDragBetweenWindows:YES];
+	[tabBar setAllowsDragBetweenWindows:NO];
 
-	NSTabViewItem *item;
-	for (item in [tabView tabViewItems])
-	{
-		[tabView removeTabViewItem:item];
-	}
+	[[self window] setDelegate:self];
+	[[self window] setFrameUsingName:@"MainDocumentWindow"];
+
+	[splitView addSubview:symbolsView];
+	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
 	isLoaded = YES;
 	if (initialDocument)
@@ -81,11 +83,6 @@ static NSWindowController	*currentWindowController = nil;
                 lastDocument = initialDocument;
                 initialDocument = nil;
 	}
-	[[self window] setDelegate:self];
-	[[self window] setFrameUsingName:@"MainDocumentWindow"];
-
-	[splitView addSubview:symbolsView];
-	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
 	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
 	// [cell setFont:[NSFont systemFontOfSize:11.0]];
@@ -102,6 +99,8 @@ static NSWindowController	*currentWindowController = nil;
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
+	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
+
 	separatorCell = [[ViSeparatorCell alloc] init];
 }
 
@@ -116,6 +115,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)addNewDocumentTab:(id)sender
 {
+	INFO(@"sender = %@", sender);
 	[[NSDocumentController sharedDocumentController] newDocument:self];
 }
 
@@ -129,29 +129,84 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+/* Called by a new ViDocument in its makeWindowControllers method.
+ */
 - (void)addNewTab:(ViDocument *)document
 {
 	if (!isLoaded)
 	{
+		/* Defer until NIB is loaded. */
 		initialDocument = document;
 		return;
 	}
 
-	NSTabViewItem *newItem = [[NSTabViewItem alloc] initWithIdentifier:document];
+	INFO(@"add new tab for document %@", document);
 
-	[NSBundle loadNibNamed:[document windowNibName] owner:document];
-	[document windowControllerDidLoadNib:self];
-	[newItem setView:[document view]];
-	[newItem setLabel:[document displayName]];
-	[tabView addTabViewItem:newItem];
-	[tabView selectTabViewItem:newItem];
+	[tabBar addDocument:document];
+	[self selectDocument:document];
 
+	// update symbol table
 	[documents addObject:document];
 	[self filterSymbols:symbolFilterField];
 	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
         NSInteger row = [symbolsOutline rowForItem:document];
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+}
+
+- (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView
+{
+	mostRecentDocument = document;
+	mostRecentView = docView;
+}
+
+- (void)selectDocument:(ViDocument *)aDocument
+{
+	INFO(@"select document %@", aDocument);
+
+	if (!isLoaded || aDocument == nil)
+		return;
+
+	INFO(@"mostRecentDocument = %@", mostRecentDocument);
+	NSView *superView = [[mostRecentView view] superview];
+	INFO(@"mostRecentView = %@ (w/superview %@)", mostRecentView, superView);
+
+	if (mostRecentDocument == aDocument)
+		return;
+
+	// create a new document view
+	ViDocumentView *docView = [aDocument makeView];
+	INFO(@"got docView %@", docView);
+
+	// add the new view
+	// if (![superView isKindOfClass:[NSSplitView class]])
+	if (mostRecentView == nil)
+	{
+		NSRect frame = mostRecentView ? [[mostRecentView view] frame] : [documentView frame];
+		frame.origin = NSMakePoint(0, 0);
+		NSSplitView *split = [[NSSplitView alloc] initWithFrame:frame];
+		[split setVertical:NO];
+		[split setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		INFO(@"created split view %@, adding subview %@, frame %@", split, [docView view], NSStringFromRect(frame));
+		[split addSubview:[docView view]];
+		[split adjustSubviews];
+		[documentView addSubview:split];
+	}
+	else
+	{
+		INFO(@"replacing document view %@ with %@", mostRecentView, docView);
+		[superView replaceSubview:[mostRecentView view] with:[docView view]];
+	}
+
+	[[self document] removeWindowController:self];
+	[aDocument addWindowController:self];
+	[self setDocument:aDocument];
+
+	lastDocument = [self selectedDocument];
+	[self setSelectedDocument:aDocument];
+	[tabBar didSelectDocument:aDocument];
+
+	[[self window] makeFirstResponder:[docView textView]];
 }
 
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -172,7 +227,6 @@ static NSWindowController	*currentWindowController = nil;
 		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
 }
-
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	if (!isLoaded)
@@ -184,19 +238,20 @@ static NSWindowController	*currentWindowController = nil;
 	[self setDocument:doc];
 }
 
-- (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
+// - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
+- (void)closeDocument:(ViDocument *)document
 {
-	ViDocument *document = [tabViewItem identifier];
-
+	INFO(@"close document %@", document);
 	[document removeObserver:self forKeyPath:@"symbols"];
 	[documents removeObject:document];
 	[self filterSymbols:symbolFilterField];
 
-	[tabView selectTabViewItem:tabViewItem];
+	[[document view] removeFromSuperview];
+	// FIXME: add another view
+
 	[[self window] performClose:document];
 	if (lastDocument == document)
 		lastDocument = nil;
-	return NO;
 }
 
 - (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)aTabView
@@ -217,6 +272,7 @@ static NSWindowController	*currentWindowController = nil;
 #endif
 }
 
+#if 0
 - (int)numberOfTabViewItems
 {
 	return [tabView numberOfTabViewItems];
@@ -240,6 +296,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	return nil;
 }
+#endif
 
 - (void)windowDidResize:(NSNotification *)aNotification
 {
@@ -253,6 +310,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
+	INFO(@"will close");
 	if (currentWindowController == self)
 		currentWindowController = nil;
 	[windowControllers removeObject:self];
@@ -261,9 +319,10 @@ static NSWindowController	*currentWindowController = nil;
 
 - (ViDocument *)currentDocument
 {
-	return [[tabView selectedTabViewItem] identifier];
+	return [self selectedDocument];
 }
 
+#if 0
 - (void)selectDocument:(ViDocument *)document
 {
 	NSTabViewItem *item = [self tabViewItemForDocument:document];
@@ -277,22 +336,23 @@ static NSWindowController	*currentWindowController = nil;
 	if (tab < [tabView numberOfTabViewItems])
 		[tabView selectTabViewItem:[[[tabView delegate] representedTabViewItems] objectAtIndex:tab]];
 }
+#endif
 
 - (IBAction)selectNextTab:(id)sender
 {
-	int num = [tabView numberOfTabViewItems];
+	NSArray *tabs = [tabBar representedDocuments];
+	int num = [tabs count];
 	if (num <= 1)
 		return;
 
-	NSArray *tabs = [tabBar representedTabViewItems];
 	int i;
 	for (i = 0; i < num; i++)
 	{
-		if ([tabs objectAtIndex:i] == [tabView selectedTabViewItem])
+		if ([tabs objectAtIndex:i] == [self selectedDocument])
 		{
 			if (++i >= num)
 				i = 0;
-			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
+			[self selectDocument:[tabs objectAtIndex:i]];
 			break;
 		}
 	}
@@ -300,19 +360,19 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)selectPreviousTab:(id)sender
 {
-	int num = [tabView numberOfTabViewItems];
+	NSArray *tabs = [tabBar representedDocuments];
+	int num = [tabs count];
 	if (num <= 1)
 		return;
 
-	NSArray *tabs = [tabBar representedTabViewItems];
 	int i;
 	for (i = 0; i < num; i++)
 	{
-		if ([tabs objectAtIndex:i] == [tabView selectedTabViewItem])
+		if ([tabs objectAtIndex:i] == [self selectedDocument])
 		{
 			if (--i < 0)
 				i = num - 1;
-			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
+			[self selectDocument:[tabs objectAtIndex:i]];
 			break;
 		}
 	}
@@ -333,45 +393,77 @@ static NSWindowController	*currentWindowController = nil;
 	return displayName;
 }
 
-#pragma mark -
-#pragma mark Split view delegate methods
-
 - (void)switchToLastFile
 {
         [self selectDocument:lastDocument];
 }
 
+- (IBAction)splitViewHorizontally:(id)sender
+{
+	NSSplitView *split = [[mostRecentView view] superview];
+	if ([split isKindOfClass:[NSSplitView class]])
+	{
+		ViDocumentView *dv = [mostRecentDocument makeView];
+		[split addSubview:[dv view]];
+		[split setPosition:100 ofDividerAtIndex:([[split subviews] count] - 2)];
+		[split adjustSubviews];
+	}
+}
+
+#pragma mark -
+#pragma mark Split view delegate methods
+
 - (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview
 {
-	return YES;
+	if (sender == splitView)
+		return YES;
+	return NO;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
-	if (offset == 0)
-		return 100;
-	NSRect frame = [sender frame];
-	return frame.size.width - 300;
+	if (sender == splitView)
+	{
+		if (offset == 0)
+			return 100;
+		NSRect frame = [sender frame];
+		return frame.size.width - 300;
+	}
+	else
+		return proposedMin;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
-	if (offset == 0)
-		return 300;
-	return proposedMax - 100;
+	if (sender == splitView)
+	{
+		if (offset == 0)
+			return 300;
+		return proposedMax - 100;
+	}
+	else
+		return proposedMax;
 }
 
-- (BOOL)splitView:(NSSplitView *)aSplitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+- (BOOL)splitView:(NSSplitView *)sender shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
 {
-	// collapse both side views, but not the edit view
-	NSView *secondView = [[aSplitView subviews] objectAtIndex:1];
-	if (subview == secondView)
+	if (sender == splitView)
+	{
+		// collapse both side views, but not the edit view
+		NSView *secondView = [[sender subviews] objectAtIndex:1];
+		if (subview == secondView)
+			return NO;
+		return YES;
+	}
+	else
 		return NO;
-	return YES;
 }
 
 - (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize
 {
+	if (sender != splitView)
+		return;
+
 	NSRect newFrame = [sender frame];
 	float dividerThickness = [sender dividerThickness];
 	
@@ -402,9 +494,12 @@ static NSWindowController	*currentWindowController = nil;
 	[sender adjustSubviews];
 }
 
-- (NSRect)splitView:(NSSplitView *)aSplitView additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
+- (NSRect)splitView:(NSSplitView *)sender additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
-	NSRect frame = [aSplitView frame];
+	if (sender != splitView)
+		return NSMakeRect(0, 0, 0, 0);
+
+	NSRect frame = [sender frame];
 	NSRect resizeRect;
 	if (dividerIndex == 0)
 	{
@@ -413,7 +508,7 @@ static NSWindowController	*currentWindowController = nil;
 	else if (dividerIndex == 1)
 	{
 		resizeRect = [symbolsResizeView frame];
-		resizeRect.origin = [splitView convertPoint:resizeRect.origin fromView:symbolsResizeView];
+		resizeRect.origin = [sender convertPoint:resizeRect.origin fromView:symbolsResizeView];
 	}
 	else
 		return NSMakeRect(0, 0, 0, 0);
@@ -583,7 +678,7 @@ static NSWindowController	*currentWindowController = nil;
 		}
 		[symbolFilterField setStringValue:@""];
 		[self filterSymbols:symbolFilterField];
-		[[self window] makeFirstResponder:[[self currentDocument] textView]];
+		[[self window] makeFirstResponder:[mostRecentView view]];
 		return YES;
 	}
 

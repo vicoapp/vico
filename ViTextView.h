@@ -8,6 +8,8 @@
 #import "ViSyntaxParser.h"
 #import "ViSnippet.h"
 
+@class ViDocumentView;
+
 #ifdef IMAX
 # undef IMAX
 #endif
@@ -22,12 +24,14 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView : NSTextView
 {
+	ViDocumentView *documentView;
+
 	ViMode mode;
 	ViCommand *parser;
 	BOOL replayingInput;  // true when dot command replays input
-	NSTextStorage *storage;
 	NSUndoManager *undoManager;
-	ViTagsDatabase *tags;
+
+	ViTagsDatabase *tags; // XXX: doesn't belong here!?
 
 	NSMutableArray *inputKeys;
 
@@ -36,7 +40,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSRect caretRect;
 	NSRect oldCaretRect;
 
-	NSMutableDictionary *buffers; // points into [[NSApp delegate] sharedBuffers]
+	NSMutableDictionary *buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
+
 	NSRange affectedRange;
 	NSUInteger start_location, end_location, final_location;
 
@@ -51,36 +56,22 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSDictionary *inputCommands;
 	NSDictionary *normalCommands;
 
-	NSMutableDictionary *marks;
-
-	ViSnippet *activeSnippet;
-
-	// language parsing and highlighting
-	BOOL ignoreEditing;
-	ViSyntaxParser *syntaxParser;
-	ViSyntaxContext *nextContext;
-	ViTheme *theme;
-	ViBundle *bundle;
-	ViLanguage *language;
-	BOOL resetFont;
+	NSMutableDictionary *marks; // XXX: move to document
+	ViSnippet *activeSnippet; // XXX: move to document ?
 
 	// symbol list
 	NSDictionary *symbolSettings;
 	NSMutableArray *symbolScopes;
-	NSTimer *updateSymbolsTimer;
 
 	CGFloat pageGuideX;
 
 	BOOL hasUndoGroup;
 }
 
-- (void)initEditorWithDelegate:(id)aDelegate;
+- (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;
 - (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
-- (void)setLanguageFromString:(NSString *)aLanguage;
-- (ViLanguage *)language;
-- (void)configureForURL:(NSURL *)aURL;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
 - (NSString *)indentStringOfLength:(int)length;
@@ -130,14 +121,12 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 
-- (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
-- (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
-- (NSUInteger)currentLine;
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
+
+- (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
 
 - (void)updateSymbolList:(NSTimer *)timer;
-
 @end
 
 @interface ViTextView (snippets)
@@ -150,9 +139,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @end
 
 @interface ViTextView (syntax)
-- (void)reapplyTheme;
-- (void)highlightEverything;
-- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag;
 @end
 
 @interface ViTextView (vi_commands)

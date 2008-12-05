@@ -102,14 +102,13 @@
 {
 	NSString *themeName = [sender title];
 	ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:themeName];
+	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
 
 	ViDocument *doc;
 	for (doc in [[NSDocumentController sharedDocumentController] documents])
 	{
 		[doc changeTheme:theme];
 	}
-
-	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
 }
 
 - (IBAction)setPageGuide:(id)sender

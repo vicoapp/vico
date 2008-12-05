@@ -5,9 +5,14 @@
 //  Created by John Pannell on 10/13/05.
 //  Copyright 2005 Positive Spin Media. All rights reserved.
 //
+//  Hacked by Martin Hedenfalk on 2008-11-30.
+//  Removes dependency to NSTabView.
+//
 
 /*
- This view provides a control interface to manage a regular NSTabView.  It looks and works like the tabbed browsing interface of many popular browsers.
+ This view provides a control interface to manage a regular NSTabView.
+It looks and works like the tabbed browsing interface of many popular
+browsers.
  */
 
 #import <Cocoa/Cocoa.h>
@@ -43,7 +48,6 @@ enum {
     
     // control basics
     NSMutableArray              *_cells;                    // the cells that draw the tabs
-    IBOutlet NSTabView          *tabView;                   // the tab view being navigated
     PSMOverflowPopUpButton      *_overflowPopUpButton;      // for too many tabs
     PSMRolloverButton           *_addTabButton;
     
@@ -98,8 +102,6 @@ enum {
 - (void)setAllowsDragBetweenWindows:(BOOL)flag;
 
 // accessors
-- (NSTabView *)tabView;
-- (void)setTabView:(NSTabView *)view;
 - (id)delegate;
 - (void)setDelegate:(id)object;
 - (id)partnerView;
@@ -108,16 +110,19 @@ enum {
 // the buttons
 - (PSMRolloverButton *)addTabButton;
 - (PSMOverflowPopUpButton *)overflowPopUpButton;
-- (NSMutableArray *)representedTabViewItems;
+- (NSMutableArray *)representedDocuments;
 
 // special effects
 - (void)hideTabBar:(BOOL)hide animate:(BOOL)animate;
 
+// content
+- (void)addDocument:(NSDocument *)aDocument;
+- (void)didSelectDocument:(NSDocument *)aDocument;
 @end
 
 
 @interface NSObject (TabBarControlDelegateMethods)
-- (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem;
-- (void)tabView:(NSTabView *)aTabView willCloseTabViewItem:(NSTabViewItem *)tabViewItem;
-- (void)tabView:(NSTabView *)aTabView didCloseTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void)closeDocument:(NSDocument *)aDocument;
+- (void)selectDocument:(NSDocument *)aDocument;
+- (NSDocument *)selectedDocument;
 @end

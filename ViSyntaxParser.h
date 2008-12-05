@@ -22,6 +22,8 @@
 	const unichar *chars;
 	NSUInteger offset;
 	ViSyntaxContext *context;
+	
+	BOOL ignoreEditing;
 
 	// statistics
 	unsigned regexps_tried;
@@ -29,6 +31,8 @@
 	unsigned regexps_matched;
 	unsigned regexps_cached;
 }
+
+@property(readwrite) BOOL ignoreEditing;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;

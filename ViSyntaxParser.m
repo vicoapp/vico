@@ -6,6 +6,8 @@
 
 @implementation ViSyntaxParser
 
+@synthesize ignoreEditing;
+
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage
 {
 	self = [super init];
@@ -17,6 +19,9 @@
 	}
 	return self;
 }
+
+#pragma mark -
+#pragma mark Line Continuations
 
 - (void)setContinuation:(NSArray *)continuedMatches forLine:(unsigned)lineno
 {
@@ -42,6 +47,43 @@
 	DEBUG(@"continuation scopes at line %u = %@", lineno, continuedMatches);
 	return continuedMatches;
 }
+
+- (void)pushContinuations:(NSValue *)rangeValue
+{
+	NSRange range = [rangeValue rangeValue];
+	unsigned lineno = range.location;
+	int n = range.length;
+
+	NSArray *prev;
+	if (lineno == 0)
+		prev = [NSArray array];
+	else
+		prev = [continuations objectAtIndex:(lineno - 1)];
+
+	DEBUG(@"pushing %i continuations after line %i, copying scopes %@", n, lineno, prev);
+
+	while (n--)
+	{
+		[continuations insertObject:[prev copy] atIndex:lineno];
+	}
+}
+
+- (void)pullContinuations:(NSValue *)rangeValue
+{
+	NSRange range = [rangeValue rangeValue];
+	unsigned lineno = range.location;
+	int n = range.length;
+
+	DEBUG(@"pulling %i continuations at line %i", n, lineno);
+
+	while (n--)
+	{
+		[continuations removeObjectAtIndex:lineno];
+	}
+}
+
+#pragma mark -
+#pragma mark Syntax parsing
 
 - (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
 {
@@ -540,40 +582,6 @@ done:
 	                reachedEOL:nil];
 }
 
-- (void)pushContinuations:(NSValue *)rangeValue
-{
-	NSRange range = [rangeValue rangeValue];
-	unsigned lineno = range.location;
-	int n = range.length;
-
-	NSArray *prev;
-	if (lineno == 0)
-		prev = [NSArray array];
-	else
-		prev = [continuations objectAtIndex:(lineno - 1)];
-
-	DEBUG(@"pushing %i continuations after line %i, copying scopes %@", n, lineno, prev);
-
-	while (n--)
-	{
-		[continuations insertObject:[prev copy] atIndex:lineno];
-	}
-}
-
-- (void)pullContinuations:(NSValue *)rangeValue
-{
-	NSRange range = [rangeValue rangeValue];
-	unsigned lineno = range.location;
-	int n = range.length;
-
-	DEBUG(@"pulling %i continuations at line %i", n, lineno);
-
-	while (n--)
-	{
-		[continuations removeObjectAtIndex:lineno];
-	}
-}
-
 - (void)parseContext:(ViSyntaxContext *)aContext
 {
 #if 0
@@ -600,9 +608,9 @@ done:
 		context.lineOffset,
 		context.range.location,
 		NSMaxRange(context.range));
-	
+
 	NSArray *continuedMatches = [self continuedMatchesForLine:lineno - 1];
-	
+
 	NSUInteger nextRange = offset;
 	NSUInteger maxRange = NSMaxRange(context.range);
 

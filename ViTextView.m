@@ -12,6 +12,8 @@
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViSymbolTransform.h"
 #import "ViCommandOutputController.h"
+#import "ViDocumentView.h"
+#import "NSTextStorage-additions.h"
 
 int logIndent = 0;
 
@@ -30,16 +32,15 @@ int logIndent = 0;
 
 @implementation ViTextView
 
-- (void)initEditorWithDelegate:(id)aDelegate
+- (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView
 {
 	[self setDelegate:aDelegate];
 	[self setCaret:0];
-	[[self textStorage] setDelegate:self];
 
+	documentView = docView;
 	undoManager = [[self delegate] undoManager];
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSApp delegate] sharedBuffers];
-	storage = [self textStorage];
 	inputKeys = [[NSMutableArray alloc] init];
 	marks = [[NSMutableDictionary alloc] init];
 
@@ -93,14 +94,12 @@ int logIndent = 0;
 	[self setSymbolScopes];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
-	[self highlightEverything];
-	resetFont = YES;
 }
 
 - (void)setString:(NSString *)aString
 {
-	[[storage mutableString] setString:aString ?: @""];
-	[storage addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [storage length])];
+	[[[self textStorage] mutableString] setString:aString ?: @""];
+	[[self textStorage] addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [[self textStorage] length])];
 	[self setCaret:0];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
@@ -114,56 +113,6 @@ int logIndent = 0;
 	{
 		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
 			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
-	}
-}
-
-- (void)setLanguageFromString:(NSString *)aLanguage
-{
-	ViLanguage *newLanguage = nil;
-	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
-	[newLanguage patterns];
-	if (newLanguage != language)
-	{
-		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
-		[self highlightEverything];
-	}
-}
-
-- (ViLanguage *)language
-{
-	return language;
-}
-
-- (void)configureForURL:(NSURL *)aURL
-{
-	ViLanguage *newLanguage = nil;
-	if (aURL)
-	{
-		NSString *firstLine = nil;
-		NSUInteger eol;
-		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:0];
-		if (eol > 0)
-			firstLine = [[storage string] substringWithRange:NSMakeRange(0, eol)];
-
-		bundle = nil;
-		if ([firstLine length] > 0)
-			bundle = [[ViLanguageStore defaultStore] bundleForFirstLine:firstLine language:&newLanguage];
-		if (bundle == nil)
-			bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
-	}
-
-	if (bundle == nil)
-	{
-		bundle = [[ViLanguageStore defaultStore] defaultBundleLanguage:&newLanguage];
-	}
-
-	[newLanguage patterns];
-	if (newLanguage != language)
-	{
-		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
-		[self highlightEverything];
 	}
 }
 
@@ -199,7 +148,7 @@ int logIndent = 0;
 
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
 {
-	[[storage string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
+	[[[self textStorage] string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
 }
 
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr
@@ -225,6 +174,7 @@ int logIndent = 0;
 	}
 }
 
+
 /* Like insertText:, but works within beginEditing/endEditing.
  * Also begins an undo group.
  */
@@ -235,10 +185,9 @@ int logIndent = 0;
 
 	if (undoGroup)
 		[self beginUndoGroup];
-	[self pushContinuationsFromLocation:aLocation string:aString forward:YES];
-	[[storage mutableString] insertString:aString atIndex:aLocation];
+	[[[self textStorage] mutableString] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
-	
+
 	if (activeSnippet)
 	{
 		if ([activeSnippet activeInRange:NSMakeRange(aLocation, [aString length])])
@@ -271,8 +220,7 @@ int logIndent = 0;
 	if (undoGroup)
 		[self beginUndoGroup];
 	[self recordDeleteOfRange:aRange];
-	[self pushContinuationsFromLocation:aRange.location string:[[storage string] substringWithRange:aRange] forward:NO];
-	[storage deleteCharactersInRange:aRange];
+	[[self textStorage] deleteCharactersInRange:aRange];
 
 	if (activeSnippet)
 	{
@@ -304,7 +252,7 @@ int logIndent = 0;
 		[self beginUndoGroup];
 #if 0
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
-	[[storage mutableString] replaceCharactersInRange:aRange withString:aString];
+	[[[self textStorage] mutableString] replaceCharactersInRange:aRange withString:aString];
 #else
 	[self deleteRange:aRange undoGroup:NO];
 	[self insertString:aString atLocation:aRange.location undoGroup:NO];
@@ -320,7 +268,7 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	return [[storage string] substringWithRange:NSMakeRange(bol, eol - bol)];
+	return [[[self textStorage] string] substringWithRange:NSMakeRange(bol, eol - bol)];
 }
 
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
@@ -370,7 +318,7 @@ int logIndent = 0;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
 	NSRange lineRange = NSMakeRange(bol, eol - bol);
 
-	NSRange r = [[storage string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
+	NSRange r = [[[self textStorage] string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
 						      options:0
 							range:lineRange];
 
@@ -379,7 +327,7 @@ int logIndent = 0;
 	else if (r.location == bol)
 		return @"";
 	
-        return [[storage string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
+        return [[[self textStorage] string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
 }
 
 - (int)lengthOfIndentString:(NSString *)indent
@@ -600,7 +548,7 @@ int logIndent = 0;
 
 - (void)recordDeleteOfRange:(NSRange)aRange
 {
-	NSString *s = [[storage string] substringWithRange:aRange];
+	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
 	[self recordDeleteOfString:s atLocation:aRange.location];
 }
 
@@ -627,7 +575,7 @@ int logIndent = 0;
 		[buffers setObject:buffer forKey:@"unnamed"];
 	}
 
-	[buffer setString:[[storage string] substringWithRange:yankRange]];
+	[buffer setString:[[[self textStorage] string] substringWithRange:yankRange]];
 }
 
 - (void)cutToBuffer:(unichar)bufferName
@@ -649,7 +597,7 @@ int logIndent = 0;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	for (i = bol; i < eol; i++)
 	{
-		unichar ch = [[storage string] characterAtIndex:i];
+		unichar ch = [[[self textStorage] string] characterAtIndex:i];
 		if (ch == '\t')
 			c += ts - (c % ts);
 		else
@@ -664,7 +612,7 @@ int logIndent = 0;
 
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
 {
-	NSInteger bol = [self locationForStartOfLine:line];
+	NSInteger bol = [[self textStorage] locationForStartOfLine:line];
 	if(bol != -1)
 	{
 		[self gotoColumn:column fromLocation:bol];
@@ -675,7 +623,7 @@ int logIndent = 0;
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
 {
-	NSString *s = [storage string];
+	NSString *s = [[self textStorage] string];
 	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
 				       options:backwardFlag ? NSBackwardsSearch : 0
 					 range:backwardFlag ? NSMakeRange(toLocation, startLocation - toLocation + 1) : NSMakeRange(startLocation, toLocation - startLocation)];
@@ -688,7 +636,7 @@ int logIndent = 0;
 {
 	return [self skipCharactersInSet:characterSet
 				    from:startLocation
-				      to:backwardFlag ? 0 : [storage length]
+				      to:backwardFlag ? 0 : [[self textStorage] length]
 				backward:backwardFlag];
 }
 
@@ -769,7 +717,7 @@ int logIndent = 0;
 
 	[[NSApp delegate] setLastSearchPattern:pattern];
 
-	NSArray *foundMatches = [rx allMatchesInString:[storage string] options:rx_options];
+	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string] options:rx_options];
 
 	if ([foundMatches count] == 0)
 	{
@@ -927,7 +875,7 @@ int logIndent = 0;
 - (void)setInsertMode:(ViCommand *)command
 {
 	DEBUG(@"entering insert mode at location %u (final location is %u), length is %u",
-		end_location, final_location, [storage length]);
+		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
 
 	if (command.text)
@@ -1100,9 +1048,9 @@ int logIndent = 0;
 	NSArray *pair;
 	for (pair in smartTypingPairs)
 	{
-		if([[pair objectAtIndex:0] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
-		   start_location + 1 < [storage length] &&
-		   [[pair objectAtIndex:1] isEqualToString:[[storage string] substringWithRange:NSMakeRange(start_location, 1)]])
+		if([[pair objectAtIndex:0] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
+		   start_location + 1 < [[self textStorage] length] &&
+		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
 		{
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
 			[self setCaret:start_location - 1];
@@ -1152,14 +1100,14 @@ int logIndent = 0;
 	}
 
 	BOOL foundSmartTypingPair = NO;
-	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [storage length] - 1)];
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
 	NSArray *pair;
 	for (pair in smartTypingPairs)
 	{
 		// check if we're inserting the end character of a smart typing pair
 		// if so, just overwrite the end character
 		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
-		    [[[storage string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 		{
 			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
 						    atCharacterIndex:start_location
@@ -1174,8 +1122,8 @@ int logIndent = 0;
 		else if ([[pair objectAtIndex:0] isEqualToString:characters])
 		{
 			// don't use it if next character is alphanumeric
-			if (start_location + 1 >= [storage length] ||
-			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[storage string] characterAtIndex:start_location]])
+			if (start_location + 1 >= [[self textStorage] length] ||
+			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[[self textStorage] string] characterAtIndex:start_location]])
 			{
 				foundSmartTypingPair = YES;
 				[self insertString:[NSString stringWithFormat:@"%@%@",
@@ -1244,11 +1192,12 @@ int logIndent = 0;
 
 - (void)scrollToCaret
 {
-        NSRect visibleRect = [[[[self delegate] scrollView] contentView] bounds];
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+        NSRect visibleRect = [clipView bounds];
 	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
 	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
 
-	NSClipView *clipView = [[[self delegate] scrollView] contentView];
 	NSPoint topPoint;
 	if (NSMinY(rect) < NSMinY(visibleRect))
 	{
@@ -1262,7 +1211,7 @@ int logIndent = 0;
 		return;
 
 	[clipView scrollToPoint:topPoint];
-	[[[self delegate] scrollView] reflectScrolledClipView:clipView];
+	[scrollView reflectScrolledClipView:clipView];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1288,7 +1237,7 @@ int logIndent = 0;
 		{
 			/* escape, return to command mode */
 #if 0
-			NSString *insertedText = [[storage string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
+			NSString *insertedText = [[[self textStorage] string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
 			INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
 				insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
 
@@ -1375,14 +1324,14 @@ int logIndent = 0;
 		if (parser.complete)
 		{
 			[[self delegate] message:@""]; // erase any previous message
-			[storage beginEditing];
+			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode)
 			{
 				// still in command mode
 				[self endUndoGroup];
 			}
-			[storage endEditing];
+			[[self textStorage] endEditing];
 			[self setCaret:final_location];
 			if (mode == ViVisualMode)
 			{
@@ -1498,14 +1447,12 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
-	theme = aTheme;
-	[self setBackgroundColor:[theme backgroundColor]];
+	[self setBackgroundColor:[aTheme backgroundColor]];
 	[self setDrawsBackground:YES];
-	[self setInsertionPointColor:[theme caretColor]];
-	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
+	[self setInsertionPointColor:[aTheme caretColor]];
+	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[aTheme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
-	[self reapplyTheme];
 }
 
 - (NSFont *)font
@@ -1532,6 +1479,7 @@ int logIndent = 0;
 	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
 	[style setDefaultTabInterval:tabSizeInPoints.width];
 
+	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
 	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
 			style, NSParagraphStyleAttributeName,
 			[theme foregroundColor], NSForegroundColorAttributeName,
@@ -1539,8 +1487,8 @@ int logIndent = 0;
 	DEBUG(@"setting typing attributes to %@", attrs);
 	[self setTypingAttributes:attrs];
 
-	ignoreEditing = YES; // XXX: don't parse scopes when setting tab size
-	[storage addAttributes:attrs range:NSMakeRange(0, [storage length])];
+	// ignoreEditing = YES; // XXX: don't parse scopes when setting tab size
+	[[self textStorage] addAttributes:attrs range:NSMakeRange(0, [[self textStorage] length])];
 }
 
 - (NSUndoManager *)undoManager
@@ -1548,47 +1496,10 @@ int logIndent = 0;
 	return undoManager;
 }
 
-- (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber
-{
-	int line = 1;
-	NSInteger location = 0;
-	while (line < aLineNumber)
-	{
-		NSUInteger end;
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:location];
-		if (location == end)
-		{
-			return -1;
-		}
-		location = end;
-		line++;
-	}
-	
-	return location;
-}
-
-- (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation
-{
-	int line = 1;
-	NSUInteger location = 0;
-	while(location < aLocation)
-	{
-		NSUInteger bol, end;
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
-		if(end > aLocation)
-		{
-			break;
-		}
-		location = end;
-		line++;
-	}
-	
-	return line;
-}
 
 - (NSUInteger)currentLine
 {
-	return [self lineNumberAtLocation:[self caret]];
+	return [[self textStorage] lineNumberAtLocation:[self caret]];
 }
 
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
@@ -1599,7 +1510,7 @@ int logIndent = 0;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	for (i = bol; i <= [self caret] && i < end; i++)
 	{
-		unichar ch = [[storage string] characterAtIndex:i];
+		unichar ch = [[[self textStorage] string] characterAtIndex:i];
 		if (ch == '\t')
 			c += ts - (c % ts);
 		else
@@ -1622,7 +1533,7 @@ int logIndent = 0;
 	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:NO];
 	if (word_end > word_start)
 	{
-		return [[storage string] substringWithRange:NSMakeRange(word_start, word_end - word_start)];
+		return [[[self textStorage] string] substringWithRange:NSMakeRange(word_start, word_end - word_start)];
 	}
 
 	return nil;
@@ -1655,7 +1566,7 @@ int logIndent = 0;
 
 	NSMutableArray *symbols = [[NSMutableArray alloc] init];
 
-	NSUInteger i, length = [storage length];
+	NSUInteger i, length = [[self textStorage] length];
 	for (i = 0; i < length;)
 	{
 		NSRange range;
@@ -1676,7 +1587,7 @@ int logIndent = 0;
 		{
 			if (lastSelector)
 			{
-				NSString *symbol = [[storage string] substringWithRange:wholeRange];
+				NSString *symbol = [[[self textStorage] string] substringWithRange:wholeRange];
 				NSDictionary *d = [symbolSettings objectForKey:[lastSelector componentsJoinedByString:@" "]];
 				NSString *transform = [d objectForKey:@"symbolTransformation"];
 				if (transform)
@@ -1723,7 +1634,7 @@ int logIndent = 0;
 	NSUInteger i = aLocation;
 	for (;;)
 	{
-		if (forward && i >= [storage length])
+		if (forward && i >= [[self textStorage] length])
 			break;
 		else if (!forward && i == 0)
 			break;
@@ -1759,13 +1670,13 @@ int logIndent = 0;
 		if (sel.length > 0)
 		{
 			*rangePtr = sel;
-			inputText = [[storage string] substringWithRange:*rangePtr];
+			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 		}
 	}
 	else if ([type isEqualToString:@"document"])
 	{
-		inputText = [storage string];
-		*rangePtr = NSMakeRange(0, [storage length]);
+		inputText = [[self textStorage] string];
+		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
 	}
 	else if ([type isEqualToString:@"scope"])
 	{
@@ -1773,7 +1684,7 @@ int logIndent = 0;
 		NSRange rf = [self trackScopeSelector:[command objectForKey:@"scope"] forward:YES fromLocation:[self caret]];
 		*rangePtr = NSUnionRange(rb, rf);
 		INFO(@"union range %@", NSStringFromRange(*rangePtr));
-		inputText = [[storage string] substringWithRange:*rangePtr];
+		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	}
 	else if ([type isEqualToString:@"none"])
 	{
@@ -1833,7 +1744,7 @@ int logIndent = 0;
 	// FIXME: TM_PROJECT_DIRECTORY
 	// FIXME: TM_SELECTED_FILES
 	// FIXME: TM_SELECTED_FILE
-	[self setenv:"TM_SELECTED_TEXT" value:[[storage string] substringWithRange:[self selectedRange]]];
+	[self setenv:"TM_SELECTED_TEXT" value:[[[self textStorage] string] substringWithRange:[self selectedRange]]];
 
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
 		setenv("TM_SOFT_TABS", "YES", 1);
@@ -1859,8 +1770,8 @@ int logIndent = 0;
 	[self setenv:"TM_INPUT_END_COLUMN" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
 	[self setenv:"TM_INPUT_START_LINE_INDEX" integer:[self columnAtLocation:inputRange.location]];
 	[self setenv:"TM_INPUT_END_LINE_INDEX" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
-	[self setenv:"TM_INPUT_START_LINE" integer:[self lineNumberAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_LINE" integer:[self lineNumberAtLocation:NSMaxRange(inputRange)]];
+	[self setenv:"TM_INPUT_START_LINE" integer:[[self textStorage] lineNumberAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_LINE" integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(inputRange)]];
 	
 	// FIXME: beforeRunningCommand
 	

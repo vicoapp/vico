@@ -451,7 +451,7 @@
 							  toPoint:NSMakePoint(NSMaxX(rect),NSMaxY(rect)-0.5)];
 	
     // no tab view == not connected
-    if(![bar tabView]){
+    if(![bar delegate]){
         NSRect labelRect = rect;
         labelRect.size.height -= 4.0;
         labelRect.origin.y += 4.0;

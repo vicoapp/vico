@@ -30,7 +30,6 @@
 - (void)setLastMouseDownEvent:(NSEvent *)event;
 
     // contents
-- (void)addTabViewItem:(NSTabViewItem *)item;
 - (void)removeTabForCell:(PSMTabBarCell *)cell;
 
     // draw
@@ -45,11 +44,13 @@
 - (void)windowDidMove:(NSNotification *)aNotification;
 - (void)windowStatusDidChange:(NSNotification *)notification;
 
+#if 0
     // NSTabView delegate
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)tabView;
+#endif
 
     // archiving
 - (void)encodeWithCoder:(NSCoder *)aCoder;
@@ -159,19 +160,21 @@
 
 - (void)awakeFromNib
 {
+#if 0
     // build cells from existing tab view items
     NSArray *existingItems = [tabView tabViewItems];
     NSEnumerator *e = [existingItems objectEnumerator];
     NSTabViewItem *item;
     while(item = [e nextObject]){
-        if(![[self representedTabViewItems] containsObject:item])
+        if(![[self representedDocuments] containsObject:item])
             [self addTabViewItem:item];
     }
-    
+#endif
+
     // resize
     [self setPostsFrameChangedNotifications:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(frameDidChange:) name:NSViewFrameDidChangeNotification object:self];
-    
+
     // window status
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowStatusDidChange:) name:NSWindowDidBecomeKeyNotification object:[self window]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowStatusDidChange:) name:NSWindowDidResignKeyNotification object:[self window]];
@@ -205,16 +208,6 @@
 - (void)setDelegate:(id)object
 {
     delegate = object;
-}
-
-- (NSTabView *)tabView
-{
-    return tabView;
-}
-
-- (void)setTabView:(NSTabView *)view
-{
-    tabView = view;
 }
 
 - (id<PSMTabStyle>)style
@@ -356,57 +349,50 @@
 
 #pragma mark -
 #pragma mark Functionality
-- (void)addTabViewItem:(NSTabViewItem *)item
+- (void)addDocument:(NSDocument *)aDocument
 {
     // create cell
     PSMTabBarCell *cell = [[PSMTabBarCell alloc] initWithControlView:self];
-    [cell setRepresentedObject:item];
+    [cell setRepresentedObject:aDocument];
     // bind the indicator to the represented object's status (if it exists)
     [[cell indicator] setHidden:YES];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(isProcessing)]){
-                NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
-                [bindingOptions setObject:NSNegateBooleanTransformerName forKey:@"NSValueTransformerName"];
-                [[cell indicator] bind:@"animate" toObject:[item identifier] withKeyPath:@"selection.isProcessing" options:nil];
-                [[cell indicator] bind:@"hidden" toObject:[item identifier] withKeyPath:@"selection.isProcessing" options:bindingOptions];
-                [[item identifier] addObserver:self forKeyPath:@"selection.isProcessing" options:0 context:nil];
-            } 
-        } 
+    if ([aDocument respondsToSelector:@selector(isProcessing)])
+    {
+	NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
+	[bindingOptions setObject:NSNegateBooleanTransformerName forKey:@"NSValueTransformerName"];
+	[[cell indicator] bind:@"animate" toObject:aDocument withKeyPath:@"selection.isProcessing" options:nil];
+	[[cell indicator] bind:@"hidden" toObject:aDocument withKeyPath:@"selection.isProcessing" options:bindingOptions];
+	[aDocument addObserver:self forKeyPath:@"selection.isProcessing" options:0 context:nil];
     } 
-    
+
     // bind for the existence of an icon
     [cell setHasIcon:NO];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(icon)]){
-                NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
-                [bindingOptions setObject:NSIsNotNilTransformerName forKey:@"NSValueTransformerName"];
-                [cell bind:@"hasIcon" toObject:[item identifier] withKeyPath:@"selection.icon" options:bindingOptions];
-                [[item identifier] addObserver:self forKeyPath:@"selection.icon" options:0 context:nil];
-            } 
-        } 
-    }
+    if ([aDocument respondsToSelector:@selector(icon)])
+    {
+	NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
+	[bindingOptions setObject:NSIsNotNilTransformerName forKey:@"NSValueTransformerName"];
+	[cell bind:@"hasIcon" toObject:aDocument withKeyPath:@"selection.icon" options:bindingOptions];
+	[aDocument addObserver:self forKeyPath:@"selection.icon" options:0 context:nil];
+    } 
     
     // bind for the existence of a counter
     [cell setCount:0];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(objectCount)]){
-                [cell bind:@"count" toObject:[item identifier] withKeyPath:@"selection.objectCount" options:nil];
-                [[item identifier] addObserver:self forKeyPath:@"selection.objectCount" options:0 context:nil];
-            } 
-        } 
-    }
+    if([aDocument respondsToSelector:@selector(objectCount)])
+    {
+	[cell bind:@"count" toObject:aDocument withKeyPath:@"selection.objectCount" options:nil];
+	[aDocument addObserver:self forKeyPath:@"selection.objectCount" options:0 context:nil];
+    } 
     
     // bind my string value to the label on the represented tab
-    [cell bind:@"title" toObject:item withKeyPath:@"label" options:nil];
-    
+    [cell bind:@"title" toObject:aDocument withKeyPath:@"displayName" options:nil];
+ 
     // add to collection
     [_cells addObject:cell];
+#if 0
     if([_cells count] == [tabView numberOfTabViewItems]){
         [self update]; // don't update unless all are accounted for!
     }
+#endif
 }
 
 - (void)removeTabForCell:(PSMTabBarCell *)cell
@@ -593,10 +579,12 @@
     // abandon hope, all ye who enter here :-)
     // this method handles all of the cell layout, and is called when something changes to require the refresh.  This method is not called during drag and drop; see the PSMTabDragAssistant's calculateDragAnimationForTabBar: method, which does layout in that case.
    
+#if 0
     // make sure all of our tabs are accounted for before updating
     if ([tabView numberOfTabViewItems] != [_cells count]) {
         return;
     }
+#endif
 
     // hide/show? (these return if already in desired state)
     if((_hideForSingleTab) && ([_cells count] <= 1)){
@@ -733,7 +721,8 @@
             [cell setEnabled:YES];
             
             // selected? set tab states...
-            if([[cell representedObject] isEqualTo:[tabView selectedTabViewItem]]){
+            if([[cell representedObject] isEqualTo:[[self delegate] selectedDocument]])
+            {
                 [cell setState:NSOnState];
                 tabState |= PSMTab_SelectedMask;
                 // previous cell
@@ -785,7 +774,7 @@
             [menuItem setRepresentedObject:[cell representedObject]];
             [cell setIsInOverflowMenu:YES];
             [[cell indicator] removeFromSuperview];
-            if ([[cell representedObject] isEqualTo:[tabView selectedTabViewItem]])
+            if ([[cell representedObject] isEqualTo:[[self delegate] selectedDocument]])
                 [menuItem setState:NSOnState];
             if([cell hasIcon])
                 [menuItem setImage:[[[[cell representedObject] identifier] content] icon]];
@@ -991,37 +980,33 @@
 
 - (void)overflowMenuAction:(id)sender
 {
-    [tabView selectTabViewItem:[sender representedObject]];
+    [[self delegate] selectDocument:[sender representedObject]];
     [self update];
 }
 
 - (void)closeTabClick:(id)sender
 {
-    if(([_cells count] == 1) && (![self canCloseOnlyTab]))
+    if ([_cells count] == 1 && ![self canCloseOnlyTab])
         return;
     
-    if(([self delegate]) && ([[self delegate] respondsToSelector:@selector(tabView:shouldCloseTabViewItem:)])){
-        if(![[self delegate] tabView:tabView shouldCloseTabViewItem:[sender representedObject]]){
+#if 0
+    if ([[self delegate] respondsToSelector:@selector(shouldCloseDocument:)])
+    {
+        if (![[self delegate] shouldCloseDocument:[sender representedObject]])
+        {
             // fix mouse downed close button
             [sender setCloseButtonPressed:NO];
             return;
         }
     }
-    
-    if(([self delegate]) && ([[self delegate] respondsToSelector:@selector(tabView:willCloseTabViewItem:)])){
-        [[self delegate] tabView:tabView willCloseTabViewItem:[sender representedObject]];
-    }
-    
-    [tabView removeTabViewItem:[sender representedObject]];
-    
-    if(([self delegate]) && ([[self delegate] respondsToSelector:@selector(tabView:didCloseTabViewItem:)])){
-        [[self delegate] tabView:tabView didCloseTabViewItem:[sender representedObject]];
-    }
+#endif
+
+    [[self delegate] closeDocument:[sender representedObject]];
 }
 
 - (void)tabClick:(id)sender
 {
-    [tabView selectTabViewItem:[sender representedObject]];
+    [[self delegate] selectDocument:[sender representedObject]];
     [self update];
 }
 
@@ -1105,41 +1090,17 @@
 #pragma mark -
 #pragma mark NSTabView Delegate
 
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+//- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+- (void)didSelectDocument:(NSDocument *)aDocument
 {
     // here's a weird one - this message is sent before the "tabViewDidChangeNumberOfTabViewItems"
     // message, thus I can end up updating when there are no cells, if no tabs were (yet) present
     if([_cells count] > 0){
         [self update];
     }
-    if([self delegate]){
-        if([[self delegate] respondsToSelector:@selector(tabView:didSelectTabViewItem:)]){
-            [[self delegate] performSelector:@selector(tabView:didSelectTabViewItem:) withObject:aTabView withObject:tabViewItem];
-        }
-    }
 }
     
-- (BOOL)tabView:(NSTabView *)aTabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-    if([self delegate]){
-        if([[self delegate] respondsToSelector:@selector(tabView:shouldSelectTabViewItem:)]){
-            return (int)[[self delegate] performSelector:@selector(tabView:shouldSelectTabViewItem:) withObject:aTabView withObject:tabViewItem];
-        } else {
-            return YES;
-        }
-    } else {
-        return YES;
-    }
-}
-- (void)tabView:(NSTabView *)aTabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-    if([self delegate]){
-        if([[self delegate] respondsToSelector:@selector(tabView:willSelectTabViewItem:)]){
-            [[self delegate] performSelector:@selector(tabView:willSelectTabViewItem:) withObject:aTabView withObject:tabViewItem];
-        }
-    }
-}
-
+#if 0
 - (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)aTabView
 {
     NSArray *tabItems = [tabView tabViewItems];
@@ -1153,7 +1114,7 @@
     }
     
     // go through tab view items, add cell for any not present
-    NSMutableArray *cellItems = [self representedTabViewItems];
+    NSMutableArray *cellItems = [self representedDocuments];
     NSEnumerator *ex = [tabItems objectEnumerator];
     NSTabViewItem *item;
     while(item = [ex nextObject]){
@@ -1169,6 +1130,7 @@
         }
     }
 }
+#endif
 
 #pragma mark -
 #pragma mark Archiving
@@ -1178,7 +1140,7 @@
     [super encodeWithCoder:aCoder];
     if ([aCoder allowsKeyedCoding]) {
         [aCoder encodeObject:_cells forKey:@"PSMcells"];
-        [aCoder encodeObject:tabView forKey:@"PSMtabView"];
+        // [aCoder encodeObject:tabView forKey:@"PSMtabView"];
         [aCoder encodeObject:_overflowPopUpButton forKey:@"PSMoverflowPopUpButton"];
         [aCoder encodeObject:_addTabButton forKey:@"PSMaddTabButton"];
         [aCoder encodeObject:style forKey:@"PSMstyle"];
@@ -1206,7 +1168,7 @@
     if (self) {
         if ([aDecoder allowsKeyedCoding]) {
             _cells = [aDecoder decodeObjectForKey:@"PSMcells"];
-            tabView = [aDecoder decodeObjectForKey:@"PSMtabView"];
+            // tabView = [aDecoder decodeObjectForKey:@"PSMtabView"];
             _overflowPopUpButton = [aDecoder decodeObjectForKey:@"PSMoverflowPopUpButton"];
             _addTabButton = [aDecoder decodeObjectForKey:@"PSMaddTabButton"];
             style = [aDecoder decodeObjectForKey:@"PSMstyle"];
@@ -1252,7 +1214,7 @@
 #pragma mark -
 #pragma mark Convenience
 
-- (NSMutableArray *)representedTabViewItems
+- (NSMutableArray *)representedDocuments
 {
     NSMutableArray *temp = [NSMutableArray arrayWithCapacity:[_cells count]];
     NSEnumerator *e = [_cells objectEnumerator];

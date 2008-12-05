@@ -1,4 +1,6 @@
 #import "ViTextView.h"
+#import "ViThemeStore.h"
+#import "ViDocument.h"
 
 @implementation ViTextView (cursor)
 
@@ -10,9 +12,9 @@
 		{
 			caretRect.size.width = 2;
 		}
-		else if (caret < [storage length])
+		else if (caret < [[self textStorage] length])
 		{
-			unichar c = [[storage string] characterAtIndex:caret];
+			unichar c = [[[self textStorage] string] characterAtIndex:caret];
 			if (c == '\t')
 			{
 				// place cursor at end of tab, like vi does
@@ -21,7 +23,7 @@
 			if (c == '\t' || c == '\n')
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
-		[[theme caretColor] set];
+		[[[[ViThemeStore defaultStore] defaultTheme] caretColor] set];
 		[[NSBezierPath bezierPathWithRect:caretRect] fill];
 	}
 }
@@ -42,6 +44,7 @@
 - (BOOL)becomeFirstResponder
 {
 	[self setNeedsDisplayInRect:oldCaretRect];
+	[[self delegate] setMostRecentDocumentView:documentView];
 	return [super becomeFirstResponder];
 }
 

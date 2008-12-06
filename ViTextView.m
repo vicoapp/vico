@@ -183,14 +183,19 @@ int logIndent = 0;
 	if ([aString length] == 0)
 		return;
 
+	NSRange range = NSMakeRange(aLocation, [aString length]);
+
+	if ([[self delegate] textView:self shouldChangeTextInRange:range replacementString:aString] == NO)
+		return;
+
 	if (undoGroup)
 		[self beginUndoGroup];
 	[[[self textStorage] mutableString] insertString:aString atIndex:aLocation];
-	[self recordInsertInRange:NSMakeRange(aLocation, [aString length])];
+	[self recordInsertInRange:range];
 
 	if (activeSnippet)
 	{
-		if ([activeSnippet activeInRange:NSMakeRange(aLocation, [aString length])])
+		if ([activeSnippet activeInRange:range])
 		{
 			INFO(@"found snippet %@ at %u", activeSnippet, aLocation - 1);
 			if ([activeSnippet insertString:aString atLocation:aLocation] == NO)
@@ -215,6 +220,9 @@ int logIndent = 0;
 - (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
 {
 	if (aRange.length == 0)
+		return;
+
+	if ([[self delegate] textView:self shouldChangeTextInRange:aRange replacementString:nil] == NO)
 		return;
 
 	if (undoGroup)

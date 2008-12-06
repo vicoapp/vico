@@ -288,6 +288,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	int n = 0;
 	NSInteger i = 0;
 
+        /* Count number of affected lines.
+         */
         while (i < [aString length])
         {
 		NSUInteger eol, end;
@@ -316,15 +318,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	INFO(@"range = %@, replacement = [%@]", NSStringFromRange(affectedCharRange), replacementString);
-	if (affectedCharRange.length == 0)
+	if ([replacementString length] > 0)
 	{
-		[self pushContinuationsFromLocation:affectedCharRange.location string:replacementString forward:YES];
-	}
-	else if ([replacementString length] == 0)
-	{
+		DEBUG(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
-		                             string:[[textStorage string] substringWithRange:affectedCharRange]
+		                             string:replacementString
+		                            forward:YES];
+	}
+	else
+	{
+		NSString *deletedString = [[textStorage string] substringWithRange:affectedCharRange];
+		DEBUG(@"pulling string [%@] from %u", deletedString, affectedCharRange.location);
+		[self pushContinuationsFromLocation:affectedCharRange.location
+		                             string:deletedString
 		                            forward:NO];
 	}
 
@@ -340,7 +346,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	NSRange area = [textStorage editedRange];
-	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
+	DEBUG(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 

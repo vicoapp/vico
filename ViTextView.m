@@ -10,7 +10,6 @@
 #import "NSArray-patterns.h"
 #import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
-#import "ViSymbolTransform.h"
 #import "ViCommandOutputController.h"
 #import "ViDocumentView.h"
 #import "NSTextStorage-additions.h"
@@ -27,7 +26,6 @@ int logIndent = 0;
 - (void)recordDeleteOfRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
-- (void)setSymbolScopes;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 @end
 
@@ -94,8 +92,6 @@ int logIndent = 0;
 	// [[self layoutManager] setShowsInvisibleCharacters:YES];
 	[[self layoutManager] setShowsControlCharacters:YES];
 
-	[self setSymbolScopes];
-
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
 
@@ -105,18 +101,6 @@ int logIndent = 0;
 	[[self textStorage] addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [[self textStorage] length])];
 	[self setCaret:0];
 	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
-}
-
-- (void)setSymbolScopes
-{
-	symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
-	NSString *selector;
-	symbolScopes = [[NSMutableArray alloc] init];
-	for (selector in symbolSettings)
-	{
-		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
-			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
-	}
 }
 
 #pragma mark -
@@ -1570,82 +1554,6 @@ int logIndent = 0;
 - (void)switch_file:(NSString *)character
 {
         [[[self delegate] windowController] switchToLastFile];
-}
-
-#pragma mark -
-#pragma mark Symbol list
-
-- (void)updateSymbolList:(NSTimer *)timer
-{
-	NSArray *lastSelector = nil;
-	NSRange wholeRange;
-
-#if 0
-	struct timeval start;
-	struct timeval stop;
-	struct timeval diff;
-	gettimeofday(&start, NULL);
-#endif
-
-	NSMutableArray *symbols = [[NSMutableArray alloc] init];
-
-	NSUInteger i, length = [[self textStorage] length];
-	for (i = 0; i < length;)
-	{
-		NSRange range;
-		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-					                  atCharacterIndex:i
-						            effectiveRange:&range];
-	
-		if (scopes == nil)
-		{
-			break;
-		}
-
-		if ([lastSelector matchesScopes:scopes])
-		{
-			wholeRange.length += range.length;
-		}
-		else
-		{
-			if (lastSelector)
-			{
-				NSString *symbol = [[[self textStorage] string] substringWithRange:wholeRange];
-				NSDictionary *d = [symbolSettings objectForKey:[lastSelector componentsJoinedByString:@" "]];
-				NSString *transform = [d objectForKey:@"symbolTransformation"];
-				if (transform)
-				{
-					ViSymbolTransform *tr = [[ViSymbolTransform alloc] initWithTransformationString:transform];
-					symbol = [tr transformSymbol:symbol];
-				}
-
-				[symbols addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange]];
-			}
-			lastSelector = nil;
-
-			NSArray *descendants;
-			for (descendants in symbolScopes)
-			{
-				if ([descendants matchesScopes:scopes])
-				{
-					lastSelector = descendants;
-					wholeRange = range;
-					break;
-				}
-			}
-		}
-		
-		i += range.length;
-	}
-
-	[[self delegate] setSymbols:symbols];
-
-#if 0
-	gettimeofday(&stop, NULL);
-	timersub(&stop, &start, &diff);
-	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
-#endif
 }
 
 #pragma mark -

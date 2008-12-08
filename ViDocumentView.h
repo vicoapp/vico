@@ -6,7 +6,6 @@
 {
 	IBOutlet NSView *view;
 	IBOutlet ViTextView *textView;
-	NSTimer *updateSymbolsTimer;
 	ViDocument *document;
 }
 

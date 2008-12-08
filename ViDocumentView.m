@@ -43,7 +43,7 @@
 	
 		DEBUG(@"[%@] (%p) range %@", [scopes componentsJoinedByString:@" "], scopes, NSStringFromRange(range));
 	
-		[[textView layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
+		// [[textView layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
 	
 		// Get the theme attributes for this collection of scopes.
 		NSDictionary *attributes = [theme attributesForScopes:scopes];
@@ -57,15 +57,6 @@
 	INFO(@"applied %u scopes in range %@ => %.3f s",
 		[[context scopes] count], NSStringFromRange([context range]), (float)ms / 1000.0);
 #endif
-
-	[updateSymbolsTimer invalidate];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
-						      interval:0
-							target:textView
-						      selector:@selector(updateSymbolList:)
-						      userInfo:nil
-						       repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 }
 
 - (void)reapplyTheme

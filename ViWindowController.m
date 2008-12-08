@@ -131,8 +131,11 @@ static NSWindowController	*currentWindowController = nil;
 	if ([keyPath isEqualToString:@"symbols"])
 	{
 		[self filterSymbols:symbolFilterField];
-		if ([self currentDocument] == object)
-			[symbolsOutline expandItem:object];
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
+		{
+			[symbolsOutline collapseItem:nil collapseChildren:YES];
+			[symbolsOutline expandItem:[self currentDocument]];
+		}
 	}
 }
 
@@ -250,8 +253,6 @@ static NSWindowController	*currentWindowController = nil;
 {
 	INFO(@"close document %@", document);
 	[document removeObserver:self forKeyPath:@"symbols"];
-	[documents removeObject:document];
-	[self filterSymbols:symbolFilterField];
 
 	while ([document visibleViews] > 0)
 		[self collapseDocumentView:[[document views] objectAtIndex:0]];
@@ -308,6 +309,9 @@ static NSWindowController	*currentWindowController = nil;
 			// no visible view found, make one
 			[self selectDocument:[documents objectAtIndex:0]];
 		}
+
+		[documents removeObject:document];
+		[self filterSymbols:symbolFilterField];
 	}
 }
 

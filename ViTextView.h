@@ -59,10 +59,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSMutableDictionary *marks; // XXX: move to document
 	ViSnippet *activeSnippet; // XXX: move to document ?
 
-	// symbol list
-	NSDictionary *symbolSettings;
-	NSMutableArray *symbolScopes;
-
 	CGFloat pageGuideX;
 
 	BOOL hasUndoGroup;
@@ -125,8 +121,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
-
-- (void)updateSymbolList:(NSTimer *)timer;
 @end
 
 @interface ViTextView (snippets)

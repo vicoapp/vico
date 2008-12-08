@@ -27,7 +27,11 @@
 	BOOL ignoreEditing;
 	ViSyntaxParser *syntaxParser;
 	ViSyntaxContext *nextContext;
-	ViSyntaxContext *lastContext;
+
+	// symbol list
+	NSDictionary *symbolSettings;
+	NSMutableArray *symbolScopes;
+	NSTimer *updateSymbolsTimer;
 }
 
 @property(readonly) NSArray *views;

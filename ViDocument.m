@@ -3,6 +3,9 @@
 #import "ExTextView.h"
 #import "ViLanguageStore.h"
 #import "NSTextStorage-additions.h"
+#import "NSArray-patterns.h"
+#import "ViScope.h"
+#import "ViSymbolTransform.h"
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
@@ -12,6 +15,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
 - (ViWindowController *)windowController;
+- (void)setSymbolScopes;
 @end
 
 @implementation ViDocument
@@ -181,7 +185,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		[dv applySyntaxResult:context];
 	}
-	lastContext = context;
+
+	[updateSymbolsTimer invalidate];
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
+						      interval:0
+							target:self
+						      selector:@selector(updateSymbolList:)
+						      userInfo:nil
+						       repeats:NO];
+	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 }
 
 - (void)highlightEverything
@@ -295,6 +307,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		language = newLanguage;
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
+		[self setSymbolScopes];
 		[self highlightEverything];
 	}
 }
@@ -329,6 +342,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		language = newLanguage;
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
+		[self setSymbolScopes];
 		[self highlightEverything];
 	}
 }
@@ -590,6 +604,86 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self setFilteredSymbols:fs];
 	return [fs count];
 }
+
+- (void)setSymbolScopes
+{
+	symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
+	NSString *selector;
+	symbolScopes = [[NSMutableArray alloc] init];
+	for (selector in symbolSettings)
+	{
+		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
+			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
+	}
+}
+
+- (void)updateSymbolList:(NSTimer *)timer
+{
+	NSArray *lastSelector = nil;
+	NSRange wholeRange;
+
+#if 0
+	struct timeval start;
+	struct timeval stop;
+	struct timeval diff;
+	gettimeofday(&start, NULL);
+#endif
+
+	NSMutableArray *syms = [[NSMutableArray alloc] init];
+
+	MHSysTree *scopeTree = [syntaxParser wholeScopeTree];
+	struct rb_entry *e;
+	for (e = [scopeTree first]; e; e = [scopeTree next:e])
+	{
+		ViScope *s = e->obj;
+		NSArray *scopes = s.scopes;
+		NSRange range = s.range;
+
+		if ([lastSelector matchesScopes:scopes])
+		{
+			wholeRange.length += range.length;
+		}
+		else
+		{
+			if (lastSelector)
+			{
+				NSString *symbol = [[textStorage string] substringWithRange:wholeRange];
+				NSDictionary *d = [symbolSettings objectForKey:[lastSelector componentsJoinedByString:@" "]];
+				NSString *transform = [d objectForKey:@"symbolTransformation"];
+				if (transform)
+				{
+					ViSymbolTransform *tr = [[ViSymbolTransform alloc] initWithTransformationString:transform];
+					symbol = [tr transformSymbol:symbol];
+				}
+
+				[syms addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange]];
+			}
+			lastSelector = nil;
+
+			NSArray *descendants;
+			for (descendants in symbolScopes)
+			{
+				if ([descendants matchesScopes:scopes])
+				{
+					lastSelector = descendants;
+					wholeRange = range;
+					break;
+				}
+			}
+		}
+	}
+
+	[self setSymbols:syms];
+
+#if 0
+	gettimeofday(&stop, NULL);
+	timersub(&stop, &start, &diff);
+	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
+#endif
+}
+
+#pragma mark -
 
 - (NSString *)description
 {

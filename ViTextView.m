@@ -1455,6 +1455,7 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
+	INFO(@"setting theme");
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[self setDrawsBackground:YES];
 	[self setInsertionPointColor:[aTheme caretColor]];

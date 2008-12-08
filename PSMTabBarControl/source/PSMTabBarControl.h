@@ -117,6 +117,7 @@ enum {
 
 // content
 - (void)addDocument:(NSDocument *)aDocument;
+- (void)removeDocument:(NSDocument *)aDocument;
 - (void)didSelectDocument:(NSDocument *)aDocument;
 @end
 

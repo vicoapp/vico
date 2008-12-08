@@ -395,6 +395,18 @@
 #endif
 }
 
+- (void)removeDocument:(NSDocument *)aDocument
+{
+    // go through cells, remove any whose representedObjects are not in [tabView tabViewItems]
+    PSMTabBarCell *cell;
+    for(cell in [_cells copy])
+    {
+        if([cell representedObject] == aDocument){
+            [self removeTabForCell:cell];
+        }
+    }
+}
+
 - (void)removeTabForCell:(PSMTabBarCell *)cell
 {
     // unbind

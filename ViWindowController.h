@@ -18,6 +18,7 @@
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	ViDocument *lastDocument;
+	ViDocumentView *lastDocumentView;
 	ViDocument *selectedDocument;
 
 	ViDocument *mostRecentDocument;
@@ -49,11 +50,11 @@
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView;
 - (void)selectDocument:(ViDocument *)aDocument;
-
-- (IBAction)saveProject:(id)sender;
+- (void)closeDocumentViews:(ViDocument *)aDocument;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
-- (void)selectDocument:(ViDocument *)document;
+
+- (IBAction)saveProject:(id)sender;
 
 - (ViTagStack *)sharedTagStack;
 
@@ -65,7 +66,6 @@
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
-
 - (IBAction)splitViewHorizontally:(id)sender;
 
 - (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector;

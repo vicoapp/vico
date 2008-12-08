@@ -6,6 +6,17 @@
 
 @synthesize view;
 @synthesize textView;
+@synthesize document;
+
+- (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
+{
+	self = [super init];
+	if (self)
+	{
+		document = aDocument;
+	}
+	return self;
+}
 
 /* Always executed on the main thread.
  */

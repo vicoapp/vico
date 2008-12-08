@@ -18,6 +18,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @synthesize symbols;
 @synthesize filteredSymbols;
+@synthesize views;
+@synthesize visibleViews;
 
 - (id)init
 {
@@ -47,20 +49,34 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[self addWindowController:windowController];
 	[windowController addNewTab:self];
+	[self configureSyntax];
+}
+
+- (void)removeView:(ViDocumentView *)aDocumentView
+{
+	// Keep the first view.
+	// if ([views objectAtIndex:0] != aDocumentView)
+	if ([views count] > 1)
+		[views removeObject:aDocumentView];
+	--visibleViews;
+	INFO(@"now %i views (%i) for document %@", visibleViews, [views count], self);
 }
 
 - (ViDocumentView *)makeView
 {
-	/*
-	if ([views count] > 0)
+	++visibleViews;
+	INFO(@"now %i views (%i) for document %@", visibleViews, [views count], self);
+	if (visibleViews == 1 && [views count] > 0)
+	{
+		INFO(@"returning saved view %@", [[views objectAtIndex:0] view]);
 		return [views objectAtIndex:0];
-	*/
+	}
 
-	ViDocumentView *documentView = [[ViDocumentView alloc] init];
+	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	ViTextView *textView = [documentView textView];
 	[views addObject:documentView];
-	INFO(@"now %u views", [views count]);
+	INFO(@"creating new view %@", [documentView view]);
 
 	if ([views count] == 1)
 	{
@@ -75,9 +91,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[textView layoutManager] replaceTextStorage:textStorage];
 	}
 	[textStorage setDelegate:self];
+	ignoreEditing = YES;
 	[textView initEditorWithDelegate:self documentView:documentView];
 
-	[self configureSyntax];
+	[documentView applySyntaxResult:lastContext];
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
 	return documentView;
@@ -124,6 +141,32 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (textStorage)
 		[self configureSyntax];
 }
+
+- (ViWindowController *)windowController
+{
+	return [[self windowControllers] objectAtIndex:0];
+}
+
+- (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
+{
+	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
+}
+
+- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
+{
+	if (shouldClose)
+	{
+		INFO(@"closing document %@", self);
+		[windowController closeDocumentViews:self];
+
+		/* Remove the window controller so the document doesn't automatically
+		 * close the window.
+		 */
+		[self removeWindowController:windowController];
+		[self close];
+	}
+}
+
 #pragma mark -
 #pragma mark Syntax parsing
 
@@ -134,6 +177,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		[dv applySyntaxResult:context];
 	}
+	lastContext = context;
 }
 
 - (void)highlightEverything
@@ -196,7 +240,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 
 	unsigned line = [textStorage lineNumberAtLocation:aRange.location];
-	DEBUG(@"dispatching from line %u", line);
+	INFO(@"dispatching from line %u", line);
 	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithLine:line];
 	ctx.range = aRange;
 	ctx.restarting = flag;
@@ -222,6 +266,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	context.range = NSMakeRange(startLocation, endLocation - startLocation);
 	DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
 	[self performContext:context];
+}
+
+- (IBAction)setLanguage:(id)sender
+{
+	INFO(@"sender = %@, title = %@", sender, [sender title]);
+
+	[self setLanguageFromString:[sender title]];
+	if (language && [self fileURL])
+	{
+		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
+			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
+		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
+		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
+	}
 }
 
 - (void)setLanguageFromString:(NSString *)aLanguage
@@ -346,7 +404,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	NSRange area = [textStorage editedRange];
-	DEBUG(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
+	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 
@@ -498,49 +556,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 }
 
 #pragma mark -
-
-- (ViWindowController *)windowController
-{
-	return [[self windowControllers] objectAtIndex:0];
-}
-
-- (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
-{
-	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
-}
-
-- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
-{
-	if (shouldClose)
-	{
-		INFO(@"closing document");
-		// [windowController closeDocument:self];
-		[self close];
-#if 0
-		if ([windowController numberOfTabViewItems] == 0)
-		{
-			/* Close the window after all tabs are gone. */
-			[[windowController window] performClose:self];
-		}
-#endif
-	}
-}
-
-- (IBAction)setLanguage:(id)sender
-{
-	INFO(@"sender = %@, title = %@", sender, [sender title]);
-
-	[self setLanguageFromString:[sender title]];
-	if (language && [self fileURL])
-	{
-		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
-			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
-		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
-		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
-	}
-}
-
-#pragma mark -
 #pragma mark Symbol List
 
 - (void)goToSymbol:(ViSymbol *)aSymbol
@@ -570,7 +585,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"ViDocument: %@", [self displayName]];
+	return [NSString stringWithFormat:@"ViDocument %p: %@", self, [self displayName]];
 }
 
 - (void)setMostRecentDocumentView:(ViDocumentView *)docView

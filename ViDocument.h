@@ -8,6 +8,7 @@
 @interface ViDocument : NSDocument
 {
 	NSMutableArray *views;
+	int visibleViews;
 
 	ViBundle *bundle;
 	ViLanguage *language;
@@ -26,8 +27,11 @@
 	BOOL ignoreEditing;
 	ViSyntaxParser *syntaxParser;
 	ViSyntaxContext *nextContext;
+	ViSyntaxContext *lastContext;
 }
 
+@property(readonly) NSArray *views;
+@property(readonly) int visibleViews;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
 
@@ -54,6 +58,7 @@
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (void)setMostRecentDocumentView:(ViDocumentView *)docView;
 - (ViDocumentView *)makeView;
+- (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 
 @end

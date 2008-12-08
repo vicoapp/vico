@@ -54,6 +54,9 @@
 	unsigned lineno = range.location;
 	int n = range.length;
 
+	if (lineno >= [continuations count])
+		return;
+
 	NSArray *prev;
 	if (lineno == 0)
 		prev = [NSArray array];
@@ -62,7 +65,7 @@
 
 	DEBUG(@"pushing %i continuations after line %i, copying scopes %@", n, lineno, prev);
 
-	while (n--)
+	while (n-- && lineno < [continuations count])
 	{
 		[continuations insertObject:[prev copy] atIndex:lineno];
 	}
@@ -76,7 +79,7 @@
 
 	DEBUG(@"pulling %i continuations at line %i", n, lineno);
 
-	while (n--)
+	while (n-- && lineno < [continuations count])
 	{
 		[continuations removeObjectAtIndex:lineno];
 	}

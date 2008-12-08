@@ -28,7 +28,10 @@ int logIndent = 0;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (void)setSymbolScopes;
+- (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 @end
+
+#pragma mark -
 
 @implementation ViTextView
 
@@ -824,22 +827,30 @@ int logIndent = 0;
 }
 
 #pragma mark -
+#pragma mark Caret and selection handling
 
-- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+- (void)scrollToCaret
 {
-	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
-		return NO;
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+        NSRect visibleRect = [clipView bounds];
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
 
-	if ([theEvent type] == NSKeyUp)
+	NSPoint topPoint;
+	if (NSMinY(rect) < NSMinY(visibleRect))
 	{
-		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
-		      [theEvent charactersIgnoringModifiers],
-		      [[theEvent characters] characterAtIndex:0],
-		      [theEvent modifierFlags]);
-		return YES;
+		topPoint = NSMakePoint(0, NSMinY(rect));
 	}
+	else if (NSMaxY(rect) > NSMaxY(visibleRect))
+	{
+		topPoint = NSMakePoint(0, NSMaxY(rect) - NSHeight(visibleRect));
+	}
+	else
+		return;
 
-	return [super performKeyEquivalent:theEvent];
+	[clipView scrollToPoint:topPoint];
+	[scrollView reflectScrolledClipView:clipView];
 }
 
 - (void)updateCaret
@@ -869,10 +880,36 @@ int logIndent = 0;
 	return caret;
 }
 
+- (void)setVisualSelection
+{
+	NSUInteger l1 = visual_start_location, l2 = [self caret];
+	if (l2 < l1)
+	{	/* swap if end < start */
+		l2 = l1;
+		l1 = end_location;
+	}
+
+	if (visual_line_mode)
+	{
+		NSUInteger bol, end;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+		l1 = bol;
+		l2 = end;
+	}
+	else
+		l2++;
+
+	NSRange sel = NSMakeRange(l1, l2 - l1);
+	[self setSelectedRange:sel];
+}
+
+#pragma mark -
+
 - (void)setNormalMode
 {
 	mode = ViNormalMode;
-	[self setSelectedRange:NSMakeRange(caret, 0)];
+	// [self setSelectedRange:NSMakeRange(caret, 0)];
 }
 
 - (void)setVisualMode
@@ -897,6 +934,208 @@ int logIndent = 0;
 		}
 		replayingInput = NO;
 	}
+}
+
+/* FIXME: these are nothing but UGLY!!!
+ * Use invocations instead, if it can't be done immediately.
+ */
+- (void)addTemporaryAttribute:(NSDictionary *)what
+{
+        [[self layoutManager] addTemporaryAttribute:[what objectForKey:@"attributeName"]
+                                              value:[what objectForKey:@"value"]
+                                  forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
+}
+
+- (void)removeTemporaryAttribute:(NSDictionary *)what
+{
+        [[self layoutManager] removeTemporaryAttribute:[what objectForKey:@"attributeName"]
+                                     forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
+}
+
+#pragma mark -
+#pragma mark Input handling and command evaluation
+
+/* Input a character from the user (in insert mode). Handle smart typing pairs.
+ * FIXME: assumes smart typing pairs are single characters.
+ * FIXME: need special handling if inside a snippet.
+ */
+- (void)inputCharacters:(NSString *)characters
+{
+	// If there is a non-zero length selection, remove it first.
+	NSRange sel = [self selectedRange];
+	if (sel.length > 0)
+	{
+		[self deleteRange:sel];
+	}
+
+	BOOL foundSmartTypingPair = NO;
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
+	NSArray *pair;
+	for (pair in smartTypingPairs)
+	{
+		// check if we're inserting the end character of a smart typing pair
+		// if so, just overwrite the end character
+		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
+		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
+		{
+			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+						    atCharacterIndex:start_location
+						      effectiveRange:NULL])
+			{
+				foundSmartTypingPair = YES;
+				[self setCaret:start_location + 1];
+			}
+			break;
+		}
+		// check for the start character of a smart typing pair
+		else if ([[pair objectAtIndex:0] isEqualToString:characters])
+		{
+			// don't use it if next character is alphanumeric
+			if (start_location + 1 >= [[self textStorage] length] ||
+			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[[self textStorage] string] characterAtIndex:start_location]])
+			{
+				foundSmartTypingPair = YES;
+				[self insertString:[NSString stringWithFormat:@"%@%@",
+					[pair objectAtIndex:0],
+					[pair objectAtIndex:1]] atLocation:start_location];
+				
+				// INFO(@"adding smart pair attr to %u + 2", start_location);
+				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
+				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+					ViSmartPairAttributeName, @"attributeName",
+					characters, @"value",
+					[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
+					nil] afterDelay:0];
+
+				[self setCaret:start_location + 1];
+				break;
+			}
+		}
+	}
+	
+	if (!foundSmartTypingPair)
+	{
+		[self insertString:characters atLocation:start_location];
+		[self setCaret:start_location + [characters length]];
+	}
+
+#if 0
+	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
+	{
+                int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
+		insert_start_location += n;
+		insert_end_location += n;
+	}
+	else if ([self shouldNotIndentLineAtLocation:insert_end_location])
+	{
+                int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
+		insert_start_location += n;
+		insert_end_location += n;
+	}
+#endif
+}
+
+- (void)input_newline:(NSString *)characters
+{
+	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+	[self setCaret:start_location + num_chars];
+}
+
+- (void)input_tab:(NSString *)characters
+{
+        // check if we're inside a snippet
+        if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)])
+	{
+		[self handleSnippetTab:activeSnippet atLocation:start_location];
+		return;
+	}
+
+        // check for a new snippet
+        if (start_location > 0)
+        {
+                // is there a word before the cursor that we just typed?
+                NSString *word = [self wordAtLocation:start_location - 1];
+                if ([word length] > 0)
+                {
+                        NSArray *scopes = [self scopesAtLocation:start_location];
+                        if (scopes)
+                        {
+                                NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
+                                if (snippetString)
+                                {
+                                        [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
+                                        activeSnippet = [self insertSnippet:snippetString atLocation:start_location - [word length]];
+                                        return;
+                                }
+                        }
+                }
+        }
+        
+	// otherwise just insert a tab
+	[self insertString:@"\t" atLocation:start_location];
+	[self setCaret:start_location + 1];
+}
+
+- (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
+	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
+
+	if (bestMatchingScope)
+	{
+		DEBUG(@"found smart typing pair scope selector [%@] at location %i", bestMatchingScope, aLocation);
+		return [smartTypingPairs objectForKey:bestMatchingScope];
+	}
+
+	return nil;
+}
+
+- (void)input_backspace:(NSString *)characters
+{
+	/* check if we're deleting the first character in a smart pair */
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
+	NSArray *pair;
+	for (pair in smartTypingPairs)
+	{
+		if([[pair objectAtIndex:0] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
+		   start_location + 1 < [[self textStorage] length] &&
+		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
+		{
+			[self deleteRange:NSMakeRange(start_location - 1, 2)];
+			[self setCaret:start_location - 1];
+			return;
+		}
+	}
+
+	/* else a regular character, just delete it */
+	[self deleteRange:NSMakeRange(start_location - 1, 1)];
+	[self setCaret:start_location - 1];
+}
+
+- (void)input_forward_delete:(NSString *)characters
+{
+	/* FIXME: should handle smart typing pairs here!
+	 */
+	[self deleteRange:NSMakeRange(start_location, 1)];
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	INFO(@"is this called at all?");
+
+	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
+		return NO;
+
+	if ([theEvent type] == NSKeyUp)
+	{
+		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
+		      [theEvent charactersIgnoringModifiers],
+		      [[theEvent characters] characterAtIndex:0],
+		      [theEvent modifierFlags]);
+		return YES;
+	}
+
+	return [super performKeyEquivalent:theEvent];
 }
 
 - (void)evaluateCommand:(ViCommand *)command
@@ -992,234 +1231,6 @@ int logIndent = 0;
 
 	if (resetVisualMode)
 		[self setNormalMode];
-}
-
-- (void)input_newline:(NSString *)characters
-{
-	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
-	[self setCaret:start_location + num_chars];
-}
-
-- (void)input_tab:(NSString *)characters
-{
-        // check if we're inside a snippet
-        if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)])
-	{
-		[self handleSnippetTab:activeSnippet atLocation:start_location];
-		return;
-	}
-
-        // check for a new snippet
-        if (start_location > 0)
-        {
-                // is there a word before the cursor that we just typed?
-                NSString *word = [self wordAtLocation:start_location - 1];
-                if ([word length] > 0)
-                {
-                        NSArray *scopes = [self scopesAtLocation:start_location];
-                        if (scopes)
-                        {
-                                NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
-                                if (snippetString)
-                                {
-                                        [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
-                                        activeSnippet = [self insertSnippet:snippetString atLocation:start_location - [word length]];
-                                        return;
-                                }
-                        }
-                }
-        }
-        
-	// otherwise just insert a tab
-	[self insertString:@"\t" atLocation:start_location];
-	[self setCaret:start_location + 1];
-}
-
-- (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
-{
-	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
-
-	if (bestMatchingScope)
-	{
-		DEBUG(@"found smart typing pair scope selector [%@] at location %i", bestMatchingScope, aLocation);
-		return [smartTypingPairs objectForKey:bestMatchingScope];
-	}
-
-	return nil;
-}
-
-- (void)input_backspace:(NSString *)characters
-{
-	/* check if we're deleting the first character in a smart pair */
-	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
-	NSArray *pair;
-	for (pair in smartTypingPairs)
-	{
-		if([[pair objectAtIndex:0] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
-		   start_location + 1 < [[self textStorage] length] &&
-		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
-		{
-			[self deleteRange:NSMakeRange(start_location - 1, 2)];
-			[self setCaret:start_location - 1];
-			return;
-		}
-	}
-
-	/* else a regular character, just delete it */
-	[self deleteRange:NSMakeRange(start_location - 1, 1)];
-	[self setCaret:start_location - 1];
-}
-
-- (void)input_forward_delete:(NSString *)characters
-{
-	/* FIXME: should handle smart typing pairs here!
-	 */
-	[self deleteRange:NSMakeRange(start_location, 1)];
-}
-
-/* FIXME: these are nothing but UGLY!!!
- * Use invocations instead, if it can't be done immediately.
- */
-- (void)addTemporaryAttribute:(NSDictionary *)what
-{
-        [[self layoutManager] addTemporaryAttribute:[what objectForKey:@"attributeName"]
-                                              value:[what objectForKey:@"value"]
-                                  forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
-}
-
-- (void)removeTemporaryAttribute:(NSDictionary *)what
-{
-        [[self layoutManager] removeTemporaryAttribute:[what objectForKey:@"attributeName"]
-                                     forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
-}
-
-/* Input a character from the user (in insert mode). Handle smart typing pairs.
- * FIXME: assumes smart typing pairs are single characters.
- * FIXME: need special handling if inside a snippet.
- */
-- (void)inputCharacters:(NSString *)characters
-{
-	// If there is a non-zero length selection, remove it first.
-	NSRange sel = [self selectedRange];
-	if (sel.length > 0)
-	{
-		[self deleteRange:sel];
-	}
-
-	BOOL foundSmartTypingPair = NO;
-	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
-	NSArray *pair;
-	for (pair in smartTypingPairs)
-	{
-		// check if we're inserting the end character of a smart typing pair
-		// if so, just overwrite the end character
-		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
-		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
-		{
-			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-						    atCharacterIndex:start_location
-						      effectiveRange:NULL])
-			{
-				foundSmartTypingPair = YES;
-				[self setCaret:start_location + 1];
-			}
-			break;
-		}
-		// check for the start character of a smart typing pair
-		else if ([[pair objectAtIndex:0] isEqualToString:characters])
-		{
-			// don't use it if next character is alphanumeric
-			if (start_location + 1 >= [[self textStorage] length] ||
-			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[[self textStorage] string] characterAtIndex:start_location]])
-			{
-				foundSmartTypingPair = YES;
-				[self insertString:[NSString stringWithFormat:@"%@%@",
-					[pair objectAtIndex:0],
-					[pair objectAtIndex:1]] atLocation:start_location];
-				
-				// INFO(@"adding smart pair attr to %u + 2", start_location);
-				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
-				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-					ViSmartPairAttributeName, @"attributeName",
-					characters, @"value",
-					[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
-					nil] afterDelay:0];
-
-				[self setCaret:start_location + 1];
-				break;
-			}
-		}
-	}
-	
-	if (!foundSmartTypingPair)
-	{
-		[self insertString:characters atLocation:start_location];
-		[self setCaret:start_location + [characters length]];
-	}
-
-#if 0
-	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
-	{
-                int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
-		insert_start_location += n;
-		insert_end_location += n;
-	}
-	else if ([self shouldNotIndentLineAtLocation:insert_end_location])
-	{
-                int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
-		insert_start_location += n;
-		insert_end_location += n;
-	}
-#endif
-}
-
-- (void)setVisualSelection
-{
-	NSUInteger l1 = visual_start_location, l2 = [self caret];
-	if (l2 < l1)
-	{	/* swap if end < start */
-		l2 = l1;
-		l1 = end_location;
-	}
-
-	if (visual_line_mode)
-	{
-		NSUInteger bol, end;
-		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
-		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
-		l1 = bol;
-		l2 = end;
-	}
-	else
-		l2++;
-
-	NSRange sel = NSMakeRange(l1, l2 - l1);
-	[self setSelectedRange:sel];
-}
-
-- (void)scrollToCaret
-{
-	NSScrollView *scrollView = [self enclosingScrollView];
-	NSClipView *clipView = [scrollView contentView];
-        NSRect visibleRect = [clipView bounds];
-	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
-
-	NSPoint topPoint;
-	if (NSMinY(rect) < NSMinY(visibleRect))
-	{
-		topPoint = NSMakePoint(0, NSMinY(rect));
-	}
-	else if (NSMaxY(rect) > NSMaxY(visibleRect))
-	{
-		topPoint = NSMakePoint(0, NSMaxY(rect) - NSHeight(visibleRect));
-	}
-	else
-		return;
-
-	[clipView scrollToPoint:topPoint];
-	[scrollView reflectScrolledClipView:clipView];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1375,7 +1386,7 @@ int logIndent = 0;
 	}
 }
 
-
+#pragma mark -
 
 /* This is stolen from Smultron.
  */
@@ -1455,7 +1466,6 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
-	INFO(@"setting theme");
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[self setDrawsBackground:YES];
 	[self setInsertionPointColor:[aTheme caretColor]];

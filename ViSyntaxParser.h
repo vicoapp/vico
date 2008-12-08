@@ -14,15 +14,13 @@
 	NSMutableArray *continuationsState;
 	NSMutableArray *continuations;
 	MHSysTree *scopeTree;
-	NSMutableArray *uglyHack;
-
-	NSMutableArray *contextStack;
+	MHSysTree *wholeScopeTree;
 
 	// per-request state
 	const unichar *chars;
 	NSUInteger offset;
 	ViSyntaxContext *context;
-	
+
 	BOOL ignoreEditing;
 
 	// statistics
@@ -33,6 +31,7 @@
 }
 
 @property(readwrite) BOOL ignoreEditing;
+@property(readonly) MHSysTree *wholeScopeTree;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;
@@ -43,5 +42,7 @@
 
 - (void)pushContinuations:(NSValue *)rangeValue;
 - (void)pullContinuations:(NSValue *)rangeValue;
+- (void)pushScopes:(NSRange)affectedRange;
+- (void)pullScopes:(NSRange)affectedRange;
 
 @end

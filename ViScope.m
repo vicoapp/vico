@@ -33,5 +33,10 @@
 	return 0;
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViScope %p %@: %@>", self, NSStringFromRange(range), [scopes componentsJoinedByString:@" "]];
+}
+
 @end
 

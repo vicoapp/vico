@@ -41,6 +41,7 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
         RB_INIT(&root);
         nitems = 0;
         compareSelector = aSelector;
+        hack = [[NSMutableSet alloc] init];
     }
     
     return self;
@@ -61,10 +62,16 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 {
     struct rb_entry *e = malloc(sizeof(*e));
     e->obj = anObject;
+    [hack addObject:anObject];
     e->compareSelector = compareSelector;
     struct rb_entry *duplicate = RB_INSERT(id_tree, &root, e);
     if (duplicate) {
-	    INFO(@"*********** got duplicate object %p for new object %p", duplicate->obj, anObject);
+	    INFO(@"*********** got duplicate object %@ for new object %@", duplicate->obj, anObject);
+	    [self removeEntry:duplicate];
+	    duplicate = RB_INSERT(id_tree, &root, e);
+	    if (duplicate) {
+		    INFO(@"!!!!!!!!!!! got second duplicate object %p for new object %p", duplicate->obj, anObject);
+	    }
     }
     nitems++;
 }
@@ -79,6 +86,7 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 - (void)removeEntry:(struct rb_entry *)anEntry
 {
     RB_REMOVE(id_tree, &root, anEntry);
+    [hack removeObject:anEntry->obj];
     free(anEntry);
     nitems--;
 }
@@ -146,11 +154,11 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
     
 }
 
-- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget
+- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget context:(id)context
 {
     struct rb_entry *e;
     RB_FOREACH(e, id_tree, &root) {
-	[aTarget performSelector:aSelector withObject:e->obj];
+	[aTarget performSelector:aSelector withObject:e->obj withObject:context];
     }
 }
 
@@ -162,6 +170,11 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 - (struct rb_entry *)first
 {
 	return RB_MIN(id_tree, &root);
+}
+
+- (struct rb_entry *)last
+{
+	return RB_MAX(id_tree, &root);
 }
 
 - (struct rb_entry *)next:(struct rb_entry *)current

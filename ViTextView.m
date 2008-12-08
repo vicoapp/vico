@@ -1092,6 +1092,12 @@ int logIndent = 0;
 
 - (void)input_backspace:(NSString *)characters
 {
+	if ([self caret] == 0)
+	{
+		[[self delegate] message:@"Already at the beginning of the document"];
+		return;
+	}
+
 	/* check if we're deleting the first character in a smart pair */
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
 	NSArray *pair;
@@ -1121,8 +1127,6 @@ int logIndent = 0;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
-	INFO(@"is this called at all?");
-
 	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
 		return NO;
 

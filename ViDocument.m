@@ -49,7 +49,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[self addWindowController:windowController];
 	[windowController addNewTab:self];
-	[self configureSyntax];
 }
 
 - (void)removeView:(ViDocumentView *)aDocumentView
@@ -84,6 +83,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[textView setString:readContent];
 		readContent = nil;
 		textStorage = [textView textStorage];
+		[self configureSyntax];
 	}
 	else
 	{
@@ -94,7 +94,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ignoreEditing = YES;
 	[textView initEditorWithDelegate:self documentView:documentView];
 
-	[documentView applySyntaxResult:lastContext];
+	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] init];
+	[ctx setRange:NSMakeRange(0, [textStorage length])];
+	[ctx setScopes:[[syntaxParser wholeScopeTree] allObjects]];
+	INFO(@"got %u stored scopes", [ctx.scopes count]);
+	[documentView applySyntaxResult:ctx];
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
 	return documentView;
@@ -240,7 +244,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 
 	unsigned line = [textStorage lineNumberAtLocation:aRange.location];
-	INFO(@"dispatching from line %u", line);
+	DEBUG(@"dispatching from line %u", line);
 	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithLine:line];
 	ctx.range = aRange;
 	ctx.restarting = flag;
@@ -376,12 +380,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
+	DEBUG(@"range = %@", NSStringFromRange(affectedCharRange));
+
 	if ([replacementString length] > 0)
 	{
 		DEBUG(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:replacementString
 		                            forward:YES];
+		[syntaxParser pushScopes:affectedCharRange];
 	}
 	else
 	{
@@ -390,6 +397,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:deletedString
 		                            forward:NO];
+		[syntaxParser pullScopes:affectedCharRange];
 	}
 
 	return YES;
@@ -404,7 +412,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	NSRange area = [textStorage editedRange];
-	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
+	DEBUG(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 

@@ -42,6 +42,7 @@ struct rb_entry
     unsigned nitems;
     RB_HEAD(id_tree, rb_entry) root;
     SEL compareSelector;
+    NSMutableSet *hack;
 }
 
 int id_cmp(struct rb_entry *a, struct rb_entry *b);
@@ -64,10 +65,11 @@ RB_PROTOTYPE(id_tree, rb_entry, entry, id_cmp);
 
 - (NSArray *)allObjects;
 - (void)removeEntry:(struct rb_entry *)anEntry;
-- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget;
+- (void)makeObjectsPerformSelector:(SEL)aSelector target:(id)aTarget context:(id)context;
 
 - (struct rb_entry *)root;
 - (struct rb_entry *)first;
+- (struct rb_entry *)last;
 - (struct rb_entry *)next:(struct rb_entry *)current;
 - (struct rb_entry *)left:(struct rb_entry *)current;
 - (struct rb_entry *)right:(struct rb_entry *)current;

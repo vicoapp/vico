@@ -240,7 +240,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-	INFO(@"will close");
 	if (currentWindowController == self)
 		currentWindowController = nil;
 	[windowControllers removeObject:self];

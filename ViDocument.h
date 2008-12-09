@@ -55,6 +55,7 @@
          regexpType:(int)regexpSyntax;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
+- (void)goToSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)aView;
 - (void)goToSymbol:(ViSymbol *)aSymbol;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)setLanguageFromString:(NSString *)aLanguage;
@@ -64,5 +65,6 @@
 - (ViDocumentView *)makeView;
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
+- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 
 @end

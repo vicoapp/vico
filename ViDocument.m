@@ -57,21 +57,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)removeView:(ViDocumentView *)aDocumentView
 {
-	// Keep the first view.
-	// if ([views objectAtIndex:0] != aDocumentView)
+	// Keep one view around for delegate methods.
 	if ([views count] > 1)
 		[views removeObject:aDocumentView];
 	--visibleViews;
-	INFO(@"now %i views (%i) for document %@", visibleViews, [views count], self);
 }
 
 - (ViDocumentView *)makeView
 {
 	++visibleViews;
-	INFO(@"now %i views (%i) for document %@", visibleViews, [views count], self);
 	if (visibleViews == 1 && [views count] > 0)
 	{
-		INFO(@"returning saved view %@", [[views objectAtIndex:0] view]);
 		return [views objectAtIndex:0];
 	}
 
@@ -79,7 +75,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	ViTextView *textView = [documentView textView];
 	[views addObject:documentView];
-	INFO(@"creating new view %@", [documentView view]);
 
 	if ([views count] == 1)
 	{
@@ -101,35 +96,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] init];
 	[ctx setRange:NSMakeRange(0, [textStorage length])];
 	[ctx setScopes:[[syntaxParser wholeScopeTree] allObjects]];
-	INFO(@"got %u stored scopes", [ctx.scopes count]);
 	[documentView applySyntaxResult:ctx];
+
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
 	return documentView;
-#if 0
-	NSRect frame = [textView frame];
-	NSScrollView *cloneScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, frame.size.width, 100)];
-
-	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(frame.size.width, 1e100)];
-	NSLayoutManager *lm = [[NSLayoutManager alloc] init];
-	[lm addTextContainer:container];
-	[[textView textStorage] addLayoutManager:lm];
-	ViTextView *cloneView = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 0, 0) textContainer:container];
-	[cloneView initEditorWithDelegate:self];
-	[cloneView configureForURL:[self fileURL]];
-
-	NSClipView *cloneClip = [[NSClipView alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)];
-	[cloneClip setDocumentView:cloneView];
-	[cloneScroll setContentView:cloneClip];
-	[cloneScroll setHasVerticalScroller:YES];
-	[cloneScroll setHasHorizontalScroller:YES];
-	[cloneScroll setAutohidesScrollers:YES];
-	[cloneScroll setHasVerticalRuler:YES];
-	[cloneScroll setRulersVisible:YES];
-	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:cloneScroll];
-
-	[documentSplit addSubview:cloneScroll];
-#endif
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -580,14 +551,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Symbol List
 
-- (void)goToSymbol:(ViSymbol *)aSymbol
+- (void)goToSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)aView
 {
 	NSRange range = [aSymbol range];
-	ViTextView *firstTextView = (ViTextView *)[[views objectAtIndex:0] textView];
-	[firstTextView setCaret:range.location];
-	[firstTextView scrollRangeToVisible:range];
-	[[[self windowController] window] makeFirstResponder:firstTextView];
-	[firstTextView showFindIndicatorForRange:range];
+	ViTextView *textView = [aView textView];
+	[textView setCaret:range.location];
+	[textView scrollRangeToVisible:range];
+	[[[self windowController] window] makeFirstResponder:textView];
+	[textView showFindIndicatorForRange:range];
+}
+
+- (void)goToSymbol:(ViSymbol *)aSymbol
+{
+	[self goToSymbol:aSymbol inView:[views objectAtIndex:0]];
 }
 
 - (NSUInteger)filterSymbols:(ViRegexp *)rx
@@ -681,6 +657,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
 #endif
+}
+
+- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation
+{
+	[windowController updateSelectedSymbolForLocation:aLocation];
 }
 
 #pragma mark -

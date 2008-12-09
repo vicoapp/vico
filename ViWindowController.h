@@ -69,6 +69,7 @@
 - (IBAction)splitViewHorizontally:(id)sender;
 
 - (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector;
+- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 
 @end
 

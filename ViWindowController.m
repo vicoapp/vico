@@ -75,7 +75,7 @@ static NSWindowController	*currentWindowController = nil;
 	[tabBar setHideForSingleTab:NO];
 	[tabBar setPartnerView:splitView];
 	[tabBar setShowAddTabButton:YES];
-	[tabBar setAllowsDragBetweenWindows:NO];
+	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update  for this to work without NSTabview
 
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
@@ -186,15 +186,8 @@ static NSWindowController	*currentWindowController = nil;
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
 		[symbolsOutline collapseItem:nil collapseChildren:YES];
         [symbolsOutline expandItem:document];
-        
-        // unless current selection is a symbol in the current document, select the document itself
-        id selectedItem = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
-        if (selectedItem != document && [symbolsOutline parentForItem:selectedItem] != document)
-        {
-		NSInteger row = [symbolsOutline rowForItem:document];
-		[symbolsOutline scrollRowToVisible:row];
-		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-        }
+ 
+	[self updateSelectedSymbolForLocation:[(ViTextView *)[docView textView] caret]];
 }
 
 - (void)selectDocument:(ViDocument *)aDocument
@@ -699,7 +692,13 @@ static NSWindowController	*currentWindowController = nil;
 	else
 	{
 		ViDocument *document = [symbolsOutline parentForItem:item];
-		[self selectDocument:document];
+		if ([self currentDocument] != document)
+		{
+			if ([document visibleViews] > 0)
+				[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
+			else
+				[self selectDocument:document];
+		}
 		[document goToSymbol:item];
 
 		// remember what symbol we selected from the filtered set
@@ -710,9 +709,11 @@ static NSWindowController	*currentWindowController = nil;
 	[symbolFilterField setStringValue:@""];
 	[self filterSymbols:symbolFilterField];
 
+        /*
         NSInteger row = [symbolsOutline rowForItem:item];
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        */
 
 	if (closeSymbolListAfterUse)
 	{
@@ -799,6 +800,27 @@ static NSWindowController	*currentWindowController = nil;
 	[symbolsOutline reloadData];
 	[symbolsOutline expandItem:nil expandChildren:YES];
 	[self selectFirstMatchingSymbolForFilter:filter];
+}
+
+- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation
+{
+	NSArray *symbols = [[self currentDocument] symbols];
+	ViSymbol *symbol;
+	id item = [self currentDocument];
+	for (symbol in symbols)
+	{
+		NSRange r = [symbol range];
+		if (r.location > aLocation)
+			break;
+		item = symbol;
+	}
+
+	if (item)
+	{
+		NSUInteger row = [symbolsOutline rowForItem:item];
+		[symbolsOutline scrollRowToVisible:row];
+		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	}
 }
 
 - (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector

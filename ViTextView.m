@@ -850,6 +850,9 @@ int logIndent = 0;
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;
+
+	// update selection in symbol list
+	[[self delegate] updateSelectedSymbolForLocation:caret];
 }
 
 - (void)setCaret:(NSUInteger)location

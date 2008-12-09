@@ -684,10 +684,31 @@ static NSWindowController	*currentWindowController = nil;
 - (void)goToSymbol:(id)sender
 {
 	id item = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
+
+	// remember what symbol we selected from the filtered set
+	NSString *filter = [symbolFilterField stringValue];
+	if ([filter length] > 0)
+	{
+		[symbolFilterCache setObject:[item symbol] forKey:filter];
+
+		[symbolFilterField setStringValue:@""];
+		[self filterSymbols:symbolFilterField];
+	}
+
 	if ([item isKindOfClass:[ViDocument class]])
 	{
-		[self selectDocument:item];
-		[[self window] makeFirstResponder:[item textView]];
+		ViDocument *document = item;
+		if ([self currentDocument] != document)
+		{
+			if ([document visibleViews] > 0)
+				[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
+			else
+				[self selectDocument:document];
+		}
+		else 
+		{
+			[self updateSelectedSymbolForLocation:[(ViTextView *)[mostRecentView textView] caret]];
+		}
 	}
 	else
 	{
@@ -700,20 +721,7 @@ static NSWindowController	*currentWindowController = nil;
 				[self selectDocument:document];
 		}
 		[document goToSymbol:item];
-
-		// remember what symbol we selected from the filtered set
-		NSString *filter = [symbolFilterField stringValue];
-		[symbolFilterCache setObject:[item symbol] forKey:filter];
 	}
-
-	[symbolFilterField setStringValue:@""];
-	[self filterSymbols:symbolFilterField];
-
-        /*
-        NSInteger row = [symbolsOutline rowForItem:item];
-        [symbolsOutline scrollRowToVisible:row];
-        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-        */
 
 	if (closeSymbolListAfterUse)
 	{

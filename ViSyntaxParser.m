@@ -101,14 +101,16 @@
 		NSRange r = [s range];
 		[wholeScopeTree removeEntry:e];
 		
-		/******************************
-		 * FIXME: cover all cases here!
-		 *****************/
-		
 		if (r.location >= affectedRange.location)
 		{
 			[s setRange:NSMakeRange(r.location + affectedRange.length, r.length)];
 		}
+		else if (NSMaxRange(r) > affectedRange.location)
+		{
+			// extend length
+			[s setRange:NSMakeRange(r.location, r.length + affectedRange.length)];
+		}
+
 		[tempTree addObject:s];
 		e = next;
 	}
@@ -223,34 +225,60 @@ check_again:
 			}
 
 			// check if there is a scope just to the right of this one that must be modified (ie, that intersects with the new scope)
-			for (;;)
+			struct rb_entry *next;
+			for (e = [tree next:node]; e; e = next)
 			{
-				e = [tree next:node];
-				if (e == NULL)
-					break;
-				s = e->obj;
-				r = [s range];
+				next = [tree next:e];
+				ViScope *xs = e->obj;
+				r = [xs range];
 				if (r.location >= NSMaxRange(aRange))
 					break;
 				[tree removeEntry:e];
 				if (NSMaxRange(r) <= NSMaxRange(aRange))
 				{
-					DEBUG(@"removing overlapped scope %@", s);
+					DEBUG(@"removing overlapped scope %@", xs);
 				}
 				else
 				{
 					r.length -= NSMaxRange(r) - NSMaxRange(aRange);
 					r.location = NSMaxRange(aRange);
-					DEBUG(@"modifying overlapped scope %@ -> %@", s, NSStringFromRange(r));
-					[s setRange:r];
-					[tree addObject:s];
+					DEBUG(@"modifying overlapped scope %@ -> %@", xs, NSStringFromRange(r));
+					[xs setRange:r];
+					[tree addObject:xs];
 				}
 			}
+
 			return;
 		}
 		else if (r.length > aRange.length)
 		{
 			NSRange newRange = NSMakeRange(NSMaxRange(aRange), r.length - aRange.length);
+
+			// check if there is a scope just to the right of this one that must be modified (ie, that intersects with the new scope)
+			struct rb_entry *next;
+			for (e = [tree next:node]; e; e = next)
+			{
+				next = [tree next:e];
+				ViScope *xs = e->obj;
+				DEBUG(@"check right scope %@", xs);
+				r = [xs range];
+				if (r.location >= NSMaxRange(newRange))
+					break;
+				[tree removeEntry:e];
+				if (NSMaxRange(r) <= NSMaxRange(newRange))
+				{
+					DEBUG(@"removing overlapped scope %@", xs);
+				}
+				else
+				{
+					r.length -= NSMaxRange(r) - NSMaxRange(newRange);
+					r.location = NSMaxRange(newRange);
+					DEBUG(@"modifying overlapped scope %@ -> %@", xs, NSStringFromRange(r));
+					[xs setRange:r];
+					[tree addObject:xs];
+				}
+			}
+
 			DEBUG(@"modifying scope %p [%@], range %@ -> %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
 			[tree removeEntry:node];
 			[s setRange:newRange];
@@ -395,7 +423,7 @@ add_node:
 	for (e = [source first]; e; e = [source next:e])
 	{
 		ViScope *s = e->obj;
-		DEBUG(@"merging scope %@ in range %@", scope, NSStringFromRange(scope.range));
+		DEBUG(@"merging scope %@", s);
 		[self setScopes:s.scopes inTree:target inRange:s.range additive:NO];
 	}
 }

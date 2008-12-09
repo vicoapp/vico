@@ -365,7 +365,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	DEBUG(@"range = %@", NSStringFromRange(affectedCharRange));
+	DEBUG(@"range = %@, string = [%@]", NSStringFromRange(affectedCharRange), replacementString);
 
 	if ([replacementString length] > 0)
 	{
@@ -373,7 +373,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:replacementString
 		                            forward:YES];
-		[syntaxParser pushScopes:affectedCharRange];
+		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, [replacementString length])];
 	}
 	else
 	{

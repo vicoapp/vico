@@ -151,11 +151,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)applySyntaxResult:(ViSyntaxContext *)context
 {
-	ViDocumentView *dv;
-	for (dv in views)
-	{
-		[dv applySyntaxResult:context];
-	}
+	[views makeObjectsPerformSelector:@selector(applySyntaxResult:) withObject:context];
 
 	[updateSymbolsTimer invalidate];
 	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
@@ -438,16 +434,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)enableLineNumbers:(BOOL)flag
 {
-	// enable line numbers for all textviews
+	ViDocumentView *dv;
+	for (dv in views)
+	{
+		[self enableLineNumbers:flag forScrollView:[[dv textView] enclosingScrollView]];
+	}
 }
 
 - (IBAction)toggleLineNumbers:(id)sender
 {
-	ViDocumentView *dv;
-	for (dv in views)
-	{
-		[self enableLineNumbers:[sender state] == NSOffState forScrollView:[[dv textView] enclosingScrollView]];
-	}
+	[self enableLineNumbers:[sender state] == NSOffState];
 }
 
 

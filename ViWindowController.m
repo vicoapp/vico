@@ -829,7 +829,7 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
-- (BOOL)searchField:(NSSearchField *)aSearchField doCommandBySelector:(SEL)aSelector
+- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
 {
 	INFO(@"selector = %s", aSelector);
 

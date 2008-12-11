@@ -8,8 +8,8 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="100250"/>
 			<integer value="100153"/>
-			<integer value="100142"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -421,7 +421,7 @@
 					</object>
 					<object class="NSMutableArray" key="dict.values">
 						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSToolbarItem" id="748321061">
+						<object class="NSToolbarItem" id="366938377">
 							<object class="NSMutableString" key="NSToolbarItemIdentifier">
 								<characters key="NS.bytes">176388A5-2C19-406C-B7D9-AAD11A8CC6BA</characters>
 							</object>
@@ -822,7 +822,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<reference ref="856958583"/>
 					<reference ref="589958458"/>
 					<reference ref="702036569"/>
-					<reference ref="748321061"/>
+					<reference ref="366938377"/>
 				</object>
 				<object class="NSMutableArray" key="NSToolbarIBDefaultItems">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -882,7 +882,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				<string key="NSClassName">ProjectDelegate</string>
 			</object>
 			<object class="NSCustomView" id="342887108">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1116,6 +1116,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{171, 489}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</object>
@@ -1374,7 +1375,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">openDocument:</string>
 						<reference key="source" ref="613418571"/>
-						<reference key="destination" ref="748321061"/>
+						<reference key="destination" ref="366938377"/>
 					</object>
 					<int key="connectionID">100310</int>
 				</object>
@@ -1440,7 +1441,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<reference ref="856958583"/>
 							<reference ref="589958458"/>
 							<reference ref="702036569"/>
-							<reference ref="748321061"/>
+							<reference ref="366938377"/>
 						</object>
 						<reference key="parent" ref="1008169181"/>
 					</object>
@@ -1748,7 +1749,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100308</int>
-						<reference key="object" ref="748321061"/>
+						<reference key="object" ref="366938377"/>
 						<reference key="parent" ref="920475372"/>
 					</object>
 				</object>
@@ -1800,7 +1801,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100264.IBPluginDependency</string>
 					<string>100266.IBPluginDependency</string>
 					<string>100269.IBPluginDependency</string>
-					<string>100275.CustomClassName</string>
 					<string>100275.IBPluginDependency</string>
 					<string>100276.IBPluginDependency</string>
 					<string>100301.IBPluginDependency</string>
@@ -1863,7 +1863,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>ViSymbolSearchField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1964,14 +1963,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ProjectDelegate.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ViSymbolSearchField</string>
-					<string key="superclassName">NSSearchField</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">ViSymbolSearchField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

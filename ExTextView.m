@@ -46,7 +46,7 @@ static id defaultEditor = nil;
 		NSString *filename = [self filenameAtLocation:caret range:&range];
 
 		if (![filename isAbsolutePath])
-			filename = [[[[NSFileManager defaultManager] currentDirectoryPath] stringByAbbreviatingWithTildeInPath] stringByAppendingPathComponent:filename];
+			filename = [[[[NSDocumentController sharedDocumentController] currentDirectory] stringByAbbreviatingWithTildeInPath] stringByAppendingPathComponent:filename];
 
 		NSArray *completions = nil;
 		NSString *completion = nil;
@@ -61,12 +61,6 @@ static id defaultEditor = nil;
 		{
 			INFO(@"display completions: %@", completions);
 		}
-	}
-	else if (code == 0x00000035 /* escape */ ||
-	         code == 0x00040008 /* ctrl-c */)
-	{
-		[self setString:@""];
-		[[self window] endEditingFor:self];
 	}
 	else
 	{

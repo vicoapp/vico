@@ -493,13 +493,27 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [[windowController statusbar] stringValue];
-	INFO(@"got ex command [%@]", exCommand);
+	if ([exCommand length] == 0)
+		return;
 	[[windowController statusbar] setStringValue:@""];
 	[[windowController statusbar] setEditable:NO];
 	[[[self windowController] window] makeFirstResponder:exCommandView];
-	if ([exCommand length] > 0)
-		[exCommandView performSelector:exCommandSelector withObject:exCommand];
+	[exCommandView performSelector:exCommandSelector withObject:exCommand];
 	exCommandView = nil;
+}
+
+- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
+{
+	if (aSelector == @selector(cancelOperation:) || // escape
+	    aSelector == @selector(noop:))              // ctrl-c and ctrl-g ...
+	{
+		[[windowController statusbar] setStringValue:@""];
+		[[windowController statusbar] setEditable:NO];
+		[[[self windowController] window] makeFirstResponder:exCommandView];
+		exCommandView = nil;
+		return YES;
+	}
+	return NO;
 }
 
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt

@@ -5,7 +5,6 @@
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
 #import "ViSeparatorCell.h"
-#import "ViSymbolSearchField.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;

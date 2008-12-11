@@ -91,8 +91,10 @@ int logIndent = 0;
 	[self setContinuousSpellCheckingEnabled:NO];
 	// [[self layoutManager] setShowsInvisibleCharacters:YES];
 	[[self layoutManager] setShowsControlCharacters:YES];
+	[self setDrawsBackground:YES];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
 - (void)setString:(NSString *)aString
@@ -100,7 +102,6 @@ int logIndent = 0;
 	[[[self textStorage] mutableString] setString:aString ?: @""];
 	[[self textStorage] addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [[self textStorage] length])];
 	[self setCaret:0];
-	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
 #pragma mark -
@@ -485,7 +486,7 @@ int logIndent = 0;
           		has_delta_offset = YES;
           		delta_offset = [newIndent length] - [indent length];
                 }
-		
+
 		// get next line
 		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
 		if (bol == NSNotFound)
@@ -516,7 +517,6 @@ int logIndent = 0;
 
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	DEBUG(@"undoing delete of [%@] (%p) at %u", aString, aString, aLocation);
 	[self insertString:aString atLocation:aLocation undoGroup:NO];
 	final_location = aLocation;
 }
@@ -1458,11 +1458,9 @@ int logIndent = 0;
 - (void)setTheme:(ViTheme *)aTheme
 {
 	[self setBackgroundColor:[aTheme backgroundColor]];
-	[self setDrawsBackground:YES];
 	[self setInsertionPointColor:[aTheme caretColor]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[aTheme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
-	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
 }
 
 - (NSFont *)font
@@ -1794,7 +1792,7 @@ int logIndent = 0;
 		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
 
 		INFO(@"command output: %@", outputText);
-		
+
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:inputRange withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"])

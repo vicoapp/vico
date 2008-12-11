@@ -136,6 +136,7 @@ static NSWindowController	*currentWindowController = nil;
 			[symbolsOutline collapseItem:nil collapseChildren:YES];
 			[symbolsOutline expandItem:[self currentDocument]];
 		}
+		[self updateSelectedSymbolForLocation:[(ViTextView *)[mostRecentView textView] caret]];
 	}
 }
 
@@ -230,7 +231,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (BOOL)windowShouldClose:(id)window
 {
-	INFO(@"have %u documents", [documents count]);
 	return [documents count] == 0;
 }
 

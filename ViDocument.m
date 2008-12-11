@@ -34,6 +34,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		symbols = [NSArray array];
 		views = [[NSMutableArray alloc] init];
+		exCommandHistory = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -500,6 +501,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[[self windowController] window] makeFirstResponder:exCommandView];
 	[exCommandView performSelector:exCommandSelector withObject:exCommand];
 	exCommandView = nil;
+	
+	// add the command to the history
+	NSUInteger i = [exCommandHistory indexOfObject:exCommand];
+	if (i == NSNotFound)
+		[exCommandHistory removeObjectAtIndex:i];
+	[exCommandHistory addObject:exCommand];
 }
 
 - (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
@@ -511,6 +518,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[windowController statusbar] setEditable:NO];
 		[[[self windowController] window] makeFirstResponder:exCommandView];
 		exCommandView = nil;
+		return YES;
+	}
+	else if (aSelector == @selector(moveUp:))
+	{
+		INFO(@"look back in history");
+		return YES;
+	}
+	else if (aSelector == @selector(moveDown:))
+	{
+		INFO(@"look forward in history");
 		return YES;
 	}
 	return NO;
@@ -696,6 +713,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)setMostRecentDocumentView:(ViDocumentView *)docView
 {
 	[windowController setMostRecentDocument:self view:docView];
+}
+
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
+{
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	if ([scopeArray count] > aLocation)
+		return [[scopeArray objectAtIndex:aLocation] scopes];
+	return nil;
 }
 
 @end

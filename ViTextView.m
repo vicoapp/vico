@@ -275,9 +275,7 @@ int logIndent = 0;
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
-	return [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-				       atCharacterIndex:aLocation
-				         effectiveRange:NULL];
+	return [[self delegate] scopesAtLocation:aLocation];
 }
 
 #pragma mark -

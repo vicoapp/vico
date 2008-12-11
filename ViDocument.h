@@ -22,6 +22,7 @@
 	// ex commands
 	SEL exCommandSelector;
 	ViTextView *exCommandView;
+	NSMutableArray *exCommandHistory;
 
 	// language parsing and highlighting
 	BOOL ignoreEditing;
@@ -66,5 +67,6 @@
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 
 @end

@@ -421,7 +421,6 @@
 
 	if ([self delete:command])
 	{
-		end_location = final_location = start_location;
 		[self setInsertMode:command];
 		return YES;
 	}

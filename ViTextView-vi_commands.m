@@ -1288,11 +1288,11 @@
 /* syntax: [count]> */
 - (BOOL)shift_right:(ViCommand *)command
 {
-	int delta_offset = [self changeIndentation:1 inRange:affectedRange];
+	NSRange delta_offset = [self changeIndentation:1 inRange:affectedRange];
 	if (start_location > affectedRange.location)
-		end_location = final_location = end_location + delta_offset;
+		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
 	else
-		end_location = final_location = start_location + delta_offset;
+		end_location = final_location = start_location + delta_offset.location;
 	return YES;
 }
 
@@ -1302,8 +1302,11 @@
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	
-	int delta_offset = [self changeIndentation:-1 inRange:affectedRange];
-	end_location = final_location = IMAX(start_location + delta_offset, bol);
+	NSRange delta_offset = [self changeIndentation:-1 inRange:affectedRange];
+	if (start_location > affectedRange.location)
+		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
+	else
+		end_location = final_location = IMAX(start_location + delta_offset.location, bol);
 	return YES;
 }
 

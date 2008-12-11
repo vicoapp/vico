@@ -462,13 +462,13 @@ int logIndent = 0;
 	return 1;
 }
 
-- (int)changeIndentation:(int)delta inRange:(NSRange)aRange
+- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange
 {
 	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
 
-	int delta_offset = 0;
+	NSRange delta_offset = NSMakeRange(0, 0);
 	BOOL has_delta_offset = NO;
 	
 	while (bol < NSMaxRange(aRange))
@@ -484,8 +484,9 @@ int logIndent = 0;
 		if (!has_delta_offset)
 		{
           		has_delta_offset = YES;
-          		delta_offset = [newIndent length] - [indent length];
+			delta_offset.location = [newIndent length] - [indent length];
                 }
+		delta_offset.length += [newIndent length] - [indent length];
 
 		// get next line
 		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
@@ -500,16 +501,16 @@ int logIndent = 0;
 {
         NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-        int n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
-        [self setCaret:start_location + n];
+        NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
+        [self setCaret:start_location + n.location];
 }
 
 - (void)decrease_indent:(NSString *)characters
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	int n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
-        [self setCaret:start_location + n];
+	NSRange n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
+        [self setCaret:start_location + n.location];
 }
 
 #pragma mark -

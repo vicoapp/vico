@@ -13,8 +13,7 @@
 	// persistent state
 	NSMutableArray *continuationsState;
 	NSMutableArray *continuations;
-	MHSysTree *scopeTree;
-	MHSysTree *wholeScopeTree;
+	NSMutableArray *scopeArray;
 
 	// per-request state
 	const unichar *chars;
@@ -31,7 +30,6 @@
 }
 
 @property(readwrite) BOOL ignoreEditing;
-@property(readonly) MHSysTree *wholeScopeTree;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;
@@ -44,5 +42,8 @@
 - (void)pullContinuations:(NSValue *)rangeValue;
 - (void)pushScopes:(NSRange)affectedRange;
 - (void)pullScopes:(NSRange)affectedRange;
+- (void)updateScopeRanges;
+
+- (NSArray *)scopeArray;
 
 @end

@@ -4,10 +4,18 @@
 #import "NSArray-patterns.h"
 #import "logging.h"
 
+@interface ViSyntaxParser ()
+- (void)updateScopeRangesInRange:(NSRange)updateRange;
+@end
+
 @implementation ViSyntaxParser
 
 @synthesize ignoreEditing;
-@synthesize wholeScopeTree;
+
+- (NSArray *)scopeArray
+{
+	return scopeArray;
+}
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage
 {
@@ -15,8 +23,7 @@
 	if (self)
 	{
 		language = aLanguage;
-		scopeTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
-		wholeScopeTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
+		scopeArray = [[NSMutableArray alloc] init];
 		continuations = [[NSMutableArray alloc] init];
 	}
 	return self;
@@ -88,82 +95,36 @@
 }
 
 #pragma mark -
-#pragma mark Scope tree mangling
+#pragma mark Scope mangling
 
 - (void)pushScopes:(NSRange)affectedRange
 {
-	MHSysTree *tempTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
-	struct rb_entry *e = [wholeScopeTree first];
-	while (e)
+	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
+	NSUInteger i = affectedRange.location;
+	NSUInteger n = affectedRange.length;
+	ViScope *scope = [[ViScope alloc] initWithScopes:[NSArray array] range:affectedRange];
+	while (n--)
 	{
-		struct rb_entry *next = [wholeScopeTree next:e];
-		ViScope *s = e->obj;
-		NSRange r = [s range];
-		[wholeScopeTree removeEntry:e];
-		
-		if (r.location >= affectedRange.location)
-		{
-			[s setRange:NSMakeRange(r.location + affectedRange.length, r.length)];
-		}
-		else if (NSMaxRange(r) > affectedRange.location)
-		{
-			// extend length
-			[s setRange:NSMakeRange(r.location, r.length + affectedRange.length)];
-		}
-
-		[tempTree addObject:s];
-		e = next;
+		[scopeArray insertObject:scope atIndex:i];
 	}
-	
-	wholeScopeTree = tempTree;
+
+	DEBUG(@"scopeArray now has %u elements", [scopeArray count]);
 }
 
 - (void)pullScopes:(NSRange)affectedRange
 {
-	MHSysTree *tempTree = [[MHSysTree alloc] initWithCompareSelector:@selector(compareBegin:)];
-	struct rb_entry *e = [wholeScopeTree first];
-	while (e)
+	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
+	if ([scopeArray count] <= affectedRange.location)
+		return;
+	NSUInteger i = affectedRange.location;
+	NSUInteger n = affectedRange.length;
+	while (n--)
 	{
-		struct rb_entry *next = [wholeScopeTree next:e];
-		ViScope *s = e->obj;
-		NSRange r = [s range];
-		[wholeScopeTree removeEntry:e];
-		if (NSMaxRange(r) <= affectedRange.location)
-		{
-			// do nothing
-		}
-		else if (r.location >= NSMaxRange(affectedRange))
-		{
-			[s setRange:NSMakeRange(r.location - affectedRange.length, r.length)];
-		}
-		else
-		{
-			// r intersects affectedRange
-			if (r.location < affectedRange.location)
-			{
-				// shorten scope
-				[s setRange:NSMakeRange(r.location, affectedRange.location - r.location)];
-			}
-			else if (NSMaxRange(r) > NSMaxRange(affectedRange))
-			{
-				// shorten scope
-				[s setRange:NSMakeRange(r.location, NSMaxRange(affectedRange) - r.location)];
-			}
-			else
-			{
-				// completely inside the affected range, just remove it
-				s = nil;
-			}
-		}
-		if (s)
-			[tempTree addObject:s];
-		e = next;
+		[scopeArray removeObjectAtIndex:i];
 	}
-	
-	wholeScopeTree = tempTree;
 }
 
-- (void)setScopes:(NSArray *)aScopeArray inTree:(MHSysTree *)tree inRange:(NSRange)aRange additive:(BOOL)additive
+- (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
 {
 	int c = [aScopeArray count];
 	if (c == 0 || aRange.length == 0)
@@ -171,261 +132,59 @@
 
 	DEBUG(@"-- got scope [%@] in range %@", [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));
 
-	/* Find the closest node already in the tree.
-	 */
-	struct rb_entry *e = [tree root];
-	struct rb_entry *node = e;
-	ViScope *s = nil;
-	NSRange r;
-	while (e)
-	{
-		s = e->obj;
-		r = [s range];
-		node = e;
+	ViScope *scope = nil;
+	if (!additive)
+		scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
 
-		if (r.location > aRange.location)
+	NSUInteger i;
+	for (i = aRange.location; i < NSMaxRange(aRange); i++)
+	{
+		if (additive)
 		{
-			e = [tree left:e];
+			NSArray *oldScopes = [[scopeArray objectAtIndex:i] scopes];
+			scope = [[ViScope alloc] initWithScopes:[oldScopes arrayByAddingObjectsFromArray:aScopeArray] range:NSMakeRange(i, 1)];
 		}
-		else if (r.location < aRange.location)
-		{
-			e = [tree right:e];
-		}
+		if (i == [scopeArray count])
+			[scopeArray insertObject:scope atIndex:i];
 		else
-		{
-			break;
-		}
-	}
-
-check_again:
-
-	if (s == nil)
-		goto add_node;
-
-	DEBUG(@"closest node is %p [%@] at %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r));
-			
-	if (r.location == aRange.location)
-	{
-		DEBUG(@" found scope collision [%@] at range %@", [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r));
-		if (r.length < aRange.length)
-		{
-			/* FIXME: additive scopes not handled here
-			 */
-			DEBUG(@"must modify scope %@ (collides with %@ in %@)", s, [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));
-			if ([aScopeArray isEqualToStringArray:[s scopes]])
-			{
-				[s setRange:aRange];
-				DEBUG(@"extending scope %@ -> %@", s, NSStringFromRange(aRange));
-			}
-			else
-			{
-				DEBUG(@"replacing scope %@ -> [%@] in %@", s, [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));
-				[s setRange:aRange];
-				[s setScopes:aScopeArray];
-			}
-
-			// check if there is a scope just to the right of this one that must be modified (ie, that intersects with the new scope)
-			struct rb_entry *next;
-			for (e = [tree next:node]; e; e = next)
-			{
-				next = [tree next:e];
-				ViScope *xs = e->obj;
-				r = [xs range];
-				if (r.location >= NSMaxRange(aRange))
-					break;
-				[tree removeEntry:e];
-				if (NSMaxRange(r) <= NSMaxRange(aRange))
-				{
-					DEBUG(@"removing overlapped scope %@", xs);
-				}
-				else
-				{
-					r.length -= NSMaxRange(r) - NSMaxRange(aRange);
-					r.location = NSMaxRange(aRange);
-					DEBUG(@"modifying overlapped scope %@ -> %@", xs, NSStringFromRange(r));
-					[xs setRange:r];
-					[tree addObject:xs];
-				}
-			}
-
-			return;
-		}
-		else if (r.length > aRange.length)
-		{
-			NSRange newRange = NSMakeRange(NSMaxRange(aRange), r.length - aRange.length);
-
-			// check if there is a scope just to the right of this one that must be modified (ie, that intersects with the new scope)
-			struct rb_entry *next;
-			for (e = [tree next:node]; e; e = next)
-			{
-				next = [tree next:e];
-				ViScope *xs = e->obj;
-				DEBUG(@"check right scope %@", xs);
-				r = [xs range];
-				if (r.location >= NSMaxRange(newRange))
-					break;
-				[tree removeEntry:e];
-				if (NSMaxRange(r) <= NSMaxRange(newRange))
-				{
-					DEBUG(@"removing overlapped scope %@", xs);
-				}
-				else
-				{
-					r.length -= NSMaxRange(r) - NSMaxRange(newRange);
-					r.location = NSMaxRange(newRange);
-					DEBUG(@"modifying overlapped scope %@ -> %@", xs, NSStringFromRange(r));
-					[xs setRange:r];
-					[tree addObject:xs];
-				}
-			}
-
-			DEBUG(@"modifying scope %p [%@], range %@ -> %@", s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-			[tree removeEntry:node];
-			[s setRange:newRange];
-			[tree addObject:s];
-			if (additive)
-			{
-				aScopeArray = [s.scopes arrayByAddingObjectsFromArray:aScopeArray];
-			}
-		}
-		else
-		{
-			DEBUG(@"modifying scope %p [%@] -> [%@]", s, [s.scopes componentsJoinedByString:@" "], [aScopeArray componentsJoinedByString:@" "]);
-			if (additive)
-				[s setScopes:[s.scopes arrayByAddingObjectsFromArray:aScopeArray]];
-			else
-				[s setScopes:aScopeArray];
-			return;
-		}
-	}
-
-	if (r.location < aRange.location)
-	{
-		if (NSMaxRange(r) == aRange.location)
-		{
-			if ([aScopeArray isEqualToStringArray:[s scopes]])
-			{
-				NSRange newRange = r;
-				newRange.length += aRange.length;
-				DEBUG(@"extending left scope %p [%@], range %@ -> %@",
-					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-				[s setRange:newRange];
-				return;
-			}
-		}
-		else if (NSMaxRange(r) > aRange.location)
-		{
-			// fixme: check if equal scopes...
-			NSRange newRange = r;
-			newRange.length = aRange.location - r.location;
-			DEBUG(@"shortening left scope %p [%@], range %@ -> %@",
-				s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-			[s setRange:newRange];
-			if (additive)
-				aScopeArray = [s.scopes arrayByAddingObjectsFromArray:aScopeArray];
-		
-			if (NSMaxRange(r) > NSMaxRange(aRange))
-			{
-				// new scope cuts old scope range in two, re-add the right part
-				newRange.location = NSMaxRange(aRange);
-				newRange.length = NSMaxRange(r) - newRange.location;
-				ViScope *cutScope = [[ViScope alloc] initWithScopes:s.scopes range:newRange];
-				DEBUG(@"adding cut scope %p [%@], range %@", cutScope, [cutScope.scopes componentsJoinedByString:@" "], NSStringFromRange(cutScope.range));
-				[tree addObject:cutScope];
-			}
-		}
-	}
-
-	if (r.location > aRange.location)
-	{
-		if (NSMaxRange(aRange) == r.location)
-		{
-			if ([aScopeArray isEqualToStringArray:[s scopes]])
-			{
-				NSRange newRange;
-				newRange = NSMakeRange(aRange.location, aRange.length + r.length);
-				DEBUG(@"extending right scope %p [%@], range %@ -> %@",
-					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-				[tree removeEntry:node];
-				[s setRange:newRange];
-				[tree addObject:s];
-				return;
-			}
-		}
-		else if (NSMaxRange(aRange) > r.location)
-		{
-			BOOL addNewScope = YES;
-			NSRange newRange;
-			if ([aScopeArray isEqualToStringArray:[s scopes]])
-			{
-				newRange = NSMakeRange(aRange.location, aRange.length + r.length);
-				addNewScope = NO;
-				DEBUG(@"extending right scope %p [%@], range %@ -> %@",
-					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-			}
-			else
-			{
-				newRange = NSMakeRange(NSMaxRange(aRange), r.length - NSMaxRange(aRange));
-				DEBUG(@"shortening right scope %p [%@], range %@ -> %@",
-					s, [s.scopes componentsJoinedByString:@" "], NSStringFromRange(r), NSStringFromRange(newRange));
-			}
-			[tree removeEntry:node];
-			[s setRange:newRange];
-			[tree addObject:s];
-			if (!addNewScope)
-				return;
-		}
-		else
-		{
-			// Closest node does not intersect. Check node directly to the left. Full traversal!
-			e = [tree first];
-			node = NULL;
-			while (e)
-			{
-				s = e->obj;
-				r = [s range];
-				if (r.location > aRange.location)
-					break;
-				node = e;
-				e = [tree next:e];
-			}
-
-			if (node)
-			{
-				s = node->obj;
-				r = [s range];
-				DEBUG(@"re-checking left node %p in range %@", s, NSStringFromRange(r));
-				goto check_again;
-			}
-			else
-				DEBUG(@"no left node to check");
-		}
-	}
-
-add_node:
-
-	{
-		ViScope *scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
-		DEBUG(@"adding scope %@", scope);
-		[tree addObject:scope];
+			[scopeArray replaceObjectAtIndex:i withObject:scope];
 	}
 }
 
-- (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
+- (void)updateScopeRangesInRange:(NSRange)updateRange
 {
-	[self setScopes:aScopeArray inTree:scopeTree inRange:aRange additive:additive];
+	if (updateRange.location >= [scopeArray count])
+		return;
+
+	NSRange beginRange;
+	ViScope *begin = [scopeArray objectAtIndex:updateRange.location];
+	beginRange = NSMakeRange(updateRange.location, 0);
+
+	NSUInteger i;
+	for (i = updateRange.location; i < NSMaxRange(updateRange) && i < [scopeArray count]; i++)
+	{
+		ViScope *s = [scopeArray objectAtIndex:i];
+		if (begin && (s == begin || [[begin scopes] isEqualToStringArray:[s scopes]]))
+		{
+			beginRange.length++;
+			[scopeArray replaceObjectAtIndex:i withObject:begin];
+		}
+		else
+		{
+			if (begin)
+				[begin setRange:beginRange];
+			begin = s;
+			beginRange = NSMakeRange(i, 1);
+		}
+	}
+
+	if (begin)
+		[begin setRange:beginRange];
 }
 
-- (void)mergeScopeTree:(MHSysTree *)target withTree:(MHSysTree *)source
+- (void)updateScopeRanges
 {
-	DEBUG(@"merging %i scopes into target (with %i scopes)", [source count], [target count]);
-	struct rb_entry *e;
-	for (e = [source first]; e; e = [source next:e])
-	{
-		ViScope *s = e->obj;
-		DEBUG(@"merging scope %@", s);
-		[self setScopes:s.scopes inTree:target inRange:s.range additive:NO];
-	}
+	[self updateScopeRangesInRange:NSMakeRange(0, [scopeArray count])];
 }
 
 #pragma mark -
@@ -829,12 +588,11 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
+	[self updateScopeRangesInRange:NSMakeRange(offset, nextRange - offset)];
 	[context setRange:NSMakeRange(offset, nextRange - offset)];
-	[context setScopes:[scopeTree allObjects]];
+	[context setScopes:scopeArray];
 
 	chars = NULL;
-	[self mergeScopeTree:wholeScopeTree withTree:scopeTree];
-	[scopeTree removeAllObjects]; // FIXME: cheaper to just allocate a new tree?
 
 	[[NSGarbageCollector defaultCollector] enable];
 	[[NSGarbageCollector defaultCollector] collectIfNeeded];

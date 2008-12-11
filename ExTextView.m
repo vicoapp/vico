@@ -31,6 +31,59 @@ static id defaultEditor = nil;
 	return [[[self textStorage] string] substringWithRange:r];
 }
 
+- (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+
+	NSString *path;
+	NSString *suffix;
+	if ([partialPath hasSuffix:@"/"])
+	{
+		path = partialPath;
+		suffix = @"";
+	}
+	else
+	{
+		path = [partialPath stringByDeletingLastPathComponent];
+		suffix = [partialPath lastPathComponent];
+	}
+
+	NSArray *directoryContents = [fm directoryContentsAtPath:[path stringByExpandingTildeInPath]];
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
+	NSString *entry;
+	for (entry in directoryContents)
+	{
+		if ([entry compare:suffix options:NSCaseInsensitiveSearch range:NSMakeRange(0, [suffix length])] == NSOrderedSame)
+		{
+			NSString *s = [path stringByAppendingPathComponent:entry];
+			BOOL isDirectory = NO;
+			if ([fm fileExistsAtPath:[s stringByExpandingTildeInPath] isDirectory:&isDirectory] && isDirectory)
+				[matches addObject:[s stringByAppendingString:@"/"]];
+			else
+				[matches addObject:s];
+		}
+	}
+
+	if (longestMatchPtr && [matches count] > 0)
+	{
+		NSString *longestMatch = nil;
+		NSString *firstMatch = [matches objectAtIndex:0];
+		NSString *m;
+		for (m in matches)
+		{
+			NSString *commonPrefix = [firstMatch commonPrefixWithString:m options:NSCaseInsensitiveSearch];
+			if (longestMatch == nil || [commonPrefix length] < [longestMatch length])
+				longestMatch = commonPrefix;
+		}
+		*longestMatchPtr = longestMatch;
+	}
+
+	if (matchesPtr)
+		*matchesPtr = matches;
+
+	return [matches count];
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
 	if ([[theEvent characters] length] == 0)
@@ -50,7 +103,7 @@ static id defaultEditor = nil;
 
 		NSArray *completions = nil;
 		NSString *completion = nil;
-		NSUInteger n = [filename completePathIntoString:&completion caseSensitive:NO matchesIntoArray:&completions filterTypes:nil];
+		NSUInteger n = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
 
 		if (completion)
 		{

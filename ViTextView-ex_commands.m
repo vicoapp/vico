@@ -51,7 +51,7 @@
 			path = [command.filename stringByExpandingTildeInPath];
 		else if (![command.filename hasPrefix:@"/"])
 			path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:command.filename];
-		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path] display:YES];
+		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path] display:YES error:nil];
 	}
 }
 

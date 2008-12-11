@@ -690,9 +690,7 @@ static NSWindowController	*currentWindowController = nil;
 	if ([filter length] > 0)
 	{
 		[symbolFilterCache setObject:[item symbol] forKey:filter];
-
 		[symbolFilterField setStringValue:@""];
-		[self filterSymbols:symbolFilterField];
 	}
 
 	if ([item isKindOfClass:[ViDocument class]])
@@ -866,8 +864,7 @@ static NSWindowController	*currentWindowController = nil;
 			closeSymbolListAfterUse = NO;
 		}
 		[symbolFilterField setStringValue:@""];
-		[self filterSymbols:symbolFilterField];
-		[[self window] makeFirstResponder:[mostRecentView view]];
+		[[self window] makeFirstResponder:[mostRecentView textView]];
 		return YES;
 	}
 

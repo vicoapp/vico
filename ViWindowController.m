@@ -71,7 +71,8 @@ static NSWindowController	*currentWindowController = nil;
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
 	[tabBar setStyleNamed:@"Unified"];
 	[tabBar setCanCloseOnlyTab:YES];
-	[tabBar setHideForSingleTab:NO];
+	[tabBar setHideForSingleTab:[[NSUserDefaults standardUserDefaults] boolForKey:@"hidetab"]];
+	// FIXME: add KVC observer for the 'hidetab' option
 	[tabBar setPartnerView:splitView];
 	[tabBar setShowAddTabButton:YES];
 	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update  for this to work without NSTabview

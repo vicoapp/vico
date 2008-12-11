@@ -504,7 +504,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	
 	// add the command to the history
 	NSUInteger i = [exCommandHistory indexOfObject:exCommand];
-	if (i == NSNotFound)
+	if (i != NSNotFound)
 		[exCommandHistory removeObjectAtIndex:i];
 	[exCommandHistory addObject:exCommand];
 }

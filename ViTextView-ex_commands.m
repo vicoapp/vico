@@ -70,10 +70,11 @@
 		@"number", @"nu",
 		@"number", @"num",
 		@"number", @"numb",
-		@"autocollapse", @"ac",
+		@"autocollapse", @"ac",  // automatically collapses other documents in the symbol list
+		@"hidetab", @"ht",  // hide tab bar for single tabs
 		nil];
 
-	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", nil];
+	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", @"hidetab", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;
@@ -143,6 +144,7 @@
 			
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
 
+			// Special handling, FIXME: replace with KVC observers!
 			if ([defaults_name isEqualToString:@"number"])
 			{
 				[[self delegate] enableLineNumbers:!turnoff];
@@ -160,6 +162,7 @@
 				NSString *val = [var substringFromIndex:equals + 1];
 				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
 				
+				// Special handling, FIXME: replace with KVC observers!
 				if ([defaults_name isEqualToString:@"tabstop"])
 				{
                                         [self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];

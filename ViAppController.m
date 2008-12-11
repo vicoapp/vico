@@ -44,6 +44,8 @@
 			[NSNumber numberWithBool:YES], @"ignorecase",
 			[NSNumber numberWithBool:YES], @"expandtabs",
 			[NSNumber numberWithBool:YES], @"number",
+			[NSNumber numberWithBool:YES], @"autocollapse",
+			[NSNumber numberWithBool:NO], @"hidetab",
 			nil]];
 
 	/* initialize languages */

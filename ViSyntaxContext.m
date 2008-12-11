@@ -7,7 +7,6 @@
 @synthesize range;
 @synthesize lineOffset;
 @synthesize restarting;
-@synthesize scopes;
 @synthesize cancelled;
 
 - (ViSyntaxContext *)initWithLine:(unsigned)line

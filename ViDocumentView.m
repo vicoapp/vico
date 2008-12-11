@@ -41,6 +41,7 @@
 			break;
 
 		ViScope *scope = [scopeArray objectAtIndex:i];
+		DEBUG(@"%@", scope);
 		NSArray *names = [scope scopes];
 		NSRange range = [scope range];
 
@@ -54,10 +55,6 @@
 				break;
 			}
 		}
-	
-		DEBUG(@"%@", scope);
-	
-		// [[textView layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
 	
 		// Get the theme attributes for this collection of scopes.
 		NSDictionary *attributes = [theme attributesForScopes:names];

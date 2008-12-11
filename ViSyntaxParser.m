@@ -153,6 +153,8 @@
 
 - (void)updateScopeRangesInRange:(NSRange)updateRange
 {
+	DEBUG(@"updating scope ranges in range %@", NSStringFromRange(updateRange));
+
 	if (updateRange.location >= [scopeArray count])
 		return;
 
@@ -180,6 +182,13 @@
 
 	if (begin)
 		[begin setRange:beginRange];
+
+#if 0
+	gettimeofday(&stop_time, NULL);
+	timersub(&stop_time, &start, &diff);
+	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+	INFO(@"=> %.3f s", (float)ms / 1000.0);
+#endif
 }
 
 - (void)updateScopeRanges
@@ -588,10 +597,7 @@ done:
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	[self updateScopeRangesInRange:NSMakeRange(offset, nextRange - offset)];
 	[context setRange:NSMakeRange(offset, nextRange - offset)];
-	[context setScopes:scopeArray];
-
 	chars = NULL;
 
 	[[NSGarbageCollector defaultCollector] enable];

@@ -1289,7 +1289,10 @@
 - (BOOL)shift_right:(ViCommand *)command
 {
 	int delta_offset = [self changeIndentation:1 inRange:affectedRange];
-	end_location = final_location = start_location + delta_offset;
+	if (start_location > affectedRange.location)
+		end_location = final_location = end_location + delta_offset;
+	else
+		end_location = final_location = start_location + delta_offset;
 	return YES;
 }
 

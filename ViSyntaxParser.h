@@ -42,6 +42,8 @@
 - (void)pullContinuations:(NSValue *)rangeValue;
 - (void)pushScopes:(NSRange)affectedRange;
 - (void)pullScopes:(NSRange)affectedRange;
+
+- (void)updateScopeRangesInRange:(NSRange)updateRange;
 - (void)updateScopeRanges;
 
 - (NSArray *)scopeArray;

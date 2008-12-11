@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ExTextView.h"
@@ -149,6 +151,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)applySyntaxResult:(ViSyntaxContext *)context
 {
+	[syntaxParser updateScopeRangesInRange:[context range]];
+
+	DEBUG(@"applying syntax scopes, range = %@", NSStringFromRange([context range]));
 	ViDocumentView *dv;
 	for (dv in views)
 	{
@@ -156,7 +161,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	[updateSymbolsTimer invalidate];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4]
 						      interval:0
 							target:self
 						      selector:@selector(updateSymbolList:)
@@ -175,7 +180,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 	}
 
-	NSInteger endLocation = [textStorage locationForStartOfLine:10];
+	NSInteger endLocation = [textStorage locationForStartOfLine:100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
 
@@ -192,7 +197,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ctx.characters = chars;
 	unsigned startLine = ctx.lineOffset;
 
-	// unsigned endLine = [self lineNumberAtLocation:NSMaxRange(range) - 1];
+	// unsigned endLine = [textStorage lineNumberAtLocation:NSMaxRange(range) - 1];
 	// INFO(@"parsing line %u -> %u (ctx = %@)", startLine, endLine, ctx);
 
 	[syntaxParser parseContext:ctx];
@@ -244,7 +249,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	NSUInteger startLocation = [textStorage locationForStartOfLine:context.lineOffset];
-	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 10];
+	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 50];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
 
@@ -255,7 +260,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (IBAction)setLanguage:(id)sender
 {
-	INFO(@"sender = %@, title = %@", sender, [sender title]);
+	DEBUG(@"sender = %@, title = %@", sender, [sender title]);
 
 	[self setLanguageFromString:[sender title]];
 	if (language && [self fileURL])
@@ -304,7 +309,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		bundle = [[ViLanguageStore defaultStore] defaultBundleLanguage:&newLanguage];
 	}
 
-	INFO(@"new language = %@, (%@)", newLanguage, language);
+	DEBUG(@"new language = %@, (%@)", newLanguage, language);
 
 	[newLanguage patterns];
 	if (newLanguage != language)

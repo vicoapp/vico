@@ -20,7 +20,7 @@
 
 /* Always executed on the main thread.
  */
-- (void)applySyntaxResult:(ViSyntaxContext *)context
+- (void)applyScopes:(NSArray *)scopeArray inRange:(NSRange)applyRange
 {
 #if 0
 	struct timeval start;
@@ -29,25 +29,44 @@
 	gettimeofday(&start, NULL);
 #endif
 
-	DEBUG(@"applying range %@ context %p", NSStringFromRange([context range]), context);
-
-	DEBUG(@"resetting attributes in range %@", NSStringFromRange([context range]));
-	[self resetAttributesInRange:[context range]];
-
 	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	ViScope *scope;
-	for (scope in [context scopes])
+
+	DEBUG(@"resetting attributes in range %@", NSStringFromRange(applyRange));
+	[self resetAttributesInRange:applyRange];
+
+	NSUInteger i;
+	for (i = applyRange.location; i < NSMaxRange(applyRange);)
 	{
-		NSArray *scopes = [scope scopes];
+		if (i >= [[textView textStorage] length] || i >= [scopeArray count])
+			break;
+
+		ViScope *scope = [scopeArray objectAtIndex:i];
+		NSArray *names = [scope scopes];
 		NSRange range = [scope range];
+
+		if (range.location < i)
+		{
+			range.length = NSMaxRange(range) - i;
+			range.location = i;
+			if (range.length == 0)
+			{
+				INFO(@"*** probably something weired, range.length == 0");
+				break;
+			}
+		}
 	
-		DEBUG(@"[%@] (%p) range %@", [scopes componentsJoinedByString:@" "], scopes, NSStringFromRange(range));
+		DEBUG(@"%@", scope);
 	
 		// [[textView layoutManager] addTemporaryAttribute:ViScopeAttributeName value:scopes forCharacterRange:range];
 	
 		// Get the theme attributes for this collection of scopes.
-		NSDictionary *attributes = [theme attributesForScopes:scopes];
-		[[textView layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
+		NSDictionary *attributes = [theme attributesForScopes:names];
+		if (attributes)
+		{
+			[[textView layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
+		}
+
+		i += range.length;
 	}
 
 #if 0
@@ -59,28 +78,9 @@
 #endif
 }
 
-- (void)reapplyTheme
+- (void)reapplyThemeWithScopes:(NSArray *)scopeArray
 {
-	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	NSUInteger i, length = [[textView textStorage] length];
-	[self resetAttributesInRange:NSMakeRange(0, length)];
-	for (i = 0; i < length;)
-	{
-		NSRange range;
-		NSArray *scopes = [[textView layoutManager] temporaryAttribute:ViScopeAttributeName
-					                  atCharacterIndex:i
-						            effectiveRange:&range];
-	
-		if (scopes == nil)
-		{
-			break;
-		}
-
-		NSDictionary *attributes = [theme attributesForScopes:scopes];
-		[[textView layoutManager] addTemporaryAttributes:attributes forCharacterRange:range];
-		
-		i += range.length;
-	}
+	[self applyScopes:scopeArray inRange:NSMakeRange(0, [[textView textStorage] length])];
 }
 
 - (NSFont *)font
@@ -95,7 +95,6 @@
 
 	[[textView layoutManager] removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:aRange];
 	[[textView layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:aRange];
-
 	[[textView layoutManager] removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:aRange];
 	[[textView layoutManager] removeTemporaryAttribute:NSObliquenessAttributeName forCharacterRange:aRange];
 
@@ -103,7 +102,6 @@
 	NSDictionary *defaultAttributes = nil;
 	defaultAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 				  [theme foregroundColor], NSForegroundColorAttributeName,
-				  [self font], NSFontAttributeName,
 				  nil];
 	[[textView layoutManager] addTemporaryAttributes:defaultAttributes forCharacterRange:aRange];
 }

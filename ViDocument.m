@@ -93,10 +93,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ignoreEditing = YES;
 	[textView initEditorWithDelegate:self documentView:documentView];
 
-	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] init];
-	[ctx setRange:NSMakeRange(0, [textStorage length])];
-	[ctx setScopes:[[syntaxParser wholeScopeTree] allObjects]];
-	[documentView applySyntaxResult:ctx];
+	[syntaxParser updateScopeRanges];
+	[documentView applyScopes:[syntaxParser scopeArray] inRange:NSMakeRange(0, [textStorage length])];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
@@ -151,7 +149,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)applySyntaxResult:(ViSyntaxContext *)context
 {
-	[views makeObjectsPerformSelector:@selector(applySyntaxResult:) withObject:context];
+	ViDocumentView *dv;
+	for (dv in views)
+	{
+		[dv applyScopes:[syntaxParser scopeArray] inRange:[context range]];
+	}
 
 	[updateSymbolsTimer invalidate];
 	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.6]
@@ -452,11 +454,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)changeTheme:(ViTheme *)theme
 {
+	[syntaxParser updateScopeRanges];
 	ViDocumentView *dv;
 	for (dv in views)
 	{
 		[[dv textView] setTheme:theme];
-		[dv reapplyTheme];
+		[dv reapplyThemeWithScopes:[syntaxParser scopeArray]];
 	}
 }
 
@@ -601,13 +604,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	gettimeofday(&start, NULL);
 #endif
 
+	[syntaxParser updateScopeRanges];
+
 	NSMutableArray *syms = [[NSMutableArray alloc] init];
 
-	MHSysTree *scopeTree = [syntaxParser wholeScopeTree];
-	struct rb_entry *e;
-	for (e = [scopeTree first]; e; e = [scopeTree next:e])
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	NSUInteger i;
+	for (i = 0; i < [scopeArray count];)
 	{
-		ViScope *s = e->obj;
+		ViScope *s = [scopeArray objectAtIndex:i];
 		NSArray *scopes = s.scopes;
 		NSRange range = s.range;
 
@@ -643,6 +648,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				}
 			}
 		}
+
+		i += range.length;
 	}
 
 	[self setSymbols:syms];
@@ -664,7 +671,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"ViDocument %p: %@", self, [self displayName]];
+	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self displayName]];
 }
 
 - (void)setMostRecentDocumentView:(ViDocumentView *)docView

@@ -123,6 +123,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation;
+- (void)pushCurrentLocationOnJumpList;
 @end
 
 @interface ViTextView (snippets)

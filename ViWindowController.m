@@ -5,6 +5,7 @@
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
 #import "ViSeparatorCell.h"
+#import "ViJumpList.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -152,6 +153,11 @@ static NSWindowController	*currentWindowController = nil;
 		return;
 	}
 
+	if (mostRecentView)
+	{
+		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
+	}
+
 	[tabBar addDocument:document];
 	[self selectDocument:document];
 
@@ -162,6 +168,8 @@ static NSWindowController	*currentWindowController = nil;
         NSInteger row = [symbolsOutline rowForItem:document];
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
+	[[ViJumpList defaultJumpList] pushURL:[document fileURL] line:1 column:1];
 }
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView
@@ -427,7 +435,7 @@ static NSWindowController	*currentWindowController = nil;
 		else
 			[self selectDocument:document];
 	}
-	[[mostRecentView textView] gotoLine:line column:column];
+	[(ViTextView *)[mostRecentView textView] gotoLine:line column:column];
 }
 
 #pragma mark -

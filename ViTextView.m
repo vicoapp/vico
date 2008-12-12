@@ -1572,6 +1572,11 @@ int logIndent = 0;
 	                               column:[self columnAtLocation:aLocation]];
 }
 
+- (void)pushCurrentLocationOnJumpList
+{
+	[self pushLocationOnJumpList:[self caret]];
+}
+
 #pragma mark -
 #pragma mark Bundle commands
 

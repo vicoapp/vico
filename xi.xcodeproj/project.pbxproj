@@ -42,6 +42,7 @@
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
 		9A9C5D470E75962C00F4B596 /* ExTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9C5D460E75962C00F4B596 /* ExTextView.m */; };
 		9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */; };
+		9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA7096A0EF284A700B4CE34 /* ViJumpList.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 		9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AB014970ED5F99200905BED /* CommandOutputWindow.xib */; };
 		9AB014B00ED6021B00905BED /* ViCommandOutputController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */; };
@@ -186,6 +187,8 @@
 		9A9C5D450E75962C00F4B596 /* ExTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExTextView.h; sourceTree = "<group>"; };
 		9A9C5D460E75962C00F4B596 /* ExTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExTextView.m; sourceTree = "<group>"; };
 		9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextField-additions.m"; sourceTree = "<group>"; };
+		9AA709690EF284A700B4CE34 /* ViJumpList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViJumpList.h; sourceTree = "<group>"; };
+		9AA7096A0EF284A700B4CE34 /* ViJumpList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViJumpList.m; sourceTree = "<group>"; };
 		9AB014970ED5F99200905BED /* CommandOutputWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CommandOutputWindow.xib; path = English.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
 		9AB014AE0ED6021A00905BED /* ViCommandOutputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommandOutputController.h; sourceTree = "<group>"; };
 		9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommandOutputController.m; sourceTree = "<group>"; };
@@ -286,6 +289,7 @@
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				9AC16DA00D93CF9C00AE45E0 /* Controllers */,
+				9AA709780EF284B900B4CE34 /* Categories */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
@@ -299,7 +303,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */,
+				9AA709690EF284A700B4CE34 /* ViJumpList.h */,
+				9AA7096A0EF284A700B4CE34 /* ViJumpList.m */,
 				9A0868B00EE03A7600274635 /* ViSeparatorCell.h */,
 				9A0868B10EE03A7600274635 /* ViSeparatorCell.m */,
 				9AB015170ED7102200905BED /* ViSnippet.h */,
@@ -310,8 +315,6 @@
 				9AF207040ED3027C00C5771B /* ViProject.m */,
 				9AF205940ED2D8B500C5771B /* ProjectDelegate.h */,
 				9AF205950ED2D8B500C5771B /* ProjectDelegate.m */,
-				9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */,
-				9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */,
 				9AF201550ECDDD7E00C5771B /* ViSyntaxContext.h */,
 				9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */,
 				9AF201570ECDDD7E00C5771B /* ViSyntaxParser.h */,
@@ -355,8 +358,6 @@
 				9A668E160D11174A003FABD9 /* ViLanguageStore.m */,
 				9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */,
 				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
-				9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */,
-				9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */,
 				9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */,
 				9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */,
 				9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */,
@@ -367,8 +368,6 @@
 				9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */,
 				9AFBC31C0EE717C400646DCB /* ViDocumentView.h */,
 				9AFBC31D0EE717C400646DCB /* ViDocumentView.m */,
-				9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */,
-				9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -433,6 +432,20 @@
 				9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9AA709780EF284B900B4CE34 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */,
+				9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */,
+				9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */,
+				9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */,
+				9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */,
+				9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */,
+				9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */,
+			);
+			name = Categories;
 			sourceTree = "<group>";
 		};
 		9AB0178A0EDDBF8100905BED /* Images */ = {
@@ -686,6 +699,7 @@
 				9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */,
 				9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */,
 				9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */,
+				9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

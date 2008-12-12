@@ -6,6 +6,7 @@
 @class ViDocumentView;
 @class ProjectDelegate;
 @class ViResizeView;
+@class ViJumpList;
 
 @interface ViWindowController : NSWindowController
 {
@@ -39,6 +40,8 @@
 	NSMutableArray *filteredDocuments;
 	NSMutableDictionary *symbolFilterCache;
 	BOOL closeSymbolListAfterUse;
+
+	ViJumpList *jumpList;
 }
 
 @property(readwrite, assign) NSMutableArray *documents;
@@ -62,6 +65,7 @@
 - (IBAction)selectPreviousTab:(id)sender;
 
 - (void)switchToLastFile;
+- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;

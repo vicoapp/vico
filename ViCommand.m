@@ -18,8 +18,10 @@ static struct vikey normal_map[] = {
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
+	{@"jumplist_forward:",	0x9, 0},  // ^I
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
+	{@"jumplist_backward:",	0xF, 0},  // ^O
 	{@"show_info:",		0x7, 0},  // ^G
 	{@"pop_tag:",		0x14, 0},  // ^T
 	{@"jump_tag:",		0x1D, 0},  // ^]

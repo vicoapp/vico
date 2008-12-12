@@ -12,6 +12,7 @@
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViCommandOutputController.h"
 #import "ViDocumentView.h"
+#import "ViJumpList.h"
 #import "NSTextStorage-additions.h"
 
 int logIndent = 0;
@@ -583,7 +584,7 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Convenience methods
 
-- (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
+- (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
@@ -601,7 +602,12 @@ int logIndent = 0;
 	}
 	if (mode != ViInsertMode && i == eol)
 		i = IMAX(bol, eol - 1);
-	final_location = end_location = i;
+	return i;
+}
+
+- (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
+{
+	final_location = end_location = [self locationForColumn:column fromLocation:aLocation];
 }
 
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
@@ -770,6 +776,7 @@ int logIndent = 0;
 {
 	if ([self findPattern:pattern options:0])
 	{
+		[self pushLocationOnJumpList:start_location];
 		[self setCaret:final_location];
 	}
 }
@@ -793,6 +800,7 @@ int logIndent = 0;
 		return NO;
 	}
 
+	[self pushLocationOnJumpList:start_location];
 	return [self findPattern:pattern options:0];
 }
 
@@ -806,6 +814,7 @@ int logIndent = 0;
 		return NO;
 	}
 
+	[self pushLocationOnJumpList:start_location];
 	return [self findPattern:pattern options:1];
 }
 
@@ -1554,6 +1563,13 @@ int logIndent = 0;
 - (void)switch_file:(NSString *)character
 {
         [[[self delegate] windowController] switchToLastFile];
+}
+
+- (void)pushLocationOnJumpList:(NSUInteger)aLocation
+{
+	[[ViJumpList defaultJumpList] pushURL:[[self delegate] fileURL]
+	                                 line:[[self textStorage] lineNumberAtLocation:aLocation]
+	                               column:[self columnAtLocation:aLocation]];
 }
 
 #pragma mark -

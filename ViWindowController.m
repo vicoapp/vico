@@ -12,6 +12,7 @@ static NSWindowController	*currentWindowController = nil;
 @interface ViWindowController ()
 - (ViDocumentView *)documentViewForView:(NSView *)aView;
 - (void)collapseDocumentView:(ViDocumentView *)docView;
+- (ViDocument *)documentForURL:(NSURL *)url;
 @end
 
 
@@ -397,6 +398,36 @@ static NSWindowController	*currentWindowController = nil;
 	}
         else
 		[self selectDocument:lastDocument];
+}
+
+- (ViDocument *)documentForURL:(NSURL *)url
+{
+	ViDocument *doc;
+	for (doc in documents)
+	{
+		if ([url isEqual:[doc fileURL]])
+			return doc;
+	}
+	return nil;
+}
+
+- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+{
+	ViDocument *document = [self documentForURL:url];
+	if (document == nil)
+	{
+		INFO(@"should open url %@", [url absoluteString]);
+		return;
+	}
+
+	if ([self currentDocument] != document)
+	{
+		if ([document visibleViews] > 0)
+			[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
+		else
+			[self selectDocument:document];
+	}
+	[[mostRecentView textView] gotoLine:line column:column];
 }
 
 #pragma mark -

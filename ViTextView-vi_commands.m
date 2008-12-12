@@ -1,9 +1,55 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
 #import "ViMark.h"
+#import "ViJumpList.h"
 #import "NSTextStorage-additions.h"
 
 @implementation ViTextView (vi_commands)
+
+- (BOOL)jumplist_forward:(ViCommand *)command
+{
+	NSURL *url;
+	NSUInteger line, column;
+	BOOL ok = [[ViJumpList defaultJumpList] forwardToURL:&url line:&line column:&column];
+	if (!ok)
+	{
+		[[self delegate] message:@"Already at end of jumplist"];
+		return NO;
+	}
+
+	if (![url isEqual:[[self delegate] fileURL]])
+	{
+		[[[self delegate] windowController] gotoURL:url line:line column:column]; // FIXME: this is ugly!
+	}
+	else
+	{
+		[self gotoLine:line column:column];
+	}
+	return YES;
+}
+
+- (BOOL)jumplist_backward:(ViCommand *)command
+{
+	NSURL *url = [[self delegate] fileURL];
+	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
+	NSUInteger column = [self columnAtLocation:start_location];
+	BOOL ok = [[ViJumpList defaultJumpList] backwardToURL:&url line:&line column:&column];
+	if (!ok)
+	{
+		[[self delegate] message:@"Already at beginning of jumplist"];
+		return NO;
+	}
+
+	if (![url isEqual:[[self delegate] fileURL]])
+	{
+		[[[self delegate] windowController] gotoURL:url line:line column:column]; // FIXME: this is ugly!
+	}
+	else
+	{
+		[self gotoLine:line column:column];
+	}
+	return YES;
+}
 
 - (BOOL)visual:(ViCommand *)command
 {
@@ -22,6 +68,8 @@
 
 - (BOOL)move_high:(ViCommand *)command
 {
+	[self pushLocationOnJumpList:start_location];
+
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
@@ -39,6 +87,8 @@
 
 - (BOOL)move_middle:(ViCommand *)command
 {
+	[self pushLocationOnJumpList:start_location];
+
 	NSScrollView *scrollView = [self enclosingScrollView];
         NSRect visibleRect = [[scrollView contentView] bounds];
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
@@ -54,6 +104,8 @@
 
 - (BOOL)move_low:(ViCommand *)command
 {
+	[self pushLocationOnJumpList:start_location];
+
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
@@ -158,6 +210,9 @@
 		[[self delegate] message:@"Matching character not found"];
 		return NO;
         }
+
+	[self pushLocationOnJumpList:start_location];
+
 	final_location = end_location = offset;
 	if (delta == 1)
                 end_location++;
@@ -237,6 +292,7 @@
 		cur = eol;
 	}
 
+	[self pushLocationOnJumpList:start_location];
 	end_location = final_location = bol;
 	return YES;
 }
@@ -263,6 +319,7 @@
 		cur = bol;
 	}
 
+	[self pushLocationOnJumpList:start_location];
 	end_location = final_location = bol;
 	return YES;
 }
@@ -421,6 +478,7 @@
 
 	if ([self delete:command])
 	{
+		end_location = start_location = affectedRange.location;
 		[self setInsertMode:command];
 		return YES;
 	}
@@ -817,6 +875,7 @@
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
 		final_location = end_location;
 	}
+	[self pushLocationOnJumpList:start_location];
 	return YES;
 }
 
@@ -1321,7 +1380,7 @@
 	if (tags == nil)
 	{
 		[[self delegate] message:@"tags: No such file or directory."];
-		return YES;
+		return NO;
 	}
 
 	NSString *word = [self wordAtLocation:start_location];
@@ -1331,6 +1390,7 @@
 		if (tag)
 		{
 			[[self delegate] pushLine:[self currentLine] column:[self currentColumn]];
+			[self pushLocationOnJumpList:start_location];
 
 			NSString *file = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
@@ -1350,7 +1410,7 @@
 			[[self delegate] message:@"%@: tag not found", word];
 		}
 	}
-	
+
 	return YES;
 }
 
@@ -1420,6 +1480,8 @@
 		[self gotoColumn:m.column fromLocation:bol];
 	else
 		final_location = [self skipWhitespaceFrom:final_location];
+
+	[self pushLocationOnJumpList:start_location];
 
 	return YES;
 }

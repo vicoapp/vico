@@ -425,11 +425,10 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocument *document = [self documentForURL:url];
 	if (document == nil)
 	{
-		INFO(@"should open url %@", [url absoluteString]);
-		return;
+		document = [[NSDocumentController sharedDocumentController]
+			openDocumentWithContentsOfURL:url display:YES error:nil];
 	}
-
-	if ([self currentDocument] != document)
+	else if ([self currentDocument] != document)
 	{
 		if ([document visibleViews] > 0)
 			[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];

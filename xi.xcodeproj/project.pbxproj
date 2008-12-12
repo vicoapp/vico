@@ -619,7 +619,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\n#echo \"Removing old OgreKit framework\"\n#rm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/OgreKit.framework\n#echo \"Copying new OgreKit framework\"\n#cp -Rp $TARGET_BUILD_DIR/../../OgreKit/build/$BUILD_STYLE/OgreKit.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+			shellScript = "set -x\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
 		};
 		9AF2FE6E0EC9C85900C5771B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

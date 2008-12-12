@@ -9,10 +9,316 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>patch</string>
+				<string>diff</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Patch File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>tex</string>
+				<string>sty</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>TeX document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>lua</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Lua source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pl</string>
+				<string>pm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Perl source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>py</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Python source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>erb</string>
+				<string>rhtml</string>
+				<string>builder</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Ruby on Rails source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>rb</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Ruby source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>txt</string>
+				<string>text</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Text document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>md</string>
+				<string>markdown</string>
+				<string>mdown</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Markdown source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>php</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>PHP source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>css</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>CSS source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>html</string>
+				<string>html</string>
+				<string>shtml</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>HTML source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Objective-C++ source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>C</string>
+				<string>cc</string>
+				<string>cpp</string>
+				<string>cxx</string>
+				<string>H</string>
+				<string>hh</string>
+				<string>hpp</string>
+				<string>hxx</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>C++ source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>m</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>Objective-C source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>c</string>
+				<string>h</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>xi</string>
+			<key>CFBundleTypeName</key>
+			<string>C source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>*</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Document</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -54,7 +360,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>XIED</string>
 	<key>CFBundleVersion</key>
 	<string>0.1</string>
 	<key>NSMainNibFile</key>

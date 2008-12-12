@@ -17,7 +17,7 @@
 	NSUInteger position;
 }
 + (ViJumpList *)defaultJumpList;
-- (void)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
+- (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 - (BOOL)forwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;
 - (BOOL)backwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;
 @end

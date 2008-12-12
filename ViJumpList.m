@@ -48,18 +48,33 @@ static ViJumpList *defaultJumpList = nil;
 	return self;
 }
 
-- (void)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+- (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
 {
 	if ([jumps count] >= MAX_JUMP_LOCATIONS)
 	{
 		[jumps removeObjectAtIndex:0];
 	}
-	ViJump *lastJump = [jumps lastObject];
-	if (lastJump && [lastJump line] == line)
-		[jumps removeLastObject];
+
+	BOOL removedDuplicate = NO;
+	ViJump *jump = nil;
+	for (jump in jumps)
+	{
+		if ([[jump url] isEqual:url] && [jump line] == line)
+		{
+			break;
+		}
+	}
+	if (jump)
+	{
+		DEBUG(@"removing duplicate jump %@", jump);
+		[jumps removeObject:jump];
+		removedDuplicate = YES;
+	}
+
 	[jumps addObject:[[ViJump alloc] initWithURL:url line:line column:column]];
 	position = [jumps count];
 	DEBUG(@"jumps = %@, position = %u", jumps, position);
+	return removedDuplicate;
 }
 
 - (BOOL)gotoJumpAtPosition:(NSUInteger)aPosition URL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr
@@ -72,6 +87,7 @@ static ViJumpList *defaultJumpList = nil;
 		*linePtr = [jump line];
 	if (columnPtr)
 		*columnPtr = [jump column];
+	DEBUG(@"jumps = %@, position = %u", jumps, position);
 	return YES;
 }
 
@@ -88,12 +104,16 @@ static ViJumpList *defaultJumpList = nil;
 	DEBUG(@"position = %u, count = %u", position, [jumps count]);
 	if (position == 0)
 		return NO;
+
 	if (position >= [jumps count])
 	{
 		NSUInteger savedPosition = position;
-		[self pushURL:*urlPtr line:*linePtr column:*columnPtr];
+		BOOL removedDuplicate = [self pushURL:*urlPtr line:*linePtr column:*columnPtr];
 		position = savedPosition;
+		if (removedDuplicate)
+			position--;
 	}
+
 	return [self gotoJumpAtPosition:--position URL:urlPtr line:linePtr column:columnPtr];
 }
 

@@ -266,6 +266,8 @@ static NSWindowController	*currentWindowController = nil;
 		lastDocumentView = nil;
 	}
 
+	[documents removeObject:document];
+
 	if ([documents count] == 0)
 	{
 		INFO(@"no documents left, closing window");
@@ -312,7 +314,6 @@ static NSWindowController	*currentWindowController = nil;
 			[self selectDocument:[documents objectAtIndex:0]];
 		}
 
-		[documents removeObject:document];
 		[self filterSymbols:symbolFilterField];
 	}
 }

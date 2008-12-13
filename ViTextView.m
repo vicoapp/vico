@@ -853,8 +853,13 @@ int logIndent = 0;
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
 	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX
+	if (caret + 1 >= [[self textStorage] length])
+	{
+		caretRect.size.height /= 2;
+	}
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;

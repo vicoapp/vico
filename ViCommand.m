@@ -16,6 +16,7 @@ static struct vikey input_map[] = {
 static struct vikey normal_map[] = {
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
+	{@"scroll_down_by_line:",0x5, 0}, // ^E
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
 	{@"jumplist_forward:",	0x9, 0},  // ^I
@@ -24,6 +25,7 @@ static struct vikey normal_map[] = {
 	{@"jumplist_backward:",	0xF, 0},  // ^O
 	{@"show_info:",		0x7, 0},  // ^G
 	{@"pop_tag:",		0x14, 0},  // ^T
+	{@"scroll_up_by_line:",	0x19, 0},  // ^Y
 	{@"jump_tag:",		0x1D, 0},  // ^]
 	{@"move_right:",	' ', VIF_IS_MOTION},
 	{@"append_eol:",	'A', VIF_SETS_DOT},

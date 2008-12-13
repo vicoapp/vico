@@ -4,8 +4,14 @@
 #import "ViJumpList.h"
 #import "NSTextStorage-additions.h"
 
+@interface ViTextView (vi_commands_private)
+- (BOOL)move_down:(ViCommand *)command;
+- (BOOL)move_up:(ViCommand *)command;
+@end
+
 @implementation ViTextView (vi_commands)
 
+/* syntax: [count]<ctrl-i> */
 - (BOOL)jumplist_forward:(ViCommand *)command
 {
 	NSURL *url;
@@ -28,6 +34,7 @@
 	return YES;
 }
 
+/* syntax: [count]<ctrl-o> */
 - (BOOL)jumplist_backward:(ViCommand *)command
 {
 	NSURL *url = [[self delegate] fileURL];
@@ -51,6 +58,7 @@
 	return YES;
 }
 
+/* syntax: v */
 - (BOOL)visual:(ViCommand *)command
 {
 	visual_start_location = [self caret];
@@ -59,6 +67,7 @@
 	return TRUE;
 }
 
+/* syntax: V */
 - (BOOL)visual_line:(ViCommand *)command
 {
 	[self visual:command];
@@ -66,6 +75,7 @@
 	return TRUE;
 }
 
+/* syntax: [count]H */
 - (BOOL)move_high:(ViCommand *)command
 {
 	[self pushLocationOnJumpList:start_location];
@@ -85,6 +95,7 @@
 	return YES;
 }
 
+/* syntax: [count]M */
 - (BOOL)move_middle:(ViCommand *)command
 {
 	[self pushLocationOnJumpList:start_location];
@@ -102,6 +113,7 @@
 	return YES;
 }
 
+/* syntax: [count]L */
 - (BOOL)move_low:(ViCommand *)command
 {
 	[self pushLocationOnJumpList:start_location];
@@ -128,6 +140,82 @@
 	return YES;
 }
 
+/* syntax: <ctrl-e> */
+- (BOOL)scroll_down_by_line:(ViCommand *)command
+{
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        NSRect visibleRect = [clipView bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// check if last line is visible
+	if (NSMaxRange(range) >= [[self textStorage] length])
+	{
+		[[self delegate] message:@"Already at end-of-file"];
+		return NO;
+	}
+
+	NSUInteger end;
+	[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:range.location];
+
+	if (start_location < end)
+	{
+		[self move_down:command];
+	}
+
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(end, 1) inTextContainer:[self textContainer]];
+	NSRect bounds = [clipView bounds];
+	[clipView scrollToPoint:NSMakePoint(bounds.origin.x, rect.origin.y)];
+	[scrollView reflectScrolledClipView:clipView];
+
+	return YES;
+}
+
+/* syntax: <ctrl-y> */
+- (BOOL)scroll_up_by_line:(ViCommand *)command
+{
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+        NSRect visibleRect = [clipView bounds];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// check if first line is visible
+	NSUInteger first_end;
+	[self getLineStart:NULL end:&first_end contentsEnd:NULL forLocation:0];
+	if (range.location < first_end)
+	{
+		[[self delegate] message:@"Already at the beginning of the file"];
+		return NO;
+	}
+
+	// check if caret is on the last line
+	NSUInteger last_bol;
+	[self getLineStart:&last_bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
+	INFO(@"start_location = %u, last_bol = %u", start_location, last_bol);
+	if (start_location >= last_bol)
+	{
+		INFO(@"move up");
+		[self move_up:command];
+	}
+
+	// get the line above the first visible line
+	NSUInteger bol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:range.location];
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:bol - 1];
+
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(bol, 1) inTextContainer:[self textContainer]];
+	NSRect bounds = [clipView bounds];
+	[clipView scrollToPoint:NSMakePoint(bounds.origin.x, rect.origin.y)];
+	[scrollView reflectScrolledClipView:clipView];
+
+	return YES;
+}
+
+/* syntax: % */
 - (BOOL)move_to_match:(ViCommand *)command
 {
         // find first paren on current line
@@ -693,6 +781,7 @@
 	final_location = end_location = start_location + 1;
 	return YES;
 }
+
 /* syntax: [count]k */
 - (BOOL)move_up:(ViCommand *)command
 {

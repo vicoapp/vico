@@ -14,16 +14,20 @@
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *documentView;
 	IBOutlet NSToolbar *toolbar;
-	IBOutlet NSTextField *statusbar;
+
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	ViDocument *lastDocument;
 	ViDocumentView *lastDocumentView;
 	ViDocument *selectedDocument;
-
 	ViDocument *mostRecentDocument;
 	ViDocumentView *mostRecentView;
+
+	// command output view
+	IBOutlet NSTextField *statusbar;
+	IBOutlet NSSplitView *commandSplit;
+	IBOutlet NSTextView *commandOutput;
 
 	// project list
 	IBOutlet NSOutlineView *projectOutline;

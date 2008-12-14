@@ -1,11 +1,11 @@
 #import "ViWindowController.h"
 #import <PSMTabBarControl/PSMTabBarControl.h>
 #import "ViDocument.h"
-#import "ExTextView.h"
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
 #import "ViSeparatorCell.h"
 #import "ViJumpList.h"
+#import "ViThemeStore.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -110,17 +110,12 @@ static NSWindowController	*currentWindowController = nil;
 	[cell setWraps:NO];
 
 	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
+	[statusbar setDelegate:self];
 
 	separatorCell = [[ViSeparatorCell alloc] init];
-}
 
-- (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
-{
-	if ([anObject isKindOfClass:[NSTextField class]] && anObject != symbolFilterField)
-	{
-		return [ExTextView defaultEditor];
-	}
-	return nil;
+	[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
+	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
 }
 
 - (IBAction)addNewDocumentTab:(id)sender
@@ -868,45 +863,238 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+- (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
+{
+	NSString *s = [fieldEditor string];
+	NSRange r = [s rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]
+				       options:NSBackwardsSearch
+					 range:NSMakeRange(0, aLocation)];
+
+	if (r.location++ == NSNotFound)
+		r.location = 0;
+
+	r.length = aLocation - r.location;
+	*outRange = r;
+
+	return [s substringWithRange:r];
+}
+
+- (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+
+	NSString *path;
+	NSString *suffix;
+	if ([partialPath hasSuffix:@"/"])
+	{
+		path = partialPath;
+		suffix = @"";
+	}
+	else
+	{
+		path = [partialPath stringByDeletingLastPathComponent];
+		suffix = [partialPath lastPathComponent];
+	}
+
+	NSArray *directoryContents = [fm directoryContentsAtPath:[path stringByExpandingTildeInPath]];
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
+	NSString *entry;
+	for (entry in directoryContents)
+	{
+		if ([entry compare:suffix options:NSCaseInsensitiveSearch range:NSMakeRange(0, [suffix length])] == NSOrderedSame)
+		{
+			if ([entry hasPrefix:@"."] && ![suffix hasPrefix:@"."])
+				continue;
+			NSString *s = [path stringByAppendingPathComponent:entry];
+			BOOL isDirectory = NO;
+			if ([fm fileExistsAtPath:[s stringByExpandingTildeInPath] isDirectory:&isDirectory] && isDirectory)
+				[matches addObject:[s stringByAppendingString:@"/"]];
+			else
+				[matches addObject:s];
+		}
+	}
+
+	if (longestMatchPtr && [matches count] > 0)
+	{
+		NSString *longestMatch = nil;
+		NSString *firstMatch = [matches objectAtIndex:0];
+		NSString *m;
+		for (m in matches)
+		{
+			NSString *commonPrefix = [firstMatch commonPrefixWithString:m options:NSCaseInsensitiveSearch];
+			if (longestMatch == nil || [commonPrefix length] < [longestMatch length])
+				longestMatch = commonPrefix;
+		}
+		*longestMatchPtr = longestMatch;
+	}
+
+	if (matchesPtr)
+		*matchesPtr = matches;
+
+	return [matches count];
+}
+
+- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path
+{
+	int skipIndex;
+	if ([path hasSuffix:@"/"])
+		skipIndex = [path length];
+	else
+		skipIndex = [[path stringByDeletingLastPathComponent] length] + 1;
+
+	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:11.0]
+							  forKey:NSFontAttributeName];
+	NSString *c;
+	NSSize maxsize = NSMakeSize(0, 0);
+	for (c in completions)
+	{
+		NSSize size = [[c substringFromIndex:skipIndex] sizeWithAttributes:attrs];
+		if (size.width > maxsize.width)
+			maxsize = size;
+	}
+
+	CGFloat colsize = maxsize.width + 50;
+
+	NSRect bounds = [commandOutput bounds];
+	int columns = NSWidth(bounds) / colsize;
+	if (columns <= 0)
+		columns = 1;
+
+	// remove all previous tab stops
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	NSTextTab *tabStop;
+	for (tabStop in [style tabStops])
+	{
+		[style removeTabStop:tabStop];
+	}
+	[style setDefaultTabInterval:colsize];
+
+	[[[commandOutput textStorage] mutableString] setString:@""];
+	int n = 0;
+	for (c in completions)
+	{
+		[[[commandOutput textStorage] mutableString] appendFormat:@"%@\t%@",
+			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @""];
+	}
+
+	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
+	[commandOutput setBackgroundColor:[theme backgroundColor]];
+	[commandOutput setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
+								             forKey:NSBackgroundColorAttributeName]];
+	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+			style, NSParagraphStyleAttributeName,
+			[theme foregroundColor], NSForegroundColorAttributeName,
+			[theme backgroundColor], NSBackgroundColorAttributeName,
+			[NSFont userFixedPitchFontOfSize:11.0], NSFontAttributeName,
+			nil];
+	[[commandOutput textStorage] addAttributes:attrs range:NSMakeRange(0, [[commandOutput textStorage] length])];
+
+        // display the completion by expanding the commandSplit view
+	[commandSplit setPosition:NSHeight([commandSplit frame])*0.60 ofDividerAtIndex:0];
+}
+
 - (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
 {
 	INFO(@"selector = %s", aSelector);
 
-	if (aSelector == @selector(insertNewline:)) // enter
+	if (sender == symbolFilterField)
 	{
-		[self goToSymbol:self];
-		return YES;
-	}
-	else if (aSelector == @selector(moveUp:)) // up arrow
-	{
-		NSInteger row = [symbolsOutline selectedRow];
-		if (row > 0)
+		if (aSelector == @selector(insertNewline:)) // enter
 		{
-			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
+			[self goToSymbol:self];
+			return YES;
 		}
-		return YES;
-	}
-	else if (aSelector == @selector(moveDown:)) // down arrow
-	{
-		NSInteger row = [symbolsOutline selectedRow];
-		if (row + 1 < [symbolsOutline numberOfRows])
+		else if (aSelector == @selector(moveUp:)) // up arrow
 		{
-			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
+			NSInteger row = [symbolsOutline selectedRow];
+			if (row > 0)
+			{
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
+			}
+			return YES;
 		}
-		return YES;
-	}
-	else if (aSelector == @selector(cancelOperation:)) // escape
-	{
-		if (closeSymbolListAfterUse)
+		else if (aSelector == @selector(moveDown:)) // down arrow
 		{
-			[self toggleSymbolList:self];
-			closeSymbolListAfterUse = NO;
+			NSInteger row = [symbolsOutline selectedRow];
+			if (row + 1 < [symbolsOutline numberOfRows])
+			{
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
+			}
+			return YES;
 		}
-		[symbolFilterField setStringValue:@""];
-		[[self window] makeFirstResponder:[mostRecentView textView]];
-		return YES;
+		else if (aSelector == @selector(cancelOperation:)) // escape
+		{
+			if (closeSymbolListAfterUse)
+			{
+				[self toggleSymbolList:self];
+				closeSymbolListAfterUse = NO;
+			}
+			[symbolFilterField setStringValue:@""];
+			[[self window] makeFirstResponder:[mostRecentView textView]];
+			return YES;
+		}
 	}
+	else if (sender == statusbar)
+	{
+		if (aSelector == @selector(cancelOperation:) || // escape
+		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
+		    aSelector == @selector(insertNewline:))
+		{
+			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
+			if (aSelector != @selector(insertNewline:))
+				[statusbar setStringValue:@""];
+			[[statusbar target] performSelector:[statusbar action] withObject:self];
+			return YES;
+		}
+		else if (aSelector == @selector(moveUp:))
+		{
+			INFO(@"look back in history");
+			return YES;
+		}
+		else if (aSelector == @selector(moveDown:))
+		{
+			INFO(@"look forward in history");
+			return YES;
+		}
+		else if (aSelector == @selector(insertBacktab:))
+		{
+			return YES;
+		}
+		else if (aSelector == @selector(insertTab:) ||
+		         aSelector == @selector(deleteForward:)) // ctrl-d
+		{
+			NSText *fieldEditor = [[self window] fieldEditor:NO forObject:sender];
+			NSUInteger caret = [fieldEditor selectedRange].location;
+			NSRange range;
+			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
 
+			if (![filename isAbsolutePath])
+				filename = [[[[NSDocumentController sharedDocumentController] currentDirectory] stringByAbbreviatingWithTildeInPath] stringByAppendingPathComponent:filename];
+
+			NSArray *completions = nil;
+			NSString *completion = nil;
+			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
+	
+			if (completion)
+			{
+				NSMutableString *s = [[NSMutableString alloc] initWithString:[fieldEditor string]];
+				[s replaceCharactersInRange:range withString:completion];
+				[fieldEditor setString:s];
+			}
+
+			if (num == 1 && [completion hasSuffix:@"/"])
+			{
+				/* If only one directory match, show completions inside that directory. */
+				num = [self completePath:completion intoString:&completion matchesIntoArray:&completions];
+			}
+
+			if (num > 1)
+			{
+				[self displayCompletions:completions forPath:completion];
+			}
+			return YES;
+		}
+	}
 	return NO;
 }
 

@@ -2,7 +2,6 @@
 
 #import "ViDocument.h"
 #import "ViDocumentView.h"
-#import "ExTextView.h"
 #import "ViLanguageStore.h"
 #import "NSTextStorage-additions.h"
 #import "NSArray-patterns.h"
@@ -531,14 +530,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [[windowController statusbar] stringValue];
-	if ([exCommand length] == 0)
-		return;
 	[[windowController statusbar] setStringValue:@""];
 	[[windowController statusbar] setEditable:NO];
 	[[[self windowController] window] makeFirstResponder:exCommandView];
+	if ([exCommand length] == 0)
+		return;
+
 	[exCommandView performSelector:exCommandSelector withObject:exCommand];
 	exCommandView = nil;
-	
+
 	// add the command to the history
 	NSUInteger i = [exCommandHistory indexOfObject:exCommand];
 	if (i != NSNotFound)
@@ -546,35 +546,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[exCommandHistory addObject:exCommand];
 }
 
-- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
-{
-	if (aSelector == @selector(cancelOperation:) || // escape
-	    aSelector == @selector(noop:))              // ctrl-c and ctrl-g ...
-	{
-		[[windowController statusbar] setStringValue:@""];
-		[[windowController statusbar] setEditable:NO];
-		[[[self windowController] window] makeFirstResponder:exCommandView];
-		exCommandView = nil;
-		return YES;
-	}
-	else if (aSelector == @selector(moveUp:))
-	{
-		INFO(@"look back in history");
-		return YES;
-	}
-	else if (aSelector == @selector(moveDown:))
-	{
-		INFO(@"look forward in history");
-		return YES;
-	}
-	return NO;
-}
-
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt
 {
 	[[windowController statusbar] setStringValue:aPrompt];
 	[[windowController statusbar] setEditable:YES];
-	[[windowController statusbar] setDelegate:self];
+	[[windowController statusbar] setTarget:self];
 	[[windowController statusbar] setAction:@selector(finishedExCommand:)];
 	exCommandSelector = aSelector;
 	exCommandView = aTextView;

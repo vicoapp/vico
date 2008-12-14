@@ -8,6 +8,7 @@
 #import "NSArray-patterns.h"
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
+#import "ViThemeStore.h"
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
@@ -77,6 +78,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	ViTextView *textView = [documentView textView];
+	[[textView layoutManager] setDelegate:self];
 	[views addObject:documentView];
 
 	if ([views count] == 1)
@@ -97,7 +99,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[textView initEditorWithDelegate:self documentView:documentView];
 
 	[syntaxParser updateScopeRanges];
-	[documentView applyScopes:[syntaxParser scopeArray] inRange:NSMakeRange(0, [textStorage length])];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
@@ -150,37 +151,49 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Syntax parsing
 
-- (void)applySyntaxResult:(ViSyntaxContext *)context
+- (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager
+   shouldUseTemporaryAttributes:(NSDictionary *)attrs
+             forDrawingToScreen:(BOOL)toScreen
+               atCharacterIndex:(NSUInteger)charIndex
+                 effectiveRange:(NSRangePointer)effectiveCharRange
 {
-	[syntaxParser updateScopeRangesInRange:[context range]];
-
-	DEBUG(@"applying syntax scopes, range = %@", NSStringFromRange([context range]));
-	ViDocumentView *dv;
-	for (dv in views)
+	if (toScreen)
 	{
-		[dv applyScopes:[syntaxParser scopeArray] inRange:[context range]];
+		ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
+		NSDictionary *attributes;
+		NSArray *scopeArray = [syntaxParser scopeArray];
+		if (charIndex >= [scopeArray count])
+		{
+			*effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
+			attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+				[theme foregroundColor], NSForegroundColorAttributeName,
+				// [theme backgroundColor], NSBackgroundColorAttributeName,
+				nil];
+			return attributes;
+		}
+		ViScope *scope = [scopeArray objectAtIndex:charIndex];
+		attributes = [scope attributes];
+		if ([attributes count] == 0)
+		{
+			attributes = [theme attributesForScopes:[scope scopes]];
+			if ([attributes count] == 0)
+			{
+				attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+					[theme foregroundColor], NSForegroundColorAttributeName,
+					// [theme backgroundColor], NSBackgroundColorAttributeName,
+					nil];
+			}
+			[scope setAttributes:attributes];
+		}
+		*effectiveCharRange = [scope range];
+		// INFO(@"index = %u, scope = %@, attrs = %@", charIndex, scope, attributes);
+		return attributes;
 	}
-
-	[updateSymbolsTimer invalidate];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4]
-						      interval:0
-							target:self
-						      selector:@selector(updateSymbolList:)
-						      userInfo:nil
-						       repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
+	return nil;
 }
 
 - (void)highlightEverything
 {
-	if (language == nil)
-	{
-		ViDocumentView *dv;
-		for (dv in views)
-			[dv resetAttributesInRange:NSMakeRange(0, [textStorage length])];
-		return;
-	}
-
 	NSInteger endLocation = [textStorage locationForStartOfLine:100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
@@ -202,7 +215,26 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	// INFO(@"parsing line %u -> %u (ctx = %@)", startLine, endLine, ctx);
 
 	[syntaxParser parseContext:ctx];
-	[self performSelector:@selector(applySyntaxResult:) withObject:ctx afterDelay:0.0];
+	// [syntaxParser updateScopeRangesInRange:[ctx range]];
+	[syntaxParser updateScopeRanges];
+
+	// invalidate the layout
+	{
+		ViDocumentView *dv;
+		for (dv in views)
+		{
+			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:[ctx range]];
+		}
+	}
+
+	[updateSymbolsTimer invalidate];
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4]
+						      interval:0
+							target:self
+						      selector:@selector(updateSymbolList:)
+						      userInfo:nil
+						       repeats:NO];
+	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 
 	if (ctx.lineOffset > startLine)
 	{
@@ -405,14 +437,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 
-	if (language == nil)
-	{
-		ViDocumentView *dv;
-		for (dv in views)
-			[dv resetAttributesInRange:area];
-		return;
-	}
-	
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;
 	[[textStorage string] getLineStart:&bol end:&eol contentsEnd:NULL forRange:area];
@@ -461,11 +485,24 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)changeTheme:(ViTheme *)theme
 {
 	[syntaxParser updateScopeRanges];
+
+	/* Reset the cached attributes.
+	 */
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	NSUInteger i;
+	for (i = 0; i < [scopeArray count];)
+	{
+		[[scopeArray objectAtIndex:i] setAttributes:nil];
+		i += [[scopeArray objectAtIndex:i] range].length;
+	}
+
+	/* Change the theme and invalidate all layout.
+	 */
 	ViDocumentView *dv;
 	for (dv in views)
 	{
 		[[dv textView] setTheme:theme];
-		[dv reapplyThemeWithScopes:[syntaxParser scopeArray]];
+		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 	}
 }
 

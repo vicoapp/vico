@@ -14,8 +14,5 @@
 @property(readonly) ViTextView *textView;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument;
-- (void)applyScopes:(NSArray *)scopeArray inRange:(NSRange)range;
-- (void)reapplyThemeWithScopes:(NSArray *)scopeArray;
-- (void)resetAttributesInRange:(NSRange)aRange;
 
 @end

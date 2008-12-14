@@ -162,6 +162,8 @@
 	ViScope *begin = [scopeArray objectAtIndex:updateRange.location];
 	beginRange = NSMakeRange(updateRange.location, 0);
 
+	NSMutableSet *set = [[NSMutableSet alloc] init];
+
 	NSUInteger i;
 	for (i = updateRange.location; i < NSMaxRange(updateRange) && i < [scopeArray count]; i++)
 	{
@@ -174,9 +176,17 @@
 		else
 		{
 			if (begin)
+			{
 				[begin setRange:beginRange];
+				[set addObject:begin];
+			}
 			begin = s;
 			beginRange = NSMakeRange(i, 1);
+			if ([set containsObject:begin])
+			{
+				begin = [[ViScope alloc] initWithScopes:[s scopes] range:[s range]];
+				[scopeArray replaceObjectAtIndex:i withObject:begin];
+			}
 		}
 	}
 

@@ -333,18 +333,47 @@
 			<array>
 				<dict>
 					<key>begin</key>
-					<string>\b(namespace)\b\s*([A-Za-z_][_A-Za-z0-9:]*\b)?+(?!\s*?(;|=|,))</string>
+					<string>\b(namespace)\b\s*([_A-Za-z][_A-Za-z0-9]*\b)?+</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.c++</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type.c++</string>
+						</dict>
+					</dict>
 					<key>end</key>
-					<string>(?&lt;=\})</string>
+					<string>(?&lt;=\})|(?=(;|,|\(|\)|&gt;|\[|\]|=))</string>
 					<key>name</key>
 					<string>meta.namespace-block.c++</string>
 					<key>patterns</key>
 					<array>
 						<dict>
 							<key>begin</key>
-							<string>\{</string>
+							<string>(\{)</string>
+							<key>beginCaptures</key>
+							<dict>
+								<key>1</key>
+								<dict>
+									<key>name</key>
+									<string>punctuation.definition.scope.c++</string>
+								</dict>
+							</dict>
 							<key>end</key>
-							<string>\}</string>
+							<string>(\})</string>
+							<key>endCaptures</key>
+							<dict>
+								<key>1</key>
+								<dict>
+									<key>name</key>
+									<string>punctuation.definition.invalid.c++</string>
+								</dict>
+							</dict>
 							<key>patterns</key>
 							<array>
 								<dict>
@@ -361,11 +390,15 @@
 								</dict>
 							</array>
 						</dict>
+						<dict>
+							<key>include</key>
+							<string>$base</string>
+						</dict>
 					</array>
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>\b(class|struct)\s+([_A-Za-z][_A-Za-z0-9]*\b)</string>
+					<string>\b(class|struct)\b\s*([_A-Za-z][_A-Za-z0-9]*\b)?+</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
@@ -380,7 +413,7 @@
 						</dict>
 					</dict>
 					<key>end</key>
-					<string>(?&lt;=\})|(?=(;|,|\(|\)|&gt;|\[|\]))</string>
+					<string>(?&lt;=\})|(?=(;|,|\(|\)|&gt;|\[|\]|=))</string>
 					<key>name</key>
 					<string>meta.class-struct-block.c++</string>
 					<key>patterns</key>

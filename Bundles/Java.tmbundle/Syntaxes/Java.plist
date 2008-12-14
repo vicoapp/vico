@@ -318,14 +318,6 @@
 		<dict>
 			<key>begin</key>
 			<string>(?=\w?[^=;]*(?:class|(?:@)?interface)\s+\w+)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>storage.modifier.java</string>
-				</dict>
-			</dict>
 			<key>end</key>
 			<string>}</string>
 			<key>endCaptures</key>
@@ -364,6 +356,8 @@
 					</dict>
 					<key>match</key>
 					<string>(class|(?:@)?interface)\s+(\w+)</string>
+					<key>name</key>
+					<string>meta.class.identifier.java</string>
 				</dict>
 				<dict>
 					<key>begin</key>

@@ -12,8 +12,11 @@
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/process"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/htmloutput"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
+require ENV["TM_SUPPORT_PATH"] + "/lib/tm/require_cmd"
 
 TextMate.save_current_document
+
+TextMate.require_cmd("kpsewhich")
 
 texMate = ENV["TM_BUNDLE_SUPPORT"] + "/bin/texMate.py"
 engine_version = TextMate::Process.run(texMate, "version")

@@ -4,6 +4,7 @@
 
 @synthesize range;
 @synthesize scopes;
+@synthesize attributes;
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
 {

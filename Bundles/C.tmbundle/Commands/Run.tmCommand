@@ -9,13 +9,17 @@
 
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/executor"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
-require ENV["TM_SUPPORT_PATH"] + "/lib/escape"
 
-bootstrap = ENV["TM_BUNDLE_SUPPORT"] + "/bin/bootstrap.sh"
-lang = ENV["TM_SCOPE"].slice(/^source\.(c(\+\+)?)/, 1)
+mode = ENV["TM_SCOPE"].slice(/^source\.(c(\+\+)?)/, 1)
 
-TextMate.save_current_document
-TextMate::Executor.run(bootstrap, lang, ENV["TM_FILEPATH"], :version_args =&gt; ["--version", lang], :version_regex =&gt; /\A(.*) \(GCC\)/)
+TextMate.save_current_document(mode.gsub(/\+\+/, "c"))
+TextMate::Executor.make_project_master_current_document
+
+g = {"c" =&gt; "GCC", "c++" =&gt; "GXX"}[mode]
+flags = ENV["TM_#{g}_FLAGS"] || "-Wall -include stdio.h #{"-include iostream" if mode == "c++"}"
+args = [ENV["TM_#{g}"] || g.downcase.gsub("x", "+"), flags + " -x #{mode}", ENV["TM_FILEPATH"]] 
+
+TextMate::Executor.run(args, :version_args =&gt; ["--version"], :version_regex =&gt; /\A(.*) \(GCC\)/)
 </string>
 	<key>input</key>
 	<string>document</string>

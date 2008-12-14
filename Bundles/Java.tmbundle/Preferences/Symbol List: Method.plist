@@ -5,11 +5,13 @@
 	<key>name</key>
 	<string>Symbol List: Methods</string>
 	<key>scope</key>
-	<string>source.java meta.method.identifier</string>
+	<string>source.java meta.class.body meta.method.identifier</string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>
 		<integer>1</integer>
+		<key>symbolTransformation</key>
+		<string>s/.*/  $0/g</string>
 	</dict>
 	<key>uuid</key>
 	<string>FA4CD3FA-A79B-43E3-A432-DA53DA4A060D</string>

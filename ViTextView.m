@@ -579,7 +579,7 @@ int logIndent = 0;
               range:(NSRange)cutRange
 {
 	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
-	[self deleteRange:cutRange undoGroup:NO];
+	[self deleteRange:cutRange undoGroup:YES];
 }
 
 #pragma mark -

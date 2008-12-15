@@ -848,9 +848,6 @@ int logIndent = 0;
 
 - (void)updateCaret
 {
-	if (mode != ViVisualMode)
-		[self setSelectedRange:NSMakeRange(caret, 0)];
-
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
 	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
@@ -879,6 +876,45 @@ int logIndent = 0;
 - (NSUInteger)caret
 {
 	return caret;
+}
+
+- (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange granularity:(NSSelectionGranularity)granularity
+{
+	visual_line_mode = (granularity == NSSelectByParagraph);
+	return proposedSelRange;
+}
+
+- (void)setSelectedRanges:(NSArray *)ranges affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag
+{
+	DEBUG(@"ranges = %@, still selecting = %@", ranges, stillSelectingFlag ? @"YES" : @"NO");
+	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
+
+	if (stillSelectingFlag == NO)
+		return;
+
+	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
+	NSRange lastRange = [[ranges lastObject] rangeValue];
+
+	if (mode != ViVisualMode)
+	{
+		[self setVisualMode];
+		[self setCaret:firstRange.location];
+		visual_start_location = firstRange.location;
+	}
+	else
+	{
+		if (lastRange.length == 0)
+		{
+			[self setNormalMode];
+		}
+		else
+		{
+			if (visual_start_location == firstRange.location)
+				[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
+			else
+				[self setCaret:firstRange.location];
+		}
+	}
 }
 
 - (void)setVisualSelection
@@ -910,7 +946,7 @@ int logIndent = 0;
 - (void)setNormalMode
 {
 	mode = ViNormalMode;
-	// [self setSelectedRange:NSMakeRange(caret, 0)];
+	[self setSelectedRange:NSMakeRange(caret, 0)];
 }
 
 - (void)setVisualMode

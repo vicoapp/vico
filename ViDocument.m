@@ -185,7 +185,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[scope setAttributes:attributes];
 		}
 		*effectiveCharRange = [scope range];
-		// INFO(@"index = %u, scope = %@, attrs = %@", charIndex, scope, attributes);
+		DEBUG(@"index = %u, scope = %@, attrs = %@", charIndex, scope, attributes);
 		return attributes;
 	}
 	return nil;
@@ -204,7 +204,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	NSRange range = ctx.range;
 	unichar *chars = malloc(range.length * sizeof(unichar));
-	DEBUG(@"allocated %u bytes characters %p", range.length * sizeof(unichar), chars);
+	DEBUG(@"allocated %u bytes, characters %p, range %@, length %u",
+		range.length * sizeof(unichar), chars, NSStringFromRange(range), [textStorage length]);
 	[[textStorage string] getCharacters:chars range:range];
 
 	ctx.characters = chars;
@@ -217,12 +218,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	// [syntaxParser updateScopeRangesInRange:[ctx range]];
 	[syntaxParser updateScopeRanges];
 
-	// invalidate the layout
+	// Invalidate the layout(s).
+	if (ctx.restarting)
 	{
 		ViDocumentView *dv;
 		for (dv in views)
 		{
-			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:[ctx range]];
+			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 		}
 	}
 
@@ -253,7 +255,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		nextContext = ctx;
 		[self performSelector:@selector(restartContext:) withObject:ctx afterDelay:0.0025];
 	}
-	// FIXME: probably need a stack here
 }
 
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag
@@ -286,8 +287,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		endLocation = [textStorage length];
 
 	context.range = NSMakeRange(startLocation, endLocation - startLocation);
-	DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
-	[self performContext:context];
+	context.restarting = YES;
+	if (context.range.length > 0)
+	{
+		DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
+		[self performContext:context];
+	}
 }
 
 - (IBAction)setLanguage:(id)sender
@@ -409,6 +414,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		                             string:replacementString
 		                            forward:YES];
 		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, [replacementString length])];
+		// FIXME: also push jumps and marks
 	}
 	else
 	{
@@ -418,6 +424,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		                             string:deletedString
 		                            forward:NO];
 		[syntaxParser pullScopes:affectedCharRange];
+		// FIXME: also pull jumps and marks
 	}
 
 	return YES;

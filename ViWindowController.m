@@ -727,6 +727,8 @@ static NSWindowController	*currentWindowController = nil;
 		[symbolFilterField setStringValue:@""];
 	}
 
+	[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
+
 	if ([item isKindOfClass:[ViDocument class]])
 	{
 		ViDocument *document = item;

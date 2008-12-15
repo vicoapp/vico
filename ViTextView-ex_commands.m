@@ -50,14 +50,24 @@
 		if ([command.filename hasPrefix:@"~"])
 			path = [command.filename stringByExpandingTildeInPath];
 		else if (![command.filename hasPrefix:@"/"])
-			path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:command.filename];
+			path = [[[NSDocumentController sharedDocumentController] currentDirectory] stringByAppendingPathComponent:command.filename];
 		BOOL isDirectory = NO;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && isDirectory)
+		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory])
 		{
-			[[self delegate] message:@"Can't edit directory %@", path];
-			return;
+			if (isDirectory)
+			{
+				[[self delegate] message:@"Can't edit directory %@", path];
+			}
+			else
+				[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+				                                                                       display:YES
+				                                                                         error:nil];
 		}
-		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path] display:YES error:nil];
+		else
+		{
+			id doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
+			[doc setFileURL:[NSURL fileURLWithPath:path]];
+		}
 	}
 }
 

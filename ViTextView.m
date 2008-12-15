@@ -880,13 +880,20 @@ int logIndent = 0;
 
 - (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange granularity:(NSSelectionGranularity)granularity
 {
+	if (proposedSelRange.length == 0 && granularity == NSSelectByCharacter)
+	{
+		NSUInteger bol, eol, end;
+		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:proposedSelRange.location];
+		if (proposedSelRange.location == eol)
+			proposedSelRange.location = IMAX(bol, eol - 1);
+		return proposedSelRange;
+	}
 	visual_line_mode = (granularity == NSSelectByParagraph);
-	return proposedSelRange;
+	return [super selectionRangeForProposedRange:proposedSelRange granularity:granularity];
 }
 
 - (void)setSelectedRanges:(NSArray *)ranges affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag
 {
-	DEBUG(@"ranges = %@, still selecting = %@", ranges, stillSelectingFlag ? @"YES" : @"NO");
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
 
 	if (stillSelectingFlag == NO)
@@ -901,19 +908,17 @@ int logIndent = 0;
 		[self setCaret:firstRange.location];
 		visual_start_location = firstRange.location;
 	}
+	else if (lastRange.length == 0)
+	{
+		[self setNormalMode];
+	}
+	else if (visual_start_location == firstRange.location)
+	{
+		[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
+	}
 	else
 	{
-		if (lastRange.length == 0)
-		{
-			[self setNormalMode];
-		}
-		else
-		{
-			if (visual_start_location == firstRange.location)
-				[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
-			else
-				[self setCaret:firstRange.location];
-		}
+		[self setCaret:firstRange.location];
 	}
 }
 

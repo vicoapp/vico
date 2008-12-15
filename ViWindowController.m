@@ -863,6 +863,9 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+#pragma mark -
+#pragma mark Ex filename completion
+
 - (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
 {
 	NSString *s = [fieldEditor string];
@@ -973,8 +976,8 @@ static NSWindowController	*currentWindowController = nil;
 	int n = 0;
 	for (c in completions)
 	{
-		[[[commandOutput textStorage] mutableString] appendFormat:@"%@\t%@",
-			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @""];
+		[[[commandOutput textStorage] mutableString] appendFormat:@"%@%@",
+			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @"\t"];
 	}
 
 	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
@@ -1036,9 +1039,11 @@ static NSWindowController	*currentWindowController = nil;
 	}
 	else if (sender == statusbar)
 	{
+		NSText *fieldEditor = [[self window] fieldEditor:NO forObject:sender];
 		if (aSelector == @selector(cancelOperation:) || // escape
 		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
-		    aSelector == @selector(insertNewline:))
+		    aSelector == @selector(insertNewline:) ||
+		    (aSelector == @selector(deleteBackward:) && [fieldEditor selectedRange].location == 0))
 		{
 			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
 			if (aSelector != @selector(insertNewline:))
@@ -1063,7 +1068,6 @@ static NSWindowController	*currentWindowController = nil;
 		else if (aSelector == @selector(insertTab:) ||
 		         aSelector == @selector(deleteForward:)) // ctrl-d
 		{
-			NSText *fieldEditor = [[self window] fieldEditor:NO forObject:sender];
 			NSUInteger caret = [fieldEditor selectedRange].location;
 			NSRange range;
 			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];

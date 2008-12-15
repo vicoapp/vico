@@ -181,7 +181,7 @@
 				// Special handling, FIXME: replace with KVC observers!
 				if ([defaults_name isEqualToString:@"tabstop"])
 				{
-                                        [self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
+                                        [self resetTypingAttributes];
                                 }
 			}
 		}

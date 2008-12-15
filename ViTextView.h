@@ -30,6 +30,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	ViCommand *parser;
 	BOOL replayingInput;  // true when dot command replays input
 	NSUndoManager *undoManager;
+	NSDictionary *typingAttributes;
 
 	ViTagsDatabase *tags; // XXX: doesn't belong here!?
 
@@ -89,7 +90,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSUInteger)caret;
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
-- (void)setTabSize:(int)tabSize;
+- (void)resetTypingAttributes;
 - (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;

@@ -95,7 +95,7 @@ int logIndent = 0;
 	[self setDrawsBackground:YES];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
-	[self setTabSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"]];
+	[self resetTypingAttributes];
 }
 
 - (void)setString:(NSString *)aString
@@ -179,7 +179,8 @@ int logIndent = 0;
 
 	if (undoGroup)
 		[self beginUndoGroup];
-	[[[self textStorage] mutableString] insertString:aString atIndex:aLocation];
+	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:aString attributes:[self typingAttributes]];
+	[[self textStorage] insertAttributedString:attrString atIndex:aLocation];
 	[self recordInsertInRange:range];
 
 	if (activeSnippet)
@@ -578,7 +579,7 @@ int logIndent = 0;
               range:(NSRange)cutRange
 {
 	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
-	[self deleteRange:cutRange];
+	[self deleteRange:cutRange undoGroup:NO];
 }
 
 #pragma mark -
@@ -1481,35 +1482,39 @@ int logIndent = 0;
 	return [NSFont userFixedPitchFontOfSize:12.0];
 }
 
-- (void)setTabSize:(int)tabSize
+- (void)setTypingAttributes:(NSDictionary *)attributes
 {
+	typingAttributes = attributes;
+}
+
+- (NSDictionary *)typingAttributes
+{
+	if (typingAttributes == nil)
+		[self resetTypingAttributes];
+	return typingAttributes;
+}
+
+- (void)resetTypingAttributes
+{
+	int tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
 
 	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
 
 	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-
 	// remove all previous tab stops
-	NSTextTab *tabStop;
-	for (tabStop in [style tabStops])
-	{
+	for (NSTextTab *tabStop in [style tabStops])
 		[style removeTabStop:tabStop];
-	}
 
 	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
 	[style setDefaultTabInterval:tabSizeInPoints.width];
 
-	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
-			style, NSParagraphStyleAttributeName,
-			[theme foregroundColor], NSForegroundColorAttributeName,
-			nil];
-	DEBUG(@"setting typing attributes to %@", attrs);
-	[self setTypingAttributes:attrs];
-
-	// ignoreEditing = YES; // XXX: don't parse scopes when setting tab size
-	[[self textStorage] addAttributes:attrs range:NSMakeRange(0, [[self textStorage] length])];
+	[self setTypingAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+		style, NSParagraphStyleAttributeName,
+		[self font], NSFontAttributeName,
+		nil]];
+	[[self textStorage] addAttributes:[self typingAttributes] range:NSMakeRange(0, [[self textStorage] length])];
 }
 
 - (NSUndoManager *)undoManager

@@ -97,8 +97,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ignoreEditing = YES;
 	[textView initEditorWithDelegate:self documentView:documentView];
 
-	[syntaxParser updateScopeRanges];
-
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 
 	return documentView;
@@ -184,8 +182,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			}
 			[scope setAttributes:attributes];
 		}
-		*effectiveCharRange = [scope range];
-		DEBUG(@"index = %u, scope = %@, attrs = %@", charIndex, scope, attributes);
+		NSRange r =  [scope range];
+		if (NSMaxRange(r) <= charIndex)
+		{
+			INFO(@"index = %u, scope = %@", charIndex, scope);
+		}
+		*effectiveCharRange = r;
 		return attributes;
 	}
 	return nil;
@@ -215,8 +217,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	// INFO(@"parsing line %u -> %u (ctx = %@)", startLine, endLine, ctx);
 
 	[syntaxParser parseContext:ctx];
-	// [syntaxParser updateScopeRangesInRange:[ctx range]];
-	[syntaxParser updateScopeRanges];
 
 	// Invalidate the layout(s).
 	if (ctx.restarting)
@@ -490,8 +490,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)changeTheme:(ViTheme *)theme
 {
-	[syntaxParser updateScopeRanges];
-
 	/* Reset the cached attributes.
 	 */
 	NSArray *scopeArray = [syntaxParser scopeArray];
@@ -659,8 +657,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
 #endif
-
-	[syntaxParser updateScopeRanges];
 
 	NSMutableArray *syms = [[NSMutableArray alloc] init];
 

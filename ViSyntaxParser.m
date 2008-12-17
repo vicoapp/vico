@@ -103,6 +103,9 @@
 {
 	INFO(@"range = %@", NSStringFromRange(affectedRange));
 
+	if (affectedRange.location >= [scopeArray count])
+		return;
+
 	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
 	NSRange r = [sleft range];
 	if (r.location < affectedRange.location && NSMaxRange(r) > affectedRange.location)
@@ -144,6 +147,9 @@
 {
 	INFO(@"range = %@", NSStringFromRange(affectedRange));
 
+	if (affectedRange.location >= [scopeArray count])
+		return;
+
 	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
 	NSRange r = [sleft range];
 	if (NSMaxRange(r) > affectedRange.location)
@@ -161,8 +167,8 @@
 		[sleft setRange:r];
 		INFO(@"updated sleft = %@", sleft);
 	}
-	
-	if ([scopeArray count] >= NSMaxRange(affectedRange))
+
+	if ([scopeArray count] > NSMaxRange(affectedRange))
 	{
 		ViScope *x = [scopeArray objectAtIndex:NSMaxRange(affectedRange)];
 		if (x != sleft && [x range].location < NSMaxRange(affectedRange))

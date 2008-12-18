@@ -13,6 +13,7 @@
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *documentView;
+	IBOutlet NSView *explorerView;
 	IBOutlet NSToolbar *toolbar;
 
 	ViTagStack *tagStack;
@@ -30,7 +31,6 @@
 	IBOutlet NSTextView *commandOutput;
 
 	// project list
-	IBOutlet NSOutlineView *projectOutline;
 	IBOutlet ProjectDelegate *projectDelegate;
 	IBOutlet NSImageView *projectResizeView;
 
@@ -75,6 +75,10 @@
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)splitViewHorizontally:(id)sender;
+
+// proxies to the project delegate
+- (IBAction)searchFiles:(id)sender;
+- (IBAction)toggleExplorer:(id)sender;
 
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 

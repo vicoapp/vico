@@ -61,7 +61,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)saveProject:(id)sender
 {
-	[projectDelegate saveProject:sender];
+	INFO(@"sender = %@", sender);
 }
 
 - (void)windowDidLoad
@@ -82,6 +82,7 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
+	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
@@ -94,18 +95,13 @@ static NSWindowController	*currentWindowController = nil;
                 initialDocument = nil;
 	}
 
-	NSCell *cell = [(NSTableColumn *)[[projectOutline tableColumns] objectAtIndex:0] dataCell];
-	// [cell setFont:[NSFont systemFontOfSize:11.0]];
-	// [projectOutline setRowHeight:15.0];
-	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
-	[cell setWraps:NO];
-
 	[[self window] makeKeyAndOrderFront:self];
 
 	[symbolsOutline setTarget:self];
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
 	[symbolsOutline setAction:@selector(goToSymbol:)];
-	cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
+
+	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
@@ -165,6 +161,8 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
 	[[ViJumpList defaultJumpList] pushURL:[document fileURL] line:1 column:1];
+	
+	// [projectDelegate addURL:[document fileURL]];
 }
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView
@@ -266,7 +264,7 @@ static NSWindowController	*currentWindowController = nil;
 	if ([documents count] == 0)
 	{
 		INFO(@"no documents left, closing window");
-		[[self window] close];
+		// [[self window] close];
 	}
 	else
 	{
@@ -388,9 +386,11 @@ static NSWindowController	*currentWindowController = nil;
 
 - (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
 {
+#if 0
 	NSString *projName = [projectDelegate projectName];
 	if (projName)
 		return [NSString stringWithFormat:@"%@ - %@", displayName, projName];
+#endif
 	return displayName;
 }
 
@@ -420,8 +420,13 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocument *document = [self documentForURL:url];
 	if (document == nil)
 	{
+		NSError *error = nil;
 		document = [[NSDocumentController sharedDocumentController]
-			openDocumentWithContentsOfURL:url display:YES error:nil];
+			openDocumentWithContentsOfURL:url display:YES error:&error];
+		if (error)
+		{
+			[NSApp presentError:error];	
+		}
 	}
 	else if ([self currentDocument] != document)
 	{
@@ -430,7 +435,13 @@ static NSWindowController	*currentWindowController = nil;
 		else
 			[self selectDocument:document];
 	}
-	[(ViTextView *)[mostRecentView textView] gotoLine:line column:column];
+	if (line > 0)
+		[(ViTextView *)[mostRecentView textView] gotoLine:line column:column];
+}
+
+- (void)goToURL:(NSURL *)url
+{
+	[self gotoURL:url line:0 column:0];
 }
 
 #pragma mark -
@@ -612,11 +623,14 @@ static NSWindowController	*currentWindowController = nil;
 	{
 		if (offset == 0)
 			return 100;
-		NSRect frame = [sender frame];
-		return frame.size.width - 300;
+		if (offset == 2)
+		{
+			NSRect frame = [sender frame];
+			return frame.size.width - 300;
+		}
 	}
-	else
-		return proposedMin;
+
+	return proposedMin;
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
@@ -636,8 +650,7 @@ static NSWindowController	*currentWindowController = nil;
 	if (sender == splitView)
 	{
 		// collapse both side views, but not the edit view
-		NSView *secondView = [[sender subviews] objectAtIndex:1];
-		if (subview == secondView)
+		if (subview == explorerView || subview == symbolsView)
 			return NO;
 		return YES;
 	}
@@ -650,13 +663,20 @@ static NSWindowController	*currentWindowController = nil;
 	if (sender != splitView)
 		return;
 
+	int nsubviews = [[sender subviews] count];
+	if (nsubviews == 1)
+	{
+		// the side views have not been added yet
+		[sender adjustSubviews];
+		return;
+	}
+
 	NSRect newFrame = [sender frame];
 	float dividerThickness = [sender dividerThickness];
-	
+
 	NSView *firstView = [[sender subviews] objectAtIndex:0];
 	NSView *secondView = [[sender subviews] objectAtIndex:1];
 	NSView *thirdView = nil;
-	int nsubviews = [[sender subviews] count];
 	if (nsubviews == 3)
 		thirdView = [[sender subviews] objectAtIndex:2];
 
@@ -863,6 +883,18 @@ static NSWindowController	*currentWindowController = nil;
 		[symbolsOutline scrollRowToVisible:row];
 		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 	}
+}
+
+#pragma mark -
+
+- (IBAction)searchFiles:(id)sender
+{
+	[projectDelegate searchFiles:sender];
+}
+
+- (IBAction)toggleExplorer:(id)sender
+{
+	[projectDelegate toggleExplorer:sender];
 }
 
 #pragma mark -
@@ -1148,7 +1180,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
-	if ([item isKindOfClass:[ViDocument class]])
+	if ([self outlineView:outlineView isGroupItem:item])
 		return 20;
 	return 15;
 }

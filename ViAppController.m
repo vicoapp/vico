@@ -46,6 +46,7 @@
 			[NSNumber numberWithBool:YES], @"number",
 			[NSNumber numberWithBool:YES], @"autocollapse",
 			[NSNumber numberWithBool:NO], @"hidetab",
+			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 			nil]];
 
 	/* initialize languages */
@@ -147,4 +148,3 @@
 }
 
 @end
-

@@ -1,26 +1,29 @@
 #import <Cocoa/Cocoa.h>
-
-extern NSString *AbstractTreeNodeType;
+#import "ViRegexp.h"
 
 @interface ProjectDelegate : NSObject
 {
-	NSString *projectName;
-
 	IBOutlet NSWindow *window;
-	IBOutlet NSOutlineView *outlineView;
-	IBOutlet NSTreeController *treeController;
+	IBOutlet NSOutlineView *explorer;
+	IBOutlet NSMenu *actionMenu;
+	IBOutlet NSSearchField *filterField;
+	IBOutlet NSSplitView *splitView;
+	IBOutlet NSView *explorerView;
 
-	NSPersistentStoreCoordinator *persistentStoreCoordinator;
-	NSManagedObjectModel *managedObjectModel;
-	NSManagedObjectContext *managedObjectContext;
+	BOOL closeExplorerAfterUse;
+	IBOutlet id delegate;
+	NSMutableArray *rootItems;
+	ViRegexp *skipRegex;
 }
 
-@property(readwrite, copy) NSString *projectName;
+@property(readwrite,assign) id delegate;
 
-- (IBAction)saveProject:(id)sender;
+- (void)addURL:(NSURL *)aURL;
+- (IBAction)addLocation:(id)sender;
+- (IBAction)actionMenu:(id)sender;
 
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
-- (NSManagedObjectModel *)managedObjectModel;
-- (NSManagedObjectContext *)managedObjectContext;
+- (IBAction)filterFiles:(id)sender;
+- (IBAction)searchFiles:(id)sender;
+- (IBAction)toggleExplorer:(id)sender;
 
 @end

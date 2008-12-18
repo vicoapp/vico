@@ -40,6 +40,7 @@
 		9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */; };
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
+		9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */; };
 		9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */; };
 		9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA7096A0EF284A700B4CE34 /* ViJumpList.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
@@ -47,17 +48,15 @@
 		9AB014B00ED6021B00905BED /* ViCommandOutputController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */; };
 		9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AB014C80ED608CE00905BED /* WebKit.framework */; };
 		9AB015190ED7102200905BED /* ViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB015180ED7102200905BED /* ViSnippet.m */; };
-		9AB017230EDD78F600905BED /* Add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB0171F0EDD78F600905BED /* Add.tiff */; };
-		9AB017240EDD78F600905BED /* Add_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB017200EDD78F600905BED /* Add_Pressed.tiff */; };
-		9AB017250EDD78F600905BED /* BottomBar.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB017210EDD78F600905BED /* BottomBar.tiff */; };
-		9AB017260EDD78F600905BED /* DBSourceSplitViewThumb.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB017220EDD78F600905BED /* DBSourceSplitViewThumb.tiff */; };
-		9AB017290EDD791500905BED /* Delete.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB017270EDD791500905BED /* Delete.tiff */; };
-		9AB0172A0EDD791500905BED /* Delete_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AB017280EDD791500905BED /* Delete_Pressed.tiff */; };
 		9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */; };
 		9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */; };
 		9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC16DA30D93D14A00AE45E0 /* ViDocument.m */; };
 		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD772810EC9A6CB00D05DDE /* ViMark.m */; };
+		9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856A80EF90AF1008DF460 /* actionmenu.png */; };
+		9AD856BA0EF90B9A008DF460 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856B90EF90B9A008DF460 /* add.png */; };
+		9AD856C20EF90CE6008DF460 /* actionbarbg.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856C10EF90CE6008DF460 /* actionbarbg.png */; };
+		9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856C30EF90D99008DF460 /* resizehandle.png */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
 		9AF200D30ECC8BED00C5771B /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF200D20ECC8BED00C5771B /* ViSymbol.m */; };
@@ -183,6 +182,8 @@
 		9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-scopeSelector.m"; sourceTree = "<group>"; };
 		9A8CC8D50D24EBA1001EE32A /* TestScopeSelectors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestScopeSelectors.h; sourceTree = "<group>"; };
 		9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
+		9A9801E90EF957F500B2EEC3 /* MHTextIconCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MHTextIconCell.h; sourceTree = "<group>"; };
+		9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MHTextIconCell.m; sourceTree = "<group>"; };
 		9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextField-additions.m"; sourceTree = "<group>"; };
 		9AA709690EF284A700B4CE34 /* ViJumpList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViJumpList.h; sourceTree = "<group>"; };
 		9AA7096A0EF284A700B4CE34 /* ViJumpList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViJumpList.m; sourceTree = "<group>"; };
@@ -192,12 +193,6 @@
 		9AB014C80ED608CE00905BED /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		9AB015170ED7102200905BED /* ViSnippet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSnippet.h; sourceTree = "<group>"; };
 		9AB015180ED7102200905BED /* ViSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSnippet.m; sourceTree = "<group>"; };
-		9AB0171F0EDD78F600905BED /* Add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add.tiff; path = Images/Add.tiff; sourceTree = "<group>"; };
-		9AB017200EDD78F600905BED /* Add_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Add_Pressed.tiff; path = Images/Add_Pressed.tiff; sourceTree = "<group>"; };
-		9AB017210EDD78F600905BED /* BottomBar.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBar.tiff; path = Images/BottomBar.tiff; sourceTree = "<group>"; };
-		9AB017220EDD78F600905BED /* DBSourceSplitViewThumb.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DBSourceSplitViewThumb.tiff; path = Images/DBSourceSplitViewThumb.tiff; sourceTree = "<group>"; };
-		9AB017270EDD791500905BED /* Delete.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Delete.tiff; path = Images/Delete.tiff; sourceTree = "<group>"; };
-		9AB017280EDD791500905BED /* Delete_Pressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Delete_Pressed.tiff; path = Images/Delete_Pressed.tiff; sourceTree = "<group>"; };
 		9AB514DA0E6E7BE100DA75F1 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
 		9AC16D940D93CD8F00AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ViDocument.xib; sourceTree = "<group>"; };
 		9AC16D970D93CDF200AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ViDocumentWindow.xib; sourceTree = "<group>"; };
@@ -206,6 +201,10 @@
 		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
 		9AD772800EC9A6CB00D05DDE /* ViMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMark.h; sourceTree = "<group>"; };
 		9AD772810EC9A6CB00D05DDE /* ViMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMark.m; sourceTree = "<group>"; };
+		9AD856A80EF90AF1008DF460 /* actionmenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = actionmenu.png; path = Images/actionmenu.png; sourceTree = "<group>"; };
+		9AD856B90EF90B9A008DF460 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add.png; path = Images/add.png; sourceTree = "<group>"; };
+		9AD856C10EF90CE6008DF460 /* actionbarbg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = actionbarbg.png; path = Images/actionbarbg.png; sourceTree = "<group>"; };
+		9AD856C30EF90D99008DF460 /* resizehandle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = resizehandle.png; path = Images/resizehandle.png; sourceTree = "<group>"; };
 		9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-vi_commands.m"; sourceTree = "<group>"; };
 		9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
 		9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagStack.m; sourceTree = "<group>"; };
@@ -363,6 +362,8 @@
 				9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */,
 				9AFBC31C0EE717C400646DCB /* ViDocumentView.h */,
 				9AFBC31D0EE717C400646DCB /* ViDocumentView.m */,
+				9A9801E90EF957F500B2EEC3 /* MHTextIconCell.h */,
+				9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -446,13 +447,11 @@
 		9AB0178A0EDDBF8100905BED /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9AD856C30EF90D99008DF460 /* resizehandle.png */,
+				9AD856C10EF90CE6008DF460 /* actionbarbg.png */,
+				9AD856B90EF90B9A008DF460 /* add.png */,
+				9AD856A80EF90AF1008DF460 /* actionmenu.png */,
 				9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */,
-				9AB017270EDD791500905BED /* Delete.tiff */,
-				9AB017280EDD791500905BED /* Delete_Pressed.tiff */,
-				9AB0171F0EDD78F600905BED /* Add.tiff */,
-				9AB017200EDD78F600905BED /* Add_Pressed.tiff */,
-				9AB017210EDD78F600905BED /* BottomBar.tiff */,
-				9AB017220EDD78F600905BED /* DBSourceSplitViewThumb.tiff */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -583,13 +582,11 @@
 				9A70F2DA0E9F68100013AA1D /* Bundles in Resources */,
 				9A11D6810EB473BE00A016AB /* xi.icns in Resources */,
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
-				9AB017230EDD78F600905BED /* Add.tiff in Resources */,
-				9AB017240EDD78F600905BED /* Add_Pressed.tiff in Resources */,
-				9AB017250EDD78F600905BED /* BottomBar.tiff in Resources */,
-				9AB017260EDD78F600905BED /* DBSourceSplitViewThumb.tiff in Resources */,
-				9AB017290EDD791500905BED /* Delete.tiff in Resources */,
-				9AB0172A0EDD791500905BED /* Delete_Pressed.tiff in Resources */,
 				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
+				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
+				9AD856BA0EF90B9A008DF460 /* add.png in Resources */,
+				9AD856C20EF90CE6008DF460 /* actionbarbg.png in Resources */,
+				9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,6 +691,7 @@
 				9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */,
 				9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */,
 				9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */,
+				9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -70,6 +70,7 @@
 
 - (void)switchToLastFile;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
+- (void)goToURL:(NSURL *)url;
 
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;

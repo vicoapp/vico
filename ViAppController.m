@@ -2,6 +2,7 @@
 #import "ViThemeStore.h"
 #import "ViLanguageStore.h"
 #import "ViDocument.h"
+#import "ViDocumentController.h"
 
 @implementation ViAppController
 
@@ -27,6 +28,9 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+	// create our subclass for the default shared document controller
+	[[ViDocumentController alloc] init];
+
 	NSArray *themes = [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(compare:)];
 	NSString *theme;
 	for (theme in themes)

@@ -18,6 +18,21 @@
 		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
+		9A1E40AA0EFBA83400682D4A /* sftp-client.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A30EFBA83400682D4A /* sftp-client.c */; };
+		9A1E40AB0EFBA83400682D4A /* sftp-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A50EFBA83400682D4A /* sftp-common.c */; };
+		9A1E40AC0EFBA83400682D4A /* sftp-glob.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A70EFBA83400682D4A /* sftp-glob.c */; };
+		9A1E40AD0EFBA83400682D4A /* sftp.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A80EFBA83400682D4A /* sftp.c */; };
+		9A1E40C00EFBAEA700682D4A /* atomicio.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40B30EFBAEA700682D4A /* atomicio.c */; };
+		9A1E40C10EFBAEA700682D4A /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40B50EFBAEA700682D4A /* buffer.c */; };
+		9A1E40C20EFBAEA700682D4A /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40B70EFBAEA700682D4A /* log.c */; };
+		9A1E40C30EFBAEA700682D4A /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40B90EFBAEA700682D4A /* misc.c */; };
+		9A1E40C50EFBAEA700682D4A /* xmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40BE0EFBAEA700682D4A /* xmalloc.c */; };
+		9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D20EFBB08400682D4A /* bufaux.c */; };
+		9A1E40D70EFBB0C100682D4A /* fatal.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D60EFBB0C100682D4A /* fatal.c */; };
+		9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DB0EFBB1A800682D4A /* vis.c */; };
+		9A1E40DF0EFBB1D000682D4A /* strtonum.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DE0EFBB1D000682D4A /* strtonum.c */; };
+		9A1E40F30EFBB35600682D4A /* progressmeter.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40F10EFBB35600682D4A /* progressmeter.c */; };
+		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
 		9A4F7DC20ED56CFE00A3CCF1 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
@@ -71,6 +86,8 @@
 		9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */; };
 		9AF2FE9D0EC9C9F600C5771B /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A13B70D044131009EABAC /* TestViTextView.m */; };
 		9AF41A560EC6E1CB00F1D681 /* MarkerLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */; };
+		9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */; };
+		9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF573CF0EFED5A10066C201 /* ViDocumentController.m */; };
 		9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFBC31D0EE717C400646DCB /* ViDocumentView.m */; };
 /* End PBXBuildFile section */
 
@@ -137,6 +154,33 @@
 		9A1A12230D02CFCF009EABAC /* TestViCommandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViCommandParser.m; sourceTree = "<group>"; };
 		9A1A13B60D044131009EABAC /* TestViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViTextView.h; sourceTree = "<group>"; };
 		9A1A13B70D044131009EABAC /* TestViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextView.m; sourceTree = "<group>"; };
+		9A1E40A30EFBA83400682D4A /* sftp-client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "sftp-client.c"; path = "sftp/sftp-client.c"; sourceTree = "<group>"; };
+		9A1E40A40EFBA83400682D4A /* sftp-client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "sftp-client.h"; path = "sftp/sftp-client.h"; sourceTree = "<group>"; };
+		9A1E40A50EFBA83400682D4A /* sftp-common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "sftp-common.c"; path = "sftp/sftp-common.c"; sourceTree = "<group>"; };
+		9A1E40A60EFBA83400682D4A /* sftp-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "sftp-common.h"; path = "sftp/sftp-common.h"; sourceTree = "<group>"; };
+		9A1E40A70EFBA83400682D4A /* sftp-glob.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "sftp-glob.c"; path = "sftp/sftp-glob.c"; sourceTree = "<group>"; };
+		9A1E40A80EFBA83400682D4A /* sftp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sftp.c; path = sftp/sftp.c; sourceTree = "<group>"; };
+		9A1E40A90EFBA83400682D4A /* sftp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sftp.h; path = sftp/sftp.h; sourceTree = "<group>"; };
+		9A1E40B30EFBAEA700682D4A /* atomicio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = atomicio.c; path = sftp/atomicio.c; sourceTree = "<group>"; };
+		9A1E40B40EFBAEA700682D4A /* atomicio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atomicio.h; path = sftp/atomicio.h; sourceTree = "<group>"; };
+		9A1E40B50EFBAEA700682D4A /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = sftp/buffer.c; sourceTree = "<group>"; };
+		9A1E40B60EFBAEA700682D4A /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = buffer.h; path = sftp/buffer.h; sourceTree = "<group>"; };
+		9A1E40B70EFBAEA700682D4A /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = log.c; path = sftp/log.c; sourceTree = "<group>"; };
+		9A1E40B80EFBAEA700682D4A /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = sftp/log.h; sourceTree = "<group>"; };
+		9A1E40B90EFBAEA700682D4A /* misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = misc.c; path = sftp/misc.c; sourceTree = "<group>"; };
+		9A1E40BA0EFBAEA700682D4A /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = misc.h; path = sftp/misc.h; sourceTree = "<group>"; };
+		9A1E40BB0EFBAEA700682D4A /* pathnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pathnames.h; path = sftp/pathnames.h; sourceTree = "<group>"; };
+		9A1E40BE0EFBAEA700682D4A /* xmalloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xmalloc.c; path = sftp/xmalloc.c; sourceTree = "<group>"; };
+		9A1E40BF0EFBAEA700682D4A /* xmalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xmalloc.h; path = sftp/xmalloc.h; sourceTree = "<group>"; };
+		9A1E40D20EFBB08400682D4A /* bufaux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bufaux.c; path = sftp/bufaux.c; sourceTree = "<group>"; };
+		9A1E40D30EFBB08400682D4A /* ssh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ssh.h; path = sftp/ssh.h; sourceTree = "<group>"; };
+		9A1E40D60EFBB0C100682D4A /* fatal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fatal.c; path = sftp/fatal.c; sourceTree = "<group>"; };
+		9A1E40DB0EFBB1A800682D4A /* vis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vis.c; path = sftp/vis.c; sourceTree = "<group>"; };
+		9A1E40DE0EFBB1D000682D4A /* strtonum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = strtonum.c; path = sftp/strtonum.c; sourceTree = "<group>"; };
+		9A1E40F10EFBB35600682D4A /* progressmeter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = progressmeter.c; path = sftp/progressmeter.c; sourceTree = "<group>"; };
+		9A1E40F20EFBB35600682D4A /* progressmeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = progressmeter.h; path = sftp/progressmeter.h; sourceTree = "<group>"; };
+		9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnection.h; sourceTree = "<group>"; };
+		9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnection.m; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolTransform.m; sourceTree = "<group>"; };
@@ -225,6 +269,10 @@
 		9AF2FE710EC9C85900C5771B /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		9AF41A540EC6E1CB00F1D681 /* MarkerLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarkerLineNumberView.h; sourceTree = "<group>"; };
 		9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MarkerLineNumberView.m; sourceTree = "<group>"; };
+		9AF573990EFE94EE0066C201 /* SFTPConnectionPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnectionPool.h; sourceTree = "<group>"; };
+		9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnectionPool.m; sourceTree = "<group>"; };
+		9AF573CE0EFED5A10066C201 /* ViDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentController.h; sourceTree = "<group>"; };
+		9AF573CF0EFED5A10066C201 /* ViDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentController.m; sourceTree = "<group>"; };
 		9AFBC31C0EE717C400646DCB /* ViDocumentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentView.h; sourceTree = "<group>"; };
 		9AFBC31D0EE717C400646DCB /* ViDocumentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -281,6 +329,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* xi */ = {
 			isa = PBXGroup;
 			children = (
+				9A1E40A10EFBA81E00682D4A /* sftp */,
 				9AF205D50ED2DF7F00C5771B /* Models */,
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
@@ -420,6 +469,42 @@
 			name = "Test Cases";
 			sourceTree = "<group>";
 		};
+		9A1E40A10EFBA81E00682D4A /* sftp */ = {
+			isa = PBXGroup;
+			children = (
+				9AF573990EFE94EE0066C201 /* SFTPConnectionPool.h */,
+				9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */,
+				9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */,
+				9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */,
+				9A1E40F10EFBB35600682D4A /* progressmeter.c */,
+				9A1E40F20EFBB35600682D4A /* progressmeter.h */,
+				9A1E40DE0EFBB1D000682D4A /* strtonum.c */,
+				9A1E40DB0EFBB1A800682D4A /* vis.c */,
+				9A1E40D60EFBB0C100682D4A /* fatal.c */,
+				9A1E40D20EFBB08400682D4A /* bufaux.c */,
+				9A1E40D30EFBB08400682D4A /* ssh.h */,
+				9A1E40B30EFBAEA700682D4A /* atomicio.c */,
+				9A1E40B40EFBAEA700682D4A /* atomicio.h */,
+				9A1E40B50EFBAEA700682D4A /* buffer.c */,
+				9A1E40B60EFBAEA700682D4A /* buffer.h */,
+				9A1E40B70EFBAEA700682D4A /* log.c */,
+				9A1E40B80EFBAEA700682D4A /* log.h */,
+				9A1E40B90EFBAEA700682D4A /* misc.c */,
+				9A1E40BA0EFBAEA700682D4A /* misc.h */,
+				9A1E40BB0EFBAEA700682D4A /* pathnames.h */,
+				9A1E40BE0EFBAEA700682D4A /* xmalloc.c */,
+				9A1E40BF0EFBAEA700682D4A /* xmalloc.h */,
+				9A1E40A30EFBA83400682D4A /* sftp-client.c */,
+				9A1E40A40EFBA83400682D4A /* sftp-client.h */,
+				9A1E40A50EFBA83400682D4A /* sftp-common.c */,
+				9A1E40A60EFBA83400682D4A /* sftp-common.h */,
+				9A1E40A70EFBA83400682D4A /* sftp-glob.c */,
+				9A1E40A80EFBA83400682D4A /* sftp.c */,
+				9A1E40A90EFBA83400682D4A /* sftp.h */,
+			);
+			name = sftp;
+			sourceTree = "<group>";
+		};
 		9A7AF1440D99820800F08222 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -459,6 +544,8 @@
 		9AC16DA00D93CF9C00AE45E0 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9AF573CE0EFED5A10066C201 /* ViDocumentController.h */,
+				9AF573CF0EFED5A10066C201 /* ViDocumentController.m */,
 				9A8CC2180D1C3E62001EE32A /* ViAppController.h */,
 				9A8CC2190D1C3E62001EE32A /* ViAppController.m */,
 				9AC16DA20D93D14A00AE45E0 /* ViDocument.h */,
@@ -692,6 +779,23 @@
 				9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */,
 				9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */,
 				9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */,
+				9A1E40AA0EFBA83400682D4A /* sftp-client.c in Sources */,
+				9A1E40AB0EFBA83400682D4A /* sftp-common.c in Sources */,
+				9A1E40AC0EFBA83400682D4A /* sftp-glob.c in Sources */,
+				9A1E40AD0EFBA83400682D4A /* sftp.c in Sources */,
+				9A1E40C00EFBAEA700682D4A /* atomicio.c in Sources */,
+				9A1E40C10EFBAEA700682D4A /* buffer.c in Sources */,
+				9A1E40C20EFBAEA700682D4A /* log.c in Sources */,
+				9A1E40C30EFBAEA700682D4A /* misc.c in Sources */,
+				9A1E40C50EFBAEA700682D4A /* xmalloc.c in Sources */,
+				9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */,
+				9A1E40D70EFBB0C100682D4A /* fatal.c in Sources */,
+				9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */,
+				9A1E40DF0EFBB1D000682D4A /* strtonum.c in Sources */,
+				9A1E40F30EFBB35600682D4A /* progressmeter.c in Sources */,
+				9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */,
+				9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */,
+				9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,7 +1007,10 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(TARGET_BUILD_DIR)/oniguruma/include";
+				HEADER_SEARCH_PATHS = (
+					sftp,
+					"$(TARGET_BUILD_DIR)/oniguruma/include",
+				);
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "";
@@ -942,7 +1049,10 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(TARGET_BUILD_DIR)/oniguruma/include";
+				HEADER_SEARCH_PATHS = (
+					sftp,
+					"$(TARGET_BUILD_DIR)/oniguruma/include",
+				);
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "";

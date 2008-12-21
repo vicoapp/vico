@@ -8,6 +8,7 @@
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
+#import "SFTPConnectionPool.h"
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
@@ -107,8 +108,62 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [[textStorage string] dataUsingEncoding:NSUTF8StringEncoding];
 }
 
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
+- (BOOL)writeSafelyToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation error:(NSError **)outError
 {
+	if ([url isFileURL])
+		return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
+
+	if (![[url scheme] isEqualToString:@"sftp"])
+	{
+		INFO(@"unsupported URL scheme: %@", [url scheme]);
+		// XXX: set outError
+		return NO;
+	}
+
+	NSData *data = [self dataOfType:typeName error:outError];
+	if (data == nil)
+		return NO;
+
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
+	if (conn == nil)
+	{
+		INFO(@"FAILED to connect to host");
+		// XXX: set outError
+		return NO;
+	}
+	return [conn writeData:data toFile:[url path] error:outError];
+}
+
+- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
+{
+	INFO(@"type = %@, url = %@, scheme = %@", typeName, [url absoluteString], [url scheme]);
+
+	NSData *data = nil;
+	if ([[url scheme] isEqualToString:@"file"])
+	{
+		data = [NSData dataWithContentsOfFile:[url path] options:0 error:outError];
+	}
+	else if ([[url scheme] isEqualToString:@"sftp"])
+	{
+		if ([url user] == nil || [url host] == nil)
+		{
+			INFO(@"missing user or host in url");
+			// XXX: set outError
+			return NO;
+		}
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
+		if (conn == nil)
+		{
+			INFO(@"FAILED to connect to host");
+			// XXX: set outError
+			return NO;
+		}
+		data = [conn dataWithContentsOfFile:[url path]];
+	}
+
+	if (data == nil)
+		return NO;
+
 	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	return YES;
 }

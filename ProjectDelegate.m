@@ -1,10 +1,15 @@
 #import "ProjectDelegate.h"
 #import "logging.h"
 #import "MHTextIconCell.h"
+#import "SFTPConnectionPool.h"
+#import "ViWindowController.h" // for goToUrl:
 
 @interface ProjectDelegate ()
 - (NSMutableArray *)childrenAtFileURL:(NSURL *)url;
 - (NSMutableDictionary *)itemAtFileURL:(NSURL *)url;
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes;
 @end
 
 @implementation ProjectDelegate
@@ -33,6 +38,8 @@
 	NSCell *cell = [(NSTableColumn *)[[explorer tableColumns] objectAtIndex:0] dataCell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
+
+	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 }
 
 - (NSMutableArray *)childrenAtFileURL:(NSURL *)url
@@ -45,6 +52,23 @@
 	{
 		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil)
 			[children addObject:[self itemAtFileURL:[NSURL fileURLWithPath:[[url path] stringByAppendingPathComponent:file]]]];
+	}
+	return children;
+}
+
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn
+{
+	NSMutableArray *children = [[NSMutableArray alloc] init];
+	NSArray *entries = [conn directoryContentsAtPath:[url path]];
+	SFTPDirectoryEntry *entry;
+	for (entry in entries)
+	{
+		NSString *file = [entry filename];
+		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil)
+		{
+			NSURL *newurl = [[NSURL alloc] initWithScheme:[url scheme] host:[conn target] path:[[url path] stringByAppendingPathComponent:file]];
+			[children addObject:[self itemAtSftpURL:newurl connection:conn attributes:[entry attributes]]];
+		}
 	}
 	return children;
 }
@@ -65,9 +89,42 @@
 	return [NSMutableDictionary dictionaryWithObject:url forKey:@"url"];
 }
 
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes
+{
+	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm))
+	{
+		// It's a directory
+		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn];
+		NSMutableDictionary *root = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+			url, @"url",
+			children, @"children",
+			nil];
+		return root;
+	}
+
+	return [NSMutableDictionary dictionaryWithObject:url forKey:@"url"];
+}
+
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn
+{
+	return [self itemAtSftpURL:url connection:conn attributes:[conn stat:[url path]]];
+}
+
 - (void)addFileURL:(NSURL *)url
 {
 	[rootItems addObject:[self itemAtFileURL:url]];
+}
+
+- (void)addSftpURL:(NSURL *)url
+{
+	NSString *target = [NSString stringWithFormat:@"%@@%@", [url user] ?: @"", [url host]];
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
+	if (conn)
+	{
+		NSMutableDictionary *item = [self itemAtSftpURL:url connection:conn];
+		if (item)
+			[rootItems addObject:item];
+	}
 }
 
 - (void)addURL:(NSURL *)aURL
@@ -78,6 +135,10 @@
 		if ([[aURL scheme] isEqualToString:@"file"])
 		{
 			[self addFileURL:aURL];
+		}
+		if ([[aURL scheme] isEqualToString:@"sftp"])
+		{
+			[self addSftpURL:aURL];
 		}
 		else
 		{
@@ -130,6 +191,59 @@
 	                    modalDelegate:self
 	                   didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
 	                      contextInfo:nil];
+}
+
+- (void)sftpSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	[sheet orderOut:self];
+}
+
+- (IBAction)acceptSftpSheet:(id)sender
+{
+	if ([[[sftpConnectForm cellAtIndex:0] stringValue] length] == 0)
+	{
+		NSBeep();
+		[sftpConnectForm selectTextAtIndex:0];
+		return;
+	}
+	[NSApp endSheet:sftpConnectView];
+	NSString *host = [[sftpConnectForm cellAtIndex:0] stringValue];
+	NSString *user = [[sftpConnectForm cellAtIndex:1] stringValue];
+	if ([user length] == 0)
+		user = [[sftpConnectForm cellAtIndex:1] placeholderString];
+	NSString *path = [[sftpConnectForm cellAtIndex:2] stringValue];
+	NSString *target = [NSString stringWithFormat:@"%@@%@", user, host];
+
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
+	if (conn)
+	{
+		INFO(@"connected to %@", target);
+		if (![path hasPrefix:@"/"])
+		{
+			NSString *pwd = [conn currentDirectory];
+			if (pwd == nil)
+			{
+				INFO(@"FAILED to read current directory");
+				return;
+			}
+			path = [NSString stringWithFormat:@"%@/%@", pwd, path];
+		}
+		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@%@", target, path]];
+		[self addURL:url];
+	}
+	else
+		INFO(@"FAILED to connect to %@", target);
+}
+
+- (IBAction)cancelSftpSheet:(id)sender
+{
+	[NSApp endSheet:sftpConnectView];
+}
+
+- (IBAction)addSFTPLocation:(id)sender
+{
+	INFO(@"sender = %@, views = %@", sender, sftpConnectView);
+	[NSApp beginSheet:sftpConnectView modalForWindow:window modalDelegate:self didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
 - (void)explorerClick:(id)sender
@@ -291,7 +405,17 @@
 	NSCell *cell = [tableColumn dataCellForRow:[explorer rowForItem:item]];
 	if (cell)
 	{
-		NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:[[item objectForKey:@"url"] path]];
+		NSURL *url = [item objectForKey:@"url"];
+		NSImage *img;
+		if ([url isFileURL])
+			img = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];
+		else
+		{
+			if ([self outlineView:outlineView isItemExpandable:item])
+				img = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
+			else
+				img = [[NSWorkspace sharedWorkspace] iconForFileType:[[url path] pathExtension]];
+		}
 		if (![self outlineView:outlineView isGroupItem:item])
 		{
 			[img setSize:NSMakeSize(16, 16)];

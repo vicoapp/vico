@@ -9,6 +9,8 @@
 	IBOutlet NSSearchField *filterField;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *explorerView;
+	IBOutlet NSWindow *sftpConnectView;
+	IBOutlet NSForm *sftpConnectForm;
 
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
@@ -20,7 +22,11 @@
 
 - (void)addURL:(NSURL *)aURL;
 - (IBAction)addLocation:(id)sender;
+- (IBAction)addSFTPLocation:(id)sender;
 - (IBAction)actionMenu:(id)sender;
+
+- (IBAction)acceptSftpSheet:(id)sender;
+- (IBAction)cancelSftpSheet:(id)sender;
 
 - (IBAction)filterFiles:(id)sender;
 - (IBAction)searchFiles:(id)sender;

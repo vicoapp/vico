@@ -771,14 +771,21 @@
 /* syntax: [count]l */
 - (BOOL)move_right:(ViCommand *)command
 {
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if(start_location + 1 >= eol)
+	if (start_location + 1 >= eol)
 	{
 		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
-	final_location = end_location = start_location + 1;
+	if (start_location + count >= eol)
+		final_location = end_location = eol - 1;
+	else
+		final_location = end_location = start_location + count;
 	return YES;
 }
 

@@ -246,6 +246,8 @@
 	if (updateRange.location >= [scopeArray count])
 		return;
 
+	NSMutableSet *set = [[NSMutableSet alloc] init];
+
 	NSUInteger i;
 	NSRange beginRange;
 	ViScope *begin = [scopeArray objectAtIndex:updateRange.location];
@@ -261,8 +263,10 @@
 			NSRange r = [s range];
 			if (NSMaxRange(r) > i)
 			{
-				[s setRange:NSMakeRange(r.location, i - r.location)];
-				INFO(@"adjusting prev scope %@", s);
+				NSRange newRange = NSMakeRange(r.location, i - r.location);
+				INFO(@"adjusting prev scope %@ -> %@", s, NSStringFromRange(newRange));
+				[s setRange:newRange];
+				[set addObject:s];
 			}
 			break;
 		}
@@ -275,8 +279,6 @@
 	beginRange = NSMakeRange(i, updateRange.location - i);
 	INFO(@"beginRange = %@, begin = %@", NSStringFromRange(beginRange), begin);
 
-	NSMutableSet *set = [[NSMutableSet alloc] init];
-
 	for (i = updateRange.location; i < [scopeArray count]; i++)
 	{
 		ViScope *s = [scopeArray objectAtIndex:i];
@@ -285,7 +287,7 @@
 			beginRange.length++;
 			[scopeArray replaceObjectAtIndex:i withObject:begin];
 		}
-		else if (i >= NSMaxRange(updateRange))
+		else if (i >= NSMaxRange(updateRange) && [s range].location == i)
 		{
 			INFO(@"stopping at %i: %@", i, s);
 			NSRange r = [s range];

@@ -28,6 +28,7 @@ int logIndent = 0;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
+- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
 @end
 
 #pragma mark -
@@ -103,6 +104,24 @@ int logIndent = 0;
 	[[[self textStorage] mutableString] setString:aString ?: @""];
 	[[self textStorage] addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [[self textStorage] length])];
 	[self setCaret:0];
+}
+
+- (void)paste:(id)sender
+{
+	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
+	NSArray *types = [pasteBoard types];
+	NSString *string = [pasteBoard stringForType:NSStringPboardType];	
+	if ([string length] > 0)
+	{
+		[self insertString:string atLocation:[self caret] undoGroup:NO];
+
+		NSUInteger eol;
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:[self caret]];
+		if ([self caret] + [string length] >= eol && mode == ViNormalMode)
+			[self setCaret:eol - 1];
+		else
+			[self setCaret:[self caret] + [string length]];
+	}
 }
 
 #pragma mark -

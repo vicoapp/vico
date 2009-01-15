@@ -136,7 +136,7 @@
 		{
 			[self addFileURL:aURL];
 		}
-		if ([[aURL scheme] isEqualToString:@"sftp"])
+		else if ([[aURL scheme] isEqualToString:@"sftp"])
 		{
 			[self addSftpURL:aURL];
 		}

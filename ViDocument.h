@@ -18,6 +18,7 @@
 	NSString *readContent;
 	NSArray *symbols;
 	NSArray *filteredSymbols;
+	NSMutableArray *lineIndices;
 
 	// ex commands
 	SEL exCommandSelector;
@@ -39,6 +40,7 @@
 @property(readonly) int visibleViews;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
+@property(readonly) NSMutableArray *lineIndices;
 
 - (void)enableLineNumbers:(BOOL)flag;
 - (IBAction)toggleLineNumbers:(id)sender;
@@ -68,5 +70,7 @@
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+
+- (NSUInteger)lineNumberForLocation:(NSUInteger)aLocation;
 
 @end

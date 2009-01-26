@@ -41,9 +41,12 @@
 	NSColor				*textColor;
 	NSColor				*alternateTextColor;
 	NSColor				*backgroundColor;
+	id delegate;
 }
 
-- (id)initWithScrollView:(NSScrollView *)aScrollView;
+@property(readwrite,assign) id delegate;
+
+- (id)initWithScrollView:(NSScrollView *)aScrollView delegate:(id)aDelegate;
 
 - (void)setFont:(NSFont *)aFont;
 - (NSFont *)font;

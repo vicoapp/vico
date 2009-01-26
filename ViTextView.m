@@ -1013,6 +1013,24 @@ int logIndent = 0;
                                      forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
 }
 
+- (void)updateRuler
+{
+        NSString *modestr;
+        switch (mode)
+        {
+                case ViCommandMode:
+                        modestr = @"Command";
+                        break;
+                case ViInsertMode:
+                        modestr = @"Insert";
+                        break;
+                case ViVisualMode:
+                        modestr = @"Visual";
+				break;
+        }
+        [[self delegate] message:[NSString stringWithFormat:@"%u,%u     %@", [self currentLine], [self currentColumn], modestr]];
+}
+
 #pragma mark -
 #pragma mark Input handling and command evaluation
 
@@ -1309,6 +1327,8 @@ int logIndent = 0;
 
 	if (mode == ViInsertMode)
 	{
+		[self updateRuler];
+
 		// add the event to the input key replay queue
 		if (!replayingInput)
 			[inputKeys addObject:theEvent];
@@ -1403,7 +1423,7 @@ int logIndent = 0;
 		[parser pushKey:charcode];
 		if (parser.complete)
 		{
-			[[self delegate] message:@""]; // erase any previous message
+			[self updateRuler];
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode)
@@ -1421,7 +1441,9 @@ int logIndent = 0;
 	}
 
 	if (!replayingInput)
+	{
 		[self scrollToCaret];
+	}
 }
 
 /* Takes a string of characters and creates key events for each one.

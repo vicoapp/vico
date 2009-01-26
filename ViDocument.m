@@ -19,6 +19,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @interface ViDocument (internal)
 - (ViWindowController *)windowController;
 - (void)setSymbolScopes;
+- (void)calculateLineNumbersFromLocation:(NSUInteger)startLocation;
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber;
 @end
 
 @implementation ViDocument
@@ -27,6 +29,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize filteredSymbols;
 @synthesize views;
 @synthesize visibleViews;
+@synthesize lineIndices;
 
 - (id)init
 {
@@ -36,6 +39,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		symbols = [NSArray array];
 		views = [[NSMutableArray alloc] init];
 		exCommandHistory = [[NSMutableArray alloc] init];
+		lineIndices = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -87,6 +91,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[textView setString:readContent];
 		readContent = nil;
 		textStorage = [textView textStorage];
+		[self calculateLineNumbersFromLocation:0];
 		[self configureSyntax];
 	}
 	else
@@ -250,7 +255,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)highlightEverything
 {
-	NSInteger endLocation = [textStorage locationForStartOfLine:100];
+	NSInteger endLocation = [self locationForStartOfLine:100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
 
@@ -317,7 +322,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (aRange.length == 0)
 		return;
 
-	unsigned line = [textStorage lineNumberAtLocation:aRange.location];
+	unsigned line = [self lineNumberForLocation:aRange.location] + 1;
 	DEBUG(@"dispatching from line %u", line);
 	ViSyntaxContext *ctx = [[ViSyntaxContext alloc] initWithLine:line];
 	ctx.range = aRange;
@@ -336,8 +341,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 	}
 
-	NSUInteger startLocation = [textStorage locationForStartOfLine:context.lineOffset];
-	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 50];
+	NSUInteger startLocation = [self locationForStartOfLine:context.lineOffset];
+	if (startLocation == -1)
+		return;
+	NSInteger endLocation = [self locationForStartOfLine:context.lineOffset + 50];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
 
@@ -456,6 +463,64 @@ BOOL makeNewWindowInsteadOfTab = NO;
 }
 
 #pragma mark -
+#pragma mark Line number cache
+
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
+{
+	if (lineNumber - 1 < [lineIndices count])
+		return [[lineIndices objectAtIndex:lineNumber - 1] integerValue];
+	return -1;
+}
+
+- (NSUInteger)lineNumberForLocation:(NSUInteger)aLocation
+{
+	// Binary search
+	NSUInteger left = 0;
+	NSUInteger right = [lineIndices count];
+
+	while ((right - left) > 1)
+	{
+		NSUInteger mid = (right + left) / 2;
+		NSUInteger lineStart = [[lineIndices objectAtIndex:mid] unsignedIntegerValue];
+		
+		if (aLocation < lineStart)
+		{
+			right = mid;
+		}
+		else if (aLocation > lineStart)
+		{
+			left = mid;
+		}
+		else
+		{
+			return mid;
+		}
+	}
+	return left;
+}
+
+- (void)calculateLineNumbersFromLocation:(NSUInteger)startLocation
+{
+	DEBUG(@"start location = %u", startLocation);
+
+	NSUInteger ndx = [self lineNumberForLocation:startLocation];
+	[lineIndices removeObjectsInRange:NSMakeRange(ndx, [lineIndices count] - ndx)];
+
+	NSUInteger stringLength = [textStorage length];
+
+	[[textStorage string] getLineStart:&ndx end:NULL contentsEnd:NULL forRange:NSMakeRange(startLocation, 0)];
+
+	do
+	{
+		[lineIndices addObject:[NSNumber numberWithUnsignedInteger:ndx]];
+		ndx = NSMaxRange([[textStorage string] lineRangeForRange:NSMakeRange(ndx, 0)]);
+	}
+	while (ndx < stringLength);
+
+	//INFO(@"lineIndices = %@", lineIndices);
+}
+
+#pragma mark -
 #pragma mark NSTextStorage delegate method
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
@@ -498,6 +563,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 
+	[self calculateLineNumbersFromLocation:area.location];
+
 	// extend our range along line boundaries.
 	NSUInteger bol, eol;
 	[[textStorage string] getLineStart:&bol end:&eol contentsEnd:NULL forRange:area];
@@ -515,7 +582,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	if (flag)
 	{
-		NoodleLineNumberView *lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:aScrollView];
+		NoodleLineNumberView *lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:aScrollView delegate:self];
 		[aScrollView setVerticalRulerView:lineNumberView];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];

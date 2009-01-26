@@ -109,9 +109,10 @@ get_msg(int fd, Buffer *m)
 	buffer_append_space(m, msg_len);
 	if (atomicio(read, fd, buffer_ptr(m), msg_len) != msg_len) {
 		if (errno == EPIPE)
-			fatal("Connection closed");
+			logit("Connection closed");
 		else
-			fatal("Read packet: %s", strerror(errno));
+			logit("Read packet: %s", strerror(errno));
+		return -1;
 	}
 	return 0;
 }

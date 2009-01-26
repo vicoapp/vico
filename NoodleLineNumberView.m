@@ -29,6 +29,7 @@
 
 #import "NoodleLineNumberView.h"
 #import "NoodleLineNumberMarker.h"
+#import "logging.h"
 
 #define DEFAULT_THICKNESS	22.0
 #define RULER_MARGIN		5.0
@@ -46,12 +47,14 @@
 
 @implementation NoodleLineNumberView
 
-- (id)initWithScrollView:(NSScrollView *)aScrollView
+@synthesize delegate;
+
+- (id)initWithScrollView:(NSScrollView *)aScrollView delegate:(id)aDelegate
 {
     if ((self = [super initWithScrollView:aScrollView orientation:NSVerticalRuler]) != nil)
     {
 	linesToMarkers = [[NSMutableDictionary alloc] init];
-		
+	[self setDelegate:aDelegate];
         [self setClientView:[aScrollView documentView]];
     }
     return self;
@@ -67,8 +70,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [lineIndices release];
-	[linesToMarkers release];
+    [linesToMarkers release];
     [font release];
     
     [super dealloc];
@@ -144,36 +146,42 @@
 
 - (void)setClientView:(NSView *)aView
 {
+#if 1
 	id		oldClientView;
 	
 	oldClientView = [self clientView];
 	
     if ((oldClientView != aView) && [oldClientView isKindOfClass:[NSTextView class]])
     {
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:NSTextStorageDidProcessEditingNotification object:[(NSTextView *)oldClientView textStorage]];
+		[[NSNotificationCenter defaultCenter] removeObserver:self
+			name:NSTextStorageDidProcessEditingNotification
+			object:[(NSTextView *)oldClientView textStorage]];
     }
+#endif
     [super setClientView:aView];
+#if 1
     if ((aView != nil) && [aView isKindOfClass:[NSTextView class]])
     {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidChange:) name:NSTextStorageDidProcessEditingNotification object:[(NSTextView *)aView textStorage]];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+			selector:@selector(textDidChange:)
+			name:NSTextStorageDidProcessEditingNotification
+			object:[(NSTextView *)aView textStorage]];
 
 		[self invalidateLineIndices];
     }
+#endif
 }
 
 - (NSMutableArray *)lineIndices
 {
-	if (lineIndices == nil)
-	{
-		[self calculateLines];
-	}
-	return lineIndices;
+	return [[self delegate] lineIndices];
 }
 
 - (void)invalidateLineIndices
 {
-	[lineIndices release];
-	lineIndices = nil;
+	//[lineIndices release];
+	//lineIndices = nil;
+	[self calculateLines];
 }
 
 - (void)textDidChange:(NSNotification *)notification
@@ -184,6 +192,7 @@
     [self setNeedsDisplay:YES];
 }
 
+#if 0
 - (unsigned)lineNumberForLocation:(float)location
 {
 	unsigned		line, count, ndx, rectCount, i;
@@ -229,12 +238,12 @@
 	}
 	return NSNotFound;
 }
+#endif
 
 - (NoodleLineNumberMarker *)markerAtLine:(unsigned)line
 {
 	return [linesToMarkers objectForKey:[NSNumber numberWithUnsignedInt:line - 1]];
 }
-
 
 - (void)calculateLines
 {
@@ -248,6 +257,7 @@
         NSString        *text;
         float         oldThickness, newThickness;
         
+#if 0
         text = [view string];
         stringLength = [text length];
         [lineIndices release];
@@ -271,6 +281,7 @@
         {
             [lineIndices addObject:[NSNumber numberWithUnsignedInt:ndx]];
         }
+#endif
 
         oldThickness = [self ruleThickness];
         newThickness = [self requiredThickness];
@@ -292,6 +303,8 @@
 
 - (unsigned)lineNumberForCharacterIndex:(unsigned)ndx inText:(NSString *)text
 {
+	return [[self delegate] lineNumberForLocation:ndx];
+#if 0
     unsigned			left, right, mid, lineStart;
 	NSMutableArray		*lines;
 
@@ -320,6 +333,7 @@
         }
     }
     return left;
+#endif
 }
 
 - (NSDictionary *)textAttributes
@@ -387,7 +401,8 @@
         NSRect					visibleRect, markerRect;
         NSRange					range, glyphRange, nullRange;
         NSString				*text, *labelText;
-        unsigned				rectCount, ndx, line, count;
+        unsigned				rectCount, line, count;
+        NSUInteger				ndx;
         NSRectArray				rects;
         float					ypos, yinset;
         NSDictionary			*textAttributes, *currentTextAttributes;
@@ -419,9 +434,12 @@
         count = [lines count];
         ndx = 0;
         
+//		INFO(@"range = %@", NSStringFromRange(range));
+        
         for (line = [self lineNumberForCharacterIndex:range.location inText:text]; line < count; line++)
         {
-            ndx = [[lines objectAtIndex:line] unsignedIntValue];
+            ndx = [[lines objectAtIndex:line] unsignedIntegerValue];
+//			INFO(@"draw ndx %u", ndx);
             
             if (NSLocationInRange(ndx, range))
             {

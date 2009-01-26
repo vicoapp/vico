@@ -38,6 +38,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/time.h>
 
 #include <openssl/bn.h>
 

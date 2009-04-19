@@ -9,6 +9,7 @@
 #import "ViSnippet.h"
 
 @class ViDocumentView;
+@class ViDocument;
 
 #ifdef IMAX
 # undef IMAX
@@ -96,6 +97,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
+- (ViDocument *)document;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options

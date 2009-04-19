@@ -32,14 +32,17 @@
 	NSString *path = command.filename;
 	if (path == nil)
 		path = @"~";
-	if (![[NSFileManager defaultManager] changeCurrentDirectoryPath:[path stringByExpandingTildeInPath]])
-	{
+        ViWindowController *windowController = [[self document] windowController];
+	if (![windowController setCurrentDirectory:[path stringByExpandingTildeInPath]])
 		[[self delegate] message:@"Error: %@: Failed to change directory.", path];
-	}
+        else
+		[[self delegate] message:@"%@", [windowController currentDirectory]];
 }
 
 - (void)ex_edit:(ExCommand *)command
 {
+        INFO(@"command.filename == %@", command.filename);
+
 	if (command.filename == nil)
 	{
 		[[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
@@ -50,7 +53,10 @@
 		if ([command.filename hasPrefix:@"~"])
 			path = [command.filename stringByExpandingTildeInPath];
 		else if (![command.filename hasPrefix:@"/"])
-			path = [[[NSDocumentController sharedDocumentController] currentDirectory] stringByAppendingPathComponent:command.filename];
+                {
+                        ViWindowController *windowController = [[self document] windowController];
+			path = [[windowController currentDirectory] stringByAppendingPathComponent:command.filename];
+                }
 		BOOL isDirectory = NO;
 		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory])
 		{

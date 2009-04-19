@@ -33,6 +33,7 @@
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
 	IBOutlet NSImageView *projectResizeView;
+	NSString *currentDirectory;
 
 	// symbol list
 	IBOutlet NSImageView *symbolsResizeView;
@@ -52,11 +53,15 @@
 @property(readwrite, assign) ViDocument *selectedDocument;
 @property(readonly) NSTextField *statusbar;
 
+@property(readonly) NSString *currentDirectory;
+- (BOOL)setCurrentDirectory:(NSString *)path;
+
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView;
 - (void)selectDocument:(ViDocument *)aDocument;
+- (void)focusEditor;
 - (void)closeDocumentViews:(ViDocument *)aDocument;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;

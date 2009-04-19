@@ -23,6 +23,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize documents;
 @synthesize selectedDocument;
 @synthesize statusbar;
+@synthesize currentDirectory;
 
 + (id)currentWindowController
 {
@@ -54,6 +55,8 @@ static NSWindowController	*currentWindowController = nil;
 		currentWindowController = self;
 		documents = [[NSMutableArray alloc] init];
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
+                [self setCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
+                INFO(@"currentDirectory = %@", [self currentDirectory]);
 	}
 
 	return self;
@@ -85,7 +88,7 @@ static NSWindowController	*currentWindowController = nil;
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
-
+	
 	isLoaded = YES;
 	if (initialDocument)
 	{
@@ -226,6 +229,11 @@ static NSWindowController	*currentWindowController = nil;
 	}
 
 	[self setMostRecentDocument:aDocument view:docView];
+}
+
+- (void)focusEditor
+{
+	[[self window] makeFirstResponder:[mostRecentView textView]];
 }
 
 #pragma mark -
@@ -900,6 +908,28 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Ex filename completion
 
+- (BOOL)setCurrentDirectory:(NSString *)path
+{
+        NSString *p;
+        if ([path isAbsolutePath])
+                p = [path stringByStandardizingPath];
+        else
+                p = [[[self currentDirectory] stringByAppendingPathComponent:path] stringByStandardizingPath];
+
+        BOOL isDirectory = NO;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:p isDirectory:&isDirectory] && isDirectory)
+        {
+                currentDirectory = p;
+                INFO(@"setting current directory to %@", currentDirectory);
+                return YES;
+        }
+        else
+        {
+                INFO(@"failed to set current directory to '%@'", p);
+                return NO;
+        }
+}
+
 - (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
 {
 	NSString *s = [fieldEditor string];
@@ -1032,8 +1062,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
 {
-	INFO(@"selector = %s", aSelector);
-
 	if (sender == symbolFilterField)
 	{
 		if (aSelector == @selector(insertNewline:)) // enter
@@ -1067,7 +1095,7 @@ static NSWindowController	*currentWindowController = nil;
 				closeSymbolListAfterUse = NO;
 			}
 			[symbolFilterField setStringValue:@""];
-			[[self window] makeFirstResponder:[mostRecentView textView]];
+			[self focusEditor];
 			return YES;
 		}
 	}
@@ -1107,7 +1135,13 @@ static NSWindowController	*currentWindowController = nil;
 			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
 
 			if (![filename isAbsolutePath])
-				filename = [[[[NSDocumentController sharedDocumentController] currentDirectory] stringByAbbreviatingWithTildeInPath] stringByAppendingPathComponent:filename];
+                        {
+				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
+                        }
+                        filename = [[filename stringByStandardizingPath] stringByAbbreviatingWithTildeInPath];
+
+                        if ([filename isEqualToString:@"~"])
+                                filename = @"~/";
 
 			NSArray *completions = nil;
 			NSString *completion = nil;

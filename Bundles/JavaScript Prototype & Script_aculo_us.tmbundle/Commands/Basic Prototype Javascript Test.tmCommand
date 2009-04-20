@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+js = STDIN.read
+puts &lt;&lt;-HTML
+&lt;!-- howdy --&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+  &lt;title&gt;Basic Javascript Test&lt;/title&gt;
+  &lt;script src="file://#{ENV['TM_SUPPORT_PATH']}/script/prototype.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;script type="text/javascript" charset="utf-8"&gt;
+try{
+//YOUR STUFF//
+//YOUR STUFF//
+//YOUR STUFF//
+
+#{js}
+
+//YOUR STUFF//
+//YOUR STUFF//
+//YOUR STUFF//
+}catch(e){ document.write(e); throw(e) };
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+HTML
+</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>@r</string>
+	<key>name</key>
+	<string>Basic Prototype Javascript Test</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.js.prototype</string>
+	<key>uuid</key>
+	<string>71838529-2441-4B3C-B9BD-B0CD115DD06C</string>
+</dict>
+</plist>

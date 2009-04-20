@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>read sel
+if grep &lt;&lt;&lt;${sel:-!} -Esq '[a-zA-Z0-9_\.]+'
+	then exit_show_html "&lt;meta http-equiv='Refresh' content='0;URLhttp://wiki.script.aculo.us/scriptaculous/search/?page%5Bname%5D=$sel'&gt;"
+	else echo "Nothing to lookup (hint: place the caret on a function name)"
+fi</string>
+	<key>fallbackInput</key>
+	<string>scope</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Scriptaculous Documentation for Word</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.js.prototype</string>
+	<key>uuid</key>
+	<string>D84F2D85-BE10-416A-BD9D-076AE6FDB436</string>
+</dict>
+</plist>

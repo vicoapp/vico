@@ -1447,6 +1447,7 @@
 		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
 	else
 		end_location = final_location = start_location + delta_offset.location;
+	final_location = end_location = IMAX(end_location, [[self textStorage] length] - 1);
 	return YES;
 }
 
@@ -1461,6 +1462,7 @@
 		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
 	else
 		end_location = final_location = IMAX(start_location + delta_offset.location, bol);
+	final_location = end_location = IMAX(end_location, [[self textStorage] length] - 1);
 	return YES;
 }
 

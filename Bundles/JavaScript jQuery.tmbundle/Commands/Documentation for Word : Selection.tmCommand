@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>ref=${TM_SELECTED_TEXT:-$TM_CURRENT_WORD}
+prefix=
+
+case "$ref" in
+
+jQuery|each|size|length|get|index)
+	section=Core
+	;;
+extend|noConflict)
+	prefix=jQuery.
+	section=Core
+	;;
+attr|removeAttr|addClass|removeClass|toggleClass|html|text|val)
+	section=Attributes
+	;;
+eq|hasClass|filter|is|map|not|slice|add|children|contents|find|next|nextAll|parent|parents|prev|prevAll|siblings|andSelf|end)
+	section=Traversing
+	;;
+append|appendTo|prepend|prependTo|after|before|insertAfter|insertBefore|wrap|wrapAll|wrapInner|replaceWith|replaceAll|empty|remove|clone)
+	section=Manipulation
+	;;
+css|offset|height|width)
+	section=CSS
+	;;
+ready|bind|one|trigger|triggerHandler|unbind|hover|toggle|blur|change|click|dblclick|error|focus|keydown|keypress|keyup|load|mousedown|mousemove|mouseout|mouseover|mouseup|resize|scroll|select|submit|unload)
+	section=Events
+	;;
+show|hide|toggle|slideDown|slideUp|slideToggle|fadeIn|fadeOut|fadeTo|animate|stop|queue|dequeue)
+	section=Effects
+	;;
+load|ajaxComplete|ajaxError|ajaxSend|ajaxStart|ajaxStop|ajaxSuccess|serialize|serializeArray)
+	section=Ajax
+	;;
+ajax|get|getJSON|getScript|post|ajaxSetup)
+	prefix=jQuery.
+	section=Ajax
+	;;
+css|offset|height|width)
+	section=Utilities
+	;;
+esac
+
+[[ -n "$section" ]] &amp;&amp; exit_show_html "&lt;meta http-equiv='Refresh' content='0;URL=http://docs.jquery.com/$section/$prefix$ref'&gt;"
+
+echo "No documentation found."</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Word / Selection</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.js.jquery support.function.js.jquery</string>
+	<key>uuid</key>
+	<string>690646D5-AC38-4EB9-8C41-776E4F55CB59</string>
+</dict>
+</plist>

@@ -29,9 +29,10 @@ translate = {"Message" => "Me",
 "DiscRecordingUI" => "DRui",
 "CoreAudioKit" => "CAK",
 "XgridFoundation" => "Grid",
-"IOBluetoothUI" => "BUI"}
+"IOBluetoothUI" => "BUI",
+"UIKit" => "UI"}
 require 'optparse'
-require 'escape'
+
 
   options = {}
   OptionParser.new do |opts|
@@ -46,8 +47,14 @@ require 'escape'
     opts.on("-w", "--withCocoaAncestry FILENAME", "Run verbosely") do |v|
       options[:super] = v
     end
+    
+    opts.on("-i", "--isCocoa", "Use this option if we are generating the Cocoa headers") do |v|
+      options[:cocoa] = v
+    end
+    
   end.parse!
 
+p options
 def method_parse(k)
   l = k.scan /(\-|\+)\s*\((([^\(\)]|\([^\)]*\))*)\)|\((([^\(\)]|\([^\)]*\))*)\)\s*[a-zA-Z][a-zA-Z0-9]*|(([a-zA-Z][a-zA-Z0-9]*)?:)/
   types = l.select {|item| item[1] || item[3] }.collect{|item| (item[1] || item[3]).gsub(/(\w)\*/,'\1 *') }
@@ -110,7 +117,7 @@ xlist = ["action:\tAK\tCl\tNSActionCell\tim\tvoid\tid",
 #headers = %x{find /System/Library/Frameworks/*.framework -name \*.h}.split("\n")
 headers = STDIN.read.split("\0")
 #headers = ["test.h"]
-rgxp = /^((@interface)|(@end)|((\-|\+)\s*\()|((\-|\+)[^;]*\;)|(@protocol[^\n;]*\n))/
+rgxp = /^(((?:[A-Z_0-9]+\s+)?@interface)|(@end)|((\-|\+)\s*\()|((\-|\+)[^;]*\;)|(@protocol[^\n;]*\n))/
 list = []
 hash = {}
 classList = []
@@ -139,6 +146,7 @@ headers.each do |name|
           end
           if k[2] && k[2]!="" #&&  options[:super]
             hash[className] = {:super => k[2]}
+            hash[className][:cocoa] = true if options[:cocoa]
           end
           classList << "#{className}"
           classType = "Cl"
@@ -201,7 +209,7 @@ headers.each do |name|
   end
 end
 end
-puts hash.inspect
+#puts hash.inspect
 
 if options.empty?
   print list.join("\n")
@@ -209,38 +217,39 @@ else
   if !hash.empty?
     classList = [] # clear classList
     require 'set'
-    if options[:super]
-      cocoaSet = %x{gunzip -c #{e_sh options[:super]} |cut -f1}.split("\n").to_set
-      hash.keys.each do |name|
-        if cocoaSet.include? hash[name][:super]
-          hash[name][:cocoa] = true
-        else
-          hash[name][:cocoa] = false
+    if options[:super] && !options[:cocoa]
+        require 'escape'
+        cocoaSet = %x{gunzip -c #{e_sh options[:super]} |cut -f1}.split("\n").to_set
+        hash.keys.each do |name|
+          if cocoaSet.include? hash[name][:super]
+            hash[name][:cocoa] = true
+          else
+            hash[name][:cocoa] = false
+          end
         end
-      end
     else
-      hash["NSObject"] = {:super => nil}
-      hash["NSProxy"] = {:super => nil}      
+      hash["NSObject"] = {:super => nil, :cocoa => true}
+      hash["NSProxy"] = {:super => nil, :cocoa => true}      
     end
     hash.keys.each do |name|
      
       tName = name
       tString = "#{name}\t#{name}:"
       i = 0
-      until hash[tName].nil? || ((hash[tName][:cocoa] && options[:super])) || i > 10
+      until hash[tName].nil? || ((hash[tName][:cocoa] && options[:super] && !options[:cocoa])) || i > 10
         tName = hash[tName][:super]
-        tString += "#{tName}:"
+        tString += "#{tName}:" if tName
         i += 1
       end
+
       tString += hash[tName][:super] if hash[tName] && hash[tName][:cocoa]
       classList << tString
     end
   end
     File.open(options[:class],"w")do |f| f.write(classList.uniq.join("\n")) end unless options[:class].nil?
-  File.open(options[:method],"w")do |f| f.write(list.join("\n")) end unless options[:method].nil?
+    File.open(options[:method],"w")do |f| f.write(list.join("\n")) end unless options[:method].nil?
 end
  #s.split("\n").select{|a| a.match(/sel_of_type/)}.collect{|b| b.match(/"\(([^"]+)/)[0]}
-p options
 extra = '
 cn = "" # use the xml exception files from BridgeSupport
 list = []

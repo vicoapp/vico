@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>beforeRunningCommand</key>
@@ -13,6 +13,10 @@ DIALOG = SUPPORT + '/bin/tm_dialog'
 require SUPPORT + '/lib/escape'
 require SUPPORT + '/lib/osx/plist'
 
+require ENV['TM_BUNDLE_SUPPORT'] + '/lib/php.rb'
+require ENV['TM_SUPPORT_PATH'] + '/lib/ui'
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
+
 # ENV['TM_BUNDLE_SUPPORT'] = '/Library/Application Support/TextMate/Bundles/PHP.tmbundle/Support/'
 # ENV['TM_CURRENT_LINE']   = 'dummy(array_merge(array("array", "number", "one"), array("array2")))'
 # ENV['TM_LINE_INDEX']     = '53'
@@ -20,50 +24,31 @@ require SUPPORT + '/lib/osx/plist'
 # ENV['TM_CURRENT_LINE']   = "date('Y-m-d', time() + ONE_MONTH)"
 # ENV['TM_LINE_INDEX']     = '23'
 
-class PHPFunction
-  def initialize(prototype)
-    @parts = prototype.strip.match(/^\s*(?:([0-9A-Za-z|_]+)\s+)?(\w+)\s*\((.*)\).*$/)
-  end
-  
-  def params
-    params = @parts[3] rescue ''
-
-    params.scan(/(\w+ )?([\w.|]+)(?:\s*=\s*(.+))?(\])?,?/).map do |(type, name, default, optional_bracket)|
-      param = type.to_s + name
-      optional = false
-      if optional_bracket
-        # Optional
-        param = '[' + param + ']'
-        optional = true
-      elsif default
-        # Optional with default
-        param = '[' + param + ' = ' + default + ']'
-        optional = true
-      end
-      {
-        :param =&gt; param,
-        :type =&gt; type.to_s.strip,
-        :name =&gt; name.to_s,
-        :optional =&gt; optional,
-        :default =&gt; default
-      }
-    end
-  end
-  
-  def name
-    @parts[2]
-  end
-  
-  def type
-    @parts[1]
+class String
+  def nbsp
+    gsub(' ', '&amp;nbsp;')
   end
 end
 
 def show_function_and_exit(function, line = nil)
   return unless function =~ /^[A-Za-z_][A-Za-z0-9_]*$/
   functions = `grep -i '^#{function}%' "$TM_BUNDLE_SUPPORT"/functions.txt`.split("\n")
+  
   if functions.size == 1
     function, prototype, description = functions.pop.split('%')
+
+    function = PHPFunction.new(prototype)
+    params = function.params.map do |param|
+      html = ''
+      html &lt;&lt; '&lt;span class="type"&gt;' + param[:type] + '&lt;/span&gt; '.nbsp unless param[:type].to_s.empty?
+      html &lt;&lt; param[:name]
+      unless param[:default].to_s.empty?
+        html &lt;&lt; ' = '.nbsp + param[:default]
+      end
+      html = '&lt;i&gt;' + html + '&lt;/i&gt;' if param[:optional]
+      html
+    end
+
 
     if line
       arg = 0
@@ -77,20 +62,35 @@ def show_function_and_exit(function, line = nil)
           depth += 1
         end
       end
-
-      function = PHPFunction.new(prototype)
-      params = function.params.map { |func| func[:param] }
       if arg &lt; params.size
-        params[arg] = '&lt;' + params[arg] + '&gt;'
+        params[arg] = '&lt;b&gt;' + params[arg] + '&lt;/b&gt;'
       elsif not params.empty?
-        params[-1] = '&lt;' + params[-1] + '&gt;'
+        params[-1] = '&lt;b&gt;' + params[-1] + '&lt;/b&gt;'
       end
-      puts function.type + ' ' + function.name + '(' + params.join(', ') + ')'
-    else
-      puts prototype
     end
-    puts description
-    
+    prototype = '&lt;span class="type"&gt;' + function.type + '&lt;/span&gt; &lt;span&gt;'.nbsp + function.name + '&lt;/span&gt;(' + params.join(', '.nbsp) + ')'
+    tip = &lt;&lt;-HTML
+      &lt;style type="text/css" media="screen"&gt;
+          p {
+              margin: 0;
+          }
+          p.prototype span {
+              color: #00008B;
+          }
+          p.prototype i {
+              color: #666;
+          }
+          p.description {
+              font-size: smaller;
+          }
+          p.prototype span.type {
+            color: #006400;
+          }
+      &lt;/style&gt;
+      &lt;p class="prototype"&gt;#{prototype}&lt;/p&gt;
+      &lt;p class="description"&gt;#{description}&lt;/p&gt;
+    HTML
+    TextMate::UI.tool_tip tip, :format =&gt; :html
     exit
   end
 end
@@ -109,7 +109,7 @@ end
 
 show_function_and_exit(function = $1) while ENV['TM_CURRENT_LINE'][0..ENV['TM_LINE_INDEX'].to_i] =~ /(\w+)\($/
 
-puts "Function not found: " + function.to_s
+TextMate.exit_show_tool_tip "Function not found: " + function.to_s
 </string>
 	<key>fallbackInput</key>
 	<string>line</string>

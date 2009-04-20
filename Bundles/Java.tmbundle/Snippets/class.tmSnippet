@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>class ${1:${TM_FILENAME/(.*?)(\..+)?/(?2:$1:untitled)/}} ${2:extends ${3:Parent} }${4:implements ${5:Interface} }$0</string>
+	<string>class ${1:${TM_FILENAME/(.*?)(\..+)?/(?2:$1:untitled)/}} ${2:extends ${3:Parent} }${4:implements ${5:Interface} }{
+	$0
+}</string>
 	<key>name</key>
 	<string>class</string>
 	<key>scope</key>

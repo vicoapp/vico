@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # p __FILE__, $PROGRAM_NAME
 
 at_exit { puts "I am <at> the exit!" }

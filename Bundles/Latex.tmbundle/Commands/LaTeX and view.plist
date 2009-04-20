@@ -3,24 +3,31 @@
 <plist version="1.0">
 <dict>
 	<key>beforeRunningCommand</key>
-	<string>nop</string>
+	<string>saveActiveFile</string>
 	<key>bundleUUID</key>
 	<string>46788DCE-6227-11D9-BFB1-000D93589AF6</string>
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
+# coding: utf-8
 
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/process"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/htmloutput"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/require_cmd"
 
-TextMate.save_current_document
+# To enable the typesetting of unsaved documents, you must change the “Save” setting of
+# this command to “Current File” and add the variable TM_LATEX_AUTOSAVE to TextMate's
+# Shell Variables preferences. Be warned that your document must be encoded as UTF-8 if
+# you excercise this option — becauseTextMate.save_current_document cannot know the file
+# encoding you prefer.
+
+TextMate.save_current_document unless ENV["TM_LATEX_AUTOSAVE"].nil?
 
 TextMate.require_cmd("kpsewhich")
 
 texMate = ENV["TM_BUNDLE_SUPPORT"] + "/bin/texMate.py"
 engine_version = TextMate::Process.run(texMate, "version")
-TextMate::HTMLOutput.show(:title =&gt; "Typesetting “#{ENV["TM_DISPLAYNAME"]}”…", :sub_title =&gt; engine_version) do |io|
+TextMate::HTMLOutput.show(:title =&gt; "Typesetting “#{ENV["TM_DISPLAYNAME"] || File.basename(ENV["TM_FILEPATH"])}”…", :sub_title =&gt; engine_version) do |io|
   TextMate::Process.run(texMate, 'latex', '1') do |line|
 	io &lt;&lt; line
   end

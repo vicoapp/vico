@@ -550,6 +550,14 @@
 			</array>
 		</dict>
 		<dict>
+			<key>comment</key>
+			<string>Needs higher precidence than regular expressions.</string>
+			<key>match</key>
+			<string>/=</string>
+			<key>name</key>
+			<string>keyword.operator.assignment.augmented.ruby</string>
+		</dict>
+		<dict>
 			<key>begin</key>
 			<string>'</string>
 			<key>beginCaptures</key>
@@ -1550,6 +1558,22 @@
 			<string>constant.other.symbol.ruby</string>
 		</dict>
 		<dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.constant.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>symbols</string>
+			<key>match</key>
+			<string>(?&gt;[a-zA-Z_]\w*(?&gt;[?!]|=(?![&gt;=]))?|===?|&gt;[&gt;=]?|&lt;[&lt;=]?|&lt;=&gt;|[%`/\|]|\*\*?|=?~|[-+]@?|\[\]=?|@@?[a-zA-Z_]\w*)(:)(?!:)</string>
+			<key>name</key>
+			<string>constant.other.symbol.ruby.19syntax</string>
+		</dict>
+		<dict>
 			<key>begin</key>
 			<string>^=begin</string>
 			<key>captures</key>
@@ -1650,46 +1674,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?!\s+#\s*([Cc]|sh|[Jj]ava))</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.heredoc.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?&gt;&lt;&lt;-HTML\b)</string>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)HTML)\b\1)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1703,7 +1688,7 @@
 			<key>contentName</key>
 			<string>text.html.embedded.ruby</string>
 			<key>end</key>
-			<string>\s*HTML$</string>
+			<string>\s*\2$</string>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1736,7 +1721,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(?&gt;&lt;&lt;-SQL\b)</string>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)SQL)\b\1)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1750,7 +1735,7 @@
 			<key>contentName</key>
 			<string>text.sql.embedded.ruby</string>
 			<key>end</key>
-			<string>\s*SQL$</string>
+			<string>\s*\2$</string>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1783,7 +1768,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(?&gt;&lt;&lt;-(["\\']?)(\w+_(?i:eval))\1)</string>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)CSS)\b\1)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1793,7 +1778,291 @@
 				</dict>
 			</dict>
 			<key>comment</key>
-			<string>ruby code in heredoc, interpolated</string>
+			<string>heredoc with embedded css and intented terminator</string>
+			<key>contentName</key>
+			<string>text.css.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.css.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.css</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)CPP)\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded c++ and intented terminator</string>
+			<key>contentName</key>
+			<string>text.c++.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.cplusplus.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.c++</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)C)\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded c++ and intented terminator</string>
+			<key>contentName</key>
+			<string>text.c.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.c.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.c</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)(?:JS|JAVASCRIPT))\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded javascript and intented terminator</string>
+			<key>contentName</key>
+			<string>text.js.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.js.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.js</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)JQUERY)\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded javascript and intented terminator</string>
+			<key>contentName</key>
+			<string>text.js.jquery.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.js.jquery.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.js.jquery</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)(?:SH|SHELL))\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded shell and intented terminator</string>
+			<key>contentName</key>
+			<string>text.shell.embedded.ruby</string>
+			<key>end</key>
+			<string>\s*\2$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.embedded.shell.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>source.shell</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;&lt;&lt;-("?)((?:[_\w]+_|)RUBY)\b\1)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>heredoc with embedded ruby and intented terminator</string>
+			<key>contentName</key>
+			<string>text.ruby.embedded.ruby</string>
 			<key>end</key>
 			<string>\s*\2$</string>
 			<key>endCaptures</key>
@@ -1814,11 +2083,50 @@
 				</dict>
 				<dict>
 					<key>include</key>
+					<string>source.ruby</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#interpolated_ruby</string>
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>source.ruby</string>
+					<string>#escaped_char</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&gt;\=\s*&lt;&lt;(\w+))</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.ruby</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>^\1$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.ruby</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.unquoted.heredoc.ruby</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#heredoc</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#interpolated_ruby</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -1869,221 +2177,6 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?=\s+#\s*[Cc](?!(\+\+|[Ss][Ss])))</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.embedded.c.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.c</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?=\s+#\s*[Cc]\+\+)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.embedded.cplusplus.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.c++</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?=\s+#\s*[Cc][Ss][Ss])</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.embedded.css.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.css</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?=\s+#\s*[Jj]ava[Ss]cript)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.embedded.js.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.js</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?&gt;\=\s*&lt;&lt;(\w+))(?=\s+#\s*sh)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.begin.ruby</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>^\1$</string>
-			<key>endCaptures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.string.end.ruby</string>
-				</dict>
-			</dict>
-			<key>name</key>
-			<string>string.unquoted.embedded.shell.ruby</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#heredoc</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>source.shell</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolated_ruby</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#escaped_char</string>
-				</dict>
-			</array>
-		</dict>
-		<dict>
-			<key>begin</key>
 			<string>(?&lt;=\{|do|\{\s|do\s)(\|)</string>
 			<key>captures</key>
 			<dict>
@@ -2119,7 +2212,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>&lt;&lt;=|%=|&amp;=|\*=|\*\*=|\+=|\-=|\^=|\|{1,2}=|/=|&lt;&lt;</string>
+			<string>&lt;&lt;=|%=|&amp;=|\*=|\*\*=|\+=|\-=|\^=|\|{1,2}=|&lt;&lt;</string>
 			<key>name</key>
 			<string>keyword.operator.assignment.augmented.ruby</string>
 		</dict>

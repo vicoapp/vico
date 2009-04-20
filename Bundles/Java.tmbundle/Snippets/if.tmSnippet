@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>if ($1) $0</string>
+	<string>if ($1) {
+	$0
+}</string>
 	<key>name</key>
 	<string>if</string>
 	<key>scope</key>

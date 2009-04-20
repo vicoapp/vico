@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/opt/local/bin/php
+&lt;?php
+
+$file = explode("\n", file_get_contents('php://stdin'));
+$start = getenv('TM_LINE_NUMBER');
+
+for ($i = $start - 1; $i &gt; 0; $i--)
+{
+    $line = trim($file[$i]);
+    switch(substr($line, 0, 2))
+    {
+        case '//':
+        case '/*':
+        case '* ':
+        case '':
+            continue 2;
+        break;
+    }
+
+    if (preg_match('/function (.+?)\s*\((.+?)\)/', $line, $matches))
+    {
+       $parameters = explode(',', $matches[2]);
+       
+       for($tabstop = 1; $tabstop &lt;= count($parameters); ++$tabstop)
+       {
+          $parameter = str_replace('$', '\$', trim($parameters[$tabstop-1]));
+          $parameters[$tabstop-1] = "\${{$tabstop}:${parameter}}";
+       }
+       echo 'parent::'.$matches[1].'(' . implode(', ', $parameters) . ');$0';
+       break;
+    }
+}
+?&gt;</string>
+	<key>input</key>
+	<string>document</string>
+	<key>name</key>
+	<string>Insert Call to Parent</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>source.php</string>
+	<key>tabTrigger</key>
+	<string>parent</string>
+	<key>uuid</key>
+	<string>978B5E5E-F5C6-4FD8-B346-B0C85883D600</string>
+</dict>
+</plist>

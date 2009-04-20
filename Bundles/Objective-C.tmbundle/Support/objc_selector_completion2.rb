@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require ENV['TM_SUPPORT_PATH'] + "/lib/exit_codes"
 require "#{ENV['TM_SUPPORT_PATH']}/lib/escape"
+require "#{ENV['TM_SUPPORT_PATH']}/lib/ui"
 
 class ObjcSelectorCompletion
   def initialize(line, caret_placement)
@@ -70,12 +71,15 @@ class ObjcSelectorCompletion
 
   def show_dialog(prettyCandidates,searchTerm,start)
     require "#{ENV['TM_SUPPORT_PATH']}/lib/osx/plist"
-    pl = {'suggestions' => prettyCandidates.map { |pretty , junk1, junk2| { 'title' => junk1} }}
-    flags = " --current-word '#{searchTerm}' --extra-chars '_:'"
-    io = open('|"$DIALOG" popup' + flags, "r+")
-    io <<  pl.to_plist
-    io.close_write
+    pl = prettyCandidates.map { |pretty , junk1, junk2| { 'display' => junk1} }
+
+    flags = {}
+    flags[:extra_chars]= '_:'
+    flags[:initial_filter]= searchTerm
+    TextMate::UI.complete(pl, flags) 
+
     TextMate.exit_discard
+    
   end
 
   def candidates_or_exit(methodSearch, list, fileNames, notif = false)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>fileTypes</key>
@@ -44,6 +44,31 @@
 			<string>^((\\)end)({)code(})</string>
 			<key>name</key>
 			<string>meta.function.embedded.haskell.latex</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.haskell</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>^(&gt; )</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.bird-track.haskell</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>This breaks type signature detection for now, but it's better than having no highlighting whatsoever.</string>
+			<key>end</key>
+			<string>$</string>
+			<key>name</key>
+			<string>meta.embedded.haskell</string>
 			<key>patterns</key>
 			<array>
 				<dict>

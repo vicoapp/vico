@@ -8,19 +8,17 @@
 	<string>#!/usr/bin/env ruby -wKU
 #
 #  Possible improvements:
-#   • Show helpful tool tip if we do not extract any methods from the clipboard
-#   • Insert return-statement in methods that have non-void/IBAction return type
 #   • Preserve empty lines between methods taken from the clipboard
 #   • Make the “parser” conform to the actual Objective-C spec
-#   • Avoid printing extra empty line after last method
 #
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
 methods = []
 
 %x{ pbpaste }.scan(/^
-
+  \s*
   ([-+])                    # Class or object method
-  (\s* \( [^\)]+ \))?       # Optional return type
+  (\s* \( ([^\)]+) \))?     # Optional return type
   (\s* [a-z0-9_]+)          # Method name
 
   # Zero or more parameters:
@@ -34,12 +32,28 @@ methods = []
 
   (?=\s* ;?)                # Optional semicolon
 
-/ix) { methods &lt;&lt; $&amp;.strip }
+/ix) do
+  rettype = $3.to_s.strip
+  methods &lt;&lt; [$&amp;.strip.gsub(' *)', (ENV['TM_C_POINTER'] || ' *').rstrip + ')'), rettype]
+end
+
+TextMate::exit_show_tool_tip('No methods found on the clipboard') if methods.empty?
 
 if ENV['TM_SCOPE'] =~ /meta.scope.interface.objc/
-  methods.each { |e| puts "#{e};" }
+  methods.each { |(proto, rettype)| puts "#{proto};" }
 else
-  methods.each { |e| puts "#{e}\n{\n}\n\n" }
+  tabstop = 0
+  puts(methods.map do |(proto, rettype)|
+    ret = case rettype
+          when "void", "IBAction"
+            ""
+          when "BOOL"
+            "\treturn ${#{tabstop+=1}:Y}${1/^(?:(Y)|(N)|.*)/(?1:ES:(?2:O))/};\n"
+          else
+            "\treturn ${#{tabstop+=1}:nil};\n"
+          end
+    "#{proto}\n{\n#{ret}}\n"
+  end.join("\n"))
 end
 </string>
 	<key>fallbackInput</key>
@@ -51,7 +65,7 @@ end
 	<key>name</key>
 	<string>Paste Implementation / Interface</string>
 	<key>output</key>
-	<string>afterSelectedText</string>
+	<string>insertAsSnippet</string>
 	<key>scope</key>
 	<string>meta.scope.implementation.objc, meta.scope.interface.objc</string>
 	<key>uuid</key>

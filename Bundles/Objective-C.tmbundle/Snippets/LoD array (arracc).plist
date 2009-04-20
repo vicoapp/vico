@@ -3,49 +3,44 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>- (void)add${1:Thing}:(${2:id})${3:a$1}
+	<string>- (void)addObjectTo${1:Things}:(${2:id})anObject
 {
-	[${4:array} addObject:$3];
+	[${3:${1/./\l$0/}} addObject:anObject];
 }
 
-- (void)insert$1:($2)$3 atIndex:(unsigned int)i 
+- (void)insertObject:($2)anObject in$1AtIndex:(unsigned int)i 
 {
-	[$4 insertObject:$3 atIndex:i];
+	[$3 insertObject:anObject atIndex:i];
 }
 
-- ($2)${1/./\l$0/}AtIndex:(unsigned int)i
+- ($2)objectIn$1AtIndex:(unsigned int)i
 {
-	return [$4 objectAtIndex:i];
+	return [$3 objectAtIndex:i];
 }
 
-- (unsigned int)indexOf$1:($2)$3
+- (unsigned int)indexOfObjectIn$1:($2)anObject
 {
-	return [$4 indexOfObject:$3];
+	return [$3 indexOfObject:anObject];
 }
 
-- (void)remove$1AtIndex:(unsigned int)i
+- (void)removeObjectFrom$1AtIndex:(unsigned int)i
 {
-	[$4 removeObjectAtIndex:i];
+	[$3 removeObjectAtIndex:i];
 }
 
-- (void)remove$1:($2)$3
+- (unsigned int)countOf$1
 {
-	[$4 removeObject:$3];
+	return [$3 count];
 }
 
-- (unsigned int)countOf$1s
+- (NSArray${TM_C_POINTER/(^(.+?)\s*$)?/(?1:$2: *)/})${1/./\l$0/}
 {
-	return [$4 count];
+	return $3;
 }
 
-- (NSArray *)${1/./\l$0/}s
+- (void)set$1:(NSArray${TM_C_POINTER/(^(.+?)\s*$)?/(?1:$2: *)/})new$1
 {
-	return $4;
-}
-
-- (void)set$1s:(NSArray *)new$1s
-{
-	[$4 setArray:new$1s];
+	[$3 setArray:new$1];
 }</string>
 	<key>name</key>
 	<string>KVC Array</string>

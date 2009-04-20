@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # 
 #  svn_revision_chooser.rb
 #  Subversion.tmbundle

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>beforeRunningCommand</key>
@@ -191,7 +191,7 @@ end
 	<key>output</key>
 	<string>insertAsSnippet</string>
 	<key>scope</key>
-	<string>meta.function.objc - (meta.argument-type.objc | meta.return-type.objc)</string>
+	<string>meta.function.objc - (meta.argument-type.objc | meta.return-type.objc | meta.bracketed)</string>
 	<key>uuid</key>
 	<string>30E93FBA-5A81-4D94-8A03-9CD46FCA3CFA</string>
 </dict>

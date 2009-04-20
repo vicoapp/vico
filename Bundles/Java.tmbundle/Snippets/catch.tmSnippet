@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>catch (${1:Exception} ${2:e}) $0</string>
+	<string>catch (${1:Exception} ${2:e}) {
+	$0
+}</string>
 	<key>name</key>
 	<string>catch</string>
 	<key>scope</key>

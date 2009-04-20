@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>public void test${1:Name}() throws Exception $0</string>
+	<string>public void test${1:Name}() throws Exception {
+	$0
+}</string>
 	<key>name</key>
 	<string>test</string>
 	<key>scope</key>

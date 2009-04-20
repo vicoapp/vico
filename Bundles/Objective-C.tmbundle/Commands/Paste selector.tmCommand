@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>pbpaste|head -n1|perl -pe's/:\(.+?\)\w+\s*/:/g'|perl -pe's/^[-+]\s*\(.+?\)\s*|\s+|;//g'</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^V</string>
+	<key>name</key>
+	<string>Paste selector</string>
+	<key>output</key>
+	<string>afterSelectedText</string>
+	<key>scope</key>
+	<string>meta.selector.objc</string>
+	<key>uuid</key>
+	<string>D9CA98D1-7564-4CCB-8156-9A06210A1A7F</string>
+</dict>
+</plist>

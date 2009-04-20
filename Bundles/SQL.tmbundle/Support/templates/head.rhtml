@@ -9,14 +9,14 @@ function updateResult(html) {
 }
 
 function getData(db, tbl, query, page_size, offset) {
-    var res = shell_run("<%= ENV['TM_BUNDLE_SUPPORT'] %>/bin/db_browser.rb", '--mode=frame', shell_join_long_args({database: db, table: tbl, query: query, rows: page_size, offset: offset}));
+    var res = shell_run("<%= ENV['TM_RUBY'] || 'ruby' %>", "<%= ENV['TM_BUNDLE_SUPPORT'] %>/bin/db_browser.rb", '--mode=frame', shell_join_long_args({database: db, table: tbl, query: query, rows: page_size, offset: offset}));
     updateResult(res);
 }
 function toggleDatabases(database, tbl, hname, stype, pw, dbuser, dbport, query, page_size, offset) {
     database_name = database.innerText;
     list = document.getElementById('db_' + database_name);
     if (list.getElementsByTagName('li').length == 0) {
-        var res = shell_run("<%= ENV['TM_BUNDLE_SUPPORT'] %>/bin/db_browser.rb", '--mode=tables', shell_join_long_args({database: database_name}));
+        var res = shell_run("<%= ENV['TM_RUBY'] || 'ruby' %>", "<%= ENV['TM_BUNDLE_SUPPORT'] %>/bin/db_browser.rb", '--mode=tables', shell_join_long_args({database: database_name}));
         list.innerHTML = res;
         list.style.display = '';
     } else if (list.style.display != '') {

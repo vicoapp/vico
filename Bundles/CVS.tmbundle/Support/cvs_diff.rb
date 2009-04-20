@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby -w
+# encoding: utf-8
 
 $LOAD_PATH << ENV['TM_SUPPORT_PATH'] + "/lib"
 require 'progress'

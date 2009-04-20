@@ -11,8 +11,8 @@ proto_re = /
             ^\s*                # Start of the line and optional space
             [+-]\s*             # a plus or minus for method specifier
             \([^)]+\)           # the return type in brackets
-            ((?:\n|[^{])*)     
-            (?m:.*?)         
+            ((?:\n|[^@{])*)     
+            (?m:[\s;]*)         
             \{                  
           /x
 
@@ -26,13 +26,15 @@ exit if proto.nil? or proto.empty?
 last_proto_sel_with_types = proto[0].strip.sub(/^\s+/, '').sub(%r{\s*//.*$}, '').gsub(/\n\s*/, ' ')
 
 params = []
-params = last_proto_sel_with_types.scan(/(.+?):\((.+?)\)(\w+)/)
+params = last_proto_sel_with_types.scan(/(.+?)\s*:\s*\((.+?)\)\s*(\w+)/)
 
 def format_specifier_for_type(type)
-  %w[int bool BOOL long].each { |t| return('%d') if type.include? t }
+  type = type.gsub(/\s*const\s*/, '')
+  %w[int bool BOOL long NSInteger NSUInteger size_t].each { |t| return('%d') if type.include? t }
+  %w[float double CGFloat].each { |t| return('%f') if type.include? t }
   return '%c' if type == 'char'
   return '%C' if type == 'unichar'
-  return '%s' if type == 'char*'
+  return '%s' if type.include?('char*') || type.include?('string')
   '%@'
 end
 
@@ -43,6 +45,7 @@ def transformer_for(type, name)
   when 'NSPoint': "NSStringFromPoint(#{name})"
   when 'NSSize':  "NSStringFromSize(#{name})"
   when 'SEL':     "NSStringFromSelector(#{name})"
+  when /string/:  "#{name}.c_str()"
   else name
   end
 end

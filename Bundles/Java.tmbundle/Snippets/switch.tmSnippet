@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>switch ($1) $0</string>
+	<string>switch ($1) {
+	$0
+}</string>
 	<key>name</key>
 	<string>switch</string>
 	<key>scope</key>

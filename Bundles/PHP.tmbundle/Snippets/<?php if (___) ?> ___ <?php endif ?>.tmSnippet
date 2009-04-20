@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>&lt;?php if (${1:condition}): ?&gt;
+	<string>&lt;?${TM_PHP_OPEN_TAG:php} if (${1:condition}): ?&gt;
 	$0
-&lt;?php endif ?&gt;</string>
+&lt;?${TM_PHP_OPEN_TAG:php} endif ?&gt;</string>
 	<key>name</key>
 	<string>&lt;?php if (…) ?&gt; … &lt;?php endif ?&gt;</string>
 	<key>scope</key>

@@ -20,7 +20,7 @@
 	<key>name</key>
 	<string>Insert ; and Indent Line</string>
 	<key>scope</key>
-	<string>(source.c | source.c++ | source.objc | source.objc++) - comment</string>
+	<string>(source.c | source.c++ | source.objc | source.objc++) - comment - string</string>
 	<key>scopeType</key>
 	<string>local</string>
 	<key>uuid</key>

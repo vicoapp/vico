@@ -11,8 +11,7 @@ ${TM_SELECTED_TEXT/([\t ]*).*/$1/m}}</string>
 	<key>keyEquivalent</key>
 	<string>^@W</string>
 	<key>name</key>
-	<string>Wrap in try { … } catch (…) { … }
-</string>
+	<string>Wrap in try { … } catch (…) { … }</string>
 	<key>scope</key>
 	<string>source.php</string>
 	<key>tabTrigger</key>

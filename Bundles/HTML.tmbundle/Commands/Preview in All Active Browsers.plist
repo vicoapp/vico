@@ -8,7 +8,6 @@
 	<string>#!/usr/bin/env ruby -wKU
 # 
 # Open Document in Running Browser(s)
-# v3 - November 22, 2007
 # 
 # Now supports multiple running versions of a single browser along
 # with a range of new/old browsers. Bring back support for Firefox.
@@ -36,11 +35,11 @@ browsers = %w[ Safari OmniWeb Camino Shiira firefox-bin Xyle\ scope Opera Intern
 #   - 'WebKit' look ahead is to rule it out so we can use the working
 #      rule below.
 #   - 'LaunchCFMApp' portion is so iCab works.
-active = proclist.scan(%r{^(?:/.*LaunchCFMApp )?(/.*\.app)(?=/Contents/MacOS/(?:#{browsers})\b(?!\s-WebKit))})
+active = proclist.scan(%r{^(?:/.*LaunchCFMApp )?(/.*\.app)(?=/Contents/MacOS/(?:#{browsers})\b(?!.*WebKit))})
 
 # Special check for WebKit as it appears as Safari
 # Note: Only supports one running instance of WebKit, picked at random.
-if proclist =~ %r{/Contents/MacOS/Safari.*-WebKit(DeveloperExtras|ScriptDebuggerEnabled)}
+if proclist =~ %r{/Contents/MacOS/Safari.*WebKit}
   active &lt;&lt; "WebKit"
 end
 

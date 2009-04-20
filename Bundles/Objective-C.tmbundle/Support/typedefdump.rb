@@ -9,9 +9,9 @@ list = str.split(/\n/)
 out = []
 typename = constantname = ""
 list.reverse_each do |x| 
-	if x =~ /\}\s*(NS[a-zA-Z0-9*]*)/
+	if x =~ /\}\s*([A-Z][A-Z][a-zA-Z0-9*]*)/
 		typename = $1
-	elsif x =~ /^\s*(NS[A-Z][A-Za-z0-9]*)/
+	elsif x =~ /^\s*([A-Z][A-Z][A-Za-z0-9]*)/
 		constantname = $1
 		out << "#{constantname}\t\t#{typename}"
 	end

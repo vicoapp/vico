@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby -w
+# encoding: utf-8
 
 # if we are not called directly from TM (e.g. JavaScript) the caller
 # should ensure that RUBYLIB is set properly
@@ -12,9 +13,7 @@ require "web_preview"
 require "erb"
 include ERB::Util
 
-tm_var_or_qri = 'RI=$(type -P ${TM_RUBY_RI:-qri})'
-ri_default    = '[[ ! -x "$RI" ]] && RI=$(type -P ri)'
-RI_EXE        = `#{tm_var_or_qri}; #{ri_default}; /bin/echo -n "$RI"`
+RI_EXE = [ ENV['TM_RUBY_RI'], 'qri', 'ri' ].find { |cmd| !cmd.to_s.empty? && (File.executable?(cmd) || ENV['PATH'].split(':').any? { |dir| File.executable? File.join(dir, cmd) }) ? cmd : false }
 
 term = ARGV.shift
 
@@ -94,7 +93,7 @@ HTML
   html_footer
   TextMate.exit_show_html
 elsif mode == 'js' then
-  documentation = h(`#{RI_EXE} -T -f plain #{e_sh term}`) \
+  documentation = h(`#{e_sh RI_EXE} -T -f plain #{e_sh term}`) \
     rescue "<h1>ri Command Error.</h1>"
 
   documentation.gsub!(/(\s|^)\+(\w+)\+(\s|$)/, "\\1<code>\\2</code>\\3")

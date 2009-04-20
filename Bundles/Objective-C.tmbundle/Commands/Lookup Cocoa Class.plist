@@ -5,7 +5,12 @@
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
 	<key>command</key>
-	<string>doc_path="/Developer/ADC Reference Library/documentation/Cocoa/Reference"
+	<string>if [[ "$(defaults read /System/Library/CoreServices/SystemVersion ProductVersion)" == 10.5.* ]]; then
+  "${TM_RUBY:-ruby}" -r"$TM_BUNDLE_SUPPORT/lib/docset_query.rb" -e 'documentation_for_word'
+  exit
+fi
+
+doc_path="/Developer/ADC Reference Library/documentation/Cocoa/Reference"
 doc_path2="/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/Cocoa/Reference"
 
 if [[ -d "$doc_path2" ]]; then
@@ -60,7 +65,7 @@ echo "Couldn’t find documentation for “${word}”"
 	<key>output</key>
 	<string>showAsTooltip</string>
 	<key>scope</key>
-	<string>source.objc, source.objc++, (source.objc support | source.objc++ support) - support.function.any-method</string>
+	<string>source.c, source.c++, source.objc, source.objc++, (source.objc support | source.objc++ support) - support.function.any-method</string>
 	<key>uuid</key>
 	<string>2E0F350A-7B23-11D9-B084-000D93589AF6</string>
 </dict>

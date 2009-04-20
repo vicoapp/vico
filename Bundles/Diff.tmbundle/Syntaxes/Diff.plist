@@ -68,7 +68,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>^(@@)\s*(.+?)\s*(@@)$\n?</string>
+			<string>^(@@)\s*(.+?)\s*(@@)($\n?)?</string>
 			<key>name</key>
 			<string>meta.diff.range.unified</string>
 		</dict>

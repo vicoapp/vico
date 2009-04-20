@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'English'
 require 'ostruct'
 require 'pathname'

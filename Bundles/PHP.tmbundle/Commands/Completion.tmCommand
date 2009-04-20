@@ -6,95 +6,22 @@
 	<string>nop</string>
 	<key>command</key>
 	<string>#!/usr/bin/env ruby -wKU
-require ENV["TM_SUPPORT_PATH"] + "/lib/ui.rb"
-require ENV["TM_SUPPORT_PATH"] + "/lib/exit_codes.rb"
+require ENV['TM_SUPPORT_PATH'] + '/lib/osx/plist'
+require ENV['TM_SUPPORT_PATH'] + '/lib/ui'
 
-ENV['TM_CURRENT_WORD'] ||= ''
-
-if ENV['TM_SELECTED_TEXT'] and ENV['TM_SELECTED_TEXT'].to_s.include?('|')
-  require ENV["TM_SUPPORT_PATH"] + "/lib/exit_codes.rb"
-  ENV['TM_SELECTED_TEXT'].to_s =~ /^(, )?\[?(.+?)\]?$/
-  comma = $1.to_s
-  choices = $2.split('|')
-  choice = TextMate::UI.menu(choices)
-  # exit_replace_text is used here since this is expected to be used in the middle of a snippet,
-  # and inserting another snippet will break the existing tabstops
-  TextMate::exit_replace_text((choice ? comma + choices[choice].strip : ENV['TM_SELECTED_TEXT']).strip)
-end
-
-functions = `grep -i "^$TM_CURRENT_WORD" "$TM_BUNDLE_SUPPORT"/functions.txt`.split("\n")
-
-TextMate::exit_show_tool_tip('No matches found') if functions.empty?
-
-if functions.size &gt; 1
-  skip_prefix = false
-  if ENV['TM_CURRENT_WORD'][-1] == ?_
-    # If the last char in the word is a _ we don't show the word in the completion list,
-    # to enable the user to continue typing. See: array_⌥⎋
-    skip_prefix = true
-  else
-    # We also skip the prefix if the first char in all the matches is a _
-    skip_prefix = ! functions.find { |fun| fun[ENV['TM_CURRENT_WORD'].size] != ?_ } rescue false
-  end
-  names = functions.map do |line|
-    line =~ /^(#{ENV['TM_CURRENT_WORD']})(.*?)(%|$)/i
-    if skip_prefix
-      $2
-    else
-      $1 + $2
-    end
-  end.uniq
-  abort unless choice = TextMate::UI.menu(names)
-  choice = functions[choice]
-else
-  choice = functions.pop
-end
-
-function, prototype, description = choice.split('%')
-
-offset = ENV['TM_CURRENT_WORD'] ? ENV['TM_CURRENT_WORD'].length : 0
-
-print function[offset..-1] + '('
-
-parts = prototype.strip.match(/^\s*(?:([0-9A-Za-z|_]+)\s+)?(\w+)\s*\((.*)\).*$/)
-params = parts[3] rescue ''
-
-params = '' if params == 'void'
-
-tabstop = 0
-print(params.scan(/(\w+ )?&amp;?([\w.|]+)( = .+)?(\])?,?/).map do |(type, name, default, optional_bracket)|
-  snippet = type.to_s + name
-  optional = false
-  if optional_bracket
-    # Optional
-    snippet = '[' + snippet + ']'
-    optional = true
-  elsif default
-    # Optional with default
-    snippet = '[' + snippet + default
-    optional = true
-  end
-  tabstop += 1
-  if tabstop &gt; 1
-    if optional
-      "${#{tabstop}:, ${#{tabstop+=1}:#{snippet}}}"
-    else
-      ", ${#{tabstop}:#{snippet}}"
-    end
-  else
-    "${#{tabstop}:#{snippet}}"
-  end
-end.join(''))
-
-print ')$0'</string>
-	<key>input</key>
-	<string>none</string>
+choices = OSX::PropertyList.load(File.read(ENV['TM_BUNDLE_SUPPORT'] + '/functions.plist'))
+TextMate::UI.complete(choices, :initial_filter =&gt; ENV['TM_CURRENT_WORD'], :extra_chars =&gt; '_')
+</string>
+<key>fallbackInput</key>
+<string>word</string>
+<key>input</key>
+<string>selection</string>
 	<key>keyEquivalent</key>
 	<string>~</string>
 	<key>name</key>
 	<string>Completions for Word…</string>
 	<key>output</key>
-	<string>insertAsSnippet</string>
+	<string>showAsTooltip</string>
 	<key>scope</key>
 	<string>source.php</string>
 	<key>uuid</key>

@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>public class ${1:${TM_FILENAME/(.*?)(\..+)/$1/}} extends ${2:TestCase} $0</string>
+	<string>public class ${1:${TM_FILENAME/(.*?)(\..+)/$1/}} extends ${2:TestCase} {
+	$0
+}</string>
 	<key>name</key>
 	<string>test case</string>
 	<key>scope</key>

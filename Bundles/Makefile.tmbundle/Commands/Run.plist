@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>autoScrollOutput</key>
+	<true/>
 	<key>beforeRunningCommand</key>
-	<string>saveModifiedFiles</string>
+	<string>nop</string>
 	<key>command</key>
-	<string>. "$TM_SUPPORT_PATH/lib/webpreview.sh"
-html_header "Running make"
+	<string>#!/usr/bin/env ruby
 
-make ${TM_MAKE_FLAGS} 2&gt;&amp;1|"${TM_RUBY:-ruby}" -rtm_parser -eTextMate.parse_errors
+require ENV["TM_SUPPORT_PATH"] + "/lib/tm/executor"
+require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
 
-echo "Done."
-html_footer
+require ENV["TM_SUPPORT_PATH"] + "/lib/escape"
+
+TextMate.save_current_document
+TextMate::Executor.make_project_master_current_document
+
+flags = []
+flags &lt;&lt; ENV["TM_MAKE_FLAGS"] unless ENV["TM_MAKE_FLAGS"].nil?
+flags &lt;&lt; ENV["TM_MAKE_TARGET"] unless ENV["TM_MAKE_TARGET"].nil?
+
+ENV["TM_DISPLAYNAME"] = ENV["TM_MAKE_TARGET"].nil? ? "default" : ENV["TM_MAKE_TARGET"]
+
+# makefiles are always in the project directory.
+#Dir.chdir(ENV["TM_PROJECT_DIRECTORY"]) unless ENV["TM_PROJECT_DIRECTORY"].nil?
+Dir.chdir("/Users/duff/Oak/avian")
+
+TextMate::Executor.run("make", flags, :verb =&gt; "Making") do |line, type|
+  if line =~ /^(.*?):(?:(\d+):)?\s*(.*?)$/ and not $1.nil? and File.exists?($1)
+    "&lt;a href=\"txmt://open?url=file://#{e_url File.expand_path($1)}#{$2.nil? ? '' : "&amp;line=" + $2}\"&gt;#{htmlize $3}&lt;/a&gt;&lt;br&gt;\n"
+  end
+end
 </string>
 	<key>input</key>
-	<string>none</string>
+	<string>document</string>
 	<key>keyEquivalent</key>
-	<string>@r</string>
+	<string>@b</string>
 	<key>name</key>
-	<string>Run</string>
+	<string>Build</string>
 	<key>output</key>
 	<string>showAsHTML</string>
-	<key>scope</key>
-	<string>source.makefile</string>
 	<key>uuid</key>
 	<string>19F9C045-7BCC-429B-8C68-967B6BD15B84</string>
 </dict>

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
 
 require "#{ENV['TM_SUPPORT_PATH']}/lib/progress"
 TextMate.call_with_progress(:title => "Contacting database", :message => "Fetching database schema…") do

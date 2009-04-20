@@ -1,6 +1,6 @@
 <% require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview.rb' %>
 
-<% # raise 'No JavaScript' if not File.exist?("#{bundle}/Template/Status.js") %>
+<%# raise 'No JavaScript' if not File.exist?("#{bundle}/Template/Status.js") %>
 
 <%# TODO: openWithFinder for image files instead of Diff %>
 
@@ -14,7 +14,7 @@ ENV['TM_SVN']				= "#{e_sh_js ENV['TM_SVN']}"
 ENV['TM_SUPPORT_PATH']		= "#{e_sh_js ENV['TM_SUPPORT_PATH']}"
 ENV['TM_BUNDLE_SUPPORT']	= "#{e_sh_js ENV['TM_BUNDLE_SUPPORT']}"
 ENV['CommitWindow']			= "#{e_sh_js ENV['CommitWindow']}"
-ENV['TM_RUBY']				= "#{e_sh_js ENV['TM_RUBY'] || '/usr/bin/ruby' }"
+ENV['TM_RUBY']				= "#{e_sh_js ENV['TM_RUBY'] || 'ruby' }"
 
 // Status class map
 var StatusMap = new Object
@@ -98,7 +98,8 @@ html_header("#{command_name.capitalize} for &ldquo;#{File.basename(display_title
 							# Make sure we ask for confirmation if we're going to lose changes using Revert
 #							if show_button and button_name == 'Revert' then
 #								button[:onclick] = 'svnRevertFile' + (status.scan(/A|D/).empty? ? 'Confirm' : '')
-#							end %>
+#							end 
+%>
 								<td class="action_button <%= button_name.downcase + '_col' %>">
 									<a id="button_<%= button_name.downcase + stdin_line_count.to_s %>"
 										class="<%= button_name.downcase + '_button' %>"

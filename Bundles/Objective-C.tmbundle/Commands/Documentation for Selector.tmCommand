@@ -9,6 +9,12 @@
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
 
+if `defaults read /System/Library/CoreServices/SystemVersion ProductVersion` !~ /10\.4\..*/
+  require ENV['TM_BUNDLE_SUPPORT'] + '/lib/docset_query.rb'
+  documentation_for_selector
+  exit
+end
+
 line = STDIN.read
 caret_placement = 0
 tmp = ENV['TM_LINE_NUMBER'].to_i - ENV['TM_INPUT_START_LINE'].to_i

@@ -8,7 +8,7 @@
 
 The PHP bundle includes snippets for the common control structures, such as `if`, `while`, `switch` and `for`, as well as `function` and `class` definitions.
 These snippets are accessible through a tab trigger for the relevant keyword.  
-Some snippets are also available in the HTML scope for use in templating using PHP; these will be wrapped in `<?php … ?>` blocks.
+Some snippets are also available in the HTML scope for use in templating using PHP; these will be wrapped in `<?php … ?>` blocks (See the Short Tags section below for details on how to use short tags instead).
 
 These snippets are designed to conform to the [PEAR style guide][]. To summarise:
 
@@ -16,7 +16,7 @@ These snippets are designed to conform to the [PEAR style guide][]. To summarise
   * Functions should be called with no spaces between the function name, the opening parenthesis, and the first parameter.
   * Function and class definitions have their brace on the line following the prototype.
 
-[PEAR style guide]: http://www.go-pear.org/manual/en/standards.php
+[PEAR style guide]: http://pear.php.net/manual/en/standards.php
 
 ## PHPDoc
 
@@ -76,6 +76,14 @@ The bundle contains a file with support code that you can include in your projec
     1. If `TEXMATE_ERRORS` is define()d before the support file is included then the script tags will automatically be printed at the end of the page. This has the disadvantage that it will invalidate the page source.
     2. You can call `textmate_print_error_handler`() anywhere in your code to print the JavaScript.
     3. Alternatively, you can use the `phperr⇥` snippet in HTML to insert the script tags directly into your template.
+
+## Short Tags
+
+If you want the various snippets to use short tags, i.e. `<? … ?>` rather than `<?php … ?>`, then you can set a shell variable in Preferences (under Advanced):
+
+   * Set `TM_PHP_OPEN_TAG` to an empty value to use short-tags.
+   * Set `TM_PHP_OPEN_TAG_WITH_ECHO` to either `" echo"` (without the quotes) to use short tags, or to `=` to use the short-form for echo statements.
+
 
 ## Miscellaneous
 

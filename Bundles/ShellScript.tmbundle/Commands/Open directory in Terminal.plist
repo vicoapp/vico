@@ -9,7 +9,7 @@
 require ENV['TM_SUPPORT_PATH'] + '/lib/escape.rb'
 
 def find_directory
-  files = [ ENV['TM_SELECTED_FILE'], ENV['TM_FILEPATH'], ENV['TM_DIRECTORY'], ENV['TM_PROJECT_DIRECTORY'] ]
+  files = [ ENV['TM_SELECTED_FILE'], ENV['TM_FILEPATH'], ENV['TM_DIRECTORY'], ENV['TM_PROJECT_DIRECTORY'], ENV['HOME'] ]
   res = files.find { |file| file &amp;&amp; File.exists?(file) }
   res &amp;&amp; File.file?(res) ? File.split(res).first : res
 end

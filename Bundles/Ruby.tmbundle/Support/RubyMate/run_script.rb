@@ -10,12 +10,14 @@ args = [ ]
 if ARGV.first == "--name="
   n = ENV['TM_LINE_NUMBER'].to_i
 
-  spec, context, name = nil, nil, nil
+  spec, context, name, test_name = nil, nil, nil
 
   File.open(ENV['TM_FILEPATH']) do |f|
     # test/unit
     lines     = f.read.split("\n")[0...n].reverse
     name      = lines.find { |line| line =~ /^\s*def test[_a-z0-9]*[\?!]?/i }.to_s.sub(/^\s*def (.*?)\s*$/) { $1 }
+    # test helper
+    test_name = $2 || $3 if lines.find { |line| line =~ /^\s*test\s+('(.*)'|"(.*)")+\s*(\{|do)/ }
     # test/spec.
     spec      = $3 || $4 if lines.find { |line| line =~ /^\s*(specify|it)\s+('(.*)'|"(.*)")+\s*(\{|do)/ }
     context   = $3 || $4 if lines.find { |line| line =~ /^\s*(context|describe)\s+('(.*)'|"(.*)")+\s*(\{|do)/ }
@@ -23,6 +25,8 @@ if ARGV.first == "--name="
 
   if name and !name.empty?
     args << "--name=#{name}"
+  elsif test_name and !test_name.empty?
+    args << "--name=test_#{test_name.gsub(/\s+/,'_')}"
   elsif spec and !spec.empty? and context and !context.empty?
     args << %Q{--name="/test_spec \\{.*#{context}\\} \\d{3} \\[#{spec}\\]/"}
   else
@@ -34,7 +38,7 @@ end
 is_test_script = !(ENV["TM_FILEPATH"].match(/(?:\b|_)(?:tc|ts|test)(?:\b|_)/).nil? and
   File.read(ENV["TM_FILEPATH"]).match(/\brequire\b.+(?:test\/unit|test_helper)/).nil?)
 
-cmd = [ENV['TM_RUBY'] || 'ruby', '-rcatch_exception']
+cmd = [ENV['TM_RUBY'] || 'ruby', '-KU', '-rcatch_exception']
 
 if is_test_script and not ENV['TM_FILE_IS_UNTITLED']
   path_ary = (ENV['TM_ORIG_FILEPATH'] || ENV['TM_FILEPATH']).split("/")
@@ -75,13 +79,24 @@ TextMate::Executor.run( cmd, :version_args => ["--version"],
         url, display_name = '', 'untitled document';
         unless file == "untitled"
           indent += " " if file.sub!(/^\[/, "")
-          file = Pathname.new(file).realpath.to_s
-          url = '&amp;url=file://' + e_url(file)
-          display_name = File.basename(file)
+          if file == '(eval)'
+            display_name = file
+          else
+            begin
+              file = Pathname.new(file).realpath.to_s
+              url = '&amp;url=file://' + e_url(file)
+              display_name = File.basename(file)
+            rescue Errno::ENOENT
+              display_name = file
+            end
+          end
         end
-        "#{indent}<a class='near' href='txmt://open?line=#{line + url}'>" +
-        (method ? "method #{CGI::escapeHTML method}" : '<em>at top level</em>') +
-        "</a> in <strong>#{CGI::escapeHTML display_name}</strong> at line #{line}<br/>"
+        out = indent
+        out += "<a class='near' href='txmt://open?line=#{line + url}'>" unless url.empty?
+        out += (method ? "method #{CGI::escapeHTML method}" : '<em>at top level</em>')
+        out += "</a>" unless url.empty?
+        out += " in <strong>#{CGI::escapeHTML display_name}</strong> at line #{line}<br/>"
+        out
       elsif line =~ /(\[[^\]]+\]\([^)]+\))\s+\[([\w\_\/\.]+)\:(\d+)\]/
         spec, file, line = $1, $2, $3, $4
         "<span><a href=\"txmt://open?#{path_to_url_chunk(file)}line=#{line}\">#{spec}</a></span>:#{line}<br/>"

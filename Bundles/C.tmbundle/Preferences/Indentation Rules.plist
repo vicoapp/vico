@@ -30,7 +30,7 @@
 	                                    #  terminated with ;, :, {, or }
 	</string>
 		<key>unIndentedLinePattern</key>
-		<string>^\s*((/\*|\*/|//|#|template\b.*?&gt;(?!\(.*\))|@protocol|@interface(?!.*\{)|@implementation|@end).*)?$</string>
+		<string>^\s*((/\*|\*/|//|#|template\b.*?&gt;(?!\(.*\))|@protocol|@optional|@interface(?!.*\{)|@implementation|@end).*)?$</string>
 	</dict>
 	<key>uuid</key>
 	<string>02EB44C6-9203-4F4C-BFCB-7E3360B12812</string>

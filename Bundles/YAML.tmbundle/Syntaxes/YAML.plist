@@ -96,6 +96,16 @@
 					<key>name</key>
 					<string>punctuation.definition.entry.yaml</string>
 				</dict>
+				<key>10</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.yaml</string>
+				</dict>
+				<key>11</key>
+				<dict>
+					<key>name</key>
+					<string>string.unquoted.yaml</string>
+				</dict>
 				<key>2</key>
 				<dict>
 					<key>name</key>
@@ -114,11 +124,31 @@
 				<key>5</key>
 				<dict>
 					<key>name</key>
-					<string>string.unquoted.yaml</string>
+					<string>string.quoted.double.yaml</string>
+				</dict>
+				<key>6</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.yaml</string>
+				</dict>
+				<key>7</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.yaml</string>
+				</dict>
+				<key>8</key>
+				<dict>
+					<key>name</key>
+					<string>string.quoted.single.yaml</string>
+				</dict>
+				<key>9</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.yaml</string>
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>(?:(?:(-\s*)?(\w+\s*(:)))|(-))\s*([A-Za-z0-9_].*)\s*$</string>
+			<string>(?:(?:(-\s*)?(\w+\s*(:)))|(-))\s*(?:((")[^"]*("))|((')[^']*('))|([^,{}&amp;#\[\]]+))\s*</string>
 			<key>name</key>
 			<string>string.unquoted.yaml</string>
 		</dict>

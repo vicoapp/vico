@@ -67,7 +67,7 @@ except:
             stat = self.stdout.close()
             return stat
 
-texMateVersion = ' $Rev: 10670 $ '
+texMateVersion = ' $Rev: 10791 $ '
 
 # 
 
@@ -148,7 +148,7 @@ def findViewerPath(viewer,pdfFile,fileName):
     vp = runObj.stdout.read()
     syncPath = None
     if viewer == 'Skim' and vp:
-        syncPath = vp + '/Contents/Resources/displayline ' + os.getenv('TM_LINE_NUMBER') + ' ' + pdfFile + ' ' + shell_quote(os.getenv('TM_FILEPATH'))
+        syncPath = vp + '/Contents/SharedSupport/displayline ' + os.getenv('TM_LINE_NUMBER') + ' ' + pdfFile + ' ' + shell_quote(os.getenv('TM_FILEPATH'))
     elif viewer == 'TeXniscope' and vp:
         syncPath = vp + '/Contents/Resources/forward-search.sh ' + os.getenv('TM_LINE_NUMBER') + ' ' + shell_quote(os.getenv('TM_FILEPATH')) + ' ' + pdfFile
     elif viewer == 'PDFView' and vp:

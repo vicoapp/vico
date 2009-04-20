@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby -w
+# encoding: utf-8
 
 # FIXME:  In a ruby code line like "lines.each { |line| puts "#{i += 1}. " + line }", the "switch between {} and do-end" command picks up the wrong braces.
 # allan: JEG2: maybe we should just let a script do the extraction rather than the current regexp find in a macro

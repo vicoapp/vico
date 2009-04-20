@@ -8,11 +8,27 @@ fi
 
 SOURCE="$1"
 shift
-TMP=/tmp/tm_javamate 
-mkdir -p "$TMP"
-cd "$TMP"
-"$TM_JAVAC" -d "$TMP" -encoding UTF8 "$SOURCE"
-if (($? >= 1)); then exit; fi
-	
-"$TM_JAVA" -Dfile.encoding=utf-8 $(basename -s .java "$SOURCE") $@
-echo -e "\nProgram exited with status $?.";
+
+PACKAGE="$1"
+
+output="$TMPDIR/tm_javamate.${TM_PID:-$LOGNAME}";
+mkdir -p "$output"
+
+if [ -n "$TM_JAVA_FILEGLOB" ]; then
+  "$TM_JAVAC" -d "$output" -encoding UTF8 $TM_JAVA_FILEGLOB; rc=$?;
+  if (($rc >= 1)); then exit $rc; fi
+fi
+
+if [[ "$SOURCE" != $TM_JAVA_FILEGLOB ]]; then
+  "$TM_JAVAC" -d "$output" -encoding UTF8 "$SOURCE"; rc=$?;
+  if (($rc >= 1)); then exit $rc; fi
+fi
+
+CLASS=$(basename -s .java "$SOURCE")
+if [ "$PACKAGE" ]
+then
+	CLASS="$PACKAGE.$CLASS"
+fi
+
+CLASSPATH="$output:$CLASSPATH" "$TM_JAVA" -Dfile.encoding=utf-8 "$CLASS" $@;
+exit $?;

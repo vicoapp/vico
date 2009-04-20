@@ -13,6 +13,8 @@ require ENV["TM_SUPPORT_PATH"] + "/lib/tm/executor"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
 
 TextMate.save_current_document
+TextMate::Executor.make_project_master_current_document
+
 TextMate::Executor.run(ENV["TM_SHELL"] || ENV["SHELL"] || "bash", ENV["TM_FILEPATH"])</string>
 	<key>input</key>
 	<string>document</string>

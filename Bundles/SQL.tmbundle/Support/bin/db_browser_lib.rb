@@ -4,6 +4,7 @@ $: << ENV['TM_BUNDLE_SUPPORT'] + '/lib/' << ENV['TM_BUNDLE_SUPPORT'] + '/lib/con
 require 'ostruct'
 require ENV['TM_SUPPORT_PATH'] + '/lib/osx/keychain'
 require ENV['TM_SUPPORT_PATH'] + '/lib/ui'
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
 
 class ConnectorException < Exception; end
 class MissingConfigurationException < ConnectorException; end
@@ -19,18 +20,23 @@ class Connector
         require 'mysql'
         get_mysql
       elsif @server == 'postgresql'
-        require 'postgres-compat'
+        begin
+          require "rubygems"
+          require "postgres"
+        rescue LoadError
+          require 'postgres-compat'
+        end
         get_pgsql
       end
     rescue LoadError
-      TextMate::exit_show_tool_tip "Database connection library not found [#{$!}]"
+      raise "Database connection library not found [#{$!}]"
     end
   end
 
   def do_query(query, database = nil)
     if @server == 'postgresql'
       mycon = self.get_pgsql(database)
-      res = mycon.query(query)
+      res = mycon.respond_to?(:exec) ? mycon.exec(query) : mycon.query(query)
     elsif @server == 'mysql'
       mycon = self.get_mysql(database)
       res = mycon.query(query)
@@ -66,7 +72,13 @@ class Connector
   end
 
   def get_pgsql(database = nil)
-    @@connector ||= PostgresPR::Connection.new(database || @settings.name, @settings.user, @settings.password, 'tcp://' + @settings.host + ":" + @settings.port.to_s)
+    unless @connector
+      if defined?(PostgresPR)
+        @@connector = PostgresPR::Connection.new(database || @settings.name, @settings.user, @settings.password, 'tcp://' + @settings.host + ":" + @settings.port.to_s)
+      else
+        @@connector = PGconn.open(@settings.host, @settings.port, "", "", (database || @settings.name), @settings.user, @settings.password.to_s)
+      end
+    end
     @@connector
   end
   
@@ -79,7 +91,7 @@ class Connector
     end
     tables = []
     do_query(query, database).rows.each {|row| tables << row[0] }
-    tables
+    tables.sort
   end
 
   def database_list
@@ -89,7 +101,7 @@ class Connector
     elsif @server == 'mysql'
       do_query('SHOW DATABASES').rows.each { |row| databases << row[0] }
     end
-    databases
+    databases.sort
   end
 
   def get_fields(table = nil)
@@ -136,11 +148,11 @@ class Result
   def rows
     if defined?(Mysql) and @res.is_a? Mysql::Result
       @res
-    elsif @res.is_a? PostgresPR::Connection::Result
+    else
       @res.rows
     end
   end
-  
+
   def fields
     if defined?(Mysql) and @res.is_a? Mysql::Result
       @res.fetch_fields.map do |field|
@@ -148,8 +160,8 @@ class Result
          :type => [Mysql::Field::TYPE_DECIMAL, Mysql::Field::TYPE_TINY, Mysql::Field::TYPE_SHORT,
                    Mysql::Field::TYPE_LONG, Mysql::Field::TYPE_FLOAT, Mysql::Field::TYPE_DOUBLE].include?(field.type) ? :number : :string }
       end
-    elsif @res.is_a? PostgresPR::Connection::Result
-      @res.fields.map{|field| {:name => field.name, :type => :string } }
+    else
+      @res.fields.map{|field| {:name => field.respond_to?(:name) ? field.name : field, :type => :string } }
     end
   end
   
@@ -222,7 +234,7 @@ def get_connection
     # Try to connect with either our stored password, or with no password
     @connection = Connector.new(@options.database)
   rescue Exception => error
-    if error.message.include?('Access denied') or error.message.include?('no password specified') or error.message.include?('authentication failed')
+    if ['Access denied', 'no password specified', 'authentication failed', 'no password supplied'].find { |msg| error.message.include?(msg) }
       # If we got an access denied error then we can request a password from the user
       begin
         # Longer prompts get cut off

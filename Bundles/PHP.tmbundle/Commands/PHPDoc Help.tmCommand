@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>beforeRunningCommand</key>
@@ -15,19 +15,14 @@ Markdown.pl &lt;&lt;'EOF'
 This bundle contains snippets for use with [PHPDoc](http://phpdoc.org/).
 
  * `doc_c ` — Class
- * `doc_cp` — Class (post documentation)
  * `doc_d ` — Define inline constant
- * `doc_dp` — Define inline constant (post documentation)
  * `doc_f ` — Function
- * `doc_fp` — Function (post documentation)
  * `doc_h ` — Document header
  * `doc_i ` — Interface class
  * `doc_s ` — Abstract function signature
  * `doc_v ` — Class variable
- * `doc_vp` — Class variable (post documentation)
- * `doc` — Generates a docblock for the item following the caret. Currently supports a class/interface, function, define or variable
 
-_Commands marked as “post documentation” are designed for undocumented code — in other words, a comment block is added at the caret position._
+There is also a command used for adding documentation to existing entities – move the caret before a class/interface, function, define or variable and use `doc⇥`.
 
 # Shell Variables
 

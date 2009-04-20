@@ -67,15 +67,7 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#comments</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#annotations</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#class</string>
+			<string>#code</string>
 		</dict>
 	</array>
 	<key>repository</key>
@@ -182,7 +174,7 @@
 				</dict>
 			</dict>
 			<key>end</key>
-			<string>(?=\s*$|;|,|\)|})</string>
+			<string>(?&lt;=\)|\])(?!\s*{)|(?&lt;=})|(?=;)</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -317,7 +309,7 @@
 		<key>class</key>
 		<dict>
 			<key>begin</key>
-			<string>(?=\w?[^=;]*(?:class|(?:@)?interface)\s+\w+)</string>
+			<string>(?=\w?[\w\s]*(?:class|(?:@)?interface|enum)\s+\w+)</string>
 			<key>end</key>
 			<string>}</string>
 			<key>endCaptures</key>
@@ -355,7 +347,7 @@
 						</dict>
 					</dict>
 					<key>match</key>
-					<string>(class|(?:@)?interface)\s+(\w+)</string>
+					<string>(class|(?:@)?interface|enum)\s+(\w+)</string>
 					<key>name</key>
 					<string>meta.class.identifier.java</string>
 				</dict>
@@ -398,7 +390,7 @@
 						</dict>
 					</dict>
 					<key>end</key>
-					<string>(?=\s*extends|$|\{)</string>
+					<string>(?=\s*extends|\{)</string>
 					<key>name</key>
 					<string>meta.definition.class.implemented.interfaces.java</string>
 					<key>patterns</key>
@@ -444,6 +436,10 @@
 				</dict>
 				<dict>
 					<key>include</key>
+					<string>#enums</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#methods</string>
 				</dict>
 				<dict>
@@ -467,6 +463,10 @@
 				<dict>
 					<key>include</key>
 					<string>#comments</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#class</string>
 				</dict>
 				<dict>
 					<key>begin</key>
@@ -617,6 +617,52 @@
 					<string>(\.)?\b([A-Z][A-Z0-9_]+)(?!&lt;|\.class|\s*\w+\s*=)\b</string>
 					<key>name</key>
 					<string>constant.other.java</string>
+				</dict>
+			</array>
+		</dict>
+		<key>enums</key>
+		<dict>
+			<key>begin</key>
+			<string>^(?=\s*[A-Z0-9_]+\s*({|\(|,))</string>
+			<key>end</key>
+			<string>(?=;|})</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>\w+</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>constant.other.enum.java</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>(?=,|;|})</string>
+					<key>name</key>
+					<string>meta.enum.java</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#parens</string>
+						</dict>
+						<dict>
+							<key>begin</key>
+							<string>{</string>
+							<key>end</key>
+							<string>}</string>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#class-body</string>
+								</dict>
+							</array>
+						</dict>
+					</array>
 				</dict>
 			</array>
 		</dict>
@@ -781,7 +827,7 @@
 					<key>begin</key>
 					<string>\b((?:[a-z]\w*\.)*[A-Z]+\w*)&lt;</string>
 					<key>end</key>
-					<string>&gt;|[^\w\s,&lt;]</string>
+					<string>&gt;|[^\w\s,&lt;\[\]]</string>
 					<key>name</key>
 					<string>storage.type.generic.java</string>
 					<key>patterns</key>
@@ -796,7 +842,7 @@
 							<key>comment</key>
 							<string>This is just to support &lt;&gt;'s with no actual type prefix</string>
 							<key>end</key>
-							<string>&gt;|[^\w\s,&lt;]</string>
+							<string>&gt;|[^\w\s,\[\]&lt;]</string>
 							<key>name</key>
 							<string>storage.type.generic.java</string>
 						</dict>

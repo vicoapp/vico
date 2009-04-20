@@ -377,7 +377,7 @@ class ObjCFallbackCompletion
     if ENV['TM_SCOPE'].include? "meta.protocol-list.objc"
       files = [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaProtocols.txt.gz",false,false, :constant]]
     elsif ENV['TM_SCOPE'].include?("meta.scope.implementation.objc") ||  ENV['TM_SCOPE'].include?("meta.interface-or-protocol.objc")
-      files = [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithFramework.txt.gz",false,false, :classes]]
+      files = [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithAncestry.txt.gz",false,false, :classes]]
       files += [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaTypes.txt.gz", true, false, :constant]] if ENV['TM_SCOPE'].include?("meta.scope.interface.objc")
       userClasses = ["#{ENV['TM_PROJECT_DIRECTORY']}/.classes.TM_Completions.txt.gz", false,false,:constant]
       files += [userClasses] if File.exists? userClasses[0]
@@ -396,7 +396,7 @@ class ObjCFallbackCompletion
       end
     else
       star = arg_name = true
-      files = [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithFramework.txt.gz",false,false, :classes],
+      files = [["#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithAncestry.txt.gz",false,false, :classes],
       [ "#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaConstants.txt.gz",true,true, :constant],
       [ "#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CocoaTypes.txt.gz",true,false, :constant],
       [ "#{e_sh ENV['TM_BUNDLE_SUPPORT']}/CLib.txt.gz",false,false, :functions],
@@ -631,7 +631,7 @@ class ObjCMethodCompletion
   def file_names(types)
     if types == :classes
       userClasses = "#{ENV['TM_PROJECT_DIRECTORY']}/.classes.TM_Completions.txt.gz"
-      fileNames = ["#{ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithFramework.txt.gz"]
+      fileNames = ["#{ENV['TM_BUNDLE_SUPPORT']}/CocoaClassesWithAncestry.txt.gz"]
       fileNames += [userClasses] if File.exists? userClasses
     elsif types == :functions
       fileNames = "#{ENV['TM_BUNDLE_SUPPORT']}/CocoaFunctions.txt.gz"
@@ -795,7 +795,7 @@ class ObjCMethodCompletion
       obType = :instanceMethod
       list = list_from_shell_command(typeName, obType)
       if list.nil? && File.exists?(userClasses = "#{ENV['TM_PROJECT_DIRECTORY']}/.classes.TM_Completions.txt.gz")
-        candidates = %x{ zgrep ^#{e_sh h[var] + "[[:space:]]" } #{userClasses} }.split("\n")
+        candidates = %x{ zgrep ^#{e_sh h[var] + "[[:space:]]" } #{e_sh userClasses} }.split("\n")
         unless candidates.empty?
           list = Set.new
           c = candidates[0].split("\t")[1].split(":")

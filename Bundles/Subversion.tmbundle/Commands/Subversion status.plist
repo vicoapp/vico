@@ -7,7 +7,7 @@
 	<key>command</key>
 	<string>require_cmd "${TM_SVN:=svn}" "If you have installed svn, then you need to either update your &lt;tt&gt;PATH&lt;/tt&gt; or set the &lt;tt&gt;TM_SVN&lt;/tt&gt; shell variable (e.g. in Preferences / Advanced)"
 
-require_cmd "${TM_RUBY:=/usr/bin/ruby}" "We need Ruby to proceed."
+require_cmd "${TM_RUBY:=ruby}" "We need Ruby to proceed."
 
 export TM_RUBY
 export TM_SVN

@@ -15,6 +15,7 @@
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
 	NSMutableArray *rootItems;
+	NSMutableArray *filteredItems;
 	ViRegexp *skipRegex;
 }
 

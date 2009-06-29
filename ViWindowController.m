@@ -569,7 +569,7 @@ static NSWindowController	*currentWindowController = nil;
 		// beep
 		return;
 	}
-	
+
 	// Find index of current subview.
 	int cur;
 	for (cur = 0; cur < [[split subviews] count]; cur++)
@@ -583,6 +583,12 @@ static NSWindowController	*currentWindowController = nil;
 		delView = [[split subviews] objectAtIndex:1];
 	else
 		delView = [[split subviews] objectAtIndex:cur - 1];
+
+        if ([delView isKindOfClass:[NSSplitView class]])
+        {
+                [[mostRecentView document] message:@"Can't collapse when other window is split"];
+                return;
+        }
 
 	ViDocumentView *docView = [self documentViewForView:delView];
 	[self collapseDocumentView:docView];

@@ -39,6 +39,12 @@
 		[[self delegate] message:@"%@", [windowController currentDirectory]];
 }
 
+- (void)ex_pwd:(ExCommand *)command
+{
+        ViWindowController *windowController = [[self document] windowController];
+	[[self delegate] message:@"%@", [windowController currentDirectory]];
+}
+
 - (void)ex_edit:(ExCommand *)command
 {
         INFO(@"command.filename == %@", command.filename);

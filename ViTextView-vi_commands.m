@@ -635,7 +635,7 @@
 {
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol];
-	if(end == eol)
+	if (end == eol)
 	{
 		[[self delegate] message:@"No following lines to join"];
 		return NO;
@@ -678,14 +678,14 @@
 	
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
-	// INFO(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
+	INFO(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
 	
-	if(eol2 == end || bol == eol || [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
+	if (eol2 == end || bol == eol || [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
 		NSRange r = NSMakeRange(eol, end - eol);
 		[self deleteRange:r];
-		if(bol == eol)
+		if (bol == eol)
 			final_location = IMAX(bol, eol2 - 1 - (end - eol));
 		else
 			final_location = IMAX(bol, eol - 1);
@@ -694,14 +694,14 @@
 	{
 		final_location = eol;
 		NSString *joinPadding = @" ";
-		if([[NSCharacterSet characterSetWithCharactersInString:@".!?"] characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
+		if ([[NSCharacterSet characterSetWithCharactersInString:@".!?"] characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 			joinPadding = @"  ";
-		else if([[[self textStorage] string] characterAtIndex:end] == ')')
+		else if ([[[self textStorage] string] characterAtIndex:end] == ')')
 		{
 			final_location = eol - 1;
 			joinPadding = @"";
 		}
-		NSUInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
+		NSInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
 		NSRange r = NSMakeRange(eol, sol2 - eol);
 		[self replaceRange:r withString:joinPadding];
 	}
@@ -1444,10 +1444,10 @@
 {
 	NSRange delta_offset = [self changeIndentation:1 inRange:affectedRange];
 	if (start_location > affectedRange.location)
-		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
+		end_location = final_location = start_location + (NSInteger)delta_offset.length;
 	else
 		end_location = final_location = start_location + delta_offset.location;
-	final_location = end_location = IMAX(end_location, [[self textStorage] length] - 1);
+	final_location = end_location = IMIN(end_location, [[self textStorage] length] - 1);
 	return YES;
 }
 
@@ -1459,10 +1459,10 @@
 	
 	NSRange delta_offset = [self changeIndentation:-1 inRange:affectedRange];
 	if (start_location > affectedRange.location)
-		end_location = final_location = start_location + (NSInteger)delta_offset.length - 1;
+		end_location = final_location = start_location + (NSInteger)delta_offset.length;
 	else
 		end_location = final_location = IMAX(start_location + delta_offset.location, bol);
-	final_location = end_location = IMAX(end_location, [[self textStorage] length] - 1);
+	final_location = end_location = IMIN(end_location, [[self textStorage] length] - 1);
 	return YES;
 }
 

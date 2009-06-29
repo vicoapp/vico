@@ -4,8 +4,6 @@
 #import "NSArray-patterns.h"
 #import "logging.h"
 
-#define INFO DEBUG
-
 @interface ViSyntaxParser ()
 - (void)updateScopeRangesInRange:(NSRange)updateRange;
 @end
@@ -99,20 +97,24 @@
 #pragma mark -
 #pragma mark Scope mangling
 
+/* Called before the insertion is actually made.
+ */
 - (void)pushScopes:(NSRange)affectedRange
 {
-	INFO(@"range = %@", NSStringFromRange(affectedRange));
+	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
 
 	if (affectedRange.location >= [scopeArray count])
 		return;
 
+	NSRange r;
 	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
-	NSRange r = [sleft range];
+	r = [sleft range];
 	if (r.location < affectedRange.location && NSMaxRange(r) > affectedRange.location)
 	{
-		INFO(@"sleft = %@", sleft);
+		DEBUG(@"sleft = %@", sleft);
 		// must split scope in left and right part
-		ViScope *sright = [[ViScope alloc] initWithScopes:[sleft scopes] range:NSMakeRange(affectedRange.location, NSMaxRange(r) - affectedRange.location)];
+		NSRange rightRange = NSMakeRange(affectedRange.location, NSMaxRange(r) - affectedRange.location);
+		ViScope *sright = [[ViScope alloc] initWithScopes:[sleft scopes] range:rightRange];
 		NSUInteger j;
 		for (j = affectedRange.location; j < NSMaxRange(r); j++)
 		{
@@ -120,8 +122,8 @@
 		}
 		r.length = affectedRange.location - r.location;
 		[sleft setRange:r];
-		INFO(@"updated sleft = %@", sleft);
-		INFO(@"sright = %@", sright);
+		DEBUG(@"updated sleft = %@", sleft);
+		DEBUG(@"sright = %@", sright);
 	}
 
 	NSUInteger i = affectedRange.location;
@@ -137,7 +139,7 @@
 		ViScope *s = [scopeArray objectAtIndex:i];
 		r = [s range];
 		r.location += affectedRange.length;
-		INFO(@"%@ -> %@", s, NSStringFromRange(r));
+		DEBUG(@"%@ -> %@", s, NSStringFromRange(r));
 		[s setRange:r];
 		i += r.length;
 	}
@@ -145,7 +147,7 @@
 
 - (void)pullScopes:(NSRange)affectedRange
 {
-	INFO(@"range = %@", NSStringFromRange(affectedRange));
+	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
 
 	if (affectedRange.location >= [scopeArray count])
 		return;
@@ -154,7 +156,7 @@
 	NSRange r = [sleft range];
 	if (NSMaxRange(r) > affectedRange.location)
 	{
-		INFO(@"sleft = %@", sleft);
+		DEBUG(@"sleft = %@", sleft);
 		// must update (shorten) length of chopped range
 		if (NSMaxRange(r) > NSMaxRange(affectedRange))
 		{
@@ -165,19 +167,35 @@
 			r.length -= NSMaxRange(r) - affectedRange.location;
 		}
 		[sleft setRange:r];
-		INFO(@"updated sleft = %@", sleft);
+		DEBUG(@"shortened sleft = %@", sleft);
 	}
 
+#if 1
 	if ([scopeArray count] > NSMaxRange(affectedRange))
 	{
-		ViScope *x = [scopeArray objectAtIndex:NSMaxRange(affectedRange)];
-		if (x != sleft && [x range].location < NSMaxRange(affectedRange))
+		ViScope *sright = [scopeArray objectAtIndex:NSMaxRange(affectedRange)];
+		if (sright != sleft && [sright range].location < NSMaxRange(affectedRange))
 		{
-			NSRange xr = NSMakeRange(NSMaxRange(affectedRange), NSMaxRange([x range]) - NSMaxRange(affectedRange));
-			INFO(@"adjusting shortened scope %i:%@ -> %@", NSMaxRange(affectedRange), x, NSStringFromRange(xr));
-			[x setRange:xr];
+			// problem if NSMaxRange(sright) < NSMaxRange(affectedRange) (BUG!)
+			if (NSMaxRange([sright range]) <= NSMaxRange(affectedRange))
+			{
+				DEBUG(@"BUG!");
+				DEBUG(@"affectedRange = %@", affectedRange);
+				DEBUG(@"sright = %@", sright);
+				DEBUG(@"sleft = %@", sleft);
+				NSBeep(); sleep(1);
+				NSBeep(); sleep(1);
+				NSBeep(); sleep(1);
+			}
+			else
+			{
+				NSRange xr = NSMakeRange(NSMaxRange(affectedRange), NSMaxRange([sright range]) - NSMaxRange(affectedRange));
+				DEBUG(@"adjusting shortened scope %i:%@ -> %@", NSMaxRange(affectedRange), sright, NSStringFromRange(xr));
+				[sright setRange:xr];
+			}
 		}
 	}
+#endif
 
 	if ([scopeArray count] <= affectedRange.location)
 		return;
@@ -185,7 +203,7 @@
 	NSUInteger n = affectedRange.length;
 	while (n--)
 	{
-		INFO(@"removing %i:%@", i, [scopeArray objectAtIndex:i]);
+		DEBUG(@"removing %i:%@", i, [scopeArray objectAtIndex:i]);
 		[scopeArray removeObjectAtIndex:i];
 	}
 
@@ -193,20 +211,20 @@
 	{
 		ViScope *s = [scopeArray objectAtIndex:i];
 		r = [s range];
-		if (r.location >= affectedRange.location)
+		if (r.location > affectedRange.location)
 		{
 			if (r.location >= affectedRange.length)
 				r.location = r.location - affectedRange.length;
 			else
 				r.location = 0;
 			// r.location = i;
-			INFO(@"%i:%@ -> %@", i, s, NSStringFromRange(r));
+			DEBUG(@"%i:%@ -> %@", i, s, NSStringFromRange(r));
 			[s setRange:r];
 			i += r.length;
 		}
 		else
 		{
-			INFO(@"skipping adjusting %i:%@", i, s);
+			DEBUG(@"skipping adjusting %i:%@", i, s);
 			i += r.length - (i - r.location);
 		}
 	}
@@ -241,7 +259,7 @@
 
 - (void)updateScopeRangesInRange:(NSRange)updateRange
 {
-	INFO(@"updating scope ranges in range %@", NSStringFromRange(updateRange));
+	DEBUG(@"updating scope ranges in range %@", NSStringFromRange(updateRange));
 
 	if (updateRange.location >= [scopeArray count])
 		return;
@@ -264,7 +282,7 @@
 			if (NSMaxRange(r) > i)
 			{
 				NSRange newRange = NSMakeRange(r.location, i - r.location);
-				INFO(@"adjusting prev scope %@ -> %@", s, NSStringFromRange(newRange));
+				DEBUG(@"adjusting prev scope %@ -> %@", s, NSStringFromRange(newRange));
 				[s setRange:newRange];
 				[set addObject:s];
 			}
@@ -277,7 +295,7 @@
 		--i;
 	}
 	beginRange = NSMakeRange(i, updateRange.location - i);
-	INFO(@"beginRange = %@, begin = %@", NSStringFromRange(beginRange), begin);
+	DEBUG(@"beginRange = %@, begin = %@", NSStringFromRange(beginRange), begin);
 
 	for (i = updateRange.location; i < [scopeArray count]; i++)
 	{
@@ -289,12 +307,12 @@
 		}
 		else if (i >= NSMaxRange(updateRange) && [s range].location == i)
 		{
-			INFO(@"stopping at %i: %@", i, s);
+			DEBUG(@"stopping at %i: %@", i, s);
 			NSRange r = [s range];
 			if (r.location < i)
 			{
 				[s setRange:NSMakeRange(i, NSMaxRange(r) - i)];
-				INFO(@"adjusting scope at %i: %@", i, s);
+				DEBUG(@"adjusting scope at %i: %@", i, s);
 			}
 			break;
 		}
@@ -303,7 +321,7 @@
 			if (begin)
 			{
 				[begin setRange:beginRange];
-				INFO(@"%@", begin);
+				DEBUG(@"%@", begin);
 				[set addObject:begin];
 			}
 			begin = s;
@@ -319,16 +337,16 @@
 	if (begin)
 	{
 		[begin setRange:beginRange];
-		INFO(@"%@", begin);
+		DEBUG(@"%@", begin);
 	}
 
-	INFO(@"done");
+	DEBUG(@"done");
 
 #if 0
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"=> %.3f s", (float)ms / 1000.0);
+	DEBUG(@"=> %.3f s", (float)ms / 1000.0);
 #endif
 }
 
@@ -393,7 +411,7 @@
 	
 	if (endRegexp == nil)
 	{
-		INFO(@"!!!!!!!!! no end regexp?");
+		DEBUG(@"!!!!!!!!! no end regexp?");
 		return nil;
 	}
 	
@@ -734,7 +752,7 @@ done:
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
+	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
 		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 

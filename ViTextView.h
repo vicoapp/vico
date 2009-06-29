@@ -136,6 +136,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @end
 
 @interface ViTextView (cursor)
+- (void)updateCaret;
 @end
 
 @interface ViTextView (syntax)

@@ -259,6 +259,12 @@ static struct ex_command ex_commands[] = {
 		"b",
 		@"[line] pu[t] [buffer]",
 		@"append a cut buffer to the line"},
+	/* C_PWD */
+	{@"pwd",		@"ex_pwd",	
+		0,
+		"",
+		@"pw[d]",
+		@"Print the curreny directory name"},
 	/* C_QUIT */
 	{@"quit",	@"ex_quit",	0,
 		"!",

@@ -124,6 +124,11 @@ int logIndent = 0;
 	}
 }
 
+- (ViDocument *)document
+{
+        return [documentView document];
+}
+
 #pragma mark -
 #pragma mark Vi error messages
 
@@ -683,7 +688,7 @@ int logIndent = 0;
 	if ([exCommandString length] > 0)
 	{
 		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
-		DEBUG(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
+		//DEBUG(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
 		if (ex.command == NULL)
 			[[self delegate] message:@"The %@ command is unknown.", ex.name];
 		else
@@ -865,28 +870,9 @@ int logIndent = 0;
 	[scrollView reflectScrolledClipView:clipView];
 }
 
-- (void)updateCaret
-{
-	NSLayoutManager *lm = [self layoutManager];
-	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
-	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
-	
-	if (NSWidth(caretRect) == 0)
-		caretRect.size.width = 7; // XXX
-	if (caret + 1 >= [[self textStorage] length])
-	{
-		caretRect.size.height /= 2;
-	}
-	[self setNeedsDisplayInRect:oldCaretRect];
-	[self setNeedsDisplayInRect:caretRect];
-	oldCaretRect = caretRect;
-
-	// update selection in symbol list
-	[[self delegate] updateSelectedSymbolForLocation:caret];
-}
-
 - (void)setCaret:(NSUInteger)location
 {
+        DEBUG(@"setting caret to %u", location);
 	caret = location;
 	if (!replayingInput)
 		[self updateCaret];
@@ -1011,24 +997,6 @@ int logIndent = 0;
 {
         [[self layoutManager] removeTemporaryAttribute:[what objectForKey:@"attributeName"]
                                      forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
-}
-
-- (void)updateRuler
-{
-        NSString *modestr;
-        switch (mode)
-        {
-                case ViCommandMode:
-                        modestr = @"Command";
-                        break;
-                case ViInsertMode:
-                        modestr = @"Insert";
-                        break;
-                case ViVisualMode:
-                        modestr = @"Visual";
-				break;
-        }
-        [[self delegate] message:[NSString stringWithFormat:@"%u,%u     %@", [self currentLine], [self currentColumn], modestr]];
 }
 
 #pragma mark -
@@ -1233,6 +1201,7 @@ int logIndent = 0;
 		/* The command has an associated motion component.
 		 * Run the motion method and record the start and end locations.
 		 */
+		DEBUG(@"perform motion command %@", command.motion_method);
 		if ([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
 		{
 			/* the command failed */
@@ -1259,7 +1228,7 @@ int logIndent = 0;
 			l1 = end_location;
 		}
 	}
-	DEBUG(@"affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u", l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
 	if (command.line_mode && !command.ismotion && mode != ViVisualMode)
 	{
@@ -1298,6 +1267,7 @@ int logIndent = 0;
 	if (mode == ViVisualMode && !command.ismotion)
 		[self setNormalMode];
 
+	DEBUG(@"perform command %@", command.method);
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
@@ -1327,8 +1297,6 @@ int logIndent = 0;
 
 	if (mode == ViInsertMode)
 	{
-		[self updateRuler];
-
 		// add the event to the input key replay queue
 		if (!replayingInput)
 			[inputKeys addObject:theEvent];
@@ -1423,7 +1391,7 @@ int logIndent = 0;
 		[parser pushKey:charcode];
 		if (parser.complete)
 		{
-			[self updateRuler];
+			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode)
@@ -1432,6 +1400,7 @@ int logIndent = 0;
 				[self endUndoGroup];
 			}
 			[[self textStorage] endEditing];
+                        DEBUG(@"final_location is %u", final_location);
 			[self setCaret:final_location];
 			if (mode == ViVisualMode)
 			{
@@ -1441,9 +1410,7 @@ int logIndent = 0;
 	}
 
 	if (!replayingInput)
-	{
 		[self scrollToCaret];
-	}
 }
 
 /* Takes a string of characters and creates key events for each one.

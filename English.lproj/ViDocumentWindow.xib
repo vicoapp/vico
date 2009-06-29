@@ -8,11 +8,11 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="100399"/>
 			<integer value="100325"/>
-			<integer value="100250"/>
 			<integer value="100151"/>
-			<integer value="100350"/>
+			<integer value="100399"/>
+			<integer value="100362"/>
+			<integer value="100276"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1102,7 +1102,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 														</object>
 														<object class="NSTextFieldCell" key="NSDataCell" id="178291306">
 															<int key="NSCellFlags">337772096</int>
-															<int key="NSCellFlags2">2048</int>
+															<int key="NSCellFlags2">1536</int>
 															<string key="NSContents">Text Cell</string>
 															<reference key="NSSupport" ref="844670655"/>
 															<reference key="NSControlView" ref="373574305"/>
@@ -1286,7 +1286,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSSearchFieldCell" key="NSCell" id="636426314">
 									<int key="NSCellFlags">343014976</int>
-									<int key="NSCellFlags2">268436480</int>
+									<int key="NSCellFlags2">272630784</int>
 									<string key="NSContents"/>
 									<reference key="NSSupport" ref="844670655"/>
 									<reference key="NSControlView" ref="578091868"/>
@@ -2571,7 +2571,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{139, 333}, {336, 389}}</string>
+					<string>{{116, 218}, {336, 389}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2606,7 +2606,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>{{21, 669}, {382, 187}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{21, 669}, {382, 187}}</string>
-					<integer value="0"/>
+					<reference ref="8"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{47, 41}, {636, 411}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2641,7 +2641,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100405</int>
+			<int key="maxID">100406</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

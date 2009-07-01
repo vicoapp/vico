@@ -8,9 +8,9 @@
 {
 	int r, g, b, a;
 	int rc = sscanf([hashRGB UTF8String], "#%02X%02X%02X%02X", &r, &g, &b, &a);
-	if(rc != 3 && rc != 4)
+	if (rc != 3 && rc != 4)
 		return nil;
-	if(rc == 3)
+	if (rc == 3)
 		a = 255;
 	// DEBUG(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
 	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
@@ -28,9 +28,9 @@
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *settings = [theme objectForKey:@"settings"];
 	NSDictionary *setting;
-	for(setting in settings)
+	for (setting in settings)
 	{
-		if([setting objectForKey:@"name"] == nil)
+		if ([setting objectForKey:@"name"] == nil)
 		{
 			/* settings for the default scope */
 			defaultSettings = [setting objectForKey:@"settings"];
@@ -38,7 +38,7 @@
 		}
 
 		NSString *scopeSelector = [setting objectForKey:@"scope"];
-		if(scopeSelector == nil)
+		if (scopeSelector == nil)
 			continue;
 
 		// split up grouped selectors
@@ -48,23 +48,23 @@
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 
 		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
-		if(foreground)
+		if (foreground)
 			[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
 
 		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
-		if(background)
+		if (background)
 			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
 
 		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
-		if(fontStyle)
+		if (fontStyle)
 		{
-			if([fontStyle rangeOfString:@"underline"].location != NSNotFound)
+			if ([fontStyle rangeOfString:@"underline"].location != NSNotFound)
 				[attrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
-			if([fontStyle rangeOfString:@"italic"].location != NSNotFound)
+			if ([fontStyle rangeOfString:@"italic"].location != NSNotFound)
 				[attrs setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
 		}
 		
-		for(scopeSelector in scopeSelectors)
+		for (scopeSelector in scopeSelectors)
 		{
 			[themeAttributes setObject:attrs forKey:scopeSelector];
 		}
@@ -152,21 +152,21 @@
 
 - (NSColor *)backgroundColor
 {
-	if(backgroundColor == nil)
+	if (backgroundColor == nil)
 		backgroundColor = [self colorWithName:@"background" orDefault:[[NSColor whiteColor] colorWithAlphaComponent:1.0]];
 	return backgroundColor;
 }
 
 - (NSColor *)foregroundColor
 {
-	if(foregroundColor == nil)
+	if (foregroundColor == nil)
 		foregroundColor = [self colorWithName:@"foreground" orDefault:[[NSColor blackColor] colorWithAlphaComponent:1.0]];
 	return foregroundColor;
 }
 
 - (NSColor *)caretColor
 {
-	if(caretColor == nil)
+	if (caretColor == nil)
 	{
 		NSColor *defaultCaretColor = [NSColor colorWithCalibratedRed:0.2
 								       green:0.2
@@ -180,7 +180,7 @@
 
 - (NSColor *)selectionColor
 {
-	if(selectionColor == nil)
+	if (selectionColor == nil)
 	{
 		NSColor *bg = [self colorWithName:@"selection" orDefault:[[NSColor blueColor] colorWithAlphaComponent:0.5]];
 		selectionColor = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];

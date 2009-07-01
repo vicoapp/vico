@@ -864,7 +864,7 @@ int logIndent = 0;
 	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
 	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
 
-	rect.size = caretRect.size;
+	rect.size.width = 20;
 
 	NSPoint topPoint;
 	CGFloat topY = visibleRect.origin.y;

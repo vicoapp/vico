@@ -78,6 +78,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (int)lenghtOfIndentAtLine:(NSUInteger)lineLocation;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
+- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;

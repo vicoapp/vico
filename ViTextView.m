@@ -486,7 +486,7 @@ int logIndent = 0;
 	return 1;
 }
 
-- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange
+- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret
 {
 	int shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
 	NSUInteger bol;
@@ -511,6 +511,11 @@ int logIndent = 0;
 			delta_offset.location = [newIndent length] - [indent length];
                 }
 		delta_offset.length += [newIndent length] - [indent length];
+		if (updatedCaret && *updatedCaret > indentRange.location)
+		{
+			NSInteger d = [newIndent length] - [indent length];
+			*updatedCaret = IMAX((NSInteger)*updatedCaret + d, 0);
+		}
 
 		// get next line
 		[self getLineStart:NULL end:&bol contentsEnd:NULL forLocation:bol];
@@ -519,6 +524,11 @@ int logIndent = 0;
 	}
 
 	return delta_offset;
+}
+
+- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange
+{
+	return [self changeIndentation:delta inRange:aRange updateCaret:nil];
 }
 
 - (void)increase_indent:(NSString *)characters
@@ -854,20 +864,34 @@ int logIndent = 0;
 	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
 	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
 
-	NSPoint topPoint;
-	if (NSMinY(rect) < NSMinY(visibleRect))
-	{
-		topPoint = NSMakePoint(0, NSMinY(rect));
-	}
-	else if (NSMaxY(rect) > NSMaxY(visibleRect))
-	{
-		topPoint = NSMakePoint(0, NSMaxY(rect) - NSHeight(visibleRect));
-	}
-	else
-		return;
+	rect.size = caretRect.size;
 
-	[clipView scrollToPoint:topPoint];
-	[scrollView reflectScrolledClipView:clipView];
+	NSPoint topPoint;
+	CGFloat topY = visibleRect.origin.y;
+	CGFloat topX = visibleRect.origin.x;
+
+	if (NSMinY(rect) < NSMinY(visibleRect))
+		topY = NSMinY(rect);
+	else if (NSMaxY(rect) > NSMaxY(visibleRect))
+		topY = NSMaxY(rect) - NSHeight(visibleRect);
+
+	CGFloat jumpX = 20*rect.size.width;
+
+	if (NSMinX(rect) < NSMinX(visibleRect))
+		topX = NSMinX(rect) > jumpX ? NSMinX(rect) - jumpX : 0;
+	else if (NSMaxX(rect) > NSMaxX(visibleRect))
+		topX = NSMaxX(rect) - NSWidth(visibleRect) + jumpX;
+
+	if (NSMinX(rect) < NSWidth(visibleRect)*0.8)
+		topX = 0;
+
+	topPoint = NSMakePoint(topX, topY);
+
+	if (topPoint.x != visibleRect.origin.x || topPoint.y != visibleRect.origin.y)
+	{
+		[clipView scrollToPoint:topPoint];
+		[scrollView reflectScrolledClipView:clipView];
+	}
 }
 
 - (void)setCaret:(NSUInteger)location
@@ -1195,6 +1219,7 @@ int logIndent = 0;
 	start_location = [self caret];
 	end_location = start_location;
 	final_location = start_location;
+	DEBUG(@"start_location = %u", start_location);
 
 	if (command.motion_method)
 	{
@@ -1268,6 +1293,7 @@ int logIndent = 0;
 		[self setNormalMode];
 
 	DEBUG(@"perform command %@", command.method);
+	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{

@@ -203,49 +203,47 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Syntax parsing
 
+- (NSDictionary *)defaultAttributesForTheme:(ViTheme *)theme
+{
+        return [NSDictionary dictionaryWithObjectsAndKeys:
+                [theme foregroundColor], NSForegroundColorAttributeName,
+                // [theme backgroundColor], NSBackgroundColorAttributeName,
+                nil];
+}
+
 - (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager
    shouldUseTemporaryAttributes:(NSDictionary *)attrs
              forDrawingToScreen:(BOOL)toScreen
                atCharacterIndex:(NSUInteger)charIndex
                  effectiveRange:(NSRangePointer)effectiveCharRange
 {
-	if (toScreen)
-	{
-		ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-		NSDictionary *attributes;
-		NSArray *scopeArray = [syntaxParser scopeArray];
-		if (charIndex >= [scopeArray count])
-		{
-			*effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
-			attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-				[theme foregroundColor], NSForegroundColorAttributeName,
-				// [theme backgroundColor], NSBackgroundColorAttributeName,
-				nil];
-			return attributes;
-		}
-		ViScope *scope = [scopeArray objectAtIndex:charIndex];
-		attributes = [scope attributes];
-		if ([attributes count] == 0)
-		{
-			attributes = [theme attributesForScopes:[scope scopes]];
-			if ([attributes count] == 0)
-			{
-				attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-					[theme foregroundColor], NSForegroundColorAttributeName,
-					// [theme backgroundColor], NSBackgroundColorAttributeName,
-					nil];
-			}
-			[scope setAttributes:attributes];
-		}
-		NSRange r =  [scope range];
-		if (NSMaxRange(r) <= charIndex)
-		{
-			INFO(@"index = %u, scope = %@", charIndex, scope);
-		}
-		*effectiveCharRange = r;
-		return attributes;
-	}
-	return nil;
+	if (!toScreen)
+                return nil;
+
+        ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
+        NSDictionary *attributes;
+        NSArray *scopeArray = [syntaxParser scopeArray];
+        if (charIndex >= [scopeArray count])
+        {
+                *effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
+                return [self defaultAttributesForTheme:theme];
+        }
+        ViScope *scope = [scopeArray objectAtIndex:charIndex];
+        attributes = [scope attributes];
+        if ([attributes count] == 0)
+        {
+                attributes = [theme attributesForScopes:[scope scopes]];
+                if ([attributes count] == 0)
+                        attributes = [self defaultAttributesForTheme:theme];
+                [scope setAttributes:attributes];
+        }
+        NSRange r =  [scope range];
+        if (NSMaxRange(r) <= charIndex)
+        {
+                INFO(@"index = %u, scope = %@", charIndex, scope);
+        }
+        *effectiveCharRange = r;
+        return attributes;
 }
 
 - (void)highlightEverything
@@ -257,7 +255,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self dispatchSyntaxParserWithRange:NSMakeRange(0, endLocation) restarting:NO];
 }
 
-- (void)performContext:(ViSyntaxContext *)ctx
+- (void)performSyntaxParsingWithContext:(ViSyntaxContext *)ctx
 {
 	NSRange range = ctx.range;
 	unichar *chars = malloc(range.length * sizeof(unichar));
@@ -308,7 +306,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 		
 		nextContext = ctx;
-		[self performSelector:@selector(restartContext:) withObject:ctx afterDelay:0.0025];
+		[self performSelector:@selector(restartSyntaxParsingWithContext:) withObject:ctx afterDelay:0.0025];
 	}
 }
 
@@ -323,10 +321,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ctx.range = aRange;
 	ctx.restarting = flag;
 
-	[self performContext:ctx];
+	[self performSyntaxParsingWithContext:ctx];
 }
 
-- (void)restartContext:(ViSyntaxContext *)context
+- (void)restartSyntaxParsingWithContext:(ViSyntaxContext *)context
 {
 	nextContext = nil;
 
@@ -346,7 +344,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (context.range.length > 0)
 	{
 		DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
-		[self performContext:context];
+		[self performSyntaxParsingWithContext:context];
 	}
 }
 

@@ -882,7 +882,7 @@ int logIndent = 0;
 	else if (NSMaxX(rect) > NSMaxX(visibleRect))
 		topX = NSMaxX(rect) - NSWidth(visibleRect) + jumpX;
 
-	if (NSMinX(rect) < NSWidth(visibleRect)*0.8)
+	if (topX < jumpX)
 		topX = 0;
 
 	topPoint = NSMakePoint(topX, topY);

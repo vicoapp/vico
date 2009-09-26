@@ -217,18 +217,20 @@ size_t num_requests = 64;
 	[handle seekToFileOffset:0ULL];
 
 	char remote_temp_file[37];
+	NSString *remote_temp_path = nil;
 	do
 	{
 		uuid_t uuid;
 		uuid_generate(uuid);
 		uuid_unparse(uuid, remote_temp_file);
-	} while ([self stat:[NSString stringWithUTF8String:remote_temp_file]] != NULL);
+		remote_temp_path = [[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithUTF8String:remote_temp_file]];
+	} while ([self stat:remote_temp_path] != NULL);
 
-	int status = do_upload(conn, fd, templateFilename, remote_temp_file, [self stat:path], 0);
+	int status = do_upload(conn, fd, templateFilename, [remote_temp_path UTF8String], [self stat:path], 0);
 	close(fd);
 	if (status == 0)
 	{
-		if (do_rename(conn, remote_temp_file, [path UTF8String]) == 0)
+		if (do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0)
 			return YES;
 
 		*outError = [NSError errorWithDomain:@"SFTP" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Failed to rename remote temporary file." forKey:NSLocalizedDescriptionKey]];

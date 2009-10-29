@@ -141,8 +141,8 @@ static void bilinearShadedColor(void *info, const float *in, float *out)
 	// draw gradient
 	colorspace = CGColorSpaceCreateDeviceRGB();
 	size_t components = 1 + CGColorSpaceGetNumberOfComponents(colorspace);
-	static const float  domain[2] = {0.0, 1.0};
-	static const float  range[10] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+	static const CGFloat  domain[2] = {0.0, 1.0};
+	static const CGFloat  range[10] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
 	//static const CGFunctionCallbacks callbacks = {0, &bilinearShadedColor, NULL};
 	
 	// Create a CGFunctionRef that describes a function taking 1 input and kChannelsPerColor outputs.

@@ -99,7 +99,6 @@ struct ex_address
 @property(readonly) struct ex_command *command;
 @property(readonly) unsigned flags;
 @property(readonly) NSString *name;
-@property(readonly) NSString *method;
 @property(readonly) NSString *filename;
 @property(readonly) NSString *string;
 @property(readonly) NSString *plus_command;

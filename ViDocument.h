@@ -1,11 +1,12 @@
 #import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViSymbol.h"
 
 @class NoodleLineNumberView;
 
-@interface ViDocument : NSDocument
+@interface ViDocument : NSDocument // <NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
 	NSMutableArray *views;
 	int visibleViews;

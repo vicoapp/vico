@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "ViTagStack.h"
 
 @class PSMTabBarControl;
@@ -8,7 +9,8 @@
 @class ViResizeView;
 @class ViJumpList;
 
-@interface ViWindowController : NSWindowController
+
+@interface ViWindowController : NSWindowController // <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;

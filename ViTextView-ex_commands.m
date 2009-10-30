@@ -41,13 +41,15 @@
 
 - (void)ex_pwd:(ExCommand *)command
 {
-        ViWindowController *windowController = [[self document] windowController];
+	ViWindowController *windowController = [[self document] windowController];
 	[[self delegate] message:@"%@", [windowController currentDirectory]];
 }
 
 - (void)ex_edit:(ExCommand *)command
 {
-        INFO(@"command.filename == %@", command.filename);
+	ViWindowController *windowController = [[self document] windowController];
+
+	INFO(@"command.filename == %@", command.filename);
 
 	if (command.filename == nil)
 	{
@@ -60,7 +62,6 @@
 			path = [command.filename stringByExpandingTildeInPath];
 		else if (![command.filename hasPrefix:@"/"])
                 {
-                        ViWindowController *windowController = [[self document] windowController];
 			path = [[windowController currentDirectory] stringByAppendingPathComponent:command.filename];
                 }
 		BOOL isDirectory = NO;
@@ -71,9 +72,14 @@
 				[[self delegate] message:@"Can't edit directory %@", path];
 			}
 			else
-				[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
-				                                                                       display:YES
-				                                                                         error:nil];
+			{
+                                ViDocument *document;
+				document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+				                                                                                  display:YES
+				                                                                                    error:nil];
+                                if (document)
+                                        [windowController selectDocument:document];
+			}
 		}
 		else
 		{

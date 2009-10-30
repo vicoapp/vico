@@ -48,7 +48,6 @@ size_t num_requests = 64;
 	self = [super init];
 	if (self)
 	{
-		int sshver = 2;
 		char *host, *userhost, *cp/*, *file2 = NULL*/;
 		char *file1 = NULL, *sftp_server = NULL;
 

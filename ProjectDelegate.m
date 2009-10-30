@@ -4,13 +4,16 @@
 #import "SFTPConnectionPool.h"
 #import "ViWindowController.h" // for goToUrl:
 
-@interface ProjectDelegate ()
+@interface ProjectDelegate (private)
 - (NSMutableArray *)childrenAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
 - (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
 - (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
 - (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
 - (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
 @end
 
 @implementation ProjectDelegate
@@ -47,7 +50,12 @@
 {
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSArray *files = [fm directoryContentsAtPath:[url path]];
+	NSError *error = nil;
+	NSArray *files = [fm contentsOfDirectoryAtPath:[url path] error:&error];
+	if (files == nil) {
+		INFO(@"failed to get files: %@", [error localizedDescription]);
+		return nil;
+	}
 	NSString *file;
 	for (file in files)
 	{
@@ -55,7 +63,7 @@
 		{
 			NSURL *childURL = [NSURL fileURLWithPath:[[url path] stringByAppendingPathComponent:file]];
 			[children addObject:[self itemAtFileURL:childURL rootURL:rootURL]];
-                }
+        }
 	}
 	return children;
 }

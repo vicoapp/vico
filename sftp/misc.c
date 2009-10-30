@@ -48,6 +48,7 @@
 #include "misc.h"
 #include "log.h"
 #include "ssh.h"
+#include "strtonum.h"
 
 /* remove newline at end of string */
 char *

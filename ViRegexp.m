@@ -172,7 +172,7 @@
 	return [self rangeOfSubstringAtIndex:0];
 }
 
-- (NSRange)rangeOfSubstringAtIndex:(unsigned)idx
+- (NSRange)rangeOfSubstringAtIndex:(NSUInteger)idx
 {
 	if ((idx >= region->num_regs) || (region->beg[idx] == -1))
 		return NSMakeRange(NSNotFound, 0);
@@ -180,7 +180,7 @@
 	return NSMakeRange(startLocation + (region->beg[idx] / sizeof(unichar)), (region->end[idx] - region->beg[idx]) / sizeof(unichar));
 }
 
-- (unsigned)count
+- (NSUInteger)count
 {
 	return region->num_regs;
 }

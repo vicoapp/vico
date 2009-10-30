@@ -38,7 +38,7 @@
 - (NSMutableArray *)lineIndices;
 - (void)invalidateLineIndices;
 - (void)calculateLines;
-- (unsigned)lineNumberForCharacterIndex:(unsigned)ndx inText:(NSString *)text;
+- (NSUInteger)lineNumberForCharacterIndex:(NSUInteger)ndx inText:(NSString *)text;
 - (NSDictionary *)textAttributes;
 - (NSDictionary *)markerTextAttributes;
 
@@ -184,9 +184,9 @@
     [self setNeedsDisplay:YES];
 }
 
-- (unsigned)lineNumberForLocation:(float)location
+- (NSUInteger)lineNumberForLocation:(float)location
 {
-	unsigned		line, count, ndx, rectCount, i;
+	NSUInteger		line, count, ndx, rectCount, i;
 	NSRectArray		rects;
 	NSRect			visibleRect;
 	NSLayoutManager	*layoutManager;
@@ -194,14 +194,14 @@
 	NSRange			nullRange;
 	NSMutableArray	*lines;
 	id				view;
-		
+
 	view = [self clientView];
 	visibleRect = [[[self scrollView] contentView] bounds];
-	
+
 	lines = [self lineIndices];
 
 	location += NSMinY(visibleRect);
-	
+
 	if ([view isKindOfClass:[NSTextView class]])
 	{
 		nullRange = NSMakeRange(NSNotFound, 0);
@@ -244,10 +244,10 @@
     
     if ([view isKindOfClass:[NSTextView class]])
     {
-        unsigned        ndx, numberOfLines, stringLength, lineEnd, contentEnd;
+        NSUInteger        ndx, numberOfLines, stringLength, lineEnd, contentEnd;
         NSString        *text;
-        float         oldThickness, newThickness;
-        
+        CGFloat         oldThickness, newThickness;
+
         text = [view string];
         stringLength = [text length];
         [lineIndices release];
@@ -290,9 +290,9 @@
 	}
 }
 
-- (unsigned)lineNumberForCharacterIndex:(unsigned)ndx inText:(NSString *)text
+- (NSUInteger)lineNumberForCharacterIndex:(NSUInteger)ndx inText:(NSString *)text
 {
-    unsigned			left, right, mid, lineStart;
+    NSUInteger			left, right, mid, lineStart;
 	NSMutableArray		*lines;
 
 	lines = [self lineIndices];
@@ -338,9 +338,9 @@
 				nil];
 }
 
-- (float)requiredThickness
+- (CGFloat)requiredThickness
 {
-    unsigned			lineCount, digits, i;
+    NSUInteger			lineCount, digits, i;
     NSMutableString     *sampleString;
     NSSize              stringSize;
     
@@ -387,9 +387,9 @@
         NSRect					visibleRect, markerRect;
         NSRange					range, glyphRange, nullRange;
         NSString				*text, *labelText;
-        unsigned				rectCount, ndx, line, count;
+        NSUInteger				rectCount, ndx, line, count;
         NSRectArray				rects;
-        float					ypos, yinset;
+        CGFloat					ypos, yinset;
         NSDictionary			*textAttributes, *currentTextAttributes;
         NSSize					stringSize, markerSize;
 		NoodleLineNumberMarker	*marker;

@@ -469,7 +469,6 @@ ex_cmd_find(NSString *cmd)
 @synthesize flags;
 @synthesize name;
 @synthesize command;
-@synthesize method;
 @synthesize filename;
 @synthesize string = arg_string;
 @synthesize plus_command;

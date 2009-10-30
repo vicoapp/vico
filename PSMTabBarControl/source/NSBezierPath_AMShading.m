@@ -11,19 +11,19 @@
 
 @implementation NSBezierPath (AMShading)
 
-static void linearShadedColor(void *info, const float *in, float *out)
+static void linearShadedColor(void *info, const CGFloat *in, CGFloat *out)
 {
-	float *colors = info;
+	CGFloat *colors = info;
 	*out++ = colors[0] + *in * colors[8];
 	*out++ = colors[1] + *in * colors[9];
 	*out++ = colors[2] + *in * colors[10];
 	*out++ = colors[3] + *in * colors[11];
 }
 
-static void bilinearShadedColor(void *info, const float *in, float *out)
+static void bilinearShadedColor(void *info, const CGFloat *in, CGFloat *out)
 {
-	float *colors = info;
-	float factor = (*in)*2.0;
+	CGFloat *colors = info;
+	CGFloat factor = (*in)*2.0;
 	if (*in > 0.5) {
 		factor = 2-factor;
 	}

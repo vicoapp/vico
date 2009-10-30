@@ -1,3 +1,4 @@
+#import "NSTextField-additions.h"
 
 @implementation NSTextField (additions)
 

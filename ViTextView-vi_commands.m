@@ -345,6 +345,7 @@
 		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
 		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
 		[self replaceRange:affectedRange withString:outputText];
+		[self endUndoGroup];
 	}
 }
 

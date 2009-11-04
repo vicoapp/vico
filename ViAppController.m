@@ -63,6 +63,7 @@
 		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
 	}
 
+#if 0
 	/* initialize commands */
 	NSArray *bundles = [[ViLanguageStore defaultStore] allBundles];
 	ViBundle *bundle;
@@ -103,6 +104,7 @@
 			[subitem setRepresentedObject:command];
 		}
 	}
+#endif
 }
 
 - (IBAction)setTheme:(id)sender

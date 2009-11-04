@@ -1488,11 +1488,13 @@
 
 			ViDocument *document = [[NSDocumentController sharedDocumentController]
 				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
-			
+
 			if (document)
 			{
+				ViWindowController *windowController = [[self document] windowController];
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+				[windowController selectDocument:document];
 				[document findPattern:pattern options:0 regexpType:0];
 			}
 		}

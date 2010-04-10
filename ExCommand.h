@@ -101,6 +101,7 @@ struct ex_address
 @property(readonly) NSString *name;
 @property(readonly) NSString *filename;
 @property(readonly) NSString *string;
+@property(readonly) NSString *method;
 @property(readonly) NSString *plus_command;
 @property(readonly) NSArray *words;
 

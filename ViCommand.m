@@ -9,9 +9,11 @@
 #define VIF_LINE_MODE	(1 << 3)
 #define VIF_NEED_CHAR	(1 << 4)
 
+#if 0
 static struct vikey input_map[] = {
 	{nil, -1, 0}
 };
+#endif
 
 static struct vikey normal_map[] = {
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
@@ -231,8 +233,7 @@ find_command_in_map(int key, struct vikey map[])
 {
 	complete = YES;
 
-	if(command && has_flag(command, VIF_SETS_DOT))
-	{
+	if (command && has_flag(command, VIF_SETS_DOT)) {
 		/* set the dot command parameters */
 		dot_command = command;
 		dot_motion_command = motion_command;
@@ -241,25 +242,22 @@ find_command_in_map(int key, struct vikey map[])
 		dot_argument = argument;
 
 		/* new (real) commands reset the associated text */
-		if(!is_dot)
+		if (!is_dot)
 			[self setText:nil];
 	}
 	
-	if(command && (command->key == 't' || command->key == 'f' ||
-			   command->key == 'T' || command->key == 'F'))
-	{
+	if (command && (command->key == 't' || command->key == 'f' ||
+	    command->key == 'T' || command->key == 'F')) {
 		last_ftFT_command = command;
 		last_ftFT_argument = argument;
 	}
-	else if(motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
-			       motion_command->key == 'T' || motion_command->key == 'F'))
-	{
+	else if (motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
+	    motion_command->key == 'T' || motion_command->key == 'F')) {
 		last_ftFT_command = motion_command;
 		last_ftFT_argument = argument;
 	}
-	
-	if(count > 0 && motion_count > 0)
-	{
+
+	if (count > 0 && motion_count > 0) {
 		/* From nvi:
 		 * A count may be provided both to the command and to the motion, in
 		 * which case the count is multiplicative.  For example, "3y4y" is the
@@ -273,8 +271,7 @@ find_command_in_map(int key, struct vikey map[])
 
 - (void)pushKey:(unichar)aKey
 {
-	if (state == ViCommandNeedChar)
-	{
+	if (state == ViCommandNeedChar) {
 		argument = aKey;
 		[self setComplete:NO];
 
@@ -282,24 +279,19 @@ find_command_in_map(int key, struct vikey map[])
 	}
 
 	// check if it's a repeat count
-	int *countp = nil;
-	if (state == ViCommandInitialState)
-		countp = &count;
-	else if (state == ViCommandNeedMotion)
+	int *countp = &count;
+	if (state == ViCommandNeedMotion)
 		countp = &motion_count;
 	// conditionally include '0' as a repeat count only if it's not the first digit
-	if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9')
-	{
+	if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9') {
 		*countp *= 10;
 		*countp += aKey - '0';
 		return;
 	}
 
 	// check for the dot command
-	if (aKey == '.')
-	{
-		if (dot_command == nil)
-		{
+	if (aKey == '.') {
+		if (dot_command == nil) {
 			method = @"nodot:"; // prints "No command to repeat"
 			[self setComplete:YES];
 			return;
@@ -317,15 +309,10 @@ find_command_in_map(int key, struct vikey map[])
 			motion_key = dot_motion_command->key;
 		[self setComplete:YES];
 		return;
-	}
-	else if (aKey == ';' || aKey == ',')
-	{
+	} else if (aKey == ';' || aKey == ',') {
 		if(last_ftFT_command == nil)
-		{
 			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
-		}
-		else
-		{
+		else {
 			DEBUG(@"repeating '%c' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
 			command = last_ftFT_command;
 			method = last_ftFT_command->method;
@@ -339,8 +326,7 @@ find_command_in_map(int key, struct vikey map[])
 	// struct vikey *map = normal_map;
 	if  (map == NULL)
 		map = normal_map;
-	if (state == ViCommandNeedMotion)
-	{
+	if (state == ViCommandNeedMotion) {
 		// hack for "doubled commands"
 		if (aKey == command->key)
 			map = normal_map;
@@ -349,48 +335,35 @@ find_command_in_map(int key, struct vikey map[])
 	}
 
 	struct vikey *vikey = find_command_in_map(aKey, map);
-	if (vikey == NULL)
-	{
+	if (vikey == NULL) {
 		// should print "X isn't a vi command"
-		if (state == ViCommandNeedMotion)
-		{
+		if (state == ViCommandNeedMotion) {
 			motion_key = aKey; // needed for error reporting
 			method = @"nonmotion:";
-		}
-		else
+		} else
 			method = @"illegal:";
 		key = aKey;
 		[self setComplete:NO];
 		return;
 	}
 
-	if (state == ViCommandInitialState)
-	{
+	if (state == ViCommandInitialState) {
 		command = vikey;
 		method = command->method;
 		key = aKey;
 		if (has_flag(vikey, VIF_NEED_MOTION))
-		{
 			state = ViCommandNeedMotion;
-		}
-		else if (has_flag(vikey, VIF_NEED_CHAR))
-		{
+		else if (has_flag(vikey, VIF_NEED_CHAR)) {
 			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
 			state = ViCommandNeedChar;
-		}
-		else
+		} else
 			[self setComplete:NO];
-	}
-	else if (state == ViCommandNeedMotion)
-	{
+	} else if (state == ViCommandNeedMotion) {
 		motion_key = aKey;
 
 		if (has_flag(vikey, VIF_IS_MOTION))
-		{
 			motion_command = vikey;
-		}
-		else if (aKey == command->key)
-		{
+		else if (aKey == command->key) {
 			/* From nvi:
 			 * Commands that have motion components can be doubled to
 			 * imply the current line.
@@ -398,21 +371,15 @@ find_command_in_map(int key, struct vikey map[])
 			 * Do this by setting the line mode flag.
 			 */
 			motion_command = command;
-		}
-		else
-		{
+		} else {
 			// should print "X may not be used as a motion command"
 			method = @"nonmotion:";
 		}
 
 		if (has_flag(vikey, VIF_NEED_CHAR))
-		{
 			state = ViCommandNeedChar;
-		}
 		else
-		{
 			[self setComplete:NO];
-		}
 	}
 }
 

@@ -447,15 +447,13 @@ static struct ex_command *
 ex_cmd_find(NSString *cmd)
 {
 	int i;
-	for (i = 0; ex_commands[i].name; i++)
-	{
+	for (i = 0; ex_commands[i].name; i++) {
 		if ([ex_commands[i].name characterAtIndex:0] > [cmd characterAtIndex:0])
 			return NULL;
 
 		if ([ex_commands[i].name compare:cmd
-					options:NSLiteralSearch
-					  range:NSMakeRange(0, [cmd length])] == NSOrderedSame)
-		{
+					 options:NSLiteralSearch
+					   range:NSMakeRange(0, [cmd length])] == NSOrderedSame) {
 			return &ex_commands[i];
 		}
 	}
@@ -1031,7 +1029,7 @@ end_case1:		break;
 			}
 			goto addr_verify;
 		default:
-			INFO(@"internal error");
+			INFO(@"%s", "internal error");
 			break;
 		}
 	}

@@ -19,7 +19,7 @@
 	if (placeholder == nil)
 	{
 		placeholder = snippet.lastPlaceholder;
-		INFO(@"last placeholder, cancelling snippet");
+		INFO(@"%s", "last placeholder, cancelling snippet");
 		[self cancelSnippet:snippet];
 	}
 

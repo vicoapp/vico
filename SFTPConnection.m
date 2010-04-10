@@ -49,7 +49,7 @@ size_t num_requests = 64;
 	if (self)
 	{
 		char *host, *userhost, *cp/*, *file2 = NULL*/;
-		char *file1 = NULL, *sftp_server = NULL;
+		char *sftp_server = NULL;
 
 		target = aTarget;
 		userhost = strdup([target UTF8String]);
@@ -71,21 +71,19 @@ size_t num_requests = 64;
 		else {
 			*host++ = '\0';
 			if (!userhost[0]) {
-				INFO(@"Missing username");
+				INFO(@"%s", "Missing username");
 				free(userhost);
 				return nil;
 			}
 			addargs(&args, "-l%s", userhost);
 		}
 
-		if ((cp = colon(host)) != NULL) {
-			*cp++ = '\0';
-			file1 = cp;
-		}
+		if ((cp = colon(host)) != NULL)
+			*cp = '\0';
 
 		host = cleanhostname(host);
 		if (!*host) {
-			INFO(@"Missing hostname");
+			INFO(@"%s", "Missing hostname");
 			return nil;
 		}
 
@@ -100,14 +98,11 @@ size_t num_requests = 64;
 		    sftp_server : "sftp"));
 		sshpid = sftp_connect_to_server(SSH_PATH, args.list, &fd_in, &fd_out);
 		if (sshpid == -1)
-		{
 			return nil;
-		}
 		conn = do_init(fd_in, fd_out, copy_buffer_len, num_requests);
 		free(userhost);
-		if (conn == NULL)
-		{
-			INFO(@"Couldn't initialise connection to server");
+		if (conn == NULL) {
+			INFO(@"%s", "Couldn't initialise connection to server");
 			return nil;
 		}
 	}
@@ -137,17 +132,14 @@ size_t num_requests = 64;
 
 - (NSArray *)directoryContentsAtPath:(NSString *)path
 {
-	int n;
 	SFTP_DIRENT **d;
-	if ((n = do_readdir(conn, [path UTF8String], &d)) != 0)
+	if (do_readdir(conn, [path UTF8String], &d) != 0)
 		return nil;
 	
 	NSMutableArray *contents = [[NSMutableArray alloc] init];
 	int i;
 	for (i = 0; d[i]; i++)
-	{
 		[contents addObject:[[SFTPDirectoryEntry alloc] initWithPointer:d[i]]];
-	}
 
 	xfree(d);
 	return contents;

@@ -243,7 +243,7 @@
 			NSString *pwd = [conn currentDirectory];
 			if (pwd == nil)
 			{
-				INFO(@"FAILED to read current directory");
+				INFO(@"%s", "FAILED to read current directory");
 				return;
 			}
 			path = [NSString stringWithFormat:@"%@/%@", pwd, path];

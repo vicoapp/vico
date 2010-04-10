@@ -198,7 +198,7 @@
 	INFO(@"start_location = %u, last_bol = %u", start_location, last_bol);
 	if (start_location >= last_bol)
 	{
-		INFO(@"move up");
+		INFO(@"%s", "move up");
 		[self move_up:command];
 	}
 
@@ -856,16 +856,13 @@
 /* syntax: [count]$ */
 - (BOOL)move_eol:(ViCommand *)command
 {
-	if ([[self textStorage] length] > 0)
-	{
+	if ([[self textStorage] length] > 0) {
 		int count = IMAX(command.count, 1);
 		if (!command.ismotion)
 			count = IMAX(command.motion_count, 1);
-		NSUInteger cur = start_location, bol, eol;
+		NSUInteger cur = start_location, bol = 0, eol = 0;
 		while (count--)
-		{
 			[self getLineStart:&bol end:&cur contentsEnd:&eol forLocation:cur];
-		}
 		final_location = end_location = IMAX(bol, eol - command.ismotion);
 	}
 	return YES;
@@ -1025,8 +1022,8 @@
 /* syntax: u */
 - (BOOL)vi_undo:(ViCommand *)command
 {
-	if (![undoManager canUndo])
-	{
+	if (![undoManager canUndo]) {
+		DEBUG(@"%s", "can't undo");
 		[[self delegate] message:@"Can't undo"];
 		return NO;
 	}
@@ -1194,7 +1191,7 @@
 
 - (BOOL)end_of_word:(ViCommand *)command
 {
-	if([[self textStorage] length] == 0)
+	if ([[self textStorage] length] == 0)
 	{
 		[[self delegate] message:@"Empty file"];
 		return NO;
@@ -1220,22 +1217,17 @@
 	}
 	
 	BOOL bigword = (command.ismotion ? command.key == 'E' : command.motion_key == 'E');
-	
+
 	ch = [s characterAtIndex:end_location];
-	if(bigword)
-	{
+	if (bigword) {
 		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
-	}
-	else if([wordSet characterIsMember:ch])
-	{
+	} else if ([wordSet characterIsMember:ch]) {
 		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
-	}
-	else
-	{
+	} else {
 		// inside non-word-chars
 		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
@@ -1254,10 +1246,9 @@
 		return YES;
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	
+
 	unichar ch = [s characterAtIndex:bol];
-	if([whitespace characterIsMember:ch])
-	{
+	if ([whitespace characterIsMember:ch]) {
 		// skip leading whitespace
 		end_location = [self skipWhitespaceFrom:bol toLocation:eol];
 	}
@@ -1272,30 +1263,28 @@
 - (BOOL)delete_forward:(ViCommand *)command
 {
 	NSString *s = [[self textStorage] string];
-	if([s length] == 0)
-	{
+	if([s length] == 0) {
 		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if(bol == eol)
-	{
-		[[self delegate] message:@"no characters to delete"];
+	if(bol == eol) {
+		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
 	
 	NSRange del;
 	del.location = start_location;
 	del.length = IMAX(1, command.count);
-	if(del.location + del.length > eol)
+	if (del.location + del.length > eol)
 		del.length = eol - del.location;
 	[self cutToBuffer:0 append:NO range:del];
 	
 	// correct caret position if we deleted the last character(s) on the line
 	end_location = start_location;
 	--eol;
-	if(end_location == eol && eol > bol)
+	if (end_location == eol && eol > bol)
 		--end_location;
 	final_location = end_location;
 	return YES;
@@ -1462,24 +1451,20 @@
 // syntax: ^]
 - (BOOL)jump_tag:(ViCommand *)command
 {
-	if (tags == nil || [tags databaseHasChanged])
-	{
+	if (tags == nil || [tags databaseHasChanged]) {
 		tags = [[ViTagsDatabase alloc] initWithFile:@"tags"
 						inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
 	}
 
-	if (tags == nil)
-	{
+	if (tags == nil) {
 		[[self delegate] message:@"tags: No such file or directory."];
 		return NO;
 	}
 
 	NSString *word = [self wordAtLocation:start_location];
-	if (word)
-	{
+	if (word) {
 		NSArray *tag = [tags lookup:word];
-		if (tag)
-		{
+		if (tag) {
 			[[self delegate] pushLine:[self currentLine] column:[self currentColumn]];
 			[self pushLocationOnJumpList:start_location];
 
@@ -1489,17 +1474,14 @@
 			ViDocument *document = [[NSDocumentController sharedDocumentController]
 				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
 
-			if (document)
-			{
+			if (document) {
 				ViWindowController *windowController = [[self document] windowController];
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
 				[windowController selectDocument:document];
 				[document findPattern:pattern options:0 regexpType:0];
 			}
-		}
-		else
-		{
+		} else {
 			[[self delegate] message:@"%@: tag not found", word];
 		}
 	}

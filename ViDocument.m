@@ -127,7 +127,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
 	if (conn == nil)
 	{
-		INFO(@"FAILED to connect to host");
+		INFO(@"%s", "FAILED to connect to host");
 		// XXX: set outError
 		return NO;
 	}
@@ -147,14 +147,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		if ([url user] == nil || [url host] == nil)
 		{
-			INFO(@"missing user or host in url");
+			INFO(@"%s", "missing user or host in url");
 			// XXX: set outError
 			return NO;
 		}
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
 		if (conn == nil)
 		{
-			INFO(@"FAILED to connect to host");
+			INFO(@"%s", "FAILED to connect to host");
 			// XXX: set outError
 			return NO;
 		}
@@ -221,27 +221,24 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 return nil;
 
         ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-        NSDictionary *attributes;
         NSArray *scopeArray = [syntaxParser scopeArray];
-        if (charIndex >= [scopeArray count])
-        {
+        if (charIndex >= [scopeArray count]) {
                 *effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
                 return [self defaultAttributesForTheme:theme];
         }
-        ViScope *scope = [scopeArray objectAtIndex:charIndex];
-        attributes = [scope attributes];
-        if ([attributes count] == 0)
-        {
+
+	ViScope *scope = [scopeArray objectAtIndex:charIndex];
+        NSDictionary *attributes = [scope attributes];
+        if ([attributes count] == 0) {
                 attributes = [theme attributesForScopes:[scope scopes]];
                 if ([attributes count] == 0)
                         attributes = [self defaultAttributesForTheme:theme];
                 [scope setAttributes:attributes];
         }
-        NSRange r =  [scope range];
+
+        NSRange r = [scope range];
         if (NSMaxRange(r) <= charIndex)
-        {
                 INFO(@"index = %u, scope = %@", charIndex, scope);
-        }
         *effectiveCharRange = r;
         return attributes;
 }
@@ -272,11 +269,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[syntaxParser parseContext:ctx];
 
 	// Invalidate the layout(s).
-	if (ctx.restarting)
-	{
+	if (ctx.restarting) {
 		ViDocumentView *dv;
-		for (dv in views)
-		{
+		for (dv in views) {
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 		}
 	}
@@ -290,14 +285,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 						       repeats:NO];
 	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
 
-	if (ctx.lineOffset > startLine)
-	{
+	if (ctx.lineOffset > startLine) {
 		// INFO(@"line endings have changed at line %u", endLine);
 		
-		if (nextContext && nextContext != ctx)
-		{
-			if (nextContext.lineOffset < startLine)
-			{
+		if (nextContext && nextContext != ctx) {
+			if (nextContext.lineOffset < startLine) {
 				DEBUG(@"letting previous scheduled parsing from line %u continue", nextContext.lineOffset);
 				return;
 			}
@@ -460,17 +452,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	DEBUG(@"range = %@, string = [%@]", NSStringFromRange(affectedCharRange), replacementString);
 
-	if ([replacementString length] > 0)
-	{
+	if ([replacementString length] > 0) {
 		DEBUG(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:replacementString
 		                            forward:YES];
 		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, [replacementString length])];
 		// FIXME: also push jumps and marks
-	}
-	else
-	{
+	} else {
 		NSString *deletedString = [[textStorage string] substringWithRange:affectedCharRange];
 		DEBUG(@"pulling string [%@] from %u", deletedString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
@@ -487,8 +476,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	NSRange area = [textStorage editedRange];
 
-	if (ignoreEditing)
-	{
+	if (ignoreEditing) {
                 DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
 		ignoreEditing = NO;
 		return;
@@ -549,8 +537,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	NSArray *scopeArray = [syntaxParser scopeArray];
 	NSUInteger i;
-	for (i = 0; i < [scopeArray count];)
-	{
+	for (i = 0; i < [scopeArray count];) {
 		[[scopeArray objectAtIndex:i] setAttributes:nil];
 		i += [[scopeArray objectAtIndex:i] range].length;
 	}
@@ -558,8 +545,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	/* Change the theme and invalidate all layout.
 	 */
 	ViDocumentView *dv;
-	for (dv in views)
-	{
+	for (dv in views) {
 		[[dv textView] setTheme:theme];
 		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 	}

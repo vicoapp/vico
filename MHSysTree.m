@@ -37,7 +37,7 @@ int id_cmp(struct rb_entry *a, struct rb_entry *b)
 
 - (id)initWithCompareSelector:(SEL)aSelector
 {
-    if ((self = [super init])) {
+    if ((self = [super init]) != nil) {
         RB_INIT(&root);
         nitems = 0;
         compareSelector = aSelector;

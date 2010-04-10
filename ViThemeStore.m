@@ -11,9 +11,7 @@
 	if (themeName)
 		defaultTheme = [self themeWithName:themeName];
 
-	if (defaultTheme == nil)
-	{
-
+	if (defaultTheme == nil) {
 		defaultTheme = [self themeWithName:@"Mac Classic"];
 		if (defaultTheme == nil)
 			defaultTheme = [[themes allValues] objectAtIndex:0];
@@ -26,9 +24,7 @@
 {
 	static ViThemeStore *defaultStore = nil;
 	if (defaultStore == nil)
-	{
 		defaultStore = [[ViThemeStore alloc] init];
-	}
 	return defaultStore;
 }
 
@@ -41,12 +37,10 @@
 - (void)addThemesFromBundleDirectory:(NSString *)aPath
 {
 	BOOL isDirectory = NO;
-	if ([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory)
-	{
+	if ([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory) {
 		NSArray *themeFiles = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
 		NSString *themeFile;
-		for (themeFile in themeFiles)
-		{
+		for (themeFile in themeFiles) {
 			if ([themeFile hasSuffix:@".tmTheme"])
 				[self addThemeWithPath:[NSString stringWithFormat:@"%@/%@", aPath, themeFile]];
 		}
@@ -56,8 +50,7 @@
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		themes = [[NSMutableDictionary alloc] init];
 
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];

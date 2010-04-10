@@ -28,8 +28,8 @@
 - (void)test010_InsertText			{ TEST(@"abc def", 3, @"i qwerty", @"abc qwerty def", 10); }
 - (void)test010_InsertTextAndEscape		{ TEST(@"abc def", 3, @"i qwerty\x1b", @"abc qwerty def", 9); }
 - (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
-- (void)test012_ChangeWordAndPut		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 7); }
-- (void)test013_ChangeWord			{ TEST(@"abc\ndef", 1, @"cw", @"a\ndef", 1); }
+- (void)test012_ChangeWord			{ TEST(@"abc\ndef", 1, @"cwcb\x1b", @"acb\ndef", 2); }
+- (void)test013_ChangeWordAndPut		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 7); }
 - (void)test014_AppendText			{ TEST(@"abc", 2, @"adef\x1b", @"abcdef", 5); }
 - (void)test015_RepeatAppendText		{ TEST(@"abc", 1, @"adef\x1b.", @"abdefdefc", 7); }
 - (void)test016_RepeatInsertText		{ TEST(@"abc", 2, @"idef\x1b.", @"abdedeffc", 6); }
@@ -160,14 +160,16 @@
 - (void)test157_DeleteToEndOfBigwordToNonword	{ TEST(@"abc:def ghi", 0, @"dE", @" ghi", 0); }
 - (void)test158_DeleteToEndOfWordFromBlanks	{ TEST(@"abc    def", 4, @"de", @"abc ", 3); }
 
-// - (void)test160_DeleteAndUndo			{ TEST(@"abc def", 2, @"xu", @"abc def", 2); }
-// - (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+- (void)test160_DeleteAndUndo			{ TEST(@"abc def", 2, @"xu", @"abc def", 2); }
+- (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"i ghi\x1bu", @"abc def", 2); }
+// XXX: cursor doesn't return to correct position when undoing an append
+//- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
 
 - (void)test170_ShiftLineRight			{ TEST(@"abc\ndef", 0, @">>", @"\tabc\ndef", 1); }
 - (void)test171_ShiftTwoLinesRight		{ TEST(@" abc\n\tdef\nghi", 0, @"2>>", @"\t abc\n\t\tdef\nghi", 1); }
 - (void)test172_ShiftThreeLinesRight		{ TEST(@" abc\n\tdef\nghi\njkl", 0, @"3>>", @"\t abc\n\t\tdef\n\tghi\njkl", 1); }
 - (void)test173_ShiftLineLeft			{ TEST(@"\t\tabc\ndef", 3, @"<<", @"\tabc\ndef", 2); }
-// - (void)test174_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
+- (void)test174_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
 
 - (void)test180_OpenLineAbove			{ TEST(@"abc\ndef", 4, @"Oxxx\x1b", @"abc\nxxx\ndef", 6); }
 - (void)test181_DeleteToChar			{ TEST(@"abc def ghi", 0, @"df ", @"def ghi", 0); }

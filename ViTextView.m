@@ -42,6 +42,8 @@ int logIndent = 0;
 
 	documentView = docView;
 	undoManager = [[self delegate] undoManager];
+	if (undoManager == nil)
+		undoManager = [[NSUndoManager alloc] init];
 	parser = [[ViCommand alloc] init];
 	buffers = [[NSApp delegate] sharedBuffers];
 	inputKeys = [[NSMutableArray alloc] init];
@@ -109,10 +111,9 @@ int logIndent = 0;
 - (void)paste:(id)sender
 {
 	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
-	NSArray *types = [pasteBoard types];
+	[pasteBoard types];
 	NSString *string = [pasteBoard stringForType:NSStringPboardType];	
-	if ([string length] > 0)
-	{
+	if ([string length] > 0) {
 		[self insertString:string atLocation:[self caret] undoGroup:NO];
 
 		NSUInteger eol;
@@ -171,8 +172,8 @@ int logIndent = 0;
 
 - (void)endUndoGroup
 {
-	if (hasUndoGroup)
-	{
+	DEBUG(@"Ending undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
+	if (hasUndoGroup) {
 		[undoManager endUndoGrouping];
 		hasUndoGroup = NO;
 	}
@@ -180,8 +181,7 @@ int logIndent = 0;
 
 - (void)beginUndoGroup
 {
-	if (!hasUndoGroup)
-	{
+	if (!hasUndoGroup) {
 		[undoManager beginUndoGrouping];
 		hasUndoGroup = YES;
 	}
@@ -198,7 +198,7 @@ int logIndent = 0;
 
 	NSRange range = NSMakeRange(aLocation, [aString length]);
 
-	if ([[self delegate] textView:self shouldChangeTextInRange:range replacementString:aString] == NO)
+	if ([self delegate] != nil && [[self delegate] textView:self shouldChangeTextInRange:range replacementString:aString] == NO)
 		return;
 
 	if (undoGroup)
@@ -233,10 +233,12 @@ int logIndent = 0;
 
 - (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
 {
+	DEBUG(@"undo in range %@", NSStringFromRange(aRange));
+
 	if (aRange.length == 0)
 		return;
 
-	if ([[self delegate] textView:self shouldChangeTextInRange:aRange replacementString:nil] == NO)
+	if ([self delegate] != nil && [[self delegate] textView:self shouldChangeTextInRange:aRange replacementString:nil] == NO)
 		return;
 
 	if (undoGroup)
@@ -244,19 +246,14 @@ int logIndent = 0;
 	[self recordDeleteOfRange:aRange];
 	[[self textStorage] deleteCharactersInRange:aRange];
 
-	if (activeSnippet)
-	{
-		if ([activeSnippet activeInRange:aRange])
-		{
+	if (activeSnippet) {
+		if ([activeSnippet activeInRange:aRange]) {
 			INFO(@"found snippet %@ at %u", activeSnippet, aRange.location);
-			if ([activeSnippet deleteRange:aRange] == NO)
-			{
+			if ([activeSnippet deleteRange:aRange] == NO) {
 				INFO(@"deleting failed, cancelling snippet %@", activeSnippet);
 				[self cancelSnippet:activeSnippet];
 			}
-		}
-		else
-		{
+		} else {
 			INFO(@"outside active range, cancelling snippet %@", activeSnippet);
 			[self cancelSnippet:activeSnippet];
 		}
@@ -494,9 +491,8 @@ int logIndent = 0;
 
 	NSRange delta_offset = NSMakeRange(0, 0);
 	BOOL has_delta_offset = NO;
-	
-	while (bol < NSMaxRange(aRange))
-	{
+
+	while (bol < NSMaxRange(aRange)) {
 		NSString *indent = [self leadingWhitespaceForLineAtLocation:bol];
 		int n = [self lengthOfIndentString:indent];
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
@@ -511,7 +507,7 @@ int logIndent = 0;
 			delta_offset.location = [newIndent length] - [indent length];
                 }
 		delta_offset.length += [newIndent length] - [indent length];
-		if (updatedCaret && *updatedCaret > indentRange.location)
+		if (updatedCaret && *updatedCaret >= indentRange.location)
 		{
 			NSInteger d = [newIndent length] - [indent length];
 			*updatedCaret = IMAX((NSInteger)*updatedCaret + d, 0);
@@ -558,6 +554,7 @@ int logIndent = 0;
 
 - (void)undoInsertInRange:(NSRange)aRange
 {
+	DEBUG(@"undoing insert in range %@", NSStringFromRange(aRange));
 	[self deleteRange:aRange undoGroup:NO];
 	final_location = aRange.location;
 }
@@ -584,7 +581,7 @@ int logIndent = 0;
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
-	[undoManager beginUndoGrouping]; // FIXME: no longer needed?
+	[undoManager beginUndoGrouping];
 	[self recordDeleteOfRange:aRange];
 	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
 	[undoManager endUndoGrouping];
@@ -1032,6 +1029,7 @@ int logIndent = 0;
  */
 - (void)inputCharacters:(NSString *)characters
 {
+	DEBUG(@"insert characters [%@] at %i", characters, start_location);
 	// If there is a non-zero length selection, remove it first.
 	NSRange sel = [self selectedRange];
 	if (sel.length > 0)
@@ -1084,21 +1082,18 @@ int logIndent = 0;
 		}
 	}
 	
-	if (!foundSmartTypingPair)
-	{
+	if (!foundSmartTypingPair) {
+		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
 		[self setCaret:start_location + [characters length]];
 	}
 
 #if 0
-	if ([self shouldDecreaseIndentAtLocation:insert_end_location])
-	{
+	if ([self shouldDecreaseIndentAtLocation:insert_end_location]) {
                 int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
 		insert_start_location += n;
 		insert_end_location += n;
-	}
-	else if ([self shouldNotIndentLineAtLocation:insert_end_location])
-	{
+	} else if ([self shouldNotIndentLineAtLocation:insert_end_location]) {
                 int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
 		insert_start_location += n;
 		insert_end_location += n;
@@ -1152,8 +1147,7 @@ int logIndent = 0;
 	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
-	if (bestMatchingScope)
-	{
+	if (bestMatchingScope) {
 		DEBUG(@"found smart typing pair scope selector [%@] at location %i", bestMatchingScope, aLocation);
 		return [smartTypingPairs objectForKey:bestMatchingScope];
 	}
@@ -1201,8 +1195,7 @@ int logIndent = 0;
 	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
 		return NO;
 
-	if ([theEvent type] == NSKeyUp)
-	{
+	if ([theEvent type] == NSKeyUp) {
 		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
 		      [theEvent charactersIgnoringModifiers],
 		      [[theEvent characters] characterAtIndex:0],
@@ -1310,7 +1303,7 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 0
+#if 1
 	INFO(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
@@ -1321,14 +1314,12 @@ int logIndent = 0;
 		return [super keyDown:theEvent];
 	unichar charcode = [[theEvent characters] characterAtIndex:0];
 
-	if (mode == ViInsertMode)
-	{
+	if (mode == ViInsertMode) {
 		// add the event to the input key replay queue
 		if (!replayingInput)
 			[inputKeys addObject:theEvent];
 
-		if (charcode == 0x1B)
-		{
+		if (charcode == 0x1B) {
 			/* escape, return to command mode */
 #if 0
 			NSString *insertedText = [[[self textStorage] string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
@@ -1337,8 +1328,7 @@ int logIndent = 0;
 
 			/* handle counts for inserted text here */
 			NSString *multipliedText = insertedText;
-			if (parser.count > 1)
-			{
+			if (parser.count > 1) {
 				multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
 						                            withString:insertedText
 							               startingAtIndex:0];
@@ -1361,48 +1351,33 @@ int logIndent = 0;
 			start_location = end_location = [self caret];
 			[self move_left:nil];
 			[self setCaret:end_location];
-		}
-		else
-		{
+		} else {
 			start_location = [self caret];
 
 			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 			NSString *inputCommand = [inputCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
 			if (inputCommand)
-			{
 				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
-			}
-			else if ((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0)
-			{
+			else if ((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0) {
 				/* other keys insert themselves */
 				/* but don't input control characters */
 				if (([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
-				{
 					[[self delegate] message:@"Illegal character; quote to enter"];
-				}
 				else
-				{
 					[self inputCharacters:[theEvent characters]];
-				}
 			}
 		}
-	}
-	else if (mode == ViNormalMode || mode == ViVisualMode)
-	{
-		if (mode == ViNormalMode)
-		{
+	} else if (mode == ViNormalMode || mode == ViVisualMode){
+		if (mode == ViNormalMode) {
 			// check for a special key bound to a function
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 			NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-			if (normalCommand)
-			{
+			if (normalCommand) {
 				[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
 				return;
 			}
-		}
-		else if (charcode == 0x1B)
-		{
+		} else if (charcode == 0x1B) {
 			[self setNormalMode];
 			[self setCaret:final_location];
 			return;
@@ -1415,23 +1390,19 @@ int logIndent = 0;
 			[parser setVisualMap];
 
 		[parser pushKey:charcode];
-		if (parser.complete)
-		{
+		if (parser.complete) {
 			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
-			if (mode != ViInsertMode)
-			{
-				// still in command mode
+			if (mode != ViInsertMode) {
+				// still in normal mode
 				[self endUndoGroup];
 			}
 			[[self textStorage] endEditing];
                         DEBUG(@"final_location is %u", final_location);
 			[self setCaret:final_location];
 			if (mode == ViVisualMode)
-			{
 				[self setVisualSelection];
-			}
 		}
 	}
 
@@ -1459,6 +1430,7 @@ int logIndent = 0;
 					      isARepeat:NO
 						keyCode:[inputString characterAtIndex:i]];
 		[self keyDown:ev];
+		DEBUG(@"textStorage = [%@]", [[self textStorage] string]);
 	}
 }
 

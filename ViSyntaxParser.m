@@ -179,7 +179,6 @@
 			// problem if NSMaxRange(sright) < NSMaxRange(affectedRange) (BUG!)
 			if (NSMaxRange([sright range]) <= NSMaxRange(affectedRange))
 			{
-				DEBUG(@"BUG!");
 				DEBUG(@"affectedRange = %@", affectedRange);
 				DEBUG(@"sright = %@", sright);
 				DEBUG(@"sleft = %@", sleft);
@@ -631,7 +630,6 @@ done:
               continueWithMatches:(NSArray *)continuedMatches
 {
 	DEBUG(@"-----> line range = %u (%u) + %u", aRange.location, aRange.location, aRange.length);
-	NSUInteger lastLocation = aRange.location;
 
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
@@ -654,7 +652,7 @@ done:
 
 		if (reachedEOL)
 			return continuedMatches;
-		lastLocation = [topMatch endLocation];
+		NSUInteger lastLocation = [topMatch endLocation];
 
 		// adjust the line range
 		if (lastLocation >= NSMaxRange(aRange))

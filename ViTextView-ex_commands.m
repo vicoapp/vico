@@ -33,7 +33,7 @@
 	if (path == nil)
 		path = @"~";
         ViWindowController *windowController = [[self document] windowController];
-	if (![windowController setCurrentDirectory:[path stringByExpandingTildeInPath]])
+	if (![windowController changeCurrentDirectory:[path stringByExpandingTildeInPath]])
 		[[self delegate] message:@"Error: %@: Failed to change directory.", path];
         else
 		[[self delegate] message:@"%@", [windowController currentDirectory]];

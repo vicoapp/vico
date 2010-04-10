@@ -56,7 +56,7 @@
 @property(readonly) NSTextField *statusbar;
 
 @property(readonly) NSString *currentDirectory;
-- (BOOL)setCurrentDirectory:(NSString *)path;
+- (BOOL)changeCurrentDirectory:(NSString *)path;
 
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;

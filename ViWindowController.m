@@ -45,8 +45,7 @@ static NSWindowController	*currentWindowController = nil;
 - (id)init
 {
 	self = [super initWithWindowNibName:@"ViDocumentWindow"];
-	if (self)
-	{
+	if (self) {
 		[self setShouldCascadeWindows:NO];
 		isLoaded = NO;
 		if (windowControllers == nil)
@@ -55,7 +54,7 @@ static NSWindowController	*currentWindowController = nil;
 		currentWindowController = self;
 		documents = [[NSMutableArray alloc] init];
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
-                [self setCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
+                [self changeCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
                 INFO(@"currentDirectory = %@", [self currentDirectory]);
 	}
 
@@ -90,8 +89,7 @@ static NSWindowController	*currentWindowController = nil;
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 	
 	isLoaded = YES;
-	if (initialDocument)
-	{
+	if (initialDocument) {
 		[self addNewTab:initialDocument];
                 lastDocument = initialDocument;
                 lastDocumentView = [[lastDocument views] objectAtIndex:0];
@@ -271,7 +269,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	if ([documents count] == 0)
 	{
-		INFO(@"no documents left, closing window");
+		INFO(@"%s", "no documents left, closing window");
 		// [[self window] close];
 	}
 	else
@@ -426,23 +424,19 @@ static NSWindowController	*currentWindowController = nil;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
 {
 	ViDocument *document = [self documentForURL:url];
-	if (document == nil)
-	{
+	if (document == nil) {
 		NSError *error = nil;
-		document = [[NSDocumentController sharedDocumentController]
-			openDocumentWithContentsOfURL:url display:YES error:&error];
+		[[NSDocumentController sharedDocumentController]
+		    openDocumentWithContentsOfURL:url display:YES error:&error];
 		if (error)
-		{
 			[NSApp presentError:error];	
-		}
-	}
-	else if ([self currentDocument] != document)
-	{
+	} else if ([self currentDocument] != document) {
 		if ([document visibleViews] > 0)
 			[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
 		else
 			[self selectDocument:document];
 	}
+
 	if (line > 0)
 		[(ViTextView *)[mostRecentView textView] gotoLine:line column:column];
 }
@@ -914,7 +908,7 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Ex filename completion
 
-- (BOOL)setCurrentDirectory:(NSString *)path
+- (BOOL)changeCurrentDirectory:(NSString *)path
 {
         NSString *p;
         if ([path isAbsolutePath])
@@ -1121,12 +1115,12 @@ static NSWindowController	*currentWindowController = nil;
 		}
 		else if (aSelector == @selector(moveUp:))
 		{
-			INFO(@"look back in history");
+			INFO(@"%s", "look back in history");
 			return YES;
 		}
 		else if (aSelector == @selector(moveDown:))
 		{
-			INFO(@"look forward in history");
+			INFO(@"%s", "look forward in history");
 			return YES;
 		}
 		else if (aSelector == @selector(insertBacktab:))

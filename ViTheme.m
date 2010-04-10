@@ -12,7 +12,7 @@
 		return nil;
 	if (rc == 3)
 		a = 255;
-	// DEBUG(@"%@ rgb = %02X%02X%02X%02X", hashRGB, r, g, b, a);
+
 	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
 }
 
@@ -28,10 +28,8 @@
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *settings = [theme objectForKey:@"settings"];
 	NSDictionary *setting;
-	for (setting in settings)
-	{
-		if ([setting objectForKey:@"name"] == nil)
-		{
+	for (setting in settings) {
+		if ([setting objectForKey:@"name"] == nil) {
 			/* settings for the default scope */
 			defaultSettings = [setting objectForKey:@"settings"];
 			continue;
@@ -56,8 +54,7 @@
 			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
 
 		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
-		if (fontStyle)
-		{
+		if (fontStyle) {
 			if ([fontStyle rangeOfString:@"underline"].location != NSNotFound)
 				[attrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
 			if ([fontStyle rangeOfString:@"italic"].location != NSNotFound)
@@ -65,9 +62,7 @@
 		}
 		
 		for (scopeSelector in scopeSelectors)
-		{
 			[themeAttributes setObject:attrs forKey:scopeSelector];
-		}
 	}
 
 	return self;
@@ -88,13 +83,15 @@
 	NSString *key = [scopes componentsJoinedByString:@" "];
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
 	if (attributes)
-	{
 		return [attributes count] == 0 ? nil : attributes;
-	}
 
 	attributes = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary *attributesRank = [[NSMutableDictionary alloc] init];
 
+	// Set default colors
+	[attributes setObject:[self foregroundColor] forKey:@"NSColor"];
+	[attributes setObject:[self backgroundColor] forKey:@"NSBackgroundColor"];
+	
 	// From the textmate manual:
 	// "For themes and preference items, the winner is undefined when
 	//  multiple items use the same scope selector, though this is on
@@ -105,18 +102,14 @@
 	//  background from the former."
 
 	NSString *scopeSelector;
-	for (scopeSelector in [themeAttributes allKeys])
-	{
+	for (scopeSelector in [themeAttributes allKeys]) {
 		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if (rank > 0)
-		{
+		if (rank > 0) {
 			NSDictionary *attrs = [themeAttributes objectForKey:scopeSelector];
 			NSString *attrKey;
-			for (attrKey in attrs)
-			{
+			for (attrKey in attrs) {
 				u_int64_t prevRank = [[attributesRank objectForKey:attrKey] unsignedLongLongValue];
-				if (rank > prevRank)
-				{
+				if (rank > prevRank) {
 					DEBUG(@"scope selector [%@] matches scopes %@ with rank %llu > %llu, setting %@", scopeSelector, key, rank, prevRank, attrKey);
 					[attributes setObject:[attrs objectForKey:attrKey] forKey:attrKey];
 					[attributesRank setObject:[NSNumber numberWithUnsignedLongLong:rank] forKey:attrKey];
@@ -127,14 +120,13 @@
 
 	// Backgrounds with alpha is not supported, so blend the background colors together.
 	NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
-	if (bg)
-	{
+	if (bg) {
 		NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
 		[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
 	}
 		
 	// cache it
-	[scopeSelectorCache setObject:attributes forKey:key];
+	// [scopeSelectorCache setObject:attributes forKey:key];
 
 	return attributes;
 }
@@ -166,8 +158,7 @@
 
 - (NSColor *)caretColor
 {
-	if (caretColor == nil)
-	{
+	if (caretColor == nil) {
 		NSColor *defaultCaretColor = [NSColor colorWithCalibratedRed:0.2
 								       green:0.2
 									blue:0.2
@@ -180,8 +171,7 @@
 
 - (NSColor *)selectionColor
 {
-	if (selectionColor == nil)
-	{
+	if (selectionColor == nil) {
 		NSColor *bg = [self colorWithName:@"selection" orDefault:[[NSColor blueColor] colorWithAlphaComponent:0.5]];
 		selectionColor = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
 	}

@@ -245,6 +245,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)highlightEverything
 {
+	/* Invalidate all document views. */
+	ViDocumentView *dv;
+	for (dv in views) {
+		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+	}
+	
 	NSInteger endLocation = [textStorage locationForStartOfLine:100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
@@ -345,8 +351,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"sender = %@, title = %@", sender, [sender title]);
 
 	[self setLanguageFromString:[sender title]];
-	if (language && [self fileURL])
-	{
+	if (language && [self fileURL]) {
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
 			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
 		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
@@ -359,8 +364,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViLanguage *newLanguage = nil;
 	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
 	[newLanguage patterns];
-	if (newLanguage != language)
-	{
+	if (newLanguage != language) {
 		language = newLanguage;
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
 		[self setSymbolScopes];

@@ -510,7 +510,7 @@ int logIndent = 0;
 		if (updatedCaret && *updatedCaret >= indentRange.location)
 		{
 			NSInteger d = [newIndent length] - [indent length];
-			*updatedCaret = IMAX((NSInteger)*updatedCaret + d, 0);
+			*updatedCaret = IMAX((NSInteger)*updatedCaret + d, bol);
 		}
 
 		// get next line

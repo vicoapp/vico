@@ -170,6 +170,7 @@
 - (void)test172_ShiftThreeLinesRight		{ TEST(@" abc\n\tdef\nghi\njkl", 0, @"3>>", @"\t abc\n\t\tdef\n\tghi\njkl", 1); }
 - (void)test173_ShiftLineLeft			{ TEST(@"\t\tabc\ndef", 3, @"<<", @"\tabc\ndef", 2); }
 - (void)test174_ShiftTwoLinesLeft		{ TEST(@" abc\n\tdef\nghi", 2, @"2<<", @"abc\ndef\nghi", 1); }
+- (void)test175_ShiftLineLeftAtColumn0		{ TEST(@"abc\n\tdef", 4, @"<<", @"abc\ndef", 4); }
 
 - (void)test180_OpenLineAbove			{ TEST(@"abc\ndef", 4, @"Oxxx\x1b", @"abc\nxxx\ndef", 6); }
 - (void)test181_DeleteToChar			{ TEST(@"abc def ghi", 0, @"df ", @"def ghi", 0); }

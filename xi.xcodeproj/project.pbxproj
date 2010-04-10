@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -390,13 +390,13 @@
 				9A1A11FF0D02C65A009EABAC /* ViCommand.m */,
 				9A73E27F0D8ECA4C00859053 /* ExCommand.h */,
 				9A73E2800D8ECA4C00859053 /* ExCommand.m */,
-				9A668E0F0D1116FC003FABD9 /* ViTheme.h */,
-				9A668E100D1116FC003FABD9 /* ViTheme.m */,
 				9A668E120D11172C003FABD9 /* ViLanguage.h */,
 				9A668E130D11172C003FABD9 /* ViLanguage.m */,
 				9A668E150D11174A003FABD9 /* ViLanguageStore.h */,
 				9A668E160D11174A003FABD9 /* ViLanguageStore.m */,
 				9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */,
+				9A668E100D1116FC003FABD9 /* ViTheme.m */,
+				9A668E0F0D1116FC003FABD9 /* ViTheme.h */,
 				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
 				9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */,
 				9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */,
@@ -601,7 +601,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* xi */;
 			projectDirPath = "";
@@ -704,17 +704,18 @@
 		9AF41B3D0EC8731B00F1D681 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
+			comments = "Build oniguruma 5.9.2 regular expressions library\n";
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/onig-5.9.1.tar.gz",
+				"$(SRCROOT)/onig-5.9.2.tar.gz",
 			);
 			outputPaths = (
 				"$(TARGET_BUILD_DIR)/oniguruma/lib/libonig.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\npwd\nls -l $TARGET_BUILD_DIR/oniguruma/lib\nrm -rf $TARGET_BUILD_DIR/onig-5.9.1\nrm -rf $TARGET_BUILD_DIR/oniguruma\ntar zxvf $SRCROOT/onig-5.9.1.tar.gz -C $TARGET_BUILD_DIR\ncd $TARGET_BUILD_DIR/onig-5.9.1\nCFLAGS=\"-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" LDFLAGS=\"-Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" ./configure --disable-shared  --disable-dependency-tracking --prefix=$TARGET_BUILD_DIR/oniguruma\nmake install\nls -l $TARGET_BUILD_DIR/oniguruma/lib\n";
+			shellScript = "set -x\npwd\nls -l $TARGET_BUILD_DIR/oniguruma/lib\nrm -rf $TARGET_BUILD_DIR/onig-5.9.2\nrm -rf $TARGET_BUILD_DIR/oniguruma\ntar zxvf $SRCROOT/onig-5.9.2.tar.gz -C $TARGET_BUILD_DIR\ncd $TARGET_BUILD_DIR/onig-5.9.2\nCFLAGS=\"-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" LDFLAGS=\"-Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" ./configure --disable-shared  --disable-dependency-tracking --prefix=$TARGET_BUILD_DIR/oniguruma\nmake install\nls -l $TARGET_BUILD_DIR/oniguruma/lib\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1003,6 +1004,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-lonig";
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64";
 				WARNING_CFLAGS = "-Wall";

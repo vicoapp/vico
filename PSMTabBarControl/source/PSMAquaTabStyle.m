@@ -364,7 +364,7 @@
     [aquaTabBg drawInRect:rect fromRect:NSMakeRect(0.0, 0.0, 1.0, 22.0) operation:NSCompositeSourceOver fraction:1.0];
     
     // no tab view == not connected
-    if(![bar tabView]){
+    if (![bar tabView]) {
         NSRect labelRect = rect;
         labelRect.size.height -= 4.0;
         labelRect.origin.y += 4.0;

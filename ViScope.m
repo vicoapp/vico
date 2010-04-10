@@ -8,8 +8,7 @@
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
 {
-	if ((self = [super init]) != nil)
-	{
+	if ((self = [super init]) != nil) {
 		scopes = scopesArray;
 		range = aRange;
 	}

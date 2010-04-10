@@ -709,7 +709,7 @@ do_realpath(struct sftp_conn *conn, char *path)
 
 	filename = buffer_get_string(&msg, NULL);
 	longname = buffer_get_string(&msg, NULL);
-	a = decode_attrib(&msg);
+	decode_attrib(&msg);
 
 	debug3("SSH_FXP_REALPATH %s -> %s", path, filename);
 

@@ -117,7 +117,7 @@
 - (id)initWithPath:(NSString *)aPath
 {
 	self = [super init];
-	if(self == nil)
+	if (self == nil)
 		return nil;
 
 	compiled = NO;
@@ -232,16 +232,14 @@
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage
 {
 	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
-	if(expandedPatterns == nil)
-	{
+	if (expandedPatterns == nil) {
 		ViLanguage *lang = [pattern objectForKey:@"language"];
-		if(lang == nil)
+		if (lang == nil)
 			lang = self;
 
 		BOOL canCache = YES;
 		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"] baseLanguage:baseLanguage canCache:&canCache];
-		if(expandedPatterns && canCache)
-		{
+		if (expandedPatterns && canCache) {
 			// cache it
 			[pattern setObject:expandedPatterns forKey:@"expandedPatterns"];
 		}

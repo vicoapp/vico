@@ -114,18 +114,15 @@ static ViLanguageStore *defaultStore = nil;
 - (ViBundle *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
 {
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		ViLanguage *language;
-		for (language in [bundle languages])
-		{
+		for (language in [bundle languages]) {
 			NSString *firstLineMatch = [language firstLineMatch];
 			if (firstLineMatch == nil)
 				continue;
 
 			ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
-			if ([rx matchInString:firstLine])
-			{
+			if ([rx matchInString:firstLine]) {
 				DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
 				if (languagePtr)
 					*languagePtr = language;
@@ -142,21 +139,20 @@ static ViLanguageStore *defaultStore = nil;
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		ViLanguage *language;
-		for (language in [bundle languages])
-		{
+
+		for (language in [bundle languages]) {
 			NSArray *fileTypes = [language fileTypes];
 			NSString *fileType;
-			for (fileType in fileTypes)
-			{
+
+			for (fileType in fileTypes) {
 				unsigned path_len = [aPath length];
 				unsigned ftype_len = [fileType length];
+
 				if ([aPath hasSuffix:fileType] &&
 				    (path_len == ftype_len ||
-				     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]]))
-				{
+				     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]])) {
 					DEBUG(@"Using language %@ for file %@", [language name], aPath);
 					if (languagePtr)
 						*languagePtr = language;
@@ -166,6 +162,7 @@ static ViLanguageStore *defaultStore = nil;
 			}
 		}
 	}
+
 	DEBUG(@"No language found for file %@", aPath);
 	return nil;
 }
@@ -173,16 +170,13 @@ static ViLanguageStore *defaultStore = nil;
 - (ViBundle *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr
 {
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		ViLanguage *language;
-		for (language in [bundle languages])
-		{
-			if ([[language displayName] isEqualToString:languageName])
-			{
+		for (language in [bundle languages]) {
+			if ([[language displayName] isEqualToString:languageName]) {
 				if (languagePtr)
 					*languagePtr = language;
-	
+
 				return bundle;
 			}
 		}
@@ -207,9 +201,8 @@ static ViLanguageStore *defaultStore = nil;
 	NSMutableArray *langnames = [[NSMutableArray alloc] init];
 	ViLanguage *lang;
 	for (lang in [languages allValues])
-	{
 		[langnames addObject:[lang displayName]];
-	}
+
 	return langnames;
 }
 
@@ -228,8 +221,7 @@ static ViLanguageStore *defaultStore = nil;
 	[cachedPreferences setObject:result forKey:prefsName];
 	
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		NSDictionary *p = [bundle preferenceItems:prefsName includeAllSettings:includeAllSettings];
 		if (p)
 			[result addEntriesFromDictionary:p];
@@ -246,13 +238,10 @@ static ViLanguageStore *defaultStore = nil;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 {
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		NSString *s = [bundle tabTrigger:name matchingScopes:scopes];
 		if (s)
-		{
 			return s;
-		}
 	}
 
 	return nil;

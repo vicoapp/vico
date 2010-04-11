@@ -267,7 +267,7 @@
 }
 
 #pragma mark -
-#pragma mark ---- drawing ----
+#pragma mark Drawing
 
 - (void)drawTabCell:(PSMTabBarCell *)cell
 {
@@ -300,10 +300,10 @@
 		
 		[bezier closePath];
 		
-		//[[NSColor windowBackgroundColor] set];
-		//[bezier fill];
-		[bezier linearGradientFillWithStartColor:[NSColor colorWithCalibratedWhite:0.99 alpha:1.0]
-										endColor:[NSColor colorWithCalibratedWhite:0.941 alpha:1.0]];
+                [[NSColor colorWithCalibratedWhite:0.0 alpha:0.1] set];
+		[bezier fill];
+		//[bezier linearGradientFillWithStartColor:[NSColor colorWithCalibratedWhite:0.99 alpha:1.0]
+		//								endColor:[NSColor colorWithCalibratedWhite:0.941 alpha:1.0]];
 		
 		[lineColor set];
         [bezier stroke];

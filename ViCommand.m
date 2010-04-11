@@ -225,11 +225,12 @@ find_command_in_map(int key, struct vikey map[])
 @synthesize key;
 @synthesize motion_key;
 @synthesize argument;
+@synthesize is_dot;
 @synthesize text;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
-- (void)setComplete:(BOOL)is_dot
+- (void)setComplete
 {
 	complete = YES;
 
@@ -271,9 +272,11 @@ find_command_in_map(int key, struct vikey map[])
 
 - (void)pushKey:(unichar)aKey
 {
+	is_dot = NO;
+
 	if (state == ViCommandNeedChar) {
 		argument = aKey;
-		[self setComplete:NO];
+		[self setComplete];
 
 		return;
 	}
@@ -291,9 +294,11 @@ find_command_in_map(int key, struct vikey map[])
 
 	// check for the dot command
 	if (aKey == '.') {
+		is_dot = YES;
+
 		if (dot_command == nil) {
 			method = @"nodot:"; // prints "No command to repeat"
-			[self setComplete:YES];
+			[self setComplete];
 			return;
 		}
 
@@ -307,7 +312,7 @@ find_command_in_map(int key, struct vikey map[])
 		argument = dot_argument;
 		if (dot_motion_command)
 			motion_key = dot_motion_command->key;
-		[self setComplete:YES];
+		[self setComplete];
 		return;
 	} else if (aKey == ';' || aKey == ',') {
 		if(last_ftFT_command == nil)
@@ -319,7 +324,7 @@ find_command_in_map(int key, struct vikey map[])
 			argument = last_ftFT_argument;
 			key = last_ftFT_command->key;
 		}
-		[self setComplete:NO];
+		[self setComplete];
 		return;
 	}
 
@@ -343,7 +348,7 @@ find_command_in_map(int key, struct vikey map[])
 		} else
 			method = @"illegal:";
 		key = aKey;
-		[self setComplete:NO];
+		[self setComplete];
 		return;
 	}
 
@@ -357,7 +362,7 @@ find_command_in_map(int key, struct vikey map[])
 			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
 			state = ViCommandNeedChar;
 		} else
-			[self setComplete:NO];
+			[self setComplete];
 	} else if (state == ViCommandNeedMotion) {
 		motion_key = aKey;
 
@@ -379,7 +384,7 @@ find_command_in_map(int key, struct vikey map[])
 		if (has_flag(vikey, VIF_NEED_CHAR))
 			state = ViCommandNeedChar;
 		else
-			[self setComplete:NO];
+			[self setComplete];
 	}
 }
 

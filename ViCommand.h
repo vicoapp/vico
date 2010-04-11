@@ -1,10 +1,3 @@
-//
-//  Parser for vi commands.
-//
-//  Created by Martin Hedenfalk on 2007-12-02.
-//  Copyright 2007 Martin Hedenfalk. All rights reserved.
-//
-
 #import <Cocoa/Cocoa.h>
 
 typedef enum { ViCommandInitialState, ViCommandNeedMotion, ViCommandNeedChar } ViCommandState;
@@ -32,6 +25,7 @@ struct vikey
 	unichar motion_key;
 	unichar argument; // extra character argument for f, t, r etc.
 
+	BOOL is_dot;	// true if command is the dot command
 	struct vikey *dot_command;
 	struct vikey *dot_motion_command;
 	int dot_count;
@@ -56,6 +50,7 @@ struct vikey
 @property(readwrite) int count;
 @property(readwrite) int motion_count;
 @property(readonly) unichar key;
+@property(readonly) BOOL is_dot;
 @property(readonly) unichar motion_key;
 @property(readonly) unichar argument;
 @property(readwrite, copy) NSArray *text;

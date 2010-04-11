@@ -82,6 +82,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)setNormalMode;
@@ -107,6 +108,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)deleteRange:(NSRange)aRange;
+- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup;
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString;
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
@@ -148,3 +150,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (BOOL)delete:(ViCommand *)command;
 - (BOOL)yank:(ViCommand *)command;
 @end
+
+@interface ViTextView (bundleCommands)
+- (void)performBundleCommand:(id)sender;
+@end
+

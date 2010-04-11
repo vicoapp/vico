@@ -64,6 +64,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	CGFloat pageGuideX;
 
 	BOOL hasUndoGroup;
+	int undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
 - (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;

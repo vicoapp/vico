@@ -1375,6 +1375,8 @@ int logIndent = 0;
 		if (parser.complete) {
 			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
+			if (parser.key != 'u' && !parser.is_dot)
+				undo_direction = 0;
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode) {
 				// still in normal mode
@@ -1578,6 +1580,13 @@ int logIndent = 0;
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange
 {
+	if (aLocation >= [[self textStorage] length]) {
+		INFO(@"start/to outside valid range (length %u)", [[self textStorage] length]);
+		if (returnRange != nil)
+			*returnRange = NSMakeRange(0, 0);
+		return @"";
+	}
+
 	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
 	if (word_start < aLocation && word_start > 0)
 		word_start += 1;

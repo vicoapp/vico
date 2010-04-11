@@ -119,7 +119,12 @@
 
 	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[self wordAtLocation:[self caret]]];
-	[self setenv:"TM_DIRECTORY" value:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+
+	// [self setenv:"TM_DIRECTORY" value:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
+	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
+	// FIXME: TM_PROJECT_DIRECTORY
+	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
+
 	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];
 	[self setenv:"TM_FULLNAME" value:NSFullUserName()];
@@ -127,7 +132,6 @@
 	[self setenv:"TM_LINE_NUMBER" integer:[self currentLine]];
 	[self setenv:"TM_SCOPE" value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
 
-	// FIXME: TM_PROJECT_DIRECTORY
 	// FIXME: TM_SELECTED_FILES
 	// FIXME: TM_SELECTED_FILE
 	[self setenv:"TM_SELECTED_TEXT" value:[[[self textStorage] string] substringWithRange:[self selectedRange]]];
@@ -171,7 +175,7 @@
 	int fd = -1;
 
 	NSString *shellCommand = [command objectForKey:@"command"];
-	if ([shellCommand hasPrefix:@"#!"])
+//	if ([shellCommand hasPrefix:@"#!"])
 	{
 		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_cmd.XXXXXX"] fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
@@ -216,6 +220,7 @@
 	NSString *outputFormat = [command objectForKey:@"output"];
 
 	[self setupEnvironmentForCommand:command];
+	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 	[task launch];
 	if ([inputText length] > 0)
 	{

@@ -746,31 +746,23 @@ int logIndent = 0;
 
 	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string] options:rx_options];
 
-	if ([foundMatches count] == 0)
-	{
+	if ([foundMatches count] == 0) {
 		[[self delegate] message:@"Pattern not found"];
-	}
-	else
-	{
+	} else {
 		ViRegexpMatch *match, *nextMatch = nil;
-		for (match in foundMatches)
-		{
+		for (match in foundMatches) {
 			NSRange r = [match rangeOfMatchedString];
-			if (find_options == 0)
-			{
-				if (nextMatch == nil && r.location > start_location)
+			if (find_options == 0) {
+				if (nextMatch == nil && r.location > start_location) {
 					nextMatch = match;
-			}
-			else if (r.location < start_location)
-			{
+					break;
+				}
+			} else if (r.location < start_location) {
 				nextMatch = match;
 			}
-			if (nextMatch)
-				break;
 		}
 
-		if (nextMatch == nil)
-		{
+		if (nextMatch == nil) {
 			if (find_options == 0)
 				nextMatch = [foundMatches objectAtIndex:0];
 			else
@@ -779,8 +771,7 @@ int logIndent = 0;
 			[[self delegate] message:@"Search wrapped"];
 		}
 
-		if (nextMatch)
-		{
+		if (nextMatch) {
 			NSRange r = [nextMatch rangeOfMatchedString];
 			[self scrollRangeToVisible:r];
 			final_location = end_location = r.location;
@@ -801,8 +792,7 @@ int logIndent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern
 {
-	if ([self findPattern:pattern options:0])
-	{
+	if ([self findPattern:pattern options:0]) {
 		[self pushLocationOnJumpList:start_location];
 		[self setCaret:final_location];
 	}
@@ -821,8 +811,7 @@ int logIndent = 0;
 - (BOOL)repeat_find:(ViCommand *)command
 {
 	NSString *pattern = [[NSApp delegate] lastSearchPattern];
-	if (pattern == nil)
-	{
+	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
@@ -835,8 +824,7 @@ int logIndent = 0;
 - (BOOL)repeat_find_backward:(ViCommand *)command
 {
 	NSString *pattern = [[NSApp delegate] lastSearchPattern];
-	if (pattern == nil)
-	{
+	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
@@ -901,8 +889,7 @@ int logIndent = 0;
 
 - (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange granularity:(NSSelectionGranularity)granularity
 {
-	if (proposedSelRange.length == 0 && granularity == NSSelectByCharacter)
-	{
+	if (proposedSelRange.length == 0 && granularity == NSSelectByCharacter) {
 		NSUInteger bol, eol, end;
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:proposedSelRange.location];
 		if (proposedSelRange.location == eol)
@@ -1062,7 +1049,7 @@ int logIndent = 0;
 				[self insertString:[NSString stringWithFormat:@"%@%@",
 					[pair objectAtIndex:0],
 					[pair objectAtIndex:1]] atLocation:start_location];
-				
+
 				// INFO(@"adding smart pair attr to %u + 2", start_location);
 				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
 				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:

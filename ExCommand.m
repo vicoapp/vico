@@ -93,11 +93,6 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"ar[gs]",
 		@"display file argument list"},
-	/* C_BG */
-	{@"bg",		@"ex_bg",		EX_VIONLY,
-		"",
-		@"bg",
-		@"put a foreground screen into the background"},
 	/* C_CHANGE */
 	{@"change",	@"ex_change",	EX_ADDR2|EX_ADDR_ZERODEF,
 		"!ca",
@@ -158,11 +153,6 @@ static struct ex_command ex_commands[] = {
 		"f1o",
 		@"f[ile] [name]",
 		@"display (and optionally set) file name"},
-	/* C_FG */
-	{@"fg",		@"ex_fg",		EX_NEWSCREEN|EX_VIONLY,
-		"f1o",
-		@"[Ff]g [file]",
-		@"bring a backgrounded screen into the foreground"},
 	/* C_GLOBAL */
 	{@"global",	@"ex_global",	EX_ADDR2_ALL,
 		"!s",
@@ -188,11 +178,6 @@ static struct ex_command ex_commands[] = {
 		"w1r",
 		@"[line] k key",
 		@"mark a line position"},
-	/* C_LIST */
-	{@"list",	@"ex_list",	EX_ADDR2|EX_CLRFLAG,
-		"ca1",
-		@"[line [,line]] l[ist] [count] [#]",
-		@"display lines in an unambiguous form"},
 	/* C_MOVE */
 	{@"move",	@"ex_move",	EX_ADDR2|EX_AUTOPRINT,
 		"l",
@@ -233,16 +218,6 @@ static struct ex_command ex_commands[] = {
 		"ca1",
 		@"[line [,line]] p[rint] [count] [#l]",
 		@"display lines"},
-	/* C_PERLCMD */
-	{@"perl",	@"ex_perl",	EX_ADDR2_ALL|EX_ADDR_ZERO|EX_ADDR_ZERODEF|EX_SECURE,
-		"s",
-		@"pe[rl] cmd",
-		@"run the perl interpreter with the command"},
-	/* C_PERLDOCMD */
-	{@"perldo",	@"ex_perl",	EX_ADDR2_ALL|EX_ADDR_ZERO|EX_ADDR_ZERODEF|EX_SECURE,
-		"s",
-		@"perld[o] cmd",
-		@"run the perl interpreter with the command, on each line"},
 	/* C_PRESERVE */
 	{@"preserve",	@"ex_preserve",	0,
 		"",
@@ -360,11 +335,6 @@ static struct ex_command ex_commands[] = {
 		"!",
 		@"tagt[op][!]",
 		@"discard all tags"},
-	/* C_TCLCMD */
-	{@"tcl",		@"ex_tcl",		EX_ADDR2_ALL|EX_ADDR_ZERO|EX_ADDR_ZERODEF|EX_SECURE,
-		"s",
-		@"tc[l] cmd",
-		@"run the tcl interpreter with the command"},
 	/* C_UNDO */
 	{@"undo",	@"ex_undo",	EX_AUTOPRINT,
 		"",
@@ -390,11 +360,6 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"version",
 		@"display the program version information"},
-	/* C_VISUAL_EX */
-	{@"visual",	@"ex_visual",	EX_ADDR1|EX_ADDR_ZERODEF,
-		"2c11",
-		@"[line] vi[sual] [-|.|+|^] [window_size] [flags]",
-		@"enter visual (vi) mode from ex mode"},
 	/* C_VISUAL_VI */
 	{@"visual",	@"ex_edit",	EX_NEWSCREEN,
 		"f1o",
@@ -688,7 +653,9 @@ ex_cmd_find(NSString *cmd)
 		return naddr;
 	++naddr;
 
-	if ([[scan string] characterAtIndex:[scan scanLocation]] == ',')
+	if ([scan isAtEnd])
+		return naddr;
+	else if ([[scan string] characterAtIndex:[scan scanLocation]] == ',')
 		[scan setScanLocation:[scan scanLocation] + 1];
 	else if ([[scan string] characterAtIndex:[scan scanLocation]] == ';')
 		[scan setScanLocation:[scan scanLocation] + 1];
@@ -747,7 +714,6 @@ ex_cmd_find(NSString *cmd)
 	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 	[scan scanCharactersFromSet:colonSet intoString:nil];
 
-
 	/*
 	 * If no command, ex does the last specified of p, l, or #, and vi
 	 * moves to the line.  Otherwise, determine the length of the command
@@ -769,11 +735,11 @@ ex_cmd_find(NSString *cmd)
 	 * command for each separator.
 	 */
 
-	unichar ch = [string characterAtIndex:[scan scanLocation]];
-	if ([scan isAtEnd] || ch == '|' || ch == '\n')
+	unichar ch;
+	if ([scan isAtEnd] || (ch = [string characterAtIndex:[scan scanLocation]]) == '|' || ch == '\n')
 	{
 		/* default command */
-		name = @"print";
+		name = @"#";
 		command = ex_cmd_find(name);
 		return YES;
 	}

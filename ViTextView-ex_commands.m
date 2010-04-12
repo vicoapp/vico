@@ -2,6 +2,7 @@
 #import "ViDocument.h"
 #import "ExCommand.h"
 #import "ViAppController.h"
+#import "NSTextStorage-additions.h"
 
 @implementation ViTextView (ex_commands)
 
@@ -91,6 +92,26 @@
 
 - (void)ex_bang:(ExCommand *)command
 {
+}
+
+- (void)ex_number:(ExCommand *)command
+{
+	NSUInteger line;
+
+	if (command.addr2->type == EX_ADDR_ABS) {
+		line = command.addr2->addr.abs.line;
+	} else if (command.addr1->type == EX_ADDR_ABS) {
+		line = command.addr1->addr.abs.line;
+	} else {
+		[[self delegate] message:@"Not implemented."];
+		return;
+	}
+
+	NSInteger location = [[self textStorage] locationForStartOfLine:line];
+	if (location == -1)
+		[[self delegate] message:@"Movement past the end-of-file"];
+	else
+		[self setCaret:location];
 }
 
 - (void)ex_set:(ExCommand *)command

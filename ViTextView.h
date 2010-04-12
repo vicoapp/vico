@@ -25,46 +25,42 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView : NSTextView
 {
-	ViDocumentView *documentView;
-
-	ViMode mode;
-	ViCommand *parser;
-	BOOL replayingInput;  // true when dot command replays input
-	NSUndoManager *undoManager;
-	NSDictionary *typingAttributes;
-
-	ViTagsDatabase *tags; // XXX: doesn't belong here!?
-
-	NSMutableArray *inputKeys;
+	ViDocumentView		*documentView;
+	ViMode			 mode;
+	ViCommand		*parser;
+	BOOL			 replayingInput;  // true when dot command replays input
+	NSUndoManager		*undoManager;
+	NSDictionary		*typingAttributes;
+	ViTagsDatabase		*tags; // XXX: doesn't belong here!?
+	NSMutableArray		*inputKeys;
 
 	// block cursor
-	NSUInteger caret;
-	NSRect caretRect;
-	NSRect oldCaretRect;
+	NSUInteger		 caret;
+	NSRect			 caretRect;
+	NSRect			 oldCaretRect;
 
-	NSMutableDictionary *buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
+	NSMutableDictionary	*buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
 
-	NSRange affectedRange;
-	NSUInteger start_location, end_location, final_location;
+	NSRange			 affectedRange;
+	NSUInteger		 start_location, end_location, final_location;
 
 	// visual mode
-	NSUInteger visual_start_location;
-	BOOL visual_line_mode;
+	NSUInteger		 visual_start_location;
+	BOOL			 visual_line_mode;
 
-	NSMutableCharacterSet *wordSet;
-	NSMutableCharacterSet *nonWordSet;
-	NSCharacterSet *whitespace;
+	NSMutableCharacterSet	*wordSet;
+	NSMutableCharacterSet	*nonWordSet;
+	NSCharacterSet		*whitespace;
 
-	NSDictionary *inputCommands;
-	NSDictionary *normalCommands;
+	NSDictionary		*inputCommands;
+	NSDictionary		*normalCommands;
 
-	NSMutableDictionary *marks; // XXX: move to document
-	ViSnippet *activeSnippet; // XXX: move to document ?
+	NSMutableDictionary	*marks; // XXX: move to document
+	ViSnippet		*activeSnippet; // XXX: move to document ?
 
-	CGFloat pageGuideX;
-
-	BOOL hasUndoGroup;
-	int undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
+	CGFloat			 pageGuideX;
+	BOOL			 hasUndoGroup;
+	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
 - (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;

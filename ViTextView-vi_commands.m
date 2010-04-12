@@ -1073,14 +1073,14 @@
 	if (undo_direction == 1) {
 		if (![undoManager canUndo]) {
 			DEBUG(@"%s", "can't undo");
-			[[self delegate] message:@"Can't undo"];
+			[[self delegate] message:@"No changes to undo"];
 			return NO;
 		}
 		[undoManager undo];
 	} else {
 		if (![undoManager canRedo]) {
 			DEBUG(@"%s", "can't redo");
-			[[self delegate] message:@"Can't redo"];
+			[[self delegate] message:@"No changes to re-do"];
 			return NO;
 		}
 		[undoManager redo];

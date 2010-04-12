@@ -164,6 +164,10 @@
 - (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"i ghi\x1bu", @"abc def", 2); }
 // XXX: cursor doesn't return to correct position when undoing an append
 //- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+- (void)test163_UndoRedo			{ TEST(@"abc def", 0, @"xxxxuu", @"def", 0); }
+- (void)test164_RepeatUndo			{ TEST(@"abc def", 0, @"xxxxu..", @"bc def", 0); }
+- (void)test165_RepeatRedo			{ TEST(@"abc def", 0, @"xxxxu..u.", @" def", 0); }
+- (void)test166_UndoAndRedoEdit			{ TEST(@"ab cd ef gh", 0, @"ix\x1bw.uw.", @"xab cd xef gh", 7); }
 
 - (void)test170_ShiftLineRight			{ TEST(@"abc\ndef", 0, @">>", @"\tabc\ndef", 1); }
 - (void)test171_ShiftTwoLinesRight		{ TEST(@" abc\n\tdef\nghi", 0, @"2>>", @"\t abc\n\t\tdef\nghi", 1); }

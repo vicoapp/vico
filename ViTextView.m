@@ -43,6 +43,7 @@ int logIndent = 0;
 	buffers = [[NSApp delegate] sharedBuffers];
 	inputKeys = [[NSMutableArray alloc] init];
 	marks = [[NSMutableDictionary alloc] init];
+	saved_column = -1;
 
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -1375,6 +1376,12 @@ int logIndent = 0;
 		if (parser.complete) {
 			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
+			if (parser.key == 'j' || parser.key == 'k') {
+				if (saved_column < 0)
+					saved_column = [self columnAtLocation:[self caret]];	
+			} else {
+				saved_column = -1;
+			}
 			if (parser.key != 'u' && !parser.is_dot)
 				undo_direction = 0;
 			[self evaluateCommand:parser];

@@ -225,7 +225,7 @@
         NSUInteger end, eol;
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	NSRange lineRange = NSMakeRange(start_location, end - start_location);
-        
+
         NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
         if (openingRange.location == NSNotFound)
         {
@@ -800,9 +800,8 @@
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
-	
-	NSUInteger column = [self columnAtLocation:start_location];
-	[self gotoColumn:column fromLocation:bol - 1];
+
+	[self gotoColumn:saved_column fromLocation:bol - 1];
 	return YES;
 }
 
@@ -820,9 +819,8 @@
 		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
 	}
-	
-	while (--count > 0)
-	{
+
+	while (--count > 0) {
 		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:end];
 		if (end >= [[self textStorage] length])
 		{
@@ -831,8 +829,7 @@
 		}
 	}
 
-	NSUInteger column = [self columnAtLocation:start_location];
-	[self gotoColumn:column fromLocation:end];
+	[self gotoColumn:saved_column fromLocation:end];
 	return YES;
 }
 

@@ -44,6 +44,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
 
+	NSInteger		 saved_column;
+
 	// visual mode
 	NSUInteger		 visual_start_location;
 	BOOL			 visual_line_mode;

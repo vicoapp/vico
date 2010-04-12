@@ -466,9 +466,7 @@
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	if ([[filterField stringValue] length] > 0)
-        {
                 return [self relativePathForItem:item];
-        }
         else
                 return [[[item objectForKey:@"url"] path] lastPathComponent];
 }
@@ -481,39 +479,29 @@
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
-	if ([self outlineView:outlineView isGroupItem:item])
-		return 20;
 	return 16;
 }
 
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	NSCell *cell = [tableColumn dataCellForRow:[explorer rowForItem:item]];
-	if (cell)
-	{
+	if (cell) {
 		NSURL *url = [item objectForKey:@"url"];
 		NSImage *img;
 		if ([url isFileURL])
 			img = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];
-		else
-		{
+		else {
 			if ([self outlineView:outlineView isItemExpandable:item])
 				img = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
 			else
 				img = [[NSWorkspace sharedWorkspace] iconForFileType:[[url path] pathExtension]];
 		}
-		if (![self outlineView:outlineView isGroupItem:item])
-		{
-			[img setSize:NSMakeSize(16, 16)];
-			[cell setFont:[NSFont systemFontOfSize:11.0]];
-		}
-		else
-		{
-			[img setSize:NSMakeSize(16, 16)];
-			[cell setFont:[NSFont systemFontOfSize:13.0]];
-		}
+
+		[cell setFont:[NSFont systemFontOfSize:11.0]];
+		[img setSize:NSMakeSize(16, 16)];
 		[cell setImage:img];
 	}
+
 	return cell;
 }
 

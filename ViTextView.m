@@ -1286,12 +1286,10 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-#if 1
-	INFO(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
+	DEBUG(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
               ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-#endif
 
 	if ([[theEvent characters] length] == 0)
 		return [super keyDown:theEvent];
@@ -1376,12 +1374,14 @@ int logIndent = 0;
 		if (parser.complete) {
 			[[self delegate] message:@""]; // erase any previous message
 			[[self textStorage] beginEditing];
-			if (parser.key == 'j' || parser.key == 'k') {
+
+			/* Set or reset the saved column for up/down movement. */
+			if (parser.key == 'j' || parser.key == 'k' || parser.key == '\x05' || parser.key == '\x19') {
 				if (saved_column < 0)
 					saved_column = [self columnAtLocation:[self caret]];	
-			} else {
+			} else
 				saved_column = -1;
-			}
+
 			if (parser.key != 'u' && !parser.is_dot)
 				undo_direction = 0;
 			[self evaluateCommand:parser];

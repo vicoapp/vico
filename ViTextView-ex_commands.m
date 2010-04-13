@@ -110,8 +110,11 @@
 	NSInteger location = [[self textStorage] locationForStartOfLine:line];
 	if (location == -1)
 		[[self delegate] message:@"Movement past the end-of-file"];
-	else
+	else {
 		[self setCaret:location];
+		[self scrollToCaret];
+
+	}
 }
 
 - (void)ex_set:(ExCommand *)command

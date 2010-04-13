@@ -89,6 +89,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (void)setInsertMode:(ViCommand *)command;
 - (void)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
+- (void)scrollToCaret;
 - (NSUInteger)caret;
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;

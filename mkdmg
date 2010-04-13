@@ -1,17 +1,13 @@
 #!/bin/sh
 
-#. ../version.mk
-#test -z "$VERSION" && die "can't find version information"
-VERSION=0.3
+if test -z "$VERSION"; then
+	echo "missing version"
+	exit 2
+fi
 
 echo "Building xi version $VERSION"
 
-# fix version in info.plist
-sed -E -i.bak \
-  "/CFBundleVersion/ { n; s/(.*>)[^<]*(<.*)/\1${VERSION}\2/; }" Info.plist
-
-# xcodebuild -project xi.xcodeproj -target xi -configuration Release clean || exit
-xcodebuild -project xi.xcodeproj -target xi -configuration Release || exit
+xcodebuild -project xi.xcodeproj -target xi -configuration Release clean build VERSION=$VERSION || exit
 
 TMPDMG=xi-tmp.dmg
 /bin/rm -f $TMPDMG
@@ -33,7 +29,7 @@ echo "Creating disk image $VOL"
 trap 'rm -f $TMPDMG; exit 1' 2 3 15
 
 # create a disk image
-hdiutil create -megabytes 20 $TMPDMG -layout NONE
+hdiutil create -megabytes 30 $TMPDMG -layout NONE
 # associate a device with this but don't mount it
 MYDEV=`hdid -nomount $TMPDMG`
 test -n "$MYDEV" || die "failed to attach disk image"
@@ -49,10 +45,6 @@ root="/Volumes/$VOL"
 # copy stuff to the disk image
 /bin/cp -R $APP "$root" || die "failed to copy application to disk image"
 #/bin/cp README.txt "$root" || die "failed to copy README.txt to disk image"
-
-#mkdir -p "$root/plugins"
-#/bin/cp ../plugins/*.lua "$root/plugins"
-#/bin/cp plugins/*.lua "$root/plugins"
 
 rm -f $VOL.dmg
 

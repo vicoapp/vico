@@ -151,8 +151,7 @@
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
 	// check if last line is visible
-	if (NSMaxRange(range) >= [[self textStorage] length])
-	{
+	if (NSMaxRange(range) >= [[self textStorage] length]) {
 		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
 	}
@@ -161,9 +160,7 @@
 	[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:range.location];
 
 	if (start_location < end)
-	{
 		[self move_down:command];
-	}
 
 	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(end, 1) inTextContainer:[self textContainer]];
 	NSRect bounds = [clipView bounds];

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"
 	exit 2

@@ -362,7 +362,7 @@
 	<key>CFBundleSignature</key>
 	<string>XIED</string>
 	<key>CFBundleVersion</key>
-	<string>0.3</string>
+	<string>${VERSION}</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

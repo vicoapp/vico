@@ -178,6 +178,21 @@ size_t num_requests = 64;
 	return nil;
 }
 
+- (NSString *)randomFileAtDirectory:(NSString *)aDirectory
+{
+	char remote_temp_file[37];
+	NSString *remote_temp_path = nil;
+	do
+	{
+		uuid_t uuid;
+		uuid_generate(uuid);
+		uuid_unparse(uuid, remote_temp_file);
+		remote_temp_path = [aDirectory stringByAppendingPathComponent:[NSString stringWithUTF8String:remote_temp_file]];
+	} while ([self stat:remote_temp_path] != NULL);
+
+	return remote_temp_path;
+}
+
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError
 {
 	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_sftp_upload.XXXXXX"] fileSystemRepresentation];
@@ -207,22 +222,26 @@ size_t num_requests = 64;
 	unlink(templateFilename);
 	[handle seekToFileOffset:0ULL];
 
-	char remote_temp_file[37];
-	NSString *remote_temp_path = nil;
-	do
-	{
-		uuid_t uuid;
-		uuid_generate(uuid);
-		uuid_unparse(uuid, remote_temp_file);
-		remote_temp_path = [[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithUTF8String:remote_temp_file]];
-	} while ([self stat:remote_temp_path] != NULL);
+	NSString *remote_temp_path = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
 
 	int status = do_upload(conn, fd, templateFilename, [remote_temp_path UTF8String], [self stat:path], 0);
 	close(fd);
 	if (status == 0)
 	{
-		if (do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0)
-			return YES;
+		if (sftp_has_posix_rename(conn)) {
+			if (do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0)
+				return YES;
+		} else {
+			/* Without POSIX rename support, first move away the existing file, rename our temporary file
+			 * to correct name, and finally delete the moved away original file.
+			 * XXX: doesn't work for new files.
+			 */
+			NSString *remote_temp_path2 = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+			if (do_rename(conn, [path UTF8String], [remote_temp_path2 UTF8String]) == 0 &&
+			    do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0 &&
+			    do_rm(conn, [remote_temp_path2 UTF8String]) == 0)
+				return YES;
+		}
 
 		*outError = [NSError errorWithDomain:@"SFTP" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Failed to rename remote temporary file." forKey:NSLocalizedDescriptionKey]];
 	}

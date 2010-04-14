@@ -111,4 +111,6 @@ int do_download(struct sftp_conn *, const char *, int, int);
  */
 int do_upload(struct sftp_conn *, int, const char *, const char *, Attrib *, int);
 
+int sftp_has_posix_rename(struct sftp_conn *conn);
+
 #endif

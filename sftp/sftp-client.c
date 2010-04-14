@@ -1323,3 +1323,10 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 
 	return status;
 }
+
+int
+sftp_has_posix_rename(struct sftp_conn *conn)
+{
+	return ((conn->exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
+}
+

@@ -23,6 +23,5 @@ cvs co -r $tag -d $dir xi || exit 2
 
 cd $dir
 ./mkdmg $version || exit 3
-mv $dir/xi-$version.dmg .
-ls -lh xi-$version.dmg 
+scp xi-$version.dmg xi.bzero.se:/var/www/xi.bzero.se/download
 

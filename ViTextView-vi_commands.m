@@ -192,12 +192,8 @@
 	// check if caret is on the last line
 	NSUInteger last_bol;
 	[self getLineStart:&last_bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
-	INFO(@"start_location = %u, last_bol = %u", start_location, last_bol);
 	if (start_location >= last_bol)
-	{
-		INFO(@"%s", "move up");
 		[self move_up:command];
-	}
 
 	// get the line above the first visible line
 	NSUInteger bol;
@@ -521,10 +517,8 @@
 {
 	int count;
 
-	INFO(@"mode == %i", mode);
 	if (mode == ViVisualMode)
 	{
-		INFO(@"affectedRange = %@", NSStringFromRange(affectedRange));
 		count = affectedRange.length;
 	}
 	else
@@ -676,8 +670,7 @@
 	
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
-	INFO(@"join: bol = %u, eol = %u, end = %u, eol2 = %u, end2 = %u", bol, eol, end, eol2, end2);
-	
+
 	if (eol2 == end || bol == eol || [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
@@ -1156,7 +1149,6 @@
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		if (end_location > eol && bol != eol)
 		{
-			// INFO(@"adjusting location from %lu to %lu at EOL", end_location, eol);
 			end_location = eol;
 		}
 	}
@@ -1579,7 +1571,6 @@
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	ViMark *m = [[ViMark alloc] initWithLine:[self currentLine] column:start_location - bol];
-	INFO(@"set mark %C at line %u, column %u", command.argument, m.line, m.column);
 	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", command.argument]];
 	return YES;
 }

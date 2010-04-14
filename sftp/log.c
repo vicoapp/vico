@@ -295,13 +295,9 @@ log_init(char *av0, LogLevel level, SyslogFacility facility, int on_stderr)
 void
 do_log(LogLevel level, const char *fmt, va_list args)
 {
-#if 0
-	struct syslog_data sdata = SYSLOG_DATA_INIT;
-#endif
 	char msgbuf[MSGBUFSIZ];
 	char fmtbuf[MSGBUFSIZ];
 	char *txt = NULL;
-	int pri = LOG_INFO;
 	int saved_errno = errno;
 
 	if (level > log_level)
@@ -313,34 +309,26 @@ do_log(LogLevel level, const char *fmt, va_list args)
 	case SYSLOG_LEVEL_FATAL:
 		if (!log_on_stderr)
 			txt = "fatal";
-		pri = LOG_CRIT;
 		break;
 	case SYSLOG_LEVEL_ERROR:
 		if (!log_on_stderr)
 			txt = "error";
-		pri = LOG_ERR;
 		break;
 	case SYSLOG_LEVEL_INFO:
-		pri = LOG_INFO;
 		break;
 	case SYSLOG_LEVEL_VERBOSE:
-		pri = LOG_INFO;
 		break;
 	case SYSLOG_LEVEL_DEBUG1:
 		txt = "debug1";
-		pri = LOG_DEBUG;
 		break;
 	case SYSLOG_LEVEL_DEBUG2:
 		txt = "debug2";
-		pri = LOG_DEBUG;
 		break;
 	case SYSLOG_LEVEL_DEBUG3:
 		txt = "debug3";
-		pri = LOG_DEBUG;
 		break;
 	default:
 		txt = "internal error";
-		pri = LOG_ERR;
 		break;
 	}
 	if (txt != NULL) {
@@ -350,15 +338,7 @@ do_log(LogLevel level, const char *fmt, va_list args)
 		vsnprintf(msgbuf, sizeof(msgbuf), fmt, args);
 	}
 	strnvis(fmtbuf, msgbuf, sizeof(fmtbuf), VIS_SAFE|VIS_OCTAL);
-	if (log_on_stderr) {
-		snprintf(msgbuf, sizeof msgbuf, "%s\r\n", fmtbuf);
-		write(STDERR_FILENO, msgbuf, strlen(msgbuf));
-	} else {
-#if 0
-		openlog_r(argv0 ? argv0 : __progname, LOG_PID, log_facility, &sdata);
-		syslog_r(pri, &sdata, "%.500s", fmtbuf);
-		closelog_r(&sdata);
-#endif
-	}
+	snprintf(msgbuf, sizeof msgbuf, "%s\r\n", fmtbuf);
+	write(STDERR_FILENO, msgbuf, strlen(msgbuf));
 	errno = saved_errno;
 }

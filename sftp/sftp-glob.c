@@ -1,4 +1,4 @@
-/* $OpenBSD: sftp-glob.c,v 1.22 2006/08/03 03:34:42 deraadt Exp $ */
+/* $OpenBSD: sftp-glob.c,v 1.21 2006/07/22 20:48:23 stevesk Exp $ */
 /*
  * Copyright (c) 2001-2004 Damien Miller <djm@openbsd.org>
  *

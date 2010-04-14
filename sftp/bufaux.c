@@ -1,4 +1,4 @@
-/* $OpenBSD: bufaux.c,v 1.46 2008/06/10 23:21:34 dtucker Exp $ */
+/* $OpenBSD: bufaux.c,v 1.48 2010/02/02 22:49:34 djm Exp $ */
 /*
  * Author: Tatu Ylonen <ylo@cs.hut.fi>
  * Copyright (c) 1995 Tatu Ylonen <ylo@cs.hut.fi>, Espoo, Finland
@@ -38,12 +38,12 @@
  */
 
 #include <sys/types.h>
-#include <sys/time.h>
 
 #include <openssl/bn.h>
 
 #include <string.h>
 #include <stdarg.h>
+#include <sys/time.h>
 
 #include "xmalloc.h"
 #include "buffer.h"
@@ -83,7 +83,8 @@ buffer_get_int_ret(u_int *ret, Buffer *buffer)
 
 	if (buffer_get_ret(buffer, (char *) buf, 4) == -1)
 		return (-1);
-	*ret = get_u32(buf);
+	if (ret != NULL)
+		*ret = get_u32(buf);
 	return (0);
 }
 
@@ -105,7 +106,8 @@ buffer_get_int64_ret(u_int64_t *ret, Buffer *buffer)
 
 	if (buffer_get_ret(buffer, (char *) buf, 8) == -1)
 		return (-1);
-	*ret = get_u64(buf);
+	if (ret != NULL)
+		*ret = get_u64(buf);
 	return (0);
 }
 
@@ -165,7 +167,10 @@ buffer_get_string_ret(Buffer *buffer, u_int *length_ptr)
 	u_int len;
 
 	/* Get the length. */
-	len = buffer_get_int(buffer);
+	if (buffer_get_int_ret(&len, buffer) != 0) {
+		error("buffer_get_string_ret: cannot extract length");
+		return (NULL);
+	}
 	if (len > 256 * 1024) {
 		error("buffer_get_string_ret: bad string length %u", len);
 		return (NULL);
@@ -197,19 +202,32 @@ buffer_get_string(Buffer *buffer, u_int *length_ptr)
 }
 
 void *
-buffer_get_string_ptr(Buffer *buffer, u_int *length_ptr)
+buffer_get_string_ptr_ret(Buffer *buffer, u_int *length_ptr)
 {
 	void *ptr;
 	u_int len;
 
-	len = buffer_get_int(buffer);
-	if (len > 256 * 1024)
-		fatal("buffer_get_string_ptr: bad string length %u", len);
+	if (buffer_get_int_ret(&len, buffer) != 0)
+		return NULL;
+	if (len > 256 * 1024) {
+		error("buffer_get_string_ptr: bad string length %u", len);
+		return NULL;
+	}
 	ptr = buffer_ptr(buffer);
 	buffer_consume(buffer, len);
 	if (length_ptr)
 		*length_ptr = len;
 	return (ptr);
+}
+
+void *
+buffer_get_string_ptr(Buffer *buffer, u_int *length_ptr)
+{
+	void *ret;
+
+	if ((ret = buffer_get_string_ptr_ret(buffer, length_ptr)) == NULL)
+		fatal("buffer_get_string_ptr: buffer error");
+	return (ret);
 }
 
 /*

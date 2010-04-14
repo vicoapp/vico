@@ -1,4 +1,4 @@
-/* $OpenBSD: atomicio.c,v 1.25 2007/06/25 12:02:27 dtucker Exp $ */
+/* $OpenBSD: atomicio.c,v 1.24 2007/06/19 02:04:43 djm Exp $ */
 /*
  * Copyright (c) 2006 Damien Miller. All rights reserved.
  * Copyright (c) 2005 Anil Madhavapeddy. All rights reserved.

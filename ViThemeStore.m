@@ -56,7 +56,6 @@
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
 #if 0
 		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Pristine Copy/Themes" stringByExpandingTildeInPath]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
 #endif
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/xi/Themes" stringByExpandingTildeInPath]];

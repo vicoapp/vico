@@ -40,7 +40,6 @@
 #include "buffer.h"
 #include "log.h"
 #include "atomicio.h"
-#include "progressmeter.h"
 #include "misc.h"
 
 #include "sftp.h"
@@ -48,7 +47,6 @@
 #include "sftp-client.h"
 
 extern volatile sig_atomic_t interrupted;
-extern int showprogress;
 
 /* Minimum amount of data to read at a time */
 #define MIN_READ_SIZE	512
@@ -487,6 +485,17 @@ do_lsreaddir(struct sftp_conn *conn, const char *path, int printflag,
 			if (printflag)
 				printf("%s\n", longname);
 
+			/*
+			 * Directory entries should never contain '/'
+			 * These can be used to attack recursive ops
+			 * (e.g. send '../../../../etc/passwd')
+			 */
+			if (strchr(filename, '/') != NULL) {
+				error("Server sent suspect path \"%s\" "
+				    "during readdir of \"%s\"", filename, path);
+				goto next;
+			}
+
 			if (dir) {
 				*dir = xrealloc(*dir, ents + 2, sizeof(**dir));
 				(*dir)[ents] = xmalloc(sizeof(***dir));
@@ -495,7 +504,7 @@ do_lsreaddir(struct sftp_conn *conn, const char *path, int printflag,
 				memcpy(&(*dir)[ents]->a, a, sizeof(*a));
 				(*dir)[++ents] = NULL;
 			}
-
+next:
 			xfree(filename);
 			xfree(longname);
 		}
@@ -669,7 +678,6 @@ do_realpath(struct sftp_conn *conn, char *path)
 	Buffer msg;
 	u_int type, expected_id, count, id;
 	char *filename, *longname;
-	Attrib *a;
 
 	expected_id = id = conn->msg_id++;
 	send_string_request(conn->fd_out, id, SSH2_FXP_REALPATH, path,
@@ -917,7 +925,6 @@ do_download(struct sftp_conn *conn, const char *remote_path, int local_fd,
 	int read_error, write_errno;
 	u_int64_t offset, size;
 	u_int handle_len, mode, type, id, buflen, num_req, max_req;
-	off_t progress_counter;
 	struct request {
 		u_int id;
 		u_int len;
@@ -986,10 +993,6 @@ do_download(struct sftp_conn *conn, const char *remote_path, int local_fd,
 	/* Read from remote and write to local */
 	write_error = read_error = write_errno = num_req = offset = 0;
 	max_req = 1;
-	progress_counter = 0;
-
-	if (showprogress && size != 0)
-		start_progress_meter(remote_path, size, &progress_counter);
 
 	while (num_req > 0 || max_req > 0) {
 		char *data;
@@ -1061,7 +1064,6 @@ do_download(struct sftp_conn *conn, const char *remote_path, int local_fd,
 				write_error = 1;
 				max_req = 0;
 			}
-			progress_counter += len;
 			xfree(data);
 
 			if (len == req->len) {
@@ -1102,9 +1104,6 @@ do_download(struct sftp_conn *conn, const char *remote_path, int local_fd,
 			    SSH2_FXP_DATA, type);
 		}
 	}
-
-	if (showprogress && size)
-		stop_progress_meter();
 
 	/* Sanity check */
 	if (TAILQ_FIRST(&requests) != NULL)
@@ -1223,8 +1222,6 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 
 	/* Read from local and write to remote */
 	offset = 0;
-	if (showprogress)
-		start_progress_meter(local_path, sb.st_size, &offset);
 
 	for (;;) {
 		int len;
@@ -1302,8 +1299,6 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 	}
 	buffer_free(&msg);
 
-	if (showprogress)
-		stop_progress_meter();
 	xfree(data);
 
 	if (status != SSH2_FX_OK) {

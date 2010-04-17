@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>comment</key>
-	<string>Created by Jacob Rus.  Based on ‘Slate’ by Wilson Miner</string>
 	<key>author</key>
 	<string>Jacob Rus</string>
+	<key>comment</key>
+	<string>Created by Jacob Rus.  Based on ‘Slate’ by Wilson Miner</string>
 	<key>name</key>
 	<string>Cobalt</string>
 	<key>settings</key>
@@ -31,7 +31,7 @@
 			<key>name</key>
 			<string>Punctuation</string>
 			<key>scope</key>
-			<string>punctuation - (punctuation.definition.string || punctuation.definition.comment)</string>
+			<string>punctuation - (punctuation.definition.string | punctuation.definition.comment)</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>

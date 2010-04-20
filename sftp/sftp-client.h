@@ -65,7 +65,7 @@ int do_readdir(struct sftp_conn *, const char *, SFTP_DIRENT ***);
 void free_sftp_dirents(SFTP_DIRENT **);
 
 /* Delete file 'path' */
-int do_rm(struct sftp_conn *, char *);
+int do_rm(struct sftp_conn *, const char *);
 
 /* Create directory 'path' */
 int do_mkdir(struct sftp_conn *, char *, Attrib *);

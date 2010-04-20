@@ -543,7 +543,7 @@ void free_sftp_dirents(SFTP_DIRENT **s)
 }
 
 int
-do_rm(struct sftp_conn *conn, char *path)
+do_rm(struct sftp_conn *conn, const char *path)
 {
 	u_int status, id;
 
@@ -1238,9 +1238,11 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 			len = read(local_fd, data, conn->transfer_buflen);
 		while ((len == -1) && (errno == EINTR || errno == EAGAIN));
 
-		if (len == -1)
-			fatal("Couldn't read from \"%s\": %s", local_path,
+		if (len == -1) {
+			error("Couldn't read from \"%s\": %s", local_path,
 			    strerror(errno));
+			goto fail;
+		}
 
 		if (len != 0) {
 			ack = xmalloc(sizeof(*ack));
@@ -1261,8 +1263,10 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 		} else if (TAILQ_FIRST(&acks) == NULL)
 			break;
 
-		if (ack == NULL)
-			fatal("Unexpected ACK %u", id);
+		if (ack == NULL) {
+			error("Unexpected ACK %u", id);
+			goto fail;
+		}
 
 		if (id == startid || len == 0 ||
 		    id - ackid >= conn->num_requests) {
@@ -1273,9 +1277,11 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 			type = buffer_get_char(&msg);
 			r_id = buffer_get_int(&msg);
 
-			if (type != SSH2_FXP_STATUS)
-				fatal("Expected SSH2_FXP_STATUS(%d) packet, "
+			if (type != SSH2_FXP_STATUS) {
+				error("Expected SSH2_FXP_STATUS(%d) packet, "
 				    "got %d", SSH2_FXP_STATUS, type);
+				goto fail;
+			}
 
 			status = buffer_get_int(&msg);
 			debug3("SSH2_FXP_STATUS %d", status);
@@ -1285,8 +1291,10 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 			    ack != NULL && ack->id != r_id;
 			    ack = TAILQ_NEXT(ack, tq))
 				;
-			if (ack == NULL)
-				fatal("Can't find request for ID %u", r_id);
+			if (ack == NULL) {
+				error("Can't find request for ID %u", r_id);
+				goto fail;
+			}
 			TAILQ_REMOVE(&acks, ack, tq);
 			debug3("In write loop, ack for %u %u bytes at %lld",
 			    ack->id, ack->len, (long long)ack->offset);
@@ -1294,29 +1302,34 @@ do_upload(struct sftp_conn *conn, int local_fd, const char *local_path, const ch
 			xfree(ack);
 		}
 		offset += len;
-		if (offset < 0)
-			fatal("%s: offset < 0", __func__);
+		if (offset < 0) {
+			error("%s: offset < 0", __func__);
+			goto fail;
+		}
 	}
 	buffer_free(&msg);
-
-	xfree(data);
 
 	if (status != SSH2_FX_OK) {
 		error("Couldn't write to remote file \"%s\": %s",
 		    remote_path, fx2txt(status));
-		status = -1;
+		goto fail;
 	}
 #if 0
 	if (close(local_fd) == -1) {
 		error("Couldn't close local file \"%s\": %s", local_path,
 		    strerror(errno));
-		status = -1;
+		goto fail;
 	}
 #endif
 	/* Override umask and utimes if asked */
 	if (pflag)
 		do_fsetstat(conn, handle, handle_len, remote_attribs);
+	goto done;
 
+fail:
+	status = -1;
+done:
+	xfree(data);
 	if (do_close(conn, handle, handle_len) != SSH2_FX_OK)
 		status = -1;
 	xfree(handle);

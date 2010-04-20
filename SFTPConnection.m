@@ -55,8 +55,7 @@ size_t num_requests = 64;
 		userhost = strdup([target UTF8String]);
 
 		arglist args;
-		memset(&args, '\0', sizeof(args));
-		args.list = NULL;
+		bzero(&args, sizeof(args));
 		addargs(&args, "%s", SSH_PATH);
 		addargs(&args, "-oForwardX11 no");
 		addargs(&args, "-oForwardAgent no");
@@ -84,6 +83,7 @@ size_t num_requests = 64;
 		host = cleanhostname(host);
 		if (!*host) {
 			INFO(@"%s", "Missing hostname");
+			freeargs(&args);
 			return nil;
 		}
 
@@ -97,6 +97,7 @@ size_t num_requests = 64;
 		addargs(&args, "%s", (sftp_server != NULL ?
 		    sftp_server : "sftp"));
 		sshpid = sftp_connect_to_server(SSH_PATH, args.list, &fd_in, &fd_out);
+		freeargs(&args);
 		if (sshpid == -1)
 			return nil;
 		conn = do_init(fd_in, fd_out, copy_buffer_len, num_requests);
@@ -198,8 +199,7 @@ size_t num_requests = 64;
 	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_sftp_upload.XXXXXX"] fileSystemRepresentation];
 	char *templateFilename = strdup(tmpl);
 	int fd = mkstemp(templateFilename);
-	if (fd == -1)
-	{
+	if (fd == -1) {
 		INFO(@"failed to open temporary file: %s", strerror(errno));
 		*outError = [NSError errorWithDomain:@"SFTP" code:1 userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:strerror(errno)] forKey:NSLocalizedDescriptionKey]];
 		return NO;
@@ -226,8 +226,7 @@ size_t num_requests = 64;
 
 	int status = do_upload(conn, fd, templateFilename, [remote_temp_path UTF8String], [self stat:path], 0);
 	close(fd);
-	if (status == 0)
-	{
+	if (status == 0) {
 		if (sftp_has_posix_rename(conn)) {
 			if (do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0)
 				return YES;
@@ -243,8 +242,9 @@ size_t num_requests = 64;
 				return YES;
 		}
 
-		*outError = [NSError errorWithDomain:@"SFTP" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Failed to rename remote temporary file." forKey:NSLocalizedDescriptionKey]];
 	}
+
+	*outError = [NSError errorWithDomain:@"SFTP" code:1 userInfo:[NSDictionary dictionaryWithObject:@"Failed to save file." forKey:NSLocalizedDescriptionKey]];
 
 	return NO;
 }

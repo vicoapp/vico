@@ -94,10 +94,9 @@ static ViLanguageStore *defaultStore = nil;
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 #if 0
 	[self addBundlesFromBundleDirectory:@"/Library/Application Support/TextMate/Bundles"];
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Pristine Copy/Bundles" stringByExpandingTildeInPath]];
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
 #endif
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/Vizard/Bundles" stringByExpandingTildeInPath]];
+	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
+	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/xi/Bundles" stringByExpandingTildeInPath]];
 	DEBUG(@"finished initializing languages");
 }
 

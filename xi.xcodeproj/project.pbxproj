@@ -27,12 +27,13 @@
 		9A1E40C30EFBAEA700682D4A /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40B90EFBAEA700682D4A /* misc.c */; };
 		9A1E40C50EFBAEA700682D4A /* xmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40BE0EFBAEA700682D4A /* xmalloc.c */; };
 		9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D20EFBB08400682D4A /* bufaux.c */; };
-		9A1E40D70EFBB0C100682D4A /* fatal.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D60EFBB0C100682D4A /* fatal.c */; };
 		9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DB0EFBB1A800682D4A /* vis.c */; };
 		9A1E40DF0EFBB1D000682D4A /* strtonum.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DE0EFBB1D000682D4A /* strtonum.c */; };
 		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
 		9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
+		9A4BA1FB118C80F10093E2AB /* b32.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A4BA1F9118C80F10093E2AB /* b32.c */; };
 		9A4F7DC20ED56CFE00A3CCF1 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */; };
+		9A5C4351117ACF6A00647F5C /* fatal.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A5C4350117ACF6A00647F5C /* fatal.c */; };
 		9A60937E1171C97F00F26B09 /* ViTextView-bundle_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
@@ -172,7 +173,6 @@
 		9A1E40BF0EFBAEA700682D4A /* xmalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xmalloc.h; path = sftp/xmalloc.h; sourceTree = "<group>"; };
 		9A1E40D20EFBB08400682D4A /* bufaux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bufaux.c; path = sftp/bufaux.c; sourceTree = "<group>"; };
 		9A1E40D30EFBB08400682D4A /* ssh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ssh.h; path = sftp/ssh.h; sourceTree = "<group>"; };
-		9A1E40D60EFBB0C100682D4A /* fatal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fatal.c; path = sftp/fatal.c; sourceTree = "<group>"; };
 		9A1E40DB0EFBB1A800682D4A /* vis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vis.c; path = sftp/vis.c; sourceTree = "<group>"; };
 		9A1E40DE0EFBB1D000682D4A /* strtonum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = strtonum.c; path = sftp/strtonum.c; sourceTree = "<group>"; };
 		9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnection.h; sourceTree = "<group>"; };
@@ -180,8 +180,11 @@
 		9A28300F109B15110023D2CF /* NSTextField-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextField-additions.h"; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
+		9A4BA1F9118C80F10093E2AB /* b32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = b32.c; sourceTree = "<group>"; };
+		9A4BA1FA118C80F10093E2AB /* b32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b32.h; sourceTree = "<group>"; };
 		9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolTransform.m; sourceTree = "<group>"; };
 		9A4F7DC10ED56CFE00A3CCF1 /* ViSymbolTransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolTransform.h; sourceTree = "<group>"; };
+		9A5C4350117ACF6A00647F5C /* fatal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fatal.c; path = sftp/fatal.c; sourceTree = "<group>"; };
 		9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-bundle_commands.m"; sourceTree = "<group>"; };
 		9A668E0F0D1116FC003FABD9 /* ViTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTheme.h; sourceTree = "<group>"; };
 		9A668E100D1116FC003FABD9 /* ViTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTheme.m; sourceTree = "<group>"; };
@@ -325,6 +328,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* xi */ = {
 			isa = PBXGroup;
 			children = (
+				9A4BA1F8118C80CD0093E2AB /* license key support */,
 				9A1E40A10EFBA81E00682D4A /* sftp */,
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
@@ -467,13 +471,13 @@
 		9A1E40A10EFBA81E00682D4A /* sftp */ = {
 			isa = PBXGroup;
 			children = (
+				9A5C4350117ACF6A00647F5C /* fatal.c */,
 				9AF573990EFE94EE0066C201 /* SFTPConnectionPool.h */,
 				9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */,
 				9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */,
 				9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */,
 				9A1E40DE0EFBB1D000682D4A /* strtonum.c */,
 				9A1E40DB0EFBB1A800682D4A /* vis.c */,
-				9A1E40D60EFBB0C100682D4A /* fatal.c */,
 				9A1E40D20EFBB08400682D4A /* bufaux.c */,
 				9A1E40D30EFBB08400682D4A /* ssh.h */,
 				9A1E40B30EFBAEA700682D4A /* atomicio.c */,
@@ -496,6 +500,15 @@
 				9A1E40A90EFBA83400682D4A /* sftp.h */,
 			);
 			name = sftp;
+			sourceTree = "<group>";
+		};
+		9A4BA1F8118C80CD0093E2AB /* license key support */ = {
+			isa = PBXGroup;
+			children = (
+				9A4BA1F9118C80F10093E2AB /* b32.c */,
+				9A4BA1FA118C80F10093E2AB /* b32.h */,
+			);
+			name = "license key support";
 			sourceTree = "<group>";
 		};
 		9A7AF1440D99820800F08222 /* Products */ = {
@@ -774,13 +787,14 @@
 				9A1E40C30EFBAEA700682D4A /* misc.c in Sources */,
 				9A1E40C50EFBAEA700682D4A /* xmalloc.c in Sources */,
 				9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */,
-				9A1E40D70EFBB0C100682D4A /* fatal.c in Sources */,
 				9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */,
 				9A1E40DF0EFBB1D000682D4A /* strtonum.c in Sources */,
 				9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */,
 				9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */,
 				9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */,
 				9A60937E1171C97F00F26B09 /* ViTextView-bundle_commands.m in Sources */,
+				9A5C4351117ACF6A00647F5C /* fatal.c in Sources */,
+				9A4BA1FB118C80F10093E2AB /* b32.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -935,6 +949,7 @@
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
+					"-lcrypto",
 				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
@@ -960,6 +975,7 @@
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
+					"-lcrypto",
 				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
@@ -1000,7 +1016,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-lonig";
+				OTHER_LDFLAGS = (
+					"-lcrypto",
+					"-lonig",
+				);
 				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
@@ -1040,7 +1059,10 @@
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-lonig";
+				OTHER_LDFLAGS = (
+					"-lcrypto",
+					"-lonig",
+				);
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64";

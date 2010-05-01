@@ -1139,18 +1139,15 @@
 	 */
 	if (command.ismotion || command.key == 'd' || command.key == 'y')
 		end_location = [self skipWhitespaceFrom:end_location];
-	
-	if (!command.ismotion && (command.key == 'd' || command.key == 'y'))
-	{
+
+	if (!command.ismotion && (command.key == 'd' || command.key == 'y' || command.key == 'c')) {
 		/* Restrict to current line if deleting/yanking last word on line.
 		 * However, an empty line can be deleted as a word.
 		 */
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		if (end_location > eol && bol != eol)
-		{
 			end_location = eol;
-		}
 	}
 	else if (end_location >= [s length])
 		end_location = [s length] - 1;

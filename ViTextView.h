@@ -10,6 +10,8 @@
 
 @class ViDocumentView;
 @class ViDocument;
+@class ViWindowController;
+@class ViTextView;
 
 #ifdef IMAX
 # undef IMAX
@@ -23,8 +25,26 @@
 
 typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisualMode } ViMode;
 
+@protocol ViTextViewDelegate
+- (void)message:(NSString *)fmt, ...;
+- (NSURL *)fileURL;
+- (ViWindowController *)windowController;
+- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
+- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
+- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
+- (void)popTag;
+- (void)enableLineNumbers:(BOOL)flag;
+- (void)saveDocument:(id)sender;
+- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
+- (NSUndoManager *)undoManager;
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (void)setMostRecentDocumentView:(ViDocumentView *)docView;
+@end
+
 @interface ViTextView : NSTextView
 {
+	id <ViTextViewDelegate>	 delegate;
+
 	ViDocumentView		*documentView;
 	ViMode			 mode;
 	ViCommand		*parser;
@@ -65,6 +85,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
+- (id <ViTextViewDelegate>)delegate;
 - (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;
 - (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;

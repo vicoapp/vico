@@ -38,20 +38,6 @@
     return self;
 }
 
-#if 0
-- (void)dealloc
-{
-    [metalCloseButton release];
-    [metalCloseButtonDown release];
-    [metalCloseButtonOver release];
-    [_addTabButtonImage release];
-    [_addTabButtonPressedImage release];
-    [_addTabButtonRolloverImage release];
-    
-    [super dealloc];
-}
-#endif
-
 #pragma mark -
 #pragma mark Control Specific
 
@@ -268,9 +254,11 @@
     NSRange range = NSMakeRange(0, [contents length]);
     
     // Add font attribute
-    [attrStr addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
-    [attrStr addAttribute:NSForegroundColorAttributeName value:[[NSColor textColor] colorWithAlphaComponent:0.75] range:range];
-    
+    [attrStr addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:11.0] range:range];
+    //[attrStr addAttribute:NSForegroundColorAttributeName value:[[NSColor textColor] colorWithAlphaComponent:0.75] range:range];
+    [attrStr addAttribute:NSForegroundColorAttributeName value:[NSColor textColor] range:range];
+
+#if 0
     // Add shadow attribute
     NSShadow* shadow;
     shadow = [[[NSShadow alloc] init] autorelease];
@@ -284,7 +272,8 @@
     [shadow setShadowOffset:NSMakeSize(0, -1)];
     [shadow setShadowBlurRadius:1.0];
     [attrStr addAttribute:NSShadowAttributeName value:shadow range:range];
-    
+#endif
+
     // Paragraph Style for Truncating Long Text
     static NSMutableParagraphStyle *TruncatingTailParagraphStyle = nil;
     if (!TruncatingTailParagraphStyle) {
@@ -293,12 +282,12 @@
         [TruncatingTailParagraphStyle setAlignment:NSCenterTextAlignment];
     }
     [attrStr addAttribute:NSParagraphStyleAttributeName value:TruncatingTailParagraphStyle range:range];
-    
+
     return attrStr;
 }
 
 #pragma mark -
-#pragma mark ---- drawing ----
+#pragma mark Drawing
 
 - (void)drawTabCell:(PSMTabBarCell *)cell
 {
@@ -311,12 +300,12 @@
         // selected tab
         NSRect aRect = NSMakeRect(cellFrame.origin.x, cellFrame.origin.y, cellFrame.size.width, cellFrame.size.height-2.5);
         aRect.size.height -= 0.5;
-        
+
         // background
         NSDrawWindowBackground(aRect);
-        
+
         aRect.size.height+=0.5;
-        
+
         // frame
         aRect.origin.x += 0.5;
         [lineColor set];
@@ -336,10 +325,10 @@
         
         // unselected tab
         NSRect aRect = NSMakeRect(cellFrame.origin.x, cellFrame.origin.y, cellFrame.size.width, cellFrame.size.height);
-        aRect.origin.y += 0.5;
+        aRect.origin.y -= 0.5;
         aRect.origin.x += 1.5;
         aRect.size.width -= 1;
-        
+
         // rollover
         if ([cell isHighlighted]) {
             [[NSColor colorWithCalibratedWhite:0.0 alpha:0.1] set];
@@ -431,18 +420,14 @@
     labelRect.origin.x = labelPosition;
     labelRect.size.width = cellFrame.size.width - (labelRect.origin.x - cellFrame.origin.x) - kPSMTabBarCellPadding;
     labelRect.size.height = cellFrame.size.height;
-    labelRect.origin.y = cellFrame.origin.y + MARGIN_Y + 1.0;
-    
-    if([cell state] == NSOnState){
-        labelRect.origin.y -= 1;
-    }
-    
+    labelRect.origin.y = cellFrame.origin.y + MARGIN_Y;
+
     if(![[cell indicator] isHidden])
         labelRect.size.width -= (kPSMTabBarIndicatorWidth + kPSMTabBarCellPadding);
-    
+
     if([cell count] > 0)
         labelRect.size.width -= ([self objectCounterRectForTabCell:cell].size.width + kPSMTabBarCellPadding);
-    
+
     // label
     [[cell attributedStringValue] drawInRect:labelRect];
 }
@@ -453,11 +438,10 @@
     [[NSColor colorWithCalibratedWhite:0.0 alpha:0.2] set];
     NSRectFillUsingOperation(rect, NSCompositeSourceAtop);
     [[NSColor darkGrayColor] set];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(rect.origin.x,rect.origin.y+0.5) toPoint:NSMakePoint(rect.origin.x+rect.size.width,rect.origin.y+0.5)];
     [NSBezierPath strokeLineFromPoint:NSMakePoint(rect.origin.x,rect.origin.y+rect.size.height-0.5) toPoint:NSMakePoint(rect.origin.x+rect.size.width,rect.origin.y+rect.size.height-0.5)];
     
     // no tab view == not connected
-    if(![bar tabView]){
+    if(![bar delegate]){
         NSRect labelRect = rect;
         labelRect.size.height -= 4.0;
         labelRect.origin.y += 4.0;

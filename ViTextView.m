@@ -171,23 +171,6 @@ int logIndent = 0;
 	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
 }
 
-- (void)endUndoGroup
-{
-	DEBUG(@"Ending undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
-	if (hasUndoGroup) {
-		[undoManager endUndoGrouping];
-		hasUndoGroup = NO;
-	}
-}
-
-- (void)beginUndoGroup
-{
-	if (!hasUndoGroup) {
-		[undoManager beginUndoGrouping];
-		hasUndoGroup = YES;
-	}
-}
-
 
 /* Like insertText:, but works within beginEditing/endEditing.
  * Also begins an undo group.
@@ -547,6 +530,24 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Undo support
 
+- (void)endUndoGroup
+{
+	DEBUG(@"Ending undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
+	if (hasUndoGroup) {
+		[undoManager endUndoGrouping];
+		hasUndoGroup = NO;
+	}
+}
+
+- (void)beginUndoGroup
+{
+	DEBUG(@"Beginning undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
+	if (!hasUndoGroup) {
+		[undoManager beginUndoGrouping];
+		hasUndoGroup = YES;
+	}
+}
+
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	[self insertString:aString atLocation:aLocation undoGroup:NO];
@@ -562,14 +563,14 @@ int logIndent = 0;
 
 - (void)recordInsertInRange:(NSRange)aRange
 {
-	// INFO(@"pushing insert of text in range %u+%u onto undo stack", aRange.location, aRange.length);
+	DEBUG(@"pushing insert of text in range %@ onto undo stack", NSStringFromRange(aRange));
 	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
 	[undoManager setActionName:@"insert text"];
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
-	// INFO(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
+	DEBUG(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
 	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
 	[undoManager setActionName:@"delete text"];
 }
@@ -582,6 +583,7 @@ int logIndent = 0;
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
+	DEBUG(@"recording replacement in range %@ with length %u in an undo group", NSStringFromRange(aRange), aLength);
 	[undoManager beginUndoGrouping];
 	[self recordDeleteOfRange:aRange];
 	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
@@ -983,8 +985,14 @@ int logIndent = 0;
 
 - (void)setNormalMode
 {
+	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u", caret, final_location, [[self textStorage] length]);
 	mode = ViNormalMode;
-	[self setSelectedRange:NSMakeRange(caret, 0)];
+}
+
+- (void)resetSelection
+{
+	DEBUG(@"resetting selection, caret = %u", [self caret]);
+	[self setSelectedRange:NSMakeRange([self caret], 0)];
 }
 
 - (void)setVisualMode
@@ -1003,11 +1011,13 @@ int logIndent = 0;
 		NSEvent *ev;
 		replayingInput = YES;
 		[self setCaret:end_location];
+		DEBUG(@"replaying input, got %u events", [command.text count]);
 		for (ev in command.text)
 		{
 			[self keyDown:ev];
 		}
 		replayingInput = NO;
+		DEBUG(@"done replaying input, caret = %u, final_location = %u", [self caret], final_location);
 	}
 }
 
@@ -1289,8 +1299,10 @@ int logIndent = 0;
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
-	if (mode == ViVisualMode && !command.ismotion)
+	if (mode == ViVisualMode && !command.ismotion) {
 		[self setNormalMode];
+		[self resetSelection];
+	}
 
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
@@ -1385,6 +1397,7 @@ int logIndent = 0;
 		} else if (charcode == 0x1B) {
 			[self setNormalMode];
 			[self setCaret:final_location];
+			[self resetSelection];
 			return;
 		}
 

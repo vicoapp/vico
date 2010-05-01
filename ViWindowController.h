@@ -9,7 +9,7 @@
 @class ViResizeView;
 @class ViJumpList;
 
-@interface ViWindowController : NSWindowController <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
+@interface ViWindowController : NSWindowController // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;

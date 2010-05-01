@@ -6,7 +6,7 @@
 
 @class NoodleLineNumberView;
 
-@interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
+@interface ViDocument : NSDocument <ViTextViewDelegate> // disabled, only for 10.6: <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
 	NSMutableArray *views;
 	int visibleViews;

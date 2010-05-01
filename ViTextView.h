@@ -43,7 +43,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView : NSTextView
 {
-	id <ViTextViewDelegate>	 delegate;
+	id <ViTextViewDelegate, NSTextViewDelegate>	 delegate;
 
 	ViDocumentView		*documentView;
 	ViMode			 mode;
@@ -85,7 +85,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
-- (id <ViTextViewDelegate>)delegate;
+- (id <ViTextViewDelegate, NSTextViewDelegate>)delegate;
 - (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;
 - (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;

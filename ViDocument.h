@@ -6,7 +6,7 @@
 
 @class NoodleLineNumberView;
 
-@interface ViDocument : NSDocument <ViTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
+@interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
 	NSMutableArray *views;
 	int visibleViews;

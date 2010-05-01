@@ -12,6 +12,7 @@
 #include "key.c"
 #include "xor.c"
 #include "b32.h"
+#include "serial.h"
 
 #define PUBKEY_LEN 271
 

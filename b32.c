@@ -38,6 +38,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "b32.h"
+
 int
 b32_ntop(uint8_t const *src, size_t srclength, char *target, size_t targsize)
 {

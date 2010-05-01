@@ -126,6 +126,11 @@ int logIndent = 0;
         return [documentView document];
 }
 
+- (id <ViTextViewDelegate>)delegate
+{
+	return delegate;
+}
+
 #pragma mark -
 #pragma mark Vi error messages
 

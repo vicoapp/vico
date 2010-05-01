@@ -195,4 +195,10 @@
 - (void)test206_RepeatMoveBackwardTilChar	{ MOVE(@"abc abc abc", 7, @"Ta;", 5); }
 - (void)test207_RepeatMoveBackwardToChar	{ MOVE(@"abc abc abc", 7, @"Fa;", 0); }
 
+// This doesn't work:
+// - (void)test210_FindForward			{ MOVE(@"abc def ghi", 0, @"/g\n", 8); }
+
+- (void)test220_ChangeWordAtEnd			{ TEST(@"apa", 0, @"cwb\x1b", @"b", 0); }
+- (void)test220_ChangeWordAndRepeatNearEnd	{ TEST(@"apa\napa", 0, @"cwb\x1bj.", @"b\nb", 2); }
+
 @end

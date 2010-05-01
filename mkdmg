@@ -47,6 +47,8 @@ root="/Volumes/$VOL"
 /bin/cp -R $APP "$root" || die "failed to copy application to disk image"
 #/bin/cp README.txt "$root" || die "failed to copy README.txt to disk image"
 
+ln -s /Applications $root/Applications
+
 rm -f $VOL.dmg
 
 # eject

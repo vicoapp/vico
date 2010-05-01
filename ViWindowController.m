@@ -73,7 +73,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
-	[tabBar setStyleNamed:@"Unified"];
+	[tabBar setStyleNamed:@"Metal"];
 	[tabBar setCanCloseOnlyTab:YES];
 	[tabBar setHideForSingleTab:[[NSUserDefaults standardUserDefaults] boolForKey:@"hidetab"]];
 	// FIXME: add KVC observer for the 'hidetab' option

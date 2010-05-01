@@ -62,24 +62,6 @@
     _addTabButtonRolloverImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"AquaTabNewRollover"]];
 }
 
-#if 0
-- (void)dealloc
-{
-    [aquaTabBg release];
-    [aquaTabBgDown release];
-    [aquaDividerDown release];
-    [aquaDivider release];
-    [aquaCloseButton release];
-    [aquaCloseButtonDown release];
-    [aquaCloseButtonOver release];
-    [_addTabButtonImage release];
-    [_addTabButtonPressedImage release];
-    [_addTabButtonRolloverImage release];
-    
-    [super dealloc];
-}
-#endif
-
 #pragma mark -
 #pragma mark Control Specifics
 
@@ -364,7 +346,7 @@
     [aquaTabBg drawInRect:rect fromRect:NSMakeRect(0.0, 0.0, 1.0, 22.0) operation:NSCompositeSourceOver fraction:1.0];
     
     // no tab view == not connected
-    if (![bar tabView]) {
+    if (![bar delegate]) {
         NSRect labelRect = rect;
         labelRect.size.height -= 4.0;
         labelRect.origin.y += 4.0;

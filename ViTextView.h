@@ -43,8 +43,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView : NSTextView
 {
-	id <ViTextViewDelegate, NSTextViewDelegate>	 delegate;
-
 	ViDocumentView		*documentView;
 	ViMode			 mode;
 	ViCommand		*parser;
@@ -86,7 +84,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 }
 
 - (id <ViTextViewDelegate, NSTextViewDelegate>)delegate;
-- (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView;
+- (void)initEditorWithDelegate:(id <ViTextViewDelegate, NSTextViewDelegate>)aDelegate documentView:(ViDocumentView *)docView;
 - (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;

@@ -126,9 +126,9 @@ int logIndent = 0;
         return [documentView document];
 }
 
-- (id <ViTextViewDelegate>)delegate
+- (id <ViTextViewDelegate, NSTextViewDelegate>)delegate
 {
-	return delegate;
+	return (id <ViTextViewDelegate, NSTextViewDelegate>)[super delegate];
 }
 
 #pragma mark -

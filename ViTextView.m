@@ -777,7 +777,9 @@ int logIndent = 0;
 			[self scrollRangeToVisible:r];
 			final_location = end_location = r.location;
 			[self setCaret:final_location];
-			[self performSelector:@selector(highlightFindMatch:) withObject:nextMatch afterDelay:0];
+			[self performSelector:@selector(highlightFindMatch:)
+				   withObject:nextMatch
+				   afterDelay:0];
 		}
 
 		return YES;
@@ -799,12 +801,29 @@ int logIndent = 0;
 	}
 }
 
+- (void)find_backward_callback:(NSString *)pattern
+{
+	if ([self findPattern:pattern options:1]) {
+		[self pushLocationOnJumpList:start_location];
+		[self setCaret:final_location];
+	}
+}
+
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
 	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:)];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
+	return YES;
+}
+
+/* syntax: ?regexp */
+- (BOOL)find_backwards:(ViCommand *)command
+{
+	[[self delegate] getExCommandForTextView:self selector:@selector(find_backward_callback:)];
+	// FIXME: this won't work as a motion command!
+	// d?pattern will not work!
 	return YES;
 }
 

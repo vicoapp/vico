@@ -1,3 +1,5 @@
+#define NO_DEBUG
+
 #import "ViTheme.h"
 #import "NSString-scopeSelector.h"
 #import "logging.h"

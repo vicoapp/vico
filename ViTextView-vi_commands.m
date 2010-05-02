@@ -783,15 +783,28 @@
 /* syntax: [count]k */
 - (BOOL)move_up:(ViCommand *)command
 {
+	int count = IMAX(command.count, 1);
+	if (!command.ismotion)
+		count = IMAX(command.motion_count, 1);
+
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if (bol == 0)
-	{
+	if (bol == 0) {
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
 
-	[self gotoColumn:saved_column fromLocation:bol - 1];
+	DEBUG(@"count = %i", count);
+
+	while (count-- > 0) {
+		if (bol <= 0) {
+			[[self delegate] message:@"Movement past the beginning of the file"];
+			return NO;
+		}
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:bol - 1];
+	}
+
+	[self gotoColumn:saved_column fromLocation:bol];
 	return YES;
 }
 
@@ -802,18 +815,16 @@
 	if (!command.ismotion)
 		count = IMAX(command.motion_count, 1);
 
-	NSUInteger bol, end;
-	[self getLineStart:&bol end:&end contentsEnd:NULL];
-	if (end >= [[self textStorage] length])
-	{
+	NSUInteger end;
+	[self getLineStart:NULL end:&end contentsEnd:NULL];
+	if (end >= [[self textStorage] length]) {
 		[[self delegate] message:@"Already at end-of-file"];
 		return NO;
 	}
 
 	while (--count > 0) {
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:end];
-		if (end >= [[self textStorage] length])
-		{
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
+		if (end >= [[self textStorage] length]) {
 			[[self delegate] message:@"Movement past the end-of-file"];
 			return NO;
 		}

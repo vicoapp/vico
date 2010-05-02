@@ -1543,6 +1543,7 @@ int logIndent = 0;
 - (void)setTheme:(ViTheme *)aTheme
 {
 	[self setBackgroundColor:[aTheme backgroundColor]];
+	[[self enclosingScrollView] setBackgroundColor:[aTheme backgroundColor]];
 	[self setInsertionPointColor:[aTheme caretColor]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[aTheme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];

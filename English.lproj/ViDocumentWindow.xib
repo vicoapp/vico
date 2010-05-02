@@ -12,11 +12,11 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="100261"/>
 			<integer value="100325"/>
-			<integer value="100153"/>
-			<integer value="100362"/>
-			<integer value="100276"/>
 			<integer value="100399"/>
+			<integer value="100362"/>
+			<integer value="100153"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -43,7 +43,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSWindowTemplate" id="275939982">
-				<int key="NSWindowStyleMask">15</int>
+				<int key="NSWindowStyleMask">4367</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{133, 204}, {636, 411}}</string>
 				<int key="NSWTFlags">1886912512</int>
@@ -715,7 +715,7 @@
 								<reference key="NSSuperview" ref="709866892"/>
 								<reference key="NSTarget" ref="709866892"/>
 								<string key="NSAction">_doScroller:</string>
-								<double key="NSPercent">0.99773239999999996</double>
+								<double key="NSPercent">0.99773242630385484</double>
 							</object>
 							<object class="NSScroller" id="120595945">
 								<reference key="NSNextResponder" ref="709866892"/>
@@ -749,9 +749,11 @@
 							<string key="NSContents"/>
 							<reference key="NSSupport" ref="844670655"/>
 							<reference key="NSControlView" ref="709655854"/>
-							<bool key="NSDrawsBackground">YES</bool>
 							<int key="NSTextBezelStyle">1</int>
-							<reference key="NSBackgroundColor" ref="914134781"/>
+							<object class="NSColor" key="NSBackgroundColor">
+								<int key="NSColorSpace">1</int>
+								<bytes key="NSRGB">MC45ODE5Mjc3MTA4IDAuOTYzODU1NDIxNyAxAA</bytes>
+							</object>
 							<reference key="NSTextColor" ref="1024489741"/>
 							<object class="NSButtonCell" key="NSSearchButtonCell">
 								<int key="NSCellFlags">130560</int>
@@ -802,7 +804,7 @@
 				</object>
 				<string key="NSFrameSize">{171, 489}</string>
 				<reference key="NSSuperview"/>
-				<string key="NSClassName">NSView</string>
+				<string key="NSClassName">ViBgView</string>
 			</object>
 			<object class="NSMenu" id="214436382">
 				<string key="NSTitle"/>
@@ -1170,7 +1172,7 @@
 				</object>
 				<string key="NSFrameSize">{336, 389}</string>
 				<reference key="NSSuperview"/>
-				<string key="NSClassName">NSView</string>
+				<string key="NSClassName">ViBgView</string>
 			</object>
 			<object class="NSWindowTemplate" id="353834376">
 				<int key="NSWindowStyleMask">1</int>
@@ -2272,6 +2274,10 @@
 					<string>100184.ImportedFromIB2</string>
 					<string>100250.IBEditorWindowLastContentRect</string>
 					<string>100250.IBPluginDependency</string>
+					<string>100250.IBViewIntegration.shadowBlurRadius</string>
+					<string>100250.IBViewIntegration.shadowColor</string>
+					<string>100250.IBViewIntegration.shadowOffsetHeight</string>
+					<string>100250.IBViewIntegration.shadowOffsetWidth</string>
 					<string>100257.IBPluginDependency</string>
 					<string>100258.IBPluginDependency</string>
 					<string>100259.IBPluginDependency</string>
@@ -2347,6 +2353,7 @@
 					<string>5.editorWindowContentRectSynchronizationRect</string>
 					<string>5.windowTemplate.hasMinSize</string>
 					<string>5.windowTemplate.minSize</string>
+					<string>6.CustomClassName</string>
 					<string>6.IBPluginDependency</string>
 					<string>6.ImportedFromIB2</string>
 				</object>
@@ -2362,8 +2369,12 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{634, 366}, {171, 489}}</string>
+					<string>{{759, 367}, {171, 489}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<real value="0.0"/>
+					<reference ref="792671138"/>
+					<real value="0.0"/>
+					<real value="0.0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2439,6 +2450,7 @@
 					<string>{{155, 232}, {637, 411}}</string>
 					<integer value="1"/>
 					<string>{640, 200}</string>
+					<string>ViBgView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 				</object>
@@ -2561,6 +2573,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ProjectDelegate.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ViBgView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViBgView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

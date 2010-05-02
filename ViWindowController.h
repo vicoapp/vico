@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
 #import "ViTagStack.h"
+#import "ViBgView.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -14,7 +15,7 @@
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *documentView;
-	IBOutlet NSView *explorerView;
+	IBOutlet ViBgView *explorerView;
 	IBOutlet NSToolbar *toolbar;
 
 	ViTagStack *tagStack;
@@ -38,7 +39,7 @@
 
 	// symbol list
 	IBOutlet NSImageView *symbolsResizeView;
-	IBOutlet NSView *symbolsView;
+	IBOutlet ViBgView *symbolsView;
 	IBOutlet NSSearchField *symbolFilterField;
 	IBOutlet NSOutlineView *symbolsOutline;
 	NSCell *separatorCell;

@@ -70,6 +70,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	[toolbar setDelegate:self];
 	[[self window] setToolbar:toolbar];
+	[toolbar setShowsBaselineSeparator:NO];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
@@ -87,7 +88,7 @@ static NSWindowController	*currentWindowController = nil;
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
-	
+
 	isLoaded = YES;
 	if (initialDocument) {
 		[self addNewTab:initialDocument];

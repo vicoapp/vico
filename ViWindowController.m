@@ -98,6 +98,10 @@ static NSWindowController	*currentWindowController = nil;
 	}
 
 	[[self window] makeKeyAndOrderFront:self];
+	[symbolsView setSourceHighlight:YES];
+	[explorerView setSourceHighlight:YES];
+	[symbolsView setNeedsDisplay:YES];
+	[explorerView setNeedsDisplay:YES];
 
 	[symbolsOutline setTarget:self];
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];

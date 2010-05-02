@@ -119,7 +119,7 @@
 												<object class="NSCustomView" id="753955306">
 													<reference key="NSNextResponder" ref="876958380"/>
 													<int key="NSvFlags">4370</int>
-													<string key="NSFrameSize">{635, 368}</string>
+													<string key="NSFrameSize">{636, 368}</string>
 													<reference key="NSSuperview" ref="876958380"/>
 													<string key="NSClassName">NSView</string>
 												</object>
@@ -245,7 +245,7 @@
 															<double key="NSPercent">0.94565220000000005</double>
 														</object>
 													</object>
-													<string key="NSFrame">{{0, 369}, {635, 0}}</string>
+													<string key="NSFrame">{{0, 369}, {636, 0}}</string>
 													<reference key="NSSuperview" ref="876958380"/>
 													<reference key="NSNextKeyView" ref="167196907"/>
 													<int key="NSsFlags">82</int>
@@ -254,17 +254,17 @@
 													<reference key="NSContentView" ref="167196907"/>
 												</object>
 											</object>
-											<string key="NSFrame">{{0, 20}, {635, 369}}</string>
+											<string key="NSFrame">{{0, 20}, {636, 369}}</string>
 											<reference key="NSSuperview" ref="68674080"/>
 											<int key="NSDividerStyle">2</int>
 										</object>
 									</object>
-									<string key="NSFrameSize">{635, 389}</string>
+									<string key="NSFrameSize">{636, 389}</string>
 									<reference key="NSSuperview" ref="892226745"/>
 									<string key="NSClassName">NSView</string>
 								</object>
 							</object>
-							<string key="NSFrameSize">{635, 389}</string>
+							<string key="NSFrameSize">{636, 389}</string>
 							<reference key="NSSuperview" ref="568628114"/>
 							<bool key="NSIsVertical">YES</bool>
 							<int key="NSDividerStyle">2</int>

@@ -512,6 +512,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];
+		[lineNumberView setBackgroundColor:[NSColor colorWithDeviceRed:(float)0xED/0xFF green:(float)0xED/0xFF blue:(float)0xED/0xFF alpha:1.0]];
 	}
 	else
 		[aScrollView setRulersVisible:NO];

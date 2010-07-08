@@ -1438,6 +1438,21 @@ int logIndent = 0;
 		[self scrollToCaret];
 }
 
+- (void)swipeWithEvent:(NSEvent *)event
+{
+	BOOL rc = FALSE;
+
+	DEBUG(@"got swipe event %@", event);
+
+	if ([event deltaX] > 0)
+		rc = [self jumplist_backward:nil];
+	else if ([event deltaX] < 0)
+		rc = [self jumplist_forward:nil];
+
+	if (rc == TRUE)
+		[[self delegate] message:@""]; // erase any previous message
+}
+
 /* Takes a string of characters and creates key events for each one.
  * Then feeds them into the keyDown method to simulate key presses.
  * Only used for unit testing.

@@ -91,5 +91,7 @@
 
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 
+- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector;
+
 @end
 

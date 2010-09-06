@@ -1,4 +1,5 @@
 #import "NSTextField-additions.h"
+#import "ViWindowController.h"
 
 @implementation NSTextField (additions)
 

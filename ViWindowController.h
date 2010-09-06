@@ -67,6 +67,7 @@
 - (void)closeDocumentViews:(ViDocument *)aDocument;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
+- (void)closeDocument:(ViDocument *)document;
 
 - (IBAction)saveProject:(id)sender;
 

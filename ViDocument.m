@@ -177,27 +177,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (ViWindowController *)windowController
 {
-	return [[self windowControllers] objectAtIndex:0];
+	return windowController;
+//	return [[self windowControllers] objectAtIndex:0];
 }
 
-- (void)canCloseDocumentWithDelegate:(id)aDelegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
+- (void)close
 {
-	[super canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:contextInfo];
-}
-
-- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
-{
-	if (shouldClose)
-	{
-		INFO(@"closing document %@", self);
-		[windowController closeDocumentViews:self];
-
-		/* Remove the window controller so the document doesn't automatically
-		 * close the window.
-		 */
-		[self removeWindowController:windowController];
-		[self close];
-	}
+	[windowController closeDocumentViews:self];
+	
+	/* Remove the window controller so the document doesn't automatically
+	 * close the window.
+	 */
+	[self removeWindowController:windowController];
+	[super close];
 }
 
 #pragma mark -

@@ -46,10 +46,10 @@
 			[NSNumber numberWithInt:8], @"tabstop",
 			[NSNumber numberWithBool:YES], @"autoindent",
 			[NSNumber numberWithBool:YES], @"ignorecase",
-			[NSNumber numberWithBool:YES], @"expandtabs",
+			[NSNumber numberWithBool:NO], @"expandtabs",
 			[NSNumber numberWithBool:YES], @"number",
 			[NSNumber numberWithBool:YES], @"autocollapse",
-			[NSNumber numberWithBool:NO], @"hidetab",
+			[NSNumber numberWithBool:YES], @"hidetab",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 			nil]];
 
@@ -63,39 +63,37 @@
 		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
 	}
 
+	[[commandMenu supermenu] removeItemAtIndex:5];
 #if 0
 	/* initialize commands */
 	NSArray *bundles = [[ViLanguageStore defaultStore] allBundles];
 	ViBundle *bundle;
-	for (bundle in bundles)
-	{
+	for (bundle in bundles) {
 		NSMenuItem *item = [commandMenu addItemWithTitle:[bundle name] action:nil keyEquivalent:@""];
 		NSMenu *submenu = [[NSMenu alloc] initWithTitle:[bundle name]];
 		[item setSubmenu:submenu];
 		NSDictionary *command;
-		for (command in [bundle commands])
-		{
+		for (command in [bundle commands]) {
 			NSString *key = [command objectForKey:@"keyEquivalent"];
 			NSString *keyEquiv = @"";
 			NSUInteger modMask = 0;
 			int i;
-			for (i = 0; i < [key length]; i++)
-			{
+			for (i = 0; i < [key length]; i++) {
 				unichar c = [key characterAtIndex:i];
 				switch (c)
 				{
-					case '^':
-						modMask |= NSControlKeyMask;
-						break;
-					case '@':
-						modMask |= NSCommandKeyMask;
-						break;
-					case '~':
-						modMask |= NSAlternateKeyMask;
-						break;
-					default:
-						keyEquiv = [NSString stringWithFormat:@"%C", c];
-						break;
+				case '^':
+					modMask |= NSControlKeyMask;
+					break;
+				case '@':
+					modMask |= NSCommandKeyMask;
+					break;
+				case '~':
+					modMask |= NSAlternateKeyMask;
+					break;
+				default:
+					keyEquiv = [NSString stringWithFormat:@"%C", c];
+					break;
 				}
 			}
 
@@ -138,8 +136,13 @@
 	return sharedBuffers;
 }
 
+extern BOOL makeNewWindowInsteadOfTab;
+
 - (IBAction)newProject:(id)sender
 {
+	makeNewWindowInsteadOfTab = YES;
+	[[NSDocumentController sharedDocumentController] newDocument:self];
+#if 0
 	NSError *error = nil;
 	NSDocument *proj = [[NSDocumentController sharedDocumentController] makeUntitledDocumentOfType:@"Project" error:&error];
 	INFO(@"proj = %@", proj);
@@ -147,10 +150,13 @@
 	{
 		[[NSDocumentController sharedDocumentController] addDocument:proj];
 		[proj makeWindowControllers];
+		[[NSDocumentController sharedDocumentController] newDocument:self];
 		[proj showWindows];
 	}
 	else
 		INFO(@"error = %@", error);
+#endif
 }
 
 @end
+

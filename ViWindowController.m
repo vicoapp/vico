@@ -157,6 +157,11 @@ static NSWindowController	*currentWindowController = nil;
 		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 	}
 
+	/* If current document is untitled and unchanged, replace it. */
+	ViDocument *closeThisDocument = nil;
+	if ([[self currentDocument] fileURL] == nil && ![[self currentDocument] isDocumentEdited])
+		closeThisDocument = [self currentDocument];
+
 	[tabBar addDocument:document];
 	[self selectDocument:document];
 
@@ -171,6 +176,7 @@ static NSWindowController	*currentWindowController = nil;
 	[[ViJumpList defaultJumpList] pushURL:[document fileURL] line:1 column:1];
 	
 	// [projectDelegate addURL:[document fileURL]];
+	[closeThisDocument close];
 }
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView

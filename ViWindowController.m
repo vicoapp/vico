@@ -159,7 +159,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	/* If current document is untitled and unchanged, replace it. */
 	ViDocument *closeThisDocument = nil;
-	if ([[self currentDocument] fileURL] == nil && ![[self currentDocument] isDocumentEdited])
+	if ([[self currentDocument] fileURL] == nil && [document fileURL] != nil && ![[self currentDocument] isDocumentEdited])
 		closeThisDocument = [self currentDocument];
 
 	[tabBar addDocument:document];

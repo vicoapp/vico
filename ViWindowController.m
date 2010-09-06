@@ -6,6 +6,7 @@
 #import "ViSeparatorCell.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"
+#import "ViDocumentController.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -64,6 +65,7 @@ static NSWindowController	*currentWindowController = nil;
 - (IBAction)saveProject:(id)sender
 {
 	INFO(@"sender = %@", sender);
+	[projectDelegate save];
 }
 
 - (void)windowDidLoad
@@ -242,9 +244,22 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Document closing
 
+- (void)documentController:(NSDocumentController *)docController didCloseAll:(BOOL)didCloseAll contextInfo:(void *)contextInfo
+{
+	if (didCloseAll)
+		[[self window] close];
+}
+
 - (BOOL)windowShouldClose:(id)window
 {
-	return [documents count] == 0;
+	[[self currentDocument] close];
+	if ([documents count] == 0)
+		return YES;
+
+	[[NSDocumentController sharedDocumentController] closeAllDocumentsInWindow:window
+								      withDelegate:self
+							       didCloseAllSelector:@selector(documentController:didCloseAll:contextInfo:)];
+	return NO;
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
@@ -257,9 +272,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)closeDocumentViews:(ViDocument *)document
 {
-	INFO(@"close document %@", document);
-	[document removeObserver:self forKeyPath:@"symbols"];
-
 	while ([document visibleViews] > 0)
 		[self collapseDocumentView:[[document views] objectAtIndex:0]];
 
@@ -274,8 +286,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	if ([documents count] == 0)
 	{
-		INFO(@"%s", "no documents left, closing window");
-		// [[self window] close];
+		[[self window] close];
 	}
 	else
 	{
@@ -288,15 +299,10 @@ static NSWindowController	*currentWindowController = nil;
 		if (lastDocument && lastDocument != document)
 		{
 			if ([lastDocument visibleViews] > 0)
-			{
 				[self setMostRecentDocument:lastDocument view:lastDocumentView];
-				foundVisibleView = YES;
-			}
 			else
-			{
 				[self selectDocument:lastDocument];
-				foundVisibleView = YES;
-			}
+			foundVisibleView = YES;
 		}
 		
 		if (!foundVisibleView)
@@ -322,13 +328,23 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
+{
+	if (shouldClose)
+		[doc close];
+}
+
+/*
+ * Called by the tabBar when clicking the X button in the tab.
+ */
 - (void)closeDocument:(ViDocument *)document
 {
 	if ([document visibleViews] > 0)
 		[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
 	else
 		[self selectDocument:document];
-	[[self window] performClose:self];
+	
+	[document canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:NULL];
 }
 
 - (void)windowDidResize:(NSNotification *)aNotification

@@ -70,9 +70,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowDidLoad
 {
-	[toolbar setDelegate:self];
-	[[self window] setToolbar:toolbar];
-	[toolbar setShowsBaselineSeparator:NO];
+	[[[self window] toolbar] setShowsBaselineSeparator:NO];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
@@ -82,7 +80,7 @@ static NSWindowController	*currentWindowController = nil;
 	// FIXME: add KVC observer for the 'hidetab' option
 	[tabBar setPartnerView:splitView];
 	[tabBar setShowAddTabButton:YES];
-	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update  for this to work without NSTabview
+	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update for this to work without NSTabview
 
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];

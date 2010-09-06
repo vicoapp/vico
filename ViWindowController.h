@@ -16,7 +16,6 @@
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *documentView;
 	IBOutlet ViBgView *explorerView;
-	IBOutlet NSToolbar *toolbar;
 
 	ViTagStack *tagStack;
 	BOOL isLoaded;

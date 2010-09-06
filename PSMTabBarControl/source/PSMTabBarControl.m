@@ -456,7 +456,6 @@
     [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     _hideIndicators = YES;
     
-    NSTimer *animationTimer;
     _isHidden = hide;
     _currentStep = 0;
     if(!animate)
@@ -527,7 +526,7 @@
     }
 
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:myOriginalY], @"myOriginalY", [NSNumber numberWithFloat:partnerOriginalY], @"partnerOriginalY", [NSNumber numberWithFloat:myOriginalHeight], @"myOriginalHeight", [NSNumber numberWithFloat:partnerOriginalHeight], @"partnerOriginalHeight", [NSNumber numberWithFloat:myTargetY], @"myTargetY", [NSNumber numberWithFloat:partnerTargetY], @"partnerTargetY", [NSNumber numberWithFloat:myTargetHeight], @"myTargetHeight", [NSNumber numberWithFloat:partnerTargetHeight], @"partnerTargetHeight", nil];
-    animationTimer = [NSTimer scheduledTimerWithTimeInterval:(1.0/20.0) target:self selector:@selector(animateShowHide:) userInfo:userInfo repeats:YES];
+    [NSTimer scheduledTimerWithTimeInterval:(1.0/20.0) target:self selector:@selector(animateShowHide:) userInfo:userInfo repeats:YES];
 }
 
 - (void)animateShowHide:(NSTimer *)timer
@@ -561,6 +560,16 @@
         [self update];
     }
     [[self window] display];
+}
+
+- (void)disableAnimations
+{
+	_animate = NO;
+}
+
+- (void)enableAnimations
+{
+	_animate = YES;
 }
 
 - (id)partnerView
@@ -599,10 +608,12 @@
 #endif
 
     // hide/show? (these return if already in desired state)
-    if((_hideForSingleTab) && ([_cells count] <= 1)){
-        [self hideTabBar:YES animate:YES];
-    } else {
-        [self hideTabBar:NO animate:YES];
+    if (_animate) {
+        if((_hideForSingleTab) && ([_cells count] <= 1)){
+            [self hideTabBar:YES animate:YES];
+        } else {
+            [self hideTabBar:NO animate:YES];
+        }
     }
 
     // size all cells appropriately and create tracking rects

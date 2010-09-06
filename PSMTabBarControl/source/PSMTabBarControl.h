@@ -69,6 +69,7 @@ enum {
     BOOL                        _hideIndicators;
     IBOutlet id                 partnerView;                // gets resized when hide/show
     BOOL                        _awakenedFromNib;
+    BOOL			_animate;
     
     // drag and drop
     NSEvent                     *_lastMouseDownEvent;      // keep this for dragging reference   
@@ -100,6 +101,8 @@ enum {
 - (void)setSizeCellsToFit:(BOOL)value;
 - (BOOL)allowsDragBetweenWindows;
 - (void)setAllowsDragBetweenWindows:(BOOL)flag;
+- (void)disableAnimations;
+- (void)enableAnimations;
 
 // accessors
 - (id)delegate;

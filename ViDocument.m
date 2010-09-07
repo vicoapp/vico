@@ -18,6 +18,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
 - (void)setSymbolScopes;
+- (void)resetTypingAttributes;
 @end
 
 @implementation ViDocument
@@ -35,8 +36,29 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		symbols = [NSArray array];
 		views = [[NSMutableArray alloc] init];
 		exCommandHistory = [[NSMutableArray alloc] init];
+
+		[[NSUserDefaults standardUserDefaults] addObserver:self
+							forKeyPath:@"number"
+							   options:NSKeyValueObservingOptionNew
+							   context:NULL];
+		[[NSUserDefaults standardUserDefaults] addObserver:self
+							forKeyPath:@"tabstop"
+							   options:NSKeyValueObservingOptionNew
+							   context:NULL];
 	}
 	return self;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
+
+{
+	if ([keyPath isEqualToString:@"number"])
+		[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
+	else if ([keyPath isEqualToString:@"tabstop"])
+		[self resetTypingAttributes];
 }
 
 #pragma mark -
@@ -44,15 +66,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)makeWindowControllers
 {
-	if (makeNewWindowInsteadOfTab)
-	{
+	if (makeNewWindowInsteadOfTab) {
 		windowController = [[ViWindowController alloc] init];
 		makeNewWindowInsteadOfTab = NO;
 	}
 	else
-	{
 		windowController = [ViWindowController currentWindowController];
-	}
 
 	[self addWindowController:windowController];
 	[windowController addNewTab:self];
@@ -99,6 +118,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ignoreEditing = NO;
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
+	[self updatePageGuide];
 
 	return documentView;
 }
@@ -497,16 +517,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView
 {
-	if (flag)
-	{
+	if (flag) {
 		NoodleLineNumberView *lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:aScrollView];
 		[aScrollView setVerticalRulerView:lineNumberView];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];
 		[lineNumberView setBackgroundColor:[NSColor colorWithDeviceRed:(float)0xED/0xFF green:(float)0xED/0xFF blue:(float)0xED/0xFF alpha:1.0]];
-	}
-	else
+	} else
 		[aScrollView setRulersVisible:NO];
 }
 
@@ -514,9 +532,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	ViDocumentView *dv;
 	for (dv in views)
-	{
 		[self enableLineNumbers:flag forScrollView:[[dv textView] enclosingScrollView]];
-	}
+}
+
+- (void)resetTypingAttributes
+{
+        [(ViTextView *)[[views objectAtIndex:0] textView] resetTypingAttributes];
 }
 
 - (IBAction)toggleLineNumbers:(id)sender
@@ -548,13 +569,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
-- (void)setPageGuide:(int)pageGuideValue
+- (void)updatePageGuide
 {
+	int pageGuideColumn = 0;
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"showguide"] == NSOnState)
+		pageGuideColumn = [[NSUserDefaults standardUserDefaults] integerForKey:@"guidecolumn"];
+
 	ViDocumentView *dv;
 	for (dv in views)
-	{
-		[[dv textView] setPageGuide:pageGuideValue];
-	}
+		[[dv textView] setPageGuide:pageGuideColumn];
 }
 
 #pragma mark -
@@ -621,8 +644,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)popTag
 {
 	NSDictionary *location = [[[self windowController] sharedTagStack] pop];
-	if (location == nil)
-	{
+	if (location == nil) {
 		[self message:@"The tags stack is empty"];
 		return;
 	}
@@ -631,8 +653,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViDocument *document = [[NSDocumentController sharedDocumentController]
 		openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
 
-	if (document)
-	{
+	if (document) {
 		[[self windowController] selectDocument:document];
 		[(ViTextView *)[[views objectAtIndex:0] textView] gotoLine:[[location objectForKey:@"line"] unsignedIntegerValue]
 				                                    column:[[location objectForKey:@"column"] unsignedIntegerValue]];
@@ -662,12 +683,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
 	ViSymbol *s;
 	for (s in symbols)
-	{
 		if ([rx matchInString:[s symbol]])
-		{
 			[fs addObject:s];
-		}
-	}
 	[self setFilteredSymbols:fs];
 	return [fs count];
 }
@@ -678,10 +695,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSString *selector;
 	symbolScopes = [[NSMutableArray alloc] init];
 	for (selector in symbolSettings)
-	{
 		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
 			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
-	}
 }
 
 - (void)updateSymbolList:(NSTimer *)timer

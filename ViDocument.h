@@ -47,7 +47,7 @@
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;
 - (void)changeTheme:(ViTheme *)theme;
-- (void)setPageGuide:(int)pageGuideValue;
+- (void)updatePageGuide;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(int)regexpSyntax;

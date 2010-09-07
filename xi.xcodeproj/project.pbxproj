@@ -31,6 +31,8 @@
 		9A1E40DF0EFBB1D000682D4A /* strtonum.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DE0EFBB1D000682D4A /* strtonum.c */; };
 		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
 		9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
+		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
+		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
 		9A4BA1FB118C80F10093E2AB /* b32.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A4BA1F9118C80F10093E2AB /* b32.c */; };
 		9A4BA2C8118D63450093E2AB /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4BA2C6118D63450093E2AB /* ViBgView.m */; };
 		9A4F7DC20ED56CFE00A3CCF1 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */; };
@@ -181,6 +183,9 @@
 		9A28300F109B15110023D2CF /* NSTextField-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextField-additions.h"; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
+		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
+		9A438ABF1235847000F7D9FD /* ViPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencesController.m; sourceTree = "<group>"; };
+		9A438AC51235867B00F7D9FD /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PreferenceWindow.xib; sourceTree = "<group>"; };
 		9A4BA1F9118C80F10093E2AB /* b32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = b32.c; sourceTree = "<group>"; };
 		9A4BA1FA118C80F10093E2AB /* b32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b32.h; sourceTree = "<group>"; };
 		9A4BA2C6118D63450093E2AB /* ViBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBgView.m; sourceTree = "<group>"; };
@@ -445,6 +450,7 @@
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				9AB014970ED5F99200905BED /* CommandOutputWindow.xib */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -564,6 +570,8 @@
 				9AC16DA30D93D14A00AE45E0 /* ViDocument.m */,
 				9A70D93B0E9E76D70013AA1D /* ViWindowController.h */,
 				9A70D93C0E9E76D70013AA1D /* ViWindowController.m */,
+				9A438ABE1235847000F7D9FD /* ViPreferencesController.h */,
+				9A438ABF1235847000F7D9FD /* ViPreferencesController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -678,6 +686,7 @@
 				9AD856BA0EF90B9A008DF460 /* add.png in Resources */,
 				9AD856C20EF90CE6008DF460 /* actionbarbg.png in Resources */,
 				9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */,
+				9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -801,6 +810,7 @@
 				9A5C4351117ACF6A00647F5C /* fatal.c in Sources */,
 				9A4BA1FB118C80F10093E2AB /* b32.c in Sources */,
 				9A4BA2C8118D63450093E2AB /* ViBgView.m in Sources */,
+				9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -845,6 +855,14 @@
 				2A37F4BAFDCFA73011CA2CEA /* English */,
 			);
 			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9A438AC51235867B00F7D9FD /* English */,
+			);
+			name = PreferenceWindow.xib;
 			sourceTree = "<group>";
 		};
 		9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */ = {

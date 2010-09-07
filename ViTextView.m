@@ -84,11 +84,11 @@ int logIndent = 0;
 
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
-	[self setUsesFontPanel:NO];
-	[self setUsesFindPanel:NO];
+//	[self setUsesFontPanel:NO];
+//	[self setUsesFindPanel:NO];
 	//[self setPageGuideValues];
 	[self disableWrapping];
-	[self setContinuousSpellCheckingEnabled:NO];
+//	[self setContinuousSpellCheckingEnabled:NO];
 	// [[self layoutManager] setShowsInvisibleCharacters:YES];
 	[[self layoutManager] setShowsControlCharacters:YES];
 	[self setDrawsBackground:YES];
@@ -1693,5 +1693,5 @@ int logIndent = 0;
 	[self pushLocationOnJumpList:[self caret]];
 }
 
-
 @end
+

@@ -3,6 +3,7 @@
 #import "ViLanguageStore.h"
 #import "ViDocument.h"
 #import "ViDocumentController.h"
+#import "ViPreferencesController.h"
 
 @implementation ViAppController
 
@@ -28,17 +29,6 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-	// create our subclass for the default shared document controller
-	[[ViDocumentController alloc] init];
-
-	NSArray *themes = [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(compare:)];
-	NSString *theme;
-	for (theme in themes)
-	{
-		NSMenuItem *item = [themeMenu addItemWithTitle:theme action:@selector(setTheme:) keyEquivalent:@""];
-		[item setTarget:self];
-	}
-
 	/* initialize default defaults */
 	[[NSUserDefaults standardUserDefaults] registerDefaults:
 		[NSDictionary dictionaryWithObjectsAndKeys:
@@ -53,9 +43,10 @@
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 			nil]];
 
-	/* initialize languages */
+	/* Initialize languages and themes. */
 	[ViLanguageStore defaultStore];
-
+	[ViThemeStore defaultStore];
+	
 	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 	NSString *language;
 	for (language in languages)
@@ -103,32 +94,42 @@
 		}
 	}
 #endif
+
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"theme"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"showguide"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"guidecolumn"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	
 }
 
-- (IBAction)setTheme:(id)sender
-{
-	NSString *themeName = [sender title];
-	ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:themeName];
-	[[NSUserDefaults standardUserDefaults] setObject:themeName forKey:@"theme"];
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
 
+{
 	ViDocument *doc;
-	for (doc in [[NSDocumentController sharedDocumentController] documents])
-	{
-		[doc changeTheme:theme];
+
+	if ([keyPath isEqualToString:@"theme"]) {
+		for (doc in [[NSDocumentController sharedDocumentController] documents])
+			[doc changeTheme:[[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]]];
+	} else if ([keyPath isEqualToString:@"showguide"] || [keyPath isEqualToString:@"guidecolumn"]) {
+		for (doc in [[NSDocumentController sharedDocumentController] documents])
+			[doc updatePageGuide];
 	}
 }
 
-- (IBAction)setPageGuide:(id)sender
+- (IBAction)showPreferences:(id)sender
 {
-	int page_guide_column = [sender tag];
-
-	ViDocument *doc;
-	for (doc in [[NSDocumentController sharedDocumentController] documents])
-	{
-		[doc setPageGuide:page_guide_column];
-	}
-
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:page_guide_column] forKey:@"pageGuide"];
+	[[ViPreferencesController sharedPreferences] show];
 }
 
 - (NSMutableDictionary *)sharedBuffers

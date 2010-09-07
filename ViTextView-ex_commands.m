@@ -201,12 +201,6 @@
 			}
 			
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
-
-			// Special handling, FIXME: replace with KVC observers!
-			if ([defaults_name isEqualToString:@"number"])
-			{
-				[[self delegate] enableLineNumbers:!turnoff];
-			}
 		}
 		else
 		{
@@ -219,12 +213,6 @@
 			{
 				NSString *val = [var substringFromIndex:equals + 1];
 				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
-				
-				// Special handling, FIXME: replace with KVC observers!
-				if ([defaults_name isEqualToString:@"tabstop"])
-				{
-                                        [self resetTypingAttributes];
-                                }
 			}
 		}
 	}

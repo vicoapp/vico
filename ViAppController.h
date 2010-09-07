@@ -4,7 +4,6 @@
 
 @interface ViAppController : NSObject
 {
-	IBOutlet NSMenu *themeMenu;
 	IBOutlet NSMenu *languageMenu;
 	IBOutlet NSMenu *commandMenu;
 	NSMutableDictionary *sharedBuffers;
@@ -13,8 +12,7 @@
 
 @property(copy, readwrite) NSString *lastSearchPattern;
 
-- (IBAction)setTheme:(id)sender;
-- (IBAction)setPageGuide:(id)sender;
+- (IBAction)showPreferences:(id)sender;
 
 - (NSMutableDictionary *)sharedBuffers;
 

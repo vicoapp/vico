@@ -41,10 +41,8 @@ ToolbarHeightForWindow(NSWindow *window)
 - (void)windowDidLoad
 {
 	NSString *theme;
-	for (theme in [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]) {
-		INFO(@"add theme %@", theme);
+	for (theme in [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)])
 		[themeButton addItemWithTitle:theme];
-	}
 	[themeButton selectItem:[themeButton itemWithTitle:[[[ViThemeStore defaultStore] defaultTheme] name]]];
 	
 	// Load last viewed pane

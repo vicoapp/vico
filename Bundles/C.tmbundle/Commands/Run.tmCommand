@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>autoScrollOutput</key>
+	<true/>
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
 	<key>command</key>
@@ -10,7 +12,7 @@
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/executor"
 require ENV["TM_SUPPORT_PATH"] + "/lib/tm/save_current_document"
 
-mode = ENV["TM_SCOPE"].slice(/^source\.((?:obj)?c(\+\+)?)/, 1)
+mode = ENV["TM_SCOPE"].slice(/.*?\bsource\.((?:obj)?c(\+\+)?)/, 1)
 
 
 case mode
@@ -42,7 +44,7 @@ TextMate::Executor.make_project_master_current_document
 flags = ENV["TM_#{env}_FLAGS"] || "-Wall -include stdio.h #{"-include iostream" unless mode[/c\+\+$/].nil?} #{"-framework Cocoa" unless mode[/^obj/].nil?}"
 args = [ENV["TM_#{g}"] || g.downcase.gsub("x", "+"), flags + " -x #{lang}", ENV["TM_FILEPATH"]] 
 
-TextMate::Executor.run(args, :version_args =&gt; ["--version"], :version_regex =&gt; /\A(.*) \(GCC\)/)
+TextMate::Executor.run(args, :version_args =&gt; ["--version"], :version_regex =&gt; /\A([^\n]*) \(GCC\).*/m)
 </string>
 	<key>input</key>
 	<string>document</string>

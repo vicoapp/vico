@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>name</key>
@@ -11,26 +11,77 @@
 		<key>completionCommand</key>
 		<string>#!/usr/bin/env ruby -wKU
 
-require ENV["TM_SUPPORT_PATH"] + "/lib/osx/plist"
+USR_HEAD  = Regexp.escape "#include \"...\" search starts here:\n"
+SYS_HEAD  = Regexp.escape "#include &lt;...&gt; search starts here:\n"
+FOOTER    = Regexp.escape "End of search list."
 
-Dir.chdir "/System/Library/Frameworks"
-res = Dir["*.framework"]
+COMPILER  = {
+  "source.c"      =&gt; "gcc 2&gt;&amp;1 &gt;/dev/null -E -v -x c /dev/null",
+  "source.c++"    =&gt; "g++ 2&gt;&amp;1 &gt;/dev/null -E -v -x c++ /dev/null",
+  "source.objc"   =&gt; "gcc 2&gt;&amp;1 &gt;/dev/null -E -v -x objective-c /dev/null",
+  "source.objc++" =&gt; "g++ 2&gt;&amp;1 &gt;/dev/null -E -v -x objective-c++ /dev/null",
+}
 
-prefs = OSX::PropertyList::load(File.new("#{ENV["HOME"]}/Library/Preferences/com.apple.Xcode.plist"))
-dir = prefs["PBXProductDirectory"]
-if dir &amp;&amp; File.exists?(File.expand_path("#{dir}/Release"))
-  Dir.chdir File.expand_path("#{dir}/Release")
-  res &lt;&lt; Dir["*.framework"]
+def compiler_search_path(domain = :system)
+  scope        = "source.c"
+  scope        = $&amp; if ENV["TM_SCOPE"] =~ /source.(obj)?c(\+\+)?/
+
+  res = IO.popen(COMPILER[scope]) { |io| io.read }
+  if res =~ /#{USR_HEAD}(.*)#{SYS_HEAD}(.*)#{FOOTER}/m
+	case domain
+	  when :system  then $2
+	  when :user    then $1 + " .\n"
+	  when :all     then $1 + " .\n" + $2
+	end.scan(/ (\S*)(?: \(framework directory\)$)?/).flatten
+  else
+	abort "Failed to parse compiler output.\nCommand: " + COMPILER[scope]
+  end
+end
+
+def user_search_path(domain = :system)
+  usr = ENV["TM_USR_HEADER_PATH"].to_s
+  sys = ENV["TM_SYS_HEADER_PATH"].to_s
+
+  res = case domain
+	when :system  then sys
+	when :user    then usr
+	when :all     then "#{usr}:#{sys}"
+  end.split(":")
+  res.delete("")
+
+  res.empty? ? nil : res
+end
+
+def expand_dirs(entries)
+	entries.map do |entry|
+		if entry =~ /(.*)\.framework$/
+			if File.exists? "#$1.framework/Headers/#$1.h"
+				"#$1/#$1.h"
+			elsif File.exists? "#$1.framework/Headers"
+				Dir["#$1.framework/Headers/[A-Za-z]*.h"].sort.map do |e|
+					e.sub(/\.framework\/Headers\//, "/")
+				end
+			else
+				[ ]
+			end
+		elsif File.directory? entry
+			Dir[entry + "/[A-Za-z]*.h"].sort
+		else
+			entry
+		end
+	end
 end
 
 partial_word = ENV["TM_CURRENT_WORD"]
-partial_len = partial_word.length
 
-res = res.flatten.find_all { |e| partial_word == e[0...partial_len] }
-res = res.sort { |a,b| a.downcase &lt;=&gt; b.downcase }.uniq
-res = res.map { |e| e.sub(/(.*)\.framework$/, "\\1/\\1.h") }
-
-puts res.join("\n")</string>
+dirs = user_search_path(:system) || compiler_search_path(:system)
+res = [ ] 
+dirs.each do |dir|
+	Dir.chdir(dir) { res &lt;&lt; expand_dirs(Dir[partial_word + "*"].sort) }
+end
+puts res.flatten.join("\n")</string>
+		<key>disableDefaultCompletion</key>
+		<integer>1</integer>
 	</dict>
 	<key>uuid</key>
 	<string>9136716A-CE06-4801-ABC9-3D64300869F8</string>

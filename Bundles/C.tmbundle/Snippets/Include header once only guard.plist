@@ -12,7 +12,7 @@ print "#{name}_#{uuid}".tr("[a-z]", "[A-Z]")
 `}
 #define $1
 
-$0
+${TM_SELECTED_TEXT/\Z\n//}${0:}
 
 #endif /* end of include guard: $1 */
 </string>

@@ -5,15 +5,16 @@
 	<key>beforeRunningCommand</key>
 	<string>nop</string>
 	<key>command</key>
-	<string>export TM_RUBY=
-$(type -p "${TM_RUBY:-ruby}") -e'
+	<string>#!/usr/bin/env ruby
+
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/tm/executor"
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/tm/save_current_document"
+
 TextMate.save_current_document
 TextMate::Executor.make_project_master_current_document
 
 TextMate::Executor.run(ENV["TM_PERL"] || "perl", "-I#{ENV["TM_BUNDLE_SUPPORT"]}",
-     "-Mexception_handler", ENV["TM_FILEPATH"], :version_args =&gt; ["-e", e_sh(%q{printf "Perl v%vd", $^V})])'&lt;&amp;0
+     "-Mexception_handler", ENV["TM_FILEPATH"], :version_args =&gt; ["-e", 'printf "Perl v%vd", $^V;'])
 </string>
 	<key>input</key>
 	<string>document</string>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>beforeRunningCommand</key>
@@ -7,7 +7,17 @@
 	<key>command</key>
 	<string>#!/usr/bin/env ruby -wKU
 
-print ': ' + STDIN.read.scan(/(\w+)(?: = [^,)]+)?(?:[,)] )/).map { |e| "#{e}(#{e})" }.join(", ")</string>
+line = STDIN.read
+
+if line =~ /\((.*)\)(\s?)/ # extract parameters
+	line, ws = $1, $2
+	line.gsub!(/&lt;.*?&gt;/, '')              # remove template args
+	line.gsub!(/\(.*?\)/, '')            # remove (…), e.g. ‘type const&amp; var = type()’
+	line = line.split(',').map { |e| e.gsub(/.*?(\w+)(\s+=.*)?$/, '\1(\1)') }.join(', ')
+	print ' ' if ws.empty?
+	print ': ' + line
+end
+</string>
 	<key>fallbackInput</key>
 	<string>line</string>
 	<key>input</key>

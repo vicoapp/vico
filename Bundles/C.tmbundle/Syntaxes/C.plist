@@ -583,6 +583,20 @@
 			<key>patterns</key>
 			<array>
 				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.toc-list.banner.block.c</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>^/\* =(\s*.*?)\s*= \*/$\n?</string>
+					<key>name</key>
+					<string>comment.block.c</string>
+				</dict>
+				<dict>
 					<key>begin</key>
 					<string>/\*</string>
 					<key>captures</key>
@@ -603,6 +617,20 @@
 					<string>\*/.*\n</string>
 					<key>name</key>
 					<string>invalid.illegal.stray-comment-end.c</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.toc-list.banner.line.c</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>^// =(\s*.*?)\s*=\s*$\n?</string>
+					<key>name</key>
+					<string>comment.line.banner.c++</string>
 				</dict>
 				<dict>
 					<key>begin</key>

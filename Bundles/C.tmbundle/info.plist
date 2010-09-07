@@ -59,6 +59,7 @@
 					<string>523B30D4-C28A-11D9-8CEF-000D93589AF6</string>
 					<string>1D14B92E-8819-11D9-8661-000D93589AF6</string>
 					<string>CEE5F928-47A2-4648-96F0-99FF5C2A7419</string>
+					<string>DD10B510-1C36-45E0-A378-527401EE55B1</string>
 					<string>08E16CAE-DBD8-4570-B778-9E0E0EFFF80C</string>
 					<string>------------------------------------</string>
 					<string>C5DEE118-4C9E-4F3E-97A4-0E01A250F142</string>
@@ -74,6 +75,7 @@
 					<string>E8C3B596-9045-11D9-AB38-000D93589AF6</string>
 					<string>BC8B81AB-5F16-11D9-B9C3-000D93589AF6</string>
 					<string>62D59E1C-1DF1-490E-86E9-DFF8A461AD9C</string>
+					<string>986C0149-7802-4385-A237-90074D9D5ACD</string>
 				</array>
 				<key>name</key>
 				<string>Idioms</string>
@@ -102,6 +104,7 @@
 		<string>1D14B92E-8819-11D9-8661-000D93589AF6</string>
 		<string>523B30D4-C28A-11D9-8CEF-000D93589AF6</string>
 		<string>CEE5F928-47A2-4648-96F0-99FF5C2A7419</string>
+		<string>DD10B510-1C36-45E0-A378-527401EE55B1</string>
 		<string>08E16CAE-DBD8-4570-B778-9E0E0EFFF80C</string>
 		<string>A295A902-ACAF-11D9-987D-000D93589AF6</string>
 		<string>5E468268-ACAF-11D9-987D-000D93589AF6</string>
@@ -121,6 +124,11 @@
 		<string>47DD44E6-B4F5-4C2E-BC62-C6ACEBC02A0D</string>
 		<string>45FFA4DA-C84A-4D1F-862B-F249C24941EF</string>
 		<string>093DA4F2-D97F-4309-B869-6970C090A539</string>
+		<string>3D221F96-F4CC-432D-9A04-F9F4DF3E0F55</string>
+		<string>1B7326BB-6A85-4ED2-A0D7-51619763D98F</string>
+		<string>E823A373-FFD6-42F1-998F-7571A3553847</string>
+		<string>B2B97E23-E686-4410-991D-A92AF3A9FC95</string>
+		<string>A8E4E48A-81F3-4DB7-A7A2-88662C06E011</string>
 	</array>
 	<key>uuid</key>
 	<string>4675A940-6227-11D9-BFB1-000D93589AF6</string>

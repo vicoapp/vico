@@ -14,7 +14,7 @@
 		<string>.textmate_init</string>
 	</array>
 	<key>firstLineMatch</key>
-	<string>^#!.*(bash|zsh|sh|tcsh)</string>
+	<string>^#!.*\b(bash|zsh|sh|tcsh)</string>
 	<key>foldingStartMarker</key>
 	<string>\b(if|case)\b|(\{|\b(do)\b)$</string>
 	<key>foldingStopMarker</key>
@@ -305,7 +305,7 @@
 			<array>
 				<dict>
 					<key>begin</key>
-					<string>\b(function)\s+((?:[^\s\\]|\\.)+)(?:\s*(\(\)))?</string>
+					<string>\b(function)\s+([^\s\\]+)(?:\s*(\(\)))?</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
@@ -346,7 +346,7 @@
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>\b((?:[^\s\\]|\\.)+)\s*(\(\))</string>
+					<string>\b([^\s\\=]+)\s*(\(\))</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>

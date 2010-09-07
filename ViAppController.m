@@ -12,8 +12,7 @@
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		[NSApp setDelegate:self];
 		sharedBuffers = [[NSMutableDictionary alloc] init];
 	}
@@ -40,6 +39,11 @@
 			[NSNumber numberWithBool:YES], @"number",
 			[NSNumber numberWithBool:YES], @"autocollapse",
 			[NSNumber numberWithBool:YES], @"hidetab",
+			[NSNumber numberWithBool:NO], @"showguide",
+			[NSNumber numberWithInt:80], @"guidecolumn",
+			[NSNumber numberWithFloat:11.0], @"fontsize",
+			@"Menlo Regular", @"fontname",
+			@"Mac Classic", @"theme",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 			nil]];
 
@@ -50,9 +54,7 @@
 	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 	NSString *language;
 	for (language in languages)
-	{
 		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
-	}
 
 	[[commandMenu supermenu] removeItemAtIndex:5];
 #if 0
@@ -107,7 +109,6 @@
 						forKeyPath:@"guidecolumn"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
-	
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

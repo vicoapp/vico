@@ -12,9 +12,7 @@
 {
 	self = [super init];
 	if (self)
-	{
 		document = aDocument;
-	}
 	return self;
 }
 

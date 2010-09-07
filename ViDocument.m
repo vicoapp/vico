@@ -45,6 +45,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							forKeyPath:@"tabstop"
 							   options:NSKeyValueObservingOptionNew
 							   context:NULL];
+		[[NSUserDefaults standardUserDefaults] addObserver:self
+							forKeyPath:@"fontsize"
+							   options:NSKeyValueObservingOptionNew
+							   context:NULL];
+		[[NSUserDefaults standardUserDefaults] addObserver:self
+							forKeyPath:@"fontname"
+							   options:NSKeyValueObservingOptionNew
+							   context:NULL];
 	}
 	return self;
 }
@@ -57,7 +65,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	if ([keyPath isEqualToString:@"number"])
 		[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
-	else if ([keyPath isEqualToString:@"tabstop"])
+	else if ([keyPath isEqualToString:@"tabstop"] ||
+		 [keyPath isEqualToString:@"fontsize"] ||
+		 [keyPath isEqualToString:@"fontname"])
 		[self resetTypingAttributes];
 }
 
@@ -466,22 +476,32 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	DEBUG(@"range = %@, string = [%@]", NSStringFromRange(affectedCharRange), replacementString);
+	INFO(@"range = %@, string = [%@], mode = %d",
+	     NSStringFromRange(affectedCharRange),
+	     replacementString,
+	     [(ViTextView *)[[views objectAtIndex:0] textView] mode]);
+	
+	if (replacementString == nil) {
+		/* Only text attributes are being changed. */
+		return YES;
+	}
 
-	if ([replacementString length] > 0) {
-		DEBUG(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
+	NSInteger diff = [replacementString length] - affectedCharRange.length;
+
+	if (diff > 0) {
+		INFO(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:replacementString
 		                            forward:YES];
-		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, [replacementString length])];
+		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, diff)];
 		// FIXME: also push jumps and marks
-	} else {
+	} else if (diff < 0) {
 		NSString *deletedString = [[textStorage string] substringWithRange:affectedCharRange];
-		DEBUG(@"pulling string [%@] from %u", deletedString, affectedCharRange.location);
+		INFO(@"pulling string [%@] from %u", deletedString, affectedCharRange.location);
 		[self pushContinuationsFromLocation:affectedCharRange.location
 		                             string:deletedString
 		                            forward:NO];
-		[syntaxParser pullScopes:affectedCharRange];
+		[syntaxParser pullScopes:NSMakeRange(affectedCharRange.location, -diff)];
 		// FIXME: also pull jumps and marks
 	}
 
@@ -498,7 +518,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 	}
 
-	DEBUG(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
+	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
 		NSStringFromRange(area), [textStorage changeInLength],
 		textStorage, self);
 

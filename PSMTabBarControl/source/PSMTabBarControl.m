@@ -110,7 +110,8 @@
     _cellMaxWidth = 280;
     _cellOptimumWidth = 130;
     style = [[PSMMetalTabStyle alloc] init];
-    
+    _animate = YES;
+
     // the overflow button/menu
     NSRect overflowButtonRect = NSMakeRect([self frame].size.width - [style rightMarginForTabBarControl] + 1, 0, [style rightMarginForTabBarControl] - 1, [self frame].size.height);
     _overflowPopUpButton = [[PSMOverflowPopUpButton alloc] initWithFrame:overflowButtonRect pullsDown:YES];

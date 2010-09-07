@@ -98,7 +98,7 @@
 
 - (void)setenv:(const char *)var integer:(NSInteger)intValue
 {
-	setenv(var, [[NSString stringWithFormat:@"%li", intValue] UTF8String], 1);
+	[self setenv:var value:[NSString stringWithFormat:@"%li", intValue]];
 }
 
 - (void)setupEnvironmentForCommand:(NSDictionary *)command
@@ -120,10 +120,8 @@
 	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[self wordAtLocation:[self caret]]];
 
-	// [self setenv:"TM_DIRECTORY" value:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
 	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
-	// FIXME: TM_PROJECT_DIRECTORY
-	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
+	[self setenv:"TM_PROJECT_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
 
 	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];

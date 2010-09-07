@@ -126,11 +126,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ([keyPath isEqualToString:@"symbols"])
-	{
+	if ([keyPath isEqualToString:@"symbols"]) {
 		[self filterSymbols:symbolFilterField];
-		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
-		{
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
 			[symbolsOutline collapseItem:nil collapseChildren:YES];
 			[symbolsOutline expandItem:[self currentDocument]];
 		}

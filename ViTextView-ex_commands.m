@@ -130,18 +130,20 @@
 		@"number", @"numb",
 		@"autocollapse", @"ac",  // automatically collapses other documents in the symbol list
 		@"hidetab", @"ht",  // hide tab bar for single tabs
+		@"fontsize", @"fontsize",
+		@"fontname", @"font",
+		@"showguide", @"sg",
+		@"guidecolumn", @"gc",
 		nil];
 
-	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", @"hidetab", nil];
+	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", @"hidetab", @"showguide", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;
-	for (var in command.words)
-	{
+	for (var in command.words) {
 		NSUInteger equals = [var rangeOfString:@"="].location;
 		NSUInteger qmark = [var rangeOfString:@"?"].location;
-		if (equals == 0 || qmark == 0)
-		{
+		if (equals == 0 || qmark == 0) {
 			[[self delegate] message:usage];
 			return;
 		}
@@ -155,14 +157,12 @@
 			name = var;
 
 		BOOL turnoff = NO;
-		if ([name hasPrefix:@"no"])
-		{
+		if ([name hasPrefix:@"no"]) {
 			name = [name substringFromIndex:2];
 			turnoff = YES;
 		}
 
-		if ([name isEqualToString:@"all"])
-		{
+		if ([name isEqualToString:@"all"]) {
 			[[self delegate] message:@"'set all' not implemented."];
 			return;
 		}
@@ -170,47 +170,35 @@
 		NSString *defaults_name = [variables objectForKey:name];
 		if (defaults_name == nil && [[variables allValues] containsObject:name])
 			defaults_name = name;
-			
-		if (defaults_name == nil)
-		{
+
+		if (defaults_name == nil) {
 			[[self delegate] message:@"set: no %@ option: 'set all' gives all option values.", name];
 			return;
 		}
 
-		if (qmark != NSNotFound)
-		{
-			if ([booleans containsObject:defaults_name])
-			{
+		if (qmark != NSNotFound) {
+			if ([booleans containsObject:defaults_name]) {
 				int val = [[NSUserDefaults standardUserDefaults] integerForKey:defaults_name];
 				[[self delegate] message:[NSString stringWithFormat:@"%@%@", val == NSOffState ? @"no" : @"", defaults_name]];
-			}
-			else
-			{
+			} else {
 				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
 				[[self delegate] message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
 			}
 			continue;
 		}
-		
-		if ([booleans containsObject:defaults_name])
-		{
-			if (equals != NSNotFound)
-			{
+
+		if ([booleans containsObject:defaults_name]) {
+			if (equals != NSNotFound) {
 				[[self delegate] message:@"set: [no]%@ option doesn't take a value", defaults_name];
 				return;
 			}
 			
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
-		}
-		else
-		{
-			if (equals == NSNotFound)
-			{
+		} else {
+			if (equals == NSNotFound) {
 				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
 				[[self delegate] message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
-			}
-			else
-			{
+			} else {
 				NSString *val = [var substringFromIndex:equals + 1];
 				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
 			}

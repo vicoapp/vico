@@ -65,7 +65,6 @@ static NSWindowController	*currentWindowController = nil;
 - (IBAction)saveProject:(id)sender
 {
 	INFO(@"sender = %@", sender);
-	[projectDelegate save];
 }
 
 - (void)windowDidLoad
@@ -151,14 +150,14 @@ static NSWindowController	*currentWindowController = nil;
 	}
 
 	if (mostRecentView)
-	{
 		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
-	}
 
-	/* If current document is untitled and unchanged, replace it. */
+	/* If current document is untitled and unchanged and the rightmost tab, replace it. */
 	ViDocument *closeThisDocument = nil;
-	if ([[self currentDocument] fileURL] == nil && [document fileURL] != nil && ![[self currentDocument] isDocumentEdited])
+	if ([[self currentDocument] fileURL] == nil && [document fileURL] != nil && ![[self currentDocument] isDocumentEdited] && [self currentDocument] == [[tabBar representedDocuments] lastObject]) {
+		[tabBar disableAnimations];
 		closeThisDocument = [self currentDocument];
+	}
 
 	[tabBar addDocument:document];
 	[self selectDocument:document];
@@ -172,9 +171,11 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
 	[[ViJumpList defaultJumpList] pushURL:[document fileURL] line:1 column:1];
-	
-	// [projectDelegate addURL:[document fileURL]];
-	[closeThisDocument close];
+
+	if (closeThisDocument) {
+		[closeThisDocument close];
+		[tabBar enableAnimations];
+	}
 }
 
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView

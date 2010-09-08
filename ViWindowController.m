@@ -150,9 +150,14 @@ static NSWindowController	*currentWindowController = nil;
 	if (mostRecentView)
 		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 
-	/* If current document is untitled and unchanged and the rightmost tab, replace it. */
+	/*
+	 * If current document is untitled and unchanged and the rightmost tab, replace it.
+	 */
 	ViDocument *closeThisDocument = nil;
-	if ([[self currentDocument] fileURL] == nil && [document fileURL] != nil && ![[self currentDocument] isDocumentEdited] && [self currentDocument] == [[tabBar representedDocuments] lastObject]) {
+	if ([self currentDocument] != nil &&
+	    [[self currentDocument] fileURL] == nil &&
+	    [document fileURL] != nil && ![[self currentDocument] isDocumentEdited] &&
+	    [self currentDocument] == [[tabBar representedDocuments] lastObject]) {
 		[tabBar disableAnimations];
 		closeThisDocument = [self currentDocument];
 	}

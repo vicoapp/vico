@@ -4,7 +4,9 @@
 #import "ViDocumentView.h"
 #import "ViLanguageStore.h"
 #import "NSTextStorage-additions.h"
+#import "NSString-additions.h"
 #import "NSArray-patterns.h"
+
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
@@ -441,34 +443,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	// [languageButton selectItemWithTitle:[[textView language] displayName]];
 }
 
-- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag
+- (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	int n = 0;
-	NSInteger i = 0;
+	NSString *affectedString = [[textStorage string] substringWithRange:affectedCharRange];
 
-        /* Count number of affected lines.
-         */
-        while (i < [aString length])
-        {
-		NSUInteger eol, end;
-		[aString getLineStart:NULL end:&end contentsEnd:&eol forRange:NSMakeRange(i, 0)];
-		if (end == eol)
-			break;
-		n++;
-		i = end;
-        }
+	NSInteger affectedLines = [affectedString numberOfLines];
+	NSInteger replacementLines = [replacementString numberOfLines];
 
-	if (n == 0)
+	NSInteger diff = replacementLines - affectedLines;
+	if (diff == 0)
 		return;
 
 	unsigned lineno = 0;
-	if (aLocation > 1)
-		lineno = [textStorage lineNumberAtLocation:aLocation - 1];
+	if (affectedCharRange.location > 1)
+		lineno = [textStorage lineNumberAtLocation:affectedCharRange.location - 1];
 
-	if (flag)
-		[syntaxParser pushContinuations:[NSValue valueWithRange:NSMakeRange(lineno, n)]];
+	if (diff > 0)
+		[syntaxParser pushContinuations:[NSValue valueWithRange:NSMakeRange(lineno, diff)]];
 	else
-		[syntaxParser pullContinuations:[NSValue valueWithRange:NSMakeRange(lineno, n)]];
+		[syntaxParser pullContinuations:[NSValue valueWithRange:NSMakeRange(lineno, -diff)]];
 }
 
 #pragma mark -
@@ -476,41 +469,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	INFO(@"range = %@, string = [%@], mode = %d",
-	     NSStringFromRange(affectedCharRange),
-	     replacementString,
-	     [(ViTextView *)[[views objectAtIndex:0] textView] mode]);
-	
-	if (replacementString == nil) {
-		/* Only text attributes are being changed. */
-		return YES;
-	}
-
-	NSInteger diff = [replacementString length] - affectedCharRange.length;
-
-	if (diff > 0) {
-		INFO(@"pushing string [%@] from %u", replacementString, affectedCharRange.location);
-		[self pushContinuationsFromLocation:affectedCharRange.location
-		                             string:replacementString
-		                            forward:YES];
-		[syntaxParser pushScopes:NSMakeRange(affectedCharRange.location, diff)];
-		// FIXME: also push jumps and marks
-	} else if (diff < 0) {
-		NSString *deletedString = [[textStorage string] substringWithRange:affectedCharRange];
-		INFO(@"pulling string [%@] from %u", deletedString, affectedCharRange.location);
-		[self pushContinuationsFromLocation:affectedCharRange.location
-		                             string:deletedString
-		                            forward:NO];
-		[syntaxParser pullScopes:NSMakeRange(affectedCharRange.location, -diff)];
-		// FIXME: also pull jumps and marks
-	}
-
+	[self pushContinuationsInRange:affectedCharRange replacementString:replacementString];
 	return YES;
 }
 
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
 	NSRange area = [textStorage editedRange];
+	NSInteger diff = [textStorage changeInLength];
 
 	if (ignoreEditing) {
                 DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
@@ -519,10 +485,22 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
-		NSStringFromRange(area), [textStorage changeInLength],
-		textStorage, self);
+		NSStringFromRange(area), diff, textStorage, self);
 
-	// extend our range along line boundaries.
+	/*
+	 * Incrementally update the scope array.
+	 */
+	if (diff > 0) {
+		[syntaxParser pushScopes:NSMakeRange(area.location, diff)];
+		// FIXME: also push jumps and marks
+	} else if (diff < 0) {
+		[syntaxParser pullScopes:NSMakeRange(area.location, -diff)];
+		// FIXME: also pull jumps and marks
+	}
+
+	/*
+	 * Extend our range along affected line boundaries and re-parse.
+	 */
 	NSUInteger bol, end;
 	[[textStorage string] getLineStart:&bol end:&end contentsEnd:NULL forRange:area];
 	area.location = bol;

@@ -55,7 +55,7 @@
 - (void)goToSymbol:(ViSymbol *)aSymbol;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)setLanguageFromString:(NSString *)aLanguage;
-- (void)pushContinuationsFromLocation:(NSUInteger)aLocation string:(NSString *)aString forward:(BOOL)flag;
+- (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (ViDocumentView *)makeView;
 - (void)removeView:(ViDocumentView *)aDocumentView;

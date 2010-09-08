@@ -1,6 +1,6 @@
 #import "NSString-additions.h"
 
-@implementation NSString (scopeSelector)
+@implementation NSString (additions)
 
 - (NSInteger)numberOfLines
 {

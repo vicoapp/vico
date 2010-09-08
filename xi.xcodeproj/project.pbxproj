@@ -33,6 +33,7 @@
 		9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
 		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
 		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
+		9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438D361236C0AB00F7D9FD /* NSString-additions.m */; };
 		9A4BA1FB118C80F10093E2AB /* b32.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A4BA1F9118C80F10093E2AB /* b32.c */; };
 		9A4BA2C8118D63450093E2AB /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4BA2C6118D63450093E2AB /* ViBgView.m */; };
 		9A4F7DC20ED56CFE00A3CCF1 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */; };
@@ -186,6 +187,8 @@
 		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
 		9A438ABF1235847000F7D9FD /* ViPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencesController.m; sourceTree = "<group>"; };
 		9A438AC51235867B00F7D9FD /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PreferenceWindow.xib; sourceTree = "<group>"; };
+		9A438D351236C0AB00F7D9FD /* NSString-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString-additions.h"; sourceTree = "<group>"; };
+		9A438D361236C0AB00F7D9FD /* NSString-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-additions.m"; sourceTree = "<group>"; };
 		9A4BA1F9118C80F10093E2AB /* b32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = b32.c; sourceTree = "<group>"; };
 		9A4BA1FA118C80F10093E2AB /* b32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b32.h; sourceTree = "<group>"; };
 		9A4BA2C6118D63450093E2AB /* ViBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBgView.m; sourceTree = "<group>"; };
@@ -342,6 +345,9 @@
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				9AC16DA00D93CF9C00AE45E0 /* Controllers */,
 				9AA709780EF284B900B4CE34 /* Categories */,
+				9A438C9412369C2D00F7D9FD /* Snippets */,
+				9A438C9612369C5400F7D9FD /* Syntax parsing */,
+				9A438CB112369F6400F7D9FD /* Bundle Support */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
@@ -361,20 +367,10 @@
 				9AA7096A0EF284A700B4CE34 /* ViJumpList.m */,
 				9A0868B00EE03A7600274635 /* ViSeparatorCell.h */,
 				9A0868B10EE03A7600274635 /* ViSeparatorCell.m */,
-				9AB015170ED7102200905BED /* ViSnippet.h */,
-				9AB015180ED7102200905BED /* ViSnippet.m */,
-				9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */,
-				9A4F7DC10ED56CFE00A3CCF1 /* ViSymbolTransform.h */,
 				9AF207030ED3027C00C5771B /* ViProject.h */,
 				9AF207040ED3027C00C5771B /* ViProject.m */,
 				9AF205940ED2D8B500C5771B /* ProjectDelegate.h */,
 				9AF205950ED2D8B500C5771B /* ProjectDelegate.m */,
-				9AF201550ECDDD7E00C5771B /* ViSyntaxContext.h */,
-				9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */,
-				9AF201570ECDDD7E00C5771B /* ViSyntaxParser.h */,
-				9AF201580ECDDD7E00C5771B /* ViSyntaxParser.m */,
-				9AF200D10ECC8BED00C5771B /* ViSymbol.h */,
-				9AF200D20ECC8BED00C5771B /* ViSymbol.m */,
 				9AD772800EC9A6CB00D05DDE /* ViMark.h */,
 				9AD772810EC9A6CB00D05DDE /* ViMark.m */,
 				9AF41A540EC6E1CB00F1D681 /* MarkerLineNumberView.h */,
@@ -383,41 +379,23 @@
 				9A6C152B0EC6D280002D6A22 /* NoodleLineNumberMarker.m */,
 				9A6C15220EC6D1B2002D6A22 /* NoodleLineNumberView.h */,
 				9A6C15230EC6D1B2002D6A22 /* NoodleLineNumberView.m */,
-				9A6C14CE0EC5E9EE002D6A22 /* ViScope.h */,
-				9A6C14CF0EC5E9EE002D6A22 /* ViScope.m */,
-				9A6C14BC0EC5E41E002D6A22 /* ViSyntaxMatch.h */,
-				9A6C14BD0EC5E41E002D6A22 /* ViSyntaxMatch.m */,
 				9A6C13BA0EC55CD1002D6A22 /* MHSysTree.h */,
 				9A6C13BB0EC55CD1002D6A22 /* MHSysTree.m */,
 				9A6C125F0EBE55FD002D6A22 /* ViRegexp.h */,
 				9A6C12600EBE55FD002D6A22 /* ViRegexp.m */,
-				9A6C11DD0EBCC497002D6A22 /* ViTextView-snippets.m */,
-				9A709CE30EA28E3600AB54E0 /* ViBundle.h */,
-				9A709CE40EA28E3600AB54E0 /* ViBundle.m */,
 				9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */,
 				9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */,
 				9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */,
-				9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */,
 				9A7B0E720D01601A00040CAC /* ViTextView.m */,
 				9A7B0E730D01601A00040CAC /* ViTextView.h */,
 				9A1A11FE0D02C65A009EABAC /* ViCommand.h */,
 				9A1A11FF0D02C65A009EABAC /* ViCommand.m */,
 				9A73E27F0D8ECA4C00859053 /* ExCommand.h */,
 				9A73E2800D8ECA4C00859053 /* ExCommand.m */,
-				9A668E120D11172C003FABD9 /* ViLanguage.h */,
-				9A668E130D11172C003FABD9 /* ViLanguage.m */,
-				9A668E150D11174A003FABD9 /* ViLanguageStore.h */,
-				9A668E160D11174A003FABD9 /* ViLanguageStore.m */,
-				9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */,
-				9A668E100D1116FC003FABD9 /* ViTheme.m */,
-				9A668E0F0D1116FC003FABD9 /* ViTheme.h */,
-				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
 				9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */,
 				9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */,
 				9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */,
 				9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */,
-				9AB014AE0ED6021A00905BED /* ViCommandOutputController.h */,
-				9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */,
 				9AFBC31C0EE717C400646DCB /* ViDocumentView.h */,
 				9AFBC31D0EE717C400646DCB /* ViDocumentView.m */,
 				9A9801E90EF957F500B2EEC3 /* MHTextIconCell.h */,
@@ -513,6 +491,63 @@
 			name = sftp;
 			sourceTree = "<group>";
 		};
+		9A438C9412369C2D00F7D9FD /* Snippets */ = {
+			isa = PBXGroup;
+			children = (
+				9AB015170ED7102200905BED /* ViSnippet.h */,
+				9AB015180ED7102200905BED /* ViSnippet.m */,
+				9A6C11DD0EBCC497002D6A22 /* ViTextView-snippets.m */,
+			);
+			name = Snippets;
+			sourceTree = "<group>";
+		};
+		9A438C9612369C5400F7D9FD /* Syntax parsing */ = {
+			isa = PBXGroup;
+			children = (
+				9AF201550ECDDD7E00C5771B /* ViSyntaxContext.h */,
+				9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */,
+				9AF201570ECDDD7E00C5771B /* ViSyntaxParser.h */,
+				9AF201580ECDDD7E00C5771B /* ViSyntaxParser.m */,
+				9A6C14CE0EC5E9EE002D6A22 /* ViScope.h */,
+				9A6C14CF0EC5E9EE002D6A22 /* ViScope.m */,
+				9A6C14BC0EC5E41E002D6A22 /* ViSyntaxMatch.h */,
+				9A6C14BD0EC5E41E002D6A22 /* ViSyntaxMatch.m */,
+			);
+			name = "Syntax parsing";
+			sourceTree = "<group>";
+		};
+		9A438CB112369F6400F7D9FD /* Bundle Support */ = {
+			isa = PBXGroup;
+			children = (
+				9A709CE30EA28E3600AB54E0 /* ViBundle.h */,
+				9A709CE40EA28E3600AB54E0 /* ViBundle.m */,
+				9A668E120D11172C003FABD9 /* ViLanguage.h */,
+				9A668E130D11172C003FABD9 /* ViLanguage.m */,
+				9A668E150D11174A003FABD9 /* ViLanguageStore.h */,
+				9A668E160D11174A003FABD9 /* ViLanguageStore.m */,
+				9A668E100D1116FC003FABD9 /* ViTheme.m */,
+				9A668E0F0D1116FC003FABD9 /* ViTheme.h */,
+				9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */,
+				9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */,
+				9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */,
+				9AB014AE0ED6021A00905BED /* ViCommandOutputController.h */,
+				9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */,
+				9A438CBA1236A12100F7D9FD /* Symbol List */,
+			);
+			name = "Bundle Support";
+			sourceTree = "<group>";
+		};
+		9A438CBA1236A12100F7D9FD /* Symbol List */ = {
+			isa = PBXGroup;
+			children = (
+				9AF200D10ECC8BED00C5771B /* ViSymbol.h */,
+				9AF200D20ECC8BED00C5771B /* ViSymbol.m */,
+				9A4F7DC00ED56CFE00A3CCF1 /* ViSymbolTransform.m */,
+				9A4F7DC10ED56CFE00A3CCF1 /* ViSymbolTransform.h */,
+			);
+			name = "Symbol List";
+			sourceTree = "<group>";
+		};
 		9A4BA1F8118C80CD0093E2AB /* license key support */ = {
 			isa = PBXGroup;
 			children = (
@@ -535,6 +570,8 @@
 		9AA709780EF284B900B4CE34 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				9A438D351236C0AB00F7D9FD /* NSString-additions.h */,
+				9A438D361236C0AB00F7D9FD /* NSString-additions.m */,
 				9A28300F109B15110023D2CF /* NSTextField-additions.h */,
 				9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */,
 				9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */,
@@ -811,6 +848,7 @@
 				9A4BA1FB118C80F10093E2AB /* b32.c in Sources */,
 				9A4BA2C8118D63450093E2AB /* ViBgView.m in Sources */,
 				9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */,
+				9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

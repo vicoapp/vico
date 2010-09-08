@@ -62,7 +62,6 @@ int logIndent = 0;
 			 nil];
 
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
-			  /*
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100013], // command-2
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100014], // command-3
@@ -72,7 +71,7 @@ int logIndent = 0;
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001A], // command-7
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
-			  */
+			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001D], // command-0
 			  @"switch_file:", [NSNumber numberWithUnsignedInteger:0x0004001E], // ctrl-^
 			  @"show_scope:", [NSNumber numberWithUnsignedInteger:0x00060023], // ctrl-shift-p
 			 nil];
@@ -1320,7 +1319,7 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	DEBUG(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
+	INFO(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
               ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
@@ -1677,9 +1676,17 @@ int logIndent = 0;
 	[[self delegate] message:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
 }
 
-- (void)switch_file:(NSString *)character
+- (void)switch_file:(NSString *)characters
 {
-        [[[self delegate] windowController] switchToLastFile];
+        [[[self delegate] windowController] switchToLastDocument];
+}
+
+- (void)switch_tab:(NSString *)characters
+{
+	int tab = [characters intValue];
+	if (tab-- == 0)
+		tab = 9;
+        [[[self delegate] windowController] switchToDocumentAtIndex:tab];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

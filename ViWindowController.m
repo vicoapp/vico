@@ -306,10 +306,7 @@ static NSWindowController	*currentWindowController = nil;
 		BOOL foundVisibleView = NO;
 		if (lastDocument && lastDocument != document)
 		{
-			if ([lastDocument visibleViews] > 0)
-				[self setMostRecentDocument:lastDocument view:lastDocumentView];
-			else
-				[self selectDocument:lastDocument];
+			[self switchToLastDocument];
 			foundVisibleView = YES;
 		}
 		
@@ -429,24 +426,36 @@ static NSWindowController	*currentWindowController = nil;
 	return displayName;
 }
 
-- (void)switchToLastFile
+- (void)switchToDocument:(ViDocument *)doc view:(ViDocumentView *)view
 {
-        if ([lastDocument visibleViews] > 0)
-        {
-		[self setMostRecentDocument:lastDocument view:lastDocumentView ?: [[lastDocument views] objectAtIndex:0]];
-	}
-        else
-		[self selectDocument:lastDocument];
+	if ([doc visibleViews] > 0)
+		[self setMostRecentDocument:doc view:view ?: [[doc views] objectAtIndex:0]];
+	else
+		[self selectDocument:doc];
+}
+
+- (void)switchToDocument:(ViDocument *)doc
+{
+	[self switchToDocument:doc view:nil];
+}
+
+- (void)switchToLastDocument
+{
+	[self switchToDocument:lastDocument view:lastDocumentView];
+}
+
+- (void)switchToDocumentAtIndex:(NSInteger)anIndex
+{
+	if (anIndex < [[tabBar representedDocuments] count])
+		[self switchToDocument:[[tabBar representedDocuments] objectAtIndex:anIndex]];
 }
 
 - (ViDocument *)documentForURL:(NSURL *)url
 {
 	ViDocument *doc;
 	for (doc in documents)
-	{
 		if ([url isEqual:[doc fileURL]])
 			return doc;
-	}
 	return nil;
 }
 
@@ -459,12 +468,8 @@ static NSWindowController	*currentWindowController = nil;
 		    openDocumentWithContentsOfURL:url display:YES error:&error];
 		if (error)
 			[NSApp presentError:error];	
-	} else if ([self currentDocument] != document) {
-		if ([document visibleViews] > 0)
-			[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
-		else
-			[self selectDocument:document];
-	}
+	} else if ([self currentDocument] != document)
+		[self switchToDocument:document];
 
 	if (line > 0)
 		[(ViTextView *)[mostRecentView textView] gotoLine:line column:column];
@@ -568,10 +573,8 @@ static NSWindowController	*currentWindowController = nil;
 	{
 		ViDocumentView *dv;
 		for (dv in [doc views])
-		{
 			if ([dv view] == aView)
 				return dv;
-		}
 	}
 	INFO(@"***** View %@ not a document view!?", aView);
 	return nil;
@@ -790,27 +793,15 @@ static NSWindowController	*currentWindowController = nil;
 	{
 		ViDocument *document = item;
 		if ([self currentDocument] != document)
-		{
-			if ([document visibleViews] > 0)
-				[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
-			else
-				[self selectDocument:document];
-		}
+			[self switchToDocument:document];
 		else 
-		{
 			[self updateSelectedSymbolForLocation:[(ViTextView *)[mostRecentView textView] caret]];
-		}
 	}
 	else
 	{
 		ViDocument *document = [symbolsOutline parentForItem:item];
 		if ([self currentDocument] != document)
-		{
-			if ([document visibleViews] > 0)
-				[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
-			else
-				[self selectDocument:document];
-		}
+			[self switchToDocument:document];
 		[document goToSymbol:item];
 	}
 

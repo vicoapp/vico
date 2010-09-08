@@ -60,7 +60,7 @@ int logIndent = 0;
 			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
 			 @"input_tab:", [NSNumber numberWithUnsignedInteger:0x00000030], // tab
 			 nil];
-	
+
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
 			  /*
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
@@ -84,11 +84,7 @@ int logIndent = 0;
 
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
-//	[self setUsesFontPanel:NO];
-//	[self setUsesFindPanel:NO];
-	//[self setPageGuideValues];
 	[self disableWrapping];
-//	[self setContinuousSpellCheckingEnabled:NO];
 	// [[self layoutManager] setShowsInvisibleCharacters:YES];
 	[[self layoutManager] setShowsControlCharacters:YES];
 	[self setDrawsBackground:YES];
@@ -182,7 +178,9 @@ int logIndent = 0;
 
 	NSRange range = NSMakeRange(aLocation, [aString length]);
 
-	if ([self delegate] != nil && [[self delegate] textView:self shouldChangeTextInRange:range replacementString:aString] == NO)
+	if ([self delegate] != nil && [[self delegate] textView:self
+					shouldChangeTextInRange:NSMakeRange(aLocation, 0)
+					      replacementString:aString] == NO)
 		return;
 
 	if (undoGroup)
@@ -217,12 +215,12 @@ int logIndent = 0;
 
 - (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
 {
-	DEBUG(@"undo in range %@", NSStringFromRange(aRange));
-
 	if (aRange.length == 0)
 		return;
 
-	if ([self delegate] != nil && [[self delegate] textView:self shouldChangeTextInRange:aRange replacementString:nil] == NO)
+	if ([self delegate] != nil && [[self delegate] textView:self
+					shouldChangeTextInRange:aRange
+					      replacementString:@""] == NO)
 		return;
 
 	if (undoGroup)
@@ -1098,7 +1096,7 @@ int logIndent = 0;
 			}
 		}
 	}
-	
+
 	if (!foundSmartTypingPair) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
@@ -1153,7 +1151,7 @@ int logIndent = 0;
                         }
                 }
         }
-        
+
 	// otherwise just insert a tab
 	[self insertString:@"\t" atLocation:start_location];
 	[self setCaret:start_location + 1];
@@ -1385,7 +1383,7 @@ int logIndent = 0;
 					[self inputCharacters:[theEvent characters]];
 			}
 		}
-	} else if (mode == ViNormalMode || mode == ViVisualMode){
+	} else if (mode == ViNormalMode || mode == ViVisualMode) {
 		if (mode == ViNormalMode) {
 			// check for a special key bound to a function
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
@@ -1410,17 +1408,17 @@ int logIndent = 0;
 		[parser pushKey:charcode];
 		if (parser.complete) {
 			[[self delegate] message:@""]; // erase any previous message
-			[[self textStorage] beginEditing];
 
 			/* Set or reset the saved column for up/down movement. */
 			if (parser.key == 'j' || parser.key == 'k' || parser.key == '\x05' || parser.key == '\x19') {
 				if (saved_column < 0)
-					saved_column = [self columnAtLocation:[self caret]];	
+					saved_column = [self columnAtLocation:[self caret]];
 			} else
 				saved_column = -1;
 
 			if (parser.key != 'u' && !parser.is_dot)
 				undo_direction = 0;
+			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode) {
 				// still in normal mode
@@ -1566,8 +1564,11 @@ int logIndent = 0;
 
 - (NSFont *)font
 {
-//	return [NSFont userFixedPitchFontOfSize:11.0];
-	return [NSFont fontWithName:@"Menlo Regular" size:11.0];
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
+	if (font == nil)
+		font = [NSFont userFixedPitchFontOfSize:11.0];
+	return font;
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes

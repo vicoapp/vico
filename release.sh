@@ -21,7 +21,8 @@ fi
 echo checking out sources
 cvs co -r $tag -d $dir xi || exit 2
 
-cd $dir
-./mkdmg $version || exit 3
-scp xi-$version.dmg xi.bzero.se:/var/www/xi.bzero.se/download
+(cd $dir && ./mkdmg $version) || exit 3
+
+#scp $dir/xi-$version.dmg xi.bzero.se:/var/www/xi.bzero.se/download
+mv $dir/xi-$version.dmg .
 

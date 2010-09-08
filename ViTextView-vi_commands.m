@@ -4,11 +4,6 @@
 #import "ViJumpList.h"
 #import "NSTextStorage-additions.h"
 
-@interface ViTextView (vi_commands_private)
-- (BOOL)move_down:(ViCommand *)command;
-- (BOOL)move_up:(ViCommand *)command;
-@end
-
 @implementation ViTextView (vi_commands)
 
 /* syntax: [count]<ctrl-i> */

@@ -13,7 +13,6 @@
 int logIndent = 0;
 
 @interface ViTextView (private)
-- (BOOL)move_right:(ViCommand *)command;
 - (void)disableWrapping;
 - (BOOL)insert:(ViCommand *)command;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
@@ -24,6 +23,7 @@ int logIndent = 0;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
+- (void)evaluateCommand:(ViCommand *)command;
 @end
 
 #pragma mark -
@@ -59,6 +59,14 @@ int logIndent = 0;
 			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
 			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
 			 @"input_tab:", [NSNumber numberWithUnsignedInteger:0x00000030], // tab
+			 @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
+			 @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
+			 @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
+			 @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
+			 @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
+			 @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
+			 @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
+			 @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
 			 nil];
 
 	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -74,8 +82,16 @@ int logIndent = 0;
 			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001D], // command-0
 			  @"switch_file:", [NSNumber numberWithUnsignedInteger:0x0004001E], // ctrl-^
 			  @"show_scope:", [NSNumber numberWithUnsignedInteger:0x00060023], // ctrl-shift-p
-			 nil];
-	
+			  @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
+			  @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
+			  @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
+			  @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
+			  @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
+			  @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
+			  @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
+			  @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
+			  nil];
+
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[nonWordSet formUnionWithCharacterSet:wordSet];
 	[nonWordSet formUnionWithCharacterSet:whitespace];
@@ -1047,9 +1063,7 @@ int logIndent = 0;
 	// If there is a non-zero length selection, remove it first.
 	NSRange sel = [self selectedRange];
 	if (sel.length > 0)
-	{
 		[self deleteRange:sel];
-	}
 
 	BOOL foundSmartTypingPair = NO;
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
@@ -1156,6 +1170,54 @@ int logIndent = 0;
 	[self setCaret:start_location + 1];
 }
 
+- (void)evaluateKey:(unichar)key
+{
+	ViCommand *cmd = [[ViCommand alloc] init];
+	[cmd pushKey:key];
+	if (cmd.complete)
+		[self evaluateCommand:cmd];
+}
+
+- (void)input_up:(NSString *)characters
+{
+	[self evaluateKey:'k'];
+}
+
+- (void)input_down:(NSString *)characters
+{
+	[self evaluateKey:'j'];
+}
+
+- (void)input_left:(NSString *)characters
+{
+	[self evaluateKey:'h'];
+}
+
+- (void)input_right:(NSString *)characters
+{
+	[self evaluateKey:'l'];
+}
+
+- (void)input_pgup:(NSString *)characters
+{
+	[self evaluateKey:0x02]; // ^B
+}
+
+- (void)input_pgdn:(NSString *)characters
+{
+	[self evaluateKey:0x06]; // ^F
+}
+
+- (void)input_home:(NSString *)characters
+{
+	[self evaluateKey:'_'];
+}
+
+- (void)input_end:(NSString *)characters
+{
+	[self evaluateKey:'$'];
+}
+
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
@@ -1228,6 +1290,21 @@ int logIndent = 0;
 	final_location = start_location;
 	DEBUG(@"start_location = %u", start_location);
 
+	[[self delegate] message:@""]; // erase any previous message
+
+	/* Set or reset the saved column for up/down movement. */
+	if ([command.method isEqualToString:@"move_down:"] ||
+	    [command.method isEqualToString:@"move_up:"] ||
+	    [command.method isEqualToString:@"scroll_down_by_line:"] ||
+	    [command.method isEqualToString:@"scroll_up_by_line:"]) {
+		if (saved_column < 0)
+			saved_column = [self columnAtLocation:[self caret]];
+	} else
+		saved_column = -1;
+
+	if (![command.method isEqualToString:@"vi_undo:"] && !command.is_dot)
+		undo_direction = 0;
+
 	if (command.motion_method)
 	{
 		/* The command has an associated motion component.
@@ -1262,33 +1339,29 @@ int logIndent = 0;
 	}
 	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u", l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
-	if (command.line_mode && !command.ismotion && mode != ViVisualMode)
-	{
-		/* If this command is line oriented, extend the affectedRange to whole lines.
+	if (command.line_mode && !command.ismotion && mode != ViVisualMode) {
+		/*
+		 * If this command is line oriented, extend the affectedRange to whole lines.
 		 * However, don't do this for Visual-Line mode, this is done in setVisualSelection.
 		 */
 		NSUInteger bol, end, eol;
 
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
 
-		if (!command.motion_method && mode != ViVisualMode)
-		{
-			/* This is a "doubled" command (like dd or yy).
+		if (!command.motion_method) {
+			/*
+			 * This is a "doubled" command (like dd or yy).
 			 * A count, or motion-count, affects that number of whole lines.
 			 */
 			int line_count = command.count;
 			if (line_count == 0)
 				line_count = command.motion_count;
-			while (--line_count > 0)
-			{
+			while (--line_count > 0) {
 				l2 = end;
 				[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
 			}
-		}
-		else
-		{
+		} else
 			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
-		}
 
 		l1 = bol;
 		l2 = end;
@@ -1303,7 +1376,11 @@ int logIndent = 0;
 
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
+	if (!command.ismotion)
+		[[self textStorage] beginEditing];
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
+	if (!command.ismotion)
+		[[self textStorage] endEditing];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
@@ -1315,6 +1392,14 @@ int logIndent = 0;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;
 	}
+
+done:
+	DEBUG(@"final_location is %u", final_location);
+	[self setCaret:final_location];
+	if (mode == ViVisualMode)
+		[self setVisualSelection];
+	if (!replayingInput)
+		[self scrollToCaret];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1368,7 +1453,10 @@ int logIndent = 0;
 		} else {
 			start_location = [self caret];
 
-			/* Lookup the key in the input command map. Some keys are handled specially, or trigger macros. */
+			/*
+			 * Lookup the key in the input command map.
+			 * Some keys are handled specially, or trigger macros.
+			 */
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 			NSString *inputCommand = [inputCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
 			if (inputCommand)
@@ -1382,9 +1470,13 @@ int logIndent = 0;
 					[self inputCharacters:[theEvent characters]];
 			}
 		}
+		if (!replayingInput)
+			[self scrollToCaret];
 	} else if (mode == ViNormalMode || mode == ViVisualMode) {
 		if (mode == ViNormalMode) {
-			// check for a special key bound to a function
+			/*
+			 * Check for a special key bound to a function.
+			 */
 			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
 			NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
 			if (normalCommand) {
@@ -1406,33 +1498,13 @@ int logIndent = 0;
 
 		[parser pushKey:charcode];
 		if (parser.complete) {
-			[[self delegate] message:@""]; // erase any previous message
-
-			/* Set or reset the saved column for up/down movement. */
-			if (parser.key == 'j' || parser.key == 'k' || parser.key == '\x05' || parser.key == '\x19') {
-				if (saved_column < 0)
-					saved_column = [self columnAtLocation:[self caret]];
-			} else
-				saved_column = -1;
-
-			if (parser.key != 'u' && !parser.is_dot)
-				undo_direction = 0;
-			[[self textStorage] beginEditing];
 			[self evaluateCommand:parser];
 			if (mode != ViInsertMode) {
 				// still in normal mode
 				[self endUndoGroup];
 			}
-			[[self textStorage] endEditing];
-                        DEBUG(@"final_location is %u", final_location);
-			[self setCaret:final_location];
-			if (mode == ViVisualMode)
-				[self setVisualSelection];
 		}
 	}
-
-	if (!replayingInput)
-		[self scrollToCaret];
 }
 
 - (void)swipeWithEvent:(NSEvent *)event

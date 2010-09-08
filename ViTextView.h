@@ -166,6 +166,9 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView (vi_commands)
 - (BOOL)move_left:(ViCommand *)command;
+- (BOOL)move_right:(ViCommand *)command;
+- (BOOL)move_down:(ViCommand *)command;
+- (BOOL)move_up:(ViCommand *)command;
 - (BOOL)delete:(ViCommand *)command;
 - (BOOL)yank:(ViCommand *)command;
 - (BOOL)jumplist_forward:(ViCommand *)command;

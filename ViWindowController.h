@@ -75,7 +75,10 @@
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
 
-- (void)switchToLastFile;
+- (void)switchToDocument:(ViDocument *)doc view:(ViDocumentView *)view;
+- (void)switchToDocument:(ViDocument *)doc;
+- (void)switchToDocumentAtIndex:(NSInteger)anIndex;
+- (void)switchToLastDocument;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 - (void)goToURL:(NSURL *)url;
 

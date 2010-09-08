@@ -7,6 +7,7 @@
 	IBOutlet NSView *editingView;
 	IBOutlet NSView *fontsColorsView;
 	IBOutlet NSPopUpButton *themeButton;
+	IBOutlet NSTextField *currentFont;
 }
 
 + (ViPreferencesController *)sharedPreferences;

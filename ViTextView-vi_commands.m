@@ -91,7 +91,7 @@
 	NSRect highRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphRange.location, 1) inTextContainer:[self textContainer]];
 	[clipView scrollToPoint:NSMakePoint(0, highRect.origin.y)];
 	[scrollView reflectScrolledClipView:clipView];
-	
+
 	return YES;
 }
 
@@ -306,9 +306,7 @@
 - (void)filter_through_shell_command:(NSString *)shellCommand
 {
 	if ([shellCommand length] == 0)
-	{
 		return;
-	}
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
 
@@ -515,26 +513,24 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
-	int count;
+	NSUInteger count;
 
 	if (mode == ViVisualMode)
-	{
 		count = affectedRange.length;
-	}
-	else
-	{
+	else {
 		count = IMAX(1, command.count);
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
-		if (start_location + count > eol)
-		{
+		if (start_location + count > eol) {
 			[[self delegate] message:@"Movement past the end-of-line"];
 			return NO;
 		}
 		affectedRange = NSMakeRange(start_location, count);
 	}
 
-	NSString *replacement = [@"" stringByPaddingToLength:count withString:[NSString stringWithFormat:@"%C", command.argument] startingAtIndex:0];
+	NSString *replacement = [@"" stringByPaddingToLength:count
+						  withString:[NSString stringWithFormat:@"%C", command.argument]
+					     startingAtIndex:0];
 	[self replaceRange:affectedRange withString:replacement];
 
 	return YES;
@@ -543,26 +539,22 @@
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {
-	if (command.line_mode)
-	{
+	if (command.line_mode) {
 		/* adjust the range to exclude the last newline */
 		NSUInteger bol, eol, end;
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
 		DEBUG(@"end_location = %u, bol = %u, eol = %u, end = %u", end_location, bol, eol, end);
-		if (end_location == bol)
-		{
+		if (end_location == bol) {
 			end_location--;
 			affectedRange.length--;
 		}
 	}
 
-	if ([self delete:command])
-	{
+	if ([self delete:command]) {
 		end_location = start_location = affectedRange.location;
 		[self setInsertMode:command];
 		return YES;
-	}
-	else
+	} else
 		return NO;
 }
 
@@ -574,16 +566,13 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:affectedRange.location];
 	[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:NSMaxRange(affectedRange) - 1];
 	if (eol < end)
-	{
 		affectedRange.length--;
-	}
 
         NSString *leading_whitespace = nil;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
                 leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
 
 	[self cutToBuffer:0 append:NO range:affectedRange];
-
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];
 
 	/* a command count should not be treated as a count for the inserted text */

@@ -586,6 +586,7 @@ int logIndent = 0;
 
 - (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
+	DEBUG(@"undoing delete of string %@ at %u", aString, aLocation);
 	[self insertString:aString atLocation:aLocation undoGroup:NO];
 	final_location = aLocation;
 }
@@ -1023,6 +1024,7 @@ int logIndent = 0;
 {
 	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u", caret, final_location, [[self textStorage] length]);
 	mode = ViNormalMode;
+	[self endUndoGroup];
 }
 
 - (void)resetSelection
@@ -1396,11 +1398,7 @@ int logIndent = 0;
 
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
-	if (!command.ismotion)
-		[[self textStorage] beginEditing];
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if (!command.ismotion)
-		[[self textStorage] endEditing];
 	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
@@ -1461,7 +1459,6 @@ int logIndent = 0;
 			if ([multipliedText length] > 0)
 				[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
 #endif
-			[self endUndoGroup];
 			if (!replayingInput)
 				parser.text = inputKeys; // copies the array
 			[inputKeys removeAllObjects];

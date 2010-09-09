@@ -308,12 +308,20 @@
 
 - (IBAction)searchFiles:(id)sender
 {
-	if ([splitView isSubviewCollapsed:explorerView])
-	{
+	if ([splitView isSubviewCollapsed:explorerView]) {
 		closeExplorerAfterUse = YES;
 		[self toggleExplorer:nil];
 	}
 	[window makeFirstResponder:filterField];
+}
+
+- (IBAction)toggleExplorer:(id)sender
+{
+	NSRect frame = [splitView frame];
+	if ([splitView isSubviewCollapsed:explorerView])
+		[splitView setPosition:200 ofDividerAtIndex:0];
+	else
+		[splitView setPosition:0 ofDividerAtIndex:0];
 }
 
 - (void)expandItems:(NSArray *)items intoArray:(NSMutableArray *)expandedArray filter:(ViRegexp *)rx
@@ -357,11 +365,6 @@
                 [self expandItems:rootItems intoArray:filteredItems filter:rx];
         }
         [explorer reloadData];
-}
-
-- (IBAction)toggleExplorer:(id)sender
-{
-	
 }
 
 #pragma mark -

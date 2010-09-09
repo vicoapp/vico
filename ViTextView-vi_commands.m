@@ -354,7 +354,7 @@
 
 	NSUInteger cur;
 	[self getLineStart:NULL end:&cur contentsEnd:NULL];
-		
+
 	NSUInteger bol = cur, end, eol = 0;
 	for (; eol < [[[self textStorage] string] length];)
 	{
@@ -381,7 +381,7 @@
 
 	NSUInteger cur;
 	[self getLineStart:&cur end:NULL contentsEnd:NULL];
-		
+
 	NSUInteger bol = 0, end;
 	for (; cur > 0;)
 	{
@@ -468,7 +468,7 @@
 	{
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL];
-		
+
 		start_location = final_location = bol;
 	}
 	[self insertString:buffer atLocation:start_location];
@@ -616,7 +616,7 @@
 		[[self delegate] message:@"No following lines to join"];
 		return NO;
 	}
-	
+
 	/* From nvi:
 	 * Historic practice:
 	 *
@@ -631,7 +631,7 @@
 	 * which we insert two spaces.  I expect that POSIX 1003.2
 	 * will require this as well.
 	 */
-	
+
 	/* From nvi:
 	 * Historic practice for vi was to put the cursor at the first
 	 * inserted whitespace character, if there was one, or the
@@ -651,7 +651,7 @@
 	 * line (possible with : commands), it is reset to the starting
 	 * line.
 	 */
-	
+
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
 
@@ -680,7 +680,7 @@
 		NSRange r = NSMakeRange(eol, sol2 - eol);
 		[self replaceRange:r withString:joinPadding];
 	}
-	
+
 	return YES;
 }
 
@@ -694,13 +694,13 @@
 		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
-	
+
 	NSRange range;
 	range.location = start_location;
 	range.length = eol - start_location;
-	
+
 	[self cutToBuffer:0 append:NO range:range];
-	
+
 	final_location = IMAX(bol, start_location - 1);
 	return YES;
 }
@@ -715,10 +715,10 @@
 		NSRange range;
 		range.location = start_location;
 		range.length = eol - start_location;
-		
+
 		[self cutToBuffer:0 append:NO range:range];
 	}
-	
+
 	[self setInsertMode:command];
 	return YES;
 }
@@ -869,7 +869,7 @@
 			return NO;
 		}
 	}
-	
+
 	final_location = command.ismotion ? i : start_location;
 	end_location = i;
 	return YES;
@@ -906,7 +906,7 @@
 			return NO;
 		}
 	}
-	
+
 	final_location = command.ismotion ? i : start_location;
 	end_location = i + 1;
 	return YES;
@@ -930,7 +930,7 @@
 	int count = command.count;
 	if(!command.ismotion)
 		count = command.motion_count;
-	
+
 	if(count > 0)
 	{
 		NSInteger location = [[self textStorage] locationForStartOfLine:count];
@@ -984,7 +984,7 @@
 	int num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
 	end_location += num_chars; // insert mode starts at end_location
  	final_location = end_location;
-	
+
 	[self setInsertMode:command];
 	return YES;
 }
@@ -1130,7 +1130,7 @@
 	 * 'a' to 'c', while "w" is from 'a' to 'd'.  In general, trailing white
 	 * space is discarded from the change movement.  Another example is that,
 	 * in the same string, a "cw" on any white space character replaces that
-	 * single character, and nothing else.  Ain't nothin' in here that's easy. 
+	 * single character, and nothing else.  Ain't nothin' in here that's easy.
 	 */
 	if (command.ismotion || command.key == 'd' || command.key == 'y')
 		end_location = [self skipWhitespaceFrom:end_location];
@@ -1235,7 +1235,7 @@
 	NSString *s = [[self textStorage] string];
 	end_location = start_location + 1;
 	unichar ch = [s characterAtIndex:end_location];
-	
+
 	/* From nvi:
          * !!!
          * If in whitespace, or the next character is whitespace, move past
@@ -1251,7 +1251,7 @@
 			return YES;
 		}
 	}
-	
+
 	BOOL bigword = (command.ismotion ? command.key == 'E' : command.motion_key == 'E');
 
 	ch = [s characterAtIndex:end_location];
@@ -1269,7 +1269,7 @@
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
 	}
-	
+
 	final_location = end_location;
 	return YES;
 }
@@ -1309,14 +1309,14 @@
 		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
-	
+
 	NSRange del;
 	del.location = start_location;
 	del.length = IMAX(1, command.count);
 	if (del.location + del.length > eol)
 		del.length = eol - del.location;
 	[self cutToBuffer:0 append:NO range:del];
-	
+
 	// correct caret position if we deleted the last character(s) on the line
 	end_location = start_location;
 	--eol;
@@ -1347,7 +1347,7 @@
 	[self cutToBuffer:0 append:NO range:del];
 	end_location = del.location;
 	final_location = end_location;
-	
+
 	return YES;
 }
 
@@ -1376,7 +1376,7 @@
 			[[self delegate] message:@"Already at end-of-file"];
 			return NO;
 		}
-		
+
 		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
 		return YES;
 	}
@@ -1422,7 +1422,7 @@
 			[[self delegate] message:@"Already at the beginning of the file"];
 			return NO;
 		}
-		
+
 		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
 		return YES;
 	}
@@ -1577,7 +1577,7 @@
 		[[self delegate] message:@"Mark %C: not set", command.argument];
 		return NO;
 	}
-	
+
 	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
 	if (bol == -1)
 	{

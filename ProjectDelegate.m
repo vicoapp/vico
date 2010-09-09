@@ -317,7 +317,6 @@
 
 - (IBAction)toggleExplorer:(id)sender
 {
-	NSRect frame = [splitView frame];
 	if ([splitView isSubviewCollapsed:explorerView])
 		[splitView setPosition:200 ofDividerAtIndex:0];
 	else

@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "ViRegexp.h"
+#import "ViBgView.h"
 
 @interface ProjectDelegate : NSObject
 {
@@ -8,7 +9,7 @@
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
 	IBOutlet NSSplitView *splitView;
-	IBOutlet NSView *explorerView;
+	IBOutlet ViBgView *explorerView;
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
 

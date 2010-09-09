@@ -593,9 +593,17 @@ int logIndent = 0;
 
 - (void)undoInsertInRange:(NSRange)aRange
 {
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aRange.location];
+
 	DEBUG(@"undoing insert in range %@", NSStringFromRange(aRange));
 	[self deleteRange:aRange undoGroup:NO];
+
+	/* Correct caret position if we deleted the last character(s) on the line. */
 	final_location = aRange.location;
+	--eol;
+	if (final_location == eol && eol > bol)
+		--final_location;
 }
 
 - (void)recordInsertInRange:(NSRange)aRange

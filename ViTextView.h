@@ -74,6 +74,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 	NSDictionary		*inputCommands;
 	NSDictionary		*normalCommands;
+	NSDictionary		*visualCommands;
 
 	NSMutableDictionary	*marks; // XXX: move to document
 	ViSnippet		*activeSnippet; // XXX: move to document ?

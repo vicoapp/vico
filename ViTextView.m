@@ -92,6 +92,17 @@ int logIndent = 0;
 			  @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
 			  nil];
 
+	visualCommands = [NSDictionary dictionaryWithObjectsAndKeys:
+			  @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
+			  @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
+			  @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
+			  @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
+			  @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
+			  @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
+			  @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
+			  @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
+			  nil];
+
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[nonWordSet formUnionWithCharacterSet:wordSet];
 	[nonWordSet formUnionWithCharacterSet:whitespace];
@@ -429,25 +440,22 @@ int logIndent = 0;
 	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"unIndentedLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
 
-	if (bestMatchingScope)
-	{
+	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
-		{
 			return YES;
-		}
 	}
-	
+
 	return NO;
 }
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
         NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
-		
+
 	[self insertString:@"\n" atLocation:aLocation];
 
         if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
@@ -1019,16 +1027,13 @@ int logIndent = 0;
 		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
 
-	if (command.text)
-	{
+	if (command.text) {
 		NSEvent *ev;
 		replayingInput = YES;
 		[self setCaret:end_location];
 		DEBUG(@"replaying input, got %u events", [command.text count]);
 		for (ev in command.text)
-		{
 			[self keyDown:ev];
-		}
 		replayingInput = NO;
 		DEBUG(@"done replaying input, caret = %u, final_location = %u", [self caret], final_location);
 	}
@@ -1393,7 +1398,6 @@ int logIndent = 0;
 		final_location = bol;
 	}
 
-done:
 	DEBUG(@"final_location is %u", final_location);
 	[self setCaret:final_location];
 	if (mode == ViVisualMode)
@@ -1404,7 +1408,7 @@ done:
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	INFO(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
+	DEBUG(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
 	      [theEvent characters],
 	      [theEvent keyCode],
               ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
@@ -1473,7 +1477,12 @@ done:
 		if (!replayingInput)
 			[self scrollToCaret];
 	} else if (mode == ViNormalMode || mode == ViVisualMode) {
-		if (mode == ViNormalMode) {
+		if (charcode == 0x1B) {
+			[self setNormalMode];
+			[self setCaret:final_location];
+			[self resetSelection];
+			return;
+		} else if (mode == ViNormalMode) {
 			/*
 			 * Check for a special key bound to a function.
 			 */
@@ -1483,11 +1492,16 @@ done:
 				[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
 				return;
 			}
-		} else if (charcode == 0x1B) {
-			[self setNormalMode];
-			[self setCaret:final_location];
-			[self resetSelection];
-			return;
+		} else if (mode == ViVisualMode) {
+			/*
+			 * Check for a special key bound to a function.
+			 */
+			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+			NSString *visualCommand = [visualCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
+			if (visualCommand) {
+				[self performSelector:NSSelectorFromString(visualCommand) withObject:[theEvent characters]];
+				return;
+			}
 		}
 
 		if (parser.complete)

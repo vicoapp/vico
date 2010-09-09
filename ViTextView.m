@@ -143,6 +143,23 @@ int logIndent = 0;
 	}
 }
 
+- (void)cut:(id)sender
+{
+	INFO(@"sender = %@, mode = %i", sender, mode);
+
+	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
+	[pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
+	NSString *selection = [[[self textStorage] string] substringWithRange:[self selectedRange]];
+	[pasteBoard setString:selection forType:NSStringPboardType];
+
+	[[self textStorage] beginEditing];
+	[self cutToBuffer:0 append:NO range:[self selectedRange]];
+	[[self textStorage] endEditing];
+	[self endUndoGroup];
+
+	[self setCaret:[self selectedRange].location];
+}
+
 - (ViDocument *)document
 {
         return [documentView document];

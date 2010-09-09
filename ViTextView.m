@@ -950,6 +950,8 @@ int logIndent = 0;
 {
         DEBUG(@"setting caret to %u", location);
 	caret = location;
+	if (mode != ViVisualMode)
+		[self setSelectedRange:NSMakeRange(location, 0)];
 	if (!replayingInput)
 		[self updateCaret];
 }

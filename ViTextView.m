@@ -145,8 +145,6 @@ int logIndent = 0;
 
 - (void)cut:(id)sender
 {
-	INFO(@"sender = %@, mode = %i", sender, mode);
-
 	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
 	[pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
 	NSString *selection = [[[self textStorage] string] substringWithRange:[self selectedRange]];

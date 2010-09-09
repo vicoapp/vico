@@ -484,9 +484,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 	}
 
-	INFO(@"got notification for changes in area %@, change length = %i, storage = %p, self = %@",
-		NSStringFromRange(area), diff, textStorage, self);
-
 	/*
 	 * Incrementally update the scope array.
 	 */
@@ -505,7 +502,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[textStorage string] getLineStart:&bol end:&end contentsEnd:NULL forRange:area];
 	area.location = bol;
 	area.length = end - bol;
-	DEBUG(@"extended area to %@", NSStringFromRange(area));
 
 	[self dispatchSyntaxParserWithRange:area restarting:NO];
 }

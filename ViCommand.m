@@ -9,13 +9,31 @@
 #define VIF_LINE_MODE	(1 << 3)
 #define VIF_NEED_CHAR	(1 << 4)
 
-#if 0
-static struct vikey input_map[] = {
+static struct vikey insert_keys[] = {
+	{@"input_character:",	0x00, 0}, // default action for unknown key
+	{@"decrease_indent:",	0x04, 0}, // ctrl-d
+	{@"input_backspace:",	0x08, 0}, // ctrl-h
+	{@"input_tab:",		0x09, 0}, // tab
+	{@"input_newline:",	0x0A, 0}, // newline (ctrl-j)
+	{@"input_newline:",	0x0D, 0}, // newline (ctrl-m)
+	{@"increase_indent:",	0x14, 0}, // ctrl-t
+	{@"literal_next:",	0x16, VIF_NEED_CHAR}, // ctrl-v
+	{@"normal_mode:",	0x1B, 0}, // escape
+	{@"input_backspace:",	0x7F, 0}, // delete
+	{@"input_forward_delete:", NSDeleteFunctionKey, 0}, // forward delete
+	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_right:",	NSRightArrowFunctionKey, VIF_IS_MOTION},
+	{@"backward_screen:",	NSPageUpFunctionKey, VIF_IS_MOTION}, // ^B
+	{@"forward_screen:",	NSPageDownFunctionKey, VIF_IS_MOTION}, // ^F
+	{@"move_first_char:",	NSHomeFunctionKey, VIF_IS_MOTION},
+	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
 	{nil, -1, 0}
 };
-#endif
 
-static struct vikey normal_map[] = {
+static struct vikey normal_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"scroll_down_by_line:",0x5, 0}, // ^E
@@ -26,9 +44,12 @@ static struct vikey normal_map[] = {
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"jumplist_backward:",	0xF, 0},  // ^O
 	{@"show_info:",		0x7, 0},  // ^G
-	{@"pop_tag:",		0x14, 0},  // ^T
-	{@"scroll_up_by_line:",	0x19, 0},  // ^Y
-	{@"jump_tag:",		0x1D, 0},  // ^]
+	{@"pop_tag:",		0x14, 0}, // ^T
+	{@"scroll_up_by_line:",	0x19, 0}, // ^Y
+	{@"normal_mode:",	0x1B, 0}, // escape
+	{@"jump_tag:",		0x1D, 0}, // ^]
+	{@"switch_file:",	0x1E, 0}, // ^^
+	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
 	{@"move_right:",	' ', VIF_IS_MOTION},
 	{@"append_eol:",	'A', VIF_SETS_DOT},
 	{@"word_backward:",	'B', VIF_IS_MOTION},
@@ -70,10 +91,10 @@ static struct vikey normal_map[] = {
 	{@"substitute:",	's', VIF_SETS_DOT},
 	{@"move_til_char:",	't', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"vi_undo:",		'u', VIF_SETS_DOT},
+	{@"visual:",		'v', 0},
 	{@"word_forward:",	'w', VIF_IS_MOTION},
 	{@"delete_forward:",	'x', VIF_SETS_DOT},
 	{@"yank:",		'y', VIF_NEED_MOTION | VIF_SETS_DOT},
-	{@"visual:",		'v', 0},
 	{@"move_eol:",		'$', VIF_IS_MOTION},
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
@@ -89,14 +110,26 @@ static struct vikey normal_map[] = {
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
 	{@"move_to_mark:",	'\'', VIF_NEED_CHAR | VIF_IS_MOTION},
 	{@"move_to_mark:",	'`', VIF_NEED_CHAR | VIF_IS_MOTION},
+	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_right:",	NSRightArrowFunctionKey, VIF_IS_MOTION},
+	{@"backward_screen:",	NSPageUpFunctionKey, VIF_IS_MOTION},
+	{@"forward_screen:",	NSPageDownFunctionKey, VIF_IS_MOTION},
+	{@"move_first_char:",	NSHomeFunctionKey, VIF_IS_MOTION},
+	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
+	{@"delete_forward:",	NSDeleteFunctionKey, VIF_SETS_DOT}, // forward delete
 	{nil, -1, 0}
 };
 
-static struct vikey operator_map[] = {
+static struct vikey operator_keys[] = {
+	{@"nonmotion:",		0x00, VIF_IS_MOTION}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
+	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
+	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"move_right:",	' ', VIF_IS_MOTION},
@@ -111,10 +144,12 @@ static struct vikey operator_map[] = {
 	{@"move_back_til_char:",'T', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"move_bol:",		'0', VIF_IS_MOTION},
+	{@"select_outer:",	'a', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_backward:",	'b', VIF_IS_MOTION},
 	{@"end_of_word:",	'e', VIF_IS_MOTION},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_left:",		'h', VIF_IS_MOTION},
+	{@"select_inner:",	'i', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
@@ -132,14 +167,25 @@ static struct vikey operator_map[] = {
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
 	{@"move_to_mark:",	'\'', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_to_mark:",	'`', VIF_IS_MOTION | VIF_NEED_CHAR},
+	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_right:",	NSRightArrowFunctionKey, VIF_IS_MOTION},
+	{@"backward_screen:",	NSPageUpFunctionKey, VIF_IS_MOTION}, // ^B
+	{@"forward_screen:",	NSPageDownFunctionKey, VIF_IS_MOTION}, // ^F
+	{@"move_first_char:",	NSHomeFunctionKey, VIF_IS_MOTION},
+	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
 	{nil, -1, 0}
 };
 
-static struct vikey visual_map[] = {
+static struct vikey visual_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
+	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
+	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"move_right:",	' ', VIF_IS_MOTION},
@@ -200,18 +246,28 @@ static struct vikey visual_map[] = {
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
 	{@"move_to_mark:",	'\'', VIF_NEED_CHAR | VIF_IS_MOTION},
 	{@"move_to_mark:",	'`', VIF_NEED_CHAR | VIF_IS_MOTION},
+	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"move_right:",	NSRightArrowFunctionKey, VIF_IS_MOTION},
+	{@"backward_screen:",	NSPageUpFunctionKey, VIF_IS_MOTION}, // ^B
+	{@"forward_screen:",	NSPageDownFunctionKey, VIF_IS_MOTION}, // ^F
+	{@"move_first_char:",	NSHomeFunctionKey, VIF_IS_MOTION},
+	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
 	{nil, -1, 0}
 };
 
 static struct vikey *
-find_command_in_map(int key, struct vikey map[])
+find_command_in_map(unichar key, struct vikey map[])
 {
 	int i;
 	for (i = 0; map[i].method; i++)
-	{
 		if (map[i].key == key)
 			return &map[i];
-	}
+
+	/* Return the default action if not found already. */
+	if (key != 0)
+		return find_command_in_map(0, map);
 
 	return NULL;
 }
@@ -246,7 +302,7 @@ find_command_in_map(int key, struct vikey map[])
 		if (!is_dot)
 			[self setText:nil];
 	}
-	
+
 	if (command && (command->key == 't' || command->key == 'f' ||
 	    command->key == 'T' || command->key == 'F')) {
 		last_ftFT_command = command;
@@ -277,7 +333,6 @@ find_command_in_map(int key, struct vikey map[])
 	if (state == ViCommandNeedChar) {
 		argument = aKey;
 		[self setComplete];
-
 		return;
 	}
 
@@ -328,26 +383,19 @@ find_command_in_map(int key, struct vikey map[])
 		return;
 	}
 
-	// struct vikey *map = normal_map;
-	if  (map == NULL)
-		map = normal_map;
+	if (map == NULL)
+		map = normal_keys;
 	if (state == ViCommandNeedMotion) {
 		// hack for "doubled commands"
 		if (aKey == command->key)
-			map = normal_map;
+			map = normal_keys;
 		else
-			map = operator_map;
+			map = operator_keys;
 	}
 
 	struct vikey *vikey = find_command_in_map(aKey, map);
 	if (vikey == NULL) {
-		// should print "X isn't a vi command"
-		if (state == ViCommandNeedMotion) {
-			motion_key = aKey; // needed for error reporting
-			method = @"nonmotion:";
-		} else
-			method = @"illegal:";
-		key = aKey;
+		method = @"internal_error:";
 		[self setComplete];
 		return;
 	}
@@ -399,7 +447,8 @@ find_command_in_map(int key, struct vikey map[])
 	motion_count = 0;
 	key = -1;
 	argument = -1;
-	map = normal_map;
+	map = normal_keys;
+	literal_next = NO;
 }
 
 - (BOOL)ismotion
@@ -409,9 +458,8 @@ find_command_in_map(int key, struct vikey map[])
 
 - (BOOL)line_mode
 {
-	if(motion_command)
-	{
-		if(motion_command == command)
+	if (motion_command) {
+		if (motion_command == command)
 			return YES;
 		return has_flag(motion_command, VIF_LINE_MODE);
 	}
@@ -420,14 +468,41 @@ find_command_in_map(int key, struct vikey map[])
 
 - (NSString *)motion_method
 {
-	if(motion_command && has_flag(motion_command, VIF_IS_MOTION))
+	if (motion_command && has_flag(motion_command, VIF_IS_MOTION))
 		return motion_command->method;
 	return nil;
 }
 
 - (void)setVisualMap
 {
-	map = visual_map;
+	map = visual_keys;
+}
+
+- (void)setInsertMap
+{
+	map = insert_keys;
 }
 
 @end
+
+@implementation ViKey
+@synthesize code;
+@synthesize flags;
+
++ (ViKey *)keyWithCode:(unichar)aCode flags:(unsigned int)aFlags
+{
+	return [[ViKey alloc] initWithCode:aCode flags:aFlags];
+}
+
+- (ViKey *)initWithCode:(unichar)aCode flags:(unsigned int)aFlags
+{
+	self = [[ViKey alloc] init];
+	if (self) {
+		code = aCode;
+		flags = aFlags;
+	}
+	return self;
+	
+}
+@end
+

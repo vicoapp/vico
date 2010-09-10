@@ -44,13 +44,21 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @interface ViTextView : NSTextView
 {
 	ViDocumentView		*documentView;
+
+	// vi command parser
 	ViMode			 mode;
 	ViCommand		*parser;
+	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 replayingInput;  // true when dot command replays input
+	NSMutableArray		*inputKeys; // used for replaying input
+
+	NSRange			 affectedRange;
+	NSUInteger		 start_location, end_location, final_location;
+
 	NSUndoManager		*undoManager;
 	NSDictionary		*typingAttributes;
-	ViTagsDatabase		*tags; // XXX: doesn't belong here!?
-	NSMutableArray		*inputKeys;
+
+	ViTagsDatabase		*tags; // XXX: doesn't belong here!? Move to the document or window controller.
 
 	// block cursor
 	NSUInteger		 caret;
@@ -58,9 +66,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSRect			 oldCaretRect;
 
 	NSMutableDictionary	*buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
-
-	NSRange			 affectedRange;
-	NSUInteger		 start_location, end_location, final_location;
 
 	NSInteger		 saved_column;
 
@@ -71,10 +76,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSMutableCharacterSet	*wordSet;
 	NSMutableCharacterSet	*nonWordSet;
 	NSCharacterSet		*whitespace;
-
-	NSDictionary		*inputCommands;
-	NSDictionary		*normalCommands;
-	NSDictionary		*visualCommands;
 
 	NSMutableDictionary	*marks; // XXX: move to document
 	ViSnippet		*activeSnippet; // XXX: move to document ?

@@ -5,8 +5,8 @@ typedef enum { ViCommandInitialState, ViCommandNeedMotion, ViCommandNeedChar } V
 struct vikey
 {
 	NSString *method;
-	int key;
-	unsigned flags;
+	unichar key;
+	unsigned int flags;
 };
 
 @interface ViCommand : NSObject
@@ -15,6 +15,8 @@ struct vikey
 	ViCommandState state;
 
 	NSString *method;
+	
+	BOOL literal_next;
 
 	struct vikey *map;
 	struct vikey *command;
@@ -44,6 +46,7 @@ struct vikey
 - (BOOL)line_mode;
 - (NSString *)motion_method;
 - (void)setVisualMap;
+- (void)setInsertMap;
 
 @property(readonly) BOOL complete;
 @property(readonly) NSString *method;
@@ -53,7 +56,18 @@ struct vikey
 @property(readonly) BOOL is_dot;
 @property(readonly) unichar motion_key;
 @property(readonly) unichar argument;
-@property(readwrite, copy) NSArray *text;
+@property(readwrite,assign) NSArray *text;
 
+@end
+
+@interface ViKey : NSObject
+{
+	unichar		 code;
+	unsigned int	 flags;
+}
++ (ViKey *)keyWithCode:(unichar)aCode flags:(unsigned int)aFlags;
+- (ViKey *)initWithCode:(unichar)aCode flags:(unsigned int)aFlags;
+@property(readonly) unichar code;
+@property(readonly) unsigned int flags;
 @end
 

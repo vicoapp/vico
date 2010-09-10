@@ -60,7 +60,8 @@
 	[parser pushKey:'c'];
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEqualObjects(parser.method, @"nonmotion:", nil);
+	STAssertEqualObjects(parser.method, @"change:", nil);
+	STAssertEqualObjects(parser.motion_method, @"nonmotion:", nil);
 }
 
 - (void)test053_DoubledCommandImpliesCurrentLine

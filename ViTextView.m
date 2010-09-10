@@ -23,7 +23,11 @@ int logIndent = 0;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
+- (void)handleKeys:(NSArray *)keys;
+- (void)handleKey:(unichar)charcode flags:(unsigned int)flags;
 - (void)evaluateCommand:(ViCommand *)command;
+- (void)switch_tab:(int)arg;
+- (void)show_scope;
 @end
 
 #pragma mark -
@@ -48,60 +52,6 @@ int logIndent = 0;
 	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-
-	inputCommands = [NSDictionary dictionaryWithObjectsAndKeys:
-			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00000024], // enter
-			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x0004002e], // ctrl-m
-			 @"input_newline:", [NSNumber numberWithUnsignedInteger:0x00040026], // ctrl-j
-			 @"increase_indent:", [NSNumber numberWithUnsignedInteger:0x00040011], // ctrl-t
-			 @"decrease_indent:", [NSNumber numberWithUnsignedInteger:0x00040002], // ctrl-d
-			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00000033], // backspace
-			 @"input_backspace:", [NSNumber numberWithUnsignedInteger:0x00040004], // ctrl-h
-			 @"input_forward_delete:", [NSNumber numberWithUnsignedInteger:0x00800075], // delete
-			 @"input_tab:", [NSNumber numberWithUnsignedInteger:0x00000030], // tab
-			 @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
-			 @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
-			 @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
-			 @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
-			 @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
-			 @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
-			 @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
-			 @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
-			 nil];
-
-	normalCommands = [NSDictionary dictionaryWithObjectsAndKeys:
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100012], // command-1
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100013], // command-2
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100014], // command-3
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100015], // command-4
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100017], // command-5
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100016], // command-6
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001A], // command-7
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001C], // command-8
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x00100019], // command-9
-			  @"switch_tab:", [NSNumber numberWithUnsignedInteger:0x0010001D], // command-0
-			  @"switch_file:", [NSNumber numberWithUnsignedInteger:0x0004001E], // ctrl-^
-			  @"show_scope:", [NSNumber numberWithUnsignedInteger:0x00060023], // ctrl-shift-p
-			  @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
-			  @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
-			  @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
-			  @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
-			  @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
-			  @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
-			  @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
-			  @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
-			  nil];
-
-	visualCommands = [NSDictionary dictionaryWithObjectsAndKeys:
-			  @"input_up:", [NSNumber numberWithUnsignedInteger:0x00A0007E], // up arrow
-			  @"input_down:", [NSNumber numberWithUnsignedInteger:0x00A0007D], // down arrow
-			  @"input_left:", [NSNumber numberWithUnsignedInteger:0x00A0007B], // left arrow
-			  @"input_right:", [NSNumber numberWithUnsignedInteger:0x00A0007C], // right arrow
-			  @"input_pgup:", [NSNumber numberWithUnsignedInteger:0x00800074], // page up
-			  @"input_pgdn:", [NSNumber numberWithUnsignedInteger:0x00800079], // page down
-			  @"input_home:", [NSNumber numberWithUnsignedInteger:0x00800073], // home
-			  @"input_end:", [NSNumber numberWithUnsignedInteger:0x00800077], // end
-			  nil];
 
 	nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[nonWordSet formUnionWithCharacterSet:wordSet];
@@ -1055,12 +1005,10 @@ int logIndent = 0;
 	mode = ViInsertMode;
 
 	if (command.text) {
-		NSEvent *ev;
 		replayingInput = YES;
 		[self setCaret:end_location];
 		DEBUG(@"replaying input, got %u events", [command.text count]);
-		for (ev in command.text)
-			[self keyDown:ev];
+		[self handleKeys:command.text];
 		replayingInput = NO;
 		DEBUG(@"done replaying input, caret = %u, final_location = %u", [self caret], final_location);
 	}
@@ -1085,13 +1033,10 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Input handling and command evaluation
 
-/* Input a character from the user (in insert mode). Handle smart typing pairs.
- * FIXME: assumes smart typing pairs are single characters.
- * FIXME: need special handling if inside a snippet.
- */
-- (void)inputCharacters:(NSString *)characters
+- (void)handle_input:(NSString *)characters
 {
-	DEBUG(@"insert characters [%@] at %i", characters, start_location);
+	INFO(@"insert characters [%@] at %i", characters, start_location);
+
 	// If there is a non-zero length selection, remove it first.
 	NSRange sel = [self selectedRange];
 	if (sel.length > 0)
@@ -1100,10 +1045,11 @@ int logIndent = 0;
 	BOOL foundSmartTypingPair = NO;
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
 	NSArray *pair;
-	for (pair in smartTypingPairs)
-	{
-		// check if we're inserting the end character of a smart typing pair
-		// if so, just overwrite the end character
+	for (pair in smartTypingPairs) {
+		/*
+		 * Check if we're inserting the end character of a smart typing pair.
+		 * If so, just overwrite the end character.
+		 */
 		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
 		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
 		{
@@ -1112,7 +1058,7 @@ int logIndent = 0;
 						      effectiveRange:NULL])
 			{
 				foundSmartTypingPair = YES;
-				[self setCaret:start_location + 1];
+				final_location = start_location + 1;
 			}
 			break;
 		}
@@ -1136,7 +1082,7 @@ int logIndent = 0;
 					[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
 					nil] afterDelay:0];
 
-				[self setCaret:start_location + 1];
+				final_location = start_location + 1;
 				break;
 			}
 		}
@@ -1145,7 +1091,8 @@ int logIndent = 0;
 	if (!foundSmartTypingPair) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
-		[self setCaret:start_location + [characters length]];
+		[self setCaret:start_location + 1];
+		final_location = start_location + 1;
 	}
 
 #if 0
@@ -1161,19 +1108,43 @@ int logIndent = 0;
 #endif
 }
 
-- (void)input_newline:(NSString *)characters
+- (BOOL)literal_next:(ViCommand *)command
 {
-	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
-	[self setCaret:start_location + num_chars];
+	[self handle_input:[NSString stringWithFormat:@"%C", command.argument]];
+	return YES;
 }
 
-- (void)input_tab:(NSString *)characters
+/* Input a character from the user (in insert mode). Handle smart typing pairs.
+ * FIXME: assumes smart typing pairs are single characters.
+ * FIXME: need special handling if inside a snippet.
+ */
+- (BOOL)input_character:(ViCommand *)command
+{
+	unichar key = command.key;
+
+	if (key < 0x20) {
+		[[self delegate] message:@"Illegal character; quote to enter"];
+		return NO;
+	}
+
+	[self handle_input:[NSString stringWithFormat:@"%C", key]];
+	return YES;
+}
+
+- (BOOL)input_newline:(ViCommand *)command
+{
+	int num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+	final_location = start_location + num_chars;
+	return YES;
+}
+
+- (BOOL)input_tab:(ViCommand *)command
 {
         // check if we're inside a snippet
         if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)])
 	{
 		[self handleSnippetTab:activeSnippet atLocation:start_location];
-		return;
+		return YES;
 	}
 
         // check for a new snippet
@@ -1191,7 +1162,7 @@ int logIndent = 0;
                                 {
                                         [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
                                         activeSnippet = [self insertSnippet:snippetString atLocation:start_location - [word length]];
-                                        return;
+                                        return YES;
                                 }
                         }
                 }
@@ -1199,55 +1170,9 @@ int logIndent = 0;
 
 	// otherwise just insert a tab
 	[self insertString:@"\t" atLocation:start_location];
-	[self setCaret:start_location + 1];
-}
+	final_location = start_location + 1;
 
-- (void)evaluateKey:(unichar)key
-{
-	ViCommand *cmd = [[ViCommand alloc] init];
-	[cmd pushKey:key];
-	if (cmd.complete)
-		[self evaluateCommand:cmd];
-}
-
-- (void)input_up:(NSString *)characters
-{
-	[self evaluateKey:'k'];
-}
-
-- (void)input_down:(NSString *)characters
-{
-	[self evaluateKey:'j'];
-}
-
-- (void)input_left:(NSString *)characters
-{
-	[self evaluateKey:'h'];
-}
-
-- (void)input_right:(NSString *)characters
-{
-	[self evaluateKey:'l'];
-}
-
-- (void)input_pgup:(NSString *)characters
-{
-	[self evaluateKey:0x02]; // ^B
-}
-
-- (void)input_pgdn:(NSString *)characters
-{
-	[self evaluateKey:0x06]; // ^F
-}
-
-- (void)input_home:(NSString *)characters
-{
-	[self evaluateKey:'_'];
-}
-
-- (void)input_end:(NSString *)characters
-{
-	[self evaluateKey:'$'];
+	return YES;
 }
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
@@ -1263,12 +1188,11 @@ int logIndent = 0;
 	return nil;
 }
 
-- (void)input_backspace:(NSString *)characters
+- (BOOL)input_backspace:(ViCommand *)command
 {
-	if ([self caret] == 0)
-	{
+	if (start_location == 0) {
 		[[self delegate] message:@"Already at the beginning of the document"];
-		return;
+		return YES;
 	}
 
 	/* check if we're deleting the first character in a smart pair */
@@ -1281,37 +1205,64 @@ int logIndent = 0;
 		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
 		{
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
-			[self setCaret:start_location - 1];
-			return;
+			final_location = start_location - 1;
+			return YES;
 		}
 	}
 
 	/* else a regular character, just delete it */
 	[self deleteRange:NSMakeRange(start_location - 1, 1)];
-	[self setCaret:start_location - 1];
+	final_location = start_location - 1;
+
+	return YES;
 }
 
-- (void)input_forward_delete:(NSString *)characters
+- (BOOL)input_forward_delete:(ViCommand *)command
 {
 	/* FIXME: should handle smart typing pairs here!
 	 */
 	[self deleteRange:NSMakeRange(start_location, 1)];
+	final_location = start_location;
+	return YES;
 }
 
-- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+- (BOOL)normal_mode:(ViCommand *)command
 {
-	if ([theEvent type] != NSKeyDown && [theEvent type] != NSKeyUp)
-		return NO;
+	if (mode == ViInsertMode) {
+		if (!replayingInput)
+			[command setText:inputKeys];
+		inputKeys = [[NSMutableArray alloc] init];
+#if 0
+		NSString *insertedText = [[[self textStorage] string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
+		INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
+			insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
 
-	if ([theEvent type] == NSKeyUp) {
-		DEBUG(@"Got a performKeyEquivalent event, characters: '%@', keycode = %u, modifiers = 0x%04X",
-		      [theEvent charactersIgnoringModifiers],
-		      [[theEvent characters] characterAtIndex:0],
-		      [theEvent modifierFlags]);
-		return YES;
+		/* handle counts for inserted text here */
+		NSString *multipliedText = insertedText;
+		if (parser.count > 1) {
+			multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
+								    withString:insertedText
+							       startingAtIndex:0];
+			[self insertString:multipliedText atLocation:[self caret]];
+
+			multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
+								    withString:insertedText
+							       startingAtIndex:0];
+		}
+
+		[parser setText:multipliedText];
+		if ([multipliedText length] > 0)
+			[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
+#endif
+		start_location = end_location = [self caret];
+		[self move_left:nil];
 	}
 
-	return [super performKeyEquivalent:theEvent];
+	[self setNormalMode];
+	[self setCaret:final_location];
+	[self resetSelection];
+
+	return YES;
 }
 
 - (void)evaluateCommand:(ViCommand *)command
@@ -1429,132 +1380,147 @@ int logIndent = 0;
 		[self scrollToCaret];
 }
 
+- (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
+{
+	INFO(@"string = [%@], len %i, replacementRange = %@",
+	    aString, [(NSString *)aString length], NSStringFromRange(replacementRange));
+
+	if ([self hasMarkedText])
+		[self unmarkText];
+
+	if (replacementRange.location == NSNotFound) {
+		NSInteger i;
+		for (i = 0; i < [(NSString *)aString length]; i++)
+			[self handleKey:[(NSString *)aString characterAtIndex:i] flags:0];
+		insertedKey = YES;
+	}
+}
+
+- (void)doCommandBySelector:(SEL)aSelector
+{
+	INFO(@"selector = %s", aSelector);
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
-	DEBUG(@"Got a keyDown event, characters: '%@', keycode = 0x%04X, code = 0x%08X",
-	      [theEvent characters],
-	      [theEvent keyCode],
-              ([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
+	// http://sigpipe.macromates.com/2005/09/24/deciphering-an-nsevent/
+	// given theEvent (NSEvent*) figure out what key 
+	// and modifiers we actually want to look at, 
+	// to compare it with a menu key description
+ 
+	unsigned int quals = [theEvent modifierFlags];
 
-	if ([[theEvent characters] length] == 0)
-		return [super keyDown:theEvent];
-	unichar charcode = [[theEvent characters] characterAtIndex:0];
+	NSString *str = [theEvent characters];
+	NSString *strWithout = [theEvent charactersIgnoringModifiers];
 
-	if (mode == ViInsertMode) {
-		// add the event to the input key replay queue
-		if (!replayingInput)
-			[inputKeys addObject:theEvent];
+	unichar ch = [str length] ? [str characterAtIndex:0] : 0;
+	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
 
-		if (charcode == 0x1B) {
-			/* escape, return to command mode */
-#if 0
-			NSString *insertedText = [[[self textStorage] string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
-			INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
-				insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
+	if (!(quals & NSNumericPadKeyMask)) {
+		if (quals & NSControlKeyMask) {
+			if (ch < 0x20)
+				quals &= ~NSControlKeyMask;
+			else
+				ch = without;
+		} else if (quals & NSAlternateKeyMask) {
+			if (0x20 < ch && ch < 0x7f && ch != without)
+				quals &= ~NSAlternateKeyMask;
+			else
+				ch = without;
+		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
+			ch = without;
+		
+		if ((0x20 < ch && ch < 0x7f) || ch == 0x19)
+			quals &= ~NSShiftKeyMask;
+	}
+ 
+	// the resulting values
+	unichar key = ch;
+	unsigned int modifiers = quals & (NSNumericPadKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
 
-			/* handle counts for inserted text here */
-			NSString *multipliedText = insertedText;
-			if (parser.count > 1) {
-				multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
-						                            withString:insertedText
-							               startingAtIndex:0];
-				[self insertString:multipliedText atLocation:[self caret]];
+	DEBUG(@"key = %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
+	    key, key,
+	    (modifiers & NSShiftKeyMask) ? "YES" : "NO",
+	    (modifiers & NSControlKeyMask) ? "YES" : "NO",
+	    (modifiers & NSAlternateKeyMask) ? "YES" : "NO",
+	    (modifiers & NSCommandKeyMask) ? "YES" : "NO"
+	);
 
-				multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
-						                            withString:insertedText
-							               startingAtIndex:0];
-			}
+	[super keyDown:theEvent];
+	INFO(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
 
-			[parser setText:multipliedText];
-			if ([multipliedText length] > 0)
-				[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
-#endif
-			if (!replayingInput)
-				parser.text = inputKeys; // copies the array
-			[inputKeys removeAllObjects];
-			[self setNormalMode];
-			start_location = end_location = [self caret];
-			[self move_left:nil];
-			[self setCaret:end_location];
-		} else {
-			start_location = [self caret];
+	if (!insertedKey && ![self hasMarkedText])
+		[self handleKey:key flags:modifiers];
+	insertedKey = NO;
+}
 
-			/*
-			 * Lookup the key in the input command map.
-			 * Some keys are handled specially, or trigger macros.
-			 */
-			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-			NSString *inputCommand = [inputCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-			if (inputCommand)
-				[self performSelector:NSSelectorFromString(inputCommand) withObject:[theEvent characters]];
-			else if ((([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) & (NSCommandKeyMask | NSFunctionKeyMask)) == 0) {
-				/* other keys insert themselves */
-				/* but don't input control characters */
-				if (([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
-					[[self delegate] message:@"Illegal character; quote to enter"];
-				else
-					[self inputCharacters:[theEvent characters]];
-			}
-		}
-		if (!replayingInput)
-			[self scrollToCaret];
-	} else if (mode == ViNormalMode || mode == ViVisualMode) {
-		if (charcode == 0x1B) {
-			[self setNormalMode];
-			[self setCaret:final_location];
-			[self resetSelection];
-			return;
-		} else if (mode == ViNormalMode) {
-			/*
-			 * Check for a special key bound to a function.
-			 */
-			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-			NSString *normalCommand = [normalCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-			if (normalCommand) {
-				[self performSelector:NSSelectorFromString(normalCommand) withObject:[theEvent characters]];
-				return;
-			}
-		} else if (mode == ViVisualMode) {
-			/*
-			 * Check for a special key bound to a function.
-			 */
-			NSUInteger code = (([theEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) | [theEvent keyCode]);
-			NSString *visualCommand = [visualCommands objectForKey:[NSNumber numberWithUnsignedInteger:code]];
-			if (visualCommand) {
-				[self performSelector:NSSelectorFromString(visualCommand) withObject:[theEvent characters]];
-				return;
-			}
-		}
+- (void)handleKeys:(NSArray *)keys
+{
+	ViKey *key;
+	for (key in keys)
+		[self handleKey:[key code] flags:[key flags]];
+}
 
-		if (parser.complete)
-			[parser reset];
+- (void)handleKey:(unichar)charcode flags:(unsigned int)flags
+{
+	INFO(@"handle key '%C' w/flags 0x%04x", charcode, flags);
 
-		if (mode == ViVisualMode)
-			[parser setVisualMap];
+	/* Special handling of command-[0-9] to switch tabs. */
+	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
+		[self switch_tab:charcode - '0'];
+		return;
+	}
 
-		[parser pushKey:charcode];
-		if (parser.complete) {
-			[self evaluateCommand:parser];
-			if (mode != ViInsertMode) {
-				// still in normal mode
-				[self endUndoGroup];
-			}
-		}
+	/* Special handling of control-shift-p. */
+	if (flags == NSShiftKeyMask && charcode == 0x10 /* C-p */) {
+		[self show_scope];
+		return;
+	}
+
+	if (flags != 0) {
+		INFO(@"unhandled key equivalent %C/0x%04X", charcode, flags);
+		return;
+	}
+
+	if (mode == ViInsertMode && !replayingInput) {
+		/* Add the key to the input replay queue. */
+		[inputKeys addObject:[ViKey keyWithCode:charcode flags:flags]];
+	}
+
+	if (parser.complete)
+		[parser reset];
+
+	if (mode == ViVisualMode)
+		[parser setVisualMap];
+	else if (mode == ViInsertMode)
+		[parser setInsertMap];
+
+	[parser pushKey:charcode];
+	if (parser.complete) {
+		[self evaluateCommand:parser];
+		if (mode != ViInsertMode)
+			[self endUndoGroup];
 	}
 }
 
 - (void)swipeWithEvent:(NSEvent *)event
 {
-	BOOL rc = FALSE;
+	BOOL rc = NO, keep_message = NO;
 
 	DEBUG(@"got swipe event %@", event);
+
+	if ([event deltaX] != 0 && mode == ViInsertMode) {
+		[[self delegate] message:@"Swipe event interrupted text insert mode."];
+		[self normal_mode:parser];
+		keep_message = YES;
+	}
 
 	if ([event deltaX] > 0)
 		rc = [self jumplist_backward:nil];
 	else if ([event deltaX] < 0)
 		rc = [self jumplist_forward:nil];
 
-	if (rc == TRUE)
+	if (rc == YES && !keep_message)
 		[[self delegate] message:@""]; // erase any previous message
 }
 
@@ -1779,22 +1745,22 @@ int logIndent = 0;
 	return [self wordAtLocation:aLocation range:nil];
 }
 
-- (void)show_scope:(NSString *)characters
+- (void)show_scope
 {
 	[[self delegate] message:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
 }
 
-- (void)switch_file:(NSString *)characters
+- (BOOL)switch_file:(ViCommand *)command
 {
         [[[self delegate] windowController] switchToLastDocument];
+        return YES;
 }
 
-- (void)switch_tab:(NSString *)characters
+- (void)switch_tab:(int)arg
 {
-	int tab = [characters intValue];
-	if (tab-- == 0)
-		tab = 9;
-        [[[self delegate] windowController] switchToDocumentAtIndex:tab];
+	if (arg-- == 0)
+		arg = 9;
+        [[[self delegate] windowController] switchToDocumentAtIndex:arg];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

@@ -25,7 +25,7 @@ int logIndent = 0;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
 - (void)handleKeys:(NSArray *)keys;
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags;
-- (void)evaluateCommand:(ViCommand *)command;
+- (BOOL)evaluateCommand:(ViCommand *)command;
 - (void)switch_tab:(int)arg;
 - (void)show_scope;
 @end
@@ -497,20 +497,20 @@ int logIndent = 0;
 	return [self changeIndentation:delta inRange:aRange updateCaret:nil];
 }
 
-- (void)increase_indent:(NSString *)characters
+- (BOOL)increase_indent:(ViCommand *)command
 {
         NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
         NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
-        [self setCaret:start_location + n.location];
+        final_location = start_location + n.location;
 }
 
-- (void)decrease_indent:(NSString *)characters
+- (void)decrease_indent:(ViCommand *)command
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	NSRange n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
-        [self setCaret:start_location + n.location];
+        final_location = start_location + n.location;
 }
 
 #pragma mark -
@@ -1035,7 +1035,7 @@ int logIndent = 0;
 
 - (void)handle_input:(NSString *)characters
 {
-	INFO(@"insert characters [%@] at %i", characters, start_location);
+	DEBUG(@"insert characters [%@] at %i", characters, start_location);
 
 	// If there is a non-zero length selection, remove it first.
 	NSRange sel = [self selectedRange];
@@ -1265,7 +1265,7 @@ int logIndent = 0;
 	return YES;
 }
 
-- (void)evaluateCommand:(ViCommand *)command
+- (BOOL)evaluateCommand:(ViCommand *)command
 {
 	/* Default start- and end-location is the current location. */
 	start_location = [self caret];
@@ -1299,7 +1299,7 @@ int logIndent = 0;
 			/* the command failed */
 			[command reset];
 			final_location = start_location;
-			return;
+			return NO;
 		}
 	}
 
@@ -1378,27 +1378,36 @@ int logIndent = 0;
 		[self setVisualSelection];
 	if (!replayingInput)
 		[self scrollToCaret];
+
+	return ok;
 }
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
 {
-	INFO(@"string = [%@], len %i, replacementRange = %@",
-	    aString, [(NSString *)aString length], NSStringFromRange(replacementRange));
+	NSString *string;
+	
+	if ([aString isMemberOfClass:[NSAttributedString class]])
+		string = [aString string];
+	else
+		string = aString;
+
+	DEBUG(@"string = [%@], len %i, replacementRange = %@",
+	    string, [(NSString *)string length], NSStringFromRange(replacementRange));
 
 	if ([self hasMarkedText])
 		[self unmarkText];
 
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
-		for (i = 0; i < [(NSString *)aString length]; i++)
-			[self handleKey:[(NSString *)aString characterAtIndex:i] flags:0];
+		for (i = 0; i < [(NSString *)string length]; i++)
+			[self handleKey:[(NSString *)string characterAtIndex:i] flags:0];
 		insertedKey = YES;
 	}
 }
 
 - (void)doCommandBySelector:(SEL)aSelector
 {
-	INFO(@"selector = %s", aSelector);
+	DEBUG(@"selector = %s", aSelector);
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1447,7 +1456,7 @@ int logIndent = 0;
 	);
 
 	[super keyDown:theEvent];
-	INFO(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
+	DEBUG(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
 
 	if (!insertedKey && ![self hasMarkedText])
 		[self handleKey:key flags:modifiers];
@@ -1463,7 +1472,7 @@ int logIndent = 0;
 
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags
 {
-	INFO(@"handle key '%C' w/flags 0x%04x", charcode, flags);
+	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
 
 	/* Special handling of command-[0-9] to switch tabs. */
 	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
@@ -1477,8 +1486,8 @@ int logIndent = 0;
 		return;
 	}
 
-	if (flags != 0) {
-		INFO(@"unhandled key equivalent %C/0x%04X", charcode, flags);
+	if ((flags & ~NSNumericPadKeyMask) != 0) {
+		DEBUG(@"unhandled key equivalent %C/0x%04X", charcode, flags);
 		return;
 	}
 

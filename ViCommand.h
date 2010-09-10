@@ -15,7 +15,7 @@ struct vikey
 	ViCommandState state;
 
 	NSString *method;
-	
+
 	BOOL literal_next;
 
 	struct vikey *map;
@@ -56,7 +56,7 @@ struct vikey
 @property(readonly) BOOL is_dot;
 @property(readonly) unichar motion_key;
 @property(readonly) unichar argument;
-@property(readwrite,assign) NSArray *text;
+@property(readwrite, assign) NSArray *text;
 
 @end
 

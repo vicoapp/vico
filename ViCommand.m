@@ -99,6 +99,8 @@ static struct vikey normal_keys[] = {
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
 	{@"ex_command:",	':', 0},
+	{@"repeat_line_search:", ';', VIF_IS_MOTION},
+	{@"repeat_line_search:", ',', VIF_IS_MOTION},
 	{@"shift_right:",	'>', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
@@ -110,6 +112,7 @@ static struct vikey normal_keys[] = {
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
 	{@"move_to_mark:",	'\'', VIF_NEED_CHAR | VIF_IS_MOTION},
 	{@"move_to_mark:",	'`', VIF_NEED_CHAR | VIF_IS_MOTION},
+	{@"dot:",		'.', 0},
 	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
 	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
@@ -159,6 +162,8 @@ static struct vikey operator_keys[] = {
 	{@"move_eol:",		'$', VIF_IS_MOTION},
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
+	{@"repeat_line_search:", ';', VIF_IS_MOTION},
+	{@"repeat_line_search:", ',', VIF_IS_MOTION},
 	{@"find:",		'/', VIF_IS_MOTION},
 	{@"find_backwards:",	'?', VIF_IS_MOTION},
 	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
@@ -290,6 +295,27 @@ find_command_in_map(unichar key, struct vikey map[])
 {
 	complete = YES;
 
+	if (command && command->key == '.') {
+		is_dot = YES;
+
+		if (dot_command == nil) {
+			method = @"nodot:"; // prints "No command to repeat"
+			command = NULL;
+			motion_command = NULL;
+		} else {
+			command = dot_command;
+			if (count == 0)
+				count = dot_count;
+			method = dot_command->method;
+			motion_command = dot_motion_command;
+			motion_count = dot_motion_count;
+			key = dot_command->key;
+			argument = dot_argument;
+			if (dot_motion_command)
+				motion_key = dot_motion_command->key;
+		}
+	}
+
 	if (command && has_flag(command, VIF_SETS_DOT)) {
 		/* set the dot command parameters */
 		dot_command = command;
@@ -303,12 +329,36 @@ find_command_in_map(unichar key, struct vikey map[])
 			[self setText:nil];
 	}
 
-	if (command && (command->key == 't' || command->key == 'f' ||
+	if (command && (command->key == ';' || command->key == ',')) {
+		if (last_ftFT_command == nil) {
+			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
+			command = NULL;
+			motion_command = NULL;
+		} else {
+			INFO(@"repeating '%C' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
+			command = last_ftFT_command;
+			method = last_ftFT_command->method;
+			argument = last_ftFT_argument;
+			key = last_ftFT_command->key;
+		}
+	} else if (command && (command->key == 't' || command->key == 'f' ||
 	    command->key == 'T' || command->key == 'F')) {
 		last_ftFT_command = command;
 		last_ftFT_argument = argument;
 	}
-	else if (motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
+
+	if (motion_command && (motion_command->key == ';' || motion_command->key == ',')) {
+		if (last_ftFT_command == nil) {
+			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
+			command = NULL;
+			motion_command = NULL;
+		} else {
+			INFO(@"repeating '%C' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
+			motion_command = last_ftFT_command;
+			argument = last_ftFT_argument;
+			motion_key = last_ftFT_command->key;
+		}
+	} else if (motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
 	    motion_command->key == 'T' || motion_command->key == 'F')) {
 		last_ftFT_command = motion_command;
 		last_ftFT_argument = argument;
@@ -317,11 +367,18 @@ find_command_in_map(unichar key, struct vikey map[])
 	if (count > 0 && motion_count > 0) {
 		/* From nvi:
 		 * A count may be provided both to the command and to the motion, in
-		 * which case the count is multiplicative.  For example, "3y4y" is the
+		 * which case the count is multiplicative.  For example ,"3y4y" is the
 		 * same as "12yy".  This count is provided to the motion command and 
 		 * not to the regular function.
 		 */
 		motion_count *= count;
+		count = 0;
+	} else if (count > 0 && motion_count == 0 && motion_command != NULL) {
+		/*
+		 * If a count is given to an operator command, attach the count
+		 * to the motion command instead.
+		 */
+		motion_count = count;
 		count = 0;
 	}
 }
@@ -344,42 +401,6 @@ find_command_in_map(unichar key, struct vikey map[])
 	if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9') {
 		*countp *= 10;
 		*countp += aKey - '0';
-		return;
-	}
-
-	// check for the dot command
-	if (aKey == '.') {
-		is_dot = YES;
-
-		if (dot_command == nil) {
-			method = @"nodot:"; // prints "No command to repeat"
-			[self setComplete];
-			return;
-		}
-
-		command = dot_command;
-		if (count == 0)
-			count = dot_count;
-		method = dot_command->method;
-		motion_command = dot_motion_command;
-		motion_count = dot_motion_count;
-		key = dot_command->key;
-		argument = dot_argument;
-		if (dot_motion_command)
-			motion_key = dot_motion_command->key;
-		[self setComplete];
-		return;
-	} else if (aKey == ';' || aKey == ',') {
-		if(last_ftFT_command == nil)
-			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
-		else {
-			DEBUG(@"repeating '%c' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
-			command = last_ftFT_command;
-			method = last_ftFT_command->method;
-			argument = last_ftFT_argument;
-			key = last_ftFT_command->key;
-		}
-		[self setComplete];
 		return;
 	}
 

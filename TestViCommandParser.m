@@ -241,15 +241,15 @@
 	[parser pushKey:'d'];
 	[parser pushKey:'w'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEquals(parser.count, 2, nil);
+	STAssertEquals(parser.motion_count, 2, nil);
 	[parser reset];
 	[parser pushKey:'3'];
 	[parser pushKey:'.'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 'd', nil);
 	STAssertEqualObjects(parser.motion_method, @"word_forward:", nil);
-	STAssertEquals(parser.count, 3, nil);
-	STAssertEquals(parser.motion_count, 0, nil);
+	STAssertEquals(parser.motion_count, 3, nil);
+	STAssertEquals(parser.count, 0, nil);
 }
 
 - (void)test077_DotCommandWithMultiplicativeCountOverridesOriginal

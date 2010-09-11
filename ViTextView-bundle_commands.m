@@ -5,41 +5,60 @@
 #import "ViTextView.h"
 #import "ViCommandOutputController.h"
 #import "ViDocument.h"  // for declaration of the message: method
-#import "NSString-scopeSelector.h"
+#import "NSArray-patterns.h"
 #import "NSTextStorage-additions.h"
 
 @implementation ViTextView (bundleCommands)
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+- (NSRange)trackScopes:(NSArray *)trackScopes forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
 {
-	NSRange trackedRange = NSMakeRange(aLocation, 0);
+	NSArray *lastScopes = nil, *scopes;
 	NSUInteger i = aLocation;
-	for (;;)
-	{
+	for (;;) {
 		if (forward && i >= [[self textStorage] length])
 			break;
 		else if (!forward && i == 0)
 			break;
-	
-		NSRange range = NSMakeRange(i, 0);
-		NSArray *scopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-							  atCharacterIndex:i
-							    effectiveRange:&range];
-		if (scopes == nil)
+
+		if (!forward)
+			i--;
+
+		if ((scopes = [self scopesAtLocation:i]) == nil)
 			break;
 
-		if ([scopeSelector matchesScopes:scopes])
-			trackedRange = NSUnionRange(trackedRange, range);
-		else
+		if (lastScopes != scopes && ![trackScopes matchesScopes:scopes]) {
+			if (!forward)
+				i++;
 			break;
+		}
 
 		if (forward)
-			i += range.length;
-		else
-			i -= range.length;
+			i++;
+
+		lastScopes = scopes;
 	}
 
-	return trackedRange;
+	if (forward)
+		return NSMakeRange(aLocation, i - aLocation);
+	else
+		return NSMakeRange(i, aLocation - i);
+}
+
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+{
+	return [self trackScopes:[scopeSelector componentsSeparatedByString:@" "] forward:forward fromLocation:aLocation];
+}
+
+- (NSRange)trackScopes:(NSArray *)scopes atLocation:(NSUInteger)aLocation
+{
+	NSRange rb = [self trackScopes:scopes forward:NO fromLocation:aLocation];
+	NSRange rf = [self trackScopes:scopes forward:YES fromLocation:aLocation];
+	return NSUnionRange(rb, rf);
+}
+
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation
+{
+	return [self trackScopes:[scopeSelector componentsSeparatedByString:@" "] atLocation:aLocation];
 }
 
 - (NSString *)inputOfType:(NSString *)type command:(NSDictionary *)command range:(NSRange *)rangePtr
@@ -62,10 +81,7 @@
 	}
 	else if ([type isEqualToString:@"scope"])
 	{
-		NSRange rb = [self trackScopeSelector:[command objectForKey:@"scope"] forward:NO fromLocation:[self caret]];
-		NSRange rf = [self trackScopeSelector:[command objectForKey:@"scope"] forward:YES fromLocation:[self caret]];
-		*rangePtr = NSUnionRange(rb, rf);
-		INFO(@"union range %@", NSStringFromRange(*rangePtr));
+		*rangePtr = [self trackScopeSelector:[command objectForKey:@"scope"] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	}
 	else if ([type isEqualToString:@"none"])

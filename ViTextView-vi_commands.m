@@ -1604,7 +1604,7 @@
 {
 	NSUInteger location = start_location;
 	if ([self selectedRange].length > 0)
-		location = visual_end_location + 1;
+		location = start_location + 1;
 	NSRange range = [self trackScopes:[self scopesAtLocation:location] atLocation:location];
 
 	visual_start_location = start_location = range.location;

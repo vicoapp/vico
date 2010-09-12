@@ -222,11 +222,11 @@
         }
 
         // special case: check if inside a string
-        NSRange scopeRange;
-	NSArray *openingScopes = [[self layoutManager] temporaryAttribute:ViScopeAttributeName
-				                         atCharacterIndex:openingRange.location
-				                           effectiveRange:&scopeRange];
+	NSArray *openingScopes = [self scopesAtLocation:openingRange.location];
         BOOL inString = [[openingScopes lastObject] hasPrefix:@"string"];
+        NSRange scopeRange;
+        if (inString)
+        	scopeRange = [self trackScopes:openingScopes atLocation:openingRange.location];
 
         // lookup the matching character and prepare search
         NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
@@ -263,7 +263,7 @@
         	unichar c = [[[self textStorage] string] characterAtIndex:offset];
         	if (c == matchChar || c == otherChar)
                 {
-			// ignore match if scopes doesn't match
+			// ignore match if scopes don't match
 			if (!inString)
                         {
                                 NSArray *scopes = [self scopesAtLocation:offset];
@@ -1595,4 +1595,54 @@
 	return YES;
 }
 
+- (BOOL)select_inner_brace:(ViCommand *)command
+{
+	return NO;
+}
+
+- (BOOL)select_inner_scope:(ViCommand *)command
+{
+	NSUInteger location = start_location;
+	if ([self selectedRange].length > 0)
+		location = visual_end_location + 1;
+	NSRange range = [self trackScopes:[self scopesAtLocation:location] atLocation:location];
+
+	visual_start_location = start_location = range.location;
+	final_location = end_location = NSMaxRange(range) - 1;
+	return YES;
+}
+
+- (BOOL)select_inner:(ViCommand *)command
+{
+	switch (command.argument) {
+	case 'w':
+		return [self select_inner_word:command];
+		break;
+	case 'W':
+		return [self select_inner_bigword:command];
+		break;
+	case '(':
+	case ')':
+	case 'b':
+		return [self select_inner_paragraph:command];
+		break;
+	case '{':
+	case '}':
+	case 'B':
+		return [self select_inner_brace:command];
+		break;
+	case '[':
+	case ']':
+		return [self select_inner_bracket:command];
+		break;
+	case 's':
+		return [self select_inner_scope:command];
+		break;
+	default:
+		[[self delegate] message:@"Unrecognized text object."];
+		return NO;
+	}
+}
+
 @end
+

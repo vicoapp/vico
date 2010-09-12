@@ -373,6 +373,7 @@ static NSWindowController	*currentWindowController = nil;
 }
 
 #pragma mark -
+#pragma mark Switching documents
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotification
 {

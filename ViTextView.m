@@ -503,14 +503,16 @@ int logIndent = 0;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
         NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
         final_location = start_location + n.location;
+        return YES;
 }
 
-- (void)decrease_indent:(ViCommand *)command
+- (BOOL)decrease_indent:(ViCommand *)command
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	NSRange n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
         final_location = start_location + n.location;
+        return YES;
 }
 
 #pragma mark -
@@ -1273,8 +1275,6 @@ int logIndent = 0;
 	final_location = start_location;
 	DEBUG(@"start_location = %u", start_location);
 
-	[[self delegate] message:@""]; // erase any previous message
-
 	/* Set or reset the saved column for up/down movement. */
 	if ([command.method isEqualToString:@"move_down:"] ||
 	    [command.method isEqualToString:@"move_up:"] ||
@@ -1378,6 +1378,9 @@ int logIndent = 0;
 		[self setVisualSelection];
 	if (!replayingInput)
 		[self scrollToCaret];
+
+	if (ok)
+		[[self delegate] message:[NSString stringWithFormat:@"%llu,%llu", [self currentLine], [self currentColumn]]]; // erase any previous message
 
 	return ok;
 }

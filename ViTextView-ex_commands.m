@@ -134,9 +134,12 @@
 		@"fontname", @"font",
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",
+		@"searchincr", @"searchincr",
 		nil];
 
-	NSArray *booleans = [NSArray arrayWithObjects:@"autoindent", @"expandtab", @"ignorecase", @"number", @"autocollapse", @"hidetab", @"showguide", nil];
+	NSArray *booleans = [NSArray arrayWithObjects:
+	    @"autoindent", @"expandtab", @"ignorecase", @"number",
+	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;

@@ -36,7 +36,7 @@ static u_int64_t tenpow(unsigned x)
 
 	// split the scope selector into descendants
 	NSArray *descendants = [self componentsSeparatedByString:@" "];
-	
+
 	return [descendants matchesScopes:scopes];
 
 }

@@ -17,6 +17,9 @@
 	IBOutlet NSView *documentView;
 	IBOutlet ViBgView *explorerView;
 
+	IBOutlet NSPopUpButton *languageButton;
+	IBOutlet NSTextField *messageField;
+
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
@@ -53,6 +56,7 @@
 @property(readwrite, assign) NSMutableArray *documents;
 @property(readwrite, assign) ViDocument *selectedDocument;
 @property(readonly) NSTextField *statusbar;
+@property(readonly) NSTextField *messageField;
 
 @property(readonly) NSString *currentDirectory;
 - (BOOL)changeCurrentDirectory:(NSString *)path;
@@ -60,6 +64,7 @@
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;
 
+- (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView;
 - (void)selectDocument:(ViDocument *)aDocument;
 - (void)focusEditor;

@@ -6,6 +6,7 @@
 #import "ViSeparatorCell.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"
+#import "ViLanguageStore.h"
 #import "ViDocumentController.h"
 
 static NSMutableArray		*windowControllers = nil;
@@ -24,6 +25,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize documents;
 @synthesize selectedDocument;
 @synthesize statusbar;
+@synthesize messageField;
 @synthesize currentDirectory;
 
 + (id)currentWindowController
@@ -84,6 +86,12 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
+	[languageButton removeAllItems];
+	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+	NSString *language;
+	for (language in languages)
+		[languageButton addItemWithTitle:language];
+
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
@@ -117,6 +125,12 @@ static NSWindowController	*currentWindowController = nil;
 
 	[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
 	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
+}
+
+- (void)setSelectedLanguage:(NSString *)aLanguage
+{
+	[languageButton selectItemWithTitle:aLanguage];
+	[languageButton setToolTip:aLanguage];
 }
 
 - (IBAction)addNewDocumentTab:(id)sender
@@ -196,6 +210,7 @@ static NSWindowController	*currentWindowController = nil;
 	[document addWindowController:self];
 	[self setDocument:document];
 
+	[self setSelectedLanguage:[[document language] displayName]];
 	[self setSelectedDocument:document];
 	[tabBar didSelectDocument:document];
 

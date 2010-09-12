@@ -39,6 +39,7 @@
 			[NSNumber numberWithBool:YES], @"number",
 			[NSNumber numberWithBool:YES], @"autocollapse",
 			[NSNumber numberWithBool:YES], @"hidetab",
+			[NSNumber numberWithBool:YES], @"searchincr",
 			[NSNumber numberWithBool:NO], @"showguide",
 			[NSNumber numberWithInt:80], @"guidecolumn",
 			[NSNumber numberWithFloat:11.0], @"fontsize",
@@ -50,13 +51,8 @@
 	/* Initialize languages and themes. */
 	[ViLanguageStore defaultStore];
 	[ViThemeStore defaultStore];
-	
-	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-	NSString *language;
-	for (language in languages)
-		[languageMenu addItemWithTitle:language action:@selector(setLanguage:) keyEquivalent:@""];
 
-	[[commandMenu supermenu] removeItemAtIndex:5];
+	[[commandMenu supermenu] removeItemAtIndex:4];
 #if 0
 	/* initialize commands */
 	NSArray *bundles = [[ViLanguageStore defaultStore] allBundles];

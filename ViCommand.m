@@ -214,14 +214,14 @@ static struct vikey visual_keys[] = {
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"delete:",		'X', VIF_SETS_DOT | VIF_LINE_MODE},
 	{@"move_bol:",		'0', VIF_IS_MOTION},
-	{@"append:",		'a', VIF_SETS_DOT},
+	{@"select_outer:",	'a', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"word_backward:",	'b', VIF_IS_MOTION},
 	{@"change:",		'c', VIF_SETS_DOT},
 	{@"delete:",		'd', VIF_SETS_DOT},
 	{@"end_of_word:",	'e', VIF_IS_MOTION},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_left:",		'h', VIF_IS_MOTION},
-	{@"insert:",		'i', VIF_SETS_DOT},
+	{@"select_inner:",	'i', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		'k', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_right:",	'l', VIF_IS_MOTION},
@@ -394,14 +394,16 @@ find_command_in_map(unichar key, struct vikey map[])
 	}
 
 	// check if it's a repeat count
-	int *countp = &count;
-	if (state == ViCommandNeedMotion)
-		countp = &motion_count;
-	// conditionally include '0' as a repeat count only if it's not the first digit
-	if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9') {
-		*countp *= 10;
-		*countp += aKey - '0';
-		return;
+	if (map != insert_keys) {
+		int *countp = &count;
+		if (state == ViCommandNeedMotion)
+			countp = &motion_count;
+		// conditionally include '0' as a repeat count only if it's not the first digit
+		if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9') {
+			*countp *= 10;
+			*countp += aKey - '0';
+			return;
+		}
 	}
 
 	if (map == NULL)

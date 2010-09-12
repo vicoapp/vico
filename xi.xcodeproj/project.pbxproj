@@ -60,7 +60,6 @@
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
 		9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */; };
-		9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */; };
 		9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA7096A0EF284A700B4CE34 /* ViJumpList.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
 		9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AB014970ED5F99200905BED /* CommandOutputWindow.xib */; };
@@ -92,6 +91,8 @@
 		9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */; };
 		9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF573CF0EFED5A10066C201 /* ViDocumentController.m */; };
 		9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFBC31D0EE717C400646DCB /* ViDocumentView.m */; };
+		9AFCB40D123BAD3E00660F02 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFCB40C123BAD3E00660F02 /* Carbon.framework */; };
+		9AFCB4C4123D2A2800660F02 /* ViCommandField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFCB4C3123D2A2800660F02 /* ViCommandField.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -181,7 +182,6 @@
 		9A1E40DE0EFBB1D000682D4A /* strtonum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = strtonum.c; path = sftp/strtonum.c; sourceTree = "<group>"; };
 		9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnection.h; sourceTree = "<group>"; };
 		9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnection.m; sourceTree = "<group>"; };
-		9A28300F109B15110023D2CF /* NSTextField-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextField-additions.h"; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
@@ -239,7 +239,6 @@
 		9A8CC8D60D24EBA1001EE32A /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
 		9A9801E90EF957F500B2EEC3 /* MHTextIconCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MHTextIconCell.h; sourceTree = "<group>"; };
 		9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MHTextIconCell.m; sourceTree = "<group>"; };
-		9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextField-additions.m"; sourceTree = "<group>"; };
 		9AA709690EF284A700B4CE34 /* ViJumpList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViJumpList.h; sourceTree = "<group>"; };
 		9AA7096A0EF284A700B4CE34 /* ViJumpList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViJumpList.m; sourceTree = "<group>"; };
 		9AB014970ED5F99200905BED /* CommandOutputWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CommandOutputWindow.xib; path = English.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
@@ -285,6 +284,9 @@
 		9AF573CF0EFED5A10066C201 /* ViDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentController.m; sourceTree = "<group>"; };
 		9AFBC31C0EE717C400646DCB /* ViDocumentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentView.h; sourceTree = "<group>"; };
 		9AFBC31D0EE717C400646DCB /* ViDocumentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentView.m; sourceTree = "<group>"; };
+		9AFCB40C123BAD3E00660F02 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		9AFCB4C2123D2A2800660F02 /* ViCommandField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommandField.h; sourceTree = "<group>"; };
+		9AFCB4C3123D2A2800660F02 /* ViCommandField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommandField.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -295,6 +297,7 @@
 				9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */,
+				9AFCB40D123BAD3E00660F02 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +314,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9AFCB40C123BAD3E00660F02 /* Carbon.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -361,6 +365,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9AFCB4C2123D2A2800660F02 /* ViCommandField.h */,
+				9AFCB4C3123D2A2800660F02 /* ViCommandField.m */,
 				9A4BA2C6118D63450093E2AB /* ViBgView.m */,
 				9A4BA2C7118D63450093E2AB /* ViBgView.h */,
 				9AA709690EF284A700B4CE34 /* ViJumpList.h */,
@@ -572,14 +578,12 @@
 			children = (
 				9A438D351236C0AB00F7D9FD /* NSString-additions.h */,
 				9A438D361236C0AB00F7D9FD /* NSString-additions.m */,
-				9A28300F109B15110023D2CF /* NSTextField-additions.h */,
 				9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */,
 				9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */,
 				9A8CC8CB0D24E981001EE32A /* NSString-scopeSelector.h */,
 				9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */,
 				9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */,
 				9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */,
-				9AA709220EF1559D00B4CE34 /* NSTextField-additions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -825,7 +829,6 @@
 				9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */,
 				9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */,
 				9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */,
-				9AA709230EF1559D00B4CE34 /* NSTextField-additions.m in Sources */,
 				9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */,
 				9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */,
 				9A1E40AA0EFBA83400682D4A /* sftp-client.c in Sources */,
@@ -849,6 +852,7 @@
 				9A4BA2C8118D63450093E2AB /* ViBgView.m in Sources */,
 				9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */,
 				9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */,
+				9AFCB4C4123D2A2800660F02 /* ViCommandField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

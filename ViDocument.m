@@ -383,6 +383,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
+- (ViLanguage *)language
+{
+	return language;
+}
+
 - (void)setLanguageFromString:(NSString *)aLanguage
 {
 	ViLanguage *newLanguage = nil;
@@ -391,6 +396,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (newLanguage != language) {
 		language = newLanguage;
 		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
+		[windowController setSelectedLanguage:aLanguage];
 		[self setSymbolScopes];
 		[self highlightEverything];
 	}
@@ -584,7 +590,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
 	va_end(ap);
 
-	[[windowController statusbar] setStringValue:msg];
+	[[windowController messageField] setStringValue:msg];
 }
 
 - (IBAction)finishedExCommand:(id)sender
@@ -592,6 +598,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSString *exCommand = [[windowController statusbar] stringValue];
 	[[windowController statusbar] setStringValue:@""];
 	[[windowController statusbar] setEditable:NO];
+	[[windowController statusbar] setHidden:YES];
+	[[windowController messageField] setHidden:NO];
 	[[[self windowController] window] makeFirstResponder:exCommandView];
 	if ([exCommand length] == 0)
 		return;
@@ -608,6 +616,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt
 {
+	[[windowController messageField] setHidden:YES];
+	[[windowController statusbar] setHidden:NO];
 	[[windowController statusbar] setStringValue:aPrompt];
 	[[windowController statusbar] setEditable:YES];
 	[[windowController statusbar] setTarget:self];

@@ -43,6 +43,7 @@
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
+- (ViLanguage *)language;
 - (IBAction)setLanguage:(id)sender;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;

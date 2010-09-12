@@ -38,6 +38,7 @@
 	[explorer setAction:@selector(explorerClick:)];
 
         [[explorer outlineTableColumn] setDataCell:[[MHTextIconCell alloc] init]];
+	[self hideExplorerSearch];
        
 	NSCell *cell = [(NSTableColumn *)[[explorer tableColumns] objectAtIndex:0] dataCell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingHead];
@@ -174,7 +175,6 @@
 
 - (IBAction)actionMenu:(id)sender
 {
-	INFO(@"sender = %@", sender);
 	NSEvent *ev = [NSEvent mouseEventWithType:NSLeftMouseDown
 	                                 location:NSMakePoint(0, 0)
 	                            modifierFlags:0
@@ -266,15 +266,32 @@
 	[NSApp beginSheet:sftpConnectView modalForWindow:window modalDelegate:self didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
+- (void)showExplorerSearch
+{
+	NSRect frame = [explorerView frame];
+	frame.size.height -= 49;
+	frame.origin.y += 49;
+	[scrollView setFrame:frame];
+	[filterField setHidden:NO];
+}
+
+- (void)hideExplorerSearch
+{
+	[filterField setHidden:YES];
+	NSRect frame = [explorerView frame];
+	frame.size.height -= 23;
+	frame.origin.y += 23;
+	[scrollView setFrame:frame];
+}
+
 - (void)resetExplorerView
 {
+	[self hideExplorerSearch];
         [filterField setStringValue:@""];
         [self filterFiles:self];
         int i, n = [self outlineView:explorer numberOfChildrenOfItem:nil];
         for (i = 0; i < n; i++)
-        {
                 [explorer expandItem:[self outlineView:explorer child:i ofItem:nil] expandChildren:NO];
-        }
 }
 
 - (void)explorerClick:(id)sender
@@ -312,6 +329,8 @@
 		closeExplorerAfterUse = YES;
 		[self toggleExplorer:nil];
 	}
+
+	[self showExplorerSearch];
 	[window makeFirstResponder:filterField];
 }
 
@@ -343,6 +362,7 @@
 {
 	INFO(@"sender = %@", sender);
 	NSString *filter = [filterField stringValue];
+
 	if ([filter length] == 0)
 	{
                 filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
@@ -481,7 +501,7 @@
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
-	return 16;
+	return 18;
 }
 
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item

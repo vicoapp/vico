@@ -12,6 +12,7 @@
 	IBOutlet ViBgView *explorerView;
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
+	IBOutlet NSScrollView *scrollView;
 
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
@@ -26,6 +27,9 @@
 - (IBAction)addLocation:(id)sender;
 - (IBAction)addSFTPLocation:(id)sender;
 - (IBAction)actionMenu:(id)sender;
+
+- (void)showExplorerSearch;
+- (void)hideExplorerSearch;
 
 - (IBAction)acceptSftpSheet:(id)sender;
 - (IBAction)cancelSftpSheet:(id)sender;

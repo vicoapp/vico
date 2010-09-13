@@ -7,6 +7,7 @@
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSArray-patterns.h"
 #import "NSTextStorage-additions.h"
+#import "NSString-scopeSelector.h"
 
 @implementation ViTextView (bundleCommands)
 

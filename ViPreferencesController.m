@@ -1,3 +1,7 @@
+#if 0
+# import <Carbon/Carbon.h>
+#endif
+
 #import "ViPreferencesController.h"
 #import "ViThemeStore.h"
 #import "logging.h"
@@ -38,15 +42,67 @@ ToolbarHeightForWindow(NSWindow *window)
 	return self;
 }
 
+#if 0
+- (void)loadInputSources
+{
+	NSArray  *inputSources = (NSArray *)TISCreateInputSourceList(NULL, false);
+	NSMutableDictionary *availableLanguages = [NSMutableDictionary dictionaryWithCapacity:[inputSources count]];
+	NSUInteger i;
+	TISInputSourceRef chosen, languageRef1, languageRef2;
+	for (i = 0; i < [inputSources count]; ++i) {
+		[availableLanguages setObject:[inputSources objectAtIndex:i]
+				       forKey:TISGetInputSourceProperty((TISInputSourceRef)[inputSources objectAtIndex:i], kTISPropertyLocalizedName)];
+	}
+
+	NSString *lang;
+	for (lang in availableLanguages) {
+		[insertModeInputSources addItemWithTitle:lang];
+		[normalModeInputSources addItemWithTitle:lang];
+	}
+}
+#endif
+
+- (void)setSelectedFont
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	[currentFont setStringValue:[NSString stringWithFormat:@"%@ %.1fpt", [defs stringForKey:@"fontname"], [defs floatForKey:@"fontsize"]]];
+}
+
 - (void)windowDidLoad
 {
 	NSString *theme;
 	for (theme in [[[ViThemeStore defaultStore] availableThemes] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)])
 		[themeButton addItemWithTitle:theme];
 	[themeButton selectItem:[themeButton itemWithTitle:[[[ViThemeStore defaultStore] defaultTheme] name]]];
-	
+
+#if 0
+	[self loadInputSources];
+#endif
+
 	// Load last viewed pane
 	[self switchToItem:[[NSUserDefaults standardUserDefaults] objectForKey:@"lastPrefPane"]];
+
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"fontsize"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"fontname"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+
+	[self setSelectedFont];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
+
+{
+	INFO(@"keyPath = %@", keyPath);
+	if ([keyPath isEqualToString:@"fontsize"] || [keyPath isEqualToString:@"fontname"])
+		[self setSelectedFont];
 }
 
 - (void)show
@@ -124,7 +180,19 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (IBAction)selectFont:(id)sender
 {
-	INFO(@"sender = %@", sender);
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSFontManager *fontManager = [NSFontManager sharedFontManager];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
+	[fontManager setSelectedFont:font isMultiple:NO];
+	[fontManager orderFrontFontPanel:nil];
+}
+
+- (void)changeFont:(id)sender
+{
+	NSFontManager *fontManager = [NSFontManager sharedFontManager];
+	NSFont *font = [fontManager convertFont:[fontManager selectedFont]];
+	[[NSUserDefaults standardUserDefaults] setObject:[font fontName] forKey:@"fontname"];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:[font pointSize]] forKey:@"fontsize"];
 }
 
 @end

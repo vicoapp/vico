@@ -8,6 +8,10 @@
 	IBOutlet NSView *fontsColorsView;
 	IBOutlet NSPopUpButton *themeButton;
 	IBOutlet NSTextField *currentFont;
+#if 0
+	IBOutlet NSPopUpButton *insertModeInputSources;
+	IBOutlet NSPopUpButton *normalModeInputSources;
+#endif
 }
 
 + (ViPreferencesController *)sharedPreferences;

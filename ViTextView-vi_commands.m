@@ -1553,7 +1553,7 @@
 	 [self currentLine],
 	 [[self textStorage] lineNumberAtLocation:IMAX(0, [[[self textStorage] string] length] - 1)],
 	 (float)[self caret]*100.0 / (float)[[[self textStorage] string] length]];
-	return YES;
+	return NO;
 }
 
 /* syntax: m<char> */

@@ -18,6 +18,7 @@ static struct vikey insert_keys[] = {
 	{@"input_newline:",	0x0D, 0}, // newline (ctrl-m)
 	{@"increase_indent:",	0x14, 0}, // ctrl-t
 	{@"literal_next:",	0x16, VIF_NEED_CHAR}, // ctrl-v
+	{@"complete:",		0x18, 0}, // ctrl-x
 	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"input_backspace:",	0x7F, 0}, // delete
 	{@"input_forward_delete:", NSDeleteFunctionKey, 0}, // forward delete

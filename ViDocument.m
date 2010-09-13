@@ -101,9 +101,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	++visibleViews;
 	if (visibleViews == 1 && [views count] > 0)
-	{
 		return [views objectAtIndex:0];
-	}
 
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
@@ -111,16 +109,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[textView layoutManager] setDelegate:self];
 	[views addObject:documentView];
 
-	if ([views count] == 1)
-	{
+	if ([views count] == 1) {
 		// this is the first view
 		[textView setString:readContent];
 		readContent = nil;
 		textStorage = [textView textStorage];
 		[self configureSyntax];
-	}
-	else
-	{
+	} else {
 		// alternative views, make them share the same text storage
 		[[textView layoutManager] replaceTextStorage:textStorage];
 	}

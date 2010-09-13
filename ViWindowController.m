@@ -1260,15 +1260,15 @@ static NSWindowController	*currentWindowController = nil;
 {
 	NSCell *cell;
 	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
-	{
 		cell = separatorCell;
-	}
 	else
 		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];
+
 	if (![item isKindOfClass:[ViDocument class]])
 		[cell setFont:[NSFont systemFontOfSize:11.0]];
 	else
 		[cell setFont:[NSFont systemFontOfSize:13.0]];
+
 	return cell;
 }
 

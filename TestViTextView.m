@@ -113,6 +113,7 @@
 - (void)test097_DeleteToRepeatedMove2		{ TEST(@"abc abc abc abc", 2, @"fa2d;", @"abc bc", 4); }
 - (void)test098_ChangeToChar			{ TEST(@"abc abc abc", 0, @"ct ABC\x1bw", @"ABC abc abc", 4); }
 - (void)test099_RepeatChangeToChar		{ TEST(@"abc abc abc", 0, @"ct ABC\x1bw.", @"ABC ABC abc", 6); }
+- (void)test099_MoveToCharFail			{ MOVE(@"", 0, @"fo", 0); }
 
 - (void)test100_WordBackward			{ MOVE(@"abcdef", 4, @"b", 0); }
 - (void)test100_WordBackward2			{ MOVE(@"abc def", 4, @"b", 0); }

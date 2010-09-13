@@ -53,11 +53,9 @@
 	if (self) {
 		themes = [[NSMutableDictionary alloc] init];
 
-		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
-#if 0
 		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
+		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
-#endif
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/xi/Themes" stringByExpandingTildeInPath]];
 	}
 	return self;

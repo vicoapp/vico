@@ -91,7 +91,6 @@
 		9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */; };
 		9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF573CF0EFED5A10066C201 /* ViDocumentController.m */; };
 		9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFBC31D0EE717C400646DCB /* ViDocumentView.m */; };
-		9AFCB40D123BAD3E00660F02 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFCB40C123BAD3E00660F02 /* Carbon.framework */; };
 		9AFCB4C4123D2A2800660F02 /* ViCommandField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFCB4C3123D2A2800660F02 /* ViCommandField.m */; };
 /* End PBXBuildFile section */
 
@@ -284,7 +283,6 @@
 		9AF573CF0EFED5A10066C201 /* ViDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentController.m; sourceTree = "<group>"; };
 		9AFBC31C0EE717C400646DCB /* ViDocumentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentView.h; sourceTree = "<group>"; };
 		9AFBC31D0EE717C400646DCB /* ViDocumentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentView.m; sourceTree = "<group>"; };
-		9AFCB40C123BAD3E00660F02 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9AFCB4C2123D2A2800660F02 /* ViCommandField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommandField.h; sourceTree = "<group>"; };
 		9AFCB4C3123D2A2800660F02 /* ViCommandField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommandField.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -297,7 +295,6 @@
 				9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */,
-				9AFCB40D123BAD3E00660F02 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,7 +311,6 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9AFCB40C123BAD3E00660F02 /* Carbon.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";

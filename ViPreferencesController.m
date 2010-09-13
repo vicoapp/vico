@@ -100,7 +100,6 @@ ToolbarHeightForWindow(NSWindow *window)
 		       context:(void *)context
 
 {
-	INFO(@"keyPath = %@", keyPath);
 	if ([keyPath isEqualToString:@"fontsize"] || [keyPath isEqualToString:@"fontname"])
 		[self setSelectedFont];
 }

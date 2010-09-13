@@ -21,6 +21,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @interface ViDocument (internal)
 - (void)setSymbolScopes;
 - (void)resetTypingAttributes;
+- (void)configureLanguage:(ViLanguage *)aLanguage;
+- (void)highlightEverything;
 @end
 
 @implementation ViDocument
@@ -55,6 +57,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							forKeyPath:@"fontname"
 							   options:NSKeyValueObservingOptionNew
 							   context:NULL];
+	
+		textStorage = [[NSTextStorage alloc] initWithString:@""];
+		[textStorage setDelegate:self];
 	}
 	return self;
 }
@@ -109,20 +114,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[textView layoutManager] setDelegate:self];
 	[views addObject:documentView];
 
-	if ([views count] == 1) {
-		// this is the first view
-		[textView setString:readContent];
-		readContent = nil;
-		textStorage = [textView textStorage];
-		[self configureSyntax];
-	} else {
-		// alternative views, make them share the same text storage
-		[[textView layoutManager] replaceTextStorage:textStorage];
-	}
-	[textStorage setDelegate:self];
-	ignoreEditing = YES;
+	/* Make all views share the same text storage. */
+	[[textView layoutManager] replaceTextStorage:textStorage];
 	[textView initEditorWithDelegate:self documentView:documentView];
-	ignoreEditing = NO;
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
@@ -140,8 +134,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([url isFileURL])
 		return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
 
-	if (![[url scheme] isEqualToString:@"sftp"])
-	{
+	if (![[url scheme] isEqualToString:@"sftp"]) {
 		INFO(@"unsupported URL scheme: %@", [url scheme]);
 		// XXX: set outError
 		return NO;
@@ -152,8 +145,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return NO;
 
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
-	if (conn == nil)
-	{
+	if (conn == nil) {
 		INFO(@"%s", "FAILED to connect to host");
 		// XXX: set outError
 		return NO;
@@ -161,26 +153,31 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [conn writeData:data toFile:[url path] error:outError];
 }
 
+- (NSFont *)font
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
+	if (font == nil)
+		font = [NSFont userFixedPitchFontOfSize:11.0];
+	return font;
+}
+
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
-	INFO(@"type = %@, url = %@, scheme = %@", typeName, [url absoluteString], [url scheme]);
+	DEBUG(@"type = %@, url = %@, scheme = %@", typeName, [url absoluteString], [url scheme]);
 
 	NSData *data = nil;
-	if ([[url scheme] isEqualToString:@"file"])
-	{
+	if ([url isFileURL])
 		data = [NSData dataWithContentsOfFile:[url path] options:0 error:outError];
-	}
-	else if ([[url scheme] isEqualToString:@"sftp"])
-	{
-		if ([url user] == nil || [url host] == nil)
-		{
+	else if ([[url scheme] isEqualToString:@"sftp"]) {
+		if ([url user] == nil || [url host] == nil) {
 			INFO(@"%s", "missing user or host in url");
 			// XXX: set outError
 			return NO;
 		}
+
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
-		if (conn == nil)
-		{
+		if (conn == nil) {
 			INFO(@"%s", "FAILED to connect to host");
 			// XXX: set outError
 			return NO;
@@ -191,21 +188,32 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (data == nil)
 		return NO;
 
-	readContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	NSString *aString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+	/*
+	 * Disable the processing in textStorageDidProcessEditing,
+	 * otherwise we'll parse the document multiple times.
+	 */
+	ignoreEditing = YES;
+	[[textStorage mutableString] setString:aString ?: @""];
+	[self resetTypingAttributes];
+
+	/* Force incremental syntax parsing. */
+	[self highlightEverything];
+
 	return YES;
 }
 
 - (void)setFileURL:(NSURL *)absoluteURL
 {
+	INFO(@"url = %@", absoluteURL);
 	[super setFileURL:absoluteURL];
-	if (textStorage)
-		[self configureSyntax];
+	[self configureSyntax];
 }
 
 - (ViWindowController *)windowController
 {
 	return windowController;
-//	return [[self windowControllers] objectAtIndex:0];
 }
 
 - (void)close
@@ -264,12 +272,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)highlightEverything
 {
+	/* Ditch the old syntax scopes and start with a fresh parser. */
+	syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
+
 	/* Invalidate all document views. */
 	ViDocumentView *dv;
-	for (dv in views) {
+	for (dv in views)
 		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
-	}
-	
+
 	NSInteger endLocation = [textStorage locationForStartOfLine:100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
@@ -321,7 +331,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			DEBUG(@"cancelling scheduled parsing from line %u (nextContext = %@)", nextContext.lineOffset, nextContext);
 			[nextContext setCancelled:YES];
 		}
-		
+
 		nextContext = ctx;
 		[self performSelector:@selector(restartSyntaxParsingWithContext:) withObject:ctx afterDelay:0.0025];
 	}
@@ -345,8 +355,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	nextContext = nil;
 
-	if (context.cancelled)
-	{
+	if (context.cancelled) {
 		DEBUG(@"context %@, from line %u, is cancelled", context, context.lineOffset);
 		return;
 	}
@@ -373,7 +382,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (language && [self fileURL]) {
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
 			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
-		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] path]];
+		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] absoluteString]];
 		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
 }
@@ -383,25 +392,30 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return language;
 }
 
-- (void)setLanguageFromString:(NSString *)aLanguage
+- (void)configureLanguage:(ViLanguage *)aLanguage
 {
-	ViLanguage *newLanguage = nil;
-	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
-	[newLanguage patterns];
-	if (newLanguage != language) {
-		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
-		[windowController setSelectedLanguage:aLanguage];
+	/* Force compilation. */
+	[aLanguage patterns];
+
+	if (aLanguage != language) {
+		language = aLanguage;
 		[self setSymbolScopes];
 		[self highlightEverything];
 	}
 }
 
+- (void)setLanguageFromString:(NSString *)aLanguage
+{
+	ViLanguage *newLanguage = nil;
+	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
+	[self configureLanguage:newLanguage];
+	[windowController setSelectedLanguage:aLanguage];
+}
+
 - (void)configureForURL:(NSURL *)aURL
 {
 	ViLanguage *newLanguage = nil;
-	if (aURL)
-	{
+	if (aURL) {
 		NSString *firstLine = nil;
 		NSUInteger eol;
 		[[textStorage string] getLineStart:NULL end:NULL contentsEnd:&eol forRange:NSMakeRange(0, 0)];
@@ -416,32 +430,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	if (bundle == nil)
-	{
 		bundle = [[ViLanguageStore defaultStore] defaultBundleLanguage:&newLanguage];
-	}
 
-	DEBUG(@"new language = %@, (%@)", newLanguage, language);
-
-	[newLanguage patterns];
-	if (newLanguage != language)
-	{
-		language = newLanguage;
-		syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
-		[self setSymbolScopes];
-		[self highlightEverything];
-	}
+	[self configureLanguage:newLanguage];
 }
 
 - (void)configureSyntax
 {
 	/* update syntax definition */
 	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
-	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] path]];
+	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] absoluteString]];
 	if (syntax)
 		[self setLanguageFromString:syntax];
 	else
 		[self configureForURL:[self fileURL]];
-	// [languageButton selectItemWithTitle:[[textView language] displayName]];
 }
 
 - (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
@@ -466,11 +468,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 }
 
 #pragma mark -
-#pragma mark NSTextStorage delegate method
+#pragma mark NSTextStorage delegate methods
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
-	[self pushContinuationsInRange:affectedCharRange replacementString:replacementString];
+	if (!ignoreEditing)
+		[self pushContinuationsInRange:affectedCharRange replacementString:replacementString];
 	return YES;
 }
 
@@ -481,7 +484,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	if (ignoreEditing) {
                 DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
-		ignoreEditing = NO;
+                ignoreEditing = NO;
 		return;
 	}
 
@@ -530,19 +533,49 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self enableLineNumbers:flag forScrollView:[[dv textView] enclosingScrollView]];
 }
 
-- (void)resetTypingAttributes
-{
-        [(ViTextView *)[[views objectAtIndex:0] textView] resetTypingAttributes];
-}
-
 - (IBAction)toggleLineNumbers:(id)sender
 {
 	[self enableLineNumbers:[sender state] == NSOffState];
 }
 
-
 #pragma mark -
 #pragma mark Other interesting stuff
+
+- (NSDictionary *)typingAttributes
+{
+	if (typingAttributes == nil)
+		[self setTypingAttributes];
+	return typingAttributes;
+}
+
+- (void)setTypingAttributes
+{
+	int tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
+
+	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
+	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
+
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	// remove all previous tab stops
+	for (NSTextTab *tabStop in [style tabStops])
+		[style removeTabStop:tabStop];
+
+	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
+	[style setDefaultTabInterval:tabSizeInPoints.width];
+
+	typingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+	    style, NSParagraphStyleAttributeName,
+	    [self font], NSFontAttributeName,
+	    nil];
+}
+
+- (void)resetTypingAttributes
+{
+	[self setTypingAttributes];
+	ignoreEditing = YES;
+	[textStorage addAttributes:[self typingAttributes] range:NSMakeRange(0, [textStorage length])];
+}
 
 - (void)changeTheme:(ViTheme *)theme
 {

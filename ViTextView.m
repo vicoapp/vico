@@ -66,14 +66,6 @@ int logIndent = 0;
 	[self setDrawsBackground:YES];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
-	[self resetTypingAttributes];
-}
-
-- (void)setString:(NSString *)aString
-{
-	[[[self textStorage] mutableString] setString:aString ?: @""];
-	[[self textStorage] addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [[self textStorage] length])];
-	[self setCaret:0];
 }
 
 - (void)paste:(id)sender
@@ -1625,46 +1617,17 @@ int logIndent = 0;
 
 - (NSFont *)font
 {
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
-	if (font == nil)
-		font = [NSFont userFixedPitchFontOfSize:11.0];
-	return font;
+	return [[self delegate] font];
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes
 {
-	typingAttributes = attributes;
+	DEBUG(@"ignored, attributes = %@", attributes);
 }
 
 - (NSDictionary *)typingAttributes
 {
-	if (typingAttributes == nil)
-		[self resetTypingAttributes];
-	return typingAttributes;
-}
-
-- (void)resetTypingAttributes
-{
-	int tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
-
-	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
-	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
-
-	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-	// remove all previous tab stops
-	for (NSTextTab *tabStop in [style tabStops])
-		[style removeTabStop:tabStop];
-
-	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
-	[style setDefaultTabInterval:tabSizeInPoints.width];
-
-	[self setTypingAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
-		style, NSParagraphStyleAttributeName,
-		[self font], NSFontAttributeName,
-		nil]];
-	[[self textStorage] addAttributes:[self typingAttributes] range:NSMakeRange(0, [[self textStorage] length])];
+	return [[self delegate] typingAttributes];
 }
 
 - (NSUndoManager *)undoManager

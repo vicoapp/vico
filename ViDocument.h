@@ -15,10 +15,9 @@
 	ViLanguage *language;
 
 	NSTextStorage *textStorage;
+	NSDictionary *typingAttributes;
 	ViWindowController *windowController;
 	NSString *readContent;
-	NSArray *symbols;
-	NSArray *filteredSymbols;
 
 	// ex commands
 	SEL exCommandSelector;
@@ -31,6 +30,8 @@
 	ViSyntaxContext *nextContext;
 
 	// symbol list
+	NSArray *symbols;
+	NSArray *filteredSymbols;
 	NSDictionary *symbolSettings;
 	NSMutableArray *symbolScopes;
 	NSTimer *updateSymbolsTimer;
@@ -62,5 +63,9 @@
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
+
+- (void)setTypingAttributes;
+- (NSDictionary *)typingAttributes;
+- (void)resetTypingAttributes;
 
 @end

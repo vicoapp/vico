@@ -56,7 +56,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSUInteger		 start_location, end_location, final_location;
 
 	NSUndoManager		*undoManager;
-	NSDictionary		*typingAttributes;
 
 	ViTagsDatabase		*tags; // XXX: doesn't belong here!? Move to the document or window controller.
 
@@ -87,7 +86,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 - (id <ViTextViewDelegate>)delegate;
 - (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate documentView:(ViDocumentView *)docView;
-- (void)setString:(NSString *)aString;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
@@ -114,7 +112,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSUInteger)caret;
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
-- (void)resetTypingAttributes;
 - (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;

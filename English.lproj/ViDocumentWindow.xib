@@ -12,10 +12,10 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="100153"/>
-			<integer value="100261"/>
+			<integer value="100348"/>
 			<integer value="100399"/>
 			<integer value="100325"/>
-			<integer value="100348"/>
+			<integer value="100250"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2444,7 +2444,6 @@
 				<string key="100442.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100443.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100444.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="100445.CustomClassName">ViCommandField</string>
 				<string key="100445.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100446.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100452.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2621,14 +2620,6 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ViBgView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ViCommandField</string>
-					<string key="superclassName">NSTextField</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">ViCommandField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

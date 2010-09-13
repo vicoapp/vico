@@ -388,7 +388,7 @@
 
 #pragma mark -
 
-- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
+- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
 	INFO(@"sender = %@, selector = %s", sender, aSelector);
 	if (aSelector == @selector(insertNewline:)) // enter

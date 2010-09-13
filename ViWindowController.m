@@ -1152,7 +1152,7 @@ static NSWindowController	*currentWindowController = nil;
 	[commandSplit setPosition:NSHeight([commandSplit frame])*0.60 ofDividerAtIndex:0];
 }
 
-- (BOOL)textField:(NSTextField *)sender doCommandBySelector:(SEL)aSelector
+- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
 	if (sender == symbolFilterField)
 	{

@@ -1595,7 +1595,27 @@
 	return YES;
 }
 
+- (BOOL)select_inner_word:(ViCommand *)command
+{
+	return NO;
+}
+
+- (BOOL)select_inner_bigword:(ViCommand *)command
+{
+	return NO;
+}
+
+- (BOOL)select_inner_paragraph:(ViCommand *)command
+{
+	return NO;
+}
+
 - (BOOL)select_inner_brace:(ViCommand *)command
+{
+	return NO;
+}
+
+- (BOOL)select_inner_bracket:(ViCommand *)command
 {
 	return NO;
 }

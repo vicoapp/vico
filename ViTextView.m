@@ -342,41 +342,20 @@ int logIndent = 0;
 	return [self lengthOfIndentString:[self leadingWhitespaceForLineAtLocation:lineLocation]];
 }
 
-- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation
-{
-	NSArray *scopes = [self scopesAtLocation:aLocation];
-	NSString *foundScopeSelector = nil;
-	NSString *scopeSelector;
-	u_int64_t highest_rank = 0;
-	for (scopeSelector in scopeSelectors)
-	{
-		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if (rank > highest_rank)
-		{
-			foundScopeSelector = scopeSelector;
-			highest_rank = rank;
-		}
-	}
-	
-	return foundScopeSelector;
-}
-
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"increaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
-	if (bestMatchingScope)
-	{
+	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
+
 		if ([rx matchInString:checkLine])
-		{
 			return YES;
-		}
 	}
-	
+
 	return NO;
 }
 
@@ -385,22 +364,19 @@ int logIndent = 0;
 	NSDictionary *decreaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"decreaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
 
-	if (bestMatchingScope)
-	{
+	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
 		NSString *checkLine = [self lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
-		{
 			return YES;
-		}
 	}
 	
 	return NO;
 }
 
-- (BOOL)shouldNotIndentLineAtLocation:(NSUInteger)aLocation
+- (BOOL)shouldUnIndentLineAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"unIndentedLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
@@ -1102,7 +1078,7 @@ int logIndent = 0;
                 int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
 		insert_start_location += n;
 		insert_end_location += n;
-	} else if ([self shouldNotIndentLineAtLocation:insert_end_location]) {
+	} else if ([self shouldUnIndentLineAtLocation:insert_end_location]) {
                 int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
 		insert_start_location += n;
 		insert_end_location += n;

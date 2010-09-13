@@ -10,6 +10,24 @@
 
 @implementation ViTextView (bundleCommands)
 
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation
+{
+	NSArray *scopes = [self scopesAtLocation:aLocation];
+	NSString *foundScopeSelector = nil;
+	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
+
+	for (scopeSelector in scopeSelectors) {
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if (rank > highest_rank) {
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
+		}
+	}
+
+	return foundScopeSelector;
+}
+
 - (NSRange)trackScopes:(NSArray *)trackScopes forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
 {
 	NSArray *lastScopes = nil, *scopes;

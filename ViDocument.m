@@ -153,15 +153,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [conn writeData:data toFile:[url path] error:outError];
 }
 
-- (NSFont *)font
-{
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
-	if (font == nil)
-		font = [NSFont userFixedPitchFontOfSize:11.0];
-	return font;
-}
-
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
 	DEBUG(@"type = %@, url = %@, scheme = %@", typeName, [url absoluteString], [url scheme]);
@@ -540,6 +531,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 #pragma mark -
 #pragma mark Other interesting stuff
+
+- (NSFont *)font
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
+	if (font == nil)
+		font = [NSFont userFixedPitchFontOfSize:11.0];
+	return font;
+}
 
 - (NSDictionary *)typingAttributes
 {

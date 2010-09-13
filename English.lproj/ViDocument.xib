@@ -295,7 +295,7 @@
 							<object class="NSScroller" id="82761719">
 								<reference key="NSNextResponder" ref="237474657"/>
 								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{603, 1}, {15, 444}}</string>
+								<string key="NSFrame">{{481, 0}, {15, 314}}</string>
 								<reference key="NSSuperview" ref="237474657"/>
 								<reference key="NSTarget" ref="237474657"/>
 								<string key="NSAction">_doScroller:</string>
@@ -304,7 +304,7 @@
 							<object class="NSScroller" id="824069413">
 								<reference key="NSNextResponder" ref="237474657"/>
 								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{-100, -100}, {87, 18}}</string>
+								<string key="NSFrame">{{-100, -100}, {481, 15}}</string>
 								<reference key="NSSuperview" ref="237474657"/>
 								<int key="NSsFlags">1</int>
 								<reference key="NSTarget" ref="237474657"/>
@@ -438,7 +438,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{220, 518}, {496, 329}}</string>
+					<string>{{333, 518}, {496, 329}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{101, 340}, {619, 465}}</string>
 				</object>

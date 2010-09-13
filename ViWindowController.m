@@ -58,7 +58,6 @@ static NSWindowController	*currentWindowController = nil;
 		documents = [[NSMutableArray alloc] init];
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
                 [self changeCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
-                INFO(@"currentDirectory = %@", [self currentDirectory]);
 	}
 
 	return self;
@@ -195,6 +194,60 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+- (void)documentChangedAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+	ViDocument *document = contextInfo;
+
+	if (returnCode == NSAlertSecondButtonReturn) {
+		NSError *error = nil;
+		[document revertToContentsOfURL:[document fileURL] ofType:[document fileType] error:&error];
+		if (error) {
+			[[alert window] orderOut:self];
+			NSAlert *revertAlert = [NSAlert alertWithError:error];
+			[revertAlert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
+			[document updateChangeCount:NSChangeReadOtherContents];
+		}
+	}
+}
+
+- (void)checkDocumentChanged:(ViDocument *)document
+{
+	if ([[document fileURL] isFileURL]) {
+		NSError *error = nil;
+		NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[[document fileURL] path] error:&error];
+		if (error) {
+			NSAlert *alert = [NSAlert alertWithError:error];
+			[alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
+			[document updateChangeCount:NSChangeReadOtherContents];
+			return;
+		}
+
+		NSDate *modificationDate = [attributes fileModificationDate];
+		if ([[document fileModificationDate] compare:modificationDate] == NSOrderedAscending) {
+			if ([document isDocumentEdited]) {
+				[document updateChangeCount:NSChangeReadOtherContents];
+
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setMessageText:@"This document’s file has been changed by another application since you opened or saved it."];
+				[alert setInformativeText:@"Do you want to keep this version or revert to the document on disk?"];
+				[alert addButtonWithTitle:@"Keep open version"];
+				[alert addButtonWithTitle:@"Revert"];
+				[alert beginSheetModalForWindow:[self window]
+						  modalDelegate:self
+						 didEndSelector:@selector(documentChangedAlertDidEnd:returnCode:contextInfo:)
+						    contextInfo:document];
+			} else {
+				[document revertToContentsOfURL:[document fileURL] ofType:[document fileType] error:&error];
+				if (error) {
+					NSAlert *alert = [NSAlert alertWithError:error];
+					[alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
+					[document updateChangeCount:NSChangeReadOtherContents];
+				}
+			}
+		}
+	}
+}
+
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView
 {
 	if (mostRecentView == docView)
@@ -222,6 +275,8 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline expandItem:document];
  
 	[self updateSelectedSymbolForLocation:[(ViTextView *)[docView textView] caret]];
+
+	[self checkDocumentChanged:document];
 }
 
 - (void)selectDocument:(ViDocument *)aDocument
@@ -378,6 +433,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)windowDidBecomeMain:(NSNotification *)aNotification
 {
 	currentWindowController = self;
+	[self checkDocumentChanged:[self currentDocument]];
 }
 
 - (ViDocument *)currentDocument
@@ -1268,7 +1324,7 @@ static NSWindowController	*currentWindowController = nil;
 		[cell setFont:[NSFont systemFontOfSize:11.0]];
 	else
 		[cell setFont:[NSFont systemFontOfSize:13.0]];
-
+		
 	return cell;
 }
 

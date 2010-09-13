@@ -852,18 +852,16 @@
 /* syntax: [count]F<char> */
 - (BOOL)move_back_to_char:(ViCommand *)command
 {
-	NSUInteger bol;
+	NSInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	NSUInteger i = start_location;
+	NSInteger i = start_location;
 	int count = IMAX(command.count, 1);
 	if (!command.ismotion)
 		count = IMAX(command.motion_count, 1);
-	while (count--)
-	{
+	while (count--) {
 		while (--i >= bol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
-		if (i < bol)
-		{
+		if (i < bol) {
 			[[self delegate] message:@"%C not found", command.argument];
 			return NO;
 		}
@@ -877,8 +875,7 @@
 /* syntax: [count]T<char> */
 - (BOOL)move_back_til_char:(ViCommand *)command
 {
-	if ([self move_back_to_char:command])
-	{
+	if ([self move_back_to_char:command]) {
 		end_location++;
 		final_location++;
 		return YES;
@@ -895,12 +892,10 @@
 	int count = IMAX(command.count, 1);
 	if (!command.ismotion)
 		count = IMAX(command.motion_count, 1);
-	while(count--)
-	{
-		while(++i < eol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
+	while (count--) {
+		while (++i < eol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
-		if(i == eol)
-		{
+		if (i >= eol) {
 			[[self delegate] message:@"%C not found", command.argument];
 			return NO;
 		}
@@ -914,8 +909,7 @@
 /* syntax: [count]t<char> */
 - (BOOL)move_til_char:(ViCommand *)command
 {
-	if ([self move_to_char:command])
-	{
+	if ([self move_to_char:command]) {
 		end_location--;
 		final_location--;
 		return YES;

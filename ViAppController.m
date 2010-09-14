@@ -41,6 +41,7 @@
 			[NSNumber numberWithBool:YES], @"hidetab",
 			[NSNumber numberWithBool:YES], @"searchincr",
 			[NSNumber numberWithBool:NO], @"showguide",
+			[NSNumber numberWithBool:NO], @"wrap",
 			[NSNumber numberWithInt:80], @"guidecolumn",
 			[NSNumber numberWithFloat:11.0], @"fontsize",
 			@"Menlo Regular", @"fontname",

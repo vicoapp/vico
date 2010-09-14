@@ -23,6 +23,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)resetTypingAttributes;
 - (void)configureLanguage:(ViLanguage *)aLanguage;
 - (void)highlightEverything;
+- (void)setWrapping:(BOOL)flag;
 @end
 
 @implementation ViDocument
@@ -57,6 +58,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							forKeyPath:@"fontname"
 							   options:NSKeyValueObservingOptionNew
 							   context:NULL];
+		[[NSUserDefaults standardUserDefaults] addObserver:self
+							forKeyPath:@"wrap"
+							   options:NSKeyValueObservingOptionNew
+							   context:NULL];
 	
 		textStorage = [[NSTextStorage alloc] initWithString:@""];
 		[textStorage setDelegate:self];
@@ -72,6 +77,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	if ([keyPath isEqualToString:@"number"])
 		[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
+	else if ([keyPath isEqualToString:@"wrap"])
+		[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
 	else if ([keyPath isEqualToString:@"tabstop"] ||
 		 [keyPath isEqualToString:@"fontsize"] ||
 		 [keyPath isEqualToString:@"fontname"])
@@ -531,6 +538,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 #pragma mark -
 #pragma mark Other interesting stuff
+
+- (void)setWrapping:(BOOL)flag
+{
+	ViDocumentView *dv;
+	for (dv in views)
+		[[dv textView] setWrapping:flag];
+}
 
 - (NSFont *)font
 {

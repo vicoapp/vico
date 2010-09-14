@@ -13,7 +13,6 @@
 int logIndent = 0;
 
 @interface ViTextView (private)
-- (void)disableWrapping;
 - (BOOL)insert:(ViCommand *)command;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
@@ -60,7 +59,7 @@ int logIndent = 0;
 
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
-	[self disableWrapping];
+	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
 	// [[self layoutManager] setShowsInvisibleCharacters:YES];
 	[[self layoutManager] setShowsControlCharacters:YES];
 	[self setDrawsBackground:YES];
@@ -142,7 +141,15 @@ int logIndent = 0;
 
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
 {
-	[[[self textStorage] string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
+	if ([[self textStorage] length] == 0) {
+		if (bol_ptr != NULL)
+			*bol_ptr = 0;
+		if (end_ptr != NULL)
+			*end_ptr = 0;
+		if (eol_ptr != NULL)
+			*eol_ptr = 0;
+	} else
+		[[[self textStorage] string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
 }
 
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr
@@ -1564,46 +1571,30 @@ int logIndent = 0;
 	[self display];
 }
 
-/* This one is from CocoaDev.
- */
-- (void)disableWrapping
+- (void)setWrapping:(BOOL)enabled
 {
 	const float LargeNumberForText = 1.0e7;
 
 	NSScrollView *scrollView = [self enclosingScrollView];
 	[scrollView setHasVerticalScroller:YES];
-	[scrollView setHasHorizontalScroller:YES];
+	[scrollView setHasHorizontalScroller:!enabled];
 	[scrollView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 
 	NSTextContainer *textContainer = [self textContainer];
-	[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
-	[textContainer setWidthTracksTextView:NO];
+	if (enabled)
+		[textContainer setContainerSize:[scrollView contentSize]];
+	else
+		[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[textContainer setWidthTracksTextView:enabled];
 	[textContainer setHeightTracksTextView:NO];
 
-	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
-	[self setHorizontallyResizable:YES];
+	if (enabled)
+		[self setMaxSize:[scrollView contentSize]];
+	else
+		[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
+	[self setHorizontallyResizable:!enabled];
 	[self setVerticallyResizable:YES];
-	[self setAutoresizingMask:NSViewNotSizable];
-}
-
-- (void)enableWrapping
-{
-	const float LargeNumberForText = 1.0e7;
-
-	NSScrollView *scrollView = [self enclosingScrollView];
-	[scrollView setHasVerticalScroller:YES];
-	[scrollView setHasHorizontalScroller:NO];
-	[scrollView setAutoresizingMask:NSViewHeightSizable];
-
-	NSTextContainer *textContainer = [self textContainer];
-	[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
-	[textContainer setWidthTracksTextView:YES];
-	[textContainer setHeightTracksTextView:NO];
-
-	[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
-	[self setHorizontallyResizable:NO];
-	[self setVerticallyResizable:YES];
-	[self setAutoresizingMask:NSViewNotSizable];
+	[self setAutoresizingMask:(enabled ? NSViewWidthSizable : NSViewNotSizable)];
 }
 
 - (void)setTheme:(ViTheme *)aTheme

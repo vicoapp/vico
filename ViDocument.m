@@ -65,6 +65,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	
 		textStorage = [[NSTextStorage alloc] initWithString:@""];
 		[textStorage setDelegate:self];
+		
+		[self configureForURL:nil];
 	}
 	return self;
 }
@@ -204,7 +206,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setFileURL:(NSURL *)absoluteURL
 {
-	INFO(@"url = %@", absoluteURL);
 	[super setFileURL:absoluteURL];
 	[self configureSyntax];
 }

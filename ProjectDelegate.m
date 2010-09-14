@@ -342,6 +342,16 @@
 		[splitView setPosition:0 ofDividerAtIndex:0];
 }
 
+- (void)cancelExplorer
+{
+	if (closeExplorerAfterUse) {
+		[self toggleExplorer:self];
+		closeExplorerAfterUse = NO;
+	}
+	[self resetExplorerView];
+	[delegate focusEditor];
+}
+
 - (void)expandItems:(NSArray *)items intoArray:(NSMutableArray *)expandedArray filter:(ViRegexp *)rx
 {
         NSDictionary *item;
@@ -364,17 +374,12 @@
 	NSString *filter = [filterField stringValue];
 
 	if ([filter length] == 0)
-	{
                 filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
-	}
-	else
-	{
+	else {
                 NSMutableString *pattern = [NSMutableString string];
                 int i;
                 for (i = 0; i < [filter length]; i++)
-                {
                         [pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
-                }
                 [pattern appendString:@".*"];
                 //NSString *pattern = [NSString stringWithFormat:@".*%@.*", filter];
                 INFO(@"using filter pattern %@", pattern);
@@ -393,16 +398,18 @@
 	INFO(@"sender = %@, selector = %s", sender, aSelector);
 	if (aSelector == @selector(insertNewline:)) // enter
 	{
-		[self explorerClick:sender];
+		NSIndexSet *set = [explorer selectedRowIndexes];
+		if ([set count] == 0)
+			[self cancelExplorer];
+		else
+			[self explorerClick:sender];
 		return YES;
 	}
 	else if (aSelector == @selector(moveUp:)) // up arrow
 	{
 		NSInteger row = [explorer selectedRow];
 		if (row > 0)
-		{
 			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
-		}
 		return YES;
 	}
 	else if (aSelector == @selector(moveDown:)) // down arrow
@@ -440,13 +447,7 @@
 	}
 	else if (aSelector == @selector(cancelOperation:)) // escape
 	{
-		if (closeExplorerAfterUse)
-		{
-			[self toggleExplorer:self];
-			closeExplorerAfterUse = NO;
-		}
-		[self resetExplorerView];
-		[delegate focusEditor];
+		[self cancelExplorer];
 		return YES;
 	}
 

@@ -4,6 +4,7 @@
 #import "ViDocument.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
+#include "license.h"
 
 @implementation ViAppController
 
@@ -47,6 +48,7 @@
 			@"Menlo Regular", @"fontname",
 			@"Mac Classic", @"theme",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
+			NSFullUserName(), @"licenseOwner",
 			nil]];
 
 	/* Initialize languages and themes. */
@@ -155,6 +157,38 @@ extern BOOL makeNewWindowInsteadOfTab;
 	else
 		INFO(@"error = %@", error);
 #endif
+}
+
+- (IBAction)registerLicense:(id)sender
+{
+	time_t created_at = 0;
+	unsigned int serial = 0;
+	unsigned int flags = 0;
+
+	const char *key = [[licenseKey stringValue] UTF8String];
+	const char *name = [[licenseOwner stringValue] UTF8String];
+	const char *email = [[licenseEmail stringValue] UTF8String];
+
+	[[NSUserDefaults standardUserDefaults] setObject:[licenseKey stringValue] forKey:@"licenseKey"];
+	[[NSUserDefaults standardUserDefaults] setObject:[licenseOwner stringValue] forKey:@"licenseOwner"];
+	[[NSUserDefaults standardUserDefaults] setObject:[licenseEmail stringValue] forKey:@"licenseEmail"];
+
+	if (!check_license_base32(key, &created_at, &serial, &flags))
+		NSLog(@"license key not properly formed");
+	else
+		INFO(@"license key appears ok, serial %u, flags %u, created %s", serial, flags, ctime(&created_at));
+
+	if (!check_license_1(name, email, key, &created_at, &serial, &flags))
+		NSLog(@"license key not valid");
+	else
+		INFO(@"license key valid, serial %u, flags %u, created %s", serial, flags, ctime(&created_at));
+
+	[registrationWindow orderOut:self];
+}
+
+- (IBAction)dismissRegistrationWindow:(id)sender
+{
+	[registrationWindow orderOut:self];
 }
 
 @end

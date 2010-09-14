@@ -1582,14 +1582,14 @@ int logIndent = 0;
 
 	NSTextContainer *textContainer = [self textContainer];
 	if (enabled)
-		[textContainer setContainerSize:[scrollView contentSize]];
+		[textContainer setContainerSize:NSMakeSize([scrollView contentSize].width, LargeNumberForText)];
 	else
 		[textContainer setContainerSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[textContainer setWidthTracksTextView:enabled];
 	[textContainer setHeightTracksTextView:NO];
 
 	if (enabled)
-		[self setMaxSize:[scrollView contentSize]];
+		[self setMaxSize:NSMakeSize([scrollView contentSize].width, LargeNumberForText)];
 	else
 		[self setMaxSize:NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[self setHorizontallyResizable:!enabled];

@@ -32,9 +32,7 @@ static ViJumpList *defaultJumpList = nil;
 + (ViJumpList *)defaultJumpList
 {
 	if (defaultJumpList == nil)
-	{
 		defaultJumpList = [[ViJumpList alloc] init];
-	}
 	return defaultJumpList;
 }
 
@@ -42,30 +40,26 @@ static ViJumpList *defaultJumpList = nil;
 {
 	self = [super init];
 	if (self)
-	{
 		jumps = [[NSMutableArray alloc] init];
-	}
 	return self;
 }
 
 - (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
 {
+	if (url == nil)
+		return NO;
+
 	if ([jumps count] >= MAX_JUMP_LOCATIONS)
-	{
 		[jumps removeObjectAtIndex:0];
-	}
 
 	BOOL removedDuplicate = NO;
 	ViJump *jump = nil;
-	for (jump in jumps)
-	{
+	for (jump in jumps) {
 		if ([[jump url] isEqual:url] && [jump line] == line)
-		{
 			break;
-		}
 	}
-	if (jump)
-	{
+
+	if (jump) {
 		DEBUG(@"removing duplicate jump %@", jump);
 		[jumps removeObject:jump];
 		removedDuplicate = YES;

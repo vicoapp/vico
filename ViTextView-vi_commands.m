@@ -845,7 +845,7 @@
 - (BOOL)move_back_to_char:(ViCommand *)command
 {
 	NSInteger bol;
-	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+	[self getLineStart:(NSUInteger *)&bol end:NULL contentsEnd:NULL];
 	NSInteger i = start_location;
 	int count = IMAX(command.count, 1);
 	if (!command.ismotion)

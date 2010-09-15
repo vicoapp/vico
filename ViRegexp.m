@@ -148,6 +148,11 @@
 	return [self allMatchesInString:aString range:aRange];
 }
 
+- (NSArray *)allMatchesInString:(NSString *)aString
+{
+	return [self allMatchesInString:aString options:0 range:NSMakeRange(0, [aString length])];
+}
+
 @end
 
 @implementation ViRegexpMatch

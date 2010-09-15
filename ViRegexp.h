@@ -38,6 +38,7 @@
 - (NSArray *)allMatchesInString:(NSString *)aString options:(int)options;
 - (NSArray *)allMatchesInString:(NSString *)aString options:(int)options range:(NSRange)aRange;
 - (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange start:(NSUInteger)aLocation;
+- (NSArray *)allMatchesInString:(NSString *)aString;
 
 @end
 

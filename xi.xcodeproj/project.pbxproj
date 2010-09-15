@@ -1011,8 +1011,8 @@
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
-					/opt/local/lib/libcrypto.a,
-					"-lz",
+					"-lcrypto",
+					"-lresolv",
 				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
@@ -1038,8 +1038,8 @@
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
-					/opt/local/lib/libcrypto.a,
-					"-lz",
+					"-lcrypto",
+					"-lresolv",
 				);
 				PRODUCT_NAME = xi;
 				WRAPPER_EXTENSION = app;
@@ -1083,9 +1083,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					/opt/local/lib/libcrypto.a,
-					"-lz",
+					"-lcrypto",
 					"-lonig",
+					"-lresolv",
 				);
 				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -1129,9 +1129,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					/opt/local/lib/libcrypto.a,
-					"-lz",
+					"-lcrypto",
 					"-lonig",
+					"-lresolv",
 				);
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;

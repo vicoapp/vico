@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define PUBKEY_LEN 149
-
 #include "xor.c"
 
 int
@@ -26,11 +24,16 @@ main(int argc, char **argv)
 	if (strlen(real_pubkey) != strlen(fake_pubkey))
 		errx(2, "real key length differs from fake key length");
 
-	if (strlen(real_pubkey) != PUBKEY_LEN)
-		errx(2, "key length %d != %d", strlen(real_pubkey), PUBKEY_LEN);
+	for (i = 0; i < strlen(real_pubkey); i++) {
+		if (i % 16 == 0) {
+			if (i > 0)
+				printf("\" \\\n");
+			printf("\"");
+		}
+		printf("\\x%02x", (unsigned char)((real_pubkey[i] ^ xor_key[i]) ^ fake_pubkey[i]));
+	}
 
-	for (i = 0; i < strlen(real_pubkey); i++)
-		printf("%c", (real_pubkey[i] ^ xor_key[i]) ^ fake_pubkey[i]);
+	printf("\";\n");
 
 	return 0;
 }

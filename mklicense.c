@@ -2,60 +2,44 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <resolv.h>
 
 #include "license.h"
-#include "b32.h"
 
 void
 usage(void)
 {
 	extern const char	*__progname;
 
-	printf("syntax: %s [-h] [-e email] [-n name] [-k keyfile] [-s serial]\n", __progname);
+	printf("syntax: %s [-h] [-n name] [-e email] [-k keyfile] [-s serial]\n", __progname);
 	exit(0);
-}
-
-void
-hexdump(void *data, size_t len)
-{
-	uint8_t *p = data;
-
-	while (len--) {
-		size_t ofs = p - (uint8_t *)data;
-		if (ofs % 16 == 0)
-			fprintf(stderr, "%s%04lx:", ofs == 0 ? "" : "\n", ofs);
-		else if (ofs % 8 == 0)
-			fprintf(stderr, " ");
-		fprintf(stderr, " %02x", *p++);
-	}
-	fprintf(stderr, "\n");
 }
 
 int
 main(int argc, char **argv)
 {
-	struct license		 input;
-	const char		*name = NULL;
-	const char		*email = NULL;
-	const char		*keyfile = NULL;
-	SHA_CTX			 ctx;
-	BIO			*bio;
-	EVP_PKEY		*pubkey, *privkey;
-	EC_KEY			*eckey;
-	ECDSA_SIG		*sig;
-	unsigned char		*bin = NULL;
-	const unsigned char	*bin_copy;
-	unsigned char		*encrypted_name;
-	char			*license, *e;
-	size_t			 sz;
-	int			 c, i;
+	struct license	 input;
+	const char	*name = NULL;
+	const char	*email = NULL;
+	const char	*keyfile = NULL;
+	SHA_CTX		 ctx;
+	BIO		*bio;
+	RSA		*rsa = NULL;
+	unsigned char	*encrypted_license;
+	char		*license, *e;
+	size_t		 sz;
+	int		 c, i;
 
 	bzero(&input, sizeof(input));
+	ERR_load_crypto_strings();
 
-	while ((c = getopt(argc, argv, "he:n:k:s:")) != EOF) {
+	while ((c = getopt(argc, argv, "hae:n:k:s:")) != EOF) {
 		switch (c) {
 		case 'h':
 			usage();
+			break;
+		case 'a':
+			input.flags |= LICENSE_F_ACADEMIC;
 			break;
 		case 'e':
 			email = optarg;
@@ -67,7 +51,7 @@ main(int argc, char **argv)
 			keyfile = optarg;
 			break;
 		case 's':
-			input.head.serial = atoi(optarg);
+			input.serial = atoi(optarg);
 			break;
 		default:
 		case '?':
@@ -75,16 +59,13 @@ main(int argc, char **argv)
 		}
 	}
 
-	printf("sizeof input = %lu\n", sizeof(input));
-	printf("sizeof input.head = %lu\n", sizeof(input.head));
-
 	if (email == NULL)
 		errx(10, "missing license owner email");
 
 	if (name == NULL)
 		errx(2, "missing license owner name");
 
-	if (input.head.serial == 0)
+	if (input.serial == 0)
 		errx(12, "missing serial number");
 
 	if (keyfile == NULL)
@@ -96,66 +77,38 @@ main(int argc, char **argv)
 	    SHA1_Final(input.name_digest, &ctx) != 1)
 		err(11, "SHA1");
 
-	printf("SHA1 (length %i)\n", SHA_DIGEST_LENGTH);
-	hexdump(input.name_digest, SHA_DIGEST_LENGTH);
+	input.created_at = time(NULL) - LICENSE_EPOCH;
 
-	input.head.created_at = (time(NULL) - LICENSE_EPOCH) / 86400;
+	if ((bio = BIO_new_file(keyfile, "r")) == NULL)
+		errx(4, "BIO_new_file: %s", ERR_error_string(ERR_get_error(), NULL));
 
-	bio = BIO_new_file(keyfile, "r");
-	if (bio == NULL)
-		err(4, "BIO_new_file");
+	if ((rsa = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL)) == 0)
+		errx(5, "PEM_read_bio_RSAPrivateKey: %s", ERR_error_string(ERR_get_error(), NULL));
 
-	if ((eckey = PEM_read_bio_ECPrivateKey(bio, NULL, NULL, NULL)) == NULL)
-		err(5, "PEM_read_bio_ECPrivateKey");
-
-	/* check keys */
-	if (!EC_KEY_check_key(eckey))
-		errx(16, "public and private key don't match");
-
-	printf("digest (length %lu)\n", sizeof(input)-3);
-	hexdump(&input, sizeof(input)-3);
-
-	/* sign */
-	sig = ECDSA_do_sign((const unsigned char *)&input, sizeof(input) - 3, eckey);
-	if (sig == NULL) {
-		unsigned long e = ERR_get_error();
-		ERR_load_crypto_strings();
-		errx(17, "ECDSA_do_sign: %s", ERR_error_string(e, NULL));
-	}
-
-	size_t rlen = BN_num_bytes(sig->r);
-	size_t slen = BN_num_bytes(sig->s);
-	printf("rlen = %zu, slen = %zu\n", rlen, slen);
-	sz = sizeof(input.head) + rlen + slen;
-
-	if ((bin = malloc(sz)) == NULL)
+	sz = RSA_size(rsa);
+	if ((encrypted_license = malloc(sz)) == NULL)
 		err(6, "malloc");
-	bzero(bin, sz);
-	printf("sz = %zu\n", sz);
 
-	bcopy(&input.head, bin, sizeof(input.head));
-	BN_bn2bin(sig->r, bin + sizeof(input.head));
-	BN_bn2bin(sig->s, bin + sizeof(input.head) + rlen); /* join two values into bin */
-	ECDSA_SIG_free(sig);
-
-	printf("signature (r || s):\n");
-	hexdump(bin + sizeof(input.head), sz - sizeof(input.head));
+	if (RSA_private_encrypt(sizeof(input), (uint8_t *)&input, encrypted_license,
+	    rsa, RSA_PKCS1_PADDING) == -1)
+		errx(7, "RSA_private_encrypt: %s", ERR_error_string(ERR_get_error(), NULL));
 
 	if ((license = malloc(sz * 2)) == NULL)
 		err(6, "malloc");
 
 	int len;
-	if ((len = b32_ntop(bin, sz, license, sz * 2)) == -1)
-		err(8, "b32_ntop");
+	if ((len = b64_ntop(encrypted_license, sz, license, sz * 2)) == -1)
+		err(8, "b64_ntop");
 
-	printf("base32 length = %i\n", len);
-
-	for (i = 0; license[i]; i++) {
-		if (i > 0 && i % 8 == 0)
-			printf("-");
+	printf("-----BEGIN LICENSE-----\n");
+	for (i = 0; i < len; i++) {
+		if (i > 0 && i % 43 == 0)
+			printf("\n");
 		printf("%c", license[i]);
 	}
-	printf("\n");
+	printf("\n-----END LICENSE-----\n");
+
+	free(license);
 
 	return 0;
 }

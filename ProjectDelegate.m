@@ -23,8 +23,7 @@
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		rootItems = [[NSMutableArray alloc] init];
 		skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
 	}
@@ -58,13 +57,11 @@
 		return nil;
 	}
 	NSString *file;
-	for (file in files)
-	{
-		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil)
-		{
+	for (file in files) {
+		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
 			NSURL *childURL = [NSURL fileURLWithPath:[[url path] stringByAppendingPathComponent:file]];
 			[children addObject:[self itemAtFileURL:childURL rootURL:rootURL]];
-        }
+		}
 	}
 	return children;
 }
@@ -74,11 +71,9 @@
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	NSArray *entries = [conn directoryContentsAtPath:[url path]];
 	SFTPDirectoryEntry *entry;
-	for (entry in entries)
-	{
+	for (entry in entries) {
 		NSString *file = [entry filename];
-		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil)
-		{
+		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
 			NSURL *newurl = [[NSURL alloc] initWithScheme:[url scheme] host:[conn target] path:[[url path] stringByAppendingPathComponent:file]];
 			[children addObject:[self itemAtSftpURL:newurl connection:conn attributes:[entry attributes]]];
 		}
@@ -90,8 +85,7 @@
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	BOOL isDirectory = NO;
-	if ([fm fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
-	{
+	if ([fm fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory) {
 		NSMutableArray *children = [self childrenAtFileURL:url rootURL:rootURL];
 		NSMutableDictionary *root = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 			url, @"url",
@@ -105,8 +99,7 @@
 
 - (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes
 {
-	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm))
-	{
+	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm)) {
 		// It's a directory
 		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn];
 		NSMutableDictionary *root = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -135,8 +128,7 @@
 {
 	NSString *target = [NSString stringWithFormat:@"%@@%@", [url user] ?: @"", [url host]];
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
-	if (conn)
-	{
+	if (conn) {
 		id item = [self itemAtSftpURL:url connection:conn];
 		if (item)
 			[rootItems addObject:item];
@@ -147,20 +139,14 @@
 
 - (void)addURL:(NSURL *)aURL
 {
-	if ([rootItems indexOfObject:aURL] == NSNotFound)
-	{
+	if ([rootItems indexOfObject:aURL] == NSNotFound) {
 		INFO(@"scheme = %@", [aURL scheme]);
 		id item = nil;
 		if ([[aURL scheme] isEqualToString:@"file"])
-		{
 			item = [self addFileURL:aURL];
-		}
 		else if ([[aURL scheme] isEqualToString:@"sftp"])
-		{
 			item = [self addSftpURL:aURL];
-		}
-		else
-		{
+		else {
 			INFO(@"unhandled scheme %@", [aURL scheme]);
 			return;
 		}
@@ -194,9 +180,7 @@
 		return;
 	
 	for (NSURL *url in [panel URLs])
-	{
 		[self addURL:url];
-	}
 }
 
 - (IBAction)addLocation:(id)sender
@@ -220,8 +204,7 @@
 
 - (IBAction)acceptSftpSheet:(id)sender
 {
-	if ([[[sftpConnectForm cellAtIndex:0] stringValue] length] == 0)
-	{
+	if ([[[sftpConnectForm cellAtIndex:0] stringValue] length] == 0) {
 		NSBeep();
 		[sftpConnectForm selectTextAtIndex:0];
 		return;
@@ -235,14 +218,11 @@
 	NSString *target = [NSString stringWithFormat:@"%@@%@", user, host];
 
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
-	if (conn)
-	{
+	if (conn) {
 		INFO(@"connected to %@", target);
-		if (![path hasPrefix:@"/"])
-		{
+		if (![path hasPrefix:@"/"]) {
 			NSString *pwd = [conn currentDirectory];
-			if (pwd == nil)
-			{
+			if (pwd == nil) {
 				INFO(@"%s", "FAILED to read current directory");
 				return;
 			}
@@ -312,14 +292,12 @@
 	if ([set count] > 1)
 		return;
 	NSDictionary *item = [explorer itemAtRow:[set firstIndex]];
-	if (item && [self outlineView:explorer isItemExpandable:item])
-	{
+	if (item && [self outlineView:explorer isItemExpandable:item]) {
 		if ([explorer isItemExpanded:item])
 			[explorer collapseItem:item];
 		else
 			[explorer expandItem:item];
-	}
-	else
+	} else
 		[self explorerClick:sender];
 }
 
@@ -355,16 +333,11 @@
 - (void)expandItems:(NSArray *)items intoArray:(NSMutableArray *)expandedArray filter:(ViRegexp *)rx
 {
         NSDictionary *item;
-        for (item in items)
-        {
+        for (item in items) {
                 if ([self outlineView:explorer isItemExpandable:item])
-                {
                         [self expandItems:[item objectForKey:@"children"] intoArray:expandedArray filter:rx];
-                }
-                else if ([rx matchInString:[[[item objectForKey:@"url"] path] lastPathComponent]])
-                {
+                else if ([rx matchInString:[[item objectForKey:@"url"] path]])
                         [expandedArray addObject:item];
-                }
         }
 }
 
@@ -396,57 +369,43 @@
 - (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
 	INFO(@"sender = %@, selector = %s", sender, aSelector);
-	if (aSelector == @selector(insertNewline:)) // enter
-	{
+	if (aSelector == @selector(insertNewline:)) { // enter
 		NSIndexSet *set = [explorer selectedRowIndexes];
 		if ([set count] == 0)
 			[self cancelExplorer];
 		else
 			[self explorerClick:sender];
 		return YES;
-	}
-	else if (aSelector == @selector(moveUp:)) // up arrow
-	{
+	} else if (aSelector == @selector(moveUp:)) { // up arrow
 		NSInteger row = [explorer selectedRow];
 		if (row > 0)
 			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
 		return YES;
-	}
-	else if (aSelector == @selector(moveDown:)) // down arrow
-	{
+	} else if (aSelector == @selector(moveDown:)) { // down arrow
 		NSInteger row = [explorer selectedRow];
 		if (row + 1 < [explorer numberOfRows])
-		{
 			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
-		}
 		return YES;
-	}
-	else if (aSelector == @selector(moveRight:)) // right arrow
-	{
+	} else if (aSelector == @selector(moveRight:)) { // right arrow
 		NSInteger row = [explorer selectedRow];
 		id item = [explorer itemAtRow:row];
 		if (item && [self outlineView:explorer isItemExpandable:item])
 			[explorer expandItem:item];
 		return YES;
-	}
-	else if (aSelector == @selector(moveLeft:)) // left arrow
-	{
+	} else if (aSelector == @selector(moveLeft:)) { // left arrow
 		NSInteger row = [explorer selectedRow];
 		id item = [explorer itemAtRow:row];
 		if (item == nil)
 			return YES;
 		if ([self outlineView:explorer isItemExpandable:item] && [explorer isItemExpanded:item])
 			[explorer collapseItem:item];
-		else
-		{
+		else {
 			id parent = [explorer parentForItem:item];
 			if (parent)
 				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:[explorer rowForItem:parent]] byExtendingSelection:NO];
 		}
 		return YES;
-	}
-	else if (aSelector == @selector(cancelOperation:)) // escape
-	{
+	} else if (aSelector == @selector(cancelOperation:)) { // escape
 		[self cancelExplorer];
 		return YES;
 	}

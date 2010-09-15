@@ -173,15 +173,15 @@ extern BOOL makeNewWindowInsteadOfTab;
 	[[NSUserDefaults standardUserDefaults] setObject:[licenseOwner stringValue] forKey:@"licenseOwner"];
 	[[NSUserDefaults standardUserDefaults] setObject:[licenseEmail stringValue] forKey:@"licenseEmail"];
 
-	if (!check_license_base32(key, &created_at, &serial, &flags))
+	if (check_license_quick(key) == 0)
+		INFO(@"license key appears ok");
+	else
 		NSLog(@"license key not properly formed");
-	else
-		INFO(@"license key appears ok, serial %u, flags %u, created %s", serial, flags, ctime(&created_at));
 
-	if (!check_license_1(name, email, key, &created_at, &serial, &flags))
-		NSLog(@"license key not valid");
-	else
+	if (check_license_1(name, email, key, &created_at, &serial, &flags) == 0)
 		INFO(@"license key valid, serial %u, flags %u, created %s", serial, flags, ctime(&created_at));
+	else
+		NSLog(@"license key not valid");
 
 	[registrationWindow orderOut:self];
 }

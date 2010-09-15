@@ -23,6 +23,9 @@ die()
 
 APP=build/Release/xi.app
 
+echo "Stripping binary"
+strip $APP/Contents/MacOS/xi
+
 VOL="xi-$VERSION"
 echo "Creating disk image $VOL"
 

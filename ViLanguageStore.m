@@ -32,6 +32,8 @@ static ViLanguageStore *defaultStore = nil;
 			continue;
 
 		ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
+		if (bundle == nil)
+			continue;
 
 		NSString *syntaxPath = [NSString stringWithFormat:@"%@/%@/Syntaxes", aPath, subdir];
 		NSArray *syntaxfiles = [[NSFileManager defaultManager] directoryContentsAtPath:syntaxPath];
@@ -53,7 +55,7 @@ static ViLanguageStore *defaultStore = nil;
 		{
 			if ([prefsfile hasSuffix:@".plist"])
 			{
-				NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", prefsPath, prefsfile]];
+				NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", prefsPath, prefsfile]];
 				[bundle addPreferences:prefs];
 			}
 		}
@@ -210,7 +212,33 @@ static ViLanguageStore *defaultStore = nil;
 	return bundles;
 }
 
-- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings
+/*
+ * Checks all bundles for the named preference (yes, this is how TextMate does it).
+ */
+- (NSDictionary *)preferenceItems:(NSArray *)prefsNames
+{
+	NSString *cacheKey = [prefsNames componentsJoinedByString:@","];
+	NSMutableDictionary *result = [cachedPreferences objectForKey:cacheKey];
+	if (result)
+		return result;
+
+	result = [[NSMutableDictionary alloc] init];
+	[cachedPreferences setObject:result forKey:cacheKey];
+
+	ViBundle *bundle;
+	for (bundle in bundles) {
+		NSDictionary *p = [bundle preferenceItems:prefsNames];
+		if (p)
+			[result addEntriesFromDictionary:p];	// XXX: need to do this in two levels? (since items in p are also dictionaries...)
+	}
+
+	return result;
+}
+
+/*
+ * Checks all bundles for the named preference (yes, this is how TextMate does it).
+ */
+- (NSDictionary *)preferenceItem:(NSString *)prefsName
 {
 	NSMutableDictionary *result = [cachedPreferences objectForKey:prefsName];
 	if (result)
@@ -218,20 +246,15 @@ static ViLanguageStore *defaultStore = nil;
 
 	result = [[NSMutableDictionary alloc] init];
 	[cachedPreferences setObject:result forKey:prefsName];
-	
+
 	ViBundle *bundle;
 	for (bundle in bundles) {
-		NSDictionary *p = [bundle preferenceItems:prefsName includeAllSettings:includeAllSettings];
+		NSDictionary *p = [bundle preferenceItem:prefsName];
 		if (p)
 			[result addEntriesFromDictionary:p];
 	}
 
 	return result;
-}
-
-- (NSDictionary *)preferenceItems:(NSString *)prefsName
-{
-	return [self preferenceItems:prefsName includeAllSettings:NO];
 }
 
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;

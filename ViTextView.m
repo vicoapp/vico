@@ -343,7 +343,7 @@ int logIndent = 0;
 
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"increaseIndentPattern"];
+	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"increaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -360,7 +360,7 @@ int logIndent = 0;
 
 - (BOOL)shouldDecreaseIndentAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *decreaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"decreaseIndentPattern"];
+	NSDictionary *decreaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"decreaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -377,7 +377,7 @@ int logIndent = 0;
 
 - (BOOL)shouldUnIndentLineAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItems:@"unIndentedLinePattern"];
+	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"unIndentedLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -1027,17 +1027,16 @@ int logIndent = 0;
 		 * Check if we're inserting the end character of a smart typing pair.
 		 * If so, just overwrite the end character.
 		 */
-		if ([[pair objectAtIndex:1] isEqualToString:characters] &&
-		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]])
-		{
-			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-						    atCharacterIndex:start_location
-						      effectiveRange:NULL])
-			{
-				foundSmartTypingPair = YES;
-				final_location = start_location + 1;
+		if ([[pair objectAtIndex:1] isEqualToString:characters]) {
+			if ([[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]]) {
+				if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+							    atCharacterIndex:start_location
+							      effectiveRange:NULL]) {
+					foundSmartTypingPair = YES;
+					final_location = start_location + 1;
+				}
+				break;
 			}
-			break;
 		}
 		// check for the start character of a smart typing pair
 		else if ([[pair objectAtIndex:0] isEqualToString:characters])
@@ -1068,7 +1067,7 @@ int logIndent = 0;
 	if (!foundSmartTypingPair) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
-		[self setCaret:start_location + 1];
+//		[self setCaret:start_location + 1];
 		final_location = start_location + 1;
 	}
 
@@ -1154,7 +1153,7 @@ int logIndent = 0;
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItems:@"smartTypingPairs"];
+	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItem:@"smartTypingPairs"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {

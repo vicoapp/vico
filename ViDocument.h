@@ -32,8 +32,8 @@
 	// symbol list
 	NSArray *symbols;
 	NSArray *filteredSymbols;
-	NSDictionary *symbolSettings;
-	NSMutableArray *symbolScopes;
+	NSDictionary *symbolScopes;
+	NSDictionary *symbolTransforms;
 	NSTimer *updateSymbolsTimer;
 }
 

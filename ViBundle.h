@@ -11,13 +11,16 @@
 	NSMutableDictionary *cachedPreferences;
 }
 
++ (NSColor *)hashRGBToColor:(NSString *)hashRGB;
++ (void)normalizePreference:(NSDictionary *)preference intoDictionary:(NSMutableDictionary *)normalizedPreference;
+
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)supportPath;
 - (NSString *)name;
 - (void)addLanguage:(ViLanguage *)lang;
-- (void)addPreferences:(NSDictionary *)prefs;
-- (NSDictionary *)preferenceItems:(NSString *)prefsName;
-- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings;
+- (void)addPreferences:(NSMutableDictionary *)prefs;
+- (NSDictionary *)preferenceItem:(NSString *)prefsName;
+- (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;

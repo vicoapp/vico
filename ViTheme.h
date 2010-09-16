@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import "ViBundle.h"
 
 // FIXME: move to a better place
 #define ViSmartPairAttributeName @"ViSmartPair"
@@ -9,7 +10,7 @@
 	NSDictionary *theme;
 	NSMutableDictionary *themeAttributes;
 	NSMutableDictionary *scopeSelectorCache;
-	NSDictionary *defaultSettings;
+	NSMutableDictionary *defaultSettings;
 	NSColor *backgroundColor;
 	NSColor *foregroundColor;
 	NSColor *caretColor;
@@ -18,7 +19,7 @@
 
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)name;
-- (NSDictionary *)attributesForScopes:(NSArray *)scopes;
+- (NSDictionary *)attributesForScopes:(NSArray *)scopes inBundle:(ViBundle *)bundle;
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;

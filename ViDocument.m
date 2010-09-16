@@ -5,6 +5,7 @@
 #import "ViLanguageStore.h"
 #import "NSTextStorage-additions.h"
 #import "NSString-additions.h"
+#import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
 
 #import "ViScope.h"
@@ -176,7 +177,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			return NO;
 		}
 
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
+		NSString *target = [NSString stringWithFormat:@"%@@%@", [url user], [url host]];
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
 		if (conn == nil) {
 			INFO(@"%s", "FAILED to connect to host");
 			// XXX: set outError
@@ -256,7 +258,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViScope *scope = [scopeArray objectAtIndex:charIndex];
         NSDictionary *attributes = [scope attributes];
         if ([attributes count] == 0) {
-                attributes = [theme attributesForScopes:[scope scopes]];
+                attributes = [theme attributesForScopes:[scope scopes] inBundle:bundle];
                 if ([attributes count] == 0)
                         attributes = [self defaultAttributesForTheme:theme];
                 [scope setAttributes:attributes];
@@ -738,17 +740,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setSymbolScopes
 {
-	symbolSettings = [[ViLanguageStore defaultStore] preferenceItems:@"showInSymbolList" includeAllSettings:YES];
-	NSString *selector;
-	symbolScopes = [[NSMutableArray alloc] init];
-	for (selector in symbolSettings)
-		if ([[[symbolSettings objectForKey:selector] objectForKey:@"showInSymbolList"] integerValue] == 1)
-			[symbolScopes addObject:[selector componentsSeparatedByString:@" "]];
+	symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
+	symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
 }
 
 - (void)updateSymbolList:(NSTimer *)timer
 {
-	NSArray *lastSelector = nil;
+	NSString *lastSelector = nil;
 	NSRange wholeRange;
 
 #if 0
@@ -768,19 +766,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		NSArray *scopes = s.scopes;
 		NSRange range = s.range;
 
-		if ([lastSelector matchesScopes:scopes])
-		{
+		if ([lastSelector matchesScopes:scopes]) {
+			/* Continue with the last scope selector, it matched this scope too. */
 			wholeRange.length += range.length;
-		}
-		else
-		{
-			if (lastSelector)
-			{
+		} else {
+			if (lastSelector) {
+				/*
+				 * Finalize the last symbol. Apply any symbol transformation.
+				 */
 				NSString *symbol = [[textStorage string] substringWithRange:wholeRange];
-				NSDictionary *d = [symbolSettings objectForKey:[lastSelector componentsJoinedByString:@" "]];
-				NSString *transform = [d objectForKey:@"symbolTransformation"];
-				if (transform)
-				{
+				NSString *transform = [symbolTransforms objectForKey:lastSelector];
+				if (transform) {
 					ViSymbolTransform *tr = [[ViSymbolTransform alloc] initWithTransformationString:transform];
 					symbol = [tr transformSymbol:symbol];
 				}
@@ -789,12 +785,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			}
 			lastSelector = nil;
 
-			NSArray *descendants;
-			for (descendants in symbolScopes)
-			{
-				if ([descendants matchesScopes:scopes])
-				{
-					lastSelector = descendants;
+			for (NSString *scopeSelector in symbolScopes) {
+				if ([scopeSelector matchesScopes:scopes]) {
+					lastSelector = scopeSelector;
 					wholeRange = range;
 					break;
 				}

@@ -6,18 +6,6 @@
 
 @implementation ViTheme
 
-- (NSColor *)hashRGBToColor:(NSString *)hashRGB
-{
-	int r, g, b, a;
-	int rc = sscanf([hashRGB UTF8String], "#%02X%02X%02X%02X", &r, &g, &b, &a);
-	if (rc != 3 && rc != 4)
-		return nil;
-	if (rc == 3)
-		a = 255;
-
-	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
-}
-
 - (id)initWithPath:(NSString *)aPath
 {
 	self = [super init];
@@ -28,41 +16,28 @@
 	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
-	NSArray *settings = [theme objectForKey:@"settings"];
-	NSDictionary *setting;
-	for (setting in settings) {
-		if ([setting objectForKey:@"name"] == nil) {
-			/* settings for the default scope */
-			defaultSettings = [setting objectForKey:@"settings"];
+	NSArray *preferences = [theme objectForKey:@"settings"];
+	NSDictionary *preference;
+	for (preference in preferences) {
+		if ([preference objectForKey:@"scope"] == nil) {
+			/* Settings for the default scope. */
+			defaultSettings = [preference objectForKey:@"settings"];
+			[ViBundle normalizePreference:preference intoDictionary:defaultSettings];
 			continue;
 		}
 
-		NSString *scopeSelector = [setting objectForKey:@"scope"];
-		if (scopeSelector == nil)
+		NSString *scopeSelector = [preference objectForKey:@"scope"];
+		if (scopeSelector == nil) {
+			DEBUG(@"missing scope selector in preference: %@", preference);
 			continue;
+		}
+
+		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
+		[ViBundle normalizePreference:preference intoDictionary:attrs];
 
 		// split up grouped selectors
 		//NSArray *scopeSelectors = [scopeSelector componentsSeparatedByRegularExpressionString:@"\\s*,\\s*"];
 		NSArray *scopeSelectors = [scopeSelector componentsSeparatedByString:@", "];
-
-		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
-
-		NSString *foreground = [[setting objectForKey:@"settings"] objectForKey:@"foreground"];
-		if (foreground)
-			[attrs setObject:[self hashRGBToColor:foreground] forKey:NSForegroundColorAttributeName];
-
-		NSString *background = [[setting objectForKey:@"settings"] objectForKey:@"background"];
-		if (background)
-			[attrs setObject:[self hashRGBToColor:background] forKey:NSBackgroundColorAttributeName];
-
-		NSString *fontStyle = [[setting objectForKey:@"settings"] objectForKey:@"fontStyle"];
-		if (fontStyle) {
-			if ([fontStyle rangeOfString:@"underline"].location != NSNotFound)
-				[attrs setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
-			if ([fontStyle rangeOfString:@"italic"].location != NSNotFound)
-				[attrs setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
-		}
-		
 		for (scopeSelector in scopeSelectors)
 			[themeAttributes setObject:attrs forKey:scopeSelector];
 	}
@@ -75,39 +50,24 @@
 	return [theme objectForKey:@"name"];
 }
 
-/* Return attributes (fore/background colors, underline, oblique) that are specified
- * by the theme by matching against the scope selectors.
- *
- * Returns nil if no attributes are applicable.
+
+/*
+ * From the textmate manual:
+ * "For themes and preference items, the winner is undefined when
+ *  multiple items use the same scope selector, though this is on
+ *  a per-property basis. So for example if one theme item sets the
+ *  background to blue for string.quoted and another theme item sets
+ *  the foreground to white, again for string.quoted, the result
+ *  would be that the foreground was taken from the latter item and
+ *  background from the former."
  */
-- (NSDictionary *)attributesForScopes:(NSArray *)scopes
+- (void)matchAttributes:(NSDictionary *)matchAttributes forScopes:(NSArray *)scopes intoDictionary:(NSMutableDictionary *)attributes rankState:(NSMutableDictionary *)attributesRank
 {
-	NSString *key = [scopes componentsJoinedByString:@" "];
-	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
-	if (attributes)
-		return [attributes count] == 0 ? nil : attributes;
-
-	attributes = [[NSMutableDictionary alloc] init];
-	NSMutableDictionary *attributesRank = [[NSMutableDictionary alloc] init];
-
-	// Set default colors
-	[attributes setObject:[self foregroundColor] forKey:@"NSColor"];
-	[attributes setObject:[self backgroundColor] forKey:@"NSBackgroundColor"];
-	
-	// From the textmate manual:
-	// "For themes and preference items, the winner is undefined when
-	//  multiple items use the same scope selector, though this is on
-	//  a per-property basis. So for example if one theme item sets the
-	//  background to blue for string.quoted and another theme item sets
-	//  the foreground to white, again for string.quoted, the result
-	//  would be that the foreground was taken from the latter item and
-	//  background from the former."
-
 	NSString *scopeSelector;
-	for (scopeSelector in [themeAttributes allKeys]) {
+	for (scopeSelector in matchAttributes) {
 		u_int64_t rank = [scopeSelector matchesScopes:scopes];
 		if (rank > 0) {
-			NSDictionary *attrs = [themeAttributes objectForKey:scopeSelector];
+			NSDictionary *attrs = [matchAttributes objectForKey:scopeSelector];
 			NSString *attrKey;
 			for (attrKey in attrs) {
 				u_int64_t prevRank = [[attributesRank objectForKey:attrKey] unsignedLongLongValue];
@@ -119,6 +79,38 @@
 			}
 		}
 	}
+}
+
+/* Return attributes (fore/background colors, underline, oblique) that are specified
+ * by the theme by matching against the scope selectors.
+ *
+ * Returns nil if no attributes are applicable.
+ */
+- (NSDictionary *)attributesForScopes:(NSArray *)scopes inBundle:(ViBundle *)bundle
+{
+	NSString *key = [scopes componentsJoinedByString:@" "];
+	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
+	if (attributes)
+		return [attributes count] == 0 ? nil : attributes;
+
+	attributes = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *attributesRank = [[NSMutableDictionary alloc] init];
+
+	// Set default colors
+	[attributes setObject:[self foregroundColor] forKey:NSForegroundColorAttributeName];
+	[attributes setObject:[self backgroundColor] forKey:NSBackgroundColorAttributeName];
+
+	[self matchAttributes:themeAttributes forScopes:scopes intoDictionary:attributes rankState:attributesRank];
+
+	/*
+	 * Bundle preferences can override/add theme attributes for certain scopes.
+	 * The Diff bundle does this for example.
+	 */
+	if (bundle != nil) {
+		NSDictionary *bundlePrefs = [bundle preferenceItems:[NSArray arrayWithObjects:NSBackgroundColorAttributeName, NSForegroundColorAttributeName, NSUnderlineStyleAttributeName, NSObliquenessAttributeName, nil]];
+		if (bundlePrefs)
+			[self matchAttributes:bundlePrefs forScopes:scopes intoDictionary:attributes rankState:attributesRank];
+	}
 
 	// Backgrounds with alpha is not supported, so blend the background colors together.
 	NSColor *bg = [attributes objectForKey:NSBackgroundColorAttributeName];
@@ -128,7 +120,7 @@
 	}
 		
 	// cache it
-	// [scopeSelectorCache setObject:attributes forKey:key];
+	[scopeSelectorCache setObject:attributes forKey:key];
 
 	return attributes;
 }
@@ -138,7 +130,7 @@
 	NSString *rgb = [defaultSettings objectForKey:colorName];
 	NSColor *color;
 	if(rgb)
-		color = [self hashRGBToColor:rgb];
+		color = [ViBundle hashRGBToColor:rgb];
 	else
 		color = defaultColor;
 	return color;
@@ -146,15 +138,21 @@
 
 - (NSColor *)backgroundColor
 {
-	if (backgroundColor == nil)
-		backgroundColor = [self colorWithName:@"background" orDefault:[[NSColor whiteColor] colorWithAlphaComponent:1.0]];
+	if (backgroundColor == nil) {
+		backgroundColor = [defaultSettings objectForKey:NSBackgroundColorAttributeName];
+		if (backgroundColor == nil)
+			backgroundColor = [[NSColor whiteColor] colorWithAlphaComponent:1.0];
+	}
 	return backgroundColor;
 }
 
 - (NSColor *)foregroundColor
 {
-	if (foregroundColor == nil)
-		foregroundColor = [self colorWithName:@"foreground" orDefault:[[NSColor blackColor] colorWithAlphaComponent:1.0]];
+	if (foregroundColor == nil) {
+		foregroundColor = [defaultSettings objectForKey:NSForegroundColorAttributeName];
+		if (foregroundColor == nil)
+			backgroundColor = [[NSColor blackColor] colorWithAlphaComponent:1.0];
+	}
 	return foregroundColor;
 }
 

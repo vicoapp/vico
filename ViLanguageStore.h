@@ -16,8 +16,8 @@
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
 - (NSArray *)allLanguageNames;
 - (NSArray *)allBundles;
-- (NSDictionary *)preferenceItems:(NSString *)prefsName;
-- (NSDictionary *)preferenceItems:(NSString *)prefsName includeAllSettings:(BOOL)includeAllSettings;
+- (NSDictionary *)preferenceItem:(NSString *)prefsName;
+- (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 
 @end

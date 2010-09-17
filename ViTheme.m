@@ -19,7 +19,7 @@
 	NSArray *preferences = [theme objectForKey:@"settings"];
 	NSDictionary *preference;
 	for (preference in preferences) {
-		if ([preference objectForKey:@"scope"] == nil) {
+		if ([preference objectForKey:@"name"] == nil) {
 			/* Settings for the default scope. */
 			defaultSettings = [preference objectForKey:@"settings"];
 			[ViBundle normalizePreference:preference intoDictionary:defaultSettings];
@@ -151,7 +151,7 @@
 	if (foregroundColor == nil) {
 		foregroundColor = [defaultSettings objectForKey:NSForegroundColorAttributeName];
 		if (foregroundColor == nil)
-			backgroundColor = [[NSColor blackColor] colorWithAlphaComponent:1.0];
+			foregroundColor = [[NSColor blackColor] colorWithAlphaComponent:1.0];
 	}
 	return foregroundColor;
 }

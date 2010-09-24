@@ -11,7 +11,7 @@ fi
 echo tag is $tag
 echo version = $version
 
-dir=build.xi-$version
+dir=build.vibrant-$version
 echo build directory is $dir
 if test -d "$dir"; then
 	echo "build dir already exists: $dir"
@@ -19,10 +19,10 @@ if test -d "$dir"; then
 fi
 
 echo checking out sources
-cvs co -r $tag -d $dir xi || exit 2
+cvs co -r $tag -d $dir vibrant || exit 2
 
 (cd $dir && ./mkdmg $version) || exit 3
 
-#scp $dir/xi-$version.dmg xi.bzero.se:/var/www/xi.bzero.se/download
-mv $dir/xi-$version.dmg .
+#scp $dir/vibrant-$version.dmg vibrant.bzero.se:/var/www/vibrant.bzero.se/download
+mv $dir/vibrant-$version.dmg .
 

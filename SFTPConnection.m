@@ -157,7 +157,7 @@ size_t num_requests = 64;
 
 - (NSData *)dataWithContentsOfFile:(NSString *)path
 {
-	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_sftp_download.XXXXXX"] fileSystemRepresentation];
+	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_sftp_download.XXXXXX"] fileSystemRepresentation];
 	char *templateFilename = strdup(tmpl);
 	int fd = mkstemp(templateFilename);
 	if (fd == -1)
@@ -196,7 +196,7 @@ size_t num_requests = 64;
 
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError
 {
-	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_sftp_upload.XXXXXX"] fileSystemRepresentation];
+	const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_sftp_upload.XXXXXX"] fileSystemRepresentation];
 	char *templateFilename = strdup(tmpl);
 	int fd = mkstemp(templateFilename);
 	if (fd == -1) {

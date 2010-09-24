@@ -174,7 +174,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 	[[NSUserDefaults standardUserDefaults] setObject:[licenseEmail stringValue] forKey:@"licenseEmail"];
 
 	if (check_license_quick(key) == 0)
-		INFO(@"license key appears ok");
+		NSLog(@"license key appears ok");
 	else
 		NSLog(@"license key not properly formed");
 

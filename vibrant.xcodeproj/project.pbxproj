@@ -14,7 +14,6 @@
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
-		9A11D6810EB473BE00A016AB /* xi.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A11D6800EB473BE00A016AB /* xi.icns */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
 		9A1E40AA0EFBA83400682D4A /* sftp-client.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A30EFBA83400682D4A /* sftp-client.c */; };
@@ -127,7 +126,7 @@
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
-			remoteInfo = xi;
+			remoteInfo = vibrant;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -139,15 +138,14 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		32DBCF750370BD2300C91783 /* xi_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xi_Prefix.pch; sourceTree = "<group>"; };
+		32DBCF750370BD2300C91783 /* vibrant_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vibrant_Prefix.pch; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8D15AC370486D014006FF6A4 /* xi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D15AC370486D014006FF6A4 /* Vibrant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vibrant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
 		9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "TB_ViewMenu-Extended.pdf"; path = "Images/TB_ViewMenu-Extended.pdf"; sourceTree = "<group>"; };
 		9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextStorage-additions.h"; sourceTree = "<group>"; };
 		9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextStorage-additions.m"; sourceTree = "<group>"; };
-		9A11D6800EB473BE00A016AB /* xi.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = xi.icns; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
 		9A1A11FE0D02C65A009EABAC /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -327,13 +325,13 @@
 		19C28FB0FE9D524F11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D15AC370486D014006FF6A4 /* xi.app */,
+				8D15AC370486D014006FF6A4 /* Vibrant.app */,
 				9AF2FE700EC9C85900C5771B /* Tests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2A37F4AAFDCFA73011CA2CEA /* xi */ = {
+		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
 				9A4BA1F8118C80CD0093E2AB /* license key support */,
@@ -352,7 +350,7 @@
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				9AF2FE710EC9C85900C5771B /* Tests-Info.plist */,
 			);
-			name = xi;
+			name = vibrant;
 			sourceTree = "<group>";
 		};
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
@@ -404,7 +402,7 @@
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				32DBCF750370BD2300C91783 /* xi_Prefix.pch */,
+				32DBCF750370BD2300C91783 /* vibrant_Prefix.pch */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 				9AB514DA0E6E7BE100DA75F1 /* logging.h */,
 			);
@@ -415,7 +413,6 @@
 			isa = PBXGroup;
 			children = (
 				9AB0178A0EDDBF8100905BED /* Images */,
-				9A11D6800EB473BE00A016AB /* xi.icns */,
 				9A70E98D0E9F68100013AA1D /* Bundles */,
 				9A70E9720E9F67B80013AA1D /* Themes */,
 				9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */,
@@ -611,9 +608,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D15AC270486D014006FF6A4 /* xi */ = {
+		8D15AC270486D014006FF6A4 /* Vibrant */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "xi" */;
+			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Vibrant" */;
 			buildPhases = (
 				9AF41B3D0EC8731B00F1D681 /* ShellScript */,
 				8D15AC2B0486D014006FF6A4 /* Resources */,
@@ -626,10 +623,10 @@
 			dependencies = (
 				9A7AF1570D99830C00F08222 /* PBXTargetDependency */,
 			);
-			name = xi;
+			name = Vibrant;
 			productInstallPath = "$(HOME)/Applications";
-			productName = xi;
-			productReference = 8D15AC370486D014006FF6A4 /* xi.app */;
+			productName = Vibrant;
+			productReference = 8D15AC370486D014006FF6A4 /* Vibrant.app */;
 			productType = "com.apple.product-type.application";
 		};
 		9AF2FE6F0EC9C85900C5771B /* Tests */ = {
@@ -656,10 +653,10 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */;
+			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "vibrant" */;
 			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 1;
-			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* xi */;
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* vibrant */;
 			projectDirPath = "";
 			projectReferences = (
 				{
@@ -669,7 +666,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				8D15AC270486D014006FF6A4 /* xi */,
+				8D15AC270486D014006FF6A4 /* Vibrant */,
 				9AF2FE6F0EC9C85900C5771B /* Tests */,
 			);
 		};
@@ -711,7 +708,6 @@
 				9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */,
 				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
 				9A70F2DA0E9F68100013AA1D /* Bundles in Resources */,
-				9A11D6810EB473BE00A016AB /* xi.icns in Resources */,
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
 				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
@@ -867,7 +863,7 @@
 		};
 		9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8D15AC270486D014006FF6A4 /* xi */;
+			target = 8D15AC270486D014006FF6A4 /* Vibrant */;
 			targetProxy = 9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -928,7 +924,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vibrant.app/Contents/MacOS/Vibrant";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -949,7 +945,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Tests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibrant.app/Contents/MacOS/Vibrant";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -958,7 +954,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vibrant.app/Contents/MacOS/Vibrant";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
@@ -978,7 +974,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Tests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/xi.app/Contents/MacOS/xi";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibrant.app/Contents/MacOS/Vibrant";
 				WRAPPER_EXTENSION = octest;
 				ZERO_LINK = NO;
 			};
@@ -991,14 +987,14 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/PSMTabBarControl/build/Release\"",
+					"\"$(SRCROOT)/PSMTabBarControl/build/$BUILD_STYLE\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = xi_Prefix.pch;
+				GCC_PREFIX_HEADER = vibrant_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1008,7 +1004,7 @@
 					"-lcrypto",
 					"-lresolv",
 				);
-				PRODUCT_NAME = xi;
+				PRODUCT_NAME = Vibrant;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -1021,11 +1017,11 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/PSMTabBarControl/build/Release\"",
+					"\"$(SRCROOT)/PSMTabBarControl/build/$BUILD_STYLE\"",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = xi_Prefix.pch;
+				GCC_PREFIX_HEADER = vibrant_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1035,7 +1031,7 @@
 					"-lcrypto",
 					"-lresolv",
 				);
-				PRODUCT_NAME = xi;
+				PRODUCT_NAME = Vibrant;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1146,7 +1142,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "xi" */ = {
+		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Vibrant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05733C808A9546B00998B17 /* Debug */,
@@ -1155,7 +1151,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "xi" */ = {
+		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "vibrant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05733CC08A9546B00998B17 /* Debug */,

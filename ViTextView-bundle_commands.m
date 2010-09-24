@@ -210,7 +210,7 @@
 	NSString *shellCommand = [command objectForKey:@"command"];
 //	if ([shellCommand hasPrefix:@"#!"])
 	{
-		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"xi_cmd.XXXXXX"] fileSystemRepresentation];
+		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_cmd.XXXXXX"] fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
 		templateFilename = strdup(tmpl);
 		fd = mkstemp(templateFilename);

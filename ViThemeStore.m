@@ -56,7 +56,7 @@
 		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/xi/Themes" stringByExpandingTildeInPath]];
+		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/vibrant/Themes" stringByExpandingTildeInPath]];
 	}
 	return self;
 }

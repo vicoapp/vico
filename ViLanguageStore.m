@@ -98,7 +98,7 @@ static ViLanguageStore *defaultStore = nil;
 	[self addBundlesFromBundleDirectory:@"/Library/Application Support/TextMate/Bundles"];
 #endif
 	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/xi/Bundles" stringByExpandingTildeInPath]];
+	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/vibrant/Bundles" stringByExpandingTildeInPath]];
 	DEBUG(@"finished initializing languages");
 }
 

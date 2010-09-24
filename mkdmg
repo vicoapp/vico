@@ -6,11 +6,11 @@ if test -z "$VERSION"; then
 	exit 2
 fi
 
-echo "Building xi version $VERSION"
+echo "Building vibrant version $VERSION"
 
-xcodebuild -project xi.xcodeproj -target xi -configuration Release clean build VERSION=$VERSION || exit
+xcodebuild -project vibrant.xcodeproj -target vibrant -configuration Release clean build VERSION=$VERSION || exit
 
-TMPDMG=xi-tmp.dmg
+TMPDMG=vibrant-tmp.dmg
 /bin/rm -f $TMPDMG
 
 die()
@@ -21,12 +21,12 @@ die()
     exit 1
 }
 
-APP=build/Release/xi.app
+APP=build/Release/vibrant.app
 
 echo "Stripping binary"
-strip $APP/Contents/MacOS/xi
+strip $APP/Contents/MacOS/vibrant
 
-VOL="xi-$VERSION"
+VOL="vibrant-$VERSION"
 echo "Creating disk image $VOL"
 
 # clean up if we're interrupted

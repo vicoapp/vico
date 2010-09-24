@@ -9,11 +9,41 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>????</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>sh</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Shell script</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>patch</string>
 				<string>diff</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Patch File</string>
 			<key>CFBundleTypeRole</key>
@@ -31,8 +61,6 @@
 				<string>tex</string>
 				<string>sty</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>TeX document</string>
 			<key>CFBundleTypeRole</key>
@@ -49,8 +77,6 @@
 			<array>
 				<string>lua</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Lua source</string>
 			<key>CFBundleTypeRole</key>
@@ -68,8 +94,6 @@
 				<string>pl</string>
 				<string>pm</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Perl source</string>
 			<key>CFBundleTypeRole</key>
@@ -86,8 +110,6 @@
 			<array>
 				<string>py</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Python source</string>
 			<key>CFBundleTypeRole</key>
@@ -106,8 +128,6 @@
 				<string>rhtml</string>
 				<string>builder</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Ruby on Rails source</string>
 			<key>CFBundleTypeRole</key>
@@ -124,8 +144,6 @@
 			<array>
 				<string>rb</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Ruby source</string>
 			<key>CFBundleTypeRole</key>
@@ -143,8 +161,6 @@
 				<string>txt</string>
 				<string>text</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Text document</string>
 			<key>CFBundleTypeRole</key>
@@ -163,8 +179,6 @@
 				<string>markdown</string>
 				<string>mdown</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Markdown source</string>
 			<key>CFBundleTypeRole</key>
@@ -181,8 +195,6 @@
 			<array>
 				<string>php</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>PHP source</string>
 			<key>CFBundleTypeRole</key>
@@ -199,8 +211,6 @@
 			<array>
 				<string>css</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>CSS source</string>
 			<key>CFBundleTypeRole</key>
@@ -215,12 +225,10 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>html</string>
+				<string>htm</string>
 				<string>html</string>
 				<string>shtml</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>HTML source</string>
 			<key>CFBundleTypeRole</key>
@@ -237,8 +245,6 @@
 			<array>
 				<string>mm</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Objective-C++ source</string>
 			<key>CFBundleTypeRole</key>
@@ -262,8 +268,6 @@
 				<string>hpp</string>
 				<string>hxx</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>C++ source</string>
 			<key>CFBundleTypeRole</key>
@@ -280,8 +284,6 @@
 			<array>
 				<string>m</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>Objective-C source</string>
 			<key>CFBundleTypeRole</key>
@@ -299,8 +301,6 @@
 				<string>c</string>
 				<string>h</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
 			<key>CFBundleTypeName</key>
 			<string>C source</string>
 			<key>CFBundleTypeRole</key>
@@ -315,25 +315,7 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>*</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>xi</string>
-			<key>CFBundleTypeName</key>
-			<string>Document</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>????</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>ViDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>xiproject</string>
+				<string>viproj</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Project</string>
@@ -349,10 +331,8 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>xi</string>
 	<key>CFBundleIdentifier</key>
-	<string>se.bzero.xi</string>
+	<string>se.bzero.vibrant</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -360,7 +340,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
-	<string>XIED</string>
+	<string>VIBR</string>
 	<key>CFBundleVersion</key>
 	<string>${VERSION}</string>
 	<key>NSMainNibFile</key>

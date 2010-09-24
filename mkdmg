@@ -8,7 +8,7 @@ fi
 
 echo "Building vibrant version $VERSION"
 
-xcodebuild -project vibrant.xcodeproj -target vibrant -configuration Release clean build VERSION=$VERSION || exit
+xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release clean build VERSION=$VERSION || exit
 
 TMPDMG=vibrant-tmp.dmg
 /bin/rm -f $TMPDMG
@@ -21,10 +21,10 @@ die()
     exit 1
 }
 
-APP=build/Release/vibrant.app
+APP=build/Release/Vibrant.app
 
 echo "Stripping binary"
-strip $APP/Contents/MacOS/vibrant
+strip $APP/Contents/MacOS/Vibrant
 
 VOL="vibrant-$VERSION"
 echo "Creating disk image $VOL"

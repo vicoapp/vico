@@ -80,7 +80,10 @@ ToolbarHeightForWindow(NSWindow *window)
 #endif
 
 	// Load last viewed pane
-	[self switchToItem:[[NSUserDefaults standardUserDefaults] objectForKey:@"lastPrefPane"]];
+	NSString *lastPrefPane = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastPrefPane"];
+	if (lastPrefPane == nil)
+		lastPrefPane = @"GeneralItem";
+	[self switchToItem:lastPrefPane];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"fontsize"

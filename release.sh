@@ -19,10 +19,8 @@ if test -d "$dir"; then
 fi
 
 echo checking out sources
-cvs co -r $tag -d $dir vibrant || exit 2
+hg clone . "$dir" || exit 2
 
 (cd $dir && ./mkdmg $version) || exit 3
 
-#scp $dir/vibrant-$version.dmg vibrant.bzero.se:/var/www/vibrant.bzero.se/download
 mv $dir/vibrant-$version.dmg .
-

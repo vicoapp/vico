@@ -39,7 +39,7 @@
 			[NSNumber numberWithBool:NO], @"expandtabs",
 			[NSNumber numberWithBool:YES], @"number",
 			[NSNumber numberWithBool:YES], @"autocollapse",
-			[NSNumber numberWithBool:YES], @"hidetab",
+			[NSNumber numberWithBool:NO], @"hidetab",
 			[NSNumber numberWithBool:YES], @"searchincr",
 			[NSNumber numberWithBool:NO], @"showguide",
 			[NSNumber numberWithBool:NO], @"wrap",

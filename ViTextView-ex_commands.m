@@ -130,7 +130,7 @@
 		@"number", @"numb",
 		@"autocollapse", @"ac",  // automatically collapses other documents in the symbol list
 		@"hidetab", @"ht",  // hide tab bar for single tabs
-		@"fontsize", @"fontsize",
+		@"fontsize", @"fs",
 		@"fontname", @"font",
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",

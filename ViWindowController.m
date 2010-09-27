@@ -1275,9 +1275,7 @@ static NSWindowController	*currentWindowController = nil;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
 	if ([item isKindOfClass:[ViDocument class]])
-	{
 		return [[(ViDocument *)item filteredSymbols] count] > 0 ? YES : NO;
-	}
 	return NO;
 }
 
@@ -1304,18 +1302,26 @@ static NSWindowController	*currentWindowController = nil;
 	return NO;
 }
 
+- (BOOL)isSeparatorItem:(id)item
+{
+	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+		return YES;
+	return NO;
+}
+
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
+	if ([self isSeparatorItem:item])
+		return 9;
 	if ([self outlineView:outlineView isGroupItem:item])
 		return 20;
 	return 15;
 }
 
-
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	NSCell *cell;
-	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+	if ([self isSeparatorItem:item])
 		cell = separatorCell;
 	else
 		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];
@@ -1330,9 +1336,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
-	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
-		return NO;
-	return YES;
+	return ![self isSeparatorItem:item];
 }
 
 @end

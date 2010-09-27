@@ -4,10 +4,13 @@
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-	[[NSColor lightGrayColor] set];
+	[[NSColor colorWithCalibratedWhite:2.0/3.0 alpha:0.5] set];
 	NSBezierPath *path = [[NSBezierPath alloc] init];
-	[path moveToPoint:NSMakePoint(NSMinX(cellFrame) + 10, NSMinY(cellFrame) + NSHeight(cellFrame)/2)];
-	[path lineToPoint:NSMakePoint(NSMinX(cellFrame) + NSWidth(cellFrame) - 20, NSMinY(cellFrame) + NSHeight(cellFrame)/2)];
+	CGFloat x = 2; //NSMinX(cellFrame);
+	CGFloat y = NSMinY(cellFrame) + NSHeight(cellFrame)/2.0;
+	[path moveToPoint:NSMakePoint(x, y)];
+	[path lineToPoint:NSMakePoint(NSWidth([controlView frame]) - 2, y)];
+	[path setLineWidth:0];
 	[path stroke];
 }
 

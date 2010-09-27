@@ -102,9 +102,22 @@
 	[wc closeDocument:[wc currentDocument]];
 }
 
+- (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(NSArray *)extensions
+{
+	[openPanel setCanChooseDirectories:YES];
+	return [super runModalOpenPanel:openPanel forTypes:extensions];
+}
+
 - (NSString *)typeForContentsOfURL:(NSURL *)inAbsoluteURL error:(NSError **)outError
 {
+	BOOL isDirectory;
+	if ([inAbsoluteURL isFileURL] &&
+	    [[NSFileManager defaultManager] fileExistsAtPath:[inAbsoluteURL path]
+						 isDirectory:&isDirectory] &&
+	    isDirectory)
+		return @"Project";
 	return @"Document";
 }
 
 @end
+

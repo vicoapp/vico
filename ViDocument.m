@@ -20,7 +20,6 @@
 BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
-- (void)setSymbolScopes;
 - (void)resetTypingAttributes;
 - (void)configureLanguage:(ViLanguage *)aLanguage;
 - (void)highlightEverything;
@@ -401,7 +400,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	if (aLanguage != language) {
 		language = aLanguage;
-		[self setSymbolScopes];
+		symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
+		symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self highlightEverything];
 	}
 }
@@ -737,12 +737,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[fs addObject:s];
 	[self setFilteredSymbols:fs];
 	return [fs count];
-}
-
-- (void)setSymbolScopes
-{
-	symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
-	symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
 }
 
 - (void)updateSymbolList:(NSTimer *)timer

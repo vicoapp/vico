@@ -4,5 +4,4 @@
 
 @interface NSString (scopeSelector)
 - (u_int64_t)matchesScopes:(NSArray *)scopes;
-- (u_int64_t)scopePartRankAtDepth:(int)depth;
 @end

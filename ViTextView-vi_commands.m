@@ -3,6 +3,7 @@
 #import "ViMark.h"
 #import "ViJumpList.h"
 #import "NSTextStorage-additions.h"
+#import "NSString-scopeSelector.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -213,12 +214,19 @@
                 return NO;
         }
 
-        // special case: check if inside a string
+        /* Special case: check if inside a string or comment. */
 	NSArray *openingScopes = [self scopesAtLocation:openingRange.location];
-        BOOL inString = [[openingScopes lastObject] hasPrefix:@"string"];
-        NSRange scopeRange;
-        if (inString)
-        	scopeRange = [self trackScopes:openingScopes atLocation:openingRange.location];
+	BOOL inSpecialScope;
+        NSRange specialScopeRange;
+
+	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
+        if (inSpecialScope)
+        	specialScopeRange = [self trackScopeSelector:@"string" atLocation:openingRange.location];
+	else {
+		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
+		if (inSpecialScope)
+			specialScopeRange = [self trackScopeSelector:@"comment" atLocation:openingRange.location];
+	}
 
         // lookup the matching character and prepare search
         NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
@@ -232,8 +240,8 @@
 		// search forward
                 otherChar = [parens characterAtIndex:r.location + 1];
                 startOffset = openingRange.location + 1;
-                if (inString)
-                	endOffset = NSMaxRange(scopeRange);
+                if (inSpecialScope)
+                	endOffset = NSMaxRange(specialScopeRange);
                 else
                         endOffset = [[[self textStorage] string] length];
         }
@@ -242,8 +250,8 @@
 		// search backwards
                 otherChar = [parens characterAtIndex:r.location - 1];
 		startOffset = openingRange.location - 1;
-		if (inString)
-			endOffset = scopeRange.location;
+		if (inSpecialScope)
+			endOffset = specialScopeRange.location;
                 delta = -1;
         }
 
@@ -255,12 +263,12 @@
         	unichar c = [[[self textStorage] string] characterAtIndex:offset];
         	if (c == matchChar || c == otherChar)
                 {
-			// ignore match if scopes don't match
-			if (!inString)
-                        {
+			/* Ignore match if scopes don't match. */
+			if (!inSpecialScope) {
                                 NSArray *scopes = [self scopesAtLocation:offset];
-                                if ([[scopes lastObject] hasPrefix:@"string"])
-                                        continue;
+				if ([@"string"  matchesScopes:scopes] > 0 ||
+				    [@"comment" matchesScopes:scopes] > 0)
+					continue;
                         }
 
 			if (c == matchChar)
@@ -1611,7 +1619,8 @@
 	NSUInteger location = start_location;
 	if ([self selectedRange].length > 0)
 		location = start_location + 1;
-	NSRange range = [self trackScopes:[self scopesAtLocation:location] atLocation:location];
+	NSString *selector = [[self scopesAtLocation:location] componentsJoinedByString:@" "];
+	NSRange range = [self trackScopeSelector:selector atLocation:location];
 
 	visual_start_location = start_location = range.location;
 	final_location = end_location = NSMaxRange(range) - 1;

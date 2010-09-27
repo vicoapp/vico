@@ -89,7 +89,9 @@
 				}
 			}
 
-			NSMenuItem *subitem = [submenu addItemWithTitle:[command objectForKey:@"name"] action:@selector(performBundleCommand:) keyEquivalent:keyEquiv];
+			NSMenuItem *subitem = [submenu addItemWithTitle:[command objectForKey:@"name"]
+								 action:@selector(performBundleCommand:)
+							  keyEquivalent:keyEquiv];
 			[subitem setKeyEquivalentModifierMask:modMask];
 			[subitem setRepresentedObject:command];
 		}

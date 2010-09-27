@@ -351,11 +351,6 @@
 #endif
 }
 
-- (void)updateScopeRanges
-{
-	[self updateScopeRangesInRange:NSMakeRange(0, [scopeArray count])];
-}
-
 #pragma mark -
 #pragma mark Syntax parsing
 

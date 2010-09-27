@@ -1020,24 +1020,27 @@ int logIndent = 0;
 		/*
 		 * Check if we're inserting the end character of a smart typing pair.
 		 * If so, just overwrite the end character.
+		 * Note: start and end characters might be the same (eg, "").
 		 */
-		if ([[pair objectAtIndex:1] isEqualToString:characters]) {
-			if ([[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]]) {
-				if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-							    atCharacterIndex:start_location
-							      effectiveRange:NULL]) {
-					foundSmartTypingPair = YES;
-					final_location = start_location + 1;
-				}
-				break;
+		if ([characters isEqualToString:[pair objectAtIndex:1]] &&
+		    [[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)] isEqualToString:[pair objectAtIndex:1]]) {
+			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+						    atCharacterIndex:start_location
+						      effectiveRange:NULL]) {
+				foundSmartTypingPair = YES;
+				final_location = start_location + 1;
 			}
+			break;
 		}
 		// check for the start character of a smart typing pair
-		else if ([[pair objectAtIndex:0] isEqualToString:characters])
-		{
-			// don't use it if next character is alphanumeric
+		else if ([characters isEqualToString:[pair objectAtIndex:0]]) {
+			/*
+			 * Only use if next character is not alphanumeric.
+			 * FIXME: ...and next character is not any start character of a smart pair?
+			 */
+			unichar next_char = [[[self textStorage] string] characterAtIndex:start_location];
 			if (start_location + 1 >= [[self textStorage] length] ||
-			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[[self textStorage] string] characterAtIndex:start_location]])
+			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:next_char])
 			{
 				foundSmartTypingPair = YES;
 				[self insertString:[NSString stringWithFormat:@"%@%@",
@@ -1061,7 +1064,6 @@ int logIndent = 0;
 	if (!foundSmartTypingPair) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
-//		[self setCaret:start_location + 1];
 		final_location = start_location + 1;
 	}
 

@@ -11,11 +11,10 @@
 			<string key="NS.object.0">788</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100153"/>
-			<integer value="100348"/>
-			<integer value="100399"/>
-			<integer value="100325"/>
 			<integer value="100250"/>
+			<integer value="100348"/>
+			<integer value="100153"/>
+			<integer value="100399"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1709,6 +1708,14 @@
 					</object>
 					<int key="connectionID">100459</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">mainView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="68674080"/>
+					</object>
+					<int key="connectionID">100460</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2465,7 +2472,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100459</int>
+			<int key="maxID">100460</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2707,6 +2714,7 @@
 						<string key="documentView">NSView</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="languageButton">NSPopUpButton</string>
+						<string key="mainView">NSView</string>
 						<string key="messageField">NSTextField</string>
 						<string key="projectDelegate">ProjectDelegate</string>
 						<string key="projectResizeView">NSImageView</string>
@@ -2738,6 +2746,10 @@
 						<object class="IBToOneOutletInfo" key="languageButton">
 							<string key="name">languageButton</string>
 							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mainView">
+							<string key="name">mainView</string>
+							<string key="candidateClassName">NSView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="messageField">
 							<string key="name">messageField</string>

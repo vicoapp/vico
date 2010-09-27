@@ -14,8 +14,9 @@
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;
-	IBOutlet NSView *documentView;
+	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
+	IBOutlet NSView *documentView;
 
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSTextField *messageField;

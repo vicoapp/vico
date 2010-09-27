@@ -1012,7 +1012,6 @@ static NSWindowController	*currentWindowController = nil;
         if ([[NSFileManager defaultManager] fileExistsAtPath:p isDirectory:&isDirectory] && isDirectory)
         {
                 currentDirectory = p;
-                INFO(@"setting current directory to %@", currentDirectory);
                 return YES;
         }
         else

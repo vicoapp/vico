@@ -9,6 +9,7 @@
 @class ProjectDelegate;
 @class ViResizeView;
 @class ViJumpList;
+@class ViProject;
 
 @interface ViWindowController : NSWindowController // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
@@ -29,6 +30,8 @@
 	ViDocument *selectedDocument;
 	ViDocument *mostRecentDocument;
 	ViDocumentView *mostRecentView;
+
+	ViProject *project;
 
 	// command output view
 	IBOutlet NSTextField *statusbar;
@@ -58,6 +61,7 @@
 @property(readwrite, assign) ViDocument *selectedDocument;
 @property(readonly) NSTextField *statusbar;
 @property(readonly) NSTextField *messageField;
+@property(readwrite, assign) ViProject *project;
 
 @property(readonly) NSString *currentDirectory;
 - (BOOL)changeCurrentDirectory:(NSString *)path;

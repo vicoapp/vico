@@ -1,6 +1,7 @@
 #import "ViWindowController.h"
 #import <PSMTabBarControl/PSMTabBarControl.h>
 #import "ViDocument.h"
+#import "ViProject.h"
 #import "ProjectDelegate.h"
 #import "ViSymbol.h"
 #import "ViSeparatorCell.h"
@@ -27,6 +28,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize statusbar;
 @synthesize messageField;
 @synthesize currentDirectory;
+@synthesize project;
 
 + (id)currentWindowController
 {
@@ -124,6 +126,9 @@ static NSWindowController	*currentWindowController = nil;
 
 	[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
 	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
+
+	if ([self project] != nil)
+		[projectDelegate addURL:[[self project] initialURL]];
 }
 
 - (void)setSelectedLanguage:(NSString *)aLanguage
@@ -287,14 +292,11 @@ static NSWindowController	*currentWindowController = nil;
 	if (mostRecentDocument == aDocument)
 		return;
 
-	NSView *superView = [[mostRecentView view] superview];
-
 	// create a new document view
 	ViDocumentView *docView = [aDocument makeView];
 
 	// add the new view
-	if (mostRecentView == nil)
-	{
+	if (mostRecentView == nil) {
 		NSRect frame = [documentView frame];
 		frame.origin = NSMakePoint(0, 0);
 		NSSplitView *split = [[NSSplitView alloc] initWithFrame:frame];
@@ -303,10 +305,9 @@ static NSWindowController	*currentWindowController = nil;
 		[split addSubview:[docView view]];
 		[split adjustSubviews];
 		[documentView addSubview:split];
-	}
-	else
-	{
+	} else {
 		[mostRecentDocument removeView:mostRecentView];
+		NSView *superView = [[mostRecentView view] superview];
 		[superView replaceSubview:[mostRecentView view] with:[docView view]];
 		mostRecentView = nil;
 	}
@@ -354,47 +355,39 @@ static NSWindowController	*currentWindowController = nil;
 		[self collapseDocumentView:[[document views] objectAtIndex:0]];
 
 	[tabBar removeDocument:document];
-	if (lastDocument == document)
-	{
+	if (lastDocument == document) {
 		lastDocument = nil;
 		lastDocumentView = nil;
 	}
 
 	[documents removeObject:document];
 
-	if ([documents count] == 0)
-	{
-		[[self window] close];
-	}
-	else
-	{
-		/* Reset the most recent document and view.
-		 */
-		mostRecentView = nil;
-		mostRecentDocument = nil;
+	/* Reset the most recent document and view.
+	 */
+	mostRecentView = nil;
+	mostRecentDocument = nil;
 
+	if ([documents count] == 0) {
+		if ([self project] == nil)
+			[[self window] close];
+	} else {
 		BOOL foundVisibleView = NO;
-		if (lastDocument && lastDocument != document)
-		{
+		if (lastDocument && lastDocument != document) {
 			[self switchToLastDocument];
 			foundVisibleView = YES;
 		}
-		
-		if (!foundVisibleView)
-		{
-			for (document in documents)
-			{
-				if ([document visibleViews] > 0)
-				{
+
+		if (!foundVisibleView) {
+			for (document in documents) {
+				if ([document visibleViews] > 0) {
 					[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
 					foundVisibleView = YES;
 					break;
 				}
 			}
 		}
-		
-		if (!foundVisibleView)
-		{
+
+		if (!foundVisibleView) {
 			// no visible view found, make one
 			[self selectDocument:[documents objectAtIndex:0]];
 		}
@@ -414,11 +407,19 @@ static NSWindowController	*currentWindowController = nil;
  */
 - (void)closeDocument:(ViDocument *)document
 {
+	if (document == nil && [[self documents] count] == 0) {
+		mostRecentView = nil;
+		mostRecentDocument = nil;
+		[[self project] close];
+		[[self window] close];
+		return;
+	}
+
 	if ([document visibleViews] > 0)
 		[self setMostRecentDocument:document view:[[document views] objectAtIndex:0]];
 	else
 		[self selectDocument:document];
-	
+
 	[document canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:NULL];
 }
 
@@ -490,11 +491,11 @@ static NSWindowController	*currentWindowController = nil;
 
 - (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
 {
-#if 0
-	NSString *projName = [projectDelegate projectName];
+	NSString *projName = [[self project] displayName];
+	if ([self currentDocument] == nil)
+		return projName;
 	if (projName)
 		return [NSString stringWithFormat:@"%@ - %@", displayName, projName];
-#endif
 	return displayName;
 }
 

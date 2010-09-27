@@ -7,9 +7,9 @@
 @interface ProjectDelegate (private)
 - (NSMutableArray *)childrenAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
 - (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes;
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
@@ -26,6 +26,9 @@
 	if (self) {
 		rootItems = [[NSMutableArray alloc] init];
 		skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+
+		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
 	}
 	return self;
 }
@@ -66,7 +69,7 @@
 	return children;
 }
 
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL
 {
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	NSArray *entries = [conn directoryContentsAtPath:[url path]];
@@ -74,47 +77,62 @@
 	for (entry in entries) {
 		NSString *file = [entry filename];
 		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
-			NSURL *newurl = [[NSURL alloc] initWithScheme:[url scheme] host:[conn target] path:[[url path] stringByAppendingPathComponent:file]];
-			[children addObject:[self itemAtSftpURL:newurl connection:conn attributes:[entry attributes]]];
+			NSURL *childURL = [[NSURL alloc] initWithScheme:[url scheme] host:[conn target] path:[[url path] stringByAppendingPathComponent:file]];
+			[children addObject:[self itemAtSftpURL:childURL connection:conn rootURL:rootURL attributes:[entry attributes]]];
 		}
 	}
 	return children;
 }
 
+- (NSString *)relativePathForItem:(NSDictionary *)item
+{
+        NSString *root = [[item objectForKey:@"root"] path];
+        NSString *path = [[item objectForKey:@"url"] path];
+        if ([path length] > [root length])
+                return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
+        return path;
+}
+
+- (NSMutableDictionary *)itemAtURL:(NSURL *)url rootURL:(NSURL *)rootURL
+{
+	NSMutableDictionary *item = [NSMutableDictionary dictionaryWithObjectsAndKeys:url, @"url", rootURL, @"root", nil];
+	NSString *relpath = [self relativePathForItem:item];
+	[item setObject:relpath forKey:@"relpath"];
+	[item setObject:[relpath stringByDeletingLastPathComponent] forKey:@"reldir"];
+	[item setObject:[[url path] lastPathComponent] forKey:@"name"];
+
+	return item;
+}
+
 - (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSMutableDictionary *item = [self itemAtURL:url rootURL:rootURL];
+
 	BOOL isDirectory = NO;
-	if ([fm fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory) {
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory) {
 		NSMutableArray *children = [self childrenAtFileURL:url rootURL:rootURL];
-		NSMutableDictionary *root = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			url, @"url",
-			children, @"children",
-			rootURL, @"root",
-			nil];
-		return root;
+		[item setObject:children forKey:@"children"];
 	}
-	return [NSMutableDictionary dictionaryWithObjectsAndKeys:url, @"url", rootURL, @"root", nil];
+
+	return item;
 }
 
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn attributes:(Attrib *)attributes
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes
 {
+	NSMutableDictionary *item = [self itemAtURL:url rootURL:rootURL];
+
 	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm)) {
 		// It's a directory
-		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn];
-		NSMutableDictionary *root = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			url, @"url",
-			children, @"children",
-			nil];
-		return root;
+		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn rootURL:rootURL];
+		[item setObject:children forKey:@"children"];
 	}
 
-	return [NSMutableDictionary dictionaryWithObject:url forKey:@"url"];
+	return item;
 }
 
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL
 {
-	return [self itemAtSftpURL:url connection:conn attributes:[conn stat:[url path]]];
+	return [self itemAtSftpURL:url connection:conn rootURL:rootURL attributes:[conn stat:[url path]]];
 }
 
 - (id)addFileURL:(NSURL *)url
@@ -129,7 +147,7 @@
 	NSString *target = [NSString stringWithFormat:@"%@@%@", [url user] ?: @"", [url host]];
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
 	if (conn) {
-		id item = [self itemAtSftpURL:url connection:conn];
+		id item = [self itemAtSftpURL:url connection:conn rootURL:url];
 		if (item)
 			[rootItems addObject:item];
                 return item;
@@ -140,7 +158,6 @@
 - (void)addURL:(NSURL *)aURL
 {
 	if ([rootItems indexOfObject:aURL] == NSNotFound) {
-		INFO(@"scheme = %@", [aURL scheme]);
 		id item = nil;
 		if ([[aURL scheme] isEqualToString:@"file"])
 			item = [self addFileURL:aURL];
@@ -242,7 +259,6 @@
 
 - (IBAction)addSFTPLocation:(id)sender
 {
-	INFO(@"sender = %@, views = %@", sender, sftpConnectView);
 	[NSApp beginSheet:sftpConnectView modalForWindow:window modalDelegate:self didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
@@ -330,45 +346,155 @@
 	[delegate focusEditor];
 }
 
-- (void)expandItems:(NSArray *)items intoArray:(NSMutableArray *)expandedArray filter:(ViRegexp *)rx
+- (void)markItem:(NSMutableDictionary *)item withFileMatch:(ViRegexpMatch *)fileMatch pathMatch:(ViRegexpMatch *)pathMatch
 {
-        NSDictionary *item;
-        for (item in items) {
-                if ([self outlineView:explorer isItemExpandable:item])
-                        [self expandItems:[item objectForKey:@"children"] intoArray:expandedArray filter:rx];
-                else if ([rx matchInString:[[item objectForKey:@"url"] path]])
-                        [expandedArray addObject:item];
-        }
+	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:[item objectForKey:@"relpath"]];
+
+	NSUInteger i;
+	for (i = 1; i <= [pathMatch count]; i++) {
+		NSRange range = [pathMatch rangeOfSubstringAtIndex:i];
+		if (range.length > 0)
+			[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
+	}
+
+	NSUInteger offset = [[item objectForKey:@"relpath"] length] - [[item objectForKey:@"name"] length];
+
+	for (i = 1; i <= [fileMatch count]; i++) {
+		NSRange range = [fileMatch rangeOfSubstringAtIndex:i];
+		if (range.length > 0) {
+			range.location += offset;
+			[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
+		}
+	}
+
+	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
+
+	[item setObject:s forKey:@"match"];
+}
+
+/* From fuzzy_file_finder.rb by Jamis Buck (public domain).
+ *
+ * Determine the score of this match.
+ * 1. fewer "inside runs" (runs corresponding to the original pattern)
+ *    is better.
+ * 2. better coverage of the actual path name is better
+ */
+- (double)scoreForMatch:(ViRegexpMatch *)match inSegments:(int)nsegments
+{
+	NSUInteger totalLength = [match rangeOfMatchedString].length;
+
+	NSUInteger insideLength = 0;
+	NSUInteger i;
+	for (i = 1; i < [match count]; i++)
+		insideLength += [match rangeOfSubstringAtIndex:i].length;
+
+	double run_ratio = ([match count] == 1) ? 1 : (double)nsegments / (double)([match count] - 1);
+	double char_ratio = (insideLength == 0 || totalLength == 0) ? 1 : (double)insideLength / (double)totalLength;
+
+	return run_ratio * char_ratio;
+}
+
+- (void)expandItems:(NSArray *)items
+	  intoArray:(NSMutableArray *)expandedArray
+	 pathRx:(ViRegexp *)pathRx
+	 fileRx:(ViRegexp *)fileRx
+{
+	NSString *reldir = nil;
+	ViRegexpMatch *pathMatch ;
+	double pathScore;
+
+	NSMutableDictionary *item;
+	for (item in items) {
+		if ([self outlineView:explorer isItemExpandable:item])
+			[self expandItems:[item objectForKey:@"children"] intoArray:expandedArray pathRx:pathRx fileRx:fileRx];
+		else {
+			if (reldir == nil) {
+				reldir = [item objectForKey:@"reldir"];
+				if ((pathMatch = [pathRx matchInString:reldir]) != nil) {
+					pathScore = [self scoreForMatch:pathMatch inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
+					// INFO(@"path %@ = %lf, total Length = %u", reldir, pathScore, (unsigned)[pathMatch rangeOfMatchedString].length);
+				}
+			}
+
+			if (pathMatch != nil) {
+				NSString *name = [item objectForKey:@"name"];
+				ViRegexpMatch *fileMatch;
+				if ((fileMatch = [fileRx matchInString:name]) != nil) {
+					double fileScore = [self scoreForMatch:fileMatch inSegments:1];
+					// INFO(@"%@ = %lf * %lf = %lf", [item objectForKey:@"relpath"], pathScore, fileScore, pathScore * fileScore);
+
+					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
+					[item setObject:[NSNumber numberWithDouble:pathScore * fileScore] forKey:@"score"];
+					[expandedArray addObject:item];
+				}
+			}
+		}
+	}
+}
+
+- (void)appendFilter:(NSString *)filter toPattern:(NSMutableString *)pattern
+{
+	NSUInteger i;
+	for (i = 0; i < [filter length]; i++) {
+		unichar c = [filter characterAtIndex:i];
+		if (i != 0)
+			[pattern appendString:@"[^/]*?"];
+		[pattern appendFormat:@"(%s%C)", c == '.' ? "\\" : "", c];
+	}
+}
+
+static NSInteger
+sort_by_score(id a, id b, void *context)
+{
+	double a_score = [[(NSDictionary *)a objectForKey:@"score"] doubleValue];
+	double b_score = [[(NSDictionary *)b objectForKey:@"score"] doubleValue];
+
+	if (a_score < b_score)
+		return NSOrderedDescending;
+	else if (a_score > b_score)
+		return NSOrderedAscending;
+	return NSOrderedSame;
 }
 
 - (IBAction)filterFiles:(id)sender
 {
-	INFO(@"sender = %@", sender);
 	NSString *filter = [filterField stringValue];
 
 	if ([filter length] == 0)
                 filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
 	else {
-                NSMutableString *pattern = [NSMutableString string];
-                int i;
-                for (i = 0; i < [filter length]; i++)
-                        [pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
-                [pattern appendString:@".*"];
-                //NSString *pattern = [NSString stringWithFormat:@".*%@.*", filter];
-                INFO(@"using filter pattern %@", pattern);
-                ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
-        
+		NSArray *components = [filter componentsSeparatedByString:@"/"];
+
+		NSMutableString *pathPattern = [NSMutableString string];
+		[pathPattern appendString:@"^.*?"];
+		NSUInteger i;
+		for (i = 0; i < [components count] - 1; i++) {
+			if (i != 0)
+				[pathPattern appendString:@".*?/.*?"];
+			[self appendFilter:[components objectAtIndex:i] toPattern:pathPattern];
+		}
+		[pathPattern appendString:@".*?$"];
+                ViRegexp *pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
+
+                NSMutableString *filePattern = [NSMutableString string];
+		[filePattern appendString:@"^.*?"];
+		[self appendFilter:[components lastObject] toPattern:filePattern];
+		[filePattern appendString:@".*$"];
+                ViRegexp *fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
+
                 filteredItems = [[NSMutableArray alloc] init];
-                [self expandItems:rootItems intoArray:filteredItems filter:rx];
+                [self expandItems:rootItems intoArray:filteredItems pathRx:pathRx fileRx:fileRx];
+
+		[filteredItems sortUsingFunction:sort_by_score context:nil];
         }
         [explorer reloadData];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
 #pragma mark -
 
 - (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
-	INFO(@"sender = %@, selector = %s", sender, aSelector);
 	if (aSelector == @selector(insertNewline:)) { // enter
 		NSIndexSet *set = [explorer selectedRowIndexes];
 		if ([set count] == 0)
@@ -436,27 +562,18 @@
 	return [[item objectForKey:@"children"] count];
 }
 
-- (NSString *)relativePathForItem:(NSDictionary *)item
-{
-        NSString *root = [[item objectForKey:@"root"] path];
-        NSString *path = [[item objectForKey:@"url"] path];
-        if ([path length] > [root length])
-                return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
-        return path;
-}
-
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-	if ([[filterField stringValue] length] > 0)
-                return [self relativePathForItem:item];
-        else
-                return [[[item objectForKey:@"url"] path] lastPathComponent];
+	if ([[filterField stringValue] length] > 0) {
+		id match = [item objectForKey:@"match"];
+		return match ?: [item objectForKey:@"relpath"];
+        } else
+                return [item objectForKey:@"name"];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
 	return NO;
-	// return [filteredItems indexOfObject:item] != NSNotFound;
 }
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item

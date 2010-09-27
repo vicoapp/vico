@@ -14,6 +14,7 @@
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;
 
+	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
 	NSMutableArray *rootItems;

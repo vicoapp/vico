@@ -1,27 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-@interface ViSnippetPlaceholder : NSObject
-{
-	NSString *string;
-	unsigned length;
-	int tabStop;
-	NSRange range;
-	NSString *variable;
-	NSString *defaultValue;
-	NSString *transformation; // regexp string
-}
-
-@property (readonly) unsigned length;
-@property (readonly) int tabStop;
-@property(readwrite) NSRange range;
-@property (readonly) NSString *variable;
-@property (readonly) NSString *defaultValue;
-@property (readonly) NSString *transformation;
-
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s;
-- (void)pushLength:(int)length ifAffectedByRange:(NSRange)affectedRange;
-
-@end
+@class ViSnippetPlaceholder;
 
 
 @interface ViSnippet : NSObject
@@ -38,13 +17,42 @@
 @property(readwrite) ViSnippetPlaceholder *currentPlaceholder;
 @property(readwrite) ViSnippetPlaceholder *lastPlaceholder;
 @property(readonly) NSArray *tabstops;
-@property(readonly) NSString *string;
+@property(readonly, copy) NSString *string;
 @property(readonly) NSRange range;
 
 - (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
-- (BOOL)deleteRange:(NSRange)affectedRange;
 - (BOOL)activeInRange:(NSRange)aRange;
+- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
+- (BOOL)done;
 
 @end
 
+
+@interface ViSnippetPlaceholder : NSObject
+{
+	NSString *string;
+	NSString *value;
+	unsigned length;
+	int tabStop;
+	BOOL selected;
+	NSRange range;
+	NSString *variable;
+	NSString *defaultValue;
+	NSString *transformation; // regexp string
+}
+
+@property (readonly) unsigned length;
+@property (readonly) int tabStop;
+@property (readwrite) BOOL selected;
+@property(readwrite) NSRange range;
+@property (readonly) NSString *variable;
+@property (readonly) NSString *defaultValue;
+@property (readonly) NSString *transformation;
+@property (readonly) NSString *value;
+
+- (ViSnippetPlaceholder *)initWithString:(NSString *)s;
+- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
+- (BOOL)activeInRange:(NSRange)aRange;
+- (NSInteger)updateValue:(NSString *)newValue;
+
+@end

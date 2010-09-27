@@ -179,22 +179,10 @@ int logIndent = 0;
 	[[self textStorage] insertAttributedString:attrString atIndex:aLocation];
 	[self recordInsertInRange:range];
 
-	if (activeSnippet)
-	{
-		if ([activeSnippet activeInRange:range])
-		{
-			INFO(@"found snippet %@ at %u", activeSnippet, aLocation - 1);
-			if ([activeSnippet insertString:aString atLocation:aLocation] == NO)
-			{
-				INFO(@"insertion failed, cancelling snippet %@", activeSnippet);
-				[self cancelSnippet:activeSnippet];
-			}
-		}
-		else
-		{
-			INFO(@"outside active range, cancelling snippet %@", activeSnippet);
-			[self cancelSnippet:activeSnippet];
-		}
+	ViSnippet *activeSnippet = [[self delegate] activeSnippet];
+	if (activeSnippet && [self updateSnippet:activeSnippet replaceRange:NSMakeRange(aLocation, 0) withString:aString] == NO) {
+		DEBUG(@"snippet insertion failed, cancelling snippet %@", activeSnippet);
+		[self cancelSnippet:activeSnippet];
 	}
 }
 
@@ -218,17 +206,10 @@ int logIndent = 0;
 	[self recordDeleteOfRange:aRange];
 	[[self textStorage] deleteCharactersInRange:aRange];
 
-	if (activeSnippet) {
-		if ([activeSnippet activeInRange:aRange]) {
-			INFO(@"found snippet %@ at %u", activeSnippet, aRange.location);
-			if ([activeSnippet deleteRange:aRange] == NO) {
-				INFO(@"deleting failed, cancelling snippet %@", activeSnippet);
-				[self cancelSnippet:activeSnippet];
-			}
-		} else {
-			INFO(@"outside active range, cancelling snippet %@", activeSnippet);
-			[self cancelSnippet:activeSnippet];
-		}
+	ViSnippet *activeSnippet = [[self delegate] activeSnippet];
+	if (activeSnippet && [self updateSnippet:activeSnippet replaceRange:aRange withString:nil] == NO) {
+		DEBUG(@"failed to update snippet, cancelling snippet %@", activeSnippet);
+		[self cancelSnippet:activeSnippet];
 	}
 }
 
@@ -1113,8 +1094,8 @@ int logIndent = 0;
 - (BOOL)input_tab:(ViCommand *)command
 {
         // check if we're inside a snippet
-        if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)])
-	{
+	ViSnippet *activeSnippet = [[self delegate] activeSnippet];
+        if ([activeSnippet activeInRange:NSMakeRange(start_location, 1)]) {
 		[self handleSnippetTab:activeSnippet atLocation:start_location];
 		return YES;
 	}
@@ -1133,7 +1114,7 @@ int logIndent = 0;
                                 if (snippetString)
                                 {
                                         [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
-                                        activeSnippet = [self insertSnippet:snippetString atLocation:start_location - [word length]];
+                                        [[self delegate] setActiveSnippet:[self insertSnippet:snippetString atLocation:start_location - [word length]]];
                                         return YES;
                                 }
                         }
@@ -1344,8 +1325,16 @@ int logIndent = 0;
 
 	DEBUG(@"final_location is %u", final_location);
 	[self setCaret:final_location];
+	ViSnippet *activeSnippet = [[self delegate] activeSnippet];
 	if (mode == ViVisualMode)
 		[self setVisualSelection];
+	else if (activeSnippet && activeSnippet.currentPlaceholder.selected) {
+		DEBUG(@"current placeholder = %@", activeSnippet.currentPlaceholder);
+		[self setSelectedRange:activeSnippet.currentPlaceholder.range];
+		if ([activeSnippet done])
+			[self cancelSnippet:activeSnippet];
+	}
+
 	if (!replayingInput)
 		[self scrollToCaret];
 

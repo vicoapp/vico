@@ -39,6 +39,11 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)setMostRecentDocumentView:(ViDocumentView *)docView;
+- (ViSnippet *)activeSnippet;
+- (void)setActiveSnippet:(ViSnippet *)aSnippet;
+- (NSFont *)font;
+- (NSDictionary *)typingAttributes;
+- (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 @end
 
 @interface ViTextView : NSTextView
@@ -77,7 +82,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSCharacterSet		*whitespace;
 
 	NSMutableDictionary	*marks; // XXX: move to document
-	ViSnippet		*activeSnippet; // XXX: move to document ?
 
 	CGFloat			 pageGuideX;
 	BOOL			 hasUndoGroup;
@@ -155,6 +159,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (void)cancelSnippet:(ViSnippet *)snippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
 - (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
+- (BOOL)updateSnippet:(ViSnippet *)snippet replaceRange:(NSRange)replaceRange withString:(NSString *)string;
 @end
 
 @interface ViTextView (cursor)

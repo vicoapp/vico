@@ -3,6 +3,7 @@
 #import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViSymbol.h"
+#import "ViSnippet.h"
 
 @class NoodleLineNumberView;
 
@@ -35,12 +36,15 @@
 	NSDictionary *symbolScopes;
 	NSDictionary *symbolTransforms;
 	NSTimer *updateSymbolsTimer;
+
+	ViSnippet *activeSnippet;
 }
 
 @property(readonly) NSArray *views;
 @property(readonly) int visibleViews;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
+@property(readwrite, assign) ViSnippet *activeSnippet;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;

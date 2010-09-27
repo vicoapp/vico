@@ -10,6 +10,18 @@
 @synthesize string;
 @synthesize range;
 
+- (void)addPlaceholder:(ViSnippetPlaceholder *)placeHolder
+{
+	// extend the tabstops array to hold enough indices
+	while ([placeHolder tabStop] >= [tabstops count]) {
+		// insert empty placeholder arrays
+		[tabstops addObject:[NSMutableArray array]];
+	}
+
+	// add the placeholder to the array
+	[[tabstops objectAtIndex:[placeHolder tabStop]] addObject:placeHolder];
+}
+
 - (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	tabstops = [[NSMutableArray alloc] init];
@@ -19,61 +31,49 @@
         NSMutableString *s = [aString mutableCopy];
 	BOOL foundMarker;
 	NSUInteger i;
-	do
-        {
+	do {
                 foundMarker = NO;
-                for (i = 0; i < [s length]; i++)
-                {
+                for (i = 0; i < [s length]; i++) {
                         // FIXME: handle escapes
-                        if ([s characterAtIndex:i] == '$')
-                        {
+                        if ([s characterAtIndex:i] == '$') {
                                 ViSnippetPlaceholder *placeHolder;
                                 placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1]];
                                 if (placeHolder == nil)
 					break;
                                 unsigned len = placeHolder.length;
 
-                                /* Update the snippet string with any default value
+                                /*
+                                 * Update the snippet string with any default value
                                  */
                                 NSRange r = NSMakeRange(i + aLocation, 0);
-                                if (placeHolder.defaultValue)
-                                {
+                                NSString *defaultValue = placeHolder.defaultValue;
+                                if (defaultValue == nil && [tabstops objectAtIndex:placeHolder.tabStop]) {
+                                	/* This is a mirror. Use default value from first placeholder. */
+                                	defaultValue = [[[tabstops objectAtIndex:placeHolder.tabStop] objectAtIndex:0] defaultValue];
+				}
+
+                                if (defaultValue) {
                                         // replace placeholder text, including dollar sign, with the default value
-                                        [s replaceCharactersInRange:NSMakeRange(i, len + 1) withString:placeHolder.defaultValue];
-					r.length = [placeHolder.defaultValue length];
-                                }
-                                else
-                                {
+                                        [s replaceCharactersInRange:NSMakeRange(i, len + 1) withString:defaultValue];
+					r.length = [defaultValue length];
+					[placeHolder updateValue:defaultValue];
+                                } else {
                                         // delete placeholder text, including dollar sign
                                         [s deleteCharactersInRange:NSMakeRange(i, len + 1)];
+					[placeHolder updateValue:@""];
                                 }
 
-                        	if (placeHolder.variable)
-                        	{
+                        	if (placeHolder.variable) {
 					// lookup variable, apply transformation and insert value
-                        	}
-				else
-                        	{
+                        	} else {
 					// tabstop, add it to the array at the correct index
 
 					int num = placeHolder.tabStop;
 					if (num == 0)
-					{
 						lastPlaceholder = placeHolder;
-					}
-					else
-					{
-						// extend the tabstops array to hold enough indices
-						while (num > [tabstops count])
-						{
-							// insert empty placeholder arrays
-							[tabstops addObject:[NSMutableArray array]];
-						}
-	
-						// add the placeholder to the array (at index num-1)
-						[[tabstops objectAtIndex:num - 1] addObject:placeHolder];
-					}
-					
+
+					[self addPlaceholder:placeHolder];
+
 					// update the range
 					[placeHolder setRange:r];
                         	}
@@ -85,6 +85,7 @@
         } while (foundMarker);
 
 	INFO(@"parsed tabstops %@", tabstops);
+	INFO(@"last tabstop %@", lastPlaceholder);
 
 	range = NSMakeRange(aLocation, [s length]);
 	string = s;
@@ -92,83 +93,40 @@
 	return self;
 }
 
-/* Called by the ViTextView when inserting a string inside the snippet.
- * Extends the snippet temporary attribute over the inserted text.
- * If inside a place holder range, updates the range. Also handles mirror
- * place holders.
- */
-- (BOOL)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
+- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation
 {
-	NSRange currentRange = currentPlaceholder.range;
-	NSRange affectedRange = NSMakeRange(aLocation, [aString length]);
-
-	// verify we're inserting inside the current placeholder
-	if (aLocation != NSMaxRange(currentRange) &&
-	    NSIntersectionRange(affectedRange, currentRange).length == 0)
-	{
-		return NO;
-	}
-
-	// update the length of the current placeholder
-	currentRange.length += [aString length];
-	currentPlaceholder.range = currentRange;
-
 	// update the location of all following placeholders
 	NSArray *a;
-	for (a in tabstops)
-	{
+	for (a in tabstops) {
 		ViSnippetPlaceholder *ph;
 		for (ph in a)
-		{
-			[ph pushLength:[aString length] ifAffectedByRange:affectedRange];
-		}
+			[ph updateLength:aLength fromLocation:aLocation];
 	}
-			
-	if (currentPlaceholder != lastPlaceholder)
-		[lastPlaceholder pushLength:[aString length] ifAffectedByRange:affectedRange];
-	range.length += [aString length];
-	
-	return YES;
+	range.length += aLength;
 }
 
-- (BOOL)deleteRange:(NSRange)affectedRange
+- (void)setPlaceholder:(ViSnippetPlaceholder *)placeHolder toValue:(NSString *)value
 {
-	NSRange currentRange = currentPlaceholder.range;
-
-	// verify we're deleting inside the current placeholder
-	if (NSIntersectionRange(affectedRange, currentRange).length == 0)
-	{
-		return NO;
-	}
-
-	// update the length of the current placeholder
-	currentRange.length -= affectedRange.length;
-	currentPlaceholder.range = currentRange;
-
-	NSArray *a;
-	for (a in tabstops)
-	{
-		ViSnippetPlaceholder *ph;
-		for (ph in a)
-		{
-			[ph pushLength:-affectedRange.length ifAffectedByRange:affectedRange];
-		}
-	}
 	
-	if (currentPlaceholder != lastPlaceholder)
-		[lastPlaceholder pushLength:-affectedRange.length ifAffectedByRange:affectedRange];
-	range.length -= affectedRange.length;
-	
-	return YES;
 }
 
 - (BOOL)activeInRange:(NSRange)aRange
 {
-	if (NSIntersectionRange(aRange, range).length == 0)
-	{
-		return NO;
-	}
-	return YES;
+	if (NSIntersectionRange(aRange, range).length > 0 || aRange.location == NSMaxRange(range))
+		return YES;
+	return NO;
+}
+
+- (BOOL)done
+{
+	if (lastPlaceholder != nil)
+		return currentPlaceholder == lastPlaceholder;
+	return currentPlaceholder == [tabstops lastObject];
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViSnippet at %@>", NSStringFromRange(range)];
 }
 
 @end
@@ -181,13 +139,29 @@
 @synthesize variable;
 @synthesize defaultValue;
 @synthesize transformation;
+@synthesize selected;
+@synthesize value;
 
-- (void)pushLength:(int)aLength ifAffectedByRange:(NSRange)affectedRange
+- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation
 {
-	if (range.location > affectedRange.location)
-	{
+	if (range.location > aLocation)
 		range.location += aLength;
-	}
+}
+
+- (BOOL)activeInRange:(NSRange)aRange
+{
+	if (aRange.location >= range.location && NSMaxRange(aRange) >= range.location && aRange.location <= NSMaxRange(range))
+		return YES;
+	return NO;
+}
+
+- (NSInteger)updateValue:(NSString *)newValue
+{
+	NSInteger delta = (NSInteger)[newValue length] - [value length];
+	INFO(@"setting value [%@] in placeholder %@", newValue, self);
+	range.length = [newValue length];
+	value = newValue;
+	return delta;
 }
 
 - (ViSnippetPlaceholder *)initWithString:(NSString *)s
@@ -197,6 +171,7 @@
 		return nil;
 
         NSScanner *scan = [NSScanner scannerWithString:s];
+        [scan setCharactersToBeSkipped:nil];
 
 	NSMutableCharacterSet *shellVariableSet = [[NSMutableCharacterSet alloc] init];
 	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
@@ -206,38 +181,28 @@
 	BOOL bracedExpression = NO;
 	if ([scan scanString:@"{" intoString:nil])
 		bracedExpression = YES;
-                
-        if (![scan scanInt:&tabStop])
-        {
-                [scan scanCharactersFromSet:shellVariableSet intoString:&variable];
-        }
 
-	if (bracedExpression)
-	{
-                if ([scan scanString:@":" intoString:nil])
-                {
+        if (![scan scanInt:&tabStop])
+                [scan scanCharactersFromSet:shellVariableSet intoString:&variable];
+
+	if (bracedExpression) {
+                if ([scan scanString:@":" intoString:nil]) {
                         // got a default value
-			if ([scan scanString:@"$" intoString:nil])
-			{
+			if ([scan scanString:@"$" intoString:nil]) {
 				// default value is a variable
 				bracedExpression = NO;
 				if ([scan scanString:@"{" intoString:nil])
 					bracedExpression = YES;
-			}
-                        else
-                        {
+			} else {
 				// default value is a constant
 				[scan scanUpToString:@"}" intoString:&defaultValue];
                         }
-                }
-                else if ([scan scanString:@"/" intoString:nil])
-                {
+                } else if ([scan scanString:@"/" intoString:nil]) {
                         // got a regular expression transformation
                         [scan scanUpToString:@"}" intoString:&transformation];
                 }
 
-                if (![scan scanString:@"}" intoString:nil])
-                {
+                if (![scan scanString:@"}" intoString:nil]) {
                         // parse error
                         return nil;
                 }
@@ -245,13 +210,13 @@
 
 	length = [scan scanLocation];
 	string = [s substringToIndex:length];
-	
+
 	return self;
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%i : %@ at %@", tabStop, defaultValue, NSStringFromRange(range)];
+	return [NSString stringWithFormat:@"<ViSnippetPlaceholder %i: \"%@\" at %@>", tabStop, value, NSStringFromRange(range)];
 }
 
 @end

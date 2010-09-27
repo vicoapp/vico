@@ -305,7 +305,7 @@
 		{
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];
-			activeSnippet = [self insertSnippet:outputText atLocation:[self caret]];
+			[[self delegate] setActiveSnippet:[self insertSnippet:outputText atLocation:[self caret]]];
 		}
 		else if ([outputFormat isEqualToString:@"discard"])
 			;

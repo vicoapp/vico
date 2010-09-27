@@ -33,6 +33,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize filteredSymbols;
 @synthesize views;
 @synthesize visibleViews;
+@synthesize activeSnippet;
 
 - (id)init
 {

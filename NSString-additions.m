@@ -16,5 +16,14 @@
         return n;
 }
 
+- (NSUInteger)occurrencesOfCharacter:(unichar)ch
+{
+	NSUInteger n, i;
+	for (i = n = 0; i < [self length]; i++)
+		if ([self characterAtIndex:i] == ch)
+			n++;
+	return n;
+}
+
 @end
 

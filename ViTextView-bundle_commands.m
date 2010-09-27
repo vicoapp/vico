@@ -29,7 +29,7 @@
 	return foundScopeSelector;
 }
 
-- (NSRange)trackScopes:(NSArray *)trackScopes forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
 {
 	NSArray *lastScopes = nil, *scopes;
 	NSUInteger i = aLocation;
@@ -45,7 +45,7 @@
 		if ((scopes = [self scopesAtLocation:i]) == nil)
 			break;
 
-		if (lastScopes != scopes && ![trackScopes matchesScopes:scopes]) {
+		if (lastScopes != scopes && ![scopeSelector matchesScopes:scopes]) {
 			if (!forward)
 				i++;
 			break;
@@ -61,23 +61,14 @@
 		return NSMakeRange(aLocation, i - aLocation);
 	else
 		return NSMakeRange(i, aLocation - i);
-}
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
-{
-	return [self trackScopes:[scopeSelector componentsSeparatedByString:@" "] forward:forward fromLocation:aLocation];
-}
-
-- (NSRange)trackScopes:(NSArray *)scopes atLocation:(NSUInteger)aLocation
-{
-	NSRange rb = [self trackScopes:scopes forward:NO fromLocation:aLocation];
-	NSRange rf = [self trackScopes:scopes forward:YES fromLocation:aLocation];
-	return NSUnionRange(rb, rf);
 }
 
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation
 {
-	return [self trackScopes:[scopeSelector componentsSeparatedByString:@" "] atLocation:aLocation];
+	NSRange rb = [self trackScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
+	NSRange rf = [self trackScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
+	return NSUnionRange(rb, rf);
 }
 
 - (NSString *)inputOfType:(NSString *)type command:(NSDictionary *)command range:(NSRange *)rangePtr

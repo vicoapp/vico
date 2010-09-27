@@ -177,9 +177,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView (bundleCommands)
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation;
-- (NSRange)trackScopes:(NSArray *)scopes atLocation:(NSUInteger)aLocation;
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
-- (NSRange)trackScopes:(NSArray *)scopes forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 - (void)performBundleCommand:(id)sender;
 @end

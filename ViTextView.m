@@ -911,24 +911,16 @@ int logIndent = 0;
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
-	if (mode != ViVisualMode)
-	{
+	if (mode != ViVisualMode) {
 		[self setVisualMode];
 		[self setCaret:firstRange.location];
 		visual_start_location = firstRange.location;
-	}
-	else if (lastRange.length == 0)
-	{
+	} else if (lastRange.length == 0)
 		[self setNormalMode];
-	}
 	else if (visual_start_location == firstRange.location)
-	{
 		[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
-	}
 	else
-	{
 		[self setCaret:firstRange.location];
-	}
 }
 
 - (void)setVisualSelection

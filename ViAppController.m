@@ -120,10 +120,12 @@
 
 	if ([keyPath isEqualToString:@"theme"]) {
 		for (doc in [[NSDocumentController sharedDocumentController] documents])
-			[doc changeTheme:[[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]]];
+			if ([doc respondsToSelector:@selector(changeTheme:)])
+				[doc changeTheme:[[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]]];
 	} else if ([keyPath isEqualToString:@"showguide"] || [keyPath isEqualToString:@"guidecolumn"]) {
 		for (doc in [[NSDocumentController sharedDocumentController] documents])
-			[doc updatePageGuide];
+			if ([doc respondsToSelector:@selector(updatePageGuide)])
+				[doc updatePageGuide];
 	}
 }
 

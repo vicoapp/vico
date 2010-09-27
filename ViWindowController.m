@@ -370,6 +370,8 @@ static NSWindowController	*currentWindowController = nil;
 	if ([documents count] == 0) {
 		if ([self project] == nil)
 			[[self window] close];
+		else
+			[self synchronizeWindowTitleWithDocumentName];
 	} else {
 		BOOL foundVisibleView = NO;
 		if (lastDocument && lastDocument != document) {

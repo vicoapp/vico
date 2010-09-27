@@ -265,10 +265,55 @@ BOOL makeNewWindowInsteadOfTab = NO;
         }
 
         NSRange r = [scope range];
-        if (NSMaxRange(r) <= charIndex)
-                INFO(@"index = %u, scope = %@", charIndex, scope);
+        if (r.location < charIndex) {
+                DEBUG(@"index = %u, r = %@", charIndex, NSStringFromRange(r));
+                r.length -= charIndex - r.location;
+                r.location = charIndex;
+        }
         *effectiveCharRange = r;
-        return attributes;
+
+	/*
+	 * If there is an active snippet in this range, merge in attributes to
+	 * mark the snippet placeholders.
+	 */
+	NSMutableDictionary *mergedAttributes = nil;
+	if (NSIntersectionRange(r, activeSnippet.range).length > 0) {
+		NSArray *a;
+		BOOL foundPlaceholder = NO;
+		for (a in [activeSnippet tabstops]) {
+			ViSnippetPlaceholder *ph;
+			for (ph in a) {
+				if (NSIntersectionRange(r, ph.range).length > 0) {
+					if (ph.range.location > r.location)
+						r.length = ph.range.location - r.location;
+					else {
+						if (mergedAttributes == nil)
+							mergedAttributes = [[NSMutableDictionary alloc] initWithDictionary:attributes];
+						[mergedAttributes setObject:[NSNumber numberWithInteger:NSUnderlinePatternDot | NSUnderlineStyleThick]
+								     forKey:NSUnderlineStyleAttributeName];
+						[mergedAttributes setObject:[NSColor redColor]
+								     forKey:NSUnderlineColorAttributeName];
+						/*
+						 * Adjust *effectiveCharRange if r != ph.range.
+						 */
+						if (NSMaxRange(ph.range) < NSMaxRange(r))
+							r.length = NSMaxRange(ph.range) - r.location;
+					}
+					DEBUG(@"merged %@ with %@ -> %@", ph, NSStringFromRange(*effectiveCharRange), NSStringFromRange(r));
+					*effectiveCharRange = r;
+					foundPlaceholder = YES;
+					break;
+				}
+			}
+
+			if (foundPlaceholder)
+				break;
+		}
+
+		DEBUG(@"merged attributes = %@", mergedAttributes);
+	}
+
+        return mergedAttributes ?: attributes;
 }
 
 - (void)highlightEverything

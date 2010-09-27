@@ -93,7 +93,8 @@ static NSWindowController	*currentWindowController = nil;
 	for (language in languages)
 		[languageButton addItemWithTitle:language];
 
-	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
+	if ([self project] != nil)
+		[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
@@ -278,7 +279,6 @@ static NSWindowController	*currentWindowController = nil;
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
 		[symbolsOutline collapseItem:nil collapseChildren:YES];
         [symbolsOutline expandItem:document];
- 
 	[self updateSelectedSymbolForLocation:[(ViTextView *)[docView textView] caret]];
 
 	[self checkDocumentChanged:document];
@@ -732,12 +732,11 @@ static NSWindowController	*currentWindowController = nil;
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
-	if (sender == splitView)
-	{
-		if (offset == 0)
+	if (sender == splitView) {
+		NSView *view = [[sender subviews] objectAtIndex:offset];
+		if (view == explorerView)
 			return 100;
-		if (offset == 2)
-		{
+		if (view == symbolsView) {
 			NSRect frame = [sender frame];
 			return frame.size.width - 300;
 		}
@@ -748,13 +747,12 @@ static NSWindowController	*currentWindowController = nil;
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
-	if (sender == splitView)
-	{
-		if (offset == 0)
+	if (sender == splitView) {
+		NSView *view = [[sender subviews] objectAtIndex:offset];
+		if (view == explorerView)
 			return 300;
 		return proposedMax - 100;
-	}
-	else
+	} else
 		return proposedMax;
 }
 
@@ -777,8 +775,7 @@ static NSWindowController	*currentWindowController = nil;
 		return;
 
 	int nsubviews = [[sender subviews] count];
-	if (nsubviews == 1)
-	{
+	if (nsubviews < 2) {
 		// the side views have not been added yet
 		[sender adjustSubviews];
 		return;
@@ -787,50 +784,45 @@ static NSWindowController	*currentWindowController = nil;
 	NSRect newFrame = [sender frame];
 	float dividerThickness = [sender dividerThickness];
 
-	NSView *firstView = [[sender subviews] objectAtIndex:0];
-	NSView *secondView = [[sender subviews] objectAtIndex:1];
-	NSView *thirdView = nil;
-	if (nsubviews == 3)
-		thirdView = [[sender subviews] objectAtIndex:2];
+	NSInteger explorerWidth = 0;
+	if ([[sender subviews] objectAtIndex:0] == explorerView) {
+		if ([sender isSubviewCollapsed:explorerView])
+			explorerWidth = 0;
+		else
+			explorerWidth = [explorerView frame].size.width;
+	}
 
-	NSRect firstFrame = [firstView frame];
-	NSRect secondFrame = [secondView frame];
-	NSRect thirdFrame = [thirdView frame];
+	NSRect symbolsFrame = [symbolsView frame];
+	NSInteger symbolsWidth = symbolsFrame.size.width;
+	if ([sender isSubviewCollapsed:symbolsView])
+		symbolsWidth = 0;
 
-	NSInteger firstWidth = firstFrame.size.width;
-	if ([splitView isSubviewCollapsed:firstView])
-		firstWidth = 0;
+	/* Keep the symbol sidebar in constant width. */
+	NSRect mainFrame = [mainView frame];
+	mainFrame.size.width = newFrame.size.width - (explorerWidth + symbolsWidth + (nsubviews-2)*dividerThickness);
+	mainFrame.size.height = newFrame.size.height;
 
-	NSInteger thirdWidth = thirdFrame.size.width;
-	if ([splitView isSubviewCollapsed:thirdView])
-		thirdWidth = 0;
-
-	/* keep sidebar in constant width */
-	secondFrame.size.width = newFrame.size.width - (firstWidth + thirdWidth + dividerThickness);
-	secondFrame.size.height = newFrame.size.height;
-
-	[secondView setFrame:secondFrame];
+	[mainView setFrame:mainFrame];
 	[sender adjustSubviews];
 }
 
 - (NSRect)splitView:(NSSplitView *)sender additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
 	if (sender != splitView)
-		return NSMakeRect(0, 0, 0, 0);
+		return NSZeroRect;
+
+	NSView *leftView = [[sender subviews] objectAtIndex:dividerIndex];
+	NSView *rightView = [[sender subviews] objectAtIndex:dividerIndex + 1];
 
 	NSRect frame = [sender frame];
 	NSRect resizeRect;
-	if (dividerIndex == 0)
-	{
+	if (leftView == explorerView)
 		resizeRect = [projectResizeView frame];
-	}
-	else if (dividerIndex == 1)
-	{
+	else if (rightView == symbolsView) {
 		resizeRect = [symbolsResizeView frame];
 		resizeRect.origin = [sender convertPoint:resizeRect.origin fromView:symbolsResizeView];
-	}
-	else
-		return NSMakeRect(0, 0, 0, 0);
+	} else
+		return NSZeroRect;
 
 	resizeRect.origin.y = NSHeight(frame) - NSHeight(resizeRect);
 	return resizeRect;
@@ -841,11 +833,13 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)toggleSymbolList:(id)sender
 {
+	NSInteger ndx = ([[splitView subviews] objectAtIndex:0] == explorerView) ? 1 : 0;
+
 	NSRect frame = [splitView frame];
 	if ([splitView isSubviewCollapsed:symbolsView])
-		[splitView setPosition:NSWidth(frame) - 200 ofDividerAtIndex:1];
+		[splitView setPosition:NSWidth(frame) - 200 ofDividerAtIndex:ndx];
 	else
-		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:ndx];
 }
 
 - (void)goToSymbol:(id)sender
@@ -995,7 +989,10 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)toggleExplorer:(id)sender
 {
-	[projectDelegate toggleExplorer:sender];
+	if ([[splitView subviews] objectAtIndex:0] == explorerView)
+		[projectDelegate toggleExplorer:sender];
+	else
+		NSBeep();
 }
 
 #pragma mark -

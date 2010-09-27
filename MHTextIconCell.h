@@ -1,6 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-@interface MHTextIconCell : NSTextFieldCell
+@interface MHTextIconCell : NSCell
 {
 	NSImage *image;
 }

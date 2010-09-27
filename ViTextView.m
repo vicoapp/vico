@@ -1008,8 +1008,10 @@ int logIndent = 0;
 
 	// If there is a non-zero length selection, remove it first.
 	NSRange sel = [self selectedRange];
-	if (sel.length > 0)
+	if (sel.length > 0) {
 		[self deleteRange:sel];
+		start_location = sel.location;
+	}
 
 	BOOL foundSmartTypingPair = NO;
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];

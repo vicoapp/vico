@@ -145,22 +145,17 @@ extern BOOL makeNewWindowInsteadOfTab;
 
 - (IBAction)newProject:(id)sender
 {
-	makeNewWindowInsteadOfTab = YES;
-	[[NSDocumentController sharedDocumentController] newDocument:self];
-#if 0
 	NSError *error = nil;
 	NSDocument *proj = [[NSDocumentController sharedDocumentController] makeUntitledDocumentOfType:@"Project" error:&error];
-	INFO(@"proj = %@", proj);
-	if (proj)
-	{
+	if (proj) {
 		[[NSDocumentController sharedDocumentController] addDocument:proj];
 		[proj makeWindowControllers];
-		[[NSDocumentController sharedDocumentController] newDocument:self];
 		[proj showWindows];
 	}
-	else
-		INFO(@"error = %@", error);
-#endif
+	else {
+		NSAlert *alert = [NSAlert alertWithError:error];
+		[alert runModal];
+	}
 }
 
 - (IBAction)registerLicense:(id)sender

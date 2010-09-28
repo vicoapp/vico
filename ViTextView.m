@@ -1525,13 +1525,11 @@ int logIndent = 0;
  */
 - (void)drawPageGuideInRect:(NSRect)rect
 {
-	if (pageGuideX > 0)
-	{
+	if (pageGuideX > 0) {
 		NSRect bounds = [self bounds];
-		if ([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES)
-		{
+		if ([self needsToDrawRect:NSMakeRect(pageGuideX, 0, 1, bounds.size.height)] == YES) {
 			// So that it doesn't draw the line if only e.g. the cursor updates
-			[[self insertionPointColor] set];
+			[[[self insertionPointColor] colorWithAlphaComponent:0.3] set];
 			[NSBezierPath strokeRect:NSMakeRect(pageGuideX, 0, 0, bounds.size.height)];
 		}
 	}
@@ -1540,11 +1538,8 @@ int logIndent = 0;
 - (void)setPageGuide:(int)pageGuideValue
 {
 	if (pageGuideValue == 0)
-	{
 		pageGuideX = 0;
-	}
-	else
-	{
+	else {
 		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[self font], NSFontAttributeName, nil];
 		CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
 		pageGuideX = (sizeOfCharacter * (pageGuideValue + 1)) - 1.5;

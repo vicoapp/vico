@@ -492,39 +492,31 @@ int logIndent = 0;
 	}
 }
 
-- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
+- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation caret:(NSUInteger)caretLocation
 {
 	DEBUG(@"undoing delete of string %@ at %u", aString, aLocation);
 	[self insertString:aString atLocation:aLocation undoGroup:NO];
-	final_location = aLocation;
+	final_location = caretLocation;
 }
 
-- (void)undoInsertInRange:(NSRange)aRange
+- (void)undoInsertInRange:(NSRange)aRange caret:(NSUInteger)caretLocation
 {
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aRange.location];
-
 	DEBUG(@"undoing insert in range %@", NSStringFromRange(aRange));
 	[self deleteRange:aRange undoGroup:NO];
-
-	/* Correct caret position if we deleted the last character(s) on the line. */
-	final_location = aRange.location;
-	--eol;
-	if (final_location == eol && eol > bol)
-		--final_location;
+	final_location = caretLocation;
 }
 
 - (void)recordInsertInRange:(NSRange)aRange
 {
 	DEBUG(@"pushing insert of text in range %@ onto undo stack", NSStringFromRange(aRange));
-	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange];
+	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange caret:[self caret]];
 	[undoManager setActionName:@"insert text"];
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	DEBUG(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
-	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation];
+	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation caret:[self caret]];
 	[undoManager setActionName:@"delete text"];
 }
 

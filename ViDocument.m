@@ -154,12 +154,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (data == nil)
 		return NO;
 
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
-	if (conn == nil) {
-		INFO(@"%s", "FAILED to connect to host");
-		// XXX: set outError
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
+	if (conn == nil)
 		return NO;
-	}
 	return [conn writeData:data toFile:[url path] error:outError];
 }
 
@@ -172,19 +169,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		data = [NSData dataWithContentsOfFile:[url path] options:0 error:outError];
 	else if ([[url scheme] isEqualToString:@"sftp"]) {
 		if ([url user] == nil || [url host] == nil) {
-			INFO(@"%s", "missing user or host in url");
-			// XXX: set outError
+			if (outError)
+				*outError = [SFTPConnection errorWithDescription:@"Missing user of host in URL."];
 			return NO;
 		}
 
-		NSString *target = [NSString stringWithFormat:@"%@@%@", [url user], [url host]];
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
-		if (conn == nil) {
-			INFO(@"%s", "FAILED to connect to host");
-			// XXX: set outError
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
+		if (conn == nil)
 			return NO;
-		}
-		data = [conn dataWithContentsOfFile:[url path]];
+		data = [conn dataWithContentsOfFile:[url path] error:outError];
 	}
 
 	if (data == nil)

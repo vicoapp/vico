@@ -7,9 +7,9 @@
 @interface ProjectDelegate (private)
 - (NSMutableArray *)childrenAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
 - (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes;
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError;
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes error:(NSError **)outError;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
@@ -69,16 +69,21 @@
 	return children;
 }
 
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL
+- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError
 {
 	NSMutableArray *children = [[NSMutableArray alloc] init];
-	NSArray *entries = [conn directoryContentsAtPath:[url path]];
+	NSArray *entries = [conn directoryContentsAtPath:[url path] error:outError];
+	if (entries == nil)
+		return nil;
 	SFTPDirectoryEntry *entry;
 	for (entry in entries) {
 		NSString *file = [entry filename];
 		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
-			NSURL *childURL = [[NSURL alloc] initWithScheme:[url scheme] host:[conn target] path:[[url path] stringByAppendingPathComponent:file]];
-			[children addObject:[self itemAtSftpURL:childURL connection:conn rootURL:rootURL attributes:[entry attributes]]];
+			NSURL *childURL = [[NSURL alloc] initWithScheme:[url scheme] host:[conn hostWithUser] path:[[url path] stringByAppendingPathComponent:file]];
+			id item = [self itemAtSftpURL:childURL connection:conn rootURL:rootURL attributes:[entry attributes] error:outError];
+			if (item == nil)
+				return nil;
+			[children addObject:item];
 		}
 	}
 	return children;
@@ -117,22 +122,27 @@
 	return item;
 }
 
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes error:(NSError **)outError
 {
 	NSMutableDictionary *item = [self itemAtURL:url rootURL:rootURL];
 
 	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm)) {
 		// It's a directory
-		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn rootURL:rootURL];
+		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn rootURL:rootURL error:outError];
+		if (children == nil)
+			return nil;
 		[item setObject:children forKey:@"children"];
 	}
 
 	return item;
 }
 
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL
+- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError
 {
-	return [self itemAtSftpURL:url connection:conn rootURL:rootURL attributes:[conn stat:[url path]]];
+	Attrib *attrs = [conn stat:[url path] error:outError];
+	if (attrs == NULL)
+		return nil;
+	return [self itemAtSftpURL:url connection:conn rootURL:rootURL attributes:attrs error:outError];
 }
 
 - (id)addFileURL:(NSURL *)url
@@ -142,12 +152,11 @@
 	return item;
 }
 
-- (id)addSftpURL:(NSURL *)url
+- (id)addSftpURL:(NSURL *)url error:(NSError **)outError
 {
-	NSString *target = [NSString stringWithFormat:@"%@@%@", [url user] ?: @"", [url host]];
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 	if (conn) {
-		id item = [self itemAtSftpURL:url connection:conn rootURL:url];
+		id item = [self itemAtSftpURL:url connection:conn rootURL:url error:outError];
 		if (item)
 			[rootItems addObject:item];
                 return item;
@@ -157,19 +166,24 @@
 
 - (void)addURL:(NSURL *)aURL
 {
-	if ([rootItems indexOfObject:aURL] == NSNotFound) {
+	if ([rootItems indexOfObject:aURL] == NSNotFound && aURL != nil) {
+		NSError *error = nil;
 		id item = nil;
 		if ([[aURL scheme] isEqualToString:@"file"])
 			item = [self addFileURL:aURL];
 		else if ([[aURL scheme] isEqualToString:@"sftp"])
-			item = [self addSftpURL:aURL];
-		else {
-			INFO(@"unhandled scheme %@", [aURL scheme]);
-			return;
+			item = [self addSftpURL:aURL error:&error];
+		else
+			error = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"unhandled scheme %@", [aURL scheme]]];
+
+		if (item) {
+			[self filterFiles:self];
+			[explorer reloadData];
+			[explorer expandItem:item expandChildren:NO];
+		} else if (error) {
+			NSAlert *alert = [NSAlert alertWithError:error];
+			[alert runModal];
 		}
-		[self filterFiles:self];
-		[explorer reloadData];
-                [explorer expandItem:item expandChildren:NO];
 	}
 }
 
@@ -232,11 +246,11 @@
 	if ([user length] == 0)
 		user = [[sftpConnectForm cellAtIndex:1] placeholderString];
 	NSString *path = [[sftpConnectForm cellAtIndex:2] stringValue];
-	NSString *target = [NSString stringWithFormat:@"%@@%@", user, host];
 
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithTarget:target];
+	NSError *error = nil;
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host user:user error:&error];
 	if (conn) {
-		INFO(@"connected to %@", target);
+		INFO(@"connected to %@ as %@", host, user);
 		if (![path hasPrefix:@"/"]) {
 			NSString *pwd = [conn currentDirectory];
 			if (pwd == nil) {
@@ -245,11 +259,13 @@
 			}
 			path = [NSString stringWithFormat:@"%@/%@", pwd, path];
 		}
-		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@%@", target, path]];
+		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
 		[self addURL:url];
+	} else {
+		INFO(@"FAILED to connect to %@: %@", host, error);
+		NSAlert *alert = [NSAlert alertWithError:error];
+		[alert runModal];
 	}
-	else
-		INFO(@"FAILED to connect to %@", target);
 }
 
 - (IBAction)cancelSftpSheet:(id)sender

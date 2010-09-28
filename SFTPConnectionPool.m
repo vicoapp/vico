@@ -7,9 +7,7 @@
 {
 	self = [super init];
 	if (self)
-	{
 		connections = [[NSMutableDictionary alloc] init];
-	}
 	return self;
 }
 
@@ -17,27 +15,25 @@
 {
 	static SFTPConnectionPool *sharedPool = nil;
 	if (sharedPool == nil)
-	{
 		sharedPool = [[SFTPConnectionPool alloc] init];
-	}
 	return sharedPool;
 }
 
-- (SFTPConnection *)connectionWithTarget:(NSString *)aTarget
+- (SFTPConnection *)connectionWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError
 {
-	SFTPConnection *conn = [connections objectForKey:aTarget];
-	INFO(@"conn %@ = %@", aTarget, conn);
-	INFO(@"all connections = %@", connections);
-	if (conn == nil)
-	{
-		conn = [[SFTPConnection alloc] initWithTarget:aTarget];
-		INFO(@"conn = %@", conn);
-		if (conn)
-		{
-			[connections setObject:conn forKey:aTarget];
-		}
+	NSString *userhost = [NSString stringWithFormat:@"%@@%@", username, hostname];
+	SFTPConnection *conn = [connections objectForKey:userhost];
+	if (conn == nil) {
+		conn = [[SFTPConnection alloc] initWithHost:hostname user:username error:outError];
+		if (conn != nil)
+			[connections setObject:conn forKey:userhost];
 	}
 	return conn;
+}
+
+- (SFTPConnection *)connectionWithURL:(NSURL *)url error:(NSError **)outError
+{
+	return [self connectionWithHost:[url host] user:[url user] error:outError];
 }
 
 @end

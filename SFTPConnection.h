@@ -8,8 +8,6 @@
 #include "sftp-client.h"
 #include "misc.h"
 
-#define SSH_PATH "/usr/bin/ssh"
-
 @interface SFTPDirectoryEntry : NSObject
 {
 	SFTP_DIRENT *dirent;
@@ -23,26 +21,33 @@
 
 @interface SFTPConnection : NSObject
 {
-	NSString *target;         // "user@host" or just "host"
+	NSString *host;
+	NSString *user;
+
+	NSTask *ssh_task;
+	NSPipe *ssh_input;
+	NSPipe *ssh_output;
+	NSPipe *ssh_error;
 	int fd_in, fd_out;        // pipes to ssh process
 	struct sftp_conn *conn;
-	NSString *controlPath;
-
-	/* PID of ssh transport process */
-	pid_t sshpid;
+	
+	NSMutableData *stderr;
 }
 
-@property(readonly) NSString *controlPath;
-@property(readonly) NSString *target;
+@property(readonly) NSString *host;
+@property(readonly) NSString *user;
 
-- (SFTPConnection *)initWithTarget:(NSString *)aTarget;
-- (SFTPConnection *)initWithControlPath:(NSString *)aPath;
++ (NSError *)errorWithDescription:(id)errorDescription;
 
-- (Attrib *)stat:(NSString *)path;
+- (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
+
+- (Attrib *)stat:(NSString *)path error:(NSError **)outError;
 - (BOOL)isDirectory:(NSString *)path;
-- (NSArray *)directoryContentsAtPath:(NSString *)path;
+- (NSArray *)directoryContentsAtPath:(NSString *)path error:(NSError **)outError;
 - (NSString *)currentDirectory;
-- (NSData *)dataWithContentsOfFile:(NSString *)path;
+- (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError;
+- (NSString *)hostWithUser;
+- (NSString *)stderr;
 
 @end

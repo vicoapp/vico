@@ -290,10 +290,17 @@
 	[self pushLocationOnJumpList:start_location];
 
 	final_location = end_location = offset;
-	if (delta == 1)
-                end_location++;
-        else
-        	start_location++;
+
+	/*
+	 * Adjust the start/end location to include the begin/end match.
+	 * Do this when % is used as motion component in a non-line-oriented editing command.
+	 */
+	if (command.key == 'd' || command.key == 'c' || command.key == 'y') {
+		if (delta == 1)
+			end_location++;
+		else
+			start_location++;
+	}
 
         return YES;
 }

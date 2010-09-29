@@ -35,6 +35,7 @@
 	NSArray *filteredSymbols;
 	NSDictionary *symbolScopes;
 	NSDictionary *symbolTransforms;
+	NSDictionary *symbolIcons;
 	NSTimer *updateSymbolsTimer;
 
 	ViSnippet *activeSnippet;

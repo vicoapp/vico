@@ -66,7 +66,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	
 		textStorage = [[NSTextStorage alloc] initWithString:@""];
 		[textStorage setDelegate:self];
-		
+
+		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"symbol-icons" ofType:@"plist"]];
+
 		[self configureForURL:nil];
 	}
 	return self;
@@ -777,6 +779,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [fs count];
 }
 
+- (NSImage *)matchSymbolIconForScope:(NSArray *)scopes
+{
+	NSString *scopeSelector = [[symbolIcons allKeys] bestMatchForScopes:scopes];
+	if (scopeSelector)
+		return [NSImage imageNamed:[symbolIcons objectForKey:scopeSelector]];
+	return nil;
+}
+
 - (void)updateSymbolList:(NSTimer *)timer
 {
 	NSString *lastSelector = nil;
@@ -823,18 +833,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				if ([scopeSelector matchesScopes:scopes]) {
 					lastSelector = scopeSelector;
 					wholeRange = range;
-					if ([@"meta.function" matchesScopes:scopes] || [@"meta.method" matchesScopes:scopes])
-						img = [NSImage imageNamed:@"function"];
-					else if ([@"meta.class" matchesScopes:scopes])
-						img = [NSImage imageNamed:@"class"];
-					else if ([@"meta.module" matchesScopes:scopes])
-						img = [NSImage imageNamed:@"module"];
-					else if ([@"meta.preprocessor" matchesScopes:scopes])
-						img = [NSImage imageNamed:@"define"];
-					else if ([@"meta.tag" matchesScopes:scopes])
-						img = [NSImage imageNamed:@"tag"];
-					else
-						img = nil;
+					img = [self matchSymbolIconForScope:scopes];
 					break;
 				}
 			}

@@ -690,27 +690,33 @@ done:
 
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError
 {
-	NSString *remote_temp_path = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+	Attrib *attr = [self stat:path error:nil];
 
-	if (![self uploadData:data toFile:remote_temp_path withAttributes:[self stat:path error:nil] error:outError])
+	if (attr == NULL) {
+		/* New file. */
+		return [self uploadData:data toFile:path withAttributes:attr error:outError];
+	}
+
+	NSString *tmp = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+
+	if (![self uploadData:data toFile:tmp withAttributes:attr error:outError])
 		return NO;
 
 	if (sftp_has_posix_rename(conn)) {
-		return [self renameItemAtPath:remote_temp_path toPath:path error:outError];
-	} else {
-		/* Without POSIX rename support, first move away the existing file, rename our temporary file
-		 * to correct name, and finally delete the moved away original file.
-		 * XXX: doesn't work for new files.
+		/*
+		 * With POSIX rename support, we're guaranteed to be able to atomically replace the file.
 		 */
-		NSString *remote_temp_path2 = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
-		if ([self renameItemAtPath:path toPath:remote_temp_path2 error:outError] &&
-		    [self renameItemAtPath:remote_temp_path toPath:path error:outError] &&
-		    [self removeItemAtPath:remote_temp_path2 error:outError])
+		return [self renameItemAtPath:tmp toPath:path error:outError];
+	} else {
+		/*
+		 * Without POSIX rename support, first move away the existing file, rename our temporary file
+		 * to correct name, and finally delete the moved away original file.
+		 */
+		NSString *tmp2 = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+		if ([self renameItemAtPath:path toPath:tmp2 error:outError] &&
+		    [self renameItemAtPath:tmp toPath:path error:outError] &&
+		    [self removeItemAtPath:tmp2 error:outError])
 			return YES;
-//		if (do_rename(conn, [path UTF8String], [remote_temp_path2 UTF8String]) == 0 &&
-//		    do_rename(conn, [remote_temp_path UTF8String], [path UTF8String]) == 0 &&
-//		    do_rm(conn, [remote_temp_path2 UTF8String]) == 0)
-//			return YES;
 	}
 
 	return NO;

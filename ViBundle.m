@@ -58,7 +58,7 @@
 		if ([value rangeOfString:@"italic"].location != NSNotFound)
 			[normalizedPreference setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
 		if ([value rangeOfString:@"bold"].location != NSNotFound)
-			[normalizedPreference setObject:[NSNumber numberWithFloat:-2.0] forKey:NSStrokeWidthAttributeName];
+			[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
 	}
 }
 

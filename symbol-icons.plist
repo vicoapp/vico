@@ -1,0 +1,13 @@
+{
+	"meta.function" = function;
+	"meta.method" = function;
+	"meta.class" = class;
+	"meta.interface-or-protocol" = class;
+	"meta.module" = module;
+	"meta.directive.module" = module;
+	"source meta.implementation entity.name.type" = module;
+	"meta.directive.define" = define;
+	"meta.preprocessor" = define;
+	"meta.tag" = tag;
+	"" = unknown;
+}

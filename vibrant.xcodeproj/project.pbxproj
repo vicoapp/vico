@@ -82,6 +82,8 @@
 		9AE501CE1253569700579C54 /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501CC1253569500579C54 /* tag.png */; };
 		9AE501D812535DE200579C54 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501D712535DE200579C54 /* define.png */; };
 		9AE501D912535DE500579C54 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501D712535DE200579C54 /* define.png */; };
+		9AE501FF1253862E00579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
+		9AE502021253891700579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
 		9AF200D30ECC8BED00C5771B /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF200D20ECC8BED00C5771B /* ViSymbol.m */; };
 		9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */; };
 		9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */; };
@@ -263,6 +265,7 @@
 		9AE501C31253551E00579C54 /* module.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = module.png; path = Images/module.png; sourceTree = "<group>"; };
 		9AE501CC1253569500579C54 /* tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tag.png; path = Images/tag.png; sourceTree = "<group>"; };
 		9AE501D712535DE200579C54 /* define.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = define.png; path = Images/define.png; sourceTree = "<group>"; };
+		9AE501FE1253862E00579C54 /* symbol-icons.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = "symbol-icons.plist"; sourceTree = "<group>"; };
 		9AF200D10ECC8BED00C5771B /* ViSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbol.h; sourceTree = "<group>"; };
 		9AF200D20ECC8BED00C5771B /* ViSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbol.m; sourceTree = "<group>"; };
 		9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray-patterns.h"; sourceTree = "<group>"; };
@@ -419,6 +422,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9AE501FE1253862E00579C54 /* symbol-icons.plist */,
 				9AB0178A0EDDBF8100905BED /* Images */,
 				9A70E98D0E9F68100013AA1D /* Bundles */,
 				9A70E9720E9F67B80013AA1D /* Themes */,
@@ -716,6 +720,7 @@
 				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
 				9A70F2DA0E9F68100013AA1D /* Bundles in Resources */,
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
+				9AE502021253891700579C54 /* symbol-icons.plist in Resources */,
 				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
 				9AE501D912535DE500579C54 /* define.png in Resources */,
@@ -739,6 +744,7 @@
 				9AE501C41253551E00579C54 /* module.png in Resources */,
 				9AE501CD1253569500579C54 /* tag.png in Resources */,
 				9AE501D812535DE200579C54 /* define.png in Resources */,
+				9AE501FF1253862E00579C54 /* symbol-icons.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

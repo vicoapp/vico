@@ -16,7 +16,7 @@
 //		imgRect.size.height += (cellFrame.size.height - size.height) / 2;
 	[image setFlipped:YES];
 	[image drawInRect:imgRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-	NSRect textRect = NSMakeRect(cellFrame.origin.x + size.width+4, cellFrame.origin.y + 2, cellFrame.size.width - size.width+4, cellFrame.size.height);
+	NSRect textRect = NSMakeRect(cellFrame.origin.x + size.width+4, cellFrame.origin.y + 3.5, cellFrame.size.width - size.width+4, cellFrame.size.height);
 	[super drawInteriorWithFrame:textRect inView:controlView];
 }
 

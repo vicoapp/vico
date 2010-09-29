@@ -164,9 +164,7 @@
 - (NSMutableArray *)lineIndices
 {
 	if (lineIndices == nil)
-	{
 		[self calculateLines];
-	}
 	return lineIndices;
 }
 
@@ -180,51 +178,42 @@
 {
 	// Invalidate the line indices. They will be recalculated and recached on demand.
 	[self invalidateLineIndices];
-	
-    [self setNeedsDisplay:YES];
+	[self setNeedsDisplay:YES];
 }
 
 - (NSUInteger)lineNumberForLocation:(float)location
 {
-	NSUInteger		line, count, ndx, rectCount, i;
-	NSRectArray		rects;
-	NSRect			visibleRect;
-	NSLayoutManager	*layoutManager;
-	NSTextContainer	*container;
-	NSRange			nullRange;
-	NSMutableArray	*lines;
-	id				view;
+	NSUInteger		 line, count, ndx, rectCount, i;
+	NSRectArray		 rects;
+	NSRect			 visibleRect;
+	NSLayoutManager		*layoutManager;
+	NSTextContainer		*container;
+	NSRange			 nullRange;
+	NSMutableArray		*lines;
+	id			 view;
 
 	view = [self clientView];
 	visibleRect = [[[self scrollView] contentView] bounds];
-
 	lines = [self lineIndices];
-
 	location += NSMinY(visibleRect);
 
-	if ([view isKindOfClass:[NSTextView class]])
-	{
+	if ([view isKindOfClass:[NSTextView class]]) {
 		nullRange = NSMakeRange(NSNotFound, 0);
 		layoutManager = [view layoutManager];
 		container = [view textContainer];
 		count = [lines count];
-		
-		for (line = 0; line < count; line++)
-		{
+
+		for (line = 0; line < count; line++) {
 			ndx = [[lines objectAtIndex:line] unsignedIntValue];
 
 			rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(ndx, 0)
-								 withinSelectedCharacterRange:nullRange
-											  inTextContainer:container
-												rectCount:&rectCount];
+					     withinSelectedCharacterRange:nullRange
+							  inTextContainer:container
+								rectCount:&rectCount];
 			
 			for (i = 0; i < rectCount; i++)
-			{
-				if ((location >= NSMinY(rects[i])) && (location < NSMaxY(rects[i])))
-				{
+				if (location >= NSMinY(rects[i]) && location < NSMaxY(rects[i]))
 					return line + 1;
-				}
-			}
 		}	
 	}
 	return NSNotFound;

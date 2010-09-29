@@ -72,6 +72,16 @@
 		9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856C30EF90D99008DF460 /* resizehandle.png */; };
 		9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */; };
 		9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */; };
+		9AE501861253487D00579C54 /* function.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501851253487D00579C54 /* function.png */; };
+		9AE5019112534A9600579C54 /* function.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501851253487D00579C54 /* function.png */; };
+		9AE501B31253527D00579C54 /* class.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501B21253527D00579C54 /* class.png */; };
+		9AE501B41253528500579C54 /* class.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501B21253527D00579C54 /* class.png */; };
+		9AE501C41253551E00579C54 /* module.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501C31253551E00579C54 /* module.png */; };
+		9AE501C51253552200579C54 /* module.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501C31253551E00579C54 /* module.png */; };
+		9AE501CD1253569500579C54 /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501CC1253569500579C54 /* tag.png */; };
+		9AE501CE1253569700579C54 /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501CC1253569500579C54 /* tag.png */; };
+		9AE501D812535DE200579C54 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501D712535DE200579C54 /* define.png */; };
+		9AE501D912535DE500579C54 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501D712535DE200579C54 /* define.png */; };
 		9AF200D30ECC8BED00C5771B /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF200D20ECC8BED00C5771B /* ViSymbol.m */; };
 		9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */; };
 		9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */; };
@@ -248,6 +258,11 @@
 		9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-vi_commands.m"; sourceTree = "<group>"; };
 		9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
 		9AD8B91B0DA8FC1700E1558E /* ViTagStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagStack.m; sourceTree = "<group>"; };
+		9AE501851253487D00579C54 /* function.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = function.png; path = Images/function.png; sourceTree = "<group>"; };
+		9AE501B21253527D00579C54 /* class.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = class.png; path = Images/class.png; sourceTree = "<group>"; };
+		9AE501C31253551E00579C54 /* module.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = module.png; path = Images/module.png; sourceTree = "<group>"; };
+		9AE501CC1253569500579C54 /* tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tag.png; path = Images/tag.png; sourceTree = "<group>"; };
+		9AE501D712535DE200579C54 /* define.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = define.png; path = Images/define.png; sourceTree = "<group>"; };
 		9AF200D10ECC8BED00C5771B /* ViSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbol.h; sourceTree = "<group>"; };
 		9AF200D20ECC8BED00C5771B /* ViSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbol.m; sourceTree = "<group>"; };
 		9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray-patterns.h"; sourceTree = "<group>"; };
@@ -566,6 +581,11 @@
 		9AB0178A0EDDBF8100905BED /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9AE501D712535DE200579C54 /* define.png */,
+				9AE501CC1253569500579C54 /* tag.png */,
+				9AE501C31253551E00579C54 /* module.png */,
+				9AE501B21253527D00579C54 /* class.png */,
+				9AE501851253487D00579C54 /* function.png */,
 				9AD856C30EF90D99008DF460 /* resizehandle.png */,
 				9AD856C10EF90CE6008DF460 /* actionbarbg.png */,
 				9AD856B90EF90B9A008DF460 /* add.png */,
@@ -698,6 +718,11 @@
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
 				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
+				9AE501D912535DE500579C54 /* define.png in Resources */,
+				9AE501CE1253569700579C54 /* tag.png in Resources */,
+				9AE501B41253528500579C54 /* class.png in Resources */,
+				9AE501C51253552200579C54 /* module.png in Resources */,
+				9AE5019112534A9600579C54 /* function.png in Resources */,
 				9AD856BA0EF90B9A008DF460 /* add.png in Resources */,
 				9AD856C20EF90CE6008DF460 /* actionbarbg.png in Resources */,
 				9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */,
@@ -709,6 +734,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9AE501861253487D00579C54 /* function.png in Resources */,
+				9AE501B31253527D00579C54 /* class.png in Resources */,
+				9AE501C41253551E00579C54 /* module.png in Resources */,
+				9AE501CD1253569500579C54 /* tag.png in Resources */,
+				9AE501D812535DE200579C54 /* define.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

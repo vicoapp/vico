@@ -15,24 +15,22 @@
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
-	NSString *localDirectory = nil;
 	BOOL isDirectory;
 	if ([absoluteURL isFileURL] &&
-	    [[NSFileManager defaultManager] fileExistsAtPath:[absoluteURL path]
-						 isDirectory:&isDirectory] && isDirectory)
-		localDirectory = [absoluteURL path];
-	else {
-		*outError = [NSError errorWithDomain:@"NSURLErrorDomain" code:NSURLErrorUnsupportedURL userInfo:nil];
-		return NO;
+	    [[NSFileManager defaultManager] fileExistsAtPath:[absoluteURL path] isDirectory:&isDirectory] && isDirectory) {
+		initialURL = absoluteURL;
+		return YES;
 	}
 
-	initialURL = absoluteURL;
-	return YES;
+	if (outError)
+		*outError = [NSError errorWithDomain:@"NSURLErrorDomain" code:NSURLErrorUnsupportedURL userInfo:nil];
+	return NO;
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-	*outError = [NSError errorWithDomain:@"NSURLErrorDomain" code:NSURLErrorUnsupportedURL userInfo:nil];
+	if (outError)
+		*outError = [NSError errorWithDomain:@"NSURLErrorDomain" code:NSURLErrorUnsupportedURL userInfo:nil];
 	return nil;
 }
 

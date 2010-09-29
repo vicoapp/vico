@@ -10,6 +10,7 @@
 	NSRect imgRect;
 	imgRect.origin = cellFrame.origin;
 	imgRect.origin.x += 1; // two pixels space around width
+	imgRect.origin.y += 2; // four pixels space around height
 	imgRect.size = size;
 //	if (imgRect.size.height < cellFrame.size.height)
 //		imgRect.size.height += (cellFrame.size.height - size.height) / 2;

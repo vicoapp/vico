@@ -43,5 +43,22 @@ static inline u_int64_t tenpow(unsigned x)
 	return YES;
 }
 
+- (NSString *)bestMatchForScopes:(NSArray *)scopes
+{
+	NSString *foundScopeSelector = nil;
+	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
+
+	for (scopeSelector in self) {
+		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		if (rank > highest_rank) {
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
+		}
+	}
+
+	return foundScopeSelector;
+}
+
 @end
 

@@ -540,13 +540,21 @@
 				topOpenMatch = [openMatches lastObject];
 				if (topOpenMatch == nil)
 					break;
+#if 0
 				NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:[endMatch rangeOfMatchedString]];
+				/*
+				 * Disabled the loop as it breaks the Java bundle.
+				 * I don't remember what the loop actually fixed,
+				 * so we're probably still doing something wrong here.
+				 */
 				// if the next top open match also matches the end range,
 				// and it is a look-ahead match, keep popping off open matches
 				if (endMatches == nil || [[endMatches objectAtIndex:0] rangeOfMatchedString].length != 0)
 					break;
+#endif
+				break;
 			}
-			
+
 			DEBUG(@"returning %i continuation matches", [openMatches count]);
 			return [openMatches count] > 0 ? openMatches : nil;
 		}

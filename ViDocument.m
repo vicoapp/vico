@@ -780,6 +780,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)updateSymbolList:(NSTimer *)timer
 {
 	NSString *lastSelector = nil;
+	NSImage *img = nil;
 	NSRange wholeRange;
 
 #if 0
@@ -814,7 +815,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 					symbol = [tr transformSymbol:symbol];
 				}
 
-				[syms addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange]];
+				[syms addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange image:img]];
 			}
 			lastSelector = nil;
 
@@ -822,6 +823,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				if ([scopeSelector matchesScopes:scopes]) {
 					lastSelector = scopeSelector;
 					wholeRange = range;
+					if ([@"meta.function" matchesScopes:scopes] || [@"meta.method" matchesScopes:scopes])
+						img = [NSImage imageNamed:@"function"];
+					else if ([@"meta.class" matchesScopes:scopes])
+						img = [NSImage imageNamed:@"class"];
+					else if ([@"meta.module" matchesScopes:scopes])
+						img = [NSImage imageNamed:@"module"];
+					else if ([@"meta.preprocessor" matchesScopes:scopes])
+						img = [NSImage imageNamed:@"define"];
+					else if ([@"meta.tag" matchesScopes:scopes])
+						img = [NSImage imageNamed:@"tag"];
+					else
+						img = nil;
 					break;
 				}
 			}

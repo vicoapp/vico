@@ -9,6 +9,7 @@
 #import "ViThemeStore.h"
 #import "ViLanguageStore.h"
 #import "ViDocumentController.h"
+#import "MHTextIconCell.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -116,6 +117,7 @@ static NSWindowController	*currentWindowController = nil;
 	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
 	[symbolsOutline setAction:@selector(goToSymbol:)];
 
+	[[symbolsOutline outlineTableColumn] setDataCell:[[MHTextIconCell alloc] init]];
 	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
@@ -1322,8 +1324,14 @@ static NSWindowController	*currentWindowController = nil;
 	NSCell *cell;
 	if ([self isSeparatorItem:item])
 		cell = separatorCell;
-	else
+	else {
 		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];
+
+		if ([item respondsToSelector:@selector(image)])
+			[cell setImage:[item image]];
+		else
+			[cell setImage:nil];
+	}
 
 	if (![item isKindOfClass:[ViDocument class]])
 		[cell setFont:[NSFont systemFontOfSize:11.0]];

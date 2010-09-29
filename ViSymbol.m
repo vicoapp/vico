@@ -2,13 +2,14 @@
 
 @implementation ViSymbol
 
-- (ViSymbol *)initWithSymbol:(NSString *)aSymbol range:(NSRange)aRange
+- (ViSymbol *)initWithSymbol:(NSString *)aSymbol range:(NSRange)aRange image:(NSImage *)anImage
 {
 	self = [super init];
 	if (self)
 	{
 		symbol = aSymbol;
 		range = aRange;
+		image = anImage;
 	}
 	
 	return self;
@@ -16,6 +17,7 @@
 
 @synthesize symbol;
 @synthesize range;
+@synthesize image;
 
 - (int)sortOnLocation:(ViSymbol *)anotherSymbol
 {

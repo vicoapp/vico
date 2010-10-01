@@ -91,12 +91,17 @@ ToolbarHeightForWindow(NSWindow *window)
 - (void)updateBundleStatus
 {
 	NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:@"LastBundleRepoReload"];
-	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
-	[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available. Last updated %@.",
-	    (unsigned)[[[ViLanguageStore defaultStore] allBundles] count],
-	    [repositories count], [dateFormatter stringFromDate:date]]];
+	if (date) {
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+		[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
+		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available. Last updated %@.",
+		    (unsigned)[[[ViLanguageStore defaultStore] allBundles] count],
+		    [repositories count], [dateFormatter stringFromDate:date]]];
+	} else {
+		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available.",
+		    (unsigned)[[[ViLanguageStore defaultStore] allBundles] count], [repositories count]]];
+	}
 }
 
 - (void)loadBundlesFromRepo:(NSString *)username

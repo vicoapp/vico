@@ -1,5 +1,0 @@
-The chktex program is licensed under the GNU General Public License Version 2, June 1991.
-
-You can download the source code for chktex from here:  http://baruch.ev-en.org/proj/chktex/
-
-For instructions on compiling under OS X see here:  http://www2.hawaii.edu/~ramonf/ChkTeXonMacOSX/index.html

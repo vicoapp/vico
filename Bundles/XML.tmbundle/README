@@ -1,9 +1,0 @@
--- Simple XML syntax dictionary for TextMate.
--- Author: Brian Lalor <blalor@bravo5.org>
--- 
--- $URL$
--- $Id$
-
-Another one I wrote. This is based off the HTML bundle that came with TM 1.0,
-probably, but with some fixes to make it more generic. I prefer this one for
-doing HTML, actually.

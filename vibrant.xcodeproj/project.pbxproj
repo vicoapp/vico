@@ -12,7 +12,6 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
-		9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
@@ -167,7 +166,6 @@
 		8D15AC370486D014006FF6A4 /* Vibrant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vibrant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
-		9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "TB_ViewMenu-Extended.pdf"; path = "Images/TB_ViewMenu-Extended.pdf"; sourceTree = "<group>"; };
 		9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextStorage-additions.h"; sourceTree = "<group>"; };
 		9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextStorage-additions.m"; sourceTree = "<group>"; };
 		9A15BB1D1254D3E7009BBFC8 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = Images/tick.png; sourceTree = "<group>"; };
@@ -612,7 +610,6 @@
 				9AD856C10EF90CE6008DF460 /* actionbarbg.png */,
 				9AD856B90EF90B9A008DF460 /* add.png */,
 				9AD856A80EF90AF1008DF460 /* actionmenu.png */,
-				9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -758,7 +755,6 @@
 				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
 				9AE502021253891700579C54 /* symbol-icons.plist in Resources */,
-				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
 				9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */,
 				9AE501D912535DE500579C54 /* define.png in Resources */,

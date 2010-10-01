@@ -287,16 +287,17 @@ ToolbarHeightForWindow(NSWindow *window)
 #pragma mark -
 #pragma mark Downloading GitHub repositories
 
-- (void)reloadSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void)progressSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-	[bundleProgress stopAnimation:self];
 	[sheet orderOut:self];
+	progressCancelled = NO;
 }
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
 	[repoDownloads removeObjectsForKeys:[repoDownloads allKeysForObject:download]];
-	INFO(@"download %@ failed with error %@", download, error);
+	[self cancelProgressSheet:nil];
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Download failed: %@", [error localizedDescription]]];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)download
@@ -312,13 +313,20 @@ ToolbarHeightForWindow(NSWindow *window)
 	}
 }
 
-- (IBAction)cancelReloadRepositories:(id)sender
+- (IBAction)cancelProgressSheet:(id)sender
 {
-	for (NSString *username in repoDownloads) {
-		INFO(@"cancelling repo download %@", username);
-		[[repoDownloads objectForKey:username] cancel];
+	if (progressCancelled) {
+		[NSApp endSheet:progressSheet];
+		return;
 	}
-	[NSApp endSheet:progressSheet];
+
+	progressCancelled = YES;
+	for (NSString *username in repoDownloads)
+		[[repoDownloads objectForKey:username] cancel];
+	[progressButton setTitle:@"OK"];
+	[progressButton setKeyEquivalent:@"\n"];
+	[bundleProgress stopAnimation:self];
+	[progressDescription setStringValue:@"Cancelled download from GitHub"];
 }
 
 - (void)reloadRepositoriesFromUsers:(NSArray *)users
@@ -326,12 +334,14 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ([users count] == 0)
 		return;
 
+	[progressButton setTitle:@"Cancel"];
+	[progressButton setKeyEquivalent:@""];
 	[bundleProgress startAnimation:self];
 	[progressDescription setStringValue:@"Reloading bundle repositories from GitHub..."];
 	[NSApp beginSheet:progressSheet
 	   modalForWindow:[self window]
 	    modalDelegate:self
-	   didEndSelector:@selector(reloadSheetDidEnd:returnCode:contextInfo:)
+	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
 	for (NSDictionary *repo in users) {
@@ -360,9 +370,10 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	INFO(@"bundle download failed: %@", error);
+	[self cancelProgressSheet:nil];
+	NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"displayName"], [error localizedDescription]]];
 	[installTask terminate];
-	[NSApp endSheet:progressSheet];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -374,13 +385,11 @@ ToolbarHeightForWindow(NSWindow *window)
 		INFO(@"failed to write to tar: %@", exception);
 		[installConnection cancel];
 		[installTask terminate];
-		[NSApp endSheet:progressSheet];
-	}
-}
 
-- (void)installSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	[sheet orderOut:self];
+		[self cancelProgressSheet:nil];
+		NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
+	}
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -405,8 +414,10 @@ ToolbarHeightForWindow(NSWindow *window)
 				break;
 			}
 		}
-	} else
-		INFO(@"tar exited with status %i", status);
+	} else {
+		[self cancelProgressSheet:nil];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
+	}
 
 	[bundlesToProcess removeObjectAtIndex:0];
 	if ([bundlesToProcess count] == 0)
@@ -435,7 +446,9 @@ ToolbarHeightForWindow(NSWindow *window)
 	}
 	@catch (NSException *exception) {
 		INFO(@"failed to launch task: %@", exception);
-		[NSApp endSheet:progressSheet];
+		[self cancelProgressSheet:nil];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
+		    [repo objectForKey:@"displayName"], [exception reason]]];
 		return;
 	}
 
@@ -449,10 +462,12 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ([selectedBundles count] == 0)
 		return;
 
+	[progressButton setTitle:@"Cancel"];
+	[progressButton setKeyEquivalent:@""];
 	[NSApp beginSheet:progressSheet
 	   modalForWindow:[self window]
 	    modalDelegate:self
-	   didEndSelector:@selector(installSheetDidEnd:returnCode:contextInfo:)
+	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
 	bundlesToProcess = [NSMutableArray arrayWithArray:selectedBundles];

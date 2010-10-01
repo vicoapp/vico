@@ -23,6 +23,7 @@
 	IBOutlet NSTableView *repoUsersTable;
 	IBOutlet NSWindow *selectRepoSheet;
 	IBOutlet NSWindow *progressSheet;
+	IBOutlet NSButton *progressButton;
 	IBOutlet NSProgressIndicator *bundleProgress;
 	IBOutlet NSTextField *progressDescription;
 	IBOutlet NSSearchField *repoFilterField;
@@ -30,6 +31,7 @@
 	IBOutlet NSPopUpButton *insertModeInputSources;
 	IBOutlet NSPopUpButton *normalModeInputSources;
 #endif
+	BOOL progressCancelled;
 	ViRegexp *repoNameRx;
 	NSMutableArray *repositories;
 	NSArray *filteredRepositories;
@@ -48,7 +50,7 @@
 
 - (IBAction)filterRepositories:(id)sender;
 - (IBAction)reloadRepositories:(id)sender;
-- (IBAction)cancelReloadRepositories:(id)sender;
+- (IBAction)cancelProgressSheet:(id)sender;
 
 - (IBAction)installBundles:(id)sender;
 - (IBAction)uninstallBundles:(id)sender;

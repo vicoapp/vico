@@ -11,13 +11,13 @@
 			<string key="NS.object.0">788</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="122"/>
+			<integer value="17"/>
 			<integer value="2"/>
-			<integer value="15"/>
 			<integer value="16"/>
 			<integer value="262"/>
-			<integer value="17"/>
+			<integer value="122"/>
 			<integer value="244"/>
+			<integer value="15"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1121,7 +1121,7 @@
 			<object class="NSWindowTemplate" id="742208481">
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{157, 382}, {441, 79}}</string>
+				<string key="NSWindowRect">{{157, 368}, {441, 93}}</string>
 				<int key="NSWTFlags">611844096</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -1134,13 +1134,13 @@
 						<object class="NSTextField" id="811909926">
 							<reference key="NSNextResponder" ref="602287331"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 45}, {407, 14}}</string>
+							<string key="NSFrame">{{17, 45}, {407, 28}}</string>
 							<reference key="NSSuperview" ref="602287331"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="66666300">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">272760832</int>
-								<string key="NSContents">Reloading bundle repositories from GitHub...</string>
+								<string key="NSContents">Reloading bundle repositories from GitHub... Reloading bundle repositories from GitHub...</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="811909926"/>
 								<reference key="NSBackgroundColor" ref="10366931"/>
@@ -1171,13 +1171,13 @@
 								<int key="NSButtonFlags">-2038284033</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
+								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
 						</object>
 					</array>
-					<string key="NSFrameSize">{441, 79}</string>
+					<string key="NSFrameSize">{441, 93}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -2094,6 +2094,22 @@
 					</object>
 					<int key="connectionID">352</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">cancelProgressSheet:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="220699598"/>
+					</object>
+					<int key="connectionID">357</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">progressButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="220699598"/>
+					</object>
+					<int key="connectionID">358</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2956,9 +2972,9 @@
 				<string key="259.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="26.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="260.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="261.IBEditorWindowLastContentRect">{{333, 675}, {441, 79}}</string>
+				<string key="261.IBEditorWindowLastContentRect">{{333, 661}, {441, 93}}</string>
 				<string key="261.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="261.IBWindowTemplateEditedContentRect">{{333, 675}, {441, 79}}</string>
+				<string key="261.IBWindowTemplateEditedContentRect">{{333, 661}, {441, 93}}</string>
 				<boolean value="NO" key="261.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="262.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="263.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3015,7 +3031,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">352</int>
+			<int key="maxID">358</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3025,7 +3041,7 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="acceptSelectRepoSheet:">id</string>
 						<string key="addRepoUser:">id</string>
-						<string key="cancelReloadRepositories:">id</string>
+						<string key="cancelProgressSheet:">id</string>
 						<string key="filterRepositories:">id</string>
 						<string key="installBundles:">id</string>
 						<string key="reloadRepositories:">id</string>
@@ -3043,8 +3059,8 @@
 							<string key="name">addRepoUser:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="cancelReloadRepositories:">
-							<string key="name">cancelReloadRepositories:</string>
+						<object class="IBActionInfo" key="cancelProgressSheet:">
+							<string key="name">cancelProgressSheet:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="filterRepositories:">
@@ -3088,6 +3104,7 @@
 						<string key="generalView">NSView</string>
 						<string key="insertModeInputSources">NSPopUpButton</string>
 						<string key="normalModeInputSources">NSPopUpButton</string>
+						<string key="progressButton">NSButton</string>
 						<string key="progressDescription">NSTextField</string>
 						<string key="progressSheet">NSWindow</string>
 						<string key="repoFilterField">NSSearchField</string>
@@ -3140,6 +3157,10 @@
 						<object class="IBToOneOutletInfo" key="normalModeInputSources">
 							<string key="name">normalModeInputSources</string>
 							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressButton">
+							<string key="name">progressButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="progressDescription">
 							<string key="name">progressDescription</string>

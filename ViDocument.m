@@ -313,6 +313,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)highlightEverything
 {
+	if (language == nil)
+		return;
+
 	/* Ditch the old syntax scopes and start with a fresh parser. */
 	syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
 
@@ -450,8 +453,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	ViLanguage *newLanguage = nil;
 	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
-	[self configureLanguage:newLanguage];
-	[windowController setSelectedLanguage:aLanguage];
+	if (newLanguage) {
+		[self configureLanguage:newLanguage];
+		[windowController setSelectedLanguage:aLanguage];
+	}
 }
 
 - (void)configureForURL:(NSURL *)aURL
@@ -529,6 +534,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 ignoreEditing = NO;
 		return;
 	}
+
+	if (language == nil)
+		return;
 
 	/*
 	 * Incrementally update the scope array.

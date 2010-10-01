@@ -68,7 +68,16 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)saveProject:(id)sender
 {
-	INFO(@"sender = %@", sender);
+}
+
+- (void)newBundleLoaded:(NSNotification *)notification
+{
+	[languageButton removeAllItems];
+	NSArray *displayNames = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+	for (NSString *displayName in displayNames)
+		[languageButton addItemWithTitle:displayName];
+	if ([[self document] respondsToSelector:@selector(language)])
+		[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
 }
 
 - (void)windowDidLoad
@@ -88,11 +97,8 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
-	[languageButton removeAllItems];
-	NSArray *languages = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-	NSString *language;
-	for (language in languages)
-		[languageButton addItemWithTitle:language];
+	[self newBundleLoaded:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newBundleLoaded:) name:ViLanguageStoreBundleLoadedNotification object:nil];
 
 	if ([self project] != nil)
 		[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:documentView];
@@ -349,6 +355,13 @@ static NSWindowController	*currentWindowController = nil;
 		currentWindowController = nil;
 	[windowControllers removeObject:self];
 	[tabBar setDelegate:nil];
+}
+
+- (void)synchronizeWindowTitleWithDocumentName
+{
+	[super synchronizeWindowTitleWithDocumentName];
+
+	/* Sync title with tab bar here. */
 }
 
 - (void)closeDocumentViews:(ViDocument *)document

@@ -49,6 +49,7 @@
 			@"Mac Classic", @"theme",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 			NSFullUserName(), @"licenseOwner",
+			[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
 			nil]];
 
 	/* Initialize languages and themes. */

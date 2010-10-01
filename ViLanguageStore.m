@@ -5,6 +5,14 @@
 @implementation ViLanguageStore
 
 static ViLanguageStore *defaultStore = nil;
+static NSString *bundlesDirectory = nil;
+
++ (NSString *)bundlesDirectory
+{
+	if (bundlesDirectory == nil)
+		bundlesDirectory = [@"~/Library/Application Support/Vibrant/Bundles" stringByExpandingTildeInPath];
+	return bundlesDirectory;
+}
 
 - (id)init
 {
@@ -17,74 +25,57 @@ static ViLanguageStore *defaultStore = nil;
 	return self;
 }
 
+- (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+
+	NSString *infoPath = [NSString stringWithFormat:@"%@/info.plist", bundleDirectory];
+	if (![fm fileExistsAtPath:infoPath])
+		return NO;
+
+	ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
+	if (bundle == nil)
+		return NO;
+
+	NSString *dir = [NSString stringWithFormat:@"%@/Syntaxes", bundleDirectory];
+	NSString *file;
+	for (file in [fm directoryContentsAtPath:dir]) {
+		if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
+			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]];
+			[bundle addLanguage:language];
+			[languages setObject:language forKey:[language name]];
+		}
+	}
+
+	dir = [NSString stringWithFormat:@"%@/Preferences", bundleDirectory];
+	for (file in [fm directoryContentsAtPath:dir])
+		if ([file hasSuffix:@".plist"])
+			[bundle addPreferences:[[NSMutableDictionary alloc] initWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
+
+	dir = [NSString stringWithFormat:@"%@/Snippets", bundleDirectory];
+	for (file in [fm directoryContentsAtPath:dir])
+		if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])
+			[bundle addSnippet:[NSDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
+
+	dir = [NSString stringWithFormat:@"%@/Commands", bundleDirectory];
+	for (file in [fm directoryContentsAtPath:dir])
+		if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
+			[bundle addCommand:[NSMutableDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
+
+	[bundles addObject:bundle];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViLanguageStoreBundleLoadedNotification
+							    object:self
+							  userInfo:[NSDictionary dictionaryWithObject:bundle forKey:@"bundle"]];
+
+	return YES;
+}
+
 - (void)addBundlesFromBundleDirectory:(NSString *)aPath
 {
-	BOOL isDirectory = NO;
-	if (![[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] || !isDirectory)
-		return;
-
-	NSArray *subdirs = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
-	NSString *subdir;
-	for (subdir in subdirs)
-	{
-		NSString *infoPath = [NSString stringWithFormat:@"%@/%@/info.plist", aPath, subdir];
-		if (![[NSFileManager defaultManager] fileExistsAtPath:infoPath])
-			continue;
-
-		ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
-		if (bundle == nil)
-			continue;
-
-		NSString *syntaxPath = [NSString stringWithFormat:@"%@/%@/Syntaxes", aPath, subdir];
-		NSArray *syntaxfiles = [[NSFileManager defaultManager] directoryContentsAtPath:syntaxPath];
-		NSString *syntaxfile;
-		for (syntaxfile in syntaxfiles)
-		{
-			if ([syntaxfile hasSuffix:@".tmLanguage"] || [syntaxfile hasSuffix:@".plist"])
-			{
-				ViLanguage *language = [[ViLanguage alloc] initWithPath:[NSString stringWithFormat:@"%@/%@", syntaxPath, syntaxfile]];
-				[bundle addLanguage:language];
-				[languages setObject:language forKey:[language name]];
-			}
-		}
-
-		NSString *prefsPath = [NSString stringWithFormat:@"%@/%@/Preferences", aPath, subdir];
-		NSArray *prefsfiles = [[NSFileManager defaultManager] directoryContentsAtPath:prefsPath];
-		NSString *prefsfile;
-		for (prefsfile in prefsfiles)
-		{
-			if ([prefsfile hasSuffix:@".plist"])
-			{
-				NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", prefsPath, prefsfile]];
-				[bundle addPreferences:prefs];
-			}
-		}
-
-		NSString *path = [NSString stringWithFormat:@"%@/%@/Snippets", aPath, subdir];
-		NSArray *files = [[NSFileManager defaultManager] directoryContentsAtPath:path];
-		NSString *file;
-		for (file in files)
-		{
-			if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])
-			{
-				NSDictionary *snippet = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
-				[bundle addSnippet:snippet];
-			}
-		}
-
-		path = [NSString stringWithFormat:@"%@/%@/Commands", aPath, subdir];
-		files = [[NSFileManager defaultManager] directoryContentsAtPath:path];
-		for (file in files)
-		{
-			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
-			{
-				NSMutableDictionary *command = [NSMutableDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]];
-				[bundle addCommand:command];
-			}
-		}
-
-		[bundles addObject:bundle];
-	}
+	NSArray *subdirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:aPath error:NULL];
+	for (NSString *subdir in subdirs)
+		[self loadBundleFromDirectory:[NSString stringWithFormat:@"%@/%@", aPath, subdir]];
 }
 
 - (void)initLanguages
@@ -92,20 +83,12 @@ static ViLanguageStore *defaultStore = nil;
 	languages = [[NSMutableDictionary alloc] init];
 	bundles = [[NSMutableArray alloc] init];
 
-	DEBUG(@"start initializing languages");
-	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
-#if 0
-	[self addBundlesFromBundleDirectory:@"/Library/Application Support/TextMate/Bundles"];
-#endif
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Bundles" stringByExpandingTildeInPath]];
-	[self addBundlesFromBundleDirectory:[@"~/Library/Application Support/vibrant/Bundles" stringByExpandingTildeInPath]];
-	DEBUG(@"finished initializing languages");
+	[self addBundlesFromBundleDirectory:[ViLanguageStore bundlesDirectory]];
 }
 
 + (ViLanguageStore *)defaultStore
 {
-	if (defaultStore == nil)
-	{
+	if (defaultStore == nil) {
 		defaultStore = [[ViLanguageStore alloc] init];
 		[defaultStore initLanguages];
 	}
@@ -182,8 +165,8 @@ static ViLanguageStore *defaultStore = nil;
 			}
 		}
 	}
-	
-	INFO(@"language '%@' not found", languageName);
+
+	INFO(@"missing language '%@'", languageName);
 	return nil;
 }
 
@@ -213,7 +196,7 @@ static ViLanguageStore *defaultStore = nil;
 }
 
 /*
- * Checks all bundles for the named preference (yes, this is how TextMate does it).
+ * Checks all bundles for the named preferences (yes, this is how TextMate does it).
  */
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames
 {
@@ -269,4 +252,14 @@ static ViLanguageStore *defaultStore = nil;
 	return nil;
 }
 
+- (BOOL)isBundleLoaded:(NSString *)name
+{
+	ViBundle *bundle;
+	for (bundle in bundles)
+		if ([[bundle path] rangeOfString:name].location != NSNotFound)
+			return YES;
+	return NO;
+}
+
 @end
+

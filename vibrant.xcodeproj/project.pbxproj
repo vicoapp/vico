@@ -14,6 +14,7 @@
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
+		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
 		9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */; };
 		9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1A11FF0D02C65A009EABAC /* ViCommand.m */; };
 		9A1E40AA0EFBA83400682D4A /* sftp-client.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40A30EFBA83400682D4A /* sftp-client.c */; };
@@ -47,7 +48,6 @@
 		9A709CE50EA28E3600AB54E0 /* ViBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A709CE40EA28E3600AB54E0 /* ViBundle.m */; };
 		9A70D93D0E9E76D70013AA1D /* ViWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A70D93C0E9E76D70013AA1D /* ViWindowController.m */; };
 		9A70E9890E9F67B80013AA1D /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A70E9720E9F67B80013AA1D /* Themes */; };
-		9A70F2DA0E9F68100013AA1D /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A70E98D0E9F68100013AA1D /* Bundles */; };
 		9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A73E2800D8ECA4C00859053 /* ExCommand.m */; };
 		9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */; };
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
@@ -84,6 +84,7 @@
 		9AE501D912535DE500579C54 /* define.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501D712535DE200579C54 /* define.png */; };
 		9AE501FF1253862E00579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
 		9AE502021253891700579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
+		9AE502421253BCA200579C54 /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE5023D1253BC5F00579C54 /* YAJL.framework */; };
 		9AF200D30ECC8BED00C5771B /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF200D20ECC8BED00C5771B /* ViSymbol.m */; };
 		9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */; };
 		9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */; };
@@ -130,6 +131,27 @@
 			remoteGlobalIDString = 53DF68FC067E5B5A0090B5B0;
 			remoteInfo = PSMTabBarControlFramework;
 		};
+		9AE5023C1253BC5F00579C54 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = YAJL;
+		};
+		9AE5023E1253BC5F00579C54 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 00E5DDF80F5B6E3E00C11F1D;
+			remoteInfo = Tests;
+		};
+		9AE502401253BC8700579C54 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = YAJL;
+		};
 		9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -155,6 +177,7 @@
 		9A0868EC0EE090FD00274635 /* TB_ViewMenu-Extended.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "TB_ViewMenu-Extended.pdf"; path = "Images/TB_ViewMenu-Extended.pdf"; sourceTree = "<group>"; };
 		9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextStorage-additions.h"; sourceTree = "<group>"; };
 		9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTextStorage-additions.m"; sourceTree = "<group>"; };
+		9A15BB1D1254D3E7009BBFC8 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = Images/tick.png; sourceTree = "<group>"; };
 		9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
 		9A1A11FE0D02C65A009EABAC /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -219,7 +242,6 @@
 		9A70D93B0E9E76D70013AA1D /* ViWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWindowController.h; sourceTree = "<group>"; };
 		9A70D93C0E9E76D70013AA1D /* ViWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWindowController.m; sourceTree = "<group>"; };
 		9A70E9720E9F67B80013AA1D /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = "<group>"; };
-		9A70E98D0E9F68100013AA1D /* Bundles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Bundles; sourceTree = "<group>"; };
 		9A73E27F0D8ECA4C00859053 /* ExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommand.h; sourceTree = "<group>"; };
 		9A73E2800D8ECA4C00859053 /* ExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommand.m; sourceTree = "<group>"; };
 		9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PSMTabBarControl.xcodeproj; path = PSMTabBarControl/PSMTabBarControl.xcodeproj; sourceTree = "<group>"; };
@@ -266,6 +288,7 @@
 		9AE501CC1253569500579C54 /* tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tag.png; path = Images/tag.png; sourceTree = "<group>"; };
 		9AE501D712535DE200579C54 /* define.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = define.png; path = Images/define.png; sourceTree = "<group>"; };
 		9AE501FE1253862E00579C54 /* symbol-icons.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = "symbol-icons.plist"; sourceTree = "<group>"; };
+		9AE502371253BC5E00579C54 /* YAJL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = YAJL.xcodeproj; path = "yajl-objc/Project/YAJL.xcodeproj"; sourceTree = "<group>"; };
 		9AF200D10ECC8BED00C5771B /* ViSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbol.h; sourceTree = "<group>"; };
 		9AF200D20ECC8BED00C5771B /* ViSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbol.m; sourceTree = "<group>"; };
 		9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray-patterns.h"; sourceTree = "<group>"; };
@@ -297,6 +320,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9AE502421253BCA200579C54 /* YAJL.framework in Frameworks */,
 				9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */,
@@ -344,6 +368,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
+				9AE502371253BC5E00579C54 /* YAJL.xcodeproj */,
 				9A4BA1F8118C80CD0093E2AB /* license key support */,
 				9A1E40A10EFBA81E00682D4A /* sftp */,
 				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
@@ -422,9 +447,9 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9A15BB1D1254D3E7009BBFC8 /* tick.png */,
 				9AE501FE1253862E00579C54 /* symbol-icons.plist */,
 				9AB0178A0EDDBF8100905BED /* Images */,
-				9A70E98D0E9F68100013AA1D /* Bundles */,
 				9A70E9720E9F67B80013AA1D /* Themes */,
 				9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */,
 				9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */,
@@ -616,6 +641,15 @@
 			name = Controllers;
 			sourceTree = "<group>";
 		};
+		9AE502381253BC5E00579C54 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9AE5023D1253BC5F00579C54 /* YAJL.framework */,
+				9AE5023F1253BC5F00579C54 /* Tests.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -633,6 +667,7 @@
 			);
 			dependencies = (
 				9A7AF1570D99830C00F08222 /* PBXTargetDependency */,
+				9AE502411253BC8700579C54 /* PBXTargetDependency */,
 			);
 			name = Vibrant;
 			productInstallPath = "$(HOME)/Applications";
@@ -674,6 +709,10 @@
 					ProductGroup = 9A7AF1440D99820800F08222 /* Products */;
 					ProjectRef = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
 				},
+				{
+					ProductGroup = 9AE502381253BC5E00579C54 /* Products */;
+					ProjectRef = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -705,6 +744,20 @@
 			remoteRef = 9A7AF1520D99820900F08222 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		9AE5023D1253BC5F00579C54 /* YAJL.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = YAJL.framework;
+			remoteRef = 9AE5023C1253BC5F00579C54 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9AE5023F1253BC5F00579C54 /* Tests.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = Tests.framework;
+			remoteRef = 9AE5023E1253BC5F00579C54 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -718,11 +771,11 @@
 				9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */,
 				9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */,
 				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
-				9A70F2DA0E9F68100013AA1D /* Bundles in Resources */,
 				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
 				9AE502021253891700579C54 /* symbol-icons.plist in Resources */,
 				9A0868ED0EE090FD00274635 /* TB_ViewMenu-Extended.pdf in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
+				9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */,
 				9AE501D912535DE500579C54 /* define.png in Resources */,
 				9AE501CE1253569700579C54 /* tag.png in Resources */,
 				9AE501B41253528500579C54 /* class.png in Resources */,
@@ -762,7 +815,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\nmkdir -p $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+			shellScript = "set -x\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\nmkdir -p $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old YAJL framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/YAJL.framework\necho \"Copying new YAJL framework\"\nmkdir -p $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\ncp -Rp $TARGET_BUILD_DIR/../../yajl-objc/Project/build/$BUILD_STYLE/YAJL.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
 		};
 		9AF2FE6E0EC9C85900C5771B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -880,6 +933,11 @@
 			isa = PBXTargetDependency;
 			name = PSMTabBarControlFramework;
 			targetProxy = 9A7AF1560D99830C00F08222 /* PBXContainerItemProxy */;
+		};
+		9AE502411253BC8700579C54 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = YAJL;
+			targetProxy = 9AE502401253BC8700579C54 /* PBXContainerItemProxy */;
 		};
 		9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1018,6 +1076,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
@@ -1045,6 +1104,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = (
 					"-L$(TARGET_BUILD_DIR)/oniguruma/lib",
 					"-lonig",
@@ -1060,7 +1120,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = PSMTabBarControl/build/$BUILD_STYLE;
+				FRAMEWORK_SEARCH_PATHS = (
+					"yajl-objc/Project/build/$BUILD_STYLE",
+					PSMTabBarControl/build/$BUILD_STYLE,
+				);
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
@@ -1109,7 +1172,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = PSMTabBarControl/build/$BUILD_STYLE;
+				FRAMEWORK_SEARCH_PATHS = (
+					"yajl-objc/Project/build/$BUILD_STYLE",
+					PSMTabBarControl/build/$BUILD_STYLE,
+				);
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;

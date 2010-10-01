@@ -35,11 +35,12 @@
 	OnigErrorInfo einfo;
 	int r = onig_new(&regex, (const UChar *)pattern, (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP, enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
-	if (r != ONIG_NORMAL)
-	{
+	if (r != ONIG_NORMAL) {
+#ifndef NO_DEBUG
 		unsigned char s[ONIG_MAX_ERROR_MESSAGE_LEN];
 		onig_error_code_to_str(s, r, &einfo);
-		INFO(@"pattern failed: %s", s);
+		DEBUG(@"pattern failed: %s", s);
+#endif
 		return nil;
 	}
 

@@ -82,7 +82,6 @@ int logIndent = 0;
 	if ([keyPath isEqualToString:@"antialias"]) {
 		antialias = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
 		[self setNeedsDisplayInRect:[self bounds]];
-		INFO(@"antialias = %s", antialias ? "YES" : "NO");
 	}
 }
 

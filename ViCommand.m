@@ -336,7 +336,6 @@ find_command_in_map(unichar key, struct vikey map[])
 			command = NULL;
 			motion_command = NULL;
 		} else {
-			INFO(@"repeating '%C' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
 			command = last_ftFT_command;
 			method = last_ftFT_command->method;
 			argument = last_ftFT_argument;
@@ -354,7 +353,6 @@ find_command_in_map(unichar key, struct vikey map[])
 			command = NULL;
 			motion_command = NULL;
 		} else {
-			INFO(@"repeating '%C' command for char '%C'", last_ftFT_command->key, last_ftFT_argument);
 			motion_command = last_ftFT_command;
 			argument = last_ftFT_argument;
 			motion_key = last_ftFT_command->key;

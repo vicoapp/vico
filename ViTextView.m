@@ -1348,8 +1348,9 @@ int logIndent = 0;
 	if (!replayingInput)
 		[self scrollToCaret];
 
-	if (ok)
-		[[self delegate] message:[NSString stringWithFormat:@"%llu,%llu", [self currentLine], [self currentColumn]]]; // erase any previous message
+	if (ok)	// erase any previous message
+		[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu",
+		    (unsigned long)[self currentLine], (unsigned long)[self currentColumn]]];
 
 	return ok;
 }

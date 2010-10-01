@@ -84,6 +84,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSMutableDictionary	*marks; // XXX: move to document
 
 	CGFloat			 pageGuideX;
+	BOOL			 antialias;
 	BOOL			 hasUndoGroup;
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }

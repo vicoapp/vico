@@ -43,6 +43,7 @@
 			[NSNumber numberWithBool:YES], @"searchincr",
 			[NSNumber numberWithBool:NO], @"showguide",
 			[NSNumber numberWithBool:NO], @"wrap",
+			[NSNumber numberWithBool:YES], @"antialias",
 			[NSNumber numberWithInt:80], @"guidecolumn",
 			[NSNumber numberWithFloat:11.0], @"fontsize",
 			@"Menlo Regular", @"fontname",

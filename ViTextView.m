@@ -64,7 +64,26 @@ int logIndent = 0;
 	[[self layoutManager] setShowsControlCharacters:YES];
 	[self setDrawsBackground:YES];
 
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"antialias"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	antialias = [[NSUserDefaults standardUserDefaults] boolForKey:@"antialias"];
+
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
+
+{
+	if ([keyPath isEqualToString:@"antialias"]) {
+		antialias = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
+		[self setNeedsDisplayInRect:[self bounds]];
+		INFO(@"antialias = %s", antialias ? "YES" : "NO");
+	}
 }
 
 - (void)paste:(id)sender

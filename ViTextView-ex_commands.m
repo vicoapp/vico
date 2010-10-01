@@ -136,12 +136,13 @@
 		@"guidecolumn", @"gc",
 		@"searchincr", @"searchincr",
 		@"wrap", @"wrap",
+		@"antialias", @"antialias",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"ignorecase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr",
-	    @"wrap", nil];
+	    @"wrap", @"antialias", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;

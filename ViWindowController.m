@@ -189,6 +189,10 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
+	NSMenuItem *item = [[openFilesButton menu] addItemWithTitle:[document displayName]
+							     action:@selector(switchToDocumentAction:)
+						      keyEquivalent:@""];
+	[item setRepresentedObject:document];
 	[tabBar addDocument:document];
 	[self selectDocument:document];
 
@@ -276,6 +280,10 @@ static NSWindowController	*currentWindowController = nil;
 	[[self document] removeWindowController:self];
 	[document addWindowController:self];
 	[self setDocument:document];
+
+	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
+	if (ndx != -1)
+		[openFilesButton selectItemAtIndex:ndx];
 
 	[self setSelectedLanguage:[[document language] displayName]];
 	[self setSelectedDocument:document];
@@ -368,6 +376,10 @@ static NSWindowController	*currentWindowController = nil;
 {
 	while ([document visibleViews] > 0)
 		[self collapseDocumentView:[[document views] objectAtIndex:0]];
+
+	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
+	if (ndx != -1)
+		[[openFilesButton menu] removeItemAtIndex:ndx];
 
 	[tabBar removeDocument:document];
 	if (lastDocument == document) {
@@ -538,6 +550,13 @@ static NSWindowController	*currentWindowController = nil;
 {
 	if (anIndex < [[tabBar representedDocuments] count])
 		[self switchToDocument:[[tabBar representedDocuments] objectAtIndex:anIndex]];
+}
+
+- (void)switchToDocumentAction:(id)sender
+{
+	ViDocument *doc = [sender representedObject];
+	if (doc)
+		[self switchToDocument:doc];
 }
 
 - (ViDocument *)documentForURL:(NSURL *)url

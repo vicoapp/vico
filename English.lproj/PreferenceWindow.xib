@@ -12,12 +12,12 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="122"/>
-			<integer value="262"/>
-			<integer value="16"/>
-			<integer value="244"/>
-			<integer value="17"/>
-			<integer value="15"/>
 			<integer value="2"/>
+			<integer value="15"/>
+			<integer value="16"/>
+			<integer value="262"/>
+			<integer value="17"/>
+			<integer value="244"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -668,8 +668,12 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="500496442">
 							<int key="NSCellFlags">-2076049856</int>
-							<int key="NSCellFlags2">134219776</int>
-							<reference key="NSSupport" ref="304478135"/>
+							<int key="NSCellFlags2">134350848</int>
+							<object class="NSFont" key="NSSupport" id="26">
+								<string key="NSName">LucidaGrande</string>
+								<double key="NSSize">11</double>
+								<int key="NSfFlags">3100</int>
+							</object>
 							<reference key="NSControlView" ref="1057388090"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">162</int>
@@ -730,7 +734,6 @@
 								</array>
 								<reference key="NSMenuFont" ref="304478135"/>
 							</object>
-							<int key="NSSelectedIndex">2</int>
 							<bool key="NSPullDown">YES</bool>
 							<int key="NSPreferredEdge">1</int>
 							<bool key="NSUsesItemFromMenu">YES</bool>
@@ -748,11 +751,7 @@
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272761856</int>
 							<string key="NSContents">X installed bundles, X available. Last updated 2010-01-01.</string>
-							<object class="NSFont" key="NSSupport" id="26">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">11</double>
-								<int key="NSfFlags">3100</int>
-							</object>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="972471105"/>
 							<reference key="NSBackgroundColor" ref="10366931"/>
 							<reference key="NSTextColor" ref="607417788"/>
@@ -1104,9 +1103,6 @@
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSUserDefaultsController" id="482503302">
-				<array class="NSMutableArray" key="NSDeclaredKeys">
-					<string>antialias</string>
-				</array>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSArrayController" id="826386863">

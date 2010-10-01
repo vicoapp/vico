@@ -21,6 +21,7 @@
 
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSTextField *messageField;
+	IBOutlet NSPopUpButton *openFilesButton;
 
 	ViTagStack *tagStack;
 	BOOL isLoaded;
@@ -89,6 +90,7 @@
 - (void)switchToDocument:(ViDocument *)doc;
 - (void)switchToDocumentAtIndex:(NSInteger)anIndex;
 - (void)switchToLastDocument;
+- (void)switchToDocumentAction:(id)sender;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 - (void)goToURL:(NSURL *)url;
 

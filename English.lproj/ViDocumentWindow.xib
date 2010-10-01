@@ -11,10 +11,10 @@
 			<string key="NS.object.0">788</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100250"/>
 			<integer value="100348"/>
-			<integer value="100153"/>
+			<integer value="5"/>
 			<integer value="100399"/>
+			<integer value="100250"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -42,13 +42,68 @@
 						<characters key="NS.bytes">4D9B28D8-A177-4086-91E8-A53904734D79</characters>
 					</object>
 					<nil key="NSToolbarDelegate"/>
-					<bool key="NSToolbarPrefersToBeShown">NO</bool>
+					<bool key="NSToolbarPrefersToBeShown">YES</bool>
 					<bool key="NSToolbarShowsBaselineSeparator">YES</bool>
 					<bool key="NSToolbarAllowsUserCustomization">YES</bool>
 					<bool key="NSToolbarAutosavesConfiguration">YES</bool>
 					<int key="NSToolbarDisplayMode">1</int>
 					<int key="NSToolbarSizeMode">1</int>
 					<dictionary class="NSMutableDictionary" key="NSToolbarIBIdentifiedItems">
+						<object class="NSToolbarItem" key="98E7B3F9-CEA0-4FC5-9278-AA242507BAEB" id="867670213">
+							<object class="NSMutableString" key="NSToolbarItemIdentifier">
+								<characters key="NS.bytes">98E7B3F9-CEA0-4FC5-9278-AA242507BAEB</characters>
+							</object>
+							<string key="NSToolbarItemLabel">Open files</string>
+							<string key="NSToolbarItemPaletteLabel">Open files</string>
+							<nil key="NSToolbarItemToolTip"/>
+							<object class="NSPopUpButton" key="NSToolbarItemView" id="560856931">
+								<reference key="NSNextResponder"/>
+								<int key="NSvFlags">268</int>
+								<string key="NSFrame">{{0, 14}, {200, 25}}</string>
+								<reference key="NSSuperview"/>
+								<reference key="NSWindow"/>
+								<int key="NSTag">101</int>
+								<bool key="NSEnabled">YES</bool>
+								<object class="NSPopUpButtonCell" key="NSCell" id="993252389">
+									<int key="NSCellFlags">-2076049856</int>
+									<int key="NSCellFlags2">2048</int>
+									<object class="NSFont" key="NSSupport" id="844670655">
+										<string key="NSName">LucidaGrande</string>
+										<double key="NSSize">13</double>
+										<int key="NSfFlags">1044</int>
+									</object>
+									<reference key="NSControlView" ref="560856931"/>
+									<int key="NSButtonFlags">-2038415105</int>
+									<int key="NSButtonFlags2">163</int>
+									<string key="NSAlternateContents"/>
+									<string key="NSKeyEquivalent"/>
+									<int key="NSPeriodicDelay">400</int>
+									<int key="NSPeriodicInterval">75</int>
+									<nil key="NSMenuItem"/>
+									<bool key="NSMenuItemRespectAlignment">YES</bool>
+									<object class="NSMenu" key="NSMenu" id="379790295">
+										<string key="NSTitle">OtherViews</string>
+										<array class="NSMutableArray" key="NSMenuItems"/>
+										<reference key="NSMenuFont" ref="844670655"/>
+									</object>
+									<int key="NSSelectedIndex">-1</int>
+									<int key="NSPreferredEdge">1</int>
+									<bool key="NSUsesItemFromMenu">YES</bool>
+									<bool key="NSAltersState">YES</bool>
+									<int key="NSArrowPosition">2</int>
+								</object>
+							</object>
+							<nil key="NSToolbarItemImage"/>
+							<nil key="NSToolbarItemTarget"/>
+							<nil key="NSToolbarItemAction"/>
+							<string key="NSToolbarItemMinSize">{100, 25}</string>
+							<string key="NSToolbarItemMaxSize">{200, 25}</string>
+							<bool key="NSToolbarItemEnabled">YES</bool>
+							<bool key="NSToolbarItemAutovalidates">YES</bool>
+							<int key="NSToolbarItemTag">101</int>
+							<bool key="NSToolbarIsUserRemovable">YES</bool>
+							<int key="NSToolbarItemVisibilityPriority">0</int>
+						</object>
 						<object class="NSToolbarItem" key="EDD5DA85-FC8F-473B-974C-D2829D66A0DC" id="702036569">
 							<object class="NSMutableString" key="NSToolbarItemIdentifier">
 								<characters key="NS.bytes">EDD5DA85-FC8F-473B-974C-D2829D66A0DC</characters>
@@ -206,8 +261,10 @@
 						<reference ref="378539291"/>
 						<reference ref="309334595"/>
 						<reference ref="702036569"/>
+						<reference ref="867670213"/>
 					</array>
 					<array class="NSMutableArray" key="NSToolbarIBDefaultItems">
+						<reference ref="867670213"/>
 						<reference ref="378539291"/>
 						<reference ref="702036569"/>
 					</array>
@@ -327,11 +384,7 @@
 															<reference key="NSTarget" ref="397046556"/>
 														</object>
 													</array>
-													<object class="NSFont" key="NSMenuFont" id="844670655">
-														<string key="NSName">LucidaGrande</string>
-														<double key="NSSize">13</double>
-														<int key="NSfFlags">1044</int>
-													</object>
+													<reference key="NSMenuFont" ref="844670655"/>
 												</object>
 												<int key="NSSelectedIndex">1</int>
 												<int key="NSPreferredEdge">1</int>
@@ -541,7 +594,7 @@
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMinSize">{640, 222}</string>
+				<string key="NSMinSize">{640, 277}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSFrameAutosaveName">documentWindow</string>
 			</object>
@@ -1716,6 +1769,14 @@
 					</object>
 					<int key="connectionID">100460</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">openFilesButton</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="560856931"/>
+					</object>
+					<int key="connectionID">100468</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2133,6 +2194,7 @@
 							<reference ref="378539291"/>
 							<reference ref="309334595"/>
 							<reference ref="702036569"/>
+							<reference ref="867670213"/>
 						</array>
 						<reference key="parent" ref="275939982"/>
 					</object>
@@ -2355,6 +2417,36 @@
 						<reference key="object" ref="187449451"/>
 						<reference key="parent" ref="195427960"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100467</int>
+						<reference key="object" ref="867670213"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="560856931"/>
+						</array>
+						<reference key="parent" ref="659594053"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100461</int>
+						<reference key="object" ref="560856931"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="993252389"/>
+						</array>
+						<reference key="parent" ref="867670213"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100462</int>
+						<reference key="object" ref="993252389"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="379790295"/>
+						</array>
+						<reference key="parent" ref="560856931"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100463</int>
+						<reference key="object" ref="379790295"/>
+						<array class="NSMutableArray" key="children"/>
+						<reference key="parent" ref="993252389"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2429,7 +2521,7 @@
 				<string key="100398.IBWindowTemplateEditedContentRect">{{333, 669}, {382, 187}}</string>
 				<integer value="0" key="100398.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="100399.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="100407.IBEditorWindowLastContentRect">{{412, 169}, {616, 0}}</string>
+				<string key="100407.IBEditorWindowLastContentRect">{{414, 778}, {616, 0}}</string>
 				<string key="100407.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100411.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100414.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2455,11 +2547,15 @@
 				<string key="100446.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100452.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100453.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="5.IBEditorWindowLastContentRect">{{322, 353}, {800, 480}}</string>
+				<string key="100461.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100462.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100463.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100467.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="5.IBEditorWindowLastContentRect">{{279, 283}, {800, 480}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="0" key="5.IBViewEditorWindowController.showingBoundsRectangles"/>
 				<integer value="0" key="5.IBViewEditorWindowController.showingLayoutRectangles"/>
-				<string key="5.IBWindowTemplateEditedContentRect">{{322, 353}, {800, 480}}</string>
+				<string key="5.IBWindowTemplateEditedContentRect">{{279, 283}, {800, 480}}</string>
 				<integer value="1" key="5.ImportedFromIB2"/>
 				<string key="5.editorWindowContentRectSynchronizationRect">{{155, 232}, {637, 411}}</string>
 				<integer value="1" key="5.windowTemplate.hasMinSize"/>
@@ -2472,7 +2568,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100460</int>
+			<int key="maxID">100468</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2667,6 +2763,7 @@
 						<string key="selectNextTab:">id</string>
 						<string key="selectPreviousTab:">id</string>
 						<string key="splitViewHorizontally:">id</string>
+						<string key="switchToDocumentAction:">id</string>
 						<string key="toggleExplorer:">id</string>
 						<string key="toggleSymbolList:">id</string>
 					</dictionary>
@@ -2699,6 +2796,10 @@
 							<string key="name">splitViewHorizontally:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="switchToDocumentAction:">
+							<string key="name">switchToDocumentAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="toggleExplorer:">
 							<string key="name">toggleExplorer:</string>
 							<string key="candidateClassName">id</string>
@@ -2716,6 +2817,7 @@
 						<string key="languageButton">NSPopUpButton</string>
 						<string key="mainView">NSView</string>
 						<string key="messageField">NSTextField</string>
+						<string key="openFilesButton">NSPopUpButton</string>
 						<string key="projectDelegate">ProjectDelegate</string>
 						<string key="projectResizeView">NSImageView</string>
 						<string key="splitView">NSSplitView</string>
@@ -2754,6 +2856,10 @@
 						<object class="IBToOneOutletInfo" key="messageField">
 							<string key="name">messageField</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="openFilesButton">
+							<string key="name">openFilesButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="projectDelegate">
 							<string key="name">projectDelegate</string>

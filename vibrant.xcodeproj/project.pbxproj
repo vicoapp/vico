@@ -138,13 +138,6 @@
 			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = YAJL;
 		};
-		9AE5023E1253BC5F00579C54 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 00E5DDF80F5B6E3E00C11F1D;
-			remoteInfo = Tests;
-		};
 		9AE502401253BC8700579C54 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
@@ -645,7 +638,6 @@
 			isa = PBXGroup;
 			children = (
 				9AE5023D1253BC5F00579C54 /* YAJL.framework */,
-				9AE5023F1253BC5F00579C54 /* Tests.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -749,13 +741,6 @@
 			fileType = wrapper.framework;
 			path = YAJL.framework;
 			remoteRef = 9AE5023C1253BC5F00579C54 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		9AE5023F1253BC5F00579C54 /* Tests.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = Tests.framework;
-			remoteRef = 9AE5023E1253BC5F00579C54 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

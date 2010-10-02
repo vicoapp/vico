@@ -4,6 +4,8 @@
 
 @implementation ViLanguage
 
+@synthesize bundle;
+
 - (ViRegexp *)compileRegexp:(NSString *)pattern
 {
 	ViRegexp *regexp = nil;
@@ -111,12 +113,13 @@
 	DEBUG(@"finished compiling language [%@]", [self name]);
 }
 
-- (id)initWithPath:(NSString *)aPath
+- (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle
 {
 	self = [super init];
 	if (self == nil)
 		return nil;
 
+	bundle = aBundle;
 	compiled = NO;
 	language = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
 	languagePatterns = [language objectForKey:@"patterns"];	

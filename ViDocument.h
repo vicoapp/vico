@@ -50,7 +50,7 @@
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
 - (ViLanguage *)language;
-- (IBAction)setLanguage:(id)sender;
+- (void)setLanguage:(ViLanguage *)aLanguage;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;
 - (void)changeTheme:(ViTheme *)theme;
@@ -61,7 +61,6 @@
 - (void)goToSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)aView;
 - (void)goToSymbol:(ViSymbol *)aSymbol;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
-- (void)setLanguageFromString:(NSString *)aLanguage;
 - (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (ViDocumentView *)makeView;

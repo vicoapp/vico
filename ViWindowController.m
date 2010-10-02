@@ -9,6 +9,7 @@
 #import "ViThemeStore.h"
 #import "ViLanguageStore.h"
 #import "ViDocumentController.h"
+#import "ViPreferencesController.h"
 #import "MHTextIconCell.h"
 
 static NSMutableArray		*windowControllers = nil;
@@ -70,14 +71,55 @@ static NSWindowController	*currentWindowController = nil;
 {
 }
 
+- (void)getMoreBundles:(id)sender
+{
+	[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
+	[[ViPreferencesController sharedPreferences] performSelector:@selector(switchToItem:) withObject:@"BundlesItem" afterDelay:0.01];
+}
+
 - (void)newBundleLoaded:(NSNotification *)notification
 {
 	[languageButton removeAllItems];
-	NSArray *displayNames = [[[ViLanguageStore defaultStore] allLanguageNames] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-	for (NSString *displayName in displayNames)
-		[languageButton addItemWithTitle:displayName];
+	NSMenu *menu = [languageButton menu];
+	NSMenuItem *item = [menu addItemWithTitle:@"No language" action:nil keyEquivalent:@""];
+	[item setTag:1001];
+	[item setEnabled:NO];
+	[[languageButton menu] addItem:[NSMenuItem separatorItem]];
+
+	NSArray *languages = [[ViLanguageStore defaultStore] languages];
+	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
+	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
+
+	for (ViLanguage *lang in sortedLanguages) {
+		item = [menu addItemWithTitle:[lang displayName] action:@selector(setLanguage:) keyEquivalent:@""];
+		[item setRepresentedObject:lang];
+	}
+
 	if ([[self document] respondsToSelector:@selector(language)])
 		[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
+
+	if ([languages count] > 0)
+		[[languageButton menu] addItem:[NSMenuItem separatorItem]];
+	[menu addItemWithTitle:@"Get more bundles..." action:@selector(getMoreBundles:) keyEquivalent:@""];
+}
+
+- (IBAction)setLanguage:(id)sender
+{
+	ViDocument *doc = [self document];
+	if (![doc respondsToSelector:@selector(setLanguage:)])
+		return;
+
+	ViLanguage *lang = nil;
+	if ([sender respondsToSelector:@selector(representedObject)])
+		lang = [sender representedObject];
+
+	[doc setLanguage:lang];
+	if ([doc fileURL]) {
+		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
+			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
+		[syntaxOverride setObject:lang ? [lang name] : @"" forKey:[[doc fileURL] absoluteString]];
+		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
+	}
 }
 
 - (void)windowDidLoad
@@ -142,7 +184,10 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)setSelectedLanguage:(NSString *)aLanguage
 {
-	[languageButton selectItemWithTitle:aLanguage];
+	if (aLanguage == nil)
+		[languageButton selectItemWithTag:1001];
+	else
+		[languageButton selectItemWithTitle:aLanguage];
 	[languageButton setToolTip:aLanguage];
 }
 

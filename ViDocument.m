@@ -21,7 +21,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
 - (void)resetTypingAttributes;
-- (void)configureLanguage:(ViLanguage *)aLanguage;
 - (void)highlightEverything;
 - (void)setWrapping:(BOOL)flag;
 @end
@@ -313,16 +312,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)highlightEverything
 {
-	if (language == nil)
-		return;
-
-	/* Ditch the old syntax scopes and start with a fresh parser. */
-	syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
-
 	/* Invalidate all document views. */
 	ViDocumentView *dv;
 	for (dv in views)
 		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+
+	if (language == nil) {
+		syntaxParser = nil;
+		[self setSymbols:nil];
+		return;
+	}
+
+	/* Ditch the old syntax scopes and start with a fresh parser. */
+	syntaxParser = [[ViSyntaxParser alloc] initWithLanguage:language];
 
 	NSInteger endLocation = [textStorage locationForStartOfLine:100];
 	if (endLocation == -1)
@@ -418,44 +420,22 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 }
 
-- (IBAction)setLanguage:(id)sender
-{
-	DEBUG(@"sender = %@, title = %@", sender, [sender title]);
-
-	[self setLanguageFromString:[sender title]];
-	if (language && [self fileURL]) {
-		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
-			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
-		[syntaxOverride setObject:[sender title] forKey:[[self fileURL] absoluteString]];
-		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
-	}
-}
-
 - (ViLanguage *)language
 {
 	return language;
 }
 
-- (void)configureLanguage:(ViLanguage *)aLanguage
+- (void)setLanguage:(ViLanguage *)aLanguage
 {
 	/* Force compilation. */
 	[aLanguage patterns];
 
 	if (aLanguage != language) {
 		language = aLanguage;
+		bundle = [language bundle];
 		symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
 		symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self highlightEverything];
-	}
-}
-
-- (void)setLanguageFromString:(NSString *)aLanguage
-{
-	ViLanguage *newLanguage = nil;
-	bundle = [[ViLanguageStore defaultStore] bundleForLanguage:aLanguage language:&newLanguage];
-	if (newLanguage) {
-		[self configureLanguage:newLanguage];
-		[windowController setSelectedLanguage:aLanguage];
 	}
 }
 
@@ -469,28 +449,32 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		if (eol > 0)
 			firstLine = [[textStorage string] substringWithRange:NSMakeRange(0, eol)];
 
-		bundle = nil;
 		if ([firstLine length] > 0)
-			bundle = [[ViLanguageStore defaultStore] bundleForFirstLine:firstLine language:&newLanguage];
-		if (bundle == nil)
-			bundle = [[ViLanguageStore defaultStore] bundleForFilename:[aURL path] language:&newLanguage];
+			newLanguage = [[ViLanguageStore defaultStore] languageForFirstLine:firstLine];
+		if (newLanguage == nil)
+			newLanguage = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
 	}
 
-	if (bundle == nil)
-		bundle = [[ViLanguageStore defaultStore] defaultBundleLanguage:&newLanguage];
+	if (newLanguage == nil)
+		newLanguage = [[ViLanguageStore defaultStore] defaultLanguage];
 
-	[self configureLanguage:newLanguage];
+	[self setLanguage:newLanguage];
 }
 
 - (void)configureSyntax
 {
-	/* update syntax definition */
+	/* Check if the user has overridden a syntax for this URL. */
 	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
 	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] absoluteString]];
-	if (syntax)
-		[self setLanguageFromString:syntax];
-	else
-		[self configureForURL:[self fileURL]];
+	if (syntax) {
+		ViLanguage *lang = [[ViLanguageStore defaultStore] languageWithScope:syntax];
+		if (lang) {
+			[self setLanguage:lang];
+			return;
+		}
+	}
+
+	[self configureForURL:[self fileURL]];
 }
 
 - (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString

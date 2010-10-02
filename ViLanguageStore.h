@@ -12,13 +12,12 @@
 }
 + (NSString *)bundlesDirectory;
 + (ViLanguageStore *)defaultStore;
-- (ViBundle *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr;
-- (ViBundle *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr;
-- (ViBundle *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr;
-- (ViBundle *)defaultBundleLanguage:(ViLanguage **)languagePtr;
+- (ViLanguage *)languageForFirstLine:(NSString *)firstLine;
+- (ViLanguage *)languageForFilename:(NSString *)aPath;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
-- (NSArray *)allLanguageNames;
+- (ViLanguage *)defaultLanguage;
 - (NSArray *)allBundles;
+- (NSArray *)languages;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;

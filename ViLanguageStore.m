@@ -41,7 +41,7 @@ static NSString *bundlesDirectory = nil;
 	NSString *file;
 	for (file in [fm directoryContentsAtPath:dir]) {
 		if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
-			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]];
+			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file] forBundle:bundle];
 			[bundle addLanguage:language];
 			[languages setObject:language forKey:[language name]];
 		}
@@ -95,54 +95,45 @@ static NSString *bundlesDirectory = nil;
 	return defaultStore;
 }
 
-- (ViBundle *)bundleForFirstLine:(NSString *)firstLine language:(ViLanguage **)languagePtr
+- (ViLanguage *)languageForFirstLine:(NSString *)firstLine
 {
-	ViBundle *bundle;
-	for (bundle in bundles) {
-		ViLanguage *language;
-		for (language in [bundle languages]) {
-			NSString *firstLineMatch = [language firstLineMatch];
-			if (firstLineMatch == nil)
-				continue;
+	ViLanguage *language;
+	for (language in [self languages]) {
+		NSString *firstLineMatch = [language firstLineMatch];
+		if (firstLineMatch == nil)
+			continue;
 
-			ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
-			if ([rx matchInString:firstLine]) {
-				DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
-				if (languagePtr)
-					*languagePtr = language;
-				DEBUG(@"Using bundle %@", [bundle name]);
-				return bundle;
-			}
+		ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
+		if ([rx matchInString:firstLine]) {
+			DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
+			DEBUG(@"Using bundle %@", [[language bundle] name]);
+			return language;
 		}
 	}
+
 	DEBUG(@"No language matching first line [%@]", firstLine);
 	return nil;
 }
 
-- (ViBundle *)bundleForFilename:(NSString *)aPath language:(ViLanguage **)languagePtr
+- (ViLanguage *)languageForFilename:(NSString *)aPath
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
-	ViBundle *bundle;
-	for (bundle in bundles) {
-		ViLanguage *language;
+	ViLanguage *language;
 
-		for (language in [bundle languages]) {
-			NSArray *fileTypes = [language fileTypes];
-			NSString *fileType;
+	for (language in [self languages]) {
+		NSArray *fileTypes = [language fileTypes];
+		NSString *fileType;
 
-			for (fileType in fileTypes) {
-				unsigned path_len = [aPath length];
-				unsigned ftype_len = [fileType length];
+		for (fileType in fileTypes) {
+			unsigned path_len = [aPath length];
+			unsigned ftype_len = [fileType length];
 
-				if ([aPath hasSuffix:fileType] &&
-				    (path_len == ftype_len ||
-				     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]])) {
-					DEBUG(@"Using language %@ for file %@", [language name], aPath);
-					if (languagePtr)
-						*languagePtr = language;
-					DEBUG(@"Using bundle %@", [bundle name]);
-					return bundle;
-				}
+			if ([aPath hasSuffix:fileType] &&
+			    (path_len == ftype_len ||
+			     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]])) {
+				DEBUG(@"Using language %@ for file %@", [language name], aPath);
+				DEBUG(@"Using bundle %@", [[language bundle] name]);
+				return language;
 			}
 		}
 	}
@@ -151,28 +142,9 @@ static NSString *bundlesDirectory = nil;
 	return nil;
 }
 
-- (ViBundle *)bundleForLanguage:(NSString *)languageName language:(ViLanguage **)languagePtr
+- (ViLanguage *)defaultLanguage
 {
-	ViBundle *bundle;
-	for (bundle in bundles) {
-		ViLanguage *language;
-		for (language in [bundle languages]) {
-			if ([[language displayName] isEqualToString:languageName]) {
-				if (languagePtr)
-					*languagePtr = language;
-
-				return bundle;
-			}
-		}
-	}
-
-	INFO(@"missing language '%@'", languageName);
-	return nil;
-}
-
-- (ViBundle *)defaultBundleLanguage:(ViLanguage **)languagePtr
-{
-	return [self bundleForLanguage:@"Plain Text" language:languagePtr];
+	return [self languageWithScope:@"text.plain"];
 }
 
 - (ViLanguage *)languageWithScope:(NSString *)scopeName
@@ -180,14 +152,9 @@ static NSString *bundlesDirectory = nil;
 	return [languages objectForKey:scopeName];
 }
 
-- (NSArray *)allLanguageNames
+- (NSArray *)languages
 {
-	NSMutableArray *langnames = [[NSMutableArray alloc] init];
-	ViLanguage *lang;
-	for (lang in [languages allValues])
-		[langnames addObject:[lang displayName]];
-
-	return langnames;
+	return [languages allValues];
 }
 
 - (NSArray *)allBundles

@@ -234,7 +234,6 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	NSMenu *menu = ;
 	NSArray *items = [menu itemArray];
 	NSInteger ndx;
 	for (ndx = 0; ndx < [items count]; ndx++)

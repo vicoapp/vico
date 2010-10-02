@@ -27,6 +27,15 @@
 	return YES;
 }
 
+- (void)newBundleLoaded:(NSNotification *)notification
+{
+	/* Check if any open documents got a better language available. */
+	ViDocument *doc;
+	for (doc in [[NSDocumentController sharedDocumentController] documents])
+		if ([doc respondsToSelector:@selector(configureSyntax)])
+			[doc configureSyntax];
+}
+
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
 	/* initialize default defaults */
@@ -112,6 +121,8 @@
 						forKeyPath:@"guidecolumn"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newBundleLoaded:) name:ViLanguageStoreBundleLoadedNotification object:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

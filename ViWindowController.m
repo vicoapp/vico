@@ -234,9 +234,16 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	NSMenuItem *item = [[openFilesButton menu] addItemWithTitle:[document displayName]
-							     action:@selector(switchToDocumentAction:)
-						      keyEquivalent:@""];
+	NSMenu *menu = ;
+	NSArray *items = [menu itemArray];
+	NSInteger ndx;
+	for (ndx = 0; ndx < [items count]; ndx++)
+		if ([[document displayName] compare:[[items objectAtIndex:ndx] title] options:NSCaseInsensitiveSearch] == NSOrderedAscending)
+			break;
+	NSMenuItem *item = [[openFilesButton menu] insertItemWithTitle:[document displayName]
+								action:@selector(switchToDocumentAction:)
+							 keyEquivalent:@""
+							       atIndex:ndx];
 	[item setRepresentedObject:document];
 	[tabBar addDocument:document];
 	[self selectDocument:document];

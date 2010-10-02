@@ -234,7 +234,7 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	NSArray *items = [menu itemArray];
+	NSArray *items = [[openFilesButton menu] itemArray];
 	NSInteger ndx;
 	for (ndx = 0; ndx < [items count]; ndx++)
 		if ([[document displayName] compare:[[items objectAtIndex:ndx] title] options:NSCaseInsensitiveSearch] == NSOrderedAscending)

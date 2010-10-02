@@ -10,6 +10,7 @@
 @interface ViPreferencesController : NSWindowController
 {
 	NSView *blankView;
+	NSString *forceSwitchToItem;
 	IBOutlet NSView *generalView;
 	IBOutlet NSView *editingView;
 	IBOutlet NSView *fontsColorsView;
@@ -62,6 +63,7 @@
 - (IBAction)addRepoUser:(id)sender;
 
 - (void)show;
+- (void)showItem:(NSString *)item;
 - (void)reloadNextUser;
 - (void)setFilteredRepositories:(NSArray *)anArray;
 - (void)installNextBundle;

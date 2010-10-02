@@ -11,12 +11,12 @@
 			<string key="NS.object.0">788</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+			<integer value="122"/>
 			<integer value="2"/>
-			<integer value="16"/>
 			<integer value="244"/>
 			<integer value="17"/>
-			<integer value="122"/>
 			<integer value="262"/>
+			<integer value="16"/>
 			<integer value="15"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
@@ -164,7 +164,7 @@
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
-				<string key="NSFrameAutosaveName">PreferenceWindow</string>
+				<string key="NSFrameAutosaveName"/>
 			</object>
 			<object class="NSCustomView" id="858582045">
 				<reference key="NSNextResponder"/>
@@ -2899,7 +2899,7 @@
 				<string key="1.IBEditorWindowLastContentRect">{{418, 449}, {480, 180}}</string>
 				<string key="1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1.IBWindowTemplateEditedContentRect">{{418, 449}, {480, 180}}</string>
-				<integer value="1" key="1.NSWindowTemplate.visibleAtLaunch"/>
+				<boolean value="NO" key="1.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="1.WindowOrigin">{196, 240}</string>
 				<string key="1.editorWindowContentRectSynchronizationRect">{{202, 428}, {480, 270}}</string>
 				<string key="11.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

@@ -187,6 +187,10 @@ ToolbarHeightForWindow(NSWindow *window)
 	[self switchToItem:lastPrefPane];
 
 	[self setSelectedFont];
+	[self setWindowFrameAutosaveName:@"PreferenceWindow"];
+
+	if (forceSwitchToItem )
+		[self switchToItem:forceSwitchToItem];
 }
 
 - (void)show
@@ -568,8 +572,6 @@ ToolbarHeightForWindow(NSWindow *window)
 	NSView *view = nil;
 	NSString *identifier;
 
-	[self show];
-
 	/*
 	 * If the call is from a toolbar button, the sender will be an
 	 * NSToolbarItem and we will need to fetch its itemIdentifier.
@@ -591,13 +593,22 @@ ToolbarHeightForWindow(NSWindow *window)
 		view = bundlesView;
 
 	if (view) {
+		if (view == [[self window] contentView])
+			return;
+
 		[self switchToView:view];
 		[[[self window] toolbar] setSelectedItemIdentifier:identifier];
 		[[NSUserDefaults standardUserDefaults] setObject:identifier forKey:@"lastPrefPane"];
 	}
-	
+
 	if (view == bundlesView && [repositories count] == 0)
-		[self reloadRepositories:self];
+		[self performSelector:@selector(reloadRepositories:) withObject:self afterDelay:0.0];
+}
+
+- (void)showItem:(NSString *)item
+{
+	forceSwitchToItem = item;
+	[self show];
 }
 
 #pragma mark -

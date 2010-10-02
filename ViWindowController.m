@@ -74,7 +74,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)getMoreBundles:(id)sender
 {
 	[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
-	[[ViPreferencesController sharedPreferences] performSelector:@selector(switchToItem:) withObject:@"BundlesItem" afterDelay:0.01];
+	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:) withObject:@"BundlesItem" afterDelay:0.01];
 }
 
 - (void)newBundleLoaded:(NSNotification *)notification

@@ -11,12 +11,12 @@
 			<string key="NS.object.0">788</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="17"/>
 			<integer value="2"/>
 			<integer value="16"/>
-			<integer value="262"/>
-			<integer value="122"/>
 			<integer value="244"/>
+			<integer value="17"/>
+			<integer value="122"/>
+			<integer value="262"/>
 			<integer value="15"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
@@ -1944,14 +1944,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">bundleProgress</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="449174376"/>
-					</object>
-					<int key="connectionID">322</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">progressDescription</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="811909926"/>
@@ -2109,6 +2101,14 @@
 						<reference key="destination" ref="220699598"/>
 					</object>
 					<int key="connectionID">358</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">progressIndicator</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="449174376"/>
+					</object>
+					<int key="connectionID">359</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3031,7 +3031,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">358</int>
+			<int key="maxID">359</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3093,7 +3093,6 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="bundleProgress">NSProgressIndicator</string>
 						<string key="bundlesController">NSArrayController</string>
 						<string key="bundlesInfo">NSTextField</string>
 						<string key="bundlesTable">NSTableView</string>
@@ -3106,6 +3105,7 @@
 						<string key="normalModeInputSources">NSPopUpButton</string>
 						<string key="progressButton">NSButton</string>
 						<string key="progressDescription">NSTextField</string>
+						<string key="progressIndicator">NSProgressIndicator</string>
 						<string key="progressSheet">NSWindow</string>
 						<string key="repoFilterField">NSSearchField</string>
 						<string key="repoUsersController">NSArrayController</string>
@@ -3114,10 +3114,6 @@
 						<string key="themeButton">NSPopUpButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="bundleProgress">
-							<string key="name">bundleProgress</string>
-							<string key="candidateClassName">NSProgressIndicator</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="bundlesController">
 							<string key="name">bundlesController</string>
 							<string key="candidateClassName">NSArrayController</string>
@@ -3165,6 +3161,10 @@
 						<object class="IBToOneOutletInfo" key="progressDescription">
 							<string key="name">progressDescription</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressIndicator">
+							<string key="name">progressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="progressSheet">
 							<string key="name">progressSheet</string>

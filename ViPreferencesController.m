@@ -56,7 +56,6 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ((self = [super initWithWindowNibName:@"PreferenceWindow"])) {
 		blankView = [[NSView alloc] init];
 		repositories = [[NSMutableArray alloc] init];
-		repoDownloads = [[NSMutableDictionary alloc] init];
 		repoNameRx = [ViRegexp regularExpressionWithString:@"([^[:alnum:]]*tmbundle$)" options:ONIG_OPTION_IGNORECASE];
 	}
 
@@ -295,22 +294,55 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
-	[repoDownloads removeObjectsForKeys:[repoDownloads allKeysForObject:download]];
 	[self cancelProgressSheet:nil];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Download failed: %@", [error localizedDescription]]];
+	NSDictionary *repoUser = [processQueue lastObject];
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to reload %@'s repository: %@",
+	    [repoUser objectForKey:@"username"], [error localizedDescription]]];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)download
 {
-	NSArray *usernames = [repoDownloads allKeysForObject:download];	/* There should only be one. */
-	[repoDownloads removeObjectsForKeys:usernames];
-	for (NSString *username in usernames)
-		[self loadBundlesFromRepo:username];
+	NSDictionary *repoUser = [processQueue lastObject];
+	[self loadBundlesFromRepo:[repoUser objectForKey:@"username"]];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"LastBundleRepoReload"];
 
-	if ([repoDownloads count] == 0) {
-		[[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"LastBundleRepoReload"];
+	[processQueue removeLastObject];
+	if ([processQueue count] == 0)
 		[NSApp endSheet:progressSheet];
+	else
+		[self reloadNextUser];
+}
+
+- (void)setExpectedContentLengthFromResponse:(NSURLResponse *)response
+{
+	long long expectedContentLength = [response expectedContentLength];
+	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0) {
+		[progressIndicator setIndeterminate:NO];
+		[progressIndicator setMaxValue:expectedContentLength];
+		[progressIndicator setDoubleValue:receivedContentLength];
 	}
+}
+
+- (void)resetProgressIndicator
+{
+	receivedContentLength = 0;
+	[progressButton setTitle:@"Cancel"];
+	[progressButton setKeyEquivalent:@""];
+	[progressIndicator setIndeterminate:YES];
+	[progressIndicator startAnimation:self];
+	installConnection = nil;
+	repoDownload = nil;
+}
+
+- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
+{
+	[self setExpectedContentLengthFromResponse:response];
+}
+
+- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
+{
+	receivedContentLength += length;
+	[progressIndicator setDoubleValue:receivedContentLength];
 }
 
 - (IBAction)cancelProgressSheet:(id)sender
@@ -320,13 +352,39 @@ ToolbarHeightForWindow(NSWindow *window)
 		return;
 	}
 
+	/* This action is connected to both repo downloads and bundle installation. */
+	if (installConnection) {
+		[installConnection cancel];
+		[installTask terminate];
+	} else {
+		[repoDownload cancel];
+	}
+
 	progressCancelled = YES;
-	for (NSString *username in repoDownloads)
-		[[repoDownloads objectForKey:username] cancel];
 	[progressButton setTitle:@"OK"];
-	[progressButton setKeyEquivalent:@"\n"];
-	[bundleProgress stopAnimation:self];
+	[progressButton setKeyEquivalent:@"\r"];
+	[progressIndicator stopAnimation:self];
 	[progressDescription setStringValue:@"Cancelled download from GitHub"];
+}
+
+- (void)reloadNextUser
+{
+	NSDictionary *repo = [processQueue lastObject];
+	NSString *username = [repo objectForKey:@"username"];
+	if ([username length] == 0) {
+		[processQueue removeLastObject];
+		if ([processQueue count] == 0)
+			[NSApp endSheet:progressSheet];
+		else
+			[self reloadNextUser];
+	}
+
+	[self resetProgressIndicator];
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Reloading repositories from %@...", username]];
+
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/repos/show/%@", username]];
+	repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+	[repoDownload setDestination:[self repoPathForUser:username] allowOverwrite:YES];
 }
 
 - (void)reloadRepositoriesFromUsers:(NSArray *)users
@@ -334,9 +392,6 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ([users count] == 0)
 		return;
 
-	[progressButton setTitle:@"Cancel"];
-	[progressButton setKeyEquivalent:@""];
-	[bundleProgress startAnimation:self];
 	[progressDescription setStringValue:@"Reloading bundle repositories from GitHub..."];
 	[NSApp beginSheet:progressSheet
 	   modalForWindow:[self window]
@@ -344,15 +399,8 @@ ToolbarHeightForWindow(NSWindow *window)
 	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
-	for (NSDictionary *repo in users) {
-		NSString *username = [repo objectForKey:@"username"];
-		if ([username length] == 0)
-			continue;
-		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/repos/show/%@", username]];
-		NSURLDownload *dl = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-		[dl setDestination:[self repoPathForUser:username] allowOverwrite:YES];
-		[repoDownloads setObject:dl forKey:username];
-	}
+	processQueue = [NSMutableArray arrayWithArray:users];
+	[self reloadNextUser];
 }
 
 - (IBAction)reloadRepositories:(id)sender
@@ -371,25 +419,31 @@ ToolbarHeightForWindow(NSWindow *window)
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
 	[self cancelProgressSheet:nil];
-	NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+	NSMutableDictionary *repo = [processQueue lastObject];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"displayName"], [error localizedDescription]]];
 	[installTask terminate];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
+	receivedContentLength += [data length];
+	[progressIndicator setDoubleValue:receivedContentLength];
 	@try {
 		[[installPipe fileHandleForWriting] writeData:data];
 	}
 	@catch (NSException *exception) {
-		INFO(@"failed to write to tar: %@", exception);
 		[installConnection cancel];
 		[installTask terminate];
 
 		[self cancelProgressSheet:nil];
-		NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+		NSMutableDictionary *repo = [processQueue lastObject];
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
 	}
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+	[self setExpectedContentLengthFromResponse:response];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -398,9 +452,9 @@ ToolbarHeightForWindow(NSWindow *window)
 
 	[installTask waitUntilExit];
 	int status = [installTask terminationStatus];
-	[bundleProgress stopAnimation:self];
+	[progressIndicator setIndeterminate:YES];
 
-	NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+	NSMutableDictionary *repo = [processQueue lastObject];
 
 	if (status == 0) {
 		NSString *prefix = [NSString stringWithFormat:@"%@-%@", [repo objectForKey:@"owner"], [repo objectForKey:@"name"]];
@@ -416,11 +470,13 @@ ToolbarHeightForWindow(NSWindow *window)
 		}
 	} else {
 		[self cancelProgressSheet:nil];
-		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking (status %d).",
+		    [repo objectForKey:@"displayName"], status]];
+		return;
 	}
 
-	[bundlesToProcess removeObjectAtIndex:0];
-	if ([bundlesToProcess count] == 0)
+	[processQueue removeLastObject];
+	if ([processQueue count] == 0)
 		[NSApp endSheet:progressSheet];
 	else
 		[self installNextBundle];
@@ -428,11 +484,11 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (void)installNextBundle
 {
-	NSMutableDictionary *repo = [bundlesToProcess objectAtIndex:0];
+	NSMutableDictionary *repo = [processQueue lastObject];
 
+	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Downloading and installing %@ (%@)...",
 	    [repo objectForKey:@"name"], [repo objectForKey:@"owner"]]];
-	[bundleProgress startAnimation:self];
 
 	installTask = [[NSTask alloc] init];
 	[installTask setLaunchPath:@"/usr/bin/tar"];
@@ -445,7 +501,6 @@ ToolbarHeightForWindow(NSWindow *window)
 		[installTask launch];
 	}
 	@catch (NSException *exception) {
-		INFO(@"failed to launch task: %@", exception);
 		[self cancelProgressSheet:nil];
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
 		    [repo objectForKey:@"displayName"], [exception reason]]];
@@ -462,15 +517,13 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ([selectedBundles count] == 0)
 		return;
 
-	[progressButton setTitle:@"Cancel"];
-	[progressButton setKeyEquivalent:@""];
 	[NSApp beginSheet:progressSheet
 	   modalForWindow:[self window]
 	    modalDelegate:self
 	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
-	bundlesToProcess = [NSMutableArray arrayWithArray:selectedBundles];
+	processQueue = [NSMutableArray arrayWithArray:selectedBundles];
 	[self installNextBundle];
 }
 

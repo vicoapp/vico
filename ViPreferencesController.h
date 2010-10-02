@@ -24,20 +24,22 @@
 	IBOutlet NSWindow *selectRepoSheet;
 	IBOutlet NSWindow *progressSheet;
 	IBOutlet NSButton *progressButton;
-	IBOutlet NSProgressIndicator *bundleProgress;
+	IBOutlet NSProgressIndicator *progressIndicator;
 	IBOutlet NSTextField *progressDescription;
 	IBOutlet NSSearchField *repoFilterField;
 #if 0
 	IBOutlet NSPopUpButton *insertModeInputSources;
 	IBOutlet NSPopUpButton *normalModeInputSources;
 #endif
+	long long receivedContentLength;
 	BOOL progressCancelled;
+	NSMutableArray *processQueue;
+
 	ViRegexp *repoNameRx;
 	NSMutableArray *repositories;
 	NSArray *filteredRepositories;
-	NSMutableDictionary *repoDownloads;
-	NSMutableArray *bundlesToProcess;
 	NSArray *previousRepoUsers;
+	NSURLDownload *repoDownload;
 
 	NSTask *installTask;
 	NSPipe *installPipe;
@@ -60,6 +62,7 @@
 - (IBAction)addRepoUser:(id)sender;
 
 - (void)show;
+- (void)reloadNextUser;
 - (void)setFilteredRepositories:(NSArray *)anArray;
 - (void)installNextBundle;
 - (void)setSelectedFont;

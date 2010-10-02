@@ -11,6 +11,7 @@
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+		9A02748B125728C200045B6E /* CommandOutputWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A02748A125728C200045B6E /* CommandOutputWindow.xib */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
@@ -56,7 +57,6 @@
 		9A9801EB0EF957F500B2EEC3 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */; };
 		9AA7096B0EF284A700B4CE34 /* ViJumpList.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA7096A0EF284A700B4CE34 /* ViJumpList.m */; };
 		9AA7861A0D185DE100C5FD67 /* ViTextView-cursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */; };
-		9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AB014970ED5F99200905BED /* CommandOutputWindow.xib */; };
 		9AB014B00ED6021B00905BED /* ViCommandOutputController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */; };
 		9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AB014C80ED608CE00905BED /* WebKit.framework */; };
 		9AB015190ED7102200905BED /* ViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB015180ED7102200905BED /* ViSnippet.m */; };
@@ -252,7 +252,7 @@
 		9A9801EA0EF957F500B2EEC3 /* MHTextIconCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MHTextIconCell.m; sourceTree = "<group>"; };
 		9AA709690EF284A700B4CE34 /* ViJumpList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViJumpList.h; sourceTree = "<group>"; };
 		9AA7096A0EF284A700B4CE34 /* ViJumpList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViJumpList.m; sourceTree = "<group>"; };
-		9AB014970ED5F99200905BED /* CommandOutputWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CommandOutputWindow.xib; path = English.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
+		9AB014970ED5F99200905BED /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CommandOutputWindow.xib; sourceTree = "<group>"; };
 		9AB014AE0ED6021A00905BED /* ViCommandOutputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommandOutputController.h; sourceTree = "<group>"; };
 		9AB014AF0ED6021A00905BED /* ViCommandOutputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommandOutputController.m; sourceTree = "<group>"; };
 		9AB014C80ED608CE00905BED /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -447,7 +447,7 @@
 				9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
-				9AB014970ED5F99200905BED /* CommandOutputWindow.xib */,
+				9A02748A125728C200045B6E /* CommandOutputWindow.xib */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */,
 			);
@@ -747,13 +747,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A02748B125728C200045B6E /* CommandOutputWindow.xib in Resources */,
 				8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */,
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */,
 				9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */,
 				9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */,
 				9A70E9890E9F67B80013AA1D /* Themes in Resources */,
-				9AB014980ED5F99200905BED /* CommandOutputWindow.xib in Resources */,
 				9AE502021253891700579C54 /* symbol-icons.plist in Resources */,
 				9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */,
 				9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */,
@@ -942,6 +942,14 @@
 				2A37F4BAFDCFA73011CA2CEA /* English */,
 			);
 			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		9A02748A125728C200045B6E /* CommandOutputWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9AB014970ED5F99200905BED /* English */,
+			);
+			name = CommandOutputWindow.xib;
 			sourceTree = "<group>";
 		};
 		9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */ = {

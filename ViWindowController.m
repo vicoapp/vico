@@ -81,7 +81,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	[languageButton removeAllItems];
 	NSMenu *menu = [languageButton menu];
-	NSMenuItem *item = [menu addItemWithTitle:@"No language" action:nil keyEquivalent:@""];
+	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:nil keyEquivalent:@""];
 	[item setTag:1001];
 	[item setEnabled:NO];
 	[[languageButton menu] addItem:[NSMenuItem separatorItem]];

@@ -6,3 +6,6 @@
     #import <Cocoa/Cocoa.h>
     #import "NSString-additions.h"
 #endif
+
+#define ViErrorDomain @"se.bzero.vibrant.ErrorDomain"
+

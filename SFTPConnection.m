@@ -58,8 +58,8 @@ size_t num_requests = 64;
 {
 	NSDictionary *userInfo = [NSDictionary dictionaryWithObject:errorDescription
 							     forKey:NSLocalizedDescriptionKey];
-	return [NSError errorWithDomain:@"SFTP"
-				   code:1
+	return [NSError errorWithDomain:ViErrorDomain
+				   code:2
 			       userInfo:userInfo];
 }
 

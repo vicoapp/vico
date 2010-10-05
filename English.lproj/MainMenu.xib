@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="57"/>
 			<integer value="538"/>
+			<integer value="567"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -243,6 +243,21 @@
 											</object>
 										</object>
 										<string key="NSName">_NSRecentDocumentsMenu</string>
+									</object>
+								</object>
+								<object class="NSMenuItem" id="717170549">
+									<reference key="NSMenu" ref="720053764"/>
+									<string key="NSTitle">Reopen with encoding</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+									<string key="NSAction">submenuAction:</string>
+									<object class="NSMenu" key="NSSubmenu" id="582327294">
+										<string key="NSTitle">Reopen with encoding</string>
+										<object class="NSMutableArray" key="NSMenuItems">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+										</object>
 									</object>
 								</object>
 								<object class="NSMenuItem" id="425164168">
@@ -914,12 +929,6 @@
 				<string key="NSClassName">ViAppController</string>
 			</object>
 			<object class="NSUserDefaultsController" id="364579288">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>licenseOwner</string>
-					<string>licenseKey</string>
-					<string>licenseEmail</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="613240063">
@@ -936,6 +945,7 @@
 				<string key="NSWindowTitle">Registration</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
+				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<object class="NSView" key="NSWindowView" id="155812701">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -1739,6 +1749,14 @@
 					</object>
 					<int key="connectionID">564</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">encodingMenu</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="582327294"/>
+					</object>
+					<int key="connectionID">569</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1849,6 +1867,7 @@
 							<reference ref="959970941"/>
 							<reference ref="196395465"/>
 							<reference ref="165656306"/>
+							<reference ref="717170549"/>
 						</object>
 						<reference key="parent" ref="379814623"/>
 					</object>
@@ -2643,6 +2662,23 @@
 						<reference key="object" ref="812773388"/>
 						<reference key="parent" ref="157308538"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">566</int>
+						<reference key="object" ref="717170549"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="582327294"/>
+						</object>
+						<reference key="parent" ref="720053764"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">567</int>
+						<reference key="object" ref="582327294"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<reference key="parent" ref="717170549"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2838,6 +2874,9 @@
 					<string>56.ImportedFromIB2</string>
 					<string>560.IBPluginDependency</string>
 					<string>561.IBPluginDependency</string>
+					<string>566.IBPluginDependency</string>
+					<string>567.IBEditorWindowLastContentRect</string>
+					<string>567.IBPluginDependency</string>
 					<string>57.IBEditorWindowLastContentRect</string>
 					<string>57.IBPluginDependency</string>
 					<string>57.ImportedFromIB2</string>
@@ -2984,7 +3023,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{256, 613}, {199, 123}}</string>
-					<string>{{357, 816}, {406, 20}}</string>
+					<string>{{357, 816}, {447, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{74, 862}</string>
@@ -3062,6 +3101,9 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{683, 750}, {64, 6}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{369, 613}, {185, 203}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -3084,7 +3126,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{400, 543}, {196, 273}}</string>
+					<string>{{441, 523}, {242, 293}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{54, 533}, {199, 203}}</string>
@@ -3112,7 +3154,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">564</int>
+			<int key="maxID">569</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3451,6 +3493,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>commandMenu</string>
+							<string>encodingMenu</string>
 							<string>licenseEmail</string>
 							<string>licenseKey</string>
 							<string>licenseOwner</string>
@@ -3458,6 +3501,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSMenu</string>
 							<string>NSMenu</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -3470,6 +3514,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>commandMenu</string>
+							<string>encodingMenu</string>
 							<string>licenseEmail</string>
 							<string>licenseKey</string>
 							<string>licenseOwner</string>
@@ -3479,6 +3524,10 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">commandMenu</string>
+								<string key="candidateClassName">NSMenu</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">encodingMenu</string>
 								<string key="candidateClassName">NSMenu</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -3556,11 +3605,13 @@
 							<string>selectNextTab:</string>
 							<string>selectPreviousTab:</string>
 							<string>splitViewHorizontally:</string>
+							<string>switchToDocumentAction:</string>
 							<string>toggleExplorer:</string>
 							<string>toggleSymbolList:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3583,6 +3634,7 @@
 							<string>selectNextTab:</string>
 							<string>selectPreviousTab:</string>
 							<string>splitViewHorizontally:</string>
+							<string>switchToDocumentAction:</string>
 							<string>toggleExplorer:</string>
 							<string>toggleSymbolList:</string>
 						</object>
@@ -3617,6 +3669,10 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">switchToDocumentAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">toggleExplorer:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -3635,7 +3691,9 @@
 							<string>documentView</string>
 							<string>explorerView</string>
 							<string>languageButton</string>
+							<string>mainView</string>
 							<string>messageField</string>
+							<string>openFilesButton</string>
 							<string>projectDelegate</string>
 							<string>projectResizeView</string>
 							<string>splitView</string>
@@ -3653,7 +3711,9 @@
 							<string>NSView</string>
 							<string>ViBgView</string>
 							<string>NSPopUpButton</string>
+							<string>NSView</string>
 							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
 							<string>ProjectDelegate</string>
 							<string>NSImageView</string>
 							<string>NSSplitView</string>
@@ -3674,7 +3734,9 @@
 							<string>documentView</string>
 							<string>explorerView</string>
 							<string>languageButton</string>
+							<string>mainView</string>
 							<string>messageField</string>
+							<string>openFilesButton</string>
 							<string>projectDelegate</string>
 							<string>projectResizeView</string>
 							<string>splitView</string>
@@ -3708,8 +3770,16 @@
 								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">mainView</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">messageField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">openFilesButton</string>
+								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">projectDelegate</string>

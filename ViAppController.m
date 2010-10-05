@@ -9,6 +9,7 @@
 @implementation ViAppController
 
 @synthesize lastSearchPattern;
+@synthesize encodingMenu;
 
 - (id)init
 {
@@ -122,7 +123,26 @@
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
 
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newBundleLoaded:) name:ViLanguageStoreBundleLoadedNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(newBundleLoaded:)
+						     name:ViLanguageStoreBundleLoadedNotification object:nil];
+
+	const NSStringEncoding *encoding = [NSString availableStringEncodings];
+	NSMutableArray *array = [NSMutableArray array];
+	NSMenuItem *item;
+	while (*encoding) {
+		item = [[NSMenuItem alloc] initWithTitle:[NSString localizedNameOfStringEncoding:*encoding]
+						  action:@selector(setEncoding:)
+					   keyEquivalent:@""];
+		[item setRepresentedObject:[NSNumber numberWithUnsignedLong:*encoding]];
+		[array addObject:item];
+		encoding++;
+	}
+
+	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];
+	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
+	for (item in array)
+		[encodingMenu addItem:item];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

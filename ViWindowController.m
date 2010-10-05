@@ -81,7 +81,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	[languageButton removeAllItems];
 	NSMenu *menu = [languageButton menu];
-	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:nil keyEquivalent:@""];
+	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:@selector(setLanguage:) keyEquivalent:@""];
 	[item setTag:1001];
 	[item setEnabled:NO];
 	[[languageButton menu] addItem:[NSMenuItem separatorItem]];
@@ -101,25 +101,6 @@ static NSWindowController	*currentWindowController = nil;
 	if ([languages count] > 0)
 		[[languageButton menu] addItem:[NSMenuItem separatorItem]];
 	[menu addItemWithTitle:@"Get more bundles..." action:@selector(getMoreBundles:) keyEquivalent:@""];
-}
-
-- (IBAction)setLanguage:(id)sender
-{
-	ViDocument *doc = [self document];
-	if (![doc respondsToSelector:@selector(setLanguage:)])
-		return;
-
-	ViLanguage *lang = nil;
-	if ([sender respondsToSelector:@selector(representedObject)])
-		lang = [sender representedObject];
-
-	[doc setLanguage:lang];
-	if ([doc fileURL]) {
-		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
-			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
-		[syntaxOverride setObject:lang ? [lang name] : @"" forKey:[[doc fileURL] absoluteString]];
-		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
-	}
 }
 
 - (void)windowDidLoad

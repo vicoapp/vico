@@ -19,6 +19,9 @@
 	NSDictionary *typingAttributes;
 	ViWindowController *windowController;
 	NSString *readContent;
+	NSStringEncoding encoding;
+	NSStringEncoding forcedEncoding;
+	BOOL retrySaveOperation;
 
 	// ex commands
 	SEL exCommandSelector;
@@ -46,11 +49,12 @@
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
 @property(readwrite, assign) ViSnippet *activeSnippet;
+@property(readonly) NSStringEncoding encoding;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (IBAction)finishedExCommand:(id)sender;
 - (ViLanguage *)language;
-- (void)setLanguage:(ViLanguage *)aLanguage;
+- (IBAction)setLanguage:(id)sender;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;
 - (void)changeTheme:(ViTheme *)theme;

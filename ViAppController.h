@@ -9,11 +9,13 @@
 	IBOutlet NSTextField *licenseKey;
 	IBOutlet NSTextField *licenseEmail;
 	IBOutlet NSWindow *registrationWindow;
+	IBOutlet NSMenu *encodingMenu;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
 }
 
 @property(copy, readwrite) NSString *lastSearchPattern;
+@property(readonly) NSMenu *encodingMenu;
 
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)registerLicense:(id)sender;

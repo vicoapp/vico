@@ -3,6 +3,7 @@
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViLanguageStore.h"
+#import "ViCharsetDetector.h"
 #import "NSTextStorage-additions.h"
 #import "NSString-additions.h"
 #import "NSString-scopeSelector.h"
@@ -32,6 +33,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize views;
 @synthesize visibleViews;
 @synthesize activeSnippet;
+@synthesize encoding;
 
 - (id)init
 {
@@ -69,6 +71,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"symbol-icons" ofType:@"plist"]];
 
 		[self configureForURL:nil];
+		forcedEncoding = 0;
+		encoding = NSUTF8StringEncoding;
 	}
 	return self;
 }
@@ -137,11 +141,52 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-	return [[textStorage string] dataUsingEncoding:NSUTF8StringEncoding];
+	NSStringEncoding enc = encoding;
+	if (retrySaveOperation)
+		enc = NSUTF8StringEncoding;
+	DEBUG(@"using encoding %@", [NSString localizedNameOfStringEncoding:enc]);
+	return [[textStorage string] dataUsingEncoding:enc];
+}
+
+- (BOOL)attemptRecoveryFromError:(NSError *)error optionIndex:(NSUInteger)recoveryOptionIndex
+{
+	if (recoveryOptionIndex == 1) {
+		retrySaveOperation = YES;
+		return YES;
+	}
+
+	return NO;
+}
+
+- (void)didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
+{
+	DEBUG(@"didRecover = %s", didRecover ? "YES" : "NO");
 }
 
 - (BOOL)writeSafelyToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation error:(NSError **)outError
 {
+	retrySaveOperation = NO;
+
+	if (![[textStorage string] canBeConvertedToEncoding:encoding]) {
+		NSString *reason = [NSString stringWithFormat:@"The %@ encoding is not appropriate.", [NSString localizedNameOfStringEncoding:encoding]];
+		NSString *suggestion = @"Consider saving the file as UTF-8 instead.";
+		NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+						   reason, NSLocalizedFailureReasonErrorKey,
+						   suggestion, NSLocalizedRecoverySuggestionErrorKey,
+						   self, NSRecoveryAttempterErrorKey,
+						   [NSArray arrayWithObjects:@"OK", @"Save as UTF-8", nil], NSLocalizedRecoveryOptionsErrorKey,
+						   nil];
+		NSError *err = [NSError errorWithDomain:ViErrorDomain code:1 userInfo:userInfo];
+		if (![self presentError:err]) {
+			if (outError)	/* Suppress the callers error. */
+				*outError = [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
+			return NO;
+		}
+
+		if (saveOperation == NSSaveOperation || saveOperation == NSSaveAsOperation)
+			encoding = NSUTF8StringEncoding;
+	}
+
 	if ([url isFileURL])
 		return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
 
@@ -151,8 +196,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return NO;
 	}
 
-	NSData *data = [self dataOfType:typeName error:outError];
+	NSData *data = [self dataOfType:typeName error:nil];
 	if (data == nil)
+		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
@@ -171,7 +217,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	else if ([[url scheme] isEqualToString:@"sftp"]) {
 		if ([url user] == nil || [url host] == nil) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:@"Missing user of host in URL."];
+				*outError = [SFTPConnection errorWithDescription:@"Missing user or host in URL."];
 			return NO;
 		}
 
@@ -184,7 +230,54 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (data == nil)
 		return NO;
 
-	NSString *aString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	NSString *aString = nil;
+	if (forcedEncoding != 0) {
+		aString = [[NSString alloc] initWithData:data encoding:forcedEncoding];
+		if (aString == nil) {
+			NSString *description = [NSString stringWithFormat:@"The file can't be interpreted in %@ encoding.",
+			    [NSString localizedNameOfStringEncoding:forcedEncoding]];
+			NSString *suggestion = [NSString stringWithFormat:@"Keeping the %@ encoding.",
+			    [NSString localizedNameOfStringEncoding:encoding]];
+			NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+			    description, NSLocalizedDescriptionKey,
+			    suggestion, NSLocalizedRecoverySuggestionErrorKey,
+			    nil];
+			NSError *err = [NSError errorWithDomain:ViErrorDomain code:2 userInfo:userInfo];
+			[self presentError:err];
+			aString = [[NSString alloc] initWithData:data encoding:encoding];
+		} else {
+			encoding = forcedEncoding;
+
+			/* Save the user-overridden encoding in preferences. */
+			NSMutableDictionary *encodingOverride = [NSMutableDictionary dictionaryWithDictionary:
+				[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encodingOverride"]];
+			[encodingOverride setObject:[NSNumber numberWithUnsignedInteger:encoding] forKey:[[self fileURL] absoluteString]];
+			[[NSUserDefaults standardUserDefaults] setObject:encodingOverride forKey:@"encodingOverride"];
+		}
+		forcedEncoding = 0;
+	} else {
+		/* Check for a user-overridden encoding in preferences. */
+		NSDictionary *encodingOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encodingOverride"];
+		NSNumber *savedEncoding = [encodingOverride objectForKey:[[self fileURL] absoluteString]];
+		if (savedEncoding) {
+			encoding = [savedEncoding unsignedIntegerValue];
+			aString = [[NSString alloc] initWithData:data encoding:encoding];
+		}
+
+		if (aString == nil) {
+			/* Try to auto-detect the encoding. */
+			encoding = [[ViCharsetDetector defaultDetector] encodingForData:data];
+			if (encoding == 0)
+				/* Try UTF-8 if auto-detecting fails. */
+				encoding = NSUTF8StringEncoding;
+			aString = [[NSString alloc] initWithData:data encoding:encoding];
+			if (aString == nil) {
+				/* If all else fails, use iso-8859-1. */
+				encoding = NSISOLatin1StringEncoding;
+				aString = [[NSString alloc] initWithData:data encoding:encoding];
+			}
+		}
+	}
 
 	/*
 	 * Disable the processing in textStorageDidProcessEditing,
@@ -198,6 +291,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self highlightEverything];
 
 	return YES;
+}
+
+- (void)setEncoding:(id)sender
+{
+	forcedEncoding = [[sender representedObject] unsignedIntegerValue];
+	INFO(@"sender = %@, rep.obj = %@, forcedEncoding = 0x%llx", sender, [sender representedObject], forcedEncoding);
+	[self revertDocumentToSaved:nil];
 }
 
 - (void)setFileURL:(NSURL *)absoluteURL
@@ -425,17 +525,30 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return language;
 }
 
-- (void)setLanguage:(ViLanguage *)aLanguage
+- (IBAction)setLanguage:(id)sender
 {
-	/* Force compilation. */
-	[aLanguage patterns];
+	ViLanguage *lang = nil;
+	if ([sender respondsToSelector:@selector(representedObject)])
+		lang = [sender representedObject];
+	else
+		lang = sender;
 
-	if (aLanguage != language) {
-		language = aLanguage;
+	/* Force compilation. */
+	[lang patterns];
+
+	if (lang != language) {
+		language = lang;
 		bundle = [language bundle];
 		symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
 		symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self highlightEverything];
+	}
+
+	if ([self fileURL] != nil) {
+		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
+			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
+		[syntaxOverride setObject:lang ? [lang name] : @"" forKey:[[self fileURL] absoluteString]];
+		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
 }
 

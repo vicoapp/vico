@@ -347,5 +347,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>sparkle_pub.pem</string>
+	<key>SUFeedURL</key>
+	<string>http://bzero.se/vibrant/appcast.xml</string>
 </dict>
 </plist>

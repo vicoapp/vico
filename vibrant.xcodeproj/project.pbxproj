@@ -38,6 +38,11 @@
 		9A0275551259D33F00045B6E /* nsUniversalDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A02753C1259D33F00045B6E /* nsUniversalDetector.cpp */; };
 		9A0275561259D33F00045B6E /* nsUTF8Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A02753D1259D33F00045B6E /* nsUTF8Prober.cpp */; };
 		9A0275731259DEB400045B6E /* ViCharsetDetector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9A0275721259DEB400045B6E /* ViCharsetDetector.mm */; };
+		9A027714125B101200045B6E /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A027713125B101200045B6E /* Sparkle.framework */; };
+		9A027727125B11C700045B6E /* sparkle_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9A027726125B11C700045B6E /* sparkle_pub.pem */; };
+		9A027734125B16BF00045B6E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A027713125B101200045B6E /* Sparkle.framework */; };
+		9A02773F125B176500045B6E /* YAJL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE5023D1253BC5F00579C54 /* YAJL.framework */; };
+		9A027740125B177900045B6E /* PSMTabBarControl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
@@ -179,6 +184,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9A02771B125B102B00045B6E /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9A027740125B177900045B6E /* PSMTabBarControl.framework in Copy Frameworks */,
+				9A02773F125B176500045B6E /* YAJL.framework in Copy Frameworks */,
+				9A027714125B101200045B6E /* Sparkle.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -217,6 +238,8 @@
 		9A02753D1259D33F00045B6E /* nsUTF8Prober.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nsUTF8Prober.cpp; path = universalchardet/nsUTF8Prober.cpp; sourceTree = "<group>"; };
 		9A0275711259DEB400045B6E /* ViCharsetDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCharsetDetector.h; sourceTree = "<group>"; };
 		9A0275721259DEB400045B6E /* ViCharsetDetector.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViCharsetDetector.mm; sourceTree = "<group>"; };
+		9A027713125B101200045B6E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		9A027726125B11C700045B6E /* sparkle_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparkle_pub.pem; sourceTree = "<group>"; };
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
 		9A099A700EE88046006A80A2 /* NSTextStorage-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTextStorage-additions.h"; sourceTree = "<group>"; };
@@ -364,6 +387,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A027734125B16BF00045B6E /* Sparkle.framework in Frameworks */,
 				9AE502421253BCA200579C54 /* YAJL.framework in Frameworks */,
 				9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
@@ -385,6 +409,7 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+				9A027713125B101200045B6E /* Sparkle.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -492,6 +517,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9A027726125B11C700045B6E /* sparkle_pub.pem */,
 				9A15BB1D1254D3E7009BBFC8 /* tick.png */,
 				9AE501FE1253862E00579C54 /* symbol-icons.plist */,
 				9AB0178A0EDDBF8100905BED /* Images */,
@@ -734,11 +760,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Vibrant" */;
 			buildPhases = (
-				9AF41B3D0EC8731B00F1D681 /* ShellScript */,
+				9A0276EC125B0B6100045B6E /* Download Sparkle.framework */,
+				9AF41B3D0EC8731B00F1D681 /* Build oniguruma */,
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
-				9AC2D8B90D9924C800A26861 /* ShellScript */,
+				9A02771B125B102B00045B6E /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -854,6 +881,7 @@
 				9AD856C20EF90CE6008DF460 /* actionbarbg.png in Resources */,
 				9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */,
 				9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */,
+				9A027727125B11C700045B6E /* sparkle_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -873,18 +901,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		9AC2D8B90D9924C800A26861 /* ShellScript */ = {
+		9A0276EC125B0B6100045B6E /* Download Sparkle.framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
+			comments = "Download and install the Sparkle framework.";
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Download Sparkle.framework";
 			outputPaths = (
+				"$(SRCROOT)/Sparkle.framework/Versions/A/Sparkle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\necho \"Removing old PSMTabBarControl framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/PSMTabBarControl.framework\necho \"Copying new PSMTabBarControl framework\"\nmkdir -p $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\ncp -Rp $TARGET_BUILD_DIR/../../PSMTabBarControl/build/$BUILD_STYLE/PSMTabBarControl.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n\necho \"Removing old YAJL framework\"\nrm -rf $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks/YAJL.framework\necho \"Copying new YAJL framework\"\nmkdir -p $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\ncp -Rp $TARGET_BUILD_DIR/../../yajl-objc/Project/build/$BUILD_STYLE/YAJL.framework $TARGET_BUILD_DIR/$WRAPPER_NAME/Contents/Frameworks\n";
+			shellScript = "SPARKLE_VERSION=1.5b6\ntest -d Sparkle.framework || {\n  URL=http://sparkle.andymatuschak.org/files/Sparkle%20${SPARKLE_VERSION}.zip\n  test -f \"Sparkle ${SPARKLE_VERSION}.zip\" || ftp $URL\n  unzip \"Sparkle ${SPARKLE_VERSION}.zip\" \"With Garbage Collection/*\" && \\\n    mv \"With Garbage Collection/Sparkle.framework\" . &&\n    rm -rf \"With Garbage Collection\"\n}\n";
 		};
 		9AF2FE6E0EC9C85900C5771B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -899,7 +930,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
-		9AF41B3D0EC8731B00F1D681 /* ShellScript */ = {
+		9AF41B3D0EC8731B00F1D681 /* Build oniguruma */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			comments = "Build oniguruma 5.9.2 regular expressions library\n";
@@ -908,6 +939,7 @@
 			inputPaths = (
 				"$(SRCROOT)/onig-5.9.2.tar.gz",
 			);
+			name = "Build oniguruma";
 			outputPaths = (
 				"$(TARGET_BUILD_DIR)/oniguruma/lib/libonig.a",
 			);

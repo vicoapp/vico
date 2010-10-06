@@ -68,7 +68,7 @@ ZIP=$VOL.zip
 ditto -ck --keepParent "$APP" "$ZIP"
 
 appsize=$(stat -f %z "$ZIP")
-SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $DMG | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
+SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $ZIP | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 cat > $VOL.xml <<EOF
 <item>

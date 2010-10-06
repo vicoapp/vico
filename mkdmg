@@ -67,7 +67,8 @@ BASE="http://bzero.se/vibrant"
 #ZIP=$VOL.zip
 #ditto -ck --keepParent "$APP" "$ZIP"
 
-SIZE=$(($(du -ks "$APP") * 1024))
+KSIZE=$(du -ks "$APP" | cut -f1)
+SIZE=$(($KSIZE * 1024))
 SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $DMG | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 cat > $VOL.xml <<EOF

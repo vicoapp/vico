@@ -50,8 +50,6 @@
 {
 	ViWindowController *windowController = [[self document] windowController];
 
-	INFO(@"command.filename == %@", command.filename);
-
 	if (command.filename == nil)
 	{
 		[[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];

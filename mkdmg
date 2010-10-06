@@ -49,7 +49,6 @@ root="/Volumes/$VOL"
 
 # copy stuff to the disk image
 /bin/cp -R $APP "$root" || die "failed to copy application to disk image"
-appsize=$(du -s $APP | cut -f1)
 
 ln -s /Applications $root/Applications
 
@@ -62,20 +61,31 @@ hdiutil convert -format UDZO $TMPDMG -o $DMG
 /bin/rm -f $TMPDMG
 ls -lh $DMG
 
-SIGNATURE=$(openssl dgst -sha1 -binary < $DMG | openssl dgst -dss1 -sign sparkle_priv.pem | openssl enc -base64)
+#### Create a zip file and sign it for sparkle updates.
 
-cat | tee $VOL.xml <<EOF
+BASE="http://bzero.se/vibrant"
+ZIP=$VOL.zip
+ditto -ck --keepParent "$APP" "$ZIP"
+
+appsize=$(stat -f %z "$ZIP")
+SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $DMG | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
+
+cat > $VOL.xml <<EOF
 <item>
     <title>Version $VERSION</title>
     <sparkle:releaseNotesLink>
-        http://bzero.se/vibrant/version-$VERSION.html
+        $BASE/version-$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="http://bzero.se/vibrant/$DMG"
+    <enclosure url="$BASE/$ZIP"
                sparkle:version="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
                length="$appsize"
                type="application/octet-stream" />
 </item>
 EOF
+cat $VOL.xml
+
+echo "scp $DMG bzero.se:/var/www/htdocs/bzero.se/vibrant"
+echo "scp $ZIP bzero.se:/var/www/htdocs/bzero.se/vibrant"
 

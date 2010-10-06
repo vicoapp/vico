@@ -14,8 +14,8 @@
 }
 
 @property(readwrite) int currentTab;
-@property(readwrite) ViSnippetPlaceholder *currentPlaceholder;
-@property(readwrite) ViSnippetPlaceholder *lastPlaceholder;
+@property(readwrite, assign) ViSnippetPlaceholder *currentPlaceholder;
+@property(readwrite, assign) ViSnippetPlaceholder *lastPlaceholder;
 @property(readonly) NSArray *tabstops;
 @property(readonly, copy) NSString *string;
 @property(readonly) NSRange range;

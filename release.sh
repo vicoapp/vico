@@ -3,7 +3,7 @@
 tag=$1
 if test -z "$tag"; then
 	version=$(date +"%Y%m%d.%H%M")
-	tag=HEAD
+	tag=tip
 else
 	version=$(echo $tag | sed -e 's/^V//' -e 's/_/./g' )
 fi
@@ -19,7 +19,7 @@ if test -d "$dir"; then
 fi
 
 echo checking out sources
-hg clone . "$dir" || exit 2
+hg clone -u $tag . "$dir" || exit 2
 
 (cd $dir && ./mkdmg $version) || exit 3
 

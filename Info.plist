@@ -342,6 +342,8 @@
 	<key>CFBundleSignature</key>
 	<string>VIBR</string>
 	<key>CFBundleVersion</key>
+	<string>${REPO_VERSION}</string>
+	<key>CFBundleShortVersionString</key>
 	<string>${VERSION}</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>

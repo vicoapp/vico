@@ -1,14 +1,15 @@
 #!/bin/sh
 
+REPO_VERSION=$(hg id -n)
 VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"
 	exit 2
 fi
 
-echo "Building vibrant version $VERSION"
+echo "Building vibrant version $VERSION (repo version $REPO_VERSION)"
 
-xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release build VERSION=$VERSION || exit
+xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release build VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
 
 TMPDMG=vibrant-tmp.dmg
 /bin/rm -f $TMPDMG
@@ -26,7 +27,7 @@ APP=build/Release/Vibrant.app
 echo "Stripping binary"
 strip $APP/Contents/MacOS/Vibrant
 
-VOL="vibrant-$VERSION"
+VOL="Vibrant-$VERSION"
 DMG=$VOL.dmg
 echo "Creating disk image $VOL"
 
@@ -35,12 +36,12 @@ trap 'rm -f $TMPDMG; exit 1' 2 3 15
 
 # create a disk image
 hdiutil create -megabytes 10 $TMPDMG -layout NONE
-# associate a device with this but don't mount it
+# Attach a device with this but don't mount it
 MYDEV=`hdid -nomount $TMPDMG`
 test -n "$MYDEV" || die "failed to attach disk image"
 # create a file system
 newfs_hfs -v "$VOL" $MYDEV || die "failed to create file system"
-# diassociate device
+# Detach device
 hdiutil eject $MYDEV
 # mount it
 hdid $TMPDMG || die "failed to mount disk image"
@@ -54,20 +55,19 @@ ln -s /Applications $root/Applications
 
 rm -f $DMG
 
-# eject
 hdiutil eject $MYDEV
 # compress it and make it read only
 hdiutil convert -format UDZO $TMPDMG -o $DMG
 /bin/rm -f $TMPDMG
 ls -lh $DMG
 
-#### Create a zip file and sign it for sparkle updates.
+#### Create and sign a zip file for automatic updates.
 
 BASE="http://bzero.se/vibrant"
 ZIP=$VOL.zip
 ditto -ck --keepParent "$APP" "$ZIP"
 
-appsize=$(stat -f %z "$ZIP")
+SIZE=$(stat -f %z "$ZIP")
 SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $ZIP | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 cat > $VOL.xml <<EOF
@@ -78,9 +78,10 @@ cat > $VOL.xml <<EOF
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
     <enclosure url="$BASE/$ZIP"
-               sparkle:version="$VERSION"
+               sparkle:version="$REPO_VERSION"
+               sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
-               length="$appsize"
+               length="$SIZE"
                type="application/octet-stream" />
 </item>
 EOF

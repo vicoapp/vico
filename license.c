@@ -34,18 +34,14 @@
 	const char *e = license_key;					\
 	char *ec, tmp[256];						\
 	uint8_t license_data[256];					\
-	fprintf(stderr, "e = [%s]\n", e);	\
 	if (strncmp(e, "-----BEGIN LICENSE-----", 23) == 0)		\
 		e += 24;						\
-	fprintf(stderr, "e = [%s]\n", e);	\
 	for (ec = tmp; *e && *e != '-'; e++)				\
 		if (isalnum(*e) || *e == '+' || *e == '/' || *e == '=')	\
 			*ec++ = *e;					\
 	*ec = '\0';							\
-	fprintf(stderr, "tmp = [%s]\n", tmp);	\
 	int license_len = b64_pton(tmp, license_data,			\
 		sizeof(license_data));					\
-	printf("license_len = %i\n", license_len);			\
 	if (license_len != 128)						\
 		goto error;
 
@@ -61,7 +57,6 @@
 /* Create a BIO and load the public key.
  */
 #define LOAD_PUBLIC_KEY()				\
-	fprintf(stderr, "pubkey = [%.*s]\n", PUBKEY_LEN, pubkey);	\
 	BIO *bio = BIO_new_mem_buf(pubkey, PUBKEY_LEN);	\
 	if (bio == NULL)				\
 		goto error;				\

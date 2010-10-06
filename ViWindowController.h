@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-#import <AppKit/AppKit.h>
 #import "ViTagStack.h"
 #import "ViBgView.h"
 

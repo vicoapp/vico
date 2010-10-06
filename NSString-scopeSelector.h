@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 #define DEPTH_RANK 1000000000000000000ULL /* 10^18 */
 
 @interface NSString (scopeSelector)

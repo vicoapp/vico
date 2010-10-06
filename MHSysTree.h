@@ -24,7 +24,6 @@
  */
 
 #include "sys_tree.h"
-#import <Foundation/Foundation.h>
 
 struct rb_entry
 {

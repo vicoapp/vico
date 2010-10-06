@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViCommand.h"
 #import "ViTheme.h"
 #import "ViLanguage.h"

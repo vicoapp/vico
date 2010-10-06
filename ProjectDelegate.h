@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViRegexp.h"
 #import "ViBgView.h"
 

@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViTheme.h"
 
 @interface ViThemeStore : NSObject

@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 @class ViRegexp;
 
 @interface ViAppController : NSObject

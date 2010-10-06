@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 #include <sys/stat.h>
 
 #include "sftp.h"

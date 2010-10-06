@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViTextView.h"
 #import "ViDocument.h"
 

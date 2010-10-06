@@ -1,7 +1,4 @@
-#import <Cocoa/Cocoa.h>
-
 @class ViSnippetPlaceholder;
-
 
 @interface ViSnippet : NSObject
 {

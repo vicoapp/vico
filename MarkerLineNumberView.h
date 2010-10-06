@@ -27,7 +27,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "NoodleLineNumberView.h"
 
 @interface MarkerLineNumberView : NoodleLineNumberView

@@ -27,9 +27,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <Cocoa/Cocoa.h>
-
-
 @interface NoodleLineNumberMarker : NSRulerMarker
 {
 	unsigned		lineNumber;

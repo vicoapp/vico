@@ -27,8 +27,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <Cocoa/Cocoa.h>
-
 @class NoodleLineNumberMarker;
 
 @interface NoodleLineNumberView : NSRulerView

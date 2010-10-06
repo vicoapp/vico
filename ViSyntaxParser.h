@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 #import "ViSyntaxContext.h"
 #import "ViSyntaxMatch.h"
 #import "MHSysTree.h"

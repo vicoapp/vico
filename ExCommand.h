@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 /* From nvi:
  */
 #define EX_ADDR1         0x00000001      /* One address. */

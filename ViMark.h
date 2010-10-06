@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 @interface ViMark : NSObject
 {
 	NSUInteger line, column;

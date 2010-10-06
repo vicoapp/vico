@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 typedef enum { ViCommandInitialState, ViCommandNeedMotion, ViCommandNeedChar } ViCommandState;
 
 struct vikey

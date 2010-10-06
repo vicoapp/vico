@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViBundle.h"
 
 // FIXME: move to a better place

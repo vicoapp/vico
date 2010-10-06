@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 #include <oniguruma.h>
 
 @interface ViRegexpMatch : NSObject

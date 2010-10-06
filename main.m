@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 #include <sys/types.h>
 #include <sys/ptrace.h>
 

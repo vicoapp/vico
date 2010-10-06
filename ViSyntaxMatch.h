@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import "ViRegexp.h"
 
 @interface ViSyntaxMatch : NSObject

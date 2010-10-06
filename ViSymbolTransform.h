@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-
 @interface ViSymbolTransform : NSObject
 {
 	NSMutableArray *transformations;

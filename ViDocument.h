@@ -1,5 +1,3 @@
-#import <Cocoa/Cocoa.h>
-#import <AppKit/AppKit.h>
 #import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViSymbol.h"

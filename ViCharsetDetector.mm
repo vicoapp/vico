@@ -49,7 +49,6 @@ ViDataDetector::~ViDataDetector()
 void
 ViDataDetector::Report(const char *aCharset)
 {
-	INFO(@"reported encoding %s", aCharset);
 	encoding = aCharset;
 }
 
@@ -73,19 +72,13 @@ ViDataDetector::Report(const char *aCharset)
 {
 	NSStringEncoding encoding = 0;
 
-	INFO(@"detecting encoding in %lu bytes of data", (unsigned long)[data length]);
-
 	ViDataDetector *detector = new ViDataDetector(NS_FILTER_ALL);
 	const char *charset = detector->detectBytes((const char *)[data bytes], [data length]);
-	INFO(@"Detected charset %s", charset);
 	delete detector;
 
 	if (charset) {
 		NSString *cset = [NSString stringWithCString:charset encoding:NSASCIIStringEncoding];
 		CFStringEncoding enc = CFStringConvertIANACharSetNameToEncoding((CFStringRef)cset);
-		INFO(@"charset %s = CFString encoding %x ~> 0x%x", charset, (long)enc,
-		    CFStringConvertEncodingToNSStringEncoding(enc));
-	
 		encoding = CFStringConvertEncodingToNSStringEncoding(enc);
 		if (encoding == kCFStringEncodingInvalidId)
 			encoding = 0;

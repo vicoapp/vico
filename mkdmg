@@ -32,7 +32,7 @@ DMG=$VOL.dmg
 echo "Creating disk image $VOL"
 
 # clean up if we're interrupted
-trap 'rm -f $TMPDMG; exit 1' 2 3 15
+trap 'die Interrupted' 2 3 15
 
 # create a disk image
 hdiutil create -megabytes 10 $TMPDMG -layout NONE
@@ -64,11 +64,11 @@ ls -lh $DMG
 #### Create and sign a zip file for automatic updates.
 
 BASE="http://bzero.se/vibrant"
-ZIP=$VOL.zip
-ditto -ck --keepParent "$APP" "$ZIP"
+#ZIP=$VOL.zip
+#ditto -ck --keepParent "$APP" "$ZIP"
 
-SIZE=$(stat -f %z "$ZIP")
-SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $ZIP | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
+SIZE=$(($(du -ks "$APP") * 1024))
+SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $DMG | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 cat > $VOL.xml <<EOF
 <item>
@@ -77,7 +77,7 @@ cat > $VOL.xml <<EOF
         $BASE/version-$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="$BASE/$ZIP"
+    <enclosure url="$BASE/$DMG"
                sparkle:version="$REPO_VERSION"
                sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
@@ -88,5 +88,5 @@ EOF
 cat $VOL.xml
 
 echo "scp $DMG bzero.se:/var/www/htdocs/bzero.se/vibrant"
-echo "scp $ZIP bzero.se:/var/www/htdocs/bzero.se/vibrant"
+#echo "scp $ZIP bzero.se:/var/www/htdocs/bzero.se/vibrant"
 

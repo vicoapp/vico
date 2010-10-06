@@ -26,7 +26,7 @@ APP=build/Release/Vibrant.app
 echo "Stripping binary"
 strip $APP/Contents/MacOS/Vibrant
 
-VOL="Vibrant $VERSION"
+VOL="vibrant-$VERSION"
 DMG="$VOL.dmg"
 echo "Creating disk image $VOL"
 
@@ -34,13 +34,14 @@ echo "Creating disk image $VOL"
 trap 'die Interrupted' 2 3 15
 
 # Create the source folder and copy the application there.
-mkdir "$VOL" || die "failed to create .dmg source folder"
-/bin/cp -R $APP "$VOL" || die "failed to copy application to the .dmg source folder"
-ln -s /Applications "$VOL/Applications"
+DMG_SOURCE="Vibrant $VERRSION"
+mkdir "$DMG_SOURCE" || die "failed to create .dmg source folder"
+/bin/cp -R $APP "$DMG_SOURCE" || die "failed to copy application to the .dmg source folder"
+ln -s /Applications "$DMG_SOURCE/Applications"
 
 # Create a disk image of the source folder and compress it.
-hdiutil makehybrid -o "$TMPDMG" "$VOL" -hfs
-hdiutil convert -format UDBZ "$DMG" -o "$TMPDMG"
+hdiutil makehybrid -o "$TMPDMG" "$DMG_SOURCE" -hfs
+hdiutil convert -format UDBZ "$TMPDMG" -o "$DMG"
 
 /bin/rm -f $TMPDMG
 ls -lh "$DMG"
@@ -60,7 +61,7 @@ cat > $VOL.xml <<EOF
         $BASE/version-$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="$($BASE/$DMG | sed 's/ /+/g')"
+    <enclosure url="$BASE/$DMG"
                sparkle:version="$REPO_VERSION"
                sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
@@ -70,5 +71,5 @@ cat > $VOL.xml <<EOF
 EOF
 cat "$VOL.xml"
 
-echo "scp '$DMG' bzero.se:/var/www/htdocs/bzero.se/vibrant"
+echo "scp $DMG bzero.se:/var/www/htdocs/bzero.se/vibrant"
 

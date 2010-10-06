@@ -1,6 +1,8 @@
 #include <sys/types.h>
 #include <sys/ptrace.h>
 
+#include <signal.h>
+
 #include "log.h"
 
 int
@@ -11,5 +13,6 @@ main(int argc, char *argv[])
 #if defined(RELEASE_BUILD)
 	ptrace(PT_DENY_ATTACH, 0, 0, 0);
 #endif
+	signal(SIGPIPE, SIG_IGN);
 	return NSApplicationMain(argc, (const char **) argv);
 }

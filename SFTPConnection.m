@@ -245,7 +245,8 @@ size_t num_requests = 64;
 	if (fd_out >= 0)
 		close(fd_out);
 	fd_in = fd_out = -1;
-	ssh_task = ssh_input = ssh_output = ssh_error = nil;
+	ssh_task = nil;
+	ssh_input = ssh_output = ssh_error = nil;
 }
 
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError

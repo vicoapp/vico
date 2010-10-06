@@ -915,7 +915,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SPARKLE_VERSION=1.5b6\ntest -d Sparkle.framework || {\n  URL=http://sparkle.andymatuschak.org/files/Sparkle%20${SPARKLE_VERSION}.zip\n  test -f \"Sparkle ${SPARKLE_VERSION}.zip\" || ftp $URL\n  unzip \"Sparkle ${SPARKLE_VERSION}.zip\" \"With Garbage Collection/*\" && \\\n    mv \"With Garbage Collection/Sparkle.framework\" . &&\n    rm -rf \"With Garbage Collection\"\n}\n";
+			shellScript = "set -x\nSPARKLE_VERSION=1.5b6\ntest -d Sparkle.framework/Versions/A/Sparkle || {\n  URL=http://sparkle.andymatuschak.org/files/Sparkle%20${SPARKLE_VERSION}.zip\n  test -f \"Sparkle ${SPARKLE_VERSION}.zip\" || {\n    test -f \"../Sparkle ${SPARKLE_VERSION}.zip\" && cp \"../Sparkle ${SPARKLE_VERSION}.zip\" .\n    test -f \"Sparkle ${SPARKLE_VERSION}.zip\" || ftp $URL\n  }\n  rm -rf Sparkle.framework\n  unzip \"Sparkle ${SPARKLE_VERSION}.zip\" \"With Garbage Collection/*\" && \\\n    mv \"With Garbage Collection/Sparkle.framework\" . &&\n    rm -rf \"With Garbage Collection\"\n}\n";
 		};
 		9AF2FE6E0EC9C85900C5771B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1281,7 +1281,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
 					sftp,
 					"$(TARGET_BUILD_DIR)/oniguruma/include",
 				);
@@ -1332,7 +1331,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
 					sftp,
 					"$(TARGET_BUILD_DIR)/oniguruma/include",
 				);

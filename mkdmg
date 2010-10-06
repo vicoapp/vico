@@ -8,7 +8,7 @@ fi
 
 echo "Building vibrant version $VERSION"
 
-xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release clean build VERSION=$VERSION || exit
+xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release build VERSION=$VERSION || exit
 
 TMPDMG=vibrant-tmp.dmg
 /bin/rm -f $TMPDMG
@@ -27,13 +27,14 @@ echo "Stripping binary"
 strip $APP/Contents/MacOS/Vibrant
 
 VOL="vibrant-$VERSION"
+DMG=$VOL.dmg
 echo "Creating disk image $VOL"
 
 # clean up if we're interrupted
 trap 'rm -f $TMPDMG; exit 1' 2 3 15
 
 # create a disk image
-hdiutil create -megabytes 30 $TMPDMG -layout NONE
+hdiutil create -megabytes 10 $TMPDMG -layout NONE
 # associate a device with this but don't mount it
 MYDEV=`hdid -nomount $TMPDMG`
 test -n "$MYDEV" || die "failed to attach disk image"
@@ -48,16 +49,33 @@ root="/Volumes/$VOL"
 
 # copy stuff to the disk image
 /bin/cp -R $APP "$root" || die "failed to copy application to disk image"
-#/bin/cp README.txt "$root" || die "failed to copy README.txt to disk image"
+appsize=$(du -s $APP | cut -f1)
 
 ln -s /Applications $root/Applications
 
-rm -f $VOL.dmg
+rm -f $DMG
 
 # eject
 hdiutil eject $MYDEV
 # compress it and make it read only
-hdiutil convert -format UDZO $TMPDMG -o $VOL.dmg
+hdiutil convert -format UDZO $TMPDMG -o $DMG
 /bin/rm -f $TMPDMG
-ls -lh $VOL.dmg
+ls -lh $DMG
+
+SIGNATURE=$(openssl dgst -sha1 -binary < $DMG | openssl dgst -dss1 -sign sparkle_priv.pem | openssl enc -base64)
+
+cat | tee $VOL.xml <<EOF
+<item>
+    <title>Version $VERSION</title>
+    <sparkle:releaseNotesLink>
+        http://bzero.se/vibrant/version-$VERSION.html
+    </sparkle:releaseNotesLink>
+    <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
+    <enclosure url="http://bzero.se/vibrant/$DMG"
+               sparkle:version="$VERSION"
+               sparkle:dsaSignature="$SIGNATURE"
+               length="$appsize"
+               type="application/octet-stream" />
+</item>
+EOF
 

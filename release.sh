@@ -24,3 +24,6 @@ hg clone . "$dir" || exit 2
 (cd $dir && ./mkdmg $version) || exit 3
 
 mv $dir/vibrant-$version.dmg .
+mv $dir/vibrant-$version.zip .
+mv $dir/vibrant-$version.xml .
+

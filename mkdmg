@@ -17,7 +17,6 @@ TMPDMG=vibrant-tmp.dmg
 die()
 {
     echo "$1"
-    test -n "$MYDEV" && hdiutil eject $MYDEV
     /bin/rm -f $TMPDMG
     exit 1
 }
@@ -27,49 +26,32 @@ APP=build/Release/Vibrant.app
 echo "Stripping binary"
 strip $APP/Contents/MacOS/Vibrant
 
-VOL="Vibrant-$VERSION"
-DMG=$VOL.dmg
+VOL="Vibrant $VERSION"
+DMG="$VOL.dmg"
 echo "Creating disk image $VOL"
 
 # clean up if we're interrupted
 trap 'die Interrupted' 2 3 15
 
-# create a disk image
-hdiutil create -megabytes 10 $TMPDMG -layout NONE
-# Attach a device with this but don't mount it
-MYDEV=`hdid -nomount $TMPDMG`
-test -n "$MYDEV" || die "failed to attach disk image"
-# create a file system
-newfs_hfs -v "$VOL" $MYDEV || die "failed to create file system"
-# Detach device
-hdiutil eject $MYDEV
-# mount it
-hdid $TMPDMG || die "failed to mount disk image"
+# Create the source folder and copy the application there.
+mkdir "$VOL" || die "failed to create .dmg source folder"
+/bin/cp -R $APP "$VOL" || die "failed to copy application to the .dmg source folder"
+ln -s /Applications "$VOL/Applications"
 
-root="/Volumes/$VOL"
+# Create a disk image of the source folder and compress it.
+hdiutil makehybrid -o "$TMPDMG" "$VOL" -hfs
+hdiutil convert -format UDBZ "$DMG" -o "$TMPDMG"
 
-# copy stuff to the disk image
-/bin/cp -R $APP "$root" || die "failed to copy application to disk image"
-
-ln -s /Applications $root/Applications
-
-rm -f $DMG
-
-hdiutil eject $MYDEV
-# compress it and make it read only
-hdiutil convert -format UDZO $TMPDMG -o $DMG
 /bin/rm -f $TMPDMG
-ls -lh $DMG
+ls -lh "$DMG"
 
 #### Create and sign a zip file for automatic updates.
 
 BASE="http://bzero.se/vibrant"
-#ZIP=$VOL.zip
-#ditto -ck --keepParent "$APP" "$ZIP"
 
 KSIZE=$(du -ks "$APP" | cut -f1)
 SIZE=$(($KSIZE * 1024))
-SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < $DMG | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
+SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < "$DMG" | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 cat > $VOL.xml <<EOF
 <item>
@@ -78,7 +60,7 @@ cat > $VOL.xml <<EOF
         $BASE/version-$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="$BASE/$DMG"
+    <enclosure url="$($BASE/$DMG | sed 's/ /+/g')"
                sparkle:version="$REPO_VERSION"
                sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
@@ -86,8 +68,7 @@ cat > $VOL.xml <<EOF
                type="application/octet-stream" />
 </item>
 EOF
-cat $VOL.xml
+cat "$VOL.xml"
 
-echo "scp $DMG bzero.se:/var/www/htdocs/bzero.se/vibrant"
-#echo "scp $ZIP bzero.se:/var/www/htdocs/bzero.se/vibrant"
+echo "scp '$DMG' bzero.se:/var/www/htdocs/bzero.se/vibrant"
 

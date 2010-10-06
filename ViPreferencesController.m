@@ -496,7 +496,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 	installTask = [[NSTask alloc] init];
 	[installTask setLaunchPath:@"/usr/bin/tar"];
-	[installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", [ViLanguageStore bundlesDirectory], @"-k", nil]];
+	[installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", [ViLanguageStore bundlesDirectory], @"-k", @"-z", nil]];
 
 	installPipe = [NSPipe pipe];
 	[installTask setStandardInput:installPipe];

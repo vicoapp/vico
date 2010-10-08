@@ -33,6 +33,11 @@ check_license_4(const char *owner_name, const char *owner_email, const char *lic
 int
 check_license_quick(const char *license_key);
 
+time_t
+get_first_launch_date(const char *path);
+time_t
+set_first_launch_date(const char *path, time_t ltime);
+
 #endif
 
 

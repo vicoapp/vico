@@ -12,6 +12,8 @@
 #define ASSERT_ARGUMENTS()				\
 	if (owner_name == NULL || *owner_name == 0)	\
 		goto error;				\
+	if (owner_email == NULL || *owner_email == 0)	\
+		goto error;				\
 	if (license_key == NULL || *license_key == 0)	\
 		goto error;
 
@@ -156,6 +158,36 @@ check_license_quick(const char *license_key)
 	return 0;
 error:
 	return -1;
+}
+
+#include <sys/xattr.h>
+#include <arpa/inet.h>
+#import <CoreFoundation/CoreFoundation.h>
+
+time_t
+set_first_launch_date(const char *path, time_t ltime)
+{
+	uint64_t ltime_be = CFSwapInt64HostToBig(ltime);
+	if (setxattr(path, "ltime", &ltime_be, sizeof(ltime_be), 0, 0) == -1) {
+		perror(path);
+		return 0;
+	}
+	return ltime;
+}
+
+time_t
+get_first_launch_date(const char *path)
+{
+	ssize_t sz;
+	time_t ltime = 0;
+	uint64_t ltime_be = 0;
+	sz = getxattr(path, "ltime", &ltime_be, sizeof(ltime_be), 0, 0);
+	if (sz == -1) {
+		perror(path);
+		ltime = set_first_launch_date(path, time(NULL));
+	} else
+		ltime = CFSwapInt64BigToHost(ltime_be);
+	return ltime;
 }
 
 #ifdef TEST

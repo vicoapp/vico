@@ -12,6 +12,7 @@
 
 	ViBundle *bundle;
 	ViLanguage *language;
+	ViTheme *theme;
 
 	NSTextStorage *textStorage;
 	NSDictionary *typingAttributes;
@@ -55,7 +56,7 @@
 - (IBAction)setLanguage:(id)sender;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;
-- (void)changeTheme:(ViTheme *)theme;
+- (void)changeTheme:(ViTheme *)aTheme;
 - (void)updatePageGuide;
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options

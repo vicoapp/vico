@@ -73,6 +73,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self configureForURL:nil];
 		forcedEncoding = 0;
 		encoding = NSUTF8StringEncoding;
+
+		theme = [[ViThemeStore defaultStore] defaultTheme];
 	}
 	return self;
 }
@@ -325,7 +327,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark Syntax parsing
 
-- (NSDictionary *)defaultAttributesForTheme:(ViTheme *)theme
+- (NSDictionary *)defaultAttributes
 {
         return [NSDictionary dictionaryWithObjectsAndKeys:
                 [theme foregroundColor], NSForegroundColorAttributeName,
@@ -342,11 +344,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (!toScreen)
                 return nil;
 
-        ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
         NSArray *scopeArray = [syntaxParser scopeArray];
         if (charIndex >= [scopeArray count]) {
                 *effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
-                return [self defaultAttributesForTheme:theme];
+                return [self defaultAttributes];
         }
 
 	ViScope *scope = [scopeArray objectAtIndex:charIndex];
@@ -354,7 +355,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
         if ([attributes count] == 0) {
                 attributes = [theme attributesForScopes:[scope scopes] inBundle:bundle];
                 if ([attributes count] == 0)
-                        attributes = [self defaultAttributesForTheme:theme];
+                        attributes = [self defaultAttributes];
                 [scope setAttributes:attributes];
         }
 
@@ -740,8 +741,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[textStorage addAttributes:[self typingAttributes] range:NSMakeRange(0, [textStorage length])];
 }
 
-- (void)changeTheme:(ViTheme *)theme
+- (void)changeTheme:(ViTheme *)aTheme
 {
+	theme = aTheme;
+
 	/* Reset the cached attributes.
 	 */
 	NSArray *scopeArray = [syntaxParser scopeArray];

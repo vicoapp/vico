@@ -9,8 +9,12 @@
 @class ViJumpList;
 @class ViProject;
 
+#define ViLicenseChangedNotification @"ViLicenseChangedNotification"
+
 @interface ViWindowController : NSWindowController // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
+	NSTextField *nagTitle;
+
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSView *mainView;

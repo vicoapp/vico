@@ -15,6 +15,7 @@
 @property(copy, readwrite) NSString *lastSearchPattern;
 @property(readonly) NSMenu *encodingMenu;
 
++ (NSString *)supportDirectory;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)registerLicense:(id)sender;
 - (IBAction)dismissRegistrationWindow:(id)sender;

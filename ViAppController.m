@@ -37,8 +37,24 @@
 			[doc configureSyntax];
 }
 
++ (NSString *)supportDirectory
+{
+	static NSString *supportDirectory = nil;
+	if (supportDirectory == nil)
+		supportDirectory = [@"~/Library/Application Support/Vibrant" stringByExpandingTildeInPath];
+	return supportDirectory;
+}
+
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
+				      withIntermediateDirectories:YES
+						       attributes:nil
+							    error:nil] == YES) {
+		/* Set the first launch date, unless it's already set. */
+		get_first_launch_date([[ViAppController supportDirectory] fileSystemRepresentation]);
+	}
+
 	/* initialize default defaults */
 	[[NSUserDefaults standardUserDefaults] registerDefaults:
 		[NSDictionary dictionaryWithObjectsAndKeys:

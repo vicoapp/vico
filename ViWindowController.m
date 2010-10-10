@@ -132,9 +132,7 @@ static NSWindowController	*currentWindowController = nil;
 		NSView *view = [[[self window] contentView] superview];
 		time_t ltime = get_first_launch_date([[ViAppController supportDirectory] fileSystemRepresentation]);
 		time_t now = time(NULL);
-		unsigned int days = (now - ltime) / 86400;
-		if (days == 0)
-			days = 1;
+		unsigned int days = (now - ltime) / 86400 + 1;
 		NSString *s = [NSString stringWithFormat:@"Evaluated for %u day%s.", days, days == 1 ? "" : "s"];
 		NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
 		if (days > 30) {

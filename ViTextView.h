@@ -11,6 +11,7 @@
 @class ViDocument;
 @class ViWindowController;
 @class ViTextView;
+@class ViJumpList;
 
 #ifdef IMAX
 # undef IMAX
@@ -43,6 +44,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSFont *)font;
 - (NSDictionary *)typingAttributes;
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
+- (ViJumpList *)jumpList;
 @end
 
 @interface ViTextView : NSTextView

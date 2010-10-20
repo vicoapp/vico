@@ -41,6 +41,7 @@
 	NSTimer *updateSymbolsTimer;
 
 	ViSnippet *activeSnippet;
+	ViJumpList *jumpList;
 }
 
 @property(readonly) NSArray *views;
@@ -48,6 +49,7 @@
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
 @property(readwrite, assign) ViSnippet *activeSnippet;
+@property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
 
 - (IBAction)toggleLineNumbers:(id)sender;

@@ -34,6 +34,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize visibleViews;
 @synthesize activeSnippet;
 @synthesize encoding;
+@synthesize jumpList;
 
 - (id)init
 {

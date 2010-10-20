@@ -1,3 +1,10 @@
+@class ViJumpList;
+@class ViJump;
+
+@protocol ViJumpListDelegate
+- (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump;
+@end
+
 @interface ViJump : NSObject
 {
 	NSURL *url;
@@ -13,8 +20,9 @@
 {
 	NSMutableArray *jumps;
 	NSUInteger position;
+	id<ViJumpListDelegate> delegate;
 }
-+ (ViJumpList *)defaultJumpList;
+@property(readwrite, assign) id<ViJumpListDelegate> delegate;
 - (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 - (BOOL)forwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;
 - (BOOL)backwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;

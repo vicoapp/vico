@@ -12,16 +12,11 @@
 {
 	NSURL *url;
 	NSUInteger line, column;
-	BOOL ok = [[ViJumpList defaultJumpList] forwardToURL:&url line:&line column:&column];
+	BOOL ok = [[[self delegate] jumpList] forwardToURL:&url line:&line column:&column];
 	if (!ok) {
 		[[self delegate] message:@"Already at end of jumplist"];
 		return NO;
 	}
-
-	if (![url isEqual:[[self delegate] fileURL]])
-		[[[self delegate] windowController] gotoURL:url line:line column:column]; // FIXME: this is ugly!
-	else
-		[self gotoLine:line column:column];
 
 	return YES;
 }
@@ -32,16 +27,11 @@
 	NSURL *url = [[self delegate] fileURL];
 	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
 	NSUInteger column = [self columnAtLocation:start_location];
-	BOOL ok = [[ViJumpList defaultJumpList] backwardToURL:&url line:&line column:&column];
+	BOOL ok = [[[self delegate] jumpList] backwardToURL:&url line:&line column:&column];
 	if (!ok) {
 		[[self delegate] message:@"Already at beginning of jumplist"];
 		return NO;
 	}
-
-	if (![url isEqual:[[self delegate] fileURL]])
-		[[[self delegate] windowController] gotoURL:url line:line column:column]; // FIXME: this is ugly!
-	else
-		[self gotoLine:line column:column];
 
 	return YES;
 }

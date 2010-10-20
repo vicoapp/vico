@@ -1,17 +1,17 @@
 #import "ViTagStack.h"
 #import "ViBgView.h"
+#import "ViJumpList.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;
 @class ProjectDelegate;
 @class ViResizeView;
-@class ViJumpList;
 @class ViProject;
 
 #define ViLicenseChangedNotification @"ViLicenseChangedNotification"
 
-@interface ViWindowController : NSWindowController // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
+@interface ViWindowController : NSWindowController <ViJumpListDelegate> // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
 	NSTextField *nagTitle;
 

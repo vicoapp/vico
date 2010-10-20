@@ -1697,9 +1697,9 @@ int logIndent = 0;
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation
 {
-	[[ViJumpList defaultJumpList] pushURL:[[self delegate] fileURL]
-	                                 line:[[self textStorage] lineNumberAtLocation:aLocation]
-	                               column:[self columnAtLocation:aLocation]];
+	[[[self delegate] jumpList] pushURL:[[self delegate] fileURL]
+				       line:[[self textStorage] lineNumberAtLocation:aLocation]
+				     column:[self columnAtLocation:aLocation]];
 }
 
 - (void)pushCurrentLocationOnJumpList

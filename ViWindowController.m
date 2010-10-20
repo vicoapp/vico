@@ -64,6 +64,8 @@ static NSWindowController	*currentWindowController = nil;
 		documents = [[NSMutableArray alloc] init];
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
                 [self changeCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
+		jumpList = [[ViJumpList alloc] init];
+		[jumpList setDelegate:self];
 	}
 
 	return self;
@@ -295,7 +297,8 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-	[[ViJumpList defaultJumpList] pushURL:[document fileURL] line:1 column:1];
+	[document setJumpList:jumpList];
+	[jumpList pushURL:[document fileURL] line:1 column:1];
 
 	if (closeThisDocument) {
 		[closeThisDocument close];
@@ -1462,6 +1465,11 @@ static NSWindowController	*currentWindowController = nil;
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
 	return ![self isSeparatorItem:item];
+}
+
+- (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump
+{
+	[self gotoURL:[jump url] line:[jump line] column:[jump column]];
 }
 
 @end

@@ -27,14 +27,7 @@
 
 @implementation ViJumpList
 
-static ViJumpList *defaultJumpList = nil;
-
-+ (ViJumpList *)defaultJumpList
-{
-	if (defaultJumpList == nil)
-		defaultJumpList = [[ViJumpList alloc] init];
-	return defaultJumpList;
-}
+@synthesize delegate;
 
 - (ViJumpList *)init
 {
@@ -82,6 +75,10 @@ static ViJumpList *defaultJumpList = nil;
 	if (columnPtr)
 		*columnPtr = [jump column];
 	DEBUG(@"jumps = %@, position = %u", jumps, position);
+
+	if ([delegate respondsToSelector:@selector(jumpList:goto:)])
+		[delegate jumpList:self goto:jump];
+
 	return YES;
 }
 

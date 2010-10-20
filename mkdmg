@@ -48,7 +48,8 @@ ls -lh "$DMG"
 
 #### Create and sign a zip file for automatic updates.
 
-BASE="http://bzero.se/vibrant"
+APPCAST_BASE="http://appcast.vibrant-editor.com"
+DOWNLOAD_BASE="http://download.vibrant-editor.com"
 
 KSIZE=$(du -ks "$APP" | cut -f1)
 SIZE=$(($KSIZE * 1024))
@@ -58,10 +59,10 @@ cat > $VOL.xml <<EOF
 <item>
     <title>Version $VERSION</title>
     <sparkle:releaseNotesLink>
-        $BASE/version-$VERSION.html
+        $APPCAST_BASE/version-$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="$BASE/$DMG"
+    <enclosure url="$DOWNLOAD_BASE/$DMG"
                sparkle:version="$REPO_VERSION"
                sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
@@ -71,5 +72,5 @@ cat > $VOL.xml <<EOF
 EOF
 cat "$VOL.xml"
 
-echo "scp $DMG bzero.se:/var/www/htdocs/bzero.se/vibrant"
+echo "scp $DMG vibrant-editor.com:/var/www/download"
 

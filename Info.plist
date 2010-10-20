@@ -352,6 +352,6 @@
 	<key>SUPublicDSAKeyFile</key>
 	<string>sparkle_pub.pem</string>
 	<key>SUFeedURL</key>
-	<string>http://bzero.se/vibrant/appcast.xml</string>
+	<string>http://appcast.vibrant-editor.com/appcast.xml</string>
 </dict>
 </plist>

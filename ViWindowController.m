@@ -214,7 +214,7 @@ static NSWindowController	*currentWindowController = nil;
 	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
 
 	if ([self project] != nil)
-		[projectDelegate addURL:[[self project] initialURL]];
+		[projectDelegate performSelector:@selector(addURL:) withObject:[[self project] initialURL] afterDelay:0.0];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(licenseChanged:)

@@ -34,7 +34,7 @@ echo "Creating disk image $VOL"
 trap 'die Interrupted' 2 3 15
 
 # Create the source folder and copy the application there.
-DMG_SOURCE="Vibrant $VERRSION"
+DMG_SOURCE="Vibrant $VERSION"
 mkdir "$DMG_SOURCE" || die "failed to create .dmg source folder"
 /bin/cp -R $APP "$DMG_SOURCE" || die "failed to copy application to the .dmg source folder"
 ln -s /Applications "$DMG_SOURCE/Applications"

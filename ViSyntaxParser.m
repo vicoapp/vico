@@ -708,8 +708,11 @@ done:
 	// highlight each line separately
 	for (;;)
 	{
+		unichar ch;
 		NSUInteger end = nextRange;
-		while (end < maxRange && chars[end - offset] != '\n') // FIXME: need updating for other line endings
+		while (end < maxRange && (ch = chars[end - offset]) != '\n' && ch != '\r')
+			++end;
+		if (ch == '\r' && end + 1 < maxRange && chars[end + 1 - offset] == '\n')
 			++end;
 		if (end < maxRange)
 			++end;

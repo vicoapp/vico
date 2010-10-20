@@ -5,6 +5,7 @@
 #import "ViPreferencesController.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
+#import "ViAppController.h"
 #import "logging.h"
 #import <YAJL/YAJL.h>
 
@@ -417,7 +418,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (NSString *)pathForBundleTarball:(NSString *)bundleName
 {
-	return [[NSString stringWithFormat:@"~/Library/Application Support/Vibrant/%@.tar.gz", bundleName] stringByExpandingTildeInPath];
+	return [[NSString stringWithFormat:@"%@/%@.tar.gz", [ViAppController supportDirectory], bundleName] stringByExpandingTildeInPath];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error

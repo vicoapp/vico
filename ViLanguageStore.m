@@ -1,5 +1,6 @@
 #import "ViLanguageStore.h"
 #import "ViBundle.h"
+#import "ViAppController.h"
 #import "logging.h"
 
 @implementation ViLanguageStore
@@ -10,7 +11,7 @@ static NSString *bundlesDirectory = nil;
 + (NSString *)bundlesDirectory
 {
 	if (bundlesDirectory == nil)
-		bundlesDirectory = [@"~/Library/Application Support/Vibrant/Bundles" stringByExpandingTildeInPath];
+		bundlesDirectory = [[NSString stringWithFormat:@"%@/Bundles", [ViAppController supportDirectory]] stringByExpandingTildeInPath];
 	return bundlesDirectory;
 }
 

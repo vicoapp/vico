@@ -1030,7 +1030,7 @@
 
 - (void)tabClick:(id)sender
 {
-    [[self delegate] selectDocument:[sender representedObject]];
+    [[self delegate] tabBar:self selectDocument:[sender representedObject]];
     [self update];
 }
 

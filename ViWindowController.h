@@ -75,6 +75,7 @@
 
 - (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView;
+- (void)tabBar:(id)aTabBar selectDocument:(ViDocument *)aDocument;
 - (void)selectDocument:(ViDocument *)aDocument;
 - (void)focusEditor;
 - (void)closeDocumentViews:(ViDocument *)aDocument;

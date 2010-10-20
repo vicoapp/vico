@@ -265,8 +265,7 @@ static NSWindowController	*currentWindowController = nil;
 		return;
 	}
 
-	if (mostRecentView)
-		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
+	[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 
 	/*
 	 * If current document is untitled and unchanged and the rightmost tab, replace it.
@@ -428,6 +427,12 @@ static NSWindowController	*currentWindowController = nil;
 	[self setMostRecentDocument:aDocument view:docView];
 }
 
+- (void)tabBar:(id)aTabBar selectDocument:(ViDocument *)aDocument
+{
+	[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
+	[self selectDocument:aDocument];
+}
+
 - (void)focusEditor
 {
 	[[self window] makeFirstResponder:[mostRecentView textView]];
@@ -577,6 +582,7 @@ static NSWindowController	*currentWindowController = nil;
 		{
 			if (++i >= num)
 				i = 0;
+			[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 			[self selectDocument:[tabs objectAtIndex:i]];
 			break;
 		}
@@ -597,6 +603,7 @@ static NSWindowController	*currentWindowController = nil;
 		{
 			if (--i < 0)
 				i = num - 1;
+			[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 			[self selectDocument:[tabs objectAtIndex:i]];
 			break;
 		}
@@ -635,20 +642,25 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)switchToLastDocument
 {
+	[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 	[self switchToDocument:lastDocument view:lastDocumentView];
 }
 
 - (void)switchToDocumentAtIndex:(NSInteger)anIndex
 {
+	[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 	if (anIndex < [[tabBar representedDocuments] count])
 		[self switchToDocument:[[tabBar representedDocuments] objectAtIndex:anIndex]];
 }
 
+/* Called from document popup in the toolbar. */
 - (void)switchToDocumentAction:(id)sender
 {
 	ViDocument *doc = [sender representedObject];
-	if (doc)
+	if (doc) {
+		[(ViTextView *)[mostRecentView textView] pushCurrentLocationOnJumpList];
 		[self switchToDocument:doc];
+	}
 }
 
 - (ViDocument *)documentForURL:(NSURL *)url

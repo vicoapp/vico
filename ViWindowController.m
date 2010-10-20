@@ -12,6 +12,7 @@
 #import "ViPreferencesController.h"
 #import "MHTextIconCell.h"
 #import "ViAppController.h"
+#import "NSTextStorage-additions.h"
 #include "license.h"
 
 static NSMutableArray		*windowControllers = nil;
@@ -21,6 +22,7 @@ static NSWindowController	*currentWindowController = nil;
 - (ViDocumentView *)documentViewForView:(NSView *)aView;
 - (void)collapseDocumentView:(ViDocumentView *)docView;
 - (ViDocument *)documentForURL:(NSURL *)url;
+- (void)updateJumplistNavigator;
 @end
 
 
@@ -222,6 +224,8 @@ static NSWindowController	*currentWindowController = nil;
 						 selector:@selector(licenseChanged:)
 						     name:ViLicenseChangedNotification
 						   object:nil];
+
+	[self updateJumplistNavigator];
 }
 
 - (void)setSelectedLanguage:(NSString *)aLanguage
@@ -298,7 +302,6 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
 	[document setJumpList:jumpList];
-	[jumpList pushURL:[document fileURL] line:1 column:1];
 
 	if (closeThisDocument) {
 		[closeThisDocument close];
@@ -1467,9 +1470,43 @@ static NSWindowController	*currentWindowController = nil;
 	return ![self isSeparatorItem:item];
 }
 
+#pragma mark -
+#pragma mark Jumplist navigation
+
+- (IBAction)navigateJumplist:(id)sender
+{
+	NSURL *url;
+	NSUInteger line, column;
+	ViTextView *tv = (ViTextView *)[mostRecentView textView];
+
+	if (tv == nil)
+		return;
+
+	if ([sender selectedSegment] == 0) {
+		url = [[self document] fileURL];
+		line = [[tv textStorage] lineNumberAtLocation:[tv caret]];
+		column = [tv columnAtLocation:[tv caret]];
+		[jumpList backwardToURL:&url line:&line column:&column];
+	} else {
+		[jumpList forwardToURL:NULL line:NULL column:NULL];
+	}
+}
+
+- (void)updateJumplistNavigator
+{
+	[jumplistNavigator setEnabled:![jumpList atEnd] forSegment:1];
+	[jumplistNavigator setEnabled:![jumpList atBeginning] forSegment:0];
+}
+
+- (void)jumpList:(ViJumpList *)aJumpList added:(ViJump *)jump
+{
+	[self updateJumplistNavigator];
+}
+
 - (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump
 {
 	[self gotoURL:[jump url] line:[jump line] column:[jump column]];
+	[self updateJumplistNavigator];
 }
 
 @end

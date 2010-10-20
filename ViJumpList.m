@@ -58,9 +58,14 @@
 		removedDuplicate = YES;
 	}
 
-	[jumps addObject:[[ViJump alloc] initWithURL:url line:line column:column]];
+	jump = [[ViJump alloc] initWithURL:url line:line column:column];
+	[jumps addObject:jump];
 	position = [jumps count];
 	DEBUG(@"jumps = %@, position = %u", jumps, position);
+
+	if ([delegate respondsToSelector:@selector(jumpList:added:)])
+		[delegate jumpList:self added:jump];
+
 	return removedDuplicate;
 }
 
@@ -93,7 +98,7 @@
 - (BOOL)backwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr
 {
 	DEBUG(@"position = %u, count = %u", position, [jumps count]);
-	if (position == 0)
+	if (position <= 0)
 		return NO;
 
 	if (position >= [jumps count])
@@ -106,6 +111,16 @@
 	}
 
 	return [self gotoJumpAtPosition:--position URL:urlPtr line:linePtr column:columnPtr];
+}
+
+- (BOOL)atBeginning
+{
+	return (position <= 0);
+}
+
+- (BOOL)atEnd
+{
+	return (position + 1 >= [jumps count]);
 }
 
 @end

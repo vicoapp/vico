@@ -3,6 +3,7 @@
 
 @protocol ViJumpListDelegate
 - (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump;
+- (void)jumpList:(ViJumpList *)aJumpList added:(ViJump *)jump;
 @end
 
 @interface ViJump : NSObject
@@ -19,11 +20,13 @@
 @interface ViJumpList : NSObject
 {
 	NSMutableArray *jumps;
-	NSUInteger position;
+	NSInteger position;
 	id<ViJumpListDelegate> delegate;
 }
 @property(readwrite, assign) id<ViJumpListDelegate> delegate;
 - (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
+- (BOOL)atBeginning;
+- (BOOL)atEnd;
 - (BOOL)forwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;
 - (BOOL)backwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr;
 @end

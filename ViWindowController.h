@@ -58,6 +58,7 @@
 	BOOL closeSymbolListAfterUse;
 
 	ViJumpList *jumpList;
+	IBOutlet NSSegmentedControl *jumplistNavigator;
 }
 
 @property(readwrite, assign) NSMutableArray *documents;
@@ -87,6 +88,7 @@
 
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
+- (IBAction)navigateJumplist:(id)sender;
 
 - (void)switchToDocument:(ViDocument *)doc view:(ViDocumentView *)view;
 - (void)switchToDocument:(ViDocument *)doc;

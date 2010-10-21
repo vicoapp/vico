@@ -1,0 +1,8 @@
+syntax: glob
+
+build
+*.dmg
+Sparkle.framework
+.*.swp
+.DS_Store
+*.orig

@@ -42,7 +42,6 @@
 		9A027727125B11C700045B6E /* sparkle_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9A027726125B11C700045B6E /* sparkle_pub.pem */; };
 		9A027734125B16BF00045B6E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A027713125B101200045B6E /* Sparkle.framework */; };
 		9A02773F125B176500045B6E /* YAJL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE5023D1253BC5F00579C54 /* YAJL.framework */; };
-		9A027740125B177900045B6E /* PSMTabBarControl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A099A720EE88046006A80A2 /* NSTextStorage-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* NSTextStorage-additions.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
@@ -58,7 +57,6 @@
 		9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D20EFBB08400682D4A /* bufaux.c */; };
 		9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DB0EFBB1A800682D4A /* vis.c */; };
 		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
-		9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */; };
 		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
 		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
 		9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438D361236C0AB00F7D9FD /* NSString-additions.m */; };
@@ -94,6 +92,21 @@
 		9AC16D950D93CD8F00AE45E0 /* ViDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */; };
 		9AC16D980D93CDF200AE45E0 /* ViDocumentWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */; };
 		9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC16DA30D93D14A00AE45E0 /* ViDocument.m */; };
+		9AC2D7C31270358D0056C06B /* PSMMetalTabStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7B51270358D0056C06B /* PSMMetalTabStyle.m */; };
+		9AC2D7C41270358D0056C06B /* PSMOverflowPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7B71270358D0056C06B /* PSMOverflowPopUpButton.m */; };
+		9AC2D7C51270358D0056C06B /* PSMProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7B91270358D0056C06B /* PSMProgressIndicator.m */; };
+		9AC2D7C61270358D0056C06B /* PSMRolloverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7BB1270358D0056C06B /* PSMRolloverButton.m */; };
+		9AC2D7C71270358D0056C06B /* PSMTabBarCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7BD1270358D0056C06B /* PSMTabBarCell.m */; };
+		9AC2D7C81270358D0056C06B /* PSMTabBarControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7BF1270358D0056C06B /* PSMTabBarControl.m */; };
+		9AC2D7C91270358D0056C06B /* PSMTabDragAssistant.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC2D7C11270358D0056C06B /* PSMTabDragAssistant.m */; };
+		9AC2D7D2127035A80056C06B /* overflowImage.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CA127035A80056C06B /* overflowImage.tiff */; };
+		9AC2D7D3127035A80056C06B /* overflowImagePressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CB127035A80056C06B /* overflowImagePressed.tif */; };
+		9AC2D7D4127035A80056C06B /* TabClose_Front_Pressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CC127035A80056C06B /* TabClose_Front_Pressed.tif */; };
+		9AC2D7D5127035A80056C06B /* TabClose_Front_Rollover.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CD127035A80056C06B /* TabClose_Front_Rollover.tif */; };
+		9AC2D7D6127035A80056C06B /* TabClose_Front.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CE127035A80056C06B /* TabClose_Front.tif */; };
+		9AC2D7D7127035A80056C06B /* TabNewMetal.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CF127035A80056C06B /* TabNewMetal.png */; };
+		9AC2D7D8127035A80056C06B /* TabNewMetalPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7D0127035A80056C06B /* TabNewMetalPressed.png */; };
+		9AC2D7D9127035A80056C06B /* TabNewMetalRollover.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7D1127035A80056C06B /* TabNewMetalRollover.png */; };
 		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD772810EC9A6CB00D05DDE /* ViMark.m */; };
 		9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856A80EF90AF1008DF460 /* actionmenu.png */; };
@@ -133,34 +146,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9A7AF14E0D99820900F08222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8D1AC9740486D14A00FE50C9;
-			remoteInfo = PSMTabBarControl;
-		};
-		9A7AF1500D99820900F08222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A251BEA00959BB5B0058BC7F;
-			remoteInfo = TabBarControlDemo;
-		};
-		9A7AF1520D99820900F08222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 53DF68FD067E5B5A0090B5B0;
-			remoteInfo = PSMTabBarControlFramework;
-		};
-		9A7AF1560D99830C00F08222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 53DF68FC067E5B5A0090B5B0;
-			remoteInfo = PSMTabBarControlFramework;
-		};
 		9AE5023C1253BC5F00579C54 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
@@ -191,7 +176,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9A027740125B177900045B6E /* PSMTabBarControl.framework in Copy Frameworks */,
 				9A02773F125B176500045B6E /* YAJL.framework in Copy Frameworks */,
 				9A027714125B101200045B6E /* Sparkle.framework in Copy Frameworks */,
 			);
@@ -311,7 +295,6 @@
 		9A70E9720E9F67B80013AA1D /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = "<group>"; };
 		9A73E27F0D8ECA4C00859053 /* ExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommand.h; sourceTree = "<group>"; };
 		9A73E2800D8ECA4C00859053 /* ExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommand.m; sourceTree = "<group>"; };
-		9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PSMTabBarControl.xcodeproj; path = PSMTabBarControl/PSMTabBarControl.xcodeproj; sourceTree = "<group>"; };
 		9A7AF1D00D9995EE00F08222 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9A7B0E720D01601A00040CAC /* ViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTextView.m; sourceTree = "<group>"; };
 		9A7B0E730D01601A00040CAC /* ViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTextView.h; sourceTree = "<group>"; };
@@ -339,6 +322,29 @@
 		9AC16D970D93CDF200AE45E0 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ViDocumentWindow.xib; sourceTree = "<group>"; };
 		9AC16DA20D93D14A00AE45E0 /* ViDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocument.h; sourceTree = "<group>"; };
 		9AC16DA30D93D14A00AE45E0 /* ViDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocument.m; sourceTree = "<group>"; };
+		9AC2D7B41270358D0056C06B /* PSMMetalTabStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMMetalTabStyle.h; sourceTree = "<group>"; };
+		9AC2D7B51270358D0056C06B /* PSMMetalTabStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMMetalTabStyle.m; sourceTree = "<group>"; };
+		9AC2D7B61270358D0056C06B /* PSMOverflowPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMOverflowPopUpButton.h; sourceTree = "<group>"; };
+		9AC2D7B71270358D0056C06B /* PSMOverflowPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMOverflowPopUpButton.m; sourceTree = "<group>"; };
+		9AC2D7B81270358D0056C06B /* PSMProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMProgressIndicator.h; sourceTree = "<group>"; };
+		9AC2D7B91270358D0056C06B /* PSMProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMProgressIndicator.m; sourceTree = "<group>"; };
+		9AC2D7BA1270358D0056C06B /* PSMRolloverButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMRolloverButton.h; sourceTree = "<group>"; };
+		9AC2D7BB1270358D0056C06B /* PSMRolloverButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMRolloverButton.m; sourceTree = "<group>"; };
+		9AC2D7BC1270358D0056C06B /* PSMTabBarCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMTabBarCell.h; sourceTree = "<group>"; };
+		9AC2D7BD1270358D0056C06B /* PSMTabBarCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMTabBarCell.m; sourceTree = "<group>"; };
+		9AC2D7BE1270358D0056C06B /* PSMTabBarControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMTabBarControl.h; sourceTree = "<group>"; };
+		9AC2D7BF1270358D0056C06B /* PSMTabBarControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMTabBarControl.m; sourceTree = "<group>"; };
+		9AC2D7C01270358D0056C06B /* PSMTabDragAssistant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMTabDragAssistant.h; sourceTree = "<group>"; };
+		9AC2D7C11270358D0056C06B /* PSMTabDragAssistant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMTabDragAssistant.m; sourceTree = "<group>"; };
+		9AC2D7C21270358D0056C06B /* PSMTabStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMTabStyle.h; sourceTree = "<group>"; };
+		9AC2D7CA127035A80056C06B /* overflowImage.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = overflowImage.tiff; path = Images/overflowImage.tiff; sourceTree = "<group>"; };
+		9AC2D7CB127035A80056C06B /* overflowImagePressed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = overflowImagePressed.tif; path = Images/overflowImagePressed.tif; sourceTree = "<group>"; };
+		9AC2D7CC127035A80056C06B /* TabClose_Front_Pressed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TabClose_Front_Pressed.tif; path = Images/TabClose_Front_Pressed.tif; sourceTree = "<group>"; };
+		9AC2D7CD127035A80056C06B /* TabClose_Front_Rollover.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TabClose_Front_Rollover.tif; path = Images/TabClose_Front_Rollover.tif; sourceTree = "<group>"; };
+		9AC2D7CE127035A80056C06B /* TabClose_Front.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TabClose_Front.tif; path = Images/TabClose_Front.tif; sourceTree = "<group>"; };
+		9AC2D7CF127035A80056C06B /* TabNewMetal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetal.png; path = Images/TabNewMetal.png; sourceTree = "<group>"; };
+		9AC2D7D0127035A80056C06B /* TabNewMetalPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalPressed.png; path = Images/TabNewMetalPressed.png; sourceTree = "<group>"; };
+		9AC2D7D1127035A80056C06B /* TabNewMetalRollover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalRollover.png; path = Images/TabNewMetalRollover.png; sourceTree = "<group>"; };
 		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
 		9AD772800EC9A6CB00D05DDE /* ViMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMark.h; sourceTree = "<group>"; };
 		9AD772810EC9A6CB00D05DDE /* ViMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMark.m; sourceTree = "<group>"; };
@@ -389,7 +395,6 @@
 			files = (
 				9A027734125B16BF00045B6E /* Sparkle.framework in Frameworks */,
 				9AE502421253BCA200579C54 /* YAJL.framework in Frameworks */,
-				9A282F82109A2A010023D2CF /* PSMTabBarControl.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */,
 			);
@@ -437,11 +442,11 @@
 		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
+				9AC2D7B31270356E0056C06B /* Tab bar control */,
 				9A0275221259D2D300045B6E /* Mozilla Universal charset detector */,
 				9AE502371253BC5E00579C54 /* YAJL.xcodeproj */,
 				9A4BA1F8118C80CD0093E2AB /* license key support */,
 				9A1E40A10EFBA81E00682D4A /* sftp */,
-				9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */,
 				9A1A121B0D02CE29009EABAC /* Test Cases */,
 				9AC16DA00D93CF9C00AE45E0 /* Controllers */,
 				9AA709780EF284B900B4CE34 /* Categories */,
@@ -687,16 +692,6 @@
 			name = "license key support";
 			sourceTree = "<group>";
 		};
-		9A7AF1440D99820800F08222 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9A7AF14F0D99820900F08222 /* PSMTabBarControl.palette */,
-				9A7AF1510D99820900F08222 /* TabBarControlDemo.app */,
-				9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		9AA709780EF284B900B4CE34 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -715,6 +710,14 @@
 		9AB0178A0EDDBF8100905BED /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9AC2D7CA127035A80056C06B /* overflowImage.tiff */,
+				9AC2D7CB127035A80056C06B /* overflowImagePressed.tif */,
+				9AC2D7CC127035A80056C06B /* TabClose_Front_Pressed.tif */,
+				9AC2D7CD127035A80056C06B /* TabClose_Front_Rollover.tif */,
+				9AC2D7CE127035A80056C06B /* TabClose_Front.tif */,
+				9AC2D7CF127035A80056C06B /* TabNewMetal.png */,
+				9AC2D7D0127035A80056C06B /* TabNewMetalPressed.png */,
+				9AC2D7D1127035A80056C06B /* TabNewMetalRollover.png */,
 				9AE501D712535DE200579C54 /* define.png */,
 				9AE501CC1253569500579C54 /* tag.png */,
 				9AE501C31253551E00579C54 /* module.png */,
@@ -745,6 +748,28 @@
 			name = Controllers;
 			sourceTree = "<group>";
 		};
+		9AC2D7B31270356E0056C06B /* Tab bar control */ = {
+			isa = PBXGroup;
+			children = (
+				9AC2D7B41270358D0056C06B /* PSMMetalTabStyle.h */,
+				9AC2D7B51270358D0056C06B /* PSMMetalTabStyle.m */,
+				9AC2D7B61270358D0056C06B /* PSMOverflowPopUpButton.h */,
+				9AC2D7B71270358D0056C06B /* PSMOverflowPopUpButton.m */,
+				9AC2D7B81270358D0056C06B /* PSMProgressIndicator.h */,
+				9AC2D7B91270358D0056C06B /* PSMProgressIndicator.m */,
+				9AC2D7BA1270358D0056C06B /* PSMRolloverButton.h */,
+				9AC2D7BB1270358D0056C06B /* PSMRolloverButton.m */,
+				9AC2D7BC1270358D0056C06B /* PSMTabBarCell.h */,
+				9AC2D7BD1270358D0056C06B /* PSMTabBarCell.m */,
+				9AC2D7BE1270358D0056C06B /* PSMTabBarControl.h */,
+				9AC2D7BF1270358D0056C06B /* PSMTabBarControl.m */,
+				9AC2D7C01270358D0056C06B /* PSMTabDragAssistant.h */,
+				9AC2D7C11270358D0056C06B /* PSMTabDragAssistant.m */,
+				9AC2D7C21270358D0056C06B /* PSMTabStyle.h */,
+			);
+			name = "Tab bar control";
+			sourceTree = "<group>";
+		};
 		9AE502381253BC5E00579C54 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -770,7 +795,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				9A7AF1570D99830C00F08222 /* PBXTargetDependency */,
 				9AE502411253BC8700579C54 /* PBXTargetDependency */,
 			);
 			name = Vibrant;
@@ -810,10 +834,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 9A7AF1440D99820800F08222 /* Products */;
-					ProjectRef = 9A7AF1430D99820800F08222 /* PSMTabBarControl.xcodeproj */;
-				},
-				{
 					ProductGroup = 9AE502381253BC5E00579C54 /* Products */;
 					ProjectRef = 9AE502371253BC5E00579C54 /* YAJL.xcodeproj */;
 				},
@@ -827,27 +847,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		9A7AF14F0D99820900F08222 /* PSMTabBarControl.palette */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PSMTabBarControl.palette;
-			remoteRef = 9A7AF14E0D99820900F08222 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		9A7AF1510D99820900F08222 /* TabBarControlDemo.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = TabBarControlDemo.app;
-			remoteRef = 9A7AF1500D99820900F08222 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		9A7AF1530D99820900F08222 /* PSMTabBarControl.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = PSMTabBarControl.framework;
-			remoteRef = 9A7AF1520D99820900F08222 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		9AE5023D1253BC5F00579C54 /* YAJL.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -882,6 +881,14 @@
 				9AD856C40EF90D99008DF460 /* resizehandle.png in Resources */,
 				9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */,
 				9A027727125B11C700045B6E /* sparkle_pub.pem in Resources */,
+				9AC2D7D2127035A80056C06B /* overflowImage.tiff in Resources */,
+				9AC2D7D3127035A80056C06B /* overflowImagePressed.tif in Resources */,
+				9AC2D7D4127035A80056C06B /* TabClose_Front_Pressed.tif in Resources */,
+				9AC2D7D5127035A80056C06B /* TabClose_Front_Rollover.tif in Resources */,
+				9AC2D7D6127035A80056C06B /* TabClose_Front.tif in Resources */,
+				9AC2D7D7127035A80056C06B /* TabNewMetal.png in Resources */,
+				9AC2D7D8127035A80056C06B /* TabNewMetalPressed.png in Resources */,
+				9AC2D7D9127035A80056C06B /* TabNewMetalRollover.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1039,6 +1046,13 @@
 				9A0275551259D33F00045B6E /* nsUniversalDetector.cpp in Sources */,
 				9A0275561259D33F00045B6E /* nsUTF8Prober.cpp in Sources */,
 				9A0275731259DEB400045B6E /* ViCharsetDetector.mm in Sources */,
+				9AC2D7C31270358D0056C06B /* PSMMetalTabStyle.m in Sources */,
+				9AC2D7C41270358D0056C06B /* PSMOverflowPopUpButton.m in Sources */,
+				9AC2D7C51270358D0056C06B /* PSMProgressIndicator.m in Sources */,
+				9AC2D7C61270358D0056C06B /* PSMRolloverButton.m in Sources */,
+				9AC2D7C71270358D0056C06B /* PSMTabBarCell.m in Sources */,
+				9AC2D7C81270358D0056C06B /* PSMTabBarControl.m in Sources */,
+				9AC2D7C91270358D0056C06B /* PSMTabDragAssistant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1056,11 +1070,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9A7AF1570D99830C00F08222 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = PSMTabBarControlFramework;
-			targetProxy = 9A7AF1560D99830C00F08222 /* PBXContainerItemProxy */;
-		};
 		9AE502411253BC8700579C54 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = YAJL;
@@ -1295,7 +1304,7 @@
 					"-lresolv",
 				);
 				PREBINDING = NO;
-				RUN_CLANG_STATIC_ANALYZER = YES;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64";
 				WARNING_CFLAGS = "-Wall";
@@ -1343,6 +1352,7 @@
 					"-lresolv",
 				);
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64";
 				WARNING_CFLAGS = "-Wall";

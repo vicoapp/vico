@@ -12,8 +12,6 @@
 #import "PSMRolloverButton.h"
 #import "PSMTabStyle.h"
 #import "PSMMetalTabStyle.h"
-#import "PSMAquaTabStyle.h"
-#import "PSMUnifiedTabStyle.h"
 #import "PSMTabDragAssistant.h"
 
 @interface PSMTabBarControl (Private)
@@ -223,15 +221,7 @@
 
 - (void)setStyleNamed:(NSString *)name
 {
-    if([name isEqualToString:@"Aqua"]){
-        style = [[PSMAquaTabStyle alloc] init];
-    }
-	else if ([name isEqualToString:@"Unified"]){
-		style = [[PSMUnifiedTabStyle alloc] init];
-	}
-	else {
-        style = [[PSMMetalTabStyle alloc] init];
-    }
+    style = [[PSMMetalTabStyle alloc] init];
    
     // restyle add tab button
     if(_addTabButton){

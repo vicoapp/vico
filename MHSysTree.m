@@ -30,9 +30,10 @@
 
 RB_GENERATE(id_tree, rb_entry, entry, id_cmp);
 
-int id_cmp(struct rb_entry *a, struct rb_entry *b)
+int
+id_cmp(struct rb_entry *a, struct rb_entry *b)
 {
-    return (int)[a->obj performSelector:a->compareSelector withObject:b->obj];
+    return (pointer_t)[a->obj performSelector:a->compareSelector withObject:b->obj];
 }
 
 - (id)initWithCompareSelector:(SEL)aSelector

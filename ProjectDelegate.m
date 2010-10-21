@@ -14,6 +14,7 @@
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
+- (void)cancelExplorer;
 @end
 
 @implementation ProjectDelegate
@@ -315,7 +316,7 @@
 	if (item && ![self outlineView:explorer isItemExpandable:item])
 		[delegate goToURL:[item objectForKey:@"url"]];
 
-        [self resetExplorerView];
+        [self cancelExplorer];
 }
 
 - (void)explorerDoubleClick:(id)sender

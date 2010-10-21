@@ -29,7 +29,8 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (id)init
 {
-    if(self = [super init]){
+    self = [super init];
+    if (self) {
         _sourceTabBar = nil;
         _destinationTabBar = nil;
         _participatingTabBars = [[NSMutableSet alloc] init];
@@ -42,20 +43,6 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
     
     return self;
 }
-
-#if 0
-- (void)dealloc
-{
-    [_sourceTabBar release];
-    [_destinationTabBar release];
-    [_participatingTabBars release];
-    [_draggedCell release];
-    [_animationTimer release];
-    [_sineCurveWidths release];
-    [_targetCell release];
-    [super dealloc];
-}
-#endif
 
 #pragma mark -
 #pragma mark Accessors
@@ -235,11 +222,8 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
     [self removeAllPlaceholdersFromTabBar:[self sourceTabBar]];
     [self setSourceTabBar:nil];
     [self setDestinationTabBar:nil];
-    NSEnumerator *e = [_participatingTabBars objectEnumerator];
-    PSMTabBarControl *tabBar;
-    while(tabBar = [e nextObject]){
+    for (PSMTabBarControl *tabBar in _participatingTabBars)
         [self removeAllPlaceholdersFromTabBar:tabBar];
-    }
     [_participatingTabBars removeAllObjects];
     [self setDraggedCell:nil];
     [_animationTimer invalidate];
@@ -253,9 +237,7 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (void)animateDrag:(NSTimer *)timer
 {
-    NSEnumerator *e = [_participatingTabBars objectEnumerator];
-    PSMTabBarControl *tabBar;
-    while(tabBar = [e nextObject]){
+    for (PSMTabBarControl *tabBar in _participatingTabBars) {
         [self calculateDragAnimationForTabBar:tabBar];
         [[NSRunLoop currentRunLoop] performSelector:@selector(display) target:tabBar argument:nil order:1 modes:[NSArray arrayWithObjects:@"NSEventTrackingRunLoopMode", @"NSDefaultRunLoopMode", nil]];
     }

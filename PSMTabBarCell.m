@@ -327,12 +327,12 @@
     [image compositeToPoint:NSMakePoint(0.0, 0.0) operation:NSCompositeSourceOver fraction:0.7];
     [returnImage unlockFocus];
     if(![[self indicator] isHidden]){
-        NSImage *pi = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"pi"]];
+        NSImage *indicatorImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"pi"]];
         [returnImage lockFocus];
         NSPoint indicatorPoint = NSMakePoint([self frame].size.width - MARGIN_X - kPSMTabBarIndicatorWidth, MARGIN_Y);
         if(([self state] == NSOnState) && ([[_controlView styleName] isEqualToString:@"Metal"]))
             indicatorPoint.y += 1.0;
-        [pi compositeToPoint:indicatorPoint operation:NSCompositeSourceOver fraction:0.7];
+        [indicatorImage compositeToPoint:indicatorPoint operation:NSCompositeSourceOver fraction:0.7];
         [returnImage unlockFocus];
     }
     return returnImage;

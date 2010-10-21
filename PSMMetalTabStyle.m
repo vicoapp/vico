@@ -462,13 +462,9 @@
     }
     
     // draw cells
-    NSEnumerator *e = [[bar cells] objectEnumerator];
-    PSMTabBarCell *cell;
-    while(cell = [e nextObject]){
-        if(![cell isInOverflowMenu]){
+    for (PSMTabBarCell *cell in [bar cells])
+        if (![cell isInOverflowMenu])
             [cell drawWithFrame:[cell frame] inView:bar];
-        }
-    }
 }   	
 
 #pragma mark -

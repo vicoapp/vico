@@ -9,7 +9,7 @@
 	NSLayoutManager *lm = [self layoutManager];
 	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
 	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
-	
+
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX
 	if (caret + 1 >= [[self textStorage] length])
@@ -20,7 +20,6 @@
 	}
         if (caretRect.origin.x == 0)
                 caretRect.origin.x = 5;
-        //if (caret == [[self textStorage] length])
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;
@@ -45,7 +44,7 @@
 				// place cursor at end of tab, like vi does
 				caretRect.origin.x += caretRect.size.width - 7;
 			}
-			if (c == '\t' || c == '\n')
+			if (c == '\t' || c == '\n' || c == '\r')
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
 		[[[[ViThemeStore defaultStore] defaultTheme] caretColor] set];

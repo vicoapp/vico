@@ -1,5 +1,5 @@
 #import "ViWindowController.h"
-#import <PSMTabBarControl/PSMTabBarControl.h>
+#import "PSMTabBarControl.h"
 #import "ViDocument.h"
 #import "ViProject.h"
 #import "ProjectDelegate.h"

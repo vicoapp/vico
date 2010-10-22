@@ -8,7 +8,6 @@
 @interface ViDocument : NSDocument <ViTextViewDelegate> // disabled, only for 10.6: <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
 	NSMutableArray *views;
-	int visibleViews;
 
 	ViBundle *bundle;
 	ViLanguage *language;
@@ -45,7 +44,6 @@
 }
 
 @property(readonly) NSArray *views;
-@property(readonly) int visibleViews;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
 @property(readwrite, assign) ViSnippet *activeSnippet;
@@ -63,8 +61,6 @@
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options
          regexpType:(int)regexpSyntax;
-- (void)goToSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)aView;
-- (void)goToSymbol:(ViSymbol *)aSymbol;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;

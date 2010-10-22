@@ -7,8 +7,10 @@
 #import "ViSyntaxParser.h"
 #import "ViSnippet.h"
 
+#define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
+#define ViCaretChangedNotification @"ViCaretChangedNotification"
+
 @class ViDocumentView;
-@class ViDocument;
 @class ViWindowController;
 @class ViTextView;
 @class ViJumpList;
@@ -28,17 +30,14 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;
 - (NSURL *)fileURL;
-- (ViWindowController *)windowController;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
 - (void)enableLineNumbers:(BOOL)flag;
 - (void)saveDocument:(id)sender;
-- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (void)setMostRecentDocumentView:(ViDocumentView *)docView;
 - (ViSnippet *)activeSnippet;
 - (void)setActiveSnippet:(ViSnippet *)aSnippet;
 - (NSFont *)font;
@@ -49,8 +48,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @interface ViTextView : NSTextView
 {
-	ViDocumentView		*documentView;
-
 	// vi command parser
 	ViMode			 mode;
 	ViCommand		*parser;
@@ -91,7 +88,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 }
 
 - (id <ViTextViewDelegate>)delegate;
-- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate documentView:(ViDocumentView *)docView;
+- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
@@ -124,7 +121,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
-- (ViDocument *)document;
 
 - (BOOL)findPattern:(NSString *)pattern
 	    options:(unsigned)find_options

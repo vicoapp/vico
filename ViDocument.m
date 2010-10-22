@@ -31,7 +31,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize symbols;
 @synthesize filteredSymbols;
 @synthesize views;
-@synthesize visibleViews;
 @synthesize activeSnippet;
 @synthesize encoding;
 @synthesize jumpList;
@@ -104,8 +103,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (makeNewWindowInsteadOfTab) {
 		windowController = [[ViWindowController alloc] init];
 		makeNewWindowInsteadOfTab = NO;
-	}
-	else
+	} else
 		windowController = [ViWindowController currentWindowController];
 
 	[self addWindowController:windowController];
@@ -114,18 +112,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)removeView:(ViDocumentView *)aDocumentView
 {
-	// Keep one view around for delegate methods.
-	if ([views count] > 1)
-		[views removeObject:aDocumentView];
-	--visibleViews;
+	[views removeObject:aDocumentView];
 }
 
 - (ViDocumentView *)makeView
 {
-	++visibleViews;
-	if (visibleViews == 1 && [views count] > 0)
-		return [views objectAtIndex:0];
-
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	ViTextView *textView = [documentView textView];
@@ -134,7 +125,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	/* Make all views share the same text storage. */
 	[[textView layoutManager] replaceTextStorage:textStorage];
-	[textView initEditorWithDelegate:self documentView:documentView];
+	[textView initEditorWithDelegate:self];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
@@ -299,7 +290,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)setEncoding:(id)sender
 {
 	forcedEncoding = [[sender representedObject] unsignedIntegerValue];
-	INFO(@"sender = %@, rep.obj = %@, forcedEncoding = 0x%llx", sender, [sender representedObject], forcedEncoding);
 	[self revertDocumentToSaved:nil];
 }
 
@@ -316,8 +306,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)close
 {
-	[windowController closeDocumentViews:self];
-	
+	[windowController closeDocument:self];
+
 	/* Remove the window controller so the document doesn't automatically
 	 * close the window.
 	 */
@@ -795,7 +785,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[windowController statusbar] setEditable:NO];
 	[[windowController statusbar] setHidden:YES];
 	[[windowController messageField] setHidden:NO];
-	[[[self windowController] window] makeFirstResponder:exCommandView];
+	[[windowController window] makeFirstResponder:exCommandView];
 	if ([exCommand length] == 0)
 		return;
 
@@ -819,7 +809,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[windowController statusbar] setAction:@selector(finishedExCommand:)];
 	exCommandSelector = aSelector;
 	exCommandView = aTextView;
-	[[[self windowController] window] makeFirstResponder:[windowController statusbar]];
+	[[windowController window] makeFirstResponder:[windowController statusbar]];
 }
 
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
@@ -837,45 +827,24 @@ BOOL makeNewWindowInsteadOfTab = NO;
 // tag push
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn
 {
-	[[[self windowController] sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
+	[[windowController sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
 }
 
 - (void)popTag
 {
-	NSDictionary *location = [[[self windowController] sharedTagStack] pop];
+	NSDictionary *location = [[windowController sharedTagStack] pop];
 	if (location == nil) {
 		[self message:@"The tags stack is empty"];
 		return;
 	}
 
-	NSString *file = [location objectForKey:@"file"];
-	ViDocument *document = [[NSDocumentController sharedDocumentController]
-		openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
-
-	if (document) {
-		[[self windowController] selectDocument:document];
-		[(ViTextView *)[[views objectAtIndex:0] textView] gotoLine:[[location objectForKey:@"line"] unsignedIntegerValue]
-				                                    column:[[location objectForKey:@"column"] unsignedIntegerValue]];
-	}
+	[windowController gotoURL:[NSURL fileURLWithPath:[location objectForKey:@"file"]]
+			     line:[[location objectForKey:@"line"] unsignedIntegerValue]
+			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
 }
 
 #pragma mark -
 #pragma mark Symbol List
-
-- (void)goToSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)aView
-{
-	NSRange range = [aSymbol range];
-	ViTextView *textView = [aView textView];
-	[textView setCaret:range.location];
-	[textView scrollRangeToVisible:range];
-	[[[self windowController] window] makeFirstResponder:textView];
-	[textView showFindIndicatorForRange:range];
-}
-
-- (void)goToSymbol:(ViSymbol *)aSymbol
-{
-	[self goToSymbol:aSymbol inView:[views objectAtIndex:0]];
-}
 
 - (NSUInteger)filterSymbols:(ViRegexp *)rx
 {
@@ -961,21 +930,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #endif
 }
 
-- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation
-{
-	[windowController updateSelectedSymbolForLocation:aLocation];
-}
-
 #pragma mark -
 
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self displayName]];
-}
-
-- (void)setMostRecentDocumentView:(ViDocumentView *)docView
-{
-	[windowController setMostRecentDocument:self view:docView];
 }
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation

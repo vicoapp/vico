@@ -33,12 +33,11 @@ int logIndent = 0;
 
 @implementation ViTextView
 
-- (void)initEditorWithDelegate:(id)aDelegate documentView:(ViDocumentView *)docView
+- (void)initEditorWithDelegate:(id)aDelegate
 {
 	[self setDelegate:aDelegate];
 	[self setCaret:0];
 
-	documentView = docView;
 	undoManager = [[self delegate] undoManager];
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
@@ -115,11 +114,6 @@ int logIndent = 0;
 	[self endUndoGroup];
 
 	[self setCaret:[self selectedRange].location];
-}
-
-- (ViDocument *)document
-{
-        return [documentView document];
 }
 
 - (id <ViTextViewDelegate>)delegate
@@ -1622,6 +1616,7 @@ int logIndent = 0;
 	return [[self textStorage] lineNumberAtLocation:[self caret]];
 }
 
+// FIXME: move to a category of NSTextStorage
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger bol, eol, end;
@@ -1644,6 +1639,7 @@ int logIndent = 0;
 	return [self columnAtLocation:[self caret]];
 }
 
+// FIXME: move to a category of NSTextStorage
 - (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange
 {
 	if (aLocation >= [[self textStorage] length]) {
@@ -1692,7 +1688,7 @@ int logIndent = 0;
 {
 	if (arg-- == 0)
 		arg = 9;
-        [[[self delegate] windowController] switchToDocumentAtIndex:arg];
+        [[[self delegate] windowController] selectTabAtIndex:arg];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

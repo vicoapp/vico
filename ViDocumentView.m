@@ -7,6 +7,7 @@
 @synthesize view;
 @synthesize textView;
 @synthesize document;
+@synthesize tabController;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
 {
@@ -14,6 +15,11 @@
 	if (self)
 		document = aDocument;
 	return self;
+}
+
+- (void)close
+{
+	[[self tabController] closeDocumentView:self];
 }
 
 @end

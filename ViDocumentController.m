@@ -67,6 +67,9 @@
 							   object:window];
 }
 
+/*
+ * Called by Cocoa when the whole application should close.
+ */
 - (void)closeAllDocumentsWithDelegate:(id)delegate
 		  didCloseAllSelector:(SEL)didCloseAllSelector
 			  contextInfo:(void *)contextInfo
@@ -78,28 +81,96 @@
 	[self closeNextDocumentInWindow:nil];
 }
 
-- (void)closeAllDocumentsInWindow:(NSWindow *)window
-		     withDelegate:(id)delegate
-	      didCloseAllSelector:(SEL)didCloseAllSelector
-{
-	closeAllDelegate = delegate;
-	closeAllSelector = didCloseAllSelector;
-	closeAllContextInfo = NULL;
-	closeAllWindows = NO;
 
-	if ([window attachedSheet] == nil)
-		[self closeNextDocumentInWindow:window];
-	else
+
+
+
+
+
+- (void)closeNextDocumentInSet:(NSMutableSet *)set force:(BOOL)force
+{
+	ViDocument *doc = [set anyObject];
+	if (doc == nil) {
+		[self callCloseAllDelegateShouldTerminate:YES];
+		return;
+	}
+
+	NSWindow *window = [[doc windowController] window];
+
+	if (force || [window attachedSheet] == nil) {
+		[[doc windowController] selectDocument:doc];
+		/* 
+		 * Schedule next close sheet in the event loop right after the windowcontroller has selected the document.
+		 */
+		SEL sel = @selector(canCloseDocumentWithDelegate:shouldCloseSelector:contextInfo:);
+		SEL closeSelector = @selector(document:shouldCloseForSet:contextInfo:);
+		void *contextInfo = NULL;
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[doc methodSignatureForSelector:sel]];
+		[invocation setSelector:sel];
+		[invocation setArgument:&self atIndex:2];
+		[invocation setArgument:&closeSelector atIndex:3];
+		[invocation setArgument:&contextInfo atIndex:4];
+		[invocation performSelector:@selector(invokeWithTarget:) withObject:doc afterDelay:0.0];
+	} else
 		[[NSNotificationCenter defaultCenter] addObserver:self
-							 selector:@selector(windowDidEndSheet:)
+							 selector:@selector(windowDidEndSheetForSet:)
 							     name:NSWindowDidEndSheetNotification
 							   object:window];
 }
 
+- (void)windowDidEndSheetForSet:(NSNotification *)notification
+{
+	NSWindow *window = [notification object];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+							name:NSWindowDidEndSheetNotification
+						      object:window];
+
+	[self closeNextDocumentInSet:closeAllSet force:YES];
+}
+
+- (void)document:(NSDocument *)doc shouldCloseForSet:(BOOL)shouldClose contextInfo:(void *)contextInfo
+{
+	if (!shouldClose) {
+		[self callCloseAllDelegateShouldTerminate:NO];
+		return;
+	}
+
+	[doc close];
+	[closeAllSet removeObject:doc];
+	[self closeNextDocumentInSet:closeAllSet force:NO];
+}
+
+/*
+ * Called by a ViWindowController when it wants to close a set of documents.
+ */
+- (void)closeAllDocumentsInSet:(NSMutableSet *)set
+		  withDelegate:(id)delegate
+	   didCloseAllSelector:(SEL)didCloseAllSelector
+		   contextInfo:(void *)contextInfo
+{
+	closeAllSet = set;
+	closeAllDelegate = delegate;
+	closeAllSelector = didCloseAllSelector;
+	closeAllContextInfo = contextInfo;
+
+	[self closeNextDocumentInSet:set force:NO];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (IBAction)closeCurrentDocument:(id)sender
 {
-	ViWindowController *wc = [ViWindowController currentWindowController];
-	[wc closeDocument:[wc currentDocument]];
+	[[ViWindowController currentWindowController] closeCurrentView];
 }
 
 - (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(NSArray *)extensions

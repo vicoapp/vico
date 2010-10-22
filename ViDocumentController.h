@@ -1,15 +1,17 @@
 @interface ViDocumentController : NSDocumentController
 {
-	id	 closeAllDelegate;
-	SEL	 closeAllSelector;
-	void	*closeAllContextInfo;
-	BOOL	 closeAllWindows;
+	id		 closeAllDelegate;
+	SEL		 closeAllSelector;
+	void		*closeAllContextInfo;
+	BOOL		 closeAllWindows;
+	NSMutableSet	*closeAllSet;
 }
 
 - (IBAction)closeCurrentDocument:(id)sender;
 
-- (void)closeAllDocumentsInWindow:(NSWindow *)window
-		     withDelegate:(id)delegate
-	      didCloseAllSelector:(SEL)didCloseAllSelector;
+- (void)closeAllDocumentsInSet:(NSMutableSet *)set
+		  withDelegate:(id)delegate
+	   didCloseAllSelector:(SEL)didCloseAllSelector
+		   contextInfo:(void *)contextInfo;
 
 @end

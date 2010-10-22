@@ -25,7 +25,8 @@
 	oldCaretRect = caretRect;
 
 	// update selection in symbol list
-	[[self delegate] updateSelectedSymbolForLocation:caret];
+	NSNotification *notification = [NSNotification notificationWithName:ViCaretChangedNotification object:self];
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
@@ -70,7 +71,10 @@
 - (BOOL)becomeFirstResponder
 {
 	[self setNeedsDisplayInRect:oldCaretRect];
-	[[self delegate] setMostRecentDocumentView:documentView];
+
+	NSNotification *notification = [NSNotification notificationWithName:ViFirstResponderChangedNotification object:self];
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+
 	return [super becomeFirstResponder];
 }
 

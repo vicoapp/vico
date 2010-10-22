@@ -16,9 +16,11 @@
 	NSTextField *nagTitle;
 
 	IBOutlet PSMTabBarControl *tabBar;
-	IBOutlet NSSplitView *splitView;
+	IBOutlet NSTabView *tabView;
+	IBOutlet NSSplitView *splitView;	// Split between explorer, main and symbol views
 	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
+
 	IBOutlet NSView *documentView;
 
 	IBOutlet NSPopUpButton *languageButton;
@@ -30,9 +32,6 @@
 	ViDocument *initialDocument;
 	ViDocument *lastDocument;
 	ViDocumentView *lastDocumentView;
-	ViDocument *selectedDocument;
-	ViDocument *mostRecentDocument;
-	ViDocumentView *mostRecentView;
 
 	ViProject *project;
 
@@ -59,10 +58,11 @@
 
 	ViJumpList *jumpList;
 	IBOutlet NSSegmentedControl *jumplistNavigator;
+
+	ViDocumentView *currentView;
 }
 
 @property(readwrite, assign) NSMutableArray *documents;
-@property(readwrite, assign) ViDocument *selectedDocument;
 @property(readonly) NSTextField *statusbar;
 @property(readonly) NSTextField *messageField;
 @property(readwrite, assign) ViProject *project;
@@ -74,14 +74,16 @@
 + (NSWindow *)currentMainWindow;
 
 - (void)setSelectedLanguage:(NSString *)aLanguage;
-- (void)setMostRecentDocument:(ViDocument *)document view:(ViDocumentView *)docView;
-- (void)tabBar:(id)aTabBar selectDocument:(ViDocument *)aDocument;
-- (void)selectDocument:(ViDocument *)aDocument;
 - (void)focusEditor;
-- (void)closeDocumentViews:(ViDocument *)aDocument;
+
+- (ViDocumentView *)selectDocumentView:(ViDocumentView *)docView;
+- (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
+
+- (void)closeDocument:(ViDocument *)aDocument;
+
+- (void)closeCurrentView;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
-- (void)closeDocument:(ViDocument *)document;
 
 - (IBAction)saveProject:(id)sender;
 
@@ -89,11 +91,11 @@
 
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
+- (void)selectTabAtIndex:(NSInteger)anIndex;
+
 - (IBAction)navigateJumplist:(id)sender;
 
-- (void)switchToDocument:(ViDocument *)doc view:(ViDocumentView *)view;
 - (void)switchToDocument:(ViDocument *)doc;
-- (void)switchToDocumentAtIndex:(NSInteger)anIndex;
 - (void)switchToLastDocument;
 - (void)switchToDocumentAction:(id)sender;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;

@@ -6,7 +6,6 @@
 //  Copyright 2005 Positive Spin Media. All rights reserved.
 //
 //  Hacked by Martin Hedenfalk on 2008-11-30.
-//  Removes dependency to NSTabView.
 //
 
 /*
@@ -48,6 +47,7 @@ enum {
     
     // control basics
     NSMutableArray              *_cells;                    // the cells that draw the tabs
+    IBOutlet NSTabView          *tabView;                   // the tab view being navigated
     PSMOverflowPopUpButton      *_overflowPopUpButton;      // for too many tabs
     PSMRolloverButton           *_addTabButton;
     
@@ -79,6 +79,10 @@ enum {
     IBOutlet id                 delegate;
 }
 
+@property(readwrite, assign) NSTabView *tabView;
+@property(readwrite, assign) id delegate;
+@property(readwrite, assign) id partnerView;
+
 // control characteristics
 + (NSBundle *)bundle;
 
@@ -104,29 +108,20 @@ enum {
 - (void)disableAnimations;
 - (void)enableAnimations;
 
-// accessors
-- (id)delegate;
-- (void)setDelegate:(id)object;
-- (id)partnerView;
-- (void)setPartnerView:(id)view;
-
 // the buttons
 - (PSMRolloverButton *)addTabButton;
 - (PSMOverflowPopUpButton *)overflowPopUpButton;
-- (NSMutableArray *)representedDocuments;
+- (NSMutableArray *)representedTabViewItems;
 
 // special effects
 - (void)hideTabBar:(BOOL)hide animate:(BOOL)animate;
 
-// content
-- (void)addDocument:(NSDocument *)aDocument;
-- (void)removeDocument:(NSDocument *)aDocument;
-- (void)didSelectDocument:(NSDocument *)aDocument;
 @end
 
 
 @interface NSObject (TabBarControlDelegateMethods)
-- (void)closeDocument:(NSDocument *)aDocument;
-- (void)selectDocument:(NSDocument *)aDocument;
-- (NSDocument *)selectedDocument;
+- (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void)tabView:(NSTabView *)aTabView willCloseTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void)tabView:(NSTabView *)aTabView didCloseTabViewItem:(NSTabViewItem *)tabViewItem;
 @end
+

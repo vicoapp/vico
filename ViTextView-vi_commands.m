@@ -295,10 +295,12 @@
         return YES;
 }
 
-- (void)filter_through_shell_command:(NSString *)shellCommand
+- (void)filter_through_shell_command:(NSString *)shellCommand contextInfo:(void *)contextInfo
 {
 	if ([shellCommand length] == 0)
 		return;
+
+	INFO(@"command = %@", contextInfo);
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
 
@@ -335,9 +337,10 @@
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self
-	                                selector:@selector(filter_through_shell_command:)
-	                                  prompt:@"!"];
+	[[self delegate] getExCommandWithDelegate:self
+					 selector:@selector(filter_through_shell_command:contextInfo:)
+					   prompt:@"!"
+				      contextInfo:command];
 	final_location = start_location;
 	return YES;
 }
@@ -1501,7 +1504,7 @@
 				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
 
 			if (document) {
-				ViWindowController *windowController = [[self document] windowController];
+				ViWindowController *windowController = [[self delegate] windowController];
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
 				[windowController selectDocument:document];

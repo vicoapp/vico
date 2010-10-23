@@ -9,6 +9,8 @@
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
 
+#import "ExEnvironment.h"
+
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
@@ -44,7 +46,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	{
 		symbols = [NSArray array];
 		views = [[NSMutableArray alloc] init];
-		exCommandHistory = [[NSMutableArray alloc] init];
 
 		[[NSUserDefaults standardUserDefaults] addObserver:self
 							forKeyPath:@"number"
@@ -774,49 +775,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	va_list ap;
 	va_start(ap, fmt);
-	NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
+	[[windowController exEnvironment] message:fmt arguments:ap];
 	va_end(ap);
-
-	[[windowController messageField] setStringValue:msg];
 }
 
-- (IBAction)finishedExCommand:(id)sender
+- (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo
 {
-	NSString *exCommand = [[windowController statusbar] stringValue];
-	[[windowController statusbar] setStringValue:@""];
-	[[windowController statusbar] setEditable:NO];
-	[[windowController statusbar] setHidden:YES];
-	[[windowController messageField] setHidden:NO];
-	[[windowController window] makeFirstResponder:exCommandView];
-	if ([exCommand length] == 0)
-		return;
-
-	[exCommandView performSelector:exCommandSelector withObject:exCommand];
-	exCommandView = nil;
-
-	// add the command to the history
-	NSUInteger i = [exCommandHistory indexOfObject:exCommand];
-	if (i != NSNotFound)
-		[exCommandHistory removeObjectAtIndex:i];
-	[exCommandHistory addObject:exCommand];
+	[[windowController exEnvironment] getExCommandWithDelegate:aDelegate selector:aSelector prompt:aPrompt contextInfo:contextInfo];
 }
 
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt
+- (void)executeExCommandForTextView:(ViTextView *)aTextView
 {
-	[[windowController messageField] setHidden:YES];
-	[[windowController statusbar] setHidden:NO];
-	[[windowController statusbar] setStringValue:aPrompt];
-	[[windowController statusbar] setEditable:YES];
-	[[windowController statusbar] setTarget:self];
-	[[windowController statusbar] setAction:@selector(finishedExCommand:)];
-	exCommandSelector = aSelector;
-	exCommandView = aTextView;
-	[[windowController window] makeFirstResponder:[windowController statusbar]];
-}
-
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector
-{
-	[self getExCommandForTextView:aTextView selector:aSelector prompt:@":"];
+	[[windowController exEnvironment] executeForDocument:self textView:aTextView];
 }
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
@@ -841,6 +811,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[windowController gotoURL:[NSURL fileURLWithPath:[location objectForKey:@"file"]]
 			     line:[[location objectForKey:@"line"] unsignedIntegerValue]
 			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
+}
+
+- (void)switchToLastDocument
+{
+	[windowController switchToLastDocument];
+}
+
+- (void)selectTabAtIndex:(NSInteger)anIndex
+{
+	[windowController selectTabAtIndex:anIndex];
+}
+
+- (NSString *)currentDirectory
+{
+	return [[windowController exEnvironment] currentDirectory];
 }
 
 #pragma mark -

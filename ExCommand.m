@@ -295,6 +295,10 @@ static struct ex_command ex_commands[] = {
 		"f1r",
 		@"so[urce] file",
 		@"read a file of ex commands"},
+	{@"split",	@"ex_split",	0,
+		"f1r",
+		@"sp[lit] file",
+		@"Split current view horizontally."},
 	/* C_STOP */
 	{@"stop",	@"ex_stop",	EX_SECURE,
 		"!",
@@ -370,6 +374,10 @@ static struct ex_command ex_commands[] = {
 		"w1o",
 		@"[viu]sage [key]",
 		@"display vi key usage statement"},
+	{@"vsplit",	@"ex_vsplit",	0,
+		"f1r",
+		@"vsp[lit] file",
+		@"Split current view vertically."},
 	/* C_WRITE */
 	{@"write",	@"ex_write",	EX_ADDR2_ALL|EX_ADDR_ZERODEF,
 		"!s",

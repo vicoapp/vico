@@ -36,10 +36,8 @@ static NSWindowController	*currentWindowController = nil;
 @implementation ViWindowController
 
 @synthesize documents;
-@synthesize statusbar;
-@synthesize messageField;
-@synthesize currentDirectory;
 @synthesize project;
+@synthesize exEnvironment;
 
 + (id)currentWindowController
 {
@@ -70,7 +68,6 @@ static NSWindowController	*currentWindowController = nil;
 		currentWindowController = self;
 		documents = [[NSMutableArray alloc] init];
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
-                [self changeCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
 	}
@@ -214,13 +211,7 @@ static NSWindowController	*currentWindowController = nil;
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
-	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
-	[statusbar setDelegate:self];
-
 	separatorCell = [[ViSeparatorCell alloc] init];
-
-	[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
-	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
 
 	if ([self project] != nil)
 		[projectDelegate performSelector:@selector(addURL:) withObject:[[self project] initialURL] afterDelay:0.0];
@@ -1135,157 +1126,6 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Ex filename completion
 
-- (BOOL)changeCurrentDirectory:(NSString *)path
-{
-        NSString *p;
-        if ([path isAbsolutePath])
-                p = [path stringByStandardizingPath];
-        else
-                p = [[[self currentDirectory] stringByAppendingPathComponent:path] stringByStandardizingPath];
-
-        BOOL isDirectory = NO;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:p isDirectory:&isDirectory] && isDirectory)
-        {
-                currentDirectory = p;
-                return YES;
-        }
-        else
-        {
-                INFO(@"failed to set current directory to '%@'", p);
-                return NO;
-        }
-}
-
-- (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
-{
-	NSString *s = [fieldEditor string];
-	NSRange r = [s rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]
-				       options:NSBackwardsSearch
-					 range:NSMakeRange(0, aLocation)];
-
-	if (r.location++ == NSNotFound)
-		r.location = 0;
-
-	r.length = aLocation - r.location;
-	*outRange = r;
-
-	return [s substringWithRange:r];
-}
-
-- (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr
-{
-	NSFileManager *fm = [NSFileManager defaultManager];
-
-	NSString *path;
-	NSString *suffix;
-	if ([partialPath hasSuffix:@"/"])
-	{
-		path = partialPath;
-		suffix = @"";
-	}
-	else
-	{
-		path = [partialPath stringByDeletingLastPathComponent];
-		suffix = [partialPath lastPathComponent];
-	}
-
-	NSArray *directoryContents = [fm directoryContentsAtPath:[path stringByExpandingTildeInPath]];
-	NSMutableArray *matches = [[NSMutableArray alloc] init];
-	NSString *entry;
-	for (entry in directoryContents)
-	{
-		if ([entry compare:suffix options:NSCaseInsensitiveSearch range:NSMakeRange(0, [suffix length])] == NSOrderedSame)
-		{
-			if ([entry hasPrefix:@"."] && ![suffix hasPrefix:@"."])
-				continue;
-			NSString *s = [path stringByAppendingPathComponent:entry];
-			BOOL isDirectory = NO;
-			if ([fm fileExistsAtPath:[s stringByExpandingTildeInPath] isDirectory:&isDirectory] && isDirectory)
-				[matches addObject:[s stringByAppendingString:@"/"]];
-			else
-				[matches addObject:s];
-		}
-	}
-
-	if (longestMatchPtr && [matches count] > 0)
-	{
-		NSString *longestMatch = nil;
-		NSString *firstMatch = [matches objectAtIndex:0];
-		NSString *m;
-		for (m in matches)
-		{
-			NSString *commonPrefix = [firstMatch commonPrefixWithString:m options:NSCaseInsensitiveSearch];
-			if (longestMatch == nil || [commonPrefix length] < [longestMatch length])
-				longestMatch = commonPrefix;
-		}
-		*longestMatchPtr = longestMatch;
-	}
-
-	if (matchesPtr)
-		*matchesPtr = matches;
-
-	return [matches count];
-}
-
-- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path
-{
-	int skipIndex;
-	if ([path hasSuffix:@"/"])
-		skipIndex = [path length];
-	else
-		skipIndex = [[path stringByDeletingLastPathComponent] length] + 1;
-
-	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:11.0]
-							  forKey:NSFontAttributeName];
-	NSString *c;
-	NSSize maxsize = NSMakeSize(0, 0);
-	for (c in completions)
-	{
-		NSSize size = [[c substringFromIndex:skipIndex] sizeWithAttributes:attrs];
-		if (size.width > maxsize.width)
-			maxsize = size;
-	}
-
-	CGFloat colsize = maxsize.width + 50;
-
-	NSRect bounds = [commandOutput bounds];
-	int columns = NSWidth(bounds) / colsize;
-	if (columns <= 0)
-		columns = 1;
-
-	// remove all previous tab stops
-	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-	NSTextTab *tabStop;
-	for (tabStop in [style tabStops])
-	{
-		[style removeTabStop:tabStop];
-	}
-	[style setDefaultTabInterval:colsize];
-
-	[[[commandOutput textStorage] mutableString] setString:@""];
-	int n = 0;
-	for (c in completions)
-	{
-		[[[commandOutput textStorage] mutableString] appendFormat:@"%@%@",
-			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @"\t"];
-	}
-
-	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	[commandOutput setBackgroundColor:[theme backgroundColor]];
-	[commandOutput setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
-								             forKey:NSBackgroundColorAttributeName]];
-	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
-			style, NSParagraphStyleAttributeName,
-			[theme foregroundColor], NSForegroundColorAttributeName,
-			[theme backgroundColor], NSBackgroundColorAttributeName,
-			[NSFont userFixedPitchFontOfSize:11.0], NSFontAttributeName,
-			nil];
-	[[commandOutput textStorage] addAttributes:attrs range:NSMakeRange(0, [[commandOutput textStorage] length])];
-
-        // display the completion by expanding the commandSplit view
-	[commandSplit setPosition:NSHeight([commandSplit frame])*0.60 ofDividerAtIndex:0];
-}
-
 - (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
 	if (sender == symbolFilterField)
@@ -1322,74 +1162,6 @@ static NSWindowController	*currentWindowController = nil;
 			}
 			[symbolFilterField setStringValue:@""];
 			[self focusEditor];
-			return YES;
-		}
-	}
-	else if (sender == statusbar)
-	{
-		NSText *fieldEditor = [[self window] fieldEditor:NO forObject:sender];
-		if (aSelector == @selector(cancelOperation:) || // escape
-		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
-		    aSelector == @selector(insertNewline:) ||
-		    (aSelector == @selector(deleteBackward:) && [fieldEditor selectedRange].location == 0))
-		{
-			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
-			if (aSelector != @selector(insertNewline:))
-				[statusbar setStringValue:@""];
-			[[statusbar target] performSelector:[statusbar action] withObject:self];
-			return YES;
-		}
-		else if (aSelector == @selector(moveUp:))
-		{
-			INFO(@"%s", "look back in history");
-			return YES;
-		}
-		else if (aSelector == @selector(moveDown:))
-		{
-			INFO(@"%s", "look forward in history");
-			return YES;
-		}
-		else if (aSelector == @selector(insertBacktab:))
-		{
-			return YES;
-		}
-		else if (aSelector == @selector(insertTab:) ||
-		         aSelector == @selector(deleteForward:)) // ctrl-d
-		{
-			NSUInteger caret = [fieldEditor selectedRange].location;
-			NSRange range;
-			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
-
-			if (![filename isAbsolutePath])
-                        {
-				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
-                        }
-                        filename = [[filename stringByStandardizingPath] stringByAbbreviatingWithTildeInPath];
-
-                        if ([filename isEqualToString:@"~"])
-                                filename = @"~/";
-
-			NSArray *completions = nil;
-			NSString *completion = nil;
-			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
-	
-			if (completion)
-			{
-				NSMutableString *s = [[NSMutableString alloc] initWithString:[fieldEditor string]];
-				[s replaceCharactersInRange:range withString:completion];
-				[fieldEditor setString:s];
-			}
-
-			if (num == 1 && [completion hasSuffix:@"/"])
-			{
-				/* If only one directory match, show completions inside that directory. */
-				num = [self completePath:completion intoString:&completion matchesIntoArray:&completions];
-			}
-
-			if (num > 1)
-			{
-				[self displayCompletions:completions forPath:completion];
-			}
 			return YES;
 		}
 	}

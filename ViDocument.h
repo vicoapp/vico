@@ -21,11 +21,6 @@
 	NSStringEncoding forcedEncoding;
 	BOOL retrySaveOperation;
 
-	// ex commands
-	SEL exCommandSelector;
-	ViTextView *exCommandView;
-	NSMutableArray *exCommandHistory;
-
 	// language parsing and highlighting
 	BOOL ignoreEditing;
 	ViSyntaxParser *syntaxParser;
@@ -51,7 +46,6 @@
 @property(readonly) NSStringEncoding encoding;
 
 - (IBAction)toggleLineNumbers:(id)sender;
-- (IBAction)finishedExCommand:(id)sender;
 - (ViLanguage *)language;
 - (IBAction)setLanguage:(id)sender;
 - (void)configureForURL:(NSURL *)aURL;

@@ -4,7 +4,6 @@
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
-#import "ExCommand.h"
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViDocumentView.h"
 #import "ViJumpList.h"
@@ -580,29 +579,10 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Ex command support
 
-- (void)parseAndExecuteExCommand:(NSString *)exCommandString
-{
-	if ([exCommandString length] > 0)
-	{
-		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
-		//DEBUG(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
-		if (ex.command == NULL)
-			[[self delegate] message:@"The %@ command is unknown.", ex.name];
-		else
-		{
-			SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
-			if ([self respondsToSelector:selector])
-				[self performSelector:selector withObject:ex];
-			else
-				[[self delegate] message:@"The %@ command is not implemented.", ex.name];
-		}
-	}
-}
-
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(parseAndExecuteExCommand:)];
+	[[self delegate] executeExCommandForTextView:self];
 	return YES;
 }
 
@@ -681,7 +661,7 @@ int logIndent = 0;
 	return NO;
 }
 
-- (void)find_forward_callback:(NSString *)pattern
+- (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
 	if ([self findPattern:pattern options:0]) {
 		[self pushLocationOnJumpList:start_location];
@@ -689,7 +669,7 @@ int logIndent = 0;
 	}
 }
 
-- (void)find_backward_callback:(NSString *)pattern
+- (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
 	if ([self findPattern:pattern options:1]) {
 		[self pushLocationOnJumpList:start_location];
@@ -700,7 +680,7 @@ int logIndent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:) prompt:@"/"];
+	[[self delegate] getExCommandWithDelegate:self selector:@selector(find_forward_callback:contextInfo:) prompt:@"/" contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
 	return YES;
@@ -709,7 +689,7 @@ int logIndent = 0;
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(find_backward_callback:) prompt:@"?"];
+	[[self delegate] getExCommandWithDelegate:self selector:@selector(find_backward_callback:contextInfo:) prompt:@"?" contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d?pattern will not work!
 	return YES;
@@ -1547,7 +1527,7 @@ int logIndent = 0;
 
 - (BOOL)switch_file:(ViCommand *)command
 {
-        [[[self delegate] windowController] switchToLastDocument];
+        [[self delegate] switchToLastDocument];
         return YES;
 }
 
@@ -1555,7 +1535,7 @@ int logIndent = 0;
 {
 	if (arg-- == 0)
 		arg = 9;
-        [[[self delegate] windowController] selectTabAtIndex:arg];
+        [[self delegate] selectTabAtIndex:arg];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

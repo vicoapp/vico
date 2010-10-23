@@ -8,6 +8,7 @@
 @class ProjectDelegate;
 @class ViResizeView;
 @class ViProject;
+@class ExEnvironment;
 
 #define ViLicenseChangedNotification @"ViLicenseChangedNotification"
 
@@ -24,8 +25,9 @@
 	IBOutlet NSView *documentView;
 
 	IBOutlet NSPopUpButton *languageButton;
-	IBOutlet NSTextField *messageField;
 	IBOutlet NSPopUpButton *openFilesButton;
+
+	IBOutlet ExEnvironment *exEnvironment;
 
 	ViTagStack *tagStack;
 	BOOL isLoaded;
@@ -35,15 +37,9 @@
 
 	ViProject *project;
 
-	// command output view
-	IBOutlet NSTextField *statusbar;
-	IBOutlet NSSplitView *commandSplit;
-	IBOutlet NSTextView *commandOutput;
-
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
 	IBOutlet NSImageView *projectResizeView;
-	NSString *currentDirectory;
 
 	// symbol list
 	IBOutlet NSImageView *symbolsResizeView;
@@ -63,12 +59,8 @@
 }
 
 @property(readwrite, assign) NSMutableArray *documents;
-@property(readonly) NSTextField *statusbar;
-@property(readonly) NSTextField *messageField;
+@property(readonly) ExEnvironment *exEnvironment;
 @property(readwrite, assign) ViProject *project;
-
-@property(readonly) NSString *currentDirectory;
-- (BOOL)changeCurrentDirectory:(NSString *)path;
 
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;
@@ -104,7 +96,9 @@
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
+
 - (IBAction)splitViewHorizontally:(id)sender;
+- (IBAction)splitViewVertically:(id)sender;
 
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;

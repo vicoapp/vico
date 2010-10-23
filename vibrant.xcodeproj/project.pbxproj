@@ -108,7 +108,6 @@
 		9AC2D7D7127035A80056C06B /* TabNewMetal.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7CF127035A80056C06B /* TabNewMetal.png */; };
 		9AC2D7D8127035A80056C06B /* TabNewMetalPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7D0127035A80056C06B /* TabNewMetalPressed.png */; };
 		9AC2D7D9127035A80056C06B /* TabNewMetalRollover.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AC2D7D1127035A80056C06B /* TabNewMetalRollover.png */; };
-		9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */; };
 		9AD772820EC9A6CB00D05DDE /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD772810EC9A6CB00D05DDE /* ViMark.m */; };
 		9AD856A90EF90AF1008DF460 /* actionmenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856A80EF90AF1008DF460 /* actionmenu.png */; };
 		9AD856BA0EF90B9A008DF460 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD856B90EF90B9A008DF460 /* add.png */; };
@@ -142,6 +141,7 @@
 		9AF41A560EC6E1CB00F1D681 /* MarkerLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF41A550EC6E1CB00F1D681 /* MarkerLineNumberView.m */; };
 		9AF5739B0EFE94EE0066C201 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */; };
 		9AF573D00EFED5A10066C201 /* ViDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF573CF0EFED5A10066C201 /* ViDocumentController.m */; };
+		9AF918F61272F55B00200384 /* ExEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF918F51272F55B00200384 /* ExEnvironment.m */; };
 		9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFBC31D0EE717C400646DCB /* ViDocumentView.m */; };
 		9AFCB69D123FA05900660F02 /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 9AFCB69B123FA05900660F02 /* license.c */; };
 /* End PBXBuildFile section */
@@ -348,7 +348,6 @@
 		9AC2D7CF127035A80056C06B /* TabNewMetal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetal.png; path = Images/TabNewMetal.png; sourceTree = "<group>"; };
 		9AC2D7D0127035A80056C06B /* TabNewMetalPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalPressed.png; path = Images/TabNewMetalPressed.png; sourceTree = "<group>"; };
 		9AC2D7D1127035A80056C06B /* TabNewMetalRollover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalRollover.png; path = Images/TabNewMetalRollover.png; sourceTree = "<group>"; };
-		9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
 		9AD772800EC9A6CB00D05DDE /* ViMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMark.h; sourceTree = "<group>"; };
 		9AD772810EC9A6CB00D05DDE /* ViMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMark.m; sourceTree = "<group>"; };
 		9AD856A80EF90AF1008DF460 /* actionmenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = actionmenu.png; path = Images/actionmenu.png; sourceTree = "<group>"; };
@@ -385,6 +384,8 @@
 		9AF5739A0EFE94EE0066C201 /* SFTPConnectionPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnectionPool.m; sourceTree = "<group>"; };
 		9AF573CE0EFED5A10066C201 /* ViDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentController.h; sourceTree = "<group>"; };
 		9AF573CF0EFED5A10066C201 /* ViDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentController.m; sourceTree = "<group>"; };
+		9AF918F21272F26300200384 /* ExEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExEnvironment.h; sourceTree = "<group>"; };
+		9AF918F51272F55B00200384 /* ExEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExEnvironment.m; sourceTree = "<group>"; };
 		9AFBC31C0EE717C400646DCB /* ViDocumentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViDocumentView.h; sourceTree = "<group>"; };
 		9AFBC31D0EE717C400646DCB /* ViDocumentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViDocumentView.m; sourceTree = "<group>"; };
 		9AFCB69B123FA05900660F02 /* license.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = license.c; sourceTree = "<group>"; };
@@ -492,7 +493,6 @@
 				9A6C125F0EBE55FD002D6A22 /* ViRegexp.h */,
 				9A6C12600EBE55FD002D6A22 /* ViRegexp.m */,
 				9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */,
-				9AD59A700D9FE66C00A5B677 /* ViTextView-ex_commands.m */,
 				9AD8B8B30DA8F55900E1558E /* ViTextView-vi_commands.m */,
 				9A7B0E720D01601A00040CAC /* ViTextView.m */,
 				9A7B0E730D01601A00040CAC /* ViTextView.h */,
@@ -500,6 +500,8 @@
 				9A1A11FF0D02C65A009EABAC /* ViCommand.m */,
 				9A73E27F0D8ECA4C00859053 /* ExCommand.h */,
 				9A73E2800D8ECA4C00859053 /* ExCommand.m */,
+				9AF918F51272F55B00200384 /* ExEnvironment.m */,
+				9AF918F21272F26300200384 /* ExEnvironment.h */,
 				9A17D1AF0DA1722F00DAFB30 /* ViTagsDatabase.h */,
 				9A17D1B00DA1722F00DAFB30 /* ViTagsDatabase.m */,
 				9AD8B91A0DA8FC1700E1558E /* ViTagStack.h */,
@@ -978,7 +980,6 @@
 				9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */,
 				9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */,
 				9AC16DA40D93D14A00AE45E0 /* ViDocument.m in Sources */,
-				9AD59A710D9FE66C00A5B677 /* ViTextView-ex_commands.m in Sources */,
 				9A17D1B10DA1722F00DAFB30 /* ViTagsDatabase.m in Sources */,
 				9AD8B8B40DA8F55900E1558E /* ViTextView-vi_commands.m in Sources */,
 				9AD8B91C0DA8FC1700E1558E /* ViTagStack.m in Sources */,
@@ -1059,6 +1060,7 @@
 				9AC2D7C81270358D0056C06B /* PSMTabBarControl.m in Sources */,
 				9AC2D7C91270358D0056C06B /* PSMTabDragAssistant.m in Sources */,
 				9A195D0E12705F1000434B4A /* ViDocumentTabController.m in Sources */,
+				9AF918F61272F55B00200384 /* ExEnvironment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1305,7 +1307,7 @@
 					"-lresolv",
 				);
 				PREBINDING = NO;
-				RUN_CLANG_STATIC_ANALYZER = NO;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64";
 				WARNING_CFLAGS = "-Wall";

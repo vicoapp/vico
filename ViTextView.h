@@ -29,11 +29,10 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
-- (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
+- (void)executeExCommandForTextView:(ViTextView *)aTextView;
+- (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
-- (void)saveDocument:(id)sender;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (ViSnippet *)activeSnippet;
@@ -42,6 +41,10 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSDictionary *)typingAttributes;
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (ViJumpList *)jumpList;
+- (void)switchToLastDocument;
+- (void)selectTabAtIndex:(NSInteger)anIndex;
+- (NSString *)currentDirectory;
+- (NSURL *)fileURL;
 @end
 
 @interface ViTextView : NSTextView

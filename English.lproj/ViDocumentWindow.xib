@@ -12,10 +12,10 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="100250"/>
-			<integer value="100320"/>
-			<integer value="100399"/>
+			<integer value="100153"/>
 			<integer value="100348"/>
 			<integer value="100325"/>
+			<integer value="100399"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -522,7 +522,7 @@
 																<object class="NSTextView" id="544083487">
 																	<reference key="NSNextResponder" ref="167196907"/>
 																	<int key="NSvFlags">6418</int>
-																	<string key="NSFrame">{{0, 87}, {783, 14}}</string>
+																	<string key="NSFrameSize">{783, 14}</string>
 																	<reference key="NSSuperview" ref="167196907"/>
 																	<object class="NSTextContainer" key="NSTextContainer" id="578695923">
 																		<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1446,6 +1446,9 @@
 			<object class="NSUserDefaultsController" id="150299444">
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
+			<object class="NSCustomObject" id="894768772">
+				<string key="NSClassName">ExEnvironment</string>
+			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<array class="NSMutableArray" key="connectionRecords">
@@ -1552,22 +1555,6 @@
 						<reference key="destination" ref="512844837"/>
 					</object>
 					<int key="connectionID">100294</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">commandOutput</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="544083487"/>
-					</object>
-					<int key="connectionID">100321</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">commandSplit</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="876958380"/>
-					</object>
-					<int key="connectionID">100322</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1755,22 +1742,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">statusbar</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="989626378"/>
-					</object>
-					<int key="connectionID">100447</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">messageField</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="195427960"/>
-					</object>
-					<int key="connectionID">100454</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">scrollView</string>
 						<reference key="source" ref="869772944"/>
 						<reference key="destination" ref="590321826"/>
@@ -1856,6 +1827,62 @@
 						<reference key="destination" ref="12489033"/>
 					</object>
 					<int key="connectionID">100528</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">commandOutput</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="544083487"/>
+					</object>
+					<int key="connectionID">100532</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">commandSplit</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="876958380"/>
+					</object>
+					<int key="connectionID">100533</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="275939982"/>
+					</object>
+					<int key="connectionID">100534</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">exEnvironment</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="894768772"/>
+					</object>
+					<int key="connectionID">100535</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">messageField</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="195427960"/>
+					</object>
+					<int key="connectionID">100536</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">statusbar</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="989626378"/>
+					</object>
+					<int key="connectionID">100537</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">windowController</string>
+						<reference key="source" ref="894768772"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100538</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2554,6 +2581,12 @@
 						<reference key="parent" ref="876958380"/>
 						<string key="objectName">Editor Tab View</string>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100529</int>
+						<reference key="object" ref="894768772"/>
+						<reference key="parent" ref="0"/>
+						<string key="objectName">ExEnvironment</string>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2662,6 +2695,7 @@
 				<integer value="0" key="100516.IBSegmentedControlInspectorSelectedSegmentMetadataKey"/>
 				<string key="100517.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100520.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100529.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBEditorWindowLastContentRect">{{347, 328}, {800, 480}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="0" key="5.IBViewEditorWindowController.showingBoundsRectangles"/>
@@ -2679,13 +2713,60 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100528</int>
+			<int key="maxID">100538</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
+					<string key="className">ExEnvironment</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="commandOutput">NSTextView</string>
+						<string key="commandSplit">NSSplitView</string>
+						<string key="exDelegate">id</string>
+						<string key="messageField">NSTextField</string>
+						<string key="statusbar">NSTextField</string>
+						<string key="window">NSWindow</string>
+						<string key="windowController">ViWindowController</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="commandOutput">
+							<string key="name">commandOutput</string>
+							<string key="candidateClassName">NSTextView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="commandSplit">
+							<string key="name">commandSplit</string>
+							<string key="candidateClassName">NSSplitView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="exDelegate">
+							<string key="name">exDelegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="messageField">
+							<string key="name">messageField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="statusbar">
+							<string key="name">statusbar</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="window">
+							<string key="name">window</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="windowController">
+							<string key="name">windowController</string>
+							<string key="candidateClassName">ViWindowController</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ExEnvironment.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="447561314">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="749084084">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">PSMTabBarControl.h</string>
 					</object>
@@ -2738,7 +2819,7 @@
 							<string key="candidateClassName">NSTabView</string>
 						</object>
 					</dictionary>
-					<reference key="sourceIdentifier" ref="447561314"/>
+					<reference key="sourceIdentifier" ref="749084084"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">PSMTabBarControl</string>
@@ -2939,19 +3020,16 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="commandOutput">NSTextView</string>
-						<string key="commandSplit">NSSplitView</string>
 						<string key="documentView">NSView</string>
+						<string key="exEnvironment">ExEnvironment</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="jumplistNavigator">NSSegmentedControl</string>
 						<string key="languageButton">NSPopUpButton</string>
 						<string key="mainView">NSView</string>
-						<string key="messageField">NSTextField</string>
 						<string key="openFilesButton">NSPopUpButton</string>
 						<string key="projectDelegate">ProjectDelegate</string>
 						<string key="projectResizeView">NSImageView</string>
 						<string key="splitView">NSSplitView</string>
-						<string key="statusbar">NSTextField</string>
 						<string key="symbolFilterField">NSSearchField</string>
 						<string key="symbolsOutline">NSOutlineView</string>
 						<string key="symbolsResizeView">NSImageView</string>
@@ -2960,17 +3038,13 @@
 						<string key="tabView">NSTabView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="commandOutput">
-							<string key="name">commandOutput</string>
-							<string key="candidateClassName">NSTextView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="commandSplit">
-							<string key="name">commandSplit</string>
-							<string key="candidateClassName">NSSplitView</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="documentView">
 							<string key="name">documentView</string>
 							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="exEnvironment">
+							<string key="name">exEnvironment</string>
+							<string key="candidateClassName">ExEnvironment</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="explorerView">
 							<string key="name">explorerView</string>
@@ -2988,10 +3062,6 @@
 							<string key="name">mainView</string>
 							<string key="candidateClassName">NSView</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="messageField">
-							<string key="name">messageField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="openFilesButton">
 							<string key="name">openFilesButton</string>
 							<string key="candidateClassName">NSPopUpButton</string>
@@ -3007,10 +3077,6 @@
 						<object class="IBToOneOutletInfo" key="splitView">
 							<string key="name">splitView</string>
 							<string key="candidateClassName">NSSplitView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="statusbar">
-							<string key="name">statusbar</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="symbolFilterField">
 							<string key="name">symbolFilterField</string>

@@ -1539,11 +1539,6 @@ int logIndent = 0;
 	return [[self delegate] typingAttributes];
 }
 
-- (NSUndoManager *)undoManager
-{
-	return undoManager;
-}
-
 - (NSUInteger)currentLine
 {
 	return [[self textStorage] lineNumberAtLocation:[self caret]];

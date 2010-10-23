@@ -113,7 +113,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setWrapping:(BOOL)flag;
-- (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;

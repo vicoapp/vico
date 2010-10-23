@@ -441,8 +441,11 @@ size_t num_requests = 64;
 		if (outError)
 			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)]];
 		do_close(conn, handle, handle_len);
-	} else
+	} else {
 		status = do_close(conn, handle, handle_len);
+		if (outError)
+			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)]];
+	}
 
 	buffer_free(&msg);
 	xfree(handle);

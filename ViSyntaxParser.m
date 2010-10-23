@@ -708,7 +708,7 @@ done:
 	// highlight each line separately
 	for (;;)
 	{
-		unichar ch;
+		unichar ch = '\0';
 		NSUInteger end = nextRange;
 		while (end < maxRange && (ch = chars[end - offset]) != '\n' && ch != '\r')
 			++end;

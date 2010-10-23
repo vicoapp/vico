@@ -63,8 +63,7 @@
 	position = [jumps count];
 	DEBUG(@"jumps = %@, position = %u", jumps, position);
 
-	if ([delegate respondsToSelector:@selector(jumpList:added:)])
-		[delegate jumpList:self added:jump];
+	[delegate jumpList:self added:jump];
 
 	return removedDuplicate;
 }
@@ -81,8 +80,7 @@
 		*columnPtr = [jump column];
 	DEBUG(@"jumps = %@, position = %u", jumps, position);
 
-	if ([delegate respondsToSelector:@selector(jumpList:goto:)])
-		[delegate jumpList:self goto:jump];
+	[delegate jumpList:self goto:jump];
 
 	return YES;
 }

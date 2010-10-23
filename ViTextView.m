@@ -47,7 +47,7 @@ int logIndent = 0;
 	marks = [[NSMutableDictionary alloc] init];
 	saved_column = -1;
 
-	wordSet = [NSCharacterSet characterSetWithCharactersInString:@"_"];
+	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 
@@ -576,30 +576,10 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Convenience methods
 
-- (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
-{
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	NSUInteger c = 0, i;
-	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	for (i = bol; i < eol; i++)
-	{
-		unichar ch = [[[self textStorage] string] characterAtIndex:i];
-		if (ch == '\t')
-			c += ts - (c % ts);
-		else
-			c++;
-		if (c >= column)
-			break;
-	}
-	if (mode != ViInsertMode && i == eol)
-		i = IMAX(bol, eol - 1);
-	return i;
-}
-
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
-	final_location = end_location = [self locationForColumn:column fromLocation:aLocation];
+	end_location = [[self textStorage] locationForColumn:column fromLocation:aLocation acceptEOL:(mode == ViInsertMode)];
+	final_location = end_location;
 }
 
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
@@ -611,40 +591,6 @@ int logIndent = 0;
 		[self setCaret:final_location];
 		[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
 	}
-}
-
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
-{
-	NSString *s = [[self textStorage] string];
-	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
-				       options:backwardFlag ? NSBackwardsSearch : 0
-					 range:backwardFlag ? NSMakeRange(toLocation, startLocation - toLocation + 1) : NSMakeRange(startLocation, toLocation - startLocation)];
-	if (r.location == NSNotFound)
-		return backwardFlag ? toLocation : toLocation; // FIXME: this is strange...
-	return r.location;
-}
-
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag
-{
-	return [self skipCharactersInSet:characterSet
-				    from:startLocation
-				      to:backwardFlag ? 0 : [[self textStorage] length]
-				backward:backwardFlag];
-}
-
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation
-{
-	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
-				    from:startLocation
-				      to:toLocation
-				backward:NO];
-}
-
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation
-{
-	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
-			    fromLocation:startLocation
-				backward:NO];
 }
 
 #pragma mark -
@@ -1034,6 +980,7 @@ int logIndent = 0;
 
 				// INFO(@"adding smart pair attr to %u + 2", start_location);
 				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
+				// FIXME: use an NSInvocation here instead
 				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
 					ViSmartPairAttributeName, @"attributeName",
 					characters, @"value",
@@ -1108,7 +1055,7 @@ int logIndent = 0;
         if (start_location > 0)
         {
                 // is there a word before the cursor that we just typed?
-                NSString *word = [self wordAtLocation:start_location - 1];
+                NSString *word = [[self textStorage] wordAtLocation:start_location - 1];
                 if ([word length] > 0)
                 {
                         NSArray *scopes = [self scopesAtLocation:start_location];
@@ -1236,7 +1183,7 @@ int logIndent = 0;
 	    [command.method isEqualToString:@"scroll_down_by_line:"] ||
 	    [command.method isEqualToString:@"scroll_up_by_line:"]) {
 		if (saved_column < 0)
-			saved_column = [self columnAtLocation:[self caret]];
+			saved_column = [self currentColumn];
 	} else
 		saved_column = -1;
 
@@ -1610,67 +1557,14 @@ int logIndent = 0;
 	return undoManager;
 }
 
-
 - (NSUInteger)currentLine
 {
 	return [[self textStorage] lineNumberAtLocation:[self caret]];
 }
 
-// FIXME: move to a category of NSTextStorage
-- (NSUInteger)columnAtLocation:(NSUInteger)aLocation
-{
-	NSUInteger bol, eol, end;
-	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:aLocation];
-	NSUInteger c = 0, i;
-	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	for (i = bol; i <= [self caret] && i < end; i++)
-	{
-		unichar ch = [[[self textStorage] string] characterAtIndex:i];
-		if (ch == '\t')
-			c += ts - (c % ts);
-		else
-			c++;
-	}
-	return c;
-}
-
 - (NSUInteger)currentColumn
 {
-	return [self columnAtLocation:[self caret]];
-}
-
-// FIXME: move to a category of NSTextStorage
-- (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange
-{
-	if (aLocation >= [[self textStorage] length]) {
-		INFO(@"start/to outside valid range (length %u)", [[self textStorage] length]);
-		if (returnRange != nil)
-			*returnRange = NSMakeRange(0, 0);
-		return @"";
-	}
-
-	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
-	if (word_start < aLocation && word_start > 0)
-		word_start += 1;
-
-	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:NO];
-	if (word_end > word_start)
-	{
-		NSRange range = NSMakeRange(word_start, word_end - word_start);
-		if (returnRange)
-			*returnRange = range;
-		return [[[self textStorage] string] substringWithRange:range];
-	}
-
-	if (returnRange)
-		*returnRange = NSMakeRange(0, 0);
-
-	return nil;
-}
-
-- (NSString *)wordAtLocation:(NSUInteger)aLocation
-{
-	return [self wordAtLocation:aLocation range:nil];
+	return [[self textStorage] columnAtLocation:[self caret]];
 }
 
 - (void)show_scope
@@ -1695,7 +1589,7 @@ int logIndent = 0;
 {
 	[[[self delegate] jumpList] pushURL:[[self delegate] fileURL]
 				       line:[[self textStorage] lineNumberAtLocation:aLocation]
-				     column:[self columnAtLocation:aLocation]];
+				     column:[[self textStorage] columnAtLocation:aLocation]];
 }
 
 - (void)pushCurrentLocationOnJumpList

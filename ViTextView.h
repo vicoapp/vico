@@ -103,7 +103,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)setNormalMode;
@@ -118,7 +117,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (void)setWrapping:(BOOL)flag;
 - (NSUndoManager *)undoManager;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
-- (NSString *)wordAtLocation:(NSUInteger)aLocation;
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
 
@@ -137,15 +135,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange;
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 
-- (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
-
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag;
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag;
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
-
-- (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
 
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;

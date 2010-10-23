@@ -26,7 +26,7 @@
 {
 	NSURL *url = [[self delegate] fileURL];
 	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
-	NSUInteger column = [self columnAtLocation:start_location];
+	NSUInteger column = [[self textStorage] columnAtLocation:start_location];
 	BOOL ok = [[[self delegate] jumpList] backwardToURL:&url line:&line column:&column];
 	if (!ok) {
 		[[self delegate] message:@"Already at beginning of jumplist"];
@@ -673,7 +673,7 @@
 			final_location = eol - 1;
 			joinPadding = @"";
 		}
-		NSInteger sol2 = [self skipWhitespaceFrom:end toLocation:eol2];
+		NSInteger sol2 = [[self textStorage] skipWhitespaceFrom:end toLocation:eol2];
 		NSRange r = NSMakeRange(eol, sol2 - eol);
 		[self replaceRange:r withString:joinPadding];
 	}
@@ -826,7 +826,7 @@
 - (BOOL)move_first_char:(ViCommand *)command
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];
-	end_location = [self skipWhitespaceFrom:end_location];
+	end_location = [[self textStorage] skipWhitespaceFrom:end_location];
 	final_location = end_location;
 	return YES;
 }
@@ -1096,12 +1096,12 @@
 		if (!bigword && [wordSet characterIsMember:ch])
 		{
 			// skip word-chars and whitespace
-			end_location = [self skipCharactersInSet:wordSet fromLocation:word_location backward:NO];
+			end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:word_location backward:NO];
 		}
 		else if (![whitespace characterIsMember:ch])
 		{
 			// inside non-word-chars
-			end_location = [self skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:word_location backward:NO];
+			end_location = [[self textStorage] skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:word_location backward:NO];
 		}
 		else if (!command.ismotion && command.key != 'd' && command.key != 'y')
 		{
@@ -1111,7 +1111,7 @@
 		}
 
 		if (count > 0)
-			end_location = [self skipWhitespaceFrom:end_location];
+			end_location = [[self textStorage] skipWhitespaceFrom:end_location];
 	}
 
 	/* From nvi:
@@ -1123,7 +1123,7 @@
 	 * single character, and nothing else.  Ain't nothin' in here that's easy.
 	 */
 	if (command.ismotion || command.key == 'd' || command.key == 'y')
-		end_location = [self skipWhitespaceFrom:end_location];
+		end_location = [[self textStorage] skipWhitespaceFrom:end_location];
 
 	if (!command.ismotion && (command.key == 'd' || command.key == 'y' || command.key == 'c')) {
 		/* Restrict to current line if deleting/yanking last word on line.
@@ -1167,7 +1167,7 @@
          */
 	if ([whitespace characterIsMember:ch])
 	{
-		end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
+		end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
 		if (end_location == 0)
 		{
 			final_location = end_location;
@@ -1189,26 +1189,26 @@
 
 		if (bigword)
 		{
-			end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:word_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet] fromLocation:word_location backward:YES];
 			if (count == 0 && [whitespace characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
 		else if ([wordSet characterIsMember:ch])
 		{
 			// skip word-chars and whitespace
-			end_location = [self skipCharactersInSet:wordSet fromLocation:word_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:word_location backward:YES];
 			if (count == 0 && ![wordSet characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
 		else
 		{
 			// inside non-word-chars
-			end_location = [self skipCharactersInSet:nonWordSet fromLocation:word_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:nonWordSet fromLocation:word_location backward:YES];
 			if (count == 0 && [wordSet characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
 		if (count > 0)
-			end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
 	}
 
 	final_location = end_location;
@@ -1234,7 +1234,7 @@
          */
 	if([whitespace characterIsMember:ch])
 	{
-		end_location = [self skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
+		end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
 		if(end_location == [s length])
 		{
 			final_location = end_location;
@@ -1246,16 +1246,16 @@
 
 	ch = [s characterAtIndex:end_location];
 	if (bigword) {
-		end_location = [self skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:NO];
+		end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
 	} else if ([wordSet characterIsMember:ch]) {
-		end_location = [self skipCharactersInSet:wordSet fromLocation:end_location backward:NO];
+		end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
 	} else {
 		// inside non-word-chars
-		end_location = [self skipCharactersInSet:nonWordSet fromLocation:end_location backward:NO];
+		end_location = [[self textStorage] skipCharactersInSet:nonWordSet fromLocation:end_location backward:NO];
 		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
 			end_location--;
 	}
@@ -1276,7 +1276,7 @@
 	unichar ch = [s characterAtIndex:bol];
 	if ([whitespace characterIsMember:ch]) {
 		// skip leading whitespace
-		end_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		end_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 	}
 	else
 		end_location = bol;
@@ -1367,7 +1367,7 @@
 			return NO;
 		}
 
-		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		end_location = final_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 		return YES;
 	}
 
@@ -1383,7 +1383,7 @@
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
 
-	end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+	end_location = final_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 	return YES;
 }
 
@@ -1413,7 +1413,7 @@
 			return NO;
 		}
 
-		end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+		end_location = final_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 		return YES;
 	}
 
@@ -1427,7 +1427,7 @@
 		if (!has_final_location)
 		{
 			has_final_location = YES;
-			end_location = final_location = [self skipWhitespaceFrom:bol toLocation:eol];
+			end_location = final_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 		}
 		lines++;
 	}
@@ -1487,7 +1487,7 @@
 		return NO;
 	}
 
-	NSString *word = [self wordAtLocation:start_location];
+	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		NSArray *tag = [tags lookup:word];
 		if (tag) {
@@ -1526,7 +1526,7 @@
 // syntax: * (from vim, incompatible with nvi)
 - (BOOL)find_current_word:(ViCommand *)command
 {
-	NSString *word = [self wordAtLocation:start_location];
+	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if(word)
 	{
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
@@ -1579,7 +1579,7 @@
 	if (command.key == '`' || command.motion_key == '`')
 		[self gotoColumn:m.column fromLocation:bol];
 	else
-		final_location = [self skipWhitespaceFrom:final_location];
+		final_location = [[self textStorage] skipWhitespaceFrom:final_location];
 
 	[self pushLocationOnJumpList:start_location];
 

@@ -1494,7 +1494,7 @@ static NSWindowController	*currentWindowController = nil;
 	if ([sender selectedSegment] == 0) {
 		url = [[self document] fileURL];
 		line = [[tv textStorage] lineNumberAtLocation:[tv caret]];
-		column = [tv columnAtLocation:[tv caret]];
+		column = [[tv textStorage] columnAtLocation:[tv caret]];
 		[jumpList backwardToURL:&url line:&line column:&column];
 	} else {
 		[jumpList forwardToURL:NULL line:NULL column:NULL];

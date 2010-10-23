@@ -89,7 +89,7 @@
 	}
 	else if ([type isEqualToString:@"word"])
 	{
-		inputText = [self wordAtLocation:[self caret] range:rangePtr];
+		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr];
 	}
 
 	return inputText;
@@ -132,7 +132,7 @@
 		[bundleSupportPath stringByAppendingPathComponent:@"bin"]]];
 
 	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
-	[self setenv:"TM_CURRENT_WORD" value:[self wordAtLocation:[self caret]]];
+	[self setenv:"TM_CURRENT_WORD" value:[[self textStorage] wordAtLocation:[self caret]]];
 
 	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
 	[self setenv:"TM_PROJECT_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];
@@ -174,10 +174,10 @@
 	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
 	 */
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
-	[self setenv:"TM_INPUT_START_COLUMN" integer:[self columnAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_COLUMN" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
-	[self setenv:"TM_INPUT_START_LINE_INDEX" integer:[self columnAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_LINE_INDEX" integer:[self columnAtLocation:NSMaxRange(inputRange)]];
+	[self setenv:"TM_INPUT_START_COLUMN" integer:[[self textStorage] columnAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_COLUMN" integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
+	[self setenv:"TM_INPUT_START_LINE_INDEX" integer:[[self textStorage] columnAtLocation:inputRange.location]];
+	[self setenv:"TM_INPUT_END_LINE_INDEX" integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
 	[self setenv:"TM_INPUT_START_LINE" integer:[[self textStorage] lineNumberAtLocation:inputRange.location]];
 	[self setenv:"TM_INPUT_END_LINE" integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(inputRange)]];
 

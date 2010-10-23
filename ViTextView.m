@@ -14,8 +14,6 @@ int logIndent = 0;
 
 @interface ViTextView (private)
 - (BOOL)insert:(ViCommand *)command;
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation;
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
 - (void)recordInsertInRange:(NSRange)aRange;
 - (void)recordDeleteOfRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;

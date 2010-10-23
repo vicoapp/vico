@@ -29,12 +29,10 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;
-- (NSURL *)fileURL;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector prompt:(NSString *)aPrompt;
 - (void)getExCommandForTextView:(ViTextView *)aTextView selector:(SEL)aSelector;
 - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 - (void)popTag;
-- (void)enableLineNumbers:(BOOL)flag;
 - (void)saveDocument:(id)sender;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
@@ -117,9 +115,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
 
-- (BOOL)findPattern:(NSString *)pattern
-	    options:(unsigned)find_options
-         regexpType:(int)regexpSyntax;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
@@ -155,6 +150,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 @end
 
 @interface ViTextView (vi_commands)
+- (BOOL)insert:(ViCommand *)command;
 - (BOOL)move_left:(ViCommand *)command;
 - (BOOL)move_right:(ViCommand *)command;
 - (BOOL)move_down:(ViCommand *)command;

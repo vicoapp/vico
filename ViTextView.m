@@ -13,7 +13,6 @@
 int logIndent = 0;
 
 @interface ViTextView (private)
-- (BOOL)insert:(ViCommand *)command;
 - (void)recordInsertInRange:(NSRange)aRange;
 - (void)recordDeleteOfRange:(NSRange)aRange;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
@@ -600,6 +599,7 @@ int logIndent = 0;
 	}
 }
 
+/* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
 	[[self delegate] getExCommandForTextView:self selector:@selector(parseAndExecuteExCommand:)];
@@ -614,9 +614,7 @@ int logIndent = 0;
 	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
 }
 
-- (BOOL)findPattern:(NSString *)pattern
-	    options:(unsigned)find_options
-         regexpType:(int)regexpSyntax
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
@@ -629,7 +627,7 @@ int logIndent = 0;
 	{
 		rx = [ViRegexp regularExpressionWithString:pattern
 						   options:rx_options
-						    syntax:regexpSyntax];
+						    syntax:0];
 	}
 	@catch(NSException *exception)
 	{
@@ -683,11 +681,6 @@ int logIndent = 0;
 	return NO;
 }
 
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
-{
-	return [self findPattern:pattern options:find_options regexpType:0];
-}
-
 - (void)find_forward_callback:(NSString *)pattern
 {
 	if ([self findPattern:pattern options:0]) {
@@ -707,7 +700,7 @@ int logIndent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:)];
+	[[self delegate] getExCommandForTextView:self selector:@selector(find_forward_callback:) prompt:@"/"];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
 	return YES;
@@ -716,7 +709,7 @@ int logIndent = 0;
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[self delegate] getExCommandForTextView:self selector:@selector(find_backward_callback:)];
+	[[self delegate] getExCommandForTextView:self selector:@selector(find_backward_callback:) prompt:@"?"];
 	// FIXME: this won't work as a motion command!
 	// d?pattern will not work!
 	return YES;

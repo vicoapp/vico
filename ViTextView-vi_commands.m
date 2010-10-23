@@ -1505,7 +1505,7 @@
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
 				[windowController selectDocument:document];
-				[document findPattern:pattern options:0 regexpType:0];
+				[document findPattern:pattern options:0];
 			}
 		} else {
 			[[self delegate] message:@"%@: tag not found", word];

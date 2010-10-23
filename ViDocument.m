@@ -24,6 +24,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)resetTypingAttributes;
 - (void)highlightEverything;
 - (void)setWrapping:(BOOL)flag;
+- (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
+- (void)enableLineNumbers:(BOOL)flag;
 @end
 
 @implementation ViDocument
@@ -817,11 +819,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self getExCommandForTextView:aTextView selector:aSelector prompt:@":"];
 }
 
-- (BOOL)findPattern:(NSString *)pattern
-	    options:(unsigned)find_options
-         regexpType:(int)regexpSyntax
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	return [(ViTextView *)[[views objectAtIndex:0] textView] findPattern:pattern options:find_options regexpType:regexpSyntax];
+	return [(ViTextView *)[[views objectAtIndex:0] textView] findPattern:pattern options:find_options];
 }
 
 // tag push

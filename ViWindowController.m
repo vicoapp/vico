@@ -262,8 +262,7 @@ static NSWindowController	*currentWindowController = nil;
  */
 - (void)addNewTab:(ViDocument *)document
 {
-	if (!isLoaded)
-	{
+	if (!isLoaded) {
 		/* Defer until NIB is loaded. */
 		initialDocument = document;
 		return;
@@ -376,9 +375,15 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+- (void)focusEditorDelayed:(id)sender
+{
+	if ([self currentView])
+		[[self window] makeFirstResponder:[[self currentView] textView]];
+}
+
 - (void)focusEditor
 {
-	[[self window] makeFirstResponder:[[self currentView] textView]];
+	[self performSelector:@selector(focusEditorDelayed:) withObject:nil afterDelay:0.0];
 }
 
 - (ViTagStack *)sharedTagStack
@@ -797,10 +802,11 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocument *document = [self documentForURL:url];
 	if (document == nil) {
 		NSError *error = nil;
-		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
-		if (error)
+		document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+		if (error) {
 			[NSApp presentError:error];	
-		return;
+			return;
+		}
 	}
 
 	ViDocumentView *docView = [self selectDocument:document];

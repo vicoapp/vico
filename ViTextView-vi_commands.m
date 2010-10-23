@@ -356,7 +356,7 @@
 	for (; eol < [[[self textStorage] string] length];)
 	{
 		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
-		if ((bol == end || [self isBlankLineAtLocation:bol]) && --count <= 0)
+		if ((bol == end || [[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0)
 		{
 			// empty or blank line, we're done
 			break;
@@ -383,7 +383,7 @@
 	for (; cur > 0;)
 	{
 		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:cur - 1];
-		if ((bol == end || [self isBlankLineAtLocation:bol]) && --count <= 0)
+		if ((bol == end || [[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0)
 		{
 			// empty or blank line, we're done
 			break;

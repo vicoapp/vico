@@ -131,7 +131,7 @@
 		[supportPath stringByAppendingPathComponent:@"bin"],
 		[bundleSupportPath stringByAppendingPathComponent:@"bin"]]];
 
-	[self setenv:"TM_CURRENT_LINE" value:[self lineForLocation:[self caret]]];
+	[self setenv:"TM_CURRENT_LINE" value:[[self textStorage] lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[[self textStorage] wordAtLocation:[self caret]]];
 
 	[self setenv:"TM_DIRECTORY" value:[[[self delegate] windowController] currentDirectory]];

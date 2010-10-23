@@ -144,4 +144,18 @@ static NSMutableCharacterSet *wordSet = nil;
 	return i;
 }
 
+- (NSString *)lineForLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, eol;
+	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
+	return [[self string] substringWithRange:NSMakeRange(bol, eol - bol)];
+}
+
+- (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
+{
+	NSString *line = [self lineForLocation:aLocation];
+	return [line rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]].location == NSNotFound;
+}
+
 @end
+

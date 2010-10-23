@@ -248,19 +248,6 @@ int logIndent = 0;
 	[self replaceRange:aRange withString:aString undoGroup:YES];
 }
 
-- (NSString *)lineForLocation:(NSUInteger)aLocation
-{
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	return [[[self textStorage] string] substringWithRange:NSMakeRange(bol, eol - bol)];
-}
-
-- (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
-{
-	NSString *line = [self lineForLocation:aLocation];
-	return [line rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]].location == NSNotFound;
-}
-
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
 	return [[self delegate] scopesAtLocation:aLocation];
@@ -342,7 +329,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
-		NSString *checkLine = [self lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -359,7 +346,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
-		NSString *checkLine = [self lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -376,7 +363,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
-		NSString *checkLine = [self lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;

@@ -14,4 +14,7 @@
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation acceptEOL:(BOOL)acceptEOL;
 
+- (NSString *)lineForLocation:(NSUInteger)aLocation;
+- (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
+
 @end

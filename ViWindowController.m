@@ -21,7 +21,6 @@ static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
 
 @interface ViWindowController ()
-- (ViDocumentView *)documentViewForView:(NSView *)aView;
 - (ViDocument *)documentForURL:(NSURL *)url;
 - (void)updateJumplistNavigator;
 - (void)didSelectDocument:(ViDocument *)document;
@@ -841,10 +840,10 @@ static NSWindowController	*currentWindowController = nil;
 {
 	for (ViDocument *doc in documents)
 		for (ViDocumentView *docView in [doc views])
-			if ([docView view] == aView)
+			if ([docView view] == aView || [docView textView] == aView)
 				return docView;
 
-	INFO(@"***** View %@ not a document view!?", aView);
+	INFO(@"***** View %@ not in a document view", aView);
 	return nil;
 }
 

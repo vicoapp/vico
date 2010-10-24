@@ -68,6 +68,7 @@
 - (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)focusEditor;
 
+- (ViDocumentView *)documentViewForView:(NSView *)aView;
 - (ViDocumentView *)selectDocumentView:(ViDocumentView *)docView;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
 

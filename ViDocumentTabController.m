@@ -75,8 +75,10 @@
 		[split addSubview:[newDocView view]];
 		[split adjustSubviews];
 	} else {
-		// Need to create a new horizontal split view and replace
-		// the current view with the split and two subviews
+		/*
+		 * Create a new horizontal split view and replace
+		 * the current view with the split and two subviews.
+		 */
 		NSRect frame = [view frame];
 		frame.origin = NSMakePoint(0, 0);
 		NSSplitView *newSplit = [[NSSplitView alloc] initWithFrame:frame];
@@ -116,6 +118,73 @@
 		if ([superSplit isMemberOfClass:[NSSplitView class]])
 			[superSplit replaceSubview:split with:[[split subviews] objectAtIndex:0]];
 	}
+}
+
+- (ViDocumentView *)documentViewForView:(NSView *)aView
+{
+	for (ViDocumentView *docView in [self views])
+		if ([docView view] == aView || [docView textView] == aView)
+			return docView;
+
+	INFO(@"***** View %@ not in a document view", aView);
+	return nil;
+}
+
+- (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view isVertical:(BOOL)isVertical index:(NSInteger *)indexPtr
+{
+	NSView *sup;
+	while (view != nil && ![view isMemberOfClass:[NSTabView class]]) {
+		sup = [view superview];
+		if ([sup isMemberOfClass:[NSSplitView class]] && [(NSSplitView *)sup isVertical] == isVertical) {
+			if (indexPtr != NULL)
+				*indexPtr = [[sup subviews] indexOfObject:view];
+			return (NSSplitView *)sup;
+		}
+		view = sup;
+	}
+	return nil;
+}
+
+- (NSView *)containedViewRelativeToView:(NSView *)view anchor:(ViViewOrderingMode)anchor
+{
+	if ([view isMemberOfClass:[NSSplitView class]]) {
+		if ((anchor == ViViewUp && ![(NSSplitView *)view isVertical]) || (anchor == ViViewLeft && [(NSSplitView *)view isVertical]))
+			view = [[view subviews] lastObject];
+		else
+			view = [[view subviews] objectAtIndex:0];
+		return [self containedViewRelativeToView:view anchor:anchor];
+	} else
+		return view;
+}
+
+- (ViDocumentView *)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)view
+{
+	if (view == nil)
+		return nil;
+
+	BOOL isVertical = (position == ViViewLeft || position == ViViewRight);
+
+	NSInteger ndx;
+	NSSplitView *split = [self containingSplitViewRelativeTo:view isVertical:isVertical index:&ndx];
+	if (split == nil) {
+		INFO(@"no containing split view for mode %i", position);
+		return nil;
+	}
+
+	NSInteger newIndex = ndx;
+	if (position == ViViewUp || position == ViViewLeft)
+		newIndex--;
+	else
+		newIndex++;
+
+	NSArray *subviews = [split subviews];
+	if (newIndex >= 0 && newIndex < [subviews count]) {
+		view = [subviews objectAtIndex:newIndex];
+		return [self documentViewForView:[self containedViewRelativeToView:view anchor:position]];
+	} else
+		return [self viewAtPosition:position relativeTo:split];
+
+	return nil;
 }
 
 @end

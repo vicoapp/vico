@@ -822,6 +822,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	ViDocumentTabController *tabController = [docView tabController];
 	[tabController splitView:docView vertically:NO];
+	[self selectDocumentView:docView];
 }
 
 - (IBAction)splitViewVertically:(id)sender
@@ -834,6 +835,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	ViDocumentTabController *tabController = [docView tabController];
 	[tabController splitView:docView vertically:YES];
+	[self selectDocumentView:docView];
 }
 
 - (ViDocumentView *)documentViewForView:(NSView *)aView

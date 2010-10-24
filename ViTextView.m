@@ -582,7 +582,7 @@ int logIndent = 0;
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[[self delegate] executeExCommandForTextView:self];
+	[[[self delegate] environment] executeForTextView:self];
 	return YES;
 }
 
@@ -680,7 +680,7 @@ int logIndent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[self delegate] getExCommandWithDelegate:self selector:@selector(find_forward_callback:contextInfo:) prompt:@"/" contextInfo:command];
+	[[[self delegate] environment] getExCommandWithDelegate:self selector:@selector(find_forward_callback:contextInfo:) prompt:@"/" contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
 	return YES;
@@ -689,7 +689,7 @@ int logIndent = 0;
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[self delegate] getExCommandWithDelegate:self selector:@selector(find_backward_callback:contextInfo:) prompt:@"?" contextInfo:command];
+	[[[self delegate] environment] getExCommandWithDelegate:self selector:@selector(find_backward_callback:contextInfo:) prompt:@"?" contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d?pattern will not work!
 	return YES;
@@ -1129,6 +1129,12 @@ int logIndent = 0;
 
 - (BOOL)evaluateCommand:(ViCommand *)command
 {
+	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
+	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
+		[[self delegate] message:@"Command not implemented."];
+		return NO;
+	}
+
 	/* Default start- and end-location is the current location. */
 	start_location = [self caret];
 	end_location = start_location;
@@ -1527,7 +1533,7 @@ int logIndent = 0;
 
 - (BOOL)switch_file:(ViCommand *)command
 {
-        [[self delegate] switchToLastDocument];
+        [[[self delegate] environment] switchToLastDocument];
         return YES;
 }
 
@@ -1535,7 +1541,7 @@ int logIndent = 0;
 {
 	if (arg-- == 0)
 		arg = 9;
-        [[self delegate] selectTabAtIndex:arg];
+        [[[self delegate] environment] selectTabAtIndex:arg];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

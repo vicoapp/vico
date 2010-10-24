@@ -6,6 +6,7 @@
 #import "logging.h"
 #import "ViSyntaxParser.h"
 #import "ViSnippet.h"
+#import "ExEnvironment.h"
 
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
@@ -29,10 +30,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;
-- (void)executeExCommandForTextView:(ViTextView *)aTextView;
-- (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
-- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
-- (void)popTag;
+// - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
+// - (void)popTag;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (ViSnippet *)activeSnippet;
@@ -41,10 +40,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSDictionary *)typingAttributes;
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (ViJumpList *)jumpList;
-- (void)switchToLastDocument;
-- (void)selectTabAtIndex:(NSInteger)anIndex;
-- (NSString *)currentDirectory;
 - (NSURL *)fileURL;
+- (ExEnvironment *)environment;
 @end
 
 @interface ViTextView : NSTextView

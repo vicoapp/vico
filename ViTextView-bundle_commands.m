@@ -134,8 +134,8 @@
 	[self setenv:"TM_CURRENT_LINE" value:[[self textStorage] lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[[self textStorage] wordAtLocation:[self caret]]];
 
-	[self setenv:"TM_DIRECTORY" value:[[self delegate] currentDirectory]];
-	[self setenv:"TM_PROJECT_DIRECTORY" value:[[self delegate] currentDirectory]];
+	[self setenv:"TM_DIRECTORY" value:[[[self delegate] environment] currentDirectory]];
+	[self setenv:"TM_PROJECT_DIRECTORY" value:[[[self delegate] environment] currentDirectory]];
 
 	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];

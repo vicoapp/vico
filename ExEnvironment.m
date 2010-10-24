@@ -4,11 +4,11 @@
 #import "ViThemeStore.h"
 #import "ViTextView.h"
 #import "ViWindowController.h"
+#import "ViDocumentView.h"
 #import "NSTextStorage-additions.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
-- (BOOL)changeCurrentDirectory:(NSString *)path;
 - (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange;
 - (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr;
 - (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path;
@@ -37,6 +37,9 @@
 	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
 }
 
+#pragma mark -
+#pragma mark Assorted
+
 - (BOOL)changeCurrentDirectory:(NSString *)path
 {
         NSString *p;
@@ -55,73 +58,63 @@
         }
 }
 
-- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
+- (void)message:(NSString *)fmt arguments:(va_list)ap
 {
-	if (sender == statusbar)
-	{
-		NSText *fieldEditor = [window fieldEditor:NO forObject:sender];
-		if (aSelector == @selector(cancelOperation:) || // escape
-		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
-		    aSelector == @selector(insertNewline:) ||
-		    (aSelector == @selector(deleteBackward:) && [fieldEditor selectedRange].location == 0))
-		{
-			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
-			if (aSelector != @selector(insertNewline:))
-				[statusbar setStringValue:@""];
-			[[statusbar target] performSelector:[statusbar action] withObject:self];
-			return YES;
-		}
-		else if (aSelector == @selector(moveUp:))
-		{
-			INFO(@"%s", "look back in history");
-			return YES;
-		}
-		else if (aSelector == @selector(moveDown:))
-		{
-			INFO(@"%s", "look forward in history");
-			return YES;
-		}
-		else if (aSelector == @selector(insertBacktab:))
-		{
-			return YES;
-		}
-		else if (aSelector == @selector(insertTab:) ||
-		         aSelector == @selector(deleteForward:)) // ctrl-d
-		{
-			NSUInteger caret = [fieldEditor selectedRange].location;
-			NSRange range;
-			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
-
-			if (![filename isAbsolutePath])
-				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
-                        filename = [[filename stringByStandardizingPath] stringByAbbreviatingWithTildeInPath];
-
-                        if ([filename isEqualToString:@"~"])
-                                filename = @"~/";
-
-			NSArray *completions = nil;
-			NSString *completion = nil;
-			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
-	
-			if (completion) {
-				NSMutableString *s = [[NSMutableString alloc] initWithString:[fieldEditor string]];
-				[s replaceCharactersInRange:range withString:completion];
-				[fieldEditor setString:s];
-			}
-
-			if (num == 1 && [completion hasSuffix:@"/"]) {
-				/* If only one directory match, show completions inside that directory. */
-				num = [self completePath:completion intoString:&completion matchesIntoArray:&completions];
-			}
-
-			if (num > 1)
-				[self displayCompletions:completions forPath:completion];
-
-			return YES;
-		}
-	}
-	return NO;
+	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];
 }
+
+- (void)message:(NSString *)fmt, ...
+{
+	va_list ap;
+	va_start(ap, fmt);
+	[self message:fmt arguments:ap];
+	va_end(ap);
+}
+
+#if 0
+// tag push
+- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn
+{
+	[[windowController sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
+}
+
+- (void)popTag
+{
+	NSDictionary *location = [[windowController sharedTagStack] pop];
+	if (location == nil) {
+		[self message:@"The tags stack is empty"];
+		return;
+	}
+
+	[windowController gotoURL:[NSURL fileURLWithPath:[location objectForKey:@"file"]]
+			     line:[[location objectForKey:@"line"] unsignedIntegerValue]
+			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
+}
+#endif
+
+- (void)switchToLastDocument
+{
+	[windowController switchToLastDocument];
+}
+
+- (void)selectTabAtIndex:(NSInteger)anIndex
+{
+	[windowController selectTabAtIndex:anIndex];
+}
+
+
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView
+{
+	ViDocumentView *docView = [windowController documentViewForView:aTextView];
+	ViDocumentView *otherView = [[docView tabController] viewAtPosition:position relativeTo:[docView view]];
+	if (otherView == nil)
+		return NO;
+	[windowController selectDocumentView:otherView];
+	return YES;
+}
+
+#pragma mark -
+#pragma mark Filename completion
 
 - (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
 {
@@ -253,6 +246,77 @@
 	[commandSplit setPosition:NSHeight([commandSplit frame])*0.60 ofDividerAtIndex:0];
 }
 
+#pragma mark -
+#pragma mark Input of ex commands
+
+- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
+{
+	if (sender == statusbar)
+	{
+		NSText *fieldEditor = [window fieldEditor:NO forObject:sender];
+		if (aSelector == @selector(cancelOperation:) || // escape
+		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
+		    aSelector == @selector(insertNewline:) ||
+		    (aSelector == @selector(deleteBackward:) && [fieldEditor selectedRange].location == 0))
+		{
+			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
+			if (aSelector != @selector(insertNewline:))
+				[statusbar setStringValue:@""];
+			[[statusbar target] performSelector:[statusbar action] withObject:self];
+			return YES;
+		}
+		else if (aSelector == @selector(moveUp:))
+		{
+			INFO(@"%s", "look back in history");
+			return YES;
+		}
+		else if (aSelector == @selector(moveDown:))
+		{
+			INFO(@"%s", "look forward in history");
+			return YES;
+		}
+		else if (aSelector == @selector(insertBacktab:))
+		{
+			return YES;
+		}
+		else if (aSelector == @selector(insertTab:) ||
+		         aSelector == @selector(deleteForward:)) // ctrl-d
+		{
+			NSUInteger caret = [fieldEditor selectedRange].location;
+			NSRange range;
+			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
+
+			if (![filename isAbsolutePath])
+				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
+                        filename = [[filename stringByStandardizingPath] stringByAbbreviatingWithTildeInPath];
+
+                        if ([filename isEqualToString:@"~"])
+                                filename = @"~/";
+
+			NSArray *completions = nil;
+			NSString *completion = nil;
+			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
+	
+			if (completion) {
+				NSMutableString *s = [[NSMutableString alloc] initWithString:[fieldEditor string]];
+				[s replaceCharactersInRange:range withString:completion];
+				[fieldEditor setString:s];
+			}
+
+			if (num == 1 && [completion hasSuffix:@"/"]) {
+				/* If only one directory match, show completions inside that directory. */
+				num = [self completePath:completion intoString:&completion matchesIntoArray:&completions];
+			}
+
+			if (num > 1)
+				[self displayCompletions:completions forPath:completion];
+
+			return YES;
+		}
+	}
+	return NO;
+}
+
 - (IBAction)finishedExCommand:(id)sender
 {
 	NSString *exCommand = [statusbar stringValue];
@@ -305,30 +369,30 @@
 	}
 }
 
-- (void)executeForDocument:(ViDocument *)aDocument textView:(ViTextView *)aTextView
+- (void)executeForTextView:(ViTextView *)aTextView
 {
-	exDocument = aDocument;
 	exTextView = aTextView;
 	[self getExCommandWithDelegate:self selector:@selector(parseAndExecuteExCommand:contextInfo:) prompt:@":" contextInfo:NULL];
 }
 
-- (void)message:(NSString *)fmt arguments:(va_list)ap
-{
-	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];
-}
+#pragma mark -
+#pragma mark Finding
 
-- (void)message:(NSString *)fmt, ...
+#if 0
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	va_list ap;
-	va_start(ap, fmt);
-	[self message:fmt arguments:ap];
-	va_end(ap);
+	return [(ViTextView *)[[views objectAtIndex:0] textView] findPattern:pattern options:find_options];
 }
+#endif
+
+#pragma mark -
+#pragma mark Ex commands
 
 
 - (void)ex_write:(ExCommand *)command
 {
-	[exDocument saveDocument:self];
+	ViDocument *doc = [[windowController documentViewForView:exTextView] document];
+	[doc saveDocument:self];
 }
 
 - (void)ex_quit:(ExCommand *)command
@@ -411,7 +475,7 @@
 		return;
 	}
 
-	NSInteger location = [[exDocument textStorage] locationForStartOfLine:line];
+	NSInteger location = [[exTextView textStorage] locationForStartOfLine:line];
 	if (location == -1)
 		[self message:@"Movement past the end-of-file"];
 	else {

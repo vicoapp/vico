@@ -779,53 +779,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	va_end(ap);
 }
 
-- (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo
+- (ExEnvironment *)environment
 {
-	[[windowController exEnvironment] getExCommandWithDelegate:aDelegate selector:aSelector prompt:aPrompt contextInfo:contextInfo];
-}
-
-- (void)executeExCommandForTextView:(ViTextView *)aTextView
-{
-	[[windowController exEnvironment] executeForDocument:self textView:aTextView];
-}
-
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
-{
-	return [(ViTextView *)[[views objectAtIndex:0] textView] findPattern:pattern options:find_options];
-}
-
-// tag push
-- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn
-{
-	[[windowController sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
-}
-
-- (void)popTag
-{
-	NSDictionary *location = [[windowController sharedTagStack] pop];
-	if (location == nil) {
-		[self message:@"The tags stack is empty"];
-		return;
-	}
-
-	[windowController gotoURL:[NSURL fileURLWithPath:[location objectForKey:@"file"]]
-			     line:[[location objectForKey:@"line"] unsignedIntegerValue]
-			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
-}
-
-- (void)switchToLastDocument
-{
-	[windowController switchToLastDocument];
-}
-
-- (void)selectTabAtIndex:(NSInteger)anIndex
-{
-	[windowController selectTabAtIndex:anIndex];
-}
-
-- (NSString *)currentDirectory
-{
-	return [[windowController exEnvironment] currentDirectory];
+	return [windowController exEnvironment];
 }
 
 #pragma mark -

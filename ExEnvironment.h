@@ -1,3 +1,5 @@
+#import "ViDocumentTabController.h"
+
 @class ViTextView;
 @class ViDocument;
 @class ViWindowController;
@@ -17,7 +19,6 @@
 
 	SEL			 exCommandSelector;
 	ViTextView		*exTextView;
-	ViDocument		*exDocument;
 	id			 exDelegate;
 	void			*exContextInfo;
 
@@ -30,7 +31,13 @@
 - (void)message:(NSString *)fmt arguments:(va_list)ap;
 
 - (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
-- (void)executeForDocument:(ViDocument *)aDocument textView:(ViTextView *)aTextView;
+- (void)executeForTextView:(ViTextView *)aTextView;
+
+- (BOOL)changeCurrentDirectory:(NSString *)path;
+
+- (void)switchToLastDocument;
+- (void)selectTabAtIndex:(NSInteger)anIndex;
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView;
 
 @end
 

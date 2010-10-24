@@ -337,10 +337,10 @@
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
-	[[self delegate] getExCommandWithDelegate:self
-					 selector:@selector(filter_through_shell_command:contextInfo:)
-					   prompt:@"!"
-				      contextInfo:command];
+	[[[self delegate] environment] getExCommandWithDelegate:self
+						       selector:@selector(filter_through_shell_command:contextInfo:)
+							 prompt:@"!"
+						    contextInfo:command];
 	final_location = start_location;
 	return YES;
 }
@@ -1657,6 +1657,26 @@
 		[[self delegate] message:@"Unrecognized text object."];
 		return NO;
 	}
+}
+
+- (BOOL)window_left:(ViCommand *)command
+{
+	return [[[self delegate] environment] selectViewAtPosition:ViViewLeft relativeTo:self];
+}
+
+- (BOOL)window_down:(ViCommand *)command
+{
+	return [[[self delegate] environment] selectViewAtPosition:ViViewDown relativeTo:self];
+}
+
+- (BOOL)window_up:(ViCommand *)command
+{
+	return [[[self delegate] environment] selectViewAtPosition:ViViewUp relativeTo:self];
+}
+
+- (BOOL)window_right:(ViCommand *)command
+{
+	return [[[self delegate] environment] selectViewAtPosition:ViViewRight relativeTo:self];
 }
 
 @end

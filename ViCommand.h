@@ -5,6 +5,7 @@ struct vikey
 	NSString *method;
 	unichar key;
 	unsigned int flags;
+	struct vikey *map;
 };
 
 @interface ViCommand : NSObject

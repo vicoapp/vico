@@ -378,4 +378,14 @@
 	STAssertTrue(parser.argument == 'a', nil);
 }
 
+- (void)test093_PrefixKeys
+{
+	[parser pushKey:0x17];	// C-w
+	STAssertFalse(parser.complete, nil);
+	[parser pushKey:'l'];
+	STAssertTrue(parser.complete, nil);
+	STAssertEqualObjects(parser.method, @"window_right:", nil);
+}
+
 @end
+

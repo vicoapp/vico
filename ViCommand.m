@@ -33,10 +33,26 @@ static struct vikey insert_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey window_keys[] = {
+	{@"window_left:",	0x8, 0},	// ^H
+	{@"window_down:",	0xA, 0},	// ^J
+	{@"window_up:",		0xB, 0},	// ^K
+	{@"window_right:",	0xC, 0},	// ^L
+	{@"window_close:",	'c', 0},
+	{@"window_left:",	'h', 0},
+	{@"window_down:",	'j', 0},
+	{@"window_up:",		'k', 0},
+	{@"window_right:",	'l', 0},
+	{@"window_split:",	's', 0},
+	{@"window_vsplit:",	'v', 0},
+	{nil, -1, 0}
+};
+
 static struct vikey normal_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
+	{@"scroll_downward:",	0x4, 0}, // ^D
 	{@"scroll_down_by_line:",0x5, 0}, // ^E
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
@@ -46,6 +62,8 @@ static struct vikey normal_keys[] = {
 	{@"jumplist_backward:",	0xF, 0},  // ^O
 	{@"show_info:",		0x7, 0},  // ^G
 	{@"pop_tag:",		0x14, 0}, // ^T
+	{@"scroll_upwards:",	0x15, 0}, // ^U
+	{@"window_prefix:",	0x17, 0, window_keys}, // ^W
 	{@"scroll_up_by_line:",	0x19, 0}, // ^Y
 	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"jump_tag:",		0x1D, 0}, // ^]
@@ -431,7 +449,9 @@ find_command_in_map(unichar key, struct vikey map[])
 		else if (has_flag(vikey, VIF_NEED_CHAR)) {
 			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
 			state = ViCommandNeedChar;
-		} else
+		} else if (vikey->map != NULL)
+			map = vikey->map;
+		else
 			[self setComplete];
 	} else if (state == ViCommandNeedMotion) {
 		motion_key = aKey;
@@ -453,6 +473,8 @@ find_command_in_map(unichar key, struct vikey map[])
 
 		if (has_flag(vikey, VIF_NEED_CHAR))
 			state = ViCommandNeedChar;
+		else if (vikey->map != NULL)
+			map = vikey->map;
 		else
 			[self setComplete];
 	}

@@ -443,7 +443,7 @@ size_t num_requests = 64;
 		do_close(conn, handle, handle_len);
 	} else {
 		status = do_close(conn, handle, handle_len);
-		if (outError)
+		if (status != SSH2_FX_OK && outError)
 			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)]];
 	}
 

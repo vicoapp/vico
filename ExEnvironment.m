@@ -324,7 +324,10 @@
 	[statusbar setEditable:NO];
 	[statusbar setHidden:YES];
 	[messageField setHidden:NO];
-	[window makeFirstResponder:exTextView];
+	if (exTextView)
+		[window makeFirstResponder:exTextView];
+	else
+		[window makeFirstResponder:exDelegate];
 	if ([exCommand length] == 0)
 		return;
 

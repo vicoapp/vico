@@ -190,8 +190,6 @@ static NSWindowController	*currentWindowController = nil;
 	isLoaded = YES;
 	if (initialDocument) {
 		[self addNewTab:initialDocument];
-                lastDocument = initialDocument;
-                lastDocumentView = [[lastDocument views] objectAtIndex:0];
                 initialDocument = nil;
 	}
 
@@ -644,6 +642,7 @@ static NSWindowController	*currentWindowController = nil;
 	[self didSelectDocument:[docView document]];
 	[self updateSelectedSymbolForLocation:[[docView textView] caret]];
 
+	lastDocumentView = currentView;
 	currentView = docView;
 }
 

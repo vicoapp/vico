@@ -32,7 +32,6 @@
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
-	ViDocument *lastDocument;
 	ViDocumentView *lastDocumentView;
 
 	ViProject *project;

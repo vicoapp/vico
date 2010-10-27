@@ -52,7 +52,6 @@
 - (void)configureSyntax;
 - (void)changeTheme:(ViTheme *)aTheme;
 - (void)updatePageGuide;
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;

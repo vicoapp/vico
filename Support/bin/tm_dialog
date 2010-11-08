@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [[ -e "$DIALOG" ]]
+	then "$DIALOG" "$@"
+	else echo 1>&2 "ERROR: Please read the 2007-03-15 update at http://macromates.com/blog/archives/2006/10/28/new-dialog-system-for-commands/"
+fi

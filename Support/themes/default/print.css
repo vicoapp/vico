@@ -1,0 +1,85 @@
+body {
+	font-family: "Palatino", "Book Antiqua", "Baskerville", serif;
+	font-size: 10pt;
+	margin: 2em 2em 2em 4.5em;
+}
+#tm_webpreview_header {
+	display: none;
+}
+
+#tm_webpreview_footer {
+	display: none;
+}
+
+	
+a:link, a:visited {
+	color: #520;
+	background: transparent;
+	font-weight: bold;
+	text-decoration: none;
+}
+h1 {
+	color: #333;
+}
+h2 {
+	color: #222;
+}
+
+h3 {
+	color: #333;
+}
+
+h4 {
+	font-style: italic;
+	color: #666;
+}
+
+blockquote {
+	margin: 1em 25px;
+	padding-left: 1em;
+}
+
+code, pre {
+	color: #1C360C;
+}
+
+
+pre {
+	padding: 10px 10px 10px 20px;
+	background-color: #f0f0f0;
+	border: 1px solid #cccbba;
+}
+
+.pro_table {
+	border-top: 1px solid #919699;
+	border-left: 1px solid #919699;
+}
+.pro_table th {
+	background: #E2E2E2;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+	font-weight: bold;
+	padding: 4px 8px 4px 8px;
+	text-align: left;
+}
+.pro_table td {
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+	padding: 8px;
+	vertical-align: top;
+}
+
+.footnote {
+	color: #525151;
+}
+.footnote:before {
+	color: #525151;
+}
+.footnote:after {
+	color: #525151;
+}
+div.footnotes {
+   padding: 1em;
+   font-size: 90%;
+   background: #F0F0F0;
+}

@@ -1,0 +1,193 @@
+/*
+
+Default style sheet for commands that output HTML.  Please use this (and customize
+locally if needed) for all commands, as it will help provide a unified look.
+Changes to this document should be coordinated (with me, for instance :-p).
+
+Most css was originally derived and adapted from the Objective-C bundle.
+The color scheme is gray-ish.
+
+If someone disagrees with the look.. well.. I'm no designer, so let's talk about it
+then :-). Especially applies to the authors of the Objective-C bundle from which I
+derived much.
+
+By Sune Foldager.
+Version 1, 2005-05-20.
+
+*/
+
+
+/* General formatting. */
+
+body {
+   font-family: "Lucida Grande", sans-serif;
+   font-size: 11pt;
+}
+
+h1 {
+   font-size: 16pt;
+   text-shadow: #ddd 2px 3px 3px;
+}
+
+hr {
+	color: #bbb;
+   margin: 2px;
+   margin-top: 6px;
+   margin-bottom: 6px;
+	background-color: #bbb;
+	height: 1px;
+	border: 0px;
+}
+
+pre, code, tt {
+   font-family: "Bitstream Vera Sans Mono", "Monaco", monospace;
+   font-size: medium;
+}
+
+/** The “pro” table look (used in Apple’s documentation)
+
+	Example:
+
+		<table class="graybox" cellspacing="0" cellpadding="5">
+			<tr>
+				<th>First</th>
+				<th>Last</th>
+			</tr>
+
+			<tr>
+				<td><p>Allan</p></td>
+				<td><p>Odgaard</p></td>
+			</tr>
+		</table>
+
+**/
+
+.graybox {
+	border-top: 1px solid #919699;
+	border-left: 1px solid #919699;
+}
+.graybox th {
+	background: #E2E2E2;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+	font-weight: bold;
+	padding: 4px 8px 4px 8px;
+}
+.graybox td {
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+	padding: 4px;
+	vertical-align: top;
+}
+.graybox p {
+	margin: 0;
+}
+.graybox p + p {
+	margin-top: 1em;
+}
+
+/* Sidebars and boxes. */
+
+div.sideBar {
+   display: block;
+   position: relative;
+   border-left: 2px solid #888;
+   background: #eee;
+   color: #888;
+   padding: 2px;
+   margin: 3px;
+   font-size: 10pt;
+}
+
+div.sideBar strong {
+   color: #555;
+}
+
+div.box {
+   display: block;
+   position: relative;
+   border: 2px solid #888;
+   background: #eee;
+   color: #888;
+   padding: 2px;
+   margin: 3px;
+   font-size: 10pt;
+}
+
+div.box strong {
+   color: #555;
+}
+
+.toggle {
+   position: absolute;
+   color: #00a;
+   top: 0px;
+   right: 8px;
+   font-size: 8pt;
+   margin: 0px;
+   margin-top: 2px;
+   margin-bottom: 2px;
+}
+
+.sideBar .toggle {
+   right: 10px;
+}
+
+.toggle :link, .toggle :visited {
+   color: #00a;
+   font-size: 8pt;
+}
+
+.toggle :active {
+   color: #e00;
+}
+
+.sideBar .details, .box .details {
+   font-size: 9pt;
+}
+
+.warning {
+    color: orange;
+}
+
+.error {
+    color: red;
+}
+
+/* a */
+td.added {
+   color: green;
+   background-color: #bbffb3;	
+}
+
+/* M */
+td.modified {
+	color: #eb6400;
+	background-color: #f7e1ad;
+}
+
+/* D */
+td.deleted {
+	color: red;
+	background-color: #f59696;
+}
+
+/* C, !, " */
+td.conflict, td.missing, td.typeconflict {
+	color: teal;
+	background-color: #A3CED0;
+}
+
+/* ?, I, X */
+td.unknown, td.ignore, td.external {
+	color: purple;
+	background-color: #edaef5;
+}
+
+div.bibtex {
+    background-color: #EBD3DF;
+}
+
+div.mkindex {
+    background-color: #C9EDCC;
+}

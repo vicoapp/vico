@@ -1,0 +1,76 @@
+/* =================== */
+/* = General Styling = */
+/* =================== */
+.dark {
+	background: #000;
+	color: #E6E2E8;
+}
+.dark a {
+	color: #BBE;
+}
+
+.dark h1 {
+	color: #FFF;
+	text-shadow:  #808080 3px 3px 5px;
+}
+
+.dark h2 {
+	text-shadow:  #808080 3px 3px 5px;
+}
+
+.dark h3 {
+	text-shadow:  #808080 3px 3px 5px;
+}
+
+.dark blockquote {
+	border-left: 4px solid #808080;
+	color: #FFF;
+}
+
+.dark code {
+	color: #C1DE77;
+}
+
+.dark pre {
+	color: #FFF;
+	background-color: #111;
+	border: 1px solid #555;
+}
+
+
+.dark .pro_table {
+	border-top: 1px solid #616465;
+	border-left: 1px solid #616465;
+}
+.dark .pro_table th {
+	background: #1C1C1C;
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.dark .pro_table td {
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.dark .footnote:before {
+	color: #888;
+}
+.dark .footnote:after {
+	color: #888;
+}
+
+.dark div.footnotes {
+   background: #111;
+}
+
+
+.dark td, .dark th {
+	color: #EEE;
+}
+
+.dark caption, .dark label {
+	color: #CCC;
+}
+
+.dark .alternate {
+	background-color: #111;
+}

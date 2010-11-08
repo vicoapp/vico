@@ -1,0 +1,77 @@
+/* ================================= */
+/* = Common Stuff for all Commands = */
+/* ================================= */
+
+.night {
+  background-color:black;
+  color:#ccc;
+}
+.night a {
+	color: rgb(192,135,30);
+	text-decoration: none;
+}
+
+.night a:hover {
+	text-decoration: underline;
+}
+
+.night h1 {
+	color: #fff;
+	text-shadow:  #0c122c 3px 3px 5px;
+}
+
+.night h2 {
+	text-shadow:  #0c122c 3px 3px 5px;
+}
+
+.night h3 {
+	text-shadow:  #0c122c 3px 3px 5px;
+}
+
+.night blockquote {
+	border-left: 4px solid #E6E5DD;
+}
+.night code {
+  color: #C1DE77;
+}
+
+.night pre {
+	background-color: #111;
+}
+
+.night .pro_table {
+	border-top: 1px solid #616465;
+	border-left: 1px solid #616465;
+}
+.night .pro_table th {
+	background: #1C1C1C;
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.night .pro_table td {
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.night .footnote:before {
+	color: #888;
+}
+.night .footnote:after {
+	color: #888;
+}
+
+.night div.footnotes {
+   background: #111;
+}
+
+
+.night td, .dark th {
+	color: #EEE;
+}
+
+.night caption, .dark label {
+	color: #CCC;
+}
+
+.night .alternate {
+	background-color: #111;
+}%

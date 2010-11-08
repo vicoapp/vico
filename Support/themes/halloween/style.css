@@ -1,0 +1,90 @@
+/* =================== */
+/* = General Styling = */
+/* =================== */
+
+.halloween #tm_webpreview_header .headline {
+	color: #F9BB46;
+	text-shadow: #E27A14 0px -5px 5px;
+}
+.halloween #tm_webpreview_header .type {
+	color: #F78446;
+}
+
+.halloween {
+	background: #000;
+	color: #E27A14;
+}
+
+.halloween ::selection {
+	background-color: rgba(50, 00, 0, 1);
+}
+
+.halloween a {
+	color: #F9BB46;
+}
+
+.halloween h1 {
+	color: #F9BB46;
+	text-shadow: #E27A14 0px -3px 5px;
+}
+
+.halloween h2 {
+	text-shadow: #E27A14 0px -3px 5px;
+}
+
+.halloween h3 {
+	text-shadow: #E27A14 0px -2px 5px;
+}
+
+.halloween blockquote {
+	border-left: 4px solid #F9BB46;
+	color: #F9BB46;
+}
+
+.halloween code {
+	color: #F9BB46;
+}
+
+.halloween pre {
+	color: #FFF;
+	background-color: #200000;
+	border: 1px solid #555;
+}
+
+
+.halloween .pro_table {
+	border-top: 1px solid #616465;
+	border-left: 1px solid #616465;
+}
+.halloween .pro_table th {
+	background: #1C1C1C;
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.halloween .pro_table td {
+	border-bottom: 1px solid #616465;
+	border-right: 1px solid #616465;
+}
+.halloween .footnote:before {
+	color: #888;
+}
+.halloween .footnote:after {
+	color: #888;
+}
+
+.halloween div.footnotes {
+   background: #111;
+}
+
+
+.halloween td, .halloween th {
+	color: #EEE;
+}
+
+.halloween caption, .halloween label {
+	color: #CCC;
+}
+
+.halloween .alternate {
+	background-color: #200000;
+}

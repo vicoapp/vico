@@ -1,0 +1,69 @@
+/* ================================= */
+/* = Common Stuff for all Commands = */
+/* ================================= */
+
+.bright {
+	background: #FFF;
+	color: #000;
+}
+.bright a {
+	color: #0D2681;
+}
+
+.bright h1 {
+	text-shadow:  #DDDDDD 3px 3px 5px;
+	color: #333;
+}
+.bright h2 {
+	color: #222;
+	text-shadow:  #DDDDDD 3px 3px 5px;
+}
+.bright h3 {
+	color: #333;
+	text-shadow:  #DDDDDD 3px 3px 5px;
+}
+.bright h4 {
+	color: #666;
+}
+
+.bright blockquote {
+	border-left: 4px solid #E6E5DD;
+}
+.bright code {
+	color: #1C360C;
+}
+
+.bright pre {
+	background-color: #f0f0f0;
+	border: 1px solid #cccbba;
+}
+
+.bright .pro_table {
+	border-top: 1px solid #919699;
+	border-left: 1px solid #919699;
+}
+.bright .pro_table th {
+	background: #E2E2E2;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+.bright .pro_table td {
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+.bright .footnote {
+	color: #525151;
+}
+.bright .footnote:before {
+	color: #525151;
+}
+.bright .footnote:after {
+	color: #525151;
+}
+.bright div.footnotes {
+   background: #F0F0F0;
+}
+
+.bright .alternate {
+	background-color: #F0F0F0;
+}

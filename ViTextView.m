@@ -1263,7 +1263,7 @@ int logIndent = 0;
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
 {
 	NSString *string;
-	
+
 	if ([aString isMemberOfClass:[NSAttributedString class]])
 		string = [aString string];
 	else
@@ -1351,6 +1351,13 @@ int logIndent = 0;
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags
 {
 	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
+
+	NSDictionary *bundleCommand = [[[self delegate] bundle] commandWithKey:charcode andFlags:flags matchingScopes:[self scopesAtLocation:[self caret]]];
+	if (bundleCommand) {
+		DEBUG(@"got bundle command %@", bundleCommand);
+		[self performBundleCommand:bundleCommand];
+		return;
+	}
 
 	/* Special handling of command-[0-9] to switch tabs. */
 	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {

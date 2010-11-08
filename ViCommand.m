@@ -299,6 +299,7 @@ find_command_in_map(unichar key, struct vikey map[])
 @implementation ViCommand
 
 @synthesize complete;
+@synthesize partial;
 @synthesize method;
 @synthesize count;
 @synthesize motion_count;
@@ -313,6 +314,7 @@ find_command_in_map(unichar key, struct vikey map[])
 - (void)setComplete
 {
 	complete = YES;
+	partial = NO;
 
 	if (command && command->key == '.') {
 		is_dot = YES;
@@ -403,6 +405,7 @@ find_command_in_map(unichar key, struct vikey map[])
 - (void)pushKey:(unichar)aKey
 {
 	is_dot = NO;
+	partial = YES;
 
 	if (state == ViCommandNeedChar) {
 		argument = aKey;
@@ -482,6 +485,7 @@ find_command_in_map(unichar key, struct vikey map[])
 
 - (void)reset
 {
+	partial = NO;
 	complete = NO;
 	method = nil;
 	command = NULL;

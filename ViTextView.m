@@ -1352,11 +1352,20 @@ int logIndent = 0;
 {
 	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
 
-	NSDictionary *bundleCommand = [[[self delegate] bundle] commandWithKey:charcode andFlags:flags matchingScopes:[self scopesAtLocation:[self caret]]];
-	if (bundleCommand) {
-		DEBUG(@"got bundle command %@", bundleCommand);
-		[self performBundleCommand:bundleCommand];
-		return;
+	if (parser.partial && (flags & ~NSNumericPadKeyMask) != 0) {
+		[[self delegate] message:@"Vi command interrupted by key equivalent."];
+		[parser reset];
+	}
+
+	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
+		NSDictionary *bundleCommand = [[[self delegate] bundle] commandWithKey:charcode
+									      andFlags:flags
+									matchingScopes:[self scopesAtLocation:[self caret]]];
+		if (bundleCommand) {
+			DEBUG(@"got bundle command %@", bundleCommand);
+			[self performBundleCommand:bundleCommand];
+			return;
+		}
 	}
 
 	/* Special handling of command-[0-9] to switch tabs. */

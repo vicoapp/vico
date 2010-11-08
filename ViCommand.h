@@ -48,6 +48,7 @@ struct vikey
 - (void)setInsertMap;
 
 @property(readonly) BOOL complete;
+@property(readonly) BOOL partial;
 @property(readonly) NSString *method;
 @property(readwrite) int count;
 @property(readwrite) int motion_count;

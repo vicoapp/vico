@@ -12,6 +12,33 @@
 			@"string.quoted.double.c",
 			@"punctuation.definition.string.begin.c",
 			nil];
+
+	scopeObjCString = [NSArray arrayWithObjects:
+		 @"source.objc",
+		 @"meta.implementation.objc",
+		 @"meta.scope.implementation.objc",
+		 @"meta.function-with-body.objc",
+		 @"meta.block.c",
+		 @"meta.bracketed.objc",
+		 @"meta.function-call.objc",
+		 @"string.quoted.double.objc",
+		 nil];
+
+	scopeObjC = [NSArray arrayWithObjects:
+		 @"source.objc",
+		 @"meta.implementation.objc",
+		 @"meta.scope.implementation.objc",
+		 @"meta.function-with-body.objc",
+		 @"meta.block.c",
+		 nil];
+
+	scopeObjCpp = [NSArray arrayWithObjects:
+		 @"source.objc++",
+		 @"meta.implementation.objc++",
+		 @"meta.scope.implementation.objc++",
+		 @"meta.function-with-body.objc++",
+		 @"meta.block.c",
+		 nil];
 }
 
 /* The rank is calculated according to the rules in the TextMate manual, section 13.5:
@@ -140,4 +167,45 @@
 	COMPARE(@"source.c string punctuation", <, @"source string.quoted punctuation");
 }
 
+- (void)test031_ExcludedSelectorNonMatch
+{
+	STAssertEquals([@"source.objc - string - comment" matchesScopes:scopeCString], 0ULL, nil);
+}
+
+- (void)test032_ExcludedSelector2
+{
+	STAssertEquals([@"source.objc - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+}
+
+- (void)test033_GroupedSelectorsMatch
+{
+	STAssertEquals([@"keyword, string" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
+}
+
+- (void)test033_GroupedSelectorsMatch2
+{
+	STAssertEquals([@"string, keyword" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
+}
+
+- (void)test034_GroupedSelectorsNonMatch
+{
+	STAssertEquals([@"keyword, blargh" matchesScopes:scopeCString], 0ULL, nil);
+}
+
+- (void)test035_GroupedSelectorsWithExclusions
+{
+	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+}
+
+- (void)test036_GroupedSelectorsWithExclusions2
+{
+	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjCpp], 1*DEPTH_RANK+10, nil);
+}
+
+- (void)test037_GroupedSelectorsWithExclusionsNonMatch
+{
+	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjCString], 0ULL, nil);
+}
+
 @end
+

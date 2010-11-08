@@ -26,7 +26,7 @@
 {
 	tabstops = [[NSMutableArray alloc] init];
 
-	INFO(@"snippet string = %@", aString);
+	INFO(@"snippet string = %@ at location %llu", aString, aLocation);
 
         NSMutableString *s = [aString mutableCopy];
 	BOOL foundMarker;
@@ -47,7 +47,8 @@
                                  */
                                 NSRange r = NSMakeRange(i + aLocation, 0);
                                 NSString *defaultValue = placeHolder.defaultValue;
-                                if (defaultValue == nil && [tabstops objectAtIndex:placeHolder.tabStop]) {
+                                if (defaultValue == nil && placeHolder.tabStop < [tabstops count] &&
+                                    [tabstops objectAtIndex:placeHolder.tabStop]) {
                                 	/* This is a mirror. Use default value from first placeholder. */
                                 	defaultValue = [[[tabstops objectAtIndex:placeHolder.tabStop] objectAtIndex:0] defaultValue];
 				}

@@ -63,32 +63,22 @@
 {
 	NSString *inputText = nil;
 
-	if ([type isEqualToString:@"selection"])
-	{
+	if ([type isEqualToString:@"selection"]) {
 		NSRange sel = [self selectedRange];
-		if (sel.length > 0)
-		{
+		if (sel.length > 0) {
 			*rangePtr = sel;
 			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 		}
-	}
-	else if ([type isEqualToString:@"document"])
-	{
+	} else if ([type isEqualToString:@"document"]) {
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
-	}
-	else if ([type isEqualToString:@"scope"])
-	{
+	} else if ([type isEqualToString:@"scope"]) {
 		*rangePtr = [self trackScopeSelector:[command objectForKey:@"scope"] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
-	}
-	else if ([type isEqualToString:@"none"])
-	{
+	} else if ([type isEqualToString:@"none"]) {
 		inputText = @"";
 		*rangePtr = NSMakeRange(0, 0);
-	}
-	else if ([type isEqualToString:@"word"])
-	{
+	} else if ([type isEqualToString:@"word"])
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr];
 	}
 
@@ -193,8 +183,7 @@
 		DEBUG(@"using template %s", tmpl);
 		templateFilename = strdup(tmpl);
 		fd = mkstemp(templateFilename);
-		if (fd == -1)
-		{
+		if (fd == -1) {
 			NSLog(@"failed to open temporary file: %s", strerror(errno));
 			return;
 		}
@@ -234,8 +223,7 @@
 	[self setupEnvironmentForCommand:command];
 	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 	[task launch];
-	if ([inputText length] > 0)
-	{
+	if ([inputText length] > 0) {
 		[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
 		[[shellInput fileHandleForWriting] closeFile];
 	}
@@ -243,15 +231,13 @@
 	[task waitUntilExit];
 	int status = [task terminationStatus];
 
-	if (fd != -1)
-	{
+	if (fd != -1) {
 		unlink(templateFilename);
 		close(fd);
 		free(templateFilename);
 	}
 
-	if (status >= 200 && status <= 207)
-	{
+	if (status >= 200 && status <= 207) {
 		NSArray *overrideOutputFormat = [NSArray arrayWithObjects:
 			@"discard",
 			@"replaceSelectedText", 
@@ -267,11 +253,8 @@
 	}
 
 	if (status != 0)
-	{
 		[[self delegate] message:@"%@: exited with status %i", [command objectForKey:@"name"], status];
-	}
-	else
-	{
+	else {
 		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
 		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
 
@@ -279,18 +262,13 @@
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:inputRange withString:outputText undoGroup:NO];
-		else if ([outputFormat isEqualToString:@"showAsTooltip"])
-		{
+		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];
-		}
-		else if ([outputFormat isEqualToString:@"showAsHTML"])
-		{
+		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
 			[[oc window] makeKeyAndOrderFront:self];
-		}
-		else if ([outputFormat isEqualToString:@"insertAsSnippet"])
-		{
+		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];
 			[[self delegate] setActiveSnippet:[self insertSnippet:outputText atLocation:[self caret]]];

@@ -128,6 +128,7 @@
 		9AE501FF1253862E00579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
 		9AE502021253891700579C54 /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE501FE1253862E00579C54 /* symbol-icons.plist */; };
 		9AE502421253BCA200579C54 /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AE5023D1253BC5F00579C54 /* YAJL.framework */; };
+		9AE629261288A057005EF102 /* Support in Resources */ = {isa = PBXBuildFile; fileRef = 9AE6288B1288A057005EF102 /* Support */; };
 		9AF200D30ECC8BED00C5771B /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF200D20ECC8BED00C5771B /* ViSymbol.m */; };
 		9AF201590ECDDD7E00C5771B /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201540ECDDD7E00C5771B /* NSArray-patterns.m */; };
 		9AF2015A0ECDDD7E00C5771B /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF201560ECDDD7E00C5771B /* ViSyntaxContext.m */; };
@@ -364,6 +365,7 @@
 		9AE501D712535DE200579C54 /* define.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = define.png; path = Images/define.png; sourceTree = "<group>"; };
 		9AE501FE1253862E00579C54 /* symbol-icons.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = "symbol-icons.plist"; sourceTree = "<group>"; };
 		9AE502371253BC5E00579C54 /* YAJL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = YAJL.xcodeproj; path = "yajl-objc/Project/YAJL.xcodeproj"; sourceTree = "<group>"; };
+		9AE6288B1288A057005EF102 /* Support */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Support; sourceTree = "<group>"; };
 		9AF200D10ECC8BED00C5771B /* ViSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbol.h; sourceTree = "<group>"; };
 		9AF200D20ECC8BED00C5771B /* ViSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbol.m; sourceTree = "<group>"; };
 		9AF201530ECDDD7E00C5771B /* NSArray-patterns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray-patterns.h"; sourceTree = "<group>"; };
@@ -534,6 +536,7 @@
 				9AE501FE1253862E00579C54 /* symbol-icons.plist */,
 				9AB0178A0EDDBF8100905BED /* Images */,
 				9A70E9720E9F67B80013AA1D /* Themes */,
+				9AE6288B1288A057005EF102 /* Support */,
 				9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */,
 				9AC16D960D93CDF200AE45E0 /* ViDocumentWindow.xib */,
 				9AC16D930D93CD8F00AE45E0 /* ViDocument.xib */,
@@ -903,6 +906,7 @@
 				9AC2D7D7127035A80056C06B /* TabNewMetal.png in Resources */,
 				9AC2D7D8127035A80056C06B /* TabNewMetalPressed.png in Resources */,
 				9AC2D7D9127035A80056C06B /* TabNewMetalRollover.png in Resources */,
+				9AE629261288A057005EF102 /* Support in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

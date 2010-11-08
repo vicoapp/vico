@@ -80,6 +80,11 @@
 		*rangePtr = NSMakeRange(0, 0);
 	} else if ([type isEqualToString:@"word"])
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr];
+	else if ([type isEqualToString:@"line"]) {
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:[self caret]];
+		*rangePtr = NSMakeRange(bol, eol - bol);
+		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	}
 
 	return inputText;

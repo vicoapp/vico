@@ -42,6 +42,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (ViJumpList *)jumpList;
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;
+- (ViBundle *)bundle;
 @end
 
 @interface ViTextView : NSTextView

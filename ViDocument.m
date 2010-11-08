@@ -35,6 +35,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize symbols;
 @synthesize filteredSymbols;
 @synthesize views;
+@synthesize bundle;
 @synthesize activeSnippet;
 @synthesize encoding;
 @synthesize jumpList;

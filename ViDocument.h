@@ -39,6 +39,7 @@
 }
 
 @property(readonly) NSArray *views;
+@property(readonly) ViBundle *bundle;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
 @property(readwrite, assign) ViSnippet *activeSnippet;

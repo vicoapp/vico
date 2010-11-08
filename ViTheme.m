@@ -35,11 +35,7 @@
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 		[ViBundle normalizePreference:preference intoDictionary:attrs];
 
-		// split up grouped selectors
-		//NSArray *scopeSelectors = [scopeSelector componentsSeparatedByRegularExpressionString:@"\\s*,\\s*"];
-		NSArray *scopeSelectors = [scopeSelector componentsSeparatedByString:@", "];
-		for (scopeSelector in scopeSelectors)
-			[themeAttributes setObject:attrs forKey:scopeSelector];
+		[themeAttributes setObject:attrs forKey:scopeSelector];
 	}
 
 	return self;

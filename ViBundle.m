@@ -124,13 +124,11 @@
 
 		if (prefsValues) {
 			NSString *scope = [prefs objectForKey:@"scope"];
-			for (NSString *s in [scope componentsSeparatedByString:@", "]) {
-				NSMutableDictionary *oldPrefsValues = [prefsForScope objectForKey:s];
-				if (oldPrefsValues)
-					[oldPrefsValues addEntriesFromDictionary:prefsValues];
-				else
-					[prefsForScope setObject:prefsValues forKey:s];
-			}
+			NSMutableDictionary *oldPrefsValues = [prefsForScope objectForKey:scope];
+			if (oldPrefsValues)
+				[oldPrefsValues addEntriesFromDictionary:prefsValues];
+			else
+				[prefsForScope setObject:prefsValues forKey:scope];
 		}
 	}
 
@@ -147,8 +145,8 @@
 		id prefsValue = [settings objectForKey:prefsName];
 		if (prefsValue) {
 			NSString *scope = [prefs objectForKey:@"scope"];
-			for (NSString *s in [scope componentsSeparatedByString:@", "])
-				[prefsForScope setObject:prefsValue forKey:s];
+			if (scope)
+				[prefsForScope setObject:prefsValue forKey:scope];
 		}
 	}
 
@@ -170,21 +168,9 @@
 {
         NSDictionary *snippet;
         for (snippet in snippets)
-        {
-                if ([[snippet objectForKey:@"tabTrigger"] isEqualToString:name])
-                {
-                        // check scopes
-                        NSArray *scopeSelectors = [[snippet objectForKey:@"scope"] componentsSeparatedByString:@", "];
-                        NSString *scopeSelector;
-                        for (scopeSelector in scopeSelectors)
-                        {
-                                if ([scopeSelector matchesScopes:scopes] > 0)
-                                {
-                                        return [snippet objectForKey:@"content"];
-                                }
-                        }
-                }
-        }
+                if ([[snippet objectForKey:@"tabTrigger"] isEqualToString:name] &&
+		    [[snippet objectForKey:@"scope"] matchesScopes:scopes] > 0)
+			return [snippet objectForKey:@"content"];
         
         return nil;
 }

@@ -2,6 +2,8 @@
 #import "NSArray-patterns.h"
 #import "logging.h"
 
+#define MAXSEL	 64
+
 /* returns 10^x */
 static u_int64_t
 tenpow(unsigned x)
@@ -12,25 +14,16 @@ tenpow(unsigned x)
 	return r;
 }
 
-@implementation NSString (scopeSelector)
-
-- (u_int64_t)matchesScopes:(NSArray *)scopes
+static u_int64_t
+match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 {
-	unichar		 buf[1024+1], *p, *end;
-	unichar		*descendants[128];
-	unsigned int	 ndots[128], n;
-	NSUInteger	 length;
+	unichar		*p, *end;
+	unichar		*descendants[MAXSEL];
+	unsigned int	 ndots[MAXSEL], n;
 	NSUInteger	 nscopes, nselectors = 0;
 	NSUInteger	 i, j, k;
 	u_int64_t	 rank = 0ULL;
 
-	length = [self length];
-	if (length == 0)
-		return 1ULL;
-	if (length > 1024)
-		return 0ULL;
-
-	[self getCharacters:buf range:NSMakeRange(0, length)];
 	end = buf + length;
 
 	/* Split the selector into descendants, and count them. */
@@ -51,7 +44,7 @@ tenpow(unsigned x)
 			p++;
 		}
 		ndots[nselectors++] = n;
-		if (nselectors >= 128)
+		if (nselectors >= MAXSEL)
 			return 0ULL;
 	}
 	*p = 0;
@@ -104,6 +97,64 @@ tenpow(unsigned x)
 	}
 
 	return rank;
+}
+
+static u_int64_t
+match_group(unichar *buf, NSUInteger length, NSArray *scopes)
+{
+	unichar		*e, *begin, *end;
+	u_int64_t	 r, incl_rank = 0ULL;
+
+	begin = buf;
+	end = begin + length;
+
+	do {
+		for (e = begin; e < end; e++)
+			if (e + 3 < end && e[0] == ' ' && e[1] == '-' && e[2] == ' ')
+				break;
+		r = match_scopes(begin, e - begin, scopes);
+		if (begin == buf) {
+			if (r == 0ULL)
+				return 0ULL;
+			incl_rank = r;
+		} else if (r > 0ULL)	/* Positive exclusion. */
+			return 0ULL;
+		begin = e + 3;
+	} while (e < end);
+
+	return incl_rank;
+}
+
+@implementation NSString (scopeSelector)
+
+- (u_int64_t)matchesScopes:(NSArray *)scopes
+{
+	unichar		 buf[1024+1], *begin, *p, *end;
+	NSUInteger	 length;
+	u_int64_t	 r;
+
+	length = [self length];
+	if (length == 0)
+		return 1ULL;
+	if (length > 1024)
+		return 0ULL;
+
+	[self getCharacters:buf range:NSMakeRange(0, length)];
+	end = buf + length;
+
+	/* Evaluate each comma-separated group. */
+	for (begin = p = buf; p < end; p++) {
+		if (*p == ',') {
+			*p = '\0';
+			if ((r = match_group(begin, p - begin, scopes)) > 0ULL)
+				return r;
+			begin = p + 1;
+		}
+	}
+
+	if (begin < p)
+		return match_group(begin, p - begin, scopes);
+	return 0ULL;
 }
 
 @end

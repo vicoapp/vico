@@ -106,10 +106,17 @@ static NSMutableCharacterSet *wordSet = nil;
 	return [self wordAtLocation:aLocation range:nil];
 }
 
+- (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, end;
+	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];
+	return aLocation - bol;
+}
+
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
-	NSUInteger bol, eol, end;
-	[[self string] getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
+	NSUInteger bol, end;
+	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];
 	NSUInteger c = 0, i;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	for (i = bol; i <= aLocation && i < end; i++)

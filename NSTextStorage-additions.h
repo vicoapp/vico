@@ -11,6 +11,7 @@
 - (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;
 
+- (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation acceptEOL:(BOOL)acceptEOL;
 

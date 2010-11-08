@@ -23,6 +23,7 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
+- (NSDictionary *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;

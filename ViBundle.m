@@ -164,6 +164,44 @@
 	[commands addObject:command];
 }
 
+- (NSDictionary *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+{
+	NSDictionary *command;
+	for (command in commands) {
+
+		NSString *key = [command objectForKey:@"keyEquivalent"];
+		unichar keyEquiv = 0;
+		NSUInteger modMask = 0;
+		int i;
+		for (i = 0; i < [key length]; i++) {
+			unichar c = [key characterAtIndex:i];
+			switch (c)
+			{
+			case '^':
+				modMask |= NSControlKeyMask;
+				break;
+			case '@':
+				modMask |= NSCommandKeyMask;
+				break;
+			case '~':
+				modMask |= NSAlternateKeyMask;
+				break;
+			default:
+				keyEquiv = c;
+				break;
+			}
+		}
+
+                if (keyEquiv != keycode || flags != modMask)
+                	continue;
+
+		if ([[command objectForKey:@"scope"] matchesScopes:scopes] > 0)
+			return command;
+	}
+
+	return nil;
+}
+
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes
 {
         NSDictionary *snippet;

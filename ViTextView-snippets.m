@@ -7,7 +7,7 @@
 - (void)cancelSnippet:(ViSnippet *)snippet
 {
 	// remove the temporary attribute, effectively cancelling the snippet
-	INFO(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
+	DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
 	[[self delegate] setActiveSnippet:nil];
 	[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
 }
@@ -20,11 +20,11 @@
 
 	if (placeholder == nil) {
 		placeholder = snippet.lastPlaceholder;
-		INFO(@"last placeholder in snippet %@", snippet);
+		DEBUG(@"last placeholder in snippet %@", snippet);
 	}
 
 	if (placeholder) {
-		INFO(@"placing cursor at tabstop %i, range %@", placeholder.tabStop, NSStringFromRange(placeholder.range));
+		DEBUG(@"placing cursor at tabstop %i, range %@", placeholder.tabStop, NSStringFromRange(placeholder.range));
 		final_location = placeholder.range.location;
 		snippet.currentTab = placeholder.tabStop;
 		snippet.currentPlaceholder = placeholder;
@@ -50,15 +50,17 @@
 	// FIXME: sort tabstops, go to tabstop 1 first, then 2, 3, 4, ... and last to 0
 	if ([[snippet tabstops] count] > 1)
 		[self gotoTabstop:1 inSnippet:snippet];
-	else
+	else {
 		[self gotoTabstop:0 inSnippet:snippet];
+		return nil;
+	}
 
 	return snippet;
 }
 
 - (void)handleSnippetTab:(ViSnippet *)snippet atLocation:(NSUInteger)aLocation
 {
-	INFO(@"current tab index is %i", snippet.currentTab);
+	DEBUG(@"current tab index is %i", snippet.currentTab);
 
 	[self gotoTabstop:snippet.currentTab + 1 inSnippet:snippet];
 }
@@ -70,22 +72,15 @@
  */
 - (BOOL)updateSnippet:(ViSnippet *)snippet replaceRange:(NSRange)replaceRange withString:(NSString *)string
 {
-/*
-	if (![snippet activeInRange:replaceRange]) {
-		INFO(@"outside active range, cancelling snippet %@", snippet);
-		return NO;
-	}
-*/
-
-	INFO(@"found snippet %@ while updating %@ with %@", snippet, NSStringFromRange(replaceRange), string);
+	DEBUG(@"found snippet %@ while updating %@ with %@", snippet, NSStringFromRange(replaceRange), string);
 	NSRange currentRange = snippet.currentPlaceholder.range;
-	INFO(@"current range = %@, current value = %@", NSStringFromRange(currentRange), snippet.currentPlaceholder.value);
+	DEBUG(@"current range = %@, current value = %@", NSStringFromRange(currentRange), snippet.currentPlaceholder.value);
 
 	snippet.currentPlaceholder.selected = NO;
 
 	// verify we're inserting inside the current placeholder, or appending to it
 	if (![snippet.currentPlaceholder activeInRange:replaceRange]) {
-		INFO(@"outside current placeholder, cancelling snippet %@", snippet);
+		DEBUG(@"outside current placeholder, cancelling snippet %@", snippet);
 		return NO;
 	}
 
@@ -114,7 +109,7 @@
 		[[self delegate] setActiveSnippet:snippet];
 	}
 
-	INFO(@"tabstops after push = [%@]", snippet.tabstops);
+	DEBUG(@"tabstops after push = [%@]", snippet.tabstops);
 
 	return YES;
 }

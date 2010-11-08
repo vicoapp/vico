@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#import "ViAppController.h"
 #import "ViTextView.h"
 #import "ViCommandOutputController.h"
 #import "ViDocument.h"  // for declaration of the message: method
@@ -118,7 +119,7 @@
 	NSString *bundleSupportPath = [[command objectForKey:@"bundle"] supportPath];
 	[self setenv:"TM_BUNDLE_SUPPORT" value:bundleSupportPath];
 
-	NSString *supportPath = @"/Library/Application Support/TextMate/Support";
+	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
 	[self setenv:"TM_SUPPORT_PATH" value:supportPath];
 
 	char *path = getenv("PATH");

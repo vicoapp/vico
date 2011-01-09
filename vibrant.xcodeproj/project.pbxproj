@@ -970,7 +970,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\npwd\nls -l $TARGET_BUILD_DIR/oniguruma/lib\nrm -rf $TARGET_BUILD_DIR/onig-5.9.2\nrm -rf $TARGET_BUILD_DIR/oniguruma\ntar zxvf $SRCROOT/onig-5.9.2.tar.gz -C $TARGET_BUILD_DIR\ncd $TARGET_BUILD_DIR/onig-5.9.2\nCFLAGS=\"-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" LDFLAGS=\"-Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk -arch i386 -arch x86_64 -arch ppc -mmacosx-version-min=10.5\" ./configure --disable-shared  --disable-dependency-tracking --prefix=$TARGET_BUILD_DIR/oniguruma\nmake install\nls -l $TARGET_BUILD_DIR/oniguruma/lib\n";
+			shellScript = "set -x\npwd\nls -l $TARGET_BUILD_DIR/oniguruma/lib\nrm -rf $TARGET_BUILD_DIR/onig-5.9.2\nrm -rf $TARGET_BUILD_DIR/oniguruma\ntar zxvf $SRCROOT/onig-5.9.2.tar.gz -C $TARGET_BUILD_DIR\ncd $TARGET_BUILD_DIR/onig-5.9.2\nCFLAGS=\"-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch x86_64 -mmacosx-version-min=10.6\" LDFLAGS=\"-Wl,-syslibroot,/Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch x86_64 -mmacosx-version-min=10.6\" ./configure --disable-shared  --disable-dependency-tracking --prefix=$TARGET_BUILD_DIR/oniguruma\nmake install\nls -l $TARGET_BUILD_DIR/oniguruma/lib\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1287,7 +1287,7 @@
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_ENABLE_SYMBOL_SEPARATION = YES;
 				GCC_OPTIMIZATION_LEVEL = 1;
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1309,7 +1309,7 @@
 				);
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -1318,9 +1318,9 @@
 					"-lresolv",
 				);
 				PREBINDING = NO;
-				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx10.5;
-				VALID_ARCHS = "i386 ppc x86_64";
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.6;
+				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
@@ -1333,9 +1333,9 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE_BUILD=1";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1355,7 +1355,7 @@
 					"$(TARGET_BUILD_DIR)/oniguruma/include",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lcrypto",
@@ -1364,8 +1364,8 @@
 				);
 				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = NO;
-				SDKROOT = macosx10.5;
-				VALID_ARCHS = "i386 ppc x86_64";
+				SDKROOT = macosx10.6;
+				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Release;

@@ -4,7 +4,7 @@
 @class ViDocument;
 @class ViWindowController;
 
-@interface ExEnvironment : NSObject
+@interface ExEnvironment : NSObject <NSTextFieldDelegate>
 {
 	IBOutlet NSTextField	*messageField;
 	IBOutlet NSTextField	*statusbar;

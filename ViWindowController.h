@@ -12,7 +12,7 @@
 
 #define ViLicenseChangedNotification @"ViLicenseChangedNotification"
 
-@interface ViWindowController : NSWindowController <ViJumpListDelegate> // disabled, only for 10.6: <NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
+@interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
 	NSTextField *nagTitle;
 

@@ -15,7 +15,6 @@
 #import "MHTextIconCell.h"
 #import "ViAppController.h"
 #import "NSTextStorage-additions.h"
-#include "license.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -124,47 +123,9 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
 
-- (void)licenseChanged:(NSNotification *)notification
-{
-	NSString *licenseKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"licenseKey"];
-	NSString *licenseOwner = [[NSUserDefaults standardUserDefaults] stringForKey:@"licenseOwner"];
-	NSString *licenseEmail = [[NSUserDefaults standardUserDefaults] stringForKey:@"licenseEmail"];
-	if (check_license_3([licenseOwner UTF8String], [licenseEmail UTF8String], [licenseKey UTF8String], NULL, NULL, NULL) == 0) {
-		if (nagTitle)
-			[nagTitle removeFromSuperview];
-		nagTitle = nil;
-	} else if (nagTitle == nil) {
-		NSView *view = [[[self window] contentView] superview];
-		time_t ltime = get_first_launch_date([[ViAppController supportDirectory] fileSystemRepresentation]);
-		time_t now = time(NULL);
-		unsigned int days = (now - ltime) / 86400 + 1;
-		NSString *s = [NSString stringWithFormat:@"Evaluated for %u day%s.", days, days == 1 ? "" : "s"];
-		NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
-		if (days > 30) {
-			[attrs setObject:[NSColor redColor] forKey:NSForegroundColorAttributeName];
-			[attrs setObject:[NSFont boldSystemFontOfSize:12.0] forKey:NSFontAttributeName];
-		} else
-			[attrs setObject:[NSFont titleBarFontOfSize:10.0] forKey:NSFontAttributeName];
-		NSRect rect;
-		rect.size = [s sizeWithAttributes:attrs];
-		rect.size.width += 10;
-		rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
-		rect.origin.y = NSMaxY([view frame]) - rect.size.height - (18 - rect.size.height);
-		nagTitle = [[NSTextField alloc] initWithFrame:rect];
-		[nagTitle setDrawsBackground:NO];
-		[nagTitle setEditable:NO];
-		[nagTitle setBezeled:NO];
-		[nagTitle setTextColor:[NSColor blackColor]];
-		[nagTitle setStringValue:[[NSAttributedString alloc] initWithString:s attributes:attrs]];
-		[view addSubview:nagTitle];
-	}
-}
-
 - (void)windowDidLoad
 {
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
-
-	[self licenseChanged:nil];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
@@ -213,7 +174,6 @@ static NSWindowController	*currentWindowController = nil;
 	if ([self project] != nil)
 		[projectDelegate performSelector:@selector(addURL:) withObject:[[self project] initialURL] afterDelay:0.0];
 
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(licenseChanged:) name:ViLicenseChangedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(caretChanged:) name:ViCaretChangedNotification object:nil];
 

@@ -4,7 +4,6 @@
 #import "ViDocument.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
-#include "license.h"
 
 @implementation ViAppController
 
@@ -47,13 +46,10 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
-				      withIntermediateDirectories:YES
-						       attributes:nil
-							    error:nil] == YES) {
-		/* Set the first launch date, unless it's already set. */
-		get_first_launch_date([[ViAppController supportDirectory] fileSystemRepresentation]);
-	}
+	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
+				  withIntermediateDirectories:YES
+						   attributes:nil
+							error:nil];
 
 	/* initialize default defaults */
 	[[NSUserDefaults standardUserDefaults] registerDefaults:
@@ -75,7 +71,6 @@
 			@"Menlo Regular", @"fontname",
 			@"Mac Classic", @"theme",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
-			NSFullUserName(), @"licenseOwner",
 			[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
 			nil]];
 
@@ -205,38 +200,6 @@ extern BOOL makeNewWindowInsteadOfTab;
 		NSAlert *alert = [NSAlert alertWithError:error];
 		[alert runModal];
 	}
-}
-
-- (IBAction)registerLicense:(id)sender
-{
-	time_t created_at = 0;
-	unsigned int serial = 0;
-	unsigned int flags = 0;
-
-	const char *key = [[licenseKey stringValue] UTF8String];
-	const char *name = [[licenseOwner stringValue] UTF8String];
-	const char *email = [[licenseEmail stringValue] UTF8String];
-
-	[[NSUserDefaults standardUserDefaults] setObject:[licenseKey stringValue] forKey:@"licenseKey"];
-	[[NSUserDefaults standardUserDefaults] setObject:[licenseOwner stringValue] forKey:@"licenseOwner"];
-	[[NSUserDefaults standardUserDefaults] setObject:[licenseEmail stringValue] forKey:@"licenseEmail"];
-
-	if (check_license_quick(key) == 0)
-		NSLog(@"license key appears ok");
-	else
-		NSLog(@"license key not properly formed");
-
-	if (check_license_1(name, email, key, &created_at, &serial, &flags) == 0)
-		INFO(@"license key valid, serial %u, flags %u, created %s", serial, flags, ctime(&created_at));
-	else
-		NSLog(@"license key not valid");
-
-	[registrationWindow orderOut:self];
-}
-
-- (IBAction)dismissRegistrationWindow:(id)sender
-{
-	[registrationWindow orderOut:self];
 }
 
 @end

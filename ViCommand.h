@@ -37,6 +37,7 @@ struct vikey
 	unichar last_ftFT_argument;
 
 	id text;
+	BOOL partial;
 }
 
 - (void)pushKey:(unichar)key;

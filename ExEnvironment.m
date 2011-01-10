@@ -149,7 +149,7 @@
 		suffix = [partialPath lastPathComponent];
 	}
 
-	NSArray *directoryContents = [fm directoryContentsAtPath:[path stringByExpandingTildeInPath]];
+	NSArray *directoryContents = [fm contentsOfDirectoryAtPath:[path stringByExpandingTildeInPath] error:NULL];
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 	NSString *entry;
 	for (entry in directoryContents)

@@ -40,7 +40,7 @@ static NSString *bundlesDirectory = nil;
 
 	NSString *dir = [NSString stringWithFormat:@"%@/Syntaxes", bundleDirectory];
 	NSString *file;
-	for (file in [fm directoryContentsAtPath:dir]) {
+	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {
 		if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
 			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file] forBundle:bundle];
 			[bundle addLanguage:language];
@@ -49,17 +49,17 @@ static NSString *bundlesDirectory = nil;
 	}
 
 	dir = [NSString stringWithFormat:@"%@/Preferences", bundleDirectory];
-	for (file in [fm directoryContentsAtPath:dir])
+	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 		if ([file hasSuffix:@".plist"])
 			[bundle addPreferences:[[NSMutableDictionary alloc] initWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
 
 	dir = [NSString stringWithFormat:@"%@/Snippets", bundleDirectory];
-	for (file in [fm directoryContentsAtPath:dir])
+	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 		if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])
 			[bundle addSnippet:[NSDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
 
 	dir = [NSString stringWithFormat:@"%@/Commands", bundleDirectory];
-	for (file in [fm directoryContentsAtPath:dir])
+	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 		if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
 			[bundle addCommand:[NSMutableDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
 

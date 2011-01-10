@@ -38,7 +38,7 @@
 {
 	BOOL isDirectory = NO;
 	if ([[NSFileManager defaultManager] fileExistsAtPath:aPath isDirectory:&isDirectory] && isDirectory) {
-		NSArray *themeFiles = [[NSFileManager defaultManager] directoryContentsAtPath:aPath];
+		NSArray *themeFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:aPath error:NULL];
 		NSString *themeFile;
 		for (themeFile in themeFiles) {
 			if ([themeFile hasSuffix:@".tmTheme"])

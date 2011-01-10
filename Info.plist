@@ -351,5 +351,7 @@
 	<string>NSApplication</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tool</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.6.6</string>
 </dict>
 </plist>

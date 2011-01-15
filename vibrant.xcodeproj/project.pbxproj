@@ -78,6 +78,10 @@
 		9A73E2810D8ECA4C00859053 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A73E2800D8ECA4C00859053 /* ExCommand.m */; };
 		9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */; };
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
+		9A8A70F012DB885500D5874C /* ber.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70EB12DB885500D5874C /* ber.c */; };
+		9A8A70F112DB885500D5874C /* receipt.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70ED12DB885500D5874C /* receipt.c */; };
+		9A8A70F212DB885500D5874C /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70EF12DB885500D5874C /* sha1.c */; };
+		9A8A70FC12E1847200D5874C /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70FB12E1847200D5874C /* debug.c */; };
 		9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */; };
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
@@ -296,6 +300,13 @@
 		9A7B0E720D01601A00040CAC /* ViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTextView.m; sourceTree = "<group>"; };
 		9A7B0E730D01601A00040CAC /* ViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTextView.h; sourceTree = "<group>"; };
 		9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-cursor.m"; sourceTree = "<group>"; };
+		9A8A70EB12DB885500D5874C /* ber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber.c; sourceTree = "<group>"; };
+		9A8A70EC12DB885500D5874C /* ber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber.h; sourceTree = "<group>"; };
+		9A8A70ED12DB885500D5874C /* receipt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = receipt.c; sourceTree = "<group>"; };
+		9A8A70EE12DB885500D5874C /* receipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = receipt.h; sourceTree = "<group>"; };
+		9A8A70EF12DB885500D5874C /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
+		9A8A70F312DB88EE00D5874C /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
+		9A8A70FB12E1847200D5874C /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViThemeStore.h; sourceTree = "<group>"; };
 		9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViThemeStore.m; sourceTree = "<group>"; };
 		9A8CC2180D1C3E62001EE32A /* ViAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViAppController.h; sourceTree = "<group>"; };
@@ -437,6 +448,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
+				9A8A70EA12DB882200D5874C /* receipt validation */,
 				9AC2D7B31270356E0056C06B /* Tab bar control */,
 				9A0275221259D2D300045B6E /* Mozilla Universal charset detector */,
 				9AE502371253BC5E00579C54 /* YAJL.xcodeproj */,
@@ -678,6 +690,20 @@
 				9A4F7DC10ED56CFE00A3CCF1 /* ViSymbolTransform.h */,
 			);
 			name = "Symbol List";
+			sourceTree = "<group>";
+		};
+		9A8A70EA12DB882200D5874C /* receipt validation */ = {
+			isa = PBXGroup;
+			children = (
+				9A8A70FB12E1847200D5874C /* debug.c */,
+				9A8A70F312DB88EE00D5874C /* sha1.h */,
+				9A8A70EB12DB885500D5874C /* ber.c */,
+				9A8A70EC12DB885500D5874C /* ber.h */,
+				9A8A70ED12DB885500D5874C /* receipt.c */,
+				9A8A70EE12DB885500D5874C /* receipt.h */,
+				9A8A70EF12DB885500D5874C /* sha1.c */,
+			);
+			name = "receipt validation";
 			sourceTree = "<group>";
 		};
 		9AA709780EF284B900B4CE34 /* Categories */ = {
@@ -1031,6 +1057,10 @@
 				9AC2D7C91270358D0056C06B /* PSMTabDragAssistant.m in Sources */,
 				9A195D0E12705F1000434B4A /* ViDocumentTabController.m in Sources */,
 				9AF918F61272F55B00200384 /* ExEnvironment.m in Sources */,
+				9A8A70F012DB885500D5874C /* ber.c in Sources */,
+				9A8A70F112DB885500D5874C /* receipt.c in Sources */,
+				9A8A70F212DB885500D5874C /* sha1.c in Sources */,
+				9A8A70FC12E1847200D5874C /* debug.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1205,6 +1235,7 @@
 					"-lresolv",
 				);
 				PRODUCT_NAME = Vibrant;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -1232,6 +1263,7 @@
 					"-lresolv",
 				);
 				PRODUCT_NAME = Vibrant;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

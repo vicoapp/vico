@@ -21,6 +21,7 @@
 {
 	NSString *host;
 	NSString *user;
+	NSString *home;		/* home directory == current directory on connect */
 
 	NSTask *ssh_task;
 	NSPipe *ssh_input;
@@ -41,6 +42,7 @@
 
 - (Attrib *)stat:(NSString *)path error:(NSError **)outError;
 - (BOOL)isDirectory:(NSString *)path;
+- (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError;
 - (NSArray *)directoryContentsAtPath:(NSString *)path error:(NSError **)outError;
 - (NSString *)currentDirectory;
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;

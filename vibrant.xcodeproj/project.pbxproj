@@ -82,6 +82,7 @@
 		9A8A70F112DB885500D5874C /* receipt.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70ED12DB885500D5874C /* receipt.c */; };
 		9A8A70F212DB885500D5874C /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70EF12DB885500D5874C /* sha1.c */; };
 		9A8A70FC12E1847200D5874C /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A70FB12E1847200D5874C /* debug.c */; };
+		9A8A710612E2DBD900D5874C /* ViSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8A710512E2DBD900D5874C /* ViSplitView.m */; };
 		9A8CC20C0D1C06D4001EE32A /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */; };
 		9A8CC21A0D1C3E62001EE32A /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC2190D1C3E62001EE32A /* ViAppController.m */; };
 		9A8CC8CD0D24E981001EE32A /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8CC8CC0D24E981001EE32A /* NSString-scopeSelector.m */; };
@@ -307,6 +308,8 @@
 		9A8A70EF12DB885500D5874C /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
 		9A8A70F312DB88EE00D5874C /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
 		9A8A70FB12E1847200D5874C /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
+		9A8A710412E2DBD900D5874C /* ViSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSplitView.h; sourceTree = "<group>"; };
+		9A8A710512E2DBD900D5874C /* ViSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSplitView.m; sourceTree = "<group>"; };
 		9A8CC20A0D1C06D4001EE32A /* ViThemeStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViThemeStore.h; sourceTree = "<group>"; };
 		9A8CC20B0D1C06D4001EE32A /* ViThemeStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViThemeStore.m; sourceTree = "<group>"; };
 		9A8CC2180D1C3E62001EE32A /* ViAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViAppController.h; sourceTree = "<group>"; };
@@ -472,6 +475,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A8A710412E2DBD900D5874C /* ViSplitView.h */,
+				9A8A710512E2DBD900D5874C /* ViSplitView.m */,
 				9A4BA2C6118D63450093E2AB /* ViBgView.m */,
 				9A4BA2C7118D63450093E2AB /* ViBgView.h */,
 				9AA709690EF284A700B4CE34 /* ViJumpList.h */,
@@ -1061,6 +1066,7 @@
 				9A8A70F112DB885500D5874C /* receipt.c in Sources */,
 				9A8A70F212DB885500D5874C /* sha1.c in Sources */,
 				9A8A70FC12E1847200D5874C /* debug.c in Sources */,
+				9A8A710612E2DBD900D5874C /* ViSplitView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

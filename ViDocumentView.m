@@ -22,4 +22,9 @@
 	[[self tabController] closeDocumentView:self];
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViDocumentView %p: %@>", self, [document displayName]];
+}
+
 @end

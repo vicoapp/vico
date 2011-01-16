@@ -1549,7 +1549,7 @@ int logIndent = 0;
 
 - (BOOL)switch_file:(ViCommand *)command
 {
-        [[[self delegate] environment] switchToLastDocument];
+        [[[self delegate] environment] selectLastDocument];
         return YES;
 }
 

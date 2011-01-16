@@ -67,7 +67,7 @@ struct sftp_statvfs {
 
 void send_msg(int fd, Buffer *m);
 int get_msg(int fd, Buffer *m);
-char *get_handle(int fd, u_int expected_id, u_int *len);
+char *get_handle(int fd, u_int expected_id, u_int *len, int *ret_status);
 void send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,
     char *handle, u_int handle_len);
 void send_string_request(int fd, u_int id, u_int code, const char *s, u_int len);

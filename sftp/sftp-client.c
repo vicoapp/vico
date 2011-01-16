@@ -161,7 +161,7 @@ get_status(int fd, u_int expected_id)
 }
 
 char *
-get_handle(int fd, u_int expected_id, u_int *len)
+get_handle(int fd, u_int expected_id, u_int *len, int *ret_status)
 {
 	Buffer msg;
 	u_int type, id;
@@ -178,6 +178,8 @@ get_handle(int fd, u_int expected_id, u_int *len)
 		int status = buffer_get_int(&msg);
 
 		error("Couldn't get handle: %s", fx2txt(status));
+		if (ret_status)
+			*ret_status = status;
 		buffer_free(&msg);
 		return(NULL);
 	} else if (type != SSH2_FXP_HANDLE)
@@ -314,7 +316,7 @@ do_readdir(struct sftp_conn *conn, const char *path, SFTP_DIRENT ***dir)
 
 	buffer_clear(&msg);
 
-	handle = get_handle(conn->fd_in, id, &handle_len);
+	handle = get_handle(conn->fd_in, id, &handle_len, NULL);
 	if (handle == NULL)
 		return(-1);
 

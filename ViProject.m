@@ -15,6 +15,9 @@
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
+	initialURL = absoluteURL;
+	return YES;
+#if 0
 	BOOL isDirectory;
 	if ([absoluteURL isFileURL] &&
 	    [[NSFileManager defaultManager] fileExistsAtPath:[absoluteURL path] isDirectory:&isDirectory] && isDirectory) {
@@ -25,6 +28,7 @@
 	if (outError)
 		*outError = [NSError errorWithDomain:@"NSURLErrorDomain" code:NSURLErrorUnsupportedURL userInfo:nil];
 	return NO;
+#endif
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError

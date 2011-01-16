@@ -142,7 +142,7 @@ receipt_validate(const char *receipt_path)
 	void			*buf;
 	void			*content, *value, *payload;
 	size_t			 sz, len;
-	int			 fd, version, type;
+	int			 version, type;
 
 	DPRINTF("validating receipt in %s", receipt_path);
 

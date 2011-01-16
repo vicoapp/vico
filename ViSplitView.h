@@ -1,0 +1,4 @@
+@interface ViSplitView : NSSplitView
+{
+}
+@end

@@ -1,5 +1,6 @@
 #import "ViDocumentController.h"
 #import "ViDocument.h"
+#import "SFTPConnectionPool.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -179,14 +180,19 @@
 	return [super runModalOpenPanel:openPanel forTypes:extensions];
 }
 
-- (NSString *)typeForContentsOfURL:(NSURL *)inAbsoluteURL error:(NSError **)outError
+- (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError **)outError
 {
+	INFO(@"url = %@", url);
 	BOOL isDirectory;
-	if ([inAbsoluteURL isFileURL] &&
-	    [[NSFileManager defaultManager] fileExistsAtPath:[inAbsoluteURL path]
-						 isDirectory:&isDirectory] &&
-	    isDirectory)
-		return @"Project";
+	if ([url isFileURL]) {
+		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
+			return @"Project";
+	} else if ([[url scheme] isEqualToString:@"sftp"]) {
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
+		if ([conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:outError] && isDirectory)
+			return @"Project";
+	}
+
 	return @"Document";
 }
 

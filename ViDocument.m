@@ -105,12 +105,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)addWindowController:(NSWindowController *)aController
 {
 	[super addWindowController:aController];
-	windowController = aController;
+	windowController = (ViWindowController *)aController;
 }
 
 - (void)makeWindowControllers
 {
-	NSWindowController *winCon = nil;
+	ViWindowController *winCon = nil;
 	if (makeNewWindowInsteadOfTab) {
 		winCon = [[ViWindowController alloc] init];
 		makeNewWindowInsteadOfTab = NO;
@@ -220,9 +220,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([url isFileURL])
 		data = [NSData dataWithContentsOfFile:[url path] options:0 error:outError];
 	else if ([[url scheme] isEqualToString:@"sftp"]) {
-		if ([url user] == nil || [url host] == nil) {
+		if ([url host] == nil) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:@"Missing user or host in URL."];
+				*outError = [SFTPConnection errorWithDescription:@"Missing host in URL."];
 			return NO;
 		}
 
@@ -783,13 +783,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	va_list ap;
 	va_start(ap, fmt);
-	[[windowController exEnvironment] message:fmt arguments:ap];
+	[[windowController environment] message:fmt arguments:ap];
 	va_end(ap);
 }
 
 - (ExEnvironment *)environment
 {
-	return [windowController exEnvironment];
+	return [windowController environment];
 }
 
 #pragma mark -

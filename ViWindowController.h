@@ -1,6 +1,7 @@
 #import "ViTagStack.h"
 #import "ViBgView.h"
 #import "ViJumpList.h"
+#import "ExEnvironment.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -8,7 +9,6 @@
 @class ProjectDelegate;
 @class ViResizeView;
 @class ViProject;
-@class ExEnvironment;
 
 #define ViLicenseChangedNotification @"ViLicenseChangedNotification"
 

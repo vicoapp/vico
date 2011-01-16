@@ -249,20 +249,22 @@
 #pragma mark -
 #pragma mark Input of ex commands
 
+/*
+ * Returns YES if the key binding was handled.
+ */
 - (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {
 	if (sender == statusbar)
 	{
-		NSText *fieldEditor = [window fieldEditor:NO forObject:sender];
 		if (aSelector == @selector(cancelOperation:) || // escape
 		    aSelector == @selector(noop:) ||            // ctrl-c and ctrl-g ...
 		    aSelector == @selector(insertNewline:) ||
-		    (aSelector == @selector(deleteBackward:) && [fieldEditor selectedRange].location == 0))
+		    (aSelector == @selector(deleteBackward:) && [textView selectedRange].location == 0))
 		{
 			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
 			if (aSelector != @selector(insertNewline:))
 				[statusbar setStringValue:@""];
-			[[statusbar target] performSelector:[statusbar action] withObject:self];
+			[[statusbar target] performSelector:[statusbar action] withObject:self afterDelay:0.0];
 			return YES;
 		}
 		else if (aSelector == @selector(moveUp:))
@@ -282,9 +284,9 @@
 		else if (aSelector == @selector(insertTab:) ||
 		         aSelector == @selector(deleteForward:)) // ctrl-d
 		{
-			NSUInteger caret = [fieldEditor selectedRange].location;
+			NSUInteger caret = [textView selectedRange].location;
 			NSRange range;
-			NSString *filename = [self filenameAtLocation:caret inFieldEditor:fieldEditor range:&range];
+			NSString *filename = [self filenameAtLocation:caret inFieldEditor:textView range:&range];
 
 			if (![filename isAbsolutePath])
 				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
@@ -298,9 +300,9 @@
 			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
 	
 			if (completion) {
-				NSMutableString *s = [[NSMutableString alloc] initWithString:[fieldEditor string]];
+				NSMutableString *s = [[NSMutableString alloc] initWithString:[textView string]];
 				[s replaceCharactersInRange:range withString:completion];
-				[fieldEditor setString:s];
+				[textView setString:s];
 			}
 
 			if (num == 1 && [completion hasSuffix:@"/"]) {
@@ -319,26 +321,31 @@
 
 - (IBAction)finishedExCommand:(id)sender
 {
+	[statusbar setTarget:nil];
+	[statusbar setAction:NULL];
+
 	NSString *exCommand = [statusbar stringValue];
+
+	if ([exCommand length] > 0) {
+		[exDelegate performSelector:exCommandSelector withObject:exCommand withObject:exContextInfo];
+
+		/* Add the command to the history. */
+		NSUInteger i = [exCommandHistory indexOfObject:exCommand];
+		if (i != NSNotFound)
+			[exCommandHistory removeObjectAtIndex:i];
+		[exCommandHistory addObject:exCommand];
+	}
+
+	exDelegate = nil;
+	exTextView = nil;
+	exContextInfo = NULL;
+
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
 	[statusbar setHidden:YES];
 	[messageField setHidden:NO];
-	if (exTextView)
-		[window makeFirstResponder:exTextView];
-	else
-		[window makeFirstResponder:exDelegate];
-	if ([exCommand length] == 0)
-		return;
 
-	[exDelegate performSelector:exCommandSelector withObject:exCommand withObject:exContextInfo];
-	exDelegate = nil;
-
-	// add the command to the history
-	NSUInteger i = [exCommandHistory indexOfObject:exCommand];
-	if (i != NSNotFound)
-		[exCommandHistory removeObjectAtIndex:i];
-	[exCommandHistory addObject:exCommand];
+	[[window windowController] focusEditor];
 }
 
 - (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo
@@ -374,6 +381,12 @@
 
 - (void)executeForTextView:(ViTextView *)aTextView
 {
+	/*
+	 * This global is a bit ugly. An alternative is to query
+	 * the windowController directly for the current document
+	 * and/or view. However, that might not play well with
+	 * automating ex commands across multiple documents.
+	 */
 	exTextView = aTextView;
 	[self getExCommandWithDelegate:self selector:@selector(parseAndExecuteExCommand:contextInfo:) prompt:@":" contextInfo:NULL];
 }

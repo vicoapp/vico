@@ -37,6 +37,7 @@
 - (BOOL)changeCurrentDirectory:(NSString *)path;
 
 - (void)switchToLastDocument;
+- (void)selectLastDocument;
 - (void)selectTabAtIndex:(NSInteger)anIndex;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView;
 

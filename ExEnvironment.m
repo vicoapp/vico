@@ -97,6 +97,11 @@
 	[windowController switchToLastDocument];
 }
 
+- (void)selectLastDocument
+{
+	[windowController selectLastDocument];
+}
+
 - (void)selectTabAtIndex:(NSInteger)anIndex
 {
 	[windowController selectTabAtIndex:anIndex];

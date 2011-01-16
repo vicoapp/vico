@@ -145,6 +145,7 @@ size_t num_requests = 64;
 		
 		host = hostname;
 		user = username;
+		home = [self currentDirectory];
 	}
 	return self;
 }
@@ -208,6 +209,21 @@ size_t num_requests = 64;
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS))
 		return NO;
 	return (S_ISDIR(a->perm));
+}
+
+- (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError
+{
+	Attrib *a = [self stat:path error:outError];
+	if (a == NULL)
+		return NO;
+	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
+		if (outError)
+			*outError = [SFTPConnection errorWithDescription:@"Permission denied"];
+		return NO;
+	}
+	if (isDirectory)
+		*isDirectory = S_ISDIR(a->perm);
+	return YES;
 }
 
 - (NSArray *)directoryContentsAtPath:(NSString *)path error:(NSError **)outError
@@ -276,11 +292,14 @@ size_t num_requests = 64;
 	a = [self stat:path error:outError];
 	if (a == NULL)
 		return nil;
-
-	if ((a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) &&
-	    (!S_ISREG(a->perm))) {
+	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Cannot download non-regular file: %@", path]];
+			*outError = [SFTPConnection errorWithDescription:@"Permission denied"];
+		return nil;
+	}
+	if (!S_ISREG(a->perm)) {
+		if (outError)
+			*outError = [SFTPConnection errorWithDescription:@"Not a regular file"];
 		return nil;
 	}
 
@@ -303,11 +322,11 @@ size_t num_requests = 64;
 	send_msg(conn->fd_out, &msg);
 	debug3("Sent message SSH2_FXP_OPEN I:%u P:%s", req_id, remote_path);
 
-	handle = get_handle(conn->fd_in, req_id, &handle_len);
+	handle = get_handle(conn->fd_in, req_id, &handle_len, &status);
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Couldn't get handle."];
+			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"%s", fx2txt(status)]];
 		return nil;
 	}
 
@@ -516,11 +535,11 @@ size_t num_requests = 64;
 
 	buffer_clear(&msg);
 
-	handle = get_handle(conn->fd_in, req_id, &handle_len);
+	handle = get_handle(conn->fd_in, req_id, &handle_len, &status);
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Couldn't get handle."];
+			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"%s", fx2txt(status)]];
 		return NO;
 	}
 

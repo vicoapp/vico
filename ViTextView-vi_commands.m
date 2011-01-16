@@ -1541,12 +1541,22 @@
 // syntax: ^G
 - (BOOL)show_info:(ViCommand *)command
 {
+	NSURL *url = [[self delegate] fileURL];
+	NSString *path;
+
+	if (url == nil)
+		path = @"[untitled]";
+	else if ([url isFileURL])
+		path = [[url path] stringByAbbreviatingWithTildeInPath];
+	else
+		path = [url absoluteString];
+
 	[[self delegate] message:@"%@: %s: line %u of %u [%.0f%%]",
-	 [[[[self delegate] fileURL] path] stringByAbbreviatingWithTildeInPath],
+	 path,
 	 [[[NSDocumentController sharedDocumentController] currentDocument] isDocumentEdited] ? "modified" : "unmodified",
 	 [self currentLine],
 	 [[self textStorage] lineNumberAtLocation:IMAX(0, [[[self textStorage] string] length] - 1)],
-	 (float)[self caret]*100.0 / (float)[[[self textStorage] string] length]];
+	 (float)[self caret]*100.0 / ((float)[[[self textStorage] string] length] ?: 1)];
 	return NO;
 }
 

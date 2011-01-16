@@ -75,6 +75,8 @@
 
 - (void)closeCurrentView;
 - (BOOL)closeCurrentViewUnlessLast;
+
+- (void)addDocument:(ViDocument *)document;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
 
@@ -85,6 +87,7 @@
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
 - (void)selectTabAtIndex:(NSInteger)anIndex;
+- (void)selectLastDocument;
 
 - (IBAction)navigateJumplist:(id)sender;
 

@@ -34,15 +34,18 @@ static struct vikey insert_keys[] = {
 };
 
 static struct vikey window_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"window_left:",	0x8, 0},	// ^H
 	{@"window_down:",	0xA, 0},	// ^J
 	{@"window_up:",		0xB, 0},	// ^K
 	{@"window_right:",	0xC, 0},	// ^L
+	{@"window_new:",	0xE, 0},	// ^N
 	{@"window_close:",	'c', 0},
 	{@"window_left:",	'h', 0},
 	{@"window_down:",	'j', 0},
 	{@"window_up:",		'k', 0},
 	{@"window_right:",	'l', 0},
+	{@"window_new:",	'n', 0},
 	{@"window_split:",	's', 0},
 	{@"window_vsplit:",	'v', 0},
 	{nil, -1, 0}

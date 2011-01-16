@@ -206,6 +206,35 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
+- (void)addDocument:(ViDocument *)document
+{
+	if ([documents containsObject:document]) {
+		INFO(@"already got document %@", document);
+		return;
+	}
+
+	NSArray *items = [[openFilesButton menu] itemArray];
+	NSInteger ndx;
+	for (ndx = 0; ndx < [items count]; ndx++)
+		if ([[document displayName] compare:[[items objectAtIndex:ndx] title] options:NSCaseInsensitiveSearch] == NSOrderedAscending)
+			break;
+	NSMenuItem *item = [[openFilesButton menu] insertItemWithTitle:[document displayName]
+								action:@selector(switchToDocumentAction:)
+							 keyEquivalent:@""
+							       atIndex:ndx];
+	[item setRepresentedObject:document];
+
+	// update symbol table
+	[documents addObject:document];
+	[self filterSymbols:symbolFilterField];
+	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
+        NSInteger row = [symbolsOutline rowForItem:document];
+        [symbolsOutline scrollRowToVisible:row];
+        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
+	[document setJumpList:jumpList];
+}
+
 /* Called by a new ViDocument in its makeWindowControllers method.
  */
 - (void)addNewTab:(ViDocument *)document
@@ -233,17 +262,6 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	NSArray *items = [[openFilesButton menu] itemArray];
-	NSInteger ndx;
-	for (ndx = 0; ndx < [items count]; ndx++)
-		if ([[document displayName] compare:[[items objectAtIndex:ndx] title] options:NSCaseInsensitiveSearch] == NSOrderedAscending)
-			break;
-	NSMenuItem *item = [[openFilesButton menu] insertItemWithTitle:[document displayName]
-								action:@selector(switchToDocumentAction:)
-							 keyEquivalent:@""
-							       atIndex:ndx];
-	[item setRepresentedObject:document];
-
 	// create a new document tab
 	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithDocumentView:[document makeView]];
 
@@ -253,15 +271,7 @@ static NSWindowController	*currentWindowController = nil;
 	[tabView addTabViewItem:tabItem];
 	[tabView selectTabViewItem:tabItem];
 
-	// update symbol table
-	[documents addObject:document];
-	[self filterSymbols:symbolFilterField];
-	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
-        NSInteger row = [symbolsOutline rowForItem:document];
-        [symbolsOutline scrollRowToVisible:row];
-        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-
-	[document setJumpList:jumpList];
+	[self addDocument:document];
 
 	if (closeThisDocument) {
 		[closeThisDocument close];
@@ -721,10 +731,18 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)switchToDocument:(ViDocument *)doc
 {
-	[self selectDocument:doc];
+	ViDocumentTabController *tabController = [self selectedTabController];
+	ViDocumentView *docView = [tabController replaceDocumentView:[self currentView] withDocument:doc];
+	[self selectDocumentView:docView];
 }
 
 - (void)switchToLastDocument
+{
+	[[[self currentView] textView] pushCurrentLocationOnJumpList];
+	[self switchToDocument:[lastDocumentView document]];
+}
+
+- (void)selectLastDocument
 {
 	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 	[self selectDocumentView:lastDocumentView];
@@ -744,10 +762,7 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocument *doc = [sender representedObject];
 	if (doc) {
 //		[[[self currentView] textView] pushCurrentLocationOnJumpList];
-
-		ViDocumentTabController *tabController = [self selectedTabController];
-		ViDocumentView *docView = [tabController replaceDocumentView:[self currentView] withDocument:doc];
-		[self selectDocumentView:docView];
+		[self switchToDocument:doc];
 	}
 }
 

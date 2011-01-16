@@ -53,6 +53,8 @@
 - (BOOL)ex_split:(ExCommand *)command;
 - (BOOL)ex_vsplit:(ExCommand *)command;
 - (BOOL)ex_close:(ExCommand *)command;
+- (BOOL)ex_new:(ExCommand *)command;
+- (BOOL)ex_vnew:(ExCommand *)command;
 
 @end
 

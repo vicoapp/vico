@@ -447,7 +447,7 @@
 - (void)ex_edit:(ExCommand *)command
 {
 	if (command.filename == nil)
-		[[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
+		/* Re-open current file. Check E_C_FORCE in flags. */ ;
 	else {
 		NSString *path = command.filename;
 		if ([command.filename hasPrefix:@"~"])
@@ -457,21 +457,72 @@
 
 		BOOL isDirectory = NO;
 		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory]) {
-			if (isDirectory)
-				[self message:@"Can't edit directory %@", path];
-			else {
-                                ViDocument *document;
-				document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
-				                                                                                  display:YES
-				                                                                                    error:nil];
-                                if (document)
-                                        [windowController selectDocument:document];
-			}
+			ViDocument *document;
+			document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+													  display:YES
+													    error:nil];
+			if (document)
+				[windowController selectDocument:document];
 		} else {
 			id doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
 			[doc setFileURL:[NSURL fileURLWithPath:path]];
 		}
 	}
+}
+
+- (BOOL)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc
+{
+	NSError *err = nil;
+
+	if (filename) {
+		NSString *path = filename;
+		if ([filename hasPrefix:@"~"])
+			path = [filename stringByExpandingTildeInPath];
+		else if (![filename hasPrefix:@"/"])
+			path = [[self currentDirectory] stringByAppendingPathComponent:filename];
+		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+											     display:NO
+											       error:&err];
+		if (err)
+			[self message:@"%@: %@", path, [err localizedDescription]];
+	} else if (doc == nil) {
+		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
+		if (err)
+			[self message:@"%@", [err localizedDescription]];
+	}
+
+	if (doc) {
+		[doc addWindowController:windowController];
+		[windowController addDocument:doc];
+		if (isVertical)
+			[windowController splitViewVertically:nil];
+		else
+			[windowController splitViewHorizontally:nil];
+		[windowController switchToDocument:doc];
+		return YES;
+	}
+
+	return NO;
+}
+
+- (BOOL)ex_new:(ExCommand *)command
+{
+	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:nil];
+}
+
+- (BOOL)ex_vnew:(ExCommand *)command
+{
+	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:nil];
+}
+
+- (BOOL)ex_split:(ExCommand *)command
+{
+	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:[windowController currentDocument]];
+}
+
+- (BOOL)ex_vsplit:(ExCommand *)command
+{
+	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:[windowController currentDocument]];
 }
 
 - (void)ex_bang:(ExCommand *)command
@@ -593,20 +644,6 @@
 			}
 		}
 	}
-}
-
-- (BOOL)ex_split:(ExCommand *)command
-{
-	[windowController splitViewHorizontally:nil];
-	// FIXME: open command.filename in new split view
-	return YES;
-}
-
-- (BOOL)ex_vsplit:(ExCommand *)command
-{
-	[windowController splitViewVertically:nil];
-	// FIXME: open command.filename in new split view
-	return YES;
 }
 
 - (BOOL)ex_close:(ExCommand *)command

@@ -1694,5 +1694,10 @@
 	return [[[self delegate] environment] ex_vsplit:nil];
 }
 
+- (BOOL)window_new:(ViCommand *)command
+{
+	return [[[self delegate] environment] ex_new:nil];
+}
+
 @end
 

@@ -102,16 +102,23 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark NSDocument interface
 
+- (void)addWindowController:(NSWindowController *)aController
+{
+	[super addWindowController:aController];
+	windowController = aController;
+}
+
 - (void)makeWindowControllers
 {
+	NSWindowController *winCon = nil;
 	if (makeNewWindowInsteadOfTab) {
-		windowController = [[ViWindowController alloc] init];
+		winCon = [[ViWindowController alloc] init];
 		makeNewWindowInsteadOfTab = NO;
 	} else
-		windowController = [ViWindowController currentWindowController];
+		winCon = [ViWindowController currentWindowController];
 
-	[self addWindowController:windowController];
-	[windowController addNewTab:self];
+	[self addWindowController:winCon];
+	[winCon addNewTab:self];
 }
 
 - (void)removeView:(ViDocumentView *)aDocumentView

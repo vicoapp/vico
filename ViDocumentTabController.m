@@ -15,6 +15,7 @@
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
 		splitView = [[NSSplitView alloc] initWithFrame:frame];
 		[splitView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[splitView setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 
 		[splitView addSubview:[initialDocumentView view]];
 		[splitView adjustSubviews];
@@ -83,6 +84,7 @@
 		NSSplitView *newSplit = [[NSSplitView alloc] initWithFrame:frame];
 		[newSplit setVertical:isVertical];
 		[newSplit setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 		[split replaceSubview:view with:newSplit];
 		[newSplit addSubview:view];
 		[newSplit addSubview:[newDocView view]];

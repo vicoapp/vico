@@ -74,6 +74,7 @@
 - (void)closeDocument:(ViDocument *)aDocument;
 
 - (void)closeCurrentView;
+- (BOOL)closeCurrentViewUnlessLast;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
 

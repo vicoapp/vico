@@ -582,16 +582,26 @@
 	}
 }
 
-- (void)ex_split:(ExCommand *)command
+- (BOOL)ex_split:(ExCommand *)command
 {
 	[windowController splitViewHorizontally:nil];
 	// FIXME: open command.filename in new split view
+	return YES;
 }
 
-- (void)ex_vsplit:(ExCommand *)command
+- (BOOL)ex_vsplit:(ExCommand *)command
 {
 	[windowController splitViewVertically:nil];
 	// FIXME: open command.filename in new split view
+	return YES;
+}
+
+- (BOOL)ex_close:(ExCommand *)command
+{
+	BOOL didClose = [windowController closeCurrentViewUnlessLast];
+	if (!didClose)
+		[self message:@"Cannot close last window"];
+	return didClose;
 }
 
 @end

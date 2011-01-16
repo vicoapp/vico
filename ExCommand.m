@@ -108,6 +108,11 @@ static struct ex_command ex_commands[] = {
 		"!f1o",
 		@"chd[ir][!] [directory]",
 		@"change the current directory"},
+	/* C_CLOSE (vim) */
+	{@"close",	@"ex_close",		0,
+		"!",
+		@"clo[se][!]",
+		@"close the current window"},
 	/* C_COPY */
 	{@"copy",	@"ex_copy",	EX_ADDR2|EX_AUTOPRINT,
 		"l1",

@@ -455,6 +455,20 @@ static NSWindowController	*currentWindowController = nil;
 		[self closeDocumentView:docView];
 }
 
+/*
+ * Close the current view unless this is the last view in the window.
+ * Called by C-w c.
+ */
+- (BOOL)closeCurrentViewUnlessLast
+{
+	ViDocumentView *docView = [self currentView];
+	if ([[[docView document] views] count] > 1) {
+		[self closeDocumentView:docView];
+		return YES;
+	}
+	return NO;
+}
+
 - (void)closeDocumentView:(ViDocumentView *)docView
 {
 	[docView close];

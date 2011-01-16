@@ -1679,6 +1679,11 @@
 	return [[[self delegate] environment] selectViewAtPosition:ViViewRight relativeTo:self];
 }
 
+- (BOOL)window_close:(ViCommand *)command
+{
+	return [[[self delegate] environment] ex_close:nil];
+}
+
 - (BOOL)window_split:(ViCommand *)command
 {
 	return [[[self delegate] environment] ex_split:nil];

@@ -3,6 +3,7 @@
 @class ViTextView;
 @class ViDocument;
 @class ViWindowController;
+@class ExCommand;
 
 @interface ExEnvironment : NSObject <NSTextFieldDelegate>
 {
@@ -38,6 +39,20 @@
 - (void)switchToLastDocument;
 - (void)selectTabAtIndex:(NSInteger)anIndex;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView;
+
+- (void)ex_write:(ExCommand *)command;
+- (void)ex_quit:(ExCommand *)command;
+- (void)ex_wq:(ExCommand *)command;
+- (void)ex_xit:(ExCommand *)command;
+- (void)ex_cd:(ExCommand *)command;
+- (void)ex_pwd:(ExCommand *)command;
+- (void)ex_edit:(ExCommand *)command;
+- (void)ex_bang:(ExCommand *)command;
+- (void)ex_number:(ExCommand *)command;
+- (void)ex_set:(ExCommand *)command;
+- (BOOL)ex_split:(ExCommand *)command;
+- (BOOL)ex_vsplit:(ExCommand *)command;
+- (BOOL)ex_close:(ExCommand *)command;
 
 @end
 

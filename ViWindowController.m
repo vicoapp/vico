@@ -35,7 +35,7 @@ static NSWindowController	*currentWindowController = nil;
 
 @synthesize documents;
 @synthesize project;
-@synthesize exEnvironment;
+@synthesize environment;
 
 + (id)currentWindowController
 {
@@ -589,7 +589,7 @@ static NSWindowController	*currentWindowController = nil;
 			return;
 		}
 
-	INFO(@"Can't find document view for text view %@ in this window.", [notification object]);
+	DEBUG(@"Can't find document view for text view %@ in this window.", [notification object]);
 }
 
 - (void)didSelectDocument:(ViDocument *)document

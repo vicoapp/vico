@@ -27,7 +27,7 @@
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;
 
-	IBOutlet ExEnvironment *exEnvironment;
+	IBOutlet ExEnvironment *environment;
 
 	ViTagStack *tagStack;
 	BOOL isLoaded;
@@ -58,7 +58,7 @@
 }
 
 @property(readwrite, assign) NSMutableArray *documents;
-@property(readonly) ExEnvironment *exEnvironment;
+@property(readonly) ExEnvironment *environment;
 @property(readwrite, assign) ViProject *project;
 
 + (id)currentWindowController;

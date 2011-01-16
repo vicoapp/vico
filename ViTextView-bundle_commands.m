@@ -131,11 +131,21 @@
 	[self setenv:"TM_CURRENT_LINE" value:[[self textStorage] lineForLocation:[self caret]]];
 	[self setenv:"TM_CURRENT_WORD" value:[[self textStorage] wordAtLocation:[self caret]]];
 
-	[self setenv:"TM_DIRECTORY" value:[[[self delegate] environment] currentDirectory]];
-	[self setenv:"TM_PROJECT_DIRECTORY" value:[[[self delegate] environment] currentDirectory]];
+	NSURL *url = [[[self delegate] environment] baseURL];
+	NSString *cwd = nil;
+	if ([url isFileURL])
+		cwd = [[[[self delegate] environment] baseURL] path];
+	else
+		cwd = [[[[self delegate] environment] baseURL] absoluteString];
+	[self setenv:"TM_DIRECTORY" value:cwd];
+	[self setenv:"TM_PROJECT_DIRECTORY" value:cwd];
 
 	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
-	[self setenv:"TM_FILEPATH" value:[[[self delegate] fileURL] path]];
+	url = [[self delegate] fileURL];
+	if ([url isFileURL])
+		[self setenv:"TM_FILEPATH" value:[url path]];
+	else
+		[self setenv:"TM_FILEPATH" value:[url absoluteString]];
 	[self setenv:"TM_FULLNAME" value:NSFullUserName()];
 	[self setenv:"TM_LINE_INDEX" integer:[[self textStorage] lineIndexAtLocation:[self caret]]];
 	[self setenv:"TM_LINE_NUMBER" integer:[self currentLine]];

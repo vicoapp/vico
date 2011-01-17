@@ -15,6 +15,7 @@
 @property(readonly) NSString *filename;
 @property(readonly) Attrib *attributes;
 - (SFTPDirectoryEntry *)initWithPointer:(SFTP_DIRENT *)aDirent;
+- (BOOL)isDirectory;
 @end
 
 @interface SFTPConnection : NSObject
@@ -39,11 +40,12 @@
 + (NSError *)errorWithDescription:(id)errorDescription;
 
 - (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
+- (BOOL)closed;
 
 - (Attrib *)stat:(NSString *)path error:(NSError **)outError;
 - (BOOL)isDirectory:(NSString *)path;
 - (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError;
-- (NSArray *)directoryContentsAtPath:(NSString *)path error:(NSError **)outError;
+- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError;
 - (NSString *)currentDirectory;
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError;

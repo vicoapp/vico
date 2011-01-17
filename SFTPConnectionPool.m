@@ -21,13 +21,20 @@
 
 - (SFTPConnection *)connectionWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError
 {
-	NSString *userhost = [NSString stringWithFormat:@"%@@%@", username, hostname];
-	SFTPConnection *conn = [connections objectForKey:userhost];
+	NSString *key = [NSString stringWithFormat:@"%@@%@", username, hostname];
+	SFTPConnection *conn = [connections objectForKey:key];
+
+	if (conn && [conn closed]) {
+		[connections removeObjectForKey:key];
+		conn = nil;
+	}
+
 	if (conn == nil) {
 		conn = [[SFTPConnection alloc] initWithHost:hostname user:username error:outError];
 		if (conn != nil)
-			[connections setObject:conn forKey:userhost];
+			[connections setObject:conn forKey:key];
 	}
+
 	return conn;
 }
 

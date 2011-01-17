@@ -37,6 +37,10 @@ volatile sig_atomic_t interrupted = 0;
 {
 	return &dirent->a;
 }
+- (BOOL)isDirectory
+{
+	return S_ISDIR(dirent->a.perm);
+}
 @end
 
 @interface SFTPConnection (Private)
@@ -226,7 +230,7 @@ size_t num_requests = 64;
 	return YES;
 }
 
-- (NSArray *)directoryContentsAtPath:(NSString *)path error:(NSError **)outError
+- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError
 {
 	SFTP_DIRENT **d;
 	if (do_readdir(conn, [path UTF8String], &d) != 0) {
@@ -263,6 +267,11 @@ size_t num_requests = 64;
 	fd_in = fd_out = -1;
 	ssh_task = nil;
 	ssh_input = ssh_output = ssh_error = nil;
+}
+
+- (BOOL)closed
+{
+	return fd_in == -1;
 }
 
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError

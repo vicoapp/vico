@@ -610,6 +610,7 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	forceSwitchToItem = item;
 	[self show];
+	[self switchToItem:item];
 }
 
 #pragma mark -

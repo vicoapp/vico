@@ -421,15 +421,19 @@ static NSWindowController	*currentWindowController = nil;
 - (void)closeTabController:(ViDocumentTabController *)tabController
 {
 	NSInteger ndx = [tabView indexOfTabViewItemWithIdentifier:tabController];
-	if (ndx == NSNotFound)
-		INFO(@"eh? tabController %@ not found in tabView?", tabController);
-	else {
-		while ([[tabController views] count] > 0)
-			[[[tabController views] objectAtIndex:0] close];
-
+	if (ndx != NSNotFound) {
 		NSTabViewItem *item = [tabView tabViewItemAtIndex:ndx];
 		[tabView removeTabViewItem:item];
 		[self tabView:tabView didCloseTabViewItem:item];
+
+		while ([[tabController views] count] > 0) {
+			ViDocumentView *docView = [[tabController views] objectAtIndex:0];
+			ViDocument *doc = [docView document];
+			if ([[doc views] count] == 1)
+				[doc close];
+			else
+				[docView close];
+		}
 	}
 }
 

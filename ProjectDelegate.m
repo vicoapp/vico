@@ -73,7 +73,7 @@
 - (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError
 {
 	NSMutableArray *children = [[NSMutableArray alloc] init];
-	NSArray *entries = [conn directoryContentsAtPath:[url path] error:outError];
+	NSArray *entries = [conn contentsOfDirectoryAtPath:[url path] error:outError];
 	if (entries == nil)
 		return nil;
 	SFTPDirectoryEntry *entry;

@@ -87,7 +87,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	[languageButton removeAllItems];
 	NSMenu *menu = [languageButton menu];
-	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:@selector(setLanguage:) keyEquivalent:@""];
+	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:@selector(setLanguageAction:) keyEquivalent:@""];
 	[item setTag:1001];
 	[item setEnabled:NO];
 	[[languageButton menu] addItem:[NSMenuItem separatorItem]];
@@ -97,7 +97,7 @@ static NSWindowController	*currentWindowController = nil;
 	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
 
 	for (ViLanguage *lang in sortedLanguages) {
-		item = [menu addItemWithTitle:[lang displayName] action:@selector(setLanguage:) keyEquivalent:@""];
+		item = [menu addItemWithTitle:[lang displayName] action:@selector(setLanguageAction:) keyEquivalent:@""];
 		[item setRepresentedObject:lang];
 	}
 

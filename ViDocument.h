@@ -48,7 +48,8 @@
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;
-- (IBAction)setLanguage:(id)sender;
+- (IBAction)setLanguageAction:(id)sender;
+- (void)setLanguage:(ViLanguage *)lang;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;
 - (void)changeTheme:(ViTheme *)aTheme;

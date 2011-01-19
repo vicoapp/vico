@@ -476,7 +476,7 @@ static NSWindowController	*currentWindowController = nil;
 - (BOOL)closeCurrentViewUnlessLast
 {
 	ViDocumentView *docView = [self currentView];
-	if ([[[docView document] views] count] > 1) {
+	if ([tabView numberOfTabViewItems] > 1 || [[[docView tabController] views] count] > 1) {
 		[self closeDocumentView:docView];
 		return YES;
 	}

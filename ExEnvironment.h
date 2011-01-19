@@ -16,7 +16,7 @@
 	IBOutlet NSSplitView	*commandSplit;
 	IBOutlet NSTextView	*commandOutput;
 
-	NSString		*currentDirectory;
+	NSURL			*baseURL;
 
 	SEL			 exCommandSelector;
 	ViTextView		*exTextView;
@@ -26,7 +26,7 @@
 	NSMutableArray		*exCommandHistory;
 }
 
-@property(readonly) NSString *currentDirectory;
+@property(readonly) NSURL *baseURL;
 
 - (void)message:(NSString *)fmt, ...;
 - (void)message:(NSString *)fmt arguments:(va_list)ap;
@@ -34,7 +34,8 @@
 - (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
 - (void)executeForTextView:(ViTextView *)aTextView;
 
-- (BOOL)changeCurrentDirectory:(NSString *)path;
+- (BOOL)setBaseURL:(NSURL *)url;
+- (NSString *)displayBaseURL;
 
 - (void)switchToLastDocument;
 - (void)selectLastDocument;

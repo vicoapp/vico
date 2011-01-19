@@ -6,24 +6,26 @@
 #import "ViWindowController.h"
 #import "ViDocumentView.h"
 #import "NSTextStorage-additions.h"
+#import "SFTPConnectionPool.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
 - (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange;
-- (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr;
-- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path;
+- (unsigned)completePath:(NSString *)partialPath relativeToURL:(NSURL *)url into:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr;
+- (void)displayCompletions:(NSArray *)completions forURL:(NSURL *)url;
+- (NSURL *)parseExFilename:(NSString *)filename;
 @end
 
 @implementation ExEnvironment
 
-@synthesize currentDirectory;
+@synthesize baseURL;
 
 - (id)init
 {
 	self = [super init];
 	if (self) {
 		exCommandHistory = [[NSMutableArray alloc] init];
-                [self changeCurrentDirectory:[[NSFileManager defaultManager] currentDirectoryPath]];
+                [self setBaseURL:[NSURL fileURLWithPath:[[NSFileManager defaultManager] currentDirectoryPath]]];
 	}
 	return self;
 }
@@ -40,22 +42,51 @@
 #pragma mark -
 #pragma mark Assorted
 
-- (BOOL)changeCurrentDirectory:(NSString *)path
+- (BOOL)setBaseURL:(NSURL *)url
 {
-        NSString *p;
-        if ([path isAbsolutePath])
-                p = [path stringByStandardizingPath];
-        else
-                p = [[[self currentDirectory] stringByAppendingPathComponent:path] stringByStandardizingPath];
+	if ([url isFileURL]) {
+		BOOL isDirectory = NO;
+		if (![[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] || !isDirectory) {
+			[self message:@"%@: not a directory", [url path]];
+			return NO;
+		}
+	}
 
-        BOOL isDirectory = NO;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:p isDirectory:&isDirectory] && isDirectory) {
-                currentDirectory = p;
-                return YES;
-        } else {
-                INFO(@"failed to set current directory to '%@'", p);
-                return NO;
-        }
+	if ([[url scheme] isEqualToString:@"sftp"]) {
+		NSError *error = nil;
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+
+		if (error == nil && [[url lastPathComponent] isEqualToString:@""])
+			url = [NSURL URLWithString:[conn home] relativeToURL:url];
+
+		BOOL isDirectory = NO;
+		BOOL exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
+		if (error) {
+			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+			return NO;
+		}
+		if (!exists) {
+			[self message:@"%@: no such file or directory", [url absoluteString]];
+			return NO;
+		}
+		if (!isDirectory) {
+			[self message:@"%@: not a directory", [url absoluteString]];
+			return NO;
+		}
+	}
+
+	if (![[url absoluteString] hasSuffix:@"/"])
+		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"] relativeToURL:url];
+
+	baseURL = [url absoluteURL];
+	return YES;
+}
+
+- (NSString *)displayBaseURL
+{
+	if ([baseURL isFileURL])
+		return [[baseURL path] stringByAbbreviatingWithTildeInPath];
+	return [baseURL absoluteString];
 }
 
 - (void)message:(NSString *)fmt arguments:(va_list)ap
@@ -137,49 +168,74 @@
 	return [s substringWithRange:r];
 }
 
-- (unsigned)completePath:(NSString *)partialPath intoString:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr
+- (unsigned)completePath:(NSString *)partialPath relativeToURL:(NSURL *)url into:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
-
 	NSString *path;
 	NSString *suffix;
-	if ([partialPath hasSuffix:@"/"])
-	{
+	if ([partialPath hasSuffix:@"/"]) {
 		path = partialPath;
 		suffix = @"";
-	}
-	else
-	{
+	} else {
 		path = [partialPath stringByDeletingLastPathComponent];
 		suffix = [partialPath lastPathComponent];
 	}
 
-	NSArray *directoryContents = [fm contentsOfDirectoryAtPath:[path stringByExpandingTildeInPath] error:NULL];
+	int options = 0;
+	if ([url isFileURL])
+		/* FIXME: check if local filesystem is case sensitive? */
+		options |= NSCaseInsensitiveSearch;
+
+	SFTPConnection *conn = nil;
+	NSFileManager *fm = nil;
+
+	NSArray *directoryContents;
+	NSError *error = nil;
+	if ([url isFileURL]) {
+		fm = [NSFileManager defaultManager];
+		directoryContents = [fm contentsOfDirectoryAtPath:path error:&error];
+	} else {
+		conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+		directoryContents = [conn contentsOfDirectoryAtPath:path error:&error];
+	}
+
+	if (error) {
+		[self message:@"%@: %@", [NSURL URLWithString:partialPath relativeToURL:url], [error localizedDescription]];
+		return 0;
+	}
+
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
-	NSString *entry;
-	for (entry in directoryContents)
-	{
-		if ([entry compare:suffix options:NSCaseInsensitiveSearch range:NSMakeRange(0, [suffix length])] == NSOrderedSame)
-		{
-			if ([entry hasPrefix:@"."] && ![suffix hasPrefix:@"."])
+	id entry;
+	for (entry in directoryContents) {
+		NSString *filename;
+		if ([url isFileURL])
+			filename = entry;
+		else
+			filename = [[(SFTPDirectoryEntry *)entry filename] lastPathComponent];
+
+		NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]), NSMakeRange(0, [filename length]));
+		if ([filename compare:suffix options:options range:r] == NSOrderedSame) {
+			/* Only show dot-files if explicitly requested. */
+			if ([filename hasPrefix:@"."] && ![suffix hasPrefix:@"."])
 				continue;
-			NSString *s = [path stringByAppendingPathComponent:entry];
+
+			NSString *s = [path stringByAppendingPathComponent:filename];
 			BOOL isDirectory = NO;
-			if ([fm fileExistsAtPath:[s stringByExpandingTildeInPath] isDirectory:&isDirectory] && isDirectory)
-				[matches addObject:[s stringByAppendingString:@"/"]];
+
+			if ([url isFileURL])
+				[fm fileExistsAtPath:s isDirectory:&isDirectory];
 			else
-				[matches addObject:s];
+				isDirectory = [entry isDirectory];
+			if (isDirectory)
+				s = [s stringByAppendingString:@"/"];
+			[matches addObject:s];
 		}
 	}
 
-	if (longestMatchPtr && [matches count] > 0)
-	{
+	if (longestMatchPtr && [matches count] > 0) {
 		NSString *longestMatch = nil;
 		NSString *firstMatch = [matches objectAtIndex:0];
-		NSString *m;
-		for (m in matches)
-		{
-			NSString *commonPrefix = [firstMatch commonPrefixWithString:m options:NSCaseInsensitiveSearch];
+		for (NSString *m in matches) {
+			NSString *commonPrefix = [firstMatch commonPrefixWithString:m options:options];
 			if (longestMatch == nil || [commonPrefix length] < [longestMatch length])
 				longestMatch = commonPrefix;
 		}
@@ -204,8 +260,7 @@
 							  forKey:NSFontAttributeName];
 	NSString *c;
 	NSSize maxsize = NSMakeSize(0, 0);
-	for (c in completions)
-	{
+	for (c in completions) {
 		NSSize size = [[c substringFromIndex:skipIndex] sizeWithAttributes:attrs];
 		if (size.width > maxsize.width)
 			maxsize = size;
@@ -222,18 +277,14 @@
 	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 	NSTextTab *tabStop;
 	for (tabStop in [style tabStops])
-	{
 		[style removeTabStop:tabStop];
-	}
 	[style setDefaultTabInterval:colsize];
 
 	[[[commandOutput textStorage] mutableString] setString:@""];
 	int n = 0;
 	for (c in completions)
-	{
 		[[[commandOutput textStorage] mutableString] appendFormat:@"%@%@",
 			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @"\t"];
-	}
 
 	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
 	[commandOutput setBackgroundColor:[theme backgroundColor]];
@@ -293,26 +344,29 @@
 			NSRange range;
 			NSString *filename = [self filenameAtLocation:caret inFieldEditor:textView range:&range];
 
-			if (![filename isAbsolutePath])
-				filename = [[self currentDirectory] stringByAppendingPathComponent:filename];
-                        filename = [[filename stringByStandardizingPath] stringByAbbreviatingWithTildeInPath];
+			NSURL *url = [self parseExFilename:filename];
 
-                        if ([filename isEqualToString:@"~"])
-                                filename = @"~/";
+			filename = [url path];
+			/* Put back the trailing slash. */
+			if ([[url absoluteString] hasSuffix:@"/"])
+				filename = [filename stringByAppendingString:@"/"];
 
 			NSArray *completions = nil;
 			NSString *completion = nil;
-			NSUInteger num = [self completePath:filename intoString:&completion matchesIntoArray:&completions];
-	
+			NSUInteger num = [self completePath:filename relativeToURL:url into:&completion matchesIntoArray:&completions];
+
 			if (completion) {
 				NSMutableString *s = [[NSMutableString alloc] initWithString:[textView string]];
-				[s replaceCharactersInRange:range withString:completion];
+				if ([url isFileURL])
+					[s replaceCharactersInRange:range withString:completion];
+				else
+					[s replaceCharactersInRange:range withString:[[NSURL URLWithString:completion relativeToURL:url] absoluteString]];
 				[textView setString:s];
 			}
 
 			if (num == 1 && [completion hasSuffix:@"/"]) {
 				/* If only one directory match, show completions inside that directory. */
-				num = [self completePath:completion intoString:&completion matchesIntoArray:&completions];
+				num = [self completePath:completion relativeToURL:url into:&completion matchesIntoArray:&completions];
 			}
 
 			if (num > 1)
@@ -322,6 +376,32 @@
 		}
 	}
 	return NO;
+}
+
+- (NSURL *)parseExFilename:(NSString *)filename
+{
+	NSURL *url;
+
+	url = [NSURL URLWithString:filename];
+	if (url == nil || [url scheme] == nil) {
+		NSString *path = filename;
+		if ([path hasPrefix:@"~"]) {
+			if ([[self baseURL] isFileURL])
+				path = [path stringByExpandingTildeInPath];
+			else {
+				NSError *error = nil;
+				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:[self baseURL] error:&error];
+				if (error) {
+					[self message:@"%@: %@", [self baseURL], [error localizedDescription]];
+					return nil;
+				}
+				path = [path stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:[conn home]];
+			}
+		}
+		url = [NSURL URLWithString:path relativeToURL:[self baseURL]];
+	}
+
+	return url;
 }
 
 - (IBAction)finishedExCommand:(id)sender
@@ -435,18 +515,24 @@
 
 - (void)ex_cd:(ExCommand *)command
 {
+#if 0
 	NSString *path = command.filename;
 	if (path == nil)
-		path = @"~";
-	if (![self changeCurrentDirectory:[path stringByExpandingTildeInPath]])
-		[self message:@"Error: %@: Failed to change directory.", path];
+		path = [@"~" stringByExpandingTildeInPath];
+	if (![path hasSuffix:@"/"])
+		path = [path stringByAppendingString:@"/"];	/* Force directory URL. */
+#endif
+
+	NSString *path = command.filename ?: @"~";
+	if (![self setBaseURL:[self parseExFilename:path]])
+		[self message:@"%@: Failed to change directory.", path];
         else
-		[self message:@"%@", [self currentDirectory]];
+        	[self ex_pwd:nil];
 }
 
 - (void)ex_pwd:(ExCommand *)command
 {
-	[self message:@"%@", [self currentDirectory]];
+	[self message:@"%@", [self displayBaseURL]];
 }
 
 - (void)ex_edit:(ExCommand *)command
@@ -454,24 +540,35 @@
 	if (command.filename == nil)
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
 	else {
-		NSString *path = command.filename;
-		if ([command.filename hasPrefix:@"~"])
-			path = [command.filename stringByExpandingTildeInPath];
-		else if (![command.filename hasPrefix:@"/"])
-			path = [[self currentDirectory] stringByAppendingPathComponent:command.filename];
-
+		NSError *error = nil;
+		NSURL *url = [self parseExFilename:command.filename];
 		BOOL isDirectory = NO;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory]) {
+		BOOL exists = NO;
+		if ([url isFileURL])
+			exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory];
+		else {
+			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+			exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
+			if (error) {
+				[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+				return;
+			}
+		}
+
+		if (exists) {
 			ViDocument *document;
-			document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+			document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
 													  display:YES
-													    error:nil];
+													    error:&error];
 			if (document)
 				[windowController selectDocument:document];
 		} else {
-			id doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
-			[doc setFileURL:[NSURL fileURLWithPath:path]];
+			id doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:&error];
+			[doc setFileURL:url];
 		}
+
+		if (error)
+			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
 	}
 }
 
@@ -480,16 +577,12 @@
 	NSError *err = nil;
 
 	if (filename) {
-		NSString *path = filename;
-		if ([filename hasPrefix:@"~"])
-			path = [filename stringByExpandingTildeInPath];
-		else if (![filename hasPrefix:@"/"])
-			path = [[self currentDirectory] stringByAppendingPathComponent:filename];
-		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:path]
+		NSURL *url = [self parseExFilename:filename];
+		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
 											     display:NO
 											       error:&err];
 		if (err)
-			[self message:@"%@: %@", path, [err localizedDescription]];
+			[self message:@"%@: %@", [url absoluteString], [err localizedDescription]];
 	} else if (doc == nil) {
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
 		if (err)

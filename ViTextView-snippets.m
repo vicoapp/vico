@@ -73,8 +73,10 @@
 - (BOOL)updateSnippet:(ViSnippet *)snippet replaceRange:(NSRange)replaceRange withString:(NSString *)string
 {
 	DEBUG(@"found snippet %@ while updating %@ with %@", snippet, NSStringFromRange(replaceRange), string);
+#ifndef NO_DEBUG
 	NSRange currentRange = snippet.currentPlaceholder.range;
 	DEBUG(@"current range = %@, current value = %@", NSStringFromRange(currentRange), snippet.currentPlaceholder.value);
+#endif
 
 	snippet.currentPlaceholder.selected = NO;
 

@@ -32,6 +32,8 @@
 	struct sftp_conn *conn;
 	
 	NSMutableData *stderr;
+
+	NSMutableDictionary *directoryCache;
 }
 
 @property(readonly) NSString *host;

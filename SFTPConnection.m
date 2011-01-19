@@ -151,6 +151,8 @@ size_t num_requests = 64;
 		host = hostname;
 		user = username;
 		home = [self currentDirectory];
+
+		directoryCache = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -233,6 +235,10 @@ size_t num_requests = 64;
 
 - (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError
 {
+	NSMutableArray *contents = [directoryCache objectForKey:path];
+	if (contents)
+		return contents;
+
 	SFTP_DIRENT **d;
 	if (do_readdir(conn, [path UTF8String], &d) != 0) {
 		if (outError)
@@ -240,12 +246,15 @@ size_t num_requests = 64;
 		return nil;
 	}
 
-	NSMutableArray *contents = [[NSMutableArray alloc] init];
+	contents = [[NSMutableArray alloc] init];
 	int i;
 	for (i = 0; d[i]; i++)
 		[contents addObject:[[SFTPDirectoryEntry alloc] initWithPointer:d[i]]];
 
 	xfree(d);
+
+	[directoryCache setObject:contents forKey:path];
+
 	return contents;
 }
 

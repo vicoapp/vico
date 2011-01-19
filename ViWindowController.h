@@ -10,8 +10,6 @@
 @class ViResizeView;
 @class ViProject;
 
-#define ViLicenseChangedNotification @"ViLicenseChangedNotification"
-
 @interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
 	NSTextField *nagTitle;

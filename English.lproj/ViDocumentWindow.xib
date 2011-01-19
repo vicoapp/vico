@@ -1078,7 +1078,7 @@
 						<reference key="NSNextResponder" ref="244902241"/>
 						<int key="NSvFlags">274</int>
 						<array class="NSMutableArray" key="NSSubviews">
-							<object class="NSBox" id="839589470">
+							<object class="NSBox" id="592663590">
 								<reference key="NSNextResponder" ref="1041578832"/>
 								<int key="NSvFlags">10</int>
 								<string key="NSFrame">{{0, 365}, {150, 5}}</string>
@@ -1103,7 +1103,7 @@
 								<int key="NSTitlePosition">0</int>
 								<bool key="NSTransparent">NO</bool>
 							</object>
-							<object class="NSPathControl" id="591044864">
+							<object class="NSPathControl" id="584024652">
 								<reference key="NSNextResponder" ref="1041578832"/>
 								<int key="NSvFlags">266</int>
 								<set class="NSMutableSet" key="NSDragTypes">
@@ -1113,7 +1113,7 @@
 								<string key="NSFrame">{{1, 368}, {148, 22}}</string>
 								<reference key="NSSuperview" ref="1041578832"/>
 								<bool key="NSEnabled">YES</bool>
-								<object class="NSPathCell" key="NSCell" id="911191455">
+								<object class="NSPathCell" key="NSCell" id="260014073">
 									<int key="NSCellFlags">337772097</int>
 									<int key="NSCellFlags2">165888</int>
 									<object class="NSURL" key="NSContents">
@@ -1123,8 +1123,7 @@
 										</object>
 									</object>
 									<reference key="NSSupport" ref="26"/>
-									<reference key="NSControlView" ref="591044864"/>
-									<reference key="NSBackgroundColor" ref="914134781"/>
+									<reference key="NSControlView" ref="584024652"/>
 									<array class="NSMutableArray" key="NSPathComponentCells">
 										<object class="NSPathComponentCell">
 											<int key="NSCellFlags">67239488</int>
@@ -1164,7 +1163,7 @@
 										</object>
 									</array>
 									<int key="NSPathStyle">2</int>
-									<reference key="NSDelegate" ref="591044864"/>
+									<reference key="NSDelegate" ref="584024652"/>
 								</object>
 							</object>
 							<object class="NSScrollView" id="590321826">
@@ -2044,7 +2043,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">rootButton</string>
 						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="591044864"/>
+						<reference key="destination" ref="584024652"/>
 					</object>
 					<int key="connectionID">100552</int>
 				</object>
@@ -2247,8 +2246,8 @@
 							<reference ref="630815511"/>
 							<reference ref="206654861"/>
 							<reference ref="801161968"/>
-							<reference ref="839589470"/>
-							<reference ref="591044864"/>
+							<reference ref="592663590"/>
+							<reference ref="584024652"/>
 						</array>
 						<reference key="parent" ref="244902241"/>
 					</object>
@@ -2777,20 +2776,20 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100550</int>
-						<reference key="object" ref="591044864"/>
+						<reference key="object" ref="584024652"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="911191455"/>
+							<reference ref="260014073"/>
 						</array>
 						<reference key="parent" ref="1041578832"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100551</int>
-						<reference key="object" ref="911191455"/>
-						<reference key="parent" ref="591044864"/>
+						<reference key="object" ref="260014073"/>
+						<reference key="parent" ref="584024652"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100555</int>
-						<reference key="object" ref="839589470"/>
+						<reference key="object" ref="592663590"/>
 						<reference key="parent" ref="1041578832"/>
 					</object>
 				</array>

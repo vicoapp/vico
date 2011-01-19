@@ -143,8 +143,7 @@ static NSWindowController	*currentWindowController = nil;
 	[self newBundleLoaded:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newBundleLoaded:) name:ViLanguageStoreBundleLoadedNotification object:nil];
 
-	if ([self project] != nil)
-		[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
+	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
@@ -173,6 +172,8 @@ static NSWindowController	*currentWindowController = nil;
 
 	if ([self project] != nil)
 		[projectDelegate performSelector:@selector(addURL:) withObject:[[self project] initialURL] afterDelay:0.0];
+	else
+		[projectDelegate performSelector:@selector(addURL:) withObject:[environment baseURL] afterDelay:0.0];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(caretChanged:) name:ViCaretChangedNotification object:nil];
@@ -356,8 +357,6 @@ static NSWindowController	*currentWindowController = nil;
 	NSString *projName = [[self project] displayName];
 	if ([self currentDocument] == nil)
 		return projName;
-	if (projName)
-		return [NSString stringWithFormat:@"%@ - %@", displayName, projName];
 	return displayName;
 }
 
@@ -574,9 +573,11 @@ static NSWindowController	*currentWindowController = nil;
 {
 	// FIXME: check if there are hidden documents and display them in that case
 	if ([tabView numberOfTabViewItems] == 0) {
+#if 0
 		if ([self project] == nil)
 			[[self window] close];
 		else
+#endif
 			[self synchronizeWindowTitleWithDocumentName];
 	}
 }

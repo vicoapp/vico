@@ -57,6 +57,7 @@ size_t num_requests = 64;
 
 @synthesize host;
 @synthesize user;
+@synthesize home;
 
 + (NSError *)errorWithDescription:(id)errorDescription
 {

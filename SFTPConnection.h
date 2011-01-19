@@ -36,6 +36,7 @@
 
 @property(readonly) NSString *host;
 @property(readonly) NSString *user;
+@property(readonly) NSString *home;
 
 + (NSError *)errorWithDescription:(id)errorDescription;
 

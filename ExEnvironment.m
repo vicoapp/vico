@@ -401,7 +401,7 @@
 		url = [NSURL URLWithString:path relativeToURL:[self baseURL]];
 	}
 
-	return url;
+	return [url absoluteURL];
 }
 
 - (IBAction)finishedExCommand:(id)sender

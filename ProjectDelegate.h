@@ -1,6 +1,18 @@
 #import "ViRegexp.h"
 #import "ViBgView.h"
 
+@class SFTPDirectoryEntry;
+
+@interface ProjectFile : NSObject
+{
+	NSURL *url;
+	SFTPDirectoryEntry *entry;
+	double score;
+	NSArray *children;
+}
+@property(readwrite, assign) double score;
+@end
+
 @interface ProjectDelegate : NSObject
 {
 	IBOutlet NSWindow *window;
@@ -12,11 +24,12 @@
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;
+	IBOutlet NSPathControl *rootButton;
 
 	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
-	NSMutableArray *rootItems;
+	NSArray *rootItems;
 	NSMutableArray *filteredItems;
 	ViRegexp *skipRegex;
 }

@@ -5,16 +5,87 @@
 #import "ViWindowController.h" // for goToUrl:
 
 @interface ProjectDelegate (private)
-- (NSMutableArray *)childrenAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
-- (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL;
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError;
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes error:(NSError **)outError;
++ (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
++ (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError;
++ (NSArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
 - (void)cancelExplorer;
+@end
+
+@implementation ProjectFile
+
+@synthesize score;
+
+- (id)initWithURL:(NSURL *)aURL
+{
+	self = [super init];
+	if (self) {
+		url = aURL;
+	}
+	return self;
+}
+
+- (id)initWithURL:(NSURL *)aURL entry:(SFTPDirectoryEntry *)anEntry
+{
+	self = [super init];
+	if (self) {
+		url = aURL;
+		entry = anEntry;
+	}
+	return self;
+}
+
++ (id)fileWithURL:(NSURL *)aURL
+{
+	return [[ProjectFile alloc] initWithURL:aURL];
+}
+
++ (id)fileWithURL:(NSURL *)aURL sftpInfo:(SFTPDirectoryEntry *)entry
+{
+	return [[ProjectFile alloc] initWithURL:aURL entry:entry];
+}
+
+- (BOOL)isDirectory
+{
+	if ([url isFileURL]) {
+		BOOL isDirectory = NO;
+		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
+			return YES;
+		return NO;
+	} else {
+		return [entry isDirectory];
+	}
+}
+
+- (NSURL *)url
+{
+	return url;
+}
+
+- (NSArray *)children
+{
+	if (children == nil) {
+		NSError *error = nil;
+		children = [ProjectDelegate childrenAtURL:url error:&error];
+		if (error)
+			INFO(@"error: %@", [error localizedDescription]);
+	}
+	return children;
+}
+
+- (NSString *)name
+{
+	return [url lastPathComponent];
+}
+
+- (NSString *)pathRelativeToURL:(NSURL *)relURL
+{
+	return [url path];
+}
+
 @end
 
 @implementation ProjectDelegate
@@ -25,11 +96,11 @@
 {
 	self = [super init];
 	if (self) {
-		rootItems = [[NSMutableArray alloc] init];
+		rootItems = [NSArray array];
 		skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
 
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
+		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	}
 	return self;
 }
@@ -44,49 +115,69 @@
 	[self hideExplorerSearch];
        
 	NSCell *cell = [(NSTableColumn *)[[explorer tableColumns] objectAtIndex:0] dataCell];
-	[cell setLineBreakMode:NSLineBreakByTruncatingHead];
+	[cell setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	[cell setWraps:NO];
 
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
+
+	[rootButton setTarget:self];
+	[rootButton setAction:@selector(changeRoot:)];
 }
 
-- (NSMutableArray *)childrenAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL
+- (void)changeRoot:(id)sender
 {
-	NSMutableArray *children = [[NSMutableArray alloc] init];
+	[self addURL:[[sender clickedPathComponentCell] URL]];
+}
+
++ (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError
+{
+	if ([url isFileURL])
+		return [self childrenAtFileURL:url error:outError];
+	else if ([[url scheme] isEqualToString:@"sftp"])
+		return [self childrenAtSftpURL:url error:outError];
+	else if (outError)
+		*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"unhandled scheme %@", [url scheme]]];
+	return nil;
+}
+
++ (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError
+{
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSError *error = nil;
-	NSArray *files = [fm contentsOfDirectoryAtPath:[url path] error:&error];
-	if (files == nil) {
-		INFO(@"failed to get files: %@", [error localizedDescription]);
+
+	NSArray *files = [fm contentsOfDirectoryAtPath:[url path] error:outError];
+	if (files == nil)
 		return nil;
-	}
-	NSString *file;
-	for (file in files) {
-		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
-			NSURL *childURL = [NSURL fileURLWithPath:[[url path] stringByAppendingPathComponent:file]];
-			[children addObject:[self itemAtFileURL:childURL rootURL:rootURL]];
-		}
-	}
+
+	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+
+	NSMutableArray *children = [[NSMutableArray alloc] init];
+	for (NSString *filename in files)
+		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
+			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename]]];
+
 	return children;
 }
 
-- (NSMutableArray *)childrenAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError
++ (NSArray*)childrenAtSftpURL:(NSURL*)url error:(NSError **)outError
 {
-	NSMutableArray *children = [[NSMutableArray alloc] init];
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
+	if (conn == nil)
+		return nil;
+
 	NSArray *entries = [conn contentsOfDirectoryAtPath:[url path] error:outError];
 	if (entries == nil)
 		return nil;
+
+	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+
+	NSMutableArray *children = [[NSMutableArray alloc] init];
 	SFTPDirectoryEntry *entry;
 	for (entry in entries) {
-		NSString *file = [entry filename];
-		if (![file hasPrefix:@"."] && [skipRegex matchInString:file] == nil) {
-			NSURL *childURL = [[NSURL alloc] initWithScheme:[url scheme] host:[conn hostWithUser] path:[[url path] stringByAppendingPathComponent:file]];
-			id item = [self itemAtSftpURL:childURL connection:conn rootURL:rootURL attributes:[entry attributes] error:outError];
-			if (item == nil)
-				return nil;
-			[children addObject:item];
-		}
+		NSString *filename = [entry filename];
+		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
+			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename] sftpInfo:entry]];
 	}
+	
 	return children;
 }
 
@@ -110,81 +201,23 @@
 	return item;
 }
 
-- (NSMutableDictionary *)itemAtFileURL:(NSURL *)url rootURL:(NSURL *)rootURL
-{
-	NSMutableDictionary *item = [self itemAtURL:url rootURL:rootURL];
-
-	BOOL isDirectory = NO;
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory) {
-		NSMutableArray *children = [self childrenAtFileURL:url rootURL:rootURL];
-		[item setObject:children forKey:@"children"];
-	}
-
-	return item;
-}
-
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL attributes:(Attrib *)attributes error:(NSError **)outError
-{
-	NSMutableDictionary *item = [self itemAtURL:url rootURL:rootURL];
-
-	if (attributes && (attributes->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) && S_ISDIR(attributes->perm)) {
-		// It's a directory
-		NSMutableArray *children = [self childrenAtSftpURL:url connection:conn rootURL:rootURL error:outError];
-		if (children == nil)
-			return nil;
-		[item setObject:children forKey:@"children"];
-	}
-
-	return item;
-}
-
-- (NSMutableDictionary *)itemAtSftpURL:(NSURL *)url connection:(SFTPConnection *)conn rootURL:(NSURL *)rootURL error:(NSError **)outError
-{
-	Attrib *attrs = [conn stat:[url path] error:outError];
-	if (attrs == NULL)
-		return nil;
-	return [self itemAtSftpURL:url connection:conn rootURL:rootURL attributes:attrs error:outError];
-}
-
-- (id)addFileURL:(NSURL *)url
-{
-        id item = [self itemAtFileURL:url rootURL:url];
-	[rootItems addObject:item];
-	return item;
-}
-
-- (id)addSftpURL:(NSURL *)url error:(NSError **)outError
-{
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
-	if (conn) {
-		id item = [self itemAtSftpURL:url connection:conn rootURL:url error:outError];
-		if (item)
-			[rootItems addObject:item];
-                return item;
-	}
-	return nil;
-}
-
 - (void)addURL:(NSURL *)aURL
 {
-	if ([rootItems indexOfObject:aURL] == NSNotFound && aURL != nil) {
-		NSError *error = nil;
-		id item = nil;
-		if ([[aURL scheme] isEqualToString:@"file"])
-			item = [self addFileURL:aURL];
-		else if ([[aURL scheme] isEqualToString:@"sftp"])
-			item = [self addSftpURL:aURL error:&error];
-		else
-			error = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"unhandled scheme %@", [aURL scheme]]];
+	INFO(@"browsing url %@", aURL);
 
-		if (item) {
-			[self filterFiles:self];
-			[explorer reloadData];
-			[explorer expandItem:item expandChildren:NO];
-		} else if (error) {
-			NSAlert *alert = [NSAlert alertWithError:error];
-			[alert runModal];
-		}
+	NSError *error = nil;
+	NSArray *children = nil;
+
+	children = [ProjectDelegate childrenAtURL:aURL error:&error];
+
+	if (children) {
+		rootItems = children;
+		[self filterFiles:self];
+		[explorer reloadData];
+		[rootButton setURL:aURL];
+	} else if (error) {
+		NSAlert *alert = [NSAlert alertWithError:error];
+		[alert runModal];
 	}
 }
 
@@ -252,14 +285,8 @@
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host user:user error:&error];
 	if (conn) {
 		INFO(@"connected to %@ as %@", host, user);
-		if (![path hasPrefix:@"/"]) {
-			NSString *pwd = [conn currentDirectory];
-			if (pwd == nil) {
-				INFO(@"%s", "FAILED to read current directory");
-				return;
-			}
-			path = [NSString stringWithFormat:@"%@/%@", pwd, path];
-		}
+		if (![path hasPrefix:@"/"])
+			path = [NSString stringWithFormat:@"%@/%@", [conn home], path];
 		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
 		[self addURL:url];
 	} else {
@@ -282,7 +309,7 @@
 - (void)showExplorerSearch
 {
 	NSRect frame = [explorerView frame];
-	frame.size.height -= 49;
+	frame.size.height -= 49 + 22;
 	frame.origin.y += 49;
 	[scrollView setFrame:frame];
 	[filterField setHidden:NO];
@@ -292,7 +319,7 @@
 {
 	[filterField setHidden:YES];
 	NSRect frame = [explorerView frame];
-	frame.size.height -= 23;
+	frame.size.height -= 23 + 22;
 	frame.origin.y += 23;
 	[scrollView setFrame:frame];
 }
@@ -302,9 +329,11 @@
 	[self hideExplorerSearch];
         [filterField setStringValue:@""];
         [self filterFiles:self];
+#if 0
         int i, n = [self outlineView:explorer numberOfChildrenOfItem:nil];
         for (i = 0; i < n; i++)
                 [explorer expandItem:[self outlineView:explorer child:i ofItem:nil] expandChildren:NO];
+#endif
 }
 
 - (void)explorerClick:(id)sender
@@ -312,11 +341,11 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 	if ([set count] > 1)
 		return;
-	NSDictionary *item = [explorer itemAtRow:[set firstIndex]];
+	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && ![self outlineView:explorer isItemExpandable:item])
-		[delegate goToURL:[item objectForKey:@"url"]];
+		[delegate goToURL:[item url]];
 
-        [self cancelExplorer];
+//        [self cancelExplorer];
 }
 
 - (void)explorerDoubleClick:(id)sender
@@ -324,12 +353,15 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 	if ([set count] > 1)
 		return;
-	NSDictionary *item = [explorer itemAtRow:[set firstIndex]];
+	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
+		[self addURL:[item url]];
+		/*
 		if ([explorer isItemExpanded:item])
 			[explorer collapseItem:item];
 		else
 			[explorer expandItem:item];
+		*/
 	} else
 		[self explorerClick:sender];
 }
@@ -420,13 +452,19 @@
 	ViRegexpMatch *pathMatch ;
 	double pathScore;
 
-	NSMutableDictionary *item;
+	/*
+	 * FIXME: transform into breadth-first search, and limit
+	 * number of descended directories (might be different for
+	 * file and sftp urls).
+	 */
+
+	ProjectFile *item;
 	for (item in items) {
 		if ([self outlineView:explorer isItemExpandable:item])
-			[self expandItems:[item objectForKey:@"children"] intoArray:expandedArray pathRx:pathRx fileRx:fileRx];
+			[self expandItems:[item children] intoArray:expandedArray pathRx:pathRx fileRx:fileRx];
 		else {
 			if (reldir == nil) {
-				reldir = [item objectForKey:@"reldir"];
+				reldir = [item pathRelativeToURL:[rootButton URL]];
 				if ((pathMatch = [pathRx matchInString:reldir]) != nil) {
 					pathScore = [self scoreForMatch:pathMatch inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
 					// INFO(@"path %@ = %lf, total Length = %u", reldir, pathScore, (unsigned)[pathMatch rangeOfMatchedString].length);
@@ -434,14 +472,13 @@
 			}
 
 			if (pathMatch != nil) {
-				NSString *name = [item objectForKey:@"name"];
 				ViRegexpMatch *fileMatch;
-				if ((fileMatch = [fileRx matchInString:name]) != nil) {
+				if ((fileMatch = [fileRx matchInString:[item name]]) != nil) {
 					double fileScore = [self scoreForMatch:fileMatch inSegments:1];
 					// INFO(@"%@ = %lf * %lf = %lf", [item objectForKey:@"relpath"], pathScore, fileScore, pathScore * fileScore);
 
-					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
-					[item setObject:[NSNumber numberWithDouble:pathScore * fileScore] forKey:@"score"];
+//					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
+					[item setScore:pathScore * fileScore];
 					[expandedArray addObject:item];
 				}
 			}
@@ -463,8 +500,8 @@
 static NSInteger
 sort_by_score(id a, id b, void *context)
 {
-	double a_score = [[(NSDictionary *)a objectForKey:@"score"] doubleValue];
-	double b_score = [[(NSDictionary *)b objectForKey:@"score"] doubleValue];
+	double a_score = [(ProjectFile *)a score];
+	double b_score = [(ProjectFile *)b score];
 
 	if (a_score < b_score)
 		return NSOrderedDescending;
@@ -563,12 +600,12 @@ sort_by_score(id a, id b, void *context)
 {
 	if (item == nil)
 		return [filteredItems objectAtIndex:anIndex];
-	return [[item objectForKey:@"children"] objectAtIndex:anIndex];
+	return [[(ProjectFile *)item children] objectAtIndex:anIndex];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-	return [item objectForKey:@"children"] != nil;
+	return [(ProjectFile *)item isDirectory];
 }
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
@@ -576,16 +613,17 @@ sort_by_score(id a, id b, void *context)
 	if (item == nil)
 		return [filteredItems count];
 
-	return [[item objectForKey:@"children"] count];
+	return [[(ProjectFile *)item children] count];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	if ([[filterField stringValue] length] > 0) {
-		id match = [item objectForKey:@"match"];
-		return match ?: [item objectForKey:@"relpath"];
+		return [(ProjectFile *)item pathRelativeToURL:[rootButton URL]];
+//		id match = [item objectForKey:@"match"];
+//		return match ?: [item objectForKey:@"relpath"];
         } else
-                return [item objectForKey:@"name"];
+		return [(ProjectFile *)item name];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
@@ -595,14 +633,14 @@ sort_by_score(id a, id b, void *context)
 
 - (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
 {
-	return 18;
+	return 20;
 }
 
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	NSCell *cell = [tableColumn dataCellForRow:[explorer rowForItem:item]];
 	if (cell) {
-		NSURL *url = [item objectForKey:@"url"];
+		NSURL *url = [item url];
 		NSImage *img;
 		if ([url isFileURL])
 			img = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];

@@ -342,4 +342,22 @@
 	STAssertEqualObjects(ex.filename, @"file.c", nil);
 }
 
+- (void)test80_BangCommand
+{
+	ExCommand *ex = [[ExCommand alloc] initWithString:@"!ls"];
+	STAssertNotNil(ex, nil);
+	STAssertEqualObjects(ex.name, @"!", nil);
+	STAssertEqualObjects(ex.method, @"ex_bang", nil);
+	STAssertEqualObjects(ex.string, @"ls", nil);
+}
+
+- (void)test80_BangCommandWithShellPipe
+{
+	ExCommand *ex = [[ExCommand alloc] initWithString:@"!ls -1 | grep .m"];
+	STAssertNotNil(ex, nil);
+	STAssertEqualObjects(ex.name, @"!", nil);
+	STAssertEqualObjects(ex.method, @"ex_bang", nil);
+	STAssertEqualObjects(ex.string, @"ls -1 | grep .m", nil);
+}
+
 @end

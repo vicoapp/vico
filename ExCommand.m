@@ -847,7 +847,8 @@ ex_cmd_find(NSString *cmd)
 		 [command->name isEqualToString:@"global"] ||
 		 [command->name isEqualToString:@"v"])
 	{
-		
+		arg_string = [[scan string] substringFromIndex:[scan scanLocation]];
+		goto addr_verify;
 	}
 
 

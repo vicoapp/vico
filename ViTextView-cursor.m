@@ -7,14 +7,16 @@
 - (void)updateCaret
 {
 	NSLayoutManager *lm = [self layoutManager];
-	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, 1) actualCharacterRange:NULL];
+	int len = 1;
+	if (caret + 1 >= [[self textStorage] length])
+		len = 0;
+	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, len) actualCharacterRange:NULL];
 	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
 
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX
-	if (caret + 1 >= [[self textStorage] length])
-	{
-                // XXX
+	if (len == 0) {
+                // XXX: at EOF
 		caretRect.size.height = 16;
 		caretRect.size.width = 7;
 	}
@@ -31,17 +33,12 @@
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	if (NSIntersectsRect(caretRect, aRect)) 
-	{
-		if (mode == ViInsertMode)
-		{
+	if (NSIntersectsRect(caretRect, aRect)) {
+		if (mode == ViInsertMode) {
 			caretRect.size.width = 2;
-		}
-		else if (caret < [[self textStorage] length])
-		{
+		} else if (caret < [[self textStorage] length]) {
 			unichar c = [[[self textStorage] string] characterAtIndex:caret];
-			if (c == '\t')
-			{
+			if (c == '\t') {
 				// place cursor at end of tab, like vi does
 				caretRect.origin.x += caretRect.size.width - 7;
 			}

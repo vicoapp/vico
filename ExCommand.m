@@ -550,7 +550,7 @@ ex_cmd_find(NSString *cmd)
 	{
 		if (addr->type == EX_ADDR_NONE)
 		{
-			addr->type = EX_ADDR_CURRENT;
+			addr->type = EX_ADDR_RELATIVE;
 		}
 
 		/* From nvi

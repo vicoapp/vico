@@ -118,7 +118,7 @@
 	struct ex_address addr;
 	NSScanner *scan = [NSScanner scannerWithString:@"+7"];
 	STAssertTrue([ExCommand parseRange:scan intoAddress:&addr], nil);
-	STAssertEquals(addr.type, EX_ADDR_CURRENT, nil);
+	STAssertEquals(addr.type, EX_ADDR_RELATIVE, nil);
 	STAssertEquals(addr.offset, 7, nil);
 }
 
@@ -127,7 +127,7 @@
 	struct ex_address addr;
 	NSScanner *scan = [NSScanner scannerWithString:@"-7"];
 	STAssertTrue([ExCommand parseRange:scan intoAddress:&addr], nil);
-	STAssertEquals(addr.type, EX_ADDR_CURRENT, nil);
+	STAssertEquals(addr.type, EX_ADDR_RELATIVE, nil);
 	STAssertEquals(addr.offset, -7, nil);
 }
 
@@ -136,7 +136,7 @@
 	struct ex_address addr;
 	NSScanner *scan = [NSScanner scannerWithString:@"^7"];
 	STAssertTrue([ExCommand parseRange:scan intoAddress:&addr], nil);
-	STAssertEquals(addr.type, EX_ADDR_CURRENT, nil);
+	STAssertEquals(addr.type, EX_ADDR_RELATIVE, nil);
 	STAssertEquals(addr.offset, -7, nil);
 }
 

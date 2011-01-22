@@ -36,11 +36,12 @@ struct ex_command
 	NSString *help;
 };
 
-#define EX_ADDR_NONE	0
-#define EX_ADDR_ABS	1
-#define EX_ADDR_SEARCH	2
-#define EX_ADDR_MARK	3
-#define EX_ADDR_CURRENT	4
+#define EX_ADDR_NONE		0
+#define EX_ADDR_ABS		1
+#define EX_ADDR_SEARCH		2
+#define EX_ADDR_MARK		3
+#define EX_ADDR_CURRENT		4
+#define EX_ADDR_RELATIVE	5
 
 struct ex_address
 {

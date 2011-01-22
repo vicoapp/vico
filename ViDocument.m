@@ -453,12 +453,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[syntaxParser parseContext:ctx];
 
 	// Invalidate the layout(s).
-	if (ctx.restarting) {
-		ViDocumentView *dv;
-		for (dv in views) {
+	if (ctx.restarting)
+		for (ViDocumentView *dv in views)
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
-		}
-	}
 
 	[updateSymbolsTimer invalidate];
 	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4]
@@ -509,7 +506,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 	}
 
-	NSUInteger startLocation = [textStorage locationForStartOfLine:context.lineOffset];
+	NSInteger startLocation = [textStorage locationForStartOfLine:context.lineOffset];
+	if (startLocation == -1)
+		return;
 	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 50];
 	if (endLocation == -1)
 		endLocation = [textStorage length];

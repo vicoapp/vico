@@ -295,43 +295,24 @@
         return YES;
 }
 
+- (void)filterText:(NSString *)outputText contextInfo:(void *)contextInfo
+{
+	NSRange range = [(NSValue *)contextInfo rangeValue];
+	[self replaceRange:range withString:outputText];
+	[self endUndoGroup];
+}
+
 - (void)filter_through_shell_command:(NSString *)shellCommand contextInfo:(void *)contextInfo
 {
 	if ([shellCommand length] == 0)
 		return;
 
-	INFO(@"command = %@", contextInfo);
-
 	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
-
-	NSTask *task = [[NSTask alloc] init];
-	[task setLaunchPath:@"/bin/sh"];
-	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
-
-	NSPipe *shellInput = [NSPipe pipe];
-	NSPipe *shellOutput = [NSPipe pipe];
-
-	[task setStandardInput:shellInput];
-	[task setStandardOutput:shellOutput];
-	/* FIXME: set standard error to standard output? */
-
-	[task launch];
-	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
-	[[shellInput fileHandleForWriting] closeFile];
-	[task waitUntilExit];
-	int status = [task terminationStatus];
-
-	if (status != 0)
-	{
-		[[self delegate] message:@"%@: exited with status %i", shellCommand, status];
-	}
-	else
-	{
-		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
-		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
-		[self replaceRange:affectedRange withString:outputText];
-		[self endUndoGroup];
-	}
+	[[[self delegate] environment] filterText:inputText
+                                   throughCommand:shellCommand
+                                           target:self
+                                         selector:@selector(filterText:contextInfo:)
+                                      contextInfo:[NSValue valueWithRange:affectedRange]];
 }
 
 /* syntax: [count]!motion command(s) */

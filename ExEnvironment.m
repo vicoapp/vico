@@ -19,6 +19,15 @@
 @implementation ExEnvironment
 
 @synthesize baseURL;
+@synthesize filterOutput;
+@synthesize filterInput;
+@synthesize window;
+@synthesize filterSheet;
+@synthesize filterLeft;
+@synthesize filterPtr;
+@synthesize filterDone;
+@synthesize filterReadFailed;
+@synthesize filterWriteFailed;
 
 - (id)init
 {
@@ -623,8 +632,345 @@
 	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:[windowController currentDocument]];
 }
 
+- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
+{
+	NSUInteger begin, end;
+	NSTextStorage *storage = [exTextView textStorage];
+
+	switch (command.addr1->type) {
+	case EX_ADDR_ABS:
+		if (command.addr1->addr.abs.line == -1)
+			begin = [[storage string] length];
+		else
+			begin = [storage locationForStartOfLine:command.addr1->addr.abs.line];
+		break;
+	case EX_ADDR_RELATIVE:
+	case EX_ADDR_CURRENT:
+		begin = [exTextView caret];
+		break;
+	case EX_ADDR_NONE:
+	default:
+		begin = NSNotFound;
+		return NO;
+		break;
+	}
+
+	begin += /* command.addr1->offset many _lines_ */ 0;
+
+	switch (command.addr2->type) {
+	case EX_ADDR_ABS:
+		if (command.addr2->addr.abs.line == -1)
+			end = [[storage string] length];
+		else {
+			end = [storage locationForStartOfLine:command.addr2->addr.abs.line];
+			INFO(@"line %lu begins at %lu", command.addr2->addr.abs.line, end);
+		}
+		break;
+	case EX_ADDR_CURRENT:
+		end = [exTextView caret];
+		break;
+	case EX_ADDR_RELATIVE:
+	case EX_ADDR_NONE:
+		end = begin;
+		break;
+	default:
+		return NO;
+	}
+
+	end += /* command.addr2->offset many _lines_ */ 0;
+
+	*outRange = NSMakeRange(begin, end - begin);
+	INFO(@"resolved range %@", NSStringFromRange(*outRange));
+	return YES;
+}
+
+static void
+filter_read(CFSocketRef s,
+	     CFSocketCallBackType callbackType,
+	     CFDataRef address,
+	     const void *data,
+	     void *info)
+{
+	char buf[64*1024];
+	ExEnvironment *env = info;
+	ssize_t ret;
+	int fd = CFSocketGetNative(s);
+
+	ret = read(fd, buf, sizeof(buf));
+	if (ret <= 0) {
+		if (ret == 0) {
+			INFO(@"read EOF from fd %d", fd);
+			if ([env.window attachedSheet] != nil)
+				[NSApp endSheet:env.filterSheet returnCode:0];
+			env.filterDone = YES;
+		} else {
+			INFO(@"read(%d) failed: %s", fd, strerror(errno));
+			env.filterReadFailed = 1;
+		}
+		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
+		CFSocketInvalidate(s);
+	} else {
+		INFO(@"read %zi bytes from fd %i", ret, fd);
+		[env.filterOutput appendBytes:buf length:ret];
+	}
+}
+
+static void
+filter_write(CFSocketRef s,
+	     CFSocketCallBackType callbackType,
+	     CFDataRef address,
+	     const void *data,
+	     void *info)
+{
+	ExEnvironment *env = info;
+	size_t len = 64*1024;
+	int fd = CFSocketGetNative(s);
+
+	if (len > env.filterLeft)
+		len = env.filterLeft;
+
+	if (len > 0) {
+		ssize_t ret = write(fd, env.filterPtr, len);
+		if (ret <= 0) {
+			INFO(@"write(%zu) failed: %s", len, strerror(errno));
+			if (errno == EAGAIN || errno == EINTR) {
+				CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
+				return;
+			}
+
+			CFSocketInvalidate(s);
+			env.filterWriteFailed = 1;
+			return;
+		}
+
+		env.filterPtr = env.filterPtr + ret;
+		// ctx->ptr += ret;
+		// ctx->left -= ret;
+		env.filterLeft = env.filterLeft - ret;
+
+		INFO(@"wrote %zi bytes, %zu left", ret, env.filterLeft);
+	}
+
+	if (env.filterLeft == 0) {
+		INFO(@"done writing %zu bytes, closing fd %d", [env.filterInput length], fd);
+		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
+		CFSocketInvalidate(s);
+		// close(ctx->fd);
+		// ctx->fd = -1;
+	} else
+		CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
+}
+
+- (void)filterReplaceWith:(NSString *)outputText contextInfo:(void *)contextInfo
+{
+	NSRange range = [(NSValue *)contextInfo rangeValue];
+	INFO(@"replace range %@ with %zu characters", NSStringFromRange(range), [outputText length]);
+	[exTextView replaceRange:range withString:outputText];
+	[exTextView endUndoGroup];
+}
+
+- (void)filterFinish
+{
+	INFO(@"wait until exit of command %@", filterCommand);
+	[filterTask waitUntilExit];
+	int status = [filterTask terminationStatus];
+	INFO(@"status = %d", status);
+
+	if (status != 0)
+		[self message:@"%@: exited with status %i", filterCommand, status];
+	else if (!filterReadFailed && !filterWriteFailed) {
+		NSString *outputText = [[NSString alloc] initWithData:filterOutput encoding:NSUTF8StringEncoding];
+
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[filterTarget methodSignatureForSelector:filterSelector]];
+		[invocation setSelector:filterSelector];
+		[invocation setArgument:&outputText atIndex:2];
+		[invocation setArgument:&filterContextInfo atIndex:3];
+		[invocation invokeWithTarget:filterTarget];
+	}
+
+	filterTask = nil;
+	filterCommand = nil;
+	filterInput = nil;
+	filterOutput = nil;
+	filterTarget = nil;
+	filterContextInfo = NULL;
+}
+
+- (void)filterSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	[sheet orderOut:self];
+	INFO(@"return code is %i", returnCode);
+
+	if (returnCode == -1) {
+		INFO(@"terminating filter task %@", filterTask);
+		[filterTask terminate];
+	}
+	
+	[filterIndicator stopAnimation:self];
+	[self filterFinish];
+}
+
+- (IBAction)filterCancel:(id)sender
+{
+	[NSApp endSheet:filterSheet returnCode:-1];
+}
+
+- (void)filterText:(NSString*)inputText
+    throughCommand:(NSString*)shellCommand
+            target:(id)target
+          selector:(SEL)selector
+       contextInfo:(void *)contextInfo
+{
+	if ([shellCommand length] == 0)
+		return;
+
+	filterTask = [[NSTask alloc] init];
+	[filterTask setLaunchPath:@"/bin/sh"];
+	[filterTask setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
+
+	NSPipe *shellInput = [NSPipe pipe];
+	NSPipe *shellOutput = [NSPipe pipe];
+
+	[filterTask setStandardInput:shellInput];
+	[filterTask setStandardOutput:shellOutput];
+	/* FIXME: what to do with standard error? */
+
+	[filterTask launch];
+
+	// setup a new runloop mode
+	// schedule read and write in this mode
+	// schedule a timer to track how long the task takes to complete
+	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
+	// accept cancel button from sheet -> terminate task and cancel filter
+
+	NSString *mode = @"ViFilterRunLoopMode";
+
+
+	filterCommand = shellCommand;
+	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];
+	filterInput = [inputText dataUsingEncoding:NSUTF8StringEncoding];
+	filterLeft = [filterInput length];
+	filterPtr = [filterInput bytes];
+	filterDone = NO;
+	filterReadFailed = NO;
+	filterWriteFailed = NO;
+
+	filterTarget = target;
+	filterSelector = selector;
+	filterContextInfo = contextInfo;
+
+
+	int fd = [[shellOutput fileHandleForReading] fileDescriptor];
+	int flags = fcntl(fd, F_GETFL, 0);
+        fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
+	inputContext.version = 0;
+	inputContext.info = self; /* user data passed to the callbacks */
+	inputContext.retain = NULL;
+	inputContext.release = NULL;
+	inputContext.copyDescription = NULL;
+
+	inputSocket = CFSocketCreateWithNative(
+		kCFAllocatorDefault,
+		fd,
+		kCFSocketReadCallBack,
+		filter_read,
+		&inputContext);
+	if (inputSocket == NULL) {
+		INFO(@"failed to create input CFSocket of fd %i", fd);
+		return;
+	}
+
+	inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, 0);
+
+
+
+
+	fd = [[shellInput fileHandleForWriting] fileDescriptor];
+	flags = fcntl(fd, F_GETFL, 0);
+        fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
+	outputContext.version = 0;
+	outputContext.info = self; /* user data passed to the callbacks */
+	outputContext.retain = NULL;
+	outputContext.release = NULL;
+	outputContext.copyDescription = NULL;
+
+	outputSocket = CFSocketCreateWithNative(
+		kCFAllocatorDefault,
+		fd,
+		kCFSocketWriteCallBack,
+		filter_write,
+		&outputContext);
+	if (outputSocket == NULL) {
+		INFO(@"failed to create output CFSocket of fd %i", fd);
+		return;
+	}
+
+	outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, 0);
+
+
+
+	/* schedule the read and write sources in the new runloop mode */
+	CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
+	CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
+
+	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
+
+	int done = 0;
+
+	for (;;) {
+		[[NSRunLoop currentRunLoop] runMode:mode beforeDate:limitDate];
+		if ([limitDate timeIntervalSinceNow] <= 0) {
+			INFO(@"limit date %@ reached", limitDate);
+			break;
+		}
+
+		if (filterReadFailed || filterWriteFailed) {
+			INFO(@"%s", "input or output failed");
+			[filterTask terminate];
+			done = -1;
+			break;
+		}
+
+		if (filterDone) {
+			done = 1;
+			break;
+		}
+	}
+
+	if (done) {
+		[self filterFinish];
+	} else {
+		[NSApp beginSheet:filterSheet
+                   modalForWindow:window
+                    modalDelegate:self
+                   didEndSelector:@selector(filterSheetDidEnd:returnCode:contextInfo:)
+                      contextInfo:NULL];
+		[filterLabel setStringValue:shellCommand];
+		[filterLabel setFont:[NSFont userFixedPitchFontOfSize:12.0]];
+		[filterIndicator startAnimation:self];
+		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, kCFRunLoopCommonModes);
+		CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, kCFRunLoopCommonModes);
+	}
+}
+
 - (void)ex_bang:(ExCommand *)command
 {
+	NSRange range;
+	if (![self resolveExAddresses:command intoRange:&range])
+		return;
+	if (range.location == NSNotFound)
+		[self message:@"not implemented"];
+	else {
+		NSTextStorage *storage = [exTextView textStorage];
+		NSString *inputText = [[storage string] substringWithRange:range];
+		[self filterText:inputText
+                  throughCommand:command.string
+                          target:self
+                        selector:@selector(filterReplaceWith:contextInfo:)
+                     contextInfo:[NSValue valueWithRange:range]];
+	}
 }
 
 - (void)ex_number:(ExCommand *)command

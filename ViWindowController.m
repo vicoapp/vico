@@ -73,10 +73,6 @@ static NSWindowController	*currentWindowController = nil;
 	return self;
 }
 
-- (IBAction)saveProject:(id)sender
-{
-}
-
 - (void)getMoreBundles:(id)sender
 {
 	[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];

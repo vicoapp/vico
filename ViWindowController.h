@@ -78,8 +78,6 @@
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
 
-- (IBAction)saveProject:(id)sender;
-
 - (ViTagStack *)sharedTagStack;
 
 - (IBAction)selectNextTab:(id)sender;

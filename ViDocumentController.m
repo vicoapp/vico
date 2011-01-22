@@ -182,7 +182,6 @@
 
 - (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError **)outError
 {
-	INFO(@"url = %@", url);
 	BOOL isDirectory;
 	if ([url isFileURL]) {
 		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)

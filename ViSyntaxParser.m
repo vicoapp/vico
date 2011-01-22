@@ -200,14 +200,9 @@
 
 	if ([scopeArray count] <= affectedRange.location)
 		return;
-	NSUInteger i = affectedRange.location;
-	NSUInteger n = affectedRange.length;
-	while (n--)
-	{
-		DEBUG(@"removing %i:%@", i, [scopeArray objectAtIndex:i]);
-		[scopeArray removeObjectAtIndex:i];
-	}
+	[scopeArray removeObjectsInRange:NSIntersectionRange(affectedRange, NSMakeRange(0, [scopeArray count]))];
 
+	NSUInteger i;
 	for (i = affectedRange.location; i < [scopeArray count];)
 	{
 		ViScope *s = [scopeArray objectAtIndex:i];

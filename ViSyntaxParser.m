@@ -229,7 +229,7 @@
 - (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
 {
 	int c = [aScopeArray count];
-	if (c == 0 || aRange.length == 0)
+	if (c == 0 || aRange.length == 0 || aRange.location > [scopeArray count])
 		return;
 
 	DEBUG(@"-- got scope [%@] in range %@", [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));

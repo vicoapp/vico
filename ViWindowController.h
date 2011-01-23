@@ -12,8 +12,6 @@
 
 @interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
-	NSTextField *nagTitle;
-
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSTabView *tabView;
 	IBOutlet NSSplitView *splitView;	// Split between explorer, main and symbol views

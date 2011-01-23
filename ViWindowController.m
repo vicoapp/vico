@@ -107,15 +107,6 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	if (nagTitle) {
-		NSView *view = [[[self window] contentView] superview];
-	
-		NSRect rect = [nagTitle frame];
-		rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
-		rect.origin.y = NSMaxY([view frame]) - rect.size.height - (18 - rect.size.height);
-		[nagTitle setFrame:rect];
-	}
-
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
 
@@ -148,6 +139,8 @@ static NSWindowController	*currentWindowController = nil;
 		[self addNewTab:initialDocument];
                 initialDocument = nil;
 	}
+
+	[[self window] bind:@"title" toObject:self withKeyPath:@"document.title" options:nil];
 
 	[[self window] makeKeyAndOrderFront:self];
 	[symbolsView setSourceHighlight:YES];
@@ -225,6 +218,7 @@ static NSWindowController	*currentWindowController = nil;
 							 keyEquivalent:@""
 							       atIndex:ndx];
 	[item setRepresentedObject:document];
+	[item bind:@"title" toObject:document withKeyPath:@"title" options:nil];
 
 	// update symbol table
 	[documents addObject:document];
@@ -299,6 +293,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)checkDocumentChanged:(ViDocument *)document
 {
+	if ([document isTemporary])
+		return;
+
 	if ([[document fileURL] isFileURL]) {
 		NSError *error = nil;
 		NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[[document fileURL] path] error:&error];
@@ -353,6 +350,7 @@ static NSWindowController	*currentWindowController = nil;
 	return tagStack;
 }
 
+#if 0
 - (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
 {
 	NSString *projName = [[self project] displayName];
@@ -360,6 +358,7 @@ static NSWindowController	*currentWindowController = nil;
 		return projName;
 	return displayName;
 }
+#endif
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotification
 {
@@ -578,8 +577,8 @@ static NSWindowController	*currentWindowController = nil;
 		if ([self project] == nil)
 			[[self window] close];
 		else
-#endif
 			[self synchronizeWindowTitleWithDocumentName];
+#endif
 	}
 }
 
@@ -620,7 +619,6 @@ static NSWindowController	*currentWindowController = nil;
 
 	[self checkDocumentChanged:document];
 
-	[[self window] setTitle:[document displayName]];
 	[[tabView selectedTabViewItem] setLabel:[document displayName]];
 }
 

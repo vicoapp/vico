@@ -13,6 +13,9 @@
 	ViLanguage *language;
 	ViTheme *theme;
 
+	/* Set when opening a new file from the ex command line. */
+	BOOL isTemporary;
+
 	NSTextStorage *textStorage;
 	NSDictionary *typingAttributes;
 	ViWindowController *windowController;
@@ -45,6 +48,8 @@
 @property(readwrite, assign) ViSnippet *activeSnippet;
 @property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
+@property(readwrite, assign) BOOL isTemporary;
+@property(readonly) NSString *title;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;
@@ -61,7 +66,6 @@
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
-
 - (void)setTypingAttributes;
 - (NSDictionary *)typingAttributes;
 - (void)resetTypingAttributes;

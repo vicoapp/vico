@@ -39,6 +39,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize activeSnippet;
 @synthesize encoding;
 @synthesize jumpList;
+@synthesize isTemporary;
+@synthesize title;
 
 - (id)init
 {
@@ -170,6 +172,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)writeSafelyToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation error:(NSError **)outError
 {
+	BOOL ret = NO;
+
 	retrySaveOperation = NO;
 
 	if (![[textStorage string] canBeConvertedToEncoding:encoding]) {
@@ -192,8 +196,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			encoding = NSUTF8StringEncoding;
 	}
 
-	if ([url isFileURL])
-		return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
+	if ([url isFileURL]) {
+		ret = [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
+		if (ret)
+			isTemporary = NO;
+		return ret;
+	}
 
 	if (![[url scheme] isEqualToString:@"sftp"]) {
 		INFO(@"unsupported URL scheme: %@", [url scheme]);
@@ -209,7 +217,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 	if (conn == nil)
 		return NO;
-	return [conn writeData:data toFile:[url path] error:outError];
+	ret = [conn writeData:data toFile:[url path] error:outError];
+	if (ret)
+		isTemporary = NO;
+	return ret;
 }
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
@@ -304,9 +315,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self revertDocumentToSaved:nil];
 }
 
+- (NSString *)title
+{
+	return [self displayName];
+}
+
 - (void)setFileURL:(NSURL *)absoluteURL
 {
+	[self willChangeValueForKey:@"title"];
 	[super setFileURL:absoluteURL];
+	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
 }
 

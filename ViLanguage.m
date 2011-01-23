@@ -155,10 +155,9 @@
 	return [language objectForKey:@"name"];
 }
 
-- (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage canCache:(BOOL *)canCache
+- (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage
 {
 	// DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
-	*canCache = YES;
 
 	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
 	NSMutableDictionary *pattern;
@@ -185,7 +184,12 @@
 			if (includePattern)
 			{
 				// DEBUG(@"includePattern = [%@]", includePattern);
-				if ([includePattern count] == 1 + ([includePattern objectForKey:@"expandedPatterns"] ? 1 : 0) + ([includePattern objectForKey:@"comment"] ? 1 : 0) && [includePattern objectForKey:@"patterns"])
+				int n = 1;
+				for (NSString *key in [includePattern allKeys])
+					if ([key hasPrefix:@"expandedPatterns."] || [key isEqualToString:@"comment"])
+						++n;
+
+				if ([includePattern count] == n && [includePattern objectForKey:@"patterns"])
 				{
 					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
@@ -204,21 +208,15 @@
 		}
 		else if ([include isEqualToString:@"$base"])
 		{
-			// no endless loop because expandedPatternsForPattern caches the first recursion
-			// DEBUG(@"including %@: baseLanguage.name = %@", include, [baseLanguage name]);
-			*canCache = NO;
 			[expandedPatterns addObjectsFromArray:[baseLanguage patterns]];
 		}
 		else if ([include isEqualToString:@"$self"])
 		{
-			// no endless loop because expandedPatternsForPattern caches the first recursion
-			// DEBUG(@"including %@: self.name = %@", include, [self name]);
 			[expandedPatterns addObjectsFromArray:[self patterns]];
 		}
 		else
 		{
 			// include an external language grammar
-			// DEBUG(@"including external language [%@]", include);
 			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
 			if (externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
@@ -231,18 +229,16 @@
 
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage
 {
-	NSArray *expandedPatterns = [pattern objectForKey:@"expandedPatterns"];
+	NSString *cacheKey = [NSString stringWithFormat:@"expandedPatterns.%@", [baseLanguage name]];
+	NSArray *expandedPatterns = [pattern objectForKey:cacheKey];
 	if (expandedPatterns == nil) {
 		ViLanguage *lang = [pattern objectForKey:@"language"];
 		if (lang == nil)
 			lang = self;
 
-		BOOL canCache = YES;
-		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"] baseLanguage:baseLanguage canCache:&canCache];
-		if (expandedPatterns && canCache) {
-			// cache it
-			[pattern setObject:expandedPatterns forKey:@"expandedPatterns"];
-		}
+		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"] baseLanguage:baseLanguage];
+		if (expandedPatterns) 
+			[pattern setObject:expandedPatterns forKey:cacheKey];
 	}
 	return expandedPatterns;
 }

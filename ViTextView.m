@@ -927,9 +927,8 @@ int logIndent = 0;
 			 * Only use if next character is not alphanumeric.
 			 * FIXME: ...and next character is not any start character of a smart pair?
 			 */
-			unichar next_char = [[[self textStorage] string] characterAtIndex:start_location];
-			if (start_location + 1 >= [[self textStorage] length] ||
-			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:next_char])
+			if (start_location >= [[self textStorage] length] ||
+			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:[[[self textStorage] string] characterAtIndex:start_location]])
 			{
 				foundSmartTypingPair = YES;
 				[self insertString:[NSString stringWithFormat:@"%@%@",

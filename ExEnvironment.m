@@ -1039,7 +1039,7 @@ filter_write(CFSocketRef s,
 			[self message:usage];
 			return;
 		}
-		
+
 		NSString *name;
 		if (equals != NSNotFound)
 			name = [var substringToIndex:equals];

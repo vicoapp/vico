@@ -1127,7 +1127,7 @@ static NSWindowController	*currentWindowController = nil;
 }
 
 #pragma mark -
-#pragma mark Ex filename completion
+#pragma mark Symbol filter key handling
 
 - (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
 {

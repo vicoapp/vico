@@ -661,10 +661,8 @@
 	case EX_ADDR_ABS:
 		if (command.addr2->addr.abs.line == -1)
 			end = [[storage string] length];
-		else {
+		else
 			end = [storage locationForStartOfLine:command.addr2->addr.abs.line];
-			INFO(@"line %lu begins at %lu", command.addr2->addr.abs.line, end);
-		}
 		break;
 	case EX_ADDR_CURRENT:
 		end = [exTextView caret];
@@ -699,7 +697,7 @@ filter_read(CFSocketRef s,
 	ret = read(fd, buf, sizeof(buf));
 	if (ret <= 0) {
 		if (ret == 0) {
-			INFO(@"read EOF from fd %d", fd);
+			DEBUG(@"read EOF from fd %d", fd);
 			if ([env.window attachedSheet] != nil)
 				[NSApp endSheet:env.filterSheet returnCode:0];
 			env.filterDone = YES;
@@ -710,7 +708,7 @@ filter_read(CFSocketRef s,
 		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
 		CFSocketInvalidate(s);
 	} else {
-		INFO(@"read %zi bytes from fd %i", ret, fd);
+		DEBUG(@"read %zi bytes from fd %i", ret, fd);
 		[env.filterOutput appendBytes:buf length:ret];
 	}
 }
@@ -732,12 +730,12 @@ filter_write(CFSocketRef s,
 	if (len > 0) {
 		ssize_t ret = write(fd, env.filterPtr, len);
 		if (ret <= 0) {
-			INFO(@"write(%zu) failed: %s", len, strerror(errno));
 			if (errno == EAGAIN || errno == EINTR) {
 				CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
 				return;
 			}
 
+			INFO(@"write(%zu) failed: %s", len, strerror(errno));
 			CFSocketInvalidate(s);
 			env.filterWriteFailed = 1;
 			return;
@@ -748,11 +746,11 @@ filter_write(CFSocketRef s,
 		// ctx->left -= ret;
 		env.filterLeft = env.filterLeft - ret;
 
-		INFO(@"wrote %zi bytes, %zu left", ret, env.filterLeft);
+		DEBUG(@"wrote %zi bytes, %zu left", ret, env.filterLeft);
 	}
 
 	if (env.filterLeft == 0) {
-		INFO(@"done writing %zu bytes, closing fd %d", [env.filterInput length], fd);
+		DEBUG(@"done writing %zu bytes, closing fd %d", [env.filterInput length], fd);
 		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
 		CFSocketInvalidate(s);
 		// close(ctx->fd);
@@ -764,17 +762,17 @@ filter_write(CFSocketRef s,
 - (void)filterReplaceWith:(NSString *)outputText contextInfo:(void *)contextInfo
 {
 	NSRange range = [(NSValue *)contextInfo rangeValue];
-	INFO(@"replace range %@ with %zu characters", NSStringFromRange(range), [outputText length]);
+	DEBUG(@"replace range %@ with %zu characters", NSStringFromRange(range), [outputText length]);
 	[exTextView replaceRange:range withString:outputText];
 	[exTextView endUndoGroup];
 }
 
 - (void)filterFinish
 {
-	INFO(@"wait until exit of command %@", filterCommand);
+	DEBUG(@"wait until exit of command %@", filterCommand);
 	[filterTask waitUntilExit];
 	int status = [filterTask terminationStatus];
-	INFO(@"status = %d", status);
+	DEBUG(@"status = %d", status);
 
 	if (status != 0)
 		[self message:@"%@: exited with status %i", filterCommand, status];
@@ -799,10 +797,9 @@ filter_write(CFSocketRef s,
 - (void)filterSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
 	[sheet orderOut:self];
-	INFO(@"return code is %i", returnCode);
 
 	if (returnCode == -1) {
-		INFO(@"terminating filter task %@", filterTask);
+		DEBUG(@"terminating filter task %@", filterTask);
 		[filterTask terminate];
 	}
 	
@@ -922,12 +919,12 @@ filter_write(CFSocketRef s,
 	for (;;) {
 		[[NSRunLoop currentRunLoop] runMode:mode beforeDate:limitDate];
 		if ([limitDate timeIntervalSinceNow] <= 0) {
-			INFO(@"limit date %@ reached", limitDate);
+			DEBUG(@"limit date %@ reached", limitDate);
 			break;
 		}
 
 		if (filterReadFailed || filterWriteFailed) {
-			INFO(@"%s", "input or output failed");
+			DEBUG(@"%s", "input or output failed");
 			[filterTask terminate];
 			done = -1;
 			break;

@@ -1571,5 +1571,36 @@ int logIndent = 0;
 	[self pushLocationOnJumpList:[self caret]];
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+	NSMenu *menu = [super menuForEvent:theEvent];
+	int n = 0;
+
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSInteger charIndex = [self characterIndexForInsertionAtPoint:point];
+	if (charIndex == NSNotFound)
+		return menu;
+
+	[self setCaret:charIndex];
+	NSArray *scopes = [self scopesAtLocation:charIndex];
+
+	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
+		NSMenu *submenu = [bundle menuForScopes:scopes];
+		if (submenu) {
+			NSMenuItem *item = [menu insertItemWithTitle:[bundle name]
+							      action:NULL
+						       keyEquivalent:@""
+							     atIndex:n++];
+			[item setSubmenu:submenu];
+		}
+	}
+
+	if (n > 0)
+		[menu insertItem:[NSMenuItem separatorItem] atIndex:n++];
+
+	return menu;
+}
+
+
 @end
 

@@ -544,55 +544,66 @@
 	[self message:@"%@", [self displayBaseURL]];
 }
 
+- (ViDocument *)openDocument:(NSString *)filename andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory
+{
+	NSError *error = nil;
+	NSURL *url = [self parseExFilename:filename];
+	BOOL isDirectory = NO;
+	BOOL exists = NO;
+	if ([url isFileURL])
+		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory];
+	else {
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
+		if (error) {
+			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+			return nil;
+		}
+	}
+
+	if (isDirectory && !allowDirectory) {
+		[self message:@"%@: is a directory", [url absoluteString]];
+		return nil;
+	}
+
+	ViDocument *doc;
+	if (exists) {
+		doc= [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:display error:&error];
+		/*
+		if (doc)
+			[windowController selectDocument:doc];
+		*/
+	} else {
+		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:display error:&error];
+		[doc setIsTemporary:YES];
+		[doc setFileURL:url];
+	}
+
+	if (error) {
+		[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+		return nil;
+	}
+
+	return doc;
+}
+
 - (void)ex_edit:(ExCommand *)command
 {
 	if (command.filename == nil)
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
 	else {
-		NSError *error = nil;
-		NSURL *url = [self parseExFilename:command.filename];
-		BOOL isDirectory = NO;
-		BOOL exists = NO;
-		if ([url isFileURL])
-			exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory];
-		else {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
-			exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
-			if (error) {
-				[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
-				return;
-			}
-		}
-
-		if (exists) {
-			ViDocument *document;
-			document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-													  display:YES
-													    error:&error];
-			if (document)
-				[windowController selectDocument:document];
-		} else {
-			id doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:&error];
-			[doc setFileURL:url];
-		}
-
-		if (error)
-			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+		ViDocument *document = [self openDocument:command.filename andDisplay:YES allowDirectory:YES];
+		if (document)
+			[windowController selectDocument:document];
 	}
 }
 
 - (BOOL)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc
 {
-	NSError *err = nil;
-
 	if (filename) {
-		NSURL *url = [self parseExFilename:filename];
-		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-											     display:NO
-											       error:&err];
-		if (err)
-			[self message:@"%@: %@", [url absoluteString], [err localizedDescription]];
+		doc = [self openDocument:filename andDisplay:NO allowDirectory:NO];
 	} else if (doc == nil) {
+		NSError *err = nil;
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
 		if (err)
 			[self message:@"%@", [err localizedDescription]];

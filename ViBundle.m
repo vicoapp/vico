@@ -75,6 +75,7 @@
 		languages = [[NSMutableArray alloc] init];
 		preferences = [[NSMutableArray alloc] init];
 		cachedPreferences = [[NSMutableDictionary alloc] init];
+		uuids = [[NSMutableDictionary alloc] init];
 		snippets = [[NSMutableArray alloc] init];
 		commands = [[NSMutableArray alloc] init];
 		path = [aPath stringByDeletingLastPathComponent];
@@ -156,12 +157,30 @@
 - (void)addSnippet:(NSDictionary *)snippet
 {
 	[snippets addObject:snippet];
+	
+	NSString *uuid = [snippet objectForKey:@"uuid"];
+	if (uuid == nil)
+		uuid = [snippet objectForKey:@"bundleUUID"];
+
+	if (uuid)
+		[uuids setObject:snippet forKey:uuid];
+	else
+		INFO(@"missing bundleUUID in snippet %@", snippet);
 }
 
 - (void)addCommand:(NSMutableDictionary *)command
 {
 	[command setObject:self forKey:@"bundle"];
 	[commands addObject:command];
+
+	NSString *uuid = [command objectForKey:@"uuid"];
+	if (uuid == nil)
+		uuid = [command objectForKey:@"bundleUUID"];
+
+	if (uuid)
+		[uuids setObject:command forKey:uuid];
+	else
+		INFO(@"missing bundleUUID in command %@", command);
 }
 
 - (NSDictionary *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
@@ -211,6 +230,86 @@
 			return [snippet objectForKey:@"content"];
         
         return nil;
+}
+
+- (NSMenu *)submenu:(NSDictionary *)menuLayout withName:(NSString *)name forScopes:(NSArray *)scopes
+{
+	int matches = 0;
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
+	NSDictionary *submenus = [menuLayout objectForKey:@"submenus"];
+
+	for (NSString *uuid in [menuLayout objectForKey:@"items"]) {
+		NSDictionary *command;
+		NSMenuItem *item;
+
+		if ([uuid isEqualToString:@"------------------------------------"]) {
+			item = [NSMenuItem separatorItem];
+			[menu addItem:item];
+		} else if ((command = [uuids objectForKey:uuid]) != nil) {
+			/*
+			 * FIXME: move this code to a new ViBundleCommand class.
+			 */
+			NSString *key = [command objectForKey:@"keyEquivalent"];
+			NSString *keyEquiv = @"";
+			NSUInteger modMask = 0;
+			int i;
+			for (i = 0; i < [key length]; i++) {
+				unichar c = [key characterAtIndex:i];
+				switch (c)
+				{
+				case '^':
+					modMask |= NSControlKeyMask;
+					break;
+				case '@':
+					modMask |= NSCommandKeyMask;
+					break;
+				case '~':
+					modMask |= NSAlternateKeyMask;
+					break;
+				default:
+					keyEquiv = [NSString stringWithFormat:@"%C", c];
+					break;
+				}
+			}
+
+			SEL selector = NULL;
+			if ([[command objectForKey:@"scope"] matchesScopes:scopes] > 0) {
+				matches++;
+				selector = @selector(performBundleCommand:) ;
+			}
+
+			item = [menu addItemWithTitle:[command objectForKey:@"name"]
+                                               action:selector
+                                        keyEquivalent:keyEquiv];
+			[item setKeyEquivalentModifierMask:modMask];
+			[item setRepresentedObject:command];
+		} else {
+			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
+			if (submenuLayout) {
+				NSMenu *submenu = [self submenu:submenuLayout withName:[submenuLayout objectForKey:@"name"] forScopes:scopes];
+				if (submenu) {
+					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"] action:NULL keyEquivalent:@""];
+					[item setSubmenu:submenu];
+				}
+			} else
+				INFO(@"missing menu item %@ in bundle %@", uuid, [self name]);
+		}
+
+	}
+
+	return matches == 0 ? nil : menu;
+}
+
+- (NSMenu *)menuForScopes:(NSArray *)scopes
+{
+	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
+	if (mainMenu == nil)
+		return nil;
+
+	NSMenu *menu = [self submenu:mainMenu withName:[self name] forScopes:scopes];
+
+	return menu;
+
 }
 
 @end

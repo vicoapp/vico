@@ -9,6 +9,7 @@
 	NSMutableArray *snippets;
 	NSMutableArray *commands;
 	NSMutableDictionary *cachedPreferences;
+	NSMutableDictionary *uuids;
 }
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
@@ -25,6 +26,7 @@
 - (void)addCommand:(NSMutableDictionary *)command;
 - (NSDictionary *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSMenu *)menuForScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;
 @property(readonly) NSMutableArray *commands;

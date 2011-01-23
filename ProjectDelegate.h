@@ -36,7 +36,7 @@
 
 @property(readwrite,assign) id delegate;
 
-- (void)addURL:(NSURL *)aURL;
+- (void)browseURL:(NSURL *)aURL;
 - (IBAction)addLocation:(id)sender;
 - (IBAction)addSFTPLocation:(id)sender;
 - (IBAction)actionMenu:(id)sender;

@@ -167,14 +167,19 @@ static NSWindowController	*currentWindowController = nil;
 	separatorCell = [[ViSeparatorCell alloc] init];
 
 	if ([self project] != nil)
-		[projectDelegate performSelector:@selector(addURL:) withObject:[[self project] initialURL] afterDelay:0.0];
+		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
 	else
-		[projectDelegate performSelector:@selector(addURL:) withObject:[environment baseURL] afterDelay:0.0];
+		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(caretChanged:) name:ViCaretChangedNotification object:nil];
 
 	[self updateJumplistNavigator];
+}
+
+- (void)browseURL:(NSURL *)url
+{
+	[projectDelegate browseURL:url];
 }
 
 - (void)setSelectedLanguage:(NSString *)aLanguage

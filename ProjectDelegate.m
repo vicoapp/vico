@@ -126,7 +126,7 @@
 
 - (void)changeRoot:(id)sender
 {
-	[self addURL:[[sender clickedPathComponentCell] URL]];
+	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
 + (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError
@@ -201,10 +201,8 @@
 	return item;
 }
 
-- (void)addURL:(NSURL *)aURL
+- (void)browseURL:(NSURL *)aURL
 {
-	INFO(@"browsing url %@", aURL);
-
 	NSError *error = nil;
 	NSArray *children = nil;
 
@@ -245,7 +243,7 @@
 		return;
 	
 	for (NSURL *url in [panel URLs])
-		[self addURL:url];
+		[self browseURL:url];
 }
 
 - (IBAction)addLocation:(id)sender
@@ -288,7 +286,7 @@
 		if (![path hasPrefix:@"/"])
 			path = [NSString stringWithFormat:@"%@/%@", [conn home], path];
 		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
-		[self addURL:url];
+		[self browseURL:url];
 	} else {
 		INFO(@"FAILED to connect to %@: %@", host, error);
 		NSAlert *alert = [NSAlert alertWithError:error];
@@ -355,7 +353,7 @@
 		return;
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
-		[self addURL:[item url]];
+		[self browseURL:[item url]];
 		/*
 		if ([explorer isItemExpanded:item])
 			[explorer collapseItem:item];

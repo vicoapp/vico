@@ -239,13 +239,12 @@
 		scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
 
 	NSUInteger i;
-	for (i = aRange.location; i < NSMaxRange(aRange); i++)
-	{
-		if (additive)
-		{
+	for (i = aRange.location; i < NSMaxRange(aRange); i++) {
+		if (additive) {
 			NSArray *oldScopes = [[scopeArray objectAtIndex:i] scopes];
 			scope = [[ViScope alloc] initWithScopes:[oldScopes arrayByAddingObjectsFromArray:aScopeArray] range:NSMakeRange(i, 1)];
 		}
+
 		if (i == [scopeArray count])
 			[scopeArray insertObject:scope atIndex:i];
 		else
@@ -265,7 +264,7 @@
 	NSUInteger i;
 	NSRange beginRange;
 	ViScope *begin = [scopeArray objectAtIndex:updateRange.location];
-	
+
 	// backtrack the first match to get the range right
 	i = updateRange.location;
 	for (;;)
@@ -290,6 +289,7 @@
 			break;
 		--i;
 	}
+
 	beginRange = NSMakeRange(i, updateRange.location - i);
 	DEBUG(@"beginRange = %@, begin = %@", NSStringFromRange(beginRange), begin);
 
@@ -299,7 +299,8 @@
 		if (s == begin || [[begin scopes] isEqualToStringArray:[s scopes]])
 		{
 			beginRange.length++;
-			[scopeArray replaceObjectAtIndex:i withObject:begin];
+			if (s != begin)
+				[scopeArray replaceObjectAtIndex:i withObject:begin];
 		}
 		else if (i >= NSMaxRange(updateRange) && [s range].location == i)
 		{
@@ -391,7 +392,7 @@
 {
 	DEBUG(@"searching for end match to [%@] in range %u + %u",
 	      [beginMatch scope], aRange.location, aRange.length);
-	
+
 	ViRegexp *endRegexp = [beginMatch endRegexp];
 	if (endRegexp == nil)
 	{
@@ -399,13 +400,13 @@
 			 withBackreferencesToRegexp:[beginMatch beginMatch]
 			                  matchText:chars];
 	}
-	
+
 	if (endRegexp == nil)
 	{
 		DEBUG(@"!!!!!!!!! no end regexp?");
 		return nil;
 	}
-	
+
 	// get all matches, one might be overlapped by a subpattern
 	regexps_tried++;
 	NSArray *matches = nil;

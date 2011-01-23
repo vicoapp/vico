@@ -14,12 +14,14 @@
 #define MOVE(inText, inLocation, commandKeys, outLocation) \
         TEST(inText, inLocation, commandKeys, inText, outLocation)
 
+#define DUMMY	/* workaround for syntax highlighting */
+
 @implementation TestViTextView
 
 - (void)setUp
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
-	[vi initEditorWithDelegate:nil];
+	[vi initEditorWithDelegate:nil viParser:[[ViCommand alloc] init]];
 }
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }

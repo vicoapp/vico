@@ -25,7 +25,7 @@
 	BOOL retrySaveOperation;
 
 	// language parsing and highlighting
-	BOOL ignoreEditing;
+	BOOL ignoreEditing, closed;
 	ViSyntaxParser *syntaxParser;
 	ViSyntaxContext *nextContext;
 

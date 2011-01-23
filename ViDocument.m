@@ -335,6 +335,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)close
 {
+	closed = YES;
 	[windowController closeDocument:self];
 
 	/* Remove the window controller so the document doesn't automatically
@@ -519,7 +520,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	nextContext = nil;
 
-	if (context.cancelled) {
+	if (context.cancelled || closed) {
 		DEBUG(@"context %@, from line %u, is cancelled", context, context.lineOffset);
 		return;
 	}

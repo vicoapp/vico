@@ -9,6 +9,7 @@
 @class ProjectDelegate;
 @class ViResizeView;
 @class ViProject;
+@class ViCommand;
 
 @interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
 {
@@ -29,7 +30,7 @@
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	ViDocumentView *lastDocumentView;
-
+	ViCommand *parser;
 	ViProject *project;
 
 	// project list
@@ -63,6 +64,7 @@
 - (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)focusEditor;
 
+- (ViCommand *)parser;
 - (ViDocumentView *)documentViewForView:(NSView *)aView;
 - (ViDocumentView *)selectDocumentView:(ViDocumentView *)docView;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;

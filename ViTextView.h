@@ -50,7 +50,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 {
 	// vi command parser
 	ViMode			 mode;
-	ViCommand		*parser;
+	ViCommand		*parser; // XXX: pointer to [windowController parser] !!!
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 replayingInput;  // true when dot command replays input
 	NSMutableArray		*inputKeys; // used for replaying input
@@ -88,7 +88,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 }
 
 - (id <ViTextViewDelegate>)delegate;
-- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate;
+- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViCommand *)aParser;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;

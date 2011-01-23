@@ -68,9 +68,15 @@ static NSWindowController	*currentWindowController = nil;
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
+		parser = [[ViCommand alloc] init];
 	}
 
 	return self;
+}
+
+- (ViCommand *)parser
+{
+	return parser;
 }
 
 - (void)getMoreBundles:(id)sender
@@ -590,6 +596,10 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocumentTabController *tabController = [self selectedTabController];
 	for (ViDocumentView *docView in [tabController views])
 		if ([docView textView] == [notification object]) {
+			if (!parser.complete) {
+				[[self environment] message:@"Vi command interrupted."];
+				[parser reset];
+			}
 			[self didSelectDocumentView:docView];
 			return;
 		}

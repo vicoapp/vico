@@ -138,7 +138,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	/* Make all views share the same text storage. */
 	[[textView layoutManager] replaceTextStorage:textStorage];
-	[textView initEditorWithDelegate:self];
+	[textView initEditorWithDelegate:self viParser:[windowController parser]];
 
 	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];

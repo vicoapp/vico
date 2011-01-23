@@ -29,7 +29,7 @@ int logIndent = 0;
 
 @implementation ViTextView
 
-- (void)initEditorWithDelegate:(id)aDelegate
+- (void)initEditorWithDelegate:(id)aDelegate viParser:(ViCommand *)aParser
 {
 	[self setDelegate:aDelegate];
 	[self setCaret:0];
@@ -37,7 +37,7 @@ int logIndent = 0;
 	undoManager = [[self delegate] undoManager];
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
-	parser = [[ViCommand alloc] init];
+	parser = aParser;
 	buffers = [[NSApp delegate] sharedBuffers];
 	inputKeys = [[NSMutableArray alloc] init];
 	marks = [[NSMutableDictionary alloc] init];

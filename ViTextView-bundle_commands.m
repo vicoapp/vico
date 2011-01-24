@@ -296,6 +296,9 @@
 			[[self delegate] setActiveSnippet:[self insertSnippet:outputText atLocation:inputRange.location]];
 			[self setInsertMode:nil];
 			[self setCaret:final_location];
+		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
+			ViDocument *doc = [[[self delegate] environment] splitVertically:NO andOpen:nil orSwitchToDocument:nil];
+			[doc setString:outputText];
 		} else if ([outputFormat isEqualToString:@"discard"])
 			;
 		else

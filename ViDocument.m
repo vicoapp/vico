@@ -40,7 +40,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize encoding;
 @synthesize jumpList;
 @synthesize isTemporary;
-@synthesize title;
 
 - (id)init
 {

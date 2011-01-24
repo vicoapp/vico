@@ -49,7 +49,6 @@
 @property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
-@property(readonly) NSString *title;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;
@@ -69,5 +68,6 @@
 - (void)setTypingAttributes;
 - (NSDictionary *)typingAttributes;
 - (void)resetTypingAttributes;
+- (NSString *)title;
 
 @end

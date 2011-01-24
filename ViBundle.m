@@ -275,7 +275,7 @@
 			SEL selector = NULL;
 			if ([[command objectForKey:@"scope"] matchesScopes:scopes] > 0) {
 				matches++;
-				selector = @selector(performBundleCommand:) ;
+				selector = @selector(performBundleCommand:);
 			}
 
 			item = [menu addItemWithTitle:[command objectForKey:@"name"]
@@ -292,7 +292,7 @@
 					[item setSubmenu:submenu];
 				}
 			} else
-				INFO(@"missing menu item %@ in bundle %@", uuid, [self name]);
+				DEBUG(@"missing menu item %@ in bundle %@", uuid, [self name]);
 		}
 
 	}

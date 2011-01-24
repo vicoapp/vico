@@ -100,36 +100,35 @@
 	return inputText;
 }
 
-- (void)setenv:(const char *)var value:(NSString *)value
+- (void)setVariable:(NSString *)var inEnvironment:(NSMutableDictionary *)env value:(NSString *)value
 {
-	DEBUG(@"%s = [%@]", var, value);
 	if (value)
-		setenv(var, [value UTF8String], 1);
+		[env setObject:value forKey:var];
 }
 
-- (void)setenv:(const char *)var integer:(NSInteger)intValue
+- (void)setVariable:(NSString *)var inEnvironment:(NSMutableDictionary *)env integer:(NSInteger)intValue
 {
-	[self setenv:var value:[NSString stringWithFormat:@"%li", intValue]];
+	[env setObject:[NSString stringWithFormat:@"%li", intValue] forKey:var];
 }
 
-- (void)setupEnvironmentForCommand:(NSDictionary *)command
+- (void)setupEnvironment:(NSMutableDictionary *)env forCommand:(NSDictionary *)command
 {
-	[self setenv:"TM_BUNDLE_PATH" value:[[command objectForKey:@"bundle"] path]];
+	[self setVariable:@"TM_BUNDLE_PATH" inEnvironment:env value:[[command objectForKey:@"bundle"] path]];
 
 	NSString *bundleSupportPath = [[command objectForKey:@"bundle"] supportPath];
-	[self setenv:"TM_BUNDLE_SUPPORT" value:bundleSupportPath];
+	[self setVariable:@"TM_BUNDLE_SUPPORT" inEnvironment:env value:bundleSupportPath];
 
 	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
-	[self setenv:"TM_SUPPORT_PATH" value:supportPath];
+	[self setVariable:@"TM_SUPPORT_PATH" inEnvironment:env value:supportPath];
 
 	char *path = getenv("PATH");
-	[self setenv:"PATH" value:[NSString stringWithFormat:@"%s:%@:%@",
+	[self setVariable:@"PATH" inEnvironment:env value:[NSString stringWithFormat:@"%s:%@:%@",
 		path,
 		[supportPath stringByAppendingPathComponent:@"bin"],
 		[bundleSupportPath stringByAppendingPathComponent:@"bin"]]];
 
-	[self setenv:"TM_CURRENT_LINE" value:[[self textStorage] lineForLocation:[self caret]]];
-	[self setenv:"TM_CURRENT_WORD" value:[[self textStorage] wordAtLocation:[self caret]]];
+	[self setVariable:@"TM_CURRENT_LINE" inEnvironment:env value:[[self textStorage] lineForLocation:[self caret]]];
+	[self setVariable:@"TM_CURRENT_WORD" inEnvironment:env value:[[self textStorage] wordAtLocation:[self caret]]];
 
 	NSURL *url = [[[self delegate] environment] baseURL];
 	NSString *cwd = nil;
@@ -137,30 +136,32 @@
 		cwd = [[[[self delegate] environment] baseURL] path];
 	else
 		cwd = [[[[self delegate] environment] baseURL] absoluteString];
-	[self setenv:"TM_DIRECTORY" value:cwd];
-	[self setenv:"TM_PROJECT_DIRECTORY" value:cwd];
+	[self setVariable:@"TM_DIRECTORY" inEnvironment:env value:cwd];
+	[self setVariable:@"TM_PROJECT_DIRECTORY" inEnvironment:env value:cwd];
 
-	[self setenv:"TM_FILENAME" value:[[[[self delegate] fileURL] path] lastPathComponent]];
+	[self setVariable:@"TM_FILENAME" inEnvironment:env value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	url = [[self delegate] fileURL];
 	if ([url isFileURL])
-		[self setenv:"TM_FILEPATH" value:[url path]];
+		[self setVariable:@"TM_FILEPATH" inEnvironment:env value:[url path]];
 	else
-		[self setenv:"TM_FILEPATH" value:[url absoluteString]];
-	[self setenv:"TM_FULLNAME" value:NSFullUserName()];
-	[self setenv:"TM_LINE_INDEX" integer:[[self textStorage] lineIndexAtLocation:[self caret]]];
-	[self setenv:"TM_LINE_NUMBER" integer:[self currentLine]];
-	[self setenv:"TM_SCOPE" value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
+		[self setVariable:@"TM_FILEPATH" inEnvironment:env value:[url absoluteString]];
+	[self setVariable:@"TM_FULLNAME" inEnvironment:env value:NSFullUserName()];
+	[self setVariable:@"TM_LINE_INDEX" inEnvironment:env integer:[[self textStorage] lineIndexAtLocation:[self caret]]];
+	[self setVariable:@"TM_LINE_NUMBER" inEnvironment:env integer:[self currentLine]];
+	[self setVariable:@"TM_SCOPE" inEnvironment:env value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
 
 	// FIXME: TM_SELECTED_FILES
 	// FIXME: TM_SELECTED_FILE
-	[self setenv:"TM_SELECTED_TEXT" value:[[[self textStorage] string] substringWithRange:[self selectedRange]]];
+	[self setVariable:@"TM_SELECTED_TEXT" inEnvironment:env value:[[[self textStorage] string] substringWithRange:[self selectedRange]]];
 
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
-		setenv("TM_SOFT_TABS", "YES", 1);
+		[env setObject:@"YES" forKey:@"TM_SOFT_TABS" ];
 	else
-		setenv("TM_SOFT_TABS", "NO", 1);
+		[env setObject:@"NO" forKey:@"TM_SOFT_TABS" ];
 
-	[self setenv:"TM_TAB_SIZE" value:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"]];
+	[self setVariable:@"TM_TAB_SIZE" inEnvironment:env value:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"]];
+
+	[env setObject:NSHomeDirectory() forKey:@"HOME"];
 
 	// FIXME: shellVariables in bundle preferences
 }
@@ -182,12 +183,6 @@
 	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
 	 */
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
-	[self setenv:"TM_INPUT_START_COLUMN" integer:[[self textStorage] columnAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_COLUMN" integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
-	[self setenv:"TM_INPUT_START_LINE_INDEX" integer:[[self textStorage] columnAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_LINE_INDEX" integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
-	[self setenv:"TM_INPUT_START_LINE" integer:[[self textStorage] lineNumberAtLocation:inputRange.location]];
-	[self setenv:"TM_INPUT_END_LINE" integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(inputRange)]];
 
 	// FIXME: beforeRunningCommand
 
@@ -240,24 +235,41 @@
 	[task setStandardOutput:shellOutput];
 	/* FIXME: set standard error to standard output? */
 
-	NSString *outputFormat = [command objectForKey:@"output"];
+	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	[self setupEnvironment:env forCommand:command];
+	[self setVariable:@"TM_INPUT_START_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:inputRange.location]];
+	[self setVariable:@"TM_INPUT_END_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
+	[self setVariable:@"TM_INPUT_START_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:inputRange.location]];
+	[self setVariable:@"TM_INPUT_END_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
+	[self setVariable:@"TM_INPUT_START_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:inputRange.location]];
+	[self setVariable:@"TM_INPUT_END_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(inputRange)]];
+	[task setCurrentDirectoryPath:[[[[self delegate] environment] baseURL] path]];
+	[task setEnvironment:env];
 
-	[self setupEnvironmentForCommand:command];
-	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
-	[task launch];
-	if ([inputText length] > 0) {
-		[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
-		[[shellInput fileHandleForWriting] closeFile];
-	}
+	INFO(@"environment: %@", env);
+	INFO(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
-	[task waitUntilExit];
-	int status = [task terminationStatus];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, @"command", [NSValue valueWithRange:inputRange], @"inputRange", nil];
+	INFO(@"contextInfo = %p", info);
+	[[[self delegate] environment] filterText:inputText throughTask:task target:self selector:@selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:) contextInfo:info];
 
 	if (fd != -1) {
 		unlink(templateFilename);
 		close(fd);
 		free(templateFilename);
 	}
+}
+
+- (void)bundleCommandFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(void *)contextInfo
+{
+	INFO(@"contextInfo = %p", contextInfo);
+	NSDictionary *info = contextInfo;
+	NSDictionary *command = [info objectForKey:@"command"];
+	NSRange inputRange = [[info objectForKey:@"inputRange"] rangeValue];
+
+	INFO(@"command %@ finished with status %i", [command objectForKey:@"name"], status);
+
+	NSString *outputFormat = [command objectForKey:@"output"];
 
 	if (status >= 200 && status <= 207) {
 		NSArray *overrideOutputFormat = [NSArray arrayWithObjects:
@@ -277,9 +289,6 @@
 	if (status != 0)
 		[[self delegate] message:@"%@: exited with status %i", [command objectForKey:@"name"], status];
 	else {
-		NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
-		NSString *outputText = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
-
 		DEBUG(@"command output: %@", outputText);
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])

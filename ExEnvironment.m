@@ -7,6 +7,7 @@
 #import "ViDocumentView.h"
 #import "NSTextStorage-additions.h"
 #import "SFTPConnectionPool.h"
+#import "ViCharsetDetector.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -598,7 +599,7 @@
 	}
 }
 
-- (BOOL)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc
+- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc
 {
 	if (filename) {
 		doc = [self openDocument:filename andDisplay:NO allowDirectory:NO];
@@ -617,30 +618,30 @@
 		else
 			[windowController splitViewHorizontally:nil];
 		[windowController switchToDocument:doc];
-		return YES;
+		return doc;
 	}
 
-	return NO;
+	return nil;
 }
 
 - (BOOL)ex_new:(ExCommand *)command
 {
-	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:nil];
+	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
 {
-	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:nil];
+	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_split:(ExCommand *)command
 {
-	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:[windowController currentDocument]];
+	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)ex_vsplit:(ExCommand *)command
 {
-	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:[windowController currentDocument]];
+	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
@@ -770,12 +771,16 @@ filter_write(CFSocketRef s,
 		CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
 }
 
-- (void)filterReplaceWith:(NSString *)outputText contextInfo:(void *)contextInfo
+- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(void *)contextInfo
 {
-	NSRange range = [(NSValue *)contextInfo rangeValue];
-	DEBUG(@"replace range %@ with %zu characters", NSStringFromRange(range), [outputText length]);
-	[exTextView replaceRange:range withString:outputText];
-	[exTextView endUndoGroup];
+	if (status != 0)
+		[self message:@"%@: exited with status %i", filterCommand, status];
+	else {
+		NSRange range = [(NSValue *)contextInfo rangeValue];
+		DEBUG(@"replace range %@ with %zu characters", NSStringFromRange(range), [outputText length]);
+		[exTextView replaceRange:range withString:outputText];
+		[exTextView endUndoGroup];
+	}
 }
 
 - (void)filterFinish
@@ -784,19 +789,30 @@ filter_write(CFSocketRef s,
 	[filterTask waitUntilExit];
 	int status = [filterTask terminationStatus];
 	DEBUG(@"status = %d", status);
-
-	if (status != 0)
-		[self message:@"%@: exited with status %i", filterCommand, status];
-	else if (!filterReadFailed && !filterWriteFailed) {
-		NSString *outputText = [[NSString alloc] initWithData:filterOutput encoding:NSUTF8StringEncoding];
-
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[filterTarget methodSignatureForSelector:filterSelector]];
-		[invocation setSelector:filterSelector];
-		[invocation setArgument:&outputText atIndex:2];
-		[invocation setArgument:&filterContextInfo atIndex:3];
-		[invocation invokeWithTarget:filterTarget];
+ 
+	if (filterReadFailed || filterWriteFailed)
+		status = -1;
+ 
+	/* Try to auto-detect the encoding. */
+	NSStringEncoding encoding = [[ViCharsetDetector defaultDetector] encodingForData:filterOutput];
+	if (encoding == 0)
+		/* Try UTF-8 if auto-detecting fails. */
+		encoding = NSUTF8StringEncoding;
+	NSString *outputText = [[NSString alloc] initWithData:filterOutput encoding:encoding];
+	if (outputText == nil) {
+		/* If all else fails, use iso-8859-1. */
+		encoding = NSISOLatin1StringEncoding;
+		outputText = [[NSString alloc] initWithData:filterOutput encoding:encoding];
 	}
 
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[filterTarget methodSignatureForSelector:filterSelector]];
+	[invocation setSelector:filterSelector];
+	[invocation setArgument:&status atIndex:2];
+	[invocation setArgument:&outputText atIndex:3];
+	[invocation setArgument:&filterContextInfo atIndex:4];
+	[invocation invokeWithTarget:filterTarget];
+
+	INFO(@"%s", "clearing filter variables");
 	filterTask = nil;
 	filterCommand = nil;
 	filterInput = nil;
@@ -824,24 +840,19 @@ filter_write(CFSocketRef s,
 }
 
 - (void)filterText:(NSString*)inputText
-    throughCommand:(NSString*)shellCommand
+    throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
        contextInfo:(void *)contextInfo
 {
-	if ([shellCommand length] == 0)
-		return;
-
-	filterTask = [[NSTask alloc] init];
-	[filterTask setLaunchPath:@"/bin/sh"];
-	[filterTask setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
+	filterTask = task;
 
 	NSPipe *shellInput = [NSPipe pipe];
 	NSPipe *shellOutput = [NSPipe pipe];
 
 	[filterTask setStandardInput:shellInput];
 	[filterTask setStandardOutput:shellOutput];
-	/* FIXME: what to do with standard error? */
+	/* FIXME: capture standard error as well! */
 
 	[filterTask launch];
 
@@ -854,7 +865,6 @@ filter_write(CFSocketRef s,
 	NSString *mode = @"ViFilterRunLoopMode";
 
 
-	filterCommand = shellCommand;
 	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];
 	filterInput = [inputText dataUsingEncoding:NSUTF8StringEncoding];
 	filterLeft = [filterInput length];
@@ -955,12 +965,31 @@ filter_write(CFSocketRef s,
                     modalDelegate:self
                    didEndSelector:@selector(filterSheetDidEnd:returnCode:contextInfo:)
                       contextInfo:NULL];
-		[filterLabel setStringValue:shellCommand];
+		NSString *label = [NSString stringWithFormat:@"%@ %@", [task launchPath], [[task arguments] componentsJoinedByString:@" "]];
+		[filterLabel setStringValue:label];
 		[filterLabel setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 		[filterIndicator startAnimation:self];
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, kCFRunLoopCommonModes);
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, kCFRunLoopCommonModes);
 	}
+}
+
+- (void)filterText:(NSString*)inputText
+    throughCommand:(NSString*)shellCommand
+            target:(id)target
+          selector:(SEL)selector
+       contextInfo:(void *)contextInfo
+{
+	if ([shellCommand length] == 0)
+		return;
+
+	NSTask *task = [[NSTask alloc] init];
+	[task setLaunchPath:@"/bin/bash"];
+	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
+
+	filterCommand = shellCommand;
+
+	return [self filterText:inputText throughTask:task target:target selector:selector contextInfo:contextInfo];
 }
 
 - (void)ex_bang:(ExCommand *)command
@@ -976,7 +1005,7 @@ filter_write(CFSocketRef s,
 		[self filterText:inputText
                   throughCommand:command.string
                           target:self
-                        selector:@selector(filterReplaceWith:contextInfo:)
+                        selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
                      contextInfo:[NSValue valueWithRange:range]];
 	}
 }

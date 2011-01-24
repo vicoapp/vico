@@ -73,6 +73,14 @@
 - (void)selectTabAtIndex:(NSInteger)anIndex;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView;
 
+- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc;
+
+- (void)filterText:(NSString*)inputText
+    throughTask:(NSTask *)task
+            target:(id)target
+          selector:(SEL)selector
+       contextInfo:(void *)contextInfo;
+
 - (void)filterText:(NSString*)inputText
     throughCommand:(NSString*)shellCommand
             target:(id)target

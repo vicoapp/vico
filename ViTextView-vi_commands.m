@@ -295,11 +295,14 @@
         return YES;
 }
 
-- (void)filterText:(NSString *)outputText contextInfo:(void *)contextInfo
+- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(void *)contextInfo
 {
-	NSRange range = [(NSValue *)contextInfo rangeValue];
-	[self replaceRange:range withString:outputText];
-	[self endUndoGroup];
+	if (status == 0) {
+		NSRange range = [(NSValue *)contextInfo rangeValue];
+		[self replaceRange:range withString:outputText];
+		[self endUndoGroup];
+	} else
+		[[self delegate] message:@"filter exited with status %i", status];
 }
 
 - (void)filter_through_shell_command:(NSString *)shellCommand contextInfo:(void *)contextInfo
@@ -311,7 +314,7 @@
 	[[[self delegate] environment] filterText:inputText
                                    throughCommand:shellCommand
                                            target:self
-                                         selector:@selector(filterText:contextInfo:)
+                                         selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
                                       contextInfo:[NSValue valueWithRange:affectedRange]];
 }
 

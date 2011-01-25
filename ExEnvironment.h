@@ -32,7 +32,7 @@
 
 	id				 filterTarget;
 	SEL				 filterSelector;
-	void				*filterContextInfo;
+	NSValue				*filterContextInfo;
 
 	// command output view
 	IBOutlet NSSplitView	*commandSplit;
@@ -76,10 +76,11 @@
 - (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc;
 
 - (void)filterText:(NSString*)inputText
-    throughTask:(NSTask *)task
+       throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
-       contextInfo:(void *)contextInfo;
+       contextInfo:(void *)contextInfo
+      displayTitle:(NSString *)displayTitle;
 
 - (void)filterText:(NSString*)inputText
     throughCommand:(NSString*)shellCommand

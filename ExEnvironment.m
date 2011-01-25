@@ -809,7 +809,8 @@ filter_write(CFSocketRef s,
 	[invocation setSelector:filterSelector];
 	[invocation setArgument:&status atIndex:2];
 	[invocation setArgument:&outputText atIndex:3];
-	[invocation setArgument:&filterContextInfo atIndex:4];
+	void *ptr = [filterContextInfo pointerValue];
+	[invocation setArgument:&ptr atIndex:4];
 	[invocation invokeWithTarget:filterTarget];
 
 	INFO(@"%s", "clearing filter variables");
@@ -818,7 +819,7 @@ filter_write(CFSocketRef s,
 	filterInput = nil;
 	filterOutput = nil;
 	filterTarget = nil;
-	filterContextInfo = NULL;
+	filterContextInfo = nil;
 }
 
 - (void)filterSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
@@ -840,10 +841,11 @@ filter_write(CFSocketRef s,
 }
 
 - (void)filterText:(NSString*)inputText
-    throughTask:(NSTask *)task
+       throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
        contextInfo:(void *)contextInfo
+      displayTitle:(NSString *)displayTitle
 {
 	filterTask = task;
 
@@ -875,7 +877,7 @@ filter_write(CFSocketRef s,
 
 	filterTarget = target;
 	filterSelector = selector;
-	filterContextInfo = contextInfo;
+	filterContextInfo = [NSValue valueWithPointer:contextInfo];
 
 
 	int fd = [[shellOutput fileHandleForReading] fileDescriptor];
@@ -965,8 +967,7 @@ filter_write(CFSocketRef s,
                     modalDelegate:self
                    didEndSelector:@selector(filterSheetDidEnd:returnCode:contextInfo:)
                       contextInfo:NULL];
-		NSString *label = [NSString stringWithFormat:@"%@ %@", [task launchPath], [[task arguments] componentsJoinedByString:@" "]];
-		[filterLabel setStringValue:label];
+		[filterLabel setStringValue:displayTitle];
 		[filterLabel setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 		[filterIndicator startAnimation:self];
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, kCFRunLoopCommonModes);
@@ -989,7 +990,7 @@ filter_write(CFSocketRef s,
 
 	filterCommand = shellCommand;
 
-	return [self filterText:inputText throughTask:task target:target selector:selector contextInfo:contextInfo];
+	return [self filterText:inputText throughTask:task target:target selector:selector contextInfo:contextInfo displayTitle:shellCommand];
 }
 
 - (void)ex_bang:(ExCommand *)command

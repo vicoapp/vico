@@ -190,8 +190,7 @@
 	int fd = -1;
 
 	NSString *shellCommand = [command objectForKey:@"command"];
-	if ([shellCommand hasPrefix:@"#!"])
-	{
+	if ([shellCommand hasPrefix:@"#!"]) {
 		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_cmd.XXXXXX"] fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
 		templateFilename = strdup(tmpl);
@@ -251,7 +250,7 @@
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, @"command", [NSValue valueWithRange:inputRange], @"inputRange", nil];
 	INFO(@"contextInfo = %p", info);
-	[[[self delegate] environment] filterText:inputText throughTask:task target:self selector:@selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:) contextInfo:info];
+	[[[self delegate] environment] filterText:inputText throughTask:task target:self selector:@selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:) contextInfo:info displayTitle:[command objectForKey:@"name"]];
 
 	if (fd != -1) {
 		unlink(templateFilename);

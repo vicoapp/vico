@@ -1,6 +1,8 @@
 extern int logIndent;
 
+#ifndef FORCE_DEBUG
 #define NO_DEBUG
+#endif
 
 #ifdef NO_DEBUG
 # define DEBUG(fmt, ...)

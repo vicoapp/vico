@@ -26,7 +26,7 @@
 {
 	tabstops = [[NSMutableArray alloc] init];
 
-	INFO(@"snippet string = %@ at location %llu", aString, aLocation);
+	DEBUG(@"snippet string = %@ at location %llu", aString, aLocation);
 
         NSMutableString *s = [aString mutableCopy];
 	BOOL foundMarker;
@@ -85,8 +85,8 @@
                 }
         } while (foundMarker);
 
-	INFO(@"parsed tabstops %@", tabstops);
-	INFO(@"last tabstop %@", lastPlaceholder);
+	DEBUG(@"parsed tabstops %@", tabstops);
+	DEBUG(@"last tabstop %@", lastPlaceholder);
 
 	range = NSMakeRange(aLocation, [s length]);
 	string = s;
@@ -159,7 +159,7 @@
 - (NSInteger)updateValue:(NSString *)newValue
 {
 	NSInteger delta = (NSInteger)[newValue length] - [value length];
-	INFO(@"setting value [%@] in placeholder %@", newValue, self);
+	DEBUG(@"setting value [%@] in placeholder %@", newValue, self);
 	range.length = [newValue length];
 	value = newValue;
 	return delta;

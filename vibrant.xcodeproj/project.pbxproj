@@ -64,6 +64,7 @@
 		9A5C547612F0C2A100484B21 /* ViBundleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5C547512F0C2A100484B21 /* ViBundleCommand.m */; };
 		9A5C54A112F4030500484B21 /* ViBundleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5C54A012F4030500484B21 /* ViBundleItem.m */; };
 		9A5C54A412F4032200484B21 /* ViBundleSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5C54A312F4032200484B21 /* ViBundleSnippet.m */; };
+		9A5C54C112F413E200484B21 /* viTabTriggerMenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5C54C012F413E200484B21 /* viTabTriggerMenuItemView.m */; };
 		9A60937E1171C97F00F26B09 /* ViTextView-bundle_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */; };
 		9A668E110D1116FC003FABD9 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E100D1116FC003FABD9 /* ViTheme.m */; };
 		9A668E140D11172C003FABD9 /* ViLanguage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A668E130D11172C003FABD9 /* ViLanguage.m */; };
@@ -279,6 +280,8 @@
 		9A5C54A012F4030500484B21 /* ViBundleItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBundleItem.m; sourceTree = "<group>"; };
 		9A5C54A212F4032200484B21 /* ViBundleSnippet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBundleSnippet.h; sourceTree = "<group>"; };
 		9A5C54A312F4032200484B21 /* ViBundleSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBundleSnippet.m; sourceTree = "<group>"; };
+		9A5C54BF12F413E200484B21 /* viTabTriggerMenuItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = viTabTriggerMenuItemView.h; sourceTree = "<group>"; };
+		9A5C54C012F413E200484B21 /* viTabTriggerMenuItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = viTabTriggerMenuItemView.m; sourceTree = "<group>"; };
 		9A60937D1171C97F00F26B09 /* ViTextView-bundle_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-bundle_commands.m"; sourceTree = "<group>"; };
 		9A668E0F0D1116FC003FABD9 /* ViTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTheme.h; sourceTree = "<group>"; };
 		9A668E100D1116FC003FABD9 /* ViTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTheme.m; sourceTree = "<group>"; };
@@ -677,6 +680,8 @@
 		9A438CB112369F6400F7D9FD /* Bundle Support */ = {
 			isa = PBXGroup;
 			children = (
+				9A5C54BF12F413E200484B21 /* viTabTriggerMenuItemView.h */,
+				9A5C54C012F413E200484B21 /* viTabTriggerMenuItemView.m */,
 				9A5C54A212F4032200484B21 /* ViBundleSnippet.h */,
 				9A5C54A312F4032200484B21 /* ViBundleSnippet.m */,
 				9A5C549F12F4030500484B21 /* ViBundleItem.h */,
@@ -1085,6 +1090,7 @@
 				9A5C547612F0C2A100484B21 /* ViBundleCommand.m in Sources */,
 				9A5C54A112F4030500484B21 /* ViBundleItem.m in Sources */,
 				9A5C54A412F4032200484B21 /* ViBundleSnippet.m in Sources */,
+				9A5C54C112F413E200484B21 /* viTabTriggerMenuItemView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

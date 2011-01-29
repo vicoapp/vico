@@ -2,6 +2,7 @@
 #import "ViBundle.h"
 #import "ViBundleCommand.h"
 #import "ViBundleSnippet.h"
+#import "ViTabTriggerMenuItemView.h"
 #import "logging.h"
 
 @implementation ViBundle
@@ -212,8 +213,7 @@
 		} else if ((op = [uuids objectForKey:uuid]) != nil) {
 			SEL selector = NULL;
 			if ([op isKindOfClass:[ViBundleItem class]]) {
-				ViBundleCommand *command = op;
-				NSString *scope = [command scope];
+				NSString *scope = [op scope];
 				if (scope == nil || [scope matchesScopes:scopes] > 0) {
 					matches++;
 					if ([op isMemberOfClass:[ViBundleCommand class]])
@@ -223,13 +223,19 @@
 				}
 				/* otherwise selector is NULL => disabled menu item */
 	
-				item = [menu addItemWithTitle:[command name]
+				item = [menu addItemWithTitle:[op name]
 						       action:selector
-						keyEquivalent:[command keyEquivalent]];
-				[item setKeyEquivalentModifierMask:[command modifierMask]];
-				[item setRepresentedObject:command];
+						keyEquivalent:[op keyEquivalent]];
+				[item setKeyEquivalentModifierMask:[op modifierMask]];
+				[item setRepresentedObject:op];
+
+				if ([op respondsToSelector:@selector(tabTrigger)]) {
+					/* Set a special view for drawing the tab trigger. */
+					ViTabTriggerMenuItemView *view = [[ViTabTriggerMenuItemView alloc] initWithTitle:[op name] tabTrigger:[op tabTrigger]];
+					[item setView:view];
+				}
 			} else
-				INFO(@"unhandled bundle item %@", op);
+				DEBUG(@"unhandled bundle item %@", op);
 		} else {
 			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
 			if (submenuLayout) {

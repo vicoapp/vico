@@ -142,6 +142,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
 - (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
 - (BOOL)updateSnippet:(ViSnippet *)snippet replaceRange:(NSRange)replaceRange withString:(NSString *)string;
+- (void)performBundleSnippet:(id)sender;
 @end
 
 @interface ViTextView (cursor)

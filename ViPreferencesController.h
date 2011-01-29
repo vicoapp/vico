@@ -41,6 +41,9 @@
 	NSArray *previousRepoUsers;
 	NSURLDownload *repoDownload;
 
+	NSURLConnection *userConnection;
+	NSMutableData *userData;
+
 	NSTask *installTask;
 	NSPipe *installPipe;
 	NSURLConnection *installConnection;
@@ -67,6 +70,6 @@
 - (void)setFilteredRepositories:(NSArray *)anArray;
 - (void)installNextBundle;
 - (void)setSelectedFont;
-- (void)reloadRepositoriesFromUsers:(NSArray *)users;
+- (void)reloadRepositoriesFromUsers:(NSArray *)usersToLoad;
 
 @end

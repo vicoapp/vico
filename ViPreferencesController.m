@@ -297,7 +297,7 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	[self cancelProgressSheet:nil];
 	NSDictionary *repoUser = [processQueue lastObject];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to reload %@'s repository: %@",
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to load %@'s repository: %@",
 	    [repoUser objectForKey:@"username"], [error localizedDescription]]];
 }
 
@@ -357,8 +357,13 @@ ToolbarHeightForWindow(NSWindow *window)
 	if (installConnection) {
 		[installConnection cancel];
 		[installTask terminate];
+		installConnection = nil;
+	} else if (userConnection) {
+		[userConnection cancel];
+		userConnection = nil;
 	} else {
 		[repoDownload cancel];
+		repoDownload = nil;
 	}
 
 	progressCancelled = YES;
@@ -381,11 +386,11 @@ ToolbarHeightForWindow(NSWindow *window)
 	}
 
 	[self resetProgressIndicator];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Reloading repositories from %@...", username]];
-
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/organizations/%@/public_repositories", username]];
-	repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-	[repoDownload setDestination:[self repoPathForUser:username] allowOverwrite:YES];
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Loading user %@...", username]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/user/show/%@", username]];
+	userConnection = [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+	userData = [[NSMutableData alloc] init];
+	installConnection = nil;
 }
 
 - (void)reloadRepositoriesFromUsers:(NSArray *)users
@@ -393,7 +398,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ([users count] == 0)
 		return;
 
-	[progressDescription setStringValue:@"Reloading bundle repositories from GitHub..."];
+	[progressDescription setStringValue:@"Loading bundle repositories from GitHub..."];
 	[NSApp beginSheet:progressSheet
 	   modalForWindow:[self window]
 	    modalDelegate:self
@@ -421,34 +426,74 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	[self cancelProgressSheet:nil];
 	NSMutableDictionary *repo = [processQueue lastObject];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"displayName"], [error localizedDescription]]];
-	[installTask terminate];
+	if (connection == installConnection) {
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"displayName"], [error localizedDescription]]];
+		[installTask terminate];
+	} else if (connection == userConnection) {
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"username"], [error localizedDescription]]];
+	}
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
 	receivedContentLength += [data length];
-	[progressIndicator setDoubleValue:receivedContentLength];
-	@try {
-		[[installPipe fileHandleForWriting] writeData:data];
-	}
-	@catch (NSException *exception) {
-		[installConnection cancel];
-		[installTask terminate];
-
-		[self cancelProgressSheet:nil];
-		NSMutableDictionary *repo = [processQueue lastObject];
-		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
+	if (connection == installConnection) {
+		[progressIndicator setDoubleValue:receivedContentLength];
+		@try {
+			[[installPipe fileHandleForWriting] writeData:data];
+		}
+		@catch (NSException *exception) {
+			[installConnection cancel];
+			[installTask terminate];
+	
+			[self cancelProgressSheet:nil];
+			NSMutableDictionary *repo = [processQueue lastObject];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
+		}
+	} else if (connection == userConnection) {
+		[userData appendData:data];
 	}
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-	[self setExpectedContentLengthFromResponse:response];
+	if (connection == installConnection)
+		[self setExpectedContentLengthFromResponse:response];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+	if (connection == userConnection) {
+		NSMutableDictionary *repo = [processQueue lastObject];
+		NSString *username = [repo objectForKey:@"username"];
+		NSDictionary *dict = [userData yajl_JSON];
+		if (dict == nil) {
+			[self cancelProgressSheet:nil];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to parse data for user %@.", username]];
+			return;
+		}
+
+		INFO(@"got user %@: %@", username, dict);
+
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Loading repositories from %@...", username]];
+		NSURL *url;
+		NSString *type = [[dict objectForKey:@"user"] objectForKey:@"type"];
+		if ([type isEqualToString:@"User"])
+			url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/repos/show/%@", username]];
+		else if ([type isEqualToString:@"Organization"])
+			url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/organizations/%@/public_repositories", username]];
+		else {
+			[self cancelProgressSheet:nil];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Unknown type %@ of user %@", type, username]];
+			return;
+		}
+
+		INFO(@"loading repositories from %@", url);
+		repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+		[repoDownload setDestination:[self repoPathForUser:username] allowOverwrite:YES];
+		return;
+	}
+
 	[[installPipe fileHandleForWriting] closeFile];
 
 	[installTask waitUntilExit];

@@ -119,6 +119,7 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
+- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)deleteRange:(NSRange)aRange;
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup;

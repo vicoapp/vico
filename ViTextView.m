@@ -17,7 +17,6 @@ int logIndent = 0;
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
 - (void)handleKeys:(NSArray *)keys;
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags;
 - (BOOL)evaluateCommand:(ViCommand *)command;
@@ -862,7 +861,7 @@ int logIndent = 0;
 		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
 
-	if (command.text) {
+	if (command && command.text) {
 		replayingInput = YES;
 		[self setCaret:end_location];
 		DEBUG(@"replaying input, got %u events", [command.text count]);
@@ -1009,23 +1008,17 @@ int logIndent = 0;
 	}
 
         // check for a new snippet
-        if (start_location > 0)
-        {
+        if (start_location > 0) {
                 // is there a word before the cursor that we just typed?
                 NSString *word = [[self textStorage] wordAtLocation:start_location - 1];
-                if ([word length] > 0)
-                {
-                        NSArray *scopes = [self scopesAtLocation:start_location];
-                        if (scopes)
-                        {
-                                NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
-                                if (snippetString)
-                                {
-                                        [self deleteRange:NSMakeRange(start_location - [word length], [word length])];
-                                        [[self delegate] setActiveSnippet:[self insertSnippet:snippetString atLocation:start_location - [word length]]];
-                                        return YES;
-                                }
-                        }
+                if ([word length] > 0) {
+                        NSArray *scopes = [self scopesAtLocation:(start_location == [[self textStorage] length]) ? MAX(0, start_location - 1) : start_location];
+			NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
+			if (snippetString) {
+				[self deleteRange:NSMakeRange(start_location - [word length], [word length])];
+				[[self delegate] setActiveSnippet:[self insertSnippet:snippetString atLocation:start_location - [word length]]];
+				return YES;
+			}
                 }
         }
 

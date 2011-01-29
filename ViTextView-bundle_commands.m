@@ -132,24 +132,35 @@
 	[self setVariable:@"TM_CURRENT_WORD" inEnvironment:env value:[[self textStorage] wordAtLocation:[self caret]]];
 
 	NSURL *url = [[[self delegate] environment] baseURL];
-	NSString *cwd = nil;
 	if ([url isFileURL])
-		cwd = [[[[self delegate] environment] baseURL] path];
-	else
-		cwd = [[[[self delegate] environment] baseURL] absoluteString];
-	[self setVariable:@"TM_DIRECTORY" inEnvironment:env value:cwd];
-	[self setVariable:@"TM_PROJECT_DIRECTORY" inEnvironment:env value:cwd];
+		[self setVariable:@"TM_PROJECT_DIRECTORY" inEnvironment:env value:[url path]];
+	[self setVariable:@"TM_PROJECT_URL" inEnvironment:env value:[url absoluteString]];
 
-	[self setVariable:@"TM_FILENAME" inEnvironment:env value:[[[[self delegate] fileURL] path] lastPathComponent]];
 	url = [[self delegate] fileURL];
-	if ([url isFileURL])
+	if ([url isFileURL]) {
+		[self setVariable:@"TM_DIRECTORY" inEnvironment:env value:[[url path] stringByDeletingLastPathComponent]];
+		[self setVariable:@"TM_FILENAME" inEnvironment:env value:[[url path] lastPathComponent]];
 		[self setVariable:@"TM_FILEPATH" inEnvironment:env value:[url path]];
-	else
-		[self setVariable:@"TM_FILEPATH" inEnvironment:env value:[url absoluteString]];
+	}
+	[self setVariable:@"TM_FILEURL" inEnvironment:env value:[url absoluteString]];
+
 	[self setVariable:@"TM_FULLNAME" inEnvironment:env value:NSFullUserName()];
 	[self setVariable:@"TM_LINE_INDEX" inEnvironment:env integer:[[self textStorage] lineIndexAtLocation:[self caret]]];
 	[self setVariable:@"TM_LINE_NUMBER" inEnvironment:env integer:[self currentLine]];
 	[self setVariable:@"TM_SCOPE" inEnvironment:env value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
+
+	NSRange sel = [self selectedRange];
+	if (sel.length > 0) {
+		[self setVariable:@"TM_INPUT_START_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:sel.location]];
+		[self setVariable:@"TM_INPUT_END_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(sel)]];
+
+		[self setVariable:@"TM_INPUT_START_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:sel.location]];
+		[self setVariable:@"TM_INPUT_START_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:sel.location]];
+
+		[self setVariable:@"TM_INPUT_END_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(sel)]];
+		[self setVariable:@"TM_INPUT_END_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(sel)]];
+	}
+
 
 	// FIXME: TM_SELECTED_FILES
 	// FIXME: TM_SELECTED_FILE
@@ -173,17 +184,13 @@
 	if ([sender respondsToSelector:@selector(representedObject)])
 		command = [sender representedObject];
 
-	NSRange inputRange;
-
-	/* FIXME: refactor ESC handling, and call it from here, ie both in insert and normal/visual mode, goto normal mode.
-	 * If in input mode, should setup repeat text and such...
+	/* FIXME: * If in input mode, should setup repeat text and such...
 	 */
-	[self setNormalMode];
-	[self endUndoGroup];
 
 	/*  FIXME: need to verify correct behaviour of these env.variables
 	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
 	 */
+	NSRange inputRange;
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
 
 	// FIXME: beforeRunningCommand
@@ -238,12 +245,6 @@
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
 	[self setupEnvironment:env forCommand:command];
-	[self setVariable:@"TM_INPUT_START_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:inputRange.location]];
-	[self setVariable:@"TM_INPUT_END_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
-	[self setVariable:@"TM_INPUT_START_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:inputRange.location]];
-	[self setVariable:@"TM_INPUT_END_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(inputRange)]];
-	[self setVariable:@"TM_INPUT_START_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:inputRange.location]];
-	[self setVariable:@"TM_INPUT_END_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(inputRange)]];
 	[task setCurrentDirectoryPath:[[[[self delegate] environment] baseURL] path]];
 	[task setEnvironment:env];
 
@@ -300,6 +301,9 @@
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
 			[[oc window] makeKeyAndOrderFront:self];
+		} else if ([outputFormat isEqualToString:@"insertAsText"] || [outputFormat isEqualToString:@"afterSelectedText"]) {
+			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
+			[self setCaret:[self caret] + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];
@@ -314,8 +318,6 @@
 		else
 			INFO(@"unknown output format: %@", outputFormat);
 	}
-
-	[self endUndoGroup];
 }
 
 @end

@@ -1,7 +1,3 @@
-#if 0
-# import <Carbon/Carbon.h>
-#endif
-
 #import "ViPreferencesController.h"
 #import "ViLanguageStore.h"
 #import "ViThemeStore.h"
@@ -387,7 +383,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Reloading repositories from %@...", username]];
 
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/repos/show/%@", username]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/organizations/%@/public_repositories", username]];
 	repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
 	[repoDownload setDestination:[self repoPathForUser:username] allowOverwrite:YES];
 }
@@ -462,17 +458,53 @@ ToolbarHeightForWindow(NSWindow *window)
 	NSMutableDictionary *repo = [processQueue lastObject];
 
 	if (status == 0) {
+		NSError *error = nil;
+		NSString *downloadDirectory = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
 		NSString *prefix = [NSString stringWithFormat:@"%@-%@", [repo objectForKey:@"owner"], [repo objectForKey:@"name"]];
-		NSArray *subdirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[ViLanguageStore bundlesDirectory] error:NULL];
-		for (NSString *subdir in subdirs) {
-			if ([subdir hasPrefix:prefix]) {
-				NSString *dir = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:subdir];
-				if ([[ViLanguageStore defaultStore] loadBundleFromDirectory:dir])
-					[repo setObject:@"Installed" forKey:@"status"];
-				[self updateBundleStatus];
+		NSString *bundleDirectory = nil;
+		NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadDirectory error:NULL];
+		for (NSString *filename in contents) {
+			if ([filename hasPrefix:prefix]) {
+				bundleDirectory = filename;
 				break;
 			}
 		}
+
+		if (bundleDirectory == nil) {
+			[self cancelProgressSheet:nil];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: downloaded bundle not found",
+			    [repo objectForKey:@"displayName"]]];
+			return;
+		}
+
+		contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[ViLanguageStore bundlesDirectory] error:NULL];
+		for (NSString *filename in contents) {
+			if ([filename hasPrefix:prefix]) {
+				NSString *path = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:filename];
+				if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
+					[self cancelProgressSheet:nil];
+					[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@ (%li)",
+					    [repo objectForKey:@"displayName"], [error localizedDescription], [error code]]];
+					return;
+				}
+				break;
+			}
+		}
+
+		/*
+		 * Move the bundle from the download directory to the bundles directory.
+		 */
+		NSString *src = [downloadDirectory stringByAppendingPathComponent:bundleDirectory];
+		NSString *dst = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:bundleDirectory];
+		if (![[NSFileManager defaultManager] moveItemAtPath:src toPath:dst error:&error])  {
+			[self cancelProgressSheet:nil];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
+			    [repo objectForKey:@"displayName"], [error localizedDescription]]];
+		}
+
+		if ([[ViLanguageStore defaultStore] loadBundleFromDirectory:dst])
+			[repo setObject:@"Installed" forKey:@"status"];
+		[self updateBundleStatus];
 	} else {
 		[self cancelProgressSheet:nil];
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking (status %d).",
@@ -492,12 +524,31 @@ ToolbarHeightForWindow(NSWindow *window)
 	NSMutableDictionary *repo = [processQueue lastObject];
 
 	[self resetProgressIndicator];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Downloading and installing %@ (%@)...",
+	[progressDescription setStringValue:[NSString stringWithFormat:@"Downloading and installing %@ (by %@)...",
 	    [repo objectForKey:@"name"], [repo objectForKey:@"owner"]]];
+
+	/*
+	 * Move away any existing (temporary) bundle directory.
+	 */
+	NSError *error = nil;
+	NSString *downloadDirectory = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
+	if (![[NSFileManager defaultManager] removeItemAtPath:downloadDirectory error:&error] && [error code] != NSFileNoSuchFileError) {
+		[self cancelProgressSheet:nil];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
+		    [repo objectForKey:@"displayName"], [error localizedDescription]]];
+		return;
+	}
+
+	if (![[NSFileManager defaultManager] createDirectoryAtPath:downloadDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
+		[self cancelProgressSheet:nil];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
+		    [repo objectForKey:@"displayName"], [error localizedDescription]]];
+		return;
+	}
 
 	installTask = [[NSTask alloc] init];
 	[installTask setLaunchPath:@"/usr/bin/tar"];
-	[installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", [ViLanguageStore bundlesDirectory], @"-k", @"-z", nil]];
+	[installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", downloadDirectory, nil]];
 
 	installPipe = [NSPipe pipe];
 	[installTask setStandardInput:installPipe];

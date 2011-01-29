@@ -41,15 +41,17 @@
                                 if (placeHolder == nil)
 					break;
                                 unsigned len = placeHolder.length;
+				DEBUG(@"got placeholder %@ at %lu", placeHolder, i);
 
                                 /*
                                  * Update the snippet string with any default value
                                  */
                                 NSRange r = NSMakeRange(i + aLocation, 0);
                                 NSString *defaultValue = placeHolder.defaultValue;
-                                if (defaultValue == nil && placeHolder.tabStop < [tabstops count] &&
+                                if (defaultValue == nil && placeHolder.tabStop > 0 && placeHolder.tabStop < [tabstops count] &&
                                     [tabstops objectAtIndex:placeHolder.tabStop]) {
                                 	/* This is a mirror. Use default value from first placeholder. */
+                                	DEBUG(@"got mirror of %li", placeHolder.tabStop);
                                 	defaultValue = [[[tabstops objectAtIndex:placeHolder.tabStop] objectAtIndex:0] defaultValue];
 				}
 

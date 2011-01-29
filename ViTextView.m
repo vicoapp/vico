@@ -1315,7 +1315,7 @@ int logIndent = 0;
 				ch = without;
 		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
 			ch = without;
-		
+
 		if ((0x20 < ch && ch < 0x7f) || ch == 0x19)
 			quals &= ~NSShiftKeyMask;
 	}
@@ -1357,13 +1357,15 @@ int logIndent = 0;
 	}
 
 	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
-		NSDictionary *bundleCommand = [[[self delegate] bundle] commandWithKey:charcode
-									      andFlags:flags
-									matchingScopes:[self scopesAtLocation:[self caret]]];
-		if (bundleCommand) {
-			DEBUG(@"got bundle command %@", bundleCommand);
-			[self performBundleCommand:bundleCommand];
-			return;
+		NSArray *scopes = [self scopesAtLocation:[self caret]];
+		for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
+			DEBUG(@"lookup bundle command for key %C flags %X in bundle %@", charcode, flags, [bundle name]);
+			ViBundleCommand *bundleCommand = [bundle commandWithKey:charcode andFlags:flags matchingScopes:scopes];
+			if (bundleCommand) {
+				INFO(@"got bundle command %@", bundleCommand);
+				[self performBundleCommand:bundleCommand];
+				return;
+			}
 		}
 	}
 

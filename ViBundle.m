@@ -191,7 +191,7 @@
 {
         for (ViBundleSnippet *snippet in snippets)
                 if ([[snippet tabTrigger] isEqualToString:name] &&
-		    [[snippet scope] matchesScopes:scopes] > 0)
+		    ([snippet scope] == nil || [[snippet scope] matchesScopes:scopes] > 0))
 			return [snippet content];
 
         return nil;

@@ -11,14 +11,14 @@
 	if (self)
 	{
 		content = aString;
-		INFO(@"content = [%@]", content);
+		DEBUG(@"content = [%@]", content);
 	}
 	return self;
 }
 
 - (void)windowDidLoad
 {
-	INFO(@"content = [%@]", content);
+	DEBUG(@"content = [%@]", content);
 	[[webView mainFrame] loadHTMLString:content baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 }
 

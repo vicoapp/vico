@@ -295,7 +295,7 @@
         return YES;
 }
 
-- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(void *)contextInfo
+- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
 {
 	if (status == 0) {
 		NSRange range = [(NSValue *)contextInfo rangeValue];

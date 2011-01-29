@@ -771,7 +771,7 @@ filter_write(CFSocketRef s,
 		CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
 }
 
-- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(void *)contextInfo
+- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
 {
 	if (status != 0)
 		[self message:@"%@: exited with status %i", filterCommand, status];
@@ -809,8 +809,7 @@ filter_write(CFSocketRef s,
 	[invocation setSelector:filterSelector];
 	[invocation setArgument:&status atIndex:2];
 	[invocation setArgument:&outputText atIndex:3];
-	void *ptr = [filterContextInfo pointerValue];
-	[invocation setArgument:&ptr atIndex:4];
+	[invocation setArgument:&filterContextInfo atIndex:4];
 	[invocation invokeWithTarget:filterTarget];
 
 	INFO(@"%s", "clearing filter variables");
@@ -844,7 +843,7 @@ filter_write(CFSocketRef s,
        throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
-       contextInfo:(void *)contextInfo
+       contextInfo:(id)contextInfo
       displayTitle:(NSString *)displayTitle
 {
 	filterTask = task;
@@ -877,7 +876,7 @@ filter_write(CFSocketRef s,
 
 	filterTarget = target;
 	filterSelector = selector;
-	filterContextInfo = [NSValue valueWithPointer:contextInfo];
+	filterContextInfo = contextInfo;
 
 
 	int fd = [[shellOutput fileHandleForReading] fileDescriptor];
@@ -979,7 +978,7 @@ filter_write(CFSocketRef s,
     throughCommand:(NSString*)shellCommand
             target:(id)target
           selector:(SEL)selector
-       contextInfo:(void *)contextInfo
+       contextInfo:(id)contextInfo
 {
 	if ([shellCommand length] == 0)
 		return;

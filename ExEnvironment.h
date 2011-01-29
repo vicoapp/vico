@@ -32,7 +32,7 @@
 
 	id				 filterTarget;
 	SEL				 filterSelector;
-	NSValue				*filterContextInfo;
+	id				 filterContextInfo;
 
 	// command output view
 	IBOutlet NSSplitView	*commandSplit;
@@ -79,14 +79,14 @@
        throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
-       contextInfo:(void *)contextInfo
+       contextInfo:(id)contextInfo
       displayTitle:(NSString *)displayTitle;
 
 - (void)filterText:(NSString*)inputText
     throughCommand:(NSString*)shellCommand
             target:(id)target
           selector:(SEL)selector
-       contextInfo:(void *)contextInfo;
+       contextInfo:(id)contextInfo;
 
 - (IBAction)filterCancel:(id)sender;
 

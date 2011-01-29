@@ -1,6 +1,7 @@
 #import "ViTextView.h"
 #import "ViSnippet.h"
 #import "ViDocument.h"
+#import "ViBundleSnippet.h"
 
 @implementation ViTextView (snippets)
 
@@ -114,6 +115,15 @@
 	DEBUG(@"tabstops after push = [%@]", snippet.tabstops);
 
 	return YES;
+}
+
+- (void)performBundleSnippet:(id)sender
+{
+	ViBundleSnippet *snippet = sender;
+	if ([sender respondsToSelector:@selector(representedObject)])
+		snippet = [sender representedObject];
+
+	[[self delegate] setActiveSnippet:[self insertSnippet:[snippet content] atLocation:[self caret]]];
 }
 
 @end

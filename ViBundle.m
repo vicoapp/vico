@@ -1,5 +1,7 @@
 #import "NSString-scopeSelector.h"
 #import "ViBundle.h"
+#import "ViBundleCommand.h"
+#import "ViBundleSnippet.h"
 #import "logging.h"
 
 @implementation ViBundle
@@ -154,81 +156,43 @@
 	return prefsForScope;
 }
 
-- (void)addSnippet:(NSDictionary *)snippet
+- (void)addSnippet:(NSDictionary *)desc
 {
-	[snippets addObject:snippet];
-	
-	NSString *uuid = [snippet objectForKey:@"uuid"];
-	if (uuid == nil)
-		uuid = [snippet objectForKey:@"bundleUUID"];
-
-	if (uuid)
-		[uuids setObject:snippet forKey:uuid];
-	else
-		INFO(@"missing bundleUUID in snippet %@", snippet);
-}
-
-- (void)addCommand:(NSMutableDictionary *)command
-{
-	[command setObject:self forKey:@"bundle"];
-	[commands addObject:command];
-
-	NSString *uuid = [command objectForKey:@"uuid"];
-	if (uuid == nil)
-		uuid = [command objectForKey:@"bundleUUID"];
-
-	if (uuid)
-		[uuids setObject:command forKey:uuid];
-	else
-		INFO(@"missing bundleUUID in command %@", command);
-}
-
-- (NSDictionary *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
-{
-	NSDictionary *command;
-	for (command in commands) {
-
-		NSString *key = [command objectForKey:@"keyEquivalent"];
-		unichar keyEquiv = 0;
-		NSUInteger modMask = 0;
-		int i;
-		for (i = 0; i < [key length]; i++) {
-			unichar c = [key characterAtIndex:i];
-			switch (c)
-			{
-			case '^':
-				modMask |= NSControlKeyMask;
-				break;
-			case '@':
-				modMask |= NSCommandKeyMask;
-				break;
-			case '~':
-				modMask |= NSAlternateKeyMask;
-				break;
-			default:
-				keyEquiv = c;
-				break;
-			}
-		}
-
-                if (keyEquiv != keycode || flags != modMask)
-                	continue;
-
-		if ([[command objectForKey:@"scope"] matchesScopes:scopes] > 0)
-			return command;
+	ViBundleSnippet *snippet = [[ViBundleSnippet alloc] initFromDictionary:desc inBundle:self];
+	if (snippet) {
+		[snippets addObject:snippet];
+		[uuids setObject:snippet forKey:[snippet uuid]];
 	}
+}
+
+- (void)addCommand:(NSMutableDictionary *)desc
+{
+	ViBundleCommand *command = [[ViBundleCommand alloc] initFromDictionary:desc inBundle:self];
+	if (command) {
+		[commands addObject:command];
+		[uuids setObject:command forKey:[command uuid]];
+	}
+}
+
+- (ViBundleCommand *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+{
+	for (ViBundleCommand *command in commands)
+                if ([command keycode] == keycode && [command keyflags] == flags) {
+			NSString *scope = [command scope];
+			if (scope == nil || [scope matchesScopes:scopes] > 0)
+				return command;
+		}
 
 	return nil;
 }
 
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes
 {
-        NSDictionary *snippet;
-        for (snippet in snippets)
-                if ([[snippet objectForKey:@"tabTrigger"] isEqualToString:name] &&
-		    [[snippet objectForKey:@"scope"] matchesScopes:scopes] > 0)
-			return [snippet objectForKey:@"content"];
-        
+        for (ViBundleSnippet *snippet in snippets)
+                if ([[snippet tabTrigger] isEqualToString:name] &&
+		    [[snippet scope] matchesScopes:scopes] > 0)
+			return [snippet content];
+
         return nil;
 }
 
@@ -239,50 +203,33 @@
 	NSDictionary *submenus = [menuLayout objectForKey:@"submenus"];
 
 	for (NSString *uuid in [menuLayout objectForKey:@"items"]) {
-		NSDictionary *command;
+		id op;
 		NSMenuItem *item;
 
 		if ([uuid isEqualToString:@"------------------------------------"]) {
 			item = [NSMenuItem separatorItem];
 			[menu addItem:item];
-		} else if ((command = [uuids objectForKey:uuid]) != nil) {
-			/*
-			 * FIXME: move this code to a new ViBundleCommand class.
-			 */
-			NSString *key = [command objectForKey:@"keyEquivalent"];
-			NSString *keyEquiv = @"";
-			NSUInteger modMask = 0;
-			int i;
-			for (i = 0; i < [key length]; i++) {
-				unichar c = [key characterAtIndex:i];
-				switch (c)
-				{
-				case '^':
-					modMask |= NSControlKeyMask;
-					break;
-				case '@':
-					modMask |= NSCommandKeyMask;
-					break;
-				case '~':
-					modMask |= NSAlternateKeyMask;
-					break;
-				default:
-					keyEquiv = [NSString stringWithFormat:@"%C", c];
-					break;
-				}
-			}
-
+		} else if ((op = [uuids objectForKey:uuid]) != nil) {
 			SEL selector = NULL;
-			if ([[command objectForKey:@"scope"] matchesScopes:scopes] > 0) {
-				matches++;
-				selector = @selector(performBundleCommand:);
-			}
-
-			item = [menu addItemWithTitle:[command objectForKey:@"name"]
-                                               action:selector
-                                        keyEquivalent:keyEquiv];
-			[item setKeyEquivalentModifierMask:modMask];
-			[item setRepresentedObject:command];
+			if ([op isKindOfClass:[ViBundleItem class]]) {
+				ViBundleCommand *command = op;
+				NSString *scope = [command scope];
+				if (scope == nil || [scope matchesScopes:scopes] > 0) {
+					matches++;
+					if ([op isMemberOfClass:[ViBundleCommand class]])
+						selector = @selector(performBundleCommand:);
+					else if ([op isMemberOfClass:[ViBundleSnippet class]])
+						selector = @selector(performBundleSnippet:);
+				}
+				/* otherwise selector is NULL => disabled menu item */
+	
+				item = [menu addItemWithTitle:[command name]
+						       action:selector
+						keyEquivalent:[command keyEquivalent]];
+				[item setKeyEquivalentModifierMask:[command modifierMask]];
+				[item setRepresentedObject:command];
+			} else
+				INFO(@"unhandled bundle item %@", op);
 		} else {
 			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
 			if (submenuLayout) {

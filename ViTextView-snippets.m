@@ -119,11 +119,19 @@
 
 - (void)performBundleSnippet:(id)sender
 {
-	ViBundleSnippet *snippet = sender;
+	ViBundleSnippet *bundleSnippet = sender;
 	if ([sender respondsToSelector:@selector(representedObject)])
-		snippet = [sender representedObject];
+		bundleSnippet = [sender representedObject];
 
-	[[self delegate] setActiveSnippet:[self insertSnippet:[snippet content] atLocation:[self caret]]];
+	[self beginUndoGroup];
+	ViSnippet *snippet = [self insertSnippet:[bundleSnippet content] atLocation:[self caret]];
+	[[self delegate] setActiveSnippet:snippet];
+
+	if (snippet && snippet.currentPlaceholder.selected) {
+		[self setSelectedRange:snippet.currentPlaceholder.range];
+		if ([snippet done])
+			[self cancelSnippet:snippet];
+	}
 }
 
 @end

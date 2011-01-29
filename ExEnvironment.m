@@ -35,7 +35,7 @@
 	self = [super init];
 	if (self) {
 		exCommandHistory = [[NSMutableArray alloc] init];
-                [self setBaseURL:[NSURL fileURLWithPath:[[NSFileManager defaultManager] currentDirectoryPath]]];
+                [self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
 	}
 	return self;
 }

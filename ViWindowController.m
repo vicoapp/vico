@@ -651,7 +651,11 @@ static NSWindowController	*currentWindowController = nil;
 {
 	ViDocumentTabController *tabController = [docView tabController];
 
-	NSTabViewItem *item = [tabView tabViewItemAtIndex:[tabView indexOfTabViewItemWithIdentifier:tabController]];
+	NSInteger ndx = [tabView indexOfTabViewItemWithIdentifier:tabController];
+	if (ndx == NSNotFound)
+		return nil;
+
+	NSTabViewItem *item = [tabView tabViewItemAtIndex:ndx];
 	[tabView selectTabViewItem:item];
 
 	// Focus the text view

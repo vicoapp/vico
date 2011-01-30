@@ -794,11 +794,17 @@ int logIndent = 0;
 {
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
 
-	if (stillSelectingFlag == NO)
-		return;
-
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
+
+	if (stillSelectingFlag == NO) {
+		if (mode != ViVisualMode && firstRange.length > 0) {
+			[self setVisualMode];
+			[self setCaret:firstRange.location];
+			visual_start_location = firstRange.location;
+		}
+		return;
+	}
 
 	if (mode != ViVisualMode) {
 		[self setVisualMode];

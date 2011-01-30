@@ -496,6 +496,7 @@
 		/*
 		 * Replacements in visual mode is restricted to the selection,
 		 * but doesn't affect the newlines.
+		 * FIXME: support multiple selection ranges (ie, block selection).
 		 * Need to process each line separately and avoid the newlines.
 		 * [count] is ignored.
 		 */

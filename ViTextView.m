@@ -798,7 +798,8 @@ int logIndent = 0;
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
 	if (stillSelectingFlag == NO) {
-		if (mode != ViVisualMode && firstRange.length > 0) {
+		ViSnippet *activeSnippet = [[self delegate] activeSnippet];
+		if (mode != ViVisualMode && firstRange.length > 0 && activeSnippet == nil) {
 			[self setVisualMode];
 			[self setCaret:firstRange.location];
 			visual_start_location = firstRange.location;

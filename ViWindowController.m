@@ -596,7 +596,7 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocumentTabController *tabController = [self selectedTabController];
 	for (ViDocumentView *docView in [tabController views])
 		if ([docView textView] == [notification object]) {
-			if (!parser.complete) {
+			if (parser.partial) {
 				[[self environment] message:@"Vi command interrupted."];
 				[parser reset];
 			}

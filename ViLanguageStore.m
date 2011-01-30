@@ -208,16 +208,26 @@ static NSString *bundlesDirectory = nil;
 	return result;
 }
 
-- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 {
-	ViBundle *bundle;
-	for (bundle in bundles) {
-		NSString *s = [bundle tabTrigger:name matchingScopes:scopes];
-		if (s)
-			return s;
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
+	for (ViBundle *bundle in bundles) {
+		NSArray *m = [bundle snippetsWithTabTrigger:name matchingScopes:scopes];
+		[matches addObjectsFromArray:m];
 	}
 
-	return nil;
+	return matches;
+}
+
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+{
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
+	for (ViBundle *bundle in bundles) {
+		NSArray *m = [bundle commandsWithKey:keycode andFlags:flags matchingScopes:scopes];
+		[matches addObjectsFromArray:m];
+	}
+
+	return matches;
 }
 
 - (BOOL)isBundleLoaded:(NSString *)name

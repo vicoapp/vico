@@ -256,5 +256,41 @@
 	}
 }
 
+/*
+ * Performs one of possibly multiple matching bundle items (commands or snippets).
+ * Show a menu of choices if more than one match.
+ */
+- (void)performBundleItems:(NSArray *)matches selector:(SEL)selector
+{
+	if ([matches count] == 1) {
+		[self performSelector:selector withObject:[matches objectAtIndex:0]];
+	} else if ([matches count] > 1) {
+		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
+		[menu setAllowsContextMenuPlugIns:NO];
+		int quickindex = 1;
+		for (ViBundleItem *c in matches) {
+			NSString *key = @"";
+			if (quickindex <= 10)
+				key = [NSString stringWithFormat:@"%i", quickindex % 10];
+			NSMenuItem *item = [menu addItemWithTitle:[c name] action:selector keyEquivalent:key];
+			[item setKeyEquivalentModifierMask:0];
+			[item setRepresentedObject:c];
+			++quickindex;
+		}
+
+		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0) inTextContainer:[self textContainer]].origin;
+		NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
+				  location:[self convertPoint:point toView:nil]
+			     modifierFlags:0
+				 timestamp:[[NSDate date] timeIntervalSinceNow]
+			      windowNumber:[[self window] windowNumber]
+				   context:[NSGraphicsContext currentContext]
+			       eventNumber:0
+				clickCount:1
+				  pressure:1.0];
+		[NSMenu popUpContextMenu:menu withEvent:ev forView:self];
+	}
+}
+
 @end
 

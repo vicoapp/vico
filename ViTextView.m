@@ -41,6 +41,7 @@ int logIndent = 0;
 	inputKeys = [[NSMutableArray alloc] init];
 	marks = [[NSMutableDictionary alloc] init];
 	saved_column = -1;
+	snippetMatchRange.location = NSNotFound;
 
 	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -1010,15 +1011,24 @@ int logIndent = 0;
         // check for a new snippet
         if (start_location > 0) {
                 // is there a word before the cursor that we just typed?
+                // FIXME: textmate includes more than just characters, sort of bigwords... investigate!
                 NSString *word = [[self textStorage] wordAtLocation:start_location - 1];
                 if ([word length] > 0) {
                         NSArray *scopes = [self scopesAtLocation:(start_location == [[self textStorage] length]) ? MAX(0, start_location - 1) : start_location];
-			NSString *snippetString = [[ViLanguageStore defaultStore] tabTrigger:word matchingScopes:scopes];
+			NSArray *matches = [[ViLanguageStore defaultStore] snippetsWithTabTrigger:word matchingScopes:scopes];
+			if ([matches count] > 0) {
+				snippetMatchRange = NSMakeRange(start_location - [word length], [word length]);
+				[self performBundleItems:matches selector:@selector(performBundleSnippet:)];
+				return YES;
+			}
+			
+			/*
 			if (snippetString) {
 				[self deleteRange:NSMakeRange(start_location - [word length], [word length])];
 				[[self delegate] setActiveSnippet:[self insertSnippet:snippetString atLocation:start_location - [word length]]];
 				return YES;
 			}
+			*/
                 }
         }
 
@@ -1355,40 +1365,9 @@ int logIndent = 0;
 	 */
 	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
-		NSMutableArray *matches = [[NSMutableArray alloc] init];
-		for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-			NSArray *bundleMatches = [bundle commandsWithKey:charcode andFlags:flags matchingScopes:scopes];
-			[matches addObjectsFromArray:bundleMatches];
-		}
-
-		if ([matches count] == 1) {
-			[self performBundleCommand:[matches objectAtIndex:0]];
-			return;
-		} else if ([matches count] > 1) {
-			NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
-			[menu setAllowsContextMenuPlugIns:NO];
-			int quickindex = 0;
-			for (ViBundleCommand *c in matches) {
-				NSString *key = @"";
-				if (quickindex < 10)
-					key = [NSString stringWithFormat:@"%i", quickindex];
-				NSMenuItem *item = [menu addItemWithTitle:[c name] action:@selector(performBundleCommand:) keyEquivalent:key];
-				[item setKeyEquivalentModifierMask:0];
-				[item setRepresentedObject:c];
-				++quickindex;
-			}
-
-			NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0) inTextContainer:[self textContainer]].origin;
-			NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
-					  location:[self convertPoint:point toView:nil]
-				     modifierFlags:0
-					 timestamp:[[NSDate date] timeIntervalSinceNow]
-				      windowNumber:[[self window] windowNumber]
-					   context:[NSGraphicsContext currentContext]
-				       eventNumber:0
-					clickCount:1
-					  pressure:1.0];
-			[NSMenu popUpContextMenu:menu withEvent:ev forView:self];
+		NSArray *matches = [[ViLanguageStore defaultStore] commandsWithKey:charcode andFlags:flags matchingScopes:scopes];
+		if ([matches count] > 0) {
+			[self performBundleItems:matches selector:@selector(performBundleCommand:)];
 			return;
 		}
 	}

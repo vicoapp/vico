@@ -19,7 +19,8 @@
 - (NSArray *)languages;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
-- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
 - (BOOL)isBundleLoaded:(NSString *)name;
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory;
 

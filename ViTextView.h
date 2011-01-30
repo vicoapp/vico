@@ -58,6 +58,8 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
 
+	NSRange			 snippetMatchRange;
+
 	NSUndoManager		*undoManager;
 
 	ViTagsDatabase		*tags; // XXX: doesn't belong here!? Move to the document or window controller.
@@ -170,5 +172,6 @@ typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisu
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 - (void)performBundleCommand:(id)sender;
+- (void)performBundleItems:(NSArray *)matches selector:(SEL)selector;
 @end
 

@@ -255,14 +255,15 @@
 	return matches;
 }
 
-- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 {
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
         for (ViBundleSnippet *snippet in snippets)
                 if ([[snippet tabTrigger] isEqualToString:name] &&
 		    ([snippet scope] == nil || [[snippet scope] matchesScopes:scopes] > 0))
-			return [snippet content];
+			[matches addObject:snippet];
 
-        return nil;
+        return matches;
 }
 
 - (NSMenu *)submenu:(NSDictionary *)menuLayout withName:(NSString *)name forScopes:(NSArray *)scopes

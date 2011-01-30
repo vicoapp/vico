@@ -29,7 +29,7 @@
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
 - (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
-- (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 - (NSMenu *)menuForScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;

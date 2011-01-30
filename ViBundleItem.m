@@ -24,7 +24,7 @@
 		uuid = [dict objectForKey:@"uuid"];
 
 		NSString *m = [dict objectForKey:@"mode"];	/* extension: 'insert', 'normal' or 'visual' mode */
-		if (m == nil)
+		if (m == nil || [m isEqualToString:@"any"])
 			mode = ViAnyMode;
 		else if ([m isEqualToString:@"insert"])
 			mode = ViInsertMode;

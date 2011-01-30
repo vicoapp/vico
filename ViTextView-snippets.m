@@ -11,6 +11,7 @@
 	DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
 	[[self delegate] setActiveSnippet:nil];
 	[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
+	[self endUndoGroup];
 }
 
 - (void)gotoTabstop:(int)num inSnippet:(ViSnippet *)snippet

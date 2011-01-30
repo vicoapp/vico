@@ -175,16 +175,18 @@
 	}
 }
 
-- (ViBundleCommand *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
 {
+	NSMutableArray *matches = [[NSMutableArray alloc] init];
+
 	for (ViBundleCommand *command in commands)
                 if ([command keycode] == keycode && [command keyflags] == flags) {
 			NSString *scope = [command scope];
 			if (scope == nil || [scope matchesScopes:scopes] > 0)
-				return command;
+				[matches addObject:command];
 		}
 
-	return nil;
+	return matches;
 }
 
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes

@@ -26,7 +26,7 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
-- (ViBundleCommand *)commandWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
 - (NSString *)tabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
 - (NSMenu *)menuForScopes:(NSArray *)scopes;
 

@@ -7,6 +7,7 @@
 @synthesize uuid;
 @synthesize name;
 @synthesize scope;
+@synthesize mode;
 @synthesize keyEquivalent;
 @synthesize modifierMask;
 @synthesize keycode;
@@ -21,6 +22,20 @@
 		name = [dict objectForKey:@"name"];
 		scope = [dict objectForKey:@"scope"];
 		uuid = [dict objectForKey:@"uuid"];
+
+		NSString *m = [dict objectForKey:@"mode"];	/* extension: 'insert', 'normal' or 'visual' mode */
+		if (m == nil)
+			mode = ViAnyMode;
+		else if ([m isEqualToString:@"insert"])
+			mode = ViInsertMode;
+		else if ([m isEqualToString:@"normal"] || [m isEqualToString:@"command"])
+			mode = ViNormalMode;
+		else if ([m isEqualToString:@"visual"])
+			mode = ViVisualMode;
+		else {
+			INFO(@"unknown mode %@", m);
+			return nil;
+		}
 
 		NSString *key = [dict objectForKey:@"keyEquivalent"];
 		keyEquivalent = @"";

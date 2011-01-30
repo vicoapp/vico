@@ -208,22 +208,22 @@ static NSString *bundlesDirectory = nil;
 	return result;
 }
 
-- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 	for (ViBundle *bundle in bundles) {
-		NSArray *m = [bundle snippetsWithTabTrigger:name matchingScopes:scopes];
+		NSArray *m = [bundle snippetsWithTabTrigger:name matchingScopes:scopes inMode:mode];
 		[matches addObjectsFromArray:m];
 	}
 
 	return matches;
 }
 
-- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 	for (ViBundle *bundle in bundles) {
-		NSArray *m = [bundle commandsWithKey:keycode andFlags:flags matchingScopes:scopes];
+		NSArray *m = [bundle commandsWithKey:keycode andFlags:flags matchingScopes:scopes inMode:mode];
 		[matches addObjectsFromArray:m];
 	}
 

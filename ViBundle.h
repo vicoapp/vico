@@ -1,4 +1,5 @@
 #import "ViLanguage.h"
+#import "ViCommon.h"
 
 @class ViBundleCommand;
 @class ViTextView;
@@ -28,8 +29,8 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
-- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes;
-- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes inMode:(ViMode)mode;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes inMode:(ViMode)mode;
 - (NSMenu *)menuForScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;

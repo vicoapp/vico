@@ -1022,7 +1022,7 @@ int logIndent = 0;
                 NSString *word = [[self textStorage] wordAtLocation:start_location - 1];
                 if ([word length] > 0) {
                         NSArray *scopes = [self scopesAtLocation:(start_location == [[self textStorage] length]) ? MAX(0, start_location - 1) : start_location];
-			NSArray *matches = [[ViLanguageStore defaultStore] snippetsWithTabTrigger:word matchingScopes:scopes];
+			NSArray *matches = [[ViLanguageStore defaultStore] snippetsWithTabTrigger:word matchingScopes:scopes inMode:mode];
 			if ([matches count] > 0) {
 				snippetMatchRange = NSMakeRange(start_location - [word length], [word length]);
 				[self performBundleItems:matches selector:@selector(performBundleSnippet:)];
@@ -1376,7 +1376,7 @@ int logIndent = 0;
 	 */
 	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
-		NSArray *matches = [[ViLanguageStore defaultStore] commandsWithKey:charcode andFlags:flags matchingScopes:scopes];
+		NSArray *matches = [[ViLanguageStore defaultStore] commandsWithKey:charcode andFlags:flags matchingScopes:scopes inMode:mode];
 		if ([matches count] > 0) {
 			[self performBundleItems:matches selector:@selector(performBundleCommand:)];
 			return;

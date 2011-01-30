@@ -1,4 +1,5 @@
 #import "ViBundle.h"
+#import "ViCommon.h"
 
 @interface ViBundleItem : NSObject
 {
@@ -6,6 +7,7 @@
 	NSString	*uuid;
 	NSString	*name;
 	NSString	*scope;
+	ViMode		 mode;
 
 	/* used in menus */
 	NSString	*keyEquivalent;
@@ -20,6 +22,7 @@
 @property(readonly) NSString *uuid;
 @property(readonly) NSString *name;
 @property(readonly) NSString *scope;
+@property(readonly) ViMode mode;
 @property(readonly) NSString *keyEquivalent;
 @property(readonly) NSUInteger modifierMask;
 @property(readonly) unichar keycode;

@@ -7,26 +7,12 @@
 #import "ViSyntaxParser.h"
 #import "ViSnippet.h"
 #import "ExEnvironment.h"
-
-#define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
-#define ViCaretChangedNotification @"ViCaretChangedNotification"
+#import "ViCommon.h"
 
 @class ViDocumentView;
 @class ViWindowController;
 @class ViTextView;
 @class ViJumpList;
-
-#ifdef IMAX
-# undef IMAX
-#endif
-#define IMAX(a, b)  (((NSInteger)a) > ((NSInteger)b) ? (a) : (b))
-
-#ifdef IMIN
-# undef IMIN
-#endif
-#define IMIN(a, b)  (((NSInteger)a) < ((NSInteger)b) ? (a) : (b))
-
-typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisualMode } ViMode;
 
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;

@@ -241,26 +241,28 @@
 	}
 }
 
-- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes
+- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 
 	for (ViBundleCommand *command in commands)
                 if ([command keycode] == keycode && [command keyflags] == flags) {
 			NSString *scope = [command scope];
-			if (scope == nil || [scope matchesScopes:scopes] > 0)
+			if ((scope == nil || [scope matchesScopes:scopes] > 0) &&
+			    ([command mode] == ViAnyMode || [command mode] == mode))
 				[matches addObject:command];
 		}
 
 	return matches;
 }
 
-- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes;
+- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
         for (ViBundleSnippet *snippet in snippets)
                 if ([[snippet tabTrigger] isEqualToString:name] &&
-		    ([snippet scope] == nil || [[snippet scope] matchesScopes:scopes] > 0))
+		    ([snippet scope] == nil || [[snippet scope] matchesScopes:scopes] > 0) &&
+		    ([snippet mode] == ViAnyMode || [snippet mode] == mode))
 			[matches addObject:snippet];
 
         return matches;

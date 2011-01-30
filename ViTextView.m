@@ -1220,10 +1220,9 @@ int logIndent = 0;
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
-	if (mode == ViVisualMode && !command.ismotion) {
-		[self setNormalMode];
-		[self resetSelection];
-	}
+	BOOL leaveVisualMode = NO;
+	if (mode == ViVisualMode && !command.ismotion)
+		leaveVisualMode = YES;
 
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
@@ -1238,6 +1237,11 @@ int logIndent = 0;
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
 		final_location = bol;
+	}
+
+	if (leaveVisualMode) {
+		[self setNormalMode];
+		[self resetSelection];
 	}
 
 	DEBUG(@"final_location is %u", final_location);

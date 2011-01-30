@@ -492,12 +492,30 @@
 /* syntax: [count]r<char> */
 - (BOOL)replace:(ViCommand *)command
 {
-	NSUInteger count;
-
-	if (mode == ViVisualMode)
-		count = affectedRange.length;
-	else {
-		count = IMAX(1, command.count);
+	if (mode == ViVisualMode) {
+		/*
+		 * Replacements in visual mode is restricted to the selection,
+		 * but doesn't affect the newlines.
+		 * Need to process each line separately and avoid the newlines.
+		 * [count] is ignored.
+		 */
+		NSUInteger bol = affectedRange.location, eol, end;
+		while (bol < NSMaxRange(affectedRange)) {
+			[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:bol];
+			if (eol > NSMaxRange(affectedRange))
+				eol = NSMaxRange(affectedRange);
+	
+			NSString *replacement = [@"" stringByPaddingToLength:eol - bol
+								  withString:[NSString stringWithFormat:@"%C", command.argument]
+							     startingAtIndex:0];
+			[self replaceRange:NSMakeRange(bol, eol - bol) withString:replacement];
+			bol = end;
+		}
+	} else {
+		/*
+		 * Replacements in normal mode is restricted to one line.
+		 */
+		NSUInteger count = IMAX(1, command.count);
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
 		if (start_location + count > eol) {
@@ -505,12 +523,12 @@
 			return NO;
 		}
 		affectedRange = NSMakeRange(start_location, count);
+	
+		NSString *replacement = [@"" stringByPaddingToLength:affectedRange.length
+							  withString:[NSString stringWithFormat:@"%C", command.argument]
+						     startingAtIndex:0];
+		[self replaceRange:affectedRange withString:replacement];
 	}
-
-	NSString *replacement = [@"" stringByPaddingToLength:count
-						  withString:[NSString stringWithFormat:@"%C", command.argument]
-					     startingAtIndex:0];
-	[self replaceRange:affectedRange withString:replacement];
 
 	return YES;
 }

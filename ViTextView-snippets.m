@@ -123,12 +123,16 @@
 	if ([sender respondsToSelector:@selector(representedObject)])
 		bundleSnippet = [sender representedObject];
 
-	if (snippetMatchRange.location != NSNotFound)
-		[self deleteRange:snippetMatchRange];
-	snippetMatchRange.location = NSNotFound;
-
 	[self beginUndoGroup];
+
+	if (snippetMatchRange.location != NSNotFound) {
+		[self deleteRange:snippetMatchRange];
+		[self setCaret:snippetMatchRange.location];
+		snippetMatchRange.location = NSNotFound;
+	}
+
 	ViSnippet *snippet = [self insertSnippet:[bundleSnippet content] atLocation:[self caret]];
+	DEBUG(@"activate snippet %@", snippet);
 	[[self delegate] setActiveSnippet:snippet];
 
 	if (snippet && snippet.currentPlaceholder.selected) {

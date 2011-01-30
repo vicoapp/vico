@@ -501,11 +501,14 @@ ToolbarHeightForWindow(NSWindow *window)
 	[progressIndicator setIndeterminate:YES];
 
 	NSMutableDictionary *repo = [processQueue lastObject];
+	NSString *owner = [repo objectForKey:@"owner"];
+	NSString *name = [repo objectForKey:@"name"];
+	NSString *displayName = [repo objectForKey:@"displayName"];
 
 	if (status == 0) {
 		NSError *error = nil;
 		NSString *downloadDirectory = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
-		NSString *prefix = [NSString stringWithFormat:@"%@-%@", [repo objectForKey:@"owner"], [repo objectForKey:@"name"]];
+		NSString *prefix = [NSString stringWithFormat:@"%@-%@", owner, name];
 		NSString *bundleDirectory = nil;
 		NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadDirectory error:NULL];
 		for (NSString *filename in contents) {
@@ -517,8 +520,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 		if (bundleDirectory == nil) {
 			[self cancelProgressSheet:nil];
-			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: downloaded bundle not found",
-			    [repo objectForKey:@"displayName"]]];
+			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: downloaded bundle not found", displayName]];
 			return;
 		}
 
@@ -529,7 +531,7 @@ ToolbarHeightForWindow(NSWindow *window)
 				if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
 					[self cancelProgressSheet:nil];
 					[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@ (%li)",
-					    [repo objectForKey:@"displayName"], [error localizedDescription], [error code]]];
+					    displayName, [error localizedDescription], [error code]]];
 					return;
 				}
 				break;
@@ -540,11 +542,11 @@ ToolbarHeightForWindow(NSWindow *window)
 		 * Move the bundle from the download directory to the bundles directory.
 		 */
 		NSString *src = [downloadDirectory stringByAppendingPathComponent:bundleDirectory];
-		NSString *dst = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:bundleDirectory];
+		NSString *dst = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@", owner, name]];
 		if (![[NSFileManager defaultManager] moveItemAtPath:src toPath:dst error:&error])  {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
-			    [repo objectForKey:@"displayName"], [error localizedDescription]]];
+			    displayName, [error localizedDescription]]];
 		}
 
 		if ([[ViLanguageStore defaultStore] loadBundleFromDirectory:dst])
@@ -553,7 +555,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	} else {
 		[self cancelProgressSheet:nil];
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking (status %d).",
-		    [repo objectForKey:@"displayName"], status]];
+		    displayName, status]];
 		return;
 	}
 

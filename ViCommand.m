@@ -93,6 +93,7 @@ static struct vikey normal_keys[] = {
 	{@"visual_line:",	'V', 0},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"delete_backward:",	'X', VIF_SETS_DOT},
+	{@"yank:",		'Y', VIF_LINE_MODE | VIF_SETS_DOT},
 	{@"move_bol:",		'0', VIF_IS_MOTION},
 	{@"append:",		'a', VIF_SETS_DOT},
 	{@"word_backward:",	'b', VIF_IS_MOTION},

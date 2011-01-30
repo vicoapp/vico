@@ -98,6 +98,7 @@
 - (void)test084_YankWordAndPasteAtEOL		{ TEST(@"abc def", 4, @"yw$p", @"abc defdef", 7); }
 - (void)test085_YankLine			{ TEST(@"abc\ndef", 2, @"yy", @"abc\ndef", 2); }
 - (void)test086_YankAndPasteLine		{ TEST(@"abc\ndef\nghi", 1, @"yyp", @"abc\nabc\ndef\nghi", 4); }
+- (void)test086_YankAndPasteLine2		{ TEST(@"abc\ndef\nghi", 1, @"ylYp", @"abc\nabc\ndef\nghi", 4); }
 - (void)test087_YankAndPasteLineBefore		{ TEST(@"abc\ndef\nghi", 5, @"yyP", @"abc\ndef\ndef\nghi", 4); }
 
 - (void)test090_MoveTilChar			{ MOVE(@"abc def ghi", 1, @"tf", 5); }

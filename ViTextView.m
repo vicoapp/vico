@@ -1349,16 +1349,47 @@ int logIndent = 0;
 		[parser reset];
 	}
 
+	/*
+	 * Find and perform bundle commands. Show a menu with commands if multiple matches found.
+	 * FIXME: should this be part of the key replay queue?
+	 */
 	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
+		NSMutableArray *matches = [[NSMutableArray alloc] init];
 		for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-			DEBUG(@"lookup bundle command for key %C flags %X in bundle %@", charcode, flags, [bundle name]);
-			ViBundleCommand *bundleCommand = [bundle commandWithKey:charcode andFlags:flags matchingScopes:scopes];
-			if (bundleCommand) {
-				INFO(@"got bundle command %@", bundleCommand);
-				[self performBundleCommand:bundleCommand];
-				return;
+			NSArray *bundleMatches = [bundle commandsWithKey:charcode andFlags:flags matchingScopes:scopes];
+			[matches addObjectsFromArray:bundleMatches];
+		}
+
+		if ([matches count] == 1) {
+			[self performBundleCommand:[matches objectAtIndex:0]];
+			return;
+		} else if ([matches count] > 1) {
+			NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
+			[menu setAllowsContextMenuPlugIns:NO];
+			int quickindex = 0;
+			for (ViBundleCommand *c in matches) {
+				NSString *key = @"";
+				if (quickindex < 10)
+					key = [NSString stringWithFormat:@"%i", quickindex];
+				NSMenuItem *item = [menu addItemWithTitle:[c name] action:@selector(performBundleCommand:) keyEquivalent:key];
+				[item setKeyEquivalentModifierMask:0];
+				[item setRepresentedObject:c];
+				++quickindex;
 			}
+
+			NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0) inTextContainer:[self textContainer]].origin;
+			NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
+					  location:[self convertPoint:point toView:nil]
+				     modifierFlags:0
+					 timestamp:[[NSDate date] timeIntervalSinceNow]
+				      windowNumber:[[self window] windowNumber]
+					   context:[NSGraphicsContext currentContext]
+				       eventNumber:0
+					clickCount:1
+					  pressure:1.0];
+			[NSMenu popUpContextMenu:menu withEvent:ev forView:self];
+			return;
 		}
 	}
 

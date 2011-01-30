@@ -45,7 +45,8 @@
 	id			 exDelegate;
 	void			*exContextInfo;
 
-	NSMutableArray		*exCommandHistory;
+	NSMutableArray		*history;
+	int			 historyIndex;
 }
 
 @property(readonly) NSURL *baseURL;

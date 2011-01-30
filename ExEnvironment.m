@@ -34,7 +34,8 @@
 {
 	self = [super init];
 	if (self) {
-		exCommandHistory = [[NSMutableArray alloc] init];
+		history = [[NSMutableArray alloc] init];
+		historyIndex = -1;
                 [self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
 	}
 	return self;
@@ -335,12 +336,18 @@
 		}
 		else if (aSelector == @selector(moveUp:))
 		{
-			INFO(@"%s", "look back in history");
+			if (historyIndex + 1 < [history count]) {
+				[statusbar setStringValue:[history objectAtIndex:++historyIndex]];
+				[textView setSelectedRange:NSMakeRange([[statusbar stringValue] length], 0)];
+			}
 			return YES;
 		}
 		else if (aSelector == @selector(moveDown:))
 		{
-			INFO(@"%s", "look forward in history");
+			if (historyIndex > 0) {
+				[statusbar setStringValue:[history objectAtIndex:--historyIndex]];
+				[textView setSelectedRange:NSMakeRange([[statusbar stringValue] length], 0)];
+			}
 			return YES;
 		}
 		else if (aSelector == @selector(insertBacktab:))
@@ -425,10 +432,12 @@
 		[exDelegate performSelector:exCommandSelector withObject:exCommand withObject:exContextInfo];
 
 		/* Add the command to the history. */
-		NSUInteger i = [exCommandHistory indexOfObject:exCommand];
+		NSUInteger i = [history indexOfObject:exCommand];
 		if (i != NSNotFound)
-			[exCommandHistory removeObjectAtIndex:i];
-		[exCommandHistory addObject:exCommand];
+			[history removeObjectAtIndex:i];
+		[history insertObject:exCommand atIndex:0];
+		while ([history count] > 100)
+			[history removeLastObject];
 	}
 
 	exDelegate = nil;
@@ -454,6 +463,7 @@
 	exCommandSelector = aSelector;
 	exDelegate = aDelegate;
 	exContextInfo = contextInfo;
+	historyIndex = -1;
 	[window makeFirstResponder:statusbar];
 }
 

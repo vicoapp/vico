@@ -1,4 +1,5 @@
 #import "ViSnippet.h"
+#import "ViBundle.h"
 #import "logging.h"
 
 @implementation ViSnippet
@@ -22,7 +23,7 @@
 	[[tabstops objectAtIndex:[placeHolder tabStop]] addObject:placeHolder];
 }
 
-- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation
+- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation inTextView:(ViTextView *)textView
 {
 	tabstops = [[NSMutableArray alloc] init];
 
@@ -37,7 +38,7 @@
                         // FIXME: handle escapes
                         if ([s characterAtIndex:i] == '$') {
                                 ViSnippetPlaceholder *placeHolder;
-                                placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1]];
+                                placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1] inTextView:textView];
                                 if (placeHolder == nil)
 					break;
                                 unsigned len = placeHolder.length;
@@ -67,6 +68,7 @@
                                 }
 
                         	if (placeHolder.variable) {
+					INFO(@"lookup variable %@", placeHolder.variable);
 					// lookup variable, apply transformation and insert value
                         	} else {
 					// tabstop, add it to the array at the correct index
@@ -167,7 +169,11 @@
 	return delta;
 }
 
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s
+/*
+ * FIXME: parse \-escaped characters!
+ */
+
+- (ViSnippetPlaceholder *)initWithString:(NSString *)s inTextView:(ViTextView *)textView
 {
         self = [super init];
         if (!self)
@@ -185,8 +191,11 @@
 	if ([scan scanString:@"{" intoString:nil])
 		bracedExpression = YES;
 
-        if (![scan scanInt:&tabStop])
+        if (![scan scanInt:&tabStop]) {
                 [scan scanCharactersFromSet:shellVariableSet intoString:&variable];
+		DEBUG(@"got shell var %@", variable);
+	} else
+		DEBUG(@"got tabstop %i", tabStop);
 
 	if (bracedExpression) {
                 if ([scan scanString:@":" intoString:nil]) {
@@ -196,13 +205,33 @@
 				bracedExpression = NO;
 				if ([scan scanString:@"{" intoString:nil])
 					bracedExpression = YES;
+				[scan scanCharactersFromSet:shellVariableSet intoString:&defaultVariable];
+				DEBUG(@"got default variable %@", defaultVariable);
+				
+				NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+				[ViBundle setupEnvironment:env forTextView:textView];
+				defaultValue = [env objectForKey:defaultVariable];
+
+				if (bracedExpression) {
+					if ([scan scanString:@"/" intoString:nil]) {
+						// got a regular expression transformation
+						[scan scanUpToString:@"}" intoString:&transformation];
+						DEBUG(@"apply transformation %@ to default variable %@ => default value", transformation, defaultVariable);
+					}
+					if (![scan scanString:@"}" intoString:nil]) {
+						// parse error
+						return nil;
+					}
+				}
 			} else {
 				// default value is a constant
 				[scan scanUpToString:@"}" intoString:&defaultValue];
+				DEBUG(@"got default value %@", defaultValue);
                         }
                 } else if ([scan scanString:@"/" intoString:nil]) {
                         // got a regular expression transformation
                         [scan scanUpToString:@"}" intoString:&transformation];
+                        DEBUG(@"got transformation %@", transformation);
                 }
 
                 if (![scan scanString:@"}" intoString:nil]) {

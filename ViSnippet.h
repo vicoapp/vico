@@ -1,3 +1,5 @@
+@class ViTextView;
+
 @class ViSnippetPlaceholder;
 
 @interface ViSnippet : NSObject
@@ -17,7 +19,7 @@
 @property(readonly, copy) NSString *string;
 @property(readonly) NSRange range;
 
-- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation inTextView:(ViTextView *)textView;
 - (BOOL)activeInRange:(NSRange)aRange;
 - (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
 - (BOOL)done;
@@ -35,6 +37,7 @@
 	NSRange range;
 	NSString *variable;
 	NSString *defaultValue;
+	NSString *defaultVariable;
 	NSString *transformation; // regexp string
 }
 
@@ -47,7 +50,7 @@
 @property (readonly) NSString *transformation;
 @property (readonly) NSString *value;
 
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s;
+- (ViSnippetPlaceholder *)initWithString:(NSString *)s inTextView:(ViTextView *)textView;
 - (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
 - (BOOL)activeInRange:(NSRange)aRange;
 - (NSInteger)updateValue:(NSString *)newValue;

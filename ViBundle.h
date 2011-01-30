@@ -1,6 +1,7 @@
 #import "ViLanguage.h"
 
 @class ViBundleCommand;
+@class ViTextView;
 
 @interface ViBundle : NSObject
 {
@@ -16,6 +17,7 @@
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
 + (void)normalizePreference:(NSDictionary *)preference intoDictionary:(NSMutableDictionary *)normalizedPreference;
++ (void)setupEnvironment:(NSMutableDictionary *)env forTextView:(ViTextView *)textView;
 
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)supportPath;

@@ -3,6 +3,8 @@
 #import "ViBundleCommand.h"
 #import "ViBundleSnippet.h"
 #import "ViTabTriggerMenuItemView.h"
+#import "ViTextView.h"
+#import "NSTextStorage-additions.h"
 #import "logging.h"
 
 @implementation ViBundle
@@ -63,6 +65,70 @@
 		if ([value rangeOfString:@"bold"].location != NSNotFound)
 			[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
 	}
+}
+
++ (void)setupEnvironment:(NSMutableDictionary *)env forTextView:(ViTextView *)textView
+{
+	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
+	[env setObject:supportPath forKey:@"TM_SUPPORT_PATH"];
+
+	NSString *line = [[textView textStorage] lineForLocation:[textView caret]];
+	if (line)
+		[env setObject:line forKey:@"TM_CURRENT_LINE"];
+
+	NSString *word = [[textView textStorage] wordAtLocation:[textView caret]];
+	if (word)
+		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
+
+	NSURL *url = [[[textView delegate] environment] baseURL];
+	if ([url isFileURL])
+		[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
+	[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
+
+	url = [[textView delegate] fileURL];
+	if (url) {
+		if ([url isFileURL]) {
+			[env setObject:[[url path] stringByDeletingLastPathComponent] forKey:@"TM_DIRECTORY"];
+			[env setObject:[url path] forKey:@"TM_FILEPATH"];
+		}
+		[env setObject:[[url path] lastPathComponent] forKey:@"TM_FILENAME"];
+		[env setObject:[url absoluteString] forKey:@"TM_FILEURL"];
+	}
+
+	[env setObject:NSFullUserName() forKey:@"TM_FULLNAME"];
+	[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineIndexAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
+	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
+
+	NSString *scope = [[textView scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];
+	if (scope)
+		[env setObject:scope forKey:@"TM_SCOPE"];
+
+	NSRange sel = [textView selectedRange];
+	if (sel.length > 0) {
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
+
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
+
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
+		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+
+		[env setObject:[[[textView textStorage] string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
+	}
+
+	// FIXME: TM_SELECTED_FILES
+	// FIXME: TM_SELECTED_FILE
+
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
+		[env setObject:@"YES" forKey:@"TM_SOFT_TABS" ];
+	else
+		[env setObject:@"NO" forKey:@"TM_SOFT_TABS" ];
+
+	[env setObject:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
+	[env setObject:NSHomeDirectory() forKey:@"HOME"];
+
+	// FIXME: shellVariables in bundle preferences
 }
 
 - (id)initWithPath:(NSString *)aPath

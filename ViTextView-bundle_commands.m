@@ -101,83 +101,6 @@
 	return inputText;
 }
 
-- (void)setVariable:(NSString *)var inEnvironment:(NSMutableDictionary *)env value:(NSString *)value
-{
-	if (value)
-		[env setObject:value forKey:var];
-}
-
-- (void)setVariable:(NSString *)var inEnvironment:(NSMutableDictionary *)env integer:(NSInteger)intValue
-{
-	[env setObject:[NSString stringWithFormat:@"%li", intValue] forKey:var];
-}
-
-- (void)setupEnvironment:(NSMutableDictionary *)env forCommand:(ViBundleCommand *)command
-{
-	[self setVariable:@"TM_BUNDLE_PATH" inEnvironment:env value:[[command bundle] path]];
-
-	NSString *bundleSupportPath = [[command bundle] supportPath];
-	[self setVariable:@"TM_BUNDLE_SUPPORT" inEnvironment:env value:bundleSupportPath];
-
-	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
-	[self setVariable:@"TM_SUPPORT_PATH" inEnvironment:env value:supportPath];
-
-	char *path = getenv("PATH");
-	[self setVariable:@"PATH" inEnvironment:env value:[NSString stringWithFormat:@"%s:%@:%@",
-		path,
-		[supportPath stringByAppendingPathComponent:@"bin"],
-		[bundleSupportPath stringByAppendingPathComponent:@"bin"]]];
-
-	[self setVariable:@"TM_CURRENT_LINE" inEnvironment:env value:[[self textStorage] lineForLocation:[self caret]]];
-	[self setVariable:@"TM_CURRENT_WORD" inEnvironment:env value:[[self textStorage] wordAtLocation:[self caret]]];
-
-	NSURL *url = [[[self delegate] environment] baseURL];
-	if ([url isFileURL])
-		[self setVariable:@"TM_PROJECT_DIRECTORY" inEnvironment:env value:[url path]];
-	[self setVariable:@"TM_PROJECT_URL" inEnvironment:env value:[url absoluteString]];
-
-	url = [[self delegate] fileURL];
-	if ([url isFileURL]) {
-		[self setVariable:@"TM_DIRECTORY" inEnvironment:env value:[[url path] stringByDeletingLastPathComponent]];
-		[self setVariable:@"TM_FILENAME" inEnvironment:env value:[[url path] lastPathComponent]];
-		[self setVariable:@"TM_FILEPATH" inEnvironment:env value:[url path]];
-	}
-	[self setVariable:@"TM_FILEURL" inEnvironment:env value:[url absoluteString]];
-
-	[self setVariable:@"TM_FULLNAME" inEnvironment:env value:NSFullUserName()];
-	[self setVariable:@"TM_LINE_INDEX" inEnvironment:env integer:[[self textStorage] lineIndexAtLocation:[self caret]]];
-	[self setVariable:@"TM_LINE_NUMBER" inEnvironment:env integer:[self currentLine]];
-	[self setVariable:@"TM_SCOPE" inEnvironment:env value:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
-
-	NSRange sel = [self selectedRange];
-	if (sel.length > 0) {
-		[self setVariable:@"TM_INPUT_START_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:sel.location]];
-		[self setVariable:@"TM_INPUT_END_COLUMN" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(sel)]];
-
-		[self setVariable:@"TM_INPUT_START_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:sel.location]];
-		[self setVariable:@"TM_INPUT_START_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:sel.location]];
-
-		[self setVariable:@"TM_INPUT_END_LINE" inEnvironment:env integer:[[self textStorage] lineNumberAtLocation:NSMaxRange(sel)]];
-		[self setVariable:@"TM_INPUT_END_LINE_INDEX" inEnvironment:env integer:[[self textStorage] columnAtLocation:NSMaxRange(sel)]];
-	}
-
-
-	// FIXME: TM_SELECTED_FILES
-	// FIXME: TM_SELECTED_FILE
-	[self setVariable:@"TM_SELECTED_TEXT" inEnvironment:env value:[[[self textStorage] string] substringWithRange:[self selectedRange]]];
-
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
-		[env setObject:@"YES" forKey:@"TM_SOFT_TABS" ];
-	else
-		[env setObject:@"NO" forKey:@"TM_SOFT_TABS" ];
-
-	[self setVariable:@"TM_TAB_SIZE" inEnvironment:env value:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"]];
-
-	[env setObject:NSHomeDirectory() forKey:@"HOME"];
-
-	// FIXME: shellVariables in bundle preferences
-}
-
 - (void)performBundleCommand:(id)sender
 {
 	ViBundleCommand *command = sender;
@@ -241,10 +164,23 @@
 
 	[task setStandardInput:shellInput];
 	[task setStandardOutput:shellOutput];
-	/* FIXME: set standard error to standard output? */
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
-	[self setupEnvironment:env forCommand:command];
+	[ViBundle setupEnvironment:env forTextView:self];
+
+	/* Additional bundle command specific variables. */
+	[env setObject:[[command bundle] path] forKey:@"TM_BUNDLE_PATH"];
+	NSString *bundleSupportPath = [[command bundle] supportPath];
+	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
+
+	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
+	char *path = getenv("PATH");
+	[env setObject:[NSString stringWithFormat:@"%s:%@:%@",
+	      path,
+	      [supportPath stringByAppendingPathComponent:@"bin"],
+	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]
+	    forKey:@"PATH"];
+
 	[task setCurrentDirectoryPath:[[[[self delegate] environment] baseURL] path]];
 	[task setEnvironment:env];
 

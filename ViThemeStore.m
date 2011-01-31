@@ -1,4 +1,5 @@
 #import "ViThemeStore.h"
+#import "ViAppController.h"
 #import "logging.h"
 
 @implementation ViThemeStore
@@ -56,7 +57,7 @@
 		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
 		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/vibrant/Themes" stringByExpandingTildeInPath]];
+		[self addThemesFromBundleDirectory:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"Themes"]];
 	}
 	return self;
 }

@@ -10,36 +10,25 @@
 #include "log.h"
 #include "xmalloc.h"
 
-/* SIGINT received during command processing */
-volatile sig_atomic_t interrupted = 0;
-
 @implementation SFTPDirectoryEntry
 @synthesize filename;
-- (SFTPDirectoryEntry *)initWithPointer:(SFTP_DIRENT *)aDirent
+- (SFTPDirectoryEntry *)initWithFilename:(const char *)aFilename attributes:(Attrib *)a
 {
 	self = [super init];
 	if (self)
 	{
-		dirent = aDirent;
-		xfree(dirent->longname);
-		dirent->longname = NULL;
-		filename = [NSString stringWithCString:dirent->filename encoding:NSUTF8StringEncoding]; // XXX: what encoding?
+		filename = [NSString stringWithCString:aFilename encoding:NSUTF8StringEncoding]; // XXX: what encoding?
+		bcopy(a, &attributes, sizeof(attributes));
 	}
 	return self;
 }
-- (void)finalize
-{
-	xfree(dirent->filename);
-	xfree(dirent);
-	[super finalize];
-}
 - (Attrib *)attributes
 {
-	return &dirent->a;
+	return &attributes;
 }
 - (BOOL)isDirectory
 {
-	return S_ISDIR(dirent->a.perm);
+	return S_ISDIR(attributes.perm);
 }
 @end
 
@@ -59,13 +48,23 @@ size_t num_requests = 64;
 @synthesize user;
 @synthesize home;
 
-+ (NSError *)errorWithDescription:(id)errorDescription
++ (NSError *)errorWithObject:(id)obj
 {
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObject:errorDescription
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObject:obj
 							     forKey:NSLocalizedDescriptionKey];
 	return [NSError errorWithDomain:ViErrorDomain
 				   code:2
 			       userInfo:userInfo];
+}
+
+
++ (NSError *)errorWithFormat:(NSString *)fmt, ...
+{
+	va_list ap;
+	va_start(ap, fmt);
+	NSError *err = [SFTPConnection errorWithObject:[[NSString alloc] initWithFormat:fmt arguments:ap]];
+	va_end(ap);
+	return err;
 }
 
 - (void)readStandardError:(NSNotification *)notification
@@ -126,7 +125,7 @@ size_t num_requests = 64;
 		}
 		@catch (NSException *exception) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:exception];
+				*outError = [SFTPConnection errorWithObject:exception];
 			[self close];
 			return nil;
 		}
@@ -140,14 +139,14 @@ size_t num_requests = 64;
 
 		fd_out = [[ssh_input fileHandleForWriting] fileDescriptor];
 		fd_in = [[ssh_output fileHandleForReading] fileDescriptor];
-		conn = do_init(fd_in, fd_out, copy_buffer_len, num_requests);
+
+		conn = [self initConnectionError:outError];
+
 		if (conn == NULL) {
-			if (outError)
-				*outError = [SFTPConnection errorWithDescription:@"Couldn't initialise connection to server"];
 			[self close];
 			return nil;
 		}
-		
+
 		host = hostname;
 		user = username;
 		home = [self currentDirectory];
@@ -155,6 +154,78 @@ size_t num_requests = 64;
 		directoryCache = [[NSMutableDictionary alloc] init];
 	}
 	return self;
+}
+
+- (struct sftp_conn *)initConnectionError:(NSError **)outError
+{
+	u_int type, exts = 0;
+	int version;
+	Buffer msg;
+	struct sftp_conn *ret;
+
+	buffer_init(&msg);
+	buffer_put_char(&msg, SSH2_FXP_INIT);
+	buffer_put_int(&msg, SSH2_FILEXFER_VERSION);
+	send_msg(fd_out, &msg);
+
+	buffer_clear(&msg);
+
+	if (get_msg(fd_in, &msg) != 0)
+		return NULL;
+
+	/* Expecting a VERSION reply */
+	if ((type = buffer_get_char(&msg)) != SSH2_FXP_VERSION) {
+		if (outError)
+			*outError = [SFTPConnection errorWithFormat:@"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
+		buffer_free(&msg);
+		return(NULL);
+	}
+	version = buffer_get_int(&msg);
+
+	DEBUG(@"Remote version: %d", version);
+
+	/* Check for extensions */
+	while (buffer_len(&msg) > 0) {
+		char *name = buffer_get_string(&msg, NULL);
+		char *value = buffer_get_string(&msg, NULL);
+		int known = 0;
+
+		if (strcmp(name, "posix-rename@openssh.com") == 0 && strcmp(value, "1") == 0) {
+			exts |= SFTP_EXT_POSIX_RENAME;
+			known = 1;
+		} else if (strcmp(name, "statvfs@openssh.com") == 0 && strcmp(value, "2") == 0) {
+			exts |= SFTP_EXT_STATVFS;
+			known = 1;
+		} if (strcmp(name, "fstatvfs@openssh.com") == 0 && strcmp(value, "2") == 0) {
+			exts |= SFTP_EXT_FSTATVFS;
+			known = 1;
+		}
+
+		if (known)
+			DEBUG(@"Server supports extension \"%s\" revision %s", name, value);
+		else
+			DEBUG(@"Unrecognised server extension \"%s\"", name);
+
+		xfree(name);
+		xfree(value);
+	}
+
+	buffer_free(&msg);
+
+	ret = xmalloc(sizeof(*ret));
+	ret->fd_in = fd_in;
+	ret->fd_out = fd_out;
+	ret->transfer_buflen = copy_buffer_len;
+	ret->num_requests = num_requests;
+	ret->version = version;
+	ret->msg_id = 1;
+	ret->exts = exts;
+
+	/* Some filexfer v.0 servers don't support large packets */
+	if (version == 0)
+		ret->transfer_buflen = MIN(ret->transfer_buflen, 20480);
+
+	return(ret);
 }
 
 - (Attrib *)decodeStatRequest:(u_int)expected_id error:(NSError **)outError
@@ -169,10 +240,10 @@ size_t num_requests = 64;
 	type = buffer_get_char(&msg);
 	req_id = buffer_get_int(&msg);
 
-	debug3("Received stat reply T:%u I:%u", type, req_id);
+	DEBUG(@"Received stat reply T:%u I:%u", type, req_id);
 	if (req_id != expected_id) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id]];
+			*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id];
 		[self close];
 		return NULL;
 	}
@@ -180,12 +251,12 @@ size_t num_requests = 64;
 	if (type == SSH2_FXP_STATUS) {
 		int status = buffer_get_int(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't stat remote file: %s", fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't stat remote file: %s", fx2txt(status)];
 		buffer_free(&msg);
 		return NULL;
 	} else if (type != SSH2_FXP_ATTRS) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u", SSH2_FXP_ATTRS, type]];
+			*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u", SSH2_FXP_ATTRS, type];
 		[self close];
 		return NULL;
 	}
@@ -225,7 +296,7 @@ size_t num_requests = 64;
 		return NO;
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Permission denied"];
+			*outError = [SFTPConnection errorWithFormat:@"Permission denied"];
 		return NO;
 	}
 	if (isDirectory)
@@ -233,37 +304,181 @@ size_t num_requests = 64;
 	return YES;
 }
 
-- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError
+- (NSArray *)readDirectory:(NSString *)pathS error:(NSError **)outError
 {
-	NSMutableArray *contents = [directoryCache objectForKey:path];
-	if (contents)
-		return contents;
+	Buffer msg;
+	u_int count, type, msgid, handle_len, i, expected_id;
+	char *handle;
 
-	SFTP_DIRENT **d;
-	if (do_readdir(conn, [path UTF8String], &d) != 0) {
-		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Failed to list directory %@", path]];
+	const char *path = [pathS UTF8String];
+	NSMutableArray *entries = [[NSMutableArray alloc] init];
+
+	msgid = conn->msg_id++;
+
+	buffer_init(&msg);
+	buffer_put_char(&msg, SSH2_FXP_OPENDIR);
+	buffer_put_int(&msg, msgid);
+	buffer_put_cstring(&msg, path);
+	send_msg(conn->fd_out, &msg);
+
+	buffer_clear(&msg);
+
+	handle = get_handle(conn->fd_in, msgid, &handle_len, NULL);
+	if (handle == NULL)
 		return nil;
+
+	for (;;) {
+		msgid = expected_id = conn->msg_id++;
+
+		DEBUG(@"Sending SSH2_FXP_READDIR I:%u", msgid);
+
+		buffer_clear(&msg);
+		buffer_put_char(&msg, SSH2_FXP_READDIR);
+		buffer_put_int(&msg, msgid);
+		buffer_put_string(&msg, handle, handle_len);
+		send_msg(conn->fd_out, &msg);
+
+		buffer_clear(&msg);
+
+		get_msg(conn->fd_in, &msg);
+
+		type = buffer_get_char(&msg);
+		msgid = buffer_get_int(&msg);
+
+		DEBUG(@"Received reply T:%u I:%u", type, msgid);
+
+		if (msgid != expected_id) {
+			if (outError)
+				*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
+			return nil;
+		}
+
+		if (type == SSH2_FXP_STATUS) {
+			int status = buffer_get_int(&msg);
+
+			DEBUG(@"Received SSH2_FXP_STATUS %d", status);
+
+			if (status == SSH2_FX_EOF) {
+				break;
+			} else {
+				if (outError)
+					*outError = [SFTPConnection errorWithFormat:@"Couldn't read directory: %s", fx2txt(status)];
+				do_close(conn, handle, handle_len);
+				xfree(handle);
+				return nil;
+			}
+		} else if (type != SSH2_FXP_NAME) {
+			if (outError)
+				*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_NAME(%u) packet, got %u", SSH2_FXP_NAME, type];
+			return nil;
+		}
+
+		count = buffer_get_int(&msg);
+		if (count == 0)
+			break;
+		DEBUG(@"Received %d SSH2_FXP_NAME responses", count);
+		for (i = 0; i < count; i++) {
+			char *filename, *longname;
+			Attrib *a;
+
+			filename = buffer_get_string(&msg, NULL);
+			longname = buffer_get_string(&msg, NULL);
+			a = decode_attrib(&msg);
+
+			/*
+			 * Directory entries should never contain '/'
+			 * These can be used to attack recursive ops
+			 * (e.g. send '../../../../etc/passwd')
+			 */
+			if (strchr(filename, '/') != NULL) {
+				INFO(@"Server sent suspect path \"%s\" during readdir of \"%s\"", filename, path);
+			} else {
+				SFTPDirectoryEntry *ent = [[SFTPDirectoryEntry alloc] initWithFilename:filename attributes:a];
+				[entries addObject:ent];
+			}
+
+			xfree(filename);
+			xfree(longname);
+		}
 	}
 
-	contents = [[NSMutableArray alloc] init];
-	int i;
-	for (i = 0; d[i]; i++)
-		[contents addObject:[[SFTPDirectoryEntry alloc] initWithPointer:d[i]]];
+	buffer_free(&msg);
+	do_close(conn, handle, handle_len);
+	xfree(handle);
 
-	xfree(d);
+	return entries;
+}
 
-	[directoryCache setObject:contents forKey:path];
 
+- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError
+{
+	NSArray *contents = [directoryCache objectForKey:path];
+	if (contents == nil) {
+		contents = [self readDirectory:path error:outError];
+		if (contents)
+			[directoryCache setObject:contents forKey:path];
+	}
 	return contents;
+}
+
+- (NSString *)realpath:(NSString *)pathS error:(NSError **)outError
+{
+	Buffer msg;
+	u_int type, expected_id, count, msgid;
+	char *filename, *longname;
+
+	const char *path = [pathS UTF8String];
+
+	expected_id = msgid = conn->msg_id++;
+	send_string_request(conn->fd_out, msgid, SSH2_FXP_REALPATH, path,
+	    strlen(path));
+
+	buffer_init(&msg);
+
+	if (get_msg(conn->fd_in, &msg) != 0)
+		return NULL;
+	type = buffer_get_char(&msg);
+	msgid = buffer_get_int(&msg);
+
+	if (msgid != expected_id) {
+		if (outError)
+			*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
+		return NULL;
+	}
+
+	if (type == SSH2_FXP_STATUS) {
+		u_int status = buffer_get_int(&msg);
+
+		error("Couldn't canonicalise: %s", fx2txt(status));
+		return(NULL);
+	} else if (type != SSH2_FXP_NAME) {
+		logit("Expected SSH2_FXP_NAME(%u) packet, got %u",
+		    SSH2_FXP_NAME, type);
+		return NULL;
+	}
+
+	count = buffer_get_int(&msg);
+	if (count != 1) {
+		logit("Got multiple names (%d) from SSH_FXP_REALPATH", count);
+		return NULL;
+	}
+
+	filename = buffer_get_string(&msg, NULL);
+	longname = buffer_get_string(&msg, NULL);
+	decode_attrib(&msg);
+
+	DEBUG(@"SSH_FXP_REALPATH %@ -> %s", pathS, filename);
+
+	xfree(longname);
+
+	buffer_free(&msg);
+
+	return [NSString stringWithCString:filename encoding:NSUTF8StringEncoding]; // XXX: encoding?
 }
 
 - (NSString *)currentDirectory
 {
-	char *pwd = do_realpath(conn, ".");
-	if (pwd)
-		return [NSString stringWithCString:pwd encoding:NSUTF8StringEncoding]; // XXX: encoding?
-	return nil;
+	return [self realpath:@"." error:nil];
 }
 
 - (void)close
@@ -313,12 +528,12 @@ size_t num_requests = 64;
 		return nil;
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Permission denied"];
+			*outError = [SFTPConnection errorWithFormat:@"Permission denied"];
 		return nil;
 	}
 	if (!S_ISREG(a->perm)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Not a regular file"];
+			*outError = [SFTPConnection errorWithFormat:@"Not a regular file"];
 		return nil;
 	}
 
@@ -339,13 +554,13 @@ size_t num_requests = 64;
 	attrib_clear(&junk); /* Send empty attributes */
 	encode_attrib(&msg, &junk);
 	send_msg(conn->fd_out, &msg);
-	debug3("Sent message SSH2_FXP_OPEN I:%u P:%s", req_id, remote_path);
+	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
 
 	handle = get_handle(conn->fd_in, req_id, &handle_len, &status);
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"%s", fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"%s", fx2txt(status)];
 		return nil;
 	}
 
@@ -357,19 +572,9 @@ size_t num_requests = 64;
 		char *data;
 		u_int len;
 
-		/*
-		 * Simulate EOF on interrupt: stop sending new requests and
-		 * allow outstanding requests to drain gracefully
-		 */
-		if (interrupted) {
-			if (num_req == 0) /* If we haven't started yet... */
-				break;
-			max_req = 0;
-		}
-
 		/* Send some more requests */
 		while (num_req < max_req) {
-			debug3("Request range %llu -> %llu (%d/%d)",
+			DEBUG(@"Request range %llu -> %llu (%d/%d)",
 			    (unsigned long long)offset,
 			    (unsigned long long)offset + buflen - 1,
 			    num_req, max_req);
@@ -388,7 +593,7 @@ size_t num_requests = 64;
 		get_msg(conn->fd_in, &msg);
 		type = buffer_get_char(&msg);
 		req_id = buffer_get_int(&msg);
-		debug3("Received reply T:%u I:%u R:%d", type, req_id, max_req);
+		DEBUG(@"Received reply T:%u I:%u R:%d", type, req_id, max_req);
 
 		/* Find the request in our queue */
 		for (req = TAILQ_FIRST(&requests);
@@ -397,7 +602,7 @@ size_t num_requests = 64;
 			;
 		if (req == NULL) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Unexpected reply %u", req_id]];
+				*outError = [SFTPConnection errorWithFormat:@"Unexpected reply %u", req_id];
 			[self close];
 			return nil;
 		}
@@ -414,12 +619,12 @@ size_t num_requests = 64;
 			break;
 		case SSH2_FXP_DATA:
 			data = buffer_get_string(&msg, &len);
-			debug3("Received data %llu -> %llu",
+			DEBUG(@"Received data %llu -> %llu",
 			    (unsigned long long)req->offset,
 			    (unsigned long long)req->offset + len - 1);
 			if (len > req->len) {
 				if (outError)
-					*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Received more data than asked for %u > %u", len, req->len]];
+					*outError = [SFTPConnection errorWithFormat:@"Received more data than asked for %u > %u", len, req->len];
 				[self close];
 				return nil;
 			}
@@ -432,7 +637,7 @@ size_t num_requests = 64;
 				num_req--;
 			} else {
 				/* Resend the request for the missing data */
-				debug3("Short data block, re-requesting "
+				DEBUG(@"Short data block, re-requesting "
 				    "%llu -> %llu (%2d)",
 				    (unsigned long long)req->offset + len,
 				    (unsigned long long)req->offset +
@@ -450,7 +655,7 @@ size_t num_requests = 64;
 				if (size > 0 && offset > size) {
 					/* Only one request at a time
 					 * after the expected EOF */
-					debug3("Finish at %llu (%2d)",
+					DEBUG(@"Finish at %llu (%2d)",
 					    (unsigned long long)offset,
 					    num_req);
 					max_req = 1;
@@ -461,7 +666,7 @@ size_t num_requests = 64;
 			break;
 		default:
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Expected SSH2_FXP_DATA(%u) packet, got %u", SSH2_FXP_DATA, type]];
+				*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_DATA(%u) packet, got %u", SSH2_FXP_DATA, type];
 			[self close];
 			return nil;
 		}
@@ -470,19 +675,19 @@ size_t num_requests = 64;
 	/* Sanity check */
 	if (TAILQ_FIRST(&requests) != NULL) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Transfer complete, but requests still in queue"];
+			*outError = [SFTPConnection errorWithFormat:@"Transfer complete, but requests still in queue"];
 		[self close];
 		return nil;
 	}
 
 	if (read_error) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)];
 		do_close(conn, handle, handle_len);
 	} else {
 		status = do_close(conn, handle, handle_len);
 		if (status != SSH2_FX_OK && outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)];
 	}
 
 	buffer_free(&msg);
@@ -550,7 +755,7 @@ size_t num_requests = 64;
 	buffer_put_int(&msg, SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_TRUNC);
 	encode_attrib(&msg, remote_attribs);
 	send_msg(conn->fd_out, &msg);
-	debug3("Sent message SSH2_FXP_OPEN I:%u P:%s", req_id, [path fileSystemRepresentation]);
+	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
 
 	buffer_clear(&msg);
 
@@ -558,7 +763,7 @@ size_t num_requests = 64;
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"%s", fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"%s", fx2txt(status)];
 		return NO;
 	}
 
@@ -573,10 +778,8 @@ size_t num_requests = 64;
 		/*
 		 * Can't use atomicio here because it returns 0 on EOF,
 		 * thus losing the last block of the file.
-		 * Simulate an EOF on interrupt, allowing ACKs from the
-		 * server to drain.
 		 */
-		if (interrupted || status != SSH2_FX_OK)
+		if (status != SSH2_FX_OK)
 			len = 0;
 		else {
 			len = conn->transfer_buflen;
@@ -600,14 +803,14 @@ size_t num_requests = 64;
 			buffer_put_int64(&msg, offset);
 			buffer_put_string(&msg, bytes, len);
 			send_msg(conn->fd_out, &msg);
-			debug3("Sent message SSH2_FXP_WRITE I:%u O:%llu S:%u",
+			DEBUG(@"Sent message SSH2_FXP_WRITE I:%u O:%llu S:%u",
 			    req_id, (unsigned long long)offset, len);
 		} else if (TAILQ_FIRST(&acks) == NULL)
 			break;
 
 		if (ack == NULL) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Unexpected ACK %u", req_id]];
+				*outError = [SFTPConnection errorWithFormat:@"Unexpected ACK %u", req_id];
 			goto fail;
 		}
 
@@ -622,12 +825,12 @@ size_t num_requests = 64;
 
 			if (type != SSH2_FXP_STATUS) {
 				if (outError)
-					*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Expected SSH2_FXP_STATUS(%d) packet, got %d", SSH2_FXP_STATUS, type]];
+					*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_STATUS(%d) packet, got %d", SSH2_FXP_STATUS, type];
 				goto fail;
 			}
 
 			status = buffer_get_int(&msg);
-			debug3("SSH2_FXP_STATUS %d", status);
+			DEBUG(@"SSH2_FXP_STATUS %d", status);
 
 			/* Find the request in our queue */
 			for (ack = TAILQ_FIRST(&acks);
@@ -636,11 +839,11 @@ size_t num_requests = 64;
 				;
 			if (ack == NULL) {
 				if (outError)
-					*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Can't find request for ID %u", r_id]];
+					*outError = [SFTPConnection errorWithFormat:@"Can't find request for ID %u", r_id];
 				goto fail;
 			}
 			TAILQ_REMOVE(&acks, ack, tq);
-			debug3("In write loop, ack for %u %u bytes at %lld",
+			DEBUG(@"In write loop, ack for %u %u bytes at %lld",
 			    ack->req_id, ack->len, (long long)ack->offset);
 			++ackid;
 			xfree(ack);
@@ -648,7 +851,7 @@ size_t num_requests = 64;
 		offset += len;
 		if (offset < 0) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:@"offset < 0 while uploading."];
+				*outError = [SFTPConnection errorWithFormat:@"offset < 0 while uploading."];
 			goto fail;
 		}
 	}
@@ -656,7 +859,7 @@ size_t num_requests = 64;
 
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't write to remote file \"%@\": %s", path, fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't write to remote file \"%@\": %s", path, fx2txt(status)];
 		goto fail;
 	}
 
@@ -667,7 +870,7 @@ fail:
 done:
 	if (do_close(conn, handle, handle_len) != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:@"Failed to close file."];
+			*outError = [SFTPConnection errorWithFormat:@"Failed to close file."];
 		status = -1;
 	}
 	xfree(handle);
@@ -681,14 +884,14 @@ done:
 	u_int status, req_id;
 
 	const char *utf8path = [path UTF8String];
-	debug2("Sending SSH2_FXP_REMOVE \"%s\"", utf8path);
+	DEBUG(@"Sending SSH2_FXP_REMOVE \"%@\"", path);
 
 	req_id = conn->msg_id++;
 	send_string_request(conn->fd_out, req_id, SSH2_FXP_REMOVE, utf8path, strlen(utf8path));
 	status = get_status(conn->fd_in, req_id);
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't delete file: %s", fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't delete file: %s", fx2txt(status)];
 		return NO;
 	}
 	return YES;
@@ -714,7 +917,7 @@ done:
 	buffer_put_cstring(&msg, [oldPath UTF8String]);
 	buffer_put_cstring(&msg, [newPath UTF8String]);
 	send_msg(conn->fd_out, &msg);
-/*	debug3("Sent message %s \"%s\" -> \"%s\"",
+/*	DEBUG(@"Sent message %s \"%s\" -> \"%s\"",
 	    (conn->exts & SFTP_EXT_POSIX_RENAME) ? "posix-rename@openssh.com" :
 	    "SSH2_FXP_RENAME", oldPath, newPath);
  */
@@ -723,7 +926,7 @@ done:
 	status = get_status(conn->fd_in, req_id);
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"Couldn't rename file \"%@\" to \"%@\": %s", oldPath, newPath, fx2txt(status)]];
+			*outError = [SFTPConnection errorWithFormat:@"Couldn't rename file \"%@\" to \"%@\": %s", oldPath, newPath, fx2txt(status)];
 		return NO;
 	}
 

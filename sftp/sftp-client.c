@@ -192,81 +192,6 @@ get_handle(int fd, u_int expected_id, u_int *len, int *ret_status)
 	return(handle);
 }
 
-struct sftp_conn *
-do_init(int fd_in, int fd_out, u_int transfer_buflen, u_int num_requests)
-{
-	u_int type, exts = 0;
-	int version;
-	Buffer msg;
-	struct sftp_conn *ret;
-
-	buffer_init(&msg);
-	buffer_put_char(&msg, SSH2_FXP_INIT);
-	buffer_put_int(&msg, SSH2_FILEXFER_VERSION);
-	send_msg(fd_out, &msg);
-
-	buffer_clear(&msg);
-
-	if (get_msg(fd_in, &msg) != 0)
-		return NULL;
-
-	/* Expecting a VERSION reply */
-	if ((type = buffer_get_char(&msg)) != SSH2_FXP_VERSION) {
-		error("Invalid packet back from SSH2_FXP_INIT (type %u)",
-		    type);
-		buffer_free(&msg);
-		return(NULL);
-	}
-	version = buffer_get_int(&msg);
-
-	debug2("Remote version: %d", version);
-
-	/* Check for extensions */
-	while (buffer_len(&msg) > 0) {
-		char *name = buffer_get_string(&msg, NULL);
-		char *value = buffer_get_string(&msg, NULL);
-		int known = 0;
-
-		if (strcmp(name, "posix-rename@openssh.com") == 0 &&
-		    strcmp(value, "1") == 0) {
-			exts |= SFTP_EXT_POSIX_RENAME;
-			known = 1;
-		} else if (strcmp(name, "statvfs@openssh.com") == 0 &&
-		    strcmp(value, "2") == 0) {
-			exts |= SFTP_EXT_STATVFS;
-			known = 1;
-		} if (strcmp(name, "fstatvfs@openssh.com") == 0 &&
-		    strcmp(value, "2") == 0) {
-			exts |= SFTP_EXT_FSTATVFS;
-			known = 1;
-		}
-		if (known) {
-			debug2("Server supports extension \"%s\" revision %s",
-			    name, value);
-		} else {
-			debug2("Unrecognised server extension \"%s\"", name);
-		}
-		xfree(name);
-		xfree(value);
-	}
-
-	buffer_free(&msg);
-
-	ret = xmalloc(sizeof(*ret));
-	ret->fd_in = fd_in;
-	ret->fd_out = fd_out;
-	ret->transfer_buflen = transfer_buflen;
-	ret->num_requests = num_requests;
-	ret->version = version;
-	ret->msg_id = 1;
-	ret->exts = exts;
-
-	/* Some filexfer v.0 servers don't support large packets */
-	if (version == 0)
-		ret->transfer_buflen = MIN(ret->transfer_buflen, 20480);
-
-	return(ret);
-}
 
 u_int
 sftp_proto_version(struct sftp_conn *conn)
@@ -299,125 +224,6 @@ do_close(struct sftp_conn *conn, char *handle, u_int handle_len)
 }
 
 
-int
-do_readdir(struct sftp_conn *conn, const char *path, SFTP_DIRENT ***dir)
-{
-	Buffer msg;
-	u_int count, type, id, handle_len, i, expected_id, ents = 0;
-	char *handle;
-
-	id = conn->msg_id++;
-
-	buffer_init(&msg);
-	buffer_put_char(&msg, SSH2_FXP_OPENDIR);
-	buffer_put_int(&msg, id);
-	buffer_put_cstring(&msg, path);
-	send_msg(conn->fd_out, &msg);
-
-	buffer_clear(&msg);
-
-	handle = get_handle(conn->fd_in, id, &handle_len, NULL);
-	if (handle == NULL)
-		return(-1);
-
-	if (dir) {
-		ents = 0;
-		*dir = xmalloc(sizeof(**dir));
-		(*dir)[0] = NULL;
-	}
-
-	for (; !interrupted;) {
-		id = expected_id = conn->msg_id++;
-
-		debug3("Sending SSH2_FXP_READDIR I:%u", id);
-
-		buffer_clear(&msg);
-		buffer_put_char(&msg, SSH2_FXP_READDIR);
-		buffer_put_int(&msg, id);
-		buffer_put_string(&msg, handle, handle_len);
-		send_msg(conn->fd_out, &msg);
-
-		buffer_clear(&msg);
-
-		get_msg(conn->fd_in, &msg);
-
-		type = buffer_get_char(&msg);
-		id = buffer_get_int(&msg);
-
-		debug3("Received reply T:%u I:%u", type, id);
-
-		if (id != expected_id)
-			fatal("ID mismatch (%u != %u)", id, expected_id);
-
-		if (type == SSH2_FXP_STATUS) {
-			int status = buffer_get_int(&msg);
-
-			debug3("Received SSH2_FXP_STATUS %d", status);
-
-			if (status == SSH2_FX_EOF) {
-				break;
-			} else {
-				error("Couldn't read directory: %s",
-				    fx2txt(status));
-				do_close(conn, handle, handle_len);
-				xfree(handle);
-				return(status);
-			}
-		} else if (type != SSH2_FXP_NAME)
-			fatal("Expected SSH2_FXP_NAME(%u) packet, got %u",
-			    SSH2_FXP_NAME, type);
-
-		count = buffer_get_int(&msg);
-		if (count == 0)
-			break;
-		debug3("Received %d SSH2_FXP_NAME responses", count);
-		for (i = 0; i < count; i++) {
-			char *filename, *longname;
-			Attrib *a;
-
-			filename = buffer_get_string(&msg, NULL);
-			longname = buffer_get_string(&msg, NULL);
-			a = decode_attrib(&msg);
-
-			/*
-			 * Directory entries should never contain '/'
-			 * These can be used to attack recursive ops
-			 * (e.g. send '../../../../etc/passwd')
-			 */
-			if (strchr(filename, '/') != NULL) {
-				error("Server sent suspect path \"%s\" "
-				    "during readdir of \"%s\"", filename, path);
-				goto next;
-			}
-
-			if (dir) {
-				*dir = xrealloc(*dir, ents + 2, sizeof(**dir));
-				(*dir)[ents] = xmalloc(sizeof(***dir));
-				(*dir)[ents]->filename = xstrdup(filename);
-				(*dir)[ents]->longname = xstrdup(longname);
-				memcpy(&(*dir)[ents]->a, a, sizeof(*a));
-				(*dir)[++ents] = NULL;
-			}
-next:
-			xfree(filename);
-			xfree(longname);
-		}
-	}
-
-	buffer_free(&msg);
-	do_close(conn, handle, handle_len);
-	xfree(handle);
-
-	/* Don't return partial matches on interrupt */
-	if (interrupted && dir != NULL && *dir != NULL) {
-		free_sftp_dirents(*dir);
-		*dir = xmalloc(sizeof(**dir));
-		**dir = NULL;
-	}
-
-	return(0);
-}
-
 void
 free_sftp_dirents(SFTP_DIRENT **s)
 {
@@ -431,6 +237,7 @@ free_sftp_dirents(SFTP_DIRENT **s)
 	xfree(s);
 }
 
+#if 0
 int
 do_mkdir(struct sftp_conn *conn, char *path, Attrib *a)
 {
@@ -462,62 +269,7 @@ do_rmdir(struct sftp_conn *conn, char *path)
 
 	return(status);
 }
-
-char *
-do_realpath(struct sftp_conn *conn, char *path)
-{
-	Buffer msg;
-	u_int type, expected_id, count, id;
-	char *filename, *longname;
-
-	expected_id = id = conn->msg_id++;
-	send_string_request(conn->fd_out, id, SSH2_FXP_REALPATH, path,
-	    strlen(path));
-
-	buffer_init(&msg);
-
-	if (get_msg(conn->fd_in, &msg) != 0)
-		return NULL;
-	type = buffer_get_char(&msg);
-	id = buffer_get_int(&msg);
-
-	if (id != expected_id)
-	{
-		logit("ID mismatch (%u != %u)", id, expected_id);
-		return NULL;
-	}
-
-	if (type == SSH2_FXP_STATUS) {
-		u_int status = buffer_get_int(&msg);
-
-		error("Couldn't canonicalise: %s", fx2txt(status));
-		return(NULL);
-	} else if (type != SSH2_FXP_NAME)
-	{
-		logit("Expected SSH2_FXP_NAME(%u) packet, got %u",
-		    SSH2_FXP_NAME, type);
-		return NULL;
-	}
-
-	count = buffer_get_int(&msg);
-	if (count != 1)
-	{
-		logit("Got multiple names (%d) from SSH_FXP_REALPATH", count);
-		return NULL;
-	}
-
-	filename = buffer_get_string(&msg, NULL);
-	longname = buffer_get_string(&msg, NULL);
-	decode_attrib(&msg);
-
-	debug3("SSH_FXP_REALPATH %s -> %s", path, filename);
-
-	xfree(longname);
-
-	buffer_free(&msg);
-
-	return(filename);
-}
+#endif
 
 void
 send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,

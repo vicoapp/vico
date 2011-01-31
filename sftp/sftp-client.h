@@ -96,24 +96,6 @@ int do_mkdir(struct sftp_conn *, char *, Attrib *);
 /* Remove directory 'path' */
 int do_rmdir(struct sftp_conn *, char *);
 
-/* Get file attributes of 'path' (follows symlinks) */
-// Attrib *do_stat(struct sftp_conn *, const char *, int);
-
-/* Get file attributes of 'path' (does not follow symlinks) */
-// Attrib *do_lstat(struct sftp_conn *, const char *, int);
-
-/* Set file attributes of 'path' */
-// int do_setstat(struct sftp_conn *, char *, Attrib *);
-
-/* Set file attributes of open file 'handle' */
-// int do_fsetstat(struct sftp_conn *, char *, u_int, Attrib *);
-
-/* Canonicalise 'path' - caller must free result */
-char *do_realpath(struct sftp_conn *, char *);
-
-/* Rename 'oldpath' to 'newpath' */
-// int do_symlink(struct sftp_conn *, char *, char *);
-
 int sftp_has_posix_rename(struct sftp_conn *conn);
 
 #endif

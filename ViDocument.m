@@ -232,7 +232,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	else if ([[url scheme] isEqualToString:@"sftp"]) {
 		if ([url host] == nil) {
 			if (outError)
-				*outError = [SFTPConnection errorWithDescription:@"Missing host in URL."];
+				*outError = [SFTPConnection errorWithFormat:@"Missing host in URL."];
 			return NO;
 		}
 

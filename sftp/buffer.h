@@ -53,9 +53,6 @@ void    buffer_put_bignum2(Buffer *, const BIGNUM *);
 void	buffer_get_bignum(Buffer *, BIGNUM *);
 void	buffer_get_bignum2(Buffer *, BIGNUM *);
 
-u_short	buffer_get_short(Buffer *);
-void	buffer_put_short(Buffer *, u_short);
-
 u_int	buffer_get_int(Buffer *);
 void    buffer_put_int(Buffer *, u_int);
 

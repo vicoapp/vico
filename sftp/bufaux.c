@@ -55,28 +55,6 @@
  */
 
 int
-buffer_get_short_ret(u_short *ret, Buffer *buffer)
-{
-	u_char buf[2];
-
-	if (buffer_get_ret(buffer, (char *) buf, 2) == -1)
-		return (-1);
-	*ret = get_u16(buf);
-	return (0);
-}
-
-u_short
-buffer_get_short(Buffer *buffer)
-{
-	u_short ret;
-
-	if (buffer_get_short_ret(&ret, buffer) == -1)
-		fatal("buffer_get_short: buffer error");
-
-	return (ret);
-}
-
-int
 buffer_get_int_ret(u_int *ret, Buffer *buffer)
 {
 	u_char buf[4];
@@ -125,15 +103,6 @@ buffer_get_int64(Buffer *buffer)
 /*
  * Stores integers in the buffer, msb first.
  */
-void
-buffer_put_short(Buffer *buffer, u_short value)
-{
-	char buf[2];
-
-	put_u16(buf, value);
-	buffer_append(buffer, buf, 2);
-}
-
 void
 buffer_put_int(Buffer *buffer, u_int value)
 {

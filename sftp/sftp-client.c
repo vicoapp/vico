@@ -463,42 +463,6 @@ do_rmdir(struct sftp_conn *conn, char *path)
 	return(status);
 }
 
-#if 0
-int
-do_setstat(struct sftp_conn *conn, char *path, Attrib *a)
-{
-	u_int status, id;
-
-	id = conn->msg_id++;
-	send_string_attrs_request(conn->fd_out, id, SSH2_FXP_SETSTAT, path,
-	    strlen(path), a);
-
-	status = get_status(conn->fd_in, id);
-	if (status != SSH2_FX_OK)
-		error("Couldn't setstat on \"%s\": %s", path,
-		    fx2txt(status));
-
-	return(status);
-}
-
-int
-do_fsetstat(struct sftp_conn *conn, char *handle, u_int handle_len,
-    Attrib *a)
-{
-	u_int status, id;
-
-	id = conn->msg_id++;
-	send_string_attrs_request(conn->fd_out, id, SSH2_FXP_FSETSTAT, handle,
-	    handle_len, a);
-
-	status = get_status(conn->fd_in, id);
-	if (status != SSH2_FX_OK)
-		error("Couldn't fsetstat: %s", fx2txt(status));
-
-	return(status);
-}
-#endif
-
 char *
 do_realpath(struct sftp_conn *conn, char *path)
 {
@@ -554,89 +518,6 @@ do_realpath(struct sftp_conn *conn, char *path)
 
 	return(filename);
 }
-
-#if 0
-int
-do_symlink(struct sftp_conn *conn, char *oldpath, char *newpath)
-{
-	Buffer msg;
-	u_int status, id;
-
-	if (conn->version < 3) {
-		error("This server does not support the symlink operation");
-		return(SSH2_FX_OP_UNSUPPORTED);
-	}
-
-	buffer_init(&msg);
-
-	/* Send symlink request */
-	id = conn->msg_id++;
-	buffer_put_char(&msg, SSH2_FXP_SYMLINK);
-	buffer_put_int(&msg, id);
-	buffer_put_cstring(&msg, oldpath);
-	buffer_put_cstring(&msg, newpath);
-	send_msg(conn->fd_out, &msg);
-	debug3("Sent message SSH2_FXP_SYMLINK \"%s\" -> \"%s\"", oldpath,
-	    newpath);
-	buffer_free(&msg);
-
-	status = get_status(conn->fd_in, id);
-	if (status != SSH2_FX_OK)
-		error("Couldn't symlink file \"%s\" to \"%s\": %s", oldpath,
-		    newpath, fx2txt(status));
-
-	return(status);
-}
-#endif
-
-#ifdef notyet
-char *
-do_readlink(struct sftp_conn *conn, char *path)
-{
-	Buffer msg;
-	u_int type, expected_id, count, id;
-	char *filename, *longname;
-	Attrib *a;
-
-	expected_id = id = conn->msg_id++;
-	send_string_request(conn->fd_out, id, SSH2_FXP_READLINK, path,
-	    strlen(path));
-
-	buffer_init(&msg);
-
-	get_msg(conn->fd_in, &msg);
-	type = buffer_get_char(&msg);
-	id = buffer_get_int(&msg);
-
-	if (id != expected_id)
-		fatal("ID mismatch (%u != %u)", id, expected_id);
-
-	if (type == SSH2_FXP_STATUS) {
-		u_int status = buffer_get_int(&msg);
-
-		error("Couldn't readlink: %s", fx2txt(status));
-		return(NULL);
-	} else if (type != SSH2_FXP_NAME)
-		fatal("Expected SSH2_FXP_NAME(%u) packet, got %u",
-		    SSH2_FXP_NAME, type);
-
-	count = buffer_get_int(&msg);
-	if (count != 1)
-		fatal("Got multiple names (%d) from SSH_FXP_READLINK", count);
-
-	filename = buffer_get_string(&msg, NULL);
-	longname = buffer_get_string(&msg, NULL);
-	a = decode_attrib(&msg);
-
-	debug3("SSH_FXP_READLINK %s -> %s", path, filename);
-
-	xfree(longname);
-
-	buffer_free(&msg);
-
-	return(filename);
-}
-#endif
 
 void
 send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,

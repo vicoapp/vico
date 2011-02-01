@@ -342,7 +342,7 @@
 	<key>CFBundleSignature</key>
 	<string>VIBR</string>
 	<key>CFBundleVersion</key>
-	<string>${REPO_VERSION}</string>
+	<string>0.1</string>
 	<key>CFBundleShortVersionString</key>
 	<string>${VERSION}</string>
 	<key>NSMainNibFile</key>
@@ -353,5 +353,26 @@
 	<string>public.app-category.developer-tool</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.6.6</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2011 Martin Hedenfalk</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Secure FTP (SFTP) URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sftp</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Local file URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>file</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

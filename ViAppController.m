@@ -10,12 +10,28 @@
 @synthesize lastSearchPattern;
 @synthesize encodingMenu;
 
+- (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
+{
+	NSString *s = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+
+	NSURL *url = [NSURL URLWithString:s];
+	NSError *error = nil;
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+	if (error)
+		[NSApp presentError:error];
+}
+
 - (id)init
 {
 	self = [super init];
 	if (self) {
 		[NSApp setDelegate:self];
 		sharedBuffers = [[NSMutableDictionary alloc] init];
+
+		[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+							  andSelector:@selector(getUrl:withReplyEvent:)
+							forEventClass:kInternetEventClass
+							   andEventID:kAEGetURL];
 	}
 	return self;
 }

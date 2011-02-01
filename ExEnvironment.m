@@ -546,8 +546,10 @@
 	NSString *path = command.filename ?: @"~";
 	if (![self setBaseURL:[self parseExFilename:path]])
 		[self message:@"%@: Failed to change directory.", path];
-        else
+        else {
         	[self ex_pwd:nil];
+        	[windowController browseURL:[self baseURL]];
+	}
 }
 
 - (void)ex_pwd:(ExCommand *)command

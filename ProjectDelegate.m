@@ -17,7 +17,7 @@
 
 @implementation ProjectFile
 
-@synthesize score;
+@synthesize score, markedString;
 
 - (id)initWithURL:(NSURL *)aURL
 {
@@ -83,7 +83,11 @@
 
 - (NSString *)pathRelativeToURL:(NSURL *)relURL
 {
-	return [url path];
+        NSString *root = [relURL path];
+        NSString *path = [url path];
+        if ([path length] > [root length])
+                return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
+        return path;
 }
 
 @end
@@ -179,26 +183,6 @@
 	}
 	
 	return children;
-}
-
-- (NSString *)relativePathForItem:(NSDictionary *)item
-{
-        NSString *root = [[item objectForKey:@"root"] path];
-        NSString *path = [[item objectForKey:@"url"] path];
-        if ([path length] > [root length])
-                return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
-        return path;
-}
-
-- (NSMutableDictionary *)itemAtURL:(NSURL *)url rootURL:(NSURL *)rootURL
-{
-	NSMutableDictionary *item = [NSMutableDictionary dictionaryWithObjectsAndKeys:url, @"url", rootURL, @"root", nil];
-	NSString *relpath = [self relativePathForItem:item];
-	[item setObject:relpath forKey:@"relpath"];
-	[item setObject:[relpath stringByDeletingLastPathComponent] forKey:@"reldir"];
-	[item setObject:[[url path] lastPathComponent] forKey:@"name"];
-
-	return item;
 }
 
 - (void)browseURL:(NSURL *)aURL
@@ -339,11 +323,12 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 	if ([set count] > 1)
 		return;
-	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
-	if (item && ![self outlineView:explorer isItemExpandable:item])
-		[delegate goToURL:[item url]];
 
-//        [self cancelExplorer];
+	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
+	if (item && ![self outlineView:explorer isItemExpandable:item]) {
+		[delegate goToURL:[item url]];
+		[self cancelExplorer];
+	}
 }
 
 - (void)explorerDoubleClick:(id)sender
@@ -354,12 +339,6 @@
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
 		[self browseURL:[item url]];
-		/*
-		if ([explorer isItemExpanded:item])
-			[explorer collapseItem:item];
-		else
-			[explorer expandItem:item];
-		*/
 	} else
 		[self explorerClick:sender];
 }
@@ -393,9 +372,10 @@
 	[delegate focusEditor];
 }
 
-- (void)markItem:(NSMutableDictionary *)item withFileMatch:(ViRegexpMatch *)fileMatch pathMatch:(ViRegexpMatch *)pathMatch
+- (void)markItem:(ProjectFile *)item withFileMatch:(ViRegexpMatch *)fileMatch pathMatch:(ViRegexpMatch *)pathMatch
 {
-	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:[item objectForKey:@"relpath"]];
+	NSString *relpath = [item pathRelativeToURL:[rootButton URL]];
+	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:relpath];
 
 	NSUInteger i;
 	for (i = 1; i <= [pathMatch count]; i++) {
@@ -404,7 +384,7 @@
 			[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
 	}
 
-	NSUInteger offset = [[item objectForKey:@"relpath"] length] - [[item objectForKey:@"name"] length];
+	NSUInteger offset = [relpath length] - [[item name] length];
 
 	for (i = 1; i <= [fileMatch count]; i++) {
 		NSRange range = [fileMatch rangeOfSubstringAtIndex:i];
@@ -416,7 +396,7 @@
 
 	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
 
-	[item setObject:s forKey:@"match"];
+	[item setMarkedString:s];
 }
 
 /* From fuzzy_file_finder.rb by Jamis Buck (public domain).
@@ -475,7 +455,7 @@
 					double fileScore = [self scoreForMatch:fileMatch inSegments:1];
 					// INFO(@"%@ = %lf * %lf = %lf", [item objectForKey:@"relpath"], pathScore, fileScore, pathScore * fileScore);
 
-//					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
+					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
 					[item setScore:pathScore * fileScore];
 					[expandedArray addObject:item];
 				}
@@ -616,11 +596,9 @@ sort_by_score(id a, id b, void *context)
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-	if ([[filterField stringValue] length] > 0) {
-		return [(ProjectFile *)item pathRelativeToURL:[rootButton URL]];
-//		id match = [item objectForKey:@"match"];
-//		return match ?: [item objectForKey:@"relpath"];
-        } else
+	if ([[filterField stringValue] length] > 0)
+		return [item markedString];
+        else
 		return [(ProjectFile *)item name];
 }
 

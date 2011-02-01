@@ -9,8 +9,10 @@
 	SFTPDirectoryEntry *entry;
 	double score;
 	NSArray *children;
+	NSAttributedString *markedString;
 }
 @property(readwrite, assign) double score;
+@property(readwrite, assign) NSAttributedString *markedString;
 @end
 
 @interface ProjectDelegate : NSObject

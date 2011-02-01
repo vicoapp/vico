@@ -291,6 +291,15 @@ size_t num_requests = 64;
 
 - (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError
 {
+	INFO(@"path = [%@]", path);
+
+	if (path == nil || [path isEqualToString:@""]) {
+		/* This is the home directory. */
+		if (isDirectory)
+			*isDirectory = YES;
+		return YES;
+	}
+
 	Attrib *a = [self stat:path error:outError];
 	if (a == NULL)
 		return NO;
@@ -309,6 +318,11 @@ size_t num_requests = 64;
 	Buffer msg;
 	u_int count, type, msgid, handle_len, i, expected_id;
 	char *handle;
+
+	if (pathS == nil || [pathS isEqualToString:@""]) {
+		/* This is the home directory. */
+		pathS = [self home];
+	}
 
 	const char *path = [pathS UTF8String];
 	NSMutableArray *entries = [[NSMutableArray alloc] init];

@@ -112,6 +112,7 @@ send_string_request(int fd, u_int id, u_int code, const char *s,
 	buffer_free(&msg);
 }
 
+#if 0
 static void
 send_string_attrs_request(int fd, u_int id, u_int code, char *s,
     u_int len, Attrib *a)
@@ -127,6 +128,7 @@ send_string_attrs_request(int fd, u_int id, u_int code, char *s,
 	debug3("Sent message fd %d T:%u I:%u", fd, code, id);
 	buffer_free(&msg);
 }
+#endif
 
 u_int
 get_status(int fd, u_int expected_id)
@@ -221,20 +223,6 @@ do_close(struct sftp_conn *conn, char *handle, u_int handle_len)
 	buffer_free(&msg);
 
 	return(status);
-}
-
-
-void
-free_sftp_dirents(SFTP_DIRENT **s)
-{
-	int i;
-
-	for (i = 0; s[i]; i++) {
-		xfree(s[i]->filename);
-		xfree(s[i]->longname);
-		xfree(s[i]);
-	}
-	xfree(s);
 }
 
 #if 0

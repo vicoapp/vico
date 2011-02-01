@@ -21,16 +21,6 @@
 #ifndef _SFTP_CLIENT_H
 #define _SFTP_CLIENT_H
 
-typedef struct SFTP_DIRENT SFTP_DIRENT;
-
-struct SFTP_DIRENT {
-	char *filename;
-	char *longname;
-	Attrib a;
-};
-
-extern volatile sig_atomic_t interrupted;
-
 /* Minimum amount of data to read at a time */
 #define MIN_READ_SIZE	512
 
@@ -83,12 +73,6 @@ u_int sftp_proto_version(struct sftp_conn *);
 
 /* Close file referred to by 'handle' */
 int do_close(struct sftp_conn *, char *, u_int);
-
-/* Read contents of 'path' to NULL-terminated array 'dir' */
-int do_readdir(struct sftp_conn *, const char *, SFTP_DIRENT ***);
-
-/* Frees a NULL-terminated array of SFTP_DIRENTs (eg. from do_readdir) */
-void free_sftp_dirents(SFTP_DIRENT **);
 
 /* Create directory 'path' */
 int do_mkdir(struct sftp_conn *, char *, Attrib *);

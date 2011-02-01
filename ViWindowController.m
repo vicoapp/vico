@@ -165,9 +165,10 @@ static NSWindowController	*currentWindowController = nil;
 
 	separatorCell = [[ViSeparatorCell alloc] init];
 
-	if ([self project] != nil)
+	if ([self project] != nil) {
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
-	else
+		[[NSDocumentController sharedDocumentController] newDocument:self];
+	} else
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];

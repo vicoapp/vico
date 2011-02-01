@@ -106,5 +106,7 @@
 
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 
+- (void)browseURL:(NSURL *)url;
+
 @end
 

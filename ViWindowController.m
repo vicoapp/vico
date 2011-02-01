@@ -209,10 +209,8 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)addDocument:(ViDocument *)document
 {
-	if ([documents containsObject:document]) {
-		INFO(@"already got document %@", document);
+	if ([documents containsObject:document])
 		return;
-	}
 
 	NSArray *items = [[openFilesButton menu] itemArray];
 	NSInteger ndx;
@@ -235,6 +233,19 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
 	[document setJumpList:jumpList];
+}
+
+/* Create a new document tab.
+ */
+- (void)createTabForDocument:(ViDocument *)document
+{
+	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithDocumentView:[document makeView]];
+
+	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
+	[tabItem setLabel:[document displayName]];
+	[tabItem setView:[tabController view]];
+	[tabView addTabViewItem:tabItem];
+	[tabView selectTabViewItem:tabItem];
 }
 
 /* Called by a new ViDocument in its makeWindowControllers method.
@@ -264,15 +275,7 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	// create a new document tab
-	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithDocumentView:[document makeView]];
-
-	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
-	[tabItem setLabel:[document displayName]];
-	[tabItem setView:[tabController view]];
-	[tabView addTabViewItem:tabItem];
-	[tabView selectTabViewItem:tabItem];
-
+	[self createTabForDocument:document];
 	[self addDocument:document];
 
 	if (closeThisDocument) {
@@ -465,8 +468,8 @@ static NSWindowController	*currentWindowController = nil;
 - (void)closeCurrentView
 {
 	ViDocumentView *docView = [self currentView];
-	ViDocument *doc = [docView document];
 
+	ViDocument *doc = [docView document];
 	if ([[doc views] count] == 1)
 		// closing the last view, close the document
 		[doc canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:docView];
@@ -490,14 +493,28 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)closeDocumentView:(ViDocumentView *)docView
 {
+	if (docView == currentView)
+		currentView = nil;
+
+	ViDocument *doc = [docView document];
 	[docView close];
+	if ([[doc views] count] == 0)
+		[doc close];
 
 	ViDocumentTabController *tabController = [docView tabController];
-	if ([[tabController views] count] == 0)
+	if ([[tabController views] count] == 0) {
 		[self closeTabController:tabController];
-	else if (tabController == [self selectedTabController])
+
+		if ([tabView numberOfTabViewItems] == 0) {
+			if ([documents count] > 0) {
+				[self selectDocument:[documents objectAtIndex:0]];
+			} else
+				[[self window] close];
+		}
+	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
 		[self selectDocumentView:[[tabController views] objectAtIndex:0]];
+	}
 }
 
 /*
@@ -685,16 +702,14 @@ static NSWindowController	*currentWindowController = nil;
 	for (docView in [tabController views])
 		if ([[docView document] isEqual:document])
 			return [self selectDocumentView:docView];
-			
 
 	// select any existing view of the document
 	if ([[document views] count] > 0)
 		return [self selectDocumentView:[[document views] objectAtIndex:0]];
 
 	// No view exists of the document. Ugh. Create a new tab? Or just keep it hidden?
-	INFO(@"No view exists of the document %@. DON'T KNOW WHAT TO DO!", document);
-
-	return nil;
+	[self createTabForDocument:document];
+	return [[document views] objectAtIndex:0];
 }
 
 - (IBAction)selectNextTab:(id)sender

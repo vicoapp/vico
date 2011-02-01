@@ -166,8 +166,14 @@ static NSWindowController	*currentWindowController = nil;
 	separatorCell = [[ViSeparatorCell alloc] init];
 
 	if ([self project] != nil) {
+		[environment setBaseURL:[[self project] initialURL]];
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
 		[[NSDocumentController sharedDocumentController] newDocument:self];
+		/* This makes repeated open requests for the same URL always open a new window.
+		 * With this commented, the "project" is already opened, and no new window will be created.
+		[[self project] close];
+		project = nil;
+		*/
 	} else
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
 
@@ -418,6 +424,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	if (currentWindowController == self)
 		currentWindowController = nil;
+	[[self project] close];
 	[windowControllers removeObject:self];
 	[tabBar setDelegate:nil];
 }

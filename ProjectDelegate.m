@@ -136,7 +136,7 @@
 	else if ([[url scheme] isEqualToString:@"sftp"])
 		return [self childrenAtSftpURL:url error:outError];
 	else if (outError)
-		*outError = [SFTPConnection errorWithDescription:[NSString stringWithFormat:@"unhandled scheme %@", [url scheme]]];
+		*outError = [SFTPConnection errorWithFormat:@"unhandled scheme %@", [url scheme]];
 	return nil;
 }
 

@@ -427,7 +427,7 @@
 	 fileRx:(ViRegexp *)fileRx
 {
 	NSString *reldir = nil;
-	ViRegexpMatch *pathMatch ;
+	ViRegexpMatch *pathMatch;
 	double pathScore;
 
 	/*
@@ -493,7 +493,7 @@ sort_by_score(id a, id b, void *context)
 	NSString *filter = [filterField stringValue];
 
 	if ([filter length] == 0)
-                filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
+		filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
 	else {
 		NSArray *components = [filter componentsSeparatedByString:@"/"];
 
@@ -506,13 +506,13 @@ sort_by_score(id a, id b, void *context)
 			[self appendFilter:[components objectAtIndex:i] toPattern:pathPattern];
 		}
 		[pathPattern appendString:@".*?$"];
-                ViRegexp *pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
+		ViRegexp *pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
 
-                NSMutableString *filePattern = [NSMutableString string];
+		NSMutableString *filePattern = [NSMutableString string];
 		[filePattern appendString:@"^.*?"];
 		[self appendFilter:[components lastObject] toPattern:filePattern];
 		[filePattern appendString:@".*$"];
-                ViRegexp *fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
+		ViRegexp *fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
 
                 filteredItems = [[NSMutableArray alloc] init];
                 [self expandItems:rootItems intoArray:filteredItems pathRx:pathRx fileRx:fileRx];

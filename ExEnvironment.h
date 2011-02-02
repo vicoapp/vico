@@ -1,4 +1,5 @@
 #import "ViDocumentTabController.h"
+#import "ProjectDelegate.h"
 
 @class ViTextView;
 @class ViDocument;
@@ -11,6 +12,7 @@
 	IBOutlet NSTextField	*statusbar;
 	IBOutlet NSWindow	*window;
 	IBOutlet ViWindowController *windowController;
+	IBOutlet ProjectDelegate *projectDelegate;
 
 	// command filtering
 	NSTask				*filterTask;
@@ -33,10 +35,6 @@
 	id				 filterTarget;
 	SEL				 filterSelector;
 	id				 filterContextInfo;
-
-	// command output view
-	IBOutlet NSSplitView	*commandSplit;
-	IBOutlet NSTextView	*commandOutput;
 
 	NSURL			*baseURL;
 

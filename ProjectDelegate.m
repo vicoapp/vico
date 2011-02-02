@@ -222,7 +222,6 @@
 
 - (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-	INFO(@"return code = %i", returnCode);
 	if (returnCode == NSCancelButton)
 		return;
 	
@@ -266,13 +265,11 @@
 	NSError *error = nil;
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host user:user error:&error];
 	if (conn) {
-		INFO(@"connected to %@ as %@", host, user);
 		if (![path hasPrefix:@"/"])
 			path = [NSString stringWithFormat:@"%@/%@", [conn home], path];
 		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
 		[self browseURL:url];
 	} else {
-		INFO(@"FAILED to connect to %@: %@", host, error);
 		NSAlert *alert = [NSAlert alertWithError:error];
 		[alert runModal];
 	}
@@ -325,6 +322,11 @@
 		return;
 
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
+	if (item && isCompletion) {
+		[completionTarget performSelector:completionAction withObject:[item url]];
+		return;
+	}
+
 	if (item && ![self outlineView:explorer isItemExpandable:item]) {
 		[delegate goToURL:[item url]];
 		[self cancelExplorer];
@@ -395,7 +397,14 @@
 	}
 
 	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
+	[item setMarkedString:s];
+}
 
+- (void)markItem:(ProjectFile *)item withPrefix:(int)length
+{
+	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:[item name]];
+	[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:NSMakeRange(0, length)];
+	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
 	[item setMarkedString:s];
 }
 
@@ -492,9 +501,11 @@ sort_by_score(id a, id b, void *context)
 {
 	NSString *filter = [filterField stringValue];
 
-	if ([filter length] == 0)
+	if ([filter length] == 0) {
+		isFiltered = NO;
+		isCompletion = NO;
 		filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
-	else {
+	} else {
 		NSArray *components = [filter componentsSeparatedByString:@"/"];
 
 		NSMutableString *pathPattern = [NSMutableString string];
@@ -518,8 +529,32 @@ sort_by_score(id a, id b, void *context)
                 [self expandItems:rootItems intoArray:filteredItems pathRx:pathRx fileRx:fileRx];
 
 		[filteredItems sortUsingFunction:sort_by_score context:nil];
+		isFiltered = YES;
         }
         [explorer reloadData];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+}
+
+- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path relativeToURL:(NSURL *)relURL target:(id)aTarget action:(SEL)anAction
+{
+	int markLength = 0;
+	if (![path hasSuffix:@"/"])
+		markLength = [[path lastPathComponent] length];
+
+	filteredItems = [[NSMutableArray alloc] init];
+	for (NSString *c in completions) {
+		ProjectFile *pf = [[ProjectFile alloc] initWithURL:[NSURL URLWithString:c relativeToURL:relURL]];
+		[filteredItems addObject:pf];
+		[self markItem:pf withPrefix:markLength];
+	}
+
+	completionTarget = aTarget;
+	completionAction = anAction;
+
+	isFiltered = YES;
+	isCompletion = YES;
+
+	[explorer reloadData];
 	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
@@ -596,7 +631,7 @@ sort_by_score(id a, id b, void *context)
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-	if ([[filterField stringValue] length] > 0)
+	if (isFiltered)
 		return [item markedString];
         else
 		return [(ProjectFile *)item name];

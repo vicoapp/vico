@@ -11,10 +11,10 @@
 #include "logging.h"
 
 @interface ExEnvironment (private)
-- (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange;
+- (NSString *)filenameInString:(NSString *)s range:(NSRange *)outRange;
 - (unsigned)completePath:(NSString *)partialPath relativeToURL:(NSURL *)url into:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr;
-- (void)displayCompletions:(NSArray *)completions forURL:(NSURL *)url;
 - (NSURL *)parseExFilename:(NSString *)filename;
+- (IBAction)finishedExCommand:(id)sender;
 @end
 
 @implementation ExEnvironment
@@ -45,9 +45,6 @@
 {
 	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 	[statusbar setDelegate:self];
-
-	[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
-	[commandOutput setFont:[NSFont userFixedPitchFontOfSize:10.0]];
 }
 
 #pragma mark -
@@ -163,17 +160,16 @@
 #pragma mark -
 #pragma mark Filename completion
 
-- (NSString *)filenameAtLocation:(NSUInteger)aLocation inFieldEditor:(NSText *)fieldEditor range:(NSRange *)outRange
+- (NSString *)filenameInString:(NSString *)s range:(NSRange *)outRange
 {
-	NSString *s = [fieldEditor string];
 	NSRange r = [s rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]
 				       options:NSBackwardsSearch
-					 range:NSMakeRange(0, aLocation)];
+					 range:NSMakeRange(0, [s length])];
 
 	if (r.location++ == NSNotFound)
 		r.location = 0;
 
-	r.length = aLocation - r.location;
+	r.length = [s length] - r.location;
 	*outRange = r;
 
 	return [s substringWithRange:r];
@@ -259,60 +255,6 @@
 	return [matches count];
 }
 
-- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path
-{
-	int skipIndex;
-	if ([path hasSuffix:@"/"])
-		skipIndex = [path length];
-	else
-		skipIndex = [[path stringByDeletingLastPathComponent] length] + 1;
-
-	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:11.0]
-							  forKey:NSFontAttributeName];
-	NSString *c;
-	NSSize maxsize = NSMakeSize(0, 0);
-	for (c in completions) {
-		NSSize size = [[c substringFromIndex:skipIndex] sizeWithAttributes:attrs];
-		if (size.width > maxsize.width)
-			maxsize = size;
-	}
-
-	CGFloat colsize = maxsize.width + 50;
-
-	NSRect bounds = [commandOutput bounds];
-	int columns = NSWidth(bounds) / colsize;
-	if (columns <= 0)
-		columns = 1;
-
-	// remove all previous tab stops
-	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-	NSTextTab *tabStop;
-	for (tabStop in [style tabStops])
-		[style removeTabStop:tabStop];
-	[style setDefaultTabInterval:colsize];
-
-	[[[commandOutput textStorage] mutableString] setString:@""];
-	int n = 0;
-	for (c in completions)
-		[[[commandOutput textStorage] mutableString] appendFormat:@"%@%@",
-			[c substringFromIndex:skipIndex], (++n % columns) == 0 ? @"\n" : @"\t"];
-
-	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	[commandOutput setBackgroundColor:[theme backgroundColor]];
-	[commandOutput setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[theme selectionColor]
-								             forKey:NSBackgroundColorAttributeName]];
-	attrs = [NSDictionary dictionaryWithObjectsAndKeys:
-			style, NSParagraphStyleAttributeName,
-			[theme foregroundColor], NSForegroundColorAttributeName,
-			[theme backgroundColor], NSBackgroundColorAttributeName,
-			[NSFont userFixedPitchFontOfSize:11.0], NSFontAttributeName,
-			nil];
-	[[commandOutput textStorage] addAttributes:attrs range:NSMakeRange(0, [[commandOutput textStorage] length])];
-
-        // display the completion by expanding the commandSplit view
-	[commandSplit setPosition:NSHeight([commandSplit frame])*0.60 ofDividerAtIndex:0];
-}
-
 #pragma mark -
 #pragma mark Input of ex commands
 
@@ -328,7 +270,6 @@
 		    aSelector == @selector(insertNewline:) ||
 		    (aSelector == @selector(deleteBackward:) && [textView selectedRange].location == 0))
 		{
-			[commandSplit setPosition:NSHeight([commandSplit frame]) ofDividerAtIndex:0];
 			if (aSelector != @selector(insertNewline:))
 				[statusbar setStringValue:@""];
 			[[statusbar target] performSelector:[statusbar action] withObject:self afterDelay:0.0];
@@ -357,9 +298,8 @@
 		else if (aSelector == @selector(insertTab:) ||
 		         aSelector == @selector(deleteForward:)) // ctrl-d
 		{
-			NSUInteger caret = [textView selectedRange].location;
 			NSRange range;
-			NSString *filename = [self filenameAtLocation:caret inFieldEditor:textView range:&range];
+			NSString *filename = [self filenameInString:[statusbar stringValue] range:&range];
 
 			NSURL *url = [self parseExFilename:filename];
 
@@ -386,13 +326,27 @@
 				num = [self completePath:completion relativeToURL:url into:&completion matchesIntoArray:&completions];
 			}
 
-			if (num > 1)
-				[self displayCompletions:completions forPath:completion];
+			[projectDelegate displayCompletions:completions forPath:completion relativeToURL:url target:self action:@selector(finishCompletionURL:)];
 
 			return YES;
 		}
 	}
 	return NO;
+}
+
+- (void)finishCompletionURL:(NSURL *)url
+{
+	NSRange range;
+	[self filenameInString:[statusbar stringValue] range:&range];
+
+	NSMutableString *s = [[NSMutableString alloc] initWithString:[statusbar stringValue]];
+	if ([url isFileURL])
+		[s replaceCharactersInRange:range withString:[url path]];
+	else
+		[s replaceCharactersInRange:range withString:[url absoluteString]];
+	[statusbar setStringValue:s];
+
+	[self finishedExCommand:nil];
 }
 
 - (NSURL *)parseExFilename:(NSString *)filename
@@ -448,6 +402,7 @@
 	[statusbar setEditable:NO];
 	[statusbar setHidden:YES];
 	[messageField setHidden:NO];
+	[projectDelegate cancelExplorer];
 
 	[[window windowController] focusEditor];
 }
@@ -824,7 +779,6 @@ filter_write(CFSocketRef s,
 	[invocation setArgument:&filterContextInfo atIndex:4];
 	[invocation invokeWithTarget:filterTarget];
 
-	INFO(@"%s", "clearing filter variables");
 	filterTask = nil;
 	filterCommand = nil;
 	filterInput = nil;

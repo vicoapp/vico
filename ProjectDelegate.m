@@ -535,7 +535,11 @@ sort_by_score(id a, id b, void *context)
 	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
-- (void)displayCompletions:(NSArray *)completions forPath:(NSString *)path relativeToURL:(NSURL *)relURL target:(id)aTarget action:(SEL)anAction
+- (void)displayCompletions:(NSArray*)completions
+                   forPath:(NSString*)path
+             relativeToURL:(NSURL*)relURL
+                    target:(id)aTarget
+                    action:(SEL)anAction
 {
 	int markLength = 0;
 	if (![path hasSuffix:@"/"])
@@ -543,7 +547,8 @@ sort_by_score(id a, id b, void *context)
 
 	filteredItems = [[NSMutableArray alloc] init];
 	for (NSString *c in completions) {
-		ProjectFile *pf = [[ProjectFile alloc] initWithURL:[NSURL URLWithString:c relativeToURL:relURL]];
+		NSURL *url = [NSURL URLWithString:[c stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:relURL];
+		ProjectFile *pf = [[ProjectFile alloc] initWithURL:url];
 		[filteredItems addObject:pf];
 		[self markItem:pf withPrefix:markLength];
 	}

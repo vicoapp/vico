@@ -1,6 +1,7 @@
 #import "ViRegexp.h"
 #import "ViBgView.h"
 
+@class ExEnvironment;
 @class SFTPDirectoryEntry;
 
 @interface ProjectFile : NSObject
@@ -18,6 +19,7 @@
 @interface ProjectDelegate : NSObject
 {
 	IBOutlet NSWindow *window;
+	IBOutlet ExEnvironment *environment;
 	IBOutlet NSOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
@@ -58,6 +60,8 @@
 - (IBAction)filterFiles:(id)sender;
 - (IBAction)searchFiles:(id)sender;
 - (BOOL)explorerIsOpen;
+- (void)openExplorerTemporarily:(BOOL)temporarily;
+- (void)closeExplorer;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
 

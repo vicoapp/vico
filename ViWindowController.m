@@ -174,7 +174,7 @@ static NSWindowController	*currentWindowController = nil;
 		project = nil;
 		*/
 	} else
-		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
+		[projectDelegate closeExplorer];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(caretChanged:) name:ViCaretChangedNotification object:nil];

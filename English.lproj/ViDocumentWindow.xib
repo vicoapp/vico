@@ -11,10 +11,10 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100452"/>
-			<integer value="100348"/>
 			<integer value="100398"/>
+			<integer value="100452"/>
 			<integer value="100557"/>
+			<integer value="100348"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -560,7 +560,6 @@
 									</array>
 									<string key="NSFrameSize">{800, 458}</string>
 									<reference key="NSSuperview" ref="892226745"/>
-									<reference key="NSNextKeyView"/>
 									<string key="NSClassName">NSView</string>
 								</object>
 							</array>
@@ -2019,6 +2018,14 @@
 					</object>
 					<int key="connectionID">100570</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">environment</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="894768772"/>
+					</object>
+					<int key="connectionID">100571</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2935,7 +2942,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100570</int>
+			<int key="maxID">100571</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3132,6 +3139,7 @@
 						<string key="actionMenu">NSMenu</string>
 						<string key="completionTarget">id</string>
 						<string key="delegate">id</string>
+						<string key="environment">ExEnvironment</string>
 						<string key="explorer">NSOutlineView</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="filterField">NSSearchField</string>
@@ -3154,6 +3162,10 @@
 						<object class="IBToOneOutletInfo" key="delegate">
 							<string key="name">delegate</string>
 							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="environment">
+							<string key="name">environment</string>
+							<string key="candidateClassName">ExEnvironment</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="explorer">
 							<string key="name">explorer</string>

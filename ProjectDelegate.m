@@ -3,6 +3,7 @@
 #import "MHTextIconCell.h"
 #import "SFTPConnectionPool.h"
 #import "ViWindowController.h" // for goToUrl:
+#import "ExEnvironment.h"
 
 @interface ProjectDelegate (private)
 + (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
@@ -12,7 +13,6 @@
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
-- (void)cancelExplorer;
 @end
 
 @implementation ProjectFile
@@ -100,9 +100,7 @@
 {
 	self = [super init];
 	if (self) {
-		rootItems = [NSArray array];
 		skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
-
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	}
@@ -193,6 +191,7 @@
 	children = [ProjectDelegate childrenAtURL:aURL error:&error];
 
 	if (children) {
+		[self openExplorerTemporarily:NO];
 		rootItems = children;
 		[self filterFiles:self];
 		[explorer reloadData];
@@ -347,11 +346,7 @@
 
 - (IBAction)searchFiles:(id)sender
 {
-	if ([splitView isSubviewCollapsed:explorerView]) {
-		closeExplorerAfterUse = YES;
-		[self toggleExplorer:nil];
-	}
-
+	[self openExplorerTemporarily:YES];
 	[self showExplorerSearch];
 	[window makeFirstResponder:filterField];
 }
@@ -361,18 +356,34 @@
 	return ![splitView isSubviewCollapsed:explorerView];
 }
 
+- (void)openExplorerTemporarily:(BOOL)temporarily
+{
+	if (![self explorerIsOpen]) {
+		if (temporarily)
+			closeExplorerAfterUse = YES;
+		[splitView setPosition:200 ofDividerAtIndex:0];
+		if (rootItems == nil)
+			[self browseURL:[environment baseURL]];
+	}
+}
+
+- (void)closeExplorer
+{
+	[splitView setPosition:0 ofDividerAtIndex:0];
+}
+
 - (IBAction)toggleExplorer:(id)sender
 {
 	if ([self explorerIsOpen])
-		[splitView setPosition:0 ofDividerAtIndex:0];
+		[self closeExplorer];
 	else
-		[splitView setPosition:200 ofDividerAtIndex:0];
+		[self openExplorerTemporarily:NO];
 }
 
 - (void)cancelExplorer
 {
 	if (closeExplorerAfterUse) {
-		[self toggleExplorer:self];
+		[self closeExplorer];
 		closeExplorerAfterUse = NO;
 	}
 	[self resetExplorerView];
@@ -546,10 +557,7 @@ sort_by_score(id a, id b, void *context)
                     target:(id)aTarget
                     action:(SEL)anAction
 {
-	if ([splitView isSubviewCollapsed:explorerView]) {
-		closeExplorerAfterUse = YES;
-		[self toggleExplorer:nil];
-	}
+	[self openExplorerTemporarily:YES];
 
 	int markLength = 0;
 	if (![path hasSuffix:@"/"])

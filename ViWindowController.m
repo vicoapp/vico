@@ -168,7 +168,6 @@ static NSWindowController	*currentWindowController = nil;
 	if ([self project] != nil) {
 		[environment setBaseURL:[[self project] initialURL]];
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
-		[[NSDocumentController sharedDocumentController] newDocument:self];
 		/* This makes repeated open requests for the same URL always open a new window.
 		 * With this commented, the "project" is already opened, and no new window will be created.
 		[[self project] close];
@@ -501,6 +500,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)closeDocumentView:(ViDocumentView *)docView
 {
+	if (docView == nil)
+		[[self window] close];
+
 	if (docView == currentView)
 		currentView = nil;
 
@@ -514,10 +516,8 @@ static NSWindowController	*currentWindowController = nil;
 		[self closeTabController:tabController];
 
 		if ([tabView numberOfTabViewItems] == 0) {
-			if ([documents count] > 0) {
+			if ([documents count] > 0)
 				[self selectDocument:[documents objectAtIndex:0]];
-			} else
-				[[self window] close];
 		}
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.

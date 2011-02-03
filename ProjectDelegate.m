@@ -356,12 +356,17 @@
 	[window makeFirstResponder:filterField];
 }
 
+- (BOOL)explorerIsOpen
+{
+	return ![splitView isSubviewCollapsed:explorerView];
+}
+
 - (IBAction)toggleExplorer:(id)sender
 {
-	if ([splitView isSubviewCollapsed:explorerView])
-		[splitView setPosition:200 ofDividerAtIndex:0];
-	else
+	if ([self explorerIsOpen])
 		[splitView setPosition:0 ofDividerAtIndex:0];
+	else
+		[splitView setPosition:200 ofDividerAtIndex:0];
 }
 
 - (void)cancelExplorer

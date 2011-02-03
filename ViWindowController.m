@@ -518,6 +518,8 @@ static NSWindowController	*currentWindowController = nil;
 		if ([tabView numberOfTabViewItems] == 0) {
 			if ([documents count] > 0)
 				[self selectDocument:[documents objectAtIndex:0]];
+			else if (![projectDelegate explorerIsOpen])
+				[[self window] close];
 		}
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
@@ -1147,10 +1149,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)toggleExplorer:(id)sender
 {
-	if ([[splitView subviews] objectAtIndex:0] == explorerView)
-		[projectDelegate toggleExplorer:sender];
-	else
-		NSBeep();
+	[projectDelegate toggleExplorer:sender];
 }
 
 #pragma mark -

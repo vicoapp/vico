@@ -57,6 +57,7 @@
 
 - (IBAction)filterFiles:(id)sender;
 - (IBAction)searchFiles:(id)sender;
+- (BOOL)explorerIsOpen;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
 

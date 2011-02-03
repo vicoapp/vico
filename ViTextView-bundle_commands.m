@@ -166,6 +166,7 @@
 	[task setStandardOutput:shellOutput];
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
 	[ViBundle setupEnvironment:env forTextView:self];
 
 	/* Additional bundle command specific variables. */

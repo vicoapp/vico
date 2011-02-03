@@ -546,6 +546,11 @@ sort_by_score(id a, id b, void *context)
                     target:(id)aTarget
                     action:(SEL)anAction
 {
+	if ([splitView isSubviewCollapsed:explorerView]) {
+		closeExplorerAfterUse = YES;
+		[self toggleExplorer:nil];
+	}
+
 	int markLength = 0;
 	if (![path hasSuffix:@"/"])
 		markLength = [[path lastPathComponent] length];

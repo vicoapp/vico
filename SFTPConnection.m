@@ -103,7 +103,7 @@ size_t num_requests = 64;
 		[arguments addObject:@"-oConnectTimeout 10"];
 		[arguments addObject:@"-vvv"];
 		[arguments addObject:@"-s"];
-		if (username)
+		if ([username length] > 0)
 			[arguments addObject:[NSString stringWithFormat:@"%@@%@", username, hostname]];
 		else
 			[arguments addObject:hostname];

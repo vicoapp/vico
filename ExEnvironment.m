@@ -512,10 +512,15 @@
 	[self message:@"%@", [self displayBaseURL]];
 }
 
-- (ViDocument *)openDocument:(NSString *)filename andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory
+- (ViDocument *)openDocument:(id)filenameOrURL andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory
 {
 	NSError *error = nil;
-	NSURL *url = [self parseExFilename:filename];
+	NSURL *url;
+	if ([filenameOrURL isKindOfClass:[NSURL class]])
+		url = filenameOrURL;
+	else
+		url = [self parseExFilename:filenameOrURL];
+	
 	BOOL isDirectory = NO;
 	BOOL exists = NO;
 	if ([url isFileURL])
@@ -537,10 +542,6 @@
 	ViDocument *doc;
 	if (exists) {
 		doc= [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:display error:&error];
-		/*
-		if (doc)
-			[windowController selectDocument:doc];
-		*/
 	} else {
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:display error:&error];
 		[doc setIsTemporary:YES];
@@ -566,10 +567,10 @@
 	}
 }
 
-- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc
+- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(id)filenameOrURL orSwitchToDocument:(ViDocument *)doc
 {
-	if (filename) {
-		doc = [self openDocument:filename andDisplay:NO allowDirectory:NO];
+	if (filenameOrURL) {
+		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
 	} else if (doc == nil) {
 		NSError *err = nil;
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
@@ -578,6 +579,9 @@
 	}
 
 	if (doc) {
+		/*
+		 * FIXME: if there is no current view, create one?
+		 */
 		[doc addWindowController:windowController];
 		[windowController addDocument:doc];
 		if (isVertical)

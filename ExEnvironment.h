@@ -72,7 +72,8 @@
 - (void)selectTabAtIndex:(NSInteger)anIndex;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView;
 
-- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(NSString *)filename orSwitchToDocument:(ViDocument *)doc;
+- (ViDocument *)openDocument:(id)filenameOrURL andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory;
+- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(id)filenameOrURL orSwitchToDocument:(ViDocument *)doc;
 
 - (void)filterText:(NSString*)inputText
        throughTask:(NSTask *)task

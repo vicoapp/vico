@@ -1,0 +1,4 @@
+@interface ViPathControl : NSPathControl
+{
+}
+@end

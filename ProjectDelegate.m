@@ -420,6 +420,23 @@
 {
 }
 
+- (IBAction)bookmarkFolder:(id)sender
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSArray *bookmarks = [defaults arrayForKey:@"bookmarks"];
+	NSString *url = [[rootButton URL] absoluteString];
+	if (![bookmarks containsObject:url]) {
+		if (bookmarks == nil)
+			bookmarks = [NSArray array];
+		[defaults setObject:[bookmarks arrayByAddingObject:url] forKey:@"bookmarks"];
+	}
+}
+
+- (IBAction)gotoBookmark:(id)sender
+{
+	[self browseURL:[NSURL URLWithString:[sender titleOfSelectedItem]]];
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
 	__block BOOL fail = NO;

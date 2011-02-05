@@ -64,9 +64,8 @@
 - (IBAction)openWithFinder:(id)sender;
 - (IBAction)newFolder:(id)sender;
 - (IBAction)newDocument:(id)sender;
-
-- (void)showExplorerSearch;
-- (void)hideExplorerSearch;
+- (IBAction)bookmarkFolder:(id)sender;
+- (IBAction)gotoBookmark:(id)sender;
 
 - (IBAction)acceptSftpSheet:(id)sender;
 - (IBAction)cancelSftpSheet:(id)sender;

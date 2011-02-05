@@ -118,6 +118,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)windowDidLoad
 {
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
+	[bookmarksButtonCell setImage:[NSImage imageNamed:@"bookmark"]];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];

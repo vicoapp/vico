@@ -2,6 +2,7 @@
 #import "ViBgView.h"
 #import "ViJumpList.h"
 #import "ExEnvironment.h"
+#import "ViToolbarPopUpButtonCell.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -18,6 +19,7 @@
 	IBOutlet NSSplitView *splitView;	// Split between explorer, main and symbol views
 	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
+	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;

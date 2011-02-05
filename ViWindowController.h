@@ -19,8 +19,6 @@
 	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
 
-	IBOutlet NSView *documentView;
-
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;
 

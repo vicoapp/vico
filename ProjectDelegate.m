@@ -118,6 +118,8 @@
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 	[rootButton setTarget:self];
 	[rootButton setAction:@selector(changeRoot:)];
+	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
+	[actionButton setMenu:actionMenu];
 }
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor

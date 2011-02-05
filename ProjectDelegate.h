@@ -1,5 +1,6 @@
 #import "ViRegexp.h"
 #import "ViBgView.h"
+#import "ViToolbarPopUpButtonCell.h"
 
 @class ViWindowController;
 @class ExEnvironment;
@@ -32,6 +33,8 @@
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;
 	IBOutlet NSPathControl *rootButton;
+	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
+	IBOutlet NSPopUpButton *actionButton;
 
 	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;

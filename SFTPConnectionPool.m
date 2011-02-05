@@ -21,7 +21,11 @@
 
 - (SFTPConnection *)connectionWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError
 {
-	NSString *key = [NSString stringWithFormat:@"%@@%@", username, hostname];
+	NSString *key;
+	if ([username length] > 0)
+		key = [NSString stringWithFormat:@"%@@%@", username, hostname];
+	else
+		key = hostname;
 	SFTPConnection *conn = [connections objectForKey:key];
 
 	if (conn && [conn closed]) {

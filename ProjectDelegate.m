@@ -445,10 +445,25 @@
 	/*
 	 * Some items only operate on a single entry.
 	 */
-	if ([set count] > 1 && ([menuItem action] == @selector(openInCurrentView:) ||
+	if ([set count] > 1 &&
+	   ([menuItem action] == @selector(openInCurrentView:) ||
 	    [menuItem action] == @selector(renameFile:) ||
 	    [menuItem action] == @selector(openInSplit:) ||		/* XXX: Splitting multiple documents is disabled for now, buggy */
 	    [menuItem action] == @selector(openInVerticalSplit:)))
+		return NO;
+
+	/*
+	 * Some items need at least one selected entry.
+	 */
+	if ([set count] == 0 && [explorer clickedRow] == -1 &&
+	   ([menuItem action] == @selector(openInTab:) ||
+	    [menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(openInSplit:) ||
+	    [menuItem action] == @selector(openInVerticalSplit:) ||
+	    [menuItem action] == @selector(renameFile:) ||
+	    [menuItem action] == @selector(removeFiles:) ||
+	    [menuItem action] == @selector(revealInFinder:) ||
+	    [menuItem action] == @selector(openWithFinder:)))
 		return NO;
 
 	/*

@@ -847,7 +847,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	ViDocumentView *docView = [self currentView];
 	if (docView == nil) {
-		NSLog(@"no current view?");
+		INFO(@"%s", "no current view?");
 		return;
 	}
 
@@ -860,7 +860,7 @@ static NSWindowController	*currentWindowController = nil;
 {
 	ViDocumentView *docView = [self currentView];
 	if (docView == nil) {
-		NSLog(@"no current view?");
+		INFO(@"%s", "no current view?");
 		return;
 	}
 

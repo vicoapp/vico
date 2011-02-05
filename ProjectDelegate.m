@@ -256,9 +256,7 @@
 	}
 	[NSApp endSheet:sftpConnectView];
 	NSString *host = [[sftpConnectForm cellAtIndex:0] stringValue];
-	NSString *user = [[sftpConnectForm cellAtIndex:1] stringValue];
-	if ([user length] == 0)
-		user = [[sftpConnectForm cellAtIndex:1] placeholderString];
+	NSString *user = [[sftpConnectForm cellAtIndex:1] stringValue];	/* might be blank */
 	NSString *path = [[sftpConnectForm cellAtIndex:2] stringValue];
 
 	NSError *error = nil;

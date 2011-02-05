@@ -78,7 +78,10 @@
 
 - (NSString *)name
 {
-	return [url lastPathComponent];
+	if ([url isFileURL]) {
+		return [[NSFileManager defaultManager] displayNameAtPath:[url path]];
+	} else
+		return [url lastPathComponent];
 }
 
 - (NSString *)pathRelativeToURL:(NSURL *)relURL

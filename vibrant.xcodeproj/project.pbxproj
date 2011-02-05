@@ -313,6 +313,7 @@
 		9A7B0E720D01601A00040CAC /* ViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTextView.m; sourceTree = "<group>"; };
 		9A7B0E730D01601A00040CAC /* ViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTextView.h; sourceTree = "<group>"; };
 		9A7B0F200D01AC9500040CAC /* ViTextView-cursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-cursor.m"; sourceTree = "<group>"; };
+		9A82FE3412FB313500D7660B /* ViCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommon.h; sourceTree = "<group>"; };
 		9A8A70EB12DB885500D5874C /* ber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber.c; sourceTree = "<group>"; };
 		9A8A70EC12DB885500D5874C /* ber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber.h; sourceTree = "<group>"; };
 		9A8A70ED12DB885500D5874C /* receipt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = receipt.c; sourceTree = "<group>"; };
@@ -487,6 +488,7 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A82FE3412FB313500D7660B /* ViCommon.h */,
 				9A8A710412E2DBD900D5874C /* ViSplitView.h */,
 				9A8A710512E2DBD900D5874C /* ViSplitView.m */,
 				9A4BA2C6118D63450093E2AB /* ViBgView.m */,

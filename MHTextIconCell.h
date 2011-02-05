@@ -1,4 +1,4 @@
-@interface MHTextIconCell : NSCell
+@interface MHTextIconCell : NSTextFieldCell
 {
 	NSImage *image;
 }

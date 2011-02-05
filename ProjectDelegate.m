@@ -17,7 +17,7 @@
 
 @implementation ProjectFile
 
-@synthesize score, markedString;
+@synthesize score, markedString, url;
 
 - (id)initWithURL:(NSURL *)aURL
 {
@@ -112,18 +112,35 @@
 	[explorer setTarget:self];
 	[explorer setDoubleAction:@selector(explorerDoubleClick:)];
 	[explorer setAction:@selector(explorerClick:)];
-
-        [[explorer outlineTableColumn] setDataCell:[[MHTextIconCell alloc] init]];
 	[self hideExplorerSearch];
-       
-	NSCell *cell = [(NSTableColumn *)[[explorer tableColumns] objectAtIndex:0] dataCell];
-	[cell setLineBreakMode:NSLineBreakByTruncatingMiddle];
-	[cell setWraps:NO];
-
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
-
 	[rootButton setTarget:self];
 	[rootButton setAction:@selector(changeRoot:)];
+}
+
+- (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor
+{
+	if (control == explorer) {
+		NSInteger idx = [explorer editedRow];
+		ProjectFile *file = [explorer itemAtRow:idx];
+		NSURL *newurl = [NSURL URLWithString:[fieldEditor string] relativeToURL:[file url]];
+		NSError *error = nil;
+		if ([[file url] isFileURL]) {
+			[[NSFileManager defaultManager] moveItemAtURL:[file url] toURL:newurl error:&error];
+		} else {
+			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:[file url] error:&error];
+			[conn renameItemAtPath:[[file url] path] toPath:[newurl path] error:&error];
+		}
+
+		if (error != nil)
+			[NSApp presentError:error];
+		else {
+			ViDocument *doc = [windowController documentForURL:[file url]];
+			[file setUrl:newurl];
+			[doc setFileURL:newurl];
+		}
+	}
+	return YES;
 }
 
 - (void)changeRoot:(id)sender
@@ -223,7 +240,7 @@
 {
 	if (returnCode == NSCancelButton)
 		return;
-	
+
 	for (NSURL *url in [panel URLs])
 		[self browseURL:url];
 }
@@ -282,6 +299,169 @@
 	[NSApp beginSheet:sftpConnectView modalForWindow:window modalDelegate:self didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
+- (NSIndexSet *)clickedIndexes
+{
+	NSIndexSet *set = [explorer selectedRowIndexes];
+	NSInteger clickedRow = [explorer clickedRow];
+	if (clickedRow != -1 && ![set containsIndex:clickedRow])
+		set = [NSIndexSet indexSetWithIndex:clickedRow];
+	return set;
+}
+
+- (IBAction)openInTab:(id)sender
+{
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		if (item && ![self outlineView:explorer isItemExpandable:item])
+			[delegate goToURL:[item url]];
+	}];
+	[self cancelExplorer];
+}
+
+- (IBAction)openInCurrentView:(id)sender
+{
+	NSUInteger idx = [[self clickedIndexes] firstIndex];
+	ProjectFile *file = [explorer itemAtRow:idx];
+	if (!file)
+		return;
+	ViDocument *doc = [environment openDocument:[file url] andDisplay:NO allowDirectory:NO];
+	if (doc)
+		[windowController switchToDocument:doc];
+}
+
+- (IBAction)openInSplit:(id)sender
+{
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		if (item && ![self outlineView:explorer isItemExpandable:item])
+			[environment splitVertically:NO andOpen:[item url] orSwitchToDocument:nil];
+	}];
+	[self cancelExplorer];
+}
+
+- (IBAction)openInVerticalSplit:(id)sender;
+{
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		if (item && ![self outlineView:explorer isItemExpandable:item])
+			[environment splitVertically:YES andOpen:[item url] orSwitchToDocument:nil];
+	}];
+	[self cancelExplorer];
+}
+
+- (IBAction)renameFile:(id)sender
+{
+	NSIndexSet *set = [self clickedIndexes];
+	if ([set count] > 1)
+		return;
+	[explorer selectRowIndexes:set byExtendingSelection:NO];
+	[explorer editColumn:0 row:[set firstIndex] withEvent:nil select:YES];
+}
+
+- (IBAction)removeFiles:(id)sender
+{
+	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		[urls addObject:[item url]];
+	}];
+
+	__block BOOL failed = NO;
+	if ([[urls objectAtIndex:0] isFileURL]) {
+		NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+		[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
+			if (error != nil) {
+				[NSApp presentError:error];
+				failed = YES;
+			}
+		}];
+	} else {
+		/* FIXME: ask for confirmation, as remote files will be deleted directly (no trash).
+		 */
+		failed = YES;
+	}
+
+	if (!failed) {
+		/* Rescan containing folder(s) ? */
+	}
+}
+
+- (IBAction)revealInFinder:(id)sender
+{
+	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		[urls addObject:[item url]];
+	}];
+	[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:urls];
+}
+
+- (IBAction)openWithFinder:(id)sender
+{
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		[[NSWorkspace sharedWorkspace] openURL:[item url]];
+	}];
+}
+
+- (IBAction)newFolder:(id)sender
+{
+}
+
+- (IBAction)newDocument:(id)sender
+{
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	__block BOOL fail = NO;
+
+	NSIndexSet *set = [self clickedIndexes];
+
+	if ([menuItem action] == @selector(openInTab:) ||
+	    [menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(openInSplit:) ||
+	    [menuItem action] == @selector(openInVerticalSplit:)) {
+		/*
+		 * Selected files must be files, not directories.
+		 */
+		[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+			ProjectFile *item = [explorer itemAtRow:idx];
+			if (item == nil || [self outlineView:explorer isItemExpandable:item]) {
+				*stop = YES;
+				fail = YES;
+			}
+		}];
+		if (fail)
+			return NO;
+	}
+
+	/*
+	 * Some items only operate on a single entry.
+	 */
+	if ([set count] > 1 && ([menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(renameFile:) ||
+	    [menuItem action] == @selector(openInSplit:) ||		/* XXX: Splitting multiple documents is disabled for now, buggy */
+	    [menuItem action] == @selector(openInVerticalSplit:)))
+		return NO;
+
+	/*
+	 * Finder operations only implemented for file:// urls.
+	 */
+	if (![[[explorer itemAtRow:[set firstIndex]] url] isFileURL] &&
+	    ([menuItem action] == @selector(revealInFinder:) ||
+	     [menuItem action] == @selector(openWithFinder:)))
+		return NO;
+
+	return YES;
+}
+
 - (void)showExplorerSearch
 {
 	NSRect frame = [explorerView frame];
@@ -315,18 +495,17 @@
 - (void)explorerClick:(id)sender
 {
 	NSIndexSet *set = [explorer selectedRowIndexes];
+
 	if ([set count] > 1)
 		return;
 
-	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
-	if (item && isCompletion) {
-		[completionTarget performSelector:completionAction withObject:[item url]];
-		return;
-	}
-
-	if (item && ![self outlineView:explorer isItemExpandable:item]) {
-		[delegate goToURL:[item url]];
-		[self cancelExplorer];
+	if (isCompletion) {
+		ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
+		if (item)
+			[completionTarget performSelector:completionAction withObject:[item url]];
+	} else {
+		// XXX: open in splits instead if alt key pressed?
+		[self openInTab:sender];
 	}
 }
 
@@ -519,6 +698,8 @@ sort_by_score(id a, id b, void *context)
 		isFiltered = NO;
 		isCompletion = NO;
 		filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
+		[explorer reloadData];
+		[explorer selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
 	} else {
 		NSArray *components = [filter componentsSeparatedByString:@"/"];
 
@@ -544,9 +725,9 @@ sort_by_score(id a, id b, void *context)
 
 		[filteredItems sortUsingFunction:sort_by_score context:nil];
 		isFiltered = YES;
+		[explorer reloadData];
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
         }
-        [explorer reloadData];
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
 - (void)displayCompletions:(NSArray*)completions

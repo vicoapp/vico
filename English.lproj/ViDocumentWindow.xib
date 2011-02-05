@@ -12,9 +12,10 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="100398"/>
+			<integer value="100325"/>
 			<integer value="100452"/>
 			<integer value="100557"/>
-			<integer value="100348"/>
+			<integer value="100362"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -838,25 +839,31 @@
 				<array class="NSMutableArray" key="NSMenuItems">
 					<object class="NSMenuItem" id="1027318679">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">Add new file...</string>
-						<string key="NSKeyEquiv">N</string>
-						<int key="NSKeyEquivModMask">1048576</int>
+						<string key="NSTitle">Open in new tab</string>
+						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
 						<reference key="NSMixedImage" ref="734990495"/>
 					</object>
 					<object class="NSMenuItem" id="309702387">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">Add existing files...</string>
-						<string key="NSKeyEquiv">A</string>
-						<int key="NSKeyEquivModMask">1048576</int>
+						<string key="NSTitle">Open in current view</string>
+						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
 						<reference key="NSMixedImage" ref="734990495"/>
 					</object>
 					<object class="NSMenuItem" id="329726202">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">Add remote files...</string>
+						<string key="NSTitle">Open in split</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="651298409"/>
+						<reference key="NSMixedImage" ref="734990495"/>
+					</object>
+					<object class="NSMenuItem" id="194244329">
+						<reference key="NSMenu" ref="214436382"/>
+						<string key="NSTitle">Open in vertical split</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
@@ -875,6 +882,14 @@
 					<object class="NSMenuItem" id="43141666">
 						<reference key="NSMenu" ref="214436382"/>
 						<string key="NSTitle">Rescan files</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="651298409"/>
+						<reference key="NSMixedImage" ref="734990495"/>
+					</object>
+					<object class="NSMenuItem" id="177080514">
+						<reference key="NSMenu" ref="214436382"/>
+						<string key="NSTitle">Browse remote files</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
@@ -900,7 +915,7 @@
 					</object>
 					<object class="NSMenuItem" id="497817310">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">Remove selected files</string>
+						<string key="NSTitle">Move selected files to the trash</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
@@ -945,6 +960,14 @@
 					<object class="NSMenuItem" id="611460060">
 						<reference key="NSMenu" ref="214436382"/>
 						<string key="NSTitle">New folder</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="651298409"/>
+						<reference key="NSMixedImage" ref="734990495"/>
+					</object>
+					<object class="NSMenuItem" id="301946186">
+						<reference key="NSMenu" ref="214436382"/>
+						<string key="NSTitle">New document</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="651298409"/>
@@ -1000,7 +1023,9 @@
 									<int key="NSCellFlags2">165888</int>
 									<object class="NSURL" key="NSContents">
 										<nil key="NS.base"/>
-										<string key="NS.relative">file://localhost/Applications/</string>
+										<object class="NSMutableString" key="NS.relative">
+											<characters key="NS.bytes">file://localhost/Applications/</characters>
+										</object>
 									</object>
 									<reference key="NSSupport" ref="26"/>
 									<reference key="NSControlView" ref="1013160728"/>
@@ -1008,7 +1033,7 @@
 									<array class="NSMutableArray" key="NSPathComponentCells">
 										<object class="NSPathComponentCell">
 											<int key="NSCellFlags">67239488</int>
-											<int key="NSCellFlags2">132096</int>
+											<int key="NSCellFlags2">1024</int>
 											<string key="NSContents">macbookpro</string>
 											<reference key="NSSupport" ref="26"/>
 											<reference key="NSBackgroundColor" ref="914134781"/>
@@ -1020,7 +1045,7 @@
 										</object>
 										<object class="NSPathComponentCell">
 											<int key="NSCellFlags">67239488</int>
-											<int key="NSCellFlags2">132096</int>
+											<int key="NSCellFlags2">1024</int>
 											<string key="NSContents">Hår-disk</string>
 											<reference key="NSSupport" ref="26"/>
 											<reference key="NSBackgroundColor" ref="914134781"/>
@@ -1032,7 +1057,7 @@
 										</object>
 										<object class="NSPathComponentCell">
 											<int key="NSCellFlags">67239488</int>
-											<int key="NSCellFlags2">132096</int>
+											<int key="NSCellFlags2">1024</int>
 											<string key="NSContents">Program</string>
 											<reference key="NSSupport" ref="26"/>
 											<reference key="NSBackgroundColor" ref="914134781"/>
@@ -1747,14 +1772,6 @@
 					<int key="connectionID">100375</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">addLocation:</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="309702387"/>
-					</object>
-					<int key="connectionID">100378</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">projectDelegate</string>
 						<reference key="source" ref="512844837"/>
@@ -1785,14 +1802,6 @@
 						<reference key="destination" ref="244902241"/>
 					</object>
 					<int key="connectionID">100382</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">addSFTPLocation:</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="329726202"/>
-					</object>
-					<int key="connectionID">100397</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2026,6 +2035,110 @@
 					</object>
 					<int key="connectionID">100571</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addSFTPLocation:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="177080514"/>
+					</object>
+					<int key="connectionID">100576</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">menu</string>
+						<reference key="source" ref="373574305"/>
+						<reference key="destination" ref="214436382"/>
+					</object>
+					<int key="connectionID">100577</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openInTab:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="1027318679"/>
+					</object>
+					<int key="connectionID">100578</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openInCurrentView:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="309702387"/>
+					</object>
+					<int key="connectionID">100579</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openInSplit:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="329726202"/>
+					</object>
+					<int key="connectionID">100580</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openInVerticalSplit:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="194244329"/>
+					</object>
+					<int key="connectionID">100581</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">newDocument:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="301946186"/>
+					</object>
+					<int key="connectionID">100582</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">newFolder:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="611460060"/>
+					</object>
+					<int key="connectionID">100583</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openWithFinder:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="968413362"/>
+					</object>
+					<int key="connectionID">100584</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">revealInFinder:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="662528957"/>
+					</object>
+					<int key="connectionID">100585</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">removeFiles:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="497817310"/>
+					</object>
+					<int key="connectionID">100586</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">renameFile:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="851475755"/>
+					</object>
+					<int key="connectionID">100587</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">windowController</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100588</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2192,6 +2305,9 @@
 							<reference ref="611460060"/>
 							<reference ref="128512282"/>
 							<reference ref="483871676"/>
+							<reference ref="194244329"/>
+							<reference ref="301946186"/>
+							<reference ref="177080514"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Explorer Menu</string>
@@ -2784,6 +2900,21 @@
 						<reference key="parent" ref="68674080"/>
 						<string key="objectName">Editor Tab View</string>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100572</int>
+						<reference key="object" ref="194244329"/>
+						<reference key="parent" ref="214436382"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100574</int>
+						<reference key="object" ref="301946186"/>
+						<reference key="parent" ref="214436382"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100575</int>
+						<reference key="object" ref="177080514"/>
+						<reference key="parent" ref="214436382"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2811,7 +2942,7 @@
 				<string key="100269.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100275.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100276.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="100325.IBEditorWindowLastContentRect">{{492, 240}, {236, 223}}</string>
+				<string key="100325.IBEditorWindowLastContentRect">{{654, 35}, {264, 283}}</string>
 				<string key="100325.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100329.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100331.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2832,6 +2963,7 @@
 				<string key="100360.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100361.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100362.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100363.CustomClassName">MHTextIconCell</string>
 				<string key="100363.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100364.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100376.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2925,6 +3057,9 @@
 				<object class="NSAffineTransform" key="100566.IBViewBoundsToFrameTransform">
 					<bytes key="NSTransformStruct">P4AAAL+AAABBkAAAwfAAAA</bytes>
 				</object>
+				<string key="100572.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100574.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100575.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBEditorWindowLastContentRect">{{343, 132}, {800, 480}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="0" key="5.IBViewEditorWindowController.showingBoundsRectangles"/>
@@ -2942,7 +3077,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100571</int>
+			<int key="maxID">100588</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3025,6 +3160,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">MHTextIconCell</string>
+					<string key="superclassName">NSTextFieldCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">MHTextIconCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="206551854">
 						<string key="majorKey">IBProjectSource</string>
@@ -3098,6 +3241,16 @@
 						<string key="addSFTPLocation:">id</string>
 						<string key="cancelSftpSheet:">id</string>
 						<string key="filterFiles:">id</string>
+						<string key="newDocument:">id</string>
+						<string key="newFolder:">id</string>
+						<string key="openInCurrentView:">id</string>
+						<string key="openInSplit:">id</string>
+						<string key="openInTab:">id</string>
+						<string key="openInVerticalSplit:">id</string>
+						<string key="openWithFinder:">id</string>
+						<string key="removeFiles:">id</string>
+						<string key="renameFile:">id</string>
+						<string key="revealInFinder:">id</string>
 						<string key="searchFiles:">id</string>
 						<string key="toggleExplorer:">id</string>
 					</dictionary>
@@ -3126,6 +3279,46 @@
 							<string key="name">filterFiles:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="newDocument:">
+							<string key="name">newDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="newFolder:">
+							<string key="name">newFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openInCurrentView:">
+							<string key="name">openInCurrentView:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openInSplit:">
+							<string key="name">openInSplit:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openInTab:">
+							<string key="name">openInTab:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openInVerticalSplit:">
+							<string key="name">openInVerticalSplit:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openWithFinder:">
+							<string key="name">openWithFinder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeFiles:">
+							<string key="name">removeFiles:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="renameFile:">
+							<string key="name">renameFile:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="revealInFinder:">
+							<string key="name">revealInFinder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="searchFiles:">
 							<string key="name">searchFiles:</string>
 							<string key="candidateClassName">id</string>
@@ -3149,6 +3342,7 @@
 						<string key="sftpConnectView">NSWindow</string>
 						<string key="splitView">NSSplitView</string>
 						<string key="window">NSWindow</string>
+						<string key="windowController">ViWindowController</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="actionMenu">
@@ -3202,6 +3396,10 @@
 						<object class="IBToOneOutletInfo" key="window">
 							<string key="name">window</string>
 							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="windowController">
+							<string key="name">windowController</string>
+							<string key="candidateClassName">ViWindowController</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

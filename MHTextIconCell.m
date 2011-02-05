@@ -7,7 +7,7 @@
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	NSSize size = NSMakeSize(0, 0);
-	
+
 	if (image) {
 		size = [image size];
 

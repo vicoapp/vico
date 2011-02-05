@@ -1,6 +1,7 @@
 #import "ViRegexp.h"
 #import "ViBgView.h"
 
+@class ViWindowController;
 @class ExEnvironment;
 @class SFTPDirectoryEntry;
 
@@ -13,6 +14,7 @@
 	NSAttributedString *markedString;
 }
 @property(readwrite, assign) double score;
+@property(readwrite, copy) NSURL *url;
 @property(readwrite, assign) NSAttributedString *markedString;
 @end
 
@@ -20,6 +22,7 @@
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;
+	IBOutlet ViWindowController *windowController;
 	IBOutlet NSOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
@@ -50,6 +53,17 @@
 - (IBAction)addLocation:(id)sender;
 - (IBAction)addSFTPLocation:(id)sender;
 - (IBAction)actionMenu:(id)sender;
+
+- (IBAction)openInTab:(id)sender;
+- (IBAction)openInCurrentView:(id)sender;
+- (IBAction)openInSplit:(id)sender;
+- (IBAction)openInVerticalSplit:(id)sender;
+- (IBAction)renameFile:(id)sender;
+- (IBAction)removeFiles:(id)sender;
+- (IBAction)revealInFinder:(id)sender;
+- (IBAction)openWithFinder:(id)sender;
+- (IBAction)newFolder:(id)sender;
+- (IBAction)newDocument:(id)sender;
 
 - (void)showExplorerSearch;
 - (void)hideExplorerSearch;

@@ -3,7 +3,7 @@
 
 @implementation ViDocumentTabController
 
-@synthesize views;
+@synthesize views, selectedDocumentView;
 
 - (id)initWithDocumentView:(ViDocumentView *)initialDocumentView
 {

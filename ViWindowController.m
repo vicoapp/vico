@@ -20,7 +20,6 @@ static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
 
 @interface ViWindowController ()
-- (ViDocument *)documentForURL:(NSURL *)url;
 - (void)updateJumplistNavigator;
 - (void)didSelectDocument:(ViDocument *)document;
 - (void)didSelectDocumentView:(ViDocumentView *)docView;
@@ -248,7 +247,7 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithDocumentView:[document makeView]];
 
 	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
-	[tabItem setLabel:[document displayName]];
+	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedDocumentView.document.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
 	[tabView selectTabViewItem:tabItem];
@@ -546,10 +545,8 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	// Give focus to the first (or last known?) view in the tab.
 	ViDocumentTabController *tabController = [tabViewItem identifier];
-	ViDocumentView *docView = [[tabController views] objectAtIndex:0];
-	[self selectDocumentView:docView];
+	[self selectDocumentView:tabController.selectedDocumentView];
 }
 
 - (void)documentController:(NSDocumentController *)docController didCloseAll:(BOOL)didCloseAll tabController:(void *)tabController
@@ -655,8 +652,6 @@ static NSWindowController	*currentWindowController = nil;
         [symbolsOutline expandItem:document];
 
 	[self checkDocumentChanged:document];
-
-	[[tabView selectedTabViewItem] setLabel:[document displayName]];
 }
 
 - (void)didSelectDocumentView:(ViDocumentView *)docView
@@ -666,6 +661,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	[self didSelectDocument:[docView document]];
 	[self updateSelectedSymbolForLocation:[[docView textView] caret]];
+	[[docView tabController] setSelectedDocumentView:docView];
 
 	lastDocumentView = currentView;
 	currentView = docView;

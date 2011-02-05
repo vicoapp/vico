@@ -14,9 +14,11 @@ enum ViViewOrderingMode {
 {
 	NSSplitView	*splitView;
 	NSMutableArray	*views;
+	ViDocumentView	*selectedDocumentView;
 }
 
 @property(readonly) NSArray *views;
+@property(readwrite, assign) ViDocumentView *selectedDocumentView;
 
 - (id)initWithDocumentView:(ViDocumentView *)initialDocumentView;
 - (void)addView:(ViDocumentView *)docView;

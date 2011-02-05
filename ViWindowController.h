@@ -77,6 +77,7 @@
 - (void)addDocument:(ViDocument *)document;
 - (void)addNewTab:(ViDocument *)document;
 - (ViDocument *)currentDocument;
+- (ViDocument *)documentForURL:(NSURL *)url;
 
 - (ViTagStack *)sharedTagStack;
 

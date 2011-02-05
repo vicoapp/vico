@@ -905,7 +905,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self displayName]];
+	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self fileURL]];
 }
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation

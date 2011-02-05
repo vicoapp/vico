@@ -435,7 +435,7 @@
 - (void)drawTabBar:(PSMTabBarControl *)bar inRect:(NSRect)rect
 {
     NSDrawWindowBackground(rect);
-    [[NSColor colorWithCalibratedWhite:0.0 alpha:0.2] set];
+    [[NSColor colorWithCalibratedWhite:0.3 alpha:0.2] set];
     NSRectFillUsingOperation(rect, NSCompositeSourceAtop);
     [[NSColor darkGrayColor] set];
     [NSBezierPath strokeLineFromPoint:NSMakePoint(rect.origin.x,rect.origin.y+0.5) toPoint:NSMakePoint(rect.origin.x+rect.size.width,rect.origin.y+0.5)];

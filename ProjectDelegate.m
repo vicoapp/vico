@@ -115,7 +115,6 @@
 	[explorer setTarget:self];
 	[explorer setDoubleAction:@selector(explorerDoubleClick:)];
 	[explorer setAction:@selector(explorerClick:)];
-	[self hideExplorerSearch];
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 	[rootButton setTarget:self];
 	[rootButton setAction:@selector(changeRoot:)];
@@ -480,27 +479,9 @@
 	return YES;
 }
 
-- (void)showExplorerSearch
-{
-	NSRect frame = [explorerView frame];
-	frame.size.height -= 49 + 22;
-	frame.origin.y += 49;
-	[scrollView setFrame:frame];
-	[filterField setHidden:NO];
-}
-
-- (void)hideExplorerSearch
-{
-	[filterField setHidden:YES];
-	NSRect frame = [explorerView frame];
-	frame.size.height -= 23 + 22;
-	frame.origin.y += 23;
-	[scrollView setFrame:frame];
-}
-
+/* FIXME: do this when filter field loses focus */
 - (void)resetExplorerView
 {
-	[self hideExplorerSearch];
         [filterField setStringValue:@""];
         [self filterFiles:self];
 #if 0
@@ -542,7 +523,6 @@
 - (IBAction)searchFiles:(id)sender
 {
 	[self openExplorerTemporarily:YES];
-	[self showExplorerSearch];
 	[window makeFirstResponder:filterField];
 }
 

@@ -4,6 +4,7 @@
 #import "ViDocument.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
+#import "TMFileURLProtocol.h"
 
 @implementation ViAppController
 
@@ -127,6 +128,8 @@
 	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
 	for (item in array)
 		[encodingMenu addItem:item];
+
+	[TMFileURLProtocol registerProtocol];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

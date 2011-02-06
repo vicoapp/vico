@@ -160,7 +160,10 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 
 	[self newBundleLoaded:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newBundleLoaded:) name:ViLanguageStoreBundleLoadedNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(newBundleLoaded:)
+                                            name:ViLanguageStoreBundleLoadedNotification
+                                          object:nil];
 
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
@@ -202,8 +205,14 @@ static NSWindowController	*currentWindowController = nil;
 	} else if ([projectDelegate explorerIsOpen])
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
 
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(firstResponderChanged:) name:ViFirstResponderChangedNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(caretChanged:) name:ViCaretChangedNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(firstResponderChanged:)
+                                            name:ViFirstResponderChangedNotification
+                                          object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(caretChanged:)
+                                            name:ViCaretChangedNotification
+                                          object:nil];
 
 	[self updateJumplistNavigator];
 }
@@ -1053,8 +1062,7 @@ static NSWindowController	*currentWindowController = nil;
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter = [symbolFilterField stringValue];
-	if ([filter length] > 0)
-	{
+	if ([filter length] > 0) {
 		[symbolFilterCache setObject:[item symbol] forKey:filter];
 		[symbolFilterField setStringValue:@""];
 	}
@@ -1071,8 +1079,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)searchSymbol:(id)sender
 {
-	if ([splitView isSubviewCollapsed:symbolsView])
-	{
+	if ([splitView isSubviewCollapsed:symbolsView]) {
 		closeSymbolListAfterUse = YES;
 		[self toggleSymbolList:nil];
 	}
@@ -1119,9 +1126,7 @@ static NSWindowController	*currentWindowController = nil;
 	NSMutableString *pattern = [NSMutableString string];
 	int i;
 	for (i = 0; i < [filter length]; i++)
-	{
 		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
-	}
 	[pattern appendString:@".*"];
 
 	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
@@ -1130,19 +1135,15 @@ static NSWindowController	*currentWindowController = nil;
 
 	// make sure the current document is displayed first in the symbol list
 	ViDocument *currentDocument = [self currentDocument];
-	if (currentDocument)
-	{
+	if (currentDocument) {
 		[filteredDocuments removeObject:currentDocument];
 		[filteredDocuments insertObject:currentDocument atIndex:0];
 	}
 
-	ViDocument *doc;
 	NSMutableArray *emptyDocuments = [[NSMutableArray alloc] init];
-	for (doc in filteredDocuments)
-	{
+	for (ViDocument *doc in filteredDocuments)
 		if ([doc filterSymbols:rx] == 0)
 			[emptyDocuments addObject:doc];
-	}
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolsOutline reloadData];
 	[symbolsOutline expandItem:nil expandChildren:YES];

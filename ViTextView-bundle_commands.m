@@ -5,7 +5,6 @@
 #import "ViAppController.h"
 #import "ViTextView.h"
 #import "ViCommandOutputController.h"
-#import "ViDocument.h"  // for declaration of the message: method
 #import "NSArray-patterns.h"
 #import "NSTextStorage-additions.h"
 #import "NSString-scopeSelector.h"
@@ -77,16 +76,16 @@
 	} else if ([type isEqualToString:@"scope"]) {
 		*rangePtr = [self trackScopeSelector:[command scope] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
-	} else if ([type isEqualToString:@"none"]) {
-		inputText = @"";
-		*rangePtr = NSMakeRange(0, 0);
-	} else if ([type isEqualToString:@"word"])
+	} else if ([type isEqualToString:@"word"]) {
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr];
-	else if ([type isEqualToString:@"line"]) {
+	} else if ([type isEqualToString:@"line"]) {
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:[self caret]];
 		*rangePtr = NSMakeRange(bol, eol - bol);
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
+	} else /* if ([type isEqualToString:@"none"]) */ {
+		inputText = @"";
+		*rangePtr = NSMakeRange([self caret], 0);
 	}
 
 	return inputText;
@@ -122,6 +121,7 @@
 	int fd = -1;
 
 	NSString *shellCommand = [command command];
+	DEBUG(@"shell command = [%@]", shellCommand);
 	if ([shellCommand hasPrefix:@"#!"]) {
 		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_cmd.XXXXXX"] fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
@@ -185,8 +185,8 @@
 	[task setCurrentDirectoryPath:[[[[self delegate] environment] baseURL] path]];
 	[task setEnvironment:env];
 
-	INFO(@"environment: %@", env);
-	INFO(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
+	DEBUG(@"environment: %@", env);
+	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, @"command", [NSValue valueWithRange:inputRange], @"inputRange", nil];
 	INFO(@"contextInfo = %p", info);
@@ -229,6 +229,7 @@
 		[[self delegate] message:@"%@: exited with status %i", [command name], status];
 	else {
 		DEBUG(@"command output: %@", outputText);
+		DEBUG(@"output format: %@", outputFormat);
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:inputRange withString:outputText undoGroup:NO];

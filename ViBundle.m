@@ -72,6 +72,8 @@
 	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
 	[env setObject:supportPath forKey:@"TM_SUPPORT_PATH"];
 
+	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];
+
 	NSString *line = [[textView textStorage] lineForLocation:[textView caret]];
 	if (line)
 		[env setObject:line forKey:@"TM_CURRENT_LINE"];

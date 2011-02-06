@@ -115,10 +115,36 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
 
+- (void)setupBundleMenu:(NSNotification *)notification
+{
+	NSMenu *menu = [bundleButton menu];
+	[menu removeAllItems];
+	[menu addItemWithTitle:@"Bundle commands" action:NULL keyEquivalent:@""];
+
+	ViTextView *textView = [[self currentView] textView];
+	NSArray *scopes = [textView scopesAtLocation:[textView caret]];
+
+	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
+		NSMenu *submenu = [bundle menuForScopes:scopes];
+		if (submenu) {
+			NSMenuItem *item = [menu addItemWithTitle:[bundle name]
+							      action:NULL
+						       keyEquivalent:@""];
+			[item setSubmenu:submenu];
+		}
+	}
+}
+
 - (void)windowDidLoad
 {
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
 	[bookmarksButtonCell setImage:[NSImage imageNamed:@"bookmark"]];
+
+	[bundleButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(setupBundleMenu:)
+                                            name:NSPopUpButtonWillPopUpNotification
+                                          object:bundleButton];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];

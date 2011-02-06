@@ -23,6 +23,8 @@
 
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;
+	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;
+	IBOutlet NSPopUpButton *bundleButton;
 
 	IBOutlet ExEnvironment *environment;
 

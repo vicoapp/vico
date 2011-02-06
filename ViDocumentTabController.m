@@ -10,7 +10,7 @@
 	self = [super init];
 	if (self) {
 		views = [[NSMutableArray alloc] init];
-		[self setObjectClass:[ViDocument class]];
+		//[self setObjectClass:[ViDocument class]];
 
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
 		splitView = [[NSSplitView alloc] initWithFrame:frame];
@@ -29,7 +29,6 @@
 {
 	[docView setTabController:self];
 	[views addObject:docView];
-	[self setContent:[docView document]];
 }
 
 - (void)removeView:(ViDocumentView *)docView

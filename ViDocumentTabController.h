@@ -10,7 +10,7 @@ enum ViViewOrderingMode {
 	ViViewRight
 };
 
-@interface ViDocumentTabController : NSObjectController
+@interface ViDocumentTabController : NSObject
 {
 	NSSplitView	*splitView;
 	NSMutableArray	*views;

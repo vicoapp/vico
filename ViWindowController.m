@@ -1014,6 +1014,17 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Symbol List
 
+- (void)cancelSymbolList
+{
+	if (closeSymbolListAfterUse) {
+		[self toggleSymbolList:self];
+		closeSymbolListAfterUse = NO;
+	}
+	[symbolFilterField setStringValue:@""];
+	[self filterSymbols:symbolFilterField];
+	[self focusEditor];
+}
+
 - (IBAction)toggleSymbolList:(id)sender
 {
 	NSInteger ndx = ([[splitView subviews] objectAtIndex:0] == explorerView) ? 1 : 0;
@@ -1055,11 +1066,7 @@ static NSWindowController	*currentWindowController = nil;
 	else
 		[self goToSymbol:item inDocument:[symbolsOutline parentForItem:item]];
 
-	if (closeSymbolListAfterUse)
-	{
-		[self toggleSymbolList:self];
-		closeSymbolListAfterUse = NO;
-	}
+	[self cancelSymbolList];
 }
 
 - (IBAction)searchSymbol:(id)sender
@@ -1207,13 +1214,7 @@ static NSWindowController	*currentWindowController = nil;
 		}
 		else if (aSelector == @selector(cancelOperation:)) // escape
 		{
-			if (closeSymbolListAfterUse)
-			{
-				[self toggleSymbolList:self];
-				closeSymbolListAfterUse = NO;
-			}
-			[symbolFilterField setStringValue:@""];
-			[self focusEditor];
+			[self cancelSymbolList];
 			return YES;
 		}
 	}

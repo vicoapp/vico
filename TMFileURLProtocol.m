@@ -1,4 +1,5 @@
 #import "TMFileURLProtocol.h"
+#include "logging.h"
 
 @implementation TMFileURLProtocol
 	
@@ -31,24 +32,40 @@
 	return request;
 }
 
+-(void)finalize
+{
+	if (client)
+		CFRelease(client);
+	[super finalize];
+}
+
 - (void)startLoading
 {
+	/*
+	 * Workaround for bug in NSURLRequest:
+	 * http://stackoverflow.com/questions/1112869/how-to-avoid-reference-count-underflow-in-nscfurlprotocolbridge-in-custom-nsurlp/4679837#4679837
+	 */
+	if (client)
+		CFRelease(client);
+        client = [self client];
+        CFRetain(client);
+
 	NSURLRequest *request = [self request];
 	NSURL *url = [request URL];
 
 	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSInteger length = -1;
 
+	DEBUG(@"loading path [%@]", [url path]);
 	NSData *data = [fm contentsAtPath:[url path]];
 	if (data)
 		length = [data length];
 
+	DEBUG(@"responding with %li bytes of data", length);
 	NSURLResponse *response = [[NSURLResponse alloc] initWithURL:url
 		MIMEType:@"text/html"
 		expectedContentLength:length
 		textEncodingName:nil];
-
-	id<NSURLProtocolClient> client = [self client];
 
 	[client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 	[client URLProtocol:self didLoadData:data];

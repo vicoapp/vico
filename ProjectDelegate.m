@@ -459,7 +459,9 @@
 
 - (IBAction)gotoBookmark:(id)sender
 {
-	[self browseURL:[NSURL URLWithString:[sender titleOfSelectedItem]]];
+	NSURL *url = [NSURL URLWithString:[sender titleOfSelectedItem]];
+	[self browseURL:url];
+	[environment setBaseURL:url];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

@@ -14,7 +14,7 @@
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
 - (void)expandNextItem:(id)dummy;
-- (void)expandItems:(NSArray *)items;
+- (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit;
 @end
 
 @implementation ProjectFile
@@ -684,7 +684,7 @@ sort_by_score(id a, id b, void *context)
 	ProjectFile *item = [itemsToFilter objectAtIndex:0];
 	[itemsToFilter removeObjectAtIndex:0];
 	DEBUG(@"expanding children of next item %@", item);
-	[self expandItems:[item children]];
+	[self expandItems:[item children] recursionLimit:3];
 
 	if ([itemsToFilter count] > 0)
 		[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.05];
@@ -692,7 +692,7 @@ sort_by_score(id a, id b, void *context)
 	[explorer reloadData];
 }
 
-- (void)expandItems:(NSArray *)items
+- (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit
 {
 	NSString *reldir = nil;
 	ViRegexpMatch *pathMatch;
@@ -707,8 +707,8 @@ sort_by_score(id a, id b, void *context)
 	for (ProjectFile *item in items) {
 		DEBUG(@"got item %@", [item url]);
 		if ([self outlineView:explorer isItemExpandable:item]) {
-			if ([item hasCachedChildren])
-				[self expandItems:[item children]];
+			if (recursionLimit > 0 && [item hasCachedChildren])
+				[self expandItems:[item children] recursionLimit:recursionLimit - 1];
 			else
 				/* schedule in runloop */
 				[itemsToFilter addObject:item];
@@ -778,7 +778,7 @@ sort_by_score(id a, id b, void *context)
 		itemsToFilter = [NSMutableArray array];
 		isFiltered = YES;
 
-		[self expandItems:rootItems];
+		[self expandItems:rootItems recursionLimit:3];
 		[filteredItems sortUsingFunction:sort_by_score context:nil];
 		[explorer reloadData];
 		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];

@@ -47,6 +47,7 @@
 - (Attrib *)stat:(NSString *)path error:(NSError **)outError;
 - (BOOL)isDirectory:(NSString *)path;
 - (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError;
+- (void)flushDirectoryCache;
 - (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError;
 - (NSString *)realpath:(NSString *)pathS error:(NSError **)outError;
 - (NSString *)currentDirectory;

@@ -424,6 +424,11 @@ size_t num_requests = 64;
 }
 
 
+- (void)flushDirectoryCache
+{
+	directoryCache = [[NSMutableDictionary alloc] init];
+}
+
 - (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError
 {
 	NSArray *contents = [directoryCache objectForKey:path];

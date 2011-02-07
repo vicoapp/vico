@@ -5,13 +5,14 @@
 
 @synthesize tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)content delegate:(id<ViTextViewDelegate>)delegate
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content environment:(ExEnvironment *)environment parser:(ViCommand *)parser
 {
 	self = [super init];
 	if (self)
 	{
 		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
-		[webView setDelegate:delegate];
+		[webView setEnvironment:environment];
+		[webView setParser:parser];
 		[[webView mainFrame] loadHTMLString:content baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	}
 	return self;

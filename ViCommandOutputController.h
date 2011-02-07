@@ -10,7 +10,7 @@
 
 @property(readwrite, assign) ViDocumentTabController *tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)content delegate:(id<ViTextViewDelegate>)delegate;
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content environment:(ExEnvironment *)environment parser:(ViCommand *)parser;
 - (NSView *)view;
 - (NSView *)innerView;
 

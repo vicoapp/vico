@@ -1,10 +1,10 @@
 #import "ViWebView.h"
-#import "ViWindowController.h"
+#import "ViCommon.h"
 #import "logging.h"
 
 @implementation ViWebView
 
-@synthesize delegate;
+@synthesize environment, parser;
 
 - (void)swipeWithEvent:(NSEvent *)event
 {
@@ -18,14 +18,14 @@
 		rc = [self goForward];
 
 	if (rc == YES && !keep_message)
-		[[self delegate] message:@""]; // erase any previous message
+		[environment message:@""]; // erase any previous message
 }
 
 - (BOOL)evaluateCommand:(ViCommand *)command
 {
 	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
 	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
-		[[self delegate] message:@"Command not implemented."];
+		[environment message:@"Command not implemented."];
 		return NO;
 	}
 
@@ -33,7 +33,7 @@
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
 
 	if (ok)	// erase any previous message
-		[[self delegate] message:@""];
+		[environment message:@""];
 
 	return ok;
 }
@@ -42,17 +42,15 @@
 {
 	if (arg-- == 0)
 		arg = 9;
-        [[[self delegate] environment] selectTabAtIndex:arg];
+        [environment selectTabAtIndex:arg];
 }
 
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags
 {
 	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
 
-	ViCommand *parser = [[[self delegate] windowController] parser];
-
 	if (parser.partial && (flags & ~NSNumericPadKeyMask) != 0) {
-		[[self delegate] message:@"Vi command interrupted by key equivalent."];
+		[environment message:@"Vi command interrupted by key equivalent."];
 		[parser reset];
 	}
 
@@ -133,44 +131,44 @@
 
 - (BOOL)window_left:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewLeft relativeTo:self];
+	return [environment selectViewAtPosition:ViViewLeft relativeTo:self];
 }
 
 - (BOOL)window_down:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewDown relativeTo:self];
+	return [environment selectViewAtPosition:ViViewDown relativeTo:self];
 }
 
 - (BOOL)window_up:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewUp relativeTo:self];
+	return [environment selectViewAtPosition:ViViewUp relativeTo:self];
 }
 
 - (BOOL)window_right:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewRight relativeTo:self];
+	return [environment selectViewAtPosition:ViViewRight relativeTo:self];
 }
 
 - (BOOL)window_close:(ViCommand *)command
 {
-	return [[[self delegate] environment] ex_close:nil];
+	return [environment ex_close:nil];
 }
 
 #if 0
 - (BOOL)window_split:(ViCommand *)command
 {
-	return [[[self delegate] environment] ex_split:nil];
+	return [environment ex_split:nil];
 }
 
 - (BOOL)window_vsplit:(ViCommand *)command
 {
-	return [[[self delegate] environment] ex_vsplit:nil];
+	return [environment ex_vsplit:nil];
 }
 #endif
 
 - (BOOL)window_new:(ViCommand *)command
 {
-	return [[[self delegate] environment] ex_new:nil];
+	return [environment ex_new:nil];
 }
 
 - (BOOL)scrollPage:(BOOL)isPageScroll vertically:(BOOL)isVertical direction:(int)direction
@@ -262,7 +260,7 @@
 		NSRect docBounds = [[scrollView documentView] bounds];
 		[[scrollView documentView] scrollPoint:NSMakePoint(0, IMAX(0, docBounds.size.height - bounds.size.height))];
 	} else {
-		[[self delegate] message:@"unsupported count for G command"];
+		[environment message:@"unsupported count for G command"];
 		return NO;
 	}
 
@@ -272,7 +270,7 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[[[self delegate] environment] executeForTextView:nil];
+	[environment executeForTextView:nil];
 	return YES;
 }
 

@@ -9,6 +9,7 @@
 #import "NSTextStorage-additions.h"
 #import "NSString-scopeSelector.h"
 #import "ViBundleCommand.h"
+#import "ViWindowController.h"
 
 @implementation ViTextView (bundleCommands)
 
@@ -237,8 +238,15 @@
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
-			[[oc window] makeKeyAndOrderFront:self];
+			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText delegate:[self delegate]];
+			id<ViViewController> viewController = [[[self delegate] windowController] currentView];
+			if (viewController == nil) {
+				INFO(@"%s", "ouch, no current view!");
+				return;
+			}
+			ViDocumentTabController *tabController = [viewController tabController];
+			[tabController splitView:viewController withView:oc vertically:YES];	// FIXME: option to specify vertical or not
+			[[[self delegate] windowController] selectDocumentView:oc];
 		} else if ([outputFormat isEqualToString:@"insertAsText"] || [outputFormat isEqualToString:@"afterSelectedText"]) {
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
 			[self setCaret:[self caret] + [outputText length]];

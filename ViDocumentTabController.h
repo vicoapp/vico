@@ -1,5 +1,5 @@
 @class ViDocument;
-@class ViDocumentView;
+@class ViDocumentTabController;
 
 typedef enum ViViewOrderingMode ViViewOrderingMode;
 enum ViViewOrderingMode {
@@ -10,24 +10,38 @@ enum ViViewOrderingMode {
 	ViViewRight
 };
 
+@protocol ViViewController <NSObject>
+@property(readonly) NSView *view;
+@property(readonly) NSView *innerView;
+@property(readwrite, assign) ViDocumentTabController *tabController;
+- (NSString *)title;
+@end
+
+@interface NSObject (ViDocumentProtocol)
+- (void)removeView:(id<ViViewController>)viewController;
+- (id<ViViewController>)makeView;
+@end
+
 @interface ViDocumentTabController : NSObject
 {
-	NSSplitView	*splitView;
-	NSMutableArray	*views;
-	ViDocumentView	*selectedDocumentView;
+	NSSplitView		*splitView;
+	NSMutableArray		*views;
+	id<ViViewController>	 selectedView;
 }
 
 @property(readonly) NSArray *views;
-@property(readwrite, assign) ViDocumentView *selectedDocumentView;
+@property(readwrite, assign) id<ViViewController> selectedView;
 
-- (id)initWithDocumentView:(ViDocumentView *)initialDocumentView;
-- (void)addView:(ViDocumentView *)docView;
+- (id)initWithViewController:(id<ViViewController>)initialView;
+- (void)addView:(id<ViViewController>)aView;
 - (NSView *)view;
-- (ViDocumentView *)splitView:(ViDocumentView *)docView vertically:(BOOL)isVertical;
-- (ViDocumentView *)replaceDocumentView:(ViDocumentView *)docView withDocument:(ViDocument *)document;
-- (void)closeDocumentView:(ViDocumentView *)docView;
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController withView:(id<ViViewController>)newViewController vertically:(BOOL)isVertical;
+- (id<ViViewController>)splitView:(id<ViViewController>)aView vertically:(BOOL)isVertical;
+- (id<ViViewController>)replaceView:(id<ViViewController>)aView withDocument:(ViDocument *)document;
+- (void)closeView:(id<ViViewController>)aView;
 - (NSSet *)documents;
-- (ViDocumentView *)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aDocView;
+//- (NSSet *)documentsOfType:(Class)class;
+- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView;
 
 @end
 

@@ -3,47 +3,54 @@
 
 @implementation ViDocumentTabController
 
-@synthesize views, selectedDocumentView;
+@synthesize views, selectedView;
 
-- (id)initWithDocumentView:(ViDocumentView *)initialDocumentView
+- (id)initWithViewController:(id<ViViewController>)initialViewController
 {
 	self = [super init];
 	if (self) {
 		views = [[NSMutableArray alloc] init];
-		//[self setObjectClass:[ViDocument class]];
 
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
 		splitView = [[NSSplitView alloc] initWithFrame:frame];
 		[splitView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 		[splitView setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 
-		[splitView addSubview:[initialDocumentView view]];
+		[splitView addSubview:[initialViewController view]];
 		[splitView adjustSubviews];
 
-		[self addView:initialDocumentView];
+		[self addView:initialViewController];
 	}
 	return self;
 }
 
-- (void)addView:(ViDocumentView *)docView
+- (void)addView:(id<ViViewController>)viewController
 {
-	[docView setTabController:self];
-	[views addObject:docView];
+	[viewController setTabController:self];
+	[views addObject:viewController];
 }
 
-- (void)removeView:(ViDocumentView *)docView
+- (void)removeView:(id<ViViewController>)viewController
 {
-	[[docView document] removeView:docView];
-	[views removeObject:docView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *docView = viewController;
+		[[docView document] removeView:viewController];
+	}
+	[views removeObject:viewController];
 }
 
 - (NSSet *)documents
 {
 	NSMutableSet *set = [[NSMutableSet alloc] init];
 
-	for (ViDocumentView *docView in views)
-		if (![set containsObject:[docView document]])
-			[set addObject:[docView document]];
+	for (id<ViViewController> viewController in views) {
+		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+			ViDocumentView *docView = viewController;
+			ViDocument *document = [docView document];
+			if (![set containsObject:document])
+				[set addObject:document];
+		}
+	}
 
 	return set;
 }
@@ -53,9 +60,9 @@
 	return splitView;
 }
 
-- (ViDocumentView *)splitView:(ViDocumentView *)docView vertically:(BOOL)isVertical
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController withView:(id<ViViewController>)newViewController vertically:(BOOL)isVertical
 {
-	NSView *view = [docView view];
+	NSView *view = [viewController view];
 
 	NSSplitView *split = (NSSplitView *)[view superview];
 	if (![split isKindOfClass:[NSSplitView class]]) {
@@ -66,16 +73,15 @@
 	if ([[split subviews] count] == 1 && [split isVertical] != isVertical)
 		[split setVertical:isVertical];
 
-	ViDocumentView *newDocView = [[docView document] makeView];
-	[self addView:newDocView];
+	[self addView:newViewController];
 
 	if ([split isVertical] == isVertical) {
 		// Just add another view to this split
-		[split addSubview:[newDocView view]];
+		[split addSubview:[newViewController view]];
 		[split adjustSubviews];
 	} else {
 		/*
-		 * Create a new horizontal split view and replace
+		 * Create a new split view and replace
 		 * the current view with the split and two subviews.
 		 */
 		NSRect frame = [view frame];
@@ -86,31 +92,45 @@
 		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 		[split replaceSubview:view with:newSplit];
 		[newSplit addSubview:view];
-		[newSplit addSubview:[newDocView view]];
+		[newSplit addSubview:[newViewController view]];
 		[newSplit adjustSubviews];
 	}
 
+	return newViewController;
+}
+
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController vertically:(BOOL)isVertical
+{
+	if (![viewController isKindOfClass:[ViDocumentView class]])
+		return nil;
+
+	ViDocumentView *docView = viewController;
+	ViDocumentView *newDocView = [[docView document] makeView];
+	if (![self splitView:viewController withView:newDocView vertically:isVertical])
+		return nil;
+
+	[[newDocView textView] setCaret:[[docView textView] caret]];
 	return newDocView;
 }
 
-- (ViDocumentView *)replaceDocumentView:(ViDocumentView *)docView withDocument:(ViDocument *)document
+- (id<ViViewController>)replaceView:(id<ViViewController>)viewController withDocument:(id)document
 {
-	ViDocumentView *newDocView = [document makeView];
+	id<ViViewController> newViewController = [document makeView];
 
-	[self addView:newDocView];
-	[self removeView:docView];
+	[self addView:newViewController];
+	[self removeView:viewController];
 
-	[[[docView view] superview] replaceSubview:[docView view] with:[newDocView view]];
+	[[[viewController view] superview] replaceSubview:[viewController view] with:[newViewController view]];
 
-	return newDocView;
+	return newViewController;
 }
 
-- (void)closeDocumentView:(ViDocumentView *)docView
+- (void)closeView:(id<ViViewController>)viewController
 {
-	[self removeView:docView];
+	[self removeView:viewController];
 
-	id split = [[docView view] superview];
-	[[docView view] removeFromSuperview];
+	id split = [[viewController view] superview];
+	[[viewController view] removeFromSuperview];
 
 	if ([[split subviews] count] == 1) {
 		id superSplit = [split superview];
@@ -119,13 +139,14 @@
 	}
 }
 
-- (ViDocumentView *)documentViewForView:(NSView *)aView
+- (id<ViViewController>)viewControllerForView:(NSView *)aView
 {
-	for (ViDocumentView *docView in [self views])
-		if ([docView view] == aView || [docView textView] == aView)
-			return docView;
+	for (id<ViViewController> viewController in [self views])
+		if ([viewController view] == aView ||
+		    [viewController innerView] == aView)
+			return viewController;
 
-	INFO(@"***** View %@ not in a document view", aView);
+	INFO(@"***** View %@ not in a view controller", aView);
 	return nil;
 }
 
@@ -147,7 +168,8 @@
 - (NSView *)containedViewRelativeToView:(NSView *)view anchor:(ViViewOrderingMode)anchor
 {
 	if ([view isMemberOfClass:[NSSplitView class]]) {
-		if ((anchor == ViViewUp && ![(NSSplitView *)view isVertical]) || (anchor == ViViewLeft && [(NSSplitView *)view isVertical]))
+		if ((anchor == ViViewUp && ![(NSSplitView *)view isVertical]) ||
+		    (anchor == ViViewLeft && [(NSSplitView *)view isVertical]))
 			view = [[view subviews] lastObject];
 		else
 			view = [[view subviews] objectAtIndex:0];
@@ -156,7 +178,7 @@
 		return view;
 }
 
-- (ViDocumentView *)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)view
+- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)view
 {
 	if (view == nil)
 		return nil;
@@ -166,7 +188,7 @@
 	NSInteger ndx;
 	NSSplitView *split = [self containingSplitViewRelativeTo:view isVertical:isVertical index:&ndx];
 	if (split == nil) {
-		INFO(@"no containing split view for mode %i", position);
+		DEBUG(@"no containing split view for mode %i", position);
 		return nil;
 	}
 
@@ -179,7 +201,7 @@
 	NSArray *subviews = [split subviews];
 	if (newIndex >= 0 && newIndex < [subviews count]) {
 		view = [subviews objectAtIndex:newIndex];
-		return [self documentViewForView:[self containedViewRelativeToView:view anchor:position]];
+		return [self viewControllerForView:[self containedViewRelativeToView:view anchor:position]];
 	} else
 		return [self viewAtPosition:position relativeTo:split];
 

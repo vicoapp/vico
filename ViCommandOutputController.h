@@ -1,13 +1,17 @@
-#import <WebKit/WebKit.h>
+#import "ViDocumentTabController.h"
+#import "ViTextView.h"
+#import "ViWebView.h"
 
-@interface ViCommandOutputController : NSWindowController
+@interface ViCommandOutputController : NSObject <ViViewController>
 {
-	NSString *content;
-	IBOutlet WebView *webView;
+	IBOutlet ViWebView *webView;
+	ViDocumentTabController *tabController;
 }
 
-@property(readonly) WebView *webView;
+@property(readwrite, assign) ViDocumentTabController *tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)aString;
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content delegate:(id<ViTextViewDelegate>)delegate;
+- (NSView *)view;
+- (NSView *)innerView;
 
 @end

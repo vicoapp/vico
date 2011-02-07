@@ -24,8 +24,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)didSelectDocument:(ViDocument *)document;
 - (void)didSelectDocumentView:(ViDocumentView *)docView;
 - (ViDocumentTabController *)selectedTabController;
-- (ViDocumentView *)currentView;
-- (void)closeDocumentView:(ViDocumentView *)docView;
+- (void)closeDocumentView:(id<ViViewController>)viewController;
 @end
 
 
@@ -121,7 +120,11 @@ static NSWindowController	*currentWindowController = nil;
 	[menu removeAllItems];
 	[menu addItemWithTitle:@"Bundle commands" action:NULL keyEquivalent:@""];
 
-	ViTextView *textView = [[self currentView] textView];
+	if (![[self currentView] isKindOfClass:[ViDocumentView class]])
+		return;
+
+	ViDocumentView *docView = [self currentView];
+	ViTextView *textView = [docView textView];
 	NSArray *scopes = [textView scopesAtLocation:[textView caret]];
 
 	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
@@ -137,6 +140,15 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)windowDidLoad
 {
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(firstResponderChanged:)
+                                            name:ViFirstResponderChangedNotification
+                                          object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(caretChanged:)
+                                            name:ViCaretChangedNotification
+                                          object:nil];
+
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
 	[bookmarksButtonCell setImage:[NSImage imageNamed:@"bookmark"]];
 
@@ -175,7 +187,7 @@ static NSWindowController	*currentWindowController = nil;
                 initialDocument = nil;
 	}
 
-	[[self window] bind:@"title" toObject:self withKeyPath:@"document.title" options:nil];
+	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
 
 	[[self window] makeKeyAndOrderFront:self];
 	[symbolsView setSourceHighlight:YES];
@@ -204,15 +216,6 @@ static NSWindowController	*currentWindowController = nil;
 		*/
 	} else if ([projectDelegate explorerIsOpen])
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(firstResponderChanged:)
-                                            name:ViFirstResponderChangedNotification
-                                          object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(caretChanged:)
-                                            name:ViCaretChangedNotification
-                                          object:nil];
 
 	[self updateJumplistNavigator];
 }
@@ -244,7 +247,10 @@ static NSWindowController	*currentWindowController = nil;
 			[symbolsOutline collapseItem:nil collapseChildren:YES];
 			[symbolsOutline expandItem:[self currentDocument]];
 		}
-		[self updateSelectedSymbolForLocation:[[[self currentView] textView] caret]];
+
+		id<ViViewController> viewController = [self currentView];
+		if ([viewController isKindOfClass:[ViDocumentView class]])
+			[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
 	}
 }
 
@@ -280,10 +286,10 @@ static NSWindowController	*currentWindowController = nil;
  */
 - (void)createTabForDocument:(ViDocument *)document
 {
-	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithDocumentView:[document makeView]];
+	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:[document makeView]];
 
 	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
-	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedDocumentView.document.title" options:nil];
+	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
 	[tabView selectTabViewItem:tabItem];
@@ -298,8 +304,6 @@ static NSWindowController	*currentWindowController = nil;
 		initialDocument = document;
 		return;
 	}
-
-//	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 
 	/*
 	 * If current document is untitled and unchanged and the rightmost tab, replace it.
@@ -343,7 +347,7 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)checkDocumentChanged:(ViDocument *)document
 {
-	if ([document isTemporary])
+	if (document == nil || [document isTemporary])
 		return;
 
 	if ([[document fileURL] isFileURL]) {
@@ -385,7 +389,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)focusEditorDelayed:(id)sender
 {
 	if ([self currentView])
-		[[self window] makeFirstResponder:[[self currentView] textView]];
+		[[self window] makeFirstResponder:[[self currentView] innerView]];
 }
 
 - (void)focusEditor
@@ -418,13 +422,16 @@ static NSWindowController	*currentWindowController = nil;
 
 - (ViDocument *)currentDocument
 {
-	return [[self currentView] document];
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		return [(ViDocumentView *)viewController document];
+	return nil;
 }
 
 - (void)caretChanged:(NSNotification *)notification
 {
 	ViTextView *textView = [notification object];
-	if (textView == [[self currentView] textView])
+	if (textView == [[self currentView] innerView])
 		[self updateSelectedSymbolForLocation:[textView caret]];
 }
 
@@ -463,9 +470,14 @@ static NSWindowController	*currentWindowController = nil;
 	[tabBar setDelegate:nil];
 }
 
-- (ViDocumentView *)currentView
+- (id<ViViewController>)currentView;
 {
 	return currentView;
+}
+
+- (void)setCurrentView:(id<ViViewController>)viewController
+{
+	currentView = viewController;
 }
 
 - (void)closeTabController:(ViDocumentTabController *)tabController
@@ -482,7 +494,7 @@ static NSWindowController	*currentWindowController = nil;
 			if ([[doc views] count] == 1)
 				[doc close];
 			else
-				[docView close];
+				[[docView tabController] closeView:docView];
 		}
 	}
 }
@@ -509,14 +521,18 @@ static NSWindowController	*currentWindowController = nil;
  */
 - (void)closeCurrentView
 {
-	ViDocumentView *docView = [self currentView];
+	id<ViViewController> viewController = [self currentView];
 
-	ViDocument *doc = [docView document];
-	if ([[doc views] count] == 1)
-		// closing the last view, close the document
-		[doc canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:docView];
-	else
-		[self closeDocumentView:docView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocument *doc = [(ViDocumentView *)viewController document];
+		if ([[doc views] count] == 1) {
+			// closing the last view, close the document
+			[doc canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:viewController];
+			return;
+		}
+	}
+
+	[self closeDocumentView:viewController];
 }
 
 /*
@@ -533,20 +549,23 @@ static NSWindowController	*currentWindowController = nil;
 	return NO;
 }
 
-- (void)closeDocumentView:(ViDocumentView *)docView
+- (void)closeDocumentView:(id<ViViewController>)viewController
 {
-	if (docView == nil)
+	if (viewController == nil)
 		[[self window] close];
 
-	if (docView == currentView)
-		currentView = nil;
+	if (viewController == currentView)
+		[self setCurrentView:nil];
 
-	ViDocument *doc = [docView document];
-	[docView close];
-	if ([[doc views] count] == 0)
-		[doc close];
+	[[viewController tabController] closeView:viewController];
 
-	ViDocumentTabController *tabController = [docView tabController];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocument *doc = [(ViDocumentView *)viewController document];
+		if ([[doc views] count] == 0)
+			[doc close];
+	}
+
+	ViDocumentTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 0) {
 		[self closeTabController:tabController];
 
@@ -582,7 +601,7 @@ static NSWindowController	*currentWindowController = nil;
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	ViDocumentTabController *tabController = [tabViewItem identifier];
-	[self selectDocumentView:tabController.selectedDocumentView];
+	[self selectDocumentView:tabController.selectedView];
 }
 
 - (void)documentController:(NSDocumentController *)docController didCloseAll:(BOOL)didCloseAll tabController:(void *)tabController
@@ -653,24 +672,30 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)firstResponderChanged:(NSNotification *)notification
 {
-	ViDocumentTabController *tabController = [self selectedTabController];
-	for (ViDocumentView *docView in [tabController views])
-		if ([docView textView] == [notification object]) {
-			if (parser.partial) {
-				[[self environment] message:@"Vi command interrupted."];
-				[parser reset];
-			}
-			[self didSelectDocumentView:docView];
-			return;
+	id<ViViewController> viewController = [self viewControllerForView:[notification object]];
+	if (viewController) {
+		if (parser.partial) {
+			[[self environment] message:@"Vi command interrupted."];
+			[parser reset];
 		}
-
-	DEBUG(@"Can't find document view for text view %@ in this window.", [notification object]);
+		[self didSelectDocumentView:viewController];
+	}
 }
 
 - (void)didSelectDocument:(ViDocument *)document
 {
-	if ([[self currentView] document] == document)
+	if (document == nil)
 		return;
+
+	// XXX: currentView is the *previously* current view
+
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *docView = viewController;
+		if ([docView document] == document)
+			return;
+		[[docView textView] pushCurrentLocationOnJumpList];
+	}
 
 	[[self document] removeWindowController:self];
 	[document addWindowController:self];
@@ -690,25 +715,27 @@ static NSWindowController	*currentWindowController = nil;
 	[self checkDocumentChanged:document];
 }
 
-- (void)didSelectDocumentView:(ViDocumentView *)docView
+- (void)didSelectDocumentView:(id<ViViewController>)viewController
 {
-	if (docView == [self currentView])
+	if (viewController == [self currentView])
 		return;
 
-	[self didSelectDocument:[docView document]];
-	[self updateSelectedSymbolForLocation:[[docView textView] caret]];
-	[[docView tabController] setSelectedDocumentView:docView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		[self didSelectDocument:[(ViDocumentView *)viewController document]];
+		[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
+	}
+	[[viewController tabController] setSelectedView:viewController];
 
 	lastDocumentView = currentView;
-	currentView = docView;
+	[self setCurrentView:viewController];
 }
 
 /*
  * Selects the tab holding the given document view and focuses the view.
  */
-- (ViDocumentView *)selectDocumentView:(ViDocumentView *)docView
+- (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController
 {
-	ViDocumentTabController *tabController = [docView tabController];
+	ViDocumentTabController *tabController = [viewController tabController];
 
 	NSInteger ndx = [tabView indexOfTabViewItemWithIdentifier:tabController];
 	if (ndx == NSNotFound)
@@ -718,9 +745,9 @@ static NSWindowController	*currentWindowController = nil;
 	[tabView selectTabViewItem:item];
 
 	// Focus the text view
-	[[self window] makeFirstResponder:[docView textView]];
+	[[self window] makeFirstResponder:[viewController innerView]];
 
-	return docView;
+	return viewController;
 }
 
 /*
@@ -734,16 +761,24 @@ static NSWindowController	*currentWindowController = nil;
 	if (!isLoaded || document == nil)
 		return nil;
 
-	if ([[self currentView] document] == document)
-		return [self selectDocumentView:[self currentView]];
-
 	ViDocumentView *docView = nil;
+	id<ViViewController> viewController = [self currentView];
+
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		docView = viewController;
+		if ([docView document] == document)
+			return [self selectDocumentView:viewController];
+	}
+
 	ViDocumentTabController *tabController = [self selectedTabController];
 
 	// check if current tab has a view of the document
-	for (docView in [tabController views])
-		if ([[docView document] isEqual:document])
-			return [self selectDocumentView:docView];
+	for (viewController in [tabController views])
+		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+			docView = viewController;
+			if ([[docView document] isEqual:document])
+				return [self selectDocumentView:viewController];
+		}
 
 	// select any existing view of the document
 	if ([[document views] count] > 0)
@@ -768,7 +803,6 @@ static NSWindowController	*currentWindowController = nil;
 		{
 			if (++i >= num)
 				i = 0;
-//			[[[self currentView] textView] pushCurrentLocationOnJumpList];
 			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
 			break;
 		}
@@ -789,7 +823,6 @@ static NSWindowController	*currentWindowController = nil;
 		{
 			if (--i < 0)
 				i = num - 1;
-//			[[[self currentView] textView] pushCurrentLocationOnJumpList];
 			[tabView selectTabViewItem:[tabs objectAtIndex:i]];
 			break;
 		}
@@ -799,7 +832,6 @@ static NSWindowController	*currentWindowController = nil;
 - (void)selectTabAtIndex:(NSInteger)anIndex
 {
 	NSArray *tabs = [tabBar representedTabViewItems];
-//	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 	if (anIndex < [tabs count])
 		[tabView selectTabViewItem:[tabs objectAtIndex:anIndex]];
 }
@@ -807,19 +839,17 @@ static NSWindowController	*currentWindowController = nil;
 - (void)switchToDocument:(ViDocument *)doc
 {
 	ViDocumentTabController *tabController = [self selectedTabController];
-	ViDocumentView *docView = [tabController replaceDocumentView:[self currentView] withDocument:doc];
-	[self selectDocumentView:docView];
+	id<ViViewController> viewController = [tabController replaceView:[self currentView] withDocument:doc];
+	[self selectDocumentView:viewController];
 }
 
 - (void)switchToLastDocument
 {
-	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 	[self switchToDocument:[lastDocumentView document]];
 }
 
 - (void)selectLastDocument
 {
-	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 	[self selectDocumentView:lastDocumentView];
 }
 
@@ -835,10 +865,8 @@ static NSWindowController	*currentWindowController = nil;
 - (void)switchToDocumentAction:(id)sender
 {
 	ViDocument *doc = [sender representedObject];
-	if (doc) {
-//		[[[self currentView] textView] pushCurrentLocationOnJumpList];
+	if (doc)
 		[self switchToDocument:doc];
-	}
 }
 
 - (ViDocument *)documentForURL:(NSURL *)url
@@ -877,38 +905,42 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)splitViewHorizontally:(id)sender
 {
-	ViDocumentView *docView = [self currentView];
-	if (docView == nil) {
-		INFO(@"%s", "no current view?");
+	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
 		return;
-	}
 
-	ViDocumentTabController *tabController = [docView tabController];
-	[tabController splitView:docView vertically:NO];
-	[self selectDocumentView:docView];
+	// Only document views support splitting (?)
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentTabController *tabController = [viewController tabController];
+		[tabController splitView:viewController vertically:NO];
+		[self selectDocumentView:viewController];
+	}
 }
 
 - (IBAction)splitViewVertically:(id)sender
 {
-	ViDocumentView *docView = [self currentView];
-	if (docView == nil) {
-		INFO(@"%s", "no current view?");
+	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
 		return;
-	}
 
-	ViDocumentTabController *tabController = [docView tabController];
-	[tabController splitView:docView vertically:YES];
-	[self selectDocumentView:docView];
+	// Only document views support splitting (?)
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentTabController *tabController = [viewController tabController];
+		[tabController splitView:viewController vertically:YES];
+		[self selectDocumentView:viewController];
+	}
 }
 
-- (ViDocumentView *)documentViewForView:(NSView *)aView
+- (id<ViViewController>)viewControllerForView:(NSView *)aView
 {
-	for (ViDocument *doc in documents)
-		for (ViDocumentView *docView in [doc views])
-			if ([docView view] == aView || [docView textView] == aView)
-				return docView;
+	NSArray *tabs = [tabBar representedTabViewItems];
+	for (NSTabViewItem *item in tabs) {
+		id<ViViewController> viewController = [[item identifier] viewControllerForView:aView];
+		if (viewController)
+			return viewController;
+	}
 
-	INFO(@"***** View %@ not in a document view", aView);
+	DEBUG(@"***** View %@ not in a view controller", aView);
 	return nil;
 }
 
@@ -1049,6 +1081,10 @@ static NSWindowController	*currentWindowController = nil;
 {
 	ViDocumentView *docView = [self selectDocument:document];
 
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
+
 	NSRange range = [aSymbol range];
 	ViTextView *textView = [docView textView];
 	[textView setCaret:range.location];
@@ -1066,8 +1102,6 @@ static NSWindowController	*currentWindowController = nil;
 		[symbolFilterCache setObject:[item symbol] forKey:filter];
 		[symbolFilterField setStringValue:@""];
 	}
-
-//	[[[self currentView] textView] pushCurrentLocationOnJumpList];
 
 	if ([item isKindOfClass:[ViDocument class]])
 		[self selectDocument:item];
@@ -1310,21 +1344,27 @@ static NSWindowController	*currentWindowController = nil;
 
 - (IBAction)navigateJumplist:(id)sender
 {
-	NSURL *url;
-	NSUInteger line, column;
-	ViTextView *tv = [[self currentView] textView];
+	NSURL *url, **urlPtr = nil;
+	NSUInteger line, *linePtr = NULL, column, *columnPtr = NULL;
 
-	if (tv == nil)
-		return;
-
-	if ([sender selectedSegment] == 0) {
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViTextView *tv = [(ViDocumentView *)viewController textView];
+		if (tv == nil)
+			return;
 		url = [[self document] fileURL];
 		line = [[tv textStorage] lineNumberAtLocation:[tv caret]];
 		column = [[tv textStorage] columnAtLocation:[tv caret]];
-		[jumpList backwardToURL:&url line:&line column:&column];
-	} else {
-		[jumpList forwardToURL:NULL line:NULL column:NULL];
+		urlPtr = &url;
+		linePtr = &line;
+		columnPtr = &column;
 	}
+
+
+	if ([sender selectedSegment] == 0)
+		[jumpList backwardToURL:urlPtr line:linePtr column:columnPtr];
+	else
+		[jumpList forwardToURL:NULL line:NULL column:NULL];
 }
 
 - (void)updateJumplistNavigator

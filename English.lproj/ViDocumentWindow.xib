@@ -11,12 +11,12 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100347"/>
-			<integer value="100250"/>
-			<integer value="100325"/>
 			<integer value="100592"/>
+			<integer value="100325"/>
+			<integer value="100347"/>
 			<integer value="100557"/>
 			<integer value="100398"/>
+			<integer value="100250"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -41,7 +41,7 @@
 				<string key="NSWindowRect">{{370, 251}, {800, 480}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">Window</string>
-				<string key="NSWindowClass">NSWindow</string>
+				<string key="NSWindowClass">ViWindow</string>
 				<object class="NSToolbar" key="NSViewClass" id="659594053">
 					<object class="NSMutableString" key="NSToolbarIdentifier">
 						<characters key="NS.bytes">4D9B28D8-A177-4086-91E8-A53904734D79</characters>
@@ -2323,6 +2323,14 @@
 					</object>
 					<int key="connectionID">100655</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">rescan:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="43141666"/>
+					</object>
+					<int key="connectionID">100656</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -3395,7 +3403,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100655</int>
+			<int key="maxID">100656</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3493,6 +3501,13 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViDocumentTabController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">PSMTabBarControl</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3570,6 +3585,7 @@
 						<string key="openWithFinder:">id</string>
 						<string key="removeFiles:">id</string>
 						<string key="renameFile:">id</string>
+						<string key="rescan:">id</string>
 						<string key="revealInFinder:">id</string>
 						<string key="searchFiles:">id</string>
 						<string key="toggleExplorer:">id</string>
@@ -3641,6 +3657,10 @@
 						</object>
 						<object class="IBActionInfo" key="renameFile:">
 							<string key="name">renameFile:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="rescan:">
+							<string key="name">rescan:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="revealInFinder:">
@@ -3775,6 +3795,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ViToolbarPopUpButtonCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ViWindow</string>
+					<string key="superclassName">NSWindow</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViWindow.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

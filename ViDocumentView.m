@@ -5,7 +5,7 @@
 @implementation ViDocumentView
 
 @synthesize view;
-@synthesize textView;
+@synthesize innerView;
 @synthesize document;
 @synthesize tabController;
 
@@ -17,14 +17,19 @@
 	return self;
 }
 
-- (void)close
-{
-	[[self tabController] closeDocumentView:self];
-}
-
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViDocumentView %p: %@>", self, [document fileURL]];
+}
+
+- (ViTextView *)textView
+{
+	return (ViTextView *)innerView;
+}
+
+- (NSString *)title
+{
+	return [document title];
 }
 
 @end

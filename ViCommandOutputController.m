@@ -3,23 +3,33 @@
 
 @implementation ViCommandOutputController
 
-@synthesize webView;
+@synthesize tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)aString
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content delegate:(id<ViTextViewDelegate>)delegate
 {
-	self = [super initWithWindowNibName:@"CommandOutputWindow"];
+	self = [super init];
 	if (self)
 	{
-		content = aString;
-		DEBUG(@"content = [%@]", content);
+		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
+		[webView setDelegate:delegate];
+		[[webView mainFrame] loadHTMLString:content baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	}
 	return self;
 }
 
-- (void)windowDidLoad
+- (NSView *)view
 {
-	DEBUG(@"content = [%@]", content);
-	[[webView mainFrame] loadHTMLString:content baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
+	return webView;
+}
+
+- (NSView *)innerView
+{
+	return webView;
+}
+
+- (NSString *)title
+{
+	return @"command output";
 }
 
 @end

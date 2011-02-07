@@ -146,14 +146,13 @@
 	[windowController selectTabAtIndex:anIndex];
 }
 
-
-- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViTextView *)aTextView
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView
 {
-	ViDocumentView *docView = [windowController documentViewForView:aTextView];
-	ViDocumentView *otherView = [[docView tabController] viewAtPosition:position relativeTo:[docView view]];
-	if (otherView == nil)
+	id<ViViewController> viewController = [windowController viewControllerForView:aView];
+	id<ViViewController> otherViewController = [[viewController tabController] viewAtPosition:position relativeTo:[viewController view]];
+	if (otherViewController == nil)
 		return NO;
-	[windowController selectDocumentView:otherView];
+	[windowController selectDocumentView:otherViewController];
 	return YES;
 }
 
@@ -467,8 +466,10 @@
 
 - (void)ex_write:(ExCommand *)command
 {
-	ViDocument *doc = [[windowController documentViewForView:exTextView] document];
-	[doc saveDocument:self];
+	if (exTextView) {
+		ViDocument *doc = [(ViDocumentView *)[windowController viewControllerForView:exTextView] document];
+		[doc saveDocument:self];
+	}
 }
 
 - (void)ex_quit:(ExCommand *)command
@@ -584,11 +585,18 @@
 		 */
 		[doc addWindowController:windowController];
 		[windowController addDocument:doc];
-		if (isVertical)
-			[windowController splitViewVertically:nil];
-		else
-			[windowController splitViewHorizontally:nil];
-		[windowController switchToDocument:doc];
+
+		id<ViViewController> viewController = [windowController currentView];
+		ViDocumentTabController *tabController = [viewController tabController];
+		ViDocumentView *newDocView = [tabController splitView:viewController withView:[doc makeView] vertically:isVertical];
+		[windowController selectDocumentView:newDocView];
+
+		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+			ViDocumentView *docView = viewController;
+			[[newDocView textView] setCaret:[[docView textView] caret]];
+			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
+		}
+
 		return doc;
 	}
 
@@ -964,6 +972,11 @@ filter_write(CFSocketRef s,
 
 - (void)ex_bang:(ExCommand *)command
 {
+	if (![exTextView isKindOfClass:[ViTextView class]]) {
+		[self message:@"not implemented"];
+		return;
+	}
+
 	NSRange range;
 	if (![self resolveExAddresses:command intoRange:&range])
 		return;
@@ -1083,7 +1096,7 @@ filter_write(CFSocketRef s,
 				[self message:@"set: [no]%@ option doesn't take a value", defaults_name];
 				return;
 			}
-			
+
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
 		} else {
 			if (equals == NSNotFound) {

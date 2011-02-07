@@ -99,7 +99,7 @@
 	if (position <= 0)
 		return NO;
 
-	if (position >= [jumps count])
+	if (position >= [jumps count] && urlPtr && linePtr && columnPtr)
 	{
 		NSUInteger savedPosition = position;
 		BOOL removedDuplicate = [self pushURL:*urlPtr line:*linePtr column:*columnPtr];

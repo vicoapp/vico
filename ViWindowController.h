@@ -67,8 +67,8 @@
 - (void)focusEditor;
 
 - (ViCommand *)parser;
-- (ViDocumentView *)documentViewForView:(NSView *)aView;
-- (ViDocumentView *)selectDocumentView:(ViDocumentView *)docView;
+- (id<ViViewController>)viewControllerForView:(NSView *)aView;
+- (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
 
 - (void)closeDocument:(ViDocument *)aDocument;
@@ -78,7 +78,11 @@
 
 - (void)addDocument:(ViDocument *)document;
 - (void)addNewTab:(ViDocument *)document;
+
+- (id<ViViewController>)currentView;
+- (void)setCurrentView:(id<ViViewController>)viewController;
 - (ViDocument *)currentDocument;
+
 - (ViDocument *)documentForURL:(NSURL *)url;
 
 - (ViTagStack *)sharedTagStack;

@@ -68,6 +68,7 @@
 - (IBAction)openInVerticalSplit:(id)sender;
 - (IBAction)renameFile:(id)sender;
 - (IBAction)removeFiles:(id)sender;
+- (IBAction)rescan:(id)sender;
 - (IBAction)revealInFinder:(id)sender;
 - (IBAction)openWithFinder:(id)sender;
 - (IBAction)newFolder:(id)sender;

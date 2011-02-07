@@ -13,6 +13,8 @@
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
+- (void)expandNextItem:(id)dummy;
+- (void)expandItems:(NSArray *)items;
 @end
 
 @implementation ProjectFile
@@ -402,6 +404,17 @@
 	if (!failed) {
 		/* Rescan containing folder(s) ? */
 	}
+}
+
+- (IBAction)rescan:(id)sender
+{
+	NSURL *url = [rootButton URL];
+	if (![url isFileURL]) {
+		/* Forget SFTP directory cache. */
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:nil];
+		[conn flushDirectoryCache];
+	}
+	[self browseURL:url];
 }
 
 - (IBAction)revealInFinder:(id)sender

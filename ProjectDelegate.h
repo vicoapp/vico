@@ -36,11 +36,16 @@
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
 
+	// incremental file filtering
+	NSMutableArray *filteredItems;
+	NSMutableArray *itemsToFilter;
+	ViRegexp *pathRx;
+	ViRegexp *fileRx;
+
 	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
 	NSArray *rootItems;
-	NSMutableArray *filteredItems;
 	ViRegexp *skipRegex;
 
 	BOOL isFiltered;

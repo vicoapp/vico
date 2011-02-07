@@ -67,13 +67,18 @@
 
 - (NSArray *)children
 {
-	if (children == nil) {
+	if (children == nil && [self isDirectory]) {
 		NSError *error = nil;
 		children = [ProjectDelegate childrenAtURL:url error:&error];
 		if (error)
 			INFO(@"error: %@", [error localizedDescription]);
 	}
 	return children;
+}
+
+- (BOOL)hasCachedChildren
+{
+	return children != nil;
 }
 
 - (NSString *)name
@@ -91,6 +96,11 @@
         if ([path length] > [root length])
                 return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
         return path;
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ProjectFile: %@>", url];
 }
 
 @end
@@ -640,14 +650,40 @@
 	return run_ratio * char_ratio;
 }
 
+static NSInteger
+sort_by_score(id a, id b, void *context)
+{
+	double a_score = [(ProjectFile *)a score];
+	double b_score = [(ProjectFile *)b score];
+
+	if (a_score < b_score)
+		return NSOrderedDescending;
+	else if (a_score > b_score)
+		return NSOrderedAscending;
+	return NSOrderedSame;
+}
+
+- (void)expandNextItem:(id)dummy
+{
+	if (!isFiltered || [itemsToFilter count] == 0)
+		return;
+
+	ProjectFile *item = [itemsToFilter objectAtIndex:0];
+	[itemsToFilter removeObjectAtIndex:0];
+	DEBUG(@"expanding children of next item %@", item);
+	[self expandItems:[item children]];
+
+	if ([itemsToFilter count] > 0)
+		[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.05];
+	[filteredItems sortUsingFunction:sort_by_score context:nil];
+	[explorer reloadData];
+}
+
 - (void)expandItems:(NSArray *)items
-	  intoArray:(NSMutableArray *)expandedArray
-	 pathRx:(ViRegexp *)pathRx
-	 fileRx:(ViRegexp *)fileRx
 {
 	NSString *reldir = nil;
 	ViRegexpMatch *pathMatch;
-	double pathScore;
+	double pathScore, fileScore;
 
 	/*
 	 * FIXME: transform into breadth-first search, and limit
@@ -655,28 +691,29 @@
 	 * file and sftp urls).
 	 */
 
-	ProjectFile *item;
-	for (item in items) {
-		if ([self outlineView:explorer isItemExpandable:item])
-			[self expandItems:[item children] intoArray:expandedArray pathRx:pathRx fileRx:fileRx];
-		else {
+	for (ProjectFile *item in items) {
+		DEBUG(@"got item %@", [item url]);
+		if ([self outlineView:explorer isItemExpandable:item]) {
+			if ([item hasCachedChildren])
+				[self expandItems:[item children]];
+			else
+				/* schedule in runloop */
+				[itemsToFilter addObject:item];
+		} else {
 			if (reldir == nil) {
+				/* Only calculate the path score once for a directory. */
 				reldir = [item pathRelativeToURL:[rootButton URL]];
-				if ((pathMatch = [pathRx matchInString:reldir]) != nil) {
+				if ((pathMatch = [pathRx matchInString:reldir]) != nil)
 					pathScore = [self scoreForMatch:pathMatch inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
-					// INFO(@"path %@ = %lf, total Length = %u", reldir, pathScore, (unsigned)[pathMatch rangeOfMatchedString].length);
-				}
 			}
 
 			if (pathMatch != nil) {
 				ViRegexpMatch *fileMatch;
 				if ((fileMatch = [fileRx matchInString:[item name]]) != nil) {
-					double fileScore = [self scoreForMatch:fileMatch inSegments:1];
-					// INFO(@"%@ = %lf * %lf = %lf", [item objectForKey:@"relpath"], pathScore, fileScore, pathScore * fileScore);
-
+					fileScore = [self scoreForMatch:fileMatch inSegments:1];
 					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
 					[item setScore:pathScore * fileScore];
-					[expandedArray addObject:item];
+					[filteredItems addObject:item];
 				}
 			}
 		}
@@ -692,19 +729,6 @@
 			[pattern appendString:@"[^/]*?"];
 		[pattern appendFormat:@"(%s%C)", c == '.' ? "\\" : "", c];
 	}
-}
-
-static NSInteger
-sort_by_score(id a, id b, void *context)
-{
-	double a_score = [(ProjectFile *)a score];
-	double b_score = [(ProjectFile *)b score];
-
-	if (a_score < b_score)
-		return NSOrderedDescending;
-	else if (a_score > b_score)
-		return NSOrderedAscending;
-	return NSOrderedSame;
 }
 
 - (IBAction)filterFiles:(id)sender
@@ -729,21 +753,24 @@ sort_by_score(id a, id b, void *context)
 			[self appendFilter:[components objectAtIndex:i] toPattern:pathPattern];
 		}
 		[pathPattern appendString:@".*?$"];
-		ViRegexp *pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
+		pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
 
 		NSMutableString *filePattern = [NSMutableString string];
 		[filePattern appendString:@"^.*?"];
 		[self appendFilter:[components lastObject] toPattern:filePattern];
 		[filePattern appendString:@".*$"];
-		ViRegexp *fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
+		fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
 
-                filteredItems = [[NSMutableArray alloc] init];
-                [self expandItems:rootItems intoArray:filteredItems pathRx:pathRx fileRx:fileRx];
-
-		[filteredItems sortUsingFunction:sort_by_score context:nil];
+		filteredItems = [NSMutableArray array];
+		itemsToFilter = [NSMutableArray array];
 		isFiltered = YES;
+
+		[self expandItems:rootItems];
+		[filteredItems sortUsingFunction:sort_by_score context:nil];
 		[explorer reloadData];
 		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+		if ([itemsToFilter count] > 0)
+			[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.05];
         }
 }
 

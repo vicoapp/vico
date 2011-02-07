@@ -146,7 +146,6 @@
 		    [viewController innerView] == aView)
 			return viewController;
 
-	INFO(@"***** View %@ not in a view controller", aView);
 	return nil;
 }
 

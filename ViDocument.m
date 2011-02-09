@@ -309,6 +309,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[textStorage mutableString] setString:aString ?: @""];
 	[self resetTypingAttributes];
 
+	[self configureSyntax];
+
 	/* Force incremental syntax parsing. */
 	[self highlightEverything];
 }

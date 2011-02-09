@@ -1,9 +1,5 @@
 #import "ViBundle.h"
 
-// FIXME: move to a better place
-#define ViSmartPairAttributeName @"ViSmartPair"
-#define ViContinuationAttributeName @"ViContinuation"
-
 @interface ViTheme : NSObject
 {
 	NSDictionary *theme;

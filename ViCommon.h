@@ -1,4 +1,7 @@
 
+#define ViSmartPairAttributeName @"ViSmartPair"
+#define ViContinuationAttributeName @"ViContinuation"
+
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
 

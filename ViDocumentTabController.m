@@ -20,6 +20,8 @@
 		[splitView adjustSubviews];
 
 		[self addView:initialViewController];
+
+		selectedView = initialViewController;
 	}
 	return self;
 }
@@ -32,10 +34,8 @@
 
 - (void)removeView:(id<ViViewController>)viewController
 {
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocumentView *docView = viewController;
-		[[docView document] removeView:viewController];
-	}
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController document] removeView:viewController];
 	[views removeObject:viewController];
 }
 
@@ -134,8 +134,19 @@
 
 	if ([[split subviews] count] == 1) {
 		id superSplit = [split superview];
-		if ([superSplit isMemberOfClass:[NSSplitView class]])
-			[superSplit replaceSubview:split with:[[split subviews] objectAtIndex:0]];
+		if ([superSplit isMemberOfClass:[NSSplitView class]]) {
+			id newSplit = [[split subviews] objectAtIndex:0];
+			[superSplit replaceSubview:split with:newSplit];
+			split = newSplit;
+		}
+	}
+
+	if (selectedView == viewController) {
+		if ([split isMemberOfClass:[NSSplitView class]]) {
+			if ([[split subviews] count] > 0)
+				[self setSelectedView:[self viewControllerForView:[[split subviews] objectAtIndex:0]]];
+		} else
+			[self setSelectedView:[self viewControllerForView:split]];
 	}
 }
 

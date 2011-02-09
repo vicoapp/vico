@@ -1712,5 +1712,10 @@
 	return [[[self delegate] environment] ex_new:nil];
 }
 
+- (BOOL)window_totab:(ViCommand *)command
+{
+	return [[[self delegate] windowController] moveCurrentViewToNewTab];
+}
+
 @end
 

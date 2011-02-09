@@ -42,6 +42,7 @@ enum ViViewOrderingMode {
 - (NSSet *)documents;
 //- (NSSet *)documentsOfType:(Class)class;
 - (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView;
+- (id<ViViewController>)viewControllerForView:(NSView *)aView;
 
 @end
 

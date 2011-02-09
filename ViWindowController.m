@@ -284,15 +284,21 @@ static NSWindowController	*currentWindowController = nil;
 
 /* Create a new document tab.
  */
-- (void)createTabForDocument:(ViDocument *)document
+- (void)createTabWithViewController:(id<ViViewController>)viewController
 {
-	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:[document makeView]];
+	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:viewController];
 
 	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
 	[tabView selectTabViewItem:tabItem];
+	[self focusEditor];
+}
+
+- (void)createTabForDocument:(ViDocument *)document
+{
+	[self createTabWithViewController:[document makeView]];
 }
 
 /* Called by a new ViDocument in its makeWindowControllers method.
@@ -577,7 +583,7 @@ static NSWindowController	*currentWindowController = nil;
 		}
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
-		[self selectDocumentView:[[tabController views] objectAtIndex:0]];
+		[self selectDocumentView:tabController.selectedView];
 	}
 }
 
@@ -942,6 +948,23 @@ static NSWindowController	*currentWindowController = nil;
 
 	DEBUG(@"***** View %@ not in a view controller", aView);
 	return nil;
+}
+
+- (BOOL)moveCurrentViewToNewTab
+{
+	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
+		return NO;
+
+	ViDocumentTabController *tabController = [viewController tabController];
+	if ([[tabController views] count] == 1) {
+		[[self environment] message:@"Already only one window"];
+		return NO;
+	}
+
+	[tabController closeView:viewController];
+	[self createTabWithViewController:viewController];
+	return YES;
 }
 
 #pragma mark -

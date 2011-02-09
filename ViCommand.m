@@ -48,6 +48,7 @@ static struct vikey window_keys[] = {
 	{@"window_new:",	'n', 0},
 	{@"window_split:",	's', 0},
 	{@"window_vsplit:",	'v', 0},
+	{@"window_totab:",	'T', 0},
 	{nil, -1, 0}
 };
 

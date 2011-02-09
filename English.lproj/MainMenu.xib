@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="29"/>
+			<integer value="24"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -756,7 +756,7 @@
 									<reference key="NSMenu" ref="835318025"/>
 									<string key="NSTitle">Next tab</string>
 									<string key="NSKeyEquiv"></string>
-									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
@@ -765,7 +765,7 @@
 									<reference key="NSMenu" ref="835318025"/>
 									<string key="NSTitle">Previous tab</string>
 									<string key="NSKeyEquiv"></string>
-									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
@@ -2071,7 +2071,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{648, 793}, {156, 23}}</string>
+					<string>{{679, 793}, {156, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{327, 713}, {122, 23}}</string>
@@ -2178,11 +2178,11 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{577, 693}, {196, 123}}</string>
+					<string>{{608, 693}, {210, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{256, 613}, {199, 123}}</string>
-					<string>{{357, 816}, {352, 20}}</string>
+					<string>{{388, 816}, {352, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{74, 862}</string>
@@ -2289,8 +2289,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>commandOutput</string>
-							<string>commandSplit</string>
 							<string>exDelegate</string>
 							<string>filterContextInfo</string>
 							<string>filterIndicator</string>
@@ -2298,14 +2296,13 @@
 							<string>filterSheet</string>
 							<string>filterTarget</string>
 							<string>messageField</string>
+							<string>projectDelegate</string>
 							<string>statusbar</string>
 							<string>window</string>
 							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSTextView</string>
-							<string>NSSplitView</string>
 							<string>id</string>
 							<string>id</string>
 							<string>NSProgressIndicator</string>
@@ -2313,6 +2310,7 @@
 							<string>NSWindow</string>
 							<string>id</string>
 							<string>NSTextField</string>
+							<string>ProjectDelegate</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>ViWindowController</string>
@@ -2322,8 +2320,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>commandOutput</string>
-							<string>commandSplit</string>
 							<string>exDelegate</string>
 							<string>filterContextInfo</string>
 							<string>filterIndicator</string>
@@ -2331,20 +2327,13 @@
 							<string>filterSheet</string>
 							<string>filterTarget</string>
 							<string>messageField</string>
+							<string>projectDelegate</string>
 							<string>statusbar</string>
 							<string>window</string>
 							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">commandOutput</string>
-								<string key="candidateClassName">NSTextView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">commandSplit</string>
-								<string key="candidateClassName">NSSplitView</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">exDelegate</string>
 								<string key="candidateClassName">id</string>
@@ -2372,6 +2361,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">messageField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">projectDelegate</string>
+								<string key="candidateClassName">ProjectDelegate</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">statusbar</string>
@@ -2517,6 +2510,13 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViDocumentTabController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">PSMTabBarControl</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -2606,13 +2606,39 @@
 							<string>actionMenu:</string>
 							<string>addLocation:</string>
 							<string>addSFTPLocation:</string>
+							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
 							<string>filterFiles:</string>
+							<string>gotoBookmark:</string>
+							<string>newDocument:</string>
+							<string>newFolder:</string>
+							<string>openInCurrentView:</string>
+							<string>openInSplit:</string>
+							<string>openInTab:</string>
+							<string>openInVerticalSplit:</string>
+							<string>openWithFinder:</string>
+							<string>removeFiles:</string>
+							<string>renameFile:</string>
+							<string>rescan:</string>
+							<string>revealInFinder:</string>
 							<string>searchFiles:</string>
 							<string>toggleExplorer:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2631,8 +2657,21 @@
 							<string>actionMenu:</string>
 							<string>addLocation:</string>
 							<string>addSFTPLocation:</string>
+							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
 							<string>filterFiles:</string>
+							<string>gotoBookmark:</string>
+							<string>newDocument:</string>
+							<string>newFolder:</string>
+							<string>openInCurrentView:</string>
+							<string>openInSplit:</string>
+							<string>openInTab:</string>
+							<string>openInVerticalSplit:</string>
+							<string>openWithFinder:</string>
+							<string>removeFiles:</string>
+							<string>renameFile:</string>
+							<string>rescan:</string>
+							<string>revealInFinder:</string>
 							<string>searchFiles:</string>
 							<string>toggleExplorer:</string>
 						</object>
@@ -2655,11 +2694,63 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">bookmarkFolder:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">cancelSftpSheet:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">filterFiles:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">gotoBookmark:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">newDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">newFolder:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openInCurrentView:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openInSplit:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openInTab:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openInVerticalSplit:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openWithFinder:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">removeFiles:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">renameFile:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">rescan:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">revealInFinder:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2676,8 +2767,12 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>actionButton</string>
+							<string>actionButtonCell</string>
 							<string>actionMenu</string>
+							<string>completionTarget</string>
 							<string>delegate</string>
+							<string>environment</string>
 							<string>explorer</string>
 							<string>explorerView</string>
 							<string>filterField</string>
@@ -2687,11 +2782,16 @@
 							<string>sftpConnectView</string>
 							<string>splitView</string>
 							<string>window</string>
+							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSPopUpButton</string>
+							<string>ViToolbarPopUpButtonCell</string>
 							<string>NSMenu</string>
 							<string>id</string>
+							<string>id</string>
+							<string>ExEnvironment</string>
 							<string>NSOutlineView</string>
 							<string>ViBgView</string>
 							<string>NSSearchField</string>
@@ -2701,14 +2801,19 @@
 							<string>NSWindow</string>
 							<string>NSSplitView</string>
 							<string>NSWindow</string>
+							<string>ViWindowController</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>actionButton</string>
+							<string>actionButtonCell</string>
 							<string>actionMenu</string>
+							<string>completionTarget</string>
 							<string>delegate</string>
+							<string>environment</string>
 							<string>explorer</string>
 							<string>explorerView</string>
 							<string>filterField</string>
@@ -2718,16 +2823,33 @@
 							<string>sftpConnectView</string>
 							<string>splitView</string>
 							<string>window</string>
+							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">actionButton</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">actionButtonCell</string>
+								<string key="candidateClassName">ViToolbarPopUpButtonCell</string>
+							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">actionMenu</string>
 								<string key="candidateClassName">NSMenu</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">completionTarget</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">delegate</string>
 								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">environment</string>
+								<string key="candidateClassName">ExEnvironment</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">explorer</string>
@@ -2764,6 +2886,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">window</string>
 								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">windowController</string>
+								<string key="candidateClassName">ViWindowController</string>
 							</object>
 						</object>
 					</object>
@@ -2838,6 +2964,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ViDocumentController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ViToolbarPopUpButtonCell</string>
+					<string key="superclassName">NSPopUpButtonCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">ViToolbarPopUpButtonCell.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -2942,7 +3076,9 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>documentView</string>
+							<string>bookmarksButtonCell</string>
+							<string>bundleButton</string>
+							<string>bundleButtonCell</string>
 							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
@@ -2961,7 +3097,9 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSView</string>
+							<string>ViToolbarPopUpButtonCell</string>
+							<string>NSPopUpButton</string>
+							<string>ViToolbarPopUpButtonCell</string>
 							<string>ExEnvironment</string>
 							<string>ViBgView</string>
 							<string>NSSegmentedControl</string>
@@ -2983,7 +3121,9 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>documentView</string>
+							<string>bookmarksButtonCell</string>
+							<string>bundleButton</string>
+							<string>bundleButtonCell</string>
 							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
@@ -3003,8 +3143,16 @@
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">documentView</string>
-								<string key="candidateClassName">NSView</string>
+								<string key="name">bookmarksButtonCell</string>
+								<string key="candidateClassName">ViToolbarPopUpButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">bundleButton</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">bundleButtonCell</string>
+								<string key="candidateClassName">ViToolbarPopUpButtonCell</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">environment</string>
@@ -3077,6 +3225,14 @@
 			<object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSActionCell</string>
+					<string key="superclassName">NSCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSActionCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSApplication</string>
 					<string key="superclassName">NSResponder</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="656511062">
@@ -3133,6 +3289,22 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSButton.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSButtonCell</string>
+					<string key="superclassName">NSActionCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSButtonCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSCell</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSCell.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3334,6 +3506,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="615961891">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSMenuItem.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSMenuItemCell</string>
+					<string key="superclassName">NSButtonCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSMenuItemCell.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3677,6 +3857,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSPopUpButtonCell</string>
+					<string key="superclassName">NSMenuItemCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSPopUpButtonCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSProgressIndicator</string>
 					<string key="superclassName">NSView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -3758,14 +3946,6 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSTextField.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTextView</string>
-					<string key="superclassName">NSText</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSTextView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

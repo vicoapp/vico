@@ -212,4 +212,11 @@
 - (void)test220_ChangeWordAtEnd			{ TEST(@"apa", 0, @"cwb\x1b", @"b", 0); }
 - (void)test220_ChangeWordAndRepeatNearEnd	{ TEST(@"apa\napa", 0, @"cwb\x1bj.", @"b\nb", 2); }
 
+- (void)test230_UpperCaseWord			{ TEST(@"abc def ghi", 0, @"gUw", @"ABC def ghi", 0); }
+- (void)test231_UpperCaseTwoWords		{ TEST(@"abc def ghi", 0, @"2gUw", @"ABC DEF ghi", 0); }
+- (void)test232_LowerCaseWord			{ TEST(@"ABC DEF GHI", 0, @"guw", @"abc DEF GHI", 0); }
+- (void)test233_LowerCaseTwoWords		{ TEST(@"ABC DEF GHI", 0, @"2guw", @"abc def GHI", 0); }
+- (void)test234_UpperCaseUnicode		{ TEST(@"ÅäöéÉ", 0, @"gUU", @"ÅÄÖÉÉ", 0); }
+
 @end
+

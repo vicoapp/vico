@@ -55,6 +55,8 @@ static struct vikey window_keys[] = {
 static struct vikey g_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"uppercase:",		'U', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"lowercase:",		'u', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{nil, -1, 0}
 };
 
@@ -452,9 +454,10 @@ find_command_in_map(unichar key, struct vikey map[])
 		command = vikey;
 		method = command->method;
 		key = aKey;
-		if (has_flag(vikey, VIF_NEED_MOTION))
+		if (has_flag(vikey, VIF_NEED_MOTION)) {
 			state = ViCommandNeedMotion;
-		else if (has_flag(vikey, VIF_NEED_CHAR)) {
+			map = normal_keys;
+		} else if (has_flag(vikey, VIF_NEED_CHAR)) {
 			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
 			state = ViCommandNeedChar;
 		} else if (vikey->map != NULL)

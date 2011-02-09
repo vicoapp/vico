@@ -1718,5 +1718,21 @@
 	return [[[self delegate] windowController] moveCurrentViewToNewTab];
 }
 
+- (BOOL)uppercase:(ViCommand *)command
+{
+	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
+	[self replaceRange:affectedRange withString:[string uppercaseString]];
+	final_location = end_location = start_location;
+	return YES;
+}
+
+- (BOOL)lowercase:(ViCommand *)command
+{
+	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
+	[self replaceRange:affectedRange withString:[string lowercaseString]];
+	final_location = end_location = start_location;
+	return YES;
+}
+
 @end
 

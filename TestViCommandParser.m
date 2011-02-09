@@ -281,6 +281,20 @@
 	STAssertEquals(parser.motion_count, 0, nil);
 }
 
+- (void)test078_gUUCommandSetsLineMode
+{
+	[parser pushKey:'g'];
+	STAssertFalse(parser.line_mode, nil);
+	[parser pushKey:'U'];
+	STAssertFalse(parser.line_mode, nil);
+	[parser pushKey:'U'];
+	STAssertTrue(parser.complete, nil);
+	STAssertTrue(parser.line_mode, nil);	
+	STAssertEquals(parser.count, 0, nil);
+	STAssertEquals(parser.motion_count, 0, nil);
+	STAssertEqualObjects(parser.method, @"uppercase:", nil);
+}
+
 - (void)test080_tCommandRequiresArgument
 {
 	[parser pushKey:'t'];
@@ -415,6 +429,21 @@
 	[parser pushKey:'c'];
 	STAssertTrue(parser.complete, @"c-w c is a complete, but invalid, motion command");
 	STAssertEqualObjects(parser.method, @"nonmotion:", nil);
+}
+
+- (void)test096_ChainedMapsCommandWithRegularMotionComponent
+{
+	[parser pushKey:'g'];
+	STAssertFalse(parser.complete, @"g is not a complete motion command");
+	[parser pushKey:'U'];
+	STAssertFalse(parser.complete, @"gU need a motion component");
+	[parser pushKey:'2'];
+	STAssertFalse(parser.complete, @"gU2 is not complete");
+	[parser pushKey:'w'];
+	STAssertTrue(parser.complete, @"gU2w is a complete command");
+	STAssertEquals(parser.motion_count, 2, nil);
+	STAssertEqualObjects(parser.method, @"uppercase:", nil);
+	STAssertEqualObjects(parser.motion_method, @"word_forward:", nil);
 }
 
 @end

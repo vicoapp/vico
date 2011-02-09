@@ -924,25 +924,21 @@
 - (BOOL)goto_line:(ViCommand *)command
 {
 	int count = command.count;
-	if(!command.ismotion)
+	if (!command.ismotion)
 		count = command.motion_count;
 
-	if(count > 0)
-	{
+	if (count > 0) {
 		NSInteger location = [[self textStorage] locationForStartOfLine:count];
-		if(location == -1)
-		{
+		if(location == -1) {
 			[[self delegate] message:@"Movement past the end-of-file"];
 			final_location = end_location = start_location;
 			return NO;
 		}
 		final_location = end_location = location;
-	}
-	else
-	{
+	} else {
 		/* goto last line */
 		NSUInteger last_location = [[[self textStorage] string] length];
-		if(last_location > 0)
+		if (last_location > 0)
 			--last_location;
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
 		final_location = end_location;
@@ -956,8 +952,7 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if (start_location < eol)
-	{
+	if (start_location < eol) {
 		start_location += 1;
 		final_location = end_location = start_location;
 	}

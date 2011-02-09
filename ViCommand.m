@@ -52,6 +52,12 @@ static struct vikey window_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey g_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
+	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
+	{nil, -1, 0}
+};
+
 static struct vikey normal_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
@@ -102,6 +108,7 @@ static struct vikey normal_keys[] = {
 	{@"delete:",		'd', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"end_of_word:",	'e', VIF_IS_MOTION},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
+	{@"g_prefix:",		'g', 0, g_keys},
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"insert:",		'i', VIF_SETS_DOT},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
@@ -433,13 +440,6 @@ find_command_in_map(unichar key, struct vikey map[])
 
 	if (map == NULL)
 		map = normal_keys;
-	if (state == ViCommandNeedMotion) {
-		// hack for "doubled commands"
-		if (aKey == command->key)
-			map = normal_keys;
-		else
-			map = operator_keys;
-	}
 
 	struct vikey *vikey = find_command_in_map(aKey, map);
 	if (vikey == NULL) {
@@ -474,7 +474,7 @@ find_command_in_map(unichar key, struct vikey map[])
 			 * Do this by setting the line mode flag.
 			 */
 			motion_command = command;
-		} else {
+		} else if (vikey->map == NULL) {
 			// should print "X may not be used as a motion command"
 			method = @"nonmotion:";
 		}
@@ -485,6 +485,10 @@ find_command_in_map(unichar key, struct vikey map[])
 			map = vikey->map;
 		else
 			[self setComplete];
+	} else {
+		method = @"internal_error:";
+		[self setComplete];
+		return;
 	}
 }
 

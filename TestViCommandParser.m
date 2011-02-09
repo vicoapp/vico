@@ -60,8 +60,7 @@
 	[parser pushKey:'c'];
 	[parser pushKey:'x'];
 	STAssertTrue(parser.complete, nil);
-	STAssertEqualObjects(parser.method, @"change:", nil);
-	STAssertEqualObjects(parser.motion_method, @"nonmotion:", nil);
+	STAssertEqualObjects(parser.method, @"nonmotion:", nil);
 }
 
 - (void)test053_DoubledCommandImpliesCurrentLine
@@ -278,8 +277,9 @@
 	[parser pushKey:'G'];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.line_mode, nil);	
+	STAssertEquals(parser.count, 0, nil);
+	STAssertEquals(parser.motion_count, 0, nil);
 }
-
 
 - (void)test080_tCommandRequiresArgument
 {
@@ -385,6 +385,36 @@
 	[parser pushKey:'l'];
 	STAssertTrue(parser.complete, nil);
 	STAssertEqualObjects(parser.method, @"window_right:", nil);
+}
+
+/* d10gg should be the same as d10G
+ */
+- (void)test094_MotionComponentInChainedMaps
+{
+	[parser pushKey:'d'];
+	[parser pushKey:'1'];
+	[parser pushKey:'0'];
+	[parser pushKey:'g'];
+	STAssertFalse(parser.complete, @"g is not a complete motion command");
+	[parser pushKey:'g'];
+	STAssertTrue(parser.complete, @"gg is a complete motion command");
+	STAssertEquals(parser.motion_count, 10, nil);
+	STAssertEqualObjects(parser.method, @"delete:", nil);
+	STAssertEqualObjects(parser.motion_method, @"goto_line:", nil);
+}
+
+/* detect non-motion components within chained maps
+ */
+- (void)test095_NonMotionComponentInChainedMaps
+{
+	[parser pushKey:'d'];
+	[parser pushKey:'1'];
+	[parser pushKey:'0'];
+	[parser pushKey:0x17];	// C-w
+	STAssertFalse(parser.complete, @"c-w is not a complete motion command");
+	[parser pushKey:'c'];
+	STAssertTrue(parser.complete, @"c-w c is a complete, but invalid, motion command");
+	STAssertEqualObjects(parser.method, @"nonmotion:", nil);
 }
 
 @end

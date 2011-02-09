@@ -923,9 +923,12 @@
 /* syntax: [count]G */
 - (BOOL)goto_line:(ViCommand *)command
 {
+	unichar key = command.key;
 	int count = command.count;
-	if (!command.ismotion)
+	if (!command.ismotion) {
 		count = command.motion_count;
+		key = command.motion_key;
+	}
 
 	if (count > 0) {
 		NSInteger location = [[self textStorage] locationForStartOfLine:count];
@@ -935,13 +938,16 @@
 			return NO;
 		}
 		final_location = end_location = location;
-	} else {
-		/* goto last line */
+	} else if (key == 'G') {
+		/* default to last line */
 		NSUInteger last_location = [[[self textStorage] string] length];
 		if (last_location > 0)
 			--last_location;
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
 		final_location = end_location;
+	} else if (key == 'g') {
+		/* default to first line */
+		final_location = end_location = 0;
 	}
 	[self pushLocationOnJumpList:start_location];
 	return YES;

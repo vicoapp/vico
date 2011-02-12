@@ -221,5 +221,11 @@
 - (void)test233_LowerCaseTwoWords		{ TEST(@"ABC DEF GHI", 0, @"2guw", @"abc def GHI", 0); }
 - (void)test234_UpperCaseUnicode		{ TEST(@"ÅäöéÉ", 0, @"gUU", @"ÅÄÖÉÉ", 0); }
 
+- (void)test240_InsertMultipliedText		{ TEST(@"", 0, @"5ix\x1b", @"xxxxx", 4); }
+- (void)test241_InsertMultipliedText2		{ TEST(@"", 0, @"5iabc\x1b", @"abcabcabcabcabc", 14); }
+- (void)test242_InsertMultipliedText3		{ TEST(@"", 0, @"ix\x1b""4.", @"xxxxx", 3); }
+- (void)test243_RepeatInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b.", @"xbbbbbbbbbb", 10); }
+- (void)test244_RepeatTwiceInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b..", @"xbbbbbbbbbbbbbbb", 15); }
+
 @end
 

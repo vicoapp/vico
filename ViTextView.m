@@ -877,13 +877,19 @@ int logIndent = 0;
 		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
 
-	if (command && command.text) {
-		replayingInput = YES;
-		[self setCaret:end_location];
-		DEBUG(@"replaying input, got %u events", [command.text count]);
-		[self handleKeys:command.text];
-		replayingInput = NO;
-		DEBUG(@"done replaying input, caret = %u, final_location = %u", [self caret], final_location);
+	if (command) {
+		if (command.text) {
+			replayingInput = YES;
+			[self setCaret:end_location];
+			int count = IMAX(1, command.count);
+			int i;
+			for (i = 0; i < count; i++)
+				[self handleKeys:command.text];
+			insert_count = 0;
+			[self normal_mode:command];
+			replayingInput = NO;
+		} else
+			insert_count = command.count;
 	}
 }
 
@@ -1108,31 +1114,20 @@ int logIndent = 0;
 - (BOOL)normal_mode:(ViCommand *)command
 {
 	if (mode == ViInsertMode) {
-		if (!replayingInput)
+		if (!replayingInput) {
 			[command setText:inputKeys];
-		inputKeys = [[NSMutableArray alloc] init];
-#if 0
-		NSString *insertedText = [[[self textStorage] string] substringWithRange:NSMakeRange(insert_start_location, insert_end_location - insert_start_location)];
-		INFO(@"registering replay text: [%@] at %u + %u (length %u), count = %i",
-			insertedText, insert_start_location, insert_end_location, [insertedText length], parser.count);
 
-		/* handle counts for inserted text here */
-		NSString *multipliedText = insertedText;
-		if (parser.count > 1) {
-			multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * (parser.count - 1)
-								    withString:insertedText
-							       startingAtIndex:0];
-			[self insertString:multipliedText atLocation:[self caret]];
-
-			multipliedText = [insertedText stringByPaddingToLength:[insertedText length] * parser.count
-								    withString:insertedText
-							       startingAtIndex:0];
+			int count = IMAX(1, insert_count);
+			if (count > 1) {
+				replayingInput = YES;
+				int i;
+				for (i = 1; i < count; i++)
+					[self handleKeys:inputKeys];
+				replayingInput = NO;
+			}
 		}
 
-		[parser setText:multipliedText];
-		if ([multipliedText length] > 0)
-			[self recordInsertInRange:NSMakeRange(insert_start_location, [multipliedText length])];
-#endif
+		inputKeys = [[NSMutableArray alloc] init];
 		start_location = end_location = [self caret];
 		[self move_left:nil];
 	}
@@ -1405,6 +1400,12 @@ int logIndent = 0;
 
 	if ((flags & ~NSNumericPadKeyMask) != 0) {
 		DEBUG(@"unhandled key equivalent %C/0x%04X", charcode, flags);
+		return;
+	}
+
+	if (charcode == 0x1B) {
+		[self normal_mode:parser];
+		[self endUndoGroup];
 		return;
 	}
 

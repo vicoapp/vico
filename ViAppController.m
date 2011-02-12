@@ -5,6 +5,7 @@
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
 #import "TMFileURLProtocol.h"
+#import "TxmtURLProtocol.h"
 
 @implementation ViAppController
 
@@ -130,6 +131,7 @@
 		[encodingMenu addItem:item];
 
 	[TMFileURLProtocol registerProtocol];
+	[TxmtURLProtocol registerProtocol];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

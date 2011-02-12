@@ -99,6 +99,7 @@
 - (void)switchToDocumentAction:(id)sender;
 - (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
 - (void)goToURL:(NSURL *)url;
+- (void)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;

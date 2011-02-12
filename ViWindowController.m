@@ -901,6 +901,11 @@ static NSWindowController	*currentWindowController = nil;
 		[[docView textView] gotoLine:line column:column];
 }
 
+- (void)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber
+{
+	[self gotoURL:url line:[lineNumber unsignedIntegerValue] column:0];
+}
+
 - (void)goToURL:(NSURL *)url
 {
 	[self gotoURL:url line:0 column:0];

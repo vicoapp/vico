@@ -333,10 +333,12 @@
 {
 	[parser pushKey:'t'];
 	STAssertFalse(parser.complete, nil);
-	[parser pushKey:'z'];
+	NSString *euro = @"€";
+	unichar ch = [euro characterAtIndex:0];
+	[parser pushKey:ch];
 	STAssertTrue(parser.complete, nil);
 	STAssertTrue(parser.key == 't', nil);
-	STAssertTrue(parser.argument == 'z', nil);
+	STAssertTrue(parser.argument == ch, nil);
 }
 
 - (void)test090_DotCommandWithInsertedText

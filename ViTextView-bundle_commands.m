@@ -247,9 +247,12 @@
 			ViDocumentTabController *tabController = [viewController tabController];
 			[tabController splitView:viewController withView:oc vertically:YES];	// FIXME: option to specify vertical or not
 			[[[self delegate] windowController] selectDocumentView:oc];
-		} else if ([outputFormat isEqualToString:@"insertAsText"] || [outputFormat isEqualToString:@"afterSelectedText"]) {
+		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
 			[self setCaret:[self caret] + [outputText length]];
+		} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
+			[self insertString:outputText atLocation:NSMaxRange(inputRange) undoGroup:NO];
+			[self setCaret:NSMaxRange(inputRange) + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];

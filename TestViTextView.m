@@ -173,8 +173,10 @@
 
 - (void)test160_DeleteAndUndo			{ TEST(@"abc def", 2, @"xu", @"abc def", 2); }
 - (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"i ghi\x1bu", @"abc def", 2); }
-// XXX: cursor doesn't return to correct position when undoing an append
-//- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+- (void)test162_AppendToEmptyLineAndUndo	{ TEST(@"", 0, @"aabc\x1bu", @"", 0); }
+- (void)test162_AppendAtEOLAndUndo		{ TEST(@"abc def", 2, @"A ghi\x1bu", @"abc def", 6); }
+- (void)test162_AppendAtEOToEmptyLineLAndUndo	{ TEST(@"", 0, @"Aabc\x1bu", @"", 0); }
 - (void)test163_UndoRedo			{ TEST(@"abc def", 0, @"xxxxuu", @"def", 0); }
 // XXX: disabled for now, error in test code
 //- (void)test164_RepeatUndo			{ TEST(@"abc def", 0, @"xxxxu..", @"bc def", 0); }

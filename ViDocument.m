@@ -69,7 +69,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							forKeyPath:@"wrap"
 							   options:NSKeyValueObservingOptionNew
 							   context:NULL];
-	
+
 		textStorage = [[NSTextStorage alloc] initWithString:@""];
 		[textStorage setDelegate:self];
 

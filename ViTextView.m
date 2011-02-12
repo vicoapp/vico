@@ -475,15 +475,19 @@ int logIndent = 0;
 	if (hasUndoGroup) {
 		[undoManager endUndoGrouping];
 		hasUndoGroup = NO;
+		has_undo_start_location = NO;
 	}
 }
 
 - (void)beginUndoGroup
 {
-	DEBUG(@"Beginning undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
 	if (!hasUndoGroup) {
 		[undoManager beginUndoGrouping];
 		hasUndoGroup = YES;
+		if (!has_undo_start_location) {
+			has_undo_start_location = YES;
+			undo_start_location = [self caret];
+		}
 	}
 }
 
@@ -504,14 +508,14 @@ int logIndent = 0;
 - (void)recordInsertInRange:(NSRange)aRange
 {
 	DEBUG(@"pushing insert of text in range %@ onto undo stack", NSStringFromRange(aRange));
-	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange caret:[self caret]];
+	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange caret:undo_start_location];
 	[undoManager setActionName:@"insert text"];
 }
 
 - (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	DEBUG(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
-	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation caret:[self caret]];
+	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation caret:undo_start_location];
 	[undoManager setActionName:@"delete text"];
 }
 

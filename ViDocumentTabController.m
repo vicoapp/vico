@@ -34,6 +34,7 @@
 
 - (void)removeView:(id<ViViewController>)viewController
 {
+	// FIXME: This doesn't really belong here, right?
 	if ([viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController document] removeView:viewController];
 	[views removeObject:viewController];

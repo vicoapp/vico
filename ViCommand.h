@@ -33,6 +33,9 @@ struct vikey
 	int dot_motion_count;
 	unichar dot_argument;
 
+	// used for nvi-style undo
+	struct vikey *last_command;
+
 	struct vikey *last_ftFT_command;
 	unichar last_ftFT_argument;
 

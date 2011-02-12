@@ -86,6 +86,7 @@
 			[NSNumber numberWithBool:YES], @"antialias",
 			[NSNumber numberWithInt:80], @"guidecolumn",
 			[NSNumber numberWithFloat:11.0], @"fontsize",
+			@"vim", @"undostyle",
 			@"Menlo Regular", @"fontname",
 			@"Mac Classic", @"theme",
 			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
@@ -106,6 +107,10 @@
 						   context:NULL];
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"guidecolumn"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"undostyle"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
 
@@ -150,6 +155,11 @@
 		for (doc in [[NSDocumentController sharedDocumentController] documents])
 			if ([doc respondsToSelector:@selector(updatePageGuide)])
 				[doc updatePageGuide];
+	} else if ([keyPath isEqualToString:@"undostyle"]) {
+		NSString *undostyle = [change objectForKey:NSKeyValueChangeNewKey];
+		INFO(@"got undo style %@", undostyle);
+		if (![undostyle isEqualToString:@"vim"] && ![undostyle isEqualToString:@"nvi"])
+			[[NSUserDefaults standardUserDefaults] setObject:@"vim" forKey:@"undostyle"];
 	}
 }
 

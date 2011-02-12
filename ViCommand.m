@@ -73,6 +73,7 @@ static struct vikey normal_keys[] = {
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"jumplist_backward:",	0xF, 0},  // ^O
 	{@"show_info:",		0x7, 0},  // ^G
+	{@"vim_redo:",		0x12, 0}, // ^R
 	{@"pop_tag:",		0x14, 0}, // ^T
 	{@"scroll_upwards:",	0x15, 0}, // ^U
 	{@"window_prefix:",	0x17, 0, window_keys}, // ^W
@@ -123,7 +124,7 @@ static struct vikey normal_keys[] = {
 	{@"replace:",		'r', VIF_SETS_DOT | VIF_NEED_CHAR},
 	{@"substitute:",	's', VIF_SETS_DOT},
 	{@"move_til_char:",	't', VIF_IS_MOTION | VIF_NEED_CHAR},
-	{@"vi_undo:",		'u', VIF_SETS_DOT},
+	{@"vi_undo:",		'u', 0},
 	{@"visual:",		'v', 0},
 	{@"word_forward:",	'w', VIF_IS_MOTION},
 	{@"delete_forward:",	'x', VIF_SETS_DOT},
@@ -244,6 +245,7 @@ static struct vikey visual_keys[] = {
 	{@"put_before:",	'P', VIF_SETS_DOT},
 	{@"subst_lines:",	'S', VIF_LINE_MODE | VIF_SETS_DOT},
 	{@"move_back_til_char:",'T', VIF_IS_MOTION | VIF_NEED_CHAR},
+	{@"uppercase:",		'U', VIF_SETS_DOT},
 	{@"word_forward:",	'W', VIF_IS_MOTION},
 	{@"delete:",		'X', VIF_SETS_DOT | VIF_LINE_MODE},
 	{@"move_bol:",		'0', VIF_IS_MOTION},
@@ -265,7 +267,7 @@ static struct vikey visual_keys[] = {
 	{@"replace:",		'r', VIF_SETS_DOT | VIF_NEED_CHAR},
 	{@"change:",		's', VIF_SETS_DOT},
 	{@"move_til_char:",	't', VIF_IS_MOTION | VIF_NEED_CHAR},
-	{@"vi_undo:",		'u', VIF_SETS_DOT},
+	{@"lowercase:",		'u', VIF_SETS_DOT},
 	{@"word_forward:",	'w', VIF_IS_MOTION},
 	{@"delete:",		'x', VIF_SETS_DOT},
 	{@"yank:",		'y', VIF_SETS_DOT},
@@ -333,23 +335,39 @@ find_command_in_map(unichar key, struct vikey map[])
 	if (command && command->key == '.') {
 		is_dot = YES;
 
-		if (dot_command == nil) {
-			method = @"nodot:"; // prints "No command to repeat"
-			command = NULL;
-			motion_command = NULL;
+		/* From nvi:
+		 * !!!
+		 * If a '.' is immediately entered after an undo command, we
+		 * replay the log instead of redoing the last command.  This
+		 * is necessary because 'u' can't set the dot command -- see
+		 * vi/v_undo.c:v_undo for details.
+		 */
+		if (last_command && last_command->key == 'u' &&
+		    [[[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"] isEqualToString:@"nvi"]) {
+			command = last_command;
+			method = last_command->method;
+			key = last_command->key;
 		} else {
-			command = dot_command;
-			if (count == 0)
-				count = dot_count;
-			method = dot_command->method;
-			motion_command = dot_motion_command;
-			motion_count = dot_motion_count;
-			key = dot_command->key;
-			argument = dot_argument;
-			if (dot_motion_command)
-				motion_key = dot_motion_command->key;
+			if (dot_command == nil) {
+				method = @"nodot:"; // prints "No command to repeat"
+				command = NULL;
+				motion_command = NULL;
+			} else {
+				command = dot_command;
+				if (count == 0)
+					count = dot_count;
+				method = dot_command->method;
+				motion_command = dot_motion_command;
+				motion_count = dot_motion_count;
+				key = dot_command->key;
+				argument = dot_argument;
+				if (dot_motion_command)
+					motion_key = dot_motion_command->key;
+			}
 		}
 	}
+
+	last_command = command;
 
 	if (command && has_flag(command, VIF_SETS_DOT)) {
 		/* set the dot command parameters */

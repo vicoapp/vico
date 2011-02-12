@@ -1035,6 +1035,7 @@ filter_write(CFSocketRef s,
 		@"searchincr", @"searchincr",
 		@"wrap", @"wrap",
 		@"antialias", @"antialias",
+		@"undostyle", @"undostyle",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:

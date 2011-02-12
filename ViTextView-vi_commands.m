@@ -1053,27 +1053,50 @@
 	 * changes, too.  This isn't worth the effort.
 	 */
 
-	DEBUG(@"undo_direction is %i", undo_direction);
-	if (undo_direction == 0)
-		undo_direction = 1;	// backward (normal undo)
-	else if (!command.is_dot)
-		undo_direction = (undo_direction == 1 ? 2 : 1);
+	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
+	if ([undoStyle isEqualToString:@"nvi"]) {
+		DEBUG(@"undo_direction is %i", undo_direction);
+		if (undo_direction == 0)
+			undo_direction = 1;	// backward (normal undo)
+		else if (!command.is_dot)
+			undo_direction = (undo_direction == 1 ? 2 : 1);
 
-	if (undo_direction == 1) {
+		if (undo_direction == 1) {
+			if (![undoManager canUndo]) {
+				[[self delegate] message:@"No changes to undo"];
+				return NO;
+			}
+			[undoManager undo];
+		} else {
+			if (![undoManager canRedo]) {
+				[[self delegate] message:@"No changes to re-do"];
+				return NO;
+			}
+			[undoManager redo];
+		}
+	} else {
 		if (![undoManager canUndo]) {
-			DEBUG(@"%s", "can't undo");
 			[[self delegate] message:@"No changes to undo"];
 			return NO;
 		}
 		[undoManager undo];
-	} else {
-		if (![undoManager canRedo]) {
-			DEBUG(@"%s", "can't redo");
-			[[self delegate] message:@"No changes to re-do"];
-			return NO;
-		}
-		[undoManager redo];
 	}
+
+	return YES;
+}
+
+/* syntax: C-r */
+- (BOOL)vim_redo:(ViCommand *)command
+{
+	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
+	if ([undoStyle isEqualToString:@"nvi"])
+		return NO;
+
+	if (![undoManager canRedo]) {
+		[[self delegate] message:@"No changes to re-do"];
+		return NO;
+	}
+	[undoManager redo];
 
 	return YES;
 }

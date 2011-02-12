@@ -6,6 +6,11 @@
 }
 @end
 
+@interface undoStyleTagTransformer : NSValueTransformer
+{
+}
+@end
+
 @interface ViPreferencesController : NSWindowController
 {
 	NSView *blankView;

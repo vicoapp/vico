@@ -62,10 +62,15 @@
 		}
 
 		modifierMask = keyflags;
-		if ((keyflags & ~NSControlKeyMask) == 0 && keycode >= 'a' && keycode < 'z') {
+
+		if (keyflags == NSControlKeyMask && tolower(keycode) >= 'a' && tolower(keycode) < 'z') {
 			keyflags = 0;
-			keycode = keycode - 'a' + 1;
+			keycode = tolower(keycode) - 'a' + 1;
 		}
+
+		if ([keyEquivalent isEqualToString:[keyEquivalent uppercaseString]] &&
+		    ![keyEquivalent isEqualToString:[keyEquivalent lowercaseString]])
+			keyflags |= NSShiftKeyMask;
 
 		DEBUG(@"parsed key equivalent [%@] as keycode %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
 		    key, keycode, keycode,

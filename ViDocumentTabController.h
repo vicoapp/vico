@@ -39,10 +39,12 @@ enum ViViewOrderingMode {
 - (id<ViViewController>)splitView:(id<ViViewController>)aView vertically:(BOOL)isVertical;
 - (id<ViViewController>)replaceView:(id<ViViewController>)aView withDocument:(ViDocument *)document;
 - (void)closeView:(id<ViViewController>)aView;
+- (void)closeViewsOtherThan:(id<ViViewController>)viewController;
 - (NSSet *)documents;
 //- (NSSet *)documentsOfType:(Class)class;
 - (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView;
 - (id<ViViewController>)viewControllerForView:(NSView *)aView;
+- (void)normalizeAllViews;
 
 @end
 

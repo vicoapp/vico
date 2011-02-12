@@ -109,6 +109,8 @@
 - (IBAction)splitViewVertically:(id)sender;
 - (IBAction)moveCurrentViewToNewTabAction:(id)sender;
 - (BOOL)moveCurrentViewToNewTab;
+- (BOOL)normalizeSplitViewSizesInCurrentTab;
+- (BOOL)closeOtherViews;
 
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;

@@ -954,6 +954,28 @@ static NSWindowController	*currentWindowController = nil;
 	return nil;
 }
 
+- (BOOL)normalizeSplitViewSizesInCurrentTab
+{
+	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
+		return NO;
+
+	ViDocumentTabController *tabController = [viewController tabController];
+	[tabController normalizeAllViews];
+	return YES;
+}
+
+- (BOOL)closeOtherViews
+{
+	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
+		return NO;
+
+	ViDocumentTabController *tabController = [viewController tabController];
+	[tabController closeViewsOtherThan:viewController];
+	return YES;
+}
+
 - (BOOL)moveCurrentViewToNewTab
 {
 	id<ViViewController> viewController = [self currentView];

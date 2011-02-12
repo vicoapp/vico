@@ -1751,6 +1751,16 @@
 	return [[[self delegate] windowController] moveCurrentViewToNewTab];
 }
 
+- (BOOL)window_normalize:(ViCommand *)command
+{
+	return [[[self delegate] windowController] normalizeSplitViewSizesInCurrentTab];
+}
+
+- (BOOL)window_only:(ViCommand *)command
+{
+	return [[[self delegate] windowController] closeOtherViews];
+}
+
 - (BOOL)uppercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];

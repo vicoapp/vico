@@ -40,15 +40,17 @@ static struct vikey window_keys[] = {
 	{@"window_up:",		0xB, 0},	// ^K
 	{@"window_right:",	0xC, 0},	// ^L
 	{@"window_new:",	0xE, 0},	// ^N
+	{@"window_totab:",	'T', 0},
 	{@"window_close:",	'c', 0},
 	{@"window_left:",	'h', 0},
 	{@"window_down:",	'j', 0},
 	{@"window_up:",		'k', 0},
 	{@"window_right:",	'l', 0},
 	{@"window_new:",	'n', 0},
+	{@"window_only:",	'o', 0},
 	{@"window_split:",	's', 0},
 	{@"window_vsplit:",	'v', 0},
-	{@"window_totab:",	'T', 0},
+	{@"window_normalize:",	'=', 0},
 	{nil, -1, 0}
 };
 

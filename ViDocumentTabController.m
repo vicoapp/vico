@@ -1,6 +1,10 @@
 #import "ViDocumentTabController.h"
 #import "ViDocumentView.h"
 
+@interface ViDocumentTabController (private)
+- (void)normalizeViewsRecursively:(id)split;
+@end
+
 @implementation ViDocumentTabController
 
 @synthesize views, selectedView;
@@ -212,6 +216,22 @@
 	}
 }
 
+- (void)closeViewsOtherThan:(id<ViViewController>)viewController
+{
+	BOOL closed = YES;
+
+	while (closed) {
+		closed = NO;
+		for (id<ViViewController> otherView in views) {
+			if (otherView != viewController) {
+				[self closeView:otherView];
+				closed = YES;
+				break;
+			}
+		}
+	}
+}
+
 - (id<ViViewController>)viewControllerForView:(NSView *)aView
 {
 	for (id<ViViewController> viewController in [self views])
@@ -278,6 +298,21 @@
 		return [self viewAtPosition:position relativeTo:split];
 
 	return nil;
+}
+
+- (void)normalizeViewsRecursively:(id)split
+{
+	if (![split isKindOfClass:[NSSplitView class]])
+		return;
+
+	[self normalizeSplitView:split];
+	for (NSView *view in [split subviews])
+		[self normalizeViewsRecursively:view];
+}
+
+- (void)normalizeAllViews
+{
+	[self normalizeViewsRecursively:splitView];
 }
 
 @end

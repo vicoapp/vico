@@ -142,7 +142,34 @@
 	[self addView:newViewController];
 	[self removeView:viewController];
 
-	[[[viewController view] superview] replaceSubview:[viewController view] with:[newViewController view]];
+	/*
+	 * Remember all subview sizes so we can restore the position
+	 * of the dividers after replacing the view.
+	 */
+	NSSplitView *split = (NSSplitView *)[[viewController view] superview];
+	NSUInteger c = [[split subviews] count];
+	NSMutableArray *sizes = [NSMutableArray arrayWithCapacity:c - 1];
+	for (NSView *view in [split subviews]) {
+		if ([split isVertical])
+			[sizes addObject:[NSNumber numberWithFloat:[view bounds].size.width]];
+		else
+			[sizes addObject:[NSNumber numberWithFloat:[view bounds].size.height]];
+	}
+
+	[split replaceSubview:[viewController view] with:[newViewController view]];
+
+	/*
+	 * Now restore the divider positions.
+	 */
+	CGFloat pos = 0;
+	int i = 0;
+	for (NSNumber *size in sizes) {
+		pos += [size floatValue];
+		[split setPosition:pos ofDividerAtIndex:i++];
+		pos += [split dividerThickness];
+		if (i + 1 == c)
+			break;
+	}
 
 	return newViewController;
 }

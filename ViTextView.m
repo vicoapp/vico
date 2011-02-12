@@ -768,8 +768,11 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location
 {
-        if (location > [[[self textStorage] string] length])
-        	location = IMAX(0, [[[self textStorage] string] length]);
+	NSInteger length = [[[self textStorage] string] length];
+	if (mode != ViInsertMode)
+		length--;
+	if (location > length)
+		location = IMAX(0, length);
 	caret = location;
 	if (mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];

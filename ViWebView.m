@@ -1,5 +1,6 @@
 #import "ViWebView.h"
 #import "ViCommon.h"
+#import "ViWindowController.h"
 #import "logging.h"
 
 @implementation ViWebView
@@ -165,6 +166,11 @@
 	return [environment ex_vsplit:nil];
 }
 #endif
+
+- (BOOL)window_totab:(ViCommand *)command
+{
+	return [[[self window] windowController] moveCurrentViewToNewTab];
+}
 
 - (BOOL)window_new:(ViCommand *)command
 {

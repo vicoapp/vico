@@ -764,7 +764,8 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location
 {
-        DEBUG(@"setting caret to %u", location);
+        if (location > [[[self textStorage] string] length])
+        	location = IMAX(0, [[[self textStorage] string] length]);
 	caret = location;
 	if (mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];

@@ -542,7 +542,7 @@
 
 	ViDocument *doc;
 	if (exists) {
-		doc= [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:display error:&error];
+		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:display error:&error];
 	} else {
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:display error:&error];
 		[doc setIsTemporary:YES];

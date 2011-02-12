@@ -107,6 +107,7 @@
 
 - (IBAction)splitViewHorizontally:(id)sender;
 - (IBAction)splitViewVertically:(id)sender;
+- (IBAction)moveCurrentViewToNewTabAction:(id)sender;
 - (BOOL)moveCurrentViewToNewTab;
 
 // proxies to the project delegate

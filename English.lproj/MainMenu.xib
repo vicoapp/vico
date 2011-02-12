@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="24"/>
+			<integer value="296"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -679,11 +679,27 @@
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
 								</object>
+								<object class="NSMenuItem" id="628230574">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Move view to new tab</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+								</object>
 								<object class="NSMenuItem" id="738449754">
 									<reference key="NSMenu" ref="466310130"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
 									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+								</object>
+								<object class="NSMenuItem" id="97161799">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Show color panel...</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1222,6 +1238,14 @@
 					</object>
 					<int key="connectionID">569</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">moveCurrentViewToNewTabAction:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="628230574"/>
+					</object>
+					<int key="connectionID">576</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1719,6 +1743,8 @@
 							<reference ref="738449754"/>
 							<reference ref="102151532"/>
 							<reference ref="237841660"/>
+							<reference ref="97161799"/>
+							<reference ref="628230574"/>
 						</object>
 						<reference key="parent" ref="586577488"/>
 					</object>
@@ -1878,6 +1904,16 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 						</object>
 						<reference key="parent" ref="717170549"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">573</int>
+						<reference key="object" ref="97161799"/>
+						<reference key="parent" ref="466310130"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">574</int>
+						<reference key="object" ref="628230574"/>
+						<reference key="parent" ref="466310130"/>
 					</object>
 				</object>
 			</object>
@@ -2039,6 +2075,8 @@
 					<string>57.IBPluginDependency</string>
 					<string>57.ImportedFromIB2</string>
 					<string>57.editorWindowContentRectSynchronizationRect</string>
+					<string>573.IBPluginDependency</string>
+					<string>574.IBPluginDependency</string>
 					<string>58.IBPluginDependency</string>
 					<string>58.ImportedFromIB2</string>
 					<string>72.IBPluginDependency</string>
@@ -2120,7 +2158,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{723, 553}, {272, 83}}</string>
+					<string>{{754, 553}, {272, 83}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{608, 612}, {275, 83}}</string>
@@ -2132,7 +2170,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{483, 593}, {240, 223}}</string>
+					<string>{{514, 593}, {240, 223}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{120, 316}, {243, 273}}</string>
@@ -2148,7 +2186,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{723, 573}, {164, 43}}</string>
+					<string>{{754, 573}, {164, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{608, 612}, {167, 43}}</string>
@@ -2166,7 +2204,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{723, 553}, {238, 103}}</string>
+					<string>{{754, 553}, {238, 103}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{440, 473}, {241, 103}}</string>
@@ -2188,7 +2226,7 @@
 					<string>{74, 862}</string>
 					<string>{{35, 589}, {377, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{527, 623}, {231, 193}}</string>
+					<string>{{558, 583}, {235, 233}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{206, 623}, {241, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2223,7 +2261,7 @@
 					<integer value="1"/>
 					<string>{{23, 553}, {186, 183}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2238,7 +2276,9 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{441, 553}, {242, 263}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>{{472, 553}, {242, 263}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{54, 533}, {199, 203}}</string>
@@ -2266,7 +2306,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">572</int>
+			<int key="maxID">576</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2982,6 +3022,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>filterSymbols:</string>
+							<string>moveCurrentViewToNewTabAction:</string>
 							<string>navigateJumplist:</string>
 							<string>searchFiles:</string>
 							<string>searchSymbol:</string>
@@ -2995,6 +3036,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3013,6 +3055,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>filterSymbols:</string>
+							<string>moveCurrentViewToNewTabAction:</string>
 							<string>navigateJumplist:</string>
 							<string>searchFiles:</string>
 							<string>searchSymbol:</string>
@@ -3028,6 +3071,10 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">filterSymbols:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">moveCurrentViewToNewTabAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

@@ -963,6 +963,11 @@ static NSWindowController	*currentWindowController = nil;
 	return YES;
 }
 
+- (IBAction)moveCurrentViewToNewTabAction:(id)sender
+{
+	[self moveCurrentViewToNewTab];
+}
+
 #pragma mark -
 #pragma mark Split view delegate methods
 

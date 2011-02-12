@@ -202,7 +202,10 @@
 			if (c > 0) {
 				if (ndx >= c)
 					ndx = c - 1;
-				[self setSelectedView:[self viewControllerForView:[[split subviews] objectAtIndex:ndx]]];
+				NSView *view = [[split subviews] objectAtIndex:ndx];
+				while ([view isKindOfClass:[NSSplitView class]])
+					view = [[(NSSplitView *)view subviews] objectAtIndex:0];
+				[self setSelectedView:[self viewControllerForView:view]];
 			}
 		} else
 			[self setSelectedView:[self viewControllerForView:split]];

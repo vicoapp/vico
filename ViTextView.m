@@ -22,6 +22,7 @@ int logIndent = 0;
 - (BOOL)evaluateCommand:(ViCommand *)command;
 - (void)switch_tab:(int)arg;
 - (void)show_scope;
+- (BOOL)normal_mode:(ViCommand *)command;
 @end
 
 #pragma mark -

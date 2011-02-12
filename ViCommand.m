@@ -159,6 +159,7 @@ static struct vikey normal_keys[] = {
 	{nil, -1, 0}
 };
 
+#if 0
 static struct vikey operator_keys[] = {
 	{@"nonmotion:",		0x00, VIF_IS_MOTION}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
@@ -216,6 +217,7 @@ static struct vikey operator_keys[] = {
 	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
 	{nil, -1, 0}
 };
+#endif
 
 static struct vikey visual_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key

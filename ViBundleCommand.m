@@ -10,7 +10,7 @@
 
 - (ViBundleCommand *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle
 {
-	self = [super initFromDictionary:dict inBundle:aBundle];
+	self = (ViBundleCommand *)[super initFromDictionary:dict inBundle:aBundle];
 	if (self) {
 		input = [dict objectForKey:@"input"];
 		output = [dict objectForKey:@"output"];

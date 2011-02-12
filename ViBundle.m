@@ -227,7 +227,7 @@
 
 - (void)addSnippet:(NSDictionary *)desc
 {
-	ViBundleSnippet *snippet = [[ViBundleSnippet alloc] initFromDictionary:desc inBundle:self];
+	ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:desc inBundle:self];
 	if (snippet) {
 		[snippets addObject:snippet];
 		[uuids setObject:snippet forKey:[snippet uuid]];
@@ -236,7 +236,7 @@
 
 - (void)addCommand:(NSMutableDictionary *)desc
 {
-	ViBundleCommand *command = [[ViBundleCommand alloc] initFromDictionary:desc inBundle:self];
+	ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:desc inBundle:self];
 	if (command) {
 		[commands addObject:command];
 		[uuids setObject:command forKey:[command uuid]];

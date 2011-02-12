@@ -63,7 +63,8 @@
 		return;
 
 	NSMenu *menu = [item menu];
-	[menu performSelector:@selector(performActionForItemAtIndex:) withObject:[menu indexOfItem:item] afterDelay:0.0];
+	// XXX: that (id) is not a nice cast!
+	[menu performSelector:@selector(performActionForItemAtIndex:) withObject:(id)[menu indexOfItem:item] afterDelay:0.0];
 	[menu cancelTracking];
 }
 

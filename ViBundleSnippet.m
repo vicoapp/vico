@@ -7,7 +7,7 @@
 
 - (ViBundleSnippet *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle
 {
-	self = [super initFromDictionary:dict inBundle:aBundle];
+	self = (ViBundleSnippet *)[super initFromDictionary:dict inBundle:aBundle];
 	if (self) {
 		content = [dict objectForKey:@"content"];
 		tabTrigger = [dict objectForKey:@"tabTrigger"];

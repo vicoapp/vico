@@ -251,7 +251,7 @@
 	int count = command.count;
 
 	NSScrollView *scrollView = [[[[self mainFrame] frameView] documentView] enclosingScrollView];
-	if (count == 1) {
+	if (count == 1 || (count == 0 && command.key == 'g')) {
 		/* goto first line */
 		[[scrollView documentView] scrollPoint:NSMakePoint(0, 0)];
 	} else if (count == 0) {

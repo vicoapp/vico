@@ -72,6 +72,10 @@
 		    ![keyEquivalent isEqualToString:[keyEquivalent lowercaseString]])
 			keyflags |= NSShiftKeyMask;
 
+		/* Same test as in keyDown: */
+		if ((0x20 < keycode && keycode < 0x7f) || keycode == 0x19)
+			keyflags &= ~NSShiftKeyMask;
+
 		DEBUG(@"parsed key equivalent [%@] as keycode %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
 		    key, keycode, keycode,
 		    (keyflags & NSShiftKeyMask) ? "YES" : "NO",

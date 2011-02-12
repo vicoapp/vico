@@ -4,6 +4,7 @@
 @interface TestViTextView : SenTestCase
 {
 	ViTextView *vi;
+	ViCommand *parser;
 }
 
 @end

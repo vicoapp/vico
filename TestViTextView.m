@@ -21,7 +21,8 @@
 - (void)setUp
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
-	[vi initEditorWithDelegate:nil viParser:[[ViCommand alloc] init]];
+	parser = [[ViCommand alloc] init];
+	[vi initEditorWithDelegate:nil viParser:parser];
 }
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }
@@ -177,7 +178,7 @@
 - (void)test162_AppendToEmptyLineAndUndo	{ TEST(@"", 0, @"aabc\x1bu", @"", 0); }
 - (void)test162_AppendAtEOLAndUndo		{ TEST(@"abc def", 2, @"A ghi\x1bu", @"abc def", 6); }
 - (void)test162_AppendAtEOToEmptyLineLAndUndo	{ TEST(@"", 0, @"Aabc\x1bu", @"", 0); }
-- (void)test163_UndoRedo			{ TEST(@"abc def", 0, @"xxxxuu", @"def", 0); }
+- (void)test163_UndoRedo			{ [parser setNviStyleUndo:YES]; TEST(@"abc def", 0, @"xxxxuu", @"def", 0); }
 // XXX: disabled for now, error in test code
 //- (void)test164_RepeatUndo			{ TEST(@"abc def", 0, @"xxxxu..", @"bc def", 0); }
 //- (void)test165_RepeatRedo			{ TEST(@"abc def", 0, @"xxxxu..u.", @" def", 0); }

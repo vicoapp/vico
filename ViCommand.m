@@ -324,6 +324,7 @@ find_command_in_map(unichar key, struct vikey map[])
 @synthesize argument;
 @synthesize is_dot;
 @synthesize text;
+@synthesize nviStyleUndo;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
@@ -342,8 +343,7 @@ find_command_in_map(unichar key, struct vikey map[])
 		 * is necessary because 'u' can't set the dot command -- see
 		 * vi/v_undo.c:v_undo for details.
 		 */
-		if (last_command && last_command->key == 'u' &&
-		    [[[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"] isEqualToString:@"nvi"]) {
+		if (nviStyleUndo && last_command && last_command->key == 'u') {
 			command = last_command;
 			method = last_command->method;
 			key = last_command->key;

@@ -218,6 +218,12 @@ static NSWindowController	*currentWindowController = nil;
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
 
 	[self updateJumplistNavigator];
+
+	[parser setNviStyleUndo:[[[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"] isEqualToString:@"nvi"]];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"undostyle"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
 }
 
 - (void)browseURL:(NSURL *)url
@@ -251,6 +257,8 @@ static NSWindowController	*currentWindowController = nil;
 		id<ViViewController> viewController = [self currentView];
 		if ([viewController isKindOfClass:[ViDocumentView class]])
 			[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
+	} else if ([keyPath isEqualToString:@"undostyle"]) {
+		[parser setNviStyleUndo:[[change objectForKey:NSKeyValueChangeNewKey] isEqualToString:@"nvi"]];
 	}
 }
 

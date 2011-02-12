@@ -368,26 +368,17 @@ static NSWindowController	*currentWindowController = nil;
 
 		NSDate *modificationDate = [attributes fileModificationDate];
 		if ([[document fileModificationDate] compare:modificationDate] == NSOrderedAscending) {
-			if ([document isDocumentEdited]) {
-				[document updateChangeCount:NSChangeReadOtherContents];
+			[document updateChangeCount:NSChangeReadOtherContents];
 
-				NSAlert *alert = [[NSAlert alloc] init];
-				[alert setMessageText:@"This document’s file has been changed by another application since you opened or saved it."];
-				[alert setInformativeText:@"Do you want to keep this version or revert to the document on disk?"];
-				[alert addButtonWithTitle:@"Keep open version"];
-				[alert addButtonWithTitle:@"Revert"];
-				[alert beginSheetModalForWindow:[self window]
-						  modalDelegate:self
-						 didEndSelector:@selector(documentChangedAlertDidEnd:returnCode:contextInfo:)
-						    contextInfo:document];
-			} else {
-				[document revertToContentsOfURL:[document fileURL] ofType:[document fileType] error:&error];
-				if (error) {
-					NSAlert *alert = [NSAlert alertWithError:error];
-					[alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
-					[document updateChangeCount:NSChangeReadOtherContents];
-				}
-			}
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"This document’s file has been changed by another application since you opened or saved it."];
+			[alert setInformativeText:@"Do you want to keep this version or revert to the document on disk?"];
+			[alert addButtonWithTitle:@"Keep open version"];
+			[alert addButtonWithTitle:@"Revert"];
+			[alert beginSheetModalForWindow:[self window]
+					  modalDelegate:self
+					 didEndSelector:@selector(documentChangedAlertDidEnd:returnCode:contextInfo:)
+					    contextInfo:document];
 		}
 	}
 }

@@ -61,6 +61,25 @@
 	return splitView;
 }
 
+- (void)normalizeSplitView:(NSSplitView *)split
+{
+	int n = [[split subviews] count];
+	CGFloat sz;
+
+	if ([split isVertical])
+		sz = [split bounds].size.width;
+	else
+		sz = [split bounds].size.height;
+
+	sz -= [split dividerThickness] * (n - 1);
+	sz /= n;
+
+	int i;
+	CGFloat pos = sz;
+	for (i = 1; i < n; i++, pos += sz + [split dividerThickness])
+		[split setPosition:pos ofDividerAtIndex:i - 1];
+}
+
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController withView:(id<ViViewController>)newViewController vertically:(BOOL)isVertical
 {
 	NSView *view = [viewController view];
@@ -80,6 +99,7 @@
 		// Just add another view to this split
 		[split addSubview:[newViewController view]];
 		[split adjustSubviews];
+		[self normalizeSplitView:split];
 	} else {
 		/*
 		 * Create a new split view and replace
@@ -95,6 +115,7 @@
 		[newSplit addSubview:view];
 		[newSplit addSubview:[newViewController view]];
 		[newSplit adjustSubviews];
+		[self normalizeSplitView:newSplit];
 	}
 
 	return newViewController;
@@ -131,6 +152,7 @@
 	[self removeView:viewController];
 
 	id split = [[viewController view] superview];
+	NSUInteger ndx = [[split subviews] indexOfObject:[viewController view]];
 	[[viewController view] removeFromSuperview];
 
 	if ([[split subviews] count] == 1) {
@@ -142,10 +164,19 @@
 		}
 	}
 
+	if ([split isMemberOfClass:[NSSplitView class]]) {
+		[split adjustSubviews];
+		[self normalizeSplitView:split];
+	}
+
 	if (selectedView == viewController) {
 		if ([split isMemberOfClass:[NSSplitView class]]) {
-			if ([[split subviews] count] > 0)
-				[self setSelectedView:[self viewControllerForView:[[split subviews] objectAtIndex:0]]];
+			NSUInteger c = [[split subviews] count];
+			if (c > 0) {
+				if (ndx >= c)
+					ndx = c - 1;
+				[self setSelectedView:[self viewControllerForView:[[split subviews] objectAtIndex:ndx]]];
+			}
 		} else
 			[self setSelectedView:[self viewControllerForView:split]];
 	}

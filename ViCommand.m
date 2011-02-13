@@ -51,6 +51,10 @@ static struct vikey window_keys[] = {
 	{@"window_split:",	's', 0},
 	{@"window_vsplit:",	'v', 0},
 	{@"window_normalize:",	'=', 0},
+	{@"window_left:",	NSLeftArrowFunctionKey, 0},
+	{@"window_down:",	NSDownArrowFunctionKey, 0},
+	{@"window_up:",		NSUpArrowFunctionKey, 0},
+	{@"window_right:",	NSRightArrowFunctionKey, 0},
 	{nil, -1, 0}
 };
 

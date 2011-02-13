@@ -759,12 +759,6 @@ sort_by_score(id a, id b, void *context)
 	ViRegexpMatch *pathMatch;
 	double pathScore, fileScore;
 
-	/*
-	 * FIXME: transform into breadth-first search, and limit
-	 * number of descended directories (might be different for
-	 * file and sftp urls).
-	 */
-
 	for (ProjectFile *item in items) {
 		DEBUG(@"got item %@", [item url]);
 		if ([self outlineView:explorer isItemExpandable:item]) {

@@ -9,6 +9,7 @@
 + (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
 + (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError;
 + (NSArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError;
++ (void)recursivelySortProjectFiles:(NSMutableArray *)children;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
@@ -115,7 +116,8 @@
 {
 	self = [super init];
 	if (self) {
-		skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+		NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
+		skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	}
@@ -132,6 +134,30 @@
 	[rootButton setAction:@selector(changeRoot:)];
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
+
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"explorecaseignore"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"exploresortfolders"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+		      ofObject:(id)object
+			change:(NSDictionary *)change
+		       context:(void *)context
+
+{
+	/* only explorecaseignore and exploresortfolders options observed */
+	/* re-sort explorer */
+	if (rootItems) {
+		[ProjectDelegate recursivelySortProjectFiles:rootItems];
+		if (!isFiltered)
+			[self filterFiles:self];
+	}
 }
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor
@@ -175,6 +201,37 @@
 	return nil;
 }
 
++ (NSArray *)sortProjectFiles:(NSMutableArray *)children
+{
+	BOOL sortFolders = [[NSUserDefaults standardUserDefaults] boolForKey:@"exploresortfolders"];
+	BOOL caseIgnoreSort = [[NSUserDefaults standardUserDefaults] boolForKey:@"explorecaseignore"];
+
+	NSStringCompareOptions sortOptions = 0;
+	if (caseIgnoreSort)
+		sortOptions = NSCaseInsensitiveSearch;
+
+	[children sortUsingComparator:^(id obj1, id obj2) {
+		if (sortFolders) {
+			if ([obj1 isDirectory]) {
+				if (![obj2 isDirectory])
+					return (NSComparisonResult)NSOrderedAscending;
+			} else if ([obj2 isDirectory])
+				return (NSComparisonResult)NSOrderedDescending;
+		}
+		return [[obj1 name] compare:[obj2 name] options:sortOptions];
+	}];
+	return children;
+}
+
++ (void)recursivelySortProjectFiles:(NSMutableArray *)children
+{
+	[self sortProjectFiles:children];
+
+	for (ProjectFile *file in children)
+		if ([file hasCachedChildren] && [file isDirectory])
+			[self recursivelySortProjectFiles:[file children]];
+}
+
 + (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -183,14 +240,15 @@
 	if (files == nil)
 		return nil;
 
-	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
+	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
 
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	for (NSString *filename in files)
 		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
 			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename]]];
 
-	return children;
+	return [self sortProjectFiles:children];
 }
 
 + (NSArray*)childrenAtSftpURL:(NSURL*)url error:(NSError **)outError
@@ -203,7 +261,8 @@
 	if (entries == nil)
 		return nil;
 
-	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
+	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
 
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	SFTPDirectoryEntry *entry;
@@ -212,8 +271,8 @@
 		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
 			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename] sftpInfo:entry]];
 	}
-	
-	return children;
+
+	return [self sortProjectFiles:children];
 }
 
 - (void)browseURL:(NSURL *)aURL

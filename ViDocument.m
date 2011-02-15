@@ -8,17 +8,12 @@
 #import "NSString-additions.h"
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
-
+#import "ViRulerView.h"
 #import "ExEnvironment.h"
-
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
 #import "SFTPConnectionPool.h"
-
-#import "NoodleLineNumberView.h"
-#import "NoodleLineNumberMarker.h"
-#import "MarkerLineNumberView.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -44,10 +39,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		symbols = [NSArray array];
-		views = [[NSMutableArray alloc] init];
+		views = [NSMutableArray array];
 
 		[[NSUserDefaults standardUserDefaults] addObserver:self
 							forKeyPath:@"number"
@@ -88,7 +82,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		      ofObject:(id)object
 			change:(NSDictionary *)change
 		       context:(void *)context
-
 {
 	if ([keyPath isEqualToString:@"number"])
 		[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
@@ -690,12 +683,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView
 {
 	if (flag) {
-		NoodleLineNumberView *lineNumberView = [[MarkerLineNumberView alloc] initWithScrollView:aScrollView];
+		ViRulerView *lineNumberView = [[ViRulerView alloc] initWithScrollView:aScrollView];
 		[aScrollView setVerticalRulerView:lineNumberView];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];
-		[lineNumberView setBackgroundColor:[NSColor colorWithDeviceRed:(float)0xED/0xFF green:(float)0xED/0xFF blue:(float)0xED/0xFF alpha:1.0]];
 	} else
 		[aScrollView setRulersVisible:NO];
 }

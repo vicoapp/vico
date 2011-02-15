@@ -36,13 +36,10 @@
 
 - (void)setContinuation:(NSArray *)continuedMatches forLine:(unsigned)lineno
 {
-	if (continuedMatches)
-	{
+	if (continuedMatches) {
 		DEBUG(@"setting continuation matches at line %u to %@", lineno, continuedMatches);
 		while ([continuations count] < lineno)
-		{
 			[continuations addObject:[NSArray array]];
-		}
 		[continuations replaceObjectAtIndex:(lineno - 1) withObject:continuedMatches];
 	}
 }
@@ -51,9 +48,7 @@
 {
 	NSArray *continuedMatches = nil;
 	if (lineno > 0 && [continuations count] >= lineno)
-	{
 		continuedMatches = [continuations objectAtIndex:(lineno - 1)];
-	}
 	
 	DEBUG(@"continuation scopes at line %u = %@", lineno, continuedMatches);
 	return continuedMatches;
@@ -77,9 +72,7 @@
 	DEBUG(@"pushing %i continuations after line %i, copying scopes %@", n, lineno, prev);
 
 	while (n-- && lineno < [continuations count])
-	{
 		[continuations insertObject:[prev copy] atIndex:lineno];
-	}
 }
 
 - (void)pullContinuations:(NSValue *)rangeValue
@@ -91,9 +84,7 @@
 	DEBUG(@"pulling %i continuations at line %i", n, lineno);
 
 	while (n-- && lineno < [continuations count])
-	{
 		[continuations removeObjectAtIndex:lineno];
-	}
 }
 
 #pragma mark -
@@ -111,17 +102,14 @@
 	NSRange r;
 	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
 	r = [sleft range];
-	if (r.location < affectedRange.location && NSMaxRange(r) > affectedRange.location)
-	{
+	if (r.location < affectedRange.location && NSMaxRange(r) > affectedRange.location) {
 		DEBUG(@"sleft = %@", sleft);
 		// must split scope in left and right part
 		NSRange rightRange = NSMakeRange(affectedRange.location, NSMaxRange(r) - affectedRange.location);
 		ViScope *sright = [[ViScope alloc] initWithScopes:[sleft scopes] range:rightRange];
 		NSUInteger j;
 		for (j = affectedRange.location; j < NSMaxRange(r); j++)
-		{
 			[scopeArray replaceObjectAtIndex:j withObject:sright];
-		}
 		r.length = affectedRange.location - r.location;
 		[sleft setRange:r];
 		DEBUG(@"updated sleft = %@", sleft);
@@ -132,12 +120,9 @@
 	NSUInteger n = affectedRange.length;
 	ViScope *scope = [[ViScope alloc] initWithScopes:[NSArray array] range:affectedRange];
 	while (n--)
-	{
 		[scopeArray insertObject:scope atIndex:i];
-	}
 
-	for (i = NSMaxRange(affectedRange); i < [scopeArray count];)
-	{
+	for (i = NSMaxRange(affectedRange); i < [scopeArray count];) {
 		ViScope *s = [scopeArray objectAtIndex:i];
 		r = [s range];
 		r.location += affectedRange.length;
@@ -156,18 +141,13 @@
 
 	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
 	NSRange r = [sleft range];
-	if (NSMaxRange(r) > affectedRange.location)
-	{
+	if (NSMaxRange(r) > affectedRange.location) {
 		DEBUG(@"sleft = %@", sleft);
 		// must update (shorten) length of chopped range
 		if (NSMaxRange(r) > NSMaxRange(affectedRange))
-		{
 			r.length -= affectedRange.length;
-		}
 		else
-		{
 			r.length -= NSMaxRange(r) - affectedRange.location;
-		}
 		[sleft setRange:r];
 		DEBUG(@"shortened sleft = %@", sleft);
 	}

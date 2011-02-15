@@ -184,6 +184,7 @@ int logIndent = 0;
 
 	if (undoGroup)
 		[self beginUndoGroup];
+
 	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:aString attributes:[self typingAttributes]];
 	[[self textStorage] insertAttributedString:attrString atIndex:aLocation];
 	[self recordInsertInRange:range];

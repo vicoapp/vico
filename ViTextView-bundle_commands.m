@@ -239,14 +239,14 @@
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText environment:[[self delegate] environment] parser:parser];
-			id<ViViewController> viewController = [[[self delegate] windowController] currentView];
+			id<ViViewController> viewController = [[[self window] windowController] currentView];
 			if (viewController == nil) {
 				INFO(@"%s", "ouch, no current view!");
 				return;
 			}
 			ViDocumentTabController *tabController = [viewController tabController];
 			[tabController splitView:viewController withView:oc vertically:YES];	// FIXME: option to specify vertical or not
-			[[[self delegate] windowController] selectDocumentView:oc];
+			[[[self window] windowController] selectDocumentView:oc];
 		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
 			[self setCaret:[self caret] + [outputText length]];

@@ -1541,7 +1541,7 @@
 				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
 
 			if (document) {
-				ViWindowController *windowController = [[self delegate] windowController];
+				ViWindowController *windowController = [[self window] windowController];
 				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
 				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
 				[windowController selectDocument:document];
@@ -1748,17 +1748,17 @@
 
 - (BOOL)window_totab:(ViCommand *)command
 {
-	return [[[self delegate] windowController] moveCurrentViewToNewTab];
+	return [[[self window] windowController] moveCurrentViewToNewTab];
 }
 
 - (BOOL)window_normalize:(ViCommand *)command
 {
-	return [[[self delegate] windowController] normalizeSplitViewSizesInCurrentTab];
+	return [[[self window] windowController] normalizeSplitViewSizesInCurrentTab];
 }
 
 - (BOOL)window_only:(ViCommand *)command
 {
-	return [[[self delegate] windowController] closeOtherViews];
+	return [[[self window] windowController] closeOtherViews];
 }
 
 - (BOOL)uppercase:(ViCommand *)command

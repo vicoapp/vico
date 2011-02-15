@@ -29,7 +29,6 @@
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;
 - (ViBundle *)bundle;
-- (ViWindowController *)windowController;
 @end
 
 @interface ViTextView : NSTextView

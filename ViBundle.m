@@ -4,7 +4,6 @@
 #import "ViBundleSnippet.h"
 #import "ViTabTriggerMenuItemView.h"
 #import "ViTextView.h"
-#import "NSTextStorage-additions.h"
 #import "logging.h"
 
 @implementation ViBundle

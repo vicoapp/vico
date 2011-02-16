@@ -2,8 +2,7 @@
 #import "ViWindowController.h"
 #import "ViSymbol.h"
 #import "ViSnippet.h"
-
-@class NoodleLineNumberView;
+#import "ViTextStorage.h"
 
 @interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
@@ -16,7 +15,7 @@
 	/* Set when opening a new file from the ex command line. */
 	BOOL isTemporary;
 
-	NSTextStorage *textStorage;
+	ViTextStorage *textStorage;
 	NSDictionary *typingAttributes;
 	ViWindowController *windowController;
 	NSString *readContent;

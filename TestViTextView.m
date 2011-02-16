@@ -22,6 +22,7 @@
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
 	parser = [[ViCommand alloc] init];
+	[[vi layoutManager] replaceTextStorage:[[ViTextStorage alloc] init]];
 	[vi initEditorWithDelegate:nil viParser:parser];
 }
 
@@ -226,6 +227,7 @@
 - (void)test242_InsertMultipliedText3		{ TEST(@"", 0, @"ix\x1b""4.", @"xxxxx", 3); }
 - (void)test243_RepeatInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b.", @"xbbbbbbbbbb", 10); }
 - (void)test244_RepeatTwiceInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b..", @"xbbbbbbbbbbbbbbb", 15); }
+//- (void)test245_OpenWithMultipliedText		{ TEST(@"abc\n", 1, @"3Odef\x1b", @"def\ndef\ndef\nabc\n", 10); }
 
 @end
 

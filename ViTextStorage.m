@@ -1,8 +1,72 @@
-#import "NSTextStorage-additions.h"
+#import "ViTextStorage.h"
+#include "logging.h"
 
-@implementation NSTextStorage (additions)
+@implementation ViTextStorage
 
 static NSMutableCharacterSet *wordSet = nil;
+
+#pragma mark -
+#pragma mark Primitive methods
+
+/*
+ * http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/TextStorageLayer/Tasks/Subclassing.html
+ */
+
+- (id)init
+{
+	self = [super init];
+	if (self) {
+		string = [[NSMutableString alloc] init];
+		typingAttributes = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:20]
+		                                               forKey:NSFontAttributeName];
+	}
+	return self;
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViTextStorage %p>", self];
+}
+
+- (NSString *)string
+{
+	return string;
+}
+
+- (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)str
+{
+	[string replaceCharactersInRange:aRange withString:str];
+
+	NSInteger lengthChange = [str length] - aRange.length;
+	[self edited:NSTextStorageEditedCharacters range:aRange changeInLength:lengthChange];
+}
+
+- (void)insertString:(NSString *)aString atIndex:(NSUInteger)anIndex
+{
+	[string insertString:aString atIndex:anIndex];
+	[self edited:NSTextStorageEditedCharacters range:NSMakeRange(anIndex, 0) changeInLength:[aString length]];
+}
+
+- (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
+{
+	if (aRangePtr)
+		*aRangePtr = NSMakeRange(0, [string length]);
+	return typingAttributes;
+}
+
+- (void)setAttributes:(NSDictionary *)attributes range:(NSRange)range
+{
+	/* We always use the typing attributes. */
+}
+
+- (void)setTypingAttributes:(NSDictionary *)attributes
+{
+	typingAttributes = [attributes copy];
+	[self edited:NSTextStorageEditedAttributes range:NSMakeRange(0, [self length]) changeInLength:0];
+}
+
+#pragma mark -
+#pragma mark Line number handling
 
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber
 {
@@ -48,6 +112,16 @@ static NSMutableCharacterSet *wordSet = nil;
 {
 	return [self lineNumberAtLocation:NSUIntegerMax];
 }
+
+- (void)processEditing
+{
+	/* Update our line number data structure. */
+
+	[super processEditing];
+}
+
+#pragma mark -
+#pragma mark Convenience methods
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet
                              from:(NSUInteger)startLocation

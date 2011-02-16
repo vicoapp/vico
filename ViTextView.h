@@ -8,6 +8,7 @@
 #import "ViSnippet.h"
 #import "ExEnvironment.h"
 #import "ViCommon.h"
+#import "ViTextStorage.h"
 
 @class ViDocumentView;
 @class ViWindowController;
@@ -80,6 +81,7 @@
 
 - (id <ViTextViewDelegate>)delegate;
 - (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViCommand *)aParser;
+- (ViTextStorage *)textStorage;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;

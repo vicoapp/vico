@@ -7,7 +7,6 @@
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViDocumentView.h"
 #import "ViJumpList.h"
-#import "NSTextStorage-additions.h"
 
 int logIndent = 0;
 
@@ -67,6 +66,11 @@ int logIndent = 0;
 	antialias = [[NSUserDefaults standardUserDefaults] boolForKey:@"antialias"];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+}
+
+- (ViTextStorage *)textStorage
+{
+	return (ViTextStorage *)[super textStorage];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -185,8 +189,7 @@ int logIndent = 0;
 	if (undoGroup)
 		[self beginUndoGroup];
 
-	NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:aString attributes:[self typingAttributes]];
-	[[self textStorage] insertAttributedString:attrString atIndex:aLocation];
+	[[self textStorage] insertString:aString atIndex:aLocation];
 	[self recordInsertInRange:range];
 
 	ViSnippet *activeSnippet = [[self delegate] activeSnippet];
@@ -770,7 +773,7 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location
 {
-	NSInteger length = [[[self textStorage] string] length];
+	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)
 		length--;
 	if (location > length)

@@ -2,7 +2,7 @@
 #import "ViDocument.h"
 #import "ViMark.h"
 #import "ViJumpList.h"
-#import "NSTextStorage-additions.h"
+#import "ViTextStorage.h"
 #import "NSString-scopeSelector.h"
 
 @implementation ViTextView (vi_commands)
@@ -233,7 +233,7 @@
                 if (inSpecialScope)
                 	endOffset = NSMaxRange(specialScopeRange);
                 else
-                        endOffset = [[[self textStorage] string] length];
+                        endOffset = [[self textStorage] length];
         }
 	else
 	{
@@ -340,7 +340,7 @@
 	[self getLineStart:NULL end:&cur contentsEnd:NULL];
 
 	NSUInteger bol = cur, end, eol = 0;
-	for (; eol < [[[self textStorage] string] length];)
+	for (; eol < [[self textStorage] length];)
 	{
 		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
 		if ((bol == end || [[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0)
@@ -940,7 +940,7 @@
 		final_location = end_location = location;
 	} else if (key == 'G') {
 		/* default to last line */
-		NSUInteger last_location = [[[self textStorage] string] length];
+		NSUInteger last_location = [[self textStorage] length];
 		if (last_location > 0)
 			--last_location;
 		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];

@@ -4,7 +4,7 @@
 #import "ViDocumentView.h"
 #import "ViLanguageStore.h"
 #import "ViCharsetDetector.h"
-#import "NSTextStorage-additions.h"
+#import "ViTextStorage.h"
 #import "NSString-additions.h"
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
@@ -18,7 +18,6 @@
 BOOL makeNewWindowInsteadOfTab = NO;
 
 @interface ViDocument (internal)
-- (void)resetTypingAttributes;
 - (void)highlightEverything;
 - (void)setWrapping:(BOOL)flag;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
@@ -64,7 +63,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							   options:NSKeyValueObservingOptionNew
 							   context:NULL];
 
-		textStorage = [[NSTextStorage alloc] initWithString:@""];
+		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
 
 		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"symbol-icons" ofType:@"plist"]];
@@ -74,6 +73,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		encoding = NSUTF8StringEncoding;
 
 		theme = [[ViThemeStore defaultStore] defaultTheme];
+		[self setTypingAttributes];
 	}
 	return self;
 }
@@ -90,7 +90,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	else if ([keyPath isEqualToString:@"tabstop"] ||
 		 [keyPath isEqualToString:@"fontsize"] ||
 		 [keyPath isEqualToString:@"fontname"])
-		[self resetTypingAttributes];
+		[self setTypingAttributes];
 }
 
 #pragma mark -
@@ -300,8 +300,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	ignoreEditing = YES;
 	[[textStorage mutableString] setString:aString ?: @""];
-	[self resetTypingAttributes];
-
 	[self configureSyntax];
 
 	/* Force incremental syntax parsing. */
@@ -750,13 +748,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	    style, NSParagraphStyleAttributeName,
 	    [self font], NSFontAttributeName,
 	    nil];
-}
 
-- (void)resetTypingAttributes
-{
-	[self setTypingAttributes];
-	ignoreEditing = YES;
-	[textStorage addAttributes:[self typingAttributes] range:NSMakeRange(0, [textStorage length])];
+	[textStorage setTypingAttributes:typingAttributes];
 }
 
 - (void)changeTheme:(ViTheme *)aTheme

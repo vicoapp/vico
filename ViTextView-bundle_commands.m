@@ -6,7 +6,6 @@
 #import "ViTextView.h"
 #import "ViCommandOutputController.h"
 #import "NSArray-patterns.h"
-#import "NSTextStorage-additions.h"
 #import "NSString-scopeSelector.h"
 #import "ViBundleCommand.h"
 #import "ViWindowController.h"

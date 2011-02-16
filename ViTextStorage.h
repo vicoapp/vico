@@ -1,4 +1,18 @@
-@interface NSTextStorage (additions)
+@interface ViTextStorage : NSTextStorage
+{
+	NSMutableString *string;
+	NSDictionary *typingAttributes;
+}
+
+- (id)init;
+
+- (void)setTypingAttributes:(NSDictionary *)attributes;
+
+- (NSString *)string;
+- (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRange;
+- (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)str;
+- (void)insertString:(NSString *)aString atIndex:(NSUInteger)anIndex;
+- (void)setAttributes:(NSDictionary *)attributes range:(NSRange)aRange;
 
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;

@@ -14,7 +14,7 @@
 #import "ViPreferencesController.h"
 #import "MHTextIconCell.h"
 #import "ViAppController.h"
-#import "NSTextStorage-additions.h"
+#import "ViTextStorage.h"
 
 static NSMutableArray		*windowControllers = nil;
 static NSWindowController	*currentWindowController = nil;
@@ -1063,12 +1063,10 @@ static NSWindowController	*currentWindowController = nil;
 	float dividerThickness = [sender dividerThickness];
 
 	NSInteger explorerWidth = 0;
-	if ([[sender subviews] objectAtIndex:0] == explorerView) {
-		if ([sender isSubviewCollapsed:explorerView])
-			explorerWidth = 0;
-		else
-			explorerWidth = [explorerView frame].size.width;
-	}
+	if ([sender isSubviewCollapsed:explorerView])
+		explorerWidth = 0;
+	else
+		explorerWidth = [explorerView frame].size.width;
 
 	NSRect symbolsFrame = [symbolsView frame];
 	NSInteger symbolsWidth = symbolsFrame.size.width;

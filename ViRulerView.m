@@ -1,5 +1,5 @@
 #import "ViRulerView.h"
-#import "NSTextStorage-additions.h"
+#import "ViTextView.h"
 #import "logging.h"
 
 #define DEFAULT_THICKNESS   22.0
@@ -79,8 +79,8 @@
 	NSSize		 stringSize;
 
 	id view = [self clientView];
-	if ([view isKindOfClass:[NSTextView class]]) {
-		lineCount = [[view textStorage] lineCount];
+	if ([view isKindOfClass:[ViTextView class]]) {
+		lineCount = [[(ViTextView *)view textStorage] lineCount];
 		digits = (unsigned)log10(lineCount) + 1;
 		sampleString = [@"" stringByPaddingToLength:digits
                                                  withString:@"8"
@@ -104,12 +104,12 @@
                                   toPoint:NSMakePoint(NSMaxX(bounds) - 0.5, NSMaxY(bounds))];
 
 	id view = [self clientView];
-	if (![view isKindOfClass:[NSTextView class]])
+	if (![view isKindOfClass:[ViTextView class]])
 		return;
 
 	NSLayoutManager         *layoutManager;
 	NSTextContainer         *container;
-	NSTextStorage		*textStorage;
+	ViTextStorage		*textStorage;
 	NSRect                  visibleRect;
 	NSRange                 range, glyphRange, nullRange;
 	NSString                *text, *labelText;
@@ -121,7 +121,7 @@
 	layoutManager = [view layoutManager];
 	container = [view textContainer];
 	text = [view string];
-	textStorage = [view textStorage];
+	textStorage = [(ViTextView *)view textStorage];
 	nullRange = NSMakeRange(NSNotFound, 0);
 	yinset = [view textContainerInset].height;        
 	visibleRect = [[[self scrollView] contentView] bounds];
@@ -138,7 +138,7 @@
 	NSUInteger lastLine = [textStorage lineNumberAtLocation:NSMaxRange(range)];
 
 	for (; line < lastLine; line++) {
-		NSUInteger location = [[view textStorage] locationForStartOfLine:line];
+		NSUInteger location = [textStorage locationForStartOfLine:line];
 
 		rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(location, 0)
                                      withinSelectedCharacterRange:nullRange

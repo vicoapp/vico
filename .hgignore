@@ -6,3 +6,4 @@ Sparkle.framework
 .*.swp
 .DS_Store
 *.orig
+onig-5.9.2

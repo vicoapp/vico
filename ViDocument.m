@@ -22,6 +22,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)setWrapping:(BOOL)flag;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (void)enableLineNumbers:(BOOL)flag;
+- (void)setTypingAttributes;
+- (NSDictionary *)typingAttributes;
 @end
 
 @implementation ViDocument

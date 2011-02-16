@@ -2,6 +2,7 @@
 
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
+- (NSUInteger)lineCount;
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag;
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag;

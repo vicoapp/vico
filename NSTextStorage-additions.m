@@ -10,7 +10,10 @@ static NSMutableCharacterSet *wordSet = nil;
 	NSInteger location = 0;
 	while (line < aLineNumber) {
 		NSUInteger end;
-		[[self string] getLineStart:NULL end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
+		[[self string] getLineStart:NULL
+                                        end:&end
+                                contentsEnd:NULL
+                                   forRange:NSMakeRange(location, 0)];
 		if (location == end)
 			return -1;
 		location = end;
@@ -24,9 +27,14 @@ static NSMutableCharacterSet *wordSet = nil;
 {
 	int line = 1;
 	NSUInteger location = 0;
+	if (aLocation > [self length])
+		aLocation = [self length];
 	while (location < aLocation) {
 		NSUInteger bol, end;
-		[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
+		[[self string] getLineStart:&bol
+		                        end:&end
+		                contentsEnd:NULL
+		                   forRange:NSMakeRange(location, 0)];
 		if (end > aLocation)
 			break;
 		location = end;
@@ -36,18 +44,34 @@ static NSMutableCharacterSet *wordSet = nil;
 	return line;
 }
 
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet from:(NSUInteger)startLocation to:(NSUInteger)toLocation backward:(BOOL)backwardFlag
+- (NSUInteger)lineCount
 {
-	NSString *s = [self string];
-	NSRange r = [s rangeOfCharacterFromSet:[characterSet invertedSet]
-				       options:backwardFlag ? NSBackwardsSearch : 0
-					 range:backwardFlag ? NSMakeRange(toLocation, startLocation - toLocation + 1) : NSMakeRange(startLocation, toLocation - startLocation)];
+	return [self lineNumberAtLocation:NSUIntegerMax];
+}
+
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet
+                             from:(NSUInteger)startLocation
+                               to:(NSUInteger)toLocation
+                         backward:(BOOL)backwardFlag
+{
+	NSRange r;
+	if (backwardFlag)
+		r = NSMakeRange(toLocation, startLocation - toLocation + 1);
+	else
+		r = NSMakeRange(startLocation, toLocation - startLocation);
+
+	r = [[self string] rangeOfCharacterFromSet:[characterSet invertedSet]
+					   options:backwardFlag ? NSBackwardsSearch : 0
+					     range:r];
+
 	if (r.location == NSNotFound)
-		return backwardFlag ? toLocation : toLocation; // FIXME: this is strange...
+		return toLocation;
 	return r.location;
 }
 
-- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet fromLocation:(NSUInteger)startLocation backward:(BOOL)backwardFlag
+- (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet
+                     fromLocation:(NSUInteger)startLocation
+                         backward:(BOOL)backwardFlag
 {
 	return [self skipCharactersInSet:characterSet
 				    from:startLocation
@@ -55,7 +79,8 @@ static NSMutableCharacterSet *wordSet = nil;
 				backward:backwardFlag];
 }
 
-- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation toLocation:(NSUInteger)toLocation
+- (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation
+                      toLocation:(NSUInteger)toLocation
 {
 	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
 				    from:startLocation
@@ -119,8 +144,7 @@ static NSMutableCharacterSet *wordSet = nil;
 	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];
 	NSUInteger c = 0, i;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	for (i = bol; i <= aLocation && i < end; i++)
-	{
+	for (i = bol; i <= aLocation && i < end; i++) {
 		unichar ch = [[self string] characterAtIndex:i];
 		if (ch == '\t')
 			c += ts - (c % ts);
@@ -130,14 +154,15 @@ static NSMutableCharacterSet *wordSet = nil;
 	return c;
 }
 
-- (NSUInteger)locationForColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation acceptEOL:(BOOL)acceptEOL
+- (NSUInteger)locationForColumn:(NSUInteger)column
+                   fromLocation:(NSUInteger)aLocation
+                      acceptEOL:(BOOL)acceptEOL
 {
 	NSUInteger bol, eol;
 	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
 	NSUInteger c = 0, i;
 	int ts = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	for (i = bol; i < eol; i++)
-	{
+	for (i = bol; i < eol; i++) {
 		unichar ch = [[self string] characterAtIndex:i];
 		if (ch == '\t')
 			c += ts - (c % ts);

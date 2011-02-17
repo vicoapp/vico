@@ -55,6 +55,7 @@
 		9A1E40D40EFBB08400682D4A /* bufaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40D20EFBB08400682D4A /* bufaux.c */; };
 		9A1E40DC0EFBB1A800682D4A /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40DB0EFBB1A800682D4A /* vis.c */; };
 		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
+		9A2DD2D9130D97A300E8657A /* ViLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DD2D8130D97A300E8657A /* ViLayoutManager.m */; };
 		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
 		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
 		9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438D361236C0AB00F7D9FD /* NSString-additions.m */; };
@@ -268,6 +269,8 @@
 		9A1E40DB0EFBB1A800682D4A /* vis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vis.c; path = sftp/vis.c; sourceTree = "<group>"; };
 		9A1E40FC0EFBBD2100682D4A /* SFTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnection.h; sourceTree = "<group>"; };
 		9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnection.m; sourceTree = "<group>"; };
+		9A2DD2D7130D97A300E8657A /* ViLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLayoutManager.h; sourceTree = "<group>"; };
+		9A2DD2D8130D97A300E8657A /* ViLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViLayoutManager.m; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
@@ -505,6 +508,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A2DD2D7130D97A300E8657A /* ViLayoutManager.h */,
+				9A2DD2D8130D97A300E8657A /* ViLayoutManager.m */,
 				9AB36F6A130B08B9000D0A05 /* ViRulerView.h */,
 				9AB36F6B130B08B9000D0A05 /* ViRulerView.m */,
 				9A82013112FEFCC400D7660B /* ViWindow.h */,
@@ -1126,6 +1131,7 @@
 				9A82017512FF0B9700D7660B /* ViWebView.m in Sources */,
 				9A8203691305C72500D7660B /* TxmtURLProtocol.m in Sources */,
 				9AB36F6C130B08B9000D0A05 /* ViRulerView.m in Sources */,
+				9A2DD2D9130D97A300E8657A /* ViLayoutManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -183,7 +183,7 @@
 												<array class="NSMutableArray" key="NSTextContainers">
 													<reference ref="881179693"/>
 												</array>
-												<int key="NSLMFlags">6</int>
+												<int key="NSLMFlags">134</int>
 												<nil key="NSDelegate"/>
 											</object>
 											<reference key="NSTextView" ref="995157227"/>
@@ -370,7 +370,7 @@
 				<string key="156.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="157.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="158.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="2.IBEditorWindowLastContentRect">{{333, 518}, {496, 329}}</string>
+				<string key="2.IBEditorWindowLastContentRect">{{403, 218}, {496, 329}}</string>
 				<string key="2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2.editorWindowContentRectSynchronizationRect">{{101, 340}, {619, 465}}</string>
 			</dictionary>

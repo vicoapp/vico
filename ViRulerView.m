@@ -59,9 +59,15 @@
 	 */
 	[self setNeedsDisplay:YES];
 
-	CGFloat thickness = [self requiredThickness];
-	if (thickness != [self ruleThickness])
-		[self setRuleThickness:thickness];
+	static CGFloat thickness;
+	thickness = [self requiredThickness];
+	if (thickness != [self ruleThickness]) {
+		SEL sel = @selector(setRuleThickness:);
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:sel]];
+		[invocation setSelector:sel];
+		[invocation setArgument:&thickness atIndex:2];
+		[invocation performSelector:@selector(invokeWithTarget:) withObject:self afterDelay:0.0];
+	}
 }
 
 - (NSDictionary *)textAttributes

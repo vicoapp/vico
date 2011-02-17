@@ -1,5 +1,3 @@
-#define NO_DEBUG
-
 #import "ViTheme.h"
 #import "NSString-scopeSelector.h"
 #import "logging.h"
@@ -14,6 +12,10 @@
 
 	scopeSelectorCache = [[NSMutableDictionary alloc] init];	
 	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
+	if (![theme isKindOfClass:[NSDictionary class]]) {
+		INFO(@"failed to parse theme %@", aPath);
+		return nil;
+	}
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *preferences = [theme objectForKey:@"settings"];
@@ -27,10 +29,8 @@
 		}
 
 		NSString *scopeSelector = [preference objectForKey:@"scope"];
-		if (scopeSelector == nil) {
-			DEBUG(@"missing scope selector in preference: %@", preference);
+		if (scopeSelector == nil)
 			continue;
-		}
 
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];	
 		[ViBundle normalizePreference:preference intoDictionary:attrs];
@@ -57,7 +57,10 @@
  *  would be that the foreground was taken from the latter item and
  *  background from the former."
  */
-- (void)matchAttributes:(NSDictionary *)matchAttributes forScopes:(NSArray *)scopes intoDictionary:(NSMutableDictionary *)attributes rankState:(NSMutableDictionary *)attributesRank
+- (void)matchAttributes:(NSDictionary *)matchAttributes
+              forScopes:(NSArray *)scopes
+         intoDictionary:(NSMutableDictionary *)attributes
+              rankState:(NSMutableDictionary *)attributesRank
 {
 	NSString *scopeSelector;
 	for (scopeSelector in matchAttributes) {
@@ -68,7 +71,7 @@
 			for (attrKey in attrs) {
 				u_int64_t prevRank = [[attributesRank objectForKey:attrKey] unsignedLongLongValue];
 				if (rank > prevRank) {
-					DEBUG(@"scope selector [%@] matches scopes %@ with rank %llu > %llu, setting %@", scopeSelector, key, rank, prevRank, attrKey);
+					DEBUG(@"scope selector [%@] matches scopes %@ with rank %llu > %llu, setting %@", scopeSelector, scopes, rank, prevRank, attrKey);
 					[attributes setObject:[attrs objectForKey:attrKey] forKey:attrKey];
 					[attributesRank setObject:[NSNumber numberWithUnsignedLongLong:rank] forKey:attrKey];
 				}
@@ -125,7 +128,7 @@
 {
 	NSString *rgb = [defaultSettings objectForKey:colorName];
 	NSColor *color;
-	if(rgb)
+	if (rgb)
 		color = [ViBundle hashRGBToColor:rgb];
 	else
 		color = defaultColor;
@@ -172,6 +175,25 @@
 		selectionColor = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
 	}
 	return selectionColor;
+}
+
+- (NSColor *)invisiblesColor
+{
+	if (invisiblesColor == nil) {
+		NSColor *defaultInvisiblesColor = [NSColor colorWithCalibratedRed:0.2
+								            green:0.2
+									     blue:0.2
+								            alpha:0.5];
+		invisiblesColor = [self colorWithName:@"invisibles" orDefault:defaultInvisiblesColor];
+		invisiblesColor = [invisiblesColor colorWithAlphaComponent:0.5];
+	}
+	return invisiblesColor;
+}
+
+- (NSDictionary *)invisiblesAttributes
+{
+	return [NSDictionary dictionaryWithObject:[self invisiblesColor]
+	                                   forKey:NSForegroundColorAttributeName];
 }
 
 - (NSString *)description

@@ -32,7 +32,8 @@
 - (void)addThemeWithPath:(NSString *)path
 {
 	ViTheme *theme = [[ViTheme alloc] initWithPath:path];
-	[themes setObject:theme forKey:[theme name]];
+	if (theme)
+		[themes setObject:theme forKey:[theme name]];
 }
 
 - (void)addThemesFromBundleDirectory:(NSString *)aPath

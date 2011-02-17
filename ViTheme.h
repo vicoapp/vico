@@ -10,6 +10,7 @@
 	NSColor *foregroundColor;
 	NSColor *caretColor;
 	NSColor *selectionColor;
+	NSColor *invisiblesColor;
 }
 
 - (id)initWithPath:(NSString *)aPath;
@@ -19,6 +20,9 @@
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;
 - (NSColor *)selectionColor;
+- (NSColor *)invisiblesColor;
 - (NSString *)description;
+
+- (NSDictionary *)invisiblesAttributes;
 
 @end

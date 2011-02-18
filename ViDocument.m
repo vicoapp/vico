@@ -136,7 +136,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[layoutManager setDelegate:self];
 	[layoutManager setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
 	[layoutManager setShowsControlCharacters:YES];
-	[layoutManager setAllowsNonContiguousLayout:YES];
 	[layoutManager setInvisiblesAttributes:[theme invisiblesAttributes]];
 
 	NSView *innerView = [documentView innerView];
@@ -144,6 +143,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
 	[layoutManager addTextContainer:container];
 	[container setWidthTracksTextView:YES];
+	[container setHeightTracksTextView:YES];
 
 	ViTextView *textView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 	[documentView replaceTextView:textView];

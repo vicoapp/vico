@@ -54,8 +54,22 @@ int logIndent = 0;
 
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
+	[self setAutomaticDashSubstitutionEnabled:NO];
+	[self setAutomaticDataDetectionEnabled:NO];
+	[self setAutomaticLinkDetectionEnabled:NO];
+	[self setAutomaticQuoteSubstitutionEnabled:NO];
+	[self setAutomaticSpellingCorrectionEnabled:NO];
+	[self setContinuousSpellCheckingEnabled:NO];
+	[self setGrammarCheckingEnabled:NO];
+	[self setDisplaysLinkToolTips:NO];
+	[self setSmartInsertDeleteEnabled:NO];
+	[self setAutomaticTextReplacementEnabled:NO];
+	[self setUsesFindPanel:NO];
+	[self setUsesFontPanel:NO];
 	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
 	[self setDrawsBackground:YES];
+
+	[[self layoutManager] setAllowsNonContiguousLayout:YES];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"antialias"

@@ -55,8 +55,6 @@ int logIndent = 0;
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
 	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
-	// [[self layoutManager] setShowsInvisibleCharacters:YES];
-	[[self layoutManager] setShowsControlCharacters:YES];
 	[self setDrawsBackground:YES];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
@@ -737,9 +735,11 @@ int logIndent = 0;
 {
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
+	NSLayoutManager *layoutManager = [self layoutManager];
         NSRect visibleRect = [clipView bounds];
-	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphIndex, 1) inTextContainer:[self textContainer]];
+	NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:[self caret]];
+	NSRect rect = [layoutManager boundingRectForGlyphRange:NSMakeRange(glyphIndex, 0)
+	                                       inTextContainer:[self textContainer]];
 
 	rect.size.width = 20;
 
@@ -764,8 +764,7 @@ int logIndent = 0;
 
 	topPoint = NSMakePoint(topX, topY);
 
-	if (topPoint.x != visibleRect.origin.x || topPoint.y != visibleRect.origin.y)
-	{
+	if (topPoint.x != visibleRect.origin.x || topPoint.y != visibleRect.origin.y) {
 		[clipView scrollToPoint:topPoint];
 		[scrollView reflectScrolledClipView:clipView];
 	}

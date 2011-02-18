@@ -14,6 +14,7 @@
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
 #import "SFTPConnectionPool.h"
+#import "ViLayoutManager.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -44,31 +45,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		symbols = [NSArray array];
 		views = [NSMutableArray array];
 
-		[[NSUserDefaults standardUserDefaults] addObserver:self
-							forKeyPath:@"number"
-							   options:NSKeyValueObservingOptionNew
-							   context:NULL];
-		[[NSUserDefaults standardUserDefaults] addObserver:self
-							forKeyPath:@"tabstop"
-							   options:NSKeyValueObservingOptionNew
-							   context:NULL];
-		[[NSUserDefaults standardUserDefaults] addObserver:self
-							forKeyPath:@"fontsize"
-							   options:NSKeyValueObservingOptionNew
-							   context:NULL];
-		[[NSUserDefaults standardUserDefaults] addObserver:self
-							forKeyPath:@"fontname"
-							   options:NSKeyValueObservingOptionNew
-							   context:NULL];
-		[[NSUserDefaults standardUserDefaults] addObserver:self
-							forKeyPath:@"wrap"
-							   options:NSKeyValueObservingOptionNew
-							   context:NULL];
+		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		[userDefaults addObserver:self forKeyPath:@"number" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"tabstop" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"fontsize" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"fontname" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"wrap" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"list" options:0 context:NULL];
 
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
 
-		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"symbol-icons" ofType:@"plist"]];
+		NSString *symbolIconsFile = [[NSBundle mainBundle] pathForResource:@"symbol-icons"
+		                                                            ofType:@"plist"];
+		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:symbolIconsFile];
 
 		[self configureForURL:nil];
 		forcedEncoding = 0;
@@ -85,14 +75,22 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			change:(NSDictionary *)change
 		       context:(void *)context
 {
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
 	if ([keyPath isEqualToString:@"number"])
-		[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
+		[self enableLineNumbers:[userDefaults boolForKey:keyPath]];
 	else if ([keyPath isEqualToString:@"wrap"])
-		[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:keyPath]];
+		[self setWrapping:[userDefaults boolForKey:keyPath]];
 	else if ([keyPath isEqualToString:@"tabstop"] ||
 		 [keyPath isEqualToString:@"fontsize"] ||
 		 [keyPath isEqualToString:@"fontname"])
 		[self setTypingAttributes];
+	else if ([keyPath isEqualToString:@"list"]) {
+		for (ViDocumentView *dv in views) {
+			[[[dv textView] layoutManager] setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
+			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+		}
+	}
 }
 
 #pragma mark -
@@ -126,15 +124,27 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
-	ViTextView *textView = [documentView textView];
-	[[textView layoutManager] setDelegate:self];
 	[views addObject:documentView];
 
-	/* Make all views share the same text storage. */
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	/*
+	 * Replace the layout manager with our subclass.
+	 */
+	ViTextView *textView = [documentView textView];
+	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
+	[textStorage addLayoutManager:layoutManager];
+	[layoutManager setDelegate:self];
+	[layoutManager setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
+	[layoutManager setShowsControlCharacters:YES];
+	[layoutManager setAllowsNonContiguousLayout:YES];
+	[layoutManager setInvisiblesAttributes:[theme invisiblesAttributes]];
+	[[textView textContainer] replaceLayoutManager:layoutManager];
+	/* XXX: Why do we need to replace the text storage again? */
 	[[textView layoutManager] replaceTextStorage:textStorage];
 	[textView initEditorWithDelegate:self viParser:[windowController parser]];
 
-	[self enableLineNumbers:[[NSUserDefaults standardUserDefaults] boolForKey:@"number"] forScrollView:[textView enclosingScrollView]];
+	[self enableLineNumbers:[userDefaults boolForKey:@"number"]
+	          forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
 
 	return documentView;
@@ -434,9 +444,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)highlightEverything
 {
 	/* Invalidate all document views. */
-	ViDocumentView *dv;
-	for (dv in views)
-		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+	NSRange r = NSMakeRange(0, [textStorage length]);
+	for (ViDocumentView *dv in views)
+		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:r];
 
 	if (language == nil) {
 		syntaxParser = nil;
@@ -466,7 +476,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	unsigned startLine = ctx.lineOffset;
 
 	// unsigned endLine = [textStorage lineNumberAtLocation:NSMaxRange(range) - 1];
-	// INFO(@"parsing line %u -> %u (ctx = %@)", startLine, endLine, ctx);
+	// INFO(@"parsing line %u -> %u, range %@", startLine, endLine, NSStringFromRange(range));
 
 	[syntaxParser parseContext:ctx];
 
@@ -486,7 +496,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	if (ctx.lineOffset > startLine) {
 		// INFO(@"line endings have changed at line %u", endLine);
-		
+
 		if (nextContext && nextContext != ctx) {
 			if (nextContext.lineOffset < startLine) {
 				DEBUG(@"letting previous scheduled parsing from line %u continue", nextContext.lineOffset);
@@ -778,9 +788,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	/* Change the theme and invalidate all layout.
 	 */
-	ViDocumentView *dv;
-	for (dv in views) {
+	for (ViDocumentView *dv in views) {
 		[[dv textView] setTheme:theme];
+		[(ViLayoutManager *)[[dv textView] layoutManager] setInvisiblesAttributes:[theme invisiblesAttributes]];
 		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 	}
 }

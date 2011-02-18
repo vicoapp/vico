@@ -143,7 +143,7 @@
 	NSUInteger line = [textStorage lineNumberAtLocation:range.location];
 	NSUInteger lastLine = [textStorage lineNumberAtLocation:NSMaxRange(range)];
 
-	for (; line < lastLine; line++) {
+	for (; line <= lastLine; line++) {
 		NSUInteger location = [textStorage locationForStartOfLine:line];
 
 		rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(location, 0)

@@ -560,6 +560,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setLanguage:(ViLanguage *)lang
 {
+	if ([textStorage lineCount] > 10000) {
+		[self message:@"Disabling syntax highlighting for large document."];
+		if (language) {
+			language = nil;
+			[self highlightEverything];
+		}
+		return;
+	}
+
 	/* Force compilation. */
 	[lang patterns];
 

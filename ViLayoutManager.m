@@ -9,10 +9,11 @@
 	if (showInvisibles) {
 		NSString *completeString = [[self textStorage] string];
 		NSUInteger lengthToRedraw = NSMaxRange(glyphRange);
-		NSUInteger ndx;
+		NSUInteger glyphIndex;
 
-		for (ndx = glyphRange.location; ndx < lengthToRedraw; ndx++) {
-			unichar ch = [completeString characterAtIndex:ndx];
+		for (glyphIndex = glyphRange.location; glyphIndex < lengthToRedraw; glyphIndex++) {
+			NSUInteger charIndex = [self characterIndexForGlyphAtIndex:glyphIndex];
+			unichar ch = [completeString characterAtIndex:charIndex];
 			NSString *visibleChar = nil;
 
 			switch (ch) {
@@ -28,8 +29,8 @@
 			}
 
 			if (visibleChar) {
-				NSPoint pointToDrawAt = [self locationForGlyphAtIndex:ndx];
-				NSRect glyphFragment = [self lineFragmentRectForGlyphAtIndex:ndx effectiveRange:NULL];
+				NSPoint pointToDrawAt = [self locationForGlyphAtIndex:glyphIndex];
+				NSRect glyphFragment = [self lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
 				pointToDrawAt.x += glyphFragment.origin.x;
 				pointToDrawAt.y = glyphFragment.origin.y;
 				[visibleChar drawAtPoint:pointToDrawAt withAttributes:invisiblesAttributes];

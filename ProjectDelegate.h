@@ -11,7 +11,7 @@
 	NSURL *url;
 	SFTPDirectoryEntry *entry;
 	double score;
-	NSArray *children;
+	NSMutableArray *children;
 	NSAttributedString *markedString;
 }
 @property(readwrite, assign) double score;
@@ -45,7 +45,7 @@
 	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
-	NSArray *rootItems;
+	NSMutableArray *rootItems;
 	ViRegexp *skipRegex;
 
 	BOOL isFiltered;

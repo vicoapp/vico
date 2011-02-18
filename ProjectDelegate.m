@@ -6,9 +6,9 @@
 #import "ExEnvironment.h"
 
 @interface ProjectDelegate (private)
-+ (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
-+ (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError;
-+ (NSArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError;
++ (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
++ (NSMutableArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError;
++ (NSMutableArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError;
 + (void)recursivelySortProjectFiles:(NSMutableArray *)children;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
@@ -16,6 +16,7 @@
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
 - (void)expandNextItem:(id)dummy;
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit;
++ (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children;
 @end
 
 @implementation ProjectFile
@@ -68,7 +69,7 @@
 	return url;
 }
 
-- (NSArray *)children
+- (NSMutableArray *)children
 {
 	if (children == nil && [self isDirectory]) {
 		NSError *error = nil;
@@ -190,7 +191,7 @@
 	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
-+ (NSArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError
++ (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError
 {
 	if ([url isFileURL])
 		return [self childrenAtFileURL:url error:outError];
@@ -201,7 +202,7 @@
 	return nil;
 }
 
-+ (NSArray *)sortProjectFiles:(NSMutableArray *)children
++ (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children
 {
 	BOOL sortFolders = [[NSUserDefaults standardUserDefaults] boolForKey:@"exploresortfolders"];
 	BOOL caseIgnoreSort = [[NSUserDefaults standardUserDefaults] boolForKey:@"explorecaseignore"];
@@ -232,7 +233,7 @@
 			[self recursivelySortProjectFiles:[file children]];
 }
 
-+ (NSArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError
++ (NSMutableArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 
@@ -251,7 +252,7 @@
 	return [self sortProjectFiles:children];
 }
 
-+ (NSArray*)childrenAtSftpURL:(NSURL*)url error:(NSError **)outError
++ (NSMutableArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError
 {
 	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 	if (conn == nil)
@@ -278,7 +279,7 @@
 - (void)browseURL:(NSURL *)aURL
 {
 	NSError *error = nil;
-	NSArray *children = nil;
+	NSMutableArray *children = nil;
 
 	children = [ProjectDelegate childrenAtURL:aURL error:&error];
 

@@ -7,6 +7,7 @@
 {
 	IBOutlet NSView *view;
 	IBOutlet NSView *innerView;
+	IBOutlet NSScrollView *scrollView;
 	ViDocument *document;
 	ViDocumentTabController *tabController;
 }
@@ -18,6 +19,7 @@
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument;
 - (ViTextView *)textView;
+- (void)replaceTextView:(ViTextView *)newTextView;
 - (NSString *)title;
 
 @end

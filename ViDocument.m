@@ -127,10 +127,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[views addObject:documentView];
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
 	/*
-	 * Replace the layout manager with our subclass.
+	 * Recreate the text system hierarchy with our text storage and layout manager.
 	 */
-	ViTextView *textView = [documentView textView];
 	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
 	[textStorage addLayoutManager:layoutManager];
 	[layoutManager setDelegate:self];
@@ -138,9 +138,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[layoutManager setShowsControlCharacters:YES];
 	[layoutManager setAllowsNonContiguousLayout:YES];
 	[layoutManager setInvisiblesAttributes:[theme invisiblesAttributes]];
-	[[textView textContainer] replaceLayoutManager:layoutManager];
-	/* XXX: Why do we need to replace the text storage again? */
-	[[textView layoutManager] replaceTextStorage:textStorage];
+
+	NSView *innerView = [documentView innerView];
+	NSRect frame = [innerView frame];
+	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
+	[layoutManager addTextContainer:container];
+
+	ViTextView *textView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
+	[documentView replaceTextView:textView];
+
 	[textView initEditorWithDelegate:self viParser:[windowController parser]];
 
 	[self enableLineNumbers:[userDefaults boolForKey:@"number"]

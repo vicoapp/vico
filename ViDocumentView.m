@@ -32,4 +32,17 @@
 	return [document title];
 }
 
+- (void)replaceTextView:(ViTextView *)textView
+{
+	[innerView removeFromSuperview];
+	[scrollView setDocumentView:textView];
+	[textView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+	[textView setMinSize:NSMakeSize(83, 0)];
+	[textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+	[textView setVerticallyResizable:YES];
+	[textView setHorizontallyResizable:YES];
+	[container setWidthTracksTextView:YES];
+	innerView = textView;
+}
+
 @end

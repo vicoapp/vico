@@ -5,7 +5,7 @@
 #import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViDocumentView.h"
-#import "NSTextStorage-additions.h"
+#import "ViTextStorage.h"
 #import "SFTPConnectionPool.h"
 #import "ViCharsetDetector.h"
 #include "logging.h"
@@ -626,7 +626,7 @@
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
 {
 	NSUInteger begin, end;
-	NSTextStorage *storage = [exTextView textStorage];
+	ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
 
 	switch (command.addr1->type) {
 	case EX_ADDR_ABS:
@@ -983,7 +983,7 @@ filter_write(CFSocketRef s,
 	if (range.location == NSNotFound)
 		[self message:@"not implemented"];
 	else {
-		NSTextStorage *storage = [exTextView textStorage];
+		ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
 		NSString *inputText = [[storage string] substringWithRange:range];
 		[self filterText:inputText
                   throughCommand:command.string
@@ -1006,7 +1006,7 @@ filter_write(CFSocketRef s,
 		return;
 	}
 
-	NSInteger location = [[exTextView textStorage] locationForStartOfLine:line];
+	NSInteger location = [(ViTextStorage *)[exTextView textStorage] locationForStartOfLine:line];
 	if (location == -1)
 		[self message:@"Movement past the end-of-file"];
 	else {

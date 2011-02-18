@@ -41,7 +41,6 @@
 	[textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 	[textView setVerticallyResizable:YES];
 	[textView setHorizontallyResizable:YES];
-	[container setWidthTracksTextView:YES];
 	innerView = textView;
 }
 

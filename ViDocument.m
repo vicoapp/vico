@@ -143,6 +143,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSRect frame = [innerView frame];
 	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
 	[layoutManager addTextContainer:container];
+	[container setWidthTracksTextView:YES];
 
 	ViTextView *textView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 	[documentView replaceTextView:textView];

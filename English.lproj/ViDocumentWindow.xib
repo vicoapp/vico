@@ -11,12 +11,12 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100557"/>
 			<integer value="100347"/>
-			<integer value="100250"/>
 			<integer value="100325"/>
-			<integer value="100398"/>
 			<integer value="100592"/>
+			<integer value="100250"/>
+			<integer value="100398"/>
+			<integer value="100557"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -38,7 +38,7 @@
 			<object class="NSWindowTemplate" id="275939982">
 				<int key="NSWindowStyleMask">4367</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{370, 251}, {800, 480}}</string>
+				<string key="NSWindowRect">{{520, 344}, {600, 650}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">ViWindow</string>
@@ -562,7 +562,7 @@
 					<array class="NSMutableArray" key="NSToolbarIBSelectableItems"/>
 				</object>
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
-				<string key="NSWindowContentMinSize">{640, 400}</string>
+				<string key="NSWindowContentMinSize">{400, 200}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -618,7 +618,7 @@
 												<object class="NSTextField" id="311339436">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">290</int>
-													<string key="NSFrame">{{148, 4}, {632, 14}}</string>
+													<string key="NSFrame">{{148, 4}, {432, 14}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSNextKeyView" ref="24397800"/>
 													<bool key="NSEnabled">YES</bool>
@@ -643,7 +643,7 @@
 												<object class="NSTextField" id="24397800">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">-2147483358</int>
-													<string key="NSFrame">{{151, 2}, {629, 19}}</string>
+													<string key="NSFrame">{{151, 2}, {429, 19}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="180256402">
@@ -707,7 +707,7 @@
 														<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 														<string>NeXT TIFF v4.0 pasteboard type</string>
 													</set>
-													<string key="NSFrameSize">{800, 23}</string>
+													<string key="NSFrameSize">{600, 23}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSNextKeyView" ref="739993370"/>
 													<bool key="NSEnabled">YES</bool>
@@ -728,7 +728,7 @@
 												<object class="NSTabView" id="144287302">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">18</int>
-													<string key="NSFrame">{{0, 23}, {800, 435}}</string>
+													<string key="NSFrame">{{0, 23}, {600, 605}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<array class="NSMutableArray" key="NSTabViewItems"/>
 													<reference key="NSFont" ref="844670655"/>
@@ -736,35 +736,35 @@
 													<bool key="NSAllowTruncatedLabels">YES</bool>
 												</object>
 											</array>
-											<string key="NSFrameSize">{800, 458}</string>
+											<string key="NSFrameSize">{600, 628}</string>
 											<reference key="NSSuperview" ref="1001936949"/>
 											<string key="NSClassName">NSView</string>
 										</object>
 										<object class="NSCustomView" id="402151357">
 											<reference key="NSNextResponder" ref="1001936949"/>
 											<int key="NSvFlags">266</int>
-											<string key="NSFrame">{{0, 458}, {800, 22}}</string>
+											<string key="NSFrame">{{0, 628}, {600, 22}}</string>
 											<reference key="NSSuperview" ref="1001936949"/>
 											<string key="NSClassName">PSMTabBarControl</string>
 										</object>
 									</array>
-									<string key="NSFrameSize">{800, 480}</string>
+									<string key="NSFrameSize">{600, 650}</string>
 									<reference key="NSSuperview" ref="892226745"/>
 									<string key="NSClassName">NSView</string>
 								</object>
 							</array>
-							<string key="NSFrameSize">{800, 480}</string>
+							<string key="NSFrameSize">{600, 650}</string>
 							<reference key="NSSuperview" ref="568628114"/>
 							<bool key="NSIsVertical">YES</bool>
 							<int key="NSDividerStyle">2</int>
 							<string key="NSAutosaveName">ProjectSplitView</string>
 						</object>
 					</array>
-					<string key="NSFrameSize">{800, 480}</string>
+					<string key="NSFrameSize">{600, 650}</string>
 					<reference key="NSSuperview"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMinSize">{640, 470}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
+				<string key="NSMinSize">{400, 270}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSFrameAutosaveName">documentWindow</string>
 			</object>
@@ -1643,10 +1643,6 @@
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
 			</object>
 			<object class="NSUserDefaultsController" id="150299444">
-				<array class="NSMutableArray" key="NSDeclaredKeys">
-					<string>explorecaseignore</string>
-					<string>exploresortfolders</string>
-				</array>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="894768772">
@@ -3483,15 +3479,15 @@
 				<string key="100658.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100659.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100664.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="5.IBEditorWindowLastContentRect">{{403, 282}, {800, 480}}</string>
+				<string key="5.IBEditorWindowLastContentRect">{{520, 174}, {600, 650}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="0" key="5.IBViewEditorWindowController.showingBoundsRectangles"/>
 				<integer value="0" key="5.IBViewEditorWindowController.showingLayoutRectangles"/>
-				<string key="5.IBWindowTemplateEditedContentRect">{{403, 282}, {800, 480}}</string>
+				<string key="5.IBWindowTemplateEditedContentRect">{{520, 174}, {600, 650}}</string>
 				<integer value="1" key="5.ImportedFromIB2"/>
 				<string key="5.editorWindowContentRectSynchronizationRect">{{155, 232}, {637, 411}}</string>
 				<boolean value="YES" key="5.windowTemplate.hasMinSize"/>
-				<string key="5.windowTemplate.minSize">{640, 400}</string>
+				<string key="5.windowTemplate.minSize">{400, 200}</string>
 				<string key="6.CustomClassName">ViBgView</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="6.ImportedFromIB2"/>

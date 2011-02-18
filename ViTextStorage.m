@@ -19,6 +19,7 @@ static NSMutableCharacterSet *wordSet = nil;
 		string = [[NSMutableString alloc] init];
 		typingAttributes = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:20]
 		                                               forKey:NSFontAttributeName];
+		TAILQ_INIT(&skiphead);
 	}
 	return self;
 }
@@ -33,18 +34,301 @@ static NSMutableCharacterSet *wordSet = nil;
 	return string;
 }
 
+static inline struct skip *
+skip_for_line(struct skiplist *head, NSUInteger lineIndex, NSUInteger *offset)
+{
+	struct skip	*skip;
+
+	*offset = 0;
+
+	TAILQ_FOREACH(skip, head, next) {
+		if (*offset + skip->nlines > lineIndex ||
+		    TAILQ_NEXT(skip, next) == NULL)
+			break;
+		*offset += skip->nlines;
+	}
+
+	return skip;
+}
+
+static void
+skip_split(struct skiplist *head, struct skip *left)
+{
+	struct line	*ln;
+	struct skip	*right;
+	NSUInteger	 half;
+
+	DEBUG(@"SPLITTING partition %p", left);
+
+	right = calloc(1, sizeof(*right));
+	TAILQ_INIT(&right->lines);
+	TAILQ_INSERT_AFTER(head, left, right, next);
+
+	half = left->nlines / 2;
+	while (half--) {
+		ln = TAILQ_LAST(&left->lines, skiplines);
+
+		TAILQ_REMOVE(&left->lines, ln, next);
+		TAILQ_INSERT_HEAD(&right->lines, ln, next);
+
+		left->length -= ln->length;
+		left->nlines--;
+
+		right->length += ln->length;
+		right->nlines++;
+	}
+}
+
+- (void)insertLine:(NSUInteger)lineIndex withLength:(NSUInteger)length contentsEnd:(NSUInteger)eol
+{
+	struct skip	*skip;
+	struct line	*ln;
+	struct line	*newln;
+	NSUInteger	 offset;
+
+	skip = skip_for_line(&skiphead, lineIndex, &offset);
+
+	if (skip == NULL) {
+		/* This is the very first skip partition. */
+		skip = calloc(1, sizeof(*skip));
+		TAILQ_INIT(&skip->lines);
+		TAILQ_INSERT_TAIL(&skiphead, skip, next);
+	}
+
+	/*
+	 * Find where the new line should be inserted.
+	 */
+	TAILQ_FOREACH(ln, &skip->lines, next)
+		if (offset++ == lineIndex)
+			break;
+
+	newln = calloc(1, sizeof(*ln));
+	newln->length = length;
+	newln->eol = eol;
+
+	if (ln == NULL)
+		TAILQ_INSERT_TAIL(&skip->lines, newln, next);
+	else
+		TAILQ_INSERT_BEFORE(ln, newln, next);
+
+	skip->length += length;
+	skip->nlines++;
+	lineCount++;
+
+	/*
+	 * If we've reached the limit of a partition, split it in
+	 * two equally sized partitions.
+	 */
+	if (skip->nlines > MAXSKIPSIZE)
+		skip_split(&skiphead, skip);
+}
+
+static void
+debug_skiplist(struct skiplist *head)
+{
+	INFO(@"%s", "current skiplist:");
+
+	int n = 0;
+	NSUInteger line = 0;
+	struct skip *skip;
+	TAILQ_FOREACH(skip, head, next) {
+		INFO(@"partition %i: nlines %lu, length %lu",
+		    n++, skip->nlines, skip->length);
+
+		struct line *ln;
+		TAILQ_FOREACH(ln, &skip->lines, next)
+			INFO(@"    line %lu: length %lu", line++, ln->length);
+	}
+}
+
+-  (void)debug
+{
+	debug_skiplist(&skiphead);
+}
+
+static void
+skip_merge_right(struct skiplist *head, struct skip *from, struct skip *to, NSUInteger num)
+{
+	DEBUG(@"merge right %lu lines from %p to %p", num, from, to);
+	struct line *ln;
+	while (num-- > 0 && (ln = TAILQ_LAST(&from->lines, skiplines)) != NULL) {
+		TAILQ_REMOVE(&from->lines, ln, next);
+		TAILQ_INSERT_HEAD(&to->lines, ln, next);
+		to->nlines++;
+		from->nlines--;
+		to->length += ln->length;
+		from->length -= ln->length;
+	}
+
+	if (from->nlines == 0)
+		TAILQ_REMOVE(head, from, next);
+}
+
+static void
+skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUInteger num)
+{
+	DEBUG(@"merge left %lu lines from %p to %p", num, from, to);
+	struct line *ln;
+	while (num-- > 0 && (ln = TAILQ_FIRST(&from->lines)) != NULL) {
+		TAILQ_REMOVE(&from->lines, ln, next);
+		TAILQ_INSERT_TAIL(&to->lines, ln, next);
+		to->nlines++;
+		from->nlines--;
+		to->length += ln->length;
+		from->length -= ln->length;
+	}
+
+	if (from->nlines == 0)
+		TAILQ_REMOVE(head, from, next);
+}
+
+- (void)removeLine:(NSUInteger)lineIndex
+{
+	struct skip	*skip;
+	struct line	*ln;
+	NSUInteger	 offset;
+
+	skip = skip_for_line(&skiphead, lineIndex, &offset);
+	DEBUG(@"skip %p has offset %lu, and %lu lines", skip, offset, skip->nlines);
+
+	/* Find the line to remove. */
+	TAILQ_FOREACH(ln, &skip->lines, next)
+		if (offset++ == lineIndex)
+			break;
+
+	if (ln == NULL) {
+		INFO(@"line %lu not found in skip partition %p!", lineIndex, skip);
+		debug_skiplist(&skiphead);
+		assert(0);
+	}
+
+	skip->length -= ln->length;
+	skip->nlines--;
+
+	TAILQ_REMOVE(&skip->lines, ln, next);
+	free(ln);
+
+	/*
+	 * If the partition now has less than the minimum lines required, try to merge
+	 * from a neighbour partition.
+	 */
+	if (skip->nlines < MINSKIPSIZE) {
+		struct skip *left_neighbour = TAILQ_PREV(skip, skiplist, next);
+		struct skip *right_neighbour = TAILQ_NEXT(skip, next);
+
+		if (right_neighbour && right_neighbour->nlines < MERGESKIPSIZE)
+			skip_merge_right(&skiphead, skip, right_neighbour, skip->nlines);
+		else if (left_neighbour && left_neighbour->nlines < MERGESKIPSIZE)
+			skip_merge_left(&skiphead, skip, left_neighbour, skip->nlines);
+		else {
+			/* Do a partial merge. Move lines from left or right. */
+			if (right_neighbour) {
+				if (left_neighbour) {
+					if (right_neighbour->nlines > left_neighbour->nlines)
+						skip_merge_left(&skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
+					else
+						skip_merge_right(&skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
+				} else
+					skip_merge_left(&skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
+			} else if (left_neighbour)
+				skip_merge_right(&skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
+		}
+	}
+
+/*
+	if (skip->nlines == 0) {
+		TAILQ_REMOVE(&skiphead, skip, next);
+		free(skip);
+	}
+*/
+
+	lineCount--;
+}
+
+- (void)replaceLine:(NSUInteger)lineIndex withLength:(NSUInteger)length contentsEnd:(NSUInteger)eol
+{
+	struct skip	*skip;
+	struct line	*ln;
+	NSUInteger	 offset;
+
+	skip = skip_for_line(&skiphead, lineIndex, &offset);
+
+	/* Find the line to replace. */
+	TAILQ_FOREACH(ln, &skip->lines, next)
+		if (offset++ == lineIndex)
+			break;
+
+	skip->length -= ln->length;
+	skip->length += length;
+	ln->length = length;
+	ln->eol = eol;
+}
+
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)str
 {
+	/*
+	 * Update our line number data structure.
+	 */
+	NSInteger diff = [str length] - aRange.length;
+	DEBUG(@"edited range = %@, diff = %li, str = [%@]", NSStringFromRange(aRange), diff, str);
+
+	NSUInteger lineIndex = [self lineIndexAtLocation:aRange.location];
+	NSUInteger location = aRange.location;
+	NSUInteger bol, eol, end;
+
+	DEBUG(@"changing line index %lu, got %lu lines", lineIndex, lineCount);
+
+	if (aRange.length > 0) /* delete or replace */
+		/* Remove affected _whole_ lines. */
+		for (;;) {
+			[string getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
+			if (end > NSMaxRange(aRange))
+				/* Line only partially affected, just update after modification. */
+				break;
+			if (lineIndex >= lineCount)
+				break;
+			DEBUG(@"remove line %lu: had length %li at location %lu, end at %lu",
+			    lineIndex, end - bol, bol, end);
+			[self removeLine:lineIndex];
+			location = end;
+		}
+
 	[string replaceCharactersInRange:aRange withString:str];
 
-	NSInteger lengthChange = [str length] - aRange.length;
-	[self edited:NSTextStorageEditedCharacters range:aRange changeInLength:lengthChange];
+	/* Update partially affected line. */
+	location = aRange.location;
+	if (lineIndex < lineCount) {
+		[string getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+		DEBUG(@"replace line %lu: has length %li at location %lu, end at %lu",
+		    lineIndex, end - bol, bol, end);
+		[self replaceLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
+		location = end;
+		lineIndex++;
+	}
+
+	/* Insert whole new lines. */
+	if ([str length] > 0) {
+		NSUInteger endLocation = NSMaxRange(aRange) + [str length];
+		DEBUG(@"location = %lu, endLocation = %lu", location, endLocation);
+		while (location < [self length]) {
+			[string getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+			if (bol > endLocation)
+				break;
+			DEBUG(@"insert line %lu: has length %li at location %lu, end at %lu",
+			    lineIndex, end - bol, bol, end);
+			[self insertLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
+			location = end;
+			lineIndex++;
+		}
+	}
+//	debug_skiplist(&skiphead);
+
+	[self edited:NSTextStorageEditedCharacters range:aRange changeInLength:diff];
 }
 
 - (void)insertString:(NSString *)aString atIndex:(NSUInteger)anIndex
 {
-	[string insertString:aString atIndex:anIndex];
-	[self edited:NSTextStorageEditedCharacters range:NSMakeRange(anIndex, 0) changeInLength:[aString length]];
+	[self replaceCharactersInRange:NSMakeRange(anIndex, 0) withString:aString];
 }
 
 - (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
@@ -68,56 +352,88 @@ static NSMutableCharacterSet *wordSet = nil;
 #pragma mark -
 #pragma mark Line number handling
 
-- (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
 {
-	int line = 1;
-	NSInteger location = 0;
-	while (line < aLineNumber) {
-		NSUInteger end;
-		[[self string] getLineStart:NULL
-                                        end:&end
-                                contentsEnd:NULL
-                                   forRange:NSMakeRange(location, 0)];
-		if (location == end)
-			return -1;
-		location = end;
-		line++;
+	if (lineNumber == 0)
+		return 0;
+
+	/* Line numbers are 1-based. Line indexes are 0-based. */
+	NSUInteger lineIndex = lineNumber - 1;
+
+	if (lineIndex >= lineCount)
+		return -1LL;
+
+	NSInteger location = 0, line = 0;
+
+	/* Find the skip partition. */
+	struct skip *skip;
+	TAILQ_FOREACH(skip, &skiphead, next) {
+		if (line + skip->nlines > lineIndex)
+			break;
+		line += skip->nlines;
+		location += skip->length;
 	}
-	
+
+	/* Find the line. */
+	struct line *ln;
+	TAILQ_FOREACH(ln, &skip->lines, next) {
+		if (line++ == lineIndex)
+			break;
+		location += ln->length;
+	}
+
 	return location;
+}
+
+- (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation
+{
+	if ([self length] == 0)
+		return 0;
+
+	if (aLocation > [self length])
+		aLocation = [self length];
+
+	/* Find the skip partition. */
+	NSUInteger line = 0;
+	NSUInteger location = 0;
+	struct skip *skip;
+	TAILQ_FOREACH(skip, &skiphead, next) {
+		if (location + skip->length >= aLocation)
+			break;
+		line += skip->nlines;
+		location += skip->length;
+		DEBUG(@"skipping %lu lines to location %lu", skip->nlines, location);
+	}
+
+	if (skip == NULL) {
+		DEBUG(@"skipped past last partition, got line %lu", line);
+		return line;
+	}
+
+	/* Find the line. */
+	struct line *ln;
+	TAILQ_FOREACH(ln, &skip->lines, next) {
+		DEBUG(@"at location %lu, got line length %lu, target is %lu", location, ln->length, aLocation);
+		if (location + ln->length > aLocation || ln->eol == ln->length)
+			break;
+		location += ln->length;
+		line++;
+		DEBUG(@"skipping to line %lu at location %lu", line, location);
+	}
+ 
+	return line;
 }
 
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation
 {
-	int line = 1;
-	NSUInteger location = 0;
-	if (aLocation > [self length])
-		aLocation = [self length];
-	while (location < aLocation) {
-		NSUInteger bol, end;
-		[[self string] getLineStart:&bol
-		                        end:&end
-		                contentsEnd:NULL
-		                   forRange:NSMakeRange(location, 0)];
-		if (end > aLocation)
-			break;
-		location = end;
-		line++;
-	}
-
-	return line;
+	if ([self length] == 0)
+		return 0;
+	return [self lineIndexAtLocation:aLocation] + 1;
 }
 
 - (NSUInteger)lineCount
 {
-	return [self lineNumberAtLocation:NSUIntegerMax];
-}
-
-- (void)processEditing
-{
-	/* Update our line number data structure. */
-
-	[super processEditing];
+	return lineCount;
 }
 
 #pragma mark -
@@ -205,7 +521,7 @@ static NSMutableCharacterSet *wordSet = nil;
 	return [self wordAtLocation:aLocation range:nil];
 }
 
-- (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation
+- (NSUInteger)columnOffsetAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger bol, end;
 	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];

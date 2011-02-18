@@ -97,7 +97,7 @@
 	}
 
 	[env setObject:NSFullUserName() forKey:@"TM_FULLNAME"];
-	[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineIndexAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
+	[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
 	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
 	NSString *scope = [[textView scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];

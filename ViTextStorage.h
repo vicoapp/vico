@@ -55,7 +55,9 @@ TAILQ_HEAD(skiplist, skip);
 - (void)insertString:(NSString *)aString atIndex:(NSUInteger)anIndex;
 - (void)setAttributes:(NSDictionary *)attributes range:(NSRange)aRange;
 
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber length:(NSUInteger *)lengthPtr contentsEnd:(NSUInteger *)eolPtr;
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
+- (NSRange)rangeOfLine:(NSUInteger)lineNumber;
 - (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
 - (NSUInteger)lineCount;

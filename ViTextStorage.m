@@ -352,7 +352,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 #pragma mark -
 #pragma mark Line number handling
 
-- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber length:(NSUInteger *)lengthPtr contentsEnd:(NSUInteger *)eolPtr
 {
 	if (lineNumber == 0)
 		return 0;
@@ -382,7 +382,24 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		location += ln->length;
 	}
 
+	if (lengthPtr)
+		*lengthPtr = ln->length;
+	if (eolPtr)
+		*eolPtr = location + ln->eol;
+
 	return location;
+}
+
+- (NSRange)rangeOfLine:(NSUInteger)lineNumber
+{
+	NSRange r;
+	r.location = [self locationForStartOfLine:lineNumber length:&r.length contentsEnd:nil];
+	return r;
+}
+
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
+{
+	return [self locationForStartOfLine:lineNumber length:nil contentsEnd:nil];
 }
 
 - (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation

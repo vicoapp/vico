@@ -64,7 +64,7 @@ int logIndent = 0;
 	[self setDisplaysLinkToolTips:NO];
 	[self setSmartInsertDeleteEnabled:NO];
 	[self setAutomaticTextReplacementEnabled:NO];
-	[self setUsesFindPanel:NO];
+	[self setUsesFindPanel:YES];
 	[self setUsesFontPanel:NO];
 	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
 	[self setDrawsBackground:YES];

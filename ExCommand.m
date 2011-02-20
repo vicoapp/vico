@@ -1017,7 +1017,6 @@ two_addr:	switch (naddr)
 	const char *p;
 	for (p = command->syntax; p && *p; p++)
 	{
-		INFO(@"parameter syntax '%c'", *p);
 		/*
 		 * The force flag is sensitive to leading whitespace, i.e.
 		 * "next !" is different from "next!".  Handle it before

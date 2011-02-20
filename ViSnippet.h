@@ -1,5 +1,4 @@
 @class ViTextView;
-
 @class ViSnippetPlaceholder;
 
 @interface ViSnippet : NSObject
@@ -19,7 +18,7 @@
 @property(readonly, copy) NSString *string;
 @property(readonly) NSRange range;
 
-- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation inTextView:(ViTextView *)textView;
+- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation environment:(NSDictionary *)environment;
 - (BOOL)activeInRange:(NSRange)aRange;
 - (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
 - (BOOL)done;
@@ -50,7 +49,7 @@
 @property (readonly) NSString *transformation;
 @property (readonly) NSString *value;
 
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s inTextView:(ViTextView *)textView;
+- (ViSnippetPlaceholder *)initWithString:(NSString *)s environment:(NSDictionary *)environment;
 - (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
 - (BOOL)activeInRange:(NSRange)aRange;
 - (NSInteger)updateValue:(NSString *)newValue;

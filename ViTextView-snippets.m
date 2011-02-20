@@ -46,7 +46,9 @@
 
 	// FIXME: replace tabs with correct shiftwidth/tabstop settings
 
-	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString atLocation:aLocation inTextView:self];
+	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	[ViBundle setupEnvironment:env forTextView:self];
+	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString atLocation:aLocation environment:env];
 	[self insertString:[snippet string] atLocation:aLocation];
 
 	// FIXME: sort tabstops, go to tabstop 1 first, then 2, 3, 4, ... and last to 0

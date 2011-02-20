@@ -57,6 +57,7 @@
 		9A1E40FE0EFBBD2100682D4A /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1E40FD0EFBBD2100682D4A /* SFTPConnection.m */; };
 		9A2DD2D9130D97A300E8657A /* ViLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DD2D8130D97A300E8657A /* ViLayoutManager.m */; };
 		9A2DD4B813110F7C00E8657A /* ViError.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DD4B713110F7C00E8657A /* ViError.m */; };
+		9A2DD50B13115E0600E8657A /* TestViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DD50913115E0000E8657A /* TestViSnippet.m */; };
 		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
 		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
 		9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438D361236C0AB00F7D9FD /* NSString-additions.m */; };
@@ -274,6 +275,8 @@
 		9A2DD2D8130D97A300E8657A /* ViLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViLayoutManager.m; sourceTree = "<group>"; };
 		9A2DD4B613110F7C00E8657A /* ViError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViError.h; sourceTree = "<group>"; };
 		9A2DD4B713110F7C00E8657A /* ViError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViError.m; sourceTree = "<group>"; };
+		9A2DD50813115E0000E8657A /* TestViSnippet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViSnippet.h; sourceTree = "<group>"; };
+		9A2DD50913115E0000E8657A /* TestViSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViSnippet.m; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
@@ -642,6 +645,8 @@
 		9A1A121B0D02CE29009EABAC /* Test Cases */ = {
 			isa = PBXGroup;
 			children = (
+				9A2DD50813115E0000E8657A /* TestViSnippet.h */,
+				9A2DD50913115E0000E8657A /* TestViSnippet.m */,
 				9AB36FB1130BC55C000D0A05 /* TestViTextStorage.h */,
 				9AB36FB2130BC55C000D0A05 /* TestViTextStorage.m */,
 				9A1A12220D02CFCF009EABAC /* TestViCommandParser.h */,
@@ -1150,6 +1155,7 @@
 				9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */,
 				9AB36FB4130BC57E000D0A05 /* TestViTextStorage.m in Sources */,
 				9AF2FE9D0EC9C9F600C5771B /* TestViTextView.m in Sources */,
+				9A2DD50B13115E0600E8657A /* TestViSnippet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

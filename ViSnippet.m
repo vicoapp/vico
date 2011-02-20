@@ -23,7 +23,9 @@
 	[[tabstops objectAtIndex:[placeHolder tabStop]] addObject:placeHolder];
 }
 
-- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation inTextView:(ViTextView *)textView
+- (ViSnippet *)initWithString:(NSString *)aString
+                   atLocation:(NSUInteger)aLocation
+                   environment:(NSDictionary *)environment
 {
 	tabstops = [[NSMutableArray alloc] init];
 
@@ -38,7 +40,8 @@
                         // FIXME: handle escapes
                         if ([s characterAtIndex:i] == '$') {
                                 ViSnippetPlaceholder *placeHolder;
-                                placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1] inTextView:textView];
+                                placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1]
+                                                                               environment:environment];
                                 if (placeHolder == nil)
 					break;
                                 unsigned len = placeHolder.length;
@@ -173,7 +176,7 @@
  * FIXME: parse \-escaped characters!
  */
 
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s inTextView:(ViTextView *)textView
+- (ViSnippetPlaceholder *)initWithString:(NSString *)s environment:(NSDictionary *)environment
 {
         self = [super init];
         if (!self)
@@ -208,15 +211,14 @@
 				[scan scanCharactersFromSet:shellVariableSet intoString:&defaultVariable];
 				DEBUG(@"got default variable %@", defaultVariable);
 				
-				NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
-				[ViBundle setupEnvironment:env forTextView:textView];
-				defaultValue = [env objectForKey:defaultVariable];
+				defaultValue = [environment objectForKey:defaultVariable];
 
 				if (bracedExpression) {
 					if ([scan scanString:@"/" intoString:nil]) {
 						// got a regular expression transformation
 						[scan scanUpToString:@"}" intoString:&transformation];
-						DEBUG(@"apply transformation %@ to default variable %@ => default value", transformation, defaultVariable);
+						DEBUG(@"apply transformation %@ to default variable %@ => default value",
+						    transformation, defaultVariable);
 					}
 					if (![scan scanString:@"}" intoString:nil]) {
 						// parse error

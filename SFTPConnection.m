@@ -1,7 +1,8 @@
 #import "SFTPConnection.h"
+#import "ViError.h"
 #import "logging.h"
 
-#include <sys/queue.h>
+#include "sys_queue.h"
 #include <sys/socket.h>
 
 #include <uuid/uuid.h>
@@ -47,25 +48,6 @@ size_t num_requests = 64;
 @synthesize host;
 @synthesize user;
 @synthesize home;
-
-+ (NSError *)errorWithObject:(id)obj
-{
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObject:obj
-							     forKey:NSLocalizedDescriptionKey];
-	return [NSError errorWithDomain:ViErrorDomain
-				   code:2
-			       userInfo:userInfo];
-}
-
-
-+ (NSError *)errorWithFormat:(NSString *)fmt, ...
-{
-	va_list ap;
-	va_start(ap, fmt);
-	NSError *err = [SFTPConnection errorWithObject:[[NSString alloc] initWithFormat:fmt arguments:ap]];
-	va_end(ap);
-	return err;
-}
 
 - (void)readStandardError:(NSNotification *)notification
 {
@@ -125,7 +107,7 @@ size_t num_requests = 64;
 		}
 		@catch (NSException *exception) {
 			if (outError)
-				*outError = [SFTPConnection errorWithObject:exception];
+				*outError = [ViError errorWithObject:exception];
 			[self close];
 			return nil;
 		}
@@ -176,7 +158,7 @@ size_t num_requests = 64;
 	/* Expecting a VERSION reply */
 	if ((type = buffer_get_char(&msg)) != SSH2_FXP_VERSION) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
+			*outError = [ViError errorWithFormat:@"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
 		buffer_free(&msg);
 		return(NULL);
 	}
@@ -243,7 +225,7 @@ size_t num_requests = 64;
 	DEBUG(@"Received stat reply T:%u I:%u", type, req_id);
 	if (req_id != expected_id) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id];
+			*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id];
 		[self close];
 		return NULL;
 	}
@@ -251,12 +233,12 @@ size_t num_requests = 64;
 	if (type == SSH2_FXP_STATUS) {
 		int status = buffer_get_int(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't stat remote file: %s", fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't stat remote file: %s", fx2txt(status)];
 		buffer_free(&msg);
 		return NULL;
 	} else if (type != SSH2_FXP_ATTRS) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u", SSH2_FXP_ATTRS, type];
+			*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u", SSH2_FXP_ATTRS, type];
 		[self close];
 		return NULL;
 	}
@@ -305,7 +287,7 @@ size_t num_requests = 64;
 		return NO;
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Permission denied"];
+			*outError = [ViError errorWithFormat:@"Permission denied"];
 		return NO;
 	}
 	if (isDirectory)
@@ -363,7 +345,7 @@ size_t num_requests = 64;
 
 		if (msgid != expected_id) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
+				*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
 			return nil;
 		}
 
@@ -376,14 +358,14 @@ size_t num_requests = 64;
 				break;
 			} else {
 				if (outError)
-					*outError = [SFTPConnection errorWithFormat:@"Couldn't read directory: %s", fx2txt(status)];
+					*outError = [ViError errorWithFormat:@"Couldn't read directory: %s", fx2txt(status)];
 				do_close(conn, handle, handle_len);
 				xfree(handle);
 				return nil;
 			}
 		} else if (type != SSH2_FXP_NAME) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_NAME(%u) packet, got %u", SSH2_FXP_NAME, type];
+				*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_NAME(%u) packet, got %u", SSH2_FXP_NAME, type];
 			return nil;
 		}
 
@@ -461,7 +443,7 @@ size_t num_requests = 64;
 
 	if (msgid != expected_id) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
+			*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
 		return NULL;
 	}
 
@@ -547,12 +529,12 @@ size_t num_requests = 64;
 		return nil;
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Permission denied"];
+			*outError = [ViError errorWithFormat:@"Permission denied"];
 		return nil;
 	}
 	if (!S_ISREG(a->perm)) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Not a regular file"];
+			*outError = [ViError errorWithFormat:@"Not a regular file"];
 		return nil;
 	}
 
@@ -579,7 +561,7 @@ size_t num_requests = 64;
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"%s", fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"%s", fx2txt(status)];
 		return nil;
 	}
 
@@ -621,7 +603,7 @@ size_t num_requests = 64;
 			;
 		if (req == NULL) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"Unexpected reply %u", req_id];
+				*outError = [ViError errorWithFormat:@"Unexpected reply %u", req_id];
 			[self close];
 			return nil;
 		}
@@ -643,7 +625,7 @@ size_t num_requests = 64;
 			    (unsigned long long)req->offset + len - 1);
 			if (len > req->len) {
 				if (outError)
-					*outError = [SFTPConnection errorWithFormat:@"Received more data than asked for %u > %u", len, req->len];
+					*outError = [ViError errorWithFormat:@"Received more data than asked for %u > %u", len, req->len];
 				[self close];
 				return nil;
 			}
@@ -685,7 +667,7 @@ size_t num_requests = 64;
 			break;
 		default:
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_DATA(%u) packet, got %u", SSH2_FXP_DATA, type];
+				*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_DATA(%u) packet, got %u", SSH2_FXP_DATA, type];
 			[self close];
 			return nil;
 		}
@@ -694,19 +676,19 @@ size_t num_requests = 64;
 	/* Sanity check */
 	if (TAILQ_FIRST(&requests) != NULL) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Transfer complete, but requests still in queue"];
+			*outError = [ViError errorWithFormat:@"Transfer complete, but requests still in queue"];
 		[self close];
 		return nil;
 	}
 
 	if (read_error) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)];
 		do_close(conn, handle, handle_len);
 	} else {
 		status = do_close(conn, handle, handle_len);
 		if (status != SSH2_FX_OK && outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)];
 	}
 
 	buffer_free(&msg);
@@ -782,7 +764,7 @@ size_t num_requests = 64;
 	if (handle == NULL) {
 		buffer_free(&msg);
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"%s", fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"%s", fx2txt(status)];
 		return NO;
 	}
 
@@ -829,7 +811,7 @@ size_t num_requests = 64;
 
 		if (ack == NULL) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"Unexpected ACK %u", req_id];
+				*outError = [ViError errorWithFormat:@"Unexpected ACK %u", req_id];
 			goto fail;
 		}
 
@@ -844,7 +826,7 @@ size_t num_requests = 64;
 
 			if (type != SSH2_FXP_STATUS) {
 				if (outError)
-					*outError = [SFTPConnection errorWithFormat:@"Expected SSH2_FXP_STATUS(%d) packet, got %d", SSH2_FXP_STATUS, type];
+					*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_STATUS(%d) packet, got %d", SSH2_FXP_STATUS, type];
 				goto fail;
 			}
 
@@ -858,7 +840,7 @@ size_t num_requests = 64;
 				;
 			if (ack == NULL) {
 				if (outError)
-					*outError = [SFTPConnection errorWithFormat:@"Can't find request for ID %u", r_id];
+					*outError = [ViError errorWithFormat:@"Can't find request for ID %u", r_id];
 				goto fail;
 			}
 			TAILQ_REMOVE(&acks, ack, tq);
@@ -870,7 +852,7 @@ size_t num_requests = 64;
 		offset += len;
 		if (offset < 0) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"offset < 0 while uploading."];
+				*outError = [ViError errorWithFormat:@"offset < 0 while uploading."];
 			goto fail;
 		}
 	}
@@ -878,7 +860,7 @@ size_t num_requests = 64;
 
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't write to remote file \"%@\": %s", path, fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't write to remote file \"%@\": %s", path, fx2txt(status)];
 		goto fail;
 	}
 
@@ -889,7 +871,7 @@ fail:
 done:
 	if (do_close(conn, handle, handle_len) != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Failed to close file."];
+			*outError = [ViError errorWithFormat:@"Failed to close file."];
 		status = -1;
 	}
 	xfree(handle);
@@ -910,7 +892,7 @@ done:
 	status = get_status(conn->fd_in, req_id);
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't delete file: %s", fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't delete file: %s", fx2txt(status)];
 		return NO;
 	}
 	return YES;
@@ -945,7 +927,7 @@ done:
 	status = get_status(conn->fd_in, req_id);
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [SFTPConnection errorWithFormat:@"Couldn't rename file \"%@\" to \"%@\": %s", oldPath, newPath, fx2txt(status)];
+			*outError = [ViError errorWithFormat:@"Couldn't rename file \"%@\" to \"%@\": %s", oldPath, newPath, fx2txt(status)];
 		return NO;
 	}
 

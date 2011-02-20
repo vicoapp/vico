@@ -39,8 +39,6 @@
 @property(readonly) NSString *user;
 @property(readonly) NSString *home;
 
-+ (NSError *)errorWithFormat:(NSString *)fmt, ...;
-
 - (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
 - (BOOL)closed;
 - (struct sftp_conn *)initConnectionError:(NSError **)outError;

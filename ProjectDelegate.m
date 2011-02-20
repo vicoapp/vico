@@ -2,8 +2,9 @@
 #import "logging.h"
 #import "MHTextIconCell.h"
 #import "SFTPConnectionPool.h"
-#import "ViWindowController.h" // for goToUrl:
+#import "ViWindowController.h"
 #import "ExEnvironment.h"
+#import "ViError.h"
 
 @interface ProjectDelegate (private)
 + (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
@@ -198,7 +199,7 @@
 	else if ([[url scheme] isEqualToString:@"sftp"])
 		return [self childrenAtSftpURL:url error:outError];
 	else if (outError)
-		*outError = [SFTPConnection errorWithFormat:@"unhandled scheme %@", [url scheme]];
+		*outError = [ViError errorWithFormat:@"unhandled scheme %@", [url scheme]];
 	return nil;
 }
 

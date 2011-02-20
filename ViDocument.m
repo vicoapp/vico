@@ -15,6 +15,7 @@
 #import "ViThemeStore.h"
 #import "SFTPConnectionPool.h"
 #import "ViLayoutManager.h"
+#import "ViError.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -244,7 +245,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	else if ([[url scheme] isEqualToString:@"sftp"]) {
 		if ([url host] == nil) {
 			if (outError)
-				*outError = [SFTPConnection errorWithFormat:@"Missing host in URL."];
+				*outError = [ViError errorWithFormat:@"Missing host in URL."];
 			return NO;
 		}
 

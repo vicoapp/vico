@@ -1060,14 +1060,6 @@ int logIndent = 0;
 				[self performBundleItems:matches selector:@selector(performBundleSnippet:)];
 				return YES;
 			}
-			
-			/*
-			if (snippetString) {
-				[self deleteRange:NSMakeRange(start_location - [word length], [word length])];
-				[[self delegate] setActiveSnippet:[self insertSnippet:snippetString atLocation:start_location - [word length]]];
-				return YES;
-			}
-			*/
                 }
         }
 

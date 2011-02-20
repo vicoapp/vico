@@ -67,7 +67,8 @@
 	}
 }
 
-+ (void)setupEnvironment:(NSMutableDictionary *)env forTextView:(ViTextView *)textView
++ (void)setupEnvironment:(NSMutableDictionary *)env
+             forTextView:(ViTextView *)textView
 {
 	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
 	[env setObject:supportPath forKey:@"TM_SUPPORT_PATH"];
@@ -243,7 +244,10 @@
 	}
 }
 
-- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
+- (NSArray*)commandsWithKey:(unichar)keycode
+                   andFlags:(unsigned int)flags
+             matchingScopes:(NSArray*)scopes
+                     inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 
@@ -258,7 +262,9 @@
 	return matches;
 }
 
-- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes inMode:(ViMode)mode
+- (NSArray*)snippetsWithTabTrigger:(NSString*)name
+                    matchingScopes:(NSArray*)scopes
+                            inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
         for (ViBundleSnippet *snippet in snippets)
@@ -270,7 +276,9 @@
         return matches;
 }
 
-- (NSMenu *)submenu:(NSDictionary *)menuLayout withName:(NSString *)name forScopes:(NSArray *)scopes
+- (NSMenu*)submenu:(NSDictionary*)menuLayout
+          withName:(NSString*)name
+         forScopes:(NSArray*)scopes
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
@@ -304,7 +312,9 @@
 
 				if ([op respondsToSelector:@selector(tabTrigger)]) {
 					/* Set a special view for drawing the tab trigger. */
-					ViTabTriggerMenuItemView *view = [[ViTabTriggerMenuItemView alloc] initWithTitle:[op name] tabTrigger:[op tabTrigger]];
+					ViTabTriggerMenuItemView *view;
+					view = [[ViTabTriggerMenuItemView alloc] initWithTitle:[op name]
+					                                            tabTrigger:[op tabTrigger]];
 					[item setView:view];
 				}
 			} else
@@ -312,9 +322,13 @@
 		} else {
 			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
 			if (submenuLayout) {
-				NSMenu *submenu = [self submenu:submenuLayout withName:[submenuLayout objectForKey:@"name"] forScopes:scopes];
+				NSMenu *submenu = [self submenu:submenuLayout
+				                       withName:[submenuLayout objectForKey:@"name"]
+				                      forScopes:scopes];
 				if (submenu) {
-					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"] action:NULL keyEquivalent:@""];
+					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"]
+					                       action:NULL
+					                keyEquivalent:@""];
 					[item setSubmenu:submenu];
 				}
 			} else

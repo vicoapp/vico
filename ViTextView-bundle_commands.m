@@ -12,13 +12,16 @@
 
 @implementation ViTextView (bundleCommands)
 
-- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
+                    atLocation:(NSUInteger)aLocation
 {
 	NSArray *scopes = [self scopesAtLocation:aLocation];
 	return [scopeSelectors bestMatchForScopes:scopes];
 }
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector
+                      forward:(BOOL)forward
+                 fromLocation:(NSUInteger)aLocation
 {
 	NSArray *lastScopes = nil, *scopes;
 	NSUInteger i = aLocation;
@@ -53,14 +56,17 @@
 
 }
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation
+- (NSRange)trackScopeSelector:(NSString *)scopeSelector
+                   atLocation:(NSUInteger)aLocation
 {
 	NSRange rb = [self trackScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
 	NSRange rf = [self trackScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
 	return NSUnionRange(rb, rf);
 }
 
-- (NSString *)inputOfType:(NSString *)type command:(ViBundleCommand *)command range:(NSRange *)rangePtr
+- (NSString *)inputOfType:(NSString *)type
+                 command:(ViBundleCommand *)command
+                   range:(NSRange *)rangePtr
 {
 	NSString *inputText = nil;
 
@@ -91,7 +97,8 @@
 	return inputText;
 }
 
-- (NSString*)inputForCommand:(ViBundleCommand *)command range:(NSRange *)rangePtr
+- (NSString *)inputForCommand:(ViBundleCommand *)command
+                       range:(NSRange *)rangePtr
 {
 	NSString *inputText = [self inputOfType:[command input] command:command range:rangePtr];
 	if (inputText == nil)
@@ -199,7 +206,9 @@
 	}
 }
 
-- (void)bundleCommandFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
+- (void)bundleCommandFinishedWithStatus:(int)status
+                         standardOutput:(NSString *)outputText
+                            contextInfo:(id)contextInfo
 {
 	INFO(@"contextInfo = %p", contextInfo);
 	NSDictionary *info = contextInfo;
@@ -290,7 +299,8 @@
 			++quickindex;
 		}
 
-		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0) inTextContainer:[self textContainer]].origin;
+		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
+		                                                inTextContainer:[self textContainer]].origin;
 		NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
 				  location:[self convertPoint:point toView:nil]
 			     modifierFlags:0

@@ -352,9 +352,10 @@
 {
 	NSURL *url;
 
-	url = [NSURL URLWithString:filename];
+	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	url = [NSURL URLWithString:escapedFilename];
 	if (url == nil || [url scheme] == nil) {
-		NSString *path = filename;
+		NSString *path = escapedFilename;
 		if ([path hasPrefix:@"~"]) {
 			if ([[self baseURL] isFileURL])
 				path = [path stringByExpandingTildeInPath];

@@ -425,17 +425,18 @@
 - (void)parseAndExecuteExCommand:(NSString *)exCommandString contextInfo:(void *)contextInfo
 {
 	if ([exCommandString length] > 0) {
-		ExCommand *ex = [[ExCommand alloc] initWithString:exCommandString];
-		//DEBUG(@"got ex [%@], command = [%@], method = [%@]", ex, ex.command, ex.method);
-		if (ex.command == NULL)
-			[self message:@"The %@ command is unknown.", ex.name];
-		else {
+		NSError *error = nil;
+		ExCommand *ex = [[ExCommand alloc] init];
+		if ([ex parse:exCommandString error:&error]) {
+			if (ex.command == nil)
+				/* do nothing */ return;
 			SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
 			if ([self respondsToSelector:selector])
 				[self performSelector:selector withObject:ex];
 			else
 				[self message:@"The %@ command is not implemented.", ex.name];
-		}
+		} else
+			[self message:[error localizedDescription]];
 	}
 }
 

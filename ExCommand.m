@@ -1,8 +1,9 @@
 #import "ExCommand.h"
+#import "ViError.h"
 #import "logging.h"
 
 @interface ExCommand (private)
-- (BOOL)parseString:(NSString *)string;
+- (BOOL)parse:(NSString *)string error:(NSError **)outError;
 @end
 
 /* From nvi:
@@ -478,12 +479,18 @@ ex_cmd_find(NSString *cmd)
 	return command ? command->method : nil;
 }
 
+- (ExCommand *)init
+{
+	self = [super init];
+	return self;
+}
+
 - (ExCommand *)initWithString:(NSString *)string
 {
 	self = [super init];
-	if (self)
-	{
-		[self parseString:string];
+	if (self) {
+		if (![self parse:string error:nil])
+			return nil;
 	}
 	return self;
 }
@@ -690,7 +697,7 @@ ex_cmd_find(NSString *cmd)
 	return naddr;
 }
 
-- (BOOL)parseString:(NSString *)string
+- (BOOL)parse:(NSString *)string error:(NSError **)outError
 {
 	NSScanner *scan = [NSScanner scannerWithString:string];
 
@@ -716,14 +723,14 @@ ex_cmd_find(NSString *cmd)
 	if ([scan scanString:@"\"" intoString:nil])
 	{
 		[scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:nil];
-		return [self parseString:[string substringFromIndex:[scan scanLocation]]];
+		return [self parse:[string substringFromIndex:[scan scanLocation]] error:outError];
 	}
 
         /* Skip whitespace. */
 	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
 	if ([scan isAtEnd])
-		return NO;
+		return YES;
 
 	// FIXME: need to return whether comma or semicolon was used
 	naddr = [ExCommand parseRange:scan intoAddress:&addr1 otherAddress:&addr2];
@@ -778,8 +785,11 @@ ex_cmd_find(NSString *cmd)
 	}
 
 	command = ex_cmd_find(name);
-	if (command == NULL)
+	if (command == NULL) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"The %@ command is unknown.", name];
 		return NO;
+	}
 
 	/*
 	 * There are three normal termination cases for an ex command.  They
@@ -839,6 +849,15 @@ ex_cmd_find(NSString *cmd)
 		if ([scan scanString:@"+" intoString:nil])
 		{
 			// FIXME: doesn't handle escaped whitespace
+			/*
+			 * QUOTING NOTE:
+			 *
+			 * The historic implementation ignored all escape characters
+			 * so there was no way to put a space or newline into the +cmd
+			 * field.  We do a simplistic job of fixing it by moving to the
+			 * first whitespace character that isn't escaped.  The escaping
+			 * characters are stripped as no longer useful.
+			 */
 			[scan scanCharactersFromSet:[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet]
 					 intoString:&plus_command];
 		}
@@ -847,10 +866,76 @@ ex_cmd_find(NSString *cmd)
 		 [command->name isEqualToString:@"global"] ||
 		 [command->name isEqualToString:@"v"])
 	{
+		/*
+		 * QUOTING NOTE:
+		 *
+		 * We use backslashes to escape <newline> characters, although
+		 * this wasn't historic practice for the bang command.  It was
+		 * for the global and v commands, and it's common usage when
+		 * doing text insert during the command.  Escaping characters
+		 * are stripped as no longer useful.
+		 */
 		arg_string = [[scan string] substringFromIndex:[scan scanLocation]];
 		goto addr_verify;
 	}
+	else if ([command->name isEqualToString:@"read"] ||
+		 [command->name isEqualToString:@"write"])
+	{
+		/*
+		 * For write commands, if the next character is a <blank>, and
+		 * the next non-blank character is a '!', it's a filter command
+		 * and we want to eat everything up to the <newline>.  For read
+		 * commands, if the next non-blank character is a '!', it's a
+		 * filter command and we want to eat everything up to the next
+		 * <newline>.  Otherwise, we're done.
+		 */
+		;
+	}
+	else if ([command->name isEqualToString:@"s"])
+	{
+		/*
+		 * Move to the next non-whitespace character, we'll use it as
+		 * the delimiter.  If the character isn't an alphanumeric or
+		 * a '|', it's the delimiter, so parse it.  Otherwise, we're
+		 * into something like ":s g", so use the special s command.
+		 */
+		[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
+		if ([scan isAtEnd])
+			return NO;
+
+		unichar delimiter = [string characterAtIndex:[scan scanLocation]];
+		[scan setScanLocation:[scan scanLocation] + 1];
+
+		if ([[NSCharacterSet alphanumericCharacterSet] characterIsMember:delimiter] || delimiter == '|') {
+			// subagain?
+		} else if (![scan isAtEnd]) {
+			/*
+			 * QUOTING NOTE:
+			 *
+			 * Backslashes quote delimiter characters for RE's.
+			 * The backslashes are NOT removed since they'll be
+			 * used by the RE code.  Move to the third delimiter
+			 * that's not escaped (or the end of the command).
+			 */
+		}
+	}
+
+	/*
+	 * Use normal quoting and termination rules to find the end of this
+	 * command.
+	 *
+	 * QUOTING NOTE:
+	 *
+	 * Historically, vi permitted ^V's to escape <newline>'s in the .exrc
+	 * file.  It was almost certainly a bug, but that's what bug-for-bug
+	 * compatibility means, Grasshopper.  Also, ^V's escape the command
+	 * delimiters.  Literal next quote characters in front of the newlines,
+	 * '|' characters or literal next characters are stripped as they're
+	 * no longer useful.
+	 */
+
+	// ...
 
 	/*
 	 * Set the default addresses.  It's an error to specify an address for
@@ -893,7 +978,7 @@ ex_cmd_find(NSString *cmd)
 		goto two_addr;
 		break;
 	case EX_ADDR2_ALL:			/* Zero/two addresses: */
-		if (naddr == 0)
+		if (naddr == 0)			/* Default entire/empty file. */
 		{
 			naddr = 2;
 			addr1.type = EX_ADDR_ABS;
@@ -901,7 +986,7 @@ ex_cmd_find(NSString *cmd)
 			addr1.addr.abs.column = 1;
 			addr1.offset = 0;
 			addr2.type = EX_ADDR_ABS;
-			addr2.addr.abs.line = -1;
+			addr2.addr.abs.line = -1;	/* last line */
 			addr2.addr.abs.column = 1;
 			addr2.offset = 0;
 		}
@@ -932,6 +1017,7 @@ two_addr:	switch (naddr)
 	const char *p;
 	for (p = command->syntax; p && *p; p++)
 	{
+		INFO(@"parameter syntax '%c'", *p);
 		/*
 		 * The force flag is sensitive to leading whitespace, i.e.
 		 * "next !" is different from "next!".  Handle it before
@@ -956,14 +1042,28 @@ two_addr:	switch (naddr)
 		switch (*p)
 		{
 		case '1':				/* +, -, #, l, p */
+			/*
+			 * !!!
+			 * Historically, some flags were ignored depending
+			 * on where they occurred in the command line.  For
+			 * example, in the command, ":3+++p--#", historic vi
+			 * acted on the '#' flag, but ignored the '-' flags.
+			 * It's unambiguous what the flags mean, so we just
+			 * handle them regardless of the stupidity of their
+			 * location.
+			 */
 			while (![scan isAtEnd])
 			{
 				unichar c = [string characterAtIndex:[scan scanLocation]];
 				switch (c)
 				{
 				case '+':
+					flagoff++;
+					break;
 				case '-':
 				case '^':
+					flagoff--;
+					break;
 				case '#':
 					flags |= E_C_HASH;
 					break;
@@ -981,19 +1081,152 @@ two_addr:	switch (naddr)
 end_case1:		break;
 		case '2':				/* -, ., +, ^ */
 		case '3':				/* -, ., +, ^, = */
-			break;
+			while (![scan isAtEnd])
+			{
+				unichar c = [string characterAtIndex:[scan scanLocation]];
+				switch (c)
+				{
+				case '-':
+					flags |= E_C_DASH;
+					break;
+				case '.':
+					flags |= E_C_DOT;
+					break;
+				case '+':
+					flags |= E_C_PLUS;
+					break;
+				case '^':
+					flags |= E_C_CARAT;
+					break;
+				case '=':
+					if (*p == '3') {
+						flags |= E_C_EQUAL;
+						break;
+					}
+					/* FALLTHROUGH */
+				default:
+					goto end_case23;
+				}
+				[scan setScanLocation:[scan scanLocation] + 1];
+			}
+end_case23:		break;
 		case 'b':				/* buffer */
+			/*
+			 * !!!
+			 * Historically, "d #" was a delete with a flag, not a
+			 * delete into the '#' buffer.  If the current command
+			 * permits a flag, don't use one as a buffer.  However,
+			 * the 'l' and 'p' flags were legal buffer names in the
+			 * historic ex, and were used as buffers, not flags.
+			 */
+			{
+				unichar c = [string characterAtIndex:[scan scanLocation]];
+				if ((c == '+' || c == '-' || c == '^' || c == '#') &&
+				    strchr(p, '1') != NULL)
+					break;
+	
+				/*
+				 * !!!
+				 * Digits can't be buffer names in ex commands, or the
+				 * command "d2" would be a delete into buffer '2', and
+				 * not a two-line deletion.
+				 */
+				if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:c]) {
+					buffer = c;
+					flags |= E_C_BUFFER;
+					[scan setScanLocation:[scan scanLocation] + 1];
+				}
+			}
 			break;
 		case 'c':				/* count [01+a] */
+#if 0
+			++p;
+			/* Validate any signed value. */
+			if (!isdigit(*ecp->cp) && (*p != '+' ||
+			    (*ecp->cp != '+' && *ecp->cp != '-')))
+				break;
+			/* If a signed value, set appropriate flags. */
+			if (*ecp->cp == '-')
+				FL_SET(ecp->iflags, E_C_COUNT_NEG);
+			else if (*ecp->cp == '+')
+				FL_SET(ecp->iflags, E_C_COUNT_POS);
+			if ((nret =
+			    nget_slong(&ltmp, ecp->cp, &t, 10)) != NUM_OK) {
+				ex_badaddr(sp, NULL, A_NOTSET, nret);
+				goto err;
+			}
+			if (ltmp == 0 && *p != '0') {
+				msgq(sp, M_ERR, "083|Count may not be zero");
+				goto err;
+			}
+			ecp->clen -= (t - ecp->cp);
+			ecp->cp = t;
+
+			/*
+			 * Counts as address offsets occur in commands taking
+			 * two addresses.  Historic vi practice was to use
+			 * the count as an offset from the *second* address.
+			 *
+			 * Set a count flag; some underlying commands (see
+			 * join) do different things with counts than with
+			 * line addresses.
+			 */
+			if (*p == 'a') {
+				ecp->addr1 = ecp->addr2;
+				ecp->addr2.lno = ecp->addr1.lno + ltmp - 1;
+			} else
+				ecp->count = ltmp;
+			FL_SET(ecp->iflags, E_C_COUNT);
+#endif
 			break;
 		case 'f':				/* file */
 			if (![scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
 						  intoString:&filename])
 				goto usage;
+			if (*++p != 'N') {
+                                /*
+                                 * If a number is specified, must either be
+                                 * 0 or that number, if optional, and that
+                                 * number, if required.
+                                 */
+				int tmp = *p - '0';
+				if (*++p != 'o' && tmp != 1)
+					goto usage;
+			}
 			break;
 		case 'l':				/* line */
 			if (![ExCommand parseRange:scan intoAddress:&line])
 				goto usage;
+#if 0
+			/*
+			 * Get a line specification.
+			 *
+			 * If the line was a search expression, we may have
+			 * changed state during the call, and we're now
+			 * searching the file.  Push ourselves onto the state
+			 * stack.
+			 */
+			if (ex_line(sp, ecp, &cur, &isaddr, &tmp))
+				goto rfail;
+			if (tmp)
+				goto err;
+
+			/* Line specifications are always required. */
+			if (!isaddr) {
+				msgq_str(sp, M_ERR, ecp->cp,
+				     "084|%s: bad line specification");
+				goto err;
+			}
+			/*
+			 * The target line should exist for these commands,
+			 * but 0 is legal for them as well.
+			 */
+			if (cur.lno != 0 && !db_exist(sp, cur.lno)) {
+				ex_badaddr(sp, NULL, A_EOF, NUM_OK);
+				goto err;
+			}
+			ecp->lineno = cur.lno;
+#endif
 			break;
 		case 'S':				/* string, file exp. */
 			break;
@@ -1004,16 +1237,15 @@ end_case1:		break;
 			break;
 		case 'w':				/* word */
 			words = [[[scan string] substringFromIndex:[scan scanLocation]] componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-			if (*++p != 'N')
-			{
-                                /* From nvi
+			if (*++p != 'N') {
+                                /*
                                  * If a number is specified, must either be
                                  * 0 or that number, if optional, and that
                                  * number, if required.
                                  */
 				int tmp = *p - '0';
-                               if ((*++p != 'o' || [words count] != 0) && [words count] != tmp)
-                                        goto usage;
+				if ((*++p != 'o' || [words count] != 0) && [words count] != tmp)
+					goto usage;
 			}
 			goto addr_verify;
 		default:
@@ -1031,10 +1263,20 @@ end_case1:		break;
 	 */
 	if (![scan isAtEnd] || strpbrk(p, "lr"))
 	{
-usage:		INFO(@"Usage: %@", command->usage);
+usage:		if (outError)
+			*outError = [ViError errorWithFormat:@"Usage: %@", command->usage];
 		return NO;
 	}
 
+	/*
+	 * Verify that the addresses are legal.  Check the addresses here,
+	 * because this is a place where all ex addresses pass through.
+	 * (They don't all pass through ex_line(), for instance.)  We're
+	 * assuming that any non-existent line doesn't exist because it's
+	 * past the end-of-file.  That's a pretty good guess.
+	 *
+	 * If it's a "default vi command", an address of zero is okay.
+	 */
 addr_verify:
 
 	return YES;

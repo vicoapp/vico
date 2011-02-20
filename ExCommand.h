@@ -82,9 +82,15 @@ struct ex_address
 	NSString *replacement;
 	NSString *plus_command;
 	NSArray *words;
+
+	NSInteger flagoff;
+	unichar buffer;
+	NSInteger count;
 }
 
+- (ExCommand *)init;
 - (ExCommand *)initWithString:(NSString *)string;
+- (BOOL)parse:(NSString *)string error:(NSError **)outError;
 + (BOOL)parseRange:(NSScanner *)scan
        intoAddress:(struct ex_address *)addr;
 + (int)parseRange:(NSScanner *)scan

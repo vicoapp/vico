@@ -13,10 +13,10 @@
 
 - (void)test011_NonexistentSimpleCommand
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"foo bar baz"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"foo", nil);
-	STAssertTrue(ex.command == NULL, nil);
+	ExCommand *ex = [[ExCommand alloc] init];
+	NSError *error = nil;
+	STAssertFalse([ex parse:@"foo bar baz" error:&error], nil);
+	STAssertNotNil(error, nil);
 }
 
 - (void)test20_AbsoluteAddress

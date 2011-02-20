@@ -27,18 +27,27 @@
                    atLocation:(NSUInteger)aLocation
                    environment:(NSDictionary *)environment
 {
+        self = [super init];
+        if (!self)
+		return nil;
+
 	tabstops = [[NSMutableArray alloc] init];
 
 	DEBUG(@"snippet string = %@ at location %llu", aString, aLocation);
 
-        NSMutableString *s = [aString mutableCopy];
+	NSMutableString *s = [aString mutableCopy];
+	unichar ch;
 	BOOL foundMarker;
 	NSUInteger i;
 	do {
                 foundMarker = NO;
                 for (i = 0; i < [s length]; i++) {
-                        // FIXME: handle escapes
-                        if ([s characterAtIndex:i] == '$') {
+                        if ([s characterAtIndex:i] == '\\') {
+				/* Delete the backslash escape if it follows by a reserved character. */
+				if (i + 1 < [s length] &&
+				    ((ch = [s characterAtIndex:i + 1]) == '$' || ch == '`'))
+					[s deleteCharactersInRange:NSMakeRange(i++, 1)];
+			} else if ([s characterAtIndex:i] == '$') {
                                 ViSnippetPlaceholder *placeHolder;
                                 placeHolder = [[ViSnippetPlaceholder alloc] initWithString:[s substringFromIndex:i + 1]
                                                                                environment:environment];

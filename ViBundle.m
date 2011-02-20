@@ -27,7 +27,8 @@
 	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
 }
 
-+ (void)normalizePreference:(NSDictionary *)preference intoDictionary:(NSMutableDictionary *)normalizedPreference
++ (void)normalizePreference:(NSDictionary *)preference
+             intoDictionary:(NSMutableDictionary *)normalizedPreference
 {
 	NSDictionary *settings = [preference objectForKey:@"settings"];
 	if (settings == nil) {

@@ -26,6 +26,7 @@
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options;
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options syntax:(int)syntax;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax;
+- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax error:(NSError **)outError;
 - (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange;
 - (ViRegexpMatch *)matchInString:(NSString *)aString;
 - (ViRegexpMatch *)matchInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation;

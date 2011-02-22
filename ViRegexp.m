@@ -1,4 +1,5 @@
 #import "ViRegexp.h"
+#import "ViError.h"
 #import "logging.h"
 
 @implementation ViRegexp
@@ -20,6 +21,11 @@
 
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax
 {
+	return [self initWithString:aString options:options syntax:syntax error:nil];
+}
+
+- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax error:(NSError **)outError
+{
 	self = [super init];
 
 	size_t len = [aString length] * sizeof(unichar);
@@ -36,11 +42,12 @@
 	int r = onig_new(&regex, (const UChar *)pattern, (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP, enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
 	if (r != ONIG_NORMAL) {
-#ifndef NO_DEBUG
-		unsigned char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-		onig_error_code_to_str(s, r, &einfo);
-		DEBUG(@"pattern failed: %s", s);
-#endif
+		if (outError) {
+			unsigned char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+			onig_error_code_to_str(s, r, &einfo);
+			DEBUG(@"pattern failed: %s", s);
+			*outError = [ViError errorWithFormat:@"%s", s];
+		}
 		return nil;
 	}
 
@@ -180,10 +187,11 @@
 
 - (NSRange)rangeOfSubstringAtIndex:(NSUInteger)idx
 {
-	if ((idx >= region->num_regs) || (region->beg[idx] == -1))
+	if (idx >= region->num_regs || region->beg[idx] == -1)
 		return NSMakeRange(NSNotFound, 0);
 
-	return NSMakeRange(startLocation + (region->beg[idx] / sizeof(unichar)), (region->end[idx] - region->beg[idx]) / sizeof(unichar));
+	return NSMakeRange(startLocation + (region->beg[idx] / sizeof(unichar)),
+	                   (region->end[idx] - region->beg[idx]) / sizeof(unichar));
 }
 
 - (NSUInteger)count

@@ -287,8 +287,8 @@
 
 - (void)test031_tabstopOrdering
 {
-	[self makeSnippet:@"2:$2 0:$0 1:$1 3:$3"];
-	STAssertEqualObjects([snippet string], @"2: 0: 1: 3:", nil);
+	[self makeSnippet:@"2:$2 0:$0 1:$1 3:$3 2.2:$2 2.3:$2"];
+	STAssertEqualObjects([snippet string], @"2: 0: 1: 3: 2.2: 2.3:", nil);
 	STAssertEquals(snippet.caret, 8ULL, nil);
 	STAssertTrue([snippet advance], nil);
 	STAssertEquals(snippet.caret, 2ULL, nil);
@@ -323,17 +323,17 @@
 /* Tabstops can be nested. */
 - (void)test037_nestedTabstops
 {
-	[self makeSnippet:@"foo: ${1:nested ${2:tabstop}}"];
-	STAssertEqualObjects([snippet string], @"foo: nested tabstop", nil);
-	STAssertEquals(snippet.caret, 5ULL, nil);
-	STAssertEquals(snippet.selectedRange.location, 5ULL, nil);
+	[self makeSnippet:@"x: ${1:nested ${2:tabstop}}"];
+	STAssertEqualObjects([snippet string], @"x: nested tabstop", nil);
+	STAssertEquals(snippet.caret, 3ULL, nil);
+	STAssertEquals(snippet.selectedRange.location, 3ULL, nil);
 	STAssertEquals(snippet.selectedRange.length, 14ULL, nil);
 	STAssertTrue([snippet advance], nil);
-	STAssertEquals(snippet.caret, 12ULL, nil);
-	STAssertEquals(snippet.selectedRange.location, 12ULL, nil);
+	STAssertEquals(snippet.caret, 10ULL, nil);
+	STAssertEquals(snippet.selectedRange.location, 10ULL, nil);
 	STAssertEquals(snippet.selectedRange.length, 7ULL, nil);
 	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"placeholder"], nil);
-	STAssertEqualObjects([snippet string], @"foo: nested placeholder", nil);
+	STAssertEqualObjects([snippet string], @"x: nested placeholder", nil);
 }
 
 /* Nested tabstops can have mirrors outside of the containing tabstop. */
@@ -341,6 +341,40 @@
 {
 	[self makeSnippet:@"foo: ${1:nested ${2:tabstop}}, ${2/^.*$/mirror: $0/}"];
 	STAssertEqualObjects([snippet string], @"foo: nested tabstop, mirror: tabstop", nil);
+}
+
+- (void)test039_updateNestedBaseLocation
+{
+	[self makeSnippet:@"for(size_t ${2:i} = 0; $2 < ${1:count}; ${3:++$2})"];
+	STAssertEqualObjects([snippet string], @"for(size_t i = 0; i < count; ++i)", nil);
+}
+
+- (void)test040_nestedTabstopCancelledIfParentEdited
+{
+	[self makeSnippet:@"${1:hello ${2:world}}"];
+	STAssertEqualObjects([snippet string], @"hello world", nil);
+	STAssertEquals(snippet.selectedRange.location, 0ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 11ULL, nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"goodbye"], nil);
+	STAssertFalse([snippet advance], nil);
+}
+
+- (void)test041_nestedTabstopCancelledIfParentEdited_2
+{
+	[self makeSnippet:@"${2:hello ${1:world}}$0"];
+	STAssertEqualObjects([snippet string], @"hello world", nil);
+	STAssertEquals(snippet.selectedRange.location, 6ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 5ULL, nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"chunky bacon"], nil);
+	STAssertEqualObjects([snippet string], @"hello chunky bacon", nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.selectedRange.location, 0ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 18ULL, nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"goodbye"], nil);
+	STAssertEqualObjects([snippet string], @"goodbye", nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.caret, 7ULL, nil);
+	STAssertFalse([snippet advance], nil);
 }
 
 @end

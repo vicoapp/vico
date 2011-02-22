@@ -313,8 +313,8 @@
 /* A mirror can be transformed by a regular expression. */
 - (void)test033_mirrorWithTransformation
 {
-	[self makeSnippet:@"tabstop:${1:bacon}\nmirror:${1/con/by/}"];
-	STAssertEqualObjects([snippet string], @"tabstop:bacon\nmirror:baby", nil);
+	[self makeSnippet:@"tabstop:${1:bacon}\nmirror:${1/[auoåeiyäö]/$0$0/g}"];
+	STAssertEqualObjects([snippet string], @"tabstop:bacon\nmirror:baacoon", nil);
 	STAssertEquals(snippet.caret, 8ULL, nil);
 }
 

@@ -3,7 +3,7 @@
 {
 	NSUInteger beginLocation;
 	ViTabstop *currentTabStop;
-	NSUInteger currentTabIndex;
+	NSInteger currentTabIndex;
 	NSMutableString *string;
 	NSRange range;
 	NSUInteger caret;

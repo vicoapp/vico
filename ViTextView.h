@@ -96,6 +96,7 @@
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
+- (void)resetSelection;
 - (void)setNormalMode;
 - (void)setVisualMode;
 - (void)setInsertMode:(ViCommand *)command;
@@ -134,9 +135,8 @@
 @interface ViTextView (snippets)
 - (void)cancelSnippet:(ViSnippet *)snippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
-- (void)handleSnippetTab:(id)snippetState atLocation:(NSUInteger)aLocation;
-- (BOOL)updateSnippet:(ViSnippet *)snippet replaceRange:(NSRange)replaceRange withString:(NSString *)string;
 - (void)performBundleSnippet:(id)sender;
+- (void)deselectSnippet;
 @end
 
 @interface ViTextView (cursor)

@@ -1,57 +1,30 @@
-@class ViTextView;
-@class ViSnippetPlaceholder;
-
+@class ViTabstop;
 @interface ViSnippet : NSObject
 {
-	int currentTab;
-	NSString *string;
+	NSUInteger beginLocation;
+	ViTabstop *currentTabStop;
+	NSUInteger currentTabIndex;
+	NSMutableString *string;
 	NSRange range;
+	NSUInteger caret;
+	NSRange selectedRange;
 	NSMutableArray *tabstops;
-	ViSnippetPlaceholder *currentPlaceholder;
-	ViSnippetPlaceholder *lastPlaceholder;
+	NSDictionary *environment;
 }
 
-@property(readwrite) int currentTab;
-@property(readwrite, assign) ViSnippetPlaceholder *currentPlaceholder;
-@property(readwrite, assign) ViSnippetPlaceholder *lastPlaceholder;
-@property(readonly) NSArray *tabstops;
-@property(readonly, copy) NSString *string;
+@property(readonly) NSString *string;
 @property(readonly) NSRange range;
+@property(readonly) NSUInteger caret;
+@property(readonly) NSRange selectedRange;
 
-- (ViSnippet *)initWithString:(NSString *)aString atLocation:(NSUInteger)aLocation environment:(NSDictionary *)environment;
+- (ViSnippet *)initWithString:(NSString *)aString
+                   atLocation:(NSUInteger)aLocation
+                  environment:(NSDictionary *)environment
+                        error:(NSError **)outError;
 - (BOOL)activeInRange:(NSRange)aRange;
-- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
-- (BOOL)done;
-
-@end
-
-
-@interface ViSnippetPlaceholder : NSObject
-{
-	NSString *string;
-	NSString *value;
-	unsigned length;
-	int tabStop;
-	BOOL selected;
-	NSRange range;
-	NSString *variable;
-	NSString *defaultValue;
-	NSString *defaultVariable;
-	NSString *transformation; // regexp string
-}
-
-@property (readonly) unsigned length;
-@property (readonly) int tabStop;
-@property (readwrite) BOOL selected;
-@property(readwrite) NSRange range;
-@property (readonly) NSString *variable;
-@property (readonly) NSString *defaultValue;
-@property (readonly) NSString *transformation;
-@property (readonly) NSString *value;
-
-- (ViSnippetPlaceholder *)initWithString:(NSString *)s environment:(NSDictionary *)environment;
-- (void)updateLength:(NSInteger)aLength fromLocation:(NSUInteger)aLocation;
-- (BOOL)activeInRange:(NSRange)aRange;
-- (NSInteger)updateValue:(NSString *)newValue;
+- (BOOL)replaceRange:(NSRange)updateRange withString:(NSString *)replacementString;
+- (BOOL)advance;
+- (void)deselect;
+- (NSRange)tabRange;
 
 @end

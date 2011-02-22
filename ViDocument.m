@@ -410,38 +410,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 * mark the snippet placeholders.
 	 */
 	NSMutableDictionary *mergedAttributes = nil;
-	if (NSIntersectionRange(r, activeSnippet.range).length > 0) {
-		NSArray *a;
-		BOOL foundPlaceholder = NO;
-		for (a in [activeSnippet tabstops]) {
-			ViSnippetPlaceholder *ph;
-			for (ph in a) {
-				if (NSIntersectionRange(r, ph.range).length > 0) {
-					if (ph.range.location > r.location)
-						r.length = ph.range.location - r.location;
-					else {
-						if (mergedAttributes == nil)
-							mergedAttributes = [[NSMutableDictionary alloc] initWithDictionary:attributes];
-						[mergedAttributes setObject:[NSNumber numberWithInteger:NSUnderlinePatternDot | NSUnderlineStyleThick]
-								     forKey:NSUnderlineStyleAttributeName];
-						[mergedAttributes setObject:[NSColor redColor]
-								     forKey:NSUnderlineColorAttributeName];
-						/*
-						 * Adjust *effectiveCharRange if r != ph.range.
-						 */
-						if (NSMaxRange(ph.range) < NSMaxRange(r))
-							r.length = NSMaxRange(ph.range) - r.location;
-					}
-					DEBUG(@"merged %@ with %@ -> %@", ph, NSStringFromRange(*effectiveCharRange), NSStringFromRange(r));
-					*effectiveCharRange = r;
-					foundPlaceholder = YES;
-					break;
-				}
-			}
+	NSRange sel = activeSnippet.selectedRange;
 
-			if (foundPlaceholder)
-				break;
+	if (NSIntersectionRange(r, sel).length > 0) {
+		DEBUG(@"selected snippet range %@", NSStringFromRange(sel));
+		if (sel.location > r.location)
+			r.length = sel.location - r.location;
+		else {
+			if (mergedAttributes == nil)
+				mergedAttributes = [[NSMutableDictionary alloc] initWithDictionary:attributes];
+			[mergedAttributes setObject:[theme selectionColor]
+					     forKey:NSBackgroundColorAttributeName];
+			/*
+			 * Adjust *effectiveCharRange if r != sel
+			 */
+			if (NSMaxRange(sel) < NSMaxRange(r))
+				r.length = NSMaxRange(sel) - r.location;
 		}
+		DEBUG(@"merged %@ with %@ -> %@", NSStringFromRange(sel), NSStringFromRange(*effectiveCharRange), NSStringFromRange(r));
+		*effectiveCharRange = r;
 
 		DEBUG(@"merged attributes = %@", mergedAttributes);
 	}
@@ -661,6 +648,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark NSTextStorage delegate methods
 
+// XXX: I don't think this is always called...
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
 	if (!ignoreEditing)
@@ -678,6 +666,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 ignoreEditing = NO;
 		return;
 	}
+
+	DEBUG(@"area = %@, diff = %li", NSStringFromRange(area), diff);
+
+	NSRange r;
+	NSString *replacementString = @"";
+	if (diff > 0) {
+		r = NSMakeRange(area.location, diff);
+		replacementString = [[textStorage string] substringWithRange:r];
+		r = NSMakeRange(area.location, area.length - diff);
+	} else
+		r = NSMakeRange(area.location, -diff);
+
+	if (![activeSnippet replaceRange:r withString:replacementString])
+		[self setActiveSnippet:nil];
 
 	if (language == nil)
 		return;

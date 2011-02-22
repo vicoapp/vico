@@ -1414,6 +1414,7 @@ int logIndent = 0;
 	}
 
 	if (charcode == 0x1B) {
+		[parser reset];
 		[self normal_mode:parser];
 		[self endUndoGroup];
 		return;

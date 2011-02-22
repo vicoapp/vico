@@ -107,7 +107,7 @@
 	NSMutableArray *matches = nil;
 
 	NSRange range = aRange;
-	while (range.location < NSMaxRange(aRange))
+	while (range.location <= NSMaxRange(aRange))
 	{
 		ViRegexpMatch *match = [self matchInCharacters:chars options:options range:range start:aLocation];
 		if (match == nil)

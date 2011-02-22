@@ -34,13 +34,6 @@
 
 @implementation ViTabstop
 @synthesize num, baseLocation, parent, mirror, range, value, rx, format, options;
-- (ViTabstop *)init
-{
-	if ((self = [super init]) != NULL) {
-		;
-	}
-	return self;
-}
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViTabstop %i@%@+%lu: [%@], parent: %@, mirror of: %@>",
@@ -49,8 +42,8 @@
 @end
 
 @interface ViSnippet (private)
-- (void)updateTabstops:(NSArray *)tsArray fromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta;
-- (void)updateTabstops:(NSArray *)tsArray;
+- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta;
+- (void)updateTabstops;
 @end
 
 @implementation ViSnippet
@@ -391,8 +384,7 @@
 
 	[self sortTabstops:tabstops];
 	DEBUG(@"tabstops = %@", tabstops);
-
-	[self updateTabstops:tabstops];
+	[self updateTabstops];
 
 	if ([tabstops count] == 0)
 		caret = NSMaxRange(range);
@@ -454,11 +446,11 @@
 	return NSMakeRange(beginLocation + r.location, r.length);
 }
 
-- (void)updateTabstops:(NSArray *)tsArray fromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta
+- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta
 {
 	DEBUG(@"update tabstops from location %lu with change %li", location, delta);
 
-	for (ViTabstop *ts in tsArray) {
+	for (ViTabstop *ts in tabstops) {
 		if (1 || ts.parent == nil) {
 			NSRange r = ts.range;	// FIXME: XXX: don't copy structs!
 			NSUInteger bs = ts.baseLocation;
@@ -503,16 +495,15 @@
 			ts.range = NSMakeRange(r.location, [value length]);
 		} else {
 			NSInteger delta = [value length] - r.length;
-			[self updateTabstops:tabstops fromLocation:r.location withChangeInLength:delta];
+			[self updateTabstopsFromLocation:r.location withChangeInLength:delta];
 		}
 	}
 }
 
-- (void)updateTabstops:(NSArray *)tsArray
+- (void)updateTabstops
 {
-	for (ViTabstop *ts in tsArray) {
+	for (ViTabstop *ts in tabstops)
 		[self updateTabstop:ts];
-	}
 }
 
 - (void)removeNestedIn:(ViTabstop *)parent
@@ -565,7 +556,7 @@
 	if (currentTabStop.value == nil)
 		currentTabStop.value = [NSMutableString string];
 	[currentTabStop.value replaceCharactersInRange:normalizedRange withString:replacementString];
-	[self updateTabstops:tabstops];
+	[self updateTabstops];
 
 	return YES;
 }

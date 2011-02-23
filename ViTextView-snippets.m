@@ -16,7 +16,7 @@
 - (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation
 {
 	// prepend leading whitespace to all newlines in the snippet string
-	NSString *leadingWhiteSpace = [self leadingWhitespaceForLineAtLocation:aLocation];
+	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
 	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
 	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
 

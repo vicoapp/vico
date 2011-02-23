@@ -593,7 +593,26 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
 {
 	NSString *line = [self lineForLocation:aLocation];
-	return [line rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]].location == NSNotFound;
+	NSCharacterSet *cset = [[NSCharacterSet whitespaceCharacterSet] invertedSet];
+	return [line rangeOfCharacterFromSet:cset].location == NSNotFound;
+}
+
+- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger bol, eol;
+	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
+	NSRange lineRange = NSMakeRange(bol, eol - bol);
+
+	NSCharacterSet *cset = [[NSCharacterSet whitespaceCharacterSet] invertedSet];
+	NSRange r = [[self string] rangeOfCharacterFromSet:cset options:0 range:lineRange];
+
+	if (r.location == NSNotFound)
+                r.location = eol;
+	else if (r.location == bol)
+		return @"";
+
+        r = NSMakeRange(lineRange.location, r.location - lineRange.location);
+        return [[self string] substringWithRange:r];
 }
 
 @end

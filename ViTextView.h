@@ -90,7 +90,6 @@
 - (NSString *)indentStringForLevel:(int)level;
 - (int)lengthOfIndentString:(NSString *)indent;
 - (int)lenghtOfIndentAtLine:(NSUInteger)lineLocation;
-- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;

@@ -282,24 +282,6 @@ int logIndent = 0;
 	return [self indentStringOfLength:shiftWidth * level];
 }
 
-- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
-{
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-	NSRange lineRange = NSMakeRange(bol, eol - bol);
-
-	NSRange r = [[[self textStorage] string] rangeOfCharacterFromSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]
-						      options:0
-							range:lineRange];
-
-	if (r.location == NSNotFound)
-                r.location = eol;
-	else if (r.location == bol)
-		return @"";
-	
-        return [[[self textStorage] string] substringWithRange:NSMakeRange(lineRange.location, r.location - lineRange.location)];
-}
-
 - (int)lengthOfIndentString:(NSString *)indent
 {
 	int tabStop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
@@ -319,7 +301,7 @@ int logIndent = 0;
 
 - (int)lenghtOfIndentAtLine:(NSUInteger)lineLocation
 {
-	return [self lengthOfIndentString:[self leadingWhitespaceForLineAtLocation:lineLocation]];
+	return [self lengthOfIndentString:[[self textStorage] leadingWhitespaceForLineAtLocation:lineLocation]];
 }
 
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
@@ -375,7 +357,7 @@ int logIndent = 0;
 
 - (int)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
-        NSString *leading_whitespace = [self leadingWhitespaceForLineAtLocation:aLocation];
+        NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
 
 	[self insertString:@"\n" atLocation:aLocation];
 
@@ -419,7 +401,7 @@ int logIndent = 0;
 	BOOL has_delta_offset = NO;
 
 	while (bol < NSMaxRange(aRange)) {
-		NSString *indent = [self leadingWhitespaceForLineAtLocation:bol];
+		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
 		int n = [self lengthOfIndentString:indent];
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
 	

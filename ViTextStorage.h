@@ -76,5 +76,6 @@ TAILQ_HEAD(skiplist, skip);
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
+- (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 
 @end

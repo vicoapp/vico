@@ -453,7 +453,9 @@
 	for (ViTabstop *ts in tabstops) {
 		if (1 || ts.parent == nil) {
 			NSRange r = ts.range;	// FIXME: XXX: don't copy structs!
+#ifndef NO_DEBUG
 			NSUInteger bs = ts.baseLocation;
+#endif
 			if (ts.baseLocation > location)
 				ts.baseLocation += delta;
 			if (r.location > location)

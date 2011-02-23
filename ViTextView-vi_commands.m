@@ -568,7 +568,7 @@
 
         NSString *leading_whitespace = nil;
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
-                leading_whitespace = [self leadingWhitespaceForLineAtLocation:affectedRange.location];
+                leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:affectedRange.location];
 
 	[self cutToBuffer:0 append:NO range:affectedRange];
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];

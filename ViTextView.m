@@ -164,7 +164,10 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Convenience methods
 
-- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation
+- (void)getLineStart:(NSUInteger *)bol_ptr
+                 end:(NSUInteger *)end_ptr
+         contentsEnd:(NSUInteger *)eol_ptr
+         forLocation:(NSUInteger)aLocation
 {
 	if ([[self textStorage] length] == 0) {
 		if (bol_ptr != NULL)
@@ -174,19 +177,29 @@ int logIndent = 0;
 		if (eol_ptr != NULL)
 			*eol_ptr = 0;
 	} else
-		[[[self textStorage] string] getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forRange:NSMakeRange(aLocation, 0)];
+		[[[self textStorage] string] getLineStart:bol_ptr
+		                                      end:end_ptr
+		                              contentsEnd:eol_ptr
+		                                 forRange:NSMakeRange(aLocation, 0)];
 }
 
-- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr
+- (void)getLineStart:(NSUInteger *)bol_ptr
+                 end:(NSUInteger *)end_ptr
+         contentsEnd:(NSUInteger *)eol_ptr
 {
-	[self getLineStart:bol_ptr end:end_ptr contentsEnd:eol_ptr forLocation:start_location];
+	[self getLineStart:bol_ptr
+	               end:end_ptr
+	       contentsEnd:eol_ptr
+	       forLocation:start_location];
 }
 
 
 /* Like insertText:, but works within beginEditing/endEditing.
  * Also begins an undo group.
  */
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup
+- (void)insertString:(NSString *)aString
+          atLocation:(NSUInteger)aLocation
+           undoGroup:(BOOL)undoGroup
 {
 	if ([aString length] == 0)
 		return;

@@ -5,6 +5,7 @@
 {
 	NSDictionary *env;
 	NSError *err;
+	id<ViSnippetDelegate> delegate;
 	ViSnippet *snippet;
 }
 

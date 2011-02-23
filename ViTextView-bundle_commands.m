@@ -264,9 +264,7 @@
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];
-			[[self delegate] setActiveSnippet:[self insertSnippet:outputText atLocation:inputRange.location]];
-			[self setInsertMode:nil];
-			[self setCaret:final_location];
+			[self insertSnippet:outputText atLocation:inputRange.location];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
 			ViDocument *doc = [[[self delegate] environment] splitVertically:NO andOpen:nil orSwitchToDocument:nil];
 			[doc setString:outputText];

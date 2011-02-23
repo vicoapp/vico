@@ -34,10 +34,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize filteredSymbols;
 @synthesize views;
 @synthesize bundle;
-@synthesize activeSnippet;
 @synthesize encoding;
 @synthesize jumpList;
 @synthesize isTemporary;
+@synthesize snippet;
 
 - (id)init
 {
@@ -410,7 +410,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 * mark the snippet placeholders.
 	 */
 	NSMutableDictionary *mergedAttributes = nil;
-	NSRange sel = activeSnippet.selectedRange;
+	NSRange sel = snippet.selectedRange;
 
 	if (NSIntersectionRange(r, sel).length > 0) {
 		DEBUG(@"selected snippet range %@", NSStringFromRange(sel));
@@ -666,20 +666,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 ignoreEditing = NO;
 		return;
 	}
-
-	DEBUG(@"area = %@, diff = %li", NSStringFromRange(area), diff);
-
-	NSRange r;
-	NSString *replacementString = @"";
-	if (diff > 0) {
-		r = NSMakeRange(area.location, diff);
-		replacementString = [[textStorage string] substringWithRange:r];
-		r = NSMakeRange(area.location, area.length - diff);
-	} else
-		r = NSMakeRange(area.location, -diff);
-
-	if (![activeSnippet replaceRange:r withString:replacementString])
-		[self setActiveSnippet:nil];
 
 	if (language == nil)
 		return;

@@ -48,7 +48,6 @@
 
 @implementation ViSnippet
 
-@synthesize string;
 @synthesize range;
 @synthesize selectedRange;
 @synthesize caret;
@@ -354,6 +353,7 @@
 
 - (ViSnippet *)initWithString:(NSString *)aString
                    atLocation:(NSUInteger)aLocation
+                     delegate:(id<ViSnippetDelegate>)aDelegate
                   environment:(NSDictionary *)env
                         error:(NSError **)outError
 {
@@ -364,10 +364,16 @@
 	environment = env;
 	tabstops = [[NSMutableArray alloc] init];
 
-	DEBUG(@"snippet string = %@ at location %llu", aString, aLocation);
+	DEBUG(@"snippet string = %@ at location %lu", aString, aLocation);
 
 	NSUInteger len;
-	string = [self parseString:aString stopAtBrace:NO parentTabstop:nil allowTabstops:YES baseLocation:0 scannedLength:&len error:outError];
+	NSMutableString *string = [self parseString:aString
+	                                stopAtBrace:NO
+	                              parentTabstop:nil
+	                              allowTabstops:YES
+	                               baseLocation:0
+	                              scannedLength:&len
+	                                      error:outError];
 	if (!string)
 		return nil;
 	DEBUG(@"scanned %lu chars", len);
@@ -380,11 +386,15 @@
 	beginLocation = aLocation;
 	range = NSMakeRange(beginLocation, [string length]);
 
-	DEBUG(@"string = [%@]", string);
-
 	[self sortTabstops:tabstops];
 	DEBUG(@"tabstops = %@", tabstops);
+
+	DEBUG(@"string = [%@]", string);
+	delegate = aDelegate;
+	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string];
+
 	[self updateTabstops];
+	DEBUG(@"updated string = [%@]", string);
 
 	if ([tabstops count] == 0)
 		caret = NSMaxRange(range);
@@ -422,7 +432,7 @@
 	}
 
 	if (candidate == nil) {
-		DEBUG(@"no candidate found");
+		DEBUG(@"%s", "no candidate found");
 		currentTabStop = NULL;
 		return NO;
 	}
@@ -484,18 +494,21 @@
 
 	if (value) {
 		NSRange r = ts.range;
-		NSMutableString *s = string;
-		if (ts.parent)
-			s = ts.parent.value;
-		r.location -= ts.baseLocation;
-		DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]", ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
-		[s replaceCharactersInRange:r withString:value];
-		r.location += ts.baseLocation;
-		DEBUG(@"string -> [%@]", s);
 		if (ts.parent) {
+			NSMutableString *s = ts.parent.value;
+			r.location -= ts.baseLocation;
+			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]", ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
+			[s replaceCharactersInRange:r withString:value];
+			DEBUG(@"string -> [%@]", s);
+			r.location += ts.baseLocation;
 			[self updateTabstop:ts.parent];
 			ts.range = NSMakeRange(r.location, [value length]);
 		} else {
+			r.location += beginLocation;
+			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]", ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
+			[delegate snippet:self replaceCharactersInRange:r withString:value];
+			DEBUG(@"string -> [%@]", [delegate string]);
+			r.location -= beginLocation;
 			NSInteger delta = [value length] - r.length;
 			[self updateTabstopsFromLocation:r.location withChangeInLength:delta];
 		}
@@ -533,10 +546,11 @@
 {
 	[self deselect];
 
-	if (currentTabStop == nil) {
-		DEBUG(@"%s", "current tab stop is nil");
+	if (![self activeInRange:updateRange])
 		return NO;
-	}
+
+	/* Remove any nested tabstops. */
+	[self removeNestedIn:currentTabStop];
 
 	NSRange normalizedRange = updateRange;
 	normalizedRange.location -= beginLocation;
@@ -544,16 +558,6 @@
 	DEBUG(@"replace range %@ with [%@]", NSStringFromRange(normalizedRange), replacementString);
 
 	NSRange r = currentTabStop.range;
-	if (normalizedRange.location < r.location ||
-	    normalizedRange.location > NSMaxRange(r) ||
-	    NSMaxRange(normalizedRange) > NSMaxRange(r)) {
-		DEBUG(@"update range %@ outside current tabstop %@", NSStringFromRange(normalizedRange), NSStringFromRange(r));
-		return NO;
-	}
-
-	/* Remove any nested tabstops. */
-	[self removeNestedIn:currentTabStop];
-
 	normalizedRange.location -= r.location;
 	if (currentTabStop.value == nil)
 		currentTabStop.value = [NSMutableString string];
@@ -565,14 +569,34 @@
 
 - (BOOL)activeInRange:(NSRange)aRange
 {
-	if (NSIntersectionRange(aRange, range).length > 0 || aRange.location == NSMaxRange(range))
-		return YES;
-	return NO;
+	if (currentTabStop == nil) {
+		DEBUG(@"%s", "current tab stop is nil");
+		return NO;
+	}
+
+	NSRange normalizedRange = aRange;
+	normalizedRange.location -= beginLocation;
+
+	NSRange r = currentTabStop.range;
+	if (normalizedRange.location < r.location ||
+	    normalizedRange.location > NSMaxRange(r) ||
+	    NSMaxRange(normalizedRange) > NSMaxRange(r)) {
+		DEBUG(@"update range %@ outside current tabstop %@",
+		    NSStringFromRange(normalizedRange), NSStringFromRange(r));
+		return NO;
+	}
+
+	return YES;
 }
 
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViSnippet at %@>", NSStringFromRange(range)];
+}
+
+- (NSString *)string
+{
+	return [delegate string];
 }
 
 @end

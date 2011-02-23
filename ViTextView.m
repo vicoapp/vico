@@ -193,6 +193,40 @@ int logIndent = 0;
 	       forLocation:start_location];
 }
 
+- (void)setString:(NSString *)aString
+{
+	[[self textStorage] replaceCharactersInRange:NSMakeRange(0, [[self textStorage] length])
+	                                  withString:aString];
+}
+
+- (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup
+{
+	modify_start_location = aRange.location;
+
+	ViSnippet *snippet = [self delegate].snippet;
+	if (snippet) {
+		/* Let the snippet drive the changes. */
+		if ([snippet replaceRange:aRange withString:aString])
+			return;
+		[self cancelSnippet:snippet];
+	}
+
+	if ([self delegate] != nil && [[self delegate] textView:self
+					shouldChangeTextInRange:aRange
+					      replacementString:aString] == NO)
+		return;
+
+	if (undoGroup)
+		[self beginUndoGroup];
+
+	[self recordReplacementOfRange:aRange withLength:[aString length]];
+	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
+}
+
+- (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
+{
+	[self replaceCharactersInRange:aRange withString:aString undoGroup:YES];
+}
 
 /* Like insertText:, but works within beginEditing/endEditing.
  * Also begins an undo group.
@@ -201,21 +235,7 @@ int logIndent = 0;
           atLocation:(NSUInteger)aLocation
            undoGroup:(BOOL)undoGroup
 {
-	if ([aString length] == 0)
-		return;
-
-	NSRange range = NSMakeRange(aLocation, [aString length]);
-
-	if ([self delegate] != nil && [[self delegate] textView:self
-					shouldChangeTextInRange:NSMakeRange(aLocation, 0)
-					      replacementString:aString] == NO)
-		return;
-
-	if (undoGroup)
-		[self beginUndoGroup];
-
-	[[self textStorage] insertString:aString atIndex:aLocation];
-	[self recordInsertInRange:range];
+	[self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:aString undoGroup:undoGroup];
 }
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
@@ -225,18 +245,7 @@ int logIndent = 0;
 
 - (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
 {
-	if (aRange.length == 0)
-		return;
-
-	if ([self delegate] != nil && [[self delegate] textView:self
-					shouldChangeTextInRange:aRange
-					      replacementString:@""] == NO)
-		return;
-
-	if (undoGroup)
-		[self beginUndoGroup];
-	[self recordDeleteOfRange:aRange];
-	[[self textStorage] deleteCharactersInRange:aRange];
+	[self replaceCharactersInRange:aRange withString:@"" undoGroup:undoGroup];
 }
 
 - (void)deleteRange:(NSRange)aRange
@@ -246,20 +255,31 @@ int logIndent = 0;
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup
 {
-	if (undoGroup)
-		[self beginUndoGroup];
-#if 0
-	[self recordReplacementOfRange:aRange withLength:[aString length]];
-	[[[self textStorage] mutableString] replaceCharactersInRange:aRange withString:aString];
-#else
-	[self deleteRange:aRange undoGroup:NO];
-	[self insertString:aString atLocation:aRange.location undoGroup:NO];
-#endif
+	[self replaceCharactersInRange:aRange withString:aString undoGroup:undoGroup];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
 {
 	[self replaceRange:aRange withString:aString undoGroup:YES];
+}
+
+- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
+{
+	DEBUG(@"replace range %@ with [%@]", NSStringFromRange(aRange), aString);
+	if ([self delegate] != nil && [[self delegate] textView:self
+					shouldChangeTextInRange:aRange
+					      replacementString:aString] == NO)
+		return;
+
+	[self beginUndoGroup];
+	[self recordReplacementOfRange:aRange withLength:[aString length]];
+	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
+
+	if (modify_start_location > NSMaxRange(NSMakeRange(aRange.location, [aString length]))) {
+		NSInteger delta = [aString length] - aRange.length;
+		DEBUG(@"modify_start_location %lu -> %lu", modify_start_location, modify_start_location + delta);
+		modify_start_location += delta;
+	}
 }
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
@@ -505,6 +525,13 @@ int logIndent = 0;
 	final_location = caretLocation;
 }
 
+- (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange caret:(NSUInteger)caretLocation
+{
+	DEBUG(@"undoing replacement of string %@ in range %@", aString, NSStringFromRange(aRange));
+	[self replaceCharactersInRange:aRange withString:aString undoGroup:NO];
+	final_location = caretLocation;
+}
+
 - (void)recordInsertInRange:(NSRange)aRange
 {
 	DEBUG(@"pushing insert of text in range %@ onto undo stack", NSStringFromRange(aRange));
@@ -527,11 +554,11 @@ int logIndent = 0;
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
-	DEBUG(@"recording replacement in range %@ with length %u in an undo group", NSStringFromRange(aRange), aLength);
-	[undoManager beginUndoGrouping];
-	[self recordDeleteOfRange:aRange];
-	[self recordInsertInRange:NSMakeRange(aRange.location, aLength)];
-	[undoManager endUndoGrouping];
+	NSRange newRange = NSMakeRange(aRange.location, aLength);
+	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
+	DEBUG(@"pushing replacement of range %@ (string [%@]) with %@ onto undo stack", NSStringFromRange(aRange), s, NSStringFromRange(newRange));
+	[[undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange caret:undo_start_location];
+	[undoManager setActionName:@"replace text"];
 }
 
 #pragma mark -
@@ -806,9 +833,10 @@ int logIndent = 0;
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
+	// XXX: is this still needed? What does it do?
 	if (stillSelectingFlag == NO) {
-		ViSnippet *activeSnippet = [[self delegate] activeSnippet];
-		if (mode != ViVisualMode && firstRange.length > 0 && activeSnippet == nil) {
+		ViSnippet *snippet = [self delegate].snippet;
+		if (mode != ViVisualMode && firstRange.length > 0 && snippet == nil) {
 			[self setVisualMode];
 			[self setCaret:firstRange.location];
 			visual_start_location = firstRange.location;
@@ -918,11 +946,11 @@ int logIndent = 0;
 	DEBUG(@"insert characters [%@] at %i", characters, start_location);
 
 	// If there is a selected snippet range, remove it first.
-	ViSnippet *snippet = [[self delegate] activeSnippet];
+	ViSnippet *snippet = [self delegate].snippet;
 	NSRange sel = snippet.selectedRange;
 	if (sel.length > 0) {
 		[self deleteRange:sel];
-		start_location = sel.location;
+		start_location = modify_start_location;
 	}
 
 	BOOL foundSmartTypingPair = NO;
@@ -976,7 +1004,7 @@ int logIndent = 0;
 	if (!foundSmartTypingPair) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
-		final_location = start_location + 1;
+		final_location = modify_start_location + 1;
 	}
 
 #if 0
@@ -1024,15 +1052,15 @@ int logIndent = 0;
 - (BOOL)input_tab:(ViCommand *)command
 {
         // check if we're inside a snippet
-	ViSnippet *snippet = [[self delegate] activeSnippet];
-        if ([snippet activeInRange:NSMakeRange(start_location, 1)]) {
+	ViSnippet *snippet = [self delegate].snippet;
+	if (snippet) {
 		if ([snippet advance]) {
 			final_location = snippet.caret;
 			[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
 			return YES;
-		}
-	} else
-		[self cancelSnippet:snippet];
+		} else
+			[self cancelSnippet:snippet];
+	}
 
         // check for a new snippet
         if (start_location > 0) {
@@ -1087,14 +1115,14 @@ int logIndent = 0;
 		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
 		{
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
-			final_location = start_location - 1;
+			final_location = modify_start_location;
 			return YES;
 		}
 	}
 
 	/* else a regular character, just delete it */
 	[self deleteRange:NSMakeRange(start_location - 1, 1)];
-	final_location = start_location - 1;
+	final_location = modify_start_location;
 
 	return YES;
 }

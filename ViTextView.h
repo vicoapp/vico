@@ -21,8 +21,6 @@
 // - (void)popTag;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (ViSnippet *)activeSnippet;
-- (void)setActiveSnippet:(ViSnippet *)aSnippet;
 - (NSFont *)font;
 - (NSDictionary *)typingAttributes;
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
@@ -30,9 +28,10 @@
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;
 - (ViBundle *)bundle;
+@property(readwrite, assign) ViSnippet *snippet;
 @end
 
-@interface ViTextView : NSTextView
+@interface ViTextView : NSTextView <ViSnippetDelegate>
 {
 	// vi command parser
 	ViMode			 mode;
@@ -44,6 +43,7 @@
 
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
+	NSUInteger		 modify_start_location;
 
 	NSUInteger		 undo_start_location;
 	BOOL			 has_undo_start_location;

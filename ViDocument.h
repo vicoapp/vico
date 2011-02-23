@@ -1,7 +1,6 @@
 #import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViSymbol.h"
-#import "ViSnippet.h"
 #import "ViTextStorage.h"
 
 @interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
@@ -36,15 +35,15 @@
 	NSDictionary *symbolIcons;
 	NSTimer *updateSymbolsTimer;
 
-	ViSnippet *activeSnippet;
 	ViJumpList *jumpList;
+	ViSnippet *snippet;
 }
 
+@property(readwrite, assign) ViSnippet *snippet;
 @property(readonly) NSArray *views;
 @property(readonly) ViBundle *bundle;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
-@property(readwrite, assign) ViSnippet *activeSnippet;
 @property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;

@@ -1,6 +1,29 @@
 #import "TestViSnippet.h"
 #include "logging.h"
 
+@interface MockDelegate : NSObject <ViSnippetDelegate>
+{
+	NSMutableString *storage;
+}
+@end
+
+@implementation MockDelegate
+- (id)init
+{
+	if ((self = [super init]) != nil)
+		storage = [NSMutableString string];
+	return self;
+}
+- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string
+{
+	[storage replaceCharactersInRange:range withString:string];
+}
+- (NSString *)string
+{
+	return storage;
+}
+@end
+
 @implementation TestViSnippet
 
 - (void)setUp
@@ -12,6 +35,7 @@
 	    @"TestViSnippet.m", @"TM_FILENAME",
 	    nil
 	];
+	delegate = [[MockDelegate alloc] init];
 }
 
 - (void)makeSnippet:(NSString *)snippetString
@@ -19,6 +43,7 @@
 	err = nil;
 	snippet = [[ViSnippet alloc] initWithString:snippetString
 	                                 atLocation:0
+	                                   delegate:delegate
 	                                environment:env
 	                                      error:&err];
 	if (err)
@@ -31,9 +56,6 @@
 {
 	[self makeSnippet:@"a long string"];
 	STAssertEqualObjects([snippet string], @"a long string", nil);
-	STAssertTrue([snippet activeInRange:NSMakeRange(0, 1)], nil);
-	STAssertTrue([snippet activeInRange:NSMakeRange(12, 1)], nil);
-	STAssertTrue([snippet activeInRange:NSMakeRange(13, 0)], nil);	// appending
 	STAssertEquals([snippet caret], 13ULL, nil);
 }
 
@@ -72,6 +94,7 @@
 {
 	snippet = [[ViSnippet alloc] initWithString:@"foo(${THIS_VARIABLE_IS_UNDEFINED:default value)"
 	                                 atLocation:0
+	                                   delegate:delegate
 	                                environment:env
 	                                      error:&err];
 	STAssertNil(snippet, nil);
@@ -120,6 +143,7 @@
 {
 	snippet = [[ViSnippet alloc] initWithString:@"{'user': '${USER/mar/tin}'}"
 	                                 atLocation:0
+	                                   delegate:delegate
 	                                environment:env
 	                                      error:&err];
 	STAssertNil(snippet, nil);
@@ -149,6 +173,7 @@
 {
 	snippet = [[ViSnippet alloc] initWithString:@"${USER/[x/bar/}"
 	                                 atLocation:0
+	                                   delegate:delegate
 	                                environment:env
 	                                      error:&err];
 	STAssertNil(snippet, nil);
@@ -303,6 +328,7 @@
 {
 	snippet = [[ViSnippet alloc] initWithString:@"hello ${USER:$1}"
 	                                 atLocation:0
+	                                   delegate:delegate
 	                                environment:env
 	                                      error:&err];
 	STAssertNil(snippet, nil);

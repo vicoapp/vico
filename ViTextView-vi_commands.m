@@ -407,10 +407,10 @@
 		bol = IMAX(0, [[self textStorage] length] - 1);
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
-	if (affectedRange.location >= eol)
+	if (modify_start_location >= eol)
 		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
 	else
-		final_location = affectedRange.location;
+		final_location = modify_start_location;
 
 	return YES;
 }
@@ -549,7 +549,7 @@
 	}
 
 	if ([self delete:command]) {
-		end_location = start_location = affectedRange.location;
+		end_location = start_location = modify_start_location;
 		[self setInsertMode:command];
 		return YES;
 	} else
@@ -1329,13 +1329,14 @@
 - (BOOL)delete_forward:(ViCommand *)command
 {
 	NSString *s = [[self textStorage] string];
-	if([s length] == 0) {
+	if ([s length] == 0) {
 		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
+
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if(bol == eol) {
+	if (bol == eol) {
 		[[self delegate] message:@"No characters to delete"];
 		return NO;
 	}
@@ -1348,7 +1349,7 @@
 	[self cutToBuffer:0 append:NO range:del];
 
 	// correct caret position if we deleted the last character(s) on the line
-	end_location = start_location;
+	end_location = modify_start_location;
 	--eol;
 	if (end_location == eol && eol > bol)
 		--end_location;
@@ -1359,24 +1360,23 @@
 /* syntax: [count]X */
 - (BOOL)delete_backward:(ViCommand *)command
 {
-	if([[self textStorage] length] == 0)
-	{
+	if ([[self textStorage] length] == 0) {
 		[[self delegate] message:@"Already in the first column"];
 		return NO;
 	}
+
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if(start_location == bol)
-	{
+	if (start_location == bol) {
 		[[self delegate] message:@"Already in the first column"];
 		return NO;
 	}
+
 	NSRange del;
 	del.location = IMAX(bol, start_location - IMAX(1, command.count));
 	del.length = start_location - del.location;
 	[self cutToBuffer:0 append:NO range:del];
-	end_location = del.location;
-	final_location = end_location;
+	final_location = end_location = modify_start_location;
 
 	return YES;
 }

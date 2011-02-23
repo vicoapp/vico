@@ -8,7 +8,7 @@
 - (void)cancelSnippet:(ViSnippet *)snippet
 {
 	DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
-	[[self delegate] setActiveSnippet:nil];
+	[self delegate].snippet = nil;
 	[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
 	[self endUndoGroup];
 }
@@ -24,9 +24,13 @@
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
 	[ViBundle setupEnvironment:env forTextView:self];
+
+	[self beginUndoGroup];
+
 	NSError *error = nil;
 	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString
 	                                            atLocation:aLocation
+	                                              delegate:self
 	                                           environment:env
 	                                                 error:&error];
 	if (snippet == nil) {
@@ -34,16 +38,19 @@
 		[[self delegate] message:[error localizedDescription]];
 		return nil;
 	}
-	[self insertString:[snippet string] atLocation:aLocation];
 
-	final_location = [snippet caret];
+	[self delegate].snippet = snippet;
+	final_location = snippet.caret;
+	[self setCaret:snippet.caret];
+	[self setInsertMode:nil];
+	[self resetSelection];
 
 	return snippet;
 }
 
 - (void)deselectSnippet
 {
-	ViSnippet *snippet = [[self delegate] activeSnippet];
+	ViSnippet *snippet = [self delegate].snippet;
 	if (snippet) {
 		NSRange sel = snippet.selectedRange;
 		if (sel.location != NSNotFound) {
@@ -59,6 +66,7 @@
 	if ([sender respondsToSelector:@selector(representedObject)])
 		bundleSnippet = [sender representedObject];
 
+	[self endUndoGroup];
 	[self beginUndoGroup];
 
 	if (snippetMatchRange.location != NSNotFound) {
@@ -67,16 +75,7 @@
 		snippetMatchRange.location = NSNotFound;
 	}
 
-	ViSnippet *snippet = [self insertSnippet:[bundleSnippet content] atLocation:[self caret]];
-	if (snippet == nil)
-		return;
-
-	DEBUG(@"activate snippet %@", snippet);
-	[[self delegate] setActiveSnippet:snippet];
-	[self setCaret:snippet.caret];
-	[self setInsertMode:nil];
-	[self resetSelection];
+	[self insertSnippet:[bundleSnippet content] atLocation:[self caret]];
 }
 
 @end
-

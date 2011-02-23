@@ -1169,6 +1169,17 @@ static NSWindowController	*currentWindowController = nil;
 		closeSymbolListAfterUse = YES;
 		[self toggleSymbolList:nil];
 	}
+
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViTextView *textView = [(ViDocumentView *)viewController textView];
+		NSString *word = [[textView textStorage] wordAtLocation:[textView caret]];
+		if (word) {
+			[symbolFilterField setStringValue:word];
+			[self filterSymbols:symbolFilterField];
+		}
+	}
+
 	[[self window] makeFirstResponder:symbolFilterField];
 }
 

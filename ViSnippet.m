@@ -114,10 +114,14 @@
 		DEBUG(@"%@: exited with status %i", shellCommand, status);
 
 	NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
-	NSMutableString *outputText = [[NSMutableString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+	NSMutableString *outputText = [[NSMutableString alloc] initWithData:outputData
+	                                                           encoding:NSUTF8StringEncoding];
 
 	if ([outputText length] > 0)
-		[outputText replaceOccurrencesOfString:@"\n" withString:@"" options:0 range:NSMakeRange([outputText length] - 1, 1)];
+		[outputText replaceOccurrencesOfString:@"\n"
+		                            withString:@""
+		                               options:0
+		                                 range:NSMakeRange([outputText length] - 1, 1)];
 
 	if (fd != -1) {
 		unlink(templateFilename);
@@ -148,7 +152,10 @@
 	}];
 }
 
-- (NSString *)transformValue:(NSString *)value withPattern:(ViRegexp *)rx format:(NSString *)format options:(NSString *)options
+- (NSString *)transformValue:(NSString *)value
+                 withPattern:(ViRegexp *)rx
+                      format:(NSString *)format
+                     options:(NSString *)options
 {
 	NSMutableString *text = [value mutableCopy];
 	NSArray *matches = [rx allMatchesInString:value];
@@ -440,7 +447,8 @@
 	currentTabIndex = candidateIndex;
 	currentTabStop = candidate;
 
-	DEBUG(@"advancing to tab stop %i range %@", currentTabStop.num, NSStringFromRange(currentTabStop.range));
+	DEBUG(@"advancing to tab stop %i range %@",
+	    currentTabStop.num, NSStringFromRange(currentTabStop.range));
 
 	NSRange r = currentTabStop.range;
 	caret = beginLocation + r.location;
@@ -456,7 +464,9 @@
 	return NSMakeRange(beginLocation + r.location, r.length);
 }
 
-- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta inParent:(ViTabstop *)parent
+- (void)updateTabstopsFromLocation:(NSUInteger)location
+                withChangeInLength:(NSInteger)delta
+                          inParent:(ViTabstop *)parent
 {
 	DEBUG(@"update tabstops from location %lu with change %li in parent %@", location, delta, parent);
 
@@ -472,7 +482,8 @@
 				r.location += delta;
 			else if (NSMaxRange(r) >= location)
 				r.length += delta;
-			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu", ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
+			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu",
+			    ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
 			ts.range = r;
 		}
 	}
@@ -488,7 +499,10 @@
 	if (mirror) {
 		value = mirror.value;
 		if (ts.rx)
-			value = [self transformValue:value withPattern:ts.rx format:ts.format options:ts.options];
+			value = [self transformValue:value
+			                 withPattern:ts.rx
+			                      format:ts.format
+			                     options:ts.options];
 	} else
 		value = ts.value;
 
@@ -497,7 +511,8 @@
 		if (ts.parent) {
 			NSMutableString *s = ts.parent.value;
 			r.location -= ts.baseLocation;
-			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]", ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
+			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]",
+			    ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
 			[s replaceCharactersInRange:r withString:value];
 			DEBUG(@"string -> [%@]", s);
 			r.location += ts.baseLocation;
@@ -505,7 +520,8 @@
 			ts.range = NSMakeRange(r.location, [value length]);
 		} else {
 			r.location += beginLocation;
-			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]", ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
+			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]",
+			    ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
 			[delegate snippet:self replaceCharactersInRange:r withString:value];
 			DEBUG(@"string -> [%@]", [delegate string]);
 			r.location -= beginLocation;

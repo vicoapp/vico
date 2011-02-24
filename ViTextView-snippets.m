@@ -13,7 +13,9 @@
 	[self endUndoGroup];
 }
 
-- (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                  fromBundle:(ViBundle *)bundle
+                  atLocation:(NSUInteger)aLocation
 {
 	// prepend leading whitespace to all newlines in the snippet string
 	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
@@ -23,7 +25,13 @@
 	// FIXME: replace tabs with correct shiftwidth/tabstop settings
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
 	[ViBundle setupEnvironment:env forTextView:self];
+
+	/* Additional bundle specific variables. */
+	[env setObject:[bundle path] forKey:@"TM_BUNDLE_PATH"];
+	NSString *bundleSupportPath = [bundle supportPath];
+	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
 
 	[self beginUndoGroup];
 
@@ -75,7 +83,9 @@
 		snippetMatchRange.location = NSNotFound;
 	}
 
-	[self insertSnippet:[bundleSnippet content] atLocation:[self caret]];
+	[self insertSnippet:[bundleSnippet content]
+	         fromBundle:[bundleSnippet bundle]
+	         atLocation:[self caret]];
 }
 
 @end

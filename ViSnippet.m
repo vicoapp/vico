@@ -108,7 +108,15 @@
 	[task setStandardInput:shellInput];
 	[task setStandardOutput:shellOutput];
 	[task setStandardError:shellOutput];
-	[task setEnvironment:environment];
+
+	NSMutableDictionary *env = [environment mutableCopy];
+	for (ViTabstop *ts in tabstops) {
+		if (ts.mirror == nil)
+			[env setObject:(ts.value ?: @"") forKey:[NSString stringWithFormat:@"TM_TABSTOP_%i", ts.num]];
+	}
+	[env setObject:([self string] ?: @"") forKey:@"TM_SNIPPET"];
+	DEBUG(@"shell environment is %@", env);
+	[task setEnvironment:env];
 
 	[task launch];
 	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];

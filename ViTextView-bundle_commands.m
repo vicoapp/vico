@@ -176,7 +176,7 @@
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
 	[ViBundle setupEnvironment:env forTextView:self];
 
-	/* Additional bundle command specific variables. */
+	/* Additional bundle specific variables. */
 	[env setObject:[[command bundle] path] forKey:@"TM_BUNDLE_PATH"];
 	NSString *bundleSupportPath = [[command bundle] supportPath];
 	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
@@ -264,7 +264,9 @@
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			[self deleteRange:inputRange];
 			[self setCaret:inputRange.location];
-			[self insertSnippet:outputText atLocation:inputRange.location];
+			[self insertSnippet:outputText
+			         fromBundle:[command bundle]
+			         atLocation:inputRange.location];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
 			ViDocument *doc = [[[self delegate] environment] splitVertically:NO andOpen:nil orSwitchToDocument:nil];
 			[doc setString:outputText];

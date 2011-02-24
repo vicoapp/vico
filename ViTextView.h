@@ -133,7 +133,9 @@
 
 @interface ViTextView (snippets)
 - (void)cancelSnippet:(ViSnippet *)snippet;
-- (ViSnippet *)insertSnippet:(NSString *)snippetString atLocation:(NSUInteger)aLocation;
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                  fromBundle:(ViBundle *)bundle
+                  atLocation:(NSUInteger)aLocation;
 - (void)performBundleSnippet:(id)sender;
 - (void)deselectSnippet;
 @end

@@ -48,6 +48,7 @@
                 withChangeInLength:(NSInteger)delta
                              error:(NSError **)outError;
 - (BOOL)updateTabstopsError:(NSError **)outError;
+- (void)removeNestedIn:(ViTabstop *)parent;
 @end
 
 @implementation ViSnippet
@@ -639,17 +640,23 @@
 	selectedRange = NSMakeRange(NSNotFound, 0);
 }
 
+- (void)filterTabstop:(ViTabstop *)ts
+{
+	if (ts.filter) {
+		ts.value  = [self runShellCommand:ts.filter
+		                        withInput:(ts.value ?: @"")
+		                            error:nil];
+		[self removeNestedIn:ts];
+		[self updateTabstopsError:nil];
+	}
+}
+
 - (BOOL)advance
 {
 	if (finished)
 		return NO;
 
-	if (currentTabStop.filter) {
-		currentTabStop.value  = [self runShellCommand:currentTabStop.filter
-		                                    withInput:(currentTabStop.value ?: @"")
-		                                        error:nil];
-		[self updateTabstopsError:nil];
-	}
+	[self filterTabstop:currentTabStop];
 
 	ViTabstop *candidate = nil;
 	NSInteger i, candidateIndex;
@@ -681,12 +688,7 @@
 	    currentTabStop.num, NSStringFromRange(currentTabStop.range));
 
 	if (currentTabStop.num == 0) {
-		if (currentTabStop.filter) {
-			currentTabStop.value = [self runShellCommand:currentTabStop.filter
-						           withInput:(currentTabStop.value ?: @"")
-							       error:nil];
-			[self updateTabstopsError:nil];
-		}
+		[self filterTabstop:currentTabStop];
 		finished = YES;
 	}
 
@@ -807,7 +809,8 @@
 	BOOL found;
 	NSUInteger i;
 
-	for (found = YES; found; found = NO) {
+	for (found = YES; found;) {
+		found = NO;
 		for (i = 0; i < [tabstops count]; i++) {
 			ViTabstop *ts = [tabstops objectAtIndex:i];
 			if (ts.parent == parent) {

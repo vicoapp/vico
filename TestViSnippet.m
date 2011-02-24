@@ -354,7 +354,7 @@
 }
 
 /* Nested tabstops can have mirrors outside of the containing tabstop. */
-- (void)test038_nestedTabstopWithMirros
+- (void)test038_nestedTabstopWithMirrors
 {
 	[self makeSnippet:@"foo: ${1:nested ${2:tabstop}}, ${2/^.*$/mirror: $0/}"];
 	STAssertEqualObjects([snippet string], @"foo: nested tabstop, mirror: tabstop", nil);
@@ -368,11 +368,12 @@
 
 - (void)test040_nestedTabstopCancelledIfParentEdited
 {
-	[self makeSnippet:@"${1:hello ${2:world}}"];
-	STAssertEqualObjects([snippet string], @"hello world", nil);
+	[self makeSnippet:@"${1:hello ${2:world}${3:!}}"];
+	STAssertEqualObjects([snippet string], @"hello world!", nil);
 	STAssertEquals(snippet.selectedRange.location, 0ULL, nil);
-	STAssertEquals(snippet.selectedRange.length, 11ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 12ULL, nil);
 	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"goodbye"], nil);
+	STAssertEqualObjects([snippet string], @"goodbye", nil);
 	STAssertFalse([snippet advance], nil);
 }
 

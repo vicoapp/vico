@@ -489,4 +489,10 @@
 	STAssertEqualObjects([snippet string], @"MArTinh", nil);
 }
 
+- (void)test054_endCaseFolding
+{
+	[self makeSnippet:@"${USER/(.*)(r)(.*)/\\U$1\\E$2$3\\l/}"];
+	STAssertEqualObjects([snippet string], @"MArtinh", nil);
+}
+
 @end

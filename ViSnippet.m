@@ -168,7 +168,7 @@
 		if (ch == '\\') {
 			/* Skip the backslash escape if it's followed by a reserved character. */
 			if ([scan scanCharacter:&ch]) {
-				if (ch != '$' && ch != '\\')
+				if (ch != '$' && ch != '\\' && ch != '(')
 					[s appendString:@"\\"];
 				[s appendFormat:@"%C", ch];
 			} else

@@ -433,10 +433,11 @@
 	STAssertEqualObjects([snippet string], @"hello $a$a$a$a$a", nil);
 }
 
-- (void)test046_validCaptureGroup
+/* Opening parenthesis are also escapable. But not closing parens, WTF? */
+- (void)test046_validCaptureGroupWithEscapedParens
 {
-	[self makeSnippet:@"${1:hello} ${1/(.)/$1/g}"];
-	STAssertEqualObjects([snippet string], @"hello hello", nil);
+	[self makeSnippet:@"${1:hello} ${1/(.)/\\($1\\)/g}"];
+	STAssertEqualObjects([snippet string], @"hello (h\\)(e\\)(l\\)(l\\)(o\\)", nil);
 }
 
 - (void)test047_unmatchedCaptureGroup

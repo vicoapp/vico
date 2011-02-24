@@ -162,7 +162,7 @@
 	NSInteger delta = 0;
 	for (ViRegexpMatch *m in matches) {
 		NSRange r = [m rangeOfMatchedString];
-		DEBUG(@"/%@/ matched range %@ in string [%@]", rx, NSStringFromRange(r), value);
+		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches", rx, NSStringFromRange(r), value, [m count]);
 		NSString *matchedText = [value substringWithRange:r];
 		r.location += delta;
 		delta += [format length] - r.length;
@@ -170,9 +170,13 @@
 		NSUInteger capture, nrep;
 		for (capture = 0; capture < [m count] && capture < 10; capture++) {
 			r = [m rangeOfSubstringAtIndex:capture];
+			DEBUG(@"got capture %i range %@ in string [%@]", capture, NSStringFromRange(r), value);
 			NSString *captureString = [NSString stringWithFormat:@"$%lu", capture];
+			NSString *captureValue = @"";
+			if (r.location != NSNotFound)
+				captureValue = [value substringWithRange:r];
 			nrep = [text replaceOccurrencesOfString:captureString
-						     withString:[value substringWithRange:r]
+						     withString:captureValue
 							options:0
 							  range:NSMakeRange(0, [text length])];
 			delta += nrep * ([matchedText length] - [captureString length]);
@@ -485,11 +489,15 @@
 			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu",
 			    ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
 			ts.range = r;
-		}
+		} else
+			DEBUG(@"tabstop %u range %@+%lu unchanged",
+			    ts.num, NSStringFromRange(ts.range), ts.baseLocation);
 	}
 
-	range.length += delta;
-	DEBUG(@"snippet range -> %@", NSStringFromRange(range));
+	if (parent == nil) {
+		range.length += delta;
+		DEBUG(@"snippet range -> %@", NSStringFromRange(range));
+	}
 }
 
 - (void)updateTabstop:(ViTabstop *)ts
@@ -510,21 +518,20 @@
 		NSRange r = ts.range;
 		if (ts.parent) {
 			NSMutableString *s = ts.parent.value;
-			r.location -= ts.baseLocation;
-			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]",
+			DEBUG(@"update tab stop %i range %@+%lu with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
+			r.location -= ts.baseLocation;
 			[s replaceCharactersInRange:r withString:value];
-			DEBUG(@"string -> [%@]", s);
 			r.location += ts.baseLocation;
+			DEBUG(@"string -> [%@]", s);
 			[self updateTabstop:ts.parent];
-			ts.range = NSMakeRange(r.location, [value length]);
 		} else {
-			r.location += beginLocation;
-			DEBUG(@"update tab stop %i range %@ (base %lu) with value [%@] in string [%@]",
+			DEBUG(@"update tab stop %i range %@+%lu with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
+			r.location += beginLocation;
 			[delegate snippet:self replaceCharactersInRange:r withString:value];
-			DEBUG(@"string -> [%@]", [delegate string]);
 			r.location -= beginLocation;
+			DEBUG(@"string -> [%@]", [delegate string]);
 		}
 
 		NSInteger delta = [value length] - r.length;

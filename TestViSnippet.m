@@ -407,7 +407,18 @@
 {
 	[self makeSnippet:@"${3:Send $2 to $1, if $1 supports it}\n[${1:self} respondsToSelector:@selector(${2:someSelector:})]"];
 	STAssertEqualObjects([snippet string], @"Send someSelector: to self, if self supports it\n[self respondsToSelector:@selector(someSelector:)]", nil);
-	
+	STAssertEquals(snippet.selectedRange.location, 49ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 4ULL, nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"bacon"], nil);
+	STAssertEqualObjects([snippet string], @"Send someSelector: to bacon, if bacon supports it\n[bacon respondsToSelector:@selector(someSelector:)]", nil);
+	STAssertEquals([snippet tabRange].location, 51ULL, nil);
+	STAssertEquals([snippet tabRange].length, 5ULL, nil);
+}
+
+- (void)test043_weirdTransformation
+{
+	[self makeSnippet:@"${2:someSelector:} ${2/((:\\s*$)|(:\\s*))/:<>(?3: )/g}"];
+	STAssertEqualObjects([snippet string], @"someSelector: someSelector:<>", nil);
 }
 
 @end

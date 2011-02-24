@@ -161,7 +161,9 @@
 
 #define test(wp, f)		((((*wp)) & (f)) == (f))
 
-- (void)appendString:(NSString *)source toString:(NSMutableString *)target caseFold:(NSUInteger *)flags
+- (void)appendString:(NSString *)source
+            toString:(NSMutableString *)target
+            caseFold:(NSUInteger *)flags
 {
 	if ([source length] == 0)
 		return;
@@ -184,7 +186,9 @@
 
 - (NSString *)expandFormat:(NSString *)format
                  withMatch:(ViRegexpMatch *)m
+                 stopChars:(NSString *)stopChars
             originalString:(NSString *)value
+             scannedLength:(NSUInteger *)scannedLength
                      error:(NSError **)outError
 {
 	NSScanner *scan = [NSScanner scannerWithString:format];
@@ -194,6 +198,7 @@
 	unichar ch;
 	NSUInteger flags = 0;
 	while ([scan scanCharacter:&ch]) {
+		NSInteger capture = -1;
 		if (ch == '\\') {
 			/* Skip the backslash escape if it's followed by a reserved character. */
 			if ([scan scanCharacter:&ch]) {
@@ -227,32 +232,96 @@
 						ch = '\t';
 					else if (ch != '$' && ch != '\\' && ch != '(')
 						[self appendString:@"\\" toString:s caseFold:&flags];
-					[self appendString:[NSString stringWithFormat:@"%C", ch] toString:s caseFold:&flags];
+					NSString *insChar = [NSString stringWithFormat:@"%C", ch];
+					[self appendString:insChar toString:s caseFold:&flags];
 				}
 			} else
 				[self appendString:@"\\" toString:s caseFold:&flags];
 		} else if (ch == '$') {
-			NSInteger capture = -1;
 			if (![scan scanInteger:&capture])
 				[s appendString:@"$"];
 			else if (capture < 0) {
-				INFO(@"capture group is negative: %li", capture);
 				if (outError)
-					*outError = [ViError errorWithFormat:@"Negative capture group not allowed."];
+					*outError = [ViError errorWithFormat:
+					    @"Negative capture group not allowed."];
 				return nil;
 			} else {
 				NSRange r = [m rangeOfSubstringAtIndex:capture];
-				DEBUG(@"got capture %i range %@ in string [%@]", capture, NSStringFromRange(r), value);
+				DEBUG(@"got capture %i range %@ in string [%@]",
+				    capture, NSStringFromRange(r), value);
 				if (r.location != NSNotFound) {
 					NSString *captureValue = [value substringWithRange:r];
 					[self appendString:captureValue toString:s caseFold:&flags];
 				}
 			}
-		} else
-			[self appendString:[NSString stringWithFormat:@"%C", ch] toString:s caseFold:&flags];
+		} else if (ch == '(' &&
+		    [scan scanString:@"?" intoString:nil] &&
+		    [scan scanInteger:&capture] &&
+		    [scan scanString:@":" intoString:nil]) {
+			if (capture < 0) {
+				if (outError)
+					*outError = [ViError errorWithFormat:
+					    @"Capture group in conditional insertion block is negative: %li",
+					    capture];
+				return nil;
+			}
+
+			NSString *conditionalString = [format substringFromIndex:[scan scanLocation]];
+			NSUInteger len = 0;
+			NSString *insertion = [self expandFormat:conditionalString 
+			                               withMatch:m
+			                               stopChars:@":)"
+			                          originalString:value
+			                           scannedLength:&len
+			                                   error:outError];
+			if (insertion == nil)
+				return nil;
+			DEBUG(@"nested parse scanned %lu characters and returned [%@]", len, insertion);
+			[scan setScanLocation:[scan scanLocation] + len];
+
+			NSString *otherwise = @"";
+			if ([scan scanString:@":" intoString:nil]) {
+				conditionalString = [format substringFromIndex:[scan scanLocation]];
+				len = 0;
+				otherwise = [self expandFormat:conditionalString
+				                     withMatch:m
+				                     stopChars:@")"
+				                originalString:value
+				                 scannedLength:&len
+				                         error:outError];
+				if (otherwise == nil)
+					return nil;
+				DEBUG(@"nested parse scanned %lu characters and returned [%@]", len, otherwise);
+				[scan setScanLocation:[scan scanLocation] + len];
+			}
+
+			if (![scan scanString:@")" intoString:nil]) {
+				if (outError)
+					*outError = [ViError errorWithFormat:
+					    @"Missing closing parenthesis for conditional insertion at %lu",
+					    [scan scanLocation] + 1];
+				return nil;
+			}
+			
+			NSRange r = [m rangeOfSubstringAtIndex:capture];
+			if (r.location != NSNotFound)
+				[self appendString:insertion toString:s caseFold:&flags];
+			else
+				[self appendString:otherwise toString:s caseFold:&flags];
+		} else {
+			NSString *insChar = [NSString stringWithFormat:@"%C", ch];
+			if (stopChars && [stopChars rangeOfString:insChar].location != NSNotFound) {
+				[scan setScanLocation:[scan scanLocation] - 1];
+				break;
+			}
+			[self appendString:insChar toString:s caseFold:&flags];
+		}
 	}
 
 	DEBUG(@"expanded format [%@] -> [%@]", format, s);
+
+	if (scannedLength)
+		*scannedLength = [scan scanLocation];
 
 	return s;
 }
@@ -273,7 +342,9 @@
 		r.location += delta;
 		NSString *expFormat = [self expandFormat:format
 		                               withMatch:m
+		                               stopChars:nil
 		                          originalString:value
+		                           scannedLength:nil
 		                                   error:outError];
 		if (expFormat == nil) {
 			if (outError)

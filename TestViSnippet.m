@@ -495,4 +495,29 @@
 	STAssertEqualObjects([snippet string], @"MArtinh", nil);
 }
 
+- (void)test055_conditionalInsertion
+{
+	[self makeSnippet:@"${1:void} ${1/void$|(.+)/(?1:return nil;)/}"];
+	STAssertEqualObjects([snippet string], @"void ", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"id"], nil);
+	STAssertEqualObjects([snippet string], @"id return nil;", nil);
+}
+
+- (void)test056_conditionalInsertionOtherwise
+{
+	[self makeSnippet:@"${1:void} ${1/void$|(.+)/(?1:return nil;:return;)/}"];
+	STAssertEqualObjects([snippet string], @"void return;", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"id"], nil);
+	STAssertEqualObjects([snippet string], @"id return nil;", nil);
+}
+
+/* Ugh. Of course you can nest 'em. */
+- (void)test057_nestedConditionalInsertion
+{
+	[self makeSnippet:@"${1:void} ${1/void$|(.+)/(?1:return (?1:$1:embedded\\:colon and paren\\));:;)/}"];
+	STAssertEqualObjects([snippet string], @"void ;", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"id"], nil);
+	STAssertEqualObjects([snippet string], @"id return id;", nil);
+}
+
 @end

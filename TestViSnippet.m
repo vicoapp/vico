@@ -403,4 +403,11 @@
 	STAssertFalse([snippet advance], nil);
 }
 
+- (void)test042_nestedTabstopWithMultipleLocations
+{
+	[self makeSnippet:@"${3:Send $2 to $1, if $1 supports it}\n[${1:self} respondsToSelector:@selector(${2:someSelector:})]"];
+	STAssertEqualObjects([snippet string], @"Send someSelector: to self, if self supports it\n[self respondsToSelector:@selector(someSelector:)]", nil);
+	
+}
+
 @end

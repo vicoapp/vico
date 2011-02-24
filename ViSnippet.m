@@ -456,13 +456,13 @@
 	return NSMakeRange(beginLocation + r.location, r.length);
 }
 
-- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta
+- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta inParent:(ViTabstop *)parent
 {
-	DEBUG(@"update tabstops from location %lu with change %li", location, delta);
+	DEBUG(@"update tabstops from location %lu with change %li in parent %@", location, delta, parent);
 
 	for (ViTabstop *ts in tabstops) {
-		if (1 || ts.parent == nil) {
-			NSRange r = ts.range;	// FIXME: XXX: don't copy structs!
+		if (ts.parent == parent) {
+			NSRange r = ts.range;
 #ifndef NO_DEBUG
 			NSUInteger bs = ts.baseLocation;
 #endif
@@ -509,9 +509,10 @@
 			[delegate snippet:self replaceCharactersInRange:r withString:value];
 			DEBUG(@"string -> [%@]", [delegate string]);
 			r.location -= beginLocation;
-			NSInteger delta = [value length] - r.length;
-			[self updateTabstopsFromLocation:r.location withChangeInLength:delta];
 		}
+
+		NSInteger delta = [value length] - r.length;
+		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
 	}
 }
 

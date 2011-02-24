@@ -459,4 +459,34 @@
 	INFO(@"expected error: %@", [err localizedDescription]);
 }
 
+- (void)test049_escapedNewlinesInRegexFormat
+{
+	[self makeSnippet:@"${TM_FILENAME/(?!^)[A-Z]/\\n$0/g}"];
+	STAssertEqualObjects([snippet string], @"Test\nVi\nSnippet.m", nil);
+}
+
+- (void)test050_escapedTabsInRegexFormat
+{
+	[self makeSnippet:@"${TM_FILENAME/(?!^)[A-Z]/\\t$0/g}"];
+	STAssertEqualObjects([snippet string], @"Test\tVi\tSnippet.m", nil);
+}
+
+- (void)test051_uppercaseNextChar
+{
+	[self makeSnippet:@"${USER/.*/\\u$0/}"];
+	STAssertEqualObjects([snippet string], @"Martinh", nil);
+}
+
+- (void)test052_uppercaseString
+{
+	[self makeSnippet:@"${1:Straße} ${1/.*/\\U$0/}"];
+	STAssertEqualObjects([snippet string], @"Straße STRASSE", nil);
+}
+
+- (void)test053_upperLowerCaseMix
+{
+	[self makeSnippet:@"${USER/(.*)(r)(.*)/\\U$1\\L$2\\u$3/}"];
+	STAssertEqualObjects([snippet string], @"MArTinh", nil);
+}
+
 @end

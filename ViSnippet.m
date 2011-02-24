@@ -154,6 +154,34 @@
 	}];
 }
 
+#define RXFLAG_UPPERCASE_ONCE	1
+#define RXFLAG_LOWERCASE_ONCE	2
+#define RXFLAG_UPPERCASE	4
+#define RXFLAG_LOWERCASE	8
+
+#define test(wp, f)		((((*wp)) & (f)) == (f))
+
+- (void)appendString:(NSString *)source toString:(NSMutableString *)target caseFold:(NSUInteger *)flags
+{
+	if ([source length] == 0)
+		return;
+
+	if (test(flags, RXFLAG_UPPERCASE_ONCE)) {
+		[target appendString:[[source substringWithRange:NSMakeRange(0, 1)] uppercaseString]];
+		[target appendString:[source substringFromIndex:1]];
+		*flags &= ~RXFLAG_UPPERCASE_ONCE;
+	} else if (test(flags, RXFLAG_UPPERCASE_ONCE)) {
+		[target appendString:[[source substringWithRange:NSMakeRange(0, 1)] lowercaseString]];
+		[target appendString:[source substringFromIndex:1]];
+		*flags &= ~RXFLAG_LOWERCASE_ONCE;
+	} else if (test(flags, RXFLAG_UPPERCASE)) {
+		[target appendString:[source uppercaseString]];
+	} else if (test(flags, RXFLAG_LOWERCASE)) {
+		[target appendString:[source lowercaseString]];
+	} else
+		[target appendString:source];
+}
+
 - (NSString *)expandFormat:(NSString *)format
                  withMatch:(ViRegexpMatch *)m
             originalString:(NSString *)value
@@ -164,15 +192,45 @@
 
 	NSMutableString *s = [NSMutableString string];
 	unichar ch;
+	NSUInteger flags = 0;
 	while ([scan scanCharacter:&ch]) {
 		if (ch == '\\') {
 			/* Skip the backslash escape if it's followed by a reserved character. */
 			if ([scan scanCharacter:&ch]) {
-				if (ch != '$' && ch != '\\' && ch != '(')
-					[s appendString:@"\\"];
-				[s appendFormat:@"%C", ch];
+				if (ch == 'u' || ch == 'U' || ch == 'l' || ch == 'L' || ch == 'E') {
+					switch (ch) {
+					case 'u':
+						flags |= RXFLAG_UPPERCASE_ONCE;
+						flags &= ~RXFLAG_LOWERCASE_ONCE;
+						break;
+					case 'U':
+						flags |= RXFLAG_UPPERCASE;
+						flags &= ~RXFLAG_LOWERCASE;
+						break;
+					case 'l':
+						flags &= ~RXFLAG_UPPERCASE_ONCE;
+						flags |= RXFLAG_LOWERCASE_ONCE;
+						break;
+					case 'L':
+						flags &= ~RXFLAG_UPPERCASE;
+						flags |= RXFLAG_LOWERCASE;
+						break;
+					case 'E':
+						flags &= ~RXFLAG_UPPERCASE;
+						flags &= ~RXFLAG_LOWERCASE;
+						break;
+					}
+				} else {
+					if (ch == 'n')
+						ch = '\n';
+					else if (ch == 't')
+						ch = '\t';
+					else if (ch != '$' && ch != '\\' && ch != '(')
+						[self appendString:@"\\" toString:s caseFold:&flags];
+					[self appendString:[NSString stringWithFormat:@"%C", ch] toString:s caseFold:&flags];
+				}
 			} else
-				[s appendString:@"\\"];
+				[self appendString:@"\\" toString:s caseFold:&flags];
 		} else if (ch == '$') {
 			NSInteger capture = -1;
 			if (![scan scanInteger:&capture])
@@ -187,12 +245,11 @@
 				DEBUG(@"got capture %i range %@ in string [%@]", capture, NSStringFromRange(r), value);
 				if (r.location != NSNotFound) {
 					NSString *captureValue = [value substringWithRange:r];
-					[s appendString:captureValue];
+					[self appendString:captureValue toString:s caseFold:&flags];
 				}
 			}
-		} else {
-			[s appendFormat:@"%C", ch];
-		}
+		} else
+			[self appendString:[NSString stringWithFormat:@"%C", ch] toString:s caseFold:&flags];
 	}
 
 	DEBUG(@"expanded format [%@] -> [%@]", format, s);

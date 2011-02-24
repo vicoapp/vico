@@ -152,6 +152,42 @@
 	}];
 }
 
+- (NSString *)expandFormat:(NSString *)format withMatch:(ViRegexpMatch *)m originalString:(NSString *)value
+{
+	NSScanner *scan = [NSScanner scannerWithString:format];
+	[scan setCharactersToBeSkipped:nil];
+
+	NSMutableString *s = [NSMutableString string];
+	unichar ch;
+	while ([scan scanCharacter:&ch]) {
+		if (ch == '\\') {
+			/* Skip the backslash escape if it's followed by a reserved character. */
+			if ([scan scanCharacter:&ch]) {
+				if (ch != '$' && ch != '\\')
+					[s appendString:@"\\"];
+				[s appendFormat:@"%C", ch];
+			} else
+				[s appendString:@"\\"];
+		} else if (ch == '$') {
+			if (![scan scanCharacter:&ch])
+				[s appendString:@"$"];
+			else if (ch >= '0' && ch <= '9') {
+				NSRange r = [m rangeOfSubstringAtIndex:ch - '0'];
+				DEBUG(@"got capture %i range %@ in string [%@]", ch - '0', NSStringFromRange(r), value);
+				if (r.location != NSNotFound) {
+					NSString *captureValue = [value substringWithRange:r];
+					[s appendString:captureValue];
+				}
+			} else
+				[s appendFormat:@"$%C", ch];
+		} else {
+			[s appendFormat:@"%C", ch];
+		}
+	}
+
+	return s;
+}
+
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
@@ -163,24 +199,10 @@
 	for (ViRegexpMatch *m in matches) {
 		NSRange r = [m rangeOfMatchedString];
 		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches", rx, NSStringFromRange(r), value, [m count]);
-		NSString *matchedText = [value substringWithRange:r];
 		r.location += delta;
-		delta += [format length] - r.length;
-		[text replaceCharactersInRange:r withString:format];
-		NSUInteger capture, nrep;
-		for (capture = 0; capture < [m count] && capture < 10; capture++) {
-			r = [m rangeOfSubstringAtIndex:capture];
-			DEBUG(@"got capture %i range %@ in string [%@]", capture, NSStringFromRange(r), value);
-			NSString *captureString = [NSString stringWithFormat:@"$%lu", capture];
-			NSString *captureValue = @"";
-			if (r.location != NSNotFound)
-				captureValue = [value substringWithRange:r];
-			nrep = [text replaceOccurrencesOfString:captureString
-						     withString:captureValue
-							options:0
-							  range:NSMakeRange(0, [text length])];
-			delta += nrep * ([matchedText length] - [captureString length]);
-		}
+		NSString *expFormat = [self expandFormat:format withMatch:m originalString:value];
+		delta += [expFormat length] - r.length;
+		[text replaceCharactersInRange:r withString:expFormat];
 		if ([options rangeOfString:@"g"].location == NSNotFound)
 			break;
 	}

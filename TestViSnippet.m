@@ -415,10 +415,10 @@
 	STAssertEquals([snippet tabRange].length, 5ULL, nil);
 }
 
-- (void)test043_weirdTransformation
+- (void)test043_escapesInRegexFormat
 {
-	[self makeSnippet:@"${2:someSelector:} ${2/((:\\s*$)|(:\\s*))/:<>(?3: )/g}"];
-	STAssertEqualObjects([snippet string], @"someSelector: someSelector:<>", nil);
+	[self makeSnippet:@"${1:hello} ${1/./\\$0/g}"];
+	STAssertEqualObjects([snippet string], @"hello $0$0$0$0$0", nil);
 }
 
 @end

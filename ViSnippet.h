@@ -17,6 +17,7 @@
 	NSRange selectedRange;
 	NSMutableArray *tabstops;
 	NSDictionary *environment;
+	BOOL finished;
 }
 
 @property(readonly) NSRange range;

@@ -249,8 +249,6 @@
 	STAssertEquals([snippet tabRange].location, 4ULL, nil);
 	STAssertEquals([snippet tabRange].length, 0ULL, nil);
 	STAssertTrue([snippet advance], nil);
-	STAssertEquals([snippet tabRange].location, 10ULL, nil);
-	STAssertEquals([snippet tabRange].length, 0ULL, nil);
 }
 
 - (void)test028_updatePlaceHolders
@@ -270,17 +268,10 @@
 	STAssertEqualObjects([snippet string], @"if (p)\n{\n    /* code */\n}", nil);
 	STAssertEquals([snippet tabRange].location, 4ULL, nil);
 	STAssertEquals([snippet tabRange].length, 1ULL, nil);
+
+	// advance to tab stop 0, which finishes the snippet
 	STAssertTrue([snippet advance], nil);
-
-	STAssertEquals([snippet tabRange].location, 13ULL, nil);
-	STAssertEquals([snippet tabRange].length, 10ULL, nil);
-	STAssertTrue([snippet replaceRange:NSMakeRange(13, 10) withString:@""], nil);
-
-	STAssertEquals([snippet tabRange].location, 13ULL, nil);
-	STAssertEquals([snippet tabRange].length, 0ULL, nil);
-	STAssertTrue([snippet replaceRange:NSMakeRange(13, 0) withString:@"return;"], nil);
-	STAssertEquals([snippet tabRange].location, 13ULL, nil);
-	STAssertEquals([snippet tabRange].length, 7ULL, nil);
+	STAssertFalse([snippet replaceRange:NSMakeRange(13, 10) withString:@""], nil);
 }
 
 - (void)test029_mirror
@@ -527,6 +518,35 @@
 	STAssertEqualObjects([snippet string], @"printf(\"%s\\n\", );", nil);
 	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"hello"], nil);
 	STAssertEqualObjects([snippet string], @"printf(\"hello\\n\");", nil);
+}
+
+/* http://e-texteditor.com/blog/2008/snippet-pipes */
+- (void)test059_snippetPipe
+{
+	[self makeSnippet:@"${1:ruby code|ruby -e \"print eval STDIN.read\"}$0"];
+	STAssertEqualObjects([snippet string], @"ruby code", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"17+42"], nil);
+	STAssertEqualObjects([snippet string], @"17+42", nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEqualObjects([snippet string], @"59", nil);
+	STAssertEquals(snippet.caret, 2ULL, nil);
+}
+
+- (void)test060_mirrorPipe
+{
+	[self makeSnippet:@"${1:expression} = ${1/$/\\n/|bc}"];
+	STAssertEqualObjects([snippet string], @"expression = 0", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"17+42"], nil);
+	STAssertEqualObjects([snippet string], @"17+42 = 59", nil);
+}
+
+- (void)test061_updateLocationZeroLengthZero
+{
+	[self makeSnippet:@"$1$0"];
+	STAssertEqualObjects([snippet string], @"", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"bacon"], nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.caret, 5ULL, nil);
 }
 
 @end

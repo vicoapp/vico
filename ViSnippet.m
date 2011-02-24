@@ -19,6 +19,7 @@
 	ViRegexp *rx;
 	NSString *format;
 	NSString *options;
+	NSString *filter;
 }
 @property(readwrite) int num;
 @property(readwrite) NSUInteger baseLocation;
@@ -28,16 +29,17 @@
 @property(readwrite) ViRegexp *rx;
 @property(readwrite, assign) NSString *format;
 @property(readwrite, assign) NSString *options;
+@property(readwrite, assign) NSString *filter;
 @property(readwrite, assign) NSMutableString *value;
 @end
 
 
 @implementation ViTabstop
-@synthesize num, baseLocation, parent, mirror, range, value, rx, format, options;
+@synthesize num, baseLocation, parent, mirror, range, value, rx, format, options, filter;
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViTabstop %i@%@+%lu: [%@], parent: %@, mirror of: %@>",
-	    num, NSStringFromRange(range), baseLocation, value, parent, mirror];
+	return [NSString stringWithFormat:@"<ViTabstop %i@%@+%lu: [%@], pipe: [%@], parent: %@, mirror of: %@>",
+	    num, NSStringFromRange(range), baseLocation, value, filter, parent, mirror];
 }
 @end
 
@@ -54,14 +56,15 @@
 @synthesize selectedRange;
 @synthesize caret;
 
-- (NSString *)runShellCommand:(NSString *)shellCommand error:(NSError **)outError
+- (NSMutableString *)runShellCommand:(NSString *)shellCommand
+                           withInput:(NSString *)inputText
+                               error:(NSError **)outError
 {
 	DEBUG(@"shell command = [%@]", shellCommand);
 
 	if ([shellCommand length] == 0)
-		return @"";
+		return [NSMutableString stringWithString:@""];
 
-	NSString *inputText = @"";
 	NSTask *task = [[NSTask alloc] init];
 	char *templateFilename = NULL;
 	int fd = -1;
@@ -363,7 +366,7 @@
 }
 
 - (NSMutableString *)parseString:(NSString *)aString
-                     stopAtBrace:(BOOL)stopAtBrace
+                       stopChars:(NSString *)stopChars
                    parentTabstop:(ViTabstop *)parentTabstop
                    allowTabstops:(BOOL)allowTabstops
                     baseLocation:(NSUInteger)baseLocation
@@ -374,7 +377,7 @@
 	NSMutableString *defaultValue;
 	NSScanner *scan;
 	NSMutableString *s = [NSMutableString string];
-	NSString *regexp, *format, *options;
+	NSString *regexp, *format, *options, *filter;
 	unichar ch;
 
 	scan = [NSScanner scannerWithString:aString];
@@ -385,9 +388,11 @@
 			/* Skip the backslash escape if it's followed by a reserved character. */
 			if ([scan scanCharacter:&ch]) {
 				/* The TextMate escaping rules are totally insane! */
-				if (ch != '$' && ch != '`' && ch != '\\' && (!stopAtBrace || ch != '}'))
+				NSString *insChar = [NSString stringWithFormat:@"%C", ch];
+				if (ch != '$' && ch != '`' && ch != '\\' &&
+				    [stopChars rangeOfString:insChar].location == NSNotFound)
 					[s appendString:@"\\"];
-				[s appendFormat:@"%C", ch];
+				[s appendString:insChar];
 			} else
 				[s appendString:@"\\"];
 		} else if (ch == '$') {
@@ -426,6 +431,7 @@
 			format = nil;
 			options = nil;
 			ViRegexp *rx = nil;
+			filter = nil;
 			defaultValue = nil;
 			if (bracedExpression) {
 				if ([scan scanString:@":" intoString:nil]) {
@@ -435,7 +441,7 @@
 					NSString *substring = [aString substringFromIndex:[scan scanLocation]];
 					NSUInteger len;
 					defaultValue = [self parseString:substring
-					                     stopAtBrace:YES
+					                       stopChars:@"|}"
 					                   parentTabstop:ts
 					                   allowTabstops:ts ? YES : NO
 					                    baseLocation:baseLocation + [s length]
@@ -458,7 +464,10 @@
 							    [scan scanLocation] + 1];
 						return NO;
 					}
-					[scan scanUpToString:@"}" intoString:&options];
+
+					NSCharacterSet *optionsCharacters = [NSCharacterSet characterSetWithCharactersInString:@"gi"];
+					[scan scanCharactersFromSet:optionsCharacters
+					                 intoString:&options];
 					if (options == nil)
 						options = @"";
 					DEBUG(@"regexp = %@", regexp);
@@ -469,9 +478,34 @@
 					if (rx == nil)
 						return NO;
 
-					value = [self transformValue:(value ?: @"") withPattern:rx format:format options:options error:outError];
+					value = [self transformValue:(value ?: @"")
+					                 withPattern:rx
+					                      format:format
+					                     options:options
+					                       error:outError];
 					if (value == nil)
 						return NO;
+				}
+
+				if ([scan scanString:@"|" intoString:nil]) {
+					/*
+					 * Shell pipe.
+					 */
+					NSUInteger startLocation = [scan scanLocation];
+					if (![scan scanUpToUnescapedCharacter:'}' intoString:&filter]) {
+						if (outError)
+							*outError = [ViError errorWithFormat:
+							    @"Unterminated shell pipe beginning at character %lu", startLocation + 1];
+						return NO;
+					}
+					DEBUG(@"got shell pipe [%@], input is [%@]", filter, value);
+					if (ts == nil) {
+						value = [self runShellCommand:filter
+								    withInput:(value ?: @"")
+									error:outError];
+						if (value == nil)
+							return NO;
+					}
 				}
 
 				if (![scan scanString:@"}" intoString:nil]) {
@@ -489,6 +523,7 @@
 				ts.rx = rx;
 				ts.format = format;
 				ts.options = options;
+				ts.filter = filter;
 				ts.value = defaultValue;
 				ts.range = NSMakeRange(baseLocation + [s length], [value length]);
 
@@ -522,15 +557,17 @@
 					*outError = [ViError errorWithFormat:@"Unterminated shell command beginning at character %lu", startLocation + 1];
 				return NO;
 			}
-			NSString *output = [self runShellCommand:shellCommand error:outError];
+			NSMutableString *output = [self runShellCommand:shellCommand withInput:@"" error:outError];
 			if (output == nil)
 				return NO;
 			[s appendString:output];
-		} else if (ch == '}' && stopAtBrace) {
-			[scan setScanLocation:[scan scanLocation] - 1];
-			break;
 		} else {
-			[s appendFormat:@"%C", ch];
+			NSString *insChar = [NSString stringWithFormat:@"%C", ch];
+			if ([stopChars rangeOfString:insChar].location != NSNotFound) {
+				[scan setScanLocation:[scan scanLocation] - 1];
+				break;
+			}
+			[s appendString:insChar];
 		}
 	}
 
@@ -555,7 +592,7 @@
 
 	NSUInteger len;
 	NSMutableString *string = [self parseString:aString
-	                                stopAtBrace:NO
+	                                  stopChars:@""
 	                              parentTabstop:nil
 	                              allowTabstops:YES
 	                               baseLocation:0
@@ -580,11 +617,13 @@
 	delegate = aDelegate;
 	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string];
 
+	finished = ([tabstops count] == 0);
+
 	if (![self updateTabstopsError:outError])
 		return NO;
 	DEBUG(@"inserted string = [%@]", [self string]);
 
-	if ([tabstops count] == 0)
+	if (finished)
 		caret = NSMaxRange(range);
 	else {
 		currentTabIndex = -1;
@@ -602,6 +641,16 @@
 
 - (BOOL)advance
 {
+	if (finished)
+		return NO;
+
+	if (currentTabStop.filter) {
+		currentTabStop.value  = [self runShellCommand:currentTabStop.filter
+		                                    withInput:(currentTabStop.value ?: @"")
+		                                        error:nil];
+		[self updateTabstopsError:nil];
+	}
+
 	ViTabstop *candidate = nil;
 	NSInteger i, candidateIndex;
 	for (i = ++currentTabIndex; i < [tabstops count]; i++) {
@@ -621,7 +670,7 @@
 
 	if (candidate == nil) {
 		DEBUG(@"%s", "no candidate found");
-		currentTabStop = NULL;
+		finished = YES;
 		return NO;
 	}
 
@@ -631,15 +680,26 @@
 	DEBUG(@"advancing to tab stop %i range %@",
 	    currentTabStop.num, NSStringFromRange(currentTabStop.range));
 
+	if (currentTabStop.num == 0) {
+		if (currentTabStop.filter) {
+			currentTabStop.value = [self runShellCommand:currentTabStop.filter
+						           withInput:(currentTabStop.value ?: @"")
+							       error:nil];
+			[self updateTabstopsError:nil];
+		}
+		finished = YES;
+	}
+
 	NSRange r = currentTabStop.range;
 	caret = beginLocation + r.location;
 	selectedRange = NSMakeRange(caret, r.length);
+
 	return YES;
 }
 
 - (NSRange)tabRange
 {
-	if (currentTabStop == NULL)
+	if (finished || currentTabStop == nil)
 		return NSMakeRange(NSNotFound, 0);
 	NSRange r = currentTabStop.range;
 	return NSMakeRange(beginLocation + r.location, r.length);
@@ -659,7 +719,7 @@
 #endif
 			if (ts.baseLocation > location)
 				ts.baseLocation += delta;
-			if (r.location > location)
+			if (r.location >= location)
 				r.location += delta;
 			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu",
 			    ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
@@ -675,7 +735,8 @@
 	}
 }
 
-- (BOOL)updateTabstop:(ViTabstop *)ts error:(NSError **)outError
+- (BOOL)updateTabstop:(ViTabstop *)ts
+                error:(NSError **)outError
 {
 	ViTabstop *mirror = ts.mirror;
 	NSString *value;
@@ -688,6 +749,14 @@
 			                     options:ts.options
 			                       error:outError];
 			if (outError && *outError)
+				return NO;
+		}
+
+		if (ts.filter) {
+			value = [self runShellCommand:ts.filter
+			                    withInput:(value ?: @"")
+			                        error:outError];
+			if (value == nil)
 				return NO;
 		}
 	} else
@@ -714,9 +783,10 @@
 		}
 
 		NSInteger delta = [value length] - r.length;
+		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
+
 		r.length = [value length];
 		ts.range = r;
-		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
 	}
 
 	return YES;
@@ -778,7 +848,7 @@
 
 - (BOOL)activeInRange:(NSRange)aRange
 {
-	if (currentTabStop == nil) {
+	if (finished || currentTabStop == nil) {
 		DEBUG(@"%s", "current tab stop is nil");
 		return NO;
 	}

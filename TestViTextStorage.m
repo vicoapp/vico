@@ -86,8 +86,10 @@
 - (void)test012_lineLocationAfterReplacingTextSameAmount
 {
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
+	STAssertEquals([textStorage lineCount], 5ULL, nil);
 	[textStorage replaceCharactersInRange:NSMakeRange(5, 3) withString:@"xxx"];
 	STAssertEquals([textStorage locationForStartOfLine:4], 9LL, nil);
+	STAssertEquals([textStorage lineCount], 5ULL, nil);
 }
 
 - (void)test013_lineLocationAfterReplacingTextLessAmount
@@ -188,7 +190,6 @@
 	STAssertEquals([textStorage lineNumberAtLocation:2], 2ULL, nil);
 }
 
-#if 1
 - (void)test040_locationOfLineWithManyLines
 {
 	int i;
@@ -251,6 +252,5 @@
 	[textStorage replaceCharactersInRange:NSMakeRange(0, [textStorage length]) withString:@""];
 	STAssertEquals([textStorage lineCount], 0ULL, nil);
 }
-#endif
 
 @end

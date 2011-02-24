@@ -308,7 +308,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 	/* Insert whole new lines. */
 	if ([str length] > 0) {
-		NSUInteger endLocation = NSMaxRange(aRange) + [str length];
+		NSUInteger endLocation = NSMaxRange(aRange) + diff;
 		DEBUG(@"location = %lu, endLocation = %lu", location, endLocation);
 		while (location < [self length]) {
 			[string getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
@@ -419,23 +419,18 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			break;
 		line += skip->nlines;
 		location += skip->length;
-		DEBUG(@"skipping %lu lines to location %lu", skip->nlines, location);
 	}
 
-	if (skip == NULL) {
-		DEBUG(@"skipped past last partition, got line %lu", line);
+	if (skip == NULL)
 		return line;
-	}
 
 	/* Find the line. */
 	struct line *ln;
 	TAILQ_FOREACH(ln, &skip->lines, next) {
-		DEBUG(@"at location %lu, got line length %lu, target is %lu", location, ln->length, aLocation);
 		if (location + ln->length > aLocation || ln->eol == ln->length)
 			break;
 		location += ln->length;
 		line++;
-		DEBUG(@"skipping to line %lu at location %lu", line, location);
 	}
  
 	return line;

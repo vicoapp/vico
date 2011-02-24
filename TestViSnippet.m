@@ -415,10 +415,47 @@
 	STAssertEquals([snippet tabRange].length, 5ULL, nil);
 }
 
-- (void)test043_escapesInRegexFormat
+- (void)test043_escapedDollarInRegexFormat
 {
 	[self makeSnippet:@"${1:hello} ${1/./\\$0/g}"];
 	STAssertEqualObjects([snippet string], @"hello $0$0$0$0$0", nil);
+}
+
+- (void)test044_unescapedDollarAtEnd
+{
+	[self makeSnippet:@"${1:hello} ${1/(.)/1$/g}"];
+	STAssertEqualObjects([snippet string], @"hello 1$1$1$1$1$", nil);
+}
+
+- (void)test045_nonNumericCaptureGroup
+{
+	[self makeSnippet:@"${1:hello} ${1/(.)/$a/g}"];
+	STAssertEqualObjects([snippet string], @"hello $a$a$a$a$a", nil);
+}
+
+- (void)test046_validCaptureGroup
+{
+	[self makeSnippet:@"${1:hello} ${1/(.)/$1/g}"];
+	STAssertEqualObjects([snippet string], @"hello hello", nil);
+}
+
+- (void)test047_unmatchedCaptureGroup
+{
+	[self makeSnippet:@"${1:hello} ${1/(.)/$10/g}"];
+	STAssertEqualObjects([snippet string], @"hello ", nil);
+}
+
+/* A capture group must be positiv or zero. */
+- (void)test048_negativeCaptureGroup
+{
+	snippet = [[ViSnippet alloc] initWithString:@"${1:hello} ${1/(.)/$-1/g}"
+	                                 atLocation:0
+	                                   delegate:delegate
+	                                environment:env
+	                                      error:&err];
+	STAssertNil(snippet, nil);
+	STAssertNotNil(err, nil);
+	INFO(@"expected error: %@", [err localizedDescription]);
 }
 
 @end

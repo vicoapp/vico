@@ -42,8 +42,10 @@
 @end
 
 @interface ViSnippet (private)
-- (void)updateTabstopsFromLocation:(NSUInteger)location withChangeInLength:(NSInteger)delta;
-- (void)updateTabstops;
+- (void)updateTabstopsFromLocation:(NSUInteger)location
+                withChangeInLength:(NSInteger)delta
+                             error:(NSError **)outError;
+- (BOOL)updateTabstopsError:(NSError **)outError;
 @end
 
 @implementation ViSnippet
@@ -152,7 +154,10 @@
 	}];
 }
 
-- (NSString *)expandFormat:(NSString *)format withMatch:(ViRegexpMatch *)m originalString:(NSString *)value
+- (NSString *)expandFormat:(NSString *)format
+                 withMatch:(ViRegexpMatch *)m
+            originalString:(NSString *)value
+                     error:(NSError **)outError
 {
 	NSScanner *scan = [NSScanner scannerWithString:format];
 	[scan setCharactersToBeSkipped:nil];
@@ -169,21 +174,28 @@
 			} else
 				[s appendString:@"\\"];
 		} else if (ch == '$') {
-			if (![scan scanCharacter:&ch])
+			NSInteger capture = -1;
+			if (![scan scanInteger:&capture])
 				[s appendString:@"$"];
-			else if (ch >= '0' && ch <= '9') {
-				NSRange r = [m rangeOfSubstringAtIndex:ch - '0'];
-				DEBUG(@"got capture %i range %@ in string [%@]", ch - '0', NSStringFromRange(r), value);
+			else if (capture < 0) {
+				INFO(@"capture group is negative: %li", capture);
+				if (outError)
+					*outError = [ViError errorWithFormat:@"Negative capture group not allowed."];
+				return nil;
+			} else {
+				NSRange r = [m rangeOfSubstringAtIndex:capture];
+				DEBUG(@"got capture %i range %@ in string [%@]", capture, NSStringFromRange(r), value);
 				if (r.location != NSNotFound) {
 					NSString *captureValue = [value substringWithRange:r];
 					[s appendString:captureValue];
 				}
-			} else
-				[s appendFormat:@"$%C", ch];
+			}
 		} else {
 			[s appendFormat:@"%C", ch];
 		}
 	}
+
+	DEBUG(@"expanded format [%@] -> [%@]", format, s);
 
 	return s;
 }
@@ -192,16 +204,27 @@
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
                      options:(NSString *)options
+                       error:(NSError **)outError
 {
 	NSMutableString *text = [value mutableCopy];
 	NSArray *matches = [rx allMatchesInString:value];
 	NSInteger delta = 0;
 	for (ViRegexpMatch *m in matches) {
 		NSRange r = [m rangeOfMatchedString];
-		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches", rx, NSStringFromRange(r), value, [m count]);
+		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches",
+		    rx, NSStringFromRange(r), value, [m count]);
 		r.location += delta;
-		NSString *expFormat = [self expandFormat:format withMatch:m originalString:value];
+		NSString *expFormat = [self expandFormat:format
+		                               withMatch:m
+		                          originalString:value
+		                                   error:outError];
+		if (expFormat == nil) {
+			if (outError)
+				return nil;
+			expFormat = @"";
+		}
 		delta += [expFormat length] - r.length;
+		DEBUG(@"replace range %@ with expanded format [%@]", NSStringFromRange(r), expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];
 		if ([options rangeOfString:@"g"].location == NSNotFound)
 			break;
@@ -317,7 +340,9 @@
 					if (rx == nil)
 						return NO;
 
-					value = [self transformValue:(value ?: @"") withPattern:rx format:format options:options];
+					value = [self transformValue:(value ?: @"") withPattern:rx format:format options:options error:outError];
+					if (value == nil)
+						return NO;
 				}
 
 				if (![scan scanString:@"}" intoString:nil]) {
@@ -426,7 +451,8 @@
 	delegate = aDelegate;
 	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string];
 
-	[self updateTabstops];
+	if (![self updateTabstopsError:outError])
+		return NO;
 	DEBUG(@"updated string = [%@]", string);
 
 	if ([tabstops count] == 0)
@@ -522,17 +548,21 @@
 	}
 }
 
-- (void)updateTabstop:(ViTabstop *)ts
+- (BOOL)updateTabstop:(ViTabstop *)ts error:(NSError **)outError
 {
 	ViTabstop *mirror = ts.mirror;
 	NSString *value;
 	if (mirror) {
 		value = mirror.value;
-		if (ts.rx)
+		if (ts.rx) {
 			value = [self transformValue:value
 			                 withPattern:ts.rx
 			                      format:ts.format
-			                     options:ts.options];
+			                     options:ts.options
+			                       error:outError];
+			if (outError && *outError)
+				return NO;
+		}
 	} else
 		value = ts.value;
 
@@ -546,7 +576,7 @@
 			[s replaceCharactersInRange:r withString:value];
 			r.location += ts.baseLocation;
 			DEBUG(@"string -> [%@]", s);
-			[self updateTabstop:ts.parent];
+			[self updateTabstop:ts.parent error:outError];
 		} else {
 			DEBUG(@"update tab stop %i range %@+%lu with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
@@ -559,12 +589,18 @@
 		NSInteger delta = [value length] - r.length;
 		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
 	}
+
+	return YES;
 }
 
-- (void)updateTabstops
+- (BOOL)updateTabstopsError:(NSError **)outError
 {
-	for (ViTabstop *ts in tabstops)
-		[self updateTabstop:ts];
+	for (ViTabstop *ts in tabstops) {
+		if (![self updateTabstop:ts error:outError])
+			return NO;
+	}
+
+	return YES;
 }
 
 - (void)removeNestedIn:(ViTabstop *)parent
@@ -608,9 +644,7 @@
 	if (currentTabStop.value == nil)
 		currentTabStop.value = [NSMutableString string];
 	[currentTabStop.value replaceCharactersInRange:normalizedRange withString:replacementString];
-	[self updateTabstops];
-
-	return YES;
+	return [self updateTabstopsError:nil];
 }
 
 - (BOOL)activeInRange:(NSRange)aRange

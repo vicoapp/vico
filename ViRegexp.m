@@ -4,12 +4,15 @@
 
 @implementation ViRegexp
 
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options syntax:(int)syntax
++ (ViRegexp *)regularExpressionWithString:(NSString *)aString
+                                  options:(int)options
+                                   syntax:(int)syntax
 {
 	return [[ViRegexp alloc] initWithString:aString options:options syntax:syntax];
 }
 
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options
++ (ViRegexp *)regularExpressionWithString:(NSString *)aString
+                                  options:(int)options
 {
 	return [ViRegexp regularExpressionWithString:aString options:options syntax:0];
 }
@@ -19,12 +22,17 @@
 	return [ViRegexp regularExpressionWithString:aString options:0 syntax:0];
 }
 
-- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax
+- (ViRegexp *)initWithString:(NSString *)aString
+                    options:(int)options
+                     syntax:(int)syntax
 {
 	return [self initWithString:aString options:options syntax:syntax error:nil];
 }
 
-- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax error:(NSError **)outError
+- (ViRegexp *)initWithString:(NSString *)aString
+                     options:(int)options
+                      syntax:(int)syntax
+                       error:(NSError **)outError
 {
 	self = [super init];
 
@@ -39,7 +47,9 @@
 	enc = ONIG_ENCODING_UTF16_LE;
 #endif
 	OnigErrorInfo einfo;
-	int r = onig_new(&regex, (const UChar *)pattern, (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP, enc, ONIG_SYNTAX_RUBY, &einfo);
+	int r = onig_new(&regex, (const UChar *)pattern,
+	    (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP,
+	    enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
 	if (r != ONIG_NORMAL) {
 		if (outError) {
@@ -57,13 +67,14 @@
 - (void)finalize
 {
 	if (regex)
-	{
 		onig_free(regex);
-	}
 	[super finalize];
 }
 
-- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars options:(int)options range:(NSRange)aRange start:(NSUInteger)aLocation
+- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars
+                             options:(int)options
+                               range:(NSRange)aRange
+                               start:(NSUInteger)aLocation
 {
 	OnigRegion *region = onig_region_new();
 
@@ -78,7 +89,9 @@
 	return nil;
 }
 
-- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+- (ViRegexpMatch *)matchInCharacters:(const unichar *)chars
+                               range:(NSRange)aRange
+                               start:(NSUInteger)aLocation
 {
 	return [self matchInCharacters:chars options:0 range:aRange start:aLocation];
 }

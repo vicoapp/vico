@@ -226,13 +226,14 @@
 						break;
 					}
 				} else {
-					if (ch == 'n')
-						ch = '\n';
-					else if (ch == 't')
-						ch = '\t';
-					else if (ch != '$' && ch != '\\' && ch != '(')
-						[self appendString:@"\\" toString:s caseFold:&flags];
 					NSString *insChar = [NSString stringWithFormat:@"%C", ch];
+					if (ch == 'n')
+						insChar = @"\n";
+					else if (ch == 't')
+						insChar = @"\t";
+					else if (ch != '$' && ch != '\\' && ch != '(' &&
+					    [stopChars rangeOfString:insChar].location == NSNotFound)
+						[self appendString:@"\\" toString:s caseFold:&flags];
 					[self appendString:insChar toString:s caseFold:&flags];
 				}
 			} else
@@ -302,7 +303,7 @@
 					    [scan scanLocation] + 1];
 				return nil;
 			}
-			
+
 			NSRange r = [m rangeOfSubstringAtIndex:capture];
 			if (r.location != NSNotFound)
 				[self appendString:insertion toString:s caseFold:&flags];
@@ -310,7 +311,7 @@
 				[self appendString:otherwise toString:s caseFold:&flags];
 		} else {
 			NSString *insChar = [NSString stringWithFormat:@"%C", ch];
-			if (stopChars && [stopChars rangeOfString:insChar].location != NSNotFound) {
+			if ([stopChars rangeOfString:insChar].location != NSNotFound) {
 				[scan setScanLocation:[scan scanLocation] - 1];
 				break;
 			}
@@ -342,7 +343,7 @@
 		r.location += delta;
 		NSString *expFormat = [self expandFormat:format
 		                               withMatch:m
-		                               stopChars:nil
+		                               stopChars:@""
 		                          originalString:value
 		                           scannedLength:nil
 		                                   error:outError];
@@ -581,7 +582,7 @@
 
 	if (![self updateTabstopsError:outError])
 		return NO;
-	DEBUG(@"updated string = [%@]", string);
+	DEBUG(@"inserted string = [%@]", [self string]);
 
 	if ([tabstops count] == 0)
 		caret = NSMaxRange(range);
@@ -660,8 +661,6 @@
 				ts.baseLocation += delta;
 			if (r.location > location)
 				r.location += delta;
-			else if (NSMaxRange(r) >= location)
-				r.length += delta;
 			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu",
 			    ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
 			ts.range = r;
@@ -715,6 +714,8 @@
 		}
 
 		NSInteger delta = [value length] - r.length;
+		r.length = [value length];
+		ts.range = r;
 		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
 	}
 

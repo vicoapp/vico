@@ -520,4 +520,13 @@
 	STAssertEqualObjects([snippet string], @"id return id;", nil);
 }
 
+/* Quick! What does this snippet do? */
+- (void)test058_printf
+{
+	[self makeSnippet:@"printf(\"${1:%s}\\n\"${1/([^%]|%%)*(%.)?.*/(?2:, :\\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\\);)/}"];
+	STAssertEqualObjects([snippet string], @"printf(\"%s\\n\", );", nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"hello"], nil);
+	STAssertEqualObjects([snippet string], @"printf(\"hello\\n\");", nil);
+}
+
 @end

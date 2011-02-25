@@ -303,8 +303,8 @@
 
 - (void)test031_tabstopOrdering
 {
-	[self makeSnippet:@"2:$2 0:$0 1:$1 3:$3 2.2:$2 2.3:$2"];
-	STAssertEqualObjects([snippet string], @"2: 0: 1: 3: 2.2: 2.3:", nil);
+	[self makeSnippet:@"2:$2 0:$0 1:$1 4:$4 2.2:$2 2.3:$2"];
+	STAssertEqualObjects([snippet string], @"2: 0: 1: 4: 2.2: 2.3:", nil);
 	STAssertEquals(snippet.caret, 8ULL, nil);
 	STAssertTrue([snippet advance], nil);
 	STAssertEquals(snippet.caret, 2ULL, nil);
@@ -521,6 +521,14 @@
 	STAssertEqualObjects([snippet string], @"printf(\"hello\\n\");", nil);
 }
 
+- (void)test058_printfAdvance
+{
+	[self makeSnippet:@"printf(\"${1:%s}\\n\"${1/([^%]|%%)*(%.)?.*/(?2:, :\\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\\);)/}"];
+	STAssertEqualObjects([snippet string], @"printf(\"%s\\n\", );", nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.caret, 15ULL, nil);
+}
+
 /* http://e-texteditor.com/blog/2008/snippet-pipes */
 - (void)test059_snippetPipe
 {
@@ -548,6 +556,25 @@
 	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"bacon"], nil);
 	STAssertTrue([snippet advance], nil);
 	STAssertEquals(snippet.caret, 5ULL, nil);
+}
+
+- (void)test062_nestedTabstopsMultipleLevels
+{
+	[self makeSnippet:@"x: ${1:nested ${2:tab${3:stop}}}"];
+	STAssertEqualObjects([snippet string], @"x: nested tabstop", nil);
+	STAssertEquals(snippet.caret, 3ULL, nil);
+	STAssertEquals(snippet.selectedRange.location, 3ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 14ULL, nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.caret, 10ULL, nil);
+	STAssertEquals(snippet.selectedRange.location, 10ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 7ULL, nil);
+	STAssertTrue([snippet advance], nil);
+	STAssertEquals(snippet.caret, 13ULL, nil);
+	STAssertEquals(snippet.selectedRange.location, 13ULL, nil);
+	STAssertEquals(snippet.selectedRange.length, 4ULL, nil);
+	STAssertTrue([snippet replaceRange:snippet.selectedRange withString:@"le"], nil);
+	STAssertEqualObjects([snippet string], @"x: nested table", nil);
 }
 
 @end

@@ -12,7 +12,7 @@
 {
 	int num;
 	NSRange range;
-	NSUInteger baseLocation;
+	NSUInteger index;
 	NSMutableString *value;
 	ViTabstop *parent;
 	ViTabstop *mirror;
@@ -22,7 +22,7 @@
 	NSString *filter;
 }
 @property(readwrite) int num;
-@property(readwrite) NSUInteger baseLocation;
+@property(readwrite) NSUInteger index;
 @property(readwrite) NSRange range;
 @property(readwrite) ViTabstop *parent;
 @property(readwrite) ViTabstop *mirror;
@@ -35,20 +35,18 @@
 
 
 @implementation ViTabstop
-@synthesize num, baseLocation, parent, mirror, range, value, rx, format, options, filter;
+@synthesize num, parent, mirror, range, value, rx, format, options, filter, index;
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViTabstop %i@%@+%lu: [%@], pipe: [%@], parent: %@, mirror of: %@>",
-	    num, NSStringFromRange(range), baseLocation, value, filter, parent, mirror];
+	return [NSString stringWithFormat:@"<ViTabstop %i@%@: [%@], pipe: [%@], parent: %@, mirror of: %@>",
+	    num, NSStringFromRange(range), value, filter, parent, mirror];
 }
 @end
 
 @interface ViSnippet (private)
-- (void)updateTabstopsFromLocation:(NSUInteger)location
-                withChangeInLength:(NSInteger)delta
-                             error:(NSError **)outError;
 - (BOOL)updateTabstopsError:(NSError **)outError;
 - (void)removeNestedIn:(ViTabstop *)parent;
+- (NSUInteger)parentLocation:(ViTabstop *)ts;
 @end
 
 @implementation ViSnippet
@@ -145,25 +143,6 @@
 
 	DEBUG(@"output is [%@]", outputText);
 	return outputText;
-}
-
-- (void)sortTabstops:(NSMutableArray *)tsArray
-{
-	[tsArray sortUsingComparator:^(id obj1, id obj2) {
-		ViTabstop *a = obj1;
-		ViTabstop *b = obj2;
-		if (a.num == 0) {
-			if (b.num == 0)
-				return (NSComparisonResult)NSOrderedSame;
-			return (NSComparisonResult)NSOrderedDescending;
-		} else if (b.num == 0)
-			return (NSComparisonResult)NSOrderedAscending;
-		if (a.num < b.num)
-			return (NSComparisonResult)NSOrderedAscending;
-		else if (a.num > b.num)
-			return (NSComparisonResult)NSOrderedDescending;
-		return (NSComparisonResult)NSOrderedSame;
-	}];
 }
 
 #define RXFLAG_UPPERCASE_ONCE	1
@@ -378,7 +357,6 @@
                        stopChars:(NSString *)stopChars
                    parentTabstop:(ViTabstop *)parentTabstop
                    allowTabstops:(BOOL)allowTabstops
-                    baseLocation:(NSUInteger)baseLocation
                    scannedLength:(NSUInteger *)scannedLength
                            error:(NSError **)outError
 {
@@ -421,9 +399,11 @@
 				DEBUG(@"got tab stop %li at %lu", tabStop, [s length]);
 				ts = [[ViTabstop alloc] init];
 				ts.num = tabStop;
-				ts.baseLocation = baseLocation;
 				ts.parent = parentTabstop;
+				ts.index = [tabstops count];
 				[tabstops addObject:ts];
+				if (tabStop > maxTabNum)
+					maxTabNum = tabStop;
 			} else if ([scan scanShellVariableIntoString:&variable]) {
 				/*
 				 * Regular shell variable.
@@ -453,7 +433,6 @@
 					                       stopChars:@"|}"
 					                   parentTabstop:ts
 					                   allowTabstops:ts ? YES : NO
-					                    baseLocation:baseLocation + [s length]
 					                   scannedLength:&len
 					                           error:outError];
 					if (!defaultValue)
@@ -534,7 +513,7 @@
 				ts.options = options;
 				ts.filter = filter;
 				ts.value = defaultValue;
-				ts.range = NSMakeRange(baseLocation + [s length], [value length]);
+				ts.range = NSMakeRange([s length], [value length]);
 
 				/*
 				 * Find mirrors. The first defined tabstop with a default value is
@@ -604,7 +583,6 @@
 	                                  stopChars:@""
 	                              parentTabstop:nil
 	                              allowTabstops:YES
-	                               baseLocation:0
 	                              scannedLength:&len
 	                                      error:outError];
 	if (!string)
@@ -619,12 +597,10 @@
 	beginLocation = aLocation;
 	range = NSMakeRange(beginLocation, [string length]);
 
-	[self sortTabstops:tabstops];
-	DEBUG(@"tabstops = %@", tabstops);
-
-	DEBUG(@"string = [%@]", string);
 	delegate = aDelegate;
 	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string];
+
+	DEBUG(@"tabstops = %@", tabstops);
 
 	finished = ([tabstops count] == 0);
 
@@ -634,10 +610,8 @@
 
 	if (finished)
 		caret = NSMaxRange(range);
-	else {
-		currentTabIndex = -1;
+	else
 		[self advance];
-	}
 
 	return self;
 }
@@ -659,6 +633,26 @@
 	}
 }
 
+- (ViTabstop *)findTabstop:(NSUInteger)num
+{
+	ViTabstop *candidate = nil;
+	NSInteger i;
+
+	DEBUG(@"finding candidate for tabstop %lu", num);
+
+	for (i = 0; i < [tabstops count]; i++) {
+		ViTabstop *ts = [tabstops objectAtIndex:i];
+		DEBUG(@"testing candidate at index %i: %@", i, ts);
+		if (ts.num == num) {
+			candidate = ts;
+			if (candidate.mirror == nil)
+				break;
+		}
+	}
+
+	return candidate;
+}
+
 - (BOOL)advance
 {
 	if (finished)
@@ -666,43 +660,38 @@
 
 	[self filterTabstop:currentTabStop];
 
-	ViTabstop *candidate = nil;
-	NSInteger i, candidateIndex;
-	for (i = ++currentTabIndex; i < [tabstops count]; i++) {
-		ViTabstop *ts = [tabstops objectAtIndex:i];
-		DEBUG(@"testing candidate at index %i: %@", i, ts);
-		if (currentTabStop && currentTabStop.num == ts.num)
-			continue;
+	NSUInteger nextTabNum;
+	for (nextTabNum = ++currentTabNum; ; nextTabNum++) {
+		if (nextTabNum > maxTabNum)
+			nextTabNum = 0;
 
-		if (candidate == nil || candidate.num == ts.num) {
-			candidate = ts;
-			candidateIndex = i;
-		}
-
-		if (candidate.mirror == nil)
+		currentTabStop = [self findTabstop:nextTabNum];
+		if (currentTabStop || nextTabNum == 0)
 			break;
 	}
 
-	if (candidate == nil) {
-		DEBUG(@"%s", "no candidate found");
+	if (currentTabStop == nil) {
+		DEBUG(@"%s", "next tabstop not found");
 		finished = YES;
 		return NO;
 	}
 
-	currentTabIndex = candidateIndex;
-	currentTabStop = candidate;
-
 	DEBUG(@"advancing to tab stop %i range %@",
 	    currentTabStop.num, NSStringFromRange(currentTabStop.range));
 
-	if (currentTabStop.num == 0) {
+	if (nextTabNum == 0) {
 		[self filterTabstop:currentTabStop];
 		finished = YES;
 	}
 
 	NSRange r = currentTabStop.range;
 	caret = beginLocation + r.location;
+	if (currentTabStop.parent)
+		caret += [self parentLocation:currentTabStop];
 	selectedRange = NSMakeRange(caret, r.length);
+	currentTabNum = nextTabNum;
+
+	DEBUG(@"tabstops = %@", tabstops);
 
 	return YES;
 }
@@ -715,28 +704,24 @@
 	return NSMakeRange(beginLocation + r.location, r.length);
 }
 
-- (void)updateTabstopsFromLocation:(NSUInteger)location
-                withChangeInLength:(NSInteger)delta
-                          inParent:(ViTabstop *)parent
+- (void)pushTabstopsFromIndex:(NSUInteger)startIndex
+           withChangeInLength:(NSInteger)delta
+                     inParent:(ViTabstop *)parent
 {
-	DEBUG(@"update tabstops from location %lu with change %li in parent %@", location, delta, parent);
+	DEBUG(@"update tabstops from index %lu with change %li in parent %@", startIndex, delta, parent);
 
-	for (ViTabstop *ts in tabstops) {
+	NSUInteger i;
+	for (i = startIndex; i < [tabstops count]; i++) {
+		ViTabstop *ts = [tabstops objectAtIndex:i];
 		if (ts.parent == parent) {
 			NSRange r = ts.range;
-#ifndef NO_DEBUG
-			NSUInteger bs = ts.baseLocation;
-#endif
-			if (ts.baseLocation > location)
-				ts.baseLocation += delta;
-			if (r.location >= location)
-				r.location += delta;
-			DEBUG(@"tabstop %u range %@+%lu -> %@+%lu",
-			    ts.num, NSStringFromRange(ts.range), bs, NSStringFromRange(r), ts.baseLocation);
+			r.location += delta;
+			DEBUG(@"tabstop %u range %@ -> %@",
+			    ts.num, NSStringFromRange(ts.range), NSStringFromRange(r));
 			ts.range = r;
 		} else
-			DEBUG(@"tabstop %u range %@+%lu unchanged",
-			    ts.num, NSStringFromRange(ts.range), ts.baseLocation);
+			DEBUG(@"tabstop %u range %@ unchanged",
+			    ts.num, NSStringFromRange(ts.range));
 	}
 
 	if (parent == nil) {
@@ -776,16 +761,14 @@
 		NSRange r = ts.range;
 		if (ts.parent) {
 			NSMutableString *s = ts.parent.value;
-			DEBUG(@"update tab stop %i range %@+%lu with value [%@] in string [%@]",
-			    ts.num, NSStringFromRange(r), ts.baseLocation, value, s);
-			r.location -= ts.baseLocation;
+			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
+			    ts.num, NSStringFromRange(r), value, s);
 			[s replaceCharactersInRange:r withString:value];
-			r.location += ts.baseLocation;
 			DEBUG(@"string -> [%@]", s);
 			[self updateTabstop:ts.parent error:outError];
 		} else {
-			DEBUG(@"update tab stop %i range %@+%lu with value [%@] in string [%@]",
-			    ts.num, NSStringFromRange(r), ts.baseLocation, value, [delegate string]);
+			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
+			    ts.num, NSStringFromRange(r), value, [delegate string]);
 			r.location += beginLocation;
 			[delegate snippet:self replaceCharactersInRange:r withString:value];
 			r.location -= beginLocation;
@@ -793,10 +776,10 @@
 		}
 
 		NSInteger delta = [value length] - r.length;
-		[self updateTabstopsFromLocation:r.location withChangeInLength:delta inParent:ts.parent];
-
 		r.length = [value length];
 		ts.range = r;
+
+		[self pushTabstopsFromIndex:ts.index + 1 withChangeInLength:delta inParent:ts.parent];
 	}
 
 	return YES;
@@ -825,8 +808,6 @@
 				[self removeNestedIn:ts];
 				DEBUG(@"removing nested tabstop %@", ts);
 				[tabstops removeObjectAtIndex:i];
-				if (currentTabIndex >= i)
-					--currentTabIndex;
 				found = YES;
 				break;
 			}
@@ -851,10 +832,18 @@
 
 	NSRange r = currentTabStop.range;
 	normalizedRange.location -= r.location;
+	normalizedRange.location -= [self parentLocation:currentTabStop];
 	if (currentTabStop.value == nil)
 		currentTabStop.value = [NSMutableString string];
 	[currentTabStop.value replaceCharactersInRange:normalizedRange withString:replacementString];
 	return [self updateTabstopsError:nil];
+}
+
+- (NSUInteger)parentLocation:(ViTabstop *)ts
+{
+	if (ts.parent)
+		return ts.parent.range.location + [self parentLocation:ts.parent];
+	return 0ULL;
 }
 
 - (BOOL)activeInRange:(NSRange)aRange
@@ -866,6 +855,7 @@
 
 	NSRange normalizedRange = aRange;
 	normalizedRange.location -= beginLocation;
+	normalizedRange.location -= [self parentLocation:currentTabStop];
 
 	NSRange r = currentTabStop.range;
 	if (normalizedRange.location < r.location ||

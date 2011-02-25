@@ -10,7 +10,7 @@
 {
 	NSUInteger beginLocation;
 	ViTabstop *currentTabStop;
-	NSInteger currentTabIndex;
+	NSUInteger currentTabNum, maxTabNum;
 	id<ViSnippetDelegate> delegate;
 	NSRange range;
 	NSUInteger caret;

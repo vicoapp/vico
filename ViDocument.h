@@ -58,7 +58,6 @@
 - (void)changeTheme:(ViTheme *)aTheme;
 - (void)updatePageGuide;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
-- (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (ViDocumentView *)makeView;
 - (void)removeView:(ViDocumentView *)aDocumentView;

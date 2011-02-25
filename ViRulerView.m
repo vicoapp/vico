@@ -34,29 +34,29 @@
 	if (oldClientView != aView &&
 	    [oldClientView isKindOfClass:[NSTextView class]])
 		[notificationCenter removeObserver:self
-                                              name:NSTextStorageDidProcessEditingNotification
-                                            object:[(NSTextView *)oldClientView textStorage]];
+		                              name:ViTextStorageChangedLinesNotification
+		                            object:[(NSTextView *)oldClientView textStorage]];
 
 	[super setClientView:aView];
 
 	if (aView != nil && [aView isKindOfClass:[NSTextView class]])
 		[notificationCenter addObserver:self
-                                       selector:@selector(textStorageDidProcessEditing:)
-                                           name:NSTextStorageDidProcessEditingNotification
-                                         object:[(NSTextView *)aView textStorage]];
+		                       selector:@selector(textStorageDidChangeLines:)
+		                           name:ViTextStorageChangedLinesNotification
+		                         object:[(NSTextView *)aView textStorage]];
 }
 
-- (void)textStorageDidProcessEditing:(NSNotification *)notification
+- (void)textStorageDidChangeLines:(NSNotification *)notification
 {
-#if 0
-	NSTextStorage *textStorage = [notification object];
-	NSRange area = [textStorage editedRange];
-	NSInteger diff = [textStorage changeInLength];
-#endif
+	NSDictionary *userInfo = [notification userInfo];
 
-	/* FIXME:
-	 * Only need to redraw the ruler if changes include newlines.
-	 */
+	NSUInteger linesRemoved = [[userInfo objectForKey:@"linesRemoved"] unsignedIntegerValue];
+	NSUInteger linesAdded = [[userInfo objectForKey:@"linesAdded"] unsignedIntegerValue];
+
+	NSInteger diff = linesAdded - linesRemoved;
+	if (diff == 0)
+		return;
+
 	[self setNeedsDisplay:YES];
 
 	static CGFloat thickness;

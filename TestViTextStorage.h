@@ -4,6 +4,11 @@
 @interface TestViTextStorage : SenTestCase
 {
 	ViTextStorage *textStorage;
+
+	NSUInteger linesChanged;
+	NSUInteger linesRemoved;
+	NSUInteger linesAdded;
+	NSUInteger lineChangeIndex;
 }
 
 @end

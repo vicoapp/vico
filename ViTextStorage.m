@@ -273,6 +273,10 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	DEBUG(@"edited range = %@, diff = %li, str = [%@]", NSStringFromRange(aRange), diff, str);
 
 	NSUInteger lineIndex = [self lineIndexAtLocation:aRange.location];
+	NSUInteger firstLineIndex = lineIndex;
+	NSUInteger linesChanged = 0;
+	NSUInteger linesRemoved = 0;
+	NSUInteger linesAdded = 0;
 	NSUInteger location = aRange.location;
 	NSUInteger bol, eol, end;
 
@@ -291,6 +295,8 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			    lineIndex, end - bol, bol, end);
 			[self removeLine:lineIndex];
 			location = end;
+			linesRemoved++;
+			linesChanged++;
 		}
 
 	[string replaceCharactersInRange:aRange withString:str];
@@ -304,6 +310,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		[self replaceLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
 		location = end;
 		lineIndex++;
+		linesChanged++;
 	}
 
 	/* Insert whole new lines. */
@@ -319,9 +326,25 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			[self insertLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
 			location = end;
 			lineIndex++;
+			linesAdded++;
+			linesChanged++;
 		}
 	}
 //	debug_skiplist(&skiphead);
+
+	DEBUG(@"changed %li lines (removed %lu, inserted %lu) from line index %lu",
+	    linesChanged, linesRemoved, linesAdded, firstLineIndex);
+
+	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+	    [NSNumber numberWithUnsignedInteger:linesChanged], @"linesChanged",
+	    [NSNumber numberWithUnsignedInteger:linesRemoved], @"linesRemoved",
+	    [NSNumber numberWithUnsignedInteger:linesAdded], @"linesAdded",
+	    [NSNumber numberWithUnsignedInteger:firstLineIndex], @"lineIndex",
+	    nil];
+	[center postNotificationName:ViTextStorageChangedLinesNotification
+	                      object:self
+	                    userInfo:userInfo];
 
 	[self edited:NSTextStorageEditedCharacters range:aRange changeInLength:diff];
 }

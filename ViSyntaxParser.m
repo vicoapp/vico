@@ -54,37 +54,31 @@
 	return continuedMatches;
 }
 
-- (void)pushContinuations:(NSValue *)rangeValue
+- (void)pushContinuations:(NSUInteger)changedLines
+           fromLineNumber:(NSUInteger)lineNumber
 {
-	NSRange range = [rangeValue rangeValue];
-	unsigned lineno = range.location;
-	int n = range.length;
-
-	if (lineno >= [continuations count])
+	if (lineNumber >= [continuations count])
 		return;
 
 	NSArray *prev;
-	if (lineno == 0)
+	if (lineNumber == 0)
 		prev = [NSArray array];
 	else
-		prev = [continuations objectAtIndex:(lineno - 1)];
+		prev = [continuations objectAtIndex:(lineNumber - 1)];
 
-	DEBUG(@"pushing %i continuations after line %i, copying scopes %@", n, lineno, prev);
+	DEBUG(@"pushing %i continuations after line %i, copying scopes %@",
+	    changedLines, lineNumber, prev);
 
-	while (n-- && lineno < [continuations count])
-		[continuations insertObject:[prev copy] atIndex:lineno];
+	while (changedLines-- && lineNumber < [continuations count])
+		[continuations insertObject:[prev copy] atIndex:lineNumber];
 }
 
-- (void)pullContinuations:(NSValue *)rangeValue
+- (void)pullContinuations:(NSUInteger)changedLines
+           fromLineNumber:(NSUInteger)lineNumber
 {
-	NSRange range = [rangeValue rangeValue];
-	unsigned lineno = range.location;
-	int n = range.length;
-
-	DEBUG(@"pulling %i continuations at line %i", n, lineno);
-
-	while (n-- && lineno < [continuations count])
-		[continuations removeObjectAtIndex:lineno];
+	DEBUG(@"pulling %i continuations at line %i", changedLines, lineNumber);
+	while (changedLines-- && lineNumber < [continuations count])
+		[continuations removeObjectAtIndex:lineNumber];
 }
 
 #pragma mark -

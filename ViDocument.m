@@ -57,6 +57,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
 
+		[[NSNotificationCenter defaultCenter] addObserver:self
+							 selector:@selector(textStorageDidChangeLines:)
+							     name:ViTextStorageChangedLinesNotification 
+							   object:textStorage];
+
 		NSString *symbolIconsFile = [[NSBundle mainBundle] pathForResource:@"symbol-icons"
 		                                                            ofType:@"plist"];
 		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:symbolIconsFile];
@@ -624,36 +629,27 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self configureForURL:[self fileURL]];
 }
 
-- (void)pushContinuationsInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
-{
-	NSString *affectedString = [[textStorage string] substringWithRange:affectedCharRange];
-
-	NSInteger affectedLines = [affectedString numberOfLines];
-	NSInteger replacementLines = [replacementString numberOfLines];
-
-	NSInteger diff = replacementLines - affectedLines;
-	if (diff == 0)
-		return;
-
-	unsigned lineno = 0;
-	if (affectedCharRange.location > 1)
-		lineno = [textStorage lineNumberAtLocation:affectedCharRange.location - 1];
-
-	if (diff > 0)
-		[syntaxParser pushContinuations:[NSValue valueWithRange:NSMakeRange(lineno, diff)]];
-	else
-		[syntaxParser pullContinuations:[NSValue valueWithRange:NSMakeRange(lineno, -diff)]];
-}
-
 #pragma mark -
 #pragma mark NSTextStorage delegate methods
 
-// XXX: I don't think this is always called...
-- (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
+- (void)textStorageDidChangeLines:(NSNotification *)notification
 {
-	if (!ignoreEditing)
-		[self pushContinuationsInRange:affectedCharRange replacementString:replacementString];
-	return YES;
+	NSDictionary *userInfo = [notification userInfo];
+
+	if (!ignoreEditing) {
+		NSUInteger lineIndex = [[userInfo objectForKey:@"lineIndex"] unsignedIntegerValue];
+		NSUInteger linesRemoved = [[userInfo objectForKey:@"linesRemoved"] unsignedIntegerValue];
+		NSUInteger linesAdded = [[userInfo objectForKey:@"linesAdded"] unsignedIntegerValue];
+
+		NSInteger diff = linesAdded - linesRemoved;
+		if (diff == 0)
+			return;
+
+		if (diff > 0)
+			[syntaxParser pushContinuations:diff fromLineNumber:lineIndex + 1];
+		else
+			[syntaxParser pullContinuations:-diff fromLineNumber:lineIndex + 1];
+	}
 }
 
 - (void)textStorageDidProcessEditing:(NSNotification *)notification

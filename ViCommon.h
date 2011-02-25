@@ -16,3 +16,6 @@
 #define IMIN(a, b)  (((NSInteger)a) < ((NSInteger)b) ? (a) : (b))
 
 typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisualMode, ViAnyMode } ViMode;
+
+#define ViTextStorageChangedLinesNotification @"ViTextStorageChangedLinesNotification"
+

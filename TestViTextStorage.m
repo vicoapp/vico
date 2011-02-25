@@ -3,9 +3,32 @@
 
 @implementation TestViTextStorage
 
+- (void)textStorageDidChangeLines:(NSNotification *)notification
+{
+	NSDictionary *userInfo = [notification userInfo];
+
+	STAssertEqualObjects([notification object], textStorage, nil);
+
+	linesChanged = [[userInfo objectForKey:@"linesChanged"] unsignedIntegerValue];
+	linesRemoved = [[userInfo objectForKey:@"linesRemoved"] unsignedIntegerValue];
+	linesAdded = [[userInfo objectForKey:@"linesAdded"] unsignedIntegerValue];
+	lineChangeIndex = [[userInfo objectForKey:@"lineIndex"] unsignedIntegerValue];
+}
+
 - (void)setUp
 {
 	textStorage = [[ViTextStorage alloc] init];
+
+	linesChanged = 4711;
+	linesRemoved = 4711;
+	linesAdded = 4711;
+	lineChangeIndex = 4711;
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+	                                         selector:@selector(textStorageDidChangeLines:)
+	                                             name:ViTextStorageChangedLinesNotification 
+	                                           object:textStorage];
+	[textStorage setDelegate:self];
 }
 
 - (void)test001_AllocateTextStorage
@@ -22,6 +45,10 @@
 {
 	[[textStorage mutableString] setString:@"bacon"];
 	STAssertEqualObjects([textStorage string], @"bacon", nil);
+	STAssertEquals(linesChanged, 1ULL, nil);
+	STAssertEquals(linesRemoved, 0ULL, nil);
+	STAssertEquals(linesAdded, 1ULL, nil);
+	STAssertEquals(lineChangeIndex, 0ULL, nil);
 }
 
 - (void)test004_GetAttributes
@@ -39,6 +66,10 @@
 {
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	STAssertEquals([textStorage locationForStartOfLine:3], 5LL, nil);
+	STAssertEquals(linesChanged, 5ULL, nil);
+	STAssertEquals(linesRemoved, 0ULL, nil);
+	STAssertEquals(linesAdded, 5ULL, nil);
+	STAssertEquals(lineChangeIndex, 0ULL, nil);
 }
 
 - (void)test006_locationOfInvalidLine
@@ -60,6 +91,9 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage insertString:@"bacon!" atIndex:3];
 	STAssertEquals([textStorage locationForStartOfLine:3], 5LL+6LL, nil);
+	STAssertEquals(linesChanged, 1ULL, nil);
+	STAssertEquals(linesRemoved, 0ULL, nil);
+	STAssertEquals(linesAdded, 0ULL, nil);
 }
 
 - (void)test009_lineLocationAfterInsertingMultipleLinesOfText
@@ -67,6 +101,11 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage insertString:@"chunky\nbacon" atIndex:3];
 	STAssertEquals([textStorage locationForStartOfLine:3], 10LL, nil);
+
+	STAssertEquals(lineChangeIndex, 1ULL, nil);
+	STAssertEquals(linesChanged, 2ULL, nil);
+	STAssertEquals(linesRemoved, 0ULL, nil);
+	STAssertEquals(linesAdded, 1ULL, nil);
 }
 
 - (void)test010_lineLocationAfterDeletingText
@@ -74,6 +113,9 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage replaceCharactersInRange:NSMakeRange(2, 1) withString:@""];
 	STAssertEquals([textStorage locationForStartOfLine:3], 4LL, nil);
+	STAssertEquals(linesChanged, 1ULL, nil);
+	STAssertEquals(linesRemoved, 0ULL, nil);
+	STAssertEquals(linesAdded, 0ULL, nil);
 }
 
 - (void)test011_lineLocationAfterDeletingMultipleLinesOfText
@@ -81,6 +123,10 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage replaceCharactersInRange:NSMakeRange(0, 6) withString:@""];
 	STAssertEquals([textStorage locationForStartOfLine:3], 8LL, nil);
+	STAssertEquals(lineChangeIndex, 0ULL, nil);
+	STAssertEquals(linesChanged, 3ULL, nil);
+	STAssertEquals(linesRemoved, 2ULL, nil);
+	STAssertEquals(linesAdded, 0ULL, nil);
 }
 
 - (void)test012_lineLocationAfterReplacingTextSameAmount
@@ -111,6 +157,10 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage replaceCharactersInRange:NSMakeRange(0, 5) withString:@"bacon"];
 	STAssertEquals([textStorage locationForStartOfLine:3], 14LL, nil);
+	STAssertEquals(lineChangeIndex, 0ULL, nil);
+	STAssertEquals(linesChanged, 3ULL, nil);
+	STAssertEquals(linesRemoved, 2ULL, nil);
+	STAssertEquals(linesAdded, 0ULL, nil);
 }
 
 - (void)test016_lineLocationAfterReplacingTextMoreLines
@@ -118,6 +168,11 @@
 	[[textStorage mutableString] setString:@"a\nbc\ndef\nghij\nklmno\n"];
 	[textStorage replaceCharactersInRange:NSMakeRange(0, 5) withString:@"1\n2\n3\n"];
 	STAssertEquals([textStorage locationForStartOfLine:3], 4LL, nil);
+
+	STAssertEquals(lineChangeIndex, 0ULL, nil);
+	STAssertEquals(linesChanged, 6ULL, nil);
+	STAssertEquals(linesRemoved, 2ULL, nil);
+	STAssertEquals(linesAdded, 3ULL, nil);
 }
 
 - (void)test017_lineLocationAfterBreakingLine

@@ -23,7 +23,6 @@
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (NSFont *)font;
 - (NSDictionary *)typingAttributes;
-- (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 - (ViJumpList *)jumpList;
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;

@@ -36,8 +36,12 @@
 
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch;
 
-- (void)pushContinuations:(NSValue *)rangeValue;
-- (void)pullContinuations:(NSValue *)rangeValue;
+- (void)pushContinuations:(NSUInteger)changedLines
+           fromLineNumber:(NSUInteger)lineNumber;
+
+- (void)pullContinuations:(NSUInteger)changedLines
+           fromLineNumber:(NSUInteger)lineNumber;
+
 - (void)pushScopes:(NSRange)affectedRange;
 - (void)pullScopes:(NSRange)affectedRange;
 

@@ -22,6 +22,9 @@ int logIndent = 0;
 - (void)switch_tab:(int)arg;
 - (void)show_scope;
 - (BOOL)normal_mode:(ViCommand *)command;
+- (void)replaceCharactersInRange:(NSRange)aRange
+                      withString:(NSString *)aString
+                       undoGroup:(BOOL)undoGroup;
 @end
 
 #pragma mark -
@@ -69,13 +72,22 @@ int logIndent = 0;
 	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
 	[self setDrawsBackground:YES];
 
-	[[self layoutManager] setAllowsNonContiguousLayout:YES];
+	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
+	if ([[self textStorage] lineCount] > 3000)
+		[[self layoutManager] setAllowsNonContiguousLayout:YES];
+	else
+		[[self layoutManager] setAllowsNonContiguousLayout:NO];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"antialias"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
 	antialias = [[NSUserDefaults standardUserDefaults] boolForKey:@"antialias"];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(textStorageDidChangeLines:)
+						     name:ViTextStorageChangedLinesNotification 
+						   object:[self textStorage]];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 }
@@ -94,6 +106,26 @@ int logIndent = 0;
 	if ([keyPath isEqualToString:@"antialias"]) {
 		antialias = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
 		[self setNeedsDisplayInRect:[self bounds]];
+	}
+}
+
+- (void)textStorageDidChangeLines:(NSNotification *)notification
+{
+	/*
+	 * Don't enable non-contiguous layout unless we have a huge document.
+	 * It's buggy and annoying, but layout is unusable on huge documents otherwise...
+	 */
+	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
+	if ([[self textStorage] lineCount] > 3000) {
+		if (![[self layoutManager] allowsNonContiguousLayout]) {
+			DEBUG(@"enabling non-contiguous layout");
+			[[self layoutManager] setAllowsNonContiguousLayout:YES];
+		}
+	} else {
+		if ([[self layoutManager] allowsNonContiguousLayout]) {
+			DEBUG(@"disabling non-contiguous layout");
+			[[self layoutManager] setAllowsNonContiguousLayout:NO];
+		}
 	}
 }
 
@@ -221,7 +253,9 @@ int logIndent = 0;
 	                                  withString:aString];
 }
 
-- (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup
+- (void)replaceCharactersInRange:(NSRange)aRange
+                      withString:(NSString *)aString
+                       undoGroup:(BOOL)undoGroup
 {
 	modify_start_location = aRange.location;
 
@@ -232,11 +266,6 @@ int logIndent = 0;
 			return;
 		[self cancelSnippet:snippet];
 	}
-
-	if ([self delegate] != nil && [[self delegate] textView:self
-					shouldChangeTextInRange:aRange
-					      replacementString:aString] == NO)
-		return;
 
 	if (undoGroup)
 		[self beginUndoGroup];
@@ -288,11 +317,6 @@ int logIndent = 0;
 - (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
 {
 	DEBUG(@"replace range %@ with [%@]", NSStringFromRange(aRange), aString);
-	if ([self delegate] != nil && [[self delegate] textView:self
-					shouldChangeTextInRange:aRange
-					      replacementString:aString] == NO)
-		return;
-
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];

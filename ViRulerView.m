@@ -171,4 +171,24 @@
 	}
 }
 
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	id view = [self clientView];
+	if ([view isKindOfClass:[ViTextView class]]) {
+		fromPoint = [view convertPoint:[theEvent locationInWindow] fromView:nil];
+		fromPoint.x = 0;
+		[(ViTextView *)view rulerView:self selectFromPoint:fromPoint toPoint:fromPoint];
+	}
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	id view = [self clientView];
+	if ([view isKindOfClass:[ViTextView class]]) {
+		NSPoint toPoint = [view convertPoint:[theEvent locationInWindow] fromView:nil];
+		toPoint.x = 0;
+		[(ViTextView *)view rulerView:self selectFromPoint:fromPoint toPoint:toPoint];
+	}
+}
+
 @end

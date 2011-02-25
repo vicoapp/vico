@@ -129,6 +129,32 @@ int logIndent = 0;
 	}
 }
 
+- (void)rulerView:(NSRulerView *)aRulerView
+  selectFromPoint:(NSPoint)fromPoint
+          toPoint:(NSPoint)toPoint
+{
+	NSInteger fromIndex = [self characterIndexForInsertionAtPoint:fromPoint];
+	if (fromIndex == NSNotFound)
+		return;
+
+	NSInteger toIndex = [self characterIndexForInsertionAtPoint:toPoint];
+	if (toIndex == NSNotFound)
+		return;
+
+	if (parser.partial) {
+		[[self delegate] message:@"Vi command interrupted."];
+		[parser reset];
+	}
+
+	visual_start_location = fromIndex;
+	visual_line_mode = YES;
+	end_location = toIndex;
+
+	[self setVisualMode];
+	[self setCaret:toIndex];
+	[self setVisualSelection];
+}
+
 - (void)paste:(id)sender
 {
 	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];

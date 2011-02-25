@@ -3,6 +3,7 @@
 	NSFont		*font;
 	NSColor		*color;
 	NSColor		*backgroundColor;
+	NSPoint		 fromPoint;
 }
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;

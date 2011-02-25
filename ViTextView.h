@@ -108,6 +108,9 @@
 - (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (void)setPageGuide:(int)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
+- (void)rulerView:(NSRulerView *)aRulerView
+  selectFromPoint:(NSPoint)fromPoint
+          toPoint:(NSPoint)toPoint;
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 

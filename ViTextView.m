@@ -25,6 +25,7 @@ int logIndent = 0;
 - (void)replaceCharactersInRange:(NSRange)aRange
                       withString:(NSString *)aString
                        undoGroup:(BOOL)undoGroup;
+- (void)setVisualSelection;
 @end
 
 #pragma mark -

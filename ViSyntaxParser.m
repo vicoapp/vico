@@ -146,7 +146,6 @@
 		DEBUG(@"shortened sleft = %@", sleft);
 	}
 
-#if 1
 	if ([scopeArray count] > NSMaxRange(affectedRange))
 	{
 		ViScope *sright = [scopeArray objectAtIndex:NSMaxRange(affectedRange)];
@@ -170,7 +169,6 @@
 			}
 		}
 	}
-#endif
 
 	if ([scopeArray count] <= affectedRange.location)
 		return;

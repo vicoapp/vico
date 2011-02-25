@@ -1100,6 +1100,15 @@ int logIndent = 0;
 
 - (BOOL)input_backspace:(ViCommand *)command
 {
+	// If there is a selected snippet range, remove it first.
+	ViSnippet *snippet = [self delegate].snippet;
+	NSRange sel = snippet.selectedRange;
+	if (sel.length > 0) {
+		[self deleteRange:sel];
+		start_location = modify_start_location;
+		return YES;
+	}
+
 	if (start_location == 0) {
 		[[self delegate] message:@"Already at the beginning of the document"];
 		return YES;

@@ -1446,10 +1446,12 @@ int logIndent = 0;
 	if (parser.complete)
 		[parser reset];
 
-	if (mode == ViVisualMode)
-		[parser setVisualMap];
-	else if (mode == ViInsertMode)
-		[parser setInsertMap];
+	if (!parser.partial) {
+		if (mode == ViVisualMode)
+			[parser setVisualMap];
+		else if (mode == ViInsertMode)
+			[parser setInsertMap];
+	}
 
 	[parser pushKey:charcode];
 	if (parser.complete) {

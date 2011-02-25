@@ -445,11 +445,6 @@ ToolbarHeightForWindow(NSWindow *window)
 #pragma mark -
 #pragma mark Installing bundles from GitHub
 
-- (NSString *)pathForBundleTarball:(NSString *)bundleName
-{
-	return [[NSString stringWithFormat:@"%@/%@.tar.gz", [ViAppController supportDirectory], bundleName] stringByExpandingTildeInPath];
-}
-
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
 	[self cancelProgressSheet:nil];

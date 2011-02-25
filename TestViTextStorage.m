@@ -28,7 +28,6 @@
 	                                         selector:@selector(textStorageDidChangeLines:)
 	                                             name:ViTextStorageChangedLinesNotification 
 	                                           object:textStorage];
-	[textStorage setDelegate:self];
 }
 
 - (void)test001_AllocateTextStorage

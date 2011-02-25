@@ -66,6 +66,14 @@ static struct vikey g_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey visual_g_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
+	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
+	{@"uppercase:",		'U', VIF_SETS_DOT},
+	{@"lowercase:",		'u', VIF_SETS_DOT},
+	{nil, -1, 0}
+};
+
 static struct vikey normal_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
@@ -263,6 +271,7 @@ static struct vikey visual_keys[] = {
 	{@"delete:",		'd', VIF_SETS_DOT},
 	{@"end_of_word:",	'e', VIF_IS_MOTION},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
+	{@"g_prefix:",		'g', 0, visual_g_keys},
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"select_inner:",	'i', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},

@@ -134,6 +134,28 @@ int logIndent = 0;
 	return (id <ViTextViewDelegate>)[super delegate];
 }
 
+- (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
+              replacementStrings:(NSArray *)replacementStrings
+{
+	[self beginUndoGroup];
+
+	NSUInteger i;
+	for (i = 0; i < [affectedRanges count]; i++) {
+		NSRange range = [[affectedRanges objectAtIndex:i] rangeValue];
+		NSString *string = [replacementStrings objectAtIndex:i];
+		[self replaceCharactersInRange:range withString:string undoGroup:NO];
+	}
+
+	[self endUndoGroup];
+
+	return NO;
+}
+
+- (void)insertText:(id)aString
+{
+	DEBUG(@"insert text [%@]", aString);
+}
+
 #pragma mark -
 #pragma mark Vi error messages
 

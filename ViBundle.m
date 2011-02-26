@@ -4,6 +4,7 @@
 #import "ViBundleSnippet.h"
 #import "ViTabTriggerMenuItemView.h"
 #import "ViTextView.h"
+#import "ViLanguageStore.h"
 #import "logging.h"
 
 @implementation ViBundle
@@ -131,7 +132,26 @@
 	[env setObject:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
 	[env setObject:NSHomeDirectory() forKey:@"HOME"];
 
-	// FIXME: shellVariables in bundle preferences
+	/*
+	 * shellVariables from bundle preferences
+	 */
+	NSDictionary *shellVariables = [[ViLanguageStore defaultStore] preferenceItem:@"shellVariables"];
+	NSString *bestMatchingScope = [textView bestMatchingScope:[shellVariables allKeys] atLocation:[textView caret]];
+
+	if (bestMatchingScope) {
+		id vars = [shellVariables objectForKey:bestMatchingScope];
+		if ([vars isKindOfClass:[NSArray class]]) {
+			for (NSDictionary *var in vars) {
+				if ([var isKindOfClass:[NSDictionary class]]) {
+					NSString *varName = [var objectForKey:@"name"];
+					NSString *varValue = [var objectForKey:@"value"];
+					if ([varName isKindOfClass:[NSString class]] &&
+					    [varValue isKindOfClass:[NSString class]])
+						[env setObject:varValue forKey:varName];
+				}
+			}
+		}
+	}
 }
 
 - (id)initWithPath:(NSString *)aPath

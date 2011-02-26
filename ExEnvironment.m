@@ -530,7 +530,7 @@
 		url = filenameOrURL;
 	else
 		url = [self parseExFilename:filenameOrURL];
-	
+
 	BOOL isDirectory = NO;
 	BOOL exists = NO;
 	if ([url isFileURL])
@@ -563,7 +563,10 @@
 		return nil;
 	}
 
-	[windowController addDocument:doc];
+	if (!display) {
+		[doc addWindowController:windowController];
+		[windowController addDocument:doc];
+	}
 
 	return doc;
 }
@@ -572,14 +575,13 @@
 {
 	if (command.filename == nil)
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
-	else {
-		ViDocument *document = [self openDocument:command.filename andDisplay:YES allowDirectory:YES];
-		if (document)
-			[windowController selectDocument:document];
-	}
+	else
+		[self openDocument:command.filename andDisplay:YES allowDirectory:YES];
 }
 
-- (ViDocument *)splitVertically:(BOOL)isVertical andOpen:(id)filenameOrURL orSwitchToDocument:(ViDocument *)doc
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc
 {
 	if (filenameOrURL) {
 		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];

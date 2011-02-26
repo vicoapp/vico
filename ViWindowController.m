@@ -399,7 +399,9 @@ static NSWindowController	*currentWindowController = nil;
 
 - (void)focusEditor
 {
-	[self performSelector:@selector(focusEditorDelayed:) withObject:nil afterDelay:0.0];
+	[self performSelector:@selector(focusEditorDelayed:)
+	           withObject:nil
+	           afterDelay:0.0];
 }
 
 - (ViTagStack *)sharedTagStack
@@ -408,16 +410,6 @@ static NSWindowController	*currentWindowController = nil;
 		tagStack = [[ViTagStack alloc] init];
 	return tagStack;
 }
-
-#if 0
-- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
-{
-	NSString *projName = [[self project] displayName];
-	if ([self currentDocument] == nil)
-		return projName;
-	return displayName;
-}
-#endif
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotification
 {
@@ -443,7 +435,9 @@ static NSWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Document closing
 
-- (void)documentController:(NSDocumentController *)docController didCloseAll:(BOOL)didCloseAll contextInfo:(void *)contextInfo
+- (void)documentController:(NSDocumentController *)docController
+               didCloseAll:(BOOL)didCloseAll
+               contextInfo:(void *)contextInfo
 {
 	if (didCloseAll)
 		[[self window] close];
@@ -504,7 +498,9 @@ static NSWindowController	*currentWindowController = nil;
 	}
 }
 
-- (void)document:(NSDocument *)doc shouldClose:(BOOL)shouldClose contextInfo:(void *)contextInfo
+- (void)document:(NSDocument *)doc
+     shouldClose:(BOOL)shouldClose
+     contextInfo:(void *)contextInfo
 {
 	if (!shouldClose)
 		return;
@@ -532,7 +528,9 @@ static NSWindowController	*currentWindowController = nil;
 		ViDocument *doc = [(ViDocumentView *)viewController document];
 		if ([[doc views] count] == 1) {
 			// closing the last view, close the document
-			[doc canCloseDocumentWithDelegate:self shouldCloseSelector:@selector(document:shouldClose:contextInfo:) contextInfo:viewController];
+			[doc canCloseDocumentWithDelegate:self
+			              shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
+			                      contextInfo:viewController];
 			return;
 		}
 	}
@@ -609,7 +607,9 @@ static NSWindowController	*currentWindowController = nil;
 	[self selectDocumentView:tabController.selectedView];
 }
 
-- (void)documentController:(NSDocumentController *)docController didCloseAll:(BOOL)didCloseAll tabController:(void *)tabController
+- (void)documentController:(NSDocumentController *)docController
+               didCloseAll:(BOOL)didCloseAll
+             tabController:(void *)tabController
 {
 	if (didCloseAll)
 		[self closeTabController:tabController];

@@ -84,6 +84,7 @@ static NSString *bundlesDirectory = nil;
 	languages = [[NSMutableDictionary alloc] init];
 	bundles = [[NSMutableArray alloc] init];
 
+	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 	[self addBundlesFromBundleDirectory:[ViLanguageStore bundlesDirectory]];
 }
 

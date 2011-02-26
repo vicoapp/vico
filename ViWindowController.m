@@ -305,9 +305,11 @@ static NSWindowController	*currentWindowController = nil;
 	[self focusEditor];
 }
 
-- (void)createTabForDocument:(ViDocument *)document
+- (ViDocumentView *)createTabForDocument:(ViDocument *)document
 {
-	[self createTabWithViewController:[document makeView]];
+	ViDocumentView *docView = [document makeView];
+	[self createTabWithViewController:docView];
+	return docView;
 }
 
 /* Called by a new ViDocument in its makeWindowControllers method.
@@ -790,9 +792,9 @@ static NSWindowController	*currentWindowController = nil;
 	if ([[document views] count] > 0)
 		return [self selectDocumentView:[[document views] objectAtIndex:0]];
 
-	// No view exists of the document. Ugh. Create a new tab? Or just keep it hidden?
-	[self createTabForDocument:document];
-	return [[document views] objectAtIndex:0];
+	// No view exists of the document, create a new tab.
+	docView = [self createTabForDocument:document];
+	return [self selectDocumentView:docView];
 }
 
 - (IBAction)selectNextTab:(id)sender

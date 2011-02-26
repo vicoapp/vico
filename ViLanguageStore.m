@@ -50,7 +50,7 @@ static NSString *bundlesDirectory = nil;
 
 	dir = [NSString stringWithFormat:@"%@/Preferences", bundleDirectory];
 	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
-		if ([file hasSuffix:@".plist"])
+		if ([file hasSuffix:@".plist"] || [file hasSuffix:@".tmPreferences"])
 			[bundle addPreferences:[[NSMutableDictionary alloc] initWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
 
 	dir = [NSString stringWithFormat:@"%@/Snippets", bundleDirectory];

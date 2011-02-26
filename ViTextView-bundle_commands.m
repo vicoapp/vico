@@ -196,7 +196,6 @@
 	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, @"command", [NSValue valueWithRange:inputRange], @"inputRange", nil];
-	INFO(@"contextInfo = %p", info);
 	[[[self delegate] environment] filterText:inputText throughTask:task target:self selector:@selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:) contextInfo:info displayTitle:[command name]];
 
 	if (fd != -1) {
@@ -210,12 +209,11 @@
                          standardOutput:(NSString *)outputText
                             contextInfo:(id)contextInfo
 {
-	INFO(@"contextInfo = %p", contextInfo);
 	NSDictionary *info = contextInfo;
 	ViBundleCommand *command = [info objectForKey:@"command"];
 	NSRange inputRange = [[info objectForKey:@"inputRange"] rangeValue];
 
-	INFO(@"command %@ finished with status %i", [command name], status);
+	DEBUG(@"command %@ finished with status %i", [command name], status);
 
 	NSString *outputFormat = [command output];
 

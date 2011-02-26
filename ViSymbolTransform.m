@@ -1,5 +1,6 @@
 #import "ViSymbolTransform.h"
 #import "ViRegexp.h"
+#import "NSScanner-additions.h"
 #import "logging.h"
 
 @implementation ViSymbolTransform
@@ -11,66 +12,46 @@
 	{
 		transformations = [[NSMutableArray alloc] init];
 
-		int i = 0;
-		while (i < [aString length])
-		{
-			unichar c = [aString characterAtIndex:i++];
-			if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
-				/* skip whitespace */ ;
-			else if (c == 's')
-			{
-				// substitute command
-				unichar delim = [aString characterAtIndex:i++];
-				NSMutableString *regexp = [[NSMutableString alloc] init];
-				NSMutableString *replacement = [[NSMutableString alloc] init];
-				int ndelim = 1;
-				while (i < [aString length])
-				{
-					c = [aString characterAtIndex:i++];
-					if (c == delim)
-					{
-						ndelim++;
-					}
-					else if (c == ';' && ndelim == 3)
-					{
-						break;
-					}
-					else
-					{
-						if (ndelim == 1)
-							[regexp appendFormat:@"%C", c];
-						else if (ndelim == 2)
-							[replacement appendFormat:@"%C", c];
-					}
-				}
+		NSScanner *scan = [NSScanner scannerWithString:aString];
+		NSCharacterSet *skipSet =[NSCharacterSet whitespaceAndNewlineCharacterSet];
 
-				if (ndelim != 3)
-				{
-					INFO(@"failed to parse transformation, i = %i", i);
+		unichar ch;
+		while ([scan scanCharacter:&ch]) {
+			if ([skipSet characterIsMember:ch])
+				/* skip whitespace and newlines */ ;
+			else if (ch == 's') {
+				NSString *regexp, *format, *options = nil;
+
+				if (![scan scanString:@"/" intoString:nil] ||
+				    ![scan scanUpToUnescapedCharacter:'/' intoString:&regexp] ||
+				    ![scan scanString:@"/" intoString:nil] ||
+				    ![scan scanUpToUnescapedCharacter:'/' intoString:&format] ||
+				    ![scan scanString:@"/" intoString:nil]) {
+//					if (outError)
+//						*outError = [ViError errorWithFormat:@"Missing separating slash at %lu",
+//						    [scan scanLocation] + 1];
 					return nil;
 				}
 
+				NSCharacterSet *optionsCharacters = [NSCharacterSet characterSetWithCharactersInString:@"gi"];
+				[scan scanCharactersFromSet:optionsCharacters
+						 intoString:&options];
+				if (options == nil)
+					options = @"";
+
 				ViRegexp *rx = [ViRegexp regularExpressionWithString:regexp];
-				if (rx == nil)
-				{
+				if (rx == nil) {
 					INFO(@"invalid regexp: %@", regexp);
 					return nil;
 				}
-				[transformations addObject:[NSArray arrayWithObjects:rx, replacement, regexp, nil]];
-			}
-			else if (c == '#')
-			{
+
+				[transformations addObject:[NSArray arrayWithObjects:rx, format, options, nil]];
+				[scan scanString:@";" intoString:nil];
+			} else if (ch == '#') {
 				// skip comments
-				while (i < [aString length])
-				{
-					c = [aString characterAtIndex:i++];
-					if (c == '\n')
-						break;
-				}
-			}
-			else
-			{
-				INFO(@"unknown transformation '%C'", c);
+				[scan scanUpToString:@"\n" intoString:nil];
+			} else {
+				INFO(@"unknown transformation '%C'", ch);
 				return nil;
 			}
 		}
@@ -87,7 +68,7 @@
 		trSymbol = [self transformValue:trSymbol
 		                    withPattern:rx
 		                         format:[tr objectAtIndex:1]
-		                        options:@""
+		                        options:[tr objectAtIndex:2]
 		                          error:nil];
 	}
 

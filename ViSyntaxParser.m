@@ -1,5 +1,3 @@
-#define NO_DEBUG
-
 #import <sys/time.h>
 #import "ViSyntaxParser.h"
 #import "ViScope.h"

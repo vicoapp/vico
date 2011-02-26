@@ -76,7 +76,7 @@
 			*rangePtr = sel;
 			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 		}
-	} else if ([type isEqualToString:@"document"]) {
+	} else if ([type isEqualToString:@"document"] || type == nil) {
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
 	} else if ([type isEqualToString:@"scope"]) {

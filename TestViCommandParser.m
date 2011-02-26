@@ -426,10 +426,10 @@
 	[parser pushKey:'d'];
 	[parser pushKey:'1'];
 	[parser pushKey:'0'];
-	[parser pushKey:0x17];	// C-w
-	STAssertFalse(parser.complete, @"c-w is not a complete motion command");
-	[parser pushKey:'c'];
-	STAssertTrue(parser.complete, @"c-w c is a complete, but invalid, motion command");
+	[parser pushKey:'g'];
+	STAssertFalse(parser.complete, @"g is not a complete motion command");
+	[parser pushKey:'U'];
+	STAssertTrue(parser.complete, @"gU is a complete, but invalid, motion command");
 	STAssertEqualObjects(parser.method, @"nonmotion:", nil);
 }
 

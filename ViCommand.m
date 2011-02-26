@@ -74,6 +74,12 @@ static struct vikey visual_g_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey operator_g_keys[] = {
+	{@"nonmotion:",		0x00, 0}, // default action for unknown key
+	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
+	{nil, -1, 0}
+};
+
 static struct vikey normal_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
@@ -173,9 +179,8 @@ static struct vikey normal_keys[] = {
 	{nil, -1, 0}
 };
 
-#if 0
 static struct vikey operator_keys[] = {
-	{@"nonmotion:",		0x00, VIF_IS_MOTION}, // default action for unknown key
+	{@"nonmotion:",		0x00, 0}, // default action for unknown key
 	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
@@ -200,6 +205,7 @@ static struct vikey operator_keys[] = {
 	{@"word_backward:",	'b', VIF_IS_MOTION},
 	{@"end_of_word:",	'e', VIF_IS_MOTION},
 	{@"move_to_char:",	'f', VIF_IS_MOTION | VIF_NEED_CHAR},
+	{@"g_prefix:",		'g', 0, operator_g_keys},
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"select_inner:",	'i', VIF_IS_MOTION | VIF_NEED_CHAR},
 	{@"move_down:",		'j', VIF_IS_MOTION | VIF_LINE_MODE},
@@ -231,7 +237,6 @@ static struct vikey operator_keys[] = {
 	{@"move_eol:",		NSEndFunctionKey, VIF_IS_MOTION},
 	{nil, -1, 0}
 };
-#endif
 
 static struct vikey visual_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
@@ -475,6 +480,19 @@ find_command_in_map(unichar key, struct vikey map[])
 		}
 	}
 
+	if (state == ViCommandNeedMotion && aKey == command->key) {
+		/* From nvi:
+		 * Commands that have motion components can be doubled to
+		 * imply the current line.
+		 *
+		 * Do this by setting the line mode flag.
+		 */
+		motion_key = aKey;
+		motion_command = command;
+		[self setComplete];
+		return;
+	}
+
 	if (map == NULL)
 		map = normal_keys;
 
@@ -491,7 +509,7 @@ find_command_in_map(unichar key, struct vikey map[])
 		key = aKey;
 		if (has_flag(vikey, VIF_NEED_MOTION)) {
 			state = ViCommandNeedMotion;
-			map = normal_keys;
+			map = operator_keys;
 		} else if (has_flag(vikey, VIF_NEED_CHAR)) {
 			// VIF_NEED_CHAR and VIF_NEED_MOTION are mutually exclusive
 			state = ViCommandNeedChar;
@@ -504,15 +522,7 @@ find_command_in_map(unichar key, struct vikey map[])
 
 		if (has_flag(vikey, VIF_IS_MOTION))
 			motion_command = vikey;
-		else if (aKey == command->key) {
-			/* From nvi:
-			 * Commands that have motion components can be doubled to
-			 * imply the current line.
-			 *
-			 * Do this by setting the line mode flag.
-			 */
-			motion_command = command;
-		} else if (vikey->map == NULL) {
+		else if (vikey->map == NULL) {
 			// should print "X may not be used as a motion command"
 			method = @"nonmotion:";
 		}

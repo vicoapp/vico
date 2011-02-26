@@ -106,7 +106,13 @@
 	 * The Diff bundle does this for example.
 	 */
 	if (bundle != nil) {
-		NSDictionary *bundlePrefs = [bundle preferenceItems:[NSArray arrayWithObjects:NSBackgroundColorAttributeName, NSForegroundColorAttributeName, NSUnderlineStyleAttributeName, NSObliquenessAttributeName, NSStrokeWidthAttributeName, nil]];
+		NSArray *prefs = [NSArray arrayWithObjects:NSBackgroundColorAttributeName,
+		    NSForegroundColorAttributeName,
+		    NSUnderlineStyleAttributeName,
+		    NSObliquenessAttributeName,
+		    NSStrokeWidthAttributeName,
+		    nil];
+		NSDictionary *bundlePrefs = [bundle preferenceItems:prefs];
 		if (bundlePrefs)
 			[self matchAttributes:bundlePrefs forScopes:scopes intoDictionary:attributes rankState:attributesRank];
 	}

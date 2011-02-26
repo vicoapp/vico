@@ -383,7 +383,9 @@
 	NSString *exCommand = [statusbar stringValue];
 
 	if ([exCommand length] > 0) {
-		[exDelegate performSelector:exCommandSelector withObject:exCommand withObject:exContextInfo];
+		[exDelegate performSelector:exCommandSelector
+		                 withObject:exCommand
+		                 withObject:exContextInfo];
 
 		/* Add the command to the history. */
 		NSUInteger i = [history indexOfObject:exCommand];
@@ -449,7 +451,10 @@
 	 * automating ex commands across multiple documents.
 	 */
 	exTextView = aTextView;
-	[self getExCommandWithDelegate:self selector:@selector(parseAndExecuteExCommand:contextInfo:) prompt:@":" contextInfo:NULL];
+	[self getExCommandWithDelegate:self
+	                      selector:@selector(parseAndExecuteExCommand:contextInfo:)
+	                        prompt:@":"
+	                   contextInfo:NULL];
 }
 
 #pragma mark -
@@ -515,7 +520,9 @@
 	[self message:@"%@", [self displayBaseURL]];
 }
 
-- (ViDocument *)openDocument:(id)filenameOrURL andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory
+- (ViDocument *)openDocument:(id)filenameOrURL
+                  andDisplay:(BOOL)display
+              allowDirectory:(BOOL)allowDirectory
 {
 	NSError *error = nil;
 	NSURL *url;
@@ -555,6 +562,8 @@
 		[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
 		return nil;
 	}
+
+	[windowController addDocument:doc];
 
 	return doc;
 }

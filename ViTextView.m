@@ -669,15 +669,17 @@ int logIndent = 0;
 	final_location = end_location;
 }
 
-- (void)gotoLine:(NSUInteger)line column:(NSUInteger)column
+- (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column
 {
 	NSInteger bol = [[self textStorage] locationForStartOfLine:line];
-	if(bol != -1)
-	{
-		[self gotoColumn:column fromLocation:bol];
-		[self setCaret:final_location];
-		[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
-	}
+	if (bol == -1)
+		return NO;
+
+	[self gotoColumn:column fromLocation:bol];
+	[self setCaret:final_location];
+	[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
+
+	return YES;
 }
 
 #pragma mark -
@@ -1378,6 +1380,7 @@ int logIndent = 0;
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
 {
+	
 	NSString *string;
 
 	if ([aString isMemberOfClass:[NSAttributedString class]])

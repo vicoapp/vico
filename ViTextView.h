@@ -93,7 +93,7 @@
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
-- (void)gotoLine:(NSUInteger)line column:(NSUInteger)column;
+- (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)resetSelection;
 - (void)setNormalMode;
 - (void)setVisualMode;

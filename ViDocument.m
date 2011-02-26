@@ -102,6 +102,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #pragma mark -
 #pragma mark NSDocument interface
 
+- (void)showWindows
+{
+	[super showWindows];
+	[windowController selectDocument:self];
+}
+
 - (void)addWindowController:(NSWindowController *)aController
 {
 	[super addWindowController:aController];

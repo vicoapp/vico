@@ -1017,13 +1017,8 @@ filter_write(CFSocketRef s,
 		return;
 	}
 
-	NSInteger location = [(ViTextStorage *)[exTextView textStorage] locationForStartOfLine:line];
-	if (location == -1)
+	if (![exTextView gotoLine:line column:0])
 		[self message:@"Movement past the end-of-file"];
-	else {
-		[exTextView setCaret:location];
-		[exTextView scrollToCaret];
-	}
 }
 
 - (void)ex_set:(ExCommand *)command

@@ -842,7 +842,7 @@ filter_write(CFSocketRef s,
 
 	[filterTask setStandardInput:shellInput];
 	[filterTask setStandardOutput:shellOutput];
-	/* FIXME: capture standard error as well! */
+	[filterTask setStandardError:shellOutput];
 
 	[filterTask launch];
 

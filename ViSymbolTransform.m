@@ -10,7 +10,7 @@
 	if (self)
 	{
 		transformations = [[NSMutableArray alloc] init];
-		
+
 		int i = 0;
 		while (i < [aString length])
 		{
@@ -43,13 +43,13 @@
 							[replacement appendFormat:@"%C", c];
 					}
 				}
-	
+
 				if (ndelim != 3)
 				{
 					INFO(@"failed to parse transformation, i = %i", i);
 					return nil;
 				}
-				
+
 				ViRegexp *rx = [ViRegexp regularExpressionWithString:regexp];
 				if (rx == nil)
 				{
@@ -80,34 +80,15 @@
 
 - (NSString *)transformSymbol:(NSString *)aSymbol
 {
-	NSMutableString *trSymbol = [aSymbol mutableCopy];
+	NSString *trSymbol = aSymbol;
 	NSArray *tr;
-	for (tr in transformations)
-	{
+	for (tr in transformations) {
 		ViRegexp *rx = [tr objectAtIndex:0];
-		for (;;)
-		{
-			ViRegexpMatch *m = [rx matchInString:trSymbol];
-			if (m == nil)
-				break;
-	
-			NSRange range = [m rangeOfMatchedString];
-			if (range.length == 0)
-				break;
-	
-			NSMutableString *repl = [[tr objectAtIndex:1] mutableCopy];
-			for (;;)
-			{
-				NSRange r = [repl rangeOfString:@"$"];
-				if (r.location == NSNotFound)
-					break;
-				int n = [repl characterAtIndex:r.location + 1] - '0';
-				NSString *groupMatch = [trSymbol substringWithRange:[m rangeOfSubstringAtIndex:n]];
-				[repl replaceCharactersInRange:NSMakeRange(r.location, 2) withString:groupMatch];
-			}
-	
-			[trSymbol replaceCharactersInRange:range withString:repl];
-		}
+		trSymbol = [self transformValue:trSymbol
+		                    withPattern:rx
+		                         format:[tr objectAtIndex:1]
+		                        options:@""
+		                          error:nil];
 	}
 
 	return trSymbol;

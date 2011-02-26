@@ -1,4 +1,6 @@
-@interface ViSymbolTransform : NSObject
+#import "ViTransformer.h"
+
+@interface ViSymbolTransform : ViTransformer
 {
 	NSMutableArray *transformations;
 }

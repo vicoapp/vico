@@ -1,3 +1,5 @@
+#import "ViTransformer.h"
+
 @class ViTabstop;
 @class ViSnippet;
 
@@ -6,7 +8,7 @@
 - (NSString *)string;
 @end
 
-@interface ViSnippet : NSObject
+@interface ViSnippet : ViTransformer
 {
 	NSUInteger beginLocation;
 	ViTabstop *currentTabStop;

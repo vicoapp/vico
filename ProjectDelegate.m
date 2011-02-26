@@ -326,7 +326,7 @@
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
 	[openPanel setCanChooseDirectories:YES];
-	[openPanel setAllowsMultipleSelection:YES];
+	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel beginSheetForDirectory:nil
 	                             file:nil
 	                            types:nil
@@ -354,11 +354,14 @@
 	NSString *path = [[sftpConnectForm cellAtIndex:2] stringValue];
 
 	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host user:user error:&error];
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host
+	                                                                      user:user
+	                                                                     error:&error];
 	if (conn) {
 		if (![path hasPrefix:@"/"])
 			path = [NSString stringWithFormat:@"%@/%@", [conn home], path];
-		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
+		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@",
+		    user, host, path]];
 		[self browseURL:url];
 	} else {
 		NSAlert *alert = [NSAlert alertWithError:error];
@@ -373,7 +376,11 @@
 
 - (IBAction)addSFTPLocation:(id)sender
 {
-	[NSApp beginSheet:sftpConnectView modalForWindow:window modalDelegate:self didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:) contextInfo:nil];
+	[NSApp beginSheet:sftpConnectView
+	   modalForWindow:window
+	    modalDelegate:self
+	   didEndSelector:@selector(sftpSheetDidEnd:returnCode:contextInfo:)
+	      contextInfo:nil];
 }
 
 - (NSIndexSet *)clickedIndexes

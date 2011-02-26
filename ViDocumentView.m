@@ -12,8 +12,13 @@
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
 {
 	self = [super init];
-	if (self)
+	if (self) {
 		document = aDocument;
+		[document addObserver:self
+		           forKeyPath:@"title"
+		              options:NSKeyValueObservingOptionNew
+		              context:nil];
+	}
 	return self;
 }
 
@@ -25,6 +30,17 @@
 - (ViTextView *)textView
 {
 	return (ViTextView *)innerView;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+	if ([keyPath isEqualToString:@"title"]) {
+		[self willChangeValueForKey:@"title"];
+		[self didChangeValueForKey:@"title"];
+	}
 }
 
 - (NSString *)title

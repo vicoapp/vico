@@ -69,62 +69,56 @@
 						   attributes:nil
 							error:nil];
 
+	NSUserDefaults *userDefs = [NSUserDefaults standardUserDefaults];
+
 	/* initialize default defaults */
-	[[NSUserDefaults standardUserDefaults] registerDefaults:
-		[NSDictionary dictionaryWithObjectsAndKeys:
-			[NSNumber numberWithInt:8], @"shiftwidth",
-			[NSNumber numberWithInt:8], @"tabstop",
-			[NSNumber numberWithBool:YES], @"autoindent",
-			[NSNumber numberWithBool:YES], @"ignorecase",
-			[NSNumber numberWithBool:NO], @"expandtabs",
-			[NSNumber numberWithBool:YES], @"number",
-			[NSNumber numberWithBool:YES], @"autocollapse",
-			[NSNumber numberWithBool:NO], @"hidetab",
-			[NSNumber numberWithBool:YES], @"searchincr",
-			[NSNumber numberWithBool:NO], @"showguide",
-			[NSNumber numberWithBool:NO], @"wrap",
-			[NSNumber numberWithBool:YES], @"antialias",
-			[NSNumber numberWithInt:80], @"guidecolumn",
-			[NSNumber numberWithFloat:11.0], @"fontsize",
-			@"vim", @"undostyle",
-			@"Menlo Regular", @"fontname",
-			@"Mac Classic", @"theme",
-			@"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
-			[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
-			[NSNumber numberWithBool:YES], @"explorecaseignore",
-			[NSNumber numberWithBool:YES], @"exploresortfolders",
-			nil]];
+	[userDefs registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+	    [NSNumber numberWithInt:8], @"shiftwidth",
+	    [NSNumber numberWithInt:8], @"tabstop",
+	    [NSNumber numberWithBool:YES], @"autoindent",
+	    [NSNumber numberWithBool:YES], @"ignorecase",
+	    [NSNumber numberWithBool:NO], @"expandtabs",
+	    [NSNumber numberWithBool:YES], @"number",
+	    [NSNumber numberWithBool:YES], @"autocollapse",
+	    [NSNumber numberWithBool:NO], @"hidetab",
+	    [NSNumber numberWithBool:YES], @"searchincr",
+	    [NSNumber numberWithBool:NO], @"showguide",
+	    [NSNumber numberWithBool:NO], @"wrap",
+	    [NSNumber numberWithBool:YES], @"antialias",
+	    [NSNumber numberWithInt:80], @"guidecolumn",
+	    [NSNumber numberWithFloat:11.0], @"fontsize",
+	    @"vim", @"undostyle",
+	    @"Menlo Regular", @"fontname",
+	    @"Mac Classic", @"theme",
+	    @"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
+	    [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
+	    [NSNumber numberWithBool:YES], @"explorecaseignore",
+	    [NSNumber numberWithBool:YES], @"exploresortfolders",
+	    nil]];
 
 	/* Initialize languages and themes. */
 	[ViLanguageStore defaultStore];
 	[ViThemeStore defaultStore];
 
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"theme"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"showguide"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"guidecolumn"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"undostyle"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
+	NSArray *opts = [NSArray arrayWithObjects:
+	    @"theme", @"showguide", @"guidecolumn", @"undostyle", nil];
+	for (NSString *opt in opts)
+		[userDefs addObserver:self
+			   forKeyPath:opt
+			      options:NSKeyValueObservingOptionNew
+			      context:NULL];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
-						 selector:@selector(newBundleLoaded:)
-						     name:ViLanguageStoreBundleLoadedNotification object:nil];
+	                                         selector:@selector(newBundleLoaded:)
+	                                             name:ViLanguageStoreBundleLoadedNotification
+	                                           object:nil];
 
 	const NSStringEncoding *encoding = [NSString availableStringEncodings];
 	NSMutableArray *array = [NSMutableArray array];
 	NSMenuItem *item;
 	while (*encoding) {
-		item = [[NSMenuItem alloc] initWithTitle:[NSString localizedNameOfStringEncoding:*encoding]
+		NSString *title = [NSString localizedNameOfStringEncoding:*encoding];
+		item = [[NSMenuItem alloc] initWithTitle:title
 						  action:@selector(setEncoding:)
 					   keyEquivalent:@""];
 		[item setRepresentedObject:[NSNumber numberWithUnsignedLong:*encoding]];
@@ -132,7 +126,8 @@
 		encoding++;
 	}
 
-	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];
+	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title"
+	                                                      ascending:YES];
 	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
 	for (item in array)
 		[encodingMenu addItem:item];

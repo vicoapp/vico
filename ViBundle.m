@@ -66,6 +66,15 @@
 		if ([value rangeOfString:@"bold"].location != NSNotFound)
 			[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
 	}
+
+	if ((value = [settings objectForKey:@"underline"]) != nil)
+		[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
+
+	if ((value = [settings objectForKey:@"italic"]) != nil)
+		[normalizedPreference setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
+
+	if ((value = [settings objectForKey:@"bold"]) != nil)
+		[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env

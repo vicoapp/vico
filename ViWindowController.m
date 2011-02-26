@@ -279,8 +279,9 @@ static NSWindowController	*currentWindowController = nil;
 	[item setRepresentedObject:document];
 	[item bind:@"title" toObject:document withKeyPath:@"title" options:nil];
 
-	// update symbol table
 	[documents addObject:document];
+
+	/* Update symbol table. */
 	[self filterSymbols:symbolFilterField];
 	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
         NSInteger row = [symbolsOutline rowForItem:document];
@@ -334,8 +335,8 @@ static NSWindowController	*currentWindowController = nil;
 		closeThisDocument = [self currentDocument];
 	}
 
-	[self createTabForDocument:document];
 	[self addDocument:document];
+	[self createTabForDocument:document];
 
 	if (closeThisDocument) {
 		[closeThisDocument close];

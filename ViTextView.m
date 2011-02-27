@@ -1137,17 +1137,19 @@ int logIndent = 0;
 			[self cancelSnippet:snippet];
 	}
 
-        // check for a new snippet
+        // check for tab trigger
         if (start_location > 0) {
                 // is there a word before the cursor that we just typed?
                 // FIXME: textmate includes more than just characters, sort of bigwords... investigate!
                 NSString *word = [[self textStorage] wordAtLocation:start_location - 1];
                 if ([word length] > 0) {
                         NSArray *scopes = [self scopesAtLocation:(start_location == [[self textStorage] length]) ? MAX(0, start_location - 1) : start_location];
-			NSArray *matches = [[ViLanguageStore defaultStore] snippetsWithTabTrigger:word matchingScopes:scopes inMode:mode];
+			NSArray *matches = [[ViLanguageStore defaultStore] itemsWithTabTrigger:word
+			                                                        matchingScopes:scopes
+			                                                                inMode:mode];
 			if ([matches count] > 0) {
 				snippetMatchRange = NSMakeRange(start_location - [word length], [word length]);
-				[self performBundleItems:matches selector:@selector(performBundleSnippet:)];
+				[self performBundleItems:matches];
 				return NO;
 			}
                 }
@@ -1482,9 +1484,12 @@ int logIndent = 0;
 	 */
 	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
-		NSArray *matches = [[ViLanguageStore defaultStore] commandsWithKey:charcode andFlags:flags matchingScopes:scopes inMode:mode];
+		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKey:charcode
+		                                                       andFlags:flags
+		                                                matchingScopes:scopes
+		                                                        inMode:mode];
 		if ([matches count] > 0) {
-			[self performBundleItems:matches selector:@selector(performBundleCommand:)];
+			[self performBundleItems:matches];
 			return;
 		}
 	}

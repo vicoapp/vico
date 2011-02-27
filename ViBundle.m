@@ -10,7 +10,6 @@
 @implementation ViBundle
 
 @synthesize languages;
-@synthesize commands;
 @synthesize path;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB
@@ -177,8 +176,7 @@
 		preferences = [[NSMutableArray alloc] init];
 		cachedPreferences = [[NSMutableDictionary alloc] init];
 		uuids = [[NSMutableDictionary alloc] init];
-		snippets = [[NSMutableArray alloc] init];
-		commands = [[NSMutableArray alloc] init];
+		items = [[NSMutableArray alloc] init];
 		path = [aPath stringByDeletingLastPathComponent];
 	}
 
@@ -259,7 +257,7 @@
 {
 	ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:desc inBundle:self];
 	if (snippet) {
-		[snippets addObject:snippet];
+		[items addObject:snippet];
 		[uuids setObject:snippet forKey:[snippet uuid]];
 	}
 }
@@ -268,41 +266,41 @@
 {
 	ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:desc inBundle:self];
 	if (command) {
-		[commands addObject:command];
+		[items addObject:command];
 		[uuids setObject:command forKey:[command uuid]];
 	}
 }
 
-- (NSArray*)commandsWithKey:(unichar)keycode
-                   andFlags:(unsigned int)flags
-             matchingScopes:(NSArray*)scopes
-                     inMode:(ViMode)mode
+- (NSArray *)itemsWithKey:(unichar)keycode
+                 andFlags:(unsigned int)flags
+           matchingScopes:(NSArray *)scopes
+                   inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
 
-	for (ViBundleCommand *command in commands)
-                if ([command keycode] == keycode && [command keyflags] == flags) {
-			NSString *scope = [command scope];
+	for (ViBundleItem *item in items)
+                if ([item keycode] == keycode && [item keyflags] == flags) {
+			NSString *scope = [item scope];
 			if ((scope == nil || [scope matchesScopes:scopes] > 0) &&
-			    ([command mode] == ViAnyMode || [command mode] == mode))
-				[matches addObject:command];
+			    ([item mode] == ViAnyMode || [item mode] == mode))
+				[matches addObject:item];
 		}
 
 	return matches;
 }
 
-- (NSArray*)snippetsWithTabTrigger:(NSString*)name
-                    matchingScopes:(NSArray*)scopes
-                            inMode:(ViMode)mode
+- (NSArray *)itemsWithTabTrigger:(NSString *)name
+                  matchingScopes:(NSArray *)scopes
+                          inMode:(ViMode)mode
 {
 	NSMutableArray *matches = [[NSMutableArray alloc] init];
-        for (ViBundleSnippet *snippet in snippets)
-                if ([[snippet tabTrigger] isEqualToString:name] &&
-		    ([snippet scope] == nil || [[snippet scope] matchesScopes:scopes] > 0) &&
-		    ([snippet mode] == ViAnyMode || [snippet mode] == mode))
-			[matches addObject:snippet];
+	for (ViBundleItem *item in items)
+		if ([[item tabTrigger] isEqualToString:name] &&
+		    ([item scope] == nil || [[item scope] matchesScopes:scopes] > 0) &&
+		    ([item mode] == ViAnyMode || [item mode] == mode))
+			[matches addObject:item];
 
-        return matches;
+	return matches;
 }
 
 - (NSMenu*)submenu:(NSDictionary*)menuLayout
@@ -326,24 +324,22 @@
 				NSString *scope = [op scope];
 				if (scope == nil || [scope matchesScopes:scopes] > 0) {
 					matches++;
-					if ([op isMemberOfClass:[ViBundleCommand class]])
-						selector = @selector(performBundleCommand:);
-					else if ([op isMemberOfClass:[ViBundleSnippet class]])
-						selector = @selector(performBundleSnippet:);
+					selector = @selector(performBundleItem:);
 				}
 				/* otherwise selector is NULL => disabled menu item */
-	
+
 				item = [menu addItemWithTitle:[op name]
 						       action:selector
 						keyEquivalent:[op keyEquivalent]];
 				[item setKeyEquivalentModifierMask:[op modifierMask]];
 				[item setRepresentedObject:op];
 
-				if ([op respondsToSelector:@selector(tabTrigger)]) {
+				NSString *tabTrigger = [op tabTrigger];
+				if ([tabTrigger length] > 0) {
 					/* Set a special view for drawing the tab trigger. */
 					ViTabTriggerMenuItemView *view;
 					view = [[ViTabTriggerMenuItemView alloc] initWithTitle:[op name]
-					                                            tabTrigger:[op tabTrigger]];
+					                                            tabTrigger:tabTrigger];
 					[item setView:view];
 				}
 			} else

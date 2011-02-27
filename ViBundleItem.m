@@ -12,8 +12,10 @@
 @synthesize modifierMask;
 @synthesize keycode;
 @synthesize keyflags;
+@synthesize tabTrigger;
 
-- (ViBundleItem *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle
+- (ViBundleItem *)initFromDictionary:(NSDictionary *)dict
+                            inBundle:(ViBundle *)aBundle
 {
 	self = [super init];
 	if (self) {
@@ -22,6 +24,7 @@
 		name = [dict objectForKey:@"name"];
 		scope = [dict objectForKey:@"scope"];
 		uuid = [dict objectForKey:@"uuid"];
+		tabTrigger = [dict objectForKey:@"tabTrigger"];
 
 		NSString *m = [dict objectForKey:@"mode"];	/* extension: 'insert', 'normal' or 'visual' mode */
 		if (m == nil || [m isEqualToString:@"any"])

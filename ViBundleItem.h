@@ -10,6 +10,7 @@
 	ViMode		 mode;
 
 	/* used in menus */
+	NSString	*tabTrigger;
 	NSString	*keyEquivalent;
 	NSUInteger	 modifierMask;
 
@@ -27,6 +28,7 @@
 @property(readonly) NSUInteger modifierMask;
 @property(readonly) unichar keycode;
 @property(readonly) unsigned int keyflags;
+@property(readonly) NSString *tabTrigger;
 
 - (ViBundleItem *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle;
 

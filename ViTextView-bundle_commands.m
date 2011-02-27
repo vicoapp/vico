@@ -8,6 +8,7 @@
 #import "NSArray-patterns.h"
 #import "NSString-scopeSelector.h"
 #import "ViBundleCommand.h"
+#import "ViBundleSnippet.h"
 #import "ViWindowController.h"
 
 @implementation ViTextView (bundleCommands)
@@ -107,14 +108,17 @@
 	return inputText;
 }
 
-- (void)performBundleCommand:(id)sender
+- (void)performBundleCommand:(ViBundleCommand *)command
 {
-	ViBundleCommand *command = sender;
-	if ([sender respondsToSelector:@selector(representedObject)])
-		command = [sender representedObject];
-
 	/* FIXME: * If in input mode, should setup repeat text and such...
 	 */
+
+	/* If we got here via a tab trigger, first remove the tab trigger word.
+	 */
+	if ([command tabTrigger] && snippetMatchRange.location != NSNotFound) {
+		[self deleteRange:snippetMatchRange];
+		[self setCaret:snippetMatchRange.location];
+	}
 
 	/*  FIXME: need to verify correct behaviour of these env.variables
 	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
@@ -260,11 +264,9 @@
 			[self insertString:outputText atLocation:NSMaxRange(inputRange) undoGroup:NO];
 			[self setCaret:NSMaxRange(inputRange) + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
-			[self deleteRange:inputRange];
-			[self setCaret:inputRange.location];
 			[self insertSnippet:outputText
 			         fromBundle:[command bundle]
-			         atLocation:inputRange.location];
+			            inRange:inputRange];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
 			ViDocument *doc = [[[self delegate] environment] splitVertically:NO andOpen:nil orSwitchToDocument:nil];
 			[doc setString:outputText];
@@ -275,14 +277,27 @@
 	}
 }
 
+- (void)performBundleItem:(id)bundleItem
+{
+	if ([bundleItem respondsToSelector:@selector(representedObject)])
+		bundleItem = [bundleItem representedObject];
+
+	INFO(@"perform bundle item %@", bundleItem);
+
+	if ([bundleItem isKindOfClass:[ViBundleCommand class]])
+		[self performBundleCommand:bundleItem];
+	else if ([bundleItem isKindOfClass:[ViBundleSnippet class]])
+		[self performBundleSnippet:bundleItem];
+}
+
 /*
  * Performs one of possibly multiple matching bundle items (commands or snippets).
  * Show a menu of choices if more than one match.
  */
-- (void)performBundleItems:(NSArray *)matches selector:(SEL)selector
+- (void)performBundleItems:(NSArray *)matches
 {
 	if ([matches count] == 1) {
-		[self performSelector:selector withObject:[matches objectAtIndex:0]];
+		[self performBundleItem:[matches objectAtIndex:0]];
 	} else if ([matches count] > 1) {
 		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
 		[menu setAllowsContextMenuPlugIns:NO];
@@ -291,7 +306,9 @@
 			NSString *key = @"";
 			if (quickindex <= 10)
 				key = [NSString stringWithFormat:@"%i", quickindex % 10];
-			NSMenuItem *item = [menu addItemWithTitle:[c name] action:selector keyEquivalent:key];
+			NSMenuItem *item = [menu addItemWithTitle:[c name]
+			                                   action:@selector(performBundleItem:)
+			                            keyEquivalent:key];
 			[item setKeyEquivalentModifierMask:0];
 			[item setRepresentedObject:c];
 			++quickindex;

@@ -10,8 +10,7 @@
 	NSMutableDictionary *info;
 	NSMutableArray *languages;
 	NSMutableArray *preferences;
-	NSMutableArray *snippets;
-	NSMutableArray *commands;
+	NSMutableArray *items;
 	NSMutableDictionary *cachedPreferences;
 	NSMutableDictionary *uuids;
 }
@@ -29,12 +28,16 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
-- (NSArray *)commandsWithKey:(unichar)keycode andFlags:(unsigned int)flags matchingScopes:(NSArray *)scopes inMode:(ViMode)mode;
-- (NSArray *)snippetsWithTabTrigger:(NSString *)name matchingScopes:(NSArray *)scopes inMode:(ViMode)mode;
+- (NSArray *)itemsWithKey:(unichar)keycode
+                 andFlags:(unsigned int)flags
+           matchingScopes:(NSArray *)scopes
+                   inMode:(ViMode)mode;
+- (NSArray *)itemsWithTabTrigger:(NSString *)name
+                  matchingScopes:(NSArray *)scopes
+                          inMode:(ViMode)mode;
 - (NSMenu *)menuForScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;
-@property(readonly) NSMutableArray *commands;
 @property(readonly) NSString *path;
 
 @end

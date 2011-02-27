@@ -15,10 +15,10 @@
 
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
                   fromBundle:(ViBundle *)bundle
-                  atLocation:(NSUInteger)aLocation
+                     inRange:(NSRange)aRange
 {
 	// prepend leading whitespace to all newlines in the snippet string
-	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
+	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aRange.location];
 	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
 	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
 
@@ -35,9 +35,12 @@
 
 	[self beginUndoGroup];
 
+	[self deleteRange:aRange];
+	[self setCaret:aRange.location];
+
 	NSError *error = nil;
 	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString
-	                                            atLocation:aLocation
+	                                            atLocation:aRange.location
 	                                              delegate:self
 	                                           environment:env
 	                                                 error:&error];
@@ -52,6 +55,8 @@
 	[self setCaret:snippet.caret];
 	[self setInsertMode:nil];
 	[self resetSelection];
+
+	snippetMatchRange.location = NSNotFound;
 
 	return snippet;
 }
@@ -68,24 +73,11 @@
 	}
 }
 
-- (void)performBundleSnippet:(id)sender
+- (void)performBundleSnippet:(ViBundleSnippet *)bundleSnippet
 {
-	ViBundleSnippet *bundleSnippet = sender;
-	if ([sender respondsToSelector:@selector(representedObject)])
-		bundleSnippet = [sender representedObject];
-
-	[self endUndoGroup];
-	[self beginUndoGroup];
-
-	if (snippetMatchRange.location != NSNotFound) {
-		[self deleteRange:snippetMatchRange];
-		[self setCaret:snippetMatchRange.location];
-		snippetMatchRange.location = NSNotFound;
-	}
-
 	[self insertSnippet:[bundleSnippet content]
 	         fromBundle:[bundleSnippet bundle]
-	         atLocation:[self caret]];
+	            inRange:snippetMatchRange];
 }
 
 @end

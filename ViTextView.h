@@ -137,7 +137,7 @@
 - (void)cancelSnippet:(ViSnippet *)snippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
                   fromBundle:(ViBundle *)bundle
-                  atLocation:(NSUInteger)aLocation;
+                     inRange:(NSRange)aRange;
 - (void)performBundleSnippet:(id)sender;
 - (void)deselectSnippet;
 @end
@@ -165,7 +165,8 @@
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation;
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
 - (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
-- (void)performBundleCommand:(id)sender;
-- (void)performBundleItems:(NSArray *)matches selector:(SEL)selector;
+- (void)performBundleCommand:(ViBundleCommand *)command;
+- (void)performBundleItem:(id)bundleItem;
+- (void)performBundleItems:(NSArray *)matches;
 @end
 

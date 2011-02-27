@@ -68,12 +68,22 @@ match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 			unichar *selector = descendants[j];
 			// DEBUG(@"comparing selector [%@] with scope [%@]", selector, scope);
 			NSUInteger sl = [scope length];
+			BOOL match = YES;
 			for (p = selector, k = 0; k < sl && *p != 0; p++, k++) {
-				if ([scope characterAtIndex:k] != *p)
+				if ([scope characterAtIndex:k] != *p) {
+					match = NO;
 					break;
+				}
 			}
 
-			if (*p == 0) {
+			if (match && k + 1 < sl) {
+				/* Don't count partial scope matches. */
+				/* "source.css" shouldn't match "source.c" */
+				if ([scope characterAtIndex:k] != '.')
+					match = NO;
+			}
+
+			if (match) {
 				// "Another 10^<depth> points is given for each additional part of the scope that is matched"
 				n = ndots[j];
 				if (n > 0)
@@ -110,7 +120,7 @@ match_group(unichar *buf, NSUInteger length, NSArray *scopes)
 
 	do {
 		for (e = begin; e < end; e++)
-			if (e + 3 < end && e[0] == ' ' && e[1] == '-' && e[2] == ' ')
+			if (e + 2 < end && e[0] == ' ' && e[1] == '-')
 				break;
 		r = match_scopes(begin, e - begin, scopes);
 		if (begin == buf) {
@@ -119,7 +129,8 @@ match_group(unichar *buf, NSUInteger length, NSArray *scopes)
 			incl_rank = r;
 		} else if (r > 0ULL)	/* Positive exclusion. */
 			return 0ULL;
-		begin = e + 3;
+		begin = e + 2;
+
 	} while (e < end);
 
 	return incl_rank;

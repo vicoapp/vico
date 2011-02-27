@@ -177,6 +177,11 @@
 	STAssertEquals([@"source.objc - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
 }
 
+- (void)test032_ExcludedSelector2WithoutWhitespace
+{
+	STAssertEquals([@"source.objc  -string -comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+}
+
 - (void)test033_GroupedSelectorsMatch
 {
 	STAssertEquals([@"keyword, string" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
@@ -205,6 +210,15 @@
 - (void)test037_GroupedSelectorsWithExclusionsNonMatch
 {
 	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjCString], 0ULL, nil);
+}
+
+- (void)test038_StrictPrefix
+{
+	NSArray *scope = [NSArray arrayWithObjects:
+		 @"source.css",
+		 nil];
+
+	STAssertEquals([@"source.c" matchesScopes:scope], 0ULL, nil);
 }
 
 @end

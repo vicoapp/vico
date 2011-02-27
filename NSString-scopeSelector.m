@@ -20,8 +20,8 @@ match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 	unichar		*p, *end;
 	unichar		*descendants[MAXSEL];
 	unsigned int	 ndots[MAXSEL], n;
-	NSUInteger	 nscopes, nselectors = 0;
-	NSUInteger	 i, j, k;
+	NSUInteger	 nscopes, nselectors = 0, scope_offset;
+	NSInteger	 i, j, k;
 	u_int64_t	 rank = 0ULL;
 
 	end = buf + length;
@@ -50,25 +50,35 @@ match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 	*p = 0;
 
 	if (nselectors == 0)
-		return 0;
+		return 0ULL;
 
 	nscopes = [scopes count];
 
-	// find the depth of the match of the first descendant
-	/* Loop through all scopes we're matching against. */
-	for (i = 0; i < nscopes; i++) {
-		// if we haven't matched by now, fail
-		if (nselectors + i > nscopes)
-			return 0;
+	if (nselectors > nscopes)
+		return 0ULL;
 
-		/* Loop through all descendants in the scope selector. */
-		for (j = 0; j < nselectors; j++)
-		{
-			NSString *scope = [scopes objectAtIndex:i+j];
-			unichar *selector = descendants[j];
-			// DEBUG(@"comparing selector [%@] with scope [%@]", selector, scope);
+	scope_offset = nscopes - 1;
+
+	for (i = nselectors - 1; i >= 0; i--) {
+		/* Match each selector against all remaining, unmatched scopes. */
+
+		BOOL match = NO;
+		for (j = scope_offset; j >= 0; j--) {
+
+			/* Match selector #i against scope #j. */
+
+			NSString *scope = [scopes objectAtIndex:j];
+			unichar *selector = descendants[i];
 			NSUInteger sl = [scope length];
-			BOOL match = YES;
+
+#ifndef NO_DEBUG
+			int x;
+			for (x = 0; selector[x] != 0; x++) ;
+			NSString *sel = [NSString stringWithCharacters:selector length:x];
+			DEBUG(@"matching selector [%@] against scope [%@]", sel, scope);
+#endif
+
+			match = YES;
 			for (p = selector, k = 0; k < sl && *p != 0; p++, k++) {
 				if ([scope characterAtIndex:k] != *p) {
 					match = NO;
@@ -79,31 +89,37 @@ match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 			if (match && k + 1 < sl) {
 				/* Don't count partial scope matches. */
 				/* "source.css" shouldn't match "source.c" */
-				if ([scope characterAtIndex:k] != '.')
+				if ([scope characterAtIndex:k] != '.') {
+					DEBUG(@"partial match of [%@] at index k = %lu", scope, k);
 					match = NO;
+				}
 			}
 
 			if (match) {
+				DEBUG(@"selector [%@] matched at depth %lu, with %lu parts", sel, j+1, ndots[i]+1);
+				/* A match is given 10^18 points for each depth down the scope stack. */
+				if (i == nselectors - 1)
+					rank += (j + 1) * DEPTH_RANK;
+
 				// "Another 10^<depth> points is given for each additional part of the scope that is matched"
-				n = ndots[j];
+				n = ndots[i]; /* Number of dots in the selector (that actually matched the scope). */
 				if (n > 0)
-					rank += n * tenpow(i+1+j);
+					rank += n * tenpow(j + 1);
 
-				/* Did the whole selector match? */
-				if (j + 1 == nselectors) {
-					/* The total depth rank is: */
-					rank += (i + 1 + j) * DEPTH_RANK;
+				/* "1 extra point is given for each extra descendant scope" */
+				rank += 1;
 
-					/* "1 extra point is given for each extra descendant scope" */
-					rank += j;
-					return rank;
-				}
-			} else {
-				/* This scope selector doesn't match here, start over. */
-				rank = 0ULL;
+				/* If we matched scope #j, next selector should start matching against scope #j-1. */
+				scope_offset = j - 1;
+
+				/* Continue with the next selector. */
 				break;
 			}
 		}
+
+		/* If the selector didn't match any scope, we fail. */
+		if (!match)
+			return 0ULL;
 	}
 
 	return rank;

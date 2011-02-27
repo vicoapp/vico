@@ -68,12 +68,12 @@
 
 - (void)test010_SimplePrefixMatch
 {
-	STAssertEquals([@"source" matchesScopes:scopeCString], 1*DEPTH_RANK, nil);
+	STAssertEquals([@"source" matchesScopes:scopeCString], 1*DEPTH_RANK + 1, nil);
 }
 
 - (void)test010_SimplePrefixMatch2
 {
-	STAssertEquals([@"string" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
+	STAssertEquals([@"string" matchesScopes:scopeCString], 2*DEPTH_RANK + 1, nil);
 }
 
 - (void)test011_SimplePrefixNonMatch
@@ -83,22 +83,22 @@
 
 - (void)test012_DeeperPrefixMatch
 {
-	STAssertEquals([@"punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK, nil);
+	STAssertEquals([@"punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK + 1, nil);
 }
 
 - (void)test013_PrefixMatchMoreSpecificSameDepth
 {
-	STAssertEquals([@"string.quoted" matchesScopes:scopeCString], 2*DEPTH_RANK+100, nil);
+	STAssertEquals([@"string.quoted" matchesScopes:scopeCString], 2*DEPTH_RANK+100 + 1, nil);
 }
 
 - (void)test014_DeeperPrefixMatch2
 {
-	STAssertEquals([@"punctuation.definition" matchesScopes:scopeCString], 3*DEPTH_RANK+1000, nil);
+	STAssertEquals([@"punctuation.definition" matchesScopes:scopeCString], 3*DEPTH_RANK+1000 + 1, nil);
 }
 
 - (void)test014_DeeperPrefixMatch3
 {
-	STAssertEquals([@"punctuation.definition.string" matchesScopes:scopeCString], 3*DEPTH_RANK+2000, nil);
+	STAssertEquals([@"punctuation.definition.string" matchesScopes:scopeCString], 3*DEPTH_RANK + 2000 + 1, nil);
 }
 
 - (void)test015_EmptyScopeSelectorMatchesWithLowestRank
@@ -108,7 +108,7 @@
 
 - (void)test016_DescendantSelector
 {
-	STAssertEquals([@"source string" matchesScopes:scopeCString], 2*DEPTH_RANK+1, nil);
+	STAssertEquals([@"source string" matchesScopes:scopeCString], 2*DEPTH_RANK+2, nil);
 }
 
 - (void)test016_DescendantSelectorNoMatch
@@ -118,22 +118,22 @@
 
 - (void)test017_DescendantSelectorMoreSpecific
 {
-	STAssertEquals([@"source string.quoted" matchesScopes:scopeCString], 2*DEPTH_RANK+100+1, nil);
+	STAssertEquals([@"source string.quoted" matchesScopes:scopeCString], 2*DEPTH_RANK+100+2, nil);
 }
 
 - (void)test018_DescendantSelectorDeeperMatch
 {
-	STAssertEquals([@"source string punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+2, nil);
+	STAssertEquals([@"source string punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+3, nil);
 }
 
 - (void)test019_DescendantSelectorDeeperMatchMoreSpecific
 {
-	STAssertEquals([@"source string.quoted punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+100+2, nil);
+	STAssertEquals([@"source string.quoted punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+100+3, nil);
 }
 
 - (void)test020_DescendantSelectorDeeperMatchMoreSpecific2
 {
-	STAssertEquals([@"source.c string punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+10+2, nil);
+	STAssertEquals([@"source.c string punctuation" matchesScopes:scopeCString], 3*DEPTH_RANK+10+3, nil);
 }
 
 - (void)test021_AmbiguousMatch
@@ -146,7 +146,7 @@
 		 @"punctuation.definition.string.begin.c",
 		 nil];
 
-	STAssertEquals([@"source.c punctuation" matchesScopes:scope], 5*DEPTH_RANK+10000+1, nil);
+	STAssertEquals([@"source.c punctuation" matchesScopes:scope], 5*DEPTH_RANK+10000+2, nil);
 }
 
 - (void)test022_ImpossibleMatch
@@ -174,22 +174,22 @@
 
 - (void)test032_ExcludedSelector2
 {
-	STAssertEquals([@"source.objc - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+	STAssertEquals([@"source.objc - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10 + 1, nil);
 }
 
 - (void)test032_ExcludedSelector2WithoutWhitespace
 {
-	STAssertEquals([@"source.objc  -string -comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+	STAssertEquals([@"source.objc  -string -comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10 + 1, nil);
 }
 
 - (void)test033_GroupedSelectorsMatch
 {
-	STAssertEquals([@"keyword, string" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
+	STAssertEquals([@"keyword, string" matchesScopes:scopeCString], 2*DEPTH_RANK + 1, nil);
 }
 
 - (void)test033_GroupedSelectorsMatch2
 {
-	STAssertEquals([@"string, keyword" matchesScopes:scopeCString], 2*DEPTH_RANK, nil);
+	STAssertEquals([@"string, keyword" matchesScopes:scopeCString], 2*DEPTH_RANK + 1, nil);
 }
 
 - (void)test034_GroupedSelectorsNonMatch
@@ -199,12 +199,12 @@
 
 - (void)test035_GroupedSelectorsWithExclusions
 {
-	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10, nil);
+	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjC], 1*DEPTH_RANK+10 + 1, nil);
 }
 
 - (void)test036_GroupedSelectorsWithExclusions2
 {
-	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjCpp], 1*DEPTH_RANK+10, nil);
+	STAssertEquals([@"source.objc - string - comment, source.objc++ - string - comment" matchesScopes:scopeObjCpp], 1*DEPTH_RANK+10 + 1, nil);
 }
 
 - (void)test037_GroupedSelectorsWithExclusionsNonMatch
@@ -219,6 +219,19 @@
 		 nil];
 
 	STAssertEquals([@"source.c" matchesScopes:scope], 0ULL, nil);
+}
+
+- (void)test039_NonContiguousScopeMatch
+{
+	NSArray *scope = [NSArray arrayWithObjects:
+		 @"source.objc",
+		 @"meta.implementation.objc",
+		 @"meta.scope.implementation.objc",
+		 @"meta.function-with-body.objc",
+		 @"meta.block.c",
+		 nil];
+	STAssertEquals([@"source.objc meta.scope.implementation" matchesScopes:scope],
+	    3*DEPTH_RANK + 1*10 + 2*1000 + 2, nil);
 }
 
 @end

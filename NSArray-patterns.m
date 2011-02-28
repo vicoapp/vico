@@ -2,15 +2,6 @@
 #import "NSString-scopeSelector.h"
 #import "ViSyntaxMatch.h"
 
-/* returns 10^x */
-static inline u_int64_t tenpow(unsigned x)
-{
-	u_int64_t r = 1ULL;
-	while(x--)
-		r *= 10ULL;
-	return r;
-}
-
 @implementation NSArray (patterns)
 
 - (BOOL)isEqualToPatternArray:(NSArray *)otherArray

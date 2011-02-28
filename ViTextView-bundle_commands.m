@@ -118,11 +118,9 @@
 	if ([command tabTrigger] && snippetMatchRange.location != NSNotFound) {
 		[self deleteRange:snippetMatchRange];
 		[self setCaret:snippetMatchRange.location];
+		snippetMatchRange.location = NSNotFound;
 	}
 
-	/*  FIXME: need to verify correct behaviour of these env.variables
-	 * cf. http://www.e-texteditor.com/forum/viewtopic.php?t=1644
-	 */
 	NSRange inputRange;
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
 
@@ -248,7 +246,9 @@
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText environment:[[self delegate] environment] parser:parser];
+			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText
+			                                                                          environment:[[self delegate] environment]
+			                                                                               parser:parser];
 			id<ViViewController> viewController = [[[self window] windowController] currentView];
 			if (viewController == nil) {
 				INFO(@"%s", "ouch, no current view!");
@@ -264,11 +264,26 @@
 			[self insertString:outputText atLocation:NSMaxRange(inputRange) undoGroup:NO];
 			[self setCaret:NSMaxRange(inputRange) + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
+			NSRange r;
+			/*
+			 * Seems TextMate replaces the snippet trigger range only
+			 * if input type is not "selection" or any fallback (line, word, ...).
+			 * Otherwise the selection is replaced... (?)
+			 */
+			if ([[command input] isEqualToString:@"document"] ||
+			    [[command input] isEqualToString:@"none"]) {
+				r = NSMakeRange([self caret], 0);
+			} else {
+				/* Replace the selection. */
+				r = inputRange;
+			}
 			[self insertSnippet:outputText
 			         fromBundle:[command bundle]
-			            inRange:inputRange];
+			            inRange:r];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
-			ViDocument *doc = [[[self delegate] environment] splitVertically:NO andOpen:nil orSwitchToDocument:nil];
+			ViDocument *doc = [[[self delegate] environment] splitVertically:NO
+			                                                         andOpen:nil
+			                                              orSwitchToDocument:nil];
 			[doc setString:outputText];
 		} else if ([outputFormat isEqualToString:@"discard"])
 			;
@@ -281,8 +296,6 @@
 {
 	if ([bundleItem respondsToSelector:@selector(representedObject)])
 		bundleItem = [bundleItem representedObject];
-
-	INFO(@"perform bundle item %@", bundleItem);
 
 	if ([bundleItem isKindOfClass:[ViBundleCommand class]])
 		[self performBundleCommand:bundleItem];

@@ -36,7 +36,6 @@
 	[self beginUndoGroup];
 
 	[self deleteRange:aRange];
-	[self setCaret:aRange.location];
 
 	NSError *error = nil;
 	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString

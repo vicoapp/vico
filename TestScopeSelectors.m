@@ -234,5 +234,23 @@
 	    3*DEPTH_RANK + 1*10 + 2*1000 + 2, nil);
 }
 
+- (void)test040_BooleanOr
+{
+	STAssertEquals([@"meta.bracketed.objc | meta.function.objc" matchesScopes:scopeObjCString],
+	    6*DEPTH_RANK + 2*1000000 + 1, nil);
+}
+
+- (void)test041_BooleanOrSecondMatch
+{
+	STAssertEquals([@"meta.function.objc | meta.bracketed.objc" matchesScopes:scopeObjCString],
+	    6*DEPTH_RANK + 2*1000000 + 1, nil);
+}
+
+- (void)test042_BooleanOrInParens
+{
+	STAssertEquals([@"(meta.bracketed.objc | meta.function.objc)" matchesScopes:scopeObjCString],
+	    6*DEPTH_RANK + 2*1000000 + 1, nil);
+}
+
 @end
 

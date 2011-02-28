@@ -69,6 +69,8 @@
 		9A2DE65A131B7D8100E8657A /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE64F131B7D8100E8657A /* SBJsonStreamWriterState.m */; };
 		9A2DE65B131B7D8100E8657A /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE651131B7D8100E8657A /* SBJsonTokeniser.m */; };
 		9A2DE65C131B7D8100E8657A /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE653131B7D8100E8657A /* SBJsonWriter.m */; };
+		9A2DE6A5131BB77F00E8657A /* lemon.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE69C131BB6EA00E8657A /* lemon.c */; };
+		9A2DE6BB131BB8D600E8657A /* scope_selector.lemon in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE6BA131BB8D600E8657A /* scope_selector.lemon */; };
 		9A438AC01235847000F7D9FD /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438ABF1235847000F7D9FD /* ViPreferencesController.m */; };
 		9A438AC61235867B00F7D9FD /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A438AC41235867B00F7D9FD /* PreferenceWindow.xib */; };
 		9A438D371236C0AB00F7D9FD /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A438D361236C0AB00F7D9FD /* NSString-additions.m */; };
@@ -171,7 +173,28 @@
 		9AFBC31E0EE717C400646DCB /* ViDocumentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AFBC31D0EE717C400646DCB /* ViDocumentView.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXBuildRule section */
+		9A2DE6CE131BBA2600E8657A /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.lemon";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"$(INPUT_FILE_DIR)/$(INPUT_FILE_BASE).c",
+			);
+			script = "${TARGET_BUILD_DIR}/lemon -s ${INPUT_FILE_PATH}";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXContainerItemProxy section */
+		9A2DE6B4131BB83E00E8657A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A2DE6A0131BB76900E8657A /* lemon */;
+			remoteInfo = lemon;
+		};
 		9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -296,6 +319,9 @@
 		9A2DE651131B7D8100E8657A /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonTokeniser.m; path = json/SBJsonTokeniser.m; sourceTree = "<group>"; };
 		9A2DE652131B7D8100E8657A /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = json/SBJsonWriter.h; sourceTree = "<group>"; };
 		9A2DE653131B7D8100E8657A /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = json/SBJsonWriter.m; sourceTree = "<group>"; };
+		9A2DE69C131BB6EA00E8657A /* lemon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lemon.c; sourceTree = "<group>"; };
+		9A2DE6A1131BB76900E8657A /* lemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lemon; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A2DE6BA131BB8D600E8657A /* scope_selector.lemon */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scope_selector.lemon; sourceTree = "<group>"; };
 		9A3A943A0D9E9FFE0071C252 /* TestExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestExCommand.h; sourceTree = "<group>"; };
 		9A3A943B0D9E9FFE0071C252 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A438ABE1235847000F7D9FD /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
@@ -466,6 +492,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A2DE69F131BB76900E8657A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9AF2FE6D0EC9C85900C5771B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -500,6 +533,7 @@
 			children = (
 				8D15AC370486D014006FF6A4 /* Vibrant.app */,
 				9AF2FE700EC9C85900C5771B /* Tests.octest */,
+				9A2DE6A1131BB76900E8657A /* lemon */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -507,6 +541,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
+				9A2DE69B131BB6D300E8657A /* lemon */,
 				9A2DE640131B7D6F00E8657A /* json */,
 				9A8A70EA12DB882200D5874C /* receipt validation */,
 				9AC2D7B31270356E0056C06B /* Tab bar control */,
@@ -734,6 +769,15 @@
 			name = json;
 			sourceTree = "<group>";
 		};
+		9A2DE69B131BB6D300E8657A /* lemon */ = {
+			isa = PBXGroup;
+			children = (
+				9A2DE6BA131BB8D600E8657A /* scope_selector.lemon */,
+				9A2DE69C131BB6EA00E8657A /* lemon.c */,
+			);
+			name = lemon;
+			sourceTree = "<group>";
+		};
 		9A438C9412369C2D00F7D9FD /* Snippets */ = {
 			isa = PBXGroup;
 			children = (
@@ -916,14 +960,32 @@
 				9A02771B125B102B00045B6E /* Copy Frameworks */,
 			);
 			buildRules = (
+				9A2DE6CE131BBA2600E8657A /* PBXBuildRule */,
 			);
 			dependencies = (
+				9A2DE6B5131BB83E00E8657A /* PBXTargetDependency */,
 			);
 			name = Vibrant;
 			productInstallPath = "$(HOME)/Applications";
 			productName = Vibrant;
 			productReference = 8D15AC370486D014006FF6A4 /* Vibrant.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9A2DE6A0131BB76900E8657A /* lemon */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A2DE6AC131BB79200E8657A /* Build configuration list for PBXNativeTarget "lemon" */;
+			buildPhases = (
+				9A2DE69E131BB76900E8657A /* Sources */,
+				9A2DE69F131BB76900E8657A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = lemon;
+			productName = lemon;
+			productReference = 9A2DE6A1131BB76900E8657A /* lemon */;
+			productType = "com.apple.product-type.tool";
 		};
 		9AF2FE6F0EC9C85900C5771B /* Tests */ = {
 			isa = PBXNativeTarget;
@@ -963,6 +1025,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				9A2DE6A0131BB76900E8657A /* lemon */,
 				8D15AC270486D014006FF6A4 /* Vibrant */,
 				9AF2FE6F0EC9C85900C5771B /* Tests */,
 			);
@@ -1060,6 +1123,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A2DE6BB131BB8D600E8657A /* scope_selector.lemon in Sources */,
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */,
 				9A1A12000D02C65A009EABAC /* ViCommand.m in Sources */,
@@ -1181,6 +1245,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A2DE69E131BB76900E8657A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2DE6A5131BB77F00E8657A /* lemon.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9AF2FE6C0EC9C85900C5771B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1197,6 +1269,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9A2DE6B5131BB83E00E8657A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A2DE6A0131BB76900E8657A /* lemon */;
+			targetProxy = 9A2DE6B4131BB83E00E8657A /* PBXContainerItemProxy */;
+		};
 		9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Vibrant */;
@@ -1264,6 +1341,42 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		9A2DE6A3131BB76900E8657A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = lemon;
+			};
+			name = Debug;
+		};
+		9A2DE6A4131BB76900E8657A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = lemon;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		9AF2FE720EC9C85A00C5771B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1392,6 +1505,7 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_ENABLE_SYMBOL_SEPARATION = YES;
+				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1403,6 +1517,7 @@
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_PROTOTYPE_CONVERSION = NO;
 				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -1430,6 +1545,7 @@
 				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
+				YACC_GENERATED_FILE_STEM = Standard;
 			};
 			name = Debug;
 		};
@@ -1482,12 +1598,22 @@
 				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
+				YACC_GENERATED_FILE_STEM = Standard;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9A2DE6AC131BB79200E8657A /* Build configuration list for PBXNativeTarget "lemon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A2DE6A3131BB76900E8657A /* Debug */,
+				9A2DE6A4131BB76900E8657A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9AF2FE740EC9C85A00C5771B /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

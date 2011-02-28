@@ -1,8 +1,30 @@
+#include <stdlib.h>
+
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
-#import "logging.h"
+#include "logging.h"
+#include "scope_selector_parser.h"
 
 #define MAXSEL	 64
+
+inline struct scope_expr *
+mk_expr(struct scope_state *state, struct scope_list *sl)
+{
+	struct scope_expr *expr = &state->exprs[state->nexprs++];
+	expr->scope_list = sl;
+	expr->op = SCOPE;
+	return expr;
+}
+
+inline struct scope_expr *
+mk_expr_op(struct scope_state *state, int op, struct scope_expr *arg1, struct scope_expr *arg2)
+{
+	struct scope_expr *expr = &state->exprs[state->nexprs++];
+	expr->op = op;
+	expr->arg1 = arg1;
+	expr->arg2 = arg2;
+	return expr;
+}
 
 /* returns 10^x */
 static u_int64_t
@@ -14,103 +36,79 @@ tenpow(unsigned x)
 	return r;
 }
 
-static u_int64_t
-match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
+@implementation NSString (scopeSelector)
+
+- (u_int64_t)matchScopeSelector:(struct scope_list *)selectors
+                     withScopes:(struct scope_list *)ref_scopes
 {
-	unichar		*p, *end;
-	unichar		*descendants[MAXSEL];
-	unsigned int	 ndots[MAXSEL], n;
-	NSUInteger	 nscopes, nselectors = 0, scope_offset;
-	NSInteger	 i, j, k;
+	NSUInteger	 depth, depth_offset, nscopes = 0;
+	NSInteger	 i, k, n;
 	u_int64_t	 rank = 0ULL;
+	struct scope	*ref;
 
-	end = buf + length;
+	TAILQ_FOREACH(ref, ref_scopes, next)
+		nscopes++;
 
-	/* Split the selector into descendants, and count them. */
-	for (p = buf; p < end;) {
-		/* Skip whitespace. */
-		while (p < end && *p == ' ') {
-			*p = 0;
-			p++;
-		}
-		if (p == end)
-			break;
-		descendants[nselectors] = p;
-		/* Skip to next whitespace and count dots. */
-		n = 0;
-		while (p < end && *p != ' ') {
-			if (*p == '.')
-				n++;
-			p++;
-		}
-		ndots[nselectors++] = n;
-		if (nselectors >= MAXSEL)
-			return 0ULL;
-	}
-	*p = 0;
+	if (nscopes == 0)
+		return 1ULL;
+	depth_offset = nscopes;
 
-	if (nselectors == 0)
-		return 0ULL;
+	struct scope *ref_begin = TAILQ_LAST(ref_scopes, scope_list);
 
-	nscopes = [scopes count];
-
-	if (nselectors > nscopes)
-		return 0ULL;
-
-	scope_offset = nscopes - 1;
-
-	for (i = nselectors - 1; i >= 0; i--) {
+	struct scope *sel;
+	TAILQ_FOREACH_REVERSE(sel, selectors, scope_list, next) {
 		/* Match each selector against all remaining, unmatched scopes. */
 
 		BOOL match = NO;
-		for (j = scope_offset; j >= 0; j--) {
+		ref = ref_begin;
+		for (depth = depth_offset; ref != NULL; ref = TAILQ_PREV(ref, scope_list, next), depth--) {
 
 			/* Match selector #i against scope #j. */
 
-			NSString *scope = [scopes objectAtIndex:j];
-			unichar *selector = descendants[i];
-			NSUInteger sl = [scope length];
-
 #ifndef NO_DEBUG
-			int x;
-			for (x = 0; selector[x] != 0; x++) ;
-			NSString *sel = [NSString stringWithCharacters:selector length:x];
-			DEBUG(@"matching selector [%@] against scope [%@]", sel, scope);
+			NSString *selscope = [NSString stringWithCharacters:sel->buf length:sel->length];
+			NSString *refscope = [NSString stringWithCharacters:ref->buf length:ref->length];
+			DEBUG(@"matching selector [%@] against scope [%@]", selscope, refscope);
 #endif
 
 			match = YES;
-			for (p = selector, k = 0; k < sl && *p != 0; p++, k++) {
-				if ([scope characterAtIndex:k] != *p) {
+			for (i = k = 0; k < ref->length && i < sel->length; i++, k++) {
+				if (ref->buf[k] != sel->buf[i]) {
 					match = NO;
 					break;
 				}
 			}
 
-			if (match && k + 1 < sl) {
+			if (match && k + 1 < ref->length) {
 				/* Don't count partial scope matches. */
 				/* "source.css" shouldn't match "source.c" */
-				if ([scope characterAtIndex:k] != '.') {
-					DEBUG(@"partial match of [%@] at index k = %lu", scope, k);
+				if (ref->buf[k] != '.') {
+					DEBUG(@"partial match of [%@] at index k = %lu", refscope, k);
 					match = NO;
 				}
 			}
 
 			if (match) {
-				DEBUG(@"selector [%@] matched at depth %lu, with %lu parts", sel, j+1, ndots[i]+1);
 				/* A match is given 10^18 points for each depth down the scope stack. */
-				if (i == nselectors - 1)
-					rank += (j + 1) * DEPTH_RANK;
+				if (TAILQ_NEXT(sel, next) == NULL)
+					rank += depth * DEPTH_RANK;
 
 				// "Another 10^<depth> points is given for each additional part of the scope that is matched"
-				n = ndots[i]; /* Number of dots in the selector (that actually matched the scope). */
+				n = 0; /* Count number of dots in the selector (that actually matched the scope). */
+				for (i = 0; i < sel->length; i++)
+					if (sel->buf[i] =='.')
+						n++;
 				if (n > 0)
-					rank += n * tenpow(j + 1);
+					rank += n * tenpow(depth);
+
+				DEBUG(@"selector [%@] matched at depth %lu, with %lu parts", selscope, depth, n+1);
 
 				/* "1 extra point is given for each extra descendant scope" */
 				rank += 1;
 
 				/* If we matched scope #j, next selector should start matching against scope #j-1. */
-				scope_offset = j - 1;
+				ref_begin = TAILQ_PREV(ref, scope_list, next);
+				depth_offset = depth - 1;
 
 				/* Continue with the next selector. */
 				break;
@@ -125,63 +123,210 @@ match_scopes(unichar *buf, NSUInteger length, NSArray *scopes)
 	return rank;
 }
 
-static u_int64_t
-match_group(unichar *buf, NSUInteger length, NSArray *scopes)
+- (u_int64_t)evalScopeSelector:(struct scope_expr *)expr againstScopes:(struct scope_list *)ref_scopes
 {
-	unichar		*e, *begin, *end;
-	u_int64_t	 r, incl_rank = 0ULL;
+	u_int64_t l, r;
 
-	begin = buf;
-	end = begin + length;
+	DEBUG(@"matching against expre %p", expr);
 
-	do {
-		for (e = begin; e < end; e++)
-			if (e + 2 < end && e[0] == ' ' && e[1] == '-')
-				break;
-		r = match_scopes(begin, e - begin, scopes);
-		if (begin == buf) {
-			if (r == 0ULL)
-				return 0ULL;
-			incl_rank = r;
-		} else if (r > 0ULL)	/* Positive exclusion. */
+	switch (expr->op) {
+	case SCOPE:
+		return [self matchScopeSelector:expr->scope_list withScopes:ref_scopes];
+	case MINUS:
+		l = [self evalScopeSelector:expr->arg1 againstScopes:ref_scopes];
+		if (l == 0ULL ||
+		    [self evalScopeSelector:expr->arg2 againstScopes:ref_scopes] > 0ULL)
 			return 0ULL;
-		begin = e + 2;
-
-	} while (e < end);
-
-	return incl_rank;
+		return l;
+	case COMMA:
+	case OR:
+		l = [self evalScopeSelector:expr->arg1 againstScopes:ref_scopes];
+		if (l > 0ULL)
+			return l;
+		return [self evalScopeSelector:expr->arg2 againstScopes:ref_scopes];
+	case AND:
+		l = [self evalScopeSelector:expr->arg1 againstScopes:ref_scopes];
+		if (l == 0ULL)
+			return 0ULL;
+		r = [self evalScopeSelector:expr->arg2 againstScopes:ref_scopes];
+		if (l > r)
+			return l;
+		return r;
+	default:
+		INFO(@"%s", "internal error");
+		return 0ULL;
+	}
 }
 
-@implementation NSString (scopeSelector)
-
-- (u_int64_t)matchesScopes:(NSArray *)scopes
+#ifndef NO_DEBUG
+- (NSString *)printScopeList:(struct scope_list *)scope_list
 {
-	unichar		 buf[1024+1], *begin, *p, *end;
-	NSUInteger	 length;
-	u_int64_t	 r;
+	NSMutableString *s;
+	struct scope *scope;
 
-	length = [self length];
-	if (length == 0)
+	s = [NSMutableString string];
+	TAILQ_FOREACH(scope, scope_list, next) {
+		NSString *tmp = [NSString stringWithCharacters:scope->buf length:scope->length];
+		[s appendString:tmp];
+		if (TAILQ_NEXT(scope, next))
+			[s appendString:@" "];
+	}
+
+	return s;
+}
+
+- (NSString *)printScopeExpression:(struct scope_expr *)expr
+{
+	NSMutableString *s;
+
+	s = [NSMutableString string];
+	[s appendString:@"("];
+
+	switch (expr->op) {
+	case SCOPE:
+		[s appendString:[self printScopeList:expr->scope_list]];
+		break;
+	case MINUS:
+		[s appendString:[self printScopeExpression:expr->arg1]];
+		[s appendString:@" - "];
+		[s appendString:[self printScopeExpression:expr->arg2]];
+		break;
+	case COMMA:
+		[s appendString:[self printScopeExpression:expr->arg1]];
+		[s appendString:@", "];
+		[s appendString:[self printScopeExpression:expr->arg2]];
+		break;
+	case OR:
+		[s appendString:[self printScopeExpression:expr->arg1]];
+		[s appendString:@" | "];
+		[s appendString:[self printScopeExpression:expr->arg2]];
+		break;
+	case AND:
+		[s appendString:[self printScopeExpression:expr->arg1]];
+		[s appendString:@" & "];
+		[s appendString:[self printScopeExpression:expr->arg2]];
+		break;
+	default:
+		INFO(@"%s", "internal error");
+		return nil;
+	}
+
+	[s appendString:@")"];
+
+	return s;
+}
+#endif
+
+- (u_int64_t)matchesScopeList:(struct scope_list *)ref_scopes
+{
+	unichar *buf;
+	u_int64_t rank = 0ULL;
+	NSUInteger i, j, len;
+	struct scope_state state;
+
+	len = [self length];
+	if (len == 0)
 		return 1ULL;
-	if (length > 1024)
+
+	buf = malloc(sizeof(unichar) * len);
+	if (buf == NULL)
 		return 0ULL;
+	[self getCharacters:buf range:NSMakeRange(0, len)];
 
-	[self getCharacters:buf range:NSMakeRange(0, length)];
-	end = buf + length;
+	void *parser = scopeSelectorParseAlloc(malloc);
+	if (parser == NULL) {
+		free(buf);
+		return 0ULL;
+	}
 
-	/* Evaluate each comma-separated group. */
-	for (begin = p = buf; p < end; p++) {
-		if (*p == ',') {
-			*p = '\0';
-			if ((r = match_group(begin, p - begin, scopes)) > 0ULL)
-				return r;
-			begin = p + 1;
+	state.top_level_expr = NULL;
+	state.nscopes = 0;
+	state.nlists = 0;
+	state.nexprs = 0;
+
+	for (i = 0; i < len;) {
+		struct scope *scope;
+		unichar ch = buf[i];
+		switch (ch) {
+		case ' ':
+		case '\n':
+			i++;
+			break;
+		case ',':
+			scopeSelectorParse(parser, COMMA, NULL, &state);
+			i++;
+			break;
+		case '-':
+			scopeSelectorParse(parser, MINUS, NULL, &state);
+			i++;
+			break;
+		case '(':
+			scopeSelectorParse(parser, LPAREN, NULL, &state);
+			i++;
+			break;
+		case ')':
+			scopeSelectorParse(parser, RPAREN, NULL, &state);
+			i++;
+			break;
+		case '&':
+			scopeSelectorParse(parser, AND, NULL, &state);
+			i++;
+			break;
+		case '|':
+			scopeSelectorParse(parser, OR, NULL, &state);
+			i++;
+			break;
+		default:
+			scope = &state.scopes[state.nscopes++];
+			for (j = i + 1; j < len; j++) {
+				ch = buf[j];
+				if (ch == ' ' || ch == ',' || ch == '(' || ch == ')' || ch == '&' || ch == '|' || ch == '\n')
+					break;
+			}
+			scope->buf = buf + i;
+			scope->length = j - i;
+			scopeSelectorParse(parser, SCOPE, scope, &state);
+			i = j;
+			break;
 		}
 	}
 
-	if (begin < p)
-		return match_group(begin, p - begin, scopes);
-	return 0ULL;
+	scopeSelectorParse(parser, 0, NULL, &state);
+
+	DEBUG(@"got top-level expression %p", state.top_level_expr);
+	if (state.top_level_expr) {
+		DEBUG(@"expression:\n%@", [self printScopeExpression:state.top_level_expr]);
+		rank = [self evalScopeSelector:state.top_level_expr againstScopes:ref_scopes];
+	}
+
+	scopeSelectorParseFree(parser, free);
+	free(buf);
+
+	return rank;
+}
+
+- (u_int64_t)matchesScopes:(NSArray *)scopes
+{
+	/* Convert the NSArray to a TAILQ. */
+	struct scope ref_scope_array[64];	/* XXX: crash if more than this many scopes! */
+	struct scope_list ref_scopes;
+	TAILQ_INIT(&ref_scopes);
+	int nrefs = 0;
+	for (NSString *tmp in scopes) {
+		struct scope *ref = &ref_scope_array[nrefs++];
+		ref->length = [tmp length];
+		ref->buf = malloc(sizeof(unichar) * ref->length);
+		[tmp getCharacters:ref->buf range:NSMakeRange(0, ref->length)];
+		TAILQ_INSERT_TAIL(&ref_scopes, ref, next);
+	}
+
+	u_int64_t rank = [self matchesScopeList:&ref_scopes];
+
+	int i;
+	for (i = 0; i < nrefs; i++)
+		free(ref_scope_array[i].buf);
+
+	return rank;
 }
 
 @end

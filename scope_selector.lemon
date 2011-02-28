@@ -1,0 +1,39 @@
+%include {
+#include "scope_selector_parser.h"
+#include <stdlib.h>
+#include <assert.h>
+}
+
+%name scopeSelectorParse
+
+%extra_argument		{ struct scope_state *state }
+
+%token_type		{ struct scope * }
+%type scopelist		{ struct scope_list * }
+%type selector		{ struct scope_expr * }
+%type expr		{ struct scope_expr * }
+
+%left AND.
+%left OR.
+%left COMMA.
+%left MINUS.
+
+selector ::= expr(X).				{ state->top_level_expr = X; }
+
+expr(LH) ::= scopelist(SL).			{ LH = mk_expr(state, SL); }
+expr(LH) ::= expr(A) OR expr(B).		{ LH = mk_expr_op(state, OR, A, B); }
+expr(LH) ::= expr(A) AND expr(B).		{ LH = mk_expr_op(state, AND, A, B); }
+expr(LH) ::= LPAREN expr(X) RPAREN.		{ LH = X; }
+expr(LH) ::= expr(A) MINUS expr(B).		{ LH = mk_expr_op(state, MINUS, A, B); }
+expr(LH) ::= expr(A) COMMA expr(B).		{ LH = mk_expr_op(state, COMMA, A, B); }
+
+scopelist(LH) ::= SCOPE(S).			{
+							LH = &state->lists[state->nlists++];
+							TAILQ_INIT(LH);
+							TAILQ_INSERT_TAIL(LH, S, next);
+						}
+scopelist(LH) ::= scopelist(SL) SCOPE(S).	{
+							LH = SL;
+							TAILQ_INSERT_TAIL(LH, S, next);
+						}
+

@@ -3,7 +3,7 @@
 #import "ViThemeStore.h"
 #import "ViAppController.h"
 #import "logging.h"
-#import <YAJL/YAJL.h>
+#import "JSON.h"
 
 /* this code is from the apple documentation... */
 static float
@@ -131,7 +131,13 @@ ToolbarHeightForWindow(NSWindow *window)
 	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
 
 	NSData *JSONData = [NSData dataWithContentsOfFile:[self repoPathForUser:username]];
-	NSDictionary *dict = [JSONData yajl_JSON];
+	NSString *JSONString = [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
+	NSDictionary *dict = [JSONString JSONValue];
+	if (![dict isKindOfClass:[NSDictionary class]]) {
+		INFO(@"%s", "failed to parse JSON");
+		return;
+	}
+
 	NSArray *userBundles = [dict objectForKey:@"repositories"];
 
 	/* Remove any non-tmbundle repositories. */
@@ -489,8 +495,10 @@ ToolbarHeightForWindow(NSWindow *window)
 	if (connection == userConnection) {
 		NSMutableDictionary *repo = [processQueue lastObject];
 		NSString *username = [repo objectForKey:@"username"];
-		NSDictionary *dict = [userData yajl_JSON];
-		if (dict == nil) {
+	
+		NSString *JSONString = [[NSString alloc] initWithData:userData encoding:NSUTF8StringEncoding];
+		NSDictionary *dict = [JSONString JSONValue];
+		if (![dict isKindOfClass:[NSDictionary class]]) {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to parse data for user %@.", username]];
 			return;

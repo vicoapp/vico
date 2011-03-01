@@ -9,7 +9,7 @@
 
 	tabTrigger = [aTabTrigger stringByAppendingFormat:@"%C", 0x21E5];
 
-	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0] forKey:NSFontAttributeName];
+	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuFontOfSize:0] forKey:NSFontAttributeName];
 	titleSize = [aTitle sizeWithAttributes:attributes];
 	triggerSize = [tabTrigger sizeWithAttributes:attributes];
 

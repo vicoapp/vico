@@ -34,7 +34,6 @@
 	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
 
 	[self beginUndoGroup];
-
 	[self deleteRange:aRange];
 
 	NSError *error = nil;
@@ -76,7 +75,7 @@
 {
 	[self insertSnippet:[bundleSnippet content]
 	         fromBundle:[bundleSnippet bundle]
-	            inRange:snippetMatchRange];
+	            inRange:snippetMatchRange.location == NSNotFound ? NSMakeRange([self caret], 0) : snippetMatchRange];
 }
 
 @end

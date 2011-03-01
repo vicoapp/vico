@@ -240,6 +240,9 @@
 		DEBUG(@"command output: %@", outputText);
 		DEBUG(@"output format: %@", outputFormat);
 
+		if (mode == ViVisualMode)
+			[self setNormalMode];
+
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:inputRange withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {

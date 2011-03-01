@@ -1,6 +1,8 @@
 #import "ViLanguageStore.h"
 #import "ViBundle.h"
 #import "ViAppController.h"
+#import "ViBundleItem.h"
+#import "NSString-scopeSelector.h"
 #import "logging.h"
 
 @implementation ViLanguageStore
@@ -213,13 +215,28 @@ static NSString *bundlesDirectory = nil;
                   matchingScopes:(NSArray *)scopes
                           inMode:(ViMode)mode
 {
-	NSMutableArray *matches = [[NSMutableArray alloc] init];
-	for (ViBundle *bundle in bundles) {
-		NSArray *m = [bundle itemsWithTabTrigger:name
-		                          matchingScopes:scopes
-		                                  inMode:mode];
-		[matches addObjectsFromArray:m];
-	}
+	NSMutableArray *matches = nil;
+	u_int64_t highest_rank = 0ULL;
+
+	for (ViBundle *bundle in bundles)
+		for (ViBundleItem *item in [bundle items])
+			if ([[item tabTrigger] isEqualToString:name] &&
+			    ([item mode] == ViAnyMode || [item mode] == mode)) {
+				NSString *scope = [item scope];
+				u_int64_t rank;
+				if (scope == nil)
+					rank = 1ULL;
+				else
+					rank = [scope matchesScopes:scopes];
+
+				if (rank > 0) {
+					if (rank > highest_rank) {
+						matches = [NSMutableArray arrayWithObject:item];
+						highest_rank = rank;
+					} else if (rank == highest_rank)
+						[matches addObject:item];
+				}
+			}
 
 	return matches;
 }
@@ -229,14 +246,28 @@ static NSString *bundlesDirectory = nil;
            matchingScopes:(NSArray *)scopes
                    inMode:(ViMode)mode
 {
-	NSMutableArray *matches = [[NSMutableArray alloc] init];
-	for (ViBundle *bundle in bundles) {
-		NSArray *m = [bundle itemsWithKey:keycode
-		                         andFlags:flags
-		                   matchingScopes:scopes
-		                           inMode:mode];
-		[matches addObjectsFromArray:m];
-	}
+	NSMutableArray *matches = nil;
+	u_int64_t highest_rank = 0ULL;
+
+	for (ViBundle *bundle in bundles)
+		for (ViBundleItem *item in [bundle items])
+			if ([item keycode] == keycode && [item keyflags] == flags &&
+			    ([item mode] == ViAnyMode || [item mode] == mode)) {
+				NSString *scope = [item scope];
+				u_int64_t rank;
+				if (scope == nil)
+					rank = 1ULL;
+				else
+					rank = [scope matchesScopes:scopes];
+
+				if (rank > 0) {
+					if (rank > highest_rank) {
+						matches = [NSMutableArray arrayWithObject:item];
+						highest_rank = rank;
+					} else if (rank == highest_rank)
+						[matches addObject:item];
+				}
+			}
 
 	return matches;
 }

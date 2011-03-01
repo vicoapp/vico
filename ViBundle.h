@@ -28,16 +28,10 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
-- (NSArray *)itemsWithKey:(unichar)keycode
-                 andFlags:(unsigned int)flags
-           matchingScopes:(NSArray *)scopes
-                   inMode:(ViMode)mode;
-- (NSArray *)itemsWithTabTrigger:(NSString *)name
-                  matchingScopes:(NSArray *)scopes
-                          inMode:(ViMode)mode;
 - (NSMenu *)menuForScopes:(NSArray *)scopes;
 
 @property(readonly) NSMutableArray *languages;
 @property(readonly) NSString *path;
+@property(readonly) NSArray *items;
 
 @end

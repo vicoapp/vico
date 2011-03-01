@@ -11,6 +11,7 @@
 
 @synthesize languages;
 @synthesize path;
+@synthesize items;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
@@ -271,41 +272,9 @@
 	}
 }
 
-- (NSArray *)itemsWithKey:(unichar)keycode
-                 andFlags:(unsigned int)flags
-           matchingScopes:(NSArray *)scopes
-                   inMode:(ViMode)mode
-{
-	NSMutableArray *matches = [[NSMutableArray alloc] init];
-
-	for (ViBundleItem *item in items)
-                if ([item keycode] == keycode && [item keyflags] == flags) {
-			NSString *scope = [item scope];
-			if ((scope == nil || [scope matchesScopes:scopes] > 0) &&
-			    ([item mode] == ViAnyMode || [item mode] == mode))
-				[matches addObject:item];
-		}
-
-	return matches;
-}
-
-- (NSArray *)itemsWithTabTrigger:(NSString *)name
-                  matchingScopes:(NSArray *)scopes
-                          inMode:(ViMode)mode
-{
-	NSMutableArray *matches = [[NSMutableArray alloc] init];
-	for (ViBundleItem *item in items)
-		if ([[item tabTrigger] isEqualToString:name] &&
-		    ([item scope] == nil || [[item scope] matchesScopes:scopes] > 0) &&
-		    ([item mode] == ViAnyMode || [item mode] == mode))
-			[matches addObject:item];
-
-	return matches;
-}
-
-- (NSMenu*)submenu:(NSDictionary*)menuLayout
-          withName:(NSString*)name
-         forScopes:(NSArray*)scopes
+- (NSMenu *)submenu:(NSDictionary *)menuLayout
+           withName:(NSString *)name
+          forScopes:(NSArray *)scopes
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];

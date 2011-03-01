@@ -1708,6 +1708,18 @@ int logIndent = 0;
 	[self pushLocationOnJumpList:[self caret]];
 }
 
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+	NSMenu *menu = [self menuForEvent:theEvent];
+	[NSMenu popUpContextMenu:menu withEvent:theEvent forView:self];
+
+	/*
+	 * Must remove the bundle menu items, otherwise the key equivalents
+	 * remain active and interfere with the handling in keyDown:.
+	 */
+	[menu removeAllItems];
+}
+
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {
 	NSMenu *menu = [super menuForEvent:theEvent];
@@ -1737,7 +1749,6 @@ int logIndent = 0;
 
 	return menu;
 }
-
 
 @end
 

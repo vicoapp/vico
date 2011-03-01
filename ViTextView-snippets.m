@@ -51,7 +51,15 @@
 	[self delegate].snippet = snippet;
 	final_location = snippet.caret;
 	[self setCaret:snippet.caret];
-	[self setInsertMode:nil];
+
+	/*
+	 * If we have an active tab stop (apart from $0), force insert mode.
+	 */
+	if (snippet.selectedRange.length > 0)
+		[self setInsertMode:nil];
+	else if (mode == ViVisualMode)
+		[self setNormalMode];
+
 	[self resetSelection];
 
 	snippetMatchRange.location = NSNotFound;

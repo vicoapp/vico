@@ -98,14 +98,12 @@
 
 - (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange
 {
-	// INFO(@"matching string in range %u + %u", aRange.location, aRange.length);
-	/* if ([aString fastestEncoding] != 30) */
-		/* INFO(@"fastest encoding = %u (expecting 0x%08X)", [aString fastestEncoding], NSUTF16LittleEndianStringEncoding); */
-
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	[aString getCharacters:chars range:aRange];
-	ViRegexpMatch *match = [self matchInCharacters:chars range:NSMakeRange(0, aRange.length) start:aRange.location];
-	
+	ViRegexpMatch *match = [self matchInCharacters:chars
+	                                         range:NSMakeRange(0, aRange.length)
+	                                         start:aRange.location];
+
 	free(chars);
 	return match;
 }
@@ -115,7 +113,10 @@
 	return [self matchInString:aString range:NSMakeRange(0, [aString length])];
 }
 
-- (NSArray *)allMatchesInCharacters:(const unichar *)chars options:(int)options range:(NSRange)aRange start:(NSUInteger)aLocation
+- (NSArray *)allMatchesInCharacters:(const unichar *)chars
+                            options:(int)options
+                              range:(NSRange)aRange
+                              start:(NSUInteger)aLocation
 {
 	NSMutableArray *matches = nil;
 
@@ -137,12 +138,16 @@
 	return matches;
 }
 
-- (NSArray *)allMatchesInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation
+- (NSArray *)allMatchesInCharacters:(const unichar *)chars
+                              range:(NSRange)aRange
+                              start:(NSUInteger)aLocation
 {
 	return [self allMatchesInCharacters:chars options:0 range:aRange start:aLocation];
 }
 
-- (NSArray *)allMatchesInString:(NSString *)aString options:(int)options range:(NSRange)aRange
+- (NSArray *)allMatchesInString:(NSString *)aString
+                        options:(int)options
+                          range:(NSRange)aRange
 {
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	[aString getCharacters:chars range:aRange];
@@ -151,17 +156,21 @@
 	return matches;
 }
 
-- (NSArray *)allMatchesInString:(NSString *)aString options:(int)options
+- (NSArray *)allMatchesInString:(NSString *)aString
+                        options:(int)options
 {
 	return [self allMatchesInString:aString options:0 range:NSMakeRange(0, [aString length])];
 }
 
-- (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange
+- (NSArray *)allMatchesInString:(NSString *)aString
+                          range:(NSRange)aRange
 {
 	return [self allMatchesInString:aString options:0 range:aRange];
 }
 
-- (NSArray *)allMatchesInString:(NSString *)aString range:(NSRange)aRange start:(NSUInteger)aLocation
+- (NSArray *)allMatchesInString:(NSString *)aString
+                          range:(NSRange)aRange
+                          start:(NSUInteger)aLocation
 {
 	return [self allMatchesInString:aString range:aRange];
 }
@@ -177,12 +186,14 @@
 
 @synthesize startLocation;
 
-+ (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation
++ (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion
+                           startLocation:(NSUInteger)aLocation
 {
 	return [[ViRegexpMatch alloc] initWithRegion:aRegion startLocation:aLocation];
 }
 
-- (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion startLocation:(NSUInteger)aLocation
+- (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion
+                    startLocation:(NSUInteger)aLocation
 {
 	self = [super init];
 	startLocation = aLocation;

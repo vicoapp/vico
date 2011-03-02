@@ -114,6 +114,21 @@ static NSWindowController	*currentWindowController = nil;
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
 
+- (void)tearDownBundleMenu:(NSNotification *)notification
+{
+	NSMenu *menu = (NSMenu *)[notification object];
+
+	/*
+	 * Must remove the bundle menu items, otherwise the key equivalents
+	 * remain active and interfere with the handling in textView.keyDown:.
+	 */
+	[menu removeAllItems];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:NSMenuDidEndTrackingNotification
+                                                      object:menu];
+}
+
 - (void)setupBundleMenu:(NSNotification *)notification
 {
 	NSMenu *menu = [bundleButton menu];
@@ -136,6 +151,11 @@ static NSWindowController	*currentWindowController = nil;
 			[item setSubmenu:submenu];
 		}
 	}
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(tearDownBundleMenu:)
+                                            name:NSMenuDidEndTrackingNotification
+                                          object:menu];
 }
 
 - (void)windowDidLoad

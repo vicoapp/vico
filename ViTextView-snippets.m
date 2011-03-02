@@ -45,8 +45,9 @@
 	                                           environment:env
 	                                                 error:&error];
 	if (snippet == nil) {
-		INFO(@"error is %@", [error localizedDescription]);
 		[[self delegate] message:[error localizedDescription]];
+		final_location = aRange.location;
+		[self setCaret:aRange.location];
 		return nil;
 	}
 

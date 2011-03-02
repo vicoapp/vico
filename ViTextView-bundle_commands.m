@@ -84,7 +84,7 @@
 		*rangePtr = [self trackScopeSelector:[command scope] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
-		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr];
+		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];
 	} else if ([type isEqualToString:@"line"]) {
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:[self caret]];
@@ -104,6 +104,11 @@
 	NSString *inputText = [self inputOfType:[command input] command:command range:rangePtr];
 	if (inputText == nil)
 		inputText = [self inputOfType:[command fallbackInput] command:command range:rangePtr];
+
+	if (inputText == nil) {
+		inputText = @"";
+		*rangePtr = NSMakeRange([self caret], 0);
+	}
 
 	return inputText;
 }

@@ -89,7 +89,7 @@
 	if (line)
 		[env setObject:line forKey:@"TM_CURRENT_LINE"];
 
-	NSString *word = [[textView textStorage] wordAtLocation:[textView caret]];
+	NSString *word = [[textView textStorage] wordAtLocation:[textView caret] range:nil acceptAfter:YES];
 	if (word)
 		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
 

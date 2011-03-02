@@ -520,17 +520,25 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 				backward:NO];
 }
 
-- (NSString *)wordAtLocation:(NSUInteger)aLocation range:(NSRange *)returnRange
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
+                 acceptAfter:(BOOL)acceptAfter
 {
-	if (aLocation >= [self length]) {
-		if (returnRange != nil)
-			*returnRange = NSMakeRange(0, 0);
-		return @"";
-	}
-
 	if (wordSet == nil) {
 		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
+	}
+
+	if (acceptAfter &&
+	   (aLocation >= [self length] ||
+	    ![wordSet characterIsMember:[[self string] characterAtIndex:aLocation]]) &&
+	   aLocation > 0)
+		aLocation--;
+
+	if (aLocation >= [self length]) {
+		if (returnRange != nil)
+			*returnRange = NSMakeRange(NSNotFound, 0);
+		return nil;
 	}
 
 	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
@@ -546,9 +554,15 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	}
 
 	if (returnRange)
-		*returnRange = NSMakeRange(0, 0);
+		*returnRange = NSMakeRange(NSNotFound, 0);
 
 	return nil;
+}
+
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
+{
+	return [self wordAtLocation:aLocation range:returnRange acceptAfter:NO];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation

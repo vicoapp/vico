@@ -307,4 +307,54 @@
 	STAssertEquals([textStorage lineCount], 0ULL, nil);
 }
 
+- (void)test044_wordAtLocation
+{
+	[[textStorage mutableString] setString:@"chunky bacon"];
+	NSRange r;
+	STAssertEqualObjects([textStorage wordAtLocation:0 range:&r], @"chunky", nil);
+	STAssertEquals(r.location, 0ULL, nil);
+	STAssertEquals(r.length, 6ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:5 range:&r], @"chunky", nil);
+	STAssertEquals(r.location, 0ULL, nil);
+	STAssertEquals(r.length, 6ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:6 range:&r], nil, nil);
+	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.length, 0ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:6 range:&r acceptAfter:YES], @"chunky", nil);
+	STAssertEquals(r.location, 0ULL, nil);
+	STAssertEquals(r.length, 6ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:7 range:&r], @"bacon", nil);
+	STAssertEquals(r.location, 7ULL, nil);
+	STAssertEquals(r.length, 5ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:11 range:&r], @"bacon", nil);
+	STAssertEquals(r.location, 7ULL, nil);
+	STAssertEquals(r.length, 5ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:12 range:&r], nil, nil);
+	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.length, 0ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:12 range:&r acceptAfter:YES], @"bacon", nil);
+	STAssertEquals(r.location, 7ULL, nil);
+	STAssertEquals(r.length, 5ULL, nil);
+
+	STAssertEqualObjects([textStorage wordAtLocation:13 range:&r], nil, nil);
+	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.length, 0ULL, nil);
+}
+
+- (void)test045_wordAtLocationInEmptyFile
+{
+	[[textStorage mutableString] setString:@""];
+	NSRange r;
+	STAssertEqualObjects([textStorage wordAtLocation:0 range:&r acceptAfter:YES], nil, nil);
+	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.length, 0ULL, nil);
+}
+
 @end

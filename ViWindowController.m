@@ -22,7 +22,7 @@ static NSWindowController	*currentWindowController = nil;
 @interface ViWindowController ()
 - (void)updateJumplistNavigator;
 - (void)didSelectDocument:(ViDocument *)document;
-- (void)didSelectDocumentView:(ViDocumentView *)docView;
+- (void)didSelectViewController:(id<ViViewController>)viewController;
 - (ViDocumentTabController *)selectedTabController;
 - (void)closeDocumentView:(id<ViViewController>)viewController;
 @end
@@ -706,7 +706,7 @@ static NSWindowController	*currentWindowController = nil;
 			[[self environment] message:@"Vi command interrupted."];
 			[parser reset];
 		}
-		[self didSelectDocumentView:viewController];
+		[self didSelectViewController:viewController];
 	}
 }
 
@@ -743,7 +743,7 @@ static NSWindowController	*currentWindowController = nil;
 	[self checkDocumentChanged:document];
 }
 
-- (void)didSelectDocumentView:(id<ViViewController>)viewController
+- (void)didSelectViewController:(id<ViViewController>)viewController
 {
 	if (viewController == [self currentView])
 		return;
@@ -966,12 +966,18 @@ static NSWindowController	*currentWindowController = nil;
 
 - (id<ViViewController>)viewControllerForView:(NSView *)aView
 {
+	if (aView == nil)
+		return nil;
+
 	NSArray *tabs = [tabBar representedTabViewItems];
 	for (NSTabViewItem *item in tabs) {
 		id<ViViewController> viewController = [[item identifier] viewControllerForView:aView];
 		if (viewController)
 			return viewController;
 	}
+
+	if ([aView respondsToSelector:@selector(superview)])
+		return [self viewControllerForView:[aView superview]];
 
 	DEBUG(@"***** View %@ not in a view controller", aView);
 	return nil;

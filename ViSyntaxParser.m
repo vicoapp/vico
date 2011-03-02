@@ -577,19 +577,15 @@ done:
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch
 {
 	NSMutableArray *scopes = [[NSMutableArray alloc] initWithCapacity:[matches count] + 1];
-	[scopes addObject:[language name]];
-	ViSyntaxMatch *m;
-	for (m in matches)
-	{
-		if ([m scope])
+	if ([[language name] length] > 0)
+		[scopes addObject:[language name]];
+	for (ViSyntaxMatch *m in matches) {
+		if ([[m scope] length] > 0)
 			[scopes addObject:[m scope]];
-		if (m != skipContentMatch)
-		{
+		if (m != skipContentMatch) {
 			NSString *contentName = [[m pattern] objectForKey:@"contentName"];
-			if (contentName)
-			{
+			if ([contentName length] > 0)
 				[scopes addObject:contentName];
-			}
 		}
 	}
 

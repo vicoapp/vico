@@ -1129,6 +1129,7 @@ int logIndent = 0;
         // check if we're inside a snippet
 	ViSnippet *snippet = [self delegate].snippet;
 	if (snippet) {
+		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
 		if ([snippet advance]) {
 			final_location = snippet.caret;
 			[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];

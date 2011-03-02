@@ -253,7 +253,11 @@
 					DEBUG(@"format = %@", format);
 					DEBUG(@"options = %@", options);
 
-					rx = [[ViRegexp alloc] initWithString:regexp options:0 syntax:0 error:outError];
+					int opts = 0;
+					if ([options rangeOfString:@"i"].location != NSNotFound)
+						opts |= ONIG_OPTION_IGNORECASE;
+
+					rx = [[ViRegexp alloc] initWithString:regexp options:opts syntax:0 error:outError];
 					if (rx == nil)
 						return NO;
 

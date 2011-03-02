@@ -36,6 +36,8 @@
 	[self beginUndoGroup];
 	[self deleteRange:aRange];
 
+	snippetMatchRange.location = NSNotFound;
+
 	NSError *error = nil;
 	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString
 	                                            atLocation:aRange.location
@@ -62,8 +64,6 @@
 
 	[self resetSelection];
 
-	snippetMatchRange.location = NSNotFound;
-
 	return snippet;
 }
 
@@ -81,9 +81,18 @@
 
 - (void)performBundleSnippet:(ViBundleSnippet *)bundleSnippet
 {
+	NSRange r;
+
+	if (snippetMatchRange.location == NSNotFound) {
+		r = [self selectedRange];
+		if (r.length == 0)
+			r = NSMakeRange([self caret], 0);
+	} else
+		r = snippetMatchRange;
+
 	[self insertSnippet:[bundleSnippet content]
 	         fromBundle:[bundleSnippet bundle]
-	            inRange:snippetMatchRange.location == NSNotFound ? NSMakeRange([self caret], 0) : snippetMatchRange];
+	            inRange:r];
 }
 
 @end

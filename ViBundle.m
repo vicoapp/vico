@@ -80,7 +80,12 @@
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
 {
-	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
+	NSString *appPath = [[NSBundle mainBundle] bundlePath];
+	[env setObject:appPath forKey:@"TM_APP_PATH"];
+
+	[env setObject:[NSString stringWithFormat:@"%lu", (unsigned long)getpid()] forKey:@"TM_PID"];
+
+	NSString *supportPath = [appPath stringByAppendingPathComponent:@"Contents/Resources/Support"];
 	[env setObject:supportPath forKey:@"TM_SUPPORT_PATH"];
 
 	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];

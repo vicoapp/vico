@@ -101,9 +101,13 @@
 - (NSString *)inputForCommand:(ViBundleCommand *)command
                        range:(NSRange *)rangePtr
 {
-	NSString *inputText = [self inputOfType:[command input] command:command range:rangePtr];
+	NSString *inputText = [self inputOfType:[command input]
+	                                command:command
+	                                  range:rangePtr];
 	if (inputText == nil)
-		inputText = [self inputOfType:[command fallbackInput] command:command range:rangePtr];
+		inputText = [self inputOfType:[command fallbackInput]
+		                      command:command
+		                        range:rangePtr];
 
 	if (inputText == nil) {
 		inputText = @"";
@@ -115,9 +119,6 @@
 
 - (void)performBundleCommand:(ViBundleCommand *)command
 {
-	/* FIXME: * If in input mode, should setup repeat text and such...
-	 */
-
 	/* If we got here via a tab trigger, first remove the tab trigger word.
 	 */
 	if ([command tabTrigger] && snippetMatchRange.location != NSNotFound) {
@@ -146,7 +147,9 @@
 	NSString *shellCommand = [command command];
 	DEBUG(@"shell command = [%@]", shellCommand);
 	if ([shellCommand hasPrefix:@"#!"]) {
-		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vibrant_cmd.XXXXXXXXXX"] fileSystemRepresentation];
+		const char *tmpl = [[NSTemporaryDirectory()
+		    stringByAppendingPathComponent:@"vibrant_cmd.XXXXXXXXXX"]
+		    fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
 		templateFilename = strdup(tmpl);
 		fd = mkstemp(templateFilename);
@@ -165,10 +168,12 @@
 			return;
 		}
 		chmod(templateFilename, 0700);
-		shellCommand = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:templateFilename length:strlen(templateFilename)];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		shellCommand = [fm stringWithFileSystemRepresentation:templateFilename
+		                                               length:strlen(templateFilename)];
 	}
 
-	DEBUG(@"input text = [%@]", inputText);
+	DEBUG(@"input text = [%@], range = %@", inputText, NSStringFromRange(inputRange));
 
 	NSTask *task = [[NSTask alloc] init];
 	if (templateFilename)
@@ -209,7 +214,8 @@
 	[task setEnvironment:env];
 
 	DEBUG(@"environment: %@", env);
-	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
+	DEBUG(@"launching task command line [%@ %@]",
+	    [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
 	    command, @"command",

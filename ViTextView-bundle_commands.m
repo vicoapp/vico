@@ -129,6 +129,15 @@
 	NSRange inputRange;
 	NSString *inputText = [self inputForCommand:command range:&inputRange];
 
+	NSRange selectedRange;
+	if ([[command input] isEqualToString:@"document"] ||
+	    [[command input] isEqualToString:@"none"]) {
+		selectedRange = [self selectedRange];
+		if (selectedRange.length == 0)
+			selectedRange = NSMakeRange([self caret], 0);
+	} else
+		selectedRange = inputRange;
+
 	// FIXME: beforeRunningCommand
 
 	char *templateFilename = NULL;
@@ -202,8 +211,18 @@
 	DEBUG(@"environment: %@", env);
 	DEBUG(@"launching task command line [%@ %@]", [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, @"command", [NSValue valueWithRange:inputRange], @"inputRange", nil];
-	[[[self delegate] environment] filterText:inputText throughTask:task target:self selector:@selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:) contextInfo:info displayTitle:[command name]];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+	    command, @"command",
+	    [NSValue valueWithRange:inputRange], @"inputRange",
+	    [NSValue valueWithRange:selectedRange], @"selectedRange",
+	    nil];
+	SEL sel = @selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:);
+	[[[self delegate] environment] filterText:inputText
+	                              throughTask:task
+	                                   target:self
+	                                 selector:sel
+	                              contextInfo:info
+	                             displayTitle:[command name]];
 
 	if (fd != -1) {
 		unlink(templateFilename);
@@ -219,6 +238,7 @@
 	NSDictionary *info = contextInfo;
 	ViBundleCommand *command = [info objectForKey:@"command"];
 	NSRange inputRange = [[info objectForKey:@"inputRange"] rangeValue];
+	NSRange selectedRange = [[info objectForKey:@"selectedRange"] rangeValue];
 
 	DEBUG(@"command %@ finished with status %i", [command name], status);
 
@@ -249,7 +269,7 @@
 			[self setNormalMode];
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
-			[self replaceRange:inputRange withString:outputText undoGroup:NO];
+			[self replaceRange:selectedRange withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];
@@ -269,8 +289,8 @@
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
 			[self setCaret:[self caret] + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
-			[self insertString:outputText atLocation:NSMaxRange(inputRange) undoGroup:NO];
-			[self setCaret:NSMaxRange(inputRange) + [outputText length]];
+			[self insertString:outputText atLocation:NSMaxRange(selectedRange) undoGroup:NO];
+			[self setCaret:NSMaxRange(selectedRange) + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			NSRange r;
 			/*

@@ -2,3 +2,7 @@
 
 This directory should contain object files that aren't supposed to be executed directly,
 such as shared libraries and bash source-files. Data files should not be here.
+
+
+# updated 2011-03-02, Martin Hedenfalk.
+Removed unused and unsupported scripts for Vibrant.

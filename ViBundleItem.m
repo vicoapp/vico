@@ -57,6 +57,9 @@
 			case '~':
 				keyflags |= NSAlternateKeyMask;
 				break;
+			case '$':
+				keyflags |= NSShiftKeyMask;
+				break;
 			default:
 				keycode = c;
 				keyEquivalent = [NSString stringWithFormat:@"%C", c];

@@ -1409,7 +1409,7 @@ int logIndent = 0;
 	DEBUG(@"selector = %s", aSelector);
 }
 
-- (void)keyDown:(NSEvent *)theEvent
+- (unichar)parseKeyEvent:(NSEvent *)theEvent modifiers:(unsigned int *)modPtr
 {
 	// http://sigpipe.macromates.com/2005/09/24/deciphering-an-nsevent/
 	// given theEvent (NSEvent*) figure out what key 
@@ -1453,6 +1453,45 @@ int logIndent = 0;
 	    (modifiers & NSAlternateKeyMask) ? "YES" : "NO",
 	    (modifiers & NSCommandKeyMask) ? "YES" : "NO"
 	);
+
+	*modPtr = modifiers;
+
+        return key;
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	unsigned int modifiers;
+	unichar key;
+	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
+
+	if (parser.partial) {
+		[[self delegate] message:@"Vi command interrupted by key equivalent."];
+		[parser reset];
+	}
+
+	/*
+	 * Find and perform bundle commands. Show a menu with commands if multiple matches found.
+	 * FIXME: should this be part of the key replay queue?
+	 */
+        NSArray *scopes = [self scopesAtLocation:[self caret]];
+        NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKey:key
+                                                               andFlags:modifiers
+                                                        matchingScopes:scopes
+                                                                inMode:mode];
+        if ([matches count] > 0) {
+                [self performBundleItems:matches];
+                return YES;
+        }
+
+	return NO;
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+	unsigned int modifiers;
+	unichar key;
+	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
 
 	[super keyDown:theEvent];
 	DEBUG(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");

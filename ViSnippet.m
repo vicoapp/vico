@@ -245,8 +245,7 @@
 						return NO;
 					}
 
-					NSCharacterSet *optionsCharacters = [NSCharacterSet characterSetWithCharactersInString:@"gi"];
-					[scan scanCharactersFromSet:optionsCharacters
+					[scan scanCharactersFromSet:[NSCharacterSet alphanumericCharacterSet]
 					                 intoString:&options];
 					if (options == nil)
 						options = @"";

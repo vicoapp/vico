@@ -577,4 +577,11 @@
 	STAssertEqualObjects([snippet string], @"x: nested table", nil);
 }
 
+/* Handle (ignore) unknown regexp options.
+ */
+- (void)test063_unknownRegexOptions
+{
+	[self makeSnippet:@"${0:${TM_SELECTED_TEXT/\\A<strong>(.*)<\\/strong>\\z|.*/(?1:$1:<strong>$0<\\/strong>)/m}}"];
+}
+
 @end

@@ -21,7 +21,8 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSArray *)itemsWithTabTrigger:(NSString *)name
                   matchingScopes:(NSArray *)scopes
-                          inMode:(ViMode)mode;
+                          inMode:(ViMode)mode
+                   matchedLength:(NSUInteger *)lengthPtr;
 - (NSArray *)itemsWithKey:(unichar)keycode
                  andFlags:(unsigned int)flags
            matchingScopes:(NSArray *)scopes

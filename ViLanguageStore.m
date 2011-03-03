@@ -211,17 +211,30 @@ static NSString *bundlesDirectory = nil;
 	return result;
 }
 
-- (NSArray *)itemsWithTabTrigger:(NSString *)name
+- (NSArray *)itemsWithTabTrigger:(NSString *)prefix
                   matchingScopes:(NSArray *)scopes
                           inMode:(ViMode)mode
+                   matchedLength:(NSUInteger *)lengthPtr
 {
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
+	NSUInteger longestMatch = 0ULL;
 
 	for (ViBundle *bundle in bundles)
 		for (ViBundleItem *item in [bundle items])
-			if ([[item tabTrigger] isEqualToString:name] &&
+			if ([item tabTrigger] &&
+			    [prefix hasSuffix:[item tabTrigger]] &&
 			    ([item mode] == ViAnyMode || [item mode] == mode)) {
+				/*
+				 * Try to match as much of the tab trigger as possible.
+				 * Favor longer matching tab trigger words.
+				 */
+				NSUInteger triggerLength = [[item tabTrigger] length];
+				if (triggerLength > longestMatch) {
+					[matches removeAllObjects];
+					longestMatch = triggerLength;
+				}
+
 				NSString *scope = [item scope];
 				u_int64_t rank;
 				if (scope == nil)
@@ -237,6 +250,9 @@ static NSString *bundlesDirectory = nil;
 						[matches addObject:item];
 				}
 			}
+
+	if (lengthPtr)
+		*lengthPtr = longestMatch;
 
 	return matches;
 }

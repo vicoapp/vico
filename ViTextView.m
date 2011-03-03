@@ -1138,19 +1138,20 @@ int logIndent = 0;
 			[self cancelSnippet:snippet];
 	}
 
-        /* Check for a tab trigger.
-	 * is there a word before the cursor that we just typed?
-	 * FIXME: textmate includes more than just characters, sort of bigwords... investigate!
+        /* Check for a tab trigger before the caret.
 	 */
-	NSRange r;
-	NSString *word = [[self textStorage] wordAtLocation:start_location range:&r acceptAfter:YES];
-	if (word) {
-		NSArray *scopes = [self scopesAtLocation:r.location];
-		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithTabTrigger:word
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	NSString *prefix = [[[self textStorage] string] substringWithRange:NSMakeRange(bol, start_location - bol)];
+	if ([prefix length] > 0) {
+		NSArray *scopes = [self scopesAtLocation:eol];
+		NSUInteger triggerLength;
+		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithTabTrigger:prefix
 									matchingScopes:scopes
-										inMode:mode];
+										inMode:mode
+									 matchedLength:&triggerLength];
 		if ([matches count] > 0) {
-			snippetMatchRange = r;
+			snippetMatchRange = NSMakeRange(start_location - triggerLength, triggerLength);
 			[self performBundleItems:matches];
 			return NO;
 		}

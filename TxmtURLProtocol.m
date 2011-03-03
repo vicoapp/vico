@@ -24,7 +24,7 @@
  * canonicalRequestForRequest method so you have an opportunity to
  * modify the NSURLRequest before processing the request.
  */
-+(NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
 {
 	/*
 	 * We don't do any special processing here, though we include this
@@ -33,7 +33,7 @@
 	return request;
 }
 
--(void)finalize
+- (void)finalize
 {
 	if (client)
 		CFRelease(client);

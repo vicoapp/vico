@@ -189,6 +189,8 @@
 	NSInteger delta = 0;
 	for (ViRegexpMatch *m in matches) {
 		NSRange r = [m rangeOfMatchedString];
+		if (r.location == NSNotFound)
+			continue;
 		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches",
 		    rx, NSStringFromRange(r), value, [m count]);
 		r.location += delta;

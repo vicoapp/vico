@@ -40,7 +40,7 @@
 @implementation SFTPConnection
 
 /* Size of buffer used when copying files */
-size_t copy_buffer_len = 32768;
+const size_t copy_buffer_len = 32768;
 
 /* Number of concurrent outstanding requests */
 size_t num_requests = 64;

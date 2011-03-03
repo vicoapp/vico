@@ -498,14 +498,6 @@
 
 - (void)ex_cd:(ExCommand *)command
 {
-#if 0
-	NSString *path = command.filename;
-	if (path == nil)
-		path = [@"~" stringByExpandingTildeInPath];
-	if (![path hasSuffix:@"/"])
-		path = [path stringByAppendingString:@"/"];	/* Force directory URL. */
-#endif
-
 	NSString *path = command.filename ?: @"~";
 	if (![self setBaseURL:[self parseExFilename:path]])
 		[self message:@"%@: Failed to change directory.", path];

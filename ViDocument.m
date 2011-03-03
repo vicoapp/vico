@@ -54,6 +54,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[userDefaults addObserver:self forKeyPath:@"wrap" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"list" options:0 context:NULL];
 
+		sym_q = dispatch_queue_create("se.bzero.vibrant.sym", NULL);
+
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
 
@@ -74,6 +76,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self setTypingAttributes];
 	}
 	return self;
+}
+
+- (void)finalize
+{
+	dispatch_release(sym_q);
+	[super finalize];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -514,7 +522,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 
 	[updateSymbolsTimer invalidate];
-	NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 1];
+	NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4];
 	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:fireDate
 						      interval:0
 							target:self
@@ -885,72 +893,79 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)updateSymbolList:(NSTimer *)timer
 {
-	NSString *lastSelector = nil;
-	NSImage *img = nil;
-	NSRange wholeRange;
+	NSString *string = [[textStorage string] copy];
+	NSMutableArray *scopeArray = [[NSMutableArray alloc] initWithArray:[syntaxParser scopeArray]
+	                                                         copyItems:YES];
+
+	dispatch_async(sym_q, ^{
+
+		NSString *lastSelector = nil;
+		NSImage *img = nil;
+		NSRange wholeRange;
 
 #if 0
-	struct timeval start;
-	struct timeval stop;
-	struct timeval diff;
-	gettimeofday(&start, NULL);
+		struct timeval start;
+		struct timeval stop;
+		struct timeval diff;
+		gettimeofday(&start, NULL);
 #endif
 
-	NSMutableArray *syms = [[NSMutableArray alloc] init];
-	NSString *string = [textStorage string];
+		NSMutableArray *syms = [[NSMutableArray alloc] init];
 
-	NSArray *scopeArray = [syntaxParser scopeArray];
-	NSUInteger i;
-	for (i = 0; i < [scopeArray count];)
-	{
-		ViScope *s = [scopeArray objectAtIndex:i];
-		NSArray *scopes = s.scopes;
-		NSRange range = s.range;
+		NSUInteger i;
+		for (i = 0; i < [scopeArray count];)
+		{
+			ViScope *s = [scopeArray objectAtIndex:i];
+			NSArray *scopes = s.scopes;
+			NSRange range = s.range;
 
-		if ([lastSelector matchesScopes:scopes]) {
-			/* Continue with the last scope selector, it matched this scope too. */
-			wholeRange.length += range.length;
-		} else {
-			if (lastSelector) {
-				/*
-				 * Finalize the last symbol. Apply any symbol transformation.
-				 */
-				NSString *symbol = [string substringWithRange:wholeRange];
-				NSString *transform = [symbolTransforms objectForKey:lastSelector];
-				if (transform) {
-					ViSymbolTransform *tr = [[ViSymbolTransform alloc]
-					    initWithTransformationString:transform];
-					symbol = [tr transformSymbol:symbol];
+			if ([lastSelector matchesScopes:scopes]) {
+				/* Continue with the last scope selector, it matched this scope too. */
+				wholeRange.length += range.length;
+			} else {
+				if (lastSelector) {
+					/*
+					 * Finalize the last symbol. Apply any symbol transformation.
+					 */
+					NSString *symbol = [string substringWithRange:wholeRange];
+					NSString *transform = [symbolTransforms objectForKey:lastSelector];
+					if (transform) {
+						ViSymbolTransform *tr = [[ViSymbolTransform alloc]
+						    initWithTransformationString:transform];
+						symbol = [tr transformSymbol:symbol];
+					}
+
+					ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
+										   range:wholeRange
+										   image:img];
+					[syms addObject:sym];
 				}
+				lastSelector = nil;
 
-				ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
-				                                           range:wholeRange
-				                                           image:img];
-				[syms addObject:sym];
-			}
-			lastSelector = nil;
-
-			for (NSString *scopeSelector in symbolScopes) {
-				if ([scopeSelector matchesScopes:scopes]) {
-					lastSelector = scopeSelector;
-					wholeRange = range;
-					img = [self matchSymbolIconForScope:scopes];
-					break;
+				for (NSString *scopeSelector in symbolScopes) {
+					if ([scopeSelector matchesScopes:scopes]) {
+						lastSelector = scopeSelector;
+						wholeRange = range;
+						img = [self matchSymbolIconForScope:scopes];
+						break;
+					}
 				}
 			}
+
+			i += range.length;
 		}
 
-		i += range.length;
-	}
-
-	[self setSymbols:syms];
-
 #if 0
-	gettimeofday(&stop, NULL);
-	timersub(&stop, &start, &diff);
-	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-	INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
+		gettimeofday(&stop, NULL);
+		timersub(&stop, &start, &diff);
+		unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+		INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
 #endif
+
+		dispatch_sync(dispatch_get_main_queue(), ^{
+			[self setSymbols:syms];
+		});
+	});
 }
 
 #pragma mark -

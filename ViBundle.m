@@ -279,11 +279,13 @@
 
 - (NSMenu *)submenu:(NSDictionary *)menuLayout
            withName:(NSString *)name
+         inMainMenu:(NSDictionary *)mainMenu
           forScopes:(NSArray *)scopes
+       enabledItems:(NSUInteger *)enabledItemsPtr
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
-	NSDictionary *submenus = [menuLayout objectForKey:@"submenus"];
+	NSDictionary *submenus = [mainMenu objectForKey:@"submenus"];
 
 	for (NSString *uuid in [menuLayout objectForKey:@"items"]) {
 		id op;
@@ -317,38 +319,51 @@
 					[item setView:view];
 				}
 			} else
-				DEBUG(@"unhandled bundle item %@", op);
+				INFO(@"unhandled bundle item %@", op);
 		} else {
 			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
 			if (submenuLayout) {
+				NSUInteger submatches = 0;
 				NSMenu *submenu = [self submenu:submenuLayout
 				                       withName:[submenuLayout objectForKey:@"name"]
-				                      forScopes:scopes];
+				                     inMainMenu:mainMenu
+				                      forScopes:scopes
+				                   enabledItems:&submatches];
 				if (submenu) {
+					matches += submatches;
 					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"]
 					                       action:NULL
 					                keyEquivalent:@""];
 					[item setSubmenu:submenu];
+					if (submatches == 0)
+						[item setEnabled:NO];
 				}
 			} else
-				DEBUG(@"missing menu item %@ in bundle %@", uuid, [self name]);
+				INFO(@"missing menu item %@ in bundle %@", uuid, [self name]);
 		}
 
 	}
 
-	return matches == 0 ? nil : menu;
+	if (enabledItemsPtr)
+		*enabledItemsPtr = matches;
+
+	return menu;
 }
 
 - (NSMenu *)menuForScopes:(NSArray *)scopes
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
-	if (mainMenu == nil)
+	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])
 		return nil;
 
-	NSMenu *menu = [self submenu:mainMenu withName:[self name] forScopes:scopes];
+	NSUInteger matches = 0;
+	NSMenu *menu = [self submenu:mainMenu
+	                    withName:[self name]
+	                  inMainMenu:mainMenu
+	                   forScopes:scopes
+	                enabledItems:&matches];
 
-	return menu;
-
+	return matches == 0 ? nil : menu;
 }
 
 @end

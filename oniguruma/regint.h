@@ -66,7 +66,7 @@
 /* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
 /* internal config */
-#define USE_PARSE_TREE_NODE_RECYCLE
+// #define USE_PARSE_TREE_NODE_RECYCLE
 #define USE_OP_PUSH_OR_JUMP_EXACT
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
@@ -95,11 +95,13 @@
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
-/* #define USE_MULTI_THREAD_SYSTEM */
-#define THREAD_SYSTEM_INIT      /* depend on thread system */
-#define THREAD_SYSTEM_END       /* depend on thread system */
-#define THREAD_ATOMIC_START     /* depend on thread system */
-#define THREAD_ATOMIC_END       /* depend on thread system */
+#include <pthread.h>
+extern pthread_mutex_t onig_mutex;
+#define USE_MULTI_THREAD_SYSTEM	1
+#define THREAD_SYSTEM_INIT      /* pthread_mutex_init(&onig_mutex, NULL) */
+#define THREAD_SYSTEM_END       
+#define THREAD_ATOMIC_START     pthread_mutex_lock(&onig_mutex)
+#define THREAD_ATOMIC_END       pthread_mutex_unlock(&onig_mutex)
 #define THREAD_PASS             /* depend on thread system */
 #define xmalloc     malloc
 #define xrealloc    realloc

@@ -5,6 +5,9 @@
 
 #include "log.h"
 
+#include <pthread.h>
+pthread_mutex_t onig_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 int
 main(int argc, char *argv[])
 {

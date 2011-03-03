@@ -11,12 +11,12 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+			<integer value="100557"/>
 			<integer value="100347"/>
 			<integer value="100325"/>
 			<integer value="100592"/>
-			<integer value="100250"/>
 			<integer value="100398"/>
-			<integer value="100557"/>
+			<integer value="100250"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -582,7 +582,7 @@
 												<object class="NSPopUpButton" id="739993370">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">292</int>
-													<string key="NSFrame">{{43, 0}, {100, 23}}</string>
+													<string key="NSFrame">{{31, 0}, {100, 23}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSNextKeyView" ref="311339436"/>
 													<bool key="NSEnabled">YES</bool>
@@ -618,7 +618,7 @@
 												<object class="NSTextField" id="311339436">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">290</int>
-													<string key="NSFrame">{{148, 4}, {432, 14}}</string>
+													<string key="NSFrame">{{131, 4}, {452, 14}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSNextKeyView" ref="24397800"/>
 													<bool key="NSEnabled">YES</bool>
@@ -643,7 +643,7 @@
 												<object class="NSTextField" id="24397800">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">-2147483358</int>
-													<string key="NSFrame">{{151, 2}, {429, 19}}</string>
+													<string key="NSFrame">{{131, 2}, {449, 19}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="180256402">
@@ -669,7 +669,7 @@
 												<object class="NSPopUpButton" id="203483497">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">292</int>
-													<string key="NSFrame">{{2, 0}, {31, 23}}</string>
+													<string key="NSFrameSize">{31, 23}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSPopUpButtonCell" key="NSCell" id="934984888">
@@ -690,6 +690,7 @@
 															<array class="NSMutableArray" key="NSMenuItems"/>
 															<reference key="NSMenuFont" ref="844670655"/>
 														</object>
+														<int key="NSSelectedIndex">-1</int>
 														<bool key="NSPullDown">YES</bool>
 														<int key="NSPreferredEdge">3</int>
 														<bool key="NSUsesItemFromMenu">YES</bool>
@@ -3598,6 +3599,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">ViDocumentTabController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">json/SBJsonStreamWriter.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

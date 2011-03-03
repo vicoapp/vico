@@ -38,5 +38,10 @@
 	return [NSString stringWithFormat:@"<ViScope %p %@: %@>", self, NSStringFromRange(range), [scopes componentsJoinedByString:@" "]];
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+	return [[ViScope alloc] initWithScopes:scopes range:range];
+}
+
 @end
 

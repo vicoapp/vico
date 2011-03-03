@@ -1,4 +1,4 @@
-@interface ViScope : NSObject
+@interface ViScope : NSObject <NSCopying>
 {
 	NSRange range;
 	NSArray *scopes;
@@ -11,5 +11,6 @@
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
 - (int)compareBegin:(ViScope *)otherContext;
+- (id)copyWithZone:(NSZone *)zone;
 
 @end

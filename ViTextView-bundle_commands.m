@@ -265,9 +265,10 @@
 		status = 0;
 	}
 
-	if (status != 0)
+	if (status != 0) {
 		[[self delegate] message:@"%@: exited with status %i", [command name], status];
-	else {
+		DEBUG(@"command output: %@", outputText);
+	} else {
 		DEBUG(@"command output: %@", outputText);
 		DEBUG(@"output format: %@", outputFormat);
 
@@ -276,6 +277,8 @@
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:selectedRange withString:outputText undoGroup:NO];
+		if ([outputFormat isEqualToString:@"replaceDocument"])
+			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];

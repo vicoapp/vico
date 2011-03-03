@@ -4,15 +4,9 @@
 
 @implementation ViRegexp
 
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString
-                                  options:(int)options
+- (ViRegexp *)initWithString:(NSString *)aString
 {
-	return [[ViRegexp alloc] initWithString:aString options:options];
-}
-
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString
-{
-	return [ViRegexp regularExpressionWithString:aString options:0];
+	return [self initWithString:aString options:0 error:nil];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString

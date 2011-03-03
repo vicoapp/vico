@@ -119,7 +119,7 @@
 	self = [super init];
 	if (self) {
 		NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-		skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
+		skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	}
@@ -243,7 +243,7 @@
 		return nil;
 
 	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
+	ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	for (NSString *filename in files)
@@ -264,7 +264,7 @@
 		return nil;
 
 	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-	ViRegexp *skipRegex = [ViRegexp regularExpressionWithString:skipPattern];
+	ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	SFTPDirectoryEntry *entry;
@@ -830,13 +830,13 @@ sort_by_score(id a, id b, void *context)
 			[self appendFilter:[components objectAtIndex:i] toPattern:pathPattern];
 		}
 		[pathPattern appendString:@".*?$"];
-		pathRx = [ViRegexp regularExpressionWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
+		pathRx = [[ViRegexp alloc] initWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
 
 		NSMutableString *filePattern = [NSMutableString string];
 		[filePattern appendString:@"^.*?"];
 		[self appendFilter:[components lastObject] toPattern:filePattern];
 		[filePattern appendString:@".*$"];
-		fileRx = [ViRegexp regularExpressionWithString:filePattern options:ONIG_OPTION_IGNORECASE];
+		fileRx = [[ViRegexp alloc] initWithString:filePattern options:ONIG_OPTION_IGNORECASE];
 
 		filteredItems = [NSMutableArray array];
 		itemsToFilter = [NSMutableArray array];

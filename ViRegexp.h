@@ -22,8 +22,7 @@
 	OnigRegex regex;
 }
 
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString;
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options;
+- (ViRegexp *)initWithString:(NSString *)aString;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options error:(NSError **)outError;
 - (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange;

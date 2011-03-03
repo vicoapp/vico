@@ -417,7 +417,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
+		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -434,7 +434,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
+		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -451,7 +451,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern];
+		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -711,8 +711,8 @@ int logIndent = 0;
 	/* compile the pattern regexp */
 	@try
 	{
-		rx = [ViRegexp regularExpressionWithString:pattern
-						   options:rx_options];
+		rx = [[ViRegexp alloc] initWithString:pattern
+					      options:rx_options];
 	}
 	@catch(NSException *exception)
 	{

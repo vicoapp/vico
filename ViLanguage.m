@@ -11,7 +11,7 @@
 	ViRegexp *regexp = nil;
 	@try
 	{
-		regexp = [ViRegexp regularExpressionWithString:pattern];
+		regexp = [[ViRegexp alloc] initWithString:pattern];
 	}
 	@catch (NSException *exception)
 	{
@@ -22,7 +22,9 @@
 	return regexp;
 }
 
-- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch matchText:(const unichar *)matchText
+- (ViRegexp *)compileRegexp:(NSString *)pattern
+ withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch
+                  matchText:(const unichar *)matchText
 {
 	ViRegexp *regexp = nil;
 	@try
@@ -51,7 +53,7 @@
 			DEBUG(@"** expanded pattern = [%@]", expandedPattern);
 		}
 
-		regexp = [ViRegexp regularExpressionWithString:expandedPattern];
+		regexp = [[ViRegexp alloc] initWithString:expandedPattern];
 	}
 	@catch (NSException *exception)
 	{
@@ -77,7 +79,7 @@
 	if (patterns == nil)
 		return;
 
-	ViRegexp *hasBackRefs = [ViRegexp regularExpressionWithString:@"\\\\([1-9]|k<.*?>)"];
+	ViRegexp *hasBackRefs = [[ViRegexp alloc] initWithString:@"\\\\([1-9]|k<.*?>)"];
 
 	NSMutableDictionary *d;
 	for (d in patterns)

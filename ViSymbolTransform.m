@@ -39,7 +39,7 @@
 				if (options == nil)
 					options = @"";
 
-				ViRegexp *rx = [ViRegexp regularExpressionWithString:regexp];
+				ViRegexp *rx = [[ViRegexp alloc] initWithString:regexp];
 				if (rx == nil) {
 					INFO(@"invalid regexp: %@", regexp);
 					return nil;

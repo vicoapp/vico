@@ -107,7 +107,7 @@ static NSString *bundlesDirectory = nil;
 		if (firstLineMatch == nil)
 			continue;
 
-		ViRegexp *rx = [ViRegexp regularExpressionWithString:firstLineMatch];
+		ViRegexp *rx = [[ViRegexp alloc] initWithString:firstLineMatch];
 		if ([rx matchInString:firstLine]) {
 			DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
 			DEBUG(@"Using bundle %@", [[language bundle] name]);

@@ -78,7 +78,8 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ((self = [super initWithWindowNibName:@"PreferenceWindow"])) {
 		blankView = [[NSView alloc] init];
 		repositories = [[NSMutableArray alloc] init];
-		repoNameRx = [ViRegexp regularExpressionWithString:@"([^[:alnum:]]*tmbundle$)" options:ONIG_OPTION_IGNORECASE];
+		repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*tmbundle$)"
+		                                      options:ONIG_OPTION_IGNORECASE];
 	}
 
 	return self;
@@ -106,7 +107,9 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (NSString *)repoPathForUser:(NSString *)username
 {
-	return [[NSString stringWithFormat:@"%@/%@-bundles.json", [ViLanguageStore bundlesDirectory], username] stringByExpandingTildeInPath];
+	return [[NSString stringWithFormat:@"%@/%@-bundles.json",
+	    [ViLanguageStore bundlesDirectory], username]
+	    stringByExpandingTildeInPath];
 }
 
 - (void)updateBundleStatus

@@ -1255,7 +1255,7 @@ static NSWindowController	*currentWindowController = nil;
 		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
 	[pattern appendString:@".*"];
 
-	ViRegexp *rx = [ViRegexp regularExpressionWithString:pattern options:ONIG_OPTION_IGNORECASE];
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern options:ONIG_OPTION_IGNORECASE];
 
 	filteredDocuments = [[NSMutableArray alloc] initWithArray:documents];
 

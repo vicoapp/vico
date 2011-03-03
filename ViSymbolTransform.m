@@ -13,7 +13,7 @@
 		transformations = [[NSMutableArray alloc] init];
 
 		NSScanner *scan = [NSScanner scannerWithString:aString];
-		NSCharacterSet *skipSet =[NSCharacterSet whitespaceAndNewlineCharacterSet];
+		NSCharacterSet *skipSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 
 		unichar ch;
 		while ([scan scanCharacter:&ch]) {
@@ -33,7 +33,7 @@
 					return nil;
 				}
 
-				NSCharacterSet *optionsCharacters = [NSCharacterSet characterSetWithCharactersInString:@"gi"];
+				NSCharacterSet *optionsCharacters = [NSCharacterSet alphanumericCharacterSet];
 				[scan scanCharactersFromSet:optionsCharacters
 						 intoString:&options];
 				if (options == nil)

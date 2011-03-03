@@ -257,7 +257,7 @@
 					if ([options rangeOfString:@"i"].location != NSNotFound)
 						opts |= ONIG_OPTION_IGNORECASE;
 
-					rx = [[ViRegexp alloc] initWithString:regexp options:opts syntax:0 error:outError];
+					rx = [[ViRegexp alloc] initWithString:regexp options:opts error:outError];
 					if (rx == nil)
 						return NO;
 

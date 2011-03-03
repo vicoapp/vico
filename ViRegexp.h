@@ -19,14 +19,13 @@
 
 @interface ViRegexp : NSObject
 {
-	regex_t *regex;
+	OnigRegex regex;
 }
 
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString;
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options;
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString options:(int)options syntax:(int)syntax;
-- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax;
-- (ViRegexp *)initWithString:(NSString *)aString options:(int)options syntax:(int)syntax error:(NSError **)outError;
+- (ViRegexp *)initWithString:(NSString *)aString options:(int)options;
+- (ViRegexp *)initWithString:(NSString *)aString options:(int)options error:(NSError **)outError;
 - (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange;
 - (ViRegexpMatch *)matchInString:(NSString *)aString;
 - (ViRegexpMatch *)matchInCharacters:(const unichar *)chars range:(NSRange)aRange start:(NSUInteger)aLocation;

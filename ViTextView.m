@@ -712,8 +712,7 @@ int logIndent = 0;
 	@try
 	{
 		rx = [ViRegexp regularExpressionWithString:pattern
-						   options:rx_options
-						    syntax:0];
+						   options:rx_options];
 	}
 	@catch(NSException *exception)
 	{

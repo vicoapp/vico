@@ -6,32 +6,23 @@
 
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString
                                   options:(int)options
-                                   syntax:(int)syntax
 {
-	return [[ViRegexp alloc] initWithString:aString options:options syntax:syntax];
-}
-
-+ (ViRegexp *)regularExpressionWithString:(NSString *)aString
-                                  options:(int)options
-{
-	return [ViRegexp regularExpressionWithString:aString options:options syntax:0];
+	return [[ViRegexp alloc] initWithString:aString options:options];
 }
 
 + (ViRegexp *)regularExpressionWithString:(NSString *)aString
 {
-	return [ViRegexp regularExpressionWithString:aString options:0 syntax:0];
+	return [ViRegexp regularExpressionWithString:aString options:0];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString
                     options:(int)options
-                     syntax:(int)syntax
 {
-	return [self initWithString:aString options:options syntax:syntax error:nil];
+	return [self initWithString:aString options:options error:nil];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString
                      options:(int)options
-                      syntax:(int)syntax
                        error:(NSError **)outError
 {
 	self = [super init];

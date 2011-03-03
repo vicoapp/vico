@@ -123,7 +123,7 @@
 		NSColor *new_bg = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
 		[attributes setObject:new_bg forKey:NSBackgroundColorAttributeName];
 	}
-		
+
 	// cache it
 	[scopeSelectorCache setObject:attributes forKey:key];
 

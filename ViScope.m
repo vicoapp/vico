@@ -6,7 +6,8 @@
 @synthesize scopes;
 @synthesize attributes;
 
-- (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
+- (ViScope *)initWithScopes:(NSArray *)scopesArray
+                      range:(NSRange)aRange
 {
 	if ((self = [super init]) != nil) {
 		scopes = scopesArray;
@@ -29,13 +30,15 @@
 		return -1;
 	if (range.length < otherContext.range.length)
 		return 1;
-	
+
 	return 0;
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViScope %p %@: %@>", self, NSStringFromRange(range), [scopes componentsJoinedByString:@" "]];
+	return [NSString stringWithFormat:@"<ViScope %p %@: %@>",
+	    self, NSStringFromRange(range),
+	    [scopes componentsJoinedByString:@" "]];
 }
 
 - (id)copyWithZone:(NSZone *)zone

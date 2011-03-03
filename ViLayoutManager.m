@@ -10,7 +10,8 @@
 	if (self) {
 		newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
 		tabChar = [NSString stringWithFormat:@"%C", 0x21E5];
-		spaceChar = [NSString stringWithFormat:@"%C", 0x2423];
+		//spaceChar = [NSString stringWithFormat:@"%C", 0x2423];
+		spaceChar = [NSString stringWithFormat:@"%C", 0x302E];
 	}
 	return self;
 }

@@ -93,8 +93,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self setTypingAttributes];
 	else if ([keyPath isEqualToString:@"list"]) {
 		for (ViDocumentView *dv in views) {
-			[[[dv textView] layoutManager] setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
-			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+			ViLayoutManager *lm = (ViLayoutManager *)[[dv textView] layoutManager];
+			[lm setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
+			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 		}
 	}
 }
@@ -178,7 +179,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return [[textStorage string] dataUsingEncoding:enc];
 }
 
-- (BOOL)attemptRecoveryFromError:(NSError *)error optionIndex:(NSUInteger)recoveryOptionIndex
+- (BOOL)attemptRecoveryFromError:(NSError *)error
+                     optionIndex:(NSUInteger)recoveryOptionIndex
 {
 	if (recoveryOptionIndex == 1) {
 		retrySaveOperation = YES;
@@ -188,30 +190,38 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return NO;
 }
 
-- (void)didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
+- (void)didPresentErrorWithRecovery:(BOOL)didRecover
+                        contextInfo:(void *)contextInfo
 {
 	DEBUG(@"didRecover = %s", didRecover ? "YES" : "NO");
 }
 
-- (BOOL)writeSafelyToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation error:(NSError **)outError
+- (BOOL)writeSafelyToURL:(NSURL *)url
+                  ofType:(NSString *)typeName
+        forSaveOperation:(NSSaveOperationType)saveOperation
+                   error:(NSError **)outError
 {
 	BOOL ret = NO;
 
 	retrySaveOperation = NO;
 
 	if (![[textStorage string] canBeConvertedToEncoding:encoding]) {
-		NSString *reason = [NSString stringWithFormat:@"The %@ encoding is not appropriate.", [NSString localizedNameOfStringEncoding:encoding]];
+		NSString *reason = [NSString stringWithFormat:
+		    @"The %@ encoding is not appropriate.",
+		    [NSString localizedNameOfStringEncoding:encoding]];
 		NSString *suggestion = @"Consider saving the file as UTF-8 instead.";
 		NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-						   reason, NSLocalizedFailureReasonErrorKey,
-						   suggestion, NSLocalizedRecoverySuggestionErrorKey,
-						   self, NSRecoveryAttempterErrorKey,
-						   [NSArray arrayWithObjects:@"OK", @"Save as UTF-8", nil], NSLocalizedRecoveryOptionsErrorKey,
-						   nil];
+		   reason, NSLocalizedFailureReasonErrorKey,
+		   suggestion, NSLocalizedRecoverySuggestionErrorKey,
+		   self, NSRecoveryAttempterErrorKey,
+		   [NSArray arrayWithObjects:@"OK", @"Save as UTF-8", nil], NSLocalizedRecoveryOptionsErrorKey,
+		   nil];
 		NSError *err = [NSError errorWithDomain:ViErrorDomain code:1 userInfo:userInfo];
 		if (![self presentError:err]) {
 			if (outError)	/* Suppress the callers error. */
-				*outError = [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
+				*outError = [NSError errorWithDomain:NSCocoaErrorDomain
+				                                code:NSUserCancelledError
+				                            userInfo:nil];
 			return NO;
 		}
 
@@ -220,7 +230,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	if ([url isFileURL]) {
-		ret = [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
+		ret = [super writeSafelyToURL:url
+		                       ofType:typeName
+		             forSaveOperation:saveOperation
+		                        error:outError];
 		if (ret)
 			isTemporary = NO;
 		return ret;
@@ -237,7 +250,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
+	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
+	                                                                    error:outError];
 	if (conn == nil)
 		return NO;
 	ret = [conn writeData:data toFile:[url path] error:outError];
@@ -269,11 +283,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (data == nil)
 		return NO;
 
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSString *aString = nil;
 	if (forcedEncoding != 0) {
 		aString = [[NSString alloc] initWithData:data encoding:forcedEncoding];
 		if (aString == nil) {
-			NSString *description = [NSString stringWithFormat:@"The file can't be interpreted in %@ encoding.",
+			NSString *description = [NSString stringWithFormat:
+			    @"The file can't be interpreted in %@ encoding.",
 			    [NSString localizedNameOfStringEncoding:forcedEncoding]];
 			NSString *suggestion = [NSString stringWithFormat:@"Keeping the %@ encoding.",
 			    [NSString localizedNameOfStringEncoding:encoding]];
@@ -289,14 +305,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 			/* Save the user-overridden encoding in preferences. */
 			NSMutableDictionary *encodingOverride = [NSMutableDictionary dictionaryWithDictionary:
-				[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encodingOverride"]];
-			[encodingOverride setObject:[NSNumber numberWithUnsignedInteger:encoding] forKey:[[self fileURL] absoluteString]];
-			[[NSUserDefaults standardUserDefaults] setObject:encodingOverride forKey:@"encodingOverride"];
+			    [userDefaults dictionaryForKey:@"encodingOverride"]];
+			[encodingOverride setObject:[NSNumber numberWithUnsignedInteger:encoding]
+			                     forKey:[[self fileURL] absoluteString]];
+			[userDefaults setObject:encodingOverride
+			                 forKey:@"encodingOverride"];
 		}
 		forcedEncoding = 0;
 	} else {
 		/* Check for a user-overridden encoding in preferences. */
-		NSDictionary *encodingOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encodingOverride"];
+		NSDictionary *encodingOverride = [userDefaults dictionaryForKey:@"encodingOverride"];
 		NSNumber *savedEncoding = [encodingOverride objectForKey:[[self fileURL] absoluteString]];
 		if (savedEncoding) {
 			encoding = [savedEncoding unsignedIntegerValue];
@@ -438,7 +456,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			if (NSMaxRange(sel) < NSMaxRange(r))
 				r.length = NSMaxRange(sel) - r.location;
 		}
-		DEBUG(@"merged %@ with %@ -> %@", NSStringFromRange(sel), NSStringFromRange(*effectiveCharRange), NSStringFromRange(r));
+		DEBUG(@"merged %@ with %@ -> %@",
+		    NSStringFromRange(sel),
+		    NSStringFromRange(*effectiveCharRange),
+		    NSStringFromRange(r));
 		*effectiveCharRange = r;
 
 		DEBUG(@"merged attributes = %@", mergedAttributes);
@@ -475,7 +496,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSRange range = ctx.range;
 	unichar *chars = malloc(range.length * sizeof(unichar));
 	DEBUG(@"allocated %u bytes, characters %p, range %@, length %u",
-		range.length * sizeof(unichar), chars, NSStringFromRange(range), [textStorage length]);
+		range.length * sizeof(unichar), chars,
+		NSStringFromRange(range), [textStorage length]);
 	[[textStorage string] getCharacters:chars range:range];
 
 	ctx.characters = chars;
@@ -492,28 +514,34 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 
 	[updateSymbolsTimer invalidate];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4]
+	NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 1];
+	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:fireDate
 						      interval:0
 							target:self
 						      selector:@selector(updateSymbolList:)
 						      userInfo:nil
 						       repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer forMode:NSDefaultRunLoopMode];
+	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer
+	                             forMode:NSDefaultRunLoopMode];
 
 	if (ctx.lineOffset > startLine) {
 		// INFO(@"line endings have changed at line %u", endLine);
 
 		if (nextContext && nextContext != ctx) {
 			if (nextContext.lineOffset < startLine) {
-				DEBUG(@"letting previous scheduled parsing from line %u continue", nextContext.lineOffset);
+				DEBUG(@"letting previous scheduled parsing from line %u continue",
+				    nextContext.lineOffset);
 				return;
 			}
-			DEBUG(@"cancelling scheduled parsing from line %u (nextContext = %@)", nextContext.lineOffset, nextContext);
+			DEBUG(@"cancelling scheduled parsing from line %u (nextContext = %@)",
+			    nextContext.lineOffset, nextContext);
 			[nextContext setCancelled:YES];
 		}
 
 		nextContext = ctx;
-		[self performSelector:@selector(restartSyntaxParsingWithContext:) withObject:ctx afterDelay:0.0025];
+		[self performSelector:@selector(restartSyntaxParsingWithContext:)
+		           withObject:ctx
+		           afterDelay:0.0025];
 	}
 }
 
@@ -551,7 +579,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	context.restarting = YES;
 	if (context.range.length > 0)
 	{
-		DEBUG(@"restarting parse context at line %u, range %@", startLocation, NSStringFromRange(context.range));
+		DEBUG(@"restarting parse context at line %u, range %@",
+		    startLocation, NSStringFromRange(context.range));
 		[self performSyntaxParsingWithContext:context];
 	}
 }
@@ -567,10 +596,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self setLanguage:lang];
 
 	if ([self fileURL] != nil) {
+		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
-			[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"]];
-		[syntaxOverride setObject:lang ? [lang name] : @"" forKey:[[self fileURL] absoluteString]];
-		[[NSUserDefaults standardUserDefaults] setObject:syntaxOverride forKey:@"syntaxOverride"];
+			[userDefaults dictionaryForKey:@"syntaxOverride"]];
+		[syntaxOverride setObject:lang ? [lang name] : @""
+		                   forKey:[[self fileURL] absoluteString]];
+		[userDefaults setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
 }
 
@@ -599,22 +630,26 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)configureForURL:(NSURL *)aURL
 {
+	ViLanguageStore *langStore = [ViLanguageStore defaultStore];
 	ViLanguage *newLanguage = nil;
 	if (aURL) {
 		NSString *firstLine = nil;
 		NSUInteger eol;
-		[[textStorage string] getLineStart:NULL end:NULL contentsEnd:&eol forRange:NSMakeRange(0, 0)];
+		[[textStorage string] getLineStart:NULL
+		                               end:NULL
+		                       contentsEnd:&eol
+		                          forRange:NSMakeRange(0, 0)];
 		if (eol > 0)
 			firstLine = [[textStorage string] substringWithRange:NSMakeRange(0, eol)];
 
 		if ([firstLine length] > 0)
-			newLanguage = [[ViLanguageStore defaultStore] languageForFirstLine:firstLine];
+			newLanguage = [langStore languageForFirstLine:firstLine];
 		if (newLanguage == nil)
-			newLanguage = [[ViLanguageStore defaultStore] languageForFilename:[aURL path]];
+			newLanguage = [langStore languageForFilename:[aURL path]];
 	}
 
 	if (newLanguage == nil)
-		newLanguage = [[ViLanguageStore defaultStore] defaultLanguage];
+		newLanguage = [langStore defaultLanguage];
 
 	[self setLanguage:newLanguage];
 }
@@ -622,7 +657,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)configureSyntax
 {
 	/* Check if the user has overridden a syntax for this URL. */
-	NSDictionary *syntaxOverride = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"syntaxOverride"];
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSDictionary *syntaxOverride = [defs dictionaryForKey:@"syntaxOverride"];
 	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] absoluteString]];
 	if (syntax) {
 		ViLanguage *lang = [[ViLanguageStore defaultStore] languageWithScope:syntax];
@@ -734,7 +770,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (NSFont *)font
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"] size:[defs floatForKey:@"fontsize"]];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"]
+	                               size:[defs floatForKey:@"fontsize"]];
 	if (font == nil)
 		font = [NSFont userFixedPitchFontOfSize:11.0];
 	return font;
@@ -752,7 +789,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	int tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
 
-	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font] forKey:NSFontAttributeName];
+	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font]
+	                                                  forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
 
 	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
@@ -760,7 +798,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	for (NSTextTab *tabStop in [style tabStops])
 		[style removeTabStop:tabStop];
 
-	// "Tabs after the last specified in tabStops are placed at integral multiples of this distance."
+	/* "Tabs after the last specified in tabStops are placed
+	 *  at integral multiples of this distance."
+	 */
 	[style setDefaultTabInterval:tabSizeInPoints.width];
 
 	typingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -788,19 +828,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	for (ViDocumentView *dv in views) {
 		[[dv textView] setTheme:theme];
-		[(ViLayoutManager *)[[dv textView] layoutManager] setInvisiblesAttributes:[theme invisiblesAttributes]];
-		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+		ViLayoutManager *lm = (ViLayoutManager *)[[dv textView] layoutManager];
+		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
+		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 	}
 }
 
 - (void)updatePageGuide
 {
 	int pageGuideColumn = 0;
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"showguide"] == NSOnState)
-		pageGuideColumn = [[NSUserDefaults standardUserDefaults] integerForKey:@"guidecolumn"];
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	if ([defs boolForKey:@"showguide"] == NSOnState)
+		pageGuideColumn = [defs integerForKey:@"guidecolumn"];
 
-	ViDocumentView *dv;
-	for (dv in views)
+	for (ViDocumentView *dv in views)
 		[[dv textView] setPageGuide:pageGuideColumn];
 }
 
@@ -856,6 +897,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 #endif
 
 	NSMutableArray *syms = [[NSMutableArray alloc] init];
+	NSString *string = [textStorage string];
 
 	NSArray *scopeArray = [syntaxParser scopeArray];
 	NSUInteger i;
@@ -873,14 +915,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				/*
 				 * Finalize the last symbol. Apply any symbol transformation.
 				 */
-				NSString *symbol = [[textStorage string] substringWithRange:wholeRange];
+				NSString *symbol = [string substringWithRange:wholeRange];
 				NSString *transform = [symbolTransforms objectForKey:lastSelector];
 				if (transform) {
-					ViSymbolTransform *tr = [[ViSymbolTransform alloc] initWithTransformationString:transform];
+					ViSymbolTransform *tr = [[ViSymbolTransform alloc]
+					    initWithTransformationString:transform];
 					symbol = [tr transformSymbol:symbol];
 				}
 
-				[syms addObject:[[ViSymbol alloc] initWithSymbol:symbol range:wholeRange image:img]];
+				ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
+				                                           range:wholeRange
+				                                           image:img];
+				[syms addObject:sym];
 			}
 			lastSelector = nil;
 

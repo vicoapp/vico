@@ -1343,8 +1343,10 @@ int logIndent = 0;
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL leaveVisualMode = NO;
-	if (mode == ViVisualMode && !command.ismotion)
+	if (mode == ViVisualMode && !command.ismotion) {
+		/* If in visual mode, edit commands leave visual mode. */
 		leaveVisualMode = YES;
+	}
 
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
@@ -1361,7 +1363,8 @@ int logIndent = 0;
 		final_location = bol;
 	}
 
-	if (leaveVisualMode) {
+	if (leaveVisualMode && mode == ViVisualMode) {
+		/* If the command didn't itself leave visual mode, do it now. */
 		[self setNormalMode];
 		[self resetSelection];
 	}

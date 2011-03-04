@@ -610,11 +610,13 @@
 	if ([set count] > 1)
 		return;
 
+	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
+	if (item == nil)
+		return;
+
 	if (isCompletion) {
-		ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
-		if (item)
-			[completionTarget performSelector:completionAction withObject:[item url]];
-	} else {
+		[completionTarget performSelector:completionAction withObject:[item url]];
+	} else if (![self outlineView:explorer isItemExpandable:item]) {
 		// XXX: open in splits instead if alt key pressed?
 		[self openInTab:sender];
 	}

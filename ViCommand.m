@@ -20,7 +20,7 @@ static struct vikey insert_keys[] = {
 	{@"literal_next:",	0x16, VIF_NEED_CHAR}, // ctrl-v
 	{@"complete:",		0x18, 0}, // ctrl-x
 	{@"normal_mode:",	0x1B, 0}, // escape
-	{@"input_backspace:",	0x7F, 0}, // delete
+	{@"input_backspace:",	0x7F, 0}, // backspace
 	{@"input_forward_delete:", NSDeleteFunctionKey, 0}, // forward delete
 	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
 	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
@@ -101,7 +101,7 @@ static struct vikey normal_keys[] = {
 	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"jump_tag:",		0x1D, 0}, // ^]
 	{@"switch_file:",	0x1E, 0}, // ^^
-	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
+	{@"move_left:",		0x7F, VIF_IS_MOTION}, // backspace
 	{@"move_right:",	' ', VIF_IS_MOTION},
 	{@"append_eol:",	'A', VIF_SETS_DOT},
 	{@"word_backward:",	'B', VIF_IS_MOTION},
@@ -186,7 +186,7 @@ static struct vikey operator_keys[] = {
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
-	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
+	{@"move_left:",		0x7F, VIF_IS_MOTION}, // backspace
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"move_right:",	' ', VIF_IS_MOTION},
@@ -240,12 +240,12 @@ static struct vikey operator_keys[] = {
 
 static struct vikey visual_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
-	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A
+	{@"find_current_word:",	0x1, VIF_IS_MOTION}, // ^A, FIXME: vim binds this to increment number
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
 	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
 	{@"normal_mode:",	0x1B, 0}, // escape
 	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
-	{@"move_left:",		0x7F, VIF_IS_MOTION}, // delete
+	{@"delete:",		0x7F, VIF_IS_MOTION}, // backspace
 	{@"move_down:",		0xA, VIF_IS_MOTION | VIF_LINE_MODE},  // ^J
 	{@"move_down:",		0xD, VIF_IS_MOTION | VIF_LINE_MODE},  // ^M
 	{@"move_right:",	' ', VIF_IS_MOTION},
@@ -308,6 +308,7 @@ static struct vikey visual_keys[] = {
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
 	{@"move_to_mark:",	'\'', VIF_NEED_CHAR | VIF_IS_MOTION},
 	{@"move_to_mark:",	'`', VIF_NEED_CHAR | VIF_IS_MOTION},
+	{@"delete:",		NSDeleteFunctionKey, 0},
 	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
 	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION | VIF_LINE_MODE},

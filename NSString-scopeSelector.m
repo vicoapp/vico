@@ -50,7 +50,7 @@ tenpow(unsigned x)
 		nscopes++;
 
 	if (nscopes == 0)
-		return 1ULL;
+		return 0ULL;
 	depth_offset = nscopes;
 
 	struct scope *ref_begin = TAILQ_LAST(ref_scopes, scope_list);

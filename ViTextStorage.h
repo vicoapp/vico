@@ -25,7 +25,6 @@ struct line
 	TAILQ_ENTRY(line)	 next;
 	NSUInteger		 length;
 	NSUInteger		 eol;
-	NSArray			*continuations;
 };
 TAILQ_HEAD(skiplines, line);
 

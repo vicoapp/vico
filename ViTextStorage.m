@@ -24,6 +24,23 @@ static NSMutableCharacterSet *wordSet = nil;
 	return self;
 }
 
+- (void)finalize
+{
+	/* Free the skiplist. */
+	struct skip *skip;
+	while ((skip = TAILQ_FIRST(&skiphead)) != NULL) {
+		struct line *ln;
+		while ((ln = TAILQ_FIRST(&skip->lines)) != NULL) {
+			TAILQ_REMOVE(&skip->lines, ln, next);
+			free(ln);
+		}
+		TAILQ_REMOVE(&skiphead, skip, next);
+		free(skip);
+	}
+
+	[super finalize];
+}
+
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViTextStorage %p>", self];

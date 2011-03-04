@@ -1466,11 +1466,6 @@ int logIndent = 0;
 	unichar key;
 	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
 
-	if (parser.partial) {
-		[[self delegate] message:@"Vi command interrupted by key equivalent."];
-		[parser reset];
-	}
-
 	/*
 	 * Find and perform bundle commands. Show a menu with commands if multiple matches found.
 	 * FIXME: should this be part of the key replay queue?
@@ -1481,6 +1476,10 @@ int logIndent = 0;
                                                         matchingScopes:scopes
                                                                 inMode:mode];
         if ([matches count] > 0) {
+		if (parser.partial) {
+			[[self delegate] message:@"Vi command interrupted by key equivalent."];
+			[parser reset];
+		}
                 [self performBundleItems:matches];
                 return YES;
         }

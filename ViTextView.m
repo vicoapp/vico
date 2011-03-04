@@ -276,8 +276,11 @@ int logIndent = 0;
 
 - (void)setString:(NSString *)aString
 {
-	[[self textStorage] replaceCharactersInRange:NSMakeRange(0, [[self textStorage] length])
+	NSRange r = NSMakeRange(0, [[self textStorage] length]);
+	[[self textStorage] replaceCharactersInRange:r
 	                                  withString:aString];
+	[[self textStorage] setAttributes:[self typingAttributes]
+	                            range:r];
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange
@@ -299,6 +302,9 @@ int logIndent = 0;
 
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
+	NSRange r = NSMakeRange(aRange.location, [aString length]);
+	[[self textStorage] setAttributes:[self typingAttributes]
+	                            range:r];
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
@@ -347,8 +353,11 @@ int logIndent = 0;
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
+	NSRange r = NSMakeRange(aRange.location, [aString length]);
+	[[self textStorage] setAttributes:[self typingAttributes]
+	                            range:r];
 
-	if (modify_start_location > NSMaxRange(NSMakeRange(aRange.location, [aString length]))) {
+	if (modify_start_location > NSMaxRange(r)) {
 		NSInteger delta = [aString length] - aRange.length;
 		DEBUG(@"modify_start_location %lu -> %lu", modify_start_location, modify_start_location + delta);
 		modify_start_location += delta;
@@ -1386,7 +1395,6 @@ int logIndent = 0;
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
 {
-	
 	NSString *string;
 
 	if ([aString isMemberOfClass:[NSAttributedString class]])
@@ -1465,6 +1473,8 @@ int logIndent = 0;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
+	DEBUG(@"event = %@", theEvent);
+
 	unsigned int modifiers;
 	unichar key;
 	key = [self parseKeyEvent:theEvent modifiers:&modifiers];

@@ -357,6 +357,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	ignoreEditing = YES;
 	[[textStorage mutableString] setString:aString ?: @""];
+	[textStorage setAttributes:[self typingAttributes]
+	                            range:NSMakeRange(0, [aString length])];
 	[self configureSyntax];
 
 	/* Force incremental syntax parsing. */
@@ -704,6 +706,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
+	if (([textStorage editedMask] & NSTextStorageEditedCharacters) != NSTextStorageEditedCharacters)
+		return;
+
 	NSRange area = [textStorage editedRange];
 	NSInteger diff = [textStorage changeInLength];
 
@@ -815,8 +820,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	    style, NSParagraphStyleAttributeName,
 	    [self font], NSFontAttributeName,
 	    nil];
-
-	[textStorage setTypingAttributes:typingAttributes];
 }
 
 - (void)changeTheme:(ViTheme *)aTheme

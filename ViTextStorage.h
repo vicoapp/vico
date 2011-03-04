@@ -39,15 +39,12 @@ TAILQ_HEAD(skiplist, skip);
 
 @interface ViTextStorage : NSTextStorage
 {
-	NSMutableString		*string;
-	NSDictionary		*typingAttributes;
-	NSUInteger		 lineCount;
-	struct skiplist		 skiphead;
+	NSMutableAttributedString	*attributedString;
+	NSUInteger			 lineCount;
+	struct skiplist			 skiphead;
 }
 
 - (id)init;
-
-- (void)setTypingAttributes:(NSDictionary *)attributes;
 
 - (NSString *)string;
 - (NSDictionary *)attributesAtIndex:(unsigned)anIndex

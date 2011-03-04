@@ -16,9 +16,7 @@ static NSMutableCharacterSet *wordSet = nil;
 {
 	self = [super init];
 	if (self) {
-		string = [[NSMutableString alloc] init];
-		typingAttributes = [NSDictionary dictionaryWithObject:[NSFont userFixedPitchFontOfSize:20]
-		                                               forKey:NSFontAttributeName];
+		attributedString = [[NSMutableAttributedString alloc] init];
 		TAILQ_INIT(&skiphead);
 	}
 	return self;
@@ -48,7 +46,7 @@ static NSMutableCharacterSet *wordSet = nil;
 
 - (NSString *)string
 {
-	return string;
+	return [attributedString string];
 }
 
 static inline struct skip *
@@ -252,13 +250,6 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		}
 	}
 
-/*
-	if (skip->nlines == 0) {
-		TAILQ_REMOVE(&skiphead, skip, next);
-		free(skip);
-	}
-*/
-
 	lineCount--;
 }
 
@@ -302,7 +293,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	if (aRange.length > 0) /* delete or replace */
 		/* Remove affected _whole_ lines. */
 		for (;;) {
-			[string getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
+			[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
 			if (end > NSMaxRange(aRange))
 				/* Line only partially affected, just update after modification. */
 				break;
@@ -316,12 +307,12 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			linesChanged++;
 		}
 
-	[string replaceCharactersInRange:aRange withString:str];
+	[attributedString replaceCharactersInRange:aRange withString:str];
 
 	/* Update partially affected line. */
 	location = aRange.location;
 	if (lineIndex < lineCount) {
-		[string getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+		[[self string] getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
 		DEBUG(@"replace line %lu: has length %li at location %lu, end at %lu",
 		    lineIndex, end - bol, bol, end);
 		[self replaceLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
@@ -335,7 +326,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		NSUInteger endLocation = NSMaxRange(aRange) + diff;
 		DEBUG(@"location = %lu, endLocation = %lu", location, endLocation);
 		while (location < [self length]) {
-			[string getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+			[[self string] getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
 			if (bol > endLocation)
 				break;
 			DEBUG(@"insert line %lu: has length %li at location %lu, end at %lu",
@@ -371,22 +362,15 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	[self replaceCharactersInRange:NSMakeRange(anIndex, 0) withString:aString];
 }
 
-- (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
+- (NSDictionary *)attributesAtIndex:(unsigned)index effectiveRange:(NSRangePointer)aRangePtr
 {
-	if (aRangePtr)
-		*aRangePtr = NSMakeRange(0, [string length]);
-	return typingAttributes;
+	return [attributedString attributesAtIndex:index effectiveRange:aRangePtr];
 }
 
-- (void)setAttributes:(NSDictionary *)attributes range:(NSRange)range
+- (void)setAttributes:(NSDictionary *)attributes range:(NSRange)aRange
 {
-	/* We always use the typing attributes. */
-}
-
-- (void)setTypingAttributes:(NSDictionary *)attributes
-{
-	typingAttributes = [attributes copy];
-	[self edited:NSTextStorageEditedAttributes range:NSMakeRange(0, [self length]) changeInLength:0];
+	[attributedString setAttributes:attributes range:aRange];
+	[self edited:NSTextStorageEditedAttributes range:aRange changeInLength:0];
 }
 
 #pragma mark -

@@ -356,6 +356,8 @@ find_command_in_map(unichar key, struct vikey map[])
 	complete = YES;
 	partial = NO;
 
+	DEBUG(@"complete, command = %@, count = %li", command->method, count);
+
 	if (command && command->key == '.') {
 		is_dot = YES;
 
@@ -462,6 +464,8 @@ find_command_in_map(unichar key, struct vikey map[])
 	is_dot = NO;
 	partial = YES;
 
+	DEBUG(@"got key 0x%04X", aKey);
+
 	if (state == ViCommandNeedChar) {
 		argument = aKey;
 		[self setComplete];
@@ -477,6 +481,7 @@ find_command_in_map(unichar key, struct vikey map[])
 		if (aKey >= '1' - ((countp && *countp > 0) ? 1 : 0) && aKey <= '9') {
 			*countp *= 10;
 			*countp += aKey - '0';
+			DEBUG(@"count is now %i", count);
 			return;
 		}
 	}
@@ -543,6 +548,7 @@ find_command_in_map(unichar key, struct vikey map[])
 
 - (void)reset
 {
+	DEBUG(@"%s", "resetting");
 	partial = NO;
 	complete = NO;
 	method = nil;

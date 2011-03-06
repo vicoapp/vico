@@ -261,7 +261,7 @@
 	STAssertEquals(snippet.selectedRange.location, 4ULL, nil);
 	STAssertEquals(snippet.selectedRange.length, 15ULL, nil);
 	[snippet deselect];
-	STAssertEquals(snippet.selectedRange.location, NSNotFound, nil);
+	STAssertEquals(snippet.selectedRange.location, (NSUInteger)NSNotFound, nil);
 	STAssertEquals(snippet.selectedRange.length, 0ULL, nil);
 
 	STAssertTrue([snippet replaceRange:NSMakeRange(4, 15) withString:@"p"], nil);

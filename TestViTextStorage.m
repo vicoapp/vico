@@ -320,7 +320,7 @@
 	STAssertEquals(r.length, 6ULL, nil);
 
 	STAssertEqualObjects([textStorage wordAtLocation:6 range:&r], nil, nil);
-	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.location, (NSUInteger)NSNotFound, nil);
 	STAssertEquals(r.length, 0ULL, nil);
 
 	STAssertEqualObjects([textStorage wordAtLocation:6 range:&r acceptAfter:YES], @"chunky", nil);
@@ -336,7 +336,7 @@
 	STAssertEquals(r.length, 5ULL, nil);
 
 	STAssertEqualObjects([textStorage wordAtLocation:12 range:&r], nil, nil);
-	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.location, (NSUInteger)NSNotFound, nil);
 	STAssertEquals(r.length, 0ULL, nil);
 
 	STAssertEqualObjects([textStorage wordAtLocation:12 range:&r acceptAfter:YES], @"bacon", nil);
@@ -344,7 +344,7 @@
 	STAssertEquals(r.length, 5ULL, nil);
 
 	STAssertEqualObjects([textStorage wordAtLocation:13 range:&r], nil, nil);
-	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.location, (NSUInteger)NSNotFound, nil);
 	STAssertEquals(r.length, 0ULL, nil);
 }
 
@@ -353,7 +353,7 @@
 	[[textStorage mutableString] setString:@""];
 	NSRange r;
 	STAssertEqualObjects([textStorage wordAtLocation:0 range:&r acceptAfter:YES], nil, nil);
-	STAssertEquals(r.location, NSNotFound, nil);
+	STAssertEquals(r.location, (NSUInteger)NSNotFound, nil);
 	STAssertEquals(r.length, 0ULL, nil);
 }
 

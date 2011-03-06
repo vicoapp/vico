@@ -298,6 +298,22 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>js</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>JavaScript source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>c</string>
 				<string>h</string>
 			</array>
@@ -312,22 +328,6 @@
 			<key>NSPersistentStoreTypeKey</key>
 			<string>Binary</string>
 		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>viproj</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Project</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSTypeIsPackage</key>
-			<false/>
-			<key>NSDocumentClass</key>
-			<string>ViProject</string>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>XML</string>
-		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
@@ -339,22 +339,10 @@
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>VIBE</string>
-	<key>CFBundleVersion</key>
-	<string>0.1</string>
 	<key>CFBundleShortVersionString</key>
 	<string>${VERSION}</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.developer-tool</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.6.6</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2011 Martin Hedenfalk</string>
+	<key>CFBundleSignature</key>
+	<string>VIBE</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -374,5 +362,17 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleVersion</key>
+	<string>0.1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.developer-tool</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.6.6</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2011 Martin Hedenfalk</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

@@ -210,11 +210,6 @@ int logIndent = 0;
 	return NO;
 }
 
-- (void)insertText:(id)aString
-{
-	DEBUG(@"insert text [%@]", aString);
-}
-
 #pragma mark -
 #pragma mark Vi error messages
 
@@ -325,6 +320,11 @@ int logIndent = 0;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
 {
 	[self insertString:aString atLocation:aLocation undoGroup:YES];
+}
+
+- (void)insertString:(NSString *)aString
+{
+	[self insertString:aString atLocation:[self caret] undoGroup:YES];
 }
 
 - (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
@@ -689,6 +689,11 @@ int logIndent = 0;
 	[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
 
 	return YES;
+}
+
+- (BOOL)gotoLine:(NSUInteger)line
+{
+	return [self gotoLine:line column:1];
 }
 
 #pragma mark -

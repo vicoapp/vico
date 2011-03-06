@@ -29,9 +29,11 @@
 	[ViBundle setupEnvironment:env forTextView:self];
 
 	/* Additional bundle specific variables. */
-	[env setObject:[bundle path] forKey:@"TM_BUNDLE_PATH"];
-	NSString *bundleSupportPath = [bundle supportPath];
-	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
+	if (bundle) {
+		[env setObject:[bundle path] forKey:@"TM_BUNDLE_PATH"];
+		NSString *bundleSupportPath = [bundle supportPath];
+		[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
+	}
 
 	[self beginUndoGroup];
 	[self deleteRange:aRange];
@@ -66,6 +68,29 @@
 	[self resetSelection];
 
 	return snippet;
+}
+
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                     inRange:(NSRange)aRange
+{
+	return [self insertSnippet:snippetString
+	                fromBundle:nil
+	                   inRange:aRange];
+}
+
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                  atLocation:(NSUInteger)aLocation
+{
+	return [self insertSnippet:snippetString
+	                fromBundle:nil
+	                   inRange:NSMakeRange(aLocation, 0)];
+}
+
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+{
+	return [self insertSnippet:snippetString
+	                fromBundle:nil
+	                   inRange:NSMakeRange([self caret], 0)];
 }
 
 - (void)deselectSnippet

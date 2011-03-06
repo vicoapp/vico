@@ -138,6 +138,11 @@
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
                   fromBundle:(ViBundle *)bundle
                      inRange:(NSRange)aRange;
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                     inRange:(NSRange)aRange;
+- (ViSnippet *)insertSnippet:(NSString *)snippetString
+                  atLocation:(NSUInteger)aLocation;
+- (ViSnippet *)insertSnippet:(NSString *)snippetString;
 - (void)performBundleSnippet:(id)sender;
 - (void)deselectSnippet;
 @end

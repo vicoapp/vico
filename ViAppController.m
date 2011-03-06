@@ -2,10 +2,12 @@
 #import "ViThemeStore.h"
 #import "ViLanguageStore.h"
 #import "ViDocument.h"
+#import "ViDocumentView.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
+#import "jscocoa/JSCocoa.h"
 
 @implementation ViAppController
 
@@ -64,6 +66,8 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+	[[JSCocoa sharedController] setDelegate:self];
+
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES
 						   attributes:nil
@@ -190,6 +194,62 @@ extern BOOL makeNewWindowInsteadOfTab;
 	makeNewWindowInsteadOfTab = YES;
 	[[ViDocumentController sharedDocumentController] newDocument:sender];
 #endif
+}
+
+
+#pragma mark -
+#pragma mark Scripting console
+
+- (void)consoleOutput:(NSString *)text
+{
+	NSTextStorage *ts = [scriptOutput textStorage];
+	[ts replaceCharactersInRange:NSMakeRange([ts length], 0) withString:text];
+	[scriptOutput scrollRangeToVisible:NSMakeRange([ts length], 0)];
+}
+
+- (void)JSCocoa:(JSCocoaController*)controller
+       hadError:(NSString*)error
+   onLineNumber:(NSInteger)lineNumber
+    atSourceURL:(id)url
+{
+	[self consoleOutput:[NSString stringWithFormat:@"Error on line %li: %@\n", lineNumber, error]];
+}
+
+- (IBAction)evalScript:(id)sender
+{
+	JSCocoa *jsc = [JSCocoa sharedController];
+
+	/* Set some convenient global objects. */
+	ViWindowController *winCon = [ViWindowController currentWindowController];
+	if (winCon) {
+		[jsc setObject:winCon withName:@"windowController"];
+		id<ViViewController> view = [winCon currentView];
+		[jsc setObject:view withName:@"view"];
+		if ([view isKindOfClass:[ViDocumentView class]]) {
+			ViTextView *textView = [(ViDocumentView *)view textView];
+			[jsc setObject:textView withName:@"textView"];
+		} else
+			[jsc removeObjectWithName:@"textView"];
+		ViDocument *doc = [winCon currentDocument];
+		[jsc setObject:doc withName:@"document"];
+	} else {
+		[jsc removeObjectWithName:@"windowController"];
+		[jsc removeObjectWithName:@"view"];
+		[jsc removeObjectWithName:@"textView"];
+		[jsc removeObjectWithName:@"document"];
+	}
+
+	JSValueRef result = [jsc evalJSString:[scriptInput stringValue]];
+	if (result != NULL) {
+		id obj = [jsc toObject:result];
+		[self consoleOutput:[NSString stringWithFormat:@"%@\n", obj]];
+	}
+}
+
+- (IBAction)clearConsole:(id)sender
+{
+	NSTextStorage *ts = [scriptOutput textStorage];
+	[ts replaceCharactersInRange:NSMakeRange(0, [ts length]) withString:@""];
 }
 
 @end

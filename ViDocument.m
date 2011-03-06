@@ -344,13 +344,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 	}
 
-	[self setString:aString];
-
-	return YES;
-}
-
-- (void)setString:(NSString *)aString
-{
 	/*
 	 * Disable the processing in textStorageDidProcessEditing,
 	 * otherwise we'll parse the document multiple times.
@@ -363,6 +356,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	/* Force incremental syntax parsing. */
 	[self highlightEverything];
+
+	return YES;
 }
 
 - (void)setEncoding:(id)sender
@@ -716,6 +711,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
                 ignoreEditing = NO;
 		return;
+	}
+
+	NSUInteger len = [textStorage length];
+	for (ViDocumentView *dv in views) {
+		ViTextView *tv = [dv textView];
+		if ([tv caret] > len)
+			[tv setCaret:len];
 	}
 
 	if (language == nil)

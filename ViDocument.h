@@ -50,7 +50,6 @@
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
 
-- (void)setString:(NSString *)aString;
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;
 - (IBAction)setLanguageAction:(id)sender;

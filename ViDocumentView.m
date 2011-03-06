@@ -24,7 +24,7 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViDocumentView %p: %@>", self, [document fileURL]];
+	return [NSString stringWithFormat:@"<ViDocumentView %p: %@>", self, (id)[document fileURL] ?: (id)@"<Untitled>"];
 }
 
 - (ViTextView *)textView

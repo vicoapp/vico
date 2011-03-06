@@ -7,11 +7,17 @@
 - (void)updateCaret
 {
 	NSLayoutManager *lm = [self layoutManager];
+	NSUInteger length = [[self textStorage] length];
 	int len = 1;
-	if (caret + 1 >= [[self textStorage] length])
+	if (caret + 1 >= length)
 		len = 0;
-	NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, len) actualCharacterRange:NULL];
-	caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	INFO(@"len = %i", len);
+	if (length == 0) {
+		caretRect.origin = NSMakePoint(0, 0);
+	} else {
+		NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, len) actualCharacterRange:NULL];
+		caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+	}
 
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX

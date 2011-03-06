@@ -362,9 +362,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	[self replaceCharactersInRange:NSMakeRange(anIndex, 0) withString:aString];
 }
 
-- (NSDictionary *)attributesAtIndex:(unsigned)index effectiveRange:(NSRangePointer)aRangePtr
+- (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
 {
-	return [attributedString attributesAtIndex:index effectiveRange:aRangePtr];
+	return [attributedString attributesAtIndex:anIndex effectiveRange:aRangePtr];
 }
 
 - (void)setAttributes:(NSDictionary *)attributes range:(NSRange)aRange

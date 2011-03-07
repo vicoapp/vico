@@ -905,6 +905,7 @@ int logIndent = 0;
 		[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
 	else
 		[self setCaret:firstRange.location];
+	final_location = [self caret];
 }
 
 - (void)setVisualSelection

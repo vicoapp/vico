@@ -864,7 +864,8 @@ int logIndent = 0;
 	return caret;
 }
 
-- (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange granularity:(NSSelectionGranularity)granularity
+- (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange
+                              granularity:(NSSelectionGranularity)granularity
 {
 	if (proposedSelRange.length == 0 && granularity == NSSelectByCharacter) {
 		NSUInteger bol, eol, end;
@@ -877,7 +878,9 @@ int logIndent = 0;
 	return [super selectionRangeForProposedRange:proposedSelRange granularity:granularity];
 }
 
-- (void)setSelectedRanges:(NSArray *)ranges affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag
+- (void)setSelectedRanges:(NSArray *)ranges
+                 affinity:(NSSelectionAffinity)affinity
+           stillSelecting:(BOOL)stillSelectingFlag
 {
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
 
@@ -936,7 +939,8 @@ int logIndent = 0;
 
 - (void)setNormalMode
 {
-	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u", caret, final_location, [[self textStorage] length]);
+	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u",
+	    caret, final_location, [[self textStorage] length]);
 	mode = ViNormalMode;
 	[self endUndoGroup];
 }

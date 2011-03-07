@@ -11,9 +11,6 @@
 int logIndent = 0;
 
 @interface ViTextView (private)
-- (void)recordInsertInRange:(NSRange)aRange;
-- (void)recordDeleteOfRange:(NSRange)aRange;
-- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 - (void)handleKeys:(NSArray *)keys;
@@ -593,45 +590,11 @@ int logIndent = 0;
 	}
 }
 
-- (void)undoDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation caret:(NSUInteger)caretLocation
-{
-	DEBUG(@"undoing delete of string %@ at %u", aString, aLocation);
-	[self insertString:aString atLocation:aLocation undoGroup:NO];
-	final_location = caretLocation;
-}
-
-- (void)undoInsertInRange:(NSRange)aRange caret:(NSUInteger)caretLocation
-{
-	DEBUG(@"undoing insert in range %@", NSStringFromRange(aRange));
-	[self deleteRange:aRange undoGroup:NO];
-	final_location = caretLocation;
-}
-
 - (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange caret:(NSUInteger)caretLocation
 {
 	DEBUG(@"undoing replacement of string %@ in range %@", aString, NSStringFromRange(aRange));
 	[self replaceCharactersInRange:aRange withString:aString undoGroup:NO];
 	final_location = caretLocation;
-}
-
-- (void)recordInsertInRange:(NSRange)aRange
-{
-	DEBUG(@"pushing insert of text in range %@ onto undo stack", NSStringFromRange(aRange));
-	[[undoManager prepareWithInvocationTarget:self] undoInsertInRange:aRange caret:undo_start_location];
-	[undoManager setActionName:@"insert text"];
-}
-
-- (void)recordDeleteOfString:(NSString *)aString atLocation:(NSUInteger)aLocation
-{
-	DEBUG(@"pushing delete of [%@] (%p) at %u onto undo stack", aString, aString, aLocation);
-	[[undoManager prepareWithInvocationTarget:self] undoDeleteOfString:aString atLocation:aLocation caret:undo_start_location];
-	[undoManager setActionName:@"delete text"];
-}
-
-- (void)recordDeleteOfRange:(NSRange)aRange
-{
-	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
-	[self recordDeleteOfString:s atLocation:aRange.location];
 }
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength

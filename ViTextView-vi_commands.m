@@ -1779,12 +1779,17 @@
 
 - (BOOL)next_tab:(ViCommand *)command
 {
-	[[[self window] windowController] selectNextTab:nil];
+	if (command.count)
+		[[[self window] windowController] selectTabAtIndex:command.count - 1];
+	else
+		[[[self window] windowController] selectNextTab:nil];
+	return YES;
 }
 
 - (BOOL)previous_tab:(ViCommand *)command
 {
 	[[[self window] windowController] selectPreviousTab:nil];
+	return YES;
 }
 
 @end

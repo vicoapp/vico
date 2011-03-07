@@ -97,7 +97,7 @@
 	    @"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 	    [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
-	    [NSNumber numberWithBool:YES], @"exploresortfolders",
+	    [NSNumber numberWithBool:NO], @"exploresortfolders",
 	    nil]];
 
 	/* Initialize languages and themes. */

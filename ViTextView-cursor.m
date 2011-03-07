@@ -11,7 +11,6 @@
 	int len = 1;
 	if (caret + 1 >= length)
 		len = 0;
-	INFO(@"len = %i", len);
 	if (length == 0) {
 		caretRect.origin = NSMakePoint(0, 0);
 	} else {

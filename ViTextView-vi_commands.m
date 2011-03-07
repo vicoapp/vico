@@ -1777,5 +1777,15 @@
 	return YES;
 }
 
+- (BOOL)next_tab:(ViCommand *)command
+{
+	[[[self window] windowController] selectNextTab:nil];
+}
+
+- (BOOL)previous_tab:(ViCommand *)command
+{
+	[[[self window] windowController] selectPreviousTab:nil];
+}
+
 @end
 

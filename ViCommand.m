@@ -63,6 +63,8 @@ static struct vikey g_keys[] = {
 	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"uppercase:",		'U', VIF_NEED_MOTION | VIF_SETS_DOT},
 	{@"lowercase:",		'u', VIF_NEED_MOTION | VIF_SETS_DOT},
+	{@"next_tab:",		't', 0},
+	{@"previous_tab:",	'T', 0},
 	{nil, -1, 0}
 };
 
@@ -71,6 +73,8 @@ static struct vikey visual_g_keys[] = {
 	{@"goto_line:",		'g', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"uppercase:",		'U', VIF_SETS_DOT},
 	{@"lowercase:",		'u', VIF_SETS_DOT},
+	{@"next_tab:",		't', 0},
+	{@"previous_tab:",	'T', 0},
 	{nil, -1, 0}
 };
 

@@ -93,7 +93,7 @@
 	    [NSNumber numberWithFloat:11.0], @"fontsize",
 	    @"vim", @"undostyle",
 	    @"Menlo Regular", @"fontname",
-	    @"Mac Classic", @"theme",
+	    @"Sunset", @"theme",
 	    @"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
 	    [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",

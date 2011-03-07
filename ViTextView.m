@@ -593,6 +593,7 @@ int logIndent = 0;
 - (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange caret:(NSUInteger)caretLocation
 {
 	DEBUG(@"undoing replacement of string %@ in range %@", aString, NSStringFromRange(aRange));
+	undo_start_location = aRange.location;
 	[self replaceCharactersInRange:aRange withString:aString undoGroup:NO];
 	final_location = caretLocation;
 }

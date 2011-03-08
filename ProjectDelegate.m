@@ -1255,6 +1255,8 @@ doCommandBySelector:(SEL)aSelector
 		[explorer scrollRowToVisible:row];
 		lastSelectedRow = row;
 	}
+
+	return YES;
 }
 
 - (BOOL)illegal:(ViCommand *)command

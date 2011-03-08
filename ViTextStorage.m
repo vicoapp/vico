@@ -573,6 +573,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSUInteger)columnOffsetAtLocation:(NSUInteger)aLocation
 {
+	if (aLocation > [self length])
+		return 0;
+
 	NSUInteger bol, end;
 	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];
 	return aLocation - bol;
@@ -580,6 +583,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation
 {
+	if (aLocation > [self length])
+		return 0;
+
 	NSUInteger bol, end;
 	[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(aLocation, 0)];
 	NSUInteger c = 0, i;
@@ -598,6 +604,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                    fromLocation:(NSUInteger)aLocation
                       acceptEOL:(BOOL)acceptEOL
 {
+	if (aLocation > [self length])
+		return NSNotFound;
+
 	NSUInteger bol, eol;
 	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
 	NSUInteger c = 0, i;
@@ -618,6 +627,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSString *)lineForLocation:(NSUInteger)aLocation
 {
+	if (aLocation > [self length])
+		return nil;
+
 	NSUInteger bol, eol;
 	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
 	return [[self string] substringWithRange:NSMakeRange(bol, eol - bol)];
@@ -625,6 +637,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
 {
+	if (aLocation > [self length])
+		return YES;
+
 	NSString *line = [self lineForLocation:aLocation];
 	NSCharacterSet *cset = [[NSCharacterSet whitespaceCharacterSet] invertedSet];
 	return [line rangeOfCharacterFromSet:cset].location == NSNotFound;
@@ -632,6 +647,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
 {
+	if (aLocation > [self length])
+		return nil;
+
 	NSUInteger bol, eol;
 	[[self string] getLineStart:&bol end:NULL contentsEnd:&eol forRange:NSMakeRange(aLocation, 0)];
 	NSRange lineRange = NSMakeRange(bol, eol - bol);

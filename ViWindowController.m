@@ -1307,6 +1307,11 @@ static NSWindowController	*currentWindowController = nil;
 	[projectDelegate searchFiles:sender];
 }
 
+- (IBAction)focusExplorer:(id)sender
+{
+	[projectDelegate focusExplorer:sender];
+}
+
 - (IBAction)toggleExplorer:(id)sender
 {
 	[projectDelegate toggleExplorer:sender];

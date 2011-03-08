@@ -324,6 +324,43 @@ static struct vikey visual_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey explorer_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
+	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
+	{@"scroll_downward:",	0x4, 0}, // ^D
+	{@"scroll_down_by_line:",0x5, 0}, // ^E
+	{@"forward_screen:",	0x6, VIF_IS_MOTION}, // ^F
+	{@"move_left:",		0x8, VIF_IS_MOTION}, // ^H
+	{@"rescan_files:",	0xC, 0}, // ^L
+	{@"tab_open:",		0xD, VIF_IS_MOTION},  // ^M
+	{@"scroll_upwards:",	0x15, 0}, // ^U
+	{@"scroll_up_by_line:",	0x19, 0}, // ^Y
+	{@"cancel_explorer:",	0x1B, 0}, // escape
+	{@"goto_line:",		'G', VIF_IS_MOTION},
+	{@"move_high:",		'H', VIF_IS_MOTION},
+	{@"move_low:",		'L', VIF_IS_MOTION},
+	{@"move_middle:",	'M', VIF_IS_MOTION},
+	{@"g_prefix:",		'g', 0, operator_g_keys},	// XXX
+	{@"move_left:",		'h', VIF_IS_MOTION},
+	{@"move_down:",		'j', VIF_IS_MOTION},
+	{@"move_up:",		'k', VIF_IS_MOTION},
+	{@"move_right:",	'l', VIF_IS_MOTION},
+	{@"switch_open:",	'o', 0},
+	{@"split_open:",	's', 0},
+	{@"tab_open:",		't', 0},
+	{@"vsplit_open:",	'v', 0},
+	{@"find:",		'/', VIF_IS_MOTION},
+	{@"move_left:",		NSLeftArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_down:",		NSDownArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_up:",		NSUpArrowFunctionKey, VIF_IS_MOTION},
+	{@"move_right:",	NSRightArrowFunctionKey, VIF_IS_MOTION},
+	{@"backward_screen:",	NSPageUpFunctionKey, VIF_IS_MOTION},
+	{@"forward_screen:",	NSPageDownFunctionKey, VIF_IS_MOTION},
+	{@"move_home:",		NSHomeFunctionKey, VIF_IS_MOTION},
+	{@"move_end:",		NSEndFunctionKey, VIF_IS_MOTION},
+	{nil, -1, 0}
+};
+
 static struct vikey *
 find_command_in_map(unichar key, struct vikey map[])
 {
@@ -597,6 +634,11 @@ find_command_in_map(unichar key, struct vikey map[])
 - (void)setInsertMap
 {
 	map = insert_keys;
+}
+
+- (void)setExplorerMap
+{
+	map = explorer_keys;
 }
 
 @end

@@ -51,6 +51,7 @@ struct vikey
 - (NSString *)motion_method;
 - (void)setVisualMap;
 - (void)setInsertMap;
+- (void)setExplorerMap;
 
 @property(readonly) BOOL complete;
 @property(readonly) BOOL partial;

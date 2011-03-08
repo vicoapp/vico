@@ -1,6 +1,7 @@
 #import "ViRegexp.h"
 #import "ViBgView.h"
 #import "ViToolbarPopUpButtonCell.h"
+#import "ViOutlineView.h"
 
 @class ViWindowController;
 @class ExEnvironment;
@@ -24,7 +25,7 @@
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;
 	IBOutlet ViWindowController *windowController;
-	IBOutlet NSOutlineView *explorer;
+	IBOutlet ViOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
 	IBOutlet NSSplitView *splitView;
@@ -35,6 +36,9 @@
 	IBOutlet NSPathControl *rootButton;
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
+
+	NSInteger lastSelectedRow;
+	BOOL returnToExplorer;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;
@@ -84,6 +88,7 @@
 - (BOOL)explorerIsOpen;
 - (void)openExplorerTemporarily:(BOOL)temporarily;
 - (void)closeExplorer;
+- (IBAction)focusExplorer:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
 

@@ -151,7 +151,6 @@
 		      ofObject:(id)object
 			change:(NSDictionary *)change
 		       context:(void *)context
-
 {
 	/* only explorecaseignore and exploresortfolders options observed */
 	/* re-sort explorer */
@@ -294,6 +293,8 @@
 		NSAlert *alert = [NSAlert alertWithError:error];
 		[alert runModal];
 	}
+
+	lastSelectedRow = 0;
 }
 
 #pragma mark -
@@ -596,11 +597,6 @@
 {
         [filterField setStringValue:@""];
         [self filterFiles:self];
-#if 0
-        int i, n = [self outlineView:explorer numberOfChildrenOfItem:nil];
-        for (i = 0; i < n; i++)
-                [explorer expandItem:[self outlineView:explorer child:i ofItem:nil] expandChildren:NO];
-#endif
 }
 
 - (void)explorerClick:(id)sender
@@ -630,6 +626,7 @@
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
 		[self browseURL:[item url]];
+		[self cancelExplorer];
 	} else
 		[self explorerClick:sender];
 }
@@ -654,6 +651,7 @@
 		if (rootItems == nil)
 			[self browseURL:[environment baseURL]];
 	}
+	returnToExplorer = NO;
 }
 
 - (void)closeExplorer
@@ -669,6 +667,15 @@
 		[self openExplorerTemporarily:NO];
 }
 
+- (IBAction)focusExplorer:(id)sender
+{
+	[self openExplorerTemporarily:YES];
+	[window makeFirstResponder:explorer];
+
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:lastSelectedRow] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:lastSelectedRow];
+}
+
 - (void)cancelExplorer
 {
 	if (closeExplorerAfterUse) {
@@ -677,6 +684,7 @@
 	}
 	[self resetExplorerView];
 	[delegate focusEditor];
+	returnToExplorer = NO;
 }
 
 - (void)markItem:(ProjectFile *)item withFileMatch:(ViRegexpMatch *)fileMatch pathMatch:(ViRegexpMatch *)pathMatch
@@ -885,7 +893,9 @@ sort_by_score(id a, id b, void *context)
 
 #pragma mark -
 
-- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
+- (BOOL)control:(NSControl *)sender
+       textView:(NSTextView *)textView
+doCommandBySelector:(SEL)aSelector
 {
 	if (aSelector == @selector(insertNewline:)) { // enter
 		NSIndexSet *set = [explorer selectedRowIndexes];
@@ -915,20 +925,359 @@ sort_by_score(id a, id b, void *context)
 		id item = [explorer itemAtRow:row];
 		if (item == nil)
 			return YES;
-		if ([self outlineView:explorer isItemExpandable:item] && [explorer isItemExpanded:item])
+		if ([self outlineView:explorer isItemExpandable:item] &&
+		    [explorer isItemExpanded:item])
 			[explorer collapseItem:item];
 		else {
 			id parent = [explorer parentForItem:item];
-			if (parent)
-				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:[explorer rowForItem:parent]] byExtendingSelection:NO];
+			if (parent) {
+				row = [explorer rowForItem:parent];
+				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+				      byExtendingSelection:NO];
+				[explorer scrollRowToVisible:row];
+			}
 		}
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
-		[self cancelExplorer];
+		if (returnToExplorer) {
+			returnToExplorer = NO;
+			[window makeFirstResponder:explorer];
+		} else
+			[self cancelExplorer];
 		return YES;
 	}
 
 	return NO;
+}
+
+#pragma mark -
+#pragma mark Explorer Command Parser
+
+/* [count]j */
+- (BOOL)move_down:(ViCommand *)command
+{
+	int c = IMAX(1, command.count);
+	NSInteger row = [explorer selectedRow];
+	if (row == -1)
+		row = 0;
+	else
+		row = IMIN([explorer numberOfRows] - 1, row + c);
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* [count]k */
+- (BOOL)move_up:(ViCommand *)command
+{
+	int c = IMAX(1, command.count);
+	NSInteger row = [explorer selectedRow];
+	if (row == -1)
+		row = 0;
+	else
+		row = IMAX(0, row - c);
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* [count]l */
+- (BOOL)move_right:(ViCommand *)command
+{
+	NSInteger row = [explorer selectedRow];
+	id item = [explorer itemAtRow:row];
+	if (item && [self outlineView:explorer isItemExpandable:item]) {
+		[explorer expandItem:item];
+		lastSelectedRow = row;
+	}
+	return YES;
+}
+
+/* [count]h */
+- (BOOL)move_left:(ViCommand *)command
+{
+	NSInteger row = [explorer selectedRow];
+	id item = [explorer itemAtRow:row];
+	if (item == nil)
+		return NO;
+	if ([self outlineView:explorer isItemExpandable:item] &&
+	    [explorer isItemExpanded:item])
+		[explorer collapseItem:item];
+	else {
+		id parent = [explorer parentForItem:item];
+		if (parent) {
+			row = [explorer rowForItem:parent];
+			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+			      byExtendingSelection:NO];
+			[explorer scrollRowToVisible:row];
+			lastSelectedRow = row;
+		}
+	}
+	return YES;
+}
+
+/* [count]H */
+- (BOOL)move_high:(ViCommand *)command
+{
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger row = [explorer rowAtPoint:bounds.origin];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* [count]M */
+- (BOOL)move_middle:(ViCommand *)command
+{
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
+	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	if (lastRow == -1)
+		lastRow = [explorer numberOfRows] - 1;
+	NSInteger row = firstRow + (lastRow - firstRow) / 2;
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* [count]L */
+- (BOOL)move_low:(ViCommand *)command
+{
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger row = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	if (row == -1)
+		row = [explorer numberOfRows] - 1;
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* <home> */
+- (BOOL)move_home:(ViCommand *)command
+{
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:0];
+	lastSelectedRow = 0;
+	return YES;
+}
+
+/* <end> */
+- (BOOL)move_end:(ViCommand *)command
+{
+	NSInteger row = [explorer numberOfRows] - 1;
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* ctrl-y */
+- (BOOL)scroll_up_by_line:(ViCommand *)command
+{
+	NSClipView *clipView = [scrollView contentView];
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
+	if (firstRow == 0) {
+		/* First row already visible. */
+		if (bounds.origin.y > 0) {
+			[clipView scrollToPoint:NSMakePoint(0, 0)];
+			[scrollView reflectScrolledClipView:clipView];
+		}
+		return NO;
+	}
+
+	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	if (lastRow == -1)
+		lastRow = [explorer numberOfRows];
+	lastRow--;
+
+	NSRect r = [explorer rectOfRow:lastRow];
+	r.origin.y -= bounds.size.height;
+	[clipView scrollToPoint:r.origin];
+	[scrollView reflectScrolledClipView:clipView];
+
+	if ([explorer selectedRow] >= lastRow) {
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:lastRow - 1]
+		      byExtendingSelection:NO];
+		lastSelectedRow = lastRow - 1;
+	}
+
+	return YES;
+}
+
+/* ctrl-e */
+- (BOOL)scroll_down_by_line:(ViCommand *)command
+{
+	NSClipView *clipView = [scrollView contentView];
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	if (lastRow == -1) {
+		/* Last row already visible. */
+		return NO;
+	}
+
+	NSInteger firstRow = [explorer rowAtPoint:bounds.origin] + 1;
+
+	NSRect r = [explorer rectOfRow:firstRow];
+	[clipView scrollToPoint:r.origin];
+	[scrollView reflectScrolledClipView:clipView];
+
+	if ([explorer selectedRow] < firstRow) {
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:firstRow]
+		      byExtendingSelection:NO];
+		lastSelectedRow = firstRow;
+	}
+
+	return YES;
+}
+
+- (BOOL)backward_screen:(ViCommand *)command
+{
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
+	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger maxRow = [explorer numberOfRows] - 1;
+	if (lastRow == -1)
+		lastRow = maxRow;
+	NSInteger screenRows = lastRow - firstRow;
+
+	NSInteger currentRow = [explorer selectedRow];
+	if (currentRow == -1)
+		currentRow = 0;
+	NSInteger row = IMAX(0, currentRow - screenRows);
+
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+- (BOOL)forward_screen:(ViCommand *)command
+{
+	NSRect bounds = [scrollView documentVisibleRect];
+	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
+	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger maxRow = [explorer numberOfRows] - 1;
+	if (lastRow == -1)
+		lastRow = maxRow;
+	NSInteger screenRows = lastRow - firstRow;
+
+	NSInteger currentRow = [explorer selectedRow];
+	if (currentRow == -1)
+		currentRow = 0;
+	NSInteger row = IMIN(maxRow, currentRow + screenRows);
+
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+/* syntax: [count]G */
+- (BOOL)goto_line:(ViCommand *)command
+{
+	unichar key = command.key;
+	int count = command.count;
+	if (!command.ismotion) {
+		count = command.motion_count;
+		key = command.motion_key;
+	}
+
+	NSInteger row = -1;
+	if (count > 0)
+		row = IMIN(count, [explorer numberOfRows]) - 1;
+	else if (key == 'G')
+		row = [explorer numberOfRows] - 1;
+	else if (key == 'g')
+		row = 0;
+
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	lastSelectedRow = row;
+	return YES;
+}
+
+- (BOOL)find:(ViCommand *)command
+{
+	returnToExplorer = YES;
+	[window makeFirstResponder:filterField];
+	return YES;
+}
+
+- (BOOL)cancel_explorer:(ViCommand *)command
+{
+	[self cancelExplorer];
+	return YES;
+}
+
+- (BOOL)switch_open:(ViCommand *)command
+{
+	[self openInCurrentView:nil];
+	return YES;
+}
+
+- (BOOL)split_open:(ViCommand *)command
+{
+	[self openInSplit:nil];
+	return YES;
+}
+
+- (BOOL)vsplit_open:(ViCommand *)command
+{
+	[self openInVerticalSplit:nil];
+	return YES;
+}
+
+- (BOOL)tab_open:(ViCommand *)command
+{
+	[self explorerDoubleClick:nil];
+	return YES;
+}
+
+- (BOOL)rescan_files:(ViCommand *)command
+{
+	NSInteger row = [explorer selectedRow];
+
+	[self rescan:nil];
+
+	if (row > [explorer numberOfRows])
+		row = [explorer numberOfRows] - 1;
+
+	if (row < 0)
+		[self move_home:command];
+	else {
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+		[explorer scrollRowToVisible:row];
+		lastSelectedRow = row;
+	}
+}
+
+- (BOOL)illegal:(ViCommand *)command
+{
+	return YES;
+}
+
+- (BOOL)nonmotion:(ViCommand *)command
+{
+	return YES;
+}
+
+- (void)outlineView:(ViOutlineView *)outlineView
+    evaluateCommand:(ViCommand *)command
+{
+	DEBUG(@"command is %@", command.method);
+	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
+	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
+		[environment message:@"Command not implemented."];
+		return;
+	}
+
+	[self performSelector:NSSelectorFromString(command.method) withObject:command];
 }
 
 #pragma mark -

@@ -43,7 +43,7 @@
 {
 	if (arg-- == 0)
 		arg = 9;
-        [environment selectTabAtIndex:arg];
+        [[[self window] windowController] selectTabAtIndex:arg];
 }
 
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags

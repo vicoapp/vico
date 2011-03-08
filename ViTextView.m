@@ -1726,7 +1726,7 @@ int logIndent = 0;
 
 - (BOOL)switch_file:(ViCommand *)command
 {
-        [[[self delegate] environment] selectLastDocument];
+        [[[self window] windowController] selectLastDocument];
         return YES;
 }
 
@@ -1734,7 +1734,7 @@ int logIndent = 0;
 {
 	if (arg-- == 0)
 		arg = 9;
-        [[[self delegate] environment] selectTabAtIndex:arg];
+        [[[self window] windowController] selectTabAtIndex:arg];
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation

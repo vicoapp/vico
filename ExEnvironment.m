@@ -131,21 +131,6 @@
 }
 #endif
 
-- (void)switchToLastDocument
-{
-	[windowController switchToLastDocument];
-}
-
-- (void)selectLastDocument
-{
-	[windowController selectLastDocument];
-}
-
-- (void)selectTabAtIndex:(NSInteger)anIndex
-{
-	[windowController selectTabAtIndex:anIndex];
-}
-
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView
 {
 	id<ViViewController> viewController = [windowController viewControllerForView:aView];

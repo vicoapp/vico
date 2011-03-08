@@ -67,9 +67,6 @@
 - (BOOL)setBaseURL:(NSURL *)url;
 - (NSString *)displayBaseURL;
 
-- (void)switchToLastDocument;
-- (void)selectLastDocument;
-- (void)selectTabAtIndex:(NSInteger)anIndex;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView;
 
 - (ViDocument *)openDocument:(id)filenameOrURL andDisplay:(BOOL)display allowDirectory:(BOOL)allowDirectory;

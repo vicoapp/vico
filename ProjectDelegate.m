@@ -521,7 +521,7 @@
 	NSString *url = [[rootButton URL] absoluteString];
 	if (![bookmarks containsObject:url]) {
 		if (bookmarks == nil)
-			bookmarks = [NSArray array];
+			bookmarks = [NSArray arrayWithObject:@"dummy"];
 		[defaults setObject:[bookmarks arrayByAddingObject:url] forKey:@"bookmarks"];
 	}
 }

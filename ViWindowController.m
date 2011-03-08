@@ -199,7 +199,6 @@ static NSWindowController	*currentWindowController = nil;
 
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
-	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
 	isLoaded = YES;
 	if (initialDocument) {
@@ -244,6 +243,10 @@ static NSWindowController	*currentWindowController = nil;
 						forKeyPath:@"undostyle"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
+
+	NSRect frame = [splitView frame];
+	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 }
 
 - (void)browseURL:(NSURL *)url

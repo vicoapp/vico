@@ -37,6 +37,7 @@
 	ViCommand		*parser; // XXX: pointer to [windowController parser] !!!
 	int			 insert_count;
 	BOOL			 insertedKey; // true if insertText: called
+	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
 	NSMutableArray		*inputKeys; // used for replaying input
 

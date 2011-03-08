@@ -193,6 +193,19 @@ int logIndent = 0;
 - (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
               replacementStrings:(NSArray *)replacementStrings
 {
+	/*
+	 * If called by [super keyDown], just return yes.
+	 * This allows us to type dead keys.
+	 */
+	if (handlingKey)
+		return YES;
+
+	/*
+	 * Otherwise it's called from somewhere else, typically by
+	 * dragging and dropping text, or using an input manager.
+	 * We handle it ourselves, and return NO.
+	 */
+
 	[self beginUndoGroup];
 
 	NSUInteger i;
@@ -1480,7 +1493,9 @@ int logIndent = 0;
 	unichar key;
 	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
 
+	handlingKey = YES;
 	[super keyDown:theEvent];
+	handlingKey = NO;
 	DEBUG(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
 
 	if (!insertedKey && ![self hasMarkedText])

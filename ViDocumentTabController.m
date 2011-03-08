@@ -84,7 +84,9 @@
 		[split setPosition:pos ofDividerAtIndex:i - 1];
 }
 
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController withView:(id<ViViewController>)newViewController vertically:(BOOL)isVertical
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController
+                         withView:(id<ViViewController>)newViewController
+                       vertically:(BOOL)isVertical
 {
 	NSView *view = [viewController view];
 
@@ -125,7 +127,8 @@
 	return newViewController;
 }
 
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController vertically:(BOOL)isVertical
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController
+                       vertically:(BOOL)isVertical
 {
 	if (![viewController isKindOfClass:[ViDocumentView class]])
 		return nil;
@@ -139,7 +142,8 @@
 	return newDocView;
 }
 
-- (id<ViViewController>)replaceView:(id<ViViewController>)viewController withDocument:(id)document
+- (id<ViViewController>)replaceView:(id<ViViewController>)viewController
+                       withDocument:(id)document
 {
 	id<ViViewController> newViewController = [document makeView];
 
@@ -248,12 +252,15 @@
 	return nil;
 }
 
-- (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view isVertical:(BOOL)isVertical index:(NSInteger *)indexPtr
+- (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view
+                                    isVertical:(BOOL)isVertical
+                                         index:(NSInteger *)indexPtr
 {
 	NSView *sup;
 	while (view != nil && ![view isMemberOfClass:[NSTabView class]]) {
 		sup = [view superview];
-		if ([sup isMemberOfClass:[NSSplitView class]] && [(NSSplitView *)sup isVertical] == isVertical) {
+		if ([sup isMemberOfClass:[NSSplitView class]] &&
+		    [(NSSplitView *)sup isVertical] == isVertical) {
 			if (indexPtr != NULL)
 				*indexPtr = [[sup subviews] indexOfObject:view];
 			return (NSSplitView *)sup;
@@ -263,7 +270,8 @@
 	return nil;
 }
 
-- (NSView *)containedViewRelativeToView:(NSView *)view anchor:(ViViewOrderingMode)anchor
+- (NSView *)containedViewRelativeToView:(NSView *)view
+                                 anchor:(ViViewOrderingMode)anchor
 {
 	if ([view isMemberOfClass:[NSSplitView class]]) {
 		if ((anchor == ViViewUp && ![(NSSplitView *)view isVertical]) ||
@@ -276,7 +284,8 @@
 		return view;
 }
 
-- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)view
+- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position
+                            relativeTo:(NSView *)view
 {
 	if (view == nil)
 		return nil;
@@ -284,7 +293,9 @@
 	BOOL isVertical = (position == ViViewLeft || position == ViViewRight);
 
 	NSInteger ndx;
-	NSSplitView *split = [self containingSplitViewRelativeTo:view isVertical:isVertical index:&ndx];
+	NSSplitView *split = [self containingSplitViewRelativeTo:view
+	                                              isVertical:isVertical
+	                                                   index:&ndx];
 	if (split == nil) {
 		DEBUG(@"no containing split view for mode %i", position);
 		return nil;

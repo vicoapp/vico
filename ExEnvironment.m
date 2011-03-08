@@ -560,6 +560,8 @@
                         andOpen:(id)filenameOrURL
              orSwitchToDocument:(ViDocument *)doc
 {
+	BOOL newDoc = YES;
+
 	if (filenameOrURL) {
 		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
 	} else if (doc == nil) {
@@ -567,7 +569,8 @@
 		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
 		if (err)
 			[self message:@"%@", [err localizedDescription]];
-	}
+	} else
+		newDoc = NO;
 
 	if (doc) {
 		/*
@@ -578,10 +581,12 @@
 
 		id<ViViewController> viewController = [windowController currentView];
 		ViDocumentTabController *tabController = [viewController tabController];
-		ViDocumentView *newDocView = [tabController splitView:viewController withView:[doc makeView] vertically:isVertical];
+		ViDocumentView *newDocView = [tabController splitView:viewController
+		                                             withView:[doc makeView]
+		                                          vertically:isVertical];
 		[windowController selectDocumentView:newDocView];
 
-		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {
 			ViDocumentView *docView = viewController;
 			[[newDocView textView] setCaret:[[docView textView] caret]];
 			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];

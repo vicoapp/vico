@@ -901,27 +901,27 @@ int logIndent = 0;
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
-	// XXX: is this still needed? What does it do?
-	if (stillSelectingFlag == NO) {
-		ViSnippet *snippet = [self delegate].snippet;
-		if (mode != ViVisualMode && firstRange.length > 0 && snippet == nil) {
+	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i",
+	    stillSelectingFlag ? "YES" : "NO",
+	    NSStringFromRange(firstRange),
+	    NSStringFromRange(lastRange),
+	    mode);
+
+	if ([ranges count] > 1 || firstRange.length > 0) {
+		if (mode != ViVisualMode) {
 			[self setVisualMode];
 			[self setCaret:firstRange.location];
 			visual_start_location = firstRange.location;
-		}
-		return;
+		} else if (visual_start_location == firstRange.location)
+			[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
+		else
+			[self setCaret:firstRange.location];
+	} else if (stillSelectingFlag) {
+		[self setNormalMode];
+		if (firstRange.location != [self caret])
+			[self setCaret:firstRange.location];
 	}
 
-	if (mode != ViVisualMode) {
-		[self setVisualMode];
-		[self setCaret:firstRange.location];
-		visual_start_location = firstRange.location;
-	} else if (lastRange.length == 0)
-		[self setNormalMode];
-	else if (visual_start_location == firstRange.location)
-		[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
-	else
-		[self setCaret:firstRange.location];
 	final_location = [self caret];
 }
 

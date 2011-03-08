@@ -978,7 +978,6 @@
 	if (!has_undo_start_location) {
 		/* This is not a motion command, so move_eol: moves after the last character. */
 		undo_start_location = IMAX(start_location - 1, 0);
-		INFO(@"undo start loc = %lu", undo_start_location);
 		has_undo_start_location = YES;
 	}
 	return [self append:command];

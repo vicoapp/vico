@@ -1040,6 +1040,13 @@ static NSWindowController	*currentWindowController = nil;
 	return NO;
 }
 
+- (BOOL)splitView:(NSSplitView *)sender shouldHideDividerAtIndex:(NSInteger)dividerIndex
+{
+	if (sender == splitView)
+		return YES;
+	return NO;
+}
+
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
 	if (sender == splitView) {

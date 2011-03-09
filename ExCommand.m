@@ -149,6 +149,10 @@ static struct ex_command ex_commands[] = {
 		"f1o",
 		@"[Ee]x[!] [+cmd] [file]",
 		@"begin editing another file"},
+	{@"export",	@"ex_export",	0,
+		"s",
+		@"export var=[value]",
+		@"export an environment variable"},
 	/* C_EXUSAGE */
 	{@"exusage",	@"ex_usage",	0,
 		"w1o",

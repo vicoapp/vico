@@ -138,13 +138,20 @@
 	// FIXME: TM_SELECTED_FILES
 	// FIXME: TM_SELECTED_FILE
 
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+
+	if ([defs integerForKey:@"expandtab"] == NSOnState)
 		[env setObject:@"YES" forKey:@"TM_SOFT_TABS" ];
 	else
 		[env setObject:@"NO" forKey:@"TM_SOFT_TABS" ];
 
-	[env setObject:[[NSUserDefaults standardUserDefaults] stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
+	[env setObject:[defs stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
 	[env setObject:NSHomeDirectory() forKey:@"HOME"];
+
+	/*
+	 * Global (static) environment variables.
+	 */
+	[env addEntriesFromDictionary:[defs dictionaryForKey:@"environment"]];
 
 	/*
 	 * shellVariables from bundle preferences

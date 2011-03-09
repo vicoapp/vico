@@ -1110,5 +1110,34 @@ filter_write(CFSocketRef s,
 	return didClose;
 }
 
+- (BOOL)ex_export:(ExCommand *)command
+{
+	NSScanner *scan = [NSScanner scannerWithString:command.string];
+	NSString *variable, *value = nil;
+
+	if (![scan scanUpToString:@"=" intoString:&variable] ||
+	    ![scan scanString:@"=" intoString:nil]) {
+		return NO;
+	}
+
+	if (![scan isAtEnd])
+		value = [[scan string] substringFromIndex:[scan scanLocation]];
+
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSDictionary *curenv = [defs dictionaryForKey:@"environment"];
+	NSMutableDictionary *env = [NSMutableDictionary dictionaryWithDictionary:curenv];
+
+	if (value)
+		[env setObject:value forKey:variable];
+	else
+		[env removeObjectForKey:value];
+
+	[defs setObject:env forKey:@"environment"];
+
+	INFO(@"static environment is now %@", env);
+
+	return YES;
+}
+
 @end
 

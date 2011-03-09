@@ -1079,11 +1079,9 @@ static NSWindowController	*currentWindowController = nil;
 	{
 		// collapse both side views, but not the edit view
 		if (subview == explorerView || subview == symbolsView)
-			return NO;
-		return YES;
+			return YES;
 	}
-	else
-		return NO;
+	return NO;
 }
 
 - (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize

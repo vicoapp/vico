@@ -66,17 +66,6 @@ buffer_get_int_ret(u_int *ret, Buffer *buffer)
 	return (0);
 }
 
-u_int
-buffer_get_int(Buffer *buffer)
-{
-	u_int ret;
-
-	if (buffer_get_int_ret(&ret, buffer) == -1)
-		fatal("buffer_get_int: buffer error");
-
-	return (ret);
-}
-
 int
 buffer_get_int64_ret(u_int64_t *ret, Buffer *buffer)
 {
@@ -87,17 +76,6 @@ buffer_get_int64_ret(u_int64_t *ret, Buffer *buffer)
 	if (ret != NULL)
 		*ret = get_u64(buf);
 	return (0);
-}
-
-u_int64_t
-buffer_get_int64(Buffer *buffer)
-{
-	u_int64_t ret;
-
-	if (buffer_get_int64_ret(&ret, buffer) == -1)
-		fatal("buffer_get_int: buffer error");
-
-	return (ret);
 }
 
 /*
@@ -161,16 +139,6 @@ buffer_get_string_ret(Buffer *buffer, u_int *length_ptr)
 }
 
 void *
-buffer_get_string(Buffer *buffer, u_int *length_ptr)
-{
-	void *ret;
-
-	if ((ret = buffer_get_string_ret(buffer, length_ptr)) == NULL)
-		fatal("buffer_get_string: buffer error");
-	return (ret);
-}
-
-void *
 buffer_get_string_ptr_ret(Buffer *buffer, u_int *length_ptr)
 {
 	void *ptr;
@@ -189,16 +157,6 @@ buffer_get_string_ptr_ret(Buffer *buffer, u_int *length_ptr)
 	return (ptr);
 }
 
-void *
-buffer_get_string_ptr(Buffer *buffer, u_int *length_ptr)
-{
-	void *ret;
-
-	if ((ret = buffer_get_string_ptr_ret(buffer, length_ptr)) == NULL)
-		fatal("buffer_get_string_ptr: buffer error");
-	return (ret);
-}
-
 /*
  * Stores and arbitrary binary string in the buffer.
  */
@@ -208,11 +166,10 @@ buffer_put_string(Buffer *buffer, const void *buf, u_int len)
 	buffer_put_int(buffer, len);
 	buffer_append(buffer, buf, len);
 }
+
 void
 buffer_put_cstring(Buffer *buffer, const char *s)
 {
-	if (s == NULL)
-		fatal("buffer_put_cstring: s == NULL");
 	buffer_put_string(buffer, s, strlen(s));
 }
 
@@ -227,16 +184,6 @@ buffer_get_char_ret(char *ret, Buffer *buffer)
 		return (-1);
 	}
 	return (0);
-}
-
-int
-buffer_get_char(Buffer *buffer)
-{
-	char ch;
-
-	if (buffer_get_char_ret(&ch, buffer) == -1)
-		fatal("buffer_get_char: buffer error");
-	return (u_char) ch;
 }
 
 /*

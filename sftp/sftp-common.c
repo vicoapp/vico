@@ -93,43 +93,6 @@ attrib_to_stat(const Attrib *a, struct stat *st)
 	}
 }
 
-/* Decode attributes in buffer */
-Attrib *
-decode_attrib(Buffer *b)
-{
-	static Attrib a;
-
-	attrib_clear(&a);
-	a.flags = buffer_get_int(b);
-	if (a.flags & SSH2_FILEXFER_ATTR_SIZE)
-		a.size = buffer_get_int64(b);
-	if (a.flags & SSH2_FILEXFER_ATTR_UIDGID) {
-		a.uid = buffer_get_int(b);
-		a.gid = buffer_get_int(b);
-	}
-	if (a.flags & SSH2_FILEXFER_ATTR_PERMISSIONS)
-		a.perm = buffer_get_int(b);
-	if (a.flags & SSH2_FILEXFER_ATTR_ACMODTIME) {
-		a.atime = buffer_get_int(b);
-		a.mtime = buffer_get_int(b);
-	}
-	/* vendor-specific extensions */
-	if (a.flags & SSH2_FILEXFER_ATTR_EXTENDED) {
-		char *type, *data;
-		int i, count;
-
-		count = buffer_get_int(b);
-		for (i = 0; i < count; i++) {
-			type = buffer_get_string(b, NULL);
-			data = buffer_get_string(b, NULL);
-			debug3("Got file attribute \"%s\"", type);
-			xfree(type);
-			xfree(data);
-		}
-	}
-	return &a;
-}
-
 /* Encode attributes to buffer */
 void
 encode_attrib(Buffer *b, const Attrib *a)

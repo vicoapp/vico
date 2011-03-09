@@ -178,13 +178,6 @@ buffer_get_ret(Buffer *buffer, void *buf, u_int len)
 	return (0);
 }
 
-void
-buffer_get(Buffer *buffer, void *buf, u_int len)
-{
-	if (buffer_get_ret(buffer, buf, len) == -1)
-		fatal("buffer_get: buffer error");
-}
-
 /* Consumes the given number of bytes from the beginning of the buffer. */
 
 int

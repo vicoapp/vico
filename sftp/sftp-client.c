@@ -68,35 +68,6 @@ send_msg(int fd, Buffer *m)
 	buffer_clear(m);
 }
 
-int
-get_msg(int fd, Buffer *m)
-{
-	u_int msg_len;
-
-	buffer_append_space(m, 4);
-	if (atomicio(read, fd, buffer_ptr(m), 4) != 4) {
-		if (errno == EPIPE)
-			logit("Connection closed");
-		else
-			logit("Couldn't read packet: %s", strerror(errno));
-		return -1;
-	}
-
-	msg_len = buffer_get_int(m);
-	if (msg_len > SFTP_MAX_MSG_LENGTH)
-		fatal("Received message too long %u", msg_len);
-
-	buffer_append_space(m, msg_len);
-	if (atomicio(read, fd, buffer_ptr(m), msg_len) != msg_len) {
-		if (errno == EPIPE)
-			logit("Connection closed");
-		else
-			logit("Read packet: %s", strerror(errno));
-		return -1;
-	}
-	return 0;
-}
-
 void
 send_string_request(int fd, u_int id, u_int code, const char *s,
     u_int len)
@@ -130,99 +101,11 @@ send_string_attrs_request(int fd, u_int id, u_int code, char *s,
 }
 #endif
 
-u_int
-get_status(int fd, u_int expected_id)
-{
-	Buffer msg;
-	u_int type, id, status;
-
-	buffer_init(&msg);
-	if (get_msg(fd, &msg) != 0)
-		return 255;
-	type = buffer_get_char(&msg);
-	id = buffer_get_int(&msg);
-
-	if (id != expected_id)
-	{
-		logit("ID mismatch (%u != %u)", id, expected_id);
-		return 255;
-	}
-	if (type != SSH2_FXP_STATUS)
-	{
-		logit("Expected SSH2_FXP_STATUS(%u) packet, got %u",
-		    SSH2_FXP_STATUS, type);
-		return 255;
-	}
-
-	status = buffer_get_int(&msg);
-	buffer_free(&msg);
-
-	debug3("SSH2_FXP_STATUS %u", status);
-
-	return(status);
-}
-
-char *
-get_handle(int fd, u_int expected_id, u_int *len, int *ret_status)
-{
-	Buffer msg;
-	u_int type, id;
-	char *handle;
-
-	buffer_init(&msg);
-	get_msg(fd, &msg);
-	type = buffer_get_char(&msg);
-	id = buffer_get_int(&msg);
-
-	if (id != expected_id)
-		fatal("ID mismatch (%u != %u)", id, expected_id);
-	if (type == SSH2_FXP_STATUS) {
-		int status = buffer_get_int(&msg);
-
-		error("Couldn't get handle: %s", fx2txt(status));
-		if (ret_status)
-			*ret_status = status;
-		buffer_free(&msg);
-		return(NULL);
-	} else if (type != SSH2_FXP_HANDLE)
-		fatal("Expected SSH2_FXP_HANDLE(%u) packet, got %u",
-		    SSH2_FXP_HANDLE, type);
-
-	handle = buffer_get_string(&msg, len);
-	buffer_free(&msg);
-
-	return(handle);
-}
-
 
 u_int
 sftp_proto_version(struct sftp_conn *conn)
 {
 	return(conn->version);
-}
-
-int
-do_close(struct sftp_conn *conn, char *handle, u_int handle_len)
-{
-	u_int id, status;
-	Buffer msg;
-
-	buffer_init(&msg);
-
-	id = conn->msg_id++;
-	buffer_put_char(&msg, SSH2_FXP_CLOSE);
-	buffer_put_int(&msg, id);
-	buffer_put_string(&msg, handle, handle_len);
-	send_msg(conn->fd_out, &msg);
-	debug3("Sent message SSH2_FXP_CLOSE I:%u", id);
-
-	status = get_status(conn->fd_in, id);
-	if (status != SSH2_FX_OK)
-		error("Couldn't close file: %s", fx2txt(status));
-
-	buffer_free(&msg);
-
-	return(status);
 }
 
 #if 0

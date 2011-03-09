@@ -10,6 +10,7 @@
 
 #include "log.h"
 #include "xmalloc.h"
+#include "atomicio.h"
 
 @implementation SFTPDirectoryEntry
 @synthesize filename;
@@ -48,6 +49,264 @@ size_t num_requests = 64;
 @synthesize host;
 @synthesize user;
 @synthesize home;
+
+- (BOOL)fail:(NSError **)outError with:(NSString *)fmt, ...
+{
+	if (outError) {
+		va_list ap;
+		va_start(ap, fmt);
+		*outError = [ViError errorWithObject:[[NSString alloc] initWithFormat:fmt arguments:ap]];
+		va_end(ap);
+	}
+	[self close];
+	return NO;
+}
+
+- (BOOL)readInt:(u_int *)ret from:(Buffer *)msg error:(NSError **)outError
+{
+	if (buffer_get_int_ret(ret, msg) == -1)
+		return [self fail:outError with:@"Read failure (%s)", strerror(errno)];
+	return YES;
+}
+
+- (BOOL)readInt64:(u_int64_t *)ret from:(Buffer *)msg error:(NSError **)outError
+{
+	if (buffer_get_int64_ret(ret, msg) == -1)
+		return [self fail:outError with:@"Read failure (%s)", strerror(errno)];
+	return YES;
+}
+
+- (BOOL)readChar:(char *)ret from:(Buffer *)msg error:(NSError **)outError
+{
+	if (buffer_get_char_ret(ret, msg) == -1)
+		return [self fail:outError with:@"Read failure (%s)", strerror(errno)];
+	return YES;
+}
+
+/*
+ * Returns an arbitrary binary string from the buffer.  The string cannot
+ * be longer than 256k.  The returned value points to memory allocated
+ * with xmalloc; it is the responsibility of the calling function to free
+ * the data.  If length_ptr is non-NULL, the length of the returned data
+ * will be stored there.  A null character will be automatically appended
+ * to the returned string, and is not counted in length.
+ */
+- (BOOL)readString:(char **)stringRet
+            length:(u_int *)lengthRet
+              from:(Buffer *)msg
+             error:(NSError **)outError
+{
+	char *value;
+	u_int len;
+
+	/* Get the length. */
+	if (![self readInt:&len from:msg error:outError])
+		return NO;
+	if (len > 256 * 1024)
+		return [self fail:outError with:@"bad string length %u", len];
+
+	/* Allocate space for the string.  Add one byte for a null character. */
+	value = xmalloc(len + 1);
+	/* Get the string. */
+	if (buffer_get_ret(msg, value, len) == -1) {
+		xfree(value);
+		return [self fail:outError with:@"buffer_get failed"];
+	}
+	/* Append a null character to make processing easier. */
+	value[len] = '\0';
+	/* Optionally return the length of the string. */
+	if (lengthRet)
+		*lengthRet = len;
+	*stringRet = value;
+	return YES;
+}
+
+- (BOOL)readMsg:(Buffer *)m on:(int)fd error:(NSError **)outError
+{
+	u_int msg_len;
+
+	buffer_append_space(m, 4);
+	if (atomicio(read, fd, buffer_ptr(m), 4) != 4) {
+		if (errno == EPIPE)
+			return [self fail:outError with:@"Connection closed"];
+		return [self fail:outError with:@"Couldn't read packet: %s", strerror(errno)];
+	}
+
+	if (![self readInt:&msg_len from:m error:outError])
+		return NO;
+	if (msg_len > SFTP_MAX_MSG_LENGTH)
+		return [self fail:outError with:@"Received message too long: %u", msg_len];
+
+	buffer_append_space(m, msg_len);
+	if (atomicio(read, fd, buffer_ptr(m), msg_len) != msg_len) {
+		if (errno == EPIPE)
+			return [self fail:outError with:@"Connection closed"];
+		return [self fail:outError with:@"Couldn't read packet: %s", strerror(errno)];
+	}
+
+	return YES;
+}
+
+- (BOOL)readStatus:(u_int *)ret
+                on:(int)fd
+       expectingID:(u_int)expected_id
+             error:(NSError **)outError
+{
+	Buffer msg;
+	char type;
+	u_int req_id;
+
+	buffer_init(&msg);
+	if (![self readMsg:&msg on:fd error:outError] ||
+	    ![self readChar:&type from:&msg error:outError] ||
+	    ![self readInt:&req_id from:&msg error:outError]) {
+		buffer_free(&msg);
+		return NO;
+	}
+
+	if (req_id != expected_id) {
+		buffer_free(&msg);
+		return [self fail:outError with:@"ID mismatch (%u != %u)", req_id, expected_id];
+	}
+
+	if (type != SSH2_FXP_STATUS) {
+		buffer_free(&msg);
+		return [self fail:outError with:@"Expected SSH2_FXP_STATUS(%u) packet, got %u",
+		    SSH2_FXP_STATUS, type];
+	}
+
+	if (![self readInt:ret from:&msg error:outError]) {
+		buffer_free(&msg);
+		return NO;
+	}
+
+	buffer_free(&msg);
+	DEBUG("SSH2_FXP_STATUS %u", *ret);
+
+	return YES;
+}
+
+- (BOOL)getHandle:(char **)handleRet
+           length:(u_int *)lenRet
+               on:(int)fd
+      expectingID:(u_int)expected_id
+            error:(NSError **)outError
+{
+	Buffer msg;
+	char type;
+	u_int req_id;
+
+	buffer_init(&msg);
+	if (![self readMsg:&msg on:fd error:outError] ||
+	    ![self readChar:&type from:&msg error:outError] ||
+	    ![self readInt:&req_id from:&msg error:outError])
+		return NO;
+
+	if (req_id != expected_id) {
+		buffer_free(&msg);
+		return [self fail:outError with:@"ID mismatch (%u != %u)", req_id, expected_id];
+	}
+
+	if (type == SSH2_FXP_STATUS) {
+		u_int status;
+		if (![self readInt:&status from:&msg error:outError]) {
+			buffer_free(&msg);
+			return NO;
+		}
+
+		buffer_free(&msg);
+		return [self fail:outError with:@"Couldn't get handle: %s", fx2txt(status)];
+	} else if (type != SSH2_FXP_HANDLE) {
+		buffer_free(&msg);
+		return [self fail:outError with:@"Expected SSH2_FXP_HANDLE(%u) packet, got %u",
+			    SSH2_FXP_HANDLE, type];
+	}
+
+	if (![self readString:handleRet length:lenRet from:&msg error:outError]) {
+		buffer_free(&msg);
+		return NO;
+	}
+	buffer_free(&msg);
+
+	return YES;
+}
+
+- (BOOL)closeHandle:(char *)handle
+             length:(u_int)handle_len
+              error:(NSError **)outError
+{
+	u_int req_id, status;
+	Buffer msg;
+
+	buffer_init(&msg);
+
+	req_id = conn->msg_id++;
+	buffer_put_char(&msg, SSH2_FXP_CLOSE);
+	buffer_put_int(&msg, req_id);
+	buffer_put_string(&msg, handle, handle_len);
+	send_msg(conn->fd_out, &msg);
+	DEBUG("Sent message SSH2_FXP_CLOSE I:%u", req_id);
+
+	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError]) {
+		buffer_free(&msg);
+		return NO;
+	}
+
+	if (status != SSH2_FX_OK) {
+		buffer_free(&msg);
+		return [self fail:outError with:@"Couldn't close file: %s", fx2txt(status)];
+	}
+
+	buffer_free(&msg);
+	return YES;
+}
+
+/* Decode attributes in buffer */
+- (BOOL)readAttributes:(Attrib *)a
+                  from:(Buffer *)b
+                 error:(NSError **)outError
+{
+	attrib_clear(a);
+	if (![self readInt:&a->flags from:b error:outError])
+		return NO;
+	if (a->flags & SSH2_FILEXFER_ATTR_SIZE) {
+		if (![self readInt64:&a->size from:b error:outError])
+			return NO;
+	}
+	if (a->flags & SSH2_FILEXFER_ATTR_UIDGID) {
+		if (![self readInt:&a->uid from:b error:outError] ||
+		    ![self readInt:&a->gid from:b error:outError])
+			return NO;
+	}
+	if (a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) {
+		if (![self readInt:&a->perm from:b error:outError])
+			return NO;
+	}
+	if (a->flags & SSH2_FILEXFER_ATTR_ACMODTIME) {
+		if (![self readInt:&a->atime from:b error:outError] ||
+		    ![self readInt:&a->mtime from:b error:outError])
+			return NO;
+	}
+
+	/* vendor-specific extensions */
+	if (a->flags & SSH2_FILEXFER_ATTR_EXTENDED) {
+		char *type, *data;
+		u_int i, count;
+
+		if (![self readInt:&count from:b error:outError])
+			return NO;
+		for (i = 0; i < count; i++) {
+			if (![self readString:&type length:NULL from:b error:outError] ||
+			    ![self readString:&data length:NULL from:b error:outError])
+				return NO;
+			debug3("Got file attribute \"%s\"", type);
+			xfree(type);
+			xfree(data);
+		}
+	}
+
+	return YES;
+}
 
 - (void)readStandardError:(NSNotification *)notification
 {
@@ -140,8 +399,9 @@ size_t num_requests = 64;
 
 - (struct sftp_conn *)initConnectionError:(NSError **)outError
 {
-	u_int type, exts = 0;
-	int version;
+	char type;
+	u_int exts = 0;
+	u_int version;
 	Buffer msg;
 	struct sftp_conn *ret;
 
@@ -152,24 +412,40 @@ size_t num_requests = 64;
 
 	buffer_clear(&msg);
 
-	if (get_msg(fd_in, &msg) != 0)
-		return NULL;
-
-	/* Expecting a VERSION reply */
-	if ((type = buffer_get_char(&msg)) != SSH2_FXP_VERSION) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
+	if (![self readMsg:&msg on:fd_in error:outError] ||
+	    ![self readChar:&type from:&msg error:outError]) {
 		buffer_free(&msg);
 		return(NULL);
 	}
-	version = buffer_get_int(&msg);
+
+	/* Expecting a VERSION reply */
+	if (type != SSH2_FXP_VERSION) {
+		if (outError)
+			*outError = [ViError errorWithFormat:
+			    @"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
+		buffer_free(&msg);
+		[self close];
+		return(NULL);
+	}
+
+	if (![self readInt:&version from:&msg error:outError]) {
+		buffer_free(&msg);
+		return(NULL);
+	}
 
 	DEBUG(@"Remote version: %d", version);
 
 	/* Check for extensions */
 	while (buffer_len(&msg) > 0) {
-		char *name = buffer_get_string(&msg, NULL);
-		char *value = buffer_get_string(&msg, NULL);
+		char *name;
+		char *value;
+
+		if (![self readString:&name length:NULL from:&msg error:outError] ||
+		    ![self readString:&value length:NULL from:&msg error:outError]) {
+			buffer_free(&msg);
+			return NULL;
+		}
+
 		int known = 0;
 
 		if (strcmp(name, "posix-rename@openssh.com") == 0 && strcmp(value, "1") == 0) {
@@ -213,39 +489,52 @@ size_t num_requests = 64;
 - (Attrib *)decodeStatRequest:(u_int)expected_id error:(NSError **)outError
 {
 	Buffer msg;
-	u_int type, req_id;
-	Attrib *a;
+	char type;
+	u_int req_id;
+	static Attrib a;
 
 	buffer_init(&msg);
-	get_msg(conn->fd_in, &msg);
 
-	type = buffer_get_char(&msg);
-	req_id = buffer_get_int(&msg);
+	if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+	    ![self readChar:&type from:&msg error:outError] ||
+	    ![self readInt:&req_id from:&msg error:outError]) {
+		buffer_free(&msg);
+		return (NULL);
+	}
 
 	DEBUG(@"Received stat reply T:%u I:%u", type, req_id);
 	if (req_id != expected_id) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id];
+		buffer_free(&msg);
 		[self close];
 		return NULL;
 	}
 
 	if (type == SSH2_FXP_STATUS) {
-		int status = buffer_get_int(&msg);
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Couldn't stat remote file: %s", fx2txt(status)];
+		u_int status = 0;
+		if ([self readInt:&status from:&msg error:outError]) {
+			if (outError)
+				*outError = [ViError errorWithFormat:
+				    @"Couldn't stat remote file: %s",
+				    fx2txt(status)];
+		}
 		buffer_free(&msg);
 		return NULL;
 	} else if (type != SSH2_FXP_ATTRS) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u", SSH2_FXP_ATTRS, type];
-		[self close];
+		buffer_free(&msg);
+		[self fail:outError with:@"Expected SSH2_FXP_ATTRS(%u) packet, got %u",
+		    SSH2_FXP_ATTRS, type];
 		return NULL;
 	}
-	a = decode_attrib(&msg);
-	buffer_free(&msg);
+	
+	if (![self readAttributes:&a from:&msg error:outError]) {
+		buffer_free(&msg);
+		return NULL;
+	}
 
-	return a;
+	buffer_free(&msg);
+	return &a;
 }
 
 - (Attrib *)stat:(NSString *)path error:(NSError **)outError
@@ -298,7 +587,8 @@ size_t num_requests = 64;
 - (NSArray *)readDirectory:(NSString *)pathS error:(NSError **)outError
 {
 	Buffer msg;
-	u_int count, type, msgid, handle_len, i, expected_id;
+	char type;
+	u_int count, msgid, handle_len, i, expected_id;
 	char *handle;
 
 	if (pathS == nil || [pathS isEqualToString:@""]) {
@@ -307,6 +597,9 @@ size_t num_requests = 64;
 	}
 
 	const char *path = [pathS UTF8String];
+	if (path == NULL)
+		return nil;
+
 	NSMutableArray *entries = [[NSMutableArray alloc] init];
 
 	msgid = conn->msg_id++;
@@ -319,9 +612,8 @@ size_t num_requests = 64;
 
 	buffer_clear(&msg);
 
-	handle = get_handle(conn->fd_in, msgid, &handle_len, NULL);
-	if (handle == NULL)
-		return nil;
+	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:msgid error:outError])
+		return NO;
 
 	for (;;) {
 		msgid = expected_id = conn->msg_id++;
@@ -336,10 +628,12 @@ size_t num_requests = 64;
 
 		buffer_clear(&msg);
 
-		get_msg(conn->fd_in, &msg);
-
-		type = buffer_get_char(&msg);
-		msgid = buffer_get_int(&msg);
+		if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+		    ![self readChar:&type from:&msg error:outError] ||
+		    ![self readInt:&msgid from:&msg error:outError]) {
+			buffer_free(&msg);
+			return nil;
+		}
 
 		DEBUG(@"Received reply T:%u I:%u", type, msgid);
 
@@ -350,7 +644,12 @@ size_t num_requests = 64;
 		}
 
 		if (type == SSH2_FXP_STATUS) {
-			int status = buffer_get_int(&msg);
+			u_int status = 0;
+			if (![self readInt:&status from:&msg error:outError]) {
+				buffer_free(&msg);
+				xfree(handle);
+				return nil;
+			}
 
 			DEBUG(@"Received SSH2_FXP_STATUS %d", status);
 
@@ -358,28 +657,39 @@ size_t num_requests = 64;
 				break;
 			} else {
 				if (outError)
-					*outError = [ViError errorWithFormat:@"Couldn't read directory: %s", fx2txt(status)];
-				do_close(conn, handle, handle_len);
+					*outError = [ViError errorWithFormat:
+					    @"Couldn't read directory: %s", fx2txt(status)];
+				[self closeHandle:handle length:handle_len error:outError];
+				/* error ignored */
 				xfree(handle);
 				return nil;
 			}
 		} else if (type != SSH2_FXP_NAME) {
 			if (outError)
-				*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_NAME(%u) packet, got %u", SSH2_FXP_NAME, type];
+				*outError = [ViError errorWithFormat:
+				    @"Expected SSH2_FXP_NAME(%u) packet, got %u",
+				    SSH2_FXP_NAME, type];
+			buffer_free(&msg);
 			return nil;
 		}
 
-		count = buffer_get_int(&msg);
+		if (![self readInt:&count from:&msg error:outError]) {
+			buffer_free(&msg);
+			return nil;
+		}
 		if (count == 0)
 			break;
 		DEBUG(@"Received %d SSH2_FXP_NAME responses", count);
 		for (i = 0; i < count; i++) {
 			char *filename, *longname;
-			Attrib *a;
+			Attrib a;
 
-			filename = buffer_get_string(&msg, NULL);
-			longname = buffer_get_string(&msg, NULL);
-			a = decode_attrib(&msg);
+			if (![self readString:&filename length:NULL from:&msg error:outError] ||
+			    ![self readString:&longname length:NULL from:&msg error:outError] ||
+			    ![self readAttributes:&a from:&msg error:outError]) {
+				buffer_free(&msg);
+				return nil;
+			}
 
 			/*
 			 * Directory entries should never contain '/'
@@ -389,7 +699,7 @@ size_t num_requests = 64;
 			if (strchr(filename, '/') != NULL) {
 				INFO(@"Server sent suspect path \"%s\" during readdir of \"%s\"", filename, path);
 			} else {
-				SFTPDirectoryEntry *ent = [[SFTPDirectoryEntry alloc] initWithFilename:filename attributes:a];
+				SFTPDirectoryEntry *ent = [[SFTPDirectoryEntry alloc] initWithFilename:filename attributes:&a];
 				[entries addObject:ent];
 			}
 
@@ -399,9 +709,13 @@ size_t num_requests = 64;
 	}
 
 	buffer_free(&msg);
-	do_close(conn, handle, handle_len);
-	xfree(handle);
 
+	if (![self closeHandle:handle length:handle_len error:outError]) {
+		xfree(handle);
+		return nil;
+	}
+
+	xfree(handle);
 	return entries;
 }
 
@@ -424,8 +738,10 @@ size_t num_requests = 64;
 
 - (NSString *)realpath:(NSString *)pathS error:(NSError **)outError
 {
+	Attrib a;
 	Buffer msg;
-	u_int type, expected_id, count, msgid;
+	char type;
+	u_int expected_id, count, msgid;
 	char *filename, *longname;
 
 	const char *path = [pathS UTF8String];
@@ -436,42 +752,61 @@ size_t num_requests = 64;
 
 	buffer_init(&msg);
 
-	if (get_msg(conn->fd_in, &msg) != 0)
-		return NULL;
-	type = buffer_get_char(&msg);
-	msgid = buffer_get_int(&msg);
+	if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+	    ![self readChar:&type from:&msg error:outError] ||
+	    ![self readInt:&msgid from:&msg error:outError]) {
+		buffer_free(&msg);
+		return nil;
+	}
 
 	if (msgid != expected_id) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
-		return NULL;
+			*outError = [ViError errorWithFormat:
+			    @"ID mismatch (%u != %u)", msgid, expected_id];
+		[self close];
+		return nil;
 	}
 
 	if (type == SSH2_FXP_STATUS) {
-		u_int status = buffer_get_int(&msg);
+		u_int status;
+		if (![self readInt:&status from:&msg error:outError])
+			return nil;
 
-		error("Couldn't canonicalise: %s", fx2txt(status));
-		return(NULL);
+		if (outError)
+			*outError = [ViError errorWithFormat:
+			    @"Couldn't canonicalise: %s", fx2txt(status)];
+		return nil;
 	} else if (type != SSH2_FXP_NAME) {
-		logit("Expected SSH2_FXP_NAME(%u) packet, got %u",
-		    SSH2_FXP_NAME, type);
-		return NULL;
+		if (outError)
+			*outError = [ViError errorWithFormat:
+			    @"Expected SSH2_FXP_NAME(%u) packet, got %u",
+			    SSH2_FXP_NAME, type];
+		[self close];
+		return nil;
 	}
 
-	count = buffer_get_int(&msg);
+	if (![self readInt:&count from:&msg error:outError]) {
+		buffer_free(&msg);
+		return nil;
+	}
 	if (count != 1) {
-		logit("Got multiple names (%d) from SSH_FXP_REALPATH", count);
-		return NULL;
+		if (outError)
+			*outError = [ViError errorWithFormat:
+			    @"Got multiple names (%d) from SSH_FXP_REALPATH", count];
+		buffer_free(&msg);
+		return nil;
 	}
 
-	filename = buffer_get_string(&msg, NULL);
-	longname = buffer_get_string(&msg, NULL);
-	decode_attrib(&msg);
+	if (![self readString:&filename length:NULL from:&msg error:outError] ||
+	    ![self readString:&longname length:NULL from:&msg error:outError] ||
+	    ![self readAttributes:&a from:&msg error:outError]) {
+		buffer_free(&msg);
+		return nil;
+	}
 
 	DEBUG(@"SSH_FXP_REALPATH %@ -> %s", pathS, filename);
 
 	xfree(longname);
-
 	buffer_free(&msg);
 
 	return [NSString stringWithCString:filename encoding:NSUTF8StringEncoding]; // XXX: encoding?
@@ -500,19 +835,24 @@ size_t num_requests = 64;
 	return fd_in == -1;
 }
 
+/* FIXME: leaks the 'requests' list on error paths
+ */
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError
 {
 	NSMutableData *output = [NSMutableData data];
 
 	const char *remote_path = [path UTF8String];
+	if (remote_path == NULL)
+		return nil;
 
 	Attrib junk, *a;
 	Buffer msg;
 	char *handle;
-	int status = 0;
+	u_int status = 0;
 	int read_error;
 	u_int64_t offset, size;
-	u_int handle_len, type, req_id, buflen, num_req, max_req;
+	char type;
+	u_int handle_len, req_id, buflen, num_req, max_req;
 	struct request {
 		u_int req_id;
 		u_int len;
@@ -557,11 +897,8 @@ size_t num_requests = 64;
 	send_msg(conn->fd_out, &msg);
 	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
 
-	handle = get_handle(conn->fd_in, req_id, &handle_len, &status);
-	if (handle == NULL) {
+	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:req_id error:outError]) {
 		buffer_free(&msg);
-		if (outError)
-			*outError = [ViError errorWithFormat:@"%s", fx2txt(status)];
 		return nil;
 	}
 
@@ -591,9 +928,14 @@ size_t num_requests = 64;
 		}
 
 		buffer_clear(&msg);
-		get_msg(conn->fd_in, &msg);
-		type = buffer_get_char(&msg);
-		req_id = buffer_get_int(&msg);
+
+		if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+		    ![self readChar:&type from:&msg error:outError] ||
+		    ![self readInt:&req_id from:&msg error:outError]) {
+			buffer_free(&msg);
+			return nil;
+		}
+
 		DEBUG(@"Received reply T:%u I:%u R:%d", type, req_id, max_req);
 
 		/* Find the request in our queue */
@@ -603,14 +945,18 @@ size_t num_requests = 64;
 			;
 		if (req == NULL) {
 			if (outError)
-				*outError = [ViError errorWithFormat:@"Unexpected reply %u", req_id];
+				*outError = [ViError errorWithFormat:
+				    @"Unexpected reply %u", req_id];
 			[self close];
 			return nil;
 		}
 
 		switch (type) {
 		case SSH2_FXP_STATUS:
-			status = buffer_get_int(&msg);
+			if (![self readInt:&status from:&msg error:outError]) {
+				buffer_free(&msg);
+				return nil;
+			}
 			if (status != SSH2_FX_EOF)
 				read_error = 1;
 			max_req = 0;
@@ -619,13 +965,17 @@ size_t num_requests = 64;
 			num_req--;
 			break;
 		case SSH2_FXP_DATA:
-			data = buffer_get_string(&msg, &len);
+			if (![self readString:&data length:&len from:&msg error:outError]) {
+				buffer_free(&msg);
+				return nil;
+			}
 			DEBUG(@"Received data %llu -> %llu",
 			    (unsigned long long)req->offset,
 			    (unsigned long long)req->offset + len - 1);
 			if (len > req->len) {
 				if (outError)
-					*outError = [ViError errorWithFormat:@"Received more data than asked for %u > %u", len, req->len];
+					*outError = [ViError errorWithFormat:
+					    @"Received more data than asked for %u > %u", len, req->len];
 				[self close];
 				return nil;
 			}
@@ -667,7 +1017,9 @@ size_t num_requests = 64;
 			break;
 		default:
 			if (outError)
-				*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_DATA(%u) packet, got %u", SSH2_FXP_DATA, type];
+				*outError = [ViError errorWithFormat:
+				    @"Expected SSH2_FXP_DATA(%u) packet, got %u",
+				    SSH2_FXP_DATA, type];
 			[self close];
 			return nil;
 		}
@@ -683,13 +1035,12 @@ size_t num_requests = 64;
 
 	if (read_error) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"Couldn't read from remote file \"%@\" : %s", path, fx2txt(status)];
-		do_close(conn, handle, handle_len);
-	} else {
-		status = do_close(conn, handle, handle_len);
-		if (status != SSH2_FX_OK && outError)
-			*outError = [ViError errorWithFormat:@"Couldn't properly close file \"%@\" : %s", path, fx2txt(status)];
+			*outError = [ViError errorWithFormat:
+			    @"Couldn't read from remote file \"%@\" : %s",
+			    path, fx2txt(status)];
 	}
+
+	[self closeHandle:handle length:handle_len error:outError];
 
 	buffer_free(&msg);
 	xfree(handle);
@@ -712,13 +1063,21 @@ size_t num_requests = 64;
 	return remote_temp_path;
 }
 
-- (BOOL)uploadData:(NSData *)data toFile:(NSString *)path withAttributes:(Attrib *)remote_attribs error:(NSError **)outError
+- (BOOL)uploadData:(NSData *)data
+            toFile:(NSString *)path
+    withAttributes:(Attrib *)remote_attribs
+             error:(NSError **)outError
 {
 	NSUInteger dataOffset = 0;
 	const void *bytes;
 
-	int status = SSH2_FX_OK;
-	u_int handle_len, req_id, type;
+	const char *remote_path = [path fileSystemRepresentation];
+	if (remote_path == NULL)
+		return NO;
+
+	u_int status = SSH2_FX_OK;
+	char type;
+	u_int handle_len, req_id;
 	off_t offset;
 	char *handle;
 	Buffer msg;
@@ -752,7 +1111,7 @@ size_t num_requests = 64;
 	req_id = conn->msg_id++;
 	buffer_put_char(&msg, SSH2_FXP_OPEN);
 	buffer_put_int(&msg, req_id);
-	buffer_put_cstring(&msg, [path fileSystemRepresentation]);
+	buffer_put_cstring(&msg, remote_path);
 	buffer_put_int(&msg, SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_TRUNC);
 	encode_attrib(&msg, remote_attribs);
 	send_msg(conn->fd_out, &msg);
@@ -760,11 +1119,8 @@ size_t num_requests = 64;
 
 	buffer_clear(&msg);
 
-	handle = get_handle(conn->fd_in, req_id, &handle_len, &status);
-	if (handle == NULL) {
+	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:req_id error:outError]) {
 		buffer_free(&msg);
-		if (outError)
-			*outError = [ViError errorWithFormat:@"%s", fx2txt(status)];
 		return NO;
 	}
 
@@ -820,17 +1176,25 @@ size_t num_requests = 64;
 			u_int r_id;
 
 			buffer_clear(&msg);
-			get_msg(conn->fd_in, &msg);
-			type = buffer_get_char(&msg);
-			r_id = buffer_get_int(&msg);
+			if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+			    ![self readChar:&type from:&msg error:outError] ||
+			    ![self readInt:&r_id from:&msg error:outError]) {
+				buffer_free(&msg);
+				return NO;
+			}
 
 			if (type != SSH2_FXP_STATUS) {
 				if (outError)
-					*outError = [ViError errorWithFormat:@"Expected SSH2_FXP_STATUS(%d) packet, got %d", SSH2_FXP_STATUS, type];
+					*outError = [ViError errorWithFormat:
+					    @"Expected SSH2_FXP_STATUS(%d) packet, got %d",
+					    SSH2_FXP_STATUS, type];
 				goto fail;
 			}
 
-			status = buffer_get_int(&msg);
+			if (![self readInt:&status from:&msg error:outError]) {
+				buffer_free(&msg);
+				return NO;
+			}
 			DEBUG(@"SSH2_FXP_STATUS %d", status);
 
 			/* Find the request in our queue */
@@ -840,7 +1204,8 @@ size_t num_requests = 64;
 				;
 			if (ack == NULL) {
 				if (outError)
-					*outError = [ViError errorWithFormat:@"Can't find request for ID %u", r_id];
+					*outError = [ViError errorWithFormat:
+					    @"Can't find request for ID %u", r_id];
 				goto fail;
 			}
 			TAILQ_REMOVE(&acks, ack, tq);
@@ -860,7 +1225,9 @@ size_t num_requests = 64;
 
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"Couldn't write to remote file \"%@\": %s", path, fx2txt(status)];
+			*outError = [ViError errorWithFormat:
+			    @"Couldn't write to remote file \"%@\": %s",
+			    path, fx2txt(status)];
 		goto fail;
 	}
 
@@ -869,11 +1236,9 @@ size_t num_requests = 64;
 fail:
 	status = -1;
 done:
-	if (do_close(conn, handle, handle_len) != SSH2_FX_OK) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Failed to close file."];
+	if (![self closeHandle:handle length:handle_len error:outError])
 		status = -1;
-	}
+
 	xfree(handle);
 
 	return status == 0 ? YES : NO;
@@ -889,19 +1254,29 @@ done:
 
 	req_id = conn->msg_id++;
 	send_string_request(conn->fd_out, req_id, SSH2_FXP_REMOVE, utf8path, strlen(utf8path));
-	status = get_status(conn->fd_in, req_id);
+	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+		return NO;
+
 	if (status != SSH2_FX_OK) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"Couldn't delete file: %s", fx2txt(status)];
+			*outError = [ViError errorWithFormat:
+			    @"Couldn't delete file: %s", fx2txt(status)];
 		return NO;
 	}
 	return YES;
 }
 
-- (BOOL)renameItemAtPath:(NSString *)oldPath toPath:(NSString *)newPath error:(NSError **)outError
+- (BOOL)renameItemAtPath:(NSString *)oldPath
+                  toPath:(NSString *)newPath
+                   error:(NSError **)outError
 {
 	Buffer msg;
 	u_int status, req_id;
+
+	const char *old_path = [oldPath UTF8String];
+	const char *new_path = [newPath UTF8String];
+	if (old_path == NULL || new_path == NULL)
+		return NO;
 
 	buffer_init(&msg);
 
@@ -915,8 +1290,8 @@ done:
 		buffer_put_char(&msg, SSH2_FXP_RENAME);
 		buffer_put_int(&msg, req_id);
 	}
-	buffer_put_cstring(&msg, [oldPath UTF8String]);
-	buffer_put_cstring(&msg, [newPath UTF8String]);
+	buffer_put_cstring(&msg, old_path);
+	buffer_put_cstring(&msg, new_path);
 	send_msg(conn->fd_out, &msg);
 /*	DEBUG(@"Sent message %s \"%s\" -> \"%s\"",
 	    (conn->exts & SFTP_EXT_POSIX_RENAME) ? "posix-rename@openssh.com" :
@@ -924,7 +1299,8 @@ done:
  */
 	buffer_free(&msg);
 
-	status = get_status(conn->fd_in, req_id);
+	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+		return NO;
 	if (status != SSH2_FX_OK) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"Couldn't rename file \"%@\" to \"%@\": %s", oldPath, newPath, fx2txt(status)];

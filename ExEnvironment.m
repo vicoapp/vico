@@ -245,7 +245,9 @@
 /*
  * Returns YES if the key binding was handled.
  */
-- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
+- (BOOL)control:(NSControl *)sender
+       textView:(NSTextView *)textView
+doCommandBySelector:(SEL)aSelector
 {
 	if (sender == statusbar)
 	{
@@ -283,7 +285,8 @@
 		         aSelector == @selector(deleteForward:)) // ctrl-d
 		{
 			NSRange range;
-			NSString *filename = [self filenameInString:[statusbar stringValue] range:&range];
+			NSString *filename = [self filenameInString:[statusbar stringValue]
+							      range:&range];
 
 			NSURL *url = [self parseExFilename:filename];
 
@@ -294,23 +297,36 @@
 
 			NSArray *completions = nil;
 			NSString *completion = nil;
-			NSUInteger num = [self completePath:filename relativeToURL:url into:&completion matchesIntoArray:&completions];
+			NSUInteger num = [self completePath:filename
+					      relativeToURL:url
+						       into:&completion
+					   matchesIntoArray:&completions];
 
 			if (completion) {
 				NSMutableString *s = [[NSMutableString alloc] initWithString:[textView string]];
 				if ([url isFileURL])
-					[s replaceCharactersInRange:range withString:completion];
+					[s replaceCharactersInRange:range
+							 withString:completion];
 				else
-					[s replaceCharactersInRange:range withString:[[NSURL URLWithString:completion relativeToURL:url] absoluteString]];
+					[s replaceCharactersInRange:range
+							 withString:[[NSURL URLWithString:completion
+									    relativeToURL:url] absoluteString]];
 				[textView setString:s];
 			}
 
 			if (num == 1 && [completion hasSuffix:@"/"]) {
 				/* If only one directory match, show completions inside that directory. */
-				num = [self completePath:completion relativeToURL:url into:&completion matchesIntoArray:&completions];
+				[self completePath:completion
+				     relativeToURL:url
+					      into:&completion
+				  matchesIntoArray:&completions];
 			}
 
-			[projectDelegate displayCompletions:completions forPath:completion relativeToURL:url target:self action:@selector(finishCompletionURL:)];
+			[projectDelegate displayCompletions:completions
+						    forPath:completion
+					      relativeToURL:url
+						     target:self
+						     action:@selector(finishCompletionURL:)];
 
 			return YES;
 		}
@@ -394,7 +410,10 @@
 	[[window windowController] focusEditor];
 }
 
-- (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo
+- (void)getExCommandWithDelegate:(id)aDelegate
+			selector:(SEL)aSelector
+			  prompt:(NSString *)aPrompt
+		     contextInfo:(void *)contextInfo
 {
 	[messageField setHidden:YES];
 	[statusbar setHidden:NO];
@@ -409,7 +428,8 @@
 	[window makeFirstResponder:statusbar];
 }
 
-- (void)parseAndExecuteExCommand:(NSString *)exCommandString contextInfo:(void *)contextInfo
+- (void)parseAndExecuteExCommand:(NSString *)exCommandString
+		     contextInfo:(void *)contextInfo
 {
 	if ([exCommandString length] > 0) {
 		NSError *error = nil;
@@ -511,7 +531,8 @@
 	BOOL isDirectory = NO;
 	BOOL exists = NO;
 	if ([url isFileURL])
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory];
+		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]
+							      isDirectory:&isDirectory];
 	else {
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
 		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
@@ -527,10 +548,14 @@
 	}
 
 	ViDocument *doc;
+	NSDocumentController *docController = [NSDocumentController sharedDocumentController];
 	if (exists) {
-		doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:display error:&error];
+		doc = [docController openDocumentWithContentsOfURL:url
+							   display:display
+							     error:&error];
 	} else {
-		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:display error:&error];
+		doc = [docController openUntitledDocumentAndDisplay:display
+							      error:&error];
 		[doc setIsTemporary:YES];
 		[doc setFileURL:url];
 	}
@@ -600,22 +625,30 @@
 
 - (BOOL)ex_new:(ExCommand *)command
 {
-	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:nil] != nil;
+	return [self splitVertically:NO
+			     andOpen:command.filename
+		  orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
 {
-	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:nil] != nil;
+	return [self splitVertically:YES
+			     andOpen:command.filename
+		  orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_split:(ExCommand *)command
 {
-	return [self splitVertically:NO andOpen:command.filename orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [self splitVertically:NO
+			     andOpen:command.filename
+		  orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)ex_vsplit:(ExCommand *)command
 {
-	return [self splitVertically:YES andOpen:command.filename orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [self splitVertically:YES
+			     andOpen:command.filename
+		  orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange

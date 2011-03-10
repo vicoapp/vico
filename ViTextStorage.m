@@ -253,7 +253,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	lineCount--;
 }
 
-- (void)replaceLine:(NSUInteger)lineIndex withLength:(NSUInteger)length contentsEnd:(NSUInteger)eol
+- (void)replaceLine:(NSUInteger)lineIndex
+	 withLength:(NSUInteger)length
+	contentsEnd:(NSUInteger)eol
 {
 	struct skip	*skip;
 	struct line	*ln;
@@ -293,7 +295,10 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	if (aRange.length > 0) /* delete or replace */
 		/* Remove affected _whole_ lines. */
 		for (;;) {
-			[[self string] getLineStart:&bol end:&end contentsEnd:NULL forRange:NSMakeRange(location, 0)];
+			[[self string] getLineStart:&bol
+						end:&end
+					contentsEnd:NULL
+					   forRange:NSMakeRange(location, 0)];
 			if (end > NSMaxRange(aRange))
 				/* Line only partially affected, just update after modification. */
 				break;
@@ -312,10 +317,15 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	/* Update partially affected line. */
 	location = aRange.location;
 	if (lineIndex < lineCount) {
-		[[self string] getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+		[[self string] getLineStart:&bol
+					end:&end
+				contentsEnd:&eol
+				   forRange:NSMakeRange(location, 0)];
 		DEBUG(@"replace line %lu: has length %li at location %lu, end at %lu",
 		    lineIndex, end - bol, bol, end);
-		[self replaceLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
+		[self replaceLine:lineIndex
+		       withLength:end - bol
+		      contentsEnd:eol - bol];
 		location = end;
 		lineIndex++;
 		linesChanged++;
@@ -326,12 +336,17 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		NSUInteger endLocation = NSMaxRange(aRange) + diff;
 		DEBUG(@"location = %lu, endLocation = %lu", location, endLocation);
 		while (location < [self length]) {
-			[[self string] getLineStart:&bol end:&end contentsEnd:&eol forRange:NSMakeRange(location, 0)];
+			[[self string] getLineStart:&bol
+						end:&end
+					contentsEnd:&eol
+					   forRange:NSMakeRange(location, 0)];
 			if (bol > endLocation)
 				break;
 			DEBUG(@"insert line %lu: has length %li at location %lu, end at %lu",
 			    lineIndex, end - bol, bol, end);
-			[self insertLine:lineIndex withLength:end - bol contentsEnd:eol - bol];
+			[self insertLine:lineIndex
+			      withLength:end - bol
+			     contentsEnd:eol - bol];
 			location = end;
 			lineIndex++;
 			linesAdded++;

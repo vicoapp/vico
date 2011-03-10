@@ -25,7 +25,10 @@
 	if (rc == 3)
 		a = 255;
 
-	return [NSColor colorWithCalibratedRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:(float)a/255.0];
+	return [NSColor colorWithCalibratedRed:(float)r/255.0
+					 green:(float)g/255.0
+					  blue:(float)b/255.0
+					 alpha:(float)a/255.0];
 }
 
 + (void)normalizePreference:(NSDictionary *)preference
@@ -50,31 +53,39 @@
 	 */
 	if ((value = [settings objectForKey:@"foreground"]) != nil) {
 		if ((color = [self hashRGBToColor:value]) != nil)
-			[normalizedPreference setObject:color forKey:NSForegroundColorAttributeName];
+			[normalizedPreference setObject:color
+						 forKey:NSForegroundColorAttributeName];
 	}
 
 	if ((value = [settings objectForKey:@"background"]) != nil) {
 		if ((color = [self hashRGBToColor:value]) != nil)
-			[normalizedPreference setObject:color forKey:NSBackgroundColorAttributeName];
+			[normalizedPreference setObject:color
+						 forKey:NSBackgroundColorAttributeName];
 	}
 
 	if ((value = [settings objectForKey:@"fontStyle"]) != nil) {
 		if ([value rangeOfString:@"underline"].location != NSNotFound)
-			[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
+			[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
+						 forKey:NSUnderlineStyleAttributeName];
 		if ([value rangeOfString:@"italic"].location != NSNotFound)
-			[normalizedPreference setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
+			[normalizedPreference setObject:[NSNumber numberWithFloat:0.3]
+						 forKey:NSObliquenessAttributeName];
 		if ([value rangeOfString:@"bold"].location != NSNotFound)
-			[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
+			[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0]
+						 forKey:NSStrokeWidthAttributeName];
 	}
 
-	if ((value = [settings objectForKey:@"underline"]) != nil)
-		[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
+	if ([settings objectForKey:@"underline"] != nil)
+		[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
+					 forKey:NSUnderlineStyleAttributeName];
 
-	if ((value = [settings objectForKey:@"italic"]) != nil)
-		[normalizedPreference setObject:[NSNumber numberWithFloat:0.3] forKey:NSObliquenessAttributeName];
+	if ([settings objectForKey:@"italic"] != nil)
+		[normalizedPreference setObject:[NSNumber numberWithFloat:0.3]
+					 forKey:NSObliquenessAttributeName];
 
-	if ((value = [settings objectForKey:@"bold"]) != nil)
-		[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0] forKey:NSStrokeWidthAttributeName];
+	if ([settings objectForKey:@"bold"] != nil)
+		[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0]
+					 forKey:NSStrokeWidthAttributeName];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env

@@ -958,10 +958,6 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if (!has_undo_start_location) {
-		undo_start_location = start_location;
-		has_undo_start_location = YES;
-	}
 	if (start_location < eol) {
 		start_location += 1;
 		final_location = end_location = start_location;
@@ -975,11 +971,6 @@
 {
 	[self move_eol:command];
 	start_location = end_location;
-	if (!has_undo_start_location) {
-		/* This is not a motion command, so move_eol: moves after the last character. */
-		undo_start_location = IMAX(start_location - 1, 0);
-		has_undo_start_location = YES;
-	}
 	return [self append:command];
 }
 

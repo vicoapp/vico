@@ -587,7 +587,6 @@ int logIndent = 0;
 	if (hasUndoGroup) {
 		[undoManager endUndoGrouping];
 		hasUndoGroup = NO;
-		has_undo_start_location = NO;
 	}
 }
 
@@ -596,27 +595,29 @@ int logIndent = 0;
 	if (!hasUndoGroup) {
 		[undoManager beginUndoGrouping];
 		hasUndoGroup = YES;
-		if (!has_undo_start_location) {
-			has_undo_start_location = YES;
-			undo_start_location = [self caret];
-		}
 	}
 }
 
-- (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange caret:(NSUInteger)caretLocation
+- (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange
 {
 	DEBUG(@"undoing replacement of string %@ in range %@", aString, NSStringFromRange(aRange));
-	undo_start_location = aRange.location;
 	[self replaceCharactersInRange:aRange withString:aString undoGroup:NO];
-	final_location = caretLocation;
+	final_location = aRange.location;
+
+	NSUInteger bol, eol, end;
+	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:final_location];
+	INFO(@"final_location = %lu, eol = %lu, end = %lu, bol = %lu", final_location, eol, end, bol);
+	if (final_location >= eol && final_location > bol)
+		final_location = eol - 1;
 }
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
 	NSRange newRange = NSMakeRange(aRange.location, aLength);
 	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
-	DEBUG(@"pushing replacement of range %@ (string [%@]) with %@ onto undo stack", NSStringFromRange(aRange), s, NSStringFromRange(newRange));
-	[[undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange caret:undo_start_location];
+	DEBUG(@"pushing replacement of range %@ (string [%@]) with %@ onto undo stack",
+	    NSStringFromRange(aRange), s, NSStringFromRange(newRange));
+	[[undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange];
 	[undoManager setActionName:@"replace text"];
 }
 
@@ -651,7 +652,9 @@ int logIndent = 0;
 
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
-	end_location = [[self textStorage] locationForColumn:column fromLocation:aLocation acceptEOL:(mode == ViInsertMode)];
+	end_location = [[self textStorage] locationForColumn:column
+	                                        fromLocation:aLocation
+	                                           acceptEOL:(mode == ViInsertMode)];
 	final_location = end_location;
 }
 

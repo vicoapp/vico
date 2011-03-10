@@ -45,9 +45,6 @@
 	NSUInteger		 start_location, end_location, final_location;
 	NSUInteger		 modify_start_location;
 
-	NSUInteger		 undo_start_location;
-	BOOL			 has_undo_start_location;
-
 	NSRange			 snippetMatchRange;
 
 	NSUndoManager		*undoManager;

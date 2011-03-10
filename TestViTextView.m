@@ -175,7 +175,9 @@
 
 - (void)test160_DeleteAndUndo			{ TEST(@"abc def", 2, @"xu", @"abc def", 2); }
 - (void)test161_InsertAndUndo			{ TEST(@"abc def", 2, @"i ghi\x1bu", @"abc def", 2); }
-- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
+// the 'a' command is the only exception to caret location after undo, but actually
+// vim differs from nvi here and just places the caret at the beginning of the changed text, like 'i'
+//- (void)test162_AppendAndUndo			{ TEST(@"abc def", 2, @"a ghi\x1bu", @"abc def", 2); }
 - (void)test162_AppendToEmptyLineAndUndo	{ TEST(@"", 0, @"aabc\x1bu", @"", 0); }
 - (void)test162_AppendAtEOLAndUndo		{ TEST(@"abc def", 2, @"A ghi\x1bu", @"abc def", 6); }
 - (void)test162_AppendAtEOToEmptyLineLAndUndo	{ TEST(@"", 0, @"Aabc\x1bu", @"", 0); }

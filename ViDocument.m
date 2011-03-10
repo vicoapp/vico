@@ -84,6 +84,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super finalize];
 }
 
+- (NSDictionary *)proxyForJson
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+	    [self fileURL], @"fileURL",
+	    [[self language] name], @"language",
+	    nil];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
 		      ofObject:(id)object
 			change:(NSDictionary *)change

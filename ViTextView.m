@@ -903,28 +903,29 @@ int logIndent = 0;
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
-	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i",
+	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
 	    stillSelectingFlag ? "YES" : "NO",
 	    NSStringFromRange(firstRange),
 	    NSStringFromRange(lastRange),
-	    mode);
+	    mode,
+	    visual_start_location);
 
 	if ([ranges count] > 1 || firstRange.length > 0) {
 		if (mode != ViVisualMode) {
 			[self setVisualMode];
 			[self setCaret:firstRange.location];
 			visual_start_location = firstRange.location;
-		} else if (visual_start_location == firstRange.location)
-			[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
-		else
-			[self setCaret:firstRange.location];
+		} else if (stillSelectingFlag) {
+			if (visual_start_location == firstRange.location)
+				[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
+			else
+				[self setCaret:firstRange.location];
+		}
 	} else if (stillSelectingFlag) {
 		[self setNormalMode];
 		if (firstRange.location != [self caret])
 			[self setCaret:firstRange.location];
 	}
-
-	final_location = [self caret];
 }
 
 - (void)setVisualSelection

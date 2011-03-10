@@ -68,7 +68,7 @@ struct ex_address
 @interface ExCommand : NSObject
 {
 	struct ex_command *command;
-	unsigned naddr;
+	int naddr;
 	struct ex_address addr1;
 	BOOL addr2_relative_addr1; // true if semicolon used between addr1 and addr2
 	struct ex_address addr2;
@@ -97,7 +97,7 @@ struct ex_address
       intoAddress:(struct ex_address *)addr1
      otherAddress:(struct ex_address *)addr2;
 
-@property(readonly) unsigned naddr;
+@property(readonly) int naddr;
 @property(readonly) struct ex_address *addr1;
 @property(readonly) struct ex_address *addr2;
 @property(readonly) struct ex_address *line;

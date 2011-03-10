@@ -7,6 +7,10 @@
 	IBOutlet NSTextView *scriptOutput;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
+
+	BOOL evalFromShell;
+	NSString *lastEvalError;
+	NSConnection *shellConn;
 }
 
 @property(copy, readwrite) NSString *lastSearchPattern;

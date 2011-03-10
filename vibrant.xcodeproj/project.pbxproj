@@ -103,6 +103,9 @@
 		9A759E2E13222098009BA485 /* JSCocoaPrivateObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A759E2813222098009BA485 /* JSCocoaPrivateObject.m */; };
 		9A759EE013222103009BA485 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A759E1613222028009BA485 /* JavaScriptCore.framework */; };
 		9A75A04F132619E4009BA485 /* ViOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A75A04E132619E4009BA485 /* ViOutlineView.m */; };
+		9A766A85132787F4009CB17C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A766A84132787F4009CB17C /* QuartzCore.framework */; };
+		9A766B9C1327E099009CB17C /* vibe.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A766B9B1327E099009CB17C /* vibe.m */; };
+		9A766BB91327E3FF009CB17C /* vibe in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A766B951327E03B009CB17C /* vibe */; };
 		9A7AF1D10D9995EE00F08222 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7AF1CF0D9995EE00F08222 /* MainMenu.xib */; };
 		9A7B0E740D01601A00040CAC /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
 		9A8149191321269100F229FE /* ascii.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A8148F91321269100F229FE /* ascii.c */; };
@@ -250,6 +253,13 @@
 			remoteGlobalIDString = 9A2DE6A0131BB76900E8657A;
 			remoteInfo = lemon;
 		};
+		9A766BA21327E37A009CB17C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A766B941327E03B009CB17C;
+			remoteInfo = vibe;
+		};
 		9AF2FE8B0EC9C8CE00C5771B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -260,14 +270,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9A02771B125B102B00045B6E /* Copy Frameworks */ = {
+		9A766BAE1327E39C009CB17C /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 6;
 			files = (
+				9A766BB91327E3FF009CB17C /* vibe in CopyFiles */,
 			);
-			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -436,6 +446,9 @@
 		9A759E2813222098009BA485 /* JSCocoaPrivateObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaPrivateObject.m; path = jscocoa/JSCocoaPrivateObject.m; sourceTree = "<group>"; };
 		9A75A04D132619E4009BA485 /* ViOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViOutlineView.h; sourceTree = "<group>"; };
 		9A75A04E132619E4009BA485 /* ViOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViOutlineView.m; sourceTree = "<group>"; };
+		9A766A84132787F4009CB17C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		9A766B951327E03B009CB17C /* vibe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vibe; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A766B9B1327E099009CB17C /* vibe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vibe.m; sourceTree = "<group>"; };
 		9A7AF1D00D9995EE00F08222 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9A7B0E720D01601A00040CAC /* ViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTextView.m; sourceTree = "<group>"; };
 		9A7B0E730D01601A00040CAC /* ViTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTextView.h; sourceTree = "<group>"; };
@@ -608,10 +621,18 @@
 				9A759EE013222103009BA485 /* JavaScriptCore.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				9AB014C90ED608CE00905BED /* WebKit.framework in Frameworks */,
+				9A766A85132787F4009CB17C /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9A2DE69F131BB76900E8657A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A766B931327E03B009CB17C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -645,6 +666,7 @@
 				2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */,
 				13E42FBA07B3F13500E4EEF1 /* CoreData.framework */,
 				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
+				9A766A84132787F4009CB17C /* QuartzCore.framework */,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
@@ -655,6 +677,7 @@
 				8D15AC370486D014006FF6A4 /* Vibrant.app */,
 				9AF2FE700EC9C85900C5771B /* Tests.octest */,
 				9A2DE6A1131BB76900E8657A /* lemon */,
+				9A766B951327E03B009CB17C /* vibe */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -662,6 +685,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* vibrant */ = {
 			isa = PBXGroup;
 			children = (
+				9A766B9A1327E072009CB17C /* shell command */,
 				9A759E1513221FF9009BA485 /* jscocoa */,
 				9A947359131FBB2D0050AFD4 /* oniguruma */,
 				9A2DE69B131BB6D300E8657A /* lemon */,
@@ -1006,6 +1030,14 @@
 			name = "AppKit subclasses";
 			sourceTree = "<group>";
 		};
+		9A766B9A1327E072009CB17C /* shell command */ = {
+			isa = PBXGroup;
+			children = (
+				9A766B9B1327E099009CB17C /* vibe.m */,
+			);
+			name = "shell command";
+			sourceTree = "<group>";
+		};
 		9A8148F81321268100F229FE /* enc */ = {
 			isa = PBXGroup;
 			children = (
@@ -1171,12 +1203,13 @@
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
-				9A02771B125B102B00045B6E /* Copy Frameworks */,
+				9A766BAE1327E39C009CB17C /* CopyFiles */,
 			);
 			buildRules = (
 				9A2DE6CE131BBA2600E8657A /* PBXBuildRule */,
 			);
 			dependencies = (
+				9A766BA31327E37A009CB17C /* PBXTargetDependency */,
 				9A2DE6B5131BB83E00E8657A /* PBXTargetDependency */,
 			);
 			name = Vibrant;
@@ -1199,6 +1232,22 @@
 			name = lemon;
 			productName = lemon;
 			productReference = 9A2DE6A1131BB76900E8657A /* lemon */;
+			productType = "com.apple.product-type.tool";
+		};
+		9A766B941327E03B009CB17C /* vibe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A766B991327E05A009CB17C /* Build configuration list for PBXNativeTarget "vibe" */;
+			buildPhases = (
+				9A766B921327E03B009CB17C /* Sources */,
+				9A766B931327E03B009CB17C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vibe;
+			productName = vibe;
+			productReference = 9A766B951327E03B009CB17C /* vibe */;
 			productType = "com.apple.product-type.tool";
 		};
 		9AF2FE6F0EC9C85900C5771B /* Tests */ = {
@@ -1242,6 +1291,7 @@
 				9A2DE6A0131BB76900E8657A /* lemon */,
 				8D15AC270486D014006FF6A4 /* Vibrant */,
 				9AF2FE6F0EC9C85900C5771B /* Tests */,
+				9A766B941327E03B009CB17C /* vibe */,
 			);
 		};
 /* End PBXProject section */
@@ -1503,6 +1553,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A766B921327E03B009CB17C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A766B9C1327E099009CB17C /* vibe.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9AF2FE6C0EC9C85900C5771B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1523,6 +1581,11 @@
 			isa = PBXTargetDependency;
 			target = 9A2DE6A0131BB76900E8657A /* lemon */;
 			targetProxy = 9A2DE6B4131BB83E00E8657A /* PBXContainerItemProxy */;
+		};
+		9A766BA31327E37A009CB17C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A766B941327E03B009CB17C /* vibe */;
+			targetProxy = 9A766BA21327E37A009CB17C /* PBXContainerItemProxy */;
 		};
 		9AF2FE8C0EC9C8CE00C5771B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1623,6 +1686,52 @@
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = lemon;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		9A766B971327E03C009CB17C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = vibe;
+			};
+			name = Debug;
+		};
+		9A766B981327E03C009CB17C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = vibe;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1862,6 +1971,15 @@
 			buildConfigurations = (
 				9A2DE6A3131BB76900E8657A /* Debug */,
 				9A2DE6A4131BB76900E8657A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9A766B991327E05A009CB17C /* Build configuration list for PBXNativeTarget "vibe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A766B971327E03C009CB17C /* Debug */,
+				9A766B981327E03C009CB17C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

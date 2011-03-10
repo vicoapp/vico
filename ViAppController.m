@@ -8,6 +8,7 @@
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
 #import "jscocoa/JSCocoa.h"
+#import "json/JSON.h"
 
 @implementation ViAppController
 
@@ -138,13 +139,16 @@
 
 	[TMFileURLProtocol registerProtocol];
 	[TxmtURLProtocol registerProtocol];
+
+	shellConn = [NSConnection new];
+	[shellConn setRootObject:self];
+	[shellConn registerName:@"chunky bacon"];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
 		      ofObject:(id)object
 			change:(NSDictionary *)change
 		       context:(void *)context
-
 {
 	ViDocument *doc;
 
@@ -212,7 +216,13 @@ extern BOOL makeNewWindowInsteadOfTab;
    onLineNumber:(NSInteger)lineNumber
     atSourceURL:(id)url
 {
-	[self consoleOutput:[NSString stringWithFormat:@"Error on line %li: %@\n", lineNumber, error]];
+	if (evalFromShell) {
+		if (url)
+			lastEvalError = [NSString stringWithFormat:@"%@:%li: %@", url, lineNumber, error];
+		else
+			lastEvalError = [NSString stringWithFormat:@"%li: %@", lineNumber, error];
+	} else
+		[self consoleOutput:[NSString stringWithFormat:@"Error on line %li: %@\n", lineNumber, error]];
 }
 
 - (IBAction)evalScript:(id)sender
@@ -242,7 +252,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 	JSValueRef result = [jsc evalJSString:[scriptInput stringValue]];
 	if (result != NULL) {
 		id obj = [jsc toObject:result];
-		[self consoleOutput:[NSString stringWithFormat:@"%@\n", obj]];
+		[self consoleOutput:[NSString stringWithFormat:@"%@\n", [obj JSONRepresentation]]];
 	}
 }
 
@@ -250,6 +260,43 @@ extern BOOL makeNewWindowInsteadOfTab;
 {
 	NSTextStorage *ts = [scriptOutput textStorage];
 	[ts replaceCharactersInRange:NSMakeRange(0, [ts length]) withString:@""];
+}
+
+#pragma mark -
+#pragma mark Shell commands
+
+- (NSString *)eval:(NSString *)script
+    withScriptPath:(NSString *)path
+       errorString:(NSString **)errorString
+{
+	JSCocoa *jsc = [JSCocoa sharedController];
+
+	evalFromShell = YES;
+	JSValueRef result = [jsc evalJSString:script withScriptPath:path];
+	evalFromShell = NO;
+	if (result != NULL) {
+		id obj = [jsc toObject:result];
+		return [obj JSONRepresentation];
+	} else if (errorString)
+		*errorString = lastEvalError;
+	lastEvalError = nil;
+	return nil;
+}
+
+- (NSError *)openURL:(NSURL *)anURL
+{
+	/* Must make a complete copy of the URL, as it's not really
+	 * a URL but a Distant Object proxy thingy. The document
+	 * controller crashes otherwise.
+	 */
+	NSURL *url = [NSURL URLWithString:[anURL absoluteString]];
+
+	NSError *error = nil;
+	id doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+	if (error == nil)
+		[NSApp activateIgnoringOtherApps:YES];
+
+	return error;
 }
 
 @end

@@ -669,7 +669,6 @@ doCommandBySelector:(SEL)aSelector
 		break;
 	case EX_ADDR_NONE:
 	default:
-		begin = NSNotFound;
 		return NO;
 		break;
 	}

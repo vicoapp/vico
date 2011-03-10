@@ -606,7 +606,6 @@ int logIndent = 0;
 
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:final_location];
-	INFO(@"final_location = %lu, eol = %lu, end = %lu, bol = %lu", final_location, eol, end, bol);
 	if (final_location >= eol && final_location > bol)
 		final_location = eol - 1;
 }

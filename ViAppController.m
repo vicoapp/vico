@@ -292,7 +292,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 	NSURL *url = [NSURL URLWithString:[anURL absoluteString]];
 
 	NSError *error = nil;
-	id doc = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
 	if (error == nil)
 		[NSApp activateIgnoringOtherApps:YES];
 

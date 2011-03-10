@@ -3,6 +3,8 @@
 #include <err.h>
 #include <stdlib.h>
 
+#import "ViAppController.h"
+
 #if 0
 - (NSAttributedString *)_formattedExceptionBacktrace:(NSArray *)backtrace {
     NSMutableAttributedString *result = [[NSMutableAttributedString alloc] init];
@@ -42,7 +44,7 @@
 int
 main(int argc, char **argv)
 {
-	NSProxy		*proxy;
+	NSProxy<ViShellCommandProtocol>		*proxy;
 	NSString	*script = nil;
 	NSString	*script_path = nil;
 	const char	*eval_script = NULL;

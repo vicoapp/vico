@@ -1,6 +1,15 @@
 @class ViRegexp;
 
-@interface ViAppController : NSObject
+@protocol ViShellCommandProtocol <NSObject>
+
+- (NSString *)eval:(NSString *)script
+    withScriptPath:(NSString *)path
+       errorString:(NSString **)errorString;
+- (NSError *)openURL:(NSURL *)anURL;
+
+@end
+
+@interface ViAppController : NSObject <ViShellCommandProtocol>
 {
 	IBOutlet NSMenu *encodingMenu;
 	IBOutlet NSTextField *scriptInput;

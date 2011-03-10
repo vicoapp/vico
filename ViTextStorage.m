@@ -268,10 +268,12 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		if (offset++ == lineIndex)
 			break;
 
-	skip->length -= ln->length;
-	skip->length += length;
-	ln->length = length;
-	ln->eol = eol;
+	if (ln) {
+		skip->length -= ln->length;
+		skip->length += length;
+		ln->length = length;
+		ln->eol = eol;
+	}
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)str
@@ -413,6 +415,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		location += skip->length;
 	}
 
+	if (skip == NULL)
+		return -1LL;
+
 	/* Find the line. */
 	struct line *ln;
 	TAILQ_FOREACH(ln, &skip->lines, next) {
@@ -420,6 +425,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			break;
 		location += ln->length;
 	}
+
+	if (ln == NULL)
+		return -1LL;
 
 	if (lengthPtr)
 		*lengthPtr = ln->length;

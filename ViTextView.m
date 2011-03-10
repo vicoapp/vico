@@ -1287,7 +1287,6 @@ int logIndent = 0;
 		{
 			/* the command failed */
 			[command reset];
-			final_location = start_location;
 			return NO;
 		}
 	}
@@ -1789,7 +1788,7 @@ int logIndent = 0;
 	}
 
 	if (n > 0)
-		[menu insertItem:[NSMenuItem separatorItem] atIndex:n++];
+		[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
 
 	return menu;
 }

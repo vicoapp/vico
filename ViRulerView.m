@@ -118,15 +118,14 @@
 	ViTextStorage		*textStorage;
 	NSRect                  visibleRect;
 	NSRange                 range, glyphRange, nullRange;
-	NSString                *text, *labelText;
+	NSString                *labelText;
 	NSUInteger              rectCount;
 	NSRectArray             rects;
 	CGFloat                 ypos, yinset;
 	NSSize                  stringSize;
-	
+
 	layoutManager = [view layoutManager];
 	container = [view textContainer];
-	text = [view string];
 	textStorage = [(ViTextView *)view textStorage];
 	nullRange = NSMakeRange(NSNotFound, 0);
 	yinset = [view textContainerInset].height;        

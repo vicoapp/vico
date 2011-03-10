@@ -120,10 +120,12 @@
 	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
 	[[shellInput fileHandleForWriting] closeFile];
 	[task waitUntilExit];
+	
+#ifndef NO_DEBUG
 	int status = [task terminationStatus];
-
 	if (status != 0)
 		DEBUG(@"%@: exited with status %i", shellCommand, status);
+#endif
 
 	NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
 	NSMutableString *outputText = [[NSMutableString alloc] initWithData:outputData

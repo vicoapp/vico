@@ -76,9 +76,8 @@ receipt_parse_payload(void *buf, size_t len, void **payload, size_t *payload_len
  
 	/* Verify the signature. If the verification is correct,
 	 * b_out will contain the PKCS #7 payload and rc will be 1. */
-	if ((ret = PKCS7_verify(p7, NULL, store, NULL, b_out, 0)) != 1) {
+	if (PKCS7_verify(p7, NULL, store, NULL, b_out, 0) != 1)
 		return -1;
-	}
  
 	/*
 	 * For additional security, you may verify the fingerprint

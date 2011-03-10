@@ -86,8 +86,11 @@
 	else if ([object respondsToSelector:@selector(proxyForJson)])
 		return [self dataWithObject:[object proxyForJson]];
 	else {
+		ok = [streamWriter writeString:[object description]];
+		/*
 		self.error = @"Not valid type for JSON";
 		return nil;
+		*/
 	}
 	
 	if (ok)

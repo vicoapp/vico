@@ -209,8 +209,10 @@ static NSDecimalNumber *notANumber;
 	} else if ([o respondsToSelector:@selector(proxyForJson)]) {
 		return [self writeValue:[o proxyForJson]];
 
-	}	
-	
+	}
+
+	return [self writeString:[o description]];
+
 	self.error = [NSString stringWithFormat:@"JSON serialisation not supported for %@", [o class]];
 	return NO;
 }

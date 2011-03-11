@@ -2,44 +2,9 @@
 
 #include <err.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #import "ViAppController.h"
-
-#if 0
-- (NSAttributedString *)_formattedExceptionBacktrace:(NSArray *)backtrace {
-    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] init];
-    for (NSString *s in backtrace) {
-        s = [s stringByAppendingString:@"\n"];
-        NSAttributedString *attrS = [[NSAttributedString alloc] initWithString:s];
-        [result appendAttributedString:attrS];
-        [attrS release];
-    }
-    [result addAttribute:NSFontAttributeName value:[NSFont fontWithName:@"Monaco" size:10] range:NSMakeRange(0, result.length)];
-    return [result autorelease];    
-}
- 
-- (void)reportException:(NSException *)exception {
-    // NSApplication simply logs the exception to the console. We
-    // want to let the user know when it happens in order to possibly
-    // prevent subsequent random crashes that are difficult to debug
-    @try {
-        // Create a string based on the exception
-        NSString *exceptionMessage = [NSString stringWithFormat:@"%@\nReason: %@\nUser Info: %@", [exception name], [exception reason], [exception userInfo]];
-        // Always log to console for history
-        NSLog(@"Exception raised:\n%@", exceptionMessage);
-        NSLog(@"Backtrace: %@", [exception callStackSymbols]);
-       /* 
-        NSString *exceptionMessage = exceptionMessage;
-        NSString *exceptionBacktrace = [self _formattedExceptionBacktrace:[exception callStackSymbols]];
-        NSLog(@"Exception raised:\n%@", exceptionMessage);
-        NSLog(@"Backtrace: %@", [exception callStackSymbols]);
-        */
-    } @catch (NSException *e) {
-        // Suppress any exceptions raised in the handling
-    }    
-}
-#endif
-
 
 int
 main(int argc, char **argv)
@@ -70,8 +35,18 @@ main(int argc, char **argv)
 
 	proxy = [NSConnection rootProxyForConnectionWithRegisteredName:@"chunky bacon"
 	                                                          host:nil];
-	if (proxy == nil)
-		errx(1, "failed to connect");
+	if (proxy == nil) {
+		/* failed to connect, try to start it */
+		if ([[NSWorkspace sharedWorkspace] launchApplication:@"Vibrant"]) {
+			for (i = 0; i < 15 && proxy == nil; i++) {
+				usleep(200000); // sleep for 0.2 seconds
+				proxy = [NSConnection rootProxyForConnectionWithRegisteredName:@"chunky bacon"
+											  host:nil];
+			}
+		}
+		if (proxy == nil)
+			errx(1, "failed to connect");
+	}
 
 	if (eval_file) {
 		NSError *error = nil;
@@ -115,7 +90,6 @@ main(int argc, char **argv)
 			 */
 			fprintf(stderr, "%s\n", [msg UTF8String]);
 			return 5;
-			//errx(5, "%s", [msg UTF8String]);
 		}
 
 		if (result == nil) {
@@ -138,6 +112,11 @@ main(int argc, char **argv)
 		NSError *error = [proxy openURL:url];
 		if (error)
 			errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
+	}
+
+	if (argc == 0) {
+		/* just make it first responder */
+		[proxy eval:@"NSApp.activateIgnoringOtherApps(YES)" withScriptPath:nil errorString:nil];
 	}
 
 	return 0;

@@ -91,6 +91,8 @@
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
 {
+	ViTextStorage *ts = [textView textStorage];
+
 	NSString *appPath = [[NSBundle mainBundle] bundlePath];
 	[env setObject:appPath forKey:@"TM_APP_PATH"];
 
@@ -101,11 +103,11 @@
 
 	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];
 
-	NSString *line = [[textView textStorage] lineForLocation:[textView caret]];
+	NSString *line = [ts lineForLocation:[textView caret]];
 	if (line)
 		[env setObject:line forKey:@"TM_CURRENT_LINE"];
 
-	NSString *word = [[textView textStorage] wordAtLocation:[textView caret] range:nil acceptAfter:YES];
+	NSString *word = [ts wordAtLocation:[textView caret] range:nil acceptAfter:YES];
 	if (word)
 		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
 
@@ -125,7 +127,7 @@
 	}
 
 	[env setObject:NSFullUserName() forKey:@"TM_FULLNAME"];
-	[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
+	[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
 	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
 	NSString *scope = [[textView scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];
@@ -134,16 +136,16 @@
 
 	NSRange sel = [textView selectedRange];
 	if (sel.length > 0) {
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
 
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
 
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
-		[env setObject:[NSString stringWithFormat:@"%li", [[textView textStorage] columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
 
-		[env setObject:[[[textView textStorage] string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
+		[env setObject:[[ts string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
 	}
 
 	// FIXME: TM_SELECTED_FILES

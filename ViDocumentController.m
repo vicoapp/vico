@@ -1,6 +1,7 @@
 #import "ViDocumentController.h"
 #import "ViDocument.h"
 #import "SFTPConnectionPool.h"
+#import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -103,15 +104,10 @@
 		/* 
 		 * Schedule next close sheet in the event loop right after the windowcontroller has selected the document.
 		 */
-		SEL sel = @selector(canCloseDocumentWithDelegate:shouldCloseSelector:contextInfo:);
 		SEL closeSelector = @selector(document:shouldCloseForSet:contextInfo:);
-		void *contextInfo = NULL;
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[doc methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&closeSelector atIndex:3];
-		[invocation setArgument:&contextInfo atIndex:4];
-		[invocation performSelector:@selector(invokeWithTarget:) withObject:doc afterDelay:0.0];
+		[[doc nextRunloop] canCloseDocumentWithDelegate:self
+		                            shouldCloseSelector:closeSelector
+		                                    contextInfo:NULL];
 	} else
 		[[NSNotificationCenter defaultCenter] addObserver:self
 							 selector:@selector(windowDidEndSheetForSet:)

@@ -16,6 +16,7 @@
 #import "SFTPConnectionPool.h"
 #import "ViLayoutManager.h"
 #import "ViError.h"
+#import "NSObject+SPInvocationGrabbing.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -724,15 +725,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	NSUInteger len = [textStorage length];
 	for (ViDocumentView *dv in views) {
 		ViTextView *tv = [dv textView];
-		if ([tv caret] > len) {
-			NSInvocation *invocation;
-			SEL sel = @selector(setCaret:);
-			invocation = [NSInvocation invocationWithMethodSignature:
-			    [tv methodSignatureForSelector:sel]];
-			[invocation setSelector:sel];
-			[invocation setArgument:&len atIndex:2];
-			[invocation performSelector:@selector(invokeWithTarget:) withObject:tv afterDelay:0.0];
-		}
+		if ([tv caret] > len)
+			[[tv nextRunloop] setCaret:len];
 	}
 
 	if (language == nil)

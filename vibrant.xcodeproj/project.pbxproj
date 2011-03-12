@@ -1694,6 +1694,7 @@
 		9A766B971327E03C009CB17C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1713,6 +1714,7 @@
 		9A766B981327E03C009CB17C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1804,6 +1806,7 @@
 					"-lffi",
 				);
 				PRODUCT_NAME = Vibrant;
+				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
@@ -1822,6 +1825,7 @@
 					"-lffi",
 				);
 				PRODUCT_NAME = Vibrant;
+				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
@@ -1836,8 +1840,6 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_GC = required;
-				GCC_ENABLE_SYMBOL_SEPARATION = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1848,7 +1850,6 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_PROTOTYPE_CONVERSION = NO;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
@@ -1873,12 +1874,9 @@
 					"-lresolv",
 					"-lffi",
 				);
-				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.6;
-				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
-				YACC_GENERATED_FILE_STEM = Standard;
 			};
 			name = Debug;
 		};
@@ -1928,12 +1926,9 @@
 					"-lresolv",
 					"-lffi",
 				);
-				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.6;
-				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
-				YACC_GENERATED_FILE_STEM = Standard;
 			};
 			name = Release;
 		};

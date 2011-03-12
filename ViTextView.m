@@ -7,6 +7,7 @@
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViDocumentView.h"
 #import "ViJumpList.h"
+#import "NSObject+SPInvocationGrabbing.h"
 
 int logIndent = 0;
 
@@ -1044,22 +1045,9 @@ int logIndent = 0;
 					[pair objectAtIndex:1]] atLocation:start_location];
 
 				// INFO(@"adding smart pair attr to %u + 2", start_location);
-				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
-
-				NSString *attrName = ViSmartPairAttributeName;
-				NSRange attrRange = NSMakeRange(start_location, 2);
-				NSInvocation *invocation;
-				SEL selector = @selector(addTemporaryAttribute:value:forCharacterRange:);
-				invocation = [NSInvocation invocationWithMethodSignature:
-				    [[self layoutManager] methodSignatureForSelector:selector]];
-				[invocation setSelector:selector];
-				[invocation setArgument:&attrName atIndex:2];
-				[invocation setArgument:&characters atIndex:3];
-				[invocation setArgument:&attrRange atIndex:4];
-				[invocation retainArguments];
-				[invocation performSelector:@selector(invokeWithTarget:)
-				                 withObject:[self layoutManager]
-				                 afterDelay:0.0];
+				[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViSmartPairAttributeName
+				                                                    value:characters
+				                                        forCharacterRange:NSMakeRange(start_location, 2)];
 
 				final_location = start_location + 1;
 				break;

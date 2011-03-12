@@ -230,23 +230,24 @@ extern BOOL makeNewWindowInsteadOfTab;
 	JSCocoa *jsc = [JSCocoa sharedController];
 
 	/* Set some convenient global objects. */
+	[jsc removeObjectWithName:@"window"];
+	[jsc removeObjectWithName:@"view"];
+	[jsc removeObjectWithName:@"text"];
+	[jsc removeObjectWithName:@"document"];
 	ViWindowController *winCon = [ViWindowController currentWindowController];
 	if (winCon) {
-		[jsc setObject:winCon withName:@"window"];
+		[jsc setObject:winCon.proxy withName:@"window"];
 		id<ViViewController> view = [winCon currentView];
-		[jsc setObject:view withName:@"view"];
-		if ([view isKindOfClass:[ViDocumentView class]]) {
-			ViTextView *textView = [(ViDocumentView *)view textView];
-			[jsc setObject:textView.proxy withName:@"text"];
-		} else
-			[jsc removeObjectWithName:@"text"];
+		if (view) {
+			[jsc setObject:view withName:@"view"];
+			if ([view isKindOfClass:[ViDocumentView class]]) {
+				ViTextView *textView = [(ViDocumentView *)view textView];
+				[jsc setObject:textView.proxy withName:@"text"];
+			}
+		}
 		ViDocument *doc = [winCon currentDocument];
-		[jsc setObject:doc withName:@"document"];
-	} else {
-		[jsc removeObjectWithName:@"window"];
-		[jsc removeObjectWithName:@"view"];
-		[jsc removeObjectWithName:@"text"];
-		[jsc removeObjectWithName:@"document"];
+		if (doc)
+			[jsc setObject:doc.proxy withName:@"document"];
 	}
 
 	JSValueRef result = [jsc evalJSString:[scriptInput stringValue]];

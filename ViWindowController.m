@@ -34,6 +34,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize documents;
 @synthesize project;
 @synthesize environment;
+@synthesize proxy;
 
 + (id)currentWindowController
 {
@@ -67,6 +68,7 @@ static NSWindowController	*currentWindowController = nil;
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
 		parser = [[ViCommand alloc] init];
+		proxy = [[ViScriptProxy alloc] initWithObject:self];
 	}
 
 	return self;

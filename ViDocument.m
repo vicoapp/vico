@@ -39,6 +39,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize jumpList;
 @synthesize isTemporary;
 @synthesize snippet;
+@synthesize proxy;
 
 - (id)init
 {
@@ -75,6 +76,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 		theme = [[ViThemeStore defaultStore] defaultTheme];
 		[self setTypingAttributes];
+
+		proxy = [[ViScriptProxy alloc] initWithObject:self];
 	}
 	return self;
 }
@@ -251,8 +254,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		                       ofType:typeName
 		             forSaveOperation:saveOperation
 		                        error:outError];
-		if (ret)
+		if (ret) {
 			isTemporary = NO;
+			[proxy emit:@"didSave" with:self, nil];
+		}
 		return ret;
 	}
 
@@ -272,8 +277,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (conn == nil)
 		return NO;
 	ret = [conn writeData:data toFile:[url path] error:outError];
-	if (ret)
+	if (ret) {
+		[proxy emit:@"didSave" with:self, nil];
 		isTemporary = NO;
+	}
 	return ret;
 }
 
@@ -366,6 +373,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	/* Force incremental syntax parsing. */
 	[self highlightEverything];
 
+	[proxy emitDelayed:@"didLoad" with:self, nil];
+
 	return YES;
 }
 
@@ -386,6 +395,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super setFileURL:absoluteURL];
 	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
+	[proxy emitDelayed:@"changedURL" with:self, absoluteURL, nil];
 }
 
 - (ViWindowController *)windowController
@@ -403,6 +413,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	[self removeWindowController:windowController];
 	[super close];
+	[proxy emitDelayed:@"didClose" with:self, nil];
 }
 
 #pragma mark -
@@ -742,6 +753,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[syntaxParser pullScopes:NSMakeRange(area.location, -diff)];
 		// FIXME: also pull jumps and marks
 	}
+
+	// emit (delayed) event to javascript
+	[proxy emitDelayed:@"modify" with:self,
+	    [NSValue valueWithRange:area],
+	    [NSNumber numberWithInteger:diff],
+	    nil];
 
 	/*
 	 * Extend our range along affected line boundaries and re-parse.

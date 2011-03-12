@@ -30,6 +30,8 @@ int logIndent = 0;
 
 @implementation ViTextView
 
+@synthesize proxy;
+
 - (void)initEditorWithDelegate:(id)aDelegate viParser:(ViCommand *)aParser
 {
 	[self setDelegate:aDelegate];
@@ -89,6 +91,8 @@ int logIndent = 0;
 						   object:[self textStorage]];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
+
+	proxy = [[ViScriptProxy alloc] initWithObject:self];
 }
 
 - (ViTextStorage *)textStorage
@@ -1479,6 +1483,11 @@ int logIndent = 0;
 	unsigned int modifiers;
 	unichar key;
 	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
+
+	[proxy emit:@"keyDown" with:self,
+	    [NSNumber numberWithChar:key],
+	    [NSNumber numberWithUnsignedInt:modifiers],
+	    nil];
 
 	handlingKey = YES;
 	[super keyDown:theEvent];

@@ -2,6 +2,7 @@
 #import "ViWindowController.h"
 #import "ViSymbol.h"
 #import "ViTextStorage.h"
+#import "ViScriptProxy.h"
 
 @interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
@@ -10,6 +11,7 @@
 	ViBundle *bundle;
 	ViLanguage *language;
 	ViTheme *theme;
+	ViScriptProxy *proxy;
 
 	dispatch_queue_t sym_q;
 
@@ -49,6 +51,7 @@
 @property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
+@property(readonly) ViScriptProxy *proxy;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;

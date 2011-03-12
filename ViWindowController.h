@@ -4,6 +4,7 @@
 #import "ExEnvironment.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViSplitView.h"
+#import "ViScriptProxy.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -35,6 +36,7 @@
 	ViDocumentView *lastDocumentView;
 	ViCommand *parser;
 	ViProject *project;
+	ViScriptProxy *proxy;
 
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
@@ -60,6 +62,7 @@
 @property(readwrite, assign) NSMutableArray *documents;
 @property(readonly) ExEnvironment *environment;
 @property(readwrite, assign) ViProject *project;
+@property(readonly) ViScriptProxy *proxy;
 
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;

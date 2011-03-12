@@ -9,6 +9,7 @@
 #import "ExEnvironment.h"
 #import "ViCommon.h"
 #import "ViTextStorage.h"
+#import "ViScriptProxy.h"
 
 @class ViDocumentView;
 @class ViWindowController;
@@ -40,6 +41,8 @@
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
 	NSMutableArray		*inputKeys; // used for replaying input
+
+	ViScriptProxy		*proxy;
 
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
@@ -75,6 +78,8 @@
 	BOOL			 hasUndoGroup;
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
+
+@property(readonly) ViScriptProxy *proxy;
 
 - (id <ViTextViewDelegate>)delegate;
 - (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViCommand *)aParser;

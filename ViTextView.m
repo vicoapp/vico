@@ -1550,6 +1550,7 @@ int logIndent = 0;
 
 	if (charcode == 0x1B) {
 		[parser reset];
+		final_location = [self caret];
 		[self normal_mode:parser];
 		[self endUndoGroup];
 		[self deselectSnippet];

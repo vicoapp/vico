@@ -397,6 +397,7 @@ static NSWindowController	*currentWindowController = nil;
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
 			[document updateChangeCount:NSChangeReadOtherContents];
+			document.isTemporary = YES;
 			return;
 		}
 

@@ -38,6 +38,9 @@
 		9A0275551259D33F00045B6E /* nsUniversalDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A02753C1259D33F00045B6E /* nsUniversalDetector.cpp */; };
 		9A0275561259D33F00045B6E /* nsUTF8Prober.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A02753D1259D33F00045B6E /* nsUTF8Prober.cpp */; };
 		9A0275731259DEB400045B6E /* ViCharsetDetector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9A0275721259DEB400045B6E /* ViCharsetDetector.mm */; };
+		9A02E00813294466001FC7D1 /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
+		9A02E013132A72B1001FC7D1 /* ViScriptProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A02E012132A72AF001FC7D1 /* ViScriptProxy.m */; };
+		9A02E016132BA829001FC7D1 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A02E015132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.m */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A099A720EE88046006A80A2 /* ViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* ViTextStorage.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
@@ -320,6 +323,10 @@
 		9A02753D1259D33F00045B6E /* nsUTF8Prober.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nsUTF8Prober.cpp; path = universalchardet/nsUTF8Prober.cpp; sourceTree = "<group>"; };
 		9A0275711259DEB400045B6E /* ViCharsetDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCharsetDetector.h; sourceTree = "<group>"; };
 		9A0275721259DEB400045B6E /* ViCharsetDetector.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViCharsetDetector.mm; sourceTree = "<group>"; };
+		9A02E011132A72AF001FC7D1 /* ViScriptProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViScriptProxy.h; sourceTree = "<group>"; };
+		9A02E012132A72AF001FC7D1 /* ViScriptProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViScriptProxy.m; sourceTree = "<group>"; };
+		9A02E014132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SPInvocationGrabbing.h"; sourceTree = "<group>"; };
+		9A02E015132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SPInvocationGrabbing.m"; sourceTree = "<group>"; };
 		9A0868B00EE03A7600274635 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
 		9A0868B10EE03A7600274635 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
 		9A099A700EE88046006A80A2 /* ViTextStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTextStorage.h; sourceTree = "<group>"; };
@@ -714,6 +721,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A02E011132A72AF001FC7D1 /* ViScriptProxy.h */,
+				9A02E012132A72AF001FC7D1 /* ViScriptProxy.m */,
 				9A2DD4B613110F7C00E8657A /* ViError.h */,
 				9A2DD4B713110F7C00E8657A /* ViError.m */,
 				9A82FE3412FB313500D7660B /* ViCommon.h */,
@@ -1115,6 +1124,8 @@
 		9AA709780EF284B900B4CE34 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				9A02E014132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.h */,
+				9A02E015132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.m */,
 				9A2DD55A1311913F00E8657A /* NSScanner-additions.h */,
 				9A2DD55B1311913F00E8657A /* NSScanner-additions.m */,
 				9A438D351236C0AB00F7D9FD /* NSString-additions.h */,
@@ -1542,6 +1553,8 @@
 				9A759E2D13222098009BA485 /* JSCocoaLib.m in Sources */,
 				9A759E2E13222098009BA485 /* JSCocoaPrivateObject.m in Sources */,
 				9A75A04F132619E4009BA485 /* ViOutlineView.m in Sources */,
+				9A02E013132A72B1001FC7D1 /* ViScriptProxy.m in Sources */,
+				9A02E016132BA829001FC7D1 /* NSObject+SPInvocationGrabbing.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1565,6 +1578,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A02E00813294466001FC7D1 /* ViTextView.m in Sources */,
 				9AF2FE760EC9C8A400C5771B /* TestViCommandParser.m in Sources */,
 				9AF2FE9B0EC9C9F600C5771B /* TestExCommand.m in Sources */,
 				9AF2FE9C0EC9C9F600C5771B /* TestScopeSelectors.m in Sources */,
@@ -1698,7 +1712,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INSTALL_PATH = /usr/local/bin;
@@ -1807,10 +1821,10 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = vibrant_Prefix.pch;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -1820,7 +1834,7 @@
 					"-lffi",
 				);
 				PRODUCT_NAME = Vibrant;
-				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -1837,7 +1851,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = vibrant_Prefix.pch;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -1866,7 +1880,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
@@ -1878,7 +1892,7 @@
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
@@ -1925,7 +1939,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE_BUILD=1";
 				GCC_THREADSAFE_STATICS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;

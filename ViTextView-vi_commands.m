@@ -39,8 +39,17 @@
 /* syntax: v */
 - (BOOL)visual:(ViCommand *)command
 {
-	visual_start_location = [self caret];
-	[self setVisualMode];
+	if (mode == ViVisualMode) {
+		if (visual_line_mode == NO) {
+			[self setNormalMode];
+			[self resetSelection];
+			return NO;
+		}
+	} else {
+		visual_start_location = [self caret];
+		[self setVisualMode];
+	}
+
 	visual_line_mode = NO;
 	return TRUE;
 }
@@ -48,7 +57,17 @@
 /* syntax: V */
 - (BOOL)visual_line:(ViCommand *)command
 {
-	[self visual:command];
+	if (mode == ViVisualMode) {
+		if (visual_line_mode == YES) {
+			[self setNormalMode];
+			[self resetSelection];
+			return NO;
+		}
+	} else {
+		visual_start_location = [self caret];
+		[self setVisualMode];
+	}
+
 	visual_line_mode = YES;
 	return TRUE;
 }

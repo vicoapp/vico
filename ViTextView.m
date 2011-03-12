@@ -1341,7 +1341,9 @@ int logIndent = 0;
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL leaveVisualMode = NO;
-	if (mode == ViVisualMode && !command.ismotion) {
+	if (mode == ViVisualMode && !command.ismotion &&
+	    ![command.method isEqualToString:@"visual:"] &&
+	    ![command.method isEqualToString:@"visual_line:"]) {
 		/* If in visual mode, edit commands leave visual mode. */
 		leaveVisualMode = YES;
 	}
@@ -1349,7 +1351,9 @@ int logIndent = 0;
 	DEBUG(@"perform command %@", command.method);
 	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if (ok && command.line_mode && !command.ismotion && (command.key != 'y' || command.motion_key != 'y') && command.key != '>' && command.key != '<' && command.key != 'S')
+	if (ok && command.line_mode && !command.ismotion &&
+	    (command.key != 'y' || command.motion_key != 'y') &&
+	    command.key != '>' && command.key != '<' && command.key != 'S')
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		/* ...well, except for yy :-) */

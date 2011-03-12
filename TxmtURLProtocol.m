@@ -74,6 +74,7 @@
 		[invocation setSelector:sel];
 		[invocation setArgument:&openURL atIndex:2];
 		[invocation setArgument:&lineNumber atIndex:3];
+		[invocation retainArguments];
 		[invocation performSelectorOnMainThread:@selector(invokeWithTarget:) withObject:winCon waitUntilDone:NO];
 	}
 

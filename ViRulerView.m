@@ -59,7 +59,7 @@
 
 	[self setNeedsDisplay:YES];
 
-	static CGFloat thickness;
+	CGFloat thickness;
 	thickness = [self requiredThickness];
 	if (thickness != [self ruleThickness]) {
 		SEL sel = @selector(setRuleThickness:);

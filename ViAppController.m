@@ -211,8 +211,8 @@ extern BOOL makeNewWindowInsteadOfTab;
 	[scriptOutput scrollRangeToVisible:NSMakeRange([ts length], 0)];
 }
 
-- (void)JSCocoa:(JSCocoaController*)controller
-       hadError:(NSString*)error
+- (void)JSCocoa:(JSCocoaController *)controller
+       hadError:(NSString *)error
    onLineNumber:(NSInteger)lineNumber
     atSourceURL:(id)url
 {
@@ -232,20 +232,20 @@ extern BOOL makeNewWindowInsteadOfTab;
 	/* Set some convenient global objects. */
 	ViWindowController *winCon = [ViWindowController currentWindowController];
 	if (winCon) {
-		[jsc setObject:winCon withName:@"windowController"];
+		[jsc setObject:winCon withName:@"window"];
 		id<ViViewController> view = [winCon currentView];
 		[jsc setObject:view withName:@"view"];
 		if ([view isKindOfClass:[ViDocumentView class]]) {
 			ViTextView *textView = [(ViDocumentView *)view textView];
-			[jsc setObject:textView withName:@"textView"];
+			[jsc setObject:textView.proxy withName:@"text"];
 		} else
-			[jsc removeObjectWithName:@"textView"];
+			[jsc removeObjectWithName:@"text"];
 		ViDocument *doc = [winCon currentDocument];
 		[jsc setObject:doc withName:@"document"];
 	} else {
-		[jsc removeObjectWithName:@"windowController"];
+		[jsc removeObjectWithName:@"window"];
 		[jsc removeObjectWithName:@"view"];
-		[jsc removeObjectWithName:@"textView"];
+		[jsc removeObjectWithName:@"text"];
 		[jsc removeObjectWithName:@"document"];
 	}
 

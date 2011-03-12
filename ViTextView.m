@@ -995,22 +995,6 @@ int logIndent = 0;
 	}
 }
 
-/* FIXME: these are nothing but UGLY!!!
- * Use invocations instead, if it can't be done immediately.
- */
-- (void)addTemporaryAttribute:(NSDictionary *)what
-{
-        [[self layoutManager] addTemporaryAttribute:[what objectForKey:@"attributeName"]
-                                              value:[what objectForKey:@"value"]
-                                  forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
-}
-
-- (void)removeTemporaryAttribute:(NSDictionary *)what
-{
-        [[self layoutManager] removeTemporaryAttribute:[what objectForKey:@"attributeName"]
-                                     forCharacterRange:[[what objectForKey:@"range"] rangeValue]];
-}
-
 #pragma mark -
 #pragma mark Input handling and command evaluation
 
@@ -1061,12 +1045,21 @@ int logIndent = 0;
 
 				// INFO(@"adding smart pair attr to %u + 2", start_location);
 				// [[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName value:characters forCharacterRange:NSMakeRange(start_location, 2)];
-				// FIXME: use an NSInvocation here instead
-				[self performSelector:@selector(addTemporaryAttribute:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-					ViSmartPairAttributeName, @"attributeName",
-					characters, @"value",
-					[NSValue valueWithRange:NSMakeRange(start_location, 2)], @"range",
-					nil] afterDelay:0];
+
+				NSString *attrName = ViSmartPairAttributeName;
+				NSRange attrRange = NSMakeRange(start_location, 2);
+				NSInvocation *invocation;
+				SEL selector = @selector(addTemporaryAttribute:value:forCharacterRange:);
+				invocation = [NSInvocation invocationWithMethodSignature:
+				    [[self layoutManager] methodSignatureForSelector:selector]];
+				[invocation setSelector:selector];
+				[invocation setArgument:&attrName atIndex:2];
+				[invocation setArgument:&characters atIndex:3];
+				[invocation setArgument:&attrRange atIndex:4];
+				[invocation retainArguments];
+				[invocation performSelector:@selector(invokeWithTarget:)
+				                 withObject:[self layoutManager]
+				                 afterDelay:0.0];
 
 				final_location = start_location + 1;
 				break;

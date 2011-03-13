@@ -925,7 +925,7 @@ static id JSCocoaSingleton = NULL;
 //
 - (BOOL)loadFrameworkWithName:(NSString*)name inPath:(NSString*)inPath
 {
-	id path = [NSString stringWithFormat:@"%@/%@.framework/Resources/BridgeSupport/%@.bridgeSupport", inPath, name, name];
+	id path = [NSString stringWithFormat:@"%@/%@.framework/Resources/BridgeSupport/%@.bridgesupport", inPath, name, name];
 
 	// Return YES if already loaded
 	if ([[BridgeSupportController sharedController] isBridgeSupportLoaded:path])	return	YES;
@@ -1973,7 +1973,7 @@ static id autoreleasePool;
 //
 // Collect on top of the run loop, not in some JS function
 //
-+ (void)garbageCollect	{	NSLog(@"***Call garbageCollect on an instance***"); JSGarbageCollect(NULL); }
++ (void)garbageCollect	{	NSLog(@"*** Deprecated — call garbageCollect on an instance ***"); /*JSGarbageCollect(NULL);*/ }
 - (void)garbageCollect	{	JSGarbageCollect(ctx); }
 
 //
@@ -4766,7 +4766,7 @@ static JSValueRef jsCocoaInfo_getProperty(JSContextRef ctx, JSObjectRef object, 
 	JSValueRef classNameJS = JSObjectGetProperty(ctx, object, classNameProperty, NULL);
 	JSStringRelease(classNameProperty);
 	
-	id className = NSStringFromJSValue(classNameJS, ctx);
+	id className = NSStringFromJSValue(ctx, classNameJS);
 //	NSLog(@"className=%@", className);
 	
 	id class = objc_getClass([className UTF8String]);
@@ -4848,7 +4848,7 @@ static void jsCocoaInfo_getPropertyNames(JSContextRef ctx, JSObjectRef object, J
 
 #pragma mark Helpers
 
-id	NSStringFromJSValue(JSValueRef value, JSContextRef ctx)
+id	NSStringFromJSValue(JSContextRef ctx, JSValueRef value)
 {
 	if (JSValueIsNull(ctx, value))	return	nil;
 	JSStringRef resultStringJS = JSValueToStringCopy(ctx, value, NULL);

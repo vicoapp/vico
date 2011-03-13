@@ -205,8 +205,9 @@ void closure_function(ffi_cif* cif, void* resp, void** args, void* userdata)
 
 	if (effectiveArgumentCount)	free(args);
 //	if (exception)	NSLog(@"%@", [[JSCocoaController controllerFromContext:ctx] formatJSException:exception]);
-	if (exception)	
+	if (exception)
 	{
+		NSLog(@"throwing");
 		@throw	[NSException exceptionWithName:@"JSCocoa exception"
 			reason:[[JSCocoaController controllerFromContext:ctx] formatJSException:exception]
 			userInfo:nil];

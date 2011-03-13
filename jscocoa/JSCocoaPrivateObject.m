@@ -38,7 +38,11 @@
 	if (object && retainObject)
 	{
 		[JSCocoaController downBoxedJSObjectCount:object];
-		[object release];
+//		NSLog(@"releasing %@(%d)", [object class], [object retainCount]);
+//		if ([object isKindOfClass:[JSCocoaController class]])
+//			[object autorelease];
+//		else
+			[object release];
 	}
 	if (jsValue)		
 	{
@@ -157,7 +161,7 @@
 	jsValue = v;
 	ctx		= c;
 
-	// Register value in a hash to protect it from GC. This sucks but JSValueProtect() fails.
+	// Register value in a global hash to protect it from GC. This sucks but JSValueProtect() fails.
 	JSStringRef scriptJS = JSStringCreateWithUTF8CString("if (!('__gcprotect' in this)) { __gcprotect = {}; __gcprotectidx = 1; } __gcprotect[__gcprotectidx] = arguments[0]; return __gcprotectidx++ ");
 	JSObjectRef fn = JSObjectMakeFunction(ctx, NULL, 0, NULL, scriptJS, NULL, 1, NULL);
 	JSStringRelease(scriptJS);

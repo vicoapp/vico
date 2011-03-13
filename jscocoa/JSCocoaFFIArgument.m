@@ -353,7 +353,7 @@
 //
 - (BOOL)fromJSValueRef:(JSValueRef)value inContext:(JSContextRef)ctx
 {
-	BOOL r = [JSCocoaFFIArgument fromJSValueRef:value inContext:ctx typeEncoding:typeEncoding fullTypeEncoding:structureTypeEncoding fromStorage:ptr];
+	BOOL r = [JSCocoaFFIArgument fromJSValueRef:value inContext:ctx typeEncoding:typeEncoding fullTypeEncoding:structureTypeEncoding?structureTypeEncoding:pointerTypeEncoding fromStorage:ptr];
 	if (!r)	
 	{
 		NSLog(@"fromJSValueRef FAILED, jsType=%d encoding=%c structureEncoding=%@", JSValueGetType(ctx, value), typeEncoding, structureTypeEncoding);
@@ -459,13 +459,13 @@
 		}
 		case	_C_SEL:
 		{
-			id str = NSStringFromJSValue(value, ctx);
+			id str = NSStringFromJSValue(ctx, value);
 			*(SEL*)ptr = NSSelectorFromString(str);
 			return	YES;
 		}
 		case	_C_CHARPTR:
 		{
-			id str = NSStringFromJSValue(value, ctx);
+			id str = NSStringFromJSValue(ctx, value);
 			*(char**)ptr = (char*)[str UTF8String];
 			return	YES;
 		}
@@ -478,6 +478,12 @@
 		
 		case	_C_PTR:
 		{
+			if ([fullTypeEncoding hasPrefix:@"^{OpaqueJSValue"])
+			{
+				NSLog(@"JSValueRef argument was converted to nil — to pass raw Javascript values to ObjC, use JSValueRefAndContextRef");
+				*(id*)ptr = nil;
+				return YES;
+			}
 			return [self unboxJSValueRef:value toObject:ptr inContext:ctx];
 		}
 		

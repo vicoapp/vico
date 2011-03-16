@@ -774,7 +774,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 * Extend our range along affected line boundaries and re-parse.
 	 */
 	NSUInteger bol, end, eol;
-	NSRange prevRange = area;
 	[[textStorage string] getLineStart:&bol end:&end contentsEnd:&eol forRange:area];
 	if (eol == area.location) {
 		/* Change at EOL, include another line to make sure

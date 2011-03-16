@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>#import &lt;${1:Cocoa/Cocoa.h}&gt;</string>
+	<key>name</key>
+	<string>#import &lt;…&gt;</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>Imp</string>
+	<key>uuid</key>
+	<string>20241464-7299-11D9-813A-000D93589AF6</string>
+</dict>
+</plist>

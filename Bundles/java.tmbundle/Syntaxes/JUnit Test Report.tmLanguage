@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>firstLineMatch</key>
+	<string>^Testsuite:</string>
+	<key>foldingStartMarker</key>
+	<string>Testcase:</string>
+	<key>foldingStopMarker</key>
+	<string>(?=Testcase:)</string>
+	<key>keyEquivalent</key>
+	<string>^~J</string>
+	<key>name</key>
+	<string>JUnit Test Report</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>meta.testsuite.label.junit-test-report</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.testsuite.junit-test-report</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(Testsuite:) (.+)$\n</string>
+			<key>name</key>
+			<string>meta.testsuite.name.junit-test-report</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>meta.testcase.label.junit-test-report</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.testcase.junit-test-report</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(Testcase:) (.+) took ([\d\.]+) sec$\n</string>
+			<key>name</key>
+			<string>meta.testcase.name.junit-test-report</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>at\s+(?=.+?\(.+?\)$)</string>
+			<key>end</key>
+			<string>$\n</string>
+			<key>name</key>
+			<string>meta.stackframe.junit-test-report</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=\.)[^\.]+?(?=\()</string>
+					<key>name</key>
+					<string>meta.stackframe.method.junit-test-report</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.stackframe.source.junit-test-report</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.stackframe.source.line.junit-test-report</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>\((.+)(:)(.+)\)$</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>------------- Standard Output ---------------$\n</string>
+			<key>end</key>
+			<string>------------- ---------------- ---------------$\n</string>
+			<key>name</key>
+			<string>meta.section.output.junit-test-report</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>--Output from (.+?)--$\n</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.testcase.junit-test-report</string>
+						</dict>
+					</dict>
+					<key>contentName</key>
+					<string>meta.output.content.junit-test-report</string>
+					<key>end</key>
+					<string>(?=--Output from|------------- ---------------- ---------------)</string>
+					<key>name</key>
+					<string>meta.output.junit-test-report</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>------------- Standard Error -----------------$\n</string>
+			<key>contentName</key>
+			<string>meta.error.junit-test-report</string>
+			<key>end</key>
+			<string>------------- ---------------- ---------------$\n</string>
+			<key>name</key>
+			<string>meta.section.error.junit-test-report</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>--Output from (.+?)--$\n</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.testcase.junit-test-report</string>
+						</dict>
+					</dict>
+					<key>contentName</key>
+					<string>meta.error.content.junit-test-report</string>
+					<key>end</key>
+					<string>(?=--Output from|------------- ---------------- ---------------)</string>
+					<key>name</key>
+					<string>meta.error.junit-test-report</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>text.junit-test-report</string>
+	<key>uuid</key>
+	<string>6F20804D-4BF2-42A7-BC64-A8CD83B7DE0F</string>
+</dict>
+</plist>

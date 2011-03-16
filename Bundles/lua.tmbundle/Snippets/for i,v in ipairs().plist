@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>for ${1:i},${2:v} in ipairs(${3:table_name}) do
+	${0:print(i,v)}
+end</string>
+	<key>name</key>
+	<string>for i,v in ipairs()</string>
+	<key>scope</key>
+	<string>source.lua</string>
+	<key>tabTrigger</key>
+	<string>fori</string>
+	<key>uuid</key>
+	<string>082D9465-0CEF-40DB-9B1C-34940D38F4F0</string>
+</dict>
+</plist>

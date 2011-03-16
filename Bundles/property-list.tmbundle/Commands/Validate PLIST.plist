@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>TEMP_FILE=`mktemp /tmp/TextMate_plist.XXXXXX`
+if [[ -n $TEMP_FILE ]]; then
+	cat &gt; "$TEMP_FILE"
+	plutil -lint "$TEMP_FILE"|perl -pe "s|\\Q$TEMP_FILE\\E:\s*||"
+	rm "$TEMP_FILE"
+else
+	echo "Error: Temporary file could not be created"
+fi</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^V</string>
+	<key>name</key>
+	<string>Validate Syntax</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.plist, text.xml.plist</string>
+	<key>uuid</key>
+	<string>DA0A5096-5F16-11D9-B9C3-000D93589AF6</string>
+</dict>
+</plist>

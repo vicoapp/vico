@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>@synthesize ${1:property};</string>
+	<key>name</key>
+	<string>Synthesize Property</string>
+	<key>scope</key>
+	<string>(source.objc | source.objc++) &amp; meta.scope.implementation.objc - meta.function-with-body</string>
+	<key>tabTrigger</key>
+	<string>syn</string>
+	<key>uuid</key>
+	<string>C0B942C9-07CE-46B6-8FAE-CB8496F9F544</string>
+</dict>
+</plist>

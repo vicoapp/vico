@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require 'rexml/document'
+
+def serialize(source, dest)
+  if source.is_a? REXML::Text
+    dest.add_text(source.dup)
+    return dest
+  end
+
+  d2 = dest.add_element('xsl:element', 'name' =&gt; source.expanded_name)
+  source.attributes.each { |(k,v)| d2.add_element('xsl:attribute', 'name' =&gt; k).text = v }
+  source.children.each { |node| serialize(node, d2)}
+  dest
+end
+
+source = REXML::Document.new(STDIN.read)
+dest   = REXML::Document.new
+
+print serialize(source.elements[1], dest).to_s</string>
+	<key>fallbackInput</key>
+	<string>document</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>name</key>
+	<string>Create XSL Generator for Selection</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>text.xml</string>
+	<key>uuid</key>
+	<string>67E7372F-C15F-4009-AE5B-975F2BC9DD91</string>
+</dict>
+</plist>

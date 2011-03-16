@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>[[NSNotificationCenter defaultCenter] addObserver:${1:self} selector:@selector(${3:${2/^([A-Z]{2})?(.+?)(Notification)?$/\l$2/}}:) name:${2:NSWindowDidBecomeMainNotification} object:${4:nil}];</string>
+	<key>name</key>
+	<string>Register for Notification</string>
+	<key>scope</key>
+	<string>source.objc meta.scope.implementation, source.objc++ meta.scope.implementation</string>
+	<key>tabTrigger</key>
+	<string>obs</string>
+	<key>uuid</key>
+	<string>E8107901-70F1-45D9-8633-81BD5E57CC89</string>
+</dict>
+</plist>

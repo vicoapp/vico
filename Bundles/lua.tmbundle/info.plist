@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>contactEmailRot13</key>
+	<string>co@r-fpevor.pbz</string>
+	<key>contactName</key>
+	<string>Paul Bissex</string>
+	<key>description</key>
+	<string>Support the &lt;a href="http://www.lua.org/"&gt;Lua&lt;/a&gt; programming language, ideal for use as an embedded scripting language.</string>
+	<key>mainMenu</key>
+	<dict>
+		<key>items</key>
+		<array>
+			<string>BF303CAC-FF2B-4299-8F2B-C84FE64B5146</string>
+			<string>C7B74C19-5DB5-47A1-A148-3A1019EF4D96</string>
+			<string>------------------------------------</string>
+			<string>E2D1F434-A472-4185-9933-4D9408C6C4D0</string>
+			<string>------------------------------------</string>
+			<string>0CEE4504-F8F1-4A98-AC7B-AA679CAAAB55</string>
+			<string>------------------------------------</string>
+			<string>082D9465-0CEF-40DB-9B1C-34940D38F4F0</string>
+			<string>A75263F5-C971-42F2-8FAC-83829AD945DE</string>
+			<string>B1FDD74B-F037-45B7-AA61-7CB56BFA67CD</string>
+			<string>------------------------------------</string>
+			<string>3E0EEDB8-2C15-4703-939B-9334714B3A8E</string>
+			<string>F4A541EB-8C83-4EFB-97A7-F780807AC23A</string>
+			<string>------------------------------------</string>
+			<string>2052FA2D-5830-4665-8C90-01D0C7E04991</string>
+			<string>8E68AA99-64F4-4D36-AF80-D7D0B3DCD041</string>
+		</array>
+		<key>submenus</key>
+		<dict/>
+	</dict>
+	<key>name</key>
+	<string>Lua</string>
+	<key>ordering</key>
+	<array>
+		<string>BF303CAC-FF2B-4299-8F2B-C84FE64B5146</string>
+		<string>C7B74C19-5DB5-47A1-A148-3A1019EF4D96</string>
+		<string>E2D1F434-A472-4185-9933-4D9408C6C4D0</string>
+		<string>0CEE4504-F8F1-4A98-AC7B-AA679CAAAB55</string>
+		<string>082D9465-0CEF-40DB-9B1C-34940D38F4F0</string>
+		<string>A75263F5-C971-42F2-8FAC-83829AD945DE</string>
+		<string>B1FDD74B-F037-45B7-AA61-7CB56BFA67CD</string>
+		<string>3E0EEDB8-2C15-4703-939B-9334714B3A8E</string>
+		<string>F4A541EB-8C83-4EFB-97A7-F780807AC23A</string>
+		<string>2052FA2D-5830-4665-8C90-01D0C7E04991</string>
+		<string>8E68AA99-64F4-4D36-AF80-D7D0B3DCD041</string>
+		<string>93E017CC-6F27-11D9-90EB-000D93589AF7</string>
+		<string>8A2A2BE0-B474-49B4-85C3-BAF2BD2FCAFB</string>
+		<string>411468A8-E0AC-415A-9E71-E2BD091EB571</string>
+	</array>
+	<key>uuid</key>
+	<string>5217EA86-3153-4568-B5FD-05917BCE46B3</string>
+</dict>
+</plist>

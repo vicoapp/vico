@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+line = STDIN.read
+TAB = line.match(/^(\s+)/).to_s
+
+# first check to see if we have a
+# key on the current line, if so indent
+if ENV['TM_CURRENT_LINE'].match /^\s*.+:/
+  $stdout.write "#{line}\n#{TAB}\t- " 
+
+# then to see if it's a one-liner list item,
+# in which case we don't indent
+elsif ENV['TM_CURRENT_LINE'].match /^\s*- /
+  $stdout.write "#{line}\n#{TAB}- "
+
+# otherwise back up indent
+else 
+  $stdout.write "#{line}\n#{TAB[(0..-3)]}- "
+end
+</string>
+	<key>fallbackInput</key>
+	<string>line</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string></string>
+	<key>name</key>
+	<string>Add list item</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>source.yaml</string>
+	<key>uuid</key>
+	<string>037242FC-9D77-46A6-94B8-865052595B5A</string>
+</dict>
+</plist>

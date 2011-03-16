@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby -wKU
+require ENV['TM_SUPPORT_PATH'] + '/lib/escape.rb'
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes.rb'
+
+def find_markers
+  10.times do |n|
+    start = ENV["TM_COMMENT_START#{"_#{n}" if n &gt; 0}"].to_s.strip
+    stop  = ENV["TM_COMMENT_END#{"_#{n}"   if n &gt; 0}"].to_s.strip
+    return start, stop if not start.empty? and not stop.empty?
+  end
+  TextMate.exit_show_tool_tip "No block comment markers found for this language."
+end
+
+start, stop = find_markers
+input = STDIN.read.to_s
+
+if input =~ /\n/
+  start &lt;&lt; "\n"
+  stop  &lt;&lt; "\n"
+end
+
+STDOUT &lt;&lt; e_sn(start) &lt;&lt; (input.empty? ? "\n\t$0\n" : e_sn(input)) &lt;&lt; e_sn(stop)
+</string>
+	<key>fallbackInput</key>
+	<string>none</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>~@/</string>
+	<key>name</key>
+	<string>Insert Block Comment</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>uuid</key>
+	<string>83560C23-63E2-4920-8E26-7EAC5FE86B2F</string>
+</dict>
+</plist>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+SUPPORT = ENV['TM_BUNDLE_SUPPORT']
+require ENV['TM_SUPPORT_PATH'] + '/lib/ui'
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
+require SUPPORT + '/lib/config_helper.rb'
+@plist = Config.load
+shortcuts = @plist['environments']
+lshortcuts = @plist['labeled_environments']
+if ENV['TM_SCOPE'].match('beamer') then
+  shortcuts.update(@plist['environments_beamer'])
+  lshortcuts.update(@plist['labeled_environments_beamer'])
+end
+name = STDIN.read
+cmd = nil
+if name == "" then
+  arr = ["custom…",nil] + (shortcuts.keys+lshortcuts.keys).sort
+  ind = TextMate::UI.menu(arr)
+  TextMate.exit_discard if ind.nil?
+  if ind == 0 then
+	name = ""
+  else
+     name = arr[ind]
+  end
+end
+options = Array.new
+for key in shortcuts.keys do
+  if shortcuts[key]['triggers'].index(name) then
+    options &lt;&lt; {:cmd =&gt; key, :setting =&gt; :no_label, :content =&gt; shortcuts[key]['content']}
+  end
+end
+for key in lshortcuts.keys do
+  if lshortcuts[key]['triggers'].index(name) then
+    options &lt;&lt; {:cmd =&gt; key, :setting =&gt; :label, :content =&gt; lshortcuts[key]['content']}
+  end
+end
+opt = case options.length
+when 0
+  nil
+when 1
+  options[0]
+else
+  ind = TextMate::UI.menu(options.map { |opt| opt[:cmd] })
+  ind.nil? ? nil : options[ind]
+end
+if !opt.nil? then
+  print "\\begin{#{opt[:cmd]}}"
+  print "\n" if opt[:setting] == :no_label
+  print opt[:content] || "\t$0"
+  print "\n\\end{#{opt[:cmd]}}"
+elsif name == ""
+  print "\\begin{${1:env}}\n\t$0\n\\end{${1:env}}"
+else
+  print "\\begin{#{name}}\n\t$0\n\\end{#{name}}"
+end
+</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>@{</string>
+	<key>name</key>
+	<string>Environment Based on Current Word / Selection</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>521C9FC0-0B61-48C8-A76B-60A4AE8DF449</string>
+</dict>
+</plist>

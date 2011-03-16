@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>egrep -v '^(\+\+\+|---) '|\
+  tee &gt;(add=$(grep ^+|wc -l);  echo 1&gt;&amp;2 "Lines Added   $add") \
+     |{ rem=$(grep ^-|wc -l); wait; echo "Lines Removed $rem"; }
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^N</string>
+	<key>name</key>
+	<string>Statistics (Lines Added/Removed)</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.diff</string>
+	<key>uuid</key>
+	<string>B9091553-4317-415E-B381-4609BD453E01</string>
+</dict>
+</plist>

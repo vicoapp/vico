@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>[[NSUserDefaults standardUserDefaults] setObject:${1:object} forKey:${2:key}];</string>
+	<key>name</key>
+	<string>Write Defaults Value</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>setprefs</string>
+	<key>uuid</key>
+	<string>53672612-B597-11D9-A114-000D93589AF6</string>
+</dict>
+</plist>

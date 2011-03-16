@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if [[ "$TM_SOFT_TABS" = "YES" ]];
+	then export XMLLINT_INDENT=`ruby -e"print(' ' * ${TM_TAB_SIZE})"`
+	else export XMLLINT_INDENT=$'\t'
+fi
+result=`xmllint --format - 2&gt;&amp;1`
+if [[ $? &gt; 0 ]];
+	then exit_show_tool_tip "Errors: $result"
+	else echo "$result"
+fi</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Tidy</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>text.xml</string>
+	<key>uuid</key>
+	<string>A1DAE610-1E05-4174-BB6D-A51E22DB0764</string>
+</dict>
+</plist>

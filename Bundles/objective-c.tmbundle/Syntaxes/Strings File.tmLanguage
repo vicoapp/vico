@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>strings</string>
+	</array>
+	<key>name</key>
+	<string>Strings File</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>begin</key>
+			<string>/\*</string>
+			<key>captures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.comment.strings</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>\*/</string>
+			<key>name</key>
+			<string>comment.block.strings</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>"</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.strings</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>"</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.strings</string>
+				</dict>
+			</dict>
+			<key>name</key>
+			<string>string.quoted.double.strings</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>\\(\\|[abefnrtv'"?]|[0-3]\d{,2}|[4-7]\d?|x[a-zA-Z0-9]+)</string>
+					<key>name</key>
+					<string>constant.character.escape.strings</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\\.</string>
+					<key>name</key>
+					<string>invalid.illegal.unknown-escape.strings</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?x)%
+						(\d+\$)?                             # field (argument #)
+						[#0\- +']*                           # flags
+						[,;:_]?                              # separator character (AltiVec)
+						((-?\d+)|\*(-?\d+\$)?)?              # minimum field width
+						(\.((-?\d+)|\*(-?\d+\$)?)?)?         # precision
+						(hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)? # length modifier
+						[@diouxXDOUeEfFgGaACcSspn%]          # conversion type
+					</string>
+					<key>name</key>
+					<string>constant.other.placeholder.strings</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>%</string>
+					<key>name</key>
+					<string>invalid.illegal.placeholder.c</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.strings</string>
+	<key>uuid</key>
+	<string>429E2DB7-EB4F-4B34-A4DF-DBFD3336C581</string>
+</dict>
+</plist>

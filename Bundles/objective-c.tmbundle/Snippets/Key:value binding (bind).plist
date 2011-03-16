@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>bind:@"${2:binding}" toObject:${3:observableController} withKeyPath:@"${4:keyPath}" options:${5:nil}</string>
+	<key>name</key>
+	<string>Bind Property to Key Path of Object</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>bind</string>
+	<key>uuid</key>
+	<string>59FC2842-A645-11D9-B2CB-000D93589AF6</string>
+</dict>
+</plist>

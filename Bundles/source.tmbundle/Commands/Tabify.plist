@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>saveActiveFile</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+# This is a little more convoluted than it needs to be
+# just to ensure that we can do an OK job on really long
+# files.  Frankly, it's probably all for nothing given
+# that we likely have plenty of memory, and that Ruby will
+# probably go an cache a whole chunk of the file somewhere in
+# the IO pipeline anyway - but we like to make the effort.
+
+spacing = nil
+lines = Array.new()
+line = $stdin.gets()
+while(line != nil)
+	lines &lt;&lt; line
+	if(line =~ /^\t/)  # mixed tabs with spaces, use TM's tab setting
+		spacing = ENV['TM_TAB_SIZE']
+		break
+	elsif(line =~ /^[ ]+\S/)
+		spacing = line[/^([ ]+)\S/, 1].length
+		break
+	end
+
+	line = $stdin.gets()
+end
+
+if(spacing != nil)
+	fp = IO.popen("cat \"#{ENV['TM_FILEPATH']}\" | unexpand -t #{spacing}", "r")
+	line = fp.gets()
+	while(line != nil)
+		print line
+		line = fp.gets
+	end
+else
+	lines.each() { |line|
+		print line
+	}
+
+	line = $stdin.gets()
+	while(line != nil)
+		print line
+		line = $stdin.gets()
+	end
+end
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^@T</string>
+	<key>name</key>
+	<string>Convert Spaces to Tabs (Estimating Indent)</string>
+	<key>output</key>
+	<string>replaceDocument</string>
+	<key>uuid</key>
+	<string>0526D870-BE98-4931-8DBF-FDD3D405BB1B</string>
+</dict>
+</plist>

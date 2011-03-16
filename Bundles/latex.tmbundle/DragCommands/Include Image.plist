@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require 'pathname'
+require "#{ENV['TM_BUNDLE_SUPPORT']}/lib/LaTeXUtils.rb"
+filename = ENV["TM_DROPPED_FILEPATH"]
+relative_to = ENV["TM_DIRECTORY"]
+startfile = ENV['TM_LATEX_MASTER'] || ENV['TM_FILEPATH']
+master = Pathname.new(LaTeX.master(startfile))
+unless master.absolute?
+  master = master.expand_path(ENV['TM_PROJECT_DIRECTORY'])
+end
+path = Pathname.new(filename).relative_path_from(master.dirname)
+case ENV['TM_MODIFIER_FLAGS']
+when /OPTION/
+	puts ["\\\\begin{center}",
+	" \\\\includegraphics[height=\${1:3in}]{#{path}}",
+"\\\\end{center}"].join("\n")
+when /SHIFT/
+  puts "\\\\includegraphics[height=\${1:3in}]{#{path}}"
+else
+  puts ["\\\\begin{figure}[\${1:htbp}]",
+"	\\\\centering",
+"		\\\\includegraphics[height=\${2:3in}]{#{path}}",
+"	\\\\caption{\${4:caption}}",
+"	\\\\label{fig:\${5:#{path.to_s.gsub(/(\.[^.]*$)|(\.\.\/)/,"").gsub(/\//,"_")}}}",
+"\\\\end{figure}"].join("\n")
+end</string>
+	<key>draggedFileExtensions</key>
+	<array>
+		<string>jpg</string>
+		<string>jpeg</string>
+		<string>pdf</string>
+		<string>eps</string>
+		<string>png</string>
+	</array>
+	<key>name</key>
+	<string>Include Image</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>2C5B80BC-C9C8-11D9-B88C-000A95C0F626</string>
+</dict>
+</plist>

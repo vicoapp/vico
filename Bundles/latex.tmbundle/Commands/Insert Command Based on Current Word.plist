@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require "#{ENV['TM_BUNDLE_SUPPORT']}/lib/config_helper.rb"
+@plist = Config.load
+shortcuts = @plist['commands']
+if ENV['TM_SCOPE'].match('beamer') then
+  shortcuts.update(@plist['commands_beamer'])
+end
+name = STDIN.read
+if (shortcuts.has_key?(name)) then
+  print shortcuts[name]
+elsif name.nil?
+  print "\\${1:cmd}{$2} "
+else
+  print "\\" + name + "{$1} "
+end
+</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>@}</string>
+	<key>name</key>
+	<string>Command Based on Current Word / Selection</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>79EBE164-2318-4563-83E5-F337588AAC73</string>
+</dict>
+</plist>

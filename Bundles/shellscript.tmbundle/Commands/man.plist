@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/bin/bash
+word=${TM_SELECTED_TEXT:-$TM_CURRENT_WORD}
+
+try_help () {
+	if help "$word" &amp;&gt;/dev/null; then
+		source "$TM_SUPPORT_PATH/lib/webpreview.sh"
+		html_header "Documentation for \"$word\""
+		help "$word" | pre
+		html_footer
+		exit_show_html
+	elif man -w "$word" &amp;&gt;/dev/null; then
+		page=$("$TM_SUPPORT_PATH/bin/html_man.sh" -a "$word")
+		echo "&lt;meta http-equiv='Refresh' content='0;URL=file://$page'&gt;"
+		exit_show_html
+	fi
+}
+
+MANSECT=${MANSECT:-2:3:4:5:6:7:8:9} try_help
+try_help
+
+echo "Couldn’t find documentation for “${word}”"
+</string>
+	<key>dontFollowNewOutput</key>
+	<true/>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Word / Selection</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>uuid</key>
+	<string>776163E4-730B-11D9-BCD0-000D93589AF6</string>
+</dict>
+</plist>

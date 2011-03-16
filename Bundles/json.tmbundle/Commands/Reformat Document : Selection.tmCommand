@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require 'strscan'
+
+def indent
+  " " * $indent * 4
+end
+
+s = StringScanner.new(STDIN.read)
+brace_stack = []
+comma_needed = false
+first_line = true
+$indent = 0
+until s.eos?
+  if s.scan(/\{/m)
+    if comma_needed then puts "," else puts end
+    comma_needed = false
+    print indent + "{"
+    first_line = false
+    $indent += 1
+    brace_stack.push "{"
+  elsif s.scan(/\}/m)
+    $indent -= 1
+    print "\n" + indent + "}"
+    if (b = brace_stack.pop) != "{"
+      puts "Expected '}' (#{brace_stack.inspect} / #{b})"
+      exit -1
+    end
+  elsif s.scan(/\[/m)
+    if comma_needed then puts "," else puts end
+    comma_needed = false
+    print indent + "["
+    $indent += 1
+    brace_stack.push "["
+  elsif s.scan(/\]/m)
+    $indent -= 1
+    print "\n" + indent + "]"
+    if (b = brace_stack.pop) != "["
+      puts "Expected ']' (#{brace_stack.inspect} / #{b})"
+      exit -2
+    end
+  elsif s.scan(/,/m)
+    comma_needed = true
+    #print "==#{brace_stack.inspect}=="
+    #puts (brace_stack.last == "{" ? "" : indent) + ","
+  else
+    if comma_needed then puts "," else puts end
+    comma_needed = false
+    print indent + s.scan(/[^{}\[\],]+/m)
+  end
+end</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Reformat Document / Selection</string>
+	<key>output</key>
+	<string>replaceSelectedText</string>
+	<key>scope</key>
+	<string>source.json</string>
+	<key>uuid</key>
+	<string>4B74F2DE-E051-4E8D-9124-EBD90A2CDD2B</string>
+</dict>
+</plist>

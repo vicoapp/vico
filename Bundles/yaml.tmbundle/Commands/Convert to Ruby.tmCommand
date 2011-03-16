@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+require "yaml"
+require "pp"
+
+puts "#!/usr/bin/env ruby\n\n"
+print "documents = "
+pp(YAML.load_stream(STDIN).documents)</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^H</string>
+	<key>name</key>
+	<string>Convert Document / Selection to Ruby</string>
+	<key>output</key>
+	<string>openAsNewDocument</string>
+	<key>scope</key>
+	<string>source.yaml</string>
+	<key>uuid</key>
+	<string>D73CBC77-1692-4981-8C3E-6DCE63F6E2E2</string>
+</dict>
+</plist>

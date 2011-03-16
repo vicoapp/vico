@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>if [[ ! -e "$TM_FILEPATH" ]]; then
+  exit_show_tool_tip "There is no file on disk"
+fi
+
+if diff --strip-trailing-cr --label "$TM_FILENAME (saved version)" --label "(current document)" -u &lt;(cat "$TM_FILEPATH" | tr -d '\r') -; then
+  exit_show_tool_tip "There are no differences."
+fi
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>^@D</string>
+	<key>name</key>
+	<string>Document With Saved Copy</string>
+	<key>output</key>
+	<string>openAsNewDocument</string>
+	<key>uuid</key>
+	<string>0979659D-126E-467F-AC07-599979A42D67</string>
+</dict>
+</plist>

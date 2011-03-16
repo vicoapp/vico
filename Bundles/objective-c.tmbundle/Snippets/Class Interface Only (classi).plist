@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>@interface ${1:${TM_FILENAME/\...*$|(^$)/(?1:object)/}} : ${2:NSObject}
+{$3
+}
+$0
+@end</string>
+	<key>name</key>
+	<string>Class Interface</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>clh</string>
+	<key>uuid</key>
+	<string>06F15373-9900-11D9-9BB8-000A95A89C98</string>
+</dict>
+</plist>

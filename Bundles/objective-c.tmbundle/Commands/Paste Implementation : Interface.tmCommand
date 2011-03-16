@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby -wKU
+#
+#  Possible improvements:
+#   • Preserve empty lines between methods taken from the clipboard
+#   • Make the “parser” conform to the actual Objective-C spec
+#
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
+
+methods = []
+
+%x{ pbpaste }.scan(/^
+  \s*
+  ([-+])                    # Class or object method
+  (\s* \( ([^\)]+) \))?     # Optional return type
+  (\s* [a-z0-9_]+)          # Method name
+
+  # Zero or more parameters:
+
+  ( (\s* [a-z0-9_]*)        # Optional name of parameter
+    :                       # Mandatory colon
+    (\s* \( [^\)]+ \))?     # Optional type of parameter
+    (\s* [a-z0-9_]+)        # Parameter name (might be optional)
+    (\s* , \s* ...)?        # Optional var-args notation
+  )*
+
+  (?=\s* ;?)                # Optional semicolon
+
+/ix) do
+  rettype = $3.to_s.strip
+  methods &lt;&lt; [$&amp;.strip.gsub(' *)', (ENV['TM_C_POINTER'] || ' *').rstrip + ')'), rettype]
+end
+
+TextMate::exit_show_tool_tip('No methods found on the clipboard') if methods.empty?
+
+if ENV['TM_SCOPE'] !~ /meta.implementation.objc/
+  methods.each { |(proto, rettype)| puts "#{proto};" }
+else
+  tabstop = 0
+  puts(methods.map do |(proto, rettype)|
+    ret = case rettype
+          when "void", "IBAction"
+            ""
+          when "BOOL"
+            "\treturn ${#{tabstop+=1}:Y}${1/^(?:(Y)|(N)|.*)/(?1:ES:(?2:O))/};\n"
+          else
+            "\treturn ${#{tabstop+=1}:nil};\n"
+          end
+    "#{proto}\n{\n#{ret}}\n"
+  end.join("\n"))
+end
+</string>
+	<key>fallbackInput</key>
+	<string>line</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^V</string>
+	<key>name</key>
+	<string>Paste Implementation / Interface</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>meta.interface-or-protocol.objc, meta.implementation.objc</string>
+	<key>uuid</key>
+	<string>CB5EC7EC-35B7-4FD8-9045-31CCC379D474</string>
+</dict>
+</plist>

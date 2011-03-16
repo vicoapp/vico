@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>- (void)addObjectTo${1:Things}:(${2:id})anObject;
+- (void)insertObject:($2)anObject in$1AtIndex:(unsigned int)i;
+- ($2)objectIn$1AtIndex:(unsigned int)i;
+- (unsigned int)indexOfObjectIn$1:($2)anObject;
+- (void)removeObjectFrom$1AtIndex:(unsigned int)i;
+- (unsigned int)countOf$1;
+- (NSArray${TM_C_POINTER/(^(.+?)\s*$)?/(?1:$2: *)/})${1/./\l$0/};
+- (void)set$1:(NSArray${TM_C_POINTER/(^(.+?)\s*$)?/(?1:$2: *)/})new$1;</string>
+	<key>name</key>
+	<string>Interface: Accessors for KVC Array</string>
+	<key>scope</key>
+	<string>source.objc meta.scope.interface, source.objc++ meta.scope.interface</string>
+	<key>tabTrigger</key>
+	<string>arracc</string>
+	<key>uuid</key>
+	<string>C125E6DB-7FB5-4B19-8648-0A5617B1B5BC</string>
+</dict>
+</plist>

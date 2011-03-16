@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>word=${TM_SELECTED_TEXT:-$TM_CURRENT_WORD}
+(perldoc -u "$word" 2&gt;/dev/null || perldoc -u -f "$word" 2&gt;/dev/null) | pod2html --q --title "Perl Documentation - $word" 2&gt;/dev/null | sed -E 's|&lt;a href="#(item_)?([^"]+)"&gt;|&lt;a href="http://perldoc.perl.org/search.html?q=\2"&gt;|g'
+if [[ -e "${TM_DIRECTORY}/pod2htmd.tmp" ]]
+  then unlink "${TM_DIRECTORY}/pod2htmd.tmp"
+fi
+if [[ -e "${TM_DIRECTORY}/pod2htmi.tmp" ]]
+  then unlink "${TM_DIRECTORY}/pod2htmi.tmp"
+fi</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Word / Selection</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>source.perl</string>
+	<key>uuid</key>
+	<string>DA0A5D89-5F16-11D9-B9C3-000D93589AF6</string>
+</dict>
+</plist>

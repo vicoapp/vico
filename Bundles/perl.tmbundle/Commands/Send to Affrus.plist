@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>saveActiveFile</string>
+	<key>command</key>
+	<string>open -a Affrus "$TM_FILEPATH"</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^@p</string>
+	<key>name</key>
+	<string>Send to Affrus</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>scope</key>
+	<string>source.perl</string>
+	<key>uuid</key>
+	<string>DA0A5E1E-5F16-11D9-B9C3-000D93589AF6</string>
+</dict>
+</plist>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby -wKU
+
+abort if File.exists? ENV['TM_NEW_FILE']
+is_on_tiger = %x{ defaults read /System/Library/CoreServices/SystemVersion ProductVersion } =~ /\A10\.4/
+
+addr = "«your address»"
+if is_on_tiger
+	require ENV['TM_SUPPORT_PATH'] + '/lib/osx/plist'
+	me_entry = ENV['HOME'] + '/Library/Preferences/AddressBookMe.plist'
+	if File.exists? me_entry
+		a = File.open(me_entry) { |io| OSX::PropertyList.load(io) }
+
+		addr  = a['StreetAddr1'] + "\n"
+		addr += a['StreetAddr2'] + "\n" unless a['StreetAddr2'].to_s.empty?
+		addr += a['ZipPostal'] + " " + a['City']
+	end	
+else
+	require 'osx/cocoa'
+	OSX.require_framework "AddressBook"
+	OSX.ns_import :ABAddressBook
+	OSX.ns_import :ABPerson
+	OSX.ns_import :ABMultiValue
+
+	me_entry = OSX::ABAddressBook.sharedAddressBook.me
+	a = me_entry.valueForProperty(OSX::KABAddressProperty).valueAtIndex(0)
+
+	addr  = a['Street'] + "\n"
+	addr += a['ZIP'] + " " + a['City']
+end
+
+open(ENV['TM_NEW_FILE'], 'w') do |out|
+	out &lt;&lt; IO.read('letter.tex').gsub(/\$\{([^}]+)\}/) do
+		if $1 == 'AUTHOR_ADDR'
+			"\n\t" + addr.gsub(/\n/, " \\\\\\\\\n\t") + "\n"
+		else
+			ENV[$1]
+		end
+	end
+end
+</string>
+	<key>extension</key>
+	<string>tex</string>
+	<key>name</key>
+	<string>Letter (for C5 and E65 window envelopes)</string>
+	<key>uuid</key>
+	<string>66F6C0FF-F105-4B89-8D56-EE8178EB57A0</string>
+</dict>
+</plist>

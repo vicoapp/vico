@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>- (${1:unsigned int})${2:thing}
+{
+	return ${3:$2};
+}
+
+- (void)set${2/./\u$0/}:(${1:unsigned int})new${2/./\u$0/}
+{
+	$3 = new${2/./\u$0/};
+}</string>
+	<key>name</key>
+	<string>Primitive Type</string>
+	<key>scope</key>
+	<string>(source.objc | source.objc++) &amp; meta.scope.implementation.objc - meta.function-with-body</string>
+	<key>tabTrigger</key>
+	<string>acc</string>
+	<key>uuid</key>
+	<string>DADC6C91-415F-463A-9C24-7A059BB5EE56</string>
+</dict>
+</plist>

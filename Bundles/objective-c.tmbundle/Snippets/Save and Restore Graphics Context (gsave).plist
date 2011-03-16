@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>[NSGraphicsContext saveGraphicsState];
+$0
+[NSGraphicsContext restoreGraphicsState];
+</string>
+	<key>name</key>
+	<string>Save and Restore Graphics Context</string>
+	<key>scope</key>
+	<string>source.objc, source.objc++</string>
+	<key>tabTrigger</key>
+	<string>gsave</string>
+	<key>uuid</key>
+	<string>F2D5B215-2C10-40BC-B973-0A859A3E3CBD</string>
+</dict>
+</plist>

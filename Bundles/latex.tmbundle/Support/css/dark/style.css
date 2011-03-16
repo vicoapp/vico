@@ -1,0 +1,31 @@
+.dark div.bibtex  {
+    background-color: #999;
+    color: black;
+}
+
+.warning {
+ color: #FF7F00;
+ margin-left: 20px; 
+}
+.dark p.warning a {
+    color: #FF7F00;
+}
+
+
+.dark div.error a {
+    color: red;
+}
+
+.error {
+ color: red;
+ margin-left: 20px;
+}
+
+.dark p.error a {
+ color: red;
+}
+
+.dark div#commandOutput {
+    background-color: rgb(40,40,40);
+    padding: 5px;
+}

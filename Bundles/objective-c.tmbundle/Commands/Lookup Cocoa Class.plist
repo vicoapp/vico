@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>ruby -r"$TM_BUNDLE_SUPPORT/lib/docset_query.rb" -e 'documentation_for_word'</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>none</string>
+	<key>keyEquivalent</key>
+	<string>^h</string>
+	<key>name</key>
+	<string>Documentation for Word / Selection</string>
+	<key>output</key>
+	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>source.c, source.c++, source.objc, source.objc++, (source.objc support | source.objc++ support) - support.function.any-method</string>
+	<key>uuid</key>
+	<string>2E0F350A-7B23-11D9-B084-000D93589AF6</string>
+</dict>
+</plist>

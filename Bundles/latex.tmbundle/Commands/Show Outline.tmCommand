@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes.rb'
+require ENV['TM_SUPPORT_PATH'] + '/lib/escape.rb'
+require ENV['TM_SUPPORT_PATH'] + '/lib/web_preview.rb'
+require "#{ENV['TM_BUNDLE_SUPPORT']}/lib/LaTeXUtils.rb"
+html_header "LaTeX Document Outline", "LaTeX"
+REGEX = /\\(part|chapter|section|subsection|subsubsection|paragraph|subparagraph)\*?(?:%.*\n[ \t]*)?(?:(?&gt;\[(.*?)\])|\{([^{}]*(?:\{[^}]*\}[^}]*?)*)\})/
+INCLUDE_REGEX = /\\(?:input|include)(?:%.*\n[ \t]*)?(?&gt;\{(.*?)\})/
+NON_COMMENT_REGEX = /^([^%]+$|(?:[^%]|\\%)*)(?=%|$)/
+class String
+  def adjust_end(new_piece)
+    new_form = self.sub(/[^\/]*$/,new_piece)
+    new_form += ".tex" unless new_form.match(/\.tex$/)
+    new_form
+  end
+end
+class Section &lt; String
+  def &lt;=&gt;(other_part)
+    parts = ["root","part","chapter","section","subsection","subsubsection","paragraph","subparagraph"]
+    return parts.index(self) &lt;=&gt; parts.index(other_part)
+  end
+  def &lt;(other_part)
+    (self&lt;=&gt;other_part) == -1
+  end
+end
+def outline_points(filename)
+  points = []
+  if filename.is_a?(String) then
+    data = File.read(filename)
+    name = "url=file://" + e_url(filename) + "&amp;"
+  else
+    data = filename.read
+    name = ""
+  end
+  data.split("\n").each_with_index do |line, i|
+    line.match(NON_COMMENT_REGEX)
+    line = $1 || ""
+    points &lt;&lt; [name,i+1,$1,$2 || $3] if line.match(REGEX)
+    points += outline_points(filename.adjust_end($1)) if line.match(INCLUDE_REGEX)
+  end
+  points
+end
+file = LaTeX.master(ENV['TM_LATEX_MASTER'] || ENV['TM_FILEPATH'])
+if file.nil?
+  file = STDIN
+else
+  file = File.expand_path(file, File.dirname(ENV['TM_FILEPATH']))
+end
+require 'pp'
+points = outline_points(file)
+# sec = Section.new("section")
+current = [Section.new("root")]
+string = []
+points.each do |file,line,part,title|
+  # pp [part,sec &lt;=&gt; part]
+  case current.last &lt;=&gt; part
+  when 1
+(current.pop; string &lt;&lt; "\t" * current.length + "&lt;/ol&gt;") while current.last &gt; part
+  when -1
+    string &lt;&lt; "\t" * current.length + "&lt;ol&gt;"
+    current &lt;&lt; Section.new(part)
+  end
+  string &lt;&lt; "\t" * current.length + "&lt;li&gt;&lt;a href=\"txmt://open?#{file}line=#{line}\"&gt;#{title}&lt;/a&gt;&lt;/li&gt;"
+end
+(current.pop; string &lt;&lt; "\t" * current.length + "&lt;/ol&gt;") while current.last != "root"
+puts string.join("\n")
+html_footer</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>document</string>
+	<key>keyEquivalent</key>
+	<string>@O</string>
+	<key>name</key>
+	<string>Show Outline</string>
+	<key>output</key>
+	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>text.tex.latex</string>
+	<key>uuid</key>
+	<string>5AED5DFA-F084-4F12-8A06-D51C78E91D05</string>
+</dict>
+</plist>

@@ -28,7 +28,7 @@
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (void)addSnippet:(NSDictionary *)snippet;
 - (void)addCommand:(NSMutableDictionary *)command;
-- (NSMenu *)menuForScopes:(NSArray *)scopes;
+- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection;
 
 @property(readonly) NSMutableArray *languages;
 @property(readonly) NSString *path;

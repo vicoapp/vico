@@ -302,6 +302,7 @@
          inMainMenu:(NSDictionary *)mainMenu
           forScopes:(NSArray *)scopes
        enabledItems:(NSUInteger *)enabledItemsPtr
+       hasSelection:(BOOL)hasSelection
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
@@ -324,7 +325,25 @@
 				}
 				/* otherwise selector is NULL => disabled menu item */
 
-				item = [menu addItemWithTitle:[op name]
+				/* Replace "Thing / Selection" depending on hasSelection.
+				 */
+				NSMutableString *title = [[op name] mutableCopy];
+				NSRange r = [title rangeOfString:@" / Selection"];
+				if (r.location != NSNotFound) {
+					if (hasSelection) {
+						NSCharacterSet *set = [NSCharacterSet letterCharacterSet];
+						NSInteger l;
+						for (l = r.location; l > 0; l--)
+							if (![set characterIsMember:[title characterAtIndex:l - 1]])
+								break;
+						NSRange altr = NSMakeRange(l, r.location - l + 3);
+						if (altr.length > 3)
+							[title deleteCharactersInRange:altr];
+					} else
+						[title deleteCharactersInRange:r];
+				}
+
+				item = [menu addItemWithTitle:title
 						       action:selector
 						keyEquivalent:[op keyEquivalent]];
 				[item setKeyEquivalentModifierMask:[op modifierMask]];
@@ -348,7 +367,8 @@
 				                       withName:[submenuLayout objectForKey:@"name"]
 				                     inMainMenu:mainMenu
 				                      forScopes:scopes
-				                   enabledItems:&submatches];
+				                   enabledItems:&submatches
+				                   hasSelection:hasSelection];
 				if (submenu) {
 					matches += submatches;
 					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"]
@@ -370,7 +390,7 @@
 	return menu;
 }
 
-- (NSMenu *)menuForScopes:(NSArray *)scopes
+- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
 	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])
@@ -381,7 +401,8 @@
 	                    withName:[self name]
 	                  inMainMenu:mainMenu
 	                   forScopes:scopes
-	                enabledItems:&matches];
+	                enabledItems:&matches
+	                hasSelection:hasSelection];
 
 	return matches == 0 ? nil : menu;
 }

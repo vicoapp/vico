@@ -1788,9 +1788,10 @@ int logIndent = 0;
 
 	[self setCaret:charIndex];
 	NSArray *scopes = [self scopesAtLocation:charIndex];
+	NSRange sel = [self selectedRange];
 
 	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-		NSMenu *submenu = [bundle menuForScopes:scopes];
+		NSMenu *submenu = [bundle menuForScopes:scopes hasSelection:sel.length > 0];
 		if (submenu) {
 			NSMenuItem *item = [menu insertItemWithTitle:[bundle name]
 							      action:NULL

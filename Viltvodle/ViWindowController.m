@@ -143,9 +143,10 @@ static NSWindowController	*currentWindowController = nil;
 	ViDocumentView *docView = [self currentView];
 	ViTextView *textView = [docView textView];
 	NSArray *scopes = [textView scopesAtLocation:[textView caret]];
+	NSRange sel = [textView selectedRange];
 
 	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-		NSMenu *submenu = [bundle menuForScopes:scopes];
+		NSMenu *submenu = [bundle menuForScopes:scopes hasSelection:sel.length > 0];
 		if (submenu) {
 			NSMenuItem *item = [menu addItemWithTitle:[bundle name]
 							      action:NULL

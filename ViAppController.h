@@ -1,10 +1,21 @@
 @class ViRegexp;
 
+@protocol ViShellThingProtocol <NSObject>
+
+- (void)exit;
+- (void)exitWithObject:(id)obj;
+- (void)exitWithError:(int)code;
+- (void)log:(NSString *)message;
+
+@end
+
 @protocol ViShellCommandProtocol <NSObject>
 
 - (NSString *)eval:(NSString *)script
     withScriptPath:(NSString *)path
-       errorString:(NSString **)errorString;
+additionalBindings:(NSDictionary *)bindings
+       errorString:(NSString **)errorString
+       backChannel:(NSString *)channelName;
 - (NSError *)openURL:(NSURL *)anURL;
 
 @end

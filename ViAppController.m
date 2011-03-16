@@ -225,10 +225,8 @@ extern BOOL makeNewWindowInsteadOfTab;
 		[self consoleOutput:[NSString stringWithFormat:@"Error on line %li: %@\n", lineNumber, error]];
 }
 
-- (IBAction)evalScript:(id)sender
+- (void)exportGlobals:(JSCocoa *)jsc
 {
-	JSCocoa *jsc = [JSCocoa sharedController];
-
 	/* Set some convenient global objects. */
 	[jsc removeObjectWithName:@"window"];
 	[jsc removeObjectWithName:@"view"];
@@ -249,6 +247,13 @@ extern BOOL makeNewWindowInsteadOfTab;
 		if (doc)
 			[jsc setObject:doc.proxy withName:@"document"];
 	}
+}
+
+- (IBAction)evalScript:(id)sender
+{
+	JSCocoa *jsc = [JSCocoa sharedController];
+
+	[self exportGlobals:jsc];
 
 	JSValueRef result = [jsc evalJSString:[scriptInput stringValue]];
 	if (result != NULL) {
@@ -268,9 +273,25 @@ extern BOOL makeNewWindowInsteadOfTab;
 
 - (NSString *)eval:(NSString *)script
     withScriptPath:(NSString *)path
+additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
+       backChannel:(NSString *)channelName
 {
 	JSCocoa *jsc = [JSCocoa sharedController];
+
+	[self exportGlobals:jsc];
+
+	if (channelName) {
+		NSConnection *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
+		[jsc setObject:backChannel withName:@"shellCommand"];
+	}
+
+	for (NSString *key in [bindings allKeys])
+		if ([key isKindOfClass:[NSString class]])
+			[jsc setObject:[bindings objectForKey:key] withName:key];
+
+	DEBUG(@"evaluating script: {{{ %@ }}}", script);
+	DEBUG(@"additional bindings: %@", bindings);
 
 	evalFromShell = YES;
 	JSValueRef result = [jsc evalJSString:script withScriptPath:path];
@@ -293,7 +314,9 @@ extern BOOL makeNewWindowInsteadOfTab;
 	NSURL *url = [NSURL URLWithString:[anURL absoluteString]];
 
 	NSError *error = nil;
-	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+	                                                                       display:YES
+	                                                                         error:&error];
 	if (error == nil)
 		[NSApp activateIgnoringOtherApps:YES];
 

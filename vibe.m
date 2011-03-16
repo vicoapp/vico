@@ -5,18 +5,62 @@
 #include <unistd.h>
 
 #import "ViAppController.h"
+#import "json/JSON.h"
+
+BOOL keepRunning = YES;
+int returnCode = 0;
+id returnObject = nil;
+
+@interface ShellThing : NSObject <ViShellThingProtocol>
+{
+}
+@end
+
+@implementation ShellThing
+
+- (void)exit
+{
+	keepRunning = NO;
+}
+
+- (void)exitWithObject:(id)obj
+{
+	keepRunning = NO;
+	returnObject = obj;
+}
+
+- (void)exitWithError:(int)code
+{
+	keepRunning = NO;
+	returnCode = code;
+}
+
+- (void)log:(NSString *)message
+{
+	fprintf(stderr, "%s\n", [message UTF8String]);
+}
+
+@end
 
 int
 main(int argc, char **argv)
 {
 	NSProxy<ViShellCommandProtocol>		*proxy;
-	NSString	*script = nil;
-	NSString	*script_path = nil;
-	const char	*eval_script = NULL;
-	const char	*eval_file = NULL;
-	int		 i, c;
+	NSString				*script = nil;
+	NSString				*script_path = nil;
+	NSString				*json;
+	NSError					*error = nil;
+	NSFileHandle				*handle;
+	NSMutableDictionary			*bindings = nil;
+	NSDictionary				*params;
+	const char				*eval_script = NULL;
+	const char				*eval_file = NULL;
+	int					 i, c;
+	BOOL					 runLoop = NO;
 
-	while ((c = getopt(argc, argv, "e:f:h")) != -1) {
+	bindings = [NSMutableDictionary dictionary];
+
+	while ((c = getopt(argc, argv, "e:f:hp:r")) != -1) {
 		switch (c) {
 		case 'e':
 			eval_script = optarg;
@@ -27,6 +71,19 @@ main(int argc, char **argv)
 		case 'h':
 			printf("DON'T PANIC\n");
 			return 0;
+		case 'p':
+			NSLog(@"parsing cmdline parameters: [%s]", optarg);
+			if ((json = [NSString stringWithUTF8String:optarg]) == nil)
+				errx(1, "-p argument not proper UTF8");
+			if ((params = [json JSONValue]) == nil)
+				errx(1, "-p argument not proper JSON");
+			if (![params isKindOfClass:[NSDictionary class]])
+				errx(1, "-p argument not a JSON object");
+			[bindings addEntriesFromDictionary:params];
+			break;
+		case 'r':
+			runLoop = YES;
+			break;
 		case '?':
 		default:
 			exit(1);
@@ -49,8 +106,6 @@ main(int argc, char **argv)
 	}
 
 	if (eval_file) {
-		NSError *error = nil;
-		NSFileHandle *handle;
 		if (strcmp(eval_file, "-") == 0) {
 			handle = [NSFileHandle fileHandleWithStandardInput];
 			script_path = @"stdin";
@@ -75,11 +130,21 @@ main(int argc, char **argv)
 			errx(2, "invalid UTF8 encoding");
 	}
 
+	NSLog(@"using additional bindings: %@", bindings);
+
 	if (script) {
+		NSConnection *backConn = [NSConnection new];
+		[backConn setRootObject:[[ShellThing alloc] init]];
+		[backConn registerName:@"crunchy frog"];
+
 		NSString *errStr = nil;
 		NSString *result = nil;
 		@try {
-			result = [proxy eval:script withScriptPath:script_path errorString:&errStr];
+			result = [proxy eval:script
+			      withScriptPath:script_path
+			  additionalBindings:bindings
+			         errorString:&errStr
+			         backChannel:@"crunchy frog"];
 		}
 		@catch (NSException *exception) {
 			NSString *msg = [NSString stringWithFormat:@"%@: %@",
@@ -92,7 +157,7 @@ main(int argc, char **argv)
 			return 5;
 		}
 
-		if (result == nil) {
+		if (errStr) {
 			fprintf(stderr, "%s\n", [errStr UTF8String]);
 			return 3;
 		}
@@ -109,16 +174,32 @@ main(int argc, char **argv)
 	for (i = 0; i < argc; i++) {
 		NSString *path = [[NSString stringWithUTF8String:argv[i]] stringByExpandingTildeInPath];
 		NSURL *url = [NSURL fileURLWithPath:path isDirectory:NO];
-		NSError *error = [proxy openURL:url];
+		error = [proxy openURL:url];
 		if (error)
 			errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
 	}
 
-	if (argc == 0) {
+	if (argc == 0 && script == nil) {
 		/* just make it first responder */
-		[proxy eval:@"NSApp.activateIgnoringOtherApps(YES)" withScriptPath:nil errorString:nil];
+		[proxy eval:@"NSApp.activateIgnoringOtherApps(YES)"
+	     withScriptPath:nil
+	 additionalBindings:nil
+	        errorString:nil
+	        backChannel:nil];
 	}
 
-	return 0;
+	if (runLoop && script) {
+		NSRunLoop *loop = [NSRunLoop currentRunLoop];
+		while (keepRunning && [loop runMode:NSDefaultRunLoopMode
+				         beforeDate:[NSDate distantFuture]])
+			;
+
+		if (returnObject) {
+			NSString *returnJSON = [returnObject JSONRepresentation];
+			printf("%s\n", [returnJSON UTF8String]);
+		}
+	}
+
+	return returnCode;
 }
 

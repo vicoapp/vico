@@ -23,6 +23,18 @@
 			<string>ViDocument</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>ViProject</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>viproj</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Project</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>sh</string>

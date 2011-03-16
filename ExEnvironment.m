@@ -12,7 +12,10 @@
 
 @interface ExEnvironment (private)
 - (NSString *)filenameInString:(NSString *)s range:(NSRange *)outRange;
-- (unsigned)completePath:(NSString *)partialPath relativeToURL:(NSURL *)url into:(NSString **)longestMatchPtr matchesIntoArray:(NSArray **)matchesPtr;
+- (unsigned)completePath:(NSString *)partialPath
+           relativeToURL:(NSURL *)url
+                    into:(NSString **)longestMatchPtr
+        matchesIntoArray:(NSArray **)matchesPtr;
 - (NSURL *)parseExFilename:(NSString *)filename;
 - (IBAction)finishedExCommand:(id)sender;
 @end

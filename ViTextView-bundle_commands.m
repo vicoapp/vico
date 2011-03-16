@@ -277,7 +277,7 @@
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
 			[self replaceRange:selectedRange withString:outputText undoGroup:NO];
-		if ([outputFormat isEqualToString:@"replaceDocument"])
+		else if ([outputFormat isEqualToString:@"replaceDocument"])
 			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];

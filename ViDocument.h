@@ -69,5 +69,6 @@
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
 - (NSString *)title;
+- (void)setString:(NSString *)aString;
 
 @end

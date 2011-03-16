@@ -365,6 +365,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 	}
 
+	[self setString:aString];
+
+	return YES;
+}
+
+- (void)setString:(NSString *)aString
+{
 	/*
 	 * Disable the processing in textStorageDidProcessEditing,
 	 * otherwise we'll parse the document multiple times.
@@ -379,8 +386,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self highlightEverything];
 
 	[proxy emitDelayed:@"didLoad" with:self, nil];
-
-	return YES;
 }
 
 - (void)setEncoding:(id)sender

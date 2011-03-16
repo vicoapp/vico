@@ -768,8 +768,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	/*
 	 * Extend our range along affected line boundaries and re-parse.
 	 */
-	NSUInteger bol, end;
-	[[textStorage string] getLineStart:&bol end:&end contentsEnd:NULL forRange:area];
+	NSUInteger bol, end, eol;
+	NSRange prevRange = area;
+	[[textStorage string] getLineStart:&bol end:&end contentsEnd:&eol forRange:area];
+	if (eol == area.location) {
+		/* Change at EOL, include another line to make sure
+		 * we get the line continuations right. */
+		[[textStorage string] getLineStart:NULL
+		                               end:&end
+		                       contentsEnd:NULL
+		                          forRange:NSMakeRange(end, 0)];
+	}
 	area.location = bol;
 	area.length = end - bol;
 

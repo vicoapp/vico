@@ -2,6 +2,7 @@
 #import "ViSyntaxParser.h"
 #import "ViScope.h"
 #import "NSArray-patterns.h"
+#import "ViCommon.h"
 #import "logging.h"
 
 @interface ViSyntaxParser ()
@@ -683,9 +684,19 @@ done:
 
 		if (end == nextRange || end == NSNotFound)
 			break;
-		NSRange line = NSMakeRange(nextRange, end - nextRange);
 
-		DEBUG(@"---> line number %i (%u -> %u, w/offset %u, length %u)", lineno, nextRange, end, offset, end - nextRange);
+		NSRange line = NSMakeRange(nextRange, end - nextRange);
+		if (line.length > 3000) {
+			/* Extremely large lines result in beachballing. */
+			NSRange overflow = NSMakeRange(line.location + 3000, line.length - 3000);
+			[self setScopes:[NSArray arrayWithObject:[language name]]
+			        inRange:overflow
+			       additive:NO];
+			line.length = 3000;
+		}
+
+		DEBUG(@"---> line number %i (%u -> %u, w/offset %u, length %u)",
+		    lineno, nextRange, end, offset, end - nextRange);
 
 		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;

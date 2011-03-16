@@ -41,6 +41,15 @@
 		9A02E00813294466001FC7D1 /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B0E720D01601A00040CAC /* ViTextView.m */; };
 		9A02E013132A72B1001FC7D1 /* ViScriptProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A02E012132A72AF001FC7D1 /* ViScriptProxy.m */; };
 		9A02E016132BA829001FC7D1 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A02E015132BA827001FC7D1 /* NSObject+SPInvocationGrabbing.m */; };
+		9A02E04F132CF89E001FC7D1 /* NSObject+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE643131B7D8100E8657A /* NSObject+JSON.m */; };
+		9A02E051132CF89E001FC7D1 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE645131B7D8100E8657A /* SBJsonParser.m */; };
+		9A02E053132CF89E001FC7D1 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE647131B7D8100E8657A /* SBJsonStreamParser.m */; };
+		9A02E055132CF89E001FC7D1 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE649131B7D8100E8657A /* SBJsonStreamParserAdapter.m */; };
+		9A02E057132CF89E001FC7D1 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE64B131B7D8100E8657A /* SBJsonStreamParserState.m */; };
+		9A02E059132CF89E001FC7D1 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE64D131B7D8100E8657A /* SBJsonStreamWriter.m */; };
+		9A02E05B132CF89E001FC7D1 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE64F131B7D8100E8657A /* SBJsonStreamWriterState.m */; };
+		9A02E05D132CF89E001FC7D1 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE651131B7D8100E8657A /* SBJsonTokeniser.m */; };
+		9A02E05F132CF89E001FC7D1 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2DE653131B7D8100E8657A /* SBJsonWriter.m */; };
 		9A0868B20EE03A7600274635 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0868B10EE03A7600274635 /* ViSeparatorCell.m */; };
 		9A099A720EE88046006A80A2 /* ViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A099A710EE88046006A80A2 /* ViTextStorage.m */; };
 		9A15BB1E1254D3E7009BBFC8 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A15BB1D1254D3E7009BBFC8 /* tick.png */; };
@@ -1570,6 +1579,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A02E04F132CF89E001FC7D1 /* NSObject+JSON.m in Sources */,
+				9A02E051132CF89E001FC7D1 /* SBJsonParser.m in Sources */,
+				9A02E053132CF89E001FC7D1 /* SBJsonStreamParser.m in Sources */,
+				9A02E055132CF89E001FC7D1 /* SBJsonStreamParserAdapter.m in Sources */,
+				9A02E057132CF89E001FC7D1 /* SBJsonStreamParserState.m in Sources */,
+				9A02E059132CF89E001FC7D1 /* SBJsonStreamWriter.m in Sources */,
+				9A02E05B132CF89E001FC7D1 /* SBJsonStreamWriterState.m in Sources */,
+				9A02E05D132CF89E001FC7D1 /* SBJsonTokeniser.m in Sources */,
+				9A02E05F132CF89E001FC7D1 /* SBJsonWriter.m in Sources */,
 				9A766B9C1327E099009CB17C /* vibe.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

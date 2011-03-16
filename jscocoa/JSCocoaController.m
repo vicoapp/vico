@@ -2194,7 +2194,7 @@ int	liveInstanceCount	= 0;
 			}
 		}
 		else
-        if ([arg isKindOfClass:[NSNumber class]]) {
+        if ([arg isKindOfClass:[NSNumber class]] && strcmp(type, @encode(id)) != 0) {
             
 //            const char *type = [signature getArgumentTypeAtIndex:argIndex + 2];
             if (strcmp(type, @encode(BOOL)) == 0) {

@@ -34,6 +34,8 @@
 {
 	[viewController setTabController:self];
 	[views addObject:viewController];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController document] addView:viewController];
 }
 
 - (void)removeView:(id<ViViewController>)viewController

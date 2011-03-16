@@ -153,11 +153,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[views removeObject:aDocumentView];
 }
 
+- (void)addView:(ViDocumentView *)aDocumentView
+{
+	[views addObject:aDocumentView];
+}
+
 - (ViDocumentView *)makeView
 {
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
-	[views addObject:documentView];
+	[self addView:documentView];
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 

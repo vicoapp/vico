@@ -65,6 +65,7 @@
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (ViDocumentView *)makeView;
 - (void)removeView:(ViDocumentView *)aDocumentView;
+- (void)addView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
 - (NSString *)title;

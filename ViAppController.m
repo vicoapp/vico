@@ -162,7 +162,6 @@
 				[doc updatePageGuide];
 	} else if ([keyPath isEqualToString:@"undostyle"]) {
 		NSString *undostyle = [change objectForKey:NSKeyValueChangeNewKey];
-		INFO(@"got undo style %@", undostyle);
 		if (![undostyle isEqualToString:@"vim"] && ![undostyle isEqualToString:@"nvi"])
 			[[NSUserDefaults standardUserDefaults] setObject:@"vim" forKey:@"undostyle"];
 	}

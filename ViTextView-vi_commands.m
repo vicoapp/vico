@@ -1075,20 +1075,26 @@
 				[[self delegate] message:@"No changes to undo"];
 				return NO;
 			}
+			[[self textStorage] beginEditing];
 			[undoManager undo];
+			[[self textStorage] endEditing];
 		} else {
 			if (![undoManager canRedo]) {
 				[[self delegate] message:@"No changes to re-do"];
 				return NO;
 			}
+			[[self textStorage] beginEditing];
 			[undoManager redo];
+			[[self textStorage] endEditing];
 		}
 	} else {
 		if (![undoManager canUndo]) {
 			[[self delegate] message:@"No changes to undo"];
 			return NO;
 		}
+		[[self textStorage] beginEditing];
 		[undoManager undo];
+		[[self textStorage] endEditing];
 	}
 
 	return YES;

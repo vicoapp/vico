@@ -586,6 +586,24 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Undo support
 
+- (IBAction)undo:(id)sender
+{
+	[self setNormalMode];
+	[[self textStorage] beginEditing];
+	[undoManager undo];
+	[[self textStorage] endEditing];
+	[self setCaret:final_location];
+}
+
+- (IBAction)redo:(id)sender
+{
+	[self setNormalMode];
+	[[self textStorage] beginEditing];
+	[undoManager redo];
+	[[self textStorage] endEditing];
+	[self setCaret:final_location];
+}
+
 - (void)endUndoGroup
 {
 	DEBUG(@"Ending undo-group: %@", hasUndoGroup ? @"YES" : @"NO");

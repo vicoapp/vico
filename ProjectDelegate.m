@@ -145,6 +145,8 @@
 						forKeyPath:@"exploresortfolders"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
+
+	[self browseURL:[environment baseURL]];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -647,16 +649,14 @@
 	if (![self explorerIsOpen]) {
 		if (temporarily)
 			closeExplorerAfterUse = YES;
-		[splitView setPosition:200 ofDividerAtIndex:0];
-		if (rootItems == nil)
-			[self browseURL:[environment baseURL]];
+		[splitView setPosition:200.0 ofDividerAtIndex:0];
 	}
 	returnToExplorer = NO;
 }
 
 - (void)closeExplorer
 {
-	[splitView setPosition:0 ofDividerAtIndex:0];
+	[splitView setPosition:0.0 ofDividerAtIndex:0];
 }
 
 - (IBAction)toggleExplorer:(id)sender

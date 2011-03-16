@@ -227,6 +227,10 @@ static NSWindowController	*currentWindowController = nil;
 
 	separatorCell = [[ViSeparatorCell alloc] init];
 
+	NSRect frame = [splitView frame];
+	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
+
 	if ([self project] != nil) {
 		[environment setBaseURL:[[self project] initialURL]];
 		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
@@ -245,10 +249,6 @@ static NSWindowController	*currentWindowController = nil;
 						forKeyPath:@"undostyle"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
-
-	NSRect frame = [splitView frame];
-	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
-	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 }
 
 - (void)browseURL:(NSURL *)url
@@ -1053,9 +1053,12 @@ static NSWindowController	*currentWindowController = nil;
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
 {
 	if (sender == splitView) {
+		CGFloat d = 100;
+		if (splitView.isAnimating)
+			d = 10;
 		NSView *view = [[sender subviews] objectAtIndex:offset];
 		if (view == explorerView)
-			return 100;
+			return d;
 		if (view == symbolsView) {
 			NSRect frame = [sender frame];
 			return frame.size.width - 300;
@@ -1068,10 +1071,13 @@ static NSWindowController	*currentWindowController = nil;
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
 {
 	if (sender == splitView) {
+		CGFloat d = 100;
+		if (splitView.isAnimating)
+			d = 10;
 		NSView *view = [[sender subviews] objectAtIndex:offset];
 		if (view == explorerView)
 			return 300;
-		return proposedMax - 100;
+		return proposedMax - d;
 	} else
 		return proposedMax;
 }

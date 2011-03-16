@@ -5,6 +5,8 @@ require "#{ENV['TM_SUPPORT_PATH']}/lib/osx/plist"
 require "#{ENV['TM_SUPPORT_PATH']}/lib/escape"
 require "#{ENV['TM_SUPPORT_PATH']}/lib/exit_codes"
 
+VIBE = ENV['TM_APP_PATH'] + '/Contents/MacOS/vibe'
+
 module TextMate
 
   class AppPathNotFoundException < StandardError; end
@@ -22,10 +24,9 @@ module TextMate
       default_line = options.has_key?(:file) ? 1 : ENV['TM_LINE_NUMBER']
       options = {:file => ENV['TM_FILEPATH'], :line => default_line, :column => 1}.merge(options)
       if options[:file]
-#        `open "txmt://open?url=file://#{e_url options[:file]}&line=#{options[:line]}&column=#{options[:column]}"`
-      else
-#        `open "txmt://open?line=#{options[:line]}&column=#{options[:column]}"`
+        `#{VIBE} #{e_sh(options[:file])}`
       end
+      `#{VIBE} -e "if(text){text.gotoLine_column_(#{options[:line]},#{options[:column]}) && NSApp.activateIgnoringOtherApps(YES)}"`
     end
 
     def require_cmd(command, message = nil)

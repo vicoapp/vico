@@ -106,7 +106,7 @@ receipt_read(const char *path, void **buf, size_t *len)
 
 	if (stbuf.st_size >= SIZE_MAX)
 		return -1;
-	*len = stbuf.st_size;
+	*len = (size_t)stbuf.st_size;
 
 	if ((*buf = malloc(*len)) == NULL) {
 		close(fd);

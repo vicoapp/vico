@@ -233,7 +233,8 @@ static NSString *bundlesDirectory = nil;
 				if (triggerLength > longestMatch) {
 					[matches removeAllObjects];
 					longestMatch = triggerLength;
-				}
+				} else if (triggerLength < longestMatch)
+					continue;
 
 				NSString *scope = [item scope];
 				u_int64_t rank;

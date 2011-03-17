@@ -719,8 +719,12 @@ int logIndent = 0;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"ignorecase"] == NSOnState)
-		rx_options |= ONIG_OPTION_IGNORECASE;
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	if ([defs integerForKey:@"ignorecase"] == NSOnState) {
+		if ([defs integerForKey:@"smartcase"] == NSOffState ||
+		    [pattern rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location == NSNotFound)
+			rx_options |= ONIG_OPTION_IGNORECASE;
+	}
 
 	ViRegexp *rx = nil;
 
@@ -1021,19 +1025,13 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Input handling and command evaluation
 
-- (void)handle_input:(NSString *)characters
+- (BOOL)handleSmartPair:(NSString *)characters
 {
-	DEBUG(@"insert characters [%@] at %i", characters, start_location);
-
-	// If there is a selected snippet range, remove it first.
-	ViSnippet *snippet = [self delegate].snippet;
-	NSRange sel = snippet.selectedRange;
-	if (sel.length > 0) {
-		[self deleteRange:sel];
-		start_location = modify_start_location;
-	}
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"smartpair"])
+		return NO;
 
 	BOOL foundSmartTypingPair = NO;
+
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, [[self textStorage] length] - 1)];
 	NSArray *pair;
 	for (pair in smartTypingPairs) {
@@ -1077,7 +1075,22 @@ int logIndent = 0;
 		}
 	}
 
-	if (!foundSmartTypingPair) {
+	return foundSmartTypingPair;
+}
+
+- (void)handle_input:(NSString *)characters
+{
+	DEBUG(@"insert characters [%@] at %i", characters, start_location);
+
+	// If there is a selected snippet range, remove it first.
+	ViSnippet *snippet = [self delegate].snippet;
+	NSRange sel = snippet.selectedRange;
+	if (sel.length > 0) {
+		[self deleteRange:sel];
+		start_location = modify_start_location;
+	}
+
+	if (![self handleSmartPair:characters]) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:characters atLocation:start_location];
 		final_location = modify_start_location + 1;

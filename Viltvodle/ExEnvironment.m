@@ -1049,7 +1049,9 @@ filter_write(CFSocketRef s,
 		@"shiftwidth", @"sw",
 		@"autoindent", @"ai",
 		@"expandtab", @"et",
+		@"smartpair", @"smp",
 		@"ignorecase", @"ic",
+		@"smartcase", @"scs",
 		@"tabstop", @"ts",
 		@"number", @"nu",
 		@"number", @"num",
@@ -1068,7 +1070,7 @@ filter_write(CFSocketRef s,
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:
-	    @"autoindent", @"expandtab", @"ignorecase", @"number",
+	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr",
 	    @"wrap", @"antialias", @"list", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";

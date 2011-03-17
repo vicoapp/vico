@@ -49,6 +49,7 @@
 - (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError;
 - (NSString *)realpath:(NSString *)pathS error:(NSError **)outError;
 - (NSString *)currentDirectory;
+- (BOOL)removeItemAtPath:(NSString *)path error:(NSError **)outError;
 - (BOOL)renameItemAtPath:(NSString *)oldPath toPath:(NSString *)newPath error:(NSError **)outError;
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError;

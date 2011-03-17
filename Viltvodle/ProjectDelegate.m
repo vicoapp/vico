@@ -465,11 +465,22 @@
 	} else {
 		/* FIXME: ask for confirmation, as remote files will be deleted directly (no trash).
 		 */
-		failed = YES;
+		for (NSURL *url in urls) {
+			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:nil];
+			NSError *error = nil;
+			failed = ![conn removeItemAtPath:[url path] error:&error];
+			if (error) {
+				[NSApp presentError:error];
+				failed = YES;
+			}
+			if (failed)
+				break;
+		}
 	}
 
 	if (!failed) {
 		/* Rescan containing folder(s) ? */
+		[self rescan_files:nil];
 	}
 }
 

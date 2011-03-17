@@ -515,9 +515,9 @@ u_int num_requests = 64;
 		u_int status = 0;
 		if ([self readInt:&status from:&msg error:outError]) {
 			if (outError)
-				*outError = [ViError errorWithFormat:
-				    @"Couldn't stat remote file: %s",
-				    fx2txt(status)];
+				*outError = [ViError errorWithCode:status
+							    format:@"Couldn't stat remote file: %s",
+								fx2txt(status)];
 		}
 		buffer_free(&msg);
 		return NULL;
@@ -572,8 +572,11 @@ u_int num_requests = 64;
 	}
 
 	Attrib *a = [self stat:path error:outError];
-	if (a == NULL)
+	if (a == NULL) {
+		if (outError && *outError && [*outError code] == SSH2_FX_NO_SUCH_FILE)
+			*outError = nil;
 		return NO;
+	}
 	if (!(a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"Permission denied"];
@@ -1245,7 +1248,6 @@ done:
 	return status == 0 ? YES : NO;
 }
 
-// int do_rm(struct sftp_conn *conn, const char *path)
 - (BOOL)removeItemAtPath:(NSString *)path error:(NSError **)outError
 {
 	u_int status, req_id;

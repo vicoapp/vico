@@ -9,6 +9,7 @@
 #import "TxmtURLProtocol.h"
 #import "JSCocoa.h"
 #import "JSON.h"
+#import "ViError.h"
 
 #include <sys/time.h>
 
@@ -256,6 +257,27 @@ extern BOOL makeNewWindowInsteadOfTab;
 		ViDocument *doc = [winCon currentDocument];
 		if (doc)
 			[jsc setObject:doc.proxy withName:@"document"];
+	}
+}
+
+- (id)evalExpression:(NSString *)expression error:(NSError **)outError
+{
+	JSCocoa *jsc = [JSCocoa sharedController];
+
+	[self exportGlobals:jsc];
+
+	NSString *wrappedExpression = [NSString stringWithFormat:@"(function(){%@})();", expression];
+
+	evalFromShell = YES;
+	JSValueRef result = [jsc evalJSString:wrappedExpression];
+	evalFromShell = NO;
+
+	if (result != NULL)
+		return [jsc toObject:result];
+	else {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"%@", lastEvalError];
+		return nil;
 	}
 }
 

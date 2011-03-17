@@ -36,6 +36,7 @@ additionalBindings:(NSDictionary *)bindings
 @property(copy, readwrite) NSString *lastSearchPattern;
 @property(readonly) NSMenu *encodingMenu;
 
+- (id)evalExpression:(NSString *)expression error:(NSError **)outError;
 - (IBAction)evalScript:(id)sender;
 - (IBAction)clearConsole:(id)sender;
 

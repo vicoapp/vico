@@ -485,6 +485,27 @@ int logIndent = 0;
 	return NO;
 }
 
+- (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *indentExpressions = [[ViLanguageStore defaultStore] preferenceItem:@"indentExpression"];
+	NSString *bestMatchingScope = [self bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
+	
+	if (bestMatchingScope) {
+		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
+		DEBUG(@"running indent expression:\n%@", expression);
+		NSError *error = nil;
+		id result = [[NSApp delegate] evalExpression:expression error:&error];
+		if (error)
+			[[self delegate] message:@"indent expression failed: %@", [error localizedDescription]];
+		else if ([result isKindOfClass:[NSNumber class]])
+			return [result integerValue];
+		else
+			[[self delegate] message:@"non-numeric result: got %@", NSStringFromClass([result class])];
+	}
+
+	return -1;
+}
+
 - (NSInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
         NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
@@ -505,14 +526,15 @@ int logIndent = 0;
 		if (indentForward)
 			checkLocation = aLocation - 1;
 
-		if ([self shouldIncreaseIndentAtLocation:checkLocation])
-		{
+		NSInteger calcIndent = [self calculatedIndentLengthAtLocation:checkLocation];
+		if (calcIndent >= 0) {
+			leading_whitespace = [self indentStringOfLength:calcIndent];
+		} else if ([self shouldIncreaseIndentAtLocation:checkLocation]) {
 			NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
 			leading_whitespace = [self indentStringOfLength:[self lengthOfIndentString:leading_whitespace] + shiftWidth];
 		}
 
-		if (leading_whitespace)
-		{
+		if (leading_whitespace) {
 			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
 			return 1 + [leading_whitespace length];
 		}

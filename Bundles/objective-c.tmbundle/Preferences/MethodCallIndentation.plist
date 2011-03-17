@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Objective-C message call indentation</string>
+	<key>scope</key>
+	<string>meta.function-call.objc</string>
+	<key>settings</key>
+	<dict>
+		<key>indentExpression</key>
+		<string>
+			/*
+			 * XXX: this is experimental proof-of-concept stuff!
+			 * See http://inexdo.com/JSCocoa for the slightly weird syntax :-)
+			 */
+			var range = [text trackScopeSelector:@"meta.bracketed.objc" atLocation:text.caret];
+			// NSLog(@"scope range is " + NSStringFromRange(range));
+			// find first colon
+			var colon = [text.textStorage.string rangeOfString:@":" options:0 range:range];
+			if (colon.location != NSNotFound &amp;&amp; colon.location &lt; text.caret) {
+				var col = text.textStorage.columnAtLocation(colon.location);
+				// NSLog(@"colon at column " + col);
+				// now find any colon after the caret
+				var colon2 = [text.textStorage.string rangeOfString:@":" options:0 range:NSMakeRange(text.caret, NSMaxRange(range) - text.caret)];
+				if (colon2 != NSNotFound) {
+					var col2 = text.textStorage.columnAtLocation(colon2.location);
+					// NSLog(@"found another colon at column " + col2);
+					var indent = col - col2;
+					if (indent &lt; 0)
+						return 0;
+					return indent;
+				}
+				return col - 1;
+			}
+			// return a negative number to use default indentation rules
+			return -1;
+		</string>
+	</dict>
+	<key>uuid</key>
+	<string>F9A613AE-5070-11E0-87E4-1786A0A61BAF</string>
+</dict>
+</plist>

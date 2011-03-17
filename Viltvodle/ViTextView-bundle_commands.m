@@ -210,7 +210,11 @@
 	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]
 	    forKey:@"PATH"];
 
-	[task setCurrentDirectoryPath:[[[[self delegate] environment] baseURL] path]];
+	NSURL *baseURL = [[[self delegate] environment] baseURL];
+	if ([baseURL isFileURL])
+		[task setCurrentDirectoryPath:[baseURL path]];
+	else
+		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
 	[task setEnvironment:env];
 
 	DEBUG(@"environment: %@", env);

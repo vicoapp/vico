@@ -683,7 +683,9 @@
 	returnToExplorer = NO;
 }
 
-- (void)markItem:(ProjectFile *)item withFileMatch:(ViRegexpMatch *)fileMatch pathMatch:(ViRegexpMatch *)pathMatch
+- (void)markItem:(ProjectFile *)item
+   withFileMatch:(ViRegexpMatch *)fileMatch
+       pathMatch:(ViRegexpMatch *)pathMatch
 {
 	NSString *relpath = [item pathRelativeToURL:[rootButton URL]];
 	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:relpath];
@@ -692,7 +694,9 @@
 	for (i = 1; i <= [pathMatch count]; i++) {
 		NSRange range = [pathMatch rangeOfSubstringAtIndex:i];
 		if (range.length > 0)
-			[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
+			[s addAttribute:NSFontAttributeName
+			          value:[NSFont boldSystemFontOfSize:11.0]
+			          range:range];
 	}
 
 	NSUInteger offset = [relpath length] - [[item name] length];
@@ -701,19 +705,27 @@
 		NSRange range = [fileMatch rangeOfSubstringAtIndex:i];
 		if (range.length > 0) {
 			range.location += offset;
-			[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:range];
+			[s addAttribute:NSFontAttributeName
+			          value:[NSFont boldSystemFontOfSize:11.0]
+			          range:range];
 		}
 	}
 
-	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
+	[s addAttribute:NSParagraphStyleAttributeName
+	          value:matchParagraphStyle
+	          range:NSMakeRange(0, [s length])];
 	[item setMarkedString:s];
 }
 
 - (void)markItem:(ProjectFile *)item withPrefix:(NSUInteger)length
 {
 	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:[item name]];
-	[s addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:11.0] range:NSMakeRange(0, length)];
-	[s addAttribute:NSParagraphStyleAttributeName value:matchParagraphStyle range:NSMakeRange(0, [s length])];
+	[s addAttribute:NSFontAttributeName
+	          value:[NSFont boldSystemFontOfSize:11.0]
+	          range:NSMakeRange(0, length)];
+	[s addAttribute:NSParagraphStyleAttributeName
+	          value:matchParagraphStyle
+	          range:NSMakeRange(0, [s length])];
 	[item setMarkedString:s];
 }
 

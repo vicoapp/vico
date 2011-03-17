@@ -310,7 +310,7 @@ static struct ex_command ex_commands[] = {
 		@"so[urce] file",
 		@"read a file of ex commands"},
 	{@"split",	@"ex_split",	0,
-		"f1r",
+		"f1o",
 		@"sp[lit] file",
 		@"Split current view horizontally."},
 	/* C_STOP */
@@ -393,7 +393,7 @@ static struct ex_command ex_commands[] = {
 		@"vne[w] [file]",
 		@"edit a new file in a new vertical split"},
 	{@"vsplit",	@"ex_vsplit",	0,
-		"f1r",
+		"f1o",
 		@"vsp[lit] file",
 		@"Split current view vertically."},
 	/* C_WRITE */

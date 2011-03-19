@@ -866,6 +866,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	    style, NSParagraphStyleAttributeName,
 	    [self font], NSFontAttributeName,
 	    nil];
+
+	NSRange r = NSMakeRange(0, [textStorage length]);
+	[textStorage setAttributes:typingAttributes range:r];
 }
 
 - (void)changeTheme:(ViTheme *)aTheme

@@ -19,6 +19,7 @@
 - (void)expandNextItem:(id)dummy;
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit;
 + (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children;
+- (BOOL)rescan_files:(ViCommand *)command;
 @end
 
 @implementation ProjectFile

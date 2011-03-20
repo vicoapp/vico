@@ -137,9 +137,12 @@ main(int argc, char **argv)
 	}
 
 	if (script) {
-		NSConnection *backConn = [NSConnection new];
-		[backConn setRootObject:[[ShellThing alloc] init]];
-		[backConn registerName:@"crunchy frog"];
+		NSConnection *backConn = nil;
+		if (runLoop) {
+			[NSConnection new];
+			[backConn setRootObject:[[ShellThing alloc] init]];
+			[backConn registerName:@"crunchy frog"];
+		}
 
 		NSString *errStr = nil;
 		NSString *result = nil;
@@ -185,7 +188,7 @@ main(int argc, char **argv)
 
 	if (argc == 0 && script == nil) {
 		/* just make it first responder */
-		[proxy eval:@"NSApp.activateIgnoringOtherApps(YES)"
+		[proxy eval:@"(NSApp activateIgnoringOtherApps(YES)"
 	     withScriptPath:nil
 	 additionalBindings:nil
 	        errorString:nil

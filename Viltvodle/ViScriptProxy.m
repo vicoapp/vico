@@ -28,12 +28,14 @@
 	if (arguments == nil)
 		arguments = [NSArray array];
 
+#if 0
 	// FIXME: catch exceptions
 	for (NSDictionary *d in callbacks) {
 		JSValueRef callback = [[d objectForKey:@"callback"] pointerValue];
 		id jsc = [d objectForKey:@"controller"];
 		[jsc callJSFunction:callback withArguments:arguments];   
 	}
+#endif
 }
 
 - (void)emit:(NSString *)event with:(id)arg1, ...
@@ -77,11 +79,12 @@
 	[self emitDelayed:event withArguments:arguments];
 }
 
-- (void)onEvent:(NSString *)event runCallback:(JSValueRefAndContextRef)callback
+- (void)onEvent:(NSString *)event runCallback:(id)callback
 {
 	if (event == nil)
 		return;
 
+#if 0
 	NSMutableArray *callbacks = [_listeners objectForKey:event];
 	if (callbacks == nil) {
 		callbacks = [NSMutableArray array];
@@ -97,6 +100,7 @@
 		    nil];
 		[callbacks addObject:d];
 	}
+#endif
 }
 
 

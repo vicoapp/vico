@@ -7,7 +7,7 @@
 #import "ViPreferencesController.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
-#import "JSCocoa.h"
+#import "Nu/Nu.h"
 #import "JSON.h"
 #import "ViError.h"
 
@@ -70,8 +70,6 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-	[[JSCocoa sharedController] setDelegate:self];
-
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES
 						   attributes:nil
@@ -155,6 +153,9 @@
 	gettimeofday(&launch_done, NULL);
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
+
+	NSString* consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
+	[[Nu parser] parseEval:consoleStartup]; 
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -222,76 +223,40 @@ extern BOOL makeNewWindowInsteadOfTab;
 	[scriptOutput scrollRangeToVisible:NSMakeRange([ts length], 0)];
 }
 
-- (void)JSCocoa:(JSCocoaController *)controller
-       hadError:(NSString *)error
-   onLineNumber:(NSInteger)lineNumber
-    atSourceURL:(id)url
+/* Set some convenient global objects. */
+- (void)exportGlobals:(id)parser
 {
-	if (evalFromShell) {
-		if (url)
-			lastEvalError = [NSString stringWithFormat:@"%@:%li: %@", url, lineNumber, error];
-		else
-			lastEvalError = [NSString stringWithFormat:@"%li: %@", lineNumber, error];
-	} else
-		[self consoleOutput:[NSString stringWithFormat:@"Error on line %li: %@\n", lineNumber, error]];
-}
-
-- (void)exportGlobals:(JSCocoa *)jsc
-{
-	/* Set some convenient global objects. */
-	[jsc removeObjectWithName:@"window"];
-	[jsc removeObjectWithName:@"view"];
-	[jsc removeObjectWithName:@"text"];
-	[jsc removeObjectWithName:@"document"];
 	ViWindowController *winCon = [ViWindowController currentWindowController];
 	if (winCon) {
-		[jsc setObject:winCon.proxy withName:@"window"];
+		[parser setValue:winCon.proxy forKey:@"window"];
 		id<ViViewController> view = [winCon currentView];
 		if (view) {
-			[jsc setObject:view withName:@"view"];
+			[parser setValue:view forKey:@"view"];
 			if ([view isKindOfClass:[ViDocumentView class]]) {
 				ViTextView *textView = [(ViDocumentView *)view textView];
-				[jsc setObject:textView.proxy withName:@"text"];
+				[parser setValue:textView.proxy forKey:@"text"];
 			}
 		}
 		ViDocument *doc = [winCon currentDocument];
 		if (doc)
-			[jsc setObject:doc.proxy withName:@"document"];
+			[parser setValue:doc.proxy forKey:@"document"];
 	}
 }
 
 - (id)evalExpression:(NSString *)expression error:(NSError **)outError
 {
-	JSCocoa *jsc = [JSCocoa sharedController];
+	id<NuParsing> parser = [Nu parser];
 
-	[self exportGlobals:jsc];
+	[self exportGlobals:parser];
 
-	NSString *wrappedExpression = [NSString stringWithFormat:@"(function(){%@})();", expression];
-
-	evalFromShell = YES;
-	JSValueRef result = [jsc evalJSString:wrappedExpression];
-	evalFromShell = NO;
-
-	if (result != NULL)
-		return [jsc toObject:result];
-	else {
+	id code = [parser parse:expression];
+	if (code == nil) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"%@", lastEvalError];
+			*outError = [ViError errorWithFormat:@"parse failed"];
 		return nil;
 	}
-}
-
-- (IBAction)evalScript:(id)sender
-{
-	JSCocoa *jsc = [JSCocoa sharedController];
-
-	[self exportGlobals:jsc];
-
-	JSValueRef result = [jsc evalJSString:[scriptInput stringValue]];
-	if (result != NULL) {
-		id obj = [jsc toObject:result];
-		[self consoleOutput:[NSString stringWithFormat:@"%@\n", [obj JSONRepresentation]]];
-	}
+	id result = [parser eval:code];
+	return result;
 }
 
 - (IBAction)clearConsole:(id)sender
@@ -309,32 +274,46 @@ additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName
 {
-	JSCocoa *jsc = [JSCocoa sharedController];
-
-	[self exportGlobals:jsc];
+	id<NuParsing> parser = [Nu parser];
+	[self exportGlobals:parser];
 
 	if (channelName) {
 		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
-		[jsc setObject:backChannel withName:@"shellCommand"];
+		[parser setValue:backChannel forKey:@"shellCommand"];
 	}
 
 	for (NSString *key in [bindings allKeys])
 		if ([key isKindOfClass:[NSString class]])
-			[jsc setObject:[bindings objectForKey:key] withName:key];
+			[parser setValue:[bindings objectForKey:key] forKey:key];
 
-	DEBUG(@"evaluating script: {{{ %@ }}}", script);
-	DEBUG(@"additional bindings: %@", bindings);
+	INFO(@"evaluating script: {{{ %@ }}}", script);
+	INFO(@"additional bindings: %@", bindings);
 
-	evalFromShell = YES;
-	JSValueRef result = [jsc evalJSString:script withScriptPath:path];
-	evalFromShell = NO;
-	if (result != NULL) {
-		id obj = [jsc toObject:result];
-		return [obj JSONRepresentation];
-	} else if (errorString)
-		*errorString = lastEvalError;
-	lastEvalError = nil;
-	return nil;
+        [Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
+        [Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
+        [Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
+        [Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
+        [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.Viltvodle" withContext:nil];
+
+	id code = [parser parse:script];
+	INFO(@"got code %@, class %@", code, NSStringFromClass([code class]));
+	if (code == nil) {
+		if (errorString)
+			*errorString = @"parse failed";
+		return nil;
+	}
+	id result = nil;
+	@try {
+		result = [parser eval:code];
+	}
+	@catch (NSException *exception) {
+		INFO(@"got exception %@", [exception name]);
+		if (errorString)
+			*errorString = [exception reason];
+		return nil;
+	}
+	INFO(@"got result %@, class %@", result, NSStringFromClass([result class]));
+	return [result JSONRepresentation];
 }
 
 - (NSError *)openURL:(NSURL *)anURL

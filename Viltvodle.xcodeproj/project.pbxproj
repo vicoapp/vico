@@ -20,7 +20,6 @@
 		9A2EF2D013310AD70023C5B7 /* TestViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CA13310AD70023C5B7 /* TestViSnippet.m */; };
 		9A2EF2D113310AD70023C5B7 /* TestViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */; };
 		9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */; };
-		9A2EF2D413310AF50023C5B7 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D313310AF50023C5B7 /* JavaScriptCore.framework */; };
 		9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D513310AF90023C5B7 /* WebKit.framework */; };
 		9A2EF37513310CB80023C5B7 /* ber.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D713310C320023C5B7 /* ber.c */; };
 		9A2EF37613310CB80023C5B7 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D913310C320023C5B7 /* debug.c */; };
@@ -110,14 +109,6 @@
 		9A2EF3E113310D080023C5B7 /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D513310D080023C5B7 /* vis.c */; };
 		9A2EF3E213310D080023C5B7 /* xmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D713310D080023C5B7 /* xmalloc.c */; };
 		9A2EF41A13310F850023C5B7 /* lemon.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF41913310F850023C5B7 /* lemon.c */; };
-		9A2EF42C133114480023C5B7 /* BridgeSupportController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF420133114480023C5B7 /* BridgeSupportController.m */; };
-		9A2EF42D133114480023C5B7 /* JSCocoaController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF423133114480023C5B7 /* JSCocoaController.m */; };
-		9A2EF42E133114480023C5B7 /* JSCocoaFFIArgument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF425133114480023C5B7 /* JSCocoaFFIArgument.m */; };
-		9A2EF42F133114480023C5B7 /* JSCocoaFFIClosure.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF427133114480023C5B7 /* JSCocoaFFIClosure.m */; };
-		9A2EF430133114480023C5B7 /* JSCocoaLib.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF429133114480023C5B7 /* JSCocoaLib.m */; };
-		9A2EF431133114480023C5B7 /* JSCocoaPrivateObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF42B133114480023C5B7 /* JSCocoaPrivateObject.m */; };
-		9A2EF434133114530023C5B7 /* class.js in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF432133114530023C5B7 /* class.js */; };
-		9A2EF435133114530023C5B7 /* jslint-jscocoa.js in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF433133114530023C5B7 /* jslint-jscocoa.js */; };
 		9A2EF469133114AE0023C5B7 /* CharDistribution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF437133114AE0023C5B7 /* CharDistribution.cpp */; };
 		9A2EF46A133114AE0023C5B7 /* JpCntx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF439133114AE0023C5B7 /* JpCntx.cpp */; };
 		9A2EF46B133114AE0023C5B7 /* LangBulgarianModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF43B133114AE0023C5B7 /* LangBulgarianModel.cpp */; };
@@ -217,7 +208,7 @@
 		9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D71331239E002B04DE /* symbol-icons.plist */; };
 		9A4346E01331257A002B04DE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A4346DF1331257A002B04DE /* Foundation.framework */; };
 		9A4346EB13312710002B04DE /* vivo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346EA13312710002B04DE /* vivo.m */; };
-		9A4346EF13312861002B04DE /* vivo in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vivo */; };
+		9A4346EF13312861002B04DE /* vivo in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vivo */; };
 		9A4347041331383C002B04DE /* NSObject+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F31331383C002B04DE /* NSObject+JSON.m */; };
 		9A4347051331383C002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
 		9A4347061331383C002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
@@ -238,6 +229,9 @@
 		9A43471513313854002B04DE /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; };
 		9A43471813313894002B04DE /* vivo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A43471613313874002B04DE /* vivo.1 */; };
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
+		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
+		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
+		9A5EE3FF1333AA2B002E82B1 /* main.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE3FE1333AA2B002E82B1 /* main.nu */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -298,14 +292,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9A4346EE13312853002B04DE /* CopyFiles */ = {
+		9A4346EE13312853002B04DE /* Copy Executables */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				9A4346EF13312861002B04DE /* vivo in CopyFiles */,
+				9A4346EF13312861002B04DE /* vivo in Copy Executables */,
 			);
+			name = "Copy Executables";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A43473013339CC6002B04DE /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -332,7 +338,6 @@
 		9A2EF2CA13310AD70023C5B7 /* TestViSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViSnippet.m; sourceTree = "<group>"; };
 		9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextStorage.m; sourceTree = "<group>"; };
 		9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextView.m; sourceTree = "<group>"; };
-		9A2EF2D313310AF50023C5B7 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		9A2EF2D513310AF90023C5B7 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		9A2EF2D713310C320023C5B7 /* ber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber.c; sourceTree = "<group>"; };
 		9A2EF2D813310C320023C5B7 /* ber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber.h; sourceTree = "<group>"; };
@@ -509,21 +514,6 @@
 		9A2EF3D813310D080023C5B7 /* xmalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xmalloc.h; path = sftp/xmalloc.h; sourceTree = SOURCE_ROOT; };
 		9A2EF41013310F4D0023C5B7 /* lemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lemon; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF41913310F850023C5B7 /* lemon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lemon.c; sourceTree = "<group>"; };
-		9A2EF41F133114480023C5B7 /* BridgeSupportController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BridgeSupportController.h; path = jscocoa/BridgeSupportController.h; sourceTree = SOURCE_ROOT; };
-		9A2EF420133114480023C5B7 /* BridgeSupportController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BridgeSupportController.m; path = jscocoa/BridgeSupportController.m; sourceTree = SOURCE_ROOT; };
-		9A2EF421133114480023C5B7 /* JSCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoa.h; path = jscocoa/JSCocoa.h; sourceTree = SOURCE_ROOT; };
-		9A2EF422133114480023C5B7 /* JSCocoaController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoaController.h; path = jscocoa/JSCocoaController.h; sourceTree = SOURCE_ROOT; };
-		9A2EF423133114480023C5B7 /* JSCocoaController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaController.m; path = jscocoa/JSCocoaController.m; sourceTree = SOURCE_ROOT; };
-		9A2EF424133114480023C5B7 /* JSCocoaFFIArgument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoaFFIArgument.h; path = jscocoa/JSCocoaFFIArgument.h; sourceTree = SOURCE_ROOT; };
-		9A2EF425133114480023C5B7 /* JSCocoaFFIArgument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaFFIArgument.m; path = jscocoa/JSCocoaFFIArgument.m; sourceTree = SOURCE_ROOT; };
-		9A2EF426133114480023C5B7 /* JSCocoaFFIClosure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoaFFIClosure.h; path = jscocoa/JSCocoaFFIClosure.h; sourceTree = SOURCE_ROOT; };
-		9A2EF427133114480023C5B7 /* JSCocoaFFIClosure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaFFIClosure.m; path = jscocoa/JSCocoaFFIClosure.m; sourceTree = SOURCE_ROOT; };
-		9A2EF428133114480023C5B7 /* JSCocoaLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoaLib.h; path = jscocoa/JSCocoaLib.h; sourceTree = SOURCE_ROOT; };
-		9A2EF429133114480023C5B7 /* JSCocoaLib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaLib.m; path = jscocoa/JSCocoaLib.m; sourceTree = SOURCE_ROOT; };
-		9A2EF42A133114480023C5B7 /* JSCocoaPrivateObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSCocoaPrivateObject.h; path = jscocoa/JSCocoaPrivateObject.h; sourceTree = SOURCE_ROOT; };
-		9A2EF42B133114480023C5B7 /* JSCocoaPrivateObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSCocoaPrivateObject.m; path = jscocoa/JSCocoaPrivateObject.m; sourceTree = SOURCE_ROOT; };
-		9A2EF432133114530023C5B7 /* class.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = class.js; path = jscocoa/class.js; sourceTree = SOURCE_ROOT; };
-		9A2EF433133114530023C5B7 /* jslint-jscocoa.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jslint-jscocoa.js"; path = "jscocoa/jslint-jscocoa.js"; sourceTree = SOURCE_ROOT; };
 		9A2EF437133114AE0023C5B7 /* CharDistribution.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CharDistribution.cpp; path = universalchardet/CharDistribution.cpp; sourceTree = SOURCE_ROOT; };
 		9A2EF438133114AE0023C5B7 /* CharDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CharDistribution.h; path = universalchardet/CharDistribution.h; sourceTree = SOURCE_ROOT; };
 		9A2EF439133114AE0023C5B7 /* JpCntx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JpCntx.cpp; path = universalchardet/JpCntx.cpp; sourceTree = SOURCE_ROOT; };
@@ -680,6 +670,8 @@
 		9A434719133138AA002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
+		9A5EE3FE1333AA2B002E82B1 /* main.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.nu; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -688,8 +680,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
-				9A2EF2D413310AF50023C5B7 /* JavaScriptCore.framework in Frameworks */,
 				9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */,
+				9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -723,6 +715,7 @@
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
+				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
 				9A434719133138AA002B04DE /* ApplicationServices.framework */,
@@ -750,7 +743,6 @@
 			isa = PBXGroup;
 			children = (
 				9A2EF2D513310AF90023C5B7 /* WebKit.framework */,
-				9A2EF2D313310AF50023C5B7 /* JavaScriptCore.framework */,
 				9A2EF293133109C20023C5B7 /* Cocoa.framework */,
 				9A4346DF1331257A002B04DE /* Foundation.framework */,
 				9A2EF295133109C20023C5B7 /* Other Frameworks */,
@@ -773,7 +765,6 @@
 			children = (
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
 				9A2EF4361331147C0023C5B7 /* Mozilla Universal charset detector */,
-				9A2EF41E133114250023C5B7 /* jscocoa */,
 				9A4346F01331381B002B04DE /* json */,
 				9A2EF3C513310CEC0023C5B7 /* sftp */,
 				9A43469B133115D4002B04DE /* More code */,
@@ -786,6 +777,7 @@
 		9A2EF29A133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9A5EE3FE1333AA2B002E82B1 /* main.nu */,
 				9A2EF29B133109C20023C5B7 /* Viltvodle-Info.plist */,
 				9A2EF29C133109C20023C5B7 /* InfoPlist.strings */,
 				9A2EF29F133109C20023C5B7 /* Viltvodle-Prefix.pch */,
@@ -852,28 +844,6 @@
 				9A2EF41913310F850023C5B7 /* lemon.c */,
 			);
 			path = lemon;
-			sourceTree = "<group>";
-		};
-		9A2EF41E133114250023C5B7 /* jscocoa */ = {
-			isa = PBXGroup;
-			children = (
-				9A2EF432133114530023C5B7 /* class.js */,
-				9A2EF433133114530023C5B7 /* jslint-jscocoa.js */,
-				9A2EF41F133114480023C5B7 /* BridgeSupportController.h */,
-				9A2EF420133114480023C5B7 /* BridgeSupportController.m */,
-				9A2EF421133114480023C5B7 /* JSCocoa.h */,
-				9A2EF422133114480023C5B7 /* JSCocoaController.h */,
-				9A2EF423133114480023C5B7 /* JSCocoaController.m */,
-				9A2EF424133114480023C5B7 /* JSCocoaFFIArgument.h */,
-				9A2EF425133114480023C5B7 /* JSCocoaFFIArgument.m */,
-				9A2EF426133114480023C5B7 /* JSCocoaFFIClosure.h */,
-				9A2EF427133114480023C5B7 /* JSCocoaFFIClosure.m */,
-				9A2EF428133114480023C5B7 /* JSCocoaLib.h */,
-				9A2EF429133114480023C5B7 /* JSCocoaLib.m */,
-				9A2EF42A133114480023C5B7 /* JSCocoaPrivateObject.h */,
-				9A2EF42B133114480023C5B7 /* JSCocoaPrivateObject.m */,
-			);
-			name = jscocoa;
 			sourceTree = "<group>";
 		};
 		9A2EF4361331147C0023C5B7 /* Mozilla Universal charset detector */ = {
@@ -1257,9 +1227,11 @@
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Viltvodle" */;
 			buildPhases = (
 				9A2EF28B133109C10023C5B7 /* Sources */,
+				9A43473013339CC6002B04DE /* Copy Frameworks */,
 				9A2EF28C133109C10023C5B7 /* Frameworks */,
 				9A2EF28D133109C10023C5B7 /* Resources */,
-				9A4346EE13312853002B04DE /* CopyFiles */,
+				9A4346EE13312853002B04DE /* Copy Executables */,
+				9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */,
 			);
 			buildRules = (
 				9A2EF41D133110A20023C5B7 /* PBXBuildRule */,
@@ -1359,8 +1331,6 @@
 				9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */,
 				9A2EF2A4133109C20023C5B7 /* Credits.rtf in Resources */,
 				9A2EF2AA133109C20023C5B7 /* MainMenu.xib in Resources */,
-				9A2EF434133114530023C5B7 /* class.js in Resources */,
-				9A2EF435133114530023C5B7 /* jslint-jscocoa.js in Resources */,
 				9A4346A413311615002B04DE /* CommandOutputWindow.xib in Resources */,
 				9A4346A513311615002B04DE /* PreferenceWindow.xib in Resources */,
 				9A4346A613311615002B04DE /* ViDocument.xib in Resources */,
@@ -1389,6 +1359,7 @@
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
+				9A5EE3FF1333AA2B002E82B1 /* main.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1415,6 +1386,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+		9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Re-link Nu framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change \"Nu.framework/Versions/A/Nu\" \"@executable_path/../Frameworks/Nu.framework/Versions/A/Nu\" $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$TARGET_NAME\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1511,12 +1496,6 @@
 				9A2EF3E013310D080023C5B7 /* sftp-common.c in Sources */,
 				9A2EF3E113310D080023C5B7 /* vis.c in Sources */,
 				9A2EF3E213310D080023C5B7 /* xmalloc.c in Sources */,
-				9A2EF42C133114480023C5B7 /* BridgeSupportController.m in Sources */,
-				9A2EF42D133114480023C5B7 /* JSCocoaController.m in Sources */,
-				9A2EF42E133114480023C5B7 /* JSCocoaFFIArgument.m in Sources */,
-				9A2EF42F133114480023C5B7 /* JSCocoaFFIClosure.m in Sources */,
-				9A2EF430133114480023C5B7 /* JSCocoaLib.m in Sources */,
-				9A2EF431133114480023C5B7 /* JSCocoaPrivateObject.m in Sources */,
 				9A2EF469133114AE0023C5B7 /* CharDistribution.cpp in Sources */,
 				9A2EF46A133114AE0023C5B7 /* JpCntx.cpp in Sources */,
 				9A2EF46B133114AE0023C5B7 /* LangBulgarianModel.cpp in Sources */,
@@ -1728,6 +1707,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = nu;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1754,6 +1734,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = nu;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1776,8 +1757,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Martin Hedenfalk";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/nu\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1797,9 +1782,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Martin Hedenfalk";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/nu\"",
+				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Viltvodle/Viltvodle-Prefix.pch";
@@ -1887,6 +1876,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/nu\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1902,6 +1895,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/nu\"",
+				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vivo/vivo-Prefix.pch";
@@ -1956,6 +1953,7 @@
 				9A4346E91331257E002B04DE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

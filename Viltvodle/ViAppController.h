@@ -27,9 +27,6 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSTextView *scriptOutput;
 	NSMutableDictionary *sharedBuffers;
 	NSString *lastSearchPattern;
-
-	BOOL evalFromShell;
-	NSString *lastEvalError;
 	NSConnection *shellConn;
 }
 
@@ -37,7 +34,6 @@ additionalBindings:(NSDictionary *)bindings
 @property(readonly) NSMenu *encodingMenu;
 
 - (id)evalExpression:(NSString *)expression error:(NSError **)outError;
-- (IBAction)evalScript:(id)sender;
 - (IBAction)clearConsole:(id)sender;
 
 + (NSString *)supportDirectory;

@@ -1,3 +1,5 @@
+#import <Nu/Nu.h>
+
 #include <sys/types.h>
 #include <sys/ptrace.h>
 #include <sys/time.h>
@@ -23,5 +25,21 @@ main(int argc, char *argv[])
 #endif
 
 	signal(SIGPIPE, SIG_IGN);
+
+        [Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+        [Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+        [Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+        [Nu loadNuFile:@"help"          fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+        [Nu loadNuFile:@"console"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+        [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.viltvodle" withContext:nil];
+
+/*
+	id nu = [Nu parser];
+	for (NSString *nuFile in [[NSBundle mainBundle] pathsForResourcesOfType:@"nu" inDirectory:nil])
+		[nu eval:[nu parse:[NSString stringWithContentsOfFile:nuFile]]];
+	[nu close];
+*/
+
 	return NSApplicationMain(argc, (const char **) argv);
+//	return NuMain(argc, (const char **) argv);
 }

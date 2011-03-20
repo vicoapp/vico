@@ -1,4 +1,4 @@
-#import "JSCocoa.h"
+#import "Nu/Nu.h"
 
 @interface ViScriptProxy : NSObject
 {
@@ -13,7 +13,7 @@
 - (void)emit:(NSString *)event withArguments:(NSArray *)arguments;
 - (void)emitDelayed:(NSString *)event withArguments:(NSArray *)arguments;
 - (void)emitDelayed:(NSString *)event with:(id)arg1, ...;
-- (void)onEvent:(NSString *)event runCallback:(JSValueRefAndContextRef)callbackFunction;
+- (void)onEvent:(NSString *)event runCallback:(id)callbackFunction;
 - (void)removeAllListeners:(NSString *)event;
 
 @end

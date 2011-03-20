@@ -10,31 +10,30 @@
 	<dict>
 		<key>indentExpression</key>
 		<string>
-			/*
-			 * XXX: this is experimental proof-of-concept stuff!
-			 * See http://inexdo.com/JSCocoa for the slightly weird syntax :-)
-			 */
-			var range = [text trackScopeSelector:@"meta.bracketed.objc" atLocation:text.caret];
-			// NSLog(@"scope range is " + NSStringFromRange(range));
-			// find first colon
-			var colon = [text.textStorage.string rangeOfString:@":" options:0 range:range];
-			if (colon.location != NSNotFound &amp;&amp; colon.location &lt; text.caret) {
-				var col = text.textStorage.columnAtLocation(colon.location);
-				// NSLog(@"colon at column " + col);
-				// now find any colon after the caret
-				var colon2 = [text.textStorage.string rangeOfString:@":" options:0 range:NSMakeRange(text.caret, NSMaxRange(range) - text.caret)];
-				if (colon2 != NSNotFound) {
-					var col2 = text.textStorage.columnAtLocation(colon2.location);
-					// NSLog(@"found another colon at column " + col2);
-					var indent = col - col2;
-					if (indent &lt; 0)
-						return 0;
-					return indent;
-				}
-				return col - 1;
-			}
-			// return a negative number to use default indentation rules
-			return -1;
+;
+; experimental testing of indent expressions
+; the code should return the absolute amount of whitespace to use for the current line
+;
+(set NSNotFound -1)
+(set string ((text textStorage) string))
+(set range (text rangeOfScopeSelector:"meta.bracketed.objc" atLocation:(text caret)))
+; find first colon
+(set colon (((text textStorage) string) rangeOfString:":" options:0 range:range))
+(set location (car colon))
+(if (and (not (eq location NSNotFound)) (&lt; location (text caret)))
+	(set col ((text textStorage) columnAtLocation:location))
+	; now find any colon after the caret
+	(set r `(,(text caret) ,(- (+ (first range) (second range)) (text caret))))
+	(set colon2 (((text textStorage) string) rangeOfString:":" options:0 range:r))
+	(if (eq (car colon2) NSNotFound)
+		(- col 1)
+		(else
+			(set col2 ((text textStorage) columnAtLocation:(first colon2)))
+			(set indent (- col col2))
+			(if (&lt; indent 0) 0 (else indent))) )
+	(else
+		; return a negative number to use default indentation rules
+		-1))
 		</string>
 	</dict>
 	<key>uuid</key>

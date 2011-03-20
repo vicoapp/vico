@@ -20,9 +20,9 @@
 	return [scopeSelectors bestMatchForScopes:scopes];
 }
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector
-                      forward:(BOOL)forward
-                 fromLocation:(NSUInteger)aLocation
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                        forward:(BOOL)forward
+                   fromLocation:(NSUInteger)aLocation
 {
 	NSArray *lastScopes = nil, *scopes;
 	NSUInteger i = aLocation;
@@ -57,11 +57,11 @@
 
 }
 
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector
-                   atLocation:(NSUInteger)aLocation
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                     atLocation:(NSUInteger)aLocation
 {
-	NSRange rb = [self trackScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
-	NSRange rf = [self trackScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
+	NSRange rb = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
+	NSRange rf = [self rangeOfScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
 	return NSUnionRange(rb, rf);
 }
 
@@ -81,7 +81,7 @@
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
 	} else if ([type isEqualToString:@"scope"]) {
-		*rangePtr = [self trackScopeSelector:[command scope] atLocation:[self caret]];
+		*rangePtr = [self rangeOfScopeSelector:[command scope] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];

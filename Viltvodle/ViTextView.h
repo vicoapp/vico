@@ -171,8 +171,8 @@
 
 @interface ViTextView (bundleCommands)
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation;
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
-- (NSRange)trackScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
 - (void)performBundleCommand:(ViBundleCommand *)command;
 - (void)performBundleItem:(id)bundleItem;
 - (void)performBundleItems:(NSArray *)matches;

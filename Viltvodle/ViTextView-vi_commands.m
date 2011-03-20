@@ -230,11 +230,11 @@
 
 	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
         if (inSpecialScope)
-        	specialScopeRange = [self trackScopeSelector:@"string" atLocation:openingRange.location];
+        	specialScopeRange = [self rangeOfScopeSelector:@"string" atLocation:openingRange.location];
 	else {
 		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
 		if (inSpecialScope)
-			specialScopeRange = [self trackScopeSelector:@"comment" atLocation:openingRange.location];
+			specialScopeRange = [self rangeOfScopeSelector:@"comment" atLocation:openingRange.location];
 	}
 
         // lookup the matching character and prepare search
@@ -1683,7 +1683,7 @@
 	if ([self selectedRange].length > 0)
 		location = start_location + 1;
 	NSString *selector = [[self scopesAtLocation:location] componentsJoinedByString:@" "];
-	NSRange range = [self trackScopeSelector:selector atLocation:location];
+	NSRange range = [self rangeOfScopeSelector:selector atLocation:location];
 
 	visual_start_location = start_location = range.location;
 	final_location = end_location = NSMaxRange(range) - 1;

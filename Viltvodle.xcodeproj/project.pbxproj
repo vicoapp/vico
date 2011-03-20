@@ -231,7 +231,6 @@
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
-		9A5EE3FF1333AA2B002E82B1 /* main.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE3FE1333AA2B002E82B1 /* main.nu */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -645,7 +644,7 @@
 		9A4346D71331239E002B04DE /* symbol-icons.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "symbol-icons.plist"; sourceTree = "<group>"; };
 		9A4346DD1331257A002B04DE /* vivo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vivo; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A4346DF1331257A002B04DE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		9A4346E51331257E002B04DE /* vish-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vish-Prefix.pch"; sourceTree = "<group>"; };
+		9A4346E51331257E002B04DE /* vivo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vivo-Prefix.pch"; sourceTree = "<group>"; };
 		9A4346EA13312710002B04DE /* vivo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vivo.m; path = vivo/vivo.m; sourceTree = SOURCE_ROOT; };
 		9A4346F11331383C002B04DE /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = json/JSON.h; sourceTree = SOURCE_ROOT; };
 		9A4346F21331383C002B04DE /* NSObject+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+JSON.h"; path = "json/NSObject+JSON.h"; sourceTree = SOURCE_ROOT; };
@@ -671,7 +670,6 @@
 		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
-		9A5EE3FE1333AA2B002E82B1 /* main.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.nu; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -777,7 +775,6 @@
 		9A2EF29A133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9A5EE3FE1333AA2B002E82B1 /* main.nu */,
 				9A2EF29B133109C20023C5B7 /* Viltvodle-Info.plist */,
 				9A2EF29C133109C20023C5B7 /* InfoPlist.strings */,
 				9A2EF29F133109C20023C5B7 /* Viltvodle-Prefix.pch */,
@@ -1188,7 +1185,7 @@
 		9A4346E41331257E002B04DE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9A4346E51331257E002B04DE /* vish-Prefix.pch */,
+				9A4346E51331257E002B04DE /* vivo-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1359,7 +1356,6 @@
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
-				9A5EE3FF1333AA2B002E82B1 /* main.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

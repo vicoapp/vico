@@ -1,0 +1,46 @@
+{
+    IBClasses = (
+        {CLASS = CXBrowserTableView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {
+            CLASS = CXMenuButton; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {menu = NSMenu; }; 
+            SUPERCLASS = NSButton; 
+        }, 
+        {
+            ACTIONS = {
+                contextExportFiles = id; 
+                contextMakeDir = id; 
+                contextRefresh = id; 
+                contextRemoveFile = id; 
+                getRootURLFromField = id; 
+                sheetCancel = id; 
+                sheetOK = id; 
+                takeRootURLFrom = id; 
+            }; 
+            CLASS = CXSVNRepoBrowser; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fCommitAnswerField = NSTextField; 
+                fCommitPromptField = NSTextField; 
+                fCommitPromptWindow = NSPanel; 
+                fCommitURLDestination = NSTextField; 
+                fCommitURLSource = NSTextField; 
+                fCommitVerbField = NSTextField; 
+                fDelegate = id; 
+                fGoButton = NSButton; 
+                fHistoryMenuButton = CXMenuButton; 
+                fOutlineView = NSOutlineView; 
+                fSpinner = NSProgressIndicator; 
+                fURLField = NSTextField; 
+                fURLHeaderView = NSView; 
+                fUserDefaultsController = NSUserDefaultsController; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = CXToolbarItemView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }
+    ); 
+    IBVersion = 1; 
+}

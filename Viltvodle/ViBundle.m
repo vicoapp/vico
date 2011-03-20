@@ -226,8 +226,10 @@
 
 - (void)addPreferences:(NSMutableDictionary *)prefs
 {
-	[ViBundle normalizePreference:prefs intoDictionary:[prefs objectForKey:@"settings"]];
-	[preferences addObject:prefs];
+	if ([prefs isKindOfClass:[NSDictionary class]]) {
+		[ViBundle normalizePreference:prefs intoDictionary:[prefs objectForKey:@"settings"]];
+		[preferences addObject:prefs];
+	}
 }
 
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames

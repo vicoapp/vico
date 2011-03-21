@@ -301,9 +301,10 @@ additionalBindings:(NSDictionary *)bindings
 
 - (NSError *)openURL:(NSString *)pathOrURL
 {
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocument:pathOrURL
-									     andDisplay:YES
-									 allowDirectory:YES];
+	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
+	ViDocument *doc = [docCon openDocument:pathOrURL
+				    andDisplay:YES
+				allowDirectory:YES];
 	if (doc)
 		[NSApp activateIgnoringOtherApps:YES];
 

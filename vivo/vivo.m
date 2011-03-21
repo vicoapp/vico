@@ -198,9 +198,13 @@ main(int argc, char **argv)
 	argv += optind;
 
 	for (i = 0; i < argc; i++) {
-		NSString *path = [[NSString stringWithUTF8String:argv[i]] stringByExpandingTildeInPath];
-		NSURL *url = [NSURL fileURLWithPath:path isDirectory:NO];
-		error = [proxy openURL:url];
+		NSString *path = [NSString stringWithUTF8String:argv[i]];
+		if ([path rangeOfString:@"://"].location == NSNotFound) {
+			path = [path stringByExpandingTildeInPath];
+			if (![path isAbsolutePath])
+				path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
+		}
+		error = [proxy openURL:path];
 		if (error)
 			errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
 	}

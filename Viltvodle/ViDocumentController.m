@@ -163,6 +163,9 @@
               relativeTo:(NSURL *)relURL
                    error:(NSError **)outError
 {
+	if (relURL ==  nil)
+		relURL = [(ExEnvironment *)[[ViWindowController currentWindowController] environment] baseURL];
+
 	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSURL *url = [NSURL URLWithString:escapedFilename];
 	if (url == nil || [url scheme] == nil) {

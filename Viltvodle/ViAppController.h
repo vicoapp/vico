@@ -16,7 +16,7 @@
 additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName;
-- (NSError *)openURL:(NSURL *)anURL;
+- (NSError *)openURL:(NSString *)pathOrURL;
 
 @end
 

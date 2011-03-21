@@ -501,38 +501,53 @@ doCommandBySelector:(SEL)aSelector
 {
 	if (command.filename == nil)
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
-	else
-		[[ViDocumentController sharedDocumentController] openDocument:command.filename
-								   andDisplay:YES
-							       allowDirectory:YES];
+	else {
+		NSURL *url = [self parseExFilename:command.filename];
+		if (url)
+			[[ViDocumentController sharedDocumentController] openDocument:url
+									   andDisplay:YES
+								       allowDirectory:YES];
+	}
 }
 
 - (BOOL)ex_new:(ExCommand *)command
 {
-	return [[ViDocumentController sharedDocumentController] splitVertically:NO
-									andOpen:command.filename
-							     orSwitchToDocument:nil] != nil;
+	NSURL *url = [self parseExFilename:command.filename];
+	if (url)
+		return [[ViDocumentController sharedDocumentController] splitVertically:NO
+										andOpen:url
+								     orSwitchToDocument:nil] != nil;
+	return NO;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
 {
-	return [[ViDocumentController sharedDocumentController] splitVertically:YES
-									andOpen:command.filename
-							     orSwitchToDocument:nil] != nil;
+	NSURL *url = [self parseExFilename:command.filename];
+	if (url)
+		return [[ViDocumentController sharedDocumentController] splitVertically:YES
+										andOpen:command.filename
+								     orSwitchToDocument:nil] != nil;
+	return NO;
 }
 
 - (BOOL)ex_split:(ExCommand *)command
 {
-	return [[ViDocumentController sharedDocumentController] splitVertically:NO
-									andOpen:command.filename
-							     orSwitchToDocument:[windowController currentDocument]] != nil;
+	NSURL *url = [self parseExFilename:command.filename];
+	if (url)
+		return [[ViDocumentController sharedDocumentController] splitVertically:NO
+										andOpen:command.filename
+								     orSwitchToDocument:[windowController currentDocument]] != nil;
+	return NO;
 }
 
 - (BOOL)ex_vsplit:(ExCommand *)command
 {
-	return [[ViDocumentController sharedDocumentController] splitVertically:YES
-									andOpen:command.filename
-							     orSwitchToDocument:[windowController currentDocument]] != nil;
+	NSURL *url = [self parseExFilename:command.filename];
+	if (url)
+		return [[ViDocumentController sharedDocumentController] splitVertically:YES
+										andOpen:command.filename
+								     orSwitchToDocument:[windowController currentDocument]] != nil;
+	return NO;
 }
 
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange

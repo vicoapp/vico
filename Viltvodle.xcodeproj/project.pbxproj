@@ -1400,6 +1400,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "install_name_tool -change \"Nu.framework/Versions/A/Nu\" \"@executable_path/../Frameworks/Nu.framework/Versions/A/Nu\" $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$TARGET_NAME\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 

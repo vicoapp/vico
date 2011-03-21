@@ -231,6 +231,7 @@
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
+		9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* viltvodle.nu */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -670,6 +671,7 @@
 		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
+		9A5EE40013366DC0002E82B1 /* viltvodle.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = viltvodle.nu; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -775,6 +777,7 @@
 		9A2EF29A133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9A5EE40013366DC0002E82B1 /* viltvodle.nu */,
 				9A2EF29B133109C20023C5B7 /* Viltvodle-Info.plist */,
 				9A2EF29C133109C20023C5B7 /* InfoPlist.strings */,
 				9A2EF29F133109C20023C5B7 /* Viltvodle-Prefix.pch */,
@@ -1356,6 +1359,7 @@
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
+				9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

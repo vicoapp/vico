@@ -1,17 +1,20 @@
 #!/bin/sh
 
 REPO_VERSION=$(hg id -n)
+REPO_VERSION="rev${REPO_VERSION%+}"
 VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"
 	exit 2
 fi
 
-echo "Building vibrant version $VERSION (repo version $REPO_VERSION)"
+echo "Building version $VERSION (repo version $REPO_VERSION)"
 
-xcodebuild -project vibrant.xcodeproj -target Vibrant -configuration Release build VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
+#sed -e "s/@VERSION@/${VERSION}/g" -e "s/@REPO_VERSION@/rev${REPO_VERSION}/g" Viltvodle/Viltvodle-Info.plist
 
-TMPDMG=vibrant-tmp.dmg
+xcodebuild -scheme archive VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
+
+TMPDMG=viltvodle-tmp.dmg
 /bin/rm -f $TMPDMG
 
 die()
@@ -21,12 +24,13 @@ die()
     exit 1
 }
 
-APP=build/Release/Vibrant.app
+APP=build/Release/Viltvodle.app
 
 echo "Stripping binary"
-strip $APP/Contents/MacOS/Vibrant
+strip $APP/Contents/MacOS/Viltvodle
+strip $APP/Contents/MacOS/vivo
 
-VOL="vibrant-$VERSION"
+VOL="viltvodle-$VERSION"
 DMG="$VOL.dmg"
 echo "Creating disk image $VOL"
 
@@ -34,7 +38,7 @@ echo "Creating disk image $VOL"
 trap 'die Interrupted' 2 3 15
 
 # Create the source folder and copy the application there.
-DMG_SOURCE="Vibrant $VERSION"
+DMG_SOURCE="Viltvodle $VERSION"
 mkdir "$DMG_SOURCE" || die "failed to create .dmg source folder"
 /bin/cp -R $APP "$DMG_SOURCE" || die "failed to copy application to the .dmg source folder"
 ln -s /Applications "$DMG_SOURCE/Applications"
@@ -46,6 +50,7 @@ hdiutil convert -format UDBZ "$TMPDMG" -o "$DMG"
 /bin/rm -f $TMPDMG
 ls -lh "$DMG"
 
+exit 0
 #### Create and sign a zip file for automatic updates.
 
 APPCAST_BASE="http://appcast.vibrant-editor.com"

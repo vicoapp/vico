@@ -37,6 +37,18 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>nu</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Nu source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>ViDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>sh</string>
 			</array>
 			<key>CFBundleTypeName</key>

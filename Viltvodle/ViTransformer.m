@@ -185,19 +185,25 @@
                        error:(NSError **)outError
 {
 	NSMutableString *text = [value mutableCopy];
-	NSArray *matches = [rx allMatchesInString:value];
-	NSInteger delta = 0;
-	for (ViRegexpMatch *m in matches) {
-		NSRange r = [m rangeOfMatchedString];
+	NSUInteger begin = 0;
+	for (;;) {
+		NSRange r = NSMakeRange(begin, [text length] - begin);
+		DEBUG(@"matching rx %@ in range %@ in string [%@]",
+		    rx, NSStringFromRange(r), text);
+		if (r.length == 0)
+			break;
+		ViRegexpMatch *m = [rx matchInString:text range:r];
+		DEBUG(@"m = %@", m);
+		if (m == nil)
+			break;
+		r = [m rangeOfMatchedString];
+		DEBUG(@"matched range %@", NSStringFromRange(r));
 		if (r.location == NSNotFound)
-			continue;
-		DEBUG(@"/%@/ matched range %@ in string [%@], total %i matches",
-		    rx, NSStringFromRange(r), value, [m count]);
-		r.location += delta;
+			break;
 		NSString *expFormat = [self expandFormat:format
 		                               withMatch:m
 		                               stopChars:@""
-		                          originalString:value
+		                          originalString:text
 		                           scannedLength:nil
 		                                   error:outError];
 		if (expFormat == nil) {
@@ -205,9 +211,11 @@
 				return nil;
 			expFormat = @"";
 		}
-		delta += [expFormat length] - r.length;
-		DEBUG(@"replace range %@ with expanded format [%@]", NSStringFromRange(r), expFormat);
+		begin = r.location + [expFormat length];
+		DEBUG(@"replace range %@ in string [%@] with expanded format [%@]",
+		    NSStringFromRange(r), text, expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];
+
 		if ([options rangeOfString:@"g"].location == NSNotFound)
 			break;
 	}

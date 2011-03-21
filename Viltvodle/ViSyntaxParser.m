@@ -381,6 +381,7 @@
 	// get all matches, one might be overlapped by a subpattern
 	regexps_tried++;
 	NSArray *matches = nil;
+	aRange.location -= offset;
 	matches = [endRegexp allMatchesInCharacters:chars range:aRange start:offset];
 
 	regexps_matched += [matches count];
@@ -424,6 +425,7 @@
 		}
 	}
 
+	NSRange rxRange = NSMakeRange(aRange.location - offset, aRange.length);
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
 	for (pattern in patterns)
 	{
@@ -436,19 +438,22 @@
 			continue;
 		NSArray *matches;
 		regexps_tried++;
-		matches = [regexp allMatchesInCharacters:chars range:aRange start:offset];
+		matches = [regexp allMatchesInCharacters:chars range:rxRange start:offset];
 
 		regexps_matched += [matches count];
 
 		if ([matches count] == 0)
 			DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
 		else
-			DEBUG(@"  matching against pattern %@ = %i matches", [pattern objectForKey:@"name"], [matches count]);
+			DEBUG(@"  matching against pattern %@ = %i matches",
+			    [pattern objectForKey:@"name"], [matches count]);
 
 		ViRegexpMatch *match;
 		for (match in matches)
 		{
-			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:pattern atIndex:i];
+			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match
+									   andPattern:pattern
+									      atIndex:i];
 			[matchingPatterns addObject:viMatch];
 		}
 
@@ -456,7 +461,8 @@
 	}
 	[matchingPatterns sortUsingSelector:@selector(sortByLocation:)];
 
-	DEBUG(@"applying %u matches in range %u + %u", [matchingPatterns count], aRange.location, aRange.length);
+	DEBUG(@"applying %u matches in range %u + %u",
+	    [matchingPatterns count], aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
 	ViSyntaxMatch *aMatch;
 	for (aMatch in matchingPatterns)
@@ -465,14 +471,17 @@
 		{
 			// skip overlapping matches
 			regexps_overlapped++;
-			DEBUG(@"skipping overlapping match for [%@] at %u + %u", [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
+			DEBUG(@"skipping overlapping match for [%@] at %u + %u",
+			    [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			continue;
 		}
 
 		if ([aMatch beginLocation] > lastLocation)
 		{
 			// Apply current scopes before adding the new match
-			[self setScopes:topScopes inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation) additive:NO];
+			[self setScopes:topScopes
+				inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation)
+			       additive:NO];
 		}
 
 		if ([aMatch isSingleLineMatch])
@@ -597,13 +606,16 @@ done:
 - (NSArray *)highlightLineInRange:(NSRange)aRange
               continueWithMatches:(NSArray *)continuedMatches
 {
-	DEBUG(@"-----> line range = %u (%u) + %u", aRange.location, aRange.location, aRange.length);
+	DEBUG(@"-----> line range = %u (%u) + %u",
+	    aRange.location, aRange.location, aRange.length);
 
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
 	while ([continuedMatches count] > 0)
 	{
-		DEBUG(@"continuing with match [%@] (of %i total) at %@", [[continuedMatches lastObject] scope], [continuedMatches count], NSStringFromRange(aRange));
+		DEBUG(@"continuing with match [%@] (of %i total) at %@",
+		    [[continuedMatches lastObject] scope],
+		    [continuedMatches count], NSStringFromRange(aRange));
 
 		ViSyntaxMatch *m;
 		for (m in continuedMatches)

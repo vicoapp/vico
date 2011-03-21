@@ -19,6 +19,7 @@
 
 @interface ViRegexp : NSObject
 {
+	NSString *_pattern;
 	OnigRegex regex;
 }
 

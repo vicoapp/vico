@@ -33,7 +33,7 @@ module TextMate
 
     def save_current_document(temp_ext='tmp')
 
-      %x{#{VIVO} -e '((((ViWindowController currentWindowController) currentView) document) saveDocument:nil)'}
+      %x{#{VIVO} -e '(document saveDocument:nil)'}
 
 #      doc, dst = STDIN.read, ENV['TM_FILEPATH']
 #      ENV['TM_DISPLAYNAME'] = ENV['TM_FILENAME']

@@ -8,6 +8,7 @@
 #import "ViTextStorage.h"
 #import "SFTPConnectionPool.h"
 #import "ViCharsetDetector.h"
+#import "ViDocumentController.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -16,8 +17,8 @@
            relativeToURL:(NSURL *)url
                     into:(NSString **)longestMatchPtr
         matchesIntoArray:(NSArray **)matchesPtr;
-- (NSURL *)parseExFilename:(NSString *)filename;
 - (IBAction)finishedExCommand:(id)sender;
+- (NSURL *)parseExFilename:(NSString *)filename;
 @end
 
 @implementation ExEnvironment
@@ -100,16 +101,11 @@
 	return [baseURL absoluteString];
 }
 
-- (void)message:(NSString *)fmt arguments:(va_list)ap
-{
-	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];
-}
-
 - (void)message:(NSString *)fmt, ...
 {
 	va_list ap;
 	va_start(ap, fmt);
-	[self message:fmt arguments:ap];
+	[windowController message:fmt arguments:ap];
 	va_end(ap);
 }
 
@@ -133,16 +129,6 @@
 			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
 }
 #endif
-
-- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView
-{
-	id<ViViewController> viewController = [windowController viewControllerForView:aView];
-	id<ViViewController> otherViewController = [[viewController tabController] viewAtPosition:position relativeTo:[viewController view]];
-	if (otherViewController == nil)
-		return NO;
-	[windowController selectDocumentView:otherViewController];
-	return YES;
-}
 
 #pragma mark -
 #pragma mark Filename completion
@@ -357,29 +343,17 @@ doCommandBySelector:(SEL)aSelector
 
 - (NSURL *)parseExFilename:(NSString *)filename
 {
-	NSURL *url;
-
-	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	url = [NSURL URLWithString:escapedFilename];
-	if (url == nil || [url scheme] == nil) {
-		NSString *path = escapedFilename;
-		if ([path hasPrefix:@"~"]) {
-			if ([[self baseURL] isFileURL])
-				path = [path stringByExpandingTildeInPath];
-			else {
-				NSError *error = nil;
-				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:[self baseURL] error:&error];
-				if (error) {
-					[self message:@"%@: %@", [self baseURL], [error localizedDescription]];
-					return nil;
-				}
-				path = [path stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:[conn home]];
-			}
-		}
-		url = [NSURL URLWithString:path relativeToURL:[self baseURL]];
+	NSError *error = nil;
+	NSURL *url = [[ViDocumentController sharedDocumentController] normalizePath:filename
+									 relativeTo:self.baseURL
+									      error:&error];
+	if (error) {
+		[self message:@"%@: %@",
+		    filename, [error localizedDescription]];
+		return nil;
 	}
 
-	return [url absoluteURL];
+	return url;
 }
 
 - (IBAction)finishedExCommand:(id)sender
@@ -523,138 +497,42 @@ doCommandBySelector:(SEL)aSelector
 	[self message:@"%@", [self displayBaseURL]];
 }
 
-- (ViDocument *)openDocument:(id)filenameOrURL
-                  andDisplay:(BOOL)display
-              allowDirectory:(BOOL)allowDirectory
-{
-	NSError *error = nil;
-	NSURL *url;
-	if ([filenameOrURL isKindOfClass:[NSURL class]])
-		url = filenameOrURL;
-	else
-		url = [self parseExFilename:filenameOrURL];
-
-	BOOL isDirectory = NO;
-	BOOL exists = NO;
-	if ([url isFileURL])
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]
-							      isDirectory:&isDirectory];
-	else {
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
-		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
-		if (error) {
-			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
-			return nil;
-		}
-	}
-
-	if (isDirectory && !allowDirectory) {
-		[self message:@"%@: is a directory", [url absoluteString]];
-		return nil;
-	}
-
-	ViDocument *doc;
-	NSDocumentController *docController = [NSDocumentController sharedDocumentController];
-	if (exists) {
-		doc = [docController openDocumentWithContentsOfURL:url
-							   display:display
-							     error:&error];
-	} else {
-		doc = [docController openUntitledDocumentAndDisplay:display
-							      error:&error];
-		[doc setIsTemporary:YES];
-		[doc setFileURL:url];
-	}
-
-	if (error) {
-		[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
-		return nil;
-	}
-
-	if (!display) {
-		[doc addWindowController:windowController];
-		[windowController addDocument:doc];
-	}
-
-	return doc;
-}
-
 - (void)ex_edit:(ExCommand *)command
 {
 	if (command.filename == nil)
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
 	else
-		[self openDocument:command.filename andDisplay:YES allowDirectory:YES];
-}
-
-- (ViDocument *)splitVertically:(BOOL)isVertical
-                        andOpen:(id)filenameOrURL
-             orSwitchToDocument:(ViDocument *)doc
-{
-	BOOL newDoc = YES;
-
-	if (filenameOrURL) {
-		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
-	} else if (doc == nil) {
-		NSError *err = nil;
-		doc = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO error:&err];
-		if (err)
-			[self message:@"%@", [err localizedDescription]];
-	} else
-		newDoc = NO;
-
-	if (doc) {
-		/*
-		 * FIXME: if there is no current view, create one?
-		 */
-		[doc addWindowController:windowController];
-		[windowController addDocument:doc];
-
-		id<ViViewController> viewController = [windowController currentView];
-		ViDocumentTabController *tabController = [viewController tabController];
-		ViDocumentView *newDocView = [tabController splitView:viewController
-		                                             withView:[doc makeView]
-		                                          vertically:isVertical];
-		[windowController selectDocumentView:newDocView];
-
-		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {
-			ViDocumentView *docView = viewController;
-			[[newDocView textView] setCaret:[[docView textView] caret]];
-			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
-		}
-
-		return doc;
-	}
-
-	return nil;
+		[[ViDocumentController sharedDocumentController] openDocument:command.filename
+								   andDisplay:YES
+							       allowDirectory:YES];
 }
 
 - (BOOL)ex_new:(ExCommand *)command
 {
-	return [self splitVertically:NO
-			     andOpen:command.filename
-		  orSwitchToDocument:nil] != nil;
+	return [[ViDocumentController sharedDocumentController] splitVertically:NO
+									andOpen:command.filename
+							     orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
 {
-	return [self splitVertically:YES
-			     andOpen:command.filename
-		  orSwitchToDocument:nil] != nil;
+	return [[ViDocumentController sharedDocumentController] splitVertically:YES
+									andOpen:command.filename
+							     orSwitchToDocument:nil] != nil;
 }
 
 - (BOOL)ex_split:(ExCommand *)command
 {
-	return [self splitVertically:NO
-			     andOpen:command.filename
-		  orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [[ViDocumentController sharedDocumentController] splitVertically:NO
+									andOpen:command.filename
+							     orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)ex_vsplit:(ExCommand *)command
 {
-	return [self splitVertically:YES
-			     andOpen:command.filename
-		  orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [[ViDocumentController sharedDocumentController] splitVertically:YES
+									andOpen:command.filename
+							     orSwitchToDocument:[windowController currentDocument]] != nil;
 }
 
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange

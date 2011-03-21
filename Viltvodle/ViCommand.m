@@ -326,6 +326,12 @@ static struct vikey visual_keys[] = {
 	{nil, -1, 0}
 };
 
+static struct vikey explorer_d_keys[] = {
+	{@"illegal:",		0x00, 0}, // default action for unknown key
+	{@"remove_files:",	'd', 0},
+	{nil, -1, 0}
+};
+
 static struct vikey explorer_keys[] = {
 	{@"illegal:",		0x00, 0}, // default action for unknown key
 	{@"backward_screen:",	0x2, VIF_IS_MOTION}, // ^B
@@ -342,6 +348,7 @@ static struct vikey explorer_keys[] = {
 	{@"move_high:",		'H', VIF_IS_MOTION},
 	{@"move_low:",		'L', VIF_IS_MOTION},
 	{@"move_middle:",	'M', VIF_IS_MOTION},
+	{@"d_prefix:",		'd', 0, explorer_d_keys},	// make dd remove files
 	{@"g_prefix:",		'g', 0, operator_g_keys},	// XXX
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"move_down:",		'j', VIF_IS_MOTION},

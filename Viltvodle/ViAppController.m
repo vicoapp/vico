@@ -24,7 +24,9 @@
 
 	NSURL *url = [NSURL URLWithString:s];
 	NSError *error = nil;
-	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+									       display:YES
+										 error:&error];
 	if (error)
 		[NSApp presentError:error];
 }
@@ -212,16 +214,8 @@ extern BOOL makeNewWindowInsteadOfTab;
 #endif
 }
 
-
 #pragma mark -
-#pragma mark Scripting console
-
-- (void)consoleOutput:(NSString *)text
-{
-	NSTextStorage *ts = [scriptOutput textStorage];
-	[ts replaceCharactersInRange:NSMakeRange([ts length], 0) withString:text];
-	[scriptOutput scrollRangeToVisible:NSMakeRange([ts length], 0)];
-}
+#pragma mark Shell commands
 
 /* Set some convenient global objects. */
 - (void)exportGlobals:(id)parser
@@ -259,15 +253,6 @@ extern BOOL makeNewWindowInsteadOfTab;
 	return result;
 }
 
-- (IBAction)clearConsole:(id)sender
-{
-	NSTextStorage *ts = [scriptOutput textStorage];
-	[ts replaceCharactersInRange:NSMakeRange(0, [ts length]) withString:@""];
-}
-
-#pragma mark -
-#pragma mark Shell commands
-
 - (NSString *)eval:(NSString *)script
     withScriptPath:(NSString *)path
 additionalBindings:(NSDictionary *)bindings
@@ -286,17 +271,16 @@ additionalBindings:(NSDictionary *)bindings
 		if ([key isKindOfClass:[NSString class]])
 			[parser setValue:[bindings objectForKey:key] forKey:key];
 
-	INFO(@"evaluating script: {{{ %@ }}}", script);
-	INFO(@"additional bindings: %@", bindings);
+	DEBUG(@"evaluating script: {{{ %@ }}}", script);
+	DEBUG(@"additional bindings: %@", bindings);
 
         [Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
         [Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
         [Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
         [Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
-        [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.Viltvodle" withContext:nil];
+        [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.Viltvodle" withContext:[parser context]];
 
 	id code = [parser parse:script];
-	INFO(@"got code %@, class %@", code, NSStringFromClass([code class]));
 	if (code == nil) {
 		if (errorString)
 			*errorString = @"parse failed";
@@ -307,31 +291,23 @@ additionalBindings:(NSDictionary *)bindings
 		result = [parser eval:code];
 	}
 	@catch (NSException *exception) {
-		INFO(@"got exception %@", [exception name]);
+		DEBUG(@"got exception %@", [exception name]);
 		if (errorString)
 			*errorString = [exception reason];
 		return nil;
 	}
-	INFO(@"got result %@, class %@", result, NSStringFromClass([result class]));
 	return [result JSONRepresentation];
 }
 
-- (NSError *)openURL:(NSURL *)anURL
+- (NSError *)openURL:(NSString *)pathOrURL
 {
-	/* Must make a complete copy of the URL, as it's not really
-	 * a URL but a Distant Object proxy thingy. The document
-	 * controller crashes otherwise.
-	 */
-	NSURL *url = [NSURL URLWithString:[anURL absoluteString]];
-
-	NSError *error = nil;
-	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-	                                                                       display:YES
-	                                                                         error:&error];
-	if (error == nil)
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocument:pathOrURL
+									     andDisplay:YES
+									 allowDirectory:YES];
+	if (doc)
 		[NSApp activateIgnoringOtherApps:YES];
 
-	return error;
+	return nil;
 }
 
 @end

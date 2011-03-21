@@ -10,6 +10,7 @@
 #import "ViBundleCommand.h"
 #import "ViBundleSnippet.h"
 #import "ViWindowController.h"
+#import "ViDocumentController.h"
 
 @implementation ViTextView (bundleCommands)
 
@@ -322,9 +323,9 @@
 			         fromBundle:[command bundle]
 			            inRange:r];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
-			ViDocument *doc = [[[self delegate] environment] splitVertically:NO
-			                                                         andOpen:nil
-			                                              orSwitchToDocument:nil];
+			ViDocument *doc = [[ViDocumentController sharedDocumentController] splitVertically:NO
+												   andOpen:nil
+											orSwitchToDocument:nil];
 			[doc setString:outputText];
 		} else if ([outputFormat isEqualToString:@"discard"])
 			;

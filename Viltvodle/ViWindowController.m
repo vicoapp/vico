@@ -35,6 +35,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize project;
 @synthesize environment;
 @synthesize proxy;
+@synthesize explorer = projectDelegate;
 
 + (id)currentWindowController
 {
@@ -82,14 +83,17 @@ static NSWindowController	*currentWindowController = nil;
 - (void)getMoreBundles:(id)sender
 {
 	[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
-	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:) withObject:@"BundlesItem" afterDelay:0.01];
+	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:)
+							  withObject:@"BundlesItem" afterDelay:0.01];
 }
 
 - (void)newBundleLoaded:(NSNotification *)notification
 {
 	[languageButton removeAllItems];
 	NSMenu *menu = [languageButton menu];
-	NSMenuItem *item = [menu addItemWithTitle:@"Unknown" action:@selector(setLanguageAction:) keyEquivalent:@""];
+	NSMenuItem *item = [menu addItemWithTitle:@"Unknown"
+					   action:@selector(setLanguageAction:)
+				    keyEquivalent:@""];
 	[item setTag:1001];
 	[item setEnabled:NO];
 	[[languageButton menu] addItem:[NSMenuItem separatorItem]];
@@ -99,7 +103,9 @@ static NSWindowController	*currentWindowController = nil;
 	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
 
 	for (ViLanguage *lang in sortedLanguages) {
-		item = [menu addItemWithTitle:[lang displayName] action:@selector(setLanguageAction:) keyEquivalent:@""];
+		item = [menu addItemWithTitle:[lang displayName]
+				       action:@selector(setLanguageAction:)
+				keyEquivalent:@""];
 		[item setRepresentedObject:lang];
 	}
 
@@ -108,7 +114,9 @@ static NSWindowController	*currentWindowController = nil;
 
 	if ([languages count] > 0)
 		[[languageButton menu] addItem:[NSMenuItem separatorItem]];
-	[menu addItemWithTitle:@"Get more bundles..." action:@selector(getMoreBundles:) keyEquivalent:@""];
+	[menu addItemWithTitle:@"Get more bundles..."
+			action:@selector(getMoreBundles:)
+		 keyEquivalent:@""];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
@@ -460,6 +468,19 @@ static NSWindowController	*currentWindowController = nil;
 	ViTextView *textView = [notification object];
 	if (textView == [[self currentView] innerView])
 		[self updateSelectedSymbolForLocation:[textView caret]];
+}
+
+- (void)message:(NSString *)fmt arguments:(va_list)ap
+{
+	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];
+}
+
+- (void)message:(NSString *)fmt, ...
+{
+	va_list ap;
+	va_start(ap, fmt);
+	[self message:fmt arguments:ap];
+	va_end(ap);
 }
 
 #pragma mark -
@@ -1032,6 +1053,18 @@ static NSWindowController	*currentWindowController = nil;
 - (IBAction)moveCurrentViewToNewTabAction:(id)sender
 {
 	[self moveCurrentViewToNewTab];
+}
+
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView
+{
+	id<ViViewController> viewController, otherViewController;
+	viewController = [self viewControllerForView:aView];
+	otherViewController = [[viewController tabController] viewAtPosition:position
+								  relativeTo:[viewController view]];
+	if (otherViewController == nil)
+		return NO;
+	[self selectDocumentView:otherViewController];
+	return YES;
 }
 
 #pragma mark -

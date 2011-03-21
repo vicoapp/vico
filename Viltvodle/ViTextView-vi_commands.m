@@ -1724,22 +1724,22 @@
 
 - (BOOL)window_left:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewLeft relativeTo:self];
+	return [[[self window] windowController] selectViewAtPosition:ViViewLeft relativeTo:self];
 }
 
 - (BOOL)window_down:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewDown relativeTo:self];
+	return [[[self window] windowController] selectViewAtPosition:ViViewDown relativeTo:self];
 }
 
 - (BOOL)window_up:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewUp relativeTo:self];
+	return [[[self window] windowController] selectViewAtPosition:ViViewUp relativeTo:self];
 }
 
 - (BOOL)window_right:(ViCommand *)command
 {
-	return [[[self delegate] environment] selectViewAtPosition:ViViewRight relativeTo:self];
+	return [[[self window] windowController] selectViewAtPosition:ViViewRight relativeTo:self];
 }
 
 - (BOOL)window_close:(ViCommand *)command

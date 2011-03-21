@@ -34,7 +34,6 @@ additionalBindings:(NSDictionary *)bindings
 @property(readonly) NSMenu *encodingMenu;
 
 - (id)evalExpression:(NSString *)expression error:(NSError **)outError;
-- (IBAction)clearConsole:(id)sender;
 
 + (NSString *)supportDirectory;
 - (IBAction)showPreferences:(id)sender;

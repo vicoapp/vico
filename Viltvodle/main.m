@@ -4,11 +4,11 @@
 #include <sys/ptrace.h>
 #include <sys/time.h>
 
+#include <pthread.h>
 #include <signal.h>
 
 #include "log.h"
 
-#include <pthread.h>
 pthread_mutex_t onig_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct timeval launch_start;
@@ -33,13 +33,5 @@ main(int argc, char *argv[])
         [Nu loadNuFile:@"console"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
         [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.viltvodle" withContext:nil];
 
-/*
-	id nu = [Nu parser];
-	for (NSString *nuFile in [[NSBundle mainBundle] pathsForResourcesOfType:@"nu" inDirectory:nil])
-		[nu eval:[nu parse:[NSString stringWithContentsOfFile:nuFile]]];
-	[nu close];
-*/
-
 	return NSApplicationMain(argc, (const char **) argv);
-//	return NuMain(argc, (const char **) argv);
 }

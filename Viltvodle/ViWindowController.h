@@ -22,6 +22,8 @@
 	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
+	IBOutlet NSTextField *messageField;
+	IBOutlet NSTextField *statusbar;
 
 	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;
@@ -63,9 +65,13 @@
 @property(readonly) ExEnvironment *environment;
 @property(readwrite, assign) ViProject *project;
 @property(readonly) ViScriptProxy *proxy;
+@property(readonly) ProjectDelegate *explorer;
 
 + (id)currentWindowController;
 + (NSWindow *)currentMainWindow;
+
+- (void)message:(NSString *)fmt, ...;
+- (void)message:(NSString *)fmt arguments:(va_list)ap;
 
 - (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)focusEditor;
@@ -115,6 +121,8 @@
 - (BOOL)moveCurrentViewToNewTab;
 - (BOOL)normalizeSplitViewSizesInCurrentTab;
 - (BOOL)closeOtherViews;
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position
+                  relativeTo:(NSView *)aView;
 
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;

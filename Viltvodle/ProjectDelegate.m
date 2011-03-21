@@ -6,6 +6,7 @@
 #import "ExEnvironment.h"
 #import "ViError.h"
 #import "NSString-additions.h"
+#import "ViDocumentController.h"
 
 @interface ProjectDelegate (private)
 + (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
@@ -409,7 +410,9 @@
 	ProjectFile *file = [explorer itemAtRow:idx];
 	if (!file)
 		return;
-	ViDocument *doc = [environment openDocument:[file url] andDisplay:NO allowDirectory:NO];
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocument:[file url]
+									     andDisplay:NO
+									 allowDirectory:NO];
 	if (doc)
 		[windowController switchToDocument:doc];
 }
@@ -420,7 +423,9 @@
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
 		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[environment splitVertically:NO andOpen:[item url] orSwitchToDocument:nil];
+			[[ViDocumentController sharedDocumentController] splitVertically:NO
+										 andOpen:[item url]
+								      orSwitchToDocument:nil];
 	}];
 	[self cancelExplorer];
 }
@@ -431,7 +436,9 @@
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
 		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[environment splitVertically:YES andOpen:[item url] orSwitchToDocument:nil];
+			[[ViDocumentController sharedDocumentController] splitVertically:YES
+										 andOpen:[item url]
+								      orSwitchToDocument:nil];
 	}];
 	[self cancelExplorer];
 }
@@ -1279,6 +1286,12 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
+- (BOOL)remove_files:(ViCommand *)command
+{
+	[self removeFiles:nil];
+	return YES;
+}
+
 - (BOOL)illegal:(ViCommand *)command
 {
 	return YES;
@@ -1295,7 +1308,7 @@ doCommandBySelector:(SEL)aSelector
 	DEBUG(@"command is %@", command.method);
 	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
 	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
-		[environment message:@"Command not implemented."];
+		[windowController message:@"Command not implemented."];
 		return;
 	}
 

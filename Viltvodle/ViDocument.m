@@ -904,7 +904,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	va_list ap;
 	va_start(ap, fmt);
-	[[windowController environment] message:fmt arguments:ap];
+	[windowController message:fmt arguments:ap];
 	va_end(ap);
 }
 

@@ -1,5 +1,7 @@
 #import "ViDocumentController.h"
+#import "ViDocumentTabController.h"
 #import "ViDocument.h"
+#import "ViDocumentView.h"
 #import "SFTPConnectionPool.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
@@ -157,7 +159,141 @@
 
 
 
+- (NSURL *)normalizePath:(NSString *)filename
+              relativeTo:(NSURL *)relURL
+                   error:(NSError **)outError
+{
+	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	NSURL *url = [NSURL URLWithString:escapedFilename];
+	if (url == nil || [url scheme] == nil) {
+		NSString *path = escapedFilename;
+		if ([path hasPrefix:@"~"]) {
+			if (relURL == nil || [relURL isFileURL])
+				path = [path stringByExpandingTildeInPath];
+			else {
+				SFTPConnection *conn = [[SFTPConnectionPool sharedPool]
+				    connectionWithURL:relURL error:outError];
+				if (conn == nil)
+					return nil;
+				path = [path stringByReplacingCharactersInRange:NSMakeRange(0, 1)
+								     withString:[conn home]];
+			}
+		}
+		url = [NSURL URLWithString:path relativeToURL:relURL];
+	}
 
+	return [url absoluteURL];
+}
+
+
+- (ViDocument *)openDocument:(id)filenameOrURL
+                  andDisplay:(BOOL)display
+              allowDirectory:(BOOL)allowDirectory
+{
+	ViWindowController *windowController = [ViWindowController currentWindowController];
+	NSError *error = nil;
+	NSURL *url;
+	if ([filenameOrURL isKindOfClass:[NSURL class]])
+		url = filenameOrURL;
+	else
+		url = [self normalizePath:filenameOrURL relativeTo:nil error:&error];
+
+	if (url == nil) {
+		if (error)
+			[windowController message:@"%@: %@",
+			    filenameOrURL, [error localizedDescription]];
+		return nil;
+	}
+
+	BOOL isDirectory = NO;
+	BOOL exists = NO;
+	if ([url isFileURL])
+		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]
+							      isDirectory:&isDirectory];
+	else {
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
+		if (error) {
+			[windowController message:@"%@: %@",
+			    [url absoluteString], [error localizedDescription]];
+			return nil;
+		}
+	}
+
+	if (isDirectory && !allowDirectory) {
+		[windowController message:@"%@: is a directory", [url absoluteString]];
+		return nil;
+	}
+
+	ViDocument *doc;
+	if (exists) {
+		doc = [self openDocumentWithContentsOfURL:url
+						  display:display
+						    error:&error];
+	} else {
+		doc = [self openUntitledDocumentAndDisplay:display
+						     error:&error];
+		[doc setIsTemporary:YES];
+		[doc setFileURL:url];
+	}
+
+	if (error) {
+		[windowController message:@"%@: %@",
+		    [url absoluteString], [error localizedDescription]];
+		return nil;
+	}
+
+	if (!display) {
+		[doc addWindowController:windowController];
+		[windowController addDocument:doc];
+	}
+
+	return doc;
+}
+
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc
+{
+	ViWindowController *windowController = [ViWindowController currentWindowController];
+	BOOL newDoc = YES;
+
+	if (filenameOrURL) {
+		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
+	} else if (doc == nil) {
+		NSError *err = nil;
+		doc = [self openUntitledDocumentAndDisplay:NO error:&err];
+		if (err)
+			[windowController message:@"%@", [err localizedDescription]];
+	} else
+		newDoc = NO;
+
+	if (doc) {
+		[doc addWindowController:windowController];
+		[windowController addDocument:doc];
+
+		id<ViViewController> viewController = [windowController currentView];
+		ViDocumentTabController *tabController = [viewController tabController];
+		ViDocumentView *newDocView = [tabController splitView:viewController
+							     withView:[doc makeView]
+							   vertically:isVertical];
+		[windowController selectDocumentView:newDocView];
+
+		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {
+			/*
+			 * If we're splitting a document, position
+			 * the caret in the new view appropriately.
+			 */
+			ViDocumentView *docView = viewController;
+			[[newDocView textView] setCaret:[[docView textView] caret]];
+			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
+		}
+
+		return doc;
+	}
+
+	return nil;
+}
 
 
 

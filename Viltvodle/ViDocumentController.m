@@ -183,8 +183,6 @@
 		path = [url path];
 	}
 
-	INFO(@"normalizing path %@", path);
-
 	if ([path hasPrefix:@"~"] || [path hasPrefix:@"/~"]) {
 		if (relURL == nil || [relURL isFileURL])
 			path = [path stringByExpandingTildeInPath];

@@ -59,6 +59,7 @@ main(int argc, char **argv)
 	const char				*eval_file = NULL;
 	int					 i, c;
 	BOOL					 runLoop = NO;
+	BOOL					 params_from_stdin = NO;
 
 	bindings = [NSMutableDictionary dictionary];
 
@@ -74,14 +75,17 @@ main(int argc, char **argv)
 			printf("DON'T PANIC\n");
 			return 0;
 		case 'p':
-			NSLog(@"parsing cmdline parameters: [%s]", optarg);
-			if ((json = [NSString stringWithUTF8String:optarg]) == nil)
-				errx(1, "-p argument not proper UTF8");
-			if ((params = [json JSONValue]) == nil)
-				errx(1, "-p argument not proper JSON");
-			if (![params isKindOfClass:[NSDictionary class]])
-				errx(1, "-p argument not a JSON object");
-			[bindings addEntriesFromDictionary:params];
+			if (strcmp(optarg, "-") == 0) {
+				params_from_stdin = YES;
+			} else {
+				if ((json = [NSString stringWithUTF8String:optarg]) == nil)
+					errx(1, "parameters not proper UTF8");
+				if ((params = [json JSONValue]) == nil)
+					errx(1, "parameters not proper JSON");
+				if (![params isKindOfClass:[NSDictionary class]])
+					errx(1, "parameters not a JSON object");
+				[bindings addEntriesFromDictionary:params];
+			}
 			break;
 		case 'r':
 			runLoop = YES;
@@ -136,10 +140,25 @@ main(int argc, char **argv)
 			errx(2, "invalid UTF8 encoding");
 	}
 
+
+	if (params_from_stdin) {
+		handle = [NSFileHandle fileHandleWithStandardInput];
+		NSData *data = [handle readDataToEndOfFile];
+		if (data == nil)
+			errx(2, "stdin: read failure");
+		if ((json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]) == nil)
+			errx(1, "parameters not proper UTF8");
+		if ((params = [json JSONValue]) == nil)
+			errx(1, "parameters not proper JSON");
+		if (![params isKindOfClass:[NSDictionary class]])
+			errx(1, "parameters not a JSON object");
+		[bindings addEntriesFromDictionary:params];
+	}
+
 	if (script) {
 		NSConnection *backConn = nil;
 		if (runLoop) {
-			[NSConnection new];
+			backConn = [NSConnection new];
 			[backConn setRootObject:[[ShellThing alloc] init]];
 			[backConn registerName:@"crunchy frog"];
 		}
@@ -151,7 +170,7 @@ main(int argc, char **argv)
 			      withScriptPath:script_path
 			  additionalBindings:bindings
 			         errorString:&errStr
-			         backChannel:@"crunchy frog"];
+			         backChannel:runLoop ? @"crunchy frog" : nil];
 		}
 		@catch (NSException *exception) {
 			NSString *msg = [NSString stringWithFormat:@"%@: %@",
@@ -168,7 +187,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "%s\n", [errStr UTF8String]);
 			return 3;
 		}
-		if ([result length] > 0)
+		if (!runLoop && [result length] > 0)
 			printf("%s\n", [result UTF8String]);
 	}
 
@@ -188,7 +207,7 @@ main(int argc, char **argv)
 
 	if (argc == 0 && script == nil) {
 		/* just make it first responder */
-		[proxy eval:@"(NSApp activateIgnoringOtherApps(YES)"
+		[proxy eval:@"(NSApp activateIgnoringOtherApps:YES)"
 	     withScriptPath:nil
 	 additionalBindings:nil
 	        errorString:nil
@@ -201,7 +220,7 @@ main(int argc, char **argv)
 				         beforeDate:[NSDate distantFuture]])
 			;
 
-		if (returnObject) {
+		if (returnObject != nil) {
 			NSString *returnJSON = [returnObject JSONRepresentation];
 			printf("%s\n", [returnJSON UTF8String]);
 		}

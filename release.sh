@@ -27,5 +27,5 @@ ln -s ../nu "$dir/nu"
 (cd $dir && ./mkdmg $version) || exit 3
 
 mv $dir/viltvodle-$version.dmg .
-mv $dir/viltvodle-$version.xml .
+#mv $dir/viltvodle-$version.xml .
 

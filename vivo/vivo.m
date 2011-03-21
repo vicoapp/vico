@@ -101,7 +101,7 @@ main(int argc, char **argv)
 	                                                          host:nil];
 	if (proxy == nil) {
 		/* failed to connect, try to start it */
-		CFStringRef bundle_id = CFSTR("se.bzero.viltvodle");
+		CFStringRef bundle_id = CFSTR("se.bzero.Viltvodle");
 		FSRef appRef;
 		if (LSFindApplicationForInfo(kLSUnknownCreator, bundle_id, NULL, &appRef, NULL) == 0 &&
 		    LSOpenFSRef(&appRef, NULL) == 0) {
@@ -203,6 +203,7 @@ main(int argc, char **argv)
 			path = [path stringByExpandingTildeInPath];
 			if (![path isAbsolutePath])
 				path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
+			path = [[NSURL fileURLWithPath:path] absoluteString];
 		}
 		error = [proxy openURL:path];
 		if (error)

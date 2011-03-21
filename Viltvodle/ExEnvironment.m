@@ -1045,6 +1045,9 @@ filter_write(CFSocketRef s,
 
 - (BOOL)ex_export:(ExCommand *)command
 {
+	if (command.string == nil)
+		return NO;
+
 	NSScanner *scan = [NSScanner scannerWithString:command.string];
 	NSString *variable, *value = nil;
 
@@ -1067,7 +1070,7 @@ filter_write(CFSocketRef s,
 
 	[defs setObject:env forKey:@"environment"];
 
-	INFO(@"static environment is now %@", env);
+	DEBUG(@"static environment is now %@", env);
 
 	return YES;
 }

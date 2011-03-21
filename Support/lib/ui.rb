@@ -47,7 +47,7 @@ module TextMate
         raise "style must be one of #{types.inspect}" unless styles.include?(style)
 
         params = {'alertStyle' => style.to_s, 'messageTitle' => title, 'informativeText' => message, 'buttonTitles' => buttons}
-        button_index = %x{#{VIVO} -r -f "#{NULIB}/alert.nu -p "#{params.to_json}"}.chomp.to_i
+        button_index = %x{#{VIVO} -r -f "#{NULIB}/alert.nu -p '#{params.to_json}'}.chomp.to_i
         buttons[button_index]
       end
 
@@ -89,7 +89,7 @@ module TextMate
 
         p = { "params" => plist, "nibFile" => nib }
 
-        `#{VIVO} -r -f "#{NULIB}/dialog.nu" -p "#{plist.to_json}" &> /dev/null &`
+        `#{VIVO} -r -f "#{NULIB}/dialog.nu" -p '#{plist.to_json}' &> /dev/null &`
         #`#{TM_DIALOG} -cqp #{e_sh plist.to_plist} #{e_sh nib} &> /dev/null &`
       end
   
@@ -180,12 +180,14 @@ module TextMate
           options = options.collect { |e| e == nil ? { 'separator' => 1 } : { 'title' => e } }
         end
 
-        res = ::IO.popen("#{TM_DIALOG} -u", "r+") do |io|
+        res = ::IO.popen("#{VIVO} -r -f '#{NULIB}/menu.nu' -p -", "r+") do |io|
           Thread.new do
-            plist = { 'menuItems' => options }.to_plist
+            plist = { 'menuItems' => options }.to_json
             io.write plist; io.close_write
           end
-          OSX::PropertyList::load(io)
+          output = io.read
+          JSON.parse(output)
+          #OSX::PropertyList::load(io)
         end
 
         return nil unless res.has_key? 'selectedIndex'
@@ -241,7 +243,7 @@ module TextMate
           params["items"] = items
 
           p = { "params" => params, "nibFile" => "#{ENV['TM_SUPPORT_PATH']}/nibs/RequestItem.nib" }
-          return_json = %x{#{VIVO} -r -f "#{NULIB}/dialog.nu" -p "#{p.to_json}"}
+          return_json = %x{#{VIVO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
 
           # return_plist = %x{#{TM_DIALOG} -cmp #{e_sh params.to_plist} #{e_sh(ENV['TM_SUPPORT_PATH'] + "/nibs/RequestItem")}}
           #return_hash = OSX::PropertyList::load(return_plist)

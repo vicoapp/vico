@@ -16,19 +16,19 @@ fi
 
 export PATH
 
-: ${TM_BASH_INIT:=$HOME/Library/Application Support/TextMate/bash_init.sh}
+: ${TM_BASH_INIT:=$HOME/Library/Application Support/Viltvodle/bash_init.sh}
 if [[ -f "$TM_BASH_INIT" ]]; then
 	. "$TM_BASH_INIT"
 fi
 
 export RUBYLIB="${RUBYLIB:+$RUBYLIB:}$TM_SUPPORT_PATH/lib"
 
-textmate_init () {
-	[[ "$1" != / && "$1" != ~ ]] && textmate_init "$(dirname "$1")"
-	[[ -f "$1/.textmate_init" ]] && . "$1/.textmate_init"
-	[[ "$1" == / && -f ~/.textmate_init ]] && . ~/.textmate_init
-}
-textmate_init "${TM_DIRECTORY:-$HOME}"
+#textmate_init () {
+#	[[ "$1" != / && "$1" != ~ ]] && textmate_init "$(dirname "$1")"
+#	[[ -f "$1/.textmate_init" ]] && . "$1/.textmate_init"
+#	[[ "$1" == / && -f ~/.textmate_init ]] && . ~/.textmate_init
+#}
+#textmate_init "${TM_DIRECTORY:-$HOME}"
 
 # an abstract way to change the output option of the running command
 exit_discard ()					{ echo -n "$1"; exit 200; }
@@ -42,9 +42,7 @@ exit_create_new_document ()	{ echo -n "$1"; exit 207; }
 
 # force TM to refresh current file and project drawer
 rescan_project () {
-	osascript &>/dev/null \
-	   -e 'tell app "SystemUIServer" to activate' \
-	   -e 'tell app "TextMate" to activate' &
+	$TM_APP_PATH/Contents/MacOS/vivo -e "(((ViWindowController currentWindowController) explorer) rescan_files:nil)"
 }
 
 # use this as a filter (|pre) when you want 

@@ -17,7 +17,7 @@
 #import "ViTextStorage.h"
 
 static NSMutableArray		*windowControllers = nil;
-static NSWindowController	*currentWindowController = nil;
+static ViWindowController	*currentWindowController = nil;
 
 @interface ViWindowController ()
 - (void)updateJumplistNavigator;
@@ -37,7 +37,7 @@ static NSWindowController	*currentWindowController = nil;
 @synthesize proxy;
 @synthesize explorer = projectDelegate;
 
-+ (id)currentWindowController
++ (ViWindowController *)currentWindowController
 {
 	if (currentWindowController == nil)
 		[[ViWindowController alloc] init];

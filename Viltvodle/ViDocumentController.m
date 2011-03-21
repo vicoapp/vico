@@ -2,6 +2,8 @@
 #import "ViDocumentTabController.h"
 #import "ViDocument.h"
 #import "ViDocumentView.h"
+#import "ViWindowController.h"
+#import "ExEnvironment.h"
 #import "SFTPConnectionPool.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
@@ -163,8 +165,13 @@
               relativeTo:(NSURL *)relURL
                    error:(NSError **)outError
 {
-	if (relURL ==  nil)
-		relURL = [(ExEnvironment *)[[ViWindowController currentWindowController] environment] baseURL];
+	if (relURL ==  nil) {
+		ExEnvironment *env = [[ViWindowController currentWindowController] environment];
+		if (env)
+			relURL = [env baseURL];
+		else
+			relURL = [NSURL fileURLWithPath:@"/"];
+	}
 
 	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSURL *url = [NSURL URLWithString:escapedFilename];

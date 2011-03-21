@@ -67,7 +67,7 @@
 			<object class="NSWindowTemplate" id="275939982">
 				<int key="NSWindowStyleMask">4367</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{520, 344}, {800, 600}}</string>
+				<string key="NSWindowRect">{{340, 173}, {800, 600}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">ViWindow</string>
@@ -106,7 +106,7 @@
 									<reference key="NSControlView" ref="190476968"/>
 									<int key="NSButtonFlags">-2032123649</int>
 									<int key="NSButtonFlags2">163</int>
-									<object class="NSCustomResource" key="NSAlternateImage" id="425118989">
+									<object class="NSCustomResource" key="NSAlternateImage" id="306495635">
 										<string key="NSClassName">NSImage</string>
 										<string key="NSResourceName">bookmark</string>
 									</object>
@@ -121,7 +121,7 @@
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSImage" ref="425118989"/>
+										<reference key="NSImage" ref="306495635"/>
 										<object class="NSCustomResource" key="NSOnImage" id="407660716">
 											<string key="NSClassName">NSImage</string>
 											<string key="NSResourceName">NSMenuCheckmark</string>
@@ -158,7 +158,7 @@
 									<bool key="NSAltersState">YES</bool>
 								</object>
 							</object>
-							<reference key="NSToolbarItemImage" ref="425118989"/>
+							<reference key="NSToolbarItemImage" ref="306495635"/>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
 							<string key="NSToolbarItemMinSize">{33, 25}</string>

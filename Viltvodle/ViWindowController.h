@@ -67,7 +67,7 @@
 @property(readonly) ViScriptProxy *proxy;
 @property(readonly) ProjectDelegate *explorer;
 
-+ (id)currentWindowController;
++ (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;
 
 - (void)message:(NSString *)fmt, ...;

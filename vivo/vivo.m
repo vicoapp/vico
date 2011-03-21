@@ -207,7 +207,7 @@ main(int argc, char **argv)
 
 	if (argc == 0 && script == nil) {
 		/* just make it first responder */
-		[proxy eval:@"(NSApp activateIgnoringOtherApps:YES)"
+		[proxy eval:@"((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"
 	     withScriptPath:nil
 	 additionalBindings:nil
 	        errorString:nil

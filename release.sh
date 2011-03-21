@@ -21,6 +21,9 @@ fi
 echo checking out sources
 hg clone -u $tag . "$dir" || exit 2
 
+# HACK!
+ln -s ../nu "$dir/nu"
+
 (cd $dir && ./mkdmg $version) || exit 3
 
 mv $dir/viltvodle-$version.dmg .

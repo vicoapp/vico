@@ -5,9 +5,9 @@ set +u # avoid warning when we use unset variables (if user had ‘set -u’ in 
 
 if [[ -d "$TM_SUPPORT_PATH/bin" ]]; then
 	PATH="$PATH:$TM_SUPPORT_PATH/bin"
-	if [[ -d "$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS" ]]; then
-		PATH="$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS:$PATH"
-	fi
+#	if [[ -d "$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS" ]]; then
+#		PATH="$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS:$PATH"
+#	fi
 fi
 
 if [[ -d "$TM_BUNDLE_SUPPORT" && -d "$TM_BUNDLE_SUPPORT/bin" ]]; then

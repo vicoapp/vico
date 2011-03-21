@@ -1,6 +1,6 @@
 require "fileutils"
 
-require ENV['TM_SUPPORT_PATH'] + '/lib/tm/tempfile'
+VIVO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vivo'
 
 module TextMate
   class << self
@@ -32,30 +32,32 @@ module TextMate
     # current document after you've called this method, do File.read(ENV['TM_FILEPATH']).
 
     def save_current_document(temp_ext='tmp')
-      
-      doc, dst = STDIN.read, ENV['TM_FILEPATH']
-      ENV['TM_DISPLAYNAME'] = ENV['TM_FILENAME']
-      
-      unless dst.nil?
-        FileUtils.touch(dst) unless File.exists?(dst) or not File.writable?(File.dirname(dst))
-        return if File.exists?(dst) and File.read(dst) == doc
-      else
-        ENV['TM_FILEPATH']         = dst = TextMate::IO.tempfile(temp_ext).path
-        ENV['TM_FILENAME']         = File.basename dst
-        ENV['TM_FILE_IS_UNTITLED'] = "true"
-        ENV['TM_DISPLAYNAME']      = 'untitled'
-        Dir.chdir(File.dirname(ENV["TM_FILEPATH"]))
-      end
 
-      begin
-        open(dst, 'w') { |io| io << doc }
-      rescue Errno::EACCES
-        ENV['TM_ORIG_FILEPATH']    = dst
-        ENV['TM_ORIG_FILENAME']    = File.basename dst
-        ENV['TM_FILEPATH']         = dst = TextMate::IO.tempfile(temp_ext).path
-        ENV['TM_FILENAME']         = File.basename dst
-        ENV['TM_DISPLAYNAME']     += ' (M)'
-      end
+      %x{#{VIVO} -e '((((ViWindowController currentWindowController) currentView) document) saveDocument:nil)'}
+
+#      doc, dst = STDIN.read, ENV['TM_FILEPATH']
+#      ENV['TM_DISPLAYNAME'] = ENV['TM_FILENAME']
+#      
+#      unless dst.nil?
+#        FileUtils.touch(dst) unless File.exists?(dst) or not File.writable?(File.dirname(dst))
+#        return if File.exists?(dst) and File.read(dst) == doc
+#      else
+#        ENV['TM_FILEPATH']         = dst = TextMate::IO.tempfile(temp_ext).path
+#        ENV['TM_FILENAME']         = File.basename dst
+#        ENV['TM_FILE_IS_UNTITLED'] = "true"
+#        ENV['TM_DISPLAYNAME']      = 'untitled'
+#        Dir.chdir(File.dirname(ENV["TM_FILEPATH"]))
+#      end
+#
+#      begin
+#        open(dst, 'w') { |io| io << doc }
+#      rescue Errno::EACCES
+#        ENV['TM_ORIG_FILEPATH']    = dst
+#        ENV['TM_ORIG_FILENAME']    = File.basename dst
+#        ENV['TM_FILEPATH']         = dst = TextMate::IO.tempfile(temp_ext).path
+#        ENV['TM_FILENAME']         = File.basename dst
+#        ENV['TM_DISPLAYNAME']     += ' (M)'
+#      end
     end
   end
 end

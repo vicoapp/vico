@@ -60,7 +60,8 @@
 {
 	if ([url isFileURL]) {
 		BOOL isDirectory = NO;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
+		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path]
+							 isDirectory:&isDirectory] && isDirectory)
 			return YES;
 		return NO;
 	} else {
@@ -96,8 +97,11 @@
 {
         NSString *root = [relURL path];
         NSString *path = [url path];
-        if ([path length] > [root length])
-                return [path substringWithRange:NSMakeRange([root length] + 1, [path length] - [root length] - 1)];
+        if ([path length] > [root length]) {
+                NSRange r = NSMakeRange([root length] + 1,
+                    [path length] - [root length] - 1);
+                return [path substringWithRange:r];
+	}
         return path;
 }
 
@@ -166,13 +170,19 @@
 	if (control == explorer) {
 		NSInteger idx = [explorer editedRow];
 		ProjectFile *file = [explorer itemAtRow:idx];
-		NSURL *newurl = [NSURL URLWithString:[fieldEditor string] relativeToURL:[file url]];
+		NSURL *newurl = [NSURL URLWithString:[fieldEditor string]
+				       relativeToURL:[file url]];
 		NSError *error = nil;
 		if ([[file url] isFileURL]) {
-			[[NSFileManager defaultManager] moveItemAtURL:[file url] toURL:newurl error:&error];
+			[[NSFileManager defaultManager] moveItemAtURL:[file url]
+							        toURL:newurl
+							        error:&error];
 		} else {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:[file url] error:&error];
-			[conn renameItemAtPath:[[file url] path] toPath:[newurl path] error:&error];
+			SFTPConnection *conn = [[SFTPConnectionPool sharedPool]
+			    connectionWithURL:[file url] error:&error];
+			[conn renameItemAtPath:[[file url] path]
+				        toPath:[newurl path]
+					 error:&error];
 		}
 
 		if (error != nil)
@@ -246,8 +256,10 @@
 
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	for (NSString *filename in files)
-		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
-			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename]]];
+		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
+			NSURL *url = [url URLByAppendingPathComponent:filename]
+			[children addObject:[ProjectFile fileWithURL:url]];
+		}
 
 	return [self sortProjectFiles:children];
 }
@@ -269,8 +281,10 @@
 	SFTPDirectoryEntry *entry;
 	for (entry in entries) {
 		NSString *filename = [entry filename];
-		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil)
-			[children addObject:[ProjectFile fileWithURL:[url URLByAppendingPathComponent:filename] sftpInfo:entry]];
+		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
+			NSURL *url = [url URLByAppendingPathComponent:filename];
+			[children addObject:[ProjectFile fileWithURL:url sftpInfo:entry]];
+		}
 	}
 
 	return [self sortProjectFiles:children];
@@ -314,7 +328,9 @@
 	[NSMenu popUpContextMenu:actionMenu withEvent:ev forView:sender];
 }
 
-- (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void)openPanelDidEnd:(NSOpenPanel *)panel
+             returnCode:(int)returnCode
+            contextInfo:(void *)contextInfo
 {
 	if (returnCode == NSCancelButton)
 		return;
@@ -337,7 +353,9 @@
 	                      contextInfo:nil];
 }
 
-- (void)sftpSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void)sftpSheetDidEnd:(NSWindow *)sheet
+             returnCode:(int)returnCode
+            contextInfo:(void *)contextInfo
 {
 	[sheet orderOut:self];
 }
@@ -474,7 +492,8 @@
 		/* FIXME: ask for confirmation, as remote files will be deleted directly (no trash).
 		 */
 		for (NSURL *url in urls) {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:nil];
+			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
+											    error:nil];
 			NSError *error = nil;
 			failed = ![conn removeItemAtPath:[url path] error:&error];
 			if (error) {
@@ -497,7 +516,8 @@
 	NSURL *url = [rootButton URL];
 	if (![url isFileURL]) {
 		/* Forget SFTP directory cache. */
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:nil];
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
+										    error:nil];
 		[conn flushDirectoryCache];
 	}
 	[self browseURL:url];
@@ -687,7 +707,8 @@
 	[self openExplorerTemporarily:YES];
 	[window makeFirstResponder:explorer];
 
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:lastSelectedRow] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:lastSelectedRow]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:lastSelectedRow];
 }
 
@@ -818,7 +839,8 @@ sort_by_score(id a, id b, void *context)
 				/* Only calculate the path score once for a directory. */
 				reldir = [item pathRelativeToURL:[rootButton URL]];
 				if ((pathMatch = [pathRx matchInString:reldir]) != nil)
-					pathScore = [self scoreForMatch:pathMatch inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
+					pathScore = [self scoreForMatch:pathMatch
+							     inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
 			}
 
 			if (pathMatch != nil) {
@@ -854,7 +876,8 @@ sort_by_score(id a, id b, void *context)
 		isCompletion = NO;
 		filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
 		[explorer reloadData];
-		[explorer selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+		[explorer selectRowIndexes:[NSIndexSet indexSet]
+		      byExtendingSelection:NO];
 	} else {
 		NSArray *components = [filter componentsSeparatedByString:@"/"];
 
@@ -864,16 +887,19 @@ sort_by_score(id a, id b, void *context)
 		for (i = 0; i < [components count] - 1; i++) {
 			if (i != 0)
 				[pathPattern appendString:@".*?/.*?"];
-			[self appendFilter:[components objectAtIndex:i] toPattern:pathPattern];
+			[self appendFilter:[components objectAtIndex:i]
+				 toPattern:pathPattern];
 		}
 		[pathPattern appendString:@".*?$"];
-		pathRx = [[ViRegexp alloc] initWithString:pathPattern options:ONIG_OPTION_IGNORECASE];
+		pathRx = [[ViRegexp alloc] initWithString:pathPattern
+						  options:ONIG_OPTION_IGNORECASE];
 
 		NSMutableString *filePattern = [NSMutableString string];
 		[filePattern appendString:@"^.*?"];
 		[self appendFilter:[components lastObject] toPattern:filePattern];
 		[filePattern appendString:@".*$"];
-		fileRx = [[ViRegexp alloc] initWithString:filePattern options:ONIG_OPTION_IGNORECASE];
+		fileRx = [[ViRegexp alloc] initWithString:filePattern
+						  options:ONIG_OPTION_IGNORECASE];
 
 		filteredItems = [NSMutableArray array];
 		itemsToFilter = [NSMutableArray array];
@@ -882,9 +908,12 @@ sort_by_score(id a, id b, void *context)
 		[self expandItems:rootItems recursionLimit:3];
 		[filteredItems sortUsingFunction:sort_by_score context:nil];
 		[explorer reloadData];
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+		      byExtendingSelection:NO];
 		if ([itemsToFilter count] > 0)
-			[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.05];
+			[self performSelector:@selector(expandNextItem:)
+				   withObject:nil
+				   afterDelay:0.05];
         }
 }
 
@@ -902,7 +931,8 @@ sort_by_score(id a, id b, void *context)
 
 	filteredItems = [[NSMutableArray alloc] init];
 	for (NSString *c in completions) {
-		NSURL *url = [NSURL URLWithString:[c stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:relURL];
+		NSString *esc = [c stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+		NSURL *url = [NSURL URLWithString:esc relativeToURL:relURL];
 		ProjectFile *pf = [[ProjectFile alloc] initWithURL:url];
 		[filteredItems addObject:pf];
 		[self markItem:pf withPrefix:markLength];
@@ -915,7 +945,8 @@ sort_by_score(id a, id b, void *context)
 	isCompletion = YES;
 
 	[explorer reloadData];
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+	      byExtendingSelection:NO];
 }
 
 #pragma mark -
@@ -934,12 +965,14 @@ doCommandBySelector:(SEL)aSelector
 	} else if (aSelector == @selector(moveUp:)) { // up arrow
 		NSInteger row = [explorer selectedRow];
 		if (row > 0)
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
+			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1]
+			      byExtendingSelection:NO];
 		return YES;
 	} else if (aSelector == @selector(moveDown:)) { // down arrow
 		NSInteger row = [explorer selectedRow];
 		if (row + 1 < [explorer numberOfRows])
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
+			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1]
+			      byExtendingSelection:NO];
 		return YES;
 	} else if (aSelector == @selector(moveRight:)) { // right arrow
 		NSInteger row = [explorer selectedRow];
@@ -989,7 +1022,8 @@ doCommandBySelector:(SEL)aSelector
 		row = 0;
 	else
 		row = IMIN([explorer numberOfRows] - 1, row + c);
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1004,7 +1038,8 @@ doCommandBySelector:(SEL)aSelector
 		row = 0;
 	else
 		row = IMAX(0, row - c);
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1050,7 +1085,8 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSRect bounds = [scrollView documentVisibleRect];
 	NSInteger row = [explorer rowAtPoint:bounds.origin];
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1061,7 +1097,8 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSRect bounds = [scrollView documentVisibleRect];
 	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
-	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger lastRow = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	if (lastRow == -1)
 		lastRow = [explorer numberOfRows] - 1;
 	NSInteger row = firstRow + (lastRow - firstRow) / 2;
@@ -1075,10 +1112,12 @@ doCommandBySelector:(SEL)aSelector
 - (BOOL)move_low:(ViCommand *)command
 {
 	NSRect bounds = [scrollView documentVisibleRect];
-	NSInteger row = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger row = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	if (row == -1)
 		row = [explorer numberOfRows] - 1;
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1087,7 +1126,8 @@ doCommandBySelector:(SEL)aSelector
 /* <home> */
 - (BOOL)move_home:(ViCommand *)command
 {
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:0];
 	lastSelectedRow = 0;
 	return YES;
@@ -1097,7 +1137,8 @@ doCommandBySelector:(SEL)aSelector
 - (BOOL)move_end:(ViCommand *)command
 {
 	NSInteger row = [explorer numberOfRows] - 1;
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1118,7 +1159,8 @@ doCommandBySelector:(SEL)aSelector
 		return NO;
 	}
 
-	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger lastRow = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	if (lastRow == -1)
 		lastRow = [explorer numberOfRows];
 	lastRow--;
@@ -1142,7 +1184,8 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSClipView *clipView = [scrollView contentView];
 	NSRect bounds = [scrollView documentVisibleRect];
-	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger lastRow = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	if (lastRow == -1) {
 		/* Last row already visible. */
 		return NO;
@@ -1167,7 +1210,8 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSRect bounds = [scrollView documentVisibleRect];
 	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
-	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger lastRow = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	NSInteger maxRow = [explorer numberOfRows] - 1;
 	if (lastRow == -1)
 		lastRow = maxRow;
@@ -1178,7 +1222,8 @@ doCommandBySelector:(SEL)aSelector
 		currentRow = 0;
 	NSInteger row = IMAX(0, currentRow - screenRows);
 
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1188,7 +1233,8 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSRect bounds = [scrollView documentVisibleRect];
 	NSInteger firstRow = [explorer rowAtPoint:bounds.origin];
-	NSInteger lastRow = [explorer rowAtPoint:NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+	NSInteger lastRow = [explorer rowAtPoint:
+	    NSMakePoint(bounds.origin.x, bounds.origin.y + bounds.size.height)];
 	NSInteger maxRow = [explorer numberOfRows] - 1;
 	if (lastRow == -1)
 		lastRow = maxRow;
@@ -1199,7 +1245,8 @@ doCommandBySelector:(SEL)aSelector
 		currentRow = 0;
 	NSInteger row = IMIN(maxRow, currentRow + screenRows);
 
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1223,7 +1270,8 @@ doCommandBySelector:(SEL)aSelector
 	else if (key == 'g')
 		row = 0;
 
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	lastSelectedRow = row;
 	return YES;
@@ -1278,7 +1326,8 @@ doCommandBySelector:(SEL)aSelector
 	if (row < 0)
 		[self move_home:command];
 	else {
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+		      byExtendingSelection:NO];
 		[explorer scrollRowToVisible:row];
 		lastSelectedRow = row;
 	}
@@ -1307,30 +1356,36 @@ doCommandBySelector:(SEL)aSelector
 {
 	DEBUG(@"command is %@", command.method);
 	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
-	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
+	    (command.motion_method &&
+	     ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
 		[windowController message:@"Command not implemented."];
 		return;
 	}
 
-	[self performSelector:NSSelectorFromString(command.method) withObject:command];
+	[self performSelector:NSSelectorFromString(command.method)
+		   withObject:command];
 }
 
 #pragma mark -
 #pragma mark Explorer Outline View Data Source
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+            child:(NSInteger)anIndex
+           ofItem:(id)item
 {
 	if (item == nil)
 		return [filteredItems objectAtIndex:anIndex];
 	return [[(ProjectFile *)item children] objectAtIndex:anIndex];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+   isItemExpandable:(id)item
 {
 	return [(ProjectFile *)item isDirectory];
 }
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
+  numberOfChildrenOfItem:(id)item
 {
 	if (item == nil)
 		return [filteredItems count];
@@ -1338,7 +1393,9 @@ doCommandBySelector:(SEL)aSelector
 	return [[(ProjectFile *)item children] count];
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+objectValueForTableColumn:(NSTableColumn *)tableColumn
+           byItem:(id)item
 {
 	if (isFiltered)
 		return [item markedString];
@@ -1346,17 +1403,21 @@ doCommandBySelector:(SEL)aSelector
 		return [(ProjectFile *)item name];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+        isGroupItem:(id)item
 {
 	return NO;
 }
 
-- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
+- (CGFloat)outlineView:(NSOutlineView *)outlineView
+     heightOfRowByItem:(id)item
 {
 	return 20;
 }
 
-- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+- (NSCell *)outlineView:(NSOutlineView *)outlineView
+ dataCellForTableColumn:(NSTableColumn *)tableColumn
+                   item:(id)item
 {
 	NSCell *cell = [tableColumn dataCellForRow:[explorer rowForItem:item]];
 	if (cell) {

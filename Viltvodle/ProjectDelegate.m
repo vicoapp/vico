@@ -441,9 +441,9 @@
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
 		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[[ViDocumentController sharedDocumentController] splitVertically:NO
-										 andOpen:[item url]
-								      orSwitchToDocument:nil];
+			[windowController splitVertically:NO
+						  andOpen:[item url]
+				       orSwitchToDocument:nil];
 	}];
 	[self cancelExplorer];
 }
@@ -454,9 +454,9 @@
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
 		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[[ViDocumentController sharedDocumentController] splitVertically:YES
-										 andOpen:[item url]
-								      orSwitchToDocument:nil];
+			[windowController splitVertically:YES
+						  andOpen:[item url]
+				       orSwitchToDocument:nil];
 	}];
 	[self cancelExplorer];
 }

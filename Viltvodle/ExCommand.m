@@ -906,7 +906,7 @@ ex_cmd_find(NSString *cmd)
 		[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
 		if ([scan isAtEnd])
-			return NO;
+			goto usage;
 
 		unichar delimiter = [string characterAtIndex:[scan scanLocation]];
 		[scan setScanLocation:[scan scanLocation] + 1];

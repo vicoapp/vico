@@ -422,7 +422,7 @@ doCommandBySelector:(SEL)aSelector
 				[self performSelector:selector withObject:ex];
 			else
 				[self message:@"The %@ command is not implemented.", ex.name];
-		} else
+		} else if (error)
 			[self message:[error localizedDescription]];
 	}
 }
@@ -595,7 +595,6 @@ doCommandBySelector:(SEL)aSelector
 	end += /* command.addr2->offset many _lines_ */ 0;
 
 	*outRange = NSMakeRange(begin, end - begin);
-	INFO(@"resolved range %@", NSStringFromRange(*outRange));
 	return YES;
 }
 

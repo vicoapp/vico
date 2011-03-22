@@ -165,6 +165,9 @@
               relativeTo:(NSURL *)relURL
                    error:(NSError **)outError
 {
+	if (filename == nil)
+		return nil;
+
 	if (relURL ==  nil) {
 		ExEnvironment *env = [[ViWindowController currentWindowController] environment];
 		if (env)

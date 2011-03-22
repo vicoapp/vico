@@ -822,6 +822,40 @@ static ViWindowController	*currentWindowController = nil;
 }
 
 /*
+ * Returns the most appropriate view for the given document.
+ * Returns nil if no view of the document is currently open.
+ */
+- (ViDocumentView *)viewForDocument:(ViDocument *)document
+{
+	if (!isLoaded || document == nil)
+		return nil;
+
+	ViDocumentView *docView = nil;
+	id<ViViewController> viewController = [self currentView];
+
+	/* Check if the current view contains the document. */
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		docView = viewController;
+		if ([docView document] == document)
+			return viewController;
+	}
+
+	/* Check if current tab has a view of the document. */
+	ViDocumentTabController *tabController = [self selectedTabController];
+	for (viewController in [tabController views])
+		if ([viewController isKindOfClass:[ViDocumentView class]] &&
+		    [[(ViDocumentView *)viewController document] isEqual:document])
+			return viewController;
+
+	/* Select any existing view of the document. */
+	if ([[document views] count] > 0)
+		return [self selectDocumentView:[[document views] objectAtIndex:0]];
+
+	/* No open view for the given document. */
+	return nil;
+}
+
+/*
  * Selects the most appropriate view for the given document.
  * Will change current tab if no view of the document is visible in the current tab.
  *
@@ -833,30 +867,11 @@ static ViWindowController	*currentWindowController = nil;
 	if (!isLoaded || document == nil)
 		return nil;
 
-	ViDocumentView *docView = nil;
-	id<ViViewController> viewController = [self currentView];
+	ViDocumentView *docView = [self viewForDocument:document];
+	if (docView)
+		return [self selectDocumentView:docView];
 
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		docView = viewController;
-		if ([docView document] == document)
-			return [self selectDocumentView:viewController];
-	}
-
-	ViDocumentTabController *tabController = [self selectedTabController];
-
-	// check if current tab has a view of the document
-	for (viewController in [tabController views])
-		if ([viewController isKindOfClass:[ViDocumentView class]]) {
-			docView = viewController;
-			if ([[docView document] isEqual:document])
-				return [self selectDocumentView:viewController];
-		}
-
-	// select any existing view of the document
-	if ([[document views] count] > 0)
-		return [self selectDocumentView:[[document views] objectAtIndex:0]];
-
-	// No view exists of the document, create a new tab.
+	/* No view exists of the document, create a new tab. */
 	docView = [self createTabForDocument:document];
 	return [self selectDocumentView:docView];
 }

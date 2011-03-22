@@ -1095,9 +1095,13 @@ filter_write(CFSocketRef s,
 	if ([command.command->name isEqualToString:@"buffer"]) {
 		if ([windowController currentDocument] != doc)
 			[windowController switchToDocument:doc];
-	} else if ([command.command->name isEqualToString:@"tbuffer"])
-		[windowController createTabForDocument:doc];
-	else
+	} else if ([command.command->name isEqualToString:@"tbuffer"]) {
+		ViDocumentView *docView = [windowController viewForDocument:doc];
+		if (docView == nil)
+			[windowController createTabForDocument:doc];
+		else
+			[windowController selectDocumentView:docView];
+	} else
 		/* otherwise it's either sbuffer or vbuffer */
 		[windowController splitVertically:[command.command->name isEqualToString:@"vbuffer"]
 					  andOpen:nil

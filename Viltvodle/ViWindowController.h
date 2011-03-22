@@ -81,6 +81,7 @@
 - (ViCommand *)parser;
 - (id<ViViewController>)viewControllerForView:(NSView *)aView;
 - (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
+- (ViDocumentView *)viewForDocument:(ViDocument *)document;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
 
 - (void)closeDocument:(ViDocument *)aDocument;

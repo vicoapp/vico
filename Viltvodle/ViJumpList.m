@@ -7,7 +7,9 @@
 @synthesize url;
 @synthesize line;
 @synthesize column;
-- (ViJump *)initWithURL:(NSURL *)aURL line:(NSUInteger)aLine column:(NSUInteger)aColumn
+- (ViJump *)initWithURL:(NSURL *)aURL
+                   line:(NSUInteger)aLine
+                 column:(NSUInteger)aColumn
 {
 	self = [super init];
 	if (self)
@@ -21,7 +23,8 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViJump %p, %@ %u:%u>", self, [url absoluteString], line, column];
+	return [NSString stringWithFormat:@"<ViJump %p, %@ %u:%u>",
+	    self, [url absoluteString], line, column];
 }
 @end
 
@@ -37,7 +40,9 @@
 	return self;
 }
 
-- (BOOL)pushURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+- (BOOL)pushURL:(NSURL *)url
+           line:(NSUInteger)line
+         column:(NSUInteger)column
 {
 	if (url == nil)
 		return NO;
@@ -68,7 +73,10 @@
 	return removedDuplicate;
 }
 
-- (BOOL)gotoJumpAtPosition:(NSUInteger)aPosition URL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr
+- (BOOL)gotoJumpAtPosition:(NSUInteger)aPosition
+                       URL:(NSURL **)urlPtr
+                      line:(NSUInteger *)linePtr
+                    column:(NSUInteger *)columnPtr
 {
 	ViJump *jump = [jumps objectAtIndex:aPosition];
 	DEBUG(@"using jump %@", jump);
@@ -85,15 +93,22 @@
 	return YES;
 }
 
-- (BOOL)forwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr
+- (BOOL)forwardToURL:(NSURL **)urlPtr
+                line:(NSUInteger *)linePtr
+              column:(NSUInteger *)columnPtr
 {
 	DEBUG(@"position = %u, count = %u", position, [jumps count]);
 	if (position + 1 >= [jumps count])
 		return NO;
-	return [self gotoJumpAtPosition:++position URL:urlPtr line:linePtr column:columnPtr];
+	return [self gotoJumpAtPosition:++position
+				    URL:urlPtr
+				   line:linePtr
+				 column:columnPtr];
 }
 
-- (BOOL)backwardToURL:(NSURL **)urlPtr line:(NSUInteger *)linePtr column:(NSUInteger *)columnPtr
+- (BOOL)backwardToURL:(NSURL **)urlPtr
+                 line:(NSUInteger *)linePtr
+               column:(NSUInteger *)columnPtr
 {
 	DEBUG(@"position = %u, count = %u", position, [jumps count]);
 	if (position <= 0)
@@ -102,13 +117,18 @@
 	if (position >= [jumps count] && urlPtr && linePtr && columnPtr)
 	{
 		NSUInteger savedPosition = position;
-		BOOL removedDuplicate = [self pushURL:*urlPtr line:*linePtr column:*columnPtr];
+		BOOL removedDuplicate = [self pushURL:*urlPtr
+						 line:*linePtr
+					       column:*columnPtr];
 		position = savedPosition;
 		if (removedDuplicate)
 			position--;
 	}
 
-	return [self gotoJumpAtPosition:--position URL:urlPtr line:linePtr column:columnPtr];
+	return [self gotoJumpAtPosition:--position
+				    URL:urlPtr
+				   line:linePtr
+				 column:columnPtr];
 }
 
 - (BOOL)atBeginning

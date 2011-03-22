@@ -212,6 +212,8 @@
 			expFormat = @"";
 		}
 		begin = r.location + [expFormat length];
+                if (begin == r.location && r.length == 0 && begin < [text length])
+                        ++begin; /* prevent infinite loops */
 		DEBUG(@"replace range %@ in string [%@] with expanded format [%@]",
 		    NSStringFromRange(r), text, expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];

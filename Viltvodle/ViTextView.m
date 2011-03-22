@@ -827,7 +827,10 @@ int logIndent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[[self delegate] environment] getExCommandWithDelegate:self selector:@selector(find_forward_callback:contextInfo:) prompt:@"/" contextInfo:command];
+	[[[self delegate] environment] getExCommandWithDelegate:self
+						       selector:@selector(find_forward_callback:contextInfo:)
+							 prompt:@"/"
+						    contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d/pattern will not work!
 	return YES;
@@ -836,7 +839,10 @@ int logIndent = 0;
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[[self delegate] environment] getExCommandWithDelegate:self selector:@selector(find_backward_callback:contextInfo:) prompt:@"?" contextInfo:command];
+	[[[self delegate] environment] getExCommandWithDelegate:self
+						       selector:@selector(find_backward_callback:contextInfo:)
+							 prompt:@"?"
+						    contextInfo:command];
 	// FIXME: this won't work as a motion command!
 	// d?pattern will not work!
 	return YES;

@@ -224,20 +224,3 @@ buffer_ptr(const Buffer *buffer)
 	return buffer->buf + buffer->offset;
 }
 
-/* Dumps the contents of the buffer to stderr. */
-
-void
-buffer_dump(const Buffer *buffer)
-{
-	u_int i;
-	u_char *ucp = buffer->buf;
-
-	for (i = buffer->offset; i < buffer->end; i++) {
-		fprintf(stderr, "%02x", ucp[i]);
-		if ((i-buffer->offset)%16==15)
-			fprintf(stderr, "\r\n");
-		else if ((i-buffer->offset)%2==1)
-			fprintf(stderr, " ");
-	}
-	fprintf(stderr, "\r\n");
-}

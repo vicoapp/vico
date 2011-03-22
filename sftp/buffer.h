@@ -40,8 +40,6 @@ void	 buffer_get(Buffer *, void *, u_int);
 void	 buffer_consume(Buffer *, u_int);
 void	 buffer_consume_end(Buffer *, u_int);
 
-void     buffer_dump(const Buffer *);
-
 int	 buffer_get_ret(Buffer *, void *, u_int);
 int	 buffer_consume_ret(Buffer *, u_int);
 int	 buffer_consume_end_ret(Buffer *, u_int);

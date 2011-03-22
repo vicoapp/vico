@@ -114,6 +114,7 @@
   selectFromPoint:(NSPoint)fromPoint
           toPoint:(NSPoint)toPoint;
 
+- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;

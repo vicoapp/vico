@@ -1584,8 +1584,7 @@
 - (BOOL)find_current_word:(ViCommand *)command
 {
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
-	if(word)
-	{
+	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
 		return [self findPattern:pattern options:0];
 	}
@@ -1617,10 +1616,7 @@
 /* syntax: m<char> */
 - (BOOL)set_mark:(ViCommand *)command
 {
-	NSUInteger bol;
-	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	ViMark *m = [[ViMark alloc] initWithLine:[self currentLine] column:start_location - bol];
-	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", command.argument]];
+	[self setMark:command.argument atLocation:start_location];
 	return YES;
 }
 
@@ -1629,15 +1625,13 @@
 - (BOOL)move_to_mark:(ViCommand *)command
 {
 	ViMark *m = [marks objectForKey:[NSString stringWithFormat:@"%C", command.argument]];
-	if (m == nil)
-	{
+	if (m == nil) {
 		[[self delegate] message:@"Mark %C: not set", command.argument];
 		return NO;
 	}
 
 	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
-	if (bol == -1)
-	{
+	if (bol == -1) {
 		[[self delegate] message:@"Mark %C: the line was deleted", command.argument];
 		return NO;
 	}

@@ -8,6 +8,7 @@
 #import "ViDocumentView.h"
 #import "ViJumpList.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViMark.h"
 
 int logIndent = 0;
 
@@ -225,6 +226,14 @@ int logIndent = 0;
 	return NO;
 }
 
+- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation
+{
+	NSUInteger lineno = [[self textStorage] lineNumberAtLocation:aLocation];
+	NSUInteger column = [[self textStorage] columnAtLocation:aLocation];
+	ViMark *m = [[ViMark alloc] initWithLine:lineno column:column];
+	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", name]];
+}
+
 #pragma mark -
 #pragma mark Vi error messages
 
@@ -315,6 +324,8 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
+
+	[self setMark:'.' atLocation:aRange.location];
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString

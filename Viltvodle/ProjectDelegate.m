@@ -257,8 +257,8 @@
 	NSMutableArray *children = [[NSMutableArray alloc] init];
 	for (NSString *filename in files)
 		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
-			NSURL *url = [url URLByAppendingPathComponent:filename]
-			[children addObject:[ProjectFile fileWithURL:url]];
+			NSURL *curl = [url URLByAppendingPathComponent:filename];
+			[children addObject:[ProjectFile fileWithURL:curl]];
 		}
 
 	return [self sortProjectFiles:children];
@@ -282,8 +282,8 @@
 	for (entry in entries) {
 		NSString *filename = [entry filename];
 		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
-			NSURL *url = [url URLByAppendingPathComponent:filename];
-			[children addObject:[ProjectFile fileWithURL:url sftpInfo:entry]];
+			NSURL *curl = [url URLByAppendingPathComponent:filename];
+			[children addObject:[ProjectFile fileWithURL:curl sftpInfo:entry]];
 		}
 	}
 
@@ -686,7 +686,6 @@
 			closeExplorerAfterUse = YES;
 		[splitView setPosition:200.0 ofDividerAtIndex:0];
 	}
-	returnToExplorer = NO;
 }
 
 - (void)closeExplorer
@@ -720,7 +719,6 @@
 	}
 	[self resetExplorerView];
 	[delegate focusEditor];
-	returnToExplorer = NO;
 }
 
 - (void)markItem:(ProjectFile *)item
@@ -999,11 +997,7 @@ doCommandBySelector:(SEL)aSelector
 		}
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
-		if (returnToExplorer) {
-			returnToExplorer = NO;
-			[window makeFirstResponder:explorer];
-		} else
-			[self cancelExplorer];
+		[window makeFirstResponder:explorer];
 		return YES;
 	}
 
@@ -1279,7 +1273,6 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)find:(ViCommand *)command
 {
-	returnToExplorer = YES;
 	[window makeFirstResponder:filterField];
 	return YES;
 }

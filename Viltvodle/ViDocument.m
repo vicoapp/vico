@@ -36,7 +36,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize views;
 @synthesize bundle;
 @synthesize encoding;
-@synthesize jumpList;
 @synthesize isTemporary;
 @synthesize snippet;
 @synthesize proxy;

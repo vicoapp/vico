@@ -36,6 +36,7 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize environment;
 @synthesize proxy;
 @synthesize explorer = projectDelegate;
+@synthesize jumpList;
 
 + (ViWindowController *)currentWindowController
 {
@@ -279,7 +280,10 @@ static ViWindowController	*currentWindowController = nil;
 	[[NSDocumentController sharedDocumentController] newDocument:self];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
 {
 	if ([keyPath isEqualToString:@"symbols"]) {
 		[self filterSymbols:symbolFilterField];
@@ -304,7 +308,8 @@ static ViWindowController	*currentWindowController = nil;
 	NSArray *items = [[openFilesButton menu] itemArray];
 	NSInteger ndx;
 	for (ndx = 0; ndx < [items count]; ndx++)
-		if ([[document displayName] compare:[[items objectAtIndex:ndx] title] options:NSCaseInsensitiveSearch] == NSOrderedAscending)
+		if ([[document displayName] compare:[[items objectAtIndex:ndx] title]
+					    options:NSCaseInsensitiveSearch] == NSOrderedAscending)
 			break;
 	NSMenuItem *item = [[openFilesButton menu] insertItemWithTitle:[document displayName]
 								action:@selector(switchToDocumentAction:)
@@ -321,8 +326,6 @@ static ViWindowController	*currentWindowController = nil;
         NSInteger row = [symbolsOutline rowForItem:document];
         [symbolsOutline scrollRowToVisible:row];
         [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-
-	[document setJumpList:jumpList];
 }
 
 /* Create a new document tab.
@@ -380,17 +383,24 @@ static ViWindowController	*currentWindowController = nil;
 	}
 }
 
-- (void)documentChangedAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+- (void)documentChangedAlertDidEnd:(NSAlert *)alert
+                        returnCode:(NSInteger)returnCode
+                       contextInfo:(void *)contextInfo
 {
 	ViDocument *document = contextInfo;
 
 	if (returnCode == NSAlertSecondButtonReturn) {
 		NSError *error = nil;
-		[document revertToContentsOfURL:[document fileURL] ofType:[document fileType] error:&error];
+		[document revertToContentsOfURL:[document fileURL]
+					 ofType:[document fileType]
+					  error:&error];
 		if (error) {
 			[[alert window] orderOut:self];
 			NSAlert *revertAlert = [NSAlert alertWithError:error];
-			[revertAlert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:nil contextInfo:nil];
+			[revertAlert beginSheetModalForWindow:[self window]
+					        modalDelegate:nil
+					       didEndSelector:nil
+						  contextInfo:nil];
 			[document updateChangeCount:NSChangeReadOtherContents];
 		}
 	}
@@ -746,12 +756,9 @@ static ViWindowController	*currentWindowController = nil;
 	// XXX: currentView is the *previously* current view
 
 	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocumentView *docView = viewController;
-		if ([docView document] == document)
-			return;
-		[[docView textView] pushCurrentLocationOnJumpList];
-	}
+	if ([viewController isKindOfClass:[ViDocumentView class]] &&
+	    [(ViDocumentView *)viewController document] == document)
+		return;
 
 	[[self document] removeWindowController:self];
 	[document addWindowController:self];
@@ -777,8 +784,11 @@ static ViWindowController	*currentWindowController = nil;
 		return;
 
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		[self didSelectDocument:[(ViDocumentView *)viewController document]];
-		[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
+		ViDocumentView *docView = viewController;
+		if (!jumping)
+			[[docView textView] pushCurrentLocationOnJumpList];
+		[self didSelectDocument:[docView document]];
+		[self updateSelectedSymbolForLocation:[[docView textView] caret]];
 	}
 	[[viewController tabController] setSelectedView:viewController];
 
@@ -934,21 +944,34 @@ static ViWindowController	*currentWindowController = nil;
 	return nil;
 }
 
-- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+- (void)gotoURL:(NSURL *)url
+           line:(NSUInteger)line
+         column:(NSUInteger)column
+           view:(ViDocumentView *)docView
 {
 	ViDocument *document = [self documentForURL:url];
 	if (document == nil) {
 		NSError *error = nil;
-		document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url display:YES error:&error];
+		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
+		document = [ctrl openDocumentWithContentsOfURL:url display:YES error:&error];
 		if (error) {
 			[NSApp presentError:error];	
 			return;
 		}
 	}
 
-	ViDocumentView *docView = [self selectDocument:document];
+	if (docView == nil)
+		docView = [self selectDocument:document];
+	else
+		[self selectDocumentView:docView];
+
 	if (line > 0)
 		[[docView textView] gotoLine:line column:column];
+}
+
+- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+{
+	[self gotoURL:url line:line column:column view:nil];
 }
 
 - (void)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber
@@ -1488,6 +1511,7 @@ static ViWindowController	*currentWindowController = nil;
 {
 	NSURL *url, **urlPtr = nil;
 	NSUInteger line, *linePtr = NULL, column, *columnPtr = NULL;
+	NSView **viewPtr = NULL;
 
 	id<ViViewController> viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
@@ -1500,13 +1524,13 @@ static ViWindowController	*currentWindowController = nil;
 		urlPtr = &url;
 		linePtr = &line;
 		columnPtr = &column;
+		viewPtr = &tv;
 	}
 
-
 	if ([sender selectedSegment] == 0)
-		[jumpList backwardToURL:urlPtr line:linePtr column:columnPtr];
+		[jumpList backwardToURL:urlPtr line:linePtr column:columnPtr view:viewPtr];
 	else
-		[jumpList forwardToURL:NULL line:NULL column:NULL];
+		[jumpList forwardToURL:NULL line:NULL column:NULL view:NULL];
 }
 
 - (void)updateJumplistNavigator
@@ -1522,7 +1546,15 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump
 {
-	[self gotoURL:[jump url] line:[jump line] column:[jump column]];
+	/* XXX: Set a flag telling didSelectDocument: that we're currently navigating the jump list.
+	 * This prevents us from pushing an extraneous jump on the list.
+	 */
+	jumping = YES;
+	id<ViViewController> viewController = nil;
+	if (jump.view)
+		viewController = [self viewControllerForView:jump.view];
+	[self gotoURL:jump.url line:jump.line column:jump.column view:viewController];
+	jumping = NO;
 	[self updateJumplistNavigator];
 }
 

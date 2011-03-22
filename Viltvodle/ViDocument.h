@@ -39,7 +39,6 @@
 	NSDictionary *symbolIcons;
 	NSTimer *updateSymbolsTimer;
 
-	ViJumpList *jumpList;
 	ViSnippet *snippet;
 }
 
@@ -48,7 +47,6 @@
 @property(readonly) ViBundle *bundle;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;
-@property(readwrite, assign) ViJumpList *jumpList;
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
 @property(readonly) ViScriptProxy *proxy;

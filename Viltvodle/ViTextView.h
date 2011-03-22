@@ -24,7 +24,6 @@
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (NSFont *)font;
 - (NSDictionary *)typingAttributes;
-- (ViJumpList *)jumpList;
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;
 - (ViBundle *)bundle;

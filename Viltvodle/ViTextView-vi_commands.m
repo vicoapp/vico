@@ -10,9 +10,8 @@
 /* syntax: [count]<ctrl-i> */
 - (BOOL)jumplist_forward:(ViCommand *)command
 {
-	NSURL *url;
-	NSUInteger line, column;
-	BOOL ok = [[[self delegate] jumpList] forwardToURL:&url line:&line column:&column];
+	ViJumpList *jumplist = [[[self window] windowController] jumpList];
+	BOOL ok = [jumplist forwardToURL:NULL line:NULL column:NULL view:NULL];
 	if (!ok) {
 		[[self delegate] message:@"Already at end of jumplist"];
 		return NO;
@@ -27,7 +26,9 @@
 	NSURL *url = [[self delegate] fileURL];
 	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
 	NSUInteger column = [[self textStorage] columnAtLocation:start_location];
-	BOOL ok = [[[self delegate] jumpList] backwardToURL:&url line:&line column:&column];
+	NSView *view = self;
+	ViJumpList *jumplist = [[[self window] windowController] jumpList];
+	BOOL ok = [jumplist backwardToURL:&url line:&line column:&column view:&view];
 	if (!ok) {
 		[[self delegate] message:@"Already at beginning of jumplist"];
 		return NO;

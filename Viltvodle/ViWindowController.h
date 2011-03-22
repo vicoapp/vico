@@ -56,6 +56,7 @@
 	BOOL closeSymbolListAfterUse;
 
 	ViJumpList *jumpList;
+	BOOL jumping;
 	IBOutlet NSSegmentedControl *jumplistNavigator;
 
 	ViDocumentView *currentView;
@@ -63,6 +64,7 @@
 
 @property(readwrite, assign) NSMutableArray *documents;
 @property(readonly) ExEnvironment *environment;
+@property(readonly) ViJumpList *jumpList;
 @property(readwrite, assign) ViProject *project;
 @property(readonly) ViScriptProxy *proxy;
 @property(readonly) ProjectDelegate *explorer;

@@ -746,7 +746,7 @@ static ViWindowController	*currentWindowController = nil;
 	id<ViViewController> viewController = [self viewControllerForView:[notification object]];
 	if (viewController) {
 		if (parser.partial) {
-			[[self environment] message:@"Vi command interrupted."];
+			[self message:@"Vi command interrupted."];
 			[parser reset];
 		}
 		[self didSelectViewController:viewController];
@@ -1074,6 +1074,10 @@ static ViWindowController	*currentWindowController = nil;
 		return NO;
 
 	ViDocumentTabController *tabController = [viewController tabController];
+	if ([[tabController views] count] == 1) {
+		[self message:@"Already only one window"];
+		return NO;
+	}
 	[tabController closeViewsOtherThan:viewController];
 	return YES;
 }
@@ -1086,7 +1090,7 @@ static ViWindowController	*currentWindowController = nil;
 
 	ViDocumentTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 1) {
-		[[self environment] message:@"Already only one window"];
+		[self message:@"Already only one window"];
 		return NO;
 	}
 

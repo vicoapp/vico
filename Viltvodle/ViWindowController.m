@@ -906,7 +906,8 @@ static ViWindowController	*currentWindowController = nil;
 - (void)switchToDocument:(ViDocument *)doc
 {
 	ViDocumentTabController *tabController = [self selectedTabController];
-	id<ViViewController> viewController = [tabController replaceView:[self currentView] withDocument:doc];
+	id<ViViewController> viewController = [tabController replaceView:[self currentView]
+							    withDocument:doc];
 	[self selectDocumentView:viewController];
 }
 
@@ -1174,7 +1175,9 @@ static ViWindowController	*currentWindowController = nil;
 	return NO;
 }
 
-- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset
+- (CGFloat)splitView:(NSSplitView *)sender
+constrainMinCoordinate:(CGFloat)proposedMin
+         ofSubviewAt:(NSInteger)offset
 {
 	if (sender == splitView) {
 		NSView *view = [[sender subviews] objectAtIndex:offset];
@@ -1189,7 +1192,9 @@ static ViWindowController	*currentWindowController = nil;
 	return proposedMin;
 }
 
-- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset
+- (CGFloat)splitView:(NSSplitView *)sender
+constrainMaxCoordinate:(CGFloat)proposedMax
+         ofSubviewAt:(NSInteger)offset
 {
 	if (sender == splitView) {
 		NSView *view = [[sender subviews] objectAtIndex:offset];
@@ -1200,7 +1205,9 @@ static ViWindowController	*currentWindowController = nil;
 		return proposedMax;
 }
 
-- (BOOL)splitView:(NSSplitView *)sender shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+- (BOOL)splitView:(NSSplitView *)sender
+shouldCollapseSubview:(NSView *)subview
+forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
 {
 	if (sender == splitView)
 	{
@@ -1246,7 +1253,8 @@ static ViWindowController	*currentWindowController = nil;
 	[sender adjustSubviews];
 }
 
-- (NSRect)splitView:(NSSplitView *)sender additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
+- (NSRect)splitView:(NSSplitView *)sender
+additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
 	if (sender != splitView)
 		return NSZeroRect;
@@ -1260,7 +1268,8 @@ static ViWindowController	*currentWindowController = nil;
 		resizeRect = [projectResizeView frame];
 	else if (rightView == symbolsView) {
 		resizeRect = [symbolsResizeView frame];
-		resizeRect.origin = [sender convertPoint:resizeRect.origin fromView:symbolsResizeView];
+		resizeRect.origin = [sender convertPoint:resizeRect.origin
+					        fromView:symbolsResizeView];
 	} else
 		return NSZeroRect;
 
@@ -1361,7 +1370,8 @@ static ViWindowController	*currentWindowController = nil;
 			if ([item isKindOfClass:[ViSymbol class]] && [[item symbol] isEqualToString:symbol])
 			{
 				[symbolsOutline scrollRowToVisible:row];
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+					    byExtendingSelection:NO];
 				return;
 			}
 		}
@@ -1374,7 +1384,8 @@ static ViWindowController	*currentWindowController = nil;
 		if ([item isKindOfClass:[ViSymbol class]])
 		{
 			[symbolsOutline scrollRowToVisible:row];
-			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+				    byExtendingSelection:NO];
 			break;
 		}
 	}
@@ -1428,7 +1439,8 @@ static ViWindowController	*currentWindowController = nil;
 	{
 		NSUInteger row = [symbolsOutline rowForItem:item];
 		[symbolsOutline scrollRowToVisible:row];
-		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+			    byExtendingSelection:NO];
 	}
 }
 
@@ -1452,7 +1464,9 @@ static ViWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Symbol filter key handling
 
-- (BOOL)control:(NSControl *)sender textView:(NSTextView *)textView doCommandBySelector:(SEL)aSelector
+- (BOOL)control:(NSControl *)sender
+       textView:(NSTextView *)textView
+doCommandBySelector:(SEL)aSelector
 {
 	if (sender == symbolFilterField)
 	{
@@ -1465,18 +1479,16 @@ static ViWindowController	*currentWindowController = nil;
 		{
 			NSInteger row = [symbolsOutline selectedRow];
 			if (row > 0)
-			{
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1] byExtendingSelection:NO];
-			}
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1]
+					    byExtendingSelection:NO];
 			return YES;
 		}
 		else if (aSelector == @selector(moveDown:)) // down arrow
 		{
 			NSInteger row = [symbolsOutline selectedRow];
 			if (row + 1 < [symbolsOutline numberOfRows])
-			{
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1] byExtendingSelection:NO];
-			}
+				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1]
+					    byExtendingSelection:NO];
 			return YES;
 		}
 		else if (aSelector == @selector(cancelOperation:)) // escape
@@ -1491,21 +1503,25 @@ static ViWindowController	*currentWindowController = nil;
 #pragma mark -
 #pragma mark Symbol Outline View Data Source
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+            child:(NSInteger)anIndex
+           ofItem:(id)item
 {
 	if (item == nil)
 		return [filteredDocuments objectAtIndex:anIndex];
 	return [[(ViDocument *)item filteredSymbols] objectAtIndex:anIndex];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+   isItemExpandable:(id)item
 {
 	if ([item isKindOfClass:[ViDocument class]])
 		return [[(ViDocument *)item filteredSymbols] count] > 0 ? YES : NO;
 	return NO;
 }
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
+  numberOfChildrenOfItem:(id)item
 {
 	if (item == nil)
 		return [filteredDocuments count];
@@ -1516,12 +1532,15 @@ static ViWindowController	*currentWindowController = nil;
 	return 0;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+objectValueForTableColumn:(NSTableColumn *)tableColumn
+           byItem:(id)item
 {
 	return [item displayName];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+        isGroupItem:(id)item
 {
 	if ([item isKindOfClass:[ViDocument class]])
 		return YES;
@@ -1530,7 +1549,8 @@ static ViWindowController	*currentWindowController = nil;
 
 - (BOOL)isSeparatorItem:(id)item
 {
-	if ([item isKindOfClass:[ViSymbol class]] && [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+	if ([item isKindOfClass:[ViSymbol class]] &&
+	    [[(ViSymbol *)item symbol] isEqualToString:@"-"])
 		return YES;
 	return NO;
 }
@@ -1544,7 +1564,9 @@ static ViWindowController	*currentWindowController = nil;
 	return 15;
 }
 
-- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+- (NSCell *)outlineView:(NSOutlineView *)outlineView
+ dataCellForTableColumn:(NSTableColumn *)tableColumn
+                   item:(id)item
 {
 	NSCell *cell;
 	if ([self isSeparatorItem:item])

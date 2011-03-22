@@ -39,7 +39,6 @@
 	IBOutlet NSPopUpButton *actionButton;
 
 	NSInteger lastSelectedRow;
-	BOOL returnToExplorer;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;

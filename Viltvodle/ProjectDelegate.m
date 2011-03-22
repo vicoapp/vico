@@ -997,7 +997,14 @@ doCommandBySelector:(SEL)aSelector
 		}
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
-		[window makeFirstResponder:explorer];
+		if (isFiltered) {
+			[window makeFirstResponder:explorer];
+			/* make sure something is selected */
+			if ([explorer selectedRow] == -1)
+				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+				      byExtendingSelection:NO];
+		} else
+			[self cancelExplorer];
 		return YES;
 	}
 

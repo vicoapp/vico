@@ -273,50 +273,6 @@
 	return doc;
 }
 
-- (ViDocument *)splitVertically:(BOOL)isVertical
-                        andOpen:(id)filenameOrURL
-             orSwitchToDocument:(ViDocument *)doc
-{
-	ViWindowController *windowController = [ViWindowController currentWindowController];
-	BOOL newDoc = YES;
-
-	if (filenameOrURL) {
-		doc = [self openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
-	} else if (doc == nil) {
-		NSError *err = nil;
-		doc = [self openUntitledDocumentAndDisplay:NO error:&err];
-		if (err)
-			[windowController message:@"%@", [err localizedDescription]];
-	} else
-		newDoc = NO;
-
-	if (doc) {
-		[doc addWindowController:windowController];
-		[windowController addDocument:doc];
-
-		id<ViViewController> viewController = [windowController currentView];
-		ViDocumentTabController *tabController = [viewController tabController];
-		ViDocumentView *newDocView = [tabController splitView:viewController
-							     withView:[doc makeView]
-							   vertically:isVertical];
-		[windowController selectDocumentView:newDocView];
-
-		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {
-			/*
-			 * If we're splitting a document, position
-			 * the caret in the new view appropriately.
-			 */
-			ViDocumentView *docView = viewController;
-			[[newDocView textView] setCaret:[[docView textView] caret]];
-			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
-		}
-
-		return doc;
-	}
-
-	return nil;
-}
-
 
 
 

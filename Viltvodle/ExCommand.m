@@ -94,6 +94,10 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"ar[gs]",
 		@"display file argument list"},
+	{@"buffer",	@"ex_buffer",	0,
+		"s",
+		@"b[uffer] bufname",
+		@"edit another open document in the current view"},
 	/* C_CHANGE */
 	{@"change",	@"ex_change",	EX_ADDR2|EX_ADDR_ZERODEF,
 		"!ca",
@@ -289,6 +293,10 @@ static struct ex_command ex_commands[] = {
 		"s",
 		@"[line [,line]] s [[/;]RE[/;]repl[/;] [cgr] [count] [#lp]]",
 		@"substitute on lines matching an RE"},
+	{@"sbuffer",	@"ex_buffer",	0,
+		"s",
+		@"sb[uffer] bufname",
+		@"split view and edit another open document"},
 	/* C_SCRIPT */
 	{@"script",	@"ex_script",	EX_SECURE,
 		"!f1o",
@@ -353,6 +361,10 @@ static struct ex_command ex_commands[] = {
 		"!",
 		@"tagt[op][!]",
 		@"discard all tags"},
+	{@"tbuffer",	@"ex_buffer",	0,
+		"s",
+		@"tb[uffer] bufname",
+		@"edit another open document in a new tab"},
 	/* C_UNDO */
 	{@"undo",	@"ex_undo",	EX_AUTOPRINT,
 		"",
@@ -373,6 +385,10 @@ static struct ex_command ex_commands[] = {
 		"s",
 		@"[line [,line]] v [;/]RE[;/] [commands]",
 		@"execute a global command on lines NOT matching an RE"},
+	{@"vbuffer",	@"ex_buffer",	0,
+		"s",
+		@"vb[uffer] bufname",
+		@"split view vertically and edit another open document"},
 	/* C_VERSION */
 	{@"version",	@"ex_version",	0,
 		"",

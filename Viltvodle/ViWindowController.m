@@ -820,7 +820,8 @@ static ViWindowController	*currentWindowController = nil;
  * Selects the most appropriate view for the given document.
  * Will change current tab if no view of the document is visible in the current tab.
  *
- * What if the document is not visible in _any_ view? Create a new tab? Change the current view to show the given document?
+ * What if the document is not visible in _any_ view? Create a new
+ * tab? Change the current view to show the given document?
  */
 - (ViDocumentView *)selectDocument:(ViDocument *)document
 {
@@ -1088,6 +1089,72 @@ static ViWindowController	*currentWindowController = nil;
 		return NO;
 	[self selectDocumentView:otherViewController];
 	return YES;
+}
+
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc
+		allowReusedView:(BOOL)allowReusedView
+{
+	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
+	BOOL newDoc = YES;
+
+	if (filenameOrURL) {
+		doc = [ctrl openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
+	} else if (doc == nil) {
+		NSError *err = nil;
+		doc = [ctrl openUntitledDocumentAndDisplay:NO error:&err];
+		if (err)
+			[self message:@"%@", [err localizedDescription]];
+	} else
+		newDoc = NO;
+
+	if (doc) {
+		[doc addWindowController:self];
+		[self addDocument:doc];
+
+		id<ViViewController> viewController = [self currentView];
+		ViDocumentTabController *tabController = [viewController tabController];
+		ViDocumentView *newDocView = nil;
+		if (allowReusedView && !newDoc) {
+			/* Check if the tab already has a view for this document. */
+			for (id<ViViewController> v in tabController.views)
+				if ([v isKindOfClass:[ViDocumentView class]] &&
+				    [(ViDocumentView *)v document] == doc) {
+					newDocView = v;
+					break;
+				}
+		}
+		if (newDocView == nil)
+			newDocView = [tabController splitView:viewController
+						     withView:[doc makeView]
+						   vertically:isVertical];
+		[self selectDocumentView:newDocView];
+
+		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {
+			/*
+			 * If we're splitting a document, position
+			 * the caret in the new view appropriately.
+			 */
+			ViDocumentView *docView = viewController;
+			[[newDocView textView] setCaret:[[docView textView] caret]];
+			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
+		}
+
+		return doc;
+	}
+
+	return nil;
+}
+
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc
+{
+	return [self splitVertically:isVertical
+			     andOpen:filenameOrURL
+		  orSwitchToDocument:doc
+		     allowReusedView:NO];
 }
 
 #pragma mark -

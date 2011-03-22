@@ -125,6 +125,13 @@
 - (BOOL)closeOtherViews;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position
                   relativeTo:(NSView *)aView;
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc
+		allowReusedView:(BOOL)allowReusedView;
+- (ViDocument *)splitVertically:(BOOL)isVertical
+                        andOpen:(id)filenameOrURL
+             orSwitchToDocument:(ViDocument *)doc;
 
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;

@@ -281,6 +281,8 @@ doCommandBySelector:(SEL)aSelector
 							      range:&range];
 
 			NSURL *url = [self parseExFilename:filename];
+			if (url == nil)
+				return YES;
 
 			filename = [url path];
 			/* Put back the trailing slash. */
@@ -512,37 +514,33 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)ex_new:(ExCommand *)command
 {
-	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
-	return [ctrl splitVertically:NO
-			     andOpen:[self parseExFilename:command.filename]
-		  orSwitchToDocument:nil] != nil;
+	return [windowController splitVertically:NO
+					 andOpen:[self parseExFilename:command.filename]
+			      orSwitchToDocument:nil] != nil;
 	return NO;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
 {
-	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
-	return [ctrl splitVertically:YES
-			     andOpen:[self parseExFilename:command.filename]
-		  orSwitchToDocument:nil] != nil;
+	return [windowController splitVertically:YES
+					 andOpen:[self parseExFilename:command.filename]
+			      orSwitchToDocument:nil] != nil;
 	return NO;
 }
 
 - (BOOL)ex_split:(ExCommand *)command
 {
-	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
-	return [ctrl splitVertically:NO
-			     andOpen:[self parseExFilename:command.filename]
-		  orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [windowController splitVertically:NO
+					 andOpen:[self parseExFilename:command.filename]
+			      orSwitchToDocument:[windowController currentDocument]] != nil;
 	return NO;
 }
 
 - (BOOL)ex_vsplit:(ExCommand *)command
 {
-	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
-	return [ctrl splitVertically:YES
-			     andOpen:[self parseExFilename:command.filename]
-		  orSwitchToDocument:[windowController currentDocument]] != nil;
+	return [windowController splitVertically:YES
+					 andOpen:[self parseExFilename:command.filename]
+			      orSwitchToDocument:[windowController currentDocument]] != nil;
 	return NO;
 }
 
@@ -1066,6 +1064,43 @@ filter_write(CFSocketRef s,
 	[defs setObject:env forKey:@"environment"];
 
 	DEBUG(@"static environment is now %@", env);
+
+	return YES;
+}
+
+- (BOOL)ex_buffer:(ExCommand *)command
+{
+	if ([command.string length] == 0)
+		return NO;
+
+	NSMutableArray *matches = [NSMutableArray array];
+
+	ViDocument *doc = nil;
+	for (doc in [windowController documents]) {
+		if ([[[doc fileURL] path] rangeOfString:command.string
+						options:NSCaseInsensitiveSearch].location != NSNotFound)
+			[matches addObject:doc];
+	}
+
+	if ([matches count] == 0) {
+		[self message:@"No matching buffer for %@", command.string];
+		return NO;
+	} else if ([matches count] > 1) {
+		[self message:@"More than one match for %@", command.string];
+		return NO;
+	}
+
+	doc = [matches objectAtIndex:0];
+	if ([command.command->name isEqualToString:@"buffer"])
+		[windowController switchToDocument:doc];
+	else if ([command.command->name isEqualToString:@"tbuffer"])
+		[windowController createTabForDocument:doc];
+	else
+		/* otherwise it's either sbuffer or vbuffer */
+		[windowController splitVertically:[command.command->name isEqualToString:@"vbuffer"]
+					  andOpen:nil
+			       orSwitchToDocument:doc
+				  allowReusedView:YES];
 
 	return YES;
 }

@@ -22,8 +22,5 @@
 - (ViDocument *)openDocument:(id)filenameOrURL
                   andDisplay:(BOOL)display
               allowDirectory:(BOOL)allowDirectory;
-- (ViDocument *)splitVertically:(BOOL)isVertical
-                        andOpen:(id)filenameOrURL
-             orSwitchToDocument:(ViDocument *)doc;
 
 @end

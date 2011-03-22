@@ -1077,7 +1077,8 @@ filter_write(CFSocketRef s,
 
 	ViDocument *doc = nil;
 	for (doc in [windowController documents]) {
-		if ([[[doc fileURL] path] rangeOfString:command.string
+		if ([doc fileURL] &&
+		    [[[doc fileURL] path] rangeOfString:command.string
 						options:NSCaseInsensitiveSearch].location != NSNotFound)
 			[matches addObject:doc];
 	}

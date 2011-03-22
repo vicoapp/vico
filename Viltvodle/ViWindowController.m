@@ -24,7 +24,8 @@ static ViWindowController	*currentWindowController = nil;
 - (void)didSelectDocument:(ViDocument *)document;
 - (void)didSelectViewController:(id<ViViewController>)viewController;
 - (ViDocumentTabController *)selectedTabController;
-- (void)closeDocumentView:(id<ViViewController>)viewController;
+- (void)closeDocumentView:(id<ViViewController>)viewController
+         canCloseDocument:(BOOL)canCloseDocument;
 @end
 
 
@@ -596,24 +597,26 @@ static ViWindowController	*currentWindowController = nil;
 		}
 	}
 
-	[self closeDocumentView:viewController];
+	[self closeDocumentView:viewController canCloseDocument:YES];
 }
 
 /*
- * Close the current view unless this is the last view in the window.
+ * Close the current view (but not the document!) unless this is
+ * the last view in the window.
  * Called by C-w c.
  */
 - (BOOL)closeCurrentViewUnlessLast
 {
 	ViDocumentView *docView = [self currentView];
 	if ([tabView numberOfTabViewItems] > 1 || [[[docView tabController] views] count] > 1) {
-		[self closeDocumentView:docView];
+		[self closeDocumentView:docView canCloseDocument:NO];
 		return YES;
 	}
 	return NO;
 }
 
 - (void)closeDocumentView:(id<ViViewController>)viewController
+         canCloseDocument:(BOOL)canCloseDocument
 {
 	if (viewController == nil)
 		[[self window] close];
@@ -623,12 +626,14 @@ static ViWindowController	*currentWindowController = nil;
 
 	[[viewController tabController] closeView:viewController];
 
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+	/* If this was the last view of the document, close the document too. */
+	if (canCloseDocument && [viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocument *doc = [(ViDocumentView *)viewController document];
 		if ([[doc views] count] == 0)
 			[doc close];
 	}
 
+	/* If this was the last view in the tab, close the tab too. */
 	ViDocumentTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 0) {
 		[self closeTabController:tabController];
@@ -653,7 +658,7 @@ static ViWindowController	*currentWindowController = nil;
 {
 	// Close all views of the document
 	while ([[document views] count] > 0)
-		[self closeDocumentView:[[document views] objectAtIndex:0]];
+		[self closeDocumentView:[[document views] objectAtIndex:0] canCloseDocument:YES];
 
 	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
 	if (ndx != -1)

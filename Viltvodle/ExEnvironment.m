@@ -1091,9 +1091,10 @@ filter_write(CFSocketRef s,
 	}
 
 	doc = [matches objectAtIndex:0];
-	if ([command.command->name isEqualToString:@"buffer"])
-		[windowController switchToDocument:doc];
-	else if ([command.command->name isEqualToString:@"tbuffer"])
+	if ([command.command->name isEqualToString:@"buffer"]) {
+		if ([windowController currentDocument] != doc)
+			[windowController switchToDocument:doc];
+	} else if ([command.command->name isEqualToString:@"tbuffer"])
 		[windowController createTabForDocument:doc];
 	else
 		/* otherwise it's either sbuffer or vbuffer */

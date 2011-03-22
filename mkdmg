@@ -1,7 +1,6 @@
 #!/bin/sh
 
-REPO_VERSION=$(hg id -n)
-REPO_VERSION="rev${REPO_VERSION%+}"
+REPO_VERSION="r$(hg id -n)"
 VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"
@@ -10,9 +9,7 @@ fi
 
 echo "Building version $VERSION (repo version $REPO_VERSION)"
 
-#sed -e "s/@VERSION@/${VERSION}/g" -e "s/@REPO_VERSION@/rev${REPO_VERSION}/g" Viltvodle/Viltvodle-Info.plist
-
-xcodebuild -scheme archive VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
+xcodebuild -scheme archive -configuration Release VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
 
 TMPDMG=viltvodle-tmp.dmg
 /bin/rm -f $TMPDMG

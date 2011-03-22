@@ -2,7 +2,7 @@
 
 tag=$1
 if test -z "$tag"; then
-	version="dev$(date +"%Y%m%d.%H%M")"
+	version="r$(hg id -n -r tip)"
 	tag=tip
 else
 	version=$(echo $tag | sed -e 's/^V//' -e 's/_/./g' )

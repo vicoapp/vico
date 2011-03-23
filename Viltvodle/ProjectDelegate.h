@@ -53,6 +53,7 @@
 	ViRegexp *skipRegex;
 
 	BOOL isFiltered;
+	BOOL isFiltering;
 
 	BOOL isCompletion;
 	id completionTarget;

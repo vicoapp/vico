@@ -1754,6 +1754,7 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
+	caretColor = [[[ViThemeStore defaultStore] defaultTheme] caretColor];
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[[self enclosingScrollView] setBackgroundColor:[aTheme backgroundColor]];
 	[self setInsertionPointColor:[aTheme caretColor]];

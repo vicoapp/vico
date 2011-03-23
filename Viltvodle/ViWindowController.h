@@ -83,9 +83,9 @@
 - (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
 - (ViDocumentView *)viewForDocument:(ViDocument *)document;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
+- (ViDocumentView *)createTabForDocument:(ViDocument *)document;
 
 - (void)closeDocument:(ViDocument *)aDocument;
-
 - (void)closeCurrentView;
 - (BOOL)closeCurrentViewUnlessLast;
 

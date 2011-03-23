@@ -57,6 +57,7 @@
 	NSUInteger		 caret;
 	NSRect			 caretRect;
 	NSRect			 oldCaretRect;
+	NSColor			*caretColor;
 
 	NSMutableDictionary	*buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
 
@@ -151,6 +152,7 @@
 @end
 
 @interface ViTextView (cursor)
+- (void)invalidateCaretRect;
 - (void)updateCaret;
 @end
 

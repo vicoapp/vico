@@ -1,4 +1,5 @@
 #import "ViLayoutManager.h"
+#include "logging.h"
 
 @implementation ViLayoutManager
 

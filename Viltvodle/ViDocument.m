@@ -428,6 +428,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 nil];
 }
 
+- (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender
+{
+	for (ViDocumentView *dv in views) {
+		ViTextView *tv = [dv textView];
+		if ([tv isKindOfClass:[ViTextView class]])
+			[tv invalidateCaretRect];
+	}
+}
+
 - (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager
    shouldUseTemporaryAttributes:(NSDictionary *)attrs
              forDrawingToScreen:(BOOL)toScreen

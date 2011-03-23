@@ -4,7 +4,7 @@
 
 @implementation ViTextView (cursor)
 
-- (void)updateCaret
+- (void)invalidateCaretRect
 {
 	NSLayoutManager *lm = [self layoutManager];
 	NSUInteger length = [[self textStorage] length];
@@ -30,6 +30,11 @@
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
 	oldCaretRect = caretRect;
+}
+
+- (void)updateCaret
+{
+	[self invalidateCaretRect];
 
 	// update selection in symbol list
 	NSNotification *notification = [NSNotification notificationWithName:ViCaretChangedNotification object:self];
@@ -50,7 +55,7 @@
 			if (c == '\t' || c == '\n' || c == '\r')
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
-		[[[[ViThemeStore defaultStore] defaultTheme] caretColor] set];
+		[caretColor set];
 		[[NSBezierPath bezierPathWithRect:caretRect] fill];
 	}
 }
@@ -73,10 +78,6 @@
 - (BOOL)becomeFirstResponder
 {
 	[self setNeedsDisplayInRect:oldCaretRect];
-
-	NSNotification *notification = [NSNotification notificationWithName:ViFirstResponderChangedNotification object:self];
-	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
-
 	return [super becomeFirstResponder];
 }
 
@@ -84,12 +85,6 @@
 {
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super resignFirstResponder];
-}
-
-- (void)setFrame:(NSRect)frameRect
-{
-	[super setFrame:frameRect];
-	[self updateCaret];
 }
 
 @end

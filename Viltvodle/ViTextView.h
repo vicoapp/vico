@@ -67,6 +67,8 @@
 	NSUInteger		 visual_start_location;
 	BOOL			 visual_line_mode;
 
+	BOOL			 showingContextMenu;
+
 	NSMutableCharacterSet	*wordSet;
 	NSMutableCharacterSet	*nonWordSet;
 	NSCharacterSet		*whitespace;

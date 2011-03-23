@@ -964,6 +964,9 @@ int logIndent = 0;
                  affinity:(NSSelectionAffinity)affinity
            stillSelecting:(BOOL)stillSelectingFlag
 {
+	if (showingContextMenu)
+		return;
+
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
 
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
@@ -1482,36 +1485,37 @@ int logIndent = 0;
 	NSString *strWithout = [theEvent charactersIgnoringModifiers];
 
 	unichar ch = [str length] ? [str characterAtIndex:0] : 0;
+	unichar key = ch;
 	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
 
 	if (!(quals & NSNumericPadKeyMask)) {
 		if (quals & NSControlKeyMask) {
-			if (ch < 0x20)
+			if (key < 0x20 && (key != 0x1B || key != without))
 				quals &= ~NSControlKeyMask;
 			else
-				ch = without;
+				key = without;
 		} else if (quals & NSAlternateKeyMask) {
-			if (0x20 < ch && ch < 0x7f && ch != without)
+			if (0x20 < key && key < 0x7f && key != without)
 				quals &= ~NSAlternateKeyMask;
 			else
-				ch = without;
+				key = without;
 		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
-			ch = without;
+			key = without;
 
-		if ((0x20 < ch && ch < 0x7f) || ch == 0x19)
+		if ((0x20 < key && key < 0x7f) || key == 0x19 || key == 0x1E)
 			quals &= ~NSShiftKeyMask;
 	}
  
 	// the resulting values
-	unichar key = ch;
 	unsigned int modifiers = quals & (NSNumericPadKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
 
-	DEBUG(@"key = %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
-	    key, key,
+	DEBUG(@"key = %C (0x%04x / 0x%04x -> 0x%04x), shift = %s, control = %s, alt = %s, command = %s (0x%04x vs. 0x%04x)",
+	    key, ch, without, key,
 	    (modifiers & NSShiftKeyMask) ? "YES" : "NO",
 	    (modifiers & NSControlKeyMask) ? "YES" : "NO",
 	    (modifiers & NSAlternateKeyMask) ? "YES" : "NO",
-	    (modifiers & NSCommandKeyMask) ? "YES" : "NO"
+	    (modifiers & NSCommandKeyMask) ? "YES" : "NO",
+	    quals, modifiers
 	);
 
 	*modPtr = modifiers;
@@ -1578,7 +1582,7 @@ int logIndent = 0;
 
 - (void)handleKey:(unichar)charcode flags:(unsigned int)flags
 {
-	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
+	DEBUG(@"handle key '%C' (0x%04X) w/flags 0x%04x", charcode, charcode, flags);
 
 	if (parser.partial && (flags & ~NSNumericPadKeyMask) != 0) {
 		[[self delegate] message:@"Vi command interrupted by key equivalent."];
@@ -1604,6 +1608,26 @@ int logIndent = 0;
 	/* Special handling of command-[0-9] to switch tabs. */
 	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
 		[self switch_tab:charcode - '0'];
+		return;
+	}
+
+	/* Special handling of control-escape. */
+	if (flags == NSControlKeyMask && charcode == 0x1B) {
+		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
+		                                                inTextContainer:[self textContainer]].origin;
+		NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
+					       location:[self convertPoint:point toView:nil]
+					  modifierFlags:0
+					      timestamp:[[NSDate date] timeIntervalSinceNow]
+					   windowNumber:[[self window] windowNumber]
+						context:[NSGraphicsContext currentContext]
+					     characters:@"\x1B"
+			    charactersIgnoringModifiers:@"\x1B"
+					      isARepeat:NO
+					        keyCode:0x1B];
+		showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
+		[self rightMouseDown:ev];
+		showingContextMenu = NO;
 		return;
 	}
 

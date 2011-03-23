@@ -27,7 +27,6 @@ BUGS
 IMPORTANT
 =========
 * re-use open help windows
-* ctrl-escape should bring up the bundle items menu
 * preference for wrapping
 * zt, zz, zb (scroll cursor to top, center, bottom)
 * ZZ and ZQ, and make :q just close the current document (?)
@@ -46,7 +45,6 @@ IMPORTANT
 * text objects
 * support a count in C and h commands
 * map ctrl-arrows and command-arrows, both in normal and insert mode
-* resizing the window feels slow, much slower than sublime text
 * highlight caret after goto line
 * check if plists return expected classes (failed to parse?)
 * allow ex commands when there is no open document
@@ -203,3 +201,4 @@ latex.tmbundle
 * [DONE] tbuffer command should reuse any view
 * [DONE] "." mark (last modification)
 * [DONE] re-position caret if view frame changes
+* [DONE] ctrl-escape should bring up the bundle items menu

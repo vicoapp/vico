@@ -211,6 +211,7 @@
 - (void)test205_DeleteBackwardTilCharWithCount	{ TEST(@"abc abc abc", 10, @"d2Ta", @"abc ac", 5); }
 - (void)test206_RepeatMoveBackwardTilChar	{ MOVE(@"abc abc abc", 7, @"Ta;", 5); }
 - (void)test207_RepeatMoveBackwardToChar	{ MOVE(@"abc abc abc", 7, @"Fa;", 0); }
+- (void)test208_RepeatOtherDirection		{ MOVE(@"abc abc abc", 0, @"fa;,", 4); }
 
 // This doesn't work:
 // - (void)test210_FindForward			{ MOVE(@"abc def ghi", 0, @"/g\n", 8); }

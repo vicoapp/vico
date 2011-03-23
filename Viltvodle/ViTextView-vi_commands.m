@@ -942,6 +942,50 @@
 	return NO;
 }
 
+/* syntax: [count]; */
+- (BOOL)repeat_line_search_forward:(ViCommand *)command
+{
+	command.argument = command.last_ftFT_argument;
+	switch (command.last_ftFT_command) {
+	case 'f':
+		return [self move_to_char:command];
+		break;
+	case 't':
+		return [self move_til_char:command];
+		break;
+	case 'F':
+		return [self move_back_to_char:command];
+		break;
+	case 'T':
+		return [self move_back_til_char:command];
+		break;
+	}
+
+	return NO;
+}
+
+/* syntax: [count], */
+- (BOOL)repeat_line_search_backward:(ViCommand *)command
+{
+	command.argument = command.last_ftFT_argument;
+	switch (command.last_ftFT_command) {
+	case 'f':
+		return [self move_back_to_char:command];
+		break;
+	case 't':
+		return [self move_back_til_char:command];
+		break;
+	case 'F':
+		return [self move_to_char:command];
+		break;
+	case 'T':
+		return [self move_til_char:command];
+		break;
+	}
+
+	return NO;
+}
+
 /* syntax: [count]G */
 - (BOOL)goto_line:(ViCommand *)command
 {

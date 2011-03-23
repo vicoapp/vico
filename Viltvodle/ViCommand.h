@@ -37,7 +37,7 @@ struct vikey
 	BOOL nviStyleUndo;
 	struct vikey *last_command;
 
-	struct vikey *last_ftFT_command;
+	unichar last_ftFT_command;
 	unichar last_ftFT_argument;
 
 	id text;
@@ -61,9 +61,11 @@ struct vikey
 @property(readonly) unichar key;
 @property(readonly) BOOL is_dot;
 @property(readonly) unichar motion_key;
-@property(readonly) unichar argument;
+@property(readwrite) unichar argument;
 @property(readwrite, assign) id text;
 @property(readwrite) BOOL nviStyleUndo;
+@property(readonly) unichar last_ftFT_command;
+@property(readonly) unichar last_ftFT_argument;
 
 @end
 

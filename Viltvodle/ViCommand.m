@@ -157,8 +157,8 @@ static struct vikey normal_keys[] = {
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
 	{@"ex_command:",	':', 0},
-	{@"repeat_line_search:", ';', VIF_IS_MOTION},
-	{@"repeat_line_search:", ',', VIF_IS_MOTION},
+	{@"repeat_line_search_forward:", ';', VIF_IS_MOTION},
+	{@"repeat_line_search_backward:", ',', VIF_IS_MOTION},
 	{@"shift_right:",	'>', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
@@ -221,8 +221,8 @@ static struct vikey operator_keys[] = {
 	{@"move_eol:",		'$', VIF_IS_MOTION},
 	{@"move_first_char:",	'_', VIF_IS_MOTION | VIF_LINE_MODE},
 	{@"move_first_char:",	'^', VIF_IS_MOTION},
-	{@"repeat_line_search:", ';', VIF_IS_MOTION},
-	{@"repeat_line_search:", ',', VIF_IS_MOTION},
+	{@"repeat_line_search_forward:", ';', VIF_IS_MOTION},
+	{@"repeat_line_search_backward:", ',', VIF_IS_MOTION},
 	{@"find:",		'/', VIF_IS_MOTION},
 	{@"find_backwards:",	'?', VIF_IS_MOTION},
 	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
@@ -398,6 +398,8 @@ find_command_in_map(unichar key, struct vikey map[])
 @synthesize is_dot;
 @synthesize text;
 @synthesize nviStyleUndo;
+@synthesize last_ftFT_command;
+@synthesize last_ftFT_argument;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */
@@ -457,36 +459,15 @@ find_command_in_map(unichar key, struct vikey map[])
 			[self setText:nil];
 	}
 
-	if (command && (command->key == ';' || command->key == ',')) {
-		if (last_ftFT_command == nil) {
-			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
-			command = NULL;
-			motion_command = NULL;
-		} else {
-			command = last_ftFT_command;
-			method = last_ftFT_command->method;
-			argument = last_ftFT_argument;
-			key = last_ftFT_command->key;
-		}
-	} else if (command && (command->key == 't' || command->key == 'f' ||
+	if (command && (command->key == 't' || command->key == 'f' ||
 	    command->key == 'T' || command->key == 'F')) {
-		last_ftFT_command = command;
+		last_ftFT_command = command->key;
 		last_ftFT_argument = argument;
 	}
 
-	if (motion_command && (motion_command->key == ';' || motion_command->key == ',')) {
-		if (last_ftFT_command == nil) {
-			method = @"no_previous_ftFT:"; // prints "No previous F, f, T or t search"
-			command = NULL;
-			motion_command = NULL;
-		} else {
-			motion_command = last_ftFT_command;
-			argument = last_ftFT_argument;
-			motion_key = last_ftFT_command->key;
-		}
-	} else if (motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
+	if (motion_command && (motion_command->key == 't' || motion_command->key == 'f' ||
 	    motion_command->key == 'T' || motion_command->key == 'F')) {
-		last_ftFT_command = motion_command;
+		last_ftFT_command = motion_command->key;
 		last_ftFT_argument = argument;
 	}
 

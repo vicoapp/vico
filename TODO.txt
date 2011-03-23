@@ -4,12 +4,12 @@ URGENT
 * ship with a default bundle plist
 * fuzzy search feels *slow*
 * searching should push on jumplist
-* ctrl-6 should be the same as ctrl-^ (right?)
 * ZZ and ZQ + handle :q! (ie, don't ask)
   => how should we handle windows? quit the app completely?
 
 BUGS
 ====
+* close a tab by click the X doesn't work for web views
 * ctrl-enter != ctrl-shift-m
 * clicking a binary file (pdf, image) in explorer opens as text
 * should dot repeat a bundle command?
@@ -19,7 +19,6 @@ BUGS
 * caret location is messed up after undo of bundle command
 * jumpy selection in symbol list when clicking symbol
 * vi always has a newline at EOF
-* , and ; doesn't seem to toggle direction?
 * "dl" on a line with only one character fails
 * honor bundle ordering when showing ambiguous items menu
 * implement "new file" and "new folder" in explorer menu
@@ -202,3 +201,5 @@ latex.tmbundle
 * [DONE] "." mark (last modification)
 * [DONE] re-position caret if view frame changes
 * [DONE] ctrl-escape should bring up the bundle items menu
+* [DONE] ctrl-6 should be the same as ctrl-^ (right?)
+* [DONE] , and ; doesn't seem to toggle direction?

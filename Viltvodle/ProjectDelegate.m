@@ -804,7 +804,7 @@ sort_by_score(id a, id b, void *context)
 
 - (void)expandNextItem:(id)dummy
 {
-	if (!isFiltered || [itemsToFilter count] == 0)
+	if (!isFiltering || [itemsToFilter count] == 0)
 		return;
 
 	ProjectFile *item = [itemsToFilter objectAtIndex:0];
@@ -871,6 +871,7 @@ sort_by_score(id a, id b, void *context)
 
 	if ([filter length] == 0) {
 		isFiltered = NO;
+		isFiltering = NO;
 		isCompletion = NO;
 		filteredItems = [[NSMutableArray alloc] initWithArray:rootItems];
 		[explorer reloadData];
@@ -902,6 +903,7 @@ sort_by_score(id a, id b, void *context)
 		filteredItems = [NSMutableArray array];
 		itemsToFilter = [NSMutableArray array];
 		isFiltered = YES;
+		isFiltering = YES;
 
 		[self expandItems:rootItems recursionLimit:3];
 		[filteredItems sortUsingFunction:sort_by_score context:nil];
@@ -997,6 +999,7 @@ doCommandBySelector:(SEL)aSelector
 		}
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
+		isFiltering = NO;
 		if (isFiltered) {
 			[window makeFirstResponder:explorer];
 			/* make sure something is selected */

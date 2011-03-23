@@ -1,0 +1,7 @@
+#!/bin/sh
+
+FILE="viltvodle-hg-$(date +%Y%m%d%H).tar.gz"
+tar zcvf $FILE .hg
+gpg -r martin -e $FILE
+rm $FILE
+

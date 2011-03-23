@@ -86,4 +86,10 @@
 	return [super resignFirstResponder];
 }
 
+- (void)setFrame:(NSRect)frameRect
+{
+	[super setFrame:frameRect];
+	[self updateCaret];
+}
+
 @end

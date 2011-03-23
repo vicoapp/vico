@@ -26,11 +26,9 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSTextField *scriptInput;
 	IBOutlet NSTextView *scriptOutput;
 	NSMutableDictionary *sharedBuffers;
-	NSString *lastSearchPattern;
 	NSConnection *shellConn;
 }
 
-@property(copy, readwrite) NSString *lastSearchPattern;
 @property(readonly) NSMenu *encodingMenu;
 
 - (id)evalExpression:(NSString *)expression error:(NSError **)outError;

@@ -15,7 +15,6 @@
 
 @implementation ViAppController
 
-@synthesize lastSearchPattern;
 @synthesize encodingMenu;
 
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent

@@ -1624,16 +1624,28 @@
 	return YES;
 }
 
-// syntax: ^A
-// syntax: * (from vim, incompatible with nvi)
-- (BOOL)find_current_word:(ViCommand *)command
+- (BOOL)find_current_word:(ViCommand *)command options:(int)options
 {
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		return [self findPattern:pattern options:0];
+		command.last_search_pattern = pattern;
+		command.last_search_options = options;
+		return [self findPattern:pattern options:options];
 	}
 	return NO;
+}
+
+// syntax: #
+- (BOOL)find_current_word_backward:(ViCommand *)command
+{
+	return [self find_current_word:command options:ViSearchOptionBackwards];
+}
+
+// syntax: *
+- (BOOL)find_current_word_forward:(ViCommand *)command
+{
+	return [self find_current_word:command options:0];
 }
 
 // syntax: ^G

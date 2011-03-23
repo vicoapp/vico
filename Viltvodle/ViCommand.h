@@ -40,6 +40,10 @@ struct vikey
 	unichar last_ftFT_command;
 	unichar last_ftFT_argument;
 
+	// search state
+	NSString *last_search_pattern;
+	int last_search_options;
+
 	id text;
 	BOOL partial;
 }
@@ -66,6 +70,8 @@ struct vikey
 @property(readwrite) BOOL nviStyleUndo;
 @property(readonly) unichar last_ftFT_command;
 @property(readonly) unichar last_ftFT_argument;
+@property(readwrite, assign) NSString *last_search_pattern;
+@property(readwrite) int last_search_options;
 
 @end
 

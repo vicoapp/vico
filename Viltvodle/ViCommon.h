@@ -1,4 +1,6 @@
 
+#define ViSearchOptionBackwards 1
+
 #define ViSmartPairAttributeName @"ViSmartPair"
 #define ViContinuationAttributeName @"ViContinuation"
 

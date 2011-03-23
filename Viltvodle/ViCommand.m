@@ -163,7 +163,8 @@ static struct vikey normal_keys[] = {
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_NEED_MOTION | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
 	{@"find_backwards:",	'?', VIF_IS_MOTION},
-	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
+	{@"find_current_word_backward:",'#', VIF_IS_MOTION},
+	{@"find_current_word_forward:",	'*', VIF_IS_MOTION},
 	{@"paragraph_forward:",	'}', VIF_IS_MOTION},
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},
 	{@"filter:",		'!', VIF_SETS_DOT | VIF_NEED_MOTION},
@@ -225,7 +226,8 @@ static struct vikey operator_keys[] = {
 	{@"repeat_line_search_backward:", ',', VIF_IS_MOTION},
 	{@"find:",		'/', VIF_IS_MOTION},
 	{@"find_backwards:",	'?', VIF_IS_MOTION},
-	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
+	{@"find_current_word_backward:",'#', VIF_IS_MOTION},
+	{@"find_current_word_forward:",	'*', VIF_IS_MOTION},
 	{@"paragraph_forward:",	'}', VIF_IS_MOTION},
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},
 	{@"move_to_match:",	'%', VIF_IS_MOTION},
@@ -307,7 +309,8 @@ static struct vikey visual_keys[] = {
 	{@"shift_left:",	'<', VIF_SETS_DOT | VIF_LINE_MODE},
 	{@"find:",		'/', VIF_IS_MOTION},
 	{@"find_backwards:",	'?', VIF_IS_MOTION},
-	{@"find_current_word:",	'*', VIF_IS_MOTION}, //from vim, incompatible with nvi
+	{@"find_current_word_backward:",'#', VIF_IS_MOTION},
+	{@"find_current_word_forward:",	'*', VIF_IS_MOTION},
 	{@"paragraph_forward:",	'}', VIF_IS_MOTION},
 	{@"paragraph_backward:",'{', VIF_IS_MOTION},
 	{@"filter:",		'!', VIF_SETS_DOT},
@@ -400,6 +403,8 @@ find_command_in_map(unichar key, struct vikey map[])
 @synthesize nviStyleUndo;
 @synthesize last_ftFT_command;
 @synthesize last_ftFT_argument;
+@synthesize last_search_pattern;
+@synthesize last_search_options;
 
 /* finalizes the command, sets the dot command and adjusts counts if necessary
  */

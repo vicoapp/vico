@@ -3,7 +3,6 @@ URGENT
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
 * fuzzy search feels *slow*
-* searching should push on jumplist
 * ZZ and ZQ + handle :q! (ie, don't ask)
   => how should we handle windows? quit the app completely?
 
@@ -71,7 +70,6 @@ FEATURES
 * maps could optionally accept a scope
 * i_CTRL-R + registers
 * :normal!
-* # (backward search word under cursor)
 * = (re-indent)
 * global shell variables (in preferences)
 * project shell variables
@@ -203,3 +201,5 @@ latex.tmbundle
 * [DONE] ctrl-escape should bring up the bundle items menu
 * [DONE] ctrl-6 should be the same as ctrl-^ (right?)
 * [DONE] , and ; doesn't seem to toggle direction?
+* [DONE] searching should push on jumplist
+* [DONE] # (backward search word under cursor)

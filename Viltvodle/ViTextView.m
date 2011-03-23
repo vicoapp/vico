@@ -744,11 +744,6 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Searching
 
-- (void)highlightFindMatch:(ViRegexpMatch *)match
-{
-	[self showFindIndicatorForRange:[match rangeOfMatchedString]];
-}
-
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
@@ -774,13 +769,14 @@ int logIndent = 0;
 		return NO;
 	}
 
-	[[NSApp delegate] setLastSearchPattern:pattern];
-
-	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string] options:rx_options];
+	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string]
+					       options:rx_options];
 
 	if ([foundMatches count] == 0) {
 		[[self delegate] message:@"Pattern not found"];
 	} else {
+		[self pushLocationOnJumpList:start_location];
+
 		ViRegexpMatch *match, *nextMatch = nil;
 		for (match in foundMatches) {
 			NSRange r = [match rangeOfMatchedString];
@@ -808,9 +804,7 @@ int logIndent = 0;
 			[self scrollRangeToVisible:r];
 			final_location = end_location = r.location;
 			[self setCaret:final_location];
-			[self performSelector:@selector(highlightFindMatch:)
-				   withObject:nextMatch
-				   afterDelay:0];
+			[[self nextRunloop] showFindIndicatorForRange:[nextMatch rangeOfMatchedString]];
 		}
 
 		return YES;
@@ -821,16 +815,20 @@ int logIndent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
+	ViCommand *command = contextInfo;
+	command.last_search_pattern = pattern;
+	command.last_search_options = 0;
 	if ([self findPattern:pattern options:0]) {
-		[self pushLocationOnJumpList:start_location];
 		[self setCaret:final_location];
 	}
 }
 
 - (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
-	if ([self findPattern:pattern options:1]) {
-		[self pushLocationOnJumpList:start_location];
+	ViCommand *command = contextInfo;
+	command.last_search_pattern = pattern;
+	command.last_search_options = ViSearchOptionBackwards;
+	if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
 		[self setCaret:final_location];
 	}
 }
@@ -862,27 +860,30 @@ int logIndent = 0;
 /* syntax: n */
 - (BOOL)repeat_find:(ViCommand *)command
 {
-	NSString *pattern = [[NSApp delegate] lastSearchPattern];
+	NSString *pattern = command.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	[self pushLocationOnJumpList:start_location];
-	return [self findPattern:pattern options:0];
+	return [self findPattern:pattern options:command.last_search_options];
 }
 
 /* syntax: N */
 - (BOOL)repeat_find_backward:(ViCommand *)command
 {
-	NSString *pattern = [[NSApp delegate] lastSearchPattern];
+	NSString *pattern = command.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	[self pushLocationOnJumpList:start_location];
-	return [self findPattern:pattern options:1];
+	int options = command.last_search_options;
+	if (options & ViSearchOptionBackwards)
+		options &= ~ViSearchOptionBackwards;
+	else
+		options |= ViSearchOptionBackwards;
+	return [self findPattern:pattern options:options];
 }
 
 #pragma mark -

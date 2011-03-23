@@ -4,6 +4,7 @@
 #import "ViJumpList.h"
 #import "ViTextStorage.h"
 #import "NSString-scopeSelector.h"
+#import "NSObject+SPInvocationGrabbing.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -1642,6 +1643,7 @@
 	else
 		final_location = [[self textStorage] skipWhitespaceFrom:final_location];
 
+	[[self nextRunloop] showFindIndicatorForRange:NSMakeRange(final_location, 1)];
 	[self pushLocationOnJumpList:start_location];
 
 	return YES;

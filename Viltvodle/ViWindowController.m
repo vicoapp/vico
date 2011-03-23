@@ -15,6 +15,7 @@
 #import "MHTextIconCell.h"
 #import "ViAppController.h"
 #import "ViTextStorage.h"
+#import "NSObject+SPInvocationGrabbing.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -1669,6 +1670,9 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 		viewController = [self viewControllerForView:jump.view];
 	[self gotoURL:jump.url line:jump.line column:jump.column view:viewController];
 	jumping = NO;
+
+	ViTextView *tv = [(ViDocumentView *)[self currentView] textView];
+	[[tv nextRunloop] showFindIndicatorForRange:NSMakeRange(tv.caret, 1)];
 	[self updateJumplistNavigator];
 }
 

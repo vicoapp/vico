@@ -313,6 +313,8 @@ tenpow(NSUInteger x)
 	TAILQ_INIT(&ref_scopes);
 	int nrefs = 0;
 	for (NSString *tmp in scopes) {
+		if (nrefs >= 64)
+			break;
 		struct scope *ref = &ref_scope_array[nrefs++];
 		ref->length = (unsigned int)[tmp length];
 		ref->buf = malloc(sizeof(unichar) * ref->length);

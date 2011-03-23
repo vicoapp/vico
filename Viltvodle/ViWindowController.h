@@ -40,9 +40,6 @@
 	ViProject *project;
 	ViScriptProxy *proxy;
 
-	unichar last_ftFT_command;
-	unichar last_ftFT_argument;
-
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
 	IBOutlet NSImageView *projectResizeView;

@@ -1340,7 +1340,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	ViTextView *textView = [docView textView];
 	[textView setCaret:range.location];
 	[textView scrollRangeToVisible:range];
-	[textView showFindIndicatorForRange:range];
+	[[textView nextRunloop] showFindIndicatorForRange:range];
 }
 
 - (void)goToSymbol:(id)sender

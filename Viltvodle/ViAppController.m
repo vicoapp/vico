@@ -72,6 +72,8 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+	[NSApp activateIgnoringOtherApps:YES];
+
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES
 						   attributes:nil

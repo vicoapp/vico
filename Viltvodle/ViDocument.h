@@ -6,7 +6,7 @@
 
 @interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
-	NSMutableArray *views;
+	NSMutableSet *views;
 
 	ViBundle *bundle;
 	ViLanguage *language;
@@ -43,7 +43,7 @@
 }
 
 @property(readwrite, assign) ViSnippet *snippet;
-@property(readonly) NSArray *views;
+@property(readonly) NSSet *views;
 @property(readonly) ViBundle *bundle;
 @property(readwrite, assign) NSArray *symbols;
 @property(readwrite, assign) NSArray *filteredSymbols;

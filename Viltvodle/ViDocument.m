@@ -45,7 +45,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	self = [super init];
 	if (self) {
 		symbols = [NSArray array];
-		views = [NSMutableArray array];
+		views = [NSMutableSet set];
 
 		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		[userDefaults addObserver:self forKeyPath:@"number" options:0 context:NULL];
@@ -144,9 +144,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[views removeObject:aDocumentView];
 }
 
-- (void)addView:(ViDocumentView *)aDocumentView
+- (void)addView:(ViDocumentView *)docView
 {
-	[views addObject:aDocumentView];
+	[views addObject:docView];
 }
 
 - (ViDocumentView *)makeView

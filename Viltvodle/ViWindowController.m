@@ -657,8 +657,9 @@ static ViWindowController	*currentWindowController = nil;
 - (void)closeDocument:(ViDocument *)document
 {
 	// Close all views of the document
-	while ([[document views] count] > 0)
-		[self closeDocumentView:[[document views] objectAtIndex:0] canCloseDocument:YES];
+	ViDocumentView *docView;
+	while ((docView = [[document views] anyObject]) != nil)
+		[self closeDocumentView:docView canCloseDocument:YES];
 
 	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
 	if (ndx != -1)
@@ -849,7 +850,7 @@ static ViWindowController	*currentWindowController = nil;
 
 	/* Select any existing view of the document. */
 	if ([[document views] count] > 0)
-		return [self selectDocumentView:[[document views] objectAtIndex:0]];
+		return [self selectDocumentView:[[document views] anyObject]];
 
 	/* No open view for the given document. */
 	return nil;

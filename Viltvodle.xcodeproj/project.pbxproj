@@ -232,6 +232,7 @@
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* viltvodle.nu */; };
+		9A9A63CC1339D0CA0053402A /* viltvodle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* viltvodle.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -672,6 +673,7 @@
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
 		9A5EE40013366DC0002E82B1 /* viltvodle.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = viltvodle.nu; sourceTree = "<group>"; };
+		9A9A63CB1339D0CA0053402A /* viltvodle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = viltvodle.icns; path = ../viltvodle.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -974,6 +976,7 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9A9A63CB1339D0CA0053402A /* viltvodle.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
 				9A4346D11331182E002B04DE /* Bundles */,
 				9A4346D21331182E002B04DE /* Support */,
@@ -1360,6 +1363,7 @@
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
 				9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */,
+				9A9A63CC1339D0CA0053402A /* viltvodle.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -428,7 +428,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
                 nil];
 }
 
-- (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)sender
+- (void)layoutManager:(NSLayoutManager *)aLayoutManager
+didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
+                atEnd:(BOOL)flag
 {
 	for (ViDocumentView *dv in views) {
 		ViTextView *tv = [dv textView];

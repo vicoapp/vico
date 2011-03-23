@@ -1,0 +1,205 @@
+URGENT
+========
+* use "git clone" when installing bundles(?)
+* ship with a default bundle plist
+* fuzzy search feels *slow*
+* searching should push on jumplist
+* ctrl-6 should be the same as ctrl-^ (right?)
+* ZZ and ZQ + handle :q! (ie, don't ask)
+  => how should we handle windows? quit the app completely?
+
+BUGS
+====
+* ctrl-enter != ctrl-shift-m
+* clicking a binary file (pdf, image) in explorer opens as text
+* should dot repeat a bundle command?
+* switch undo direction after bundle command
+* repeatable o and O commands
+* O on a line with "}" (obj-c) inserts extra blank line
+* caret location is messed up after undo of bundle command
+* jumpy selection in symbol list when clicking symbol
+* vi always has a newline at EOF
+* , and ; doesn't seem to toggle direction?
+* "dl" on a line with only one character fails
+* honor bundle ordering when showing ambiguous items menu
+* implement "new file" and "new folder" in explorer menu
+
+IMPORTANT
+=========
+* re-use open help windows
+* ctrl-escape should bring up the bundle items menu
+* preference for wrapping
+* zt, zz, zb (scroll cursor to top, center, bottom)
+* ZZ and ZQ, and make :q just close the current document (?)
+* p/P with a count
+* J with visual selection, and J with a count
+* +/- commands
+* global marks (A-Z)
+* open alternative file (.h/.c/.m)
+* yank buffers? do they all work? across documents?
+* dot should work with ! filters
+* :write filename
+* :write !program
+* :read
+* :read !program
+* :edit! => revert
+* text objects
+* support a count in C and h commands
+* map ctrl-arrows and command-arrows, both in normal and insert mode
+* resizing the window feels slow, much slower than sublime text
+* highlight caret after goto line
+* check if plists return expected classes (failed to parse?)
+* allow ex commands when there is no open document
+
+
+FEATURES
+========
+* :e# => open alternate file
+* set incsearch
+* set smarttab
+* set listchars
+* search and replace
+* symbol list should use same filtering algorithm as file explorer
+* > command should not indent empty lines
+* option to hide the tab bar
+* option to open files in the same view per default (ie, not tabs)
+* vimtutor
+* :set filetype=[source.]objc
+* implement R
+* implement c-w in insert mode
+* escape after creating new line should blank the line
+* local keyword completion (vim c-x c-n)
+* history in explorer view + go back/forward with swiping
+* maps (:nmap, :vmap, :imap, :omap)
+* maps could optionally accept a scope
+* i_CTRL-R + registers
+* :normal!
+* # (backward search word under cursor)
+* = (re-indent)
+* global shell variables (in preferences)
+* project shell variables
+* draw marks in gutter view
+* action menu on document tabs with
+  * close tab
+  * close others
+* gq<motion> = reformat through 'formatprg' (ship with par)
+* dynamic headIndent paragraph style dependent on line indentation
+
+
+LONG TERM FEATURES
+==================
+* syntax / scope inspector, like in espresso.app
+  * remove show_scope: and shift-ctrl-p mapping
+* scope injection
+* preview location while searching/traversing symbol list
+  - esc cancels, go back to before
+  - enter/click shows yellow highlight
+* block selection with ctrl-v + block editing
+* autocommands (or events)
+* undo tree + visualisation (check out Gundo)
+* integrated terminal
+
+IDEAS
+=====
+* option whether to open an untitled file in a new window / project (?) why?
+* ODB Editor suite? why?
+* [REJECTED] make vi keys preferred before bundle key equivalents?
+  (must allow overriding vi keys with specialized commands)
+
+
+
+
+example:
+:map ,i O0<C-D>#include "<C-R>%"<ESC>T.c
+
+need to support <KEY> syntax
+
+
+:wnext (?)
+
+:command calling for bundle commands? arguments?
+
+0<C-D> in insert mode removes all indentation
+
+<C-W> in insert mode
+
+
+
+
+:[range]m[ove] {address}
+ Move the lines given by [range] to below the line given by {address}.
+
+
+java.tmbundle
+javadoc.tmbundle
+latex.tmbundle
+[OK] json.tmbundle
+[OK] javascript.tmbundle
+[OK] erlang.tmbundle
+[OK] lua.tmbundle
+[OK] php.tmbundle
+[OK] diff.tmbundle
+[OK] python.tmbundle
+[SORTOFOK] ruby-on-rails.tmbundle  FIXME: txmt:// URL!
+[OK] css.tmbundle
+[OK] ruby.tmbundle
+[OK] html.tmbundle  FIXME: completion not removed
+[OK] sql.tmbundle
+[OK] shellscript.tmbundle
+[OK] perl.tmbundle
+[OK] yaml.tmbundle
+[OK] source.tmbundle
+[OK] objective-c.tmbundle   FIXME: completion removed
+[OK] c.tmbundle  FIXME: completion command removed, but scripts left
+[OK] text.tmbundle
+[OK] property-list.tmbundle
+[OK] xml.tmbundle
+
+
+
+* [DONE] vim-style undo + preference
+* [DONE] (nvi-style) undo and dot don't play nice together
+* [DONE] dot should not be local to a document VIEW! => global per window controller
+* [DONE] opening and saving new files, check file names, no "doesn't exist" alert!
+* [DONE] splitting views messes up the caret in the current buffer
+* [DONE] confirm re-read buffer on re-focus
+* [DONE] close last window with hidden buffers left? switch in remaing buffers?
+* [DONE] selecting an entry in symbol list sometimes jumps to wrong entry
+* [DONE] cmd-t searching is unbound => gui stalls! (limit to 2 depth dir structure?)
+* [DONE] explorer isn't reset after opening a document
+* [DONE] replacing a split view changes the size of the split
+* [DONE] repeatable text input! 10ix\x1b = xxxxxxxxxx
+* [DONE] selecting a bookmark doesn't set environment baseURL
+* [DONE] explorer bookmarks
+* [DONE] implement c-w T (move split view to new tab)
+* [DONE] gg
+* [DONE] gU and gu
+* [DONE] implement C-W = and better control of split view sizes
+* [DONE] c-w o
+* [DONE] shift-cmd-t (filter symbol) should default to word under cursor
+* [DONE] make snippets work!
+* [DONE] Placeholder text in bundle preferences!
+* [DONE] closing tabs now seems to close document, even if more views are open
+* [DONE] "save as" and ":e newfile" doesn't update tab title directly
+* [DONE] bundle preference items shell variables (scope dependent)
+* [DONE] bundle commands with tab trigger
+* [DONE] snippets with key equivalents
+* [DONE] document action menu sets key equivalents and overrides keyDown: handling
+* [DONE] c doesn't work in visual mode
+* [DONE] case insensitive regex matching in snippets (i option)
+* [DONE] (single-)clicking a folder in explorer does nothing, annoyingly
+* [DONE] caret location after undo is a DISASTER!
+* [DONE] when a file is removed, set the isTemporary flag, to avoid repetitive alerts
+* [DONE] syntax highlight sometimes doesn't restart properly
+* [DONE] fix tab triggers: fprintf vs. printf
+* [DONE] 2011-03-14 13:54:54.596 Vibrant[39228:903] -[ViDocument setString:]: unrecognized selector sent to instance 0x200b25040
+* [DONE] Can't open projects anymore!
+* [DONE] ship with a set of default bundles
+* [DONE] set smartcase
+* [DONE] setting for inserting smart typing pairs
+* [DONE] jumplist is broken!
+* [DONE] implement :b, :bd and other :buffer commands (:bd still not implemented)
+* [DONE] c-w c should just close the view, not close the document
+* [DONE] tbuffer command should reuse any view
+* [DONE] "." mark (last modification)
+* [DONE] re-position caret if view frame changes

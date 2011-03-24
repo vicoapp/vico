@@ -545,6 +545,40 @@
 
 - (IBAction)newFolder:(id)sender
 {
+	NSIndexSet *set = [self clickedIndexes];
+	NSURL *parent = nil;
+	if ([set count] == 1) {
+		ProjectFile *pf = [explorer itemAtRow:[set firstIndex]];
+		if ([pf isDirectory])
+			parent = [pf url];
+		else
+			parent = [[explorer parentForItem:pf] url];
+	}
+	if (parent == nil)
+		parent = [rootButton URL];
+
+	NSError *error = nil;
+	NSString *path = [[parent path] stringByAppendingPathComponent:@"New Folder"];
+	if ([parent isFileURL]) {
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if (![fm createDirectoryAtPath:path
+		   withIntermediateDirectories:NO
+				    attributes:nil
+					 error:&error])
+			[NSApp presentError:error];
+		else
+			[self rescan_files:nil];
+	} else {
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:parent error:&error];
+		if (conn == nil && error)
+			[NSApp presentError:error];
+		else {
+			if (![conn createDirectory:path error:&error])
+				[NSApp presentError:error];
+			else
+				[self rescan_files:nil];
+		}
+	}
 }
 
 - (IBAction)newDocument:(id)sender
@@ -1335,6 +1369,12 @@ doCommandBySelector:(SEL)aSelector
 		lastSelectedRow = row;
 	}
 
+	return YES;
+}
+
+- (BOOL)new_folder:(ViCommand *)command
+{
+	[self newFolder:nil];
 	return YES;
 }
 

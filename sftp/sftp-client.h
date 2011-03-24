@@ -61,7 +61,8 @@ char *get_handle(int fd, u_int expected_id, u_int *len, int *ret_status);
 void send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,
     char *handle, u_int handle_len);
 void send_string_request(int fd, u_int id, u_int code, const char *s, u_int len);
-u_int get_status(int fd, u_int expected_id);
+void send_string_attrs_request(int fd, u_int id, u_int code, const char *s,
+    u_int len, Attrib *a);
 
 /*
  * Initialise a SSH filexfer connection. Returns NULL on error or
@@ -73,9 +74,6 @@ u_int sftp_proto_version(struct sftp_conn *);
 
 /* Close file referred to by 'handle' */
 int do_close(struct sftp_conn *, char *, u_int);
-
-/* Create directory 'path' */
-int do_mkdir(struct sftp_conn *, char *, Attrib *);
 
 /* Remove directory 'path' */
 int do_rmdir(struct sftp_conn *, char *);

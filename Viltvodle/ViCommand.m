@@ -351,12 +351,14 @@ static struct vikey explorer_keys[] = {
 	{@"move_high:",		'H', VIF_IS_MOTION},
 	{@"move_low:",		'L', VIF_IS_MOTION},
 	{@"move_middle:",	'M', VIF_IS_MOTION},
+	{@"new_folder:",	'N', 0},
 	{@"d_prefix:",		'd', 0, explorer_d_keys},	// make dd remove files
 	{@"g_prefix:",		'g', 0, operator_g_keys},	// XXX
 	{@"move_left:",		'h', VIF_IS_MOTION},
 	{@"move_down:",		'j', VIF_IS_MOTION},
 	{@"move_up:",		'k', VIF_IS_MOTION},
 	{@"move_right:",	'l', VIF_IS_MOTION},
+	{@"new_document:",	'n', 0},
 	{@"switch_open:",	'o', 0},
 	{@"split_open:",	's', 0},
 	{@"tab_open:",		't', 0},

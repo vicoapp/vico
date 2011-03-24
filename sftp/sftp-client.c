@@ -83,9 +83,8 @@ send_string_request(int fd, u_int id, u_int code, const char *s,
 	buffer_free(&msg);
 }
 
-#if 0
-static void
-send_string_attrs_request(int fd, u_int id, u_int code, char *s,
+void
+send_string_attrs_request(int fd, u_int id, u_int code, const char *s,
     u_int len, Attrib *a)
 {
 	Buffer msg;
@@ -99,8 +98,6 @@ send_string_attrs_request(int fd, u_int id, u_int code, char *s,
 	debug3("Sent message fd %d T:%u I:%u", fd, code, id);
 	buffer_free(&msg);
 }
-#endif
-
 
 u_int
 sftp_proto_version(struct sftp_conn *conn)
@@ -109,22 +106,6 @@ sftp_proto_version(struct sftp_conn *conn)
 }
 
 #if 0
-int
-do_mkdir(struct sftp_conn *conn, char *path, Attrib *a)
-{
-	u_int status, id;
-
-	id = conn->msg_id++;
-	send_string_attrs_request(conn->fd_out, id, SSH2_FXP_MKDIR, path,
-	    strlen(path), a);
-
-	status = get_status(conn->fd_in, id);
-	if (status != SSH2_FX_OK)
-		error("Couldn't create directory: %s", fx2txt(status));
-
-	return(status);
-}
-
 int
 do_rmdir(struct sftp_conn *conn, char *path)
 {

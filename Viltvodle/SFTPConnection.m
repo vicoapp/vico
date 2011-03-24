@@ -722,6 +722,36 @@ u_int num_requests = 64;
 	return entries;
 }
 
+- (BOOL)createDirectory:(NSString *)path error:(NSError **)outError
+{
+	Attrib a;
+	u_int status, req_id;
+	const char *utf8path = [path UTF8String];
+
+	if (utf8path == NULL) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Invalid path"];
+		return NO;
+	}
+
+	attrib_clear(&a);
+
+	req_id = conn->msg_id++;
+	send_string_attrs_request(conn->fd_out, req_id, SSH2_FXP_MKDIR, utf8path,
+	    (u_int)strlen(utf8path), &a);
+
+	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+		return NO;
+	if (status != SSH2_FX_OK) {
+		if (outError)
+			*outError = [ViError errorWithCode:status
+						    format:@"Couldn't create directory: %s",
+							fx2txt(status)];
+		return NO;
+	}
+
+	return YES;
+}
 
 - (void)flushDirectoryCache
 {

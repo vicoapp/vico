@@ -69,7 +69,7 @@
 
 			modifierMask = keyflags;
 
-			if (keyflags == NSControlKeyMask && tolower(keycode) >= 'a' && tolower(keycode) < 'z') {
+			if (keyflags == NSControlKeyMask && keycode >= 'a' && keycode < 'z') {
 				keyflags = 0;
 				keycode = tolower(keycode) - 'a' + 1;
 			}

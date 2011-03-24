@@ -1490,9 +1490,10 @@ int logIndent = 0;
 	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
 
 	if (!(quals & NSNumericPadKeyMask)) {
-		if ((quals & NSControlKeyMask) && !(quals & (NSCommandKeyMask | NSAlternateKeyMask))) {
-			if (key < 0x20 && (key != 0x1B || key != without))
-				quals &= ~NSControlKeyMask;
+		if ((quals & NSControlKeyMask)) {
+			if (key < 0x20 && (key != 0x1B || key != without) &&
+			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)	/* only control pressed */
+				quals = 0;
 			else
 				key = without;
 		} else if (quals & NSAlternateKeyMask) {

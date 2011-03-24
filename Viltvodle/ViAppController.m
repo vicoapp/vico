@@ -342,7 +342,7 @@ additionalBindings:(NSDictionary *)bindings
 					vrange = nrange;
 
 				BOOL hasSelection = NO;
-				NSWindow *window = [[NSApplication sharedApplication] keyWindow];
+				NSWindow *window = [[NSApplication sharedApplication] mainWindow];
 				NSResponder *target = [window firstResponder];
 				if ([target respondsToSelector:@selector(selectedRange)]) {
 					if ([target selectedRange].length > 0)

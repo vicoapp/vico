@@ -104,6 +104,7 @@ IDEAS
 
 example:
 :map ,i O0<C-D>#include "<C-R>%"<ESC>T.c
+:map ,i O0<^d>#include "<^r>%"<ESC>T.c
 
 need to support <KEY> syntax
 

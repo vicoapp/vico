@@ -1,20 +1,57 @@
-#import "ViTabTriggerMenuItemView.h"
+#import "ViCommandMenuItemView.h"
 #include "logging.h"
 
-@implementation ViTabTriggerMenuItemView : NSView
+@implementation ViCommandMenuItemView : NSView
 
-- (id)initWithTitle:(NSString *)aTitle tabTrigger:(NSString *)aTabTrigger
+@synthesize command, title;
+
+- (void)setCommand:(NSString *)aCommand
+{
+	NSSize oldSize = [command sizeWithAttributes:attributes];
+	command = aCommand;
+	commandSize = [command sizeWithAttributes:attributes];
+
+	double dw = commandSize.width - oldSize.width;
+	double dh = commandSize.height - oldSize.height;
+
+	NSRect frame = [self frame];
+	frame.size.width += dw;
+	frame.size.height += dh;
+	[self setFrame:frame];
+}
+
+- (void)setTabTrigger:(NSString *)aTabTrigger
+{
+	[self setCommand:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]];
+}
+
+- (void)setTitle:(NSString *)aTitle
+{
+	NSSize oldSize = [title sizeWithAttributes:attributes];
+	title = aTitle;
+	titleSize = [title sizeWithAttributes:attributes];
+
+	double dw = titleSize.width - oldSize.width;
+	double dh = titleSize.height - oldSize.height;
+
+	NSRect frame = [self frame];
+	frame.size.width += dw;
+	frame.size.height += dh;
+	[self setFrame:frame];
+}
+
+- (id)initWithTitle:(NSString *)aTitle command:(NSString *)aCommand
 {
 	double w, h;
 
-	tabTrigger = [aTabTrigger stringByAppendingFormat:@"%C", 0x21E5];
+	command = aCommand;
 
-	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuFontOfSize:0] forKey:NSFontAttributeName];
+	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0] forKey:NSFontAttributeName];
 	titleSize = [aTitle sizeWithAttributes:attributes];
-	triggerSize = [tabTrigger sizeWithAttributes:attributes];
+	commandSize = [command sizeWithAttributes:attributes];
 
 	h = titleSize.height + 1;
-	w = 20 + titleSize.width + 30 + triggerSize.width + 10;
+	w = 20 + titleSize.width + 30 + commandSize.width + 15;
 
 	self = [super initWithFrame:NSMakeRect(0, 0, w, h)];
 	if (self) {
@@ -22,6 +59,11 @@
 		[self setAutoresizingMask:NSViewWidthSizable];
 	}
 	return self;
+}
+
+- (id)initWithTitle:(NSString *)aTitle tabTrigger:(NSString *)aTabTrigger
+{
+	return [self initWithTitle:aTitle command:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -43,8 +85,8 @@
 	[title drawAtPoint:NSMakePoint(21, 1) withAttributes:attributes];
 
 	NSRect b = [self bounds];
-	NSPoint p = NSMakePoint(b.size.width - triggerSize.width - 10, 1);
-	NSRect bg = NSMakeRect(p.x - 4, p.y, triggerSize.width + 8, triggerSize.height);
+	NSPoint p = NSMakePoint(b.size.width - commandSize.width - 15, 1);
+	NSRect bg = NSMakeRect(p.x - 4, p.y, commandSize.width + 8, commandSize.height);
 	if (!enabled)
 		[[NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF green:(CGFloat)0xE5/0xFF blue:(CGFloat)0xE5/0xFF alpha:1.0] set];
 	else if (highlighted)
@@ -53,7 +95,7 @@
 		[[NSColor colorWithCalibratedRed:(CGFloat)0xD5/0xFF green:(CGFloat)0xD5/0xFF blue:(CGFloat)0xD5/0xFF alpha:1.0] set];
 	[[NSBezierPath bezierPathWithRoundedRect:bg xRadius:4 yRadius:4] fill];
 
-	[tabTrigger drawAtPoint:p withAttributes:attributes];
+	[command drawAtPoint:p withAttributes:attributes];
 }
 
 - (void)mouseUp:(NSEvent*)event

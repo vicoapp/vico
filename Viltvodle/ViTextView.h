@@ -137,6 +137,7 @@
 - (NSUInteger)currentColumn;
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation;
 - (void)pushCurrentLocationOnJumpList;
+- (IBAction)performNormalModeMenuItem:(id)sender;
 @end
 
 @interface ViTextView (snippets)

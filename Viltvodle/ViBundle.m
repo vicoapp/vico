@@ -2,7 +2,7 @@
 #import "ViBundle.h"
 #import "ViBundleCommand.h"
 #import "ViBundleSnippet.h"
-#import "ViTabTriggerMenuItemView.h"
+#import "ViCommandMenuItemView.h"
 #import "ViTextView.h"
 #import "ViLanguageStore.h"
 #import "logging.h"
@@ -354,9 +354,9 @@
 				NSString *tabTrigger = [op tabTrigger];
 				if ([tabTrigger length] > 0) {
 					/* Set a special view for drawing the tab trigger. */
-					ViTabTriggerMenuItemView *view;
-					view = [[ViTabTriggerMenuItemView alloc] initWithTitle:[op name]
-					                                            tabTrigger:tabTrigger];
+					ViCommandMenuItemView *view;
+					view = [[ViCommandMenuItemView alloc] initWithTitle:[op name]
+										 tabTrigger:tabTrigger];
 					[item setView:view];
 				}
 			} else

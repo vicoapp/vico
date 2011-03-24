@@ -9,6 +9,7 @@
 #import "ViJumpList.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViMark.h"
+#import "ViCommandMenuItemView.h"
 
 int logIndent = 0;
 
@@ -1886,6 +1887,25 @@ int logIndent = 0;
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
 
 	return menu;
+}
+
+- (IBAction)performNormalModeMenuItem:(id)sender
+{
+	if (parser.partial) {
+		[[[self delegate] nextRunloop] message:@"Vi command interrupted."];
+		[parser reset];
+	}
+
+	ViCommandMenuItemView *view = [sender view];
+	if (view) {
+		NSString *command = view.command;
+		if (command) {
+			if (mode == ViInsertMode)
+				[self setNormalMode];
+			DEBUG(@"performing command: %@", command);
+			[self input:command];
+		}
+	}
 }
 
 @end

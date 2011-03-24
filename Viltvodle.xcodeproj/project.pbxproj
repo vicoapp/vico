@@ -82,7 +82,7 @@
 		9A2EF3B213310CB80023C5B7 /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35413310C860023C5B7 /* ViSyntaxContext.m */; };
 		9A2EF3B313310CB80023C5B7 /* ViSyntaxMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35613310C890023C5B7 /* ViSyntaxMatch.m */; };
 		9A2EF3B413310CB80023C5B7 /* ViSyntaxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35813310C8C0023C5B7 /* ViSyntaxParser.m */; };
-		9A2EF3B513310CB80023C5B7 /* ViTabTriggerMenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35A13310C8E0023C5B7 /* ViTabTriggerMenuItemView.m */; };
+		9A2EF3B513310CB80023C5B7 /* ViCommandMenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35A13310C8E0023C5B7 /* ViCommandMenuItemView.m */; };
 		9A2EF3B613310CB80023C5B7 /* ViTagsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35C13310C910023C5B7 /* ViTagsDatabase.m */; };
 		9A2EF3B713310CB80023C5B7 /* ViTagStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35E13310C940023C5B7 /* ViTagStack.m */; };
 		9A2EF3B813310CB80023C5B7 /* ViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36013310C970023C5B7 /* ViTextStorage.m */; };
@@ -466,8 +466,8 @@
 		9A2EF35613310C890023C5B7 /* ViSyntaxMatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSyntaxMatch.m; sourceTree = "<group>"; };
 		9A2EF35713310C8A0023C5B7 /* ViSyntaxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSyntaxParser.h; sourceTree = "<group>"; };
 		9A2EF35813310C8C0023C5B7 /* ViSyntaxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSyntaxParser.m; sourceTree = "<group>"; };
-		9A2EF35913310C8D0023C5B7 /* ViTabTriggerMenuItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTabTriggerMenuItemView.h; sourceTree = "<group>"; };
-		9A2EF35A13310C8E0023C5B7 /* ViTabTriggerMenuItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTabTriggerMenuItemView.m; sourceTree = "<group>"; };
+		9A2EF35913310C8D0023C5B7 /* ViCommandMenuItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ViCommandMenuItemView.h; sourceTree = "<group>"; };
+		9A2EF35A13310C8E0023C5B7 /* ViCommandMenuItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCommandMenuItemView.m; sourceTree = "<group>"; };
 		9A2EF35B13310C900023C5B7 /* ViTagsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagsDatabase.h; sourceTree = "<group>"; };
 		9A2EF35C13310C910023C5B7 /* ViTagsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTagsDatabase.m; sourceTree = "<group>"; };
 		9A2EF35D13310C930023C5B7 /* ViTagStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTagStack.h; sourceTree = "<group>"; };
@@ -1118,8 +1118,8 @@
 				9A2EF35613310C890023C5B7 /* ViSyntaxMatch.m */,
 				9A2EF35713310C8A0023C5B7 /* ViSyntaxParser.h */,
 				9A2EF35813310C8C0023C5B7 /* ViSyntaxParser.m */,
-				9A2EF35913310C8D0023C5B7 /* ViTabTriggerMenuItemView.h */,
-				9A2EF35A13310C8E0023C5B7 /* ViTabTriggerMenuItemView.m */,
+				9A2EF35913310C8D0023C5B7 /* ViCommandMenuItemView.h */,
+				9A2EF35A13310C8E0023C5B7 /* ViCommandMenuItemView.m */,
 				9A2EF35B13310C900023C5B7 /* ViTagsDatabase.h */,
 				9A2EF35C13310C910023C5B7 /* ViTagsDatabase.m */,
 				9A2EF35D13310C930023C5B7 /* ViTagStack.h */,
@@ -1475,7 +1475,7 @@
 				9A2EF3B213310CB80023C5B7 /* ViSyntaxContext.m in Sources */,
 				9A2EF3B313310CB80023C5B7 /* ViSyntaxMatch.m in Sources */,
 				9A2EF3B413310CB80023C5B7 /* ViSyntaxParser.m in Sources */,
-				9A2EF3B513310CB80023C5B7 /* ViTabTriggerMenuItemView.m in Sources */,
+				9A2EF3B513310CB80023C5B7 /* ViCommandMenuItemView.m in Sources */,
 				9A2EF3B613310CB80023C5B7 /* ViTagsDatabase.m in Sources */,
 				9A2EF3B713310CB80023C5B7 /* ViTagStack.m in Sources */,
 				9A2EF3B813310CB80023C5B7 /* ViTextStorage.m in Sources */,

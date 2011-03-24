@@ -9,6 +9,8 @@
 #import "SFTPConnectionPool.h"
 #import "ViCharsetDetector.h"
 #import "ViDocumentController.h"
+#import "ViLanguageStore.h"
+#import "NSString-scopeSelector.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -1108,6 +1110,47 @@ filter_write(CFSocketRef s,
 			       orSwitchToDocument:doc
 				  allowReusedView:YES];
 
+	return YES;
+}
+
+- (BOOL)ex_setfiletype:(ExCommand *)command
+{
+	if ([command.words count] != 1)
+		return NO;
+
+	id<ViViewController> viewController = [windowController currentView];
+	if (viewController == nil || ![viewController isKindOfClass:[ViDocumentView class]])
+		return NO;
+
+	NSString *langScope = [command.words objectAtIndex:0];
+	NSString *pattern = [NSString stringWithFormat:@"(^|\\.)%@(\\.|$)",
+	    [langScope stringByReplacingOccurrencesOfString:@"." withString:@"\\."]];	// XXX: should have a proper regexp escape function
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+	NSMutableSet *matches = [NSMutableSet set];
+	ViLanguage *lang;
+	for (lang in [[ViLanguageStore defaultStore] languages]) {
+		if ([[lang name] isEqualToString:langScope]) {
+			/* full match */
+			[matches removeAllObjects];
+			[matches addObject:lang];
+			break;
+		} else if ([rx matchesString:[lang name]]) {
+			/* partial match */
+			[matches addObject:lang];
+		}
+	}
+
+	if ([matches count] == 0) {
+		[self message:@"Unknown syntax %@", langScope];
+		return NO;
+	} else if ([matches count] > 1) {
+		[self message:@"More than one match for %@", langScope];
+		INFO(@"matches: %@", matches);
+		return NO;
+	}
+
+	ViDocumentView *docView = viewController;
+	[[docView document] setLanguage:[matches anyObject]];
 	return YES;
 }
 

@@ -123,7 +123,8 @@ tenpow(NSUInteger x)
 	return rank;
 }
 
-- (u_int64_t)evalScopeSelector:(struct scope_expr *)expr againstScopes:(struct scope_list *)ref_scopes
+- (u_int64_t)evalScopeSelector:(struct scope_expr *)expr
+                 againstScopes:(struct scope_list *)ref_scopes
 {
 	u_int64_t l, r;
 

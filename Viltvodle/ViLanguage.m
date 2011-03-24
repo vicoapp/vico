@@ -157,6 +157,11 @@
 	return [language objectForKey:@"name"];
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViLanguage %p: %@ (%@)>", self, [self name], [self displayName]];
+}
+
 - (NSArray *)expandPatterns:(NSArray *)patterns baseLanguage:(ViLanguage *)baseLanguage
 {
 	// DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);

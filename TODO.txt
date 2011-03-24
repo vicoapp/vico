@@ -13,7 +13,7 @@ BUGS
 * clicking a binary file (pdf, image) in explorer opens as text
 * should dot repeat a bundle command?
 * switch undo direction after bundle command
-* repeatable o and O commands
+* o and O commands with a count does the wrong thing
 * O on a line with "}" (obj-c) inserts extra blank line
 * caret location is messed up after undo of bundle command
 * jumpy selection in symbol list when clicking symbol
@@ -21,6 +21,7 @@ BUGS
 * "dl" on a line with only one character fails
 * honor bundle ordering when showing ambiguous items menu
 * implement "new file" and "new folder" in explorer menu
+* searching is slow on large files, naïve implementation
 
 IMPORTANT
 =========
@@ -60,7 +61,6 @@ FEATURES
 * option to hide the tab bar
 * option to open files in the same view per default (ie, not tabs)
 * vimtutor
-* :set filetype=[source.]objc
 * implement R
 * implement c-w in insert mode
 * escape after creating new line should blank the line
@@ -203,3 +203,4 @@ latex.tmbundle
 * [DONE] , and ; doesn't seem to toggle direction?
 * [DONE] searching should push on jumplist
 * [DONE] # (backward search word under cursor)
+* [DONE] :set filetype=[source.]objc (:setfiletype)

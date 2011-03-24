@@ -307,6 +307,10 @@ static struct ex_command ex_commands[] = {
 		"wN",
 		@"se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]",
 		@"set options (use \":set all\" to see all options)"},
+	{@"setfiletype",	@"ex_setfiletype",	0,
+		"w1r",
+		@"setf[iletype] syntax name",
+		@"set the file type (eg, 'source.perl' or just 'perl')"},
 	/* C_SHELL */
 	{@"shell",	@"ex_shell",	EX_SECURE,
 		"",

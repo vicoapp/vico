@@ -106,6 +106,12 @@
 			     range:NSMakeRange(0, [aString length])];
 }
 
+- (BOOL)matchesString:(NSString *)aString
+{
+	return [self matchInString:aString
+			     range:NSMakeRange(0, [aString length])] != nil;
+}
+
 - (NSArray *)allMatchesInCharacters:(const unichar *)chars
                             options:(int)options
                               range:(NSRange)aRange

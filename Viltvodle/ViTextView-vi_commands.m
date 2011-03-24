@@ -175,9 +175,9 @@
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
-        NSRect visibleRect = [clipView bounds];
-        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+	NSRect visibleRect = [clipView bounds];
+	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
 	// check if first line is visible
 	NSUInteger first_end;
@@ -1766,7 +1766,7 @@
 	case ']':
 		return [self select_inner_bracket:command];
 		break;
-	case 's':
+	case 'S':
 		return [self select_inner_scope:command];
 		break;
 	default:

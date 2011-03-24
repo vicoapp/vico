@@ -18,7 +18,6 @@ BUGS
 * caret location is messed up after undo of bundle command
 * jumpy selection in symbol list when clicking symbol
 * vi always has a newline at EOF
-* "dl" on a line with only one character fails
 * honor bundle ordering when showing ambiguous items menu
 * implement "new file" and "new folder" in explorer menu
 * searching is slow on large files, naïve implementation
@@ -204,3 +203,4 @@ latex.tmbundle
 * [DONE] searching should push on jumplist
 * [DONE] # (backward search word under cursor)
 * [DONE] :set filetype=[source.]objc (:setfiletype)
+* [DONE] "dl" on a line with only one character fails

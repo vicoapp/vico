@@ -777,12 +777,12 @@
 
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if (start_location + (mode == ViInsertMode ? 0 : 1) >= eol) {
+	if (start_location + ((mode == ViInsertMode || !command.ismotion) ? 0 : 1) >= eol) {
 		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
 	if (start_location + count >= eol)
-		final_location = end_location = eol - (mode == ViInsertMode ? 0 : 1);
+		final_location = end_location = eol - ((mode == ViInsertMode || !command.ismotion) ? 0 : 1);
 	else
 		final_location = end_location = start_location + count;
 	return YES;

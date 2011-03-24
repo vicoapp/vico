@@ -48,6 +48,7 @@
 - (void)test023_DeleteForwardWithLargeCount	{ TEST(@"abcdef\nghi", 4, @"33x", @"abcd\nghi", 4); }
 - (void)test024_DeleteForwardAndPut		{ TEST(@"abc", 0, @"xlp", @"bca", 2); }
 - (void)test025_RepeatDeleteForward		{ TEST(@"abcdef", 0, @"x..", @"def", 0); }
+- (void)test026_DeleteRightAtEOL		{ TEST(@"x", 0, @"dl", @"", 0); }
 
 - (void)test030_DeleteBackward			{ TEST(@"abcdef", 3, @"X", @"abdef", 2); }
 - (void)test031_DeleteBackwardAtBol		{ TEST(@"abcdef", 0, @"X", @"abcdef", 0); }

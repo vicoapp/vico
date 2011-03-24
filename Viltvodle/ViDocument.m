@@ -913,10 +913,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)message:(NSString *)fmt, ...
 {
-	va_list ap;
-	va_start(ap, fmt);
-	[windowController message:fmt arguments:ap];
-	va_end(ap);
+	if (fmt) {
+		va_list ap;
+		va_start(ap, fmt);
+		[windowController message:fmt arguments:ap];
+		va_end(ap);
+	}
 }
 
 - (ExEnvironment *)environment

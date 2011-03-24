@@ -1635,7 +1635,7 @@ int logIndent = 0;
 	}
 
 	/* Special handling of control-shift-p. */
-	if (flags == NSShiftKeyMask && charcode == 0x10 /* C-p */) {
+	if (flags == NSControlKeyMask && charcode == 'P') {
 		[self show_scope];
 		return;
 	}

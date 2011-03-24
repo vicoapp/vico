@@ -91,9 +91,11 @@
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:[self caret]];
 		*rangePtr = NSMakeRange(bol, eol - bol);
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
-	} else /* if ([type isEqualToString:@"none"]) */ {
-		inputText = @"";
-		*rangePtr = NSMakeRange([self caret], 0);
+	} else if ([type isEqualToString:@"character"]) {
+		if ([self caret] < [[self textStorage] length]) {
+			*rangePtr = NSMakeRange([self caret], 1);
+			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
+		}
 	}
 
 	return inputText;

@@ -123,7 +123,7 @@
 		NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
 		skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
+		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
 	}
 	return self;
 }

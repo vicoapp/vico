@@ -41,53 +41,55 @@
 		}
 
 		NSString *key = [dict objectForKey:@"keyEquivalent"];
-		keyEquivalent = @"";
-		keyflags = 0;
-		int i;
-		for (i = 0; i < [key length]; i++) {
-			unichar c = [key characterAtIndex:i];
-			switch (c)
-			{
-			case '^':
-				keyflags |= NSControlKeyMask;
-				break;
-			case '@':
-				keyflags |= NSCommandKeyMask;
-				break;
-			case '~':
-				keyflags |= NSAlternateKeyMask;
-				break;
-			case '$':
-				keyflags |= NSShiftKeyMask;
-				break;
-			default:
-				keycode = c;
-				keyEquivalent = [NSString stringWithFormat:@"%C", c];
-				break;
+		if ([key length] > 0) {
+			NSRange r = NSMakeRange([key length] - 1, 1);
+			keycode = [key characterAtIndex:r.location];
+			keyEquivalent = [key substringWithRange:r];
+			for (int i = 0; i < [key length] - 1; i++) {
+				unichar c = [key characterAtIndex:i];
+				switch (c)
+				{
+				case '^':
+					keyflags |= NSControlKeyMask;
+					break;
+				case '@':
+					keyflags |= NSCommandKeyMask;
+					break;
+				case '~':
+					keyflags |= NSAlternateKeyMask;
+					break;
+				case '$':
+					keyflags |= NSShiftKeyMask;
+					break;
+				default:
+					INFO(@"unknown key modifier '%C'", c);
+					break;
+				}
 			}
-		}
 
-		modifierMask = keyflags;
+			modifierMask = keyflags;
 
-		if (keyflags == NSControlKeyMask && tolower(keycode) >= 'a' && tolower(keycode) < 'z') {
-			keyflags = 0;
-			keycode = tolower(keycode) - 'a' + 1;
-		}
+			if (keyflags == NSControlKeyMask && tolower(keycode) >= 'a' && tolower(keycode) < 'z') {
+				keyflags = 0;
+				keycode = tolower(keycode) - 'a' + 1;
+			}
 
-		if ([keyEquivalent isEqualToString:[keyEquivalent uppercaseString]] &&
-		    ![keyEquivalent isEqualToString:[keyEquivalent lowercaseString]])
-			keyflags |= NSShiftKeyMask;
+			if ([keyEquivalent isEqualToString:[keyEquivalent uppercaseString]] &&
+			    ![keyEquivalent isEqualToString:[keyEquivalent lowercaseString]])
+				keyflags |= NSShiftKeyMask;
 
-		/* Same test as in keyDown: */
-		if ((0x20 < keycode && keycode < 0x7f) || keycode == 0x19)
-			keyflags &= ~NSShiftKeyMask;
+			/* Same test as in keyDown: */
+			if ((0x20 < keycode && keycode < 0x7f) || keycode == 0x19)
+				keyflags &= ~NSShiftKeyMask;
 
-		DEBUG(@"parsed key equivalent [%@] as keycode %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
-		    key, keycode, keycode,
-		    (keyflags & NSShiftKeyMask) ? "YES" : "NO",
-		    (keyflags & NSControlKeyMask) ? "YES" : "NO",
-		    (keyflags & NSAlternateKeyMask) ? "YES" : "NO",
-		    (keyflags & NSCommandKeyMask) ? "YES" : "NO");
+			DEBUG(@"parsed key equivalent [%@] as [%@] keycode 0x%04x, flags 0x%04X: s=%s, c=%s, a=%s, C=%s, name is %@",
+			    key, keyEquivalent, keycode, keyflags,
+			    (keyflags & NSShiftKeyMask) ? "YES" : "NO",
+			    (keyflags & NSControlKeyMask) ? "YES" : "NO",
+			    (keyflags & NSAlternateKeyMask) ? "YES" : "NO",
+			    (keyflags & NSCommandKeyMask) ? "YES" : "NO", name);
+		} else
+			keyEquivalent = @"";
 	}
 	return self;
 }

@@ -1490,7 +1490,7 @@ int logIndent = 0;
 	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
 
 	if (!(quals & NSNumericPadKeyMask)) {
-		if (quals & NSControlKeyMask) {
+		if ((quals & NSControlKeyMask) && !(quals & (NSCommandKeyMask | NSAlternateKeyMask))) {
 			if (key < 0x20 && (key != 0x1B || key != without))
 				quals &= ~NSControlKeyMask;
 			else
@@ -1508,9 +1508,9 @@ int logIndent = 0;
 	}
  
 	// the resulting values
-	unsigned int modifiers = quals & (NSNumericPadKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
+	unsigned int modifiers = quals & (/*NSNumericPadKeyMask |*/ NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
 
-	DEBUG(@"key = %C (0x%04x / 0x%04x -> 0x%04x), shift = %s, control = %s, alt = %s, command = %s (0x%04x vs. 0x%04x)",
+	DEBUG(@"key = %C (0x%04x / 0x%04x -> 0x%04x), s=%s, c=%s, a=%s, C=%s (0x%04x vs. 0x%04x)",
 	    key, ch, without, key,
 	    (modifiers & NSShiftKeyMask) ? "YES" : "NO",
 	    (modifiers & NSControlKeyMask) ? "YES" : "NO",

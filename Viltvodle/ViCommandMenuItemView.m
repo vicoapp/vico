@@ -64,10 +64,10 @@
 
 - (void)setCommand:(NSString *)aCommand
 {
-	NSSize oldSize = [command sizeWithAttributes:attributes];
+	NSSize oldSize = [commandTitle sizeWithAttributes:attributes];
 	command = aCommand;
 	commandTitle = [self expandSpecialKeys:command];
-	commandSize = [command sizeWithAttributes:attributes];
+	commandSize = [commandTitle sizeWithAttributes:attributes];
 
 	double dw = commandSize.width - oldSize.width;
 	double dh = commandSize.height - oldSize.height;

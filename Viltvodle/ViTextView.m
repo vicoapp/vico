@@ -1717,7 +1717,7 @@ int logIndent = 0;
 		without = tolower(without);
 	}
 
-	INFO(@"generated key 0x%04x / 0x%04x, flags 0x%04x from char %C (0x%04x)",
+	DEBUG(@"generated key 0x%04x / 0x%04x, flags 0x%04x from char %C (0x%04x)",
 	    ch, without, flags, orig, orig);
 
 	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown

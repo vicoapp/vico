@@ -1558,6 +1558,13 @@ int logIndent = 0;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+	NSResponder *r = [[self window] firstResponder];
+	if (r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
+		/* Pass the (generated) event to the ex command line. */
+		[r keyDown:theEvent];
+		return;
+	}
+
 	unsigned int modifiers;
 	unichar key;
 	key = [self parseKeyEvent:theEvent modifiers:&modifiers];

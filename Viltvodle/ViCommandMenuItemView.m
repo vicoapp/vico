@@ -65,7 +65,8 @@
 - (void)setCommand:(NSString *)aCommand
 {
 	NSSize oldSize = [command sizeWithAttributes:attributes];
-	command = [self expandSpecialKeys:aCommand];
+	command = aCommand;
+	commandTitle = [self expandSpecialKeys:command];
 	commandSize = [command sizeWithAttributes:attributes];
 
 	double dw = commandSize.width - oldSize.width;
@@ -101,12 +102,13 @@
 {
 	double w, h;
 
-	command = [self expandSpecialKeys:aCommand];
+	command = aCommand;
+	commandTitle = [self expandSpecialKeys:command];
 
 	attributes = [NSMutableDictionary dictionaryWithObject:aFont
 							forKey:NSFontAttributeName];
 	titleSize = [aTitle sizeWithAttributes:attributes];
-	commandSize = [command sizeWithAttributes:attributes];
+	commandSize = [commandTitle sizeWithAttributes:attributes];
 	disabledColor = [NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF
 						  green:(CGFloat)0xE5/0xFF
 						   blue:(CGFloat)0xE5/0xFF
@@ -170,7 +172,7 @@
 		[normalColor set];
 	[[NSBezierPath bezierPathWithRoundedRect:bg xRadius:6 yRadius:6] fill];
 
-	[command drawAtPoint:p withAttributes:attributes];
+	[commandTitle drawAtPoint:p withAttributes:attributes];
 }
 
 - (void)mouseUp:(NSEvent*)event

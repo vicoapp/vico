@@ -2,7 +2,7 @@
 {
 	NSMutableDictionary	*attributes;
 	NSString		*title;
-	NSString		*command;
+	NSString		*command, *commandTitle;
 	NSSize			 titleSize, commandSize;
 	NSColor			*disabledColor;
 	NSColor			*highlightColor;

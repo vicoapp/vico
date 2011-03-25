@@ -10,6 +10,7 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViMark.h"
 #import "ViCommandMenuItemView.h"
+#import "NSScanner-additions.h"
 
 int logIndent = 0;
 
@@ -1698,27 +1699,89 @@ int logIndent = 0;
 		[[self delegate] message:@""]; // erase any previous message
 }
 
+
+- (NSEvent *)eventForCharacter:(unichar)ch flags:(NSUInteger)flags
+{
+	unichar orig = ch;
+	unichar without = ch;
+
+	NSString *s = [NSString stringWithFormat:@"%C", without];
+
+	if (flags == NSControlKeyMask && tolower(ch) >= 'a' && tolower(ch) < 'z')
+		ch = tolower(ch) - 'a' + 1;
+
+	/* Are we uppercased? If so, add shift. */
+	if ([s isEqualToString:[s uppercaseString]] &&
+	    ![s isEqualToString:[s lowercaseString]]) {
+		flags |= NSShiftKeyMask;
+		without = tolower(without);
+	}
+
+	INFO(@"generated key 0x%04x / 0x%04x, flags 0x%04x from char %C (0x%04x)",
+	    ch, without, flags, orig, orig);
+
+	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
+				       location:NSMakePoint(0, 0)
+				  modifierFlags:flags
+				      timestamp:[[NSDate date] timeIntervalSinceNow]
+				   windowNumber:0
+					context:[NSGraphicsContext currentContext]
+				     characters:[NSString stringWithFormat:@"%C", ch]
+		    charactersIgnoringModifiers:[NSString stringWithFormat:@"%C", without]
+				      isARepeat:NO
+					keyCode:ch];
+	return ev;
+}
+
+- (NSEvent *)eventForCharacter:(unichar)ch
+{
+	return [self eventForCharacter:ch flags:0];
+}
+
 /* Takes a string of characters and creates key events for each one.
  * Then feeds them into the keyDown method to simulate key presses.
- * Only used for unit testing.
  */
 - (void)input:(NSString *)inputString
 {
-	int i;
-	for(i = 0; i < [inputString length]; i++)
-	{
-		NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
-					       location:NSMakePoint(0, 0)
-					  modifierFlags:0
-					      timestamp:[[NSDate date] timeIntervalSinceNow]
-					   windowNumber:0
-						context:[NSGraphicsContext currentContext]
-					     characters:[inputString substringWithRange:NSMakeRange(i, 1)]
-			    charactersIgnoringModifiers:[inputString substringWithRange:NSMakeRange(i, 1)]
-					      isARepeat:NO
-						keyCode:[inputString characterAtIndex:i]];
-		[self keyDown:ev];
-		DEBUG(@"textStorage = [%@]", [[self textStorage] string]);
+	NSScanner *scan = [NSScanner scannerWithString:inputString];
+	unichar ch;
+	while ([scan scanCharacter:&ch]) {
+		if (ch == '\\') {
+			/* Escaped character. */
+			if ([scan scanCharacter:&ch]) {
+				[self keyDown:[self eventForCharacter:ch]];
+			} else {
+				/* trailing backslash? treat as literal */
+				[self keyDown:[self eventForCharacter:'\\']];
+			}
+		} else if (ch == '<') {
+			NSString *special = nil;
+			if ([scan scanUpToUnescapedCharacter:'>' intoString:&special] &&
+			    [scan scanString:@">" intoString:nil]) {
+				DEBUG(@"parsing special key <%@>", special);
+				NSString *lcase = [special lowercaseString];
+				if ([lcase isEqualToString:@"cr"])
+					[self keyDown:[self eventForCharacter:'\n']];
+				else if ([lcase isEqualToString:@"esc"])
+					[self keyDown:[self eventForCharacter:'\x1B']];
+				else if ([lcase hasPrefix:@"c-"]) {
+					/* control-key */
+					ch = [special characterAtIndex:2];
+					[self keyDown:[self eventForCharacter:ch
+						                        flags:NSControlKeyMask]];
+				}
+			} else {
+				/* "<" without a ">", treat as literal */
+				if (special) {
+					NSUInteger i;
+					for (i = 0; i < [special length]; i++)
+						[self keyDown:[self eventForCharacter:
+						    [special characterAtIndex:i]]];
+				}
+				[self keyDown:[self eventForCharacter:'<']];
+			}
+		} else
+			[self keyDown:[self eventForCharacter:ch]];
 	}
 }
 

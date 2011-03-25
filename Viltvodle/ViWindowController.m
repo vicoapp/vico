@@ -157,7 +157,9 @@ static ViWindowController	*currentWindowController = nil;
 	NSRange sel = [textView selectedRange];
 
 	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-		NSMenu *submenu = [bundle menuForScopes:scopes hasSelection:sel.length > 0];
+		NSMenu *submenu = [bundle menuForScopes:scopes
+					   hasSelection:sel.length > 0
+						   font:[menu font]];
 		if (submenu) {
 			NSMenuItem *item = [menu addItemWithTitle:[bundle name]
 							      action:NULL

@@ -36,16 +36,17 @@
 			if ([scan scanUpToUnescapedCharacter:'>' intoString:&special] &&
 			    [scan scanString:@">" intoString:nil]) {
 				DEBUG(@"parsing special key <%@>", special);
-				if ([[special lowercaseString] isEqualToString:@"cr"])
+				NSString *lcase = [special lowercaseString];
+				if ([lcase isEqualToString:@"cr"])
 					[s appendString:[NSString stringWithFormat:@"%C", 0x21A9]];
-				else if ([[special lowercaseString] isEqualToString:@"esc"])
+				else if ([lcase isEqualToString:@"esc"])
 					[s appendString:[NSString stringWithFormat:@"%C", 0x238B]];
-				else if ([[special lowercaseString] hasPrefix:@"c-"]) {
+				else if ([lcase hasPrefix:@"c-"]) {
 					/* control-key */
 					[s appendString:[NSString stringWithFormat:@"%C", 0x2303]];
 					[s appendString:[[special substringFromIndex:2] uppercaseString]];
 					if (![scan isAtEnd]) {
-						/* Add a thin space after a control-key */
+						/* Add a thin space after a control-key sequence. */
 						[s appendString:[NSString stringWithFormat:@"%C", 0x2009]];
 					}
 				}
@@ -96,15 +97,28 @@
 	[self setFrame:frame];
 }
 
-- (id)initWithTitle:(NSString *)aTitle command:(NSString *)aCommand
+- (id)initWithTitle:(NSString *)aTitle command:(NSString *)aCommand font:(NSFont *)aFont
 {
 	double w, h;
 
 	command = [self expandSpecialKeys:aCommand];
 
-	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0] forKey:NSFontAttributeName];
+	attributes = [NSMutableDictionary dictionaryWithObject:aFont
+							forKey:NSFontAttributeName];
 	titleSize = [aTitle sizeWithAttributes:attributes];
 	commandSize = [command sizeWithAttributes:attributes];
+	disabledColor = [NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF
+						  green:(CGFloat)0xE5/0xFF
+						   blue:(CGFloat)0xE5/0xFF
+						  alpha:1.0];
+	highlightColor = [NSColor colorWithCalibratedRed:(CGFloat)0x2B/0xFF
+						   green:(CGFloat)0x41/0xFF
+						    blue:(CGFloat)0xD3/0xFF
+						   alpha:1.0];
+	normalColor = [NSColor colorWithCalibratedRed:(CGFloat)0xD5/0xFF
+						green:(CGFloat)0xD5/0xFF
+						 blue:(CGFloat)0xD5/0xFF
+						alpha:1.0];
 
 	h = titleSize.height + 1;
 	w = 20 + titleSize.width + 30 + commandSize.width + 15;
@@ -117,9 +131,11 @@
 	return self;
 }
 
-- (id)initWithTitle:(NSString *)aTitle tabTrigger:(NSString *)aTabTrigger
+- (id)initWithTitle:(NSString *)aTitle tabTrigger:(NSString *)aTabTrigger font:(NSFont *)aFont
 {
-	return [self initWithTitle:aTitle command:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]];
+	return [self initWithTitle:aTitle
+			   command:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]
+			      font:aFont];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -133,22 +149,25 @@
 	}
 
 	if (!enabled)
-		[attributes setObject:[NSColor disabledControlTextColor] forKey:NSForegroundColorAttributeName];
+		[attributes setObject:[NSColor disabledControlTextColor]
+			       forKey:NSForegroundColorAttributeName];
 	else if (highlighted)
-		[attributes setObject:[NSColor selectedMenuItemTextColor] forKey:NSForegroundColorAttributeName];
+		[attributes setObject:[NSColor selectedMenuItemTextColor]
+			       forKey:NSForegroundColorAttributeName];
 	else
-		[attributes setObject:[NSColor controlTextColor] forKey:NSForegroundColorAttributeName];
+		[attributes setObject:[NSColor controlTextColor]
+			       forKey:NSForegroundColorAttributeName];
 	[title drawAtPoint:NSMakePoint(21, 1) withAttributes:attributes];
 
 	NSRect b = [self bounds];
 	NSPoint p = NSMakePoint(b.size.width - commandSize.width - 15, 1);
 	NSRect bg = NSMakeRect(p.x - 4, p.y, commandSize.width + 8, commandSize.height);
 	if (!enabled)
-		[[NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF green:(CGFloat)0xE5/0xFF blue:(CGFloat)0xE5/0xFF alpha:1.0] set];
+		[disabledColor set];
 	else if (highlighted)
-		[[NSColor colorWithCalibratedRed:(CGFloat)0x2B/0xFF green:(CGFloat)0x41/0xFF blue:(CGFloat)0xD3/0xFF alpha:1.0] set];
+		[highlightColor set];
 	else
-		[[NSColor colorWithCalibratedRed:(CGFloat)0xD5/0xFF green:(CGFloat)0xD5/0xFF blue:(CGFloat)0xD5/0xFF alpha:1.0] set];
+		[normalColor set];
 	[[NSBezierPath bezierPathWithRoundedRect:bg xRadius:6 yRadius:6] fill];
 
 	[command drawAtPoint:p withAttributes:attributes];
@@ -162,7 +181,9 @@
 
 	NSMenu *menu = [item menu];
 	// XXX: that (id) is not a nice cast!
-	[menu performSelector:@selector(performActionForItemAtIndex:) withObject:(id)[menu indexOfItem:item] afterDelay:0.0];
+	[menu performSelector:@selector(performActionForItemAtIndex:)
+		   withObject:(id)[menu indexOfItem:item]
+		   afterDelay:0.0];
 	[menu cancelTracking];
 }
 

@@ -383,7 +383,8 @@ additionalBindings:(NSDictionary *)bindings
 				ViCommandMenuItemView *view = (ViCommandMenuItemView *)[item view];
 				if (view == nil)
 					view = [[ViCommandMenuItemView alloc] initWithTitle:newTitle
-										       command:command];
+										       command:command
+										       font:[menu font]];
 				else {
 					view.title = newTitle;
 					view.command = command;

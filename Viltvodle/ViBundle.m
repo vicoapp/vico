@@ -305,6 +305,7 @@
           forScopes:(NSArray *)scopes
        enabledItems:(NSUInteger *)enabledItemsPtr
        hasSelection:(BOOL)hasSelection
+               font:(NSFont *)aFont
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
@@ -356,7 +357,8 @@
 					/* Set a special view for drawing the tab trigger. */
 					ViCommandMenuItemView *view;
 					view = [[ViCommandMenuItemView alloc] initWithTitle:[op name]
-										 tabTrigger:tabTrigger];
+										 tabTrigger:tabTrigger
+										       font:aFont];
 					[item setView:view];
 				}
 			} else
@@ -370,7 +372,8 @@
 				                     inMainMenu:mainMenu
 				                      forScopes:scopes
 				                   enabledItems:&submatches
-				                   hasSelection:hasSelection];
+				                   hasSelection:hasSelection
+							   font:aFont];
 				if (submenu) {
 					matches += submatches;
 					item = [menu addItemWithTitle:[submenuLayout objectForKey:@"name"]
@@ -392,7 +395,7 @@
 	return menu;
 }
 
-- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection
+- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection font:(NSFont *)aFont
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
 	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])
@@ -404,7 +407,8 @@
 	                  inMainMenu:mainMenu
 	                   forScopes:scopes
 	                enabledItems:&matches
-	                hasSelection:hasSelection];
+	                hasSelection:hasSelection
+				font:aFont];
 
 	return matches == 0 ? nil : menu;
 }

@@ -1559,8 +1559,9 @@ int logIndent = 0;
 - (void)keyDown:(NSEvent *)theEvent
 {
 	NSResponder *r = [[self window] firstResponder];
-	if (r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
+	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
 		/* Pass the (generated) event to the ex command line. */
+		INFO(@"passing generated key event to ex command line %@", r);
 		[r keyDown:theEvent];
 		return;
 	}

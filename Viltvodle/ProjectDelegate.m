@@ -433,6 +433,7 @@
 									 allowDirectory:NO];
 	if (doc)
 		[windowController switchToDocument:doc];
+	[self cancelExplorer];
 }
 
 - (IBAction)openInSplit:(id)sender

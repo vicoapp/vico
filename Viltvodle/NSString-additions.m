@@ -72,7 +72,7 @@
 		special = [NSString stringWithFormat:@"f%i", key - NSF1FunctionKey + 1];
 
 	if (key < 0x20 && key > 0 && key != 0x1B && key != 0x0D && key != 0x09)
-		special = [NSString stringWithFormat:@"ctrl-%C", key + 'a' - 1];
+		special = [[NSString stringWithFormat:@"ctrl-%C", key + 'A' - 1] lowercaseString];
 
 	NSString *encodedKey;
 	if (modifiers) {

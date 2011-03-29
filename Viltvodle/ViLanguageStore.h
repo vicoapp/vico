@@ -23,10 +23,9 @@
                   matchingScopes:(NSArray *)scopes
                           inMode:(ViMode)mode
                    matchedLength:(NSUInteger *)lengthPtr;
-- (NSArray *)itemsWithKey:(unichar)keycode
-                 andFlags:(unsigned int)flags
-           matchingScopes:(NSArray *)scopes
-                   inMode:(ViMode)mode;
+- (NSArray *)itemsWithKeyCode:(NSInteger)keyCode
+               matchingScopes:(NSArray *)scopes
+                       inMode:(ViMode)mode;
 - (BOOL)isBundleLoaded:(NSString *)name;
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory;
 

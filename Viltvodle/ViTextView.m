@@ -3,6 +3,7 @@
 #import "ViThemeStore.h"
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
+#import "NSString-additions.h"
 #import "NSArray-patterns.h"
 #import "ViAppController.h"  // for sharedBuffers
 #import "ViDocumentView.h"
@@ -11,6 +12,8 @@
 #import "ViMark.h"
 #import "ViCommandMenuItemView.h"
 #import "NSScanner-additions.h"
+#import "NSEvent-keyAdditions.h"
+#import "ViError.h"
 
 int logIndent = 0;
 
@@ -18,10 +21,10 @@ int logIndent = 0;
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
 - (void)handleKeys:(NSArray *)keys;
-- (void)handleKey:(unichar)charcode flags:(unsigned int)flags;
+- (void)handleKey:(NSInteger)keyCode;
+- (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError;
 - (BOOL)evaluateCommand:(ViCommand *)command;
 - (void)switch_tab:(int)arg;
-- (void)show_scope;
 - (BOOL)normal_mode:(ViCommand *)command;
 - (void)replaceCharactersInRange:(NSRange)aRange
                       withString:(NSString *)aString
@@ -35,7 +38,7 @@ int logIndent = 0;
 
 @synthesize proxy;
 
-- (void)initEditorWithDelegate:(id)aDelegate viParser:(ViCommand *)aParser
+- (void)initEditorWithDelegate:(id)aDelegate viParser:(ViParser *)aParser
 {
 	[self setDelegate:aDelegate];
 	[self setCaret:0];
@@ -45,8 +48,8 @@ int logIndent = 0;
 		undoManager = [[NSUndoManager alloc] init];
 	parser = aParser;
 	buffers = [[NSApp delegate] sharedBuffers];
-	inputKeys = [[NSMutableArray alloc] init];
-	marks = [[NSMutableDictionary alloc] init];
+	inputKeys = [NSMutableArray array];
+	marks = [NSMutableDictionary dictionary];
 	saved_column = -1;
 	snippetMatchRange.location = NSNotFound;
 
@@ -123,15 +126,11 @@ int logIndent = 0;
 	 */
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
 	if ([[self textStorage] lineCount] > 3000) {
-		if (![[self layoutManager] allowsNonContiguousLayout]) {
-			DEBUG(@"enabling non-contiguous layout");
+		if (![[self layoutManager] allowsNonContiguousLayout])
 			[[self layoutManager] setAllowsNonContiguousLayout:YES];
-		}
 	} else {
-		if ([[self layoutManager] allowsNonContiguousLayout]) {
-			DEBUG(@"disabling non-contiguous layout");
+		if ([[self layoutManager] allowsNonContiguousLayout])
 			[[self layoutManager] setAllowsNonContiguousLayout:NO];
-		}
 	}
 }
 
@@ -161,6 +160,7 @@ int logIndent = 0;
 	[self setVisualSelection];
 }
 
+// FIXME: just alias as "*p
 - (void)paste:(id)sender
 {
 	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
@@ -178,6 +178,7 @@ int logIndent = 0;
 	}
 }
 
+// FIXME: just alias as "*x
 - (void)cut:(id)sender
 {
 	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
@@ -234,33 +235,6 @@ int logIndent = 0;
 	NSUInteger column = [[self textStorage] columnAtLocation:aLocation];
 	ViMark *m = [[ViMark alloc] initWithLine:lineno column:column];
 	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", name]];
-}
-
-#pragma mark -
-#pragma mark Vi error messages
-
-- (BOOL)illegal:(ViCommand *)command
-{
-	[[self delegate] message:@"%C isn't a vi command", command.key];
-	return NO;
-}
-
-- (BOOL)nonmotion:(ViCommand *)command
-{
-	[[self delegate] message:@"%C may not be used as a motion command", command.motion_key];
-	return NO;
-}
-
-- (BOOL)nodot:(ViCommand *)command
-{
-	[[self delegate] message:@"No command to repeat"];
-	return NO;
-}
-
-- (BOOL)no_previous_ftFT:(ViCommand *)command
-{
-	[[self delegate] message:@"No previous F, f, T or t search"];
-	return NO;
 }
 
 #pragma mark -
@@ -817,22 +791,18 @@ int logIndent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
-	ViCommand *command = contextInfo;
-	command.last_search_pattern = pattern;
-	command.last_search_options = 0;
-	if ([self findPattern:pattern options:0]) {
+	parser.last_search_pattern = pattern;
+	parser.last_search_options = 0;
+	if ([self findPattern:pattern options:0])
 		[self setCaret:final_location];
-	}
 }
 
 - (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
-	ViCommand *command = contextInfo;
-	command.last_search_pattern = pattern;
-	command.last_search_options = ViSearchOptionBackwards;
-	if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
+	parser.last_search_pattern = pattern;
+	parser.last_search_options = ViSearchOptionBackwards;
+	if ([self findPattern:pattern options:ViSearchOptionBackwards])
 		[self setCaret:final_location];
-	}
 }
 
 /* syntax: /regexp */
@@ -862,25 +832,25 @@ int logIndent = 0;
 /* syntax: n */
 - (BOOL)repeat_find:(ViCommand *)command
 {
-	NSString *pattern = command.last_search_pattern;
+	NSString *pattern = parser.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	return [self findPattern:pattern options:command.last_search_options];
+	return [self findPattern:pattern options:parser.last_search_options];
 }
 
 /* syntax: N */
 - (BOOL)repeat_find_backward:(ViCommand *)command
 {
-	NSString *pattern = command.last_search_pattern;
+	NSString *pattern = parser.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	int options = command.last_search_options;
+	int options = parser.last_search_options;
 	if (options & ViSearchOptionBackwards)
 		options &= ~ViSearchOptionBackwards;
 	else
@@ -975,12 +945,12 @@ int logIndent = 0;
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
-	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
+	/*DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
 	    stillSelectingFlag ? "YES" : "NO",
 	    NSStringFromRange(firstRange),
 	    NSStringFromRange(lastRange),
 	    mode,
-	    visual_start_location);
+	    visual_start_location);*/
 
 	if ([ranges count] > 1 || firstRange.length > 0) {
 		if (mode != ViVisualMode) {
@@ -1050,6 +1020,13 @@ int logIndent = 0;
 	DEBUG(@"entering insert mode at location %u (final location is %u), length is %u",
 		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
+
+	/*
+	 * Remember the command that entered insert mode. When leaving insert mode,
+	 * we update this command with the inserted text (or keys, actually). This
+	 * is used for repeating the insertion with the dot command.
+	 */
+	lastEditCommand = command;
 
 	if (command) {
 		if (command.text) {
@@ -1123,9 +1100,9 @@ int logIndent = 0;
 	return foundSmartTypingPair;
 }
 
-- (void)handle_input:(NSString *)characters
+- (void)handle_input:(unichar)character
 {
-	DEBUG(@"insert characters [%@] at %i", characters, start_location);
+	DEBUG(@"insert character %C at %i", character, start_location);
 
 	// If there is a selected snippet range, remove it first.
 	ViSnippet *snippet = [self delegate].snippet;
@@ -1135,9 +1112,11 @@ int logIndent = 0;
 		start_location = modify_start_location;
 	}
 
-	if (![self handleSmartPair:characters]) {
+	NSString *s = [NSString stringWithFormat:@"%C", character];
+	if (![self handleSmartPair:s]) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
-		[self insertString:characters atLocation:start_location];
+		[self insertString:s
+			atLocation:start_location];
 		final_location = modify_start_location + 1;
 	}
 
@@ -1156,7 +1135,7 @@ int logIndent = 0;
 
 - (BOOL)literal_next:(ViCommand *)command
 {
-	[self handle_input:[NSString stringWithFormat:@"%C", command.argument]];
+	[self handle_input:command.argument];	// XXX: un-parse!
 	return YES;
 }
 
@@ -1165,14 +1144,18 @@ int logIndent = 0;
  */
 - (BOOL)input_character:(ViCommand *)command
 {
-	unichar key = command.key;
+	NSArray *keys = command.mapping.keySequence;
+	NSInteger keyCode = [[keys lastObject] integerValue];
+	if ([keys count] > 1 || (keyCode & 0xFFFF0000) != 0)
+		[[self delegate] message:@"Can't insert key equivalent: %@.",
+		    [NSString stringWithKeySequence:keys]];
 
-	if (key < 0x20) {
+	if (keyCode < 0x20) {
 		[[self delegate] message:@"Illegal character; quote to enter"];
 		return NO;
 	}
 
-	[self handle_input:[NSString stringWithFormat:@"%C", key]];
+	[self handle_input:keyCode];
 	return YES;
 }
 
@@ -1287,19 +1270,29 @@ int logIndent = 0;
 {
 	if (mode == ViInsertMode) {
 		if (!replayingInput) {
+			/*
+			 * Remember the typed keys so we can repeat it
+			 * with the dot command.
+			 */
 			[command setText:inputKeys];
 
-			int count = IMAX(1, insert_count);
+			/*
+			 * A count given to the command that started insert
+			 * mode (i, I, a or A) means we should multiply the
+			 * inserted text.
+			 */
+			DEBUG(@"last edit command is %@, got %lu input keys",
+			    lastEditCommand, [inputKeys count]);
+			int count = IMAX(1, lastEditCommand.count);
 			if (count > 1) {
 				replayingInput = YES;
-				int i;
-				for (i = 1; i < count; i++)
+				for (int i = 1; i < count; i++)
 					[self handleKeys:inputKeys];
 				replayingInput = NO;
 			}
 		}
 
-		inputKeys = [[NSMutableArray alloc] init];
+		inputKeys = [NSMutableArray array];
 		start_location = end_location = [self caret];
 		[self move_left:nil];
 	}
@@ -1313,9 +1306,20 @@ int logIndent = 0;
 
 - (BOOL)evaluateCommand:(ViCommand *)command
 {
-	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
-	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
-		[[self delegate] message:@"Command not implemented."];
+	if (![command.mapping isAction]) {
+		[[self delegate] message:@"Macros not implemented."];
+		return NO;
+	}
+
+	if (![self respondsToSelector:command.action]) {
+		[[self delegate] message:@"Command %@ not implemented.",
+		    command.mapping.keyString];
+		return NO;
+	}
+
+	if (command.motion && ![self respondsToSelector:command.motion.action]) {
+		[[self delegate] message:@"Motion command %@ not implemented.",
+		    command.motion.mapping.keyString];
 		return NO;
 	}
 
@@ -1326,95 +1330,98 @@ int logIndent = 0;
 	DEBUG(@"start_location = %u", start_location);
 
 	/* Set or reset the saved column for up/down movement. */
-	if ([command.method isEqualToString:@"move_down:"] ||
-	    [command.method isEqualToString:@"move_up:"] ||
-	    [command.method isEqualToString:@"scroll_down_by_line:"] ||
-	    [command.method isEqualToString:@"scroll_up_by_line:"]) {
+	if (command.action == @selector(move_down:) ||
+	    command.action == @selector(move_up:) ||
+	    command.action == @selector(scroll_down_by_line:) ||
+	    command.action == @selector(scroll_up_by_line:)) {
 		if (saved_column < 0)
 			saved_column = [self currentColumn];
 	} else
 		saved_column = -1;
 
-	if (![command.method isEqualToString:@"vi_undo:"] && !command.is_dot)
+	if (command.action != @selector(vi_undo:) && !command.fromDot)
 		undo_direction = 0;
 
-	if (command.motion_method)
-	{
+	if (command.motion) {
 		/* The command has an associated motion component.
-		 * Run the motion method and record the start and end locations.
+		 * Run the motion command and record the start and end locations.
 		 */
-		DEBUG(@"perform motion command %@", command.motion_method);
-		if ([self performSelector:NSSelectorFromString(command.motion_method) withObject:command] == NO)
-		{
+		DEBUG(@"perform motion command %@", command.motion);
+		if (![self performSelector:command.motion.action
+			        withObject:command.motion])
 			/* the command failed */
-			[command reset];
 			return NO;
-		}
 	}
 
-	/* Find out the affected range for this command */
+	/* Find out the affected range for this command. */
 	NSUInteger l1, l2;
-	if (mode == ViVisualMode)
-	{
+	if (mode == ViVisualMode) {
 		NSRange sel = [self selectedRange];
 		l1 = sel.location;
 		l2 = NSMaxRange(sel);
-	}
-	else
-	{
+	} else {
 		l1 = start_location, l2 = end_location;
-		if (l2 < l1)
-		{	/* swap if end < start */
+		if (l2 < l1) {
+			/* swap if end < start */
 			l2 = l1;
 			l1 = end_location;
 		}
 	}
-	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u", l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
+	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
+	    l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
-	if (command.line_mode && !command.ismotion && mode != ViVisualMode) {
+	if (command.isLineMode && !command.isMotion && mode != ViVisualMode) {
 		/*
-		 * If this command is line oriented, extend the affectedRange to whole lines.
-		 * However, don't do this for Visual-Line mode, this is done in setVisualSelection.
+		 * If this command is line oriented, extend the
+		 * affectedRange to whole lines. However, don't
+		 * do this for Visual-Line mode, this is done in
+		 * setVisualSelection.
 		 */
 		NSUInteger bol, end, eol;
-
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
 
-		if (!command.motion_method) {
+		if (command.motion == nil) {
 			/*
 			 * This is a "doubled" command (like dd or yy).
-			 * A count, or motion-count, affects that number of whole lines.
+			 * A count affects that number of whole lines.
 			 */
 			int line_count = command.count;
-			if (line_count == 0)
-				line_count = command.motion_count;
 			while (--line_count > 0) {
 				l2 = end;
-				[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+				[self getLineStart:NULL
+					       end:&end
+				       contentsEnd:NULL
+				       forLocation:l2];
 			}
 		} else
-			[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
+			[self getLineStart:NULL
+				       end:&end
+			       contentsEnd:NULL
+			       forLocation:l2];
 
 		l1 = bol;
 		l2 = end;
-		DEBUG(@"after line mode correction: affected locations: %u -> %u (%u chars)", l1, l2, l2 - l1);
+		DEBUG(@"after line mode correction: %u -> %u (%u chars)",
+		    l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
 
 	BOOL leaveVisualMode = NO;
-	if (mode == ViVisualMode && !command.ismotion &&
-	    ![command.method isEqualToString:@"visual:"] &&
-	    ![command.method isEqualToString:@"visual_line:"]) {
+	if (mode == ViVisualMode && !command.isMotion &&
+	    command.action != @selector(visual:) &&
+	    command.action != @selector(visual_line:)) {
 		/* If in visual mode, edit commands leave visual mode. */
 		leaveVisualMode = YES;
 	}
 
-	DEBUG(@"perform command %@", command.method);
+	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
-	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
-	if (ok && command.line_mode && !command.ismotion &&
-	    (command.key != 'y' || command.motion_key != 'y') &&
-	    command.key != '>' && command.key != '<' && command.key != 'S')
+	BOOL ok = (NSUInteger)[self performSelector:command.action withObject:command];
+	if (ok && command.isLineMode && !command.isMotion &&
+	    command.action != @selector(yank:) &&
+	    command.action != @selector(shift_right:) &&
+	    command.action != @selector(shift_left:) &&
+	    command.action != @selector(subst_lines:))
 	{
 		/* For line mode operations, we always end up at the beginning of the line. */
 		/* ...well, except for yy :-) */
@@ -1422,7 +1429,10 @@ int logIndent = 0;
 		/* ...and < */
 		// FIXME: this is not a generic case!
 		NSUInteger bol;
-		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:final_location];
+		[self getLineStart:&bol
+			       end:NULL
+		       contentsEnd:NULL
+		       forLocation:final_location];
 		final_location = bol;
 	}
 
@@ -1440,9 +1450,24 @@ int logIndent = 0;
 	if (!replayingInput)
 		[self scrollToCaret];
 
-	if (ok)	// erase any previous message
-		[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu",
-		    (unsigned long)[self currentLine], (unsigned long)[self currentColumn]]];
+	if (ok) {
+		const char *modestr = "";
+		if (mode == ViInsertMode) {
+			if ([self delegate].snippet)
+				modestr = "--SNIPPET--";
+			else
+				modestr = "--INSERT--";
+		} else if (mode == ViVisualMode) {
+			if (visual_line_mode)
+				modestr = "--VISUAL LINE--";
+			else
+				modestr = "--VISUAL--";
+		}
+		[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu   %s",
+		    (unsigned long)[self currentLine],
+		    (unsigned long)[self currentColumn],
+		    modestr]];
+	}
 
 	return ok;
 }
@@ -1465,7 +1490,7 @@ int logIndent = 0;
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
 		for (i = 0; i < [(NSString *)string length]; i++)
-			[self handleKey:[(NSString *)string characterAtIndex:i] flags:0];
+			[self handleKey:[(NSString *)string characterAtIndex:i]];
 		insertedKey = YES;
 	}
 }
@@ -1475,89 +1500,27 @@ int logIndent = 0;
 	DEBUG(@"selector = %s", aSelector);
 }
 
-- (unichar)parseKeyEvent:(NSEvent *)theEvent modifiers:(unsigned int *)modPtr
-{
-	// http://sigpipe.macromates.com/2005/09/24/deciphering-an-nsevent/
-	// given theEvent (NSEvent*) figure out what key 
-	// and modifiers we actually want to look at, 
-	// to compare it with a menu key description
-
-	NSUInteger quals = [theEvent modifierFlags];
-
-	NSString *str = [theEvent characters];
-	NSString *strWithout = [theEvent charactersIgnoringModifiers];
-
-	unichar ch = [str length] ? [str characterAtIndex:0] : 0;
-	unichar key = ch;
-	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
-
-	if (!(quals & NSNumericPadKeyMask)) {
-		if ((quals & NSControlKeyMask)) {
-			if (key < 0x20 && (key != 0x1B || key != without) &&
-			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)	/* only control pressed */
-				quals = 0;
-			else
-				key = without;
-		} else if (quals & NSAlternateKeyMask) {
-			if (0x20 < key && key < 0x7f && key != without)
-				quals &= ~NSAlternateKeyMask;
-			else
-				key = without;
-		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
-			key = without;
-
-		if ((0x20 < key && key < 0x7f) || key == 0x19 || key == 0x1E)
-			quals &= ~NSShiftKeyMask;
-	}
- 
-	// the resulting values
-	unsigned int modifiers = quals & (/*NSNumericPadKeyMask |*/ NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
-
-	DEBUG(@"key = %C (0x%04x / 0x%04x -> 0x%04x), s=%s, c=%s, a=%s, C=%s (0x%04x vs. 0x%04x)",
-	    key, ch, without, key,
-	    (modifiers & NSShiftKeyMask) ? "YES" : "NO",
-	    (modifiers & NSControlKeyMask) ? "YES" : "NO",
-	    (modifiers & NSAlternateKeyMask) ? "YES" : "NO",
-	    (modifiers & NSCommandKeyMask) ? "YES" : "NO",
-	    quals, modifiers
-	);
-
-	*modPtr = modifiers;
-
-        return key;
-}
-
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
-	DEBUG(@"event = %@", theEvent);
+	[keyTimeout invalidate];
+	DEBUG(@"got key equivalent event %p = %@", theEvent, theEvent);
+	BOOL partial = parser.partial;
+	NSError *error = nil;
+	if (![self handleKey:[theEvent normalizedKeyCode] error:&error]) {
+		if (!partial && [error code] == ViErrorMapNotFound)
+			return NO;
+		[[self delegate] message:@"%@", [error localizedDescription]];
+	}
 
-	unsigned int modifiers;
-	unichar key;
-	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
-
-	/*
-	 * Find and perform bundle commands. Show a menu with commands if multiple matches found.
-	 * FIXME: should this be part of the key replay queue?
-	 */
-        NSArray *scopes = [self scopesAtLocation:[self caret]];
-        NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKey:key
-                                                               andFlags:modifiers
-                                                        matchingScopes:scopes
-                                                                inMode:mode];
-        if ([matches count] > 0) {
-		if (parser.partial) {
-			[[self delegate] message:@"Vi command interrupted by key equivalent."];
-			[parser reset];
-		}
-                [self performBundleItems:matches];
-                return YES;
-        }
-
-	return NO;
+	return YES;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+	DEBUG(@"got keyDown event: %p = %@", theEvent, theEvent);
+
+	[keyTimeout invalidate];
+
 	NSResponder *r = [[self window] firstResponder];
 	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
 		/* Pass the (generated) event to the ex command line. */
@@ -1566,63 +1529,60 @@ int logIndent = 0;
 		return;
 	}
 
-	unsigned int modifiers;
-	unichar key;
-	key = [self parseKeyEvent:theEvent modifiers:&modifiers];
-
-	[proxy emit:@"keyDown" with:self,
-	    [NSNumber numberWithChar:key],
-	    [NSNumber numberWithUnsignedInt:modifiers],
-	    nil];
+//	[proxy emit:@"keyDown" with:self, key, nil];
+	[[self delegate] message:@""];
 
 	handlingKey = YES;
 	[super keyDown:theEvent];
 	handlingKey = NO;
-	DEBUG(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
+	DEBUG(@"done interpreting key events, inserted key = %s",
+	    insertedKey ? "YES" : "NO");
 
-	if (!insertedKey && ![self hasMarkedText])
-		[self handleKey:key flags:modifiers];
+	if (!insertedKey && ![self hasMarkedText]) {
+		DEBUG(@"decoding event %@", theEvent);
+		[self handleKey:[theEvent normalizedKeyCode]];
+	}
 	insertedKey = NO;
 }
 
 - (void)handleKeys:(NSArray *)keys
 {
-	ViKey *key;
-	for (key in keys)
-		[self handleKey:[key code] flags:[key flags]];
+	for (NSNumber *n in keys)
+		[self handleKey:[n integerValue]];
 }
 
-- (void)handleKey:(unichar)charcode flags:(unsigned int)flags
+- (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError
 {
-	DEBUG(@"handle key '%C' (0x%04X) w/flags 0x%04x", charcode, charcode, flags);
+	DEBUG(@"handle key 0x%04x (%@)", keyCode, [NSString stringWithKeyCode:keyCode]);
 
-	if (parser.partial && (flags & ~NSNumericPadKeyMask) != 0) {
-		[[self delegate] message:@"Vi command interrupted by key equivalent."];
-		[parser reset];
+	if (keyCode == -1) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Interal error."];
+		return NO;
+	}
+
+	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
+		/* Add the key to the input replay queue. */
+		[inputKeys addObject:[NSNumber numberWithInteger:keyCode]];
 	}
 
 	/*
-	 * Find and perform bundle commands. Show a menu with commands if multiple matches found.
+	 * Find and perform bundle commands. Show a menu with commands
+	 * if multiple matches found.
 	 * FIXME: should this be part of the key replay queue?
 	 */
-	if (!parser.partial || (flags & ~NSNumericPadKeyMask) != 0) {
+	if (!parser.partial) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
-		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKey:charcode
-		                                                       andFlags:flags
-		                                                matchingScopes:scopes
-		                                                        inMode:mode];
+		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKeyCode:keyCode
+								     matchingScopes:scopes
+									     inMode:mode];
 		if ([matches count] > 0) {
 			[self performBundleItems:matches];
-			return;
+			return YES;
 		}
 	}
 
-	/* Special handling of command-[0-9] to switch tabs. */
-	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
-		[self switch_tab:charcode - '0'];
-		return;
-	}
-
+#if 0
 	/* Special handling of control-escape. */
 	if (flags == NSControlKeyMask && charcode == 0x1B) {
 		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
@@ -1642,34 +1602,17 @@ int logIndent = 0;
 		showingContextMenu = NO;
 		return;
 	}
+#endif
 
-	/* Special handling of control-shift-p. */
-	if (flags == NSControlKeyMask && charcode == 'P') {
-		[self show_scope];
-		return;
-	}
-
-	if ((flags & ~NSNumericPadKeyMask) != 0) {
-		DEBUG(@"unhandled key equivalent %C/0x%04X", charcode, flags);
-		return;
-	}
-
-	if (charcode == 0x1B) {
+	// XXX: any chance we can do this with a map action again?
+	if (keyCode == 0x1B) {
 		[parser reset];
 		final_location = [self caret];
-		[self normal_mode:parser];
+		[self normal_mode:lastEditCommand];
 		[self endUndoGroup];
 		[self deselectSnippet];
-		return;
+		return YES;
 	}
-
-	if (mode == ViInsertMode && !replayingInput) {
-		/* Add the key to the input replay queue. */
-		[inputKeys addObject:[ViKey keyWithCode:charcode flags:flags]];
-	}
-
-	if (parser.complete)
-		[parser reset];
 
 	if (!parser.partial) {
 		if (mode == ViVisualMode)
@@ -1678,12 +1621,51 @@ int logIndent = 0;
 			[parser setInsertMap];
 	}
 
-	[parser pushKey:charcode];
-	if (parser.complete) {
-		[self evaluateCommand:parser];
+	NSError *error = nil;
+	BOOL timeout = NO;
+	ViCommand *command = [parser pushKey:keyCode
+				       scope:[self scopesAtLocation:[self caret]]
+				     timeout:&timeout
+				       error:&error];
+	if (command) {
+		[self evaluateCommand:command];
 		if (mode != ViInsertMode)
 			[self endUndoGroup];
+	} else if (error) {
+		if (outError)
+			*outError = error;
+		return NO;
+	} else {
+		[[self delegate] message:@"%@", [parser keyString]];
+		if (timeout)
+			keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
+								       target:self
+								     selector:@selector(keyTimedOut:)
+								     userInfo:nil
+								      repeats:NO];
 	}
+
+	return YES;
+}
+
+- (void)handleKey:(NSInteger)keyCode
+{
+	NSError *error = nil;
+	if (![self handleKey:keyCode error:&error] && error)
+		[[self delegate] message:@"%@", [error localizedDescription]];
+}
+
+- (void)keyTimedOut:(id)sender
+{
+	NSError *error = nil;
+	ViCommand *command = [parser timeoutInScope:[self scopesAtLocation:[self caret]]
+					      error:&error];
+	if (command) {
+		[self evaluateCommand:command];
+		if (mode != ViInsertMode)
+			[self endUndoGroup];
+	} else if (error)
+		[[self delegate] message:@"%@", [error localizedDescription]];
 }
 
 - (void)swipeWithEvent:(NSEvent *)event
@@ -1694,7 +1676,7 @@ int logIndent = 0;
 
 	if ([event deltaX] != 0 && mode == ViInsertMode) {
 		[[self delegate] message:@"Swipe event interrupted text insert mode."];
-		[self normal_mode:parser];
+		[self normal_mode:lastEditCommand];
 		keep_message = YES;
 	}
 
@@ -1751,46 +1733,12 @@ int logIndent = 0;
  */
 - (void)input:(NSString *)inputString
 {
-	NSScanner *scan = [NSScanner scannerWithString:inputString];
-	unichar ch;
-	while ([scan scanCharacter:&ch]) {
-		if (ch == '\\') {
-			/* Escaped character. */
-			if ([scan scanCharacter:&ch]) {
-				[self keyDown:[self eventForCharacter:ch]];
-			} else {
-				/* trailing backslash? treat as literal */
-				[self keyDown:[self eventForCharacter:'\\']];
-			}
-		} else if (ch == '<') {
-			NSString *special = nil;
-			if ([scan scanUpToUnescapedCharacter:'>' intoString:&special] &&
-			    [scan scanString:@">" intoString:nil]) {
-				DEBUG(@"parsing special key <%@>", special);
-				NSString *lcase = [special lowercaseString];
-				if ([lcase isEqualToString:@"cr"])
-					[self keyDown:[self eventForCharacter:'\n']];
-				else if ([lcase isEqualToString:@"esc"])
-					[self keyDown:[self eventForCharacter:'\x1B']];
-				else if ([lcase hasPrefix:@"c-"]) {
-					/* control-key */
-					ch = [special characterAtIndex:2];
-					[self keyDown:[self eventForCharacter:ch
-						                        flags:NSControlKeyMask]];
-				}
-			} else {
-				/* "<" without a ">", treat as literal */
-				if (special) {
-					NSUInteger i;
-					for (i = 0; i < [special length]; i++)
-						[self keyDown:[self eventForCharacter:
-						    [special characterAtIndex:i]]];
-				}
-				[self keyDown:[self eventForCharacter:'<']];
-			}
-		} else
-			[self keyDown:[self eventForCharacter:ch]];
+	NSArray *keys = [inputString keyCodes];
+	if (keys == nil) {
+		INFO(@"invalid key sequence: %@", inputString);
+		return;
 	}
+	[self handleKeys:keys];
 }
 
 #pragma mark -
@@ -1867,7 +1815,7 @@ int logIndent = 0;
 
 - (void)setTypingAttributes:(NSDictionary *)attributes
 {
-	DEBUG(@"ignored, attributes = %@", attributes);
+//	DEBUG(@"ignored, attributes = %@", attributes);
 }
 
 - (NSDictionary *)typingAttributes
@@ -1885,9 +1833,10 @@ int logIndent = 0;
 	return [[self textStorage] columnAtLocation:[self caret]];
 }
 
-- (void)show_scope
+- (BOOL)show_scope:(ViCommand *)command
 {
 	[[self delegate] message:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
+	return NO;
 }
 
 - (BOOL)switch_file:(ViCommand *)command
@@ -1896,11 +1845,17 @@ int logIndent = 0;
         return YES;
 }
 
-- (void)switch_tab:(int)arg
+- (BOOL)switch_tab:(ViCommand *)command
 {
-	if (arg-- == 0)
-		arg = 9;
-        [[[self window] windowController] selectTabAtIndex:arg];
+	INFO(@"switch to tab: %@", command.mapping.parameter);
+	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
+		[[self delegate] message:@"Unexpected parameter type %@",
+		    NSStringFromClass([command.mapping.parameter class])];
+		return NO;
+	}
+	int arg = [command.mapping.parameter intValue];
+	[[[self window] windowController] selectTabAtIndex:arg];
+	return YES;
 }
 
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation
@@ -1969,7 +1924,7 @@ int logIndent = 0;
 		[parser reset];
 	}
 
-	ViCommandMenuItemView *view = [sender view];
+	ViCommandMenuItemView *view = (ViCommandMenuItemView *)[sender view];
 	if (view) {
 		NSString *command = view.command;
 		if (command) {

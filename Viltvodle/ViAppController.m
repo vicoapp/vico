@@ -159,7 +159,7 @@
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
-	NSString* consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
+	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
 	[[Nu parser] parseEval:consoleStartup]; 
 }
 

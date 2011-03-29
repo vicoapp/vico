@@ -13,17 +13,17 @@ static NSString *bundlesDirectory = nil;
 + (NSString *)bundlesDirectory
 {
 	if (bundlesDirectory == nil)
-		bundlesDirectory = [[NSString stringWithFormat:@"%@/Bundles", [ViAppController supportDirectory]] stringByExpandingTildeInPath];
+		bundlesDirectory = [[NSString stringWithFormat:@"%@/Bundles",
+		    [ViAppController supportDirectory]] stringByExpandingTildeInPath];
 	return bundlesDirectory;
 }
 
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
-		languages = [[NSMutableDictionary alloc] init];
-		cachedPreferences = [[NSMutableDictionary alloc] init];
+	if (self) {
+		languages = [NSMutableDictionary dictionary];
+		cachedPreferences = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -44,7 +44,8 @@ static NSString *bundlesDirectory = nil;
 	NSString *file;
 	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {
 		if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
-			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file] forBundle:bundle];
+			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]
+								      forBundle:bundle];
 			[bundle addLanguage:language];
 			[languages setObject:language forKey:[language name]];
 		}
@@ -258,17 +259,16 @@ static NSString *bundlesDirectory = nil;
 	return matches;
 }
 
-- (NSArray *)itemsWithKey:(unichar)keycode
-                 andFlags:(unsigned int)flags
-           matchingScopes:(NSArray *)scopes
-                   inMode:(ViMode)mode
+- (NSArray *)itemsWithKeyCode:(NSInteger)keyCode
+               matchingScopes:(NSArray *)scopes
+                       inMode:(ViMode)mode
 {
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
 
 	for (ViBundle *bundle in bundles)
 		for (ViBundleItem *item in [bundle items])
-			if ([item keycode] == keycode && [item keyflags] == flags &&
+			if ([item keyCode] == keyCode &&
 			    ([item mode] == ViAnyMode || [item mode] == mode)) {
 				NSString *scope = [item scope];
 				u_int64_t rank;

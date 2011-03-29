@@ -1,5 +1,19 @@
 #define ViErrorDomain @"se.bzero.ErrorDomain"
 
+enum {
+	ViErrorMapInternal,
+	ViErrorMapNotFound,
+	ViErrorMapAmbiguous,
+	ViErrorParserNoDot,
+	ViErrorParserInvalidArgument,
+	ViErrorParserInvalidRegister,
+	ViErrorParserMultipleRegisters,
+	ViErrorParserRegisterOrder,
+	ViErrorParserNoOperatorMap,
+	ViErrorParserInvalidMotion,
+	ViErrorParserInternal
+};
+
 @interface ViError : NSObject
 {
 }

@@ -306,14 +306,16 @@
 	 * Adjust the start/end location to include the begin/end match.
 	 * Do this when % is used as motion component in a non-line-oriented editing command.
 	 */
-	if (command.key == 'd' || command.key == 'c' || command.key == 'y') {
+	if (command.action == @selector(delete:) ||
+	    command.action == @selector(change:) ||
+	    command.action == @selector(yank:)) {
 		if (delta == 1)
 			end_location++;
 		else
 			start_location++;
 	}
 
-        return YES;
+	return YES;
 }
 
 - (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
@@ -354,8 +356,6 @@
 - (BOOL)paragraph_forward:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger cur;
 	[self getLineStart:NULL end:&cur contentsEnd:NULL];
@@ -381,8 +381,6 @@
 - (BOOL)paragraph_backward:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger cur;
 	[self getLineStart:&cur end:NULL contentsEnd:NULL];
@@ -414,14 +412,13 @@
 	/* If a line mode range includes the last line, also include the newline before the first line.
 	 * This way delete doesn't leave an empty line.
 	 */
-	if (command.line_mode && NSMaxRange(affectedRange) == [[self textStorage] length] && bol > 0)
-	{
+	if (command.isLineMode && NSMaxRange(affectedRange) == [[self textStorage] length] && bol > 0) {
 		affectedRange.location--;	// FIXME: what about using CRLF at end-of-lines?
 		affectedRange.length++;
 		DEBUG(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
 	}
 
-	[self cutToBuffer:0 append:NO range:affectedRange];
+	[self cutToBuffer:command.reg append:NO range:affectedRange];
 
 	// correct caret position if we deleted the last character(s) on the line
 	if (bol >= [[self textStorage] length])
@@ -429,7 +426,7 @@
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol];
 	if (modify_start_location >= eol)
-		final_location = IMAX(bol, eol - (command.key == 'c' ? 0 : 1));
+		final_location = IMAX(bol, eol - (command.action == @selector(change:) ? 0 : 1));
 	else
 		final_location = modify_start_location;
 
@@ -453,7 +450,7 @@
 	 * got it right...   Unlike delete, we make no adjustments here.
 	 */
 	/* yy shouldn't move the cursor */
-	if (command.motion_key != 'y')
+	if (command.motion != nil)
 		final_location = affectedRange.location;
 	return YES;
 }
@@ -558,7 +555,7 @@
 /* syntax: [buffer][count]c[count]motion */
 - (BOOL)change:(ViCommand *)command
 {
-	if (command.line_mode) {
+	if (command.isLineMode) {
 		/* adjust the range to exclude the last newline */
 		NSUInteger bol, eol, end;
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
@@ -620,8 +617,9 @@
 		c = 1;
 
 	/* XXX: treat a command count as motion count */
-	command.motion_count = c;
-	command.count = 0;
+	// XXX: why? what?
+//	command.motion.count = c;
+//	command.count = 0;
 
 	NSUInteger len = c;
 	if (start_location + len >= eol)
@@ -636,8 +634,7 @@
 {
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol];
-	if (end == eol)
-	{
+	if (end == eol) {
 		[[self delegate] message:@"No following lines to join"];
 		return NO;
 	}
@@ -680,7 +677,8 @@
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
 
-	if (eol2 == end || bol == eol || [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
+	if (eol2 == end || bol == eol || 
+	    [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
 		NSRange r = NSMakeRange(eol, end - eol);
@@ -772,17 +770,15 @@
 - (BOOL)move_right:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if (start_location + ((mode == ViInsertMode || !command.ismotion) ? 0 : 1) >= eol) {
+	if (start_location + ((mode == ViInsertMode || command.hasOperator) ? 0 : 1) >= eol) {
 		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
 	if (start_location + count >= eol)
-		final_location = end_location = eol - ((mode == ViInsertMode || !command.ismotion) ? 0 : 1);
+		final_location = end_location = eol - ((mode == ViInsertMode || command.hasOperator) ? 0 : 1);
 	else
 		final_location = end_location = start_location + count;
 	return YES;
@@ -792,8 +788,6 @@
 - (BOOL)move_up:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
@@ -820,8 +814,6 @@
 - (BOOL)move_down:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger end;
 	[self getLineStart:NULL end:&end contentsEnd:NULL];
@@ -864,12 +856,10 @@
 {
 	if ([[self textStorage] length] > 0) {
 		int count = IMAX(command.count, 1);
-		if (!command.ismotion)
-			count = IMAX(command.motion_count, 1);
 		NSUInteger cur = start_location, bol = 0, eol = 0;
 		while (count--)
 			[self getLineStart:&bol end:&cur contentsEnd:&eol forLocation:cur];
-		final_location = end_location = IMAX(bol, eol - command.ismotion);
+		final_location = end_location = IMAX(bol, eol - (command.hasOperator ? 0 : 1 ));
 	}
 	return YES;
 }
@@ -881,8 +871,6 @@
 	[self getLineStart:(NSUInteger *)&bol end:NULL contentsEnd:NULL];
 	NSInteger i = start_location;
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 	while (count--) {
 		while (--i >= bol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
@@ -892,7 +880,7 @@
 		}
 	}
 
-	final_location = command.ismotion ? i : start_location;
+	final_location = command.hasOperator ? start_location : i;
 	end_location = i;
 	return YES;
 }
@@ -915,8 +903,6 @@
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	NSUInteger i = start_location;
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 	while (count--) {
 		while (++i < eol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
@@ -926,7 +912,7 @@
 		}
 	}
 
-	final_location = command.ismotion ? i : start_location;
+	final_location = command.hasOperator ? start_location : i;
 	end_location = i + 1;
 	return YES;
 }
@@ -945,21 +931,23 @@
 /* syntax: [count]; */
 - (BOOL)repeat_line_search_forward:(ViCommand *)command
 {
-	command.argument = command.last_ftFT_argument;
-	switch (command.last_ftFT_command) {
-	case 'f':
-		return [self move_to_char:command];
-		break;
-	case 't':
-		return [self move_til_char:command];
-		break;
-	case 'F':
-		return [self move_back_to_char:command];
-		break;
-	case 'T':
-		return [self move_back_til_char:command];
-		break;
+	ViCommand *c = [parser.last_ftFT_command dotCopy];
+	if (c == nil) {
+		[[self delegate] message:@"No previous F, f, T or t search"];
+		return NO;
 	}
+
+	c.count = command.count;
+
+	SEL sel = c.action;
+	if (sel == @selector(move_to_char:))
+		return [self move_to_char:c];
+	else if (sel == @selector(move_til_char:))
+		return [self move_til_char:c];
+	else if (sel == @selector(move_back_to_char:))
+		return [self move_back_to_char:c];
+	else if (sel == @selector(move_back_til_char:))
+		return [self move_back_til_char:c];
 
 	return NO;
 }
@@ -967,21 +955,23 @@
 /* syntax: [count], */
 - (BOOL)repeat_line_search_backward:(ViCommand *)command
 {
-	command.argument = command.last_ftFT_argument;
-	switch (command.last_ftFT_command) {
-	case 'f':
-		return [self move_back_to_char:command];
-		break;
-	case 't':
-		return [self move_back_til_char:command];
-		break;
-	case 'F':
-		return [self move_to_char:command];
-		break;
-	case 'T':
-		return [self move_til_char:command];
-		break;
+	ViCommand *c = [parser.last_ftFT_command dotCopy];
+	if (c == nil) {
+		[[self delegate] message:@"No previous F, f, T or t search"];
+		return NO;
 	}
+
+	c.count = command.count;
+
+	SEL sel = c.action;
+	if (sel == @selector(move_to_char:))
+		return [self move_back_to_char:c];
+	else if (sel == @selector(move_til_char:))
+		return [self move_back_til_char:c];
+	else if (sel == @selector(move_back_to_char:))
+		return [self move_to_char:c];
+	else if (sel == @selector(move_back_til_char:))
+		return [self move_til_char:c];
 
 	return NO;
 }
@@ -989,12 +979,8 @@
 /* syntax: [count]G */
 - (BOOL)goto_line:(ViCommand *)command
 {
-	unichar key = command.key;
 	int count = command.count;
-	if (!command.ismotion) {
-		count = command.motion_count;
-		key = command.motion_key;
-	}
+	BOOL defaultToEOF = [command.mapping.parameter intValue];
 
 	if (count > 0) {
 		NSInteger location = [[self textStorage] locationForStartOfLine:count];
@@ -1004,14 +990,17 @@
 			return NO;
 		}
 		final_location = end_location = location;
-	} else if (key == 'G') {
+	} else if (defaultToEOF) {
 		/* default to last line */
 		NSUInteger last_location = [[self textStorage] length];
 		if (last_location > 0)
 			--last_location;
-		[self getLineStart:&end_location end:NULL contentsEnd:NULL forLocation:last_location];
+		[self getLineStart:&end_location
+			       end:NULL
+		       contentsEnd:NULL
+		       forLocation:last_location];
 		final_location = end_location;
-	} else if (key == 'g') {
+	} else {
 		/* default to first line */
 		final_location = end_location = 0;
 	}
@@ -1114,7 +1103,7 @@
 		DEBUG(@"undo_direction is %i", undo_direction);
 		if (undo_direction == 0)
 			undo_direction = 1;	// backward (normal undo)
-		else if (!command.is_dot)
+		else if (!command.fromDot)
 			undo_direction = (undo_direction == 1 ? 2 : 1);
 
 		if (undo_direction == 1) {
@@ -1177,36 +1166,32 @@
 /* syntax: [count]W */
 - (BOOL)word_forward:(ViCommand *)command
 {
-	if ([[self textStorage] length] == 0)
-	{
+	if ([[self textStorage] length] == 0) {
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
+
 	NSString *s = [[self textStorage] string];
-
-	BOOL bigword = (command.ismotion ? command.key == 'W' : command.motion_key == 'W');
-
+	BOOL bigword = [command.mapping.keyString isEqualToString:@"W"];	// XXX: use another selector!
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
 	NSUInteger word_location;
-	while (count--)
-	{
+	while (count--) {
 		word_location = end_location;
 		unichar ch = [s characterAtIndex:word_location];
-		if (!bigword && [wordSet characterIsMember:ch])
-		{
+		if (!bigword && [wordSet characterIsMember:ch]) {
 			// skip word-chars and whitespace
-			end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:word_location backward:NO];
-		}
-		else if (![whitespace characterIsMember:ch])
-		{
+			end_location = [[self textStorage] skipCharactersInSet:wordSet
+								  fromLocation:word_location
+								      backward:NO];
+		} else if (![whitespace characterIsMember:ch]) {
 			// inside non-word-chars
-			end_location = [[self textStorage] skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet fromLocation:word_location backward:NO];
-		}
-		else if (!command.ismotion && command.key != 'd' && command.key != 'y')
-		{
+			end_location = [[self textStorage] skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet
+								  fromLocation:word_location
+								      backward:NO];
+		} else if (command.hasOperator &&
+		    command.operator.action != @selector(delete:) &&
+		    command.operator.action != @selector(yank:)) {
 			/* We're in whitespace. */
 			/* See comment from nvi below. */
 			end_location = word_location + 1;
@@ -1224,10 +1209,15 @@
 	 * in the same string, a "cw" on any white space character replaces that
 	 * single character, and nothing else.  Ain't nothin' in here that's easy.
 	 */
-	if (command.ismotion || command.key == 'd' || command.key == 'y')
+	if (!command.hasOperator ||
+	    command.operator.action == @selector(delete:) ||
+	    command.operator.action == @selector(yank:))
 		end_location = [[self textStorage] skipWhitespaceFrom:end_location];
 
-	if (!command.ismotion && (command.key == 'd' || command.key == 'y' || command.key == 'c')) {
+	if (command.hasOperator &&
+	    (command.operator.action == @selector(delete:) ||
+	     command.operator.action == @selector(yank:) ||
+	     command.operator.action == @selector(change:))) {
 		/* Restrict to current line if deleting/yanking last word on line.
 		 * However, an empty line can be deleted as a word.
 		 */
@@ -1235,8 +1225,7 @@
 		[self getLineStart:&bol end:NULL contentsEnd:&eol];
 		if (end_location > eol && bol != eol)
 			end_location = eol;
-	}
-	else if (end_location >= [s length])
+	} else if (end_location >= [s length])
 		end_location = [s length] - 1;
 	final_location = end_location;
 	return YES;
@@ -1246,16 +1235,16 @@
 /* syntax: [count]B */
 - (BOOL)word_backward:(ViCommand *)command
 {
-	if ([[self textStorage] length] == 0)
-	{
+	if ([[self textStorage] length] == 0) {
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
-	if (start_location == 0)
-	{
+
+	if (start_location == 0) {
 		[[self delegate] message:@"Already at the beginning of the file"];
 		return NO;
 	}
+
 	NSString *s = [[self textStorage] string];
 	end_location = start_location - 1;
 	unichar ch = [s characterAtIndex:end_location];
@@ -1267,50 +1256,49 @@
          * character before the current one, it sets word "state" for the
          * 'b' command.
          */
-	if ([whitespace characterIsMember:ch])
-	{
+	if ([whitespace characterIsMember:ch]) {
 		end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
-		if (end_location == 0)
-		{
+		if (end_location == 0) {
 			final_location = end_location;
 			return YES;
 		}
 	}
 
 	int count = IMAX(command.count, 1);
-	if (!command.ismotion)
-		count = IMAX(command.motion_count, 1);
 
-	BOOL bigword = (command.ismotion ? command.key == 'B' : command.motion_key == 'B');
+	BOOL bigword = [command.mapping.keyString isEqualToString:@"B"];	// XXX: use another selector!
 
 	NSUInteger word_location;
-	while (count--)
-	{
+	while (count--) {
 		word_location = end_location;
 		ch = [s characterAtIndex:word_location];
 
-		if (bigword)
-		{
-			end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet] fromLocation:word_location backward:YES];
+		if (bigword) {
+			end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet]
+								  fromLocation:word_location
+								      backward:YES];
 			if (count == 0 && [whitespace characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
-		}
-		else if ([wordSet characterIsMember:ch])
-		{
+		} else if ([wordSet characterIsMember:ch]) {
 			// skip word-chars and whitespace
-			end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:word_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:wordSet
+								  fromLocation:word_location
+								      backward:YES];
 			if (count == 0 && ![wordSet characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
-		}
-		else
-		{
+		} else {
 			// inside non-word-chars
-			end_location = [[self textStorage] skipCharactersInSet:nonWordSet fromLocation:word_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:nonWordSet
+								  fromLocation:word_location
+								      backward:YES];
 			if (count == 0 && [wordSet characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
+
 		if (count > 0)
-			end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
+			end_location = [[self textStorage] skipCharactersInSet:whitespace
+								  fromLocation:end_location
+								      backward:YES];
 	}
 
 	final_location = end_location;
@@ -1319,11 +1307,11 @@
 
 - (BOOL)end_of_word:(ViCommand *)command
 {
-	if ([[self textStorage] length] == 0)
-	{
+	if ([[self textStorage] length] == 0) {
 		[[self delegate] message:@"Empty file"];
 		return NO;
 	}
+
 	NSString *s = [[self textStorage] string];
 	end_location = start_location + 1;
 	unichar ch = [s characterAtIndex:end_location];
@@ -1334,31 +1322,42 @@
          * it.  (This doesn't count as a word move.)  Stay at the character
          * past the current one, it sets word "state" for the 'e' command.
          */
-	if([whitespace characterIsMember:ch])
-	{
-		end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:NO];
-		if(end_location == [s length])
-		{
+	if ([whitespace characterIsMember:ch]) {
+		end_location = [[self textStorage] skipCharactersInSet:whitespace
+							  fromLocation:end_location
+							      backward:NO];
+		if (end_location == [s length]) {
 			final_location = end_location;
 			return YES;
 		}
 	}
 
-	BOOL bigword = (command.ismotion ? command.key == 'E' : command.motion_key == 'E');
+	BOOL bigword = [command.mapping.keyString isEqualToString:@"E"];	// XXX: use another selector!
 
 	ch = [s characterAtIndex:end_location];
 	if (bigword) {
-		end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet] fromLocation:end_location backward:NO];
-		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+		end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet]
+							  fromLocation:end_location backward:NO];
+		if (!command.hasOperator ||
+		    (command.operator.action != @selector(delete:) &&
+		     command.operator.action != @selector(end_of_word:)))
 			end_location--;
 	} else if ([wordSet characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:wordSet fromLocation:end_location backward:NO];
-		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+		end_location = [[self textStorage] skipCharactersInSet:wordSet
+							  fromLocation:end_location
+							      backward:NO];
+		if (!command.hasOperator ||
+		    (command.operator.action != @selector(delete:) &&
+		     command.operator.action != @selector(end_of_word:)))
 			end_location--;
 	} else {
 		// inside non-word-chars
-		end_location = [[self textStorage] skipCharactersInSet:nonWordSet fromLocation:end_location backward:NO];
-		if(command.ismotion || (command.key != 'd' && command.key != 'e'))
+		end_location = [[self textStorage] skipCharactersInSet:nonWordSet
+							  fromLocation:end_location
+							      backward:NO];
+		if (!command.hasOperator ||
+		    (command.operator.action != @selector(delete:) &&
+		     command.operator.action != @selector(end_of_word:)))
 			end_location--;
 	}
 
@@ -1629,8 +1628,8 @@
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		command.last_search_pattern = pattern;
-		command.last_search_options = options;
+		parser.last_search_pattern = pattern;
+		parser.last_search_options = options;
 		return [self findPattern:pattern options:options];
 	}
 	return NO;
@@ -1694,7 +1693,7 @@
 	}
 	final_location = bol;
 
-	if (command.key == '`' || command.motion_key == '`')
+	if ([command.mapping.keyString isEqualToString:@"`"])	// XXX: use another selector!
 		[self gotoColumn:m.column fromLocation:bol];
 	else
 		final_location = [[self textStorage] skipWhitespaceFrom:final_location];

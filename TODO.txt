@@ -5,9 +5,12 @@ URGENT
 * fuzzy search feels *slow*
 * ZZ and ZQ + handle :q! (ie, don't ask)
   => how should we handle windows? quit the app completely?
+* ctrl-q bundle command operates on the left view when typed in the right view !??
+* ctrl-space seems to match all snippets
 
 BUGS
 ====
+* ctrl-^ should switch between *files*, not views
 * close a tab by click the X doesn't work for web views
 * ctrl-enter != ctrl-shift-m
 * clicking a binary file (pdf, image) in explorer opens as text
@@ -20,6 +23,7 @@ BUGS
 * honor bundle ordering when showing ambiguous items menu
 * implement "new file" and "new folder" in explorer menu
 * searching is slow on large files, naïve implementation
+* yk and yj commands doesn't position caret correctly
 
 IMPORTANT
 =========
@@ -49,6 +53,7 @@ IMPORTANT
 
 FEATURES
 ========
+* message how many lines yanked
 * :e# => open alternate file
 * set incsearch
 * set smarttab
@@ -64,8 +69,7 @@ FEATURES
 * escape after creating new line should blank the line
 * local keyword completion (vim c-x c-n)
 * history in explorer view + go back/forward with swiping
-* maps (:nmap, :vmap, :imap, :omap)
-* maps could optionally accept a scope
+* macros in maps
 * i_CTRL-R + registers
 * :normal!
 * = (re-indent)
@@ -106,8 +110,6 @@ example:
 :map ,i O0<C-D>#include "<C-R>%"<ESC>T.c
 :map ,i O0<^d>#include "<^r>%"<ESC>T.c
 
-need to support <KEY> syntax
-
 
 :wnext (?)
 
@@ -117,6 +119,17 @@ need to support <KEY> syntax
 
 <C-W> in insert mode
 
+
+There are nine types of registers:			*registers* *E354*
+1. The unnamed register ""
+2. 10 numbered registers "0 to "9
+3. The small delete register "-
+4. 26 named registers "a to "z or "A to "Z
+5. four read-only registers ":, "., "% and "#
+6. the expression register "=
+7. The selection and drop registers "*, "+ and "~ 
+8. The black hole register "_
+9. Last search pattern register "/
 
 
 

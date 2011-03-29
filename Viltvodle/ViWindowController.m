@@ -71,14 +71,14 @@ static ViWindowController	*currentWindowController = nil;
 		symbolFilterCache = [[NSMutableDictionary alloc] init];
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
-		parser = [[ViCommand alloc] init];
+		parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 		proxy = [[ViScriptProxy alloc] initWithObject:self];
 	}
 
 	return self;
 }
 
-- (ViCommand *)parser
+- (ViParser *)parser
 {
 	return parser;
 }

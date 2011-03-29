@@ -15,8 +15,7 @@
 	NSUInteger	 modifierMask;
 
 	/* used when matching keys */
-	unichar		 keycode;
-	unsigned int	 keyflags;
+	NSInteger	 keyCode;
 }
 
 @property(readonly) ViBundle *bundle;
@@ -26,10 +25,10 @@
 @property(readonly) ViMode mode;
 @property(readonly) NSString *keyEquivalent;
 @property(readonly) NSUInteger modifierMask;
-@property(readonly) unichar keycode;
-@property(readonly) unsigned int keyflags;
+@property(readonly) NSInteger keyCode;
 @property(readonly) NSString *tabTrigger;
 
-- (ViBundleItem *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle;
+- (ViBundleItem *)initFromDictionary:(NSDictionary *)dict
+                            inBundle:(ViBundle *)aBundle;
 
 @end

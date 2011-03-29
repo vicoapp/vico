@@ -290,9 +290,9 @@
 			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText
-			                                                                          environment:[[self delegate] environment]
-			                                                                               parser:parser];
+			ViCommandOutputController *oc = [[ViCommandOutputController alloc]
+			    initWithHTMLString:outputText
+			    environment:[[self delegate] environment]];
 			id<ViViewController> viewController = [[[self window] windowController] currentView];
 			if (viewController == nil) {
 				INFO(@"%s", "ouch, no current view!");

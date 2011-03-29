@@ -1,14 +1,14 @@
 #import "ViCommon.h"
-#import "ViCommand.h"
+#import "ViParser.h"
 
 @interface ViOutlineView : NSOutlineView
 {
 	ViMode mode;
-	ViCommand *parser;
+	ViParser *parser;
 }
 @end
 
 @interface NSObject (ViOutlineViewDelegateMethods)
 - (void)outlineView:(ViOutlineView *)outlineView
-    evaluateCommand:(ViCommand *)command;
+    evaluateCommand:(ViParser *)command;
 @end

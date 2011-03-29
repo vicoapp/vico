@@ -1,3 +1,4 @@
+#import "ViParser.h"
 #import "ViCommand.h"
 #import "ViTheme.h"
 #import "ViLanguage.h"
@@ -34,7 +35,13 @@
 {
 	// vi command parser
 	ViMode			 mode;
-	ViCommand		*parser; // XXX: pointer to [windowController parser] !!!
+	ViParser		*parser; // XXX: pointer to [windowController parser] !!!
+	NSTimer			*keyTimeout;
+
+	/* Command that entered insert mode. Used to set the inserted
+	 * text for the dot command. */
+	ViCommand		*lastEditCommand;
+
 	int			 insert_count;
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 handlingKey; // true while inside keyDown: method
@@ -59,6 +66,7 @@
 	NSRect			 oldCaretRect;
 	NSColor			*caretColor;
 
+	// XXX: actually _registers_
 	NSMutableDictionary	*buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
 
 	NSInteger		 saved_column;
@@ -84,7 +92,7 @@
 @property(readonly) ViScriptProxy *proxy;
 
 - (id <ViTextViewDelegate>)delegate;
-- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViCommand *)aParser;
+- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViParser *)aParser;
 - (ViTextStorage *)textStorage;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;

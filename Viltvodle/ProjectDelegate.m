@@ -1294,19 +1294,13 @@ doCommandBySelector:(SEL)aSelector
 /* syntax: [count]G */
 - (BOOL)goto_line:(ViCommand *)command
 {
-	unichar key = command.key;
-	int count = command.count;
-	if (!command.ismotion) {
-		count = command.motion_count;
-		key = command.motion_key;
-	}
-
 	NSInteger row = -1;
-	if (count > 0)
-		row = IMIN(count, [explorer numberOfRows]) - 1;
-	else if (key == 'G')
+	BOOL defaultToEOF = [command.mapping.parameter intValue];
+	if (command.count > 0)
+		row = IMIN(command.count, [explorer numberOfRows]) - 1;
+	else if (defaultToEOF)
 		row = [explorer numberOfRows] - 1;
-	else if (key == 'g')
+	else
 		row = 0;
 
 	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
@@ -1399,14 +1393,13 @@ doCommandBySelector:(SEL)aSelector
     evaluateCommand:(ViCommand *)command
 {
 	DEBUG(@"command is %@", command.method);
-	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
-	    (command.motion_method &&
-	     ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
+	if (![self respondsToSelector:command.action] ||
+	    (command.motion && ![self respondsToSelector:command.motion.action])) {
 		[windowController message:@"Command not implemented."];
 		return;
 	}
 
-	[self performSelector:NSSelectorFromString(command.method)
+	[self performSelector:command.action
 		   withObject:command];
 }
 

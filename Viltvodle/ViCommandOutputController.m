@@ -1,19 +1,22 @@
 #import "ViCommandOutputController.h"
+#import "ViParser.h"
 #import "logging.h"
 
 @implementation ViCommandOutputController
 
 @synthesize tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)content environment:(ExEnvironment *)environment parser:(ViCommand *)parser
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content
+                                      environment:(ExEnvironment *)environment
 {
 	self = [super init];
 	if (self)
 	{
 		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
 		[webView setEnvironment:environment];
-		[webView setParser:parser];
-		[[webView mainFrame] loadHTMLString:content baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
+		[webView setParser:[[ViParser alloc] initWithDefaultMap:[ViMap normalMap]]];
+		[[webView mainFrame] loadHTMLString:content
+					    baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	}
 	return self;
 }

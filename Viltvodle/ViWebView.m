@@ -1,7 +1,8 @@
 #import "ViWebView.h"
 #import "ViCommon.h"
 #import "ViWindowController.h"
-#import "logging.h"
+#import "NSEvent-keyAdditions.h"
+#include "logging.h"
 
 @implementation ViWebView
 
@@ -24,14 +25,15 @@
 
 - (BOOL)evaluateCommand:(ViCommand *)command
 {
-	if (![self respondsToSelector:NSSelectorFromString(command.method)] ||
-	    (command.motion_method && ![self respondsToSelector:NSSelectorFromString(command.motion_method)])) {
+	if (![self respondsToSelector:command.action] ||
+	    (command.motion && ![self respondsToSelector:command.motion.action])) {
 		[environment message:@"Command not implemented."];
 		return NO;
 	}
 
-	DEBUG(@"perform command %@", command.method);
-	BOOL ok = (NSUInteger)[self performSelector:NSSelectorFromString(command.method) withObject:command];
+	DEBUG(@"perform command %@", command);
+	BOOL ok = (NSUInteger)[self performSelector:command.action
+					 withObject:command];
 
 	if (ok)	// erase any previous message
 		[environment message:@""];
@@ -46,15 +48,9 @@
         [[[self window] windowController] selectTabAtIndex:arg];
 }
 
-- (void)handleKey:(unichar)charcode flags:(unsigned int)flags
+- (void)keyDown:(NSEvent *)theEvent
 {
-	DEBUG(@"handle key '%C' w/flags 0x%04x", charcode, flags);
-
-	if (parser.partial && (flags & ~NSNumericPadKeyMask) != 0) {
-		[environment message:@"Vi command interrupted by key equivalent."];
-		[parser reset];
-	}
-
+#if 0
 	/* Special handling of command-[0-9] to switch tabs. */
 	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
 		[self switch_tab:charcode - '0'];
@@ -65,69 +61,14 @@
 		DEBUG(@"unhandled key equivalent %C/0x%04X", charcode, flags);
 		return;
 	}
+#endif
 
-	if (parser.complete)
-		[parser reset];
-
-	[parser pushKey:charcode];
-	if (parser.complete)
-		[self evaluateCommand:parser];
-}
-
-- (void)keyDown:(NSEvent *)theEvent
-{
-	
-	// XXX: can we move this to a category on NSEvent, please?
-
-	// http://sigpipe.macromates.com/2005/09/24/deciphering-an-nsevent/
-	// given theEvent (NSEvent*) figure out what key 
-	// and modifiers we actually want to look at, 
-	// to compare it with a menu key description
- 
-	NSUInteger quals = [theEvent modifierFlags];
-
-	NSString *str = [theEvent characters];
-	NSString *strWithout = [theEvent charactersIgnoringModifiers];
-
-	unichar ch = [str length] ? [str characterAtIndex:0] : 0;
-	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
-
-	if (!(quals & NSNumericPadKeyMask)) {
-		if (quals & NSControlKeyMask) {
-			if (ch < 0x20)
-				quals &= ~NSControlKeyMask;
-			else
-				ch = without;
-		} else if (quals & NSAlternateKeyMask) {
-			if (0x20 < ch && ch < 0x7f && ch != without)
-				quals &= ~NSAlternateKeyMask;
-			else
-				ch = without;
-		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
-			ch = without;
-
-		if ((0x20 < ch && ch < 0x7f) || ch == 0x19)
-			quals &= ~NSShiftKeyMask;
-	}
- 
-	// the resulting values
-	unichar key = ch;
-	unsigned int modifiers = quals & (NSNumericPadKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
-
-	DEBUG(@"key = %C (0x%04x), shift = %s, control = %s, alt = %s, command = %s",
-	    key, key,
-	    (modifiers & NSShiftKeyMask) ? "YES" : "NO",
-	    (modifiers & NSControlKeyMask) ? "YES" : "NO",
-	    (modifiers & NSAlternateKeyMask) ? "YES" : "NO",
-	    (modifiers & NSCommandKeyMask) ? "YES" : "NO"
-	);
-
-//	[super keyDown:theEvent];
-//	DEBUG(@"done interpreting key events, inserted key = %s", insertedKey ? "YES" : "NO");
-
-//	if (!insertedKey && ![self hasMarkedText])
-		[self handleKey:key flags:modifiers];
-//	insertedKey = NO;
+	ViCommand *command = [parser pushKey:[theEvent normalizedKeyCode]
+				       scope:nil
+				     timeout:nil
+				       error:nil];
+	if (command)
+		[self evaluateCommand:command];
 }
 
 - (BOOL)window_left:(ViCommand *)command
@@ -252,21 +193,27 @@
 }
 
 /* syntax: [count]G */
+/* syntax: [count]gg */
 - (BOOL)goto_line:(ViCommand *)command
 {
 	int count = command.count;
+	BOOL defaultToEOF = [command.mapping.parameter intValue];
 
 	NSScrollView *scrollView = [[[[self mainFrame] frameView] documentView] enclosingScrollView];
-	if (count == 1 || (count == 0 && command.key == 'g')) {
+	if (count == 1 ||
+	    (count == 0 && !defaultToEOF)) {
 		/* goto first line */
 		[[scrollView documentView] scrollPoint:NSMakePoint(0, 0)];
 	} else if (count == 0) {
 		/* goto last line */
 		NSRect bounds = [[scrollView contentView] bounds];
 		NSRect docBounds = [[scrollView documentView] bounds];
-		[[scrollView documentView] scrollPoint:NSMakePoint(0, IMAX(0, docBounds.size.height - bounds.size.height))];
+		NSPoint p = NSMakePoint(0,
+		    IMAX(0, docBounds.size.height - bounds.size.height));
+		[[scrollView documentView] scrollPoint:p];
 	} else {
-		[environment message:@"unsupported count for G command"];
+		[environment message:@"unsupported count for %@ command",
+		    command.mapping.keyString];
 		return NO;
 	}
 

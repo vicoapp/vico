@@ -21,7 +21,7 @@
 - (void)setUp
 {
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
-	parser = [[ViCommand alloc] init];
+	parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 	[[vi layoutManager] replaceTextStorage:[[ViTextStorage alloc] init]];
 	[vi initEditorWithDelegate:nil viParser:parser];
 }
@@ -214,11 +214,10 @@
 - (void)test207_RepeatMoveBackwardToChar	{ MOVE(@"abc abc abc", 7, @"Fa;", 0); }
 - (void)test208_RepeatOtherDirection		{ MOVE(@"abc abc abc", 0, @"fa;,", 4); }
 
-// This doesn't work:
-// - (void)test210_FindForward			{ MOVE(@"abc def ghi", 0, @"/g\n", 8); }
+// - (void)test210_FindForward			{ MOVE(@"abc def ghi", 0, @"/g<cr>", 8); }
 
-- (void)test220_ChangeWordAtEnd			{ TEST(@"apa", 0, @"cwb\x1b", @"b", 0); }
-- (void)test220_ChangeWordAndRepeatNearEnd	{ TEST(@"apa\napa", 0, @"cwb\x1bj.", @"b\nb", 2); }
+- (void)test220_ChangeWordAtEnd			{ TEST(@"apa", 0, @"cwb<esc>", @"b", 0); }
+- (void)test220_ChangeWordAndRepeatNearEnd	{ TEST(@"apa\napa", 0, @"cwb<esc>j.", @"b\nb", 2); }
 
 - (void)test230_UpperCaseWord			{ TEST(@"abc def ghi", 0, @"gUw", @"ABC def ghi", 0); }
 - (void)test231_UpperCaseTwoWords		{ TEST(@"abc def ghi", 0, @"2gUw", @"ABC DEF ghi", 0); }
@@ -226,11 +225,11 @@
 - (void)test233_LowerCaseTwoWords		{ TEST(@"ABC DEF GHI", 0, @"2guw", @"abc def GHI", 0); }
 - (void)test234_UpperCaseUnicode		{ TEST(@"ÅäöéÉ", 0, @"gUU", @"ÅÄÖÉÉ", 0); }
 
-- (void)test240_InsertMultipliedText		{ TEST(@"", 0, @"5ix\x1b", @"xxxxx", 4); }
-- (void)test241_InsertMultipliedText2		{ TEST(@"", 0, @"5iabc\x1b", @"abcabcabcabcabc", 14); }
-- (void)test242_InsertMultipliedText3		{ TEST(@"", 0, @"ix\x1b""4.", @"xxxxx", 3); }
-- (void)test243_RepeatInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b.", @"xbbbbbbbbbb", 10); }
-- (void)test244_RepeatTwiceInsertMultipliedText	{ TEST(@"x", 0, @"5ab\x1b..", @"xbbbbbbbbbbbbbbb", 15); }
+- (void)test240_InsertMultipliedText		{ TEST(@"", 0, @"5ix<esc>", @"xxxxx", 4); }
+- (void)test241_InsertMultipliedText2		{ TEST(@"", 0, @"5iabc<esc>", @"abcabcabcabcabc", 14); }
+- (void)test242_InsertMultipliedText3		{ TEST(@"", 0, @"ix<esc>""4.", @"xxxxx", 3); }
+- (void)test243_RepeatInsertMultipliedText	{ TEST(@"x", 0, @"5ab<esc>.", @"xbbbbbbbbbb", 10); }
+- (void)test244_RepeatTwiceInsertMultipliedText	{ TEST(@"x", 0, @"5ab<esc>..", @"xbbbbbbbbbbbbbbb", 15); }
 //- (void)test245_OpenWithMultipliedText		{ TEST(@"abc\n", 1, @"3Odef\x1b", @"def\ndef\ndef\nabc\n", 10); }
 
 @end

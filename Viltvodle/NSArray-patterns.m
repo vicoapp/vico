@@ -51,5 +51,17 @@
 	return foundScopeSelector;
 }
 
+- (BOOL)hasPrefix:(NSArray *)otherArray
+{
+	if ([self count] < [otherArray count])
+		return NO;
+
+	for (NSUInteger i = 0; i < [otherArray count]; i++)
+		if (![[self objectAtIndex:i] isEqual:[otherArray objectAtIndex:i]])
+			return NO;
+
+	return YES;
+}
+
 @end
 

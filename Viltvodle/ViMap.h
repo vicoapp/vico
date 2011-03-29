@@ -7,6 +7,7 @@
 @interface ViMapping : NSObject
 {
 	NSArray *keySequence;
+	NSString *keyString;
 	NSString *scopeSelector;
 
 	SEL action;

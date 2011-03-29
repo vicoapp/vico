@@ -10,7 +10,6 @@
 @synthesize motion;
 @synthesize text;
 @synthesize isLineMode;
-@synthesize isMotion;
 @synthesize operator;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping

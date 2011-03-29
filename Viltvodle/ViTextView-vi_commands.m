@@ -306,9 +306,10 @@
 	 * Adjust the start/end location to include the begin/end match.
 	 * Do this when % is used as motion component in a non-line-oriented editing command.
 	 */
-	if (command.action == @selector(delete:) ||
-	    command.action == @selector(change:) ||
-	    command.action == @selector(yank:)) {
+	if (command.hasOperator &&
+	    (command.operator.action == @selector(delete:) ||
+	     command.operator.action == @selector(change:) ||
+	     command.operator.action == @selector(yank:))) {
 		if (delta == 1)
 			end_location++;
 		else

@@ -262,7 +262,7 @@
 (emap setKey:"o" toAction:"switch_open:")
 (emap setKey:"s" toAction:"split_open:")
 (emap setKey:"t" toAction:"tab_open:")
-(emap setKey:"s" toAction:"vsplit_open:")
+(emap setKey:"v" toAction:"vsplit_open:")
 (emap setKey:"/" toMotion:"find:")
 
 

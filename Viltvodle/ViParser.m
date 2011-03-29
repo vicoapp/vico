@@ -202,7 +202,7 @@
 	}
 
 	/* XXX: this makes it impossible to map " (but who would want to?) */
-	if (singleKey == '"') {
+	if (singleKey == '"' && [map acceptsCounts]) {
 		/* Expecting a register. */
 		if (state == ViParserInitialState) {
 			state = ViParserNeedRegister;

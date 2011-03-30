@@ -1502,6 +1502,9 @@ int logIndent = 0;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
+	if ([[self window] firstResponder] != self)
+		return NO;
+
 	[keyTimeout invalidate];
 	DEBUG(@"got key equivalent event %p = %@", theEvent, theEvent);
 	BOOL partial = parser.partial;
@@ -1557,7 +1560,7 @@ int logIndent = 0;
 
 	if (keyCode == -1) {
 		if (outError)
-			*outError = [ViError errorWithFormat:@"Interal error."];
+			*outError = [ViError errorWithFormat:@"Internal error."];
 		return NO;
 	}
 

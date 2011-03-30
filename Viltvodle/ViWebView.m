@@ -47,7 +47,8 @@
 	[environment message:@"%@", keyString];
 }
 
-- (void)presentViError:(NSError *)error
+- (void)keyManager:(ViKeyManager *)aKeyManager
+      presentError:(NSError *)error
 {
 	[environment message:@"%@", [error localizedDescription]];
 }

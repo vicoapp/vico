@@ -77,6 +77,7 @@ FEATURES
   * close others
 * gq<motion> = reformat through 'formatprg' (ship with par)
 * dynamic headIndent paragraph style dependent on line indentation
+* cdpath setting? looked at by :edit
 
 
 LONG TERM FEATURES

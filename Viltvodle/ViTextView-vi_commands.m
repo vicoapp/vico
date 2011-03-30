@@ -919,7 +919,7 @@
 /* syntax: [count]; */
 - (BOOL)repeat_line_search_forward:(ViCommand *)command
 {
-	ViCommand *c = [parser.last_ftFT_command dotCopy];
+	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
 	if (c == nil) {
 		[[self delegate] message:@"No previous F, f, T or t search"];
 		return NO;
@@ -943,7 +943,7 @@
 /* syntax: [count], */
 - (BOOL)repeat_line_search_backward:(ViCommand *)command
 {
-	ViCommand *c = [parser.last_ftFT_command dotCopy];
+	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
 	if (c == nil) {
 		[[self delegate] message:@"No previous F, f, T or t search"];
 		return NO;
@@ -1620,8 +1620,8 @@
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		parser.last_search_pattern = pattern;
-		parser.last_search_options = options;
+		keyManager.parser.last_search_pattern = pattern;
+		keyManager.parser.last_search_options = options;
 		return [self findPattern:pattern options:options];
 	}
 	return NO;

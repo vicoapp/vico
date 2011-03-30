@@ -11,6 +11,7 @@
 #import "ViCommon.h"
 #import "ViTextStorage.h"
 #import "ViScriptProxy.h"
+#import "ViKeyManager.h"
 
 @class ViDocumentView;
 @class ViWindowController;
@@ -33,16 +34,13 @@
 
 @interface ViTextView : NSTextView <ViSnippetDelegate>
 {
-	// vi command parser
 	ViMode			 mode;
-	ViParser		*parser; // XXX: pointer to [windowController parser] !!!
-	NSTimer			*keyTimeout;
+	ViKeyManager		*keyManager;
 
 	/* Command that entered insert mode. Used to set the inserted
 	 * text for the dot command. */
 	ViCommand		*lastEditCommand;
 
-	int			 insert_count;
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input

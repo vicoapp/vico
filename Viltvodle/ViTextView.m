@@ -21,9 +21,6 @@ int logIndent = 0;
 @interface ViTextView (private)
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
-- (void)handleKeys:(NSArray *)keys;
-- (void)handleKey:(NSInteger)keyCode;
-- (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError;
 - (BOOL)evaluateCommand:(ViCommand *)command;
 - (void)switch_tab:(int)arg;
 - (BOOL)normal_mode:(ViCommand *)command;
@@ -44,10 +41,12 @@ int logIndent = 0;
 	[self setDelegate:aDelegate];
 	[self setCaret:0];
 
+	keyManager = [[ViKeyManager alloc] initWithTarget:self
+					       parser:aParser];
+
 	undoManager = [[self delegate] undoManager];
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
-	parser = aParser;
 	inputKeys = [NSMutableArray array];
 	marks = [NSMutableDictionary dictionary];
 	saved_column = -1;
@@ -146,9 +145,9 @@ int logIndent = 0;
 	if (toIndex == NSNotFound)
 		return;
 
-	if (parser.partial) {
+	if (keyManager.parser.partial) {
 		[[self delegate] message:@"Vi command interrupted."];
-		[parser reset];
+		[keyManager.parser reset];
 	}
 
 	visual_start_location = fromIndex;
@@ -162,17 +161,17 @@ int logIndent = 0;
 
 - (void)copy:(id)sender
 {
-	[self handleKeys:[@"\"+y" keyCodes]];
+	[keyManager handleKeys:[@"\"+y" keyCodes]];
 }
 
 - (void)paste:(id)sender
 {
-	[self handleKeys:[@"\"+P" keyCodes]];
+	[keyManager handleKeys:[@"\"+P" keyCodes]];
 }
 
 - (void)cut:(id)sender
 {
-	[self handleKeys:[@"\"+x" keyCodes]];
+	[keyManager handleKeys:[@"\"+x" keyCodes]];
 }
 
 - (id <ViTextViewDelegate>)delegate
@@ -763,16 +762,16 @@ int logIndent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
-	parser.last_search_pattern = pattern;
-	parser.last_search_options = 0;
+	keyManager.parser.last_search_pattern = pattern;
+	keyManager.parser.last_search_options = 0;
 	if ([self findPattern:pattern options:0])
 		[self setCaret:final_location];
 }
 
 - (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
-	parser.last_search_pattern = pattern;
-	parser.last_search_options = ViSearchOptionBackwards;
+	keyManager.parser.last_search_pattern = pattern;
+	keyManager.parser.last_search_options = ViSearchOptionBackwards;
 	if ([self findPattern:pattern options:ViSearchOptionBackwards])
 		[self setCaret:final_location];
 }
@@ -804,25 +803,25 @@ int logIndent = 0;
 /* syntax: n */
 - (BOOL)repeat_find:(ViCommand *)command
 {
-	NSString *pattern = parser.last_search_pattern;
+	NSString *pattern = keyManager.parser.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	return [self findPattern:pattern options:parser.last_search_options];
+	return [self findPattern:pattern options:keyManager.parser.last_search_options];
 }
 
 /* syntax: N */
 - (BOOL)repeat_find_backward:(ViCommand *)command
 {
-	NSString *pattern = parser.last_search_pattern;
+	NSString *pattern = keyManager.parser.last_search_pattern;
 	if (pattern == nil) {
 		[[self delegate] message:@"No previous search pattern"];
 		return NO;
 	}
 
-	int options = parser.last_search_options;
+	int options = keyManager.parser.last_search_options;
 	if (options & ViSearchOptionBackwards)
 		options &= ~ViSearchOptionBackwards;
 	else
@@ -1007,12 +1006,10 @@ int logIndent = 0;
 			int count = IMAX(1, command.count);
 			int i;
 			for (i = 0; i < count; i++)
-				[self handleKeys:command.text];
-			insert_count = 0;
+				[keyManager handleKeys:command.text];
 			[self normal_mode:command];
 			replayingInput = NO;
-		} else
-			insert_count = command.count;
+		}
 	}
 }
 
@@ -1254,7 +1251,7 @@ int logIndent = 0;
 			 * Remember the typed keys so we can repeat it
 			 * with the dot command.
 			 */
-			[command setText:inputKeys];
+			[lastEditCommand setText:inputKeys];
 
 			/*
 			 * A count given to the command that started insert
@@ -1267,7 +1264,7 @@ int logIndent = 0;
 			if (count > 1) {
 				replayingInput = YES;
 				for (int i = 1; i < count; i++)
-					[self handleKeys:inputKeys];
+					[keyManager handleKeys:inputKeys];
 				replayingInput = NO;
 			}
 		}
@@ -1284,26 +1281,27 @@ int logIndent = 0;
 	return YES;
 }
 
-- (BOOL)evaluateCommand:(ViCommand *)command
+- (void)keyManager:(ViKeyManager *)keyManager
+   evaluateCommand:(ViCommand *)command
 {
 	if (mode != ViInsertMode)
 		[self endUndoGroup];
 
 	if (![command.mapping isAction]) {
 		[[self delegate] message:@"Macros not implemented."];
-		return NO;
+		return;
 	}
 
 	if (![self respondsToSelector:command.action]) {
 		[[self delegate] message:@"Command %@ not implemented.",
 		    command.mapping.keyString];
-		return NO;
+		return;
 	}
 
 	if (command.motion && ![self respondsToSelector:command.motion.action]) {
 		[[self delegate] message:@"Motion command %@ not implemented.",
 		    command.motion.mapping.keyString];
-		return NO;
+		return;
 	}
 
 	/* Default start- and end-location is the current location. */
@@ -1333,7 +1331,7 @@ int logIndent = 0;
 		if (![self performSelector:command.motion.action
 			        withObject:command.motion])
 			/* the command failed */
-			return NO;
+			return;
 	}
 
 	/* Find out the affected range for this command. */
@@ -1451,8 +1449,6 @@ int logIndent = 0;
 		    (unsigned long)[self currentColumn],
 		    modestr]];
 	}
-
-	return ok;
 }
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
@@ -1484,7 +1480,7 @@ int logIndent = 0;
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
 		for (i = 0; i < [string length]; i++)
-			[self handleKey:[string characterAtIndex:i]];
+			[keyManager handleKey:[string characterAtIndex:i]];
 		insertedKey = YES;
 	}
 }
@@ -1494,29 +1490,33 @@ int logIndent = 0;
 	DEBUG(@"selector = %s", aSelector);
 }
 
+- (void)keyManager:(ViKeyManager *)aKeyManager
+      presentError:(NSError *)error
+{
+	[[self delegate] message:@"%@", [error localizedDescription]];
+}
+
+- (void)keyManager:(ViKeyManager *)aKeyManager
+  partialKeyString:(NSString *)keyString
+{
+	[[self delegate] message:@"%@", keyString];
+}
+
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
+	DEBUG(@"got key equivalent event %p = %@", theEvent, theEvent);
+
 	if ([[self window] firstResponder] != self)
 		return NO;
 
-	[keyTimeout invalidate];
-	BOOL partial = parser.partial;
-	NSError *error = nil;
-	if (![self handleKey:[theEvent normalizedKeyCode] error:&error]) {
-		if (!partial && [error code] == ViErrorMapNotFound)
-			return NO;
-		[[self delegate] message:@"%@", [error localizedDescription]];
-	}
-
-	return YES;
+	return [keyManager performKeyEquivalent:theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
 	DEBUG(@"got keyDown event: %p = %@", theEvent, theEvent);
 
-	[keyTimeout invalidate];
-
+#if 0
 	NSResponder *r = [[self window] firstResponder];
 	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
 		/* Pass the (generated) event to the ex command line. */
@@ -1524,9 +1524,7 @@ int logIndent = 0;
 		[r keyDown:theEvent];
 		return;
 	}
-
-//	[proxy emit:@"keyDown" with:self, key, nil];
-	[[self delegate] message:@""];
+#endif
 
 	handlingKey = YES;
 	[super keyDown:theEvent];
@@ -1536,106 +1534,45 @@ int logIndent = 0;
 
 	if (!insertedKey && ![self hasMarkedText]) {
 		DEBUG(@"decoding event %@", theEvent);
-		[self handleKey:[theEvent normalizedKeyCode]];
+		[keyManager keyDown:theEvent];
 	}
 	insertedKey = NO;
 }
 
-- (void)handleKeys:(NSArray *)keys
+- (BOOL)keyManager:(ViKeyManager *)aKeyManager
+    shouldParseKey:(NSInteger)keyCode
 {
-	for (NSNumber *n in keys)
-		[self handleKey:[n integerValue]];
-}
-
-- (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError
-{
-	DEBUG(@"handle key 0x%04x (%@)", keyCode, [NSString stringWithKeyCode:keyCode]);
-
-	if (keyCode == -1) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Internal error."];
-		return NO;
-	}
-
 	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
 		/* Add the key to the input replay queue. */
 		[inputKeys addObject:[NSNumber numberWithInteger:keyCode]];
 	}
+
+//	[proxy emit:@"keyDown" with:self, keyCode, nil];
 
 	/*
 	 * Find and perform bundle commands. Show a menu with commands
 	 * if multiple matches found.
 	 * FIXME: should this be part of the key replay queue?
 	 */
-	if (!parser.partial) {
+	if (!keyManager.parser.partial) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
 		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKeyCode:keyCode
 								     matchingScopes:scopes
 									     inMode:mode];
 		if ([matches count] > 0) {
 			[self performBundleItems:matches];
-			return YES;
+			return NO; /* We already handled the key */
 		}
 	}
 
-	// XXX: any chance we can do this with a map action again?
-	if (keyCode == 0x1B) {
-		[parser reset];
-		final_location = [self caret];
-		[self normal_mode:lastEditCommand];
-		[self endUndoGroup];
-		[self deselectSnippet];
-		return YES;
-	}
-
-	if (!parser.partial) {
+	if (!keyManager.parser.partial) {
 		if (mode == ViVisualMode)
-			[parser setVisualMap];
+			[keyManager.parser setVisualMap];
 		else if (mode == ViInsertMode)
-			[parser setInsertMap];
-	}
-
-	NSError *error = nil;
-	BOOL timeout = NO;
-	ViCommand *command = [parser pushKey:keyCode
-				       scope:[self scopesAtLocation:[self caret]]
-				     timeout:&timeout
-				       error:&error];
-	if (command) {
-		[self evaluateCommand:command];
-	} else if (error) {
-		if (outError)
-			*outError = error;
-		return NO;
-	} else {
-		[[self delegate] message:@"%@", [parser keyString]];
-		if (timeout)
-			keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
-								       target:self
-								     selector:@selector(keyTimedOut:)
-								     userInfo:nil
-								      repeats:NO];
+			[keyManager.parser setInsertMap];
 	}
 
 	return YES;
-}
-
-- (void)handleKey:(NSInteger)keyCode
-{
-	NSError *error = nil;
-	if (![self handleKey:keyCode error:&error] && error)
-		[[self delegate] message:@"%@", [error localizedDescription]];
-}
-
-- (void)keyTimedOut:(id)sender
-{
-	NSError *error = nil;
-	ViCommand *command = [parser timeoutInScope:[self scopesAtLocation:[self caret]]
-					      error:&error];
-	if (command) {
-		[self evaluateCommand:command];
-	} else if (error)
-		[[self delegate] message:@"%@", [error localizedDescription]];
 }
 
 - (void)swipeWithEvent:(NSEvent *)event
@@ -1659,42 +1596,6 @@ int logIndent = 0;
 		[[self delegate] message:@""]; // erase any previous message
 }
 
-#if 0
-- (NSEvent *)eventForCharacter:(unichar)ch flags:(NSUInteger)flags
-{
-	unichar without = ch;
-
-	NSString *s = [NSString stringWithFormat:@"%C", without];
-
-	if (flags == NSControlKeyMask && tolower(ch) >= 'a' && tolower(ch) < 'z')
-		ch = tolower(ch) - 'a' + 1;
-
-	/* Are we uppercased? If so, add shift. */
-	if ([s isEqualToString:[s uppercaseString]] &&
-	    ![s isEqualToString:[s lowercaseString]]) {
-		flags |= NSShiftKeyMask;
-		without = tolower(without);
-	}
-
-	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
-				       location:NSMakePoint(0, 0)
-				  modifierFlags:flags
-				      timestamp:[[NSDate date] timeIntervalSinceNow]
-				   windowNumber:0
-					context:[NSGraphicsContext currentContext]
-				     characters:[NSString stringWithFormat:@"%C", ch]
-		    charactersIgnoringModifiers:[NSString stringWithFormat:@"%C", without]
-				      isARepeat:NO
-					keyCode:ch];
-	return ev;
-}
-
-- (NSEvent *)eventForCharacter:(unichar)ch
-{
-	return [self eventForCharacter:ch flags:0];
-}
-#endif
-
 /* Takes a string of characters and creates key events for each one.
  * Then feeds them into the keyDown method to simulate key presses.
  */
@@ -1705,7 +1606,7 @@ int logIndent = 0;
 		INFO(@"invalid key sequence: %@", inputString);
 		return;
 	}
-	[self handleKeys:keys];
+	[keyManager handleKeys:keys];
 }
 
 #pragma mark -
@@ -1887,9 +1788,9 @@ int logIndent = 0;
 
 - (IBAction)performNormalModeMenuItem:(id)sender
 {
-	if (parser.partial) {
+	if (keyManager.parser.partial) {
 		[[[self delegate] nextRunloop] message:@"Vi command interrupted."];
-		[parser reset];
+		[keyManager.parser reset];
 	}
 
 	ViCommandMenuItemView *view = (ViCommandMenuItemView *)[sender view];

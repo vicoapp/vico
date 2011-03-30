@@ -5,20 +5,31 @@
 
 @implementation ViKeyManager
 
+@synthesize parser;
+
 - (ViKeyManager *)initWithTarget:(id)aTarget
-                      defaultMap:(ViMap *)map
+                          parser:(ViParser *)aParser
 {
 	if ((self = [super init]) != nil) {
-		parser = [[ViParser alloc] initWithDefaultMap:map];
+		parser = aParser;
 		target = aTarget;
 	}
 	return self;
 }
 
-- (void)presentViError:(NSError *)error
+- (ViKeyManager *)initWithTarget:(id)aTarget
+                      defaultMap:(ViMap *)map
 {
-	if ([target respondsToSelector:@selector(presentViError:)])
-		[target performSelector:@selector(presentViError:) withObject:error];
+	return [self initWithTarget:aTarget
+			     parser:[[ViParser alloc] initWithDefaultMap:map]];
+}
+
+- (void)presentError:(NSError *)error
+{
+	if ([target respondsToSelector:@selector(keyManager:presentError:)])
+		[target performSelector:@selector(keyManager:presentError:)
+			     withObject:self
+			     withObject:error];
 }
 
 - (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError
@@ -29,6 +40,20 @@
 		if (outError)
 			*outError = [ViError errorWithFormat:@"Internal error."];
 		return NO;
+	}
+
+	SEL shouldSel = @selector(keyManager:shouldParseKey:);
+	if ([target respondsToSelector:shouldSel]) {
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
+		    [target methodSignatureForSelector:shouldSel]];
+		[invocation setSelector:shouldSel];
+		[invocation setArgument:&self atIndex:2];
+		[invocation setArgument:&keyCode atIndex:3];
+		[invocation invokeWithTarget:target];
+		BOOL shouldRet;
+		[invocation getReturnValue:&shouldRet];
+		if (shouldRet == NO)
+			return YES; /* target handled the key already */
 	}
 
 	NSError *error = nil;
@@ -66,7 +91,13 @@
 {
 	NSError *error = nil;
 	if (![self handleKey:keyCode error:&error] && error)
-		[self presentViError:error];
+		[self presentError:error];
+}
+
+- (void)handleKeys:(NSArray *)keys
+{
+	for (NSNumber *n in keys)
+		[self handleKey:[n integerValue]];
 }
 
 - (void)keyTimedOut:(id)sender
@@ -79,7 +110,7 @@
 				     withObject:self
 				     withObject:command];
 	} else if (error)
-		[self presentViError:error];
+		[self presentError:error];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
@@ -89,7 +120,7 @@
 	if (![self handleKey:[theEvent normalizedKeyCode] error:&error]) {
 		if (!partial && [error code] == ViErrorMapNotFound)
 			return NO;
-		[self presentViError:error];
+		[self presentError:error];
 	}
 
 	return YES;

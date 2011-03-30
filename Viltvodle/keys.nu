@@ -40,7 +40,8 @@
 (cmap setKey:"<cmd-9>" toMotion:"switch_tab:" flags:0 parameter:8 scope:nil)
 (cmap setKey:"<cmd-0>" toMotion:"switch_tab:" flags:0 parameter:9 scope:nil)
 (cmap setKey:"<c-P>" toMotion:"show_scope:")
-(cmap setKey:"<c-esc>" toMotion:"show_bundle_menu:")
+(cmap setKey:"<ctrl-esc>" toMotion:"show_bundle_menu:")
+(cmap setKey:"<cmd-esc>" toMotion:"show_bundle_menu:")
 
 
 ;; insert map

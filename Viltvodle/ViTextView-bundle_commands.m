@@ -324,10 +324,11 @@
 			[self insertSnippet:outputText
 			         fromBundle:[command bundle]
 			            inRange:r];
-		} else if ([outputFormat isEqualToString:@"openAsNewDocument"]) {
-			ViDocument *doc = [[ViDocumentController sharedDocumentController] splitVertically:NO
-												   andOpen:nil
-											orSwitchToDocument:nil];
+		} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
+		           [outputFormat isEqualToString:@"createNewDocument"]) {
+			ViDocument *doc = [[[self window] windowController] splitVertically:NO
+										    andOpen:nil
+									 orSwitchToDocument:nil];
 			[doc setString:outputText];
 		} else if ([outputFormat isEqualToString:@"discard"])
 			;

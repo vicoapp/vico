@@ -40,8 +40,6 @@
 			return nil;
 		}
 
-		keyEquivalent = [dict objectForKey:@"keyEquivalent"];
-
 		NSString *key = [dict objectForKey:@"keyEquivalent"];
 		if ([key length] > 0) {
 			NSRange r = NSMakeRange([key length] - 1, 1);
@@ -70,6 +68,8 @@
 				}
 			}
 
+			modifierMask = keyflags;
+
 			if (keyflags == NSControlKeyMask && keyCode >= 'a' && keyCode < '~') {
 				keyflags = 0;
 				keyCode = keyCode - 'a' + 1;
@@ -80,7 +80,7 @@
 				keyflags |= NSShiftKeyMask;
 
 			/* Same test as in keyDown: */
-			if ((0x20 < keyCode && keyCode < 0x7f) || keyCode == 0x19 || keyCode == 0x1E)
+			if ((0x20 < keyCode && keyCode < 0x7f) || keyCode == 0x1E)
 				keyflags &= ~NSShiftKeyMask;
 
 			keyCode |= keyflags;

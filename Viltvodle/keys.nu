@@ -70,7 +70,6 @@
 ;; and include it in the normal, operator and visual maps
 (set mmap (ViMap mapWithName:"motionMap"))
 (mmap include:amap)
-(mmap setKey:"<c-a>" toMotion:"find_current_word:")
 (mmap setKey:"<c-b>" toMotion:"backward_screen:")
 (mmap setKey:"<c-f>" toMotion:"forward_screen:")
 (mmap setKey:"<c-h>" toMotion:"move_left:")
@@ -152,6 +151,8 @@
 (nmap setOperatorMap:(ViMap operatorMap))
 (nmap include:cmap)
 (nmap include:mmap)
+(mmap setKey:"<c-a>" toEditAction:"increment:")
+(mmap setKey:"<c-x>" toEditAction:"decrement:")
 (nmap setKey:"<c-d>" toAction:"scroll_downward:")
 (nmap setKey:"<c-e>" toAction:"scroll_down_by_line:")
 (nmap setKey:"<c-i>" toAction:"jumplist_forward:")

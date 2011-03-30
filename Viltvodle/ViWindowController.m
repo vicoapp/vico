@@ -776,7 +776,6 @@ static ViWindowController	*currentWindowController = nil;
 		if ([(ViDocumentView *)viewController document] == document)
 			return;
 		previousDocument = [(ViDocumentView *)viewController document];
-		INFO(@"last doc is now %@", previousDocument);
 	}
 
 	[[self document] removeWindowController:self];

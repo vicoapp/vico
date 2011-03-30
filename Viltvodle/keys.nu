@@ -61,6 +61,7 @@
 (imap setKey:"<c-x>" toAction:"complete:")
 (imap setKey:"<Esc>" toAction:"normal_mode:")
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
+(imap map:"<cmd-v>" to:"\"+P")
 
 
 

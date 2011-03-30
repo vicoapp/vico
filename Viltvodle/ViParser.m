@@ -167,7 +167,7 @@
                timeout:(BOOL *)timeoutPtr
                  error:(NSError **)outError
 {
-	DEBUG(@"got key %@ in state %d", [NSString stringWithKeyCode:keyCode], state);
+	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], state);
 	
 	unichar singleKey = 0;
 	if ((keyCode & 0xFFFF0000) == 0)

@@ -231,6 +231,7 @@
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
 		9A5DD69A13430176006981AE /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
 		9A5DD69E134326A6006981AE /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
+		9A5DD6A013435F0D006981AE /* TestKeyCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69F13435F0D006981AE /* TestKeyCodes.m */; };
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* viltvodle.nu */; };
@@ -682,6 +683,7 @@
 		9A5DD69913430176006981AE /* ViKeyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViKeyManager.m; sourceTree = "<group>"; };
 		9A5DD69C134326A6006981AE /* ViRegisterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViRegisterManager.h; sourceTree = "<group>"; };
 		9A5DD69D134326A6006981AE /* ViRegisterManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViRegisterManager.m; sourceTree = "<group>"; };
+		9A5DD69F13435F0D006981AE /* TestKeyCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyCodes.m; sourceTree = "<group>"; };
 		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
 		9A5EE40013366DC0002E82B1 /* viltvodle.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = viltvodle.nu; sourceTree = "<group>"; };
 		9A9A63CB1339D0CA0053402A /* viltvodle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = viltvodle.icns; path = ../viltvodle.icns; sourceTree = "<group>"; };
@@ -812,6 +814,7 @@
 		9A2EF2B4133109C20023C5B7 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				9A5DD69F13435F0D006981AE /* TestKeyCodes.m */,
 				9AB10BAD1340BAE700D81D33 /* TestViMap.m */,
 				9A2EF2C713310AD70023C5B7 /* TestExCommand.m */,
 				9A2EF2C813310AD70023C5B7 /* TestScopeSelectors.m */,
@@ -1631,6 +1634,7 @@
 				9A2EF2D013310AD70023C5B7 /* TestViSnippet.m in Sources */,
 				9A2EF2D113310AD70023C5B7 /* TestViTextStorage.m in Sources */,
 				9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */,
+				9A5DD6A013435F0D006981AE /* TestKeyCodes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

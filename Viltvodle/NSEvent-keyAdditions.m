@@ -1,6 +1,9 @@
 #import "NSEvent-keyAdditions.h"
 #include "logging.h"
 
+/* I just wanted the Events.h header! */
+#import <Carbon/Carbon.h>
+
 @implementation NSEvent (keyAdditions)
 
 - (NSInteger)normalizedKeyCode
@@ -27,12 +30,25 @@
 	unichar ch = [str length] ? [str characterAtIndex:0] : 0;
 	unichar key = ch;
 	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
+	unsigned short keycode = [self keyCode];
 
 	DEBUG(@"decoding event %@", self);
+	DEBUG(@"ch = 0x%02x, without = 0x%02x, keycode = 0x%02x, flags = 0x%08x => s=%s, c=%s, a=%s, C=%s ",
+	    ch, without, keycode, quals,
+	    (quals & NSShiftKeyMask) ? "YES" : "NO",
+	    (quals & NSControlKeyMask) ? "YES" : "NO",
+	    (quals & NSAlternateKeyMask) ? "YES" : "NO",
+	    (quals & NSCommandKeyMask) ? "YES" : "NO"
+	);
+
+	if (ch == 0x19 && keycode == kVK_Tab) {
+		/* apparently shift-control-tab sends a ctrl-y on my keyboard */
+		ch = without = 0x09;
+	}
 
 	if (!(quals & NSNumericPadKeyMask)) {
 		if ((quals & NSControlKeyMask)) {
-			if (key < 0x20 && ((key != 0x1B && key != 0x0D && key != 0x09) || key != without) &&
+			if (key < 0x20 && ((key != 0x1B && key != 0x0D && key != 0x09 && key != 0x19) || key != without) &&
 			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)
 				/* only control pressed */
 				quals = 0;
@@ -46,7 +62,7 @@
 		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
 			key = without;
 
-		if ((0x20 < key && key < 0x7f) || key == 0x19 || key == 0x1E)
+		if ((0x20 < key && key < 0x7f) || key == 0x1E)
 			quals &= ~NSShiftKeyMask;
 	}
 

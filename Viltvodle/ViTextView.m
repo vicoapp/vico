@@ -1465,15 +1465,26 @@ int logIndent = 0;
 		string = aString;
 
 	DEBUG(@"string = [%@], len %i, replacementRange = %@",
-	    string, [(NSString *)string length], NSStringFromRange(replacementRange));
+	    string, [string length], NSStringFromRange(replacementRange));
 
 	if ([self hasMarkedText])
 		[self unmarkText];
 
+	/*
+	 * For some weird reason, ctrl-alt-a wants to insert the character 0x01.
+	 * We don't want that, but rather have the opportunity to map it.
+	 * If you want a real 0x01 (ctrl-a) in the text, type <ctrl-v><ctrl-a>.
+	 */
+	if ([string length] > 0) {
+		unichar ch = [string characterAtIndex:0];
+		if (ch < 0x20)
+			return;
+	}
+
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
-		for (i = 0; i < [(NSString *)string length]; i++)
-			[self handleKey:[(NSString *)string characterAtIndex:i]];
+		for (i = 0; i < [string length]; i++)
+			[self handleKey:[string characterAtIndex:i]];
 		insertedKey = YES;
 	}
 }

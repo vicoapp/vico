@@ -180,8 +180,10 @@
 			if ((key == 'f' || key == 'F') && [self scanInt:&f]) {
 				key = NSF1FunctionKey + f - 1;
 			} else if (modifiers == NSControlKeyMask &&
-			    (toupper(key) >= '@' && toupper(key) <= '_')) {
-				/* ASCII control character 0x00 - 0x20. */
+			    ((key >= 'a' && key <= 'z') ||
+			     key == '@' ||
+			     (key >= '[' && key <= '_'))) {
+				/* ASCII control character 0x00 - 0x1F. */
 				key = tolower(toupper(key) - '@');
 				modifiers = 0;
 			}

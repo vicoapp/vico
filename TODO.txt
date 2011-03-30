@@ -5,7 +5,6 @@ URGENT
 * fuzzy search feels *slow*
 * ZZ and ZQ + handle :q! (ie, don't ask)
   => how should we handle windows? quit the app completely?
-* ctrl-space seems to match all snippets
 
 BUGS
 ====
@@ -44,7 +43,6 @@ IMPORTANT
 * :edit! => revert
 * text objects
 * support a count in C and h commands
-* map ctrl-arrows and command-arrows, both in normal and insert mode
 * highlight caret after goto line
 * check if plists return expected classes (failed to parse?)
 * allow ex commands when there is no open document

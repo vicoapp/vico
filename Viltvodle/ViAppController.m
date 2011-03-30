@@ -37,8 +37,6 @@
 	self = [super init];
 	if (self) {
 		[NSApp setDelegate:self];
-		sharedBuffers = [[NSMutableDictionary alloc] init];
-
 		[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
 							  andSelector:@selector(getUrl:withReplyEvent:)
 							forEventClass:kInternetEventClass
@@ -188,11 +186,6 @@
 - (IBAction)showPreferences:(id)sender
 {
 	[[ViPreferencesController sharedPreferences] show];
-}
-
-- (NSMutableDictionary *)sharedBuffers
-{
-	return sharedBuffers;
 }
 
 extern BOOL makeNewWindowInsteadOfTab;
@@ -345,7 +338,7 @@ additionalBindings:(NSDictionary *)bindings
 				NSWindow *window = [[NSApplication sharedApplication] mainWindow];
 				NSResponder *target = [window firstResponder];
 				if ([target respondsToSelector:@selector(selectedRange)]) {
-					if ([target selectedRange].length > 0)
+					if ([(NSText *)target selectedRange].length > 0)
 						hasSelection = YES;
 				}
 

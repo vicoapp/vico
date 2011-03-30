@@ -14,6 +14,7 @@
 #import "NSScanner-additions.h"
 #import "NSEvent-keyAdditions.h"
 #import "ViError.h"
+#import "ViRegisterManager.h"
 
 int logIndent = 0;
 
@@ -47,7 +48,6 @@ int logIndent = 0;
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
 	parser = aParser;
-	buffers = [[NSApp delegate] sharedBuffers];
 	inputKeys = [NSMutableArray array];
 	marks = [NSMutableDictionary dictionary];
 	saved_column = -1;
@@ -160,38 +160,19 @@ int logIndent = 0;
 	[self setVisualSelection];
 }
 
-// FIXME: just alias as "*p
-- (void)paste:(id)sender
+- (void)copy:(id)sender
 {
-	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
-	[pasteBoard types];
-	NSString *string = [pasteBoard stringForType:NSStringPboardType];	
-	if ([string length] > 0) {
-		[self insertString:string atLocation:[self caret] undoGroup:NO];
-
-		NSUInteger eol;
-		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:[self caret]];
-		if ([self caret] + [string length] >= eol && mode == ViNormalMode)
-			[self setCaret:eol - 1];
-		else
-			[self setCaret:[self caret] + [string length]];
-	}
+	[self handleKeys:[@"\"+y" keyCodes]];
 }
 
-// FIXME: just alias as "*x
+- (void)paste:(id)sender
+{
+	[self handleKeys:[@"\"+p" keyCodes]];
+}
+
 - (void)cut:(id)sender
 {
-	NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
-	[pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
-	NSString *selection = [[[self textStorage] string] substringWithRange:[self selectedRange]];
-	[pasteBoard setString:selection forType:NSStringPboardType];
-
-	[[self textStorage] beginEditing];
-	[self cutToBuffer:0 append:NO range:[self selectedRange]];
-	[[self textStorage] endEditing];
-	[self endUndoGroup];
-
-	[self setCaret:[self selectedRange].location];
+	[self handleKeys:[@"\"+x" keyCodes]];
 }
 
 - (id <ViTextViewDelegate>)delegate
@@ -653,28 +634,19 @@ int logIndent = 0;
 }
 
 #pragma mark -
-#pragma mark Buffers
+#pragma mark Register
 
-- (void)yankToBuffer:(unichar)bufferName
-              append:(BOOL)appendFlag
-               range:(NSRange)yankRange
+- (void)yankToRegister:(unichar)regName
+                 range:(NSRange)yankRange
 {
-	// get the unnamed buffer
-	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if (buffer == nil)
-	{
-		buffer = [[NSMutableString alloc] init];
-		[buffers setObject:buffer forKey:@"unnamed"];
-	}
-
-	[buffer setString:[[[self textStorage] string] substringWithRange:yankRange]];
+	NSString *content = [[[self textStorage] string] substringWithRange:yankRange];
+	[[ViRegisterManager sharedManager] setContent:content ofRegister:regName];
 }
 
-- (void)cutToBuffer:(unichar)bufferName
-             append:(BOOL)appendFlag
-              range:(NSRange)cutRange
+- (void)cutToRegister:(unichar)regName
+                range:(NSRange)cutRange
 {
-	[self yankToBuffer:bufferName append:appendFlag range:cutRange];
+	[self yankToRegister:regName range:cutRange];
 	[self deleteRange:cutRange undoGroup:YES];
 }
 
@@ -1146,9 +1118,11 @@ int logIndent = 0;
 {
 	NSArray *keys = command.mapping.keySequence;
 	NSInteger keyCode = [[keys lastObject] integerValue];
-	if ([keys count] > 1 || (keyCode & 0xFFFF0000) != 0)
+	if ([keys count] > 1 || (keyCode & 0xFFFF0000) != 0) {
 		[[self delegate] message:@"Can't insert key equivalent: %@.",
 		    [NSString stringWithKeySequence:keys]];
+		return NO;
+	}
 
 	if (keyCode < 0x20) {
 		[[self delegate] message:@"Illegal character; quote to enter"];
@@ -1585,28 +1559,6 @@ int logIndent = 0;
 		}
 	}
 
-#if 0
-	/* Special handling of control-escape. */
-	if (flags == NSControlKeyMask && charcode == 0x1B) {
-		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
-		                                                inTextContainer:[self textContainer]].origin;
-		NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
-					       location:[self convertPoint:point toView:nil]
-					  modifierFlags:0
-					      timestamp:[[NSDate date] timeIntervalSinceNow]
-					   windowNumber:[[self window] windowNumber]
-						context:[NSGraphicsContext currentContext]
-					     characters:@"\x1B"
-			    charactersIgnoringModifiers:@"\x1B"
-					      isARepeat:NO
-					        keyCode:0x1B];
-		showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
-		[self rightMouseDown:ev];
-		showingContextMenu = NO;
-		return;
-	}
-#endif
-
 	// XXX: any chance we can do this with a map action again?
 	if (keyCode == 0x1B) {
 		[parser reset];
@@ -1692,10 +1644,9 @@ int logIndent = 0;
 		[[self delegate] message:@""]; // erase any previous message
 }
 
-
+#if 0
 - (NSEvent *)eventForCharacter:(unichar)ch flags:(NSUInteger)flags
 {
-	unichar orig = ch;
 	unichar without = ch;
 
 	NSString *s = [NSString stringWithFormat:@"%C", without];
@@ -1709,9 +1660,6 @@ int logIndent = 0;
 		flags |= NSShiftKeyMask;
 		without = tolower(without);
 	}
-
-	DEBUG(@"generated key 0x%04x / 0x%04x, flags 0x%04x from char %C (0x%04x)",
-	    ch, without, flags, orig, orig);
 
 	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
 				       location:NSMakePoint(0, 0)
@@ -1730,6 +1678,7 @@ int logIndent = 0;
 {
 	return [self eventForCharacter:ch flags:0];
 }
+#endif
 
 /* Takes a string of characters and creates key events for each one.
  * Then feeds them into the keyDown method to simulate key presses.
@@ -1937,6 +1886,27 @@ int logIndent = 0;
 			[self input:command];
 		}
 	}
+}
+
+- (BOOL)show_bundle_menu:(ViCommand *)command
+{
+	/* Special handling of control-escape. */
+	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
+							inTextContainer:[self textContainer]].origin;
+	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
+				       location:[self convertPoint:point toView:nil]
+				  modifierFlags:0
+				      timestamp:[[NSDate date] timeIntervalSinceNow]
+				   windowNumber:[[self window] windowNumber]
+					context:[NSGraphicsContext currentContext]
+				     characters:@"\x1B"
+		    charactersIgnoringModifiers:@"\x1B"
+				      isARepeat:NO
+					keyCode:53];
+	showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
+	[self rightMouseDown:ev];
+	showingContextMenu = NO;
+	return YES;
 }
 
 @end

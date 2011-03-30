@@ -78,7 +78,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	if ((self = [super initWithWindowNibName:@"PreferenceWindow"])) {
 		blankView = [[NSView alloc] init];
 		repositories = [[NSMutableArray alloc] init];
-		repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*tmbundle$)"
+		repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*(tmbundle|textmate-bundle)$)"
 		                                      options:ONIG_OPTION_IGNORECASE];
 	}
 
@@ -145,7 +145,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 	/* Remove any non-tmbundle repositories. */
 	[repositories addObjectsFromArray:userBundles];
-	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"name ENDSWITH \"tmbundle\""]];
+	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"(name ENDSWITH \"tmbundle\") OR (name ENDSWITH \"textmate-bundle\")"]];
 
 	for (NSMutableDictionary *bundle in repositories) {
 		NSString *name = [bundle objectForKey:@"name"];

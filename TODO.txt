@@ -21,7 +21,7 @@ BUGS
 * honor bundle ordering when showing ambiguous items menu
 * implement "new file" and "new folder" in explorer menu
 * searching is slow on large files, naïve implementation
-* yk and yj commands doesn't position caret correctly
+* yk and yj commands don't position caret correctly
 
 IMPORTANT
 =========
@@ -50,6 +50,8 @@ IMPORTANT
 
 FEATURES
 ========
+* move split views relative each other
+* convert horizontal split to vertical and vice versa
 * message how many lines yanked
 * :e# => open alternate file
 * set incsearch
@@ -97,15 +99,7 @@ IDEAS
 =====
 * option whether to open an untitled file in a new window / project (?) why?
 * ODB Editor suite? why?
-* [REJECTED] make vi keys preferred before bundle key equivalents?
-  (must allow overriding vi keys with specialized commands)
-
-
-
-
-example:
-:map ,i O0<C-D>#include "<C-R>%"<ESC>T.c
-:map ,i O0<^d>#include "<^r>%"<ESC>T.c
+* make vi keys preferred over bundle key equivalents?
 
 
 :wnext (?)
@@ -118,14 +112,15 @@ example:
 
 
 There are nine types of registers:			*registers* *E354*
-1. The unnamed register ""
+[DONE] 1. The unnamed register ""
 2. 10 numbered registers "0 to "9
 3. The small delete register "-
-4. 26 named registers "a to "z or "A to "Z
+[DONE] 4. 26 named registers "a to "z or "A to "Z
 5. four read-only registers ":, "., "% and "#
 6. the expression register "=
-7. The selection and drop registers "*, "+ and "~ 
-8. The black hole register "_
+[DONE] 7. The selection registers "*, "+
+7. The drop register "~ 
+[DONE] 8. The black hole register "_
 9. Last search pattern register "/
 
 
@@ -215,3 +210,4 @@ latex.tmbundle
 * [DONE] :set filetype=[source.]objc (:setfiletype)
 * [DONE] "dl" on a line with only one character fails
 * [DONE] O on a line with "}" (obj-c) inserts extra blank line
+* [DONE] copy/paste to clipboard (* and + register)

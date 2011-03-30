@@ -5,6 +5,7 @@
 #import "ViTextStorage.h"
 #import "NSString-scopeSelector.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViRegisterManager.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -419,7 +420,7 @@
 		DEBUG(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
 	}
 
-	[self cutToBuffer:command.reg append:NO range:affectedRange];
+	[self cutToRegister:command.reg range:affectedRange];
 
 	// correct caret position if we deleted the last character(s) on the line
 	if (bol >= [[self textStorage] length])
@@ -437,7 +438,7 @@
 /* syntax: [buffer][count]y[count][motion] */
 - (BOOL)yank:(ViCommand *)command
 {
-	[self yankToBuffer:0 append:NO range:affectedRange];
+	[self yankToRegister:command.reg range:affectedRange];
 
 	/* From nvi:
 	 * !!!
@@ -459,22 +460,19 @@
 /* syntax: [buffer][count]P */
 - (BOOL)put_before:(ViCommand *)command
 {
-	// get the unnamed buffer
-	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if ([buffer length] == 0)
-	{
-		[[self delegate] message:@"The default buffer is empty"];
+	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.reg];
+	if ([content length] == 0) {
+		[[self delegate] message:@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]];
 		return NO;
 	}
 
-	if ([buffer hasSuffix:@"\n"])
-	{
+	if ([content hasSuffix:@"\n"]) {
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL];
-
 		start_location = final_location = bol;
 	}
-	[self insertString:buffer atLocation:start_location];
+	[self insertString:content atLocation:start_location];
 
 	return YES;
 }
@@ -482,28 +480,24 @@
 /* syntax: [buffer][count]p */
 - (BOOL)put_after:(ViCommand *)command
 {
-	// get the unnamed buffer
-	NSMutableString *buffer = [buffers objectForKey:@"unnamed"];
-	if ([buffer length] == 0)
-	{
-		[[self delegate] message:@"The default buffer is empty"];
+	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.reg];
+	if ([content length] == 0) {
+		[[self delegate] message:@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]];
 		return NO;
 	}
 
 	NSUInteger end, eol;
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
-	if ([buffer hasSuffix:@"\n"])
-	{
+	if ([content hasSuffix:@"\n"]) {
 		// putting whole lines
 		final_location = end;
-	}
-	else if (start_location < eol)
-	{
+	} else if (start_location < eol) {
 		// in contrast to move_right, we are allowed to move to EOL here
 		final_location = start_location + 1;
 	}
 
-	[self insertString:buffer atLocation:final_location];
+	[self insertString:content atLocation:final_location];
 
 	return YES;
 }
@@ -589,7 +583,7 @@
 	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
                 leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:affectedRange.location];
 
-	[self cutToBuffer:0 append:NO range:affectedRange];
+	[self cutToRegister:command.reg range:affectedRange];
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];
 
 	/* a command count should not be treated as a count for the inserted text */
@@ -625,7 +619,7 @@
 	NSUInteger len = c;
 	if (start_location + len >= eol)
 		len = eol - start_location;
-	[self cutToBuffer:0 append:NO range:NSMakeRange(start_location, len)];
+	[self cutToRegister:command.reg range:NSMakeRange(start_location, len)];
 	[self setInsertMode:command];
 	return YES;
 }
@@ -713,8 +707,7 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if(bol == eol)
-	{
+	if (bol == eol) {
 		[[self delegate] message:@"Already at end-of-line"];
 		return NO;
 	}
@@ -723,7 +716,7 @@
 	range.location = start_location;
 	range.length = eol - start_location;
 
-	[self cutToBuffer:0 append:NO range:range];
+	[self cutToRegister:command.reg range:range];
 
 	final_location = IMAX(bol, start_location - 1);
 	return YES;
@@ -734,13 +727,12 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if (eol > bol)
-	{
+	if (eol > bol) {
 		NSRange range;
 		range.location = start_location;
 		range.length = eol - start_location;
 
-		[self cutToBuffer:0 append:NO range:range];
+		[self cutToRegister:command.reg range:range];
 	}
 
 	[self setInsertMode:command];
@@ -1408,7 +1400,7 @@
 	del.length = IMAX(1, command.count);
 	if (del.location + del.length > eol)
 		del.length = eol - del.location;
-	[self cutToBuffer:0 append:NO range:del];
+	[self cutToRegister:command.reg range:del];
 
 	// correct caret position if we deleted the last character(s) on the line
 	end_location = modify_start_location;
@@ -1437,7 +1429,7 @@
 	NSRange del;
 	del.location = IMAX(bol, start_location - IMAX(1, command.count));
 	del.length = start_location - del.location;
-	[self cutToBuffer:0 append:NO range:del];
+	[self cutToRegister:command.reg range:del];
 	final_location = end_location = modify_start_location;
 
 	return YES;

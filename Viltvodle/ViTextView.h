@@ -66,9 +66,6 @@
 	NSRect			 oldCaretRect;
 	NSColor			*caretColor;
 
-	// XXX: actually _registers_
-	NSMutableDictionary	*buffers; // XXX: points into [[NSApp delegate] sharedBuffers]
-
 	NSInteger		 saved_column;
 
 	// visual mode
@@ -118,7 +115,6 @@
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setWrapping:(BOOL)flag;
-- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
 - (void)setPageGuide:(NSInteger)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
 - (void)rulerView:(NSRulerView *)aRulerView
@@ -136,8 +132,10 @@
 
 - (NSInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
 
-- (void)yankToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)yankRange;
-- (void)cutToBuffer:(unichar)bufferName append:(BOOL)appendFlag range:(NSRange)cutRange;
+- (void)yankToRegister:(unichar)regName
+                 range:(NSRange)yankRange;
+- (void)cutToRegister:(unichar)regName
+                range:(NSRange)cutRange;
 
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 

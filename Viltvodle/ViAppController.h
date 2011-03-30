@@ -25,7 +25,6 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSMenu *encodingMenu;
 	IBOutlet NSTextField *scriptInput;
 	IBOutlet NSTextView *scriptOutput;
-	NSMutableDictionary *sharedBuffers;
 	NSConnection *shellConn;
 }
 
@@ -35,7 +34,5 @@ additionalBindings:(NSDictionary *)bindings
 
 + (NSString *)supportDirectory;
 - (IBAction)showPreferences:(id)sender;
-
-- (NSMutableDictionary *)sharedBuffers;
 
 @end

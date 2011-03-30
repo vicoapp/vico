@@ -8,6 +8,7 @@
 	BOOL fromDot;
 	BOOL isLineMode;
 	int count;
+	int saved_count;
 	unichar argument;
 	unichar reg;
 	id text;
@@ -25,8 +26,10 @@
 @property (readwrite) ViCommand *operator;
 @property (readwrite) id text;
 
-+ (ViCommand *)commandWithMapping:(ViMapping *)aMapping;
-- (ViCommand *)initWithMapping:(ViMapping *)aMapping;
++ (ViCommand *)commandWithMapping:(ViMapping *)aMapping
+                            count:(int)aCount;
+- (ViCommand *)initWithMapping:(ViMapping *)aMapping
+                         count:(int)aCount;
 
 - (SEL)action;
 - (BOOL)isMotion;

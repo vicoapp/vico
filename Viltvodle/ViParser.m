@@ -310,8 +310,7 @@
 	keySequence = [NSMutableArray array];
 
 	if (state == ViParserInitialState || state == ViParserPartialCommand) {
-		command = [ViCommand commandWithMapping:mapping];
-		command.count = count;
+		command = [ViCommand commandWithMapping:mapping count:count];
 		count = 0;
 		// FIXME: check if a register is valid for the mapping?
 		command.reg = reg;
@@ -336,8 +335,7 @@
 				  message:@"%@ may not be used as a motion command.",
 					 mapping.keyString];
 
-		command.motion = [ViCommand commandWithMapping:mapping];
-		command.motion.count = count;
+		command.motion = [ViCommand commandWithMapping:mapping count:count];
 		command.motion.operator = command;
 		command.isLineMode = command.motion.mapping.isLineMode;
 		count = 0;

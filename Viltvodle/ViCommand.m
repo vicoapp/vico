@@ -12,15 +12,16 @@
 @synthesize isLineMode;
 @synthesize operator;
 
-+ (ViCommand *)commandWithMapping:(ViMapping *)aMapping
++ (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
-	return [[ViCommand alloc] initWithMapping:aMapping];
+	return [[ViCommand alloc] initWithMapping:aMapping count:aCount];
 }
 
-- (ViCommand *)initWithMapping:(ViMapping *)aMapping
+- (ViCommand *)initWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
 	if ((self = [super init]) != nil) {
 		mapping = aMapping;
+		count = saved_count = aCount;
 	}
 	return self;
 }
@@ -57,8 +58,7 @@
 
 - (ViCommand *)dotCopy
 {
-	ViCommand *copy = [ViCommand commandWithMapping:mapping];
-	copy.count = count;
+	ViCommand *copy = [ViCommand commandWithMapping:mapping count:saved_count];
 	copy.fromDot = YES;
 	copy.argument = argument;
 	copy.reg = reg;

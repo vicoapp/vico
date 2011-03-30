@@ -607,16 +607,11 @@
 {
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:start_location];
-	int c = command.count;
-	if (command.count == 0)
-		c = 1;
+	NSUInteger len = IMAX(1, command.count);
 
-	/* XXX: treat a command count as motion count */
-	// XXX: why? what?
-//	command.motion.count = c;
-//	command.count = 0;
+	/* A count should not cause multiplied text (after leaving insert mode). */
+	command.count = 0;
 
-	NSUInteger len = c;
 	if (start_location + len >= eol)
 		len = eol - start_location;
 	[self cutToRegister:command.reg range:NSMakeRange(start_location, len)];

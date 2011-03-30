@@ -28,9 +28,11 @@
 	unichar key = ch;
 	unichar without = [strWithout length] ? [strWithout characterAtIndex:0] : 0;
 
+	DEBUG(@"decoding event %@", self);
+
 	if (!(quals & NSNumericPadKeyMask)) {
 		if ((quals & NSControlKeyMask)) {
-			if (key < 0x20 && (key != 0x1B || key != 0x0D || key != 0x09 || key != without) &&
+			if (key < 0x20 && ((key != 0x1B && key != 0x0D && key != 0x09) || key != without) &&
 			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)
 				/* only control pressed */
 				quals = 0;

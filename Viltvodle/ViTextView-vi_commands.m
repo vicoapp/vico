@@ -1302,14 +1302,18 @@
 
 	NSString *s = [[self textStorage] string];
 	end_location = start_location + 1;
+	if (end_location >= [[self textStorage] length]) {
+		final_location = start_location;
+		return YES;
+	}
 	unichar ch = [s characterAtIndex:end_location];
 
 	/* From nvi:
-         * !!!
-         * If in whitespace, or the next character is whitespace, move past
-         * it.  (This doesn't count as a word move.)  Stay at the character
-         * past the current one, it sets word "state" for the 'e' command.
-         */
+	 * !!!
+	 * If in whitespace, or the next character is whitespace, move past
+	 * it.  (This doesn't count as a word move.)  Stay at the character
+	 * past the current one, it sets word "state" for the 'e' command.
+	 */
 	if ([whitespace characterIsMember:ch]) {
 		end_location = [[self textStorage] skipCharactersInSet:whitespace
 							  fromLocation:end_location

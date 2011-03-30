@@ -1280,6 +1280,9 @@ int logIndent = 0;
 
 - (BOOL)evaluateCommand:(ViCommand *)command
 {
+	if (mode != ViInsertMode)
+		[self endUndoGroup];
+
 	if (![command.mapping isAction]) {
 		[[self delegate] message:@"Macros not implemented."];
 		return NO;
@@ -1480,7 +1483,6 @@ int logIndent = 0;
 		return NO;
 
 	[keyTimeout invalidate];
-	DEBUG(@"got key equivalent event %p = %@", theEvent, theEvent);
 	BOOL partial = parser.partial;
 	NSError *error = nil;
 	if (![self handleKey:[theEvent normalizedKeyCode] error:&error]) {
@@ -1584,8 +1586,6 @@ int logIndent = 0;
 				       error:&error];
 	if (command) {
 		[self evaluateCommand:command];
-		if (mode != ViInsertMode)
-			[self endUndoGroup];
 	} else if (error) {
 		if (outError)
 			*outError = error;
@@ -1617,8 +1617,6 @@ int logIndent = 0;
 					      error:&error];
 	if (command) {
 		[self evaluateCommand:command];
-		if (mode != ViInsertMode)
-			[self endUndoGroup];
 	} else if (error)
 		[[self delegate] message:@"%@", [error localizedDescription]];
 }
@@ -1890,7 +1888,6 @@ int logIndent = 0;
 
 - (BOOL)show_bundle_menu:(ViCommand *)command
 {
-	/* Special handling of control-escape. */
 	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
 							inTextContainer:[self textContainer]].origin;
 	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown

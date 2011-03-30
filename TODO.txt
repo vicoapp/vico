@@ -8,9 +8,6 @@ URGENT
 
 BUGS
 ====
-* ctrl-^ should switch between *files*, not views
-* close a tab by click the X doesn't work for web views
-* ctrl-enter != ctrl-shift-m
 * clicking a binary file (pdf, image) in explorer opens as text
 * should dot repeat a bundle command?
 * switch undo direction after bundle command
@@ -211,3 +208,6 @@ latex.tmbundle
 * [DONE] "dl" on a line with only one character fails
 * [DONE] O on a line with "}" (obj-c) inserts extra blank line
 * [DONE] copy/paste to clipboard (* and + register)
+* [DONE] close a tab by click the X doesn't work for web views
+* [DONE] ctrl-enter != ctrl-shift-m
+* [DONE] ctrl-^ should switch between *files*, not views

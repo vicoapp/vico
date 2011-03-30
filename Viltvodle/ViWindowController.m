@@ -772,9 +772,12 @@ static ViWindowController	*currentWindowController = nil;
 	// XXX: currentView is the *previously* current view
 
 	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]] &&
-	    [(ViDocumentView *)viewController document] == document)
-		return;
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		if ([(ViDocumentView *)viewController document] == document)
+			return;
+		previousDocument = [(ViDocumentView *)viewController document];
+		INFO(@"last doc is now %@", previousDocument);
+	}
 
 	[[self document] removeWindowController:self];
 	[document addWindowController:self];
@@ -808,7 +811,7 @@ static ViWindowController	*currentWindowController = nil;
 	}
 	[[viewController tabController] setSelectedView:viewController];
 
-	lastDocumentView = currentView;
+	previousDocumentView = currentView;
 	[self setCurrentView:viewController];
 }
 
@@ -858,9 +861,24 @@ static ViWindowController	*currentWindowController = nil;
 		    [[(ViDocumentView *)viewController document] isEqual:document])
 			return viewController;
 
+	/* Check if the previous document view holds the document. */
+	if ([previousDocumentView document] == document)
+		return previousDocumentView;
+
 	/* Select any existing view of the document. */
-	if ([[document views] count] > 0)
-		return [self selectDocumentView:[[document views] anyObject]];
+	if ([[document views] count] > 0) {
+		docView = [[document views] anyObject];
+		/*
+		 * If the tab with the document view contains more views
+		 * of the same document, prefer the selected view in the
+		 * (randomly) selected tab controller.
+		 */
+		id<ViViewController> selView = [[docView tabController] selectedView];
+		if ([selView isKindOfClass:[ViDocumentView class]] &&
+		    [(ViDocumentView *)selView document] == document)
+			return [self selectDocumentView:selView];
+		return [self selectDocumentView:docView];
+	}
 
 	/* No open view for the given document. */
 	return nil;
@@ -944,12 +962,12 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)switchToLastDocument
 {
-	[self switchToDocument:[lastDocumentView document]];
+	[self switchToDocument:previousDocument];
 }
 
 - (void)selectLastDocument
 {
-	[self selectDocumentView:lastDocumentView];
+	[self selectDocument:previousDocument];
 }
 
 - (ViDocumentTabController *)selectedTabController

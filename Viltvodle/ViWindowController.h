@@ -35,7 +35,8 @@
 	ViTagStack *tagStack;
 	BOOL isLoaded;
 	ViDocument *initialDocument;
-	ViDocumentView *lastDocumentView;
+	ViDocument *previousDocument;
+	ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
 	ViScriptProxy *proxy;

@@ -1806,10 +1806,11 @@ int logIndent = 0;
 	return NO;
 }
 
+/* syntax: ctrl-^ */
 - (BOOL)switch_file:(ViCommand *)command
 {
-        [[[self window] windowController] selectLastDocument];
-        return YES;
+	[[[self window] windowController] selectLastDocument];
+	return YES;
 }
 
 - (BOOL)switch_tab:(ViCommand *)command

@@ -29,19 +29,19 @@
 
 
 (set cmap (ViMap mapWithName:"commandMap"))
-(cmap setKey:"<cmd-1>" toMotion:"switch_tab:" flags:0 parameter:0 scope:nil)
-(cmap setKey:"<cmd-2>" toMotion:"switch_tab:" flags:0 parameter:1 scope:nil)
-(cmap setKey:"<cmd-3>" toMotion:"switch_tab:" flags:0 parameter:2 scope:nil)
-(cmap setKey:"<cmd-4>" toMotion:"switch_tab:" flags:0 parameter:3 scope:nil)
-(cmap setKey:"<cmd-5>" toMotion:"switch_tab:" flags:0 parameter:4 scope:nil)
-(cmap setKey:"<cmd-6>" toMotion:"switch_tab:" flags:0 parameter:5 scope:nil)
-(cmap setKey:"<cmd-7>" toMotion:"switch_tab:" flags:0 parameter:6 scope:nil)
-(cmap setKey:"<cmd-8>" toMotion:"switch_tab:" flags:0 parameter:7 scope:nil)
-(cmap setKey:"<cmd-9>" toMotion:"switch_tab:" flags:0 parameter:8 scope:nil)
-(cmap setKey:"<cmd-0>" toMotion:"switch_tab:" flags:0 parameter:9 scope:nil)
-(cmap setKey:"<c-P>" toMotion:"show_scope:")
-(cmap setKey:"<ctrl-esc>" toMotion:"show_bundle_menu:")
-(cmap setKey:"<cmd-esc>" toMotion:"show_bundle_menu:")
+(cmap setKey:"<cmd-1>" toAction:"switch_tab:" flags:0 parameter:0 scope:nil)
+(cmap setKey:"<cmd-2>" toAction:"switch_tab:" flags:0 parameter:1 scope:nil)
+(cmap setKey:"<cmd-3>" toAction:"switch_tab:" flags:0 parameter:2 scope:nil)
+(cmap setKey:"<cmd-4>" toAction:"switch_tab:" flags:0 parameter:3 scope:nil)
+(cmap setKey:"<cmd-5>" toAction:"switch_tab:" flags:0 parameter:4 scope:nil)
+(cmap setKey:"<cmd-6>" toAction:"switch_tab:" flags:0 parameter:5 scope:nil)
+(cmap setKey:"<cmd-7>" toAction:"switch_tab:" flags:0 parameter:6 scope:nil)
+(cmap setKey:"<cmd-8>" toAction:"switch_tab:" flags:0 parameter:7 scope:nil)
+(cmap setKey:"<cmd-9>" toAction:"switch_tab:" flags:0 parameter:8 scope:nil)
+(cmap setKey:"<cmd-0>" toAction:"switch_tab:" flags:0 parameter:9 scope:nil)
+(cmap setKey:"<c-P>" toAction:"show_scope:")
+(cmap setKey:"<ctrl-esc>" toAction:"show_bundle_menu:")
+(cmap setKey:"<cmd-esc>" toAction:"show_bundle_menu:")
 
 
 ;; insert map

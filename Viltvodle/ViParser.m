@@ -168,7 +168,10 @@
                  error:(NSError **)outError
 {
 	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], state);
-	
+
+	NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
+	[totalKeySequence addObject:keyNum];
+
 	unichar singleKey = 0;
 	if ((keyCode & 0xFFFF0000) == 0)
 		singleKey = keyCode & 0x0000FFFF;
@@ -261,10 +264,7 @@
 	if (map == NULL)
 		map = defaultMap;
 
-	NSNumber *num = [NSNumber numberWithInteger:keyCode];
-	[keySequence addObject:num];
-	[totalKeySequence addObject:num];
-
+	[keySequence addObject:keyNum];
 	return [self handleKeySequenceInScope:scopeArray
 				   didTimeout:NO
 				      timeout:timeoutPtr

@@ -26,7 +26,9 @@
 	return self;
 }
 
-- (ViCommand *)fail:(NSError **)outError with:(NSInteger)code message:(NSString *)fmt, ...
+- (ViCommand *)fail:(NSError **)outError
+               with:(NSInteger)code
+            message:(NSString *)fmt, ...
 {
 	if (outError) {
 		va_list ap;

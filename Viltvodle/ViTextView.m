@@ -167,7 +167,7 @@ int logIndent = 0;
 
 - (void)paste:(id)sender
 {
-	[self handleKeys:[@"\"+p" keyCodes]];
+	[self handleKeys:[@"\"+P" keyCodes]];
 }
 
 - (void)cut:(id)sender
@@ -1072,6 +1072,9 @@ int logIndent = 0;
 	return foundSmartTypingPair;
 }
 
+/* Input a character from the user (in insert mode). Handle smart typing pairs.
+ * FIXME: assumes smart typing pairs are single characters.
+ */
 - (void)handle_input:(unichar)character
 {
 	DEBUG(@"insert character %C at %i", character, start_location);
@@ -1107,42 +1110,45 @@ int logIndent = 0;
 
 - (BOOL)literal_next:(ViCommand *)command
 {
-	[self handle_input:command.argument];	// XXX: un-parse!
+	[self handle_input:command.argument];
 	return YES;
 }
 
-/* Input a character from the user (in insert mode). Handle smart typing pairs.
- * FIXME: assumes smart typing pairs are single characters.
- */
 - (BOOL)input_character:(ViCommand *)command
 {
-	NSArray *keys = command.mapping.keySequence;
-	NSInteger keyCode = [[keys lastObject] integerValue];
-	if ([keys count] > 1 || (keyCode & 0xFFFF0000) != 0) {
-		[[self delegate] message:@"Can't insert key equivalent: %@.",
-		    [NSString stringWithKeySequence:keys]];
-		return NO;
+	for (NSNumber *n in command.mapping.keySequence) {
+		NSInteger keyCode = [n integerValue];
+
+		if ((keyCode & 0xFFFF0000) != 0) {
+			[[self delegate] message:@"Can't insert key equivalent: %@.",
+			    [NSString stringWithKeyCode:keyCode]];
+			return NO;
+		}
+
+		if (keyCode < 0x20) {
+			[[self delegate] message:@"Illegal character: %@; quote to enter",
+			    [NSString stringWithKeyCode:keyCode]];
+			return NO;
+		}
+
+		[self handle_input:keyCode];
+		start_location = final_location;
 	}
 
-	if (keyCode < 0x20) {
-		[[self delegate] message:@"Illegal character; quote to enter"];
-		return NO;
-	}
-
-	[self handle_input:keyCode];
 	return YES;
 }
 
 - (BOOL)input_newline:(ViCommand *)command
 {
-	NSInteger num_chars = [self insertNewlineAtLocation:start_location indentForward:YES];
+	NSInteger num_chars = [self insertNewlineAtLocation:start_location
+					      indentForward:YES];
 	final_location = start_location + num_chars;
 	return YES;
 }
 
 - (BOOL)input_tab:(ViCommand *)command
 {
-        // check if we're inside a snippet
+	// check if we're inside a snippet
 	ViSnippet *snippet = [self delegate].snippet;
 	if (snippet) {
 		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
@@ -1154,7 +1160,7 @@ int logIndent = 0;
 			[self cancelSnippet:snippet];
 	}
 
-        /* Check for a tab trigger before the caret.
+	/* Check for a tab trigger before the caret.
 	 */
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];

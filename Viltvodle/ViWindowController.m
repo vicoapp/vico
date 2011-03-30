@@ -553,12 +553,17 @@ static ViWindowController	*currentWindowController = nil;
 		[self tabView:tabView didCloseTabViewItem:item];
 
 		while ([[tabController views] count] > 0) {
-			ViDocumentView *docView = [[tabController views] objectAtIndex:0];
-			ViDocument *doc = [docView document];
-			if ([[doc views] count] == 1)
-				[doc close];
-			else
-				[[docView tabController] closeView:docView];
+			id<ViViewController> viewController;
+			viewController  = [[tabController views] objectAtIndex:0];
+			if ([viewController isKindOfClass:[ViDocumentView class]]) {
+				ViDocumentView *docView = viewController;
+				ViDocument *doc = [docView document];
+				if ([[doc views] count] == 1) {
+					[doc close];
+					continue;
+				}
+			}
+			[[viewController tabController] closeView:viewController];
 		}
 	}
 }
@@ -699,22 +704,24 @@ static ViWindowController	*currentWindowController = nil;
 
 	NSMutableSet *set = [[NSMutableSet alloc] init];
 
-	ViDocumentView *docView;
-	for (docView in [tabController views]) {
-		if ([set containsObject:[docView document]])
-			continue;
+	id<ViViewController> viewController;
+	for (viewController in [tabController views]) {
+		if ([viewController isKindOfClass:[ViDocument class]]) {
+			ViDocumentView *docView;
+			if ([set containsObject:[docView document]])
+				continue;
+			if (![[docView document] isDocumentEdited])
+				continue;
 
-		if (![[docView document] isDocumentEdited])
-			continue;
+			ViDocumentView *otherDocView;
+			for (otherDocView in [[docView document] views])
+				if ([otherDocView tabController] != tabController)
+					break;
+			if (otherDocView != nil)
+				continue;
 
-		ViDocumentView *otherDocView;
-		for (otherDocView in [[docView document] views])
-			if ([otherDocView tabController] != tabController)
-				break;
-		if (otherDocView != nil)
-			continue;
-
-		[set addObject:[docView document]];
+			[set addObject:[docView document]];
+		}
 	}
 
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
@@ -1135,6 +1142,7 @@ static ViWindowController	*currentWindowController = nil;
 		doc = [ctrl openUntitledDocumentAndDisplay:NO error:&err];
 		if (err)
 			[self message:@"%@", [err localizedDescription]];
+		doc.isTemporary = YES;
 	} else
 		newDoc = NO;
 

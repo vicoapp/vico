@@ -6,7 +6,25 @@
 
 @implementation ViWebView
 
-@synthesize environment, parser;
+@synthesize environment;
+
+- (void)awakeFromNib
+{
+	keyManager = [[ViKeyManager alloc] initWithTarget:self
+					       defaultMap:[ViMap normalMap]];
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	if ([[self window] firstResponder] != self)
+		return NO;
+	return [keyManager performKeyEquivalent:theEvent];
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+	[keyManager keyDown:theEvent];
+}
 
 - (void)swipeWithEvent:(NSEvent *)event
 {
@@ -23,52 +41,43 @@
 		[environment message:@""]; // erase any previous message
 }
 
-- (BOOL)evaluateCommand:(ViCommand *)command
+- (void)keyManager:(ViKeyManager *)keyManager
+  partialKeyString:(NSString *)keyString
 {
+	[environment message:@"%@", keyString];
+}
+
+- (void)presentViError:(NSError *)error
+{
+	[environment message:@"%@", [error localizedDescription]];
+}
+
+- (void)keyManager:(ViKeyManager *)keyManager
+   evaluateCommand:(ViCommand *)command
+{
+	DEBUG(@"command is %@", command);
+	[environment message:@""]; // erase any previous message
 	if (![self respondsToSelector:command.action] ||
 	    (command.motion && ![self respondsToSelector:command.motion.action])) {
 		[environment message:@"Command not implemented."];
+		return;
+	}
+
+	[self performSelector:command.action
+		   withObject:command];
+}
+
+- (BOOL)switch_tab:(ViCommand *)command
+{
+	INFO(@"switch to tab: %@", command.mapping.parameter);
+	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
+		[environment message:@"Unexpected parameter type %@",
+		    NSStringFromClass([command.mapping.parameter class])];
 		return NO;
 	}
-
-	DEBUG(@"perform command %@", command);
-	BOOL ok = (NSUInteger)[self performSelector:command.action
-					 withObject:command];
-
-	if (ok)	// erase any previous message
-		[environment message:@""];
-
-	return ok;
-}
-
-- (void)switch_tab:(int)arg
-{
-	if (arg-- == 0)
-		arg = 9;
-        [[[self window] windowController] selectTabAtIndex:arg];
-}
-
-- (void)keyDown:(NSEvent *)theEvent
-{
-#if 0
-	/* Special handling of command-[0-9] to switch tabs. */
-	if (flags == NSCommandKeyMask && charcode >= '0' && charcode <= '9') {
-		[self switch_tab:charcode - '0'];
-		return;
-	}
-
-	if ((flags & ~NSNumericPadKeyMask) != 0) {
-		DEBUG(@"unhandled key equivalent %C/0x%04X", charcode, flags);
-		return;
-	}
-#endif
-
-	ViCommand *command = [parser pushKey:[theEvent normalizedKeyCode]
-				       scope:nil
-				     timeout:nil
-				       error:nil];
-	if (command)
-		[self evaluateCommand:command];
+	int arg = [command.mapping.parameter intValue];
+	[[[self window] windowController] selectTabAtIndex:arg];
+	return YES;
 }
 
 - (BOOL)window_left:(ViCommand *)command

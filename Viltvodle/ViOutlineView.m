@@ -1,23 +1,26 @@
 #import "ViOutlineView.h"
 #import "NSEvent-keyAdditions.h"
+#import "ViError.h"
 #include "logging.h"
 
 @implementation ViOutlineView
 
 - (void)awakeFromNib
 {
-	parser = [[ViParser alloc] initWithDefaultMap:[ViMap explorerMap]]; // XXX: ...or symbolMap?
+	keyManager = [[ViKeyManager alloc] initWithTarget:[self delegate]
+					       defaultMap:[ViMap explorerMap]];
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	if ([[self window] firstResponder] != self)
+		return NO;
+	return [keyManager performKeyEquivalent:theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	ViCommand *command = [parser pushKey:[theEvent normalizedKeyCode]
-				       scope:nil
-				     timeout:nil
-				       error:nil];
-	if (command)
-		if ([[self delegate] respondsToSelector:@selector(outlineView:evaluateCommand:)])
-			[[self delegate] outlineView:self evaluateCommand:command];
+	[keyManager keyDown:theEvent];
 }
 
 @end

@@ -10,11 +10,9 @@
                                       environment:(ExEnvironment *)environment
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
 		[webView setEnvironment:environment];
-		[webView setParser:[[ViParser alloc] initWithDefaultMap:[ViMap normalMap]]];
 		[[webView mainFrame] loadHTMLString:content
 					    baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	}

@@ -1389,10 +1389,10 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
-- (void)outlineView:(ViOutlineView *)outlineView
-    evaluateCommand:(ViCommand *)command
+- (void)keyManager:(ViKeyManager *)keyManager
+   evaluateCommand:(ViCommand *)command
 {
-	DEBUG(@"command is %@", command.method);
+	DEBUG(@"command is %@", command);
 	if (![self respondsToSelector:command.action] ||
 	    (command.motion && ![self respondsToSelector:command.motion.action])) {
 		[windowController message:@"Command not implemented."];

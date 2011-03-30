@@ -5,7 +5,6 @@ URGENT
 * fuzzy search feels *slow*
 * ZZ and ZQ + handle :q! (ie, don't ask)
   => how should we handle windows? quit the app completely?
-* ctrl-q bundle command operates on the left view when typed in the right view !??
 * ctrl-space seems to match all snippets
 
 BUGS

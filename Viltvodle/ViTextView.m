@@ -1312,7 +1312,11 @@ int logIndent = 0;
 	if (command.action == @selector(move_down:) ||
 	    command.action == @selector(move_up:) ||
 	    command.action == @selector(scroll_down_by_line:) ||
-	    command.action == @selector(scroll_up_by_line:)) {
+	    command.action == @selector(scroll_up_by_line:) ||
+	    command.motion.action == @selector(move_down:) ||
+	    command.motion.action == @selector(move_up:) ||
+	    command.motion.action == @selector(scroll_down_by_line:) ||
+	    command.motion.action == @selector(scroll_up_by_line:)) {
 		if (saved_column < 0)
 			saved_column = [self currentColumn];
 	} else

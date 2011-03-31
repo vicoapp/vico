@@ -82,6 +82,8 @@
 + (ViMap *)explorerMap;
 + (ViMap *)symbolMap;
 
+- (BOOL)includesMap:(ViMap *)aMap;
+
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
                        withScope:(NSArray *)scopeArray
                      allowMacros:(BOOL)allowMacros

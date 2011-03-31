@@ -206,6 +206,7 @@ static NSMutableDictionary *maps = nil;
 {
 	ViMapping *candidate = nil;
 	ViMapping *exact_candidate = nil;
+	ViMap *exact_candidate_map = nil; /* map of the exact_candidate */
 	ViMapping *op = nil; /* fully matched operator */
 	for (ViMap *map in maps) {
 		for (ViMapping *m in map.actions) {
@@ -220,15 +221,15 @@ static NSMutableDictionary *maps = nil;
 			if ([keySequence hasPrefix:m.keySequence] && [m wantsKeys]) {
 				/*
 				 * We found an action that requires additional (dynamic) keys.
-				 * Remember the most significant match.
+				 * Remember the most significant match. If no other mapping
+				 * matches, we return this operator and the excess keys back
+				 * to the parser (which will try to map them to motion commands).
 				 */
 				if ([m.keySequence count] > [op.keySequence count]) {
 					op = m;
 					DEBUG(@"got operator candidate %@", op);
 				}
-			} else if ([keySequence isEqual:m.keySequence] &&
-				  ([m isAction] || allowMacros) &&
-				  ![m wantsKeys]) {
+			} else if ([keySequence isEqual:m.keySequence] && ![m wantsKeys]) {
 				/* 
 				 * If we get an exact match, but there are longer key
 				 * sequences that might match if we get more keys, we
@@ -237,37 +238,56 @@ static NSMutableDictionary *maps = nil;
 				 * additional keys, because in that case we must wait
 				 * for keys anyway.
 				 */
-				if (exact_candidate && [exact_candidate isAction] == [m isAction]) {
+				if (exact_candidate) {
 					/*
-					 * This should not happen inside a single map as we make
+					 * We should not get duplicates inside a single map as we make
 					 * sure there are no duplicate key sequences of the same type
 					 * that either does or does not require additional keys.
 					 *
 					 * However, since we iterate over multiple included maps,
 					 * we might now get duplicates between maps.
 					 *
-					 * What to do?
-					 *  - overwrite the old one (or skip the new one)
-					 *    (maps are not iterated in a predictable order)
-					 *  - offer a menu of choices (ugh, feels fugly)
-					 *  - bail?
+					 * We solve this by making actions in included maps be
+					 * overridden by higher-level maps.
+					 *
+					 * Should included macros still be preferred over actions?
 					 */
-					if (([m isAction] && m.action == exact_candidate.action) ||
-					    (![m isAction] && [m.macro isEqualToString:exact_candidate.macro])) {
-						/* Pjuh, they are identical! */
+					if (map == exact_candidate_map) {
+						if ([exact_candidate isAction] == [m isAction]) {
+							INFO(@"Ouch! already got an exact match %@ in map %@",
+							    exact_candidate, map);
+							if (outError)
+								*outError = [ViError
+								    errorWithCode:ViErrorMapInternal
+									   format:@"Duplicate mapping %@.",
+									       [m keyString]];
+							return nil;
+						}
+						/*
+						 * Otherwise we let macros override regular
+						 * actions within the same map.
+						 */
+					} else if ([exact_candidate_map includesMap:map]) {
+						/* This map is a sub-map of the found candidate map. */
+						DEBUG(@"%@ in map %@ overrides %@ in map %@",
+						    exact_candidate, exact_candidate_map,
+						    m, map);
+						continue;
 					} else {
-						DEBUG(@"Ouch! already got an exact match %@", exact_candidate);
-						if (outError)
-							*outError = [ViError errorWithCode:ViErrorMapInternal
-										    format:@"Duplicate mapping %@.", [m keyString]];
-						return nil;
+						/* This map is a super-map of the found candidate map. */
+						DEBUG(@"%@ in map %@ overrides %@ in map %@",
+						    m, map,
+						    exact_candidate, exact_candidate_map);
+						exact_candidate = nil;
 					}
 				}
 
-				/* Macros override regular actions. */
-				if (exact_candidate == nil || [exact_candidate isAction]) {
+				if (exact_candidate == nil ||
+					/* Macros override regular actions. */
+				    ([exact_candidate isAction] && [m isMacro])) {
 					DEBUG(@"got exact candidate %@", m);
 					exact_candidate = m;
+					exact_candidate_map = map;
 				}
 			}
 
@@ -293,6 +313,12 @@ static NSMutableDictionary *maps = nil;
 						DEBUG(@"%s", "partial match, need more keys");
 
 					if (exact_candidate) {
+						/*
+						 * We found an ambiguous mapping, but we have
+						 * an exact match. If no other key is received
+						 * without a timeout, we should return the
+						 * exact match.
+						 */
 						if (*timeout == YES) {
 							DEBUG(@"timeout: returning exact match %@",
 							    exact_candidate);
@@ -344,6 +370,16 @@ static NSMutableDictionary *maps = nil;
 					    format:@"%@ is not mapped.", [NSString stringWithKeySequence:keySequence]];
 
 	return candidate;
+}
+
+- (BOOL)includesMap:(ViMap *)aMap
+{
+	if ([includes containsObject:aMap])
+		return YES;
+	for (ViMap *map in includes)
+		if ([map includesMap:aMap])
+			return YES;
+	return NO;
 }
 
 - (void)resolveIncludedMaps:(NSMutableArray *)includeMaps

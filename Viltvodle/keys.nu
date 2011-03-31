@@ -214,6 +214,8 @@
 (set omap (ViMap operatorMap))
 (omap include:mmap)
 (omap include:tmap)
+(omap setKey:"vj" toMotion:"move_down:")
+(omap setKey:"vk" toMotion:"move_up:")
 
 
 
@@ -222,6 +224,8 @@
 (vmap include:cmap)
 (vmap include:mmap)
 (vmap include:tmap)
+(vmap setKey:"<bs>" toEditAction:"delete:")
+(vmap setKey:"<del>" toEditAction:"delete:")
 (vmap setKey:"C" toEditAction:"change:" flags:ViMapLineMode parameter:nil scope:nil)
 (vmap setKey:"D" toEditAction:"delete:")
 (vmap setKey:"S" toEditAction:"subst_lines:" flags:ViMapLineMode parameter:nil scope:nil)

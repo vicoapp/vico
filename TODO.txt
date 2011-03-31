@@ -1,5 +1,6 @@
 URGENT
 ========
+* jumping to symbol should push location on jump list!
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
 * fuzzy search feels *slow*
@@ -31,7 +32,6 @@ IMPORTANT
 * +/- commands
 * global marks (A-Z)
 * open alternative file (.h/.c/.m)
-* yank buffers? do they all work? across documents?
 * dot should work with ! filters
 * :write filename
 * :write !program
@@ -65,8 +65,6 @@ FEATURES
 * escape after creating new line should blank the line
 * local keyword completion (vim c-x c-n)
 * history in explorer view + go back/forward with swiping
-* macros in maps
-* i_CTRL-R + registers
 * :normal!
 * = (re-indent)
 * global shell variables (in preferences)
@@ -212,3 +210,6 @@ latex.tmbundle
 * [DONE] close a tab by click the X doesn't work for web views
 * [DONE] ctrl-enter != ctrl-shift-m
 * [DONE] ctrl-^ should switch between *files*, not views
+* [DONE] i_CTRL-R + registers
+* [DONE] macros in maps
+* [DONE] yank buffers? do they all work? across documents?

@@ -473,6 +473,7 @@
 		start_location = final_location = bol;
 	}
 	[self insertString:content atLocation:start_location];
+	final_location = start_location + IMAX([content length] - 1, 0);
 
 	return YES;
 }
@@ -498,6 +499,7 @@
 	}
 
 	[self insertString:content atLocation:final_location];
+	final_location = final_location + IMAX([content length] - 1, 0);
 
 	return YES;
 }
@@ -1849,6 +1851,19 @@
 - (BOOL)previous_tab:(ViCommand *)command
 {
 	[[[self window] windowController] selectPreviousTab:nil];
+	return YES;
+}
+
+- (BOOL)input_register:(ViCommand *)command
+{
+	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.argument];
+	if (content == nil) {
+		[[self delegate] message:@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.argument]];
+		return NO;
+	}
+	[self insertString:content atLocation:start_location];
+	final_location = start_location + [content length];
 	return YES;
 }
 

@@ -32,7 +32,7 @@
 	NSArray *keys = [@"i" keyCodes];
 	STAssertEquals([keys count], 1ULL, nil);
 	STAssertEquals([[keys objectAtIndex:0] integerValue], 0x69LL, nil);
-	ViMapping *m = [map lookupKeySequence:keys withScope:nil excessKeys:nil timeout:nil error:nil];
+	ViMapping *m = [map lookupKeySequence:keys withScope:nil allowMacros:YES excessKeys:nil timeout:nil error:nil];
 	STAssertNotNil(m, nil);
 	STAssertEquals(m.isAction, YES, nil);
 	STAssertEquals(m.isMacro, NO, nil);
@@ -47,7 +47,7 @@
 	ViMap *map = [ViMap normalMap];
 //	[map setKey:@"w" toMotion:@selector(word_forward:)];
 	NSArray *keys = [@"w" keyCodes];
-	ViMapping *m = [map lookupKeySequence:keys withScope:nil excessKeys:nil timeout:nil error:nil];
+	ViMapping *m = [map lookupKeySequence:keys withScope:nil allowMacros:YES excessKeys:nil timeout:nil error:nil];
 	STAssertNotNil(m, nil);
 	STAssertEquals(m.isMotion, YES, nil);
 	STAssertEquals(m.isOperator, NO, nil);
@@ -60,7 +60,7 @@
 //	[map setKey:@"w" toMotion:@selector(word_forward:)];
 //	[map setKey:@"c" toOperator:@selector(change:)];
 	NSArray *keys = [@"c" keyCodes];
-	ViMapping *m = [map lookupKeySequence:keys withScope:nil excessKeys:nil timeout:nil error:nil];
+	ViMapping *m = [map lookupKeySequence:keys withScope:nil allowMacros:YES excessKeys:nil timeout:nil error:nil];
 	STAssertNotNil(m, nil);
 	STAssertEquals(m.isMotion, NO, nil);
 	STAssertEquals(m.isOperator, YES, nil);
@@ -72,7 +72,7 @@
 	ViMap *map = [ViMap normalMap];
 //	[map setKey:@"f" toMotion:@selector(move_to_char:) flags:ViMapNeedArgument parameter:nil scope:nil];
 	NSArray *keys = [@"f" keyCodes];
-	ViMapping *m = [map lookupKeySequence:keys withScope:nil excessKeys:nil timeout:nil error:nil];
+	ViMapping *m = [map lookupKeySequence:keys withScope:nil allowMacros:YES excessKeys:nil timeout:nil error:nil];
 	STAssertNotNil(m, nil);
 	STAssertEquals(m.isMotion, YES, nil);
 	STAssertEquals(m.isOperator, NO, nil);

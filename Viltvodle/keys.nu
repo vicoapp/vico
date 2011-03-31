@@ -211,7 +211,6 @@
 
 ;; operator map
 (set omap (ViMap operatorMap))
-; (omap setDefaultAction:"nonmotion:")
 (omap include:mmap)
 (omap include:tmap)
 
@@ -243,6 +242,8 @@
 (vmap setKey:"<" toEditAction:"shift_left:" flags:ViMapLineMode parameter:nil scope:nil)
 (vmap setKey:">" toEditAction:"shift_right:" flags:ViMapLineMode parameter:nil scope:nil)
 (vmap setKey:"!" toEditAction:"filter:")
+(vmap setKey:":" toAction:"ex_command:")
+(vmap setKey:"<esc>" toAction:"normal_mode:")
 
 
 

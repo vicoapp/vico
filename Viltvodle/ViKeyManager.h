@@ -7,6 +7,7 @@
 	ViParser *parser;
 	id target;
 	NSTimer *keyTimeout;
+	NSInteger recursionLevel;
 }
 
 @property (readonly) ViParser *parser;
@@ -18,7 +19,7 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent;
-- (void)handleKey:(NSInteger)keyCode;
+- (BOOL)handleKey:(NSInteger)keyCode;
 - (void)handleKeys:(NSArray *)keys;
 @end
 
@@ -27,7 +28,7 @@
     shouldParseKey:(NSInteger)keyCode;
 - (void)keyManager:(ViKeyManager *)aKeyManager
       presentError:(NSError *)error;
-- (void)keyManager:(ViKeyManager *)keyManager
+- (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command;
 - (void)keyManager:(ViKeyManager *)keyManager
   partialKeyString:(NSString *)keyString;

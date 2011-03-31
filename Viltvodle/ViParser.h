@@ -45,6 +45,7 @@ typedef enum {
 - (ViCommand *)pushKey:(NSInteger)keyCode;
 
 - (ViCommand *)pushKey:(NSInteger)keyCode
+           allowMacros:(BOOL)allowMacros
                  scope:(NSArray *)scopeArray
                timeout:(BOOL *)timeoutPtr
                  error:(NSError **)outError;

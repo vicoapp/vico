@@ -53,7 +53,7 @@
 	[environment message:@"%@", [error localizedDescription]];
 }
 
-- (void)keyManager:(ViKeyManager *)keyManager
+- (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
 	DEBUG(@"command is %@", command);
@@ -61,11 +61,10 @@
 	if (![self respondsToSelector:command.action] ||
 	    (command.motion && ![self respondsToSelector:command.motion.action])) {
 		[environment message:@"Command not implemented."];
-		return;
+		return NO;
 	}
 
-	[self performSelector:command.action
-		   withObject:command];
+	return (BOOL)[self performSelector:command.action withObject:command];
 }
 
 - (BOOL)switch_tab:(ViCommand *)command

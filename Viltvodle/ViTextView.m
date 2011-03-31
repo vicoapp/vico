@@ -21,8 +21,6 @@ int logIndent = 0;
 @interface ViTextView (private)
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation;
-- (BOOL)evaluateCommand:(ViCommand *)command;
-- (void)switch_tab:(int)arg;
 - (BOOL)normal_mode:(ViCommand *)command;
 - (void)replaceCharactersInRange:(NSRange)aRange
                       withString:(NSString *)aString
@@ -1281,7 +1279,7 @@ int logIndent = 0;
 	return YES;
 }
 
-- (void)keyManager:(ViKeyManager *)keyManager
+- (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
 	if (mode != ViInsertMode)
@@ -1289,19 +1287,19 @@ int logIndent = 0;
 
 	if (![command.mapping isAction]) {
 		[[self delegate] message:@"Macros not implemented."];
-		return;
+		return NO;
 	}
 
 	if (![self respondsToSelector:command.action]) {
 		[[self delegate] message:@"Command %@ not implemented.",
 		    command.mapping.keyString];
-		return;
+		return NO;
 	}
 
 	if (command.motion && ![self respondsToSelector:command.motion.action]) {
 		[[self delegate] message:@"Motion command %@ not implemented.",
 		    command.motion.mapping.keyString];
-		return;
+		return NO;
 	}
 
 	/* Default start- and end-location is the current location. */
@@ -1331,7 +1329,7 @@ int logIndent = 0;
 		if (![self performSelector:command.motion.action
 			        withObject:command.motion])
 			/* the command failed */
-			return;
+			return NO;
 	}
 
 	/* Find out the affected range for this command. */
@@ -1449,6 +1447,8 @@ int logIndent = 0;
 		    (unsigned long)[self currentColumn],
 		    modestr]];
 	}
+
+	return ok;
 }
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
@@ -1487,7 +1487,7 @@ int logIndent = 0;
 
 - (void)doCommandBySelector:(SEL)aSelector
 {
-	DEBUG(@"selector = %s", aSelector);
+	DEBUG(@"selector = %@ (ignored)", NSStringFromSelector(aSelector));
 }
 
 - (void)keyManager:(ViKeyManager *)aKeyManager

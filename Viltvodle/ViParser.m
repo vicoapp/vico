@@ -1,6 +1,7 @@
 #import "ViParser.h"
 #import "ViError.h"
 #import "NSString-additions.h"
+#import "ViMacro.h"
 #import "logging.h"
 
 @interface ViParser (private)
@@ -163,6 +164,7 @@
 }
 
 - (ViCommand *)pushKey:(NSInteger)keyCode
+           allowMacros:(BOOL)allowMacros
                  scope:(NSArray *)scopeArray
                timeout:(BOOL *)timeoutPtr
                  error:(NSError **)outError
@@ -266,12 +268,14 @@
 
 	[keySequence addObject:keyNum];
 	return [self handleKeySequenceInScope:scopeArray
+				  allowMacros:allowMacros
 				   didTimeout:NO
 				      timeout:timeoutPtr
 				        error:outError];
 }
 
 - (ViCommand *)handleKeySequenceInScope:(NSArray *)scopeArray
+                            allowMacros:(BOOL)allowMacros
                              didTimeout:(BOOL)didTimeout
                                 timeout:(BOOL *)timeoutPtr
                                   error:(NSError **)outError
@@ -281,6 +285,7 @@
 	BOOL timeout = didTimeout;
 	ViMapping *mapping = [map lookupKeySequence:keySequence
 					  withScope:scopeArray
+					allowMacros:allowMacros
 					 excessKeys:&excessKeys
 					    timeout:&timeout
 					      error:&error];
@@ -302,10 +307,31 @@
 		return nil;
 	}
 
-	if (![mapping isAction])
-		return [self fail:outError
-			     with:-1
-			  message:@"macros not yet supported."];
+	if ([mapping isMacro]) {
+		if (!allowMacros) {
+			if (outError)
+				*outError = [ViError errorWithFormat:
+				    @"Internal error in key parser."];
+			[self reset];
+			return nil;
+		}
+
+		/*
+		 * Create a new macro that concatenates the currently
+		 * typed keys (including register, count and operator)
+		 * with the mapped keys.
+		 */
+
+		/* totalKeySequence - keySequence = macro prefix */
+		NSRange r = NSMakeRange(0, [totalKeySequence count] - [keySequence count]);
+		NSArray *prefix = [totalKeySequence subarrayWithRange:r];
+
+		ViMacro *macro = [ViMacro macroWithMapping:mapping
+						    prefix:prefix];
+		[self reset];
+		DEBUG(@"returning macro %@", macro);
+		return macro;
+	}
 
 	keySequence = [NSMutableArray array];
 
@@ -347,7 +373,8 @@
 	} else
 		return [self fail:outError
 			     with:ViErrorParserInternal
-			  message:@"Internal error in vi parser."];
+			  message:@"Internal error in key parser with map %@.",
+				[map name]];
 
 	/* If we got excess keys from the map, parse them now. */
 	return [self pushExcessKeys:excessKeys

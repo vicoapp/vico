@@ -1,7 +1,15 @@
 #import "ViKeyManager.h"
 #import "NSEvent-keyAdditions.h"
+#import "NSString-additions.h"
 #import "ViError.h"
+#import "ViMacro.h"
 #include "logging.h"
+
+@interface ViKeyManager (private)
+- (BOOL)handleKey:(NSInteger)keyCode
+      allowMacros:(BOOL)allowMacros
+            error:(NSError **)outError;
+@end
 
 @implementation ViKeyManager
 
@@ -32,7 +40,36 @@
 			     withObject:error];
 }
 
-- (BOOL)handleKey:(NSInteger)keyCode error:(NSError **)outError
+- (void)runMacro:(ViMacro *)macro
+{
+	DEBUG(@"running macro %@", macro);
+
+	if (++recursionLevel > 1000) {
+		[self presentError:[ViError errorWithFormat:@"Recursive mapping."]];
+		recursionLevel = 0;
+		return;
+	}
+
+	NSInteger keyCode;
+	NSError *error = nil;
+	while ((keyCode = [macro pop]) != -1) {
+		if ([self handleKey:keyCode
+			allowMacros:macro.mapping.recursive
+			      error:&error] == NO || error) {
+			if (error)
+				[self presentError:error];
+		 	INFO(@"aborting macro on key %@",
+			    [NSString stringWithKeyCode:keyCode]);
+			return;
+		}
+	}
+
+	recursionLevel = 0;
+}
+
+- (BOOL)handleKey:(NSInteger)keyCode
+      allowMacros:(BOOL)allowMacros
+            error:(NSError **)outError
 {
 	[keyTimeout invalidate];
 
@@ -59,14 +96,18 @@
 	NSError *error = nil;
 	BOOL timeout = NO;
 	ViCommand *command = [parser pushKey:keyCode
+				 allowMacros:allowMacros
 				       scope:nil
 				     timeout:&timeout
 				       error:&error];
 	if (command) {
-		if ([target respondsToSelector:@selector(keyManager:evaluateCommand:)])
-			[target performSelector:@selector(keyManager:evaluateCommand:)
-				     withObject:self
-				     withObject:command];
+		SEL action = @selector(keyManager:evaluateCommand:);
+		if ([command isKindOfClass:[ViMacro class]])
+			[self runMacro:command];
+		else if ([target respondsToSelector:action])
+			return (BOOL)[target performSelector:action
+						  withObject:self
+						  withObject:command];
 	} else if (error) {
 		if (outError)
 			*outError = error;
@@ -80,18 +121,20 @@
 			keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
 								       target:self
 								     selector:@selector(keyTimedOut:)
-								     userInfo:self
+								     userInfo:nil
 								      repeats:NO];
 	}
 
 	return YES;
 }
 
-- (void)handleKey:(NSInteger)keyCode
+- (BOOL)handleKey:(NSInteger)keyCode
 {
 	NSError *error = nil;
-	if (![self handleKey:keyCode error:&error] && error)
+	BOOL ret;
+	if ((ret = [self handleKey:keyCode allowMacros:YES error:&error]) && error)
 		[self presentError:error];
+	return ret;
 }
 
 - (void)handleKeys:(NSArray *)keys
@@ -105,6 +148,8 @@
 	NSError *error = nil;
 	ViCommand *command = [parser timeoutInScope:nil error:&error];
 	if (command) {
+		if ([command isKindOfClass:[ViMacro class]])
+			[self runMacro:command];
 		if ([target respondsToSelector:@selector(keyManager:evaluateCommand:)])
 			[target performSelector:@selector(keyManager:evaluateCommand:)
 				     withObject:self
@@ -117,7 +162,8 @@
 {
 	BOOL partial = parser.partial;
 	NSError *error = nil;
-	if (![self handleKey:[theEvent normalizedKeyCode] error:&error]) {
+	[self handleKey:[theEvent normalizedKeyCode] allowMacros:YES error:&error];
+	if (error) {
 		if (!partial && [error code] == ViErrorMapNotFound)
 			return NO;
 		[self presentError:error];

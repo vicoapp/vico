@@ -212,6 +212,8 @@ static NSMutableDictionary *maps = nil;
 			u_int64_t rank = [m.scopeSelector matchesScopes:scopeArray];
 			if (rank == 0)
 				continue;
+			if (!allowMacros && [m isMacro])
+				continue;
 
 //			DEBUG(@"testing key [%@] against %@", keySequence, m);
 
@@ -355,6 +357,7 @@ static NSMutableDictionary *maps = nil;
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
                        withScope:(NSArray *)scopeArray
+                     allowMacros:(BOOL)allowMacros
                       excessKeys:(NSArray **)excessKeys
                          timeout:(BOOL *)timeoutPtr
                            error:(NSError **)outError
@@ -370,7 +373,7 @@ static NSMutableDictionary *maps = nil;
 	m = [self lookupKeySequence:keySequence
 			     inMaps:resolved
 			  withScope:scopeArray
-			allowMacros:YES
+			allowMacros:allowMacros
 			 excessKeys:excessKeys
 			    timeout:timeoutPtr
 			      error:&error];

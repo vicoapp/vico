@@ -84,6 +84,7 @@
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
                        withScope:(NSArray *)scopeArray
+                     allowMacros:(BOOL)allowMacros
                       excessKeys:(NSArray **)excessKeys
                          timeout:(BOOL *)timeoutPtr
                            error:(NSError **)outError;

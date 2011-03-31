@@ -222,8 +222,10 @@
 ;; visual map
 (set vmap (ViMap visualMap))
 (vmap include:cmap)
-(vmap include:mmap)
 (vmap include:tmap)
+(vmap include:mmap)
+;; <bs> is already bound to move_left in motionMap (included above),
+;; but mappings in included maps are overridden in the "calling" map.
 (vmap setKey:"<bs>" toEditAction:"delete:")
 (vmap setKey:"<del>" toEditAction:"delete:")
 (vmap setKey:"C" toEditAction:"change:" flags:ViMapLineMode parameter:nil scope:nil)

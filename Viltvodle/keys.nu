@@ -242,6 +242,7 @@
 (vmap setKey:"gu" toEditAction:"lowercase:")
 (vmap setKey:"gt" toAction:"next_tab:")
 (vmap setKey:"gT" toAction:"previous_tab:")
+(vmap setKey:"r" toEditAction:"replace:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (vmap setKey:"s" toEditAction:"substitute:")
 (vmap setKey:"u" toEditAction:"lowercase:")
 (vmap setKey:"v" toAction:"visual:")

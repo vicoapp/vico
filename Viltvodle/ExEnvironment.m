@@ -60,7 +60,8 @@
 {
 	if ([url isFileURL]) {
 		BOOL isDirectory = NO;
-		if (![[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] || !isDirectory) {
+		if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]
+							  isDirectory:&isDirectory] || !isDirectory) {
 			[self message:@"%@: not a directory", [url path]];
 			return NO;
 		}
@@ -68,13 +69,16 @@
 
 	if ([[url scheme] isEqualToString:@"sftp"]) {
 		NSError *error = nil;
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
+										    error:&error];
 
 		if (error == nil && [[url lastPathComponent] isEqualToString:@""])
 			url = [NSURL URLWithString:[conn home] relativeToURL:url];
 
 		BOOL isDirectory = NO;
-		BOOL exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
+		BOOL exists = [conn fileExistsAtPath:[url path]
+					 isDirectory:&isDirectory
+					       error:&error];
 		if (error) {
 			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
 			return NO;
@@ -90,7 +94,8 @@
 	}
 
 	if (![[url absoluteString] hasSuffix:@"/"])
-		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"] relativeToURL:url];
+		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"]
+			     relativeToURL:url];
 
 	baseURL = [url absoluteURL];
 	return YES;
@@ -184,7 +189,9 @@
 	}
 
 	if (error) {
-		[self message:@"%@: %@", [NSURL URLWithString:partialPath relativeToURL:url], [error localizedDescription]];
+		[self message:@"%@: %@",
+		    [NSURL URLWithString:partialPath relativeToURL:url],
+		    [error localizedDescription]];
 		return 0;
 	}
 
@@ -197,7 +204,8 @@
 		else
 			filename = [[(SFTPDirectoryEntry *)entry filename] lastPathComponent];
 
-		NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]), NSMakeRange(0, [filename length]));
+		NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]),
+		    NSMakeRange(0, [filename length]));
 		if ([filename compare:suffix options:options range:r] == NSOrderedSame) {
 			/* Only show dot-files if explicitly requested. */
 			if ([filename hasPrefix:@"."] && ![suffix hasPrefix:@"."])

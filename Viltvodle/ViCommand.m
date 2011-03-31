@@ -61,6 +61,7 @@
 {
 	ViCommand *copy = [ViCommand commandWithMapping:mapping count:saved_count];
 	copy.fromDot = YES;
+	copy.isLineMode = isLineMode;
 	copy.argument = argument;
 	copy.reg = reg;
 	copy.motion = [motion dotCopy];

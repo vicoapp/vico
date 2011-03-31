@@ -210,15 +210,22 @@ static NSMutableDictionary *maps = nil;
 	ViMapping *op = nil; /* fully matched operator */
 	for (ViMap *map in maps) {
 		for (ViMapping *m in map.actions) {
-			u_int64_t rank = [m.scopeSelector matchesScopes:scopeArray];
-			if (rank == 0)
-				continue;
+			u_int64_t rank = 0;
+
 			if (!allowMacros && [m isMacro])
+				continue;
+
+			BOOL partialMatch = [m.keySequence hasPrefix:keySequence];
+			BOOL overflowOrEqualMatch = [keySequence hasPrefix:m.keySequence];
+			BOOL equalMatch = overflowOrEqualMatch && [keySequence count] == [m.keySequence count];
+
+			if (!(partialMatch || overflowOrEqualMatch || equalMatch) ||
+			    (rank = [m.scopeSelector matchesScopes:scopeArray]) == 0)
 				continue;
 
 //			DEBUG(@"testing key [%@] against %@", keySequence, m);
 
-			if ([keySequence hasPrefix:m.keySequence] && [m wantsKeys]) {
+			if (overflowOrEqualMatch && [m wantsKeys]) {
 				/*
 				 * We found an action that requires additional (dynamic) keys.
 				 * Remember the most significant match. If no other mapping
@@ -229,7 +236,7 @@ static NSMutableDictionary *maps = nil;
 					op = m;
 					DEBUG(@"got operator candidate %@", op);
 				}
-			} else if ([keySequence isEqual:m.keySequence] && ![m wantsKeys]) {
+			} else if (equalMatch && ![m wantsKeys]) {
 				/* 
 				 * If we get an exact match, but there are longer key
 				 * sequences that might match if we get more keys, we
@@ -292,7 +299,7 @@ static NSMutableDictionary *maps = nil;
 			}
 
 			/* Check for possibly partial matches. */
-			if ([m.keySequence hasPrefix:keySequence]) {
+			if (partialMatch) {
 				DEBUG(@"got candidate %@", m);
 				/*
 				 * Check for a macro overriding an action with the same key sequence.

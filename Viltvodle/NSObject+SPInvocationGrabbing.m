@@ -11,7 +11,7 @@
 @implementation SPInvocationGrabber
 - (id)initWithObject:(id)obj;
 {
-	return [self initWithObject:obj stacktraceSaving:YES];
+	return [self initWithObject:obj stacktraceSaving:NO];
 }
 
 -(id)initWithObject:(id)obj stacktraceSaving:(BOOL)saveStack;

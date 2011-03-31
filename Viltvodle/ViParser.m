@@ -78,15 +78,15 @@
 				command.motion.count = 0;
 			}
 		}
-	} else if (command.mapping.action == @selector(move_til_char:) ||
-	    command.mapping.action == @selector(move_to_char:) ||
-	    command.mapping.action == @selector(move_back_til_char:) ||
-	    command.mapping.action == @selector(move_back_to_char:)) {
+	} else if (command.action == @selector(move_til_char:) ||
+	    command.action == @selector(move_to_char:) ||
+	    command.action == @selector(move_back_til_char:) ||
+	    command.action == @selector(move_back_to_char:)) {
 		last_ftFT_command = command;
-	} else if (command.motion.mapping.action == @selector(move_til_char:) ||
-	    command.motion.mapping.action == @selector(move_to_char:) ||
-	    command.motion.mapping.action == @selector(move_back_til_char:) ||
-	    command.motion.mapping.action == @selector(move_back_to_char:)) {
+	} else if (command.motion.action == @selector(move_til_char:) ||
+	    command.motion.action == @selector(move_to_char:) ||
+	    command.motion.action == @selector(move_back_til_char:) ||
+	    command.motion.action == @selector(move_back_to_char:)) {
 		last_ftFT_command = command;
 	}
 
@@ -95,10 +95,6 @@
 	if ((command.mapping.flags & ViMapSetsDot) == ViMapSetsDot) {
 		/* set the dot command */
 		dot_command = command;
-
-		/* new (real) commands reset the associated text */
-//		if (!is_dot)
-//			[self setText:nil];
 	}
 
 	if (command.count > 0 && command.motion && command.motion.count > 0) {

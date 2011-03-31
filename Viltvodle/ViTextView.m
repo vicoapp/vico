@@ -677,16 +677,6 @@ int logIndent = 0;
 }
 
 #pragma mark -
-#pragma mark Ex command support
-
-/* syntax: : */
-- (BOOL)ex_command:(ViCommand *)command
-{
-	[[[self delegate] environment] executeForTextView:self];
-	return YES;
-}
-
-#pragma mark -
 #pragma mark Searching
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
@@ -1284,11 +1274,6 @@ int logIndent = 0;
 {
 	if (mode != ViInsertMode)
 		[self endUndoGroup];
-
-	if (![command.mapping isAction]) {
-		[[self delegate] message:@"Macros not implemented."];
-		return NO;
-	}
 
 	if (![self respondsToSelector:command.action]) {
 		[[self delegate] message:@"Command %@ not implemented.",

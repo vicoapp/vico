@@ -1867,5 +1867,12 @@
 	return YES;
 }
 
+/* syntax: : */
+- (BOOL)ex_command:(ViCommand *)command
+{
+	[[[self delegate] environment] executeForTextView:self];
+	return YES;
+}
+
 @end
 

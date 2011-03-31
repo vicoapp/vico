@@ -210,17 +210,26 @@ static NSMutableDictionary *maps = nil;
 	ViMapping *op = nil; /* fully matched operator */
 	for (ViMap *map in maps) {
 		for (ViMapping *m in map.actions) {
-			u_int64_t rank = 0;
-
 			if (!allowMacros && [m isMacro])
 				continue;
 
-			BOOL partialMatch = [m.keySequence hasPrefix:keySequence];
-			BOOL overflowOrEqualMatch = [keySequence hasPrefix:m.keySequence];
-			BOOL equalMatch = overflowOrEqualMatch && [keySequence count] == [m.keySequence count];
+			NSUInteger len = [keySequence count];
+			NSUInteger mlen = [m.keySequence count];
+			NSUInteger i;
+			for (i = 0; i < len && i < mlen; i++)
+				if (![[keySequence objectAtIndex:i] isEqual:[m.keySequence objectAtIndex:i]])
+					break;
+			if (i < len && i < mlen)
+				/* Not enough keys in common. No match. */
+				continue;
 
-			if (!(partialMatch || overflowOrEqualMatch || equalMatch) ||
-			    (rank = [m.scopeSelector matchesScopes:scopeArray]) == 0)
+			BOOL partialOrEqualMatch = (mlen >= len);
+			BOOL overflowOrEqualMatch = (len >= mlen);
+			BOOL equalMatch = (len == mlen);
+
+			/* FIXME: compare rank of all matches */
+			u_int64_t rank = [m.scopeSelector matchesScopes:scopeArray];
+			if (rank == 0)
 				continue;
 
 //			DEBUG(@"testing key [%@] against %@", keySequence, m);
@@ -232,7 +241,7 @@ static NSMutableDictionary *maps = nil;
 				 * matches, we return this operator and the excess keys back
 				 * to the parser (which will try to map them to motion commands).
 				 */
-				if ([m.keySequence count] > [op.keySequence count]) {
+				if (mlen > [op.keySequence count]) {
 					op = m;
 					DEBUG(@"got operator candidate %@", op);
 				}
@@ -299,20 +308,20 @@ static NSMutableDictionary *maps = nil;
 			}
 
 			/* Check for possibly partial matches. */
-			if (partialMatch) {
+			if (partialOrEqualMatch) {
 				DEBUG(@"got candidate %@", m);
 				/*
 				 * Check for a macro overriding an action with the same key sequence.
 				 */
 				if (candidate &&
-				    [m.keySequence count] == [candidate.keySequence count] &&
+				    mlen == [candidate.keySequence count] &&
 				    [m isAction] != [candidate isAction]) {
 					if ([m isMacro])
 						candidate = m;
 					continue;
 				}
 
-				if (candidate || [m.keySequence count] != [keySequence count]) {
+				if (candidate || mlen != len) {
 					/* Need more keys to disambiguate. */
 					if (candidate)
 						DEBUG(@"%s", "multiple matches, need more keys");

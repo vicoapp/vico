@@ -6,6 +6,7 @@
 
 @interface ViParser (private)
 - (ViCommand *)handleKeySequenceInScope:(NSArray *)scopeArray
+                            allowMacros:(BOOL)allowMacros
                              didTimeout:(BOOL)didTimeout
                                 timeout:(BOOL *)timeoutPtr
                                   error:(NSError **)outError;
@@ -124,6 +125,7 @@
 }
 
 - (ViCommand *)pushExcessKeys:(NSArray *)excessKeys
+                  allowMacros:(BOOL)allowMacros
                         scope:(NSArray *)scopeArray
                       timeout:(BOOL *)timeoutPtr
                         error:(NSError **)outError
@@ -131,6 +133,7 @@
 	for (NSNumber *n in excessKeys) {
 		NSError *error = nil;
 		ViCommand *c = [self pushKey:[n integerValue]
+				 allowMacros:allowMacros
 				       scope:scopeArray
 				     timeout:timeoutPtr
 				       error:&error];
@@ -153,6 +156,7 @@
                         error:(NSError **)outError
 {
 	return [self handleKeySequenceInScope:scopeArray
+				  allowMacros:YES	/* XXX: ? */
 				   didTimeout:YES
 				      timeout:nil
 				        error:outError];
@@ -378,6 +382,7 @@
 
 	/* If we got excess keys from the map, parse them now. */
 	return [self pushExcessKeys:excessKeys
+			allowMacros:allowMacros
 			      scope:scopeArray
 			    timeout:timeoutPtr
 			      error:outError];

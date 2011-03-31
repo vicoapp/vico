@@ -28,6 +28,7 @@
 (amap setKey:"<cmd-down>" toMotion:"goto_line:" flags:ViMapLineMode parameter:YES scope:nil)
 
 
+;; generic commands, valid in most maps
 (set cmap (ViMap mapWithName:"commandMap"))
 (cmap setKey:"<cmd-1>" toAction:"switch_tab:" flags:0 parameter:0 scope:nil)
 (cmap setKey:"<cmd-2>" toAction:"switch_tab:" flags:0 parameter:1 scope:nil)

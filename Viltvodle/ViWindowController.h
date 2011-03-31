@@ -1,4 +1,5 @@
 #import "ViTagStack.h"
+#import "ViTagsDatabase.h"
 #import "ViBgView.h"
 #import "ViJumpList.h"
 #import "ExEnvironment.h"
@@ -33,6 +34,8 @@
 	IBOutlet ExEnvironment *environment;
 
 	ViTagStack *tagStack;
+	ViTagsDatabase *tagsDatabase;
+
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	ViDocument *previousDocument;
@@ -69,6 +72,8 @@
 @property(readwrite, assign) ViProject *project;
 @property(readonly) ViScriptProxy *proxy;
 @property(readonly) ProjectDelegate *explorer;
+@property(readonly) ViTagStack *tagStack;
+@property(readonly) ViTagsDatabase *tagsDatabase;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;
@@ -99,8 +104,6 @@
 
 - (ViDocument *)documentForURL:(NSURL *)url;
 
-- (ViTagStack *)sharedTagStack;
-
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
 - (void)selectTabAtIndex:(NSInteger)anIndex;
@@ -111,9 +114,9 @@
 - (void)switchToDocument:(ViDocument *)doc;
 - (void)switchToLastDocument;
 - (void)switchToDocumentAction:(id)sender;
-- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
-- (void)goToURL:(NSURL *)url;
-- (void)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
+- (BOOL)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;
+- (BOOL)gotoURL:(NSURL *)url;
+- (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;

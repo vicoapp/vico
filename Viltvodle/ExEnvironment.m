@@ -116,27 +116,6 @@
 	va_end(ap);
 }
 
-#if 0
-// tag push
-- (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn
-{
-	[[windowController sharedTagStack] pushFile:[[self fileURL] path] line:aLine column:aColumn];
-}
-
-- (void)popTag
-{
-	NSDictionary *location = [[windowController sharedTagStack] pop];
-	if (location == nil) {
-		[self message:@"The tags stack is empty"];
-		return;
-	}
-
-	[windowController gotoURL:[NSURL fileURLWithPath:[location objectForKey:@"file"]]
-			     line:[[location objectForKey:@"line"] unsignedIntegerValue]
-			   column:[[location objectForKey:@"column"] unsignedIntegerValue]];
-}
-#endif
-
 #pragma mark -
 #pragma mark Filename completion
 

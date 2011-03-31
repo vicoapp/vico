@@ -2,7 +2,6 @@
 #import "ViCommand.h"
 #import "ViTheme.h"
 #import "ViLanguage.h"
-#import "ViTagsDatabase.h"
 #import "ViBundle.h"
 #import "logging.h"
 #import "ViSyntaxParser.h"
@@ -20,8 +19,6 @@
 
 @protocol ViTextViewDelegate
 - (void)message:(NSString *)fmt, ...;
-// - (void)pushLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
-// - (void)popTag;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (NSFont *)font;
@@ -55,8 +52,6 @@
 	NSRange			 snippetMatchRange;
 
 	NSUndoManager		*undoManager;
-
-	ViTagsDatabase		*tags; // XXX: doesn't belong here!? Move to the document or window controller.
 
 	// block cursor
 	NSUInteger		 caret;

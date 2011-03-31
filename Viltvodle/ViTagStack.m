@@ -5,20 +5,19 @@
 - (id)init
 {
 	self = [super init];
-	if (self)
-	{
-		stack = [[NSMutableArray alloc] init];
+	if (self) {
+		stack = [NSMutableArray array];
 	}
 	return self;
 }
 
-- (void)pushFile:(NSString*)aFile
-            line:(NSUInteger)aLine
-          column:(NSUInteger)aColumn
+- (void)pushURL:(NSURL *)url
+           line:(NSUInteger)line
+         column:(NSUInteger)column
 {
-	NSDictionary *location = [[NSDictionary alloc] initWithObjectsAndKeys:aFile, @"file",
-				  [NSNumber numberWithUnsignedInteger:aLine], @"line",
-				  [NSNumber numberWithUnsignedInteger:aColumn], @"column",
+	NSDictionary *location = [[NSDictionary alloc] initWithObjectsAndKeys:url, @"url",
+				  [NSNumber numberWithUnsignedInteger:line], @"line",
+				  [NSNumber numberWithUnsignedInteger:column], @"column",
 				  nil];
 	[stack addObject:location];
 }

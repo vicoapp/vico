@@ -39,6 +39,7 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize proxy;
 @synthesize explorer = projectDelegate;
 @synthesize jumpList;
+@synthesize tagStack, tagsDatabase;
 
 + (ViWindowController *)currentWindowController
 {
@@ -73,9 +74,22 @@ static ViWindowController	*currentWindowController = nil;
 		[jumpList setDelegate:self];
 		parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 		proxy = [[ViScriptProxy alloc] initWithObject:self];
+		tagStack = [[ViTagStack alloc] init];
 	}
 
 	return self;
+}
+
+- (ViTagsDatabase *)tagsDatabase
+{
+	if (tagsDatabase == nil || [tagsDatabase databaseHasChanged]) {
+		/* FIXME: tags doesn't work over sftp connections! */
+		NSString *directory = [[environment baseURL] path];
+		tagsDatabase = [[ViTagsDatabase alloc] initWithFile:@"tags"
+							inDirectory:directory];
+	}
+
+	return tagsDatabase;
 }
 
 - (ViParser *)parser
@@ -994,7 +1008,7 @@ static ViWindowController	*currentWindowController = nil;
 	return nil;
 }
 
-- (void)gotoURL:(NSURL *)url
+- (BOOL)gotoURL:(NSURL *)url
            line:(NSUInteger)line
          column:(NSUInteger)column
            view:(ViDocumentView *)docView
@@ -1006,7 +1020,7 @@ static ViWindowController	*currentWindowController = nil;
 		document = [ctrl openDocumentWithContentsOfURL:url display:YES error:&error];
 		if (error) {
 			[NSApp presentError:error];	
-			return;
+			return NO;
 		}
 	}
 
@@ -1017,21 +1031,23 @@ static ViWindowController	*currentWindowController = nil;
 
 	if (line > 0)
 		[[docView textView] gotoLine:line column:column];
+
+	return YES;
 }
 
-- (void)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
+- (BOOL)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
 {
-	[self gotoURL:url line:line column:column view:nil];
+	return [self gotoURL:url line:line column:column view:nil];
 }
 
-- (void)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber
+- (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber
 {
-	[self gotoURL:url line:[lineNumber unsignedIntegerValue] column:0];
+	return [self gotoURL:url line:[lineNumber unsignedIntegerValue] column:0];
 }
 
-- (void)goToURL:(NSURL *)url
+- (BOOL)gotoURL:(NSURL *)url
 {
-	[self gotoURL:url line:0 column:0];
+	return [self gotoURL:url line:0 column:0];
 }
 
 #pragma mark -

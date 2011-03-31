@@ -417,7 +417,7 @@
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
 		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[delegate goToURL:[item url]];
+			[delegate gotoURL:[item url]];
 	}];
 	[self cancelExplorer];
 }
@@ -1399,7 +1399,7 @@ doCommandBySelector:(SEL)aSelector
 		return NO;
 	}
 
-	return [self performSelector:command.action withObject:command];
+	return (BOOL)[self performSelector:command.action withObject:command];
 }
 
 #pragma mark -

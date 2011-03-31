@@ -49,13 +49,16 @@
 
 		NSStringEncoding encoding;
 		NSError *error = nil;
-		NSString *data = [NSString stringWithContentsOfFile:path usedEncoding:&encoding error:&error];
+		NSString *data = [NSString stringWithContentsOfFile:path
+						       usedEncoding:&encoding
+							      error:&error];
 		if (error)
 			[NSApp presentError:error];
 		else {
 			[self parseData:data];
 
-			NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+			NSDictionary *attributes = [fm attributesOfItemAtPath:path
+								        error:&error];
 			if (error)
 				[NSApp presentError:error];
 			else {
@@ -79,9 +82,9 @@
 		NSString *file;
 
 		if ([scan scanUpToString:@"\t" intoString:&symbol] &&
-		   [scan scanCharactersFromSet:tabSet intoString:nil] &&
-		   [scan scanUpToString:@"\t" intoString:&file] &&
-		   [scan scanCharactersFromSet:tabSet intoString:nil] &&
+		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
+		    [scan scanUpToString:@"\t" intoString:&file] &&
+		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
 		   ![scan isAtEnd]) {
 			NSString *path = [prefixPath stringByAppendingPathComponent:file];
 			NSString *command = [[scan string] substringFromIndex:[scan scanLocation]];
@@ -89,7 +92,10 @@
 			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
 			command = [command stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
 	 		command = [command stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
-			// [command replaceOccurrencesOfRegularExpressionString:@"[\\*\\(\\)]" withString:@"\\&" options:OgreRubySyntax range:NSMakeRange(0, [command length])];
+			/*[command replaceOccurrencesOfRegularExpressionString:@"[\\*\\(\\)]"
+								  withString:@"\\&"
+								     options:OgreRubySyntax
+								       range:NSMakeRange(0, [command length])];*/
 			[tags setObject:[NSArray arrayWithObjects:path, command, nil] forKey:symbol];
 		} else
 			DEBUG(@"skipping tags line [%@]", line);

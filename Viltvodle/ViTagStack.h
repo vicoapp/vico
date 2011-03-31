@@ -3,7 +3,9 @@
 	NSMutableArray *stack;
 }
 
-- (void)pushFile:(NSString *)aFile line:(NSUInteger)aLine column:(NSUInteger)aColumn;
+- (void)pushURL:(NSURL *)url
+           line:(NSUInteger)line
+         column:(NSUInteger)column;
 - (NSDictionary *)pop;
 
 @end

@@ -6,6 +6,9 @@
 #import "NSString-scopeSelector.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViRegisterManager.h"
+#import "ViWindowController.h"
+
+#import "ViDocumentView.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -1572,36 +1575,34 @@
 // syntax: ^]
 - (BOOL)jump_tag:(ViCommand *)command
 {
-	if (tags == nil || [tags databaseHasChanged]) {
-		tags = [[ViTagsDatabase alloc] initWithFile:@"tags"
-						inDirectory:[[[[self delegate] fileURL] path] stringByDeletingLastPathComponent]];
-	}
+	ViWindowController *windowController = [[self window] windowController];
+	ViTagsDatabase *db = windowController.tagsDatabase;
+	ViTagStack *stack = windowController.tagStack;
 
-	if (tags == nil) {
+	if (db == nil) {
 		[[self delegate] message:@"tags: No such file or directory."];
 		return NO;
 	}
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
-		NSArray *tag = [tags lookup:word];
+		NSArray *tag = [db lookup:word];
 		if (tag) {
-			[[self delegate] pushLine:[self currentLine] column:[self currentColumn]];
-			[self pushLocationOnJumpList:start_location];
+			NSURL *url = [[self delegate] fileURL];
+			if (url)
+				[stack pushURL:url line:[self currentLine] column:[self currentColumn]];
+			[self pushCurrentLocationOnJumpList];
 
-			NSString *file = [tag objectAtIndex:0];
+			NSString *path = [tag objectAtIndex:0];
 			NSString *ex_command = [tag objectAtIndex:1];
 
-			ViDocument *document = [[NSDocumentController sharedDocumentController]
-				openDocumentWithContentsOfURL:[NSURL fileURLWithPath:file] display:YES error:nil];
+			if (![windowController gotoURL:[NSURL fileURLWithPath:path]])
+				return NO;
 
-			if (document) {
-				ViWindowController *windowController = [[self window] windowController];
-				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
-				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-				[windowController selectDocument:document];
-				[document findPattern:pattern options:0];
-			}
+			NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
+			NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+			ViDocumentView *docView = (ViDocumentView *)[windowController currentView];
+			[[docView textView] findPattern:pattern options:0];
 		} else {
 			[[self delegate] message:@"%@: tag not found", word];
 		}
@@ -1613,7 +1614,17 @@
 // syntax: ^T
 - (BOOL)pop_tag:(ViCommand *)command
 {
-	[[self delegate] popTag];
+	ViWindowController *windowController = [[self window] windowController];
+	ViTagStack *stack = windowController.tagStack;
+	NSDictionary *tag = [stack pop];
+	if (tag) {
+		[windowController gotoURL:[tag objectForKey:@"url"]
+				     line:[[tag objectForKey:@"line"] unsignedIntegerValue]
+				   column:[[tag objectForKey:@"column"] unsignedIntegerValue]];
+	} else {
+		[[self delegate] message:@"The tag stack is empty"];
+		return NO;
+	}
 	return YES;
 }
 

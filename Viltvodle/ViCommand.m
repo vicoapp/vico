@@ -21,6 +21,7 @@
 {
 	if ((self = [super init]) != nil) {
 		mapping = aMapping;
+		isLineMode = mapping.isLineMode;
 		count = saved_count = aCount;
 	}
 	return self;
@@ -33,7 +34,7 @@
 
 - (BOOL)isLineMode
 {
-	return isLineMode || mapping.isLineMode;
+	return isLineMode;
 }
 
 - (BOOL)isMotion

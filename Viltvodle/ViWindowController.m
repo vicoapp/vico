@@ -62,7 +62,6 @@ static ViWindowController	*currentWindowController = nil;
 {
 	self = [super initWithWindowNibName:@"ViDocumentWindow"];
 	if (self) {
-		[self setShouldCascadeWindows:NO];
 		isLoaded = NO;
 		if (windowControllers == nil)
 			windowControllers = [[NSMutableArray alloc] init];

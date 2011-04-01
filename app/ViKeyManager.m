@@ -58,7 +58,7 @@
 			      error:&error] == NO || error) {
 			if (error)
 				[self presentError:error];
-		 	INFO(@"aborting macro on key %@",
+		 	DEBUG(@"aborting macro on key %@",
 			    [NSString stringWithKeyCode:keyCode]);
 			return;
 		}
@@ -131,8 +131,8 @@
 - (BOOL)handleKey:(NSInteger)keyCode
 {
 	NSError *error = nil;
-	BOOL ret;
-	if ((ret = [self handleKey:keyCode allowMacros:YES error:&error]) && error)
+	BOOL ret = [self handleKey:keyCode allowMacros:YES error:&error];
+	if (error)
 		[self presentError:error];
 	return ret;
 }

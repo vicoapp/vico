@@ -28,3 +28,5 @@ ln -s ../Nu.framework "$dir"
 
 mv $dir/vico-$version.dmg .
 
+echo removing build directory
+rm -r "$dir"

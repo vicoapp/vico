@@ -22,7 +22,7 @@ echo checking out sources
 hg clone -u $tag . "$dir" || exit 2
 
 # HACK!
-ln -s ../nu "$dir/nu"
+ln -s ../Nu.framework "$dir"
 
 (cd $dir && ./mkdmg $version) || exit 3
 

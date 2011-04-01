@@ -24,8 +24,7 @@ die()
 APP=build/Release/Vico.app
 
 echo "Stripping binary"
-strip $APP/Contents/MacOS/Vico
-strip $APP/Contents/MacOS/vico.shell
+strip $APP/Contents/MacOS/*
 
 VOL="vico-$VERSION"
 DMG="$VOL.dmg"

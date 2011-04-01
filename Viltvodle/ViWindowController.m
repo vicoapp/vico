@@ -1373,14 +1373,13 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (void)goToSymbol:(ViSymbol *)aSymbol inDocument:(ViDocument *)document
 {
 	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		/* XXX: prevent pushing an extraneous jump on the list. */
-		jumping = YES;
+	if ([viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
-		jumping = NO;
-	}
 
+	/* XXX: prevent pushing an extraneous jump on the list. */
+	jumping = YES;
 	ViDocumentView *docView = [self selectDocument:document];
+	jumping = NO;
 
 	NSRange range = [aSymbol range];
 	ViTextView *textView = [docView textView];

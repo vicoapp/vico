@@ -1372,11 +1372,11 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (void)goToSymbol:(ViSymbol *)aSymbol inDocument:(ViDocument *)document
 {
-	ViDocumentView *docView = [self selectDocument:document];
-
 	id<ViViewController> viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
+
+	ViDocumentView *docView = [self selectDocument:document];
 
 	NSRange range = [aSymbol range];
 	ViTextView *textView = [docView textView];

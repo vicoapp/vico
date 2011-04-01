@@ -1,6 +1,5 @@
 URGENT
 ========
-* jumping to symbol should push location on jump list!
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
 * fuzzy search feels *slow*

@@ -1608,19 +1608,41 @@
 	} else if ([syms count] == 1) {
 		[self gotoSymbol:[syms objectAtIndex:0]];
 	} else {
+		NSMapTable *docs = [NSMapTable mapTableWithStrongToStrongObjects];
+		for (ViSymbol *sym in syms) {
+			NSMutableArray *a = [docs objectForKey:sym.document];
+			if (a == nil) {
+				a = [NSMutableArray array];
+				[docs setObject:a forKey:sym.document];
+			}
+			[a addObject:sym];
+		}
+		BOOL multiDocs = [docs count] > 1;
+
 		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Symbol matches"];
 		[menu setAllowsContextMenuPlugIns:NO];
 		int quickindex = 1;
-		for (ViSymbol *sym in syms) {
-			NSString *key = @"";
-			if (quickindex <= 10)
-				key = [NSString stringWithFormat:@"%i", quickindex % 10];
-			NSMenuItem *item = [menu addItemWithTitle:sym.displayName
-			                                   action:@selector(gotoSymbol:)
-			                            keyEquivalent:key];
-			[item setKeyEquivalentModifierMask:0];
-			[item setRepresentedObject:sym];
-			++quickindex;
+		for (ViDocument *doc in docs) {
+			if (multiDocs) {
+				NSMenuItem *item = [menu addItemWithTitle:[doc title]
+								   action:nil
+							    keyEquivalent:@""];
+				[item setEnabled:NO];
+			}
+
+			for (ViSymbol *sym in [docs objectForKey:doc]) {
+				NSString *key = @"";
+				if (quickindex <= 10)
+					key = [NSString stringWithFormat:@"%i", quickindex % 10];
+				NSMenuItem *item = [menu addItemWithTitle:sym.displayName
+								   action:@selector(gotoSymbol:)
+							    keyEquivalent:key];
+				[item setKeyEquivalentModifierMask:0];
+				[item setRepresentedObject:sym];
+				if (multiDocs)
+					[item setIndentationLevel:1];
+				++quickindex;
+			}
 		}
 		[self popUpContextMenu:menu];
 	}

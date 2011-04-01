@@ -55,7 +55,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[userDefaults addObserver:self forKeyPath:@"wrap" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"list" options:0 context:NULL];
 
-		sym_q = dispatch_queue_create("se.bzero.viltvodle.sym", NULL);
+		sym_q = dispatch_queue_create("se.bzero.vico.sym", NULL);
 
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];

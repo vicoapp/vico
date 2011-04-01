@@ -151,7 +151,7 @@
 	DEBUG(@"shell command = [%@]", shellCommand);
 	if ([shellCommand hasPrefix:@"#!"]) {
 		const char *tmpl = [[NSTemporaryDirectory()
-		    stringByAppendingPathComponent:@"viltvodle_cmd.XXXXXXXXXX"]
+		    stringByAppendingPathComponent:@"vico_cmd.XXXXXXXXXX"]
 		    fileSystemRepresentation];
 		DEBUG(@"using template %s", tmpl);
 		templateFilename = strdup(tmpl);

@@ -1,6 +1,6 @@
 require "fileutils"
 
-VIVO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vivo'
+VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool'
 
 module TextMate
   class << self
@@ -33,7 +33,7 @@ module TextMate
 
     def save_current_document(temp_ext='tmp')
 
-      %x{#{VIVO} -e '(document saveDocument:nil)'}
+      %x{#{VICO} -e '(document saveDocument:nil)'}
 
 #      doc, dst = STDIN.read, ENV['TM_FILEPATH']
 #      ENV['TM_DISPLAYNAME'] = ENV['TM_FILENAME']

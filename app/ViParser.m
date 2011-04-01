@@ -160,7 +160,7 @@
 
 - (ViCommand *)pushKey:(NSInteger)keyCode
 {
-	return [self pushKey:keyCode scope:nil timeout:nil error:nil];
+	return [self pushKey:keyCode allowMacros:YES scope:nil timeout:nil error:nil];
 }
 
 - (ViCommand *)pushKey:(NSInteger)keyCode

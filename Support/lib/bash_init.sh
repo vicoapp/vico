@@ -16,7 +16,7 @@ fi
 
 export PATH
 
-: ${TM_BASH_INIT:=$HOME/Library/Application Support/Viltvodle/bash_init.sh}
+: ${TM_BASH_INIT:=$HOME/Library/Application Support/Vico/bash_init.sh}
 if [[ -f "$TM_BASH_INIT" ]]; then
 	. "$TM_BASH_INIT"
 fi
@@ -42,7 +42,7 @@ exit_create_new_document ()	{ echo -n "$1"; exit 207; }
 
 # force TM to refresh current file and project drawer
 rescan_project () {
-	$TM_APP_PATH/Contents/MacOS/vivo -e "(explorer rescan_files:nil)"
+	$TM_APP_PATH/Contents/MacOS/vicotool -e "(explorer rescan_files:nil)"
 }
 
 # use this as a filter (|pre) when you want 

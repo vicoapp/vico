@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'ViltvodleTests' target in the 'ViltvodleTests' project
-//
-
-#ifdef __OBJC__
-	#import <Cocoa/Cocoa.h>
-#endif

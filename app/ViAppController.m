@@ -65,7 +65,7 @@
 {
 	static NSString *supportDirectory = nil;
 	if (supportDirectory == nil)
-		supportDirectory = [@"~/Library/Application Support/Viltvodle" stringByExpandingTildeInPath];
+		supportDirectory = [@"~/Library/Application Support/Vico" stringByExpandingTildeInPath];
 	return supportDirectory;
 }
 
@@ -149,7 +149,7 @@
 	//shellConn = [NSConnection serviceConnectionWithName:@"chunky bacon" rootObject:self];
 	shellConn = [NSConnection new];
 	[shellConn setRootObject:self];
-	[shellConn registerName:[NSString stringWithFormat:@"viltvodle.%u", (unsigned int)getuid()]];
+	[shellConn registerName:[NSString stringWithFormat:@"vico.%u", (unsigned int)getuid()]];
 
 	extern struct timeval launch_start;
 	struct timeval launch_done, launch_diff;
@@ -275,7 +275,7 @@ additionalBindings:(NSDictionary *)bindings
         [Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
         [Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
         [Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:[parser context]];
-        [Nu loadNuFile:@"viltvodle"     fromBundleWithIdentifier:@"se.bzero.Viltvodle" withContext:[parser context]];
+        [Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:[parser context]];
 
 	id code = [parser parse:script];
 	if (code == nil) {

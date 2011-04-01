@@ -10,7 +10,7 @@ require 'osx/plist'
 require 'json'
 require 'json/add/core'
 
-VIVO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vivo'
+VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool'
 NULIB = ENV['TM_SUPPORT_PATH'] + '/lib/nu'
 
 module TextMate
@@ -47,7 +47,7 @@ module TextMate
         raise "style must be one of #{types.inspect}" unless styles.include?(style)
 
         params = {'alertStyle' => style.to_s, 'messageTitle' => title, 'informativeText' => message, 'buttonTitles' => buttons}
-        button_index = %x{#{VIVO} -r -f "#{NULIB}/alert.nu -p '#{params.to_json}'}.chomp.to_i
+        button_index = %x{#{VICO} -r -f "#{NULIB}/alert.nu -p '#{params.to_json}'}.chomp.to_i
         buttons[button_index]
       end
 
@@ -89,7 +89,7 @@ module TextMate
 
         p = { "params" => plist, "nibFile" => nib }
 
-        `#{VIVO} -r -f "#{NULIB}/dialog.nu" -p '#{plist.to_json}' &> /dev/null &`
+        `#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{plist.to_json}' &> /dev/null &`
         #`#{TM_DIALOG} -cqp #{e_sh plist.to_plist} #{e_sh nib} &> /dev/null &`
       end
   
@@ -166,7 +166,7 @@ module TextMate
 
           # Insert the snippet if necessary
           #`"$DIALOG" x-insert --snippet #{e_sh to_insert}` unless to_insert.empty?
-          `#{VIVO} -e '(text insertSnippet:"#{to_insert}")'` unless to_insert.empty?
+          `#{VICO} -e '(text insertSnippet:"#{to_insert}")'` unless to_insert.empty?
         end
       end
       
@@ -180,7 +180,7 @@ module TextMate
           options = options.collect { |e| e == nil ? { 'separator' => 1 } : { 'title' => e } }
         end
 
-        res = ::IO.popen("#{VIVO} -r -f '#{NULIB}/menu.nu' -p -", "r+") do |io|
+        res = ::IO.popen("#{VICO} -r -f '#{NULIB}/menu.nu' -p -", "r+") do |io|
           Thread.new do
             plist = { 'menuItems' => options }.to_json
             io.write plist; io.close_write
@@ -243,7 +243,7 @@ module TextMate
           params["items"] = items
 
           p = { "params" => params, "nibFile" => "#{ENV['TM_SUPPORT_PATH']}/nibs/RequestItem.nib" }
-          return_json = %x{#{VIVO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
+          return_json = %x{#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
 
           # return_plist = %x{#{TM_DIALOG} -cmp #{e_sh params.to_plist} #{e_sh(ENV['TM_SUPPORT_PATH'] + "/nibs/RequestItem")}}
           #return_hash = OSX::PropertyList::load(return_plist)

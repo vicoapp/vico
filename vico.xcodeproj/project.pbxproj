@@ -207,8 +207,8 @@
 		9A4346D61331182E002B04DE /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D31331182E002B04DE /* Themes */; };
 		9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D71331239E002B04DE /* symbol-icons.plist */; };
 		9A4346E01331257A002B04DE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A4346DF1331257A002B04DE /* Foundation.framework */; };
-		9A4346EB13312710002B04DE /* vivo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346EA13312710002B04DE /* vivo.m */; };
-		9A4346EF13312861002B04DE /* vivo in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vivo */; };
+		9A4346EB13312710002B04DE /* vico.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346EA13312710002B04DE /* vico.m */; };
+		9A4346EF13312861002B04DE /* vicotool in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vicotool */; };
 		9A4347041331383C002B04DE /* NSObject+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F31331383C002B04DE /* NSObject+JSON.m */; };
 		9A4347051331383C002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
 		9A4347061331383C002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
@@ -227,7 +227,7 @@
 		9A43471313313854002B04DE /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FF1331383C002B04DE /* SBJsonStreamWriterState.m */; };
 		9A43471413313854002B04DE /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347011331383C002B04DE /* SBJsonTokeniser.m */; };
 		9A43471513313854002B04DE /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; };
-		9A43471813313894002B04DE /* vivo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A43471613313874002B04DE /* vivo.1 */; };
+		9A43471813313894002B04DE /* vico.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A43471613313874002B04DE /* vico.1 */; };
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
 		9A5DD69A13430176006981AE /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
 		9A5DD69E134326A6006981AE /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
@@ -235,8 +235,8 @@
 		9A5DD6B213445C80006981AE /* ViMacro.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD6B113445C80006981AE /* ViMacro.m */; };
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
-		9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* viltvodle.nu */; };
-		9A9A63CC1339D0CA0053402A /* viltvodle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* viltvodle.icns */; };
+		9A5EE40113366DC0002E82B1 /* vico.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* vico.nu */; };
+		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
@@ -264,7 +264,7 @@
 			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 9A2EF28E133109C10023C5B7;
-			remoteInfo = Viltvodle;
+			remoteInfo = Vico;
 		};
 		9A2EF41B13310F9B0023C5B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -278,7 +278,7 @@
 			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 9A4346DC1331257A002B04DE;
-			remoteInfo = vivo;
+			remoteInfo = vico;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -298,7 +298,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				9A43471813313894002B04DE /* vivo.1 in CopyFiles */,
+				9A43471813313894002B04DE /* vico.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +308,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				9A4346EF13312861002B04DE /* vivo in Copy Executables */,
+				9A4346EF13312861002B04DE /* vicotool in Copy Executables */,
 			);
 			name = "Copy Executables";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -327,21 +327,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9A2EF28F133109C10023C5B7 /* Viltvodle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Viltvodle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A2EF297133109C20023C5B7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		9A2EF298133109C20023C5B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		9A2EF29B133109C20023C5B7 /* Viltvodle-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Viltvodle-Info.plist"; sourceTree = "<group>"; };
+		9A2EF29B133109C20023C5B7 /* Vico-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Vico-Info.plist"; sourceTree = "<group>"; };
 		9A2EF29D133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9A2EF29F133109C20023C5B7 /* Viltvodle-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Viltvodle-Prefix.pch"; sourceTree = "<group>"; };
+		9A2EF29F133109C20023C5B7 /* Vico-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Prefix.pch"; sourceTree = "<group>"; };
 		9A2EF2A0133109C20023C5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A2EF2A3133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		9A2EF2A9133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		9A2EF2B0133109C20023C5B7 /* ViltvodleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ViltvodleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A2EF2B6133109C20023C5B7 /* ViltvodleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ViltvodleTests-Info.plist"; sourceTree = "<group>"; };
+		9A2EF2B0133109C20023C5B7 /* tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A2EF2B6133109C20023C5B7 /* tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "tests-Info.plist"; sourceTree = "<group>"; };
 		9A2EF2B8133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9A2EF2BA133109C20023C5B7 /* ViltvodleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ViltvodleTests-Prefix.pch"; sourceTree = "<group>"; };
+		9A2EF2BA133109C20023C5B7 /* tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tests-Prefix.pch"; sourceTree = "<group>"; };
 		9A2EF2C713310AD70023C5B7 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A2EF2C813310AD70023C5B7 /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
 		9A2EF2C913310AD70023C5B7 /* TestViParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViParser.m; sourceTree = "<group>"; };
@@ -653,10 +653,10 @@
 		9A4346D21331182E002B04DE /* Support */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Support; sourceTree = SOURCE_ROOT; };
 		9A4346D31331182E002B04DE /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = SOURCE_ROOT; };
 		9A4346D71331239E002B04DE /* symbol-icons.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "symbol-icons.plist"; sourceTree = "<group>"; };
-		9A4346DD1331257A002B04DE /* vivo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vivo; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A4346DD1331257A002B04DE /* vicotool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vicotool; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A4346DF1331257A002B04DE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		9A4346E51331257E002B04DE /* vivo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vivo-Prefix.pch"; sourceTree = "<group>"; };
-		9A4346EA13312710002B04DE /* vivo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vivo.m; path = vivo/vivo.m; sourceTree = SOURCE_ROOT; };
+		9A4346E51331257E002B04DE /* vico-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vico-Prefix.pch"; sourceTree = "<group>"; };
+		9A4346EA13312710002B04DE /* vico.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vico.m; path = util/vico.m; sourceTree = SOURCE_ROOT; };
 		9A4346F11331383C002B04DE /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = json/JSON.h; sourceTree = SOURCE_ROOT; };
 		9A4346F21331383C002B04DE /* NSObject+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+JSON.h"; path = "json/NSObject+JSON.h"; sourceTree = SOURCE_ROOT; };
 		9A4346F31331383C002B04DE /* NSObject+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+JSON.m"; path = "json/NSObject+JSON.m"; sourceTree = SOURCE_ROOT; };
@@ -676,7 +676,7 @@
 		9A4347011331383C002B04DE /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonTokeniser.m; path = json/SBJsonTokeniser.m; sourceTree = SOURCE_ROOT; };
 		9A4347021331383C002B04DE /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = json/SBJsonWriter.h; sourceTree = SOURCE_ROOT; };
 		9A4347031331383C002B04DE /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = json/SBJsonWriter.m; sourceTree = SOURCE_ROOT; };
-		9A43471613313874002B04DE /* vivo.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; name = vivo.1; path = vivo/vivo.1; sourceTree = SOURCE_ROOT; };
+		9A43471613313874002B04DE /* vico.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; name = vico.1; path = util/vico.1; sourceTree = SOURCE_ROOT; };
 		9A434719133138AA002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
@@ -687,9 +687,9 @@
 		9A5DD69F13435F0D006981AE /* TestKeyCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyCodes.m; sourceTree = "<group>"; };
 		9A5DD6B013445C80006981AE /* ViMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMacro.h; sourceTree = "<group>"; };
 		9A5DD6B113445C80006981AE /* ViMacro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMacro.m; sourceTree = "<group>"; };
-		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nu.framework; path = nu/Nu.framework; sourceTree = "<group>"; };
-		9A5EE40013366DC0002E82B1 /* viltvodle.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = viltvodle.nu; sourceTree = "<group>"; };
-		9A9A63CB1339D0CA0053402A /* viltvodle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = viltvodle.icns; path = ../viltvodle.icns; sourceTree = "<group>"; };
+		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Nu.framework; sourceTree = "<group>"; };
+		9A5EE40013366DC0002E82B1 /* vico.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vico.nu; sourceTree = "<group>"; };
+		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
 		9AB10BA2133F72E600D81D33 /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -745,10 +745,10 @@
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
 				9A434719133138AA002B04DE /* ApplicationServices.framework */,
-				9A2EF299133109C20023C5B7 /* Viltvodle */,
+				9A2EF299133109C20023C5B7 /* app */,
 				9A2EF2B4133109C20023C5B7 /* Tests */,
 				9A2EF41213310F4D0023C5B7 /* lemon */,
-				9A4346E11331257A002B04DE /* vivo */,
+				9A4346E11331257A002B04DE /* shell tool */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
 			);
@@ -757,10 +757,10 @@
 		9A2EF290133109C10023C5B7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9A2EF28F133109C10023C5B7 /* Viltvodle.app */,
-				9A2EF2B0133109C20023C5B7 /* ViltvodleTests.octest */,
+				9A2EF28F133109C10023C5B7 /* Vico.app */,
+				9A2EF2B0133109C20023C5B7 /* tests.octest */,
 				9A2EF41013310F4D0023C5B7 /* lemon */,
-				9A4346DD1331257A002B04DE /* vivo */,
+				9A4346DD1331257A002B04DE /* vicotool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -786,7 +786,7 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		9A2EF299133109C20023C5B7 /* Viltvodle */ = {
+		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
@@ -797,17 +797,17 @@
 				9A434699133115AB002B04DE /* Resources */,
 				9A2EF29A133109C20023C5B7 /* Supporting Files */,
 			);
-			path = Viltvodle;
+			path = app;
 			sourceTree = "<group>";
 		};
 		9A2EF29A133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
 				9AB10BAB13408B6600D81D33 /* keys.nu */,
-				9A5EE40013366DC0002E82B1 /* viltvodle.nu */,
-				9A2EF29B133109C20023C5B7 /* Viltvodle-Info.plist */,
+				9A5EE40013366DC0002E82B1 /* vico.nu */,
+				9A2EF29B133109C20023C5B7 /* Vico-Info.plist */,
 				9A2EF29C133109C20023C5B7 /* InfoPlist.strings */,
-				9A2EF29F133109C20023C5B7 /* Viltvodle-Prefix.pch */,
+				9A2EF29F133109C20023C5B7 /* Vico-Prefix.pch */,
 				9A2EF2A0133109C20023C5B7 /* main.m */,
 				9A2EF2A2133109C20023C5B7 /* Credits.rtf */,
 			);
@@ -828,15 +828,15 @@
 				9A2EF2B5133109C20023C5B7 /* Supporting Files */,
 			);
 			name = Tests;
-			path = ViltvodleTests;
+			path = tests;
 			sourceTree = "<group>";
 		};
 		9A2EF2B5133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9A2EF2B6133109C20023C5B7 /* ViltvodleTests-Info.plist */,
+				9A2EF2B6133109C20023C5B7 /* tests-Info.plist */,
 				9A2EF2B7133109C20023C5B7 /* InfoPlist.strings */,
-				9A2EF2BA133109C20023C5B7 /* ViltvodleTests-Prefix.pch */,
+				9A2EF2BA133109C20023C5B7 /* tests-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1003,7 +1003,7 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9A9A63CB1339D0CA0053402A /* viltvodle.icns */,
+				9A9A63CB1339D0CA0053402A /* vico.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
 				9A4346D11331182E002B04DE /* Bundles */,
 				9A4346D21331182E002B04DE /* Support */,
@@ -1216,21 +1216,21 @@
 			name = Images;
 			sourceTree = "<group>";
 		};
-		9A4346E11331257A002B04DE /* vivo */ = {
+		9A4346E11331257A002B04DE /* shell tool */ = {
 			isa = PBXGroup;
 			children = (
-				9A43471613313874002B04DE /* vivo.1 */,
-				9A4346EA13312710002B04DE /* vivo.m */,
+				9A43471613313874002B04DE /* vico.1 */,
+				9A4346EA13312710002B04DE /* vico.m */,
 				9A4346E41331257E002B04DE /* Supporting Files */,
 			);
-			name = vivo;
-			path = vish;
+			name = "shell tool";
+			path = util;
 			sourceTree = "<group>";
 		};
 		9A4346E41331257E002B04DE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9A4346E51331257E002B04DE /* vivo-Prefix.pch */,
+				9A4346E51331257E002B04DE /* vico-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1264,9 +1264,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9A2EF28E133109C10023C5B7 /* Viltvodle */ = {
+		9A2EF28E133109C10023C5B7 /* Vico */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Viltvodle" */;
+			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
 			buildPhases = (
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
@@ -1282,14 +1282,14 @@
 				9A4346ED1331284C002B04DE /* PBXTargetDependency */,
 				9A2EF41C13310F9B0023C5B7 /* PBXTargetDependency */,
 			);
-			name = Viltvodle;
-			productName = Viltvodle;
-			productReference = 9A2EF28F133109C10023C5B7 /* Viltvodle.app */;
+			name = Vico;
+			productName = Vico;
+			productReference = 9A2EF28F133109C10023C5B7 /* Vico.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9A2EF2AF133109C20023C5B7 /* ViltvodleTests */ = {
+		9A2EF2AF133109C20023C5B7 /* Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9A2EF2C4133109C20023C5B7 /* Build configuration list for PBXNativeTarget "ViltvodleTests" */;
+			buildConfigurationList = 9A2EF2C4133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
 				9A2EF2AB133109C20023C5B7 /* Sources */,
 				9A2EF2AC133109C20023C5B7 /* Frameworks */,
@@ -1301,9 +1301,9 @@
 			dependencies = (
 				9A2EF2B3133109C20023C5B7 /* PBXTargetDependency */,
 			);
-			name = ViltvodleTests;
-			productName = ViltvodleTests;
-			productReference = 9A2EF2B0133109C20023C5B7 /* ViltvodleTests.octest */;
+			name = Tests;
+			productName = tests;
+			productReference = 9A2EF2B0133109C20023C5B7 /* tests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 		9A2EF40F13310F4D0023C5B7 /* lemon */ = {
@@ -1323,9 +1323,9 @@
 			productReference = 9A2EF41013310F4D0023C5B7 /* lemon */;
 			productType = "com.apple.product-type.tool";
 		};
-		9A4346DC1331257A002B04DE /* vivo */ = {
+		9A4346DC1331257A002B04DE /* vicotool */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9A4346E71331257E002B04DE /* Build configuration list for PBXNativeTarget "vivo" */;
+			buildConfigurationList = 9A4346E71331257E002B04DE /* Build configuration list for PBXNativeTarget "vicotool" */;
 			buildPhases = (
 				9A4346D91331257A002B04DE /* Sources */,
 				9A4346DA1331257A002B04DE /* Frameworks */,
@@ -1335,9 +1335,9 @@
 			);
 			dependencies = (
 			);
-			name = vivo;
-			productName = vish;
-			productReference = 9A4346DD1331257A002B04DE /* vivo */;
+			name = vicotool;
+			productName = vico.shell;
+			productReference = 9A4346DD1331257A002B04DE /* vicotool */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -1345,7 +1345,7 @@
 /* Begin PBXProject section */
 		9A2EF286133109C10023C5B7 /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "Viltvodle" */;
+			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1357,10 +1357,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9A2EF28E133109C10023C5B7 /* Viltvodle */,
-				9A2EF2AF133109C20023C5B7 /* ViltvodleTests */,
+				9A2EF28E133109C10023C5B7 /* Vico */,
+				9A2EF2AF133109C20023C5B7 /* Tests */,
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
-				9A4346DC1331257A002B04DE /* vivo */,
+				9A4346DC1331257A002B04DE /* vicotool */,
 			);
 		};
 /* End PBXProject section */
@@ -1401,8 +1401,8 @@
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
-				9A5EE40113366DC0002E82B1 /* viltvodle.nu in Resources */,
-				9A9A63CC1339D0CA0053402A /* viltvodle.icns in Resources */,
+				9A5EE40113366DC0002E82B1 /* vico.nu in Resources */,
+				9A9A63CC1339D0CA0053402A /* vico.icns in Resources */,
 				9AB10BAC13408B6600D81D33 /* keys.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1665,7 +1665,7 @@
 				9A43471313313854002B04DE /* SBJsonStreamWriterState.m in Sources */,
 				9A43471413313854002B04DE /* SBJsonTokeniser.m in Sources */,
 				9A43471513313854002B04DE /* SBJsonWriter.m in Sources */,
-				9A4346EB13312710002B04DE /* vivo.m in Sources */,
+				9A4346EB13312710002B04DE /* vico.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1674,7 +1674,7 @@
 /* Begin PBXTargetDependency section */
 		9A2EF2B3133109C20023C5B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9A2EF28E133109C10023C5B7 /* Viltvodle */;
+			target = 9A2EF28E133109C10023C5B7 /* Vico */;
 			targetProxy = 9A2EF2B2133109C20023C5B7 /* PBXContainerItemProxy */;
 		};
 		9A2EF41C13310F9B0023C5B7 /* PBXTargetDependency */ = {
@@ -1684,7 +1684,7 @@
 		};
 		9A4346ED1331284C002B04DE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9A4346DC1331257A002B04DE /* vivo */;
+			target = 9A4346DC1331257A002B04DE /* vicotool */;
 			targetProxy = 9A4346EC1331284C002B04DE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1761,7 +1761,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = nu;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1788,7 +1788,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = nu;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1813,15 +1813,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/nu\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Viltvodle/Viltvodle-Prefix.pch";
-				INFOPLIST_FILE = "Viltvodle/Viltvodle-Info.plist";
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				INFOPLIST_FILE = "app/Vico-Info.plist";
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -1839,14 +1836,11 @@
 				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/nu\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Viltvodle/Viltvodle-Prefix.pch";
-				INFOPLIST_FILE = "Viltvodle/Viltvodle-Info.plist";
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				INFOPLIST_FILE = "app/Vico-Info.plist";
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -1861,14 +1855,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Viltvodle.app/Contents/MacOS/Viltvodle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ViltvodleTests/ViltvodleTests-Prefix.pch";
-				INFOPLIST_FILE = "ViltvodleTests/ViltvodleTests-Info.plist";
+				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
+				INFOPLIST_FILE = "tests/Tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",
 					SenTestingKit,
@@ -1883,14 +1877,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Viltvodle.app/Contents/MacOS/Viltvodle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ViltvodleTests/ViltvodleTests-Prefix.pch";
-				INFOPLIST_FILE = "ViltvodleTests/ViltvodleTests-Info.plist";
+				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
+				INFOPLIST_FILE = "tests/Tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",
 					SenTestingKit,
@@ -1930,14 +1924,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/nu\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "vivo/vivo-Prefix.pch";
+				GCC_PREFIX_HEADER = "util/vico-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1949,13 +1940,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/nu\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "vivo/vivo-Prefix.pch";
+				GCC_PREFIX_HEADER = "util/vico-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1964,7 +1952,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "Viltvodle" */ = {
+		9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2BF133109C20023C5B7 /* Debug */,
@@ -1973,7 +1961,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Viltvodle" */ = {
+		9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2C2133109C20023C5B7 /* Debug */,
@@ -1982,7 +1970,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9A2EF2C4133109C20023C5B7 /* Build configuration list for PBXNativeTarget "ViltvodleTests" */ = {
+		9A2EF2C4133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2C5133109C20023C5B7 /* Debug */,
@@ -2000,7 +1988,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9A4346E71331257E002B04DE /* Build configuration list for PBXNativeTarget "vivo" */ = {
+		9A4346E71331257E002B04DE /* Build configuration list for PBXNativeTarget "vicotool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A4346E81331257E002B04DE /* Debug */,

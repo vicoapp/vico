@@ -11,7 +11,7 @@ fi
 echo tag is $tag
 echo version = $version
 
-dir=build.viltvodle-$version
+dir=build.vico-$version
 echo build directory is $dir
 if test -d "$dir"; then
 	echo "build dir already exists: $dir"
@@ -26,6 +26,5 @@ ln -s ../nu "$dir/nu"
 
 (cd $dir && ./mkdmg $version) || exit 3
 
-mv $dir/viltvodle-$version.dmg .
-#mv $dir/viltvodle-$version.xml .
+mv $dir/vico-$version.dmg .
 

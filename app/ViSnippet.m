@@ -69,7 +69,7 @@
 	int fd = -1;
 
 	if ([shellCommand hasPrefix:@"#!"]) {
-		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"viltvodle_cmd.XXXXXXXXXX"] fileSystemRepresentation];
+		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vico_cmd.XXXXXXXXXX"] fileSystemRepresentation];
 		templateFilename = strdup(tmpl);
 		fd = mkstemp(templateFilename);
 		DEBUG(@"using template %s", templateFilename);

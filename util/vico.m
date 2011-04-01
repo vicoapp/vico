@@ -96,12 +96,12 @@ main(int argc, char **argv)
 		}
 	}
 
-	NSString *connName = [NSString stringWithFormat:@"viltvodle.%u", (unsigned int)getuid()];
+	NSString *connName = [NSString stringWithFormat:@"vico.%u", (unsigned int)getuid()];
 	proxy = [NSConnection rootProxyForConnectionWithRegisteredName:connName
 	                                                          host:nil];
 	if (proxy == nil) {
 		/* failed to connect, try to start it */
-		CFStringRef bundle_id = CFSTR("se.bzero.Viltvodle");
+		CFStringRef bundle_id = CFSTR("se.bzero.Vico");
 		FSRef appRef;
 		if (LSFindApplicationForInfo(kLSUnknownCreator, bundle_id, NULL, &appRef, NULL) == 0 &&
 		    LSOpenFSRef(&appRef, NULL) == 0) {

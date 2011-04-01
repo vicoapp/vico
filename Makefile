@@ -2,19 +2,19 @@ debug:
 	xcodebuild -configuration Debug
 
 run: debug
-	./build/Debug/Viltvodle.app/Contents/MacOS/Viltvodle 
+	./build/Debug/Vico.app/Contents/MacOS/Vico
 
 build:
 	xcodebuild -scheme archive
 
 test:
-	xcodebuild -configuration Debug -target ViltvodleTests
+	xcodebuild -configuration Debug -target Tests
 
 release:
 	./release.sh
 
 tarball:
-	FILE="viltvodle-hg-$(date +%Y%m%d%H).tar.gz" \
+	FILE="vico-hg-$(date +%Y%m%d%H).tar.gz" \
 	tar zcvf $FILE .hg && \
 	gpg -r martin -e $FILE && \
 	rm $FILE

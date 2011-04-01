@@ -11,7 +11,7 @@ echo "Building version $VERSION (repo version $REPO_VERSION)"
 
 xcodebuild -scheme archive -configuration Release VERSION=$VERSION REPO_VERSION=$REPO_VERSION || exit
 
-TMPDMG=viltvodle-tmp.dmg
+TMPDMG=vico-tmp.dmg
 /bin/rm -f $TMPDMG
 
 die()
@@ -21,13 +21,13 @@ die()
     exit 1
 }
 
-APP=build/Release/Viltvodle.app
+APP=build/Release/Vico.app
 
 echo "Stripping binary"
-strip $APP/Contents/MacOS/Viltvodle
-strip $APP/Contents/MacOS/vivo
+strip $APP/Contents/MacOS/Vico
+strip $APP/Contents/MacOS/vico.shell
 
-VOL="viltvodle-$VERSION"
+VOL="vico-$VERSION"
 DMG="$VOL.dmg"
 echo "Creating disk image $VOL"
 
@@ -35,7 +35,7 @@ echo "Creating disk image $VOL"
 trap 'die Interrupted' 2 3 15
 
 # Create the source folder and copy the application there.
-DMG_SOURCE="Viltvodle $VERSION"
+DMG_SOURCE="Vico $VERSION"
 mkdir "$DMG_SOURCE" || die "failed to create .dmg source folder"
 /bin/cp -R $APP "$DMG_SOURCE" || die "failed to copy application to the .dmg source folder"
 ln -s /Applications "$DMG_SOURCE/Applications"
@@ -46,33 +46,4 @@ hdiutil convert -format UDBZ "$TMPDMG" -o "$DMG"
 
 /bin/rm -f $TMPDMG
 ls -lh "$DMG"
-
-exit 0
-#### Create and sign a zip file for automatic updates.
-
-APPCAST_BASE="http://appcast.vibrant-editor.com"
-DOWNLOAD_BASE="http://download.vibrant-editor.com"
-
-KSIZE=$(du -ks "$APP" | cut -f1)
-SIZE=$(($KSIZE * 1024))
-SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < "$DMG" | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
-
-cat > $VOL.xml <<EOF
-<item>
-    <title>Version $VERSION</title>
-    <sparkle:releaseNotesLink>
-        $APPCAST_BASE/version-$VERSION.html
-    </sparkle:releaseNotesLink>
-    <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
-    <enclosure url="$DOWNLOAD_BASE/$DMG"
-               sparkle:version="$REPO_VERSION"
-               sparkle:shortVersionString="$VERSION"
-               sparkle:dsaSignature="$SIGNATURE"
-               length="$SIZE"
-               type="application/octet-stream" />
-</item>
-EOF
-cat "$VOL.xml"
-
-echo "scp $DMG vibrant-editor.com:/var/www/download"
 

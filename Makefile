@@ -19,4 +19,9 @@ tarball:
 	gpg -r martin -e $FILE && \
 	rm $FILE
 
+clean:
+	xcodebuild -configuration Debug clean
+
+distclean:
+	rm -rf build
 

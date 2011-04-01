@@ -1572,6 +1572,62 @@
 	return YES;
 }
 
+- (void)gotoSymbol:(id)sender
+{
+	ViWindowController *windowController = [[self window] windowController];
+	ViSymbol *sym = sender;
+	if ([sender respondsToSelector:@selector(representedObject)])
+		sym = [sender representedObject];
+
+	ViTagStack *stack = windowController.tagStack;
+	NSURL *url = [[self delegate] fileURL];
+	if (url)
+		[stack pushURL:url
+			  line:[self currentLine]
+			column:[self currentColumn]];
+
+	[windowController goToSymbol:sym inDocument:sym.document];
+	final_location = NSNotFound;
+}
+
+- (BOOL)jump_symbol:(ViCommand *)command
+{
+	ViWindowController *windowController = [[self window] windowController];
+
+	NSString *word = [[self textStorage] wordAtLocation:start_location];
+	if (word == nil)
+		return NO;
+
+	NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
+	NSArray *syms = [windowController symbolsFilteredByPattern:pattern];
+
+	if ([syms count] == 0) {
+		[[self delegate] message:
+		    @"Symbol \"%@\" not found. Perhaps its document isn't open?", word];
+		return NO;
+	} else if ([syms count] == 1) {
+		[self gotoSymbol:[syms objectAtIndex:0]];
+	} else {
+		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Symbol matches"];
+		[menu setAllowsContextMenuPlugIns:NO];
+		int quickindex = 1;
+		for (ViSymbol *sym in syms) {
+			NSString *key = @"";
+			if (quickindex <= 10)
+				key = [NSString stringWithFormat:@"%i", quickindex % 10];
+			NSMenuItem *item = [menu addItemWithTitle:sym.displayName
+			                                   action:@selector(gotoSymbol:)
+			                            keyEquivalent:key];
+			[item setKeyEquivalentModifierMask:0];
+			[item setRepresentedObject:sym];
+			++quickindex;
+		}
+		[self popUpContextMenu:menu];
+	}
+
+	return YES;
+}
+
 // syntax: ^]
 - (BOOL)jump_tag:(ViCommand *)command
 {
@@ -1580,8 +1636,8 @@
 	ViTagStack *stack = windowController.tagStack;
 
 	if (db == nil) {
-		[[self delegate] message:@"tags: No such file or directory."];
-		return NO;
+		return [self jump_symbol:command];
+		// [[self delegate] message:@"tags: No such file or directory."];
 	}
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
@@ -1603,6 +1659,7 @@
 			NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
 			ViDocumentView *docView = (ViDocumentView *)[windowController currentView];
 			[[docView textView] findPattern:pattern options:0];
+			final_location = NSNotFound;
 		} else {
 			[[self delegate] message:@"%@: tag not found", word];
 		}

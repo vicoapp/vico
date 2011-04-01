@@ -932,8 +932,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSUInteger)filterSymbols:(ViRegexp *)rx
 {
 	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
-	ViSymbol *s;
-	for (s in symbols)
+	for (ViSymbol *s in symbols)
 		if ([rx matchInString:[s symbol]])
 			[fs addObject:s];
 	[self setFilteredSymbols:fs];
@@ -993,6 +992,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					}
 
 					ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
+										document:self
 										   range:wholeRange
 										   image:img];
 					[syms addObject:sym];

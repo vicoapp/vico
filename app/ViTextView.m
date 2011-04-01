@@ -1411,7 +1411,8 @@ int logIndent = 0;
 	}
 
 	DEBUG(@"final_location is %u", final_location);
-	[self setCaret:final_location];
+	if (final_location != NSNotFound)
+		[self setCaret:final_location];
 	if (mode == ViVisualMode)
 		[self setVisualSelection];
 
@@ -1705,7 +1706,6 @@ int logIndent = 0;
 
 - (BOOL)switch_tab:(ViCommand *)command
 {
-	INFO(@"switch to tab: %@", command.mapping.parameter);
 	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
 		[[self delegate] message:@"Unexpected parameter type %@",
 		    NSStringFromClass([command.mapping.parameter class])];
@@ -1796,22 +1796,33 @@ int logIndent = 0;
 
 - (BOOL)show_bundle_menu:(ViCommand *)command
 {
-	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
-							inTextContainer:[self textContainer]].origin;
-	NSEvent *ev = [NSEvent keyEventWithType:NSKeyDown
-				       location:[self convertPoint:point toView:nil]
-				  modifierFlags:0
-				      timestamp:[[NSDate date] timeIntervalSinceNow]
-				   windowNumber:[[self window] windowNumber]
-					context:[NSGraphicsContext currentContext]
-				     characters:@"\x1B"
-		    charactersIgnoringModifiers:@"\x1B"
-				      isARepeat:NO
-					keyCode:53];
 	showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
-	[self rightMouseDown:ev];
+	[self rightMouseDown:[self popUpContextEvent]];
 	showingContextMenu = NO;
 	return YES;
+}
+
+- (NSEvent *)popUpContextEvent
+{
+	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
+							inTextContainer:[self textContainer]].origin;
+	NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
+			  location:[self convertPoint:point toView:nil]
+		     modifierFlags:0
+			 timestamp:[[NSDate date] timeIntervalSinceNow]
+		      windowNumber:[[self window] windowNumber]
+			   context:[NSGraphicsContext currentContext]
+		       eventNumber:0
+			clickCount:1
+			  pressure:1.0];
+	return ev;
+}
+
+- (void)popUpContextMenu:(NSMenu *)menu
+{
+	showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
+	[NSMenu popUpContextMenu:menu withEvent:[self popUpContextEvent] forView:self];
+	showingContextMenu = NO;
 }
 
 @end

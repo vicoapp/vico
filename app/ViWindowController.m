@@ -1402,7 +1402,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	if ([item isKindOfClass:[ViDocument class]])
 		[self selectDocument:item];
 	else
-		[self goToSymbol:item inDocument:[symbolsOutline parentForItem:item]];
+		[self goToSymbol:item inDocument:[item document]];
 
 	[self cancelSymbolList];
 }
@@ -1491,6 +1491,20 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[symbolsOutline reloadData];
 	[symbolsOutline expandItem:nil expandChildren:YES];
 	[self selectFirstMatchingSymbolForFilter:filter];
+}
+
+- (NSArray *)symbolsFilteredByPattern:(NSString *)pattern
+{
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
+						options:ONIG_OPTION_IGNORECASE];
+
+	NSMutableArray *syms = [NSMutableArray array];
+	for (ViDocument *doc in documents)
+		for (ViSymbol *s in doc.symbols)
+			if ([rx matchInString:s.symbol])
+				[syms addObject:s];
+
+	return syms;
 }
 
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation

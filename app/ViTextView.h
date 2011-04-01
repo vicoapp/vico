@@ -137,6 +137,9 @@
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation;
 - (void)pushCurrentLocationOnJumpList;
 - (IBAction)performNormalModeMenuItem:(id)sender;
+
+- (NSEvent *)popUpContextEvent;
+- (void)popUpContextMenu:(NSMenu *)menu;
 @end
 
 @interface ViTextView (snippets)

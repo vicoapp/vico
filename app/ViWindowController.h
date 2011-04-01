@@ -121,6 +121,7 @@
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
+- (NSArray *)symbolsFilteredByPattern:(NSString *)pattern;
 
 - (IBAction)splitViewHorizontally:(id)sender;
 - (IBAction)splitViewVertically:(id)sender;

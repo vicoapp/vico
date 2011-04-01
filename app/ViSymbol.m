@@ -2,12 +2,15 @@
 
 @implementation ViSymbol
 
-- (ViSymbol *)initWithSymbol:(NSString *)aSymbol range:(NSRange)aRange image:(NSImage *)anImage
+- (ViSymbol *)initWithSymbol:(NSString *)aSymbol
+                    document:(ViDocument *)aDocument
+                       range:(NSRange)aRange
+                       image:(NSImage *)anImage
 {
 	self = [super init];
-	if (self)
-	{
+	if (self) {
 		symbol = aSymbol;
+		document = aDocument;
 		range = aRange;
 		image = anImage;
 	}
@@ -16,6 +19,7 @@
 }
 
 @synthesize symbol;
+@synthesize document;
 @synthesize range;
 @synthesize image;
 
@@ -36,6 +40,12 @@
 - (NSArray *)symbols
 {
 	return nil;
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViSymbol: %@ in %@, range %@>",
+	    symbol, [document title], NSStringFromRange(range)];
 }
 
 @end

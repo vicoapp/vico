@@ -316,8 +316,12 @@
 
 - (IBAction)actionMenu:(id)sender
 {
+	NSPoint p = NSMakePoint(0, 0);
+	NSIndexSet *set = [explorer selectedRowIndexes];
+	if ([set count] > 0)
+		p = [explorer rectOfRow:[set firstIndex]].origin;
 	NSEvent *ev = [NSEvent mouseEventWithType:NSLeftMouseDown
-	                                 location:NSMakePoint(0, 0)
+	                                 location:[explorer convertPoint:p toView:nil]
 	                            modifierFlags:0
 	                                timestamp:1
 	                             windowNumber:[window windowNumber]
@@ -1051,6 +1055,12 @@ doCommandBySelector:(SEL)aSelector
 
 #pragma mark -
 #pragma mark Explorer Command Parser
+
+- (BOOL)show_menu:(ViCommand *)command
+{
+	[self actionMenu:explorer];
+	return YES;
+}
 
 /* [count]j */
 - (BOOL)move_down:(ViCommand *)command

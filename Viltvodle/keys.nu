@@ -293,6 +293,8 @@
 (emap setKey:"t" toAction:"tab_open:")
 (emap setKey:"v" toAction:"vsplit_open:")
 (emap setKey:"/" toMotion:"find:")
+(emap setKey:"<ctrl-esc>" toMotion:"show_menu:")
+(emap setKey:"<cmd-esc>" toMotion:"show_menu:")
 
 
 

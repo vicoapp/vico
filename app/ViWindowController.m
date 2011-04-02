@@ -1082,10 +1082,13 @@ static ViWindowController	*currentWindowController = nil;
 	[self moveCurrentViewToNewTab];
 }
 
-- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(NSView *)aView
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
 {
 	id<ViViewController> viewController, otherViewController;
-	viewController = [self viewControllerForView:aView];
+	if ([aView conformsToProtocol:@protocol(ViViewController)])
+		viewController = aView;
+	else
+		viewController = [self viewControllerForView:aView];
 	otherViewController = [[viewController tabController] viewAtPosition:position
 								  relativeTo:[viewController view]];
 	if (otherViewController == nil)
@@ -1681,22 +1684,22 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 
 - (BOOL)window_left:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewLeft relativeTo:self];
+	return [self selectViewAtPosition:ViViewLeft relativeTo:currentView];
 }
 
 - (BOOL)window_down:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewDown relativeTo:self];
+	return [self selectViewAtPosition:ViViewDown relativeTo:currentView];
 }
 
 - (BOOL)window_up:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewUp relativeTo:self];
+	return [self selectViewAtPosition:ViViewUp relativeTo:currentView];
 }
 
 - (BOOL)window_right:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewRight relativeTo:self];
+	return [self selectViewAtPosition:ViViewRight relativeTo:currentView];
 }
 
 - (BOOL)window_close:(ViCommand *)command

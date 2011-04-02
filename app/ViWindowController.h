@@ -129,7 +129,7 @@
 - (BOOL)normalizeSplitViewSizesInCurrentTab;
 - (BOOL)closeOtherViews;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position
-                  relativeTo:(NSView *)aView;
+                  relativeTo:(id)aView;
 - (ViDocument *)splitVertically:(BOOL)isVertical
                         andOpen:(id)filenameOrURL
              orSwitchToDocument:(ViDocument *)doc

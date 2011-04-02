@@ -1968,7 +1968,7 @@
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSInteger fs;
-	int delta = 1;
+	NSInteger delta = 1;
 	if ([command.mapping.parameter respondsToSelector:@selector(integerValue)])
 		delta = [command.mapping.parameter integerValue];
 	if (delta == 0)

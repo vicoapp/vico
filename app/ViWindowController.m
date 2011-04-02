@@ -5,7 +5,6 @@
 #import "ViDocumentTabController.h"
 #import "ViProject.h"
 #import "ProjectDelegate.h"
-#import "ViSymbol.h"
 #import "ViSeparatorCell.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"

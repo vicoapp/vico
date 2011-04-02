@@ -97,6 +97,8 @@ int logIndent = 0;
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 
 	proxy = [[ViScriptProxy alloc] initWithObject:self];
+
+	[self updateStatus];
 }
 
 - (ViTextStorage *)textStorage
@@ -923,13 +925,13 @@ int logIndent = 0;
 			else
 				[self setCaret:firstRange.location];
 		}
+		[self updateStatus];
 	} else if (stillSelectingFlag) {
 		[self setNormalMode];
 		if (firstRange.location != [self caret])
 			[self setCaret:firstRange.location];
+		[self updateStatus];
 	}
-
-	[self updateStatus];
 }
 
 - (void)setVisualSelection

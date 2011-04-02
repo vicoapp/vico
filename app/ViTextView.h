@@ -26,6 +26,7 @@
 - (NSURL *)fileURL;
 - (ExEnvironment *)environment;
 - (ViBundle *)bundle;
+- (ViLanguage *)language;
 @property(readwrite, assign) ViSnippet *snippet;
 @end
 

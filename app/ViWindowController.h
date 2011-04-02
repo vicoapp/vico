@@ -6,6 +6,7 @@
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViSplitView.h"
 #import "ViScriptProxy.h"
+#import "ViSymbol.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -115,6 +116,7 @@
 - (BOOL)gotoURL:(NSURL *)url;
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
+- (void)goToSymbol:(ViSymbol *)aSymbol inDocument:(ViDocument *)document;
 - (IBAction)searchSymbol:(id)sender;
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;

@@ -669,21 +669,19 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	ViLanguageStore *langStore = [ViLanguageStore defaultStore];
 	ViLanguage *newLanguage = nil;
-	if (aURL) {
-		NSString *firstLine = nil;
-		NSUInteger eol;
-		[[textStorage string] getLineStart:NULL
-		                               end:NULL
-		                       contentsEnd:&eol
-		                          forRange:NSMakeRange(0, 0)];
-		if (eol > 0)
-			firstLine = [[textStorage string] substringWithRange:NSMakeRange(0, eol)];
 
-		if ([firstLine length] > 0)
-			newLanguage = [langStore languageForFirstLine:firstLine];
-		if (newLanguage == nil)
-			newLanguage = [langStore languageForFilename:[aURL path]];
-	}
+	NSString *firstLine = nil;
+	NSUInteger eol;
+	[[textStorage string] getLineStart:NULL
+				       end:NULL
+			       contentsEnd:&eol
+				  forRange:NSMakeRange(0, 0)];
+	if (eol > 0)
+		firstLine = [[textStorage string] substringWithRange:NSMakeRange(0, eol)];
+	if ([firstLine length] > 0)
+		newLanguage = [langStore languageForFirstLine:firstLine];
+	if (newLanguage == nil && aURL)
+		newLanguage = [langStore languageForFilename:[aURL path]];
 
 	if (newLanguage == nil)
 		newLanguage = [langStore defaultLanguage];

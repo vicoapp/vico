@@ -198,6 +198,8 @@
 (nmap setKey:"!" toOperator:"filter:")
 (nmap setKey:"." toAction:"dot:")
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
+(nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
+(nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
 ;; <C-w> prefix
 (nmap include:wmap)
 ;; g prefix

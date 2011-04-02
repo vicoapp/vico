@@ -1964,5 +1964,24 @@
 	return YES;
 }
 
+- (BOOL)increase_fontsize:(ViCommand *)command
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSInteger fs;
+	int delta = 1;
+	if ([command.mapping.parameter respondsToSelector:@selector(integerValue)])
+		delta = [command.mapping.parameter integerValue];
+	if (delta == 0)
+		delta = 1;
+	if (command.count == 0)
+		fs = [defs integerForKey:@"fontsize"] + delta;
+	else
+		fs = command.count;
+	if (fs <= 1)
+		return NO;
+	[defs setInteger:fs forKey:@"fontsize"];
+	return YES;
+}
+
 @end
 

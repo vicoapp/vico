@@ -1768,7 +1768,13 @@ int logIndent = 0;
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	NSMenu *menu = [self menuForEvent:theEvent];
-	[NSMenu popUpContextMenu:menu withEvent:theEvent forView:self];
+	NSMenuItem *item = [menu itemWithTitle:[[[self delegate] language] displayName]];
+	if (item) {
+		NSPoint event_location = [theEvent locationInWindow];
+		NSPoint local_point = [self convertPoint:event_location fromView:nil];
+		[menu popUpMenuPositioningItem:item atLocation:local_point inView:self];
+	} else
+		[NSMenu popUpContextMenu:menu withEvent:theEvent forView:self];
 
 	/*
 	 * Must remove the bundle menu items, otherwise the key equivalents
@@ -1777,18 +1783,12 @@ int logIndent = 0;
 	[menu removeAllItems];
 }
 
-- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent atLocation:(NSUInteger)location
 {
 	NSMenu *menu = [super menuForEvent:theEvent];
 	int n = 0;
 
-	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger charIndex = [self characterIndexForInsertionAtPoint:point];
-	if (charIndex == NSNotFound)
-		return menu;
-
-	[self setCaret:charIndex];
-	NSArray *scopes = [self scopesAtLocation:charIndex];
+	NSArray *scopes = [self scopesAtLocation:location];
 	NSRange sel = [self selectedRange];
 	NSMenuItem *item;
 	NSMenu *submenu;
@@ -1849,6 +1849,17 @@ int logIndent = 0;
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
 
 	return menu;
+}
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSInteger charIndex = [self characterIndexForInsertionAtPoint:point];
+	if (charIndex == NSNotFound)
+		return [super menuForEvent:theEvent];
+
+	[self setCaret:charIndex];
+	return [self menuForEvent:theEvent atLocation:charIndex];
 }
 
 - (IBAction)performNormalModeMenuItem:(id)sender

@@ -129,8 +129,10 @@ static ViWindowController	*currentWindowController = nil;
 	ViTextView *textView = [docView textView];
 
 	NSEvent *ev = [textView popUpContextEvent];
-
 	NSMenu *menu = [textView menuForEvent:ev];
+	/* Insert a dummy item at index 0 as the NSPopUpButton title. */
+	[menu insertItemWithTitle:@"Action menu" action:NULL keyEquivalent:@"" atIndex:0];
+	[menu update];
 	[bundleButton setMenu:menu];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self

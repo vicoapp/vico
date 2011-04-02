@@ -309,6 +309,7 @@
 {
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
+	[menu setAutoenablesItems:NO];
 	NSDictionary *submenus = [mainMenu objectForKey:@"submenus"];
 
 	for (NSString *uuid in [menuLayout objectForKey:@"items"]) {
@@ -351,6 +352,7 @@
 						keyEquivalent:[op keyEquivalent]];
 				[item setKeyEquivalentModifierMask:[op modifierMask]];
 				[item setRepresentedObject:op];
+				[item setEnabled:(selector != NULL)];
 
 				NSString *tabTrigger = [op tabTrigger];
 				if ([tabTrigger length] > 0) {
@@ -395,7 +397,9 @@
 	return menu;
 }
 
-- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection font:(NSFont *)aFont
+- (NSMenu *)menuForScopes:(NSArray *)scopes
+             hasSelection:(BOOL)hasSelection
+                     font:(NSFont *)aFont
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
 	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])

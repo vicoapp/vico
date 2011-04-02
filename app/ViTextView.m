@@ -1755,22 +1755,63 @@ int logIndent = 0;
 	[self setCaret:charIndex];
 	NSArray *scopes = [self scopesAtLocation:charIndex];
 	NSRange sel = [self selectedRange];
+	NSMenuItem *item;
+	NSMenu *submenu;
 
 	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-		NSMenu *submenu = [bundle menuForScopes:scopes
-					   hasSelection:sel.length > 0
-						   font:[menu font]];
+		submenu = [bundle menuForScopes:scopes
+				   hasSelection:sel.length > 0
+					   font:[menu font]];
 		if (submenu) {
-			NSMenuItem *item = [menu insertItemWithTitle:[bundle name]
-							      action:NULL
-						       keyEquivalent:@""
-							     atIndex:n++];
+			item = [menu insertItemWithTitle:[bundle name]
+						  action:NULL
+					   keyEquivalent:@""
+						 atIndex:n++];
 			[item setSubmenu:submenu];
 		}
 	}
 
 	if (n > 0)
-		[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
+		[menu insertItem:[NSMenuItem separatorItem] atIndex:n++];
+
+	ViLanguage *curLang = [[self delegate] language];
+
+	submenu = [[NSMenu alloc] initWithTitle:@"Language syntax"];
+	item = [menu insertItemWithTitle:@"Language syntax"
+				  action:NULL
+			   keyEquivalent:@""
+				 atIndex:n++];
+	[item setSubmenu:submenu];
+
+	item = [submenu addItemWithTitle:@"Unknown"
+				  action:@selector(setLanguageAction:)
+			   keyEquivalent:@""];
+	[item setTag:1001];
+	[item setEnabled:NO];
+	if (curLang == nil)
+		[item setState:NSOnState];
+	[submenu addItem:[NSMenuItem separatorItem]];
+
+	NSArray *languages = [[ViLanguageStore defaultStore] languages];
+	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
+	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
+
+	for (ViLanguage *lang in sortedLanguages) {
+		item = [submenu addItemWithTitle:[lang displayName]
+					  action:@selector(setLanguageAction:)
+				   keyEquivalent:@""];
+		[item setRepresentedObject:lang];
+		if (curLang == lang)
+			[item setState:NSOnState];
+	}
+
+	if ([languages count] > 0)
+		[submenu addItem:[NSMenuItem separatorItem]];
+	[submenu addItemWithTitle:@"Get more bundles..."
+			   action:@selector(getMoreBundles:)
+		    keyEquivalent:@""];
+
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
 
 	return menu;
 }

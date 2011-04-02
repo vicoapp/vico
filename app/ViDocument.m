@@ -658,7 +658,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if (lang != language) {
 		language = lang;
-		[windowController setSelectedLanguage:[lang displayName]];
 		bundle = [language bundle];
 		symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
 		symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];

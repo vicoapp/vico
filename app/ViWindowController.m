@@ -98,41 +98,8 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)getMoreBundles:(id)sender
 {
-	[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
 	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:)
 							  withObject:@"BundlesItem" afterDelay:0.01];
-}
-
-- (void)newBundleLoaded:(NSNotification *)notification
-{
-	[languageButton removeAllItems];
-	NSMenu *menu = [languageButton menu];
-	NSMenuItem *item = [menu addItemWithTitle:@"Unknown"
-					   action:@selector(setLanguageAction:)
-				    keyEquivalent:@""];
-	[item setTag:1001];
-	[item setEnabled:NO];
-	[[languageButton menu] addItem:[NSMenuItem separatorItem]];
-
-	NSArray *languages = [[ViLanguageStore defaultStore] languages];
-	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
-	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
-
-	for (ViLanguage *lang in sortedLanguages) {
-		item = [menu addItemWithTitle:[lang displayName]
-				       action:@selector(setLanguageAction:)
-				keyEquivalent:@""];
-		[item setRepresentedObject:lang];
-	}
-
-	if ([[self document] respondsToSelector:@selector(language)])
-		[self setSelectedLanguage:[[(ViDocument *)[self document] language] displayName]];
-
-	if ([languages count] > 0)
-		[[languageButton menu] addItem:[NSMenuItem separatorItem]];
-	[menu addItemWithTitle:@"Get more bundles..."
-			action:@selector(getMoreBundles:)
-		 keyEquivalent:@""];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
@@ -157,29 +124,15 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)setupBundleMenu:(NSNotification *)notification
 {
-	NSMenu *menu = [bundleButton menu];
-	[menu removeAllItems];
-	[menu addItemWithTitle:@"Bundle commands" action:NULL keyEquivalent:@""];
-
 	if (![[self currentView] isKindOfClass:[ViDocumentView class]])
 		return;
-
 	ViDocumentView *docView = [self currentView];
 	ViTextView *textView = [docView textView];
-	NSArray *scopes = [textView scopesAtLocation:[textView caret]];
-	NSRange sel = [textView selectedRange];
 
-	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
-		NSMenu *submenu = [bundle menuForScopes:scopes
-					   hasSelection:sel.length > 0
-						   font:[menu font]];
-		if (submenu) {
-			NSMenuItem *item = [menu addItemWithTitle:[bundle name]
-							      action:NULL
-						       keyEquivalent:@""];
-			[item setSubmenu:submenu];
-		}
-	}
+	NSEvent *ev = [textView popUpContextEvent];
+
+	NSMenu *menu = [textView menuForEvent:ev];
+	[bundleButton setMenu:menu];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
                                         selector:@selector(tearDownBundleMenu:)
@@ -219,12 +172,6 @@ static ViWindowController	*currentWindowController = nil;
 
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
-
-	[self newBundleLoaded:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(newBundleLoaded:)
-                                            name:ViLanguageStoreBundleLoadedNotification
-                                          object:nil];
 
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
@@ -281,15 +228,6 @@ static ViWindowController	*currentWindowController = nil;
 - (void)browseURL:(NSURL *)url
 {
 	[projectDelegate browseURL:url];
-}
-
-- (void)setSelectedLanguage:(NSString *)aLanguage
-{
-	if (aLanguage == nil)
-		[languageButton selectItemWithTag:1001];
-	else
-		[languageButton selectItemWithTitle:aLanguage];
-	[languageButton setToolTip:aLanguage];
 }
 
 - (IBAction)addNewDocumentTab:(id)sender
@@ -798,8 +736,6 @@ static ViWindowController	*currentWindowController = nil;
 	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
 	if (ndx != -1)
 		[openFilesButton selectItemAtIndex:ndx];
-
-	[self setSelectedLanguage:[[document language] displayName]];
 
 	// update symbol list
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)

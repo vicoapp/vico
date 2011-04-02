@@ -26,7 +26,6 @@
 	IBOutlet NSTextField *messageField;
 	IBOutlet NSTextField *statusbar;
 
-	IBOutlet NSPopUpButton *languageButton;
 	IBOutlet NSPopUpButton *openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;
 	IBOutlet NSPopUpButton *bundleButton;
@@ -80,8 +79,6 @@
 
 - (void)message:(NSString *)fmt, ...;
 - (void)message:(NSString *)fmt arguments:(va_list)ap;
-
-- (void)setSelectedLanguage:(NSString *)aLanguage;
 - (void)focusEditor;
 
 - (ViParser *)parser;

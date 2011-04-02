@@ -221,6 +221,15 @@
 	STAssertEquals([@"source.c" matchesScopes:scope], 0ULL, nil);
 }
 
+- (void)test038_StrictPrefix2
+{
+	NSArray *scope = [NSArray arrayWithObjects:
+		 @"source.c",
+		 nil];
+
+	STAssertEquals([@"source.css" matchesScopes:scope], 0ULL, nil);
+}
+
 - (void)test039_NonContiguousScopeMatch
 {
 	NSArray *scope = [NSArray arrayWithObjects:

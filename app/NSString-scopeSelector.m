@@ -88,6 +88,15 @@ tenpow(NSUInteger x)
 				}
 			}
 
+			if (match && k + 1 < sel->length) {
+				/* Don't count partial scope matches. */
+				/* "source.c" shouldn't match "source.css" */
+				if (sel->buf[k] != '.') {
+					DEBUG(@"partial match of [%@] at index k = %lu", selscope, k);
+					match = NO;
+				}
+			}
+
 			if (match) {
 				/* A match is given 10^18 points for each depth down the scope stack. */
 				if (TAILQ_NEXT(sel, next) == NULL)

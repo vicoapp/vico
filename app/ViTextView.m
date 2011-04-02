@@ -26,6 +26,7 @@ int logIndent = 0;
                       withString:(NSString *)aString
                        undoGroup:(BOOL)undoGroup;
 - (void)setVisualSelection;
+- (void)updateStatus;
 @end
 
 #pragma mark -
@@ -927,6 +928,8 @@ int logIndent = 0;
 		if (firstRange.location != [self caret])
 			[self setCaret:firstRange.location];
 	}
+
+	[self updateStatus];
 }
 
 - (void)setVisualSelection
@@ -1269,6 +1272,26 @@ int logIndent = 0;
 	return YES;
 }
 
+- (void)updateStatus
+{
+	const char *modestr = "";
+	if (mode == ViInsertMode) {
+		if ([self delegate].snippet)
+			modestr = "--SNIPPET--";
+		else
+			modestr = "--INSERT--";
+	} else if (mode == ViVisualMode) {
+		if (visual_line_mode)
+			modestr = "--VISUAL LINE--";
+		else
+			modestr = "--VISUAL--";
+	}
+	[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu   %s",
+	    (unsigned long)[self currentLine],
+	    (unsigned long)[self currentColumn],
+	    modestr]];
+}
+
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
@@ -1419,24 +1442,8 @@ int logIndent = 0;
 	if (!replayingInput)
 		[self scrollToCaret];
 
-	if (ok) {
-		const char *modestr = "";
-		if (mode == ViInsertMode) {
-			if ([self delegate].snippet)
-				modestr = "--SNIPPET--";
-			else
-				modestr = "--INSERT--";
-		} else if (mode == ViVisualMode) {
-			if (visual_line_mode)
-				modestr = "--VISUAL LINE--";
-			else
-				modestr = "--VISUAL--";
-		}
-		[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu   %s",
-		    (unsigned long)[self currentLine],
-		    (unsigned long)[self currentColumn],
-		    modestr]];
-	}
+	if (ok)
+		[self updateStatus];
 
 	return ok;
 }

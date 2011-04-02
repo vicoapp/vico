@@ -25,3 +25,4 @@ clean:
 distclean:
 	rm -rf build
 
+.PHONY: build

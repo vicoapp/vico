@@ -17,7 +17,7 @@
 @class ViTextView;
 @class ViJumpList;
 
-@protocol ViTextViewDelegate
+@protocol ViTextViewDelegate <NSObject>
 - (void)message:(NSString *)fmt, ...;
 - (NSUndoManager *)undoManager;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;

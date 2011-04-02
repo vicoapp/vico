@@ -1660,5 +1660,94 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	[self updateJumplistNavigator];
 }
 
+- (BOOL)increase_fontsize:(ViCommand *)command
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSInteger fs;
+	NSInteger delta = 1;
+	if ([command.mapping.parameter respondsToSelector:@selector(integerValue)])
+		delta = [command.mapping.parameter integerValue];
+	if (delta == 0)
+		delta = 1;
+	if (command.count == 0)
+		fs = [defs integerForKey:@"fontsize"] + delta;
+	else
+		fs = command.count;
+	if (fs <= 1)
+		return NO;
+	[defs setInteger:fs forKey:@"fontsize"];
+	return YES;
+}
+
+- (BOOL)window_left:(ViCommand *)command
+{
+	return [self selectViewAtPosition:ViViewLeft relativeTo:self];
+}
+
+- (BOOL)window_down:(ViCommand *)command
+{
+	return [self selectViewAtPosition:ViViewDown relativeTo:self];
+}
+
+- (BOOL)window_up:(ViCommand *)command
+{
+	return [self selectViewAtPosition:ViViewUp relativeTo:self];
+}
+
+- (BOOL)window_right:(ViCommand *)command
+{
+	return [self selectViewAtPosition:ViViewRight relativeTo:self];
+}
+
+- (BOOL)window_close:(ViCommand *)command
+{
+	return [environment ex_close:nil];
+}
+
+- (BOOL)window_split:(ViCommand *)command
+{
+	return [environment ex_split:nil];
+}
+
+- (BOOL)window_vsplit:(ViCommand *)command
+{
+	return [environment ex_vsplit:nil];
+}
+
+- (BOOL)window_new:(ViCommand *)command
+{
+	return [environment ex_new:nil];
+}
+
+- (BOOL)window_totab:(ViCommand *)command
+{
+	return [self moveCurrentViewToNewTab];
+}
+
+- (BOOL)window_normalize:(ViCommand *)command
+{
+	return [self normalizeSplitViewSizesInCurrentTab];
+}
+
+- (BOOL)window_only:(ViCommand *)command
+{
+	return [self closeOtherViews];
+}
+
+- (BOOL)next_tab:(ViCommand *)command
+{
+	if (command.count)
+		[self selectTabAtIndex:command.count - 1];
+	else
+		[self selectNextTab:nil];
+	return YES;
+}
+
+- (BOOL)previous_tab:(ViCommand *)command
+{
+	[self selectPreviousTab:nil];
+	return YES;
+}
+
 @end
 

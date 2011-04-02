@@ -1294,22 +1294,48 @@ int logIndent = 0;
 	    modestr]];
 }
 
+- (id)targetForCommand:(ViCommand *)command
+{
+	NSView *view = self;
+
+	do {
+		if ([view respondsToSelector:command.action])
+			return view;
+	} while ((view = [view superview]) != nil);
+
+	if ([[self window] respondsToSelector:command.action])
+		return [self window];
+
+	if ([[[self window] windowController] respondsToSelector:command.action])
+		return [[self window] windowController];
+
+	if ([[self delegate] respondsToSelector:command.action])
+		return [self delegate];
+
+	return nil;
+}
+
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
 	if (mode != ViInsertMode)
 		[self endUndoGroup];
 
-	if (![self respondsToSelector:command.action]) {
+	id target = [self targetForCommand:command];
+	if (target == nil) {
 		[[self delegate] message:@"Command %@ not implemented.",
 		    command.mapping.keyString];
 		return NO;
 	}
 
-	if (command.motion && ![self respondsToSelector:command.motion.action]) {
-		[[self delegate] message:@"Motion command %@ not implemented.",
-		    command.motion.mapping.keyString];
-		return NO;
+	id motion_target = nil;
+	if (command.motion) {
+		motion_target = [self targetForCommand:command.motion];
+		if (motion_target == nil) {
+			[[self delegate] message:@"Motion command %@ not implemented.",
+			    command.motion.mapping.keyString];
+			return NO;
+		}
 	}
 
 	/* Default start- and end-location is the current location. */
@@ -1340,8 +1366,8 @@ int logIndent = 0;
 		 * Run the motion command and record the start and end locations.
 		 */
 		DEBUG(@"perform motion command %@", command.motion);
-		if (![self performSelector:command.motion.action
-			        withObject:command.motion])
+		if (![motion_target performSelector:command.motion.action
+					 withObject:command.motion])
 			/* the command failed */
 			return NO;
 	}
@@ -1409,7 +1435,7 @@ int logIndent = 0;
 
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
-	BOOL ok = (NSUInteger)[self performSelector:command.action withObject:command];
+	BOOL ok = (NSUInteger)[target performSelector:command.action withObject:command];
 	if (ok && command.isLineMode && !command.isMotion &&
 	    command.action != @selector(yank:) &&
 	    command.action != @selector(shift_right:) &&

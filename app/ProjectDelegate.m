@@ -1389,16 +1389,6 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
-- (BOOL)illegal:(ViCommand *)command
-{
-	return YES;
-}
-
-- (BOOL)nonmotion:(ViCommand *)command
-{
-	return YES;
-}
-
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {

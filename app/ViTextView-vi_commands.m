@@ -1858,61 +1858,6 @@
 	}
 }
 
-- (BOOL)window_left:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewLeft relativeTo:self];
-}
-
-- (BOOL)window_down:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewDown relativeTo:self];
-}
-
-- (BOOL)window_up:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewUp relativeTo:self];
-}
-
-- (BOOL)window_right:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewRight relativeTo:self];
-}
-
-- (BOOL)window_close:(ViCommand *)command
-{
-	return [[[self delegate] environment] ex_close:nil];
-}
-
-- (BOOL)window_split:(ViCommand *)command
-{
-	return [[[self delegate] environment] ex_split:nil];
-}
-
-- (BOOL)window_vsplit:(ViCommand *)command
-{
-	return [[[self delegate] environment] ex_vsplit:nil];
-}
-
-- (BOOL)window_new:(ViCommand *)command
-{
-	return [[[self delegate] environment] ex_new:nil];
-}
-
-- (BOOL)window_totab:(ViCommand *)command
-{
-	return [[[self window] windowController] moveCurrentViewToNewTab];
-}
-
-- (BOOL)window_normalize:(ViCommand *)command
-{
-	return [[[self window] windowController] normalizeSplitViewSizesInCurrentTab];
-}
-
-- (BOOL)window_only:(ViCommand *)command
-{
-	return [[[self window] windowController] closeOtherViews];
-}
-
 - (BOOL)uppercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
@@ -1926,21 +1871,6 @@
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
 	[self replaceRange:affectedRange withString:[string lowercaseString]];
 	final_location = end_location = start_location;
-	return YES;
-}
-
-- (BOOL)next_tab:(ViCommand *)command
-{
-	if (command.count)
-		[[[self window] windowController] selectTabAtIndex:command.count - 1];
-	else
-		[[[self window] windowController] selectNextTab:nil];
-	return YES;
-}
-
-- (BOOL)previous_tab:(ViCommand *)command
-{
-	[[[self window] windowController] selectPreviousTab:nil];
 	return YES;
 }
 
@@ -1961,25 +1891,6 @@
 - (BOOL)ex_command:(ViCommand *)command
 {
 	[[[self delegate] environment] executeForTextView:self];
-	return YES;
-}
-
-- (BOOL)increase_fontsize:(ViCommand *)command
-{
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSInteger fs;
-	NSInteger delta = 1;
-	if ([command.mapping.parameter respondsToSelector:@selector(integerValue)])
-		delta = [command.mapping.parameter integerValue];
-	if (delta == 0)
-		delta = 1;
-	if (command.count == 0)
-		fs = [defs integerForKey:@"fontsize"] + delta;
-	else
-		fs = command.count;
-	if (fs <= 1)
-		return NO;
-	[defs setInteger:fs forKey:@"fontsize"];
 	return YES;
 }
 

@@ -1,5 +1,6 @@
 #import "ExTextField.h"
 #import "ViThemeStore.h"
+#import "ViTextView.h"
 #include "logging.h"
 
 @implementation ExTextField
@@ -19,18 +20,15 @@
 	while ([history count] > 100)
 		[history removeLastObject];
 
-	INFO(@"history = %@", history);
+	DEBUG(@"history = %@", history);
 }
 
 - (BOOL)becomeFirstResponder
 {
 	NSTextView *editor = [[self window] fieldEditor:YES forObject:self];
-	INFO(@"init, current editor is %@", editor);
 
+	current = nil;
 	historyIndex = -1;
-	ViTheme *theme = [[ViThemeStore defaultStore] defaultTheme];
-	[self setBackgroundColor:[theme backgroundColor]];
-	[self setTextColor:[theme foregroundColor]];
 
 	[(ViTextView *)editor setCaret:0];
 	[(ViTextView *)editor setInsertMode:nil];
@@ -39,53 +37,66 @@
 	return [super becomeFirstResponder];
 }
 
+- (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix
+{
+	if (historyIndex == -1)
+		current = [self stringValue];
+
+	int i = historyIndex;
+	DEBUG(@"history index = %i, count = %lu, prefix = %@",
+	    historyIndex, [history count], prefix);
+	while (upwards ? i + 1 < [history count] : i > 0) {
+		i += (upwards ? +1 : -1);
+		NSString *item = [history objectAtIndex:i];
+		DEBUG(@"got item %@", item);
+		if ([prefix length] == 0 || [item hasPrefix:prefix]) {
+			DEBUG(@"insert item %@", item);
+			[self setStringValue:item];
+			[(ViTextView *)[self currentEditor] setInsertMode:nil];
+			historyIndex = i;
+			return YES;
+		}
+	}
+
+	if (!upwards && i == 0) {
+		[self setStringValue:current];
+		[(ViTextView *)[self currentEditor] setInsertMode:nil];
+		historyIndex = -1;
+		return YES;
+	}
+
+	return NO;
+}
+
+- (BOOL)prev_history_ignoring_prefix:(ViCommand *)command
+{
+	return [self navigateHistory:YES prefix:nil];
+}
+
 - (BOOL)prev_history:(ViCommand *)command
 {
 	NSRange sel = [[self currentEditor] selectedRange];
 	NSString *prefix = [[self stringValue] substringToIndex:sel.location];
-	int i = historyIndex;
-	INFO(@"history index = %i, count = %lu, prefix = %@",
-	    historyIndex, [history count], prefix);
-	while (i + 1 < [history count]) {
-		NSString *item = [history objectAtIndex:++i];
-		INFO(@"got item %@", item);
-		if ([prefix length] == 0 || [item hasPrefix:prefix]) {
-			INFO(@"insert item %@", item);
-			[self setStringValue:item];
-			historyIndex = i;
-			[[self currentEditor] setSelectedRange:NSMakeRange(0, 0)];
-			break;
-		}
-	}
-	return YES;
+	return [self navigateHistory:YES prefix:prefix];
+}
+
+- (BOOL)next_history_ignoring_prefix:(ViCommand *)command
+{
+	return [self navigateHistory:NO prefix:nil];
 }
 
 - (BOOL)next_history:(ViCommand *)command
 {
 	NSRange sel = [[self currentEditor] selectedRange];
 	NSString *prefix = [[self stringValue] substringToIndex:sel.location];
-	int i = historyIndex;
-	INFO(@"history index = %i, count = %lu, prefix = %@", historyIndex, [history count], prefix);
-	while (i > 0) {
-		NSString *item = [history objectAtIndex:--i];
-		if ([prefix length] == 0 || [item hasPrefix:prefix]) {
-			[self setStringValue:item];
-			historyIndex = i;
-			[[self currentEditor] setSelectedRange:NSMakeRange(0, 0)];
-			break;
-		}
-	}
-	if (i == 0) {
-		historyIndex = -1;
-		[self setStringValue:@""];
-	}
-	return YES;
+	return [self navigateHistory:NO prefix:prefix];
 }
 
 - (BOOL)ex_cancel:(ViCommand *)command
 {
 	running = NO;
 	[[self delegate] cancel_ex_command];
+	return YES;
 }
 
 - (BOOL)ex_execute:(ViCommand *)command
@@ -94,6 +105,7 @@
 	[self addToHistory:exCommand];
 	running = NO;
 	[[self delegate] execute_ex_command:exCommand];
+	return YES;
 }
 
 - (void)textDidEndEditing:(NSNotification *)aNotification

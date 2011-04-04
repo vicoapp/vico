@@ -4,6 +4,7 @@
 {
 	NSMutableArray		*history;
 	int			 historyIndex;
+	NSString		*current;
 	BOOL			 running;
 }
 

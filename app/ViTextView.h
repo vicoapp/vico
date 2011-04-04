@@ -11,27 +11,19 @@
 #import "ViTextStorage.h"
 #import "ViScriptProxy.h"
 #import "ViKeyManager.h"
+#import "ViDocument.h"
+
+#define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
 @class ViDocumentView;
 @class ViWindowController;
 @class ViTextView;
 @class ViJumpList;
 
-@protocol ViTextViewDelegate <NSObject>
-- (void)message:(NSString *)fmt, ...;
-- (NSUndoManager *)undoManager;
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (NSFont *)font;
-- (NSDictionary *)typingAttributes;
-- (NSURL *)fileURL;
-- (ExEnvironment *)environment;
-- (ViBundle *)bundle;
-- (ViLanguage *)language;
-@property(readwrite, assign) ViSnippet *snippet;
-@end
-
 @interface ViTextView : NSTextView <ViSnippetDelegate>
 {
+	ViDocument		*document;
+
 	ViMode			 mode;
 	ViKeyManager		*keyManager;
 
@@ -81,9 +73,10 @@
 }
 
 @property(readonly) ViScriptProxy *proxy;
+@property(readonly) ViKeyManager *keyManager;
+@property(readonly) ViDocument *document;
 
-- (id <ViTextViewDelegate>)delegate;
-- (void)initEditorWithDelegate:(id <ViTextViewDelegate>)aDelegate viParser:(ViParser *)aParser;
+- (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser;
 - (ViTextStorage *)textStorage;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;

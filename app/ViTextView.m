@@ -15,6 +15,7 @@
 #import "NSEvent-keyAdditions.h"
 #import "ViError.h"
 #import "ViRegisterManager.h"
+#import "ViLayoutManager.h"
 
 int logIndent = 0;
 
@@ -34,16 +35,18 @@ int logIndent = 0;
 @implementation ViTextView
 
 @synthesize proxy;
+@synthesize keyManager;
+@synthesize document;
 
-- (void)initEditorWithDelegate:(id)aDelegate viParser:(ViParser *)aParser
+- (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
 {
-	[self setDelegate:aDelegate];
 	[self setCaret:0];
 
 	keyManager = [[ViKeyManager alloc] initWithTarget:self
 					       parser:aParser];
 
-	undoManager = [[self delegate] undoManager];
+	document = aDocument;
+	undoManager = [document undoManager];
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
 	inputKeys = [NSMutableArray array];
@@ -84,6 +87,10 @@ int logIndent = 0;
 		[[self layoutManager] setAllowsNonContiguousLayout:NO];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"theme"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"antialias"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
@@ -95,9 +102,7 @@ int logIndent = 0;
 						   object:[self textStorage]];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
-
 	proxy = [[ViScriptProxy alloc] initWithObject:self];
-
 	[self updateStatus];
 }
 
@@ -110,11 +115,19 @@ int logIndent = 0;
 		      ofObject:(id)object
 			change:(NSDictionary *)change
 		       context:(void *)context
-
 {
 	if ([keyPath isEqualToString:@"antialias"]) {
 		antialias = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
 		[self setNeedsDisplayInRect:[self bounds]];
+	} else if ([keyPath isEqualToString:@"theme"]) {
+		/*
+		 * Change the theme and invalidate all layout.
+		 */
+		ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]];
+		[self setTheme:theme];
+		ViLayoutManager *lm = (ViLayoutManager *)[self layoutManager];
+		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
+		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [[self textStorage] length])];
 	}
 }
 
@@ -125,13 +138,12 @@ int logIndent = 0;
 	 * It's buggy and annoying, but layout is unusable on huge documents otherwise...
 	 */
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
-	if ([[self textStorage] lineCount] > 3000) {
-		if (![[self layoutManager] allowsNonContiguousLayout])
-			[[self layoutManager] setAllowsNonContiguousLayout:YES];
-	} else {
-		if ([[self layoutManager] allowsNonContiguousLayout])
-			[[self layoutManager] setAllowsNonContiguousLayout:NO];
-	}
+	if ([self isFieldEditor])
+		return;
+	if ([[self textStorage] lineCount] > 3000)
+		[[self layoutManager] setAllowsNonContiguousLayout:YES];
+	else
+		[[self layoutManager] setAllowsNonContiguousLayout:NO];
 }
 
 - (void)rulerView:(NSRulerView *)aRulerView
@@ -147,7 +159,7 @@ int logIndent = 0;
 		return;
 
 	if (keyManager.parser.partial) {
-		[[self delegate] message:@"Vi command interrupted."];
+		MESSAGE(@"Vi command interrupted.");
 		[keyManager.parser reset];
 	}
 
@@ -173,11 +185,6 @@ int logIndent = 0;
 - (void)cut:(id)sender
 {
 	[keyManager handleKeys:[@"\"+x" keyCodes]];
-}
-
-- (id <ViTextViewDelegate>)delegate
-{
-	return (id <ViTextViewDelegate>)[super delegate];
 }
 
 - (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
@@ -255,8 +262,12 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(0, [[self textStorage] length]);
 	[[self textStorage] replaceCharactersInRange:r
 	                                  withString:aString];
-	[[self textStorage] setAttributes:[self typingAttributes]
-	                            range:r];
+	NSDictionary *attrs = [self typingAttributes];
+	if (attrs) {
+		r = NSMakeRange(0, [[self textStorage] length]);
+		[[self textStorage] setAttributes:attrs
+					    range:r];
+	}
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange
@@ -265,7 +276,7 @@ int logIndent = 0;
 {
 	modify_start_location = aRange.location;
 
-	ViSnippet *snippet = [self delegate].snippet;
+	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		/* Let the snippet drive the changes. */
 		if ([snippet replaceRange:aRange withString:aString])
@@ -349,7 +360,7 @@ int logIndent = 0;
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
-	return [[self delegate] scopesAtLocation:aLocation];
+	return [document scopesAtLocation:aLocation];
 }
 
 #pragma mark -
@@ -464,11 +475,11 @@ int logIndent = 0;
 		NSError *error = nil;
 		id result = [[NSApp delegate] evalExpression:expression error:&error];
 		if (error)
-			[[self delegate] message:@"indent expression failed: %@", [error localizedDescription]];
+			MESSAGE(@"indent expression failed: %@", [error localizedDescription]);
 		else if ([result isKindOfClass:[NSNumber class]])
 			return [result integerValue];
 		else
-			[[self delegate] message:@"non-numeric result: got %@", NSStringFromClass([result class])];
+			MESSAGE(@"non-numeric result: got %@", NSStringFromClass([result class]));
 	}
 
 	return -1;
@@ -703,7 +714,7 @@ int logIndent = 0;
 	@catch(NSException *exception)
 	{
 		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
-		[[self delegate] message:@"Invalid search pattern: %@", exception];
+		MESSAGE(@"Invalid search pattern: %@", exception);
 		return NO;
 	}
 
@@ -711,7 +722,7 @@ int logIndent = 0;
 					       options:rx_options];
 
 	if ([foundMatches count] == 0) {
-		[[self delegate] message:@"Pattern not found"];
+		MESSAGE(@"Pattern not found");
 	} else {
 		[self pushLocationOnJumpList:start_location];
 
@@ -734,7 +745,7 @@ int logIndent = 0;
 			else
 				nextMatch = [foundMatches lastObject];
 
-			[[self delegate] message:@"Search wrapped"];
+			MESSAGE(@"Search wrapped");
 		}
 
 		if (nextMatch) {
@@ -770,7 +781,7 @@ int logIndent = 0;
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[[self delegate] environment] getExCommandWithDelegate:self
+	[[document environment] getExCommandWithDelegate:self
 						       selector:@selector(find_forward_callback:contextInfo:)
 							 prompt:@"/"
 						    contextInfo:command];
@@ -782,7 +793,7 @@ int logIndent = 0;
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[[self delegate] environment] getExCommandWithDelegate:self
+	[[document environment] getExCommandWithDelegate:self
 						       selector:@selector(find_backward_callback:contextInfo:)
 							 prompt:@"?"
 						    contextInfo:command];
@@ -796,7 +807,7 @@ int logIndent = 0;
 {
 	NSString *pattern = keyManager.parser.last_search_pattern;
 	if (pattern == nil) {
-		[[self delegate] message:@"No previous search pattern"];
+		MESSAGE(@"No previous search pattern");
 		return NO;
 	}
 
@@ -808,7 +819,7 @@ int logIndent = 0;
 {
 	NSString *pattern = keyManager.parser.last_search_pattern;
 	if (pattern == nil) {
-		[[self delegate] message:@"No previous search pattern"];
+		MESSAGE(@"No previous search pattern");
 		return NO;
 	}
 
@@ -1070,7 +1081,7 @@ int logIndent = 0;
 	DEBUG(@"insert character %C at %i", character, start_location);
 
 	// If there is a selected snippet range, remove it first.
-	ViSnippet *snippet = [self delegate].snippet;
+	ViSnippet *snippet = document.snippet;
 	NSRange sel = snippet.selectedRange;
 	if (sel.length > 0) {
 		[self deleteRange:sel];
@@ -1110,14 +1121,14 @@ int logIndent = 0;
 		NSInteger keyCode = [n integerValue];
 
 		if ((keyCode & 0xFFFF0000) != 0) {
-			[[self delegate] message:@"Can't insert key equivalent: %@.",
-			    [NSString stringWithKeyCode:keyCode]];
+			MESSAGE(@"Can't insert key equivalent: %@.",
+			    [NSString stringWithKeyCode:keyCode]);
 			return NO;
 		}
 
 		if (keyCode < 0x20) {
-			[[self delegate] message:@"Illegal character: %@; quote to enter",
-			    [NSString stringWithKeyCode:keyCode]];
+			MESSAGE(@"Illegal character: %@; quote to enter",
+			    [NSString stringWithKeyCode:keyCode]);
 			return NO;
 		}
 
@@ -1139,7 +1150,7 @@ int logIndent = 0;
 - (BOOL)input_tab:(ViCommand *)command
 {
 	// check if we're inside a snippet
-	ViSnippet *snippet = [self delegate].snippet;
+	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
 		if ([snippet advance]) {
@@ -1192,7 +1203,7 @@ int logIndent = 0;
 - (BOOL)input_backspace:(ViCommand *)command
 {
 	// If there is a selected snippet range, remove it first.
-	ViSnippet *snippet = [self delegate].snippet;
+	ViSnippet *snippet = document.snippet;
 	NSRange sel = snippet.selectedRange;
 	if (sel.length > 0) {
 		[self deleteRange:sel];
@@ -1201,7 +1212,7 @@ int logIndent = 0;
 	}
 
 	if (start_location == 0) {
-		[[self delegate] message:@"Already at the beginning of the document"];
+		MESSAGE(@"Already at the beginning of the document");
 		return YES;
 	}
 
@@ -1276,9 +1287,12 @@ int logIndent = 0;
 
 - (void)updateStatus
 {
+	if ([self isFieldEditor])
+		return;
+
 	const char *modestr = "";
 	if (mode == ViInsertMode) {
-		if ([self delegate].snippet)
+		if (document.snippet)
 			modestr = "--SNIPPET--";
 		else
 			modestr = "--INSERT--";
@@ -1288,10 +1302,10 @@ int logIndent = 0;
 		else
 			modestr = "--VISUAL--";
 	}
-	[[self delegate] message:[NSString stringWithFormat:@"%lu,%lu   %s",
+	MESSAGE([NSString stringWithFormat:@"%lu,%lu   %s",
 	    (unsigned long)[self currentLine],
 	    (unsigned long)[self currentColumn],
-	    modestr]];
+	    modestr]);
 }
 
 - (id)targetForCommand:(ViCommand *)command
@@ -1312,6 +1326,9 @@ int logIndent = 0;
 	if ([[self delegate] respondsToSelector:command.action])
 		return [self delegate];
 
+	if ([document respondsToSelector:command.action])
+		return document;
+
 	return nil;
 }
 
@@ -1323,8 +1340,8 @@ int logIndent = 0;
 
 	id target = [self targetForCommand:command];
 	if (target == nil) {
-		[[self delegate] message:@"Command %@ not implemented.",
-		    command.mapping.keyString];
+		MESSAGE(@"Command %@ not implemented.",
+		    command.mapping.keyString);
 		return NO;
 	}
 
@@ -1332,8 +1349,8 @@ int logIndent = 0;
 	if (command.motion) {
 		motion_target = [self targetForCommand:command.motion];
 		if (motion_target == nil) {
-			[[self delegate] message:@"Motion command %@ not implemented.",
-			    command.motion.mapping.keyString];
+			MESSAGE(@"Motion command %@ not implemented.",
+			    command.motion.mapping.keyString);
 			return NO;
 		}
 	}
@@ -1518,13 +1535,13 @@ int logIndent = 0;
 - (void)keyManager:(ViKeyManager *)aKeyManager
       presentError:(NSError *)error
 {
-	[[self delegate] message:@"%@", [error localizedDescription]];
+	MESSAGE(@"%@", [error localizedDescription]);
 }
 
 - (void)keyManager:(ViKeyManager *)aKeyManager
   partialKeyString:(NSString *)keyString
 {
-	[[self delegate] message:@"%@", keyString];
+	MESSAGE(@"%@", keyString);
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
@@ -1540,16 +1557,6 @@ int logIndent = 0;
 - (void)keyDown:(NSEvent *)theEvent
 {
 	DEBUG(@"got keyDown event: %p = %@", theEvent, theEvent);
-
-#if 0
-	NSResponder *r = [[self window] firstResponder];
-	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
-		/* Pass the (generated) event to the ex command line. */
-		INFO(@"passing generated key event to ex command line %@", r);
-		[r keyDown:theEvent];
-		return;
-	}
-#endif
 
 	handlingKey = YES;
 	[super keyDown:theEvent];
@@ -1567,6 +1574,16 @@ int logIndent = 0;
 - (BOOL)keyManager:(ViKeyManager *)aKeyManager
     shouldParseKey:(NSInteger)keyCode
 {
+#if 0
+	NSResponder *r = [[self window] firstResponder];
+	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
+		/* Pass the (generated) event to the ex command line. */
+		INFO(@"passing generated key event to ex command line %@", r);
+		[r keyDown:theEvent];
+		return;
+	}
+#endif
+
 	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
 		/* Add the key to the input replay queue. */
 		[inputKeys addObject:[NSNumber numberWithInteger:keyCode]];
@@ -1579,7 +1596,7 @@ int logIndent = 0;
 	 * if multiple matches found.
 	 * FIXME: should this be part of the key replay queue?
 	 */
-	if (!keyManager.parser.partial) {
+	if (!keyManager.parser.partial && ![self isFieldEditor]) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
 		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKeyCode:keyCode
 								     matchingScopes:scopes
@@ -1590,7 +1607,7 @@ int logIndent = 0;
 		}
 	}
 
-	if (!keyManager.parser.partial) {
+	if (!keyManager.parser.partial && ![self isFieldEditor]) {
 		if (mode == ViVisualMode)
 			[keyManager.parser setVisualMap];
 		else if (mode == ViInsertMode)
@@ -1607,7 +1624,7 @@ int logIndent = 0;
 	DEBUG(@"got swipe event %@", event);
 
 	if ([event deltaX] != 0 && mode == ViInsertMode) {
-		[[self delegate] message:@"Swipe event interrupted text insert mode."];
+		MESSAGE(@"Swipe event interrupted text insert mode.");
 		[self normal_mode:lastEditCommand];
 		keep_message = YES;
 	}
@@ -1618,11 +1635,11 @@ int logIndent = 0;
 		rc = [self jumplist_forward:nil];
 
 	if (rc == YES && !keep_message)
-		[[self delegate] message:@""]; // erase any previous message
+		MESSAGE(@""); // erase any previous message
 }
 
-/* Takes a string of characters and creates key events for each one.
- * Then feeds them into the keyDown method to simulate key presses.
+/* Takes a string of characters and creates a macro of it.
+ * Then feeds it into the key manager.
  */
 - (void)input:(NSString *)inputString
 {
@@ -1631,7 +1648,7 @@ int logIndent = 0;
 		INFO(@"invalid key sequence: %@", inputString);
 		return;
 	}
-	[keyManager handleKeys:keys];
+	[keyManager runAsMacro:inputString];
 }
 
 #pragma mark -
@@ -1693,7 +1710,7 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
-	caretColor = [[[ViThemeStore defaultStore] defaultTheme] caretColor];
+	caretColor = [aTheme caretColor];
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[[self enclosingScrollView] setBackgroundColor:[aTheme backgroundColor]];
 	[self setInsertionPointColor:[aTheme caretColor]];
@@ -1703,17 +1720,20 @@ int logIndent = 0;
 
 - (NSFont *)font
 {
-	return [[self delegate] font];
+	return [document font];
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes
 {
-//	DEBUG(@"ignored, attributes = %@", attributes);
+	if ([self isFieldEditor])
+		[super setTypingAttributes:attributes];
 }
 
 - (NSDictionary *)typingAttributes
 {
-	return [[self delegate] typingAttributes];
+	if ([self isFieldEditor])
+		return [super typingAttributes];
+	return [document typingAttributes];
 }
 
 - (NSUInteger)currentLine
@@ -1726,9 +1746,10 @@ int logIndent = 0;
 	return [[self textStorage] columnAtLocation:[self caret]];
 }
 
+/* syntax: ctrl-P */
 - (BOOL)show_scope:(ViCommand *)command
 {
-	[[self delegate] message:[[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]];
+	MESSAGE(@"%@", [[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]);
 	return NO;
 }
 
@@ -1739,11 +1760,12 @@ int logIndent = 0;
 	return YES;
 }
 
+/* syntax: cmd-[0-9] */
 - (BOOL)switch_tab:(ViCommand *)command
 {
 	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
-		[[self delegate] message:@"Unexpected parameter type %@",
-		    NSStringFromClass([command.mapping.parameter class])];
+		MESSAGE(@"Unexpected parameter type %@",
+		    NSStringFromClass([command.mapping.parameter class]));
 		return NO;
 	}
 	int arg = [command.mapping.parameter intValue];
@@ -1754,7 +1776,7 @@ int logIndent = 0;
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation
 {
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];
-	[jumplist pushURL:[[self delegate] fileURL]
+	[jumplist pushURL:[document fileURL]
 		     line:[[self textStorage] lineNumberAtLocation:aLocation]
 		   column:[[self textStorage] columnAtLocation:aLocation]
 		     view:self];
@@ -1768,7 +1790,7 @@ int logIndent = 0;
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	NSMenu *menu = [self menuForEvent:theEvent];
-	NSMenuItem *item = [menu itemWithTitle:[[[self delegate] language] displayName]];
+	NSMenuItem *item = [menu itemWithTitle:[[document language] displayName]];
 	if (item) {
 		NSPoint event_location = [theEvent locationInWindow];
 		NSPoint local_point = [self convertPoint:event_location fromView:nil];
@@ -1809,7 +1831,7 @@ int logIndent = 0;
 	if (n > 0)
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:n++];
 
-	ViLanguage *curLang = [[self delegate] language];
+	ViLanguage *curLang = [document language];
 
 	submenu = [[NSMenu alloc] initWithTitle:@"Language syntax"];
 	item = [menu insertItemWithTitle:@"Language syntax"
@@ -1865,7 +1887,7 @@ int logIndent = 0;
 - (IBAction)performNormalModeMenuItem:(id)sender
 {
 	if (keyManager.parser.partial) {
-		[[[self delegate] nextRunloop] message:@"Vi command interrupted."];
+		[[[[self window] windowController] nextRunloop] message:@"Vi command interrupted."];
 		[keyManager.parser reset];
 	}
 

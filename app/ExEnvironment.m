@@ -40,8 +40,6 @@
 {
 	self = [super init];
 	if (self) {
-		history = [[NSMutableArray alloc] init];
-		historyIndex = -1;
                 [self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
 	}
 	return self;
@@ -230,6 +228,7 @@
 #pragma mark -
 #pragma mark Input of ex commands
 
+#if 0
 /*
  * Returns YES if the key binding was handled.
  */
@@ -323,6 +322,7 @@ doCommandBySelector:(SEL)aSelector
 	}
 	return NO;
 }
+#endif
 
 - (void)finishCompletionURL:(NSURL *)url
 {
@@ -354,27 +354,8 @@ doCommandBySelector:(SEL)aSelector
 	return url;
 }
 
-- (IBAction)finishedExCommand:(id)sender
+- (void)cancel_ex_command
 {
-	[statusbar setTarget:nil];
-	[statusbar setAction:NULL];
-
-	NSString *exCommand = [statusbar stringValue];
-
-	if ([exCommand length] > 0) {
-		[exDelegate performSelector:exCommandSelector
-		                 withObject:exCommand
-		                 withObject:exContextInfo];
-
-		/* Add the command to the history. */
-		NSUInteger i = [history indexOfObject:exCommand];
-		if (i != NSNotFound)
-			[history removeObjectAtIndex:i];
-		[history insertObject:exCommand atIndex:0];
-		while ([history count] > 100)
-			[history removeLastObject];
-	}
-
 	exDelegate = nil;
 	exTextView = nil;
 	exContextInfo = NULL;
@@ -388,6 +369,15 @@ doCommandBySelector:(SEL)aSelector
 	[[window windowController] focusEditor];
 }
 
+- (void)execute_ex_command:(NSString *)exCommand
+{
+	[exDelegate performSelector:exCommandSelector
+			 withObject:exCommand
+			 withObject:exContextInfo];
+
+	[self cancel_ex_command];
+}
+
 - (void)getExCommandWithDelegate:(id)aDelegate
 			selector:(SEL)aSelector
 			  prompt:(NSString *)aPrompt
@@ -395,14 +385,13 @@ doCommandBySelector:(SEL)aSelector
 {
 	[messageField setHidden:YES];
 	[statusbar setHidden:NO];
-	[statusbar setStringValue:aPrompt];
+	//[statusbar setStringValue:aPrompt];
 	[statusbar setEditable:YES];
-	[statusbar setTarget:self];
-	[statusbar setAction:@selector(finishedExCommand:)];
+	//[statusbar setTarget:self];
+	//[statusbar setAction:@selector(finishedExCommand:)];
 	exCommandSelector = aSelector;
 	exDelegate = aDelegate;
 	exContextInfo = contextInfo;
-	historyIndex = -1;
 	[window makeFirstResponder:statusbar];
 }
 
@@ -439,16 +428,6 @@ doCommandBySelector:(SEL)aSelector
 	                        prompt:@":"
 	                   contextInfo:NULL];
 }
-
-#pragma mark -
-#pragma mark Finding
-
-#if 0
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
-{
-	return [(ViTextView *)[[views objectAtIndex:0] textView] findPattern:pattern options:find_options];
-}
-#endif
 
 #pragma mark -
 #pragma mark Ex commands

@@ -42,9 +42,6 @@
 	ViTextView		*exTextView;
 	id			 exDelegate;
 	void			*exContextInfo;
-
-	NSMutableArray		*history;
-	int			 historyIndex;
 }
 
 @property(readonly) NSURL *baseURL;
@@ -59,6 +56,9 @@
 @property(readwrite, assign) BOOL filterWriteFailed;
 
 - (void)message:(NSString *)fmt, ...;
+
+- (void)execute_ex_command:(NSString *)exCommand;
+- (void)cancel_ex_command;
 
 - (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
 - (void)executeForTextView:(ViTextView *)aTextView;

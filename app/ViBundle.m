@@ -111,12 +111,12 @@
 	if (word)
 		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
 
-	NSURL *url = [[[textView delegate] environment] baseURL];
+	NSURL *url = [[textView.document environment] baseURL];
 	if ([url isFileURL])
 		[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
 	[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
 
-	url = [[textView delegate] fileURL];
+	url = [textView.document fileURL];
 	if (url) {
 		if ([url isFileURL]) {
 			[env setObject:[[url path] stringByDeletingLastPathComponent] forKey:@"TM_DIRECTORY"];

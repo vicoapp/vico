@@ -213,7 +213,7 @@
 	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]
 	    forKey:@"PATH"];
 
-	NSURL *baseURL = [[[self delegate] environment] baseURL];
+	NSURL *baseURL = [[document environment] baseURL];
 	if ([baseURL isFileURL])
 		[task setCurrentDirectoryPath:[baseURL path]];
 	else
@@ -230,7 +230,7 @@
 	    [NSValue valueWithRange:selectedRange], @"selectedRange",
 	    nil];
 	SEL sel = @selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:);
-	[[[self delegate] environment] filterText:inputText
+	[[document environment] filterText:inputText
 	                              throughTask:task
 	                                   target:self
 	                                 selector:sel
@@ -273,7 +273,7 @@
 	}
 
 	if (status != 0) {
-		[[self delegate] message:@"%@: exited with status %i", [command name], status];
+		MESSAGE(@"%@: exited with status %i", [command name], status);
 		DEBUG(@"command output: %@", outputText);
 	} else {
 		DEBUG(@"command output: %@", outputText);
@@ -287,12 +287,12 @@
 		else if ([outputFormat isEqualToString:@"replaceDocument"])
 			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText undoGroup:NO];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
-			[[self delegate] message:@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
+			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			ViCommandOutputController *oc = [[ViCommandOutputController alloc]
 			    initWithHTMLString:outputText
-			    environment:[[self delegate] environment]];
+			    environment:[document environment]];
 			id<ViViewController> viewController = [[[self window] windowController] currentView];
 			if (viewController == nil) {
 				INFO(@"%s", "ouch, no current view!");

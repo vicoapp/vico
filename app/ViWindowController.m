@@ -15,6 +15,8 @@
 #import "ViAppController.h"
 #import "ViTextStorage.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViLayoutManager.h"
+#import "ExTextField.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -224,6 +226,27 @@ static ViWindowController	*currentWindowController = nil;
 						forKeyPath:@"undostyle"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
+}
+
+- (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject
+{
+	if ([anObject isKindOfClass:[ExTextField class]]) {
+		if (viFieldEditor == nil) {
+			ViTextStorage *textStorage = [[ViTextStorage alloc] init];
+			ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
+			[textStorage addLayoutManager:layoutManager];
+			NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
+			[layoutManager addTextContainer:container];
+			NSRect frame = NSMakeRect(0, 0, 100, 10);
+			viFieldEditor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
+			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"fieldMap"]];
+			[viFieldEditor initWithDocument:nil viParser:fieldParser];
+			[viFieldEditor setFieldEditor:YES];
+			[viFieldEditor setInsertMode:nil];
+		}
+		return viFieldEditor;
+	}
+	return nil;
 }
 
 - (void)browseURL:(NSURL *)url

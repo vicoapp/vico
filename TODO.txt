@@ -3,8 +3,8 @@ URGENT
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
 * fuzzy search feels *slow*
-* ZZ and ZQ + handle :q! (ie, don't ask)
-  => how should we handle windows? quit the app completely?
+* implement "new file" and "new folder" in explorer menu
+* snippets are buggy wrt caret location near EOF
 
 BUGS
 ====
@@ -14,7 +14,6 @@ BUGS
 * caret location is messed up after undo of bundle command
 * jumpy selection in symbol list when clicking symbol
 * vi always has a newline at EOF
-* implement "new file" and "new folder" in explorer menu
 * searching is slow on large files, naïve implementation
 * yk and yj commands don't position caret correctly
 
@@ -212,3 +211,4 @@ latex.tmbundle
 * [DONE] macros in maps
 * [DONE] yank buffers? do they all work? across documents?
 * [DONE] should dot repeat a bundle command? (they do in insert mode now, a bit weird perhaps)
+* [DONE] pass macro keys to ex command line

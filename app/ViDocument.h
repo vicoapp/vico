@@ -4,7 +4,7 @@
 #import "ViTextStorage.h"
 #import "ViScriptProxy.h"
 
-@interface ViDocument : NSDocument <ViTextViewDelegate, NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
+@interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
 	NSMutableSet *views;
 
@@ -50,6 +50,12 @@
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
 @property(readonly) ViScriptProxy *proxy;
+
+- (void)message:(NSString *)fmt, ...;
+- (ExEnvironment *)environment;
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (NSFont *)font;
+- (NSDictionary *)typingAttributes;
 
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;

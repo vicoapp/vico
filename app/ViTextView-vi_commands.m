@@ -18,7 +18,7 @@
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];
 	BOOL ok = [jumplist forwardToURL:NULL line:NULL column:NULL view:NULL];
 	if (!ok) {
-		[[self delegate] message:@"Already at end of jumplist"];
+		MESSAGE(@"Already at end of jumplist");
 		return NO;
 	}
 
@@ -28,14 +28,14 @@
 /* syntax: [count]<ctrl-o> */
 - (BOOL)jumplist_backward:(ViCommand *)command
 {
-	NSURL *url = [[self delegate] fileURL];
+	NSURL *url = [document fileURL];
 	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
 	NSUInteger column = [[self textStorage] columnAtLocation:start_location];
 	NSView *view = self;
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];
 	BOOL ok = [jumplist backwardToURL:&url line:&line column:&column view:&view];
 	if (!ok) {
-		[[self delegate] message:@"Already at beginning of jumplist"];
+		MESSAGE(@"Already at beginning of jumplist");
 		return NO;
 	}
 
@@ -155,7 +155,7 @@
 
 	// check if last line is visible
 	if (NSMaxRange(range) >= [[self textStorage] length]) {
-		[[self delegate] message:@"Already at end-of-file"];
+		MESSAGE(@"Already at end-of-file");
 		return NO;
 	}
 
@@ -188,7 +188,7 @@
 	[self getLineStart:NULL end:&first_end contentsEnd:NULL forLocation:0];
 	if (range.location < first_end)
 	{
-		[[self delegate] message:@"Already at the beginning of the file"];
+		MESSAGE(@"Already at the beginning of the file");
 		return NO;
 	}
 
@@ -225,7 +225,7 @@
         NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
         if (openingRange.location == NSNotFound)
         {
-                [[self delegate] message:@"No match character on this line"];
+                MESSAGE(@"No match character on this line");
                 return NO;
         }
 
@@ -298,7 +298,7 @@
 
         if (level > 0)
 	{
-		[[self delegate] message:@"Matching character not found"];
+		MESSAGE(@"Matching character not found");
 		return NO;
         }
 
@@ -330,7 +330,7 @@
 		[self replaceRange:range withString:outputText];
 		[self endUndoGroup];
 	} else
-		[[self delegate] message:@"filter exited with status %i", status];
+		MESSAGE(@"filter exited with status %i", status);
 }
 
 - (void)filter_through_shell_command:(NSString *)shellCommand contextInfo:(void *)contextInfo
@@ -339,7 +339,7 @@
 		return;
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
-	[[[self delegate] environment] filterText:inputText
+	[[document environment] filterText:inputText
                                    throughCommand:shellCommand
                                            target:self
                                          selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
@@ -349,7 +349,7 @@
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
-	[[[self delegate] environment] getExCommandWithDelegate:self
+	[[document environment] getExCommandWithDelegate:self
 						       selector:@selector(filter_through_shell_command:contextInfo:)
 							 prompt:@"!"
 						    contextInfo:command];
@@ -465,8 +465,8 @@
 {
 	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.reg];
 	if ([content length] == 0) {
-		[[self delegate] message:@"The %@ register is empty",
-		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]];
+		MESSAGE(@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]);
 		return NO;
 	}
 
@@ -486,8 +486,8 @@
 {
 	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.reg];
 	if ([content length] == 0) {
-		[[self delegate] message:@"The %@ register is empty",
-		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]];
+		MESSAGE(@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.reg]);
 		return NO;
 	}
 
@@ -538,7 +538,7 @@
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
 		if (start_location + count > eol) {
-			[[self delegate] message:@"Movement past the end-of-line"];
+			MESSAGE(@"Movement past the end-of-line");
 			return NO;
 		}
 		affectedRange = NSMakeRange(start_location, count);
@@ -630,7 +630,7 @@
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol];
 	if (end == eol) {
-		[[self delegate] message:@"No following lines to join"];
+		MESSAGE(@"No following lines to join");
 		return NO;
 	}
 
@@ -708,7 +708,7 @@
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if (bol == eol) {
-		[[self delegate] message:@"Already at end-of-line"];
+		MESSAGE(@"Already at end-of-line");
 		return NO;
 	}
 
@@ -751,7 +751,7 @@
 			/* XXX: this command is also used outside the scope of an explicit 'h' command.
 			 * In such cases, we shouldn't issue an error message.
 			 */
-			[[self delegate] message:@"Already in the first column"];
+			MESSAGE(@"Already in the first column");
 		}
 		return NO;
 	}
@@ -767,7 +767,7 @@
 	NSUInteger eol;
 	[self getLineStart:NULL end:NULL contentsEnd:&eol];
 	if (start_location + ((mode == ViInsertMode || command.hasOperator) ? 0 : 1) >= eol) {
-		[[self delegate] message:@"Already at end-of-line"];
+		MESSAGE(@"Already at end-of-line");
 		return NO;
 	}
 	if (start_location + count >= eol)
@@ -785,7 +785,7 @@
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if (bol == 0) {
-		[[self delegate] message:@"Already at the beginning of the file"];
+		MESSAGE(@"Already at the beginning of the file");
 		return NO;
 	}
 
@@ -793,7 +793,7 @@
 
 	while (count-- > 0) {
 		if (bol <= 0) {
-			[[self delegate] message:@"Movement past the beginning of the file"];
+			MESSAGE(@"Movement past the beginning of the file");
 			return NO;
 		}
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:bol - 1];
@@ -811,14 +811,14 @@
 	NSUInteger end;
 	[self getLineStart:NULL end:&end contentsEnd:NULL];
 	if (end >= [[self textStorage] length]) {
-		[[self delegate] message:@"Already at end-of-file"];
+		MESSAGE(@"Already at end-of-file");
 		return NO;
 	}
 
 	while (--count > 0) {
 		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
 		if (end >= [[self textStorage] length]) {
-			[[self delegate] message:@"Movement past the end-of-file"];
+			MESSAGE(@"Movement past the end-of-file");
 			return NO;
 		}
 	}
@@ -868,7 +868,7 @@
 		while (--i >= bol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
 		if (i < bol) {
-			[[self delegate] message:@"%C not found", command.argument];
+			MESSAGE(@"%C not found", command.argument);
 			return NO;
 		}
 	}
@@ -900,7 +900,7 @@
 		while (++i < eol && [[[self textStorage] string] characterAtIndex:i] != command.argument)
 			/* do nothing */ ;
 		if (i >= eol) {
-			[[self delegate] message:@"%C not found", command.argument];
+			MESSAGE(@"%C not found", command.argument);
 			return NO;
 		}
 	}
@@ -926,7 +926,7 @@
 {
 	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
 	if (c == nil) {
-		[[self delegate] message:@"No previous F, f, T or t search"];
+		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
 	}
 
@@ -950,7 +950,7 @@
 {
 	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
 	if (c == nil) {
-		[[self delegate] message:@"No previous F, f, T or t search"];
+		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
 	}
 
@@ -978,7 +978,7 @@
 	if (count > 0) {
 		NSInteger location = [[self textStorage] locationForStartOfLine:count];
 		if(location == -1) {
-			[[self delegate] message:@"Movement past the end-of-file"];
+			MESSAGE(@"Movement past the end-of-file");
 			final_location = end_location = start_location;
 			return NO;
 		}
@@ -1101,7 +1101,7 @@
 
 		if (undo_direction == 1) {
 			if (![undoManager canUndo]) {
-				[[self delegate] message:@"No changes to undo"];
+				MESSAGE(@"No changes to undo");
 				return NO;
 			}
 			[[self textStorage] beginEditing];
@@ -1109,7 +1109,7 @@
 			[[self textStorage] endEditing];
 		} else {
 			if (![undoManager canRedo]) {
-				[[self delegate] message:@"No changes to re-do"];
+				MESSAGE(@"No changes to re-do");
 				return NO;
 			}
 			[[self textStorage] beginEditing];
@@ -1118,7 +1118,7 @@
 		}
 	} else {
 		if (![undoManager canUndo]) {
-			[[self delegate] message:@"No changes to undo"];
+			MESSAGE(@"No changes to undo");
 			return NO;
 		}
 		[[self textStorage] beginEditing];
@@ -1137,7 +1137,7 @@
 		return NO;
 
 	if (![undoManager canRedo]) {
-		[[self delegate] message:@"No changes to re-do"];
+		MESSAGE(@"No changes to re-do");
 		return NO;
 	}
 	[undoManager redo];
@@ -1160,7 +1160,7 @@
 - (BOOL)word_forward:(ViCommand *)command
 {
 	if ([[self textStorage] length] == 0) {
-		[[self delegate] message:@"Empty file"];
+		MESSAGE(@"Empty file");
 		return NO;
 	}
 
@@ -1229,12 +1229,12 @@
 - (BOOL)word_backward:(ViCommand *)command
 {
 	if ([[self textStorage] length] == 0) {
-		[[self delegate] message:@"Empty file"];
+		MESSAGE(@"Empty file");
 		return NO;
 	}
 
 	if (start_location == 0) {
-		[[self delegate] message:@"Already at the beginning of the file"];
+		MESSAGE(@"Already at the beginning of the file");
 		return NO;
 	}
 
@@ -1301,7 +1301,7 @@
 - (BOOL)end_of_word:(ViCommand *)command
 {
 	if ([[self textStorage] length] == 0) {
-		[[self delegate] message:@"Empty file"];
+		MESSAGE(@"Empty file");
 		return NO;
 	}
 
@@ -1388,14 +1388,14 @@
 {
 	NSString *s = [[self textStorage] string];
 	if ([s length] == 0) {
-		[[self delegate] message:@"No characters to delete"];
+		MESSAGE(@"No characters to delete");
 		return NO;
 	}
 
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	if (bol == eol) {
-		[[self delegate] message:@"No characters to delete"];
+		MESSAGE(@"No characters to delete");
 		return NO;
 	}
 
@@ -1419,14 +1419,14 @@
 - (BOOL)delete_backward:(ViCommand *)command
 {
 	if ([[self textStorage] length] == 0) {
-		[[self delegate] message:@"Already in the first column"];
+		MESSAGE(@"Already in the first column");
 		return NO;
 	}
 
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 	if (start_location == bol) {
-		[[self delegate] message:@"Already in the first column"];
+		MESSAGE(@"Already in the first column");
 		return NO;
 	}
 
@@ -1461,7 +1461,7 @@
 		 */
 		if ([self caret] >= bol)
 		{
-			[[self delegate] message:@"Already at end-of-file"];
+			MESSAGE(@"Already at end-of-file");
 			return NO;
 		}
 
@@ -1507,7 +1507,7 @@
 		 */
 		if ([self caret] < eol)
 		{
-			[[self delegate] message:@"Already at the beginning of the file"];
+			MESSAGE(@"Already at the beginning of the file");
 			return NO;
 		}
 
@@ -1580,7 +1580,7 @@
 		sym = [sender representedObject];
 
 	ViTagStack *stack = windowController.tagStack;
-	NSURL *url = [[self delegate] fileURL];
+	NSURL *url = [document fileURL];
 	if (url)
 		[stack pushURL:url
 			  line:[self currentLine]
@@ -1602,8 +1602,8 @@
 	NSArray *syms = [windowController symbolsFilteredByPattern:pattern];
 
 	if ([syms count] == 0) {
-		[[self delegate] message:
-		    @"Symbol \"%@\" not found. Perhaps its document isn't open?", word];
+		MESSAGE(
+		    @"Symbol \"%@\" not found. Perhaps its document isn't open?", word);
 		return NO;
 	} else if ([syms count] == 1) {
 		[self gotoSymbol:[syms objectAtIndex:0]];
@@ -1659,14 +1659,14 @@
 
 	if (db == nil) {
 		return [self jump_symbol:command];
-		// [[self delegate] message:@"tags: No such file or directory."];
+		// MESSAGE(@"tags: No such file or directory.");
 	}
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		NSArray *tag = [db lookup:word];
 		if (tag) {
-			NSURL *url = [[self delegate] fileURL];
+			NSURL *url = [document fileURL];
 			if (url)
 				[stack pushURL:url line:[self currentLine] column:[self currentColumn]];
 			[self pushCurrentLocationOnJumpList];
@@ -1683,7 +1683,7 @@
 			[[docView textView] findPattern:pattern options:0];
 			final_location = NSNotFound;
 		} else {
-			[[self delegate] message:@"%@: tag not found", word];
+			MESSAGE(@"%@: tag not found", word);
 		}
 	}
 
@@ -1701,7 +1701,7 @@
 				     line:[[tag objectForKey:@"line"] unsignedIntegerValue]
 				   column:[[tag objectForKey:@"column"] unsignedIntegerValue]];
 	} else {
-		[[self delegate] message:@"The tag stack is empty"];
+		MESSAGE(@"The tag stack is empty");
 		return NO;
 	}
 	return YES;
@@ -1734,7 +1734,7 @@
 // syntax: ^G
 - (BOOL)show_info:(ViCommand *)command
 {
-	NSURL *url = [[self delegate] fileURL];
+	NSURL *url = [document fileURL];
 	NSString *path;
 
 	if (url == nil)
@@ -1744,14 +1744,14 @@
 	else
 		path = [url absoluteString];
 
-	[[self delegate] message:@"%@: %s: line %u of %u [%.0f%%] %@ syntax, %@ encoding",
+	MESSAGE(@"%@: %s: line %u of %u [%.0f%%] %@ syntax, %@ encoding",
 	 path,
 	 [[[NSDocumentController sharedDocumentController] currentDocument] isDocumentEdited] ? "modified" : "unmodified",
 	 [self currentLine],
 	 [[self textStorage] lineNumberAtLocation:IMAX(0, [[[self textStorage] string] length] - 1)],
 	 (float)[self caret]*100.0 / ((float)[[[self textStorage] string] length] ?: 1),
-	 [[[self delegate] language] displayName],
-	 [NSString localizedNameOfStringEncoding:[[self delegate] encoding]]];
+	 [[document language] displayName],
+	 [NSString localizedNameOfStringEncoding:[document encoding]]);
 	return NO;
 }
 
@@ -1768,13 +1768,13 @@
 {
 	ViMark *m = [marks objectForKey:[NSString stringWithFormat:@"%C", command.argument]];
 	if (m == nil) {
-		[[self delegate] message:@"Mark %C: not set", command.argument];
+		MESSAGE(@"Mark %C: not set", command.argument);
 		return NO;
 	}
 
 	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
 	if (bol == -1) {
-		[[self delegate] message:@"Mark %C: the line was deleted", command.argument];
+		MESSAGE(@"Mark %C: the line was deleted", command.argument);
 		return NO;
 	}
 	final_location = bol;
@@ -1855,7 +1855,7 @@
 		return [self select_inner_scope:command];
 		break;
 	default:
-		[[self delegate] message:@"Unrecognized text object."];
+		MESSAGE(@"Unrecognized text object.");
 		return NO;
 	}
 }
@@ -1880,8 +1880,8 @@
 {
 	NSString *content = [[ViRegisterManager sharedManager] contentOfRegister:command.argument];
 	if (content == nil) {
-		[[self delegate] message:@"The %@ register is empty",
-		    [[ViRegisterManager sharedManager] nameOfRegister:command.argument]];
+		MESSAGE(@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:command.argument]);
 		return NO;
 	}
 	[self insertString:content atLocation:start_location];
@@ -1892,7 +1892,7 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[[[self delegate] environment] executeForTextView:self];
+	[[document environment] executeForTextView:self];
 	return YES;
 }
 

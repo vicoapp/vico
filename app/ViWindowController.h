@@ -33,6 +33,8 @@
 
 	IBOutlet ExEnvironment *environment;
 
+	ViTextView *viFieldEditor;
+
 	ViTagStack *tagStack;
 	ViTagsDatabase *tagsDatabase;
 

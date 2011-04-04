@@ -299,6 +299,33 @@
 (emap setKey:"<cmd-esc>" toMotion:"show_menu:")
 
 
+(set fmap (ViMap mapWithName:"fieldMap"))
+(fmap setDefaultAction:"input_character:")
+(fmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
+(fmap setKey:"<esc>" toAction:"ex_cancel:")
+(fmap setKey:"<ctrl-c>" toAction:"ex_cancel:")
+(fmap setKey:"<cr>" toAction:"ex_execute:")
+(fmap setKey:"<bs>" toAction:"input_backspace:")
+(fmap setKey:"<Del>" toAction:"input_forward_delete:")
+(fmap setKey:"<c-j>" toAction:"ex_execute:")
+(fmap setKey:"<c-m>" toAction:"ex_execute:")
+(fmap setKey:"<c-v>" toAction:"literal_next:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(fmap setKey:"<c-r>" toAction:"input_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(fmap map:"<cmd-v>" to:"<ctrl-r>*")
+(fmap setKey:"<right>" toAction:"move_right:")
+(fmap setKey:"<left>" toAction:"move_left:")
+(fmap setKey:"<home>" toAction:"move_first_char:")
+(fmap setKey:"<end>" toAction:"move_eol:")
+(fmap setKey:"<alt-right>" toAction:"end_of_word:")
+(fmap setKey:"<alt-left>" toAction:"word_backward:")
+(fmap setKey:"<ctrl-right>" toAction:"move_eol:")
+(fmap setKey:"<ctrl-left>" toAction:"move_bol:")
+(fmap setKey:"<cmd-right>" toAction:"move_eol:")
+(fmap setKey:"<cmd-left>" toAction:"move_bol:")
+(fmap setKey:"<down>" toAction:"next_history_with_prefix:")
+(fmap setKey:"<up>" toAction:"prev_history_with_prefix:")
+(fmap setKey:"<pagedown>" toAction:"next_history:")
+(fmap setKey:"<pageup>" toAction:"prev_history:")
 
 ; simple macro to insert an include header based on the current file
 ;(nmap map:",i" to:"O0<C-D>#include \"<C-R>%\"<esc>T.c")

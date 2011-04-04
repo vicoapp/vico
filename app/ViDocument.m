@@ -177,7 +177,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	ViTextView *textView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 	[documentView replaceTextView:textView];
 
-	[textView initEditorWithDelegate:self viParser:[windowController parser]];
+	[textView initWithDocument:self viParser:[windowController parser]];
 
 	[self enableLineNumbers:[userDefaults boolForKey:@"number"]
 	          forScrollView:[textView enclosingScrollView]];
@@ -883,15 +883,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[[scopeArray objectAtIndex:i] setAttributes:nil];
 		i += [[scopeArray objectAtIndex:i] range].length;
 	}
-
-	/* Change the theme and invalidate all layout.
-	 */
-	for (ViDocumentView *dv in views) {
-		[[dv textView] setTheme:theme];
-		ViLayoutManager *lm = (ViLayoutManager *)[[dv textView] layoutManager];
-		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
-		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
-	}
 }
 
 - (void)updatePageGuide
@@ -904,9 +895,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	for (ViDocumentView *dv in views)
 		[[dv textView] setPageGuide:pageGuideColumn];
 }
-
-#pragma mark -
-#pragma mark ViTextView delegate methods
 
 - (void)message:(NSString *)fmt, ...
 {

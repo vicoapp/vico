@@ -8,7 +8,7 @@
 - (void)cancelSnippet:(ViSnippet *)snippet
 {
 	DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
-	[self delegate].snippet = nil;
+	document.snippet = nil;
 	[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
 	[self endUndoGroup];
 }
@@ -47,13 +47,13 @@
 	                                           environment:env
 	                                                 error:&error];
 	if (snippet == nil) {
-		[[self delegate] message:[error localizedDescription]];
+		MESSAGE(@"%@", [error localizedDescription]);
 		final_location = aRange.location;
 		[self setCaret:aRange.location];
 		return nil;
 	}
 
-	[self delegate].snippet = snippet;
+	document.snippet = snippet;
 	final_location = snippet.caret;
 	[self setCaret:snippet.caret];
 
@@ -95,7 +95,7 @@
 
 - (void)deselectSnippet
 {
-	ViSnippet *snippet = [self delegate].snippet;
+	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		NSRange sel = snippet.selectedRange;
 		if (sel.location != NSNotFound) {

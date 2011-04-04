@@ -150,9 +150,16 @@
 	}
 
 	int options = 0;
-	if ([url isFileURL])
-		/* FIXME: check if local filesystem is case sensitive? */
-		options |= NSCaseInsensitiveSearch;
+	if ([url isFileURL]) {
+		/* Check if local filesystem is case sensitive. */
+		NSNumber *isCaseSensitive;
+		if ([url getResourceValue:&isCaseSensitive
+				   forKey:NSURLVolumeSupportsCaseSensitiveNamesKey
+				    error:NULL] && ![isCaseSensitive intValue] == 1) {
+			INFO(@"file system for url %@ is case insensitive", url);
+			options |= NSCaseInsensitiveSearch;
+		}
+	}
 
 	SFTPConnection *conn = nil;
 	NSFileManager *fm = nil;

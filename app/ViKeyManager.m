@@ -53,9 +53,18 @@
 	NSInteger keyCode;
 	NSError *error = nil;
 	while ((keyCode = [macro pop]) != -1) {
-		if ([self handleKey:keyCode
-			allowMacros:macro.mapping.recursive
-			      error:&error] == NO || error) {
+		/*
+		 * Send the key to the key manager of the first responder.
+		 * First responder might be another buffer, or the ex command line.
+		 */
+		NSResponder *responder = [[NSApp keyWindow] firstResponder];
+		ViKeyManager *km = self;
+		if ([responder respondsToSelector:@selector(keyManager)])
+			km = [responder performSelector:@selector(keyManager)];
+
+		if ([km handleKey:keyCode
+		      allowMacros:macro.mapping.recursive
+			    error:&error] == NO || error) {
 			if (error)
 				[self presentError:error];
 		 	DEBUG(@"aborting macro on key %@",
@@ -65,6 +74,16 @@
 	}
 
 	recursionLevel = 0;
+}
+
+- (void)runAsMacro:(NSString *)inputString
+{
+	ViMapping *m = [ViMapping mappingWithKeySequence:nil
+						   macro:inputString
+					       recursive:YES
+						   scope:nil];
+	ViMacro *macro = [ViMacro macroWithMapping:m prefix:nil];
+	[self runMacro:macro];
 }
 
 - (BOOL)handleKey:(NSInteger)keyCode

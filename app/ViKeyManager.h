@@ -21,6 +21,7 @@
 - (void)keyDown:(NSEvent *)theEvent;
 - (BOOL)handleKey:(NSInteger)keyCode;
 - (void)handleKeys:(NSArray *)keys;
+- (void)runAsMacro:(NSString *)inputString;
 @end
 
 @interface NSObject (ViKeyManagerTarget)

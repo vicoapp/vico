@@ -322,10 +322,10 @@
 (fmap setKey:"<ctrl-left>" toAction:"move_bol:")
 (fmap setKey:"<cmd-right>" toAction:"move_eol:")
 (fmap setKey:"<cmd-left>" toAction:"move_bol:")
-(fmap setKey:"<down>" toAction:"next_history_with_prefix:")
-(fmap setKey:"<up>" toAction:"prev_history_with_prefix:")
-(fmap setKey:"<pagedown>" toAction:"next_history:")
-(fmap setKey:"<pageup>" toAction:"prev_history:")
+(fmap setKey:"<down>" toAction:"next_history:")
+(fmap setKey:"<up>" toAction:"prev_history:")
+(fmap setKey:"<pagedown>" toAction:"next_history_ignoring_prefix:")
+(fmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
 
 ; simple macro to insert an include header based on the current file
 ;(nmap map:",i" to:"O0<C-D>#include \"<C-R>%\"<esc>T.c")

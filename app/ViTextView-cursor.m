@@ -44,7 +44,9 @@
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
 	if (NSIntersectsRect(caretRect, aRect)) {
-		if (mode == ViInsertMode) {
+		if ([self isFieldEditor]) {
+			caretRect.size.width = 1;
+		} else if (mode == ViInsertMode) {
 			caretRect.size.width = 2;
 		} else if (caret < [[self textStorage] length]) {
 			unichar c = [[[self textStorage] string] characterAtIndex:caret];
@@ -55,7 +57,10 @@
 			if (c == '\t' || c == '\n' || c == '\r')
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
-		[caretColor set];
+		if ([self isFieldEditor])
+			[[NSColor blackColor] set];
+		else
+			[caretColor set];
 		[[NSBezierPath bezierPathWithRect:caretRect] fill];
 	}
 }

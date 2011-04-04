@@ -743,13 +743,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		return;
 	}
 
-	NSUInteger len = [textStorage length];
-	for (ViDocumentView *dv in views) {
-		ViTextView *tv = [dv textView];
-		if ([tv caret] > len)
-			[[tv nextRunloop] setCaret:len];
-	}
-
 	if (language == nil)
 		return;
 

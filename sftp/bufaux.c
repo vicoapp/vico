@@ -170,7 +170,7 @@ buffer_put_string(Buffer *buffer, const void *buf, u_int len)
 void
 buffer_put_cstring(Buffer *buffer, const char *s)
 {
-	buffer_put_string(buffer, s, strlen(s));
+	buffer_put_string(buffer, s, (u_int)strlen(s));
 }
 
 /*

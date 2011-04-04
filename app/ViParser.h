@@ -42,16 +42,16 @@ typedef enum {
 
 - (ViParser *)initWithDefaultMap:(ViMap *)aMap;
 
-- (ViCommand *)pushKey:(NSInteger)keyCode;
+- (id)pushKey:(NSInteger)keyCode;
 
-- (ViCommand *)pushKey:(NSInteger)keyCode
-           allowMacros:(BOOL)allowMacros
-                 scope:(NSArray *)scopeArray
-               timeout:(BOOL *)timeoutPtr
-                 error:(NSError **)outError;
+- (id)pushKey:(NSInteger)keyCode
+  allowMacros:(BOOL)allowMacros
+        scope:(NSArray *)scopeArray
+      timeout:(BOOL *)timeoutPtr
+        error:(NSError **)outError;
 
-- (ViCommand *)timeoutInScope:(NSArray *)scopeArray
-                        error:(NSError **)outError;
+- (id)timeoutInScope:(NSArray *)scopeArray
+               error:(NSError **)outError;
 
 - (void)reset;
 

@@ -86,6 +86,18 @@
 	[self runMacro:macro];
 }
 
+- (BOOL)evalCommand:(id)command
+{
+	SEL action = @selector(keyManager:evaluateCommand:);
+	if ([command isKindOfClass:[ViMacro class]])
+		[self runMacro:command];
+	else if ([target respondsToSelector:action])
+		return (BOOL)[target performSelector:action
+					  withObject:self
+					  withObject:command];
+	return YES;
+}
+
 - (BOOL)handleKey:(NSInteger)keyCode
       allowMacros:(BOOL)allowMacros
             error:(NSError **)outError
@@ -114,19 +126,13 @@
 
 	NSError *error = nil;
 	BOOL timeout = NO;
-	ViCommand *command = [parser pushKey:keyCode
-				 allowMacros:allowMacros
-				       scope:nil
-				     timeout:&timeout
-				       error:&error];
+	id command = [parser pushKey:keyCode
+			 allowMacros:allowMacros
+			       scope:nil
+			     timeout:&timeout
+			       error:&error];
 	if (command) {
-		SEL action = @selector(keyManager:evaluateCommand:);
-		if ([command isKindOfClass:[ViMacro class]])
-			[self runMacro:command];
-		else if ([target respondsToSelector:action])
-			return (BOOL)[target performSelector:action
-						  withObject:self
-						  withObject:command];
+		return [self evalCommand:command];
 	} else if (error) {
 		if (outError)
 			*outError = error;
@@ -165,15 +171,10 @@
 - (void)keyTimedOut:(id)sender
 {
 	NSError *error = nil;
-	ViCommand *command = [parser timeoutInScope:nil error:&error];
-	if (command) {
-		if ([command isKindOfClass:[ViMacro class]])
-			[self runMacro:command];
-		if ([target respondsToSelector:@selector(keyManager:evaluateCommand:)])
-			[target performSelector:@selector(keyManager:evaluateCommand:)
-				     withObject:self
-				     withObject:command];
-	} else if (error)
+	id command = [parser timeoutInScope:nil error:&error];
+	if (command)
+		[self evalCommand:command];
+	else if (error)
 		[self presentError:error];
 }
 

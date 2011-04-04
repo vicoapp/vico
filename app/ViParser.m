@@ -28,9 +28,9 @@
 	return self;
 }
 
-- (ViCommand *)fail:(NSError **)outError
-               with:(NSInteger)code
-            message:(NSString *)fmt, ...
+- (id)fail:(NSError **)outError
+      with:(NSInteger)code
+   message:(NSString *)fmt, ...
 {
 	if (outError) {
 		va_list ap;
@@ -120,11 +120,11 @@
 	return ret;
 }
 
-- (ViCommand *)pushExcessKeys:(NSArray *)excessKeys
-                  allowMacros:(BOOL)allowMacros
-                        scope:(NSArray *)scopeArray
-                      timeout:(BOOL *)timeoutPtr
-                        error:(NSError **)outError
+- (id)pushExcessKeys:(NSArray *)excessKeys
+         allowMacros:(BOOL)allowMacros
+               scope:(NSArray *)scopeArray
+             timeout:(BOOL *)timeoutPtr
+               error:(NSError **)outError
 {
 	for (NSNumber *n in excessKeys) {
 		NSError *error = nil;
@@ -148,8 +148,8 @@
 	return nil;
 }
 
-- (ViCommand *)timeoutInScope:(NSArray *)scopeArray
-                        error:(NSError **)outError
+- (id)timeoutInScope:(NSArray *)scopeArray
+               error:(NSError **)outError
 {
 	return [self handleKeySequenceInScope:scopeArray
 				  allowMacros:YES	/* XXX: ? */
@@ -158,16 +158,16 @@
 				        error:outError];
 }
 
-- (ViCommand *)pushKey:(NSInteger)keyCode
+- (id)pushKey:(NSInteger)keyCode
 {
 	return [self pushKey:keyCode allowMacros:YES scope:nil timeout:nil error:nil];
 }
 
-- (ViCommand *)pushKey:(NSInteger)keyCode
-           allowMacros:(BOOL)allowMacros
-                 scope:(NSArray *)scopeArray
-               timeout:(BOOL *)timeoutPtr
-                 error:(NSError **)outError
+- (id)pushKey:(NSInteger)keyCode
+  allowMacros:(BOOL)allowMacros
+        scope:(NSArray *)scopeArray
+      timeout:(BOOL *)timeoutPtr
+        error:(NSError **)outError
 {
 	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], state);
 
@@ -274,11 +274,11 @@
 				        error:outError];
 }
 
-- (ViCommand *)handleKeySequenceInScope:(NSArray *)scopeArray
-                            allowMacros:(BOOL)allowMacros
-                             didTimeout:(BOOL)didTimeout
-                                timeout:(BOOL *)timeoutPtr
-                                  error:(NSError **)outError
+- (id)handleKeySequenceInScope:(NSArray *)scopeArray
+                   allowMacros:(BOOL)allowMacros
+                    didTimeout:(BOOL)didTimeout
+                       timeout:(BOOL *)timeoutPtr
+                         error:(NSError **)outError
 {
 	NSError *error = nil;
 	NSArray *excessKeys = nil;

@@ -69,8 +69,8 @@ stat_to_attrib(const struct stat *st, Attrib *a)
 	a->flags |= SSH2_FILEXFER_ATTR_PERMISSIONS;
 	a->perm = st->st_mode;
 	a->flags |= SSH2_FILEXFER_ATTR_ACMODTIME;
-	a->atime = st->st_atime;
-	a->mtime = st->st_mtime;
+	a->atime = (u_int32_t)st->st_atime;
+	a->mtime = (u_int32_t)st->st_mtime;
 }
 
 /* Convert from filexfer attribs to struct stat */

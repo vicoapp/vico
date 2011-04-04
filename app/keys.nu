@@ -254,6 +254,7 @@
 (vmap setKey:">" toEditAction:"shift_right:" flags:ViMapLineMode parameter:nil scope:nil)
 (vmap setKey:"!" toEditAction:"filter:")
 (vmap setKey:":" toAction:"ex_command:")
+(vmap map:":" to:":'<,'>")
 (vmap setKey:"<esc>" toAction:"normal_mode:")
 (vmap setKey:"<c-b>" toAction:"backward_screen:")
 (vmap setKey:"<c-d>" toAction:"scroll_downward:")

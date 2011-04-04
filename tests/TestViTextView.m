@@ -23,7 +23,7 @@
 	vi = [[ViTextView alloc] initWithFrame:NSMakeRect(0, 0, 320, 200)];
 	parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 	[[vi layoutManager] replaceTextStorage:[[ViTextStorage alloc] init]];
-	[vi initEditorWithDelegate:nil viParser:parser];
+	[vi initWithDocument:nil viParser:parser];
 }
 
 - (void)test001_AllocateTextView		{ STAssertNotNil(vi, nil); }

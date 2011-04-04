@@ -967,6 +967,9 @@ int logIndent = 0;
 	else
 		l2++;
 
+	[self setMark:'<' atLocation:l1];
+	[self setMark:'>' atLocation:IMAX(l1, l2 - 1)];
+
 	NSRange sel = NSMakeRange(l1, l2 - l1);
 	[self setSelectedRange:sel];
 }

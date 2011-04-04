@@ -33,7 +33,7 @@
 - (void)test010_InsertTextAndEscape		{ TEST(@"abc def", 3, @"i qwerty\x1b", @"abc qwerty def", 9); }
 - (void)test011_InsertMovesBackward		{ TEST(@"abc def", 3, @"i\x1b", @"abc def", 2); }
 - (void)test012_ChangeWord			{ TEST(@"abc\ndef", 1, @"cwcb\x1b", @"acb\ndef", 2); }
-- (void)test013_ChangeWordAndPut		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 9); }
+- (void)test013_ChangeWordAndPut		{ TEST(@"abc def", 0, @"cwapa\x1b$p", @"apa defabc", 7); }
 - (void)test014_AppendText			{ TEST(@"abc", 2, @"adef\x1b", @"abcdef", 5); }
 - (void)test015_RepeatAppendText		{ TEST(@"abc", 1, @"adef\x1b.", @"abdefdefc", 7); }
 - (void)test016_RepeatInsertText		{ TEST(@"abc", 2, @"idef\x1b.", @"abdedeffc", 6); }
@@ -88,17 +88,17 @@
 - (void)test073_DeleteLastLine			{ TEST(@"abc\ndef", 5, @"dd", @"abc", 0); }
 - (void)test074_DeleteToFirstLine		{ TEST(@"abc\ndef\nghi", 5, @"d1G", @"ghi", 0); }
 - (void)test075_DeleteToLastLine		{ TEST(@"abc\ndef\nghi\njkl", 5, @"dG", @"abc", 0); }
-- (void)test076_DeleteAndPut			{ TEST(@"abc def", 0, @"dw$p", @"defabc ", 6); }
+- (void)test076_DeleteAndPut			{ TEST(@"abc def", 0, @"dw$p", @"defabc ", 3); }
 - (void)test077_DeleteToEOL2			{ TEST(@"abc def", 2, @"D", @"ab", 1); }
 - (void)test078_DeleteTwoLines			{ TEST(@"abc\ndef\nghi", 1, @"2dd", @"ghi", 0); }
 - (void)test078_DeleteTwoLines2			{ TEST(@"abc\ndef\nghi", 1, @"d2d", @"ghi", 0); }
 
 - (void)test080_YankWord			{ TEST(@"abc def ghi", 4, @"yw", @"abc def ghi", 4); }
-- (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 11); }
-- (void)test081_YankWord2			{ TEST(@"abc def ghi", 8, @"yw0p", @"aghibc def ghi", 3); }
+- (void)test080_YankWordAndPaste		{ TEST(@"abc def ghi", 4, @"ywwP", @"abc def def ghi", 8); }
+- (void)test081_YankWord2			{ TEST(@"abc def ghi", 8, @"yw0p", @"aghibc def ghi", 1); }
 - (void)test082_YankBackwards			{ TEST(@"abcdef", 3, @"y0", @"abcdef", 0); }
-- (void)test083_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 3); }
-- (void)test084_YankWordAndPasteAtEOL		{ TEST(@"abc def", 4, @"yw$p", @"abc defdef", 9); }
+- (void)test083_YankBackwardsAndPaste		{ TEST(@"abcdef", 3, @"y0p", @"aabcbcdef", 1); }
+- (void)test084_YankWordAndPasteAtEOL		{ TEST(@"abc def", 4, @"yw$p", @"abc defdef", 7); }
 - (void)test085_YankLine			{ TEST(@"abc\ndef", 2, @"yy", @"abc\ndef", 2); }
 - (void)test086_YankAndPasteLine		{ TEST(@"abc\ndef\nghi", 1, @"yyp", @"abc\nabc\ndef\nghi", 4); }
 - (void)test086_YankAndPasteLine2		{ TEST(@"abc\ndef\nghi", 1, @"ylYp", @"abc\nabc\ndef\nghi", 4); }

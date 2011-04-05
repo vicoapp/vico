@@ -92,6 +92,13 @@
 			    (keyflags & NSControlKeyMask) ? "YES" : "NO",
 			    (keyflags & NSAlternateKeyMask) ? "YES" : "NO",
 			    (keyflags & NSCommandKeyMask) ? "YES" : "NO", name);
+		
+			if (keyCode == 0x1B) {
+				/* Prevent mapping of escape. */
+				INFO(@"refusing to map <esc> to bundle command %@", name);
+				keyEquivalent = @"";
+				keyCode = -1;
+			}
 		} else {
 			keyEquivalent = @"";
 			keyCode = -1;

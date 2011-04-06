@@ -1214,10 +1214,8 @@ constrainMinCoordinate:(CGFloat)proposedMin
 		NSView *view = [[sender subviews] objectAtIndex:offset];
 		if (view == explorerView)
 			return 100;
-		if (view == symbolsView) {
-			NSRect frame = [sender frame];
-			return frame.size.width - 300;
-		}
+		NSRect frame = [sender frame];
+		return IMAX(frame.size.width - 500, 0);
 	}
 
 	return proposedMin;
@@ -1230,8 +1228,8 @@ constrainMaxCoordinate:(CGFloat)proposedMax
 	if (sender == splitView) {
 		NSView *view = [[sender subviews] objectAtIndex:offset];
 		if (view == explorerView)
-			return 300;
-		return proposedMax - 100;
+			return 500;
+		return IMAX(proposedMax - 100, 0);
 	} else
 		return proposedMax;
 }

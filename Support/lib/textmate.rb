@@ -5,7 +5,7 @@ require "#{ENV['TM_SUPPORT_PATH']}/lib/osx/plist"
 require "#{ENV['TM_SUPPORT_PATH']}/lib/escape"
 require "#{ENV['TM_SUPPORT_PATH']}/lib/exit_codes"
 
-VIBE = ENV['TM_APP_PATH'] + '/Contents/MacOS/vibe'
+VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool'
 
 module TextMate
 
@@ -24,9 +24,9 @@ module TextMate
       default_line = options.has_key?(:file) ? 1 : ENV['TM_LINE_NUMBER']
       options = {:file => ENV['TM_FILEPATH'], :line => default_line, :column => 1}.merge(options)
       if options[:file]
-        `#{VIBE} #{e_sh(options[:file])}`
+        `#{VICO} #{e_sh(options[:file])}`
       end
-      `#{VIBE} -e "if(text){text.gotoLine_column_(#{options[:line]},#{options[:column]}) && NSApp.activateIgnoringOtherApps(YES)}"`
+      `#{VICO} -e "(text gotoLine:#{options[:line]} column:#{options[:column]})((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"`
     end
 
     def require_cmd(command, message = nil)

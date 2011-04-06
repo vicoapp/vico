@@ -10,8 +10,8 @@ require 'osx/plist'
 require 'json'
 require 'json/add/core'
 
-VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool'
-NULIB = ENV['TM_SUPPORT_PATH'] + '/lib/nu'
+VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool' unless defined? VICO
+NULIB = ENV['TM_SUPPORT_PATH'] + '/lib/nu' unless defined? NULIB
 
 module TextMate
 
@@ -366,7 +366,7 @@ module TextMate
 
         p = { "params" => params, "nibFile" => "#{ENV['TM_SUPPORT_PATH']}/nibs/#{nib_name}.nib" }
 
-        return_json = %x{#{VIBE} -r -f "#{JSLIB}/dialog.js" -p '#{p.to_json}'}
+        return_json = %x{#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
         #return_plist = %x{#{TM_DIALOG} -cmp #{e_sh params.to_plist} #{e_sh(ENV['TM_SUPPORT_PATH'] + "/nibs/#{nib_name}")}}
         #return_hash = OSX::PropertyList::load(return_plist)
         return_hash = JSON.parse(return_json)
@@ -544,7 +544,8 @@ class TestCompletes < Test::Unit::TestCase
     ]
   end
   def make_front!
-    `open "txmt://open?url=file://$TM_FILEPATH"` #For testing purposes, make this document the topmost so that the complete popup works
+    # `open "txmt://open?url=file://$TM_FILEPATH"` #For testing purposes, make this document the topmost so that the complete popup works
+    `#{VICO}`
   end
 end
 

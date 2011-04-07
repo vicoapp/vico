@@ -29,20 +29,21 @@
 
 
 ;; generic commands, valid in most maps
-(set cmap (ViMap mapWithName:"commandMap"))
-(cmap setKey:"<cmd-1>" toAction:"switch_tab:" flags:0 parameter:0 scope:nil)
-(cmap setKey:"<cmd-2>" toAction:"switch_tab:" flags:0 parameter:1 scope:nil)
-(cmap setKey:"<cmd-3>" toAction:"switch_tab:" flags:0 parameter:2 scope:nil)
-(cmap setKey:"<cmd-4>" toAction:"switch_tab:" flags:0 parameter:3 scope:nil)
-(cmap setKey:"<cmd-5>" toAction:"switch_tab:" flags:0 parameter:4 scope:nil)
-(cmap setKey:"<cmd-6>" toAction:"switch_tab:" flags:0 parameter:5 scope:nil)
-(cmap setKey:"<cmd-7>" toAction:"switch_tab:" flags:0 parameter:6 scope:nil)
-(cmap setKey:"<cmd-8>" toAction:"switch_tab:" flags:0 parameter:7 scope:nil)
-(cmap setKey:"<cmd-9>" toAction:"switch_tab:" flags:0 parameter:8 scope:nil)
-(cmap setKey:"<cmd-0>" toAction:"switch_tab:" flags:0 parameter:9 scope:nil)
-(cmap setKey:"<c-P>" toAction:"show_scope:")
-(cmap setKey:"<ctrl-esc>" toAction:"show_bundle_menu:")
-(cmap setKey:"<cmd-esc>" toAction:"show_bundle_menu:")
+(set gmap (ViMap mapWithName:"genericMap"))
+(gmap setKey:"<cmd-1>" toAction:"switch_tab:" flags:0 parameter:0 scope:nil)
+(gmap setKey:"<cmd-2>" toAction:"switch_tab:" flags:0 parameter:1 scope:nil)
+(gmap setKey:"<cmd-3>" toAction:"switch_tab:" flags:0 parameter:2 scope:nil)
+(gmap setKey:"<cmd-4>" toAction:"switch_tab:" flags:0 parameter:3 scope:nil)
+(gmap setKey:"<cmd-5>" toAction:"switch_tab:" flags:0 parameter:4 scope:nil)
+(gmap setKey:"<cmd-6>" toAction:"switch_tab:" flags:0 parameter:5 scope:nil)
+(gmap setKey:"<cmd-7>" toAction:"switch_tab:" flags:0 parameter:6 scope:nil)
+(gmap setKey:"<cmd-8>" toAction:"switch_tab:" flags:0 parameter:7 scope:nil)
+(gmap setKey:"<cmd-9>" toAction:"switch_tab:" flags:0 parameter:8 scope:nil)
+(gmap setKey:"<cmd-0>" toAction:"switch_tab:" flags:0 parameter:9 scope:nil)
+(gmap setKey:"<c-P>" toAction:"show_scope:")
+(gmap setKey:"<ctrl-esc>" toAction:"show_bundle_menu:")
+(gmap setKey:"<cmd-esc>" toAction:"show_bundle_menu:")
+(gmap map:"<cmd-q>" to:"<esc>:quit<cr>")
 
 
 ;; insert map
@@ -50,7 +51,7 @@
 (imap setDefaultAction:"input_character:")
 (imap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (imap include:amap)
-(imap include:cmap)
+(imap include:gmap)
 (imap setKey:"<c-d>" toAction:"decrease_indent:")
 (imap setKey:"<c-t>" toAction:"increase_indent:")
 (imap setKey:"<c-h>" toAction:"input_backspace:")
@@ -60,8 +61,12 @@
 (imap setKey:"<c-j>" toAction:"input_newline:")
 (imap setKey:"<c-m>" toAction:"input_newline:")
 (imap setKey:"<c-v>" toAction:"literal_next:" flags:ViMapNeedArgument parameter:nil scope:nil)
-(imap setKey:"<c-x>" toAction:"complete:")
+(imap setKey:"<c-n>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
+(imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
+(imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil)
+(imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
 (imap setKey:"<Esc>" toAction:"normal_mode:")
+(imap setKey:"<ctrl-c>" toAction:"normal_mode:")
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
 
@@ -111,7 +116,7 @@
 (mmap setKey:"}" toMotion:"paragraph_forward:")
 (mmap setKey:"{" toMotion:"paragraph_backward:")
 (mmap setKey:"%" toMotion:"move_to_match:")
-(mmap setKey:"'" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(mmap setKey:"'" toMotion:"move_to_mark:" flags:(| ViMapNeedArgument ViMapLineMode) parameter:nil scope:nil)
 (mmap setKey:"`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
 
 
@@ -149,7 +154,7 @@
 ;; normal map
 (set nmap (ViMap normalMap))
 (nmap setOperatorMap:(ViMap operatorMap))
-(nmap include:cmap)
+(nmap include:gmap)
 (nmap include:mmap)
 (nmap setKey:"<c-a>" toEditAction:"increment:")
 (nmap setKey:"<c-x>" toEditAction:"decrement:")
@@ -224,7 +229,7 @@
 
 ;; visual map
 (set vmap (ViMap visualMap))
-(vmap include:cmap)
+(vmap include:gmap)
 (vmap include:tmap)
 (vmap include:mmap)
 ;; <bs> is already bound to move_left in motionMap (included above),
@@ -267,7 +272,7 @@
 
 ;; explorer map
 (set emap (ViMap explorerMap))
-(emap include:cmap)
+(emap include:gmap)
 (emap include:amap)
 (emap setKey:"<c-b>" toMotion:"backward_screen:")
 (emap setKey:"<c-d>" toAction:"scroll_downward:")
@@ -327,9 +332,26 @@
 (fmap setKey:"<up>" toAction:"prev_history:")
 (fmap setKey:"<pagedown>" toAction:"next_history_ignoring_prefix:")
 (fmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
+(fmap setKey:"<ctrl-d>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
+(fmap setKey:"<tab>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
+(fmap setKey:"<ctrl-b>" toAction:"complete_buffer:" flags:0 parameter:"Ffa" scope:nil)
 
-; simple macro to insert an include header based on the current file
-;(nmap map:",i" to:"O0<C-D>#include \"<C-R>%\"<esc>T.c")
+
+;; a map for the completion list, similar to vim's ctrl-x mode
+(set cmap (ViMap completionMap))
+(cmap setDefaultAction:"filter:")
+(cmap setKey:"<esc>" toAction:"cancel:")
+(cmap setKey:"<ctrl-e>" toAction:"cancel:")
+(cmap setKey:"<cr>" toAction:"accept:")
+(cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
+(cmap setKey:"<space>" toAction:"accept:")
+(cmap setKey:"<ctrl-y>" toAction:"accept:")
+(cmap setKey:"<ctrl-n>" toAction:"move_down:")
+(cmap setKey:"<ctrl-p>" toAction:"move_up:")
+(cmap setKey:"<down>" toAction:"move_down:")
+(cmap setKey:"<up>" toAction:"move_up:")
+
+
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")
@@ -338,9 +360,5 @@
 ; recursive macros:
 ;(nmap map:"h" to:"l" recursively:YES scope:nil)
 ;(nmap map:"l" to:"h" recursively:YES scope:nil)
-; this will cause an infinite loop! (XXX: abort after 1000 iterations)
-
-;; do we really need recursive macros?
-;; we could probably do those tricks with nu instead...?
-;(nmap map:"<c-a>" to:":eval '(text evaluateCommand:(ViCommand commandWithMethod:\"increment:\" count:4 flags:0 motion:nil))'")
+; this will cause unbound recursion and will abort after 1000 iterations
 

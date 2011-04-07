@@ -652,6 +652,8 @@ int logIndent = 0;
 {
 	NSString *content = [[[self textStorage] string] substringWithRange:yankRange];
 	[[ViRegisterManager sharedManager] setContent:content ofRegister:regName];
+	[self setMark:'[' atLocation:yankRange.location];
+	[self setMark:']' atLocation:IMAX(yankRange.location, NSMaxRange(yankRange) - 1)];
 }
 
 - (void)cutToRegister:(unichar)regName
@@ -659,6 +661,7 @@ int logIndent = 0;
 {
 	[self yankToRegister:regName range:cutRange];
 	[self deleteRange:cutRange undoGroup:YES];
+	[self setMark:']' atLocation:cutRange.location];
 }
 
 #pragma mark -
@@ -981,6 +984,7 @@ int logIndent = 0;
 	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u",
 	    caret, final_location, [[self textStorage] length]);
 	mode = ViNormalMode;
+	[self setMark:']' atLocation:end_location];
 	[self endUndoGroup];
 }
 
@@ -1000,6 +1004,8 @@ int logIndent = 0;
 	DEBUG(@"entering insert mode at location %u (final location is %u), length is %u",
 		end_location, final_location, [[self textStorage] length]);
 	mode = ViInsertMode;
+
+	[self setMark:'[' atLocation:end_location];
 
 	/*
 	 * Remember the command that entered insert mode. When leaving insert mode,
@@ -1677,7 +1683,7 @@ int logIndent = 0;
 	if (pageGuideValue == 0)
 		pageGuideX = 0;
 	else {
-		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[self font], NSFontAttributeName, nil];
+		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[ViThemeStore font], NSFontAttributeName, nil];
 		CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
 		pageGuideX = (sizeOfCharacter * (pageGuideValue + 1)) - 1.5;
 		// -1.5 to put it between the two characters and draw only on one pixel and
@@ -1725,9 +1731,7 @@ int logIndent = 0;
 
 - (NSFont *)font
 {
-	if (document)
-		return [document font];
-	return [NSFont systemFontOfSize:0];
+	return [ViThemeStore font];
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes

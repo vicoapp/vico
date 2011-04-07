@@ -220,7 +220,7 @@
 		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
 	[task setEnvironment:env];
 
-	DEBUG(@"environment: %@", env);
+	//DEBUG(@"environment: %@", env);
 	DEBUG(@"launching task command line [%@ %@]",
 	    [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 

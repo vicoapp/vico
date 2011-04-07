@@ -290,7 +290,7 @@
 	return [self sortProjectFiles:children];
 }
 
-- (void)browseURL:(NSURL *)aURL
+- (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
 {
 	NSError *error = nil;
 	NSMutableArray *children = nil;
@@ -298,7 +298,8 @@
 	children = [ProjectDelegate childrenAtURL:aURL error:&error];
 
 	if (children) {
-		[self openExplorerTemporarily:NO];
+		if (display)
+			[self openExplorerTemporarily:NO];
 		rootItems = children;
 		[self filterFiles:self];
 		[explorer reloadData];
@@ -309,6 +310,11 @@
 	}
 
 	lastSelectedRow = 0;
+}
+
+- (void)browseURL:(NSURL *)aURL
+{
+	[self browseURL:aURL andDisplay:YES];
 }
 
 #pragma mark -

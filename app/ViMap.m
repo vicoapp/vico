@@ -136,6 +136,11 @@ static NSMutableDictionary *maps = nil;
 	maps = nil;
 }
 
++ (NSArray *)allMaps
+{
+	return [maps allValues];
+}
+
 + (ViMap *)mapWithName:(NSString *)mapName
 {
 	if (maps == nil)
@@ -180,6 +185,11 @@ static NSMutableDictionary *maps = nil;
 	return [ViMap mapWithName:@"symbolMap"];
 }
 
++ (ViMap *)completionMap
+{
+	return [ViMap mapWithName:@"completionMap"];
+}
+
 - (ViMap *)initWithName:(NSString *)aName
 {
 	if ((self = [super init]) != nil) {
@@ -193,7 +203,8 @@ static NSMutableDictionary *maps = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViMap %@>", name];
+	return [NSString stringWithFormat:@"<ViMap %@, %lu actions>",
+	    name, [actions count]];
 }
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence

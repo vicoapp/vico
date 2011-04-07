@@ -4,7 +4,11 @@ URGENT
 * ship with a default bundle plist
 * fuzzy search feels *slow*
 * implement "new file" and "new folder" in explorer menu
-* snippets are buggy wrt caret location near EOF
+* bundle-specific nu startup scripts (nu/main.nu)
+* global nu startup script in application support folder
+* :map commands
+* preference pane for editing macros?
+* toggling explorer always opens to 200px
 
 BUGS
 ====
@@ -60,7 +64,6 @@ FEATURES
 * implement R
 * implement c-w in insert mode
 * escape after creating new line should blank the line
-* local keyword completion (vim c-x c-n)
 * history in explorer view + go back/forward with swiping
 * :normal!
 * = (re-indent)
@@ -212,3 +215,6 @@ latex.tmbundle
 * [DONE] yank buffers? do they all work? across documents?
 * [DONE] should dot repeat a bundle command? (they do in insert mode now, a bit weird perhaps)
 * [DONE] pass macro keys to ex command line
+* [DONE] snippets are buggy wrt caret location near EOF
+* [DONE] re-implement filename completion in ex command line
+* [DONE] local keyword completion (vim c-x c-n)

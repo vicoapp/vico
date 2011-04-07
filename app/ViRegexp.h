@@ -23,6 +23,10 @@
 	OnigRegex regex;
 }
 
++ (NSCharacterSet *)reservedCharacters;
++ (BOOL)needEscape:(unichar)ch;
++ (NSString *)escape:(NSString *)string;
+
 - (ViRegexp *)initWithString:(NSString *)aString;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options error:(NSError **)outError;

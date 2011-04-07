@@ -1,3 +1,4 @@
+#define FORCE_DEBUG
 #import "ExEnvironment.h"
 #import "ExCommand.h"
 #import "ViTheme.h"
@@ -14,11 +15,6 @@
 #include "logging.h"
 
 @interface ExEnvironment (private)
-- (NSString *)filenameInString:(NSString *)s range:(NSRange *)outRange;
-- (unsigned)completePath:(NSString *)partialPath
-           relativeToURL:(NSURL *)url
-                    into:(NSString **)longestMatchPtr
-        matchesIntoArray:(NSArray **)matchesPtr;
 - (IBAction)finishedExCommand:(id)sender;
 - (NSURL *)parseExFilename:(NSString *)filename;
 @end
@@ -117,6 +113,8 @@
 #pragma mark -
 #pragma mark Filename completion
 
+
+#if 0
 - (NSString *)filenameInString:(NSString *)s range:(NSRange *)outRange
 {
 	NSRange r = [s rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]
@@ -132,10 +130,11 @@
 	return [s substringWithRange:r];
 }
 
-- (NSUInteger)completePath:(NSString *)partialPath
-	     relativeToURL:(NSURL *)url
-		      into:(NSString **)longestMatchPtr
-	  matchesIntoArray:(NSArray **)matchesPtr
++ (NSUInteger)completePath:(NSString *)partialPath
+             relativeToURL:(NSURL *)url
+                      into:(NSString **)longestMatchPtr
+          matchesIntoArray:(NSArray **)matchesPtr
+                     error:(NSError **)outError
 {
 	NSString *path;
 	NSString *suffix;
@@ -146,6 +145,8 @@
 		path = [partialPath stringByDeletingLastPathComponent];
 		suffix = [partialPath lastPathComponent];
 	}
+
+	INFO(@"path = [%@], suffix = [%@]", path, suffix);
 
 	int options = 0;
 	if ([url isFileURL]) {
@@ -162,20 +163,22 @@
 	SFTPConnection *conn = nil;
 	NSFileManager *fm = nil;
 
+	NSURL *tmpURL = [NSURL URLWithString:path relativeToURL:url];
+	INFO(@"tmpURL = %@, tmpURL path = %@", tmpURL, [tmpURL path]);
+
 	NSArray *directoryContents;
 	NSError *error = nil;
 	if ([url isFileURL]) {
 		fm = [NSFileManager defaultManager];
-		directoryContents = [fm contentsOfDirectoryAtPath:path error:&error];
+		directoryContents = [fm contentsOfDirectoryAtPath:[tmpURL path] error:&error];
 	} else {
 		conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
-		directoryContents = [conn contentsOfDirectoryAtPath:path error:&error];
+		directoryContents = [conn contentsOfDirectoryAtPath:[tmpURL path] error:&error];
 	}
 
 	if (error) {
-		[self message:@"%@: %@",
-		    [NSURL URLWithString:partialPath relativeToURL:url],
-		    [error localizedDescription]];
+		if (outError)
+			*outError = error;
 		return 0;
 	}
 
@@ -228,7 +231,6 @@
 #pragma mark -
 #pragma mark Input of ex commands
 
-#if 0
 /*
  * Returns YES if the key binding was handled.
  */
@@ -322,7 +324,6 @@ doCommandBySelector:(SEL)aSelector
 	}
 	return NO;
 }
-#endif
 
 - (void)finishCompletionURL:(NSURL *)url
 {
@@ -338,16 +339,18 @@ doCommandBySelector:(SEL)aSelector
 
 	[self finishedExCommand:nil];
 }
+#endif
 
 - (NSURL *)parseExFilename:(NSString *)filename
 {
 	NSError *error = nil;
-	NSURL *url = [[ViDocumentController sharedDocumentController] normalizePath:filename
+	NSString *trimmed = [filename stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSURL *url = [[ViDocumentController sharedDocumentController] normalizePath:trimmed
 									 relativeTo:self.baseURL
 									      error:&error];
 	if (error) {
 		[self message:@"%@: %@",
-		    filename, [error localizedDescription]];
+		    trimmed, [error localizedDescription]];
 		return nil;
 	}
 
@@ -465,7 +468,7 @@ doCommandBySelector:(SEL)aSelector
 		[self message:@"%@: Failed to change directory.", path];
         else {
         	[self ex_pwd:nil];
-        	[windowController browseURL:[self baseURL]];
+        	[windowController.explorer browseURL:[self baseURL] andDisplay:NO];
 	}
 }
 
@@ -1096,8 +1099,7 @@ filter_write(CFSocketRef s,
 		return NO;
 
 	NSString *langScope = [command.words objectAtIndex:0];
-	NSString *pattern = [NSString stringWithFormat:@"(^|\\.)%@(\\.|$)",
-	    [langScope stringByReplacingOccurrencesOfString:@"." withString:@"\\."]];	// XXX: should have a proper regexp escape function
+	NSString *pattern = [NSString stringWithFormat:@"(^|\\.)%@(\\.|$)", [ViRegexp escape:langScope]];
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 	NSMutableSet *matches = [NSMutableSet set];
 	ViLanguage *lang;

@@ -74,6 +74,7 @@
 @property (readwrite) SEL defaultAction;
 
 + (void)clearAll;
++ (NSArray *)allMaps;
 + (ViMap *)mapWithName:(NSString *)mapName;
 + (ViMap *)insertMap;
 + (ViMap *)normalMap;
@@ -81,6 +82,7 @@
 + (ViMap *)visualMap;
 + (ViMap *)explorerMap;
 + (ViMap *)symbolMap;
++ (ViMap *)completionMap;
 
 - (BOOL)includesMap:(ViMap *)aMap;
 

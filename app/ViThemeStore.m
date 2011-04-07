@@ -9,6 +9,16 @@
 	return [[ViThemeStore defaultStore] defaultTheme];
 }
 
++ (NSFont *)font
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"]
+	                               size:[defs floatForKey:@"fontsize"]];
+	if (font == nil)
+		font = [NSFont userFixedPitchFontOfSize:11.0];
+	return font;
+}
+
 - (ViTheme *)defaultTheme
 {
 	ViTheme *defaultTheme = nil;

@@ -1,8 +1,9 @@
 debug:
+#	rm -rf build/Debug/Vico.app
 	xcodebuild -configuration Debug
 
 run: debug
-	./build/Debug/Vico.app/Contents/MacOS/Vico
+	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico/app/ViDocument.m
 
 build:
 	xcodebuild -scheme archive

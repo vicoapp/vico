@@ -62,6 +62,7 @@
 
 @property(readwrite,assign) id delegate;
 
+- (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;
 - (IBAction)addLocation:(id)sender;
 - (IBAction)addSFTPLocation:(id)sender;

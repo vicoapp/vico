@@ -819,16 +819,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[[dv textView] setWrapping:flag];
 }
 
-- (NSFont *)font
-{
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSFont *font = [NSFont fontWithName:[defs stringForKey:@"fontname"]
-	                               size:[defs floatForKey:@"fontsize"]];
-	if (font == nil)
-		font = [NSFont userFixedPitchFontOfSize:11.0];
-	return font;
-}
-
 - (NSDictionary *)typingAttributes
 {
 	if (typingAttributes == nil)
@@ -841,7 +831,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSInteger tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
 
-	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[self font]
+	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[ViThemeStore font]
 	                                                  forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
 
@@ -857,7 +847,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	typingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 	    style, NSParagraphStyleAttributeName,
-	    [self font], NSFontAttributeName,
+	    [ViThemeStore font], NSFontAttributeName,
 	    nil];
 
 	NSRange r = NSMakeRange(0, [textStorage length]);

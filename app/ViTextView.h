@@ -12,6 +12,7 @@
 #import "ViScriptProxy.h"
 #import "ViKeyManager.h"
 #import "ViDocument.h"
+#import "ViCompletionController.h"
 
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
@@ -20,7 +21,7 @@
 @class ViTextView;
 @class ViJumpList;
 
-@interface ViTextView : NSTextView <ViSnippetDelegate>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate>
 {
 	ViDocument		*document;
 
@@ -113,6 +114,7 @@
 
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
 - (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (void)insertString:(NSString *)aString;
 - (void)deleteRange:(NSRange)aRange;
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup;
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString;

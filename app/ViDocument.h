@@ -54,7 +54,6 @@
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (NSFont *)font;
 - (NSDictionary *)typingAttributes;
 
 - (IBAction)toggleLineNumbers:(id)sender;

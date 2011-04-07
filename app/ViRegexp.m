@@ -4,6 +4,31 @@
 
 @implementation ViRegexp
 
++ (NSCharacterSet *)reservedCharacters
+{
+	static NSCharacterSet *reservedCharacters = nil;
+	if (reservedCharacters == nil)
+		reservedCharacters = [NSCharacterSet characterSetWithCharactersInString:@".{[(|\\+?*^$"];
+	return reservedCharacters;
+}
+
++ (BOOL)needEscape:(unichar)ch
+{
+	return [[self reservedCharacters] characterIsMember:ch];
+}
+
++ (NSString *)escape:(NSString *)string
+{
+	NSMutableString *s = [NSMutableString string];
+	for (NSUInteger i = 0; i < [string length]; i++) {
+		unichar ch = [string characterAtIndex:i];
+		if ([self needEscape:ch])
+			[s appendString:@"\\"];
+		[s appendFormat:@"%C", ch];
+	}
+	return s;
+}
+
 - (ViRegexp *)initWithString:(NSString *)aString
 {
 	return [self initWithString:aString options:0 error:nil];
@@ -247,6 +272,12 @@
 		onig_region_free(region, 1);
 
 	[super finalize];
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViRegexpMatch %@, %lu captures>",
+	    NSStringFromRange([self rangeOfMatchedString]), [self count]];
 }
 
 @end

@@ -94,7 +94,9 @@ skip_split(struct skiplist *head, struct skip *left)
 	}
 }
 
-- (void)insertLine:(NSUInteger)lineIndex withLength:(NSUInteger)length contentsEnd:(NSUInteger)eol
+- (void)insertLine:(NSUInteger)lineIndex
+        withLength:(NSUInteger)length
+       contentsEnd:(NSUInteger)eol
 {
 	struct skip	*skip;
 	struct line	*ln;
@@ -393,7 +395,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 #pragma mark -
 #pragma mark Line number handling
 
-- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber length:(NSUInteger *)lengthPtr contentsEnd:(NSUInteger *)eolPtr
+- (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
+                             length:(NSUInteger *)lengthPtr
+                        contentsEnd:(NSUInteger *)eolPtr
 {
 	if (lineNumber == 0)
 		return 0;
@@ -542,6 +546,43 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	return [self skipCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
 			    fromLocation:startLocation
 				backward:NO];
+}
+
+- (NSString *)pathAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
+                 acceptAfter:(BOOL)acceptAfter
+{
+	NSMutableCharacterSet *pathSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_/-.:"];
+	[pathSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
+
+	if (acceptAfter &&
+	   (aLocation >= [self length] ||
+	    ![pathSet characterIsMember:[[self string] characterAtIndex:aLocation]]) &&
+	   aLocation > 0)
+		aLocation--;
+
+	if (aLocation >= [self length]) {
+		if (returnRange != nil)
+			*returnRange = NSMakeRange(NSNotFound, 0);
+		return nil;
+	}
+
+	NSUInteger word_start = [self skipCharactersInSet:pathSet fromLocation:aLocation backward:YES];
+	if (word_start < aLocation && word_start > 0)
+		word_start += 1;
+
+	NSUInteger word_end = [self skipCharactersInSet:pathSet fromLocation:aLocation backward:NO];
+	if (word_end > word_start) {
+		NSRange range = NSMakeRange(word_start, word_end - word_start);
+		if (returnRange)
+			*returnRange = range;
+		return [[self string] substringWithRange:range];
+	}
+
+	if (returnRange)
+		*returnRange = NSMakeRange(NSNotFound, 0);
+
+	return nil;
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation

@@ -1,0 +1,4 @@
+@interface ViCompletionWindow : NSWindow
+{
+}
+@end

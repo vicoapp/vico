@@ -284,9 +284,8 @@
 	}
 	[self setCompletions:array];
 
-	if ([filteredCompletions count] == 1) {
+	if ([filteredCompletions count] == 1)
 		return [self accept:command];
-	}
 
 	return YES;
 }
@@ -314,6 +313,17 @@
 	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:++row]
 	       byExtendingSelection:NO];
 	[tableView scrollRowToVisible:row];
+	return YES;
+}
+
+- (BOOL)toggle_fuzzy:(ViCommand *)command
+{
+	fuzzySearch = !fuzzySearch;
+	for (ViCompletion *c in completions)
+		c.filterIsFuzzy = fuzzySearch;
+	[self filterCompletions];
+	if ([filteredCompletions count] == 1)
+		return [self accept:command];
 	return YES;
 }
 

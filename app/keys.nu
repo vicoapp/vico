@@ -336,6 +336,7 @@
 (fmap setKey:"<ctrl-d>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
 (fmap setKey:"<tab>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
 (fmap setKey:"<ctrl-b>" toAction:"complete_buffer:" flags:0 parameter:"Ffpa" scope:nil)
+(fmap setKey:"<ctrl-f>" toAction:"complete_path:" flags:0 parameter:"Ffpa" scope:nil)
 
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
@@ -351,6 +352,7 @@
 (cmap setKey:"<ctrl-p>" toAction:"move_up:")
 (cmap setKey:"<down>" toAction:"move_down:")
 (cmap setKey:"<up>" toAction:"move_up:")
+(cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 
 

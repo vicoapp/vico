@@ -2190,9 +2190,10 @@
 				s = [s stringByAppendingString:@"/"];
 
 			ViCompletion *c;
-			if (fuzzySearch)
+			if (fuzzySearch) {
 				c = [ViCompletion completionWithContent:s fuzzyMatch:m];
-			else
+				c.prefixLength = range.length;
+			} else
 				c = [ViCompletion completionWithContent:s prefixLength:range.length];
 			[matches addObject:c];
 		}

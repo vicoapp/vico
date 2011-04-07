@@ -4,6 +4,7 @@
 {
 	NSMutableDictionary *themes;
 }
++ (ViTheme *)defaultTheme;
 + (ViThemeStore *)defaultStore;
 - (NSArray *)availableThemes;
 - (ViTheme *)themeWithName:(NSString *)aName;

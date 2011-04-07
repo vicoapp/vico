@@ -4,6 +4,11 @@
 
 @implementation ViThemeStore
 
++ (ViTheme *)defaultTheme
+{
+	return [[ViThemeStore defaultStore] defaultTheme];
+}
+
 - (ViTheme *)defaultTheme
 {
 	ViTheme *defaultTheme = nil;
@@ -13,7 +18,7 @@
 		defaultTheme = [self themeWithName:themeName];
 
 	if (defaultTheme == nil) {
-		defaultTheme = [self themeWithName:@"Mac Classic"];
+		defaultTheme = [self themeWithName:@"Sunset"];
 		if (defaultTheme == nil)
 			defaultTheme = [[themes allValues] objectAtIndex:0];
 	}

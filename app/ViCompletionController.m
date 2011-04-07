@@ -5,6 +5,7 @@
 #include "logging.h"
 
 @interface ViCompletionController (private)
+- (void)updateBounds;
 - (void)filterCompletions;
 @end
 
@@ -13,7 +14,6 @@
 @synthesize delegate;
 @synthesize window;
 @synthesize completions;
-@synthesize font;
 @synthesize terminatingKey;
 
 + (id)sharedController
@@ -32,7 +32,6 @@
 								 defaultMap:[ViMap completionMap]];
 		[window setStyleMask:NSBorderlessWindowMask];
 		[window setHasShadow:YES];
-		font = [NSFont systemFontOfSize:0];
 		theme = [ViThemeStore defaultTheme];
 //		[tableView setBackgroundColor:[theme backgroundColor]];
 
@@ -42,24 +41,44 @@
 	return self;
 }
 
-- (NSSize)boundsForCompletions:(NSArray *)array
+- (void)updateBounds
 {
-	NSDictionary *attributes = [NSMutableDictionary dictionaryWithObject:font
-							forKey:NSFontAttributeName];
-	NSSize winsz = NSMakeSize(0, 20);
-	for (NSString *s in array) {
-		NSSize sz = [s sizeWithAttributes:attributes];
+	NSSize winsz = NSMakeSize(0, 0);
+	for (ViCompletion *c in filteredCompletions) {
+		NSSize sz = [c.title size];
 		if (sz.width + 20 > winsz.width)
 			winsz.width = sz.width + 20;
-		winsz.height += sz.height;
 	}
 
-	return winsz;
+	winsz.height = [filteredCompletions count] * ([tableView rowHeight] + 2);
+
+	NSScreen *screen = [NSScreen mainScreen];
+	NSSize scrsz = [screen visibleFrame].size;
+	NSPoint origin = screenOrigin;
+	if (winsz.height > scrsz.height / 2)
+		winsz.height = scrsz.height / 2;
+	if (upwards) {
+		if (origin.y + winsz.height > scrsz.height)
+			origin.y = scrsz.height - winsz.height - 5;
+	} else {
+		if (origin.y < winsz.height)
+			origin.y = winsz.height + 5;
+	}
+	if (origin.x + winsz.width > scrsz.width)
+		origin.x = scrsz.width - winsz.width - 5;
+
+	NSRect frame = [window frame];
+	frame.origin = origin;
+	if (!upwards)
+		frame.origin.y -= winsz.height;
+	frame.size = winsz;
+	if (!NSEqualRects(frame, [window frame]))
+		[window setFrame:frame display:YES];
 }
 
 - (NSString *)chooseFrom:(NSArray *)anArray
              prefixRange:(NSRange *)aRange
-                      at:(NSPoint)screenOrigin
+                      at:(NSPoint)origin
                direction:(int)direction /* 0 = down, 1 = up */
              fuzzySearch:(BOOL)fuzzyFlag
 {
@@ -73,35 +92,13 @@
 	prefixRange = *aRange;
 	fuzzySearch = fuzzyFlag;
 
-	[tableView setFont:font];
-
-	NSSize sz = [self boundsForCompletions:anArray];
-	sz.height = [anArray count] * ([tableView rowHeight] + 2);
-
-	NSScreen *screen = [NSScreen mainScreen];
-	NSSize scrsz = [screen visibleFrame].size;
-	if (sz.height > scrsz.height / 2)
-		sz.height = scrsz.height / 2;
-	if (direction == 0) {
-		if (screenOrigin.y < sz.height)
-			screenOrigin.y = sz.height + 5;
-	} else {
-		if (screenOrigin.y + sz.height > scrsz.height)
-			screenOrigin.y = scrsz.height - sz.height - 5;
-	}
-	if (screenOrigin.x + sz.width > scrsz.width)
-		screenOrigin.x = scrsz.width - sz.width - 5;
-
-	[window setContentSize:sz];
+	screenOrigin = origin;
+	upwards = (direction == 1);
 
 	[self filterCompletions];
 	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 	       byExtendingSelection:NO];
 
-	if (direction == 0)
-		[window setFrameTopLeftPoint:screenOrigin];
-	else
-		[window setFrameOrigin:screenOrigin];
 	[window orderFront:nil];
 	NSInteger ret = [NSApp runModalForWindow:window];
 
@@ -114,10 +111,10 @@
 {
 	int options = NSCaseInsensitiveSearch;
 	NSString *longestMatch = nil;
-	id fm = [completions objectAtIndex:0];
-	NSString *firstMatch = [fm respondsToSelector:@selector(string)] ? [fm string] : fm;
-	for (id m in completions) {
-		NSString *s = [m respondsToSelector:@selector(string)] ? [m string] : m;
+	ViCompletion *c = [completions objectAtIndex:0];
+	NSString *firstMatch = c.content;
+	for (c in completions) {
+		NSString *s = c.content;
 		NSString *commonPrefix = [firstMatch commonPrefixWithString:s options:options];
 		if (longestMatch == nil || [commonPrefix length] < [longestMatch length])
 			longestMatch = commonPrefix;
@@ -174,34 +171,26 @@
 					      options:ONIG_OPTION_IGNORECASE];
 	}
 
-	NSRange grayRange = NSMakeRange(0, prefixRange.length);
-	if (!fuzzySearch)
-		grayRange.length += [filter length];
-	NSColor *gray = [NSColor grayColor];
-
 	filteredCompletions = [NSMutableArray array];
-	for (NSString *s in completions) {
+	for (ViCompletion *c in completions) {
+		NSString *s = c.content;
 		if ([s length] < prefixRange.length)
 			continue;
-		if (rx == nil || [rx matchInString:s]) {
-			NSMutableAttributedString *a = [[NSMutableAttributedString alloc] initWithString:s];
-			[a addAttribute:NSForegroundColorAttributeName
-				  value:gray
-				  range:grayRange];
-/*			[a addAttribute:NSFontAttributeName
-				  value:font
-				  range:NSMakeRange(0, [s length])];*/
-			[filteredCompletions addObject:a];
+		ViRegexpMatch *m = nil;
+		if (rx == nil || (m = [rx matchInString:s]) != nil) {
+			c.filter = m;
+			[filteredCompletions addObject:c];
 		}
 	}
 
 	[tableView reloadData];
+	[self updateBounds];
 }
 
 - (void)acceptByKey:(NSInteger)termKey
 {
 	terminatingKey = termKey;
-	selection = [[filteredCompletions objectAtIndex:[tableView selectedRow]] string];
+	selection = [[filteredCompletions objectAtIndex:[tableView selectedRow]] content];
 	[window orderOut:nil];
 	[NSApp stopModal];
 
@@ -287,10 +276,12 @@
 	if (!ret)
 		return [self cancel:command];
 
-	NSMutableArray *array = [NSMutableArray array];
-	for (id m in filteredCompletions)
-		[array addObject:[m string]];
 	prefixRange = NSMakeRange(prefixRange.location, [partialCompletion length]);
+	NSMutableArray *array = [NSMutableArray array];
+	for (ViCompletion *c in filteredCompletions) {
+		c.prefixLength = prefixRange.length;
+		[array addObject:c];
+	}
 	[self setCompletions:array];
 
 	if ([filteredCompletions count] == 1) {
@@ -338,7 +329,7 @@
 objectValueForTableColumn:(NSTableColumn *)aTableColumn
             row:(NSInteger)rowIndex
 {
-	return [filteredCompletions objectAtIndex:rowIndex];
+	return [(ViCompletion *)[filteredCompletions objectAtIndex:rowIndex] title];
 }
 
 @end

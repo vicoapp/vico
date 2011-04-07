@@ -1,4 +1,5 @@
 #import "ViCompletionView.h"
+#import "ViCompletion.h"
 #import "ViThemeStore.h"
 
 @class ViCompletionController;
@@ -19,20 +20,20 @@
 	NSArray *completions;
 	NSMutableArray *filteredCompletions;
 	NSString *selection;
-	NSFont *font;
 	ViTheme *theme;
 	NSMutableString *filter;
 	NSMutableParagraphStyle *matchParagraphStyle;
 	id<ViCompletionDelegate> delegate;
 	NSInteger terminatingKey;
 	NSRange prefixRange;
+	NSPoint screenOrigin;
+	BOOL upwards;
 	BOOL fuzzySearch;
 }
 
 @property (readwrite, assign) id<ViCompletionDelegate> delegate;
 @property (readonly) NSWindow *window;
 @property (readwrite, assign) NSArray *completions;
-@property (readwrite, assign) NSFont *font;
 @property (readonly) NSInteger terminatingKey;
 
 + (id)sharedController;

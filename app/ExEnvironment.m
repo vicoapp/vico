@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ExEnvironment.h"
 #import "ExCommand.h"
 #import "ViTheme.h"
@@ -1056,8 +1055,8 @@ filter_write(CFSocketRef s,
 	ViDocument *doc = nil;
 	for (doc in [windowController documents]) {
 		if ([doc fileURL] &&
-		    [[[doc fileURL] path] rangeOfString:command.string
-						options:NSCaseInsensitiveSearch].location != NSNotFound)
+		    [[[doc fileURL] absoluteString] rangeOfString:command.string
+							  options:NSCaseInsensitiveSearch].location != NSNotFound)
 			[matches addObject:doc];
 	}
 

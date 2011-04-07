@@ -252,38 +252,6 @@
 					</object>
 					<int key="connectionID">13</int>
 				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">font: font</string>
-						<reference key="source" ref="477578145"/>
-						<reference key="destination" ref="1001"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="477578145"/>
-							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">font: font</string>
-							<string key="NSBinding">font</string>
-							<string key="NSKeyPath">font</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">14</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">font: font</string>
-						<reference key="source" ref="609695758"/>
-						<reference key="destination" ref="1001"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="609695758"/>
-							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">font: font</string>
-							<string key="NSBinding">font</string>
-							<string key="NSKeyPath">font</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">15</int>
-				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">

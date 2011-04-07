@@ -61,10 +61,10 @@
 (imap setKey:"<c-j>" toAction:"input_newline:")
 (imap setKey:"<c-m>" toAction:"input_newline:")
 (imap setKey:"<c-v>" toAction:"literal_next:" flags:ViMapNeedArgument parameter:nil scope:nil)
-(imap setKey:"<c-n>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
-(imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
+(imap setKey:"<c-n>" toAction:"complete_keyword:" flags:0 parameter:"f" scope:nil)	; add F to parameter for fuzzy keyword trigger
+(imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"f" scope:nil)
 (imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil)
-(imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"Ff" scope:nil)
+(imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"fd" scope:nil)  ; d parameter sorts descending
 (imap setKey:"<Esc>" toAction:"normal_mode:")
 (imap setKey:"<ctrl-c>" toAction:"normal_mode:")
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
@@ -205,6 +205,7 @@
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
 (nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
 (nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
+(nmap map:"<ctrl-s>" to:":tbuffer <ctrl-b>")
 ;; <C-w> prefix
 (nmap include:wmap)
 ;; g prefix
@@ -334,7 +335,7 @@
 (fmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
 (fmap setKey:"<ctrl-d>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
 (fmap setKey:"<tab>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
-(fmap setKey:"<ctrl-b>" toAction:"complete_buffer:" flags:0 parameter:"Ffa" scope:nil)
+(fmap setKey:"<ctrl-b>" toAction:"complete_buffer:" flags:0 parameter:"Ffpa" scope:nil)
 
 
 ;; a map for the completion list, similar to vim's ctrl-x mode

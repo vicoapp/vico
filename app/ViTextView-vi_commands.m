@@ -12,6 +12,7 @@
 #import "ExEnvironment.h"
 #import "ViDocumentController.h"
 #import "SFTPConnectionPool.h"
+#import "NSString-additions.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -1918,10 +1919,11 @@
 		MESSAGE(@"No available completion.");
 		return NO;
 	} else if ([completions count] == 1) {
-		[self insertSnippet:[completions objectAtIndex:0] inRange:range];
+		ViCompletion *c = [completions objectAtIndex:0];
+		[self insertSnippet:c.content inRange:range];
 		return YES;
 	} else {
-		/* uncomment to automatically insert common prefix among all possible completions
+		/* Automatically insert common prefix among all possible completions.
 		 */
 		if ([options rangeOfString:@"p"].location != NSNotFound) {
 			NSString *commonPrefix = [ViCompletionController commonPrefixInCompletions:completions];
@@ -1930,6 +1932,9 @@
 				range.length = [commonPrefix length];
 				final_location = NSMaxRange(range);
 				[self setCaret:final_location];
+
+				for (ViCompletion *c in completions)
+					c.prefixLength = range.length;
 			}
 		}
 
@@ -1938,7 +1943,6 @@
 
 		/* Present a list to choose from. */
 		ViCompletionController *cc = [ViCompletionController sharedController];
-		[cc setFont:[self font]];
 		cc.delegate = self;
 		NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
 								inTextContainer:[self textContainer]].origin;
@@ -1957,8 +1961,11 @@
 
 		NSInteger termKey = cc.terminatingKey;
 		if (termKey >= 0x20 && termKey < 0xFFFF) {
-			[self insertString:[NSString stringWithFormat:@"%C", termKey]];
-			final_location++;
+			NSString *special = [NSString stringWithKeyCode:termKey];
+			if ([special length] == 1) {
+				[self insertString:[NSString stringWithFormat:@"%C", termKey]];
+				final_location++;
+			} /* otherwise it's a <special> key code, ignore it */
 		} else if (termKey == 0x0D && [self isFieldEditor]) {
 			[keyManager handleKey:termKey];
 		}
@@ -1976,13 +1983,14 @@
 						      range:&range
 					        acceptAfter:YES];
 
+	BOOL fuzzySearch = ([command.mapping.parameter rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([command.mapping.parameter rangeOfString:@"F"].location != NSNotFound);
 	NSMutableString *pattern = [NSMutableString string];
 	if (word == nil) {
 		pattern = @"\\b\\w{3,}";
 		range = NSMakeRange([self caret], 0);
 	} else if (fuzzyTrigger) { /* Fuzzy completion trigger. */
-		[pattern appendString:@"\\b"];
+		[pattern appendString:@"\\b\\w*"];
 		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"\\w"];
 		[pattern appendString:@"\\w*"];
 	} else {
@@ -2004,10 +2012,36 @@
 		if (r.location == NSNotFound || r.location == range.location)
 			/* Don't include the word we're about to complete. */
 			continue;
-		[uniq addObject:[[[self textStorage] string] substringWithRange:r]];
+		NSString *content = [[[self textStorage] string] substringWithRange:r];
+		ViCompletion *c;
+		if (fuzzySearch)
+			c = [ViCompletion completionWithContent:content fuzzyMatch:m];
+		else
+			c = [ViCompletion completionWithContent:content prefixLength:range.length];
+		c.location = r.location;
+		[uniq addObject:c];
 	}
 
-	if (![self presentCompletions:[uniq allObjects]
+	BOOL sortDescending = ([command.mapping.parameter rangeOfString:@"d"].location != NSNotFound);
+	NSUInteger ref = [self caret];
+	NSComparator sortByLocation = ^(id a, id b) {
+		ViCompletion *ca = a, *cb = b;
+		NSUInteger al = ca.location;
+		NSUInteger bl = cb.location;
+		if (al > bl) {
+			if (bl < ref && al > ref)
+				return (NSComparisonResult)(sortDescending ? NSOrderedDescending : NSOrderedAscending); // a < b
+			return (NSComparisonResult)(sortDescending ? NSOrderedAscending : NSOrderedDescending); // a > b
+		} else if (al < bl) {
+			if (al < ref && bl > ref)
+				return (NSComparisonResult)(sortDescending ? NSOrderedAscending : NSOrderedDescending); // a > b
+			return (NSComparisonResult)(sortDescending ? NSOrderedDescending : NSOrderedAscending); // a < b
+		}
+		return (NSComparisonResult)NSOrderedSame;
+	};
+	NSArray *completions = [[uniq allObjects] sortedArrayUsingComparator:sortByLocation];
+
+	if (![self presentCompletions:completions
 			    fromRange:range
 			      options:command.mapping.parameter])
 		return NO;
@@ -2073,6 +2107,7 @@
 		url = [url URLByDeletingLastPathComponent];
 	}
 
+	BOOL fuzzySearch = ([command.mapping.parameter rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([command.mapping.parameter rangeOfString:@"F"].location != NSNotFound);
 	ViRegexp *rx = nil;
 	if (fuzzyTrigger) { /* Fuzzy completion trigger. */
@@ -2125,10 +2160,12 @@
 		NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]),
 		    NSMakeRange(0, [filename length]));
 		BOOL match;
+		ViRegexpMatch *m = nil;
 		if (fuzzyTrigger)
-			match = ([rx matchInString:filename] != nil);
+			match = ((m = [rx matchInString:filename]) != nil);
 		else
 			match = [filename compare:suffix options:options range:r] == NSOrderedSame;
+
 		if (match) {
 			/* Only show dot-files if explicitly requested. */
 			if ([filename hasPrefix:@"."] && ![suffix hasPrefix:@"."])
@@ -2151,7 +2188,13 @@
 				isDirectory = [entry isDirectory];
 			if (isDirectory)
 				s = [s stringByAppendingString:@"/"];
-			[matches addObject:s];
+
+			ViCompletion *c;
+			if (fuzzySearch)
+				c = [ViCompletion completionWithContent:s fuzzyMatch:m];
+			else
+				c = [ViCompletion completionWithContent:s prefixLength:range.length];
+			[matches addObject:c];
 		}
 	}
 
@@ -2164,34 +2207,42 @@
 
 - (BOOL)complete_buffer:(ViCommand *)command
 {
-	NSString *pattern = nil;
 	NSRange range;
 	NSString *word = [[self textStorage] wordAtLocation:start_location
 						      range:&range
 					        acceptAfter:YES];
-	if (word)
-		pattern = [NSString stringWithFormat:@"\\b%@\\w*", word];
-	else
-		range = NSMakeRange([self caret], 0);
 
-	DEBUG(@"searching for %@", pattern);
+	BOOL fuzzySearch = ([command.mapping.parameter rangeOfString:@"f"].location != NSNotFound);
+	BOOL fuzzyTrigger = ([command.mapping.parameter rangeOfString:@"F"].location != NSNotFound);
+	NSMutableString *pattern = [NSMutableString string];
+	if (word == nil) {
+		range = NSMakeRange([self caret], 0);
+	} else if (fuzzyTrigger) {
+		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"."];
+	} else {
+		pattern = [NSString stringWithFormat:@"^%@.*", word];
+	}
 
 	unsigned rx_options = ONIG_OPTION_IGNORECASE;
-	ViRegexp *rx;
-	rx = [[ViRegexp alloc] initWithString:pattern
-				      options:rx_options];
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
+						options:rx_options];
 
 	NSMutableArray *buffers = [NSMutableArray array];
 	for (ViDocument *doc in [[[self window] windowController] documents]) {
-		NSString *fn = [[[doc fileURL] path] lastPathComponent];
-		if (pattern == nil || [rx matchInString:fn]) 
-			[buffers addObject:fn];
+		NSString *fn = [[doc fileURL] absoluteString];
+		ViRegexpMatch *m = nil;
+		if (pattern == nil || (m = [rx matchInString:fn]) != nil) {
+			ViCompletion *c;
+			if (fuzzySearch)
+				c = [ViCompletion completionWithContent:fn fuzzyMatch:m];
+			else
+				c = [ViCompletion completionWithContent:fn prefixLength:range.length];
+			[buffers addObject:c];
+		}
 	}
 
-	if (![self presentCompletions:buffers fromRange:range options:command.mapping.parameter]) {
-		//[self normal_mode:nil];
+	if (![self presentCompletions:buffers fromRange:range options:command.mapping.parameter])
 		return NO;
-	}
 	return YES;
 }
 

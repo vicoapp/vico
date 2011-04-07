@@ -1929,6 +1929,7 @@
 				[self replaceRange:range withString:commonPrefix];
 				range.length = [commonPrefix length];
 				final_location = NSMaxRange(range);
+				[self setCaret:final_location];
 			}
 		}
 

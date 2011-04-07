@@ -262,10 +262,10 @@
 (vmap setKey:":" toAction:"ex_command:")
 (vmap map:":" to:":'<,'>")
 (vmap setKey:"<esc>" toAction:"normal_mode:")
-(vmap setKey:"<c-b>" toAction:"backward_screen:")
+(vmap setKey:"<c-b>" toMotion:"backward_screen:")
 (vmap setKey:"<c-d>" toAction:"scroll_downward:")
 (vmap setKey:"<c-e>" toAction:"scroll_down_by_line:")
-(vmap setKey:"<c-f>" toAction:"forward_screen:")
+(vmap setKey:"<c-f>" toMotion:"forward_screen:")
 (vmap setKey:"<c-u>" toAction:"scroll_upwards:")
 (vmap setKey:"<c-y>" toAction:"scroll_up_by_line:")
 

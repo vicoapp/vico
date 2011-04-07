@@ -1725,7 +1725,9 @@ int logIndent = 0;
 
 - (NSFont *)font
 {
-	return [document font];
+	if (document)
+		return [document font];
+	return [NSFont systemFontOfSize:0];
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes

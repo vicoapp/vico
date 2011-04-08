@@ -1985,14 +1985,15 @@
 
 	BOOL fuzzySearch = ([command.mapping.parameter rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([command.mapping.parameter rangeOfString:@"F"].location != NSNotFound);
-	NSMutableString *pattern = [NSMutableString string];
+	NSString *pattern;
 	if (word == nil) {
 		pattern = @"\\b\\w{3,}";
 		range = NSMakeRange([self caret], 0);
 	} else if (fuzzyTrigger) { /* Fuzzy completion trigger. */
-		[pattern appendString:@"\\b\\w*"];
-		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"\\w"];
-		[pattern appendString:@"\\w*"];
+		pattern = [NSMutableString string];
+		[(NSMutableString *)pattern appendString:@"\\b\\w*"];
+		[ViCompletionController appendFilter:word toPattern:(NSMutableString *)pattern fuzzyClass:@"\\w"];
+		[(NSMutableString *)pattern appendString:@"\\w*"];
 	} else {
 		pattern = [NSString stringWithFormat:@"\\b(%@)\\w*", word];
 	}
@@ -2098,7 +2099,7 @@
 			basePath = path;
 		else
 			basePath = [path stringByDeletingLastPathComponent];
-		relURL = [[[[self window] windowController] environment] baseURL];
+		relURL = [(ExEnvironment *)[[[self window] windowController] environment] baseURL];
 		url = [NSURL URLWithString:[path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 			     relativeToURL:relURL];
 	}

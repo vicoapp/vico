@@ -7,7 +7,7 @@ run: debug
 
 build:
 	rm -rf build/Release/Vico.app
-	xcodebuild -scheme archive
+	xcodebuild -scheme archive EXPIRATION=$$(date -v +1w +%s)
 
 test:
 	xcodebuild -configuration Debug -target Tests

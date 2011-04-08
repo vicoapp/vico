@@ -2,13 +2,12 @@ URGENT
 ========
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
-* cmd-t fuzzy search feels *slow*
-* implement "new file" and "new folder" in explorer menu
-* bundle-specific nu startup scripts (nu/main.nu)
-* global nu startup script in application support folder
-* :map commands
-* preference pane for editing macros?
-* toggling explorer always opens to 200px
+* implement "new file" and "new folder" in explorer menu + confirmation dialog
+* = command (or remove from Edit menu)
+* gq command (or remove from Edit menu)
+* text objects (or remove from Edit menu)
+* vi navigation of symbol list
+* disable bookmarks button in toolbar?
 
 BUGS
 ====
@@ -23,22 +22,18 @@ BUGS
 
 IMPORTANT
 =========
+* cmd-t fuzzy search feels *slow*
+* bundle-specific nu startup scripts (nu/main.nu)
+* global nu startup script in application support folder
+* toggling explorer always opens to 200px
 * re-use open help windows
 * preference for wrapping
-* zt, zz, zb (scroll cursor to top, center, bottom)
-* ZZ and ZQ, and make :q just close the current document (?)
-* p/P with a count
-* J with visual selection, and J with a count
-* +/- commands
-* global marks (A-Z)
-* open alternative file (.h/.c/.m)
 * dot should work with ! filters
 * :write filename
 * :write !program
 * :read
 * :read !program
 * :edit! => revert
-* text objects
 * support a count in C and h commands
 * highlight caret after goto line
 * check if plists return expected classes (failed to parse?)
@@ -47,6 +42,15 @@ IMPORTANT
 
 FEATURES
 ========
+* zt, zz, zb (scroll cursor to top, center, bottom)
+* ZZ and ZQ, and make :q just close the current document (?)
+* p/P with a count
+* J with visual selection, and J with a count
+* +/- commands
+* global marks (A-Z)
+* open alternative file (.h/.c/.m)
+* :map commands
+* preference pane for editing macros?
 * honor bundle ordering when showing ambiguous items menu
 * move split views relative each other
 * convert horizontal split to vertical and vice versa

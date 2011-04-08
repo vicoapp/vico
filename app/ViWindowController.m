@@ -834,8 +834,11 @@ static ViWindowController	*currentWindowController = nil;
 			return viewController;
 
 	/* Check if the previous document view holds the document. */
-	if ([previousDocumentView document] == document)
-		return previousDocumentView;
+	if ([previousDocumentView document] == document) {
+		/* Is it still visible? */
+		if ([[document views] containsObject:previousDocumentView])
+			return previousDocumentView;
+	}
 
 	/* Select any existing view of the document. */
 	if ([[document views] count] > 0) {

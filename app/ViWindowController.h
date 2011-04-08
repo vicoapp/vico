@@ -40,8 +40,8 @@
 
 	BOOL isLoaded;
 	ViDocument *initialDocument;
-	ViDocument *previousDocument;
-	ViDocumentView *previousDocumentView;
+	__weak ViDocument *previousDocument;
+	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
 	ViScriptProxy *proxy;

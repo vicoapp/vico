@@ -157,6 +157,23 @@
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
+#ifdef EXPIRATION
+#warning Enabling time-based expiration of development build
+	time_t expire_at = EXPIRATION;
+	DEBUG(@"checking expiration date at %s", ctime(&expire_at));
+	if (time(NULL) > expire_at) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"This development version has expired."];
+		[alert addButtonWithTitle:@"Quit"];
+		[alert addButtonWithTitle:@"Download new version"];
+		[alert setInformativeText:@"Development versions have a limited validity period for you to test the program. This version has now expired, but you can download a new version for another period."];
+		NSUInteger ret = [alert runModal];
+		if (ret == NSAlertSecondButtonReturn)
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
+		exit(7);
+	}
+#endif
+
 	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
 	[[Nu parser] parseEval:consoleStartup]; 
 }

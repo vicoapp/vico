@@ -222,3 +222,4 @@ latex.tmbundle
 * [DONE] snippets are buggy wrt caret location near EOF
 * [DONE] re-implement filename completion in ex command line
 * [DONE] local keyword completion (vim c-x c-n)
+* [DONE] expiration date for development builds

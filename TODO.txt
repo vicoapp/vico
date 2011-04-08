@@ -1,7 +1,6 @@
 URGENT
 ========
 * use "git clone" when installing bundles(?)
-* ship with a default bundle plist
 * implement "new file" and "new folder" in explorer menu + confirmation dialog
 * = command (or remove from Edit menu)
 * gq command (or remove from Edit menu)
@@ -80,6 +79,8 @@ FEATURES
 * gq<motion> = reformat through 'formatprg' (ship with par)
 * dynamic headIndent paragraph style dependent on line indentation
 * cdpath setting? looked at by :edit
+* <C-W> in insert mode
+* 0<C-D> in insert mode removes all indentation
 
 
 LONG TERM FEATURES
@@ -106,9 +107,7 @@ IDEAS
 
 :command calling for bundle commands? arguments?
 
-0<C-D> in insert mode removes all indentation
 
-<C-W> in insert mode
 
 
 There are nine types of registers:			*registers* *E354*
@@ -121,7 +120,7 @@ There are nine types of registers:			*registers* *E354*
 [DONE] 7. The selection registers "*, "+
 7. The drop register "~ 
 [DONE] 8. The black hole register "_
-9. Last search pattern register "/
+[DONW] 9. Last search pattern register "/
 
 
 
@@ -223,3 +222,4 @@ latex.tmbundle
 * [DONE] re-implement filename completion in ex command line
 * [DONE] local keyword completion (vim c-x c-n)
 * [DONE] expiration date for development builds
+* [DONE] ship with a default bundle plist

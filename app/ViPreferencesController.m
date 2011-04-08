@@ -105,11 +105,26 @@ ToolbarHeightForWindow(NSWindow *window)
 }
 #endif
 
-- (NSString *)repoPathForUser:(NSString *)username
+- (NSString *)repoPathForUser:(NSString *)username readonly:(BOOL)readonly
 {
-	return [[NSString stringWithFormat:@"%@/%@-bundles.json",
+	NSString *path = [[NSString stringWithFormat:@"%@/%@-bundles.json",
 	    [ViLanguageStore bundlesDirectory], username]
 	    stringByExpandingTildeInPath];
+
+	if (!readonly)
+		return path;
+
+	if ([[NSFileManager defaultManager] fileExistsAtPath:path])
+		return path;
+
+	NSString *bundlePath = [[NSString stringWithFormat:@"%@/Contents/Resources/%@-bundles.json",
+	    [[NSBundle mainBundle] bundlePath], username]
+	    stringByExpandingTildeInPath];
+
+	if ([[NSFileManager defaultManager] fileExistsAtPath:bundlePath])
+		return bundlePath;
+
+	return path;
 }
 
 - (void)updateBundleStatus
@@ -133,7 +148,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	/* Remove any existing repositories owned by this user. */
 	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
 
-	NSData *JSONData = [NSData dataWithContentsOfFile:[self repoPathForUser:username]];
+	NSData *JSONData = [NSData dataWithContentsOfFile:[self repoPathForUser:username readonly:YES]];
 	NSString *JSONString = [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
 	NSDictionary *dict = [JSONString JSONValue];
 	if (![dict isKindOfClass:[NSDictionary class]]) {
@@ -524,7 +539,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 		INFO(@"loading repositories from %@", url);
 		repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-		[repoDownload setDestination:[self repoPathForUser:username] allowOverwrite:YES];
+		[repoDownload setDestination:[self repoPathForUser:username readonly:NO] allowOverwrite:YES];
 		return;
 	}
 

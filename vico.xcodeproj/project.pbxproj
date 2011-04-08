@@ -1299,6 +1299,7 @@
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
 				9A2EF28C133109C10023C5B7 /* Frameworks */,
+				9A260675134F4F8F002C86FB /* Download bundle repo from GitHub */,
 				9A2EF28D133109C10023C5B7 /* Resources */,
 				9A4346EE13312853002B04DE /* Copy Executables */,
 				9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */,
@@ -1447,6 +1448,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		9A260675134F4F8F002C86FB /* Download bundle repo from GitHub */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Download bundle repo from GitHub";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "USERS=\"textmate\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
+			showEnvVarsInLog = 0;
+		};
 		9A2EF2AE133109C20023C5B7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

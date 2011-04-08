@@ -25,7 +25,7 @@
 
 - (BOOL)becomeFirstResponder
 {
-	NSTextView *editor = [[self window] fieldEditor:YES forObject:self];
+	NSText *editor = [[self window] fieldEditor:YES forObject:self];
 
 	current = nil;
 	historyIndex = -1;

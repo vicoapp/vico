@@ -1994,7 +1994,7 @@
 		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"\\w"];
 		[pattern appendString:@"\\w*"];
 	} else {
-		pattern = [NSString stringWithFormat:@"\\b%@\\w*", word];
+		pattern = [NSString stringWithFormat:@"\\b(%@)\\w*", word];
 	}
 
 	DEBUG(@"searching for %@", pattern);

@@ -68,10 +68,12 @@
 		    convertWeight:12 ofFont:font];*/
 		NSColor *markColor = [NSColor redColor];
 
+		NSUInteger offset = [filter rangeOfMatchedString].location;
 		NSUInteger i;
 		for (i = 1; i <= [filter count]; i++) {
 			NSRange range = [filter rangeOfSubstringAtIndex:i];
 			if (range.length > 0 && range.location != NSNotFound) {
+				range.location -= offset;
 				[title addAttribute:NSFontAttributeName
 					      value:boldFont
 					      range:range];

@@ -2014,9 +2014,11 @@
 			continue;
 		NSString *content = [[[self textStorage] string] substringWithRange:r];
 		ViCompletion *c;
-		if (fuzzySearch)
+		if (fuzzySearch) {
 			c = [ViCompletion completionWithContent:content fuzzyMatch:m];
-		else
+			if (!fuzzyTrigger)
+				c.prefixLength = range.length;
+		} else
 			c = [ViCompletion completionWithContent:content prefixLength:range.length];
 		c.location = r.location;
 		[uniq addObject:c];

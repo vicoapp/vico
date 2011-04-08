@@ -2,7 +2,7 @@ URGENT
 ========
 * use "git clone" when installing bundles(?)
 * ship with a default bundle plist
-* fuzzy search feels *slow*
+* cmd-t fuzzy search feels *slow*
 * implement "new file" and "new folder" in explorer menu
 * bundle-specific nu startup scripts (nu/main.nu)
 * global nu startup script in application support folder

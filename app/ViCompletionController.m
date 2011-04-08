@@ -183,6 +183,16 @@
 		}
 	}
 
+	if (fuzzySearch)
+		[filteredCompletions sortUsingComparator:^(id a, id b) {
+			ViCompletion *ca = a, *cb = b;
+			if (ca.score > cb.score)
+				return (NSComparisonResult)NSOrderedAscending;
+			else if (cb.score > ca.score)
+				return (NSComparisonResult)NSOrderedDescending;
+			return (NSComparisonResult)NSOrderedSame;
+		}];
+
 	[tableView reloadData];
 	[self updateBounds];
 }

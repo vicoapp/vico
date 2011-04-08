@@ -6,6 +6,7 @@ run: debug
 	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico/app/ViDocument.m
 
 build:
+	rm -rf build/Release/Vico.app
 	xcodebuild -scheme archive
 
 test:

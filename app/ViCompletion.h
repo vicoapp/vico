@@ -9,6 +9,7 @@
 	BOOL filterIsFuzzy;
 	NSFont *font;
 	NSUInteger location;
+	double score;
 }
 
 @property (readonly, assign) NSMutableAttributedString *title;
@@ -18,6 +19,7 @@
 @property (readwrite) BOOL filterIsFuzzy;
 @property (readwrite, assign) NSFont *font;
 @property (readwrite) NSUInteger location;
+@property (readonly) double score;
 
 + (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength;
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch;

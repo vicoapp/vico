@@ -157,7 +157,7 @@
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
-#ifdef EXPIRATION
+#if defined(EXPIRATION) && EXPIRATION > 0
 #warning Enabling time-based expiration of development build
 	time_t expire_at = EXPIRATION;
 	DEBUG(@"checking expiration date at %s", ctime(&expire_at));

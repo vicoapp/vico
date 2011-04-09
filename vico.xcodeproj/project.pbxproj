@@ -53,7 +53,7 @@
 		9A2EF38E13310CB80023C5B7 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30813310C400023C5B7 /* sha1.c */; };
 		9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30D13310C430023C5B7 /* TMFileURLProtocol.m */; };
 		9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */; };
-		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; };
+		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; settings = {COMPILER_FLAGS = "-DEXPIRATION=${EXPIRATION:-0}"; }; };
 		9A2EF39213310CB80023C5B7 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31313310C460023C5B7 /* ViBgView.m */; };
 		9A2EF39313310CB80023C5B7 /* ViBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31513310C470023C5B7 /* ViBundle.m */; };
 		9A2EF39413310CB80023C5B7 /* ViBundleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31713310C480023C5B7 /* ViBundleCommand.m */; };
@@ -1460,7 +1460,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$BUILD_STYLE\" != \"RELEASE\"; then\n    exit 0\nfi\n\nUSERS=\"textmate\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
+			shellScript = "if test \"$BUILD_STYLE\" != \"Release\"; then\n    echo \"ignoring downloading bundle repo in $BUILD_STYLE build\"\n    exit 0\nfi\n\nUSERS=\"textmate\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		9A2EF2AE133109C20023C5B7 /* ShellScript */ = {
@@ -1898,10 +1898,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"EXPIRATION=${EXPIRATION}",
-					"NDEBUG=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
 				INFOPLIST_FILE = "app/Vico-Info.plist";
 				OTHER_LDFLAGS = (
 					"-lcrypto",

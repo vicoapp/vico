@@ -1,6 +1,6 @@
 debug:
 #	rm -rf build/Debug/Vico.app
-	xcodebuild -configuration Debug
+	xcodebuild -configuration Debug EXPIRATION=0
 
 run: debug
 	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico/app/ViDocument.m

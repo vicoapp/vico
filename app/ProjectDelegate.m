@@ -481,17 +481,18 @@
 	[explorer editColumn:0 row:[set firstIndex] withEvent:nil select:YES];
 }
 
-- (IBAction)removeFiles:(id)sender
+- (void)removeAlertDidEnd:(NSAlert *)alert
+               returnCode:(NSInteger)returnCode
+              contextInfo:(void *)contextInfo
 {
-	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		[urls addObject:[item url]];
-	}];
+	if (returnCode != NSAlertFirstButtonReturn)
+		return;
 
+	NSArray *urls = contextInfo;
+
+	BOOL isLocal = [[urls objectAtIndex:0] isFileURL];
 	__block BOOL failed = NO;
-	if ([[urls objectAtIndex:0] isFileURL]) {
+	if (isLocal) {
 		NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 		[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
 			if (error != nil) {
@@ -500,8 +501,6 @@
 			}
 		}];
 	} else {
-		/* FIXME: ask for confirmation, as remote files will be deleted directly (no trash).
-		 */
 		for (NSURL *url in urls) {
 			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
 											    error:nil];
@@ -520,6 +519,42 @@
 		/* Rescan containing folder(s) ? */
 		[self rescan_files:nil];
 	}
+}
+
+- (IBAction)removeFiles:(id)sender
+{
+	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *item = [explorer itemAtRow:idx];
+		[urls addObject:[item url]];
+	}];
+
+	if ([urls count] == 0)
+		return;
+
+	BOOL isLocal = [[urls objectAtIndex:0] isFileURL];
+	char *pluralS = ([urls count] == 1 ? "" : "s");
+
+	NSAlert *alert = [[NSAlert alloc] init];
+	if (isLocal)
+		[alert setMessageText:[NSString stringWithFormat:@"Do you want to move the selected file%s to the trash?", pluralS]];
+	else
+		[alert setMessageText:[NSString stringWithFormat:@"Do you want to permanently delete the selected file%s?", pluralS]];
+	[alert addButtonWithTitle:@"OK"];
+	[alert addButtonWithTitle:@"Cancel"];
+	if (isLocal) {
+		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be moved to the trash.", [urls count], pluralS]];
+		[alert setAlertStyle:NSWarningAlertStyle];
+	} else {
+		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be deleted immediately. This operation cannot be undone!", [urls count], pluralS]];
+		[alert setAlertStyle:NSCriticalAlertStyle];
+	}
+
+	[alert beginSheetModalForWindow:window
+			  modalDelegate:self
+			 didEndSelector:@selector(removeAlertDidEnd:returnCode:contextInfo:)
+			    contextInfo:urls];
 }
 
 - (IBAction)rescan:(id)sender

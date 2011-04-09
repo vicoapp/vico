@@ -1,7 +1,7 @@
 URGENT
 ========
 * use "git clone" when installing bundles(?)
-* implement "new file" and "new folder" in explorer menu + confirmation dialog
+* implement "new file" and "new folder" in explorer menu
 * = command (or remove from Edit menu)
 * gq command (or remove from Edit menu)
 * text objects (or remove from Edit menu)
@@ -223,3 +223,4 @@ latex.tmbundle
 * [DONE] local keyword completion (vim c-x c-n)
 * [DONE] expiration date for development builds
 * [DONE] ship with a default bundle plist
+* [DONE] confirmation dialog when deleting files

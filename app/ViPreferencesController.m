@@ -522,7 +522,7 @@ ToolbarHeightForWindow(NSWindow *window)
 			return;
 		}
 
-		INFO(@"got user %@: %@", username, dict);
+		DEBUG(@"got user %@: %@", username, dict);
 
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Loading repositories from %@...", username]];
 		NSURL *url;
@@ -537,7 +537,7 @@ ToolbarHeightForWindow(NSWindow *window)
 			return;
 		}
 
-		INFO(@"loading repositories from %@", url);
+		DEBUG(@"loading repositories from %@", url);
 		repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
 		[repoDownload setDestination:[self repoPathForUser:username readonly:NO] allowOverwrite:YES];
 		return;

@@ -64,8 +64,14 @@
 + (NSString *)supportDirectory
 {
 	static NSString *supportDirectory = nil;
-	if (supportDirectory == nil)
-		supportDirectory = [@"~/Library/Application Support/Vico" stringByExpandingTildeInPath];
+	if (supportDirectory == nil) {
+		NSURL *url = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+								    inDomain:NSUserDomainMask
+							   appropriateForURL:nil
+								      create:YES
+								       error:nil];
+		supportDirectory = [[url path] stringByAppendingPathComponent:@"Vico"];
+	}
 	return supportDirectory;
 }
 

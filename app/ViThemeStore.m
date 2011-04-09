@@ -70,9 +70,24 @@
 	if (self) {
 		themes = [[NSMutableDictionary alloc] init];
 
-		[self addThemesFromBundleDirectory:@"/Library/Application Support/TextMate/Themes"];
+		NSURL *url = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+								    inDomain:NSLocalDomainMask
+							   appropriateForURL:nil
+								      create:YES
+								       error:nil];
+ 		if (url)
+			[self addThemesFromBundleDirectory:[[url path] stringByAppendingPathComponent:@"TextMate/Themes"]];
+
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
-		[self addThemesFromBundleDirectory:[@"~/Library/Application Support/TextMate/Themes" stringByExpandingTildeInPath]];
+
+		url = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+							     inDomain:NSUserDomainMask
+						    appropriateForURL:nil
+							       create:NO
+								error:nil];
+		if (url)
+			[self addThemesFromBundleDirectory:[[url path] stringByAppendingPathComponent:@"TextMate/Themes"]];
+		
 		[self addThemesFromBundleDirectory:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"Themes"]];
 	}
 	return self;

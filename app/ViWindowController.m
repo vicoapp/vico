@@ -5,13 +5,11 @@
 #import "ViDocumentTabController.h"
 #import "ViProject.h"
 #import "ProjectDelegate.h"
-#import "ViSeparatorCell.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"
 #import "ViLanguageStore.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
-#import "MHTextIconCell.h"
 #import "ViAppController.h"
 #import "ViTextStorage.h"
 #import "NSObject+SPInvocationGrabbing.h"
@@ -65,11 +63,10 @@ static ViWindowController	*currentWindowController = nil;
 	if (self) {
 		isLoaded = NO;
 		if (windowControllers == nil)
-			windowControllers = [[NSMutableArray alloc] init];
+			windowControllers = [NSMutableArray array];
 		[windowControllers addObject:self];
 		currentWindowController = self;
-		documents = [[NSMutableArray alloc] init];
-		symbolFilterCache = [[NSMutableDictionary alloc] init];
+		documents = [NSMutableArray array];
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
 		parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
@@ -193,17 +190,6 @@ static ViWindowController	*currentWindowController = nil;
 	[symbolsView setNeedsDisplay:YES];
 	[explorerView setNeedsDisplay:YES];
 
-	[symbolsOutline setTarget:self];
-	[symbolsOutline setDoubleAction:@selector(goToSymbol:)];
-	[symbolsOutline setAction:@selector(goToSymbol:)];
-
-	[[symbolsOutline outlineTableColumn] setDataCell:[[MHTextIconCell alloc] init]];
-	NSCell *cell = [(NSTableColumn *)[[symbolsOutline tableColumns] objectAtIndex:0] dataCell];
-	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
-	[cell setWraps:NO];
-
-	separatorCell = [[ViSeparatorCell alloc] init];
-
 	NSRect frame = [splitView frame];
 	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
@@ -264,18 +250,9 @@ static ViWindowController	*currentWindowController = nil;
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-	if ([keyPath isEqualToString:@"symbols"]) {
-		[self filterSymbols:symbolFilterField];
-		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
-			[symbolsOutline collapseItem:nil collapseChildren:YES];
-			[symbolsOutline expandItem:[self currentDocument]];
-		}
-
-		id<ViViewController> viewController = [self currentView];
-		if ([viewController isKindOfClass:[ViDocumentView class]])
-			[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
-	} else if ([keyPath isEqualToString:@"undostyle"]) {
-		[parser setNviStyleUndo:[[change objectForKey:NSKeyValueChangeNewKey] isEqualToString:@"nvi"]];
+	if ([keyPath isEqualToString:@"undostyle"]) {
+		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
+		[parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
 	}
 }
 
@@ -300,11 +277,8 @@ static ViWindowController	*currentWindowController = nil;
 	[documents addObject:document];
 
 	/* Update symbol table. */
-	[self filterSymbols:symbolFilterField];
-	[document addObserver:self forKeyPath:@"symbols" options:0 context:NULL];
-        NSInteger row = [symbolsOutline rowForItem:document];
-        [symbolsOutline scrollRowToVisible:row];
-        [symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	[symbolController filterSymbols];
+	[document addObserver:symbolController forKeyPath:@"symbols" options:0 context:NULL];
 }
 
 /* Create a new document tab.
@@ -456,7 +430,7 @@ static ViWindowController	*currentWindowController = nil;
 {
 	ViTextView *textView = [notification object];
 	if (textView == [[self currentView] innerView])
-		[self updateSelectedSymbolForLocation:[textView caret]];
+		[symbolController updateSelectedSymbolForLocation:[textView caret]];
 }
 
 - (void)message:(NSString *)fmt arguments:(va_list)ap
@@ -762,9 +736,7 @@ static ViWindowController	*currentWindowController = nil;
 		[openFilesButton selectItemAtIndex:ndx];
 
 	// update symbol list
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES)
-		[symbolsOutline collapseItem:nil collapseChildren:YES];
-        [symbolsOutline expandItem:document];
+	[symbolController didSelectDocument:document];
 
 	[self checkDocumentChanged:document];
 }
@@ -779,7 +751,7 @@ static ViWindowController	*currentWindowController = nil;
 		if (!jumping)
 			[[docView textView] pushCurrentLocationOnJumpList];
 		[self didSelectDocument:[docView document]];
-		[self updateSelectedSymbolForLocation:[[docView textView] caret]];
+		[symbolController updateSelectedSymbolForLocation:[[docView textView] caret]];
 	}
 	[[viewController tabController] setSelectedView:viewController];
 
@@ -1312,39 +1284,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 #pragma mark -
 #pragma mark Symbol List
 
-- (void)cancelSymbolList
+- (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView
 {
-	if (closeSymbolListAfterUse) {
-		[self toggleSymbolList:self];
-		closeSymbolListAfterUse = NO;
-	}
-	[symbolFilterField setStringValue:@""];
-	[self filterSymbols:symbolFilterField];
-	[self focusEditor];
-}
-
-- (IBAction)toggleSymbolList:(id)sender
-{
-	NSInteger ndx = ([[splitView subviews] objectAtIndex:0] == explorerView) ? 1 : 0;
-
-	NSRect frame = [splitView frame];
-	if ([splitView isSubviewCollapsed:symbolsView])
-		[splitView setPosition:NSWidth(frame) - 200 ofDividerAtIndex:ndx];
-	else
-		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:ndx];
-}
-
-- (void)goToSymbol:(ViSymbol *)aSymbol inDocument:(ViDocument *)document
-{
-	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]])
-		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
-
-	/* XXX: prevent pushing an extraneous jump on the list. */
-	jumping = YES;
-	ViDocumentView *docView = [self selectDocument:document];
-	jumping = NO;
-
 	NSRange range = [aSymbol range];
 	ViTextView *textView = [docView textView];
 	[textView setCaret:range.location];
@@ -1352,99 +1293,33 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[[textView nextRunloop] showFindIndicatorForRange:range];
 }
 
-- (void)goToSymbol:(id)sender
+- (void)gotoSymbol:(ViSymbol *)aSymbol
 {
-	id item = [symbolsOutline itemAtRow:[symbolsOutline selectedRow]];
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
 
-	// remember what symbol we selected from the filtered set
-	NSString *filter = [symbolFilterField stringValue];
-	if ([filter length] > 0) {
-		[symbolFilterCache setObject:[item symbol] forKey:filter];
-		[symbolFilterField setStringValue:@""];
-	}
+	/* XXX: prevent pushing an extraneous jump on the list. */
+	jumping = YES;
+	ViDocumentView *docView = [self selectDocument:aSymbol.document];
+	jumping = NO;
 
-	if ([item isKindOfClass:[ViDocument class]])
-		[self selectDocument:item];
-	else
-		[self goToSymbol:item inDocument:[item document]];
+	[self gotoSymbol:aSymbol inView:docView];
+}
 
-	[self cancelSymbolList];
+- (IBAction)toggleSymbolList:(id)sender
+{
+	[symbolController toggleSymbolList:sender];
 }
 
 - (IBAction)searchSymbol:(id)sender
 {
-	if ([splitView isSubviewCollapsed:symbolsView]) {
-		closeSymbolListAfterUse = YES;
-		[self toggleSymbolList:nil];
-	}
-
-	[[self window] makeFirstResponder:symbolFilterField];
+	[symbolController searchSymbol:sender];
 }
 
-- (void)selectFirstMatchingSymbolForFilter:(NSString *)filter
+- (IBAction)focusSymbols:(id)sender
 {
-	NSUInteger row;
-
-	NSString *symbol = [symbolFilterCache objectForKey:filter];
-	if (symbol)
-	{
-		// check if the cached symbol is available, then select it
-		for (row = 0; row < [symbolsOutline numberOfRows]; row++)
-		{
-			id item = [symbolsOutline itemAtRow:row];
-			if ([item isKindOfClass:[ViSymbol class]] && [[item symbol] isEqualToString:symbol])
-			{
-				[symbolsOutline scrollRowToVisible:row];
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-					    byExtendingSelection:NO];
-				return;
-			}
-		}
-	}
-
-	// skip past all document entries, selecting the first symbol
-	for (row = 0; row < [symbolsOutline numberOfRows]; row++)
-	{
-		id item = [symbolsOutline itemAtRow:row];
-		if ([item isKindOfClass:[ViSymbol class]])
-		{
-			[symbolsOutline scrollRowToVisible:row];
-			[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-				    byExtendingSelection:NO];
-			break;
-		}
-	}
-}
-
-- (IBAction)filterSymbols:(id)sender
-{
-	NSString *filter = [sender stringValue];
-
-	NSMutableString *pattern = [NSMutableString string];
-	int i;
-	for (i = 0; i < [filter length]; i++)
-		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
-	[pattern appendString:@".*"];
-
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern options:ONIG_OPTION_IGNORECASE];
-
-	filteredDocuments = [[NSMutableArray alloc] initWithArray:documents];
-
-	// make sure the current document is displayed first in the symbol list
-	ViDocument *currentDocument = [self currentDocument];
-	if (currentDocument) {
-		[filteredDocuments removeObject:currentDocument];
-		[filteredDocuments insertObject:currentDocument atIndex:0];
-	}
-
-	NSMutableArray *emptyDocuments = [[NSMutableArray alloc] init];
-	for (ViDocument *doc in filteredDocuments)
-		if ([doc filterSymbols:rx] == 0)
-			[emptyDocuments addObject:doc];
-	[filteredDocuments removeObjectsInArray:emptyDocuments];
-	[symbolsOutline reloadData];
-	[symbolsOutline expandItem:nil expandChildren:YES];
-	[self selectFirstMatchingSymbolForFilter:filter];
+	[symbolController focusSymbols:sender];
 }
 
 - (NSArray *)symbolsFilteredByPattern:(NSString *)pattern
@@ -1459,28 +1334,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 				[syms addObject:s];
 
 	return syms;
-}
-
-- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation
-{
-	NSArray *symbols = [[self currentDocument] symbols];
-	ViSymbol *symbol;
-	id item = [self currentDocument];
-	for (symbol in symbols)
-	{
-		NSRange r = [symbol range];
-		if (r.location > aLocation)
-			break;
-		item = symbol;
-	}
-
-	if (item)
-	{
-		NSUInteger row = [symbolsOutline rowForItem:item];
-		[symbolsOutline scrollRowToVisible:row];
-		[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-			    byExtendingSelection:NO];
-	}
 }
 
 #pragma mark -
@@ -1498,138 +1351,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (IBAction)toggleExplorer:(id)sender
 {
 	[projectDelegate toggleExplorer:sender];
-}
-
-#pragma mark -
-#pragma mark Symbol filter key handling
-
-- (BOOL)control:(NSControl *)sender
-       textView:(NSTextView *)textView
-doCommandBySelector:(SEL)aSelector
-{
-	if (sender == symbolFilterField)
-	{
-		if (aSelector == @selector(insertNewline:)) // enter
-		{
-			[self goToSymbol:self];
-			return YES;
-		}
-		else if (aSelector == @selector(moveUp:)) // up arrow
-		{
-			NSInteger row = [symbolsOutline selectedRow];
-			if (row > 0)
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1]
-					    byExtendingSelection:NO];
-			return YES;
-		}
-		else if (aSelector == @selector(moveDown:)) // down arrow
-		{
-			NSInteger row = [symbolsOutline selectedRow];
-			if (row + 1 < [symbolsOutline numberOfRows])
-				[symbolsOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1]
-					    byExtendingSelection:NO];
-			return YES;
-		}
-		else if (aSelector == @selector(cancelOperation:)) // escape
-		{
-			[self cancelSymbolList];
-			return YES;
-		}
-	}
-	return NO;
-}
-
-#pragma mark -
-#pragma mark Symbol Outline View Data Source
-
-- (id)outlineView:(NSOutlineView *)outlineView
-            child:(NSInteger)anIndex
-           ofItem:(id)item
-{
-	if (item == nil)
-		return [filteredDocuments objectAtIndex:anIndex];
-	return [[(ViDocument *)item filteredSymbols] objectAtIndex:anIndex];
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-   isItemExpandable:(id)item
-{
-	if ([item isKindOfClass:[ViDocument class]])
-		return [[(ViDocument *)item filteredSymbols] count] > 0 ? YES : NO;
-	return NO;
-}
-
-- (NSInteger)outlineView:(NSOutlineView *)outlineView
-  numberOfChildrenOfItem:(id)item
-{
-	if (item == nil)
-		return [filteredDocuments count];
-
-	if ([item isKindOfClass:[ViDocument class]])
-		return [[(ViDocument *)item filteredSymbols] count];
-
-	return 0;
-}
-
-- (id)outlineView:(NSOutlineView *)outlineView
-objectValueForTableColumn:(NSTableColumn *)tableColumn
-           byItem:(id)item
-{
-	return [item displayName];
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-        isGroupItem:(id)item
-{
-	if ([item isKindOfClass:[ViDocument class]])
-		return YES;
-	return NO;
-}
-
-- (BOOL)isSeparatorItem:(id)item
-{
-	if ([item isKindOfClass:[ViSymbol class]] &&
-	    [[(ViSymbol *)item symbol] isEqualToString:@"-"])
-		return YES;
-	return NO;
-}
-
-- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
-{
-	if ([self isSeparatorItem:item])
-		return 9;
-	if ([self outlineView:outlineView isGroupItem:item])
-		return 20;
-	return 15;
-}
-
-- (NSCell *)outlineView:(NSOutlineView *)outlineView
- dataCellForTableColumn:(NSTableColumn *)tableColumn
-                   item:(id)item
-{
-	NSCell *cell;
-	if ([self isSeparatorItem:item])
-		cell = separatorCell;
-	else {
-		cell  = [tableColumn dataCellForRow:[symbolsOutline rowForItem:item]];
-
-		if ([item respondsToSelector:@selector(image)])
-			[cell setImage:[item image]];
-		else
-			[cell setImage:nil];
-	}
-
-	if (![item isKindOfClass:[ViDocument class]])
-		[cell setFont:[NSFont systemFontOfSize:11.0]];
-	else
-		[cell setFont:[NSFont systemFontOfSize:13.0]];
-		
-	return cell;
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
-{
-	return ![self isSeparatorItem:item];
 }
 
 #pragma mark -
@@ -1688,6 +1409,9 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	[[tv nextRunloop] showFindIndicatorForRange:NSMakeRange(tv.caret, 1)];
 	[self updateJumplistNavigator];
 }
+
+#pragma mark -
+#pragma mark Vi actions
 
 - (BOOL)increase_fontsize:(ViCommand *)command
 {

@@ -1588,7 +1588,7 @@
 			  line:[self currentLine]
 			column:[self currentColumn]];
 
-	[windowController goToSymbol:sym inDocument:sym.document];
+	[windowController gotoSymbol:sym];
 	final_location = NSNotFound;
 }
 

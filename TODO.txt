@@ -5,11 +5,11 @@ URGENT
 * = command (or remove from Edit menu)
 * gq command (or remove from Edit menu)
 * text objects (or remove from Edit menu)
-* vi navigation of symbol list
 * disable bookmarks button in toolbar?
 
 BUGS
 ====
+* get rid of ViBgView
 * clicking a binary file (pdf, image) in explorer opens as text
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
@@ -224,3 +224,4 @@ latex.tmbundle
 * [DONE] expiration date for development builds
 * [DONE] ship with a default bundle plist
 * [DONE] confirmation dialog when deleting files
+* [DONE] vi navigation of symbol list

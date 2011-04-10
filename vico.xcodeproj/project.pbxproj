@@ -13,6 +13,7 @@
 		9A26066E134B0024002C86FB /* ViCompletionWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26066D134B0024002C86FB /* ViCompletionWindow.m */; };
 		9A260671134C50C3002C86FB /* CompletionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A26066F134C50C3002C86FB /* CompletionWindow.xib */; };
 		9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260673134DF8D7002C86FB /* ViCompletion.m */; };
+		9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
 		9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
 		9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2A1133109C20023C5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
@@ -344,6 +345,8 @@
 		9A260670134C50C3002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/CompletionWindow.xib; sourceTree = "<group>"; };
 		9A260672134DF8D7002C86FB /* ViCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCompletion.h; sourceTree = "<group>"; };
 		9A260673134DF8D7002C86FB /* ViCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletion.m; sourceTree = "<group>"; };
+		9A26067613505AEF002C86FB /* ViSymbolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolController.h; sourceTree = "<group>"; };
+		9A26067713505AEF002C86FB /* ViSymbolController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolController.m; sourceTree = "<group>"; };
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -1039,6 +1042,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9A26067613505AEF002C86FB /* ViSymbolController.h */,
+				9A26067713505AEF002C86FB /* ViSymbolController.m */,
 				9A260672134DF8D7002C86FB /* ViCompletion.h */,
 				9A260673134DF8D7002C86FB /* ViCompletion.m */,
 				9A26066C134B0024002C86FB /* ViCompletionWindow.h */,
@@ -1676,6 +1681,7 @@
 				9A26066B134A4F13002C86FB /* ViCompletionView.m in Sources */,
 				9A26066E134B0024002C86FB /* ViCompletionWindow.m in Sources */,
 				9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */,
+				9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1801,6 +1801,14 @@
 					</object>
 					<int key="connectionID">683</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">focusSymbols:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="250341445"/>
+					</object>
+					<int key="connectionID">684</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -3297,7 +3305,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">683</int>
+			<int key="maxID">684</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4030,6 +4038,113 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">ViSymbolController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>filterSymbols:</string>
+							<string>focusSymbols:</string>
+							<string>searchSymbol:</string>
+							<string>toggleSymbolList:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>filterSymbols:</string>
+							<string>focusSymbols:</string>
+							<string>searchSymbol:</string>
+							<string>toggleSymbolList:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">filterSymbols:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">focusSymbols:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">searchSymbol:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">toggleSymbolList:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>splitView</string>
+							<string>symbolFilterField</string>
+							<string>symbolView</string>
+							<string>window</string>
+							<string>windowController</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSSplitView</string>
+							<string>NSSearchField</string>
+							<string>ViOutlineView</string>
+							<string>NSWindow</string>
+							<string>ViWindowController</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>splitView</string>
+							<string>symbolFilterField</string>
+							<string>symbolView</string>
+							<string>window</string>
+							<string>windowController</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">splitView</string>
+								<string key="candidateClassName">NSSplitView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">symbolFilterField</string>
+								<string key="candidateClassName">NSSearchField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">symbolView</string>
+								<string key="candidateClassName">ViOutlineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">window</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">windowController</string>
+								<string key="candidateClassName">ViWindowController</string>
+							</object>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ViSymbolController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ViToolbarPopUpButtonCell</string>
 					<string key="superclassName">NSPopUpButtonCell</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -4044,7 +4159,7 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>filterSymbols:</string>
+							<string>focusSymbols:</string>
 							<string>moveCurrentViewToNewTabAction:</string>
 							<string>navigateJumplist:</string>
 							<string>searchFiles:</string>
@@ -4075,7 +4190,7 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>filterSymbols:</string>
+							<string>focusSymbols:</string>
 							<string>moveCurrentViewToNewTabAction:</string>
 							<string>navigateJumplist:</string>
 							<string>searchFiles:</string>
@@ -4090,7 +4205,7 @@
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
-								<string key="name">filterSymbols:</string>
+								<string key="name">focusSymbols:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4145,7 +4260,6 @@
 							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
-							<string>languageButton</string>
 							<string>mainView</string>
 							<string>messageField</string>
 							<string>openFilesButton</string>
@@ -4153,8 +4267,7 @@
 							<string>projectResizeView</string>
 							<string>splitView</string>
 							<string>statusbar</string>
-							<string>symbolFilterField</string>
-							<string>symbolsOutline</string>
+							<string>symbolController</string>
 							<string>symbolsResizeView</string>
 							<string>symbolsView</string>
 							<string>tabBar</string>
@@ -4168,7 +4281,6 @@
 							<string>ExEnvironment</string>
 							<string>ViBgView</string>
 							<string>NSSegmentedControl</string>
-							<string>NSPopUpButton</string>
 							<string>NSView</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
@@ -4176,8 +4288,7 @@
 							<string>NSImageView</string>
 							<string>ViSplitView</string>
 							<string>NSTextField</string>
-							<string>NSSearchField</string>
-							<string>NSOutlineView</string>
+							<string>ViSymbolController</string>
 							<string>NSImageView</string>
 							<string>ViBgView</string>
 							<string>PSMTabBarControl</string>
@@ -4194,7 +4305,6 @@
 							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
-							<string>languageButton</string>
 							<string>mainView</string>
 							<string>messageField</string>
 							<string>openFilesButton</string>
@@ -4202,8 +4312,7 @@
 							<string>projectResizeView</string>
 							<string>splitView</string>
 							<string>statusbar</string>
-							<string>symbolFilterField</string>
-							<string>symbolsOutline</string>
+							<string>symbolController</string>
 							<string>symbolsResizeView</string>
 							<string>symbolsView</string>
 							<string>tabBar</string>
@@ -4236,10 +4345,6 @@
 								<string key="candidateClassName">NSSegmentedControl</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">languageButton</string>
-								<string key="candidateClassName">NSPopUpButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">mainView</string>
 								<string key="candidateClassName">NSView</string>
 							</object>
@@ -4268,12 +4373,8 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">symbolFilterField</string>
-								<string key="candidateClassName">NSSearchField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">symbolsOutline</string>
-								<string key="candidateClassName">NSOutlineView</string>
+								<string key="name">symbolController</string>
+								<string key="candidateClassName">ViSymbolController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">symbolsResizeView</string>

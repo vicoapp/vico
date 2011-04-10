@@ -7,6 +7,7 @@
 #import "ViSplitView.h"
 #import "ViScriptProxy.h"
 #import "ViSymbol.h"
+#import "ViSymbolController.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -20,7 +21,7 @@
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSTabView *tabView;
-	IBOutlet ViSplitView *splitView;	// Split between explorer, main and symbol views
+	IBOutlet ViSplitView *splitView; // Split between explorer, main and symbol views
 	IBOutlet NSView *mainView;
 	IBOutlet ViBgView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
@@ -40,6 +41,7 @@
 
 	BOOL isLoaded;
 	ViDocument *initialDocument;
+	NSMutableArray *documents;
 	__weak ViDocument *previousDocument;
 	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
@@ -51,15 +53,9 @@
 	IBOutlet NSImageView *projectResizeView;
 
 	// symbol list
+	IBOutlet ViSymbolController *symbolController;
 	IBOutlet NSImageView *symbolsResizeView;
 	IBOutlet ViBgView *symbolsView;
-	IBOutlet NSSearchField *symbolFilterField;
-	IBOutlet NSOutlineView *symbolsOutline;
-	NSCell *separatorCell;
-	NSMutableArray *documents;
-	NSMutableArray *filteredDocuments;
-	NSMutableDictionary *symbolFilterCache;
-	BOOL closeSymbolListAfterUse;
 
 	ViJumpList *jumpList;
 	BOOL jumping;
@@ -118,11 +114,12 @@
 - (BOOL)gotoURL:(NSURL *)url;
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
-- (void)goToSymbol:(ViSymbol *)aSymbol inDocument:(ViDocument *)document;
 - (IBAction)searchSymbol:(id)sender;
-- (IBAction)filterSymbols:(id)sender;
-- (IBAction)toggleSymbolList:(id)sender;
+- (void)gotoSymbol:(ViSymbol *)aSymbol;
+- (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView;
 - (NSArray *)symbolsFilteredByPattern:(NSString *)pattern;
+- (IBAction)toggleSymbolList:(id)sender;
+- (IBAction)focusSymbols:(id)sender;
 
 - (IBAction)splitViewHorizontally:(id)sender;
 - (IBAction)splitViewVertically:(id)sender;
@@ -143,8 +140,6 @@
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
-
-- (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
 
 - (void)browseURL:(NSURL *)url;
 

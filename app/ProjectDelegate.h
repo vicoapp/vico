@@ -21,7 +21,7 @@
 @property(readwrite, assign) NSAttributedString *markedString;
 @end
 
-@interface ProjectDelegate : NSObject
+@interface ProjectDelegate : NSObject <NSOutlineViewDataSource>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;
@@ -37,8 +37,6 @@
 	IBOutlet NSPathControl *rootButton;
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
-
-	NSInteger lastSelectedRow;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;

@@ -95,7 +95,8 @@
 - (BOOL)ex_cancel:(ViCommand *)command
 {
 	running = NO;
-	[[self delegate] cancel_ex_command];
+	if ([[self delegate] respondsToSelector:@selector(cancel_ex_command)])
+		[[self delegate] performSelector:@selector(cancel_ex_command)];
 	return YES;
 }
 
@@ -104,7 +105,8 @@
 	NSString *exCommand = [self stringValue];
 	[self addToHistory:exCommand];
 	running = NO;
-	[[self delegate] execute_ex_command:exCommand];
+	if ([[self delegate] respondsToSelector:@selector(execute_ex_command:)])
+		[[self delegate] performSelector:@selector(execute_ex_command:) withObject:exCommand];
 	return YES;
 }
 

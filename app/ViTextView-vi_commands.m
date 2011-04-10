@@ -1685,7 +1685,8 @@
 			[[docView textView] findPattern:pattern options:0];
 			final_location = NSNotFound;
 		} else {
-			MESSAGE(@"%@: tag not found", word);
+			return [self jump_symbol:command];
+			// MESSAGE(@"%@: tag not found", word);
 		}
 	}
 

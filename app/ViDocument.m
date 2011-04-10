@@ -17,6 +17,7 @@
 #import "ViLayoutManager.h"
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViAppController.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -65,8 +66,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							     name:ViTextStorageChangedLinesNotification 
 							   object:textStorage];
 
-		NSString *symbolIconsFile = [[NSBundle mainBundle] pathForResource:@"symbol-icons"
-		                                                            ofType:@"plist"];
+		NSString *symbolIconsFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"symbol-icons.plist"];
+		if (![[NSFileManager defaultManager] fileExistsAtPath:symbolIconsFile])
+			symbolIconsFile = [[NSBundle mainBundle] pathForResource:@"symbol-icons"
+									  ofType:@"plist"];
 		symbolIcons = [NSDictionary dictionaryWithContentsOfFile:symbolIconsFile];
 
 		[self configureForURL:nil];

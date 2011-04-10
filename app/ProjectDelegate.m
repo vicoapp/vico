@@ -729,12 +729,8 @@
 	if (item == nil)
 		return;
 
-	if (isCompletion) {
-		[completionTarget performSelector:completionAction withObject:[item url]];
-	} else if (![self outlineView:explorer isItemExpandable:item]) {
-		// XXX: open in splits instead if alt key pressed?
-		[self openInTab:sender];
-	}
+	// XXX: open in splits instead if alt key pressed?
+	[self openInTab:sender];
 }
 
 - (void)explorerDoubleClick:(id)sender
@@ -954,7 +950,6 @@ sort_by_score(id a, id b, void *context)
 	if ([filter length] == 0) {
 		isFiltered = NO;
 		isFiltering = NO;
-		isCompletion = NO;
 		filteredItems = [NSMutableArray arrayWithArray:rootItems];
 		[explorer reloadData];
 		[explorer selectRowIndexes:[NSIndexSet indexSet]
@@ -997,38 +992,6 @@ sort_by_score(id a, id b, void *context)
 				   withObject:nil
 				   afterDelay:0.05];
         }
-}
-
-- (void)displayCompletions:(NSArray*)completions
-                   forPath:(NSString*)path
-             relativeToURL:(NSURL*)relURL
-                    target:(id)aTarget
-                    action:(SEL)anAction
-{
-	[self openExplorerTemporarily:YES];
-
-	NSUInteger markLength = 0;
-	if (![path hasSuffix:@"/"])
-		markLength = [[path lastPathComponent] length];
-
-	filteredItems = [[NSMutableArray alloc] init];
-	for (NSString *c in completions) {
-		NSString *esc = [c stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-		NSURL *url = [NSURL URLWithString:esc relativeToURL:relURL];
-		ProjectFile *pf = [[ProjectFile alloc] initWithURL:url];
-		[filteredItems addObject:pf];
-		[self markItem:pf withPrefix:markLength];
-	}
-
-	completionTarget = aTarget;
-	completionAction = anAction;
-
-	isFiltered = YES;
-	isCompletion = YES;
-
-	[explorer reloadData];
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-	      byExtendingSelection:NO];
 }
 
 #pragma mark -

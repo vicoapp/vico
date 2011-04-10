@@ -52,10 +52,6 @@
 
 	BOOL isFiltered;
 	BOOL isFiltering;
-
-	BOOL isCompletion;
-	id completionTarget;
-	SEL completionAction;
 }
 
 @property(readwrite,assign) id delegate;
@@ -91,11 +87,5 @@
 - (IBAction)focusExplorer:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
-
-- (void)displayCompletions:(NSArray*)completions
-                   forPath:(NSString*)path
-             relativeToURL:(NSURL*)relURL
-                    target:(id)aTarget
-                    action:(SEL)anAction;
 
 @end

@@ -21,11 +21,8 @@
 
 - (void)filterSymbols;
 - (void)updateSelectedSymbolForLocation:(NSUInteger)aLocation;
-
 - (void)didSelectDocument:(ViDocument *)document;
-
 - (IBAction)searchSymbol:(id)sender;
-
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)focusSymbols:(id)sender;

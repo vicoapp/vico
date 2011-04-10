@@ -311,7 +311,10 @@ doCommandBySelector:(SEL)aSelector
 		[symbolFilterField setStringValue:@""];
 	}
 
-	[windowController switchToDocument:doc];
+	windowController.jumping = YES; /* XXX: need better API! */
+	if ([windowController currentDocument] != doc)
+		[windowController switchToDocument:doc];
+	windowController.jumping = NO;
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:[windowController currentView]];
 
@@ -335,9 +338,11 @@ doCommandBySelector:(SEL)aSelector
 		[symbolFilterField setStringValue:@""];
 	}
 
+	windowController.jumping = YES; /* XXX: need better API! */
 	[windowController splitVertically:isVertical
 				  andOpen:nil
 		       orSwitchToDocument:doc];
+	windowController.jumping = NO;
 
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:[windowController currentView]];
@@ -378,11 +383,19 @@ doCommandBySelector:(SEL)aSelector
 		[symbolFilterField setStringValue:@""];
 	}
 
+	windowController.jumping = YES; /* XXX: need better API! */
 	ViDocumentView *docView = [windowController createTabForDocument:doc];
+	windowController.jumping = NO;
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:docView];
 
 	[self closeSymbolList];
+	return YES;
+}
+
+- (BOOL)open:(ViCommand *)command
+{
+	[self gotoSymbolAction:nil];
 	return YES;
 }
 

@@ -37,7 +37,7 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize environment;
 @synthesize proxy;
 @synthesize explorer = projectDelegate;
-@synthesize jumpList;
+@synthesize jumpList, jumping;
 @synthesize tagStack, tagsDatabase;
 
 + (ViWindowController *)currentWindowController

@@ -304,7 +304,7 @@
 (emap setKey:"s" toAction:"split_open:")
 (emap setKey:"t" toAction:"tab_open:")
 (emap setKey:"v" toAction:"vsplit_open:")
-(emap setKey:"<cr>" toAction:"tab_open:")
+(emap setKey:"<cr>" toAction:"open:")
 (emap setKey:"<ctrl-esc>" toMotion:"show_menu:")
 (emap setKey:"<cmd-esc>" toMotion:"show_menu:")
 
@@ -315,7 +315,7 @@
 (smap setKey:"o" toAction:"switch_open:")
 (smap setKey:"s" toAction:"split_open:")
 (smap setKey:"t" toAction:"tab_open:")
-(smap setKey:"<cr>" toAction:"tab_open:")
+(smap setKey:"<cr>" toAction:"open:")
 (smap setKey:"v" toAction:"vsplit_open:")
 
 

@@ -714,8 +714,8 @@
 /* FIXME: do this when filter field loses focus */
 - (void)resetExplorerView
 {
-        [filterField setStringValue:@""];
-        [self filterFiles:self];
+	[filterField setStringValue:@""];
+	[self filterFiles:self];
 }
 
 - (void)explorerClick:(id)sender
@@ -1099,6 +1099,12 @@ doCommandBySelector:(SEL)aSelector
 }
 
 - (BOOL)tab_open:(ViCommand *)command
+{
+	[self openInTab:nil];
+	return YES;
+}
+
+- (BOOL)open:(ViCommand *)command
 {
 	[self explorerDoubleClick:nil];
 	return YES;

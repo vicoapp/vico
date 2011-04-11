@@ -15,7 +15,7 @@ if test "$VERSION" = "$REPO_VERSION"; then
 	EXPIRATION=$(date -v +2w +%s)
 fi
 
-xcodebuild -scheme archive -configuration Release VERSION=$VERSION REPO_VERSION=$REPO_VERSION EXPIRATION=$EXPIRATION || exit
+xcodebuild -scheme archive -configuration Snapshot VERSION=$VERSION REPO_VERSION=$REPO_VERSION EXPIRATION=$EXPIRATION || exit
 
 TMPDMG=vico-tmp.dmg
 /bin/rm -f $TMPDMG
@@ -27,7 +27,7 @@ die()
     exit 1
 }
 
-APP=build/Release/Vico.app
+APP=build/Snapshot/Vico.app
 
 echo "Stripping binary"
 strip $APP/Contents/MacOS/*

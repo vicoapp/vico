@@ -6,6 +6,7 @@ URGENT
 * gq command (or remove from Edit menu)
 * text objects (or remove from Edit menu)
 * disable bookmarks button in toolbar?
+* check printing
 
 BUGS
 ====
@@ -225,3 +226,4 @@ latex.tmbundle
 * [DONE] ship with a default bundle plist
 * [DONE] confirmation dialog when deleting files
 * [DONE] vi navigation of symbol list
+* [DONE] receipt validation

@@ -6,8 +6,8 @@ run: debug
 	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico/app/ViDocument.m
 
 build:
-	rm -rf build/Release/Vico.app
-	xcodebuild -scheme archive EXPIRATION=$$(date -v +1w +%s)
+	rm -rf build/Snapshot/Vico.app
+	xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$$(date -v +1w +%s)
 
 test:
 	xcodebuild -configuration Debug -target Tests

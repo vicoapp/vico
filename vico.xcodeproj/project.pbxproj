@@ -14,6 +14,8 @@
 		9A260671134C50C3002C86FB /* CompletionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A26066F134C50C3002C86FB /* CompletionWindow.xib */; };
 		9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260673134DF8D7002C86FB /* ViCompletion.m */; };
 		9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
+		9A26068113530FF3002C86FB /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A26068013530FF3002C86FB /* main.c */; };
+		9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */; };
 		9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
 		9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2A1133109C20023C5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
@@ -29,7 +31,6 @@
 		9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */; };
 		9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D513310AF90023C5B7 /* WebKit.framework */; };
 		9A2EF37513310CB80023C5B7 /* ber.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D713310C320023C5B7 /* ber.c */; };
-		9A2EF37613310CB80023C5B7 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D913310C320023C5B7 /* debug.c */; };
 		9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2DB13310C320023C5B7 /* ExCommand.m */; };
 		9A2EF37813310CB80023C5B7 /* ExEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2DD13310C320023C5B7 /* ExEnvironment.m */; };
 		9A2EF37B13310CB80023C5B7 /* MHSysTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E213310C330023C5B7 /* MHSysTree.m */; };
@@ -54,7 +55,7 @@
 		9A2EF38E13310CB80023C5B7 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30813310C400023C5B7 /* sha1.c */; };
 		9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30D13310C430023C5B7 /* TMFileURLProtocol.m */; };
 		9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */; };
-		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; settings = {COMPILER_FLAGS = "-DEXPIRATION=${EXPIRATION:-0}"; }; };
+		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; };
 		9A2EF39213310CB80023C5B7 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31313310C460023C5B7 /* ViBgView.m */; };
 		9A2EF39313310CB80023C5B7 /* ViBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31513310C470023C5B7 /* ViBundle.m */; };
 		9A2EF39413310CB80023C5B7 /* ViBundleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31713310C480023C5B7 /* ViBundleCommand.m */; };
@@ -266,6 +267,13 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		9A2606881353105C002C86FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A26067C13530FF3002C86FB;
+			remoteInfo = xorkey;
+		};
 		9A2EF2B2133109C20023C5B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
@@ -290,6 +298,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9A26067B13530FF3002C86FB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		9A2EF40E13310F4D0023C5B7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -347,6 +364,9 @@
 		9A260673134DF8D7002C86FB /* ViCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletion.m; sourceTree = "<group>"; };
 		9A26067613505AEF002C86FB /* ViSymbolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolController.h; sourceTree = "<group>"; };
 		9A26067713505AEF002C86FB /* ViSymbolController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolController.m; sourceTree = "<group>"; };
+		9A26067D13530FF3002C86FB /* xorkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xorkey; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A26068013530FF3002C86FB /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -371,7 +391,6 @@
 		9A2EF2D513310AF90023C5B7 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		9A2EF2D713310C320023C5B7 /* ber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber.c; sourceTree = "<group>"; };
 		9A2EF2D813310C320023C5B7 /* ber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber.h; sourceTree = "<group>"; };
-		9A2EF2D913310C320023C5B7 /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		9A2EF2DA13310C320023C5B7 /* ExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommand.h; sourceTree = "<group>"; };
 		9A2EF2DB13310C320023C5B7 /* ExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommand.m; sourceTree = "<group>"; };
 		9A2EF2DC13310C320023C5B7 /* ExEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExEnvironment.h; sourceTree = "<group>"; };
@@ -721,6 +740,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9A26067A13530FF3002C86FB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF28C133109C10023C5B7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -758,9 +785,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9A26067F13530FF3002C86FB /* xorkey */ = {
+			isa = PBXGroup;
+			children = (
+				9A26068013530FF3002C86FB /* main.c */,
+			);
+			path = xorkey;
+			sourceTree = "<group>";
+		};
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
+				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
 				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
@@ -769,6 +805,7 @@
 				9A2EF2B4133109C20023C5B7 /* Tests */,
 				9A2EF41213310F4D0023C5B7 /* lemon */,
 				9A4346E11331257A002B04DE /* shell tool */,
+				9A26067F13530FF3002C86FB /* xorkey */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
 			);
@@ -781,6 +818,7 @@
 				9A2EF2B0133109C20023C5B7 /* tests.octest */,
 				9A2EF41013310F4D0023C5B7 /* lemon */,
 				9A4346DD1331257A002B04DE /* vicotool */,
+				9A26067D13530FF3002C86FB /* xorkey */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1068,7 +1106,6 @@
 				9AB10BA5133F72E600D81D33 /* ViMap.m */,
 				9A2EF2D713310C320023C5B7 /* ber.c */,
 				9A2EF2D813310C320023C5B7 /* ber.h */,
-				9A2EF2D913310C320023C5B7 /* debug.c */,
 				9A2EF2DA13310C320023C5B7 /* ExCommand.h */,
 				9A2EF2DB13310C320023C5B7 /* ExCommand.m */,
 				9A2EF2DC13310C320023C5B7 /* ExEnvironment.h */,
@@ -1297,10 +1334,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9A26067C13530FF3002C86FB /* xorkey */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A26068313530FF3002C86FB /* Build configuration list for PBXNativeTarget "xorkey" */;
+			buildPhases = (
+				9A26067913530FF3002C86FB /* Sources */,
+				9A26067A13530FF3002C86FB /* Frameworks */,
+				9A26067B13530FF3002C86FB /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = xorkey;
+			productName = xorkey;
+			productReference = 9A26067D13530FF3002C86FB /* xorkey */;
+			productType = "com.apple.product-type.tool";
+		};
 		9A2EF28E133109C10023C5B7 /* Vico */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
 			buildPhases = (
+				9A26068A13531066002C86FB /* Generate receipt validation fingerprints */,
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
 				9A2EF28C133109C10023C5B7 /* Frameworks */,
@@ -1313,6 +1368,7 @@
 				9A2EF41D133110A20023C5B7 /* PBXBuildRule */,
 			);
 			dependencies = (
+				9A2606891353105C002C86FB /* PBXTargetDependency */,
 				9A4346ED1331284C002B04DE /* PBXTargetDependency */,
 				9A2EF41C13310F9B0023C5B7 /* PBXTargetDependency */,
 			);
@@ -1395,6 +1451,7 @@
 				9A2EF2AF133109C20023C5B7 /* Tests */,
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
 				9A4346DC1331257A002B04DE /* vicotool */,
+				9A26067C13530FF3002C86FB /* xorkey */,
 			);
 		};
 /* End PBXProject section */
@@ -1468,6 +1525,22 @@
 			shellScript = "if test \"$BUILD_STYLE\" != \"Release\"; then\n    echo \"ignoring downloading bundle repo in $BUILD_STYLE build\"\n    exit 0\nfi\n\nUSERS=\"textmate\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
 			showEnvVarsInLog = 0;
 		};
+		9A26068A13531066002C86FB /* Generate receipt validation fingerprints */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate receipt validation fingerprints";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/bundle_fingerprint.h",
+				"$(DERIVED_FILE_DIR)/AppleIncRootCertificate.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo -n \"se.bzero.Vico${VERSION}\" | openssl sha1 -binary | ${SOURCE_ROOT}/app/b2h > ${DERIVED_FILE_DIR}/bundle_fingerprint.h\n${BUILT_PRODUCTS_DIR}/xorkey ${SOURCE_ROOT}/app/AppleIncRootCertificate.cer > ${DERIVED_FILE_DIR}/AppleIncRootCertificate.h\n";
+		};
 		9A2EF2AE133109C20023C5B7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1500,6 +1573,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9A26067913530FF3002C86FB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A26068113530FF3002C86FB /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF28B133109C10023C5B7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1507,7 +1588,6 @@
 				9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */,
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
 				9A2EF37513310CB80023C5B7 /* ber.c in Sources */,
-				9A2EF37613310CB80023C5B7 /* debug.c in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
 				9A2EF37813310CB80023C5B7 /* ExEnvironment.m in Sources */,
 				9A2EF37B13310CB80023C5B7 /* MHSysTree.m in Sources */,
@@ -1728,6 +1808,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9A2606891353105C002C86FB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A26067C13530FF3002C86FB /* xorkey */;
+			targetProxy = 9A2606881353105C002C86FB /* PBXContainerItemProxy */;
+		};
 		9A2EF2B3133109C20023C5B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9A2EF28E133109C10023C5B7 /* Vico */;
@@ -1821,12 +1906,147 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		9A2EF2BF133109C20023C5B7 /* Debug */ = {
+		9A26068413530FF3002C86FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		9A26068513530FF3002C86FB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		9A26068B135316F7002C86FB /* Snapshot */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_OBJC_GC = required;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"EXPIRATION=${EXPIRATION:-0}",
+					"NDEBUG=1",
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					json,
+					jscocoa,
+					sftp,
+					oniguruma,
+					universalchardet,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+				TEST_AFTER_BUILD = YES;
+			};
+			name = Snapshot;
+		};
+		9A26068C135316F7002C86FB /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				INFOPLIST_FILE = "app/Vico-Info.plist";
+				OTHER_LDFLAGS = (
+					"-lcrypto",
+					"-lresolv",
+					"-lffi",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Snapshot;
+		};
+		9A26068D135316F7002C86FB /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
+				INFOPLIST_FILE = "tests/Tests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-framework",
+					SenTestingKit,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Snapshot;
+		};
+		9A26068E135316F7002C86FB /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Snapshot;
+		};
+		9A26068F135316F7002C86FB /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "util/vico-Prefix.pch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Snapshot;
+		};
+		9A260690135316F7002C86FB /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Snapshot;
+		};
+		9A2EF2BF133109C20023C5B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -1845,6 +2065,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRIP_INSTALLED_PRODUCT = NO;
+				TEST_AFTER_BUILD = YES;
 			};
 			name = Debug;
 		};
@@ -1852,9 +2074,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: Martin Hedenfalk";
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"RELEASE_BUILD=1",
+					"NDEBUG=1",
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1868,6 +2095,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
+				TEST_AFTER_BUILD = YES;
 			};
 			name = Release;
 		};
@@ -1875,7 +2103,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1897,14 +2124,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
 				INFOPLIST_FILE = "app/Vico-Info.plist";
 				OTHER_LDFLAGS = (
 					"-lcrypto",
@@ -2017,50 +2242,65 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9A26068313530FF3002C86FB /* Build configuration list for PBXNativeTarget "xorkey" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A26068413530FF3002C86FB /* Debug */,
+				9A26068513530FF3002C86FB /* Release */,
+				9A260690135316F7002C86FB /* Snapshot */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Snapshot;
+		};
 		9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2BF133109C20023C5B7 /* Debug */,
 				9A2EF2C0133109C20023C5B7 /* Release */,
+				9A26068B135316F7002C86FB /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Snapshot;
 		};
 		9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2C2133109C20023C5B7 /* Debug */,
 				9A2EF2C3133109C20023C5B7 /* Release */,
+				9A26068C135316F7002C86FB /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Snapshot;
 		};
 		9A2EF2C4133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF2C5133109C20023C5B7 /* Debug */,
 				9A2EF2C6133109C20023C5B7 /* Release */,
+				9A26068D135316F7002C86FB /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Snapshot;
 		};
 		9A2EF41613310F4D0023C5B7 /* Build configuration list for PBXNativeTarget "lemon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A2EF41713310F4D0023C5B7 /* Debug */,
 				9A2EF41813310F4D0023C5B7 /* Release */,
+				9A26068E135316F7002C86FB /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Snapshot;
 		};
 		9A4346E71331257E002B04DE /* Build configuration list for PBXNativeTarget "vicotool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A4346E81331257E002B04DE /* Debug */,
 				9A4346E91331257E002B04DE /* Release */,
+				9A26068F135316F7002C86FB /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Snapshot;
 		};
 /* End XCConfigurationList section */
 	};

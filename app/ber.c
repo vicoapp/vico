@@ -46,6 +46,8 @@ static ssize_t	ber_read_element(struct ber *ber, struct ber_element *elm);
 static ssize_t	ber_getc(struct ber *b, u_char *c);
 static ssize_t	ber_read(struct ber *ber, void *buf, size_t len);
 
+#undef DEBUG
+
 #ifdef DEBUG
 # define DPRINTF(...)	do { fprintf(stderr, "%s:%d: ", __func__, __LINE__); \
 			     fprintf(stderr, __VA_ARGS__); \
@@ -467,8 +469,7 @@ ber_add_noid(struct ber_element *prev, struct ber_oid *o, int n)
 struct ber_element *
 ber_add_oidstring(struct ber_element *prev, const char *oidstr)
 {
-	fprintf(stderr, "ber oidstrings not implemented\n");
-	exit(1);
+	DPRINTF("ber oidstrings not implemented");
 	return NULL;
 }
 
@@ -960,14 +961,7 @@ ber_read_element(struct ber *ber, struct ber_element *elm)
 			elm->be_encoding = BER_TYPE_SEQUENCE;
 		else if (class == BER_CLASS_UNIVERSAL)
 			elm->be_encoding = type;
-		else if (ber->br_application != NULL) {
-			/*
-			 * Ask the application to map the encoding to a
-			 * universal type. For example, a SMI IpAddress
-			 * type is defined as 4 byte OCTET STRING.
-			 */
-			elm->be_encoding = (*ber->br_application)(elm);
-		} else
+		else
 			/* last resort option */
 			elm->be_encoding = BER_TYPE_OCTETSTRING;
 	}
@@ -1079,12 +1073,6 @@ ber_set_readbuf(struct ber *b, void *buf, size_t len)
 	bzero(b, sizeof(*b));
 	b->br_rbuf = b->br_rptr = buf;
 	b->br_rend = (u_int8_t *)buf + len;
-}
-
-void
-ber_set_application(struct ber *b, unsigned long (*cb)(struct ber_element *))
-{
-	b->br_application = cb;
 }
 
 static ssize_t

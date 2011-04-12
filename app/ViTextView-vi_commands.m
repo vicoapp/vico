@@ -2264,9 +2264,11 @@
 		DEBUG(@"indenting line %lu at %lu", [[self textStorage] lineNumberAtLocation:loc], loc);
 		[self getLineStart:&bol end:&loc contentsEnd:NULL forLocation:loc];
 		NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
-		NSString *newIndent = [self suggestedIndentAtLocation:bol];
+		NSString *newIndent = nil;
+		if (![[self textStorage] isBlankLineAtLocation:bol])
+			newIndent = [self suggestedIndentAtLocation:bol];
 		NSRange indentRange = NSMakeRange(bol, curIndent.length);
-		[self replaceRange:indentRange withString:newIndent];
+		[self replaceRange:indentRange withString:newIndent ?: @""];
 		NSInteger delta = [newIndent length] - indentRange.length;
 		loc += delta;
 		endLocation += delta;

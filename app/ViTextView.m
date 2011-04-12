@@ -515,6 +515,8 @@ int logIndent = 0;
 	NSUInteger bol, end;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:location];
 	NSUInteger len = 0;
+	if (bol == 0) /* First line can't be indented. */
+		return 0;
 	for (; bol > 0;) {
 		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:bol - 1];
 		if ([[self textStorage] isBlankLineAtLocation:bol])
@@ -616,7 +618,8 @@ int logIndent = 0;
 				n -= n % shiftWidth;
 		}
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-		if ([[self textStorage] isBlankLineAtLocation:bol])
+		if ([[self textStorage] isBlankLineAtLocation:bol] && updatedCaret)
+			/* XXX: should not indent empty lines when using the < or > operators. */
 			newIndent = indent;
 
 		NSRange indentRange = NSMakeRange(bol, [indent length]);

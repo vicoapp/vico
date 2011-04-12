@@ -611,7 +611,8 @@ int logIndent = 0;
 	while (bol < NSMaxRange(aRange)) {
 		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
 		NSUInteger n = [self lengthOfIndentString:indent];
-		if (n % shiftWidth != 0) {
+		if (n % shiftWidth != 0 && !updatedCaret) {
+			/* XXX: updatedCaret is nil when called from ctrl-t / ctrl-d */
 			if (delta < 0)
 				n += shiftWidth - (n % shiftWidth);
 			else

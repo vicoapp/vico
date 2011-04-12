@@ -69,6 +69,8 @@
 (imap setKey:"<ctrl-c>" toAction:"normal_mode:")
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
+(imap map:"<cmd-z>" to:"<esc>u")
+(imap map:"<cmd-Z>" to:"<esc><cmd-Z>")
 
 
 
@@ -207,6 +209,8 @@
 (nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
 (nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
 (nmap map:"<ctrl-s>" to:":tbuffer <ctrl-b>")
+(nmap setKey:"<cmd-z>" toAction:"undo:")
+(nmap setKey:"<cmd-Z>" toAction:"redo:")
 ;; <C-w> prefix
 (nmap include:wmap)
 ;; g prefix

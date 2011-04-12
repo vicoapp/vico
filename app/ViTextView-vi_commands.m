@@ -2069,7 +2069,7 @@
 	NSRange range;
 	NSString *path = [[self textStorage] pathAtLocation:start_location
 						      range:&range
-					        acceptAfter:YES];
+						acceptAfter:YES];
 	if (path == nil) {
 		path = @"";
 		range = NSMakeRange([self caret], 0);

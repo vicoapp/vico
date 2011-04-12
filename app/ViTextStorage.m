@@ -552,7 +552,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                        range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter
 {
-	NSMutableCharacterSet *pathSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_/-.:"];
+	NSMutableCharacterSet *pathSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_/-.:~"];
 	[pathSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 
 	if (acceptAfter &&

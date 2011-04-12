@@ -7,7 +7,7 @@ URGENT
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
 * clone modified bundles to vicoapp@github ?
-* :edit ~/file doesn't expand tilde
+* modified status is not updated immediately, ok after escape?
 
 BUGS
 ====
@@ -233,3 +233,4 @@ latex.tmbundle
 * [DONE] > command should not indent empty lines
 * [DONE] autoindent should not just copy indentation string, but honor expandtab setting
 * [DONE] increase/decrease indent (ctrl-t/ctrl-d in insert mode) should align to shiftwidth from beginning of line
+* [DONE] :edit ~/file doesn't expand tilde

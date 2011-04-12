@@ -586,12 +586,14 @@
 	if (eol < end)
 		affectedRange.length--;
 
-        NSString *leading_whitespace = nil;
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
-                leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:affectedRange.location];
+	NSString *leading_whitespace = [self suggestedIndentAtLocation:affectedRange.location];
 
 	[self cutToRegister:command.reg range:affectedRange];
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];
+	NSRange autoIndentRange = NSMakeRange(bol, [leading_whitespace length]);
+	[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoIndentAttributeName
+							    value:[NSNumber numberWithInt:1]
+						forCharacterRange:autoIndentRange];
 
 	/* a command count should not be treated as a count for the inserted text */
 	command.count = 0;
@@ -1028,8 +1030,7 @@
 - (BOOL)open_line_below:(ViCommand *)command
 {
 	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
-	NSInteger num_chars = [self insertNewlineAtLocation:end_location indentForward:YES];
-	end_location += num_chars; // insert mode starts at end_location
+	end_location = [self insertNewlineAtLocation:end_location indentForward:YES];
  	final_location = end_location;
 
 	[self setInsertMode:command];
@@ -1041,8 +1042,8 @@
 {
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	NSInteger num_chars = [self insertNewlineAtLocation:bol indentForward:NO];
-	final_location = end_location = bol - 1 + num_chars;
+	end_location = [self insertNewlineAtLocation:bol indentForward:NO];
+ 	final_location = end_location;
 
 	[self setInsertMode:command];
 	return YES;
@@ -2235,6 +2236,8 @@
 	NSMutableArray *buffers = [NSMutableArray array];
 	for (ViDocument *doc in [[[self window] windowController] documents]) {
 		NSString *fn = [[doc fileURL] absoluteString];
+		if (fn == nil)
+			continue;
 		ViRegexpMatch *m = nil;
 		if (pattern == nil || (m = [rx matchInString:fn]) != nil) {
 			ViCompletion *c;
@@ -2248,6 +2251,28 @@
 
 	if (![self presentCompletions:buffers fromRange:range options:command.mapping.parameter])
 		return NO;
+	return YES;
+}
+
+- (BOOL)indent:(ViCommand *)command
+{
+	DEBUG(@"indenting range %@", NSStringFromRange(affectedRange));
+	NSUInteger endLocation = NSMaxRange(affectedRange);
+	NSUInteger loc = affectedRange.location;
+	NSUInteger bol;
+	while (loc < endLocation) {
+		DEBUG(@"indenting line %lu at %lu", [[self textStorage] lineNumberAtLocation:loc], loc);
+		[self getLineStart:&bol end:&loc contentsEnd:NULL forLocation:loc];
+		NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
+		NSString *newIndent = [self suggestedIndentAtLocation:bol];
+		NSRange indentRange = NSMakeRange(bol, curIndent.length);
+		[self replaceRange:indentRange withString:newIndent];
+		NSInteger delta = [newIndent length] - indentRange.length;
+		loc += delta;
+		endLocation += delta;
+	}
+
+	final_location = [[self textStorage] firstNonBlankAtLocation:affectedRange.location];
 	return YES;
 }
 

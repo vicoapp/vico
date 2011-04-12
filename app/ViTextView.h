@@ -86,7 +86,13 @@
 - (NSString *)indentStringOfLength:(NSInteger)length;
 - (NSString *)indentStringForLevel:(int)level;
 - (NSUInteger)lengthOfIndentString:(NSString *)indent;
-- (NSUInteger)lenghtOfIndentAtLine:(NSUInteger)lineLocation;
+- (NSUInteger)lengthOfIndentAtLocation:(NSUInteger)aLocation;
+- (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation;
+- (BOOL)shouldDecreaseIndentAtLocation:(NSUInteger)aLocation;
+- (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation;
+- (BOOL)shouldIncreaseIndentOnceAtLocation:(NSUInteger)aLocation;
+- (BOOL)shouldIgnoreIndentAtLocation:(NSUInteger)aLocation;
+- (NSString *)suggestedIndentAtLocation:(NSUInteger)location;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
@@ -119,7 +125,7 @@
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup;
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString;
 
-- (NSInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
+- (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
 
 - (void)yankToRegister:(unichar)regName
                  range:(NSRange)yankRange;

@@ -93,8 +93,11 @@ TAILQ_HEAD(skiplist, skip);
                    fromLocation:(NSUInteger)aLocation
                       acceptEOL:(BOOL)acceptEOL;
 
+- (NSRange)rangeOfLineAtLocation:(NSUInteger)aLocation;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfLeadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
+- (NSUInteger)firstNonBlankAtLocation:(NSUInteger)aLocation;
 
 @end

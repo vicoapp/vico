@@ -28,6 +28,7 @@ int logIndent = 0;
                        undoGroup:(BOOL)undoGroup;
 - (void)setVisualSelection;
 - (void)updateStatus;
+- (NSUInteger)removeTrailingAutoIndentForLineAtLocation:(NSUInteger)aLocation;
 @end
 
 #pragma mark -
@@ -402,20 +403,37 @@ int logIndent = 0;
 		if (c == ' ')
 			++length;
 		else if (c == '\t')
-			length += tabStop;
+			length += tabStop - (length % tabStop);
 	}
 
 	return length;
 }
 
-- (NSUInteger)lenghtOfIndentAtLine:(NSUInteger)lineLocation
+- (NSUInteger)lengthOfIndentAtLocation:(NSUInteger)aLocation
 {
-	return [self lengthOfIndentString:[[self textStorage] leadingWhitespaceForLineAtLocation:lineLocation]];
+	return [self lengthOfIndentString:[[self textStorage] leadingWhitespaceForLineAtLocation:aLocation]];
 }
 
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"increaseIndentPattern"];
+	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
+
+	if (bestMatchingScope) {
+		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
+		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
+
+		if ([rx matchInString:checkLine])
+			return YES;
+	}
+
+	return NO;
+}
+
+- (BOOL)shouldIncreaseIndentOnceAtLocation:(NSUInteger)aLocation
+{
+	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"indentNextLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -447,7 +465,7 @@ int logIndent = 0;
 	return NO;
 }
 
-- (BOOL)shouldUnIndentLineAtLocation:(NSUInteger)aLocation
+- (BOOL)shouldIgnoreIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"unIndentedLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
@@ -485,41 +503,98 @@ int logIndent = 0;
 	return -1;
 }
 
-- (NSInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
+- (NSString *)suggestedIndentAtLocation:(NSUInteger)location
 {
-        NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
+	NSInteger calcIndent = [self calculatedIndentLengthAtLocation:location];
+	if (calcIndent >= 0) {
+		DEBUG(@"calculated indent at %lu to %lu", location, calcIndent);
+		return [self indentStringOfLength:calcIndent];
+	}
 
-	[self insertString:@"\n" atLocation:aLocation];
-
-        if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-                                    atCharacterIndex:aLocation + 1
-                                      effectiveRange:NULL] && aLocation > 0)
-        {
-		// assumes indentForward
-                [self insertString:[NSString stringWithFormat:@"\n%@", leading_whitespace] atLocation:aLocation + 1];
-        }
-
-	if (aLocation != 0 && [[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState)
-	{
-		NSUInteger checkLocation = aLocation;
-		if (indentForward)
-			checkLocation = aLocation - 1;
-
-		NSInteger calcIndent = [self calculatedIndentLengthAtLocation:checkLocation];
-		if (calcIndent >= 0) {
-			leading_whitespace = [self indentStringOfLength:calcIndent];
-		} else if ([self shouldIncreaseIndentAtLocation:checkLocation]) {
-			NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
-			leading_whitespace = [self indentStringOfLength:[self lengthOfIndentString:leading_whitespace] + shiftWidth];
-		}
-
-		if (leading_whitespace) {
-			[self insertString:leading_whitespace atLocation:aLocation + (indentForward ? 1 : 0)];
-			return 1 + [leading_whitespace length];
+	/* Find out indentation of first (non-blank) line before the affected range. */
+	NSUInteger bol, end;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:location];
+	NSUInteger len = 0;
+	for (; bol > 0;) {
+		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:bol - 1];
+		if ([[self textStorage] isBlankLineAtLocation:bol])
+			DEBUG(@"line %lu is blank", [[self textStorage] lineNumberAtLocation:bol]);
+		else if ([self shouldIgnoreIndentAtLocation:bol])
+			DEBUG(@"line %lu is ignored", [[self textStorage] lineNumberAtLocation:bol]);
+		else {
+			len = [self lengthOfIndentAtLocation:bol];
+			DEBUG(@"indent at line %lu is %lu", [[self textStorage] lineNumberAtLocation:bol], len);
+			break;
 		}
 	}
 
-	return 1;
+	NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+	if (![self shouldIgnoreIndentAtLocation:bol]) {
+		if ([self shouldIncreaseIndentAtLocation:bol] ||
+		    [self shouldIncreaseIndentOnceAtLocation:bol]) {
+			DEBUG(@"increase indent at %lu", bol);
+			len += shiftWidth;
+		} else {
+			/* Check if previous lines are indented by an indentNextLinePattern. */
+			while (bol > 0) {
+				[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:bol - 1];
+				if ([self shouldIgnoreIndentAtLocation:bol]) {
+					continue;
+				} if ([self shouldIncreaseIndentOnceAtLocation:bol]) {
+					DEBUG(@"compensating for indentNextLinePattern at line %lu",
+					    [[self textStorage] lineNumberAtLocation:bol]);
+					len -= shiftWidth;
+				} else
+					break;
+			}
+	
+			if ([self shouldDecreaseIndentAtLocation:location]) {
+				DEBUG(@"decrease indent at %lu", location);
+				len -= shiftWidth;
+			}
+		}
+	}
+
+	return [self indentStringOfLength:len];
+}
+
+- (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
+{
+	NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
+
+	aLocation = [self removeTrailingAutoIndentForLineAtLocation:aLocation];
+
+	NSRange smartRange;
+	if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+				    atCharacterIndex:aLocation
+				      effectiveRange:&smartRange] && smartRange.length > 1)
+	{
+		// assumes indentForward
+		[self insertString:[NSString stringWithFormat:@"\n\n%@", leading_whitespace] atLocation:aLocation];
+	} else
+		[self insertString:@"\n" atLocation:aLocation];
+
+	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState) {
+		if (indentForward)
+			aLocation += 1;
+
+		[self setCaret:aLocation];
+		leading_whitespace = [self suggestedIndentAtLocation:aLocation];
+		if (leading_whitespace) {
+			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
+			[self replaceCharactersInRange:curIndent withString:leading_whitespace];
+			NSRange autoIndentRange = NSMakeRange(curIndent.location, [leading_whitespace length]);
+			[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoIndentAttributeName
+									    value:[NSNumber numberWithInt:1]
+								forCharacterRange:autoIndentRange];
+			return aLocation + autoIndentRange.length;
+		}
+	}
+
+	if (indentForward)
+		return aLocation + 1;
+	else
+		return aLocation;
 }
 
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret
@@ -534,20 +609,26 @@ int logIndent = 0;
 	while (bol < NSMaxRange(aRange)) {
 		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
 		NSUInteger n = [self lengthOfIndentString:indent];
+		if (n % shiftWidth != 0) {
+			if (delta < 0)
+				n += shiftWidth - (n % shiftWidth);
+			else
+				n -= n % shiftWidth;
+		}
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-	
+		if ([[self textStorage] isBlankLineAtLocation:bol])
+			newIndent = indent;
+
 		NSRange indentRange = NSMakeRange(bol, [indent length]);
 		[self replaceRange:indentRange withString:newIndent];
 
 		aRange.length += [newIndent length] - [indent length];
-		if (!has_delta_offset)
-		{
-          		has_delta_offset = YES;
+		if (!has_delta_offset) {
+			has_delta_offset = YES;
 			delta_offset.location = [newIndent length] - [indent length];
-                }
+		}
 		delta_offset.length += [newIndent length] - [indent length];
-		if (updatedCaret && *updatedCaret >= indentRange.location)
-		{
+		if (updatedCaret && *updatedCaret >= indentRange.location) {
 			NSInteger d = [newIndent length] - [indent length];
 			*updatedCaret = IMAX((NSInteger)*updatedCaret + d, bol);
 		}
@@ -568,11 +649,11 @@ int logIndent = 0;
 
 - (BOOL)increase_indent:(ViCommand *)command
 {
-        NSUInteger bol, eol;
+	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-        NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
-        final_location = start_location + n.location;
-        return YES;
+	NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
+	final_location = start_location + n.location;
+	return YES;
 }
 
 - (BOOL)decrease_indent:(ViCommand *)command
@@ -580,8 +661,8 @@ int logIndent = 0;
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	NSRange n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
-        final_location = start_location + n.location;
-        return YES;
+	final_location = start_location + n.location;
+	return YES;
 }
 
 #pragma mark -
@@ -1106,18 +1187,6 @@ int logIndent = 0;
 			atLocation:start_location];
 		final_location = modify_start_location + 1;
 	}
-
-#if 0
-	if ([self shouldDecreaseIndentAtLocation:insert_end_location]) {
-                int n = [self changeIndentation:-1 inRange:NSMakeRange(insert_end_location, 1)];
-		insert_start_location += n;
-		insert_end_location += n;
-	} else if ([self shouldUnIndentLineAtLocation:insert_end_location]) {
-                int n = [self changeIndentation:-1000 inRange:NSMakeRange(insert_end_location, 1)];
-		insert_start_location += n;
-		insert_end_location += n;
-	}
-#endif
 }
 
 - (BOOL)literal_next:(ViCommand *)command
@@ -1152,9 +1221,8 @@ int logIndent = 0;
 
 - (BOOL)input_newline:(ViCommand *)command
 {
-	NSInteger num_chars = [self insertNewlineAtLocation:start_location
-					      indentForward:YES];
-	final_location = start_location + num_chars;
+	final_location = [self insertNewlineAtLocation:start_location
+					 indentForward:YES];
 	return YES;
 }
 
@@ -1258,6 +1326,26 @@ int logIndent = 0;
 	return YES;
 }
 
+- (NSUInteger)removeTrailingAutoIndentForLineAtLocation:(NSUInteger)aLocation
+{
+	DEBUG(@"checking for auto-indent at %lu", aLocation);
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
+	NSRange r;
+	if ([[self layoutManager] temporaryAttribute:ViAutoIndentAttributeName
+				    atCharacterIndex:bol
+				      effectiveRange:&r]) {
+		DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
+		if (r.location == bol && NSMaxRange(r) == eol) {
+			[self replaceCharactersInRange:NSMakeRange(bol, eol - bol) withString:@""];
+			return bol;
+
+		}
+	}
+
+	return aLocation;
+}
+
 - (BOOL)normal_mode:(ViCommand *)command
 {
 	if (mode == ViInsertMode) {
@@ -1288,6 +1376,8 @@ int logIndent = 0;
 		start_location = end_location = [self caret];
 		[self move_left:nil];
 	}
+
+	final_location = [self removeTrailingAutoIndentForLineAtLocation:final_location];
 
 	[self setNormalMode];
 	[self setCaret:final_location];
@@ -1475,12 +1565,7 @@ int logIndent = 0;
 		/* ...and > */
 		/* ...and < */
 		// FIXME: this is not a generic case!
-		NSUInteger bol;
-		[self getLineStart:&bol
-			       end:NULL
-		       contentsEnd:NULL
-		       forLocation:final_location];
-		final_location = bol;
+		final_location = [[self textStorage] firstNonBlankAtLocation:final_location];
 	}
 
 	if (leaveVisualMode && mode == ViVisualMode) {
@@ -1585,16 +1670,6 @@ int logIndent = 0;
 - (BOOL)keyManager:(ViKeyManager *)aKeyManager
     shouldParseKey:(NSInteger)keyCode
 {
-#if 0
-	NSResponder *r = [[self window] firstResponder];
-	if (r && r != self && r == [[self window] fieldEditor:NO forObject:nil]) {
-		/* Pass the (generated) event to the ex command line. */
-		INFO(@"passing generated key event to ex command line %@", r);
-		[r keyDown:theEvent];
-		return;
-	}
-#endif
-
 	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
 		/* Add the key to the input replay queue. */
 		[inputKeys addObject:[NSNumber numberWithInteger:keyCode]];

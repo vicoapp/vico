@@ -12,6 +12,8 @@
 	unichar argument;
 	unichar reg;
 	id text;
+	NSRange affectedRange;
+	NSUInteger finalLocation;
 }
 
 @property (readonly) ViMapping *mapping;
@@ -25,6 +27,8 @@
 @property (readwrite) ViCommand *motion;
 @property (readwrite) ViCommand *operator;
 @property (readwrite) id text;
+@property (readwrite) NSRange affectedRange;
+@property (readwrite) NSUInteger finalLocation;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping
                             count:(int)aCount;

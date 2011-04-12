@@ -25,6 +25,7 @@
 	    (?! .* [;:{}]                   # do not indent when line ends with ;, :, {, or }
 	        \s* (//|/[*] .* [*]/ \s* $) #  …account for potential trailing comment
 	    |   @(public|private|protected) # do not indent after obj-c data access keywords
+	    |   (-|[+]) \s* [(]                 # do not indent after obj-c method definitions
 	    )
 	    .* [^\s;:{}] \s* $              # indent next if this one isn’t
 	                                    #  terminated with ;, :, {, or }

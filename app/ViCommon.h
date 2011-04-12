@@ -2,6 +2,7 @@
 #define ViSearchOptionBackwards 1
 
 #define ViSmartPairAttributeName @"ViSmartPair"
+#define ViAutoIndentAttributeName @"ViAutoIndent"
 #define ViContinuationAttributeName @"ViContinuation"
 
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"

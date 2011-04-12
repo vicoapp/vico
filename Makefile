@@ -1,5 +1,5 @@
 debug:
-#	rm -rf build/Debug/Vico.app
+	rm -rf build/Debug/Vico.app
 	xcodebuild -configuration Debug EXPIRATION=0
 
 run: debug

@@ -2,9 +2,12 @@ URGENT
 ========
 * use "git clone" when installing bundles(?)
 * implement "new file" and "new folder" in explorer menu
-* = command (or remove from Edit menu)
 * gq command (or remove from Edit menu)
 * text objects (or remove from Edit menu)
+* bundle commands time out when presenting ui
+* bundled bundles are not shown as installed in preferences
+* clone modified bundles to vicoapp@github ?
+* :edit ~/file doesn't expand tilde
 
 BUGS
 ====
@@ -20,6 +23,7 @@ BUGS
 
 IMPORTANT
 =========
+* Reload themes!
 * cmd-t fuzzy search feels *slow*
 * bundle-specific nu startup scripts (nu/main.nu)
 * global nu startup script in application support folder
@@ -40,6 +44,7 @@ IMPORTANT
 
 FEATURES
 ========
+* completion expressions in nu
 * zt, zz, zb (scroll cursor to top, center, bottom)
 * ZZ and ZQ, and make :q just close the current document (?)
 * p/P with a count
@@ -59,7 +64,6 @@ FEATURES
 * set listchars
 * search and replace
 * symbol list should use same filtering algorithm as file explorer
-* > command should not indent empty lines
 * option to hide the tab bar
 * option to open files in the same view per default (ie, not tabs)
 * vimtutor
@@ -68,7 +72,6 @@ FEATURES
 * escape after creating new line should blank the line
 * history in explorer view + go back/forward with swiping
 * :normal!
-* = (re-indent)
 * global shell variables (in preferences)
 * project shell variables
 * draw marks in gutter view
@@ -226,3 +229,7 @@ latex.tmbundle
 * [DONE] vi navigation of symbol list
 * [DONE] receipt validation
 * [DONE] disable bookmarks button in toolbar
+* [DONE] = command (re-indent)
+* [DONE] > command should not indent empty lines
+* [DONE] autoindent should not just copy indentation string, but honor expandtab setting
+* [DONE] increase/decrease indent (ctrl-t/ctrl-d in insert mode) should align to shiftwidth from beginning of line

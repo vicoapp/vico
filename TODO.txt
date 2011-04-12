@@ -7,10 +7,10 @@ URGENT
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
 * clone modified bundles to vicoapp@github ?
-* modified status is not updated immediately, ok after escape?
 
 BUGS
 ====
+* modified status is not updated immediately, ok after escape?
 * get rid of ViBgView
 * clicking a binary file (pdf, image) in explorer opens as text
 * switch undo direction after bundle command
@@ -234,3 +234,4 @@ latex.tmbundle
 * [DONE] autoindent should not just copy indentation string, but honor expandtab setting
 * [DONE] increase/decrease indent (ctrl-t/ctrl-d in insert mode) should align to shiftwidth from beginning of line
 * [DONE] :edit ~/file doesn't expand tilde
+* [DONE] while filtering symbols, selection should be updated

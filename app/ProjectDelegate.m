@@ -1074,7 +1074,16 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
-- (BOOL)cancel_explorer:(ViCommand *)command
+- (BOOL)cancel_or_reset:(ViCommand *)command
+{
+	if (isFiltered)
+		[self resetExplorerView];
+	else
+		[self cancelExplorer];
+	return YES;
+}
+
+- (BOOL)cancel:(ViCommand *)command
 {
 	[self cancelExplorer];
 	return YES;

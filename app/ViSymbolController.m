@@ -136,7 +136,6 @@
 	return (BOOL)[target performSelector:command.action withObject:command];
 }
 
-#if 0
 - (void)selectFirstMatchingSymbolForFilter:(NSString *)filter
 {
 	NSUInteger row;
@@ -167,7 +166,6 @@
 		}
 	}
 }
-#endif
 
 - (IBAction)filterSymbols:(id)sender
 {
@@ -203,7 +201,7 @@
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
 	[symbolView expandItem:nil expandChildren:YES];
-	//[self selectFirstMatchingSymbolForFilter:filter];
+	[self selectFirstMatchingSymbolForFilter:filter];
 }
 
 - (void)filterSymbols
@@ -399,12 +397,18 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
-- (BOOL)cancel_symbols:(ViCommand *)command
+- (BOOL)cancel_or_reset:(ViCommand *)command
 {
 	if (isFiltered)
 		[self resetSymbolList];
 	else
 		[self cancelSymbolList];
+	return YES;
+}
+
+- (BOOL)cancel:(ViCommand *)command
+{
+	[self cancelSymbolList];
 	return YES;
 }
 

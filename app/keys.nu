@@ -303,6 +303,8 @@
 (emap include:sidemap)
 (emap setKey:"<c-l>" toAction:"rescan_files:")
 (emap setKey:"<esc>" toAction:"cancel_explorer:")
+(emap setKey:"<esc>" toAction:"cancel:")
+(emap setKey:"<ctrl-c>" toAction:"cancel_or_reset:")
 (emap setKey:"N" toAction:"new_folder:")
 (emap setKey:"dd" toAction:"remove_files:")
 (emap setKey:"n" toAction:"new_document:")
@@ -317,7 +319,8 @@
 ;; symbol map
 (set smap (ViMap symbolMap))
 (smap include:sidemap)
-(smap setKey:"<esc>" toAction:"cancel_symbols:")
+(smap setKey:"<esc>" toAction:"cancel:")
+(smap setKey:"<ctrl-c>" toAction:"cancel_or_reset:")
 (smap setKey:"o" toAction:"switch_open:")
 (smap setKey:"s" toAction:"split_open:")
 (smap setKey:"t" toAction:"tab_open:")

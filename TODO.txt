@@ -5,7 +5,6 @@ URGENT
 * = command (or remove from Edit menu)
 * gq command (or remove from Edit menu)
 * text objects (or remove from Edit menu)
-* check printing
 
 BUGS
 ====

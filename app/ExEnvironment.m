@@ -506,7 +506,7 @@ filter_write(CFSocketRef s,
 	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
 	// accept cancel button from sheet -> terminate task and cancel filter
 
-	NSString *mode = @"ViFilterRunLoopMode";
+	NSString *mode = ViFilterRunLoopMode;
 
 
 	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];

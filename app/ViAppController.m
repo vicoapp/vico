@@ -163,12 +163,12 @@
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
-#if defined(EXPIRATION) && EXPIRATION > 0
+#if defined(SNAPSHOT_BUILD) && defined(EXPIRATION) && EXPIRATION > 0
 #warning Enabling time-based expiration of development build
 	time_t expire_at = EXPIRATION;
 	DEBUG(@"checking expiration date at %s", ctime(&expire_at));
+	NSAlert *alert = [[NSAlert alloc] init];
 	if (time(NULL) > expire_at) {
-		NSAlert *alert = [[NSAlert alloc] init];
 		[alert setMessageText:@"This development version has expired."];
 		[alert addButtonWithTitle:@"Quit"];
 		[alert addButtonWithTitle:@"Download new version"];
@@ -177,6 +177,17 @@
 		if (ret == NSAlertSecondButtonReturn)
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
 		exit(7);
+	} else if (![userDefs boolForKey:@"devVersionInfoSuppress"]) {
+		[alert setMessageText:@"This is a development version."];
+		[alert addButtonWithTitle:@"OK"];
+		NSString *expireAt = [[NSDate dateWithTimeIntervalSince1970:expire_at] descriptionWithLocale:[NSLocale currentLocale]];
+		[alert setInformativeText:[NSString stringWithFormat:@"Development versions have a limited validity period for you to test the program. This version expires at %@. If you want to continue testing after this, you should download a new version.", expireAt]];
+		[alert setShowsSuppressionButton:YES];
+		[alert runModal];
+		if ([[alert suppressionButton] state] == NSOnState) {
+			// Suppress this alert from now on.
+			[userDefs setBool:YES forKey:@"devVersionInfoSuppress"];
+		}
 	}
 #endif
 

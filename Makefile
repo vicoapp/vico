@@ -7,7 +7,7 @@ run: debug
 
 build:
 	rm -rf build/Snapshot/Vico.app
-	xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$$(date -v +1w +%s)
+	xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$$(date -v +10M +%s)
 
 test:
 	xcodebuild -configuration Debug -target Tests

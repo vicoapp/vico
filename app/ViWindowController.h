@@ -72,7 +72,8 @@
 @property(readonly) ProjectDelegate *explorer;
 @property(readonly) ViTagStack *tagStack;
 @property(readonly) ViTagsDatabase *tagsDatabase;
-@property (readwrite) BOOL jumping; /* XXX: need better API! */
+@property(readwrite) BOOL jumping; /* XXX: need better API! */
+@property(readonly) __weak ViDocument *previousDocument;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;

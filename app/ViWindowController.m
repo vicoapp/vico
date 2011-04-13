@@ -39,6 +39,7 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize explorer = projectDelegate;
 @synthesize jumpList, jumping;
 @synthesize tagStack, tagsDatabase;
+@synthesize previousDocument;
 
 + (ViWindowController *)currentWindowController
 {

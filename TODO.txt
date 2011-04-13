@@ -160,7 +160,7 @@ latex.tmbundle
 
 
 * [DONE] vim-style undo + preference
-* [DONE] (nvi-style) undo and dot don't play nice together
+* [DONE]  (nvi-style) undo and dot don't play nice together
 * [DONE] dot should not be local to a document VIEW! => global per window controller
 * [DONE] opening and saving new files, check file names, no "doesn't exist" alert!
 * [DONE] splitting views messes up the caret in the current buffer

@@ -591,6 +591,10 @@
 	}];
 }
 
+- (IBAction)newDocument:(id)sender
+{
+}
+
 - (IBAction)newFolder:(id)sender
 {
 	NSIndexSet *set = [self clickedIndexes];
@@ -702,6 +706,9 @@
 	if (![[[explorer itemAtRow:[set firstIndex]] url] isFileURL] &&
 	    ([menuItem action] == @selector(revealInFinder:) ||
 	     [menuItem action] == @selector(openWithFinder:)))
+		return NO;
+
+	if ([menuItem action] == @selector(newDocument:))
 		return NO;
 
 	return YES;

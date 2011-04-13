@@ -18,11 +18,11 @@
 (set NSNotFound -1)
 (set string ((text textStorage) string))
 (set lineRange ((text textStorage) rangeOfLineAtLocation:(text caret)))
-(NSLog (NSString stringWithFormat:"line range is #{lineRange}"))
+;(NSLog (NSString stringWithFormat:"line range is #{lineRange}"))
 (set range (text rangeOfScopeSelector:"meta.bracketed.objc" atLocation:(text caret)))
-(NSLog (NSString stringWithFormat:"scope range is #{range}"))
+;(NSLog (NSString stringWithFormat:"scope range is #{range}"))
 (if (&lt; (first lineRange) (first range))
-	(NSLog (NSString stringWithFormat:"scope range doesn't span previous line"))
+	;(NSLog (NSString stringWithFormat:"scope range doesn't span previous line"))
 	-1
 (else
 	; find first colon
@@ -30,16 +30,16 @@
 	(set location (first colonRange))
 	(if (and (not (eq location NSNotFound)) (&lt; location (first lineRange)))
 		(set col ((text textStorage) columnAtLocation:location))
-		(NSLog (NSString stringWithFormat:"first colon is at column #{col}"))
+		;(NSLog (NSString stringWithFormat:"first colon is at column #{col}"))
 		; now find the first colon on the current line
 		;(set r `(,(text caret) ,(- (+ (first range) (second range)) (text caret))))
 		(set colon2 (((text textStorage) string) rangeOfString:":" options:0 range:lineRange))
-		(NSLog (NSString stringWithFormat:"second colon is at #{colon2}"))
+		;(NSLog (NSString stringWithFormat:"second colon is at #{colon2}"))
 		(if (eq (first colon2) NSNotFound)
 			-1
 			(else
 				(set col2 ((text textStorage) columnAtLocation:(first colon2)))
-				(NSLog (NSString stringWithFormat:"second colon is at column #{col2}"))
+				;(NSLog (NSString stringWithFormat:"second colon is at column #{col2}"))
 				(set curIndent (text lengthOfIndentAtLocation:(text caret)))
 				(set indent (- col (- col2 curIndent)))
 				(if (&lt; indent 0) 0 (else indent))) )

@@ -4,7 +4,7 @@
 (set ViMapLineMode 8)
 (set ViMapNeedArgument 16)
 
-(NSLog "loading key mappings")
+(puts "loading key mappings")
 
 ;; arrow motions, also valid in insert mode
 (set amap (ViMap mapWithName:"arrowMap"))

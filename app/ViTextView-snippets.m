@@ -66,6 +66,7 @@
 		[self setNormalMode];
 
 	[self resetSelection];
+	[self updateStatus];
 
 	return snippet;
 }

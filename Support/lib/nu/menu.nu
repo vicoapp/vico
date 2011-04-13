@@ -38,8 +38,6 @@
 		(@shellCommand exitWithObject:ret)
 		(set @shellCommand nil)))
 
-(set NSRightMouseDown 3)
-
 ; FIXME: why doesn't this work directly? need to run the runloop once?
 ((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
 ;((NSRunLoop mainRunLoop) runMode:NSDefaultRunLoopMode beforeDate:(NSDate distantFuture))
@@ -49,6 +47,7 @@
 (set menu ((NSMenu alloc) initWithTitle:"a menu"))
 (menu setAllowsContextMenuPlugIns:NO)
 (set tag 1)
+; FIXME: should read 'menuList' variable here
 ('("one" "two" "three") each: (do (title)
 	(set key "")
 	(if (<= tag 10)
@@ -60,19 +59,8 @@
 	(item setTag:tag)
 	(item setRepresentedObject:title)))
 
-(set range `(,(text caret) 0))
-(set rect ((text layoutManager) boundingRectForGlyphRange:range inTextContainer:(text textContainer)))
-(set point (cons (first rect) (list (second rect))))
-(set ev (NSEvent mouseEventWithType:NSRightMouseDown
-			   location:(text convertPoint:point toView:nil)
-		      modifierFlags:0
-			  timestamp:((NSDate date) timeIntervalSinceNow)
-		       windowNumber:((text window) windowNumber)
-			    context:(NSGraphicsContext currentContext)
-		        eventNumber:0
-			 clickCount:1
-			   pressure:1.0))
-(NSMenu popUpContextMenu:menu withEvent:ev forView:text)
+; this pops up the menu at the carets location in the current text view
+(text popUpContextMenu:menu)
 (unless (target itemSelected)
 	(shellCommand exitWithError:1))
 	

@@ -15,11 +15,12 @@ test:
 release:
 	./release.sh
 
+TARDATE := $(shell date +%Y%m%d%H)
+TARBALL  = vico-hg-$(TARDATE).tar.gz
 tarball:
-	FILE="vico-hg-$(date +%Y%m%d%H).tar.gz" \
-	tar zcvf $FILE .hg && \
-	gpg -r martin -e $FILE && \
-	rm $FILE
+	tar zcvf $(TARBALL) .hg && \
+	gpg -r martin -e $(TARBALL) && \
+	rm $(TARBALL)
 
 clean:
 	xcodebuild -configuration Debug clean

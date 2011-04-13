@@ -629,10 +629,6 @@
 	}
 }
 
-- (IBAction)newDocument:(id)sender
-{
-}
-
 - (IBAction)bookmarkFolder:(id)sender
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

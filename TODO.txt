@@ -125,7 +125,7 @@ There are nine types of registers:			*registers* *E354*
 [DONE] 7. The selection registers "*, "+
 7. The drop register "~ 
 [DONE] 8. The black hole register "_
-[DONW] 9. Last search pattern register "/
+[DONE] 9. Last search pattern register "/
 
 
 
@@ -143,7 +143,7 @@ latex.tmbundle
 [OK] php.tmbundle
 [OK] diff.tmbundle
 [OK] python.tmbundle
-[SORTOFOK] ruby-on-rails.tmbundle  FIXME: txmt:// URL!
+[OK] ruby-on-rails.tmbundle
 [OK] css.tmbundle
 [OK] ruby.tmbundle
 [OK] html.tmbundle  FIXME: completion not removed

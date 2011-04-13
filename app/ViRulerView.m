@@ -161,7 +161,7 @@
 			// Draw string flush right, centered vertically within the line
 			NSRect rect;
 			rect.origin.x = NSWidth(bounds) - stringSize.width - RULER_MARGIN;
-			rect.origin.y = ypos + (NSHeight(rects[0]) - stringSize.height) / 2.0;
+			rect.origin.y = ypos + (NSHeight(rects[0]) - stringSize.height) / 2.0 - 1.0;
 			rect.size.width = NSWidth(bounds) - RULER_MARGIN * 2.0;
 			rect.size.height = NSHeight(rects[0]);
 

@@ -203,7 +203,7 @@ main(int argc, char **argv)
 			path = [path stringByExpandingTildeInPath];
 			if (![path isAbsolutePath])
 				path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
-			path = [[NSURL fileURLWithPath:path] absoluteString];
+			path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
 		}
 		error = [proxy openURL:path];
 		if (error)

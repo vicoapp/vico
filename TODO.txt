@@ -1,6 +1,5 @@
 URGENT
 ========
-* unable to save ~/.environment!
 * use "git clone" when installing bundles(?)
 * implement "new file" and "new folder" in explorer menu
 * gq command (or remove from Edit menu)
@@ -238,3 +237,4 @@ latex.tmbundle
 * [DONE] increase/decrease indent (ctrl-t/ctrl-d in insert mode) should align to shiftwidth from beginning of line
 * [DONE] :edit ~/file doesn't expand tilde
 * [DONE] while filtering symbols, selection should be updated
+* [DONE] resolve symlinks in paths from vicotool

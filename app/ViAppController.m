@@ -406,7 +406,7 @@ additionalBindings:(NSDictionary *)bindings
 					DEBUG(@"disabled command is [%@]", command);
 					[item setEnabled:NO];
 					[item setAction:NULL];
-				} else {
+				} else if ([item isEnabled]) {
 					[item setEnabled:YES];
 					[item setAction:@selector(performNormalModeMenuItem:)];
 				}

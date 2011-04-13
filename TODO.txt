@@ -1,9 +1,6 @@
 URGENT
 ========
 * use "git clone" when installing bundles(?)
-* implement "new file" and "new folder" in explorer menu
-* gq command (or remove from Edit menu)
-* text objects (or remove from Edit menu)
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
 * clone modified bundles to vicoapp@github ?
@@ -238,3 +235,5 @@ latex.tmbundle
 * [DONE] :edit ~/file doesn't expand tilde
 * [DONE] while filtering symbols, selection should be updated
 * [DONE] resolve symlinks in paths from vicotool
+* [DONE] disable gq command from Edit menu
+* [DONE] disable text objects from Edit menu

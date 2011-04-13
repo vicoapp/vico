@@ -268,10 +268,8 @@
 {
 	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
 
-	if (fuzzySearch || ![delegate respondsToSelector:sel]) {
-		NSLog(@"accepting directly");
+	if (fuzzySearch || ![delegate respondsToSelector:sel])
 		return [self accept:command];
-	}
 
 	NSString *partialCompletion = [ViCompletionController commonPrefixInCompletions:filteredCompletions];
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:

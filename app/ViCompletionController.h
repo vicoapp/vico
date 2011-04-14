@@ -19,7 +19,7 @@
 	IBOutlet ViCompletionView *tableView;
 	NSArray *completions;
 	NSMutableArray *filteredCompletions;
-	NSString *selection;
+	ViCompletion *selection;
 	ViTheme *theme;
 	NSMutableString *filter;
 	NSMutableParagraphStyle *matchParagraphStyle;
@@ -42,7 +42,7 @@
            toPattern:(NSMutableString *)pattern
           fuzzyClass:(NSString *)fuzzyClass;
 
-- (NSString *)chooseFrom:(NSArray *)anArray
+- (ViCompletion *)chooseFrom:(NSArray *)anArray
              prefixRange:(NSRange *)aRange
                       at:(NSPoint)screenOrigin
                direction:(int)direction /* 0 = down, 1 = up */

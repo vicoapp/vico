@@ -1926,6 +1926,7 @@
 		return YES;
 	} else {
 		/* Automatically insert common prefix among all possible completions.
+		 * FIXME: can't the completionController do this?
 		 */
 		if ([options rangeOfString:@"p"].location != NSNotFound) {
 			NSString *commonPrefix = [ViCompletionController commonPrefixInCompletions:completions];
@@ -1951,7 +1952,7 @@
 		/* Offset the completion window a bit. */
 		point.x += (positionAbove ? 0 : 5);
 		point.y += (positionAbove ? -3 : 10);
-		NSString *selection;
+		ViCompletion *selection;
 		selection = [cc chooseFrom:completions
 			       prefixRange:&range
 					at:[[self window] convertBaseToScreen:[self convertPointToBase:point]]
@@ -1959,7 +1960,7 @@
 			       fuzzySearch:fuzzySearch];
 		DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(range));
 		if (selection)
-			[self insertSnippet:selection inRange:range];
+			[self insertSnippet:selection.content inRange:range];
 
 		NSInteger termKey = cc.terminatingKey;
 		if (termKey >= 0x20 && termKey < 0xFFFF) {

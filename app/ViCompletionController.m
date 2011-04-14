@@ -76,11 +76,11 @@
 		[window setFrame:frame display:YES];
 }
 
-- (NSString *)chooseFrom:(NSArray *)anArray
-             prefixRange:(NSRange *)aRange
-                      at:(NSPoint)origin
-               direction:(int)direction /* 0 = down, 1 = up */
-             fuzzySearch:(BOOL)fuzzyFlag
+- (ViCompletion *)chooseFrom:(NSArray *)anArray
+                 prefixRange:(NSRange *)aRange
+                          at:(NSPoint)origin
+                   direction:(int)direction /* 0 = down, 1 = up */
+                 fuzzySearch:(BOOL)fuzzyFlag
 {
 	terminatingKey = 0;
 
@@ -200,7 +200,7 @@
 - (void)acceptByKey:(NSInteger)termKey
 {
 	terminatingKey = termKey;
-	selection = [[filteredCompletions objectAtIndex:[tableView selectedRow]] content];
+	selection = [filteredCompletions objectAtIndex:[tableView selectedRow]];
 	[window orderOut:nil];
 	[NSApp stopModal];
 

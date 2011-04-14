@@ -1,5 +1,7 @@
 URGENT
 ========
+* ctrl-^ in a command output window:
+  2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
@@ -26,7 +28,6 @@ IMPORTANT
 * bundle-specific nu startup scripts (nu/main.nu)
 * global nu startup script in application support folder
 * toggling explorer always opens to 200px
-* re-use open help windows
 * preference for wrapping
 * dot should work with ! filters
 * :write filename
@@ -237,3 +238,4 @@ latex.tmbundle
 * [DONE] resolve symlinks in paths from vicotool
 * [DONE] disable gq command from Edit menu
 * [DONE] disable text objects from Edit menu
+* [DONE] re-use open help windows

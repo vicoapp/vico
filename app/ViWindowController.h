@@ -87,6 +87,7 @@
 - (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
 - (ViDocumentView *)viewForDocument:(ViDocument *)document;
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
+- (void)createTabWithViewController:(id<ViViewController>)viewController;
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document;
 
 - (void)closeDocument:(ViDocument *)aDocument;

@@ -13,8 +13,9 @@
 	if (self) {
 		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
 		[webView setEnvironment:environment];
+		NSURL *baseURL = [NSURL fileURLWithPath:@"/" isDirectory:YES];
 		[[webView mainFrame] loadHTMLString:content
-					    baseURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
+					    baseURL:baseURL];
 	}
 	return self;
 }
@@ -32,6 +33,13 @@
 - (NSString *)title
 {
 	return @"command output";
+}
+
+- (void)setContent:(NSString *)content
+{
+	NSURL *baseURL = [NSURL fileURLWithPath:@"/" isDirectory:YES];
+	[[webView mainFrame] loadHTMLString:content
+				    baseURL:baseURL];
 }
 
 @end

@@ -290,17 +290,29 @@
 			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-			ViCommandOutputController *oc = [[ViCommandOutputController alloc]
-			    initWithHTMLString:outputText
-			    environment:[document environment]];
 			id<ViViewController> viewController = [[[self window] windowController] currentView];
-			if (viewController == nil) {
-				INFO(@"%s", "ouch, no current view!");
-				return;
-			}
 			ViDocumentTabController *tabController = [viewController tabController];
-			[tabController splitView:viewController withView:oc vertically:NO];	// FIXME: option to specify vertical or not
-			[[[self window] windowController] selectDocumentView:oc];
+			id<ViViewController> webView = nil;
+			/* Try to reuse any existing web view in the current tab. */
+			for (webView in [tabController views]) {
+				if ([webView isKindOfClass:[ViCommandOutputController class]])
+					break;
+			}
+
+			if (webView) {
+				[(ViCommandOutputController *)webView setContent:outputText];
+				[[[self window] windowController] selectDocumentView:webView];
+			} else {
+				ViCommandOutputController *oc = [[ViCommandOutputController alloc]
+				    initWithHTMLString:outputText
+				    environment:[document environment]];
+
+				if (viewController)
+					[tabController splitView:viewController withView:oc vertically:NO];	// FIXME: option to specify vertical or not
+				else
+					[[[self window] windowController] createTabWithViewController:oc];
+				[[[self window] windowController] selectDocumentView:oc];
+			}
 		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
 			[self setCaret:[self caret] + [outputText length]];

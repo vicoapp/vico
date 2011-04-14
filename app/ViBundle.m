@@ -161,6 +161,12 @@
 	[env setObject:[defs stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
 	[env setObject:NSHomeDirectory() forKey:@"HOME"];
 
+	/* Some bundles check for dialog2 support by matching the DIALOG
+	 * environment variable with /2$/. This uses the new(er) infrastructure
+	 * with ui.rb, which we have better support for (although limited).
+	 */
+	[env setObject:@"/nope/vico_doesnt_support_dialog2" forKey:@"DIALOG"];
+
 	/*
 	 * Global (static) environment variables.
 	 */

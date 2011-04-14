@@ -548,6 +548,34 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 				backward:NO];
 }
 
+- (NSRange)rangeOfCharactersFromSet:(NSCharacterSet *)characterSet
+                         atLocation:(NSUInteger)aLocation
+                        acceptAfter:(BOOL)acceptAfter
+{
+	if (acceptAfter &&
+	   (aLocation >= [self length] ||
+	    ![characterSet characterIsMember:[[self string] characterAtIndex:aLocation]]) &&
+	   aLocation > 0)
+		aLocation--;
+
+	if (aLocation >= [self length])
+		return NSMakeRange(NSNotFound, 0);
+
+	NSUInteger word_start = [self skipCharactersInSet:characterSet
+					     fromLocation:aLocation
+						 backward:YES];
+	if (word_start < aLocation && word_start > 0)
+		word_start += 1;
+
+	NSUInteger word_end = [self skipCharactersInSet:characterSet
+					   fromLocation:aLocation
+					       backward:NO];
+	if (word_end > word_start)
+		return NSMakeRange(word_start, word_end - word_start);
+
+	return NSMakeRange(NSNotFound, 0);
+}
+
 - (NSString *)pathAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter
@@ -555,73 +583,41 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSMutableCharacterSet *pathSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_/-.:~"];
 	[pathSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 
-	if (acceptAfter &&
-	   (aLocation >= [self length] ||
-	    ![pathSet characterIsMember:[[self string] characterAtIndex:aLocation]]) &&
-	   aLocation > 0)
-		aLocation--;
-
-	if (aLocation >= [self length]) {
-		if (returnRange != nil)
-			*returnRange = NSMakeRange(NSNotFound, 0);
-		return nil;
-	}
-
-	NSUInteger word_start = [self skipCharactersInSet:pathSet fromLocation:aLocation backward:YES];
-	if (word_start < aLocation && word_start > 0)
-		word_start += 1;
-
-	NSUInteger word_end = [self skipCharactersInSet:pathSet fromLocation:aLocation backward:NO];
-	if (word_end > word_start) {
-		NSRange range = NSMakeRange(word_start, word_end - word_start);
-		if (returnRange)
-			*returnRange = range;
-		return [[self string] substringWithRange:range];
-	}
-
+	NSRange range = [self rangeOfCharactersFromSet:pathSet
+					    atLocation:aLocation
+					   acceptAfter:acceptAfter];
 	if (returnRange)
-		*returnRange = NSMakeRange(NSNotFound, 0);
+		*returnRange = range;
+	if (range.location == NSNotFound)
+		return nil;
 
-	return nil;
+	return [[self string] substringWithRange:range];
 }
 
-- (NSString *)wordAtLocation:(NSUInteger)aLocation
-                       range:(NSRange *)returnRange
-                 acceptAfter:(BOOL)acceptAfter
+- (NSRange)rangeOfWordAtLocation:(NSUInteger)aLocation
+                     acceptAfter:(BOOL)acceptAfter
 {
 	if (wordSet == nil) {
 		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	}
 
-	if (acceptAfter &&
-	   (aLocation >= [self length] ||
-	    ![wordSet characterIsMember:[[self string] characterAtIndex:aLocation]]) &&
-	   aLocation > 0)
-		aLocation--;
+	return [self rangeOfCharactersFromSet:wordSet
+				   atLocation:aLocation
+				  acceptAfter:acceptAfter];
+}
 
-	if (aLocation >= [self length]) {
-		if (returnRange != nil)
-			*returnRange = NSMakeRange(NSNotFound, 0);
-		return nil;
-	}
-
-	NSUInteger word_start = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:YES];
-	if (word_start < aLocation && word_start > 0)
-		word_start += 1;
-
-	NSUInteger word_end = [self skipCharactersInSet:wordSet fromLocation:aLocation backward:NO];
-	if (word_end > word_start) {
-		NSRange range = NSMakeRange(word_start, word_end - word_start);
-		if (returnRange)
-			*returnRange = range;
-		return [[self string] substringWithRange:range];
-	}
-
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
+                 acceptAfter:(BOOL)acceptAfter
+{
+	NSRange range = [self rangeOfWordAtLocation:aLocation acceptAfter:acceptAfter];
 	if (returnRange)
-		*returnRange = NSMakeRange(NSNotFound, 0);
+		*returnRange = range;
+	if (range.location == NSNotFound)
+		return nil;
 
-	return nil;
+	return [[self string] substringWithRange:range];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation

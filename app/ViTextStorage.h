@@ -75,11 +75,16 @@ TAILQ_HEAD(skiplist, skip);
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation
                       toLocation:(NSUInteger)toLocation;
 - (NSUInteger)skipWhitespaceFrom:(NSUInteger)startLocation;
+- (NSRange)rangeOfCharactersFromSet:(NSCharacterSet *)characterSet
+                         atLocation:(NSUInteger)aLocation
+                        acceptAfter:(BOOL)acceptAfter;
 
 - (NSString *)pathAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter;
 
+- (NSRange)rangeOfWordAtLocation:(NSUInteger)aLocation
+                     acceptAfter:(BOOL)acceptAfter;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter;

@@ -434,6 +434,11 @@ static ViWindowController	*currentWindowController = nil;
 		[symbolController updateSelectedSymbolForLocation:[textView caret]];
 }
 
+- (void)showMessage:(NSString *)string
+{
+	[messageField setStringValue:string];
+}
+
 - (void)message:(NSString *)fmt arguments:(va_list)ap
 {
 	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];

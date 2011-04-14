@@ -95,7 +95,9 @@ module TextMate
   
       # Show Tooltip
       def tool_tip(content, options={}) # Possible options = {:format => :html|:text, :transparent => true}
-        # not implemented
+        # real tooltips not yet implemented
+        %x{#{VICO} -e '(window showMessage:<<-ENDOFSTRING
+#{content}ENDOFSTRING)'}
 =begin
         command = %{"$DIALOG" tooltip < /dev/null}
         command << ' --transparent' if options[:transparent]

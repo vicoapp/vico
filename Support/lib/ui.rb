@@ -54,6 +54,7 @@ module TextMate
       # show the system color picker and return a hex-format color (#RRGGBB).
       # If the input string is a recognizable hex string, the default color will be set to it.
       def request_color(string = nil)
+        # not yet implemented
         return "#f00"
 =begin
         string = '#999' unless string.to_s.match(/#?[0-9A-F]{3,6}/i)
@@ -90,7 +91,6 @@ module TextMate
         p = { "params" => plist, "nibFile" => nib }
 
         `#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{plist.to_json}' &> /dev/null &`
-        #`#{TM_DIALOG} -cqp #{e_sh plist.to_plist} #{e_sh nib} &> /dev/null &`
       end
   
       # Show Tooltip
@@ -137,18 +137,6 @@ module TextMate
           STDOUT.reopen(open('/dev/null'))
           STDERR.reopen(open('/dev/null'))
 
-#          unless options.has_key? :initial_filter
-#            require ENV['TM_SUPPORT_PATH'] + '/lib/current_word'
-#            characters = "a-zA-Z0-9" # Hard-coded into D2
-#            characters += Regexp.escape(options[:extra_chars]) if options[:extra_chars]
-#            options[:initial_filter] = Word.current_word characters, :left
-#          end
-
-#          command =  "#{TM_DIALOG} popup --returnChoice"
-#          command << " --alreadyTyped #{e_sh options[:initial_filter]}"
-#          command << " --staticPrefix #{e_sh options[:static_prefix]}"           if options[:static_prefix]
-#          command << " --additionalWordCharacters #{e_sh options[:extra_chars]}" if options[:extra_chars]
-#          command << " --caseInsensitive"                                        if options[:case_insensitive]
           command = "#{VICO} -r -f '#{NULIB}/complete.nu' -p -"
 
           choices = choices.map! {|c| {'display' => c.to_s} } unless choices[0].is_a? Hash
@@ -222,7 +210,8 @@ module TextMate
         _options["text"] = options[:default] || ""
         _options["select-only-directories"] = "" if options[:only_directories]
         _options["with-directory"] = options[:directory] if options[:directory]
-        cocoa_dialog("fileselect", _options,&block)
+        result = %x{#{VICO} -r -f '#{NULIB}/open_panel.nu' -p '#{{"options" => _options}.to_json}'}
+        block_given? ? yield(result) : result
       end
       
       # show a standard open file dialog, allowing multiple selections 
@@ -234,7 +223,8 @@ module TextMate
         _options["select-only-directories"] = "" if options[:only_directories]
         _options["with-directory"] = options[:directory] if options[:directory]
         _options["select-multiple"] = ""
-        cocoa_dialog("fileselect", _options,&block)
+        result = %x{#{VICO} -r -f '#{NULIB}/open_panel.nu' -p '#{{"options" => _options}.to_json}'}
+        block_given? ? yield(result) : result
       end
             
       # Request an item from a list of items
@@ -252,9 +242,6 @@ module TextMate
 
           p = { "params" => params, "nibFile" => "#{ENV['TM_SUPPORT_PATH']}/nibs/RequestItem.nib" }
           return_json = %x{#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
-
-          # return_plist = %x{#{TM_DIALOG} -cmp #{e_sh params.to_plist} #{e_sh(ENV['TM_SUPPORT_PATH'] + "/nibs/RequestItem")}}
-          #return_hash = OSX::PropertyList::load(return_plist)
           return_hash = JSON.parse(return_json)
 
           # return string is in hash->result.
@@ -373,10 +360,7 @@ module TextMate
         params["string"] = options[:default] || ""
 
         p = { "params" => params, "nibFile" => "#{ENV['TM_SUPPORT_PATH']}/nibs/#{nib_name}.nib" }
-
         return_json = %x{#{VICO} -r -f "#{NULIB}/dialog.nu" -p '#{p.to_json}'}
-        #return_plist = %x{#{TM_DIALOG} -cmp #{e_sh params.to_plist} #{e_sh(ENV['TM_SUPPORT_PATH'] + "/nibs/#{nib_name}")}}
-        #return_hash = OSX::PropertyList::load(return_plist)
         return_hash = JSON.parse(return_json)
 
         # return string is in hash->result->returnArgument.
@@ -459,7 +443,7 @@ class TestCompletes < Test::Unit::TestCase
   def test_basic_completion
     #Should complete the snippet, if there is one, without requiring a block
     TextMate::UI.complete(@choices)
-    # 
+    # foo(one, "one", three, five, six)
   end
   
   def test_with_images
@@ -482,7 +466,7 @@ class TestCompletes < Test::Unit::TestCase
     #Use a block to create a custom snippet to be inserted, the block gets passed your choice as a hash
     # Cancelling the popup will pass nil to the block
     TextMate::UI.complete(@choices){|choice| e_sn choice.inspect }
-    # 
+    # f
   end
   
   def test_nested_or_stacked
@@ -609,6 +593,18 @@ class TestMenu < Test::Unit::TestCase
   private
   def setup
     @items = []
+  end
+end
+
+# ======================
+# = request_file usage =
+# ======================
+
+class TestOpenPanel < Test::Unit::TestCase
+  def test_open_panel
+    TextMate::UI.request_file do |url|
+      puts("got url #{url}")
+    end
   end
 end
 

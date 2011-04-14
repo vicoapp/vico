@@ -31,6 +31,7 @@ main(int argc, char *argv[])
 	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
 	[Nu loadNuFile:@"help"          fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
 	[Nu loadNuFile:@"console"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
+	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
 	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 	[Nu loadNuFile:@"keys"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 

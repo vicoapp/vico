@@ -1,5 +1,6 @@
 URGENT
 ========
+* different indent settings for different file types!
 * ctrl-^ in a command output window:
   2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
 * ctrl-^ doesn't work for web views
@@ -10,12 +11,12 @@ URGENT
 * scoped macros doesn't seem to work?
 * tweak smart typing pair invocation
 * package license for SBJson, see http://stig.github.com/json-framework/
+* build osx::plist
 
 BUGS
 ====
 * modified status is not updated immediately, ok after escape?
 * get rid of ViBgView
-* clicking a binary file (pdf, image) in explorer opens as text
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
 * caret location is messed up after undo of bundle command
@@ -26,6 +27,8 @@ BUGS
 
 IMPORTANT
 =========
+* always open an untitled document when opening a project?
+* indented paste
 * showAsHtml + dontFollowOutput (?)
 * shiftwidth, tabstop, etc. as preference variables
 * Reload themes!
@@ -245,3 +248,4 @@ latex.tmbundle
 * [DONE] disable text objects from Edit menu
 * [DONE] re-use open help windows
 * [DONE] skip tags/symbols on the current line if ambiguous match (ctrl-])
+* [DONE] clicking a binary file (pdf, image) in explorer opens as text

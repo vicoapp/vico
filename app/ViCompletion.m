@@ -202,4 +202,9 @@
 	return NO;
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViCompletion %@>", content];
+}
+
 @end

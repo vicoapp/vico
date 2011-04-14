@@ -1,5 +1,6 @@
 #import "ViCompletion.h"
 #import "ViThemeStore.h"
+#import "ViCommon.h"
 #include "logging.h"
 
 @interface ViCompletion (private)
@@ -48,6 +49,9 @@
 
 - (void)updateTitle
 {
+	if (prefixLength > [content length])
+		return;
+
 	NSRange grayRange = NSMakeRange(0, prefixLength);
 	if (filterMatch && !filterIsFuzzy)
 		grayRange.length = filterMatch.rangeOfMatchedString.length;

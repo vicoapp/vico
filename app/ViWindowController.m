@@ -1292,7 +1292,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView
 {
-	NSRange range = [aSymbol range];
+	NSRange range = aSymbol.range;
 	ViTextView *textView = [docView textView];
 	[textView setCaret:range.location];
 	[textView scrollRangeToVisible:range];

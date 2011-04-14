@@ -109,6 +109,8 @@
 
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions
 {
+	if ([completions count] == 0)
+		return nil;
 	int options = NSCaseInsensitiveSearch;
 	NSString *longestMatch = nil;
 	ViCompletion *c = [completions objectAtIndex:0];
@@ -173,6 +175,7 @@
 
 	filteredCompletions = [NSMutableArray array];
 	for (ViCompletion *c in completions) {
+		DEBUG(@"filtering completion %@ on %@", c, rx);
 		NSString *s = c.content;
 		if ([s length] < prefixRange.length)
 			continue;
@@ -200,7 +203,9 @@
 - (void)acceptByKey:(NSInteger)termKey
 {
 	terminatingKey = termKey;
-	selection = [filteredCompletions objectAtIndex:[tableView selectedRow]];
+	NSInteger row = [tableView selectedRow];
+	if (row >= 0 && row < [filteredCompletions count])
+		selection = [filteredCompletions objectAtIndex:row];
 	[window orderOut:nil];
 	[NSApp stopModal];
 

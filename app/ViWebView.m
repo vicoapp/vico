@@ -4,6 +4,8 @@
 #import "NSEvent-keyAdditions.h"
 #include "logging.h"
 
+#define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
+
 @implementation ViWebView
 
 @synthesize environment;
@@ -38,96 +40,43 @@
 		rc = [self goForward];
 
 	if (rc == YES && !keep_message)
-		[environment message:@""]; // erase any previous message
+		MESSAGE(@""); // erase any previous message
 }
 
 - (void)keyManager:(ViKeyManager *)keyManager
   partialKeyString:(NSString *)keyString
 {
-	[environment message:@"%@", keyString];
+	MESSAGE(@"%@", keyString);
 }
 
 - (void)keyManager:(ViKeyManager *)aKeyManager
       presentError:(NSError *)error
 {
-	[environment message:@"%@", [error localizedDescription]];
+	MESSAGE(@"%@", [error localizedDescription]);
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
+	ViWindowController *windowController = [[self window] windowController];
 	DEBUG(@"command is %@", command);
-	[environment message:@""]; // erase any previous message
-	if (![self respondsToSelector:command.action] ||
-	    (command.motion && ![self respondsToSelector:command.motion.action])) {
-		[environment message:@"Command not implemented."];
+	MESSAGE(@""); // erase any previous message
+	id target;
+	if ([self respondsToSelector:command.action])
+		target = self;
+	else if ([windowController respondsToSelector:command.action])
+		target = windowController;
+	else {
+		MESSAGE(@"Command not implemented.");
 		return NO;
 	}
 
-	return (BOOL)[self performSelector:command.action withObject:command];
+	return (BOOL)[target performSelector:command.action withObject:command];
 }
 
-- (BOOL)switch_tab:(ViCommand *)command
-{
-	INFO(@"switch to tab: %@", command.mapping.parameter);
-	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
-		[environment message:@"Unexpected parameter type %@",
-		    NSStringFromClass([command.mapping.parameter class])];
-		return NO;
-	}
-	int arg = [command.mapping.parameter intValue];
-	[[[self window] windowController] selectTabAtIndex:arg];
-	return YES;
-}
-
-- (BOOL)window_left:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewLeft relativeTo:self];
-}
-
-- (BOOL)window_down:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewDown relativeTo:self];
-}
-
-- (BOOL)window_up:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewUp relativeTo:self];
-}
-
-- (BOOL)window_right:(ViCommand *)command
-{
-	return [[[self window] windowController] selectViewAtPosition:ViViewRight relativeTo:self];
-}
-
-- (BOOL)window_close:(ViCommand *)command
-{
-	return [environment ex_close:nil];
-}
-
-#if 0
-- (BOOL)window_split:(ViCommand *)command
-{
-	return [environment ex_split:nil];
-}
-
-- (BOOL)window_vsplit:(ViCommand *)command
-{
-	return [environment ex_vsplit:nil];
-}
-#endif
-
-- (BOOL)window_totab:(ViCommand *)command
-{
-	return [[[self window] windowController] moveCurrentViewToNewTab];
-}
-
-- (BOOL)window_new:(ViCommand *)command
-{
-	return [environment ex_new:nil];
-}
-
-- (BOOL)scrollPage:(BOOL)isPageScroll vertically:(BOOL)isVertical direction:(int)direction
+- (BOOL)scrollPage:(BOOL)isPageScroll
+        vertically:(BOOL)isVertical
+         direction:(int)direction
 {
 	NSScrollView *scrollView = [[[[self mainFrame] frameView] documentView] enclosingScrollView];
 
@@ -221,8 +170,8 @@
 		    IMAX(0, docBounds.size.height - bounds.size.height));
 		[[scrollView documentView] scrollPoint:p];
 	} else {
-		[environment message:@"unsupported count for %@ command",
-		    command.mapping.keyString];
+		MESSAGE(@"unsupported count for %@ command",
+		    command.mapping.keyString);
 		return NO;
 	}
 

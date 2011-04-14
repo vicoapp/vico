@@ -2,10 +2,14 @@ URGENT
 ========
 * ctrl-^ in a command output window:
   2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
+* ctrl-^ doesn't work for web views
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
 * clone modified bundles to vicoapp@github ?
+* scoped macros doesn't seem to work?
+* tweak smart typing pair invocation
+* package license for SBJson, see http://stig.github.com/json-framework/
 
 BUGS
 ====
@@ -22,6 +26,7 @@ BUGS
 
 IMPORTANT
 =========
+* showAsHtml + dontFollowOutput (?)
 * shiftwidth, tabstop, etc. as preference variables
 * Reload themes!
 * cmd-t fuzzy search feels *slow*
@@ -239,3 +244,4 @@ latex.tmbundle
 * [DONE] disable gq command from Edit menu
 * [DONE] disable text objects from Edit menu
 * [DONE] re-use open help windows
+* [DONE] skip tags/symbols on the current line if ambiguous match (ctrl-])

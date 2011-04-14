@@ -99,6 +99,7 @@
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)resetSelection;
+- (void)updateStatus;
 - (void)setNormalMode;
 - (void)setVisualMode;
 - (void)setInsertMode:(ViCommand *)command;

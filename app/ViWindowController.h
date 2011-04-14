@@ -121,7 +121,7 @@
 - (IBAction)searchSymbol:(id)sender;
 - (void)gotoSymbol:(ViSymbol *)aSymbol;
 - (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView;
-- (NSArray *)symbolsFilteredByPattern:(NSString *)pattern;
+- (NSMutableArray *)symbolsFilteredByPattern:(NSString *)pattern;
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)focusSymbols:(id)sender;
 

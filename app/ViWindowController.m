@@ -1328,7 +1328,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[symbolController focusSymbols:sender];
 }
 
-- (NSArray *)symbolsFilteredByPattern:(NSString *)pattern
+- (NSMutableArray *)symbolsFilteredByPattern:(NSString *)pattern
 {
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
 						options:ONIG_OPTION_IGNORECASE];

@@ -1602,7 +1602,21 @@
 		return NO;
 
 	NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-	NSArray *syms = [windowController symbolsFilteredByPattern:pattern];
+	NSMutableArray *syms = [windowController symbolsFilteredByPattern:pattern];
+
+	if ([syms count] > 1) {
+		NSMutableArray *toRemove = [NSMutableArray array];
+		for (ViSymbol *sym in syms) {
+			if (sym.document == document) {
+				NSRange range = sym.range;
+				NSUInteger lineno = [[self textStorage] lineNumberAtLocation:range.location];
+				if (lineno == [[self textStorage] lineNumberAtLocation:start_location])
+					/* Ignore symbol matches on the current line. */
+					[toRemove addObject:sym];
+			}
+		}
+		[syms removeObjectsInArray:toRemove];
+	}
 
 	if ([syms count] == 0) {
 		MESSAGE(
@@ -1611,6 +1625,7 @@
 	} else if ([syms count] == 1) {
 		[self gotoSymbol:[syms objectAtIndex:0]];
 	} else {
+		/* Sort symbols per document. */
 		NSMapTable *docs = [NSMapTable mapTableWithStrongToStrongObjects];
 		for (ViSymbol *sym in syms) {
 			NSMutableArray *a = [docs objectForKey:sym.document];

@@ -157,7 +157,55 @@
 	[self closeNextDocumentInSet:set force:NO];
 }
 
+- (BOOL)fileAppearsBinaryAtURL:(NSURL *)absoluteURL
+{
+	NSData *chunk = nil;
 
+	if ([absoluteURL isFileURL]) {
+		NSFileHandle *handle = [NSFileHandle fileHandleForReadingFromURL:absoluteURL
+									   error:nil];
+		chunk = [handle readDataOfLength:1024];
+		[handle closeFile];
+	}
+	/* SFTP URLs not yet handled */
+
+	if (chunk == nil)
+		return NO;
+
+	const void *buf = [chunk bytes];
+	NSUInteger length = [chunk length];
+	if (buf == NULL)
+		return NO;
+
+	if (memchr(buf, 0, length) != NULL)
+		return YES;
+	return NO;
+}
+
+- (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL
+                            display:(BOOL)displayDocument
+                              error:(NSError **)outError
+{
+	id doc = [self documentForURL:absoluteURL];
+	if (doc)
+		return doc;
+
+	if ([self fileAppearsBinaryAtURL:absoluteURL]) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:[NSString stringWithFormat:@"%@ appears to be a binary file",
+			[absoluteURL lastPathComponent]]];
+		[alert addButtonWithTitle:@"Open"];
+		[alert addButtonWithTitle:@"Cancel"];
+		[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
+		NSUInteger ret = [alert runModal];
+		if (ret == NSAlertSecondButtonReturn)
+			return nil;
+	}
+
+	return [super openDocumentWithContentsOfURL:absoluteURL
+					    display:displayDocument
+					      error:outError];
+}
 
 
 

@@ -1,5 +1,5 @@
 ; Simple menu popup at the carets location in the current text view.
-; Input is a JSON-encoded menu structure in the 'menuList' variable.
+; Input is a JSON-encoded menu structure in the 'menuItems' variable.
 ;
 ; Copyright (c) 2011 Martin Hedenfalk <martin@bzero.se>
 ;
@@ -26,38 +26,40 @@
 		(super init)
 		(set @itemSelected NO)
 		(set @shellCommand shell)
-		(@shellCommand log:"returning #{self}")
+		;(@shellCommand log:"returning #{self}")
 		self)
 
 	(imethod (void) selectMenuItem:(id) sender is
-		(@shellCommand log:"selected item #{(sender description)}")
+		;(@shellCommand log:"selected item #{(sender description)}")
 		(set @itemSelected YES)
 		(set ret (NSMutableDictionary dictionary))
 		(ret setObject:(sender representedObject) forKey:"selectedTitle")
-		(ret setObject:(- (sender tag) 1) forKey:"selectedIndex")
+		(ret setObject:(- (sender tag) 2) forKey:"selectedIndex")
+		;(@shellCommand log:"returning #{(ret description)}")
 		(@shellCommand exitWithObject:ret)
 		(set @shellCommand nil)))
 
-; FIXME: why doesn't this work directly? need to run the runloop once?
 ((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
-;((NSRunLoop mainRunLoop) runMode:NSDefaultRunLoopMode beforeDate:(NSDate distantFuture))
 
 (set target ((ShellMenuDelegate alloc) initWithShell:shellCommand))
 
 (set menu ((NSMenu alloc) initWithTitle:"a menu"))
 (menu setAllowsContextMenuPlugIns:NO)
 (set tag 1)
-; FIXME: should read 'menuList' variable here
-('("one" "two" "three") each: (do (title)
+(menuItems each: (do (obj)
 	(set key "")
 	(if (<= tag 10)
 		(set key "#{(% tag 10)}"))
 	(set tag (+ tag 1))
-	(set item (menu addItemWithTitle:title action:"selectMenuItem:" keyEquivalent:key))
-	(item setKeyEquivalentModifierMask:0)
-	(item setTarget:target)
-	(item setTag:tag)
-	(item setRepresentedObject:title)))
+	(set title (obj objectForKey:"title"))
+	(if (obj objectForKey:"separator")
+		(menu addItem:(NSMenuItem separatorItem))
+	(else
+		(set item (menu addItemWithTitle:title action:"selectMenuItem:" keyEquivalent:key))
+		(item setKeyEquivalentModifierMask:0)
+		(item setTarget:target)
+		(item setTag:tag)
+		(item setRepresentedObject:obj)) )))
 
 ; this pops up the menu at the carets location in the current text view
 (text popUpContextMenu:menu)

@@ -1843,26 +1843,6 @@ int logIndent = 0;
 	return NO;
 }
 
-/* syntax: ctrl-^ */
-- (BOOL)switch_file:(ViCommand *)command
-{
-	[[[self window] windowController] selectLastDocument];
-	return YES;
-}
-
-/* syntax: cmd-[0-9] */
-- (BOOL)switch_tab:(ViCommand *)command
-{
-	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
-		MESSAGE(@"Unexpected parameter type %@",
-		    NSStringFromClass([command.mapping.parameter class]));
-		return NO;
-	}
-	int arg = [command.mapping.parameter intValue];
-	[[[self window] windowController] selectTabAtIndex:arg];
-	return YES;
-}
-
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation
 {
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];

@@ -1508,5 +1508,25 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return YES;
 }
 
+/* syntax: ctrl-^ */
+- (BOOL)switch_file:(ViCommand *)command
+{
+	[self selectLastDocument];
+	return YES;
+}
+
+/* syntax: cmd-[0-9] */
+- (BOOL)switch_tab:(ViCommand *)command
+{
+	if (![command.mapping.parameter respondsToSelector:@selector(intValue)]) {
+		MESSAGE(@"Unexpected parameter type %@",
+		    NSStringFromClass([command.mapping.parameter class]));
+		return NO;
+	}
+	int arg = [command.mapping.parameter intValue];
+	[self selectTabAtIndex:arg];
+	return YES;
+}
+
 @end
 

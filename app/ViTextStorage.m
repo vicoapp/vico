@@ -596,15 +596,28 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSRange)rangeOfWordAtLocation:(NSUInteger)aLocation
                      acceptAfter:(BOOL)acceptAfter
+                 extraCharacters:(NSString *)extraCharacters
 {
 	if (wordSet == nil) {
 		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	}
+	NSCharacterSet *set = wordSet;
 
-	return [self rangeOfCharactersFromSet:wordSet
+	if (extraCharacters) {
+		set = [wordSet mutableCopy];
+		[set formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:extraCharacters]];
+	}
+
+	return [self rangeOfCharactersFromSet:set
 				   atLocation:aLocation
 				  acceptAfter:acceptAfter];
+}
+
+- (NSRange)rangeOfWordAtLocation:(NSUInteger)aLocation
+                     acceptAfter:(BOOL)acceptAfter
+{
+	return [self rangeOfWordAtLocation:aLocation acceptAfter:acceptAfter extraCharacters:nil];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation

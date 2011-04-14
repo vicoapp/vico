@@ -17,6 +17,7 @@
                   fromBundle:(ViBundle *)bundle
                      inRange:(NSRange)aRange
 {
+	DEBUG(@"insert snippet [%@] at %@", snippetString, NSStringFromRange(aRange));
 	// prepend leading whitespace to all newlines in the snippet string
 	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aRange.location];
 	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];

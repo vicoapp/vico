@@ -1969,13 +1969,15 @@
 		point.y += (positionAbove ? -3 : 10);
 		ViCompletion *selection;
 		selection = [cc chooseFrom:completions
-			       prefixRange:&range
+			             range:range
+			      prefixLength:range.length
 					at:[[self window] convertBaseToScreen:[self convertPointToBase:point]]
 				 direction:(positionAbove ? 1 : 0)
-			       fuzzySearch:fuzzySearch];
-		DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(range));
+			       fuzzySearch:fuzzySearch
+			     initialFilter:nil];
+		DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
 		if (selection)
-			[self insertSnippet:selection.content inRange:range];
+			[self insertSnippet:selection.content inRange:cc.range];
 
 		NSInteger termKey = cc.terminatingKey;
 		if (termKey >= 0x20 && termKey < 0xFFFF) {

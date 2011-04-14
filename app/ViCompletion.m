@@ -9,7 +9,8 @@
 
 @implementation ViCompletion
 
-@synthesize title, content, filter, prefixLength, filterIsFuzzy, font, location, score;
+@synthesize title, content, filterMatch, prefixLength, filterIsFuzzy, font, location, score;
+@synthesize representedObject;
 
 + (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
 {
@@ -36,7 +37,7 @@
 {
 	if ((self = [super init]) != nil) {
 		content = aString;
-		filter = aMatch;
+		filterMatch = aMatch;
 		filterIsFuzzy = YES;
 		font = [ViThemeStore font];
 		[self updateTitle];
@@ -48,8 +49,8 @@
 - (void)updateTitle
 {
 	NSRange grayRange = NSMakeRange(0, prefixLength);
-	if (filter && !filterIsFuzzy)
-		grayRange.length = filter.rangeOfMatchedString.length;
+	if (filterMatch && !filterIsFuzzy)
+		grayRange.length = filterMatch.rangeOfMatchedString.length;
 	NSColor *gray = [NSColor grayColor];
 
 	title = [[NSMutableAttributedString alloc] initWithString:content];
@@ -62,7 +63,7 @@
 		      value:font
 		      range:NSMakeRange(0, [title length])];
 
-	if (filter && filterIsFuzzy) {
+	if (filterMatch && filterIsFuzzy) {
 		/* Mark sub-matches with bold. */
 		NSFont *boldFont = [[NSFontManager sharedFontManager]
 		    convertFont:font
@@ -71,10 +72,10 @@
 		    convertWeight:12 ofFont:font];*/
 		NSColor *markColor = [NSColor redColor];
 
-		NSUInteger offset = [filter rangeOfMatchedString].location;
+		NSUInteger offset = [filterMatch rangeOfMatchedString].location;
 		NSUInteger i;
-		for (i = 1; i <= [filter count]; i++) {
-			NSRange range = [filter rangeOfSubstringAtIndex:i];
+		for (i = 1; i <= [filterMatch count]; i++) {
+			NSRange range = [filterMatch rangeOfSubstringAtIndex:i];
 			if (range.length > 0 && range.location != NSNotFound) {
 				range.location -= offset;
 				[title addAttribute:NSFontAttributeName
@@ -95,15 +96,15 @@
 {
 	NSUInteger flen = [content length]; /* full length */
 	NSUInteger slen; /* short length */
-	NSUInteger offset = [filter rangeOfMatchedString].location;
+	NSUInteger offset = [filterMatch rangeOfMatchedString].location;
 	NSCharacterSet *separators = [NSCharacterSet punctuationCharacterSet];
 	NSCharacterSet *ucase = [NSCharacterSet uppercaseLetterCharacterSet];
 	NSCharacterSet *lcase = [NSCharacterSet lowercaseLetterCharacterSet];
 	NSUInteger i;
 	double match_score = 0, prev_score = 0;
 	NSUInteger prev_pos = 0;
-	for (i = 1; i <= [filter count]; i++) {
-		NSRange range = [filter rangeOfSubstringAtIndex:i];
+	for (i = 1; i <= [filterMatch count]; i++) {
+		NSRange range = [filterMatch rangeOfSubstringAtIndex:i];
 		if (range.location == NSNotFound || range.length == 0)
 			continue;
 		NSUInteger pos = range.location - offset;
@@ -170,7 +171,7 @@
 
 - (void)setFilter:(ViRegexpMatch *)m
 {
-	filter = m;
+	filterMatch = m;
 	[self updateTitle];
 	[self calcScore];
 }

@@ -15,12 +15,15 @@
 @synthesize window;
 @synthesize completions;
 @synthesize terminatingKey;
+@synthesize range;
+@synthesize filter;
 
 + (id)sharedController
 {
 	static ViCompletionController *sharedController = nil;
 	if (sharedController == nil)
 		sharedController = [[ViCompletionController alloc] init];
+	sharedController.delegate = nil;
 	return sharedController;
 }
 
@@ -50,6 +53,7 @@
 			winsz.width = sz.width + 20;
 	}
 
+	DEBUG(@"got %lu completions, row height is %f", [filteredCompletions count], [tableView rowHeight]);
 	winsz.height = [filteredCompletions count] * ([tableView rowHeight] + 2);
 
 	NSScreen *screen = [NSScreen mainScreen];
@@ -72,15 +76,19 @@
 	if (!upwards)
 		frame.origin.y -= winsz.height;
 	frame.size = winsz;
-	if (!NSEqualRects(frame, [window frame]))
+	if (!NSEqualRects(frame, [window frame])) {
+		DEBUG(@"setting frame %@", NSStringFromRect(frame));
 		[window setFrame:frame display:YES];
+	}
 }
 
 - (ViCompletion *)chooseFrom:(NSArray *)anArray
-                 prefixRange:(NSRange *)aRange
+                       range:(NSRange)aRange
+                prefixLength:(NSUInteger)aPrefixLength
                           at:(NSPoint)origin
                    direction:(int)direction /* 0 = down, 1 = up */
                  fuzzySearch:(BOOL)fuzzyFlag
+               initialFilter:(NSString *)initialFilter
 {
 	terminatingKey = 0;
 
@@ -88,21 +96,34 @@
 		return nil;
 
 	completions = anArray;
-	filter = [NSMutableString string];
-	prefixRange = *aRange;
+	if (initialFilter)
+		filter = [initialFilter mutableCopy];
+	else
+		filter = [NSMutableString string];
+	range = aRange;
+	prefixLength = aPrefixLength;
 	fuzzySearch = fuzzyFlag;
+
+	DEBUG(@"range is %@, with %lu chars as prefix and [%@] as initial filter",
+	    NSStringFromRange(range), prefixLength, initialFilter);
 
 	screenOrigin = origin;
 	upwards = (direction == 1);
 
 	[self filterCompletions];
+	if ([filteredCompletions count] == 0) {
+		completions = nil;
+		filteredCompletions = nil;
+		filter = nil;
+		return nil;
+	}
+
 	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 	       byExtendingSelection:NO];
 
+	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
 	NSInteger ret = [NSApp runModalForWindow:window];
-
-	*aRange = prefixRange;
 
 	return ret == NSRunAbortedResponse ? nil : selection;
 }
@@ -162,11 +183,11 @@
 	if ([filter length] > 0) {
 		NSMutableString *pattern = [NSMutableString string];
 		if (fuzzySearch) {
-			[pattern appendFormat:@"^.{%lu}.*?", prefixRange.length];
+			[pattern appendFormat:@"^.{%lu}.*?", prefixLength];
 			[ViCompletionController appendFilter:filter toPattern:pattern fuzzyClass:@"."];
 			[pattern appendString:@".*$"];
 		} else {
-			[pattern appendFormat:@"^.{%lu}%@", prefixRange.length, [ViRegexp escape:filter]];
+			[pattern appendFormat:@"^.{%lu}%@", prefixLength, [ViRegexp escape:filter]];
 		}
 
 		rx = [[ViRegexp alloc] initWithString:pattern
@@ -177,11 +198,11 @@
 	for (ViCompletion *c in completions) {
 		DEBUG(@"filtering completion %@ on %@", c, rx);
 		NSString *s = c.content;
-		if ([s length] < prefixRange.length)
+		if ([s length] < prefixLength)
 			continue;
 		ViRegexpMatch *m = nil;
 		if (rx == nil || (m = [rx matchInString:s]) != nil) {
-			c.filter = m;
+			c.filterMatch = m;
 			[filteredCompletions addObject:c];
 		}
 	}
@@ -198,6 +219,12 @@
 
 	[tableView reloadData];
 	[self updateBounds];
+}
+
+- (void)setFilter:(NSString *)aString
+{
+	filter = [aString mutableCopy];
+	[self filterCompletions];
 }
 
 - (void)acceptByKey:(NSInteger)termKey
@@ -282,17 +309,18 @@
 	[invocation setSelector:sel];
 	[invocation setArgument:&self atIndex:2];
 	[invocation setArgument:&partialCompletion atIndex:3];
-	[invocation setArgument:&prefixRange atIndex:4];
+	[invocation setArgument:&range atIndex:4];
 	[invocation invokeWithTarget:delegate];
 	BOOL ret;
 	[invocation getReturnValue:&ret];
 	if (!ret)
 		return [self cancel:command];
 
-	prefixRange = NSMakeRange(prefixRange.location, [partialCompletion length]);
+	range = NSMakeRange(range.location, [partialCompletion length]);
+	prefixLength = range.length;
 	NSMutableArray *array = [NSMutableArray array];
 	for (ViCompletion *c in filteredCompletions) {
-		c.prefixLength = prefixRange.length;
+		c.prefixLength = prefixLength;
 		[array addObject:c];
 	}
 	[self setCompletions:array];

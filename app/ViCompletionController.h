@@ -25,7 +25,8 @@
 	NSMutableParagraphStyle *matchParagraphStyle;
 	id<ViCompletionDelegate> delegate;
 	NSInteger terminatingKey;
-	NSRange prefixRange;
+	NSRange range;
+	NSUInteger prefixLength;
 	NSPoint screenOrigin;
 	BOOL upwards;
 	BOOL fuzzySearch;
@@ -35,6 +36,8 @@
 @property (readonly) NSWindow *window;
 @property (readwrite, assign) NSArray *completions;
 @property (readonly) NSInteger terminatingKey;
+@property (readonly) NSRange range;
+@property (readwrite, assign) NSString *filter;
 
 + (id)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;
@@ -43,9 +46,11 @@
           fuzzyClass:(NSString *)fuzzyClass;
 
 - (ViCompletion *)chooseFrom:(NSArray *)anArray
-             prefixRange:(NSRange *)aRange
-                      at:(NSPoint)screenOrigin
-               direction:(int)direction /* 0 = down, 1 = up */
-             fuzzySearch:(BOOL)fuzzyFlag;
+                       range:(NSRange)aRange
+                prefixLength:(NSUInteger)prefixLength
+                          at:(NSPoint)screenOrigin
+                   direction:(int)direction /* 0 = down, 1 = up */
+                 fuzzySearch:(BOOL)fuzzyFlag
+               initialFilter:(NSString *)initialFilter;
 
 @end

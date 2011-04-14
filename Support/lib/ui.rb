@@ -137,26 +137,30 @@ module TextMate
           STDOUT.reopen(open('/dev/null'))
           STDERR.reopen(open('/dev/null'))
 
-          unless options.has_key? :initial_filter
-            require ENV['TM_SUPPORT_PATH'] + '/lib/current_word'
-            characters = "a-zA-Z0-9" # Hard-coded into D2
-            characters += Regexp.escape(options[:extra_chars]) if options[:extra_chars]
-            options[:initial_filter] = Word.current_word characters, :left
-          end
+#          unless options.has_key? :initial_filter
+#            require ENV['TM_SUPPORT_PATH'] + '/lib/current_word'
+#            characters = "a-zA-Z0-9" # Hard-coded into D2
+#            characters += Regexp.escape(options[:extra_chars]) if options[:extra_chars]
+#            options[:initial_filter] = Word.current_word characters, :left
+#          end
 
 #          command =  "#{TM_DIALOG} popup --returnChoice"
 #          command << " --alreadyTyped #{e_sh options[:initial_filter]}"
 #          command << " --staticPrefix #{e_sh options[:static_prefix]}"           if options[:static_prefix]
 #          command << " --additionalWordCharacters #{e_sh options[:extra_chars]}" if options[:extra_chars]
 #          command << " --caseInsensitive"                                        if options[:case_insensitive]
+          command = "#{VICO} -r -f '#{NULIB}/complete.nu' -p -"
 
           choices = choices.map! {|c| {'display' => c.to_s} } unless choices[0].is_a? Hash
-          plist   = {'suggestions' => choices}
+          plist   = {'choices' => choices,
+                     'initial_filter' => options[:initial_filter],
+                     'extra_chars' => options[:extra_chars]}
 
           result = ::IO.popen(command, 'w+') do |io|
-            io << plist.to_plist; io.close_write
-            OSX::PropertyList.load io rescue nil
-          end
+            io << plist.to_json; io.close_write
+            output = io.read
+            JSON.parse(output) rescue {}
+          end || {}
 
           # Use a default block if none was provided
           block ||= lambda do |choice|
@@ -164,11 +168,14 @@ module TextMate
           end
 
           # The block should return the text to insert as a snippet
-          to_insert = block.call(result).to_s
+          obj = result['representedObject']
+          obj['index'] ||= result['index'] if obj
+          to_insert = block.call(obj).to_s
 
           # Insert the snippet if necessary
           #`"$DIALOG" x-insert --snippet #{e_sh to_insert}` unless to_insert.empty?
-          `#{VICO} -e '(text insertSnippet:"#{to_insert}")'` unless to_insert.empty?
+          `#{VICO} -e '(text insertSnippet:<<-ENDOFSTRING
+#{to_insert}ENDOFSTRING)'` unless to_insert.empty?
         end
       end
       
@@ -188,8 +195,7 @@ module TextMate
             io.write plist; io.close_write
           end
           output = io.read
-          JSON.parse(output)
-          #OSX::PropertyList::load(io)
+          JSON.parse(output) rescue {}
         end
 
         return nil unless res.has_key? 'selectedIndex'
@@ -546,8 +552,7 @@ class TestCompletes < Test::Unit::TestCase
     ]
   end
   def make_front!
-    # `open "txmt://open?url=file://$TM_FILEPATH"` #For testing purposes, make this document the topmost so that the complete popup works
-    `#{VICO}`
+    `#{VICO}` #For testing purposes, make this document the topmost so that the complete popup works
   end
 end
 

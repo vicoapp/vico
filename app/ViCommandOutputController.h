@@ -15,4 +15,6 @@
 - (NSView *)view;
 - (NSView *)innerView;
 
+- (void)setContent:(NSString *)content;
+
 @end

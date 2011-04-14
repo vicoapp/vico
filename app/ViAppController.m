@@ -181,7 +181,7 @@
 		[alert setMessageText:@"This is a development version."];
 		[alert addButtonWithTitle:@"OK"];
 		NSString *expireAt = [[NSDate dateWithTimeIntervalSince1970:expire_at] descriptionWithLocale:[NSLocale currentLocale]];
-		[alert setInformativeText:[NSString stringWithFormat:@"Development versions have a limited validity period for you to test the program. This version expires at %@. If you want to continue testing after this, you should download a new version.", expireAt]];
+		[alert setInformativeText:[NSString stringWithFormat:@"Development versions have a limited validity period for you to test the program. This version expires at %@. If you want to continue testing after this, you are welcome to download a new version.", expireAt]];
 		[alert setShowsSuppressionButton:YES];
 		[alert runModal];
 		if ([[alert suppressionButton] state] == NSOnState) {

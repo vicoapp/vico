@@ -8,6 +8,7 @@
 @interface ViKeyManager (private)
 - (BOOL)handleKey:(NSInteger)keyCode
       allowMacros:(BOOL)allowMacros
+          inScope:(NSArray*)scopeArray
             error:(NSError **)outError;
 @end
 
@@ -64,6 +65,7 @@
 
 		if ([km handleKey:keyCode
 		      allowMacros:macro.mapping.recursive
+			  inScope:nil
 			    error:&error] == NO || error) {
 			if (error)
 				[self presentError:error];
@@ -100,6 +102,7 @@
 
 - (BOOL)handleKey:(NSInteger)keyCode
       allowMacros:(BOOL)allowMacros
+          inScope:(NSArray*)scopeArray
             error:(NSError **)outError
 {
 	[keyTimeout invalidate];
@@ -128,7 +131,7 @@
 	BOOL timeout = NO;
 	id command = [parser pushKey:keyCode
 			 allowMacros:allowMacros
-			       scope:nil
+			       scope:scopeArray
 			     timeout:&timeout
 			       error:&error];
 	if (command) {
@@ -146,20 +149,25 @@
 			keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
 								       target:self
 								     selector:@selector(keyTimedOut:)
-								     userInfo:nil
+								     userInfo:scopeArray
 								      repeats:NO];
 	}
 
 	return YES;
 }
 
-- (BOOL)handleKey:(NSInteger)keyCode
+- (BOOL)handleKey:(NSInteger)keyCode inScope:(NSArray *)scopeArray
 {
 	NSError *error = nil;
-	BOOL ret = [self handleKey:keyCode allowMacros:YES error:&error];
+	BOOL ret = [self handleKey:keyCode allowMacros:YES inScope:scopeArray error:&error];
 	if (error)
 		[self presentError:error];
 	return ret;
+}
+
+- (BOOL)handleKey:(NSInteger)keyCode
+{
+	return [self handleKey:keyCode inScope:nil];
 }
 
 - (void)handleKeys:(NSArray *)keys
@@ -168,21 +176,25 @@
 		[self handleKey:[n integerValue]];
 }
 
-- (void)keyTimedOut:(id)sender
+- (void)keyTimedOut:(NSTimer*)timer
 {
 	NSError *error = nil;
-	id command = [parser timeoutInScope:nil error:&error];
+	NSArray *scopeArray = [timer userInfo];
+	id command = [parser timeoutInScope:scopeArray error:&error];
 	if (command)
 		[self evalCommand:command];
 	else if (error)
 		[self presentError:error];
 }
 
-- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
 {
 	BOOL partial = parser.partial;
 	NSError *error = nil;
-	[self handleKey:[theEvent normalizedKeyCode] allowMacros:YES error:&error];
+	[self handleKey:[theEvent normalizedKeyCode]
+	    allowMacros:YES
+		inScope:scopeArray
+		  error:&error];
 	if (error) {
 		if (!partial && [error code] == ViErrorMapNotFound)
 			return NO;
@@ -192,9 +204,19 @@
 	return YES;
 }
 
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	return [self performKeyEquivalent:theEvent inScope:nil];
+}
+
+- (void)keyDown:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
+{
+	[self handleKey:[theEvent normalizedKeyCode] inScope:scopeArray];
+}
+
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[self handleKey:[theEvent normalizedKeyCode]];
+	[self keyDown:theEvent inScope:nil];
 }
 
 @end

@@ -7,8 +7,6 @@ URGENT
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
-* clone modified bundles to vicoapp@github ?
-* scoped macros doesn't seem to work?
 * tweak smart typing pair invocation
 * package license for SBJson, see http://stig.github.com/json-framework/
 * build osx::plist
@@ -249,3 +247,4 @@ latex.tmbundle
 * [DONE] re-use open help windows
 * [DONE] skip tags/symbols on the current line if ambiguous match (ctrl-])
 * [DONE] clicking a binary file (pdf, image) in explorer opens as text
+* [DONE] clone modified bundles to vicoapp@github

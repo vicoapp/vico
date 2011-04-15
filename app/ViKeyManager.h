@@ -18,7 +18,9 @@
                       defaultMap:(ViMap *)map;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent;
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
 - (void)keyDown:(NSEvent *)theEvent;
+- (void)keyDown:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
 - (BOOL)handleKey:(NSInteger)keyCode;
 - (void)handleKeys:(NSArray *)keys;
 - (void)runAsMacro:(NSString *)inputString;

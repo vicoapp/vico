@@ -1622,7 +1622,7 @@ int logIndent = 0;
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
 		for (i = 0; i < [string length]; i++)
-			[keyManager handleKey:[string characterAtIndex:i]];
+			[keyManager handleKey:[string characterAtIndex:i] inScope:[self scopesAtLocation:[self caret]]];
 		insertedKey = YES;
 	}
 }
@@ -1651,7 +1651,7 @@ int logIndent = 0;
 	if ([[self window] firstResponder] != self)
 		return NO;
 
-	return [keyManager performKeyEquivalent:theEvent];
+	return [keyManager performKeyEquivalent:theEvent inScope:[self scopesAtLocation:[self caret]]];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1666,7 +1666,7 @@ int logIndent = 0;
 
 	if (!insertedKey && ![self hasMarkedText]) {
 		DEBUG(@"decoding event %@", theEvent);
-		[keyManager keyDown:theEvent];
+		[keyManager keyDown:theEvent inScope:[self scopesAtLocation:[self caret]]];
 	}
 	insertedKey = NO;
 }

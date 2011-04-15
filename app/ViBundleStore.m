@@ -30,43 +30,13 @@ static NSString *bundlesDirectory = nil;
 
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
-
-	NSString *infoPath = [NSString stringWithFormat:@"%@/info.plist", bundleDirectory];
-	if (![fm fileExistsAtPath:infoPath])
-		return NO;
-
-	ViBundle *bundle = [[ViBundle alloc] initWithPath:infoPath];
+	ViBundle *bundle = [[ViBundle alloc] initWithDirectory:bundleDirectory];
 	if (bundle == nil)
 		return NO;
-
-	NSString *dir = [NSString stringWithFormat:@"%@/Syntaxes", bundleDirectory];
-	NSString *file;
-	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {
-		if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
-			ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]
-								      forBundle:bundle];
-			[bundle addLanguage:language];
-			[languages setObject:language forKey:[language name]];
-		}
-	}
-
-	dir = [NSString stringWithFormat:@"%@/Preferences", bundleDirectory];
-	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
-		if ([file hasSuffix:@".plist"] || [file hasSuffix:@".tmPreferences"])
-			[bundle addPreferences:[[NSMutableDictionary alloc] initWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
-
-	dir = [NSString stringWithFormat:@"%@/Snippets", bundleDirectory];
-	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
-		if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])
-			[bundle addSnippet:[NSDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
-
-	dir = [NSString stringWithFormat:@"%@/Commands", bundleDirectory];
-	for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
-		if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"])
-			[bundle addCommand:[NSMutableDictionary dictionaryWithContentsOfFile:[dir stringByAppendingPathComponent:file]]];
-
 	[bundles addObject:bundle];
+
+	for (ViLanguage *lang in [bundle languages])
+		[languages setObject:lang forKey:[lang name]];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViBundleStoreBundleLoadedNotification
 							    object:self
@@ -84,8 +54,8 @@ static NSString *bundlesDirectory = nil;
 
 - (void)initLanguages
 {
-	languages = [[NSMutableDictionary alloc] init];
-	bundles = [[NSMutableArray alloc] init];
+	languages = [NSMutableDictionary dictionary];
+	bundles = [NSMutableArray array];
 
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 	[self addBundlesFromBundleDirectory:[ViBundleStore bundlesDirectory]];

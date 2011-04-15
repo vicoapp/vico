@@ -1,5 +1,6 @@
 #import "ViLanguage.h"
 #import "ViCommon.h"
+#import "Nu/Nu.h"
 
 @class ViBundleCommand;
 @class ViTextView;
@@ -13,23 +14,24 @@
 	NSMutableArray *items;
 	NSMutableDictionary *cachedPreferences;
 	NSMutableDictionary *uuids;
+	id<NuParsing> parser;
 }
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
-+ (void)normalizePreference:(NSDictionary *)preference intoDictionary:(NSMutableDictionary *)normalizedPreference;
-+ (void)setupEnvironment:(NSMutableDictionary *)env forTextView:(ViTextView *)textView;
++ (void)normalizePreference:(NSDictionary *)preference
+             intoDictionary:(NSMutableDictionary *)normalizedPreference;
++ (void)setupEnvironment:(NSMutableDictionary *)env
+             forTextView:(ViTextView *)textView;
 
-- (id)initWithPath:(NSString *)aPath;
+- (ViBundle *)initWithDirectory:(NSString *)bundleDirectory;
 - (NSString *)supportPath;
 - (NSString *)name;
 - (NSString *)uuid;
-- (void)addLanguage:(ViLanguage *)lang;
-- (void)addPreferences:(NSMutableDictionary *)prefs;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
-- (void)addSnippet:(NSDictionary *)snippet;
-- (void)addCommand:(NSMutableDictionary *)command;
-- (NSMenu *)menuForScopes:(NSArray *)scopes hasSelection:(BOOL)hasSelection font:(NSFont *)aFont;
+- (NSMenu *)menuForScopes:(NSArray *)scopes
+             hasSelection:(BOOL)hasSelection
+                     font:(NSFont *)aFont;
 
 @property(readonly) NSMutableArray *languages;
 @property(readonly) NSString *path;

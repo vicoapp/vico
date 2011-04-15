@@ -194,24 +194,113 @@
 	}
 }
 
-- (id)initWithPath:(NSString *)aPath
+- (ViBundle *)initWithDirectory:(NSString *)bundleDirectory
 {
 	self = [super init];
 	if (self) {
-		info = [NSDictionary dictionaryWithContentsOfFile:aPath];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		NSString *plistPath = [bundleDirectory stringByAppendingPathComponent:@"info.plist"];
+		if (![fm fileExistsAtPath:plistPath])
+			return nil;
+
+		info = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+		if (info == nil || ![info isKindOfClass:[NSDictionary class]]) {
+			INFO(@"malformed info.plist in bundle %@", bundleDirectory);
+			return nil;
+		}
 		if ([info objectForKey:@"isDelta"]) {
-			INFO(@"delta bundles not implemented, at %@", aPath);
+			INFO(@"delta bundles not implemented, at %@", bundleDirectory);
 			return nil;
 		}
 
-		languages = [[NSMutableArray alloc] init];
-		preferences = [[NSMutableArray alloc] init];
-		cachedPreferences = [[NSMutableDictionary alloc] init];
-		uuids = [[NSMutableDictionary alloc] init];
-		items = [[NSMutableArray alloc] init];
-		path = [aPath stringByDeletingLastPathComponent];
-	}
+		languages = [NSMutableArray array];
+		preferences = [NSMutableArray array];
+		cachedPreferences = [NSMutableDictionary dictionary];
+		uuids = [NSMutableDictionary dictionary];
+		items = [NSMutableArray array];
+		path = bundleDirectory;
 
+		parser = [Nu parser];
+		NSMutableDictionary *context = [(NuParser *)parser context];
+		[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+		[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+		[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+		[Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+		[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+		[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
+
+		NSString *dir = [path stringByAppendingPathComponent:@"Syntaxes"];
+		NSString *file;
+		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {
+			if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
+				ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]
+									      forBundle:self];
+				if (language)
+					[languages addObject:language];
+			}
+		}
+
+		dir = [path stringByAppendingPathComponent:@"Preferences"];
+		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
+			if ([file hasSuffix:@".plist"] || [file hasSuffix:@".tmPreferences"]) {
+				NSString *f = [dir stringByAppendingPathComponent:file];
+				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				if ([plist isKindOfClass:[NSDictionary class]]) {
+					[ViBundle normalizePreference:plist
+						       intoDictionary:[plist objectForKey:@"settings"]];
+					[preferences addObject:plist];
+				}
+			}
+
+		dir = [path stringByAppendingPathComponent:@"Snippets"];
+		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
+			if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])  {
+				NSString *f = [dir stringByAppendingPathComponent:file];
+				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:plist
+														 inBundle:self];
+				if (snippet) {
+					[items addObject:snippet];
+					[uuids setObject:snippet forKey:[snippet uuid]];
+				}
+
+			}
+
+		dir = [path stringByAppendingPathComponent:@"Commands"];
+		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
+			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"]) {
+				NSString *f = [dir stringByAppendingPathComponent:file];
+				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:plist
+														 inBundle:self];
+				if (command) {
+					[items addObject:command];
+					[uuids setObject:command forKey:[command uuid]];
+				}
+			}
+
+		file = [path stringByAppendingPathComponent:@"main.nu"];
+		BOOL isDir = NO;
+		if ([fm fileExistsAtPath:file isDirectory:&isDir] && !isDir) {
+			NSString *script = [NSString stringWithContentsOfFile:file
+								     encoding:NSUTF8StringEncoding
+									error:nil];
+			if (script) {
+				id code = [parser parse:script asIfFromFilename:file];
+				if (code == nil) {
+					INFO(@"failed to parse %@", file);
+				} else {
+					id result = nil;
+					@try {
+						result = [parser eval:code];
+					}
+					@catch (NSException *exception) {
+						INFO(@"got exception while evaluating %@: %@", file, [exception name]);
+					}
+				}
+			}
+		}
+	}
 	return self;
 }
 
@@ -230,22 +319,9 @@
 	return [info objectForKey:@"uuid"];
 }
 
-- (void)addLanguage:(ViLanguage *)lang
-{
-	[languages addObject:lang];
-}
-
-- (void)addPreferences:(NSMutableDictionary *)prefs
-{
-	if ([prefs isKindOfClass:[NSDictionary class]]) {
-		[ViBundle normalizePreference:prefs intoDictionary:[prefs objectForKey:@"settings"]];
-		[preferences addObject:prefs];
-	}
-}
-
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames
 {
-	NSMutableDictionary *prefsForScope = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *prefsForScope = [NSMutableDictionary dictionary];
 
 	NSDictionary *prefs;
 	for (prefs in preferences) {
@@ -256,7 +332,7 @@
 			id prefsValue = [settings objectForKey:prefsName];
 			if (prefsValue) {
 				if (prefsValues == nil)
-					prefsValues = [[NSMutableDictionary alloc] init];
+					prefsValues = [NSMutableDictionary dictionary];
 				[prefsValues setObject:prefsValue forKey:prefsName];
 			}
 		}
@@ -276,7 +352,7 @@
 
 - (NSDictionary *)preferenceItem:(NSString *)prefsName
 {
-	NSMutableDictionary *prefsForScope = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *prefsForScope = [NSMutableDictionary dictionary];
 
 	NSDictionary *prefs;
 	for (prefs in preferences) {
@@ -290,24 +366,6 @@
 	}
 
 	return prefsForScope;
-}
-
-- (void)addSnippet:(NSDictionary *)desc
-{
-	ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:desc inBundle:self];
-	if (snippet) {
-		[items addObject:snippet];
-		[uuids setObject:snippet forKey:[snippet uuid]];
-	}
-}
-
-- (void)addCommand:(NSMutableDictionary *)desc
-{
-	ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:desc inBundle:self];
-	if (command) {
-		[items addObject:command];
-		[uuids setObject:command forKey:[command uuid]];
-	}
 }
 
 - (NSMenu *)submenu:(NSDictionary *)menuLayout

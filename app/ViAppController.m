@@ -108,7 +108,12 @@
 	    @"Menlo Regular", @"fontname",
 	    @"Sunset", @"theme",
 	    @"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$)", @"skipPattern",
-	    [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"]], @"bundleRepositoryUsers",
+	    [NSArray arrayWithObjects:
+		[NSDictionary dictionaryWithObject:@"vicoapp" forKey:@"username"],
+		[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"],
+		[NSDictionary dictionaryWithObject:@"jsallis" forKey:@"username"],
+		[NSDictionary dictionaryWithObject:@"kswedberg" forKey:@"username"],
+		nil], @"bundleRepositoryUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",
 	    nil]];

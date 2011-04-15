@@ -221,13 +221,7 @@
 		path = bundleDirectory;
 
 		parser = [Nu parser];
-		NSMutableDictionary *context = [(NuParser *)parser context];
-		[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-		[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-		[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-		[Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-		[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-		[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
+		[[NSApp delegate] loadStandardModules:parser];
 
 		NSString *dir = [path stringByAppendingPathComponent:@"Syntaxes"];
 		NSString *file;
@@ -286,18 +280,10 @@
 								     encoding:NSUTF8StringEncoding
 									error:nil];
 			if (script) {
-				id code = [parser parse:script asIfFromFilename:file];
-				if (code == nil) {
-					INFO(@"failed to parse %@", file);
-				} else {
-					id result = nil;
-					@try {
-						result = [parser eval:code];
-					}
-					@catch (NSException *exception) {
-						INFO(@"got exception while evaluating %@: %@", file, [exception name]);
-					}
-				}
+				NSError *error = nil;
+				[[NSApp delegate] eval:script error:&error];
+				if (error)
+					INFO(@"%@: %@", file, [error localizedDescription]);
 			}
 		}
 	}

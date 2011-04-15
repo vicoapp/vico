@@ -167,7 +167,6 @@ main(int argc, char **argv)
 		NSString *result = nil;
 		@try {
 			result = [proxy eval:script
-			      withScriptPath:script_path
 			  additionalBindings:bindings
 			         errorString:&errStr
 			         backChannel:runLoop ? @"crunchy frog" : nil];
@@ -213,10 +212,7 @@ main(int argc, char **argv)
 	if (argc == 0 && script == nil) {
 		/* just make it first responder */
 		[proxy eval:@"((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"
-	     withScriptPath:nil
-	 additionalBindings:nil
-	        errorString:nil
-	        backChannel:nil];
+		      error:nil];
 	}
 
 	if (runLoop && script) {

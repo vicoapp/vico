@@ -7,7 +7,6 @@
 #import "ViPreferencesController.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
-#import "Nu/Nu.h"
 #import "JSON.h"
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
@@ -197,7 +196,18 @@
 #endif
 
 	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
-	[[Nu parser] parseEval:consoleStartup]; 
+	[self eval:consoleStartup error:nil]; 
+
+	NSString *siteFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"];
+	NSString *siteScript = [NSString stringWithContentsOfFile:siteFile
+							 encoding:NSUTF8StringEncoding
+							    error:nil];
+	if (siteScript) {
+		NSError *error = nil;
+		[self eval:siteScript error:&error]; 
+		if (error)
+			INFO(@"%@: %@", siteFile, [error localizedDescription]);
+	}
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -273,55 +283,29 @@ extern BOOL makeNewWindowInsteadOfTab;
 	}
 }
 
-- (id)evalExpression:(NSString *)expression error:(NSError **)outError
+- (void)loadStandardModules:(id<NuParsing>)parser
 {
-	id<NuParsing> parser = [Nu parser];
-
-	[self exportGlobals:parser];
-
-	id code = [parser parse:expression];
-	if (code == nil) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"parse failed"];
-		return nil;
-	}
-	id result = [parser eval:code];
-	return result;
-}
-
-- (NSString *)eval:(NSString *)script
-    withScriptPath:(NSString *)path
-additionalBindings:(NSDictionary *)bindings
-       errorString:(NSString **)errorString
-       backChannel:(NSString *)channelName
-{
-	id<NuParsing> parser = [Nu parser];
-	[self exportGlobals:parser];
-
-	if (channelName) {
-		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
-		[parser setValue:backChannel forKey:@"shellCommand"];
-	}
-
-	for (NSString *key in [bindings allKeys])
-		if ([key isKindOfClass:[NSString class]])
-			[parser setValue:[bindings objectForKey:key] forKey:key];
-
-	DEBUG(@"evaluating script: {{{ %@ }}}", script);
-	DEBUG(@"additional bindings: %@", bindings);
-	
 	NSMutableDictionary *context = [(NuParser *)parser context];
 	[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+	// [Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
+}
+
+- (id)eval:(NSString *)script
+withParser:(id<NuParsing>)parser
+     error:(NSError **)outError
+{
+	[self exportGlobals:parser];
+
+	DEBUG(@"evaluating script: {{{ %@ }}}", script);
 
 	id code = [parser parse:script];
 	if (code == nil) {
-		if (errorString)
-			*errorString = @"parse failed";
+		if (outError)
+			*outError = [ViError errorWithFormat:@"parse failed"];
 		return nil;
 	}
 	id result = nil;
@@ -329,11 +313,41 @@ additionalBindings:(NSDictionary *)bindings
 		result = [parser eval:code];
 	}
 	@catch (NSException *exception) {
-		DEBUG(@"got exception %@", [exception name]);
-		if (errorString)
-			*errorString = [exception reason];
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Got exception %@:\n%@", [exception name], [exception reason]];
 		return nil;
 	}
+
+	return result;
+}
+
+- (id)eval:(NSString *)script
+     error:(NSError **)outError
+{
+	return [self eval:script withParser:[Nu parser] error:outError];
+}
+
+- (NSString *)eval:(NSString *)script
+additionalBindings:(NSDictionary *)bindings
+       errorString:(NSString **)errorString
+       backChannel:(NSString *)channelName
+{
+	id<NuParsing> parser = [Nu parser];
+
+	if (channelName) {
+		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
+		[parser setValue:backChannel forKey:@"shellCommand"];
+	}
+
+	DEBUG(@"additional bindings: %@", bindings);
+	for (NSString *key in [bindings allKeys])
+		if ([key isKindOfClass:[NSString class]])
+			[parser setValue:[bindings objectForKey:key] forKey:key];
+
+	NSError *error = nil;
+	id result = [self eval:script withParser:parser error:&error];
+	if (error && errorString)
+		*errorString = [error localizedDescription];
 
 	if ([result isKindOfClass:[NSNull class]])
 		return nil;

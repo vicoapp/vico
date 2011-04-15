@@ -1,3 +1,5 @@
+#import "Nu/Nu.h"
+
 @class ViRegexp;
 
 @protocol ViShellThingProtocol <NSObject>
@@ -11,8 +13,9 @@
 
 @protocol ViShellCommandProtocol <NSObject>
 
+- (id)eval:(NSString *)script
+     error:(NSError **)outError;
 - (NSString *)eval:(NSString *)script
-    withScriptPath:(NSString *)path
 additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName;
@@ -30,7 +33,13 @@ additionalBindings:(NSDictionary *)bindings
 
 @property(readonly) NSMenu *encodingMenu;
 
-- (id)evalExpression:(NSString *)expression error:(NSError **)outError;
+- (void)exportGlobals:(id)parser;
+- (void)loadStandardModules:(id<NuParsing>)parser;
+- (id)eval:(NSString *)script
+withParser:(id<NuParsing>)parser
+     error:(NSError **)outError;
+- (id)eval:(NSString *)script
+     error:(NSError **)outError;
 
 + (NSString *)supportDirectory;
 - (IBAction)showPreferences:(id)sender;

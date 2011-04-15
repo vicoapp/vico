@@ -491,7 +491,7 @@ int logIndent = 0;
 		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
 		DEBUG(@"running indent expression:\n%@", expression);
 		NSError *error = nil;
-		id result = [[NSApp delegate] evalExpression:expression error:&error];
+		id result = [[NSApp delegate] eval:expression error:&error];
 		if (error)
 			MESSAGE(@"indent expression failed: %@", [error localizedDescription]);
 		else if ([result isKindOfClass:[NSNumber class]])

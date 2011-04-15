@@ -369,6 +369,15 @@
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 
+; move to BOL and insert newline
+((ViMap insertMap) map:"<ctrl-k>" to:"<esc>O")
+
+; move to EOL and insert statement terminator
+((ViMap insertMap) map:"<alt-cmd-cr>" toExpression:(do ()
+	(let (term (or ((text environment) objectForKey:"TM_LINE_TERMINATOR") ";"))
+		(text input:"<esc>A#{term}"))))
+((ViMap insertMap) map:"<shift-cmd-cr>" to:"<alt-cmd-cr><esc>o" recursively:YES scope:nil)
+
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")

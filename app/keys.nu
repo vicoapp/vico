@@ -376,6 +376,7 @@
 ((ViMap insertMap) map:"<alt-cmd-cr>" toExpression:(do ()
 	(let (term (or ((text environment) objectForKey:"TM_LINE_TERMINATOR") ";"))
 		(text input:"<esc>A#{term}"))))
+; move to EOL and insert statement terminator + newline
 ((ViMap insertMap) map:"<shift-cmd-cr>" to:"<alt-cmd-cr><esc>o" recursively:YES scope:nil)
 
 

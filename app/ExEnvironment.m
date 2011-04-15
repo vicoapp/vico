@@ -524,7 +524,7 @@ filter_write(CFSocketRef s,
 
 	int fd = [[shellOutput fileHandleForReading] fileDescriptor];
 	int flags = fcntl(fd, F_GETFL, 0);
-        fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
 	inputContext.version = 0;
 	inputContext.info = self; /* user data passed to the callbacks */
@@ -632,7 +632,12 @@ filter_write(CFSocketRef s,
 
 	filterCommand = shellCommand;
 
-	return [self filterText:inputText throughTask:task target:target selector:selector contextInfo:contextInfo displayTitle:shellCommand];
+	return [self filterText:inputText
+		    throughTask:task
+			 target:target
+		       selector:selector
+		    contextInfo:contextInfo
+		   displayTitle:shellCommand];
 }
 
 - (void)ex_bang:(ExCommand *)command

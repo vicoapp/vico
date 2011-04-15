@@ -2,7 +2,7 @@
 
 #import "ViDocument.h"
 #import "ViDocumentView.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViCharsetDetector.h"
 #import "ViTextStorage.h"
 #import "NSString-additions.h"
@@ -662,15 +662,15 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (lang != language) {
 		language = lang;
 		bundle = [language bundle];
-		symbolScopes = [[ViLanguageStore defaultStore] preferenceItem:@"showInSymbolList"];
-		symbolTransforms = [[ViLanguageStore defaultStore] preferenceItem:@"symbolTransformation"];
+		symbolScopes = [[ViBundleStore defaultStore] preferenceItem:@"showInSymbolList"];
+		symbolTransforms = [[ViBundleStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self highlightEverything];
 	}
 }
 
 - (void)configureForURL:(NSURL *)aURL
 {
-	ViLanguageStore *langStore = [ViLanguageStore defaultStore];
+	ViBundleStore *langStore = [ViBundleStore defaultStore];
 	ViLanguage *newLanguage = nil;
 
 	NSString *firstLine = nil;
@@ -699,7 +699,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSDictionary *syntaxOverride = [defs dictionaryForKey:@"syntaxOverride"];
 	NSString *syntax = [syntaxOverride objectForKey:[[self fileURL] absoluteString]];
 	if (syntax) {
-		ViLanguage *lang = [[ViLanguageStore defaultStore] languageWithScope:syntax];
+		ViLanguage *lang = [[ViBundleStore defaultStore] languageWithScope:syntax];
 		if (lang) {
 			[self setLanguage:lang];
 			return;

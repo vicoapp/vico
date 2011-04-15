@@ -22,6 +22,8 @@
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;
 - (ViRegexp *)compileRegexp:(NSString *)pattern;
-- (ViRegexp *)compileRegexp:(NSString *)pattern withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch matchText:(const unichar *)matchText;
+- (ViRegexp *)compileRegexp:(NSString *)pattern
+ withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch
+                  matchText:(const unichar *)matchText;
 
 @end

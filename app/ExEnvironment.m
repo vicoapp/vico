@@ -9,7 +9,7 @@
 #import "SFTPConnectionPool.h"
 #import "ViCharsetDetector.h"
 #import "ViDocumentController.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "NSString-scopeSelector.h"
 #include "logging.h"
 
@@ -871,7 +871,7 @@ filter_write(CFSocketRef s,
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 	NSMutableSet *matches = [NSMutableSet set];
 	ViLanguage *lang;
-	for (lang in [[ViLanguageStore defaultStore] languages]) {
+	for (lang in [[ViBundleStore defaultStore] languages]) {
 		if ([[lang name] isEqualToString:langScope]) {
 			/* full match */
 			[matches removeAllObjects];

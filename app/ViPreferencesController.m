@@ -1,5 +1,5 @@
 #import "ViPreferencesController.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViThemeStore.h"
 #import "ViAppController.h"
 #import "logging.h"
@@ -108,7 +108,7 @@ ToolbarHeightForWindow(NSWindow *window)
 - (NSString *)repoPathForUser:(NSString *)username readonly:(BOOL)readonly
 {
 	NSString *path = [[NSString stringWithFormat:@"%@/%@-bundles.json",
-	    [ViLanguageStore bundlesDirectory], username]
+	    [ViBundleStore bundlesDirectory], username]
 	    stringByExpandingTildeInPath];
 
 	if (!readonly)
@@ -135,11 +135,11 @@ ToolbarHeightForWindow(NSWindow *window)
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
 		[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
 		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available. Last updated %@.",
-		    (unsigned)[[[ViLanguageStore defaultStore] allBundles] count],
+		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count],
 		    [repositories count], [dateFormatter stringFromDate:date]]];
 	} else {
 		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available.",
-		    (unsigned)[[[ViLanguageStore defaultStore] allBundles] count], [repositories count]]];
+		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count], [repositories count]]];
 	}
 }
 
@@ -165,7 +165,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	for (NSMutableDictionary *bundle in repositories) {
 		NSString *name = [bundle objectForKey:@"name"];
 		NSString *status = @"";
-		if ([[ViLanguageStore defaultStore] isBundleLoaded:[NSString stringWithFormat:@"%@-%@", [bundle objectForKey:@"owner"], name]])
+		if ([[ViBundleStore defaultStore] isBundleLoaded:[NSString stringWithFormat:@"%@-%@", [bundle objectForKey:@"owner"], name]])
 			status = @"Installed";
 		[bundle setObject:status forKey:@"status"];
 
@@ -202,7 +202,7 @@ ToolbarHeightForWindow(NSWindow *window)
 						   context:NULL];
 
 	NSError *error = nil;
-	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViLanguageStore bundlesDirectory]
+	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViBundleStore bundlesDirectory]
 				      withIntermediateDirectories:YES
 						       attributes:nil
 							    error:&error] == NO) {
@@ -556,7 +556,7 @@ ToolbarHeightForWindow(NSWindow *window)
 
 	if (status == 0) {
 		NSError *error = nil;
-		NSString *downloadDirectory = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
+		NSString *downloadDirectory = [[ViBundleStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
 		NSString *prefix = [NSString stringWithFormat:@"%@-%@", owner, name];
 		NSString *bundleDirectory = nil;
 		NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadDirectory error:NULL];
@@ -573,10 +573,10 @@ ToolbarHeightForWindow(NSWindow *window)
 			return;
 		}
 
-		contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[ViLanguageStore bundlesDirectory] error:NULL];
+		contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[ViBundleStore bundlesDirectory] error:NULL];
 		for (NSString *filename in contents) {
 			if ([filename hasPrefix:prefix]) {
-				NSString *path = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:filename];
+				NSString *path = [[ViBundleStore bundlesDirectory] stringByAppendingPathComponent:filename];
 				if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
 					[self cancelProgressSheet:nil];
 					[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@ (%li)",
@@ -591,14 +591,14 @@ ToolbarHeightForWindow(NSWindow *window)
 		 * Move the bundle from the download directory to the bundles directory.
 		 */
 		NSString *src = [downloadDirectory stringByAppendingPathComponent:bundleDirectory];
-		NSString *dst = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@", owner, name]];
+		NSString *dst = [[ViBundleStore bundlesDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@", owner, name]];
 		if (![[NSFileManager defaultManager] moveItemAtPath:src toPath:dst error:&error])  {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",
 			    displayName, [error localizedDescription]]];
 		}
 
-		if ([[ViLanguageStore defaultStore] loadBundleFromDirectory:dst])
+		if ([[ViBundleStore defaultStore] loadBundleFromDirectory:dst])
 			[repo setObject:@"Installed" forKey:@"status"];
 		[self updateBundleStatus];
 	} else {
@@ -627,7 +627,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	 * Move away any existing (temporary) bundle directory.
 	 */
 	NSError *error = nil;
-	NSString *downloadDirectory = [[ViLanguageStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
+	NSString *downloadDirectory = [[ViBundleStore bundlesDirectory] stringByAppendingPathComponent:@"download"];
 	if (![[NSFileManager defaultManager] removeItemAtPath:downloadDirectory error:&error] && [error code] != NSFileNoSuchFileError) {
 		[self cancelProgressSheet:nil];
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed: %@",

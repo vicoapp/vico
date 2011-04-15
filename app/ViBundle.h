@@ -22,6 +22,7 @@
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)supportPath;
 - (NSString *)name;
+- (NSString *)uuid;
 - (void)addLanguage:(ViLanguage *)lang;
 - (void)addPreferences:(NSMutableDictionary *)prefs;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;

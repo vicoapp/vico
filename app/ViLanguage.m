@@ -1,5 +1,5 @@
 #import "ViLanguage.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "logging.h"
 
 @implementation ViLanguage
@@ -224,7 +224,7 @@
 		else
 		{
 			// include an external language grammar
-			ViLanguage *externalLanguage = [[ViLanguageStore defaultStore] languageWithScope:include];
+			ViLanguage *externalLanguage = [[ViBundleStore defaultStore] languageWithScope:include];
 			if (externalLanguage)
 				[expandedPatterns addObjectsFromArray:[externalLanguage patterns]];
 			else

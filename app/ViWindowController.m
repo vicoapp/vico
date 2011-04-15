@@ -7,7 +7,7 @@
 #import "ProjectDelegate.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
 #import "ViAppController.h"

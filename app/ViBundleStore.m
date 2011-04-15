@@ -1,13 +1,13 @@
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViBundle.h"
 #import "ViAppController.h"
 #import "ViBundleItem.h"
 #import "NSString-scopeSelector.h"
 #import "logging.h"
 
-@implementation ViLanguageStore
+@implementation ViBundleStore
 
-static ViLanguageStore *defaultStore = nil;
+static ViBundleStore *defaultStore = nil;
 static NSString *bundlesDirectory = nil;
 
 + (NSString *)bundlesDirectory
@@ -68,7 +68,7 @@ static NSString *bundlesDirectory = nil;
 
 	[bundles addObject:bundle];
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:ViLanguageStoreBundleLoadedNotification
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViBundleStoreBundleLoadedNotification
 							    object:self
 							  userInfo:[NSDictionary dictionaryWithObject:bundle forKey:@"bundle"]];
 
@@ -88,13 +88,13 @@ static NSString *bundlesDirectory = nil;
 	bundles = [[NSMutableArray alloc] init];
 
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
-	[self addBundlesFromBundleDirectory:[ViLanguageStore bundlesDirectory]];
+	[self addBundlesFromBundleDirectory:[ViBundleStore bundlesDirectory]];
 }
 
-+ (ViLanguageStore *)defaultStore
++ (ViBundleStore *)defaultStore
 {
 	if (defaultStore == nil) {
-		defaultStore = [[ViLanguageStore alloc] init];
+		defaultStore = [[ViBundleStore alloc] init];
 		[defaultStore initLanguages];
 	}
 	return defaultStore;
@@ -165,6 +165,22 @@ static NSString *bundlesDirectory = nil;
 - (NSArray *)allBundles
 {
 	return bundles;
+}
+
+- (ViBundle *)bundleWithName:(NSString *)name
+{
+	for (ViBundle *b in bundles)
+		if ([[b name] isEqualToString:name])
+			return b;
+	return nil;
+}
+
+- (ViBundle *)bundleWithUUID:(NSString *)uuid
+{
+	for (ViBundle *b in bundles)
+		if ([[b uuid] isEqualToString:uuid])
+			return b;
+	return nil;
 }
 
 /*

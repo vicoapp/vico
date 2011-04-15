@@ -1,6 +1,6 @@
 #import "ViAppController.h"
 #import "ViThemeStore.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViDocumentController.h"
@@ -114,7 +114,7 @@
 	    nil]];
 
 	/* Initialize languages and themes. */
-	[ViLanguageStore defaultStore];
+	[ViBundleStore defaultStore];
 	[ViThemeStore defaultStore];
 
 	NSArray *opts = [NSArray arrayWithObjects:
@@ -127,7 +127,7 @@
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 	                                         selector:@selector(newBundleLoaded:)
-	                                             name:ViLanguageStoreBundleLoadedNotification
+	                                             name:ViBundleStoreBundleLoadedNotification
 	                                           object:nil];
 
 	const NSStringEncoding *encoding = [NSString availableStringEncodings];

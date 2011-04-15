@@ -4,7 +4,7 @@
 #import "ViBundleSnippet.h"
 #import "ViCommandMenuItemView.h"
 #import "ViTextView.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "logging.h"
 
 @implementation ViBundle
@@ -175,7 +175,7 @@
 	/*
 	 * shellVariables from bundle preferences
 	 */
-	NSDictionary *shellVariables = [[ViLanguageStore defaultStore] preferenceItem:@"shellVariables"];
+	NSDictionary *shellVariables = [[ViBundleStore defaultStore] preferenceItem:@"shellVariables"];
 	NSString *bestMatchingScope = [textView bestMatchingScope:[shellVariables allKeys] atLocation:[textView caret]];
 
 	if (bestMatchingScope) {
@@ -223,6 +223,11 @@
 - (NSString *)name
 {
 	return [info objectForKey:@"name"];
+}
+
+- (NSString *)uuid
+{
+	return [info objectForKey:@"uuid"];
 }
 
 - (void)addLanguage:(ViLanguage *)lang
@@ -421,6 +426,11 @@
 				font:aFont];
 
 	return matches == 0 ? nil : menu;
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViBundle %@ (%@)>", [self name], [self uuid]];
 }
 
 @end

@@ -1,5 +1,5 @@
 #import "ViTextView.h"
-#import "ViLanguageStore.h"
+#import "ViBundleStore.h"
 #import "ViThemeStore.h"
 #import "ViDocument.h"  // for declaration of the message: method
 #import "NSString-scopeSelector.h"
@@ -416,7 +416,7 @@ int logIndent = 0;
 
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"increaseIndentPattern"];
+	NSDictionary *increaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"increaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -433,7 +433,7 @@ int logIndent = 0;
 
 - (BOOL)shouldIncreaseIndentOnceAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *increaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"indentNextLinePattern"];
+	NSDictionary *increaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"indentNextLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -450,7 +450,7 @@ int logIndent = 0;
 
 - (BOOL)shouldDecreaseIndentAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *decreaseIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"decreaseIndentPattern"];
+	NSDictionary *decreaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"decreaseIndentPattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -467,7 +467,7 @@ int logIndent = 0;
 
 - (BOOL)shouldIgnoreIndentAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *unIndentPatterns = [[ViLanguageStore defaultStore] preferenceItem:@"unIndentedLinePattern"];
+	NSDictionary *unIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"unIndentedLinePattern"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -484,7 +484,7 @@ int logIndent = 0;
 
 - (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *indentExpressions = [[ViLanguageStore defaultStore] preferenceItem:@"indentExpression"];
+	NSDictionary *indentExpressions = [[ViBundleStore defaultStore] preferenceItem:@"indentExpression"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
 	
 	if (bestMatchingScope) {
@@ -1252,7 +1252,7 @@ int logIndent = 0;
 	if ([prefix length] > 0) {
 		NSArray *scopes = [self scopesAtLocation:eol];
 		NSUInteger triggerLength;
-		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithTabTrigger:prefix
+		NSArray *matches = [[ViBundleStore defaultStore] itemsWithTabTrigger:prefix
 									matchingScopes:scopes
 										inMode:mode
 									 matchedLength:&triggerLength];
@@ -1272,7 +1272,7 @@ int logIndent = 0;
 
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *smartTypingPairs = [[ViLanguageStore defaultStore] preferenceItem:@"smartTypingPairs"];
+	NSDictionary *smartTypingPairs = [[ViBundleStore defaultStore] preferenceItem:@"smartTypingPairs"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
@@ -1688,7 +1688,7 @@ int logIndent = 0;
 	 */
 	if (!keyManager.parser.partial && ![self isFieldEditor]) {
 		NSArray *scopes = [self scopesAtLocation:[self caret]];
-		NSArray *matches = [[ViLanguageStore defaultStore] itemsWithKeyCode:keyCode
+		NSArray *matches = [[ViBundleStore defaultStore] itemsWithKeyCode:keyCode
 								     matchingScopes:scopes
 									     inMode:mode];
 		if ([matches count] > 0) {
@@ -1885,7 +1885,7 @@ int logIndent = 0;
 	NSMenuItem *item;
 	NSMenu *submenu;
 
-	for (ViBundle *bundle in [[ViLanguageStore defaultStore] allBundles]) {
+	for (ViBundle *bundle in [[ViBundleStore defaultStore] allBundles]) {
 		submenu = [bundle menuForScopes:scopes
 				   hasSelection:sel.length > 0
 					   font:[menu font]];
@@ -1919,7 +1919,7 @@ int logIndent = 0;
 		[item setState:NSOnState];
 	[submenu addItem:[NSMenuItem separatorItem]];
 
-	NSArray *languages = [[ViLanguageStore defaultStore] languages];
+	NSArray *languages = [[ViBundleStore defaultStore] languages];
 	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
 	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
 

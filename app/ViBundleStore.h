@@ -1,21 +1,23 @@
 #import "ViLanguage.h"
 #import "ViBundle.h"
 
-#define ViLanguageStoreBundleLoadedNotification @"ViLanguageStoreBundleLoaded"
+#define ViBundleStoreBundleLoadedNotification @"ViBundleStoreBundleLoaded"
 
-@interface ViLanguageStore : NSObject
+@interface ViBundleStore : NSObject
 {
 	NSMutableDictionary *languages;
 	NSMutableArray *bundles;
 	NSMutableDictionary *cachedPreferences;
 }
 + (NSString *)bundlesDirectory;
-+ (ViLanguageStore *)defaultStore;
++ (ViBundleStore *)defaultStore;
 - (ViLanguage *)languageForFirstLine:(NSString *)firstLine;
 - (ViLanguage *)languageForFilename:(NSString *)aPath;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
 - (ViLanguage *)defaultLanguage;
 - (NSArray *)allBundles;
+- (ViBundle *)bundleWithName:(NSString *)name;
+- (ViBundle *)bundleWithUUID:(NSString *)uuid;
 - (NSArray *)languages;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;

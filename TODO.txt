@@ -1,5 +1,7 @@
 URGENT
 ========
+* fuzzy completion is no longer highlighted!
+* undo manager messed up after undo and repeat of bundle command!
 * different indent settings for different file types!
 * ctrl-^ in a command output window:
   2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
@@ -31,8 +33,6 @@ IMPORTANT
 * shiftwidth, tabstop, etc. as preference variables
 * Reload themes!
 * cmd-t fuzzy search feels *slow*
-* bundle-specific nu startup scripts (nu/main.nu)
-* global nu startup script in application support folder
 * toggling explorer always opens to 200px
 * preference for wrapping
 * dot should work with ! filters
@@ -248,3 +248,5 @@ latex.tmbundle
 * [DONE] skip tags/symbols on the current line if ambiguous match (ctrl-])
 * [DONE] clicking a binary file (pdf, image) in explorer opens as text
 * [DONE] clone modified bundles to vicoapp@github
+* [DONE] bundle-specific nu startup scripts (nu/main.nu)
+* [DONE] global nu startup script in application support folder

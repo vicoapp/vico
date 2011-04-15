@@ -3,6 +3,7 @@
 #import "NSString-scopeSelector.h"
 #import "NSString-additions.h"
 #import "NSArray-patterns.h"
+#import "ViAppController.h"
 #include "logging.h"
 
 @implementation ViMapping
@@ -15,6 +16,7 @@
 @synthesize recursive;
 @synthesize macro;
 @synthesize parameter;
+@synthesize expression;
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
 			       action:(SEL)anAction
@@ -37,6 +39,15 @@
 	return [[ViMapping alloc] initWithKeySequence:aKeySequence
 						macro:aMacro
 					    recursive:recursiveFlag
+					        scope:aSelector];
+}
+
++ (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
+			   expression:(NuBlock *)expr
+				scope:(NSString *)aSelector
+{
+	return [[ViMapping alloc] initWithKeySequence:aKeySequence
+					   expression:expr
 					        scope:aSelector];
 }
 
@@ -72,16 +83,35 @@
 	return self;
 }
 
+- (ViMapping *)initWithKeySequence:(NSArray *)aKeySequence
+			expression:(NuBlock *)anExpression
+			     scope:(NSString *)aSelector
+{
+	if ((self = [super init]) != nil) {
+		keySequence = aKeySequence;
+		expression = anExpression;
+		recursive = NO;
+		scopeSelector = aSelector ? [aSelector copy] : @"";
+		keyString = [NSString stringWithKeySequence:keySequence];
+	}
+	return self;
+}
+
 #define has_flag(flag) ((flags & flag) == flag)
 
 - (BOOL)isAction
 {
-	return macro == nil;
+	return macro == nil && expression == nil;
 }
 
 - (BOOL)isMacro
 {
-	return !!macro;
+	return macro != nil || expression != nil;
+}
+
+- (BOOL)isExpression
+{
+	return !!expression;
 }
 
 - (BOOL)isOperator
@@ -114,6 +144,9 @@
 	if ([self isAction])
 		return [NSString stringWithFormat:@"<ViMapping %@: \"%@\", flags 0x%02x>",
 		    keyString, NSStringFromSelector(action), flags];
+	else if ([self isExpression])
+		return [NSString stringWithFormat:@"<ViMapping %@: nu expression>",
+		    keyString];
 	else
 		return [NSString stringWithFormat:@"<ViMapping %@: macro \"%@\">",
 		    keyString, macro];
@@ -243,7 +276,7 @@ static NSMutableDictionary *maps = nil;
 			if (rank == 0)
 				continue;
 
-//			DEBUG(@"testing key [%@] against %@", keySequence, m);
+			DEBUG(@"testing key [%@] against %@", keySequence, m);
 
 			if (overflowOrEqualMatch && [m wantsKeys]) {
 				/*
@@ -430,7 +463,8 @@ static NSMutableDictionary *maps = nil;
 	NSMutableArray *resolved = [NSMutableArray arrayWithObject:self];
 	[self resolveIncludedMaps:resolved];
 
-	DEBUG(@"looking up [%@] in maps %@", keySequence, resolved);
+	DEBUG(@"looking up [%@] in maps %@, %sincluding macros",
+	    keySequence, resolved, allowMacros ? "" : "NOT ");
 
 	NSError *error = nil;
 	m = [self lookupKeySequence:keySequence
@@ -513,6 +547,47 @@ recursively:(BOOL)recursiveFlag
 	       to:macro
       recursively:NO
 	    scope:nil];
+}
+
+- (void)map:(NSString *)keySequence
+toExpression:(id)expr
+      scope:(NSString *)scopeSelector
+{
+	NSArray *keyCodes = [keySequence keyCodes];
+	if (keyCodes == nil) {
+		INFO(@"invalid key sequence: %@", keySequence);
+		return;
+	}
+
+	NuBlock *code;
+	if ([expr isKindOfClass:[NSString class]]) {
+		id<NuParsing> parser = [Nu parser];
+		code = [parser parse:expr];
+		if (code == nil) {
+			INFO(@"failed to parse expression: %@", expr);
+			return;
+		}
+	} else if ([expr isKindOfClass:[NuBlock class]]) {
+		code = expr;
+	} else {
+		INFO(@"unhandled expression of type %@", NSStringFromClass([expr class]));
+		return;
+	}
+
+	if ([[code parameters] count] > 0) {
+		INFO(@"parameters %@ will be ignored in expression map %@",
+		    [[code parameters] stringValue], keySequence);
+	}
+
+	[self addMapping:[ViMapping mappingWithKeySequence:keyCodes
+						expression:code
+						     scope:scopeSelector]];
+}
+
+- (void)map:(NSString *)keySequence
+toExpression:(id)expr
+{
+	[self map:keySequence toExpression:expr scope:nil];
 }
 
 - (void)unmap:(NSString *)keySequence

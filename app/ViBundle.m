@@ -5,7 +5,8 @@
 #import "ViCommandMenuItemView.h"
 #import "ViTextView.h"
 #import "ViBundleStore.h"
-#import "logging.h"
+#import "ViAppController.h"
+#include "logging.h"
 
 @implementation ViBundle
 

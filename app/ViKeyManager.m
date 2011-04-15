@@ -3,6 +3,7 @@
 #import "NSString-additions.h"
 #import "ViError.h"
 #import "ViMacro.h"
+#import "ViAppController.h"
 #include "logging.h"
 
 @interface ViKeyManager (private)
@@ -51,6 +52,28 @@
 		return;
 	}
 
+	/*
+	 * Evaluate macro as a Nu expression.
+	 * Result is discarded.
+	 */
+	if ([macro.mapping isExpression]) {
+		id<NuParsing> nuParser = [Nu parser];
+		[[NSApp delegate] exportGlobals:nuParser];
+		id result = nil;
+		DEBUG(@"evaling with context %@", [(NuParser *)nuParser context]);
+		@try {
+			result = [[macro.mapping.expression body] evalWithContext:[(NuParser *)nuParser context]];
+		}
+		@catch (NSException *exception) {
+			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
+			[self presentError:[ViError errorWithFormat:@"Got exception %@:\n%@",
+			    [exception name], [exception reason]]];
+			return;
+		}
+		recursionLevel = 0;
+		return;
+	}
+
 	NSInteger keyCode;
 	NSError *error = nil;
 	while ((keyCode = [macro pop]) != -1) {
@@ -58,6 +81,7 @@
 		 * Send the key to the key manager of the first responder.
 		 * First responder might be another buffer, or the ex command line.
 		 */
+		DEBUG(@"evaluating key %@", [NSString stringWithKeyCode:keyCode]);
 		NSResponder *responder = [[NSApp keyWindow] firstResponder];
 		ViKeyManager *km = self;
 		if ([responder respondsToSelector:@selector(keyManager)])

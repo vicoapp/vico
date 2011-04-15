@@ -1,3 +1,5 @@
+#import "Nu/Nu.h"
+
 #define ViMapSetsDot		1ULL
 #define ViMapNeedMotion		2ULL
 #define ViMapIsMotion		4ULL
@@ -16,6 +18,7 @@
 
 	BOOL recursive;
 	NSString *macro;
+	NuBlock *expression;
 }
 
 @property (readonly) NSString *scopeSelector;
@@ -25,6 +28,7 @@
 @property (readonly) NSUInteger flags;
 @property (readonly) BOOL recursive;
 @property (readonly) NSString *macro;
+@property (readonly) NuBlock *expression;
 @property (readonly) id parameter;
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
@@ -35,6 +39,9 @@
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
 				macro:(NSString *)aMacro
 			    recursive:(BOOL)recursiveFlag
+				scope:(NSString *)aSelector;
++ (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
+			   expression:(NuBlock *)expr
 				scope:(NSString *)aSelector;
 
 - (ViMapping *)initWithKeySequence:(NSArray *)aKeySequence
@@ -47,8 +54,13 @@
 			 recursive:(BOOL)recursiveFlag
 			     scope:(NSString *)aSelector;
 
+- (ViMapping *)initWithKeySequence:(NSArray *)aKeySequence
+			expression:(NuBlock *)anExpression
+			     scope:(NSString *)aSelector;
+
 - (BOOL)isAction;
 - (BOOL)isMacro;
+- (BOOL)isExpression;
 - (BOOL)isOperator;
 - (BOOL)isMotion;
 - (BOOL)isLineMode;
@@ -106,6 +118,9 @@ recursively:(BOOL)recursiveFlag
 - (void)unmap:(NSString *)keySequence
         scope:(NSString *)scopeSelector;
 - (void)unmap:(NSString *)keySequence;
+
+- (void)map:(NSString *)keySequence toExpression:(id)expr scope:(NSString *)scopeSelector;
+- (void)map:(NSString *)keySequence toExpression:(id)expr;
 
 - (void)setKey:(NSString *)keyDescription
       toAction:(SEL)selector

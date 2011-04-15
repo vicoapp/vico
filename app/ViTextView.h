@@ -144,6 +144,8 @@
 - (NSEvent *)popUpContextEvent;
 - (void)popUpContextMenu:(NSMenu *)menu;
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent atLocation:(NSUInteger)location;
+
+- (NSDictionary *)environment;
 @end
 
 @interface ViTextView (snippets)

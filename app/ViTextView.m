@@ -2008,5 +2008,12 @@ int logIndent = 0;
 	showingContextMenu = NO;
 }
 
+- (NSDictionary *)environment
+{
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
+	[ViBundle setupEnvironment:env forTextView:self];
+	return env;
+}
+
 @end
 

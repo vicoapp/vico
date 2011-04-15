@@ -1106,7 +1106,8 @@ int logIndent = 0;
 			int count = IMAX(1, command.count);
 			int i;
 			for (i = 0; i < count; i++)
-				[keyManager handleKeys:command.text];
+				[keyManager handleKeys:command.text
+					       inScope:[self scopesAtLocation:end_location]];
 			[self normal_mode:command];
 			replayingInput = NO;
 		}
@@ -1371,7 +1372,8 @@ int logIndent = 0;
 			if (count > 1) {
 				replayingInput = YES;
 				for (int i = 1; i < count; i++)
-					[keyManager handleKeys:inputKeys];
+					[keyManager handleKeys:inputKeys
+						       inScope:[self scopesAtLocation:[self caret]]];
 				replayingInput = NO;
 			}
 		}
@@ -1622,7 +1624,8 @@ int logIndent = 0;
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
 		for (i = 0; i < [string length]; i++)
-			[keyManager handleKey:[string characterAtIndex:i] inScope:[self scopesAtLocation:[self caret]]];
+			[keyManager handleKey:[string characterAtIndex:i]
+				      inScope:[self scopesAtLocation:[self caret]]];
 		insertedKey = YES;
 	}
 }
@@ -1651,7 +1654,8 @@ int logIndent = 0;
 	if ([[self window] firstResponder] != self)
 		return NO;
 
-	return [keyManager performKeyEquivalent:theEvent inScope:[self scopesAtLocation:[self caret]]];
+	return [keyManager performKeyEquivalent:theEvent
+					inScope:[self scopesAtLocation:[self caret]]];
 }
 
 - (void)keyDown:(NSEvent *)theEvent

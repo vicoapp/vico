@@ -170,10 +170,15 @@
 	return [self handleKey:keyCode inScope:nil];
 }
 
-- (void)handleKeys:(NSArray *)keys
+- (void)handleKeys:(NSArray *)keys inScope:(NSArray *)scopeArray
 {
 	for (NSNumber *n in keys)
-		[self handleKey:[n integerValue]];
+		[self handleKey:[n integerValue] inScope:scopeArray];
+}
+
+- (void)handleKeys:(NSArray *)keys
+{
+	[self handleKeys:keys inScope:nil];
 }
 
 - (void)keyTimedOut:(NSTimer*)timer

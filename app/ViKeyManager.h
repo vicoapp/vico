@@ -22,7 +22,9 @@
 - (void)keyDown:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
 - (BOOL)handleKey:(NSInteger)keyCode;
+- (BOOL)handleKey:(NSInteger)keyCode inScope:(NSArray *)scopeArray;
 - (void)handleKeys:(NSArray *)keys;
+- (void)handleKeys:(NSArray *)keys inScope:(NSArray *)scopeArray;
 - (void)runAsMacro:(NSString *)inputString;
 @end
 

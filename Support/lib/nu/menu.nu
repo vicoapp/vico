@@ -52,7 +52,7 @@
 		(set key "#{(% tag 10)}"))
 	(set tag (+ tag 1))
 	(set title (obj objectForKey:"title"))
-	(if (obj objectForKey:"separator")
+	(if (or (obj objectForKey:"separator") (title hasPrefix:"--"))
 		(menu addItem:(NSMenuItem separatorItem))
 	(else
 		(set item (menu addItemWithTitle:title action:"selectMenuItem:" keyEquivalent:key))

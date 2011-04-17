@@ -90,6 +90,7 @@
 	    [NSNumber numberWithInt:8], @"shiftwidth",
 	    [NSNumber numberWithInt:8], @"tabstop",
 	    [NSNumber numberWithBool:YES], @"autoindent",
+	    [NSNumber numberWithBool:YES], @"smartindent",
 	    [NSNumber numberWithBool:YES], @"smartpair",
 	    [NSNumber numberWithBool:YES], @"ignorecase",
 	    [NSNumber numberWithBool:YES], @"smartcase",
@@ -260,7 +261,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 }
 
 #pragma mark -
-#pragma mark Shell commands
+#pragma mark Script evaluation
 
 /* Set some convenient global objects. */
 - (void)exportGlobals:(id)parser
@@ -327,6 +328,9 @@ withParser:(id<NuParsing>)parser
 	return [self eval:script withParser:[Nu parser] error:outError];
 }
 
+#pragma mark -
+#pragma mark Shell commands
+
 - (NSString *)eval:(NSString *)script
 additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
@@ -365,6 +369,8 @@ additionalBindings:(NSDictionary *)bindings
 
 	return nil;
 }
+
+#pragma mark -
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {

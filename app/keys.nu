@@ -369,7 +369,7 @@
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 
-; move to BOL and insert newline
+; insert newline above current line
 ((ViMap insertMap) map:"<ctrl-k>" to:"<esc>O")
 
 ; move to EOL and insert statement terminator

@@ -77,12 +77,18 @@
 @property(readonly) ViKeyManager *keyManager;
 @property(readonly) ViDocument *document;
 
-- (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser;
+- (void)initWithDocument:(ViDocument *)aDocument
+                viParser:(ViParser *)aParser;
 - (ViTextStorage *)textStorage;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
-- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr forLocation:(NSUInteger)aLocation;
-- (void)getLineStart:(NSUInteger *)bol_ptr end:(NSUInteger *)end_ptr contentsEnd:(NSUInteger *)eol_ptr;
+- (void)getLineStart:(NSUInteger *)bol_ptr
+                 end:(NSUInteger *)end_ptr
+         contentsEnd:(NSUInteger *)eol_ptr
+         forLocation:(NSUInteger)aLocation;
+- (void)getLineStart:(NSUInteger *)bol_ptr
+                 end:(NSUInteger *)end_ptr
+         contentsEnd:(NSUInteger *)eol_ptr;
 - (NSString *)indentStringOfLength:(NSInteger)length;
 - (NSString *)indentStringForLevel:(int)level;
 - (NSUInteger)lengthOfIndentString:(NSString *)indent;
@@ -92,8 +98,12 @@
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation;
 - (BOOL)shouldIncreaseIndentOnceAtLocation:(NSUInteger)aLocation;
 - (BOOL)shouldIgnoreIndentAtLocation:(NSUInteger)aLocation;
+- (NSString*)suggestedIndentAtLocation:(NSUInteger)location
+                      forceSmartIndent:(BOOL)smartFlag;
 - (NSString *)suggestedIndentAtLocation:(NSUInteger)location;
-- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret;
+- (NSRange)changeIndentation:(int)delta
+                     inRange:(NSRange)aRange
+                 updateCaret:(NSUInteger *)updatedCaret;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
@@ -119,21 +129,29 @@
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation undoGroup:(BOOL)undoGroup;
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation;
+- (void)insertString:(NSString *)aString
+          atLocation:(NSUInteger)aLocation
+           undoGroup:(BOOL)undoGroup;
+- (void)insertString:(NSString *)aString
+          atLocation:(NSUInteger)aLocation;
 - (void)insertString:(NSString *)aString;
 - (void)deleteRange:(NSRange)aRange;
-- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup;
-- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString;
+- (void)replaceRange:(NSRange)aRange
+          withString:(NSString *)aString
+           undoGroup:(BOOL)undoGroup;
+- (void)replaceRange:(NSRange)aRange
+          withString:(NSString *)aString;
 
-- (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward;
+- (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation
+                        indentForward:(BOOL)indentForward;
 
 - (void)yankToRegister:(unichar)regName
                  range:(NSRange)yankRange;
 - (void)cutToRegister:(unichar)regName
                 range:(NSRange)cutRange;
 
-- (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
+- (void)gotoColumn:(NSUInteger)column
+      fromLocation:(NSUInteger)aLocation;
 
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
@@ -143,7 +161,8 @@
 
 - (NSEvent *)popUpContextEvent;
 - (void)popUpContextMenu:(NSMenu *)menu;
-- (NSMenu *)menuForEvent:(NSEvent *)theEvent atLocation:(NSUInteger)location;
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+              atLocation:(NSUInteger)location;
 
 - (NSDictionary *)environment;
 @end
@@ -183,9 +202,13 @@
 @end
 
 @interface ViTextView (bundleCommands)
-- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors atLocation:(NSUInteger)aLocation;
-- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector atLocation:(NSUInteger)aLocation;
-- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector forward:(BOOL)forward fromLocation:(NSUInteger)aLocation;
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
+                     atLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                     atLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                        forward:(BOOL)forward
+                   fromLocation:(NSUInteger)aLocation;
 - (void)performBundleCommand:(ViBundleCommand *)command;
 - (void)performBundleItem:(id)bundleItem;
 - (void)performBundleItems:(NSArray *)matches;

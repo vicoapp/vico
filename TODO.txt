@@ -24,17 +24,16 @@ BUGS
 * vi always has a newline at EOF
 * searching is slow on large files, naïve implementation
 * yk and yj commands don't position caret correctly
+* search should be useable as motion command!
 
 IMPORTANT
 =========
 * always open an untitled document when opening a project?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
-* shiftwidth, tabstop, etc. as preference variables
 * Reload themes!
 * cmd-t fuzzy search feels *slow*
 * toggling explorer always opens to 200px
-* preference for wrapping
 * dot should work with ! filters
 * :write filename
 * :write !program
@@ -250,3 +249,4 @@ latex.tmbundle
 * [DONE] clone modified bundles to vicoapp@github
 * [DONE] bundle-specific nu startup scripts (nu/main.nu)
 * [DONE] global nu startup script in application support folder
+* [DONE] preference for wrapping

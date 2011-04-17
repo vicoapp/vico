@@ -503,9 +503,13 @@ int logIndent = 0;
 	return -1;
 }
 
-- (NSString *)suggestedIndentAtLocation:(NSUInteger)location
+- (NSString *)suggestedIndentAtLocation:(NSUInteger)location forceSmartIndent:(BOOL)smartFlag
 {
-	NSInteger calcIndent = [self calculatedIndentLengthAtLocation:location];
+	BOOL smartIndent = smartFlag || [[NSUserDefaults standardUserDefaults] boolForKey:@"smartindent"];
+
+	NSInteger calcIndent = -1;
+	if (smartIndent)
+		calcIndent = [self calculatedIndentLengthAtLocation:location];
 	if (calcIndent >= 0) {
 		DEBUG(@"calculated indent at %lu to %lu", location, calcIndent);
 		return [self indentStringOfLength:calcIndent];
@@ -519,9 +523,9 @@ int logIndent = 0;
 		return 0;
 	for (; bol > 0;) {
 		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:bol - 1];
-		if ([[self textStorage] isBlankLineAtLocation:bol])
+		if (smartIndent && [[self textStorage] isBlankLineAtLocation:bol])
 			DEBUG(@"line %lu is blank", [[self textStorage] lineNumberAtLocation:bol]);
-		else if ([self shouldIgnoreIndentAtLocation:bol])
+		else if (smartIndent && [self shouldIgnoreIndentAtLocation:bol])
 			DEBUG(@"line %lu is ignored", [[self textStorage] lineNumberAtLocation:bol]);
 		else {
 			len = [self lengthOfIndentAtLocation:bol];
@@ -531,7 +535,7 @@ int logIndent = 0;
 	}
 
 	NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
-	if (![self shouldIgnoreIndentAtLocation:bol]) {
+	if (smartIndent && ![self shouldIgnoreIndentAtLocation:bol]) {
 		if ([self shouldIncreaseIndentAtLocation:bol] ||
 		    [self shouldIncreaseIndentOnceAtLocation:bol]) {
 			DEBUG(@"increase indent at %lu", bol);
@@ -558,6 +562,11 @@ int logIndent = 0;
 	}
 
 	return [self indentStringOfLength:len];
+}
+
+- (NSString *)suggestedIndentAtLocation:(NSUInteger)location
+{
+	return [self suggestedIndentAtLocation:location forceSmartIndent:NO];
 }
 
 - (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward

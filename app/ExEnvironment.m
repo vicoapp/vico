@@ -685,11 +685,17 @@ filter_write(CFSocketRef s,
 	NSDictionary *variables = [NSDictionary dictionaryWithObjectsAndKeys:
 		@"shiftwidth", @"sw",
 		@"autoindent", @"ai",
+		@"smartindent", @"si",
 		@"expandtab", @"et",
 		@"smartpair", @"smp",
+		@"tabstop", @"ts",
+		@"wrap", @"wrap",
+
+		@"showguide", @"sg",
+		@"guidecolumn", @"gc",
+
 		@"ignorecase", @"ic",
 		@"smartcase", @"scs",
-		@"tabstop", @"ts",
 		@"number", @"nu",
 		@"number", @"num",
 		@"number", @"numb",
@@ -697,10 +703,7 @@ filter_write(CFSocketRef s,
 		@"hidetab", @"ht",  // hide tab bar for single tabs
 		@"fontsize", @"fs",
 		@"fontname", @"font",
-		@"showguide", @"sg",
-		@"guidecolumn", @"gc",
 		@"searchincr", @"searchincr",
-		@"wrap", @"wrap",
 		@"antialias", @"antialias",
 		@"undostyle", @"undostyle",
 		@"list", @"list",
@@ -708,7 +711,7 @@ filter_write(CFSocketRef s,
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
-	    @"autocollapse", @"hidetab", @"showguide", @"searchincr",
+	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
 	    @"wrap", @"antialias", @"list", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 

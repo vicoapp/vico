@@ -586,7 +586,8 @@
 	if (eol < end)
 		affectedRange.length--;
 
-	NSString *leading_whitespace = [self suggestedIndentAtLocation:affectedRange.location];
+	NSString *leading_whitespace = [self suggestedIndentAtLocation:affectedRange.location
+						      forceSmartIndent:YES];
 
 	[self cutToRegister:command.reg range:affectedRange];
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];

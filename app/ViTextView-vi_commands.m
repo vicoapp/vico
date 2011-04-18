@@ -343,20 +343,31 @@
 		return;
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
+
+	NSTask *task = [[NSTask alloc] init];
+	[task setLaunchPath:@"/bin/bash"];
+	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
+
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
+	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
+	[ViBundle setupEnvironment:env forTextView:self];
+	[task setEnvironment:env];
+
 	[[document environment] filterText:inputText
-                                   throughCommand:shellCommand
-                                           target:self
-                                         selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
-                                      contextInfo:[NSValue valueWithRange:affectedRange]];
+			       throughTask:task
+				    target:self
+				  selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
+			       contextInfo:[NSValue valueWithRange:affectedRange]
+			      displayTitle:shellCommand];
 }
 
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
 	[[document environment] getExCommandWithDelegate:self
-						       selector:@selector(filter_through_shell_command:contextInfo:)
-							 prompt:@"!"
-						    contextInfo:command];
+						selector:@selector(filter_through_shell_command:contextInfo:)
+						  prompt:@"!"
+					     contextInfo:command];
 	final_location = start_location;
 	return YES;
 }

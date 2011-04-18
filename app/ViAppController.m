@@ -5,6 +5,10 @@
 #import "ViDocumentView.h"
 #import "ViDocumentController.h"
 #import "ViPreferencesController.h"
+#import "ViPreferencePaneGeneral.h"
+#import "ViPreferencePaneEdit.h"
+#import "ViPreferencePaneTheme.h"
+#import "ViPreferencePaneBundles.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
 #import "JSON.h"
@@ -157,7 +161,6 @@
 	[TMFileURLProtocol registerProtocol];
 	[TxmtURLProtocol registerProtocol];
 
-	//shellConn = [NSConnection serviceConnectionWithName:@"chunky bacon" rootObject:self];
 	shellConn = [NSConnection new];
 	[shellConn setRootObject:self];
 	[shellConn registerName:[NSString stringWithFormat:@"vico.%u", (unsigned int)getuid()]];
@@ -195,6 +198,13 @@
 		}
 	}
 #endif
+
+	/* Register default preference panes. */
+	ViPreferencesController *prefs = [ViPreferencesController sharedPreferences];
+	[prefs registerPane:[[ViPreferencePaneGeneral alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneEdit alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneTheme alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
 
 	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
 	[self eval:consoleStartup error:nil]; 

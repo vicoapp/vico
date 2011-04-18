@@ -16,6 +16,12 @@
 		9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
 		9A26068113530FF3002C86FB /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A26068013530FF3002C86FB /* main.c */; };
 		9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */; };
+		9A2606A4135B17F2002C86FB /* ThemePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606A2135B17F2002C86FB /* ThemePrefs.xib */; };
+		9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A7135B1924002C86FB /* ViPreferencePane.m */; };
+		9A2606AD135B1924002C86FB /* ViPreferencePaneGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A9135B1924002C86FB /* ViPreferencePaneGeneral.m */; };
+		9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */; };
+		9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */; };
+		9A2606B4135B1C63002C86FB /* BundlePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606B2135B1C63002C86FB /* BundlePrefs.xib */; };
 		9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
 		9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2A1133109C20023C5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
@@ -209,7 +215,6 @@
 		9A4346CD13311694002B04DE /* TabNewMetalPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B913311694002B04DE /* TabNewMetalPressed.png */; };
 		9A4346CE13311694002B04DE /* TabNewMetalRollover.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BA13311694002B04DE /* TabNewMetalRollover.png */; };
 		9A4346CF13311694002B04DE /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BB13311694002B04DE /* tag.png */; };
-		9A4346D013311694002B04DE /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BC13311694002B04DE /* tick.png */; };
 		9A4346D41331182E002B04DE /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D11331182E002B04DE /* Bundles */; };
 		9A4346D51331182E002B04DE /* Support in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D21331182E002B04DE /* Support */; };
 		9A4346D61331182E002B04DE /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D31331182E002B04DE /* Themes */; };
@@ -244,6 +249,9 @@
 		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE40113366DC0002E82B1 /* vico.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* vico.nu */; };
+		9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A66526F135B21D700A2F93C /* EditPrefs.xib */; };
+		9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */; };
+		9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
@@ -367,6 +375,16 @@
 		9A26067D13530FF3002C86FB /* xorkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xorkey; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A26068013530FF3002C86FB /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
+		9A2606A3135B17F2002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThemePrefs.xib; sourceTree = "<group>"; };
+		9A2606A6135B1924002C86FB /* ViPreferencePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePane.h; sourceTree = "<group>"; };
+		9A2606A7135B1924002C86FB /* ViPreferencePane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePane.m; sourceTree = "<group>"; };
+		9A2606A8135B1924002C86FB /* ViPreferencePaneGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneGeneral.h; sourceTree = "<group>"; };
+		9A2606A9135B1924002C86FB /* ViPreferencePaneGeneral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneGeneral.m; sourceTree = "<group>"; };
+		9A2606AA135B1924002C86FB /* ViPreferencePaneTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneTheme.h; sourceTree = "<group>"; };
+		9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneTheme.m; sourceTree = "<group>"; };
+		9A2606AF135B1C4F002C86FB /* ViPreferencePaneBundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneBundles.h; sourceTree = "<group>"; };
+		9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneBundles.m; sourceTree = "<group>"; };
+		9A2606B3135B1C63002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/BundlePrefs.xib; sourceTree = "<group>"; };
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -687,7 +705,6 @@
 		9A4346B913311694002B04DE /* TabNewMetalPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalPressed.png; path = Images/TabNewMetalPressed.png; sourceTree = SOURCE_ROOT; };
 		9A4346BA13311694002B04DE /* TabNewMetalRollover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TabNewMetalRollover.png; path = Images/TabNewMetalRollover.png; sourceTree = SOURCE_ROOT; };
 		9A4346BB13311694002B04DE /* tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tag.png; path = Images/tag.png; sourceTree = SOURCE_ROOT; };
-		9A4346BC13311694002B04DE /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = Images/tick.png; sourceTree = SOURCE_ROOT; };
 		9A4346D11331182E002B04DE /* Bundles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Bundles; sourceTree = SOURCE_ROOT; };
 		9A4346D21331182E002B04DE /* Support */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Support; sourceTree = SOURCE_ROOT; };
 		9A4346D31331182E002B04DE /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = SOURCE_ROOT; };
@@ -728,6 +745,10 @@
 		9A5DD6B113445C80006981AE /* ViMacro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMacro.m; sourceTree = "<group>"; };
 		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Nu.framework; sourceTree = "<group>"; };
 		9A5EE40013366DC0002E82B1 /* vico.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vico.nu; sourceTree = "<group>"; };
+		9A665270135B21D700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/EditPrefs.xib; sourceTree = "<group>"; };
+		9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneEdit.h; sourceTree = "<group>"; };
+		9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneEdit.m; sourceTree = "<group>"; };
+		9A665277135B288700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
 		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
@@ -1068,7 +1089,11 @@
 				9A4346D31331182E002B04DE /* Themes */,
 				9A4346A813311673002B04DE /* Images */,
 				9A43469C13311615002B04DE /* CommandOutputWindow.xib */,
+				9A2606B2135B1C63002C86FB /* BundlePrefs.xib */,
+				9A66526F135B21D700A2F93C /* EditPrefs.xib */,
+				9A665276135B288700A2F93C /* GeneralPrefs.xib */,
 				9A43469E13311615002B04DE /* PreferenceWindow.xib */,
+				9A2606A2135B17F2002C86FB /* ThemePrefs.xib */,
 				9A4346A013311615002B04DE /* ViDocument.xib */,
 				9A4346A213311615002B04DE /* ViDocumentWindow.xib */,
 				9A2EF2A8133109C20023C5B7 /* MainMenu.xib */,
@@ -1080,6 +1105,16 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */,
+				9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */,
+				9A2606AF135B1C4F002C86FB /* ViPreferencePaneBundles.h */,
+				9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */,
+				9A2606A6135B1924002C86FB /* ViPreferencePane.h */,
+				9A2606A7135B1924002C86FB /* ViPreferencePane.m */,
+				9A2606A8135B1924002C86FB /* ViPreferencePaneGeneral.h */,
+				9A2606A9135B1924002C86FB /* ViPreferencePaneGeneral.m */,
+				9A2606AA135B1924002C86FB /* ViPreferencePaneTheme.h */,
+				9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */,
 				9A26067613505AEF002C86FB /* ViSymbolController.h */,
 				9A26067713505AEF002C86FB /* ViSymbolController.m */,
 				9A260672134DF8D7002C86FB /* ViCompletion.h */,
@@ -1281,7 +1316,6 @@
 				9A4346B913311694002B04DE /* TabNewMetalPressed.png */,
 				9A4346BA13311694002B04DE /* TabNewMetalRollover.png */,
 				9A4346BB13311694002B04DE /* tag.png */,
-				9A4346BC13311694002B04DE /* tick.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -1487,7 +1521,6 @@
 				9A4346CD13311694002B04DE /* TabNewMetalPressed.png in Resources */,
 				9A4346CE13311694002B04DE /* TabNewMetalRollover.png in Resources */,
 				9A4346CF13311694002B04DE /* tag.png in Resources */,
-				9A4346D013311694002B04DE /* tick.png in Resources */,
 				9A4346D41331182E002B04DE /* Bundles in Resources */,
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
@@ -1496,6 +1529,10 @@
 				9A9A63CC1339D0CA0053402A /* vico.icns in Resources */,
 				9AB10BAC13408B6600D81D33 /* keys.nu in Resources */,
 				9A260671134C50C3002C86FB /* CompletionWindow.xib in Resources */,
+				9A2606A4135B17F2002C86FB /* ThemePrefs.xib in Resources */,
+				9A2606B4135B1C63002C86FB /* BundlePrefs.xib in Resources */,
+				9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */,
+				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1762,6 +1799,11 @@
 				9A26066E134B0024002C86FB /* ViCompletionWindow.m in Sources */,
 				9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */,
 				9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */,
+				9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */,
+				9A2606AD135B1924002C86FB /* ViPreferencePaneGeneral.m in Sources */,
+				9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */,
+				9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */,
+				9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1839,6 +1881,22 @@
 			name = CompletionWindow.xib;
 			sourceTree = "<group>";
 		};
+		9A2606A2135B17F2002C86FB /* ThemePrefs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9A2606A3135B17F2002C86FB /* en */,
+			);
+			name = ThemePrefs.xib;
+			sourceTree = "<group>";
+		};
+		9A2606B2135B1C63002C86FB /* BundlePrefs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9A2606B3135B1C63002C86FB /* en */,
+			);
+			name = BundlePrefs.xib;
+			sourceTree = "<group>";
+		};
 		9A2EF29C133109C20023C5B7 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1901,6 +1959,23 @@
 				9A4346A313311615002B04DE /* en */,
 			);
 			name = ViDocumentWindow.xib;
+			sourceTree = "<group>";
+		};
+		9A66526F135B21D700A2F93C /* EditPrefs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9A665270135B21D700A2F93C /* en */,
+			);
+			name = EditPrefs.xib;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		9A665276135B288700A2F93C /* GeneralPrefs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9A665277135B288700A2F93C /* en */,
+			);
+			name = GeneralPrefs.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

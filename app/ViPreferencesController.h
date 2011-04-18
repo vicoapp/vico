@@ -1,80 +1,30 @@
 #import "ViRegexp.h"
 
-@interface statusIconTransformer : NSValueTransformer
-{
-	NSImage *installedIcon;
-}
+@protocol ViPreferencePane <NSObject>
+- (NSString *)name;
+- (NSImage *)icon;
+- (NSView *)view;
 @end
 
-@interface undoStyleTagTransformer : NSValueTransformer
-{
-}
-@end
-
-@interface ViPreferencesController : NSWindowController
+@interface ViPreferencesController : NSWindowController <NSToolbarDelegate>
 {
 	NSView *blankView;
 	NSString *forceSwitchToItem;
-	IBOutlet NSView *generalView;
-	IBOutlet NSView *editingView;
-	IBOutlet NSView *fontsColorsView;
-	IBOutlet NSView *bundlesView;
-	IBOutlet NSPopUpButton *themeButton;
-	IBOutlet NSTextField *currentFont;
-	IBOutlet NSTextField *bundlesInfo;
-	IBOutlet NSArrayController *bundlesController;
-	IBOutlet NSArrayController *repoUsersController;
-	IBOutlet NSTableView *bundlesTable;
-	IBOutlet NSTableView *repoUsersTable;
-	IBOutlet NSWindow *selectRepoSheet;
-	IBOutlet NSWindow *progressSheet;
-	IBOutlet NSButton *progressButton;
-	IBOutlet NSProgressIndicator *progressIndicator;
-	IBOutlet NSTextField *progressDescription;
-	IBOutlet NSSearchField *repoFilterField;
+	NSMutableArray *panes;
+	NSMutableDictionary *toolbarItems;
+
 #if 0
 	IBOutlet NSPopUpButton *insertModeInputSources;
 	IBOutlet NSPopUpButton *normalModeInputSources;
 #endif
-	long long receivedContentLength;
-	BOOL progressCancelled;
-	NSMutableArray *processQueue;
-
-	ViRegexp *repoNameRx;
-	NSMutableArray *repositories;
-	NSArray *filteredRepositories;
-	NSArray *previousRepoUsers;
-	NSURLDownload *repoDownload;
-
-	NSURLConnection *userConnection;
-	NSMutableData *userData;
-
-	NSTask *installTask;
-	NSPipe *installPipe;
-	NSURLConnection *installConnection;
 }
 
 + (ViPreferencesController *)sharedPreferences;
+- (void)registerPane:(id<ViPreferencePane>)pane;
+
 - (IBAction)switchToItem:(id)sender;
-- (IBAction)selectFont:(id)sender;
-
-- (IBAction)filterRepositories:(id)sender;
-- (IBAction)reloadRepositories:(id)sender;
-- (IBAction)cancelProgressSheet:(id)sender;
-
-- (IBAction)installBundles:(id)sender;
-- (IBAction)uninstallBundles:(id)sender;
-
-- (IBAction)acceptSelectRepoSheet:(id)sender;
-- (IBAction)selectRepositories:(id)sender;
-- (IBAction)addRepoUser:(id)sender;
 
 - (void)show;
 - (void)showItem:(NSString *)item;
-- (void)reloadNextUser;
-- (void)setFilteredRepositories:(NSArray *)anArray;
-- (void)installNextBundle;
-- (void)setSelectedFont;
-- (void)reloadRepositoriesFromUsers:(NSArray *)usersToLoad;
 
 @end

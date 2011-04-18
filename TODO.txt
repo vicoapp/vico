@@ -2,7 +2,6 @@ URGENT
 ========
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
-* package license for SBJson, see http://stig.github.com/json-framework/
 * build osx::plist
 
 BUGS
@@ -250,3 +249,4 @@ latex.tmbundle
 * [DONE] different indent settings for different file types!
 * [DONE] fuzzy completion is no longer highlighted!
 * [DONE] bundled bundles are not shown as installed in preferences
+* [DONE] package license for SBJson, see http://stig.github.com/json-framework/

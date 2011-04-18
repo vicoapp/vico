@@ -1912,7 +1912,8 @@ int logIndent = 0;
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	NSMenu *menu = [self menuForEvent:theEvent];
-	NSMenuItem *item = [menu itemWithTitle:[[document language] displayName]];
+	NSString *title = [[document language] displayName];
+	NSMenuItem *item = title ? [menu itemWithTitle:title] : nil;
 	if (item) {
 		NSPoint event_location = [theEvent locationInWindow];
 		NSPoint local_point = [self convertPoint:event_location fromView:nil];

@@ -27,7 +27,7 @@
 				 name:@"Bundles"
 				 icon:[NSImage imageNamed:NSImageNameNetwork]];
 
-	repositories = [[NSMutableArray alloc] init];
+	repositories = [NSMutableArray array];
 	repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*(tmbundle|textmate-bundle)$)"
 					      options:ONIG_OPTION_IGNORECASE];
 
@@ -51,6 +51,7 @@
 
 	return self;
 }
+
 - (NSString *)repoPathForUser:(NSString *)username readonly:(BOOL)readonly
 {
 	NSString *path = [[NSString stringWithFormat:@"%@/%@-bundles.json",
@@ -70,7 +71,7 @@
 	if ([[NSFileManager defaultManager] fileExistsAtPath:bundlePath])
 		return bundlePath;
 
-	return path;
+	return nil;
 }
 
 - (void)updateBundleStatus
@@ -94,7 +95,10 @@
 	/* Remove any existing repositories owned by this user. */
 	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
 
-	NSData *JSONData = [NSData dataWithContentsOfFile:[self repoPathForUser:username readonly:YES]];
+	NSString *path = [self repoPathForUser:username readonly:YES];
+	if (path == nil)
+		return;
+	NSData *JSONData = [NSData dataWithContentsOfFile:path];
 	NSString *JSONString = [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
 	NSDictionary *dict = [JSONString JSONValue];
 	if (![dict isKindOfClass:[NSDictionary class]]) {

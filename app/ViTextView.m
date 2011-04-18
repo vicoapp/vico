@@ -80,8 +80,14 @@ int logIndent = 0;
 	[self setUsesFontPanel:NO];
 	if (document) {
 		/* FIXME: change wrap setting if language changes. */
-		NSArray *langScope = [NSArray arrayWithObject:[[document language] name]];
-		NSInteger wrap = [[self preference:@"wrap" forScope:langScope] integerValue];
+		NSString *scope = [[document language] name];
+		NSInteger wrap = 1;
+		if (scope) {
+			NSArray *langScope = [NSArray arrayWithObject:scope];
+			wrap = [[self preference:@"wrap" forScope:langScope] integerValue];
+		} else {
+			wrap = [[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"];
+		}
 		[self setWrapping:wrap];
 	}
 	[self setDrawsBackground:YES];

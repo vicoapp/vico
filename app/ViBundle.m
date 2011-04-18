@@ -442,7 +442,7 @@
 						[item setEnabled:NO];
 				}
 			} else
-				INFO(@"missing menu item %@ in bundle %@", uuid, [self name]);
+				DEBUG(@"missing menu item %@ in bundle %@", uuid, [self name]);
 		}
 
 	}

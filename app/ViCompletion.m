@@ -68,7 +68,7 @@
 		      range:NSMakeRange(0, [title length])];
 
 	if (filterMatch && filterIsFuzzy) {
-		/* Mark sub-matches with bold. */
+		/* Mark sub-matches with bold red. */
 		NSFont *boldFont = [[NSFontManager sharedFontManager]
 		    convertFont:font
 		    toHaveTrait:NSBoldFontMask];
@@ -173,7 +173,7 @@
 	[self calcScore];
 }
 
-- (void)setFilter:(ViRegexpMatch *)m
+- (void)setFilterMatch:(ViRegexpMatch *)m
 {
 	filterMatch = m;
 	[self updateTitle];

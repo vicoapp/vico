@@ -1,20 +1,17 @@
 URGENT
 ========
-* fuzzy completion is no longer highlighted!
-* undo manager messed up after undo and repeat of bundle command!
-* different indent settings for different file types!
-* ctrl-^ in a command output window:
-  2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
-* ctrl-^ doesn't work for web views
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
 * bundled bundles are not shown as installed in preferences
-* tweak smart typing pair invocation
 * package license for SBJson, see http://stig.github.com/json-framework/
 * build osx::plist
 
 BUGS
 ====
+* undo manager messed up after undo and repeat of bundle command!
+* ctrl-^ in a command output window:
+  2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
+* ctrl-^ doesn't work for web views
 * modified status is not updated immediately, ok after escape?
 * get rid of ViBgView
 * switch undo direction after bundle command
@@ -28,6 +25,7 @@ BUGS
 
 IMPORTANT
 =========
+* tweak smart typing pair invocation
 * always open an untitled document when opening a project?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
@@ -250,3 +248,5 @@ latex.tmbundle
 * [DONE] bundle-specific nu startup scripts (nu/main.nu)
 * [DONE] global nu startup script in application support folder
 * [DONE] preference for wrapping
+* [DONE] different indent settings for different file types!
+* [DONE] fuzzy completion is no longer highlighted!

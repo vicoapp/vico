@@ -6,6 +6,7 @@
 @implementation ViProject
 
 @synthesize initialURL;
+@synthesize windowController;
 
 - (NSString *)title
 {

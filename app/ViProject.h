@@ -7,5 +7,6 @@
 }
 
 @property(readonly) NSURL *initialURL;
+@property(readonly) ViWindowController *windowController;
 
 @end

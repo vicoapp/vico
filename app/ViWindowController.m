@@ -226,7 +226,7 @@ static ViWindowController	*currentWindowController = nil;
 			[layoutManager addTextContainer:container];
 			NSRect frame = NSMakeRect(0, 0, 100, 10);
 			viFieldEditor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
-			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"fieldMap"]];
+			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
 			[viFieldEditor initWithDocument:nil viParser:fieldParser];
 			[viFieldEditor setFieldEditor:YES];
 			[viFieldEditor setInsertMode:nil];

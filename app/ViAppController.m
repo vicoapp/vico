@@ -98,7 +98,7 @@
 	    [NSNumber numberWithBool:YES], @"smartpair",
 	    [NSNumber numberWithBool:YES], @"ignorecase",
 	    [NSNumber numberWithBool:YES], @"smartcase",
-	    [NSNumber numberWithBool:YES], @"expandtabs",
+	    [NSNumber numberWithBool:YES], @"expandtab",
 	    [NSNumber numberWithBool:YES], @"number",
 	    [NSNumber numberWithBool:YES], @"autocollapse",
 	    [NSNumber numberWithBool:NO], @"hidetab",

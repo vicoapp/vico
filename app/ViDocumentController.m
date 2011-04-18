@@ -7,6 +7,7 @@
 #import "SFTPConnectionPool.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViError.h"
+#import "TxmtURLProtocol.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -187,7 +188,8 @@
 {
 	if ([scheme isEqualToString:@"file"] ||
 	    [scheme isEqualToString:@"sftp"] ||
-	    [scheme isEqualToString:@"vico"])
+	    [scheme isEqualToString:@"vico"] ||
+	    [scheme isEqualToString:@"txmt"])
 		return YES;
 	return NO;
 }
@@ -207,10 +209,18 @@
 		return nil;
 	}
 
-	if ([self fileAppearsBinaryAtURL:absoluteURL]) {
+	NSNumber *lineNumber = nil;
+	NSURL *url = [TxmtURLProtocol parseURL:absoluteURL intoLineNumber:&lineNumber];
+	if (url == nil) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"invalid URL"];
+		return nil;
+	}
+
+	if ([self fileAppearsBinaryAtURL:url]) {
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert setMessageText:[NSString stringWithFormat:@"%@ appears to be a binary file",
-			[absoluteURL lastPathComponent]]];
+			[url lastPathComponent]]];
 		[alert addButtonWithTitle:@"Open"];
 		[alert addButtonWithTitle:@"Cancel"];
 		[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
@@ -219,7 +229,7 @@
 			return nil;
 	}
 
-	return [super openDocumentWithContentsOfURL:absoluteURL
+	return [super openDocumentWithContentsOfURL:url
 					    display:displayDocument
 					      error:outError];
 }
@@ -293,6 +303,14 @@
 	if (![self supportedURLScheme:[url scheme]]) {
 		[windowController message:@"Unsupported URL scheme '%@'",
 		    [url scheme]];
+		return nil;
+	}
+
+	NSNumber *lineNumber = nil;
+	url = [TxmtURLProtocol parseURL:url intoLineNumber:&lineNumber];
+	if (url == nil) {
+		[windowController message:@"%@: invalid URL",
+		    filenameOrURL];
 		return nil;
 	}
 

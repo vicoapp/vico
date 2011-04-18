@@ -16,7 +16,8 @@
 + (BOOL)canInitWithRequest:(NSURLRequest *)theRequest
 {
 	NSString *theScheme = [[theRequest URL] scheme];
-	return ([theScheme caseInsensitiveCompare:@"txmt"] == NSOrderedSame);
+	return ([theScheme caseInsensitiveCompare:@"txmt"] == NSOrderedSame ||
+		[theScheme caseInsensitiveCompare:@"vico"] == NSOrderedSame);
 }
 
 /*
@@ -40,23 +41,16 @@
 	[super finalize];
 }
 
-- (void)startLoading
++ (NSURL *)parseURL:(NSURL *)url intoLineNumber:(NSNumber **)outLineNumber
 {
-	/*
-	 * Workaround for bug in NSURLRequest:
-	 * http://stackoverflow.com/questions/1112869/how-to-avoid-reference-count-underflow-in-nscfurlprotocolbridge-in-custom-nsurlp/4679837#4679837
-	 */
-	if (client)
-		CFRelease(client);
-        client = [self client];
-        CFRetain(client);
+	NSURL *openURL = nil;
 
-	NSURLRequest *request = [self request];
-	NSURL *url = [request URL];
+	if ([[url scheme] caseInsensitiveCompare:@"txmt"] != NSOrderedSame &&
+	    [[url scheme] caseInsensitiveCompare:@"vico"] != NSOrderedSame)
+		return url;
 
 	if ([[url host] isEqualToString:@"open"]) {
 		NSArray *components = [[url query] componentsSeparatedByString:@"&"];
-		NSURL *openURL = nil;
 		NSString *line = nil;
 		for (NSString *comp in components) {
 			NSArray *tmp = [comp componentsSeparatedByString:@"="];
@@ -66,16 +60,45 @@
 				line = [tmp objectAtIndex:1];
 		}
 
-		ViWindowController *winCon = [ViWindowController currentWindowController];
-		NSNumber *lineNumber = [NSNumber numberWithInteger:[line integerValue]];
+		if (outLineNumber)
+			*outLineNumber = [NSNumber numberWithInteger:[line integerValue]];
+	} else if ([[url host] isEqualToString:@"credits"]) {
+		NSString *p = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Credits.txt"];
+		openURL = [NSURL fileURLWithPath:p];
+		if (outLineNumber)
+			*outLineNumber = [NSNumber numberWithInteger:0];
+	}
 
+	return openURL;
+}
+
+- (void)startLoading
+{
+	/*
+	 * Workaround for bug in NSURLRequest:
+	 * http://stackoverflow.com/questions/1112869/how-to-avoid-reference-count-underflow-in-nscfurlprotocolbridge-in-custom-nsurlp/4679837#4679837
+	 */
+	if (client)
+		CFRelease(client);
+	client = [self client];
+	CFRetain(client);
+
+	NSURLRequest *request = [self request];
+	NSURL *url = [request URL];
+
+	NSNumber *lineNumber = nil;
+	NSURL *openURL = [TxmtURLProtocol parseURL:url intoLineNumber:&lineNumber];
+	if (openURL) {
 		SEL sel = @selector(gotoURL:lineNumber:);
+		ViWindowController *winCon = [ViWindowController currentWindowController];
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[winCon methodSignatureForSelector:sel]];
 		[invocation setSelector:sel];
 		[invocation setArgument:&openURL atIndex:2];
 		[invocation setArgument:&lineNumber atIndex:3];
 		[invocation retainArguments];
-		[invocation performSelectorOnMainThread:@selector(invokeWithTarget:) withObject:winCon waitUntilDone:NO];
+		[invocation performSelectorOnMainThread:@selector(invokeWithTarget:)
+					     withObject:winCon
+					  waitUntilDone:NO];
 	}
 
 	/*

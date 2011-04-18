@@ -1,18 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>content</key>
-	<string>
-	$0
-</string>
-	<key>keyEquivalent</key>
-	<string></string>
-	<key>name</key>
-	<string>Special: Return Inside an Array</string>
-	<key>scope</key>
-	<string>meta.array.empty.php punctuation.definition.array.end.php</string>
-	<key>uuid</key>
-	<string>E0FF5942-5249-4097-A4EE-E01FAE518CD2</string>
-</dict>
-</plist>

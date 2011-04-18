@@ -196,7 +196,7 @@
 	[task setStandardInput:shellInput];
 	[task setStandardOutput:shellOutput];
 
-	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
 	[ViBundle setupEnvironment:env forTextView:self];
 
@@ -231,11 +231,11 @@
 	    nil];
 	SEL sel = @selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:);
 	[[document environment] filterText:inputText
-	                              throughTask:task
-	                                   target:self
-	                                 selector:sel
-	                              contextInfo:info
-	                             displayTitle:[command name]];
+			       throughTask:task
+				    target:self
+				  selector:sel
+			       contextInfo:info
+			      displayTitle:[command name]];
 
 	if (fd != -1) {
 		unlink(templateFilename);

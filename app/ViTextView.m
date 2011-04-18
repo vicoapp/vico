@@ -570,7 +570,7 @@ int logIndent = 0;
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
 	if (prefs == nil)
-		return nil;
+		return [defs objectForKey:name];
 	u_int64_t max_rank = 0;
 	id scopeValue = nil;
 	for (NSString *scope in [prefs allKeys]) {
@@ -642,6 +642,8 @@ int logIndent = 0;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret
 {
 	NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
+	if (shiftWidth == 0)
+		shiftWidth = 8;
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
 

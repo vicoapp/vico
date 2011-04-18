@@ -7,7 +7,6 @@
 	ViBundle *bundle;
 	NSMutableDictionary *language;
 	NSMutableArray *languagePatterns;
-	NSMutableDictionary *scopeMappingCache;
 	BOOL compiled;
 }
 

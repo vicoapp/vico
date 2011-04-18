@@ -240,6 +240,10 @@
 			if ([file hasSuffix:@".plist"] || [file hasSuffix:@".tmPreferences"]) {
 				NSString *f = [dir stringByAppendingPathComponent:file];
 				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				if (![plist isKindOfClass:[NSDictionary class]]) {
+					INFO(@"%@: failed to load plist", f);
+					continue;
+				}
 				if ([plist isKindOfClass:[NSDictionary class]]) {
 					[ViBundle normalizePreference:plist
 						       intoDictionary:[plist objectForKey:@"settings"]];
@@ -252,6 +256,10 @@
 			if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])  {
 				NSString *f = [dir stringByAppendingPathComponent:file];
 				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				if (![plist isKindOfClass:[NSDictionary class]]) {
+					INFO(@"%@: failed to load plist", f);
+					continue;
+				}
 				ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:plist
 														 inBundle:self];
 				if (snippet) {
@@ -266,6 +274,10 @@
 			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"]) {
 				NSString *f = [dir stringByAppendingPathComponent:file];
 				NSDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:f];
+				if (![plist isKindOfClass:[NSDictionary class]]) {
+					INFO(@"%@: failed to load plist", f);
+					continue;
+				}
 				ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:plist
 														 inBundle:self];
 				if (command) {

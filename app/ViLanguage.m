@@ -123,9 +123,12 @@
 
 	bundle = aBundle;
 	compiled = NO;
-	language = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
+	language = [[NSMutableDictionary dictionaryWithContentsOfFile:aPath] mutableCopy];
+	if (![language isKindOfClass:[NSDictionary class]]) {
+		INFO(@"%@: failed to load plist", aPath);
+		return nil;
+	}
 	languagePatterns = [language objectForKey:@"patterns"];	
-	scopeMappingCache = [[NSMutableDictionary alloc] init];
 
 	return self;
 }
@@ -166,7 +169,7 @@
 {
 	// DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
 
-	NSMutableArray *expandedPatterns = [[NSMutableArray alloc] init];
+	NSMutableArray *expandedPatterns = [NSMutableArray array];
 	NSMutableDictionary *pattern;
 	for (pattern in patterns)
 	{
@@ -234,7 +237,8 @@
 	return expandedPatterns;
 }
 
-- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage
+- (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern
+                           baseLanguage:(ViLanguage*)baseLanguage
 {
 	NSString *cacheKey = [NSString stringWithFormat:@"expandedPatterns.%@", [baseLanguage name]];
 	NSArray *expandedPatterns = [pattern objectForKey:cacheKey];
@@ -243,7 +247,8 @@
 		if (lang == nil)
 			lang = self;
 
-		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"] baseLanguage:baseLanguage];
+		expandedPatterns = [lang expandPatterns:[pattern objectForKey:@"patterns"]
+					   baseLanguage:baseLanguage];
 		if (expandedPatterns) 
 			[pattern setObject:expandedPatterns forKey:cacheKey];
 	}

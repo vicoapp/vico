@@ -253,6 +253,7 @@
 		9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AAF73E0135C5FB500D75E1E /* git in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9AAF73DE135C5F9C00D75E1E /* git */; };
+		9AAF73E2135C931600D75E1E /* Credits.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AAF73E1135C931600D75E1E /* Credits.txt */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
@@ -752,6 +753,7 @@
 		9A665277135B288700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
 		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
 		9AAF73DE135C5F9C00D75E1E /* git */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = git; sourceTree = "<group>"; };
+		9AAF73E1135C931600D75E1E /* Credits.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Credits.txt; path = ../Credits.txt; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
 		9AB10BA2133F72E600D81D33 /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -1085,6 +1087,7 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9AAF73E1135C931600D75E1E /* Credits.txt */,
 				9A9A63CB1339D0CA0053402A /* vico.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
 				9A4346D11331182E002B04DE /* Bundles */,
@@ -1536,6 +1539,7 @@
 				9A2606B4135B1C63002C86FB /* BundlePrefs.xib in Resources */,
 				9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */,
 				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
+				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

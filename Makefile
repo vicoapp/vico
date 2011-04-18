@@ -3,16 +3,16 @@ debug:
 	xcodebuild -configuration Debug EXPIRATION=0
 
 run: debug
-	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico/app/ViDocument.m
+	./build/Debug/Vico.app/Contents/MacOS/Vico $(HOME)/src/vico
 
-build:
+build: test
 	rm -rf build/Snapshot/Vico.app
-	xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$$(date -v +10M +%s)
+	xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$$(date -v +1d +%s)
 
 test:
 	xcodebuild -configuration Debug -target Tests
 
-release:
+release: test
 	./release.sh
 
 TARDATE := $(shell date +%Y%m%d%H)

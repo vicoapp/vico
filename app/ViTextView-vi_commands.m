@@ -1781,7 +1781,7 @@
 	 [self currentLine],
 	 [[self textStorage] lineNumberAtLocation:IMAX(0, [[[self textStorage] string] length] - 1)],
 	 (float)[self caret]*100.0 / ((float)[[[self textStorage] string] length] ?: 1),
-	 [[document language] displayName] ?: "No",
+	 [[document language] displayName] ?: @"No",
 	 [NSString localizedNameOfStringEncoding:[document encoding]]);
 	return NO;
 }

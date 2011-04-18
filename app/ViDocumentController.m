@@ -6,6 +6,7 @@
 #import "ExEnvironment.h"
 #import "SFTPConnectionPool.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViError.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -182,6 +183,15 @@
 	return NO;
 }
 
+- (BOOL)supportedURLScheme:(NSString *)scheme
+{
+	if ([scheme isEqualToString:@"file"] ||
+	    [scheme isEqualToString:@"sftp"] ||
+	    [scheme isEqualToString:@"vico"])
+		return YES;
+	return NO;
+}
+
 - (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL
                             display:(BOOL)displayDocument
                               error:(NSError **)outError
@@ -189,6 +199,13 @@
 	id doc = [self documentForURL:absoluteURL];
 	if (doc)
 		return doc;
+
+	if (![self supportedURLScheme:[absoluteURL scheme]]) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Unsupported URL scheme '%@'",
+			    [absoluteURL scheme]];
+		return nil;
+	}
 
 	if ([self fileAppearsBinaryAtURL:absoluteURL]) {
 		NSAlert *alert = [[NSAlert alloc] init];
@@ -206,8 +223,6 @@
 					    display:displayDocument
 					      error:outError];
 }
-
-
 
 - (NSURL *)normalizePath:(NSString *)filename
               relativeTo:(NSURL *)relURL
@@ -275,12 +290,18 @@
 		return nil;
 	}
 
+	if (![self supportedURLScheme:[url scheme]]) {
+		[windowController message:@"Unsupported URL scheme '%@'",
+		    [url scheme]];
+		return nil;
+	}
+
 	BOOL isDirectory = NO;
 	BOOL exists = NO;
 	if ([url isFileURL])
 		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]
 							      isDirectory:&isDirectory];
-	else {
+	else if ([[url scheme] isEqualToString:@"sftp"]) {
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
 		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
 		if (error) {
@@ -348,7 +369,8 @@
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 		if ([conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:outError] && isDirectory)
 			return @"Project";
-	}
+	} else
+		return nil;
 
 	return @"Document";
 }

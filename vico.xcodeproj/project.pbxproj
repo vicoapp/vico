@@ -215,7 +215,6 @@
 		9A4346CD13311694002B04DE /* TabNewMetalPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346B913311694002B04DE /* TabNewMetalPressed.png */; };
 		9A4346CE13311694002B04DE /* TabNewMetalRollover.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BA13311694002B04DE /* TabNewMetalRollover.png */; };
 		9A4346CF13311694002B04DE /* tag.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346BB13311694002B04DE /* tag.png */; };
-		9A4346D41331182E002B04DE /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D11331182E002B04DE /* Bundles */; };
 		9A4346D51331182E002B04DE /* Support in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D21331182E002B04DE /* Support */; };
 		9A4346D61331182E002B04DE /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D31331182E002B04DE /* Themes */; };
 		9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D71331239E002B04DE /* symbol-icons.plist */; };
@@ -1522,7 +1521,6 @@
 				9A4346CD13311694002B04DE /* TabNewMetalPressed.png in Resources */,
 				9A4346CE13311694002B04DE /* TabNewMetalRollover.png in Resources */,
 				9A4346CF13311694002B04DE /* tag.png in Resources */,
-				9A4346D41331182E002B04DE /* Bundles in Resources */,
 				9A4346D51331182E002B04DE /* Support in Resources */,
 				9A4346D61331182E002B04DE /* Themes in Resources */,
 				9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */,
@@ -1620,7 +1618,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring updating bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\necho \"downloading bundle $bundle...\"\nrepo=\"vicoapp-$bundle.tmbundle\"\nurl=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone \"$url\" \"$BUNDLEDIR/$repo\"\nfi\ndone\n";
+			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring updating bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\nrepo=\"vicoapp-$bundle.tmbundle\"\nurl=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone \"$url\" \"$BUNDLEDIR/$repo\"\nfi\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

@@ -90,7 +90,6 @@
                  end:(NSUInteger *)end_ptr
          contentsEnd:(NSUInteger *)eol_ptr;
 - (NSString *)indentStringOfLength:(NSInteger)length;
-- (NSString *)indentStringForLevel:(int)level;
 - (NSUInteger)lengthOfIndentString:(NSString *)indent;
 - (NSUInteger)lengthOfIndentAtLocation:(NSUInteger)aLocation;
 - (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation;
@@ -165,6 +164,10 @@
               atLocation:(NSUInteger)location;
 
 - (NSDictionary *)environment;
+
+- (id)preference:(NSString *)name forScope:(NSArray *)scopeArray;
+- (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation;
+- (id)preference:(NSString *)name;
 @end
 
 @interface ViTextView (snippets)

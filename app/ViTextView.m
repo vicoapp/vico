@@ -78,7 +78,12 @@ int logIndent = 0;
 	[self setAutomaticTextReplacementEnabled:NO];
 	[self setUsesFindPanel:YES];
 	[self setUsesFontPanel:NO];
-	[self setWrapping:[[NSUserDefaults standardUserDefaults] boolForKey:@"wrap"]];
+	if (document) {
+		/* FIXME: change wrap setting if language changes. */
+		NSArray *langScope = [NSArray arrayWithObject:[[document language] name]];
+		NSInteger wrap = [[self preference:@"wrap" forScope:langScope] integerValue];
+		[self setWrapping:wrap];
+	}
 	[self setDrawsBackground:YES];
 
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
@@ -370,14 +375,11 @@ int logIndent = 0;
 - (NSString *)indentStringOfLength:(NSInteger)length
 {
 	length = IMAX(length, 0);
-	NSInteger tabstop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"expandtab"] == NSOnState)
-	{
+	NSInteger tabstop = [[self preference:@"tabstop"] integerValue];
+	if ([[self preference:@"expandtab"] integerValue] == NSOnState) {
 		// length * " "
 		return [@"" stringByPaddingToLength:length withString:@" " startingAtIndex:0];
-	}
-	else
-	{
+	} else {
 		// length / tabstop * "tab" + length % tabstop * " "
 		NSInteger ntabs = (length / tabstop);
 		NSInteger nspaces = (length % tabstop);
@@ -386,15 +388,9 @@ int logIndent = 0;
 	}
 }
 
-- (NSString *)indentStringForLevel:(int)level
-{
-	NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"] * level;
-	return [self indentStringOfLength:shiftWidth * level];
-}
-
 - (NSUInteger)lengthOfIndentString:(NSString *)indent
 {
-	NSInteger tabStop = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
+	NSInteger tabstop = [[self preference:@"tabstop"] integerValue];
 	NSUInteger i;
 	NSUInteger length = 0;
 	for (i = 0; i < [indent length]; i++)
@@ -403,7 +399,7 @@ int logIndent = 0;
 		if (c == ' ')
 			++length;
 		else if (c == '\t')
-			length += tabStop - (length % tabStop);
+			length += tabstop - (length % tabstop);
 	}
 
 	return length;
@@ -505,7 +501,7 @@ int logIndent = 0;
 
 - (NSString *)suggestedIndentAtLocation:(NSUInteger)location forceSmartIndent:(BOOL)smartFlag
 {
-	BOOL smartIndent = smartFlag || [[NSUserDefaults standardUserDefaults] boolForKey:@"smartindent"];
+	BOOL smartIndent = smartFlag || [[self preference:@"smartindent" atLocation:location] integerValue];
 
 	NSInteger calcIndent = -1;
 	if (smartIndent)
@@ -534,7 +530,7 @@ int logIndent = 0;
 		}
 	}
 
-	NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+	NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:location] integerValue];
 	if (smartIndent && ![self shouldIgnoreIndentAtLocation:bol]) {
 		if ([self shouldIncreaseIndentAtLocation:bol] ||
 		    [self shouldIncreaseIndentOnceAtLocation:bol]) {
@@ -569,6 +565,41 @@ int logIndent = 0;
 	return [self suggestedIndentAtLocation:location forceSmartIndent:NO];
 }
 
+- (id)preference:(NSString *)name forScope:(NSArray *)scopeArray
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
+	if (prefs == nil)
+		return nil;
+	u_int64_t max_rank = 0;
+	id scopeValue = nil;
+	for (NSString *scope in [prefs allKeys]) {
+		NSDictionary *scopePrefs = [prefs objectForKey:scope];
+		id value = [scopePrefs objectForKey:name];
+		if (value == nil)
+			continue;
+		u_int64_t rank = [scope matchesScopes:scopeArray];
+		if (rank > max_rank) {
+			max_rank = rank;
+			scopeValue = value;
+		}
+	}
+
+	if (scopeValue == nil)
+		return [defs objectForKey:name];
+	return scopeValue;
+}
+
+- (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation
+{
+	return [self preference:name forScope:[self scopesAtLocation:aLocation]];
+}
+
+- (id)preference:(NSString *)name
+{
+	return [self preference:name atLocation:[self caret]];
+}
+
 - (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
 	NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
@@ -585,7 +616,7 @@ int logIndent = 0;
 	} else
 		[self insertString:@"\n" atLocation:aLocation];
 
-	if ([[NSUserDefaults standardUserDefaults] integerForKey:@"autoindent"] == NSOnState) {
+	if ([[self preference:@"autoindent"] integerValue] == NSOnState) {
 		if (indentForward)
 			aLocation += 1;
 
@@ -610,7 +641,7 @@ int logIndent = 0;
 
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret
 {
-	NSInteger shiftWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"shiftwidth"];
+	NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:aRange.location];
 
@@ -1128,7 +1159,7 @@ int logIndent = 0;
 
 - (BOOL)handleSmartPair:(NSString *)characters
 {
-	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"smartpair"])
+	if ([[self preference:@"smartpair"] integerValue] == 0)
 		return NO;
 
 	BOOL foundSmartTypingPair = NO;

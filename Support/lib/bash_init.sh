@@ -3,11 +3,10 @@ export LC_CTYPE="en_US.UTF-8"
 
 set +u # avoid warning when we use unset variables (if user had ‘set -u’ in his profile)
 
+PATH="$PATH:$TM_APP_PATH/Contents/MacOS"
+
 if [[ -d "$TM_SUPPORT_PATH/bin" ]]; then
 	PATH="$PATH:$TM_SUPPORT_PATH/bin"
-#	if [[ -d "$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS" ]]; then
-#		PATH="$TM_SUPPORT_PATH/bin/CocoaDialog.app/Contents/MacOS:$PATH"
-#	fi
 fi
 
 if [[ -d "$TM_BUNDLE_SUPPORT" && -d "$TM_BUNDLE_SUPPORT/bin" ]]; then
@@ -22,13 +21,6 @@ if [[ -f "$TM_BASH_INIT" ]]; then
 fi
 
 export RUBYLIB="${RUBYLIB:+$RUBYLIB:}$TM_SUPPORT_PATH/lib"
-
-#textmate_init () {
-#	[[ "$1" != / && "$1" != ~ ]] && textmate_init "$(dirname "$1")"
-#	[[ -f "$1/.textmate_init" ]] && . "$1/.textmate_init"
-#	[[ "$1" == / && -f ~/.textmate_init ]] && . ~/.textmate_init
-#}
-#textmate_init "${TM_DIRECTORY:-$HOME}"
 
 # an abstract way to change the output option of the running command
 exit_discard ()					{ echo -n "$1"; exit 200; }

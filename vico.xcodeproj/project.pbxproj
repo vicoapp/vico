@@ -1623,7 +1623,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring checking out bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\nrepo=\"vicoapp-$bundle.tmbundle\"\nurl=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\nfi\ndone\n\nfind \"$BUNDLEDIR\" -name \".git\" -exec rm -rf \"{}\" \\;\n";
+			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring checking out bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\nrepo=\"vicoapp-$bundle.tmbundle\"\n#url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nurl=\"$HOME/src/vico/Bundles/$tmbundle.git\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\nrm -rf \"$BUNDLEDIR/$repo/.git\"\nfi\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

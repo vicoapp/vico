@@ -482,7 +482,7 @@ filter_write(CFSocketRef s,
 	[NSApp endSheet:filterSheet returnCode:-1];
 }
 
-- (void)filterText:(NSString*)inputText
+- (void)filterText:(NSString *)inputText
        throughTask:(NSTask *)task
             target:(id)target
           selector:(SEL)selector
@@ -496,7 +496,7 @@ filter_write(CFSocketRef s,
 
 	[filterTask setStandardInput:shellInput];
 	[filterTask setStandardOutput:shellOutput];
-	[filterTask setStandardError:shellOutput];
+	//[filterTask setStandardError:shellOutput];
 
 	[filterTask launch];
 
@@ -506,8 +506,7 @@ filter_write(CFSocketRef s,
 	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
 	// accept cancel button from sheet -> terminate task and cancel filter
 
-	NSString *mode = ViFilterRunLoopMode;
-
+	NSString *mode = NSDefaultRunLoopMode; //ViFilterRunLoopMode;
 
 	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];
 	filterInput = [inputText dataUsingEncoding:NSUTF8StringEncoding];
@@ -617,8 +616,8 @@ filter_write(CFSocketRef s,
 	}
 }
 
-- (void)filterText:(NSString*)inputText
-    throughCommand:(NSString*)shellCommand
+- (void)filterText:(NSString *)inputText
+    throughCommand:(NSString *)shellCommand
             target:(id)target
           selector:(SEL)selector
        contextInfo:(id)contextInfo

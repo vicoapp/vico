@@ -85,12 +85,6 @@ Nu is available from http://programming.nu. Nu is awesome.
 
 
 ================================================================================
-Vico distributes an unmodified binary version of git.
-Git, including its sources, is available from http://git-scm.com/.
-Git is licensed under the GNU GENERAL PUBLIC LICENSE Version 2, June 1991.
-
-
-================================================================================
 Vico uses SBJSON by Stig Brautaset to parse and generate JSON.
 Copyright (C) 2007–2011 Stig Brautaset. All rights reserved.
 

@@ -24,7 +24,7 @@
 	preferences = [NSMutableSet set];
 
 	self = [super initWithNibName:@"EditPrefs"
-				 name:@"Text Editing"
+				 name:@"Editing"
 				 icon:[NSImage imageNamed:NSImageNameMultipleDocuments]];
 
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];

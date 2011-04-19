@@ -2,7 +2,6 @@ URGENT
 ========
 * use "git clone" when installing bundles(?)
 * bundle commands time out when presenting ui
-* build osx::plist
 
 BUGS
 ====
@@ -28,6 +27,7 @@ IMPORTANT
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
+* Reload bundles!
 * cmd-t fuzzy search feels *slow*
 * toggling explorer always opens to 200px
 * dot should work with ! filters
@@ -250,3 +250,4 @@ latex.tmbundle
 * [DONE] fuzzy completion is no longer highlighted!
 * [DONE] bundled bundles are not shown as installed in preferences
 * [DONE] package license for SBJson, see http://stig.github.com/json-framework/
+* [DONE] build osx::plist

@@ -1,9 +1,10 @@
 URGENT
 ========
-* bundle commands time out when presenting ui
+* documentation
 
 BUGS
 ====
+* bundle commands time out when presenting ui
 * undo manager messed up after undo and repeat of bundle command!
 * ctrl-^ in a command output window:
   2011-04-13 19:55:07.010 Vico[71108:903] -[ViCommandOutputController document]: unrecognized selector sent to instance 0x200d4d7a0
@@ -42,6 +43,7 @@ IMPORTANT
 
 FEATURES
 ========
+* :mkdir command
 * completion expressions in nu
 * zt, zz, zb (scroll cursor to top, center, bottom)
 * ZZ and ZQ, and make :q just close the current document (?)

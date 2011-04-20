@@ -358,5 +358,9 @@
 	<array/>
 	<key>UTImportedTypeDeclarations</key>
 	<array/>
+	<key>CFBundleHelpBookFolder</key>
+	<string>help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>Vico Help</string>
 </dict>
 </plist>

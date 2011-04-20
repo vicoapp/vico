@@ -1,0 +1,12 @@
+body {
+	font-family: "Lucida Grande", sans-serif;
+	font-size: small;
+	padding: 3em 1em 0em 1em;
+}
+
+kbd {	/* stolen from github */
+	background-color: ghostWhite;
+	border: 1px solid #DEDEDE;
+	color: #444;
+	padding: padding: 0px 0.2em;
+}

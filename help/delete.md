@@ -2,7 +2,8 @@
 
 The simplest deletion command is <kbd>x</kbd>. It deletes the character under
 the caret. A count before deletes that many characters, e.g. <kbd>10x</kbd>
-deletes 10 characters.
+deletes 10 characters. Similarly, the <kbd>X</kbd> command deletes one character
+to the left of the caret.
 
 The <kbd>D</kbd> command deletes from the current location to the end of the
 line.

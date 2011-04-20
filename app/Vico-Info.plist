@@ -359,8 +359,8 @@
 	<key>UTImportedTypeDeclarations</key>
 	<array/>
 	<key>CFBundleHelpBookFolder</key>
-	<string>help</string>
+	<string>Vico.help</string>
 	<key>CFBundleHelpBookName</key>
-	<string>Vico Help</string>
+	<string>se.bzero.Vico.help</string>
 </dict>
 </plist>

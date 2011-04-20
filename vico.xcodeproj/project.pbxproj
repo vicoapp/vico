@@ -253,8 +253,6 @@
 		9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AAF73E2135C931600D75E1E /* Credits.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AAF73E1135C931600D75E1E /* Credits.txt */; };
-		9AAF73EE135E09C100D75E1E /* help in Resources */ = {isa = PBXBuildFile; fileRef = 9AAF73ED135E09C100D75E1E /* help */; };
-		9AAF73EF135E09EA00D75E1E /* help in Copy Help files */ = {isa = PBXBuildFile; fileRef = 9AAF73ED135E09C100D75E1E /* help */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
@@ -356,17 +354,6 @@
 				9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9AAF73EB135E098400D75E1E /* Copy Help files */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = en.lproj;
-			dstSubfolderSpec = 7;
-			files = (
-				9AAF73EF135E09EA00D75E1E /* help in Copy Help files */,
-			);
-			name = "Copy Help files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -764,7 +751,7 @@
 		9A665277135B288700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
 		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
 		9AAF73E1135C931600D75E1E /* Credits.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Credits.txt; path = ../Credits.txt; sourceTree = "<group>"; };
-		9AAF73ED135E09C100D75E1E /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = SOURCE_ROOT; };
+		9AAF73F3135F3BDF00D75E1E /* Vico.help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Vico.help; path = help/Vico.help; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
 		9AB10BA2133F72E600D81D33 /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -832,6 +819,7 @@
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
+				9AAF73F3135F3BDF00D75E1E /* Vico.help */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
 				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
@@ -840,7 +828,6 @@
 				9A2EF299133109C20023C5B7 /* app */,
 				9A2EF2B4133109C20023C5B7 /* Tests */,
 				9A2EF41213310F4D0023C5B7 /* lemon */,
-				9AAF73ED135E09C100D75E1E /* help */,
 				9A4346E11331257A002B04DE /* shell tool */,
 				9A26067F13530FF3002C86FB /* xorkey */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
@@ -1413,7 +1400,7 @@
 				9A260675134F4F8F002C86FB /* Download bundle repo from GitHub */,
 				9AAF73DC135C4A4600D75E1E /* Checkout bundles from GitHub */,
 				9A2EF28D133109C10023C5B7 /* Resources */,
-				9AAF73EB135E098400D75E1E /* Copy Help files */,
+				9AAF73F7135F5D5500D75E1E /* Build help bundle */,
 				9A4346EE13312853002B04DE /* Copy Executables */,
 				9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */,
 			);
@@ -1552,7 +1539,6 @@
 				9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */,
 				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
 				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
-				9AAF73EE135E09C100D75E1E /* help in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1642,6 +1628,20 @@
 			shellPath = /bin/sh;
 			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring checking out bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\nrepo=\"vicoapp-$bundle.tmbundle\"\n#url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nurl=\"$HOME/src/vico/Bundles/$repo\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\nrm -rf \"$BUNDLEDIR/$repo/.git\"\nfi\ndone\n";
 			showEnvVarsInLog = 0;
+		};
+		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build help bundle";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "HELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/en.lproj\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/Info.plist\ncp -rf $HELP_SRC/img $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

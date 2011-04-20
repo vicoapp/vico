@@ -148,7 +148,7 @@ utf32be_is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* e
 static UChar*
 utf32be_left_adjust_char_head(const UChar* start, const UChar* s)
 {
-  int rem;
+  long rem;
 
   if (s <= start) return (UChar* )s;
 

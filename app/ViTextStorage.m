@@ -602,7 +602,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	}
-	NSCharacterSet *set = wordSet;
+	NSMutableCharacterSet *set = wordSet;
 
 	if (extraCharacters) {
 		set = [wordSet mutableCopy];

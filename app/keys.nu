@@ -355,6 +355,7 @@
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
 (set cmap (ViMap completionMap))
+(cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (cmap setDefaultAction:"filter:")
 (cmap setKey:"<esc>" toAction:"cancel:")
 (cmap setKey:"<ctrl-e>" toAction:"cancel:")

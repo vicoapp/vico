@@ -59,7 +59,7 @@
 {
 	NSInteger row = [self selectedRow];
 	id item = [self itemAtRow:row];
-	if (item && [[self delegate] outlineView:self isItemExpandable:item]) {
+	if (item && [[self dataSource] outlineView:self isItemExpandable:item]) {
 		[self expandItem:item];
 		lastSelectedRow = row;
 	}
@@ -73,7 +73,7 @@
 	id item = [self itemAtRow:row];
 	if (item == nil)
 		return NO;
-	if ([[self delegate] outlineView:self isItemExpandable:item] &&
+	if ([[self dataSource] outlineView:self isItemExpandable:item] &&
 	    [self isItemExpanded:item])
 		[self collapseItem:item];
 	else {

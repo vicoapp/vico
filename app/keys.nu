@@ -43,7 +43,8 @@
 (gmap setKey:"<c-P>" toAction:"show_scope:")
 (gmap setKey:"<ctrl-esc>" toAction:"show_bundle_menu:")
 (gmap setKey:"<cmd-esc>" toAction:"show_bundle_menu:")
-(gmap map:"<cmd-q>" to:"<esc>:quit<cr>")
+(gmap map:"<cmd-q>" toExpression:(do ()
+	((NSApplication sharedApplication) terminate:nil)))
 
 
 ;; insert map
@@ -304,6 +305,8 @@
 (sidemap setKey:"t" toAction:"tab_open:")
 (sidemap setKey:"v" toAction:"vsplit_open:")
 (sidemap setKey:"<cr>" toAction:"open:")
+(sidemap map:"<cmd-q>" toExpression:(do ()
+	((NSApplication sharedApplication) terminate:nil)))
 
 ;; explorer map
 (set emap (ViMap explorerMap))

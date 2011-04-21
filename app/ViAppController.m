@@ -467,5 +467,10 @@ additionalBindings:(NSDictionary *)bindings
 	}
 }
 
+- (IBAction)visitWebsite:(id)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
+}
+
 @end
 

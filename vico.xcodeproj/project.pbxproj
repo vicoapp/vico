@@ -1626,7 +1626,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$BUILD_STYLE\" = \"Debug\"; then\necho \"ignoring checking out bundle repos in $BUILD_STYLE build\"\nexit 0\nfi\n\nBUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\nrepo=\"vicoapp-$bundle.tmbundle\"\n#url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\nurl=\"$HOME/src/vico/Bundles/$repo\"\nif test -d \"$BUNDLEDIR/$repo\"; then\ncd \"$BUNDLEDIR/$repo\" && git update\nelse\ngit clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\nrm -rf \"$BUNDLEDIR/$repo/.git\"\nfi\ndone\n";
+			shellScript = "BUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\n  repo=\"vicoapp-$bundle.tmbundle\"\n  #url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\n  url=\"$HOME/src/vico/Bundles/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo\"\n  git clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {
@@ -1641,7 +1641,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "HELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/en.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/Info.plist\ncp -rf $HELP_SRC/img $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
+			shellScript = "HELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/English.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN/VicoHelp.html\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/../Info.plist\ncp -f $HELP_SRC/help-InfoPlist.strings $HELP_EN/InfoPlist.strings\ncp -rf $HELP_SRC/shared $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

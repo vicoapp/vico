@@ -99,7 +99,7 @@
 	    [NSNumber numberWithBool:YES], @"smartindent",
 	    [NSNumber numberWithBool:YES], @"smartpair",
 	    [NSNumber numberWithBool:YES], @"ignorecase",
-	    [NSNumber numberWithBool:YES], @"smartcase",
+	    [NSNumber numberWithBool:NO], @"smartcase",
 	    [NSNumber numberWithBool:YES], @"expandtab",
 	    [NSNumber numberWithBool:YES], @"number",
 	    [NSNumber numberWithBool:YES], @"autocollapse",

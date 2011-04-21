@@ -496,6 +496,8 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)setCurrentView:(id<ViViewController>)viewController
 {
+	if ([currentView isKindOfClass:[ViDocumentView class]])
+		previousDocumentView = currentView;
 	currentView = viewController;
 }
 
@@ -725,12 +727,10 @@ static ViWindowController	*currentWindowController = nil;
 		return;
 
 	// XXX: currentView is the *previously* current view
-
 	id<ViViewController> viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		if ([(ViDocumentView *)viewController document] == document)
 			return;
-		previousDocument = [(ViDocumentView *)viewController document];
 	}
 
 	[[self document] removeWindowController:self];
@@ -752,6 +752,12 @@ static ViWindowController	*currentWindowController = nil;
 	if (viewController == [self currentView])
 		return;
 
+	/* Update the previous document pointer. */
+	id<ViViewController> prevView = [self currentView];
+	if ([prevView isKindOfClass:[ViDocumentView class]]) {
+		previousDocument = [(ViDocumentView *)prevView document];
+	}
+
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocumentView *docView = viewController;
 		if (!jumping)
@@ -761,7 +767,6 @@ static ViWindowController	*currentWindowController = nil;
 	}
 	[[viewController tabController] setSelectedView:viewController];
 
-	previousDocumentView = currentView;
 	[self setCurrentView:viewController];
 }
 

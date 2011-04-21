@@ -501,6 +501,7 @@
 				[NSApp presentError:error];
 				failed = YES;
 			}
+			[self rescan:nil];
 		}];
 	} else {
 		for (NSURL *url in urls) {
@@ -515,11 +516,8 @@
 			if (failed)
 				break;
 		}
-	}
 
-	if (!failed) {
-		/* Rescan containing folder(s) ? */
-		[self rescan_files:nil];
+		[self rescan:nil];
 	}
 }
 

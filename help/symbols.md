@@ -1,7 +1,7 @@
 # The symbol list
 
 The symbol list shows language-specific symbols extracted from the document.
-You can navigate the symbol list by pressing <kbd>&#x2318;-Y</kbd> key.
+You can navigate the symbol list by pressing the <kbd>&#x2318;Y</kbd> key.
 
 To jump to a symbol, select the symbol and press <kbd>enter</kbd>, <kbd>s</kbd>,
 <kbd>v</kbd> or <kbd>o</kbd> to open it in a tab, a split view, a vertical

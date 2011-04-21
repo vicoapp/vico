@@ -1,6 +1,6 @@
 # Using the file explorer
 
-Activate the file explorer with the <kbd>&#x2318;-E</kbd> key. When the explorer
+Activate the file explorer with the <kbd>&#x2318;E</kbd> key. When the explorer
 has focus, you can navigate using many of the regular
 [vi motion keys](movement.html).
 

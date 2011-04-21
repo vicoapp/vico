@@ -208,7 +208,48 @@
 {
 	if (exTextView) {
 		ViDocument *doc = [(ViDocumentView *)[windowController viewControllerForView:exTextView] document];
-		[doc saveDocument:self];
+		INFO(@"got %i addresses", command.naddr);
+		if ([command.string hasPrefix:@">>"]) {
+			[self message:@"Appending not yet supported"];
+			return;
+		}
+		if ([command.string length] == 0) {
+			[doc saveDocument:self];
+		} else {
+			NSError *error = nil;
+			NSURL *newURL = [[ViDocumentController sharedDocumentController]
+			    normalizePath:command.string
+			       relativeTo:[self baseURL]
+				    error:&error];
+			if (error != nil) {
+				[NSApp presentError:error];
+				return;
+			}
+
+			BOOL exists = NO;
+			/* FIXME: Aaaargh!!! I don't want to check for file:// vs sftp:// URLs _everywhere_! */
+			if ([newURL isFileURL]) {
+				exists = [[NSFileManager sharedManager] fileExistsAtPath:[newURL path]];
+			} else {
+				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:newURL
+												    error:nil];
+				exists = [conn fileExistsAtPath:[newURL path]];
+			}
+
+			if (exists && (command.flags & E_C_FORCE) != E_C_FORCE) {
+				[self message:@"File exists (add ! to override)"];
+				return;
+			}
+
+			if ([doc saveToURL:newURL
+				    ofType:nil
+			  forSaveOperation:NSSaveToOperation
+				     error:&error] == NO) {
+				[NSApp presentError:error];
+			} else {
+				[self message:@"Wrote %@", newURL];
+			}
+		}
 	}
 }
 

@@ -19,6 +19,7 @@ BUGS
 
 IMPORTANT
 =========
+* unify SFTPConnection and NSFileManager methods!
 * tweak smart typing pair invocation
 * always open an untitled document when opening a project?
 * indented paste

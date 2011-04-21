@@ -586,6 +586,11 @@ u_int num_requests = 64;
 	return YES;
 }
 
+- (BOOL)fileExistsAtPath:(NSString *)path
+{
+	return [self fileExistsAtPath:path isDirectory:nil error:nil];
+}
+
 - (NSArray *)readDirectory:(NSString *)pathS error:(NSError **)outError
 {
 	Buffer msg;

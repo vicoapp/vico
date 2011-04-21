@@ -2,6 +2,7 @@
 #import "logging.h"
 #import "ProjectDelegate.h"
 #import "SFTPConnectionPool.h"
+#import "ViDocumentController.h"
 
 @implementation ViProject
 
@@ -19,6 +20,8 @@
 	[self addWindowController:windowController];
 	[windowController setProject:self];
 	[windowController browseURL:initialURL];
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
+	[doc setIsTemporary:YES];
 }
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError

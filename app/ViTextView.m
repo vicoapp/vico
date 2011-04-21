@@ -638,9 +638,9 @@ int logIndent = 0;
 			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
 			[self replaceCharactersInRange:curIndent withString:leading_whitespace];
 			NSRange autoIndentRange = NSMakeRange(curIndent.location, [leading_whitespace length]);
-			[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoIndentAttributeName
-									    value:[NSNumber numberWithInt:1]
-								forCharacterRange:autoIndentRange];
+			[[self layoutManager] addTemporaryAttribute:ViAutoIndentAttributeName
+							      value:[NSNumber numberWithInt:1]
+						  forCharacterRange:autoIndentRange];
 			return aLocation + autoIndentRange.length;
 		}
 	}
@@ -1226,9 +1226,9 @@ int logIndent = 0;
 
 				NSRange r = NSMakeRange(start_location, [pair0 length] + [pair1 length]);
 				DEBUG(@"adding smart pair attr to %@", NSStringFromRange(r));
-				[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViSmartPairAttributeName
-				                                                    value:characters
-				                                        forCharacterRange:r];
+				[[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName
+								      value:characters
+							  forCharacterRange:r];
 
 				final_location = start_location + [pair1 length];
 				break;

@@ -603,9 +603,9 @@
 	[self cutToRegister:command.reg range:affectedRange];
 	[self insertString:leading_whitespace ?: @"" atLocation:bol];
 	NSRange autoIndentRange = NSMakeRange(bol, [leading_whitespace length]);
-	[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoIndentAttributeName
-							    value:[NSNumber numberWithInt:1]
-						forCharacterRange:autoIndentRange];
+	[[self layoutManager] addTemporaryAttribute:ViAutoIndentAttributeName
+					      value:[NSNumber numberWithInt:1]
+				  forCharacterRange:autoIndentRange];
 
 	/* a command count should not be treated as a count for the inserted text */
 	command.count = 0;

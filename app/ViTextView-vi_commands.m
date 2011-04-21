@@ -2126,14 +2126,14 @@
 			basePath = path;
 		else
 			basePath = [path stringByDeletingLastPathComponent];
-		url = [NSURL URLWithString:[path stringByExpandingTildeInPath] relativeToURL:relURL];
+		url = [[NSURL URLWithString:[path stringByExpandingTildeInPath] relativeToURL:relURL] absoluteURL];
 	} else {
 		if ([path hasSuffix:@"/"])
 			basePath = path;
 		else
 			basePath = [path stringByDeletingLastPathComponent];
-		url = [NSURL URLWithString:[path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-			     relativeToURL:relURL];
+		url = [[NSURL URLWithString:[path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+			     relativeToURL:relURL] absoluteURL];
 	}
 
 	NSString *suffix = @"";

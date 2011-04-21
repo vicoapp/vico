@@ -1,11 +1,12 @@
 URGENT
 ========
+* undo manager messed up after undo and repeat of bundle command!
+* opening a directory should start with a scratch buffer
 
 BUGS
 ====
 * h doesn't accept a count
 * bundle commands time out when presenting ui
-* undo manager messed up after undo and repeat of bundle command!
 * modified status is not updated immediately, ok after escape?
 * get rid of ViBgView
 * switch undo direction after bundle command

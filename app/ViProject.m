@@ -3,6 +3,7 @@
 #import "ProjectDelegate.h"
 #import "SFTPConnectionPool.h"
 #import "ViDocumentController.h"
+#import "ViDocument.h"
 
 @implementation ViProject
 

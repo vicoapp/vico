@@ -39,12 +39,12 @@ To authorize a remote server to log you in with this key, you copy the
 
 	cat ~/.ssh/id_rsa.pub | ssh hostname 'mkdir -m700 -p .ssh && cat >> .ssh/authorized_keys'
 
-The above command makes sure the <kbd>.ssh</kbd> directory exists and has the
-correct permissions, and appends your new public key to any existing authorized
-keys.
+The above command makes sure the remote <kbd>.ssh</kbd> directory exists and has
+the correct permissions, and appends your new public key to any existing
+authorized keys.
 
 If you have multiple keys, or use non-standard filenames, you may have to tell
-ssh what key to use. You can do this by adding a host directive the ssh
+ssh what key to use. You can do this by adding a host directive in the ssh
 configuration file, <kbd>~/.ssh/config</kbd>:
 
 	Host www.example.com

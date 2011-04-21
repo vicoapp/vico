@@ -110,7 +110,7 @@
 /* #undef USE_CRNL_AS_LINE_TERMINATOR */
 
 /* Version number of package */
-#define VERSION "5.9.2"
+#define VERSION_STRING "5.9.2"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

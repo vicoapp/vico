@@ -621,7 +621,7 @@ int logIndent = 0;
 	NSRange smartRange;
 	if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
 				    atCharacterIndex:aLocation
-				      effectiveRange:&smartRange] && smartRange.length > 1)
+				      effectiveRange:&smartRange] && smartRange.length > 1 && smartRange.location == aLocation - 1)
 	{
 		// assumes indentForward
 		[self insertString:[NSString stringWithFormat:@"\n\n%@", leading_whitespace] atLocation:aLocation];

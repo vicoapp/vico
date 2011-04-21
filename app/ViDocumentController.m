@@ -199,8 +199,13 @@
                               error:(NSError **)outError
 {
 	id doc = [self documentForURL:absoluteURL];
-	if (doc)
+	if (doc) {
+		if ([doc windowController] == [ViWindowController currentWindowController])
+			[[doc windowController] selectDocument:doc];
+		else
+			[[ViWindowController currentWindowController] createTabForDocument:doc];
 		return doc;
+	}
 
 	if (![self supportedURLScheme:[absoluteURL scheme]]) {
 		if (outError)

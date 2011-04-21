@@ -1,8 +1,8 @@
 # Visual mode
 
 When you select text in Vico, you enter visual mode. This is similar to normal
-mode in that keys act as commands, they don't replace the selected text (you
-need to use the [change](change.html) command for that).
+mode in that keys act as commands. They do not replace the selected text (you
+must use the [change](change.html) command for that).
 
 Commands that require a motion ([operators](operators.html)) instead use the
 selected text directly.

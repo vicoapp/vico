@@ -4,7 +4,7 @@ To move to the next word, use the <kbd>w</kbd> command.
 
 The <kbd>w</kbd> command considers separator characters when deciding where the
 next word starts. To only consider whitespace as word separators, you can use
-the <kbd>W</kbd> command.
+the (uppercase) <kbd>W</kbd> command.
 
 To move in the opposite direction, use the <kbd>b</kbd> command to move over a
 normal word, and the capital <kbd>B</kbd> command to move over "big words".

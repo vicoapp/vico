@@ -3,7 +3,7 @@
 Vico maintains a list of locations while you move around in files. Some movement
 commands are considered "jumps", and those jumps are remembered in a list.
 
-Generally, movement commands that generates jumps are those that
+Generally, movement commands that generate jumps are those that
 move more than a few lines. So the [word](move_words.html),
 [character](move_chars.html) and [line search](line_search.html)
 motion commands do not generate a jump, but the [line](move_lines.html)

@@ -1,0 +1,22 @@
+body {
+	font-family: "Lucida Grande", sans-serif;
+	font-size: small;
+	padding: 1em 1em 0em 1em;
+}
+
+kbd {	/* stolen from github */
+	background-color: ghostWhite;
+	border: 1px solid #DEDEDE;
+	color: #444;
+	padding: padding: 0px 0.2em;
+}
+
+h1 {
+	font-size: medium;
+	margin: 0 0 0.5em 0;
+	padding-left: 42px;
+	min-height: 32px;
+	background: url(../shared/icon_hand_32.png) no-repeat bottom left;
+	-webkit-background-size: 32px 32px;
+	line-height: 32px;
+}

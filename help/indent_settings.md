@@ -2,7 +2,7 @@
 
 The <kbd>shiftwidth</kbd> setting controls how large an indentation is in terms
 of spaces. This is different from the <kbd>tabstop</kbd> setting that specifies
-has large an actual tab character is.
+how large an actual tab character is.
 
 If <kbd>shiftwidth</kbd> is set to 4 and <kbd>tabstop</kbd> is left at the
 default 8, one indentation will use 4 spaces, but two indentations will use one

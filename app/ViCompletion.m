@@ -99,7 +99,7 @@
 - (void)calcScore
 {
 	NSUInteger flen = [content length]; /* full length */
-	NSUInteger slen; /* short length */
+	NSUInteger slen = 0; /* short length */
 	NSUInteger offset = [filterMatch rangeOfMatchedString].location;
 	NSCharacterSet *separators = [NSCharacterSet punctuationCharacterSet];
 	NSCharacterSet *ucase = [NSCharacterSet uppercaseLetterCharacterSet];
@@ -162,7 +162,8 @@
 		prev_pos = pos;
 	}
 
-	double length_score = 10.0 / (1 + flen - slen);
+	double length_score = (double)10.0 / (double)(1 + flen - slen);
+	DEBUG(@"match score is %lf, length score is %lf", match_score, length_score);
 	score = match_score + length_score;
 }
 

@@ -80,7 +80,9 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+#if defined(DEBUG_BUILD)
 	[NSApp activateIgnoringOtherApps:YES];
+#endif
 
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES

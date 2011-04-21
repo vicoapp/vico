@@ -35,10 +35,6 @@
  */
 static struct ex_command ex_commands[] = {
 	/* C_SCROLL */
-	{@"\004",	@"ex_pr",		EX_ADDR2,
-		"",
-		@"^D",
-		@"scroll lines"},
 	/* C_BANG */
 	{@"!",		@"ex_bang",	EX_ADDR2_NONE | EX_SECURE,
 		"S",
@@ -84,11 +80,6 @@ static struct ex_command ex_commands[] = {
 		"!",
 		@"[line] a[ppend][!]",
 		@"append input to a line"},
-	/* C_ABBR */
-	{@"abbreviate", 	@"ex_abbr",	0,
-		"W",
-		@"ab[brev] [word replace]",
-		@"specify an input abbreviation"},
 	/* C_ARGS */
 	{@"args",	@"ex_args",	0,
 		"",
@@ -148,11 +139,6 @@ static struct ex_command ex_commands[] = {
 		"f1o",
 		@"[Ee][dit][!] [+cmd] [file]",
 		@"begin editing another file"},
-	/* C_EX */
-	{@"ex",		@"ex_edit",	EX_NEWSCREEN,
-		"f1o",
-		@"[Ee]x[!] [+cmd] [file]",
-		@"begin editing another file"},
 	{@"export",	@"ex_export",	0,
 		"s",
 		@"export var=[value]",
@@ -207,11 +193,6 @@ static struct ex_command ex_commands[] = {
 		"!W",
 		@"map[!] [keys replace]",
 		@"map input or commands to one or more keys"},
-	/* C_MKEXRC */
-	{@"mkexrc",	@"ex_mkexrc",	0,
-		"!f1r",
-		@"mkexrc[!] file",
-		@"write a .exrc file"},
 	/* C_NEXT */
 	{@"next",	@"ex_next",	EX_NEWSCREEN,
 		"!fN",
@@ -273,11 +254,6 @@ static struct ex_command ex_commands[] = {
 		"!f1r",
 		@"recover[!] file",
 		@"recover a saved file"},
-	/* C_RESIZE */
-	{@"resize",	@"ex_resize",	EX_VIONLY,
-		"c+",
-		@"resize [+-]rows",
-		@"grow or shrink the current screen"},
 	/* C_REWIND */
 	{@"rewind",	@"ex_rew",		0,
 		"!",
@@ -297,11 +273,6 @@ static struct ex_command ex_commands[] = {
 		"s",
 		@"sb[uffer] bufname",
 		@"split view and edit another open document"},
-	/* C_SCRIPT */
-	{@"script",	@"ex_script",	EX_SECURE,
-		"!f1o",
-		@"sc[ript][!] [file]",
-		@"run a shell in a screen"},
 	/* C_SET */
 	{@"set",		@"ex_set",		0,
 		"wN",
@@ -316,25 +287,10 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"sh[ell]",
 		@"suspend editing and run a shell"},
-	/* C_SOURCE */
-	{@"source",	@"ex_source",	0,
-		"f1r",
-		@"so[urce] file",
-		@"read a file of ex commands"},
 	{@"split",	@"ex_split",	0,
 		"f1o",
 		@"sp[lit] file",
 		@"Split current view horizontally."},
-	/* C_STOP */
-	{@"stop",	@"ex_stop",	EX_SECURE,
-		"!",
-		@"st[op][!]",
-		@"suspend the edit session"},
-	/* C_SUSPEND */
-	{@"suspend",	@"ex_stop",	EX_SECURE,
-		"!",
-		@"su[spend][!]",
-		@"suspend the edit session"},
 	/* C_T */
 	{@"t",		@"ex_copy",	EX_ADDR2|EX_AUTOPRINT,
 		"l1",
@@ -374,11 +330,6 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"u[ndo]",
 		@"undo the most recent change"},
-	/* C_UNABBREVIATE */
-	{@"unabbreviate",@"ex_unabbr",	0,
-		"w1r",
-		@"una[bbrev] word",
-		@"delete an abbreviation"},
 	/* C_UNMAP */
 	{@"unmap",	@"ex_unmap",	0,
 		"!w1r",
@@ -398,11 +349,6 @@ static struct ex_command ex_commands[] = {
 		"",
 		@"version",
 		@"display the program version information"},
-	/* C_VISUAL_VI */
-	{@"visual",	@"ex_edit",	EX_NEWSCREEN,
-		"f1o",
-		@"[Vv]i[sual][!] [+cmd] [file]",
-		@"edit another file (from vi mode only)"},
 	/* C_VIUSAGE */
 	{@"viusage",	@"ex_viusage",	0,
 		"w1o",

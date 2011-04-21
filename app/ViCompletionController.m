@@ -183,7 +183,7 @@
 	if ([filter length] > 0) {
 		NSMutableString *pattern = [NSMutableString string];
 		if (fuzzySearch) {
-			[pattern appendFormat:@"^.{%lu}.*?", prefixLength];
+			[pattern appendFormat:@"^.{%lu}.*", prefixLength];
 			[ViCompletionController appendFilter:filter toPattern:pattern fuzzyClass:@"."];
 			[pattern appendString:@".*$"];
 		} else {

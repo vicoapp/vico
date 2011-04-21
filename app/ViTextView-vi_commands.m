@@ -2107,7 +2107,8 @@
 
 	NSString *basePath = nil;
 	NSURL *baseURL = nil;
-	NSURL *relURL = nil, *url = nil;
+	NSURL *url = nil;
+	NSURL *relURL = [(ExEnvironment *)[[[self window] windowController] environment] baseURL];
 	BOOL isAbsoluteURL = NO;
 	if ([path rangeOfString:@"://"].location != NSNotFound) {
 		isAbsoluteURL = YES;
@@ -2125,13 +2126,12 @@
 			basePath = path;
 		else
 			basePath = [path stringByDeletingLastPathComponent];
-		url = [NSURL fileURLWithPath:[path stringByExpandingTildeInPath]];
+		url = [NSURL URLWithString:[path stringByExpandingTildeInPath] relativeToURL:relURL];
 	} else {
 		if ([path hasSuffix:@"/"])
 			basePath = path;
 		else
 			basePath = [path stringByDeletingLastPathComponent];
-		relURL = [(ExEnvironment *)[[[self window] windowController] environment] baseURL];
 		url = [NSURL URLWithString:[path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 			     relativeToURL:relURL];
 	}

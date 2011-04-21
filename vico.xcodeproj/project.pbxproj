@@ -1583,7 +1583,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo -n \"se.bzero.Vico${VERSION}\" | openssl sha1 -binary | ${SOURCE_ROOT}/app/b2h > ${DERIVED_FILE_DIR}/bundle_fingerprint.h\n${BUILT_PRODUCTS_DIR}/xorkey ${SOURCE_ROOT}/app/AppleIncRootCertificate.cer > ${DERIVED_FILE_DIR}/AppleIncRootCertificate.h\n";
+			shellScript = "set -x\nSHORT_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH})\necho \"Using version $SHORT_VERSION for receipt validation\"\necho -n \"se.bzero.Vico${SHORT_VERSION}\" | openssl sha1 -binary | ${SOURCE_ROOT}/app/b2h > ${DERIVED_FILE_DIR}/bundle_fingerprint.h\n${BUILT_PRODUCTS_DIR}/xorkey ${SOURCE_ROOT}/app/AppleIncRootCertificate.cer > ${DERIVED_FILE_DIR}/AppleIncRootCertificate.h\n";
 			showEnvVarsInLog = 0;
 		};
 		9A2EF2AE133109C20023C5B7 /* ShellScript */ = {

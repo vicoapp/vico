@@ -1224,11 +1224,11 @@ int logIndent = 0;
 					pair0,
 					pair1] atLocation:start_location];
 
-				// INFO(@"adding smart pair attr to %u + 2", start_location);
+				NSRange r = NSMakeRange(start_location, [pair0 length] + [pair1 length]);
+				DEBUG(@"adding smart pair attr to %@", NSStringFromRange(r));
 				[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViSmartPairAttributeName
 				                                                    value:characters
-				                                        forCharacterRange:NSMakeRange(start_location,
-										[pair0 length] + [pair1 length])];
+				                                        forCharacterRange:r];
 
 				final_location = start_location + [pair1 length];
 				break;
@@ -1370,14 +1370,12 @@ int logIndent = 0;
 	}
 
 	/* check if we're deleting the first character in a smart pair */
-	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:start_location - 1];
-	NSArray *pair;
-	for (pair in smartTypingPairs)
-	{
-		if([[pair objectAtIndex:0] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location - 1, 1)]] &&
-		   start_location + 1 < [[self textStorage] length] &&
-		   [[pair objectAtIndex:1] isEqualToString:[[[self textStorage] string] substringWithRange:NSMakeRange(start_location, 1)]])
-		{
+	NSRange r;
+	if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+				    atCharacterIndex:start_location
+				      effectiveRange:&r]) {
+		DEBUG(@"found smart pair in range %@", NSStringFromRange(r));
+		if (r.location == start_location - 1 && r.length == 2) {
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
 			final_location = modify_start_location;
 			return YES;

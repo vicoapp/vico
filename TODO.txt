@@ -7,6 +7,7 @@ URGENT
 
 BUGS
 ====
+* h doesn't accept a count
 * bundle commands time out when presenting ui
 * undo manager messed up after undo and repeat of bundle command!
 * ctrl-^ in a command output window:

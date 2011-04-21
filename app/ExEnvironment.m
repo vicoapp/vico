@@ -895,7 +895,7 @@ filter_write(CFSocketRef s,
 		return NO;
 	} else if ([matches count] > 1) {
 		[self message:@"More than one match for %@", langScope];
-		INFO(@"matches: %@", matches);
+		DEBUG(@"matches: %@", matches);
 		return NO;
 	}
 

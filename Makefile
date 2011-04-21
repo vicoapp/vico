@@ -24,14 +24,19 @@ tarball:
 
 HELP_SRC = $(CURDIR)/help
 HELP_DST = $(CURDIR)/help/Vico.help/Contents/Resources
-HELP_EN  = $(HELP_DST)/en.lproj
+HELP_EN  = $(HELP_DST)/English.lproj
 help:
-	rm -rf help/Vico.help
+	rm -rf $(CURDIR)/help/Vico.help
 	mkdir -p $(HELP_EN)
-	cp -f help/index.html $(HELP_EN)
-	cp -rf help/img $(HELP_DST)
+	cp -f $(HELP_SRC)/index.html $(HELP_EN)/VicoHelp.html
+	cp -rf $(HELP_SRC)/shared $(HELP_DST)
+	cp -f $(HELP_SRC)/help-Info.plist $(HELP_DST)/../Info.plist
+	cp -f $(HELP_SRC)/help-InfoPlist.strings $(HELP_EN)/InfoPlist.strings
 	cd $(HELP_EN) && $(HELP_SRC)/md2html $(HELP_SRC)/*.md
 	hiutil -vg -s en -Caf $(HELP_EN)/Vico.helpindex $(HELP_EN)
+
+synchelp: help
+	rsync -avr $(HELP_DST)/ www.vicoapp.com:/var/www/vicoapp.com/help
 
 clean:
 	xcodebuild -configuration Debug clean

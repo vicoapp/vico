@@ -13,3 +13,5 @@ If a tag or symbol is found, the current location is pushed on the
 [tag stack](tagstack.html), and the caret is jumped to the new location.
 Press <kbd>ctrl-t</kbd> to go back.
 
+You can also use the <kbd>&#x21E7;&#x2318;T</kbd> key to search the
+[symbol list](symbols.md).

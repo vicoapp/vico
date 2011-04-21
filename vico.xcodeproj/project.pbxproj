@@ -1393,6 +1393,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
 			buildPhases = (
+				9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */,
 				9A26068A13531066002C86FB /* Generate receipt validation fingerprints */,
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
@@ -1642,6 +1643,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "HELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/English.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN/VicoHelp.html\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/../Info.plist\ncp -f $HELP_SRC/help-InfoPlist.strings $HELP_EN/InfoPlist.strings\ncp -rf $HELP_SRC/shared $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
+			showEnvVarsInLog = 0;
+		};
+		9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set version numbers in Info.plist";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -x\nREPO_VERSION=$(/opt/local/bin/hg identify -n $SOURCE_ROOT)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\nif test $BUILD_STYLE == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=$REPO_VERSION\nfi\ncat ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -2250,6 +2266,10 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"RELEASE_BUILD=1",
+					"NDEBUG=1",
+				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
 				OTHER_LDFLAGS = (
 					"-lcrypto",

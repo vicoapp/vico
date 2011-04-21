@@ -15,7 +15,7 @@ if test "$VERSION" = "$REPO_VERSION"; then
 	EXPIRATION=$(date -v +2w +%s)
 fi
 
-xcodebuild -scheme archive -configuration Snapshot VERSION=$VERSION REPO_VERSION=$REPO_VERSION EXPIRATION=$EXPIRATION || exit
+xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$EXPIRATION || exit
 
 TMPDMG=vico-tmp.dmg
 /bin/rm -f $TMPDMG

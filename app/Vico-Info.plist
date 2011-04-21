@@ -295,6 +295,10 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>Vico.help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>se.bzero.Vico.help</string>
 	<key>CFBundleIconFile</key>
 	<string>vico.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -347,7 +351,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
+	<string>10.6.6</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -358,9 +362,5 @@
 	<array/>
 	<key>UTImportedTypeDeclarations</key>
 	<array/>
-	<key>CFBundleHelpBookFolder</key>
-	<string>Vico.help</string>
-	<key>CFBundleHelpBookName</key>
-	<string>se.bzero.Vico.help</string>
 </dict>
 </plist>

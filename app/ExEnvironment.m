@@ -229,7 +229,7 @@
 			BOOL exists = NO;
 			/* FIXME: Aaaargh!!! I don't want to check for file:// vs sftp:// URLs _everywhere_! */
 			if ([newURL isFileURL]) {
-				exists = [[NSFileManager sharedManager] fileExistsAtPath:[newURL path]];
+				exists = [[NSFileManager defaultManager] fileExistsAtPath:[newURL path]];
 			} else {
 				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:newURL
 												    error:nil];

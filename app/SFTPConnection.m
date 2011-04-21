@@ -335,14 +335,13 @@ u_int num_requests = 64;
 		ssh_task = [[NSTask alloc] init];
 		[ssh_task setLaunchPath:@"/usr/bin/ssh"];
 
-		NSMutableArray *arguments = [[NSMutableArray alloc] init];
+		NSMutableArray *arguments = [NSMutableArray array];
 		[arguments addObject:@"-oForwardX11 no"];
 		[arguments addObject:@"-oForwardAgent no"];
 		[arguments addObject:@"-oPermitLocalCommand no"];
 		[arguments addObject:@"-oClearAllForwardings yes"];
-		[arguments addObject:@"-oBatchMode yes"];
 		[arguments addObject:@"-oConnectTimeout 10"];
-		[arguments addObject:@"-vvv"];
+		//[arguments addObject:@"-vvv"];
 		[arguments addObject:@"-s"];
 		if ([username length] > 0)
 			[arguments addObject:[NSString stringWithFormat:@"%@@%@", username, hostname]];
@@ -392,7 +391,7 @@ u_int num_requests = 64;
 		user = username;
 		home = [self currentDirectory];
 
-		directoryCache = [[NSMutableDictionary alloc] init];
+		directoryCache = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -603,7 +602,7 @@ u_int num_requests = 64;
 	if (path == NULL)
 		return nil;
 
-	NSMutableArray *entries = [[NSMutableArray alloc] init];
+	NSMutableArray *entries = [NSMutableArray array];
 
 	msgid = conn->msg_id++;
 
@@ -755,7 +754,7 @@ u_int num_requests = 64;
 
 - (void)flushDirectoryCache
 {
-	directoryCache = [[NSMutableDictionary alloc] init];
+	directoryCache = [NSMutableDictionary dictionary];
 }
 
 - (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError

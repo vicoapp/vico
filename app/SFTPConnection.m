@@ -322,7 +322,7 @@ u_int num_requests = 64;
 	} else {
 		[stderr appendData:data];
 		NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-		INFO(@"read data %@", str);
+		DEBUG(@"read data %@", str);
 
 		[[ssh_error fileHandleForReading] readInBackgroundAndNotify];
 	}
@@ -349,7 +349,7 @@ u_int num_requests = 64;
 			[arguments addObject:hostname];
 		[arguments addObject:@"sftp"];
 
-		INFO(@"ssh arguments: %@", arguments);
+		DEBUG(@"ssh arguments: %@", arguments);
 		[ssh_task setArguments:arguments];
 
 		ssh_input = [NSPipe pipe];
@@ -561,7 +561,7 @@ u_int num_requests = 64;
 
 - (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError
 {
-	INFO(@"path = [%@]", path);
+	DEBUG(@"path = [%@]", path);
 
 	if (path == nil || [path isEqualToString:@""]) {
 		/* This is the home directory. */

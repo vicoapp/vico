@@ -80,12 +80,8 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViTagsDatabase *)tagsDatabase
 {
-	if (tagsDatabase == nil || [tagsDatabase databaseHasChanged]) {
-		/* FIXME: tags doesn't work over sftp connections! */
-		NSString *directory = [[environment baseURL] path];
-		tagsDatabase = [[ViTagsDatabase alloc] initWithFile:@"tags"
-							inDirectory:directory];
-	}
+	if (tagsDatabase == nil)
+		tagsDatabase = [[ViTagsDatabase alloc] initWithBaseURL:[environment baseURL]];
 
 	return tagsDatabase;
 }
@@ -1116,16 +1112,29 @@ static ViWindowController	*currentWindowController = nil;
 	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
 	BOOL newDoc = YES;
 
+	NSError *err = nil;
 	if (filenameOrURL) {
-		doc = [ctrl openDocument:filenameOrURL andDisplay:NO allowDirectory:NO];
+		NSURL *url;
+		if ([filenameOrURL isKindOfClass:[NSURL class]])
+			url = filenameOrURL;
+		else
+			url = [ctrl normalizePath:filenameOrURL
+				       relativeTo:[environment baseURL]
+					    error:&err];
+		if (url && !err)
+			doc = [ctrl openDocumentWithContentsOfURL:filenameOrURL
+							  display:NO
+							    error:&err];
 	} else if (doc == nil) {
-		NSError *err = nil;
 		doc = [ctrl openUntitledDocumentAndDisplay:NO error:&err];
-		if (err)
-			[self message:@"%@", [err localizedDescription]];
 		doc.isTemporary = YES;
 	} else
 		newDoc = NO;
+
+	if (err) {
+		[self message:@"%@", [err localizedDescription]];
+		return nil;
+	}
 
 	if (doc) {
 		[doc addWindowController:self];

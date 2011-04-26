@@ -271,6 +271,11 @@ int logIndent = 0;
 
 - (void)setString:(NSString *)aString
 {
+	if (document.busy) {
+		MESSAGE(@"Document is busy");
+		return;
+	}
+
 	NSRange r = NSMakeRange(0, [[self textStorage] length]);
 	[[self textStorage] replaceCharactersInRange:r
 	                                  withString:aString];
@@ -286,6 +291,11 @@ int logIndent = 0;
                       withString:(NSString *)aString
                        undoGroup:(BOOL)undoGroup
 {
+	if (document.busy) {
+		MESSAGE(@"Document is busy");
+		return;
+	}
+
 	modify_start_location = aRange.location;
 
 	ViSnippet *snippet = document.snippet;
@@ -1465,7 +1475,9 @@ int logIndent = 0;
 		return;
 
 	const char *modestr = "";
-	if (mode == ViInsertMode) {
+	if (document.busy) {
+		modestr = "--BUSY--";
+	} else if (mode == ViInsertMode) {
 		if (document.snippet)
 			modestr = "--SNIPPET--";
 		else
@@ -1516,6 +1528,11 @@ int logIndent = 0;
 	if (target == nil) {
 		MESSAGE(@"Command %@ not implemented.",
 		    command.mapping.keyString);
+		return NO;
+	}
+
+	if (document.busy && !command.isMotion) {
+		MESSAGE(@"Document is busy");
 		return NO;
 	}
 

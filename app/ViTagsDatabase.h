@@ -1,13 +1,13 @@
 @interface ViTagsDatabase : NSObject
 {
-	NSString *databaseFile;
+	NSURL *baseURL;
+	NSURL *databaseURL;
 	NSDate *modificationDate;
 	NSMutableDictionary *tags;
-	NSString *prefixPath;
 }
 
-- (ViTagsDatabase *)initWithFile:(NSString *)aFile inDirectory:(NSString *)aDirectory;
-- (NSArray *)lookup:(NSString *)symbol;
-- (BOOL)databaseHasChanged;
+- (ViTagsDatabase *)initWithBaseURL:(NSURL *)aURL;
+- (void)lookup:(NSString *)symbol
+  onCompletion:(void (^)(NSArray *tag, NSError *error))aBlock;
 
 @end

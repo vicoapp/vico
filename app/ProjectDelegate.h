@@ -11,7 +11,7 @@
 @interface ProjectFile : NSObject
 {
 	NSURL *url;
-	SFTPDirectoryEntry *entry;
+	NSDictionary *attributes;
 	double score;
 	NSMutableArray *children;
 	NSAttributedString *markedString;
@@ -19,6 +19,7 @@
 @property(readwrite, assign) double score;
 @property(readwrite, copy) NSURL *url;
 @property(readwrite, assign) NSAttributedString *markedString;
+@property(readwrite, assign) NSMutableArray *children;
 @end
 
 @interface ProjectDelegate : NSObject <NSOutlineViewDataSource>

@@ -18,6 +18,8 @@
 	/* Set when opening a new file from the ex command line. */
 	BOOL isTemporary;
 
+	BOOL busy;
+
 	ViTextStorage *textStorage;
 	NSDictionary *typingAttributes;
 	ViWindowController *windowController;
@@ -50,6 +52,7 @@
 @property(readonly) NSStringEncoding encoding;
 @property(readwrite, assign) BOOL isTemporary;
 @property(readonly) ViScriptProxy *proxy;
+@property(readwrite) BOOL busy;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;

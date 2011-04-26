@@ -230,6 +230,7 @@
 	    [NSValue valueWithRange:selectedRange], @"selectedRange",
 	    nil];
 	SEL sel = @selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:);
+	document.busy = YES;
 	[[document environment] filterText:inputText
 			       throughTask:task
 				    target:self
@@ -254,6 +255,7 @@
 	NSRange selectedRange = [[info objectForKey:@"selectedRange"] rangeValue];
 
 	DEBUG(@"command %@ finished with status %i", [command name], status);
+	document.busy = NO;
 
 	NSString *outputFormat = [command output];
 

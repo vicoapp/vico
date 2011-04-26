@@ -1,3 +1,4 @@
+//#define FORCE_DEBUG
 #import "SFTPConnection.h"
 #import "ViError.h"
 #import "logging.h"
@@ -13,26 +14,35 @@
 #include "atomicio.h"
 
 @implementation SFTPDirectoryEntry
+
 @synthesize filename;
+
 - (SFTPDirectoryEntry *)initWithFilename:(const char *)aFilename attributes:(Attrib *)a
 {
 	self = [super init];
 	if (self)
 	{
 		filename = [NSString stringWithCString:aFilename encoding:NSUTF8StringEncoding]; // XXX: what encoding?
+		if (filename == nil)
+			filename = [NSString stringWithCString:aFilename encoding:NSISOLatin1StringEncoding];
 		bcopy(a, &attributes, sizeof(attributes));
 	}
 	return self;
 }
+
 - (Attrib *)attributes
 {
 	return &attributes;
 }
+
 - (BOOL)isDirectory
 {
 	return S_ISDIR(attributes.perm);
 }
+
 @end
+
+#pragma mark -
 
 @interface SFTPConnection (Private)
 - (void)close;
@@ -43,8 +53,8 @@
 /* Size of buffer used when copying files */
 const size_t copy_buffer_len = 32768;
 
-/* Number of concurrent outstanding requests */
-u_int num_requests = 64;
+/* Max number of concurrent outstanding requests */
+#define NUM_REQUESTS 64
 
 @synthesize host;
 @synthesize user;
@@ -121,12 +131,12 @@ u_int num_requests = 64;
 	return YES;
 }
 
-- (BOOL)readMsg:(Buffer *)m on:(int)fd error:(NSError **)outError
+- (BOOL)readMsg:(Buffer *)m error:(NSError **)outError
 {
 	u_int msg_len;
 
 	buffer_append_space(m, 4);
-	if (atomicio(read, fd, buffer_ptr(m), 4) != 4) {
+	if (atomicio(read, fd_in, buffer_ptr(m), 4) != 4) {
 		if (errno == EPIPE)
 			return [self fail:outError with:@"Connection closed"];
 		return [self fail:outError with:@"Couldn't read packet: %s", strerror(errno)];
@@ -138,7 +148,7 @@ u_int num_requests = 64;
 		return [self fail:outError with:@"Received message too long: %u", msg_len];
 
 	buffer_append_space(m, msg_len);
-	if (atomicio(read, fd, buffer_ptr(m), msg_len) != msg_len) {
+	if (atomicio(read, fd_in, buffer_ptr(m), msg_len) != msg_len) {
 		if (errno == EPIPE)
 			return [self fail:outError with:@"Connection closed"];
 		return [self fail:outError with:@"Couldn't read packet: %s", strerror(errno)];
@@ -148,7 +158,6 @@ u_int num_requests = 64;
 }
 
 - (BOOL)readStatus:(u_int *)ret
-                on:(int)fd
        expectingID:(u_int)expected_id
              error:(NSError **)outError
 {
@@ -157,7 +166,7 @@ u_int num_requests = 64;
 	u_int req_id;
 
 	buffer_init(&msg);
-	if (![self readMsg:&msg on:fd error:outError] ||
+	if (![self readMsg:&msg error:outError] ||
 	    ![self readChar:&type from:&msg error:outError] ||
 	    ![self readInt:&req_id from:&msg error:outError]) {
 		buffer_free(&msg);
@@ -188,7 +197,6 @@ u_int num_requests = 64;
 
 - (BOOL)getHandle:(char **)handleRet
            length:(u_int *)lenRet
-               on:(int)fd
       expectingID:(u_int)expected_id
             error:(NSError **)outError
 {
@@ -197,7 +205,7 @@ u_int num_requests = 64;
 	u_int req_id;
 
 	buffer_init(&msg);
-	if (![self readMsg:&msg on:fd error:outError] ||
+	if (![self readMsg:&msg error:outError] ||
 	    ![self readChar:&type from:&msg error:outError] ||
 	    ![self readInt:&req_id from:&msg error:outError])
 		return NO;
@@ -240,14 +248,14 @@ u_int num_requests = 64;
 
 	buffer_init(&msg);
 
-	req_id = conn->msg_id++;
+	req_id = msg_id++;
 	buffer_put_char(&msg, SSH2_FXP_CLOSE);
 	buffer_put_int(&msg, req_id);
 	buffer_put_string(&msg, handle, handle_len);
-	send_msg(conn->fd_out, &msg);
+	send_msg(fd_out, &msg);
 	DEBUG("Sent message SSH2_FXP_CLOSE I:%u", req_id);
 
-	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError]) {
+	if (![self readStatus:&status expectingID:req_id error:outError]) {
 		buffer_free(&msg);
 		return NO;
 	}
@@ -321,8 +329,10 @@ u_int num_requests = 64;
 		[self close];
 	} else {
 		[stderr appendData:data];
+#ifndef NO_DEBUG
 		NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 		DEBUG(@"read data %@", str);
+#endif
 
 		[[ssh_error fileHandleForReading] readInBackgroundAndNotify];
 	}
@@ -341,7 +351,9 @@ u_int num_requests = 64;
 		[arguments addObject:@"-oPermitLocalCommand no"];
 		[arguments addObject:@"-oClearAllForwardings yes"];
 		[arguments addObject:@"-oConnectTimeout 10"];
-		//[arguments addObject:@"-vvv"];
+#ifndef NO_DEBUG
+		[arguments addObject:@"-vvv"];
+#endif
 		[arguments addObject:@"-s"];
 		if ([username length] > 0)
 			[arguments addObject:[NSString stringWithFormat:@"%@@%@", username, hostname]];
@@ -380,9 +392,7 @@ u_int num_requests = 64;
 		fd_out = [[ssh_input fileHandleForWriting] fileDescriptor];
 		fd_in = [[ssh_output fileHandleForReading] fileDescriptor];
 
-		conn = [self initConnectionError:outError];
-
-		if (conn == NULL) {
+		if (![self initConnectionError:outError]) {
 			[self close];
 			return nil;
 		}
@@ -396,13 +406,10 @@ u_int num_requests = 64;
 	return self;
 }
 
-- (struct sftp_conn *)initConnectionError:(NSError **)outError
+- (BOOL)initConnectionError:(NSError **)outError
 {
 	char type;
-	u_int exts = 0;
-	u_int version;
 	Buffer msg;
-	struct sftp_conn *ret;
 
 	buffer_init(&msg);
 	buffer_put_char(&msg, SSH2_FXP_INIT);
@@ -411,10 +418,10 @@ u_int num_requests = 64;
 
 	buffer_clear(&msg);
 
-	if (![self readMsg:&msg on:fd_in error:outError] ||
+	if (![self readMsg:&msg error:outError] ||
 	    ![self readChar:&type from:&msg error:outError]) {
 		buffer_free(&msg);
-		return(NULL);
+		return NO;
 	}
 
 	/* Expecting a VERSION reply */
@@ -424,12 +431,12 @@ u_int num_requests = 64;
 			    @"Invalid packet back from SSH2_FXP_INIT (type %u)", type];
 		buffer_free(&msg);
 		[self close];
-		return(NULL);
+		return NO;
 	}
 
 	if (![self readInt:&version from:&msg error:outError]) {
 		buffer_free(&msg);
-		return(NULL);
+		return NO;
 	}
 
 	DEBUG(@"Remote version: %d", version);
@@ -442,7 +449,7 @@ u_int num_requests = 64;
 		if (![self readString:&name length:NULL from:&msg error:outError] ||
 		    ![self readString:&value length:NULL from:&msg error:outError]) {
 			buffer_free(&msg);
-			return NULL;
+			return NO;
 		}
 
 		int known = 0;
@@ -469,20 +476,14 @@ u_int num_requests = 64;
 
 	buffer_free(&msg);
 
-	ret = xmalloc(sizeof(*ret));
-	ret->fd_in = fd_in;
-	ret->fd_out = fd_out;
-	ret->transfer_buflen = copy_buffer_len;
-	ret->num_requests = num_requests;
-	ret->version = version;
-	ret->msg_id = 1;
-	ret->exts = exts;
+	transfer_buflen = copy_buffer_len;
+	msg_id = 1;
 
 	/* Some filexfer v.0 servers don't support large packets */
 	if (version == 0)
-		ret->transfer_buflen = MIN(ret->transfer_buflen, 20480);
+		transfer_buflen = MIN(transfer_buflen, 20480);
 
-	return(ret);
+	return YES;
 }
 
 - (Attrib *)decodeStatRequest:(u_int)expected_id error:(NSError **)outError
@@ -494,7 +495,7 @@ u_int num_requests = 64;
 
 	buffer_init(&msg);
 
-	if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+	if (![self readMsg:&msg error:outError] ||
 	    ![self readChar:&type from:&msg error:outError] ||
 	    ![self readInt:&req_id from:&msg error:outError]) {
 		buffer_free(&msg);
@@ -536,14 +537,15 @@ u_int num_requests = 64;
 	return &a;
 }
 
+/* FIXME: try attributes in directoryCache first. */
 - (Attrib *)stat:(NSString *)path error:(NSError **)outError
 {
-	u_int req_id = conn->msg_id++;
+	u_int req_id = msg_id++;
 
 	const char *utf8path = [path UTF8String];
 
-	send_string_request(conn->fd_out, req_id,
-	    conn->version == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_STAT,
+	send_string_request(fd_out, req_id,
+	    version == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_STAT,
 	    utf8path, (u_int)strlen(utf8path));
 
 	return [self decodeStatRequest:req_id error:outError];
@@ -595,7 +597,7 @@ u_int num_requests = 64;
 {
 	Buffer msg;
 	char type;
-	u_int count, msgid, handle_len, i, expected_id;
+	u_int count, req_id, handle_len, i, expected_id;
 	char *handle;
 
 	if (pathS == nil || [pathS isEqualToString:@""]) {
@@ -609,44 +611,44 @@ u_int num_requests = 64;
 
 	NSMutableArray *entries = [NSMutableArray array];
 
-	msgid = conn->msg_id++;
+	req_id = msg_id++;
 
 	buffer_init(&msg);
 	buffer_put_char(&msg, SSH2_FXP_OPENDIR);
-	buffer_put_int(&msg, msgid);
+	buffer_put_int(&msg, req_id);
 	buffer_put_cstring(&msg, path);
-	send_msg(conn->fd_out, &msg);
+	send_msg(fd_out, &msg);
 
 	buffer_clear(&msg);
 
-	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:msgid error:outError])
+	if (![self getHandle:&handle length:&handle_len expectingID:req_id error:outError])
 		return NO;
 
 	for (;;) {
-		msgid = expected_id = conn->msg_id++;
+		req_id = expected_id = msg_id++;
 
-		DEBUG(@"Sending SSH2_FXP_READDIR I:%u", msgid);
+		DEBUG(@"Sending SSH2_FXP_READDIR I:%u", req_id);
 
 		buffer_clear(&msg);
 		buffer_put_char(&msg, SSH2_FXP_READDIR);
-		buffer_put_int(&msg, msgid);
+		buffer_put_int(&msg, req_id);
 		buffer_put_string(&msg, handle, handle_len);
-		send_msg(conn->fd_out, &msg);
+		send_msg(fd_out, &msg);
 
 		buffer_clear(&msg);
 
-		if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+		if (![self readMsg:&msg error:outError] ||
 		    ![self readChar:&type from:&msg error:outError] ||
-		    ![self readInt:&msgid from:&msg error:outError]) {
+		    ![self readInt:&req_id from:&msg error:outError]) {
 			buffer_free(&msg);
 			return nil;
 		}
 
-		DEBUG(@"Received reply T:%u I:%u", type, msgid);
+		DEBUG(@"Received reply T:%u I:%u", type, req_id);
 
-		if (msgid != expected_id) {
+		if (req_id != expected_id) {
 			if (outError)
-				*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", msgid, expected_id];
+				*outError = [ViError errorWithFormat:@"ID mismatch (%u != %u)", req_id, expected_id];
 			return nil;
 		}
 
@@ -740,11 +742,11 @@ u_int num_requests = 64;
 
 	attrib_clear(&a);
 
-	req_id = conn->msg_id++;
-	send_string_attrs_request(conn->fd_out, req_id, SSH2_FXP_MKDIR, utf8path,
+	req_id = msg_id++;
+	send_string_attrs_request(fd_out, req_id, SSH2_FXP_MKDIR, utf8path,
 	    (u_int)strlen(utf8path), &a);
 
-	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+	if (![self readStatus:&status expectingID:req_id error:outError])
 		return NO;
 	if (status != SSH2_FX_OK) {
 		if (outError)
@@ -778,28 +780,28 @@ u_int num_requests = 64;
 	Attrib a;
 	Buffer msg;
 	char type;
-	u_int expected_id, count, msgid;
+	u_int expected_id, count, req_id;
 	char *filename, *longname;
 
 	const char *path = [pathS UTF8String];
 
-	expected_id = msgid = conn->msg_id++;
-	send_string_request(conn->fd_out, msgid, SSH2_FXP_REALPATH, path,
+	expected_id = req_id = msg_id++;
+	send_string_request(fd_out, req_id, SSH2_FXP_REALPATH, path,
 	    (u_int)strlen(path));
 
 	buffer_init(&msg);
 
-	if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+	if (![self readMsg:&msg error:outError] ||
 	    ![self readChar:&type from:&msg error:outError] ||
-	    ![self readInt:&msgid from:&msg error:outError]) {
+	    ![self readInt:&req_id from:&msg error:outError]) {
 		buffer_free(&msg);
 		return nil;
 	}
 
-	if (msgid != expected_id) {
+	if (req_id != expected_id) {
 		if (outError)
 			*outError = [ViError errorWithFormat:
-			    @"ID mismatch (%u != %u)", msgid, expected_id];
+			    @"ID mismatch (%u != %u)", req_id, expected_id];
 		[self close];
 		return nil;
 	}
@@ -879,8 +881,11 @@ u_int num_requests = 64;
 	NSMutableData *output = [NSMutableData data];
 
 	const char *remote_path = [path UTF8String];
-	if (remote_path == NULL)
+	if (remote_path == NULL) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Invalid filename"];
 		return nil;
+	}
 
 	Attrib junk, *a;
 	Buffer msg;
@@ -920,21 +925,21 @@ u_int num_requests = 64;
 	else
 		size = 0;
 
-	buflen = conn->transfer_buflen;
+	buflen = transfer_buflen;
 	buffer_init(&msg);
 
 	/* Send open request */
-	req_id = conn->msg_id++;
+	req_id = msg_id++;
 	buffer_put_char(&msg, SSH2_FXP_OPEN);
 	buffer_put_int(&msg, req_id);
 	buffer_put_cstring(&msg, remote_path);
 	buffer_put_int(&msg, SSH2_FXF_READ);
 	attrib_clear(&junk); /* Send empty attributes */
 	encode_attrib(&msg, &junk);
-	send_msg(conn->fd_out, &msg);
+	send_msg(fd_out, &msg);
 	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
 
-	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:req_id error:outError]) {
+	if (![self getHandle:&handle length:&handle_len expectingID:req_id error:outError]) {
 		buffer_free(&msg);
 		return nil;
 	}
@@ -955,19 +960,19 @@ u_int num_requests = 64;
 			    (unsigned long long)offset + buflen - 1,
 			    num_req, max_req);
 			req = xmalloc(sizeof(*req));
-			req->req_id = conn->msg_id++;
+			req->req_id = msg_id++;
 			req->len = buflen;
 			req->offset = offset;
 			offset += buflen;
 			num_req++;
 			TAILQ_INSERT_TAIL(&requests, req, tq);
-			send_read_request(conn->fd_out, req->req_id, req->offset,
+			send_read_request(fd_out, req->req_id, req->offset,
 			    req->len, handle, handle_len);
 		}
 
 		buffer_clear(&msg);
 
-		if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+		if (![self readMsg:&msg error:outError] ||
 		    ![self readChar:&type from:&msg error:outError] ||
 		    ![self readInt:&req_id from:&msg error:outError]) {
 			buffer_free(&msg);
@@ -1031,10 +1036,10 @@ u_int num_requests = 64;
 				    (unsigned long long)req->offset + len,
 				    (unsigned long long)req->offset +
 				    req->len - 1, num_req);
-				req->req_id = conn->msg_id++;
+				req->req_id = msg_id++;
 				req->len -= len;
 				req->offset += len;
-				send_read_request(conn->fd_out, req->req_id,
+				send_read_request(fd_out, req->req_id,
 				    req->offset, req->len, handle, handle_len);
 				/* Reduce the request size */
 				if (len < buflen)
@@ -1048,7 +1053,7 @@ u_int num_requests = 64;
 					    (unsigned long long)offset,
 					    num_req);
 					max_req = 1;
-				} else if (max_req <= conn->num_requests) {
+				} else if (max_req <= NUM_REQUESTS) {
 					++max_req;
 				}
 			}
@@ -1146,18 +1151,18 @@ u_int num_requests = 64;
 	buffer_init(&msg);
 
 	/* Send open request */
-	req_id = conn->msg_id++;
+	req_id = msg_id++;
 	buffer_put_char(&msg, SSH2_FXP_OPEN);
 	buffer_put_int(&msg, req_id);
 	buffer_put_cstring(&msg, remote_path);
 	buffer_put_int(&msg, SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_TRUNC);
 	encode_attrib(&msg, remote_attribs);
-	send_msg(conn->fd_out, &msg);
+	send_msg(fd_out, &msg);
 	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
 
 	buffer_clear(&msg);
 
-	if (![self getHandle:&handle length:&handle_len on:conn->fd_in expectingID:req_id error:outError]) {
+	if (![self getHandle:&handle length:&handle_len expectingID:req_id error:outError]) {
 		buffer_free(&msg);
 		return NO;
 	}
@@ -1177,7 +1182,7 @@ u_int num_requests = 64;
 		if (status != SSH2_FX_OK)
 			len = 0;
 		else {
-			len = conn->transfer_buflen;
+			len = transfer_buflen;
 			if (dataOffset + len > [data length])
 				len = (int)([data length]- dataOffset);
 			bytes = [data bytes] + dataOffset;
@@ -1197,7 +1202,7 @@ u_int num_requests = 64;
 			buffer_put_string(&msg, handle, handle_len);
 			buffer_put_int64(&msg, offset);
 			buffer_put_string(&msg, bytes, len);
-			send_msg(conn->fd_out, &msg);
+			send_msg(fd_out, &msg);
 			DEBUG(@"Sent message SSH2_FXP_WRITE I:%u O:%llu S:%u",
 			    req_id, (unsigned long long)offset, len);
 		} else if (TAILQ_FIRST(&acks) == NULL)
@@ -1210,11 +1215,11 @@ u_int num_requests = 64;
 		}
 
 		if (req_id == startid || len == 0 ||
-		    req_id - ackid >= conn->num_requests) {
+		    req_id - ackid >= NUM_REQUESTS) {
 			u_int r_id;
 
 			buffer_clear(&msg);
-			if (![self readMsg:&msg on:conn->fd_in error:outError] ||
+			if (![self readMsg:&msg error:outError] ||
 			    ![self readChar:&type from:&msg error:outError] ||
 			    ![self readInt:&r_id from:&msg error:outError]) {
 				buffer_free(&msg);
@@ -1289,9 +1294,9 @@ done:
 	const char *utf8path = [path UTF8String];
 	DEBUG(@"Sending SSH2_FXP_REMOVE \"%@\"", path);
 
-	req_id = conn->msg_id++;
-	send_string_request(conn->fd_out, req_id, SSH2_FXP_REMOVE, utf8path, (u_int)strlen(utf8path));
-	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+	req_id = msg_id++;
+	send_string_request(fd_out, req_id, SSH2_FXP_REMOVE, utf8path, (u_int)strlen(utf8path));
+	if (![self readStatus:&status expectingID:req_id error:outError])
 		return NO;
 
 	if (status != SSH2_FX_OK) {
@@ -1318,8 +1323,8 @@ done:
 	buffer_init(&msg);
 
 	/* Send rename request */
-	req_id = conn->msg_id++;
-	if ((conn->exts & SFTP_EXT_POSIX_RENAME)) {
+	req_id = msg_id++;
+	if ((exts & SFTP_EXT_POSIX_RENAME)) {
 		buffer_put_char(&msg, SSH2_FXP_EXTENDED);
 		buffer_put_int(&msg, req_id);
 		buffer_put_cstring(&msg, "posix-rename@openssh.com");
@@ -1329,14 +1334,14 @@ done:
 	}
 	buffer_put_cstring(&msg, old_path);
 	buffer_put_cstring(&msg, new_path);
-	send_msg(conn->fd_out, &msg);
+	send_msg(fd_out, &msg);
 /*	DEBUG(@"Sent message %s \"%s\" -> \"%s\"",
-	    (conn->exts & SFTP_EXT_POSIX_RENAME) ? "posix-rename@openssh.com" :
+	    (exts & SFTP_EXT_POSIX_RENAME) ? "posix-rename@openssh.com" :
 	    "SSH2_FXP_RENAME", oldPath, newPath);
  */
 	buffer_free(&msg);
 
-	if (![self readStatus:&status on:conn->fd_in expectingID:req_id error:outError])
+	if (![self readStatus:&status expectingID:req_id error:outError])
 		return NO;
 	if (status != SSH2_FX_OK) {
 		if (outError)
@@ -1345,6 +1350,11 @@ done:
 	}
 
 	return YES;
+}
+
+- (BOOL)hasPosixRename
+{
+	return ((exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
 }
 
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError
@@ -1361,7 +1371,7 @@ done:
 	if (![self uploadData:data toFile:tmp withAttributes:attr error:outError])
 		return NO;
 
-	if (sftp_has_posix_rename(conn)) {
+	if ([self hasPosixRename]) {
 		/*
 		 * With POSIX rename support, we're guaranteed to be able to atomically replace the file.
 		 */

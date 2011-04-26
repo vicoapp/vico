@@ -63,7 +63,9 @@
 - (void)getExCommandWithDelegate:(id)aDelegate selector:(SEL)aSelector prompt:(NSString *)aPrompt contextInfo:(void *)contextInfo;
 - (void)executeForTextView:(ViTextView *)aTextView;
 
-- (BOOL)setBaseURL:(NSURL *)url;
+- (void)setBaseURL:(NSURL *)url;
+- (void)checkBaseURL:(NSURL *)url
+	onCompletion:(void (^)(NSURL *url, NSError *error))aBlock;
 - (NSString *)displayBaseURL;
 
 - (void)filterText:(NSString*)inputText

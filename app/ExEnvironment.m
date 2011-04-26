@@ -11,6 +11,7 @@
 #import "ViDocumentController.h"
 #import "ViBundleStore.h"
 #import "NSString-scopeSelector.h"
+#import "ViURLManager.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -35,7 +36,7 @@
 {
 	self = [super init];
 	if (self) {
-                [self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+		[self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
 	}
 	return self;
 }
@@ -47,51 +48,35 @@
 }
 
 #pragma mark -
-#pragma mark Assorted
 
-- (BOOL)setBaseURL:(NSURL *)url
+- (void)setBaseURL:(NSURL *)url
 {
-	if ([url isFileURL]) {
-		BOOL isDirectory = NO;
-		if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]
-							  isDirectory:&isDirectory] || !isDirectory) {
-			[self message:@"%@: not a directory", [url path]];
-			return NO;
-		}
-	}
-
-	if ([[url scheme] isEqualToString:@"sftp"]) {
-		NSError *error = nil;
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
-										    error:&error];
-
-		if (error == nil && [[url lastPathComponent] isEqualToString:@""])
-			url = [NSURL URLWithString:[conn home] relativeToURL:url];
-
-		BOOL isDirectory = NO;
-		BOOL exists = [conn fileExistsAtPath:[url path]
-					 isDirectory:&isDirectory
-					       error:&error];
-		if (error) {
-			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
-			return NO;
-		}
-		if (!exists) {
-			[self message:@"%@: no such file or directory", [url absoluteString]];
-			return NO;
-		}
-		if (!isDirectory) {
-			[self message:@"%@: not a directory", [url absoluteString]];
-			return NO;
-		}
-	}
-
 	if (![[url absoluteString] hasSuffix:@"/"])
 		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"]
 			     relativeToURL:url];
 
 	baseURL = [url absoluteURL];
-	return YES;
+}
+
+- (void)checkBaseURL:(NSURL *)url onCompletion:(void (^)(NSURL *url, NSError *error))aBlock
+{
+//	if (error == nil && [[url lastPathComponent] isEqualToString:@""])
+//		url = [NSURL URLWithString:[conn home] relativeToURL:url];
+
+	[[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+		if (error)
+			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+		else if (!exists)
+			[self message:@"%@: no such file or directory", [url absoluteString]];
+		else if (!isDirectory)
+			[self message:@"%@: not a directory", [url absoluteString]];
+		else {
+			[self setBaseURL:url];
+			aBlock([self baseURL], error);
+			return;
+		}
+		aBlock(nil, error);
+	}];
 }
 
 - (NSString *)displayBaseURL
@@ -208,7 +193,7 @@
 {
 	if (exTextView) {
 		ViDocument *doc = [(ViDocumentView *)[windowController viewControllerForView:exTextView] document];
-		INFO(@"got %i addresses", command.naddr);
+		DEBUG(@"got %i addresses", command.naddr);
 		if ([command.string hasPrefix:@">>"]) {
 			[self message:@"Appending not yet supported"];
 			return;
@@ -273,12 +258,12 @@
 - (void)ex_cd:(ExCommand *)command
 {
 	NSString *path = command.filename ?: @"~";
-	if (![self setBaseURL:[self parseExFilename:path]])
-		[self message:@"%@: Failed to change directory.", path];
-        else {
-        	[self ex_pwd:nil];
-        	[windowController.explorer browseURL:[self baseURL] andDisplay:NO];
-	}
+	[self checkBaseURL:[self parseExFilename:path] onCompletion:^(NSURL *url, NSError *error) {
+		if (url && !error) {
+			[self ex_pwd:nil];
+			[windowController.explorer browseURL:url andDisplay:NO];
+		}
+	}];
 }
 
 - (void)ex_pwd:(ExCommand *)command
@@ -292,10 +277,14 @@
 		/* Re-open current file. Check E_C_FORCE in flags. */ ;
 	else {
 		NSURL *url = [self parseExFilename:command.filename];
-		if (url)
-			[[ViDocumentController sharedDocumentController] openDocument:url
-									   andDisplay:YES
-								       allowDirectory:YES];
+		if (url) {
+			NSError *error = nil;
+			[[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+											       display:YES
+												 error:&error];
+			if (error)
+				[self message:@"%@: %@", url, [error localizedDescription]];
+		}
 	}
 }
 

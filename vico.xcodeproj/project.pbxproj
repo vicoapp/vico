@@ -253,6 +253,10 @@
 		9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AAF73E2135C931600D75E1E /* Credits.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9AAF73E1135C931600D75E1E /* Credits.txt */; };
+		9AAF73FD13654C8600D75E1E /* ViFileURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF73FA13654C8500D75E1E /* ViFileURLHandler.m */; };
+		9AAF73FE13654C8600D75E1E /* ViURLManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF73FC13654C8500D75E1E /* ViURLManager.m */; };
+		9AAF74011366938700D75E1E /* ViSFTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */; };
+		9AAF74041366A4CF00D75E1E /* ViHTTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
@@ -752,6 +756,14 @@
 		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
 		9AAF73E1135C931600D75E1E /* Credits.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Credits.txt; path = ../Credits.txt; sourceTree = "<group>"; };
 		9AAF73F3135F3BDF00D75E1E /* Vico.help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Vico.help; path = help/Vico.help; sourceTree = "<group>"; };
+		9AAF73F913654C8500D75E1E /* ViFileURLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileURLHandler.h; sourceTree = "<group>"; };
+		9AAF73FA13654C8500D75E1E /* ViFileURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileURLHandler.m; sourceTree = "<group>"; };
+		9AAF73FB13654C8500D75E1E /* ViURLManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViURLManager.h; sourceTree = "<group>"; };
+		9AAF73FC13654C8500D75E1E /* ViURLManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViURLManager.m; sourceTree = "<group>"; };
+		9AAF73FF1366938600D75E1E /* ViSFTPURLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSFTPURLHandler.h; sourceTree = "<group>"; };
+		9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSFTPURLHandler.m; sourceTree = "<group>"; };
+		9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViHTTPURLHandler.h; sourceTree = "<group>"; };
+		9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViHTTPURLHandler.m; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
 		9AB10BA2133F72E600D81D33 /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -1109,6 +1121,14 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */,
+				9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */,
+				9AAF73FF1366938600D75E1E /* ViSFTPURLHandler.h */,
+				9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */,
+				9AAF73F913654C8500D75E1E /* ViFileURLHandler.h */,
+				9AAF73FA13654C8500D75E1E /* ViFileURLHandler.m */,
+				9AAF73FB13654C8500D75E1E /* ViURLManager.h */,
+				9AAF73FC13654C8500D75E1E /* ViURLManager.m */,
 				9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */,
 				9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */,
 				9A2606AF135B1C4F002C86FB /* ViPreferencePaneBundles.h */,
@@ -1627,7 +1647,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "BUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\n  repo=\"vicoapp-$bundle.tmbundle\"\n  #url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\n  url=\"$HOME/src/vico/Bundles/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo\"\n  git clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo/.git\"\ndone\n";
+			shellScript = "BUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\n  repo=\"vicoapp-$bundle.tmbundle\"\n  #url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\n  url=\"$HOME/src/vico/Bundles/$repo\"\n  test \"$BUILD_STYLE\" = \"Debug\" -a -d \"$BUNDLEDIR/$repo\" && continue\n  rm -rf \"$BUNDLEDIR/$repo\"\n  git clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo/.git\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {
@@ -1642,7 +1662,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "HELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/English.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN/VicoHelp.html\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/../Info.plist\ncp -f $HELP_SRC/help-InfoPlist.strings $HELP_EN/InfoPlist.strings\ncp -rf $HELP_SRC/shared $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
+			shellScript = "test $BUILD_STYLE = \"Debug\" && exit\nHELP_SRC=$SOURCE_ROOT/help\nHELP_DST=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Vico.help/Contents/Resources\nHELP_EN=$HELP_DST/English.lproj\nrm -rf $HELP_DST\nmkdir -p $HELP_EN\ncp -f $HELP_SRC/index.html $HELP_EN/VicoHelp.html\ncp -f $HELP_SRC/help-Info.plist $HELP_DST/../Info.plist\ncp -f $HELP_SRC/help-InfoPlist.strings $HELP_EN/InfoPlist.strings\ncp -rf $HELP_SRC/shared $HELP_DST\ncd $HELP_EN && $HELP_SRC/md2html $HELP_SRC/*.md\nhiutil -vg -s en -Caf $HELP_EN/Vico.helpindex $HELP_EN\n";
 			showEnvVarsInLog = 0;
 		};
 		9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */ = {
@@ -1857,6 +1877,10 @@
 				9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */,
 				9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */,
 				9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */,
+				9AAF73FD13654C8600D75E1E /* ViFileURLHandler.m in Sources */,
+				9AAF73FE13654C8600D75E1E /* ViURLManager.m in Sources */,
+				9AAF74011366938700D75E1E /* ViSFTPURLHandler.m in Sources */,
+				9AAF74041366A4CF00D75E1E /* ViHTTPURLHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

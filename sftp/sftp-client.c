@@ -99,13 +99,13 @@ send_string_attrs_request(int fd, u_int id, u_int code, const char *s,
 	buffer_free(&msg);
 }
 
+#if 0
 u_int
 sftp_proto_version(struct sftp_conn *conn)
 {
 	return(conn->version);
 }
 
-#if 0
 int
 do_rmdir(struct sftp_conn *conn, char *path)
 {
@@ -139,10 +139,3 @@ send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,
 	send_msg(fd_out, &msg);
 	buffer_free(&msg);
 }
-
-int
-sftp_has_posix_rename(struct sftp_conn *conn)
-{
-	return ((conn->exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
-}
-

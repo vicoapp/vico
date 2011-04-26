@@ -1694,28 +1694,31 @@
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
-		NSArray *tag = [db lookup:word];
-		if (tag) {
-			NSURL *url = [document fileURL];
-			if (url)
-				[stack pushURL:url line:[self currentLine] column:[self currentColumn]];
-			[self pushCurrentLocationOnJumpList];
+		[db lookup:word onCompletion:^(NSArray *tag, NSError *error) {
+			if (tag) {
+				NSURL *url = [document fileURL];
+				if (url)
+					[stack pushURL:url line:[self currentLine] column:[self currentColumn]];
+				[self pushCurrentLocationOnJumpList];
 
-			NSString *path = [tag objectAtIndex:0];
-			NSString *ex_command = [tag objectAtIndex:1];
+				url = [tag objectAtIndex:0];
+				NSString *ex_command = [tag objectAtIndex:1];
 
-			if (![windowController gotoURL:[NSURL fileURLWithPath:path]])
-				return NO;
+				if (![windowController gotoURL:url])
+					return;
 
-			NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
-			NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
-			ViDocumentView *docView = (ViDocumentView *)[windowController currentView];
-			[[docView textView] findPattern:pattern options:0];
-			final_location = NSNotFound;
-		} else {
-			return [self jump_symbol:command];
-			// MESSAGE(@"%@: tag not found", word);
-		}
+				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
+				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+				ViDocumentView *docView = (ViDocumentView *)[windowController currentView];
+				[[docView textView] findPattern:pattern options:0];
+				final_location = NSNotFound;
+			} else {
+				if (error)
+					[NSApp presentError:error];
+				[self jump_symbol:command];
+				// MESSAGE(@"%@: tag not found", word);
+			}
+		}];
 	}
 
 	return YES;

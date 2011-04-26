@@ -16,6 +16,10 @@
 #import "ViCommandMenuItemView.h"
 #import "ViTextView.h"
 
+#import "ViFileURLHandler.h"
+#import "ViSFTPURLHandler.h"
+#import "ViHTTPURLHandler.h"
+
 #include <sys/time.h>
 
 @implementation ViAppController
@@ -153,6 +157,10 @@
 		[array addObject:item];
 		encoding++;
 	}
+
+	[[ViURLManager defaultManager] registerHandler:[[ViFileURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViSFTPURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViHTTPURLHandler alloc] init]];
 
 	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title"
 	                                                      ascending:YES];
@@ -373,13 +381,27 @@ additionalBindings:(NSDictionary *)bindings
 - (NSError *)openURL:(NSString *)pathOrURL
 {
 	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
-	ViDocument *doc = [docCon openDocument:pathOrURL
-				    andDisplay:YES
-				allowDirectory:YES];
+
+	NSError *error = nil;
+	NSURL *url;
+	if ([pathOrURL isKindOfClass:[NSURL class]])
+		url = (NSURL *)pathOrURL;
+	else
+		url = [docCon normalizePath:pathOrURL
+				 relativeTo:nil
+				      error:&error];
+	
+	if (error)
+		return error;
+
+	ViDocument *doc = [docCon openDocumentWithContentsOfURL:url
+							display:YES
+							  error:&error];
+
 	if (doc)
 		[NSApp activateIgnoringOtherApps:YES];
 
-	return nil;
+	return error;
 }
 
 #pragma mark -

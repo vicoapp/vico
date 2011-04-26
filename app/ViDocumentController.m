@@ -1,3 +1,4 @@
+#define FORCE_DEBUG
 #import "ViDocumentController.h"
 #import "ViDocumentTabController.h"
 #import "ViDocument.h"
@@ -8,6 +9,7 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViError.h"
 #import "TxmtURLProtocol.h"
+#import "ViURLManager.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -184,12 +186,11 @@
 	return NO;
 }
 
-- (BOOL)supportedURLScheme:(NSString *)scheme
+- (BOOL)supportedURLScheme:(NSURL *)url
 {
-	if ([scheme isEqualToString:@"file"] ||
-	    [scheme isEqualToString:@"sftp"] ||
-	    [scheme isEqualToString:@"vico"] ||
-	    [scheme isEqualToString:@"txmt"])
+	if ([[ViURLManager defaultManager] respondsToURL:url] ||
+	    [[url scheme] isEqualToString:@"vico"] ||
+	    [[url scheme] isEqualToString:@"txmt"])
 		return YES;
 	return NO;
 }
@@ -198,20 +199,19 @@
                             display:(BOOL)displayDocument
                               error:(NSError **)outError
 {
+	DEBUG(@"open %@", absoluteURL);
+
+	ViWindowController *windowController = [ViWindowController currentWindowController];
+
 	id doc = [self documentForURL:absoluteURL];
 	if (doc) {
-		if ([doc windowController] == [ViWindowController currentWindowController])
-			[[doc windowController] selectDocument:doc];
-		else
-			[[ViWindowController currentWindowController] createTabForDocument:doc];
+		if (displayDocument) {
+			if ([doc windowController] == windowController)
+				[[doc windowController] selectDocument:doc];
+			else
+				[windowController createTabForDocument:doc];
+		}
 		return doc;
-	}
-
-	if (![self supportedURLScheme:[absoluteURL scheme]]) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"Unsupported URL scheme '%@'",
-			    [absoluteURL scheme]];
-		return nil;
 	}
 
 	NSNumber *lineNumber = nil;
@@ -219,6 +219,13 @@
 	if (url == nil) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"invalid URL"];
+		return nil;
+	}
+
+	if (![self supportedURLScheme:url]) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Unsupported URL scheme '%@'",
+			    [url scheme]];
 		return nil;
 	}
 
@@ -234,9 +241,15 @@
 			return nil;
 	}
 
-	return [super openDocumentWithContentsOfURL:url
-					    display:displayDocument
-					      error:outError];
+	doc = [super openDocumentWithContentsOfURL:url
+					   display:displayDocument
+					     error:outError];
+	if (doc && !displayDocument) {
+		[doc addWindowController:windowController];
+		[windowController addDocument:doc];
+	}
+
+	return doc;
 }
 
 - (NSURL *)normalizePath:(NSString *)filename
@@ -290,6 +303,8 @@
                   andDisplay:(BOOL)display
               allowDirectory:(BOOL)allowDirectory
 {
+	INFO(@"open document %@", filenameOrURL);
+
 	ViWindowController *windowController = [ViWindowController currentWindowController];
 	NSError *error = nil;
 	NSURL *url;
@@ -305,17 +320,17 @@
 		return nil;
 	}
 
-	if (![self supportedURLScheme:[url scheme]]) {
-		[windowController message:@"Unsupported URL scheme '%@'",
-		    [url scheme]];
-		return nil;
-	}
-
 	NSNumber *lineNumber = nil;
 	url = [TxmtURLProtocol parseURL:url intoLineNumber:&lineNumber];
 	if (url == nil) {
 		[windowController message:@"%@: invalid URL",
 		    filenameOrURL];
+		return nil;
+	}
+
+	if (![self supportedURLScheme:url]) {
+		[windowController message:@"Unsupported URL scheme '%@'",
+		    [url scheme]];
 		return nil;
 	}
 
@@ -357,10 +372,12 @@
 		return nil;
 	}
 
+	/*
 	if (!display) {
 		[doc addWindowController:windowController];
 		[windowController addDocument:doc];
 	}
+	*/
 
 	return doc;
 }
@@ -384,6 +401,9 @@
 
 - (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError **)outError
 {
+	DEBUG(@"determining type for %@", url);
+
+#if 0
 	BOOL isDirectory;
 	if ([url isFileURL]) {
 		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
@@ -392,8 +412,8 @@
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 		if ([conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:outError] && isDirectory)
 			return @"Project";
-	} else
-		return nil;
+	}
+#endif
 
 	return @"Document";
 }

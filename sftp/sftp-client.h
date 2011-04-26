@@ -24,19 +24,6 @@
 /* Minimum amount of data to read at a time */
 #define MIN_READ_SIZE	512
 
-struct sftp_conn {
-	int fd_in;
-	int fd_out;
-	u_int transfer_buflen;
-	u_int num_requests;
-	u_int version;
-	u_int msg_id;
-#define SFTP_EXT_POSIX_RENAME	0x00000001
-#define SFTP_EXT_STATVFS	0x00000002
-#define SFTP_EXT_FSTATVFS	0x00000004
-	u_int exts;
-};
-
 /*
  * Used for statvfs responses on the wire from the server, because the
  * server's native format may be larger than the client's.
@@ -63,21 +50,5 @@ void send_read_request(int fd_out, u_int id, u_int64_t offset, u_int len,
 void send_string_request(int fd, u_int id, u_int code, const char *s, u_int len);
 void send_string_attrs_request(int fd, u_int id, u_int code, const char *s,
     u_int len, Attrib *a);
-
-/*
- * Initialise a SSH filexfer connection. Returns NULL on error or
- * a pointer to a initialized sftp_conn struct on success.
- */
-struct sftp_conn *do_init(int, int, u_int, u_int);
-
-u_int sftp_proto_version(struct sftp_conn *);
-
-/* Close file referred to by 'handle' */
-int do_close(struct sftp_conn *, char *, u_int);
-
-/* Remove directory 'path' */
-int do_rmdir(struct sftp_conn *, char *);
-
-int sftp_has_posix_rename(struct sftp_conn *conn);
 
 #endif

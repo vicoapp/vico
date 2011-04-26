@@ -7,11 +7,9 @@
 #import "ViError.h"
 #import "NSString-additions.h"
 #import "ViDocumentController.h"
+#import "ViURLManager.h"
 
 @interface ProjectDelegate (private)
-+ (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError;
-+ (NSMutableArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError;
-+ (NSMutableArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError;
 + (void)recursivelySortProjectFiles:(NSMutableArray *)children;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
@@ -25,59 +23,26 @@
 
 @implementation ProjectFile
 
-@synthesize score, markedString, url;
+@synthesize score, markedString, url, children;
 
-- (id)initWithURL:(NSURL *)aURL
+- (id)initWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
 {
 	self = [super init];
 	if (self) {
 		url = aURL;
+		attributes = aDictionary;
 	}
 	return self;
 }
 
-- (id)initWithURL:(NSURL *)aURL entry:(SFTPDirectoryEntry *)anEntry
++ (id)fileWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
 {
-	self = [super init];
-	if (self) {
-		url = aURL;
-		entry = anEntry;
-	}
-	return self;
-}
-
-+ (id)fileWithURL:(NSURL *)aURL
-{
-	return [[ProjectFile alloc] initWithURL:aURL];
-}
-
-+ (id)fileWithURL:(NSURL *)aURL sftpInfo:(SFTPDirectoryEntry *)entry
-{
-	return [[ProjectFile alloc] initWithURL:aURL entry:entry];
+	return [[ProjectFile alloc] initWithURL:aURL attributes:aDictionary];
 }
 
 - (BOOL)isDirectory
 {
-	if ([url isFileURL]) {
-		BOOL isDirectory = NO;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path]
-							 isDirectory:&isDirectory] && isDirectory)
-			return YES;
-		return NO;
-	} else {
-		return [entry isDirectory];
-	}
-}
-
-- (NSMutableArray *)children
-{
-	if (children == nil && [self isDirectory]) {
-		NSError *error = nil;
-		children = [ProjectDelegate childrenAtURL:url error:&error];
-		if (error)
-			INFO(@"error: %@", [error localizedDescription]);
-	}
-	return children;
+	return [[attributes fileType] isEqualToString:NSFileTypeDirectory];
 }
 
 - (BOOL)hasCachedChildren
@@ -174,26 +139,17 @@
 		ProjectFile *file = [explorer itemAtRow:idx];
 		NSURL *newurl = [NSURL URLWithString:[fieldEditor string]
 				       relativeToURL:[file url]];
-		NSError *error = nil;
-		if ([[file url] isFileURL]) {
-			[[NSFileManager defaultManager] moveItemAtURL:[file url]
-							        toURL:newurl
-							        error:&error];
-		} else {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool]
-			    connectionWithURL:[file url] error:&error];
-			[conn renameItemAtPath:[[file url] path]
-				        toPath:[newurl path]
-					 error:&error];
-		}
-
-		if (error != nil)
-			[NSApp presentError:error];
-		else {
-			ViDocument *doc = [windowController documentForURL:[file url]];
-			[file setUrl:newurl];
-			[doc setFileURL:newurl];
-		}
+		[[ViURLManager defaultManager] moveItemAtURL:[file url]
+						       toURL:newurl
+						onCompletion:^(NSError *error) {
+			if (error)
+				[NSApp presentError:error];
+			else {
+				ViDocument *doc = [windowController documentForURL:[file url]];
+				[file setUrl:newurl];
+				[doc setFileURL:newurl];
+			}
+		}];
 	}
 	return YES;
 }
@@ -203,15 +159,30 @@
 	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
-+ (NSMutableArray *)childrenAtURL:(NSURL *)url error:(NSError **)outError
++ (void)childrenAtURL:(NSURL *)url onCompletion:(void (^)(NSMutableArray *children, NSError *error))aBlock
 {
-	if ([url isFileURL])
-		return [self childrenAtFileURL:url error:outError];
-	else if ([[url scheme] isEqualToString:@"sftp"])
-		return [self childrenAtSftpURL:url error:outError];
-	else if (outError)
-		*outError = [ViError errorWithFormat:@"unhandled scheme %@", [url scheme]];
-	return nil;
+	ViURLManager *um = [ViURLManager defaultManager];
+
+	[um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *files, NSError *error) {
+		if (error)
+			[NSApp presentError:error];
+		else {
+			NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
+			ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
+
+			NSMutableArray *children = [NSMutableArray array];
+			for (NSArray *entry in files) {
+				NSString *filename = [entry objectAtIndex:0];
+				NSDictionary *attributes = [entry objectAtIndex:1];
+				if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
+					NSURL *curl = [url URLByAppendingPathComponent:filename];
+					[children addObject:[ProjectFile fileWithURL:curl attributes:attributes]];
+				}
+			}
+			[self sortProjectFiles:children];
+			aBlock(children, nil);
+		}
+	}];
 }
 
 + (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children
@@ -245,71 +216,21 @@
 			[self recursivelySortProjectFiles:[file children]];
 }
 
-+ (NSMutableArray *)childrenAtFileURL:(NSURL *)url error:(NSError **)outError
-{
-	NSFileManager *fm = [NSFileManager defaultManager];
-
-	NSArray *files = [fm contentsOfDirectoryAtPath:[url path] error:outError];
-	if (files == nil)
-		return nil;
-
-	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-	ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
-
-	NSMutableArray *children = [[NSMutableArray alloc] init];
-	for (NSString *filename in files)
-		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
-			NSURL *curl = [url URLByAppendingPathComponent:filename];
-			[children addObject:[ProjectFile fileWithURL:curl]];
-		}
-
-	return [self sortProjectFiles:children];
-}
-
-+ (NSMutableArray *)childrenAtSftpURL:(NSURL *)url error:(NSError **)outError
-{
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
-	if (conn == nil)
-		return nil;
-
-	NSArray *entries = [conn contentsOfDirectoryAtPath:[url path] error:outError];
-	if (entries == nil)
-		return nil;
-
-	NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-	ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
-
-	NSMutableArray *children = [[NSMutableArray alloc] init];
-	SFTPDirectoryEntry *entry;
-	for (entry in entries) {
-		NSString *filename = [entry filename];
-		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
-			NSURL *curl = [url URLByAppendingPathComponent:filename];
-			[children addObject:[ProjectFile fileWithURL:curl sftpInfo:entry]];
-		}
-	}
-
-	return [self sortProjectFiles:children];
-}
-
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
 {
-	NSError *error = nil;
-	NSMutableArray *children = nil;
-
-	children = [ProjectDelegate childrenAtURL:aURL error:&error];
-
-	if (children) {
-		if (display)
-			[self openExplorerTemporarily:NO];
-		rootItems = children;
-		[self filterFiles:self];
-		[explorer reloadData];
-		[rootButton setURL:aURL];
-	} else if (error) {
-		NSAlert *alert = [NSAlert alertWithError:error];
-		[alert runModal];
-	}
+	[ProjectDelegate childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
+		if (error) {
+			NSAlert *alert = [NSAlert alertWithError:error];
+			[alert runModal];
+		} else {
+			if (display)
+				[self openExplorerTemporarily:NO];
+			rootItems = children;
+			[self filterFiles:self];
+			[explorer reloadData];
+			[rootButton setURL:aURL];
+		}
+	}];
 
 	explorer.lastSelectedRow = 0;
 }
@@ -440,10 +361,14 @@
 	ProjectFile *file = [explorer itemAtRow:idx];
 	if (!file)
 		return;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocument:[file url]
-									     andDisplay:NO
-									 allowDirectory:NO];
-	if (doc)
+	NSError *err = nil;
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[file url]
+												 display:NO
+												   error:&err];
+
+	if (err)
+		[windowController message:@"%@: %@", [file url], [err localizedDescription]];
+	else if (doc)
 		[windowController switchToDocument:doc];
 	[self cancelExplorer];
 }
@@ -492,33 +417,11 @@
 
 	NSArray *urls = contextInfo;
 
-	BOOL isLocal = [[urls objectAtIndex:0] isFileURL];
-	__block BOOL failed = NO;
-	if (isLocal) {
-		NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-		[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
-			if (error != nil) {
-				[NSApp presentError:error];
-				failed = YES;
-			}
-			[self rescan:nil];
-		}];
-	} else {
-		for (NSURL *url in urls) {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
-											    error:nil];
-			NSError *error = nil;
-			failed = ![conn removeItemAtPath:[url path] error:&error];
-			if (error) {
-				[NSApp presentError:error];
-				failed = YES;
-			}
-			if (failed)
-				break;
-		}
-
+	[[ViURLManager defaultManager] removeItemsAtURLs:urls onCompletion:^(NSError *error) {
+		if (error != nil)
+			[NSApp presentError:error];
 		[self rescan:nil];
-	}
+	}];
 }
 
 - (IBAction)removeFiles:(id)sender
@@ -607,28 +510,14 @@
 	if (parent == nil)
 		parent = [rootButton URL];
 
-	NSError *error = nil;
-	NSString *path = [[parent path] stringByAppendingPathComponent:@"New Folder"];
-	if ([parent isFileURL]) {
-		NSFileManager *fm = [NSFileManager defaultManager];
-		if (![fm createDirectoryAtPath:path
-		   withIntermediateDirectories:NO
-				    attributes:nil
-					 error:&error])
+	NSURL *newURL = [parent URLByAppendingPathComponent:@"New Folder"];
+	[[ViURLManager defaultManager] createDirectoryAtURL:newURL
+					       onCompletion:^(NSError *error) {
+		if (error)
 			[NSApp presentError:error];
 		else
 			[self rescan_files:nil];
-	} else {
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:parent error:&error];
-		if (conn == nil && error)
-			[NSApp presentError:error];
-		else {
-			if (![conn createDirectory:path error:&error])
-				[NSApp presentError:error];
-			else
-				[self rescan_files:nil];
-		}
-	}
+	}];
 }
 
 - (IBAction)bookmarkFolder:(id)sender
@@ -1171,6 +1060,28 @@ doCommandBySelector:(SEL)aSelector
 }
 
 #pragma mark -
+#pragma mark Explorer Outline View Delegate
+
+- (void)outlineViewItemWillExpand:(NSNotification *)notification
+{
+	ProjectFile *pf = [[notification userInfo] objectForKey:@"NSObject"];
+	if ([pf hasCachedChildren])
+		return;
+
+	[ProjectDelegate childrenAtURL:[pf url] onCompletion:^(NSMutableArray *children, NSError *error) {
+		if (error)
+			[NSApp presentError:error];
+		else {
+			pf.children = children;
+			if (![[pf url] isFileURL]) { /* XXX: did we get here synchronously? */
+				[explorer reloadData];
+				[explorer expandItem:pf];
+			}
+		}
+	}];
+}
+
+#pragma mark -
 #pragma mark Explorer Outline View Data Source
 
 - (id)outlineView:(NSOutlineView *)outlineView
@@ -1179,7 +1090,11 @@ doCommandBySelector:(SEL)aSelector
 {
 	if (item == nil)
 		return [filteredItems objectAtIndex:anIndex];
-	return [[(ProjectFile *)item children] objectAtIndex:anIndex];
+
+	ProjectFile *pf = item;
+	if (![pf hasCachedChildren])
+		return nil;
+	return [[pf children] objectAtIndex:anIndex];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
@@ -1194,7 +1109,10 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return [filteredItems count];
 
-	return [[(ProjectFile *)item children] count];
+	ProjectFile *pf = item;
+	if (![pf hasCachedChildren])
+		return 0;
+	return [[pf children] count];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView

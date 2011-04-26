@@ -1,79 +1,97 @@
+#define FORCE_DEBUG
 #import "ViTagsDatabase.h"
-#import "logging.h"
+#import "ViURLManager.h"
+#include "logging.h"
 
 @interface ViTagsDatabase (private)
-- (void)parseData:(NSString *)data;
+- (void)parseData:(NSData *)data;
+- (void)onOpen:(void (^)(NSError *error))aBlock;
+- (void)onDatabaseChanged:(void (^)(NSError *error))aBlock;
 @end
 
 @implementation ViTagsDatabase
 
-- (ViTagsDatabase *)initWithFile:(NSString *)aFile inDirectory:(NSString *)aDirectory
+- (ViTagsDatabase *)initWithBaseURL:(NSURL *)aURL
 {
 	self = [super init];
 	if (self) {
-		tags = [[NSMutableDictionary alloc] init];
-
-		/* If the file is not an absolute path, try to find it in the current directory.
-		 * Look in parent directories if not found.
-		 */
-		NSFileManager *fm = [NSFileManager defaultManager];
-		prefixPath = [aDirectory copy];
-		DEBUG(@"prefix path = [%@]", prefixPath);
-		NSString *path = nil;
-		if (![aFile isAbsolutePath]) {
-			NSString *component;
-			NSString *p = nil;
-			for (component in [prefixPath pathComponents]) {
-				if (p)
-					p = [p stringByAppendingPathComponent:component];
-				else
-					p = component;
-
-				NSString *check = [p stringByAppendingPathComponent:aFile];
-				DEBUG(@"checking for tags file [%@]", check);
-				if ([fm fileExistsAtPath:check]) {
-					/* We found a tags file. There might be more files
-					 * closer to the current directory so we continue looking.
-					 */
-					path = check;
-					prefixPath = p;
-				}
-			}
-		} else
-			path = aFile;
-
-		if (path == nil)
-			return nil;
-
-		DEBUG(@"opening tags file [%@]", path);
-
-		NSStringEncoding encoding;
-		NSError *error = nil;
-		NSString *data = [NSString stringWithContentsOfFile:path
-						       usedEncoding:&encoding
-							      error:&error];
-		if (error)
-			[NSApp presentError:error];
-		else {
-			[self parseData:data];
-
-			NSDictionary *attributes = [fm attributesOfItemAtPath:path
-								        error:&error];
-			if (error)
-				[NSApp presentError:error];
-			else {
-				modificationDate = [attributes fileModificationDate];
-				databaseFile = path;
-			}
-		}
+		baseURL = aURL;
+		tags = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
 
-- (void)parseData:(NSString *)data
+- (void)onOpen:(void (^)(NSError *error))aBlock
 {
+	/* If the file is not an absolute path, try to find it in the current directory.
+	 * Look in parent directories if not found.
+	 */
+	ViURLManager *um = [ViURLManager defaultManager];
+#if 0
+	prefixPath = [aDirectory copy];
+	DEBUG(@"prefix path = [%@]", prefixPath);
+	NSString *path = nil;
+	if (![aFile isAbsolutePath]) {
+		NSString *component;
+		NSString *p = nil;
+		for (component in [prefixPath pathComponents]) {
+			if (p)
+				p = [p stringByAppendingPathComponent:component];
+			else
+				p = component;
+
+			NSString *check = [p stringByAppendingPathComponent:aFile];
+			DEBUG(@"checking for tags file [%@]", check);
+			if ([fm fileExistsAtPath:check]) {
+				/* We found a tags file. There might be more files
+				 * closer to the current directory so we continue looking.
+				 */
+				path = check;
+				prefixPath = p;
+			}
+		}
+	} else {
+		path = aFile;
+	}
+#endif
+	
+	NSURL *url = [baseURL URLByAppendingPathComponent:@"tags"];
+	DEBUG(@"opening tags file [%@]", url);
+
+	NSMutableData *tagsData = [NSMutableData data];
+	void (^dataCallback)(NSData *data) = ^(NSData *data) {
+		[tagsData appendData:data];
+	};
+
+	[um dataWithContentsOfURL:url onData:dataCallback onCompletion:^(NSError *error) {
+		if (error) {
+			aBlock(error);
+		} else {
+			/* There is a race here between reading and checking modtime. */
+			[um attributesOfItemAtURL:url
+				     onCompletion:^(NSDictionary *attributes, NSError *error) {
+				if (error) {
+					aBlock(error);
+				} else {
+					modificationDate = [attributes fileModificationDate];
+					DEBUG(@"got modtime %@", modificationDate);
+					databaseURL = url;
+					[self parseData:tagsData];
+					aBlock(nil);
+				}
+			}];
+		}
+	}];
+}
+
+- (void)parseData:(NSData *)data
+{
+	NSString *strdata = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	if (strdata == nil)
+		strdata = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+
 	NSString *line;
-	for (line in [data componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+	for (line in [strdata componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
 		NSScanner *scan = [NSScanner scannerWithString:line];
 		NSCharacterSet *tabSet = [NSCharacterSet characterSetWithCharactersInString:@"\t"];
 		[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
@@ -86,7 +104,7 @@
 		    [scan scanUpToString:@"\t" intoString:&file] &&
 		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
 		   ![scan isAtEnd]) {
-			NSString *path = [prefixPath stringByAppendingPathComponent:file];
+			NSURL *path = [baseURL URLByAppendingPathComponent:file];
 			NSString *command = [[scan string] substringFromIndex:[scan scanLocation]];
 			DEBUG(@"got symbol [%@] in file [%@]", symbol, path);
 			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
@@ -102,27 +120,35 @@
 	}
 }
 
-- (NSArray *)lookup:(NSString *)symbol
+- (void)onDatabaseChanged:(void (^)(NSError *error))aBlock
 {
-	return [tags objectForKey:symbol];
+	DEBUG(@"checking if %@ has change modtime from %@", databaseURL, modificationDate);
+	[[ViURLManager defaultManager] attributesOfItemAtURL:databaseURL
+						onCompletion:^(NSDictionary *attributes, NSError *error) {
+		if (error)
+			aBlock(error);
+		if ([modificationDate isEqualToDate:[attributes fileModificationDate]]) {
+			DEBUG(@"tags file %@ unmodified: %@", databaseURL, modificationDate);
+			aBlock(nil);
+		} else
+			[self onOpen:aBlock];
+	}];
 }
 
-- (BOOL)databaseHasChanged
+- (void)lookup:(NSString *)symbol onCompletion:(void (^)(NSArray *tag, NSError *error))aBlock
 {
-	if (databaseFile) {
-		NSError *error = nil;
-		NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:databaseFile error:&error];
-		if (error) {
-			[NSApp presentError:error];
-			return NO;
-		}
+	void (^fun)(NSError *error) = ^(NSError *error) {
+		if (error)
+			aBlock(nil, error);
+		else
+			aBlock([tags objectForKey:symbol], nil);
+	};
 
-		if ([modificationDate isEqualToDate:[attributes fileModificationDate]]) {
-			DEBUG(@"tags file unmodified [%@], [%@]", databaseFile, modificationDate);
-			return NO;
-		}
-	}
-	return YES;
+	DEBUG(@"looking up symbol %@", symbol);
+	if (modificationDate)
+		[self onDatabaseChanged:fun];
+	else
+		[self onOpen:fun];
 }
 
 @end

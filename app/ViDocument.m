@@ -18,6 +18,7 @@
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViAppController.h"
+#import "ViURLManager.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -28,6 +29,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)enableLineNumbers:(BOOL)flag;
 - (void)setTypingAttributes;
 - (NSDictionary *)typingAttributes;
+- (BOOL)addData:(NSData *)data;
 @end
 
 @implementation ViDocument
@@ -40,6 +42,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize isTemporary;
 @synthesize snippet;
 @synthesize proxy;
+@synthesize busy;
+
++ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
+{
+	return YES;
+}
 
 - (id)init
 {
@@ -81,6 +89,47 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 		proxy = [[ViScriptProxy alloc] initWithObject:self];
 	}
+
+	return self;
+}
+
+- (id)initWithContentsOfURL:(NSURL *)absoluteURL
+                     ofType:(NSString *)typeName
+                      error:(NSError **)outError
+{
+	DEBUG(@"init with URL %@ of type %@", absoluteURL, typeName);
+
+	void (^dataCallback)(NSData *data) = ^(NSData *data) {
+		[self addData:data];
+	};
+
+	void (^completionCallback)(NSError *error) = ^(NSError *error) {
+		INFO(@"error is %@", error);
+		busy = NO;
+		if (error) {
+			/* If the file doesn't exist, treat it as an untitled file. */
+			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
+			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
+				INFO(@"treating non-existent file %@ as untitled file", absoluteURL);
+				[self setIsTemporary:YES];
+				[self setFileURL:absoluteURL];
+			} else
+				[NSApp presentError:error];
+		} else
+			[self setFileURL:absoluteURL];
+	};
+
+	self = [self init];
+	if (self) {
+		busy = YES;
+		id<ViDeferred> deferred = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
+											onData:dataCallback
+										  onCompletion:completionCallback];
+
+//		if (deferred)
+//			[self message:@"loading %@...", absoluteURL];
+	}
+
 	return self;
 }
 
@@ -116,6 +165,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 #pragma mark -
 #pragma mark NSDocument interface
+
+- (BOOL)keepBackupFile
+{
+	return YES;
+}
 
 - (void)showWindows
 {
@@ -195,7 +249,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (retrySaveOperation)
 		enc = NSUTF8StringEncoding;
 	DEBUG(@"using encoding %@", [NSString localizedNameOfStringEncoding:enc]);
-	return [[textStorage string] dataUsingEncoding:enc];
+	NSData *data = [[textStorage string] dataUsingEncoding:enc];
+	if (data == nil && outError)
+		*outError = [ViError errorWithFormat:@"The %@ encoding is not appropriate.",
+		    [NSString localizedNameOfStringEncoding:encoding]];
+	return data;
 }
 
 - (BOOL)attemptRecoveryFromError:(NSError *)error
@@ -220,8 +278,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
         forSaveOperation:(NSSaveOperationType)saveOperation
                    error:(NSError **)outError
 {
-	BOOL ret = NO;
-
 	retrySaveOperation = NO;
 
 	if (![[textStorage string] canBeConvertedToEncoding:encoding]) {
@@ -248,64 +304,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			encoding = NSUTF8StringEncoding;
 	}
 
-	if ([url isFileURL]) {
-		ret = [super writeSafelyToURL:url
-		                       ofType:typeName
-		             forSaveOperation:saveOperation
-		                        error:outError];
-		if (ret) {
-			isTemporary = NO;
-			[proxy emit:@"didSave" with:self, nil];
-		}
-		return ret;
-	}
-
-	if (![[url scheme] isEqualToString:@"sftp"]) {
-		INFO(@"unsupported URL scheme: %@", [url scheme]);
-		// XXX: set outError
-		return NO;
-	}
-
-	NSData *data = [self dataOfType:typeName error:nil];
+	NSData *data = [self dataOfType:typeName error:outError];
 	if (data == nil)
 		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
-	                                                                    error:outError];
-	if (conn == nil)
-		return NO;
-	ret = [conn writeData:data toFile:[url path] error:outError];
-	if (ret) {
-		[proxy emit:@"didSave" with:self, nil];
-		isTemporary = NO;
-	}
-	return ret;
+	[[ViURLManager defaultManager] writeDataSafely:data toURL:url onCompletion:^(NSError *error) {
+		if (error)
+			[NSApp presentError:error];
+		else {
+			isTemporary = NO;
+			[proxy emit:@"didSave" with:self, nil];
+		}
+	}];
+
+	return YES;
 }
 
-- (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
+- (BOOL)addData:(NSData *)data
 {
-	DEBUG(@"type = %@, url = %@, scheme = %@", typeName, [url absoluteString], [url scheme]);
-
-	NSData *data = nil;
-	if ([url isFileURL])
-		data = [NSData dataWithContentsOfFile:[url path] options:0 error:outError];
-	else if ([[url scheme] isEqualToString:@"sftp"]) {
-		if ([url host] == nil) {
-			if (outError)
-				*outError = [ViError errorWithFormat:@"Missing host in URL."];
-			return NO;
-		}
-
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
-		if (conn == nil)
-			return NO;
-		data = [conn dataWithContentsOfFile:[url path] error:outError];
-	}
-
-	if (data == nil)
-		return NO;
-
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSString *aString = nil;
 	if (forcedEncoding != 0) {
@@ -359,7 +376,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 	}
 
-	[self setString:aString];
+	INFO(@"begin adding %lu bytes", [data length]);
+
+	NSUInteger len = [textStorage length];
+	if (len == 0)
+		[self setString:aString];
+	else {
+		[textStorage replaceCharactersInRange:NSMakeRange(len, 0) withString:aString];
+		NSRange r = NSMakeRange(len, [aString length]);
+		[textStorage setAttributes:[self typingAttributes] range:r];
+	}
+
+	INFO(@"done adding %lu bytes", [data length]);
 
 	return YES;
 }

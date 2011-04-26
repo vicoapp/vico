@@ -1,6 +1,8 @@
 URGENT
 ========
+* vsplit with already open buffer switches tab!
 * undo manager messed up after undo and repeat of bundle command!
+* :*buffer doesn't push on jump list
 
 BUGS
 ====

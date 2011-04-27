@@ -6,7 +6,6 @@
 
 @class ViWindowController;
 @class ExEnvironment;
-@class SFTPDirectoryEntry;
 
 @interface ProjectFile : NSObject
 {

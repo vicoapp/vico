@@ -135,6 +135,24 @@ fx2txt(int status)
 		return("Connection lost");
 	case SSH2_FX_OP_UNSUPPORTED:
 		return("Operation unsupported");
+	case SSH_FX_INVALID_HANDLE:
+		return("Invalid handle");
+	case SSH_FX_NO_SUCH_PATH:
+		return("No such path");
+	case SSH_FX_FILE_ALREADY_EXISTS:
+		return("File already exists");
+	case SSH_FX_WRITE_PROTECT:
+		return("Media is write-protected");
+	case SSH_FX_NO_MEDIA:
+		return("No media available");
+	case SSH_FX_NO_SPACE_ON_FILESYSTEM:
+		return("No space left on device");
+	case SSH_FX_QUOTA_EXCEEDED:
+		return("Quota exceeded");
+	case SSH_FX_UNKNOWN_PRINCIPLE:
+		return("Unknown principle");
+	case SSH_FX_LOCK_CONFlICT:
+		return("Lock conflict");
 	default:
 		return("Unknown status");
 	}

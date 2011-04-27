@@ -107,13 +107,16 @@
 - (void)createDirectory:(NSString *)path
 	     onResponse:(void (^)(NSError *))responseCallback;
 
+- (void)dataWithContentsOfFile:(NSString *)path
+		    onResponse:(void (^)(NSData *, NSError *))responseCallback;
+
 - (void)flushDirectoryCache;
 - (BOOL)removeItemAtPath:(NSString *)path error:(NSError **)outError;
 - (BOOL)renameItemAtPath:(NSString *)oldPath toPath:(NSString *)newPath error:(NSError **)outError;
-- (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;
 - (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError;
 - (NSString *)hostWithUser;
 - (NSString *)stderr;
 - (BOOL)hasPosixRename;
+- (void)close;
 
 @end

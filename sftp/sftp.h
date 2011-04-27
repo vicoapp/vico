@@ -25,11 +25,11 @@
  */
 
 /*
- * draft-ietf-secsh-filexfer-01.txt
+ * http://tools.ietf.org/html/draft-ietf-secsh-filexfer-13
  */
 
 /* version */
-#define	SSH2_FILEXFER_VERSION		3
+#define	SSH2_FILEXFER_VERSION		6
 
 /* client to server */
 #define SSH2_FXP_INIT			1
@@ -93,5 +93,14 @@
 #define SSH2_FX_NO_CONNECTION		6
 #define SSH2_FX_CONNECTION_LOST		7
 #define SSH2_FX_OP_UNSUPPORTED		8
-#define SSH2_FX_MAX			8
+#define SSH_FX_INVALID_HANDLE		9
+#define SSH_FX_NO_SUCH_PATH		10
+#define SSH_FX_FILE_ALREADY_EXISTS	11
+#define SSH_FX_WRITE_PROTECT		12
+#define SSH_FX_NO_MEDIA			13
+#define SSH_FX_NO_SPACE_ON_FILESYSTEM	14
+#define SSH_FX_QUOTA_EXCEEDED		15
+#define SSH_FX_UNKNOWN_PRINCIPLE	16
+#define SSH_FX_LOCK_CONFlICT		17
+#define SSH2_FX_MAX			18
 

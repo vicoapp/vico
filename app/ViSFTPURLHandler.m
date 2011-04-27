@@ -139,11 +139,8 @@
 		return nil;
 	}
 
-	NSData *data = [conn dataWithContentsOfFile:[aURL path]
-					      error:&error];
-	dataCallback(data);
-	completionCallback(error);
-	return nil;
+	[conn dataWithContentsOfFile:[aURL path] onData:dataCallback onResponse:completionCallback];
+	return nil; // FIXME: return deferred
 }
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data

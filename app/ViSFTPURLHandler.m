@@ -14,36 +14,6 @@
 	return self;
 }
 
-- (NSDictionary *)attribsToDictionary:(Attrib *)a
-{
-	NSString *fileType = nil;
-	if (S_ISREG(a->perm))
-		fileType = NSFileTypeRegular;
-	else if (S_ISDIR(a->perm))
-		fileType = NSFileTypeDirectory;
-	else if (S_ISLNK(a->perm))
-		fileType = NSFileTypeSymbolicLink;
-	else if (S_ISSOCK(a->perm))
-		fileType = NSFileTypeSocket;
-	else if (S_ISBLK(a->perm))
-		fileType = NSFileTypeBlockSpecial;
-	else if (S_ISCHR(a->perm))
-		fileType = NSFileTypeCharacterSpecial;
-	else
-		fileType = NSFileTypeUnknown;
-
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithUnsignedLong:a->gid], NSFileGroupOwnerAccountID,
-		[NSNumber numberWithUnsignedLong:a->uid], NSFileOwnerAccountID,
-		[NSNumber numberWithUnsignedLong:a->perm], NSFilePosixPermissions,
-		[NSNumber numberWithUnsignedLongLong:a->size], NSFileSize,
-		[NSDate dateWithTimeIntervalSince1970:a->mtime], NSFileModificationDate,
-		fileType, NSFileType,
-		nil];
-
-	return attributes;
-}
-
 - (BOOL)respondsToURL:(NSURL *)aURL
 {
 	return [[aURL scheme] isEqualToString:@"sftp"];
@@ -59,17 +29,11 @@
 									    error:&error];
 	if (error) {
 		aBlock(nil, error);
-		return NO;
+		return nil;
 	}
 
-	NSArray *files = [conn contentsOfDirectoryAtPath:[aURL path] error:&error];
-	DEBUG(@"got contents %@, error is %@", files, error);
-	NSMutableArray *contents = [NSMutableArray array];
-	for (SFTPDirectoryEntry *entry in files)
-		[contents addObject:[NSArray arrayWithObjects:entry.filename,
-		    [self attribsToDictionary:entry.attributes], nil]];
-	aBlock(contents, error);
-	return NO;
+	[conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
+	return nil; // XXX: return a deferred object!
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL
@@ -82,17 +46,15 @@
 									    error:&error];
 	if (error) {
 		aBlock(error);
-		return NO;
+		return nil;
 	}
 
-	[conn createDirectory:[aURL path]
-			error:&error];
-	aBlock(error);
-	return NO;
+	[conn createDirectory:[aURL path] onResponse:aBlock];
+	return nil; // XXX: return a deferred object!
 }
 
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(BOOL result, BOOL isDirectory, NSError *error))aBlock
+		     onCompletion:(void (^)(BOOL, BOOL, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
@@ -101,13 +63,13 @@
 									    error:&error];
 	if (error) {
 		aBlock(NO, NO, error);
-		return NO;
+		return nil;
 	}
 
-	BOOL result = NO, isDirectory = NO;
-	result = [conn fileExistsAtPath:[aURL path] isDirectory:&isDirectory error:&error];
-	aBlock(result, isDirectory, error);
-	return NO;
+	// [aBlock copy];
+
+	[conn fileExistsAtPath:[aURL path] onResponse:aBlock];
+	return nil; // FIXME: return a deferred
 }
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
@@ -121,12 +83,12 @@
 									    error:&error];
 	if (error) {
 		aBlock(error);
-		return NO;
+		return nil;
 	}
 
 	[conn renameItemAtPath:[srcURL path] toPath:[dstURL path] error:&error];
 	aBlock(error);
-	return NO;
+	return nil;
 }
 
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock
@@ -138,16 +100,16 @@
 									    error:&error];
 	if (error) {
 		aBlock(error);
-		return NO;
+		return nil;
 	}
 
 	[conn removeItemAtPath:[aURL path] error:&error];
 	aBlock(error);
-	return NO;
+	return nil;
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
-			   onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock
+			   onCompletion:(void (^)(NSDictionary *, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
@@ -156,16 +118,11 @@
 									    error:&error];
 	if (error) {
 		aBlock(nil, error);
-		return NO;
+		return nil;
 	}
 
-	Attrib *a = [conn stat:[aURL path] error:&error];
-	if (a == nil) {
-		aBlock(nil, error);
-		return NO;
-	}
-	aBlock([self attribsToDictionary:a], error);
-	return NO;
+	[conn attributesOfItemAtPath:[aURL path] onResponse:aBlock];
+	return nil; // FIXME:
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
@@ -179,14 +136,14 @@
 									    error:&error];
 	if (error) {
 		completionCallback(error);
-		return NO;
+		return nil;
 	}
 
 	NSData *data = [conn dataWithContentsOfFile:[aURL path]
 					      error:&error];
 	dataCallback(data);
 	completionCallback(error);
-	return NO;
+	return nil;
 }
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
@@ -200,12 +157,12 @@
 									    error:&error];
 	if (error) {
 		aBlock(error);
-		return NO;
+		return nil;
 	}
 
 	[conn writeData:data toFile:[aURL path] error:&error];
 	aBlock(error);
-	return NO;
+	return nil;
 }
 
 @end

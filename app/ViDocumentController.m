@@ -298,7 +298,7 @@
 	return [url absoluteURL];
 }
 
-
+#if 0
 - (ViDocument *)openDocument:(id)filenameOrURL
                   andDisplay:(BOOL)display
               allowDirectory:(BOOL)allowDirectory
@@ -381,6 +381,7 @@
 
 	return doc;
 }
+#endif
 
 
 

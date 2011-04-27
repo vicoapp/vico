@@ -1,3 +1,5 @@
+#import "ViBufferedStream.h"
+
 #include <sys/stat.h>
 
 #include "sftp.h"
@@ -17,7 +19,40 @@
 - (BOOL)isDirectory;
 @end
 
-@interface SFTPConnection : NSObject
+@interface SFTPMessage : NSObject
+{
+	uint8_t		 type;
+	uint32_t	 requestId;
+	NSData		*data;
+	const void	*ptr;
+}
+@property (readonly) uint8_t type;
+@property (readonly) uint32_t requestId;
+@property (readonly) NSData *data;
++ (SFTPMessage *)messageWithData:(NSData *)someData;
+- (SFTPMessage *)initWithData:(NSData *)someData;
+
+- (NSInteger)left;
+- (void)reset;
+- (BOOL)getString:(NSString **)ret;
+- (BOOL)getByte:(uint8_t *)ret;
+- (BOOL)getUnsigned:(uint32_t *)ret;
+- (BOOL)getInt64:(int64_t *)ret;
+- (BOOL)getAttributes:(NSDictionary **)ret;
+
+@end
+
+@interface SFTPRequest : NSObject
+{
+	uint32_t requestId;
+	void (^responseCallback)(SFTPMessage *);
+}
++ (SFTPRequest *)requestWithId:(uint32_t)reqId onResponse:(void (^)(SFTPMessage *))aCallback;
+- (SFTPRequest *)initWithId:(uint32_t)reqId onResponse:(void (^)(SFTPMessage *))aCallback;
+- (void)response:(SFTPMessage *)msg;
+@end
+
+@interface SFTPConnection : NSObject <NSStreamDelegate>
 {
 	NSString *host;
 	NSString *user;
@@ -27,7 +62,20 @@
 	NSPipe *ssh_input;
 	NSPipe *ssh_output;
 	NSPipe *ssh_error;
-	int fd_in, fd_out;        // pipes to ssh process
+	//int fd_in, fd_out;        // pipes to ssh process
+
+	int remoteVersion;
+
+	/* Outstanding requests, keyed on request ID. */
+	NSMutableDictionary *requests;
+	SFTPRequest *initRequest;
+
+	NSMutableData *inbuf;
+	NSMutableData *errbuf;
+
+	ViBufferedStream *sshPipe;
+
+	uint32_t nextRequestId;
 
 	u_int transfer_buflen;
 	u_int version;
@@ -37,7 +85,6 @@
 #define SFTP_EXT_FSTATVFS	0x00000004
 	u_int exts;
 	
-	NSMutableData *stderr;
 	NSMutableDictionary *directoryCache;
 }
 
@@ -47,16 +94,20 @@
 
 - (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
 - (BOOL)closed;
-- (BOOL)initConnectionError:(NSError **)outError;
-- (Attrib *)stat:(NSString *)path error:(NSError **)outError;
-- (BOOL)isDirectory:(NSString *)path;
-- (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory error:(NSError **)outError;
-- (BOOL)fileExistsAtPath:(NSString *)path;
-- (BOOL)createDirectory:(NSString *)path error:(NSError **)outError;
+
+- (void)attributesOfItemAtPath:(NSString *)path
+		    onResponse:(void (^)(NSDictionary *, NSError *))responseCallback;
+
+- (void)fileExistsAtPath:(NSString *)path
+	      onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback;
+
+- (void)contentsOfDirectoryAtPath:(NSString *)path
+		       onResponse:(void (^)(NSArray *, NSError *))responseCallback;
+
+- (void)createDirectory:(NSString *)path
+	     onResponse:(void (^)(NSError *))responseCallback;
+
 - (void)flushDirectoryCache;
-- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path error:(NSError **)outError;
-- (NSString *)realpath:(NSString *)pathS error:(NSError **)outError;
-- (NSString *)currentDirectory;
 - (BOOL)removeItemAtPath:(NSString *)path error:(NSError **)outError;
 - (BOOL)renameItemAtPath:(NSString *)oldPath toPath:(NSString *)newPath error:(NSError **)outError;
 - (NSData *)dataWithContentsOfFile:(NSString *)path error:(NSError **)outError;

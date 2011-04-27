@@ -19,8 +19,11 @@
 - (NSURL *)normalizePath:(NSString *)filename
               relativeTo:(NSURL *)relURL
                    error:(NSError **)outError;
+
+/*
 - (ViDocument *)openDocument:(id)filenameOrURL
                   andDisplay:(BOOL)display
               allowDirectory:(BOOL)allowDirectory;
+	      */
 
 @end

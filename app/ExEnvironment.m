@@ -1,3 +1,4 @@
+#define FORCE_DEBUG
 #import "ExEnvironment.h"
 #import "ExCommand.h"
 #import "ViTheme.h"
@@ -22,15 +23,7 @@
 @implementation ExEnvironment
 
 @synthesize baseURL;
-@synthesize filterOutput;
-@synthesize filterInput;
 @synthesize window;
-@synthesize filterSheet;
-@synthesize filterLeft;
-@synthesize filterPtr;
-@synthesize filterDone;
-@synthesize filterReadFailed;
-@synthesize filterWriteFailed;
 
 - (id)init
 {
@@ -368,83 +361,6 @@
 	return YES;
 }
 
-static void
-filter_read(CFSocketRef s,
-	     CFSocketCallBackType callbackType,
-	     CFDataRef address,
-	     const void *data,
-	     void *info)
-{
-	char buf[64*1024];
-	ExEnvironment *env = info;
-	ssize_t ret;
-	int fd = CFSocketGetNative(s);
-
-	ret = read(fd, buf, sizeof(buf));
-	if (ret <= 0) {
-		if (ret == 0) {
-			DEBUG(@"read EOF from fd %d", fd);
-			if ([env.window attachedSheet] != nil)
-				[NSApp endSheet:env.filterSheet returnCode:0];
-			env.filterDone = YES;
-		} else {
-			INFO(@"read(%d) failed: %s", fd, strerror(errno));
-			env.filterReadFailed = 1;
-		}
-		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
-		CFSocketInvalidate(s);
-	} else {
-		DEBUG(@"read %zi bytes from fd %i", ret, fd);
-		[env.filterOutput appendBytes:buf length:ret];
-	}
-}
-
-static void
-filter_write(CFSocketRef s,
-	     CFSocketCallBackType callbackType,
-	     CFDataRef address,
-	     const void *data,
-	     void *info)
-{
-	ExEnvironment *env = info;
-	size_t len = 64*1024;
-	int fd = CFSocketGetNative(s);
-
-	if (len > env.filterLeft)
-		len = env.filterLeft;
-
-	if (len > 0) {
-		ssize_t ret = write(fd, env.filterPtr, len);
-		if (ret <= 0) {
-			if (errno == EAGAIN || errno == EINTR) {
-				CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
-				return;
-			}
-
-			INFO(@"write(%zu) failed: %s", len, strerror(errno));
-			CFSocketInvalidate(s);
-			env.filterWriteFailed = 1;
-			return;
-		}
-
-		env.filterPtr = env.filterPtr + ret;
-		// ctx->ptr += ret;
-		// ctx->left -= ret;
-		env.filterLeft = env.filterLeft - ret;
-
-		DEBUG(@"wrote %zi bytes, %zu left", ret, env.filterLeft);
-	}
-
-	if (env.filterLeft == 0) {
-		DEBUG(@"done writing %zu bytes, closing fd %d", [env.filterInput length], fd);
-		// XXX: Do not in either case close the underlying native socket without invalidating the CFSocket object.
-		CFSocketInvalidate(s);
-		// close(ctx->fd);
-		// ctx->fd = -1;
-	} else
-		CFSocketEnableCallBacks(s, kCFSocketWriteCallBack);
-}
-
 - (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
 {
 	if (status != 0)
@@ -464,7 +380,7 @@ filter_write(CFSocketRef s,
 	int status = [filterTask terminationStatus];
 	DEBUG(@"status = %d", status);
  
-	if (filterReadFailed || filterWriteFailed)
+	if (filterFailed)
 		status = -1;
  
 	/* Try to auto-detect the encoding. */
@@ -488,7 +404,6 @@ filter_write(CFSocketRef s,
 
 	filterTask = nil;
 	filterCommand = nil;
-	filterInput = nil;
 	filterOutput = nil;
 	filterTarget = nil;
 	filterContextInfo = nil;
@@ -510,6 +425,42 @@ filter_write(CFSocketRef s,
 - (IBAction)filterCancel:(id)sender
 {
 	[NSApp endSheet:filterSheet returnCode:-1];
+}
+
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)event
+{
+	DEBUG(@"got event %lu on stream %@", event, stream);
+
+	const void *ptr;
+	NSUInteger len;
+
+	switch (event) {
+	case NSStreamEventNone:
+	case NSStreamEventOpenCompleted:
+	default:
+		break;
+	case NSStreamEventHasBytesAvailable:
+		[filterStream getBuffer:&ptr length:&len];
+		DEBUG(@"got %lu bytes", len);
+		if (len > 0) {
+			[filterOutput appendBytes:ptr length:len];
+		}
+		break;
+	case NSStreamEventHasSpaceAvailable:
+		/* All output data flushed. */
+		[filterStream shutdownWrite];
+		break;
+	case NSStreamEventErrorOccurred:
+		INFO(@"error on stream %@: %@", stream, [stream streamError]);
+		filterFailed = 1;
+		break;
+	case NSStreamEventEndEncountered:
+		DEBUG(@"EOF on stream %@", stream);
+		if ([window attachedSheet] != nil)
+			[NSApp endSheet:filterSheet returnCode:0];
+		filterDone = YES;
+		break;
+	}
 }
 
 - (void)filterText:(NSString *)inputText
@@ -538,73 +489,22 @@ filter_write(CFSocketRef s,
 
 	NSString *mode = NSDefaultRunLoopMode; //ViFilterRunLoopMode;
 
+	filterStream = [[ViBufferedStream alloc] initWithTask:filterTask];
+	[filterStream setDelegate:self];
+
 	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];
-	filterInput = [inputText dataUsingEncoding:NSUTF8StringEncoding];
-	filterLeft = [filterInput length];
-	filterPtr = [filterInput bytes];
+	[filterStream writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
+
 	filterDone = NO;
-	filterReadFailed = NO;
-	filterWriteFailed = NO;
+	filterFailed = NO;
 
 	filterTarget = target;
 	filterSelector = selector;
 	filterContextInfo = contextInfo;
 
 
-	int fd = [[shellOutput fileHandleForReading] fileDescriptor];
-	int flags = fcntl(fd, F_GETFL, 0);
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-
-	inputContext.version = 0;
-	inputContext.info = self; /* user data passed to the callbacks */
-	inputContext.retain = NULL;
-	inputContext.release = NULL;
-	inputContext.copyDescription = NULL;
-
-	inputSocket = CFSocketCreateWithNative(
-		kCFAllocatorDefault,
-		fd,
-		kCFSocketReadCallBack,
-		filter_read,
-		&inputContext);
-	if (inputSocket == NULL) {
-		INFO(@"failed to create input CFSocket of fd %i", fd);
-		return;
-	}
-
-	inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, 0);
-
-
-
-
-	fd = [[shellInput fileHandleForWriting] fileDescriptor];
-	flags = fcntl(fd, F_GETFL, 0);
-        fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-
-	outputContext.version = 0;
-	outputContext.info = self; /* user data passed to the callbacks */
-	outputContext.retain = NULL;
-	outputContext.release = NULL;
-	outputContext.copyDescription = NULL;
-
-	outputSocket = CFSocketCreateWithNative(
-		kCFAllocatorDefault,
-		fd,
-		kCFSocketWriteCallBack,
-		filter_write,
-		&outputContext);
-	if (outputSocket == NULL) {
-		INFO(@"failed to create output CFSocket of fd %i", fd);
-		return;
-	}
-
-	outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, 0);
-
-
-
 	/* schedule the read and write sources in the new runloop mode */
-	CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
-	CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
+	[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
 
 	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
 
@@ -617,8 +517,8 @@ filter_write(CFSocketRef s,
 			break;
 		}
 
-		if (filterReadFailed || filterWriteFailed) {
-			DEBUG(@"%s", "input or output failed");
+		if (filterFailed) {
+			DEBUG(@"%s", "filter I/O failed");
 			[filterTask terminate];
 			done = -1;
 			break;
@@ -641,8 +541,7 @@ filter_write(CFSocketRef s,
 		[filterLabel setStringValue:displayTitle];
 		[filterLabel setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 		[filterIndicator startAnimation:self];
-		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, kCFRunLoopCommonModes);
-		CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, kCFRunLoopCommonModes);
+		[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
 	}
 }
 

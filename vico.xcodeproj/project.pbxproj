@@ -257,6 +257,7 @@
 		9AAF73FE13654C8600D75E1E /* ViURLManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF73FC13654C8500D75E1E /* ViURLManager.m */; };
 		9AAF74011366938700D75E1E /* ViSFTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */; };
 		9AAF74041366A4CF00D75E1E /* ViHTTPURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */; };
+		9AAF740F13680F4900D75E1E /* ViBufferedStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAF740E13680F4900D75E1E /* ViBufferedStream.m */; };
 		9AB10BA6133F72E600D81D33 /* NSEvent-keyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */; };
 		9AB10BA7133F72E600D81D33 /* ViCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA3133F72E600D81D33 /* ViCommand.m */; };
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
@@ -764,6 +765,8 @@
 		9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSFTPURLHandler.m; sourceTree = "<group>"; };
 		9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViHTTPURLHandler.h; sourceTree = "<group>"; };
 		9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViHTTPURLHandler.m; sourceTree = "<group>"; };
+		9AAF740D13680F4900D75E1E /* ViBufferedStream.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ViBufferedStream.h; sourceTree = "<group>"; };
+		9AAF740E13680F4900D75E1E /* ViBufferedStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferedStream.m; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
 		9AB10BA2133F72E600D81D33 /* ViCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCommand.h; sourceTree = "<group>"; };
@@ -1121,6 +1124,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AAF740D13680F4900D75E1E /* ViBufferedStream.h */,
+				9AAF740E13680F4900D75E1E /* ViBufferedStream.m */,
 				9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */,
 				9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */,
 				9AAF73FF1366938600D75E1E /* ViSFTPURLHandler.h */,
@@ -1881,6 +1886,7 @@
 				9AAF73FE13654C8600D75E1E /* ViURLManager.m in Sources */,
 				9AAF74011366938700D75E1E /* ViSFTPURLHandler.m in Sources */,
 				9AAF74041366A4CF00D75E1E /* ViHTTPURLHandler.m in Sources */,
+				9AAF740F13680F4900D75E1E /* ViBufferedStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

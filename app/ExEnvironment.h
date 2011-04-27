@@ -1,12 +1,13 @@
 #import "ViDocumentTabController.h"
 #import "ProjectDelegate.h"
+#import "ViBufferedStream.h"
 
 @class ViTextView;
 @class ViDocument;
 @class ViWindowController;
 @class ExCommand;
 
-@interface ExEnvironment : NSObject <NSTextFieldDelegate>
+@interface ExEnvironment : NSObject <NSTextFieldDelegate, NSStreamDelegate>
 {
 	IBOutlet NSTextField	*messageField;
 	IBOutlet NSTextField	*statusbar;
@@ -16,21 +17,15 @@
 
 	// command filtering
 	NSTask				*filterTask;
-	size_t				 filterLeft;
-	const void			*filterPtr;
+	ViBufferedStream		*filterStream;
+
 	NSMutableData			*filterOutput;
-	NSData				*filterInput;
 	IBOutlet NSWindow		*filterSheet;
 	IBOutlet NSProgressIndicator	*filterIndicator;
 	IBOutlet NSTextField		*filterLabel;
 	BOOL				 filterDone;
-	BOOL				 filterReadFailed;
-	BOOL				 filterWriteFailed;
+	BOOL				 filterFailed;
 	NSString			*filterCommand;
-
-	CFSocketRef			 inputSocket, outputSocket;
-	CFRunLoopSourceRef		 inputSource , outputSource;
-	CFSocketContext			 inputContext, outputContext;
 
 	id				 filterTarget;
 	SEL				 filterSelector;
@@ -45,15 +40,7 @@
 }
 
 @property(readonly) NSURL *baseURL;
-@property(readonly) NSMutableData *filterOutput;
-@property(readonly) NSData *filterInput;
 @property(readonly) NSWindow *window;
-@property(readonly) NSWindow *filterSheet;
-@property(readwrite, assign) size_t filterLeft;
-@property(readwrite, assign) const void *filterPtr;
-@property(readwrite, assign) BOOL filterDone;
-@property(readwrite, assign) BOOL filterReadFailed;
-@property(readwrite, assign) BOOL filterWriteFailed;
 
 - (void)message:(NSString *)fmt, ...;
 

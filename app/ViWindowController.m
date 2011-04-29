@@ -841,9 +841,6 @@ static ViWindowController	*currentWindowController = nil;
 /*
  * Selects the most appropriate view for the given document.
  * Will change current tab if no view of the document is visible in the current tab.
- *
- * What if the document is not visible in _any_ view? Create a new
- * tab? Change the current view to show the given document?
  */
 - (ViDocumentView *)selectDocument:(ViDocument *)document
 {

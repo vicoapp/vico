@@ -104,6 +104,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return NO;
 }
 
+- (void)openFailedAlertDidEnd:(NSAlert *)alert
+                   returnCode:(NSInteger)returnCode
+                  contextInfo:(void *)contextInfo
+{
+	INFO(@"alert is %@", alert);
+}
+
 - (id)initWithContentsOfURL:(NSURL *)absoluteURL
                      ofType:(NSString *)typeName
                       error:(NSError **)outError
@@ -142,8 +149,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				[self setIsTemporary:YES];
 				[self setFileURL:absoluteURL];
 				[self message:@"%@: new file", [self title]];
-			} else
-				[NSApp presentError:error];
+			} else {
+				/* Make sure this document has focus, and show alert sheet. */
+				[windowController selectDocument:self];
+
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setMessageText:[NSString stringWithFormat:@"Couldn't open %@",
+					absoluteURL]];
+				[alert addButtonWithTitle:@"OK"];
+				[alert setInformativeText:[error localizedDescription]];
+				[alert beginSheetModalForWindow:[windowController window]
+						  modalDelegate:self
+						 didEndSelector:@selector(openFailedAlertDidEnd:returnCode:contextInfo:)
+						    contextInfo:nil];
+			}
 		} else
 			[self setFileURL:absoluteURL];
 	};

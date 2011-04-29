@@ -159,13 +159,17 @@ resp2txt(int type)
 	DEBUG(@"cancelling request %@", self);
 	cancelled = YES;
 	[connection dequeueRequest:requestId];
+
 	if (cancelCallback) {
 		DEBUG(@"running cancel callback %p", cancelCallback);
 		cancelCallback(self);
 	}
+
 	/* If this request has subrequests, cancel them too. */
-	[subRequest cancel];
-	subRequest = nil;
+	if (subRequest) {
+		[subRequest cancel];
+		subRequest = nil;
+	}
 }
 
 - (NSString *)description
@@ -496,7 +500,7 @@ resp2txt(int type)
 
 	NSData *data = [inbuf subdataWithRange:NSMakeRange(sizeof(uint32_t), msg_len)];
 
-	hexdump([data bytes], msg_len, "raw message bytes:");
+	// hexdump([data bytes], msg_len, "raw message bytes:");
 
 	/* Drain the extracted bytes. */
 	[inbuf replaceBytesInRange:NSMakeRange(0, msg_len + sizeof(uint32_t)) withBytes:NULL length:0];
@@ -735,13 +739,16 @@ resp2txt(int type)
 				break;
 
 			BOOL known = NO;
-			if ([name isEqualToString:@"posix-rename@openssh.com"] && [value isEqualToString:@"1"]) {
+			if ([name isEqualToString:@"posix-rename@openssh.com"] &&
+			    [value isEqualToString:@"1"]) {
 				exts |= SFTP_EXT_POSIX_RENAME;
 				known = YES;
-			} else if ([name isEqualToString:@"statvfs@openssh.com"] && [value isEqualToString:@"2"]) {
+			} else if ([name isEqualToString:@"statvfs@openssh.com"] &&
+				   [value isEqualToString:@"2"]) {
 				exts |= SFTP_EXT_STATVFS;
 				known = YES;
-			} else if ([name isEqualToString:@"fstatvfs@openssh.com"] && [value isEqualToString:@"2"]) {
+			} else if ([name isEqualToString:@"fstatvfs@openssh.com"] &&
+				   [value isEqualToString:@"2"]) {
 				exts |= SFTP_EXT_FSTATVFS;
 				known = YES;
 			}
@@ -766,6 +773,11 @@ resp2txt(int type)
 			home = filename;
 		}
 	}];
+}
+
+- (BOOL)hasPosixRename
+{
+	return ((exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
 }
 
 - (SFTPConnection *)initWithHost:(NSString *)hostname
@@ -839,8 +851,8 @@ resp2txt(int type)
 }
 
 /* FIXME: try attributes in directoryCache first? */
-- (void)attributesOfItemAtPath:(NSString *)path
-		    onResponse:(void (^)(NSDictionary *, NSError *))responseCallback
+- (SFTPRequest *)attributesOfItemAtPath:(NSString *)path
+			     onResponse:(void (^)(NSDictionary *, NSError *))responseCallback
 {
 	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_STAT format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -855,20 +867,22 @@ resp2txt(int type)
 			responseCallback(attributes, nil);
 		}
 	};
+
+	return req;
 }
 
-- (void)fileExistsAtPath:(NSString *)path
-	      onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback
+- (SFTPRequest *)fileExistsAtPath:(NSString *)path
+		       onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback
 {
 	DEBUG(@"path = [%@]", path);
 
 	if (path == nil || [path isEqualToString:@""]) {
 		/* This is the home directory. */
 		responseCallback(YES, YES, nil);
-		return;
+		return nil;
 	}
 
-	[self attributesOfItemAtPath:path onResponse:^(NSDictionary *attributes, NSError *error) {
+	return [self attributesOfItemAtPath:path onResponse:^(NSDictionary *attributes, NSError *error) {
 		if (error) {
 			if ([error code] == SSH2_FX_NO_SUCH_FILE)
 				error = nil;
@@ -883,7 +897,8 @@ resp2txt(int type)
 		uint32_t perms = (uint32_t)[attributes filePosixPermissions];
 		if (perms == 0) {
 			/* Attributes didn't include permissions, probably because we couldn't read them. */
-			responseCallback(NO, NO, [ViError errorWithFormat:@"Permission denied"]);
+			responseCallback(NO, NO, [ViError errorWithCode:SSH2_FX_PERMISSION_DENIED
+								 format:@"Permission denied"]);
 		} else {
 			DEBUG(@"got permissions %06o", perms);
 			responseCallback(YES, [[attributes fileType] isEqualToString:NSFileTypeDirectory], nil);
@@ -905,8 +920,8 @@ resp2txt(int type)
 	};
 }
 
-- (void)contentsOfDirectoryAtPath:(NSString *)path
-		       onResponse:(void (^)(NSArray *, NSError *))responseCallback
+- (SFTPRequest *)contentsOfDirectoryAtPath:(NSString *)path
+				onResponse:(void (^)(NSArray *, NSError *))responseCallback
 {
 	if (path == nil || [path isEqualToString:@""]) {
 		/* This is the home directory. */
@@ -918,72 +933,95 @@ resp2txt(int type)
 	NSArray *contents = [directoryCache objectForKey:path];
 	if (contents) {
 		responseCallback(contents, nil);
-		return;
+		return nil;
 	}
 
-	SFTPRequest *req = [self addRequest:SSH2_FXP_OPENDIR format:"s", path];
-	req.onResponse = ^(SFTPMessage *msg) {
+	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", path];
+	openRequest.onResponse = ^(SFTPMessage *msg) {
 		NSData *handle;
 		NSError *error;
-		if (![msg expectType:SSH2_FXP_HANDLE error:&error])
+		if (![msg expectType:SSH2_FXP_HANDLE error:&error]) {
 			responseCallback(nil, error);
-		else if (![msg getBlob:&handle])
+			return;
+		} else if (![msg getBlob:&handle]) {
 			responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
-		else {
-			DEBUG(@"got handle [%@]", handle);
-			NSMutableArray *entries = [NSMutableArray array];
+			[self close];
+			return;
+		}
 
-			/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
-			__block void (^readfun)(SFTPMessage *);
-			readfun = Block_copy(^(SFTPMessage *msg) {
-				NSError *error;
-				uint32_t count;
-				if (msg.type == SSH2_FXP_STATUS) {
-					if (![msg expectStatus:SSH2_FX_EOF error:&error])
-						responseCallback(nil, error);
-					else {
-						[self closeHandle:handle
-							  onError:^(NSError *error) { responseCallback(nil, error); }
-							onSuccess:^(SFTPMessage *msg) {
-								[directoryCache setObject:entries forKey:path];
-								responseCallback(entries, nil);
-						}];
-					}
-				} else if (msg.type != SSH2_FXP_NAME || ![msg getUnsigned:&count]) {
-					responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
-				} else {
-					for (uint32_t i = 0; i < count; i++) {
-						NSString *filename;
-						NSDictionary *attributes;
-						if (![msg getString:&filename] ||
-						    ![msg getString:NULL] ||
-						    ![msg getAttributes:&attributes]) {
-							responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
-							return;
-						}
-						DEBUG(@"got file %@, attributes %@", filename, attributes);
+		DEBUG(@"got handle [%@]", handle);
+		NSMutableArray *entries = [NSMutableArray array];
 
-						if ([filename rangeOfString:@"/"].location != NSNotFound)
-							INFO(@"Ignoring suspect path \"%@\" during readdir of \"%s\"", filename, path);
-						else
-							[entries addObject:[NSArray arrayWithObjects:filename, attributes, nil]];
-					}
+		void (^cancelfun)(SFTPRequest *);
+		cancelfun = Block_copy(^(SFTPRequest *req) {
+			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
+			[self closeHandle:handle
+				  onError:^(NSError *error) {
+					INFO(@"failed to close file after cancel: %@",
+					    [error localizedDescription]); }
+				onSuccess:nil];
+		});
 
-					/* Request another batch of names. */
-					SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
-					req.onResponse = readfun;
+		/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
+		__block void (^readfun)(SFTPMessage *);
+		readfun = Block_copy(^(SFTPMessage *msg) {
+			NSError *error;
+			uint32_t count;
+			if (msg.type == SSH2_FXP_STATUS) {
+				if (![msg expectStatus:SSH2_FX_EOF error:&error])
+					responseCallback(nil, error);
+				else {
+					[self closeHandle:handle
+						  onError:^(NSError *error) { responseCallback(nil, error); }
+						onSuccess:^(SFTPMessage *msg) {
+							[directoryCache setObject:entries forKey:path];
+							responseCallback(entries, nil);
+					}];
 				}
-			});
+				return;
+			} else if (msg.type != SSH2_FXP_NAME || ![msg getUnsigned:&count]) {
+				responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+				[self close];
+				return;
+			}
 
-			/* Request a batch of names. */
+			for (uint32_t i = 0; i < count; i++) {
+				NSString *filename;
+				NSDictionary *attributes;
+				if (![msg getString:&filename] ||
+				    ![msg getString:NULL] || /* ignore longname */
+				    ![msg getAttributes:&attributes]) {
+					responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+					[self close];
+					return;
+				}
+				DEBUG(@"got file %@, attributes %@", filename, attributes);
+
+				if ([filename rangeOfString:@"/"].location != NSNotFound)
+					INFO(@"Ignoring suspect path \"%@\" during readdir of \"%s\"", filename, path);
+				else
+					[entries addObject:[NSArray arrayWithObjects:filename, attributes, nil]];
+			}
+
+			/* Request another batch of names. */
 			SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
 			req.onResponse = readfun;
-		}
+			req.onCancel = cancelfun;
+			openRequest.subRequest = req;
+		});
+
+		/* Request a batch of names. */
+		SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
+		req.onResponse = readfun;
+		req.onCancel = cancelfun;
+		openRequest.subRequest = req;
 	};
+
+	return openRequest;
 }
 
-- (void)createDirectory:(NSString *)path
-	     onResponse:(void (^)(NSError *))responseCallback
+- (SFTPRequest *)createDirectory:(NSString *)path
+		      onResponse:(void (^)(NSError *))responseCallback
 {
 	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"pa", path, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -993,6 +1031,7 @@ resp2txt(int type)
 		else
 			responseCallback(nil);
 	};
+	return req;
 }
 
 - (void)flushDirectoryCache
@@ -1003,7 +1042,7 @@ resp2txt(int type)
 - (void)close
 {
 	INFO(@"Closing connection %@", sshPipe);
-	INFO(@"outstanding requests: %@", requests); // XXX: cancel them!
+	INFO(@"outstanding requests: %@", requests); // XXX: cancel them? only on "nice" close?
 	[sshPipe close];
 	sshPipe = nil;
 	[ssh_task terminate];
@@ -1030,6 +1069,7 @@ resp2txt(int type)
 			return;
 		} else if (![openResponse getBlob:&handle]) {
 			responseCallback([ViError errorWithFormat:@"SFTP protocol error"]);
+			[self close];
 			return;
 		}
 
@@ -1040,7 +1080,7 @@ resp2txt(int type)
 		__block uint64_t offset = 0;
 		__block uint32_t len = transfer_buflen;
 
-		__block void (^cancelfun)(SFTPRequest *);
+		void (^cancelfun)(SFTPRequest *);
 		cancelfun = Block_copy(^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 			[self closeHandle:handle
@@ -1088,11 +1128,7 @@ resp2txt(int type)
 			NSData *data;
 			if (![msg getBlob:&data]) {
 				responseCallback([ViError errorWithFormat:@"SFTP protocol error"]);
-				[self closeHandle:handle
-					  onError:^(NSError *error) {
-						INFO(@"failed to close file after protocol error: %@",
-						    [error localizedDescription]); }
-					onSuccess:nil];
+				[self close];
 				openRequest.subRequest = nil;
 				return;
 			}
@@ -1334,8 +1370,8 @@ done:
 #endif
 }
 
-- (void)removeItemAtPath:(NSString *)path
-	      onResponse:(void (^)(NSError *))responseCallback
+- (SFTPRequest *)removeItemAtPath:(NSString *)path
+		       onResponse:(void (^)(NSError *))responseCallback
 {
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REMOVE format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -1345,11 +1381,12 @@ done:
 		else
 			responseCallback(nil);
 	};
+	return req;
 }
 
-- (void)renameItemAtPath:(NSString *)oldPath
-		  toPath:(NSString *)newPath
-	      onResponse:(void (^)(NSError *))responseCallback
+- (SFTPRequest *)renameItemAtPath:(NSString *)oldPath
+			   toPath:(NSString *)newPath
+		       onResponse:(void (^)(NSError *))responseCallback
 {
 	SFTPRequest *req;
 	if ([self hasPosixRename])
@@ -1364,18 +1401,16 @@ done:
 		else
 			responseCallback(nil);
 	};
+
+	return req;
 }
 
-- (BOOL)hasPosixRename
+- (SFTPRequest *)writeData:(NSData *)data
+		    toFile:(NSString *)path
+		onResponse:(void (^)(NSError *))responseCallback
 {
-	return ((exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
-}
-
-- (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError
-{
-	if (outError)
-		*outError = [ViError errorWithFormat:@"not implemented"];
-	return NO;
+	responseCallback([ViError errorWithFormat:@"not implemented"]);
+	return nil;
 
 #if 0
 	Attrib *attr = [self stat:path error:nil];

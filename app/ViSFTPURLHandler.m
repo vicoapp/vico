@@ -32,8 +32,7 @@
 		return nil;
 	}
 
-	[conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
-	return nil; // XXX: return a deferred object!
+	return [conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL
@@ -49,8 +48,7 @@
 		return nil;
 	}
 
-	[conn createDirectory:[aURL path] onResponse:aBlock];
-	return nil; // XXX: return a deferred object!
+	return [conn createDirectory:[aURL path] onResponse:aBlock];
 }
 
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
@@ -66,10 +64,7 @@
 		return nil;
 	}
 
-	// [aBlock copy];
-
-	[conn fileExistsAtPath:[aURL path] onResponse:aBlock];
-	return nil; // FIXME: return a deferred
+	return [conn fileExistsAtPath:[aURL path] onResponse:aBlock];
 }
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
@@ -86,10 +81,9 @@
 		return nil;
 	}
 
-	[conn renameItemAtPath:[srcURL path]
-			toPath:[dstURL path]
-		    onResponse:aBlock];
-	return nil; // FIXME: deferred
+	return [conn renameItemAtPath:[srcURL path]
+			       toPath:[dstURL path]
+			   onResponse:aBlock];
 }
 
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
@@ -105,8 +99,7 @@
 		return nil;
 	}
 
-	[conn removeItemAtPath:[aURL path] onResponse:aBlock];
-	return nil; // FIXME: deferred
+	return [conn removeItemAtPath:[aURL path] onResponse:aBlock];
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
@@ -122,8 +115,7 @@
 		return nil;
 	}
 
-	[conn attributesOfItemAtPath:[aURL path] onResponse:aBlock];
-	return nil; // FIXME:
+	return [conn attributesOfItemAtPath:[aURL path] onResponse:aBlock];
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
@@ -159,9 +151,7 @@
 		return nil;
 	}
 
-	[conn writeData:data toFile:[aURL path] error:&error];
-	aBlock(error);
-	return nil;
+	return [conn writeData:data toFile:[aURL path] onResponse:aBlock];
 }
 
 @end

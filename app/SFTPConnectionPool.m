@@ -7,7 +7,7 @@
 {
 	self = [super init];
 	if (self)
-		connections = [[NSMutableDictionary alloc] init];
+		connections = [NSMutableDictionary dictionary];
 	return self;
 }
 

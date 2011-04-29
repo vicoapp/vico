@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 /*
- * http://tools.ietf.org/html/draft-ietf-secsh-filexfer-13
+ * draft-ietf-secsh-filexfer-02
  */
 
 /* version */
@@ -72,6 +72,7 @@
 #define SSH2_FX_NO_CONNECTION		6
 #define SSH2_FX_CONNECTION_LOST		7
 #define SSH2_FX_OP_UNSUPPORTED		8
+/* The rest are defined in version 6 of the protocol. */
 #define SSH2_FX_INVALID_HANDLE		9
 #define SSH2_FX_NO_SUCH_PATH		10
 #define SSH2_FX_FILE_ALREADY_EXISTS	11
@@ -82,6 +83,8 @@
 #define SSH2_FX_UNKNOWN_PRINCIPLE	16
 #define SSH2_FX_LOCK_CONFlICT		17
 #define SSH2_FX_MAX			18
+
+#pragma mark -
 
 @interface SFTPMessage : NSObject
 {
@@ -103,8 +106,9 @@
 - (BOOL)getUnsigned:(uint32_t *)ret;
 - (BOOL)getInt64:(int64_t *)ret;
 - (BOOL)getAttributes:(NSDictionary **)ret;
-
 @end
+
+#pragma mark -
 
 @class SFTPConnection;
 
@@ -134,6 +138,8 @@
 - (void)response:(SFTPMessage *)msg;
 - (void)cancel;
 @end
+
+#pragma mark -
 
 @interface SFTPConnection : NSObject <NSStreamDelegate>
 {
@@ -174,37 +180,40 @@
 @property(readonly) NSString *home;
 
 - (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
-- (BOOL)closed;
 
-- (void)attributesOfItemAtPath:(NSString *)path
-		    onResponse:(void (^)(NSDictionary *, NSError *))responseCallback;
+- (SFTPRequest *)attributesOfItemAtPath:(NSString *)path
+			     onResponse:(void (^)(NSDictionary *, NSError *))responseCallback;
 
-- (void)fileExistsAtPath:(NSString *)path
-	      onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback;
+- (SFTPRequest *)fileExistsAtPath:(NSString *)path
+		       onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback;
 
-- (void)contentsOfDirectoryAtPath:(NSString *)path
-		       onResponse:(void (^)(NSArray *, NSError *))responseCallback;
+- (SFTPRequest *)contentsOfDirectoryAtPath:(NSString *)path
+				onResponse:(void (^)(NSArray *, NSError *))responseCallback;
 
-- (void)createDirectory:(NSString *)path
-	     onResponse:(void (^)(NSError *))responseCallback;
+- (SFTPRequest *)createDirectory:(NSString *)path
+		      onResponse:(void (^)(NSError *))responseCallback;
 
 - (SFTPRequest *)dataWithContentsOfFile:(NSString *)path
 				 onData:(void (^)(NSData *))dataCallback
 			     onResponse:(void (^)(NSError *))responseCallback;
 
-- (void)renameItemAtPath:(NSString *)oldPath
-		  toPath:(NSString *)newPath
-	      onResponse:(void (^)(NSError *))responseCallback;
+- (SFTPRequest *)renameItemAtPath:(NSString *)oldPath
+			   toPath:(NSString *)newPath
+		       onResponse:(void (^)(NSError *))responseCallback;
 
-- (void)removeItemAtPath:(NSString *)path
-	      onResponse:(void (^)(NSError *))responseCallback;
+- (SFTPRequest *)removeItemAtPath:(NSString *)path
+		       onResponse:(void (^)(NSError *))responseCallback;
+
+- (SFTPRequest *)writeData:(NSData *)data
+		    toFile:(NSString *)path
+		onResponse:(void (^)(NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
 - (void)flushDirectoryCache;
-- (BOOL)writeData:(NSData *)data toFile:(NSString *)path error:(NSError **)outError;
 - (NSString *)hostWithUser;
 - (NSString *)stderr;
 - (BOOL)hasPosixRename;
 - (void)close;
+- (BOOL)closed;
 
 @end

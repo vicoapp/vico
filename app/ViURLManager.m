@@ -103,7 +103,8 @@
 }
 
 /* All URLs must be of the same type (scheme). */
-- (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls onCompletion:(void (^)(NSError *error))aBlock
+- (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls
+		       onCompletion:(void (^)(NSError *error))aBlock
 {
 	NSURL *firstURL = [urls objectAtIndex:0];
 	if (firstURL == nil) {
@@ -122,7 +123,7 @@
 		NSMutableArray *mutableURLs = [urls mutableCopy];
 		void (^fun)(void) = ^{
 			NSURL *url = [mutableURLs objectAtIndex:0];
-			[handler removeItemAtURL:url onCompletion:^(NSError *error){
+			[handler removeItemAtURL:url onCompletion:^(NSError *error) {
 				[mutableURLs removeObjectAtIndex:0];
 				if (error)
 					aBlock(error);
@@ -140,7 +141,8 @@
 	return nil;
 }
 
-- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock
+- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSError *error))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(removeItemAtURL:onCompletion:)];
@@ -150,7 +152,8 @@
 	return nil;
 }
 
-- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock
+- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
+			   onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(attributesOfItemAtURL:onCompletion:)];
@@ -174,7 +177,9 @@
 	return nil;
 }
 
-- (id<ViDeferred>)writeDataSafely:(NSData *)data toURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock
+- (id<ViDeferred>)writeDataSafely:(NSData *)data
+			    toURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSError *error))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(writeDataSafely:toURL:onCompletion:)];

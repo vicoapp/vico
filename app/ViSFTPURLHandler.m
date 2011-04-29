@@ -86,12 +86,14 @@
 		return nil;
 	}
 
-	[conn renameItemAtPath:[srcURL path] toPath:[dstURL path] error:&error];
-	aBlock(error);
-	return nil;
+	[conn renameItemAtPath:[srcURL path]
+			toPath:[dstURL path]
+		    onResponse:aBlock];
+	return nil; // FIXME: deferred
 }
 
-- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock
+- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSError *error))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
@@ -103,9 +105,8 @@
 		return nil;
 	}
 
-	[conn removeItemAtPath:[aURL path] error:&error];
-	aBlock(error);
-	return nil;
+	[conn removeItemAtPath:[aURL path] onResponse:aBlock];
+	return nil; // FIXME: deferred
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
@@ -139,8 +140,9 @@
 		return nil;
 	}
 
-	[conn dataWithContentsOfFile:[aURL path] onData:dataCallback onResponse:completionCallback];
-	return nil; // FIXME: return deferred
+	return [conn dataWithContentsOfFile:[aURL path]
+				     onData:dataCallback
+				 onResponse:completionCallback];
 }
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data

@@ -161,31 +161,6 @@
 	[self closeNextDocumentInSet:set force:NO];
 }
 
-- (BOOL)fileAppearsBinaryAtURL:(NSURL *)absoluteURL
-{
-	NSData *chunk = nil;
-
-	if ([absoluteURL isFileURL]) {
-		NSFileHandle *handle = [NSFileHandle fileHandleForReadingFromURL:absoluteURL
-									   error:nil];
-		chunk = [handle readDataOfLength:1024];
-		[handle closeFile];
-	}
-	/* SFTP URLs not yet handled */
-
-	if (chunk == nil)
-		return NO;
-
-	const void *buf = [chunk bytes];
-	NSUInteger length = [chunk length];
-	if (buf == NULL)
-		return NO;
-
-	if (memchr(buf, 0, length) != NULL)
-		return YES;
-	return NO;
-}
-
 - (BOOL)supportedURLScheme:(NSURL *)url
 {
 	if ([[ViURLManager defaultManager] respondsToURL:url] ||
@@ -227,18 +202,6 @@
 			*outError = [ViError errorWithFormat:@"Unsupported URL scheme '%@'",
 			    [url scheme]];
 		return nil;
-	}
-
-	if ([self fileAppearsBinaryAtURL:url]) {
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:[NSString stringWithFormat:@"%@ appears to be a binary file",
-			[url lastPathComponent]]];
-		[alert addButtonWithTitle:@"Open"];
-		[alert addButtonWithTitle:@"Cancel"];
-		[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
-		NSUInteger ret = [alert runModal];
-		if (ret == NSAlertSecondButtonReturn)
-			return nil;
 	}
 
 	doc = [super openDocumentWithContentsOfURL:url
@@ -298,95 +261,6 @@
 	return [url absoluteURL];
 }
 
-#if 0
-- (ViDocument *)openDocument:(id)filenameOrURL
-                  andDisplay:(BOOL)display
-              allowDirectory:(BOOL)allowDirectory
-{
-	INFO(@"open document %@", filenameOrURL);
-
-	ViWindowController *windowController = [ViWindowController currentWindowController];
-	NSError *error = nil;
-	NSURL *url;
-	if ([filenameOrURL isKindOfClass:[NSURL class]])
-		url = filenameOrURL;
-	else
-		url = [self normalizePath:filenameOrURL relativeTo:nil error:&error];
-
-	if (url == nil) {
-		if (error)
-			[windowController message:@"%@: %@",
-			    filenameOrURL, [error localizedDescription]];
-		return nil;
-	}
-
-	NSNumber *lineNumber = nil;
-	url = [TxmtURLProtocol parseURL:url intoLineNumber:&lineNumber];
-	if (url == nil) {
-		[windowController message:@"%@: invalid URL",
-		    filenameOrURL];
-		return nil;
-	}
-
-	if (![self supportedURLScheme:url]) {
-		[windowController message:@"Unsupported URL scheme '%@'",
-		    [url scheme]];
-		return nil;
-	}
-
-	BOOL isDirectory = NO;
-	BOOL exists = NO;
-	if ([url isFileURL])
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]
-							      isDirectory:&isDirectory];
-	else if ([[url scheme] isEqualToString:@"sftp"]) {
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
-		exists = [conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:&error];
-		if (error) {
-			[windowController message:@"%@: %@",
-			    [url absoluteString], [error localizedDescription]];
-			return nil;
-		}
-	}
-
-	if (isDirectory && !allowDirectory) {
-		[windowController message:@"%@: is a directory", [url absoluteString]];
-		return nil;
-	}
-
-	ViDocument *doc;
-	if (exists) {
-		doc = [self openDocumentWithContentsOfURL:url
-						  display:display
-						    error:&error];
-	} else {
-		doc = [self openUntitledDocumentAndDisplay:display
-						     error:&error];
-		[doc setIsTemporary:YES];
-		[doc setFileURL:url];
-	}
-
-	if (error) {
-		[windowController message:@"%@: %@",
-		    [url absoluteString], [error localizedDescription]];
-		return nil;
-	}
-
-	/*
-	if (!display) {
-		[doc addWindowController:windowController];
-		[windowController addDocument:doc];
-	}
-	*/
-
-	return doc;
-}
-#endif
-
-
-
-
-
 
 
 - (IBAction)closeCurrentDocument:(id)sender
@@ -403,6 +277,9 @@
 - (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError **)outError
 {
 	DEBUG(@"determining type for %@", url);
+
+	if ([[url absoluteString] hasSuffix:@"/"])
+		return @"Project";
 
 #if 0
 	BOOL isDirectory;

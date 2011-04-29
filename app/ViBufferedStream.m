@@ -320,9 +320,11 @@ fd_write(CFSocketRef s,
 
 - (void)writeData:(NSData *)data
 {
-	INFO(@"enqueueing %lu bytes", [data length]);
-	[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
-	CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+	if ([data length] > 0) {
+		INFO(@"enqueueing %lu bytes", [data length]);
+		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
+		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+	}
 }
 
 - (void)setDelegate:(id<NSStreamDelegate>)aDelegate

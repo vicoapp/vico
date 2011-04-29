@@ -11,17 +11,18 @@
 {
 	if ((self = [super init]) != nil) {
 		connData = [NSMutableData data];
-		dataCallback = [aDataCallback copy];
+		dataCallback = Block_copy(aDataCallback);
 		completionCallback = [aCompletionCallback copy];
 		conn = [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:aURL]
 						     delegate:self];
+		DEBUG(@"conn = %@", conn);
 	}
 	return self;
 }
 
 - (void)finishWithError:(NSError *)error
 {
-	DEBUG(@"finished on conn %@", conn);
+	DEBUG(@"finished on conn %@, callback %p", conn, completionCallback);
 
 	if (completionCallback)
 		completionCallback(error);

@@ -18,7 +18,6 @@
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViAppController.h"
-#import "ViURLManager.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -93,6 +92,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return self;
 }
 
+- (BOOL)dataAppearsBinary:(NSData *)data
+{
+	const void *buf = [data bytes];
+	NSUInteger length = [data length];
+	if (buf == NULL)
+		return NO;
+
+	if (memchr(buf, 0, length) != NULL)
+		return YES;
+	return NO;
+}
+
 - (id)initWithContentsOfURL:(NSURL *)absoluteURL
                      ofType:(NSString *)typeName
                       error:(NSError **)outError
@@ -100,19 +111,37 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"init with URL %@ of type %@", absoluteURL, typeName);
 
 	void (^dataCallback)(NSData *data) = ^(NSData *data) {
+		if (!acceptedBinaryLoad && [self dataAppearsBinary:data]) {
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:[NSString stringWithFormat:@"%@ appears to be a binary file",
+				[absoluteURL lastPathComponent]]];
+			[alert addButtonWithTitle:@"Continue"];
+			[alert addButtonWithTitle:@"Cancel"];
+			[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
+			NSUInteger ret = [alert runModal];
+			if (ret == NSAlertSecondButtonReturn) {
+				INFO(@"cancelling deferred %@", loader);
+				[loader cancel];
+				return;
+			} else
+				acceptedBinaryLoad = YES;
+		}
 		[self addData:data];
 	};
 
 	void (^completionCallback)(NSError *error) = ^(NSError *error) {
 		INFO(@"error is %@", error);
 		busy = NO;
+		loader = nil;
 		if (error) {
 			/* If the file doesn't exist, treat it as an untitled file. */
 			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
+			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorFileDoesNotExist) ||
 			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
 				INFO(@"treating non-existent file %@ as untitled file", absoluteURL);
 				[self setIsTemporary:YES];
 				[self setFileURL:absoluteURL];
+				[self message:@"%@: new file", [self title]];
 			} else
 				[NSApp presentError:error];
 		} else
@@ -122,9 +151,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	self = [self init];
 	if (self) {
 		busy = YES;
-		id<ViDeferred> deferred = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
-											onData:dataCallback
-										  onCompletion:completionCallback];
+		loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
+								       onData:dataCallback
+								 onCompletion:completionCallback];
 
 //		if (deferred)
 //			[self message:@"loading %@...", absoluteURL];
@@ -437,6 +466,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)close
 {
+	if (loader) {
+		INFO(@"cancelling load callback %@", loader);
+		[loader cancel];
+		loader = nil;
+	}
+
 	closed = YES;
 	[windowController closeDocument:self];
 

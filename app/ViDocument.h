@@ -3,6 +3,7 @@
 #import "ViSymbol.h"
 #import "ViTextStorage.h"
 #import "ViScriptProxy.h"
+#import "ViURLManager.h"
 
 @interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
 {
@@ -18,6 +19,8 @@
 	/* Set when opening a new file from the ex command line. */
 	BOOL isTemporary;
 
+	id<ViDeferred> loader;
+	BOOL acceptedBinaryLoad;
 	BOOL busy;
 
 	ViTextStorage *textStorage;

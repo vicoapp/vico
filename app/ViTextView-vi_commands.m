@@ -2169,7 +2169,7 @@
 		}
 	}
 
-	SFTPConnection *conn = nil;
+	//SFTPConnection *conn = nil;
 	NSFileManager *fm = nil;
 
 	NSArray *directoryContents;
@@ -2178,8 +2178,10 @@
 		fm = [NSFileManager defaultManager];
 		directoryContents = [fm contentsOfDirectoryAtPath:[url path] error:&error];
 	} else {
-		conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
-		directoryContents = [conn contentsOfDirectoryAtPath:[url path] error:&error];
+		MESSAGE(@"Non-file URLs temporarily disabled");
+		return NO;
+		/*conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:&error];
+		directoryContents = [conn contentsOfDirectoryAtPath:[url path] error:&error];*/
 	}
 
 	if (error) {
@@ -2192,8 +2194,8 @@
 		NSString *filename;
 		if ([url isFileURL])
 			filename = entry;
-		else
-			filename = [[(SFTPDirectoryEntry *)entry filename] lastPathComponent];
+		/*else
+			filename = [[(SFTPDirectoryEntry *)entry filename] lastPathComponent];*/
 
 		NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]),
 		    NSMakeRange(0, [filename length]));

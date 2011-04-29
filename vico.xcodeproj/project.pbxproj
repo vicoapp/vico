@@ -112,16 +112,6 @@
 		9A2EF3C213310CB80023C5B7 /* ViWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37013310CB00023C5B7 /* ViWebView.m */; };
 		9A2EF3C313310CB80023C5B7 /* ViWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37213310CB30023C5B7 /* ViWindow.m */; };
 		9A2EF3C413310CB80023C5B7 /* ViWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37413310CB60023C5B7 /* ViWindowController.m */; };
-		9A2EF3D913310D080023C5B7 /* atomicio.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3C613310D080023C5B7 /* atomicio.c */; };
-		9A2EF3DA13310D080023C5B7 /* bufaux.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3C813310D080023C5B7 /* bufaux.c */; };
-		9A2EF3DB13310D080023C5B7 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3C913310D080023C5B7 /* buffer.c */; };
-		9A2EF3DC13310D080023C5B7 /* fatal.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3CB13310D080023C5B7 /* fatal.c */; };
-		9A2EF3DD13310D080023C5B7 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3CC13310D080023C5B7 /* log.c */; };
-		9A2EF3DE13310D080023C5B7 /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3CE13310D080023C5B7 /* misc.c */; };
-		9A2EF3DF13310D080023C5B7 /* sftp-client.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D013310D080023C5B7 /* sftp-client.c */; };
-		9A2EF3E013310D080023C5B7 /* sftp-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D213310D080023C5B7 /* sftp-common.c */; };
-		9A2EF3E113310D080023C5B7 /* vis.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D513310D080023C5B7 /* vis.c */; };
-		9A2EF3E213310D080023C5B7 /* xmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF3D713310D080023C5B7 /* xmalloc.c */; };
 		9A2EF41A13310F850023C5B7 /* lemon.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF41913310F850023C5B7 /* lemon.c */; };
 		9A2EF469133114AE0023C5B7 /* CharDistribution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF437133114AE0023C5B7 /* CharDistribution.cpp */; };
 		9A2EF46A133114AE0023C5B7 /* JpCntx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF439133114AE0023C5B7 /* JpCntx.cpp */; };
@@ -565,25 +555,6 @@
 		9A2EF37213310CB30023C5B7 /* ViWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWindow.m; sourceTree = "<group>"; };
 		9A2EF37313310CB40023C5B7 /* ViWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWindowController.h; sourceTree = "<group>"; };
 		9A2EF37413310CB60023C5B7 /* ViWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWindowController.m; sourceTree = "<group>"; };
-		9A2EF3C613310D080023C5B7 /* atomicio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = atomicio.c; path = sftp/atomicio.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3C713310D080023C5B7 /* atomicio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atomicio.h; path = sftp/atomicio.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3C813310D080023C5B7 /* bufaux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bufaux.c; path = sftp/bufaux.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3C913310D080023C5B7 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = sftp/buffer.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3CA13310D080023C5B7 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = buffer.h; path = sftp/buffer.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3CB13310D080023C5B7 /* fatal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fatal.c; path = sftp/fatal.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3CC13310D080023C5B7 /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = log.c; path = sftp/log.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3CD13310D080023C5B7 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = sftp/log.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3CE13310D080023C5B7 /* misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = misc.c; path = sftp/misc.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3CF13310D080023C5B7 /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = misc.h; path = sftp/misc.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3D013310D080023C5B7 /* sftp-client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "sftp-client.c"; path = "sftp/sftp-client.c"; sourceTree = SOURCE_ROOT; };
-		9A2EF3D113310D080023C5B7 /* sftp-client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "sftp-client.h"; path = "sftp/sftp-client.h"; sourceTree = SOURCE_ROOT; };
-		9A2EF3D213310D080023C5B7 /* sftp-common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "sftp-common.c"; path = "sftp/sftp-common.c"; sourceTree = SOURCE_ROOT; };
-		9A2EF3D313310D080023C5B7 /* sftp-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "sftp-common.h"; path = "sftp/sftp-common.h"; sourceTree = SOURCE_ROOT; };
-		9A2EF3D413310D080023C5B7 /* sftp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sftp.h; path = sftp/sftp.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3D513310D080023C5B7 /* vis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vis.c; path = sftp/vis.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3D613310D080023C5B7 /* vis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vis.h; path = sftp/vis.h; sourceTree = SOURCE_ROOT; };
-		9A2EF3D713310D080023C5B7 /* xmalloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xmalloc.c; path = sftp/xmalloc.c; sourceTree = SOURCE_ROOT; };
-		9A2EF3D813310D080023C5B7 /* xmalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xmalloc.h; path = sftp/xmalloc.h; sourceTree = SOURCE_ROOT; };
 		9A2EF41013310F4D0023C5B7 /* lemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lemon; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF41913310F850023C5B7 /* lemon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lemon.c; sourceTree = "<group>"; };
 		9A2EF437133114AE0023C5B7 /* CharDistribution.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CharDistribution.cpp; path = universalchardet/CharDistribution.cpp; sourceTree = SOURCE_ROOT; };
@@ -765,7 +736,7 @@
 		9AAF74001366938600D75E1E /* ViSFTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSFTPURLHandler.m; sourceTree = "<group>"; };
 		9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViHTTPURLHandler.h; sourceTree = "<group>"; };
 		9AAF74031366A4CF00D75E1E /* ViHTTPURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViHTTPURLHandler.m; sourceTree = "<group>"; };
-		9AAF740D13680F4900D75E1E /* ViBufferedStream.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ViBufferedStream.h; sourceTree = "<group>"; };
+		9AAF740D13680F4900D75E1E /* ViBufferedStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBufferedStream.h; sourceTree = "<group>"; };
 		9AAF740E13680F4900D75E1E /* ViBufferedStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferedStream.m; sourceTree = "<group>"; };
 		9AB10BA0133F72E600D81D33 /* NSEvent-keyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSEvent-keyAdditions.h"; sourceTree = "<group>"; };
 		9AB10BA1133F72E600D81D33 /* NSEvent-keyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSEvent-keyAdditions.m"; sourceTree = "<group>"; };
@@ -889,7 +860,6 @@
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
 				9A2EF4361331147C0023C5B7 /* Mozilla Universal charset detector */,
 				9A4346F01331381B002B04DE /* json */,
-				9A2EF3C513310CEC0023C5B7 /* sftp */,
 				9A43469B133115D4002B04DE /* More code */,
 				9A434699133115AB002B04DE /* Resources */,
 				9A2EF29A133109C20023C5B7 /* Supporting Files */,
@@ -936,32 +906,6 @@
 				9A2EF2BA133109C20023C5B7 /* tests-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		9A2EF3C513310CEC0023C5B7 /* sftp */ = {
-			isa = PBXGroup;
-			children = (
-				9A2EF3C613310D080023C5B7 /* atomicio.c */,
-				9A2EF3C713310D080023C5B7 /* atomicio.h */,
-				9A2EF3C813310D080023C5B7 /* bufaux.c */,
-				9A2EF3C913310D080023C5B7 /* buffer.c */,
-				9A2EF3CA13310D080023C5B7 /* buffer.h */,
-				9A2EF3CB13310D080023C5B7 /* fatal.c */,
-				9A2EF3CC13310D080023C5B7 /* log.c */,
-				9A2EF3CD13310D080023C5B7 /* log.h */,
-				9A2EF3CE13310D080023C5B7 /* misc.c */,
-				9A2EF3CF13310D080023C5B7 /* misc.h */,
-				9A2EF3D013310D080023C5B7 /* sftp-client.c */,
-				9A2EF3D113310D080023C5B7 /* sftp-client.h */,
-				9A2EF3D213310D080023C5B7 /* sftp-common.c */,
-				9A2EF3D313310D080023C5B7 /* sftp-common.h */,
-				9A2EF3D413310D080023C5B7 /* sftp.h */,
-				9A2EF3D513310D080023C5B7 /* vis.c */,
-				9A2EF3D613310D080023C5B7 /* vis.h */,
-				9A2EF3D713310D080023C5B7 /* xmalloc.c */,
-				9A2EF3D813310D080023C5B7 /* xmalloc.h */,
-			);
-			name = sftp;
 			sourceTree = "<group>";
 		};
 		9A2EF41213310F4D0023C5B7 /* lemon */ = {
@@ -1777,16 +1721,6 @@
 				9A2EF3C213310CB80023C5B7 /* ViWebView.m in Sources */,
 				9A2EF3C313310CB80023C5B7 /* ViWindow.m in Sources */,
 				9A2EF3C413310CB80023C5B7 /* ViWindowController.m in Sources */,
-				9A2EF3D913310D080023C5B7 /* atomicio.c in Sources */,
-				9A2EF3DA13310D080023C5B7 /* bufaux.c in Sources */,
-				9A2EF3DB13310D080023C5B7 /* buffer.c in Sources */,
-				9A2EF3DC13310D080023C5B7 /* fatal.c in Sources */,
-				9A2EF3DD13310D080023C5B7 /* log.c in Sources */,
-				9A2EF3DE13310D080023C5B7 /* misc.c in Sources */,
-				9A2EF3DF13310D080023C5B7 /* sftp-client.c in Sources */,
-				9A2EF3E013310D080023C5B7 /* sftp-common.c in Sources */,
-				9A2EF3E113310D080023C5B7 /* vis.c in Sources */,
-				9A2EF3E213310D080023C5B7 /* xmalloc.c in Sources */,
 				9A2EF469133114AE0023C5B7 /* CharDistribution.cpp in Sources */,
 				9A2EF46A133114AE0023C5B7 /* JpCntx.cpp in Sources */,
 				9A2EF46B133114AE0023C5B7 /* LangBulgarianModel.cpp in Sources */,

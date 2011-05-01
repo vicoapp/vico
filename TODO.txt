@@ -1,3 +1,11 @@
+REQUESTED
+=========
+
+* setting for default language syntax instead of text.plain
+* vim text objects, especially i[, a]
+* project search
+
+
 URGENT
 ========
 * vsplit with already open buffer switches tab!

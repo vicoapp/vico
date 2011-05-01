@@ -151,7 +151,7 @@
 		return nil;
 	}
 
-	return [conn writeData:data toFile:[aURL path] onResponse:aBlock];
+	return [conn writeDataSefely:data toFile:[aURL path] onResponse:aBlock];
 }
 
 @end

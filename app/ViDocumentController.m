@@ -174,6 +174,7 @@
                             display:(BOOL)displayDocument
                               error:(NSError **)outError
 {
+	absoluteURL = [absoluteURL absoluteURL];
 	DEBUG(@"open %@", absoluteURL);
 
 	ViWindowController *windowController = [ViWindowController currentWindowController];

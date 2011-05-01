@@ -5,7 +5,7 @@
 #import "ViScriptProxy.h"
 #import "ViURLManager.h"
 
-@interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate>
+@interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate>
 {
 	NSMutableSet *views;
 
@@ -20,7 +20,6 @@
 	BOOL isTemporary;
 
 	id<ViDeferred> loader;
-	BOOL acceptedBinaryLoad;
 	BOOL busy;
 
 	ViTextStorage *textStorage;

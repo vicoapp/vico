@@ -1,6 +1,7 @@
 #define FORCE_DEBUG
 #import "SFTPConnection.h"
 #import "ViError.h"
+#import "ViRegexp.h"
 
 #include "sys_queue.h"
 #include <sys/socket.h>
@@ -119,6 +120,8 @@ resp2txt(int type)
 @synthesize cancelled;
 @synthesize requestId;
 @synthesize subRequest;
+@synthesize progress;
+@synthesize delegate;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type
@@ -447,26 +450,12 @@ resp2txt(int type)
 	return NO;
 }
 
-- (void)readStandardError:(NSNotification *)notification
+- (void)reportConnectionStatus:(NSString *)status
 {
-	NSDictionary *userInfo = [notification userInfo];
-	NSData *data = [userInfo objectForKey:NSFileHandleNotificationDataItem];
-	if (data == nil) {
-		int err = [[userInfo objectForKey:@"NSFileHandleError"] intValue];
-		INFO(@"error: %s", strerror(err));
-		[self close];
-	} else if ([data length] == 0) {
-		INFO(@"End-of-file on ssh connection %@", [self hostWithUser]);
-		[self close];
-	} else {
-		[errbuf appendData:data];
-#ifndef NO_DEBUG
-		NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-		DEBUG(@"read data %@", str);
-#endif
-
-		[[ssh_error fileHandleForReading] readInBackgroundAndNotify];
-	}
+	DEBUG(@"reporting connection status [%@]", status);
+	for (SFTPRequest *req in [requests allValues])
+		if ([req.delegate respondsToSelector:@selector(deferred:status:)])
+			[req.delegate deferred:req status:status];
 }
 
 - (SFTPMessage *)readMessage
@@ -547,22 +536,59 @@ resp2txt(int type)
 	default:
 		break;
 	case NSStreamEventHasBytesAvailable:
-		[sshPipe getBuffer:&ptr length:&len];
-		DEBUG(@"got %lu bytes", len);
-		if (len > 0) {
-			[inbuf appendBytes:ptr length:len];
-			[self dispatchMessages];
+		if (stream == sshPipe) {
+			[sshPipe getBuffer:&ptr length:&len];
+			DEBUG(@"got %lu bytes", len);
+			if (len > 0) {
+				[inbuf appendBytes:ptr length:len];
+				[self dispatchMessages];
+			}
+		} else if (stream == errStream) {
+			[errStream getBuffer:&ptr length:&len];
+			DEBUG(@"got %lu bytes", len);
+			if (len > 0) {
+				[errbuf appendBytes:ptr length:len];
+
+				NSString *str = [[NSString alloc] initWithBytesNoCopy:(void *)ptr
+									       length:len
+									     encoding:NSISOLatin1StringEncoding
+									 freeWhenDone:NO];
+				DEBUG(@"read data: [%@]", str);
+
+				NSRange range = NSMakeRange(0, [str length]);
+				while (range.length > 0) {
+					DEBUG(@"looking for connect messages in range %@", NSStringFromRange(range));
+					unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
+					ViRegexp *rx = [[ViRegexp alloc] initWithString:@"^debug1: (Connecting to .*)$"
+										options:rx_options];
+					ViRegexpMatch *m = [rx matchInString:str range:range];
+					if (m == nil) {
+						rx = [[ViRegexp alloc] initWithString:@"^debug1: (connect to address .* port .*: .*)$"
+									      options:rx_options];
+						m = [rx matchInString:str range:range];
+					}
+					if (m) {
+						NSRange r = [m rangeOfSubstringAtIndex:1];
+						if (r.location != NSNotFound)
+							[self reportConnectionStatus:[str substringWithRange:r]];
+						r = [m rangeOfMatchedString];
+						range.location = NSMaxRange(r);
+						range.length = [str length] - range.location;
+					} else
+						break;
+				}
+			}
 		}
 		break;
 	case NSStreamEventHasSpaceAvailable:
 		break;
 	case NSStreamEventErrorOccurred:
 		INFO(@"error on stream %@: %@", stream, [stream streamError]);
-		[self close];
+		[self abort];
 		break;
 	case NSStreamEventEndEncountered:
 		DEBUG(@"EOF on stream %@", stream);
-		[self close];
+		[self abort];
 		break;
 	}
 }
@@ -685,30 +711,31 @@ resp2txt(int type)
 - (SFTPRequest *)realpath:(NSString *)path
 	       onResponse:(void (^)(NSString *, NSDictionary *, NSError *))responseCallback
 {
+	void (^originalCallback)(NSString *, NSDictionary *, NSError *) = Block_copy(responseCallback);
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REALPATH format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		uint32_t count;
 		NSError *error;
 
 		if (![msg expectType:SSH2_FXP_NAME error:&error]) {
-			responseCallback(nil, nil, error);
+			originalCallback(nil, nil, error);
 			[self close];
 		} else if (![msg getUnsigned:&count]) {
-			responseCallback(nil, nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+			originalCallback(nil, nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 			[self close];
 		} else if (count != 1) {
-			responseCallback(nil, nil, [ViError errorWithFormat:@"Got multiple names (%d) from SSH_FXP_REALPATH", count]);
+			originalCallback(nil, nil, [ViError errorWithFormat:@"Got multiple names (%d) from SSH_FXP_REALPATH", count]);
 		} else {
 			NSString *filename;
 			NSDictionary *attributes;
 
 			if (![msg getString:&filename] || ![msg getString:NULL] || ![msg getAttributes:&attributes]) {
-				responseCallback(nil, nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+				originalCallback(nil, nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 				[self close];
 			} else {
 				DEBUG(@"SSH_FXP_REALPATH %@ -> %@", path, filename);
 				DEBUG(@"attributes = %@", attributes);
-				responseCallback(filename, attributes, nil);
+				originalCallback(filename, attributes, nil);
 			}
 		}
 	};
@@ -829,11 +856,12 @@ resp2txt(int type)
 		inbuf = [NSMutableData data];
 		errbuf = [NSMutableData data];
 
-		[[ssh_error fileHandleForReading] readInBackgroundAndNotify];
-		[[NSNotificationCenter defaultCenter] addObserver:self
-							 selector:@selector(readStandardError:)
-							     name:NSFileHandleReadCompletionNotification
-							   object:[ssh_error fileHandleForReading]];
+		int err_fd = [[ssh_error fileHandleForReading] fileDescriptor];
+		errStream = [[ViBufferedStream alloc] initWithReadDescriptor:err_fd
+							     writeDescriptor:-1
+								    priority:0];
+		[errStream setDelegate:self];
+		[errStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
 		sshPipe = [[ViBufferedStream alloc] initWithTask:ssh_task];
 		[sshPipe setDelegate:self];
@@ -854,17 +882,18 @@ resp2txt(int type)
 - (SFTPRequest *)attributesOfItemAtPath:(NSString *)path
 			     onResponse:(void (^)(NSDictionary *, NSError *))responseCallback
 {
+	void (^originalCallback)(NSDictionary *, NSError *) = Block_copy(responseCallback);
 	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_STAT format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSDictionary *attributes;
 		NSError *error;
 		if (![msg expectType:SSH2_FXP_ATTRS error:&error])
-			responseCallback(nil, error);
+			originalCallback(nil, error);
 		else if (![msg getAttributes:&attributes])
-			responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+			originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 		else {
 			DEBUG(@"got attributes %@", attributes);
-			responseCallback(attributes, nil);
+			originalCallback(attributes, nil);
 		}
 	};
 
@@ -882,11 +911,13 @@ resp2txt(int type)
 		return nil;
 	}
 
+	void (^originalCallback)(BOOL, BOOL, NSError *) = Block_copy(responseCallback);
+
 	return [self attributesOfItemAtPath:path onResponse:^(NSDictionary *attributes, NSError *error) {
 		if (error) {
 			if ([error code] == SSH2_FX_NO_SUCH_FILE)
 				error = nil;
-			responseCallback(NO, NO, error);
+			originalCallback(NO, NO, error);
 			return;
 		}
 
@@ -897,26 +928,27 @@ resp2txt(int type)
 		uint32_t perms = (uint32_t)[attributes filePosixPermissions];
 		if (perms == 0) {
 			/* Attributes didn't include permissions, probably because we couldn't read them. */
-			responseCallback(NO, NO, [ViError errorWithCode:SSH2_FX_PERMISSION_DENIED
+			originalCallback(NO, NO, [ViError errorWithCode:SSH2_FX_PERMISSION_DENIED
 								 format:@"Permission denied"]);
 		} else {
 			DEBUG(@"got permissions %06o", perms);
-			responseCallback(YES, [[attributes fileType] isEqualToString:NSFileTypeDirectory], nil);
+			originalCallback(YES, [[attributes fileType] isEqualToString:NSFileTypeDirectory], nil);
 		}
 	}];
 }
 
 - (void)closeHandle:(NSData *)handle
-	    onError:(void (^)(NSError *))errorCallback
-	  onSuccess:(void (^)(SFTPMessage *))successCallback
+	 onResponse:(void (^)(NSError *))responseCallback
 {
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+
 	SFTPRequest *req = [self addRequest:SSH2_FXP_CLOSE format:"d", handle];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])
-			errorCallback(error);
-		else if (successCallback)
-			successCallback(msg);
+			originalCallback(error);
+		else
+			originalCallback(nil);
 	};
 }
 
@@ -936,15 +968,17 @@ resp2txt(int type)
 		return nil;
 	}
 
+	void (^originalCallback)(NSArray *, NSError *) = Block_copy(responseCallback);
+
 	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", path];
 	openRequest.onResponse = ^(SFTPMessage *msg) {
 		NSData *handle;
 		NSError *error;
 		if (![msg expectType:SSH2_FXP_HANDLE error:&error]) {
-			responseCallback(nil, error);
+			originalCallback(nil, error);
 			return;
 		} else if (![msg getBlob:&handle]) {
-			responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+			originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 			[self close];
 			return;
 		}
@@ -956,10 +990,11 @@ resp2txt(int type)
 		cancelfun = Block_copy(^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 			[self closeHandle:handle
-				  onError:^(NSError *error) {
+			       onResponse:^(NSError *error) {
+				if (error)
 					INFO(@"failed to close file after cancel: %@",
-					    [error localizedDescription]); }
-				onSuccess:nil];
+					    [error localizedDescription]);
+			}];
 		});
 
 		/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
@@ -969,18 +1004,21 @@ resp2txt(int type)
 			uint32_t count;
 			if (msg.type == SSH2_FXP_STATUS) {
 				if (![msg expectStatus:SSH2_FX_EOF error:&error])
-					responseCallback(nil, error);
+					originalCallback(nil, error);
 				else {
 					[self closeHandle:handle
-						  onError:^(NSError *error) { responseCallback(nil, error); }
-						onSuccess:^(SFTPMessage *msg) {
+					       onResponse:^(NSError *error) {
+						if (error)
+							originalCallback(nil, error);
+						else {
 							[directoryCache setObject:entries forKey:path];
-							responseCallback(entries, nil);
+							originalCallback(entries, nil);
+						}
 					}];
 				}
 				return;
 			} else if (msg.type != SSH2_FXP_NAME || ![msg getUnsigned:&count]) {
-				responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+				originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 				[self close];
 				return;
 			}
@@ -991,7 +1029,7 @@ resp2txt(int type)
 				if (![msg getString:&filename] ||
 				    ![msg getString:NULL] || /* ignore longname */
 				    ![msg getAttributes:&attributes]) {
-					responseCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+					originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 					[self close];
 					return;
 				}
@@ -1023,13 +1061,14 @@ resp2txt(int type)
 - (SFTPRequest *)createDirectory:(NSString *)path
 		      onResponse:(void (^)(NSError *))responseCallback
 {
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
 	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"pa", path, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])
-			responseCallback(error);
+			originalCallback(error);
 		else
-			responseCallback(nil);
+			originalCallback(nil);
 	};
 	return req;
 }
@@ -1042,7 +1081,6 @@ resp2txt(int type)
 - (void)close
 {
 	INFO(@"Closing connection %@", sshPipe);
-	INFO(@"outstanding requests: %@", requests); // XXX: cancel them? only on "nice" close?
 	[sshPipe close];
 	sshPipe = nil;
 	[ssh_task terminate];
@@ -1050,336 +1088,279 @@ resp2txt(int type)
 	ssh_input = ssh_output = ssh_error = nil;
 }
 
+- (void)abort
+{
+	[self close];
+	INFO(@"cancelling outstanding requests: %@", requests);
+	for (SFTPRequest *req in [requests allValues])
+		[req cancel];
+	[requests removeAllObjects];
+}
+
 - (BOOL)closed
 {
 	return sshPipe == nil;
+}
+
+- (SFTPRequest *)openFile:(NSString *)path
+	       forWriting:(BOOL)isWrite
+	       onResponse:(void (^)(NSData *handle, NSError *error))responseCallback
+{
+	uint32_t mode;
+	if (isWrite)
+		mode = SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_EXCL;
+	else
+		mode = SSH2_FXF_READ;
+
+	void (^originalCallback)(NSData *, NSError *) = Block_copy(responseCallback);
+
+	SFTPRequest *req = [self addRequest:SSH2_FXP_OPEN format:"sua", path, mode, [NSDictionary dictionary]];
+	req.onResponse = ^(SFTPMessage *msg) {
+		NSError *error;
+		NSData *handle;
+		if (![msg expectType:SSH2_FXP_HANDLE error:&error]) {
+			originalCallback(nil, error);
+			return;
+		} else if (![msg getBlob:&handle]) {
+			originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
+			[self close];
+			return;
+		}
+
+		DEBUG(@"opened file %@ on handle %@", path, handle);
+		originalCallback(handle, nil);
+	};
+
+	return req;
 }
 
 - (SFTPRequest *)dataWithContentsOfFile:(NSString *)path
 				 onData:(void (^)(NSData *))dataCallback
 			     onResponse:(void (^)(NSError *))responseCallback
 {
-	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPEN format:"sua",
-	    path, SSH2_FXF_READ, [NSDictionary dictionary] /* Send empty attributes. */];
-	openRequest.onResponse = ^(SFTPMessage *openResponse) {
-		NSError *error;
-		NSData *handle;
-		if (![openResponse expectType:SSH2_FXP_HANDLE error:&error]) {
-			responseCallback(error);
-			return;
-		} else if (![openResponse getBlob:&handle]) {
-			responseCallback([ViError errorWithFormat:@"SFTP protocol error"]);
-			[self close];
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+
+	__block SFTPRequest *statRequest = nil;
+
+	void (^fun)(NSDictionary *, NSError *) = ^(NSDictionary *attributes, NSError *error) {
+		INFO(@"statRequest is %@", statRequest);
+
+		if (error) {
+			originalCallback(error);
 			return;
 		}
 
-		DEBUG(@"opened file %@ on handle %@", path, handle);
+		NSUInteger fileSize = [attributes fileSize]; /* may be zero */
+		statRequest.progress = 0.0;
 
-		__block int num_req = 0;
-		__block int max_req = 1;
-		__block uint64_t offset = 0;
-		__block uint32_t len = transfer_buflen;
+		statRequest.subRequest = [self openFile:path forWriting:NO onResponse:^(NSData *handle, NSError *error) {
+			__block uint64_t offset = 0;
+			__block uint32_t len = transfer_buflen;
+
+			void (^cancelfun)(SFTPRequest *);
+			cancelfun = Block_copy(^(SFTPRequest *req) {
+				DEBUG(@"%@ cancelled, closing handle %@", req, handle);
+				responseCallback([NSError errorWithDomain:NSCocoaErrorDomain
+								     code:NSUserCancelledError
+								 userInfo:nil]);
+				[self closeHandle:handle
+				       onResponse:^(NSError *error) {
+					if (error)
+						INFO(@"failed to close file after cancel: %@",
+						    [error localizedDescription]);
+				}];
+			});
+
+			__block void (^readfun)(SFTPMessage *);
+			readfun = Block_copy(^(SFTPMessage *msg) {
+				NSError *error;
+				if (msg.type == SSH2_FXP_STATUS) {
+					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
+						originalCallback(error);
+						[self closeHandle:handle
+						       onResponse:^(NSError *error) {
+							if (error)
+								INFO(@"failed to close file after read error: %@",
+								    [error localizedDescription]);
+						}];
+						statRequest.subRequest = nil;
+						return;
+					}
+					DEBUG(@"%s", "got EOF, closing handle");
+					[self closeHandle:handle
+						  onResponse:^(NSError *error) { originalCallback(error); }];
+					statRequest.subRequest = nil;
+					/*
+					 * Done downloading file.
+					 */
+					 return;
+				} else if (![msg expectType:SSH2_FXP_DATA error:&error]) {
+					originalCallback(error);
+					[self closeHandle:handle
+					       onResponse:^(NSError *error) {
+						if (error)
+							INFO(@"failed to close file after protocol error: %@",
+							    [error localizedDescription]);
+					}];
+					statRequest.subRequest = nil;
+					return;
+				}
+
+				NSData *data;
+				if (![msg getBlob:&data]) {
+					originalCallback([ViError errorWithFormat:@"SFTP protocol error"]);
+					[self close];
+					statRequest.subRequest = nil;
+					return;
+				}
+
+				DEBUG(@"got %lu bytes of data, requested %u", [data length], len);
+				if (dataCallback)
+					dataCallback(data);
+				offset += [data length];
+				if (fileSize > 0)
+					statRequest.progress = (CGFloat)offset / (CGFloat)fileSize;
+				else
+					statRequest.progress = -1.0; /* unknown/indefinite progress */
+
+				/* Data callback may have cancelled us. */
+				if (statRequest.cancelled)
+					return;
+
+				if ([data length] < len)
+					len = (uint32_t)[data length];
+
+				/* Dispatch next read request. */
+				for (int i = 0; i < 1/*max_req*/; i++) {
+					DEBUG(@"requesting %u bytes at offset %lu", len, offset);
+					SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
+					req.onResponse = readfun;
+					req.onCancel = cancelfun;
+					statRequest.subRequest = req;
+				}
+			});
+
+			/* Dispatch first read request. */
+			DEBUG(@"requesting %u bytes at offset %lu", len, offset);
+			SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
+			req.onResponse = readfun;
+			req.onCancel = cancelfun;
+			statRequest.subRequest = req;
+		}];
+	};
+
+	statRequest = [self attributesOfItemAtPath:path onResponse:fun];
+	DEBUG(@"returning statRequest %@", statRequest);
+	return statRequest;
+}
+
+- (NSString *)randomFileAtDirectory:(NSString *)aDirectory
+{
+	char tmp[37];
+	uuid_t uuid;
+	uuid_generate(uuid);
+	uuid_unparse(uuid, tmp);
+
+	return [aDirectory stringByAppendingPathComponent:[NSString stringWithUTF8String:tmp]];
+}
+
+- (SFTPRequest *)uploadData:(NSData *)data
+		     toFile:(NSString *)path
+		 onResponse:(void (^)(NSError *))responseCallback
+{
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	__block SFTPRequest *openRequest = nil;
+
+	void (^fun)(NSData *, NSError *) = ^(NSData *handle, NSError *error) {
+		INFO(@"openRequest is %@", openRequest);
+
+		if (error) {
+			originalCallback(error);
+			return;
+		}
 
 		void (^cancelfun)(SFTPRequest *);
 		cancelfun = Block_copy(^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
+			responseCallback([NSError errorWithDomain:NSCocoaErrorDomain
+							     code:NSUserCancelledError
+							 userInfo:nil]);
 			[self closeHandle:handle
-				  onError:^(NSError *error) {
-					INFO(@"failed to close file after cancel: %@", [error localizedDescription]); }
-				onSuccess:nil];
+			       onResponse:^(NSError *error) {
+				if (error)
+					INFO(@"failed to close file after cancel: %@",
+					    [error localizedDescription]);
+			}];
 		});
 
-		__block void (^readfun)(SFTPMessage *);
-		readfun = Block_copy(^(SFTPMessage *msg) {
+		__block uint64_t offset = 0;
+
+		__block void (^writefun)(SFTPMessage *);
+		writefun = Block_copy(^(SFTPMessage *msg) {
 			NSError *error;
-			if (msg.type == SSH2_FXP_STATUS) {
-				if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
-					responseCallback(error);
-					[self closeHandle:handle
-						  onError:^(NSError *error) {
-							INFO(@"failed to close file after read error: %@",
-							    [error localizedDescription]); }
-						onSuccess:nil];
-					openRequest.subRequest = nil;
-					return;
-				}
-				DEBUG(@"%s", "got EOF, closing handle");
-				max_req = 0;
-				num_req--;
+			if (![msg expectStatus:SSH2_FX_OK error:&error]) {
+				originalCallback(error);
 				[self closeHandle:handle
-					  onError:^(NSError *error) { responseCallback(error); }
-					onSuccess:^(SFTPMessage *msg) { responseCallback(nil); }];
+				       onResponse:^(NSError *error) {
+					if (error)
+						INFO(@"failed to close file after write error: %@",
+						    [error localizedDescription]);
+				}];
 				openRequest.subRequest = nil;
-				/*
-				 * Done downloading file.
-				 */
+				return;
+			}
+
+			if (offset == [data length]) {
+				DEBUG(@"finished uploading %lu bytes, closing file", [data length]);
+				[self closeHandle:handle
+				       onResponse:^(NSError *error) { originalCallback(error); }];
+				openRequest.subRequest = nil;
 				 return;
-			} else if (![msg expectType:SSH2_FXP_DATA error:&error]) {
-				responseCallback(error);
-				[self closeHandle:handle
-					  onError:^(NSError *error) {
-						INFO(@"failed to close file after protocol error: %@",
-						    [error localizedDescription]); }
-					onSuccess:nil];
-				openRequest.subRequest = nil;
-				return;
 			}
-
-			NSData *data;
-			if (![msg getBlob:&data]) {
-				responseCallback([ViError errorWithFormat:@"SFTP protocol error"]);
-				[self close];
-				openRequest.subRequest = nil;
-				return;
-			}
-
-			DEBUG(@"got %lu bytes of data, requested %u", [data length], len);
-			if (dataCallback)
-				dataCallback(data);
-			offset += [data length];
-
-			/* Data callback may have cancelled us. */
-			if (openRequest.cancelled)
-				return;
-
-			if ([data length] < len)
-				len = (uint32_t)[data length];
 
 			/* Dispatch next read request. */
-			for (int i = 0; i < 1/*max_req*/; i++) {
-				DEBUG(@"requesting %u bytes at offset %lu", len, offset);
-				SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
-				req.onResponse = readfun;
-				req.onCancel = cancelfun;
-				openRequest.subRequest = req;
-			}
+			uint32_t len = transfer_buflen;
+			if (offset + len > [data length])
+				len = (uint32_t)([data length] - offset);
+			NSData *chunk = [NSData dataWithBytesNoCopy:(void *)[data bytes] + offset length:len freeWhenDone:NO];
+			DEBUG(@"writing %u bytes at offset %lu", len, offset);
+			SFTPRequest *req = [self addRequest:SSH2_FXP_WRITE format:"dqd", handle, offset, chunk];
+			offset += len;
+			req.onResponse = writefun;
+			req.onCancel = cancelfun;
+			openRequest.subRequest = req;
 		});
 
 		/* Dispatch first read request. */
-		DEBUG(@"requesting %u bytes at offset %lu", len, offset);
-		SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
-		req.onResponse = readfun;
+		uint32_t len = transfer_buflen;
+		if (offset + len > [data length])
+			len = (uint32_t)([data length] - offset);
+		NSData *chunk = [NSData dataWithBytesNoCopy:(void *)[data bytes] + offset length:len freeWhenDone:NO];
+		DEBUG(@"writing %u bytes at offset %lu", len, offset);
+		SFTPRequest *req = [self addRequest:SSH2_FXP_WRITE format:"dqd", handle, offset, chunk];
+		offset += len;
+		req.onResponse = writefun;
 		req.onCancel = cancelfun;
 		openRequest.subRequest = req;
 	};
 
+	openRequest = [self openFile:path forWriting:YES onResponse:fun];
+
+	INFO(@"returning openRequest %@", openRequest);
 	return openRequest;
-}
-
-#if 0
-- (NSString *)randomFileAtDirectory:(NSString *)aDirectory
-{
-	char remote_temp_file[37];
-	NSString *remote_temp_path = nil;
-	do
-	{
-		uuid_t uuid;
-		uuid_generate(uuid);
-		uuid_unparse(uuid, remote_temp_file);
-		remote_temp_path = [aDirectory stringByAppendingPathComponent:[NSString stringWithUTF8String:remote_temp_file]];
-	} while ([self stat:remote_temp_path error:nil] != NULL);
-
-	return remote_temp_path;
-}
-#endif
-
-- (BOOL)uploadData:(NSData *)data
-            toFile:(NSString *)path
-    withAttributes:(NSDictionary *)attributes
-             error:(NSError **)outError
-{
-	if (outError)
-		*outError = [ViError errorWithFormat:@"not implemented"];
-	return NO;
-
-#if 0
-	NSUInteger dataOffset = 0;
-	const void *bytes;
-
-	const char *remote_path = [path fileSystemRepresentation];
-	if (remote_path == NULL)
-		return NO;
-
-	u_int status = SSH2_FX_OK;
-	char type;
-	u_int handle_len, req_id;
-	off_t offset;
-	char *handle;
-	Buffer msg;
-	Attrib a;
-	u_int32_t startid;
-	u_int32_t ackid;
-	struct outstanding_ack {
-		u_int req_id;
-		u_int len;
-		off_t offset;
-		TAILQ_ENTRY(outstanding_ack) tq;
-	};
-	TAILQ_HEAD(, outstanding_ack) acks;
-	struct outstanding_ack *ack = NULL;
-
-	TAILQ_INIT(&acks);
-
-	if (remote_attribs == NULL) {
-		attrib_clear(&a);
-		remote_attribs = &a;
-	}
-
-	remote_attribs->flags &= ~SSH2_FILEXFER_ATTR_SIZE;
-	remote_attribs->flags &= ~SSH2_FILEXFER_ATTR_UIDGID;
-	remote_attribs->perm &= 0777;
-	remote_attribs->flags &= ~SSH2_FILEXFER_ATTR_ACMODTIME;
-
-	buffer_init(&msg);
-
-	/* Send open request */
-	req_id = msg_id++;
-	buffer_put_char(&msg, SSH2_FXP_OPEN);
-	buffer_put_int(&msg, req_id);
-	buffer_put_cstring(&msg, remote_path);
-	buffer_put_int(&msg, SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_TRUNC);
-	encode_attrib(&msg, remote_attribs);
-	send_msg(fd_out, &msg);
-	DEBUG(@"Sent message SSH2_FXP_OPEN I:%u P:%@", req_id, path);
-
-	buffer_clear(&msg);
-
-	if (![self getHandle:&handle length:&handle_len expectingID:req_id error:outError]) {
-		buffer_free(&msg);
-		return NO;
-	}
-
-	startid = ackid = req_id + 1;
-
-	/* Read from NSData and write to remote */
-	offset = 0;
-
-	for (;;) {
-		int len;
-
-		/*
-		 * Can't use atomicio here because it returns 0 on EOF,
-		 * thus losing the last block of the file.
-		 */
-		if (status != SSH2_FX_OK)
-			len = 0;
-		else {
-			len = transfer_buflen;
-			if (dataOffset + len > [data length])
-				len = (int)([data length]- dataOffset);
-			bytes = [data bytes] + dataOffset;
-			dataOffset += len;
-		}
-
-		if (len != 0) {
-			ack = xmalloc(sizeof(*ack));
-			ack->req_id = ++req_id;
-			ack->offset = offset;
-			ack->len = len;
-			TAILQ_INSERT_TAIL(&acks, ack, tq);
-
-			buffer_clear(&msg);
-			buffer_put_char(&msg, SSH2_FXP_WRITE);
-			buffer_put_int(&msg, ack->req_id);
-			buffer_put_string(&msg, handle, handle_len);
-			buffer_put_int64(&msg, offset);
-			buffer_put_string(&msg, bytes, len);
-			send_msg(fd_out, &msg);
-			DEBUG(@"Sent message SSH2_FXP_WRITE I:%u O:%llu S:%u",
-			    req_id, (unsigned long long)offset, len);
-		} else if (TAILQ_FIRST(&acks) == NULL)
-			break;
-
-		if (ack == NULL) {
-			if (outError)
-				*outError = [ViError errorWithFormat:@"Unexpected ACK %u", req_id];
-			goto fail;
-		}
-
-		if (req_id == startid || len == 0 ||
-		    req_id - ackid >= NUM_REQUESTS) {
-			u_int r_id;
-
-			buffer_clear(&msg);
-			if (![self readMsg:&msg error:outError] ||
-			    ![self readChar:&type from:&msg error:outError] ||
-			    ![self readInt:&r_id from:&msg error:outError]) {
-				buffer_free(&msg);
-				return NO;
-			}
-
-			if (type != SSH2_FXP_STATUS) {
-				if (outError)
-					*outError = [ViError errorWithFormat:
-					    @"Expected SSH2_FXP_STATUS(%d) packet, got %d",
-					    SSH2_FXP_STATUS, type];
-				goto fail;
-			}
-
-			if (![self readInt:&status from:&msg error:outError]) {
-				buffer_free(&msg);
-				return NO;
-			}
-			DEBUG(@"SSH2_FXP_STATUS %d", status);
-
-			/* Find the request in our queue */
-			for (ack = TAILQ_FIRST(&acks);
-			    ack != NULL && ack->req_id != r_id;
-			    ack = TAILQ_NEXT(ack, tq))
-				;
-			if (ack == NULL) {
-				if (outError)
-					*outError = [ViError errorWithFormat:
-					    @"Can't find request for ID %u", r_id];
-				goto fail;
-			}
-			TAILQ_REMOVE(&acks, ack, tq);
-			DEBUG(@"In write loop, ack for %u %u bytes at %lld",
-			    ack->req_id, ack->len, (long long)ack->offset);
-			++ackid;
-			xfree(ack);
-		}
-		offset += len;
-		if (offset < 0) {
-			if (outError)
-				*outError = [ViError errorWithFormat:@"offset < 0 while uploading."];
-			goto fail;
-		}
-	}
-	buffer_free(&msg);
-
-	if (status != SSH2_FX_OK) {
-		if (outError)
-			*outError = [ViError errorWithFormat:
-			    @"Couldn't write to remote file \"%@\": %s",
-			    path, fx2txt(status)];
-		goto fail;
-	}
-
-	goto done;
-
-fail:
-	status = -1;
-done:
-	if (![self closeHandle:handle length:handle_len error:outError])
-		status = -1;
-
-	xfree(handle);
-
-	return status == 0 ? YES : NO;
-#endif
 }
 
 - (SFTPRequest *)removeItemAtPath:(NSString *)path
 		       onResponse:(void (^)(NSError *))responseCallback
 {
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REMOVE format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])
-			responseCallback(error);
+			originalCallback(error);
 		else
-			responseCallback(nil);
+			originalCallback(nil);
 	};
 	return req;
 }
@@ -1388,62 +1369,114 @@ done:
 			   toPath:(NSString *)newPath
 		       onResponse:(void (^)(NSError *))responseCallback
 {
-	SFTPRequest *req;
-	if ([self hasPosixRename])
-		req = [self addRequest:SSH2_FXP_EXTENDED format:"sss", @"posix-rename@openssh.com", oldPath, newPath];
-	else
-		req = [self addRequest:SSH2_FXP_RENAME format:"ss", oldPath, newPath];
-
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	SFTPRequest *req = [self addRequest:SSH2_FXP_RENAME format:"ss", oldPath, newPath];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])
-			responseCallback(error);
+			originalCallback(error);
 		else
-			responseCallback(nil);
+			originalCallback(nil);
 	};
 
 	return req;
 }
 
-- (SFTPRequest *)writeData:(NSData *)data
-		    toFile:(NSString *)path
-		onResponse:(void (^)(NSError *))responseCallback
+- (SFTPRequest *)atomicallyRenameItemAtPath:(NSString *)oldPath
+				     toPath:(NSString *)newPath
+				 onResponse:(void (^)(NSError *))responseCallback
 {
-	responseCallback([ViError errorWithFormat:@"not implemented"]);
-	return nil;
-
-#if 0
-	Attrib *attr = [self stat:path error:nil];
-
-	if (attr == NULL) {
-		/* New file. */
-		return [self uploadData:data toFile:path withAttributes:attr error:outError];
-	}
-
-	NSString *tmp = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
-
-	if (![self uploadData:data toFile:tmp withAttributes:attr error:outError])
-		return NO;
-
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	__block SFTPRequest *renameRequest = nil;
 	if ([self hasPosixRename]) {
 		/*
 		 * With POSIX rename support, we're guaranteed to be able to atomically replace the file.
 		 */
-		return [self renameItemAtPath:tmp toPath:path error:outError];
+		renameRequest = [self addRequest:SSH2_FXP_EXTENDED format:"sss", @"posix-rename@openssh.com", oldPath, newPath];
+		renameRequest.onResponse = ^(SFTPMessage *msg) {
+			NSError *error;
+			if (![msg expectStatus:SSH2_FX_OK error:&error])
+				originalCallback(error);
+			else
+				originalCallback(nil);
+		};
 	} else {
 		/*
 		 * Without POSIX rename support, first move away the existing file, rename our temporary file
-		 * to correct name, and finally delete the moved away original file.
+		 * to correct name, and finally delete the original file.
 		 */
-		NSString *tmp2 = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
-		if ([self renameItemAtPath:path toPath:tmp2 error:outError] &&
-		    [self renameItemAtPath:tmp toPath:path error:outError] &&
-		    [self removeItemAtPath:tmp2 error:outError])
-			return YES;
+		NSString *dir = [oldPath stringByDeletingLastPathComponent];
+		NSString *randomFilename = [self randomFileAtDirectory:dir];
+
+		void (^fun)(NSError *error) = ^(NSError *error) {
+			INFO(@"renameRequest is %@", renameRequest);
+			BOOL newPathExists = YES;
+			if (error) {
+				if ([error code] == SSH2_FX_NO_SUCH_FILE)
+					newPathExists = NO;
+				else {
+					originalCallback(error);
+					return;
+				}
+			}
+
+			renameRequest.subRequest = [self renameItemAtPath:oldPath toPath:newPath onResponse:^(NSError *error) {
+				if (!newPathExists) {
+					/* If the new path didn't exist, we're done. */
+					originalCallback(error);
+					return;
+				}
+
+				/* Otherwise, we must clean up the temporary random filename. */
+				renameRequest.subRequest = [self removeItemAtPath:randomFilename onResponse:^(NSError *error) {
+					originalCallback(error);
+				}];
+			}];
+		};
+
+		renameRequest = [self renameItemAtPath:newPath toPath:randomFilename onResponse:fun];
 	}
 
-	return NO;
-#endif
+	INFO(@"returning renameRequest %@", renameRequest);
+	return renameRequest;
+}
+
+- (SFTPRequest *)writeDataSefely:(NSData *)data
+			  toFile:(NSString *)path
+		      onResponse:(void (^)(NSError *))responseCallback
+{
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	__block SFTPRequest *uploadRequest = nil;
+
+	void (^fun)(NSError *) = ^(NSError *error) {
+		INFO(@"uploadRequest is %@", uploadRequest);
+		if (error && [error code] == SSH2_FX_FAILURE) {
+			/* File already exists. Probably. */
+			/* Upload to a random file, then rename it to our destination filename. */
+			NSString *randomFilename = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+			uploadRequest.subRequest = [self uploadData:data
+							   toFile:randomFilename
+						       onResponse:^(NSError *error) {
+				INFO(@"uploadRequest is hopefully still %@", uploadRequest);
+				if (error)
+					originalCallback(error);
+				else
+					uploadRequest.subRequest = [self atomicallyRenameItemAtPath:randomFilename
+											   toPath:path
+										       onResponse:^(NSError *error) {
+											     originalCallback(error);
+										     }];
+			}];
+		} else {
+			/* It was a new file, upload successful. Or other error. */
+			originalCallback(error);
+		}
+	};
+
+	uploadRequest = [self uploadData:data toFile:path onResponse:fun];
+
+	INFO(@"returning uploadRequest %@", uploadRequest);
+	return uploadRequest;
 }
 
 - (NSString *)hostWithUser

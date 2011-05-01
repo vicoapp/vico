@@ -111,14 +111,20 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	INFO(@"alert is %@", alert);
 }
 
-- (id)initWithContentsOfURL:(NSURL *)absoluteURL
-                     ofType:(NSString *)typeName
-                      error:(NSError **)outError
+- (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage
 {
-	DEBUG(@"init with URL %@ of type %@", absoluteURL, typeName);
+	INFO(@"got status message {{%@}}", statusMessage);
+	[self message:@"%@", statusMessage];
+}
+
+- (BOOL)readFromURL:(NSURL *)absoluteURL
+	     ofType:(NSString *)typeName
+	      error:(NSError **)outError
+{
+	__block BOOL firstChunk = YES;
 
 	void (^dataCallback)(NSData *data) = ^(NSData *data) {
-		if (!acceptedBinaryLoad && [self dataAppearsBinary:data]) {
+		if (firstChunk && [self dataAppearsBinary:data]) {
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:[NSString stringWithFormat:@"%@ appears to be a binary file",
 				[absoluteURL lastPathComponent]]];
@@ -130,14 +136,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				INFO(@"cancelling deferred %@", loader);
 				[loader cancel];
 				return;
-			} else
-				acceptedBinaryLoad = YES;
+			}
 		}
+		if (firstChunk)
+			[self setString:@""]; /* Make sure document is empty before appending data. */
 		[self addData:data];
+		firstChunk = NO;
+
+		if ([loader respondsToSelector:@selector(progress)]) {
+			CGFloat progress = [loader progress];
+			[self message:@"%.1f%% loaded", progress * 100.0];
+		}
 	};
+
+	/* If the completion callback is called immediately, we can return an error directly. */
+	__block NSError *returnError = nil;
 
 	void (^completionCallback)(NSError *error) = ^(NSError *error) {
 		INFO(@"error is %@", error);
+		returnError = error;
 		busy = NO;
 		loader = nil;
 		if (error) {
@@ -149,8 +166,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				[self setIsTemporary:YES];
 				[self setFileURL:absoluteURL];
 				[self message:@"%@: new file", [self title]];
+			} else if ([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError) {
+				[self message:@"cancelled loading of %@", absoluteURL];
 			} else {
-				/* Make sure this document has focus, and show alert sheet. */
+				/* Make sure this document has focus, then show an alert sheet. */
 				[windowController selectDocument:self];
 
 				NSAlert *alert = [[NSAlert alloc] init];
@@ -163,19 +182,38 @@ BOOL makeNewWindowInsteadOfTab = NO;
 						 didEndSelector:@selector(openFailedAlertDidEnd:returnCode:contextInfo:)
 						    contextInfo:nil];
 			}
-		} else
+		} else {
+			[self setIsTemporary:NO];
 			[self setFileURL:absoluteURL];
+			[proxy emitDelayed:@"didLoad" with:self, nil];
+		}
 	};
+
+	busy = YES;
+	loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
+							       onData:dataCallback
+							 onCompletion:completionCallback];
+	DEBUG(@"got deferred loader %@", loader);
+	[loader setDelegate:self];
+
+	if (outError)
+		*outError = returnError;
+
+//	if (deferred)
+//		[self message:@"loading %@...", absoluteURL];
+
+	return returnError == nil ? YES : NO;
+}
+
+- (id)initWithContentsOfURL:(NSURL *)absoluteURL
+                     ofType:(NSString *)typeName
+                      error:(NSError **)outError
+{
+	DEBUG(@"init with URL %@ of type %@", absoluteURL, typeName);
 
 	self = [self init];
 	if (self) {
-		busy = YES;
-		loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
-								       onData:dataCallback
-								 onCompletion:completionCallback];
-
-//		if (deferred)
-//			[self message:@"loading %@...", absoluteURL];
+		[self readFromURL:absoluteURL ofType:typeName error:outError];
 	}
 
 	return self;
@@ -454,8 +492,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	/* Force incremental syntax parsing. */
 	[self highlightEverything];
-
-	[proxy emitDelayed:@"didLoad" with:self, nil];
 }
 
 - (void)setEncoding:(id)sender

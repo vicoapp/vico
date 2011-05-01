@@ -77,7 +77,7 @@
 	[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
 		aBlock(error);
 	}];
-	return YES;
+	return nil;
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL

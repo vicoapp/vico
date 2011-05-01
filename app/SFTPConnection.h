@@ -121,11 +121,14 @@
 	SFTPConnection *connection;
 	BOOL cancelled;
 	SFTPRequest *subRequest;
+	CGFloat progress;
+	id<ViDeferredDelegate> delegate;
 }
 @property (copy) void (^onResponse)(SFTPMessage *);
 @property (copy) void (^onCancel)(SFTPRequest *);
 @property (readwrite, assign) SFTPRequest *subRequest;
 @property (readwrite) BOOL cancelled;
+@property (readwrite) CGFloat progress;
 @property (readonly) uint32_t requestId;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
@@ -147,6 +150,8 @@
 	NSString *user;
 	NSString *home;		/* home directory == current directory on connect */
 
+	id delegate;
+
 	NSTask *ssh_task;
 	NSPipe *ssh_input;
 	NSPipe *ssh_output;
@@ -163,6 +168,7 @@
 	NSMutableData *errbuf;
 
 	ViBufferedStream *sshPipe;
+	ViBufferedStream *errStream;
 
 	uint32_t nextRequestId;
 	uint32_t transfer_buflen;
@@ -201,18 +207,23 @@
 			   toPath:(NSString *)newPath
 		       onResponse:(void (^)(NSError *))responseCallback;
 
+- (SFTPRequest *)atomicallyRenameItemAtPath:(NSString *)oldPath
+				     toPath:(NSString *)newPath
+				 onResponse:(void (^)(NSError *))responseCallback;
+
 - (SFTPRequest *)removeItemAtPath:(NSString *)path
 		       onResponse:(void (^)(NSError *))responseCallback;
 
-- (SFTPRequest *)writeData:(NSData *)data
-		    toFile:(NSString *)path
-		onResponse:(void (^)(NSError *))responseCallback;
+- (SFTPRequest *)writeDataSefely:(NSData *)data
+			  toFile:(NSString *)path
+		      onResponse:(void (^)(NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
 - (void)flushDirectoryCache;
 - (NSString *)hostWithUser;
 - (NSString *)stderr;
 - (BOOL)hasPosixRename;
+- (void)abort;
 - (void)close;
 - (BOOL)closed;
 

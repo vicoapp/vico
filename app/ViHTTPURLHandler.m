@@ -5,6 +5,8 @@
 
 @implementation ViHTTPDeferred
 
+@synthesize delegate;
+
 - (id)initWithURL:(NSURL *)aURL
 	   onData:(void (^)(NSData *data))aDataCallback
      onCompletion:(void (^)(NSError *error))aCompletionCallback
@@ -71,7 +73,8 @@
 - (void)cancel
 {
 	[conn cancel];
-	[self finishWithError:[ViError errorWithFormat:@"Request cancelled"]];
+	/* Prevent error display. */
+	[self finishWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
 }
 
 @end

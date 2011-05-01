@@ -7,6 +7,7 @@
 	void (^dataCallback)(NSData *data);
 	void (^completionCallback)(NSError *error);
 	NSUInteger receivedContentLength, expectedContentLength;
+	id<ViDeferredDelegate> delegate;
 }
 
 - (void)cancel;

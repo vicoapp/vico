@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #include <sys/uio.h>
 #include <unistd.h>
 
@@ -83,7 +82,7 @@
 	}
 }
 
-void	 hexdump(void *data, size_t len, const char *fmt, ...);
+void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 - (int)flush
 {
@@ -167,8 +166,9 @@ fd_write(CFSocketRef s,
 	}
 }
 
-- (id)initWithReadFileDescriptor:(int)read_fd
-	     writeFileDescriptor:(int)write_fd
+- (id)initWithReadDescriptor:(int)read_fd
+	     writeDescriptor:(int)write_fd
+		    priority:(int)prio
 {
 	DEBUG(@"init with read fd %d, write fd %d", read_fd, write_fd);
 
@@ -178,51 +178,57 @@ fd_write(CFSocketRef s,
 
 		outputBuffers = [NSMutableArray array];
 
-		int flags = fcntl(fd_in, F_GETFL, 0);
-		fcntl(fd_in, F_SETFL, flags | O_NONBLOCK);
-		flags = fcntl(fd_out, F_GETFL, 0);
-		fcntl(fd_out, F_SETFL, flags | O_NONBLOCK);
+		int flags;
+		if (fd_in != -1) {
+			flags = fcntl(fd_in, F_GETFL, 0);
+			fcntl(fd_in, F_SETFL, flags | O_NONBLOCK);
 
-		inputContext.version = 0;
-		inputContext.info = self; /* user data passed to the callbacks */
-		inputContext.retain = NULL;
-		inputContext.release = NULL;
-		inputContext.copyDescription = NULL;
+			inputContext.version = 0;
+			inputContext.info = self; /* user data passed to the callbacks */
+			inputContext.retain = NULL;
+			inputContext.release = NULL;
+			inputContext.copyDescription = NULL;
 
-		inputSocket = CFSocketCreateWithNative(
-			kCFAllocatorDefault,
-			fd_in,
-			kCFSocketReadCallBack,
-			fd_read,
-			&inputContext);
-		if (inputSocket == NULL) {
-			INFO(@"failed to create input CFSocket of fd %i", fd_in);
-			return nil;
+			inputSocket = CFSocketCreateWithNative(
+				kCFAllocatorDefault,
+				fd_in,
+				kCFSocketReadCallBack,
+				fd_read,
+				&inputContext);
+			if (inputSocket == NULL) {
+				INFO(@"failed to create input CFSocket of fd %i", fd_in);
+				return nil;
+			}
+			inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, prio);
+			INFO(@"created input source %@", inputSource);
+
+			CFSocketEnableCallBacks(inputSocket, kCFSocketReadCallBack);
 		}
-		inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, 0);
-		INFO(@"created input source %@", inputSource);
 
-		outputContext.version = 0;
-		outputContext.info = self; /* user data passed to the callbacks */
-		outputContext.retain = NULL;
-		outputContext.release = NULL;
-		outputContext.copyDescription = NULL;
 
-		outputSocket = CFSocketCreateWithNative(
-			kCFAllocatorDefault,
-			fd_out,
-			kCFSocketWriteCallBack,
-			fd_write,
-			&outputContext);
-		if (outputSocket == NULL) {
-			INFO(@"failed to create output CFSocket of fd %i", fd_out);
-			return nil;
+		if (fd_out != -1) {
+			flags = fcntl(fd_out, F_GETFL, 0);
+			fcntl(fd_out, F_SETFL, flags | O_NONBLOCK);
+
+			outputContext.version = 0;
+			outputContext.info = self; /* user data passed to the callbacks */
+			outputContext.retain = NULL;
+			outputContext.release = NULL;
+			outputContext.copyDescription = NULL;
+
+			outputSocket = CFSocketCreateWithNative(
+				kCFAllocatorDefault,
+				fd_out,
+				kCFSocketWriteCallBack,
+				fd_write,
+				&outputContext);
+			if (outputSocket == NULL) {
+				INFO(@"failed to create output CFSocket of fd %i", fd_out);
+				return nil;
+			}
+			outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, prio);
+			INFO(@"created output source %@", outputSource);
 		}
-		outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, 0);
-		INFO(@"created output source %@", outputSource);
-
-
-		CFSocketEnableCallBacks(inputSocket, kCFSocketReadCallBack);
 	}
 	return self;
 }
@@ -233,8 +239,9 @@ fd_write(CFSocketRef s,
 	NSPipe *stdout = [task standardOutput];
 	if (![stdin isKindOfClass:[NSPipe class]] || ![stdout isKindOfClass:[NSPipe class]])
 		return nil;
-	return [self initWithReadFileDescriptor:[[stdout fileHandleForReading] fileDescriptor]
-			    writeFileDescriptor:[[stdin fileHandleForWriting] fileDescriptor]];
+	return [self initWithReadDescriptor:[[stdout fileHandleForReading] fileDescriptor]
+			    writeDescriptor:[[stdin fileHandleForWriting] fileDescriptor]
+				   priority:5];
 }
 
 - (void)open
@@ -313,14 +320,16 @@ fd_write(CFSocketRef s,
 
 - (void)write:(const void *)buf length:(NSUInteger)length
 {
-	INFO(@"enqueueing %lu bytes", length);
-	[outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
-	CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+	if (fd_out >= 0 && length > 0) {
+		INFO(@"enqueueing %lu bytes", length);
+		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
+		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+	}
 }
 
 - (void)writeData:(NSData *)data
 {
-	if ([data length] > 0) {
+	if (fd_out >= 0 && [data length] > 0) {
 		INFO(@"enqueueing %lu bytes", [data length]);
 		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
 		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);

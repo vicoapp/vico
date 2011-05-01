@@ -30,8 +30,9 @@
 	NSString		*runLoopMode;
 }
 
-- (id)initWithReadFileDescriptor:(int)read_fd
-	     writeFileDescriptor:(int)write_fd;
+- (id)initWithReadDescriptor:(int)read_fd
+	     writeDescriptor:(int)write_fd
+		    priority:(int)prio;
 - (id)initWithTask:(NSTask *)task;
 
 - (BOOL)hasBytesAvailable;

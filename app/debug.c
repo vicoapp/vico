@@ -19,12 +19,12 @@
 int	 debug;
 int	 verbose;
 
-void	 hexdump(void *data, size_t len, const char *fmt, ...);
+void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 void	 ldap_debug_elements(struct ber_element *root, int context,
 	    const char *fmt, ...);
 
 void
-hexdump(void *data, size_t len, const char *fmt, ...)
+hexdump(const void *data, size_t len, const char *fmt, ...)
 {
 	uint8_t *p = data;
 	va_list ap;

@@ -1,6 +1,14 @@
+@protocol ViDeferred;
+
+@protocol ViDeferredDelegate <NSObject>
+@optional
+- (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage;
+@end
+
 @protocol ViDeferred <NSObject>
 @required
 - (void)cancel;
+@property (readwrite, assign) id<ViDeferredDelegate> delegate;
 
 @optional
 - (CGFloat)progress;
@@ -9,13 +17,13 @@
 @protocol ViURLHandler <NSObject>
 @required
 - (BOOL)respondsToURL:(NSURL *)aURL;
+
+@optional
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
 				 onData:(void (^)(NSData *data))dataCallback
 			   onCompletion:(void (^)(NSError *error))completionCallback;
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
 		     onCompletion:(void (^)(BOOL result, BOOL isDirectory, NSError *error))aBlock;
-
-@optional
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSArray *contents, NSError *error))aBlock;
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock;
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL onCompletion:(void (^)(NSError *error))aBlock;

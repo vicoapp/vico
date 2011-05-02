@@ -1,7 +1,6 @@
 REQUESTED
 =========
 
-* setting for default language syntax instead of text.plain
 * vim text objects, especially i[, a]
 * project search
 
@@ -244,3 +243,4 @@ There are nine types of registers:			*registers* *E354*
 * [DONE] numbers doesn't work as completion filter
 * [DONE] explorer doesn't rescan after delete
 * [DONE] opening a directory should start with a scratch buffer
+* [DONE] setting for default language syntax instead of text.plain

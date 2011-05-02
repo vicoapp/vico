@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ViDocumentController.h"
 #import "ViDocumentTabController.h"
 #import "ViDocument.h"

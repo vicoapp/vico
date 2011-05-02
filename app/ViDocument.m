@@ -46,7 +46,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
-	return YES;
+	return NO;
 }
 
 - (id)init
@@ -109,12 +109,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
                    returnCode:(NSInteger)returnCode
                   contextInfo:(void *)contextInfo
 {
-	INFO(@"alert is %@", alert);
+	DEBUG(@"alert is %@", alert);
 }
 
 - (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage
 {
-	INFO(@"got status message {{%@}}", statusMessage);
 	[self message:@"%@", statusMessage];
 }
 
@@ -134,7 +133,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
 			NSUInteger ret = [alert runModal];
 			if (ret == NSAlertSecondButtonReturn) {
-				INFO(@"cancelling deferred %@", loader);
+				DEBUG(@"cancelling deferred %@", loader);
 				[loader cancel];
 				return;
 			}
@@ -154,7 +153,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	__block NSError *returnError = nil;
 
 	void (^completionCallback)(NSURL *, NSDictionary *, NSError *error) = ^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
-		INFO(@"error is %@", error);
+		DEBUG(@"error is %@", error);
 		returnError = error;
 		busy = NO;
 		loader = nil;
@@ -163,15 +162,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
 			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorFileDoesNotExist) ||
 			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
-				INFO(@"treating non-existent file %@ as untitled file", normalizedURL);
+				DEBUG(@"treating non-existent file %@ as untitled file", normalizedURL);
 				[self setIsTemporary:YES];
 				[self setFileURL:normalizedURL];
 				[self message:@"%@: new file", [self title]];
 			} else if ([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError) {
 				[self message:@"cancelled loading of %@", normalizedURL];
+				[self setFileURL:nil];
 			} else {
 				/* Make sure this document has focus, then show an alert sheet. */
 				[windowController selectDocument:self];
+				[self setFileURL:nil];
 
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:[NSString stringWithFormat:@"Couldn't open %@",
@@ -184,13 +185,22 @@ BOOL makeNewWindowInsteadOfTab = NO;
 						    contextInfo:nil];
 			}
 		} else {
-			INFO(@"loaded %@ with attributes %@", normalizedURL, attributes);
+			DEBUG(@"loaded %@ with attributes %@", normalizedURL, attributes);
+			[self setFileModificationDate:[attributes fileModificationDate]];
 			[self setIsTemporary:NO];
 			[self setFileURL:normalizedURL];
 			[proxy emitDelayed:@"didLoad" with:self, nil];
 			[self message:@"%@: loaded", [self title]];
+
+			for (ViDocumentView *dv in views) {
+				ViTextView *tv = [dv textView];
+				[tv documentDidLoad:self];
+			}
 		}
 	};
+
+	[self setFileType:@"Document"];
+	[self setFileURL:absoluteURL];
 
 	busy = YES;
 	loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
@@ -362,6 +372,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"didRecover = %s", didRecover ? "YES" : "NO");
 }
 
+- (void)saveDocument:(id)sender
+{
+	DEBUG(@"saving %@, url is %@, type is %@", sender, [self fileURL], [self fileType]);
+	if ([self fileURL]) {
+		NSError *error = nil;
+		if (![self writeSafelyToURL:[self fileURL]
+				     ofType:[self fileType]
+			   forSaveOperation:NSSaveOperation
+				      error:&error]) {
+			[NSApp presentError:error];
+		}
+	} else
+		[super saveDocument:sender];
+}
+
 - (BOOL)writeSafelyToURL:(NSURL *)url
                   ofType:(NSString *)typeName
         forSaveOperation:(NSSaveOperationType)saveOperation
@@ -403,6 +428,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[NSApp presentError:error];
 		else {
 			[self updateChangeCount:NSChangeCleared];
+			[self message:@"%@: wrote %lu byte", url, [data length]];
 			isTemporary = NO;
 			[proxy emit:@"didSave" with:self, nil];
 		}
@@ -470,8 +496,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 	}
 
-	INFO(@"begin adding %lu bytes", [data length]);
-
 	NSUInteger len = [textStorage length];
 	if (len == 0)
 		[self setString:aString];
@@ -480,8 +504,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		NSRange r = NSMakeRange(len, [aString length]);
 		[textStorage setAttributes:[self typingAttributes] range:r];
 	}
-
-	INFO(@"done adding %lu bytes", [data length]);
 
 	return YES;
 }
@@ -530,7 +552,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)close
 {
 	if (loader) {
-		INFO(@"cancelling load callback %@", loader);
+		DEBUG(@"cancelling load callback %@", loader);
 		[loader cancel];
 		loader = nil;
 	}

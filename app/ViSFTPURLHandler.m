@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ViSFTPURLHandler.h"
 #import "SFTPConnectionPool.h"
 #include "logging.h"

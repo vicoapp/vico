@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ViFileURLHandler.h"
 #include "logging.h"
 

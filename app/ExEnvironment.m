@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ExEnvironment.h"
 #import "ExCommand.h"
 #import "ViTheme.h"

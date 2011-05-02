@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ViTagsDatabase.h"
 #import "ViURLManager.h"
 #include "logging.h"

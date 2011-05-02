@@ -1030,13 +1030,14 @@
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
-					<object class="NSProgressIndicator" id="430640285">
+					<object class="NSProgressIndicator" id="1000356792">
 						<reference key="NSNextResponder" ref="244902241"/>
 						<int key="NSvFlags">-2147482332</int>
 						<object class="NSPSMatrix" key="NSDrawMatrix"/>
 						<string key="NSFrame">{{39, 3}, {16, 16}}</string>
 						<reference key="NSSuperview" ref="244902241"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="630815511"/>
 						<int key="NSpiFlags">28938</int>
 						<double key="NSMaxValue">100</double>
 					</object>
@@ -1221,7 +1222,7 @@
 										<bool key="NSAllowsTypeSelect">YES</bool>
 										<int key="NSTableViewSelectionHighlightStyle">1</int>
 										<int key="NSTableViewDraggingDestinationStyle">1</int>
-										<float key="NSOutlineViewIndentationPerLevelKey">14</float>
+										<float key="NSOutlineViewIndentationPerLevelKey">20</float>
 									</object>
 								</array>
 								<string key="NSFrameSize">{150, 325}</string>
@@ -1284,7 +1285,7 @@
 						<string key="NSFrame">{{31, 0}, {104, 23}}</string>
 						<reference key="NSSuperview" ref="244902241"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="630815511"/>
+						<reference key="NSNextKeyView" ref="1000356792"/>
 						<int key="NSViewLayerContentsRedrawPolicy">2</int>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="51076460">
@@ -2278,7 +2279,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">progressIndicator</string>
 						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="430640285"/>
+						<reference key="destination" ref="1000356792"/>
 					</object>
 					<int key="connectionID">100710</int>
 				</object>
@@ -2460,7 +2461,7 @@
 							<reference ref="50669392"/>
 							<reference ref="643230473"/>
 							<reference ref="540044896"/>
-							<reference ref="430640285"/>
+							<reference ref="1000356792"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">ExplorerView</string>
@@ -3073,7 +3074,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100709</int>
-						<reference key="object" ref="430640285"/>
+						<reference key="object" ref="1000356792"/>
 						<reference key="parent" ref="244902241"/>
 					</object>
 				</array>

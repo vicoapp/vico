@@ -42,6 +42,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize snippet;
 @synthesize proxy;
 @synthesize busy;
+@synthesize loader;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {

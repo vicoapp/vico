@@ -55,6 +55,7 @@
 @property(readwrite, assign) BOOL isTemporary;
 @property(readonly) ViScriptProxy *proxy;
 @property(readwrite) BOOL busy;
+@property (readonly) id<ViDeferred> loader;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;

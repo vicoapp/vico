@@ -316,7 +316,7 @@ static ViWindowController	*currentWindowController = nil;
 	ViDocumentTabController *lastTabController = [[[tabBar representedTabViewItems] lastObject] identifier];
 	if ([self currentDocument] != nil &&
 	    [[self currentDocument] fileURL] == nil &&
-	    [document fileURL] != nil &&
+	    [document loader] != nil &&
 	    ![[self currentDocument] isDocumentEdited] &&
 	    [[lastTabController views] count] == 1 &&
 	    [self currentDocument] == [[[lastTabController views] objectAtIndex:0] document]) {

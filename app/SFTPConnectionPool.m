@@ -1,5 +1,6 @@
 #import "SFTPConnectionPool.h"
-#import "logging.h"
+#import "ViError.h"
+#include "logging.h"
 
 @implementation SFTPConnectionPool
 
@@ -20,15 +21,17 @@
 	return sharedPool;
 }
 
-- (id<ViDeferred>)connectionWithHost:(NSString *)hostname
-				user:(NSString *)username
-			   onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
+- (id<ViDeferred>)connectionWithURL:(NSURL *)url
+			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {
-	NSString *key;
-	if ([username length] > 0)
-		key = [NSString stringWithFormat:@"%@@%@", username, hostname];
-	else
-		key = hostname;
+	NSString *username = [url user];
+	NSString *hostname = [url host];
+	NSNumber *port = [url port];
+
+	if (hostname == nil)
+		return connectCallback(nil, [ViError errorWithFormat:@"missing hostname in URL %@", url]);
+
+	NSString *key = [NSString stringWithFormat:@"%@@%@:%@", username ?: @"", hostname, port ?: @"22"];
 	SFTPConnection *conn = [connections objectForKey:key];
 
 	if (conn && [conn closed]) {
@@ -38,10 +41,9 @@
 
 	if (conn == nil) {
 		NSError *error = nil;
-		conn = [[SFTPConnection alloc] initWithHost:hostname user:username error:&error];
-		if (conn == nil || error) {
+		conn = [[SFTPConnection alloc] initWithURL:url error:&error];
+		if (conn == nil || error)
 			return connectCallback(nil, error);
-		}
 
 		[connections setObject:conn forKey:key];
 
@@ -55,12 +57,6 @@
 		return connectCallback(conn, nil);
 
 	return nil;
-}
-
-- (id<ViDeferred>)connectionWithURL:(NSURL *)url
-			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
-{
-	return [self connectionWithHost:[url host] user:[url user] onConnect:connectCallback];
 }
 
 @end

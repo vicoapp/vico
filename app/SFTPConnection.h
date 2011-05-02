@@ -148,6 +148,7 @@
 {
 	NSString *host;
 	NSString *user;
+	NSNumber *port;
 	NSString *home;		/* home directory == current directory on connect */
 
 	id delegate;
@@ -183,7 +184,7 @@
 @property(readonly) NSString *user;
 @property(readonly) NSString *home;
 
-- (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
+- (SFTPConnection *)initWithURL:(NSURL *)url error:(NSError **)outError;
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback;
 
 - (SFTPRequest *)attributesOfItemAtURL:(NSURL *)url
@@ -218,7 +219,6 @@
 		      onResponse:(void (^)(NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
-- (NSString *)hostWithUser;
 - (NSString *)stderr;
 - (BOOL)hasPosixRename;
 - (void)abort;

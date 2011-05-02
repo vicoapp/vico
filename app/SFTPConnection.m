@@ -820,9 +820,8 @@ resp2txt(int type)
 	return ((exts & SFTP_EXT_POSIX_RENAME) == SFTP_EXT_POSIX_RENAME);
 }
 
-- (SFTPConnection *)initWithHost:(NSString *)hostname
-			    user:(NSString *)username
-			   error:(NSError **)outError
+- (SFTPConnection *)initWithURL:(NSURL *)url
+			  error:(NSError **)outError
 {
 	self = [super init];
 	if (self) {
@@ -835,14 +834,14 @@ resp2txt(int type)
 		[arguments addObject:@"-oPermitLocalCommand no"];
 		[arguments addObject:@"-oClearAllForwardings yes"];
 		[arguments addObject:@"-oConnectTimeout 10"];
-#ifndef NO_DEBUG
+		if ([url port])
+			[arguments addObject:[NSString stringWithFormat:@"-p %@", [url port]]];
 		[arguments addObject:@"-vvv"];
-#endif
 		[arguments addObject:@"-s"];
-		if ([username length] > 0)
-			[arguments addObject:[NSString stringWithFormat:@"%@@%@", username, hostname]];
+		if ([[url user] length] > 0)
+			[arguments addObject:[NSString stringWithFormat:@"%@@%@", [url user], [url host]]];
 		else
-			[arguments addObject:hostname];
+			[arguments addObject:[url host]];
 		[arguments addObject:@"sftp"];
 
 		DEBUG(@"ssh arguments: %@", arguments);
@@ -882,8 +881,9 @@ resp2txt(int type)
 		[sshPipe setDelegate:self];
 		[sshPipe scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
-		host = hostname;
-		user = username;
+		host = [url host];
+		user = [url user];
+		port = [url port];
 
 		requests = [NSMutableDictionary dictionary];
 	}
@@ -1088,7 +1088,7 @@ resp2txt(int type)
 
 - (void)close
 {
-	INFO(@"Closing connection %@", sshPipe);
+	DEBUG(@"Closing connection %@", sshPipe);
 	[sshPipe close];
 	sshPipe = nil;
 	[ssh_task terminate];
@@ -1099,7 +1099,7 @@ resp2txt(int type)
 - (void)abort
 {
 	[self close];
-	INFO(@"cancelling outstanding requests: %@", requests);
+	DEBUG(@"cancelling outstanding requests: %@", requests);
 	for (SFTPRequest *req in [requests allValues])
 		[req cancel];
 	[requests removeAllObjects];
@@ -1496,13 +1496,6 @@ resp2txt(int type)
 
 	INFO(@"returning uploadRequest %@", uploadRequest);
 	return uploadRequest;
-}
-
-- (NSString *)hostWithUser
-{
-	if (user)
-		return [NSString stringWithFormat:@"%@@%@", user, host];
-	return host;
 }
 
 - (NSString *)stderr

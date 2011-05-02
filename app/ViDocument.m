@@ -190,7 +190,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[self setIsTemporary:NO];
 			[self setFileURL:normalizedURL];
 			[proxy emitDelayed:@"didLoad" with:self, nil];
-			[self message:@"%@: loaded", [self title]];
+			[self message:@"%@: %lu lines", [self title], [textStorage lineCount]];
 
 			for (ViDocumentView *dv in views) {
 				ViTextView *tv = [dv textView];

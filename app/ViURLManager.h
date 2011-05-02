@@ -39,7 +39,9 @@
 @interface ViURLManager : NSObject <ViURLHandler>
 {
 	NSMutableArray *handlers;
+	NSMutableDictionary *directoryCache;
 }
 + (ViURLManager *)defaultManager;
 - (void)registerHandler:(id<ViURLHandler>)handler;
+- (void)flushDirectoryCache;
 @end

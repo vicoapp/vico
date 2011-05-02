@@ -885,7 +885,6 @@ resp2txt(int type)
 		host = hostname;
 		user = username;
 
-		directoryCache = [NSMutableDictionary dictionary];
 		requests = [NSMutableDictionary dictionary];
 	}
 	return self;
@@ -906,7 +905,6 @@ resp2txt(int type)
 	return [[NSURL URLWithString:path relativeToURL:aURL] absoluteURL];
 }
 
-/* FIXME: try attributes in directoryCache first? */
 - (SFTPRequest *)attributesOfItemAtURL:(NSURL *)url
 			    onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback
 {
@@ -985,12 +983,6 @@ resp2txt(int type)
 			path = @"";
 	}
 
-	NSArray *contents = [directoryCache objectForKey:path];
-	if (contents) {
-		responseCallback(contents, nil);
-		return nil;
-	}
-
 	void (^originalCallback)(NSArray *, NSError *) = Block_copy(responseCallback);
 
 	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", path];
@@ -1033,10 +1025,8 @@ resp2txt(int type)
 					       onResponse:^(NSError *error) {
 						if (error)
 							originalCallback(nil, error);
-						else {
-							[directoryCache setObject:entries forKey:path];
+						else
 							originalCallback(entries, nil);
-						}
 					}];
 				}
 				return;
@@ -1094,11 +1084,6 @@ resp2txt(int type)
 			originalCallback(nil);
 	};
 	return req;
-}
-
-- (void)flushDirectoryCache
-{
-	directoryCache = [NSMutableDictionary dictionary];
 }
 
 - (void)close

@@ -15,6 +15,4 @@
 - (id<ViDeferred>)connectionWithURL:(NSURL *)url
 			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback;
 
-- (void)flushDirectoryCacheForURL:(NSURL *)url;
-
 @end

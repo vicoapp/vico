@@ -63,18 +63,5 @@
 	return [self connectionWithHost:[url host] user:[url user] onConnect:connectCallback];
 }
 
-- (void)flushDirectoryCacheForURL:(NSURL *)url
-{
-	NSString *key;
-	if ([[url user] length] > 0)
-		key = [NSString stringWithFormat:@"%@@%@", [url user], [url host]];
-	else
-		key = [url host];
-	SFTPConnection *conn = [connections objectForKey:key];
-	if (conn) {
-		[conn flushDirectoryCache];
-	}
-}
-
 @end
 

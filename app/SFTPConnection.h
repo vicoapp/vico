@@ -177,8 +177,6 @@
 #define SFTP_EXT_STATVFS	0x00000002
 #define SFTP_EXT_FSTATVFS	0x00000004
 	uint32_t exts;
-
-	NSMutableDictionary *directoryCache;
 }
 
 @property(readonly) NSString *host;
@@ -220,7 +218,6 @@
 		      onResponse:(void (^)(NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
-- (void)flushDirectoryCache;
 - (NSString *)hostWithUser;
 - (NSString *)stderr;
 - (BOOL)hasPosixRename;

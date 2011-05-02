@@ -1,7 +1,6 @@
 #import "ProjectDelegate.h"
 #import "logging.h"
 #import "MHTextIconCell.h"
-#import "SFTPConnectionPool.h"
 #import "ViWindowController.h"
 #import "ExEnvironment.h"
 #import "ViError.h"
@@ -462,10 +461,7 @@
 - (IBAction)rescan:(id)sender
 {
 	NSURL *url = [rootButton URL];
-	if (![url isFileURL]) {
-		/* Forget SFTP directory cache. */
-		[[SFTPConnectionPool sharedPool] flushDirectoryCacheForURL:url];
-	}
+	[[ViURLManager defaultManager] flushDirectoryCache];
 	[self browseURL:url];
 }
 

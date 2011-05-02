@@ -18,6 +18,7 @@
 {
 	if ((self = [super init]) != nil) {
 		handlers = [NSMutableArray array];
+		directoryCache = [NSMutableDictionary dictionary];
 	}
 
 	return self;
@@ -28,24 +29,15 @@
 	[handlers addObject:handler];
 }
 
-- (BOOL)respondsToURL:(NSURL *)aURL
+- (id<ViURLHandler>)handlerForURL:(NSURL *)aURL
 {
 	id<ViURLHandler> handler;
 	for (handler in handlers)
 		if ([handler respondsToURL:aURL])
-			return YES;
+			return handler;
 
 	DEBUG(@"no handler found for URL %@", aURL);
-	return NO;
-}
-
-- (NSURL *)normalizeURL:(NSURL *)aURL
-{
-	id<ViURLHandler> handler;
-	for (handler in handlers)
-		if ([handler respondsToURL:aURL])
-			return [handler normalizeURL:aURL];
-	return aURL;
+	return nil;
 }
 
 - (id<ViURLHandler>)handlerForURL:(NSURL *)aURL
@@ -62,13 +54,44 @@
 	return nil;
 }
 
+- (BOOL)respondsToURL:(NSURL *)aURL
+{
+	return [self handlerForURL:aURL] != nil;
+}
+
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	id<ViURLHandler> handler;
+	for (handler in handlers)
+		if ([handler respondsToURL:aURL])
+			return [handler normalizeURL:aURL];
+	return aURL;
+}
+
+- (void)flushDirectoryCache
+{
+	directoryCache = [NSMutableDictionary dictionary];
+}
+
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
 			      onCompletion:(void (^)(NSArray *, NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(contentsOfDirectoryAtURL:onCompletion:)];
-	if (handler)
-		return [handler contentsOfDirectoryAtURL:aURL onCompletion:aBlock];
+	if (handler) {
+		NSURL *normalizedURL = [self normalizeURL:aURL];
+		NSArray *contents = [directoryCache objectForKey:normalizedURL];
+		if (contents) {
+			aBlock(contents, nil);
+			return nil;
+		}
+
+		return [handler contentsOfDirectoryAtURL:normalizedURL onCompletion:^(NSArray *contents, NSError *error) {
+			if (contents && !error)
+			       [directoryCache setObject:contents forKey:normalizedURL];
+			aBlock(contents, error);
+		}];
+	}
 	aBlock(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }

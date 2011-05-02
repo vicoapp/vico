@@ -54,6 +54,9 @@
 	NSColor			*caretColor;
 
 	NSInteger		 saved_column;
+	NSInteger		 initial_line, initial_column;
+	NSString		*initial_find_pattern;
+	unsigned		 initial_find_options;
 
 	// visual mode
 	NSUInteger		 visual_start_location;
@@ -80,6 +83,7 @@
 - (void)initWithDocument:(ViDocument *)aDocument
                 viParser:(ViParser *)aParser;
 - (ViTextStorage *)textStorage;
+- (void)documentDidLoad:(ViDocument *)aDocument;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;
 - (void)getLineStart:(NSUInteger *)bol_ptr

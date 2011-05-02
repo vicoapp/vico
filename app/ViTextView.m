@@ -118,6 +118,16 @@ int logIndent = 0;
 	[self updateStatus];
 }
 
+- (void)documentDidLoad:(ViDocument *)aDocument
+{
+	if (initial_line >= 0)
+		[self gotoLine:initial_line column:initial_column];
+	if (initial_find_pattern)
+		[self findPattern:initial_find_pattern options:initial_find_options];
+	initial_line = -1;
+	initial_find_pattern = nil;
+}
+
 - (ViTextStorage *)textStorage
 {
 	return (ViTextStorage *)[super textStorage];
@@ -829,6 +839,12 @@ int logIndent = 0;
 
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column
 {
+	if (document.loader) {
+		initial_line = line;
+		initial_column = column;
+		return YES;
+	}
+
 	NSInteger bol = [[self textStorage] locationForStartOfLine:line];
 	if (bol == -1)
 		return NO;
@@ -850,6 +866,12 @@ int logIndent = 0;
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
+	if (document.loader) {
+		initial_find_pattern = pattern;
+		initial_find_options = find_options;
+		return YES;
+	}
+
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	if ([defs integerForKey:@"ignorecase"] == NSOnState) {
@@ -1042,6 +1064,9 @@ int logIndent = 0;
 		[self setSelectedRange:NSMakeRange(location, 0)];
 	if (!replayingInput)
 		[self updateCaret];
+
+	initial_line = -1;
+	initial_find_pattern = nil;
 }
 
 - (NSUInteger)caret

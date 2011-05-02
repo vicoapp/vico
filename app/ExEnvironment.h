@@ -1,13 +1,14 @@
 #import "ViDocumentTabController.h"
 #import "ProjectDelegate.h"
 #import "ViBufferedStream.h"
+#import "ViURLManager.h"
 
 @class ViTextView;
 @class ViDocument;
 @class ViWindowController;
 @class ExCommand;
 
-@interface ExEnvironment : NSObject <NSTextFieldDelegate, NSStreamDelegate>
+@interface ExEnvironment : NSObject <NSTextFieldDelegate, NSStreamDelegate, ViDeferredDelegate>
 {
 	IBOutlet NSTextField	*messageField;
 	IBOutlet NSTextField	*statusbar;

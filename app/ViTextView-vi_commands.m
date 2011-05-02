@@ -1689,7 +1689,6 @@
 
 	if (db == nil) {
 		return [self jump_symbol:command];
-		// MESSAGE(@"tags: No such file or directory.");
 	}
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
@@ -1713,10 +1712,7 @@
 				[[docView textView] findPattern:pattern options:0];
 				final_location = NSNotFound;
 			} else {
-				if (error)
-					[NSApp presentError:error];
 				[self jump_symbol:command];
-				// MESSAGE(@"%@: tag not found", word);
 			}
 		}];
 	}

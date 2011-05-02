@@ -1,4 +1,5 @@
 #import "ViPreferencePaneGeneral.h"
+#import "ViBundleStore.h"
 
 @implementation undoStyleTagTransformer
 + (Class)transformedValueClass { return [NSNumber class]; }
@@ -36,6 +37,18 @@
 	/* Convert between tags and undo style strings (vim and nvi). */
 	[NSValueTransformer setValueTransformer:[[undoStyleTagTransformer alloc] init]
 					forName:@"undoStyleTagTransformer"];
+
+	[defaultSyntaxButton removeAllItems];
+	NSArray *sortedLanguages = [[ViBundleStore defaultStore] sortedLanguages];
+	for (ViLanguage *lang in sortedLanguages) {
+		NSMenuItem *item;
+		item = [[defaultSyntaxButton menu] addItemWithTitle:[lang displayName] action:nil keyEquivalent:@""];
+		[item setRepresentedObject:[lang name]];
+	}
+
+	NSString *defaultName = [[[ViBundleStore defaultStore] defaultLanguage] displayName];
+	if (defaultName)
+		[defaultSyntaxButton selectItemWithTitle:defaultName];
 
 	return self;
 }

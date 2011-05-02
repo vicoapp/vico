@@ -126,6 +126,7 @@
 		nil], @"bundleRepositoryUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",
+	    @"text.plain", @"defaultsyntax",
 	    nil]];
 
 	/* Initialize languages and themes. */

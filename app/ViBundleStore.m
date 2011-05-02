@@ -119,7 +119,11 @@ static NSString *bundlesDirectory = nil;
 
 - (ViLanguage *)defaultLanguage
 {
-	return [self languageWithScope:@"text.plain"];
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	ViLanguage *lang = [self languageWithScope:[defs stringForKey:@"defaultsyntax"]];
+	if (lang == nil)
+		lang = [self languageWithScope:@"text.plain"];
+	return lang;
 }
 
 - (ViLanguage *)languageWithScope:(NSString *)scopeName
@@ -130,6 +134,14 @@ static NSString *bundlesDirectory = nil;
 - (NSArray *)languages
 {
 	return [languages allValues];
+}
+
+- (NSArray *)sortedLanguages
+{
+	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc]
+	    initWithKey:@"displayName" ascending:YES];
+	return [[self languages] sortedArrayUsingDescriptors:
+	    [NSArray arrayWithObject:descriptor]];
 }
 
 - (NSArray *)allBundles

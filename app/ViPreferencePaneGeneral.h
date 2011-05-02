@@ -7,6 +7,7 @@
 
 @interface ViPreferencePaneGeneral : ViPreferencePane
 {
+	IBOutlet NSPopUpButton *defaultSyntaxButton;
 }
 
 @end

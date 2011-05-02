@@ -19,6 +19,7 @@
 - (ViBundle *)bundleWithName:(NSString *)name;
 - (ViBundle *)bundleWithUUID:(NSString *)uuid;
 - (NSArray *)languages;
+- (NSArray *)sortedLanguages;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSArray *)itemsWithTabTrigger:(NSString *)name

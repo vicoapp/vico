@@ -2039,10 +2039,7 @@ int logIndent = 0;
 		[item setState:NSOnState];
 	[submenu addItem:[NSMenuItem separatorItem]];
 
-	NSArray *languages = [[ViBundleStore defaultStore] languages];
-	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"displayName" ascending:YES];
-	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:[NSArray arrayWithObject:descriptor]];
-
+	NSArray *sortedLanguages = [[ViBundleStore defaultStore] sortedLanguages];
 	for (ViLanguage *lang in sortedLanguages) {
 		item = [submenu addItemWithTitle:[lang displayName]
 					  action:@selector(setLanguageAction:)
@@ -2052,7 +2049,7 @@ int logIndent = 0;
 			[item setState:NSOnState];
 	}
 
-	if ([languages count] > 0)
+	if ([sortedLanguages count] > 0)
 		[submenu addItem:[NSMenuItem separatorItem]];
 	[submenu addItemWithTitle:@"Get more bundles..."
 			   action:@selector(getMoreBundles:)

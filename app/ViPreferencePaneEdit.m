@@ -165,13 +165,9 @@
 	while ([[menu itemAtIndex:0] tag] == 0)
 		[menu removeItemAtIndex:0];
 
-	/* FIXME: This is the same code as in the ViTextView action menu. */
-	NSArray *languages = [[ViBundleStore defaultStore] languages];
-	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc]
-	    initWithKey:@"displayName" ascending:YES];
-	NSArray *sortedLanguages = [languages sortedArrayUsingDescriptors:
-	    [NSArray arrayWithObject:descriptor]];
+	NSArray *sortedLanguages = [[ViBundleStore defaultStore] sortedLanguages];
 
+	/* FIXME: This is the same code as in the ViTextView action menu. */
 	int i = 0;
 	for (ViLanguage *lang in sortedLanguages) {
 		NSMenuItem *item;

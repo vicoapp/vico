@@ -1,6 +1,6 @@
 #!/bin/sh
 
-REPO_VERSION="r$(hg id -n)"
+REPO_VERSION=$(hg id -n)
 VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"
@@ -69,7 +69,7 @@ cat > $VOL.xml <<EOF
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
     <enclosure url="$DOWNLOAD_BASE/$DMG"
-               sparkle:version="$(REPO_VERSION#r)"
+               sparkle:version="$REPO_VERSION"
                sparkle:shortVersionString="$VERSION"
                sparkle:dsaSignature="$SIGNATURE"
                length="$SIZE"

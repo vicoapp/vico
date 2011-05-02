@@ -298,6 +298,8 @@ int logIndent = 0;
 
 	modify_start_location = aRange.location;
 
+	DEBUG(@"replace range %@ with string [%@]", NSStringFromRange(aRange), aString);
+
 	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		/* Let the snippet drive the changes. */
@@ -372,6 +374,7 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
+	[self setMark:'.' atLocation:aRange.location];
 
 	if (modify_start_location > NSMaxRange(r)) {
 		NSInteger delta = [aString length] - aRange.length;
@@ -1076,13 +1079,12 @@ int logIndent = 0;
 	INFO(@"got marked text [%@] in range %@, replacement range %@",
 	    aString, NSStringFromRange(selectedRange), NSStringFromRange(replacementRange));
 }
-#endif
 
-#if 0
 - (void)unmarkText
 {
 	INFO(@"unmarking text at %lu", [self caret]);
 	[super unmarkText];
+	INFO(@"done unmarking text at %lu", [self caret]);
 }
 #endif
 
@@ -1717,8 +1719,11 @@ int logIndent = 0;
 	DEBUG(@"string = [%@], len %i, replacementRange = %@",
 	    string, [string length], NSStringFromRange(replacementRange));
 
-	if ([self hasMarkedText])
-		[self unmarkText];
+	if ([self hasMarkedText]) {
+		[self setMarkedText:@"" selectedRange:NSMakeRange(0, 0)];
+		DEBUG(@"unmarking marked text in range %@", NSStringFromRange([self markedRange]));
+		//[self unmarkText];
+	}
 
 	/*
 	 * For some weird reason, ctrl-alt-a wants to insert the character 0x01.

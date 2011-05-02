@@ -29,8 +29,8 @@ die()
 
 APP=build/Snapshot/Vico.app
 
-echo "Stripping binary"
-strip $APP/Contents/MacOS/*
+#echo "Stripping binary"
+#strip $APP/Contents/MacOS/*
 
 VOL="vico-$VERSION"
 DMG="$VOL.dmg"
@@ -51,4 +51,32 @@ hdiutil convert -format UDBZ "$TMPDMG" -o "$DMG"
 
 /bin/rm -f $TMPDMG
 ls -lh "$DMG"
+
+#### Create and sign a zip file for automatic updates.
+
+APPCAST_BASE="http://www.vicoapp.com/appcast"
+DOWNLOAD_BASE="http://www.vicoapp.com/download/t"
+
+KSIZE=$(du -ks "$APP" | cut -f1)
+SIZE=$(($KSIZE * 1024))
+SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < "$DMG" | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
+
+cat > $VOL.xml <<EOF
+<item>
+    <title>Version $VERSION</title>
+    <sparkle:releaseNotesLink>
+        $APPCAST_BASE/version-$VERSION.html
+    </sparkle:releaseNotesLink>
+    <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
+    <enclosure url="$DOWNLOAD_BASE/$DMG"
+               sparkle:version="$(REPO_VERSION#r)"
+               sparkle:shortVersionString="$VERSION"
+               sparkle:dsaSignature="$SIGNATURE"
+               length="$SIZE"
+               type="application/octet-stream" />
+</item>
+EOF
+cat "$VOL.xml"
+
+echo "scp $DMG vicoapp.com:/var/www/vicoapp.com/download/t"
 

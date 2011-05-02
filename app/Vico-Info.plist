@@ -356,11 +356,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSServices</key>
-	<array/>
-	<key>UTExportedTypeDeclarations</key>
-	<array/>
-	<key>UTImportedTypeDeclarations</key>
-	<array/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>sparkle_pub.pem</string>
+	<key>SUFeedURL</key>
+	<string>http://www.vicoapp.com/appcast.xml</string>
 </dict>
 </plist>

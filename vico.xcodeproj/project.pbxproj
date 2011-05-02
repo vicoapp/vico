@@ -253,6 +253,9 @@
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
 		9AB10BAC13408B6600D81D33 /* keys.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AB10BAB13408B6600D81D33 /* keys.nu */; };
 		9AB10BAF1340BB4C00D81D33 /* TestViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BAD1340BAE700D81D33 /* TestViMap.m */; };
+		9ACAA931136F0253001FC553 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
+		9ACAA932136F02A8001FC553 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
+		9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -347,6 +350,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */,
+				9ACAA932136F02A8001FC553 /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -746,6 +750,8 @@
 		9AB10BA5133F72E600D81D33 /* ViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMap.m; sourceTree = "<group>"; };
 		9AB10BAB13408B6600D81D33 /* keys.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.nu; sourceTree = "<group>"; };
 		9AB10BAD1340BAE700D81D33 /* TestViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViMap.m; sourceTree = "<group>"; };
+		9ACAA930136F0253001FC553 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparkle_pub.pem; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -764,6 +770,7 @@
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
 				9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */,
 				9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */,
+				9ACAA931136F0253001FC553 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -807,6 +814,7 @@
 			children = (
 				9AAF73F3135F3BDF00D75E1E /* Vico.help */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
+				9ACAA930136F0253001FC553 /* Sparkle.framework */,
 				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
@@ -1044,6 +1052,7 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */,
 				9AAF73E1135C931600D75E1E /* Credits.txt */,
 				9A9A63CB1339D0CA0053402A /* vico.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
@@ -1509,6 +1518,7 @@
 				9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */,
 				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
 				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
+				9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1626,7 +1636,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\nREPO_VERSION=$(/opt/local/bin/hg identify -n $SOURCE_ROOT)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\nif test $BUILD_STYLE == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n";
+			shellScript = "set -x\nREPO_VERSION=$(/opt/local/bin/hg identify -n $SOURCE_ROOT)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\nif test $BUILD_STYLE == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -2060,7 +2070,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
@@ -2206,7 +2219,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2228,7 +2244,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";

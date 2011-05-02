@@ -152,7 +152,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	/* If the completion callback is called immediately, we can return an error directly. */
 	__block NSError *returnError = nil;
 
-	void (^completionCallback)(NSError *error) = ^(NSError *error) {
+	void (^completionCallback)(NSURL *, NSDictionary *, NSError *error) = ^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		INFO(@"error is %@", error);
 		returnError = error;
 		busy = NO;
@@ -162,19 +162,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
 			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorFileDoesNotExist) ||
 			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
-				INFO(@"treating non-existent file %@ as untitled file", absoluteURL);
+				INFO(@"treating non-existent file %@ as untitled file", normalizedURL);
 				[self setIsTemporary:YES];
-				[self setFileURL:absoluteURL];
+				[self setFileURL:normalizedURL];
 				[self message:@"%@: new file", [self title]];
 			} else if ([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError) {
-				[self message:@"cancelled loading of %@", absoluteURL];
+				[self message:@"cancelled loading of %@", normalizedURL];
 			} else {
 				/* Make sure this document has focus, then show an alert sheet. */
 				[windowController selectDocument:self];
 
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:[NSString stringWithFormat:@"Couldn't open %@",
-					absoluteURL]];
+					normalizedURL]];
 				[alert addButtonWithTitle:@"OK"];
 				[alert setInformativeText:[error localizedDescription]];
 				[alert beginSheetModalForWindow:[windowController window]
@@ -183,9 +183,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 						    contextInfo:nil];
 			}
 		} else {
+			INFO(@"loaded %@ with attributes %@", normalizedURL, attributes);
 			[self setIsTemporary:NO];
-			[self setFileURL:absoluteURL];
+			[self setFileURL:normalizedURL];
 			[proxy emitDelayed:@"didLoad" with:self, nil];
+			[self message:@"%@: loaded", [self title]];
 		}
 	};
 
@@ -399,12 +401,17 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		if (error)
 			[NSApp presentError:error];
 		else {
+			[self updateChangeCount:NSChangeCleared];
 			isTemporary = NO;
 			[proxy emit:@"didSave" with:self, nil];
 		}
 	}];
 
-	return YES;
+	if (outError)
+		*outError = [NSError errorWithDomain:NSCocoaErrorDomain
+						code:NSUserCancelledError
+					    userInfo:nil];
+	return NO;
 }
 
 - (BOOL)addData:(NSData *)data

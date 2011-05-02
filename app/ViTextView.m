@@ -1060,6 +1060,32 @@ int logIndent = 0;
 	return [super selectionRangeForProposedRange:proposedSelRange granularity:granularity];
 }
 
+#if 0
+- (void)setMarkedText:(id)aString selectedRange:(NSRange)selRange
+{
+	INFO(@"got marked text [%@] in range %@", aString, NSStringFromRange(selRange));
+	[super setMarkedText:aString selectedRange:selRange];
+	/*if (selRange.length > 0)
+		[self setCaret:NSMaxRange(selRange)];*/
+}
+#endif
+
+#if 0
+- (void)setMarkedText:(id)aString selectedRange:(NSRange)selectedRange replacementRange:(NSRange)replacementRange
+{
+	INFO(@"got marked text [%@] in range %@, replacement range %@",
+	    aString, NSStringFromRange(selectedRange), NSStringFromRange(replacementRange));
+}
+#endif
+
+#if 0
+- (void)unmarkText
+{
+	INFO(@"unmarking text at %lu", [self caret]);
+	[super unmarkText];
+}
+#endif
+
 - (void)setSelectedRanges:(NSArray *)ranges
                  affinity:(NSSelectionAffinity)affinity
            stillSelecting:(BOOL)stillSelectingFlag

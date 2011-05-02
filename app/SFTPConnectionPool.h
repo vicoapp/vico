@@ -7,7 +7,14 @@
 }
 
 + (SFTPConnectionPool *)sharedPool;
-- (SFTPConnection *)connectionWithURL:(NSURL *)url error:(NSError **)outError;
-- (SFTPConnection *)connectionWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
+
+- (id<ViDeferred>)connectionWithHost:(NSString *)hostname
+				user:(NSString *)username
+			   onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback;
+
+- (id<ViDeferred>)connectionWithURL:(NSURL *)url
+			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback;
+
+- (void)flushDirectoryCacheForURL:(NSURL *)url;
 
 @end

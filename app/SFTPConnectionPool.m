@@ -6,8 +6,9 @@
 - (SFTPConnectionPool *)init
 {
 	self = [super init];
-	if (self)
+	if (self) {
 		connections = [NSMutableDictionary dictionary];
+	}
 	return self;
 }
 
@@ -19,7 +20,9 @@
 	return sharedPool;
 }
 
-- (SFTPConnection *)connectionWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError
+- (id<ViDeferred>)connectionWithHost:(NSString *)hostname
+				user:(NSString *)username
+			   onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {
 	NSString *key;
 	if ([username length] > 0)
@@ -34,17 +37,43 @@
 	}
 
 	if (conn == nil) {
-		conn = [[SFTPConnection alloc] initWithHost:hostname user:username error:outError];
-		if (conn != nil)
-			[connections setObject:conn forKey:key];
-	}
+		NSError *error = nil;
+		conn = [[SFTPConnection alloc] initWithHost:hostname user:username error:&error];
+		if (conn == nil || error) {
+			return connectCallback(nil, error);
+		}
 
-	return conn;
+		[connections setObject:conn forKey:key];
+
+		__block SFTPRequest *initRequest = nil;
+		void (^initCallback)(NSError *) = ^(NSError *error) {
+			initRequest.subRequest = connectCallback(conn, error);
+		};
+		initRequest = [conn onConnect:initCallback];
+		return initRequest;
+	} else
+		return connectCallback(conn, nil);
+
+	return nil;
 }
 
-- (SFTPConnection *)connectionWithURL:(NSURL *)url error:(NSError **)outError
+- (id<ViDeferred>)connectionWithURL:(NSURL *)url
+			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {
-	return [self connectionWithHost:[url host] user:[url user] error:outError];
+	return [self connectionWithHost:[url host] user:[url user] onConnect:connectCallback];
+}
+
+- (void)flushDirectoryCacheForURL:(NSURL *)url
+{
+	NSString *key;
+	if ([[url user] length] > 0)
+		key = [NSString stringWithFormat:@"%@@%@", [url user], [url host]];
+	else
+		key = [url host];
+	SFTPConnection *conn = [connections objectForKey:key];
+	if (conn) {
+		[conn flushDirectoryCache];
+	}
 }
 
 @end

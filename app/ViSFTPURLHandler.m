@@ -19,20 +19,48 @@
 	return [[aURL scheme] isEqualToString:@"sftp"];
 }
 
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	return aURL;
+}
+
+- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
+{
+	DEBUG(@"url = %@", aURL);
+
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn attributesOfItemAtURL:aURL onResponse:aBlock];
+		aBlock(nil, nil, error);
+		return nil;
+	}];
+}
+
+- (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSURL *, BOOL, NSError *))aBlock
+{
+	DEBUG(@"url = %@", aURL);
+
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn fileExistsAtURL:aURL onResponse:aBlock];
+		aBlock(nil, NO, error);
+		return nil;
+	}];
+}
+
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
 			      onCompletion:(void (^)(NSArray *contents, NSError *error))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
 		aBlock(nil, error);
 		return nil;
-	}
-
-	return [conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
+	}];
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL
@@ -40,31 +68,12 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn createDirectory:[aURL path] onResponse:aBlock];
 		aBlock(error);
 		return nil;
-	}
-
-	return [conn createDirectory:[aURL path] onResponse:aBlock];
-}
-
-- (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(BOOL, BOOL, NSError *))aBlock
-{
-	DEBUG(@"url = %@", aURL);
-
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
-		aBlock(NO, NO, error);
-		return nil;
-	}
-
-	return [conn fileExistsAtPath:[aURL path] onResponse:aBlock];
+	}];
 }
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
@@ -73,17 +82,14 @@
 {
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:srcURL
-									    error:&error];
-	if (error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:srcURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn renameItemAtPath:[srcURL path]
+					       toPath:[dstURL path]
+					   onResponse:aBlock];
 		aBlock(error);
 		return nil;
-	}
-
-	return [conn renameItemAtPath:[srcURL path]
-			       toPath:[dstURL path]
-			   onResponse:aBlock];
+	}];
 }
 
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
@@ -91,50 +97,28 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn removeItemAtPath:[aURL path] onResponse:aBlock];
 		aBlock(error);
 		return nil;
-	}
-
-	return [conn removeItemAtPath:[aURL path] onResponse:aBlock];
-}
-
-- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
-			   onCompletion:(void (^)(NSDictionary *, NSError *))aBlock
-{
-	DEBUG(@"url = %@", aURL);
-
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
-		aBlock(nil, error);
-		return nil;
-	}
-
-	return [conn attributesOfItemAtPath:[aURL path] onResponse:aBlock];
+	}];
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
 				 onData:(void (^)(NSData *data))dataCallback
-			   onCompletion:(void (^)(NSError *error))completionCallback
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))completionCallback
 {
 	DEBUG(@"url = %@", aURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
-		completionCallback(error);
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn dataWithContentsOfURL:aURL
+						    onData:dataCallback
+						onResponse:completionCallback];
+		completionCallback(nil, nil, error);
 		return nil;
-	}
-
-	return [conn dataWithContentsOfFile:[aURL path]
-				     onData:dataCallback
-				 onResponse:completionCallback];
+	}];
 }
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
@@ -143,15 +127,12 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-									    error:&error];
-	if (error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn writeDataSefely:data toFile:[aURL path] onResponse:aBlock];
 		aBlock(error);
 		return nil;
-	}
-
-	return [conn writeDataSefely:data toFile:[aURL path] onResponse:aBlock];
+	}];
 }
 
 @end

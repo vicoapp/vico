@@ -1,7 +1,6 @@
 #import "ViProject.h"
 #import "logging.h"
 #import "ProjectDelegate.h"
-#import "SFTPConnectionPool.h"
 #import "ViDocumentController.h"
 #import "ViDocument.h"
 
@@ -27,10 +26,12 @@
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
+#if 0
 	if ([[url scheme] isEqualToString:@"sftp"] && ([url path] == nil || [[url path] isEqualToString:@""])) {
 		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
 		initialURL = [NSURL URLWithString:[conn home] relativeToURL:url];
 	} else
+#endif
 		initialURL = url;
 
 	return YES;

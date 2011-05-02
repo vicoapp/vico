@@ -39,6 +39,15 @@
 	return NO;
 }
 
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	id<ViURLHandler> handler;
+	for (handler in handlers)
+		if ([handler respondsToURL:aURL])
+			return [handler normalizeURL:aURL];
+	return aURL;
+}
+
 - (id<ViURLHandler>)handlerForURL:(NSURL *)aURL
 			 selector:(SEL)aSelector
 {
@@ -54,7 +63,7 @@
 }
 
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
-			      onCompletion:(void (^)(NSArray *contents, NSError *error))aBlock
+			      onCompletion:(void (^)(NSArray *, NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(contentsOfDirectoryAtURL:onCompletion:)];
@@ -65,7 +74,7 @@
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL
-			  onCompletion:(void (^)(NSError *error))aBlock
+			  onCompletion:(void (^)(NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(createDirectoryAtURL:onCompletion:)];
@@ -75,22 +84,24 @@
 	return nil;
 }
 
-- (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL onCompletion:(void (^)(BOOL result, BOOL isDirectory, NSError *error))aBlock
+- (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSURL *, BOOL, NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(fileExistsAtURL:onCompletion:)];
 	if (handler)
 		return [handler fileExistsAtURL:aURL onCompletion:aBlock];
-	aBlock(NO, NO, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
+	aBlock(nil, NO, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
-		toURL:(NSURL *)dstURL
-	 onCompletion:(void (^)(NSError *error))aBlock
+			  toURL:(NSURL *)dstURL
+		   onCompletion:(void (^)(NSError *))aBlock
 {
 	if (![[srcURL scheme] isEqualToString:[dstURL scheme]]) {
-		aBlock([ViError errorWithFormat:@"Moving between different URL schemes not implemented (%@ => %@)", [srcURL scheme], [dstURL scheme]]);
+		aBlock([ViError errorWithFormat:@"Moving between different URL schemes not implemented (%@ => %@)",
+		    [srcURL scheme], [dstURL scheme]]);
 		return nil;
 	}
 
@@ -104,7 +115,7 @@
 
 /* All URLs must be of the same type (scheme). */
 - (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls
-		       onCompletion:(void (^)(NSError *error))aBlock
+		       onCompletion:(void (^)(NSError *))aBlock
 {
 	NSURL *firstURL = [urls objectAtIndex:0];
 	if (firstURL == nil) {
@@ -142,7 +153,7 @@
 }
 
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSError *error))aBlock
+		     onCompletion:(void (^)(NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(removeItemAtURL:onCompletion:)];
@@ -153,19 +164,19 @@
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
-			   onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(attributesOfItemAtURL:onCompletion:)];
 	if (handler)
 		return [handler attributesOfItemAtURL:aURL onCompletion:aBlock];
-	aBlock(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
+	aBlock(nil, nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
-				 onData:(void (^)(NSData *data))dataCallback
-			   onCompletion:(void (^)(NSError *error))completionCallback
+				 onData:(void (^)(NSData *))dataCallback
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))completionCallback
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(dataWithContentsOfURL:onData:onCompletion:)];
@@ -173,13 +184,13 @@
 		return [handler dataWithContentsOfURL:aURL
 					       onData:dataCallback
 					 onCompletion:completionCallback];
-	completionCallback([ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
+	completionCallback(nil, nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSError *error))aBlock
+		     onCompletion:(void (^)(NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(writeDataSafely:toURL:onCompletion:)];

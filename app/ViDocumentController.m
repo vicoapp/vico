@@ -5,7 +5,6 @@
 #import "ViDocumentView.h"
 #import "ViWindowController.h"
 #import "ExEnvironment.h"
-#import "SFTPConnectionPool.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViError.h"
 #import "TxmtURLProtocol.h"
@@ -244,6 +243,7 @@
 	if ([path hasPrefix:@"~"] || [path hasPrefix:@"/~"]) {
 		if (relURL == nil || [relURL isFileURL])
 			path = [path stringByExpandingTildeInPath];
+#if 0 // FIXME!
 		else {
 			SFTPConnection *conn = [[SFTPConnectionPool sharedPool]
 			    connectionWithURL:relURL error:outError];
@@ -255,6 +255,7 @@
 			path = [path stringByReplacingCharactersInRange:r
 							     withString:[conn home]];
 		}
+#endif
 	}
 
 	url = [NSURL URLWithString:path relativeToURL:relURL];

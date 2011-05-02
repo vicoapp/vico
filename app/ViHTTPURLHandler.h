@@ -3,9 +3,10 @@
 @interface ViHTTPDeferred : NSObject <ViDeferred>
 {
 	NSURLConnection *conn;
+	NSURLRequest *request;
 	NSMutableData *connData;
-	void (^dataCallback)(NSData *data);
-	void (^completionCallback)(NSError *error);
+	void (^dataCallback)(NSData *);
+	void (^completionCallback)(NSURL *, NSDictionary *, NSError *);
 	NSUInteger receivedContentLength, expectedContentLength;
 	id<ViDeferredDelegate> delegate;
 }

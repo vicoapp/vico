@@ -51,25 +51,31 @@
 	baseURL = [url absoluteURL];
 }
 
+- (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage
+{
+	[self message:@"%@", statusMessage];
+}
+
 - (void)checkBaseURL:(NSURL *)url onCompletion:(void (^)(NSURL *url, NSError *error))aBlock
 {
 //	if (error == nil && [[url lastPathComponent] isEqualToString:@""])
 //		url = [NSURL URLWithString:[conn home] relativeToURL:url];
 
-	[[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+	id<ViDeferred> deferred = [[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
 		if (error)
 			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
-		else if (!exists)
+		else if (normalizedURL == nil)
 			[self message:@"%@: no such file or directory", [url absoluteString]];
 		else if (!isDirectory)
-			[self message:@"%@: not a directory", [url absoluteString]];
+			[self message:@"%@: not a directory", [normalizedURL absoluteString]];
 		else {
-			[self setBaseURL:url];
+			[self setBaseURL:normalizedURL];
 			aBlock([self baseURL], error);
 			return;
 		}
 		aBlock(nil, error);
 	}];
+	[deferred setDelegate:self];
 }
 
 - (NSString *)displayBaseURL
@@ -209,9 +215,12 @@
 			if ([newURL isFileURL]) {
 				exists = [[NSFileManager defaultManager] fileExistsAtPath:[newURL path]];
 			} else {
+#if 0
 				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:newURL
 												    error:nil];
 				exists = [conn fileExistsAtPath:[newURL path]];
+#endif
+				exists = YES; // FIXME!
 			}
 
 			if (exists && (command.flags & E_C_FORCE) != E_C_FORCE) {

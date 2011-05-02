@@ -49,13 +49,35 @@
 	return nil;
 }
 
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	NSString *path = [aURL path];
+	if ([path hasPrefix:@"~"] || [path hasPrefix:@"/~"]) {
+		path = [path stringByExpandingTildeInPath];
+		return [NSURL fileURLWithPath:path];
+	}
+	return aURL;
+}
+
+- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
+{
+	DEBUG(@"url = %@", aURL);
+	NSError *error = nil;
+	NSURL *url = [self normalizeURL:aURL];
+	NSDictionary *attributes = [fm attributesOfItemAtPath:[url path] error:&error];
+	aBlock(url, attributes, error);
+	return nil;
+}
+
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(BOOL result, BOOL isDirectory, NSError *error))aBlock
+		     onCompletion:(void (^)(NSURL *, BOOL, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 	BOOL result, isDirectory;
-	result = [fm fileExistsAtPath:[aURL path] isDirectory:&isDirectory];
-	aBlock(result, isDirectory, nil);
+	NSURL *url = [self normalizeURL:aURL];
+	result = [fm fileExistsAtPath:[url path] isDirectory:&isDirectory];
+	aBlock(result ? url : nil, isDirectory, nil);
 	return nil;
 }
 
@@ -77,16 +99,6 @@
 	[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
 		aBlock(error);
 	}];
-	return nil;
-}
-
-- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
-			   onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock
-{
-	DEBUG(@"url = %@", aURL);
-	NSError *error = nil;
-	NSDictionary *attributes = [fm attributesOfItemAtPath:[aURL path] error:&error];
-	aBlock(attributes, error);
 	return nil;
 }
 

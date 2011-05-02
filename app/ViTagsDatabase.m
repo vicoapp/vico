@@ -63,24 +63,14 @@
 		[tagsData appendData:data];
 	};
 
-	[um dataWithContentsOfURL:url onData:dataCallback onCompletion:^(NSError *error) {
-		if (error) {
-			aBlock(error);
-		} else {
-			/* There is a race here between reading and checking modtime. */
-			[um attributesOfItemAtURL:url
-				     onCompletion:^(NSDictionary *attributes, NSError *error) {
-				if (error) {
-					aBlock(error);
-				} else {
-					modificationDate = [attributes fileModificationDate];
-					DEBUG(@"got modtime %@", modificationDate);
-					databaseURL = url;
-					[self parseData:tagsData];
-					aBlock(nil);
-				}
-			}];
+	[um dataWithContentsOfURL:url onData:dataCallback onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+		if (!error) {
+			modificationDate = [attributes fileModificationDate];
+			DEBUG(@"got modtime %@", modificationDate);
+			databaseURL = normalizedURL;
+			[self parseData:tagsData];
 		}
+		aBlock(error);
 	}];
 }
 
@@ -124,11 +114,11 @@
 {
 	DEBUG(@"checking if %@ has change modtime from %@", databaseURL, modificationDate);
 	[[ViURLManager defaultManager] attributesOfItemAtURL:databaseURL
-						onCompletion:^(NSDictionary *attributes, NSError *error) {
+						onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error)
 			aBlock(error);
 		if ([modificationDate isEqualToDate:[attributes fileModificationDate]]) {
-			DEBUG(@"tags file %@ unmodified: %@", databaseURL, modificationDate);
+			DEBUG(@"tags file %@ unmodified: %@", normalizedURL, modificationDate);
 			aBlock(nil);
 		} else
 			[self onOpen:aBlock];

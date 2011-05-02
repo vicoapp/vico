@@ -10,14 +10,14 @@
 #import "ViURLManager.h"
 
 @interface ProjectDelegate (private)
-+ (void)recursivelySortProjectFiles:(NSMutableArray *)children;
+- (void)recursivelySortProjectFiles:(NSMutableArray *)children;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
 - (void)expandNextItem:(id)dummy;
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit;
-+ (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children;
+- (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children;
 - (BOOL)rescan_files:(ViCommand *)command;
 @end
 
@@ -126,7 +126,7 @@
 	/* only explorecaseignore and exploresortfolders options observed */
 	/* re-sort explorer */
 	if (rootItems) {
-		[ProjectDelegate recursivelySortProjectFiles:rootItems];
+		[self recursivelySortProjectFiles:rootItems];
 		if (!isFiltered)
 			[self filterFiles:self];
 	}
@@ -159,17 +159,16 @@
 	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
-+ (void)childrenAtURL:(NSURL *)url onCompletion:(void (^)(NSMutableArray *children, NSError *error))aBlock
+- (void)childrenAtURL:(NSURL *)url onCompletion:(void (^)(NSMutableArray *children, NSError *error))aBlock
 {
 	ViURLManager *um = [ViURLManager defaultManager];
 
-	[um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *files, NSError *error) {
+	id<ViDeferred> deferred = [um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *files, NSError *error) {
+		[progressIndicator setHidden:YES];
+		[progressIndicator stopAnimation:nil];
 		if (error)
 			[NSApp presentError:error];
 		else {
-			NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-			ViRegexp *skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
-
 			NSMutableArray *children = [NSMutableArray array];
 			for (NSArray *entry in files) {
 				NSString *filename = [entry objectAtIndex:0];
@@ -183,9 +182,14 @@
 			aBlock(children, nil);
 		}
 	}];
+
+	if (deferred) {
+		[progressIndicator setHidden:NO];
+		[progressIndicator startAnimation:nil];
+	}
 }
 
-+ (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children
+- (NSMutableArray *)sortProjectFiles:(NSMutableArray *)children
 {
 	BOOL sortFolders = [[NSUserDefaults standardUserDefaults] boolForKey:@"exploresortfolders"];
 	BOOL caseIgnoreSort = [[NSUserDefaults standardUserDefaults] boolForKey:@"explorecaseignore"];
@@ -207,7 +211,7 @@
 	return children;
 }
 
-+ (void)recursivelySortProjectFiles:(NSMutableArray *)children
+- (void)recursivelySortProjectFiles:(NSMutableArray *)children
 {
 	[self sortProjectFiles:children];
 
@@ -218,7 +222,7 @@
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
 {
-	[ProjectDelegate childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert runModal];
@@ -305,20 +309,15 @@
 	NSString *user = [[sftpConnectForm cellAtIndex:1] stringValue];	/* might be blank */
 	NSString *path = [[sftpConnectForm cellAtIndex:2] stringValue];
 
-	NSError *error = nil;
-	SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithHost:host
-	                                                                      user:user
-	                                                                     error:&error];
-	if (conn) {
-		if (![path hasPrefix:@"/"])
-			path = [NSString stringWithFormat:@"%@/%@", [conn home], path];
-		NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@",
-		    user, host, path]];
-		[self browseURL:url];
-	} else {
-		NSAlert *alert = [NSAlert alertWithError:error];
-		[alert runModal];
-	}
+	if (![path hasPrefix:@"/"])
+		path = [NSString stringWithFormat:@"/~/%@", path];
+	NSURL *url;
+	path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	if ([user length] > 0)
+		url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@@%@%@", user, host, path]];
+	else
+		url = [NSURL URLWithString:[NSString stringWithFormat:@"sftp://%@%@", host, path]];
+	[self browseURL:url];
 }
 
 - (IBAction)cancelSftpSheet:(id)sender
@@ -465,9 +464,7 @@
 	NSURL *url = [rootButton URL];
 	if (![url isFileURL]) {
 		/* Forget SFTP directory cache. */
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url
-										    error:nil];
-		[conn flushDirectoryCache];
+		[[SFTPConnectionPool sharedPool] flushDirectoryCacheForURL:url];
 	}
 	[self browseURL:url];
 }
@@ -1068,7 +1065,7 @@ doCommandBySelector:(SEL)aSelector
 	if ([pf hasCachedChildren])
 		return;
 
-	[ProjectDelegate childrenAtURL:[pf url] onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:[pf url] onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {

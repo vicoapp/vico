@@ -186,22 +186,23 @@
 @property(readonly) NSString *home;
 
 - (SFTPConnection *)initWithHost:(NSString *)hostname user:(NSString *)username error:(NSError **)outError;
+- (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback;
 
-- (SFTPRequest *)attributesOfItemAtPath:(NSString *)path
-			     onResponse:(void (^)(NSDictionary *, NSError *))responseCallback;
+- (SFTPRequest *)attributesOfItemAtURL:(NSURL *)url
+			    onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback;
 
-- (SFTPRequest *)fileExistsAtPath:(NSString *)path
-		       onResponse:(void (^)(BOOL, BOOL, NSError *))responseCallback;
+- (SFTPRequest *)fileExistsAtURL:(NSURL *)url
+		       onResponse:(void (^)(NSURL *, BOOL, NSError *))responseCallback;
+
+- (SFTPRequest *)dataWithContentsOfURL:(NSURL *)url
+				onData:(void (^)(NSData *))dataCallback
+			    onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback;
 
 - (SFTPRequest *)contentsOfDirectoryAtPath:(NSString *)path
 				onResponse:(void (^)(NSArray *, NSError *))responseCallback;
 
 - (SFTPRequest *)createDirectory:(NSString *)path
 		      onResponse:(void (^)(NSError *))responseCallback;
-
-- (SFTPRequest *)dataWithContentsOfFile:(NSString *)path
-				 onData:(void (^)(NSData *))dataCallback
-			     onResponse:(void (^)(NSError *))responseCallback;
 
 - (SFTPRequest *)renameItemAtPath:(NSString *)oldPath
 			   toPath:(NSString *)newPath
@@ -226,5 +227,7 @@
 - (void)abort;
 - (void)close;
 - (BOOL)closed;
+- (BOOL)connected;
+- (NSURL *)normalizeURL:(NSURL *)aURL;
 
 @end

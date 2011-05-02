@@ -8,14 +8,15 @@
 @synthesize delegate;
 
 - (id)initWithURL:(NSURL *)aURL
-	   onData:(void (^)(NSData *data))aDataCallback
-     onCompletion:(void (^)(NSError *error))aCompletionCallback
+	   onData:(void (^)(NSData *))aDataCallback
+     onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aCompletionCallback
 {
 	if ((self = [super init]) != nil) {
 		connData = [NSMutableData data];
 		dataCallback = Block_copy(aDataCallback);
-		completionCallback = [aCompletionCallback copy];
-		conn = [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:aURL]
+		completionCallback = Block_copy(aCompletionCallback);
+		request = [NSURLRequest requestWithURL:aURL];
+		conn = [NSURLConnection connectionWithRequest:request
 						     delegate:self];
 		DEBUG(@"conn = %@", conn);
 	}
@@ -27,17 +28,20 @@
 	DEBUG(@"finished on conn %@, callback %p", conn, completionCallback);
 
 	if (completionCallback)
-		completionCallback(error);
+		completionCallback([request URL], nil, error);
 
 	completionCallback = NULL;
 	dataCallback = NULL;
 	connData = nil;
 	conn = nil;
+	request = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
 	DEBUG(@"received response %@", response);
+	if ([response isKindOfClass:[NSHTTPURLResponse class]])
+		DEBUG(@"http headers: %@", [(NSHTTPURLResponse *)response allHeaderFields]);
 	expectedContentLength = [response expectedContentLength];
 	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0)
 		DEBUG(@"expecting %lld bytes", expectedContentLength);
@@ -98,9 +102,14 @@
 	       [[aURL scheme] isEqualToString:@"ftp"];
 }
 
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	return aURL;
+}
+
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
-				 onData:(void (^)(NSData *data))dataCallback
-			   onCompletion:(void (^)(NSError *error))completionCallback
+				 onData:(void (^)(NSData *))dataCallback
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))completionCallback
 {
 	DEBUG(@"url = %@", aURL);
 	ViHTTPDeferred *deferred = [[ViHTTPDeferred alloc] initWithURL:aURL

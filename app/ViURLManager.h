@@ -17,20 +17,23 @@
 @protocol ViURLHandler <NSObject>
 @required
 - (BOOL)respondsToURL:(NSURL *)aURL;
+- (NSURL *)normalizeURL:(NSURL *)aURL;
 
 @optional
-- (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
-				 onData:(void (^)(NSData *data))dataCallback
-			   onCompletion:(void (^)(NSError *error))completionCallback;
+- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock;
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(BOOL result, BOOL isDirectory, NSError *error))aBlock;
-- (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSArray *contents, NSError *error))aBlock;
-- (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock;
-- (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL onCompletion:(void (^)(NSError *error))aBlock;
-- (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls onCompletion:(void (^)(NSError *error))aBlock;
-- (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSDictionary *attributes, NSError *error))aBlock;
-- (id<ViDeferred>)writeDataSafely:(NSData *)data toURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock;
-- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *error))aBlock;
+		     onCompletion:(void (^)(NSURL *, BOOL, NSError *))aBlock;
+- (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
+				 onData:(void (^)(NSData *))dataCallback
+			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))completionCallback;
+
+- (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSArray *, NSError *))aBlock;
+- (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
+- (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL onCompletion:(void (^)(NSError *))aBlock;
+- (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls onCompletion:(void (^)(NSError *))aBlock;
+- (id<ViDeferred>)writeDataSafely:(NSData *)data toURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
+- (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
 @end
 
 @interface ViURLManager : NSObject <ViURLHandler>

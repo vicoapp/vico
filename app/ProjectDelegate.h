@@ -37,6 +37,7 @@
 	IBOutlet NSPathControl *rootButton;
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
+	IBOutlet NSProgressIndicator *progressIndicator;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;

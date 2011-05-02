@@ -405,7 +405,7 @@
 				</object>
 				<string key="NSWindowContentMinSize">{400, 200}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSSplitView" id="892226745">
@@ -591,10 +591,9 @@
 						</object>
 					</array>
 					<string key="NSFrame">{{7, 11}, {800, 600}}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="892226745"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{400, 270}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 				<string key="NSFrameAutosaveName">documentWindow</string>
@@ -603,7 +602,7 @@
 				<string key="NSClassName">ProjectDelegate</string>
 			</object>
 			<object class="NSCustomView" id="342887108">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSImageView" id="701209205">
@@ -849,7 +848,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{150, 489}</string>
-				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="709866892"/>
 				<string key="NSClassName">ViBgView</string>
 			</object>
@@ -1032,6 +1030,16 @@
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
+					<object class="NSProgressIndicator" id="430640285">
+						<reference key="NSNextResponder" ref="244902241"/>
+						<int key="NSvFlags">-2147482332</int>
+						<object class="NSPSMatrix" key="NSDrawMatrix"/>
+						<string key="NSFrame">{{39, 3}, {16, 16}}</string>
+						<reference key="NSSuperview" ref="244902241"/>
+						<reference key="NSWindow"/>
+						<int key="NSpiFlags">28938</int>
+						<double key="NSMaxValue">100</double>
+					</object>
 					<object class="NSSearchField" id="540044896">
 						<reference key="NSNextResponder" ref="244902241"/>
 						<int key="NSvFlags">290</int>
@@ -1508,7 +1516,7 @@
 					</array>
 					<string key="NSFrameSize">{382, 187}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 			</object>
 			<object class="NSUserDefaultsController" id="150299444">
@@ -1577,7 +1585,7 @@
 					</array>
 					<string key="NSFrame">{{7, 11}, {329, 82}}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 			</object>
 			<object class="NSCustomObject" id="687101210">
@@ -2266,6 +2274,14 @@
 					</object>
 					<int key="connectionID">100706</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">progressIndicator</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="430640285"/>
+					</object>
+					<int key="connectionID">100710</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2444,6 +2460,7 @@
 							<reference ref="50669392"/>
 							<reference ref="643230473"/>
 							<reference ref="540044896"/>
+							<reference ref="430640285"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">ExplorerView</string>
@@ -3054,6 +3071,11 @@
 						<reference key="parent" ref="0"/>
 						<string key="objectName">SymbolController</string>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100709</int>
+						<reference key="object" ref="430640285"/>
+						<reference key="parent" ref="244902241"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -3239,6 +3261,7 @@
 				</object>
 				<string key="100672.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100694.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100709.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBEditorWindowLastContentRect">{{709, 178}, {600, 650}}</string>
 				<boolean value="YES" key="5.IBNSWindowAutoPositionCentersHorizontal"/>
 				<boolean value="YES" key="5.IBNSWindowAutoPositionCentersVertical"/>
@@ -3256,7 +3279,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100708</int>
+			<int key="maxID">100710</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3492,6 +3515,7 @@
 						<string key="explorer">ViOutlineView</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="filterField">NSSearchField</string>
+						<string key="progressIndicator">NSProgressIndicator</string>
 						<string key="rootButton">NSPathControl</string>
 						<string key="scrollView">NSScrollView</string>
 						<string key="sftpConnectForm">NSForm</string>
@@ -3532,6 +3556,10 @@
 						<object class="IBToOneOutletInfo" key="filterField">
 							<string key="name">filterField</string>
 							<string key="candidateClassName">NSSearchField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressIndicator">
+							<string key="name">progressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="rootButton">
 							<string key="name">rootButton</string>

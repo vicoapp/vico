@@ -479,7 +479,7 @@ static NSMutableDictionary *maps = nil;
 		*outError = error;
 
 	if (m == nil) {
-		if (error.code == ViErrorMapNotFound && defaultAction) {
+		if (error.code == ViErrorMapNotFound && defaultAction && [[keySequence objectAtIndex:0] integerValue] < 0xFFFF) {
 			/* Nothing matched. Return the default action, if there is one. */
 			if (outError)
 				*outError = nil;

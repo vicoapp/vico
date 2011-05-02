@@ -242,7 +242,7 @@
 
 - (void)ex_quit:(ExCommand *)command
 {
-	[NSApp terminate:self];
+	[windowController closeCurrentView];
 }
 
 - (void)ex_wq:(ExCommand *)command

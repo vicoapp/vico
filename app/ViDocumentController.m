@@ -230,36 +230,10 @@
 	}
 
 	NSString *escapedFilename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	NSURL *url = [NSURL URLWithString:escapedFilename];
-	NSString *path;
-	if (url == nil || [url scheme] == nil)
-		path = escapedFilename;
-	else {
-		relURL = url;
-		path = [url path];
-	}
-
-	if ([path hasPrefix:@"~"] || [path hasPrefix:@"/~"]) {
-		if (relURL == nil || [relURL isFileURL])
-			path = [path stringByExpandingTildeInPath];
-#if 0 // FIXME!
-		else {
-			SFTPConnection *conn = [[SFTPConnectionPool sharedPool]
-			    connectionWithURL:relURL error:outError];
-			if (conn == nil)
-				return nil;
-			NSRange r = NSMakeRange(0, 1);
-			if ([path hasPrefix:@"/~"])
-				r.length = 2;
-			path = [path stringByReplacingCharactersInRange:r
-							     withString:[conn home]];
-		}
-#endif
-	}
-
-	url = [NSURL URLWithString:path relativeToURL:relURL];
-
-	return [url absoluteURL];
+	NSURL *url = [NSURL URLWithString:escapedFilename relativeToURL:relURL];
+	NSURL *normalizedURL = [[ViURLManager defaultManager] normalizeURL:url];
+	DEBUG(@"normalized %@ -> %@", url, normalizedURL);
+	return normalizedURL;
 }
 
 

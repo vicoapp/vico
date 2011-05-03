@@ -891,15 +891,13 @@ resp2txt(int type)
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
+	// BOOL hasTrailingSlash = [[aURL absoluteString] hasPrefix:@"/"];
 	NSString *path = [aURL path];
-	if ([path isEqualToString:@""]) {
-		/* This is the home directory. */
-		/*responseCallback(YES, YES, nil);
-		return nil;*/
+	if ([path length] == 0)
 		path = home;
-	} else if ([path hasPrefix:@"/~"]) {
+	else if ([path hasPrefix:@"/~"])
 		path = [home stringByAppendingPathComponent:[path substringFromIndex:2]];
-	} else
+	else
 		return aURL;
 	return [[NSURL URLWithString:path relativeToURL:aURL] absoluteURL];
 }

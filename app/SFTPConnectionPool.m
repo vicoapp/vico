@@ -21,17 +21,30 @@
 	return sharedPool;
 }
 
+- (NSString *)connectionKeyForURL:(NSURL *)aURL
+{
+	NSString *username = [aURL user];
+	NSString *hostname = [aURL host];
+	NSNumber *port = [aURL port];
+	return [NSString stringWithFormat:@"%@@%@:%@", username ?: @"", hostname, port ?: @"22"];
+}
+
+- (NSURL *)normalizeURL:(NSURL *)aURL
+{
+	NSString *key = [self connectionKeyForURL:aURL];
+	SFTPConnection *conn = [connections objectForKey:key];
+	if (conn)
+		return [conn normalizeURL:aURL];
+	return aURL;
+}
+
 - (id<ViDeferred>)connectionWithURL:(NSURL *)url
 			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {
-	NSString *username = [url user];
-	NSString *hostname = [url host];
-	NSNumber *port = [url port];
-
-	if (hostname == nil)
+	if ([url host] == nil)
 		return connectCallback(nil, [ViError errorWithFormat:@"missing hostname in URL %@", url]);
 
-	NSString *key = [NSString stringWithFormat:@"%@@%@:%@", username ?: @"", hostname, port ?: @"22"];
+	NSString *key = [self connectionKeyForURL:url];
 	SFTPConnection *conn = [connections objectForKey:key];
 
 	if (conn && [conn closed]) {

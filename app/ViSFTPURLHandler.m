@@ -20,7 +20,7 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
-	return aURL;
+	return [[SFTPConnectionPool sharedPool] normalizeURL:aURL];
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL

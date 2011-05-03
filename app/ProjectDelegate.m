@@ -165,9 +165,10 @@
 	id<ViDeferred> deferred = [um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *files, NSError *error) {
 		[progressIndicator setHidden:YES];
 		[progressIndicator stopAnimation:nil];
-		if (error)
-			[NSApp presentError:error];
-		else {
+		if (error) {
+			INFO(@"failed to read contents of folder %@", url);
+			aBlock(nil, error);
+		} else {
 			NSMutableArray *children = [NSMutableArray array];
 			for (NSArray *entry in files) {
 				NSString *filename = [entry objectAtIndex:0];
@@ -774,8 +775,13 @@ sort_by_score(id a, id b, void *context)
 
 	[self childrenAtURL:[item url] onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
-			NSAlert *alert = [NSAlert alertWithError:error];
-			[alert runModal];
+			/* schedule re-read of parent folder */
+			ProjectFile *parent = [explorer parentForItem:item];
+			if (parent) {
+				DEBUG(@"scheduling re-read of parent item %@", parent);
+				[itemsToFilter addObject:parent];
+			} else
+				DEBUG(@"no parent for item %@", item);
 		} else {
 			[item setChildren:children];
 			[self expandItems:[item children] recursionLimit:3];

@@ -53,19 +53,19 @@ hdiutil convert -format UDBZ "$TMPDMG" -o "$DMG"
 ls -lh "$DMG"
 
 #### Create and sign a zip file for automatic updates.
-
-APPCAST_BASE="http://www.vicoapp.com/appcast"
+set -x
+APPCAST_BASE="http://www.vicoapp.com/relnotes"
 DOWNLOAD_BASE="http://www.vicoapp.com/download/t"
 
 KSIZE=$(du -ks "$APP" | cut -f1)
 SIZE=$(($KSIZE * 1024))
 SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < "$DMG" | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
-cat > $VOL.xml <<EOF
+tee $VOL.xml <<EOF
 <item>
     <title>Version $VERSION</title>
     <sparkle:releaseNotesLink>
-        $APPCAST_BASE/version-$VERSION.html
+        $APPCAST_BASE/$VERSION.html
     </sparkle:releaseNotesLink>
     <pubDate>$(LC_TIME=en_US date +"%a, %d %b %G %T %z")</pubDate>
     <enclosure url="$DOWNLOAD_BASE/$DMG"
@@ -76,7 +76,6 @@ cat > $VOL.xml <<EOF
                type="application/octet-stream" />
 </item>
 EOF
-cat "$VOL.xml"
 
 echo "scp $DMG vicoapp.com:/var/www/vicoapp.com/download/t"
 

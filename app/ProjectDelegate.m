@@ -232,6 +232,7 @@
 			[self filterFiles:self];
 			[explorer reloadData];
 			[rootButton setURL:aURL];
+			[environment setBaseURL:aURL];
 		}
 	}];
 
@@ -529,7 +530,6 @@
 {
 	NSURL *url = [NSURL URLWithString:[sender titleOfSelectedItem]];
 	[self browseURL:url];
-	[environment setBaseURL:url];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

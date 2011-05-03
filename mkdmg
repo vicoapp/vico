@@ -59,6 +59,7 @@ DOWNLOAD_BASE="http://www.vicoapp.com/download/t"
 
 KSIZE=$(du -ks "$APP" | cut -f1)
 SIZE=$(($KSIZE * 1024))
+export DMG
 SIGNATURE=$(/usr/bin/openssl dgst -sha1 -binary < "$DMG" | /usr/bin/openssl dgst -dss1 -sign sparkle_priv.pem | /usr/bin/openssl enc -base64)
 
 tee $VOL.xml <<EOF

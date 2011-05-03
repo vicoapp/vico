@@ -771,12 +771,20 @@ sort_by_score(id a, id b, void *context)
 	ProjectFile *item = [itemsToFilter objectAtIndex:0];
 	[itemsToFilter removeObjectAtIndex:0];
 	DEBUG(@"expanding children of next item %@", item);
-	[self expandItems:[item children] recursionLimit:3];
 
-	if ([itemsToFilter count] > 0)
-		[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.05];
-	[filteredItems sortUsingFunction:sort_by_score context:nil];
-	[explorer reloadData];
+	[self childrenAtURL:[item url] onCompletion:^(NSMutableArray *children, NSError *error) {
+		if (error) {
+			NSAlert *alert = [NSAlert alertWithError:error];
+			[alert runModal];
+		} else {
+			[item setChildren:children];
+			[self expandItems:[item children] recursionLimit:3];
+			[filteredItems sortUsingFunction:sort_by_score context:nil];
+			[explorer reloadData];
+			if ([itemsToFilter count] > 0)
+				[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.0];
+		}
+	}];
 }
 
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit
@@ -871,9 +879,7 @@ sort_by_score(id a, id b, void *context)
 		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 		      byExtendingSelection:NO];
 		if ([itemsToFilter count] > 0)
-			[self performSelector:@selector(expandNextItem:)
-				   withObject:nil
-				   afterDelay:0.05];
+			[self expandNextItem:nil];
         }
 }
 

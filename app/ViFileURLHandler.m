@@ -50,12 +50,16 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
-	NSString *path = [aURL path];
-	if ([path hasPrefix:@"~"] || [path hasPrefix:@"/~"]) {
-		path = [path stringByExpandingTildeInPath];
-		return [NSURL fileURLWithPath:path];
-	}
-	return aURL;
+	NSString *path = [aURL relativePath];
+	if ([path length] == 0)
+		path = NSHomeDirectory();
+	else if ([path hasPrefix:@"~"])
+		path = [NSHomeDirectory() stringByAppendingPathComponent:[path substringFromIndex:1]];
+	else if ([path hasPrefix:@"/~"])
+		path = [NSHomeDirectory() stringByAppendingPathComponent:[path substringFromIndex:2]];
+	else
+		return aURL;
+	return [[NSURL fileURLWithPath:path] absoluteURL];
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL

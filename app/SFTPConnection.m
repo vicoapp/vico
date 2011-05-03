@@ -892,9 +892,11 @@ resp2txt(int type)
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
 	// BOOL hasTrailingSlash = [[aURL absoluteString] hasPrefix:@"/"];
-	NSString *path = [aURL path];
+	NSString *path = [aURL relativePath];
 	if ([path length] == 0)
 		path = home;
+	else if ([path hasPrefix:@"~"])
+		path = [home stringByAppendingPathComponent:[path substringFromIndex:1]];
 	else if ([path hasPrefix:@"/~"])
 		path = [home stringByAppendingPathComponent:[path substringFromIndex:2]];
 	else

@@ -60,10 +60,9 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
-	id<ViURLHandler> handler;
-	for (handler in handlers)
-		if ([handler respondsToURL:aURL])
-			return [handler normalizeURL:aURL];
+	id<ViURLHandler> handler = [self handlerForURL:aURL selector:@selector(normalizeURL:)];
+	if (handler)
+		return [handler normalizeURL:aURL];
 	return aURL;
 }
 

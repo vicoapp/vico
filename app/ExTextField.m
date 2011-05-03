@@ -7,7 +7,10 @@
 
 - (void)awakeFromNib
 {
-	history = [NSMutableArray array];
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	history = [NSMutableArray arrayWithArray:[defs arrayForKey:@"exhistory"]];
+	if (history == nil)
+		history = [NSMutableArray array];
 }
 
 - (void)addToHistory:(NSString *)line
@@ -21,6 +24,8 @@
 		[history removeLastObject];
 
 	DEBUG(@"history = %@", history);
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	[defs setObject:history forKey:@"exhistory"];
 }
 
 - (BOOL)becomeFirstResponder

@@ -24,7 +24,7 @@
 
 - (void)finishWithError:(NSError *)error
 {
-	DEBUG(@"finished on conn %@, callback %p", conn, completionCallback);
+	DEBUG(@"finished on conn %@, callback %p, error %@", conn, completionCallback, error);
 
 	if (completionCallback)
 		completionCallback([request URL], nil, error);

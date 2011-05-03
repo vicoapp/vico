@@ -160,12 +160,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		if (error) {
 			/* If the file doesn't exist, treat it as an untitled file. */
 			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
-			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorFileDoesNotExist) ||
+			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == (NSInteger)NSURLErrorFileDoesNotExist) ||
 			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
 				DEBUG(@"treating non-existent file %@ as untitled file", normalizedURL);
-				[self setIsTemporary:YES];
 				[self setFileURL:normalizedURL];
 				[self message:@"%@: new file", [self title]];
+				returnError = nil;
 			} else if ([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError) {
 				[self message:@"cancelled loading of %@", normalizedURL];
 				[self setFileURL:nil];
@@ -201,6 +201,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[self setFileType:@"Document"];
 	[self setFileURL:absoluteURL];
+	[self setIsTemporary:YES]; /* Prevents triggering checkDocumentChanged in window controller. */
 
 	busy = YES;
 	loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL

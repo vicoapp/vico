@@ -280,4 +280,16 @@
 	return YES;
 }
 
+#pragma mark -
+
+- (void)swipeWithEvent:(NSEvent *)event
+{
+	DEBUG(@"got swipe event %@", event);
+	[keyManager.parser reset];
+	if ([event deltaX] > 0)
+		[keyManager runAsMacro:@"<ctrl-o>"];
+	else if ([event deltaX] < 0)
+		[keyManager runAsMacro:@"<ctrl-i>"];
+}
+
 @end

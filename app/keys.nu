@@ -313,6 +313,8 @@
 (emap setKey:"n" toAction:"new_document:")
 (emap setKey:"<ctrl-esc>" toMotion:"show_menu:")
 (emap setKey:"<cmd-esc>" toMotion:"show_menu:")
+(emap setKey:"<ctrl-i>" toAction:"jumplist_forward:")
+(emap setKey:"<ctrl-o>" toAction:"jumplist_backward:")
 
 ;; symbol map
 (set smap (ViMap symbolMap))

@@ -88,6 +88,8 @@
 		skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
+		history = [[ViJumpList alloc] init];
+		[history setDelegate:self];
 	}
 	return self;
 }
@@ -220,13 +222,15 @@
 			[self recursivelySortProjectFiles:[file children]];
 }
 
-- (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
+- (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display jump:(BOOL)jump
 {
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert runModal];
 		} else {
+			if (jump)
+				[history pushURL:[rootButton URL] line:0 column:0 view:nil];
 			if (display)
 				[self openExplorerTemporarily:NO];
 			rootItems = children;
@@ -234,15 +238,51 @@
 			[explorer reloadData];
 			[rootButton setURL:aURL];
 			[environment setBaseURL:aURL];
+
+			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+			      byExtendingSelection:NO];
 		}
 	}];
 
 	explorer.lastSelectedRow = 0;
 }
 
+- (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
+{
+	[self browseURL:aURL andDisplay:display jump:YES];
+}
+
 - (void)browseURL:(NSURL *)aURL
 {
-	[self browseURL:aURL andDisplay:YES];
+	[self browseURL:aURL andDisplay:YES jump:YES];
+}
+
+#pragma mark -
+#pragma mark ViJumpList delegate
+
+- (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump
+{
+	[self browseURL:[jump url] andDisplay:YES jump:NO];
+}
+
+- (void)jumpList:(ViJumpList *)aJumpList added:(ViJump *)jump
+{
+	INFO(@"added jump %@", jump);
+}
+
+/* syntax: [count]<ctrl-i> */
+- (BOOL)jumplist_forward:(ViCommand *)command
+{
+	return [history forwardToURL:NULL line:NULL column:NULL view:NULL];
+}
+
+/* syntax: [count]<ctrl-o> */
+- (BOOL)jumplist_backward:(ViCommand *)command
+{
+	NSURL *url = [rootButton URL];
+	NSUInteger zero = 0;
+	NSView *view = nil;
+	return [history backwardToURL:&url line:&zero column:&zero view:&view];
 }
 
 #pragma mark -

@@ -3,6 +3,7 @@
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViOutlineView.h"
 #import "ViSplitView.h"
+#import "ViJumpList.h"
 
 @class ViWindowController;
 @class ExEnvironment;
@@ -21,7 +22,7 @@
 @property(readwrite, assign) NSMutableArray *children;
 @end
 
-@interface ProjectDelegate : NSObject <NSOutlineViewDataSource>
+@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, ViJumpListDelegate>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;
@@ -53,6 +54,8 @@
 
 	BOOL isFiltered;
 	BOOL isFiltering;
+
+	ViJumpList *history;
 }
 
 @property(readwrite,assign) id delegate;

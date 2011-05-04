@@ -54,7 +54,7 @@
 				// place cursor at end of tab, like vi does
 				caretRect.origin.x += caretRect.size.width - 7;
 			}
-			if (c == '\t' || c == '\n' || c == '\r')
+			if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
 		if ([self isFieldEditor])

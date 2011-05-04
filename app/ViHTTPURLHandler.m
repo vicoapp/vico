@@ -38,9 +38,11 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
+#ifndef NO_DEBUG
 	DEBUG(@"received response %@", response);
 	if ([response isKindOfClass:[NSHTTPURLResponse class]])
 		DEBUG(@"http headers: %@", [(NSHTTPURLResponse *)response allHeaderFields]);
+#endif
 	expectedContentLength = [response expectedContentLength];
 	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0)
 		DEBUG(@"expecting %lld bytes", expectedContentLength);

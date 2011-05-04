@@ -1151,10 +1151,8 @@ resp2txt(int type)
 	__block SFTPRequest *statRequest = nil;
 
 	void (^fun)(NSURL *, NSDictionary *, NSError *) = ^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
-		INFO(@"statRequest is %@", statRequest);
-
 		if (error) {
-			originalCallback(normalizedURL, nil, error);
+			originalCallback(url, nil, error);
 			return;
 		}
 
@@ -1265,7 +1263,6 @@ resp2txt(int type)
 	};
 
 	statRequest = [self attributesOfItemAtURL:url onResponse:fun];
-	DEBUG(@"returning statRequest %@", statRequest);
 	return statRequest;
 }
 
@@ -1287,8 +1284,6 @@ resp2txt(int type)
 	__block SFTPRequest *openRequest = nil;
 
 	void (^fun)(NSData *, NSError *) = ^(NSData *handle, NSError *error) {
-		INFO(@"openRequest is %@", openRequest);
-
 		if (error) {
 			originalCallback(error);
 			return;
@@ -1361,7 +1356,6 @@ resp2txt(int type)
 
 	openRequest = [self openFile:path forWriting:YES onResponse:fun];
 
-	INFO(@"returning openRequest %@", openRequest);
 	return openRequest;
 }
 
@@ -1424,7 +1418,6 @@ resp2txt(int type)
 		NSString *randomFilename = [self randomFileAtDirectory:dir];
 
 		void (^fun)(NSError *error) = ^(NSError *error) {
-			INFO(@"renameRequest is %@", renameRequest);
 			BOOL newPathExists = YES;
 			if (error) {
 				if ([error code] == SSH2_FX_NO_SUCH_FILE)
@@ -1452,45 +1445,43 @@ resp2txt(int type)
 		renameRequest = [self renameItemAtPath:newPath toPath:randomFilename onResponse:fun];
 	}
 
-	INFO(@"returning renameRequest %@", renameRequest);
 	return renameRequest;
 }
 
 - (SFTPRequest *)writeDataSefely:(NSData *)data
-			  toFile:(NSString *)path
-		      onResponse:(void (^)(NSError *))responseCallback
+			  toURL:(NSURL *)aURL
+		      onResponse:(void (^)(NSURL *, NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	NSURL *url = [self normalizeURL:aURL];
+
+	void (^originalCallback)(NSURL *, NSError *) = Block_copy(responseCallback);
 	__block SFTPRequest *uploadRequest = nil;
 
 	void (^fun)(NSError *) = ^(NSError *error) {
-		INFO(@"uploadRequest is %@", uploadRequest);
 		if (error && [error code] == SSH2_FX_FAILURE) {
 			/* File already exists. Probably. */
 			/* Upload to a random file, then rename it to our destination filename. */
-			NSString *randomFilename = [self randomFileAtDirectory:[path stringByDeletingLastPathComponent]];
+			NSString *randomFilename = [self randomFileAtDirectory:[[url path] stringByDeletingLastPathComponent]];
 			uploadRequest.subRequest = [self uploadData:data
 							   toFile:randomFilename
 						       onResponse:^(NSError *error) {
-				INFO(@"uploadRequest is hopefully still %@", uploadRequest);
 				if (error)
-					originalCallback(error);
+					originalCallback(url, error);
 				else
 					uploadRequest.subRequest = [self atomicallyRenameItemAtPath:randomFilename
-											   toPath:path
+											   toPath:[url path]
 										       onResponse:^(NSError *error) {
-											     originalCallback(error);
+											     originalCallback(url, error);
 										     }];
 			}];
 		} else {
 			/* It was a new file, upload successful. Or other error. */
-			originalCallback(error);
+			originalCallback(url, error);
 		}
 	};
 
-	uploadRequest = [self uploadData:data toFile:path onResponse:fun];
+	uploadRequest = [self uploadData:data toFile:[url path] onResponse:fun];
 
-	INFO(@"returning uploadRequest %@", uploadRequest);
 	return uploadRequest;
 }
 

@@ -105,7 +105,7 @@
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL
-				 onData:(void (^)(NSData *data))dataCallback
+				 onData:(void (^)(NSData *))dataCallback
 			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))completionCallback
 {
 	DEBUG(@"url = %@", aURL);
@@ -122,14 +122,14 @@
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSError *error))aBlock
+		     onCompletion:(void (^)(NSURL *, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
-			return [conn writeDataSefely:data toFile:[aURL path] onResponse:aBlock];
-		aBlock(error);
+			return [conn writeDataSefely:data toURL:aURL onResponse:aBlock];
+		aBlock(nil, error);
 		return nil;
 	}];
 }

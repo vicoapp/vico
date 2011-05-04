@@ -424,10 +424,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
-	[[ViURLManager defaultManager] writeDataSafely:data toURL:url onCompletion:^(NSError *error) {
+	[[ViURLManager defaultManager] writeDataSafely:data toURL:url onCompletion:^(NSURL *normalizedURL, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {
+			[self setFileURL:normalizedURL];
 			[self updateChangeCount:NSChangeCleared];
 			[self message:@"%@: wrote %lu byte", url, [data length]];
 			isTemporary = NO;
@@ -533,7 +534,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSString *)title
 {
-	return [self displayName];
+	NSString *displayName = [self displayName];
+	if ([displayName length] == 0) {
+		displayName = [[self fileURL] lastPathComponent];
+		if ([displayName length] == 0)
+			displayName = [[self fileURL] host];
+	}
+	return displayName;
 }
 
 - (void)setFileURL:(NSURL *)absoluteURL

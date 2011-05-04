@@ -86,7 +86,7 @@
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
 			  toURL:(NSURL *)dstURL
-		   onCompletion:(void (^)(NSError *error))aBlock
+		   onCompletion:(void (^)(NSError *))aBlock
 {
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 	NSError *error = nil;
@@ -96,7 +96,7 @@
 }
 
 - (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls
-		       onCompletion:(void (^)(NSError *error))aBlock
+		       onCompletion:(void (^)(NSError *))aBlock
 {
 	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 	[workspace recycleURLs:urls completionHandler:^(NSDictionary *newURLs, NSError *error) {
@@ -122,12 +122,12 @@
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSError *error))aBlock
+		     onCompletion:(void (^)(NSURL *, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 	NSError *error = nil;
 	[data writeToURL:aURL options:NSDataWritingAtomic error:&error];
-	aBlock(error);
+	aBlock([self normalizeURL:aURL], error);
 	return nil;
 }
 

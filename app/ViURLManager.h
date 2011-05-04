@@ -32,7 +32,9 @@
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL onCompletion:(void (^)(NSError *))aBlock;
 - (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls onCompletion:(void (^)(NSError *))aBlock;
-- (id<ViDeferred>)writeDataSafely:(NSData *)data toURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
+- (id<ViDeferred>)writeDataSafely:(NSData *)data
+			    toURL:(NSURL *)aURL
+		     onCompletion:(void (^)(NSURL *, NSError *))aBlock;
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
 @end
 

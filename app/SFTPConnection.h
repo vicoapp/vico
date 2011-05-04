@@ -215,8 +215,8 @@
 		       onResponse:(void (^)(NSError *))responseCallback;
 
 - (SFTPRequest *)writeDataSefely:(NSData *)data
-			  toFile:(NSString *)path
-		      onResponse:(void (^)(NSError *))responseCallback;
+			  toURL:(NSURL *)aURL
+		      onResponse:(void (^)(NSURL *, NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
 - (NSString *)stderr;

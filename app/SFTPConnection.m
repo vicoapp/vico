@@ -1374,6 +1374,27 @@ resp2txt(int type)
 	return req;
 }
 
+- (SFTPRequest *)removeItemsAtURLs:(NSArray *)urls
+		       onResponse:(void (^)(NSError *))responseCallback
+{
+	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	NSMutableArray *mutableURLs = [urls mutableCopy];
+
+	/* Dispatch all requests at once. */
+	SFTPRequest *req = nil;
+	for (NSURL *url in mutableURLs) {
+		req = [self removeItemAtPath:[url path] onResponse:^(NSError *error) {
+			[mutableURLs removeObject:url];
+			if (error)
+				originalCallback(error);
+			if ([mutableURLs count] == 0)
+				originalCallback(nil);
+		}];
+	}
+
+	return req; /* XXX: only returns the last request. */
+}
+
 - (SFTPRequest *)renameItemAtPath:(NSString *)oldPath
 			   toPath:(NSString *)newPath
 		       onResponse:(void (^)(NSError *))responseCallback

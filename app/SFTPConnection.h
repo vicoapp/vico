@@ -213,6 +213,8 @@
 
 - (SFTPRequest *)removeItemAtPath:(NSString *)path
 		       onResponse:(void (^)(NSError *))responseCallback;
+- (SFTPRequest *)removeItemsAtURLs:(NSArray *)urls
+		       onResponse:(void (^)(NSError *))responseCallback;
 
 - (SFTPRequest *)writeDataSefely:(NSData *)data
 			  toURL:(NSURL *)aURL

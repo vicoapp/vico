@@ -92,13 +92,26 @@
 }
 
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSError *error))aBlock
+		     onCompletion:(void (^)(NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
+							onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn removeItemAtPath:[aURL path] onResponse:aBlock];
+		aBlock(error);
+		return nil;
+	}];
+}
+
+- (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls
+		       onCompletion:(void (^)(NSError *))aBlock
+{
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:[urls objectAtIndex:0]
+							onConnect:^(SFTPConnection *conn, NSError *error) {
+		if (!error)
+			return [conn removeItemsAtURLs:urls onResponse:aBlock];
 		aBlock(error);
 		return nil;
 	}];
@@ -110,7 +123,8 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
+							onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn dataWithContentsOfURL:aURL
 						    onData:dataCallback

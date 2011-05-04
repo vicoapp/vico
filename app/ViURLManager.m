@@ -149,26 +149,6 @@
 	if (handler)
 		return [handler removeItemsAtURLs:urls onCompletion:aBlock];
 
-	/* Handle each URL one at a time. */
-	handler = [self handlerForURL:firstURL selector:@selector(removeItemAtURL:onCompletion:)];
-	if (handler) {
-		NSMutableArray *mutableURLs = [urls mutableCopy];
-		void (^fun)(void) = ^{
-			NSURL *url = [mutableURLs objectAtIndex:0];
-			[handler removeItemAtURL:url onCompletion:^(NSError *error) {
-				[mutableURLs removeObjectAtIndex:0];
-				if (error)
-					aBlock(error);
-				else if ([mutableURLs count] == 0)
-					aBlock(nil);
-				else
-					fun();
-			}];
-		};
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), fun);
-		return nil; // XXX: !!!
-	}
-
 	aBlock([ViError errorWithFormat:@"Unsupported URL scheme %@", [firstURL scheme]]);
 	return nil;
 }

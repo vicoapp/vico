@@ -239,8 +239,9 @@
 			[rootButton setURL:aURL];
 			[environment setBaseURL:aURL];
 
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-			      byExtendingSelection:NO];
+			if (!jump)
+				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+				      byExtendingSelection:NO];
 		}
 	}];
 
@@ -267,7 +268,7 @@
 
 - (void)jumpList:(ViJumpList *)aJumpList added:(ViJump *)jump
 {
-	INFO(@"added jump %@", jump);
+	DEBUG(@"added jump %@", jump);
 }
 
 /* syntax: [count]<ctrl-i> */
@@ -646,11 +647,20 @@
 {
 	NSIndexSet *set = [explorer selectedRowIndexes];
 
+	if ([set count] == 0) {
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:explorer.lastSelectedRow]
+		      byExtendingSelection:NO];
+		return;
+	}
+
 	if ([set count] > 1)
 		return;
 
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item == nil)
+		return;
+
+	if ([self outlineView:explorer isItemExpandable:item])
 		return;
 
 	// XXX: open in splits instead if alt key pressed?

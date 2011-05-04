@@ -197,7 +197,7 @@
 				onData:(void (^)(NSData *))dataCallback
 			    onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback;
 
-- (SFTPRequest *)contentsOfDirectoryAtPath:(NSString *)path
+- (SFTPRequest *)contentsOfDirectoryAtURL:(NSURL *)aURL
 				onResponse:(void (^)(NSArray *, NSError *))responseCallback;
 
 - (SFTPRequest *)createDirectory:(NSString *)path

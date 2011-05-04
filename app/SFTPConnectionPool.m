@@ -42,7 +42,8 @@
 			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {
 	if ([url host] == nil)
-		return connectCallback(nil, [ViError errorWithFormat:@"missing hostname in URL %@", url]);
+		return connectCallback(nil,
+		    [ViError errorWithFormat:@"missing hostname in URL %@", url]);
 
 	NSString *key = [self connectionKeyForURL:url];
 	SFTPConnection *conn = [connections objectForKey:key];

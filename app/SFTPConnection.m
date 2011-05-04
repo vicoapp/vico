@@ -875,10 +875,12 @@ resp2txt(int type)
 								    priority:0];
 		[errStream setDelegate:self];
 		[errStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+		[errStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSModalPanelRunLoopMode];
 
 		sshPipe = [[ViBufferedStream alloc] initWithTask:ssh_task];
 		[sshPipe setDelegate:self];
 		[sshPipe scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+		[sshPipe scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSModalPanelRunLoopMode];
 
 		host = [url host];
 		user = [url user];
@@ -972,19 +974,14 @@ resp2txt(int type)
 	};
 }
 
-- (SFTPRequest *)contentsOfDirectoryAtPath:(NSString *)path
+- (SFTPRequest *)contentsOfDirectoryAtURL:(NSURL *)aURL
 				onResponse:(void (^)(NSArray *, NSError *))responseCallback
 {
-	if (path == nil || [path isEqualToString:@""]) {
-		/* This is the home directory. */
-		path = home;
-		if (path == nil)
-			path = @"";
-	}
+	NSURL *url = [self normalizeURL:aURL];
 
 	void (^originalCallback)(NSArray *, NSError *) = Block_copy(responseCallback);
 
-	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", path];
+	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", [url path]];
 	openRequest.onResponse = ^(SFTPMessage *msg) {
 		NSData *handle;
 		NSError *error;
@@ -1048,7 +1045,7 @@ resp2txt(int type)
 				DEBUG(@"got file %@, attributes %@", filename, attributes);
 
 				if ([filename rangeOfString:@"/"].location != NSNotFound)
-					INFO(@"Ignoring suspect path \"%@\" during readdir of \"%s\"", filename, path);
+					INFO(@"Ignoring suspect path \"%@\" during readdir of \"%@\"", filename, url);
 				else
 					[entries addObject:[NSArray arrayWithObjects:filename, attributes, nil]];
 			}

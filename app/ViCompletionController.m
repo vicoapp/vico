@@ -7,6 +7,9 @@
 @interface ViCompletionController (private)
 - (void)updateBounds;
 - (void)filterCompletions;
+- (BOOL)complete_partially:(ViCommand *)command;
+- (void)acceptByKey:(NSInteger)termKey;
+- (BOOL)cancel:(ViCommand *)command;
 @end
 
 @implementation ViCompletionController
@@ -53,7 +56,8 @@
 			winsz.width = sz.width + 20;
 	}
 
-	DEBUG(@"got %lu completions, row height is %f", [filteredCompletions count], [tableView rowHeight]);
+	DEBUG(@"got %lu completions, row height is %f",
+	    [filteredCompletions count], [tableView rowHeight]);
 	winsz.height = [filteredCompletions count] * ([tableView rowHeight] + 2);
 
 	NSScreen *screen = [NSScreen mainScreen];
@@ -82,44 +86,87 @@
 	}
 }
 
-- (ViCompletion *)chooseFrom:(NSArray *)anArray
+- (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-                prefixLength:(NSUInteger)aPrefixLength
+		      prefix:(NSString *)aPrefix
                           at:(NSPoint)origin
+		     options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
-                 fuzzySearch:(BOOL)fuzzyFlag
                initialFilter:(NSString *)initialFilter
 {
 	terminatingKey = 0;
 
-	if ([anArray count] == 0)
-		return nil;
-
-	completions = anArray;
 	if (initialFilter)
 		filter = [initialFilter mutableCopy];
 	else
 		filter = [NSMutableString string];
-	range = aRange;
-	prefixLength = aPrefixLength;
-	fuzzySearch = fuzzyFlag;
 
-	DEBUG(@"range is %@, with %lu chars as prefix and [%@] as initial filter",
-	    NSStringFromRange(range), prefixLength, initialFilter);
+	provider = aProvider;
+	range = aRange;
+	prefix = aPrefix;
+	prefixLength = [aPrefix length];
+	options = optionString;
+	fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);
+
+	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
+	    NSStringFromRange(range), prefix, initialFilter, options);
+
+	__block ViCompletion *onlyCompletion = nil;
+
+	void (^onCompletionResponse)(NSArray *, NSError *) = ^(NSArray *array, NSError *error) {
+		DEBUG(@"got completions: %@, error %@", array, error);
+		completions = array;
+		if ([completions count] == 0) {
+			if ([window isVisible]) {
+				[self cancel:nil];
+				return;
+			}
+		} else {
+			[self filterCompletions];
+			if ([filteredCompletions count] == 0) {
+				if ([window isVisible]) {
+					[self cancel:nil];
+					return;
+				}
+			} else if ([filteredCompletions count] == 1) {
+				if ([window isVisible]) {
+					[self acceptByKey:0];
+				} else
+					onlyCompletion = [filteredCompletions objectAtIndex:0];
+			}
+
+			/* Automatically insert common prefix among all possible completions.
+			 */
+			if ([options rangeOfString:@"p"].location != NSNotFound)
+				[self complete_partially:nil];
+		}
+	};
+
+	completions = nil;
+	filteredCompletions = nil;
+	[aProvider completionsForString:prefix
+				options:options
+			     onResponse:onCompletionResponse];
+
+	if (onlyCompletion) {
+		DEBUG(@"returning %@ as only completion", onlyCompletion);
+		return onlyCompletion;
+	}
+
+	if ((completions && [completions count] == 0) ||
+	    (filteredCompletions && [filteredCompletions count] == 0)) {
+		DEBUG(@"%s", "returning without completions");
+		return nil;
+	}
 
 	screenOrigin = origin;
 	upwards = (direction == 1);
 
 	[self filterCompletions];
-	if ([filteredCompletions count] == 0) {
-		completions = nil;
-		filteredCompletions = nil;
-		filter = nil;
-		return nil;
-	}
 
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-	       byExtendingSelection:NO];
+	if ([filteredCompletions count] > 0)
+		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+		       byExtendingSelection:NO];
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
@@ -196,7 +243,7 @@
 
 	filteredCompletions = [NSMutableArray array];
 	for (ViCompletion *c in completions) {
-		DEBUG(@"filtering completion %@ on %@", c, rx);
+		// DEBUG(@"filtering completion %@ on %@", c, rx);
 		NSString *s = c.content;
 		if ([s length] < prefixLength)
 			continue;
@@ -296,14 +343,15 @@
 	return YES;
 }
 
-- (BOOL)accept_or_complete_partially:(ViCommand *)command
+- (BOOL)complete_partially:(ViCommand *)command
 {
 	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
 
-	if (fuzzySearch || ![delegate respondsToSelector:sel])
-		return [self accept:command];
-
-	NSString *partialCompletion = [ViCompletionController commonPrefixInCompletions:filteredCompletions];
+	NSString *partialCompletion =
+	    [ViCompletionController commonPrefixInCompletions:filteredCompletions];
+	if ([partialCompletion length] == 0)
+		return YES;
+	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(range));
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
 	    [(NSObject *)delegate methodSignatureForSelector:sel]];
 	[invocation setSelector:sel];
@@ -314,7 +362,7 @@
 	BOOL ret;
 	[invocation getReturnValue:&ret];
 	if (!ret)
-		return [self cancel:command];
+		return NO;
 
 	range = NSMakeRange(range.location, [partialCompletion length]);
 	prefixLength = range.length;
@@ -324,6 +372,19 @@
 		[array addObject:c];
 	}
 	[self setCompletions:array];
+
+	return YES;
+}
+
+- (BOOL)accept_or_complete_partially:(ViCommand *)command
+{
+	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
+
+	if (fuzzySearch || ![delegate respondsToSelector:sel])
+		return [self accept:command];
+
+	if (![self complete_partially:command])
+		return [self cancel:command];
 
 	if ([filteredCompletions count] == 1)
 		return [self accept:command];

@@ -56,7 +56,7 @@
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
-			return [conn contentsOfDirectoryAtPath:[aURL path] onResponse:aBlock];
+			return [conn contentsOfDirectoryAtURL:aURL onResponse:aBlock];
 		aBlock(nil, error);
 		return nil;
 	}];

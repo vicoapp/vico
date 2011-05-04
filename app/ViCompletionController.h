@@ -1,6 +1,13 @@
 #import "ViCompletionView.h"
 #import "ViCompletion.h"
 #import "ViThemeStore.h"
+#import "ViURLManager.h"
+
+@protocol ViCompletionProvider <NSObject>
+- (id<ViDeferred>)completionsForString:(NSString *)path
+			       options:(NSString *)options
+			    onResponse:(void (^)(NSArray *completions, NSError *error))responseCallback;
+@end
 
 @class ViCompletionController;
 
@@ -17,7 +24,12 @@
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ViCompletionView *tableView;
+
+	id<ViCompletionProvider> provider;
 	NSArray *completions;
+	NSString *options;
+	NSString *prefix;
+
 	NSMutableArray *filteredCompletions;
 	ViCompletion *selection;
 	ViTheme *theme;
@@ -45,12 +57,12 @@
            toPattern:(NSMutableString *)pattern
           fuzzyClass:(NSString *)fuzzyClass;
 
-- (ViCompletion *)chooseFrom:(NSArray *)anArray
+- (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-                prefixLength:(NSUInteger)prefixLength
+		      prefix:(NSString *)aPrefix
                           at:(NSPoint)screenOrigin
+		     options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
-                 fuzzySearch:(BOOL)fuzzyFlag
                initialFilter:(NSString *)initialFilter;
 
 @end

@@ -256,6 +256,9 @@
 		9ACAA931136F0253001FC553 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
 		9ACAA932136F02A8001FC553 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
 		9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */; };
+		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
+		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
+		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -752,6 +755,12 @@
 		9AB10BAD1340BAE700D81D33 /* TestViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViMap.m; sourceTree = "<group>"; };
 		9ACAA930136F0253001FC553 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparkle_pub.pem; sourceTree = SOURCE_ROOT; };
+		9ACAA93D13707177001FC553 /* ViBufferCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBufferCompletion.h; sourceTree = "<group>"; };
+		9ACAA93E13707177001FC553 /* ViBufferCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferCompletion.m; sourceTree = "<group>"; };
+		9ACAA93F13707177001FC553 /* ViFileCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileCompletion.h; sourceTree = "<group>"; };
+		9ACAA94013707177001FC553 /* ViFileCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileCompletion.m; sourceTree = "<group>"; };
+		9ACAA94113707177001FC553 /* ViWordCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWordCompletion.h; sourceTree = "<group>"; };
+		9ACAA94213707177001FC553 /* ViWordCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWordCompletion.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1077,6 +1086,12 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9ACAA93D13707177001FC553 /* ViBufferCompletion.h */,
+				9ACAA93E13707177001FC553 /* ViBufferCompletion.m */,
+				9ACAA93F13707177001FC553 /* ViFileCompletion.h */,
+				9ACAA94013707177001FC553 /* ViFileCompletion.m */,
+				9ACAA94113707177001FC553 /* ViWordCompletion.h */,
+				9ACAA94213707177001FC553 /* ViWordCompletion.m */,
 				9AAF740D13680F4900D75E1E /* ViBufferedStream.h */,
 				9AAF740E13680F4900D75E1E /* ViBufferedStream.m */,
 				9AAF74021366A4CF00D75E1E /* ViHTTPURLHandler.h */,
@@ -1831,6 +1846,9 @@
 				9AAF74011366938700D75E1E /* ViSFTPURLHandler.m in Sources */,
 				9AAF74041366A4CF00D75E1E /* ViHTTPURLHandler.m in Sources */,
 				9AAF740F13680F4900D75E1E /* ViBufferedStream.m in Sources */,
+				9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */,
+				9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */,
+				9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

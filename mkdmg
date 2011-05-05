@@ -55,7 +55,7 @@ ls -lh "$DMG"
 #### Create and sign a zip file for automatic updates.
 set -x
 APPCAST_BASE="http://www.vicoapp.com/relnotes"
-DOWNLOAD_BASE="http://www.vicoapp.com/download/t"
+DOWNLOAD_BASE="http://www.vicoapp.com/download"
 
 KSIZE=$(du -ks "$APP" | cut -f1)
 SIZE=$(($KSIZE * 1024))

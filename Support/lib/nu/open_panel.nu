@@ -16,6 +16,8 @@
 
 ((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
 
+(load "vico")
+
 (set openPanel (NSOpenPanel openPanel))
 (unless (defined? options)
 	(set options (NSDictionary dictionary)))

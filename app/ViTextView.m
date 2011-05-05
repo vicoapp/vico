@@ -1020,10 +1020,17 @@ int logIndent = 0;
 	NSLayoutManager *layoutManager = [self layoutManager];
         NSRect visibleRect = [clipView bounds];
 	NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:[self caret]];
-	NSRect rect = [layoutManager boundingRectForGlyphRange:NSMakeRange(glyphIndex, 0)
+	BOOL atEOL = ([self caret] >= [[self textStorage] length]);
+	NSRect rect = [layoutManager boundingRectForGlyphRange:NSMakeRange(glyphIndex, atEOL ? 0 : 1)
 	                                       inTextContainer:[self textContainer]];
 
-	rect.size.width = 20;
+	if (atEOL)
+		rect.size.width = 1;
+	else {
+		unichar c = [[[self textStorage] string] characterAtIndex:[self caret]];
+		if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
+			rect.size.width = 7;
+	}
 
 	NSPoint topPoint;
 	CGFloat topY = visibleRect.origin.y;
@@ -1036,6 +1043,7 @@ int logIndent = 0;
 
 	CGFloat jumpX = 20*rect.size.width;
 
+	DEBUG(@"rect = %@, visible rect = %@", NSStringFromRect(rect), NSStringFromRect(visibleRect));
 	if (NSMinX(rect) < NSMinX(visibleRect))
 		topX = NSMinX(rect) > jumpX ? NSMinX(rect) - jumpX : 0;
 	else if (NSMaxX(rect) > NSMaxX(visibleRect))
@@ -1047,6 +1055,7 @@ int logIndent = 0;
 	topPoint = NSMakePoint(topX, topY);
 
 	if (topPoint.x != visibleRect.origin.x || topPoint.y != visibleRect.origin.y) {
+		DEBUG(@"scrolling to point %@", NSStringFromPoint(topPoint));
 		[clipView scrollToPoint:topPoint];
 		[scrollView reflectScrolledClipView:clipView];
 	}

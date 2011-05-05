@@ -1504,16 +1504,89 @@
 	return YES;
 }
 
-/* syntax: ^B */
-- (BOOL)backward_screen:(ViCommand *)command
+/* syntax: ^D */
+- (BOOL)scroll_downward:(ViCommand *)command
 {
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
         // get visible character range
         NSRect visibleRect = [clipView bounds];
+	DEBUG(@"visibleRect is %@", NSStringFromRect(visibleRect));
         NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
         NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// last screen line
+	NSRange lastScreenLineGlyphRange;
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:NSMaxRange(glyphRange) - 1 effectiveRange:&lastScreenLineGlyphRange];
+
+	if (NSMaxRange(range) == [[self textStorage] length]) {
+		/* Already showing last page, place cursor at last line.
+		 * Check if already on last line.
+		 */
+		DEBUG(@"%s", "last page shown");
+		NSRange lastScreenLineRange = [[self layoutManager] characterRangeForGlyphRange:lastScreenLineGlyphRange actualGlyphRange:NULL];
+
+		if ([self caret] >= lastScreenLineRange.location) {
+			MESSAGE(@"Already at end-of-file");
+			return NO;
+		}
+
+		end_location = final_location = lastScreenLineRange.location;
+		return YES;
+	}
+
+	// Count number of visible screen lines
+	NSUInteger numberOfScreenLines = 0;
+	NSRange lineRange;
+	NSUInteger glyphIndex = glyphRange.location;
+	while (glyphIndex < NSMaxRange(glyphRange) - 1) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+		glyphIndex = NSMaxRange(lineRange);
+		numberOfScreenLines++;
+	}
+	DEBUG(@"got %lu screen lines", numberOfScreenLines);
+
+	NSUInteger numberOfScreenLinesToScroll = numberOfScreenLines / 2;
+	glyphIndex = glyphRange.location;
+	NSRect lineRect;
+	for (NSUInteger i = 0; i < numberOfScreenLinesToScroll; i++) {
+		lineRect = [[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+		glyphIndex = NSMaxRange(lineRange);
+	}
+
+	NSPoint topPoint;
+	topPoint = NSMakePoint(0, NSMinY(lineRect));
+
+	DEBUG(@"setting top point to %@", NSStringFromPoint(topPoint));
+	[clipView scrollToPoint:topPoint];
+	[scrollView reflectScrolledClipView:clipView];
+
+
+	/* Now place the caret numberOfScreenLinesToScroll lines below current caret. */
+	glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	for (NSUInteger i = 0; glyphIndex < [[self layoutManager] numberOfGlyphs];) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+		if (++i >= numberOfScreenLinesToScroll)
+			break;
+		glyphIndex = NSMaxRange(lineRange);
+	}
+	end_location = final_location = [[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex];
+	DEBUG(@"setting end location to %lu", end_location);
+
+	return YES;
+}
+
+/* syntax: ^B */
+- (BOOL)backward_screen:(ViCommand *)command
+{
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+	// get visible character range
+	NSRect visibleRect = [clipView bounds];
+	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
 	// get first line
 	NSUInteger bol, eol, end;
@@ -1568,6 +1641,80 @@
 
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
+
+	return YES;
+}
+
+/* syntax: ^U */
+- (BOOL)scroll_upwards:(ViCommand *)command
+{
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+	// get visible character range
+	NSRect visibleRect = [clipView bounds];
+	DEBUG(@"visibleRect is %@", NSStringFromRect(visibleRect));
+	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+
+	// first screen line
+	NSRange firstScreenLineGlyphRange;
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:0 effectiveRange:&firstScreenLineGlyphRange];
+
+	if (range.location == 0) {
+		/* Already showing first page, place cursor at first line.
+		 * Check if already on first line.
+		 */
+		DEBUG(@"%s", "first page shown");
+		NSRange firstScreenLineRange = [[self layoutManager] characterRangeForGlyphRange:firstScreenLineGlyphRange actualGlyphRange:NULL];
+
+		if ([self caret] < NSMaxRange(firstScreenLineRange)) {
+			MESSAGE(@"Already at the beginning of the file");
+			return NO;
+		}
+
+		end_location = final_location = firstScreenLineRange.location;
+		return YES;
+	}
+
+	// Count number of visible screen lines
+	NSUInteger numberOfScreenLines = 0;
+	NSRange lineRange;
+	NSUInteger glyphIndex = glyphRange.location;
+	while (glyphIndex < NSMaxRange(glyphRange) - 1) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+		glyphIndex = NSMaxRange(lineRange);
+		numberOfScreenLines++;
+	}
+	DEBUG(@"got %lu screen lines", numberOfScreenLines);
+
+	NSUInteger numberOfScreenLinesToScroll = numberOfScreenLines / 2;
+
+	glyphIndex = glyphRange.location;
+	NSRect lineRect;
+	for (NSUInteger i = 0; i < numberOfScreenLinesToScroll && glyphIndex > 0; i++) {
+		lineRect = [[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex - 1 effectiveRange:&lineRange];
+		glyphIndex = lineRange.location;
+	}
+
+	NSPoint topPoint;
+	topPoint = NSMakePoint(0, NSMinY(lineRect));
+
+	DEBUG(@"setting top point to %@", NSStringFromPoint(topPoint));
+	[clipView scrollToPoint:topPoint];
+	[scrollView reflectScrolledClipView:clipView];
+
+
+	/* Now place the caret numberOfScreenLinesToScroll lines above current caret. */
+	glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	for (NSUInteger i = 0; glyphIndex > 0;) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex - 1 effectiveRange:&lineRange];
+		glyphIndex = lineRange.location;
+		if (++i >= numberOfScreenLinesToScroll)
+			break;
+	}
+	end_location = final_location = [[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex];
+	DEBUG(@"setting end location to %lu", end_location);
 
 	return YES;
 }

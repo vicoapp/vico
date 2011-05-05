@@ -78,5 +78,5 @@ tee $VOL.xml <<EOF
 </item>
 EOF
 
-echo "scp $DMG vicoapp.com:/var/www/vicoapp.com/download/t"
+echo "scp $DMG vicoapp.com:/var/www/vicoapp.com/download"
 

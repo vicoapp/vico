@@ -10,7 +10,7 @@ fi
 echo "Building version $VERSION (repo version $REPO_VERSION)"
 
 EXPIRATION=0
-if test "$VERSION" = "$REPO_VERSION"; then
+if test "$VERSION" = "r$REPO_VERSION"; then
 	# expire in two weeks
 	EXPIRATION=$(date -v +2w +%s)
 fi

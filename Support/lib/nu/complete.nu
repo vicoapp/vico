@@ -15,18 +15,35 @@
 ; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+;
+; FIXME: This is currently broken!
+;
+(class TmCompletionProvider is NSObject
+	(unless ($TmProviderLoaded)
+		(set $TmProviderLoaded t)
+		(ivar (id)completions))
+
+	(- (id) initWithArray:(id) anArray is
+		(super init)
+		(set @completions anArray)
+		(self))
+
+	(- (void) completionsForString:(id) aString options:(id) options onResponse:(cblock void (id, id)) responseCallback is
+		(responseCallback @completions nil)
+		(nil)))
+
 (unless (defined? choices)
 	(shellCommand log:"missing choices")
 	(shellCommand exitWithError:1)
 (else
-	(shellCommand log:"choices are: #{(choices description)}")
+	; (shellCommand log:"choices are: #{(choices description)}")
 	(set range `(,(- (text caret) (initial_filter length)) ,(initial_filter length)))
 	(unless (initial_filter)
 		(set wordRange ((text textStorage) rangeOfWordAtLocation:(text caret) acceptAfter:YES extraCharacters:extra_chars))
 		(unless (eq (first wordRange) -1)
 			(set range wordRange)
 			(set initial_filter (((text textStorage) string) substringWithRange:range)) ))
-	(shellCommand log:"initial filter is #{initial_filter} in range #{range}")
+	; (shellCommand log:"initial filter is #{initial_filter} in range #{range}")
 	((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
 	(set cc (ViCompletionController sharedController))
 	(set prefixLength (initial_filter length))
@@ -40,9 +57,10 @@
 	(set point ((text layoutManager) boundingRectForGlyphRange:`(,(text caret) 0)
 						   inTextContainer:(text textContainer)))
 	(set screenPoint ((window window) convertBaseToScreen:(text convertPointToBase:point)))
-	(set choice (cc chooseFrom:completions range:range prefixLength:0 at:screenPoint direction:0 fuzzySearch:NO initialFilter:initial_filter))
-	(shellCommand log:"got choice: #{(choice description)}")
-	(shellCommand log:"termination character was: #{(NSString stringWithKeyCode:(cc terminatingKey))}")
+	(set provider ((TmCompletionProvider alloc) initWithArray:completions))
+	(set choice (cc chooseFrom:provider range:range prefix:"" at:screenPoint options:"" direction:0 initialFilter:initial_filter))
+	; (shellCommand log:"got choice: #{(choice description)}")
+	; (shellCommand log:"termination character was: #{(NSString stringWithKeyCode:(cc terminatingKey))}")
 	(if (choice)
 		(text replaceCharactersInRange:(cc range) withString:(choice content))
 		(text setCaret:(+ (first (cc range)) ((choice content) length)))
@@ -50,7 +68,7 @@
 		(result setObject:(choice representedObject) forKey:"representedObject")
 		(result setObject:(completions indexOfObject:choice) forKey:"index")
 		;(result setObject:(choice content) forKey:"insert")
-		(shellCommand log:"exiting with object #{(result description)}")
+		; (shellCommand log:"exiting with object #{(result description)}")
 		(shellCommand exitWithObject:result)
 	(else
 		(shellCommand exitWithError:1) ))))

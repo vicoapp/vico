@@ -49,6 +49,7 @@
 	SFTPConnection *conn = [connections objectForKey:key];
 
 	if (conn && [conn closed]) {
+		DEBUG(@"connection %@ is closed", conn);
 		[connections removeObjectForKey:key];
 		conn = nil;
 	}

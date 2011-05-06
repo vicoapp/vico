@@ -256,18 +256,6 @@
 	if ([[url absoluteString] hasSuffix:@"/"])
 		return @"Project";
 
-#if 0
-	BOOL isDirectory;
-	if ([url isFileURL]) {
-		if ([[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDirectory] && isDirectory)
-			return @"Project";
-	} else if ([[url scheme] isEqualToString:@"sftp"]) {
-		SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:url error:outError];
-		if ([conn fileExistsAtPath:[url path] isDirectory:&isDirectory error:outError] && isDirectory)
-			return @"Project";
-	}
-#endif
-
 	return @"Document";
 }
 

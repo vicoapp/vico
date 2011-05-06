@@ -6,7 +6,6 @@
 #import "ViWindowController.h"
 #import "ViDocumentView.h"
 #import "ViTextStorage.h"
-#import "SFTPConnectionPool.h"
 #import "ViCharsetDetector.h"
 #import "ViDocumentController.h"
 #import "ViBundleStore.h"

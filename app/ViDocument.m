@@ -13,7 +13,7 @@
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
-#import "SFTPConnectionPool.h"
+#import "SFTPConnection.h" /* Only for SSH2_FX_NO_SUCH_FILE constant. */
 #import "ViLayoutManager.h"
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"

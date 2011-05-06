@@ -11,7 +11,6 @@
 #import "ViDocumentView.h"
 #import "ExEnvironment.h"
 #import "ViDocumentController.h"
-#import "SFTPConnectionPool.h"
 #import "NSString-additions.h"
 
 #import "ViFileCompletion.h"

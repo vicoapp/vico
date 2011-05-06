@@ -7,7 +7,8 @@
 	NSMutableData *connData;
 	void (^dataCallback)(NSData *);
 	void (^completionCallback)(NSURL *, NSDictionary *, NSError *);
-	NSUInteger receivedContentLength, expectedContentLength;
+	NSUInteger receivedContentLength;
+	NSInteger expectedContentLength;
 	id<ViDeferredDelegate> delegate;
 }
 

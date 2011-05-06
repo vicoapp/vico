@@ -101,7 +101,7 @@
 {
 	return [[aURL scheme] isEqualToString:@"file"] ||
 	       [[aURL scheme] isEqualToString:@"http"] ||
-	       [[aURL scheme] isEqualToString:@"https"] ||
+	       // [[aURL scheme] isEqualToString:@"https"] ||
 	       [[aURL scheme] isEqualToString:@"ftp"];
 }
 

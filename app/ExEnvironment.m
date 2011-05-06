@@ -625,6 +625,7 @@
 		@"smartpair", @"smp",
 		@"tabstop", @"ts",
 		@"wrap", @"wrap",
+		@"smarttab", @"sta",
 
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",
@@ -647,7 +648,7 @@
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
-	    @"wrap", @"antialias", @"list", nil];
+	    @"wrap", @"antialias", @"list", @"smarttab", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;

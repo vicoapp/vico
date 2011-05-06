@@ -757,7 +757,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
         return [[self string] substringWithRange:r];
 }
 
-- (NSUInteger)firstNonBlankAtLocation:(NSUInteger)aLocation
+- (NSUInteger)firstNonBlankForLineAtLocation:(NSUInteger)aLocation
 {
 	if (aLocation > [self length])
 		return NSNotFound;
@@ -770,7 +770,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSRange r = [[self string] rangeOfCharacterFromSet:cset options:0 range:lineRange];
 
 	if (r.location == NSNotFound)
-                return bol;
+		return bol;
 	return r.location;
 }
 

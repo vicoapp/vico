@@ -3,7 +3,6 @@ REQUESTED
 
 * vim text objects, especially i[, a]
 * project search
-* gj and gk (move up/down screen lines)
 
 
 URGENT
@@ -11,6 +10,8 @@ URGENT
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * snippets still use hard tabs
+* split views top line is ANNOYINGLY changed when editing in another view
+
 
 BUGS
 ====
@@ -29,9 +30,7 @@ BUGS
 
 IMPORTANT
 =========
-* unify SFTPConnection and NSFileManager methods!
 * tweak smart typing pair invocation
-* always open an untitled document when opening a project?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
@@ -39,7 +38,6 @@ IMPORTANT
 * cmd-t fuzzy search feels *slow*
 * toggling explorer always opens to 200px
 * dot should work with ! filters
-* :write filename
 * :write !program
 * :read
 * :read !program
@@ -48,9 +46,9 @@ IMPORTANT
 * highlight caret after goto line
 * allow ex commands when there is no open document
 
-
 FEATURES
 ========
+* tab in ex command should do context-sensitive completion
 * completion for :setfiletype
 * :mkdir command
 * completion expressions in nu
@@ -69,7 +67,6 @@ FEATURES
 * message how many lines yanked
 * :e# => open alternate file
 * set incsearch
-* set smarttab
 * set listchars
 * search and replace
 * symbol list should use same filtering algorithm as file explorer
@@ -139,110 +136,3 @@ There are nine types of registers:			*registers* *E354*
 :[range]m[ove] {address}
  Move the lines given by [range] to below the line given by {address}.
 
-
-
-* [DONE] vim-style undo + preference
-* [DONE]  (nvi-style) undo and dot don't play nice together
-* [DONE] dot should not be local to a document VIEW! => global per window controller
-* [DONE] opening and saving new files, check file names, no "doesn't exist" alert!
-* [DONE] splitting views messes up the caret in the current buffer
-* [DONE] confirm re-read buffer on re-focus
-* [DONE] close last window with hidden buffers left? switch in remaing buffers?
-* [DONE] selecting an entry in symbol list sometimes jumps to wrong entry
-* [DONE] cmd-t searching is unbound => gui stalls! (limit to 2 depth dir structure?)
-* [DONE] explorer isn't reset after opening a document
-* [DONE] replacing a split view changes the size of the split
-* [DONE] repeatable text input! 10ix\x1b = xxxxxxxxxx
-* [DONE] selecting a bookmark doesn't set environment baseURL
-* [DONE] explorer bookmarks
-* [DONE] implement c-w T (move split view to new tab)
-* [DONE] gg
-* [DONE] gU and gu
-* [DONE] implement C-W = and better control of split view sizes
-* [DONE] c-w o
-* [DONE] shift-cmd-t (filter symbol) should default to word under cursor
-* [DONE] make snippets work!
-* [DONE] Placeholder text in bundle preferences!
-* [DONE] closing tabs now seems to close document, even if more views are open
-* [DONE] "save as" and ":e newfile" doesn't update tab title directly
-* [DONE] bundle preference items shell variables (scope dependent)
-* [DONE] bundle commands with tab trigger
-* [DONE] snippets with key equivalents
-* [DONE] document action menu sets key equivalents and overrides keyDown: handling
-* [DONE] c doesn't work in visual mode
-* [DONE] case insensitive regex matching in snippets (i option)
-* [DONE] (single-)clicking a folder in explorer does nothing, annoyingly
-* [DONE] caret location after undo is a DISASTER!
-* [DONE] when a file is removed, set the isTemporary flag, to avoid repetitive alerts
-* [DONE] syntax highlight sometimes doesn't restart properly
-* [DONE] fix tab triggers: fprintf vs. printf
-* [DONE] 2011-03-14 13:54:54.596 Vibrant[39228:903] -[ViDocument setString:]: unrecognized selector sent to instance 0x200b25040
-* [DONE] Can't open projects anymore!
-* [DONE] ship with a set of default bundles
-* [DONE] set smartcase
-* [DONE] setting for inserting smart typing pairs
-* [DONE] jumplist is broken!
-* [DONE] implement :b, :bd and other :buffer commands (:bd still not implemented)
-* [DONE] c-w c should just close the view, not close the document
-* [DONE] tbuffer command should reuse any view
-* [DONE] "." mark (last modification)
-* [DONE] re-position caret if view frame changes
-* [DONE] ctrl-escape should bring up the bundle items menu
-* [DONE] ctrl-6 should be the same as ctrl-^ (right?)
-* [DONE] , and ; doesn't seem to toggle direction?
-* [DONE] searching should push on jumplist
-* [DONE] # (backward search word under cursor)
-* [DONE] :set filetype=[source.]objc (:setfiletype)
-* [DONE] "dl" on a line with only one character fails
-* [DONE] O on a line with "}" (obj-c) inserts extra blank line
-* [DONE] copy/paste to clipboard (* and + register)
-* [DONE] close a tab by click the X doesn't work for web views
-* [DONE] ctrl-enter != ctrl-shift-m
-* [DONE] ctrl-^ should switch between *files*, not views
-* [DONE] i_CTRL-R + registers
-* [DONE] macros in maps
-* [DONE] yank buffers? do they all work? across documents?
-* [DONE] should dot repeat a bundle command? (they do in insert mode now, a bit weird perhaps)
-* [DONE] pass macro keys to ex command line
-* [DONE] snippets are buggy wrt caret location near EOF
-* [DONE] re-implement filename completion in ex command line
-* [DONE] local keyword completion (vim c-x c-n)
-* [DONE] expiration date for development builds
-* [DONE] ship with a default bundle plist
-* [DONE] confirmation dialog when deleting files
-* [DONE] vi navigation of symbol list
-* [DONE] receipt validation
-* [DONE] disable bookmarks button in toolbar
-* [DONE] = command (re-indent)
-* [DONE] > command should not indent empty lines
-* [DONE] autoindent should not just copy indentation string, but honor expandtab setting
-* [DONE] increase/decrease indent (ctrl-t/ctrl-d in insert mode) should align to shiftwidth from beginning of line
-* [DONE] :edit ~/file doesn't expand tilde
-* [DONE] while filtering symbols, selection should be updated
-* [DONE] resolve symlinks in paths from vicotool
-* [DONE] disable gq command from Edit menu
-* [DONE] disable text objects from Edit menu
-* [DONE] re-use open help windows
-* [DONE] skip tags/symbols on the current line if ambiguous match (ctrl-])
-* [DONE] clicking a binary file (pdf, image) in explorer opens as text
-* [DONE] clone modified bundles to vicoapp@github
-* [DONE] bundle-specific nu startup scripts (nu/main.nu)
-* [DONE] global nu startup script in application support folder
-* [DONE] preference for wrapping
-* [DONE] different indent settings for different file types!
-* [DONE] fuzzy completion is no longer highlighted!
-* [DONE] bundled bundles are not shown as installed in preferences
-* [DONE] package license for SBJson, see http://stig.github.com/json-framework/
-* [DONE] build osx::plist
-* [DONE] check if plists return expected classes (failed to parse?)
-* [DONE] integrate help
-* [DONE] make commands and snippets work at EOF
-* [DONE] :edit already open file doesn't focus the file
-* [DONE] :tbuffer doesn't work if there is an html view in the tab!
-* [DONE] completion treats absolute paths as file:// urls, even though baseurl is sftp://
-* [DONE] numbers doesn't work as completion filter
-* [DONE] explorer doesn't rescan after delete
-* [DONE] opening a directory should start with a scratch buffer
-* [DONE] setting for default language syntax instead of text.plain
-* [DONE] vsplit with already open buffer switches tab!
-* [DONE] bundle keys no longer work in insert mode?

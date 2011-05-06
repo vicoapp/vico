@@ -723,17 +723,11 @@ int logIndent = 0;
 	return delta_offset;
 }
 
-- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange
-{
-	return [self changeIndentation:delta inRange:aRange updateCaret:nil];
-}
-
 - (BOOL)increase_indent:(ViCommand *)command
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	NSRange n = [self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1))];
-	final_location = start_location + n.location;
+	[self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1)) updateCaret:&final_location];
 	return YES;
 }
 
@@ -741,8 +735,7 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	NSRange n = [self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol)];
-	final_location = start_location + n.location;
+	[self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol) updateCaret:&final_location];
 	return YES;
 }
 
@@ -1422,6 +1415,15 @@ int logIndent = 0;
 		}
 	}
 
+	if ([[self preference:@"smarttab"] integerValue] == NSOnState) {
+		/* Check if we're in leading whitespace. */
+		NSUInteger firstNonBlank = [[self textStorage] firstNonBlankForLineAtLocation:start_location];
+		if (firstNonBlank >= start_location) {
+			/* Do smart tab, behaves as ctrl-t. */
+			return [self increase_indent:command];
+		}
+	}
+
 	// otherwise just insert a tab
 	NSString *tabString = @"\t";
 	if ([[self preference:@"expandtab"] integerValue] == NSOnState) {
@@ -1475,6 +1477,20 @@ int logIndent = 0;
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
 			final_location = modify_start_location;
 			return YES;
+		}
+	}
+
+	if ([[self preference:@"smarttab"] integerValue] == NSOnState) {
+		/* Check if we're in leading whitespace. */
+		NSUInteger bol;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:start_location];
+		if (start_location > bol) {
+			NSUInteger firstNonBlank = [[self textStorage]
+			    firstNonBlankForLineAtLocation:start_location];
+			if (firstNonBlank >= start_location) {
+				/* Do smart backspace, behaves as ctrl-d. */
+				return [self decrease_indent:command];
+			}
 		}
 	}
 
@@ -1747,7 +1763,7 @@ int logIndent = 0;
 		/* ...and > */
 		/* ...and < */
 		// FIXME: this is not a generic case!
-		final_location = [[self textStorage] firstNonBlankAtLocation:final_location];
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:final_location];
 	}
 
 	if (leaveVisualMode && mode == ViVisualMode) {

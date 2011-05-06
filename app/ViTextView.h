@@ -107,7 +107,6 @@
 - (NSRange)changeIndentation:(int)delta
                      inRange:(NSRange)aRange
                  updateCaret:(NSUInteger *)updatedCaret;
-- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;

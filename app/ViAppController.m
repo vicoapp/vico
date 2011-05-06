@@ -105,6 +105,7 @@
 	    [NSNumber numberWithBool:YES], @"ignorecase",
 	    [NSNumber numberWithBool:NO], @"smartcase",
 	    [NSNumber numberWithBool:YES], @"expandtab",
+	    [NSNumber numberWithBool:YES], @"smarttab",
 	    [NSNumber numberWithBool:YES], @"number",
 	    [NSNumber numberWithBool:YES], @"autocollapse",
 	    [NSNumber numberWithBool:NO], @"hidetab",

@@ -58,7 +58,6 @@
 		9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30313310C3D0023C5B7 /* scope_selector.lemon */; };
 		9A2EF38C13310CB80023C5B7 /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30513310C3E0023C5B7 /* SFTPConnection.m */; };
 		9A2EF38D13310CB80023C5B7 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30713310C3F0023C5B7 /* SFTPConnectionPool.m */; };
-		9A2EF38E13310CB80023C5B7 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30813310C400023C5B7 /* sha1.c */; };
 		9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30D13310C430023C5B7 /* TMFileURLProtocol.m */; };
 		9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */; };
 		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; };
@@ -455,8 +454,6 @@
 		9A2EF30513310C3E0023C5B7 /* SFTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnection.m; sourceTree = "<group>"; };
 		9A2EF30613310C3F0023C5B7 /* SFTPConnectionPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTPConnectionPool.h; sourceTree = "<group>"; };
 		9A2EF30713310C3F0023C5B7 /* SFTPConnectionPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFTPConnectionPool.m; sourceTree = "<group>"; };
-		9A2EF30813310C400023C5B7 /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
-		9A2EF30913310C400023C5B7 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
 		9A2EF30A13310C410023C5B7 /* sys_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys_queue.h; sourceTree = "<group>"; };
 		9A2EF30B13310C420023C5B7 /* sys_tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys_tree.h; sourceTree = "<group>"; };
 		9A2EF30C13310C420023C5B7 /* TMFileURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMFileURLProtocol.h; sourceTree = "<group>"; };
@@ -1182,8 +1179,6 @@
 				9A2EF30513310C3E0023C5B7 /* SFTPConnection.m */,
 				9A2EF30613310C3F0023C5B7 /* SFTPConnectionPool.h */,
 				9A2EF30713310C3F0023C5B7 /* SFTPConnectionPool.m */,
-				9A2EF30813310C400023C5B7 /* sha1.c */,
-				9A2EF30913310C400023C5B7 /* sha1.h */,
 				9A2EF30A13310C410023C5B7 /* sys_queue.h */,
 				9A2EF30B13310C420023C5B7 /* sys_tree.h */,
 				9A2EF30C13310C420023C5B7 /* TMFileURLProtocol.h */,
@@ -1692,7 +1687,6 @@
 				9A2EF38A13310CB80023C5B7 /* receipt.c in Sources */,
 				9A2EF38C13310CB80023C5B7 /* SFTPConnection.m in Sources */,
 				9A2EF38D13310CB80023C5B7 /* SFTPConnectionPool.m in Sources */,
-				9A2EF38E13310CB80023C5B7 /* sha1.c in Sources */,
 				9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */,
 				9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */,
 				9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */,

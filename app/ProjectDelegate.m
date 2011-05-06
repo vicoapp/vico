@@ -84,8 +84,6 @@
 {
 	self = [super init];
 	if (self) {
-		NSString *skipPattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-		skipRegex = [[ViRegexp alloc] initWithString:skipPattern];
 		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
 		history = [[ViJumpList alloc] init];
@@ -224,6 +222,8 @@
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display jump:(BOOL)jump
 {
+	skipRegex = [[ViRegexp alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
+
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];

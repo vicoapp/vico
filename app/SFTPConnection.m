@@ -143,14 +143,6 @@ resp2txt(int type)
 	return self;
 }
 
-#if 0
-- (void)setSubRequest:(SFTPRequest *)aRequest
-{
-	subRequest = aRequest;
-	[subRequest setDelegate:delegate];
-}
-#endif
-
 - (void)response:(SFTPMessage *)msg
 {
 	if (responseCallback)
@@ -756,6 +748,7 @@ resp2txt(int type)
 	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
 	SFTPRequest *req = [self addRequest:SSH2_FXP_INIT format:NULL];
 	req.onCancel = ^(SFTPRequest *req) {
+		originalCallback([ViError operationCancelled]);
 		[self abort];
 	};
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -926,6 +919,7 @@ resp2txt(int type)
 			originalCallback(url, attributes, nil);
 		}
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback(nil, nil, [ViError operationCancelled]); };
 
 	return req;
 }
@@ -972,6 +966,7 @@ resp2txt(int type)
 		else
 			originalCallback(nil);
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 }
 
 - (SFTPRequest *)contentsOfDirectoryAtURL:(NSURL *)aURL
@@ -982,6 +977,7 @@ resp2txt(int type)
 	void (^originalCallback)(NSArray *, NSError *) = Block_copy(responseCallback);
 
 	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", [url path]];
+	openRequest.onCancel = ^(SFTPRequest *req) { originalCallback(nil, [ViError operationCancelled]); };
 	openRequest.onResponse = ^(SFTPMessage *msg) {
 		NSData *handle;
 		NSError *error;
@@ -1079,6 +1075,7 @@ resp2txt(int type)
 		else
 			originalCallback(nil);
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	return req;
 }
 
@@ -1090,12 +1087,14 @@ resp2txt(int type)
 	[ssh_task terminate];
 	ssh_task = nil;
 	ssh_input = ssh_output = ssh_error = nil;
+	[errStream close];
+	errStream = nil;
 }
 
 - (void)abort
 {
 	[self close];
-	DEBUG(@"cancelling outstanding requests: %@", requests);
+	INFO(@"cancelling outstanding requests: %@", requests);
 	for (SFTPRequest *req in [requests allValues])
 		[req cancel];
 	[requests removeAllObjects];
@@ -1139,6 +1138,7 @@ resp2txt(int type)
 		DEBUG(@"opened file %@ on handle %@", path, handle);
 		originalCallback(handle, nil);
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback(nil, [ViError operationCancelled]); };
 
 	return req;
 }
@@ -1172,10 +1172,7 @@ resp2txt(int type)
 			void (^cancelfun)(SFTPRequest *);
 			cancelfun = Block_copy(^(SFTPRequest *req) {
 				DEBUG(@"%@ cancelled, closing handle %@", req, handle);
-				originalCallback(normalizedURL, attributes,
-				    [NSError errorWithDomain:NSCocoaErrorDomain
-							code:NSUserCancelledError
-						    userInfo:nil]);
+				originalCallback(normalizedURL, attributes, [ViError operationCancelled]);
 				[self closeHandle:handle
 				       onResponse:^(NSError *error) {
 					if (error)
@@ -1292,9 +1289,7 @@ resp2txt(int type)
 		void (^cancelfun)(SFTPRequest *);
 		cancelfun = Block_copy(^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
-			responseCallback([NSError errorWithDomain:NSCocoaErrorDomain
-							     code:NSUserCancelledError
-							 userInfo:nil]);
+			responseCallback([ViError operationCancelled]);
 			[self closeHandle:handle
 			       onResponse:^(NSError *error) {
 				if (error)
@@ -1371,6 +1366,7 @@ resp2txt(int type)
 		else
 			originalCallback(nil);
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	return req;
 }
 
@@ -1408,6 +1404,7 @@ resp2txt(int type)
 		else
 			originalCallback(nil);
 	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 
 	return req;
 }
@@ -1430,6 +1427,7 @@ resp2txt(int type)
 			else
 				originalCallback(nil);
 		};
+		renameRequest.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	} else {
 		/*
 		 * Without POSIX rename support, first move away the existing file, rename our temporary file

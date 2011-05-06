@@ -318,9 +318,15 @@ extern BOOL makeNewWindowInsteadOfTab;
 
 - (id)eval:(NSString *)script
 withParser:(id<NuParsing>)parser
+  bindings:(NSDictionary *)bindings
      error:(NSError **)outError
 {
 	[self exportGlobals:parser];
+
+	DEBUG(@"additional bindings: %@", bindings);
+	for (NSString *key in [bindings allKeys])
+		if ([key isKindOfClass:[NSString class]])
+			[parser setValue:[bindings objectForKey:key] forKey:key];
 
 	DEBUG(@"evaluating script: {{{ %@ }}}", script);
 
@@ -346,7 +352,7 @@ withParser:(id<NuParsing>)parser
 - (id)eval:(NSString *)script
      error:(NSError **)outError
 {
-	return [self eval:script withParser:[Nu parser] error:outError];
+	return [self eval:script withParser:[Nu parser] bindings:nil error:outError];
 }
 
 #pragma mark -
@@ -364,13 +370,8 @@ additionalBindings:(NSDictionary *)bindings
 		[parser setValue:backChannel forKey:@"shellCommand"];
 	}
 
-	DEBUG(@"additional bindings: %@", bindings);
-	for (NSString *key in [bindings allKeys])
-		if ([key isKindOfClass:[NSString class]])
-			[parser setValue:[bindings objectForKey:key] forKey:key];
-
 	NSError *error = nil;
-	id result = [self eval:script withParser:parser error:&error];
+	id result = [self eval:script withParser:parser bindings:bindings error:&error];
 	if (error && errorString)
 		*errorString = [error localizedDescription];
 

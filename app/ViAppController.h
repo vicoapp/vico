@@ -37,6 +37,7 @@ additionalBindings:(NSDictionary *)bindings
 - (void)loadStandardModules:(id<NuParsing>)parser;
 - (id)eval:(NSString *)script
 withParser:(id<NuParsing>)parser
+  bindings:(NSDictionary *)bindings
      error:(NSError **)outError;
 - (id)eval:(NSString *)script
      error:(NSError **)outError;

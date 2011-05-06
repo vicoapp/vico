@@ -293,8 +293,14 @@
 								     encoding:NSUTF8StringEncoding
 									error:nil];
 			if (script) {
+				NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:
+				    path, @"bundlePath",
+				    nil];
 				NSError *error = nil;
-				[[NSApp delegate] eval:script error:&error];
+				[[NSApp delegate] eval:script
+					    withParser:parser
+					      bindings:bindings
+						 error:&error];
 				if (error)
 					INFO(@"%@: %@", file, [error localizedDescription]);
 			}

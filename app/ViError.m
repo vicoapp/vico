@@ -35,4 +35,11 @@
 	return err;
 }
 
++ (NSError *)operationCancelled
+{
+	return [NSError errorWithDomain:NSCocoaErrorDomain
+				   code:NSUserCancelledError
+			       userInfo:nil];
+}
+
 @end

@@ -22,5 +22,7 @@ enum {
 + (NSError *)errorWithObject:(id)obj code:(NSInteger)code;
 + (NSError *)errorWithFormat:(NSString *)fmt, ...;
 + (NSError *)errorWithCode:(NSInteger)code format:(NSString *)fmt, ...;
++ (NSError *)operationCancelled;
+
 @end
 

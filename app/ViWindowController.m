@@ -659,8 +659,8 @@ static ViWindowController	*currentWindowController = nil;
 
 	id<ViViewController> viewController;
 	for (viewController in [tabController views]) {
-		if ([viewController isKindOfClass:[ViDocument class]]) {
-			ViDocumentView *docView;
+		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+			ViDocumentView *docView = (ViDocumentView *)viewController;
 			if ([set containsObject:[docView document]])
 				continue;
 			if (![[docView document] isDocumentEdited])

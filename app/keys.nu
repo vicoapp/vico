@@ -98,6 +98,8 @@
 (mmap setKey:"e" toMotion:"end_of_word:")
 (mmap setKey:"f" toMotion:"move_to_char:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (mmap setKey:"gg" toMotion:"goto_line:" flags:ViMapLineMode parameter:NO scope:nil)
+(mmap setKey:"gj" toMotion:"move_down_soft:")
+(mmap setKey:"gk" toMotion:"move_up_soft:")
 (mmap setKey:"h" toMotion:"move_left:")
 (mmap setKey:"j" toMotion:"move_down:" flags:ViMapLineMode parameter:nil scope:nil)
 (mmap setKey:"k" toMotion:"move_up:" flags:ViMapLineMode parameter:nil scope:nil)

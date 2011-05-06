@@ -1423,8 +1423,15 @@ int logIndent = 0;
 	}
 
 	// otherwise just insert a tab
-	[self insertString:@"\t" atLocation:start_location];
-	final_location = start_location + 1;
+	NSString *tabString = @"\t";
+	if ([[self preference:@"expandtab"] integerValue] == NSOnState) {
+		NSInteger tabstop = [[self preference:@"tabstop" atLocation:start_location] integerValue];
+		NSInteger nspaces = tabstop - (([self currentColumn] - 1) % tabstop);
+		tabString = [@"" stringByPaddingToLength:nspaces withString:@" " startingAtIndex:0];
+	}
+
+	[self insertString:tabString atLocation:start_location];
+	final_location = start_location + [tabString length];
 
 	return YES;
 }

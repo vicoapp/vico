@@ -44,8 +44,10 @@
 		DEBUG(@"http headers: %@", [(NSHTTPURLResponse *)response allHeaderFields]);
 #endif
 	expectedContentLength = [response expectedContentLength];
+#ifndef NO_DEBUG
 	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0)
 		DEBUG(@"expecting %lld bytes", expectedContentLength);
+#endif
 }
 
 - (CGFloat)progress

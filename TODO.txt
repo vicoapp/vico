@@ -11,6 +11,9 @@ URGENT
 * :*buffer doesn't push on jump list
 * snippets still use hard tabs
 * split views top line is ANNOYINGLY changed when editing in another view
+* :q! should not prompt for saving
+* :q should terminate app on last document in last window
+* :q should close window on last document w/other windows
 
 
 BUGS
@@ -32,6 +35,7 @@ BUGS
 
 IMPORTANT
 =========
+* :bdelete command
 * tweak smart typing pair invocation
 * indented paste
 * showAsHtml + dontFollowOutput (?)

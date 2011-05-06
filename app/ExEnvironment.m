@@ -322,19 +322,20 @@
 
 - (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
 {
+	NSUInteger begin_line, end_line;
 	NSUInteger begin, end;
 	ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
 
 	switch (command.addr1->type) {
 	case EX_ADDR_ABS:
 		if (command.addr1->addr.abs.line == -1)
-			begin = [[storage string] length];
+			begin_line = [storage lineCount];
 		else
-			begin = [storage locationForStartOfLine:command.addr1->addr.abs.line];
+			begin_line = command.addr1->addr.abs.line;
 		break;
 	case EX_ADDR_RELATIVE:
 	case EX_ADDR_CURRENT:
-		begin = [exTextView caret];
+		begin_line = [exTextView currentLine];
 		break;
 	case EX_ADDR_NONE:
 	default:
@@ -342,27 +343,35 @@
 		break;
 	}
 
-	begin += /* command.addr1->offset many _lines_ */ 0;
+	begin_line += command.addr1->offset;
+	begin = [storage locationForStartOfLine:begin_line];
+	if (begin == -1ULL)
+		return NO;
 
 	switch (command.addr2->type) {
 	case EX_ADDR_ABS:
 		if (command.addr2->addr.abs.line == -1)
-			end = [[storage string] length];
+			end_line = [storage lineCount];
 		else
-			end = [storage locationForStartOfLine:command.addr2->addr.abs.line];
+			end_line = command.addr2->addr.abs.line;
 		break;
 	case EX_ADDR_CURRENT:
-		end = [exTextView caret];
+		end_line = [exTextView currentLine];
 		break;
 	case EX_ADDR_RELATIVE:
 	case EX_ADDR_NONE:
-		end = begin;
+		end_line = begin_line;
 		break;
 	default:
 		return NO;
 	}
 
-	end += /* command.addr2->offset many _lines_ */ 0;
+	end_line += command.addr2->offset;
+	end = [storage locationForStartOfLine:end_line];
+	if (end == -1ULL)
+		return NO;
+	/* end location should include the contents of the end_line */
+	[exTextView getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
 
 	*outRange = NSMakeRange(begin, end - begin);
 	return YES;
@@ -600,22 +609,15 @@
 
 - (void)ex_number:(ExCommand *)command
 {
-	NSInteger line;
-
-	if (command.addr2->type == EX_ADDR_ABS)
-		line = command.addr2->addr.abs.line;
-	else if (command.addr1->type == EX_ADDR_ABS)
-		line = command.addr1->addr.abs.line;
-	else {
-		[self message:@"Not implemented."];
+	NSRange range;
+	if (![self resolveExAddresses:command intoRange:&range]) {
+		[self message:@"Movement past the end-of-file"];
 		return;
 	}
 
-	if (line == -1) /* $ == last line */
-		line = [[exTextView textStorage] lineCount];
-
-	if (![exTextView gotoLine:line column:0])
-		[self message:@"Movement past the end-of-file"];
+	NSUInteger location = [[exTextView textStorage] firstNonBlankForLineAtLocation:range.location];
+	[exTextView setCaret:location];
+	[exTextView scrollRangeToVisible:NSMakeRange(location, 0)];
 }
 
 - (void)ex_set:(ExCommand *)command

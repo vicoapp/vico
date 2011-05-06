@@ -600,7 +600,7 @@
 
 - (void)ex_number:(ExCommand *)command
 {
-	NSUInteger line;
+	NSInteger line;
 
 	if (command.addr2->type == EX_ADDR_ABS)
 		line = command.addr2->addr.abs.line;
@@ -610,6 +610,9 @@
 		[self message:@"Not implemented."];
 		return;
 	}
+
+	if (line == -1) /* $ == last line */
+		line = [[exTextView textStorage] lineCount];
 
 	if (![exTextView gotoLine:line column:0])
 		[self message:@"Movement past the end-of-file"];

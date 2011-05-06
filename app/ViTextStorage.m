@@ -744,9 +744,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 						     range:lineRange];
 
 	if (r.location == NSNotFound)
-                r.location = eol;
+		r.location = eol;
 
-        return NSMakeRange(lineRange.location, r.location - lineRange.location);
+	return NSMakeRange(lineRange.location, r.location - lineRange.location);
 }
 
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation
@@ -754,7 +754,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSRange r = [self rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
 	if (r.location == NSNotFound)
 		return nil;
-        return [[self string] substringWithRange:r];
+	return [[self string] substringWithRange:r];
 }
 
 - (NSUInteger)firstNonBlankForLineAtLocation:(NSUInteger)aLocation
@@ -770,7 +770,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSRange r = [[self string] rangeOfCharacterFromSet:cset options:0 range:lineRange];
 
 	if (r.location == NSNotFound)
-		return bol;
+		return eol;
 	return r.location;
 }
 

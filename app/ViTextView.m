@@ -674,7 +674,11 @@ int logIndent = 0;
 		return aLocation;
 }
 
-- (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange updateCaret:(NSUInteger *)updatedCaret
+- (NSRange)changeIndentation:(int)delta
+		     inRange:(NSRange)aRange
+		 updateCaret:(NSUInteger *)updatedCaret
+	      alignToTabstop:(BOOL)alignToTabstop
+	    indentEmptyLines:(BOOL)indentEmptyLines
 {
 	NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
 	if (shiftWidth == 0)
@@ -688,16 +692,16 @@ int logIndent = 0;
 	while (bol < NSMaxRange(aRange)) {
 		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
 		NSUInteger n = [self lengthOfIndentString:indent];
-		if (n % shiftWidth != 0 && !updatedCaret) {
-			/* XXX: updatedCaret is nil when called from ctrl-t / ctrl-d */
+		if (n % shiftWidth != 0 && alignToTabstop) {
+			/* ctrl-t / ctrl-d aligns to tabstop, but <> doesn't */
 			if (delta < 0)
 				n += shiftWidth - (n % shiftWidth);
 			else
 				n -= n % shiftWidth;
 		}
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-		if ([[self textStorage] isBlankLineAtLocation:bol] && updatedCaret)
-			/* XXX: should not indent empty lines when using the < or > operators. */
+		if ([[self textStorage] isBlankLineAtLocation:bol] && !indentEmptyLines)
+			/* should not indent empty lines when using the < or > operators. */
 			newIndent = indent;
 
 		NSRange indentRange = NSMakeRange(bol, [indent length]);
@@ -727,7 +731,11 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	[self changeIndentation:+1 inRange:NSMakeRange(bol, IMAX(eol - bol, 1)) updateCaret:&final_location];
+	[self changeIndentation:+1
+			inRange:NSMakeRange(bol, IMAX(eol - bol, 1))
+		    updateCaret:&final_location
+		 alignToTabstop:YES
+	       indentEmptyLines:YES];
 	return YES;
 }
 
@@ -735,7 +743,11 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	[self changeIndentation:-1 inRange:NSMakeRange(bol, eol - bol) updateCaret:&final_location];
+	[self changeIndentation:-1
+			inRange:NSMakeRange(bol, eol - bol)
+		    updateCaret:&final_location
+		 alignToTabstop:YES
+	       indentEmptyLines:YES];
 	return YES;
 }
 
@@ -1415,10 +1427,10 @@ int logIndent = 0;
 		}
 	}
 
-	if ([[self preference:@"smarttab"] integerValue] == NSOnState) {
+	if ([[self preference:@"smarttab" atLocation:start_location] integerValue] == NSOnState) {
 		/* Check if we're in leading whitespace. */
 		NSUInteger firstNonBlank = [[self textStorage] firstNonBlankForLineAtLocation:start_location];
-		if (firstNonBlank >= start_location) {
+		if (firstNonBlank == NSNotFound || firstNonBlank >= start_location) {
 			/* Do smart tab, behaves as ctrl-t. */
 			return [self increase_indent:command];
 		}
@@ -1426,7 +1438,7 @@ int logIndent = 0;
 
 	// otherwise just insert a tab
 	NSString *tabString = @"\t";
-	if ([[self preference:@"expandtab"] integerValue] == NSOnState) {
+	if ([[self preference:@"expandtab" atLocation:start_location] integerValue] == NSOnState) {
 		NSInteger tabstop = [[self preference:@"tabstop" atLocation:start_location] integerValue];
 		NSInteger nspaces = tabstop - (([self currentColumn] - 1) % tabstop);
 		tabString = [@"" stringByPaddingToLength:nspaces withString:@" " startingAtIndex:0];
@@ -1480,14 +1492,14 @@ int logIndent = 0;
 		}
 	}
 
-	if ([[self preference:@"smarttab"] integerValue] == NSOnState) {
-		/* Check if we're in leading whitespace. */
+	if ([[self preference:@"smarttab" atLocation:start_location] integerValue] == NSOnState) {
+		/* Check if we're in leading whitespace and not at BOL. */
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:start_location];
 		if (start_location > bol) {
 			NSUInteger firstNonBlank = [[self textStorage]
 			    firstNonBlankForLineAtLocation:start_location];
-			if (firstNonBlank >= start_location) {
+			if (firstNonBlank == NSNotFound || firstNonBlank >= start_location) {
 				/* Do smart backspace, behaves as ctrl-d. */
 				return [self decrease_indent:command];
 			}

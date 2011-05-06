@@ -58,7 +58,7 @@
 					<object class="NSPopUpButton" id="720712456">
 						<reference key="NSNextResponder" ref="629504409"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{33, 250}, {188, 26}}</string>
+						<string key="NSFrame">{{33, 268}, {188, 26}}</string>
 						<reference key="NSSuperview" ref="629504409"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
@@ -147,7 +147,7 @@
 									<object class="NSButton" id="982924639">
 										<reference key="NSNextResponder" ref="569656065"/>
 										<int key="NSvFlags">268</int>
-										<string key="NSFrame">{{20, 203}, {216, 18}}</string>
+										<string key="NSFrame">{{20, 221}, {216, 18}}</string>
 										<reference key="NSSuperview" ref="569656065"/>
 										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="348315277"/>
@@ -522,10 +522,10 @@
 									<object class="NSButton" id="348315277">
 										<reference key="NSNextResponder" ref="569656065"/>
 										<int key="NSvFlags">268</int>
-										<string key="NSFrame">{{32, 183}, {273, 18}}</string>
+										<string key="NSFrame">{{32, 201}, {273, 18}}</string>
 										<reference key="NSSuperview" ref="569656065"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="244470713"/>
+										<reference key="NSNextKeyView" ref="627904728"/>
 										<bool key="NSEnabled">YES</bool>
 										<object class="NSButtonCell" key="NSCell" id="1002129213">
 											<int key="NSCellFlags">-2080244224</int>
@@ -589,14 +589,38 @@
 											<int key="NSPeriodicInterval">25</int>
 										</object>
 									</object>
+									<object class="NSButton" id="627904728">
+										<reference key="NSNextResponder" ref="569656065"/>
+										<int key="NSvFlags">268</int>
+										<string key="NSFrame">{{20, 181}, {408, 18}}</string>
+										<reference key="NSSuperview" ref="569656065"/>
+										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="244470713"/>
+										<bool key="NSEnabled">YES</bool>
+										<object class="NSButtonCell" key="NSCell" id="671188605">
+											<int key="NSCellFlags">-2080244224</int>
+											<int key="NSCellFlags2">0</int>
+											<string key="NSContents">Tab/backspace in leading whitespace changes indentation</string>
+											<reference key="NSSupport" ref="100506631"/>
+											<reference key="NSControlView" ref="627904728"/>
+											<int key="NSButtonFlags">1211912703</int>
+											<int key="NSButtonFlags2">2</int>
+											<reference key="NSNormalImage" ref="1005493489"/>
+											<reference key="NSAlternateImage" ref="106077221"/>
+											<string key="NSAlternateContents"/>
+											<string key="NSKeyEquivalent"/>
+											<int key="NSPeriodicDelay">200</int>
+											<int key="NSPeriodicInterval">25</int>
+										</object>
+									</object>
 								</object>
-								<string key="NSFrame">{{1, 1}, {444, 248}}</string>
+								<string key="NSFrame">{{1, 1}, {444, 266}}</string>
 								<reference key="NSSuperview" ref="679587162"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="982924639"/>
 							</object>
 						</object>
-						<string key="NSFrame">{{17, 16}, {446, 250}}</string>
+						<string key="NSFrame">{{17, 16}, {446, 268}}</string>
 						<reference key="NSSuperview" ref="629504409"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="569656065"/>
@@ -623,7 +647,7 @@
 						<bool key="NSTransparent">NO</bool>
 					</object>
 				</object>
-				<string key="NSFrameSize">{480, 286}</string>
+				<string key="NSFrameSize">{480, 304}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="679587162"/>
@@ -661,25 +685,26 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<nil key="NSMenuItem"/>
+								<object class="NSMenuItem" key="NSMenuItem" id="842768395">
+									<reference key="NSMenu" ref="114567856"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<int key="NSState">1</int>
+									<reference key="NSOnImage" ref="334854429"/>
+									<reference key="NSMixedImage" ref="55065710"/>
+									<string key="NSAction">_popUpItemAction:</string>
+									<int key="NSTag">-2</int>
+									<reference key="NSTarget" ref="821232794"/>
+								</object>
 								<bool key="NSMenuItemRespectAlignment">YES</bool>
 								<object class="NSMenu" key="NSMenu" id="114567856">
 									<string key="NSTitle">OtherViews</string>
 									<object class="NSMutableArray" key="NSMenuItems">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<object class="NSMenuItem" id="842768395">
-											<reference key="NSMenu" ref="114567856"/>
-											<bool key="NSIsDisabled">YES</bool>
-											<bool key="NSIsSeparator">YES</bool>
-											<string key="NSTitle"/>
-											<string key="NSKeyEquiv"/>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="334854429"/>
-											<reference key="NSMixedImage" ref="55065710"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<int key="NSTag">-2</int>
-											<reference key="NSTarget" ref="821232794"/>
-										</object>
+										<reference ref="842768395"/>
 										<object class="NSMenuItem" id="594292400">
 											<reference key="NSMenu" ref="114567856"/>
 											<string key="NSTitle">Custom scope</string>
@@ -1086,6 +1111,22 @@
 					</object>
 					<int key="connectionID">120</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: smarttab</string>
+						<reference key="source" ref="627904728"/>
+						<reference key="destination" ref="1001"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="627904728"/>
+							<reference key="NSDestination" ref="1001"/>
+							<string key="NSLabel">value: smarttab</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">smarttab</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1140,17 +1181,18 @@
 						<reference key="object" ref="679587162"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1055788180"/>
 							<reference ref="348315277"/>
-							<reference ref="196515017"/>
-							<reference ref="173873085"/>
-							<reference ref="1019725353"/>
-							<reference ref="146331098"/>
-							<reference ref="621997526"/>
-							<reference ref="540364818"/>
-							<reference ref="464918028"/>
-							<reference ref="244470713"/>
 							<reference ref="982924639"/>
+							<reference ref="627904728"/>
+							<reference ref="244470713"/>
+							<reference ref="1055788180"/>
+							<reference ref="464918028"/>
+							<reference ref="540364818"/>
+							<reference ref="621997526"/>
+							<reference ref="146331098"/>
+							<reference ref="1019725353"/>
+							<reference ref="173873085"/>
+							<reference ref="196515017"/>
 							<reference ref="805981590"/>
 						</object>
 						<reference key="parent" ref="629504409"/>
@@ -1542,6 +1584,20 @@
 						<reference key="object" ref="124925765"/>
 						<reference key="parent" ref="27530393"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">121</int>
+						<reference key="object" ref="627904728"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="671188605"/>
+						</object>
+						<reference key="parent" ref="679587162"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">122</int>
+						<reference key="object" ref="671188605"/>
+						<reference key="parent" ref="627904728"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1558,6 +1614,9 @@
 					<string>11.IBAttributePlaceholdersKey</string>
 					<string>11.IBPluginDependency</string>
 					<string>12.IBPluginDependency</string>
+					<string>121.IBAttributePlaceholdersKey</string>
+					<string>121.IBPluginDependency</string>
+					<string>122.IBPluginDependency</string>
 					<string>13.IBAttributePlaceholdersKey</string>
 					<string>13.IBPluginDependency</string>
 					<string>14.IBPluginDependency</string>
@@ -1637,6 +1696,16 @@
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="146331098"/>
 							<string key="toolTip">:set shiftwidth</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="627904728"/>
+							<string key="toolTip">:set smarttab</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1746,7 +1815,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">120</int>
+			<int key="maxID">124</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

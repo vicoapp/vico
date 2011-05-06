@@ -1766,7 +1766,11 @@
 - (BOOL)shift_right:(ViCommand *)command
 {
 	final_location = start_location;
-	[self changeIndentation:1 inRange:affectedRange updateCaret:&final_location];
+	[self changeIndentation:1
+			inRange:affectedRange
+		    updateCaret:&final_location
+		 alignToTabstop:NO
+	       indentEmptyLines:NO];
 	return YES;
 }
 
@@ -1777,7 +1781,11 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 
 	final_location = start_location;
-	[self changeIndentation:-1 inRange:affectedRange updateCaret:&final_location];
+	[self changeIndentation:-1
+			inRange:affectedRange
+		    updateCaret:&final_location
+		 alignToTabstop:NO
+	       indentEmptyLines:NO];
 	return YES;
 }
 
@@ -2254,7 +2262,7 @@
 		endLocation += delta;
 	}
 
-	final_location = [[self textStorage] firstNonBlankAtLocation:affectedRange.location];
+	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;
 }
 

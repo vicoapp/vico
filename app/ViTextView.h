@@ -105,8 +105,10 @@
                       forceSmartIndent:(BOOL)smartFlag;
 - (NSString *)suggestedIndentAtLocation:(NSUInteger)location;
 - (NSRange)changeIndentation:(int)delta
-                     inRange:(NSRange)aRange
-                 updateCaret:(NSUInteger *)updatedCaret;
+		     inRange:(NSRange)aRange
+		 updateCaret:(NSUInteger *)updatedCaret
+	      alignToTabstop:(BOOL)alignToTabstop
+	    indentEmptyLines:(BOOL)indentEmptyLines;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;

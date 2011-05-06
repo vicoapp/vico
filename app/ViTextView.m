@@ -829,6 +829,23 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Convenience methods
 
+- (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
+{
+	NSUInteger eol;
+	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:aLocation];
+
+	NSRange lineRange;
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:aLocation effectiveRange:&lineRange];
+	end_location =  [[self layoutManager] characterIndexForGlyphAtIndex:lineRange.location];
+	if (column > 1)
+		end_location += column - 1;
+
+	if (end_location >= eol)
+		end_location = eol - (mode == ViInsertMode ? 0 : 1);
+
+	final_location = end_location;
+}
+
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
 	end_location = [[self textStorage] locationForColumn:column
@@ -1625,6 +1642,12 @@ int logIndent = 0;
 	    command.motion.action == @selector(scroll_up_by_line:)) {
 		if (saved_column < 0)
 			saved_column = [self currentColumn];
+	} else if (command.motion.action == @selector(move_down_soft:) ||
+	    command.motion.action == @selector(move_up_soft:) ||
+	    command.action == @selector(move_down_soft:) ||
+	    command.action == @selector(move_up_soft:)) {
+		if (saved_column < 0)
+			saved_column = [self currentScreenColumn];
 	} else
 		saved_column = -1;
 
@@ -1987,6 +2010,14 @@ int logIndent = 0;
 - (NSUInteger)currentColumn
 {
 	return [[self textStorage] columnAtLocation:[self caret]];
+}
+
+- (NSUInteger)currentScreenColumn
+{
+	NSRange lineRange;
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+	return glyphIndex - lineRange.location + 1; /* XXX: mixing glyphs and characters? */
 }
 
 /* syntax: ctrl-P */

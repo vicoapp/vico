@@ -109,6 +109,7 @@
                  updateCaret:(NSUInteger *)updatedCaret;
 - (NSRange)changeIndentation:(int)delta inRange:(NSRange)aRange;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)resetSelection;
@@ -158,6 +159,7 @@
 
 - (NSUInteger)currentLine;
 - (NSUInteger)currentColumn;
+- (NSUInteger)currentScreenColumn;
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation;
 - (void)pushCurrentLocationOnJumpList;
 - (IBAction)performNormalModeMenuItem:(id)sender;

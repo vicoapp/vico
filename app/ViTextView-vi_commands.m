@@ -846,6 +846,56 @@
 	return YES;
 }
 
+/* syntax: [count]gj */
+- (BOOL)move_down_soft:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+
+	NSRange lineRange;
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	for (NSUInteger i = 0; glyphIndex < [[self layoutManager] numberOfGlyphs] && i < count; i++) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+		if (i == 0) {
+			if (NSMaxRange(lineRange) >= [[self textStorage] length]) {
+				MESSAGE(@"Already at end-of-file");
+				return NO;
+			}
+		}
+		glyphIndex = NSMaxRange(lineRange);
+	}
+
+	if (glyphIndex >= [[self layoutManager] numberOfGlyphs]) {
+		MESSAGE(@"Movement past the end-of-file");
+		return NO;
+	}
+
+	[self gotoScreenColumn:saved_column fromLocation:[[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex]];
+	return YES;
+}
+
+/* syntax: [count]gk */
+- (BOOL)move_up_soft:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+
+	NSRange lineRange;
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
+	if (lineRange.location == 0) {
+		MESSAGE(@"Already at the beginning of the file");
+		return NO;
+	}
+
+	glyphIndex = lineRange.location;
+	for (NSUInteger i = 0; glyphIndex > 0 && i < count; i++) {
+		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex - 1 effectiveRange:&lineRange];
+		glyphIndex = lineRange.location;
+	}
+
+	[self gotoScreenColumn:saved_column fromLocation:[[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex]];
+	return YES;
+}
+
 /* syntax: 0 */
 - (BOOL)move_bol:(ViCommand *)command
 {

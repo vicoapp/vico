@@ -3,10 +3,15 @@ REQUESTED
 
 * vim text objects, especially i[, a]
 * project search
+* Toggle ERb tags snippet fails with exit status 1
+* vicotool --wait <file>
+* vicotool --line 1
+* R (replace mode)
 
 
 URGENT
 ========
+* can't cd ~: unsupported URL scheme (null) !!
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * snippets still use hard tabs
@@ -35,13 +40,13 @@ BUGS
 
 IMPORTANT
 =========
+* installer for vicotool
 * :bdelete command
 * tweak smart typing pair invocation
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
 * Reload bundles!
-* cmd-t fuzzy search feels *slow*
 * toggling explorer always opens to 200px
 * dot should work with ! filters
 * :write !program

@@ -580,11 +580,11 @@ int logIndent = 0;
 				} if ([self shouldIncreaseIndentOnceAtLocation:bol]) {
 					DEBUG(@"compensating for indentNextLinePattern at line %lu",
 					    [[self textStorage] lineNumberAtLocation:bol]);
-					len -= shiftWidth;
+					len = [self lengthOfIndentAtLocation:bol];
 				} else
 					break;
 			}
-	
+
 			if ([self shouldDecreaseIndentAtLocation:location]) {
 				DEBUG(@"decrease indent at %lu", location);
 				len -= shiftWidth;

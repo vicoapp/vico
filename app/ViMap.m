@@ -600,7 +600,7 @@ toExpression:(id)expr
 	}
 
 	for (ViMapping *m in actions)
-		if ([m.keySequence isEqual:keySequence] &&
+		if ([m.keySequence isEqual:keyCodes] &&
 		    [m.scopeSelector isEqualToString:(scopeSelector ?: @"")] &&
 		    [m isMacro]) {
 			[actions removeObject:m];

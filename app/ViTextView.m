@@ -1186,21 +1186,19 @@ int logIndent = 0;
 - (void)setVisualSelection
 {
 	NSUInteger l1 = visual_start_location, l2 = [self caret];
-	if (l2 < l1)
-	{	/* swap if end < start */
+	if (l2 < l1) {
+		/* swap if end < start */
 		l2 = l1;
 		l1 = end_location;
 	}
 
-	if (visual_line_mode)
-	{
+	if (visual_line_mode) {
 		NSUInteger bol, end;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:l1];
 		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:l2];
 		l1 = bol;
 		l2 = end;
-	}
-	else
+	} else
 		l2++;
 
 	[self setMark:'<' atLocation:l1];
@@ -1714,7 +1712,7 @@ int logIndent = 0;
 			l1 = end_location;
 		}
 	}
-	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
+	INFO(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
 	    l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
 	if (command.isLineMode && !command.isMotion && mode != ViVisualMode) {
@@ -1764,6 +1762,7 @@ int logIndent = 0;
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = (NSUInteger)[target performSelector:command.action withObject:command];
+
 	if (ok && command.isLineMode && !command.isMotion &&
 	    command.action != @selector(yank:) &&
 	    command.action != @selector(shift_right:) &&
@@ -1787,8 +1786,13 @@ int logIndent = 0;
 	DEBUG(@"final_location is %u", final_location);
 	if (final_location != NSNotFound)
 		[self setCaret:final_location];
-	if (mode == ViVisualMode)
+	if (mode == ViVisualMode) {
+		NSRange sel = [self selectedRange];
+		/* Text objects can extend visual selection in both directions. */
+		if (sel.length <= 1 && start_location < sel.location)
+			visual_start_location = start_location;
 		[self setVisualSelection];
+	}
 
 	if (!replayingInput)
 		[self scrollToCaret];

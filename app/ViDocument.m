@@ -1167,5 +1167,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return nil;
 }
 
+- (ViScope *)scopeAtLocation:(NSUInteger)aLocation
+{
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	if ([scopeArray count] > aLocation)
+		return [scopeArray objectAtIndex:aLocation];
+	return nil;
+}
+
 @end
 

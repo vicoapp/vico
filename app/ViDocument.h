@@ -4,6 +4,7 @@
 #import "ViTextStorage.h"
 #import "ViScriptProxy.h"
 #import "ViURLManager.h"
+#import "ViScope.h"
 
 @interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate>
 {
@@ -60,6 +61,7 @@
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (ViScope *)scopeAtLocation:(NSUInteger)aLocation;
 - (NSDictionary *)typingAttributes;
 
 - (IBAction)toggleLineNumbers:(id)sender;

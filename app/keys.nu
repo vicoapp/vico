@@ -132,8 +132,10 @@
 ;; text objects in operator and visual maps
 (set tmap (ViMap mapWithName:"textObjectsMap"))
 (tmap setKey:"iw" toMotion:"select_inner_word:")
-(tmap setKey:"iS" toMotion:"select_inner_scope:")
 (tmap setKey:"aw" toMotion:"select_outer_word:")
+(tmap setKey:"iW" toMotion:"select_inner_bigword:")
+(tmap setKey:"aW" toMotion:"select_outer_bigword:")
+(tmap setKey:"iS" toMotion:"select_inner_scope:")
 
 
 ;; c-w prefix map for managing split views

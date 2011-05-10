@@ -2037,21 +2037,35 @@
  * If on whitespace: select the whitespace
  * If on other non-whitespace: select that
  */
-- (BOOL)select_inner_word:(ViCommand *)command
+- (BOOL)select_inner_word:(ViCommand *)command bigword:(BOOL)bigword
 {
 	ViTextStorage *ts = [self textStorage];
-	if (start_location >= [ts length])
+
+	NSUInteger location = start_location;
+	if (mode == ViVisualMode && [self selectedRange].length > 1)
+		location = NSMaxRange([self selectedRange]);
+	if (location >= [ts length])
 		return NO;
 
 	BOOL first = YES;
 	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
-	NSUInteger location = start_location;
+	NSCharacterSet *bigwordSet = [whitespace invertedSet];
 	int count = IMAX(command.count, 1);
 	while (count--) {
 		unichar ch = [[ts string] characterAtIndex:location];
+		if (first && [[NSCharacterSet newlineCharacterSet] characterIsMember:ch]) {
+			first = NO;
+			start_location = location;
+			location = [ts skipCharactersInSet:[NSCharacterSet newlineCharacterSet]
+					      fromLocation:location
+						  backward:NO];
+			ch = [[ts string] characterAtIndex:location];
+		}
 
 		NSCharacterSet *set = nil;
-		if ([wordSet characterIsMember:ch])
+		if (bigword && [bigwordSet characterIsMember:ch])
+			set = bigwordSet;
+		else if (!bigword && [wordSet characterIsMember:ch])
 			set = wordSet;
 		else if ([ws characterIsMember:ch])
 			set = ws;
@@ -2076,7 +2090,17 @@
 	return YES;
 }
 
-- (BOOL)select_outer_word:(ViCommand *)command
+- (BOOL)select_inner_word:(ViCommand *)command
+{
+	return [self select_inner_word:command bigword:NO];
+}
+
+- (BOOL)select_inner_bigword:(ViCommand *)command
+{
+	return [self select_inner_word:command bigword:YES];
+}
+
+- (BOOL)select_outer_word:(ViCommand *)command bigword:(BOOL)bigword
 {
 	ViTextStorage *ts = [self textStorage];
 
@@ -2088,6 +2112,7 @@
 
 	BOOL first = YES;
 	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
+	NSCharacterSet *bigwordSet = [whitespace invertedSet];
 	BOOL gotWhitespace = NO;
 	int count = IMAX(command.count, 1);
 	while (count > 0 || !gotWhitespace) {
@@ -2102,7 +2127,11 @@
 		}
 
 		NSCharacterSet *set = nil;
-		if ([wordSet characterIsMember:ch]) {
+		if (bigword && [bigwordSet characterIsMember:ch]) {
+			set = bigwordSet;
+			if (count-- == 0)
+				break;
+		} else if (!bigword && [wordSet characterIsMember:ch]) {
 			set = wordSet;
 			if (count-- == 0)
 				break;
@@ -2147,9 +2176,14 @@
 	return YES;
 }
 
-- (BOOL)select_inner_bigword:(ViCommand *)command
+- (BOOL)select_outer_word:(ViCommand *)command
 {
-	return NO;
+	return [self select_outer_word:command bigword:NO];
+}
+
+- (BOOL)select_outer_bigword:(ViCommand *)command
+{
+	return [self select_outer_word:command bigword:YES];
 }
 
 - (BOOL)select_inner_paragraph:(ViCommand *)command

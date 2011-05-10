@@ -26,8 +26,15 @@
 {
 	DEBUG(@"finished on conn %@, callback %p, error %@", conn, completionCallback, error);
 
-	if (completionCallback)
-		completionCallback([request URL], nil, error);
+	if (completionCallback) {
+		NSDictionary *attributes = nil;
+		if (!error && [[request URL] isFileURL]) {
+			NSFileManager *fm = [[NSFileManager alloc] init];
+			attributes = [fm attributesOfItemAtPath:[[request URL] path]
+							  error:&error];
+		}
+		completionCallback([request URL], attributes, error);
+	}
 
 	completionCallback = NULL;
 	dataCallback = NULL;

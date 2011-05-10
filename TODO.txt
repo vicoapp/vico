@@ -1,3 +1,7 @@
+REGRESSIONS
+===========
+
+
 REQUESTED
 =========
 
@@ -7,6 +11,7 @@ REQUESTED
 * vicotool --wait <file>
 * vicotool --line 1
 * R (replace mode)
+* show hidden files in explorer (option in action menu? or skipPattern?)
 
 
 URGENT

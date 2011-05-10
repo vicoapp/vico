@@ -135,6 +135,8 @@
 (tmap setKey:"aw" toMotion:"select_outer_word:")
 (tmap setKey:"iW" toMotion:"select_inner_bigword:")
 (tmap setKey:"aW" toMotion:"select_outer_bigword:")
+(tmap setKey:"ip" toMotion:"select_inner_paragraph:")
+(tmap setKey:"ap" toMotion:"select_outer_paragraph:")
 (tmap setKey:"iS" toMotion:"select_inner_scope:")
 
 

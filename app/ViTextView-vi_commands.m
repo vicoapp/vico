@@ -384,11 +384,9 @@
 	[self getLineStart:NULL end:&cur contentsEnd:NULL];
 
 	NSUInteger bol = cur, end, eol = 0;
-	for (; eol < [[self textStorage] length];)
-	{
+	for (; eol < [[self textStorage] length];) {
 		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
-		if ((bol == end || [[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0)
-		{
+		if (([[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0) {
 			// empty or blank line, we're done
 			break;
 		}
@@ -2033,6 +2031,9 @@
 	return YES;
 }
 
+#pragma mark -
+#pragma mark Text Objects
+
 /* If on a word (letters, numbers, underscore): select the word
  * If on whitespace: select the whitespace
  * If on other non-whitespace: select that
@@ -2086,6 +2087,7 @@
 		end_location = NSMaxRange(range);
 	}
 
+	visual_line_mode = NO;
 	final_location = end_location - 1;
 	return YES;
 }
@@ -2172,6 +2174,7 @@
 		}
 	}
 
+	visual_line_mode = NO;
 	final_location = end_location - 1;
 	return YES;
 }
@@ -2186,9 +2189,65 @@
 	return [self select_outer_word:command bigword:YES];
 }
 
+- (BOOL)select_paragraph:(ViCommand *)command
+       includeWhitespace:(BOOL)includeWhitespace
+{
+	int count = IMAX(command.count, 1);
+	NSUInteger location = start_location;
+
+	NSUInteger bol = location;
+	NSUInteger end = 0;
+
+	if (mode == ViVisualMode && [self selectedRange].length > 1)
+		location = NSMaxRange([self selectedRange]);
+
+	BOOL blankLine = [[self textStorage] isBlankLineAtLocation:location];
+	BOOL initialBlankLine = blankLine;
+
+	for (; location > 0;) {
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location - 1];
+		if (blankLine != [[self textStorage] isBlankLineAtLocation:bol])
+			break;
+		location = bol;
+	}
+
+	if ([self selectedRange].length <= 1)
+		start_location = location;
+	end_location = location;
+
+	for (location = end; end < [[self textStorage] length]; location = end) {
+		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
+		if ([[self textStorage] isBlankLineAtLocation:bol] != blankLine) {
+			blankLine = !blankLine;
+			if ((!includeWhitespace || blankLine) && --count == 0)
+				break;
+		}
+		end_location = bol;
+	}
+
+	if (includeWhitespace && !initialBlankLine) {
+		for (location = end; end < [[self textStorage] length]; location = end) {
+			end_location = bol;
+			[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
+			if ([[self textStorage] isBlankLineAtLocation:bol] != blankLine)
+				break;
+		}
+	}
+
+	visual_line_mode = YES;
+	final_location = end_location;
+
+	return YES;
+}
+
 - (BOOL)select_inner_paragraph:(ViCommand *)command
 {
-	return NO;
+	return [self select_paragraph:command includeWhitespace:NO];
+}
+
+- (BOOL)select_outer_paragraph:(ViCommand *)command
+{
+	return [self select_paragraph:command includeWhitespace:YES];
 }
 
 - (BOOL)select_inner_brace:(ViCommand *)command
@@ -2213,6 +2272,8 @@
 	final_location = end_location = NSMaxRange(range) - 1;
 	return YES;
 }
+
+#pragma mark -
 
 - (BOOL)uppercase:(ViCommand *)command
 {

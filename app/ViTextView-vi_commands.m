@@ -2069,38 +2069,6 @@
 	return YES;
 }
 
-- (BOOL)select_inner:(ViCommand *)command
-{
-	switch (command.argument) {
-	case 'w':
-		return [self select_inner_word:command];
-		break;
-	case 'W':
-		return [self select_inner_bigword:command];
-		break;
-	case '(':
-	case ')':
-	case 'b':
-		return [self select_inner_paragraph:command];
-		break;
-	case '{':
-	case '}':
-	case 'B':
-		return [self select_inner_brace:command];
-		break;
-	case '[':
-	case ']':
-		return [self select_inner_bracket:command];
-		break;
-	case 'S':
-		return [self select_inner_scope:command];
-		break;
-	default:
-		MESSAGE(@"Unrecognized text object.");
-		return NO;
-	}
-}
-
 - (BOOL)uppercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];

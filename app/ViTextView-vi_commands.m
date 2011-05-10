@@ -1327,7 +1327,9 @@
          * 'b' command.
          */
 	if ([whitespace characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:whitespace fromLocation:end_location backward:YES];
+		end_location = [[self textStorage] skipCharactersInSet:whitespace
+							  fromLocation:end_location
+							      backward:YES];
 		if (end_location == 0) {
 			final_location = end_location;
 			return YES;
@@ -2031,9 +2033,118 @@
 	return YES;
 }
 
+/* If on a word (letters, numbers, underscore): select the word
+ * If on whitespace: select the whitespace
+ * If on other non-whitespace: select that
+ */
 - (BOOL)select_inner_word:(ViCommand *)command
 {
-	return NO;
+	ViTextStorage *ts = [self textStorage];
+	if (start_location >= [ts length])
+		return NO;
+
+	BOOL first = YES;
+	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
+	NSUInteger location = start_location;
+	int count = IMAX(command.count, 1);
+	while (count--) {
+		unichar ch = [[ts string] characterAtIndex:location];
+
+		NSCharacterSet *set = nil;
+		if ([wordSet characterIsMember:ch])
+			set = wordSet;
+		else if ([ws characterIsMember:ch])
+			set = ws;
+		else
+			set = nonWordSet;
+
+		NSRange range = [ts rangeOfCharactersFromSet:set
+						  atLocation:location
+						 acceptAfter:NO];
+
+		if (range.location == NSNotFound || range.length == 0)
+			break;
+		location = NSMaxRange(range);
+		if (first) {
+			start_location = range.location;
+			first = NO;
+		}
+		end_location = NSMaxRange(range);
+	}
+
+	final_location = end_location - 1;
+	return YES;
+}
+
+- (BOOL)select_outer_word:(ViCommand *)command
+{
+	ViTextStorage *ts = [self textStorage];
+
+	NSUInteger location = start_location;
+	if (mode == ViVisualMode && [self selectedRange].length > 1)
+		location = NSMaxRange([self selectedRange]);
+	if (location >= [ts length])
+		return NO;
+
+	BOOL first = YES;
+	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
+	BOOL gotWhitespace = NO;
+	int count = IMAX(command.count, 1);
+	while (count > 0 || !gotWhitespace) {
+		unichar ch = [[ts string] characterAtIndex:location];
+		if (first && [[NSCharacterSet newlineCharacterSet] characterIsMember:ch]) {
+			first = NO;
+			start_location = location;
+			location = [ts skipCharactersInSet:[NSCharacterSet newlineCharacterSet]
+					      fromLocation:location
+						  backward:NO];
+			ch = [[ts string] characterAtIndex:location];
+		}
+
+		NSCharacterSet *set = nil;
+		if ([wordSet characterIsMember:ch]) {
+			set = wordSet;
+			if (count-- == 0)
+				break;
+		} else if ([ws characterIsMember:ch]) {
+			set = ws;
+			if (first || count == 0)
+				gotWhitespace = YES;
+		} else {
+			set = nonWordSet;
+			if (count-- == 0)
+				break;
+		}
+
+		NSRange range = [ts rangeOfCharactersFromSet:set
+						  atLocation:location
+						 acceptAfter:NO];
+
+		if (range.location == NSNotFound || range.length == 0)
+			break;
+		end_location = location = NSMaxRange(range);
+		if (first) {
+			start_location = range.location;
+			first = NO;
+		}
+	}
+
+	/* Check for leading whitespace. */
+	if (!gotWhitespace && start_location > 0) {
+		NSRange range = [ts rangeOfCharactersFromSet:ws
+						  atLocation:start_location - 1
+						 acceptAfter:NO];
+		if (range.location != NSNotFound && range.length > 0) {
+			/* Vim doesn't include leading whitespace if it's only indentation. (?) */
+			NSUInteger bol;
+			[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:start_location - 1];
+			if (range.location > bol)
+				start_location = range.location;
+		}
+	}
+
+	final_location = end_location - 1;
+	return YES;
 }
 
 - (BOOL)select_inner_bigword:(ViCommand *)command

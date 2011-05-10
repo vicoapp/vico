@@ -1712,7 +1712,7 @@ int logIndent = 0;
 			l1 = end_location;
 		}
 	}
-	INFO(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
+	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
 	    l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
 	if (command.isLineMode && !command.isMotion && mode != ViVisualMode) {

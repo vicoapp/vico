@@ -121,6 +121,15 @@ tenpow(NSUInteger x)
 
 				/* Continue with the next selector. */
 				break;
+			} else {
+				struct scope *child = TAILQ_NEXT(sel, next);
+				if (child && child->child) {
+#ifndef NO_DEBUG
+					NSString *childscope = [NSString stringWithCharacters:child->buf length:child->length];
+					DEBUG(@"selector [%@] not a direct parent of child [%@]", selscope, childscope);
+#endif
+					return 0ULL;
+				}
 			}
 		}
 
@@ -137,7 +146,7 @@ tenpow(NSUInteger x)
 {
 	u_int64_t l, r;
 
-	DEBUG(@"matching against expre %p", expr);
+	DEBUG(@"matching against expr %p", expr);
 
 	switch (expr->op) {
 	case SCOPE:
@@ -176,6 +185,8 @@ tenpow(NSUInteger x)
 
 	s = [NSMutableString string];
 	TAILQ_FOREACH(scope, scope_list, next) {
+		if (scope->child)
+			[s appendString:@"> "];
 		NSString *tmp = [NSString stringWithCharacters:scope->buf length:scope->length];
 		[s appendString:tmp];
 		if (TAILQ_NEXT(scope, next))
@@ -286,15 +297,20 @@ tenpow(NSUInteger x)
 			scopeSelectorParse(parser, OR, NULL, &state);
 			i++;
 			break;
+		case '>':
+			scopeSelectorParse(parser, GT, NULL, &state);
+			i++;
+			break;
 		default:
 			scope = &state.scopes[state.nscopes++];
 			for (j = i + 1; j < len; j++) {
 				ch = buf[j];
-				if (ch == ' ' || ch == ',' || ch == '(' || ch == ')' || ch == '&' || ch == '|' || ch == '\n')
+				if (ch == ' ' || ch == ',' || ch == '(' || ch == ')' || ch == '&' || ch == '|' || ch == '>' || ch == '\n')
 					break;
 			}
 			scope->buf = buf + i;
 			scope->length = (unsigned int)(j - i);
+			scope->child = 0;
 			scopeSelectorParse(parser, SCOPE, scope, &state);
 			i = j;
 			break;

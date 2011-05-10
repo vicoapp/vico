@@ -11,6 +11,7 @@ struct scope
 	TAILQ_ENTRY(scope) next;
 	u_int16_t *buf;
 	unsigned int length;
+	int child; /* 1 if this scope must be an immediate child of the previous scope in the list. */
 };
 
 TAILQ_HEAD(scope_list, scope);

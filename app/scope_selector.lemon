@@ -32,6 +32,11 @@ scopelist(LH) ::= SCOPE(S).			{
 							TAILQ_INIT(LH);
 							TAILQ_INSERT_TAIL(LH, S, next);
 						}
+scopelist(LH) ::= scopelist(SL) GT SCOPE(S).	{
+							LH = SL;
+							S->child = 1;
+							TAILQ_INSERT_TAIL(LH, S, next);
+						}
 scopelist(LH) ::= scopelist(SL) SCOPE(S).	{
 							LH = SL;
 							TAILQ_INSERT_TAIL(LH, S, next);

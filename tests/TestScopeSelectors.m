@@ -261,5 +261,11 @@
 	    6*DEPTH_RANK + 2*1000000 + 1, nil);
 }
 
+- (void)test050_ChildSelector
+{
+	STAssertTrue([@"source > string" matchesScopes:scopeCString] > 0ULL, nil);
+	STAssertEquals([@"source > string" matchesScopes:scopeObjCString], 0ULL, nil);
+}
+
 @end
 

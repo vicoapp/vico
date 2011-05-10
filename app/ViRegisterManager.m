@@ -59,7 +59,7 @@
 	}
 
 	[registers setObject:content forKey:[self nameOfRegister:regName]];
-	if (regName != 0 && regName != '"')
+	if (regName != 0 && regName != '"' && regName != '/')
 		[registers setObject:content forKey:[self nameOfRegister:0]];
 }
 

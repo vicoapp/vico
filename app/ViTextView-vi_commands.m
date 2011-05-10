@@ -629,16 +629,25 @@
 /* syntax: [buffer][count]s */
 - (BOOL)substitute:(ViCommand *)command
 {
-	NSUInteger eol;
-	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:start_location];
-	NSUInteger len = IMAX(1, command.count);
+	NSRange range;
+
+	if (mode == ViVisualMode) {
+		range = affectedRange;
+	} else {
+		NSUInteger eol;
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:start_location];
+		NSUInteger len = IMAX(1, command.count);
+
+		if (start_location + len >= eol)
+			len = eol - start_location;
+		range = NSMakeRange(start_location, len);
+	}
 
 	/* A count should not cause multiplied text (after leaving insert mode). */
 	command.count = 0;
 
-	if (start_location + len >= eol)
-		len = eol - start_location;
-	[self cutToRegister:command.reg range:NSMakeRange(start_location, len)];
+	end_location = final_location = range.location;
+	[self cutToRegister:command.reg range:range];
 	[self setInsertMode:command];
 	return YES;
 }

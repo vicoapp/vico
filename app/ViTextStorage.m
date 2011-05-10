@@ -718,12 +718,17 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation
 {
-	if (aLocation > [self length])
+	NSRange r = [self rangeOfLineAtLocation:aLocation];
+	if (r.location == NSNotFound)
 		return YES;
 
-	NSString *line = [self lineForLocation:aLocation];
+	if (r.length == 0)
+		return YES;
+
 	NSCharacterSet *cset = [[NSCharacterSet whitespaceCharacterSet] invertedSet];
-	return [line rangeOfCharacterFromSet:cset].location == NSNotFound;
+	return [[self string] rangeOfCharacterFromSet:cset
+					      options:NSLiteralSearch
+						range:r].location == NSNotFound;
 }
 
 - (NSRange)rangeOfLeadingWhitespaceForLineAtLocation:(NSUInteger)aLocation

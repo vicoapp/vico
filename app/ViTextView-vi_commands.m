@@ -2250,12 +2250,64 @@
 	return [self select_paragraph:command includeWhitespace:YES];
 }
 
-- (BOOL)select_inner_brace:(ViCommand *)command
+- (BOOL)select_string:(ViCommand *)command
+	    inclusive:(BOOL)inclusive
+{
+	NSUInteger eol;
+	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:start_location];
+	NSUInteger location;
+	ViScope *scope = nil;
+	for (location = start_location; location <= eol; ) {
+		scope = [document scopeAtLocation:location];
+		if (scope == nil)
+			return NO;
+		if ([@"string - (punctuation.definition.string.begin | keyword.control.heredoc-token)" matchesScopes:scope.scopes])
+			break;
+		location = NSMaxRange(scope.range);
+	}
+
+	if (location > eol)
+		return NO;
+
+	DEBUG(@"got scope %@", scope);
+	NSInteger i;
+	NSArray *scopes = scope.scopes;
+	for (i = [scopes count]; i > 0; i--) {
+		if ([[scopes objectAtIndex:i - 1] hasPrefix:@"string."])
+			break;
+	}
+	NSArray *baseScopes = [scopes subarrayWithRange:NSMakeRange(0, i)];
+	DEBUG(@"base scopes are %@", baseScopes);
+	NSString *baseSelector = [baseScopes componentsJoinedByString:@" > "];
+	NSString *selector = baseSelector;
+	if (!inclusive)
+		selector = [NSString stringWithFormat:@"%@ - (%@ > punctuation.definition.string.begin | %@ > punctuation.definition.string.end | %@ > keyword.control.heredoc-token)", baseSelector, baseSelector, baseSelector, baseSelector];
+	DEBUG(@"selector is %@", selector);
+	NSRange range = [self rangeOfScopeSelector:selector atLocation:location];
+	DEBUG(@"range = %@", NSStringFromRange(range));
+
+	start_location = range.location;
+	end_location = NSMaxRange(range);
+	final_location = end_location - 1;
+	return YES;
+}
+
+- (BOOL)select_inner_string:(ViCommand *)command
+{
+	return [self select_string:command inclusive:NO];
+}
+
+- (BOOL)select_outer_string:(ViCommand *)command
+{
+	return [self select_string:command inclusive:YES];
+}
+
+- (BOOL)select_inner_bracket:(ViCommand *)command
 {
 	return NO;
 }
 
-- (BOOL)select_inner_bracket:(ViCommand *)command
+- (BOOL)select_inner_brace:(ViCommand *)command
 {
 	return NO;
 }

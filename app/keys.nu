@@ -137,6 +137,12 @@
 (tmap setKey:"aW" toMotion:"select_outer_bigword:")
 (tmap setKey:"ip" toMotion:"select_inner_paragraph:")
 (tmap setKey:"ap" toMotion:"select_outer_paragraph:")
+(tmap setKey:"i\"" toMotion:"select_inner_string:")
+(tmap setKey:"i\'" toMotion:"select_inner_string:")
+(tmap setKey:"i\`" toMotion:"select_inner_string:")
+(tmap setKey:"a\"" toMotion:"select_outer_string:")
+(tmap setKey:"a\'" toMotion:"select_outer_string:")
+(tmap setKey:"a\`" toMotion:"select_outer_string:")
 (tmap setKey:"iS" toMotion:"select_inner_scope:")
 
 

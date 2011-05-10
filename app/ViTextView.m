@@ -1789,7 +1789,7 @@ int logIndent = 0;
 	if (mode == ViVisualMode) {
 		NSRange sel = [self selectedRange];
 		/* Text objects can extend visual selection in both directions. */
-		if (sel.length <= 1 && start_location < sel.location)
+		if (sel.length <= 1 && start_location != sel.location)
 			visual_start_location = start_location;
 		[self setVisualSelection];
 	}

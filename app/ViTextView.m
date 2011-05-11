@@ -517,7 +517,7 @@ int logIndent = 0;
 {
 	NSDictionary *indentExpressions = [[ViBundleStore defaultStore] preferenceItem:@"indentExpression"];
 	NSString *bestMatchingScope = [self bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
-	
+
 	if (bestMatchingScope) {
 		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
 		DEBUG(@"running indent expression:\n%@", expression);
@@ -1353,6 +1353,26 @@ int logIndent = 0;
 			atLocation:start_location];
 		final_location = modify_start_location + 1;
 	}
+
+	if ([[self preference:@"smartindent" atLocation:start_location] integerValue]) {
+		DEBUG(@"checking for auto-dedent at %lu", start_location);
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
+		NSRange r;
+		if ([[self layoutManager] temporaryAttribute:ViAutoIndentAttributeName
+					    atCharacterIndex:bol
+					      effectiveRange:&r]) {
+			DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
+			if ([self shouldDecreaseIndentAtLocation:bol]) {
+				[[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
+							     forCharacterRange:r];
+				NSString *indent = [self suggestedIndentAtLocation:bol];
+				NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
+				[self replaceCharactersInRange:curIndent withString:indent];
+				final_location += [indent length] - curIndent.length;
+			}
+		}
+	}
 }
 
 - (BOOL)literal_next:(ViCommand *)command
@@ -1530,10 +1550,11 @@ int logIndent = 0;
 				    atCharacterIndex:bol
 				      effectiveRange:&r]) {
 		DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
+		[[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
+					     forCharacterRange:r];
 		if (r.location == bol && NSMaxRange(r) == eol) {
 			[self replaceCharactersInRange:NSMakeRange(bol, eol - bol) withString:@""];
 			return bol;
-
 		}
 	}
 

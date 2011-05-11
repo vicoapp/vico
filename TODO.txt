@@ -11,7 +11,6 @@ REQUESTED
 * vicotool --line 1
 * R (replace mode)
 * show hidden files in explorer (option in action menu? or skipPattern?)
-* "end" should de-indent automatically in ruby
 
 
 URGENT
@@ -91,8 +90,6 @@ FEATURES
 * vimtutor
 * implement R
 * implement c-w in insert mode
-* escape after creating new line should blank the line
-* history in explorer view + go back/forward with swiping
 * :normal!
 * global shell variables (in preferences)
 * project shell variables
@@ -103,7 +100,6 @@ FEATURES
 * gq<motion> = reformat through 'formatprg' (ship with par)
 * dynamic headIndent paragraph style dependent on line indentation
 * cdpath setting? looked at by :edit
-* <C-W> in insert mode
 * 0<C-D> in insert mode removes all indentation
 
 

@@ -591,7 +591,6 @@
 											<bool key="EncodedWithXMLCoder">YES</bool>
 											<object class="NSMenuItem" id="702185781">
 												<reference key="NSMenu" ref="1042284489"/>
-												<bool key="NSIsDisabled">YES</bool>
 												<string key="NSTitle">Word (viw)(iw)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -620,7 +619,6 @@
 											</object>
 											<object class="NSMenuItem" id="157859298">
 												<reference key="NSMenu" ref="1042284489"/>
-												<bool key="NSIsDisabled">YES</bool>
 												<string key="NSTitle">Paragraph (vip)(ip)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -650,7 +648,6 @@
 											</object>
 											<object class="NSMenuItem" id="334831986">
 												<reference key="NSMenu" ref="1042284489"/>
-												<bool key="NSIsDisabled">YES</bool>
 												<string key="NSTitle">Scope (viS)(iS)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>

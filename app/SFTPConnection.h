@@ -216,9 +216,9 @@
 - (SFTPRequest *)removeItemsAtURLs:(NSArray *)urls
 		       onResponse:(void (^)(NSError *))responseCallback;
 
-- (SFTPRequest *)writeDataSefely:(NSData *)data
+- (SFTPRequest *)writeDataSafely:(NSData *)data
 			  toURL:(NSURL *)aURL
-		      onResponse:(void (^)(NSURL *, NSError *))responseCallback;
+		      onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback;
 
 - (void)dequeueRequest:(uint32_t)requestId;
 - (NSString *)stderr;

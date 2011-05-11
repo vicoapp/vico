@@ -424,11 +424,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
-	[[ViURLManager defaultManager] writeDataSafely:data toURL:url onCompletion:^(NSURL *normalizedURL, NSError *error) {
+	[[ViURLManager defaultManager] writeDataSafely:data
+						 toURL:url
+					  onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {
 			[self setFileURL:normalizedURL];
+			[self setFileModificationDate:[attributes fileModificationDate]];
 			[self updateChangeCount:NSChangeCleared];
 			[self message:@"%@: wrote %lu byte", url, [data length]];
 			isTemporary = NO;

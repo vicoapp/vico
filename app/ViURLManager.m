@@ -191,13 +191,13 @@
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSURL *, NSError *))aBlock
+		     onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(writeDataSafely:toURL:onCompletion:)];
 	if (handler)
 		return [handler writeDataSafely:data toURL:aURL onCompletion:aBlock];
-	aBlock(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
+	aBlock(nil, nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }
 

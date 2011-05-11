@@ -136,14 +136,15 @@
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSURL *, NSError *))aBlock
+		     onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
+							onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
-			return [conn writeDataSefely:data toURL:aURL onResponse:aBlock];
-		aBlock(nil, error);
+			return [conn writeDataSafely:data toURL:aURL onResponse:aBlock];
+		aBlock(nil, nil, error);
 		return nil;
 	}];
 }

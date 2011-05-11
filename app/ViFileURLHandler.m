@@ -122,12 +122,14 @@
 
 - (id<ViDeferred>)writeDataSafely:(NSData *)data
 			    toURL:(NSURL *)aURL
-		     onCompletion:(void (^)(NSURL *, NSError *))aBlock
+		     onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {
 	DEBUG(@"url = %@", aURL);
 	NSError *error = nil;
 	[data writeToURL:aURL options:NSDataWritingAtomic error:&error];
-	aBlock([self normalizeURL:aURL], error);
+	NSURL *normalizedURL = [self normalizeURL:aURL];
+	NSDictionary *attributes = [fm attributesOfItemAtPath:[normalizedURL path] error:&error];
+	aBlock(normalizedURL, attributes, error);
 	return nil;
 }
 

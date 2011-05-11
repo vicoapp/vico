@@ -1467,13 +1467,13 @@ resp2txt(int type)
 	return renameRequest;
 }
 
-- (SFTPRequest *)writeDataSefely:(NSData *)data
-			  toURL:(NSURL *)aURL
-		      onResponse:(void (^)(NSURL *, NSError *))responseCallback
+- (SFTPRequest *)writeDataSafely:(NSData *)data
+			   toURL:(NSURL *)aURL
+		      onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback
 {
 	NSURL *url = [self normalizeURL:aURL];
 
-	void (^originalCallback)(NSURL *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = Block_copy(responseCallback);
 	__block SFTPRequest *uploadRequest = nil;
 
 	void (^fun)(NSError *) = ^(NSError *error) {
@@ -1484,18 +1484,30 @@ resp2txt(int type)
 			uploadRequest.subRequest = [self uploadData:data
 							   toFile:randomFilename
 						       onResponse:^(NSError *error) {
-				if (error)
-					originalCallback(url, error);
-				else
-					uploadRequest.subRequest = [self atomicallyRenameItemAtPath:randomFilename
-											   toPath:[url path]
-										       onResponse:^(NSError *error) {
-											     originalCallback(url, error);
-										     }];
+				if (error) {
+					originalCallback(url, nil, error);
+					return;
+				}
+				uploadRequest.subRequest = [self atomicallyRenameItemAtPath:randomFilename
+										     toPath:[url path]
+										 onResponse:^(NSError *error) {
+					uploadRequest.subRequest = [self attributesOfItemAtURL:url
+										    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+						originalCallback(normalizedURL, attributes, error);
+					}];
+				}];
 			}];
 		} else {
 			/* It was a new file, upload successful. Or other error. */
-			originalCallback(url, error);
+			if (error) {
+				originalCallback(url, nil, error);
+				return;
+			}
+
+			uploadRequest.subRequest = [self attributesOfItemAtURL:url
+								    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+				originalCallback(normalizedURL, attributes, error);
+			}];
 		}
 	};
 

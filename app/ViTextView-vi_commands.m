@@ -353,7 +353,7 @@
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
-	[ViBundle setupEnvironment:env forTextView:self];
+	[ViBundle setupEnvironment:env forTextView:self selectedRange:affectedRange];
 	[task setEnvironment:env];
 
 	[[document environment] filterText:inputText

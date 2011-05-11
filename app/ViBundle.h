@@ -21,6 +21,9 @@
 + (void)normalizePreference:(NSDictionary *)preference
              intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)setupEnvironment:(NSMutableDictionary *)env
+             forTextView:(ViTextView *)textView
+	   selectedRange:(NSRange)sel;
++ (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView;
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory;

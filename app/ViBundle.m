@@ -91,6 +91,7 @@
 
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
+	   selectedRange:(NSRange)sel
 {
 	ViTextStorage *ts = [textView textStorage];
 
@@ -135,16 +136,15 @@
 	if (scope)
 		[env setObject:scope forKey:@"TM_SCOPE"];
 
-	NSRange sel = [textView selectedRange];
 	if (sel.length > 0) {
 		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
 		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
 
 		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
-		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
-
-		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
 		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+
+		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
 
 		[env setObject:[[ts string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
 	}
@@ -193,6 +193,12 @@
 			}
 		}
 	}
+}
+
++ (void)setupEnvironment:(NSMutableDictionary *)env
+             forTextView:(ViTextView *)textView
+{
+	return [ViBundle setupEnvironment:env forTextView:textView selectedRange:[textView selectedRange]];
 }
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory

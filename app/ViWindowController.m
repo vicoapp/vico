@@ -353,7 +353,8 @@ static ViWindowController	*currentWindowController = nil;
 						  contextInfo:nil];
 			[document updateChangeCount:NSChangeReadOtherContents];
 		}
-	}
+	} else
+		document.isTemporary = YES;
 }
 
 - (void)checkDocumentChanged:(ViDocument *)document

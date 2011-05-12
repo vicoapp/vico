@@ -388,18 +388,13 @@ additionalBindings:(NSDictionary *)bindings
 {
 	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
 
-	NSError *error = nil;
 	NSURL *url;
 	if ([pathOrURL isKindOfClass:[NSURL class]])
 		url = (NSURL *)pathOrURL;
 	else
-		url = [docCon normalizePath:pathOrURL
-				 relativeTo:nil
-				      error:&error];
-	
-	if (error)
-		return error;
+		url = [[ViURLManager defaultManager] normalizeURL:[[NSURL URLWithString:pathOrURL] absoluteURL]];
 
+	NSError *error = nil;
 	ViDocument *doc = [docCon openDocumentWithContentsOfURL:url
 							display:YES
 							  error:&error];

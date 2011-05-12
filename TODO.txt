@@ -103,7 +103,6 @@ FEATURES
 * :e# => open alternate file
 * set incsearch
 * set listchars
-* search and replace
 * symbol list should use same filtering algorithm as file explorer
 * option to hide the tab bar
 * option to open files in the same view per default (ie, not tabs)

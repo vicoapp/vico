@@ -11,6 +11,7 @@
 #import "ViBundleStore.h"
 #import "NSString-scopeSelector.h"
 #import "ViURLManager.h"
+#import "ViTransformer.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -843,6 +844,50 @@
 
 	ViDocumentView *docView = viewController;
 	[[docView document] setLanguage:[matches anyObject]];
+	return YES;
+}
+
+- (BOOL)ex_s:(ExCommand *)command
+{
+	NSRange exRange;
+	if (![self resolveExAddresses:command intoRange:&exRange]) {
+		[self message:@"Invalid addresses"];
+		return NO;
+	}
+
+	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
+	if ([command.string rangeOfString:@"i"].location != NSNotFound)
+		rx_options |= ONIG_OPTION_IGNORECASE;
+
+	ViRegexp *rx = nil;
+
+	/* compile the pattern regexp */
+	@try {
+		rx = [[ViRegexp alloc] initWithString:command.pattern
+					      options:rx_options];
+	}
+	@catch(NSException *exception) {
+		[self message:@"Invalid search pattern: %@", exception];
+		return NO;
+	}
+
+	ViTextStorage *storage = [exTextView textStorage];
+	ViTransformer *tform = [[ViTransformer alloc] init];
+	NSError *error = nil;
+
+	/* FIXME: this is inefficient: there are two copies of the range being made. */
+	NSString *replacedText = [tform transformValue:[[storage string] substringWithRange:exRange]
+					   withPattern:rx
+						format:command.replacement
+					       options:command.string
+						 error:&error];
+
+	if (error) {
+		[self message:@"substitute failed: %@", [error localizedDescription]];
+		return NO;
+	}
+
+	[exTextView replaceCharactersInRange:exRange withString:replacedText];
 	return YES;
 }
 

@@ -51,22 +51,22 @@
 
 - (NSString *)name
 {
-	if ([url isFileURL]) {
+	if ([url isFileURL])
 		return [[NSFileManager defaultManager] displayNameAtPath:[url path]];
-	} else
+	else
 		return [url lastPathComponent];
 }
 
 - (NSString *)pathRelativeToURL:(NSURL *)relURL
 {
-        NSString *root = [relURL path];
-        NSString *path = [url path];
-        if ([path length] > [root length]) {
-                NSRange r = NSMakeRange([root length] + 1,
-                    [path length] - [root length] - 1);
-                return [path substringWithRange:r];
+	NSString *root = [relURL path];
+	NSString *path = [url path];
+	if ([path length] > [root length]) {
+		NSRange r = NSMakeRange([root length] + 1,
+		    [path length] - [root length] - 1);
+		return [path substringWithRange:r];
 	}
-        return path;
+	return path;
 }
 
 - (NSString *)description

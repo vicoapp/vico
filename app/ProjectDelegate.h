@@ -40,6 +40,8 @@
 	IBOutlet NSPopUpButton *actionButton;
 	IBOutlet NSProgressIndicator *progressIndicator;
 
+	NSFont *font;
+
 	// incremental file filtering
 	NSMutableArray *filteredItems;
 	NSMutableArray *itemsToFilter;

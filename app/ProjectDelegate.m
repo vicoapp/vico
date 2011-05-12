@@ -88,6 +88,7 @@
 	if (self) {
 		history = [[ViJumpList alloc] init];
 		[history setDelegate:self];
+		font = [NSFont systemFontOfSize:11.0];
 	}
 	return self;
 }
@@ -844,7 +845,7 @@
 			NSString *p = [[[item url] path] substringFromIndex:prefixLength];
 			if (rx == nil || (m = [rx matchInString:p]) != nil) {
 				ViCompletion *c = [ViCompletion completionWithContent:p fuzzyMatch:m];
-				c.font = [NSFont systemFontOfSize:11.0];
+				c.font = font;
 				c.representedObject = item;
 				c.markColor = [NSColor blackColor];
 				[filteredItems addObject:c];
@@ -1174,7 +1175,14 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 				img = [[NSWorkspace sharedWorkspace] iconForFileType:[[url path] pathExtension]];
 		}
 
-		[cell setFont:[NSFont systemFontOfSize:11.0]];
+#if 0
+		ViDocument *doc = [[ViDocumentController sharedDocumentController] documentForURL:url];
+		if (doc && [doc isDocumentEdited]) {
+			INFO(@"doc %@ is edited", doc);
+		}
+#endif
+
+		[cell setFont:font];
 		[img setSize:NSMakeSize(16, 16)];
 		[cell setImage:img];
 	}

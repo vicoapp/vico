@@ -18,7 +18,6 @@ REQUESTED
 * @fkoeppe: Adding a new file should automatically rescan the files in the File Explorer.
 * @fkoeppe: Indicating if a file is "dirty" in the tab bar.
 * @fkoeppe: When pressing enter while renaming a file in the File Explorer, it opens it in a new tab.
-* @fkoeppe: When pressing the arrow keys while renaming a file, it does not move within the input box, but within the File Explorer.
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: How would I go about removing trailing white spaces on save?
 * @fkoeppe: Save width of the file explorer window.

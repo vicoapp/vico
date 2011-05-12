@@ -548,6 +548,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setFileURL:(NSURL *)absoluteURL
 {
+	if ([absoluteURL isEqual:[self fileURL]])
+		return;
+
 	[self willChangeValueForKey:@"title"];
 	[super setFileURL:absoluteURL];
 	[self didChangeValueForKey:@"title"];

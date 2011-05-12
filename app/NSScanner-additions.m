@@ -6,7 +6,8 @@
 {
 	if ([self isAtEnd])
 		return NO;
-	*ch = [[self string] characterAtIndex:[self scanLocation]];
+	if (ch)
+		*ch = [[self string] characterAtIndex:[self scanLocation]];
 	[self setScanLocation:[self scanLocation] + 1];
 	return YES;
 }

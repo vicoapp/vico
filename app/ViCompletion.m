@@ -10,8 +10,8 @@
 
 @implementation ViCompletion
 
-@synthesize title, content, filterMatch, prefixLength, filterIsFuzzy, font, location, score;
-@synthesize representedObject;
+@synthesize content, filterMatch, prefixLength, filterIsFuzzy, font, location;
+@synthesize representedObject, markColor;
 
 + (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
 {
@@ -23,26 +23,33 @@
 	return [[ViCompletion alloc] initWithContent:aString fuzzyMatch:aMatch];
 }
 
-- (id)initWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
+- (id)initWithContent:(NSString *)aString
 {
 	if ((self = [super init]) != nil) {
 		content = aString;
-		prefixLength = aLength;
 		font = [ViThemeStore font];
-		[self updateTitle];
+		titleParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+		[titleParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
+		markColor = [NSColor redColor];
+		titleIsDirty = YES;
+		scoreIsDirty = YES;
+	}
+	return self;
+}
+
+- (id)initWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
+{
+	if ([self initWithContent:aString]) {
+		prefixLength = aLength;
 	}
 	return self;
 }
 
 - (id)initWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
-	if ((self = [super init]) != nil) {
-		content = aString;
+	if ([self initWithContent:aString]) {
 		filterMatch = aMatch;
 		filterIsFuzzy = YES;
-		font = [ViThemeStore font];
-		[self updateTitle];
-		[self calcScore];
 	}
 	return self;
 }
@@ -67,6 +74,10 @@
 		      value:font
 		      range:NSMakeRange(0, [title length])];
 
+	[title addAttribute:NSParagraphStyleAttributeName
+		      value:titleParagraphStyle
+		      range:NSMakeRange(0, [title length])];
+
 	if (filterMatch && filterIsFuzzy) {
 		/* Mark sub-matches with bold red. */
 		NSFont *boldFont = [[NSFontManager sharedFontManager]
@@ -74,7 +85,6 @@
 		    toHaveTrait:NSBoldFontMask];
 		/*NSFont *boldFont = [[NSFontManager sharedFontManager]
 		    convertWeight:12 ofFont:font];*/
-		NSColor *markColor = [NSColor redColor];
 
 		NSUInteger offset = [filterMatch rangeOfMatchedString].location;
 		NSUInteger i;
@@ -170,27 +180,41 @@
 - (void)setFilterIsFuzzy:(BOOL)aFlag
 {
 	filterIsFuzzy = aFlag;
-	[self updateTitle];
-	[self calcScore];
+	titleIsDirty = YES;
+	scoreIsDirty = YES;
 }
 
 - (void)setFilterMatch:(ViRegexpMatch *)m
 {
 	filterMatch = m;
-	[self updateTitle];
-	[self calcScore];
+	titleIsDirty = YES;
+	scoreIsDirty = YES;
 }
 
 - (void)setPrefixLength:(NSUInteger)len
 {
 	prefixLength = len;
-	[self updateTitle];
+	titleIsDirty = YES;
 }
 
 - (void)setFont:(NSFont *)aFont
 {
 	font = aFont;
-	[self updateTitle];
+	titleIsDirty = YES;
+}
+
+- (double)score
+{
+	if (scoreIsDirty)
+		[self calcScore];
+	return score;
+}
+
+- (NSAttributedString *)title
+{
+	if (titleIsDirty)
+		[self updateTitle];
+	return title;
 }
 
 - (NSUInteger)hash

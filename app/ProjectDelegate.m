@@ -7,6 +7,8 @@
 #import "NSString-additions.h"
 #import "ViDocumentController.h"
 #import "ViURLManager.h"
+#import "ViCompletion.h"
+#import "ViCompletionController.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -84,8 +86,6 @@
 {
 	self = [super init];
 	if (self) {
-		matchParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		[matchParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
 		history = [[ViJumpList alloc] init];
 		[history setDelegate:self];
 	}
@@ -387,28 +387,45 @@
 
 - (IBAction)openInTab:(id)sender
 {
+	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		if (item && ![self outlineView:explorer isItemExpandable:item])
-			[delegate gotoURL:[item url]];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
+			[delegate gotoURL:[pf url]];
+			didOpen = YES;
+		}
 	}];
-	[self cancelExplorer];
+
+	if (didOpen)
+		[self cancelExplorer];
 }
 
 - (IBAction)openInCurrentView:(id)sender
 {
 	NSUInteger idx = [[self clickedIndexes] firstIndex];
-	ProjectFile *file = [explorer itemAtRow:idx];
-	if (!file)
+	id item = [explorer itemAtRow:idx];
+	if (item == nil || [self outlineView:explorer isItemExpandable:item])
+		return;
+	ProjectFile *pf;
+	if ([item isKindOfClass:[ViCompletion class]])
+		pf = [(ViCompletion *)item representedObject];
+	else
+		pf = item;
+	if (!pf)
 		return;
 	NSError *err = nil;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[file url]
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[pf url]
 												 display:NO
 												   error:&err];
 
 	if (err)
-		[windowController message:@"%@: %@", [file url], [err localizedDescription]];
+		[windowController message:@"%@: %@", [pf url], [err localizedDescription]];
 	else if (doc)
 		[windowController switchToDocument:doc];
 	[self cancelExplorer];
@@ -416,28 +433,43 @@
 
 - (IBAction)openInSplit:(id)sender
 {
+	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		if (item && ![self outlineView:explorer isItemExpandable:item])
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:NO
-						  andOpen:[item url]
+						  andOpen:[pf url]
 				       orSwitchToDocument:nil];
+			didOpen = YES;
+		}
 	}];
-	[self cancelExplorer];
+
+	if (didOpen)
+		[self cancelExplorer];
 }
 
 - (IBAction)openInVerticalSplit:(id)sender;
 {
+	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		ProjectFile *item = [explorer itemAtRow:idx];
-		if (item && ![self outlineView:explorer isItemExpandable:item])
+		if (item && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:YES
 						  andOpen:[item url]
 				       orSwitchToDocument:nil];
+			didOpen = YES;
+		}
 	}];
-	[self cancelExplorer];
+
+	if (didOpen)
+		[self cancelExplorer];
 }
 
 - (IBAction)renameFile:(id)sender
@@ -470,8 +502,13 @@
 	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		[urls addObject:[item url]];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		[urls addObject:[pf url]];
 	}];
 
 	if ([urls count] == 0)
@@ -513,8 +550,13 @@
 	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		[urls addObject:[item url]];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		[urls addObject:[pf url]];
 	}];
 	[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:urls];
 }
@@ -523,8 +565,13 @@
 {
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
-		[[NSWorkspace sharedWorkspace] openURL:[item url]];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		[[NSWorkspace sharedWorkspace] openURL:[pf url]];
 	}];
 }
 
@@ -537,7 +584,12 @@
 	NSIndexSet *set = [self clickedIndexes];
 	NSURL *parent = nil;
 	if ([set count] == 1) {
-		ProjectFile *pf = [explorer itemAtRow:[set firstIndex]];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:[set firstIndex]];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
 		if ([pf isDirectory])
 			parent = [pf url];
 		else
@@ -733,87 +785,6 @@
 	[delegate focusEditor];
 }
 
-- (void)markItem:(ProjectFile *)item
-   withFileMatch:(ViRegexpMatch *)fileMatch
-       pathMatch:(ViRegexpMatch *)pathMatch
-{
-	NSString *relpath = [item pathRelativeToURL:[rootButton URL]];
-	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:relpath];
-
-	NSUInteger i;
-	for (i = 1; i <= [pathMatch count]; i++) {
-		NSRange range = [pathMatch rangeOfSubstringAtIndex:i];
-		if (range.length > 0)
-			[s addAttribute:NSFontAttributeName
-			          value:[NSFont boldSystemFontOfSize:11.0]
-			          range:range];
-	}
-
-	NSUInteger offset = [relpath length] - [[item name] length];
-
-	for (i = 1; i <= [fileMatch count]; i++) {
-		NSRange range = [fileMatch rangeOfSubstringAtIndex:i];
-		if (range.length > 0) {
-			range.location += offset;
-			[s addAttribute:NSFontAttributeName
-			          value:[NSFont boldSystemFontOfSize:11.0]
-			          range:range];
-		}
-	}
-
-	[s addAttribute:NSParagraphStyleAttributeName
-	          value:matchParagraphStyle
-	          range:NSMakeRange(0, [s length])];
-	[item setMarkedString:s];
-}
-
-- (void)markItem:(ProjectFile *)item withPrefix:(NSUInteger)length
-{
-	NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:[item name]];
-	[s addAttribute:NSFontAttributeName
-	          value:[NSFont boldSystemFontOfSize:11.0]
-	          range:NSMakeRange(0, length)];
-	[s addAttribute:NSParagraphStyleAttributeName
-	          value:matchParagraphStyle
-	          range:NSMakeRange(0, [s length])];
-	[item setMarkedString:s];
-}
-
-/* From fuzzy_file_finder.rb by Jamis Buck (public domain).
- *
- * Determine the score of this match.
- * 1. fewer "inside runs" (runs corresponding to the original pattern)
- *    is better.
- * 2. better coverage of the actual path name is better
- */
-- (double)scoreForMatch:(ViRegexpMatch *)match inSegments:(NSUInteger)nsegments
-{
-	NSUInteger totalLength = [match rangeOfMatchedString].length;
-
-	NSUInteger insideLength = 0;
-	NSUInteger i;
-	for (i = 1; i < [match count]; i++)
-		insideLength += [match rangeOfSubstringAtIndex:i].length;
-
-	double run_ratio = ([match count] == 1) ? 1 : (double)nsegments / (double)([match count] - 1);
-	double char_ratio = (insideLength == 0 || totalLength == 0) ? 1 : (double)insideLength / (double)totalLength;
-
-	return run_ratio * char_ratio;
-}
-
-static NSInteger
-sort_by_score(id a, id b, void *context)
-{
-	double a_score = [(ProjectFile *)a score];
-	double b_score = [(ProjectFile *)b score];
-
-	if (a_score < b_score)
-		return NSOrderedDescending;
-	else if (a_score > b_score)
-		return NSOrderedAscending;
-	return NSOrderedSame;
-}
-
 - (void)expandNextItem:(id)dummy
 {
 	if (!isFiltering || [itemsToFilter count] == 0)
@@ -835,7 +806,16 @@ sort_by_score(id a, id b, void *context)
 		} else {
 			[item setChildren:children];
 			[self expandItems:[item children] recursionLimit:3];
-			[filteredItems sortUsingFunction:sort_by_score context:nil];
+
+			[filteredItems sortUsingComparator:^(id a, id b) {
+				ViCompletion *ca = a, *cb = b;
+				if (ca.score > cb.score)
+					return (NSComparisonResult)NSOrderedAscending;
+				else if (cb.score > ca.score)
+					return (NSComparisonResult)NSOrderedDescending;
+				return (NSComparisonResult)NSOrderedSame;
+			}];
+
 			[explorer reloadData];
 			if ([itemsToFilter count] > 0)
 				[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.0];
@@ -845,12 +825,14 @@ sort_by_score(id a, id b, void *context)
 
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit
 {
-	NSString *reldir = nil;
-	ViRegexpMatch *pathMatch;
-	double pathScore, fileScore;
+	NSString *base = [[rootButton URL] path];
+	NSUInteger prefixLength = [base length];
+	if (![base hasSuffix:@"/"])
+		prefixLength++;
 
 	for (ProjectFile *item in items) {
-		DEBUG(@"got item %@", [item url]);
+		DEBUG(@"got item %@", item);
+		DEBUG(@"got item url %@", [item url]);
 		if ([self outlineView:explorer isItemExpandable:item]) {
 			if (recursionLimit > 0 && [item hasCachedChildren])
 				[self expandItems:[item children] recursionLimit:recursionLimit - 1];
@@ -858,35 +840,16 @@ sort_by_score(id a, id b, void *context)
 				/* schedule in runloop */
 				[itemsToFilter addObject:item];
 		} else {
-			if (reldir == nil) {
-				/* Only calculate the path score once for a directory. */
-				reldir = [item pathRelativeToURL:[rootButton URL]];
-				if ((pathMatch = [pathRx matchInString:reldir]) != nil)
-					pathScore = [self scoreForMatch:pathMatch
-							     inSegments:[reldir occurrencesOfCharacter:'/'] + 1];
-			}
-
-			if (pathMatch != nil) {
-				ViRegexpMatch *fileMatch;
-				if ((fileMatch = [fileRx matchInString:[item name]]) != nil) {
-					fileScore = [self scoreForMatch:fileMatch inSegments:1];
-					[self markItem:item withFileMatch:fileMatch pathMatch:pathMatch];
-					[item setScore:pathScore * fileScore];
-					[filteredItems addObject:item];
-				}
+			ViRegexpMatch *m = nil;
+			NSString *p = [[[item url] path] substringFromIndex:prefixLength];
+			if (rx == nil || (m = [rx matchInString:p]) != nil) {
+				ViCompletion *c = [ViCompletion completionWithContent:p fuzzyMatch:m];
+				c.font = [NSFont systemFontOfSize:11.0];
+				c.representedObject = item;
+				c.markColor = [NSColor blackColor];
+				[filteredItems addObject:c];
 			}
 		}
-	}
-}
-
-- (void)appendFilter:(NSString *)filter toPattern:(NSMutableString *)pattern
-{
-	NSUInteger i;
-	for (i = 0; i < [filter length]; i++) {
-		unichar c = [filter characterAtIndex:i];
-		if (i != 0)
-			[pattern appendString:@"[^/]*?"];
-		[pattern appendFormat:@"(%s%C)", c == '.' ? "\\" : "", c];
 	}
 }
 
@@ -902,27 +865,13 @@ sort_by_score(id a, id b, void *context)
 		[explorer selectRowIndexes:[NSIndexSet indexSet]
 		      byExtendingSelection:NO];
 	} else {
-		NSArray *components = [filter componentsSeparatedByString:@"/"];
+		NSMutableString *pattern = [NSMutableString string];
+		[pattern appendFormat:@"^.*"];
+		[ViCompletionController appendFilter:filter toPattern:pattern fuzzyClass:@"[^/]"];
+		[pattern appendString:@"[^/]*$"];
 
-		NSMutableString *pathPattern = [NSMutableString string];
-		[pathPattern appendString:@"^.*?"];
-		NSUInteger i;
-		for (i = 0; i < [components count] - 1; i++) {
-			if (i != 0)
-				[pathPattern appendString:@".*?/.*?"];
-			[self appendFilter:[components objectAtIndex:i]
-				 toPattern:pathPattern];
-		}
-		[pathPattern appendString:@".*?$"];
-		pathRx = [[ViRegexp alloc] initWithString:pathPattern
-						  options:ONIG_OPTION_IGNORECASE];
-
-		NSMutableString *filePattern = [NSMutableString string];
-		[filePattern appendString:@"^.*?"];
-		[self appendFilter:[components lastObject] toPattern:filePattern];
-		[filePattern appendString:@".*$"];
-		fileRx = [[ViRegexp alloc] initWithString:filePattern
-						  options:ONIG_OPTION_IGNORECASE];
+		rx = [[ViRegexp alloc] initWithString:pattern
+					      options:ONIG_OPTION_IGNORECASE];
 
 		filteredItems = [NSMutableArray array];
 		itemsToFilter = [NSMutableArray array];
@@ -930,13 +879,22 @@ sort_by_score(id a, id b, void *context)
 		isFiltering = YES;
 
 		[self expandItems:rootItems recursionLimit:3];
-		[filteredItems sortUsingFunction:sort_by_score context:nil];
+
+		[filteredItems sortUsingComparator:^(id a, id b) {
+			ViCompletion *ca = a, *cb = b;
+			if (ca.score > cb.score)
+				return (NSComparisonResult)NSOrderedAscending;
+			else if (cb.score > ca.score)
+				return (NSComparisonResult)NSOrderedDescending;
+			return (NSComparisonResult)NSOrderedSame;
+			}];
+
 		[explorer reloadData];
 		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 		      byExtendingSelection:NO];
 		if ([itemsToFilter count] > 0)
 			[self expandNextItem:nil];
-        }
+	}
 }
 
 #pragma mark -
@@ -1119,7 +1077,12 @@ doCommandBySelector:(SEL)aSelector
 
 - (void)outlineViewItemWillExpand:(NSNotification *)notification
 {
-	ProjectFile *pf = [[notification userInfo] objectForKey:@"NSObject"];
+	ProjectFile *pf;
+	id item = [[notification userInfo] objectForKey:@"NSObject"];
+	if ([item isKindOfClass:[ViCompletion class]])
+		pf = [(ViCompletion *)item representedObject];
+	else
+		pf = item;
 	if ([pf hasCachedChildren])
 		return;
 
@@ -1147,6 +1110,8 @@ doCommandBySelector:(SEL)aSelector
 		return [filteredItems objectAtIndex:anIndex];
 
 	ProjectFile *pf = item;
+	if ([item isKindOfClass:[ViCompletion class]])
+		pf = [(ViCompletion *)item representedObject];
 	if (![pf hasCachedChildren])
 		return nil;
 	return [[pf children] objectAtIndex:anIndex];
@@ -1155,7 +1120,10 @@ doCommandBySelector:(SEL)aSelector
 - (BOOL)outlineView:(NSOutlineView *)outlineView
    isItemExpandable:(id)item
 {
-	return [(ProjectFile *)item isDirectory];
+	ProjectFile *pf = item;
+	if ([item isKindOfClass:[ViCompletion class]])
+		pf = [(ViCompletion *)item representedObject];
+	return [pf isDirectory];
 }
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView
@@ -1165,6 +1133,8 @@ doCommandBySelector:(SEL)aSelector
 		return [filteredItems count];
 
 	ProjectFile *pf = item;
+	if ([item isKindOfClass:[ViCompletion class]])
+		pf = [(ViCompletion *)item representedObject];
 	if (![pf hasCachedChildren])
 		return 0;
 	return [[pf children] count];
@@ -1175,7 +1145,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
            byItem:(id)item
 {
 	if (isFiltered)
-		return [item markedString];
+		return [(ViCompletion *)item title];
         else
 		return [(ProjectFile *)item name];
 }
@@ -1198,7 +1168,10 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 {
 	NSCell *cell = [tableColumn dataCellForRow:[explorer rowForItem:item]];
 	if (cell) {
-		NSURL *url = [item url];
+		ProjectFile *pf = item;
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		NSURL *url = [pf url];
 		NSImage *img;
 		if ([url isFileURL])
 			img = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];

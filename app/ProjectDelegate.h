@@ -43,10 +43,8 @@
 	// incremental file filtering
 	NSMutableArray *filteredItems;
 	NSMutableArray *itemsToFilter;
-	ViRegexp *pathRx;
-	ViRegexp *fileRx;
+	ViRegexp *rx;
 
-	NSMutableParagraphStyle *matchParagraphStyle;
 	BOOL closeExplorerAfterUse;
 	IBOutlet id delegate;
 	NSMutableArray *rootItems;

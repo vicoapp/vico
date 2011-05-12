@@ -40,7 +40,6 @@ URGENT
 * can't cd ~: unsupported URL scheme (null) !!
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
-* snippets still use hard tabs
 * split views top line is ANNOYINGLY changed when editing in another view
 * :q! should not prompt for saving
 * :q should terminate app on last document in last window

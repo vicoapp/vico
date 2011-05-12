@@ -23,6 +23,14 @@
 	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
 	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
 
+
+	NSString *expandedSnippetString = indentedSnippetString;
+	if ([[self preference:@"expandtab" atLocation:aRange.location] integerValue] == NSOnState) {
+		NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
+		NSString *tabString = [@"" stringByPaddingToLength:shiftWidth withString:@" " startingAtIndex:0];
+		expandedSnippetString = [indentedSnippetString stringByReplacingOccurrencesOfString:@"\t" withString:tabString];
+	}
+
 	// FIXME: replace tabs with correct shiftwidth/tabstop settings
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
@@ -42,7 +50,7 @@
 	snippetMatchRange.location = NSNotFound;
 
 	NSError *error = nil;
-	ViSnippet *snippet = [[ViSnippet alloc] initWithString:indentedSnippetString
+	ViSnippet *snippet = [[ViSnippet alloc] initWithString:expandedSnippetString
 	                                            atLocation:aRange.location
 	                                              delegate:self
 	                                           environment:env

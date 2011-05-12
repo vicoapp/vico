@@ -1,6 +1,7 @@
 #import "ExCommand.h"
 #import "ViError.h"
-#import "logging.h"
+#import "NSScanner-additions.h"
+#include "logging.h"
 
 @interface ExCommand (private)
 - (BOOL)parse:(NSString *)string error:(NSError **)outError;
@@ -428,6 +429,8 @@ ex_cmd_find(NSString *cmd)
 @synthesize string = arg_string;
 @synthesize plus_command;
 @synthesize words;
+@synthesize pattern;
+@synthesize replacement;
 
 - (struct ex_address *)addr1
 {
@@ -871,11 +874,9 @@ ex_cmd_find(NSString *cmd)
 		 */
 		[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
-		if ([scan isAtEnd])
+		unichar delimiter;
+		if (![scan scanCharacter:&delimiter])
 			goto usage;
-
-		unichar delimiter = [string characterAtIndex:[scan scanLocation]];
-		[scan setScanLocation:[scan scanLocation] + 1];
 
 		if ([[NSCharacterSet alphanumericCharacterSet] characterIsMember:delimiter] || delimiter == '|') {
 			// subagain?
@@ -888,6 +889,13 @@ ex_cmd_find(NSString *cmd)
 			 * used by the RE code.  Move to the third delimiter
 			 * that's not escaped (or the end of the command).
 			 */
+			if (![scan scanUpToUnescapedCharacter:delimiter intoString:&pattern] ||
+			    ![scan scanCharacter:nil])
+				goto usage;
+			replacement = @"";
+			if ([scan scanUpToUnescapedCharacter:delimiter intoString:&replacement] &&
+			    ![scan scanCharacter:nil])
+				goto usage;
 		}
 	}
 

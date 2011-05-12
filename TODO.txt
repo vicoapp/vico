@@ -5,12 +5,32 @@ REGRESSIONS
 REQUESTED
 =========
 
+* fuzzy match whole path in cmd-t
+* @fkoeppe: Let cmd-t also match on path, not only on filenames, which is relevant when many files have the same name (index.html.erb).
+
+* @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
+* @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
+* @fkoeppe: Rescanning files in the File Explorer resets the current tree position to the tree root.
+* @fkoeppe: Adding a new file should automatically rescan the files in the File Explorer.
+* @fkoeppe: Indicating if a file is "dirty" in the tab bar.
+* @fkoeppe: When pressing enter while renaming a file in the File Explorer, it opens it in a new tab.
+* @fkoeppe: When pressing the arrow keys while renaming a file, it does not move within the input box, but within the File Explorer.
+* @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
+* @fkoeppe: How would I go about removing trailing white spaces on save?
+* @fkoeppe: Save width of the file explorer window.
+* @fkoeppe: When opening a folder in the File Explorer the File Explorer loses focus. For folders it should keep the focus.
+* @tobiastom: Will you implement shift+cursors for additional visual selecting?
+* @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
+* @lampshadish: All I need now is some sort of recursive-find-in-directory and I can switch. Maybe using #ack so it doesn't block like in TextMate.
+* @growt: Some neat git integration would be great, like coloring the line number of rows that changed or a diff-tool. but first things first
+
 * vim text objects, especially i[, a]
 * project search
 * vicotool --wait <file>
 * vicotool --line 1
 * R (replace mode)
 * show hidden files in explorer (option in action menu? or skipPattern?)
+* tabstop setting per scope not honored!
 
 
 URGENT

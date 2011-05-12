@@ -206,8 +206,12 @@
 	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
 
 	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
-	char *path = getenv("PATH");
-	[env setObject:[NSString stringWithFormat:@"%s:%@:%@",
+	NSString *path = [env objectForKey:@"PATH"];
+	if (path == nil)
+		path = [NSString stringWithCString:getenv("PATH") encoding:NSUTF8StringEncoding];
+	if (path == nil)
+		path = [NSString stringWithCString:getenv("PATH") encoding:NSISOLatin1StringEncoding];
+	[env setObject:[NSString stringWithFormat:@"%@:%@:%@",
 	      path,
 	      [supportPath stringByAppendingPathComponent:@"bin"],
 	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]

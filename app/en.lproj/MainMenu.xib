@@ -281,14 +281,14 @@
 								</object>
 								<object class="NSMenuItem" id="717170549">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Reopen with encoding</string>
+									<string key="NSTitle">Reopen with Encoding</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="582327294">
-										<string key="NSTitle">Reopen with encoding</string>
+										<string key="NSTitle">Reopen with Encoding</string>
 										<object class="NSMutableArray" key="NSMenuItems">
 											<bool key="EncodedWithXMLCoder">YES</bool>
 										</object>
@@ -307,7 +307,7 @@
 								</object>
 								<object class="NSMenuItem" id="776162233">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Close window</string>
+									<string key="NSTitle">Close Window</string>
 									<string key="NSKeyEquiv">W</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -316,7 +316,7 @@
 								</object>
 								<object class="NSMenuItem" id="165656306">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Close tab</string>
+									<string key="NSTitle">Close Tab</string>
 									<string key="NSKeyEquiv">w</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -325,7 +325,7 @@
 								</object>
 								<object class="NSMenuItem" id="864393799">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Close view (&lt;c-w&gt;c)</string>
+									<string key="NSTitle">Close View (&lt;c-w&gt;c)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -334,7 +334,7 @@
 								</object>
 								<object class="NSMenuItem" id="388819970">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Close other views (&lt;c-w&gt;o)</string>
+									<string key="NSTitle">Close Other Views (&lt;c-w&gt;o)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -629,7 +629,7 @@
 											<object class="NSMenuItem" id="670726447">
 												<reference key="NSMenu" ref="1042284489"/>
 												<bool key="NSIsDisabled">YES</bool>
-												<string key="NSTitle">Bracketed block (vi[)(i[)</string>
+												<string key="NSTitle">Bracketed Block (vi[)(i[)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
@@ -639,7 +639,7 @@
 											<object class="NSMenuItem" id="1018563354">
 												<reference key="NSMenu" ref="1042284489"/>
 												<bool key="NSIsDisabled">YES</bool>
-												<string key="NSTitle">Braced block (viB)(iB)</string>
+												<string key="NSTitle">Braced Block (viB)(iB)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
@@ -937,7 +937,7 @@
 								</object>
 								<object class="NSMenuItem" id="164049102">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go to previous file (&lt;C-^&gt;)</string>
+									<string key="NSTitle">Go to Previous File (&lt;C-^&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -956,7 +956,7 @@
 								</object>
 								<object class="NSMenuItem" id="907437096">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go back in jump list (&lt;C-o&gt;)</string>
+									<string key="NSTitle">Go Back in Jump List (&lt;C-o&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -965,7 +965,7 @@
 								</object>
 								<object class="NSMenuItem" id="301931247">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go forward in jump list (&lt;C-i&gt;)</string>
+									<string key="NSTitle">Go Forward in Jump List (&lt;C-i&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -984,7 +984,7 @@
 								</object>
 								<object class="NSMenuItem" id="533546593">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go to definition of tag (&lt;C-]&gt;)</string>
+									<string key="NSTitle">Go to Definition of Tag (&lt;C-]&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -993,7 +993,7 @@
 								</object>
 								<object class="NSMenuItem" id="969062120">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go back (&lt;C-t&gt;)</string>
+									<string key="NSTitle">Go Back (&lt;C-t&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1012,7 +1012,7 @@
 								</object>
 								<object class="NSMenuItem" id="922576025">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go to top of screen (H)</string>
+									<string key="NSTitle">Go to Top of Screen (H)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1021,7 +1021,7 @@
 								</object>
 								<object class="NSMenuItem" id="150187684">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go to middle of screen (M)</string>
+									<string key="NSTitle">Go to Middle of Screen (M)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1030,7 +1030,7 @@
 								</object>
 								<object class="NSMenuItem" id="740304271">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Go to bottom of screen (L)</string>
+									<string key="NSTitle">Go to Bottom of Screen (L)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1049,7 +1049,7 @@
 								</object>
 								<object class="NSMenuItem" id="555428326">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Scroll line down (&lt;C-e&gt;)</string>
+									<string key="NSTitle">Scroll Line Down (&lt;C-e&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1058,7 +1058,25 @@
 								</object>
 								<object class="NSMenuItem" id="308520918">
 									<reference key="NSMenu" ref="309918917"/>
-									<string key="NSTitle">Scroll line up (&lt;C-y&gt;)</string>
+									<string key="NSTitle">Scroll Line Up (&lt;C-y&gt;)</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+									<int key="NSTag">4000</int>
+								</object>
+								<object class="NSMenuItem" id="231246486">
+									<reference key="NSMenu" ref="309918917"/>
+									<string key="NSTitle">Scroll Half Page Down (&lt;C-d&gt;)</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+									<int key="NSTag">4000</int>
+								</object>
+								<object class="NSMenuItem" id="13270362">
+									<reference key="NSMenu" ref="309918917"/>
+									<string key="NSTitle">Scroll Half Page Up (&lt;C-u&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1158,7 +1176,7 @@
 								</object>
 								<object class="NSMenuItem" id="293428546">
 									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Split horizontally (&lt;c-w&gt;s)</string>
+									<string key="NSTitle">Split Horizontally (&lt;c-w&gt;s)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1167,7 +1185,7 @@
 								</object>
 								<object class="NSMenuItem" id="364115203">
 									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Split vertically (&lt;c-w&gt;v)</string>
+									<string key="NSTitle">Split Vertically (&lt;c-w&gt;v)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1176,7 +1194,7 @@
 								</object>
 								<object class="NSMenuItem" id="628230574">
 									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Move view to new tab (&lt;c-w&gt;T)</string>
+									<string key="NSTitle">Move View to New Tab (&lt;c-w&gt;T)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -1258,23 +1276,21 @@
 								</object>
 								<object class="NSMenuItem" id="971371586">
 									<reference key="NSMenu" ref="835318025"/>
-									<string key="NSTitle">Next tab (gt)</string>
+									<string key="NSTitle">Select Next Tab</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">CQ</string>
 									<int key="NSKeyEquivModMask">262144</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
-									<int key="NSTag">4000</int>
 								</object>
 								<object class="NSMenuItem" id="393306656">
 									<reference key="NSMenu" ref="835318025"/>
-									<string key="NSTitle">Previous tab (gT)</string>
+									<string key="NSTitle">Select Previous Tab</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">CQ</string>
 									<int key="NSKeyEquivModMask">393216</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
-									<int key="NSTag">4000</int>
 								</object>
 								<object class="NSMenuItem" id="262739524">
 									<reference key="NSMenu" ref="835318025"/>
@@ -2749,6 +2765,8 @@
 							<reference ref="70790615"/>
 							<reference ref="634120254"/>
 							<reference ref="164049102"/>
+							<reference ref="231246486"/>
+							<reference ref="13270362"/>
 						</object>
 						<reference key="parent" ref="136143755"/>
 					</object>
@@ -2889,6 +2907,16 @@
 						<int key="objectID">689</int>
 						<reference key="object" ref="1020675238"/>
 						<reference key="parent" ref="110575045"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">691</int>
+						<reference key="object" ref="231246486"/>
+						<reference key="parent" ref="309918917"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">692</int>
+						<reference key="object" ref="13270362"/>
+						<reference key="parent" ref="309918917"/>
 					</object>
 				</object>
 			</object>
@@ -3110,6 +3138,8 @@
 					<string>686.IBPluginDependency</string>
 					<string>688.IBPluginDependency</string>
 					<string>689.IBPluginDependency</string>
+					<string>691.IBPluginDependency</string>
+					<string>692.IBPluginDependency</string>
 					<string>72.IBPluginDependency</string>
 					<string>72.ImportedFromIB2</string>
 					<string>73.IBPluginDependency</string>
@@ -3352,6 +3382,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -3389,7 +3421,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">690</int>
+			<int key="maxID">692</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

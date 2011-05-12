@@ -7,9 +7,6 @@ REQUESTED
 
 * tabstop setting per scope not honored!
 
-* fuzzy match whole path in cmd-t
-* @fkoeppe: Let cmd-t also match on path, not only on filenames, which is relevant when many files have the same name (index.html.erb).
-
 * project search
 * @lampshadish: All I need now is some sort of recursive-find-in-directory and I can switch. Maybe using #ack so it doesn't block like in TextMate.
 

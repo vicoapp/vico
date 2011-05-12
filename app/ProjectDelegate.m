@@ -853,6 +853,22 @@
 	}
 }
 
+- (void)appendFilter:(NSString *)string
+           toPattern:(NSMutableString *)pattern
+          fuzzyClass:(NSString *)fuzzyClass
+{
+	NSUInteger i;
+	for (i = 0; i < [string length]; i++) {
+		unichar c = [string characterAtIndex:i];
+		if (i != 0)
+			[pattern appendFormat:@"%@*?", fuzzyClass];
+		if (c == ' ')
+			[pattern appendString:@"([ /])"];
+		else
+			[pattern appendFormat:@"(%s%C)", [ViRegexp needEscape:c] ? "\\" : "", c];
+	}
+}
+
 - (IBAction)filterFiles:(id)sender
 {
 	NSString *filter = [filterField stringValue];
@@ -867,7 +883,7 @@
 	} else {
 		NSMutableString *pattern = [NSMutableString string];
 		[pattern appendFormat:@"^.*"];
-		[ViCompletionController appendFilter:filter toPattern:pattern fuzzyClass:@"[^/]"];
+		[self appendFilter:filter toPattern:pattern fuzzyClass:@"[^/]"];
 		[pattern appendString:@"[^/]*$"];
 
 		rx = [[ViRegexp alloc] initWithString:pattern

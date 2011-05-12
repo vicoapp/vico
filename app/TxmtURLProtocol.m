@@ -54,9 +54,12 @@
 		NSString *line = nil;
 		for (NSString *comp in components) {
 			NSArray *tmp = [comp componentsSeparatedByString:@"="];
-			if ([[tmp objectAtIndex:0] isEqualToString:@"url"])
-				openURL = [NSURL URLWithString:[tmp objectAtIndex:1]];
-			else if ([[tmp objectAtIndex:0] isEqualToString:@"line"])
+			if ([[tmp objectAtIndex:0] isEqualToString:@"url"]) {
+				/* Need to unescape/escape since bundles also escape '/', and NSURL doesn't like that. */
+				NSString *s = [[tmp objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+				s = [s stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+				openURL = [NSURL URLWithString:s];
+			} else if ([[tmp objectAtIndex:0] isEqualToString:@"line"])
 				line = [tmp objectAtIndex:1];
 		}
 

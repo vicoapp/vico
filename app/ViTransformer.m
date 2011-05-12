@@ -218,7 +218,7 @@
 		    NSStringFromRange(r), text, expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];
 
-		if ([options rangeOfString:@"g"].location == NSNotFound)
+		if (options == nil || [options rangeOfString:@"g"].location == NSNotFound)
 			break;
 	}
 	DEBUG(@"transformed [%@] -> [%@]", value, text);

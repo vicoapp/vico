@@ -107,16 +107,17 @@
 			    [self scanString:@"control-"])
 				modifiers |= NSControlKeyMask;
 			else if ([self scanString:@"a-"] ||
-			         [self scanString:@"m-"] ||
-			         [self scanString:@"alt-"] ||
-			         [self scanString:@"meta-"])
+				 [self scanString:@"m-"] ||
+				 [self scanString:@"alt-"] ||
+				 [self scanString:@"option-"] ||
+				 [self scanString:@"meta-"])
 				modifiers |= NSAlternateKeyMask;
 			else if ([self scanString:@"s-"] ||
-			         [self scanString:@"shift-"])
+				 [self scanString:@"shift-"])
 				modifiers |= NSShiftKeyMask;
 			else if ([self scanString:@"d-"] ||
-			         [self scanString:@"cmd-"] ||
-			         [self scanString:@"command-"])
+				 [self scanString:@"cmd-"] ||
+				 [self scanString:@"command-"])
 				modifiers |= NSCommandKeyMask;
 			else
 				gotModifier = NO;
@@ -135,31 +136,31 @@
 		else if ([self scanString:@"down"])
 			key = NSDownArrowFunctionKey;
 		else if ([self scanString:@"pagedown"] ||
-		         [self scanString:@"pgdn"])
+			 [self scanString:@"pgdn"])
 			key = NSPageDownFunctionKey;
 		else if ([self scanString:@"pageup"] ||
-		         [self scanString:@"pgup"])
+			 [self scanString:@"pgup"])
 			key = NSPageUpFunctionKey;
 		else if ([self scanString:@"home"])
 			key = NSHomeFunctionKey;
 		else if ([self scanString:@"end"])
 			key = NSEndFunctionKey;
 		else if ([self scanString:@"insert"] ||
-		         [self scanString:@"ins"])
+			 [self scanString:@"ins"])
 			key = NSInsertFunctionKey;
 		else if ([self scanString:@"help"])
 			key = NSHelpFunctionKey;
 		else if ([self scanString:@"bs"] ||
-		         [self scanString:@"backspace"])
+			 [self scanString:@"backspace"])
 			key = 0x7F;
 		else if ([self scanString:@"tab"])
 			key = 0x09;
 		else if ([self scanString:@"escape"] ||
-		         [self scanString:@"esc"])
+			 [self scanString:@"esc"])
 			key = 0x1B;
 		else if ([self scanString:@"cr"] ||
-		         [self scanString:@"enter"] ||
-		         [self scanString:@"return"])
+			 [self scanString:@"enter"] ||
+			 [self scanString:@"return"])
 			key = 0x0D;
 		else if ([self scanString:@"space"])
 			key = ' ';
@@ -168,7 +169,7 @@
 		else if ([self scanString:@"lt"])
 			key = '<';
 		else if ([self scanString:@"bslash"] ||
-		         [self scanString:@"backslash"])
+			 [self scanString:@"backslash"])
 			key = '\\';
 		else if ([self scanString:@"nl"])	/* ctrl-J */
 			key = 0x0A;

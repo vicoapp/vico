@@ -9,6 +9,7 @@
 #import "ViPreferencePaneEdit.h"
 #import "ViPreferencePaneTheme.h"
 #import "ViPreferencePaneBundles.h"
+#import "ViPreferencePaneAdvanced.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
 #import "JSON.h"
@@ -128,6 +129,7 @@
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",
 	    @"text.plain", @"defaultsyntax",
+	    [NSDictionary dictionaryWithObject:@"__MyCompanyName__" forKey:@"TM_ORGANIZATION_NAME"], @"environment",
 	    nil]];
 
 	/* Initialize languages and themes. */
@@ -217,6 +219,7 @@
 	[prefs registerPane:[[ViPreferencePaneEdit alloc] init]];
 	[prefs registerPane:[[ViPreferencePaneTheme alloc] init]];
 	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneAdvanced alloc] init]];
 
 	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
 	[self eval:consoleStartup error:nil]; 

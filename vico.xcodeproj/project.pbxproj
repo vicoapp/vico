@@ -258,6 +258,8 @@
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
+		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
+		9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -758,6 +760,9 @@
 		9ACAA94013707177001FC553 /* ViFileCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileCompletion.m; sourceTree = "<group>"; };
 		9ACAA94113707177001FC553 /* ViWordCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWordCompletion.h; sourceTree = "<group>"; };
 		9ACAA94213707177001FC553 /* ViWordCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWordCompletion.m; sourceTree = "<group>"; };
+		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
+		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
+		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1067,6 +1072,7 @@
 				9A4346D31331182E002B04DE /* Themes */,
 				9A4346A813311673002B04DE /* Images */,
 				9A43469C13311615002B04DE /* CommandOutputWindow.xib */,
+				9AF71075137BC12900EC858E /* AdvancedPrefs.xib */,
 				9A2606B2135B1C63002C86FB /* BundlePrefs.xib */,
 				9A66526F135B21D700A2F93C /* EditPrefs.xib */,
 				9A665276135B288700A2F93C /* GeneralPrefs.xib */,
@@ -1083,6 +1089,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */,
+				9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */,
 				9ACAA93D13707177001FC553 /* ViBufferCompletion.h */,
 				9ACAA93E13707177001FC553 /* ViBufferCompletion.m */,
 				9ACAA93F13707177001FC553 /* ViFileCompletion.h */,
@@ -1529,6 +1537,7 @@
 				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
 				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
 				9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */,
+				9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1843,6 +1852,7 @@
 				9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */,
 				9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */,
 				9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */,
+				9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2015,6 +2025,14 @@
 				9A665277135B288700A2F93C /* en */,
 			);
 			name = GeneralPrefs.xib;
+			sourceTree = "<group>";
+		};
+		9AF71075137BC12900EC858E /* AdvancedPrefs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9AF71076137BC12900EC858E /* en */,
+			);
+			name = AdvancedPrefs.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

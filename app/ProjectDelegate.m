@@ -938,30 +938,6 @@ doCommandBySelector:(SEL)aSelector
 			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1]
 			      byExtendingSelection:NO];
 		return YES;
-	} else if (aSelector == @selector(moveRight:)) { // right arrow
-		NSInteger row = [explorer selectedRow];
-		id item = [explorer itemAtRow:row];
-		if (item && [self outlineView:explorer isItemExpandable:item])
-			[explorer expandItem:item];
-		return YES;
-	} else if (aSelector == @selector(moveLeft:)) { // left arrow
-		NSInteger row = [explorer selectedRow];
-		id item = [explorer itemAtRow:row];
-		if (item == nil)
-			return YES;
-		if ([self outlineView:explorer isItemExpandable:item] &&
-		    [explorer isItemExpanded:item])
-			[explorer collapseItem:item];
-		else {
-			id parent = [explorer parentForItem:item];
-			if (parent) {
-				row = [explorer rowForItem:parent];
-				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-				      byExtendingSelection:NO];
-				[explorer scrollRowToVisible:row];
-			}
-		}
-		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
 		isFiltering = NO;
 		if (isFiltered) {
@@ -1162,7 +1138,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 {
 	if (isFiltered)
 		return [(ViCompletion *)item title];
-        else
+	else
 		return [(ProjectFile *)item name];
 }
 

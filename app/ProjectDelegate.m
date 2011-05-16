@@ -728,7 +728,8 @@
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
 		[self browseURL:[item url]];
-		[self cancelExplorer];
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+		      byExtendingSelection:NO];
 	} else
 		[self explorerClick:sender];
 }

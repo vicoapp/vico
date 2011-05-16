@@ -21,7 +21,6 @@ REQUESTED
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: How would I go about removing trailing white spaces on save?
 * @fkoeppe: Save width of the file explorer window.
-* @fkoeppe: When opening a folder in the File Explorer the File Explorer loses focus. For folders it should keep the focus.
 * @tobiastom: Will you implement shift+cursors for additional visual selecting?
 * @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
 * @growt: Some neat git integration would be great, like coloring the line number of rows that changed or a diff-tool. but first things first

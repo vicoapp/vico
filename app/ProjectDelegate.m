@@ -386,7 +386,7 @@
 	return set;
 }
 
-- (IBAction)openInTab:(id)sender
+- (IBAction)openDocuments:(id)sender
 {
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
@@ -400,6 +400,35 @@
 		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			[delegate gotoURL:[pf url]];
 			didOpen = YES;
+		}
+	}];
+
+	if (didOpen)
+		[self cancelExplorer];
+}
+
+- (IBAction)openInTab:(id)sender
+{
+	__block BOOL didOpen = NO;
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
+		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
+			NSError *err = nil;
+			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[pf url]
+														 display:NO
+														   error:&err];
+			if (err)
+				[windowController message:@"%@: %@", [pf url], [err localizedDescription]];
+			else if (doc) {
+				[windowController createTabForDocument:doc];
+				didOpen = YES;
+			}
 		}
 	}];
 
@@ -717,7 +746,7 @@
 		return;
 
 	// XXX: open in splits instead if alt key pressed?
-	[self openInTab:sender];
+	[self openDocuments:sender];
 }
 
 - (void)explorerDoubleClick:(id)sender

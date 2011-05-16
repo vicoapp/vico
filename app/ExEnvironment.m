@@ -325,6 +325,7 @@
 {
 	NSUInteger begin_line, end_line;
 	NSUInteger begin, end;
+	ViMark *m = nil;
 	ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
 
 	switch (command.addr1->type) {
@@ -337,6 +338,14 @@
 	case EX_ADDR_RELATIVE:
 	case EX_ADDR_CURRENT:
 		begin_line = [exTextView currentLine];
+		break;
+	case EX_ADDR_MARK:
+		m = [exTextView markNamed:command.addr1->addr.mark];
+		if (m == nil) {
+			[self message:@"Mark %C: not set", command.addr1->addr.mark];
+			return NO;
+		}
+		begin_line = m.line;
 		break;
 	case EX_ADDR_NONE:
 	default:
@@ -358,6 +367,14 @@
 		break;
 	case EX_ADDR_CURRENT:
 		end_line = [exTextView currentLine];
+		break;
+	case EX_ADDR_MARK:
+		m = [exTextView markNamed:command.addr2->addr.mark];
+		if (m == nil) {
+			[self message:@"Mark %C: not set", command.addr2->addr.mark];
+			return NO;
+		}
+		end_line = m.line;
 		break;
 	case EX_ADDR_RELATIVE:
 	case EX_ADDR_NONE:

@@ -239,6 +239,11 @@ int logIndent = 0;
 	return NO;
 }
 
+- (ViMark *)markNamed:(unichar)markName
+{
+	return [marks objectForKey:[NSString stringWithFormat:@"%C", markName]];
+}
+
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation
 {
 	NSUInteger lineno = [[self textStorage] lineNumberAtLocation:aLocation];

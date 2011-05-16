@@ -13,6 +13,7 @@
 #import "ViKeyManager.h"
 #import "ViDocument.h"
 #import "ViCompletionController.h"
+#import "ViMark.h"
 
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
@@ -131,6 +132,7 @@
   selectFromPoint:(NSPoint)fromPoint
           toPoint:(NSPoint)toPoint;
 
+- (ViMark *)markNamed:(unichar)markName;
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 

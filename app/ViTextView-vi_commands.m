@@ -1,6 +1,5 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
-#import "ViMark.h"
 #import "ViJumpList.h"
 #import "ViTextStorage.h"
 #import "NSString-scopeSelector.h"
@@ -2007,7 +2006,7 @@
 /* syntax: `<char> */
 - (BOOL)move_to_mark:(ViCommand *)command
 {
-	ViMark *m = [marks objectForKey:[NSString stringWithFormat:@"%C", command.argument]];
+	ViMark *m = [self markNamed:command.argument];
 	if (m == nil) {
 		MESSAGE(@"Mark %C: not set", command.argument);
 		return NO;

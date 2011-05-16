@@ -2392,7 +2392,7 @@
 							inTextContainer:[self textContainer]].origin;
 	/* Offset the completion window a bit. */
 	point.x += (positionAbove ? 0 : 5);
-	point.y += (positionAbove ? -3 : 10);
+	point.y += (positionAbove ? -3 : 15);
 	ViCompletion *selection;
 	selection = [cc chooseFrom:provider
 			     range:range

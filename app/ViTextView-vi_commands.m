@@ -1245,6 +1245,8 @@
 	NSUInteger word_location;
 	while (count--) {
 		word_location = end_location;
+		if (word_location >= [[self textStorage] length])
+			break;
 		unichar ch = [s characterAtIndex:word_location];
 		if (!bigword && [wordSet characterIsMember:ch]) {
 			// skip word-chars and whitespace
@@ -2052,6 +2054,8 @@
 	NSCharacterSet *bigwordSet = [whitespace invertedSet];
 	int count = IMAX(command.count, 1);
 	while (count--) {
+		if (location >= [ts length])
+			break;
 		unichar ch = [[ts string] characterAtIndex:location];
 		if (first && [[NSCharacterSet newlineCharacterSet] characterIsMember:ch]) {
 			first = NO;
@@ -2059,6 +2063,10 @@
 			location = [ts skipCharactersInSet:[NSCharacterSet newlineCharacterSet]
 					      fromLocation:location
 						  backward:NO];
+			if (location >= [ts length]) {
+				end_location = [ts length];
+				break;
+			}
 			ch = [[ts string] characterAtIndex:location];
 		}
 
@@ -2116,7 +2124,10 @@
 	NSCharacterSet *bigwordSet = [whitespace invertedSet];
 	BOOL gotWhitespace = NO;
 	int count = IMAX(command.count, 1);
+	int n = 0;
 	while (count > 0 || !gotWhitespace) {
+		if (location >= [ts length])
+			break;
 		unichar ch = [[ts string] characterAtIndex:location];
 		if (first && [[NSCharacterSet newlineCharacterSet] characterIsMember:ch]) {
 			first = NO;
@@ -2124,6 +2135,10 @@
 			location = [ts skipCharactersInSet:[NSCharacterSet newlineCharacterSet]
 					      fromLocation:location
 						  backward:NO];
+			if (location >= [ts length]) {
+				end_location = [ts length];
+				break;
+			}
 			ch = [[ts string] characterAtIndex:location];
 		}
 
@@ -2157,10 +2172,11 @@
 			start_location = range.location;
 			first = NO;
 		}
+		++n;
 	}
 
 	/* Check for leading whitespace. */
-	if (!gotWhitespace && start_location > 0) {
+	if (!gotWhitespace && start_location > 0 && n == 1) {
 		NSRange range = [ts rangeOfCharactersFromSet:ws
 						  atLocation:start_location - 1
 						 acceptAfter:NO];
@@ -2503,4 +2519,3 @@
 }
 
 @end
-

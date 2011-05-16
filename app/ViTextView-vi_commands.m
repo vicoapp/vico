@@ -2195,7 +2195,7 @@
 	NSUInteger location = start_location;
 
 	NSUInteger bol = location;
-	NSUInteger end = 0;
+	NSUInteger end = 0, eol = 0;
 
 	if (mode == ViVisualMode && [self selectedRange].length > 1)
 		location = NSMaxRange([self selectedRange]);
@@ -2215,26 +2215,28 @@
 	end_location = location;
 
 	for (location = end; end < [[self textStorage] length]; location = end) {
-		[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
+		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:location];
 		if ([[self textStorage] isBlankLineAtLocation:bol] != blankLine) {
 			blankLine = !blankLine;
 			if ((!includeWhitespace || blankLine) && --count == 0)
 				break;
 		}
-		end_location = bol;
+
+		end_location = eol;
+		final_location = bol;
 	}
 
 	if (includeWhitespace && !initialBlankLine) {
 		for (location = end; end < [[self textStorage] length]; location = end) {
-			end_location = bol;
-			[self getLineStart:&bol end:&end contentsEnd:NULL forLocation:location];
+			end_location = eol;
+			final_location = bol;
+			[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:location];
 			if ([[self textStorage] isBlankLineAtLocation:bol] != blankLine)
 				break;
 		}
 	}
 
 	visual_line_mode = YES;
-	final_location = end_location;
 
 	return YES;
 }

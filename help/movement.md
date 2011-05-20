@@ -17,3 +17,4 @@ realize they aren't so bad at all.
   * [Moving back to previous locations](jumplist.html)
   * [Searching](searching.html)
   * [Scrolling the screen](scrolling.html)
+

@@ -5,6 +5,13 @@ REGRESSIONS
 REQUESTED
 =========
 
+* When deleting (dd) last line and pasting it in other place, blank
+  line is pasted, while if pasting back to the last line - it pastes
+  normally. Also if pasting back (P) on the last line, it pastes both
+  blank and the line.
+* p and P keys are not mapped in visual mode (to paste with substitute of selected text).
+
+
 * tabstop setting per scope not honored!
 
 * project search

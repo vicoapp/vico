@@ -217,6 +217,12 @@
 	STAssertEqualObjects([snippet string], @"`hej`", nil);
 }
 
+- (void)test024_shebangShellCommandWithDoubleEscapes
+{
+	[self makeSnippet:@"`#!/usr/bin/env perl\nprint(\"\\\\\\`hej\\\\\\`\");\n`"];
+	STAssertEqualObjects([snippet string], @"\\`hej\\`", nil);
+}
+
 /* Shell commands have access to the environment variables. */
 - (void)test024_shellCommandWithEnvironment
 {

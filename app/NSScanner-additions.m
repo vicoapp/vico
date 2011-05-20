@@ -1,4 +1,5 @@
 #import "NSScanner-additions.h"
+#include "logging.h"
 
 @implementation NSScanner (additions)
 
@@ -12,7 +13,9 @@
 	return YES;
 }
 
-- (BOOL)scanUpToUnescapedCharacter:(unichar)toChar intoString:(NSString **)string
+- (BOOL)scanUpToUnescapedCharacter:(unichar)toChar
+                        intoString:(NSString **)string
+                      stripEscapes:(BOOL)stripEscapes
 {
 	NSMutableString *s = [NSMutableString string];
 	unichar ch;
@@ -21,7 +24,7 @@
 	while ([self scanCharacter:&ch]) {
 		if (ch == '\\') {
 			if ([self scanCharacter:&ch]) {
-				if (ch != toChar)
+				if (!stripEscapes)
 					[s appendString:@"\\"];
 				[s appendFormat:@"%C", ch];
 			} else
@@ -38,7 +41,16 @@
 	if (string)
 		*string = s;
 
+	DEBUG(@"scanned escaped string [%@]", s);
+
 	return gotChar ? YES : NO;
+}
+
+- (BOOL)scanUpToUnescapedCharacter:(unichar)toChar
+                        intoString:(NSString **)string
+{
+	/* TextMate bundle commands want backslash escapes intact. sh unescapes. */
+	return [self scanUpToUnescapedCharacter:toChar intoString:string stripEscapes:NO];
 }
 
 - (BOOL)scanShellVariableIntoString:(NSString **)intoString

@@ -490,7 +490,13 @@
 		[self getLineStart:&bol end:NULL contentsEnd:NULL];
 		start_location = final_location = bol;
 	}
-	[self insertString:content atLocation:start_location];
+
+	if (mode == ViVisualMode) {
+		[self yankToRegister:0 range:affectedRange];
+		[self replaceCharactersInRange:affectedRange withString:content];
+		final_location = affectedRange.location;
+	} else
+		[self insertString:content atLocation:start_location];
 
 	return YES;
 }
@@ -515,7 +521,12 @@
 		final_location = start_location + 1;
 	}
 
-	[self insertString:content atLocation:final_location];
+	if (mode == ViVisualMode) {
+		[self yankToRegister:0 range:affectedRange];
+		[self replaceCharactersInRange:affectedRange withString:content];
+		final_location = affectedRange.location;
+	} else
+		[self insertString:content atLocation:final_location];
 
 	return YES;
 }

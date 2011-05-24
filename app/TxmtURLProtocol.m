@@ -59,6 +59,8 @@
 				NSString *s = [[tmp objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 				s = [s stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 				openURL = [NSURL URLWithString:s];
+				if ([openURL isFileURL])
+					openURL = [NSURL fileURLWithPath:[openURL path]];
 			} else if ([[tmp objectAtIndex:0] isEqualToString:@"line"])
 				line = [tmp objectAtIndex:1];
 		}

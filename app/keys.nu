@@ -45,10 +45,10 @@
 (gmap setKey:"<cmd-esc>" toAction:"show_bundle_menu:")
 ; alternative key bindings for switching tabs
 ; the default is ctrl-tab / shift-ctrl-tab
-(gmap map:"<cmd-{>" to:"gT")
-(gmap map:"<cmd-}>" to:"gt")
-(gmap map:"<alt-cmd-left>" to:"gT")
-(gmap map:"<alt-cmd-right>" to:"gt")
+(gmap map:"<cmd-{>" to:"<esc>gT")
+(gmap map:"<cmd-}>" to:"<esc>gt")
+(gmap map:"<alt-cmd-left>" to:"<esc>gT")
+(gmap map:"<alt-cmd-right>" to:"<esc>gt")
 
 
 ;; insert map

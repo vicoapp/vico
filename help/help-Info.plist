@@ -28,6 +28,8 @@
 		<string>vico</string>
 		<key>HPDBookRemoteURL</key>
 		<string>http://www.vicoapp.com/help/</string>
+		<key>HPDBookKBURL</key>
+		<string>http://help.vicoapp.com/kbsearch?q='query'</string>
 		<key>HPDBookTopicListCSSPath</key>
 		<string>../shared/help.css</string>
 		<key>HPDBookTitle</key>

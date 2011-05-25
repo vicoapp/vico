@@ -220,93 +220,86 @@
 /* syntax: % */
 - (BOOL)move_to_match:(ViCommand *)command
 {
-        // find first paren on current line
+	/* Find first paren on current line. */
 	NSString *parens = @"<>(){}[]";
-        NSCharacterSet *parensSet = [NSCharacterSet characterSetWithCharactersInString:parens];
+	NSCharacterSet *parensSet = [NSCharacterSet characterSetWithCharactersInString:parens];
 
-        NSUInteger end, eol;
+	NSUInteger end, eol;
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	NSRange lineRange = NSMakeRange(start_location, end - start_location);
 
-        NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
-        if (openingRange.location == NSNotFound)
-        {
-                MESSAGE(@"No match character on this line");
-                return NO;
-        }
+	NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
+	if (openingRange.location == NSNotFound) {
+		MESSAGE(@"No match character on this line");
+		return NO;
+	}
 
-        /* Special case: check if inside a string or comment. */
+	/* Special case: check if inside a string or comment. */
 	NSArray *openingScopes = [self scopesAtLocation:openingRange.location];
 	BOOL inSpecialScope;
-        NSRange specialScopeRange;
+	NSRange specialScopeRange;
 
 	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
-        if (inSpecialScope)
-        	specialScopeRange = [self rangeOfScopeSelector:@"string" atLocation:openingRange.location];
+	if (inSpecialScope)
+		specialScopeRange = [self rangeOfScopeSelector:@"string" atLocation:openingRange.location];
 	else {
 		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
 		if (inSpecialScope)
 			specialScopeRange = [self rangeOfScopeSelector:@"comment" atLocation:openingRange.location];
 	}
 
-        // lookup the matching character and prepare search
-        NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
-        unichar matchChar = [match characterAtIndex:0];
-        unichar otherChar;
+	// lookup the matching character and prepare search
+	NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
+	unichar matchChar = [match characterAtIndex:0];
+	unichar otherChar;
 	NSUInteger startOffset, endOffset = 0;
 	int delta = 1;
-        NSRange r = [parens rangeOfString:match];
-        if (r.location % 2 == 0)
-        {
+	NSRange r = [parens rangeOfString:match];
+	if (r.location % 2 == 0) {
 		// search forward
-                otherChar = [parens characterAtIndex:r.location + 1];
-                startOffset = openingRange.location + 1;
-                if (inSpecialScope)
-                	endOffset = NSMaxRange(specialScopeRange);
-                else
-                        endOffset = [[self textStorage] length];
-        }
-	else
-	{
+		otherChar = [parens characterAtIndex:r.location + 1];
+		startOffset = openingRange.location + 1;
+		if (inSpecialScope)
+			endOffset = NSMaxRange(specialScopeRange);
+		else
+			endOffset = [[self textStorage] length];
+	} else {
 		// search backwards
-                otherChar = [parens characterAtIndex:r.location - 1];
+		otherChar = [parens characterAtIndex:r.location - 1];
 		startOffset = openingRange.location - 1;
 		if (inSpecialScope)
 			endOffset = specialScopeRange.location;
-                delta = -1;
-        }
+		delta = -1;
+	}
 
-        // search for matching character
+	// search for matching character
 	int level = 1;
 	NSUInteger offset;
-	for (offset = startOffset; offset != endOffset; offset += delta)
-	{
-        	unichar c = [[[self textStorage] string] characterAtIndex:offset];
-        	if (c == matchChar || c == otherChar)
-                {
+	for (offset = startOffset; offset != endOffset; offset += delta) {
+		unichar c = [[[self textStorage] string] characterAtIndex:offset];
+		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */
 			if (!inSpecialScope) {
-                                NSArray *scopes = [self scopesAtLocation:offset];
+				NSArray *scopes = [self scopesAtLocation:offset];
 				if ([@"string"  matchesScopes:scopes] > 0 ||
-				    [@"comment" matchesScopes:scopes] > 0)
-					continue;
-                        }
+					[@"comment" matchesScopes:scopes] > 0)
+						continue;
+			}
 
 			if (c == matchChar)
-                                level++;
-                        else
-                                level--;
+				level++;
+			else
+				level--;
 
-                        if (level == 0)
-                                break;
-                }
-        }
+			if (level == 0)
+				break;
+		}
+	}
 
-        if (level > 0)
-	{
+	if (level > 0) {
 		MESSAGE(@"Matching character not found");
 		return NO;
-        }
+	}
 
 	[self pushLocationOnJumpList:start_location];
 

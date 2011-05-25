@@ -217,7 +217,7 @@
 	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]
 	    forKey:@"PATH"];
 
-	NSURL *baseURL = [[document environment] baseURL];
+	NSURL *baseURL = [[document fileURL] URLByDeletingLastPathComponent];
 	if ([baseURL isFileURL])
 		[task setCurrentDirectoryPath:[baseURL path]];
 	else

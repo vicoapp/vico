@@ -4,7 +4,7 @@
 @class ViSnippet;
 
 @protocol ViSnippetDelegate <NSObject>
-- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string;
+- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string forTabstop:(ViTabstop *)tabstop;
 - (NSString *)string;
 @end
 
@@ -25,6 +25,8 @@
 @property(readonly) NSRange range;
 @property(readonly) NSUInteger caret;
 @property(readonly) NSRange selectedRange;
+@property(readonly) BOOL finished;
+@property(readonly) ViTabstop *currentTabStop;
 
 - (ViSnippet *)initWithString:(NSString *)aString
                    atLocation:(NSUInteger)aLocation

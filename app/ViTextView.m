@@ -317,10 +317,21 @@ int logIndent = 0;
 
 	ViSnippet *snippet = document.snippet;
 	if (snippet) {
+		/* If there is a selected snippet range, remove it first. */
+		NSRange sel = snippet.selectedRange;
+		if (sel.length > 0) {
+			DEBUG(@"got snippet selection range %@", NSStringFromRange(sel));
+			if (NSLocationInRange(aRange.location, sel) || NSLocationInRange(NSMaxRange(aRange), sel)) {
+				aRange = NSUnionRange(sel, aRange);
+				DEBUG(@"union range = %@", NSStringFromRange(aRange));
+			} else
+				[self deselectSnippet];
+		}
+
 		/* Let the snippet drive the changes. */
 		if ([snippet replaceRange:aRange withString:aString])
 			return;
-		[self cancelSnippet:snippet];
+		[self cancelSnippet];
 	}
 
 	if (undoGroup)
@@ -380,9 +391,10 @@ int logIndent = 0;
 	[self replaceRange:aRange withString:aString undoGroup:YES];
 }
 
-- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
+- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString forTabstop:(ViTabstop *)tabstop
 {
-	DEBUG(@"replace range %@ with [%@]", NSStringFromRange(aRange), aString);
+	DEBUG(@"replace range %@ with [%@] for tab %@, currentTabStop = %@, tabRange = %@",
+	    NSStringFromRange(aRange), aString, tabstop, snippet.currentTabStop, NSStringFromRange(snippet.tabRange));
 	[self beginUndoGroup];
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
@@ -391,8 +403,11 @@ int logIndent = 0;
 	                            range:r];
 	[self setMark:'.' atLocation:aRange.location];
 
+	NSInteger delta = [aString length] - aRange.length;
 	if (modify_start_location > NSMaxRange(r)) {
-		NSInteger delta = [aString length] - aRange.length;
+		DEBUG(@"modify_start_location %lu -> %lu", modify_start_location, modify_start_location + delta);
+		modify_start_location += delta;
+	} else if (modify_start_location == r.location && delta > 0 && tabstop != snippet.currentTabStop) {
 		DEBUG(@"modify_start_location %lu -> %lu", modify_start_location, modify_start_location + delta);
 		modify_start_location += delta;
 	}
@@ -761,6 +776,7 @@ int logIndent = 0;
 
 - (IBAction)undo:(id)sender
 {
+	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];
 	[undoManager undo];
@@ -770,6 +786,7 @@ int logIndent = 0;
 
 - (IBAction)redo:(id)sender
 {
+	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];
 	[undoManager redo];
@@ -779,8 +796,8 @@ int logIndent = 0;
 
 - (void)endUndoGroup
 {
-	DEBUG(@"Ending undo-group: %@", hasUndoGroup ? @"YES" : @"NO");
 	if (hasUndoGroup) {
+		DEBUG(@"%s", "====================> Ending undo-group");
 		[undoManager endUndoGrouping];
 		hasUndoGroup = NO;
 	}
@@ -789,6 +806,7 @@ int logIndent = 0;
 - (void)beginUndoGroup
 {
 	if (!hasUndoGroup) {
+		DEBUG(@"%s", "====================> Beginning undo-group");
 		[undoManager beginUndoGrouping];
 		hasUndoGroup = YES;
 	}
@@ -1343,14 +1361,6 @@ int logIndent = 0;
 {
 	DEBUG(@"insert character %C at %i", character, start_location);
 
-	// If there is a selected snippet range, remove it first.
-	ViSnippet *snippet = document.snippet;
-	NSRange sel = snippet.selectedRange;
-	if (sel.length > 0) {
-		[self deleteRange:sel];
-		start_location = modify_start_location;
-	}
-
 	NSString *s = [NSString stringWithFormat:@"%C", character];
 	if (![self handleSmartPair:s]) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
@@ -1424,11 +1434,12 @@ int logIndent = 0;
 	if (snippet) {
 		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
 		if ([snippet advance]) {
+			[self endUndoGroup];
 			final_location = snippet.caret;
 			[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
 			return YES;
 		} else
-			[self cancelSnippet:snippet];
+			[self cancelSnippet];
 	}
 
 	/* Check for a tab trigger before the caret.
@@ -1492,9 +1503,13 @@ int logIndent = 0;
 	ViSnippet *snippet = document.snippet;
 	NSRange sel = snippet.selectedRange;
 	if (sel.length > 0) {
-		[self deleteRange:sel];
-		start_location = modify_start_location;
-		return YES;
+		if ([snippet activeInRange:NSMakeRange(start_location, 0)]) {
+			[self deleteRange:sel];
+			start_location = modify_start_location;
+			DEBUG(@"setting start location to %lu", modify_start_location);
+			return YES;
+		} else
+			[self deselectSnippet];
 	}
 
 	if (start_location == 0) {
@@ -1600,6 +1615,8 @@ int logIndent = 0;
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:final_location];
 
+	[self deselectSnippet];
+
 	[self setNormalMode];
 	[self setCaret:final_location];
 	[self resetSelection];
@@ -1659,9 +1676,6 @@ int logIndent = 0;
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
-	if (mode != ViInsertMode)
-		[self endUndoGroup];
-
 	id target = [self targetForCommand:command];
 	if (target == nil) {
 		MESSAGE(@"Command %@ not implemented.",
@@ -1710,6 +1724,7 @@ int logIndent = 0;
 	} else
 		saved_column = -1;
 
+	/* nvi-style undo direction toggling */
 	if (command.action != @selector(vi_undo:) && !command.fromDot)
 		undo_direction = 0;
 
@@ -1810,8 +1825,15 @@ int logIndent = 0;
 	}
 
 	DEBUG(@"final_location is %u", final_location);
-	if (final_location != NSNotFound)
+	if (final_location != NSNotFound) {
 		[self setCaret:final_location];
+		ViSnippet *snippet = document.snippet;
+		if (snippet) {
+			NSRange sel = snippet.selectedRange;
+			if (!NSLocationInRange(final_location, sel))
+				[self deselectSnippet];
+		}
+	}
 	if (mode == ViVisualMode) {
 		NSRange sel = [self selectedRange];
 		/* Text objects can extend visual selection in both directions. */
@@ -1819,6 +1841,9 @@ int logIndent = 0;
 			visual_start_location = start_location;
 		[self setVisualSelection];
 	}
+
+	if (mode != ViInsertMode)
+		[self endUndoGroup];
 
 	if (!replayingInput)
 		[self scrollToCaret];

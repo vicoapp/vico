@@ -14,7 +14,7 @@
 		storage = [NSMutableString string];
 	return self;
 }
-- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string
+- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string forTabstop:(ViTabstop *)tabstop
 {
 	[storage replaceCharactersInRange:range withString:string];
 }

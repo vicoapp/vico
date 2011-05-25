@@ -180,7 +180,7 @@
 @end
 
 @interface ViTextView (snippets)
-- (void)cancelSnippet:(ViSnippet *)snippet;
+- (void)cancelSnippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
                   fromBundle:(ViBundle *)bundle
                      inRange:(NSRange)aRange;

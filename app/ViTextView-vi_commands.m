@@ -1176,6 +1176,8 @@
 	 * changes, too.  This isn't worth the effort.
 	 */
 
+	[self cancelSnippet];
+
 	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
 	if ([undoStyle isEqualToString:@"nvi"]) {
 		DEBUG(@"undo_direction is %i", undo_direction);
@@ -1217,6 +1219,8 @@
 /* syntax: C-r */
 - (BOOL)vim_redo:(ViCommand *)command
 {
+	[self cancelSnippet];
+
 	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
 	if ([undoStyle isEqualToString:@"nvi"])
 		return NO;

@@ -54,6 +54,8 @@
 @synthesize range;
 @synthesize selectedRange;
 @synthesize caret;
+@synthesize currentTabStop;
+@synthesize finished;
 
 - (NSMutableString *)runShellCommand:(NSString *)shellCommand
                            withInput:(NSString *)inputText
@@ -395,7 +397,7 @@
 	range = NSMakeRange(beginLocation, [string length]);
 
 	delegate = aDelegate;
-	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string];
+	[delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string forTabstop:nil];
 
 	DEBUG(@"tabstops = %@", tabstops);
 
@@ -567,7 +569,7 @@
 			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), value, [delegate string]);
 			r.location += beginLocation;
-			[delegate snippet:self replaceCharactersInRange:r withString:value];
+			[delegate snippet:self replaceCharactersInRange:r withString:value forTabstop:ts];
 			r.location -= beginLocation;
 			DEBUG(@"string -> [%@]", [delegate string]);
 		}
@@ -616,7 +618,7 @@
 {
 	[self deselect];
 
-	if (![self activeInRange:updateRange])
+	if (finished || ![self activeInRange:updateRange])
 		return NO;
 
 	/* Remove any nested tabstops. */
@@ -645,7 +647,7 @@
 
 - (BOOL)activeInRange:(NSRange)aRange
 {
-	if (finished || currentTabStop == nil) {
+	if (currentTabStop == nil) {
 		DEBUG(@"%s", "current tab stop is nil");
 		return NO;
 	}

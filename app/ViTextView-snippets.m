@@ -5,12 +5,15 @@
 
 @implementation ViTextView (snippets)
 
-- (void)cancelSnippet:(ViSnippet *)snippet
+- (void)cancelSnippet
 {
-	DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
-	document.snippet = nil;
-	[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
-	[self endUndoGroup];
+	ViSnippet *snippet = document.snippet;
+	if (snippet) {
+		DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
+		document.snippet = nil;
+		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.range];
+		[self endUndoGroup];
+	}
 }
 
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
@@ -23,15 +26,12 @@
 	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
 	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
 
-
 	NSString *expandedSnippetString = indentedSnippetString;
 	if ([[self preference:@"expandtab" atLocation:aRange.location] integerValue] == NSOnState) {
 		NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
 		NSString *tabString = [@"" stringByPaddingToLength:shiftWidth withString:@" " startingAtIndex:0];
 		expandedSnippetString = [indentedSnippetString stringByReplacingOccurrencesOfString:@"\t" withString:tabString];
 	}
-
-	// FIXME: replace tabs with correct shiftwidth/tabstop settings
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
@@ -44,6 +44,7 @@
 		[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
 	}
 
+	[self endUndoGroup];
 	[self beginUndoGroup];
 	[self deleteRange:aRange];
 

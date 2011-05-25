@@ -938,7 +938,7 @@
 		NSUInteger cur = start_location, bol = 0, eol = 0;
 		while (count--)
 			[self getLineStart:&bol end:&cur contentsEnd:&eol forLocation:cur];
-		final_location = end_location = IMAX(bol, eol - (command.hasOperator ? 0 : 1 ));
+		final_location = end_location = IMAX(bol, eol - (command.hasOperator || mode == ViInsertMode ? 0 : 1 ));
 	}
 	return YES;
 }
@@ -1428,20 +1428,20 @@
 	if (bigword) {
 		end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet]
 							  fromLocation:end_location backward:NO];
-		if (!command.hasOperator)
+		if (!command.hasOperator && mode != ViInsertMode)
 			end_location--;
 	} else if ([wordSet characterIsMember:ch]) {
 		end_location = [[self textStorage] skipCharactersInSet:wordSet
 							  fromLocation:end_location
 							      backward:NO];
-		if (!command.hasOperator)
+		if (!command.hasOperator && mode != ViInsertMode)
 			end_location--;
 	} else {
 		// inside non-word-chars
 		end_location = [[self textStorage] skipCharactersInSet:nonWordSet
 							  fromLocation:end_location
 							      backward:NO];
-		if (!command.hasOperator)
+		if (!command.hasOperator && mode != ViInsertMode)
 			end_location--;
 	}
 

@@ -12,6 +12,8 @@ require 'fcntl'
 $KCODE = 'u'
 require 'jcode'
 
+VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool' unless defined? VICO
+
 $SCRIPTMATE_VERSION = "$Revision: 11069 $"
 
 def my_popen3(*cmd) # returns [stdin, stdout, strerr, pid]
@@ -153,15 +155,7 @@ class UserScript
     if ENV.has_key? 'TM_FILEPATH' then
       @path = ENV['TM_FILEPATH']
       @display_name = File.basename(@path)
-      begin
-        file = open(@path, 'w')
-        file.write @content
-      rescue Errno::EACCES
-        @saved = false
-        @warning = "Could not save #{@path} before running, using temp file..."
-      ensure
-        file.close unless file.nil?
-      end
+      %x{#{VICO} -e '(document saveDocument:nil)'}
     else
       @saved = false
     end

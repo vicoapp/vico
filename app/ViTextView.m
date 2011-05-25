@@ -1357,12 +1357,12 @@ int logIndent = 0;
 /* Input a character from the user (in insert mode). Handle smart typing pairs.
  * FIXME: assumes smart typing pairs are single characters.
  */
-- (void)handle_input:(unichar)character
+- (void)handle_input:(unichar)character literal:(BOOL)literal
 {
 	DEBUG(@"insert character %C at %i", character, start_location);
 
 	NSString *s = [NSString stringWithFormat:@"%C", character];
-	if (![self handleSmartPair:s]) {
+	if (literal || ![self handleSmartPair:s]) {
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:s
 			atLocation:start_location];
@@ -1392,7 +1392,7 @@ int logIndent = 0;
 
 - (BOOL)literal_next:(ViCommand *)command
 {
-	[self handle_input:command.argument];
+	[self handle_input:command.argument literal:YES];
 	return YES;
 }
 
@@ -1413,7 +1413,7 @@ int logIndent = 0;
 			return NO;
 		}
 
-		[self handle_input:keyCode];
+		[self handle_input:keyCode literal:NO];
 		start_location = final_location;
 	}
 

@@ -228,7 +228,9 @@
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
 	NSRange lineRange = NSMakeRange(start_location, end - start_location);
 
-	NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet options:0 range:lineRange];
+	NSRange openingRange = [[[self textStorage] string] rangeOfCharacterFromSet:parensSet
+									    options:0
+									      range:lineRange];
 	if (openingRange.location == NSNotFound) {
 		MESSAGE(@"No match character on this line");
 		return NO;
@@ -240,19 +242,21 @@
 	NSRange specialScopeRange;
 
 	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
-	if (inSpecialScope)
-		specialScopeRange = [self rangeOfScopeSelector:@"string" atLocation:openingRange.location];
-	else {
+	if (inSpecialScope) {
+		specialScopeRange = [self rangeOfScopeSelector:@"string"
+						    atLocation:openingRange.location];
+	} else {
 		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
 		if (inSpecialScope)
-			specialScopeRange = [self rangeOfScopeSelector:@"comment" atLocation:openingRange.location];
+			specialScopeRange = [self rangeOfScopeSelector:@"comment"
+							    atLocation:openingRange.location];
 	}
 
-	// lookup the matching character and prepare search
+	/* Lookup the matching character and prepare search. */
 	NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
 	unichar matchChar = [match characterAtIndex:0];
 	unichar otherChar;
-	NSUInteger startOffset, endOffset = 0;
+	NSInteger startOffset, endOffset = 0;
 	int delta = 1;
 	NSRange r = [parens rangeOfString:match];
 	if (r.location % 2 == 0) {
@@ -274,15 +278,15 @@
 
 	// search for matching character
 	int level = 1;
-	NSUInteger offset;
-	for (offset = startOffset; offset != endOffset; offset += delta) {
+	NSInteger offset;
+	for (offset = startOffset; delta > 0 ? offset <= endOffset : offset >= endOffset; offset += delta) {
 		unichar c = [[[self textStorage] string] characterAtIndex:offset];
 		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */
 			if (!inSpecialScope) {
 				NSArray *scopes = [self scopesAtLocation:offset];
 				if ([@"string"  matchesScopes:scopes] > 0 ||
-					[@"comment" matchesScopes:scopes] > 0)
+				    [@"comment" matchesScopes:scopes] > 0)
 						continue;
 			}
 

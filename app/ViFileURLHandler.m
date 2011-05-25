@@ -26,7 +26,8 @@
 	NSMutableArray *contents = [NSMutableArray array];
 	for (NSString *filename in files) {
 		NSDictionary *attrs;
-		NSString *p = [[aURL path] stringByAppendingPathComponent:filename];
+		NSURL *u = [aURL URLByAppendingPathComponent:filename];
+		NSString *p = [[u URLByResolvingSymlinksInPath] path];
 		attrs = [fm attributesOfItemAtPath:p error:&error];
 		[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
 	}

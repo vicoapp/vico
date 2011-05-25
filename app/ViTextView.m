@@ -859,8 +859,8 @@ int logIndent = 0;
 
 - (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
-	NSUInteger eol;
-	[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:aLocation];
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
 
 	NSRange lineRange;
 	[[self layoutManager] lineFragmentRectForGlyphAtIndex:aLocation effectiveRange:&lineRange];
@@ -869,7 +869,7 @@ int logIndent = 0;
 		end_location += column - 1;
 
 	if (end_location >= eol)
-		end_location = eol - (mode == ViInsertMode ? 0 : 1);
+		end_location = IMAX(bol, eol - (mode == ViInsertMode ? 0 : 1));
 
 	final_location = end_location;
 }

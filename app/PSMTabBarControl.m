@@ -13,6 +13,7 @@
 #import "PSMTabStyle.h"
 #import "PSMMetalTabStyle.h"
 #import "PSMTabDragAssistant.h"
+#include "logging.h"
 
 @interface PSMTabBarControl (Private)
 // characteristics
@@ -48,10 +49,6 @@
 - (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)tabView;
-
-    // archiving
-- (void)encodeWithCoder:(NSCoder *)aCoder;
-- (id)initWithCoder:(NSCoder *)aDecoder;
 
     // convenience
 - (id)cellForPoint:(NSPoint)point cellFrame:(NSRectPointer)outFrame;
@@ -461,12 +458,9 @@
         partnerOriginalHeight = [[self window] frame].size.height;
         partnerOriginalY = [[self window] frame].origin.y;
     }
-    
+
     // target values for partner
     if(partnerView){
-        // above or below me?
-        if((myOriginalY - 22) > partnerOriginalY){
-            // partner is below me
             if(_isHidden){
                 // I'm shrinking
                 myTargetY = myOriginalY + 21;
@@ -480,22 +474,6 @@
                 partnerTargetY = partnerOriginalY;
                 partnerTargetHeight = partnerOriginalHeight - 21;
             }
-        } else {
-            // partner is above me
-            if(_isHidden){
-                // I'm shrinking
-                myTargetY = myOriginalY;
-                myTargetHeight = myOriginalHeight - 21;
-                partnerTargetY = partnerOriginalY - 21;
-                partnerTargetHeight = partnerOriginalHeight + 21;
-            } else {
-                // I'm growing
-                myTargetY = myOriginalY;
-                myTargetHeight = myOriginalHeight + 21;
-                partnerTargetY = partnerOriginalY + 21;
-                partnerTargetHeight = partnerOriginalHeight - 21;
-            }
-        }
     } else {
         // for window movement
         if(_isHidden){
@@ -512,6 +490,17 @@
             partnerTargetHeight = partnerOriginalHeight + 21;
         }
     }
+
+#ifndef NO_DEBUG
+    NSRect frame = [self frame];
+    frame.origin.y = myTargetY;
+    frame.size.height = myTargetHeight;
+    DEBUG(@"my frame: %@ -> %@", NSStringFromRect([self frame]), NSStringFromRect(frame));
+    frame = [partnerView frame];
+    frame.origin.y = partnerTargetY;
+    frame.size.height = partnerTargetHeight;
+    //DEBUG(@"partner frame: %@ -> %@", NSStringFromRect([partnerView frame]), NSStringFromRect(frame));
+#endif
 
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:myOriginalY], @"myOriginalY", [NSNumber numberWithFloat:partnerOriginalY], @"partnerOriginalY", [NSNumber numberWithFloat:myOriginalHeight], @"myOriginalHeight", [NSNumber numberWithFloat:partnerOriginalHeight], @"partnerOriginalHeight", [NSNumber numberWithFloat:myTargetY], @"myTargetY", [NSNumber numberWithFloat:partnerTargetY], @"partnerTargetY", [NSNumber numberWithFloat:myTargetHeight], @"myTargetHeight", [NSNumber numberWithFloat:partnerTargetHeight], @"partnerTargetHeight", nil];
     [NSTimer scheduledTimerWithTimeInterval:(1.0/20.0) target:self selector:@selector(animateShowHide:) userInfo:userInfo repeats:YES];
@@ -532,6 +521,7 @@
         // resize self and view
         [partnerView setFrame:NSMakeRect([partnerView frame].origin.x, partnerCurrentY, [partnerView frame].size.width, partnerCurrentHeight)];
         [partnerView setNeedsDisplay:YES];
+	DEBUG(@"my frame: %@ -> %@", NSStringFromRect(myFrame), NSStringFromRect(myNewFrame));
         [self setFrame:myNewFrame];
     } else {
         // resize self and window
@@ -594,7 +584,7 @@
 
     // size all cells appropriately and create tracking rects
     // nuke old tracking rects
-    int i, cellCount = [_cells count];
+    int i, cellCount = (int)[_cells count];
     for(i = 0; i < cellCount; i++){
         id cell = [_cells objectAtIndex:i];
         [[NSNotificationCenter defaultCenter] removeObserver:cell];
@@ -1023,7 +1013,7 @@
     // this one fixes the "blanking" effect when the control hides and shows itself
     NSEnumerator *e = [_cells objectEnumerator];
     PSMTabBarCell *cell;
-    while(cell = [e nextObject]){
+    while ((cell = [e nextObject]) != nil) {
         [[cell indicator] stopAnimation:self];
         [[cell indicator] startAnimation:self];
     }
@@ -1056,23 +1046,19 @@
 {
     // hide? must readjust things if I'm not supposed to be showing
     // this block of code only runs when the app launches
-    if(_hideForSingleTab && ([_cells count] <= 1) && !_awakenedFromNib){
+    if (1 && _hideForSingleTab && ([_cells count] <= 1) && !_awakenedFromNib){
         // must adjust frames now before display
         NSRect myFrame = [self frame];
-        if(partnerView){
+        if (partnerView) {
             NSRect partnerFrame = [partnerView frame];
-            // above or below me?
-            if(([self frame].origin.y - 22) > [partnerView frame].origin.y){
-                // partner is below me
-                [self setFrame:NSMakeRect(myFrame.origin.x, myFrame.origin.y + 21, myFrame.size.width, myFrame.size.height - 21)];
-                [partnerView setFrame:NSMakeRect(partnerFrame.origin.x, partnerFrame.origin.y, partnerFrame.size.width, partnerFrame.size.height + 21)];
-            } else {
-                // partner is above me
-                [self setFrame:NSMakeRect(myFrame.origin.x, myFrame.origin.y, myFrame.size.width, myFrame.size.height - 21)];
-                [partnerView setFrame:NSMakeRect(partnerFrame.origin.x, partnerFrame.origin.y - 21, partnerFrame.size.width, partnerFrame.size.height + 21)];
-            }
+            NSRect newFrame = NSMakeRect(myFrame.origin.x, myFrame.origin.y + 21, myFrame.size.width, myFrame.size.height - 21);
+            NSRect newPartnerFrame = NSMakeRect(partnerFrame.origin.x, partnerFrame.origin.y, partnerFrame.size.width, partnerFrame.size.height + 21);
+            DEBUG(@"my frame: %@ -> %@", NSStringFromRect(myFrame), NSStringFromRect(newFrame));
+            DEBUG(@"partner frame: %@ -> %@", NSStringFromRect(partnerFrame), NSStringFromRect(newPartnerFrame));
+            [partnerView setFrame:newPartnerFrame];
+            [self setFrame:newFrame];
+            DEBUG(@"my frame is now %@", NSStringFromRect([self frame]));
             [partnerView setNeedsDisplay:YES];
-            [self setNeedsDisplay:YES];
         } else {
             // for window movement
             NSRect windowFrame = [[self window] frame];
@@ -1141,85 +1127,6 @@
 }
 
 #pragma mark -
-#pragma mark Archiving
-
-- (void)encodeWithCoder:(NSCoder *)aCoder 
-{
-    [super encodeWithCoder:aCoder];
-    if ([aCoder allowsKeyedCoding]) {
-        [aCoder encodeObject:_cells forKey:@"PSMcells"];
-        // [aCoder encodeObject:tabView forKey:@"PSMtabView"];
-        [aCoder encodeObject:_overflowPopUpButton forKey:@"PSMoverflowPopUpButton"];
-        [aCoder encodeObject:_addTabButton forKey:@"PSMaddTabButton"];
-        [aCoder encodeObject:style forKey:@"PSMstyle"];
-        [aCoder encodeBool:_canCloseOnlyTab forKey:@"PSMcanCloseOnlyTab"];
-        [aCoder encodeBool:_hideForSingleTab forKey:@"PSMhideForSingleTab"];
-        [aCoder encodeBool:_showAddTabButton forKey:@"PSMshowAddTabButton"];
-        [aCoder encodeBool:_sizeCellsToFit forKey:@"PSMsizeCellsToFit"];
-        [aCoder encodeInt:_cellMinWidth forKey:@"PSMcellMinWidth"];
-        [aCoder encodeInt:_cellMaxWidth forKey:@"PSMcellMaxWidth"];
-        [aCoder encodeInt:_cellOptimumWidth forKey:@"PSMcellOptimumWidth"];
-        [aCoder encodeInt:_currentStep forKey:@"PSMcurrentStep"];
-        [aCoder encodeBool:_isHidden forKey:@"PSMisHidden"];
-        [aCoder encodeBool:_hideIndicators forKey:@"PSMhideIndicators"];
-        [aCoder encodeObject:partnerView forKey:@"PSMpartnerView"];
-        [aCoder encodeBool:_awakenedFromNib forKey:@"PSMawakenedFromNib"];
-        [aCoder encodeObject:_lastMouseDownEvent forKey:@"PSMlastMouseDownEvent"];
-        [aCoder encodeObject:delegate forKey:@"PSMdelegate"];
-        
-    }
-}
-
-- (id)initWithCoder:(NSCoder *)aDecoder 
-{
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        if ([aDecoder allowsKeyedCoding]) {
-            _cells = [aDecoder decodeObjectForKey:@"PSMcells"];
-            // tabView = [aDecoder decodeObjectForKey:@"PSMtabView"];
-            _overflowPopUpButton = [aDecoder decodeObjectForKey:@"PSMoverflowPopUpButton"];
-            _addTabButton = [aDecoder decodeObjectForKey:@"PSMaddTabButton"];
-            style = [aDecoder decodeObjectForKey:@"PSMstyle"];
-            _canCloseOnlyTab = [aDecoder decodeBoolForKey:@"PSMcanCloseOnlyTab"];
-            _hideForSingleTab = [aDecoder decodeBoolForKey:@"PSMhideForSingleTab"];
-            _showAddTabButton = [aDecoder decodeBoolForKey:@"PSMshowAddTabButton"];
-            _sizeCellsToFit = [aDecoder decodeBoolForKey:@"PSMsizeCellsToFit"];
-            _cellMinWidth = [aDecoder decodeIntForKey:@"PSMcellMinWidth"];
-            _cellMaxWidth = [aDecoder decodeIntForKey:@"PSMcellMaxWidth"];
-            _cellOptimumWidth = [aDecoder decodeIntForKey:@"PSMcellOptimumWidth"];
-            _currentStep = [aDecoder decodeIntForKey:@"PSMcurrentStep"];
-            _isHidden = [aDecoder decodeBoolForKey:@"PSMisHidden"];
-            _hideIndicators = [aDecoder decodeBoolForKey:@"PSMhideIndicators"];
-            partnerView = [aDecoder decodeObjectForKey:@"PSMpartnerView"];
-            _awakenedFromNib = [aDecoder decodeBoolForKey:@"PSMawakenedFromNib"];
-            _lastMouseDownEvent = [aDecoder decodeObjectForKey:@"PSMlastMouseDownEvent"];
-            delegate = [aDecoder decodeObjectForKey:@"PSMdelegate"];
-        }
-    }
-    return self;
-}
-
-#pragma mark -
-#pragma mark IB Palette
-
-- (NSSize)minimumFrameSizeFromKnobPosition:(int)position
-{
-    return NSMakeSize(100.0, 22.0);
-}
-
-- (NSSize)maximumFrameSizeFromKnobPosition:(int)knobPosition
-{
-    return NSMakeSize(10000.0, 22.0);
-}
-
-- (void)placeView:(NSRect)newFrame
-{
-    // this is called any time the view is resized in IB
-    [self setFrame:newFrame];
-    [self update];
-}
-
-#pragma mark -
 #pragma mark Convenience
 
 - (NSMutableArray *)representedTabViewItems
@@ -1239,7 +1146,7 @@
         return nil;
     }
     
-    int i, cnt = [_cells count];
+    int i, cnt = (int)[_cells count];
     for(i = 0; i < cnt; i++){
         PSMTabBarCell *cell = [_cells objectAtIndex:i];
         float width = [cell width];
@@ -1258,7 +1165,7 @@
 
 - (PSMTabBarCell *)lastVisibleTab
 {
-    int i, cellCount = [_cells count];
+    int i, cellCount = (int)[_cells count];
     for(i = 0; i < cellCount; i++){
         if([[_cells objectAtIndex:i] isInOverflowMenu])
             return [_cells objectAtIndex:(i-1)];
@@ -1268,7 +1175,7 @@
 
 - (int)numberOfVisibleTabs
 {
-    int i, cellCount = [_cells count];
+    int i, cellCount = (int)[_cells count];
     for(i = 0; i < cellCount; i++){
         if([[_cells objectAtIndex:i] isInOverflowMenu])
             return i+1;

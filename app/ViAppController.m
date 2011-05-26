@@ -93,6 +93,14 @@
 				  withIntermediateDirectories:YES
 						   attributes:nil
 							error:nil];
+	[[NSFileManager defaultManager] createDirectoryAtPath:[ViBundleStore bundlesDirectory]
+				  withIntermediateDirectories:NO
+						   attributes:nil
+							error:nil];
+	[[NSFileManager defaultManager] createDirectoryAtPath:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"Themes"]
+				  withIntermediateDirectories:NO
+						   attributes:nil
+							error:nil];
 
 	NSUserDefaults *userDefs = [NSUserDefaults standardUserDefaults];
 

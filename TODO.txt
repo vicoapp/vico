@@ -1,3 +1,6 @@
+!!! explorer flickers when opening new windows!
+!!! and seems to always want to open!?
+
 REGRESSIONS
 ===========
 
@@ -9,30 +12,21 @@ REQUESTED
   line is pasted, while if pasting back to the last line - it pastes
   normally. Also if pasting back (P) on the last line, it pastes both
   blank and the line.
-* p and P keys are not mapped in visual mode (to paste with substitute of selected text).
-
 
 * tabstop setting per scope not honored!
-
-* project search
-* @lampshadish: All I need now is some sort of recursive-find-in-directory and I can switch. Maybe using #ack so it doesn't block like in TextMate.
 
 * option to open files in the same view per default (ie, not tabs)
 * @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
 
-* @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 * @fkoeppe: Rescanning files in the File Explorer resets the current tree position to the tree root.
 * @fkoeppe: Adding a new file should automatically rescan the files in the File Explorer.
-* @fkoeppe: Indicating if a file is "dirty" in the tab bar.
 * @fkoeppe: When pressing enter while renaming a file in the File Explorer, it opens it in a new tab.
-* @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: How would I go about removing trailing white spaces on save?
 * @fkoeppe: Save width of the file explorer window.
 * @tobiastom: Will you implement shift+cursors for additional visual selecting?
 * @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
-* @growt: Some neat git integration would be great, like coloring the line number of rows that changed or a diff-tool. but first things first
 
-* vim text objects, especially i[, a]
+* vim text objects, especially i[, a] and it, at
 * vicotool --wait <file>
 * vicotool --line 1
 * R (replace mode)
@@ -41,7 +35,7 @@ REQUESTED
 
 URGENT
 ========
-* can't cd ~: unsupported URL scheme (null) !!
+* bundle commands not repeatable with dot
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
@@ -52,9 +46,9 @@ URGENT
 
 BUGS
 ====
+* r<esc> should not insert literal <esc>
 * h doesn't accept a count
 * bundle commands time out when presenting ui
-* modified status is not updated immediately, ok after escape?
 * get rid of ViBgView
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
@@ -88,6 +82,9 @@ IMPORTANT
 
 FEATURES
 ========
+* @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
+* @fkoeppe: Indicating if a file is "dirty" in the tab bar.
+* @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 * tab in ex command should do context-sensitive completion
 * completion for :setfiletype
 * :mkdir command
@@ -135,6 +132,12 @@ LONG TERM FEATURES
 * autocommands (or events)
 * undo tree + visualisation (check out Gundo)
 * integrated terminal
+
+* project search
+* @lampshadish: All I need now is some sort of recursive-find-in-directory and I can switch. Maybe using #ack so it doesn't block like in TextMate.
+
+* @growt: Some neat git integration would be great, like coloring the line number of rows that changed or a diff-tool. but first things first
+
 
 IDEAS
 =====

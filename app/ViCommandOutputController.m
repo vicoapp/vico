@@ -5,6 +5,7 @@
 @implementation ViCommandOutputController
 
 @synthesize tabController;
+@synthesize window;
 
 - (ViCommandOutputController *)initWithHTMLString:(NSString *)content
                                       environment:(ExEnvironment *)environment

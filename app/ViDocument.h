@@ -9,6 +9,7 @@
 @interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate>
 {
 	NSMutableSet *views;
+	ViDocumentView *hiddenView;
 
 	ViBundle *bundle;
 	ViLanguage *language;
@@ -45,6 +46,10 @@
 	NSTimer *updateSymbolsTimer;
 
 	ViSnippet *snippet;
+
+	id didSaveDelegate;
+	SEL didSaveSelector;
+	void *didSaveContext;
 }
 
 @property(readwrite, assign) ViSnippet *snippet;
@@ -74,12 +79,13 @@
 - (void)updatePageGuide;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
-- (ViDocumentView *)makeView;
+- (ViDocumentView *)makeViewInWindow:(NSWindow *)aWindow;
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)addView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
 - (NSString *)title;
 - (void)setString:(NSString *)aString;
+- (void)closeAndWindow:(BOOL)canCloseWindow;
 
 @end

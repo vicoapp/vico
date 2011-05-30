@@ -155,6 +155,7 @@
 (wmap setKey:"<c-w><c-n>" toAction:"window_new:")
 (wmap setKey:"<c-w>T" toAction:"window_totab:")
 (wmap setKey:"<c-w>c" toAction:"window_close:")
+(wmap setKey:"<c-w><c-c>" toAction:"window_close:")
 (wmap setKey:"<c-w>h" toAction:"window_left:")
 (wmap setKey:"<c-w>j" toAction:"window_down:")
 (wmap setKey:"<c-w>k" toAction:"window_up:")

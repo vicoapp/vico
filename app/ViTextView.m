@@ -312,6 +312,7 @@ int logIndent = 0;
 	}
 
 	modify_start_location = aRange.location;
+	DEBUG(@"modify_start_location -> %lu", modify_start_location);
 
 	DEBUG(@"replace range %@ with string [%@]", NSStringFromRange(aRange), aString);
 
@@ -986,6 +987,7 @@ int logIndent = 0;
 
 - (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
+	ViCommand *command = contextInfo;
 	keyManager.parser.last_search_pattern = pattern;
 	keyManager.parser.last_search_options = 0;
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
@@ -995,6 +997,7 @@ int logIndent = 0;
 
 - (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
 {
+	ViCommand *command = contextInfo;
 	keyManager.parser.last_search_pattern = pattern;
 	keyManager.parser.last_search_options = ViSearchOptionBackwards;
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
@@ -1175,16 +1178,17 @@ int logIndent = 0;
 		return;
 
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
+	DEBUG(@"selection = %@", NSStringFromRange([self selectedRange]));
 
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
 	NSRange lastRange = [[ranges lastObject] rangeValue];
 
-	/*DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
+	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
 	    stillSelectingFlag ? "YES" : "NO",
 	    NSStringFromRange(firstRange),
 	    NSStringFromRange(lastRange),
 	    mode,
-	    visual_start_location);*/
+	    visual_start_location);
 
 	if ([ranges count] > 1 || firstRange.length > 0) {
 		if (mode != ViVisualMode) {
@@ -1367,6 +1371,7 @@ int logIndent = 0;
 		[self insertString:s
 			atLocation:start_location];
 		final_location = modify_start_location + 1;
+		DEBUG(@"setting final location to %lu", final_location);
 	}
 
 	if ([[self preference:@"smartindent" atLocation:start_location] integerValue]) {

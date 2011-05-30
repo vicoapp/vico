@@ -12,6 +12,7 @@
 #import "NSString-scopeSelector.h"
 #import "ViURLManager.h"
 #import "ViTransformer.h"
+#import "ViError.h"
 #include "logging.h"
 
 @interface ExEnvironment (private)
@@ -189,59 +190,81 @@
 
 - (void)ex_write:(ExCommand *)command
 {
-	if (exTextView) {
-		ViDocument *doc = [(ViDocumentView *)[windowController viewControllerForView:exTextView] document];
-		DEBUG(@"got %i addresses", command.naddr);
-		if ([command.string hasPrefix:@">>"]) {
-			[self message:@"Appending not yet supported"];
+	if (exTextView == nil)
+		return;
+
+	ViDocument *doc = [(ViDocumentView *)[windowController viewControllerForView:exTextView] document];
+	DEBUG(@"got %i addresses", command.naddr);
+	if ([command.string hasPrefix:@">>"]) {
+		[self message:@"Appending not yet supported"];
+		return;
+	}
+
+	if ([command.string length] == 0) {
+		[doc saveDocument:self];
+	} else {
+		__block NSError *error = nil;
+		NSURL *newURL = [[ViDocumentController sharedDocumentController]
+		    normalizePath:command.string
+		       relativeTo:[self baseURL]
+			    error:&error];
+		if (error != nil) {
+			[NSApp presentError:error];
 			return;
 		}
-		if ([command.string length] == 0) {
-			[doc saveDocument:self];
-		} else {
-			NSError *error = nil;
-			NSURL *newURL = [[ViDocumentController sharedDocumentController]
-			    normalizePath:command.string
-			       relativeTo:[self baseURL]
-				    error:&error];
-			if (error != nil) {
-				[NSApp presentError:error];
-				return;
-			}
 
-			BOOL exists = NO;
-			/* FIXME: Aaaargh!!! I don't want to check for file:// vs sftp:// URLs _everywhere_! */
-			if ([newURL isFileURL]) {
-				exists = [[NSFileManager defaultManager] fileExistsAtPath:[newURL path]];
-			} else {
-#if 0
-				SFTPConnection *conn = [[SFTPConnectionPool sharedPool] connectionWithURL:newURL
-												    error:nil];
-				exists = [conn fileExistsAtPath:[newURL path]];
-#endif
-				exists = YES; // FIXME!
-			}
+		id<ViDeferred> deferred;
+		ViURLManager *urlman = [ViURLManager defaultManager];
+		__block NSDictionary *attributes = nil;
+		__block NSURL *normalizedURL = nil;
+		deferred = [urlman attributesOfItemAtURL:newURL
+				      onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
+			normalizedURL = _url;
+			attributes = _attrs;
+			if (![_err isFileNotFoundError])
+				error = _err;
+		}];
+		[deferred wait];
 
-			if (exists && (command.flags & E_C_FORCE) != E_C_FORCE) {
-				[self message:@"File exists (add ! to override)"];
-				return;
-			}
-
-			if ([doc saveToURL:newURL
-				    ofType:nil
-			  forSaveOperation:NSSaveToOperation
-				     error:&error] == NO) {
-				[NSApp presentError:error];
-			} else {
-				[self message:@"Wrote %@", newURL];
-			}
+		if (error) {
+			[self message:@"%@", [error localizedDescription]];
+			return;
 		}
+
+		if (normalizedURL && ![[attributes fileType] isEqualToString:NSFileTypeRegular]) {
+			[self message:@"%@ is not a regular file", normalizedURL];
+			return;
+		}
+
+		if (normalizedURL && (command.flags & E_C_FORCE) != E_C_FORCE) {
+			[self message:@"File exists (add ! to override)"];
+			return;
+		}
+
+		if ([doc saveToURL:newURL
+			    ofType:nil
+		  forSaveOperation:NSSaveAsOperation
+			     error:&error] == NO)
+			[self message:@"%@", [error localizedDescription]];
 	}
+}
+
+/* syntax: bd[elete] bufname */
+- (void)ex_bdelete:(ExCommand *)command
+{
+	if ((command.flags & E_C_FORCE) == E_C_FORCE)
+		[[windowController currentDocument] close];
+	else
+		[windowController closeCurrentDocumentAndWindow:NO];
 }
 
 - (void)ex_quit:(ExCommand *)command
 {
-	[windowController closeCurrentView];
+	if ((command.flags & E_C_FORCE) == E_C_FORCE)
+		[[windowController currentDocument] closeAndWindow:YES];
+	else
+		[windowController closeCurrentDocumentAndWindow:YES];
+	// FIXME: quit app if last window?
 }
 
 - (void)ex_wq:(ExCommand *)command
@@ -280,11 +303,37 @@
 		NSURL *url = [self parseExFilename:command.filename];
 		if (url) {
 			NSError *error = nil;
-			[[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-											       display:YES
-												 error:&error];
-			if (error)
+			ViDocument *doc;
+			doc = [[ViDocumentController sharedDocumentController]
+				openDocumentWithContentsOfURL:url
+						      display:YES
+							error:&error];
+			if (error) {
 				[self message:@"%@: %@", url, [error localizedDescription]];
+				return;
+			}
+		}
+	}
+}
+
+- (void)ex_tabedit:(ExCommand *)command
+{
+	if (command.filename == nil)
+		/* Re-open current file. Check E_C_FORCE in flags. */ ;
+	else {
+		NSURL *url = [self parseExFilename:command.filename];
+		if (url) {
+			NSError *error = nil;
+			ViDocument *doc;
+			doc = [[ViDocumentController sharedDocumentController]
+				openDocumentWithContentsOfURL:url
+						      display:NO
+							error:&error];
+			if (error) {
+				[self message:@"%@: %@", url, [error localizedDescription]];
+				return;
+			} else if (doc)
+				[windowController createTabForDocument:doc];
 		}
 	}
 }
@@ -295,6 +344,20 @@
 					 andOpen:[self parseExFilename:command.filename]
 			      orSwitchToDocument:nil] != nil;
 	return NO;
+}
+
+- (BOOL)ex_tabnew:(ExCommand *)command
+{
+	NSError *error = nil;
+	ViDocument *doc = [[ViDocumentController sharedDocumentController]
+	    openUntitledDocumentAndDisplay:YES error:&error];
+	doc.isTemporary = YES;
+	if (error) {
+		[self message:@"%@", [error localizedDescription]];
+		return NO;
+	}
+
+	return YES;
 }
 
 - (BOOL)ex_vnew:(ExCommand *)command
@@ -652,7 +715,7 @@
 
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",
-
+		@"prefertabs", @"prefertabs",
 		@"ignorecase", @"ic",
 		@"smartcase", @"scs",
 		@"number", @"nu",
@@ -671,7 +734,7 @@
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
-	    @"wrap", @"antialias", @"list", @"smarttab", nil];
+	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;
@@ -805,7 +868,7 @@
 	}
 
 	doc = [matches objectAtIndex:0];
-	if ([command.command->name isEqualToString:@"buffer"]) {
+	if ([command.command->name hasPrefix:@"b"]) {
 		if ([windowController currentDocument] != doc)
 			[windowController switchToDocument:doc];
 	} else if ([command.command->name isEqualToString:@"tbuffer"]) {

@@ -136,7 +136,7 @@
 		return nil;
 
 	ViDocumentView *docView = viewController;
-	ViDocumentView *newDocView = [[docView document] makeView];
+	ViDocumentView *newDocView = [[docView document] makeViewInWindow:viewController.window];
 	if (![self splitView:viewController withView:newDocView vertically:isVertical])
 		return nil;
 
@@ -147,7 +147,7 @@
 - (id<ViViewController>)replaceView:(id<ViViewController>)viewController
                        withDocument:(id)document
 {
-	id<ViViewController> newViewController = [document makeView];
+	id<ViViewController> newViewController = [document makeViewInWindow:viewController.window];
 
 	[self addView:newViewController];
 	[self removeView:viewController];

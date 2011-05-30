@@ -120,6 +120,7 @@
 	void (^cancelCallback)(SFTPRequest *);
 	SFTPConnection *connection;
 	BOOL cancelled;
+	BOOL finished;
 	SFTPRequest *subRequest;
 	CGFloat progress;
 	id<ViDeferredDelegate> delegate;
@@ -127,7 +128,7 @@
 @property (copy) void (^onResponse)(SFTPMessage *);
 @property (copy) void (^onCancel)(SFTPRequest *);
 @property (readwrite, assign) SFTPRequest *subRequest;
-@property (readwrite) BOOL cancelled;
+@property (readonly) BOOL cancelled;
 @property (readwrite) CGFloat progress;
 @property (readonly) uint32_t requestId;
 
@@ -140,6 +141,7 @@
 
 - (void)response:(SFTPMessage *)msg;
 - (void)cancel;
+- (void)wait;
 @end
 
 #pragma mark -

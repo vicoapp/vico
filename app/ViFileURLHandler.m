@@ -27,7 +27,7 @@
 	for (NSString *filename in files) {
 		NSDictionary *attrs;
 		NSURL *u = [aURL URLByAppendingPathComponent:filename];
-		NSString *p = [[u URLByResolvingSymlinksInPath] path];
+		NSString *p = [u path];
 		attrs = [fm attributesOfItemAtPath:p error:&error];
 		[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
 	}
@@ -59,7 +59,7 @@
 	else if ([path hasPrefix:@"/~"])
 		path = [NSHomeDirectory() stringByAppendingPathComponent:[path substringFromIndex:2]];
 	else
-		return aURL;
+		return [aURL absoluteURL];
 	return [[NSURL fileURLWithPath:path] absoluteURL];
 }
 

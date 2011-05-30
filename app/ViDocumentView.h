@@ -10,6 +10,7 @@
 	IBOutlet NSScrollView *scrollView;
 	ViDocument *document;
 	ViDocumentTabController *tabController;
+	NSWindow *window;
 }
 
 @property(readonly) ViDocument *document;

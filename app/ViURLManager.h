@@ -8,6 +8,7 @@
 @protocol ViDeferred <NSObject>
 @required
 - (void)cancel;
+- (void)wait;
 @property (readwrite, assign) id<ViDeferredDelegate> delegate;
 
 @optional

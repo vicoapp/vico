@@ -614,6 +614,29 @@ toExpression:(id)expr
 	[self unmap:keySequence scope:nil];
 }
 
+- (void)unset:(NSString *)keySequence
+        scope:(NSString *)scopeSelector
+{
+	NSArray *keyCodes = [keySequence keyCodes];
+	if (keyCodes == nil) {
+		INFO(@"invalid key sequence: %@", keySequence);
+		return;
+	}
+
+	for (ViMapping *m in actions)
+		if ([m.keySequence isEqual:keyCodes] &&
+		    [m.scopeSelector isEqualToString:(scopeSelector ?: @"")] &&
+		    ![m isMacro]) {
+			[actions removeObject:m];
+			break;
+		}
+}
+
+- (void)unset:(NSString *)keySequence
+{
+	[self unset:keySequence scope:nil];
+}
+
 - (void)setKey:(NSString *)keySequence
       toAction:(SEL)selector
          flags:(NSUInteger)flags

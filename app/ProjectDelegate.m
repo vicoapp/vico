@@ -59,18 +59,6 @@
 		return [url lastPathComponent];
 }
 
-- (NSString *)pathRelativeToURL:(NSURL *)relURL
-{
-	NSString *root = [relURL path];
-	NSString *path = [url path];
-	if ([path length] > [root length]) {
-		NSRange r = NSMakeRange([root length] + 1,
-		    [path length] - [root length] - 1);
-		return [path substringWithRange:r];
-	}
-	return path;
-}
-
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ProjectFile: %@>", url];
@@ -176,6 +164,13 @@
 				NSDictionary *attributes = [entry objectAtIndex:1];
 				if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
 					NSURL *curl = [url URLByAppendingPathComponent:filename];
+					if ([curl isFileURL]) {
+						/*
+						 * XXX: resolve symlinks for all URL types!
+						 */
+						NSURL *symurl = [curl URLByResolvingSymlinksInPath];
+						attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:nil];
+					}
 					[children addObject:[ProjectFile fileWithURL:curl attributes:attributes]];
 				}
 			}

@@ -122,6 +122,7 @@
 	    [NSNumber numberWithBool:NO], @"showguide",
 	    [NSNumber numberWithBool:YES], @"wrap",
 	    [NSNumber numberWithBool:YES], @"antialias",
+	    [NSNumber numberWithBool:YES], @"prefertabs",
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:11.0], @"fontsize",
 	    @"vim", @"undostyle",
@@ -420,6 +421,15 @@ additionalBindings:(NSDictionary *)bindings
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
 	for (NSMenuItem *item in [menu itemArray]) {
+		if (item == closeDocumentMenuItem) {
+			id<ViViewController> viewController = [[ViWindowController currentWindowController] currentView];
+			if (viewController == nil)
+				[item setTitle:@"Close Document"];
+			else
+				[item setTitle:[NSString stringWithFormat:@"Close \"%@\"", [viewController title]]];
+			continue;
+		}
+
 		NSString *title = nil;
 		if ([item tag] == 4000) {
 			title = [item title];

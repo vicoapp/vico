@@ -10,9 +10,11 @@
 	NSUInteger receivedContentLength;
 	NSInteger expectedContentLength;
 	id<ViDeferredDelegate> delegate;
+	BOOL finished;
 }
 
 - (void)cancel;
+- (void)wait;
 - (CGFloat)progress;
 @end
 

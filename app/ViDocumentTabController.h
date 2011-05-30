@@ -11,6 +11,7 @@ enum ViViewOrderingMode {
 };
 
 @protocol ViViewController <NSObject>
+@property(readwrite, assign) NSWindow *window;
 @property(readonly) NSView *view;
 @property(readonly) NSView *innerView;
 @property(readwrite, assign) ViDocumentTabController *tabController;

@@ -28,6 +28,7 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSMenu *encodingMenu;
 	IBOutlet NSTextField *scriptInput;
 	IBOutlet NSTextView *scriptOutput;
+	IBOutlet NSMenuItem *closeDocumentMenuItem;
 	NSConnection *shellConn;
 }
 

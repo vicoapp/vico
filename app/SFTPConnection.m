@@ -149,6 +149,7 @@ resp2txt(int type)
 		responseCallback(msg);
 	else
 		DEBUG(@"NULL response callback for request id %u", requestId);
+	finished = YES;
 }
 
 - (void)cancel
@@ -160,6 +161,7 @@ resp2txt(int type)
 
 	DEBUG(@"cancelling request %@", self);
 	cancelled = YES;
+	finished = YES;
 	[connection dequeueRequest:requestId];
 
 	if (cancelCallback) {
@@ -172,6 +174,26 @@ resp2txt(int type)
 		[subRequest cancel];
 		subRequest = nil;
 	}
+}
+
+- (void)wait
+{
+	while (!finished) {
+		DEBUG(@"request %@ not finished yet", self);
+		[[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+	}
+
+	while (subRequest && !cancelled) {
+		DEBUG(@"waiting for subrequest %@", subRequest);
+		SFTPRequest *req = subRequest;
+		[req wait];
+		if (subRequest == req) {
+			DEBUG(@"Warning: request %@ didn't reset subRequest after %@", self, req);
+			break;
+		}
+	}
+
+	DEBUG(@"request %@ is finished", self);
 }
 
 - (NSString *)description
@@ -376,9 +398,7 @@ resp2txt(int type)
 		[attributes setObject:n forKey:NSFilePosixPermissions];
 
 		NSString *fileType;
-		if (S_ISREG(perm))
-			fileType = NSFileTypeRegular;
-		else if (S_ISDIR(perm))
+		if (S_ISDIR(perm))
 			fileType = NSFileTypeDirectory;
 		else if (S_ISLNK(perm))
 			fileType = NSFileTypeSymbolicLink;
@@ -388,6 +408,8 @@ resp2txt(int type)
 			fileType = NSFileTypeBlockSpecial;
 		else if (S_ISCHR(perm))
 			fileType = NSFileTypeCharacterSpecial;
+		else if (S_ISREG(perm))
+			fileType = NSFileTypeRegular;
 		else
 			fileType = NSFileTypeUnknown;
 
@@ -796,6 +818,7 @@ resp2txt(int type)
 			transfer_buflen = MIN(transfer_buflen, 20480);
 
 		req.subRequest = [self realpath:@"." onResponse:^(NSString *filename, NSDictionary *attributes, NSError *error) {
+			req.subRequest = nil;
 			if (!error) {
 				DEBUG(@"resolved home directory to %@", filename);
 				home = filename;
@@ -895,7 +918,7 @@ resp2txt(int type)
 	else if ([path hasPrefix:@"/~"])
 		path = [home stringByAppendingPathComponent:[path substringFromIndex:2]];
 	else
-		return aURL;
+		return [aURL absoluteURL];
 	return [[NSURL URLWithString:path relativeToURL:aURL] absoluteURL];
 }
 
@@ -906,7 +929,7 @@ resp2txt(int type)
 	url = [self normalizeURL:url];
 
 	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = Block_copy(responseCallback);
-	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_STAT format:"s", [url path]];
+	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_LSTAT format:"s", [url path]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSDictionary *attributes;
 		NSError *error;
@@ -953,8 +976,8 @@ resp2txt(int type)
 	}];
 }
 
-- (void)closeHandle:(NSData *)handle
-	 onResponse:(void (^)(NSError *))responseCallback
+- (SFTPRequest *)closeHandle:(NSData *)handle
+		  onResponse:(void (^)(NSError *))responseCallback
 {
 	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
 
@@ -967,6 +990,8 @@ resp2txt(int type)
 			originalCallback(nil);
 	};
 	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
+
+	return req;
 }
 
 - (SFTPRequest *)contentsOfDirectoryAtURL:(NSURL *)aURL
@@ -1010,11 +1035,13 @@ resp2txt(int type)
 			NSError *error;
 			uint32_t count;
 			if (msg.type == SSH2_FXP_STATUS) {
-				if (![msg expectStatus:SSH2_FX_EOF error:&error])
+				if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
+					openRequest.subRequest = nil;
 					originalCallback(nil, error);
-				else {
-					[self closeHandle:handle
-					       onResponse:^(NSError *error) {
+				} else {
+					openRequest.subRequest = [self closeHandle:handle
+									onResponse:^(NSError *error) {
+						openRequest.subRequest = nil;
 						if (error)
 							originalCallback(nil, error);
 						else
@@ -1023,6 +1050,7 @@ resp2txt(int type)
 				}
 				return;
 			} else if (msg.type != SSH2_FXP_NAME || ![msg getUnsigned:&count]) {
+				openRequest.subRequest = nil;
 				originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 				[self close];
 				return;
@@ -1034,6 +1062,7 @@ resp2txt(int type)
 				if (![msg getString:&filename] ||
 				    ![msg getString:NULL] || /* ignore longname */
 				    ![msg getAttributes:&attributes]) {
+					openRequest.subRequest = nil;
 					originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 					[self close];
 					return;
@@ -1197,9 +1226,11 @@ resp2txt(int type)
 						return;
 					}
 					DEBUG(@"%s", "got EOF, closing handle");
-					[self closeHandle:handle
-						  onResponse:^(NSError *error) { originalCallback(normalizedURL, attributes, error); }];
-					statRequest.subRequest = nil;
+					statRequest.subRequest = [self closeHandle:handle
+									onResponse:^(NSError *error) {
+						statRequest.subRequest = nil;
+						originalCallback(normalizedURL, attributes, error);
+					}];
 					/*
 					 * Done downloading file.
 					 */
@@ -1317,10 +1348,12 @@ resp2txt(int type)
 
 			if (offset == [data length]) {
 				DEBUG(@"finished uploading %lu bytes, closing file", [data length]);
-				[self closeHandle:handle
-				       onResponse:^(NSError *error) { originalCallback(error); }];
-				openRequest.subRequest = nil;
-				 return;
+				openRequest.subRequest = [self closeHandle:handle
+								onResponse:^(NSError *error) {
+					openRequest.subRequest = nil;
+					originalCallback(error);
+				}];
+				return;
 			}
 
 			/* Dispatch next read request. */
@@ -1450,12 +1483,14 @@ resp2txt(int type)
 			renameRequest.subRequest = [self renameItemAtPath:oldPath toPath:newPath onResponse:^(NSError *error) {
 				if (!newPathExists) {
 					/* If the new path didn't exist, we're done. */
+					renameRequest.subRequest = nil;
 					originalCallback(error);
 					return;
 				}
 
 				/* Otherwise, we must clean up the temporary random filename. */
 				renameRequest.subRequest = [self removeItemAtPath:randomFilename onResponse:^(NSError *error) {
+					renameRequest.subRequest = nil;
 					originalCallback(error);
 				}];
 			}];
@@ -1485,6 +1520,7 @@ resp2txt(int type)
 							   toFile:randomFilename
 						       onResponse:^(NSError *error) {
 				if (error) {
+					uploadRequest.subRequest = nil;
 					originalCallback(url, nil, error);
 					return;
 				}
@@ -1493,6 +1529,7 @@ resp2txt(int type)
 										 onResponse:^(NSError *error) {
 					uploadRequest.subRequest = [self attributesOfItemAtURL:url
 										    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+						uploadRequest.subRequest = nil;
 						originalCallback(normalizedURL, attributes, error);
 					}];
 				}];
@@ -1500,12 +1537,14 @@ resp2txt(int type)
 		} else {
 			/* It was a new file, upload successful. Or other error. */
 			if (error) {
+				uploadRequest.subRequest = nil;
 				originalCallback(url, nil, error);
 				return;
 			}
 
 			uploadRequest.subRequest = [self attributesOfItemAtURL:url
 								    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+				uploadRequest.subRequest = nil;
 				originalCallback(normalizedURL, attributes, error);
 			}];
 		}

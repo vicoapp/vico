@@ -121,6 +121,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	     ofType:(NSString *)typeName
 	      error:(NSError **)outError
 {
+	DEBUG(@"read from %@", absoluteURL);
 	__block BOOL firstChunk = YES;
 
 	void (^dataCallback)(NSData *data) = ^(NSData *data) {
@@ -159,14 +160,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		loader = nil;
 		if (error) {
 			/* If the file doesn't exist, treat it as an untitled file. */
-			if (([[error domain] isEqualToString:NSPOSIXErrorDomain] && [error code] == ENOENT) ||
-			    ([[error domain] isEqualToString:NSURLErrorDomain] && [error code] == (NSInteger)NSURLErrorFileDoesNotExist) ||
-			    ([[error domain] isEqualToString:ViErrorDomain] && [error code] == SSH2_FX_NO_SUCH_FILE)) {
+			if ([error isFileNotFoundError]) {
 				DEBUG(@"treating non-existent file %@ as untitled file", normalizedURL);
 				[self setFileURL:normalizedURL];
 				[self message:@"%@: new file", [self title]];
 				returnError = nil;
-			} else if ([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError) {
+			} else if ([error isOperationCancelledError]) {
 				[self message:@"cancelled loading of %@", normalizedURL];
 				[self setFileURL:nil];
 			} else {
@@ -212,9 +211,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	if (outError)
 		*outError = returnError;
-
-//	if (deferred)
-//		[self message:@"loading %@...", absoluteURL];
 
 	return returnError == nil ? YES : NO;
 }
@@ -298,19 +294,29 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)removeView:(ViDocumentView *)aDocumentView
 {
+	if ([views count] == 1)
+		hiddenView = aDocumentView;
 	[views removeObject:aDocumentView];
 }
 
 - (void)addView:(ViDocumentView *)docView
 {
 	[views addObject:docView];
+	hiddenView = nil;
 }
 
-- (ViDocumentView *)makeView
+- (ViDocumentView *)makeViewInWindow:(NSWindow *)aWindow
 {
+	if (hiddenView) {
+		hiddenView.window = aWindow;
+		return hiddenView;
+	}
+
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	[self addView:documentView];
+
+	documentView.window = aWindow;
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -373,26 +379,91 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"didRecover = %s", didRecover ? "YES" : "NO");
 }
 
-- (void)saveDocument:(id)sender
+- (void)continueSavingAfterError:(NSError *)error
 {
-	DEBUG(@"saving %@, url is %@, type is %@", sender, [self fileURL], [self fileType]);
+	BOOL didSave = NO;
+	if (error == nil) {
+		didSave = [self saveToURL:[self fileURL]
+				   ofType:[self fileType]
+			 forSaveOperation:NSSaveOperation
+				    error:&error];
+	}
+
+	if (error && !([[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] == NSUserCancelledError))
+		[NSApp presentError:error];
+
+	DEBUG(@"calling delegate %@ with selector %@", didSaveDelegate, NSStringFromSelector(didSaveSelector));
+	if (didSaveDelegate && didSaveSelector) {
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
+		    [didSaveDelegate methodSignatureForSelector:didSaveSelector]];
+		[invocation setSelector:didSaveSelector];
+		[invocation setArgument:&self atIndex:2];
+		[invocation setArgument:&didSave atIndex:3];
+		[invocation setArgument:&didSaveContext atIndex:4];
+		[invocation invokeWithTarget:didSaveDelegate];
+	}
+}
+
+- (void)fileModifiedAlertDidEnd:(NSAlert *)alert
+		     returnCode:(NSInteger)returnCode
+		    contextInfo:(void *)contextInfo
+{
+	NSError *error = nil;
+	if (returnCode == NSAlertFirstButtonReturn)
+		error = [ViError operationCancelled];
+	[self continueSavingAfterError:error];
+}
+
+- (void)saveDocumentWithDelegate:(id)delegate
+		 didSaveSelector:(SEL)selector
+		     contextInfo:(void *)contextInfo
+{
 	if ([self fileURL]) {
-		NSError *error = nil;
-		if (![self writeSafelyToURL:[self fileURL]
-				     ofType:[self fileType]
-			   forSaveOperation:NSSaveOperation
-				      error:&error]) {
-			[NSApp presentError:error];
-		}
+		__block NSError *error = nil;
+		__block NSDictionary *attributes = nil;
+		ViURLManager *urlman = [ViURLManager defaultManager];
+		id<ViDeferred> deferred = [urlman attributesOfItemAtURL:[self fileURL]
+							   onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
+			if (_err && ![_err isFileNotFoundError])
+				error = _err;
+			else
+				attributes = _attrs;
+		}];
+
+		[deferred wait];
+		DEBUG(@"done getting attributes of %@, error is %@", [self fileURL], error);
+
+		didSaveDelegate = delegate;
+		didSaveSelector = selector;
+		didSaveContext = contextInfo;
+
+		if (!error && attributes && ![[attributes fileType] isEqualToString:NSFileTypeRegular])
+			error = [ViError errorWithFormat:@"%@ is not a regular file.", [[self fileURL] lastPathComponent]];
+
+		if (!error && attributes && ![[attributes fileModificationDate] isEqual:[self fileModificationDate]]) {
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"This document’s file has been changed by another application since you opened or saved it."];
+			[alert addButtonWithTitle:@"Don't Save"];
+			[alert addButtonWithTitle:@"Save"];
+			[alert setInformativeText:@"The changes made by the other application will be lost if you save. Save anyway?"];
+			[alert beginSheetModalForWindow:[windowController window]
+					  modalDelegate:self
+					 didEndSelector:@selector(fileModifiedAlertDidEnd:returnCode:contextInfo:)
+					    contextInfo:nil];
+		} else
+			[self continueSavingAfterError:error];
 	} else
-		[super saveDocument:sender];
+		[super saveDocumentWithDelegate:delegate
+				didSaveSelector:didSaveSelector
+				    contextInfo:contextInfo];
 }
 
 - (BOOL)writeSafelyToURL:(NSURL *)url
-                  ofType:(NSString *)typeName
-        forSaveOperation:(NSSaveOperationType)saveOperation
-                   error:(NSError **)outError
+		  ofType:(NSString *)typeName
+	forSaveOperation:(NSSaveOperationType)saveOperation
+		   error:(NSError **)outError
 {
+	DEBUG(@"write to %@", url);
 	retrySaveOperation = NO;
 
 	if (![[textStorage string] canBeConvertedToEncoding:encoding]) {
@@ -409,9 +480,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		NSError *err = [NSError errorWithDomain:ViErrorDomain code:1 userInfo:userInfo];
 		if (![self presentError:err]) {
 			if (outError)	/* Suppress the callers error. */
-				*outError = [NSError errorWithDomain:NSCocoaErrorDomain
-				                                code:NSUserCancelledError
-				                            userInfo:nil];
+				*outError = [ViError operationCancelled];
 			return NO;
 		}
 
@@ -424,26 +493,47 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		/* Should not happen. We've already checked for encoding problems. */
 		return NO;
 
-	[[ViURLManager defaultManager] writeDataSafely:data
-						 toURL:url
-					  onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
-		if (error)
-			[NSApp presentError:error];
-		else {
-			[self setFileURL:normalizedURL];
-			[self setFileModificationDate:[attributes fileModificationDate]];
-			[self updateChangeCount:NSChangeCleared];
-			[self message:@"%@: wrote %lu byte", url, [data length]];
+	__block NSError *returnError = nil;
+	ViURLManager *urlman = [ViURLManager defaultManager];
+	id<ViDeferred> deferred = [urlman writeDataSafely:data
+						    toURL:url
+					     onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+		if (error) {
+			returnError = error;
+		} else {
+			[self message:@"%@: wrote %lu byte", normalizedURL, [data length]];
+			if (saveOperation == NSSaveOperation || saveOperation == NSSaveAsOperation) {
+				DEBUG(@"setting normalized URL %@", normalizedURL);
+				[self setFileURL:normalizedURL];
+				[self setFileModificationDate:[attributes fileModificationDate]];
+				[self updateChangeCount:NSChangeCleared];
+				[proxy emit:@"didSave" with:self, nil];
+			}
 			isTemporary = NO;
-			[proxy emit:@"didSave" with:self, nil];
 		}
 	}];
 
-	if (outError)
-		*outError = [NSError errorWithDomain:NSCocoaErrorDomain
-						code:NSUserCancelledError
-					    userInfo:nil];
-	return NO;
+	[deferred wait];
+	DEBUG(@"done saving file, error is %@", returnError);
+
+	if (returnError) {
+		if (outError)
+			*outError = returnError;
+		return NO;
+	}
+
+	return YES;
+}
+
+- (BOOL)saveToURL:(NSURL *)absoluteURL
+           ofType:(NSString *)typeName
+ forSaveOperation:(NSSaveOperationType)saveOperation
+            error:(NSError **)outError
+{
+	return [self writeSafelyToURL:absoluteURL
+			       ofType:typeName
+		     forSaveOperation:saveOperation
+				error:outError];
 }
 
 - (BOOL)addData:(NSData *)data
@@ -548,6 +638,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)setFileURL:(NSURL *)absoluteURL
 {
+	DEBUG(@"set url %@ (was %@)", absoluteURL, [self fileURL]);
 	if ([absoluteURL isEqual:[self fileURL]])
 		return;
 
@@ -563,8 +654,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return windowController;
 }
 
-- (void)close
+- (void)closeAndWindow:(BOOL)canCloseWindow
 {
+	DEBUG(@"closing, w/window: %s", canCloseWindow ? "YES" : "NO");
 	if (loader) {
 		DEBUG(@"cancelling load callback %@", loader);
 		[loader cancel];
@@ -572,7 +664,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	closed = YES;
-	[windowController closeDocument:self];
+	[windowController closeDocument:self andWindow:canCloseWindow];
 
 	/* Remove the window controller so the document doesn't automatically
 	 * close the window.
@@ -581,6 +673,32 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super close];
 	[proxy emitDelayed:@"didClose" with:self, nil];
 }
+
+- (void)close
+{
+	[self closeAndWindow:YES];
+}
+
+- (void)shouldCloseWindowController:(NSWindowController *)aWindowController
+			   delegate:(id)delegate
+		shouldCloseSelector:(SEL)shouldCloseSelector
+			contextInfo:(void *)contextInfo
+{
+	DEBUG(@"should close window controller %@?", aWindowController);
+
+	// BOOL flag = [[(ViWindowController *)aWindowController documents] count] == 0;
+	BOOL flag = NO;
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[delegate methodSignatureForSelector:shouldCloseSelector]];
+	[invocation setSelector:shouldCloseSelector];
+	[invocation setArgument:&self atIndex:2];
+	[invocation setArgument:&flag atIndex:3];
+	[invocation setArgument:&contextInfo atIndex:4];
+	[invocation invokeWithTarget:delegate];
+
+	if ([aWindowController windowShouldClose:[aWindowController window]])
+		[[aWindowController window] close];
+}
+
 
 #pragma mark -
 #pragma mark Syntax parsing

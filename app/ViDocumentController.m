@@ -14,6 +14,8 @@
 
 - (void)callCloseAllDelegateShouldTerminate:(BOOL)flag
 {
+	DEBUG(@"should%s terminate", flag ? "" : " NOT");
+	DEBUG(@"calling delegate %@ selector %@", closeAllDelegate, NSStringFromSelector(closeAllSelector));
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[closeAllDelegate methodSignatureForSelector:closeAllSelector]];
 	[invocation setSelector:closeAllSelector];
 	[invocation setArgument:&self atIndex:2];
@@ -24,6 +26,8 @@
 
 - (void)closeNextDocumentInWindow:(NSWindow *)window
 {
+	DEBUG(@"window %@", window);
+
 	if (window != nil && closeAllWindows && [[(ViWindowController *)[window windowController] documents] count] == 0)
 		window = nil;	/* Proceed with next window. */
 
@@ -47,6 +51,7 @@
 - (void)windowDidEndSheet:(NSNotification *)notification
 {
 	NSWindow *window = [notification object];
+	DEBUG(@"window %@ ended a sheet", window);
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 							name:NSWindowDidEndSheetNotification
 						      object:window];
@@ -58,6 +63,8 @@
      shouldClose:(BOOL)shouldClose
      contextInfo:(void *)contextInfo
 {
+	DEBUG(@"%s close document %@", shouldClose ? "SHOULD" : "Should NOT", doc);
+
 	if (!shouldClose) {
 		[self callCloseAllDelegateShouldTerminate:NO];
 		return;
@@ -82,6 +89,7 @@
 		  didCloseAllSelector:(SEL)didCloseAllSelector
 			  contextInfo:(void *)contextInfo
 {
+	DEBUG(@"%s", "closing all documents");
 	closeAllDelegate = delegate;
 	closeAllSelector = didCloseAllSelector;
 	closeAllContextInfo = contextInfo;
@@ -97,13 +105,28 @@
 
 - (void)closeNextDocumentInSet:(NSMutableSet *)set force:(BOOL)force
 {
-	ViDocument *doc = [set anyObject];
-	if (doc == nil) {
+	if ([set count] == 0) {
 		[self callCloseAllDelegateShouldTerminate:YES];
 		return;
 	}
 
-	NSWindow *window = [[doc windowController] window];
+	ViDocument *doc = nil;
+	NSWindow *window = nil;
+
+#if 0
+	/* Prefer to close a document in the current window. */
+	for (doc in set) {
+		if ([[[ViWindowController currentWindowController] documents] containsObject:doc]) {
+			window = [[ViWindowController currentWindowController] window];
+			break;
+		}
+	}
+#endif
+
+	if (doc == nil)
+		doc = [set anyObject];
+	if (window == nil)
+		window = [[doc windowController] window];
 
 	if (force || [window attachedSheet] == nil) {
 		[[doc windowController] selectDocument:doc];
@@ -156,6 +179,8 @@
 	closeAllSelector = didCloseAllSelector;
 	closeAllContextInfo = contextInfo;
 
+	DEBUG(@"closing documents in set %@", set);
+
 	[self closeNextDocumentInSet:set force:NO];
 }
 
@@ -177,13 +202,15 @@
 
 	ViWindowController *windowController = [ViWindowController currentWindowController];
 
+	absoluteURL = [absoluteURL URLByResolvingSymlinksInPath];
+
 	id doc = [self documentForURL:absoluteURL];
 	if (doc) {
 		if (displayDocument) {
 			if ([doc windowController] == windowController)
 				[[doc windowController] selectDocument:doc];
 			else
-				[windowController createTabForDocument:doc];
+				[windowController addNewTab:doc];
 		}
 		return doc;
 	}
@@ -233,15 +260,11 @@
 	NSURL *url = [NSURL URLWithString:escapedFilename relativeToURL:relURL];
 	NSURL *normalizedURL = [[ViURLManager defaultManager] normalizeURL:url];
 	DEBUG(@"normalized %@ -> %@", url, normalizedURL);
-	return normalizedURL;
+	NSURL *resolvedURL = [normalizedURL URLByResolvingSymlinksInPath];
+	DEBUG(@"resolved %@ -> %@", normalizedURL, resolvedURL);
+	return resolvedURL;
 }
 
-
-
-- (IBAction)closeCurrentDocument:(id)sender
-{
-	[[ViWindowController currentWindowController] closeCurrentView];
-}
 
 - (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(NSArray *)extensions
 {

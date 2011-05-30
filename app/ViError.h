@@ -14,6 +14,11 @@ enum {
 	ViErrorParserInternal
 };
 
+@interface NSError (additions)
+- (BOOL)isFileNotFoundError;
+- (BOOL)isOperationCancelledError;
+@end
+
 @interface ViError : NSObject
 {
 }

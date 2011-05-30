@@ -6,6 +6,7 @@
 {
 	IBOutlet ViWebView *webView;
 	ViDocumentTabController *tabController;
+	NSWindow *window;
 }
 
 @property(readwrite, assign) ViDocumentTabController *tabController;

@@ -1,4 +1,29 @@
 #import "ViError.h"
+#import "SFTPConnection.h"
+
+@implementation NSError (additions)
+
+- (BOOL)isFileNotFoundError
+{
+	if (([[self domain] isEqualToString:NSPOSIXErrorDomain] && [self code] == ENOENT) ||
+	    ([[self domain] isEqualToString:NSURLErrorDomain] && [self code] == (NSInteger)NSURLErrorFileDoesNotExist) ||
+	    ([[self domain] isEqualToString:ViErrorDomain] && [self code] == SSH2_FX_NO_SUCH_FILE) ||
+	    ([[self domain] isEqualToString:NSCocoaErrorDomain] && ([self code] == NSFileReadNoSuchFileError) || [self code] == NSFileNoSuchFileError)) {
+		    return YES;
+	}
+
+	return NO;
+}
+
+- (BOOL)isOperationCancelledError
+{
+	if ([[self domain] isEqualToString:NSCocoaErrorDomain] && [self code] == NSUserCancelledError)
+		return YES;
+	return NO;
+}
+
+@end
+
 
 @implementation ViError
 

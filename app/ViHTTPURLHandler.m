@@ -41,6 +41,7 @@
 	connData = nil;
 	conn = nil;
 	request = nil;
+	finished = YES;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -87,8 +88,20 @@
 - (void)cancel
 {
 	[conn cancel];
+
 	/* Prevent error display. */
-	[self finishWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil]];
+	[self finishWithError:[NSError errorWithDomain:NSCocoaErrorDomain
+                                                  code:NSUserCancelledError
+                                              userInfo:nil]];
+}
+
+- (void)wait
+{
+	while (!finished) {
+		DEBUG(@"request %@ not finished yet", self);
+		[[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+	}
+	DEBUG(@"request %@ is finished", self);
 }
 
 @end
@@ -114,7 +127,7 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
-	return aURL;
+	return [aURL absoluteURL];
 }
 
 - (id<ViDeferred>)dataWithContentsOfURL:(NSURL *)aURL

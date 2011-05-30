@@ -1,3 +1,4 @@
+#define FORCE_DEBUG
 #import "ViWindowController.h"
 #import "PSMTabBarControl.h"
 #import "ViDocument.h"
@@ -25,7 +26,11 @@ static ViWindowController	*currentWindowController = nil;
 - (void)didSelectViewController:(id<ViViewController>)viewController;
 - (ViDocumentTabController *)selectedTabController;
 - (void)closeDocumentView:(id<ViViewController>)viewController
-         canCloseDocument:(BOOL)canCloseDocument;
+	 canCloseDocument:(BOOL)canCloseDocument
+	   canCloseWindow:(BOOL)canCloseWindow;
+- (void)documentController:(NSDocumentController *)docController
+	       didCloseAll:(BOOL)didCloseAll
+	     tabController:(void *)tabController;
 @end
 
 
@@ -160,7 +165,7 @@ static ViWindowController	*currentWindowController = nil;
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];
 	[tabBar setStyleNamed:@"Metal"];
-	[tabBar setCanCloseOnlyTab:YES];
+	[tabBar setCanCloseOnlyTab:NO];
 	[tabBar setHideForSingleTab:[[NSUserDefaults standardUserDefaults] boolForKey:@"hidetab"]];
 	// FIXME: add KVC observer for the 'hidetab' option
 	[tabBar setPartnerView:splitView];
@@ -294,7 +299,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document
 {
-	ViDocumentView *docView = [document makeView];
+	ViDocumentView *docView = [document makeViewInWindow:[self window]];
 	[self createTabWithViewController:docView];
 	return docView;
 }
@@ -325,7 +330,11 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	[self addDocument:document];
-	[self createTabForDocument:document];
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
+	    [tabView numberOfTabViewItems] == 0)
+		[self createTabForDocument:document];
+	else
+		[self switchToDocument:document];
 
 	if (closeThisDocument) {
 		[closeThisDocument close];
@@ -456,24 +465,58 @@ static ViWindowController	*currentWindowController = nil;
                didCloseAll:(BOOL)didCloseAll
                contextInfo:(void *)contextInfo
 {
-	if (didCloseAll)
-		[[self window] close];
+	DEBUG(@"force closing all views: %s", didCloseAll ? "YES" : "NO");
+	if (!didCloseAll)
+		return;
+
+	while ([tabView numberOfTabViewItems] > 0) {
+		NSTabViewItem *item = [tabView tabViewItemAtIndex:0];
+		ViDocumentTabController *tabController = [item identifier];
+		[self documentController:[ViDocumentController sharedDocumentController]
+			     didCloseAll:YES
+			   tabController:tabController];
+	}
 }
 
 - (BOOL)windowShouldClose:(id)window
 {
-	[[self currentDocument] close];
-	if ([documents count] == 0)
-		return YES;
+	DEBUG(@"documents = %@", documents);
+
+#if 0
+	/* Close the current document first to avoid unecessary document switching. */
+	if ([[self currentDocument] isDocumentEdited]) {
+		[[self currentDocument] close];
+		if ([documents count] == 0)
+			return YES;
+	}
+#endif
 
 	NSMutableSet *set = [[NSMutableSet alloc] init];
-	for (ViDocument *doc in [[window windowController] documents])
-		[set addObject:doc];
+	for (ViDocument *doc in documents) {
+		INFO(@"got doc %@", doc);
+		if ([set containsObject:doc])
+			continue;
+		if (![doc isDocumentEdited])
+			continue;
 
-	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
+		/* Check if this document is open in another window. */
+		INFO(@"checking views %@", [doc views]);
+		ViDocumentView *otherDocView;
+		for (otherDocView in [doc views])
+			if (otherDocView.window != window)
+				break;
+		if (otherDocView != nil) {
+			INFO(@"got other doc view %@, window %@ != %@", otherDocView, otherDocView.window, window);
+			continue;
+		}
+
+		[set addObject:doc];
+	}
+
+	[[ViDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
 							    didCloseAllSelector:@selector(documentController:didCloseAll:contextInfo:)
-								    contextInfo:NULL];
+								    contextInfo:window];
 	return NO;
 }
 
@@ -481,6 +524,7 @@ static ViWindowController	*currentWindowController = nil;
 {
 	if (currentWindowController == self)
 		currentWindowController = nil;
+	DEBUG(@"will close, got documents: %@", documents);
 	[[self project] close];
 	[windowControllers removeObject:self];
 	[tabBar setDelegate:nil];
@@ -498,27 +542,22 @@ static ViWindowController	*currentWindowController = nil;
 	currentView = viewController;
 }
 
+/*
+ * Closes a tab. All views in it should be closed already.
+ */
 - (void)closeTabController:(ViDocumentTabController *)tabController
 {
+	DEBUG(@"closing tab controller %@", tabController);
+
 	NSInteger ndx = [tabView indexOfTabViewItemWithIdentifier:tabController];
 	if (ndx != NSNotFound) {
 		NSTabViewItem *item = [tabView tabViewItemAtIndex:ndx];
 		[tabView removeTabViewItem:item];
 		[self tabView:tabView didCloseTabViewItem:item];
-
-		while ([[tabController views] count] > 0) {
-			id<ViViewController> viewController;
-			viewController  = [[tabController views] objectAtIndex:0];
-			if ([viewController isKindOfClass:[ViDocumentView class]]) {
-				ViDocumentView *docView = viewController;
-				ViDocument *doc = [docView document];
-				if ([[doc views] count] == 1) {
-					[doc close];
-					continue;
-				}
-			}
-			[[viewController tabController] closeView:viewController];
-		}
+#ifndef NO_DEBUG
+		if ([[tabController views] count] > 0)
+			DEBUG(@"WARNING: got %lu views left in tab", [[tabController views] count]);
+#endif
 	}
 }
 
@@ -526,40 +565,37 @@ static ViWindowController	*currentWindowController = nil;
      shouldClose:(BOOL)shouldClose
      contextInfo:(void *)contextInfo
 {
-	if (!shouldClose)
-		return;
-
-	[doc close];
+	if (shouldClose)
+		[(ViDocument *)doc closeAndWindow:(intptr_t)contextInfo];
 }
 
-/*
- * Called by the ViDocumentController when user presses command-w.
- *
- * Close the current view. If this is the last view of the enclosed document,
- * close the document too.
- *
- * If this view is the last in a tab, the tab is closed.
- *
- * If the tab is the last one, either:
- *  a) if there are no more open documents, close the window.
- *  b) bring in one of the other hidden documents into this view. (??)
- */
-- (void)closeCurrentView
+- (IBAction)closeCurrentTab:(id)sender
 {
-	id<ViViewController> viewController = [self currentView];
+	[self closeCurrentTab];
+}
 
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocument *doc = [(ViDocumentView *)viewController document];
-		if ([[doc views] count] == 1) {
-			// closing the last view, close the document
-			[doc canCloseDocumentWithDelegate:self
-			              shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
-			                      contextInfo:viewController];
-			return;
-		}
+- (IBAction)closeCurrentDocument:(id)sender
+{
+	[self closeCurrentDocumentAndWindow:NO];
+}
+
+- (void)closeCurrentTab
+{
+	[self tabView:tabView shouldCloseTabViewItem:[tabView selectedTabViewItem]];
+}
+
+- (void)closeCurrentDocumentAndWindow:(BOOL)canCloseWindow
+{
+	ViDocument *doc = [self currentDocument];
+	if (doc) {
+		[doc canCloseDocumentWithDelegate:self
+			      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
+				      contextInfo:(void *)(intptr_t)canCloseWindow];
+	} else {
+		[self closeDocumentView:[self currentView]
+		       canCloseDocument:NO
+			 canCloseWindow:canCloseWindow];
 	}
-
-	[self closeDocumentView:viewController canCloseDocument:YES];
 }
 
 /*
@@ -571,15 +607,31 @@ static ViWindowController	*currentWindowController = nil;
 {
 	ViDocumentView *docView = [self currentView];
 	if ([tabView numberOfTabViewItems] > 1 || [[[docView tabController] views] count] > 1) {
-		[self closeDocumentView:docView canCloseDocument:NO];
+		[self closeDocumentView:docView
+		       canCloseDocument:NO
+			 canCloseWindow:NO];
 		return YES;
 	}
 	return NO;
 }
 
-- (void)closeDocumentView:(id<ViViewController>)viewController
-         canCloseDocument:(BOOL)canCloseDocument
+- (void)unlistDocument:(ViDocument *)document
 {
+	DEBUG(@"unlisting document %@", document);
+
+	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
+	if (ndx != -1)
+		[[openFilesButton menu] removeItemAtIndex:ndx];
+	[documents removeObject:document];
+	[document removeWindowController:self];
+}
+
+- (void)closeDocumentView:(id<ViViewController>)viewController
+	 canCloseDocument:(BOOL)canCloseDocument
+	   canCloseWindow:(BOOL)canCloseWindow
+{
+	DEBUG(@"closing view controller %@, and document: %s", viewController, canCloseDocument ? "YES" : "NO");
+
 	if (viewController == nil)
 		[[self window] close];
 
@@ -591,8 +643,20 @@ static ViWindowController	*currentWindowController = nil;
 	/* If this was the last view of the document, close the document too. */
 	if (canCloseDocument && [viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocument *doc = [(ViDocumentView *)viewController document];
-		if ([[doc views] count] == 0)
+		if ([[doc views] count] == 0) {
+			DEBUG(@"closed last view of document %@, closing document", doc);
 			[doc close];
+		} else {
+			int nViewsInWindow = 0;
+			for (ViDocumentView *docView in [doc views])
+				if (docView.window == [self window])
+					nViewsInWindow++;
+			if (nViewsInWindow == 0) {
+				DEBUG(@"closed last view of document %@ in this window, unlisting document", doc);
+				[self unlistDocument:doc];
+			} else
+				DEBUG(@"got %i views in other windows", nViewsInWindow);
+		}
 	}
 
 	/* If this was the last view in the tab, close the tab too. */
@@ -601,10 +665,14 @@ static ViWindowController	*currentWindowController = nil;
 		[self closeTabController:tabController];
 
 		if ([tabView numberOfTabViewItems] == 0) {
+			DEBUG(@"closed last tab, got documents: %@", documents);
 			if ([documents count] > 0)
 				[self selectDocument:[documents objectAtIndex:0]];
-			else if (![projectDelegate explorerIsOpen])
+			else if (canCloseWindow)
 				[[self window] close];
+			else
+				[[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES
+													  error:nil];
 		}
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
@@ -616,32 +684,32 @@ static ViWindowController	*currentWindowController = nil;
  * Called by the document when it closes.
  * Removes all views of the document.
  */
-- (void)closeDocument:(ViDocument *)document
+- (void)closeDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow
 {
-	// Close all views of the document
+	DEBUG(@"closing document %@, and window: %s", document, canCloseWindow ? "YES" : "NO");
+
+	[self unlistDocument:document];
+
+	/* Close all views of the document. */
 	ViDocumentView *docView;
 	while ((docView = [[document views] anyObject]) != nil)
-		[self closeDocumentView:docView canCloseDocument:YES];
-
-	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
-	if (ndx != -1)
-		[[openFilesButton menu] removeItemAtIndex:ndx];
-
-	[documents removeObject:document];
-}
-
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-	ViDocumentTabController *tabController = [tabViewItem identifier];
-	[self selectDocumentView:tabController.selectedView];
+		[self closeDocumentView:docView
+		       canCloseDocument:NO
+			 canCloseWindow:canCloseWindow];
 }
 
 - (void)documentController:(NSDocumentController *)docController
-               didCloseAll:(BOOL)didCloseAll
-             tabController:(void *)tabController
+	       didCloseAll:(BOOL)didCloseAll
+	     tabController:(void *)tabController
 {
-	if (didCloseAll)
-		[self closeTabController:tabController];
+	DEBUG(@"force close all views in tab %@: %s", tabController, didCloseAll ? "YES" : "NO");
+	if (didCloseAll) {
+		/* Close any views left in this tab. Do not ask for confirmation. */
+		while ([[(ViDocumentTabController *)tabController views] count] > 0)
+			[self closeDocumentView:[[(ViDocumentTabController *)tabController views] objectAtIndex:0]
+			       canCloseDocument:YES
+				 canCloseWindow:YES];
+	}
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
@@ -658,6 +726,15 @@ static ViWindowController	*currentWindowController = nil;
 
 	NSMutableSet *set = [[NSMutableSet alloc] init];
 
+	DEBUG(@"closing tab controller %@", tabController);
+
+	/* If closing the last tab, close the window. */
+	if ([tabView numberOfTabViewItems] == 1) {
+		[[self window] performClose:nil];
+		return NO;
+	}
+
+	/* Close all documents in this tab. */
 	id<ViViewController> viewController;
 	for (viewController in [tabController views]) {
 		if ([viewController isKindOfClass:[ViDocumentView class]]) {
@@ -740,19 +817,23 @@ static ViWindowController	*currentWindowController = nil;
 
 	// update symbol list
 	[symbolController didSelectDocument:document];
-
-	[self checkDocumentChanged:document];
 }
 
 - (void)didSelectViewController:(id<ViViewController>)viewController
 {
+	DEBUG(@"did select view %@", viewController);
+
 	if (viewController == [self currentView])
 		return;
 
 	/* Update the previous document pointer. */
 	id<ViViewController> prevView = [self currentView];
 	if ([prevView isKindOfClass:[ViDocumentView class]]) {
-		previousDocument = [(ViDocumentView *)prevView document];
+		ViDocument *doc = [(ViDocumentView *)prevView document];
+		if (doc != previousDocument) {
+			DEBUG(@"previous document %@ -> %@", previousDocument, doc);
+			previousDocument = doc;
+		}
 	}
 
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
@@ -785,6 +866,12 @@ static ViWindowController	*currentWindowController = nil;
 	[[self window] makeFirstResponder:[viewController innerView]];
 
 	return viewController;
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	ViDocumentTabController *tabController = [tabViewItem identifier];
+	[self selectDocumentView:tabController.selectedView];
 }
 
 /*
@@ -853,7 +940,11 @@ static ViWindowController	*currentWindowController = nil;
 		return [self selectDocumentView:docView];
 
 	/* No view exists of the document, create a new tab. */
-	docView = [self createTabForDocument:document];
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
+	    [tabView numberOfTabViewItems] == 0)
+		docView = [self createTabForDocument:document];
+	else
+		docView = [self switchToDocument:document];
 	return [self selectDocumentView:docView];
 }
 
@@ -904,21 +995,42 @@ static ViWindowController	*currentWindowController = nil;
 		[tabView selectTabViewItem:[tabs objectAtIndex:anIndex]];
 }
 
-- (void)switchToDocument:(ViDocument *)doc
+- (id<ViViewController>)switchToDocument:(ViDocument *)doc
 {
+	INFO(@"switch to document %@", doc);
+	if (doc == nil)
+		return nil;
+
+	if ([[self currentView] isKindOfClass:[ViDocumentView class]] &&
+	    [[(ViDocumentView *)[self currentView] document] isEqual:doc])
+		return [self currentView];
+
 	ViDocumentTabController *tabController = [self selectedTabController];
 	id<ViViewController> viewController = [tabController replaceView:[self currentView]
 							    withDocument:doc];
-	[self selectDocumentView:viewController];
+	return [self selectDocumentView:viewController];
 }
 
 - (void)switchToLastDocument
 {
+	/* Make sure the previous document is still registered in the document controller. */
+	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
+		DEBUG(@"previous document %@ not listed", previousDocument);
+		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]
+													  display:NO
+													    error:nil];
+	}
 	[self switchToDocument:previousDocument];
 }
 
 - (void)selectLastDocument
 {
+	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
+		DEBUG(@"previous document %@ not listed", previousDocument);
+		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]
+													  display:NO
+													    error:nil];
+	}
 	[self selectDocument:previousDocument];
 }
 
@@ -940,8 +1052,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViDocument *)documentForURL:(NSURL *)url
 {
-	ViDocument *doc;
-	for (doc in documents)
+	for (ViDocument *doc in documents)
 		if ([url isEqual:[doc fileURL]])
 			return doc;
 	return nil;
@@ -1152,7 +1263,7 @@ static ViWindowController	*currentWindowController = nil;
 		}
 		if (newDocView == nil)
 			newDocView = [tabController splitView:viewController
-						     withView:[doc makeView]
+						     withView:[doc makeViewInWindow:[self window]]
 						   vertically:isVertical];
 		[self selectDocumentView:newDocView];
 
@@ -1523,7 +1634,11 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 /* syntax: ctrl-^ */
 - (BOOL)switch_file:(ViCommand *)command
 {
-	[self selectLastDocument];
+	DEBUG(@"previous document is %@", previousDocument);
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"])
+		[self selectLastDocument];
+	else
+		[self switchToLastDocument];
 	return YES;
 }
 

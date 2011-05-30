@@ -9,8 +9,6 @@
 	NSMutableSet	*closeAllSet;
 }
 
-- (IBAction)closeCurrentDocument:(id)sender;
-
 - (void)closeAllDocumentsInSet:(NSMutableSet *)set
 		  withDelegate:(id)delegate
 	   didCloseAllSelector:(SEL)didCloseAllSelector
@@ -19,11 +17,5 @@
 - (NSURL *)normalizePath:(NSString *)filename
               relativeTo:(NSURL *)relURL
                    error:(NSError **)outError;
-
-/*
-- (ViDocument *)openDocument:(id)filenameOrURL
-                  andDisplay:(BOOL)display
-              allowDirectory:(BOOL)allowDirectory;
-	      */
 
 @end

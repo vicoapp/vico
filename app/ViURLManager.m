@@ -72,7 +72,7 @@
 }
 
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
-			      onCompletion:(void (^)(NSArray *, NSError *))aBlock
+			      onCompletion:(void (^)(NSArray *, NSError *))completionCallback
 {
 	id<ViURLHandler> handler = [self handlerForURL:aURL
 					      selector:@selector(contentsOfDirectoryAtURL:onCompletion:)];
@@ -80,17 +80,18 @@
 		NSURL *normalizedURL = [self normalizeURL:aURL];
 		NSArray *contents = [directoryCache objectForKey:normalizedURL];
 		if (contents) {
-			aBlock(contents, nil);
+			completionCallback(contents, nil);
 			return nil;
 		}
 
 		return [handler contentsOfDirectoryAtURL:normalizedURL onCompletion:^(NSArray *contents, NSError *error) {
 			if (contents && !error)
 			       [directoryCache setObject:contents forKey:normalizedURL];
-			aBlock(contents, error);
+			completionCallback(contents, error);
 		}];
 	}
-	aBlock(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
+
+	completionCallback(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
 }
 

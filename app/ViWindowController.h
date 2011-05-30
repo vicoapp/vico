@@ -42,7 +42,7 @@
 	BOOL isLoaded;
 	ViDocument *initialDocument;
 	NSMutableArray *documents;
-	__weak ViDocument *previousDocument;
+	ViDocument *previousDocument;
 	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
@@ -73,7 +73,7 @@
 @property(readonly) ViTagStack *tagStack;
 @property(readonly) ViTagsDatabase *tagsDatabase;
 @property(readwrite) BOOL jumping; /* XXX: need better API! */
-@property(readonly) __weak ViDocument *previousDocument;
+@property(readonly) ViDocument *previousDocument;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;
@@ -91,8 +91,9 @@
 - (void)createTabWithViewController:(id<ViViewController>)viewController;
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document;
 
-- (void)closeDocument:(ViDocument *)aDocument;
-- (void)closeCurrentView;
+- (void)closeDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow;
+- (void)closeCurrentDocumentAndWindow:(BOOL)canCloseWindow;
+- (void)closeCurrentTab;
 - (BOOL)closeCurrentViewUnlessLast;
 
 - (void)addDocument:(ViDocument *)document;
@@ -111,7 +112,7 @@
 
 - (IBAction)navigateJumplist:(id)sender;
 
-- (void)switchToDocument:(ViDocument *)doc;
+- (id<ViViewController>)switchToDocument:(ViDocument *)doc;
 - (void)switchToLastDocument;
 - (void)switchToDocumentAction:(id)sender;
 - (BOOL)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column;

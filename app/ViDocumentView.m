@@ -8,6 +8,7 @@
 @synthesize innerView;
 @synthesize document;
 @synthesize tabController;
+@synthesize window;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
 {

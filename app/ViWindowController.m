@@ -492,22 +492,18 @@ static ViWindowController	*currentWindowController = nil;
 
 	NSMutableSet *set = [[NSMutableSet alloc] init];
 	for (ViDocument *doc in documents) {
-		INFO(@"got doc %@", doc);
 		if ([set containsObject:doc])
 			continue;
 		if (![doc isDocumentEdited])
 			continue;
 
 		/* Check if this document is open in another window. */
-		INFO(@"checking views %@", [doc views]);
 		ViDocumentView *otherDocView;
 		for (otherDocView in [doc views])
 			if (otherDocView.window != window)
 				break;
-		if (otherDocView != nil) {
-			INFO(@"got other doc view %@, window %@ != %@", otherDocView, otherDocView.window, window);
+		if (otherDocView != nil)
 			continue;
-		}
 
 		[set addObject:doc];
 	}
@@ -1006,7 +1002,6 @@ static ViWindowController	*currentWindowController = nil;
 
 - (id<ViViewController>)switchToDocument:(ViDocument *)doc
 {
-	INFO(@"switch to document %@", doc);
 	if (doc == nil)
 		return nil;
 

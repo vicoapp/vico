@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "ViWindowController.h"
 #import "PSMTabBarControl.h"
 #import "ViDocument.h"
@@ -778,6 +777,16 @@ static ViWindowController	*currentWindowController = nil;
 			[self synchronizeWindowTitleWithDocumentName];
 #endif
 	}
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	NSWindow *keyWindow = [NSApp keyWindow];
+	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
+
+	if (isDocWindow || [menuItem action] == @selector(performClose:))
+		return YES;
+	return NO;
 }
 
 #pragma mark -

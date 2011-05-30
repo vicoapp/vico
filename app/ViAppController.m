@@ -420,14 +420,27 @@ additionalBindings:(NSDictionary *)bindings
 {
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
+	NSWindow *keyWindow = [NSApp keyWindow];
+	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
+
 	for (NSMenuItem *item in [menu itemArray]) {
 		if (item == closeDocumentMenuItem) {
 			id<ViViewController> viewController = [[ViWindowController currentWindowController] currentView];
-			if (viewController == nil)
+			if (viewController == nil || !isDocWindow)
 				[item setTitle:@"Close Document"];
 			else
 				[item setTitle:[NSString stringWithFormat:@"Close \"%@\"", [viewController title]]];
 			continue;
+		} else if (item == closeWindowMenuItem) {
+			if (isDocWindow)
+				[item setKeyEquivalent:@"W"];
+			else
+				[item setKeyEquivalent:@"w"];
+		} else if (item == closeTabMenuItem) {
+			if (isDocWindow)
+				[item setKeyEquivalent:@"w"];
+			else
+				[item setKeyEquivalent:@""];
 		}
 
 		NSString *title = nil;

@@ -91,7 +91,7 @@
 #endif
 
 	original_input_source = TISCopyCurrentKeyboardInputSource();
-	INFO(@"remembering original input: %@",
+	DEBUG(@"remembering original input: %@",
 	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
 	recently_launched = YES;
 
@@ -276,7 +276,7 @@
 - (void)applicationWillResignActive:(NSNotification *)aNotification
 {
 	TISSelectInputSource(original_input_source);
-	INFO(@"selecting original input: %@",
+	DEBUG(@"selecting original input: %@",
 	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
 }
 
@@ -284,7 +284,7 @@
 {
 	if (!recently_launched) {
 		original_input_source = TISCopyCurrentKeyboardInputSource();
-		INFO(@"remembering original input: %@",
+		DEBUG(@"remembering original input: %@",
 		    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
 	}
 	recently_launched = NO;

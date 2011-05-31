@@ -90,9 +90,7 @@
 
 - (BOOL)becomeFirstResponder
 {
-	INFO(@"%p: became first responder", self);
 	[self resetInputSource];
-
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super becomeFirstResponder];
 }
@@ -102,11 +100,11 @@
 	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
 
 	if (mode == ViInsertMode) {
-		INFO(@"%p: remembering original insert input: %@", self,
+		DEBUG(@"%p: remembering original insert input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_insert_source = input;
 	} else {
-		INFO(@"%p: remembering original normal input: %@", self,
+		DEBUG(@"%p: remembering original normal input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_normal_source = input;
 	}

@@ -70,32 +70,8 @@ ToolbarHeightForWindow(NSWindow *window)
 	return self;
 }
 
-#if 0
-- (void)loadInputSources
-{
-	NSArray  *inputSources = (NSArray *)TISCreateInputSourceList(NULL, false);
-	NSMutableDictionary *availableLanguages = [NSMutableDictionary dictionaryWithCapacity:[inputSources count]];
-	NSUInteger i;
-	TISInputSourceRef chosen, languageRef1, languageRef2;
-	for (i = 0; i < [inputSources count]; ++i) {
-		[availableLanguages setObject:[inputSources objectAtIndex:i]
-				       forKey:TISGetInputSourceProperty((TISInputSourceRef)[inputSources objectAtIndex:i], kTISPropertyLocalizedName)];
-	}
-
-	NSString *lang;
-	for (lang in availableLanguages) {
-		[insertModeInputSources addItemWithTitle:lang];
-		[normalModeInputSources addItemWithTitle:lang];
-	}
-}
-#endif
-
 - (void)windowDidLoad
 {
-#if 0
-	[self loadInputSources];
-#endif
-
 	NSError *error = nil;
 	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViBundleStore bundlesDirectory]
 				      withIntermediateDirectories:YES

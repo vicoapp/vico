@@ -2105,6 +2105,10 @@ int logIndent = 0;
 {
 	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	visual_start_location = [self characterIndexForInsertionAtPoint:point];
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:visual_start_location];
+	if (visual_start_location >= eol && bol < eol)
+		visual_start_location = eol - 1;
 	DEBUG(@"clicked %li times at location %lu", [theEvent clickCount], visual_start_location);
 
 	selection_affinity = (int)[theEvent clickCount];

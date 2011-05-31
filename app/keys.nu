@@ -256,6 +256,7 @@
 (vmap include:gmap)
 (vmap include:tmap)
 (vmap include:mmap)
+(vmap include:wmap)
 ;; <bs> is already bound to move_left in motionMap (included above),
 ;; but mappings in included maps are overridden in the "calling" map.
 (vmap setKey:"<bs>" toEditAction:"delete:")

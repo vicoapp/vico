@@ -15,6 +15,8 @@
 #import "ViCompletionController.h"
 #import "ViMark.h"
 
+#include <Carbon/carbon.h>
+
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
 @class ViDocumentView;
@@ -25,6 +27,9 @@
 @interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate>
 {
 	ViDocument		*document;
+
+	TISInputSourceRef	 original_insert_source;
+	TISInputSourceRef	 original_normal_source;
 
 	ViMode			 mode;
 	ViKeyManager		*keyManager;
@@ -62,6 +67,7 @@
 	// visual mode
 	NSUInteger		 visual_start_location;
 	BOOL			 visual_line_mode;
+	int			 selection_affinity; /* 1 = char, 2 = word, 3 = line */
 
 	BOOL			 showingContextMenu;
 
@@ -177,6 +183,9 @@
 - (id)preference:(NSString *)name forScope:(NSArray *)scopeArray;
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation;
 - (id)preference:(NSString *)name;
+
+- (void)switchToNormalInputSourceAndRemember:(BOOL)rememberFlag;
+- (void)switchToInsertInputSource;
 @end
 
 @interface ViTextView (snippets)

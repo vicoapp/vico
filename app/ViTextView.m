@@ -1109,7 +1109,7 @@ int logIndent = 0;
 	}
 }
 
-- (void)setCaret:(NSUInteger)location
+- (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection
 {
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)
@@ -1117,13 +1117,22 @@ int logIndent = 0;
 	if (location > length)
 		location = IMAX(0, length);
 	caret = location;
-	if (mode != ViVisualMode)
+	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
-	if (!replayingInput)
-		[self updateCaret];
+	if (!replayingInput) {
+		if (updateSelection)
+			[self updateCaret];
+		else
+			[[self nextRunloop] updateCaret];
+	}
 
 	initial_line = -1;
 	initial_find_pattern = nil;
+}
+
+- (void)setCaret:(NSUInteger)location
+{
+	[self setCaret:location updateSelection:YES];
 }
 
 - (NSUInteger)caret
@@ -1145,69 +1154,18 @@ int logIndent = 0;
 	return [super selectionRangeForProposedRange:proposedSelRange granularity:granularity];
 }
 
-#if 0
-- (void)setMarkedText:(id)aString selectedRange:(NSRange)selRange
-{
-	INFO(@"got marked text [%@] in range %@", aString, NSStringFromRange(selRange));
-	[super setMarkedText:aString selectedRange:selRange];
-	/*if (selRange.length > 0)
-		[self setCaret:NSMaxRange(selRange)];*/
-}
-#endif
-
-#if 0
-- (void)setMarkedText:(id)aString selectedRange:(NSRange)selectedRange replacementRange:(NSRange)replacementRange
-{
-	INFO(@"got marked text [%@] in range %@, replacement range %@",
-	    aString, NSStringFromRange(selectedRange), NSStringFromRange(replacementRange));
-}
-
-- (void)unmarkText
-{
-	INFO(@"unmarking text at %lu", [self caret]);
-	[super unmarkText];
-	INFO(@"done unmarking text at %lu", [self caret]);
-}
-#endif
-
 - (void)setSelectedRanges:(NSArray *)ranges
                  affinity:(NSSelectionAffinity)affinity
            stillSelecting:(BOOL)stillSelectingFlag
 {
-	if (showingContextMenu)
+	if (showingContextMenu) /* XXX: not used anymore? */
 		return;
 
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
-	DEBUG(@"selection = %@", NSStringFromRange([self selectedRange]));
 
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
-	NSRange lastRange = [[ranges lastObject] rangeValue];
-
-	DEBUG(@"still selecting = %s, firstRange = %@, lastRange = %@, mode = %i, visual_start = %lu",
-	    stillSelectingFlag ? "YES" : "NO",
-	    NSStringFromRange(firstRange),
-	    NSStringFromRange(lastRange),
-	    mode,
-	    visual_start_location);
-
-	if ([ranges count] > 1 || firstRange.length > 0) {
-		if (mode != ViVisualMode) {
-			[self setVisualMode];
-			[self setCaret:firstRange.location];
-			visual_start_location = firstRange.location;
-		} else if (stillSelectingFlag) {
-			if (visual_start_location == firstRange.location)
-				[self setCaret:IMAX(lastRange.location, NSMaxRange(lastRange) - 1)];
-			else
-				[self setCaret:firstRange.location];
-		}
-		[self updateStatus];
-	} else if (stillSelectingFlag) {
-		[self setNormalMode];
-		if (firstRange.location != [self caret])
-			[self setCaret:firstRange.location];
-		[self updateStatus];
-	}
+	if ([ranges count] == 1 && !stillSelectingFlag && firstRange.length == 0 && firstRange.location != caret)
+		[self setCaret:firstRange.location updateSelection:NO];
 }
 
 - (void)setVisualSelection
@@ -1215,8 +1173,9 @@ int logIndent = 0;
 	NSUInteger l1 = visual_start_location, l2 = [self caret];
 	if (l2 < l1) {
 		/* swap if end < start */
+		NSUInteger tmp = l2;
 		l2 = l1;
-		l1 = end_location;
+		l1 = tmp;
 	}
 
 	if (visual_line_mode) {
@@ -1241,6 +1200,7 @@ int logIndent = 0;
 {
 	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u",
 	    caret, final_location, [[self textStorage] length]);
+	[self switchToNormalInputSourceAndRemember:YES];
 	mode = ViNormalMode;
 	[self setMark:']' atLocation:end_location];
 	[self endUndoGroup];
@@ -1261,6 +1221,7 @@ int logIndent = 0;
 {
 	DEBUG(@"entering insert mode at location %u (final location is %u), length is %u",
 		end_location, final_location, [[self textStorage] length]);
+	[self switchToInsertInputSource];
 	mode = ViInsertMode;
 
 	[self setMark:'[' atLocation:end_location];
@@ -1868,13 +1829,12 @@ int logIndent = 0;
 	else
 		string = aString;
 
-	DEBUG(@"string = [%@], len %i, replacementRange = %@",
-	    string, [string length], NSStringFromRange(replacementRange));
+	DEBUG(@"string = [%@], len %i, replacementRange = %@, hasMarkedText %s",
+	    string, [string length], NSStringFromRange(replacementRange), [self hasMarkedText] ? "YES" : "NO");
 
 	if ([self hasMarkedText]) {
-		[self setMarkedText:@"" selectedRange:NSMakeRange(0, 0)];
 		DEBUG(@"unmarking marked text in range %@", NSStringFromRange([self markedRange]));
-		//[self unmarkText];
+		[self setMarkedText:@"" selectedRange:NSMakeRange(0, 0)];
 	}
 
 	/*
@@ -2136,6 +2096,82 @@ int logIndent = 0;
 	[self pushLocationOnJumpList:[self caret]];
 }
 
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	visual_start_location = [self characterIndexForInsertionAtPoint:point];
+	DEBUG(@"clicked %li times at location %lu", [theEvent clickCount], visual_start_location);
+
+	selection_affinity = (int)[theEvent clickCount];
+	if (selection_affinity <= 1)
+		selection_affinity = 1;
+	else if (selection_affinity > 3)
+		selection_affinity = 3;
+
+	if (selection_affinity == 2) {
+		/* align to word boundaries */
+		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
+								  acceptAfter:NO];
+		if (wordRange.location != NSNotFound) {
+			visual_start_location = wordRange.location;
+			[self setCaret:NSMaxRange(wordRange) - 1];
+		} else
+			[self setCaret:visual_start_location];
+	} else if (visual_start_location != [self caret])
+		[self setCaret:visual_start_location];
+
+	if (selection_affinity > 1) {
+		visual_line_mode = (selection_affinity == 3);
+		[self setVisualMode];
+		[self setVisualSelection];
+	} else {
+		[self setNormalMode];
+		[self resetSelection];
+	}
+
+	[self updateStatus];
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSUInteger location = [self characterIndexForInsertionAtPoint:point];
+	DEBUG(@"dragged from location %lu -> %lu", visual_start_location, location);
+
+	if (mode != ViVisualMode) {
+		visual_line_mode = (selection_affinity == 3);
+		[self setVisualMode];
+	}
+
+	if (selection_affinity == 2) {
+		/* align to word boundaries */
+		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:location
+								  acceptAfter:NO];
+		if (wordRange.location != NSNotFound) {
+			if (location > visual_start_location)
+				[self setCaret:NSMaxRange(wordRange) - 1];
+			else
+				[self setCaret:wordRange.location];
+		} else
+			[self setCaret:location];
+	} else
+		[self setCaret:location];
+
+	[self scrollToCaret];
+	[self setVisualSelection];
+	[self updateStatus];
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+#if 0
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSUInteger location = [self characterIndexForInsertionAtPoint:point];
+	DEBUG(@"dragged from location %lu -> %lu", visual_start_location, location);
+	// [self setCaret:location];
+#endif
+}
+
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	NSMenu *menu = [self menuForEvent:theEvent];
@@ -2286,6 +2322,79 @@ int logIndent = 0;
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[ViBundle setupEnvironment:env forTextView:self];
 	return env;
+}
+
+/*
+ * Called just before the mode is changed from ViInsertMode.
+ */
+- (void)switchToNormalInputSourceAndRemember:(BOOL)rememberFlag
+{
+	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
+
+	if (original_insert_source != input && mode == ViInsertMode) {
+		DEBUG(@"%p: remembering original insert input: %@", self,
+		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
+		original_insert_source = input;
+	}
+
+	if (mode != ViInsertMode) {
+		if (rememberFlag) {
+			DEBUG(@"%p: remembering original normal input: %@", self,
+			    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
+			original_normal_source = input;
+		}
+	}
+
+	if (input != original_normal_source &&
+	    original_normal_source &&
+	    CFBooleanGetValue(TISGetInputSourceProperty(original_normal_source, kTISPropertyInputSourceIsASCIICapable))) {
+		DEBUG(@"%p: switching to original normal input: %@", self,
+		    TISGetInputSourceProperty(original_normal_source, kTISPropertyLocalizedName));
+		TISSelectInputSource(original_normal_source);
+		return;
+	}
+
+	if (!CFBooleanGetValue(TISGetInputSourceProperty(input, kTISPropertyInputSourceIsASCIICapable))) {
+
+		/* Get an ASCII compatible input source. Try the users language first.
+		 */
+		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
+		TISInputSourceRef ascii_input = TISCopyInputSourceForLanguage((CFStringRef)locale);
+
+		/* Otherwise let the system provide an ASCII compatible input source.
+		 */
+		if (!CFBooleanGetValue(TISGetInputSourceProperty(ascii_input, kTISPropertyInputSourceIsASCIICapable)))
+			ascii_input = TISCopyCurrentASCIICapableKeyboardInputSource();
+
+		DEBUG(@"%p: switching to ascii input: %@", self,
+		    TISGetInputSourceProperty(ascii_input, kTISPropertyLocalizedName));
+		TISSelectInputSource(ascii_input);
+	}
+}
+
+/*
+ * Called just before the mode is changed to ViInsertMode.
+ */
+- (void)switchToInsertInputSource
+{
+	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
+
+	if (mode != ViInsertMode) {
+		DEBUG(@"%p: remembering original normal input: %@", self,
+		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
+		original_normal_source = input;
+	}
+
+	if (original_insert_source == NULL) {
+		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
+		original_insert_source = TISCopyInputSourceForLanguage((CFStringRef)locale);
+	}
+
+	if (input != original_insert_source) {
+		DEBUG(@"%p: switching to original insert input: %@", self,
+		    TISGetInputSourceProperty(original_insert_source, kTISPropertyLocalizedName));
+		TISSelectInputSource(original_insert_source);
+	}
 }
 
 @end

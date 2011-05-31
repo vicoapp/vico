@@ -28,6 +28,7 @@ ln -s ../Sparkle.framework "$dir"
 (cd $dir && ./mkdmg $version) || exit 3
 
 mv $dir/vico-$version.dmg .
+mv $dir/vico-$version.xml .
 
 echo removing build directory
 rm -rf "$dir"

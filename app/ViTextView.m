@@ -2358,12 +2358,16 @@ int logIndent = 0;
 
 		/* Get an ASCII compatible input source. Try the users language first.
 		 */
+		 TISInputSourceRef ascii_input = NULL;
+
 		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
-		TISInputSourceRef ascii_input = TISCopyInputSourceForLanguage((CFStringRef)locale);
+		if (locale)
+			ascii_input = TISCopyInputSourceForLanguage((CFStringRef)locale);
 
 		/* Otherwise let the system provide an ASCII compatible input source.
 		 */
-		if (!CFBooleanGetValue(TISGetInputSourceProperty(ascii_input, kTISPropertyInputSourceIsASCIICapable)))
+		if (ascii_input == NULL ||
+		    !CFBooleanGetValue(TISGetInputSourceProperty(ascii_input, kTISPropertyInputSourceIsASCIICapable)))
 			ascii_input = TISCopyCurrentASCIICapableKeyboardInputSource();
 
 		DEBUG(@"%p: switching to ascii input: %@", self,
@@ -2387,7 +2391,8 @@ int logIndent = 0;
 
 	if (original_insert_source == NULL) {
 		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
-		original_insert_source = TISCopyInputSourceForLanguage((CFStringRef)locale);
+		if (locale)
+			original_insert_source = TISCopyInputSourceForLanguage((CFStringRef)locale);
 	}
 
 	if (input != original_insert_source) {

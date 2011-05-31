@@ -184,6 +184,7 @@
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation;
 - (id)preference:(NSString *)name;
 
+- (void)resetInputSource;
 - (void)switchToNormalInputSourceAndRemember:(BOOL)rememberFlag;
 - (void)switchToInsertInputSource;
 @end

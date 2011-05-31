@@ -26,6 +26,7 @@
 @implementation ViAppController
 
 @synthesize encodingMenu;
+@synthesize original_input_source;
 
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
@@ -88,6 +89,11 @@
 #if defined(DEBUG_BUILD)
 	[NSApp activateIgnoringOtherApps:YES];
 #endif
+
+	original_input_source = TISCopyCurrentKeyboardInputSource();
+	INFO(@"remembering original input: %@",
+	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
+	recently_launched = YES;
 
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES
@@ -264,6 +270,29 @@
 		NSString *undostyle = [change objectForKey:NSKeyValueChangeNewKey];
 		if (![undostyle isEqualToString:@"vim"] && ![undostyle isEqualToString:@"nvi"])
 			[[NSUserDefaults standardUserDefaults] setObject:@"vim" forKey:@"undostyle"];
+	}
+}
+
+- (void)applicationWillResignActive:(NSNotification *)aNotification
+{
+	TISSelectInputSource(original_input_source);
+	INFO(@"selecting original input: %@",
+	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
+}
+
+- (void)applicationWillBecomeActive:(NSNotification *)aNotification
+{
+	if (!recently_launched) {
+		original_input_source = TISCopyCurrentKeyboardInputSource();
+		INFO(@"remembering original input: %@",
+		    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
+	}
+	recently_launched = NO;
+
+	ViWindowController *wincon = [ViWindowController currentWindowController];
+	id<ViViewController> viewController = [wincon currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		[[(ViDocumentView *)viewController textView] resetInputSource];
 	}
 }
 

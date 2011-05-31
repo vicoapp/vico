@@ -54,6 +54,7 @@ int logIndent = 0;
 	marks = [NSMutableDictionary dictionary];
 	saved_column = -1;
 	snippetMatchRange.location = NSNotFound;
+	original_insert_source = [[NSApp delegate] original_input_source];
 
 	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -2332,14 +2333,14 @@ int logIndent = 0;
 	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
 
 	if (original_insert_source != input && mode == ViInsertMode) {
-		DEBUG(@"%p: remembering original insert input: %@", self,
+		INFO(@"%p: remembering original insert input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_insert_source = input;
 	}
 
 	if (mode != ViInsertMode) {
 		if (rememberFlag) {
-			DEBUG(@"%p: remembering original normal input: %@", self,
+			INFO(@"%p: remembering original normal input: %@", self,
 			    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 			original_normal_source = input;
 		}
@@ -2348,7 +2349,7 @@ int logIndent = 0;
 	if (input != original_normal_source &&
 	    original_normal_source &&
 	    CFBooleanGetValue(TISGetInputSourceProperty(original_normal_source, kTISPropertyInputSourceIsASCIICapable))) {
-		DEBUG(@"%p: switching to original normal input: %@", self,
+		INFO(@"%p: switching to original normal input: %@", self,
 		    TISGetInputSourceProperty(original_normal_source, kTISPropertyLocalizedName));
 		TISSelectInputSource(original_normal_source);
 		return;
@@ -2370,7 +2371,7 @@ int logIndent = 0;
 		    !CFBooleanGetValue(TISGetInputSourceProperty(ascii_input, kTISPropertyInputSourceIsASCIICapable)))
 			ascii_input = TISCopyCurrentASCIICapableKeyboardInputSource();
 
-		DEBUG(@"%p: switching to ascii input: %@", self,
+		INFO(@"%p: switching to ascii input: %@", self,
 		    TISGetInputSourceProperty(ascii_input, kTISPropertyLocalizedName));
 		TISSelectInputSource(ascii_input);
 	}
@@ -2384,19 +2385,21 @@ int logIndent = 0;
 	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
 
 	if (mode != ViInsertMode) {
-		DEBUG(@"%p: remembering original normal input: %@", self,
+		INFO(@"%p: remembering original normal input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_normal_source = input;
 	}
 
+#if 0
 	if (original_insert_source == NULL) {
 		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
 		if (locale)
 			original_insert_source = TISCopyInputSourceForLanguage((CFStringRef)locale);
 	}
+#endif
 
 	if (input != original_insert_source) {
-		DEBUG(@"%p: switching to original insert input: %@", self,
+		INFO(@"%p: switching to original insert input: %@", self,
 		    TISGetInputSourceProperty(original_insert_source, kTISPropertyLocalizedName));
 		TISSelectInputSource(original_insert_source);
 	}

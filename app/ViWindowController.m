@@ -229,7 +229,6 @@ static ViWindowController	*currentWindowController = nil;
 			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
 			[viFieldEditor initWithDocument:nil viParser:fieldParser];
 			[viFieldEditor setFieldEditor:YES];
-			[viFieldEditor setInsertMode:nil];
 		}
 		return viFieldEditor;
 	}

@@ -80,13 +80,18 @@
 	return NO;
 }
 
-- (BOOL)becomeFirstResponder
+- (void)resetInputSource
 {
-	DEBUG(@"%p: became first responder", self);
 	if (mode == ViInsertMode)
 		[self switchToInsertInputSource];
 	else
 		[self switchToNormalInputSourceAndRemember:NO];
+}
+
+- (BOOL)becomeFirstResponder
+{
+	INFO(@"%p: became first responder", self);
+	[self resetInputSource];
 
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super becomeFirstResponder];
@@ -97,11 +102,11 @@
 	TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
 
 	if (mode == ViInsertMode) {
-		DEBUG(@"%p: remembering original insert input: %@", self,
+		INFO(@"%p: remembering original insert input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_insert_source = input;
 	} else {
-		DEBUG(@"%p: remembering original normal input: %@", self,
+		INFO(@"%p: remembering original normal input: %@", self,
 		    TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
 		original_normal_source = input;
 	}

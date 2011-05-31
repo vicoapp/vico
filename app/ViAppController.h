@@ -1,4 +1,5 @@
 #import "Nu/Nu.h"
+#import <Carbon/Carbon.h>
 
 @class ViRegexp;
 
@@ -32,9 +33,13 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSMenuItem *closeWindowMenuItem;
 	IBOutlet NSMenuItem *closeTabMenuItem;
 	NSConnection *shellConn;
+
+	TISInputSourceRef original_input_source;
+	BOOL recently_launched;
 }
 
 @property(readonly) NSMenu *encodingMenu;
+@property (readonly) TISInputSourceRef original_input_source;
 
 - (void)exportGlobals:(id)parser;
 - (void)loadStandardModules:(id<NuParsing>)parser;

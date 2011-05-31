@@ -1883,6 +1883,9 @@ int logIndent = 0;
 	if ([[self window] firstResponder] != self)
 		return NO;
 
+	if ([self hasMarkedText])
+		return [super performKeyEquivalent:theEvent];
+
 	return [keyManager performKeyEquivalent:theEvent
 					inScope:[self scopesAtLocation:[self caret]]];
 }

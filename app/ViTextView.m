@@ -1165,7 +1165,8 @@ int logIndent = 0;
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
 
 	NSRange firstRange = [[ranges objectAtIndex:0] rangeValue];
-	if ([ranges count] == 1 && !stillSelectingFlag && firstRange.length == 0 && firstRange.location != caret)
+	if ([self hasMarkedText] && [ranges count] == 1 && !stillSelectingFlag &&
+	    firstRange.length == 0 && firstRange.location != caret)
 		[self setCaret:firstRange.location updateSelection:NO];
 }
 

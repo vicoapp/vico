@@ -1471,7 +1471,7 @@
 - (BOOL)delete_forward:(ViCommand *)command
 {
 	NSString *s = [[self textStorage] string];
-	if ([s length] == 0) {
+	if (start_location >= [s length]) {
 		MESSAGE(@"No characters to delete");
 		return NO;
 	}

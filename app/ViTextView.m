@@ -1523,6 +1523,13 @@ int logIndent = 0;
 {
 	/* FIXME: should handle smart typing pairs here!
 	 */
+
+	NSString *s = [[self textStorage] string];
+	if (start_location >= [s length]) {
+		MESSAGE(@"No characters to delete");
+		return NO;
+	}
+
 	[self deleteRange:NSMakeRange(start_location, 1)];
 	final_location = start_location;
 	return YES;

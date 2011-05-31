@@ -383,6 +383,8 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
 {
+	if (anIndex >= [attributedString length])
+		return nil;
 	return [attributedString attributesAtIndex:anIndex effectiveRange:aRangePtr];
 }
 

@@ -226,7 +226,7 @@
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
 (nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
 (nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
-(nmap map:"<ctrl-s>" to:":tbuffer <ctrl-b>")
+(nmap map:"<ctrl-s>" to:":tbuffer <ctrl-f>")
 (nmap setKey:"<cmd-z>" toAction:"undo:")
 (nmap setKey:"<cmd-Z>" toAction:"redo:")
 ;; <C-w> prefix
@@ -370,10 +370,9 @@
 (xmap setKey:"<up>" toAction:"prev_history:")
 (xmap setKey:"<pagedown>" toAction:"next_history_ignoring_prefix:")
 (xmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
-(xmap setKey:"<ctrl-d>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
-(xmap setKey:"<tab>" toAction:"complete_path:" flags:0 parameter:"pa" scope:nil)
-(xmap setKey:"<ctrl-b>" toAction:"complete_buffer:" flags:0 parameter:"Ffpa" scope:nil)
-(xmap setKey:"<ctrl-f>" toAction:"complete_path:" flags:0 parameter:"Ffpa" scope:nil)
+(xmap setKey:"<ctrl-d>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
+(xmap setKey:"<tab>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
+(xmap setKey:"<ctrl-f>" toAction:"ex_complete:" flags:0 parameter:"Ffpa" scope:nil)
 
 
 ;; a map for the completion list, similar to vim's ctrl-x mode

@@ -34,7 +34,7 @@
  *	W		-- word string
  *	w[N#][or]	-- word (a number or N, optional or required)
  */
-static struct ex_command ex_commands[] = {
+struct ex_command ex_commands[] = {
 	/* C_SCROLL */
 	/* C_BANG */
 	{@"!",		@"ex_bang",	EX_ADDR2_NONE | EX_SECURE,
@@ -123,11 +123,6 @@ static struct ex_command ex_commands[] = {
 		"l1",
 		@"[line [,line]] co[py] line [flags]",
 		@"copy lines elsewhere in the file"},
-	/* C_CSCOPE */
-	{@"cscope",      @"ex_cscope",      0,
-		"!s",
-		@"cs[cope] command [args]",
-		@"create a set of tags using a cscope command"},
 	/*
 	 * !!!
 	 * Adding new commands starting with 'd' may break the delete command code
@@ -686,46 +681,54 @@ ex_cmd_find(NSString *cmd)
 	return naddr;
 }
 
-- (BOOL)parse:(NSString *)string error:(NSError **)outError
+- (BOOL)parse:(NSString *)string contextAtEnd:(int *)endContext error:(NSError **)outError
 {
 	NSScanner *scan = [NSScanner scannerWithString:string];
 
-        /* From nvi:
-         * !!!
-         * Permit extra colons at the start of the line.  Historically,
-         * ex/vi allowed a single extra one.  It's simpler not to count.
-         * The stripping is done here because, historically, any command
-         * could have preceding colons, e.g. ":g/pattern/:p" worked.
-         */
+	/* from nvi:
+	 * !!!
+	 * permit extra colons at the start of the line.  historically,
+	 * ex/vi allowed a single extra one.  it's simpler not to count.
+	 * the stripping is done here because, historically, any command
+	 * could have preceding colons, e.g. ":g/pattern/:p" worked.
+	 */
 	NSCharacterSet *colonSet = [NSCharacterSet characterSetWithCharactersInString:@":"];
 	[scan scanCharactersFromSet:colonSet intoString:nil];
 
-        /* From nvi:
-         * Command lines that start with a double-quote are comments.
-         *
-         * !!!
-         * Historically, there was no escape or delimiter for a comment, e.g.
-         * :"foo|set was a single comment and nothing was output.  Since nvi
-         * permits users to escape <newline> characters into command lines, we
-         * have to check for that case.
-         */
+	/* From nvi:
+	 * Command lines that start with a double-quote are comments.
+	 *
+	 * !!!
+	 * Historically, there was no escape or delimiter for a comment, e.g.
+	 * :"foo|set was a single comment and nothing was output.  Since nvi
+	 * permits users to escape <newline> characters into command lines, we
+	 * have to check for that case.
+	 */
 	if ([scan scanString:@"\"" intoString:nil])
 	{
 		[scan scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:nil];
-		return [self parse:[string substringFromIndex:[scan scanLocation]] error:outError];
+		return [self parse:[string substringFromIndex:[scan scanLocation]]
+		      contextAtEnd:endContext
+			     error:outError];
 	}
 
-        /* Skip whitespace. */
+	/* Skip whitespace. */
 	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 
-	if ([scan isAtEnd])
+	if ([scan isAtEnd]) {
+		if (endContext)
+			*endContext = EX_CTX_COMMAND;
 		return YES;
+	}
 
 	// FIXME: need to return whether comma or semicolon was used
 	naddr = [ExCommand parseRange:scan intoAddress:&addr1 otherAddress:&addr2];
 
-	if (naddr < 0)
+	if (naddr < 0) {
+		if (endContext)
+			*endContext = EX_CTX_FAIL;
 		return NO;
+	}
 
         /* Skip whitespace and colons. */
 	[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
@@ -758,25 +761,32 @@ ex_cmd_find(NSString *cmd)
 		/* default command */
 		name = @"#";
 		command = ex_cmd_find(name);
+		if (endContext)
+			*endContext = EX_CTX_COMMAND;
 		return YES;
 	}
 
 	NSCharacterSet *singleCharCommandSet = [NSCharacterSet characterSetWithCharactersInString:@"\004!#&*<=>@~"];
 
-	if ([singleCharCommandSet characterIsMember:ch])
-	{
+	if ([singleCharCommandSet characterIsMember:ch]) {
 		name = [NSString stringWithCharacters:&ch length:1];
 		[scan setScanLocation:[scan scanLocation] + 1];
-	}
-	else
-	{
+	} else
 		[scan scanCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:&name];
+
+	if ([scan isAtEnd] && endContext) {
+		*endContext = EX_CTX_COMMAND;
+		return NO;
 	}
 
 	command = ex_cmd_find(name);
 	if (command == NULL) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"The %@ command is unknown.", name];
+		if (![scan isAtEnd]) {
+			if (endContext)
+				*endContext = EX_CTX_FAIL;
+		}
 		return NO;
 	}
 
@@ -882,6 +892,9 @@ ex_cmd_find(NSString *cmd)
 	}
 	else if ([command->name isEqualToString:@"s"])
 	{
+		if (endContext)
+			*endContext = EX_CTX_NONE;
+
 		/*
 		 * Move to the next non-whitespace character, we'll use it as
 		 * the delimiter.  If the character isn't an alphanumeric or
@@ -914,6 +927,10 @@ ex_cmd_find(NSString *cmd)
 				goto usage;
 		}
 	}
+
+	/* default completion context after command */
+	if (endContext)
+		*endContext = EX_CTX_NONE;
 
 	/*
 	 * Use normal quoting and termination rules to find the end of this
@@ -1005,6 +1022,23 @@ two_addr:	switch (naddr)
 	}
 
 	line.type = EX_ADDR_NONE;
+
+	if (endContext) {
+		if (strchr(command->syntax, 'f') || strchr(command->syntax, 'S')) {
+			*endContext = EX_CTX_FILE;
+		} else {
+			/* completion context depending on command */
+			if ([command->name isEqualToString:@"buffer"] ||
+			    [command->name isEqualToString:@"b"] ||
+			    [command->name isEqualToString:@"sbuffer"] ||
+			    [command->name isEqualToString:@"vbuffer"] ||
+			    [command->name isEqualToString:@"tbuffer"] ||
+			    [command->name isEqualToString:@"bdelete"])
+				*endContext = EX_CTX_BUFFER;
+			else if ([command->name isEqualToString:@"setfiletype"])
+				*endContext = EX_CTX_SYNTAX;
+		}
+	}
 
 	/* Go through the command's syntax definition and parse parameters.
 	 */
@@ -1177,11 +1211,11 @@ end_case23:		break;
 						  intoString:&filename])
 				goto usage;
 			if (*++p != 'N') {
-                                /*
-                                 * If a number is specified, must either be
-                                 * 0 or that number, if optional, and that
-                                 * number, if required.
-                                 */
+				/*
+				 * If a number is specified, must either be
+				 * 0 or that number, if optional, and that
+				 * number, if required.
+				 */
 				int tmp = *p - '0';
 				if (*++p != 'o' && tmp != 1)
 					goto usage;
@@ -1231,11 +1265,11 @@ end_case23:		break;
 		case 'w':				/* word */
 			words = [[[scan string] substringFromIndex:[scan scanLocation]] componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 			if (*++p != 'N') {
-                                /*
-                                 * If a number is specified, must either be
-                                 * 0 or that number, if optional, and that
-                                 * number, if required.
-                                 */
+				/*
+				 * If a number is specified, must either be
+				 * 0 or that number, if optional, and that
+				 * number, if required.
+				 */
 				int tmp = *p - '0';
 				if ((*++p != 'o' || [words count] != 0) && [words count] != tmp)
 					goto usage;
@@ -1273,6 +1307,11 @@ usage:		if (outError)
 addr_verify:
 
 	return YES;
+}
+
+- (BOOL)parse:(NSString *)string error:(NSError **)outError
+{
+	return [self parse:string contextAtEnd:NULL error:outError];
 }
 
 @end

@@ -26,6 +26,13 @@
 #define E_C_PLUS        0x00800         /*  + flag. */
 #define E_C_PRINT       0x01000         /*  p flag. */
 
+#define EX_CTX_FAIL	-1
+#define EX_CTX_NONE	1
+#define EX_CTX_COMMAND	2
+#define EX_CTX_FILE	3
+#define EX_CTX_BUFFER	4
+#define EX_CTX_SYNTAX	5
+
 struct ex_command
 {
 	NSString *name;
@@ -35,6 +42,8 @@ struct ex_command
 	NSString *usage;
 	NSString *help;
 };
+
+extern struct ex_command ex_commands[];
 
 #define EX_ADDR_NONE		0
 #define EX_ADDR_ABS		1
@@ -91,7 +100,11 @@ struct ex_address
 
 - (ExCommand *)init;
 - (ExCommand *)initWithString:(NSString *)string;
-- (BOOL)parse:(NSString *)string error:(NSError **)outError;
+- (BOOL)parse:(NSString*)string
+ contextAtEnd:(int*)endContext
+        error:(NSError **)outError;
+- (BOOL)parse:(NSString*)string
+        error:(NSError **)outError;
 + (BOOL)parseRange:(NSScanner *)scan
        intoAddress:(struct ex_address *)addr;
 + (int)parseRange:(NSScanner *)scan

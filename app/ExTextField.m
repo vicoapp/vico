@@ -1,6 +1,7 @@
 #import "ExTextField.h"
 #import "ViThemeStore.h"
 #import "ViTextView.h"
+#import "ExCommand.h"
 #include "logging.h"
 
 @implementation ExTextField
@@ -113,6 +114,37 @@
 	if ([[self delegate] respondsToSelector:@selector(execute_ex_command:)])
 		[[self delegate] performSelector:@selector(execute_ex_command:) withObject:exCommand];
 	return YES;
+}
+
+- (BOOL)ex_complete:(ViCommand *)command
+{
+	int context = 0;
+
+	NSText *editor = [[self window] fieldEditor:YES forObject:self];
+
+	ExCommand *ex = [[ExCommand alloc] init];
+	NSError *error = nil;
+	[ex parse:[self stringValue] contextAtEnd:&context error:&error];
+
+	switch (context) {
+	case EX_CTX_FAIL:
+		break;
+	case EX_CTX_NONE:
+		break;
+	case EX_CTX_COMMAND:
+		return [editor complete_ex_command:command];
+		break;
+	case EX_CTX_FILE:
+		return [editor complete_path:command];
+		break;
+	case EX_CTX_BUFFER:
+		return [editor complete_buffer:command];
+		break;
+	case EX_CTX_SYNTAX:
+		return [editor complete_syntax:command];
+		break;
+	}
+	return NO;
 }
 
 - (void)textDidEndEditing:(NSNotification *)aNotification

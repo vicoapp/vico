@@ -15,6 +15,8 @@
 #import "ViFileCompletion.h"
 #import "ViWordCompletion.h"
 #import "ViBufferCompletion.h"
+#import "ExCommandCompletion.h"
+#import "ViSyntaxCompletion.h"
 
 @implementation ViTextView (vi_commands)
 
@@ -2502,6 +2504,42 @@
 
 	return [self presentCompletionsOf:word
 			     fromProvider:[[ViBufferCompletion alloc] initWithWindowController:[[self window] windowController]]
+				fromRange:range
+				  options:command.mapping.parameter];
+}
+
+- (BOOL)complete_ex_command:(ViCommand *)command
+{
+	NSRange range;
+	NSString *word = [[self textStorage] wordAtLocation:start_location
+						      range:&range
+					        acceptAfter:YES];
+
+	if (word == nil) {
+		word = @"";
+		range = NSMakeRange([self caret], 0);
+	}
+
+	return [self presentCompletionsOf:word
+			     fromProvider:[[ExCommandCompletion alloc] init]
+				fromRange:range
+				  options:command.mapping.parameter];
+}
+
+- (BOOL)complete_syntax:(ViCommand *)command
+{
+	NSRange range;
+	NSString *word = [[self textStorage] wordAtLocation:start_location
+						      range:&range
+					        acceptAfter:YES];
+
+	if (word == nil) {
+		word = @"";
+		range = NSMakeRange([self caret], 0);
+	}
+
+	return [self presentCompletionsOf:word
+			     fromProvider:[[ViSyntaxCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }

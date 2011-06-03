@@ -39,9 +39,7 @@ URGENT
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
-* :q! should not prompt for saving
 * :q should terminate app on last document in last window
-* :q should close window on last document w/other windows
 
 
 BUGS

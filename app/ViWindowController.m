@@ -180,7 +180,11 @@ static ViWindowController	*currentWindowController = nil;
 	isLoaded = YES;
 	if (initialDocument) {
 		[self addNewTab:initialDocument];
-                initialDocument = nil;
+		initialDocument = nil;
+	}
+	if (initialViewController) {
+		[self createTabWithViewController:initialViewController];
+		initialViewController = nil;
 	}
 
 	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
@@ -192,19 +196,19 @@ static ViWindowController	*currentWindowController = nil;
 	[explorerView setNeedsDisplay:YES];
 
 	NSRect frame = [splitView frame];
-	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1]; // Symbol list not shown on first launch
 	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
 
 	if ([self project] != nil) {
 		[environment setBaseURL:[[self project] initialURL]];
-		[projectDelegate performSelector:@selector(browseURL:) withObject:[[self project] initialURL] afterDelay:0.0];
+		[[projectDelegate nextRunloop] browseURL:[[self project] initialURL]];
 		/* This makes repeated open requests for the same URL always open a new window.
 		 * With this commented, the "project" is already opened, and no new window will be created.
 		[[self project] close];
 		project = nil;
 		*/
 	} else if ([projectDelegate explorerIsOpen])
-		[projectDelegate performSelector:@selector(browseURL:) withObject:[environment baseURL] afterDelay:0.0];
+		[[projectDelegate nextRunloop] browseURL:[environment baseURL]];
 
 	[self updateJumplistNavigator];
 
@@ -285,6 +289,12 @@ static ViWindowController	*currentWindowController = nil;
  */
 - (void)createTabWithViewController:(id<ViViewController>)viewController
 {
+	if (!isLoaded) {
+		/* Defer until NIB is loaded. */
+		initialViewController = viewController;
+		return;
+	}
+
 	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:viewController];
 
 	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];

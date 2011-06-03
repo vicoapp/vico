@@ -41,6 +41,7 @@
 
 	BOOL isLoaded;
 	ViDocument *initialDocument;
+	id<ViViewController> initialViewController;
 	NSMutableArray *documents;
 	ViDocument *previousDocument;
 	__weak ViDocumentView *previousDocumentView;

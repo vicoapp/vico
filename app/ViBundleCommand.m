@@ -7,6 +7,7 @@
 @synthesize fallbackInput;
 @synthesize beforeRunningCommand;
 @synthesize command;
+@synthesize htmlMode;
 
 - (ViBundleCommand *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle
 {
@@ -17,6 +18,7 @@
 		fallbackInput = [dict objectForKey:@"fallbackInput"];
 		beforeRunningCommand = [dict objectForKey:@"beforeRunningCommand"];
 		command = [dict objectForKey:@"command"];
+		htmlMode = [dict objectForKey:@"htmlMode"];
 	}
 	return self;
 }

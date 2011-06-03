@@ -305,6 +305,18 @@
 					break;
 			}
 
+			BOOL splitVertically = NO;
+			BOOL newWindow = NO;
+			NSString *htmlMode = [command htmlMode];
+			if (htmlMode == nil)
+				htmlMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHTMLMode"];
+			if ([htmlMode isEqualTo:@"split"])
+				splitVertically = NO;
+			else if ([htmlMode isEqualTo:@"vsplit"])
+				splitVertically = YES;
+			else if ([htmlMode isEqualTo:@"window"])
+				newWindow = YES;
+
 			if (webView) {
 				[(ViCommandOutputController *)webView setContent:outputText];
 				[[[self window] windowController] selectDocumentView:webView];
@@ -313,11 +325,19 @@
 				    initWithHTMLString:outputText
 				    environment:[document environment]];
 
-				if (viewController)
-					[tabController splitView:viewController withView:oc vertically:NO];	// FIXME: option to specify vertical or not
-				else
-					[[[self window] windowController] createTabWithViewController:oc];
-				[[[self window] windowController] selectDocumentView:oc];
+				if (newWindow) {
+					ViWindowController *winCon = [[ViWindowController alloc] init];
+					[winCon createTabWithViewController:oc];
+					[winCon selectDocumentView:oc];
+				} else {
+					if (viewController) {
+						[tabController splitView:viewController
+								withView:oc
+							      vertically:splitVertically];
+					} else
+						[[[self window] windowController] createTabWithViewController:oc];
+					[[[self window] windowController] selectDocumentView:oc];
+				}
 			}
 		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
 			[self insertString:outputText atLocation:[self caret] undoGroup:NO];

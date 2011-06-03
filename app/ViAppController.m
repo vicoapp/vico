@@ -144,7 +144,7 @@
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",
 	    @"text.plain", @"defaultsyntax",
-	    [NSDictionary dictionaryWithObject:@"__MyCompanyName__" forKey:@"TM_ORGANIZATION_NAME"], @"environment",
+	    [NSDictionary dictionaryWithObjectsAndKeys:@"__MyCompanyName__", @"TM_ORGANIZATION_NAME", @"rTbgqR B=.,?_A_a Q=_s>|", @"PARINIT", nil], @"environment",
 	    nil]];
 
 	/* Initialize languages and themes. */

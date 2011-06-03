@@ -2414,5 +2414,13 @@ int logIndent = 0;
 	}
 }
 
+- (void)resetInputSource
+{
+	if (mode == ViInsertMode)
+		[self switchToInsertInputSource];
+	else
+		[self switchToNormalInputSourceAndRemember:NO];
+}
+
 @end
 

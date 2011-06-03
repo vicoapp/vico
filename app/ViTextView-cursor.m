@@ -80,14 +80,6 @@
 	return NO;
 }
 
-- (void)resetInputSource
-{
-	if (mode == ViInsertMode)
-		[self switchToInsertInputSource];
-	else
-		[self switchToNormalInputSourceAndRemember:NO];
-}
-
 - (BOOL)becomeFirstResponder
 {
 	[self resetInputSource];

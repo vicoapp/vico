@@ -445,12 +445,22 @@ additionalBindings:(NSDictionary *)bindings
 
 #pragma mark -
 
+/*
+ * XXX: this is called on every key event, can we only call it when the menu is shown?
+ */
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
 	NSWindow *keyWindow = [NSApp keyWindow];
 	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
+
+	BOOL hasSelection = NO;
+	NSWindow *window = [[NSApplication sharedApplication] mainWindow];
+	NSResponder *target = [window firstResponder];
+	if ([target respondsToSelector:@selector(selectedRange)] &&
+	    [(NSText *)target selectedRange].length > 0)
+		hasSelection = YES;
 
 	for (NSMenuItem *item in [menu itemArray]) {
 		if (item == closeDocumentMenuItem) {
@@ -465,11 +475,13 @@ additionalBindings:(NSDictionary *)bindings
 				[item setKeyEquivalent:@"W"];
 			else
 				[item setKeyEquivalent:@"w"];
+			continue;
 		} else if (item == closeTabMenuItem) {
 			if (isDocWindow)
 				[item setKeyEquivalent:@"w"];
 			else
 				[item setKeyEquivalent:@""];
+			continue;
 		}
 
 		NSString *title = nil;
@@ -493,13 +505,9 @@ additionalBindings:(NSDictionary *)bindings
 				if (vrange.location == NSNotFound)
 					vrange = nrange;
 
-				BOOL hasSelection = NO;
-				NSWindow *window = [[NSApplication sharedApplication] mainWindow];
-				NSResponder *target = [window firstResponder];
-				if ([target respondsToSelector:@selector(selectedRange)]) {
-					if ([(NSText *)target selectedRange].length > 0)
-						hasSelection = YES;
-				}
+				DEBUG(@"nrange = %@, vrange = %@", NSStringFromRange(nrange), NSStringFromRange(vrange));
+
+				DEBUG(@"hasSelection = %s", hasSelection ? "YES" : "NO");
 
 				/* Replace "Thing / Selection" depending on hasSelection.
 				 */
@@ -527,7 +535,7 @@ additionalBindings:(NSDictionary *)bindings
 					DEBUG(@"disabled command is [%@]", command);
 					[item setEnabled:NO];
 					[item setAction:NULL];
-				} else if ([item isEnabled]) {
+				} else {
 					[item setEnabled:YES];
 					[item setAction:@selector(performNormalModeMenuItem:)];
 				}
@@ -535,13 +543,14 @@ additionalBindings:(NSDictionary *)bindings
 				ViCommandMenuItemView *view = (ViCommandMenuItemView *)[item view];
 				if (view == nil)
 					view = [[ViCommandMenuItemView alloc] initWithTitle:newTitle
-										       command:command
+										    command:command
 										       font:[menu font]];
 				else {
 					view.title = newTitle;
 					view.command = command;
 				}
 				[item setView:view];
+				DEBUG(@"setting title [%@], action is %@", newTitle, NSStringFromSelector([item action]));
 				[item setTitle:newTitle];
 			}
 

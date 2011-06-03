@@ -484,7 +484,12 @@
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *item = [explorer itemAtRow:idx];
+		ProjectFile *pf;
+		id item = [explorer itemAtRow:idx];
+		if ([item isKindOfClass:[ViCompletion class]])
+			pf = [(ViCompletion *)item representedObject];
+		else
+			pf = item;
 		if (item && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:YES
 						  andOpen:[item url]

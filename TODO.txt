@@ -4,8 +4,6 @@
 REGRESSIONS
 ===========
 
-* S command with a visual selection not on line boundaries doesn't extend to whole lines (S is linewise)
-
 
 REQUESTED
 =========

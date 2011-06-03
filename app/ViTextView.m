@@ -1731,7 +1731,7 @@ int logIndent = 0;
 	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
 	    l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
-	if (command.isLineMode && !command.isMotion && mode != ViVisualMode) {
+	if (command.isLineMode && !command.isMotion) {
 		/*
 		 * If this command is line oriented, extend the
 		 * affectedRange to whole lines. However, don't
@@ -1741,7 +1741,7 @@ int logIndent = 0;
 		NSUInteger bol, end, eol;
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:l1];
 
-		if (command.motion == nil) {
+		if (command.motion == nil && mode != ViVisualMode) {
 			/*
 			 * This is a "doubled" command (like dd or yy).
 			 * A count affects that number of whole lines.

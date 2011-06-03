@@ -729,6 +729,7 @@
 		@"antialias", @"antialias",
 		@"undostyle", @"undostyle",
 		@"list", @"list",
+		@"formatprg", @"fp",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:

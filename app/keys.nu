@@ -233,13 +233,13 @@
 (nmap include:wmap)
 ;; g prefix
 (nmap setKey:"gU" toOperator:"uppercase:")
-(nmap setKey:"gUU" toEditAction:"uppercase:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gUgU" toEditAction:"uppercase:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gu" toOperator:"lowercase:")
-(nmap setKey:"guu" toEditAction:"lowercase:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gugu" toEditAction:"lowercase:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gt" toAction:"next_tab:")
 (nmap setKey:"gT" toAction:"previous_tab:")
+(nmap setKey:"gq" toOperator:"format:")
+(nmap setKey:"gqgq" toEditAction:"format:" flags:ViMapLineMode parameter:nil scope:nil)
 
 
 ;; operator map
@@ -275,6 +275,7 @@
 (vmap setKey:"gu" toEditAction:"lowercase:")
 (vmap setKey:"gt" toAction:"next_tab:")
 (vmap setKey:"gT" toAction:"previous_tab:")
+(vmap setKey:"gq" toEditAction:"format:")
 (vmap setKey:"p" toEditAction:"put_after:")
 (vmap setKey:"r" toEditAction:"replace:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (vmap setKey:"s" toEditAction:"substitute:")

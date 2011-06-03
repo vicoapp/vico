@@ -334,6 +334,8 @@
 		NSRange range = [(NSValue *)contextInfo rangeValue];
 		[self replaceRange:range withString:outputText];
 		[self endUndoGroup];
+		final_location = range.location + [outputText length];
+		[self setCaret:final_location];
 	} else
 		MESSAGE(@"filter exited with status %i", status);
 }
@@ -370,6 +372,15 @@
 						  prompt:@"!"
 					     contextInfo:command];
 	final_location = start_location;
+	return YES;
+}
+
+- (BOOL)format:(ViCommand *)command
+{
+	NSString *formatprg = [[NSUserDefaults standardUserDefaults] stringForKey:@"formatprg"];
+	if ([formatprg length] == 0)
+		formatprg = @"par";
+	[self filter_through_shell_command:formatprg contextInfo:command];
 	return YES;
 }
 

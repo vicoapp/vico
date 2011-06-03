@@ -567,7 +567,6 @@
 								</object>
 								<object class="NSMenuItem" id="704246332">
 									<reference key="NSMenu" ref="789758025"/>
-									<bool key="NSIsDisabled">YES</bool>
 									<string key="NSTitle">Reformat Paragraph / Selection (gqap)(gq)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>

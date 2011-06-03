@@ -72,6 +72,19 @@ ViDataDetector::Report(const char *aCharset)
 {
 	NSStringEncoding encoding = 0;
 
+	/* Check for BOMs. */
+	const uint8_t *bytes = (const uint8_t *)[data bytes];
+	if ([data length] >= 2) {
+		if (bytes[0] == 0xFF && bytes[1] == 0xFE)
+			return NSUTF16LittleEndianStringEncoding;
+		if (bytes[0] == 0xFE && bytes[1] == 0xFF)
+			return NSUTF16BigEndianStringEncoding;
+	}
+	if ([data length] >= 3) {
+		if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+			return NSUTF8StringEncoding;
+	}
+
 	ViDataDetector *detector = new ViDataDetector(NS_FILTER_ALL);
 	const char *charset = detector->detectBytes((const char *)[data bytes], (unsigned int)[data length]);
 	delete detector;

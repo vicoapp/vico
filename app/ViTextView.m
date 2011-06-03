@@ -2112,6 +2112,8 @@ int logIndent = 0;
 {
 	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	visual_start_location = [self characterIndexForInsertionAtPoint:point];
+	if (visual_start_location >= [[self textStorage] length])
+		visual_start_location = IMAX(0, [[self textStorage] length] - 1);
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:visual_start_location];
 	if (visual_start_location >= eol && bol < eol)

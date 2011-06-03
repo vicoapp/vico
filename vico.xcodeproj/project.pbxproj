@@ -22,6 +22,12 @@
 		9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606AB135B1924002C86FB /* ViPreferencePaneTheme.m */; };
 		9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */; };
 		9A2606B4135B1C63002C86FB /* BundlePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606B2135B1C63002C86FB /* BundlePrefs.xib */; };
+		9A288E311398EA9C00258451 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E281398EA9C00258451 /* buffer.c */; };
+		9A288E321398EA9C00258451 /* charset.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2A1398EA9C00258451 /* charset.c */; };
+		9A288E331398EA9C00258451 /* errmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2C1398EA9C00258451 /* errmsg.c */; };
+		9A288E341398EA9C00258451 /* par.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2E1398EA9C00258451 /* par.c */; };
+		9A288E351398EA9C00258451 /* reformat.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2F1398EA9C00258451 /* reformat.c */; };
+		9A288E381398EAE400258451 /* par in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A288E1E1398EA6F00258451 /* par */; };
 		9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
 		9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2A1133109C20023C5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
@@ -287,6 +293,13 @@
 			remoteGlobalIDString = 9A26067C13530FF3002C86FB;
 			remoteInfo = xorkey;
 		};
+		9A288E361398EAD200258451 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A288E1D1398EA6F00258451;
+			remoteInfo = par;
+		};
 		9A2EF2B2133109C20023C5B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
@@ -345,6 +358,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				9A288E381398EAE400258451 /* par in Copy Executables */,
 				9A4346EF13312861002B04DE /* vicotool in Copy Executables */,
 			);
 			name = "Copy Executables";
@@ -391,6 +405,16 @@
 		9A2606AF135B1C4F002C86FB /* ViPreferencePaneBundles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneBundles.h; sourceTree = "<group>"; };
 		9A2606B0135B1C4F002C86FB /* ViPreferencePaneBundles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneBundles.m; sourceTree = "<group>"; };
 		9A2606B3135B1C63002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/BundlePrefs.xib; sourceTree = "<group>"; };
+		9A288E1E1398EA6F00258451 /* par */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = par; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A288E281398EA9C00258451 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
+		9A288E291398EA9C00258451 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
+		9A288E2A1398EA9C00258451 /* charset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = charset.c; sourceTree = "<group>"; };
+		9A288E2B1398EA9C00258451 /* charset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = charset.h; sourceTree = "<group>"; };
+		9A288E2C1398EA9C00258451 /* errmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = errmsg.c; sourceTree = "<group>"; };
+		9A288E2D1398EA9C00258451 /* errmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errmsg.h; sourceTree = "<group>"; };
+		9A288E2E1398EA9C00258451 /* par.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = par.c; sourceTree = "<group>"; };
+		9A288E2F1398EA9C00258451 /* reformat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = reformat.c; sourceTree = "<group>"; };
+		9A288E301398EA9C00258451 /* reformat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reformat.h; sourceTree = "<group>"; };
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -782,6 +806,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A288E1B1398EA6F00258451 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF28C133109C10023C5B7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -829,6 +860,22 @@
 			path = xorkey;
 			sourceTree = "<group>";
 		};
+		9A288E201398EA7000258451 /* par */ = {
+			isa = PBXGroup;
+			children = (
+				9A288E281398EA9C00258451 /* buffer.c */,
+				9A288E291398EA9C00258451 /* buffer.h */,
+				9A288E2A1398EA9C00258451 /* charset.c */,
+				9A288E2B1398EA9C00258451 /* charset.h */,
+				9A288E2C1398EA9C00258451 /* errmsg.c */,
+				9A288E2D1398EA9C00258451 /* errmsg.h */,
+				9A288E2E1398EA9C00258451 /* par.c */,
+				9A288E2F1398EA9C00258451 /* reformat.c */,
+				9A288E301398EA9C00258451 /* reformat.h */,
+			);
+			path = par;
+			sourceTree = "<group>";
+		};
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
@@ -845,6 +892,7 @@
 				9A2EF41213310F4D0023C5B7 /* lemon */,
 				9A4346E11331257A002B04DE /* shell tool */,
 				9A26067F13530FF3002C86FB /* xorkey */,
+				9A288E201398EA7000258451 /* par */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
 			);
@@ -858,6 +906,7 @@
 				9A2EF41013310F4D0023C5B7 /* lemon */,
 				9A4346DD1331257A002B04DE /* vicotool */,
 				9A26067D13530FF3002C86FB /* xorkey */,
+				9A288E1E1398EA6F00258451 /* par */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1399,6 +1448,22 @@
 			productReference = 9A26067D13530FF3002C86FB /* xorkey */;
 			productType = "com.apple.product-type.tool";
 		};
+		9A288E1D1398EA6F00258451 /* par */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */;
+			buildPhases = (
+				9A288E1A1398EA6F00258451 /* Sources */,
+				9A288E1B1398EA6F00258451 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = par;
+			productName = par;
+			productReference = 9A288E1E1398EA6F00258451 /* par */;
+			productType = "com.apple.product-type.tool";
+		};
 		9A2EF28E133109C10023C5B7 /* Vico */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
@@ -1419,6 +1484,7 @@
 				9A2EF41D133110A20023C5B7 /* PBXBuildRule */,
 			);
 			dependencies = (
+				9A288E371398EAD200258451 /* PBXTargetDependency */,
 				9A2606891353105C002C86FB /* PBXTargetDependency */,
 				9A4346ED1331284C002B04DE /* PBXTargetDependency */,
 				9A2EF41C13310F9B0023C5B7 /* PBXTargetDependency */,
@@ -1503,6 +1569,7 @@
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
 				9A4346DC1331257A002B04DE /* vicotool */,
 				9A26067C13530FF3002C86FB /* xorkey */,
+				9A288E1D1398EA6F00258451 /* par */,
 			);
 		};
 /* End PBXProject section */
@@ -1680,6 +1747,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A26068113530FF3002C86FB /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A288E1A1398EA6F00258451 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A288E311398EA9C00258451 /* buffer.c in Sources */,
+				9A288E321398EA9C00258451 /* charset.c in Sources */,
+				9A288E331398EA9C00258451 /* errmsg.c in Sources */,
+				9A288E341398EA9C00258451 /* par.c in Sources */,
+				9A288E351398EA9C00258451 /* reformat.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1919,6 +1998,11 @@
 			isa = PBXTargetDependency;
 			target = 9A26067C13530FF3002C86FB /* xorkey */;
 			targetProxy = 9A2606881353105C002C86FB /* PBXContainerItemProxy */;
+		};
+		9A288E371398EAD200258451 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A288E1D1398EA6F00258451 /* par */;
+			targetProxy = 9A288E361398EAD200258451 /* PBXContainerItemProxy */;
 		};
 		9A2EF2B3133109C20023C5B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2197,6 +2281,43 @@
 			};
 			name = Snapshot;
 		};
+		9A288E251398EA7000258451 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		9A288E261398EA7000258451 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		9A288E271398EA7000258451 /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Snapshot;
+		};
 		9A2EF2BF133109C20023C5B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2424,6 +2545,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Snapshot;
+		};
+		9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A288E251398EA7000258451 /* Debug */,
+				9A288E261398EA7000258451 /* Release */,
+				9A288E271398EA7000258451 /* Snapshot */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */ = {
 			isa = XCConfigurationList;

@@ -1,0 +1,219 @@
+  ***********************
+  * releasenotes        *
+  * for Par 1.52-i18n.3 *
+  * Copyright 2001 by   *
+  * Adam M. Costello    *
+  * Modified by         *
+  * Jérôme Pouiller     *
+  ***********************
+
+
+Each entry below describes changes since the previous version.
+Par 1.52-i18n.3 released 2006-Oct-03
+    Fix bug with option 'g'
+
+Par 1.52-i18n.2 released 2006-Aug-03
+    Fix bug debian #310495.
+
+Par 1.52-i18n.1 released 2006-Jun-22
+    Changed char in wchar_t. Allow support of multibytes characters.
+    Added support for double-width characters.
+
+Par 1.52 released 2001-Apr-29
+    Fixed a portability problem regarding unsigned char versus char.
+        (This was a potential problem only on platforms where char is a
+        non-two's-complement signed type, which is very few, if any.)
+    Added a call to setlocale(), for 8-bit character support, requested by
+        Alex Postnikov (apost at math.berkeley.edu) and Oliver Fromme (olli
+        at secnetix.de).
+    Added some unnecessary parentheses, braces, and initialization,
+        to quiet the more aggressive compiler warnings.  (This
+        was suggested back in 1993 by Thomas E. Dickey (dickey at
+        software.org) but I refused.  I guess my attitude has changed.)
+    Changed the EXAMPLES section of par.1 to use the constant-width font
+        rather than constant-spaced Roman, suggested by Carl Lowenstein (cdl
+        at mpl.ucsd.edu).
+    Reorganized releasenotes to put the most recent version first, and
+        rearranged the email addresses to confuse address harvesters.
+
+Par 1.51 released 2000-Feb-24
+    Updated the author contact information.
+    Relaxed the copyright restrictions.
+    Added comma to the recommended set of body characters in PARINIT.
+
+Par 1.50 released 1996-Feb-11
+    Added the following features:
+        The T option, suggested by Jules Junker (jjunker at eos.hitc.com).
+        The b option.
+    Loosened the terms of the Copyright.
+    Changed protoMakefile:
+        Added the E and O macros, suggested by Peter A. Getterman
+            (pgutterman at worldbank.org).
+        Added sensible default values for all macros.
+    Added question-mark to the recommended set of body characters.
+    Restored documentation of the number-without-a-letter shortcut
+        command-line option, which got lost between versions 1.00 and 1.10.
+        Its absence was noted by David W. Sanderson (dws at ssec.wisc.edu).
+    Added .exrc examples, suggested by Alex Matulich (matuli_a at
+        marlin.navsea.navy.mil), though I used my own .exrc.
+    Added the Apologies section to par.doc and par.1.
+    Made many other tweeks to the documentation.
+    Removed the useless synopsis from the runtime help message.
+
+Par 1.41 released 1993-Oct-31
+    Moved the former Release Notes section of par.doc into its own file.
+    Fixed the following bugs:
+        A couple of inconsistencies of style in the code, pointed out by
+            Thomas E. Dickey (dickey at software.org).
+        If <quote> and <hang> were 1 and a one-line paragraph beginning with
+            quote characters was reformatted into a multi-line paragraph,
+            the new lines began with spaces instead of quote characters.
+            This was because the policy for copying prefixes used the
+            fallback prelen rather than the augmented version of it used for
+            computing the default value of <prefix>.  Now both use the same
+            formula.  Thanks go to Steven King (king at rtsg.mot.com) for
+            reporting the problem.
+        If the t option were given without a number, it was unset instead of
+            being set to 1.
+    Added the following feature:
+        The E option, suggested by Alex Matulich (alex at bilver.oau.org).
+    Altered the terminology:
+        Added the term "augmented fallback prelen".
+    Added to the Rights and Responsibilities section of par.doc a guideline
+        for handling version numbers in patched versions of Par.
+    Added a useful suggestion to protoMakefile.
+
+Par 1.40 released 1993-Oct-10
+    Fixed the following bugs:
+        The phrase "containing at least two lines" was left out of the
+            definition of "vacant line" in par.doc and par.1, although
+            the code implemented the correct definition.  (The phrase now
+            appears in the definition of "order <k> bodiless line".)
+        There was still a flaw in the design of the <quote> feature.  If two
+            adjacent lines had quoteprefixes neither of which was a prefix
+            of the other, no line would be inserted between them, possibly
+            causing other inserted lines not to be vacant.  Now it should
+            be true that every line inserted or truncated by the <quote>
+            feature will turn out to be vacant.
+        When <hang> began affecting the default value of <suffix> (as of Par
+            1.20), it should also have begun affecting the choice of source
+            of characters for the suffixes of lines in OPs.
+    Added the following features:
+        The i option, suggested by Alan Barrett (barrett at ee.und.ac.za).
+        The e option, inspired by a suggestion from Tim Pointing (tim at
+            ben.dciem.dnd.ca).
+        The r option.
+        The p, s, and w options are now accepted without numbers.
+        par no longer gives up so easily when choosing default values for
+            <prefix> and <suffix> for an IP with less than <hang>+2 lines,
+            nor when choosing the source of characters for the prefix and
+            suffix of the <i>th output line when <i> > <n> and <n> <=
+            <hang>.  These are incompatible changes, but I cannot imagine
+            anyone preferring the old behavior.
+    Altered the terminology:
+        Added the terms "bodiless line" (a generalization of "vacant line"),
+            "fallback prelen", and "fallback suflen".
+    Made miscellaneous changes to the documentation, including the addition
+        of the Quick Start section.
+
+Par 1.32 released 1993-Sep-13
+    Fixed the following bugs:
+        par could crash when the + or - operator was used with the B, P, and
+            Q options.  Thanks go to Andrew Cashin (splat at deakin.oz.au)
+            for reporting this.
+        If <quote> were 1 and two adjacent lines had different
+            quoteprefixes, one of which was a prefix of the other, and only
+            the line with the shorter quoteprefix contained a non-quote
+            character, then nothing would be altered.  According to par.doc
+            1.31, this was correct, but since neither line is vacant, I
+            consider this a bug in the design of the <quote> feature.  Now
+            the longer quoteprefix will be truncated to match the shorter
+            one, and will therefore be vacant.  Thanks go to Andrew Cashin
+            (splat at deakin.oz.au) for asking about this.
+    Made slight changes to the documentation.
+
+Par 1.31 released 1993-Sep-07
+    The version number is 1.31 rather than 1.40 because all added features
+        are really just enhancements of existing features.
+    Fixed the following bug:
+        In par.doc, in the example of a paragraph produced by a greedy
+            algorithm, the word "establish" appeared twice in a row.  Thanks
+            go to Daniel Kussendrager (daniel at astro.rug.nl) for first
+            pointing this out.  (The example is now even better because the
+            paragraph looks even worse than before.)
+    Added the following features:
+        A usage message to accompany command line or environment variable
+            syntax errors, first suggested by Karl Stiefvater (qarl at
+            ecl.wustl.edu).
+        The help and c options.
+        The B, P, and Q options, which render PARBODY, PARPROTECT, and
+            PARQUOTE no longer necessary.  They are retained, though, for
+            compatibility and convenience.
+        The _b, _q, and _Q escape sequences for charset syntax.
+    Added the term "charset syntax".
+    Isolated the character set code in charset.c and charset.h.
+
+Par 1.30 released 1993-Aug-18
+    Since Par 1.20 was posted to comp.sources.misc, I have made only
+        backward-compatible changes in Par 1.30.
+    Fixed the following bugs:
+        One wrong word in par.c sometimes caused par to crash.  Thanks go to
+            Contr Karl Vogel (vogelke at c-17igp.wpafb.af.mil) for sending
+            me an input file that caused a crash.
+        Too-long words were chopped up before the first word in a paragraph
+            was expanded to include initial spaces, allowing impossibility
+            #1 to occur.  The order of the two operations has been reversed.
+            Thanks go to Andrew Cashin (splat at deakin.oz.au) for reporting
+            the error message.
+    Added the following features:
+        The g option, motivated by suggestions from several people.
+        The q option, inspired by a suggestion from Andrew Cashin (splat at
+            deakin.oz.au).
+        The R option (my attempt to squash a bad idea from Par 1.00).
+        The PARQUOTE environment variable (comes with the q option).
+        The PARPROTECT environment variable, inspired by a suggestion from
+            Dennis Flaherty (dennisf at se01.elk.miles.com).
+    Altered the terminology:
+        Several terms have been added, and the meaning of some terms has
+        been slightly modified.  This is a change in the language used to
+        describe par's behavior, not a change in par's actual behavior.
+    Added a clean target to protoMakefile, suggested by Hal Jespersen (hlj
+        at posix.com).
+
+Par 1.20 released 1993-Aug-10
+    Since Par 1.10 was distributed to no one, I've made some more
+        incompatible changes in Par 1.20.
+    Added the following features:
+        The d option.
+        Paragraphs are now separated by vacant lines, not just blank lines.
+        <hang> now affects not only <prefix> but also <suffix>.
+
+Par 1.10 released 1993-Aug-02
+    Fixed the following bugs:
+        In reformat.c I used sprintf() but forgot to #include <stdio.h>.
+        I forgot to verify that <width> > <prefix> + <suffix>.
+        The first word of a paragraph was expanded to include initial white
+        characters, not just spaces, contrary to par.doc.
+        Some invalid options were not complained about.
+        NUL characters in the input were not handled.
+        A pointer foul-up in freelines() in par.c could cause a crash.
+    Added the following features:
+        The f, j, and t options.
+        The PARBODY environment variable.
+        Multiple options may be concatenated into a single argument.
+    Removed the m option:
+        Its function is better performed by the f and t options.  Normally
+        I would avoid making incompatible changes, unless I were doing a
+        complete overhaul of the whole program, in which case I'd make the
+        version number 2.00 to alert users to possible incompatibilities.
+        However, in this particular instance I allowed an incompatibility in
+        a minor upgrade because version 1.00 was distributed to only four
+        people.
+    Changed the handling of white characters:
+        par now changes all of them (except newlines) to spaces as they are
+        read.  This is another incompatible change, excused for the same
+        reason.
+    Made all error messages begin with "par error:".
+
+Par 1.00 released 1993-Jul-25
+    The first release.

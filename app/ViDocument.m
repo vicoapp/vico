@@ -95,10 +95,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)dataAppearsBinary:(NSData *)data
 {
-	const void *buf = [data bytes];
+	const uint8_t *buf = [data bytes];
 	NSUInteger length = [data length];
 	if (buf == NULL)
 		return NO;
+
+	/* If there's a UTF-16 BOM, it's probably not binary. */
+	if (length >= 2) {
+		if (buf[0] == 0xFF && buf[1] == 0xFE)
+			return NO;
+		if (buf[0] == 0xFE && buf[1] == 0xFF)
+			return NO;
+	}
 
 	if (memchr(buf, 0, length) != NULL)
 		return YES;

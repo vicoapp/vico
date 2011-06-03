@@ -28,6 +28,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)enableLineNumbers:(BOOL)flag;
 - (void)setTypingAttributes;
 - (NSDictionary *)typingAttributes;
+- (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data;
 - (BOOL)addData:(NSData *)data;
 @end
 
@@ -95,21 +96,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (BOOL)dataAppearsBinary:(NSData *)data
 {
-	const uint8_t *buf = [data bytes];
-	NSUInteger length = [data length];
-	if (buf == NULL)
-		return NO;
+	NSString *string = nil;
+	if (forcedEncoding)
+		string = [[NSString alloc] initWithData:data encoding:forcedEncoding];
+	if (string == nil)
+		string = [self suggestEncoding:NULL forData:data];
 
-	/* If there's a UTF-16 BOM, it's probably not binary. */
-	if (length >= 2) {
-		if (buf[0] == 0xFF && buf[1] == 0xFE)
-			return NO;
-		if (buf[0] == 0xFE && buf[1] == 0xFF)
-			return NO;
-	}
-
-	if (memchr(buf, 0, length) != NULL)
+	if ([string rangeOfString:[NSString stringWithFormat:@"%C", 0]].location != NSNotFound)
 		return YES;
+
 	return NO;
 }
 
@@ -544,6 +539,40 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				error:outError];
 }
 
+- (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data
+{
+	NSString *string = nil;
+	NSStringEncoding enc = 0;
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
+	/* Check for a user-overridden encoding in preferences. */
+	NSDictionary *encodingOverride = [userDefaults dictionaryForKey:@"encodingOverride"];
+	NSNumber *savedEncoding = [encodingOverride objectForKey:[[self fileURL] absoluteString]];
+	if (savedEncoding) {
+		enc = [savedEncoding unsignedIntegerValue];
+		string = [[NSString alloc] initWithData:data encoding:enc];
+	}
+
+	if (string == nil) {
+		/* Try to auto-detect the encoding. */
+		enc = [[ViCharsetDetector defaultDetector] encodingForData:data];
+		if (enc == 0)
+			/* Try UTF-8 if auto-detecting fails. */
+			enc = NSUTF8StringEncoding;
+		string = [[NSString alloc] initWithData:data encoding:enc];
+		if (string == nil) {
+			/* If all else fails, use iso-8859-1. */
+			enc = NSISOLatin1StringEncoding;
+			string = [[NSString alloc] initWithData:data encoding:enc];
+		}
+	}
+
+	if (outEncoding)
+		*outEncoding = enc;
+
+	return string;
+}
+
 - (BOOL)addData:(NSData *)data
 {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -575,29 +604,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			                 forKey:@"encodingOverride"];
 		}
 		forcedEncoding = 0;
-	} else {
-		/* Check for a user-overridden encoding in preferences. */
-		NSDictionary *encodingOverride = [userDefaults dictionaryForKey:@"encodingOverride"];
-		NSNumber *savedEncoding = [encodingOverride objectForKey:[[self fileURL] absoluteString]];
-		if (savedEncoding) {
-			encoding = [savedEncoding unsignedIntegerValue];
-			aString = [[NSString alloc] initWithData:data encoding:encoding];
-		}
-
-		if (aString == nil) {
-			/* Try to auto-detect the encoding. */
-			encoding = [[ViCharsetDetector defaultDetector] encodingForData:data];
-			if (encoding == 0)
-				/* Try UTF-8 if auto-detecting fails. */
-				encoding = NSUTF8StringEncoding;
-			aString = [[NSString alloc] initWithData:data encoding:encoding];
-			if (aString == nil) {
-				/* If all else fails, use iso-8859-1. */
-				encoding = NSISOLatin1StringEncoding;
-				aString = [[NSString alloc] initWithData:data encoding:encoding];
-			}
-		}
-	}
+	} else
+		aString = [self suggestEncoding:&encoding forData:data];
 
 	NSUInteger len = [textStorage length];
 	if (len == 0)

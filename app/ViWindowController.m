@@ -1613,13 +1613,35 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return [self selectViewAtPosition:ViViewRight relativeTo:currentView];
 }
 
-- (BOOL)window_previous:(ViCommand *)command
+- (BOOL)window_last:(ViCommand *)command
 {
 	ViDocumentTabController *tabController = [[self currentView] tabController];
 	id<ViViewController> prevView = tabController.previousView;
 	if (prevView == nil)
 		return NO;
 	[self selectDocumentView:prevView];
+	return YES;
+}
+
+- (BOOL)window_next:(ViCommand *)command
+{
+	ViDocumentTabController *tabController = [[self currentView] tabController];
+	id<ViViewController> nextView = [tabController nextViewClockwise:YES
+							      relativeTo:[[self currentView] view]];
+	if (nextView == nil)
+		return NO;
+	[self selectDocumentView:nextView];
+	return YES;
+}
+
+- (BOOL)window_previous:(ViCommand *)command
+{
+	ViDocumentTabController *tabController = [[self currentView] tabController];
+	id<ViViewController> nextView = [tabController nextViewClockwise:NO
+							      relativeTo:[[self currentView] view]];
+	if (nextView == nil)
+		return NO;
+	[self selectDocumentView:nextView];
 	return YES;
 }
 

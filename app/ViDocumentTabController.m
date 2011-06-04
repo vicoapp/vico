@@ -274,6 +274,23 @@
 	return nil;
 }
 
+- (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view
+                                         index:(NSInteger *)indexPtr
+{
+	NSView *sup;
+	while (view != nil && ![view isMemberOfClass:[NSTabView class]]) {
+		sup = [view superview];
+		DEBUG(@"%@ -> %@", view, sup);
+		if ([sup isMemberOfClass:[NSSplitView class]]) {
+			if (indexPtr != NULL)
+				*indexPtr = [[sup subviews] indexOfObject:view];
+			return (NSSplitView *)sup;
+		}
+		view = sup;
+	}
+	return nil;
+}
+
 - (NSView *)containedViewRelativeToView:(NSView *)view
                                  anchor:(ViViewOrderingMode)anchor
 {
@@ -319,6 +336,42 @@
 		return [self viewAtPosition:position relativeTo:split];
 
 	return nil;
+}
+
+- (id<ViViewController>)nextViewClockwise:(BOOL)clockwise
+			       relativeTo:(NSView *)view
+{
+	DEBUG(@"view = %@", view);
+	NSInteger ndx;
+	NSSplitView *split = [self containingSplitViewRelativeTo:view index:&ndx];
+	if (split == nil) {
+		DEBUG(@"%s", "no containing split view");
+		return nil;
+	}
+
+	NSInteger newIndex = ndx;
+	if (clockwise)
+		newIndex++;
+	else
+		newIndex--;
+
+	ViViewOrderingMode anchor = (clockwise ? ViViewRight : ViViewLeft);
+
+	NSArray *subviews = [split subviews];
+	if (newIndex >= 0 && newIndex < [subviews count]) {
+		view = [subviews objectAtIndex:newIndex];
+		return [self viewControllerForView:[self containedViewRelativeToView:view anchor:anchor]];
+	} else {
+		id<ViViewController> nextView = [self nextViewClockwise:clockwise relativeTo:split];
+		if (nextView)
+			return nextView;
+
+		if (clockwise)
+			view = [subviews objectAtIndex:0];
+		else
+			view = [subviews lastObject];
+		return [self viewControllerForView:[self containedViewRelativeToView:view anchor:anchor]];
+	}
 }
 
 - (void)normalizeViewsRecursively:(id)split

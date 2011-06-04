@@ -573,9 +573,25 @@ static ViWindowController	*currentWindowController = nil;
 		[(ViDocument *)doc closeAndWindow:(intptr_t)contextInfo];
 }
 
-- (IBAction)closeCurrentTab:(id)sender
+- (IBAction)closeCurrent:(id)sender
 {
-	[self closeCurrentTab];
+	id<ViViewController> viewController = [self currentView];
+
+	/* If the current view is a document view, check if it's the last document view. */
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *docView = viewController;
+		ViDocument *doc = [docView document];
+		if ([[doc views] count] == 1) {
+			[doc canCloseDocumentWithDelegate:self
+				      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
+					      contextInfo:(void *)(intptr_t)1];
+			return;
+		}
+	}
+
+	[self closeDocumentView:viewController
+	       canCloseDocument:YES
+		 canCloseWindow:YES];
 }
 
 - (IBAction)closeCurrentDocument:(id)sender
@@ -583,11 +599,7 @@ static ViWindowController	*currentWindowController = nil;
 	[self closeCurrentDocumentAndWindow:NO];
 }
 
-- (void)closeCurrentTab
-{
-	[self tabView:tabView shouldCloseTabViewItem:[tabView selectedTabViewItem]];
-}
-
+/* :bdelete and ctrl-cmd-w */
 - (void)closeCurrentDocumentAndWindow:(BOOL)canCloseWindow
 {
 	ViDocument *doc = [self currentDocument];

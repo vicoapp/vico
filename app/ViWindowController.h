@@ -94,8 +94,10 @@
 
 - (void)closeDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow;
 - (void)closeCurrentDocumentAndWindow:(BOOL)canCloseWindow;
-- (void)closeCurrentTab;
 - (BOOL)closeCurrentViewUnlessLast;
+- (BOOL)closeOtherViews;
+- (IBAction)closeCurrentDocument:(id)sender;
+- (IBAction)closeCurrent:(id)sender;
 
 - (void)addDocument:(ViDocument *)document;
 - (void)addNewTab:(ViDocument *)document;
@@ -132,7 +134,6 @@
 - (IBAction)moveCurrentViewToNewTabAction:(id)sender;
 - (BOOL)moveCurrentViewToNewTab;
 - (BOOL)normalizeSplitViewSizesInCurrentTab;
-- (BOOL)closeOtherViews;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position
                   relativeTo:(id)aView;
 - (ViDocument *)splitVertically:(BOOL)isVertical

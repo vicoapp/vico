@@ -7,7 +7,7 @@
 
 @implementation ViDocumentTabController
 
-@synthesize views, selectedView;
+@synthesize views, selectedView, previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialViewController
 {
@@ -44,6 +44,8 @@
 	if ([viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController document] removeView:viewController];
 	[views removeObject:viewController];
+	if (viewController == previousView)
+		previousView = nil;
 }
 
 - (NSSet *)documents

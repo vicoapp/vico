@@ -28,10 +28,12 @@ enum ViViewOrderingMode {
 	NSSplitView		*splitView;
 	NSMutableArray		*views;
 	id<ViViewController>	 selectedView;
+	id<ViViewController>	 previousView;
 }
 
 @property(readonly) NSArray *views;
 @property(readwrite, assign) id<ViViewController> selectedView;
+@property(readwrite, assign) id<ViViewController> previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialView;
 - (void)addView:(id<ViViewController>)aView;

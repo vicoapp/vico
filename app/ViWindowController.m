@@ -869,7 +869,14 @@ static ViWindowController	*currentWindowController = nil;
 		[self didSelectDocument:[docView document]];
 		[symbolController updateSelectedSymbolForLocation:[[docView textView] caret]];
 	}
-	[[viewController tabController] setSelectedView:viewController];
+
+	ViDocumentTabController *tabController = [viewController tabController];
+	[tabController setSelectedView:viewController];
+
+	if (tabController == [currentView tabController] &&
+	    currentView != [tabController previousView]) {
+		[tabController setPreviousView:currentView];
+	}
 
 	[self setCurrentView:viewController];
 }
@@ -1604,6 +1611,16 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)window_right:(ViCommand *)command
 {
 	return [self selectViewAtPosition:ViViewRight relativeTo:currentView];
+}
+
+- (BOOL)window_previous:(ViCommand *)command
+{
+	ViDocumentTabController *tabController = [[self currentView] tabController];
+	id<ViViewController> prevView = tabController.previousView;
+	if (prevView == nil)
+		return NO;
+	[self selectDocumentView:prevView];
+	return YES;
 }
 
 - (BOOL)window_close:(ViCommand *)command

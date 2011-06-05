@@ -356,6 +356,12 @@
 	[ViBundle setupEnvironment:env forTextView:self selectedRange:affectedRange];
 	[task setEnvironment:env];
 
+	NSURL *baseURL = [[document environment] baseURL];
+	if ([baseURL isFileURL])
+		[task setCurrentDirectoryPath:[baseURL path]];
+	else
+		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
+
 	[[document environment] filterText:inputText
 			       throughTask:task
 				    target:self

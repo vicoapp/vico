@@ -71,6 +71,16 @@
 	directoryCache = [NSMutableDictionary dictionary];
 }
 
+- (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
+{
+	return [directoryCache objectForKey:[self normalizeURL:aURL]];
+}
+
+- (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
+{
+	[directoryCache removeObjectForKey:[self normalizeURL:aURL]];
+}
+
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
 			      onCompletion:(void (^)(NSArray *, NSError *))completionCallback
 {

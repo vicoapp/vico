@@ -4,6 +4,8 @@
 REGRESSIONS
 ===========
 
+* visual line mode + > (shift) shifts one line too much!
+
 
 REQUESTED
 =========
@@ -18,9 +20,6 @@ REQUESTED
 * option to open files in the same view per default (ie, not tabs)
 * @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
 
-* @fkoeppe: Rescanning files in the File Explorer resets the current tree position to the tree root.
-* @fkoeppe: Adding a new file should automatically rescan the files in the File Explorer.
-* @fkoeppe: When pressing enter while renaming a file in the File Explorer, it opens it in a new tab.
 * @fkoeppe: How would I go about removing trailing white spaces on save?
 * @fkoeppe: Save width of the file explorer window.
 * @tobiastom: Will you implement shift+cursors for additional visual selecting?
@@ -62,7 +61,6 @@ BUGS
 IMPORTANT
 =========
 * installer for vicotool
-* :bdelete command
 * tweak smart typing pair invocation
 * indented paste
 * showAsHtml + dontFollowOutput (?)
@@ -76,15 +74,13 @@ IMPORTANT
 * :edit! => revert
 * support a count in C and h commands
 * highlight caret after goto line
-* allow ex commands when there is no open document
+* allow ex commands when there is no open document?
 
 FEATURES
 ========
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: Indicating if a file is "dirty" in the tab bar.
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
-* tab in ex command should do context-sensitive completion
-* completion for :setfiletype
 * :mkdir command
 * completion expressions in nu
 * zt, zz, zb (scroll cursor to top, center, bottom)
@@ -103,7 +99,6 @@ FEATURES
 * set incsearch
 * set listchars
 * symbol list should use same filtering algorithm as file explorer
-* option to hide the tab bar
 * implement R
 * implement c-w in insert mode
 * :normal!
@@ -112,7 +107,6 @@ FEATURES
 * action menu on document tabs with
   * close tab
   * close others
-* gq<motion> = reformat through 'formatprg' (ship with par)
 * dynamic headIndent paragraph style dependent on line indentation
 * cdpath setting? looked at by :edit
 * 0<C-D> in insert mode removes all indentation
@@ -144,23 +138,4 @@ IDEAS
 * make vi keys preferred over bundle key equivalents?
 
 
-:wnext (?)
-
 :command calling for bundle commands? arguments?
-
-
-
-
-There are nine types of registers:			*registers* *E354*
-[DONE] 1. The unnamed register ""
-2. 10 numbered registers "0 to "9
-3. The small delete register "-
-[DONE] 4. 26 named registers "a to "z or "A to "Z
-5. read-only registers ":, ".
-[DONE] 5. read-only registers "% and "#
-6. the expression register "=
-[DONE] 7. The selection registers "*, "+
-7. The drop register "~ 
-[DONE] 8. The black hole register "_
-[DONE] 9. Last search pattern register "/
-

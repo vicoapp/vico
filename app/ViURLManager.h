@@ -47,4 +47,6 @@
 + (ViURLManager *)defaultManager;
 - (void)registerHandler:(id<ViURLHandler>)handler;
 - (void)flushDirectoryCache;
+- (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL;
+- (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL;
 @end

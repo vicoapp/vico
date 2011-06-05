@@ -5,6 +5,8 @@
 #import "ViSplitView.h"
 #import "ViJumpList.h"
 
+#include <CoreServices/CoreServices.h>
+
 @class ViWindowController;
 @class ExEnvironment;
 
@@ -20,9 +22,12 @@
 @property(readwrite, copy) NSURL *url;
 @property(readwrite, assign) NSAttributedString *markedString;
 @property(readwrite, assign) NSMutableArray *children;
+- (BOOL)isDirectory;
+- (BOOL)hasCachedChildren;
+- (NSString *)name;
 @end
 
-@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, ViJumpListDelegate>
+@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;
@@ -41,6 +46,12 @@
 	IBOutlet NSProgressIndicator *progressIndicator;
 
 	NSFont *font;
+
+	// file system events
+	FSEventStreamRef evstream;
+
+	// remembering expanded state
+	NSMutableSet *expandedSet;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;
@@ -62,7 +73,6 @@
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;
-- (IBAction)addLocation:(id)sender;
 - (IBAction)addSFTPLocation:(id)sender;
 - (IBAction)actionMenu:(id)sender;
 
@@ -91,5 +101,6 @@
 - (IBAction)focusExplorer:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
+- (BOOL)isEditing;
 
 @end

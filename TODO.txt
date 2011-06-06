@@ -4,8 +4,6 @@
 REGRESSIONS
 ===========
 
-* visual line mode + > (shift) shifts one line too much!
-
 
 REQUESTED
 =========

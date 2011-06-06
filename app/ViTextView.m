@@ -1731,7 +1731,7 @@ int logIndent = 0;
 	DEBUG(@"affected locations: %u -> %u (%u chars), caret = %u, length = %u",
 	    l1, l2, l2 - l1, [self caret], [[self textStorage] length]);
 
-	if (command.isLineMode && !command.isMotion) {
+	if (command.isLineMode && !command.isMotion && (mode != ViVisualMode || !visual_line_mode)) {
 		/*
 		 * If this command is line oriented, extend the
 		 * affectedRange to whole lines. However, don't

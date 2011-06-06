@@ -1119,8 +1119,12 @@
 /* syntax: [count]A */
 - (BOOL)append_eol:(ViCommand *)command
 {
+	/* Save the count for the append command. */
+	int count = command.count;
+	command.count = 0;
 	[self move_eol:command];
 	start_location = end_location;
+	command.count = count;
 	return [self append:command];
 }
 

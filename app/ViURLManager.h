@@ -43,10 +43,13 @@
 {
 	NSMutableArray *handlers;
 	NSMutableDictionary *directoryCache;
+	NSCharacterSet *slashSet;
 }
 + (ViURLManager *)defaultManager;
 - (void)registerHandler:(id<ViURLHandler>)handler;
 - (void)flushDirectoryCache;
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL;
 - (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL;
+- (BOOL)directoryIsCachedAtURL:(NSURL *)aURL;
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL;
 @end

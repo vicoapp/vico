@@ -1,5 +1,6 @@
 #import "ViURLManager.h"
 #import "ViError.h"
+#import "ViCommon.h"
 #include "logging.h"
 
 @implementation ViURLManager
@@ -18,6 +19,7 @@
 	if ((self = [super init]) != nil) {
 		handlers = [NSMutableArray array];
 		directoryCache = [NSMutableDictionary dictionary];
+		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
 	}
 
 	return self;
@@ -73,12 +75,56 @@
 
 - (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
 {
-	return [directoryCache objectForKey:[self normalizeURL:aURL]];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	return [directoryCache objectForKey:key];
+}
+
+- (BOOL)directoryIsCachedAtURL:(NSURL *)aURL
+{
+	return [self cachedContentsOfDirectoryAtURL:aURL] != nil;
 }
 
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
 {
-	[directoryCache removeObjectForKey:[self normalizeURL:aURL]];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	[directoryCache removeObjectForKey:key];
+}
+
+- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL
+{
+	NSString *key = [[aURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	[directoryCache setObject:contents forKey:key];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
+							    object:self
+							  userInfo:[NSDictionary dictionaryWithObject:aURL
+											       forKey:@"URL"]];
+}
+
+- (BOOL)shouldRescanDirectoryAtURL:(NSURL *)aURL
+{
+	if (![self directoryIsCachedAtURL:aURL])
+		return NO;
+	// FIXME: check if this URL is displayed by a project explorer
+	return YES;
+}
+
+/* Called by ourselves whenever we know a directory has changed, e.g. when
+ * creating a new document.
+ */
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+{
+	if ([aURL isFileURL]) {
+		/* FS events does a better job for local files. */
+		return;
+	}
+
+	if ([self shouldRescanDirectoryAtURL:aURL]) {
+		[self flushCachedContentsOfDirectoryAtURL:aURL];
+		[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
+			/* Any interested project explorer will get a notification. */
+			DEBUG(@"rescanned URL %@, error %@", aURL, error);
+		}];
+	}
 }
 
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
@@ -88,15 +134,16 @@
 					      selector:@selector(contentsOfDirectoryAtURL:onCompletion:)];
 	if (handler) {
 		NSURL *normalizedURL = [self normalizeURL:aURL];
-		NSArray *contents = [directoryCache objectForKey:normalizedURL];
+		NSArray *contents = [self cachedContentsOfDirectoryAtURL:aURL];
 		if (contents) {
 			completionCallback(contents, nil);
 			return nil;
 		}
 
+		DEBUG(@"reading contents of %@", normalizedURL);
 		return [handler contentsOfDirectoryAtURL:normalizedURL onCompletion:^(NSArray *contents, NSError *error) {
 			if (contents && !error)
-			       [directoryCache setObject:contents forKey:normalizedURL];
+				[self cacheContents:contents forDirectoryAtURL:normalizedURL];
 			completionCallback(contents, error);
 		}];
 	}

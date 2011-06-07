@@ -29,6 +29,7 @@
 	   rename:(BOOL)renameFlag;
 - (void)rescanURL:(NSURL *)aURL;
 - (void)selectURL:(NSURL *)aURL;
+- (void)stopEvents;
 - (void)pauseEvents;
 - (void)resumeEvents;
 @end
@@ -558,9 +559,9 @@ void mycallback(
 			pf = [(ViCompletion *)item representedObject];
 		else
 			pf = item;
-		if (item && ![self outlineView:explorer isItemExpandable:item]) {
+		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:YES
-						  andOpen:[item url]
+						  andOpen:[pf url]
 				       orSwitchToDocument:nil];
 			didOpen = YES;
 		}

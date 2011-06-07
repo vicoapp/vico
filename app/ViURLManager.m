@@ -68,65 +68,6 @@
 	return aURL;
 }
 
-- (void)flushDirectoryCache
-{
-	directoryCache = [NSMutableDictionary dictionary];
-}
-
-- (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
-{
-	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	return [directoryCache objectForKey:key];
-}
-
-- (BOOL)directoryIsCachedAtURL:(NSURL *)aURL
-{
-	return [self cachedContentsOfDirectoryAtURL:aURL] != nil;
-}
-
-- (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
-{
-	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	[directoryCache removeObjectForKey:key];
-}
-
-- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL
-{
-	NSString *key = [[aURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	[directoryCache setObject:contents forKey:key];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
-							    object:self
-							  userInfo:[NSDictionary dictionaryWithObject:aURL
-											       forKey:@"URL"]];
-}
-
-- (BOOL)shouldRescanDirectoryAtURL:(NSURL *)aURL
-{
-	if (![self directoryIsCachedAtURL:aURL])
-		return NO;
-	// FIXME: check if this URL is displayed by a project explorer
-	return YES;
-}
-
-/* Called by ourselves whenever we know a directory has changed, e.g. when
- * creating a new document.
- */
-- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
-{
-	if ([aURL isFileURL]) {
-		/* FS events does a better job for local files. */
-		return;
-	}
-
-	if ([self shouldRescanDirectoryAtURL:aURL]) {
-		[self flushCachedContentsOfDirectoryAtURL:aURL];
-		[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
-			/* Any interested project explorer will get a notification. */
-			DEBUG(@"rescanned URL %@, error %@", aURL, error);
-		}];
-	}
-}
-
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
 			      onCompletion:(void (^)(NSArray *, NSError *))completionCallback
 {
@@ -257,6 +198,68 @@
 		return [handler writeDataSafely:data toURL:aURL onCompletion:aBlock];
 	aBlock(nil, nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [aURL scheme]]);
 	return nil;
+}
+
+#pragma mark -
+#pragma mark Directory Cache Control
+
+- (void)flushDirectoryCache
+{
+	directoryCache = [NSMutableDictionary dictionary];
+}
+
+- (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
+{
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	return [directoryCache objectForKey:key];
+}
+
+- (BOOL)directoryIsCachedAtURL:(NSURL *)aURL
+{
+	return [self cachedContentsOfDirectoryAtURL:aURL] != nil;
+}
+
+- (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
+{
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	[directoryCache removeObjectForKey:key];
+}
+
+- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL
+{
+	NSString *key = [[aURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	[directoryCache setObject:contents forKey:key];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
+							    object:self
+							  userInfo:[NSDictionary dictionaryWithObject:aURL
+											       forKey:@"URL"]];
+}
+
+- (BOOL)shouldRescanDirectoryAtURL:(NSURL *)aURL
+{
+	if (![self directoryIsCachedAtURL:aURL])
+		return NO;
+	// FIXME: check if this URL is displayed by a project explorer
+	return YES;
+}
+
+/* Called by ourselves whenever we know a directory has changed, e.g. when
+ * creating a new document.
+ */
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+{
+	if ([aURL isFileURL]) {
+		/* FS events does a better job for local files. */
+		return;
+	}
+
+	if ([self shouldRescanDirectoryAtURL:aURL]) {
+		[self flushCachedContentsOfDirectoryAtURL:aURL];
+		[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
+			/* Any interested project explorer will get a notification. */
+			DEBUG(@"rescanned URL %@, error %@", aURL, error);
+		}];
+	}
 }
 
 @end

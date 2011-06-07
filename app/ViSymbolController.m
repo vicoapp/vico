@@ -10,6 +10,7 @@
 {
 	if ((self = [super init]) != nil) {
 		symbolFilterCache = [NSMutableDictionary dictionary];
+		width = 200.0;
 	}
 	return self;
 }
@@ -29,6 +30,20 @@
 	[cell setWraps:NO];
 
 	separatorCell = [[ViSeparatorCell alloc] init];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(firstResponderChanged:)
+						     name:ViFirstResponderChangedNotification
+						   object:nil];
+}
+
+- (void)firstResponderChanged:(NSNotification *)notification
+{
+	NSView *view = [notification object];
+	if (view == symbolFilterField)
+		[self openSymbolListTemporarily:YES];
+	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView])
+		[self closeSymbolList];
 }
 
 - (void)didSelectDocument:(ViDocument *)document
@@ -85,7 +100,6 @@
 		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 		closeSymbolListAfterUse = NO;
 	}
-	[windowController focusEditor];
 }
 
 - (void)resetSymbolList
@@ -98,6 +112,7 @@
 {
 	[self resetSymbolList];
 	[self closeSymbolList];
+	[windowController focusEditor];
 }
 
 - (IBAction)gotoSymbolAction:(id)sender
@@ -214,19 +229,34 @@
 	NSView *view = [[splitView subviews] objectAtIndex:2];
 	NSRect frame = [splitView frame];
 	if ([splitView isSubviewCollapsed:view])
-		[splitView setPosition:NSWidth(frame) - 200 ofDividerAtIndex:1];
-	else
+		[splitView setPosition:NSWidth(frame) - width ofDividerAtIndex:1];
+	else {
+		width = [view bounds].size.width;
 		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+	}
 }
 
-- (IBAction)searchSymbol:(id)sender
+- (void)openSymbolListTemporarily:(BOOL)temporary
 {
 	NSView *view = [[splitView subviews] objectAtIndex:2];
 	if ([splitView isSubviewCollapsed:view]) {
 		closeSymbolListAfterUse = YES;
 		[self toggleSymbolList:nil];
 	}
+}
 
+- (IBAction)searchSymbol:(id)sender
+{
+	NSToolbar *toolbar = [window toolbar];
+	if (![[toolbar items] containsObject:searchToolbarItem]) {
+		NSBeep();
+		return;
+	}
+	[toolbar setVisible:YES];
+	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
+		NSBeep();
+		return;
+	}
 	[window makeFirstResponder:symbolFilterField];
 }
 

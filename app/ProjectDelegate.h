@@ -44,7 +44,9 @@
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
 	IBOutlet NSProgressIndicator *progressIndicator;
+	IBOutlet NSToolbarItem *searchToolbarItem;
 
+	CGFloat width;
 	NSFont *font;
 
 	// remembering expanded state

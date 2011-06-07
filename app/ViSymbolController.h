@@ -10,7 +10,10 @@
 	IBOutlet ViOutlineView *symbolView;
 	IBOutlet NSSearchField *symbolFilterField;
 	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
+	IBOutlet NSView *symbolsView;
+	IBOutlet NSToolbarItem *searchToolbarItem;
 
+	CGFloat width;
 	NSCell *separatorCell;
 	NSMutableArray *filteredDocuments;
 	NSMutableDictionary *symbolFilterCache;
@@ -26,5 +29,7 @@
 - (IBAction)filterSymbols:(id)sender;
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)focusSymbols:(id)sender;
+- (void)openSymbolListTemporarily:(BOOL)temporary;
+- (void)closeSymbolList;
 
 @end

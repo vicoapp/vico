@@ -4,8 +4,6 @@ BEFORE 1.0
 * tabstop setting per scope not honored!
 
 
-
-
 !!! explorer flickers when opening new windows!
 
 REGRESSIONS
@@ -24,7 +22,6 @@ REQUESTED
 * @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
 
 * @fkoeppe: How would I go about removing trailing white spaces on save?
-* @fkoeppe: Save width of the file explorer window.
 * @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
 
 * vim text objects, especially i[, a] and it, at
@@ -64,12 +61,10 @@ BUGS
 IMPORTANT
 =========
 * installer for vicotool
-* tweak smart typing pair invocation
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
 * Reload bundles!
-* toggling explorer always opens to 200px
 * dot should work with ! filters
 * :write !program
 * :read
@@ -137,7 +132,6 @@ LONG TERM FEATURES
 
 IDEAS
 =====
-* option whether to open an untitled file in a new window / project (?) why?
 * ODB Editor suite? why?
 * make vi keys preferred over bundle key equivalents?
 

@@ -50,6 +50,7 @@
      andRenameURL:(NSURL *)renameURL;
 - (void)rescanURL:(NSURL *)aURL;
 - (void)selectURL:(NSURL *)aURL;
+- (void)resetExplorerView;
 @end
 
 @implementation ProjectFile
@@ -108,6 +109,7 @@
 		[history setDelegate:self];
 		font = [NSFont systemFontOfSize:11.0];
 		expandedSet = [NSMutableSet set];
+		width = 200.0;
 	}
 	return self;
 }
@@ -138,6 +140,11 @@
 						 selector:@selector(URLContentsWasCached:)
 						     name:ViURLContentsCachedNotification
 						   object:[ViURLManager defaultManager]];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(firstResponderChanged:)
+						     name:ViFirstResponderChangedNotification
+						   object:nil];
 
 	[self browseURL:[environment baseURL]];
 }
@@ -516,8 +523,18 @@
 {
 	NSIndexSet *set = [self clickedIndexes];
 	NSInteger row = [set firstIndex];
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-	[explorer editColumn:0 row:row withEvent:nil select:YES];
+	id item = [explorer itemAtRow:row];
+	if (item == nil)
+		return;
+	if (isFiltered) {
+		[self resetExplorerView];
+		item = [item representedObject];
+	}
+	row = [explorer rowForItem:item];
+	if (row != -1) {
+		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+		[explorer editColumn:0 row:row withEvent:nil select:YES];
+	}
 }
 
 - (void)removeAlertDidEnd:(NSAlert *)alert
@@ -545,6 +562,9 @@
 
 		for (NSURL *url in set)
 			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:url];
+
+		if (isFiltered)
+			[self resetExplorerView];
 	}];
 }
 
@@ -770,6 +790,16 @@
 	     [menuItem action] == @selector(openWithFinder:)))
 		return NO;
 
+	/*
+	 * Some operations not applicable in filtered list.
+	 */
+	if (isFiltered &&
+	    ([menuItem action] == @selector(rescan:) ||
+	     [menuItem action] == @selector(addSFTPLocation:) ||
+	     [menuItem action] == @selector(newFolder:) ||
+	     [menuItem action] == @selector(newDocument:)))
+		return NO;
+
 	return YES;
 }
 
@@ -820,8 +850,28 @@
 
 - (IBAction)searchFiles:(id)sender
 {
-	[self openExplorerTemporarily:YES];
+	NSToolbar *toolbar = [window toolbar];
+	if (![[toolbar items] containsObject:searchToolbarItem]) {
+		NSBeep();
+		return;
+	}
+	[toolbar setVisible:YES];
+	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
+		NSBeep();
+		return;
+	}
 	[window makeFirstResponder:filterField];
+}
+
+- (void)firstResponderChanged:(NSNotification *)notification
+{
+	NSView *view = [notification object];
+	if (view == filterField)
+		[self openExplorerTemporarily:YES];
+	else if ([view isKindOfClass:[NSView class]] && closeExplorerAfterUse && ![view isDescendantOf:explorerView]) {
+		[self closeExplorer];
+		closeExplorerAfterUse = NO;
+	}
 }
 
 - (BOOL)explorerIsOpen
@@ -834,12 +884,13 @@
 	if (![self explorerIsOpen]) {
 		if (temporarily)
 			closeExplorerAfterUse = YES;
-		[splitView setPosition:200.0 ofDividerAtIndex:0];
+		[splitView setPosition:width ofDividerAtIndex:0];
 	}
 }
 
 - (void)closeExplorer
 {
+	width = [[[splitView subviews] objectAtIndex:0] bounds].size.width;
 	[splitView setPosition:0.0 ofDividerAtIndex:0];
 }
 

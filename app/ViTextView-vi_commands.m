@@ -884,8 +884,13 @@
 {
 	int count = IMAX(command.count, 1);
 
+	if (start_location >= [[self textStorage] length]) {
+		MESSAGE(@"Already at end-of-file");
+		return NO;
+	}
+
 	NSRange lineRange;
-	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:start_location];
 	for (NSUInteger i = 0; glyphIndex < [[self layoutManager] numberOfGlyphs] && i < count; i++) {
 		[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 		if (i == 0) {
@@ -910,6 +915,11 @@
 - (BOOL)move_up_soft:(ViCommand *)command
 {
 	int count = IMAX(command.count, 1);
+
+	if (start_location == 0) {
+		MESSAGE(@"Already at the beginning of the file");
+		return NO;
+	}
 
 	NSRange lineRange;
 	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];

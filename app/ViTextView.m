@@ -41,8 +41,6 @@ int logIndent = 0;
 
 - (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
 {
-	[self setCaret:0];
-
 	keyManager = [[ViKeyManager alloc] initWithTarget:self
 					       parser:aParser];
 
@@ -109,6 +107,12 @@ int logIndent = 0;
 						   context:NULL];
 	antialias = [[NSUserDefaults standardUserDefaults] boolForKey:@"antialias"];
 
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"cursorline"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+	highlightCursorLine = [[NSUserDefaults standardUserDefaults] boolForKey:@"cursorline"];
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(textStorageDidChangeLines:)
 						     name:ViTextStorageChangedLinesNotification 
@@ -116,6 +120,7 @@ int logIndent = 0;
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	proxy = [[ViScriptProxy alloc] initWithObject:self];
+	[self setCaret:0];
 	[self updateStatus];
 }
 
@@ -151,6 +156,9 @@ int logIndent = 0;
 		ViLayoutManager *lm = (ViLayoutManager *)[self layoutManager];
 		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
 		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [[self textStorage] length])];
+	} else if ([keyPath isEqualToString:@"cursorline"]) {
+		highlightCursorLine = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
+		[self invalidateCaretRect];
 	}
 }
 
@@ -2044,6 +2052,7 @@ int logIndent = 0;
 - (void)setTheme:(ViTheme *)aTheme
 {
 	caretColor = [aTheme caretColor];
+	lineHighlightColor = [aTheme lineHighlightColor];
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[[self enclosingScrollView] setBackgroundColor:[aTheme backgroundColor]];
 	[self setInsertionPointColor:[aTheme caretColor]];
@@ -2082,7 +2091,10 @@ int logIndent = 0;
 - (NSUInteger)currentScreenColumn
 {
 	NSRange lineRange;
-	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	NSUInteger length = [[self textStorage] length];
+	if (length == 0)
+		return 0;
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:IMIN(start_location, length - 1)];
 	[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 	return glyphIndex - lineRange.location + 1; /* XXX: mixing glyphs and characters? */
 }

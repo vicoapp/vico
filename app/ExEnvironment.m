@@ -730,12 +730,13 @@
 		@"undostyle", @"undostyle",
 		@"list", @"list",
 		@"formatprg", @"fp",
+		@"cursorline", @"cul",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
-	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", nil];
+	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", nil];
 	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
 
 	NSString *var;

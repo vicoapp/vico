@@ -9,6 +9,7 @@
 	NSColor *backgroundColor;
 	NSColor *foregroundColor;
 	NSColor *caretColor;
+	NSColor *lineHighlightColor;
 	NSColor *selectionColor;
 	NSColor *invisiblesColor;
 }
@@ -19,6 +20,7 @@
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;
+- (NSColor *)lineHighlightColor;
 - (NSColor *)selectionColor;
 - (NSColor *)invisiblesColor;
 - (NSString *)description;

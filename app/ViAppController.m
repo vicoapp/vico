@@ -129,6 +129,7 @@
 	    [NSNumber numberWithBool:YES], @"wrap",
 	    [NSNumber numberWithBool:YES], @"antialias",
 	    [NSNumber numberWithBool:YES], @"prefertabs",
+	    [NSNumber numberWithBool:NO], @"cursorline",
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:11.0], @"fontsize",
 	    @"vim", @"undostyle",

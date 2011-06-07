@@ -161,6 +161,15 @@
 	return foregroundColor;
 }
 
+- (NSColor *)lineHighlightColor
+{
+	if (lineHighlightColor == nil) {
+		lineHighlightColor = [self colorWithName:@"lineHighlight" orDefault:nil];
+		lineHighlightColor = [caretColor colorWithAlphaComponent:0.1];
+	}
+	return lineHighlightColor;
+}
+
 - (NSColor *)caretColor
 {
 	if (caretColor == nil) {

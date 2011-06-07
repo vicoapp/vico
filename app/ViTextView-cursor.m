@@ -7,7 +7,8 @@
 - (void)invalidateCaretRect
 {
 	NSLayoutManager *lm = [self layoutManager];
-	NSUInteger length = [[self textStorage] length];
+	ViTextStorage *ts = [self textStorage];
+	NSUInteger length = [ts length];
 	int len = 1;
 	if (caret + 1 >= length)
 		len = 0;
@@ -21,15 +22,37 @@
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX
 	if (len == 0) {
-                // XXX: at EOF
+		// XXX: at EOF
 		caretRect.size.height = 16;
 		caretRect.size.width = 7;
 	}
-        if (caretRect.origin.x == 0)
-                caretRect.origin.x = 5;
+	if (caretRect.origin.x == 0)
+		caretRect.origin.x = 5;
+
+	if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode) {
+		NSRange lineRange;
+		if (length == 0) {
+			lineHighlightRect = NSMakeRect(0, 0, 0, 16);
+		} else {
+			[lm lineFragmentRectForGlyphAtIndex:IMIN(caret, length - 1) effectiveRange:&lineRange];
+			if (lineRange.length > 0) {
+				NSUInteger eol = [lm characterIndexForGlyphAtIndex:NSMaxRange(lineRange) - 1];
+				if ([[ts string] characterAtIndex:eol] == '\n') // XXX: what about other line endings?
+					lineRange.length -= 1;
+			}
+
+			lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
+							  inTextContainer:[self textContainer]];
+		}
+		lineHighlightRect.size.width = [self bounds].size.width;
+	}
+
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self setNeedsDisplayInRect:caretRect];
+	[self setNeedsDisplayInRect:oldLineHighlightRect];
+	[self setNeedsDisplayInRect:lineHighlightRect];
 	oldCaretRect = caretRect;
+	oldLineHighlightRect = lineHighlightRect;
 }
 
 - (void)updateCaret
@@ -43,6 +66,13 @@
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
+	if (NSIntersectsRect(lineHighlightRect, aRect)) {
+		if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
+			[lineHighlightColor set];
+			[[NSBezierPath bezierPathWithRect:lineHighlightRect] fill];
+		}
+	}
+
 	if (NSIntersectsRect(caretRect, aRect)) {
 		if ([self isFieldEditor]) {
 			caretRect.size.width = 1;
@@ -57,6 +87,7 @@
 			if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
 				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
 		}
+
 		if ([self isFieldEditor])
 			[[NSColor blackColor] set];
 		else
@@ -83,6 +114,7 @@
 - (BOOL)becomeFirstResponder
 {
 	[self resetInputSource];
+	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super becomeFirstResponder];
 }
@@ -101,6 +133,7 @@
 		original_normal_source = input;
 	}
 
+	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super resignFirstResponder];
 }

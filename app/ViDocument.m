@@ -512,6 +512,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				[self updateChangeCount:NSChangeCleared];
 				[proxy emit:@"didSave" with:self, nil];
 			}
+
+			if (isTemporary)
+				[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:[normalizedURL URLByDeletingLastPathComponent]];
 			isTemporary = NO;
 		}
 	}];

@@ -1,5 +1,12 @@
+BEFORE 1.0
+==========
+
+* tabstop setting per scope not honored!
+
+
+
+
 !!! explorer flickers when opening new windows!
-!!! and seems to always want to open!?
 
 REGRESSIONS
 ===========
@@ -13,22 +20,19 @@ REQUESTED
   normally. Also if pasting back (P) on the last line, it pastes both
   blank and the line.
 
-* tabstop setting per scope not honored!
-
 * option to open files in the same view per default (ie, not tabs)
 * @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
 
 * @fkoeppe: How would I go about removing trailing white spaces on save?
 * @fkoeppe: Save width of the file explorer window.
-* @tobiastom: Will you implement shift+cursors for additional visual selecting?
 * @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
 
 * vim text objects, especially i[, a] and it, at
 * vicotool --wait <file>
 * vicotool --line 1
 * R (replace mode)
-* show hidden files in explorer (option in action menu? or skipPattern?)
 
+* show hidden files in explorer (option in action menu? or skipPattern?)
 
 URGENT
 ========
@@ -41,6 +45,7 @@ URGENT
 
 BUGS
 ====
+* :setf should remember url<->syntax mapping
 * r<esc> should not insert literal <esc>
 * h doesn't accept a count
 * bundle commands time out when presenting ui
@@ -73,6 +78,7 @@ IMPORTANT
 * support a count in C and h commands
 * highlight caret after goto line
 * allow ex commands when there is no open document?
+
 
 FEATURES
 ========

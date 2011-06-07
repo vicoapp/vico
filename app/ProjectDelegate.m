@@ -9,6 +9,28 @@
 #import "ViURLManager.h"
 #import "ViCompletion.h"
 #import "ViCompletionController.h"
+#import "NSObject+SPInvocationGrabbing.h"
+
+@interface NSURL (equality)
+- (BOOL)isEqualToURL:(NSURL *)otherURL;
+- (BOOL)hasPrefix:(NSURL *)prefixURL;
+@end
+@implementation NSURL (equality)
+- (BOOL)isEqualToURL:(NSURL *)otherURL
+{
+	NSCharacterSet *slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	return [s1 isEqualToString:s2];
+}
+- (BOOL)hasPrefix:(NSURL *)prefixURL
+{
+	NSCharacterSet *slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	return [s1 hasPrefix:s2];
+}
+@end
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -16,7 +38,7 @@
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)anIndex ofItem:(id)item;
-- (void)expandNextItem:(id)dummy;
+- (void)expandNextItem;
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit;
 - (void)sortProjectFiles:(NSMutableArray *)children;
 - (BOOL)rescan_files:(ViCommand *)command;
@@ -24,9 +46,8 @@
 - (void)resetExpandedItems;
 - (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items;
 - (void)rescanURL:(NSURL *)aURL
-       ifExpanded:(BOOL)ifExpandedFlag
-     andSelectURL:(NSURL *)selectedURL
-	   rename:(BOOL)renameFlag;
+     onlyIfCached:(BOOL)cacheFlag
+     andRenameURL:(NSURL *)renameURL;
 - (void)rescanURL:(NSURL *)aURL;
 - (void)selectURL:(NSURL *)aURL;
 - (void)stopEvents;
@@ -121,6 +142,11 @@
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(URLContentsWasCached:)
+						     name:ViURLContentsCachedNotification
+						   object:[ViURLManager defaultManager]];
+
 	[self browseURL:[environment baseURL]];
 }
 
@@ -175,7 +201,7 @@
 	return children;
 }
 
-- (void)childrenAtURL:(NSURL *)url onCompletion:(void (^)(NSMutableArray *children, NSError *error))aBlock
+- (void)childrenAtURL:(NSURL *)url onCompletion:(void (^)(NSMutableArray *, NSError *))aBlock
 {
 	ViURLManager *um = [ViURLManager defaultManager];
 
@@ -227,6 +253,11 @@
 			[self recursivelySortProjectFiles:[file children]];
 }
 
+- (BOOL)isEditing
+{
+	return [explorer editedRow] != -1;
+}
+
 - (void)stopEvents
 {
 	if (evstream) {
@@ -250,11 +281,6 @@
 		FSEventStreamStart(evstream);
 }
 
-- (BOOL)isEditing
-{
-	return [explorer editedRow] != -1;
-}
-
 void mycallback(
     ConstFSEventStreamRef streamRef,
     void *clientCallBackInfo,
@@ -273,9 +299,10 @@ void mycallback(
 	}
 
 	for (i = 0; i < numEvents; i++) {
-		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i] length:strlen(paths[i])];
+		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
+											     length:strlen(paths[i])];
 		NSURL *url = [NSURL fileURLWithPath:path];
-		[explorer rescanURL:url ifExpanded:YES andSelectURL:nil rename:NO];
+		[explorer rescanURL:url];
 	}
 }
 
@@ -286,7 +313,7 @@ void mycallback(
 
 	CFStringRef mypath = (CFStringRef)[aURL path];
 	CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&mypath, 1, NULL);
-	CFAbsoluteTime latency = 1.0; /* Latency in seconds */
+	CFAbsoluteTime latency = 0.3; /* Latency in seconds */
 
 	struct FSEventStreamContext ctx;
 	bzero(&ctx, sizeof(ctx));
@@ -604,7 +631,7 @@ void mycallback(
 		}
 
 		for (NSURL *url in set)
-			[self rescanURL:url ifExpanded:YES andSelectURL:nil rename:NO];
+			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:url];
 	}];
 }
 
@@ -651,6 +678,19 @@ void mycallback(
 
 - (IBAction)rescan:(id)sender
 {
+	ProjectFile *pf = [explorer itemAtRow:[explorer selectedRow]];
+	if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
+		pf = [explorer parentForItem:pf];
+
+	NSURL *parent;
+	if (pf)
+		parent = [pf url];
+	else
+		parent = [rootButton URL];
+
+	[self rescanURL:parent];
+
+#if 0
 	NSInteger row = [explorer selectedRow];
 
 	NSURL *url = [rootButton URL];
@@ -661,6 +701,7 @@ void mycallback(
 		byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
 	explorer.lastSelectedRow = row;
+#endif
 }
 
 - (IBAction)revealInFinder:(id)sender
@@ -714,7 +755,7 @@ void mycallback(
 		if (error)
 			[NSApp presentError:error];
 		else
-			[self rescanURL:parent ifExpanded:NO andSelectURL:url rename:YES];
+			[self rescanURL:parent onlyIfCached:NO andRenameURL:url];
 	}];
 }
 
@@ -738,7 +779,7 @@ void mycallback(
 		if (error)
 			[NSApp presentError:error];
 		else
-			[self rescanURL:parent ifExpanded:NO andSelectURL:newURL rename:YES];
+			[self rescanURL:parent onlyIfCached:NO andRenameURL:newURL];
 	}];
 }
 
@@ -917,7 +958,25 @@ void mycallback(
 	[delegate focusEditor];
 }
 
-- (void)expandNextItem:(id)dummy
+- (void)expandItems:(NSArray *)items
+{
+	[self expandItems:items recursionLimit:3];
+
+	[filteredItems sortUsingComparator:^(id a, id b) {
+		ViCompletion *ca = a, *cb = b;
+		if (ca.score > cb.score)
+			return (NSComparisonResult)NSOrderedAscending;
+		else if (cb.score > ca.score)
+			return (NSComparisonResult)NSOrderedDescending;
+		return (NSComparisonResult)NSOrderedSame;
+		}];
+
+	[explorer reloadData];
+	if ([itemsToFilter count] > 0)
+		[[self nextRunloop] expandNextItem];
+}
+
+- (void)expandNextItem
 {
 	if (!isFiltering || [itemsToFilter count] == 0)
 		return;
@@ -937,20 +996,7 @@ void mycallback(
 				DEBUG(@"no parent for item %@", item);
 		} else {
 			[item setChildren:children];
-			[self expandItems:[item children] recursionLimit:3];
-
-			[filteredItems sortUsingComparator:^(id a, id b) {
-				ViCompletion *ca = a, *cb = b;
-				if (ca.score > cb.score)
-					return (NSComparisonResult)NSOrderedAscending;
-				else if (cb.score > ca.score)
-					return (NSComparisonResult)NSOrderedDescending;
-				return (NSComparisonResult)NSOrderedSame;
-			}];
-
-			[explorer reloadData];
-			if ([itemsToFilter count] > 0)
-				[self performSelector:@selector(expandNextItem:) withObject:nil afterDelay:0.0];
+			[self expandItems:[item children]];
 		}
 	}];
 }
@@ -1027,22 +1073,9 @@ void mycallback(
 		isFiltered = YES;
 		isFiltering = YES;
 
-		[self expandItems:rootItems recursionLimit:3];
-
-		[filteredItems sortUsingComparator:^(id a, id b) {
-			ViCompletion *ca = a, *cb = b;
-			if (ca.score > cb.score)
-				return (NSComparisonResult)NSOrderedAscending;
-			else if (cb.score > ca.score)
-				return (NSComparisonResult)NSOrderedDescending;
-			return (NSComparisonResult)NSOrderedSame;
-			}];
-
-		[explorer reloadData];
+		[self expandItems:rootItems];
 		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 		      byExtendingSelection:NO];
-		if ([itemsToFilter count] > 0)
-			[self expandNextItem:nil];
 	}
 }
 
@@ -1177,7 +1210,7 @@ doCommandBySelector:(SEL)aSelector
 - (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items
 {
 	for (id item in items) {
-		if ([[item url] isEqual:aURL])
+		if ([[item url] isEqualToURL:aURL])
 			return item;
 		if ([self outlineView:explorer isItemExpandable:item] && [item hasCachedChildren]) {
 			id foundItem = [self findItemWithURL:aURL inItems:[item children]];
@@ -1203,44 +1236,77 @@ doCommandBySelector:(SEL)aSelector
 	}
 }
 
-- (void)rescanURL:(NSURL *)aURL
-       ifExpanded:(BOOL)ifExpandedFlag
-     andSelectURL:(NSURL *)selectedURL
-	   rename:(BOOL)renameFlag
+- (void)URLContentsWasCached:(NSNotification *)notification
 {
-	if (![aURL isEqual:[rootButton URL]]) {
-		id item = [self findItemWithURL:aURL inItems:rootItems];
-		if (item == nil)
-			return;
+	NSURL *url = [[notification userInfo] objectForKey:@"URL"];
 
-		if (ifExpandedFlag && ![explorer isItemExpanded:item])
-			return;
+	if (isExpandingTree)
+		return;
+
+	ViURLManager *urlman = [ViURLManager defaultManager];
+	NSArray *contents = [urlman cachedContentsOfDirectoryAtURL:url];
+	if (contents == nil) {
+		DEBUG(@"huh? cached contents of %@ gone already!?", url);
+		return;
 	}
 
+	if (![url hasPrefix:[rootButton URL]]) {
+		DEBUG(@"changed URL %@ currently not shown in this explorer, ignoring", url);
+		return;
+	}
+
+	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
+
+	id item = [self findItemWithURL:url inItems:rootItems];
+	if (item) {
+		[item setChildren:children];
+	} else if ([url isEqualToURL:[rootButton URL]]) {
+		rootItems = children;
+		[self filterFiles:self];
+	} else {
+		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, [rootButton URL]);
+		return;
+	}
+
+	[explorer reloadData];
+	[self resetExpandedItems];
+}
+
+- (void)rescanURL:(NSURL *)aURL
+     onlyIfCached:(BOOL)cacheFlag
+     andRenameURL:(NSURL *)renameURL
+{
+	ViURLManager *urlman = [ViURLManager defaultManager];
+
+	if (cacheFlag) {
+		if (![urlman directoryIsCachedAtURL:aURL]) {
+			DEBUG(@"changed URL %@ is not cached", aURL);
+			return;
+		}
+		if (![aURL hasPrefix:[rootButton URL]]) {
+			DEBUG(@"changed URL %@ currently not shown in explorer, flushing cache", aURL);
+			[urlman flushCachedContentsOfDirectoryAtURL:aURL];
+			return;
+		}
+	}
+
+	NSURL *selectedURL = renameURL;
 	if (selectedURL == nil) {
 		id selectedItem = [explorer itemAtRow:[explorer selectedRow]];
 		selectedURL = [selectedItem url];
 	}
 
-	[[ViURLManager defaultManager] flushCachedContentsOfDirectoryAtURL:aURL];
+	[urlman flushCachedContentsOfDirectoryAtURL:aURL];
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error && ![error isFileNotFoundError]) {
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert runModal];
 		} else {
-			id item = [self findItemWithURL:aURL inItems:rootItems];
-			if (item) {
-				[item setChildren:children];
-			} else {
-				rootItems = children;
-				[self filterFiles:self];
-			}
-			[explorer reloadData];
-			[self resetExpandedItems];
+			/* The notification should already have reloaded the data. */
 			[explorer expandItem:[self findItemWithURL:aURL inItems:rootItems]];
 
-			if (renameFlag) {
-				item = [self findItemWithURL:selectedURL inItems:rootItems];
+			if (renameURL) {
+				id item = [self findItemWithURL:renameURL inItems:rootItems];
 				if (item) {
 					NSInteger row = [explorer rowForItem:item];
 					[self pauseEvents];
@@ -1256,22 +1322,12 @@ doCommandBySelector:(SEL)aSelector
 
 - (void)rescanURL:(NSURL *)aURL
 {
-	[self rescanURL:aURL ifExpanded:YES andSelectURL:nil rename:NO];
+	[self rescanURL:aURL onlyIfCached:YES andRenameURL:nil];
 }
 
 - (BOOL)rescan_files:(ViCommand *)command
 {
-	ProjectFile *pf = [explorer itemAtRow:[explorer selectedRow]];
-	if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
-		pf = [explorer parentForItem:pf];
-
-	NSURL *parent;
-	if (pf)
-		parent = [pf url];
-	else
-		parent = [rootButton URL];
-
-	[self rescanURL:parent];
+	[self rescan:nil];
 	return YES;
 }
 
@@ -1330,17 +1386,21 @@ doCommandBySelector:(SEL)aSelector
 	if ([pf hasCachedChildren])
 		return;
 
+	__block BOOL directoryContentsIsAsync = NO;
+	isExpandingTree = YES;
 	[self childrenAtURL:[pf url] onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {
 			pf.children = children;
-			if (![[pf url] isFileURL]) { /* XXX: did we get here synchronously? */
+			if (directoryContentsIsAsync) {
 				[explorer reloadData];
 				[explorer expandItem:pf];
 			}
 		}
 	}];
+	isExpandingTree = NO;
+	directoryContentsIsAsync = YES;
 }
 
 - (void)outlineViewItemDidExpand:(NSNotification *)notification
@@ -1383,7 +1443,7 @@ doCommandBySelector:(SEL)aSelector
 	ProjectFile *file = item;
 	NSURL *parentURL = [[file url] URLByDeletingLastPathComponent];
 	NSURL *newurl = [[parentURL URLByAppendingPathComponent:object] URLByStandardizingPath];
-	if ([[file url] isEqual:newurl])
+	if ([[file url] isEqualToURL:newurl])
 		return;
 
 	[[ViURLManager defaultManager] moveItemAtURL:[file url]
@@ -1395,6 +1455,8 @@ doCommandBySelector:(SEL)aSelector
 			ViDocument *doc = [windowController documentForURL:[file url]];
 			[file setUrl:newurl];
 			[doc setFileURL:newurl];
+			[explorer reloadData];
+			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
 		}
 	}];
 }

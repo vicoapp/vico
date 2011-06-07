@@ -52,6 +52,7 @@
 
 	// remembering expanded state
 	NSMutableSet *expandedSet;
+	BOOL isExpandingTree;
 
 	// incremental file filtering
 	NSMutableArray *filteredItems;

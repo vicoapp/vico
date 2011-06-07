@@ -8,6 +8,8 @@
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
 
+#define ViURLContentsCachedNotification @"ViURLContentsCachedNotification"
+
 #define ViFilterRunLoopMode @"ViFilterRunLoopMode"
 
 #ifdef IMAX

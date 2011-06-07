@@ -93,6 +93,11 @@
 	return self;
 }
 
+- (void)finalize
+{
+	[self stopEvents];
+}
+
 - (void)awakeFromNib
 {
 	explorer.keyManager = [[ViKeyManager alloc] initWithTarget:self

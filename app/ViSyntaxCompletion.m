@@ -29,6 +29,8 @@
 	NSArray *languages = [[ViBundleStore defaultStore] languages];
 	for (ViLanguage *lang in languages) {
 		NSString *name = lang.name;
+		if ([name length] == 0)
+			continue;
 		ViRegexpMatch *m = nil;
 		if (pattern == nil || (m = [rx matchInString:name]) != nil) {
 			ViCompletion *c;

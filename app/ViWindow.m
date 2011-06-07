@@ -15,4 +15,24 @@
 	return NO;
 }
 
+- (IBAction)closeCurrent:(id)sender
+{
+	[[self windowController] closeCurrent:sender];
+}
+
+- (IBAction)closeCurrentDocument:(id)sender
+{
+	[[self windowController] closeCurrentDocument:sender];
+}
+
+- (IBAction)selectNextTab:(id)sender
+{
+	[[self windowController] selectNextTab:sender];
+}
+
+- (IBAction)selectPreviousTab:(id)sender
+{
+	[[self windowController] selectPreviousTab:sender];
+}
+
 @end

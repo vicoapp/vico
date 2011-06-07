@@ -44,6 +44,9 @@
 	NSMutableArray *handlers;
 	NSMutableDictionary *directoryCache;
 	NSCharacterSet *slashSet;
+
+	// file system events
+	FSEventStreamRef evstream;
 }
 + (ViURLManager *)defaultManager;
 - (void)registerHandler:(id<ViURLHandler>)handler;

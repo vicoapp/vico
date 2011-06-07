@@ -1,7 +1,20 @@
 #import "ViURLManager.h"
 #import "ViError.h"
 #import "ViCommon.h"
+#import "NSObject+SPInvocationGrabbing.h"
+
+/* XXX: this is butt ugly! */
+#import "ViWindowController.h"
+#import "ProjectDelegate.h"
+
 #include "logging.h"
+
+@interface ViURLManager (private)
+- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL;
+- (void)monitorDirectoryAtURL:(NSURL *)aURL;
+- (void)restartEvents;
+- (void)stopEvents;
+@end
 
 @implementation ViURLManager
 
@@ -23,6 +36,11 @@
 	}
 
 	return self;
+}
+
+- (void)finalize
+{
+	[self stopEvents];
 }
 
 - (void)registerHandler:(id<ViURLHandler>)handler
@@ -206,6 +224,7 @@
 - (void)flushDirectoryCache
 {
 	directoryCache = [NSMutableDictionary dictionary];
+	[self restartEvents];
 }
 
 - (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
@@ -221,45 +240,173 @@
 
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
 {
+	DEBUG(@"flushing cache for %@", aURL);
 	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	[directoryCache removeObjectForKey:key];
 }
 
 - (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL
 {
+	DEBUG(@"caching contents of URL %@", aURL);
+
 	NSString *key = [[aURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	[directoryCache setObject:contents forKey:key];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
 							    object:self
 							  userInfo:[NSDictionary dictionaryWithObject:aURL
 											       forKey:@"URL"]];
+	[self monitorDirectoryAtURL:aURL];
 }
 
 - (BOOL)shouldRescanDirectoryAtURL:(NSURL *)aURL
 {
-	if (![self directoryIsCachedAtURL:aURL])
-		return NO;
-	// FIXME: check if this URL is displayed by a project explorer
-	return YES;
+	// XXX: check if this URL is displayed by a project explorer
+	for (NSWindow *window in [NSApp windows]) {
+		ViWindowController *wincon = [window windowController];
+		if ([wincon respondsToSelector:@selector(explorer)]) {
+			ProjectDelegate *explorer = [wincon explorer];
+			if ([explorer displaysURL:aURL])
+				return YES;
+		}
+	}
+
+	DEBUG(@"URL %@ not displayed by any project explorer", aURL);
+	return NO;
 }
 
 /* Called by ourselves whenever we know a directory has changed, e.g. when
  * creating a new document.
  */
-- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL force:(BOOL)force
 {
-	if ([aURL isFileURL]) {
+	DEBUG(@"directory %@ has changed", aURL);
+
+	if (!force && [aURL isFileURL]) {
 		/* FS events does a better job for local files. */
 		return;
 	}
 
+	if (![self directoryIsCachedAtURL:aURL])
+		return;
+
+	[self flushCachedContentsOfDirectoryAtURL:aURL];
+
 	if ([self shouldRescanDirectoryAtURL:aURL]) {
-		[self flushCachedContentsOfDirectoryAtURL:aURL];
 		[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
 			/* Any interested project explorer will get a notification. */
 			DEBUG(@"rescanned URL %@, error %@", aURL, error);
 		}];
+	} else if ([aURL isFileURL])
+		[self restartEvents];
+}
+
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+{
+	[self notifyChangedDirectoryAtURL:aURL force:NO];
+}
+
+#pragma mark -
+#pragma mark File System Events
+
+- (void)stopEvents
+{
+	if (evstream) {
+		DEBUG(@"stopping fs events %@", FSEventStreamCopyDescription(evstream));
+		FSEventStreamStop(evstream);
+		FSEventStreamUnscheduleFromRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		FSEventStreamInvalidate(evstream);
+		FSEventStreamRelease(evstream);
+		evstream = NULL;
 	}
+}
+
+void mycallback(
+    ConstFSEventStreamRef streamRef,
+    void *clientCallBackInfo,
+    size_t numEvents,
+    void *eventPaths,
+    const FSEventStreamEventFlags eventFlags[],
+    const FSEventStreamEventId eventIds[])
+{
+	int i;
+	char **paths = eventPaths;
+	ViURLManager *urlManager = clientCallBackInfo;
+
+	for (i = 0; i < numEvents; i++) {
+		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
+											     length:strlen(paths[i])];
+		NSURL *url = [NSURL fileURLWithPath:path];
+		[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url force:YES];
+	}
+}
+
+- (BOOL)URLIsMonitored:(NSURL *)aURL
+{
+	if (evstream == NULL)
+		return NO;
+
+	NSString *path = [aURL path];
+	NSArray *pathsBeingWatched = (NSArray *)FSEventStreamCopyPathsBeingWatched(evstream);
+	for (NSString *p in pathsBeingWatched)
+		if ([path hasPrefix:p]) {
+			DEBUG(@"URL %@ is already being watched", aURL);
+			return YES;
+		}
+
+	return NO;
+}
+
+- (NSArray *)pathsToWatch
+{
+	NSMutableArray *paths = [NSMutableArray array];
+	NSArray *keys = [[directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	for (NSUInteger i = 0; i < [keys count]; i++) {
+		NSString *key = [keys objectAtIndex:i];
+		if (i > 0 && [key hasPrefix:[keys objectAtIndex:i - 1]]) {
+			DEBUG(@"%@ is a child of %@", key, [keys objectAtIndex:i - 1]);
+			continue;
+		}
+
+		NSURL *url = [NSURL URLWithString:key];
+		if ([url isFileURL])
+			[paths addObject:[url path]];
+	}
+
+	DEBUG(@"paths = %@", paths);
+	return paths;
+}
+
+- (void)restartEvents
+{
+	[self stopEvents];
+
+	NSArray *paths = [self pathsToWatch];
+	if ([paths count] == 0)
+		return;
+
+	CFAbsoluteTime latency = 0.3; /* Latency in seconds */
+
+	struct FSEventStreamContext ctx;
+	bzero(&ctx, sizeof(ctx));
+	ctx.info = self;
+
+	evstream = FSEventStreamCreate(NULL,
+		&mycallback,
+		&ctx,
+		(CFArrayRef)paths,
+		kFSEventStreamEventIdSinceNow,
+		latency,
+		kFSEventStreamCreateFlagWatchRoot
+	);
+
+	FSEventStreamScheduleWithRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+	FSEventStreamStart(evstream);
+}
+
+- (void)monitorDirectoryAtURL:(NSURL *)aURL
+{
+	if ([aURL isFileURL] && ![self URLIsMonitored:aURL])
+		[self restartEvents];
 }
 
 @end

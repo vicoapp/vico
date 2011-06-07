@@ -50,9 +50,6 @@
      andRenameURL:(NSURL *)renameURL;
 - (void)rescanURL:(NSURL *)aURL;
 - (void)selectURL:(NSURL *)aURL;
-- (void)stopEvents;
-- (void)pauseEvents;
-- (void)resumeEvents;
 @end
 
 @implementation ProjectFile
@@ -113,11 +110,6 @@
 		expandedSet = [NSMutableSet set];
 	}
 	return self;
-}
-
-- (void)finalize
-{
-	[self stopEvents];
 }
 
 - (void)awakeFromNib
@@ -258,87 +250,10 @@
 	return [explorer editedRow] != -1;
 }
 
-- (void)stopEvents
-{
-	if (evstream) {
-		FSEventStreamStop(evstream);
-		FSEventStreamUnscheduleFromRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-		FSEventStreamInvalidate(evstream);
-		FSEventStreamRelease(evstream);
-		evstream = NULL;
-	}
-}
-
-- (void)pauseEvents
-{
-	if (evstream)
-		FSEventStreamStop(evstream);
-}
-
-- (void)resumeEvents
-{
-	if (evstream)
-		FSEventStreamStart(evstream);
-}
-
-void mycallback(
-    ConstFSEventStreamRef streamRef,
-    void *clientCallBackInfo,
-    size_t numEvents,
-    void *eventPaths,
-    const FSEventStreamEventFlags eventFlags[],
-    const FSEventStreamEventId eventIds[])
-{
-	int i;
-	char **paths = eventPaths;
-	ProjectDelegate *explorer = clientCallBackInfo;
-
-	if ([explorer isEditing]) {
-		DEBUG(@"ignoring %lu events while editing", numEvents);
-		return;
-	}
-
-	for (i = 0; i < numEvents; i++) {
-		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
-											     length:strlen(paths[i])];
-		NSURL *url = [NSURL fileURLWithPath:path];
-		[explorer rescanURL:url];
-	}
-}
-
-- (void)startEvents:(NSURL *)aURL
-{
-	if (![aURL isFileURL])
-		return;
-
-	CFStringRef mypath = (CFStringRef)[aURL path];
-	CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&mypath, 1, NULL);
-	CFAbsoluteTime latency = 0.3; /* Latency in seconds */
-
-	struct FSEventStreamContext ctx;
-	bzero(&ctx, sizeof(ctx));
-	ctx.info = self;
-
-	evstream = FSEventStreamCreate(NULL,
-		&mycallback,
-		&ctx,
-		pathsToWatch,
-		kFSEventStreamEventIdSinceNow,
-		latency,
-		kFSEventStreamCreateFlagWatchRoot
-	);
-
-	 /* Create the stream before calling this. */
-	FSEventStreamScheduleWithRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-
-	FSEventStreamStart(evstream);
-}
-
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display jump:(BOOL)jump
 {
 	skipRegex = [[ViRegexp alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
 
-	[self stopEvents];
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];
@@ -354,7 +269,6 @@ void mycallback(
 			[self resetExpandedItems];
 			[rootButton setURL:aURL];
 			[environment setBaseURL:aURL];
-			[self startEvents:aURL];
 
 			if (!jump)
 				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
@@ -602,7 +516,6 @@ void mycallback(
 {
 	NSIndexSet *set = [self clickedIndexes];
 	NSInteger row = [set firstIndex];
-	[self pauseEvents];
 	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 	[explorer editColumn:0 row:row withEvent:nil select:YES];
 }
@@ -1222,6 +1135,12 @@ doCommandBySelector:(SEL)aSelector
 	return nil;
 }
 
+- (BOOL)displaysURL:(NSURL *)aURL
+{
+	return [[rootButton URL] isEqualToURL:aURL] ||
+	       [self findItemWithURL:aURL inItems:rootItems] != nil;
+}
+
 - (void)selectURL:(NSURL *)aURL
 {
 	id item = [self findItemWithURL:aURL inItems:rootItems];
@@ -1240,8 +1159,10 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSURL *url = [[notification userInfo] objectForKey:@"URL"];
 
-	if (isExpandingTree)
+	if (isExpandingTree || [self isEditing]) {
+		DEBUG(@"ignoring changes to directory %@", url);
 		return;
+	}
 
 	ViURLManager *urlman = [ViURLManager defaultManager];
 	NSArray *contents = [urlman cachedContentsOfDirectoryAtURL:url];
@@ -1255,6 +1176,7 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
+	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
 
 	id item = [self findItemWithURL:url inItems:rootItems];
@@ -1309,7 +1231,6 @@ doCommandBySelector:(SEL)aSelector
 				id item = [self findItemWithURL:renameURL inItems:rootItems];
 				if (item) {
 					NSInteger row = [explorer rowForItem:item];
-					[self pauseEvents];
 					[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 					[explorer editColumn:0 row:row withEvent:nil select:YES];
 				}
@@ -1435,8 +1356,6 @@ doCommandBySelector:(SEL)aSelector
      forTableColumn:(NSTableColumn *)tableColumn
 	     byItem:(id)item
 {
-	[self resumeEvents];
-
 	if (![object isKindOfClass:[NSString class]])
 		return;
 
@@ -1449,9 +1368,11 @@ doCommandBySelector:(SEL)aSelector
 	[[ViURLManager defaultManager] moveItemAtURL:[file url]
 					       toURL:newurl
 					onCompletion:^(NSError *error) {
-		if (error)
+		if (error) {
 			[NSApp presentError:error];
-		else {
+			if ([error isFileNotFoundError])
+				[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
+		} else {
 			ViDocument *doc = [windowController documentForURL:[file url]];
 			[file setUrl:newurl];
 			[doc setFileURL:newurl];

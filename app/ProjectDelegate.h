@@ -47,9 +47,6 @@
 
 	NSFont *font;
 
-	// file system events
-	FSEventStreamRef evstream;
-
 	// remembering expanded state
 	NSMutableSet *expandedSet;
 	BOOL isExpandingTree;
@@ -103,5 +100,6 @@
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;
 - (BOOL)isEditing;
+- (BOOL)displaysURL:(NSURL *)aURL;
 
 @end

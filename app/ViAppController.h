@@ -36,6 +36,7 @@ additionalBindings:(NSDictionary *)bindings
 
 	TISInputSourceRef original_input_source;
 	BOOL recently_launched;
+	NSWindow *menuTrackedKeyWindow;
 }
 
 @property(readonly) NSMenu *encodingMenu;

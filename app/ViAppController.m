@@ -236,6 +236,11 @@
 	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
 	[prefs registerPane:[[ViPreferencePaneAdvanced alloc] init]];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(beginTrackingMainMenu:)
+						     name:NSMenuDidBeginTrackingNotification
+						   object:[NSApp mainMenu]];
+
 	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
 	[self eval:consoleStartup error:nil]; 
 
@@ -445,6 +450,11 @@ additionalBindings:(NSDictionary *)bindings
 
 #pragma mark -
 
+- (void)beginTrackingMainMenu:(NSNotification *)notification
+{
+	menuTrackedKeyWindow = [NSApp keyWindow];
+}
+
 /*
  * XXX: this is called on every key event, can we only call it when the menu is shown?
  */
@@ -452,7 +462,7 @@ additionalBindings:(NSDictionary *)bindings
 {
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
-	NSWindow *keyWindow = [NSApp keyWindow];
+	NSWindow *keyWindow = menuTrackedKeyWindow;
 	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
 
 	BOOL hasSelection = NO;

@@ -44,6 +44,20 @@ id returnObject = nil;
 
 @end
 
+void
+usage(void)
+{
+	printf("syntax: vicotool [-hrw] [-e string] [-f file] [-p params] [file ...]\n");
+	printf("options:\n");
+	printf("    -h            show this help\n");
+	printf("    -e string     evaluate the string as a Nu script\n");
+	printf("    -f file       read file and evaluate as a Nu script\n");
+	printf("    -p params     read script parameters as a JSON string\n");
+	printf("    -p -          read script parameters as JSON from standard input\n");
+	printf("    -r            enter runloop (don't exit script immediately)\n");
+	printf("    -w            wait for document to close\n");
+}
+
 int
 main(int argc, char **argv)
 {
@@ -60,10 +74,11 @@ main(int argc, char **argv)
 	int					 i, c;
 	BOOL					 runLoop = NO;
 	BOOL					 params_from_stdin = NO;
+	BOOL					 wait_for_close = NO;
 
 	bindings = [NSMutableDictionary dictionary];
 
-	while ((c = getopt(argc, argv, "e:f:hp:r")) != -1) {
+	while ((c = getopt(argc, argv, "e:f:hp:rw")) != -1) {
 		switch (c) {
 		case 'e':
 			eval_script = optarg;
@@ -72,7 +87,7 @@ main(int argc, char **argv)
 			eval_file = optarg;
 			break;
 		case 'h':
-			printf("DON'T PANIC\n");
+			usage();
 			return 0;
 		case 'p':
 			if (strcmp(optarg, "-") == 0) {
@@ -90,11 +105,26 @@ main(int argc, char **argv)
 		case 'r':
 			runLoop = YES;
 			break;
+		case 'w':
+			wait_for_close = YES;
+			break;
 		case '?':
 		default:
 			exit(1);
 		}
 	}
+
+	/*
+	 * Treat remainder of arguments as files that should be opened.
+	 */
+	argc -= optind;
+	argv += optind;
+
+	if (argc > 1 && wait_for_close)
+		errx(6, "can't --wait for multiple files");
+
+	if (wait_for_close && (eval_script || eval_file))
+		errx(1, "can't both evaluate script and wait for document");
 
 	NSString *connName = [NSString stringWithFormat:@"vico.%u", (unsigned int)getuid()];
 	proxy = [NSConnection rootProxyForConnectionWithRegisteredName:connName
@@ -155,21 +185,23 @@ main(int argc, char **argv)
 		[bindings addEntriesFromDictionary:params];
 	}
 
-	if (script) {
+	NSString *backChannelName = nil;
+	if (runLoop || wait_for_close) {
 		NSConnection *backConn = nil;
-		if (runLoop) {
-			backConn = [NSConnection new];
-			[backConn setRootObject:[[ShellThing alloc] init]];
-			[backConn registerName:@"crunchy frog"];
-		}
+		backConn = [NSConnection new];
+		[backConn setRootObject:[[ShellThing alloc] init]];
+		backChannelName = [NSString stringWithFormat:@"vicotool.%u", getpid()];
+		[backConn registerName:backChannelName];
+	}
 
+	if (script) {
 		NSString *errStr = nil;
 		NSString *result = nil;
 		@try {
 			result = [proxy eval:script
 			  additionalBindings:bindings
 			         errorString:&errStr
-			         backChannel:runLoop ? @"crunchy frog" : nil];
+			         backChannel:backChannelName];
 		}
 		@catch (NSException *exception) {
 			NSString *msg = [NSString stringWithFormat:@"%@: %@",
@@ -190,12 +222,6 @@ main(int argc, char **argv)
 			printf("%s\n", [result UTF8String]);
 	}
 
-	/*
-	 * Treat remainder of arguments as files that should be opened.
-	 */
-	argc -= optind;
-	argv += optind;
-
 	for (i = 0; i < argc; i++) {
 		NSString *path = [NSString stringWithUTF8String:argv[i]];
 		if ([path rangeOfString:@"://"].location == NSNotFound) {
@@ -204,7 +230,7 @@ main(int argc, char **argv)
 				path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
 			path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
 		}
-		error = [proxy openURL:path];
+		error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];
 		if (error)
 			errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
 	}
@@ -215,7 +241,7 @@ main(int argc, char **argv)
 		      error:nil];
 	}
 
-	if (runLoop && script) {
+	if ((runLoop && script) || wait_for_close) {
 		NSRunLoop *loop = [NSRunLoop currentRunLoop];
 		while (keepRunning && [loop runMode:NSDefaultRunLoopMode
 				         beforeDate:[NSDate distantFuture]])

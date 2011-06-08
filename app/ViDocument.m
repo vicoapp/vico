@@ -46,6 +46,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize proxy;
 @synthesize busy;
 @synthesize loader;
+@synthesize closeCallback;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
@@ -175,6 +176,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			} else if ([error isOperationCancelledError]) {
 				[self message:@"cancelled loading of %@", normalizedURL];
 				[self setFileURL:nil];
+				if (closeCallback)
+					closeCallback(2);
+				closeCallback = NULL;
 			} else {
 				/* Make sure this document has focus, then show an alert sheet. */
 				[windowController selectDocument:self];
@@ -189,6 +193,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 						  modalDelegate:self
 						 didEndSelector:@selector(openFailedAlertDidEnd:returnCode:contextInfo:)
 						    contextInfo:nil];
+				if (closeCallback)
+					closeCallback(3);
+				closeCallback = NULL;
 			}
 		} else {
 			DEBUG(@"loaded %@ with attributes %@", normalizedURL, attributes);
@@ -693,12 +700,19 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)closeAndWindow:(BOOL)canCloseWindow
 {
+	int code = 1; /* not saved */
+
 	DEBUG(@"closing, w/window: %s", canCloseWindow ? "YES" : "NO");
 	if (loader) {
 		DEBUG(@"cancelling load callback %@", loader);
 		[loader cancel];
 		loader = nil;
-	}
+		code = 2; /* not loaded */
+	} else if (![self isDocumentEdited])
+		code = 0; /* saved */
+
+	if (closeCallback)
+		closeCallback(code);
 
 	closed = YES;
 	[windowController closeDocument:self andWindow:canCloseWindow];

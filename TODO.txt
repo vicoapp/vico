@@ -25,7 +25,6 @@ REQUESTED
 * @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
 
 * vim text objects, especially i[, a] and it, at
-* vicotool --wait <file>
 * vicotool --line 1
 * R (replace mode)
 

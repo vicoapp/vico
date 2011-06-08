@@ -20,6 +20,9 @@
 additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName;
+- (NSError *)openURL:(NSString *)pathOrURL
+             andWait:(BOOL)waitFlag
+         backChannel:(NSString *)channelName;
 - (NSError *)openURL:(NSString *)pathOrURL;
 
 @end

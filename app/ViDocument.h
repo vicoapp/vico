@@ -49,6 +49,9 @@
 	id didSaveDelegate;
 	SEL didSaveSelector;
 	void *didSaveContext;
+
+	/* Called when the document closes. code is 0 if document saved successfully. */
+	void (^closeCallback)(int code);
 }
 
 @property(nonatomic,readwrite, assign) ViSnippet *snippet;
@@ -60,6 +63,7 @@
 @property(nonatomic,readwrite, assign) BOOL isTemporary;
 @property(nonatomic,readonly) ViScriptProxy *proxy;
 @property(nonatomic,readwrite) BOOL busy;
+@property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property (readonly) id<ViDeferred> loader;
 
 - (void)message:(NSString *)fmt, ...;

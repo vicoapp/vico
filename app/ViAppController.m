@@ -432,9 +432,13 @@ additionalBindings:(NSDictionary *)bindings
 	return [result JSONRepresentation];
 }
 
-- (NSError *)openURL:(NSString *)pathOrURL
+- (NSError *)openURL:(NSString *)pathOrURL andWait:(BOOL)waitFlag backChannel:(NSString *)channelName
 {
 	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
+
+	NSProxy<ViShellThingProtocol> *backChannel = nil;
+	if (channelName)
+		backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
 
 	NSURL *url;
 	if ([pathOrURL isKindOfClass:[NSURL class]])
@@ -447,10 +451,24 @@ additionalBindings:(NSDictionary *)bindings
 							display:YES
 							  error:&error];
 
-	if (doc)
+	if (doc) {
+		[doc setCloseCallback:^(int code) {
+			@try {
+				[backChannel exitWithError:code];
+			}
+			@catch (NSException *exception) {
+				INFO(@"failed to notify vicotool: %@", exception);
+			}
+		}];
 		[NSApp activateIgnoringOtherApps:YES];
+	}
 
 	return error;
+}
+
+- (NSError *)openURL:(NSString *)pathOrURL
+{
+	return [self openURL:pathOrURL andWait:NO backChannel:nil];
 }
 
 #pragma mark -

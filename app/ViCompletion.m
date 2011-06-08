@@ -8,6 +8,9 @@
 - (void)calcScore;
 @end
 
+static NSCharacterSet *separators = nil;
+static NSCharacterSet *ucase = nil;
+
 @implementation ViCompletion
 
 @synthesize content, filterMatch, prefixLength, filterIsFuzzy, font, location;
@@ -33,6 +36,11 @@
 		markColor = [NSColor redColor];
 		titleIsDirty = YES;
 		scoreIsDirty = YES;
+
+		if (separators == nil) {
+			separators = [NSCharacterSet punctuationCharacterSet];
+			ucase = [NSCharacterSet uppercaseLetterCharacterSet];
+		}
 	}
 	return self;
 }
@@ -56,6 +64,8 @@
 
 - (void)updateTitle
 {
+	titleIsDirty = NO;
+
 	if (prefixLength > [content length])
 		return;
 
@@ -108,12 +118,11 @@
  */
 - (void)calcScore
 {
+	scoreIsDirty = NO;
+
 	NSUInteger flen = [content length]; /* full length */
 	NSUInteger slen = 0; /* short length */
 	NSUInteger offset = [filterMatch rangeOfMatchedString].location;
-	NSCharacterSet *separators = [NSCharacterSet punctuationCharacterSet];
-	NSCharacterSet *ucase = [NSCharacterSet uppercaseLetterCharacterSet];
-	NSCharacterSet *lcase = [NSCharacterSet lowercaseLetterCharacterSet];
 	NSUInteger i;
 	double match_score = 0, prev_score = 0;
 	NSUInteger prev_pos = 0;
@@ -145,10 +154,8 @@
 			base_score = 1.0;
 		else if ([separators characterIsMember:[content characterAtIndex:pos + 1]])
 			base_score = 4.0;
-		else if ([ucase characterIsMember:[content characterAtIndex:pos]] &&
-		         [lcase characterIsMember:[content characterAtIndex:pos-1]] &&
-		         [lcase characterIsMember:[content characterAtIndex:pos+1]])
-			base_score = 8.0;
+		else if ([ucase characterIsMember:[content characterAtIndex:pos]])
+			base_score = 7.0;
 
 		DEBUG(@"scoring match at %lu (%@) in [%@] with base %lf",
 		    pos, NSStringFromRange(range), content, base_score);

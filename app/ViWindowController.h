@@ -65,16 +65,16 @@
 	ViDocumentView *currentView;
 }
 
-@property(readwrite, assign) NSMutableArray *documents;
-@property(readonly) ExEnvironment *environment;
-@property(readonly) ViJumpList *jumpList;
-@property(readwrite, assign) ViProject *project;
-@property(readonly) ViScriptProxy *proxy;
-@property(readonly) ProjectDelegate *explorer;
-@property(readonly) ViTagStack *tagStack;
-@property(readonly) ViTagsDatabase *tagsDatabase;
-@property(readwrite) BOOL jumping; /* XXX: need better API! */
-@property(readonly) ViDocument *previousDocument;
+@property(nonatomic,readwrite, assign) NSMutableArray *documents;
+@property(nonatomic,readonly) ExEnvironment *environment;
+@property(nonatomic,readonly) ViJumpList *jumpList;
+@property(nonatomic,readwrite, assign) ViProject *project;
+@property(nonatomic,readonly) ViScriptProxy *proxy;
+@property(nonatomic,readonly) ProjectDelegate *explorer;
+@property(nonatomic,readonly) ViTagStack *tagStack;
+@property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
+@property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
+@property(nonatomic,readonly) ViDocument *previousDocument;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;

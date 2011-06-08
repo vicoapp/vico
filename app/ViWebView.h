@@ -9,7 +9,7 @@
 	ViKeyManager *keyManager;
 }
 
-@property(readwrite, assign) ExEnvironment *environment;
+@property(nonatomic,readwrite, assign) ExEnvironment *environment;
 
 @end
 

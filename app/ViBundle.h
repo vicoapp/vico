@@ -36,8 +36,8 @@
              hasSelection:(BOOL)hasSelection
                      font:(NSFont *)aFont;
 
-@property(readonly) NSMutableArray *languages;
-@property(readonly) NSString *path;
-@property(readonly) NSArray *items;
+@property(nonatomic,readonly) NSMutableArray *languages;
+@property(nonatomic,readonly) NSString *path;
+@property(nonatomic,readonly) NSArray *items;
 
 @end

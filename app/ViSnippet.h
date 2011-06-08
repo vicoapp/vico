@@ -22,11 +22,11 @@
 	BOOL finished;
 }
 
-@property(readonly) NSRange range;
-@property(readonly) NSUInteger caret;
-@property(readonly) NSRange selectedRange;
-@property(readonly) BOOL finished;
-@property(readonly) ViTabstop *currentTabStop;
+@property(nonatomic,readonly) NSRange range;
+@property(nonatomic,readonly) NSUInteger caret;
+@property(nonatomic,readonly) NSRange selectedRange;
+@property(nonatomic,readonly) BOOL finished;
+@property(nonatomic,readonly) ViTabstop *currentTabStop;
 
 - (ViSnippet *)initWithString:(NSString *)aString
                    atLocation:(NSUInteger)aLocation

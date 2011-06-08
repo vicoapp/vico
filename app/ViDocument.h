@@ -52,15 +52,15 @@
 	void *didSaveContext;
 }
 
-@property(readwrite, assign) ViSnippet *snippet;
-@property(readonly) NSSet *views;
-@property(readonly) ViBundle *bundle;
-@property(readwrite, assign) NSArray *symbols;
-@property(readwrite, assign) NSArray *filteredSymbols;
-@property(readonly) NSStringEncoding encoding;
-@property(readwrite, assign) BOOL isTemporary;
-@property(readonly) ViScriptProxy *proxy;
-@property(readwrite) BOOL busy;
+@property(nonatomic,readwrite, assign) ViSnippet *snippet;
+@property(nonatomic,readonly) NSSet *views;
+@property(nonatomic,readonly) ViBundle *bundle;
+@property(nonatomic,readwrite, assign) NSArray *symbols;
+@property(nonatomic,readwrite, assign) NSArray *filteredSymbols;
+@property(nonatomic,readonly) NSStringEncoding encoding;
+@property(nonatomic,readwrite, assign) BOOL isTemporary;
+@property(nonatomic,readonly) ViScriptProxy *proxy;
+@property(nonatomic,readwrite) BOOL busy;
 @property (readonly) id<ViDeferred> loader;
 
 - (void)message:(NSString *)fmt, ...;

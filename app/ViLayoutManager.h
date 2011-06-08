@@ -8,7 +8,7 @@
 	NSString *spaceChar;
 }
 
-@property(readwrite,copy) NSDictionary *invisiblesAttributes;
+@property(nonatomic,readwrite,copy) NSDictionary *invisiblesAttributes;
 
 - (void)setShowsInvisibleCharacters:(BOOL)flag;
 - (BOOL)showsInvisibleCharacters;

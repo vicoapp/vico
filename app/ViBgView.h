@@ -2,5 +2,5 @@
 {
 	BOOL sourceHighlight;
 }
-@property(readwrite) BOOL sourceHighlight;
+@property(nonatomic,readwrite) BOOL sourceHighlight;
 @end

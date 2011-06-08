@@ -18,15 +18,15 @@
 	NSInteger	 keyCode;
 }
 
-@property(readonly) ViBundle *bundle;
-@property(readonly) NSString *uuid;
-@property(readonly) NSString *name;
-@property(readonly) NSString *scope;
-@property(readonly) ViMode mode;
-@property(readonly) NSString *keyEquivalent;
-@property(readonly) NSUInteger modifierMask;
-@property(readonly) NSInteger keyCode;
-@property(readonly) NSString *tabTrigger;
+@property(nonatomic,readonly) ViBundle *bundle;
+@property(nonatomic,readonly) NSString *uuid;
+@property(nonatomic,readonly) NSString *name;
+@property(nonatomic,readonly) NSString *scope;
+@property(nonatomic,readonly) ViMode mode;
+@property(nonatomic,readonly) NSString *keyEquivalent;
+@property(nonatomic,readonly) NSUInteger modifierMask;
+@property(nonatomic,readonly) NSInteger keyCode;
+@property(nonatomic,readonly) NSString *tabTrigger;
 
 - (ViBundleItem *)initFromDictionary:(NSDictionary *)dict
                             inBundle:(ViBundle *)aBundle;

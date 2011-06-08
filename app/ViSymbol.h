@@ -8,10 +8,10 @@
 	NSImage *image;
 }
 
-@property(readonly) NSString *symbol;
-@property(readonly) ViDocument *document;
-@property(readonly) NSImage *image;
-@property(readwrite) NSRange range;
+@property(nonatomic,readonly) NSString *symbol;
+@property(nonatomic,readonly) ViDocument *document;
+@property(nonatomic,readonly) NSImage *image;
+@property(nonatomic,readwrite) NSRange range;
 
 - (ViSymbol *)initWithSymbol:(NSString *)aSymbol
                     document:(ViDocument *)aDocument

@@ -2,6 +2,6 @@
 {
 	NSImage *image;
 }
-@property(readwrite,assign) NSImage *image;
+@property(nonatomic,readwrite,assign) NSImage *image;
 
 @end

@@ -13,10 +13,10 @@
 	NSWindow *window;
 }
 
-@property(readonly) ViDocument *document;
-@property(readonly) NSView *view;
-@property(readonly) NSView *innerView;
-@property(readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readonly) ViDocument *document;
+@property(nonatomic,readonly) NSView *view;
+@property(nonatomic,readonly) NSView *innerView;
+@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument;
 - (ViTextView *)textView;

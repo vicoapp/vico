@@ -9,7 +9,7 @@
 	NSWindow *window;
 }
 
-@property(readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
 
 - (ViCommandOutputController *)initWithHTMLString:(NSString *)content
                                       environment:(ExEnvironment *)environment;

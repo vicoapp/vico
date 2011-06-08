@@ -8,11 +8,11 @@
 	BOOL cancelled;
 }
 
-@property(readwrite, assign) unichar *characters;
-@property(readwrite) NSRange range;
-@property(readwrite) NSUInteger lineOffset;
-@property(readwrite) BOOL restarting;
-@property(readwrite) BOOL cancelled;
+@property(nonatomic,readwrite, assign) unichar *characters;
+@property(nonatomic,readwrite) NSRange range;
+@property(nonatomic,readwrite) NSUInteger lineOffset;
+@property(nonatomic,readwrite) BOOL restarting;
+@property(nonatomic,readwrite) BOOL cancelled;
 
 - (ViSyntaxContext *)initWithLine:(NSUInteger)line;
 - (ViSyntaxContext *)initWithCharacters:(unichar *)chars

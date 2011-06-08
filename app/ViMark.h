@@ -2,8 +2,8 @@
 {
 	NSUInteger line, column;
 }
-@property(readonly) NSUInteger line;
-@property(readonly) NSUInteger column;
+@property(nonatomic,readonly) NSUInteger line;
+@property(nonatomic,readonly) NSUInteger column;
 
 - (ViMark *)initWithLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
 

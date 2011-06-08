@@ -62,9 +62,9 @@ typedef enum {
 - (BOOL)partial;
 - (NSString *)keyString;
 
-@property(readwrite) BOOL nviStyleUndo;
-@property(readonly) ViCommand *last_ftFT_command;
-@property(readwrite, assign) NSString *last_search_pattern;
-@property(readwrite) int last_search_options;
+@property(nonatomic,readwrite) BOOL nviStyleUndo;
+@property(nonatomic,readonly) ViCommand *last_ftFT_command;
+@property(nonatomic,readwrite, assign) NSString *last_search_pattern;
+@property(nonatomic,readwrite) int last_search_options;
 
 @end

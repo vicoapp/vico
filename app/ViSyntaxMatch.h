@@ -21,12 +21,12 @@
 - (void)setEndMatch:(ViRegexpMatch *)aMatch;
 - (void)setBeginLocation:(NSUInteger)aLocation;
 
-@property(readonly) int patternIndex;
-@property(readonly) NSMutableDictionary *pattern;
-@property(readonly) NSUInteger beginLocation;
-@property(readonly) NSUInteger beginLength;
-@property(readonly) ViRegexpMatch *beginMatch;
-@property(readonly) ViRegexpMatch *endMatch;
+@property(nonatomic,readonly) int patternIndex;
+@property(nonatomic,readonly) NSMutableDictionary *pattern;
+@property(nonatomic,readonly) NSUInteger beginLocation;
+@property(nonatomic,readonly) NSUInteger beginLength;
+@property(nonatomic,readonly) ViRegexpMatch *beginMatch;
+@property(nonatomic,readonly) ViRegexpMatch *endMatch;
 
 @end
 

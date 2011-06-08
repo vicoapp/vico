@@ -21,10 +21,10 @@
 	BOOL nameIsDirty, iconIsDirty;
 	BOOL isDirectory;
 }
-@property(readwrite, assign) double score;
-@property(readonly) NSURL *url;
-@property(readwrite, assign) NSMutableArray *children;
-@property(readonly) BOOL isDirectory;
+@property(nonatomic,readwrite, assign) double score;
+@property(nonatomic,readonly) NSURL *url;
+@property(nonatomic,readwrite, assign) NSMutableArray *children;
+@property(nonatomic,readonly) BOOL isDirectory;
 - (void)setURL:(NSURL *)aURL;
 - (BOOL)hasCachedChildren;
 - (NSString *)name;
@@ -73,7 +73,7 @@
 	ViJumpList *history;
 }
 
-@property(readwrite,assign) id delegate;
+@property(nonatomic,readwrite,assign) id delegate;
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;

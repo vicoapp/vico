@@ -39,7 +39,7 @@ additionalBindings:(NSDictionary *)bindings
 	NSWindow *menuTrackedKeyWindow;
 }
 
-@property(readonly) NSMenu *encodingMenu;
+@property(nonatomic,readonly) NSMenu *encodingMenu;
 @property (readonly) TISInputSourceRef original_input_source;
 
 - (void)exportGlobals:(id)parser;

@@ -111,19 +111,19 @@ struct ex_address
       intoAddress:(struct ex_address *)addr1
      otherAddress:(struct ex_address *)addr2;
 
-@property(readonly) int naddr;
-@property(readonly) struct ex_address *addr1;
-@property(readonly) struct ex_address *addr2;
-@property(readonly) struct ex_address *line;
-@property(readonly) struct ex_command *command;
-@property(readonly) unsigned flags;
-@property(readonly) NSString *name;
-@property(readonly) NSString *filename;
-@property(readonly) NSString *string;
-@property(readonly) NSString *method;
-@property(readonly) NSString *plus_command;
-@property(readonly) NSString *pattern;
-@property(readonly) NSString *replacement;
-@property(readonly) NSArray *words;
+@property(nonatomic,readonly) int naddr;
+@property(nonatomic,readonly) struct ex_address *addr1;
+@property(nonatomic,readonly) struct ex_address *addr2;
+@property(nonatomic,readonly) struct ex_address *line;
+@property(nonatomic,readonly) struct ex_command *command;
+@property(nonatomic,readonly) unsigned flags;
+@property(nonatomic,readonly) NSString *name;
+@property(nonatomic,readonly) NSString *filename;
+@property(nonatomic,readonly) NSString *string;
+@property(nonatomic,readonly) NSString *method;
+@property(nonatomic,readonly) NSString *plus_command;
+@property(nonatomic,readonly) NSString *pattern;
+@property(nonatomic,readonly) NSString *replacement;
+@property(nonatomic,readonly) NSArray *words;
 
 @end

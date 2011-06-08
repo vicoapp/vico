@@ -10,7 +10,7 @@
 	BOOL compiled;
 }
 
-@property(readonly) ViBundle *bundle;
+@property(nonatomic,readonly) ViBundle *bundle;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle;
 - (NSArray *)fileTypes;

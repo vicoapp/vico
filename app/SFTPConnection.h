@@ -182,9 +182,9 @@
 	uint32_t exts;
 }
 
-@property(readonly) NSString *host;
-@property(readonly) NSString *user;
-@property(readonly) NSString *home;
+@property(nonatomic,readonly) NSString *host;
+@property(nonatomic,readonly) NSString *user;
+@property(nonatomic,readonly) NSString *home;
 
 - (SFTPConnection *)initWithURL:(NSURL *)url error:(NSError **)outError;
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback;

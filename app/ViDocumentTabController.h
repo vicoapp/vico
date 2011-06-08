@@ -11,10 +11,10 @@ enum ViViewOrderingMode {
 };
 
 @protocol ViViewController <NSObject>
-@property(readwrite, assign) NSWindow *window;
-@property(readonly) NSView *view;
-@property(readonly) NSView *innerView;
-@property(readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readwrite, assign) NSWindow *window;
+@property(nonatomic,readonly) NSView *view;
+@property(nonatomic,readonly) NSView *innerView;
+@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
 - (NSString *)title;
 @end
 
@@ -31,9 +31,9 @@ enum ViViewOrderingMode {
 	id<ViViewController>	 previousView;
 }
 
-@property(readonly) NSArray *views;
-@property(readwrite, assign) id<ViViewController> selectedView;
-@property(readwrite, assign) id<ViViewController> previousView;
+@property(nonatomic,readonly) NSArray *views;
+@property(nonatomic,readwrite, assign) id<ViViewController> selectedView;
+@property(nonatomic,readwrite, assign) id<ViViewController> previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialView;
 - (void)addView:(id<ViViewController>)aView;

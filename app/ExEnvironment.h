@@ -40,8 +40,8 @@
 	void			*exContextInfo;
 }
 
-@property(readonly) NSURL *baseURL;
-@property(readonly) NSWindow *window;
+@property(nonatomic,readonly) NSURL *baseURL;
+@property(nonatomic,readonly) NSWindow *window;
 
 - (void)message:(NSString *)fmt, ...;
 

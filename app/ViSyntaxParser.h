@@ -27,7 +27,7 @@
 	unsigned regexps_cached;
 }
 
-@property(readwrite) BOOL ignoreEditing;
+@property(nonatomic,readwrite) BOOL ignoreEditing;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;

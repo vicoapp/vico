@@ -87,9 +87,9 @@
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
-@property(readonly) ViScriptProxy *proxy;
-@property(readonly) ViKeyManager *keyManager;
-@property(readonly) ViDocument *document;
+@property(nonatomic,readonly) ViScriptProxy *proxy;
+@property(nonatomic,readonly) ViKeyManager *keyManager;
+@property(nonatomic,readonly) ViDocument *document;
 
 - (void)initWithDocument:(ViDocument *)aDocument
                 viParser:(ViParser *)aParser;

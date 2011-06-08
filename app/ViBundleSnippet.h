@@ -5,7 +5,7 @@
 	NSString	*content;
 }
 
-@property(readonly) NSString *content;
+@property(nonatomic,readonly) NSString *content;
 
 - (ViBundleSnippet *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle;
 

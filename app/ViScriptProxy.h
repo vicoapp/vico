@@ -6,7 +6,7 @@
 	NSMutableDictionary *_listeners;
 }
 
-@property(readonly) id __obj;
+@property(nonatomic,readonly) id __obj;
 
 - (ViScriptProxy *)initWithObject:(id)object;
 - (void)emit:(NSString *)event with:(id)arg1, ...;

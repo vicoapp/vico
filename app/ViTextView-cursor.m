@@ -32,7 +32,7 @@
 	if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode) {
 		NSRange lineRange;
 		if (length == 0) {
-			lineHighlightRect = NSMakeRect(0, 0, 0, 16);
+			lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
 		} else {
 			[lm lineFragmentRectForGlyphAtIndex:IMIN(caret, length - 1) effectiveRange:&lineRange];
 			if (lineRange.length > 0) {
@@ -43,8 +43,8 @@
 
 			lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
 							  inTextContainer:[self textContainer]];
+			lineHighlightRect.size.width = 10000;
 		}
-		lineHighlightRect.size.width = [self bounds].size.width;
 	}
 
 	[self setNeedsDisplayInRect:oldCaretRect];

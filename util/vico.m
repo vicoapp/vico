@@ -121,7 +121,9 @@ main(int argc, char **argv)
 	argv += optind;
 
 	if (argc > 1 && wait_for_close)
-		errx(6, "can't --wait for multiple files");
+		errx(6, "can't wait for multiple files");
+	if (argc == 0 && wait_for_close)
+		errx(6, "no document to wait for");
 
 	if (wait_for_close && (eval_script || eval_file))
 		errx(1, "can't both evaluate script and wait for document");

@@ -586,5 +586,11 @@ additionalBindings:(NSDictionary *)bindings
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
 }
 
+- (IBAction)editSiteScript:(id)sender
+{
+	NSURL *siteURL = [NSURL fileURLWithPath:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"]];
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:siteURL display:YES error:nil];
+}
+
 @end
 

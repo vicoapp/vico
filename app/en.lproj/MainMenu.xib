@@ -95,6 +95,14 @@
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
 								</object>
+								<object class="NSMenuItem" id="23794259">
+									<reference key="NSMenu" ref="110575045"/>
+									<string key="NSTitle">Edit Site Script</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+								</object>
 								<object class="NSMenuItem" id="481834944">
 									<reference key="NSMenu" ref="110575045"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1935,6 +1943,14 @@
 					</object>
 					<int key="connectionID">702</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">editSiteScript:</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="23794259"/>
+					</object>
+					<int key="connectionID">706</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2298,6 +2314,7 @@
 							<reference ref="1056857174"/>
 							<reference ref="342932134"/>
 							<reference ref="1020675238"/>
+							<reference ref="23794259"/>
 						</object>
 						<reference key="parent" ref="694149608"/>
 					</object>
@@ -2994,6 +3011,11 @@
 						<reference key="object" ref="234104298"/>
 						<reference key="parent" ref="835318025"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">705</int>
+						<reference key="object" ref="23794259"/>
+						<reference key="parent" ref="110575045"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3219,6 +3241,7 @@
 					<string>694.IBPluginDependency</string>
 					<string>703.IBPluginDependency</string>
 					<string>704.IBPluginDependency</string>
+					<string>705.IBPluginDependency</string>
 					<string>72.IBPluginDependency</string>
 					<string>72.ImportedFromIB2</string>
 					<string>73.IBPluginDependency</string>
@@ -3466,6 +3489,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -3503,7 +3527,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">704</int>
+			<int key="maxID">706</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3840,7 +3864,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>acceptSftpSheet:</string>
 							<string>actionMenu:</string>
-							<string>addLocation:</string>
 							<string>addSFTPLocation:</string>
 							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
@@ -3863,7 +3886,6 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3893,7 +3915,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>acceptSftpSheet:</string>
 							<string>actionMenu:</string>
-							<string>addLocation:</string>
 							<string>addSFTPLocation:</string>
 							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
@@ -3922,10 +3943,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">actionMenu:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">addLocation:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4021,6 +4038,7 @@
 							<string>progressIndicator</string>
 							<string>rootButton</string>
 							<string>scrollView</string>
+							<string>searchToolbarItem</string>
 							<string>sftpConnectForm</string>
 							<string>sftpConnectView</string>
 							<string>splitView</string>
@@ -4040,6 +4058,7 @@
 							<string>NSProgressIndicator</string>
 							<string>NSPathControl</string>
 							<string>NSScrollView</string>
+							<string>NSToolbarItem</string>
 							<string>NSForm</string>
 							<string>NSWindow</string>
 							<string>ViSplitView</string>
@@ -4062,6 +4081,7 @@
 							<string>progressIndicator</string>
 							<string>rootButton</string>
 							<string>scrollView</string>
+							<string>searchToolbarItem</string>
 							<string>sftpConnectForm</string>
 							<string>sftpConnectView</string>
 							<string>splitView</string>
@@ -4113,6 +4133,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">scrollView</string>
 								<string key="candidateClassName">NSScrollView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">searchToolbarItem</string>
+								<string key="candidateClassName">NSToolbarItem</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">sftpConnectForm</string>
@@ -4178,11 +4202,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>editSiteScript:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -4191,11 +4217,16 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>editSiteScript:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">editSiteScript:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 							<object class="IBActionInfo">
 								<string key="name">showPreferences:</string>
 								<string key="candidateClassName">id</string>
@@ -4356,17 +4387,21 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>searchToolbarItem</string>
 							<string>splitView</string>
 							<string>symbolFilterField</string>
 							<string>symbolView</string>
+							<string>symbolsView</string>
 							<string>window</string>
 							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSToolbarItem</string>
 							<string>NSSplitView</string>
 							<string>NSSearchField</string>
 							<string>ViOutlineView</string>
+							<string>NSView</string>
 							<string>NSWindow</string>
 							<string>ViWindowController</string>
 						</object>
@@ -4375,14 +4410,20 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>searchToolbarItem</string>
 							<string>splitView</string>
 							<string>symbolFilterField</string>
 							<string>symbolView</string>
+							<string>symbolsView</string>
 							<string>window</string>
 							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">searchToolbarItem</string>
+								<string key="candidateClassName">NSToolbarItem</string>
+							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">splitView</string>
 								<string key="candidateClassName">NSSplitView</string>
@@ -4394,6 +4435,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">symbolView</string>
 								<string key="candidateClassName">ViOutlineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">symbolsView</string>
+								<string key="candidateClassName">NSView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">window</string>

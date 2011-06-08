@@ -54,5 +54,6 @@ withParser:(id<NuParsing>)parser
 + (NSString *)supportDirectory;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)visitWebsite:(id)sender;
+- (IBAction)editSiteScript:(id)sender;
 
 @end

@@ -215,10 +215,13 @@
 			[emptyDocuments addObject:doc];
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
-	[symbolView expandItem:nil expandChildren:YES];
 
-	if ([filter length] > 0)
+	if ([filter length] > 0) {
+		[symbolView expandItem:nil expandChildren:YES];
 		[self selectFirstMatchingSymbolForFilter:filter];
+	} else {
+		[self didSelectDocument:[windowController currentDocument]];
+	}
 }
 
 - (void)filterSymbols

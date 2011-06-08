@@ -39,50 +39,50 @@ tenpow(NSUInteger x)
 @implementation NSString (scopeSelector)
 
 - (u_int64_t)matchScopeSelector:(struct scope_list *)selectors
-                     withScopes:(struct scope_list *)ref_scopes
+                     withScopes:(NSArray *)ref_scopes
 {
 	NSUInteger	 depth, depth_offset, nscopes = 0;
 	NSInteger	 i, k, n;
 	u_int64_t	 rank = 0ULL;
-	struct scope	*ref;
+	NSString	*ref;
 
-	TAILQ_FOREACH(ref, ref_scopes, next)
-		nscopes++;
-
+	nscopes = [ref_scopes count];
 	if (nscopes == 0)
 		return 0ULL;
 	depth_offset = nscopes;
 
-	struct scope *ref_begin = TAILQ_LAST(ref_scopes, scope_list);
+	NSInteger ref_begin_idx = nscopes - 1;
 
 	struct scope *sel;
 	TAILQ_FOREACH_REVERSE(sel, selectors, scope_list, next) {
 		/* Match each selector against all remaining, unmatched scopes. */
 
 		BOOL match = NO;
-		ref = ref_begin;
-		for (depth = depth_offset; ref != NULL; ref = TAILQ_PREV(ref, scope_list, next), depth--) {
+		NSInteger ref_idx = ref_begin_idx;
+		for (depth = depth_offset; ref_idx >= 0; ref_idx--, depth--) {
+			ref = [ref_scopes objectAtIndex:ref_idx];
 
 			/* Match selector #i against scope #j. */
 
 #ifndef NO_DEBUG
 			NSString *selscope = [NSString stringWithCharacters:sel->buf length:sel->length];
-			NSString *refscope = [NSString stringWithCharacters:ref->buf length:ref->length];
+			NSString *refscope = ref;
 			DEBUG(@"matching selector [%@] against scope [%@]", selscope, refscope);
 #endif
 
+			NSUInteger reflength = [ref length];
 			match = YES;
-			for (i = k = 0; k < ref->length && i < sel->length; i++, k++) {
-				if (ref->buf[k] != sel->buf[i]) {
+			for (i = k = 0; k < reflength && i < sel->length; i++, k++) {
+				if ([ref characterAtIndex:k] != sel->buf[i]) {
 					match = NO;
 					break;
 				}
 			}
 
-			if (match && k + 1 < ref->length) {
+			if (match && k + 1 < reflength) {
 				/* Don't count partial scope matches. */
 				/* "source.css" shouldn't match "source.c" */
-				if (ref->buf[k] != '.') {
+				if ([ref characterAtIndex:k] != '.') {
 					DEBUG(@"partial match of [%@] at index k = %lu", refscope, k);
 					match = NO;
 				}
@@ -116,7 +116,7 @@ tenpow(NSUInteger x)
 				rank += 1;
 
 				/* If we matched scope #j, next selector should start matching against scope #j-1. */
-				ref_begin = TAILQ_PREV(ref, scope_list, next);
+				ref_begin_idx = ref_idx - 1;
 				depth_offset = depth - 1;
 
 				/* Continue with the next selector. */
@@ -142,7 +142,7 @@ tenpow(NSUInteger x)
 }
 
 - (u_int64_t)evalScopeSelector:(struct scope_expr *)expr
-                 againstScopes:(struct scope_list *)ref_scopes
+                 againstScopes:(NSArray *)ref_scopes
 {
 	u_int64_t l, r;
 
@@ -238,7 +238,7 @@ tenpow(NSUInteger x)
 }
 #endif
 
-- (u_int64_t)matchesScopeList:(struct scope_list *)ref_scopes
+- (u_int64_t)matchesScopeList:(NSArray *)ref_scopes
 {
 	unichar *buf;
 	u_int64_t rank = 0ULL;
@@ -333,6 +333,7 @@ tenpow(NSUInteger x)
 
 - (u_int64_t)matchesScopes:(NSArray *)scopes
 {
+#if 0
 	/* Convert the NSArray to a TAILQ. */
 	struct scope ref_scope_array[64];	/* XXX: crash if more than this many scopes! */
 	struct scope_list ref_scopes;
@@ -347,12 +348,15 @@ tenpow(NSUInteger x)
 		[tmp getCharacters:ref->buf range:NSMakeRange(0, ref->length)];
 		TAILQ_INSERT_TAIL(&ref_scopes, ref, next);
 	}
+#endif
 
-	u_int64_t rank = [self matchesScopeList:&ref_scopes];
+	u_int64_t rank = [self matchesScopeList:scopes];
 
+#if 0
 	int i;
 	for (i = 0; i < nrefs; i++)
 		free(ref_scope_array[i].buf);
+#endif
 
 	return rank;
 }

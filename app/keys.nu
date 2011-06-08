@@ -235,7 +235,6 @@
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
 (nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
 (nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
-(nmap map:"<ctrl-s>" to:":tbuffer <ctrl-f>")
 (nmap setKey:"<cmd-z>" toAction:"undo:")
 (nmap setKey:"<cmd-Z>" toAction:"redo:")
 ;; <C-w> prefix
@@ -476,6 +475,15 @@
 ; move to EOL and insert statement terminator + newline
 ((ViMap insertMap) map:"<shift-cmd-cr>" to:"<alt-cmd-cr><esc>o" recursively:YES scope:nil)
 
+; switch buffer, w/fuzzy completion
+((ViMap normalMap) map:"<ctrl-s>" toExpression:(do ()
+	(if ((NSUserDefaults standardUserDefaults) boolForKey:"prefertabs")
+		; if we prefer documents in tabs, switch to an open tab, or open a new tab
+		(text input:":tbuffer <ctrl-f>")
+		(else
+			; we prefer to open documents in the same view
+			(text input:":buffer <ctrl-f>"))) ))
+
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")
@@ -485,3 +493,4 @@
 ;(nmap map:"h" to:"l" recursively:YES scope:nil)
 ;(nmap map:"l" to:"h" recursively:YES scope:nil)
 ; this will cause unbound recursion and will abort after 1000 iterations
+

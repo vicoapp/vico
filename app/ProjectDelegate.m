@@ -1046,7 +1046,7 @@ static NSCharacterSet *slashSet = nil;
 		if (i != 0)
 			[pattern appendFormat:@"%@*?", fuzzyClass];
 		if (c == ' ')
-			[pattern appendString:@"([ /])"];
+			[pattern appendString:@"(\\W*?)"];
 		else
 			[pattern appendFormat:@"(%s%C)", [ViRegexp needEscape:c] ? "\\" : "", c];
 	}

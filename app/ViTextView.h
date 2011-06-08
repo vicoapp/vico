@@ -56,8 +56,12 @@
 	// block cursor
 	NSUInteger		 caret;
 	NSRect			 caretRect;
+	NSRect			 lineHighlightRect;
 	NSRect			 oldCaretRect;
+	NSRect			 oldLineHighlightRect;
 	NSColor			*caretColor;
+	NSColor			*lineHighlightColor;
+	BOOL			 highlightCursorLine;
 
 	NSInteger		 saved_column;
 	NSInteger		 initial_line, initial_column;

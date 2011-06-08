@@ -194,6 +194,13 @@ static NSCharacterSet *slashSet = nil;
 	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
+- (ProjectFile *)fileForItem:(id)item
+{
+	if ([item isKindOfClass:[ViCompletion class]])
+		return [(ViCompletion *)item representedObject];
+	return item;
+}
+
 - (NSMutableArray *)filteredContents:(NSArray *)files ofDirectory:(NSURL *)url
 {
 	if (files == nil)
@@ -438,14 +445,10 @@ static NSCharacterSet *slashSet = nil;
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
+		ProjectFile *pf = [self fileForItem:item];
 		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
-			[delegate gotoURL:[pf url]];
+			[delegate gotoURL:pf.url];
 			didOpen = YES;
 		}
 	}];
@@ -459,19 +462,15 @@ static NSCharacterSet *slashSet = nil;
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
+		ProjectFile *pf = [self fileForItem:item];
 		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			NSError *err = nil;
-			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[pf url]
+			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:pf.url
 														 display:NO
 														   error:&err];
 			if (err)
-				[windowController message:@"%@: %@", [pf url], [err localizedDescription]];
+				[windowController message:@"%@: %@", pf.url, [err localizedDescription]];
 			else if (doc) {
 				[windowController createTabForDocument:doc];
 				didOpen = YES;
@@ -489,20 +488,16 @@ static NSCharacterSet *slashSet = nil;
 	id item = [explorer itemAtRow:idx];
 	if (item == nil || [self outlineView:explorer isItemExpandable:item])
 		return;
-	ProjectFile *pf;
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
-	else
-		pf = item;
+	ProjectFile *pf = [self fileForItem:item];
 	if (!pf)
 		return;
 	NSError *err = nil;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[pf url]
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:pf.url
 												 display:NO
 												   error:&err];
 
 	if (err)
-		[windowController message:@"%@: %@", [pf url], [err localizedDescription]];
+		[windowController message:@"%@: %@", pf.url, [err localizedDescription]];
 	else if (doc)
 		[windowController switchToDocument:doc];
 	[self cancelExplorer];
@@ -513,15 +508,11 @@ static NSCharacterSet *slashSet = nil;
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
+		ProjectFile *pf = [self fileForItem:item];
 		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:NO
-						  andOpen:[pf url]
+						  andOpen:pf.url
 				       orSwitchToDocument:nil];
 			didOpen = YES;
 		}
@@ -536,15 +527,11 @@ static NSCharacterSet *slashSet = nil;
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
+		ProjectFile *pf = [self fileForItem:item];
 		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
 			[windowController splitVertically:YES
-						  andOpen:[pf url]
+						  andOpen:pf.url
 				       orSwitchToDocument:nil];
 			didOpen = YES;
 		}
@@ -608,13 +595,9 @@ static NSCharacterSet *slashSet = nil;
 	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
-		[urls addObject:[pf url]];
+		ProjectFile *pf = [self fileForItem:item];
+		[urls addObject:pf.url];
 	}];
 
 	if ([urls count] == 0)
@@ -677,13 +660,9 @@ static NSCharacterSet *slashSet = nil;
 	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
-		[urls addObject:[pf url]];
+		ProjectFile *pf = [self fileForItem:item];
+		[urls addObject:pf.url];
 	}];
 	[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:urls];
 }
@@ -692,13 +671,9 @@ static NSCharacterSet *slashSet = nil;
 {
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		ProjectFile *pf;
 		id item = [explorer itemAtRow:idx];
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-		else
-			pf = item;
-		[[NSWorkspace sharedWorkspace] openURL:[pf url]];
+		ProjectFile *pf = [self fileForItem:item];
+		[[NSWorkspace sharedWorkspace] openURL:pf.url];
 	}];
 }
 
@@ -783,7 +758,7 @@ static NSCharacterSet *slashSet = nil;
 		 * Selected files must be files, not directories.
 		 */
 		[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-			ProjectFile *item = [explorer itemAtRow:idx];
+			id item = [explorer itemAtRow:idx];
 			if (item == nil || [self outlineView:explorer isItemExpandable:item]) {
 				*stop = YES;
 				fail = YES;
@@ -820,7 +795,8 @@ static NSCharacterSet *slashSet = nil;
 	/*
 	 * Finder operations only implemented for file:// urls.
 	 */
-	if (![[[explorer itemAtRow:[set firstIndex]] url] isFileURL] &&
+	 ProjectFile *pf = [self fileForItem:[explorer itemAtRow:[set firstIndex]]];
+	if (![pf.url isFileURL] &&
 	    ([menuItem action] == @selector(revealInFinder:) ||
 	     [menuItem action] == @selector(openWithFinder:)))
 		return NO;
@@ -1392,18 +1368,14 @@ doCommandBySelector:(SEL)aSelector
 
 - (void)outlineViewItemWillExpand:(NSNotification *)notification
 {
-	ProjectFile *pf;
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
-	else
-		pf = item;
+	ProjectFile *pf = [self fileForItem:item];
 	if ([pf hasCachedChildren])
 		return;
 
 	__block BOOL directoryContentsIsAsync = NO;
 	isExpandingTree = YES;
-	[self childrenAtURL:[pf url] onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:pf.url onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {
@@ -1420,25 +1392,15 @@ doCommandBySelector:(SEL)aSelector
 
 - (void)outlineViewItemDidExpand:(NSNotification *)notification
 {
-	ProjectFile *pf;
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
-	else
-		pf = item;
-
+	ProjectFile *pf = [self fileForItem:item];
 	[expandedSet addObject:pf.url];
 }
 
 - (void)outlineViewItemDidCollapse:(NSNotification *)notification
 {
-	ProjectFile *pf;
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
-	else
-		pf = item;
-
+	ProjectFile *pf = [self fileForItem:item];
 	[expandedSet removeObject:pf.url];
 }
 
@@ -1483,20 +1445,16 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return [filteredItems objectAtIndex:anIndex];
 
-	ProjectFile *pf = item;
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
+	ProjectFile *pf = [self fileForItem:item];
 	if (![pf hasCachedChildren])
 		return nil;
-	return [[pf children] objectAtIndex:anIndex];
+	return [pf.children objectAtIndex:anIndex];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
    isItemExpandable:(id)item
 {
-	ProjectFile *pf = item;
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
+	ProjectFile *pf = [self fileForItem:item];
 	return [pf isDirectory];
 }
 
@@ -1506,12 +1464,10 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return [filteredItems count];
 
-	ProjectFile *pf = item;
-	if ([item isKindOfClass:[ViCompletion class]])
-		pf = [(ViCompletion *)item representedObject];
+	ProjectFile *pf = [self fileForItem:item];
 	if (![pf hasCachedChildren])
 		return 0;
-	return [[pf children] count];
+	return [pf.children count];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView
@@ -1542,19 +1498,8 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 {
 	NSInteger row = [explorer rowForItem:item];
 	NSCell *cell = [tableColumn dataCellForRow:row];
-
 	if (cell) {
-		ProjectFile *pf = item;
-		if ([item isKindOfClass:[ViCompletion class]])
-			pf = [(ViCompletion *)item representedObject];
-
-#if 0
-		ViDocument *doc = [[ViDocumentController sharedDocumentController] documentForURL:url];
-		if (doc && [doc isDocumentEdited]) {
-			INFO(@"doc %@ is edited", doc);
-		}
-#endif
-
+		ProjectFile *pf = [self fileForItem:item];
 		[cell setFont:font];
 		[cell setImage:[pf icon]];
 	}

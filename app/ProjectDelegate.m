@@ -11,6 +11,8 @@
 #import "ViCompletionController.h"
 #import "NSObject+SPInvocationGrabbing.h"
 
+static NSCharacterSet *slashSet = nil;
+
 @interface NSURL (equality)
 - (BOOL)isEqualToURL:(NSURL *)otherURL;
 - (BOOL)hasPrefix:(NSURL *)prefixURL;
@@ -18,14 +20,16 @@
 @implementation NSURL (equality)
 - (BOOL)isEqualToURL:(NSURL *)otherURL
 {
-	NSCharacterSet *slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+	if (slashSet == nil)
+		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
 	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	return [s1 isEqualToString:s2];
 }
 - (BOOL)hasPrefix:(NSURL *)prefixURL
 {
-	NSCharacterSet *slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+	if (slashSet == nil)
+		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
 	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	return [s1 hasPrefix:s2];
@@ -55,14 +59,15 @@
 
 @implementation ProjectFile
 
-@synthesize score, markedString, url, children;
+@synthesize score, url, children, isDirectory;
 
 - (id)initWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
 {
 	self = [super init];
 	if (self) {
-		url = aURL;
 		attributes = aDictionary;
+		isDirectory = [[attributes fileType] isEqualToString:NSFileTypeDirectory];
+		[self setURL:aURL];
 	}
 	return self;
 }
@@ -72,22 +77,43 @@
 	return [[ProjectFile alloc] initWithURL:aURL attributes:aDictionary];
 }
 
-- (BOOL)isDirectory
-{
-	return [[attributes fileType] isEqualToString:NSFileTypeDirectory];
-}
-
 - (BOOL)hasCachedChildren
 {
 	return children != nil;
 }
 
+- (void)setURL:(NSURL *)aURL
+{
+	url = aURL;
+	nameIsDirty = YES;
+	iconIsDirty = YES;
+}
+
 - (NSString *)name
 {
-	if ([url isFileURL])
-		return [[NSFileManager defaultManager] displayNameAtPath:[url path]];
-	else
-		return [url lastPathComponent];
+	if (nameIsDirty) {
+		if ([url isFileURL])
+			name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
+		else
+			name = [url lastPathComponent];
+		nameIsDirty = NO;
+	}
+	return name;
+}
+
+- (NSImage *)icon
+{
+	if (iconIsDirty) {
+		if ([url isFileURL])
+			icon = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];
+		else if (isDirectory)
+			icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
+		else
+			icon = [[NSWorkspace sharedWorkspace] iconForFileType:[url pathExtension]];
+		[icon setSize:NSMakeSize(16, 16)];
+		iconIsDirty = NO;
+	}
+	return icon;
 }
 
 - (NSString *)description
@@ -173,13 +199,15 @@
 	if (files == nil)
 		return nil;
 
+	id olditem = [self findItemWithURL:url inItems:rootItems];
+
 	NSMutableArray *children = [NSMutableArray array];
 	for (NSArray *entry in files) {
 		NSString *filename = [entry objectAtIndex:0];
 		NSDictionary *attributes = [entry objectAtIndex:1];
 		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
 			NSURL *curl = [url URLByAppendingPathComponent:filename];
-			if ([curl isFileURL]) {
+			if ([curl isFileURL] && [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink]) {
 				/*
 				 * XXX: resolve symlinks for all URL types!
 				 */
@@ -188,8 +216,15 @@
 			}
 			ProjectFile *pf = [ProjectFile fileWithURL:curl attributes:attributes];
 			if ([pf isDirectory]) {
-				NSArray *contents = [[ViURLManager defaultManager] cachedContentsOfDirectoryAtURL:pf.url];
-				pf.children = [self filteredContents:contents ofDirectory:pf.url];
+				ProjectFile *oldPf = nil;
+				if (olditem)
+					oldPf = [self findItemWithURL:curl inItems:[olditem children]];
+				if (oldPf && [oldPf hasCachedChildren])
+					pf.children = oldPf.children;
+				else {
+					NSArray *contents = [[ViURLManager defaultManager] cachedContentsOfDirectoryAtURL:pf.url];
+					pf.children = [self filteredContents:contents ofDirectory:pf.url];
+				}
 			}
 			[children addObject:pf];
 		}
@@ -947,7 +982,11 @@
 
 	ProjectFile *item = [itemsToFilter objectAtIndex:0];
 	[itemsToFilter removeObjectAtIndex:0];
-	DEBUG(@"expanding children of next item %@", item);
+
+	if ([item hasCachedChildren]) {
+		[self expandItems:[item children]];
+		return;
+	}
 
 	[self childrenAtURL:[item url] onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
@@ -960,6 +999,7 @@
 				DEBUG(@"no parent for item %@", item);
 		} else {
 			[item setChildren:children];
+			DEBUG(@"expanding children of item %@", item);
 			[self expandItems:[item children]];
 		}
 	}];
@@ -976,9 +1016,10 @@
 		DEBUG(@"got item %@", item);
 		DEBUG(@"got item url %@", [item url]);
 		if ([self outlineView:explorer isItemExpandable:item]) {
-			if (recursionLimit > 0 && [item hasCachedChildren])
+			if (recursionLimit > 0 && [item hasCachedChildren]) {
+				DEBUG(@"expanding children of item %@", item);
 				[self expandItems:[item children] recursionLimit:recursionLimit - 1];
-			else
+			} else
 				/* schedule in runloop */
 				[itemsToFilter addObject:item];
 		} else {
@@ -1210,7 +1251,7 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSURL *url = [[notification userInfo] objectForKey:@"URL"];
 
-	if (isExpandingTree || [self isEditing]) {
+	if (isFiltering || isExpandingTree || [self isEditing]) {
 		DEBUG(@"ignoring changes to directory %@", url);
 		return;
 	}
@@ -1241,8 +1282,10 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
-	[explorer reloadData];
-	[self resetExpandedItems];
+	if (!isFiltered) {
+		[explorer reloadData];
+		[self resetExpandedItems];
+	}
 }
 
 - (void)rescanURL:(NSURL *)aURL
@@ -1425,7 +1468,7 @@ doCommandBySelector:(SEL)aSelector
 				[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
 		} else {
 			ViDocument *doc = [windowController documentForURL:[file url]];
-			[file setUrl:newurl];
+			[file setURL:newurl];
 			[doc setFileURL:newurl];
 			[explorer reloadData];
 			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
@@ -1504,16 +1547,6 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 		ProjectFile *pf = item;
 		if ([item isKindOfClass:[ViCompletion class]])
 			pf = [(ViCompletion *)item representedObject];
-		NSURL *url = [pf url];
-		NSImage *img;
-		if ([url isFileURL])
-			img = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];
-		else {
-			if ([self outlineView:outlineView isItemExpandable:item])
-				img = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
-			else
-				img = [[NSWorkspace sharedWorkspace] iconForFileType:[[url path] pathExtension]];
-		}
 
 #if 0
 		ViDocument *doc = [[ViDocumentController sharedDocumentController] documentForURL:url];
@@ -1523,8 +1556,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 #endif
 
 		[cell setFont:font];
-		[img setSize:NSMakeSize(16, 16)];
-		[cell setImage:img];
+		[cell setImage:[pf icon]];
 	}
 
 	return cell;

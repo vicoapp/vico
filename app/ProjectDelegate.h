@@ -16,15 +16,19 @@
 	NSDictionary *attributes;
 	double score;
 	NSMutableArray *children;
-	NSAttributedString *markedString;
+	NSString *name;
+	NSImage *icon;
+	BOOL nameIsDirty, iconIsDirty;
+	BOOL isDirectory;
 }
 @property(readwrite, assign) double score;
-@property(readwrite, copy) NSURL *url;
-@property(readwrite, assign) NSAttributedString *markedString;
+@property(readonly) NSURL *url;
 @property(readwrite, assign) NSMutableArray *children;
-- (BOOL)isDirectory;
+@property(readonly) BOOL isDirectory;
+- (void)setURL:(NSURL *)aURL;
 - (BOOL)hasCachedChildren;
 - (NSString *)name;
+- (NSImage *)icon;
 @end
 
 @interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate>

@@ -652,7 +652,21 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		if ([displayName length] == 0)
 			displayName = [[self fileURL] host];
 	}
+
+	if ([self isDocumentEdited])
+		return [NSString stringWithFormat:@"%@ •", displayName];
+
 	return displayName;
+}
+
+- (void)updateChangeCount:(NSDocumentChangeType)changeType
+{
+	BOOL edited = [self isDocumentEdited];
+	[super updateChangeCount:changeType];
+	if (edited != [self isDocumentEdited]) {
+		[self willChangeValueForKey:@"title"];
+		[self didChangeValueForKey:@"title"];
+	}
 }
 
 - (void)setFileURL:(NSURL *)absoluteURL

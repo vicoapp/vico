@@ -30,6 +30,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (NSDictionary *)typingAttributes;
 - (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data;
 - (BOOL)addData:(NSData *)data;
+- (void)invalidateSymbolsInRange:(NSRange)range;
+- (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
 @end
 
 @implementation ViDocument
@@ -54,7 +56,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	self = [super init];
 	if (self) {
-		symbols = [NSArray array];
+		symbols = [NSMutableArray array];
 		views = [NSMutableSet set];
 
 		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -124,6 +126,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	     ofType:(NSString *)typeName
 	      error:(NSError **)outError
 {
+	symbols = [NSMutableArray array];
+
 	DEBUG(@"read from %@", absoluteURL);
 	__block BOOL firstChunk = YES;
 
@@ -830,7 +834,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if (language == nil) {
 		syntaxParser = nil;
-		[self setSymbols:nil];
+		[self willChangeValueForKey:@"symbols"];
+		[symbols removeAllObjects];
+		[self didChangeValueForKey:@"symbols"];
 		return;
 	}
 
@@ -866,16 +872,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		for (ViDocumentView *dv in views)
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 
-	[updateSymbolsTimer invalidate];
-	NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4];
-	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:fireDate
-						      interval:0
-							target:self
-						      selector:@selector(updateSymbolList:)
-						      userInfo:nil
-						       repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer
-	                             forMode:NSDefaultRunLoopMode];
+	[self invalidateSymbolsInRange:range];
 
 	if (ctx.lineOffset > startLine) {
 		// INFO(@"line endings have changed at line %u", endLine);
@@ -924,7 +921,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSInteger startLocation = [textStorage locationForStartOfLine:context.lineOffset];
 	if (startLocation == -1)
 		return;
-	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 50];
+	NSInteger endLocation = [textStorage locationForStartOfLine:context.lineOffset + 100];
 	if (endLocation == -1)
 		endLocation = [textStorage length];
 
@@ -1054,8 +1051,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSInteger diff = [textStorage changeInLength];
 
 	if (ignoreEditing) {
-                DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
-                ignoreEditing = NO;
+		DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
+		ignoreEditing = NO;
 		return;
 	}
 
@@ -1072,6 +1069,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[syntaxParser pullScopes:NSMakeRange(area.location, -diff)];
 		// FIXME: also pull jumps and marks
 	}
+
+	if (diff != 0)
+		[self pushSymbols:diff fromLocation:area.location];
 
 	// emit (delayed) event to javascript
 	[proxy emitDelayed:@"modify" with:self,
@@ -1231,82 +1231,132 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return nil;
 }
 
-- (void)updateSymbolList:(NSTimer *)timer
+- (void)invalidateSymbolsInRange:(NSRange)updateRange
 {
-	NSString *string = [[textStorage string] copy];
-	NSMutableArray *scopeArray = [[NSMutableArray alloc] initWithArray:[syntaxParser scopeArray]
-	                                                         copyItems:YES];
+	NSString *string = [textStorage string];
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	DEBUG(@"invalidate symbols in range %@", NSStringFromRange(updateRange));
 
-	dispatch_async(sym_q, ^{
+	NSString *lastSelector = nil;
+	NSImage *img = nil;
+	NSRange wholeRange;
 
-		NSString *lastSelector = nil;
-		NSImage *img = nil;
-		NSRange wholeRange;
+	[self willChangeValueForKey:@"symbols"];
 
-#if 0
-		struct timeval start;
-		struct timeval stop;
-		struct timeval diff;
-		gettimeofday(&start, NULL);
-#endif
+	NSUInteger maxRange = NSMaxRange(updateRange);
 
-		NSMutableArray *syms = [[NSMutableArray alloc] init];
+	NSUInteger i;
+	/* Remove old symbols in the range. Assumes the symbols are sorted on location. */
+	for (i = 0; i < [symbols count];) {
+		ViSymbol *sym = [symbols objectAtIndex:i];
+		NSRange r = sym.range;
+		if (r.location > maxRange)
+			/* we're past our range */
+			break;
+		if (NSMaxRange(r) <= updateRange.location)
+			/* the symbol doesn't intersect the range */
+			i++;
+		else {
+			DEBUG(@"remove symbol %@", sym);
+			[symbols removeObjectAtIndex:i];
+		}
+	}
 
-		NSUInteger i;
-		for (i = 0; i < [scopeArray count];)
-		{
-			ViScope *s = [scopeArray objectAtIndex:i];
-			NSArray *scopes = s.scopes;
-			NSRange range = s.range;
+	/* Parse new symbols in the range. */
+	for (i = updateRange.location; (i <= maxRange || lastSelector) && i < [scopeArray count];) {
+		ViScope *s = [scopeArray objectAtIndex:i];
+		NSArray *scopes = s.scopes;
+		NSRange range = s.range;
 
-			if ([lastSelector matchesScopes:scopes]) {
-				/* Continue with the last scope selector, it matched this scope too. */
-				wholeRange.length += range.length;
-			} else {
-				if (lastSelector) {
-					/*
-					 * Finalize the last symbol. Apply any symbol transformation.
-					 */
-					NSString *symbol = [string substringWithRange:wholeRange];
-					NSString *transform = [symbolTransforms objectForKey:lastSelector];
-					if (transform) {
-						ViSymbolTransform *tr = [[ViSymbolTransform alloc]
-						    initWithTransformationString:transform];
-						symbol = [tr transformSymbol:symbol];
-					}
-
-					ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
-										document:self
-										   range:wholeRange
-										   image:img];
-					[syms addObject:sym];
+		if ([lastSelector matchesScopes:scopes]) {
+			/* Continue with the last scope selector, it matched this scope too. */
+			wholeRange.length += range.length;
+		} else {
+			if (lastSelector) {
+				/*
+				 * Finalize the last symbol. Apply any symbol transformation.
+				 */
+				NSString *symbol = [string substringWithRange:wholeRange];
+				NSString *transform = [symbolTransforms objectForKey:lastSelector];
+				if (transform) {
+					ViSymbolTransform *tr = [[ViSymbolTransform alloc]
+					    initWithTransformationString:transform];
+					symbol = [tr transformSymbol:symbol];
 				}
-				lastSelector = nil;
 
-				for (NSString *scopeSelector in symbolScopes) {
-					if ([scopeSelector matchesScopes:scopes]) {
-						lastSelector = scopeSelector;
+				ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
+									document:self
+									   range:wholeRange
+									   image:img];
+				DEBUG(@"adding symbol %@", sym);
+				[symbols addObject:sym];
+			}
+			lastSelector = nil;
+
+			for (NSString *scopeSelector in symbolScopes) {
+				if ([scopeSelector matchesScopes:scopes]) {
+					lastSelector = scopeSelector;
+					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
+					if (backRange.length > 0) {
+						DEBUG(@"EXTENDED WITH backRange = %@ from %@", NSStringFromRange(backRange), NSStringFromRange(range));
+						wholeRange = NSUnionRange(range, backRange);
+					} else
 						wholeRange = range;
-						img = [self matchSymbolIconForScope:scopes];
-						break;
-					}
+					img = [self matchSymbolIconForScope:scopes];
+					break;
 				}
 			}
-
-			i += range.length;
 		}
 
-#if 0
-		gettimeofday(&stop, NULL);
-		timersub(&stop, &start, &diff);
-		unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
-		INFO(@"updated %u symbols => %.3f s", [symbols count], (float)ms / 1000.0);
-#endif
+		i += range.length;
+	}
 
-		dispatch_sync(dispatch_get_main_queue(), ^{
-			[self setSymbols:syms];
-		});
-	});
+	[symbols sortUsingComparator:^(id obj1, id obj2) {
+		ViSymbol *sym1 = obj1, *sym2 = obj2;
+		return (NSComparisonResult)(sym1.range.location - sym2.range.location);
+	}];
+
+	[self didChangeValueForKey:@"symbols"];
+}
+
+- (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location
+{
+	DEBUG(@"pushing symbols from %lu", location);
+	[self willChangeValueForKey:@"symbols"];
+	for (NSUInteger i = 0; i < [symbols count];) {
+		ViSymbol *sym = [symbols objectAtIndex:i];
+		NSRange r = sym.range;
+		if (delta < 0) {
+			NSRange deletedRange = NSMakeRange(location, -delta);
+			if (r.location < location) {
+				/* the symbol isn't contained in the range */
+				i++;
+			} else if (NSIntersectionRange(deletedRange, r).length > 0) {
+				DEBUG(@"remove symbol %@", sym);
+				[symbols removeObjectAtIndex:i];
+			} else {
+				/* we're past our range */
+				r.location += delta;
+				DEBUG(@"pushing symbol %@ to %@", sym, NSStringFromRange(r));
+				sym.range = r;
+				i++;
+			}
+		} else { /* delta > 0 */
+			if (r.location >= location) {
+				r.location += delta;
+				DEBUG(@"pushing symbol %@ to %@", sym, NSStringFromRange(r));
+				sym.range = r;
+				i++;
+			/*} else if (NSMaxRange(r) >= location) {
+				DEBUG(@"remove symbol %@", sym);
+				[symbols removeObjectAtIndex:i];*/
+			} else {
+				/* the symbol doesn't intersect the range */
+				i++;
+			}
+		}
+	}
+	[self didChangeValueForKey:@"symbols"];
 }
 
 #pragma mark -
@@ -1318,10 +1368,14 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
-	NSArray *scopeArray = [syntaxParser scopeArray];
-	if ([scopeArray count] > aLocation)
-		return [[scopeArray objectAtIndex:aLocation] scopes];
-	return nil;
+	if (aLocation >= [textStorage length]) {
+		/* use document scope at EOF */
+		DEBUG(@"document language is %@ (%@)", [self language], [[self language] name]);
+		NSString *scope = [[self language] name];
+		return scope ? [NSArray arrayWithObject:scope] : nil;
+	}
+
+	return [[self scopeAtLocation:aLocation] scopes];
 }
 
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation
@@ -1330,6 +1384,58 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if ([scopeArray count] > aLocation)
 		return [scopeArray objectAtIndex:aLocation];
 	return nil;
+}
+
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
+                    atLocation:(NSUInteger)aLocation
+{
+	NSArray *scopes = [self scopesAtLocation:aLocation];
+	return [scopeSelectors bestMatchForScopes:scopes];
+}
+
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                        forward:(BOOL)forward
+                   fromLocation:(NSUInteger)aLocation
+{
+	NSArray *lastScopes = nil, *scopes;
+	NSUInteger i = aLocation;
+	for (;;) {
+		if (forward && i >= [textStorage length])
+			break;
+		else if (!forward && i == 0)
+			break;
+
+		if (!forward)
+			i--;
+
+		if ((scopes = [self scopesAtLocation:i]) == nil)
+			break;
+
+		if (lastScopes != scopes && ![scopeSelector matchesScopes:scopes]) {
+			if (!forward)
+				i++;
+			break;
+		}
+
+		if (forward)
+			i++;
+
+		lastScopes = scopes;
+	}
+
+	if (forward)
+		return NSMakeRange(aLocation, i - aLocation);
+	else
+		return NSMakeRange(i, aLocation - i);
+
+}
+
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                     atLocation:(NSUInteger)aLocation
+{
+	NSRange rb = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
+	NSRange rf = [self rangeOfScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
+	return NSUnionRange(rb, rf);
 }
 
 @end

@@ -177,7 +177,7 @@
 	 * shellVariables from bundle preferences
 	 */
 	NSDictionary *shellVariables = [[ViBundleStore defaultStore] preferenceItem:@"shellVariables"];
-	NSString *bestMatchingScope = [textView bestMatchingScope:[shellVariables allKeys] atLocation:[textView caret]];
+	NSString *bestMatchingScope = [textView.document bestMatchingScope:[shellVariables allKeys] atLocation:[textView caret]];
 
 	if (bestMatchingScope) {
 		id vars = [shellVariables objectForKey:bestMatchingScope];

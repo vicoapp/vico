@@ -425,12 +425,6 @@ int logIndent = 0;
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
-	if (aLocation >= [[self textStorage] length]) {
-		/* use document scope at EOF */
-		DEBUG(@"document language is %@ (%@)", [document language], [[document language] name]);
-		NSString *scope = [[document language] name];
-		return scope ? [NSArray arrayWithObject:scope] : nil;
-	}
 	return [document scopesAtLocation:aLocation];
 }
 
@@ -478,7 +472,7 @@ int logIndent = 0;
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *increaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"increaseIndentPattern"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
@@ -495,7 +489,7 @@ int logIndent = 0;
 - (BOOL)shouldIncreaseIndentOnceAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *increaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"indentNextLinePattern"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[increaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
@@ -512,7 +506,7 @@ int logIndent = 0;
 - (BOOL)shouldDecreaseIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *decreaseIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"decreaseIndentPattern"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[decreaseIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
@@ -529,7 +523,7 @@ int logIndent = 0;
 - (BOOL)shouldIgnoreIndentAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *unIndentPatterns = [[ViBundleStore defaultStore] preferenceItem:@"unIndentedLinePattern"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[unIndentPatterns allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
@@ -546,7 +540,7 @@ int logIndent = 0;
 - (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *indentExpressions = [[ViBundleStore defaultStore] preferenceItem:@"indentExpression"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
@@ -1463,7 +1457,7 @@ int logIndent = 0;
 - (NSArray *)smartTypingPairsAtLocation:(NSUInteger)aLocation
 {
 	NSDictionary *smartTypingPairs = [[ViBundleStore defaultStore] preferenceItem:@"smartTypingPairs"];
-	NSString *bestMatchingScope = [self bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
+	NSString *bestMatchingScope = [document bestMatchingScope:[smartTypingPairs allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
 		DEBUG(@"found smart typing pair scope selector [%@] at location %i", bestMatchingScope, aLocation);

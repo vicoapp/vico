@@ -245,13 +245,13 @@
 
 	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
 	if (inSpecialScope) {
-		specialScopeRange = [self rangeOfScopeSelector:@"string"
-						    atLocation:openingRange.location];
+		specialScopeRange = [document rangeOfScopeSelector:@"string"
+							atLocation:openingRange.location];
 	} else {
 		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
 		if (inSpecialScope)
-			specialScopeRange = [self rangeOfScopeSelector:@"comment"
-							    atLocation:openingRange.location];
+			specialScopeRange = [document rangeOfScopeSelector:@"comment"
+								atLocation:openingRange.location];
 	}
 
 	/* Lookup the matching character and prepare search. */
@@ -2345,7 +2345,7 @@
 	if (!inclusive)
 		selector = [NSString stringWithFormat:@"%@ - (%@ > punctuation.definition.string.begin | %@ > punctuation.definition.string.end | %@ > keyword.control.heredoc-token)", baseSelector, baseSelector, baseSelector, baseSelector];
 	DEBUG(@"selector is %@", selector);
-	NSRange range = [self rangeOfScopeSelector:selector atLocation:location];
+	NSRange range = [document rangeOfScopeSelector:selector atLocation:location];
 	DEBUG(@"range = %@", NSStringFromRange(range));
 
 	start_location = range.location;
@@ -2380,7 +2380,7 @@
 	if ([self selectedRange].length > 0)
 		location = start_location + 1;
 	NSString *selector = [[self scopesAtLocation:location] componentsJoinedByString:@" "];
-	NSRange range = [self rangeOfScopeSelector:selector atLocation:location];
+	NSRange range = [document rangeOfScopeSelector:selector atLocation:location];
 
 	visual_start_location = start_location = range.location;
 	final_location = end_location = NSMaxRange(range) - 1;

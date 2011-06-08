@@ -14,57 +14,6 @@
 
 @implementation ViTextView (bundleCommands)
 
-- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
-                    atLocation:(NSUInteger)aLocation
-{
-	NSArray *scopes = [self scopesAtLocation:aLocation];
-	return [scopeSelectors bestMatchForScopes:scopes];
-}
-
-- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
-                        forward:(BOOL)forward
-                   fromLocation:(NSUInteger)aLocation
-{
-	NSArray *lastScopes = nil, *scopes;
-	NSUInteger i = aLocation;
-	for (;;) {
-		if (forward && i >= [[self textStorage] length])
-			break;
-		else if (!forward && i == 0)
-			break;
-
-		if (!forward)
-			i--;
-
-		if ((scopes = [self scopesAtLocation:i]) == nil)
-			break;
-
-		if (lastScopes != scopes && ![scopeSelector matchesScopes:scopes]) {
-			if (!forward)
-				i++;
-			break;
-		}
-
-		if (forward)
-			i++;
-
-		lastScopes = scopes;
-	}
-
-	if (forward)
-		return NSMakeRange(aLocation, i - aLocation);
-	else
-		return NSMakeRange(i, aLocation - i);
-
-}
-
-- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
-                     atLocation:(NSUInteger)aLocation
-{
-	NSRange rb = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
-	NSRange rf = [self rangeOfScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
-	return NSUnionRange(rb, rf);
-}
 
 - (NSString *)inputOfType:(NSString *)type
                  command:(ViBundleCommand *)command
@@ -82,7 +31,7 @@
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
 	} else if ([type isEqualToString:@"scope"]) {
-		*rangePtr = [self rangeOfScopeSelector:[command scope] atLocation:[self caret]];
+		*rangePtr = [document rangeOfScopeSelector:[command scope] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];

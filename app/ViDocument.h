@@ -38,12 +38,11 @@
 	ViSyntaxContext *nextContext;
 
 	// symbol list
-	NSArray *symbols;
+	NSMutableArray *symbols;
 	NSArray *filteredSymbols;
 	NSDictionary *symbolScopes;
 	NSDictionary *symbolTransforms;
 	NSDictionary *symbolIcons;
-	NSTimer *updateSymbolsTimer;
 
 	ViSnippet *snippet;
 
@@ -55,7 +54,7 @@
 @property(nonatomic,readwrite, assign) ViSnippet *snippet;
 @property(nonatomic,readonly) NSSet *views;
 @property(nonatomic,readonly) ViBundle *bundle;
-@property(nonatomic,readwrite, assign) NSArray *symbols;
+@property(nonatomic,readonly) NSArray *symbols;
 @property(nonatomic,readwrite, assign) NSArray *filteredSymbols;
 @property(nonatomic,readonly) NSStringEncoding encoding;
 @property(nonatomic,readwrite, assign) BOOL isTemporary;
@@ -65,8 +64,6 @@
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (ViScope *)scopeAtLocation:(NSUInteger)aLocation;
 - (NSDictionary *)typingAttributes;
 
 - (IBAction)toggleLineNumbers:(id)sender;
@@ -87,5 +84,15 @@
 - (NSString *)title;
 - (void)setString:(NSString *)aString;
 - (void)closeAndWindow:(BOOL)canCloseWindow;
+
+- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
+- (ViScope *)scopeAtLocation:(NSUInteger)aLocation;
+- (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
+                     atLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                     atLocation:(NSUInteger)aLocation;
+- (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
+                        forward:(BOOL)forward
+                   fromLocation:(NSUInteger)aLocation;
 
 @end

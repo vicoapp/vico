@@ -140,6 +140,16 @@ static NSCharacterSet *slashSet = nil;
 	return self;
 }
 
+- (void)compileSkipPattern
+{
+	NSError *error = nil;
+	skipRegex = [[ViRegexp alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"] options:0 error:&error];
+	if (error) {
+		[windowController message:@"Invalid regular expression in skipPattern: %@", [error localizedDescription]];
+		skipRegex = nil;
+	}
+}
+
 - (void)awakeFromNib
 {
 	explorer.keyManager = [[ViKeyManager alloc] initWithTarget:self
@@ -157,6 +167,12 @@ static NSCharacterSet *slashSet = nil;
 						   context:NULL];
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"exploresortfolders"
+						   options:NSKeyValueObservingOptionNew
+						   context:NULL];
+
+	[self compileSkipPattern];
+	[[NSUserDefaults standardUserDefaults] addObserver:self
+						forKeyPath:@"skipPattern"
 						   options:NSKeyValueObservingOptionNew
 						   context:NULL];
 
@@ -178,18 +194,21 @@ static NSCharacterSet *slashSet = nil;
 			change:(NSDictionary *)change
 		       context:(void *)context
 {
-	/* only explorecaseignore and exploresortfolders options observed */
+	if ([keyPath isEqualToString:@"skipPattern"]) {
+		[self compileSkipPattern];
+		rootItems = nil;
+		[explorer reloadData];
+		[self browseURL:rootURL];
+		return;
+	}
+
+	/* only explorecaseignore, exploresortfolders and skipPattern options observed */
 	/* re-sort explorer */
 	if (rootItems) {
 		[self recursivelySortProjectFiles:rootItems];
 		if (!isFiltered)
 			[self filterFiles:self];
 	}
-}
-
-- (void)changeRoot:(id)sender
-{
-	[self browseURL:[[sender clickedPathComponentCell] URL]];
 }
 
 - (ProjectFile *)fileForItem:(id)item
@@ -299,8 +318,6 @@ static NSCharacterSet *slashSet = nil;
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display jump:(BOOL)jump
 {
-	skipRegex = [[ViRegexp alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"]];
-
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];

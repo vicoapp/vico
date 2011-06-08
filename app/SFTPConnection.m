@@ -1123,7 +1123,7 @@ resp2txt(int type)
 - (void)abort
 {
 	[self close];
-	INFO(@"cancelling outstanding requests: %@", requests);
+	DEBUG(@"cancelling outstanding requests: %@", requests);
 	for (SFTPRequest *req in [requests allValues])
 		[req cancel];
 	[requests removeAllObjects];

@@ -148,8 +148,6 @@ static NSCharacterSet *slashSet = nil;
 	[explorer setDoubleAction:@selector(explorerDoubleClick:)];
 	[explorer setAction:@selector(explorerClick:)];
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
-	[rootButton setTarget:self];
-	[rootButton setAction:@selector(changeRoot:)];
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
 
@@ -212,7 +210,7 @@ static NSCharacterSet *slashSet = nil;
 	for (NSArray *entry in files) {
 		NSString *filename = [entry objectAtIndex:0];
 		NSDictionary *attributes = [entry objectAtIndex:1];
-		if (![filename hasPrefix:@"."] && [skipRegex matchInString:filename] == nil) {
+		if ([skipRegex matchInString:filename] == nil) {
 			NSURL *curl = [url URLByAppendingPathComponent:filename];
 			if ([curl isFileURL] && [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink]) {
 				/*
@@ -309,14 +307,14 @@ static NSCharacterSet *slashSet = nil;
 			[alert runModal];
 		} else {
 			if (jump)
-				[history pushURL:[rootButton URL] line:0 column:0 view:nil];
+				[history pushURL:rootURL line:0 column:0 view:nil];
 			if (display)
 				[self openExplorerTemporarily:NO];
 			rootItems = children;
 			[self filterFiles:self];
 			[explorer reloadData];
 			[self resetExpandedItems];
-			[rootButton setURL:aURL];
+			rootURL = aURL;
 			[environment setBaseURL:aURL];
 
 			if (!jump)
@@ -360,10 +358,9 @@ static NSCharacterSet *slashSet = nil;
 /* syntax: [count]<ctrl-o> */
 - (BOOL)jumplist_backward:(ViCommand *)command
 {
-	NSURL *url = [rootButton URL];
 	NSUInteger zero = 0;
 	NSView *view = nil;
-	return [history backwardToURL:&url line:&zero column:&zero view:&view];
+	return [history backwardToURL:&rootURL line:&zero column:&zero view:&view];
 }
 
 #pragma mark -
@@ -577,7 +574,7 @@ static NSCharacterSet *slashSet = nil;
 			id item = [self findItemWithURL:url inItems:rootItems];
 			id parent = [explorer parentForItem:item];
 			if (parent == nil)
-				[set addObject:[rootButton URL]];
+				[set addObject:rootURL];
 			else
 				[set addObject:[parent url]];
 		}
@@ -637,14 +634,14 @@ static NSCharacterSet *slashSet = nil;
 	if (pf)
 		parent = [pf url];
 	else
-		parent = [rootButton URL];
+		parent = rootURL;
 
 	[self rescanURL:parent];
 
 #if 0
 	NSInteger row = [explorer selectedRow];
 
-	NSURL *url = [rootButton URL];
+	NSURL *url = rootURL;
 	[[ViURLManager defaultManager] flushDirectoryCache];
 	[self browseURL:url];
 
@@ -689,7 +686,7 @@ static NSCharacterSet *slashSet = nil;
 			parent = [[explorer parentForItem:pf] url];
 	}
 	if (parent == nil)
-		parent = [rootButton URL];
+		parent = rootURL;
 
 	NSURL *newURL = [parent URLByAppendingPathComponent:@"New File"];
 	[[ViURLManager defaultManager] writeDataSafely:[NSData data]
@@ -714,7 +711,7 @@ static NSCharacterSet *slashSet = nil;
 			parent = [[explorer parentForItem:pf] url];
 	}
 	if (parent == nil)
-		parent = [rootButton URL];
+		parent = rootURL;
 
 	NSURL *newURL = [parent URLByAppendingPathComponent:@"New Folder"];
 	[[ViURLManager defaultManager] createDirectoryAtURL:newURL
@@ -730,7 +727,7 @@ static NSCharacterSet *slashSet = nil;
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSArray *bookmarks = [defaults arrayForKey:@"bookmarks"];
-	NSString *url = [[rootButton URL] absoluteString];
+	NSString *url = [rootURL absoluteString];
 	if (![bookmarks containsObject:url]) {
 		if (bookmarks == nil)
 			bookmarks = [NSArray arrayWithObject:@"dummy"];
@@ -983,7 +980,7 @@ static NSCharacterSet *slashSet = nil;
 
 - (void)expandItems:(NSArray *)items recursionLimit:(int)recursionLimit
 {
-	NSString *base = [[rootButton URL] path];
+	NSString *base = [rootURL path];
 	NSUInteger prefixLength = [base length];
 	if (![base hasSuffix:@"/"])
 		prefixLength++;
@@ -1205,7 +1202,7 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)displaysURL:(NSURL *)aURL
 {
-	return [[rootButton URL] isEqualToURL:aURL] ||
+	return [rootURL isEqualToURL:aURL] ||
 	       [self findItemWithURL:aURL inItems:rootItems] != nil;
 }
 
@@ -1239,7 +1236,7 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
-	if (![url hasPrefix:[rootButton URL]]) {
+	if (rootURL && ![url hasPrefix:rootURL]) {
 		DEBUG(@"changed URL %@ currently not shown in this explorer, ignoring", url);
 		return;
 	}
@@ -1250,11 +1247,11 @@ doCommandBySelector:(SEL)aSelector
 	id item = [self findItemWithURL:url inItems:rootItems];
 	if (item) {
 		[item setChildren:children];
-	} else if ([url isEqualToURL:[rootButton URL]]) {
+	} else if ([url isEqualToURL:rootURL]) {
 		rootItems = children;
 		[self filterFiles:self];
 	} else {
-		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, [rootButton URL]);
+		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, rootURL);
 		return;
 	}
 
@@ -1275,7 +1272,7 @@ doCommandBySelector:(SEL)aSelector
 			DEBUG(@"changed URL %@ is not cached", aURL);
 			return;
 		}
-		if (![aURL hasPrefix:[rootButton URL]]) {
+		if (![aURL hasPrefix:rootURL]) {
 			DEBUG(@"changed URL %@ currently not shown in explorer, flushing cache", aURL);
 			[urlman flushCachedContentsOfDirectoryAtURL:aURL];
 			return;

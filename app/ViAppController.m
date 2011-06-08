@@ -123,7 +123,7 @@
 	    [NSNumber numberWithBool:YES], @"smarttab",
 	    [NSNumber numberWithBool:YES], @"number",
 	    [NSNumber numberWithBool:YES], @"autocollapse",
-	    [NSNumber numberWithBool:NO], @"hidetab",
+	    [NSNumber numberWithBool:YES], @"hidetab",
 	    [NSNumber numberWithBool:YES], @"searchincr",
 	    [NSNumber numberWithBool:NO], @"showguide",
 	    [NSNumber numberWithBool:YES], @"wrap",
@@ -135,7 +135,7 @@
 	    @"vim", @"undostyle",
 	    @"Menlo Regular", @"fontname",
 	    @"Sunset", @"theme",
-	    @"(CVS|_darcs|.svn|.git|~$|\\.bak$|\\.o$|\\.pyc$)", @"skipPattern",
+	    @"(^\\.|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|tar.gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
 	    [NSArray arrayWithObjects:
 		[NSDictionary dictionaryWithObject:@"vicoapp" forKey:@"username"],
 		[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"],

@@ -44,12 +44,12 @@
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;
-	IBOutlet NSPathControl *rootButton;
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
 	IBOutlet NSPopUpButton *actionButton;
 	IBOutlet NSProgressIndicator *progressIndicator;
 	IBOutlet NSToolbarItem *searchToolbarItem;
 
+	NSURL *rootURL;
 	CGFloat width;
 	NSFont *font;
 

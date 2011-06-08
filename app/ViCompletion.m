@@ -148,14 +148,13 @@ static NSCharacterSet *ucase = nil;
 			base_score = 10.0;
 		else if (pos == flen - 1)
 			base_score = 6.0;
-		else if ([separators characterIsMember:[content characterAtIndex:pos - 1]])
+		else if ([separators characterIsMember:[content characterAtIndex:pos - 1]] ||
+		         [ucase characterIsMember:[content characterAtIndex:pos]])
 			base_score = 8.0;
 		else if ([separators characterIsMember:[content characterAtIndex:pos]])
 			base_score = 1.0;
 		else if ([separators characterIsMember:[content characterAtIndex:pos + 1]])
 			base_score = 4.0;
-		else if ([ucase characterIsMember:[content characterAtIndex:pos]])
-			base_score = 7.0;
 
 		DEBUG(@"scoring match at %lu (%@) in [%@] with base %lf",
 		    pos, NSStringFromRange(range), content, base_score);

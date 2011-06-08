@@ -20,6 +20,8 @@
 	BOOL closeSymbolListAfterUse;
 	NSInteger lastSelectedRow;
 	BOOL isFiltered;
+
+	NSTimer *reloadTimer;
 }
 
 - (void)filterSymbols;

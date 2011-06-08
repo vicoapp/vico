@@ -80,6 +80,17 @@
 	if (![keyPath isEqualToString:@"symbols"])
 		return;
 
+	[reloadTimer invalidate];
+	reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.2
+						       target:self
+						     selector:@selector(symbolsUpdate:)
+						     userInfo:nil
+						      repeats:NO];
+}
+
+- (void)symbolsUpdate:(NSTimer *)aTimer
+{
+	reloadTimer = nil;
 	[self filterSymbols:symbolFilterField];
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
 		[symbolView collapseItem:nil collapseChildren:YES];

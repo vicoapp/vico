@@ -866,7 +866,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		for (ViDocumentView *dv in views)
 			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
 
-	/*
 	[updateSymbolsTimer invalidate];
 	NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:updateSymbolsTimer == nil ? 0 : 0.4];
 	updateSymbolsTimer = [[NSTimer alloc] initWithFireDate:fireDate
@@ -877,7 +876,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 						       repeats:NO];
 	[[NSRunLoop currentRunLoop] addTimer:updateSymbolsTimer
 	                             forMode:NSDefaultRunLoopMode];
-				     */
 
 	if (ctx.lineOffset > startLine) {
 		// INFO(@"line endings have changed at line %u", endLine);

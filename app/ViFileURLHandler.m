@@ -1,6 +1,22 @@
 #import "ViFileURLHandler.h"
 #include "logging.h"
 
+@interface ViFileDeferred : NSObject <ViDeferred>
+{
+	id<ViDeferredDelegate> delegate;
+}
+@end
+
+@implementation ViFileDeferred
+@synthesize delegate;
+- (void)cancel
+{
+}
+- (void)wait
+{
+}
+@end
+
 @implementation ViFileURLHandler
 
 - (id)init
@@ -21,19 +37,27 @@
 			      onCompletion:(void (^)(NSArray *contents, NSError *error))aBlock
 {
 	DEBUG(@"url = %@", aURL);
-	NSError *error = nil;
-	NSArray *files = [fm contentsOfDirectoryAtPath:[aURL path] error:&error];
-	NSMutableArray *contents = [NSMutableArray array];
-	for (NSString *filename in files) {
-		NSDictionary *attrs;
-		NSURL *u = [aURL URLByAppendingPathComponent:filename];
-		NSString *p = [u path];
-		attrs = [fm attributesOfItemAtPath:p error:&error];
-		[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
-	}
 
-	aBlock(contents, error);
-	return nil;
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+		NSFileManager *fileman = [[NSFileManager alloc] init];
+		NSError *error = nil;
+		NSArray *files = [fileman contentsOfDirectoryAtPath:[aURL path] error:&error];
+		NSMutableArray *contents = [NSMutableArray array];
+		for (NSString *filename in files) {
+			NSDictionary *attrs;
+			NSURL *u = [aURL URLByAppendingPathComponent:filename];
+			NSString *p = [u path];
+			attrs = [fileman attributesOfItemAtPath:p error:&error];
+			[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
+		}
+
+		/* Schedule completion block on main queue. */
+		dispatch_sync(dispatch_get_main_queue(), ^{
+			aBlock(contents, error);
+		});
+	});
+
+	return [[ViFileDeferred alloc] init];
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL

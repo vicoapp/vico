@@ -116,6 +116,7 @@
 	[self resetInputSource];
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
+	[self updateCaret];
 	return [super becomeFirstResponder];
 }
 

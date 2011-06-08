@@ -216,7 +216,9 @@
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
 	[symbolView expandItem:nil expandChildren:YES];
-	[self selectFirstMatchingSymbolForFilter:filter];
+
+	if ([filter length] > 0)
+		[self selectFirstMatchingSymbolForFilter:filter];
 }
 
 - (void)filterSymbols
@@ -347,6 +349,7 @@ doCommandBySelector:(SEL)aSelector
 		[windowController gotoSymbol:symbol inView:[windowController currentView]];
 
 	[self closeSymbolList];
+	[windowController focusEditor];
 	return YES;
 }
 

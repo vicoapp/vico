@@ -16,6 +16,10 @@ test_snippets:
 	export OTHER_TEST_FLAGS="-SenTest TestViSnippet" && \
 	xcodebuild -configuration Debug -target Tests
 
+test_scopes:
+	export OTHER_TEST_FLAGS="-SenTest TestScopeSelectors" && \
+	xcodebuild -configuration Debug -target Tests
+
 release: test
 	./release.sh
 

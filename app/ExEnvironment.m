@@ -384,10 +384,9 @@
 	return NO;
 }
 
-- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
+- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange
 {
 	NSUInteger begin_line, end_line;
-	NSUInteger begin, end;
 	ViMark *m = nil;
 	ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
 
@@ -417,8 +416,7 @@
 	}
 
 	begin_line += command.addr1->offset;
-	begin = [storage locationForStartOfLine:begin_line];
-	if (begin == -1ULL)
+	if ([storage locationForStartOfLine:begin_line] == -1ULL)
 		return NO;
 
 	switch (command.addr2->type) {
@@ -448,13 +446,26 @@
 	}
 
 	end_line += command.addr2->offset;
-	end = [storage locationForStartOfLine:end_line];
-	if (end == -1ULL)
+	if ([storage locationForStartOfLine:end_line] == -1ULL)
 		return NO;
+
+	*outRange = NSMakeRange(begin_line, end_line - begin_line);
+	return YES;
+}
+
+- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
+{
+	NSRange lineRange;
+	if ([self resolveExAddresses:command intoLineRange:&lineRange] == NO)
+		return NO;
+
+	ViTextStorage *storage = (ViTextStorage *)[exTextView textStorage];
+	NSUInteger beg = [storage locationForStartOfLine:lineRange.location];
+	NSUInteger end = [storage locationForStartOfLine:NSMaxRange(lineRange)];
+
 	/* end location should include the contents of the end_line */
 	[exTextView getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
-
-	*outRange = NSMakeRange(begin, end - begin);
+	*outRange = NSMakeRange(beg, end - beg);
 	return YES;
 }
 
@@ -932,7 +943,7 @@
 - (BOOL)ex_s:(ExCommand *)command
 {
 	NSRange exRange;
-	if (![self resolveExAddresses:command intoRange:&exRange]) {
+	if (![self resolveExAddresses:command intoLineRange:&exRange]) {
 		[self message:@"Invalid addresses"];
 		return NO;
 	}
@@ -957,19 +968,36 @@
 	ViTransformer *tform = [[ViTransformer alloc] init];
 	NSError *error = nil;
 
-	/* FIXME: this is inefficient: there are two copies of the range being made. */
-	NSString *replacedText = [tform transformValue:[[storage string] substringWithRange:exRange]
-					   withPattern:rx
-						format:command.replacement
-					       options:command.string
-						 error:&error];
+	NSString *s = [storage string];
+	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
-	if (error) {
-		[self message:@"substitute failed: %@", [error localizedDescription]];
-		return NO;
+	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
+		NSUInteger bol = [storage locationForStartOfLine:lineno];
+		NSUInteger end, eol;
+		[s getLineStart:NULL end:&end contentsEnd:&eol forRange:NSMakeRange(bol, 0)];
+
+		NSRange lineRange = NSMakeRange(bol, eol - bol);
+		NSString *value = [s substringWithRange:lineRange];
+		DEBUG(@"range %@ = %@", NSStringFromRange(lineRange), value);
+		NSString *replacedText = [tform transformValue:value
+						   withPattern:rx
+							format:command.replacement
+						       options:command.string
+							 error:&error];
+		if (error) {
+			[self message:@"substitute failed: %@", [error localizedDescription]];
+			return NO;
+		}
+
+		if (replacedText != value)
+			[exTextView replaceCharactersInRange:lineRange withString:replacedText];
 	}
 
-	[exTextView replaceCharactersInRange:exRange withString:replacedText];
+	[exTextView endUndoGroup];
+	NSUInteger final_location = [storage locationForStartOfLine:NSMaxRange(exRange)];
+	[exTextView setCaret:final_location];
+	[exTextView scrollToCaret];
+
 	return YES;
 }
 

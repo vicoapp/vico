@@ -2,6 +2,8 @@ BEFORE 1.0
 ==========
 
 * tabstop setting per scope not honored!
+? search should be useable as motion command!
+? using :set variable no longer changes default editing preferences
 
 
 !!! explorer flickers when opening new windows!
@@ -18,17 +20,12 @@ REQUESTED
   normally. Also if pasting back (P) on the last line, it pastes both
   blank and the line.
 
-* option to open files in the same view per default (ie, not tabs)
-* @jasontorres: when I do an `:e filename` it always open on another tab :( Is there a way to prevent it from creating a new tab?
-
 * @fkoeppe: How would I go about removing trailing white spaces on save?
-* @tobiastom: Once more thing: pleeeease let me hide this stupid tab bar!
 
 * vim text objects, especially i[, a] and it, at
 * vicotool --line 1
 * R (replace mode)
 
-* show hidden files in explorer (option in action menu? or skipPattern?)
 
 URGENT
 ========
@@ -42,7 +39,6 @@ URGENT
 BUGS
 ====
 * :setf should remember url<->syntax mapping
-* r<esc> should not insert literal <esc>
 * h doesn't accept a count
 * bundle commands time out when presenting ui
 * get rid of ViBgView
@@ -53,8 +49,6 @@ BUGS
 * vi always has a newline at EOF
 * searching is slow on large files, naïve implementation
 * yk and yj commands don't position caret correctly
-* search should be useable as motion command!
-* using :set variable no longer changes default editing preferences
 
 
 IMPORTANT

@@ -10,6 +10,7 @@
 #import "ViCompletion.h"
 #import "ViCompletionController.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViCommon.h"
 
 static NSCharacterSet *slashSet = nil;
 
@@ -184,6 +185,11 @@ static NSCharacterSet *slashSet = nil;
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(firstResponderChanged:)
 						     name:ViFirstResponderChangedNotification
+						   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(documentEditedChanged:)
+						     name:ViDocumentEditedChangedNotification 
 						   object:nil];
 
 	[self browseURL:[environment baseURL]];
@@ -1510,15 +1516,33 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
  dataCellForTableColumn:(NSTableColumn *)tableColumn
                    item:(id)item
 {
+	NSDocumentController *docController = [NSDocumentController sharedDocumentController];
 	NSInteger row = [explorer rowForItem:item];
 	NSCell *cell = [tableColumn dataCellForRow:row];
 	if (cell) {
 		ProjectFile *pf = [self fileForItem:item];
+		ViDocument *doc = [docController documentForURL:pf.url];
+		if ([doc isDocumentEdited])
+			[(MHTextIconCell *)cell setModified:YES];
+		else
+			[(MHTextIconCell *)cell setModified:NO];
 		[cell setFont:font];
 		[cell setImage:[pf icon]];
 	}
 
 	return cell;
+}
+
+- (void)documentEditedChanged:(NSNotification *)notification
+{
+	ViDocument *doc = [notification object];
+	id item = [self findItemWithURL:[doc fileURL] inItems:rootItems];
+	if (item) {
+		NSInteger row = [explorer rowForItem:item];
+		if (row != -1)
+			[explorer reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
+					    columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+	}
 }
 
 @end

@@ -677,6 +677,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (edited != [self isDocumentEdited]) {
 		[self willChangeValueForKey:@"title"];
 		[self didChangeValueForKey:@"title"];
+
+		[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentEditedChangedNotification
+								    object:self
+								  userInfo:nil];
 	}
 }
 

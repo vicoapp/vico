@@ -8,6 +8,7 @@
 @implementation MHTextIconCell
 
 @synthesize image;
+@synthesize modified;
 
 - (void)editWithFrame:(NSRect)aRect
                inView:(NSView *)controlView
@@ -49,9 +50,10 @@
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
+	NSSize imageSize;
+	NSRect imageFrame;
+
 	if (image != nil) {
-		NSSize imageSize;
-		NSRect imageFrame;
 
 		imageSize = [image size];
 		NSDivideRect(cellFrame, &imageFrame, &cellFrame, 4 + imageSize.width, NSMinXEdge);
@@ -68,6 +70,17 @@
 			imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
 
 		[image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
+	}
+
+	if (modified) {
+		if (modImage == nil) {
+			modImage = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
+			modImageSize = [modImage size];
+		}
+		NSPoint modPoint = cellFrame.origin;
+		modPoint.y += ceil((cellFrame.size.height + modImageSize.height) / 2);
+		modPoint.x = imageFrame.origin.x - modImageSize.width;
+		[modImage compositeToPoint:modPoint operation:NSCompositeSourceOver];
 	}
 
 	CGFloat d = (cellFrame.size.height - [[self font] pointSize]) / 3.0;

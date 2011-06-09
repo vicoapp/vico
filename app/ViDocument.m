@@ -284,20 +284,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)editPreferenceChanged:(NSNotification *)notification
 {
-	if (language == nil)
-		return;
-
-	NSDictionary *info = [notification userInfo];
-
-	if ([[info objectForKey:@"key"] isEqualToString:@"wrap"]) {
-		[self updateWrapping];
-		return;
-	}
-
-	if ([[info objectForKey:@"key"] isEqualToString:@"tabstop"]) {
-		[self updateTabSize];
-		return;
-	}
+	[self updateWrapping];
+	[self updateTabSize];
 }
 
 #pragma mark -
@@ -1005,7 +993,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"wrap" inScope:[language name]] integerValue];
 	if (tmp != wrap) {
-		INFO(@"wrap changed from %li -> %li", wrap, tmp);
 		wrap = tmp;
 		[self setWrapping:wrap];
 	}

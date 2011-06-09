@@ -50,6 +50,13 @@
 	}
 }
 
+- (void)notifyPreferencesChanged
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViEditPreferenceChangedNotification
+							    object:nil
+							  userInfo:nil];
+}
+
 - (void)initPreferenceScope:(NSString *)scope
 {
 	if ([scope length] == 0)
@@ -66,6 +73,8 @@
 		[scopedPrefs setObject:[defs objectForKey:key] forKey:key];
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];
+
+	[self notifyPreferencesChanged];
 }
 
 - (void)deletePreferenceScope:(NSString *)scope
@@ -76,6 +85,8 @@
 		return;
 	[prefs removeObjectForKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];
+
+	[self notifyPreferencesChanged];
 }
 
 - (void)revertSheetDidEnd:(NSAlert *)alert
@@ -228,14 +239,7 @@
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];
 
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-		scope, @"scope",
-		value, @"value",
-		key, @"key",
-		nil];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ViEditPreferenceChangedNotification
-							    object:self
-							  userInfo:userInfo];
+	[self notifyPreferencesChanged];
 }
 
 + (id)valueForKey:(NSString *)key inScope:(NSString *)scope

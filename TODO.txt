@@ -1,7 +1,6 @@
 BEFORE 1.0
 ==========
 
-* tabstop setting per scope not honored!
 ? search should be useable as motion command!
 ? using :set variable no longer changes default editing preferences
 ? cmd-slash highlights current line?

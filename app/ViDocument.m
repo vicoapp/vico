@@ -18,6 +18,7 @@
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViAppController.h"
+#import "ViPreferencePaneEdit.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -32,6 +33,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (BOOL)addData:(NSData *)data;
 - (void)invalidateSymbolsInRange:(NSRange)range;
 - (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
+- (void)updateTabSize;
 @end
 
 @implementation ViDocument
@@ -77,6 +79,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 							 selector:@selector(textStorageDidChangeLines:)
 							     name:ViTextStorageChangedLinesNotification 
 							   object:textStorage];
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
+							 selector:@selector(editPreferenceChanged:)
+							     name:ViEditPreferenceChangedNotification
+							   object:nil];
 
 		NSString *symbolIconsFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"symbol-icons.plist"];
 		if (![[NSFileManager defaultManager] fileExistsAtPath:symbolIconsFile])
@@ -260,15 +267,35 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self enableLineNumbers:[userDefaults boolForKey:keyPath]];
 	else if ([keyPath isEqualToString:@"wrap"])
 		[self setWrapping:[userDefaults boolForKey:keyPath]];
-	else if ([keyPath isEqualToString:@"tabstop"] ||
-		 [keyPath isEqualToString:@"fontsize"] ||
-		 [keyPath isEqualToString:@"fontname"])
+	else if ([keyPath isEqualToString:@"tabstop"]) {
+		[self updateTabSize];
+	} else if ([keyPath isEqualToString:@"fontsize"] ||
+		   [keyPath isEqualToString:@"fontname"])
 		[self setTypingAttributes];
 	else if ([keyPath isEqualToString:@"list"]) {
 		for (ViDocumentView *dv in views) {
 			ViLayoutManager *lm = (ViLayoutManager *)[[dv textView] layoutManager];
 			[lm setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
 			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
+		}
+	}
+}
+
+- (void)editPreferenceChanged:(NSNotification *)notification
+{
+	if (language == nil)
+		return;
+
+	NSDictionary *info = [notification userInfo];
+	if (![[info objectForKey:@"key"] isEqualToString:@"tabstop"])
+		return;
+
+	NSString *scope = [info objectForKey:@"scope"];
+	if ([scope matchesScopes:[NSArray arrayWithObject:[[self language] name]]]) {
+		NSInteger tmp = [[info objectForKey:@"value"] integerValue];
+		if (tmp != tabSize) {
+			tabSize = tmp;
+			[self setTypingAttributes];
 		}
 	}
 }
@@ -973,12 +1000,22 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
+- (void)updateTabSize
+{
+	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"tabstop" inScope:[language name]] integerValue];
+	if (tmp != tabSize) {
+		tabSize = tmp;
+		[self setTypingAttributes];
+	}
+}
+
 - (void)setLanguage:(ViLanguage *)lang
 {
 	if ([textStorage lineCount] > 10000) {
 		[self message:@"Disabling syntax highlighting for large document."];
 		if (language) {
 			language = nil;
+			[self updateTabSize];
 			[self highlightEverything];
 		}
 		return;
@@ -992,6 +1029,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		bundle = [language bundle];
 		symbolScopes = [[ViBundleStore defaultStore] preferenceItem:@"showInSymbolList"];
 		symbolTransforms = [[ViBundleStore defaultStore] preferenceItem:@"symbolTransformation"];
+		[self updateTabSize];
 		[self highlightEverything];
 	}
 }
@@ -1162,7 +1200,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)setTypingAttributes
 {
-	NSInteger tabSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"tabstop"];
 	NSString *tab = [@"" stringByPaddingToLength:tabSize withString:@" " startingAtIndex:0];
 
 	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[ViThemeStore font]

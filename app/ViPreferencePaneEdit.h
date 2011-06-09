@@ -12,6 +12,8 @@
 	NSMutableSet *preferences;
 }
 
++ (id)valueForKey:(NSString *)key inScope:(NSString *)scope;
+
 - (IBAction)selectScope:(id)sender;
 - (IBAction)selectNewPreferenceScope:(id)sender;
 - (IBAction)cancelNewPreferenceScope:(id)sender;

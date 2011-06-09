@@ -1,6 +1,7 @@
 #import "ViPreferencePaneEdit.h"
 #import "ViBundleStore.h"
 #import "NSString-additions.h"
+#import "NSString-scopeSelector.h"
 #include "logging.h"
 
 @implementation ViPreferencePaneEdit
@@ -226,6 +227,38 @@
 	[scopedPrefs setObject:value forKey:key];
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];
+
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+		scope, @"scope",
+		value, @"value",
+		key, @"key",
+		nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViEditPreferenceChangedNotification
+							    object:self
+							  userInfo:userInfo];
+}
+
++ (id)valueForKey:(NSString *)key inScope:(NSString *)scope
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+
+	if (scope) {
+		NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
+		NSArray *scopes = [NSArray arrayWithObject:scope];
+
+		for (NSString *selector in [prefs allKeys]) {
+			if ([selector matchesScopes:scopes]) {
+				NSDictionary *scopesPrefs = [prefs objectForKey:selector];
+				id value = [scopesPrefs objectForKey:key];
+				if (value)
+					return value;
+				return nil;
+			}
+		}
+	}
+
+	/* No scopes matched. Return default setting. */
+	return [defs objectForKey:key];
 }
 
 @end

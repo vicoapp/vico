@@ -10,6 +10,7 @@
 #define ViDocumentEditedChangedNotification @"ViDocumentEditedChangedNotification "
 #define ViURLContentsCachedNotification @"ViURLContentsCachedNotification"
 #define ViTextStorageChangedLinesNotification @"ViTextStorageChangedLinesNotification"
+#define ViEditPreferenceChangedNotification @"ViEditPreferenceChangedNotification"
 
 #define ViFilterRunLoopMode @"ViFilterRunLoopMode"
 

@@ -18,6 +18,8 @@
 
 	dispatch_queue_t sym_q;
 
+	NSInteger tabSize; /* scope-specific */
+
 	/* Set when opening a new file from the ex command line. */
 	BOOL isTemporary;
 

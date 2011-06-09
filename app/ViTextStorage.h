@@ -90,6 +90,10 @@ TAILQ_HEAD(skiplist, skip);
                      acceptAfter:(BOOL)acceptAfter;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange
+                 acceptAfter:(BOOL)acceptAfter
+	     extraCharacters:(NSString *)extraCharacters;
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter;
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange;

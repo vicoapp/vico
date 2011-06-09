@@ -2583,8 +2583,9 @@
 {
 	NSRange range;
 	NSString *word = [[self textStorage] wordAtLocation:start_location
-						      range:&range
-					        acceptAfter:YES];
+                                                      range:&range
+                                                acceptAfter:YES
+                                            extraCharacters:@"."];
 
 	if (word == nil) {
 		word = @"";

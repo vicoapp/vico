@@ -619,20 +619,35 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 - (NSRange)rangeOfWordAtLocation:(NSUInteger)aLocation
                      acceptAfter:(BOOL)acceptAfter
 {
-	return [self rangeOfWordAtLocation:aLocation acceptAfter:acceptAfter extraCharacters:nil];
+	return [self rangeOfWordAtLocation:aLocation
+                               acceptAfter:acceptAfter
+                           extraCharacters:nil];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation
                        range:(NSRange *)returnRange
                  acceptAfter:(BOOL)acceptAfter
+	     extraCharacters:(NSString *)extraCharacters
 {
-	NSRange range = [self rangeOfWordAtLocation:aLocation acceptAfter:acceptAfter];
+	NSRange range = [self rangeOfWordAtLocation:aLocation
+                                        acceptAfter:acceptAfter
+                                    extraCharacters:extraCharacters];
 	if (returnRange)
 		*returnRange = range;
 	if (range.location == NSNotFound)
 		return nil;
 
 	return [[self string] substringWithRange:range];
+}
+
+- (NSString *)wordAtLocation:(NSUInteger)aLocation
+                       range:(NSRange *)returnRange
+                 acceptAfter:(BOOL)acceptAfter
+{
+	return [self wordAtLocation:aLocation
+                              range:returnRange
+                        acceptAfter:acceptAfter
+                    extraCharacters:nil];
 }
 
 - (NSString *)wordAtLocation:(NSUInteger)aLocation

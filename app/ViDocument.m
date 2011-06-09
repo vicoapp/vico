@@ -34,6 +34,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)invalidateSymbolsInRange:(NSRange)range;
 - (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
 - (void)updateTabSize;
+- (void)updateWrapping;
 @end
 
 @implementation ViDocument
@@ -266,7 +267,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([keyPath isEqualToString:@"number"])
 		[self enableLineNumbers:[userDefaults boolForKey:keyPath]];
 	else if ([keyPath isEqualToString:@"wrap"])
-		[self setWrapping:[userDefaults boolForKey:keyPath]];
+		[self updateWrapping];
 	else if ([keyPath isEqualToString:@"tabstop"]) {
 		[self updateTabSize];
 	} else if ([keyPath isEqualToString:@"fontsize"] ||
@@ -287,16 +288,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return;
 
 	NSDictionary *info = [notification userInfo];
-	if (![[info objectForKey:@"key"] isEqualToString:@"tabstop"])
-		return;
 
-	NSString *scope = [info objectForKey:@"scope"];
-	if ([scope matchesScopes:[NSArray arrayWithObject:[[self language] name]]]) {
-		NSInteger tmp = [[info objectForKey:@"value"] integerValue];
-		if (tmp != tabSize) {
-			tabSize = tmp;
-			[self setTypingAttributes];
-		}
+	if ([[info objectForKey:@"key"] isEqualToString:@"wrap"]) {
+		[self updateWrapping];
+		return;
+	}
+
+	if ([[info objectForKey:@"key"] isEqualToString:@"tabstop"]) {
+		[self updateTabSize];
+		return;
 	}
 }
 
@@ -386,6 +386,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self enableLineNumbers:[userDefaults boolForKey:@"number"]
 	          forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
+	[textView setWrapping:wrap];
 
 	return documentView;
 }
@@ -1000,6 +1001,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
+- (void)updateWrapping
+{
+	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"wrap" inScope:[language name]] integerValue];
+	if (tmp != wrap) {
+		INFO(@"wrap changed from %li -> %li", wrap, tmp);
+		wrap = tmp;
+		[self setWrapping:wrap];
+	}
+}
+
 - (void)updateTabSize
 {
 	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"tabstop" inScope:[language name]] integerValue];
@@ -1016,6 +1027,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (language) {
 			language = nil;
 			[self updateTabSize];
+			[self updateWrapping];
 			[self highlightEverything];
 		}
 		return;
@@ -1030,6 +1042,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		symbolScopes = [[ViBundleStore defaultStore] preferenceItem:@"showInSymbolList"];
 		symbolTransforms = [[ViBundleStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self updateTabSize];
+		[self updateWrapping];
 		[self highlightEverything];
 	}
 }

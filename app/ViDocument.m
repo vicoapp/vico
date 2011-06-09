@@ -681,7 +681,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	if ([self isDocumentEdited])
-		return [NSString stringWithFormat:@"• %@", displayName];
+		return [NSString stringWithFormat:@"%@ •", displayName];
 
 	return displayName;
 }

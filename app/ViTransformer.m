@@ -184,7 +184,8 @@
                      options:(NSString *)options
                        error:(NSError **)outError
 {
-	NSMutableString *text = [value mutableCopy];
+	id text = value;
+	BOOL copied = NO;
 	NSUInteger begin = 0;
 	for (;;) {
 		NSRange r = NSMakeRange(begin, [text length] - begin);
@@ -200,6 +201,10 @@
 		DEBUG(@"matched range %@", NSStringFromRange(r));
 		if (r.location == NSNotFound)
 			break;
+		if (!copied) {
+			text = [value mutableCopy];
+			copied = YES;
+		}
 		NSString *expFormat = [self expandFormat:format
 		                               withMatch:m
 		                               stopChars:@""

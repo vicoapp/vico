@@ -98,6 +98,12 @@ tenpow(NSUInteger x)
 			}
 
 			if (match) {
+
+				if (sel->last && ref_idx != nscopes - 1) {
+					DEBUG(@"scope selector [%@] not last", selscope);
+					return 0ULL;
+				}
+
 				/* A match is given 10^18 points for each depth down the scope stack. */
 				if (TAILQ_NEXT(sel, next) == NULL)
 					rank += depth * DEPTH_RANK;
@@ -189,6 +195,12 @@ tenpow(NSUInteger x)
 			[s appendString:@"> "];
 		NSString *tmp = [NSString stringWithCharacters:scope->buf length:scope->length];
 		[s appendString:tmp];
+		if (scope->last) {
+			[s appendString:@" $"];
+			if (TAILQ_NEXT(scope, next))
+				[s appendString:@" (INTERNAL ERROR)$"];
+		}
+
 		if (TAILQ_NEXT(scope, next))
 			[s appendString:@" "];
 	}
@@ -301,16 +313,21 @@ tenpow(NSUInteger x)
 			scopeSelectorParse(parser, GT, NULL, &state);
 			i++;
 			break;
+		case '$':
+			scopeSelectorParse(parser, DOLLAR, NULL, &state);
+			i++;
+			break;
 		default:
 			scope = &state.scopes[state.nscopes++];
 			for (j = i + 1; j < len; j++) {
 				ch = buf[j];
-				if (ch == ' ' || ch == ',' || ch == '(' || ch == ')' || ch == '&' || ch == '|' || ch == '>' || ch == '\n')
+				if (ch == ' ' || ch == ',' || ch == '(' || ch == ')' || ch == '&' || ch == '|' || ch == '>' || ch == '\n' || ch == '$')
 					break;
 			}
 			scope->buf = buf + i;
 			scope->length = (unsigned int)(j - i);
 			scope->child = 0;
+			scope->last = 0;
 			scopeSelectorParse(parser, SCOPE, scope, &state);
 			i = j;
 			break;

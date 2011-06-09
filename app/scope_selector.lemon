@@ -10,6 +10,7 @@
 
 %token_type		{ struct scope * }
 %type scopelist		{ struct scope_list * }
+%type limited_scopelist	{ struct scope_list * }
 %type selector		{ struct scope_expr * }
 %type expr		{ struct scope_expr * }
 
@@ -20,12 +21,19 @@
 
 selector ::= expr(X).				{ state->top_level_expr = X; }
 
-expr(LH) ::= scopelist(SL).			{ LH = mk_expr(state, SL); }
+expr(LH) ::= limited_scopelist(SL).		{ LH = mk_expr(state, SL); }
 expr(LH) ::= expr(A) OR expr(B).		{ LH = mk_expr_op(state, OR, A, B); }
 expr(LH) ::= expr(A) AND expr(B).		{ LH = mk_expr_op(state, AND, A, B); }
 expr(LH) ::= LPAREN expr(X) RPAREN.		{ LH = X; }
 expr(LH) ::= expr(A) MINUS expr(B).		{ LH = mk_expr_op(state, MINUS, A, B); }
 expr(LH) ::= expr(A) COMMA expr(B).		{ LH = mk_expr_op(state, COMMA, A, B); }
+
+limited_scopelist(LH) ::= scopelist(SL).	{	LH = SL; }
+
+limited_scopelist(LH) ::= scopelist(SL) DOLLAR.	{
+							LH = SL;
+							TAILQ_LAST(SL, scope_list)->last = 1;
+						}
 
 scopelist(LH) ::= SCOPE(S).			{
 							LH = &state->lists[state->nlists++];

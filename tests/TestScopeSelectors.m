@@ -267,5 +267,11 @@
 	STAssertEquals([@"source > string" matchesScopes:scopeObjCString], 0ULL, nil);
 }
 
+- (void)test051_LastSelector
+{
+	STAssertTrue([@"string $" matchesScopes:scopeObjCString] > 0ULL, nil);
+	STAssertEquals([@"string $" matchesScopes:scopeCString], 0ULL, nil);
+}
+
 @end
 

@@ -12,6 +12,7 @@ struct scope
 	u_int16_t *buf;
 	unsigned int length;
 	int child; /* 1 if this scope must be an immediate child of the previous scope in the list. */
+	int last;  /* 1 if this scope must be the last in the list of scopes */
 };
 
 TAILQ_HEAD(scope_list, scope);

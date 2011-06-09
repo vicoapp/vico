@@ -221,6 +221,7 @@
 (nmap setKey:"o" toEditAction:"open_line_below:")
 (nmap setKey:"p" toEditAction:"put_after:")
 (nmap setKey:"r" toEditAction:"replace:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(nmap setKey:"r<ctrl-v>" toEditAction:"replace_literal:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"s" toEditAction:"substitute:")
 (nmap setKey:"u" toAction:"vi_undo:")
 (nmap setKey:"v" toAction:"visual:")

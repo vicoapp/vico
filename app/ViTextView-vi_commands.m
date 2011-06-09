@@ -547,9 +547,20 @@
 	return YES;
 }
 
-/* syntax: [count]r<char> */
-- (BOOL)replace:(ViCommand *)command
+- (BOOL)replace:(ViCommand *)command literal:(BOOL)literal
 {
+	unichar key = command.argument;
+
+	if (key == 0x0D)
+		key = '\n';
+
+	if (key < 0x20 && key != '\t' && key != '\n' && !literal) {
+		if (key != 0x1B)
+			MESSAGE(@"Illegal character: %@; quote to enter",
+			    [NSString stringWithKeyCode:key]);
+		return NO;
+	}
+
 	if (mode == ViVisualMode) {
 		/*
 		 * Replacements in visual mode is restricted to the selection,
@@ -565,7 +576,7 @@
 				eol = NSMaxRange(affectedRange);
 	
 			NSString *replacement = [@"" stringByPaddingToLength:eol - bol
-								  withString:[NSString stringWithFormat:@"%C", command.argument]
+								  withString:[NSString stringWithFormat:@"%C", key]
 							     startingAtIndex:0];
 			[self replaceRange:NSMakeRange(bol, eol - bol) withString:replacement];
 			bol = end;
@@ -584,12 +595,23 @@
 		affectedRange = NSMakeRange(start_location, count);
 	
 		NSString *replacement = [@"" stringByPaddingToLength:affectedRange.length
-							  withString:[NSString stringWithFormat:@"%C", command.argument]
+							  withString:[NSString stringWithFormat:@"%C", key]
 						     startingAtIndex:0];
 		[self replaceRange:affectedRange withString:replacement];
 	}
 
 	return YES;
+}
+
+- (BOOL)replace_literal:(ViCommand *)command
+{
+	return [self replace:command literal:YES];
+}
+
+/* syntax: [count]r<char> */
+- (BOOL)replace:(ViCommand *)command
+{
+	return [self replace:command literal:NO];
 }
 
 /* syntax: [buffer][count]c[count]motion */

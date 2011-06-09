@@ -403,9 +403,10 @@ static NSMutableDictionary *maps = nil;
 	if (candidate == nil && op != nil) {
 		NSUInteger oplen = [op.keySequence count];
 		NSRange r = NSMakeRange(oplen, [keySequence count] - oplen);
-		*excessKeys = [keySequence subarrayWithRange:r];
+		if (excessKeys)
+			*excessKeys = [keySequence subarrayWithRange:r];
 		DEBUG(@"mapped [%@] to %@ with excess keys [%@]",
-		    keySequence, op, *excessKeys);
+		    keySequence, op, excessKeys ? *excessKeys : @"discarded");
 		return op;
 	}
 

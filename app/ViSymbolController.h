@@ -22,6 +22,7 @@
 	BOOL isFiltered;
 
 	NSTimer *reloadTimer;
+	BOOL dirty;
 }
 
 - (void)filterSymbols;

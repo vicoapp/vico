@@ -72,6 +72,12 @@
 	}
 }
 
+- (BOOL)symbolListVisible
+{
+	NSView *view = [[splitView subviews] objectAtIndex:2];
+	return ![splitView isSubviewCollapsed:view];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary *)change
@@ -80,17 +86,22 @@
 	if (![keyPath isEqualToString:@"symbols"])
 		return;
 
+	dirty = YES;
 	[reloadTimer invalidate];
-	reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.2
-						       target:self
-						     selector:@selector(symbolsUpdate:)
-						     userInfo:nil
-						      repeats:NO];
+
+	if ([self symbolListVisible])
+		reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
+							       target:self
+							     selector:@selector(symbolsUpdate:)
+							     userInfo:nil
+							      repeats:NO];
 }
 
 - (void)symbolsUpdate:(NSTimer *)aTimer
 {
+	dirty = NO;
 	reloadTimer = nil;
+
 	[self filterSymbols:symbolFilterField];
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
 		[symbolView collapseItem:nil collapseChildren:YES];
@@ -244,9 +255,11 @@
 {
 	NSView *view = [[splitView subviews] objectAtIndex:2];
 	NSRect frame = [splitView frame];
-	if ([splitView isSubviewCollapsed:view])
+	if ([splitView isSubviewCollapsed:view]) {
+		if (dirty)
+			[self symbolsUpdate:nil];
 		[splitView setPosition:NSWidth(frame) - width ofDividerAtIndex:1];
-	else {
+	} else {
 		width = [view bounds].size.width;
 		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 	}

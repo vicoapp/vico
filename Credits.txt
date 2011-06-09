@@ -1,3 +1,7 @@
+The Vico logo is done by Johannes Kitselis of Månen Design.
+http://www.manendesign.se/
+
+================================================================================
 Vico uses the Oniguruma regular expressions library by K. Kosako.
 Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
 All rights reserved.
@@ -239,7 +243,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 ================================================================================
-Vico include the par paragraph formatter by Adam M. Costello.
+Vico includes the par paragraph formatter by Adam M. Costello.
 Par is available from http://www.nicemice.net/par/.
 The par version shipped with Vico includes the par_1.52-i18n.3.diff.gz patch
 by Jérôme Pouiller that adds multibyte support.

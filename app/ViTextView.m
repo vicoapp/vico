@@ -1255,6 +1255,30 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Input handling and command evaluation
 
+/*
+ * Helper for deciding if we should insert a smart typing pair or not.
+ * If we're inserting a double or single qoute, check if we're inside
+ * a (double or single) quoted string already. In that case, assume we
+ * just want to end the string.
+ *
+ * This assumes that quotes generates string scopes.
+ */
+- (BOOL)shouldEndString:(NSArray *)pair atLocation:(NSUInteger)location
+{
+	NSString *pair0 = [pair objectAtIndex:0];
+	NSString *pair1 = [pair objectAtIndex:1];
+
+	if ([pair0 isEqualToString:pair1]) {
+		NSArray *scopes = [document scopesAtLocation:location];
+		if ([pair0 isEqualToString:@"\""])
+			return [@"string.quoted.double$" matchesScopes:scopes];
+		else if ([pair0 isEqualToString:@"'"])
+			return [@"string.quoted.single$" matchesScopes:scopes];
+	}
+
+	return NO;
+}
+
 - (BOOL)handleSmartPair:(NSString *)characters
 {
 	if ([[self preference:@"smartpair"] integerValue] == 0)
@@ -1294,7 +1318,7 @@ int logIndent = 0;
 			break;
 		}
 		// check for the start character of a smart typing pair
-		else if ([characters isEqualToString:pair0]) {
+		else if ([characters isEqualToString:pair0] && ![self shouldEndString:pair atLocation:start_location]) {
 			/*
 			 * Only use if next character is not alphanumeric.
 			 * FIXME: ...and next character is not any start character of a smart pair?

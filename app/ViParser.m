@@ -224,15 +224,38 @@
 			DEBUG(@"got register in state %d ?", state);
 	}
 
+	if (map == NULL)
+		map = defaultMap;
+
 	/* Check if it's a repeat count, unless we're in the insert map. */
 	/* FIXME: only in initial and operator-pending state, right? */
 	/* FIXME: Some multi-key commands accepts counts in between, eg ctrl-w */
 	if ([map acceptsCounts]) {
+
+		/*
+                 * If we're in an partial/ambiguous command, test if the
+                 * count results in an unambiguous command that needs an
+                 * argument. In that case, the key is not a count, but
+                 * an argument.
+		 */
+		BOOL mapKey = NO;
+		if (state == ViParserPartialCommand) {
+			NSArray *testSequence = [keySequence arrayByAddingObject:keyNum];
+			ViMapping *mapping = [map lookupKeySequence:testSequence
+							  withScope:scopeArray
+							allowMacros:allowMacros
+							 excessKeys:nil
+							    timeout:nil
+							      error:nil];
+			if ([mapping needsArgument])
+				mapKey = YES;
+		}
+
 		/*
 		 * Conditionally include '0' as a repeat count only
 		 * if it's not the first digit.
 		 */
-		if (singleKey >= '1' - (count > 0 ? 1 : 0) &&
+		if (!mapKey && singleKey >= '1' - (count > 0 ? 1 : 0) &&
 		    singleKey <= '9') {
 			count *= 10;
 			count += singleKey - '0';
@@ -262,9 +285,6 @@
 		}
 		return [self completeWithError:outError];
 	}
-
-	if (map == NULL)
-		map = defaultMap;
 
 	[keySequence addObject:keyNum];
 	return [self handleKeySequenceInScope:scopeArray

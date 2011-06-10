@@ -8,7 +8,7 @@
 {
 	static NSCharacterSet *reservedCharacters = nil;
 	if (reservedCharacters == nil)
-		reservedCharacters = [NSCharacterSet characterSetWithCharactersInString:@".{[(|\\+?*^$"];
+		reservedCharacters = [NSCharacterSet characterSetWithCharactersInString:@".{[()|\\+?*^$"];
 	return reservedCharacters;
 }
 
@@ -17,16 +17,21 @@
 	return [[self reservedCharacters] characterIsMember:ch];
 }
 
-+ (NSString *)escape:(NSString *)string
++ (NSString *)escape:(NSString *)string inRange:(NSRange)range
 {
 	NSMutableString *s = [NSMutableString string];
 	for (NSUInteger i = 0; i < [string length]; i++) {
 		unichar ch = [string characterAtIndex:i];
-		if ([self needEscape:ch])
+		if (NSLocationInRange(i, range) && [self needEscape:ch])
 			[s appendString:@"\\"];
 		[s appendFormat:@"%C", ch];
 	}
 	return s;
+}
+
++ (NSString *)escape:(NSString *)string
+{
+	return [self escape:string inRange:NSMakeRange(0, [string length])];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString

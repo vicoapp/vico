@@ -25,6 +25,7 @@
 
 + (NSCharacterSet *)reservedCharacters;
 + (BOOL)needEscape:(unichar)ch;
++ (NSString *)escape:(NSString *)string inRange:(NSRange)range;
 + (NSString *)escape:(NSString *)string;
 
 - (ViRegexp *)initWithString:(NSString *)aString;

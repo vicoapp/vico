@@ -1,5 +1,6 @@
 #import "ViTagsDatabase.h"
 #import "ViURLManager.h"
+#import "NSScanner-additions.h"
 #include "logging.h"
 
 @interface ViTagsDatabase (private)
@@ -9,6 +10,8 @@
 @end
 
 @implementation ViTagsDatabase
+
+@synthesize baseURL;
 
 - (ViTagsDatabase *)initWithBaseURL:(NSURL *)aURL
 {
@@ -79,31 +82,26 @@
 	if (strdata == nil)
 		strdata = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
 
+	NSCharacterSet *tabSet = [NSCharacterSet characterSetWithCharactersInString:@"\t"];
+
 	NSString *line;
 	for (line in [strdata componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
 		NSScanner *scan = [NSScanner scannerWithString:line];
-		NSCharacterSet *tabSet = [NSCharacterSet characterSetWithCharactersInString:@"\t"];
 		[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
 
 		NSString *symbol;
 		NSString *file;
+		NSString *pattern;
 
 		if ([scan scanUpToString:@"\t" intoString:&symbol] &&
 		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
 		    [scan scanUpToString:@"\t" intoString:&file] &&
 		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
-		   ![scan isAtEnd]) {
+		    [scan scanString:@"/" intoString:nil] &&
+		    [scan scanUpToUnescapedCharacter:'/' intoString:&pattern stripEscapes:YES]) {
 			NSURL *path = [baseURL URLByAppendingPathComponent:file];
-			NSString *command = [[scan string] substringFromIndex:[scan scanLocation]];
-			DEBUG(@"got symbol [%@] in file [%@]", symbol, path);
-			command = [command stringByReplacingOccurrencesOfString:@"*" withString:@"\\*"];
-			command = [command stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
-	 		command = [command stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
-			/*[command replaceOccurrencesOfRegularExpressionString:@"[\\*\\(\\)]"
-								  withString:@"\\&"
-								     options:OgreRubySyntax
-								       range:NSMakeRange(0, [command length])];*/
-			[tags setObject:[NSArray arrayWithObjects:path, command, nil] forKey:symbol];
+			DEBUG(@"got symbol [%@] in file [%@], pattern [%@]", symbol, path, pattern);
+			[tags setObject:[NSArray arrayWithObjects:path, pattern, nil] forKey:symbol];
 		} else
 			DEBUG(@"skipping tags line [%@]", line);
 	}

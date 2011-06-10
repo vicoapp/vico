@@ -350,12 +350,13 @@
 {
 	NSError *error = nil;
 	ViDocument *doc = [[ViDocumentController sharedDocumentController]
-	    openUntitledDocumentAndDisplay:YES error:&error];
-	doc.isTemporary = YES;
+	    openUntitledDocumentAndDisplay:NO error:&error];
 	if (error) {
 		[self message:@"%@", [error localizedDescription]];
 		return NO;
 	}
+	doc.isTemporary = YES;
+	[windowController createTabForDocument:doc];
 
 	return YES;
 }

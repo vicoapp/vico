@@ -34,7 +34,8 @@
 		if (length == 0) {
 			lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
 		} else {
-			[lm lineFragmentRectForGlyphAtIndex:IMIN(caret, length - 1) effectiveRange:&lineRange];
+			NSUInteger glyphIndex = [lm glyphIndexForCharacterAtIndex:IMIN(caret, length - 1)];
+			[lm lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 			if (lineRange.length > 0) {
 				NSUInteger eol = [lm characterIndexForGlyphAtIndex:NSMaxRange(lineRange) - 1];
 				if ([[ts string] characterAtIndex:eol] == '\n') // XXX: what about other line endings?

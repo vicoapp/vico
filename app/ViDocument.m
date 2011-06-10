@@ -1361,7 +1361,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			}
 		}
 
-		i += range.length;
+		i = NSMaxRange(range);
 	}
 
 	[symbols sortUsingComparator:^(id obj1, id obj2) {

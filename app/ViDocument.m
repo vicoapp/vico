@@ -960,10 +960,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	context.range = NSMakeRange(startLocation, endLocation - startLocation);
 	context.restarting = YES;
-	if (context.range.length > 0)
-	{
+	if (context.range.length > 0) {
 		DEBUG(@"restarting parse context at line %u, range %@",
-		    startLocation, NSStringFromRange(context.range));
+		    context.lineOffset, NSStringFromRange(context.range));
 		[self performSyntaxParsingWithContext:context];
 	}
 }

@@ -930,7 +930,7 @@
 		return NO;
 	}
 
-	[self gotoScreenColumn:saved_column fromLocation:[[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex]];
+	[self gotoScreenColumn:saved_column fromGlyphIndex:glyphIndex];
 	return YES;
 }
 
@@ -958,7 +958,7 @@
 		glyphIndex = lineRange.location;
 	}
 
-	[self gotoScreenColumn:saved_column fromLocation:[[self layoutManager] characterIndexForGlyphAtIndex:glyphIndex]];
+	[self gotoScreenColumn:saved_column fromGlyphIndex:glyphIndex];
 	return YES;
 }
 

@@ -1,10 +1,10 @@
 BEFORE 1.0
 ==========
 
-? search should be useable as motion command!
-? cmd-slash highlights current line?
+* :e http://twitter.com - -100.0% loaded
+* check if jump_tag still works
 
-!!! explorer flickers when opening new windows!
+? cmd-slash highlights current line?
 
 * [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
 
@@ -27,9 +27,12 @@ REQUESTED
 * vicotool --line 1
 * R (replace mode)
 
+* search should be useable as motion command!
+
 
 URGENT
 ========
+* explorer flickers when opening new windows!
 * bundle commands not repeatable with dot
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list

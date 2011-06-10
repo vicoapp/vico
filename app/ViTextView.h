@@ -121,7 +121,7 @@
 	      alignToTabstop:(BOOL)alignToTabstop
 	    indentEmptyLines:(BOOL)indentEmptyLines;
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
-- (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
+- (void)gotoScreenColumn:(NSUInteger)column fromGlyphIndex:(NSUInteger)glyphIndex;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 - (void)resetSelection;

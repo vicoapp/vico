@@ -861,19 +861,23 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Convenience methods
 
-- (void)gotoScreenColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
+- (void)gotoScreenColumn:(NSUInteger)column fromGlyphIndex:(NSUInteger)glyphIndex
 {
-	NSUInteger bol, eol;
-	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
-
 	NSRange lineRange;
-	[[self layoutManager] lineFragmentRectForGlyphAtIndex:aLocation effectiveRange:&lineRange];
+	[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 	end_location =  [[self layoutManager] characterIndexForGlyphAtIndex:lineRange.location];
 	if (column > 1)
 		end_location += column - 1;
 
-	if (end_location >= eol)
-		end_location = IMAX(bol, eol - (mode == ViInsertMode ? 0 : 1));
+	NSUInteger endOfScreenLine = [[self layoutManager] characterIndexForGlyphAtIndex:NSMaxRange(lineRange)];
+	if (end_location >= endOfScreenLine) {
+		end_location = IMAX(lineRange.location, endOfScreenLine - 1);
+
+		NSUInteger eol;
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:lineRange.location];
+		if (end_location >= eol)
+			end_location = IMAX(lineRange.location, eol - (mode == ViInsertMode ? 0 : 1));
+	}
 
 	final_location = end_location;
 }

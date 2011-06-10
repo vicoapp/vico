@@ -82,6 +82,8 @@ ToolbarHeightForWindow(NSWindow *window)
 		/* FIXME: continue? disable bundle download? */
 	}
 
+	/* We want the preference window to move to the active space. */
+	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorMoveToActiveSpace];
 	[self setWindowFrameAutosaveName:@"PreferenceWindow"];
 
 	if (forceSwitchToItem)

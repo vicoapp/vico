@@ -76,8 +76,8 @@
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
 (imap map:"<cmd-z>" to:"<esc>u")
 (imap map:"<cmd-Z>" to:"<esc><cmd-Z>")
-
-
+(imap map:"<cmd-del>" to:"<esc>ax<esc>d$a")
+(imap map:"<cmd-bs>" to:"<esc>d0xi")
 
 
 ;; create a separate mapping for motion commands

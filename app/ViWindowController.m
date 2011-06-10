@@ -84,6 +84,9 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViTagsDatabase *)tagsDatabase
 {
+	if (![[tagsDatabase baseURL] isEqualToURL:[environment baseURL]])
+		tagsDatabase = nil;
+
 	if (tagsDatabase == nil)
 		tagsDatabase = [[ViTagsDatabase alloc] initWithBaseURL:[environment baseURL]];
 

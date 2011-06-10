@@ -210,7 +210,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[self setFileModificationDate:[attributes fileModificationDate]];
 			[self setIsTemporary:NO];
 			[self setFileURL:normalizedURL];
+#if 0
 			[proxy emitDelayed:@"didLoad" with:self, nil];
+#endif
 			[self message:@"%@: %lu lines", [self title], [textStorage lineCount]];
 
 			for (ViDocumentView *dv in views) {
@@ -537,7 +539,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				[self setFileURL:normalizedURL];
 				[self setFileModificationDate:[attributes fileModificationDate]];
 				[self updateChangeCount:NSChangeCleared];
+#if 0
 				[proxy emit:@"didSave" with:self, nil];
+#endif
 			}
 
 			if (isTemporary)
@@ -709,7 +713,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super setFileURL:absoluteURL];
 	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
+#if 0
 	[proxy emitDelayed:@"changedURL" with:self, absoluteURL, nil];
+#endif
 }
 
 - (ViWindowController *)windowController
@@ -741,7 +747,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	[self removeWindowController:windowController];
 	[super close];
+#if 0
 	[proxy emitDelayed:@"didClose" with:self, nil];
+#endif
 }
 
 - (void)close
@@ -1127,11 +1135,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (diff != 0)
 		[self pushSymbols:diff fromLocation:area.location];
 
+#if 0
 	// emit (delayed) event to javascript
 	[proxy emitDelayed:@"modify" with:self,
 	    [NSValue valueWithRange:area],
 	    [NSNumber numberWithInteger:diff],
 	    nil];
+#endif
 
 	/*
 	 * Extend our range along affected line boundaries and re-parse.

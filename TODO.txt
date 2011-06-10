@@ -1,7 +1,6 @@
 BEFORE 1.0
 ==========
 
-* :e http://twitter.com - -100.0% loaded
 * check if jump_tag still works
 
 ? cmd-slash highlights current line?
@@ -110,6 +109,7 @@ FEATURES
 * dynamic headIndent paragraph style dependent on line indentation
 * cdpath setting? looked at by :edit
 * 0<C-D> in insert mode removes all indentation
+* g$ and g0 and g^
 
 
 LONG TERM FEATURES

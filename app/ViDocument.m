@@ -162,7 +162,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 		if ([loader respondsToSelector:@selector(progress)]) {
 			CGFloat progress = [loader progress];
-			[self message:@"%.1f%% loaded", progress * 100.0];
+			if (progress >= 0)
+				[self message:@"%.1f%% loaded", progress * 100.0];
 		}
 	};
 

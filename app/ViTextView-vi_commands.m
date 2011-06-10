@@ -1981,15 +1981,19 @@
 				[self pushCurrentLocationOnJumpList];
 
 				url = [tag objectAtIndex:0];
-				NSString *ex_command = [tag objectAtIndex:1];
 
 				if (![windowController gotoURL:url])
 					return;
 
-				NSArray *p = [ex_command componentsSeparatedByString:@"/;"];
-				NSString *pattern = [[p objectAtIndex:0] substringFromIndex:1];
+				NSString *pattern = [tag objectAtIndex:1];
+				NSRange r = NSMakeRange(0, [pattern length]);
+				if ([pattern hasPrefix:@"^"])
+					r.location++, r.length--;
+				if ([pattern hasSuffix:@"$"])
+					r.length--;
+				NSString *escapedPattern = [ViRegexp escape:pattern inRange:r];
 				ViDocumentView *docView = (ViDocumentView *)[windowController currentView];
-				[[docView textView] findPattern:pattern options:0];
+				[[docView textView] findPattern:escapedPattern options:0];
 				final_location = NSNotFound;
 			} else {
 				[self jump_symbol:command];

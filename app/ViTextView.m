@@ -869,14 +869,14 @@ int logIndent = 0;
 	if (column > 1)
 		end_location += column - 1;
 
-	NSUInteger endOfScreenLine = [[self layoutManager] characterIndexForGlyphAtIndex:NSMaxRange(lineRange)];
+	NSUInteger endOfScreenLine = [[self layoutManager] characterIndexForGlyphAtIndex:IMAX(lineRange.location, NSMaxRange(lineRange) - 1)];
 	if (end_location >= endOfScreenLine) {
-		end_location = IMAX(lineRange.location, endOfScreenLine - 1);
+		end_location = endOfScreenLine;
 
-		NSUInteger eol;
-		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:lineRange.location];
+		NSUInteger bol, eol;
+		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:end_location];
 		if (end_location >= eol)
-			end_location = IMAX(lineRange.location, eol - (mode == ViInsertMode ? 0 : 1));
+			end_location = IMAX(bol, eol - (mode == ViInsertMode ? 0 : 1));
 	}
 
 	final_location = end_location;

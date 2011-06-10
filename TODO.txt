@@ -1,10 +1,7 @@
 BEFORE 1.0
 ==========
 
-* check if jump_tag still works
-
 ? cmd-slash highlights current line?
-
 * [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
 
 

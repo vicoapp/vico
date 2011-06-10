@@ -94,7 +94,10 @@
 	NSError *error = nil;
 	NSURL *url = [self normalizeURL:aURL];
 	NSDictionary *attributes = [fm attributesOfItemAtPath:[url path] error:&error];
-	aBlock(url, attributes, error);
+	if (error || attributes == nil)
+		aBlock(nil, nil, error);
+	else
+		aBlock(url, attributes, nil);
 	return nil;
 }
 

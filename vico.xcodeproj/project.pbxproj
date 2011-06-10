@@ -261,9 +261,6 @@
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
 		9AB10BAC13408B6600D81D33 /* keys.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AB10BAB13408B6600D81D33 /* keys.nu */; };
 		9AB10BAF1340BB4C00D81D33 /* TestViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BAD1340BAE700D81D33 /* TestViMap.m */; };
-		9ACAA931136F0253001FC553 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
-		9ACAA932136F02A8001FC553 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACAA930136F0253001FC553 /* Sparkle.framework */; };
-		9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */; };
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
@@ -371,7 +368,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */,
-				9ACAA932136F02A8001FC553 /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -784,8 +780,6 @@
 		9AB10BA5133F72E600D81D33 /* ViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMap.m; sourceTree = "<group>"; };
 		9AB10BAB13408B6600D81D33 /* keys.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.nu; sourceTree = "<group>"; };
 		9AB10BAD1340BAE700D81D33 /* TestViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViMap.m; sourceTree = "<group>"; };
-		9ACAA930136F0253001FC553 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparkle_pub.pem; sourceTree = SOURCE_ROOT; };
 		9ACAA93D13707177001FC553 /* ViBufferCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBufferCompletion.h; sourceTree = "<group>"; };
 		9ACAA93E13707177001FC553 /* ViBufferCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferCompletion.m; sourceTree = "<group>"; };
 		9ACAA93F13707177001FC553 /* ViFileCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileCompletion.h; sourceTree = "<group>"; };
@@ -821,7 +815,6 @@
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
 				9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */,
 				9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */,
-				9ACAA931136F0253001FC553 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -882,7 +875,6 @@
 				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9AAF73F3135F3BDF00D75E1E /* Vico.help */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
-				9ACAA930136F0253001FC553 /* Sparkle.framework */,
 				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
@@ -1122,7 +1114,6 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9ACAA933136F0F6F001FC553 /* sparkle_pub.pem */,
 				9AAF73E1135C931600D75E1E /* Credits.txt */,
 				9A9A63CB1339D0CA0053402A /* vico.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
@@ -1617,7 +1608,6 @@
 				9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */,
 				9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */,
 				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
-				9ACAA934136F0F6F001FC553 /* sparkle_pub.pem in Resources */,
 				9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2188,6 +2178,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
 				TEST_AFTER_BUILD = YES;
 			};
@@ -2291,6 +2282,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -2303,6 +2295,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -2315,6 +2308,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 			};
 			name = Snapshot;
 		};
@@ -2346,6 +2340,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
 				TEST_AFTER_BUILD = YES;
 			};
@@ -2377,6 +2372,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
 				TEST_AFTER_BUILD = YES;
 			};
 			name = Release;
@@ -2554,6 +2550,7 @@
 				9A288E271398EA7000258451 /* Snapshot */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Snapshot;
 		};
 		9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */ = {
 			isa = XCConfigurationList;

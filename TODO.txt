@@ -2,10 +2,12 @@ BEFORE 1.0
 ==========
 
 ? search should be useable as motion command!
-? using :set variable no longer changes default editing preferences
 ? cmd-slash highlights current line?
 
 !!! explorer flickers when opening new windows!
+
+* [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
+
 
 REGRESSIONS
 ===========
@@ -48,6 +50,9 @@ BUGS
 * vi always has a newline at EOF
 * searching is slow on large files, naïve implementation
 * yk and yj commands don't position caret correctly
+* Downloading tmbundles seems to duplicate tab triggers (HN)
+* push marks
+* push jumps
 
 
 IMPORTANT
@@ -69,6 +74,7 @@ IMPORTANT
 
 FEATURES
 ========
+* Ability to edit tmbundles within the app (HN)
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: Indicating if a file is "dirty" in the tab bar.
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+

@@ -173,7 +173,8 @@
 	if (start_location < end)
 		[self move_down:command];
 
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(end, 1) inTextContainer:[self textContainer]];
+	NSRange nextLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(end, 1) actualCharacterRange:NULL];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:nextLineGlyphRange inTextContainer:[self textContainer]];
 	NSRect bounds = [clipView bounds];
 	[clipView scrollToPoint:NSMakePoint(bounds.origin.x, rect.origin.y)];
 	[scrollView reflectScrolledClipView:clipView];

@@ -659,10 +659,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[textStorage mutableString] setString:aString ?: @""];
 	[textStorage setAttributes:[self typingAttributes]
 	                            range:NSMakeRange(0, [aString length])];
-	[self configureSyntax];
-
 	/* Force incremental syntax parsing. */
-	[self highlightEverything];
+	language = nil;
+	[self configureSyntax];
 }
 
 - (void)setEncoding:(id)sender

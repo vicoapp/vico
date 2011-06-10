@@ -332,8 +332,11 @@
 			if (error) {
 				[self message:@"%@: %@", url, [error localizedDescription]];
 				return;
-			} else if (doc)
+			} else if (doc) {
+				[doc addWindowController:windowController];
+				[windowController addDocument:doc];
 				[windowController createTabForDocument:doc];
+			}
 		}
 	}
 }
@@ -356,6 +359,8 @@
 		return NO;
 	}
 	doc.isTemporary = YES;
+	[doc addWindowController:windowController];
+	[windowController addDocument:doc];
 	[windowController createTabForDocument:doc];
 
 	return YES;

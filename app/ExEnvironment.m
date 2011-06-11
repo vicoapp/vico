@@ -942,7 +942,7 @@
 	}
 
 	ViDocumentView *docView = viewController;
-	[[docView document] setLanguage:[matches anyObject]];
+	[[docView document] setLanguageAndRemember:[matches anyObject]];
 	return YES;
 }
 

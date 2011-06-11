@@ -76,6 +76,7 @@
 - (IBAction)toggleLineNumbers:(id)sender;
 - (ViLanguage *)language;
 - (IBAction)setLanguageAction:(id)sender;
+- (void)setLanguageAndRemember:(ViLanguage *)lang;
 - (void)setLanguage:(ViLanguage *)lang;
 - (void)configureForURL:(NSURL *)aURL;
 - (void)configureSyntax;

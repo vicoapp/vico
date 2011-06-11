@@ -38,7 +38,6 @@ URGENT
 
 BUGS
 ====
-* :setf should remember url<->syntax mapping
 * h doesn't accept a count
 * bundle commands time out when presenting ui
 * get rid of ViBgView

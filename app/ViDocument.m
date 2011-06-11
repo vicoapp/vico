@@ -981,11 +981,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return language;
 }
 
-- (IBAction)setLanguageAction:(id)sender
+- (void)setLanguageAndRemember:(ViLanguage *)lang
 {
-	ViLanguage *lang = [sender representedObject];
 	[self setLanguage:lang];
-
 	if ([self fileURL] != nil) {
 		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		NSMutableDictionary *syntaxOverride = [NSMutableDictionary dictionaryWithDictionary:
@@ -994,6 +992,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		                   forKey:[[self fileURL] absoluteString]];
 		[userDefaults setObject:syntaxOverride forKey:@"syntaxOverride"];
 	}
+}
+
+- (IBAction)setLanguageAction:(id)sender
+{
+	ViLanguage *lang = [sender representedObject];
+	[self setLanguageAndRemember:lang];
 }
 
 - (void)updateWrapping

@@ -63,5 +63,10 @@
 	return YES;
 }
 
+- (u_int64_t)matchesSelector:(NSString *)selector
+{
+	return [selector matchesScopes:self];
+}
+
 @end
 

@@ -1986,10 +1986,14 @@ int logIndent = 0;
 
 	DEBUG(@"got swipe event %@", event);
 
-	if ([event deltaX] != 0 && mode == ViInsertMode) {
-		MESSAGE(@"Swipe event interrupted text insert mode.");
-		[self normal_mode:lastEditCommand];
+	if ([event deltaX] != 0) {
+		if (mode == ViInsertMode) {
+			MESSAGE(@"Swipe event interrupted text insert mode.");
+			[self normal_mode:lastEditCommand];
+		} else if (keyManager.parser.partial)
+			MESSAGE(@"Vi command interrupted.");
 		keep_message = YES;
+		[keyManager.parser reset];
 	}
 
 	if ([event deltaX] > 0)

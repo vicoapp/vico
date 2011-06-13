@@ -19,6 +19,9 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViAppController.h"
 #import "ViPreferencePaneEdit.h"
+#import "ViEventManager.h"
+#import "ViDocumentController.h"
+#import "NSURL-additions.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -46,7 +49,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize encoding;
 @synthesize isTemporary;
 @synthesize snippet;
-@synthesize proxy;
 @synthesize busy;
 @synthesize loader;
 @synthesize closeCallback;
@@ -71,14 +73,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[userDefaults addObserver:self forKeyPath:@"wrap" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"list" options:0 context:NULL];
 
-		sym_q = dispatch_queue_create("se.bzero.vico.sym", NULL);
-
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
 
 		[[NSNotificationCenter defaultCenter] addObserver:self
 							 selector:@selector(textStorageDidChangeLines:)
-							     name:ViTextStorageChangedLinesNotification 
+							     name:ViTextStorageChangedLinesNotification
 							   object:textStorage];
 
 		[[NSNotificationCenter defaultCenter] addObserver:self
@@ -98,8 +98,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 		theme = [[ViThemeStore defaultStore] defaultTheme];
 		[self setTypingAttributes];
-
-		proxy = [[ViScriptProxy alloc] initWithObject:self];
 	}
 
 	return self;
@@ -136,6 +134,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	      error:(NSError **)outError
 {
 	symbols = [NSMutableArray array];
+
+	[[ViEventManager defaultManager] emit:ViEventWillLoadDocument for:self with:self, absoluteURL, nil];
 
 	DEBUG(@"read from %@", absoluteURL);
 	__block BOOL firstChunk = YES;
@@ -181,6 +181,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				DEBUG(@"treating non-existent file %@ as untitled file", normalizedURL);
 				[self setFileURL:normalizedURL];
 				[self message:@"%@: new file", [self title]];
+				[[ViEventManager defaultManager] emitDelayed:ViEventDidLoadDocument for:self with:self, nil];
 				returnError = nil;
 			} else if ([error isOperationCancelledError]) {
 				[self message:@"cancelled loading of %@", normalizedURL];
@@ -211,9 +212,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[self setFileModificationDate:[attributes fileModificationDate]];
 			[self setIsTemporary:NO];
 			[self setFileURL:normalizedURL];
-#if 0
-			[proxy emitDelayed:@"didLoad" with:self, nil];
-#endif
+			[[ViEventManager defaultManager] emitDelayed:ViEventDidLoadDocument for:self with:self, nil];
 			[self message:@"%@: %lu lines", [self title], [textStorage lineCount]];
 
 			for (ViDocumentView *dv in views) {
@@ -256,7 +255,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)finalize
 {
-	dispatch_release(sym_q);
 	[super finalize];
 }
 
@@ -378,6 +376,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	          forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
 	[textView setWrapping:wrap];
+
+	[[ViEventManager defaultManager] emit:ViEventDidMakeView for:self with:self, documentView, textView, nil];
 
 	return documentView;
 }
@@ -540,9 +540,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				[self setFileURL:normalizedURL];
 				[self setFileModificationDate:[attributes fileModificationDate]];
 				[self updateChangeCount:NSChangeCleared];
-#if 0
-				[proxy emit:@"didSave" with:self, nil];
-#endif
+				if (saveOperation == NSSaveOperation)
+					[[ViEventManager defaultManager] emitDelayed:ViEventDidSaveDocument for:self with:self, nil];
+				else if (saveOperation == NSSaveAsOperation)
+					[[ViEventManager defaultManager] emit:ViEventDidSaveAsDocument for:self with:self, normalizedURL, nil];
 			}
 
 			if (isTemporary)
@@ -568,6 +569,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
  forSaveOperation:(NSSaveOperationType)saveOperation
             error:(NSError **)outError
 {
+	DEBUG(@"saving %@ to %@", self, absoluteURL);
+
+	if (saveOperation == NSSaveOperation)
+		[[ViEventManager defaultManager] emit:ViEventWillSaveDocument for:self with:self, nil];
+	else if (saveOperation == NSSaveAsOperation)
+		[[ViEventManager defaultManager] emit:ViEventWillSaveAsDocument for:self with:self, absoluteURL, nil];
+
 	return [self writeSafelyToURL:absoluteURL
 			       ofType:typeName
 		     forSaveOperation:saveOperation
@@ -710,13 +718,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([absoluteURL isEqual:[self fileURL]])
 		return;
 
+	[[ViEventManager defaultManager] emit:ViEventWillChangeURL for:self with:self, absoluteURL, nil];
 	[self willChangeValueForKey:@"title"];
 	[super setFileURL:absoluteURL];
 	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
-#if 0
-	[proxy emitDelayed:@"changedURL" with:self, absoluteURL, nil];
-#endif
+	[[ViEventManager defaultManager] emit:ViEventDidChangeURL for:self with:self, absoluteURL, nil];
 }
 
 - (ViWindowController *)windowController
@@ -727,6 +734,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)closeAndWindow:(BOOL)canCloseWindow
 {
 	int code = 1; /* not saved */
+
+	[[ViEventManager defaultManager] emit:ViEventWillCloseDocument for:self with:self, nil];
 
 	DEBUG(@"closing, w/window: %s", canCloseWindow ? "YES" : "NO");
 	if (loader) {
@@ -748,9 +757,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	 */
 	[self removeWindowController:windowController];
 	[super close];
-#if 0
-	[proxy emitDelayed:@"didClose" with:self, nil];
-#endif
+	[[ViEventManager defaultManager] emitDelayed:ViEventDidCloseDocument for:self with:self, nil];
 }
 
 - (void)close
@@ -1023,10 +1030,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if ([textStorage lineCount] > 10000) {
 		[self message:@"Disabling syntax highlighting for large document."];
 		if (language) {
+			[[ViEventManager defaultManager] emitDelayed:ViEventWillChangeSyntax for:self with:self, [NSNull null], nil];
 			language = nil;
 			[self updateTabSize];
 			[self updateWrapping];
 			[self highlightEverything];
+			[[ViEventManager defaultManager] emitDelayed:ViEventDidChangeSyntax for:self with:self, [NSNull null], nil];
 		}
 		return;
 	}
@@ -1035,6 +1044,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	[lang patterns];
 
 	if (lang != language) {
+		[[ViEventManager defaultManager] emitDelayed:ViEventWillChangeSyntax for:self with:self, lang ?: [NSNull null], nil];
 		language = lang;
 		bundle = [language bundle];
 		symbolScopes = [[ViBundleStore defaultStore] preferenceItem:@"showInSymbolList"];
@@ -1042,6 +1052,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[self updateTabSize];
 		[self updateWrapping];
 		[self highlightEverything];
+		[[ViEventManager defaultManager] emitDelayed:ViEventDidChangeSyntax for:self with:self, lang ?: [NSNull null], nil];
 	}
 }
 
@@ -1140,13 +1151,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (diff != 0)
 		[self pushSymbols:diff fromLocation:area.location];
 
-#if 0
-	// emit (delayed) event to javascript
-	[proxy emitDelayed:@"modify" with:self,
+	// emit (delayed) event to Nu
+	[[ViEventManager defaultManager] emitDelayed:ViEventDidModifyDocument for:self with:self,
 	    [NSValue valueWithRange:area],
 	    [NSNumber numberWithInteger:diff],
 	    nil];
-#endif
 
 	/*
 	 * Extend our range along affected line boundaries and re-parse.

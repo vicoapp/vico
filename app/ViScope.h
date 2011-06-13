@@ -10,6 +10,7 @@
 @property(nonatomic,readwrite,assign) NSDictionary *attributes;
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
+- (u_int64_t)match:(NSString *)scopeSelector;
 - (int)compareBegin:(ViScope *)otherContext;
 - (id)copyWithZone:(NSZone *)zone;
 

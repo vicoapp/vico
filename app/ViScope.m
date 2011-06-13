@@ -1,4 +1,5 @@
 #import "ViScope.h"
+#import "NSString-scopeSelector.h"
 
 @implementation ViScope
 
@@ -44,6 +45,11 @@
 - (id)copyWithZone:(NSZone *)zone
 {
 	return [[ViScope alloc] initWithScopes:scopes range:range];
+}
+
+- (u_int64_t)match:(NSString *)scopeSelector
+{
+	return [scopeSelector matchesScopes:scopes];
 }
 
 @end

@@ -379,7 +379,8 @@
 	if (command.text)
 		cmdline = command.text;
 	else {
-		cmdline = [[document environment] getExStringForCommand:command];
+		cmdline = [[document environment] getExStringForCommand:command
+							  interactively:([self window] != nil)];
 		command.text = cmdline;
 	}
 
@@ -2457,7 +2458,8 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	NSString *exline = [[document environment] getExStringForCommand:command];
+	NSString *exline = [[document environment] getExStringForCommand:command
+                                                           interactively:([self window] != nil)];
 	if (exline == nil)
 		return NO;
 

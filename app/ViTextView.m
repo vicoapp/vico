@@ -998,7 +998,8 @@ int logIndent = 0;
 	if (command.text)
 		pattern = command.text;
 	else {
-		pattern = [[document environment] getExStringForCommand:command];
+		pattern = [[document environment] getExStringForCommand:command
+                                                          interactively:([self window] != nil)];
 		command.text = pattern;
 	}
 
@@ -1025,7 +1026,8 @@ int logIndent = 0;
 	if (command.text)
 		pattern = command.text;
 	else {
-		pattern = [[document environment] getExStringForCommand:command];
+		pattern = [[document environment] getExStringForCommand:command
+                                                          interactively:([self window] != nil)];
 		command.text = pattern;
 	}
 

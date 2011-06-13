@@ -215,13 +215,13 @@
 	if (status >= 200 && status <= 207) {
 		NSArray *overrideOutputFormat = [NSArray arrayWithObjects:
 			@"discard",
-			@"replaceSelectedText", 
-			@"replaceDocument", 
-			@"insertAsText", 
-			@"insertAsSnippet", 
-			@"showAsHTML", 
-			@"showAsTooltip", 
-			@"createNewDocument", 
+			@"replaceSelectedText",
+			@"replaceDocument",
+			@"insertAsText",
+			@"insertAsSnippet",
+			@"showAsHTML",
+			@"showAsTooltip",
+			@"createNewDocument",
 			nil];
 		outputFormat = [overrideOutputFormat objectAtIndex:status - 200];
 		status = 0;

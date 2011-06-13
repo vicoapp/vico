@@ -1985,14 +1985,16 @@ int logIndent = 0;
 /* Takes a string of characters and creates a macro of it.
  * Then feeds it into the key manager.
  */
-- (void)input:(NSString *)inputString
+- (BOOL)input:(NSString *)inputString
 {
 	NSArray *keys = [inputString keyCodes];
 	if (keys == nil) {
 		INFO(@"invalid key sequence: %@", inputString);
-		return;
+		return NO;
 	}
-	[keyManager runAsMacro:inputString];
+
+	BOOL interactive = ([self window] != nil || [self isFieldEditor]);
+	return [keyManager runAsMacro:inputString interactively:interactive];
 }
 
 #pragma mark -

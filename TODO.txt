@@ -1,8 +1,52 @@
 BEFORE 1.0
 ==========
 
+2011-06-13 12:02:43.873 Vico[9043:903] HIToolbox: ignoring exception '*** -[NSCFString characterAtIndex:]: Range or index out of bounds' that raised inside Carbon event dispatch
+(
+	0   CoreFoundation                      0x00007fff8158c7b4 __exceptionPreprocess + 180
+	1   libobjc.A.dylib                     0x00007fff81b3e0f3 objc_exception_throw + 45
+	2   CoreFoundation                      0x00007fff8158c5d7 +[NSException raise:format:arguments:] + 103
+	3   CoreFoundation                      0x00007fff8158c564 +[NSException raise:format:] + 148
+	4   Foundation                          0x00007fff887c54c1 -[NSCFString characterAtIndex:] + 97
+	5   Vico                                0x0000000100082b27 -[ViTextView(vi_commands) move_to_match:] + 1495
+	6   Vico                                0x000000010009d2ab -[ViTextView keyManager:evaluateCommand:] + 2971
+	7   Vico                                0x000000010010081a -[ViKeyManager evalCommand:] + 250
+	8   Vico                                0x0000000100100c6b -[ViKeyManager handleKey:allowMacros:inScope:fromMacro:excessKeys:error:] + 1067
+	9   Vico                                0x0000000100100e8e -[ViKeyManager handleKey:inScope:] + 110
+	10  Vico                                0x000000010009d929 -[ViTextView insertText:replacementRange:] + 617
+	11  AppKit                              0x00007fff82c0f471 -[NSTextInputContext handleTSMEvent:] + 2204
+	12  AppKit                              0x00007fff82c0ebc6 _NSTSMEventHandler + 156
+	13  HIToolbox                           0x00007fff800637f7 _ZL23DispatchEventToHandlersP14EventTargetRecP14OpaqueEventRefP14HandlerCallRec + 1002
+	14  HIToolbox                           0x00007fff80062d46 _ZL30SendEventToEventTargetInternalP14OpaqueEventRefP20OpaqueEventTargetRefP14HandlerCallRec + 395
+	15  HIToolbox                           0x00007fff80080a81 SendEventToEventTarget + 45
+	16  HIToolbox                           0x00007fff800b2213 SendTSMEvent + 48
+	17  HIToolbox                           0x00007fff800b1db9 SendUnicodeTextAEToUnicodeDoc + 468
+	18  HIToolbox                           0x00007fff800b1b34 TSMKeyEvent + 604
+	19  HIToolbox                           0x00007fff8009c5d8 TSMProcessRawKeyEvent + 1909
+	20  AppKit                              0x00007fff82c0d8bb -[NSTextInputContext handleEvent:] + 620
+	21  AppKit                              0x00007fff82c0d5e5 -[NSView interpretKeyEvents:] + 186
+	22  AppKit                              0x00007fff82c0d3be -[NSTextView keyDown:] + 819
+	23  Vico                                0x000000010009dc0a -[ViTextView keyDown:] + 90
+	24  AppKit                              0x00007fff82b7f06f -[NSWindow sendEvent:] + 8769
+	25  AppKit                              0x00007fff82ab3a86 -[NSApplication sendEvent:] + 4719
+	26  AppKit                              0x00007fff82a4a4da -[NSApplication run] + 474
+	27  AppKit                              0x00007fff82a431a8 NSApplicationMain + 364
+	28  Vico                                0x0000000100002e07 main + 647
+	29  Vico                                0x0000000100001b24 start + 52
+)
+2011-06-13 12:02:43.875 Vico[9043:903] *** -[NSCFString characterAtIndex:]: Range or index out of bounds
+
+
+? use ViScope instead of NSArray *scopeArray -> can use u_int16_t array internally
+* can Nu return BOOLs?
+* define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
+* "&" in :s replace part should expand to whole match
+* check map error in excessKeys.nu (re vs r duplicate mapping)
+
 ? cmd-slash highlights current line?
 * [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
+* why doesn't objc indent expression work anymore?
+* not all properties converted to nonatomic
 
 
 REGRESSIONS
@@ -38,6 +82,7 @@ URGENT
 
 BUGS
 ====
+* jumps doesn't work in untitled files
 * h doesn't accept a count
 * bundle commands time out when presenting ui
 * get rid of ViBgView
@@ -72,6 +117,7 @@ IMPORTANT
 
 FEATURES
 ========
+* ability to direct stderr to other place than (or, separately from) stdout in bundle commands
 * Ability to edit tmbundles within the app (HN)
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @fkoeppe: Indicating if a file is "dirty" in the tab bar.

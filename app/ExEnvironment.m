@@ -17,10 +17,6 @@
 #import "ViCommon.h"
 #include "logging.h"
 
-@interface ExEnvironment (private)
-- (IBAction)finishedExCommand:(id)sender;
-@end
-
 @implementation ExEnvironment
 
 @synthesize window;
@@ -72,6 +68,7 @@
 }
 
 - (NSString *)getExStringForCommand:(ViCommand *)command
+		      interactively:(BOOL)interactiveFlag
 {
 	ViMacro *macro = command.macro;
 
@@ -96,7 +93,8 @@
 	}
 
 	if (busy) {
-		[NSApp runModalForWindow:window];
+		if (interactiveFlag)
+			[NSApp runModalForWindow:window];
 		busy = NO;
 	}
 

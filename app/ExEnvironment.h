@@ -38,7 +38,8 @@
 
 @property(nonatomic,readonly) NSWindow *window;
 
-- (NSString *)getExStringForCommand:(ViCommand *)command;
+- (NSString *)getExStringForCommand:(ViCommand *)command
+		      interactively:(BOOL)interactiveFlag;
 
 - (void)filterText:(NSString*)inputText
        throughTask:(NSTask *)task

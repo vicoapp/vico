@@ -1,10 +1,12 @@
 #import "ViMap.h"
+#import "ViMacro.h"
 
 @interface ViCommand : NSObject
 {
 	ViMapping *mapping;
 	ViCommand *motion;
 	ViCommand *operator;
+	ViMacro *macro;
 	BOOL fromDot;
 	BOOL isLineMode;
 	int count;

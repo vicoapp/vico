@@ -16,6 +16,7 @@
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
 #import "ViTextView.h"
+#import "ViEventManager.h"
 
 #import "ViFileURLHandler.h"
 #import "ViSFTPURLHandler.h"
@@ -259,6 +260,8 @@
 		if (error)
 			INFO(@"%@: %@", siteFile, [error localizedDescription]);
 	}
+
+	[[ViEventManager defaultManager] emit:ViEventDidFinishLaunching for:nil with:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -288,6 +291,7 @@
 	TISSelectInputSource(original_input_source);
 	DEBUG(@"selecting original input: %@",
 	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
+	[[ViEventManager defaultManager] emit:ViEventWillResignActive for:nil with:nil];
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification
@@ -304,6 +308,8 @@
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		[[(ViDocumentView *)viewController textView] resetInputSource];
 	}
+
+	[[ViEventManager defaultManager] emit:ViEventDidBecomeActive for:nil with:nil];
 }
 
 - (IBAction)showPreferences:(id)sender

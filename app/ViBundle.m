@@ -405,7 +405,7 @@
 			SEL selector = NULL;
 			if ([op isKindOfClass:[ViBundleItem class]]) {
 				NSString *scopeSelector = [op scopeSelector];
-				if (scopeSelector == nil || [scope match:scopeSelector] > 0) {
+				if (scopeSelector == nil || [scopeSelector match:scope] > 0) {
 					matches++;
 					selector = @selector(performBundleItem:);
 				}

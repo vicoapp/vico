@@ -245,12 +245,12 @@
 	BOOL inSpecialScope;
 	NSRange specialScopeRange;
 
-	inSpecialScope = ([openingScope match:@"string"] > 0);
+	inSpecialScope = ([@"string" match:openingScope] > 0);
 	if (inSpecialScope) {
 		specialScopeRange = [document rangeOfScopeSelector:@"string"
 							atLocation:openingRange.location];
 	} else {
-		inSpecialScope = ([openingScope match:@"comment"] > 0);
+		inSpecialScope = ([@"comment" match:openingScope ] > 0);
 		if (inSpecialScope)
 			specialScopeRange = [document rangeOfScopeSelector:@"comment"
 								atLocation:openingRange.location];
@@ -289,7 +289,7 @@
 			/* Ignore match if scopes don't match. */
 			if (!inSpecialScope) {
 				ViScope *scope = [document scopeAtLocation:offset];
-				if ([scope match:@"string | comment"])
+				if ([@"string | comment" match:scope])
 					continue;
 			}
 
@@ -2359,7 +2359,7 @@
 		scope = [document scopeAtLocation:location];
 		if (scope == nil)
 			return NO;
-		if ([scope match:@"string - (punctuation.definition.string.begin | keyword.control.heredoc-token)"] > 0)
+		if ([@"string - (punctuation.definition.string.begin | keyword.control.heredoc-token)" match:scope] > 0)
 			break;
 		location = NSMaxRange(scope.range);
 	}

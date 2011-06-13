@@ -378,4 +378,11 @@ tenpow(NSUInteger x)
 	return rank;
 }
 
+- (u_int64_t)match:(ViScope *)scope
+{
+	if (scope == nil)
+		return 1ULL;
+	return [scope match:self];
+}
+
 @end

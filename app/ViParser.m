@@ -98,7 +98,7 @@
 		/* From nvi:
 		 * A count may be provided both to the command and to the motion, in
 		 * which case the count is multiplicative.  For example, "3y4y" is the
-		 * same as "12yy".  This count is provided to the motion command and 
+		 * same as "12yy".  This count is provided to the motion command and
 		 * not to the regular function.
 		 */
 		command.motion.count = command.count * command.motion.count;

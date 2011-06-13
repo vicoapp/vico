@@ -273,7 +273,7 @@ static NSString *bundlesDirectory = nil;
 				if (scopeSelector == nil)
 					rank = 1ULL;
 				else
-					rank = [scope match:scopeSelector];
+					rank = [scopeSelector match:scope];
 
 				if (rank > 0) {
 					if (rank > highest_rank) {

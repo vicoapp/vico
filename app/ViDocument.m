@@ -1361,7 +1361,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		ViScope *scope = [scopeArray objectAtIndex:i];
 		NSRange range = scope.range;
 
-		if ([scope match:lastSelector] > 0) {
+		if ([lastSelector match:scope] > 0) {
 			/* Continue with the last scope selector, it matched this scope too. */
 			wholeRange.length += range.length;
 		} else {
@@ -1387,7 +1387,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			lastSelector = nil;
 
 			for (NSString *scopeSelector in symbolScopes) {
-				if ([scope match:scopeSelector] > 0) {
+				if ([scopeSelector match:scope] > 0) {
 					lastSelector = scopeSelector;
 					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
 					if (backRange.length > 0) {
@@ -1492,7 +1492,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if ((scope = [self scopeAtLocation:i]) == nil)
 			break;
 
-		if (lastScope != scope && [scope match:scopeSelector] == 0) {
+		if (lastScope != scope && [scopeSelector match:scope] == 0) {
 			if (!forward)
 				i++;
 			break;

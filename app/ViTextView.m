@@ -624,7 +624,7 @@ int logIndent = 0;
 		id value = [scopePrefs objectForKey:name];
 		if (value == nil)
 			continue;
-		u_int64_t rank = [scope match:scopeSelector];
+		u_int64_t rank = [scopeSelector match:scope];
 		if (rank > max_rank) {
 			max_rank = rank;
 			scopeValue = value;
@@ -1274,9 +1274,9 @@ int logIndent = 0;
 	if ([pair0 isEqualToString:pair1]) {
 		ViScope *scope = [document scopeAtLocation:location];
 		if ([pair0 isEqualToString:@"\""])
-			return [scope match:@"string.quoted.double$"] > 0;
+			return [@"string.quoted.double$" match:scope] > 0;
 		else if ([pair0 isEqualToString:@"'"])
-			return [scope match:@"string.quoted.single$"] > 0;
+			return [@"string.quoted.single$" match:scope] > 0;
 	}
 
 	return NO;

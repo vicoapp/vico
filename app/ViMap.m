@@ -273,8 +273,7 @@ static NSMutableDictionary *maps = nil;
 			BOOL equalMatch = (len == mlen);
 
 			/* FIXME: compare rank of all matches */
-			u_int64_t rank = [scope match:m.scopeSelector];
-			if (rank == 0)
+			if ([m.scopeSelector match:scope] == 0)
 				continue;
 
 			DEBUG(@"testing key [%@] against %@ (%s)",

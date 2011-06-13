@@ -64,7 +64,7 @@
 {
 	NSString *scopeSelector;
 	for (scopeSelector in matchAttributes) {
-		u_int64_t rank = [scope match:scopeSelector];
+		u_int64_t rank = [scopeSelector match:scope];
 		if (rank > 0) {
 			NSDictionary *attrs = [matchAttributes objectForKey:scopeSelector];
 			NSString *attrKey;

@@ -5,7 +5,7 @@
 #import "logging.h"
 
 @interface ViParser (private)
-- (ViCommand *)handleKeySequenceInScope:(NSArray *)scopeArray
+- (ViCommand *)handleKeySequenceInScope:(ViScope *)scope
                             allowMacros:(BOOL)allowMacros
                              didTimeout:(BOOL)didTimeout
                                 timeout:(BOOL *)timeoutPtr
@@ -49,10 +49,7 @@
 - (ViCommand *)completeWithError:(NSError **)outError
 {
 	DEBUG(@"complete, command = %@, motion = %li", command, command.motion);
-
-	/* FIXME: we might have unused excess keys here, should issue a
-	 * warning/notice message that we discarded them.
-	 */
+	remainingExcessKeysPtr = nil;
 
 	if ([command isDot]) {
 		/* From nvi:
@@ -122,16 +119,19 @@
 
 - (id)pushExcessKeys:(NSArray *)excessKeys
          allowMacros:(BOOL)allowMacros
-               scope:(NSArray *)scopeArray
+               scope:(ViScope *)scope
              timeout:(BOOL *)timeoutPtr
                error:(NSError **)outError
 {
-	for (NSNumber *n in excessKeys) {
+	NSUInteger i;
+	for (i = 0; i < [excessKeys count]; i++) {
+		NSNumber *n = [excessKeys objectAtIndex:i];
 		NSError *error = nil;
 		ViCommand *c = [self pushKey:[n integerValue]
 				 allowMacros:allowMacros
-				       scope:scopeArray
+				       scope:scope
 				     timeout:timeoutPtr
+				  excessKeys:remainingExcessKeysPtr
 				       error:&error];
 		if (c == nil && error) {
 			if (outError)
@@ -140,18 +140,22 @@
 			break;
 		}
 
-		if (c)
+		if (c) {
 			/* XXX: what if we have more excess keys? Error or warning? */
+			if (i + 1 < [excessKeys count] && remainingExcessKeysPtr)
+				*remainingExcessKeysPtr = [excessKeys subarrayWithRange:NSMakeRange(i + 1, [excessKeys count] - (i + 1))];
 			return c;
+		}
 	}
 
 	return nil;
 }
 
-- (id)timeoutInScope:(NSArray *)scopeArray
+- (id)timeoutInScope:(ViScope *)scope
                error:(NSError **)outError
 {
-	return [self handleKeySequenceInScope:scopeArray
+	remainingExcessKeysPtr = nil;
+	return [self handleKeySequenceInScope:scope
 				  allowMacros:YES	/* XXX: ? */
 				   didTimeout:YES
 				      timeout:nil
@@ -160,16 +164,24 @@
 
 - (id)pushKey:(NSInteger)keyCode
 {
-	return [self pushKey:keyCode allowMacros:YES scope:nil timeout:nil error:nil];
+	return [self pushKey:keyCode
+                 allowMacros:YES
+                       scope:nil
+                     timeout:nil
+                  excessKeys:nil
+                       error:nil];
 }
 
 - (id)pushKey:(NSInteger)keyCode
   allowMacros:(BOOL)allowMacros
-        scope:(NSArray *)scopeArray
+        scope:(ViScope *)scope
       timeout:(BOOL *)timeoutPtr
+   excessKeys:(NSArray **)excessKeysPtr
         error:(NSError **)outError
 {
 	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], state);
+
+	remainingExcessKeysPtr = excessKeysPtr;
 
 	NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
 	[totalKeySequence addObject:keyNum];
@@ -231,36 +243,36 @@
 	/* FIXME: only in initial and operator-pending state, right? */
 	/* FIXME: Some multi-key commands accepts counts in between, eg ctrl-w */
 	if ([map acceptsCounts]) {
-
-		/*
-                 * If we're in an partial/ambiguous command, test if the
-                 * count results in an unambiguous command that needs an
-                 * argument. In that case, the key is not a count, but
-                 * an argument.
-		 */
-		BOOL mapKey = NO;
-		if (state == ViParserPartialCommand) {
-			NSArray *testSequence = [keySequence arrayByAddingObject:keyNum];
-			ViMapping *mapping = [map lookupKeySequence:testSequence
-							  withScope:scopeArray
-							allowMacros:allowMacros
-							 excessKeys:nil
-							    timeout:nil
-							      error:nil];
-			if ([mapping needsArgument])
-				mapKey = YES;
-		}
-
 		/*
 		 * Conditionally include '0' as a repeat count only
 		 * if it's not the first digit.
 		 */
-		if (!mapKey && singleKey >= '1' - (count > 0 ? 1 : 0) &&
-		    singleKey <= '9') {
-			count *= 10;
-			count += singleKey - '0';
-			DEBUG(@"count is now %i", count);
-			return nil;
+		if (singleKey >= '1' - (count > 0 ? 1 : 0) && singleKey <= '9') {
+			/*
+			 * If we're in an partial/ambiguous command, test if the
+			 * count results in an unambiguous command that needs an
+			 * argument. In that case, the key is not a count, but
+			 * an argument.
+			 */
+			BOOL useCount = YES;
+			if (state == ViParserPartialCommand) {
+				NSArray *testSequence = [keySequence arrayByAddingObject:keyNum];
+				ViMapping *mapping = [map lookupKeySequence:testSequence
+								  withScope:scope
+								allowMacros:allowMacros
+								 excessKeys:nil
+								    timeout:nil
+								      error:nil];
+				if ([mapping needsArgument])
+					useCount = NO;
+			}
+
+			if (useCount) {
+				count *= 10;
+				count += singleKey - '0';
+				DEBUG(@"count is now %i", count);
+				return nil;
+			}
 		}
 	}
 
@@ -287,14 +299,14 @@
 	}
 
 	[keySequence addObject:keyNum];
-	return [self handleKeySequenceInScope:scopeArray
+	return [self handleKeySequenceInScope:scope
 				  allowMacros:allowMacros
 				   didTimeout:NO
 				      timeout:timeoutPtr
 				        error:outError];
 }
 
-- (id)handleKeySequenceInScope:(NSArray *)scopeArray
+- (id)handleKeySequenceInScope:(ViScope *)scope
                    allowMacros:(BOOL)allowMacros
                     didTimeout:(BOOL)didTimeout
                        timeout:(BOOL *)timeoutPtr
@@ -304,7 +316,7 @@
 	NSArray *excessKeys = nil;
 	BOOL timeout = didTimeout;
 	ViMapping *mapping = [map lookupKeySequence:keySequence
-					  withScope:scopeArray
+					  withScope:scope
 					allowMacros:allowMacros
 					 excessKeys:&excessKeys
 					    timeout:&timeout
@@ -371,8 +383,11 @@
 			DEBUG(@"%@ is an operator, using operatorMap", mapping);
 		} else if ([mapping needsArgument])
 			state = ViParserNeedChar;
-		else
+		else {
+			if (remainingExcessKeysPtr)
+				*remainingExcessKeysPtr = excessKeys;
 			return [self completeWithError:outError];
+		}
 	} else if (state == ViParserNeedMotion || state == ViParserPartialMotion) {
 		DEBUG(@"got motion command %@", mapping);
 		if (![mapping isMotion])
@@ -388,8 +403,11 @@
 
 		if ([mapping needsArgument])
 			state = ViParserNeedChar;
-		else
+		else {
+			if (remainingExcessKeysPtr)
+				*remainingExcessKeysPtr = excessKeys;
 			return [self completeWithError:outError];
+		}
 	} else
 		return [self fail:outError
 			     with:ViErrorParserInternal
@@ -399,7 +417,7 @@
 	/* If we got excess keys from the map, parse them now. */
 	return [self pushExcessKeys:excessKeys
 			allowMacros:allowMacros
-			      scope:scopeArray
+			      scope:scope
 			    timeout:timeoutPtr
 			      error:outError];
 }

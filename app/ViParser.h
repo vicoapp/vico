@@ -1,5 +1,6 @@
 #import "ViMap.h"
 #import "ViCommand.h"
+#import "ViScope.h"
 
 typedef enum {
 	ViParserInitialState,		/* expecting a command, or " */
@@ -19,6 +20,8 @@ typedef enum {
 
 	NSMutableArray *keySequence;
 	NSMutableArray *totalKeySequence;
+
+	NSArray **remainingExcessKeysPtr;
 
 	ViCommand *command;
 	unichar reg; /* register */
@@ -46,11 +49,12 @@ typedef enum {
 
 - (id)pushKey:(NSInteger)keyCode
   allowMacros:(BOOL)allowMacros
-        scope:(NSArray *)scopeArray
+        scope:(ViScope *)scope
       timeout:(BOOL *)timeoutPtr
+   excessKeys:(NSArray **)excessKeysPtr
         error:(NSError **)outError;
 
-- (id)timeoutInScope:(NSArray *)scopeArray
+- (id)timeoutInScope:(ViScope *)scope
                error:(NSError **)outError;
 
 - (void)reset;

@@ -44,8 +44,6 @@ BEFORE 1.0
 
 ? cmd-slash highlights current line?
 * [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
-* why doesn't objc indent expression work anymore?
-* not all properties converted to nonatomic
 
 
 REGRESSIONS

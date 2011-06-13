@@ -9,7 +9,7 @@
 @required
 - (void)cancel;
 - (void)wait;
-@property (readwrite, assign) id<ViDeferredDelegate> delegate;
+@property (nonatomic, readwrite, assign) id<ViDeferredDelegate> delegate;
 
 @optional
 - (CGFloat)progress;

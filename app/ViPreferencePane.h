@@ -7,9 +7,9 @@
 	IBOutlet NSView *view;
 }
 
-@property (readonly) NSString *name;
-@property (readonly) NSImage *icon;
-@property (readonly) NSView *view;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSImage *icon;
+@property (nonatomic, readonly) NSView *view;
 
 - (id)initWithNib:(NSNib *)nib
              name:(NSString *)aName

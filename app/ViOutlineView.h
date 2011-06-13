@@ -6,8 +6,8 @@
 	NSInteger lastSelectedRow;
 }
 
-@property (readwrite, assign) ViKeyManager *keyManager;
-@property (readwrite) NSInteger lastSelectedRow;
+@property (nonatomic, readwrite, assign) ViKeyManager *keyManager;
+@property (nonatomic, readwrite) NSInteger lastSelectedRow;
 
 - (BOOL)move_down:(ViCommand *)command;
 - (BOOL)move_up:(ViCommand *)command;

@@ -44,12 +44,12 @@
 	BOOL fuzzySearch;
 }
 
-@property (readwrite, assign) id<ViCompletionDelegate> delegate;
-@property (readonly) NSWindow *window;
-@property (readwrite, assign) NSArray *completions;
-@property (readonly) NSInteger terminatingKey;
-@property (readonly) NSRange range;
-@property (readwrite, assign) NSString *filter;
+@property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;
+@property (nonatomic, readonly) NSWindow *window;
+@property (nonatomic, readwrite, assign) NSArray *completions;
+@property (nonatomic, readonly) NSInteger terminatingKey;
+@property (nonatomic, readonly) NSRange range;
+@property (nonatomic, readwrite, assign) NSString *filter;
 
 + (id)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;

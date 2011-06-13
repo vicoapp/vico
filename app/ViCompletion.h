@@ -17,14 +17,14 @@
 	NSMutableParagraphStyle *titleParagraphStyle;
 }
 
-@property (readonly) NSString *content;
-@property (readwrite, assign) ViRegexpMatch *filterMatch;
-@property (readwrite) NSUInteger prefixLength;
-@property (readwrite) BOOL filterIsFuzzy;
-@property (readwrite, assign) NSFont *font;
-@property (readwrite) NSUInteger location;
-@property (readwrite, assign) id representedObject;
-@property (readwrite, assign) NSColor *markColor;
+@property (nonatomic, readonly) NSString *content;
+@property (nonatomic, readwrite, assign) ViRegexpMatch *filterMatch;
+@property (nonatomic, readwrite) NSUInteger prefixLength;
+@property (nonatomic, readwrite) BOOL filterIsFuzzy;
+@property (nonatomic, readwrite, assign) NSFont *font;
+@property (nonatomic, readwrite) NSUInteger location;
+@property (nonatomic, readwrite, assign) id representedObject;
+@property (nonatomic, readwrite, assign) NSColor *markColor;
 
 + (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength;
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch;

@@ -5,6 +5,6 @@
 	ViKeyManager *keyManager;
 }
 
-@property (readwrite, assign) ViKeyManager *keyManager;
+@property (nonatomic, readwrite, assign) ViKeyManager *keyManager;
 
 @end

@@ -43,7 +43,7 @@ additionalBindings:(NSDictionary *)bindings
 }
 
 @property(nonatomic,readonly) NSMenu *encodingMenu;
-@property (readonly) TISInputSourceRef original_input_source;
+@property (nonatomic, readonly) TISInputSourceRef original_input_source;
 
 - (void)exportGlobals:(NSMutableDictionary *)context;
 - (void)loadStandardModules:(NSMutableDictionary *)context;

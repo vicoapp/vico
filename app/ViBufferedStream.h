@@ -5,9 +5,9 @@
 	NSUInteger left;
 	NSUInteger length;
 }
-@property (readonly) const void *ptr;
-@property (readonly) NSUInteger left;
-@property (readonly) NSUInteger length;
+@property (nonatomic, readonly) const void *ptr;
+@property (nonatomic, readonly) NSUInteger left;
+@property (nonatomic, readonly) NSUInteger length;
 - (ViStreamBuffer *)initWithBuffer:(const void *)buffer length:(NSUInteger)aLength;
 - (ViStreamBuffer *)initWithData:(NSData *)aData;
 @end

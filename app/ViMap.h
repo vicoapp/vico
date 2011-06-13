@@ -22,15 +22,15 @@
 	NuBlock *expression;
 }
 
-@property (readonly) NSString *scopeSelector;
-@property (readonly) NSString *keyString;
-@property (readonly) NSArray *keySequence;
-@property (readonly) SEL action;
-@property (readonly) NSUInteger flags;
-@property (readonly) BOOL recursive;
-@property (readonly) NSString *macro;
-@property (readonly) NuBlock *expression;
-@property (readonly) id parameter;
+@property (nonatomic, readonly) NSString *scopeSelector;
+@property (nonatomic, readonly) NSString *keyString;
+@property (nonatomic, readonly) NSArray *keySequence;
+@property (nonatomic, readonly) SEL action;
+@property (nonatomic, readonly) NSUInteger flags;
+@property (nonatomic, readonly) BOOL recursive;
+@property (nonatomic, readonly) NSString *macro;
+@property (nonatomic, readonly) NuBlock *expression;
+@property (nonatomic, readonly) id parameter;
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
 			       action:(SEL)anAction
@@ -80,11 +80,11 @@
 	BOOL acceptsCounts; /* Default is YES. Disabled for insertMap. */
 }
 
-@property (readonly) NSString *name;
-@property (readonly) NSArray *actions;
-@property (readwrite, assign) ViMap *operatorMap;
-@property (readwrite) BOOL acceptsCounts;
-@property (readwrite) SEL defaultAction;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSArray *actions;
+@property (nonatomic, readwrite, assign) ViMap *operatorMap;
+@property (nonatomic, readwrite) BOOL acceptsCounts;
+@property (nonatomic, readwrite) SEL defaultAction;
 
 + (void)clearAll;
 + (NSArray *)allMaps;

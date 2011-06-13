@@ -9,8 +9,8 @@
 	NSColor			*normalColor;
 }
 
-@property (readonly) NSString *command;
-@property (readonly) NSString *title;
+@property (nonatomic, readonly) NSString *command;
+@property (nonatomic, readonly) NSString *title;
 
 - (void)setCommand:(NSString *)aCommand;
 - (void)setTabTrigger:(NSString *)aTabTrigger;

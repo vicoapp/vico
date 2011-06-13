@@ -93,9 +93,9 @@
 	NSData		*data;
 	const void	*ptr;
 }
-@property (readonly) uint8_t type;
-@property (readonly) uint32_t requestId;
-@property (readonly) NSData *data;
+@property (nonatomic, readonly) uint8_t type;
+@property (nonatomic, readonly) uint32_t requestId;
+@property (nonatomic, readonly) NSData *data;
 + (SFTPMessage *)messageWithData:(NSData *)someData;
 - (SFTPMessage *)initWithData:(NSData *)someData;
 
@@ -125,12 +125,12 @@
 	CGFloat progress;
 	id<ViDeferredDelegate> delegate;
 }
-@property (copy) void (^onResponse)(SFTPMessage *);
-@property (copy) void (^onCancel)(SFTPRequest *);
-@property (readwrite, assign) SFTPRequest *subRequest;
-@property (readonly) BOOL cancelled;
-@property (readwrite) CGFloat progress;
-@property (readonly) uint32_t requestId;
+@property (nonatomic, copy) void (^onResponse)(SFTPMessage *);
+@property (nonatomic, copy) void (^onCancel)(SFTPRequest *);
+@property (nonatomic, readwrite, assign) SFTPRequest *subRequest;
+@property (nonatomic, readonly) BOOL cancelled;
+@property (nonatomic, readwrite) CGFloat progress;
+@property (nonatomic, readonly) uint32_t requestId;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type

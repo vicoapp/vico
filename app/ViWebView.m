@@ -15,7 +15,7 @@
 - (void)awakeFromNib
 {
 	keyManager = [[ViKeyManager alloc] initWithTarget:self
-					       defaultMap:[ViMap normalMap]];
+					       defaultMap:[ViMap mapWithName:@"webMap"]];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent

@@ -307,6 +307,12 @@
 (vmap setKey:"<c-y>" toMotion:"scroll_up_by_line:")
 
 
+;; command HTML output map
+(set webmap (ViMap mapWithName:"webMap"))
+(webmap setOperatorMap:(ViMap operatorMap))
+(webmap include:(ViMap normalMap))
+
+
 ;; sidebar navigation map (valid for explorer and symbol map)
 (set sidemap (ViMap mapWithName:"sidebarMap"))
 (sidemap include:gmap)

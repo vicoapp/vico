@@ -15,14 +15,17 @@
 	if ((self = [super init])) {
 		mapping = aMapping;
 		ip = 0;
-		NSArray *macroKeys = [aMapping.macro keyCodes];
+		keys = [[aMapping.macro keyCodes] mutableCopy];
 		if ([prefixKeys count] > 0)
-			keys = [prefixKeys arrayByAddingObjectsFromArray:macroKeys];
-		else
-			keys = macroKeys;
+			[keys replaceObjectsInRange:NSMakeRange(0, 0) withObjectsFromArray:prefixKeys];
 	}
 
 	return self;
+}
+
+- (void)push:(NSNumber *)keyCode
+{
+	[keys insertObject:keyCode atIndex:ip];
 }
 
 - (NSInteger)pop

@@ -2,16 +2,17 @@
 
 @interface ViMacro : NSObject
 {
-	NSArray		*keys;
+	NSMutableArray	*keys;
 	NSUInteger	 ip;
 	ViMapping	*mapping;
 }
 
-@property (readonly) ViMapping *mapping;
+@property(nonatomic,readonly) ViMapping *mapping;
 
 + (id)macroWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys;
 - (id)initWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys;
 
+- (void)push:(NSNumber *)keyCode;
 - (NSInteger)pop;
 
 @end

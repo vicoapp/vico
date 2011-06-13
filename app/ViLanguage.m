@@ -4,7 +4,7 @@
 
 @implementation ViLanguage
 
-@synthesize bundle;
+@synthesize bundle, scope;
 
 - (ViRegexp *)compileRegexp:(NSString *)pattern
 {
@@ -129,6 +129,9 @@
 		return nil;
 	}
 	languagePatterns = [language objectForKey:@"patterns"];	
+
+	if ([[self name] length] > 0)
+		scope = [[ViScope alloc] initWithScopes:[NSArray arrayWithObject:[self name]] range:NSMakeRange(0, 0)];
 
 	return self;
 }

@@ -1,4 +1,5 @@
 #import "ViRegexp.h"
+#import "ViScope.h"
 
 @class ViBundle;
 
@@ -8,9 +9,11 @@
 	NSMutableDictionary *language;
 	NSMutableArray *languagePatterns;
 	BOOL compiled;
+	ViScope *scope;
 }
 
 @property(nonatomic,readonly) ViBundle *bundle;
+@property(nonatomic,readonly) ViScope *scope;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle;
 - (NSArray *)fileTypes;

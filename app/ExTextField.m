@@ -31,13 +31,13 @@
 
 - (BOOL)becomeFirstResponder
 {
-	NSText *editor = [[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 
 	current = nil;
 	historyIndex = -1;
 
-	[(ViTextView *)editor setCaret:0];
-	[(ViTextView *)editor setInsertMode:nil];
+	[editor setCaret:0];
+	[editor setInsertMode:nil];
 
 	running = YES;
 	return [super becomeFirstResponder];
@@ -55,7 +55,7 @@
 		i += (upwards ? +1 : -1);
 		NSString *item = [history objectAtIndex:i];
 		DEBUG(@"got item %@", item);
-		if ([prefix length] == 0 || [item hasPrefix:prefix]) {
+		if ([prefix length] == 0 || [[item lowercaseString] hasPrefix:prefix]) {
 			DEBUG(@"insert item %@", item);
 			[self setStringValue:item];
 			[(ViTextView *)[self currentEditor] setInsertMode:nil];
@@ -82,7 +82,7 @@
 - (BOOL)prev_history:(ViCommand *)command
 {
 	NSRange sel = [[self currentEditor] selectedRange];
-	NSString *prefix = [[self stringValue] substringToIndex:sel.location];
+	NSString *prefix = [[[self stringValue] substringToIndex:sel.location] lowercaseString];
 	return [self navigateHistory:YES prefix:prefix];
 }
 
@@ -94,7 +94,7 @@
 - (BOOL)next_history:(ViCommand *)command
 {
 	NSRange sel = [[self currentEditor] selectedRange];
-	NSString *prefix = [[self stringValue] substringToIndex:sel.location];
+	NSString *prefix = [[[self stringValue] substringToIndex:sel.location] lowercaseString];
 	return [self navigateHistory:NO prefix:prefix];
 }
 
@@ -120,7 +120,7 @@
 {
 	int context = 0;
 
-	NSText *editor = [[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 
 	ExCommand *ex = [[ExCommand alloc] init];
 	NSError *error = nil;

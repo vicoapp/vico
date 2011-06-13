@@ -284,6 +284,8 @@
 	int level = 1;
 	NSInteger offset;
 	for (offset = startOffset; delta > 0 ? offset <= endOffset : offset >= endOffset; offset += delta) {
+		if (offset >= [[self textStorage] length])
+			break;
 		unichar c = [[[self textStorage] string] characterAtIndex:offset];
 		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */

@@ -89,7 +89,6 @@
 - (void)setString:(NSString *)aString;
 - (void)closeAndWindow:(BOOL)canCloseWindow;
 
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation;
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
                      atLocation:(NSUInteger)aLocation;

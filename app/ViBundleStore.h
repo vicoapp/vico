@@ -23,11 +23,11 @@
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSArray *)itemsWithTabTrigger:(NSString *)name
-                  matchingScopes:(NSArray *)scopes
+                   matchingScope:(ViScope *)scope
                           inMode:(ViMode)mode
                    matchedLength:(NSUInteger *)lengthPtr;
 - (NSArray *)itemsWithKeyCode:(NSInteger)keyCode
-               matchingScopes:(NSArray *)scopes
+                matchingScope:(ViScope *)scope
                        inMode:(ViMode)mode;
 - (BOOL)isBundleLoaded:(NSString *)name;
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory;

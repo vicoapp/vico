@@ -16,7 +16,7 @@
 
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)name;
-- (NSDictionary *)attributesForScopes:(NSArray *)scopes inBundle:(ViBundle *)bundle;
+- (NSDictionary *)attributesForScope:(ViScope *)scope inBundle:(ViBundle *)bundle;
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;

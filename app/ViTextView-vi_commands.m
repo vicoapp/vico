@@ -241,16 +241,16 @@
 	}
 
 	/* Special case: check if inside a string or comment. */
-	NSArray *openingScopes = [document scopesAtLocation:openingRange.location];
+	ViScope *openingScope = [document scopeAtLocation:openingRange.location];
 	BOOL inSpecialScope;
 	NSRange specialScopeRange;
 
-	inSpecialScope = ([@"string" matchesScopes:openingScopes] > 0);
+	inSpecialScope = ([openingScope match:@"string"] > 0);
 	if (inSpecialScope) {
 		specialScopeRange = [document rangeOfScopeSelector:@"string"
 							atLocation:openingRange.location];
 	} else {
-		inSpecialScope = ([@"comment" matchesScopes:openingScopes] > 0);
+		inSpecialScope = ([openingScope match:@"comment"] > 0);
 		if (inSpecialScope)
 			specialScopeRange = [document rangeOfScopeSelector:@"comment"
 								atLocation:openingRange.location];
@@ -288,10 +288,9 @@
 		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */
 			if (!inSpecialScope) {
-				NSArray *scopes = [document scopesAtLocation:offset];
-				if ([@"string"  matchesScopes:scopes] > 0 ||
-				    [@"comment" matchesScopes:scopes] > 0)
-						continue;
+				ViScope *scope = [document scopeAtLocation:offset];
+				if ([scope match:@"string | comment"])
+					continue;
 			}
 
 			if (c == matchChar)
@@ -2360,7 +2359,7 @@
 		scope = [document scopeAtLocation:location];
 		if (scope == nil)
 			return NO;
-		if ([@"string - (punctuation.definition.string.begin | keyword.control.heredoc-token)" matchesScopes:scope.scopes])
+		if ([scope match:@"string - (punctuation.definition.string.begin | keyword.control.heredoc-token)"] > 0)
 			break;
 		location = NSMaxRange(scope.range);
 	}
@@ -2416,7 +2415,7 @@
 	NSUInteger location = start_location;
 	if ([self selectedRange].length > 0)
 		location = start_location + 1;
-	NSString *selector = [[document scopesAtLocation:location] componentsJoinedByString:@" "];
+	NSString *selector = [[[document scopeAtLocation:location] scopes] componentsJoinedByString:@" "];
 	NSRange range = [document rangeOfScopeSelector:selector atLocation:location];
 
 	visual_start_location = start_location = range.location;

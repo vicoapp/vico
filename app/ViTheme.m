@@ -58,20 +58,20 @@
  *  background from the former."
  */
 - (void)matchAttributes:(NSDictionary *)matchAttributes
-              forScopes:(NSArray *)scopes
+               forScope:(ViScope *)scope
          intoDictionary:(NSMutableDictionary *)attributes
               rankState:(NSMutableDictionary *)attributesRank
 {
 	NSString *scopeSelector;
 	for (scopeSelector in matchAttributes) {
-		u_int64_t rank = [scopeSelector matchesScopes:scopes];
+		u_int64_t rank = [scope match:scopeSelector];
 		if (rank > 0) {
 			NSDictionary *attrs = [matchAttributes objectForKey:scopeSelector];
 			NSString *attrKey;
 			for (attrKey in attrs) {
 				u_int64_t prevRank = [[attributesRank objectForKey:attrKey] unsignedLongLongValue];
 				if (rank > prevRank) {
-					DEBUG(@"scope selector [%@] matches scopes %@ with rank %llu > %llu, setting %@", scopeSelector, scopes, rank, prevRank, attrKey);
+					DEBUG(@"scope selector [%@] matches scope %@ with rank %llu > %llu, setting %@", scopeSelector, scope, rank, prevRank, attrKey);
 					[attributes setObject:[attrs objectForKey:attrKey] forKey:attrKey];
 					[attributesRank setObject:[NSNumber numberWithUnsignedLongLong:rank] forKey:attrKey];
 				}
@@ -85,9 +85,9 @@
  *
  * Returns nil if no attributes are applicable.
  */
-- (NSDictionary *)attributesForScopes:(NSArray *)scopes inBundle:(ViBundle *)bundle
+- (NSDictionary *)attributesForScope:(ViScope *)scope inBundle:(ViBundle *)bundle
 {
-	NSString *key = [scopes componentsJoinedByString:@" "];
+	NSString *key = [[scope scopes] componentsJoinedByString:@" "];
 	NSMutableDictionary *attributes = [scopeSelectorCache objectForKey:key];
 	if (attributes)
 		return [attributes count] == 0 ? nil : attributes;
@@ -99,7 +99,10 @@
 	[attributes setObject:[self foregroundColor] forKey:NSForegroundColorAttributeName];
 	[attributes setObject:[self backgroundColor] forKey:NSBackgroundColorAttributeName];
 
-	[self matchAttributes:themeAttributes forScopes:scopes intoDictionary:attributes rankState:attributesRank];
+	[self matchAttributes:themeAttributes
+		     forScope:scope
+	       intoDictionary:attributes
+		    rankState:attributesRank];
 
 	/*
 	 * Bundle preferences can override/add theme attributes for certain scopes.
@@ -114,7 +117,7 @@
 		    nil];
 		NSDictionary *bundlePrefs = [bundle preferenceItems:prefs];
 		if (bundlePrefs)
-			[self matchAttributes:bundlePrefs forScopes:scopes intoDictionary:attributes rankState:attributesRank];
+			[self matchAttributes:bundlePrefs forScope:scope intoDictionary:attributes rankState:attributesRank];
 	}
 
 	// Backgrounds with alpha is not supported, so blend the background colors together.

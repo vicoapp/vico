@@ -273,7 +273,7 @@ static NSMutableDictionary *maps = nil;
 			BOOL equalMatch = (len == mlen);
 
 			/* FIXME: compare rank of all matches */
-			u_int64_t rank = [m.scopeSelector matchesScopes:[scope scopes]];
+			u_int64_t rank = [scope match:m.scopeSelector];
 			if (rank == 0)
 				continue;
 
@@ -293,7 +293,7 @@ static NSMutableDictionary *maps = nil;
 					DEBUG(@"got operator candidate %@", op);
 				}
 			} else if ((equalMatch || overflowOrEqualMatch) && ![m wantsKeys]) {
-				/* 
+				/*
 				 * If we get an exact match, but there are longer key
 				 * sequences that might match if we get more keys, we
 				 * set a timeout and then go with the exact match.

@@ -242,22 +242,16 @@
 	[self notifyPreferencesChanged];
 }
 
-+ (id)valueForKey:(NSString *)key inScope:(NSString *)scope
++ (id)valueForKey:(NSString *)key inScope:(ViScope *)scope
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 
 	if (scope) {
 		NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
-		NSArray *scopes = [NSArray arrayWithObject:scope];
-
-		for (NSString *selector in [prefs allKeys]) {
-			if ([selector matchesScopes:scopes]) {
-				NSDictionary *scopesPrefs = [prefs objectForKey:selector];
-				id value = [scopesPrefs objectForKey:key];
-				if (value)
-					return value;
-				return nil;
-			}
+		NSString *selector = [scope bestMatch:[prefs allKeys]];
+		if (selector) {
+			NSDictionary *scopedPrefs = [prefs objectForKey:selector];
+			return [scopedPrefs objectForKey:key];
 		}
 	}
 

@@ -52,5 +52,22 @@
 	return [scopeSelector matchesScopes:scopes];
 }
 
+- (NSString *)bestMatch:(NSArray *)scopeSelectors
+{
+	NSString *foundScopeSelector = nil;
+	NSString *scopeSelector;
+	u_int64_t highest_rank = 0;
+
+	for (scopeSelector in scopeSelectors) {
+		u_int64_t rank = [self match:scopeSelector];
+		if (rank > highest_rank) {
+			foundScopeSelector = scopeSelector;
+			highest_rank = rank;
+		}
+	}
+
+	return foundScopeSelector;
+}
+
 @end
 

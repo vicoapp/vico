@@ -808,10 +808,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (NSDictionary *)defaultAttributes
 {
-        return [NSDictionary dictionaryWithObjectsAndKeys:
-                [theme foregroundColor], NSForegroundColorAttributeName,
-                // [theme backgroundColor], NSBackgroundColorAttributeName,
-                nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+		[theme foregroundColor], NSForegroundColorAttributeName,
+		// [theme backgroundColor], NSBackgroundColorAttributeName,
+		nil];
 }
 
 - (void)layoutManager:(NSLayoutManager *)aLayoutManager
@@ -832,30 +832,30 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
                  effectiveRange:(NSRangePointer)effectiveCharRange
 {
 	if (!toScreen)
-                return nil;
+		return nil;
 
-        NSArray *scopeArray = [syntaxParser scopeArray];
-        if (charIndex >= [scopeArray count]) {
-                *effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
-                return [self defaultAttributes];
-        }
+	NSArray *scopeArray = [syntaxParser scopeArray];
+	if (charIndex >= [scopeArray count]) {
+		*effectiveCharRange = NSMakeRange(charIndex, [textStorage length] - charIndex);
+		return [self defaultAttributes];
+	}
 
 	ViScope *scope = [scopeArray objectAtIndex:charIndex];
-        NSDictionary *attributes = [scope attributes];
-        if ([attributes count] == 0) {
-                attributes = [theme attributesForScopes:[scope scopes] inBundle:bundle];
-                if ([attributes count] == 0)
-                        attributes = [self defaultAttributes];
-                [scope setAttributes:attributes];
-        }
+	NSDictionary *attributes = [scope attributes];
+	if ([attributes count] == 0) {
+		attributes = [theme attributesForScope:scope inBundle:bundle];
+		if ([attributes count] == 0)
+			attributes = [self defaultAttributes];
+		[scope setAttributes:attributes];
+	}
 
-        NSRange r = [scope range];
-        if (r.location < charIndex) {
-                DEBUG(@"index = %u, r = %@", charIndex, NSStringFromRange(r));
-                r.length -= charIndex - r.location;
-                r.location = charIndex;
-        }
-        *effectiveCharRange = r;
+	NSRange r = [scope range];
+	if (r.location < charIndex) {
+		DEBUG(@"index = %u, r = %@", charIndex, NSStringFromRange(r));
+		r.length -= charIndex - r.location;
+		r.location = charIndex;
+	}
+	*effectiveCharRange = r;
 
 	/*
 	 * If there is an active snippet in this range, merge in attributes to
@@ -888,7 +888,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		DEBUG(@"merged attributes = %@", mergedAttributes);
 	}
 
-        return mergedAttributes ?: attributes;
+	return mergedAttributes ?: attributes;
 }
 
 - (void)highlightEverything
@@ -1026,7 +1026,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)updateWrapping
 {
-	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"wrap" inScope:[language name]] integerValue];
+	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"wrap" inScope:language.scope] integerValue];
 	if (tmp != wrap) {
 		wrap = tmp;
 		[self setWrapping:wrap];
@@ -1035,7 +1035,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)updateTabSize
 {
-	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"tabstop" inScope:[language name]] integerValue];
+	NSInteger tmp = [[ViPreferencePaneEdit valueForKey:@"tabstop" inScope:language.scope] integerValue];
 	if (tmp != tabSize) {
 		tabSize = tmp;
 		[self setTypingAttributes];
@@ -1317,9 +1317,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return [fs count];
 }
 
-- (NSImage *)matchSymbolIconForScope:(NSArray *)scopes
+- (NSImage *)matchSymbolIconForScope:(ViScope *)scope
 {
-	NSString *scopeSelector = [[symbolIcons allKeys] bestMatchForScopes:scopes];
+	NSString *scopeSelector = [scope bestMatch:[symbolIcons allKeys]];
 	if (scopeSelector)
 		return [NSImage imageNamed:[symbolIcons objectForKey:scopeSelector]];
 	return nil;
@@ -1358,11 +1358,10 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	/* Parse new symbols in the range. */
 	for (i = updateRange.location; (i <= maxRange || lastSelector) && i < [scopeArray count];) {
-		ViScope *s = [scopeArray objectAtIndex:i];
-		NSArray *scopes = s.scopes;
-		NSRange range = s.range;
+		ViScope *scope = [scopeArray objectAtIndex:i];
+		NSRange range = scope.range;
 
-		if ([lastSelector matchesScopes:scopes]) {
+		if ([scope match:lastSelector] > 0) {
 			/* Continue with the last scope selector, it matched this scope too. */
 			wholeRange.length += range.length;
 		} else {
@@ -1388,7 +1387,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			lastSelector = nil;
 
 			for (NSString *scopeSelector in symbolScopes) {
-				if ([scopeSelector matchesScopes:scopes]) {
+				if ([scope match:scopeSelector] > 0) {
 					lastSelector = scopeSelector;
 					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
 					if (backRange.length > 0) {
@@ -1396,7 +1395,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 						wholeRange = NSUnionRange(range, backRange);
 					} else
 						wholeRange = range;
-					img = [self matchSymbolIconForScope:scopes];
+					img = [self matchSymbolIconForScope:scope];
 					break;
 				}
 			}
@@ -1460,11 +1459,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self fileURL]];
 }
 
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
-{
-	return [[self scopeAtLocation:aLocation] scopes];
-}
-
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation
 {
 	NSArray *scopeArray = [syntaxParser scopeArray];
@@ -1476,16 +1470,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
                     atLocation:(NSUInteger)aLocation
 {
-	NSArray *scopes = [self scopesAtLocation:aLocation];
-	return [scopeSelectors bestMatchForScopes:scopes];
+	ViScope *scope = [self scopeAtLocation:aLocation];
+	return [scope bestMatch:scopeSelectors];
 }
 
 - (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
                         forward:(BOOL)forward
                    fromLocation:(NSUInteger)aLocation
 {
-	NSArray *lastScopes = nil, *scopes;
 	NSUInteger i = aLocation;
+	ViScope *lastScope = nil, *scope;
 	for (;;) {
 		if (forward && i >= [textStorage length])
 			break;
@@ -1495,10 +1489,10 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (!forward)
 			i--;
 
-		if ((scopes = [self scopesAtLocation:i]) == nil)
+		if ((scope = [self scopeAtLocation:i]) == nil)
 			break;
 
-		if (lastScopes != scopes && ![scopeSelector matchesScopes:scopes]) {
+		if (lastScope != scope && [scope match:scopeSelector] == 0) {
 			if (!forward)
 				i++;
 			break;
@@ -1507,7 +1501,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (forward)
 			i++;
 
-		lastScopes = scopes;
+		lastScope = scope;
 	}
 
 	if (forward)

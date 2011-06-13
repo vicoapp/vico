@@ -37,7 +37,6 @@ BEFORE 1.0
 2011-06-13 12:02:43.875 Vico[9043:903] *** -[NSCFString characterAtIndex:]: Range or index out of bounds
 
 
-? use ViScope instead of NSArray *scopeArray -> can use u_int16_t array internally
 * can Nu return BOOLs?
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
 * "&" in :s replace part should expand to whole match

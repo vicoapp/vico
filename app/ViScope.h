@@ -11,6 +11,7 @@
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
 - (u_int64_t)match:(NSString *)scopeSelector;
+- (NSString *)bestMatch:(NSArray *)scopeSelectors;
 - (int)compareBegin:(ViScope *)otherContext;
 - (id)copyWithZone:(NSZone *)zone;
 

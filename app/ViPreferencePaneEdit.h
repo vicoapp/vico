@@ -1,4 +1,5 @@
 #import "ViPreferencePane.h"
+#import "ViScope.h"
 
 @interface ViPreferencePaneEdit : ViPreferencePane
 {
@@ -12,7 +13,7 @@
 	NSMutableSet *preferences;
 }
 
-+ (id)valueForKey:(NSString *)key inScope:(NSString *)scope;
++ (id)valueForKey:(NSString *)key inScope:(ViScope *)scope;
 
 - (IBAction)selectScope:(id)sender;
 - (IBAction)selectNewPreferenceScope:(id)sender;

@@ -611,7 +611,7 @@ int logIndent = 0;
 	return [self suggestedIndentAtLocation:location forceSmartIndent:NO];
 }
 
-- (id)preference:(NSString *)name forScope:(NSArray *)scopeArray
+- (id)preference:(NSString *)name forScope:(ViScope *)scope
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
@@ -619,12 +619,12 @@ int logIndent = 0;
 		return [defs objectForKey:name];
 	u_int64_t max_rank = 0;
 	id scopeValue = nil;
-	for (NSString *scope in [prefs allKeys]) {
+	for (NSString *scopeSelector in [prefs allKeys]) {
 		NSDictionary *scopePrefs = [prefs objectForKey:scope];
 		id value = [scopePrefs objectForKey:name];
 		if (value == nil)
 			continue;
-		u_int64_t rank = [scope matchesScopes:scopeArray];
+		u_int64_t rank = [scope match:scopeSelector];
 		if (rank > max_rank) {
 			max_rank = rank;
 			scopeValue = value;
@@ -638,7 +638,7 @@ int logIndent = 0;
 
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation
 {
-	return [self preference:name forScope:[document scopesAtLocation:aLocation]];
+	return [self preference:name forScope:[document scopeAtLocation:aLocation]];
 }
 
 - (id)preference:(NSString *)name
@@ -1272,11 +1272,11 @@ int logIndent = 0;
 	NSString *pair1 = [pair objectAtIndex:1];
 
 	if ([pair0 isEqualToString:pair1]) {
-		NSArray *scopes = [document scopesAtLocation:location];
+		ViScope *scope = [document scopeAtLocation:location];
 		if ([pair0 isEqualToString:@"\""])
-			return [@"string.quoted.double$" matchesScopes:scopes];
+			return [scope match:@"string.quoted.double$"] > 0;
 		else if ([pair0 isEqualToString:@"'"])
-			return [@"string.quoted.single$" matchesScopes:scopes];
+			return [scope match:@"string.quoted.single$"] > 0;
 	}
 
 	return NO;
@@ -1445,12 +1445,12 @@ int logIndent = 0;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	NSString *prefix = [[[self textStorage] string] substringWithRange:NSMakeRange(bol, start_location - bol)];
 	if ([prefix length] > 0) {
-		NSArray *scopes = [document scopesAtLocation:eol];
+		ViScope *scope = [document scopeAtLocation:eol];
 		NSUInteger triggerLength;
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithTabTrigger:prefix
-									matchingScopes:scopes
-										inMode:mode
-									 matchedLength:&triggerLength];
+                                                                       matchingScope:scope
+                                                                              inMode:mode
+                                                                       matchedLength:&triggerLength];
 		if ([matches count] > 0) {
 			snippetMatchRange = NSMakeRange(start_location - triggerLength, triggerLength);
 			[self performBundleItems:matches];
@@ -1938,8 +1938,8 @@ int logIndent = 0;
 	 */
 	if (!keyManager.parser.partial && ![self isFieldEditor]) {
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithKeyCode:keyCode
-								     matchingScopes:[scope scopes]
-									     inMode:mode];
+								    matchingScope:scope
+									   inMode:mode];
 		if ([matches count] > 0) {
 			[self performBundleItems:matches];
 			return [NSNumber numberWithBool:NO]; /* We already handled the key */
@@ -2106,7 +2106,7 @@ int logIndent = 0;
 /* syntax: ctrl-P */
 - (BOOL)show_scope:(ViCommand *)command
 {
-	MESSAGE(@"%@", [[document scopesAtLocation:[self caret]] componentsJoinedByString:@" "]);
+	MESSAGE(@"%@", [[[document scopeAtLocation:[self caret]] scopes] componentsJoinedByString:@" "]);
 	return NO;
 }
 
@@ -2230,15 +2230,15 @@ int logIndent = 0;
 	NSMenu *menu = [super menuForEvent:theEvent];
 	int n = 0;
 
-	NSArray *scopes = [document scopesAtLocation:location];
+	ViScope *scope = [document scopeAtLocation:location];
 	NSRange sel = [self selectedRange];
 	NSMenuItem *item;
 	NSMenu *submenu;
 
 	for (ViBundle *bundle in [[ViBundleStore defaultStore] allBundles]) {
-		submenu = [bundle menuForScopes:scopes
-				   hasSelection:sel.length > 0
-					   font:[menu font]];
+		submenu = [bundle menuForScope:scope
+				  hasSelection:sel.length > 0
+					  font:[menu font]];
 		if (submenu) {
 			item = [menu insertItemWithTitle:[bundle name]
 						  action:NULL

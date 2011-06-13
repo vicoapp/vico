@@ -133,7 +133,7 @@
 	[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
 	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
-	NSString *scope = [[textView.document scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];
+	NSString *scope = [[[textView.document scopeAtLocation:[textView caret]] scopes] componentsJoinedByString:@" "];
 	if (scope)
 		[env setObject:scope forKey:@"TM_SCOPE"];
 
@@ -384,7 +384,7 @@
 - (NSMenu *)submenu:(NSDictionary *)menuLayout
            withName:(NSString *)name
          inMainMenu:(NSDictionary *)mainMenu
-          forScopes:(NSArray *)scopes
+           forScope:(ViScope *)scope
        enabledItems:(NSUInteger *)enabledItemsPtr
        hasSelection:(BOOL)hasSelection
                font:(NSFont *)aFont
@@ -405,7 +405,7 @@
 			SEL selector = NULL;
 			if ([op isKindOfClass:[ViBundleItem class]]) {
 				NSString *scopeSelector = [op scopeSelector];
-				if (scopeSelector == nil || [scopeSelector matchesScopes:scopes] > 0) {
+				if (scopeSelector == nil || [scope match:scopeSelector] > 0) {
 					matches++;
 					selector = @selector(performBundleItem:);
 				}
@@ -454,7 +454,7 @@
 				NSMenu *submenu = [self submenu:submenuLayout
 				                       withName:[submenuLayout objectForKey:@"name"]
 				                     inMainMenu:mainMenu
-				                      forScopes:scopes
+				                       forScope:scope
 				                   enabledItems:&submatches
 				                   hasSelection:hasSelection
 							   font:aFont];
@@ -479,9 +479,9 @@
 	return menu;
 }
 
-- (NSMenu *)menuForScopes:(NSArray *)scopes
-             hasSelection:(BOOL)hasSelection
-                     font:(NSFont *)aFont
+- (NSMenu *)menuForScope:(ViScope *)scope
+            hasSelection:(BOOL)hasSelection
+                    font:(NSFont *)aFont
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
 	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])
@@ -491,7 +491,7 @@
 	NSMenu *menu = [self submenu:mainMenu
 	                    withName:[self name]
 	                  inMainMenu:mainMenu
-	                   forScopes:scopes
+	                    forScope:scope
 	                enabledItems:&matches
 	                hasSelection:hasSelection
 				font:aFont];

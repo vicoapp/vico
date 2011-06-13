@@ -32,9 +32,9 @@
 - (NSString *)uuid;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
-- (NSMenu *)menuForScopes:(NSArray *)scopes
-             hasSelection:(BOOL)hasSelection
-                     font:(NSFont *)aFont;
+- (NSMenu *)menuForScope:(ViScope *)scope
+            hasSelection:(BOOL)hasSelection
+                    font:(NSFont *)aFont;
 
 @property(nonatomic,readonly) NSMutableArray *languages;
 @property(nonatomic,readonly) NSString *path;

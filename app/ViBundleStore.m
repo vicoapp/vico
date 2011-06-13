@@ -211,9 +211,9 @@ static NSString *bundlesDirectory = nil;
 }
 
 - (NSArray *)itemsWithTabTrigger:(NSString *)prefix
-                  matchingScopes:(NSArray *)scopes
-                          inMode:(ViMode)mode
-                   matchedLength:(NSUInteger *)lengthPtr
+		   matchingScope:(ViScope *)scope
+			  inMode:(ViMode)mode
+		   matchedLength:(NSUInteger *)lengthPtr
 {
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
@@ -240,7 +240,7 @@ static NSString *bundlesDirectory = nil;
 				if (scopeSelector == nil)
 					rank = 1ULL;
 				else
-					rank = [scopeSelector matchesScopes:scopes];
+					rank = [scope match:scopeSelector];
 
 				if (rank > 0) {
 					if (rank > highest_rank) {
@@ -258,8 +258,8 @@ static NSString *bundlesDirectory = nil;
 }
 
 - (NSArray *)itemsWithKeyCode:(NSInteger)keyCode
-               matchingScopes:(NSArray *)scopes
-                       inMode:(ViMode)mode
+		matchingScope:(ViScope *)scope
+		       inMode:(ViMode)mode
 {
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
@@ -273,7 +273,7 @@ static NSString *bundlesDirectory = nil;
 				if (scopeSelector == nil)
 					rank = 1ULL;
 				else
-					rank = [scopeSelector matchesScopes:scopes];
+					rank = [scope match:scopeSelector];
 
 				if (rank > 0) {
 					if (rank > highest_rank) {

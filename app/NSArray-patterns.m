@@ -12,10 +12,8 @@
 	if (c != [otherArray count])
 		return NO;
 	for (i = 0; i < c; i++)
-	{
 		if ([[self objectAtIndex:i] pattern] != [[otherArray objectAtIndex:i] pattern])
 			return NO;
-	}
 	return YES;
 }
 
@@ -27,28 +25,9 @@
 	if (c != [otherArray count])
 		return NO;
 	for (i = c - 1; i >= 0; i--)
-	{
 		if (![[self objectAtIndex:i] isEqualToString:[otherArray objectAtIndex:i]])
 			return NO;
-	}
 	return YES;
-}
-
-- (NSString *)bestMatchForScopes:(NSArray *)scopes
-{
-	NSString *foundScopeSelector = nil;
-	NSString *scopeSelector;
-	u_int64_t highest_rank = 0;
-
-	for (scopeSelector in self) {
-		u_int64_t rank = [scopeSelector matchesScopes:scopes];
-		if (rank > highest_rank) {
-			foundScopeSelector = scopeSelector;
-			highest_rank = rank;
-		}
-	}
-
-	return foundScopeSelector;
 }
 
 - (BOOL)hasPrefix:(NSArray *)otherArray
@@ -61,11 +40,6 @@
 			return NO;
 
 	return YES;
-}
-
-- (u_int64_t)matchesSelector:(NSString *)selector
-{
-	return [selector matchesScopes:self];
 }
 
 @end

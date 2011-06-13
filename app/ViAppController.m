@@ -247,8 +247,8 @@
 						     name:NSMenuDidEndTrackingNotification
 						   object:[NSApp mainMenu]];
 
-	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)"; 
-	[self eval:consoleStartup error:nil]; 
+	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)";
+	[self eval:consoleStartup error:nil];
 
 	NSString *siteFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"];
 	NSString *siteScript = [NSString stringWithContentsOfFile:siteFile
@@ -256,7 +256,7 @@
 							    error:nil];
 	if (siteScript) {
 		NSError *error = nil;
-		[self eval:siteScript error:&error]; 
+		[self eval:siteScript error:&error];
 		if (error)
 			INFO(@"%@: %@", siteFile, [error localizedDescription]);
 	}
@@ -403,6 +403,7 @@ withParser:(NuParser *)parser
 		result = [parser eval:code];
 	}
 	@catch (NSException *exception) {
+		INFO(@"%@: %@", [exception name], [exception reason]);
 		if (outError)
 			*outError = [ViError errorWithFormat:@"Got exception %@:\n%@", [exception name], [exception reason]];
 		return nil;

@@ -235,12 +235,12 @@ static NSString *bundlesDirectory = nil;
 				} else if (triggerLength < longestMatch)
 					continue;
 
-				NSString *scope = [item scope];
+				NSString *scopeSelector = [item scopeSelector];
 				u_int64_t rank;
-				if (scope == nil)
+				if (scopeSelector == nil)
 					rank = 1ULL;
 				else
-					rank = [scope matchesScopes:scopes];
+					rank = [scopeSelector matchesScopes:scopes];
 
 				if (rank > 0) {
 					if (rank > highest_rank) {
@@ -268,12 +268,12 @@ static NSString *bundlesDirectory = nil;
 		for (ViBundleItem *item in [bundle items])
 			if ([item keyCode] == keyCode &&
 			    ([item mode] == ViAnyMode || [item mode] == mode)) {
-				NSString *scope = [item scope];
+				NSString *scopeSelector = [item scopeSelector];
 				u_int64_t rank;
-				if (scope == nil)
+				if (scopeSelector == nil)
 					rank = 1ULL;
 				else
-					rank = [scope matchesScopes:scopes];
+					rank = [scopeSelector matchesScopes:scopes];
 
 				if (rank > 0) {
 					if (rank > highest_rank) {

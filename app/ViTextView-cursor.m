@@ -1,6 +1,7 @@
 #import "ViTextView.h"
 #import "ViThemeStore.h"
 #import "ViDocument.h"
+#import "ViEventManager.h"
 
 @implementation ViTextView (cursor)
 
@@ -63,6 +64,7 @@
 	// update selection in symbol list
 	NSNotification *notification = [NSNotification notificationWithName:ViCaretChangedNotification object:self];
 	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+	[[ViEventManager defaultManager] emitDelayed:ViEventCaretDidMove for:self with:self, nil];
 }
 
 - (void)updateInsertionPointInRect:(NSRect)aRect

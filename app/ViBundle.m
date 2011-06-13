@@ -227,8 +227,9 @@
 		items = [NSMutableArray array];
 		path = bundleDirectory;
 
-		parser = [Nu parser];
-		[[NSApp delegate] loadStandardModules:parser];
+		parser = [[NuParser alloc] init];
+		[[NSApp delegate] loadStandardModules:[parser context]];
+		[parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
 
 		NSString *dir = [path stringByAppendingPathComponent:@"Syntaxes"];
 		NSString *file;

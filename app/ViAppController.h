@@ -45,10 +45,10 @@ additionalBindings:(NSDictionary *)bindings
 @property(nonatomic,readonly) NSMenu *encodingMenu;
 @property (readonly) TISInputSourceRef original_input_source;
 
-- (void)exportGlobals:(id)parser;
-- (void)loadStandardModules:(id<NuParsing>)parser;
+- (void)exportGlobals:(NSMutableDictionary *)context;
+- (void)loadStandardModules:(NSMutableDictionary *)context;
 - (id)eval:(NSString *)script
-withParser:(id<NuParsing>)parser
+withParser:(NuParser *)parser
   bindings:(NSDictionary *)bindings
      error:(NSError **)outError;
 - (id)eval:(NSString *)script

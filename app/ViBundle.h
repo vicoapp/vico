@@ -14,7 +14,7 @@
 	NSMutableArray *items;
 	NSMutableDictionary *cachedPreferences;
 	NSMutableDictionary *uuids;
-	id<NuParsing> parser;
+	NuParser *parser;
 }
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;

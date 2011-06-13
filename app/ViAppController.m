@@ -343,29 +343,32 @@ extern BOOL makeNewWindowInsteadOfTab;
 #pragma mark Script evaluation
 
 /* Set some convenient global objects. */
-- (void)exportGlobals:(id)parser
+- (void)exportGlobals:(NSMutableDictionary *)context
 {
+	NuSymbolTable *symbolTable = [NuSymbolTable sharedSymbolTable];
+
 	ViWindowController *winCon = [ViWindowController currentWindowController];
 	if (winCon) {
-		[parser setValue:winCon.proxy forKey:@"window"];
-		[parser setValue:winCon.explorer forKey:@"explorer"];
+		[context setObject:winCon forKey:[symbolTable symbolWithString:@"window"]];
+		[context setObject:winCon.explorer forKey:[symbolTable symbolWithString:@"explorer"]];
 		id<ViViewController> view = [winCon currentView];
 		if (view) {
-			[parser setValue:view forKey:@"view"];
+			[context setObject:view forKey:[symbolTable symbolWithString:@"view"]];
 			if ([view isKindOfClass:[ViDocumentView class]]) {
 				ViTextView *textView = [(ViDocumentView *)view textView];
-				[parser setValue:textView.proxy forKey:@"text"];
+				[context setObject:textView forKey:[symbolTable symbolWithString:@"text"]];
 			}
 		}
 		ViDocument *doc = [winCon currentDocument];
 		if (doc)
-			[parser setValue:doc.proxy forKey:@"document"];
+			[context setObject:doc forKey:[symbolTable symbolWithString:@"document"]];
 	}
+
+	[context setObject:[ViEventManager defaultManager] forKey:[symbolTable symbolWithString:@"eventManager"]];
 }
 
-- (void)loadStandardModules:(id<NuParsing>)parser
+- (void)loadStandardModules:(NSMutableDictionary *)context
 {
-	NSMutableDictionary *context = [(NuParser *)parser context];
 	[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
@@ -375,11 +378,11 @@ extern BOOL makeNewWindowInsteadOfTab;
 }
 
 - (id)eval:(NSString *)script
-withParser:(id<NuParsing>)parser
+withParser:(NuParser *)parser
   bindings:(NSDictionary *)bindings
      error:(NSError **)outError
 {
-	[self exportGlobals:parser];
+	[self exportGlobals:[parser context]];
 
 	DEBUG(@"additional bindings: %@", bindings);
 	for (NSString *key in [bindings allKeys])
@@ -396,6 +399,7 @@ withParser:(id<NuParsing>)parser
 	}
 	id result = nil;
 	@try {
+		DEBUG(@"context: %@", [parser context]);
 		result = [parser eval:code];
 	}
 	@catch (NSException *exception) {
@@ -410,7 +414,9 @@ withParser:(id<NuParsing>)parser
 - (id)eval:(NSString *)script
      error:(NSError **)outError
 {
-	return [self eval:script withParser:[Nu parser] bindings:nil error:outError];
+	NuParser *parser = [[NuParser alloc] init];
+	[self loadStandardModules:[parser context]];
+	return [self eval:script withParser:parser bindings:nil error:outError];
 }
 
 #pragma mark -
@@ -421,7 +427,8 @@ additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName
 {
-	id<NuParsing> parser = [Nu parser];
+	NuParser *parser = [[NuParser alloc] init];
+	[self loadStandardModules:[parser context]];
 
 	if (channelName) {
 		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];

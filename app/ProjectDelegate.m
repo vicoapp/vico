@@ -11,31 +11,7 @@
 #import "ViCompletionController.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViCommon.h"
-
-static NSCharacterSet *slashSet = nil;
-
-@interface NSURL (equality)
-- (BOOL)isEqualToURL:(NSURL *)otherURL;
-- (BOOL)hasPrefix:(NSURL *)prefixURL;
-@end
-@implementation NSURL (equality)
-- (BOOL)isEqualToURL:(NSURL *)otherURL
-{
-	if (slashSet == nil)
-		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
-	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	return [s1 isEqualToString:s2];
-}
-- (BOOL)hasPrefix:(NSURL *)prefixURL
-{
-	if (slashSet == nil)
-		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
-	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	return [s1 hasPrefix:s2];
-}
-@end
+#import "NSURL-additions.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;

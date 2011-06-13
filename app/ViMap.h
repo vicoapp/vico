@@ -1,4 +1,5 @@
 #import "Nu/Nu.h"
+#import "ViScope.h"
 
 #define ViMapSetsDot		1ULL
 #define ViMapNeedMotion		2ULL
@@ -99,7 +100,7 @@
 - (BOOL)includesMap:(ViMap *)aMap;
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
-                       withScope:(NSArray *)scopeArray
+                       withScope:(ViScope *)scope
                      allowMacros:(BOOL)allowMacros
                       excessKeys:(NSArray **)excessKeys
                          timeout:(BOOL *)timeoutPtr

@@ -242,7 +242,7 @@ static NSMutableDictionary *maps = nil;
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
                           inMaps:(NSArray *)maps
-                       withScope:(NSArray *)scopeArray
+                       withScope:(ViScope *)scope
                      allowMacros:(BOOL)allowMacros
                       excessKeys:(NSArray **)excessKeys
                          timeout:(BOOL *)timeout
@@ -252,12 +252,13 @@ static NSMutableDictionary *maps = nil;
 	ViMapping *exact_candidate = nil;
 	ViMap *exact_candidate_map = nil; /* map of the exact_candidate */
 	ViMapping *op = nil; /* fully matched operator */
+	NSUInteger len = [keySequence count];
+	BOOL gotMultipleCandidates = NO;
 	for (ViMap *map in maps) {
 		for (ViMapping *m in map.actions) {
 			if (!allowMacros && [m isMacro])
 				continue;
 
-			NSUInteger len = [keySequence count];
 			NSUInteger mlen = [m.keySequence count];
 			NSUInteger i;
 			for (i = 0; i < len && i < mlen; i++)
@@ -272,11 +273,13 @@ static NSMutableDictionary *maps = nil;
 			BOOL equalMatch = (len == mlen);
 
 			/* FIXME: compare rank of all matches */
-			u_int64_t rank = [m.scopeSelector matchesScopes:scopeArray];
+			u_int64_t rank = [m.scopeSelector matchesScopes:[scope scopes]];
 			if (rank == 0)
 				continue;
 
-			DEBUG(@"testing key [%@] against %@", keySequence, m);
+			DEBUG(@"testing key [%@] against %@ (%s)",
+			     keySequence, m,
+			     equalMatch ? "EQUAL" : (partialOrEqualMatch ? "PART+EQUAL" : "OVERFLOW+EQUAL"));
 
 			if (overflowOrEqualMatch && [m wantsKeys]) {
 				/*
@@ -289,7 +292,7 @@ static NSMutableDictionary *maps = nil;
 					op = m;
 					DEBUG(@"got operator candidate %@", op);
 				}
-			} else if (equalMatch && ![m wantsKeys]) {
+			} else if ((equalMatch || overflowOrEqualMatch) && ![m wantsKeys]) {
 				/* 
 				 * If we get an exact match, but there are longer key
 				 * sequences that might match if we get more keys, we
@@ -365,36 +368,31 @@ static NSMutableDictionary *maps = nil;
 					continue;
 				}
 
-				if (candidate || mlen != len) {
-					/* Need more keys to disambiguate. */
-					if (candidate)
-						DEBUG(@"%s", "multiple matches, need more keys");
-					else
-						DEBUG(@"%s", "partial match, need more keys");
+				if (candidate)
+					gotMultipleCandidates = YES;
 
-					if (exact_candidate) {
-						/*
-						 * We found an ambiguous mapping, but we have
-						 * an exact match. If no other key is received
-						 * without a timeout, we should return the
-						 * exact match.
-						 */
-						if (*timeout == YES) {
-							DEBUG(@"timeout: returning exact match %@",
-							    exact_candidate);
-							return exact_candidate;
-						}
-						DEBUG(@"setting timeout for exact candidate %@",
+				if (candidate && exact_candidate) {
+					/*
+					 * We found an ambiguous mapping, but we have
+					 * an exact match. If no other key is received
+					 * without a timeout, we should return the
+					 * exact match.
+					 */
+					if (*timeout == YES) {
+						DEBUG(@"timeout: returning exact match %@",
 						    exact_candidate);
-						*timeout = YES;
+						return exact_candidate;
 					}
+					DEBUG(@"setting timeout for exact candidate %@",
+					    exact_candidate);
+					*timeout = YES;
 
 					if (outError)
 						*outError = [ViError errorWithCode:ViErrorMapAmbiguous
 									    format:@"Ambiguous match."];
-
 					return nil;
 				}
+
 				candidate = m;
 			}
 		}
@@ -402,12 +400,22 @@ static NSMutableDictionary *maps = nil;
 
 	if (candidate == nil && op != nil) {
 		NSUInteger oplen = [op.keySequence count];
-		NSRange r = NSMakeRange(oplen, [keySequence count] - oplen);
+		NSRange r = NSMakeRange(oplen, len - oplen);
 		if (excessKeys)
 			*excessKeys = [keySequence subarrayWithRange:r];
 		DEBUG(@"mapped [%@] to %@ with excess keys [%@]",
 		    keySequence, op, excessKeys ? *excessKeys : @"discarded");
 		return op;
+	}
+
+	if (candidate == nil && exact_candidate != nil) {
+		NSUInteger eclen = [exact_candidate.keySequence count];
+		NSRange r = NSMakeRange(eclen, len - eclen);
+		if (excessKeys)
+			*excessKeys = [keySequence subarrayWithRange:r];
+		DEBUG(@"mapped [%@] to %@ with excess keys [%@]",
+		    keySequence, exact_candidate, excessKeys ? *excessKeys : @"discarded");
+		return exact_candidate;
 	}
 
 	/*
@@ -429,6 +437,22 @@ static NSMutableDictionary *maps = nil;
 	if (candidate == nil && outError)
 		*outError = [ViError errorWithCode:ViErrorMapNotFound
 					    format:@"%@ is not mapped.", [NSString stringWithKeySequence:keySequence]];
+
+	if (gotMultipleCandidates) {
+		DEBUG(@"%s", "multiple matches, need more keys");
+		if (outError)
+			*outError = [ViError errorWithCode:ViErrorMapAmbiguous
+						    format:@"Ambiguous match."];
+		return nil;
+	}
+
+	if (candidate && len != [candidate.keySequence count]) {
+		DEBUG(@"%@ is partial match, need more keys", candidate);
+		if (outError)
+			*outError = [ViError errorWithCode:ViErrorMapAmbiguous
+						    format:@"Ambiguous match."];
+		return nil;
+	}
 
 	return candidate;
 }
@@ -453,7 +477,7 @@ static NSMutableDictionary *maps = nil;
 }
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
-                       withScope:(NSArray *)scopeArray
+                       withScope:(ViScope *)scope
                      allowMacros:(BOOL)allowMacros
                       excessKeys:(NSArray **)excessKeys
                          timeout:(BOOL *)timeoutPtr
@@ -470,7 +494,7 @@ static NSMutableDictionary *maps = nil;
 	NSError *error = nil;
 	m = [self lookupKeySequence:keySequence
 			     inMaps:resolved
-			  withScope:scopeArray
+			  withScope:scope
 			allowMacros:allowMacros
 			 excessKeys:excessKeys
 			    timeout:timeoutPtr

@@ -8,6 +8,7 @@
 #import "ViError.h"
 #import "TxmtURLProtocol.h"
 #import "ViURLManager.h"
+#import "ViEventManager.h"
 #include "logging.h"
 
 @implementation ViDocumentController
@@ -191,6 +192,18 @@
 	    [[url scheme] isEqualToString:@"txmt"])
 		return YES;
 	return NO;
+}
+
+- (void)addDocument:(NSDocument *)document
+{
+	[super addDocument:document];
+	[[ViEventManager defaultManager] emit:ViEventDidAddDocument for:nil with:document, nil];
+}
+
+- (void)removeDocument:(NSDocument *)document
+{
+	[super removeDocument:document];
+	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
 }
 
 - (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL

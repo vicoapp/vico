@@ -3,15 +3,15 @@ BEFORE 1.0
 
 * can Nu return BOOLs?
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
-* "&" in :s replace part should expand to whole match
-* check map error in excessKeys.nu (re vs r duplicate mapping)
 
 ? cmd-slash highlights current line?
-* [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
 
 
 REGRESSIONS
 ===========
+
+* check map error in excessKeys.nu (re vs r duplicate mapping)
+* [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
 
 
 REQUESTED
@@ -22,23 +22,19 @@ REQUESTED
   normally. Also if pasting back (P) on the last line, it pastes both
   blank and the line.
 
-* @fkoeppe: How would I go about removing trailing white spaces on save?
-
 * vim text objects, especially i[, a] and it, at
 * vicotool --line 1
 * R (replace mode)
 
-* search should be useable as motion command!
-
 
 URGENT
 ========
+* "&" in :s replace part should expand to whole match
 * explorer flickers when opening new windows!
 * bundle commands not repeatable with dot
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
-* :q should terminate app on last document in last window
 
 
 BUGS
@@ -61,6 +57,7 @@ BUGS
 
 IMPORTANT
 =========
+* :q should terminate app on last document in last window?
 * installer for vicotool
 * indented paste
 * showAsHtml + dontFollowOutput (?)
@@ -73,7 +70,6 @@ IMPORTANT
 * :edit! => revert
 * support a count in C and h commands
 * highlight caret after goto line
-* allow ex commands when there is no open document?
 
 
 FEATURES
@@ -81,7 +77,6 @@ FEATURES
 * ability to direct stderr to other place than (or, separately from) stdout in bundle commands
 * Ability to edit tmbundles within the app (HN)
 * @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
-* @fkoeppe: Indicating if a file is "dirty" in the tab bar.
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 * :mkdir command
 * completion expressions in nu
@@ -124,7 +119,6 @@ LONG TERM FEATURES
   - esc cancels, go back to before
   - enter/click shows yellow highlight
 * block selection with ctrl-v + block editing
-* autocommands (or events)
 * undo tree + visualisation (check out Gundo)
 * integrated terminal
 
@@ -138,6 +132,5 @@ IDEAS
 =====
 * ODB Editor suite? why?
 * make vi keys preferred over bundle key equivalents?
-
-
 :command calling for bundle commands? arguments?
+

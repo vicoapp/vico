@@ -2,7 +2,6 @@
 #import "ViWindowController.h"
 #import "ViSymbol.h"
 #import "ViTextStorage.h"
-#import "ViScriptProxy.h"
 #import "ViURLManager.h"
 #import "ViScope.h"
 
@@ -10,13 +9,11 @@
 {
 	NSMutableSet *views;
 	ViDocumentView *hiddenView;
+	ViTextView *scriptView;
 
 	ViBundle *bundle;
 	ViLanguage *language;
 	ViTheme *theme;
-	ViScriptProxy *proxy;
-
-	dispatch_queue_t sym_q;
 
 	NSInteger tabSize; /* scope-specific */
 	BOOL wrap; /* scope-specific */
@@ -64,10 +61,9 @@
 @property(nonatomic,readwrite, assign) NSArray *filteredSymbols;
 @property(nonatomic,readonly) NSStringEncoding encoding;
 @property(nonatomic,readwrite, assign) BOOL isTemporary;
-@property(nonatomic,readonly) ViScriptProxy *proxy;
 @property(nonatomic,readwrite) BOOL busy;
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
-@property (readonly) id<ViDeferred> loader;
+@property(nonatomic,readonly) id<ViDeferred> loader;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;
@@ -102,5 +98,8 @@
 - (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
                         forward:(BOOL)forward
                    fromLocation:(NSUInteger)aLocation;
+
+- (BOOL)ex_write:(ExCommand *)command;
+- (BOOL)ex_setfiletype:(ExCommand *)command;
 
 @end

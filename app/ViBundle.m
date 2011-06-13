@@ -6,6 +6,7 @@
 #import "ViTextView.h"
 #import "ViBundleStore.h"
 #import "ViAppController.h"
+#import "ViEventManager.h"
 #include "logging.h"
 
 @implementation ViBundle
@@ -113,7 +114,7 @@
 	if (word)
 		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
 
-	NSURL *url = [[textView.document environment] baseURL];
+	NSURL *url = [[[textView window] windowController] baseURL];
 	if ([url isFileURL])
 		[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
 	[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
@@ -132,7 +133,7 @@
 	[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
 	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
-	NSString *scope = [[textView scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];
+	NSString *scope = [[textView.document scopesAtLocation:[textView caret]] componentsJoinedByString:@" "];
 	if (scope)
 		[env setObject:scope forKey:@"TM_SCOPE"];
 
@@ -403,8 +404,8 @@
 		} else if ((op = [uuids objectForKey:uuid]) != nil) {
 			SEL selector = NULL;
 			if ([op isKindOfClass:[ViBundleItem class]]) {
-				NSString *scope = [op scope];
-				if (scope == nil || [scope matchesScopes:scopes] > 0) {
+				NSString *scopeSelector = [op scopeSelector];
+				if (scopeSelector == nil || [scopeSelector matchesScopes:scopes] > 0) {
 					matches++;
 					selector = @selector(performBundleItem:);
 				}

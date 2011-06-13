@@ -36,7 +36,6 @@ int logIndent = 0;
 
 @implementation ViTextView
 
-@synthesize proxy;
 @synthesize keyManager;
 @synthesize document;
 
@@ -116,13 +115,17 @@ int logIndent = 0;
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(textStorageDidChangeLines:)
-						     name:ViTextStorageChangedLinesNotification 
+						     name:ViTextStorageChangedLinesNotification
 						   object:[self textStorage]];
 
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
-	proxy = [[ViScriptProxy alloc] initWithObject:self];
 	[self setCaret:0];
 	[self updateStatus];
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViTextView %p: %@>", self, document];
 }
 
 - (void)documentDidLoad:(ViDocument *)aDocument
@@ -424,11 +427,6 @@ int logIndent = 0;
 	}
 }
 
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation
-{
-	return [document scopesAtLocation:aLocation];
-}
-
 #pragma mark -
 #pragma mark Indentation
 
@@ -652,7 +650,7 @@ int logIndent = 0;
 
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation
 {
-	return [self preference:name forScope:[self scopesAtLocation:aLocation]];
+	return [self preference:name forScope:[document scopesAtLocation:aLocation]];
 }
 
 - (id)preference:(NSString *)name
@@ -993,48 +991,58 @@ int logIndent = 0;
 	return NO;
 }
 
-- (void)find_forward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
-{
-	ViCommand *command = contextInfo;
-	keyManager.parser.last_search_pattern = pattern;
-	keyManager.parser.last_search_options = 0;
-	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
-	if ([self findPattern:pattern options:0])
-		[self setCaret:final_location];
-}
-
-- (void)find_backward_callback:(NSString *)pattern contextInfo:(void *)contextInfo
-{
-	ViCommand *command = contextInfo;
-	keyManager.parser.last_search_pattern = pattern;
-	keyManager.parser.last_search_options = ViSearchOptionBackwards;
-	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
-	if ([self findPattern:pattern options:ViSearchOptionBackwards])
-		[self setCaret:final_location];
-}
-
 /* syntax: /regexp */
 - (BOOL)find:(ViCommand *)command
 {
-	[[document environment] getExCommandWithDelegate:self
-						       selector:@selector(find_forward_callback:contextInfo:)
-							 prompt:@"/"
-						    contextInfo:command];
-	// FIXME: this won't work as a motion command!
-	// d/pattern will not work!
-	return YES;
+	NSString *pattern = nil;
+	if (command.text)
+		pattern = command.text;
+	else {
+		pattern = [[document environment] getExStringForCommand:command];
+		command.text = pattern;
+	}
+
+	if (pattern) {
+		if ([pattern length] == 0)
+			pattern = keyManager.parser.last_search_pattern;
+
+		keyManager.parser.last_search_pattern = pattern;
+		keyManager.parser.last_search_options = 0;
+		[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
+		if ([self findPattern:pattern options:0]) {
+			[self setCaret:final_location];
+			return YES;
+		}
+	}
+
+	return NO;
 }
 
 /* syntax: ?regexp */
 - (BOOL)find_backwards:(ViCommand *)command
 {
-	[[document environment] getExCommandWithDelegate:self
-						       selector:@selector(find_backward_callback:contextInfo:)
-							 prompt:@"?"
-						    contextInfo:command];
-	// FIXME: this won't work as a motion command!
-	// d?pattern will not work!
-	return YES;
+	NSString *pattern = nil;
+	if (command.text)
+		pattern = command.text;
+	else {
+		pattern = [[document environment] getExStringForCommand:command];
+		command.text = pattern;
+	}
+
+	if (pattern) {
+		if ([pattern length] == 0)
+			pattern = keyManager.parser.last_search_pattern;
+
+		keyManager.parser.last_search_pattern = pattern;
+		keyManager.parser.last_search_options = ViSearchOptionBackwards;
+		[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
+		if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
+			[self setCaret:final_location];
+			return YES;
+		}
+	}
+
+	return NO;
 }
 
 /* syntax: n */
@@ -1250,7 +1258,7 @@ int logIndent = 0;
 			int i;
 			for (i = 0; i < count; i++)
 				[keyManager handleKeys:command.text
-					       inScope:[self scopesAtLocation:end_location]];
+					       inScope:[document scopeAtLocation:end_location]];
 			[self normal_mode:command];
 			replayingInput = NO;
 		}
@@ -1447,7 +1455,7 @@ int logIndent = 0;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 	NSString *prefix = [[[self textStorage] string] substringWithRange:NSMakeRange(bol, start_location - bol)];
 	if ([prefix length] > 0) {
-		NSArray *scopes = [self scopesAtLocation:eol];
+		NSArray *scopes = [document scopesAtLocation:eol];
 		NSUInteger triggerLength;
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithTabTrigger:prefix
 									matchingScopes:scopes
@@ -1609,7 +1617,7 @@ int logIndent = 0;
 				replayingInput = YES;
 				for (int i = 1; i < count; i++)
 					[keyManager handleKeys:inputKeys
-						       inScope:[self scopesAtLocation:[self caret]]];
+						       inScope:[document scopeAtLocation:[self caret]]];
 				replayingInput = NO;
 			}
 		}
@@ -1868,7 +1876,7 @@ int logIndent = 0;
 		NSInteger i;
 		for (i = 0; i < [string length]; i++)
 			[keyManager handleKey:[string characterAtIndex:i]
-				      inScope:[self scopesAtLocation:[self caret]]];
+				      inScope:[document scopeAtLocation:[self caret]]];
 		insertedKey = YES;
 	}
 }
@@ -1901,7 +1909,7 @@ int logIndent = 0;
 		return [super performKeyEquivalent:theEvent];
 
 	return [keyManager performKeyEquivalent:theEvent
-					inScope:[self scopesAtLocation:[self caret]]];
+					inScope:[document scopeAtLocation:[self caret]]];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1916,17 +1924,20 @@ int logIndent = 0;
 
 	if (!insertedKey && ![self hasMarkedText]) {
 		DEBUG(@"decoding event %@", theEvent);
-		[keyManager keyDown:theEvent inScope:[self scopesAtLocation:[self caret]]];
+		[keyManager keyDown:theEvent inScope:[document scopeAtLocation:[self caret]]];
 	}
 	insertedKey = NO;
 }
 
-- (BOOL)keyManager:(ViKeyManager *)aKeyManager
-    shouldParseKey:(NSInteger)keyCode
+- (NSNumber *)keyManager:(ViKeyManager *)aKeyManager
+	  shouldParseKey:(NSNumber *)keyNum
+		 inScope:(ViScope *)scope
 {
+	NSInteger keyCode = [keyNum integerValue];
+
 	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
 		/* Add the key to the input replay queue. */
-		[inputKeys addObject:[NSNumber numberWithInteger:keyCode]];
+		[inputKeys addObject:keyNum];
 	}
 
 //	[proxy emit:@"keyDown" with:self, keyCode, nil];
@@ -1934,16 +1945,14 @@ int logIndent = 0;
 	/*
 	 * Find and perform bundle commands. Show a menu with commands
 	 * if multiple matches found.
-	 * FIXME: should this be part of the key replay queue?
 	 */
 	if (!keyManager.parser.partial && ![self isFieldEditor]) {
-		NSArray *scopes = [self scopesAtLocation:[self caret]];
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithKeyCode:keyCode
-								     matchingScopes:scopes
+								     matchingScopes:[scope scopes]
 									     inMode:mode];
 		if ([matches count] > 0) {
 			[self performBundleItems:matches];
-			return NO; /* We already handled the key */
+			return [NSNumber numberWithBool:NO]; /* We already handled the key */
 		}
 	}
 
@@ -1954,7 +1963,7 @@ int logIndent = 0;
 			[keyManager.parser setInsertMap];
 	}
 
-	return YES;
+	return [NSNumber numberWithBool:YES];
 }
 
 - (void)swipeWithEvent:(NSEvent *)event
@@ -2107,7 +2116,7 @@ int logIndent = 0;
 /* syntax: ctrl-P */
 - (BOOL)show_scope:(ViCommand *)command
 {
-	MESSAGE(@"%@", [[self scopesAtLocation:[self caret]] componentsJoinedByString:@" "]);
+	MESSAGE(@"%@", [[document scopesAtLocation:[self caret]] componentsJoinedByString:@" "]);
 	return NO;
 }
 
@@ -2231,7 +2240,7 @@ int logIndent = 0;
 	NSMenu *menu = [super menuForEvent:theEvent];
 	int n = 0;
 
-	NSArray *scopes = [self scopesAtLocation:location];
+	NSArray *scopes = [document scopesAtLocation:location];
 	NSRange sel = [self selectedRange];
 	NSMenuItem *item;
 	NSMenu *submenu;

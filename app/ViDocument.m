@@ -767,7 +767,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		closeCallback(code);
 
 	closed = YES;
-	[windowController closeDocument:self andWindow:canCloseWindow];
+	[windowController didCloseDocument:self andWindow:canCloseWindow];
 
 	/* Remove the window controller so the document doesn't automatically
 	 * close the window.
@@ -1462,13 +1462,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSArray *)scopesAtLocation:(NSUInteger)aLocation
 {
-	if (aLocation >= [textStorage length]) {
-		/* use document scope at EOF */
-		DEBUG(@"document language is %@ (%@)", [self language], [[self language] name]);
-		NSString *scope = [[self language] name];
-		return scope ? [NSArray arrayWithObject:scope] : nil;
-	}
-
 	return [[self scopeAtLocation:aLocation] scopes];
 }
 
@@ -1477,7 +1470,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSArray *scopeArray = [syntaxParser scopeArray];
 	if ([scopeArray count] > aLocation)
 		return [scopeArray objectAtIndex:aLocation];
-	return nil;
+	return [self language].scope;
 }
 
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
@@ -1530,6 +1523,133 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSRange rb = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:aLocation];
 	NSRange rf = [self rangeOfScopeSelector:scopeSelector forward:YES fromLocation:aLocation];
 	return NSUnionRange(rb, rf);
+}
+
+#pragma mark -
+#pragma mark Ex actions
+
+- (BOOL)ex_write:(ExCommand *)command
+{
+	DEBUG(@"got %i addresses", command.naddr);
+	if ([command.string hasPrefix:@">>"]) {
+		[self message:@"Appending not yet supported"];
+		return NO;
+	}
+
+	if ([command.string length] == 0) {
+		[self saveDocument:self];
+	} else {
+		__block NSError *error = nil;
+		NSURL *newURL = [[ViDocumentController sharedDocumentController] normalizePath:command.string
+                                                                                    relativeTo:windowController.baseURL
+                                                                                         error:&error];
+		if (error != nil) {
+			[NSApp presentError:error];
+			return NO;
+		}
+
+		id<ViDeferred> deferred;
+		ViURLManager *urlman = [ViURLManager defaultManager];
+		__block NSDictionary *attributes = nil;
+		__block NSURL *normalizedURL = nil;
+		deferred = [urlman attributesOfItemAtURL:newURL
+				      onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
+			normalizedURL = _url;
+			attributes = _attrs;
+			if (![_err isFileNotFoundError])
+				error = _err;
+		}];
+		[deferred wait];
+
+		if (error) {
+			[self message:@"%@", [error localizedDescription]];
+			return NO;
+		}
+
+		if (normalizedURL && ![[attributes fileType] isEqualToString:NSFileTypeRegular]) {
+			[self message:@"%@ is not a regular file", normalizedURL];
+			return NO;
+		}
+
+		if (normalizedURL && (command.flags & E_C_FORCE) != E_C_FORCE) {
+			[self message:@"File exists (add ! to override)"];
+			return NO;
+		}
+
+		if ([self saveToURL:newURL
+                             ofType:nil
+                   forSaveOperation:NSSaveAsOperation
+                              error:&error] == NO) {
+			[self message:@"%@", [error localizedDescription]];
+			return NO;
+		}
+	}
+
+	return YES;
+}
+
+- (BOOL)ex_setfiletype:(ExCommand *)command
+{
+	if ([command.words count] != 1)
+		return NO;
+
+	NSString *langScope = [command.words objectAtIndex:0];
+	NSString *pattern = [NSString stringWithFormat:@"(^|\\.)%@(\\.|$)", [ViRegexp escape:langScope]];
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+	NSMutableSet *matches = [NSMutableSet set];
+	for (ViLanguage *lang in [[ViBundleStore defaultStore] languages]) {
+		if ([[lang name] isEqualToString:langScope]) {
+			/* full match */
+			[matches removeAllObjects];
+			[matches addObject:lang];
+			break;
+		} else if ([rx matchesString:[lang name]]) {
+			/* partial match */
+			[matches addObject:lang];
+		}
+	}
+
+	if ([matches count] == 0) {
+		[self message:@"Unknown syntax %@", langScope];
+		return NO;
+	} else if ([matches count] > 1) {
+		[self message:@"More than one match for %@", langScope];
+		DEBUG(@"matches: %@", matches);
+		return NO;
+	}
+
+	[self setLanguageAndRemember:[matches anyObject]];
+	return YES;
+}
+
+/* syntax: bd[elete] bufname */
+- (void)ex_bdelete:(ExCommand *)command
+{
+	if ((command.flags & E_C_FORCE) == E_C_FORCE)
+		[self close];
+	else
+		[windowController closeDocument:self andWindow:NO];
+}
+
+- (void)ex_quit:(ExCommand *)command
+{
+	if ((command.flags & E_C_FORCE) == E_C_FORCE)
+		[self closeAndWindow:YES];
+	else
+		[windowController closeDocument:self andWindow:YES];
+	// FIXME: quit app if last window?
+}
+
+- (void)ex_wq:(ExCommand *)command
+{
+	[self ex_write:command];
+	[self ex_quit:command];
+}
+
+- (void)ex_xit:(ExCommand *)command
+{
+	[self ex_write:command];
+	[self ex_quit:command];
 }
 
 @end

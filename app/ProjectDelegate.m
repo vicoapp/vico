@@ -168,7 +168,7 @@
 						     name:ViDocumentEditedChangedNotification 
 						   object:nil];
 
-	[self browseURL:[environment baseURL]];
+	[self browseURL:windowController.baseURL];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -314,7 +314,7 @@
 			[explorer reloadData];
 			[self resetExpandedItems];
 			rootURL = aURL;
-			[environment setBaseURL:aURL];
+			[windowController setBaseURL:aURL];
 
 			if (!jump)
 				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]

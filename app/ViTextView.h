@@ -9,11 +9,11 @@
 #import "ExEnvironment.h"
 #import "ViCommon.h"
 #import "ViTextStorage.h"
-#import "ViScriptProxy.h"
 #import "ViKeyManager.h"
 #import "ViDocument.h"
 #import "ViCompletionController.h"
 #import "ViMark.h"
+#import "ExCommand.h"
 
 #include <Carbon/carbon.h>
 
@@ -42,8 +42,6 @@
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
 	NSMutableArray		*inputKeys; // used for replaying input
-
-	ViScriptProxy		*proxy;
 
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
@@ -87,8 +85,7 @@
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
 }
 
-@property(nonatomic,readonly) ViScriptProxy *proxy;
-@property(nonatomic,readonly) ViKeyManager *keyManager;
+@property(nonatomic,readwrite,assign) ViKeyManager *keyManager;
 @property(nonatomic,readonly) ViDocument *document;
 
 - (void)initWithDocument:(ViDocument *)aDocument
@@ -120,7 +117,6 @@
 		 updateCaret:(NSUInteger *)updatedCaret
 	      alignToTabstop:(BOOL)alignToTabstop
 	    indentEmptyLines:(BOOL)indentEmptyLines;
-- (NSArray *)scopesAtLocation:(NSUInteger)aLocation;
 - (void)gotoScreenColumn:(NSUInteger)column fromGlyphIndex:(NSUInteger)glyphIndex;
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation;
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
@@ -129,7 +125,7 @@
 - (void)setNormalMode;
 - (void)setVisualMode;
 - (void)setInsertMode:(ViCommand *)command;
-- (void)input:(NSString *)inputString;
+- (BOOL)input:(NSString *)inputString;
 - (void)setCaret:(NSUInteger)location;
 - (void)scrollToCaret;
 - (NSUInteger)caret;
@@ -225,6 +221,20 @@
 - (BOOL)yank:(ViCommand *)command;
 - (BOOL)jumplist_forward:(ViCommand *)command;
 - (BOOL)jumplist_backward:(ViCommand *)command;
+- (BOOL)complete_keyword:(ViCommand *)command;
+- (BOOL)complete_path:(ViCommand *)command;
+- (BOOL)complete_buffer:(ViCommand *)command;
+- (BOOL)complete_ex_command:(ViCommand *)command;
+- (BOOL)complete_syntax:(ViCommand *)command;
+@end
+
+@interface ViTextView (ex_commands)
+- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange;
+- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange;
+- (BOOL)ex_bang:(ExCommand *)command;
+- (BOOL)ex_eval:(ExCommand *)command;
+- (BOOL)ex_s:(ExCommand *)command;
+- (BOOL)ex_number:(ExCommand *)command;
 @end
 
 @interface ViTextView (bundleCommands)

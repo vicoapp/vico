@@ -11,6 +11,7 @@
 #import "ExEnvironment.h"
 #import "ViDocumentController.h"
 #import "NSString-additions.h"
+#import "NSView-additions.h"
 
 #import "ViFileCompletion.h"
 #import "ViWordCompletion.h"
@@ -240,7 +241,7 @@
 	}
 
 	/* Special case: check if inside a string or comment. */
-	NSArray *openingScopes = [self scopesAtLocation:openingRange.location];
+	NSArray *openingScopes = [document scopesAtLocation:openingRange.location];
 	BOOL inSpecialScope;
 	NSRange specialScopeRange;
 
@@ -287,7 +288,7 @@
 		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */
 			if (!inSpecialScope) {
-				NSArray *scopes = [self scopesAtLocation:offset];
+				NSArray *scopes = [document scopesAtLocation:offset];
 				if ([@"string"  matchesScopes:scopes] > 0 ||
 				    [@"comment" matchesScopes:scopes] > 0)
 						continue;
@@ -357,7 +358,7 @@
 	[ViBundle setupEnvironment:env forTextView:self selectedRange:affectedRange];
 	[task setEnvironment:env];
 
-	NSURL *baseURL = [[document environment] baseURL];
+	NSURL *baseURL = [(ViWindowController *)[[self window] windowController] baseURL];
 	if ([baseURL isFileURL])
 		[task setCurrentDirectoryPath:[baseURL path]];
 	else
@@ -374,12 +375,20 @@
 /* syntax: [count]!motion command(s) */
 - (BOOL)filter:(ViCommand *)command
 {
-	[[document environment] getExCommandWithDelegate:self
-						selector:@selector(filter_through_shell_command:contextInfo:)
-						  prompt:@"!"
-					     contextInfo:command];
-	final_location = start_location;
-	return YES;
+	NSString *cmdline = nil;
+	if (command.text)
+		cmdline = command.text;
+	else {
+		cmdline = [[document environment] getExStringForCommand:command];
+		command.text = cmdline;
+	}
+
+	if (cmdline) {
+		[self filter_through_shell_command:cmdline contextInfo:command];
+		return YES;
+	}
+
+	return NO;
 }
 
 - (BOOL)format:(ViCommand *)command
@@ -747,7 +756,7 @@
 	NSUInteger end2, eol2;
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
 
-	if (eol2 == end || bol == eol || 
+	if (eol2 == end || bol == eol ||
 	    [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
@@ -2406,7 +2415,7 @@
 	NSUInteger location = start_location;
 	if ([self selectedRange].length > 0)
 		location = start_location + 1;
-	NSString *selector = [[self scopesAtLocation:location] componentsJoinedByString:@" "];
+	NSString *selector = [[document scopesAtLocation:location] componentsJoinedByString:@" "];
 	NSRange range = [document rangeOfScopeSelector:selector atLocation:location];
 
 	visual_start_location = start_location = range.location;
@@ -2448,8 +2457,25 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[[document environment] executeForTextView:self];
-	return YES;
+	NSString *exline = [[document environment] getExStringForCommand:command];
+	if (exline == nil)
+		return NO;
+
+	NSError *error = nil;
+	ExCommand *ex = [[ExCommand alloc] init];
+	if ([ex parse:exline error:&error]) {
+		if (ex.command == nil)
+			/* do nothing */ return YES;
+		SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
+		id target = [self targetForSelector:selector];
+		if (target == nil)
+			MESSAGE(@"The %@ command is not implemented.", ex.name);
+		else
+			return (BOOL)[target performSelector:selector withObject:ex];
+	} else if (error)
+		MESSAGE(@"%@", [error localizedDescription]);
+
+	return NO;
 }
 
 #pragma mark -
@@ -2541,7 +2567,7 @@
 		range = NSMakeRange([self caret], 0);
 	}
 
-	NSURL *relURL = [[(ViWindowController *)[[self window] windowController] environment] baseURL];
+	NSURL *relURL = [(ViWindowController *)[[self window] windowController] baseURL];
 	return [self presentCompletionsOf:path
 			     fromProvider:[[ViFileCompletion alloc] initWithRelativeURL:relURL]
 				fromRange:range

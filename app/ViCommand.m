@@ -12,6 +12,7 @@
 @synthesize isLineMode;
 @synthesize operator;
 @synthesize affectedRange, finalLocation;
+@synthesize macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {

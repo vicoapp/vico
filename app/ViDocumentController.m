@@ -262,9 +262,9 @@
 		return nil;
 
 	if (relURL ==  nil) {
-		ExEnvironment *env = [[ViWindowController currentWindowController] environment];
-		if (env)
-			relURL = [env baseURL];
+		ViWindowController *winController = [ViWindowController currentWindowController];
+		if (winController)
+			relURL = [winController baseURL];
 		else
 			relURL = [NSURL fileURLWithPath:@"/"];
 	}

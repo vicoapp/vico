@@ -2,6 +2,8 @@
 #import "ViCommon.h"
 #import "ViWindowController.h"
 #import "NSEvent-keyAdditions.h"
+#import "NSView-additions.h"
+#import "ExCommand.h"
 #include "logging.h"
 
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
@@ -181,8 +183,25 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[environment executeForTextView:nil];
-	return YES;
+	NSString *exline = [[[self window] windowController] getExStringForCommand:command];
+	if (exline == nil)
+		return NO;
+
+	NSError *error = nil;
+	ExCommand *ex = [[ExCommand alloc] init];
+	if ([ex parse:exline error:&error]) {
+		if (ex.command == nil)
+			/* do nothing */ return YES;
+		SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
+		id target = [self targetForSelector:selector];
+		if (target == nil)
+			MESSAGE(@"The %@ command is not implemented.", ex.name);
+		else
+			return (BOOL)[target performSelector:selector withObject:ex];
+	} else if (error)
+		MESSAGE(@"%@", [error localizedDescription]);
+
+	return NO;
 }
 
 @end

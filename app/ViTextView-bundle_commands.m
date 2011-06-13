@@ -31,7 +31,7 @@
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
 	} else if ([type isEqualToString:@"scope"]) {
-		*rangePtr = [document rangeOfScopeSelector:[command scope] atLocation:[self caret]];
+		*rangePtr = [document rangeOfScopeSelector:[command scopeSelector] atLocation:[self caret]];
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];

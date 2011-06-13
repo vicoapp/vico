@@ -5,7 +5,6 @@
 #import "ExEnvironment.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViSplitView.h"
-#import "ViScriptProxy.h"
 #import "ViSymbol.h"
 #import "ViSymbolController.h"
 
@@ -17,7 +16,7 @@
 @class ViProject;
 @class ViParser;
 
-@interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate>
+@interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate, ViDeferredDelegate>
 {
 	IBOutlet PSMTabBarControl *tabBar;
 	IBOutlet NSTabView *tabView;
@@ -33,6 +32,7 @@
 	IBOutlet NSPopUpButton *bundleButton;
 
 	IBOutlet ExEnvironment *environment;
+	NSURL			*baseURL;
 
 	ViTextView *viFieldEditor;
 
@@ -47,7 +47,6 @@
 	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
-	ViScriptProxy *proxy;
 
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
@@ -69,12 +68,12 @@
 @property(nonatomic,readonly) ExEnvironment *environment;
 @property(nonatomic,readonly) ViJumpList *jumpList;
 @property(nonatomic,readwrite, assign) ViProject *project;
-@property(nonatomic,readonly) ViScriptProxy *proxy;
 @property(nonatomic,readonly) ProjectDelegate *explorer;
 @property(nonatomic,readonly) ViTagStack *tagStack;
 @property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
 @property(nonatomic,readonly) ViDocument *previousDocument;
+@property(nonatomic,readwrite,assign) NSURL *baseURL;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;
@@ -92,12 +91,14 @@
 - (void)createTabWithViewController:(id<ViViewController>)viewController;
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document;
 
+- (void)didCloseDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow;
 - (void)closeDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow;
 - (void)closeCurrentDocumentAndWindow:(BOOL)canCloseWindow;
 - (BOOL)closeCurrentViewUnlessLast;
 - (BOOL)closeOtherViews;
 - (IBAction)closeCurrentDocument:(id)sender;
 - (IBAction)closeCurrent:(id)sender;
+- (BOOL)windowShouldClose:(id)window;
 
 - (void)addDocument:(ViDocument *)document;
 - (void)addNewTab:(ViDocument *)document;
@@ -149,6 +150,23 @@
 - (IBAction)toggleExplorer:(id)sender;
 
 - (void)browseURL:(NSURL *)url;
+
+- (void)setBaseURL:(NSURL *)url;
+- (void)checkBaseURL:(NSURL *)url
+	onCompletion:(void (^)(NSURL *url, NSError *error))aBlock;
+- (NSString *)displayBaseURL;
+
+- (BOOL)ex_cd:(ExCommand *)command;
+- (BOOL)ex_pwd:(ExCommand *)command;
+- (BOOL)ex_close:(ExCommand *)command;
+- (BOOL)ex_edit:(ExCommand *)command;
+- (BOOL)ex_tabedit:(ExCommand *)command;
+- (BOOL)ex_new:(ExCommand *)command;
+- (BOOL)ex_tabnew:(ExCommand *)command;
+- (BOOL)ex_vnew:(ExCommand *)command;
+- (BOOL)ex_split:(ExCommand *)command;
+- (BOOL)ex_vsplit:(ExCommand *)command;
+- (BOOL)ex_buffer:(ExCommand *)command;
 
 @end
 

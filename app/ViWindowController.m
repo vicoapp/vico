@@ -15,6 +15,8 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViLayoutManager.h"
 #import "ExTextField.h"
+#import "ViEventManager.h"
+#import "NSURL-additions.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -39,7 +41,6 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize documents;
 @synthesize project;
 @synthesize environment;
-@synthesize proxy;
 @synthesize explorer = projectDelegate;
 @synthesize jumpList, jumping;
 @synthesize tagStack, tagsDatabase;
@@ -75,7 +76,6 @@ static ViWindowController	*currentWindowController = nil;
 		jumpList = [[ViJumpList alloc] init];
 		[jumpList setDelegate:self];
 		parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
-		proxy = [[ViScriptProxy alloc] initWithObject:self];
 		tagStack = [[ViTagStack alloc] init];
 	}
 
@@ -836,6 +836,7 @@ static ViWindowController	*currentWindowController = nil;
 			return;
 	}
 
+	[[ViEventManager defaultManager] emit:ViEventWillSelectDocument for:self with:self, document, nil];
 	[[self document] removeWindowController:self];
 	[document addWindowController:self];
 	[self setDocument:document];
@@ -846,6 +847,8 @@ static ViWindowController	*currentWindowController = nil;
 
 	// update symbol list
 	[symbolController didSelectDocument:document];
+
+	[[ViEventManager defaultManager] emit:ViEventDidSelectDocument for:self with:self, document, nil];
 }
 
 - (void)didSelectViewController:(id<ViViewController>)viewController
@@ -854,6 +857,8 @@ static ViWindowController	*currentWindowController = nil;
 
 	if (viewController == [self currentView])
 		return;
+
+	[[ViEventManager defaultManager] emit:ViEventWillSelectView for:self with:self, viewController, nil];
 
 	/* Update the previous document pointer. */
 	id<ViViewController> prevView = [self currentView];
@@ -882,6 +887,8 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	[self setCurrentView:viewController];
+
+	[[ViEventManager defaultManager] emit:ViEventDidSelectView for:self with:self, viewController, nil];
 }
 
 /*
@@ -904,10 +911,17 @@ static ViWindowController	*currentWindowController = nil;
 	return viewController;
 }
 
+- (void)tabView:(NSTabView *)aTabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	ViDocumentTabController *tabController = [tabViewItem identifier];
+	[[ViEventManager defaultManager] emit:ViEventWillSelectTab for:self with:self, tabController, nil];
+}
+
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	ViDocumentTabController *tabController = [tabViewItem identifier];
 	[self selectDocumentView:tabController.selectedView];
+	[[ViEventManager defaultManager] emit:ViEventDidSelectTab for:self with:self, tabController, nil];
 }
 
 /*

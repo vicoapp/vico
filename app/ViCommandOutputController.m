@@ -8,15 +8,12 @@
 @synthesize window;
 
 - (ViCommandOutputController *)initWithHTMLString:(NSString *)content
-                                      environment:(ExEnvironment *)environment
 {
 	self = [super init];
 	if (self) {
 		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
-		[webView setEnvironment:environment];
-		NSURL *baseURL = [NSURL fileURLWithPath:@"/" isDirectory:YES];
-		[[webView mainFrame] loadHTMLString:content
-					    baseURL:baseURL];
+		[self setContent:content];
+		[self setTitle:@"command output"];
 	}
 	return self;
 }
@@ -31,9 +28,14 @@
 	return webView;
 }
 
+- (void)setTitle:(NSString *)aTitle
+{
+	title = aTitle;
+}
+
 - (NSString *)title
 {
-	return @"command output";
+	return title;
 }
 
 - (void)setContent:(NSString *)content

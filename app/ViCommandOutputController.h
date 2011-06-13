@@ -7,14 +7,15 @@
 	IBOutlet ViWebView *webView;
 	ViDocumentTabController *tabController;
 	NSWindow *window;
+	NSString *title;
 }
 
 @property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
 
-- (ViCommandOutputController *)initWithHTMLString:(NSString *)content
-                                      environment:(ExEnvironment *)environment;
+- (ViCommandOutputController *)initWithHTMLString:(NSString *)content;
 - (NSView *)view;
 - (NSView *)innerView;
+- (void)setTitle:(NSString *)aTitle;
 
 - (void)setContent:(NSString *)content;
 

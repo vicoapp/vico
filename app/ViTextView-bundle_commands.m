@@ -268,11 +268,11 @@
 
 			if (webView) {
 				[(ViCommandOutputController *)webView setContent:outputText];
+				[(ViCommandOutputController *)webView setTitle:[command name]];
 				[[[self window] windowController] selectDocumentView:webView];
 			} else {
-				ViCommandOutputController *oc = [[ViCommandOutputController alloc]
-				    initWithHTMLString:outputText
-				    environment:[document environment]];
+				ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
+				[oc setTitle:[command name]];
 
 				if (newWindow) {
 					ViWindowController *winCon = [[ViWindowController alloc] init];

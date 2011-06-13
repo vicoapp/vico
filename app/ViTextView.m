@@ -16,6 +16,7 @@
 #import "ViError.h"
 #import "ViRegisterManager.h"
 #import "ViLayoutManager.h"
+#import "NSView-additions.h"
 
 int logIndent = 0;
 
@@ -1654,34 +1655,10 @@ int logIndent = 0;
 	    modestr]);
 }
 
-- (id)targetForCommand:(ViCommand *)command
-{
-	NSView *view = self;
-
-	do {
-		if ([view respondsToSelector:command.action])
-			return view;
-	} while ((view = [view superview]) != nil);
-
-	if ([[self window] respondsToSelector:command.action])
-		return [self window];
-
-	if ([[[self window] windowController] respondsToSelector:command.action])
-		return [[self window] windowController];
-
-	if ([[self delegate] respondsToSelector:command.action])
-		return [self delegate];
-
-	if ([document respondsToSelector:command.action])
-		return document;
-
-	return nil;
-}
-
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
-	id target = [self targetForCommand:command];
+	id target = [self targetForSelector:command.action];
 	if (target == nil) {
 		MESSAGE(@"Command %@ not implemented.",
 		    command.mapping.keyString);
@@ -1695,7 +1672,7 @@ int logIndent = 0;
 
 	id motion_target = nil;
 	if (command.motion) {
-		motion_target = [self targetForCommand:command.motion];
+		motion_target = [self targetForSelector:command.motion.action];
 		if (motion_target == nil) {
 			MESSAGE(@"Motion command %@ not implemented.",
 			    command.motion.mapping.keyString);

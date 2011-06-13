@@ -1,5 +1,6 @@
 #import "ViCommon.h"
 #import "ViParser.h"
+#import "ViScope.h"
 
 @interface ViKeyManager : NSObject
 {
@@ -10,7 +11,8 @@
 	NSInteger recursionLevel;
 }
 
-@property (readonly) ViParser *parser;
+@property(nonatomic,readonly) ViParser *parser;
+@property(nonatomic,readwrite,assign) id target;
 
 - (ViKeyManager *)initWithTarget:(id)aTarget
                           parser:(ViParser *)aParser;
@@ -18,19 +20,21 @@
                       defaultMap:(ViMap *)map;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent;
-- (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(ViScope *)scope;
 - (void)keyDown:(NSEvent *)theEvent;
-- (void)keyDown:(NSEvent *)theEvent inScope:(NSArray *)scopeArray;
+- (void)keyDown:(NSEvent *)theEvent inScope:(ViScope *)scope;
 - (BOOL)handleKey:(NSInteger)keyCode;
-- (BOOL)handleKey:(NSInteger)keyCode inScope:(NSArray *)scopeArray;
+- (BOOL)handleKey:(NSInteger)keyCode inScope:(ViScope *)scope;
 - (void)handleKeys:(NSArray *)keys;
-- (void)handleKeys:(NSArray *)keys inScope:(NSArray *)scopeArray;
-- (void)runAsMacro:(NSString *)inputString;
+- (void)handleKeys:(NSArray *)keys inScope:(ViScope *)scope;
+- (BOOL)runAsMacro:(NSString *)inputString interactively:(BOOL)interactiveFlag;
+- (BOOL)runAsMacro:(NSString *)inputString;
 @end
 
 @interface NSObject (ViKeyManagerTarget)
 - (BOOL)keyManager:(ViKeyManager *)aKeyManager
-    shouldParseKey:(NSInteger)keyCode;
+    shouldParseKey:(NSInteger)keyCode
+	   inScope:(ViScope *)scope;
 - (void)keyManager:(ViKeyManager *)aKeyManager
       presentError:(NSError *)error;
 - (BOOL)keyManager:(ViKeyManager *)keyManager

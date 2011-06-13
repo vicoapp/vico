@@ -16,19 +16,20 @@
 	NSUInteger finalLocation;
 }
 
-@property (readonly) ViMapping *mapping;
-@property (readwrite) int count;
-@property (readwrite) BOOL fromDot;
-@property (readwrite) BOOL isLineMode;
-@property (readonly) BOOL isMotion;
-@property (readonly) BOOL hasOperator;
-@property (readwrite) unichar argument;
-@property (readwrite) unichar reg;
-@property (readwrite) ViCommand *motion;
-@property (readwrite) ViCommand *operator;
-@property (readwrite) id text;
-@property (readwrite) NSRange affectedRange;
-@property (readwrite) NSUInteger finalLocation;
+@property(nonatomic,readonly) ViMapping *mapping;
+@property(nonatomic,readwrite) int count;
+@property(nonatomic,readwrite) BOOL fromDot;
+@property(nonatomic,readwrite) BOOL isLineMode;
+@property(nonatomic,readonly) BOOL isMotion;
+@property(nonatomic,readonly) BOOL hasOperator;
+@property(nonatomic,readwrite) unichar argument;
+@property(nonatomic,readwrite) unichar reg;
+@property(nonatomic,readwrite) ViCommand *motion;
+@property(nonatomic,readwrite) ViCommand *operator;
+@property(nonatomic,readwrite) id text;
+@property(nonatomic,readwrite) NSRange affectedRange;
+@property(nonatomic,readwrite) NSUInteger finalLocation;
+@property(nonatomic,readwrite) ViMacro *macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping
                             count:(int)aCount;

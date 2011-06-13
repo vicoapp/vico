@@ -4,13 +4,12 @@
 #import "NSEvent-keyAdditions.h"
 #import "NSView-additions.h"
 #import "ExCommand.h"
+#import "ExEnvironment.h"
 #include "logging.h"
 
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
 @implementation ViWebView
-
-@synthesize environment;
 
 - (void)awakeFromNib
 {
@@ -60,16 +59,12 @@
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
-	ViWindowController *windowController = [[self window] windowController];
 	DEBUG(@"command is %@", command);
 	MESSAGE(@""); // erase any previous message
-	id target;
-	if ([self respondsToSelector:command.action])
-		target = self;
-	else if ([windowController respondsToSelector:command.action])
-		target = windowController;
-	else {
-		MESSAGE(@"Command not implemented.");
+	id target = [self targetForSelector:command.action];
+	if (target == nil) {
+		MESSAGE(@"Command %@ not implemented.",
+		    command.mapping.keyString);
 		return NO;
 	}
 
@@ -183,7 +178,9 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	NSString *exline = [[[self window] windowController] getExStringForCommand:command];
+	ExEnvironment *env = [(ViWindowController *)[[self window] windowController] environment];
+	NSString *exline = [env getExStringForCommand:command
+                                        interactively:YES /* obviously */];
 	if (exline == nil)
 		return NO;
 

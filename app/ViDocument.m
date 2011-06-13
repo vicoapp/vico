@@ -335,6 +335,23 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	hiddenView = nil;
 }
 
+- (ViTextView *)text
+{
+	if (scriptView == nil) {
+		ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
+		[textStorage addLayoutManager:layoutManager];
+		[layoutManager setDelegate:self];
+		NSRect frame = NSMakeRect(0, 0, 10, 10);
+		NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
+		[layoutManager addTextContainer:container];
+		scriptView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
+		ViParser *parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
+		[scriptView initWithDocument:self viParser:parser];
+		[[ViEventManager defaultManager] emit:ViEventDidMakeView for:self with:self, [NSNull null], scriptView, nil];
+	}
+	return scriptView;
+}
+
 - (ViDocumentView *)makeViewInWindow:(NSWindow *)aWindow
 {
 	if (hiddenView) {

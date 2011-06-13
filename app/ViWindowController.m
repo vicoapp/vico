@@ -101,7 +101,8 @@ static ViWindowController	*currentWindowController = nil;
 - (void)getMoreBundles:(id)sender
 {
 	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:)
-							  withObject:@"BundlesItem" afterDelay:0.01];
+                                                          withObject:@"Bundles"
+                                                          afterDelay:0.01];
 }
 
 - (void)windowDidResize:(NSNotification *)notification

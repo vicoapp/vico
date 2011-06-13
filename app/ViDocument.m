@@ -798,7 +798,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[invocation setArgument:&contextInfo atIndex:4];
 	[invocation invokeWithTarget:delegate];
 
-	if ([aWindowController windowShouldClose:[aWindowController window]])
+	if ([(ViWindowController *)aWindowController windowShouldClose:[aWindowController window]])
 		[[aWindowController window] close];
 }
 

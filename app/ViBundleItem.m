@@ -6,7 +6,7 @@
 @synthesize bundle;
 @synthesize uuid;
 @synthesize name;
-@synthesize scope;
+@synthesize scopeSelector;
 @synthesize mode;
 @synthesize keyEquivalent;
 @synthesize modifierMask;
@@ -21,7 +21,7 @@
 		bundle = aBundle;
 
 		name = [dict objectForKey:@"name"];
-		scope = [dict objectForKey:@"scope"];
+		scopeSelector = [dict objectForKey:@"scope"];
 		uuid = [dict objectForKey:@"uuid"];
 		tabTrigger = [dict objectForKey:@"tabTrigger"];
 

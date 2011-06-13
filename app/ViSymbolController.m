@@ -143,7 +143,7 @@
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter = [symbolFilterField stringValue];
-	if ([filter length] > 0) {
+	if ([filter length] > 0 && [item isKindOfClass:[ViSymbol class]]) {
 		[symbolFilterCache setObject:[item symbol] forKey:filter];
 		[symbolFilterField setStringValue:@""];
 	}

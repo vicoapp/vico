@@ -251,6 +251,7 @@ static NSMutableDictionary *maps = nil;
 	ViMapping *candidate = nil;
 	ViMapping *exact_candidate = nil;
 	ViMap *exact_candidate_map = nil; /* map of the exact_candidate */
+	u_int64_t exact_candidate_rank = 0;
 	ViMapping *op = nil; /* fully matched operator */
 	NSUInteger len = [keySequence count];
 	BOOL gotMultipleCandidates = NO;
@@ -273,7 +274,8 @@ static NSMutableDictionary *maps = nil;
 			BOOL equalMatch = (len == mlen);
 
 			/* FIXME: compare rank of all matches */
-			if ([m.scopeSelector match:scope] == 0)
+			u_int64_t rank = [m.scopeSelector match:scope];
+			if (rank == 0)
 				continue;
 
 			DEBUG(@"testing key [%@] against %@ (%s)",
@@ -314,7 +316,15 @@ static NSMutableDictionary *maps = nil;
 					 *
 					 * Should included macros still be preferred over actions?
 					 */
-					if (map == exact_candidate_map) {
+					
+					if (rank > exact_candidate_rank) {
+						DEBUG(@"%@ in map %@ w/rank %llu overrides %@ in map %@ w/rank %llu",
+						    m, map, rank,
+						    exact_candidate, exact_candidate_map, exact_candidate_rank);
+						if (candidate == exact_candidate)
+							candidate = nil;
+						exact_candidate = nil;
+					} else if (map == exact_candidate_map) {
 						if ([exact_candidate isAction] == [m isAction]) {
 							INFO(@"Ouch! already got an exact match %@ in map %@",
 							    exact_candidate, map);
@@ -350,6 +360,7 @@ static NSMutableDictionary *maps = nil;
 					DEBUG(@"got exact candidate %@", m);
 					exact_candidate = m;
 					exact_candidate_map = map;
+					exact_candidate_rank = rank;
 				}
 			}
 

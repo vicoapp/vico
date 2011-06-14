@@ -1292,9 +1292,9 @@ int logIndent = 0;
 	if ([pair0 isEqualToString:pair1]) {
 		ViScope *scope = [document scopeAtLocation:location];
 		if ([pair0 isEqualToString:@"\""])
-			return [@"string.quoted.double$" match:scope] > 0;
+			return [@"string.quoted.double$|string.quoted.double>invalid.illegal.unclosed-string$" match:scope] > 0;
 		else if ([pair0 isEqualToString:@"'"])
-			return [@"string.quoted.single$" match:scope] > 0;
+			return [@"string.quoted.single$|string.quoted.single>invalid.illegal.unclosed-string$" match:scope] > 0;
 	}
 
 	return NO;

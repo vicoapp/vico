@@ -1958,13 +1958,13 @@ int logIndent = 0;
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithKeyCode:keyCode
 								    matchingScope:scope
 									   inMode:mode];
+		DEBUG(@"key %@ in scope %@ matched bundle items %@",
+		    [NSString stringWithKeyCode:keyCode], scope, matches);
 		if ([matches count] > 0) {
 			[self performBundleItems:matches];
 			return [NSNumber numberWithBool:NO]; /* We already handled the key */
 		}
-	}
 
-	if (!keyManager.parser.partial && ![self isFieldEditor]) {
 		if (mode == ViVisualMode)
 			[keyManager.parser setVisualMap];
 		else if (mode == ViInsertMode)

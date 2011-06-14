@@ -247,9 +247,6 @@
 						     name:NSMenuDidEndTrackingNotification
 						   object:[NSApp mainMenu]];
 
-	NSString *consoleStartup = @"((NuConsoleWindowController alloc) init)";
-	[self eval:consoleStartup error:nil];
-
 	NSString *siteFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"];
 	NSString *siteScript = [NSString stringWithContentsOfFile:siteFile
 							 encoding:NSUTF8StringEncoding

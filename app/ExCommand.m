@@ -883,15 +883,15 @@ ex_cmd_find(NSString *cmd)
 			 * QUOTING NOTE:
 			 *
 			 * Backslashes quote delimiter characters for RE's.
-			 * The backslashes are NOT removed since they'll be
-			 * used by the RE code.  Move to the third delimiter
+			 * Move to the third delimiter
 			 * that's not escaped (or the end of the command).
 			 */
-			if (![scan scanUpToUnescapedCharacter:delimiter intoString:&pattern] ||
+			if (![scan scanUpToUnescapedCharacter:delimiter intoString:&pattern stripEscapes:NO] ||
 			    ![scan scanCharacter:nil])
 				goto usage;
+
 			replacement = @"";
-			if ([scan scanUpToUnescapedCharacter:delimiter intoString:&replacement] &&
+			if ([scan scanUpToUnescapedCharacter:delimiter intoString:&replacement stripEscapes:YES] &&
 			    ![scan scanCharacter:nil])
 				goto usage;
 		}

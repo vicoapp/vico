@@ -618,6 +618,7 @@
 											<object class="NSMenuItem" id="684449483">
 												<reference key="NSMenu" ref="1042284489"/>
 												<bool key="NSIsDisabled">YES</bool>
+												<bool key="NSIsHidden">YES</bool>
 												<string key="NSTitle">Sentence (vis)(is)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -637,6 +638,7 @@
 											<object class="NSMenuItem" id="670726447">
 												<reference key="NSMenu" ref="1042284489"/>
 												<bool key="NSIsDisabled">YES</bool>
+												<bool key="NSIsHidden">YES</bool>
 												<string key="NSTitle">Bracketed Block (vi[)(i[)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -647,6 +649,7 @@
 											<object class="NSMenuItem" id="1018563354">
 												<reference key="NSMenu" ref="1042284489"/>
 												<bool key="NSIsDisabled">YES</bool>
+												<bool key="NSIsHidden">YES</bool>
 												<string key="NSTitle">Braced Block (viB)(iB)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -4001,7 +4004,6 @@
 							<string>explorerView</string>
 							<string>filterField</string>
 							<string>progressIndicator</string>
-							<string>rootButton</string>
 							<string>scrollView</string>
 							<string>searchToolbarItem</string>
 							<string>sftpConnectForm</string>
@@ -4021,7 +4023,6 @@
 							<string>ViBgView</string>
 							<string>NSSearchField</string>
 							<string>NSProgressIndicator</string>
-							<string>NSPathControl</string>
 							<string>NSScrollView</string>
 							<string>NSToolbarItem</string>
 							<string>NSForm</string>
@@ -4044,7 +4045,6 @@
 							<string>explorerView</string>
 							<string>filterField</string>
 							<string>progressIndicator</string>
-							<string>rootButton</string>
 							<string>scrollView</string>
 							<string>searchToolbarItem</string>
 							<string>sftpConnectForm</string>
@@ -4090,10 +4090,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">progressIndicator</string>
 								<string key="candidateClassName">NSProgressIndicator</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">rootButton</string>
-								<string key="candidateClassName">NSPathControl</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">scrollView</string>

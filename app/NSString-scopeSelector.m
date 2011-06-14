@@ -380,7 +380,7 @@ tenpow(NSUInteger x)
 
 - (u_int64_t)match:(ViScope *)scope
 {
-	if (scope == nil)
+	if ([self length] == 0)
 		return 1ULL;
 	return [scope match:self];
 }

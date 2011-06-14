@@ -108,5 +108,11 @@
 	return self;
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@: %p, %@, scope %@>",
+	    NSStringFromClass([self class]), self, name, scopeSelector];
+}
+
 @end
 

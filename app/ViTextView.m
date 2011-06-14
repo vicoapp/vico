@@ -415,6 +415,24 @@ int logIndent = 0;
 	}
 }
 
+- (unichar)characterAtIndex:(NSUInteger)location
+{
+	NSString *s = [[self textStorage] string];
+	if (location >= [s length])
+		return 0;
+	return [s characterAtIndex:location];
+}
+
+- (unichar)currentCharacter
+{
+	return [self characterAtIndex:[self caret]];
+}
+
+- (NSString *)line
+{
+	return [[self textStorage] lineForLocation:[self caret]];
+}
+
 #pragma mark -
 #pragma mark Indentation
 

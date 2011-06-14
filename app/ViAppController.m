@@ -535,6 +535,9 @@ additionalBindings:(NSDictionary *)bindings
 			continue;
 		}
 
+		if ([item isHidden])
+			continue;
+
 		NSString *title = nil;
 		if ([item tag] == 4000) {
 			title = [item title];

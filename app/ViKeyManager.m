@@ -167,6 +167,8 @@
 	[keyTimeout invalidate];
 	keyTimeout = nil;
 
+	DEBUG(@"handling key %li (%@) in scope %@", keyCode, [NSString stringWithKeyCode:keyCode], scope);
+
 	if (keyCode == -1) {
 		if (outError)
 			*outError = [ViError errorWithFormat:@"Internal error."];

@@ -234,6 +234,7 @@ static ViWindowController	*currentWindowController = nil;
 			[textStorage addLayoutManager:layoutManager];
 			NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
 			[layoutManager addTextContainer:container];
+			[layoutManager setShowsControlCharacters:YES];
 			NSRect frame = NSMakeRect(0, 0, 100, 10);
 			viFieldEditor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];

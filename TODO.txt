@@ -1,11 +1,6 @@
 BEFORE 1.0
 ==========
 
-* can Nu return BOOLs?
-* define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
-
-? cmd-slash highlights current line?
-
 
 REGRESSIONS
 ===========
@@ -29,6 +24,8 @@ REQUESTED
 
 URGENT
 ========
+* cmd-slash highlights current line?
+* can Nu return BOOLs?
 * "&" in :s replace part should expand to whole match
 * explorer flickers when opening new windows!
 * bundle commands not repeatable with dot
@@ -57,6 +54,7 @@ BUGS
 
 IMPORTANT
 =========
+* define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
 * :q should terminate app on last document in last window?
 * installer for vicotool
 * indented paste

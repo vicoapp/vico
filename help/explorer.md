@@ -31,7 +31,10 @@ Here is a list of all key mappings in the explorer:
   * <kbd>v</kbd> &mdash; open the selected file in a vertical split view
   * <kbd>t</kbd> &mdash; open the selected file in a tab
   * <kbd>N</kbd> &mdash; create a new directory
+  * <kbd>r</kbd> &mdash; rename the selected file
   * <kbd>dd</kbd> &mdash; delete the selected files
-  * <kbd>&lt;ctrl-l&gt;</kbd> &mdash; rescan files
+  * <kbd>&lt;ctrl-o&gt;</kbd> &mdash; navigate back in the browse history
+  * <kbd>&lt;ctrl-i&gt;</kbd> &mdash; navigate forward in the browse history
+  * <kbd>&lt;ctrl-l&gt;</kbd> &mdash; rescan files in the selected directory
   * <kbd>&lt;ctrl-esc&gt;</kbd> or <kbd>&lt;cmd-esc&gt;</kbd> &mdash; show action menu
 

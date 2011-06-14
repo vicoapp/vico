@@ -201,11 +201,6 @@ struct ex_command ex_commands[] = {
 		"!W",
 		@"map[!] [keys replace]",
 		@"map input or commands to one or more keys"},
-	/* C_NEXT */
-	{@"next",	@"ex_next",	EX_NEWSCREEN,
-		"!fN",
-		@"[Nn][ext][!] [+cmd] [file ...]",
-		@"edit (and optionally specify) the next file"},
 	{@"new",	@"ex_new",	0,
 		"f1o",
 		@"new [file]",
@@ -215,26 +210,6 @@ struct ex_command ex_commands[] = {
 		"ca1",
 		@"[line [,line]] nu[mber] [count] [l]",
 		@"change display to number lines"},
-	/* C_OPEN */
-	{@"open",	@"ex_open",	EX_ADDR1,
-		"s",
-		@"[line] o[pen] [/RE/] [flags]",
-		@"enter \"open\" mode (not implemented)"},
-	/* C_PRINT */
-	{@"print",	@"ex_pr",		EX_ADDR2|EX_CLRFLAG,
-		"ca1",
-		@"[line [,line]] p[rint] [count] [#l]",
-		@"display lines"},
-	/* C_PRESERVE */
-	{@"preserve",	@"ex_preserve",	0,
-		"",
-		@"pre[serve]",
-		@"preserve an edit session for recovery"},
-	/* C_PREVIOUS */
-	{@"previous",	@"ex_prev",	EX_NEWSCREEN,
-		"!",
-		@"[Pp]rev[ious][!]",
-		@"edit the previous file in the file argument list"},
 	/* C_PUT */
 	{@"put",		@"ex_put",	
 		EX_ADDR1|EX_AUTOPRINT|EX_ADDR_ZERO|EX_ADDR_ZERODEF,
@@ -257,16 +232,6 @@ struct ex_command ex_commands[] = {
 		"s",
 		@"[line] r[ead] [!cmd | [file]]",
 		@"append input from a command or file to the line"},
-	/* C_RECOVER */
-	{@"recover",	@"ex_recover",	0,
-		"!f1r",
-		@"recover[!] file",
-		@"recover a saved file"},
-	/* C_REWIND */
-	{@"rewind",	@"ex_rew",		0,
-		"!",
-		@"rew[ind][!]",
-		@"re-edit all the files in the file argument list"},
 	/*
 	 * !!!
 	 * Adding new commands starting with 's' may break the substitute command code

@@ -49,6 +49,8 @@
 
 - (u_int64_t)match:(NSString *)scopeSelector
 {
+	if (scopeSelector == nil)
+		return 1ULL;
 	return [scopeSelector matchesScopes:scopes];
 }
 

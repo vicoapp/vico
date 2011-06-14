@@ -1,7 +1,7 @@
 # Ex command ranges
 
 Many [ex commands](ex_cmds.html) accept a range of lines to operate
-upon. The range preced the command name and consists of zero, one or
+upon. The range precede the command name and consists of zero, one or
 two line specifiers separated with comma. 
 
 A line specifier can be written as:

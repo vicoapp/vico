@@ -15,6 +15,7 @@ The standard operator commands are:
   * <kbd>!</kbd> -- filter through external command
   * <kbd>gu</kbd> -- lowercase
   * <kbd>gU</kbd> -- uppercase
+  * <kbd>gq</kbd> -- format text
 
 You combine the operator with a motion just by entering the motion command
 after the operator. For example, <kbd>cw</kbd> **c**hanges a **w**ord.

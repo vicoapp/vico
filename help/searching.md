@@ -17,3 +17,5 @@ You can repeat the last seach command in the same direction with the
 <kbd>n</kbd> command. The upper case <kbd>N</kbd> command reverses the
 direction.
 
+  * [Movement](movement.html)
+

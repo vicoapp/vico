@@ -1976,7 +1976,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		[self splitVertically:[command.command->name isEqualToString:@"vbuffer"]
                               andOpen:nil
                    orSwitchToDocument:doc
-                      allowReusedView:YES];
+                      allowReusedView:NO];
 
 	return YES;
 }

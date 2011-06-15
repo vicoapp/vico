@@ -785,6 +785,7 @@ int logIndent = 0;
 
 - (IBAction)undo:(id)sender
 {
+	[self endUndoGroup];
 	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];
@@ -795,6 +796,7 @@ int logIndent = 0;
 
 - (IBAction)redo:(id)sender
 {
+	[self endUndoGroup];
 	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];

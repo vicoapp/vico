@@ -1241,6 +1241,7 @@
 	 */
 
 	[self cancelSnippet];
+	[self endUndoGroup];
 
 	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
 	if ([undoStyle isEqualToString:@"nvi"]) {
@@ -1284,6 +1285,7 @@
 - (BOOL)vim_redo:(ViCommand *)command
 {
 	[self cancelSnippet];
+	[self endUndoGroup];
 
 	NSString *undoStyle = [[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"];
 	if ([undoStyle isEqualToString:@"nvi"])

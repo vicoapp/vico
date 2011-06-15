@@ -1940,8 +1940,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (BOOL)ex_buffer:(ExCommand *)command
 {
-	if ([command.string length] == 0)
+	if ([command.string length] == 0) {
+		[self message:@"Missing buffer name"];
 		return NO;
+	}
 
 	NSMutableArray *matches = [NSMutableArray array];
 

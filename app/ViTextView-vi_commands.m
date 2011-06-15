@@ -635,8 +635,8 @@
 		[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:end_location];
 		DEBUG(@"end_location = %u, bol = %u, eol = %u, end = %u", end_location, bol, eol, end);
 		if (end_location == bol) {
-			end_location--;
-			affectedRange.length--;
+			end_location -= (end - eol);
+			affectedRange.length -= (end - eol);
 		}
 	}
 

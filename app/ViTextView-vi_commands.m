@@ -541,7 +541,7 @@
 
 	NSUInteger end, eol;
 	[self getLineStart:NULL end:&end contentsEnd:&eol];
-	if ([content hasSuffix:@"\n"]) {
+	if ([content hasSuffix:@"\n"]) { // XXX: this assumes UNIX line endings
 		// putting whole lines
 		final_location = end;
 	} else if (start_location < eol) {
@@ -2034,11 +2034,14 @@
 
 - (BOOL)find_current_word:(ViCommand *)command options:(int)options
 {
-	NSString *word = [[self textStorage] wordAtLocation:start_location];
+	NSRange wordRange;
+	NSString *word = [[self textStorage] wordAtLocation:start_location range:&wordRange];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
 		keyManager.parser.last_search_pattern = pattern;
 		keyManager.parser.last_search_options = options;
+		if (options == ViSearchOptionBackwards)
+			start_location = wordRange.location;
 		return [self findPattern:pattern options:options];
 	}
 	return NO;

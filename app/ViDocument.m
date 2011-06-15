@@ -52,6 +52,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize busy;
 @synthesize loader;
 @synthesize closeCallback;
+@synthesize ignoreChangeCountNotification;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
@@ -592,11 +593,15 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[ViEventManager defaultManager] emit:ViEventWillSaveDocument for:self with:self, nil];
 	else if (saveOperation == NSSaveAsOperation)
 		[[ViEventManager defaultManager] emit:ViEventWillSaveAsDocument for:self with:self, absoluteURL, nil];
+	[self endUndoGroup];
 
-	return [self writeSafelyToURL:absoluteURL
+	if ([self writeSafelyToURL:absoluteURL
 			       ofType:typeName
 		     forSaveOperation:saveOperation
-				error:outError];
+				error:outError]) {
+		ignoreChangeCountNotification = YES;
+		[[self nextRunloop] setIgnoreChangeCountNotification:NO];
+	}
 }
 
 - (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data
@@ -717,6 +722,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)updateChangeCount:(NSDocumentChangeType)changeType
 {
+	DEBUG(@"called from %@", [NSThread callStackSymbols]);
+	if (ignoreChangeCountNotification) {
+		DEBUG(@"%s", "ignoring change count notification");
+		ignoreChangeCountNotification = NO;
+		return;
+	}
 	BOOL edited = [self isDocumentEdited];
 	[super updateChangeCount:changeType];
 	if (edited != [self isDocumentEdited]) {
@@ -802,6 +813,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[[aWindowController window] close];
 }
 
+#pragma mark -
+
+- (void)endUndoGroup
+{
+	if (hasUndoGroup) {
+		DEBUG(@"%s", "====================> Ending undo-group");
+		[[self undoManager] endUndoGrouping];
+		hasUndoGroup = NO;
+	}
+}
+
+- (void)beginUndoGroup
+{
+	if (!hasUndoGroup) {
+		DEBUG(@"%s", "====================> Beginning undo-group");
+		[[self undoManager] beginUndoGrouping];
+		hasUndoGroup = YES;
+	}
+}
 
 #pragma mark -
 #pragma mark Syntax parsing

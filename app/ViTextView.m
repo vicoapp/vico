@@ -521,7 +521,7 @@ int logIndent = 0;
 		if ([rx matchInString:checkLine])
 			return YES;
 	}
-	
+
 	return NO;
 }
 
@@ -807,7 +807,9 @@ int logIndent = 0;
 
 - (void)endUndoGroup
 {
-	if (hasUndoGroup) {
+	if ([document undoManager])
+		[document endUndoGroup];
+	else if (hasUndoGroup) {
 		DEBUG(@"%s", "====================> Ending undo-group");
 		[undoManager endUndoGrouping];
 		hasUndoGroup = NO;
@@ -816,7 +818,9 @@ int logIndent = 0;
 
 - (void)beginUndoGroup
 {
-	if (!hasUndoGroup) {
+	if ([document undoManager])
+		[document beginUndoGroup];
+	else if (!hasUndoGroup) {
 		DEBUG(@"%s", "====================> Beginning undo-group");
 		[undoManager beginUndoGrouping];
 		hasUndoGroup = YES;

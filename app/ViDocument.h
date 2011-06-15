@@ -21,6 +21,9 @@
 	/* Set when opening a new file from the ex command line. */
 	BOOL isTemporary;
 
+	BOOL hasUndoGroup;
+	BOOL ignoreChangeCountNotification; // XXX: this is a hack
+
 	id<ViDeferred> loader;
 	BOOL busy;
 
@@ -64,6 +67,7 @@
 @property(nonatomic,readwrite) BOOL busy;
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property(nonatomic,readonly) id<ViDeferred> loader;
+@property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;

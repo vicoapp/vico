@@ -215,6 +215,7 @@
 (nmap setKey:"Y" toAction:"yank:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"a" toEditAction:"append:")
 (nmap setKey:"c" toOperator:"change:")
+(nmap setKey:"cc" toEditAction:"subst_lines:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"d" toOperator:"delete:")
 (nmap setKey:"i" toEditAction:"insert:")
 (nmap setKey:"m" toAction:"set_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)

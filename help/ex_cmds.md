@@ -17,13 +17,13 @@ The following [ex](ex.html) commands are available:
   * <kbd>:sbuffer</kbd> <filename> &mdash; split view horizontally and edit another open document
   * <kbd>:set</kbd> option[=value] &mdash; set an option
   * <kbd>:setfiletype</kbd> <syntax> &mdash; change the language syntax of the document
-  * <kbd>:split</kbd> &mdash; split the current view horizontally
+  * <kbd>:split</kbd> [filename] &mdash; split the current view horizontally, and optionally edit another file
   * <kbd>:tabedit</kbd> <filename> &mdash; edit another file in a new tab
   * <kbd>:tabnew</kbd> &mdash; edit a new file in a new tab
   * <kbd>:tbuffer</kbd> <filename> &mdash; switch to a tab showing <filename>, or open a new tab
   * <kbd>:vbuffer</kbd> <filename> &mdash; split view vertically and edit another open document
   * <kbd>:vnew</kbd> &mdash; edit a new file in a new vertical split
-  * <kbd>:vsplit</kbd> &mdash; split the current view vertically
+  * <kbd>:vsplit</kbd> [filename] &mdash; split the current view vertically, and optionally edit another file
   * <kbd>:write</kbd> [new filename] &mdash; save the document, optionally with a new name
   * <kbd>:wq</kbd> &mdash; write the document and close it
   * <kbd>:x[it]</kbd> &mdash; write the document and close it

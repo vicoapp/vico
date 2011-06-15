@@ -388,21 +388,22 @@ withParser:(NuParser *)parser
 
 	DEBUG(@"evaluating script: {{{ %@ }}}", script);
 
-	id code = [parser parse:script];
-	if (code == nil) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"parse failed"];
-		return nil;
-	}
 	id result = nil;
 	@try {
+		id code = [parser parse:script];
+		if (code == nil) {
+			if (outError)
+				*outError = [ViError errorWithFormat:@"parse failed"];
+			return nil;
+		}
+
 		DEBUG(@"context: %@", [parser context]);
 		result = [parser eval:code];
 	}
 	@catch (NSException *exception) {
 		INFO(@"%@: %@", [exception name], [exception reason]);
 		if (outError)
-			*outError = [ViError errorWithFormat:@"Got exception %@:\n%@", [exception name], [exception reason]];
+			*outError = [ViError errorWithFormat:@"Got exception %@: %@", [exception name], [exception reason]];
 		return nil;
 	}
 

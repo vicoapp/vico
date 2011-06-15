@@ -2462,6 +2462,7 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
+	[self updateStatus]; // clear any previous message
 	NSString *exline = [[document environment] getExStringForCommand:command
                                                            interactively:([self window] != nil)];
 	if (exline == nil)

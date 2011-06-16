@@ -26,8 +26,6 @@
 		<string>Vico.helpindex</string>
 		<key>HPDBookKBProduct</key>
 		<string>vico</string>
-		<key>HPDBookRemoteURL</key>
-		<string>http://www.vicoapp.com/help/</string>
 		<key>HPDBookKBURL</key>
 		<string>http://help.vicoapp.com/kbsearch?q='query'</string>
 		<key>HPDBookTopicListCSSPath</key>

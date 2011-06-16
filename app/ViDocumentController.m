@@ -131,7 +131,7 @@
 
 	if (force || [window attachedSheet] == nil) {
 		[[doc windowController] selectDocument:doc];
-		/* 
+		/*
 		 * Schedule next close sheet in the event loop right after the windowcontroller has selected the document.
 		 */
 		SEL closeSelector = @selector(document:shouldCloseForSet:contextInfo:);

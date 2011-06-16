@@ -122,7 +122,7 @@
 	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
 	[[shellInput fileHandleForWriting] closeFile];
 	[task waitUntilExit];
-	
+
 #ifndef NO_DEBUG
 	int status = [task terminationStatus];
 	if (status != 0)
@@ -248,6 +248,12 @@
 							    [scan scanLocation] + 1];
 						return NO;
 					}
+
+					/*
+					 * If the replacement format escaped the delimiting slash, we should remove the escape.
+					 * Other escapes should be left intact though.
+					 */
+					format = [format stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"];
 
 					[scan scanCharactersFromSet:[NSCharacterSet alphanumericCharacterSet]
 					                 intoString:&options];

@@ -1,8 +1,6 @@
 BEFORE 1.0
 ==========
 
-* error in symbol when cw imethod - in nu file
-
 
 REGRESSIONS
 ===========
@@ -26,6 +24,7 @@ REQUESTED
 
 URGENT
 ========
+* quickly repeating shell filters get stuck (try !!nl and hold down . to repeat)
 * can Nu return BOOLs?
 * "&" in :s replace part should expand to whole match
 * explorer flickers when opening new windows!

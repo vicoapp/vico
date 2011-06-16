@@ -320,6 +320,8 @@
 (sidemap include:amap)
 (sidemap setKey:"<down>" toMotion:"move_down:")
 (sidemap setKey:"<up>" toMotion:"move_up:")
+(sidemap setKey:"<left>" toMotion:"move_left:")
+(sidemap setKey:"<right>" toMotion:"move_right:")
 (sidemap setKey:"<c-b>" toMotion:"backward_screen:")
 (sidemap setKey:"<c-d>" toAction:"scroll_downward:")
 (sidemap setKey:"<c-e>" toAction:"scroll_down_by_line:")

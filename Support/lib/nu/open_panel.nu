@@ -19,7 +19,7 @@
 (load "vico")
 
 (set openPanel (NSOpenPanel openPanel))
-(unless (defined? options)
+(unless (defined options)
 	(set options (NSDictionary dictionary)))
 (if (set title (options objectForKey:"title"))
 	(openPanel setTitle:title))

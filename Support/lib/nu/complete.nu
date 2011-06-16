@@ -32,7 +32,7 @@
 		(responseCallback @completions nil)
 		(nil)))
 
-(unless (defined? choices)
+(unless (defined choices)
 	(shellCommand log:"missing choices")
 	(shellCommand exitWithError:1)
 (else

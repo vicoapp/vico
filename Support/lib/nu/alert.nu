@@ -16,13 +16,13 @@
 
 ((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
 
-(unless (defined? buttonTitles)
+(unless (defined buttonTitles)
 	(set buttonTitles (NSArray arrayWithList:'("OK" "Cancel"))))
-(unless (defined? messageTitle)
+(unless (defined messageTitle)
 	(set messageTitle "Something happened"))
-(unless (defined? informativeText)
+(unless (defined informativeText)
 	(set informativeText "It was unexpected"))
-(unless (defined? alertStyle)
+(unless (defined alertStyle)
 	(set alertStyle "informational"))
 
 (set alert ((NSAlert alloc) init))

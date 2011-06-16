@@ -832,6 +832,10 @@
 
 	NSUInteger location = start_location;
 	while (count--) {
+		if (location == 0) {
+			MESSAGE(@"Movement past the beginning of the file");
+			return NO;
+		}
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:location];
 		if (location == bol) {
@@ -872,11 +876,19 @@
 
 	NSUInteger location = start_location;
 	while (count--) {
+		if (location >= [[self textStorage] length]) {
+			MESSAGE(@"Movement past the end-of-file");
+			return NO;
+		}
 		NSUInteger end, eol;
 		[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:location];
 		if (location + ((mode == ViInsertMode || command.hasOperator) ? 0 : 1) >= eol) {
 			if (!wrap) {
 				MESSAGE(@"Already at end-of-line");
+				return NO;
+			}
+			if (end == [[self textStorage] length]) {
+				MESSAGE(@"Movement past the end-of-file");
 				return NO;
 			}
 			[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:end];

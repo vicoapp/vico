@@ -9,6 +9,8 @@
 	self = (ViBundleSnippet *)[super initFromDictionary:dict inBundle:aBundle];
 	if (self) {
 		content = [dict objectForKey:@"content"];
+		if (content == nil)
+			return nil;
 	}
 	return self;
 }

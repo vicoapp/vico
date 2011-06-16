@@ -18,6 +18,8 @@
 		fallbackInput = [dict objectForKey:@"fallbackInput"];
 		beforeRunningCommand = [dict objectForKey:@"beforeRunningCommand"];
 		command = [dict objectForKey:@"command"];
+		if (command == nil)
+			return nil;
 		htmlMode = [dict objectForKey:@"htmlMode"];
 	}
 	return self;

@@ -54,9 +54,9 @@
 + (ViEventManager *)defaultManager;
 
 - (void)emit:(NSString *)event for:(id)owner with:(id)arg1, ...;
-- (void)emit:(NSString *)event for:(id)owner withArguments:(NSArray *)arguments;
+- (void)emit:(NSString *)event for:(id)owner withArguments:(id)arguments;
 
-- (void)emitDelayed:(NSString *)event for:(id)owner withArguments:(NSArray *)arguments;
+- (void)emitDelayed:(NSString *)event for:(id)owner withArguments:(id)arguments;
 - (void)emitDelayed:(NSString *)event for:(id)owner with:(id)arg1, ...;
 
 - (NSInteger)on:(NSString *)event by:(id)owner do:(NuBlock *)expression;

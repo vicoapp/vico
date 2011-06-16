@@ -36,7 +36,7 @@ static NSInteger nextEventId = 0;
 	return self;
 }
 
-- (void)emit:(NSString *)event for:(id)owner withArguments:(NSArray *)arguments
+- (void)emit:(NSString *)event for:(id)owner withArguments:(id)arguments
 {
 	DEBUG(@"emitting event %@ for %@", event, owner);
 
@@ -50,7 +50,13 @@ static NSInteger nextEventId = 0;
 	if (arguments == nil)
 		arguments = [NSArray array];
 
-	NuCell *arglist = [arguments list];
+	NuCell *arglist = arguments;
+	if ([arguments isKindOfClass:[NSArray class]])
+		arglist = [arguments list];
+	else if (![arguments isKindOfClass:[NuCell class]]) {
+		INFO(@"invalid type of arguments: %@", NSStringFromClass([arguments class]));
+		return;
+	}
 
 	for (ViEvent *ev in callbacks) {
 		if (ev.owner == nil || [owner isEqual:ev.owner]) {
@@ -61,7 +67,7 @@ static NSInteger nextEventId = 0;
 				id result =
 #endif
 				[ev.expression evalWithArguments:arglist
-								     context:[ev.expression context]];
+							 context:[ev.expression context]];
 				DEBUG(@"expression returned %@", result);
 			}
 			@catch (NSException *exception) {
@@ -89,7 +95,7 @@ static NSInteger nextEventId = 0;
 	[self emit:event for:owner withArguments:arguments];
 }
 
-- (void)emitDelayed:(NSString *)event for:(id)owner withArguments:(NSArray *)arguments
+- (void)emitDelayed:(NSString *)event for:(id)owner withArguments:(id)arguments
 {
 	[[self nextRunloop] emit:event for:owner withArguments:arguments];
 }

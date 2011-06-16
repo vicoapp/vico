@@ -140,7 +140,6 @@
 	    [NSArray arrayWithObjects:
 		[NSDictionary dictionaryWithObject:@"vicoapp" forKey:@"username"],
 		[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"],
-		[NSDictionary dictionaryWithObject:@"jsallis" forKey:@"username"],
 		[NSDictionary dictionaryWithObject:@"kswedberg" forKey:@"username"],
 		nil], @"bundleRepositoryUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",

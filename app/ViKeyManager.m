@@ -63,16 +63,17 @@
 		[[NSApp delegate] exportGlobals:[expression context]];
 		DEBUG(@"evaling with context %@", [expression context]);
 		@try {
-			[[expression body] evalWithContext:[expression context]];
+			id result = [[expression body] evalWithContext:[expression context]];
+			DEBUG(@"got result %@, class %@", result, NSStringFromClass([result class]));
+			return [result respondsToSelector:@selector(boolValue)] && [result boolValue];
 		}
 		@catch (NSException *exception) {
 			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
 			[self presentError:[ViError errorWithFormat:@"Got exception %@:\n%@",
 			    [exception name], [exception reason]]];
+			recursionLevel = 0;
 			return NO;
 		}
-		recursionLevel = 0;
-		return YES; // XXX: check result from expression?
 	}
 
 	NSInteger keyCode;

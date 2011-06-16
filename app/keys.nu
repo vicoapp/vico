@@ -499,6 +499,7 @@
 	(if (document fileURL)
 		(if ((window explorer) selectItemWithURL:(document fileURL))
 			((window explorer) focusExplorer:nil)
+			(YES)
 			(else (window showMessage:"#{((document fileURL) lastPathComponent)} not found in explorer"))) )))
 
 ; macros are not recursive by default (this will just shift j and k)

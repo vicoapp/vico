@@ -147,7 +147,7 @@
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
-	[ViBundle setupEnvironment:env forTextView:self selectedRange:selectedRange];
+	[ViBundle setupEnvironment:env forTextView:self];
 
 	/* Additional bundle specific variables. */
 	[env setObject:[[command bundle] path] forKey:@"TM_BUNDLE_PATH"];

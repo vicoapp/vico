@@ -233,13 +233,15 @@
 
 - (void)test50_AddressExtraColonCommand
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@":3,5:print"];
+	ExCommand *ex = [[ExCommand alloc] initWithString:@":3,5:eval"];
 	STAssertNotNil(ex, nil);
 	STAssertEquals(ex.naddr, 2, nil);
+	STAssertTrue([ex addr1] != NULL, nil);
+	STAssertTrue([ex addr2] != NULL, nil);
 	STAssertEquals([ex addr1]->type, EX_ADDR_ABS, nil);
 	STAssertEquals([ex addr2]->type, EX_ADDR_ABS, nil);
-	STAssertEqualObjects(ex.name, @"print", nil);
-	STAssertEqualObjects(ex.method, @"ex_pr", nil);
+	STAssertEqualObjects(ex.name, @"eval", nil);
+	STAssertEqualObjects(ex.method, @"ex_eval", nil);
 }
 
 - (void)test60_semicolonDelimitedRange
@@ -258,7 +260,7 @@
 	STAssertEqualObjects([ex addr2]->addr.search.pattern, @"pattern", nil);
 	STAssertEquals([ex addr2]->addr.search.backwards, NO, nil);
 	STAssertEquals([ex addr2]->offset, 0, nil);
-	
+
 }
 
 - (void)test60_OneAddressCommandWithTwoAddresses

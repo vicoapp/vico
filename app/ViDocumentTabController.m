@@ -295,7 +295,8 @@
                                  anchor:(ViViewOrderingMode)anchor
 {
 	if ([view isMemberOfClass:[NSSplitView class]]) {
-		if ((anchor == ViViewUp && ![(NSSplitView *)view isVertical]) ||
+		if (anchor == ViViewLast ||
+		    (anchor == ViViewUp && ![(NSSplitView *)view isVertical]) ||
 		    (anchor == ViViewLeft && [(NSSplitView *)view isVertical]))
 			view = [[view subviews] lastObject];
 		else
@@ -355,7 +356,7 @@
 	else
 		newIndex--;
 
-	ViViewOrderingMode anchor = (clockwise ? ViViewRight : ViViewLeft);
+	ViViewOrderingMode anchor = (clockwise ? ViViewRight : ViViewLast);
 
 	NSArray *subviews = [split subviews];
 	if (newIndex >= 0 && newIndex < [subviews count]) {

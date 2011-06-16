@@ -7,7 +7,8 @@ enum ViViewOrderingMode {
 	ViViewLeft,
 	ViViewDown,
 	ViViewUp,
-	ViViewRight
+	ViViewRight,
+	ViViewLast
 };
 
 @protocol ViViewController <NSObject>

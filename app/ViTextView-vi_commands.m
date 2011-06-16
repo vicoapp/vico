@@ -846,7 +846,7 @@
 			}
 			NSUInteger end, eol;
 			[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:bol - 1];
-			location = eol - ((mode == ViInsertMode || command.hasOperator) ? 0 : 1);
+			location = IMAX(bol, eol - ((mode == ViInsertMode || command.hasOperator) ? 0 : 1));
 		} else
 			location--;
 	}

@@ -26,7 +26,6 @@ REQUESTED
 
 URGENT
 ========
-* cmd-slash highlights current line?
 * can Nu return BOOLs?
 * "&" in :s replace part should expand to whole match
 * explorer flickers when opening new windows!

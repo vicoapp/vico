@@ -74,6 +74,7 @@
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
 @property(nonatomic,readonly) ViDocument *previousDocument;
 @property(nonatomic,readwrite,assign) NSURL *baseURL;
+@property(nonatomic,readonly) ViSymbolController *symbolController;
 
 + (ViWindowController *)currentWindowController;
 + (NSWindow *)currentMainWindow;

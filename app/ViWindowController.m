@@ -46,6 +46,7 @@ static ViWindowController	*currentWindowController = nil;
 @synthesize tagStack, tagsDatabase;
 @synthesize previousDocument;
 @synthesize baseURL;
+@synthesize symbolController;
 
 + (ViWindowController *)currentWindowController
 {
@@ -1170,7 +1171,7 @@ static ViWindowController	*currentWindowController = nil;
 		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
 		document = [ctrl openDocumentWithContentsOfURL:url display:YES error:&error];
 		if (error) {
-			[NSApp presentError:error];	
+			[NSApp presentError:error];
 			return NO;
 		}
 	}

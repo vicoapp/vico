@@ -71,10 +71,10 @@
 
 - (void)test053_DoubledCommandImpliesCurrentLine
 {
-	[parser pushKey:'c' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
-	command = [parser pushKey:'c' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
+	[parser pushKey:'d' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
+	command = [parser pushKey:'d' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
 	STAssertNotNil(command, nil);
-	STAssertEquals(command.mapping.action, @selector(change:), nil);
+	STAssertEquals(command.mapping.action, @selector(delete:), nil);
 	STAssertTrue(command.isLineMode, nil);
 	STAssertFalse(command.isMotion, nil);
 }
@@ -143,7 +143,7 @@
 	/* From nvi:
          * A count may be provided both to the command and to the motion, in
          * which case the count is multiplicative.  For example, "3y4y" is the
-         * same as "12yy".  This count is provided to the motion command and 
+         * same as "12yy".  This count is provided to the motion command and
          * not to the regular function.
          */
 	[parser pushKey:'3' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
@@ -270,7 +270,7 @@
 	command = [parser pushKey:'d' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
 	STAssertFalse(command.isLineMode, nil);
 	command = [parser pushKey:'G' allowMacros:YES scope:nil timeout:nil excessKeys:nil error:&error];
-	STAssertTrue(command.isLineMode, nil);	
+	STAssertTrue(command.isLineMode, nil);
 	STAssertEquals(command.count, 0, nil);
 	STAssertEquals(command.motion.count, 0, nil);
 }

@@ -59,7 +59,7 @@
 	ViMap *map = [ViMap normalMap];
 //	[map setKey:@"w" toMotion:@selector(word_forward:)];
 //	[map setKey:@"c" toOperator:@selector(change:)];
-	NSArray *keys = [@"c" keyCodes];
+	NSArray *keys = [@"d" keyCodes];
 	ViMapping *m = [map lookupKeySequence:keys withScope:nil allowMacros:YES excessKeys:nil timeout:nil error:nil];
 	STAssertNotNil(m, nil);
 	STAssertEquals(m.isMotion, NO, nil);

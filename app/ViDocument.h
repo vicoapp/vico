@@ -102,6 +102,9 @@
                         forward:(BOOL)forward
                    fromLocation:(NSUInteger)aLocation;
 
+- (void)endUndoGroup;
+- (void)beginUndoGroup;
+
 - (BOOL)ex_write:(ExCommand *)command;
 - (BOOL)ex_setfiletype:(ExCommand *)command;
 

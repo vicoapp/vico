@@ -17,6 +17,11 @@
 	NuParser *parser;
 }
 
+@property(nonatomic,readonly) NSMutableArray *languages;
+@property(nonatomic,readonly) NSString *path;
+@property(nonatomic,readonly) NSArray *items;
+@property(nonatomic,readonly) NSArray *preferences;
+
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
 + (void)normalizePreference:(NSDictionary *)preference
              intoDictionary:(NSMutableDictionary *)normalizedPreference;
@@ -35,9 +40,5 @@
 - (NSMenu *)menuForScope:(ViScope *)scope
             hasSelection:(BOOL)hasSelection
                     font:(NSFont *)aFont;
-
-@property(nonatomic,readonly) NSMutableArray *languages;
-@property(nonatomic,readonly) NSString *path;
-@property(nonatomic,readonly) NSArray *items;
 
 @end

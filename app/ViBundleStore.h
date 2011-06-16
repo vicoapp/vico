@@ -22,6 +22,7 @@
 - (NSArray *)sortedLanguages;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
+- (NSDictionary *)shellVariablesForScope:(ViScope *)scope;
 - (NSArray *)itemsWithTabTrigger:(NSString *)name
                    matchingScope:(ViScope *)scope
                           inMode:(ViMode)mode

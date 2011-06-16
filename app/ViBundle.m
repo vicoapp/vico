@@ -14,6 +14,7 @@
 @synthesize languages;
 @synthesize path;
 @synthesize items;
+@synthesize preferences;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
@@ -177,23 +178,9 @@
 	/*
 	 * shellVariables from bundle preferences
 	 */
-	NSDictionary *shellVariables = [[ViBundleStore defaultStore] preferenceItem:@"shellVariables"];
-	NSString *bestMatchingScope = [textView.document bestMatchingScope:[shellVariables allKeys] atLocation:[textView caret]];
-
-	if (bestMatchingScope) {
-		id vars = [shellVariables objectForKey:bestMatchingScope];
-		if ([vars isKindOfClass:[NSArray class]]) {
-			for (NSDictionary *var in vars) {
-				if ([var isKindOfClass:[NSDictionary class]]) {
-					NSString *varName = [var objectForKey:@"name"];
-					NSString *varValue = [var objectForKey:@"value"];
-					if ([varName isKindOfClass:[NSString class]] &&
-					    [varValue isKindOfClass:[NSString class]])
-						[env setObject:varValue forKey:varName];
-				}
-			}
-		}
-	}
+	NSDictionary *shellVariables = [[ViBundleStore defaultStore] shellVariablesForScope:[textView.document scopeAtLocation:[textView caret]]];
+	if (shellVariables)
+		[env addEntriesFromDictionary:shellVariables];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env
@@ -252,11 +239,10 @@
 					INFO(@"%@: failed to load plist", f);
 					continue;
 				}
-				if ([plist isKindOfClass:[NSDictionary class]]) {
-					[ViBundle normalizePreference:plist
-						       intoDictionary:[plist objectForKey:@"settings"]];
-					[preferences addObject:plist];
-				}
+
+				[ViBundle normalizePreference:plist
+					       intoDictionary:[plist objectForKey:@"settings"]];
+				[preferences addObject:plist];
 			}
 
 		dir = [path stringByAppendingPathComponent:@"Snippets"];

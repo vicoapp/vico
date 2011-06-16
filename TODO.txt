@@ -1,6 +1,8 @@
 BEFORE 1.0
 ==========
 
+* error in symbol when cw imethod - in nu file
+
 
 REGRESSIONS
 ===========

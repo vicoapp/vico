@@ -210,6 +210,54 @@ static NSString *bundlesDirectory = nil;
 	return result;
 }
 
+- (NSDictionary *)shellVariablesForScope:(ViScope *)scope
+{
+	NSMutableDictionary *result = nil;
+	u_int64_t rank = 0ULL;
+
+	for (ViBundle *bundle in bundles) {
+		NSArray *preferences = bundle.preferences;
+		for (NSDictionary *preference in preferences) {
+			NSString *scopeSelector = [preference objectForKey:@"scope"];
+			if (scopeSelector == nil)
+				scopeSelector = @"";
+			u_int64_t r = [scopeSelector match:scope];
+			if (r == 0 || r < rank)
+				continue;
+
+			NSDictionary *settings = [preference objectForKey:@"settings"];
+			if (![settings isKindOfClass:[NSDictionary class]])
+				continue;
+
+			NSArray *variables = [settings objectForKey:@"shellVariables"];
+			if (![variables isKindOfClass:[NSArray class]])
+				continue;
+
+			if (r > rank) {
+				result = nil;
+				rank = r;
+			}
+
+			for (NSDictionary *d in variables) {
+				if (![d isKindOfClass:[NSDictionary class]])
+					continue;
+				NSString *name = [d objectForKey:@"name"];
+				if (![name isKindOfClass:[NSString class]])
+					continue;
+				id value = [d objectForKey:@"value"];
+				if (value == nil)
+					continue;
+
+				if (result == nil)
+					result = [NSMutableDictionary dictionary];
+				[result setObject:value forKey:name];
+			}
+		}
+	}
+
+	return result;
+}
+
 - (NSArray *)itemsWithTabTrigger:(NSString *)prefix
 		   matchingScope:(ViScope *)scope
 			  inMode:(ViMode)mode

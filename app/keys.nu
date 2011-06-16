@@ -492,6 +492,12 @@
 			; we prefer to open documents in the same view
 			(text input:":buffer <ctrl-f>"))) ))
 
+; reveal current document in explorer
+((ViMap normalMap) map:"<ctrl-cmd-r>" toExpression:(do ()
+	(if (document fileURL)
+		(if ((window explorer) selectItemWithURL:(document fileURL))
+			((window explorer) focusExplorer:nil)
+			(else (window showMessage:"#{((document fileURL) lastPathComponent)} not found in explorer"))) )))
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")

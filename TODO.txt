@@ -37,7 +37,6 @@ URGENT
 BUGS
 ====
 * jumps doesn't work in untitled files
-* h doesn't accept a count
 * bundle commands time out when presenting ui
 * get rid of ViBgView
 * switch undo direction after bundle command

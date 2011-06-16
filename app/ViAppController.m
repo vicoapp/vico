@@ -369,7 +369,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	// [Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
+	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
 }
 

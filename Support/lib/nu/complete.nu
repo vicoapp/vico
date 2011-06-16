@@ -18,6 +18,7 @@
 ;
 ; FIXME: This is currently broken!
 ;
+
 (class TmCompletionProvider is NSObject
 	(unless ($TmProviderLoaded)
 		(set $TmProviderLoaded t)
@@ -28,7 +29,8 @@
 		(set @completions anArray)
 		(self))
 
-	(- (void) completionsForString:(id) aString options:(id) options onResponse:(cblock void (id, id)) responseCallback is
+	; XXX: "I can't bridge this return type yet"
+	(- (void) completionsForString:(id) aString options:(id) options onResponse:(cblock void ((id) completions (id) err)) responseCallback is
 		(responseCallback @completions nil)
 		(nil)))
 

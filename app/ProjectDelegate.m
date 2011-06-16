@@ -26,11 +26,15 @@
 - (NSMutableArray *)filteredContents:(NSArray *)contents ofDirectory:(NSURL *)url;
 - (void)resetExpandedItems;
 - (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items;
+- (id)findItemWithURL:(NSURL *)aURL;
+- (NSInteger)rowForItemWithURL:(NSURL *)aURL;
+- (BOOL)selectItemAtRow:(NSInteger)row;
+- (BOOL)selectItem:(id)item;
+- (BOOL)selectItemWithURL:(NSURL *)aURL;
 - (void)rescanURL:(NSURL *)aURL
      onlyIfCached:(BOOL)cacheFlag
      andRenameURL:(NSURL *)renameURL;
 - (void)rescanURL:(NSURL *)aURL;
-- (void)selectURL:(NSURL *)aURL;
 - (void)resetExplorerView;
 @end
 
@@ -103,6 +107,7 @@
 @implementation ProjectDelegate
 
 @synthesize delegate;
+@synthesize outlineView = explorer;
 
 - (id)init
 {
@@ -165,7 +170,7 @@
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(documentEditedChanged:)
-						     name:ViDocumentEditedChangedNotification 
+						     name:ViDocumentEditedChangedNotification
 						   object:nil];
 
 	[self browseURL:windowController.baseURL];
@@ -205,7 +210,7 @@
 	if (files == nil)
 		return nil;
 
-	id olditem = [self findItemWithURL:url inItems:rootItems];
+	id olditem = [self findItemWithURL:url];
 
 	NSMutableArray *children = [NSMutableArray array];
 	for (NSArray *entry in files) {
@@ -317,8 +322,7 @@
 			[windowController setBaseURL:aURL];
 
 			if (!jump)
-				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-				      byExtendingSelection:NO];
+				[self selectItemAtRow:0];
 		}
 	}];
 
@@ -550,7 +554,7 @@
 	}
 	row = [explorer rowForItem:item];
 	if (row != -1) {
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+		[self selectItemAtRow:row];
 		[explorer editColumn:0 row:row withEvent:nil select:YES];
 	}
 }
@@ -570,7 +574,7 @@
 
 		NSMutableSet *set = [NSMutableSet set];
 		for (NSURL *url in urls) {
-			id item = [self findItemWithURL:url inItems:rootItems];
+			id item = [self findItemWithURL:url];
 			id parent = [explorer parentForItem:item];
 			if (parent == nil)
 				[set addObject:rootURL];
@@ -822,8 +826,7 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 
 	if ([set count] == 0) {
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:explorer.lastSelectedRow]
-		      byExtendingSelection:NO];
+		[self selectItemAtRow:explorer.lastSelectedRow];
 		return;
 	}
 
@@ -849,8 +852,7 @@
 	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
 	if (item && [self outlineView:explorer isItemExpandable:item]) {
 		[self browseURL:[item url]];
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-		      byExtendingSelection:NO];
+		[self selectItemAtRow:0];
 	} else
 		[self explorerClick:sender];
 }
@@ -914,8 +916,7 @@
 	[self openExplorerTemporarily:YES];
 	[window makeFirstResponder:explorer];
 
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:explorer.lastSelectedRow]
-	      byExtendingSelection:NO];
+	[self selectItemAtRow:explorer.lastSelectedRow];
 	[explorer scrollRowToVisible:explorer.lastSelectedRow];
 }
 
@@ -1051,8 +1052,7 @@
 		isFiltering = YES;
 
 		[self expandItems:rootItems];
-		[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-		      byExtendingSelection:NO];
+		[self selectItemAtRow:0];
 	}
 }
 
@@ -1081,14 +1081,12 @@ doCommandBySelector:(SEL)aSelector
 	} else if (aSelector == @selector(moveUp:)) { // up arrow
 		NSInteger row = [explorer selectedRow];
 		if (row > 0)
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row - 1]
-			      byExtendingSelection:NO];
+			[self selectItemAtRow:row - 1];
 		return YES;
 	} else if (aSelector == @selector(moveDown:)) { // down arrow
 		NSInteger row = [explorer selectedRow];
 		if (row + 1 < [explorer numberOfRows])
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row + 1]
-			      byExtendingSelection:NO];
+			[self selectItemAtRow:row + 1];
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
 		isFiltering = NO;
@@ -1096,8 +1094,7 @@ doCommandBySelector:(SEL)aSelector
 			[window makeFirstResponder:explorer];
 			/* make sure something is selected */
 			if ([explorer selectedRow] == -1)
-				[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-				      byExtendingSelection:NO];
+				[self selectItemAtRow:0];
 		} else
 			[self cancelExplorer];
 		return YES;
@@ -1199,24 +1196,56 @@ doCommandBySelector:(SEL)aSelector
 	return nil;
 }
 
+- (id)findItemWithURL:(NSURL *)aURL
+{
+	return [self findItemWithURL:aURL inItems:rootItems];
+}
+
+- (NSInteger)rowForItemWithURL:(NSURL *)aURL
+{
+	id item = [self findItemWithURL:aURL];
+	if (item == nil)
+		return -1;
+	NSURL *parentURL = [[[self fileForItem:item] url] URLByDeletingLastPathComponent];
+	if (parentURL && ![parentURL isEqualToURL:rootURL]) {
+		NSInteger parentRow = [self rowForItemWithURL:parentURL];
+		if (parentRow != -1)
+			[explorer expandItem:[explorer itemAtRow:parentRow]];
+	}
+	return [explorer rowForItem:item];
+}
+
+- (BOOL)selectItemAtRow:(NSInteger)row
+{
+	if (row == -1)
+		return NO;
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
+	[explorer scrollRowToVisible:row];
+	explorer.lastSelectedRow = row;
+
+	return YES;
+}
+
+- (BOOL)selectItem:(id)item
+{
+	NSInteger row = [explorer rowForItem:item];
+	if (row == -1)
+		return NO;
+	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+	      byExtendingSelection:NO];
+	return YES;
+}
+
+- (BOOL)selectItemWithURL:(NSURL *)aURL
+{
+	return [self selectItemAtRow:[self rowForItemWithURL:aURL]];
+}
+
 - (BOOL)displaysURL:(NSURL *)aURL
 {
 	return [rootURL isEqualToURL:aURL] ||
-	       [self findItemWithURL:aURL inItems:rootItems] != nil;
-}
-
-- (void)selectURL:(NSURL *)aURL
-{
-	id item = [self findItemWithURL:aURL inItems:rootItems];
-	if (item) {
-		NSInteger row = [explorer rowForItem:item];
-		if (row != -1) {
-			[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-			      byExtendingSelection:NO];
-			[explorer scrollRowToVisible:row];
-			explorer.lastSelectedRow = row;
-		}
-	}
+	       [self findItemWithURL:aURL] != nil;
 }
 
 - (void)URLContentsWasCached:(NSNotification *)notification
@@ -1243,7 +1272,7 @@ doCommandBySelector:(SEL)aSelector
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
 
-	id item = [self findItemWithURL:url inItems:rootItems];
+	id item = [self findItemWithURL:url];
 	if (item) {
 		[item setChildren:children];
 	} else if ([url isEqualToURL:rootURL]) {
@@ -1291,17 +1320,17 @@ doCommandBySelector:(SEL)aSelector
 			[alert runModal];
 		} else {
 			/* The notification should already have reloaded the data. */
-			[explorer expandItem:[self findItemWithURL:aURL inItems:rootItems]];
+			[explorer expandItem:[self findItemWithURL:aURL]];
 
 			if (renameURL) {
-				id item = [self findItemWithURL:renameURL inItems:rootItems];
+				id item = [self findItemWithURL:renameURL];
 				if (item) {
 					NSInteger row = [explorer rowForItem:item];
-					[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+					[self selectItemAtRow:row];
 					[explorer editColumn:0 row:row withEvent:nil select:YES];
 				}
 			} else {
-				[self selectURL:selectedURL];
+				[self selectItemWithURL:selectedURL];
 			}
 		}
 	}];
@@ -1512,7 +1541,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 - (void)documentEditedChanged:(NSNotification *)notification
 {
 	ViDocument *doc = [notification object];
-	id item = [self findItemWithURL:[doc fileURL] inItems:rootItems];
+	id item = [self findItemWithURL:[doc fileURL]];
 	if (item) {
 		NSInteger row = [explorer rowForItem:item];
 		if (row != -1)

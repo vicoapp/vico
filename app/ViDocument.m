@@ -601,7 +601,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				error:outError]) {
 		ignoreChangeCountNotification = YES;
 		[[self nextRunloop] setIgnoreChangeCountNotification:NO];
+		return YES;
 	}
+	return NO;
 }
 
 - (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data

@@ -136,7 +136,7 @@
 	    @"vim", @"undostyle",
 	    @"Menlo Regular", @"fontname",
 	    @"Sunset", @"theme",
-	    @"(^\\.|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|tar.gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
+	    @"(^\\.|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
 	    [NSArray arrayWithObjects:
 		[NSDictionary dictionaryWithObject:@"vicoapp" forKey:@"username"],
 		[NSDictionary dictionaryWithObject:@"textmate" forKey:@"username"],

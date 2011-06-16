@@ -316,7 +316,7 @@ static NSMutableDictionary *maps = nil;
 					 *
 					 * Should included macros still be preferred over actions?
 					 */
-					
+
 					if (rank > exact_candidate_rank) {
 						DEBUG(@"%@ in map %@ w/rank %llu overrides %@ in map %@ w/rank %llu",
 						    m, map, rank,

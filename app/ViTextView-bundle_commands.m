@@ -322,6 +322,8 @@
 		else
 			INFO(@"unknown output format: %@", outputFormat);
 	}
+
+	[self endUndoGroup];
 }
 
 - (void)performBundleItem:(id)bundleItem

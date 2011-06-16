@@ -462,7 +462,7 @@ additionalBindings:(NSDictionary *)bindings
 							display:YES
 							  error:&error];
 
-	if (doc) {
+	if ([doc respondsToSelector:@selector(setCloseCallback:)]) {
 		[doc setCloseCallback:^(int code) {
 			@try {
 				[backChannel exitWithError:code];
@@ -471,8 +471,10 @@ additionalBindings:(NSDictionary *)bindings
 				INFO(@"failed to notify vicotool: %@", exception);
 			}
 		}];
-		[NSApp activateIgnoringOtherApps:YES];
 	}
+
+	if (doc)
+		[NSApp activateIgnoringOtherApps:YES];
 
 	return error;
 }

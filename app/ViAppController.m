@@ -505,7 +505,8 @@ additionalBindings:(NSDictionary *)bindings
 	NSWindow *keyWindow = menuTrackedKeyWindow;
 	if (keyWindow == nil)
 		keyWindow = [NSApp keyWindow];
-	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
+	ViWindowController *windowController = [keyWindow windowController];
+	BOOL isDocWindow = [windowController isKindOfClass:[ViWindowController class]];
 
 	BOOL hasSelection = NO;
 	NSWindow *window = [[NSApplication sharedApplication] mainWindow];
@@ -534,6 +535,16 @@ additionalBindings:(NSDictionary *)bindings
 			else
 				[item setKeyEquivalent:@""];
 			continue;
+		} else if (item == showFileExplorerMenuItem) {
+			if (isDocWindow && [[windowController explorer] explorerIsOpen])
+				[item setTitle:@"Hide File Explorer"];
+			else
+				[item setTitle:@"Show File Explorer"];
+		} else if (item == showSymbolListMenuItem) {
+			if (isDocWindow && [[windowController symbolController] symbolListVisible])
+				[item setTitle:@"Hide Symbol List"];
+			else
+				[item setTitle:@"Show Symbol List"];
 		}
 
 		if ([item isHidden])

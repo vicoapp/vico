@@ -35,6 +35,8 @@ additionalBindings:(NSDictionary *)bindings
 	IBOutlet NSMenuItem *closeDocumentMenuItem;
 	IBOutlet NSMenuItem *closeWindowMenuItem;
 	IBOutlet NSMenuItem *closeTabMenuItem;
+	IBOutlet NSMenuItem *showFileExplorerMenuItem;
+	IBOutlet NSMenuItem *showSymbolListMenuItem;
 	NSConnection *shellConn;
 
 	TISInputSourceRef original_input_source;

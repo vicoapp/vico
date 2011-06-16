@@ -34,5 +34,6 @@
 - (IBAction)focusSymbols:(id)sender;
 - (void)openSymbolListTemporarily:(BOOL)temporary;
 - (void)closeSymbolList;
+- (BOOL)symbolListVisible;
 
 @end

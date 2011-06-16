@@ -1935,6 +1935,22 @@
 					</object>
 					<int key="connectionID">706</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">showSymbolListMenuItem</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="915560103"/>
+					</object>
+					<int key="connectionID">707</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">showFileExplorerMenuItem</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="478868776"/>
+					</object>
+					<int key="connectionID">708</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -3495,7 +3511,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">706</int>
+			<int key="maxID">708</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4178,6 +4194,8 @@
 							<string>encodingMenu</string>
 							<string>scriptInput</string>
 							<string>scriptOutput</string>
+							<string>showFileExplorerMenuItem</string>
+							<string>showSymbolListMenuItem</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4187,6 +4205,8 @@
 							<string>NSMenu</string>
 							<string>NSTextField</string>
 							<string>NSTextView</string>
+							<string>NSMenuItem</string>
+							<string>NSMenuItem</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -4199,6 +4219,8 @@
 							<string>encodingMenu</string>
 							<string>scriptInput</string>
 							<string>scriptOutput</string>
+							<string>showFileExplorerMenuItem</string>
+							<string>showSymbolListMenuItem</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4225,6 +4247,14 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">scriptOutput</string>
 								<string key="candidateClassName">NSTextView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">showFileExplorerMenuItem</string>
+								<string key="candidateClassName">NSMenuItem</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">showSymbolListMenuItem</string>
+								<string key="candidateClassName">NSMenuItem</string>
 							</object>
 						</object>
 					</object>

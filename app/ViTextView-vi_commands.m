@@ -586,7 +586,7 @@
 			[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:bol];
 			if (eol > NSMaxRange(affectedRange))
 				eol = NSMaxRange(affectedRange);
-	
+
 			NSString *replacement = [@"" stringByPaddingToLength:eol - bol
 								  withString:[NSString stringWithFormat:@"%C", key]
 							     startingAtIndex:0];
@@ -605,7 +605,7 @@
 			return NO;
 		}
 		affectedRange = NSMakeRange(start_location, count);
-	
+
 		NSString *replacement = [@"" stringByPaddingToLength:affectedRange.length
 							  withString:[NSString stringWithFormat:@"%C", key]
 						     startingAtIndex:0];
@@ -826,41 +826,75 @@
 }
 
 /* syntax: [count]h */
-- (BOOL)move_left:(ViCommand *)command
-{
-	NSUInteger bol;
-	[self getLineStart:&bol end:NULL contentsEnd:NULL];
-	if (start_location == bol)
-	{
-		if (command)
-		{
-			/* XXX: this command is also used outside the scope of an explicit 'h' command.
-			 * In such cases, we shouldn't issue an error message.
-			 */
-			MESSAGE(@"Already in the first column");
-		}
-		return NO;
-	}
-	final_location = end_location = start_location - 1;
-	return YES;
-}
-
-/* syntax: [count]l */
-- (BOOL)move_right:(ViCommand *)command
+- (BOOL)move_left:(ViCommand *)command andWrap:(BOOL)wrap
 {
 	int count = IMAX(command.count, 1);
 
-	NSUInteger eol;
-	[self getLineStart:NULL end:NULL contentsEnd:&eol];
-	if (start_location + ((mode == ViInsertMode || command.hasOperator) ? 0 : 1) >= eol) {
-		MESSAGE(@"Already at end-of-line");
-		return NO;
+	NSUInteger location = start_location;
+	while (count--) {
+		NSUInteger bol;
+		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:location];
+		if (location == bol) {
+			if (!wrap) {
+				if (command) {
+					/* XXX: this command is also used outside the scope of an explicit 'h' command.
+					 * In such cases, we shouldn't issue an error message.
+					 */
+					MESSAGE(@"Already in the first column");
+				}
+				return NO;
+			}
+			NSUInteger end, eol;
+			[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:bol - 1];
+			location = eol - ((mode == ViInsertMode || command.hasOperator) ? 0 : 1);
+		} else
+			location--;
 	}
-	if (start_location + count >= eol)
-		final_location = end_location = eol - ((mode == ViInsertMode || command.hasOperator) ? 0 : 1);
-	else
-		final_location = end_location = start_location + count;
+
+	final_location = end_location = location;
 	return YES;
+}
+
+- (BOOL)move_left:(ViCommand *)command
+{
+	return [self move_left:command andWrap:NO];
+}
+
+- (BOOL)move_left_and_wrap:(ViCommand *)command
+{
+	return [self move_left:command andWrap:YES];
+}
+
+/* syntax: [count]l */
+- (BOOL)move_right:(ViCommand *)command andWrap:(BOOL)wrap
+{
+	int count = IMAX(command.count, 1);
+
+	NSUInteger location = start_location;
+	while (count--) {
+		NSUInteger end, eol;
+		[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:location];
+		if (location + ((mode == ViInsertMode || command.hasOperator) ? 0 : 1) >= eol) {
+			if (!wrap) {
+				MESSAGE(@"Already at end-of-line");
+				return NO;
+			}
+			[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:end];
+		} else
+			location++;
+	}
+	final_location = end_location = location;
+	return YES;
+}
+
+- (BOOL)move_right:(ViCommand *)command
+{
+	return [self move_right:command andWrap:NO];
+}
+
+- (BOOL)move_right_and_wrap:(ViCommand *)command
+{
+	return [self move_right:command andWrap:YES];
 }
 
 /* syntax: [count]k */

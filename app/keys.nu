@@ -8,8 +8,8 @@
 
 ;; arrow motions, also valid in insert mode
 (set amap (ViMap mapWithName:"arrowMap"))
-(amap setKey:"<right>" toMotion:"move_right:")
-(amap setKey:"<left>" toMotion:"move_left:")
+(amap setKey:"<right>" toMotion:"move_right_and_wrap:")
+(amap setKey:"<left>" toMotion:"move_left_and_wrap:")
 (amap setKey:"<down>" toMotion:"move_down_soft:" flags:ViMapLineMode parameter:nil scope:nil)
 (amap setKey:"<up>" toMotion:"move_up_soft:" flags:ViMapLineMode parameter:nil scope:nil)
 (amap setKey:"<pageup>" toMotion:"backward_screen:")

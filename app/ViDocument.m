@@ -1441,6 +1441,21 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		return (NSComparisonResult)(sym1.range.location - sym2.range.location);
 	}];
 
+	if ([symbols count] > 0) {
+		// XXX: remove duplicates, ie hide bugs
+		NSUInteger i;
+		NSUInteger prevLocation = ((ViSymbol *)[symbols objectAtIndex:0]).range.location;
+		for (i = 1; i < [symbols count];) {
+			ViSymbol *sym = [symbols objectAtIndex:i];
+			if (sym.range.location == prevLocation)
+				[symbols removeObjectAtIndex:i];
+			else {
+				i++;
+				prevLocation = sym.range.location;
+			}
+		}
+	}
+
 	[self didChangeValueForKey:@"symbols"];
 }
 

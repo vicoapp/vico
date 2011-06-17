@@ -481,7 +481,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 				attributes = _attrs;
 		}];
 
-		[deferred wait];
+		if ([deferred respondsToSelector:@selector(waitInWindow:message:)])
+			[deferred waitInWindow:[windowController window]
+				       message:[NSString stringWithFormat:@"Saving %@...",
+					       [[self fileURL] lastPathComponent]]];
+		else
+			[deferred wait];
 		DEBUG(@"done getting attributes of %@, error is %@", [self fileURL], error);
 
 		didSaveDelegate = delegate;
@@ -570,7 +575,12 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		}
 	}];
 
-	[deferred wait];
+	if ([deferred respondsToSelector:@selector(waitInWindow:message:)])
+		[deferred waitInWindow:[windowController window]
+			       message:[NSString stringWithFormat:@"Saving %@...",
+				       [url lastPathComponent]]];
+	else
+		[deferred wait];
 	DEBUG(@"done saving file, error is %@", returnError);
 
 	if (returnError) {
@@ -1600,7 +1610,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			if (![_err isFileNotFoundError])
 				error = _err;
 		}];
-		[deferred wait];
+
+		if ([deferred respondsToSelector:@selector(waitInWindow:message:)])
+			[deferred waitInWindow:[windowController window]
+				       message:[NSString stringWithFormat:@"Saving %@...",
+					       [newURL lastPathComponent]]];
+		else
+			[deferred wait];
 
 		if (error) {
 			[self message:@"%@", [error localizedDescription]];

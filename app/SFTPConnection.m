@@ -121,6 +121,7 @@ resp2txt(int type)
 @synthesize subRequest;
 @synthesize progress;
 @synthesize delegate;
+@synthesize waitRequest;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type
@@ -145,11 +146,27 @@ resp2txt(int type)
 
 - (void)response:(SFTPMessage *)msg
 {
+	BOOL gotWaitResponse = NO;
+	if (waitRequest && (waitRequest == self || waitRequest.subRequest == self)) {
+		gotWaitResponse = YES;
+		DEBUG(@"got wait response %@ for %@", msg, waitRequest);
+	}
+
 	if (responseCallback)
 		responseCallback(msg);
 	else
 		DEBUG(@"NULL response callback for request id %u", requestId);
 	finished = YES;
+
+	if (gotWaitResponse) {
+		if (waitRequest.subRequest) {
+			waitRequest.subRequest.waitRequest = waitRequest;
+		} else {
+			DEBUG(@"stopping wait request %@", waitRequest);
+			[NSApp abortModal];
+		}
+	} else
+		DEBUG(@"no wait request for request %@", self);
 }
 
 - (void)cancel
@@ -174,6 +191,61 @@ resp2txt(int type)
 		[subRequest cancel];
 		subRequest = nil;
 	}
+
+	if (waitWindow) {
+		DEBUG(@"aborting wait window %@", waitWindow);
+		[NSApp abortModal];
+	}
+}
+
+- (IBAction)cancelDeferred:(id)sender
+{
+	DEBUG(@"cancelling wait window %@ with code 2", waitWindow);
+	[NSApp stopModalWithCode:2];
+}
+
+- (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage
+{
+	waitRequest = self;
+
+	/* Run and block the UI for 2 seconds. */
+	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
+	while ([limitDate timeIntervalSinceNow] > 0) {
+		if (finished)
+			return;
+		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:limitDate];
+	}
+
+	DEBUG(@"limitdate %@ reached, presenting cancellable sheet", limitDate);
+
+	/* Continue with a sheet with a cancel button. */
+	[NSBundle loadNibNamed:@"WaitProgress" owner:self];
+	[waitLabel setStringValue:waitMessage];
+	[progressIndicator startAnimation:nil];
+	[waitWindow setTitle:[NSString stringWithFormat:@"Waiting on %@", connection.title]];
+
+	NSInteger reason = [NSApp runModalForWindow:waitWindow];
+
+	DEBUG(@"wait window %@ done with reason %li", waitWindow, reason);
+	[progressIndicator stopAnimation:nil];
+	[waitWindow orderOut:nil];
+	waitWindow = nil;
+
+	if (reason == 2)
+		[self cancel];
+
+	/* Wait for subrequests. */
+	while (subRequest && !cancelled) {
+		DEBUG(@"waiting for subrequest %@", subRequest);
+		SFTPRequest *req = subRequest;
+		[req waitInWindow:window message:waitMessage];
+		if (subRequest == req) {
+			DEBUG(@"Warning: request %@ didn't reset subRequest after %@", self, req);
+			break;
+		}
+	}
+
+	DEBUG(@"request %@ is finished", self);
 }
 
 - (void)wait
@@ -255,7 +327,7 @@ resp2txt(int type)
 							     length:len
 							   encoding:NSISOLatin1StringEncoding
 						       freeWhenDone:NO];
-		
+
 		*outString = str;
 	}
 
@@ -277,7 +349,7 @@ resp2txt(int type)
 			str = [[NSString alloc] initWithBytes:(void *)ptr
 						       length:len
 						     encoding:NSISOLatin1StringEncoding];
-		
+
 		*outString = str;
 	}
 
@@ -787,7 +859,7 @@ resp2txt(int type)
 		/* Check for extensions */
 		while ([msg left] > 0) {
 			NSString *name, *value;
-			
+
 			if (![msg getStringNoCopy:&name] || ![msg getStringNoCopy:&value])
 				break;
 
@@ -1137,6 +1209,12 @@ resp2txt(int type)
 - (BOOL)connected
 {
 	return ![self closed] && remoteVersion != -1;
+}
+
+- (NSString *)title
+{
+	return [NSString stringWithFormat:@"sftp://%@%s%@%s%@",
+	    user ? user : @"", user ? "@" : "", host, port ? ":" : "", port ? port : @""];
 }
 
 - (SFTPRequest *)openFile:(NSString *)path

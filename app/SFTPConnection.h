@@ -124,6 +124,13 @@
 	SFTPRequest *subRequest;
 	CGFloat progress;
 	id<ViDeferredDelegate> delegate;
+
+	/* Blocking for completion. */
+	IBOutlet NSWindow *waitWindow;
+	IBOutlet NSButton *cancelButton;
+	IBOutlet NSProgressIndicator *progressIndicator;
+	IBOutlet NSTextField *waitLabel;
+	SFTPRequest *waitRequest;
 }
 @property (nonatomic, copy) void (^onResponse)(SFTPMessage *);
 @property (nonatomic, copy) void (^onCancel)(SFTPRequest *);
@@ -131,6 +138,7 @@
 @property (nonatomic, readonly) BOOL cancelled;
 @property (nonatomic, readwrite) CGFloat progress;
 @property (nonatomic, readonly) uint32_t requestId;
+@property (nonatomic, readwrite, assign) SFTPRequest *waitRequest;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type
@@ -140,8 +148,7 @@
 	       onConnection:(SFTPConnection *)aConnection;
 
 - (void)response:(SFTPMessage *)msg;
-- (void)cancel;
-- (void)wait;
+- (IBAction)cancelDeferred:(id)sender;
 @end
 
 #pragma mark -
@@ -185,6 +192,7 @@
 @property(nonatomic,readonly) NSString *host;
 @property(nonatomic,readonly) NSString *user;
 @property(nonatomic,readonly) NSString *home;
+@property(nonatomic,readonly) NSString *title;
 
 - (SFTPConnection *)initWithURL:(NSURL *)url error:(NSError **)outError;
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback;

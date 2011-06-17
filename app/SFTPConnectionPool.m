@@ -33,7 +33,7 @@
 {
 	NSString *key = [self connectionKeyForURL:aURL];
 	SFTPConnection *conn = [connections objectForKey:key];
-	if (conn)
+	if (conn && [conn connected])
 		return [conn normalizeURL:aURL];
 	return aURL;
 }

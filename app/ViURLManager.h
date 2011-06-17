@@ -12,6 +12,7 @@
 @property (nonatomic, readwrite, assign) id<ViDeferredDelegate> delegate;
 
 @optional
+- (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage;
 - (CGFloat)progress;
 @end
 

@@ -1,12 +1,8 @@
-BEFORE 1.0
-==========
-
-
 REGRESSIONS
 ===========
 
 * check map error in excessKeys.nu (re vs r duplicate mapping)
-* [deferred wait] actually blocks the UI! Major fuck-up if SFTP is down!
+* github repository users not saved
 
 
 REQUESTED

@@ -18,7 +18,9 @@
     NSSize              _stringSize;
     int                 _currentStep;
     BOOL                _isPlaceholder;
-    
+
+    PSMTabBarControl 	*_myControlView;
+
     // state
     int                 _tabState;
     NSTrackingRectTag   _closeButtonTrackingTag;    // left side tracking, if dragging

@@ -21,7 +21,7 @@
 {
     self = [super init];
     if(self){
-        _controlView = controlView;
+        _myControlView = controlView;
         _closeButtonTrackingTag = 0;
         _cellTrackingTag = 0;
         _closeButtonOver = NO;
@@ -41,7 +41,7 @@
 {
     self = [super init];
     if(self){
-        _controlView = controlView;
+        _myControlView = controlView;
         _isPlaceholder = YES;
         if(!value)
             frame.size.width = 0.0;
@@ -54,15 +54,15 @@
         _hasCloseButton = YES;
         _isCloseButtonSuppressed = NO;
         _count = 0;
-        
+
         if(value){
             [self setCurrentStep:(kPSMTabDragAnimationSteps - 1)];
         } else {
             [self setCurrentStep:0];
         }
-        
+
     }
-    
+
     return self;
 }
 
@@ -71,13 +71,13 @@
 
 - (id)controlView
 {
-    return _controlView;
+    return _myControlView;
 }
 
 - (void)setControlView:(id)view
 {
     // no retain release pattern, as this simply switches a tab to another view.
-    _controlView = view;
+    _myControlView = view;
 }
 
 - (NSTrackingRectTag)closeButtonTrackingTag
@@ -120,7 +120,7 @@
     [super setStringValue:aString];
     _stringSize = [[self attributedStringValue] size];
     // need to redisplay now - binding observation was too quick.
-    [_controlView update];
+    [_myControlView update];
 }
 
 - (NSSize)stringSize
@@ -130,7 +130,7 @@
 
 - (NSAttributedString *)attributedStringValue
 {
-    return [(id <PSMTabStyle>)[_controlView style] attributedStringValueForTabCell:self];
+    return [(id <PSMTabStyle>)[_myControlView style] attributedStringValueForTabCell:self];
 }
 
 - (int)tabState
@@ -144,7 +144,7 @@
 }
 
 - (NSProgressIndicator *)indicator
-{ 
+{
     return _indicator;
 }
 
@@ -206,7 +206,7 @@
 - (void)setHasIcon:(BOOL)value
 {
     _hasIcon = value;
-    [_controlView update]; // binding notice is too fast
+    [_myControlView update]; // binding notice is too fast
 }
 
 - (int)count
@@ -217,7 +217,7 @@
 - (void)setCount:(int)value
 {
     _count = value;
-    [_controlView update]; // binding notice is too fast
+    [_myControlView update]; // binding notice is too fast
 }
 
 - (BOOL)isPlaceholder
@@ -239,10 +239,10 @@
 {
     if(value < 0)
         value = 0;
-    
+
     if(value > (kPSMTabDragAnimationSteps - 1))
         value = (kPSMTabDragAnimationSteps - 1);
-    
+
     _currentStep = value;
 }
 
@@ -251,23 +251,23 @@
 
 - (NSRect)indicatorRectForFrame:(NSRect)cellFrame
 {
-    return [(id <PSMTabStyle>)[_controlView style] indicatorRectForTabCell:self];
+    return [(id <PSMTabStyle>)[_myControlView style] indicatorRectForTabCell:self];
 }
 
 - (NSRect)closeButtonRectForFrame:(NSRect)cellFrame
 {
-    return [(id <PSMTabStyle>)[_controlView style] closeButtonRectForTabCell:self];
+    return [(id <PSMTabStyle>)[_myControlView style] closeButtonRectForTabCell:self];
 }
 
 - (float)minimumWidthOfCell
 {
-    return [(id <PSMTabStyle>)[_controlView style] minimumWidthOfTabCell:self];
+    return [(id <PSMTabStyle>)[_myControlView style] minimumWidthOfTabCell:self];
 }
 
 - (float)desiredWidthOfCell
 {
-    return [(id <PSMTabStyle>)[_controlView style] desiredWidthOfTabCell:self];
-}  
+    return [(id <PSMTabStyle>)[_myControlView style] desiredWidthOfTabCell:self];
+}
 
 #pragma mark -
 #pragma mark Drawing
@@ -279,8 +279,8 @@
         NSRectFillUsingOperation(cellFrame, NSCompositeSourceAtop);
         return;
     }
-    
-    [(id <PSMTabStyle>)[_controlView style] drawTabCell:self];	
+
+    [(id <PSMTabStyle>)[_myControlView style] drawTabCell:self];
 }
 
 #pragma mark -
@@ -295,7 +295,7 @@
     if([theEvent trackingNumber] == _cellTrackingTag){
         [self setHighlighted:YES];
     }
-    [_controlView setNeedsDisplay];
+    [_myControlView setNeedsDisplay];
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
@@ -307,7 +307,7 @@
     if([theEvent trackingNumber] == _cellTrackingTag){
         [self setHighlighted:NO];
     }
-    [_controlView setNeedsDisplay];
+    [_myControlView setNeedsDisplay];
 }
 
 #pragma mark -
@@ -315,11 +315,11 @@
 
 - (NSImage*)dragImageForRect:(NSRect)cellFrame
 {
-    if(([self state] == NSOnState) && ([[_controlView styleName] isEqualToString:@"Metal"]))
+    if(([self state] == NSOnState) && ([[_myControlView styleName] isEqualToString:@"Metal"]))
         cellFrame.size.width += 1.0;
-    [_controlView lockFocus];
+    [_myControlView lockFocus];
     NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame];
-    [_controlView unlockFocus];
+    [_myControlView unlockFocus];
     NSImage *image = [[NSImage alloc] initWithSize:[rep size]];
     [image addRepresentation:rep];
     NSImage *returnImage = [[NSImage alloc] initWithSize:[rep size]];
@@ -330,7 +330,7 @@
         NSImage *indicatorImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"pi"]];
         [returnImage lockFocus];
         NSPoint indicatorPoint = NSMakePoint([self frame].size.width - MARGIN_X - kPSMTabBarIndicatorWidth, MARGIN_Y);
-        if(([self state] == NSOnState) && ([[_controlView styleName] isEqualToString:@"Metal"]))
+        if(([self state] == NSOnState) && ([[_myControlView styleName] isEqualToString:@"Metal"]))
             indicatorPoint.y += 1.0;
         [indicatorImage compositeToPoint:indicatorPoint operation:NSCompositeSourceOver fraction:0.7];
         [returnImage unlockFocus];

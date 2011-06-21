@@ -343,12 +343,12 @@
 		MESSAGE(@"filter exited with status %i", status);
 }
 
-- (void)filter_through_shell_command:(NSString *)shellCommand contextInfo:(void *)contextInfo
+- (void)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand
 {
-	if ([shellCommand length] == 0)
+	if ([shellCommand length] == 0 || range.length == 0)
 		return;
 
-	NSString *inputText = [[[self textStorage] string] substringWithRange:affectedRange];
+	NSString *inputText = [[[self textStorage] string] substringWithRange:range];
 
 	NSTask *task = [[NSTask alloc] init];
 	[task setLaunchPath:@"/bin/bash"];
@@ -356,7 +356,12 @@
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
-	[ViBundle setupEnvironment:env forTextView:self selectedRange:affectedRange];
+	/*
+	 * Be careful not to set selected range (ie, TM_SELECTED_TEXT) too big, or the task won't be able to launch.
+	 * If environment is too big, the process fails with:
+	 * *** NSTask: Task create for path '/bin/bash' failed: 22, "Invalid argument".  Terminating temporary process.
+	 */
+	[ViBundle setupEnvironment:env forTextView:self selectedRange:NSMakeRange(0, 0)];
 	[task setEnvironment:env];
 
 	NSURL *baseURL = [(ViWindowController *)[[self window] windowController] baseURL];
@@ -369,7 +374,7 @@
 			       throughTask:task
 				    target:self
 				  selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
-			       contextInfo:[NSValue valueWithRange:affectedRange]
+			       contextInfo:[NSValue valueWithRange:range]
 			      displayTitle:shellCommand];
 }
 
@@ -386,7 +391,7 @@
 	}
 
 	if (cmdline) {
-		[self filter_through_shell_command:cmdline contextInfo:command];
+		[self filterRange:affectedRange throughCommand:cmdline];
 		return YES;
 	}
 
@@ -398,7 +403,7 @@
 	NSString *formatprg = [[NSUserDefaults standardUserDefaults] stringForKey:@"formatprg"];
 	if ([formatprg length] == 0)
 		formatprg = @"par";
-	[self filter_through_shell_command:formatprg contextInfo:command];
+	[self filterRange:affectedRange throughCommand:formatprg];
 	return YES;
 }
 

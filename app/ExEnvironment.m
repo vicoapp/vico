@@ -148,7 +148,7 @@
 		DEBUG(@"terminating filter task %@", filterTask);
 		[filterTask terminate];
 	}
-	
+
 	[filterIndicator stopAnimation:self];
 	[self filterFinish];
 }
@@ -233,7 +233,6 @@
 	filterSelector = selector;
 	filterContextInfo = contextInfo;
 
-
 	/* schedule the read and write sources in the new runloop mode */
 	[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
 
@@ -275,30 +274,6 @@
 		[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
 	}
 }
-
-- (void)filterText:(NSString *)inputText
-    throughCommand:(NSString *)shellCommand
-            target:(id)target
-          selector:(SEL)selector
-       contextInfo:(id)contextInfo
-{
-	if ([shellCommand length] == 0)
-		return;
-
-	NSTask *task = [[NSTask alloc] init];
-	[task setLaunchPath:@"/bin/bash"];
-	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
-
-	filterCommand = shellCommand;
-
-	return [self filterText:inputText
-		    throughTask:task
-			 target:target
-		       selector:selector
-		    contextInfo:contextInfo
-		   displayTitle:shellCommand];
-}
-
 
 @end
 

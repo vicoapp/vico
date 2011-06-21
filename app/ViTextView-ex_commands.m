@@ -93,14 +93,7 @@
 	NSRange range;
 	if (![self resolveExAddresses:command intoRange:&range])
 		return NO;
-
-	ViTextStorage *storage = [self textStorage];
-	NSString *inputText = [[storage string] substringWithRange:range];
-	[[document environment] filterText:inputText
-			    throughCommand:command.string
-				    target:self
-				  selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
-			       contextInfo:[NSValue valueWithRange:range]];
+	[self filterRange:range throughCommand:command.string];
 	return YES;
 }
 

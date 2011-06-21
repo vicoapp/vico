@@ -48,12 +48,6 @@
        contextInfo:(id)contextInfo
       displayTitle:(NSString *)displayTitle;
 
-- (void)filterText:(NSString*)inputText
-    throughCommand:(NSString*)shellCommand
-            target:(id)target
-          selector:(SEL)selector
-       contextInfo:(id)contextInfo;
-
 - (IBAction)filterCancel:(id)sender;
 
 @end

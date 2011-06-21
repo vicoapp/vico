@@ -1,8 +1,11 @@
 #import "NSView-additions.h"
+#import "ViWindowController.h"
+#import "ViAppController.h"
 
 @interface NSObject (private)
 - (id)delegate;
 - (id)document;
+- (id)keyManager;
 @end
 
 @implementation NSView (additions)
@@ -47,6 +50,16 @@
 		return [NSApp delegate];
 
 	return nil;
+}
+
+- (NSString *)getExStringForCommand:(ViCommand *)command
+{
+	NSString *exString = nil;
+	if ([self window])
+		exString = [[[self window] windowController] getExStringInteractivelyForCommand:command];
+	else
+		exString = [[NSApp delegate] getExStringForCommand:command];
+	return exString;
 }
 
 @end

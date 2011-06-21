@@ -4,6 +4,10 @@
 #import "ExCommand.h"
 #include "logging.h"
 
+@interface NSObject (private)
+- (void)textField:(ExTextField *)textField executeExCommand:(NSString *)exCommand;
+@end
+
 @implementation ExTextField
 
 - (void)awakeFromNib
@@ -12,6 +16,7 @@
 	history = [NSMutableArray arrayWithArray:[defs arrayForKey:@"exhistory"]];
 	if (history == nil)
 		history = [NSMutableArray array];
+	DEBUG(@"loaded %lu lines from history", [history count]);
 }
 
 - (void)addToHistory:(NSString *)line
@@ -32,6 +37,7 @@
 - (BOOL)becomeFirstResponder
 {
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	DEBUG(@"using field editor %@", editor);
 
 	current = nil;
 	historyIndex = -1;
@@ -101,8 +107,8 @@
 - (BOOL)ex_cancel:(ViCommand *)command
 {
 	running = NO;
-	if ([[self delegate] respondsToSelector:@selector(cancel_ex_command)])
-		[[self delegate] performSelector:@selector(cancel_ex_command)];
+	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
+		[[self delegate] textField:self executeExCommand:nil];
 	return YES;
 }
 
@@ -111,8 +117,8 @@
 	NSString *exCommand = [self stringValue];
 	[self addToHistory:exCommand];
 	running = NO;
-	if ([[self delegate] respondsToSelector:@selector(execute_ex_command:)])
-		[[self delegate] performSelector:@selector(execute_ex_command:) withObject:exCommand];
+	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
+		[[self delegate] textField:self executeExCommand:exCommand];
 	return YES;
 }
 
@@ -151,7 +157,7 @@
 {
 	if (running)
 		[self ex_cancel:nil];
-	else 
+	else
 		[super textDidEndEditing:aNotification];
 }
 

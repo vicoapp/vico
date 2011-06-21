@@ -178,9 +178,7 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	ExEnvironment *env = [(ViWindowController *)[[self window] windowController] environment];
-	NSString *exline = [env getExStringForCommand:command
-                                        interactively:YES /* obviously */];
+	NSString *exline = [self getExStringForCommand:command];
 	if (exline == nil)
 		return NO;
 

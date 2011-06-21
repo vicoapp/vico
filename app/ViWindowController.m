@@ -2,7 +2,6 @@
 #import "PSMTabBarControl.h"
 #import "ViDocument.h"
 #import "ViDocumentView.h"
-#import "ViDocumentTabController.h"
 #import "ViProject.h"
 #import "ProjectDelegate.h"
 #import "ViJumpList.h"
@@ -17,6 +16,7 @@
 #import "ExTextField.h"
 #import "ViEventManager.h"
 #import "NSURL-additions.h"
+#import "ExCommand.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -229,19 +229,8 @@ static ViWindowController	*currentWindowController = nil;
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject
 {
 	if ([anObject isKindOfClass:[ExTextField class]]) {
-		if (viFieldEditor == nil) {
-			ViTextStorage *textStorage = [[ViTextStorage alloc] init];
-			ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
-			[textStorage addLayoutManager:layoutManager];
-			NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
-			[layoutManager addTextContainer:container];
-			[layoutManager setShowsControlCharacters:YES];
-			NSRect frame = NSMakeRect(0, 0, 100, 10);
-			viFieldEditor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
-			ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
-			[viFieldEditor initWithDocument:nil viParser:fieldParser];
-			[viFieldEditor setFieldEditor:YES];
-		}
+		if (viFieldEditor == nil)
+			viFieldEditor = [ViTextView makeFieldEditor];
 		return viFieldEditor;
 	}
 	return nil;
@@ -867,13 +856,19 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)firstResponderChanged:(NSNotification *)notification
 {
-	id<ViViewController> viewController = [self viewControllerForView:[notification object]];
+	NSView *view = [notification object];
+	id<ViViewController> viewController = [self viewControllerForView:view];
 	if (viewController) {
 		if (parser.partial) {
 			[self message:@"Vi command interrupted."];
 			[parser reset];
 		}
 		[self didSelectViewController:viewController];
+	}
+
+	if (ex_modal && view != statusbar) {
+		[NSApp abortModal];
+		ex_modal = NO;
 	}
 }
 
@@ -1794,6 +1789,72 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[self selectTabAtIndex:arg];
 	return YES;
 }
+
+#pragma mark -
+#pragma mark Input of ex commands
+
+- (NSFont *)font
+{
+	return [ViThemeStore font];
+}
+
+- (void)textField:(ExTextField *)textField executeExCommand:(NSString *)exCommand
+{
+	if (exCommand) {
+		exString = exCommand;
+		if (ex_modal)
+			[NSApp abortModal];
+	} else if (ex_modal)
+		[NSApp abortModal];
+
+	ex_busy = NO;
+}
+
+- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command
+{
+	ViMacro *macro = command.macro;
+
+	if (ex_busy) {
+		INFO(@"%s", "can't handle nested ex commands!");
+		return nil;
+	}
+
+	ex_busy = YES;
+	exString = nil;
+
+	[messageField setHidden:YES];
+	[statusbar setHidden:NO];
+	[statusbar setEditable:YES];
+	[statusbar setStringValue:@""];
+	/*
+	 * The ExTextField resets the field editor when gaining focus (in becomeFirstResponder).
+	 */
+	[[self window] makeFirstResponder:statusbar];
+
+	if (macro) {
+		NSInteger keyCode;
+		ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:statusbar];
+		while (ex_busy && (keyCode = [macro pop]) != -1)
+			[editor.keyManager handleKey:keyCode];
+	}
+
+	if (ex_busy) {
+
+		ex_modal = YES;
+		[NSApp runModalForWindow:[self window]];
+		ex_modal = NO;
+		ex_busy = NO;
+	}
+
+	[statusbar setStringValue:@""];
+	[statusbar setEditable:NO];
+	[statusbar setHidden:YES];
+	[messageField setHidden:NO];
+	[self focusEditor];
+
+	return exString;
+}
+
 
 #pragma mark -
 #pragma mark Ex actions

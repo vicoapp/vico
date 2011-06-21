@@ -1,105 +1,12 @@
 #import "ExEnvironment.h"
-#import "ExCommand.h"
-#import "ViTheme.h"
-#import "ViThemeStore.h"
-#import "ViTextView.h"
-#import "ViWindowController.h"
-#import "ViDocumentView.h"
-#import "ViTextStorage.h"
 #import "ViCharsetDetector.h"
-#import "ViDocumentController.h"
-#import "ViBundleStore.h"
-#import "NSString-scopeSelector.h"
-#import "ViURLManager.h"
-#import "ViTransformer.h"
 #import "ViError.h"
-#import "ViAppController.h"
 #import "ViCommon.h"
 #include "logging.h"
 
 @implementation ExEnvironment
 
 @synthesize window;
-
-- (void)awakeFromNib
-{
-	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12.0]];
-	[statusbar setDelegate:self];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(firstResponderChanged:)
-                                                     name:ViFirstResponderChangedNotification
-                                                   object:nil];
-}
-
-#pragma mark -
-
-#pragma mark -
-#pragma mark Input of ex commands
-
-- (void)cancel_ex_command
-{
-	[statusbar setStringValue:@""];
-	[statusbar setEditable:NO];
-	[statusbar setHidden:YES];
-	[messageField setHidden:NO];
-	[projectDelegate cancelExplorer];
-
-	[[window windowController] focusEditor];
-}
-
-- (void)execute_ex_command:(NSString *)exCommand
-{
-	exString = exCommand;
-
-	if (busy)
-		[NSApp stopModalWithCode:0];
-	busy = NO;
-	[self cancel_ex_command];
-}
-
-- (void)firstResponderChanged:(NSNotification *)notification
-{
-	NSView *view = [notification object];
-	if (busy && view != statusbar) {
-		[NSApp stopModalWithCode:1];
-		busy = NO;
-	}
-}
-
-- (NSString *)getExStringForCommand:(ViCommand *)command
-		      interactively:(BOOL)interactiveFlag
-{
-	ViMacro *macro = command.macro;
-
-	if (busy) {
-		INFO(@"%s", "can't handle nested ex commands!");
-		return nil;
-	}
-
-	[messageField setHidden:YES];
-	[statusbar setHidden:NO];
-	[statusbar setEditable:YES];
-	[window makeFirstResponder:statusbar];
-
-	busy = YES;
-	exString = nil;
-
-	if (macro) {
-		NSInteger keyCode;
-		ViTextView *editor = (ViTextView *)[window fieldEditor:YES forObject:statusbar];
-		while (busy && (keyCode = [macro pop]) != -1)
-			[editor.keyManager handleKey:keyCode];
-	}
-
-	if (busy) {
-		if (interactiveFlag)
-			[NSApp runModalForWindow:window];
-		busy = NO;
-	}
-
-	return exString;
-}
 
 #pragma mark -
 #pragma mark Pipe Filtering

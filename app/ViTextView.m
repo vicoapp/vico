@@ -41,6 +41,22 @@ int logIndent = 0;
 @synthesize mode;
 @synthesize visual_line_mode;
 
++ (ViTextView *)makeFieldEditor
+{
+	ViTextStorage *textStorage = [[ViTextStorage alloc] init];
+	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
+	[textStorage addLayoutManager:layoutManager];
+	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
+	[layoutManager addTextContainer:container];
+	[layoutManager setShowsControlCharacters:YES];
+	NSRect frame = NSMakeRect(0, 0, 100, 10);
+	ViTextView *editor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
+	ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
+	[editor initWithDocument:nil viParser:fieldParser];
+	[editor setFieldEditor:YES];
+	return editor;
+}
+
 - (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
 {
 	keyManager = [[ViKeyManager alloc] initWithTarget:self
@@ -1012,8 +1028,7 @@ int logIndent = 0;
 	if (command.text)
 		pattern = command.text;
 	else {
-		pattern = [[document environment] getExStringForCommand:command
-                                                          interactively:([self window] != nil)];
+		pattern = [self getExStringForCommand:command];
 		command.text = pattern;
 	}
 
@@ -1040,8 +1055,7 @@ int logIndent = 0;
 	if (command.text)
 		pattern = command.text;
 	else {
-		pattern = [[document environment] getExStringForCommand:command
-                                                          interactively:([self window] != nil)];
+		pattern = [self getExStringForCommand:command];
 		command.text = pattern;
 	}
 

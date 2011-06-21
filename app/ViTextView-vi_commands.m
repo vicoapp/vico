@@ -385,8 +385,7 @@
 	if (command.text)
 		cmdline = command.text;
 	else {
-		cmdline = [[document environment] getExStringForCommand:command
-							  interactively:([self window] != nil)];
+		cmdline = [self getExStringForCommand:command];
 		command.text = cmdline;
 	}
 
@@ -2516,8 +2515,8 @@
 - (BOOL)ex_command:(ViCommand *)command
 {
 	[self updateStatus]; // clear any previous message
-	NSString *exline = [[document environment] getExStringForCommand:command
-                                                           interactively:([self window] != nil)];
+
+	NSString *exline = [self getExStringForCommand:command];
 	if (exline == nil)
 		return NO;
 

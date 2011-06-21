@@ -7,6 +7,9 @@
 #import "ViSplitView.h"
 #import "ViSymbol.h"
 #import "ViSymbolController.h"
+#import "ViURLManager.h"
+#import "ViDocumentTabController.h"
+#import "ViTextView.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -15,6 +18,7 @@
 @class ViResizeView;
 @class ViProject;
 @class ViParser;
+@class ExCommand;
 
 @interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate, ViDeferredDelegate>
 {
@@ -25,7 +29,6 @@
 	IBOutlet ViBgView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 	IBOutlet NSTextField *messageField;
-	IBOutlet NSTextField *statusbar;
 
 	IBOutlet NSPopUpButton *openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;
@@ -47,6 +50,12 @@
 	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
+
+	// ex command line
+	IBOutlet NSTextField	*statusbar;
+	BOOL			 ex_busy;
+	BOOL			 ex_modal;
+	NSString		*exString;
 
 	// project list
 	IBOutlet ProjectDelegate *projectDelegate;
@@ -156,6 +165,8 @@
 - (void)checkBaseURL:(NSURL *)url
 	onCompletion:(void (^)(NSURL *url, NSError *error))aBlock;
 - (NSString *)displayBaseURL;
+
+- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command;
 
 - (BOOL)ex_cd:(ExCommand *)command;
 - (BOOL)ex_pwd:(ExCommand *)command;

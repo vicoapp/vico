@@ -15,8 +15,8 @@
 #import "JSON.h"
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
-#import "ViTextView.h"
 #import "ViEventManager.h"
+#import "ProjectDelegate.h"
 
 #import "ViFileURLHandler.h"
 #import "ViSFTPURLHandler.h"
@@ -635,6 +635,57 @@ additionalBindings:(NSDictionary *)bindings
 {
 	NSURL *siteURL = [NSURL fileURLWithPath:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"]];
 	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:siteURL display:YES error:nil];
+}
+
+#pragma mark -
+#pragma mark Input of scripted ex commands
+
+- (BOOL)ex_cancel:(ViCommand *)command
+{
+	if (busy)
+		[NSApp stopModalWithCode:2];
+	return YES;
+}
+
+- (BOOL)ex_execute:(ViCommand *)command
+{
+	exString = [[fieldEditor textStorage] string];
+	if (busy)
+		[NSApp stopModalWithCode:0];
+	busy = NO;
+	return YES;
+}
+
+- (NSString *)getExStringForCommand:(ViCommand *)command
+{
+	ViMacro *macro = command.macro;
+
+	if (busy) {
+		INFO(@"%s", "can't handle nested ex commands!");
+		return nil;
+	}
+
+	busy = YES;
+	exString = nil;
+
+	if (macro) {
+		NSInteger keyCode;
+		if (fieldEditor == nil)
+			fieldEditor = [ViTextView makeFieldEditor];
+		[fieldEditor setInsertMode:nil];
+		[fieldEditor setCaret:0];
+		[fieldEditor setString:@""];
+		[fieldEditor setDelegate:self];
+		while (busy && (keyCode = [macro pop]) != -1)
+			[fieldEditor.keyManager handleKey:keyCode];
+	}
+
+	if (busy) {
+		busy = NO;
+		return nil;
+	}
+
+	return exString;
 }
 
 @end

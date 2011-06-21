@@ -1,3 +1,4 @@
+#import "ViTextView.h"
 #import "Nu/Nu.h"
 #import <Carbon/Carbon.h>
 
@@ -27,7 +28,7 @@ additionalBindings:(NSDictionary *)bindings
 
 @end
 
-@interface ViAppController : NSObject <ViShellCommandProtocol>
+@interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
 {
 	IBOutlet NSMenu *encodingMenu;
 	IBOutlet NSTextField *scriptInput;
@@ -42,6 +43,12 @@ additionalBindings:(NSDictionary *)bindings
 	TISInputSourceRef original_input_source;
 	BOOL recently_launched;
 	NSWindow *menuTrackedKeyWindow;
+
+	// input of scripted ex commands
+	// XXX: in search of a better place (refugees from ExEnvironment)
+	BOOL				 busy;
+	NSString			*exString;
+	ViTextView			*fieldEditor;
 }
 
 @property(nonatomic,readonly) NSMenu *encodingMenu;
@@ -60,5 +67,7 @@ withParser:(NuParser *)parser
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)visitWebsite:(id)sender;
 - (IBAction)editSiteScript:(id)sender;
+
+- (NSString *)getExStringForCommand:(ViCommand *)command;
 
 @end

@@ -91,6 +91,8 @@
 @property(nonatomic,readonly) ViMode mode;
 @property(nonatomic,readwrite) BOOL visual_line_mode;
 
++ (ViTextView *)makeFieldEditor;
+
 - (void)initWithDocument:(ViDocument *)aDocument
                 viParser:(ViParser *)aParser;
 - (ViTextStorage *)textStorage;

@@ -1,20 +1,8 @@
-#import "ViDocumentTabController.h"
-#import "ProjectDelegate.h"
 #import "ViBufferedStream.h"
-#import "ViURLManager.h"
 
-@class ViTextView;
-@class ViDocument;
-@class ViWindowController;
-@class ExCommand;
-
-@interface ExEnvironment : NSObject <NSTextFieldDelegate, NSStreamDelegate, ViDeferredDelegate>
+@interface ExEnvironment : NSObject <NSStreamDelegate>
 {
-	IBOutlet NSTextField	*messageField;
-	IBOutlet NSTextField	*statusbar;
 	IBOutlet NSWindow	*window;
-	IBOutlet ViWindowController *windowController;
-	IBOutlet ProjectDelegate *projectDelegate;
 
 	// command filtering
 	NSTask				*filterTask;
@@ -31,15 +19,9 @@
 	id				 filterTarget;
 	SEL				 filterSelector;
 	id				 filterContextInfo;
-
-	BOOL			 busy;
-	NSString		*exString;
 }
 
 @property(nonatomic,readonly) NSWindow *window;
-
-- (NSString *)getExStringForCommand:(ViCommand *)command
-		      interactively:(BOOL)interactiveFlag;
 
 - (void)filterText:(NSString*)inputText
        throughTask:(NSTask *)task

@@ -1327,10 +1327,15 @@ static ViWindowController	*currentWindowController = nil;
 			url = [ctrl normalizePath:filenameOrURL
 				       relativeTo:baseURL
 					    error:&err];
-		if (url && !err)
-			doc = [ctrl openDocumentWithContentsOfURL:filenameOrURL
-							  display:NO
-							    error:&err];
+		if (url && !err) {
+			doc = [ctrl documentForURL:url];
+			if (doc)
+				newDoc = NO;
+			else
+				doc = [ctrl openDocumentWithContentsOfURL:filenameOrURL
+								  display:NO
+								    error:&err];
+		}
 	} else if (doc == nil) {
 		doc = [ctrl openUntitledDocumentAndDisplay:NO error:&err];
 		doc.isTemporary = YES;

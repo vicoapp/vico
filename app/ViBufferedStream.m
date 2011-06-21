@@ -134,17 +134,6 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 }
 
 static void
-fd_read(CFSocketRef s,
-	CFSocketCallBackType callbackType,
-	CFDataRef address,
-	const void *data,
-	void *info)
-{
-	ViBufferedStream *stream = info;
-	[stream read];
-}
-
-static void
 fd_write(CFSocketRef s,
 	 CFSocketCallBackType callbackType,
 	 CFDataRef address,
@@ -165,6 +154,21 @@ fd_write(CFSocketRef s,
 		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)])
 			[[stream delegate] stream:stream handleEvent:NSStreamEventEndEncountered];
 		[stream shutdownWrite];
+	}
+}
+
+static void
+fd_read(CFSocketRef s,
+	CFSocketCallBackType callbackType,
+	CFDataRef address,
+	const void *data,
+	void *info)
+{
+	if (callbackType == kCFSocketWriteCallBack)
+		fd_write(s, callbackType, address, data, info);
+	else {
+		ViBufferedStream *stream = info;
+		[stream read];
 	}
 }
 
@@ -191,10 +195,13 @@ fd_write(CFSocketRef s,
 			inputContext.release = NULL;
 			inputContext.copyDescription = NULL;
 
+			CFSocketCallBackType cbType = kCFSocketReadCallBack;
+			if (fd_out == fd_in)
+				cbType |= kCFSocketWriteCallBack;
 			inputSocket = CFSocketCreateWithNative(
 				kCFAllocatorDefault,
 				fd_in,
-				kCFSocketReadCallBack,
+				cbType,
 				fd_read,
 				&inputContext);
 			if (inputSocket == NULL) {
@@ -206,28 +213,31 @@ fd_write(CFSocketRef s,
 			CFSocketEnableCallBacks(inputSocket, kCFSocketReadCallBack);
 		}
 
-
 		if (fd_out != -1) {
-			flags = fcntl(fd_out, F_GETFL, 0);
-			fcntl(fd_out, F_SETFL, flags | O_NONBLOCK);
+			if (fd_out == fd_in)
+				outputSocket = inputSocket;
+			else {
+				flags = fcntl(fd_out, F_GETFL, 0);
+				fcntl(fd_out, F_SETFL, flags | O_NONBLOCK);
 
-			outputContext.version = 0;
-			outputContext.info = self; /* user data passed to the callbacks */
-			outputContext.retain = NULL;
-			outputContext.release = NULL;
-			outputContext.copyDescription = NULL;
+				outputContext.version = 0;
+				outputContext.info = self; /* user data passed to the callbacks */
+				outputContext.retain = NULL;
+				outputContext.release = NULL;
+				outputContext.copyDescription = NULL;
 
-			outputSocket = CFSocketCreateWithNative(
-				kCFAllocatorDefault,
-				fd_out,
-				kCFSocketWriteCallBack,
-				fd_write,
-				&outputContext);
-			if (outputSocket == NULL) {
-				INFO(@"failed to create output CFSocket of fd %i", fd_out);
-				return nil;
+				outputSocket = CFSocketCreateWithNative(
+					kCFAllocatorDefault,
+					fd_out,
+					kCFSocketWriteCallBack,
+					fd_write,
+					&outputContext);
+				if (outputSocket == NULL) {
+					INFO(@"failed to create output CFSocket of fd %i", fd_out);
+					return nil;
+				}
+				outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, prio);
 			}
-			outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, prio);
 		}
 	}
 	return self;
@@ -251,7 +261,7 @@ fd_write(CFSocketRef s,
 
 - (void)shutdownWrite
 {
-	if (fd_out >= 0) {
+	if (outputSource) {
 		DEBUG(@"shutting down write pipe %d", fd_out);
 		if (runLoopMode)
 			CFRunLoopRemoveSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)runLoopMode);
@@ -264,11 +274,15 @@ fd_write(CFSocketRef s,
 
 - (void)shutdownRead
 {
-	if (fd_in >= 0) {
+	if (inputSource) {
 		DEBUG(@"shutting down read pipe %d", fd_in);
 		if (runLoopMode)
 			CFRunLoopRemoveSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)runLoopMode);
 		CFSocketInvalidate(inputSocket);
+		if (outputSocket == inputSocket) {
+			outputSocket = NULL;
+			fd_out = -1;
+		}
 		inputSocket = NULL;
 		close(fd_in);
 		fd_in = -1;
@@ -284,9 +298,9 @@ fd_write(CFSocketRef s,
 - (void)scheduleInRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"adding to mode %@", mode);
-	if (fd_in >= 0)
+	if (inputSource)
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
-	if (fd_out >= 0)
+	if (outputSource)
 		CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
 	runLoopMode = mode;
 }
@@ -294,9 +308,9 @@ fd_write(CFSocketRef s,
 - (void)removeFromRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"removing from mode %@", mode);
-	if (fd_in >= 0)
+	if (inputSource)
 		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
-	if (fd_out >= 0)
+	if (outputSource)
 		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
 	runLoopMode = nil;
 }
@@ -320,7 +334,7 @@ fd_write(CFSocketRef s,
 
 - (void)write:(const void *)buf length:(NSUInteger)length
 {
-	if (fd_out >= 0 && length > 0) {
+	if (outputSocket && length > 0) {
 		DEBUG(@"enqueueing %lu bytes", length);
 		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
 		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
@@ -329,7 +343,7 @@ fd_write(CFSocketRef s,
 
 - (void)writeData:(NSData *)data
 {
-	if (fd_out >= 0 && [data length] > 0) {
+	if (outputSocket && [data length] > 0) {
 		DEBUG(@"enqueueing %lu bytes", [data length]);
 		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
 		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);

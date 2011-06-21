@@ -720,6 +720,7 @@ static ViWindowController	*currentWindowController = nil;
 	/* If this was the last view in the tab, close the tab too. */
 	ViDocumentTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 0) {
+		[tabBar disableAnimations];
 		[self closeTabController:tabController];
 
 		if ([tabView numberOfTabViewItems] == 0) {
@@ -731,6 +732,7 @@ static ViWindowController	*currentWindowController = nil;
 			else
 				[[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES
 													  error:nil];
+			[tabBar enableAnimations];
 		}
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.

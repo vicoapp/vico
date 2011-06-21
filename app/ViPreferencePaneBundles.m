@@ -78,9 +78,9 @@
 								 ascending:YES];
 	[bundlesController setSortDescriptors:[NSArray arrayWithObjects:statusSort, nameSort, nil]];
 
-	NSArray *repoUsers = [[NSUserDefaults standardUserDefaults] arrayForKey:@"bundleRepositoryUsers"];
-	for (NSDictionary *repo in repoUsers)
-		[self loadBundlesFromRepo:[repo objectForKey:@"username"]];
+	NSArray *repoUsers = [[NSUserDefaults standardUserDefaults] arrayForKey:@"bundleRepoUsers"];
+	for (NSString *username in repoUsers)
+		[self loadBundlesFromRepo:username];
 
 	[bundlesTable setDoubleAction:@selector(installBundles:)];
 	[bundlesTable setTarget:self];

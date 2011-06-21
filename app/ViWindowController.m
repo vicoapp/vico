@@ -1892,7 +1892,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)ex_pwd:(ExCommand *)command
 {
 	MESSAGE(@"%@", [self displayBaseURL]);
-	return YES;
+	return NO; /* XXX: this is wrong, but needed to keep -keyManager:evaluateCommand: in ViTextView overwrite the message with -updateStatus. */
 }
 
 - (BOOL)ex_close:(ExCommand *)command

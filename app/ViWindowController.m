@@ -337,7 +337,7 @@ static ViWindowController	*currentWindowController = nil;
 		[self switchToDocument:document];
 
 	if (closeThisDocument) {
-		[closeThisDocument close];
+		[closeThisDocument closeAndWindow:NO];
 		[tabBar enableAnimations];
 	}
 }
@@ -688,7 +688,8 @@ static ViWindowController	*currentWindowController = nil;
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow
 {
-	DEBUG(@"closing view controller %@, and document: %s", viewController, canCloseDocument ? "YES" : "NO");
+	DEBUG(@"closing view controller %@, and document: %s, and window: %s",
+		viewController, canCloseDocument ? "YES" : "NO", canCloseWindow ? "YES" : "NO");
 
 	if (viewController == nil)
 		[[self window] close];
@@ -720,7 +721,8 @@ static ViWindowController	*currentWindowController = nil;
 	/* If this was the last view in the tab, close the tab too. */
 	ViDocumentTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 0) {
-		[tabBar disableAnimations];
+		if ([tabView numberOfTabViewItems] == 1)
+			[tabBar disableAnimations];
 		[self closeTabController:tabController];
 
 		if ([tabView numberOfTabViewItems] == 0) {
@@ -732,8 +734,8 @@ static ViWindowController	*currentWindowController = nil;
 			else
 				[[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES
 													  error:nil];
-			[tabBar enableAnimations];
 		}
+		[tabBar enableAnimations];
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
 		[self selectDocumentView:tabController.selectedView];

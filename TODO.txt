@@ -20,6 +20,7 @@ REQUESTED
 
 URGENT
 ========
+* should check all documents for external changes when app becomes active again
 * quickly repeating shell filters get stuck (try !!nl and hold down . to repeat)
 * check map error in excessKeys.nu (re vs r duplicate mapping)
 * "&" in :s replace part should expand to whole match

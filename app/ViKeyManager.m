@@ -69,7 +69,7 @@
 		}
 		@catch (NSException *exception) {
 			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
-			[self presentError:[ViError errorWithFormat:@"Got exception %@:\n%@",
+			[self presentError:[ViError errorWithFormat:@"Got exception %@: %@",
 			    [exception name], [exception reason]]];
 			recursionLevel = 0;
 			return NO;

@@ -185,7 +185,6 @@
 
 - (NSDictionary *)environment;
 
-- (id)preference:(NSString *)name forScope:(ViScope *)scope;
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation;
 - (id)preference:(NSString *)name;
 

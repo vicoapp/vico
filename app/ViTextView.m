@@ -17,6 +17,7 @@
 #import "ViRegisterManager.h"
 #import "ViLayoutManager.h"
 #import "NSView-additions.h"
+#import "ViPreferencePaneEdit.h"
 
 int logIndent = 0;
 
@@ -647,34 +648,9 @@ int logIndent = 0;
 	return [self suggestedIndentAtLocation:location forceSmartIndent:NO];
 }
 
-- (id)preference:(NSString *)name forScope:(ViScope *)scope
-{
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSDictionary *prefs = [defs dictionaryForKey:@"scopedPreferences"];
-	if (prefs == nil)
-		return [defs objectForKey:name];
-	u_int64_t max_rank = 0;
-	id scopeValue = nil;
-	for (NSString *scopeSelector in [prefs allKeys]) {
-		NSDictionary *scopePrefs = [prefs objectForKey:scope];
-		id value = [scopePrefs objectForKey:name];
-		if (value == nil)
-			continue;
-		u_int64_t rank = [scopeSelector match:scope];
-		if (rank > max_rank) {
-			max_rank = rank;
-			scopeValue = value;
-		}
-	}
-
-	if (scopeValue == nil)
-		return [defs objectForKey:name];
-	return scopeValue;
-}
-
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation
 {
-	return [self preference:name forScope:[document scopeAtLocation:aLocation]];
+	return [ViPreferencePaneEdit valueForKey:name inScope:[document scopeAtLocation:aLocation]];
 }
 
 - (id)preference:(NSString *)name

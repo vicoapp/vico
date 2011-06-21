@@ -317,17 +317,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	windowController = (ViWindowController *)aController;
 }
 
-- (void)removeWindowController:(NSWindowController *)aWindowController
-{
-	[super removeWindowController:aWindowController];
-	if (aWindowController == windowController) {
-		if ([[self windowControllers] count] > 0)
-			windowController = [[self windowControllers] objectAtIndex:0];
-		else
-			windowController = nil;
-	}
-}
-
 - (void)makeWindowControllers
 {
 	ViWindowController *winCon = nil;

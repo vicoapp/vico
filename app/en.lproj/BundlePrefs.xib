@@ -688,7 +688,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="310071716"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 			</object>
 			<object class="NSArrayController" id="553922329">
@@ -921,7 +921,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="353137721"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 			</object>
 			<object class="NSUserDefaultsController" id="274958371">
@@ -1234,22 +1234,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentArray: values.bundleRepositoryUsers</string>
-						<reference key="source" ref="553922329"/>
-						<reference key="destination" ref="274958371"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="553922329"/>
-							<reference key="NSDestination" ref="274958371"/>
-							<string key="NSLabel">contentArray: values.bundleRepositoryUsers</string>
-							<string key="NSBinding">contentArray</string>
-							<string key="NSKeyPath">values.bundleRepositoryUsers</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">107</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">contentArray: filteredRepositories</string>
 						<reference key="source" ref="795412458"/>
 						<reference key="destination" ref="1001"/>
@@ -1343,6 +1327,35 @@
 						</object>
 					</object>
 					<int key="connectionID">120</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentArray: values.bundleRepoUsers</string>
+						<reference key="source" ref="553922329"/>
+						<reference key="destination" ref="274958371"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="553922329"/>
+							<reference key="NSDestination" ref="274958371"/>
+							<string key="NSLabel">contentArray: values.bundleRepoUsers</string>
+							<string key="NSBinding">contentArray</string>
+							<string key="NSKeyPath">values.bundleRepoUsers</string>
+							<object class="NSDictionary" key="NSOptions">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>NSHandlesContentAsCompoundValue</string>
+									<string>NSValueTransformerName</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<boolean value="YES"/>
+									<string>repoUserTransformer</string>
+								</object>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">124</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1942,7 +1955,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">120</int>
+			<int key="maxID">124</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

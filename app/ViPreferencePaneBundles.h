@@ -1,5 +1,10 @@
 #import "ViPreferencePane.h"
 
+@interface repoUserTransformer : NSValueTransformer
+{
+}
+@end
+
 @interface statusIconTransformer : NSValueTransformer
 {
 	NSImage *installedIcon;

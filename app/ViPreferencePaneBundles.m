@@ -3,6 +3,39 @@
 #import "JSON.h"
 #include "logging.h"
 
+@implementation repoUserTransformer
++ (Class)transformedValueClass { return [NSDictionary class]; }
++ (BOOL)allowsReverseTransformation { return YES; }
+- (id)init { return [super init]; }
+- (id)transformedValue:(id)value
+{
+	if (![value isKindOfClass:[NSArray class]])
+		return nil;
+
+	NSArray *array = value;
+	if ([array count] == 0)
+		return value;
+
+	if ([[array objectAtIndex:0] isKindOfClass:[NSString class]]) {
+		/* Convert an array of strings to an array of dictionaries with "username" key. */
+		NSMutableArray *a = [NSMutableArray array];
+		NSArray *usernames = [array sortedArrayUsingSelector:@selector(compare:)];
+		for (NSString *username in usernames)
+			[a addObject:[NSMutableDictionary dictionaryWithObject:[username mutableCopy] forKey:@"username"]];
+		return a;
+	} else if ([[array objectAtIndex:0] isKindOfClass:[NSDictionary class]]) {
+		/* Convert an array of dictionaries with "username" keys to an array of strings. */
+		NSMutableArray *a = [NSMutableArray array];
+		for (NSDictionary *dict in array)
+			[a addObject:[[dict objectForKey:@"username"] mutableCopy]];
+		[a sortUsingSelector:@selector(compare:)];
+		return a;
+	}
+
+	return nil;
+}
+@end
+
 @implementation statusIconTransformer
 + (Class)transformedValueClass { return [NSImage class]; }
 + (BOOL)allowsReverseTransformation { return NO; }
@@ -34,6 +67,9 @@
 	/* Show an icon in the status column of the repository table. */
 	[NSValueTransformer setValueTransformer:[[statusIconTransformer alloc] init]
 					forName:@"statusIconTransformer"];
+
+	[NSValueTransformer setValueTransformer:[[repoUserTransformer alloc] init]
+					forName:@"repoUserTransformer"];
 
 	/* Sort repositories by installed status, then by name. */
 	NSSortDescriptor *statusSort = [[NSSortDescriptor alloc] initWithKey:@"status"
@@ -208,11 +244,10 @@
 
 - (IBAction)addRepoUser:(id)sender
 {
-	NSUInteger row = [[repoUsersController arrangedObjects] count];
 	NSMutableDictionary *item = [NSMutableDictionary dictionaryWithObject:[NSMutableString string] forKey:@"username"];
-	[repoUsersController insertObject:item atArrangedObjectIndex:row];
-	[repoUsersTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-	[repoUsersTable editColumn:0 row:row withEvent:nil select:YES];
+	[repoUsersController addObject:item];
+	[repoUsersController setSelectedObjects:[NSArray arrayWithObject:item]];
+	[repoUsersTable editColumn:0 row:[repoUsersController selectionIndex] withEvent:nil select:YES];
 }
 
 #pragma mark -
@@ -371,7 +406,7 @@
 		@catch (NSException *exception) {
 			[installConnection cancel];
 			[installTask terminate];
-	
+
 			[self cancelProgressSheet:nil];
 			NSMutableDictionary *repo = [processQueue lastObject];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
@@ -392,7 +427,7 @@
 	if (connection == userConnection) {
 		NSMutableDictionary *repo = [processQueue lastObject];
 		NSString *username = [repo objectForKey:@"username"];
-	
+
 		NSString *JSONString = [[NSString alloc] initWithData:userData encoding:NSUTF8StringEncoding];
 		NSDictionary *dict = [JSONString JSONValue];
 		if (![dict isKindOfClass:[NSDictionary class]]) {

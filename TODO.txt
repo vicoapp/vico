@@ -1,7 +1,10 @@
 REGRESSIONS
 ===========
 
-* check map error in excessKeys.nu (re vs r duplicate mapping)
+* double-click select word + drag left doesn't keep the initial word selected
+* expose mode in vitextview
+* make windowcontroller.splitvertically:andopen:orswitch: return the created view instead of the document
+* :pwd doesn't show the directory!
 * github repository users not saved
 
 
@@ -21,7 +24,7 @@ REQUESTED
 URGENT
 ========
 * quickly repeating shell filters get stuck (try !!nl and hold down . to repeat)
-* can Nu return BOOLs?
+* check map error in excessKeys.nu (re vs r duplicate mapping)
 * "&" in :s replace part should expand to whole match
 * explorer flickers when opening new windows!
 * bundle commands not repeatable with dot

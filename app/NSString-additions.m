@@ -13,9 +13,9 @@
 		[self getLineStart:NULL end:&end contentsEnd:&eol forRange:NSMakeRange(i, 0)];
 		if (end == eol)
 			break;
-        }
+	}
 
-        return n;
+	return n;
 }
 
 - (NSUInteger)occurrencesOfCharacter:(unichar)ch
@@ -96,6 +96,15 @@
 	NSMutableString *s = [NSMutableString string];
 	for (NSNumber *n in keySequence)
 		[s appendString:[self stringWithKeyCode:[n integerValue]]];
+	return s;
+}
+
++ (NSString *)stringWithCharacters:(NSArray *)keySequence
+{
+	NSMutableString *s = [NSMutableString string];
+	for (NSNumber *n in keySequence)
+		if ([n unsignedIntegerValue] <= 0xFFFF)
+			[s appendFormat:@"%C", (unichar)[n unsignedIntegerValue]];
 	return s;
 }
 

@@ -35,7 +35,7 @@
 {
 	[viewController setTabController:self];
 	[views addObject:viewController];
-	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
+	[[ViEventManager defaultManager] emit:ViEventDidAddView for:viewController with:viewController, nil];
 	if ([viewController respondsToSelector:@selector(document)])
 		[[viewController document] addView:viewController];
 }

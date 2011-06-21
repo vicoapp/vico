@@ -31,8 +31,12 @@
 #define ViEventDidSelectDocument @"didSelectDocument" // window, doc
 #define ViEventWillSelectView @"willSelectView" // window, view
 #define ViEventDidSelectView @"didSelectView" // window, view
-#define ViEventWillSelectTab @"willSelectTab" // window, tabcontroller
-#define ViEventDidSelectTab @"didSelectTab" // window, tabcontroller
+#define ViEventWillSelectTab @"willSelectTab" // window, tabController
+#define ViEventDidSelectTab @"didSelectTab" // window, tabController
+
+// Tabcontroller events
+#define ViEventDidAddView @"didAddView" // view
+#define ViEventDidCloseView @"didCloseView" // view
 
 @interface ViEvent : NSObject
 {

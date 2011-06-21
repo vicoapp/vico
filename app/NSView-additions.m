@@ -34,6 +34,15 @@
 			return document;
 	}
 
+	if ([self respondsToSelector:@selector(keyManager)]) {
+		id keyManager = [self keyManager];
+		if ([keyManager respondsToSelector:@selector(target)]) {
+			id target = [keyManager target];
+			if ([target respondsToSelector:action])
+				return target;
+		}
+	}
+
 	if ([[NSApp delegate] respondsToSelector:action])
 		return [NSApp delegate];
 

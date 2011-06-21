@@ -362,7 +362,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	}
 
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
-	[NSBundle loadNibNamed:@"ViDocument" owner:documentView];
 	[self addView:documentView];
 
 	documentView.window = aWindow;

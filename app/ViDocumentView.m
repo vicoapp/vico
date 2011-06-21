@@ -14,6 +14,7 @@
 {
 	self = [super init];
 	if (self) {
+		[NSBundle loadNibNamed:@"ViDocument" owner:self];
 		document = aDocument;
 		[document addObserver:self
 		           forKeyPath:@"title"

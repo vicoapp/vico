@@ -68,6 +68,7 @@
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property(nonatomic,readonly) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
+@property(nonatomic,readonly) ViTextStorage *textStorage;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;

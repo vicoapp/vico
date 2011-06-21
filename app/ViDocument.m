@@ -53,6 +53,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize loader;
 @synthesize closeCallback;
 @synthesize ignoreChangeCountNotification;
+@synthesize textStorage;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {

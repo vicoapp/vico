@@ -342,7 +342,8 @@ extern BOOL makeNewWindowInsteadOfTab;
 	ViWindowController *winCon = [ViWindowController currentWindowController];
 	if (winCon) {
 		[context setObject:winCon forKey:[symbolTable symbolWithString:@"window"]];
-		[context setObject:winCon.explorer forKey:[symbolTable symbolWithString:@"explorer"]];
+		if (winCon.explorer)
+			[context setObject:winCon.explorer forKey:[symbolTable symbolWithString:@"explorer"]];
 		id<ViViewController> view = [winCon currentView];
 		if (view) {
 			[context setObject:view forKey:[symbolTable symbolWithString:@"view"]];

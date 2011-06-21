@@ -2219,8 +2219,17 @@ int logIndent = 0;
 
 	if (selection_affinity == 2) {
 		/* align to word boundaries */
-		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:location
+		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
 								  acceptAfter:NO];
+		if (wordRange.location != NSNotFound) {
+			if (location > visual_start_location)
+				visual_start_location = wordRange.location;
+			else
+				visual_start_location = NSMaxRange(wordRange) - 1;
+		}
+
+		wordRange = [[self textStorage] rangeOfWordAtLocation:location
+							  acceptAfter:NO];
 		if (wordRange.location != NSNotFound) {
 			if (location > visual_start_location)
 				[self setCaret:NSMaxRange(wordRange) - 1];

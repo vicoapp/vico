@@ -26,6 +26,12 @@ You can open multiple files at once, also using globbing characters (eg,
 <kbd>vico *.py</kbd>). If you specify a directory, Vico will display a
 new window with the directory selected in the explorer sidebar.
 
+If you want to use Vico in your <kbd>$EDITOR</kbd> variable to edit
+commit messages, you need to use the <kbd>-w</kbd> switch. This makes
+Vico wait until the document is closed to return. The return code from
+vicotool is 0 if the document saved successfully before closing, and
+non-zero if it wasn't saved.
+
 To see a quick description of the command line usage, use the
 <kbd>-h</kbd> option:
 

@@ -1798,11 +1798,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 #pragma mark -
 #pragma mark Input of ex commands
 
-- (NSFont *)font
-{
-	return [ViThemeStore font];
-}
-
 - (void)textField:(ExTextField *)textField executeExCommand:(NSString *)exCommand
 {
 	if (exCommand) {
@@ -1831,6 +1826,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[statusbar setHidden:NO];
 	[statusbar setEditable:YES];
 	[statusbar setStringValue:@""];
+	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12]];
 	/*
 	 * The ExTextField resets the field editor when gaining focus (in becomeFirstResponder).
 	 */

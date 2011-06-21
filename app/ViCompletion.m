@@ -30,7 +30,7 @@ static NSCharacterSet *ucase = nil;
 {
 	if ((self = [super init]) != nil) {
 		content = aString;
-		font = [ViThemeStore font];
+		font = [NSFont userFixedPitchFontOfSize:12];
 		titleParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[titleParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
 		markColor = [NSColor redColor];

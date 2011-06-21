@@ -72,16 +72,6 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (void)windowDidLoad
 {
-	NSError *error = nil;
-	if ([[NSFileManager defaultManager] createDirectoryAtPath:[ViBundleStore bundlesDirectory]
-				      withIntermediateDirectories:YES
-						       attributes:nil
-							    error:&error] == NO) {
-		NSAlert *alert = [NSAlert alertWithError:error];
-		[alert runModal];
-		/* FIXME: continue? disable bundle download? */
-	}
-
 	/* We want the preference window to move to the active space. */
 	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorMoveToActiveSpace];
 	[self setWindowFrameAutosaveName:@"PreferenceWindow"];

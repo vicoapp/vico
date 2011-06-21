@@ -43,6 +43,7 @@
 	BOOL			 replayingInput;  // true when dot command replays input
 	NSMutableArray		*inputKeys; // used for replaying input
 
+	// FIXME: move these to the ViCommand as properties
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
 	NSUInteger		 modify_start_location;
@@ -87,6 +88,8 @@
 
 @property(nonatomic,readwrite,assign) ViKeyManager *keyManager;
 @property(nonatomic,readonly) ViDocument *document;
+@property(nonatomic,readonly) ViMode mode;
+@property(nonatomic,readwrite) BOOL visual_line_mode;
 
 - (void)initWithDocument:(ViDocument *)aDocument
                 viParser:(ViParser *)aParser;

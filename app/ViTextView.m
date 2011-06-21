@@ -38,6 +38,8 @@ int logIndent = 0;
 
 @synthesize keyManager;
 @synthesize document;
+@synthesize mode;
+@synthesize visual_line_mode;
 
 - (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
 {

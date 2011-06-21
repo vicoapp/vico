@@ -11,7 +11,7 @@
 	NSInteger recursionLevel;
 }
 
-@property(nonatomic,readonly) ViParser *parser;
+@property(nonatomic,readwrite,assign) ViParser *parser;
 @property(nonatomic,readwrite,assign) id target;
 
 - (ViKeyManager *)initWithTarget:(id)aTarget

@@ -313,9 +313,10 @@
 			            inRange:r];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
 		           [outputFormat isEqualToString:@"createNewDocument"]) {
-			ViDocument *doc = [[[self window] windowController] splitVertically:NO
-										    andOpen:nil
-									 orSwitchToDocument:nil];
+			id<ViViewController> viewController = [[[self window] windowController] splitVertically:NO
+													andOpen:nil
+											     orSwitchToDocument:nil];
+			ViDocument *doc = [viewController document];
 			[doc setString:outputText];
 		} else if ([outputFormat isEqualToString:@"discard"])
 			;

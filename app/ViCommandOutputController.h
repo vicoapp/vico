@@ -6,7 +6,6 @@
 {
 	IBOutlet ViWebView *webView;
 	ViDocumentTabController *tabController;
-	NSWindow *window;
 	NSString *title;
 }
 

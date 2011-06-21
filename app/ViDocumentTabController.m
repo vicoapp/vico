@@ -1,5 +1,6 @@
 #import "ViDocumentTabController.h"
 #import "ViDocumentView.h"
+#import "ViEventManager.h"
 
 @interface ViDocumentTabController (private)
 - (void)normalizeViewsRecursively:(id)split;
@@ -34,16 +35,17 @@
 {
 	[viewController setTabController:self];
 	[views addObject:viewController];
-	if ([viewController isKindOfClass:[ViDocumentView class]])
-		[[(ViDocumentView *)viewController document] addView:viewController];
+	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
+	if ([viewController respondsToSelector:@selector(document)])
+		[[viewController document] addView:viewController];
 }
 
 - (void)removeView:(id<ViViewController>)viewController
 {
-	// FIXME: This doesn't really belong here, right?
-	if ([viewController isKindOfClass:[ViDocumentView class]])
-		[[(ViDocumentView *)viewController document] removeView:viewController];
+	if ([viewController respondsToSelector:@selector(document)])
+		[[viewController document] removeView:viewController];
 	[views removeObject:viewController];
+	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
 	if (viewController == previousView)
 		previousView = nil;
 }
@@ -134,22 +136,20 @@
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController
                        vertically:(BOOL)isVertical
 {
-	if (![viewController isKindOfClass:[ViDocumentView class]])
+	if (![viewController respondsToSelector:@selector(document)])
 		return nil;
 
-	ViDocumentView *docView = viewController;
-	ViDocumentView *newDocView = [[docView document] makeViewInWindow:viewController.window];
-	if (![self splitView:viewController withView:newDocView vertically:isVertical])
+	id<ViViewController> newView = [[viewController document] cloneView:viewController];
+	if (![self splitView:viewController withView:newView vertically:isVertical])
 		return nil;
 
-	[[newDocView textView] setCaret:[[docView textView] caret]];
-	return newDocView;
+	return newView;
 }
 
 - (id<ViViewController>)replaceView:(id<ViViewController>)viewController
-                       withDocument:(id)document
+                       withDocument:(id<ViViewDocument>)document
 {
-	id<ViViewController> newViewController = [document makeViewInWindow:viewController.window];
+	id<ViViewController> newViewController = [document makeView];
 
 	[self addView:newViewController];
 	[self removeView:viewController];

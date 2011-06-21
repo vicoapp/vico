@@ -22,6 +22,7 @@
 #import "ViEventManager.h"
 #import "ViDocumentController.h"
 #import "NSURL-additions.h"
+#import "ViTextView.h"
 
 BOOL makeNewWindowInsteadOfTab = NO;
 
@@ -305,10 +306,26 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[windowController selectDocument:self];
 }
 
+- (ViWindowController *)windowController
+{
+	return windowController;
+}
+
 - (void)addWindowController:(NSWindowController *)aController
 {
 	[super addWindowController:aController];
 	windowController = (ViWindowController *)aController;
+}
+
+- (void)removeWindowController:(NSWindowController *)aWindowController
+{
+	[super removeWindowController:aWindowController];
+	if (aWindowController == windowController) {
+		if ([[self windowControllers] count] > 0)
+			windowController = [[self windowControllers] objectAtIndex:0];
+		else
+			windowController = nil;
+	}
 }
 
 - (void)makeWindowControllers
@@ -354,17 +371,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return scriptView;
 }
 
-- (ViDocumentView *)makeViewInWindow:(NSWindow *)aWindow
+- (ViDocumentView *)makeView
 {
-	if (hiddenView) {
-		hiddenView.window = aWindow;
+	if (hiddenView)
 		return hiddenView;
-	}
 
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
 	[self addView:documentView];
-
-	documentView.window = aWindow;
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -398,6 +411,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[[ViEventManager defaultManager] emit:ViEventDidMakeView for:self with:self, documentView, textView, nil];
 
 	return documentView;
+}
+
+- (ViDocumentView *)cloneView:(ViDocumentView *)oldView
+{
+	ViDocumentView *newView = [self makeView];
+	[[newView textView] setCaret:[[oldView textView] caret]];
+	return newView;
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
@@ -764,11 +784,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
 	[[ViEventManager defaultManager] emit:ViEventDidChangeURL for:self with:self, absoluteURL, nil];
-}
-
-- (ViWindowController *)windowController
-{
-	return windowController;
 }
 
 - (void)closeAndWindow:(BOOL)canCloseWindow

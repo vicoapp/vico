@@ -1,11 +1,14 @@
-#import "ViTextView.h"
 #import "ViWindowController.h"
 #import "ViSymbol.h"
 #import "ViTextStorage.h"
 #import "ViURLManager.h"
 #import "ViScope.h"
+#import "ViDocumentView.h"
 
-@interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate>
+@class ViTextView;
+@class ExCommand;
+
+@interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate, ViViewDocument>
 {
 	NSMutableSet *views;
 	ViDocumentView *hiddenView;
@@ -85,7 +88,7 @@
 - (void)updatePageGuide;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
-- (ViDocumentView *)makeViewInWindow:(NSWindow *)aWindow;
+- (ViDocumentView *)makeView;
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)addView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;

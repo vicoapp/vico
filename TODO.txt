@@ -1,9 +1,10 @@
 REGRESSIONS
 ===========
 
+* ctrl-^ (prev document) doesn't work with untitled files
+* ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 * double-click select word + drag left doesn't keep the initial word selected
 * expose mode in vitextview
-* make windowcontroller.splitvertically:andopen:orswitch: return the created view instead of the document
 * :pwd doesn't show the directory!
 * github repository users not saved
 

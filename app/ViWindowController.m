@@ -299,7 +299,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document
 {
-	ViDocumentView *docView = [document makeViewInWindow:[self window]];
+	ViDocumentView *docView = [document makeView];
 	[self createTabWithViewController:docView];
 	return docView;
 }
@@ -428,8 +428,8 @@ static ViWindowController	*currentWindowController = nil;
 - (ViDocument *)currentDocument
 {
 	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]])
-		return [(ViDocumentView *)viewController document];
+	if ([viewController respondsToSelector:@selector(document)])
+		return [viewController document];
 	return nil;
 }
 
@@ -550,12 +550,10 @@ static ViWindowController	*currentWindowController = nil;
 		/* Check if this document is open in another window. */
 		ViDocumentView *otherDocView;
 		for (otherDocView in [doc views])
-			if (otherDocView.window != window)
+			if ([[otherDocView view] window] != window)
 				break;
-		if (otherDocView != nil)
-			continue;
-
-		[set addObject:doc];
+		if (otherDocView == nil)
+			[set addObject:doc];
 	}
 
 	[[ViDocumentController sharedDocumentController] closeAllDocumentsInSet:set
@@ -582,7 +580,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)setCurrentView:(id<ViViewController>)viewController
 {
-	if ([currentView isKindOfClass:[ViDocumentView class]])
+	if ([currentView respondsToSelector:@selector(document)])
 		previousDocumentView = currentView;
 	currentView = viewController;
 }
@@ -619,9 +617,8 @@ static ViWindowController	*currentWindowController = nil;
 	id<ViViewController> viewController = [self currentView];
 
 	/* If the current view is a document view, check if it's the last document view. */
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocumentView *docView = viewController;
-		ViDocument *doc = [docView document];
+	if ([viewController respondsToSelector:@selector(document)]) {
+		ViDocument *doc = [viewController document];
 		if ([[doc views] count] == 1) {
 			[doc canCloseDocumentWithDelegate:self
 				      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
@@ -710,7 +707,7 @@ static ViWindowController	*currentWindowController = nil;
 		} else {
 			int nViewsInWindow = 0;
 			for (ViDocumentView *docView in [doc views])
-				if (docView.window == [self window])
+				if ([[docView view] window] == [self window])
 					nViewsInWindow++;
 			if (nViewsInWindow == 0) {
 				DEBUG(@"closed last view of document %@ in this window, unlisting document", doc);
@@ -798,21 +795,20 @@ static ViWindowController	*currentWindowController = nil;
 	/* Close all documents in this tab. */
 	id<ViViewController> viewController;
 	for (viewController in [tabController views]) {
-		if ([viewController isKindOfClass:[ViDocumentView class]]) {
-			ViDocumentView *docView = (ViDocumentView *)viewController;
-			if ([set containsObject:[docView document]])
+		if ([viewController respondsToSelector:@selector(document)]) {
+			if ([set containsObject:[viewController document]])
 				continue;
-			if (![[docView document] isDocumentEdited])
+			if (![[viewController document] isDocumentEdited])
 				continue;
 
-			ViDocumentView *otherDocView;
-			for (otherDocView in [[docView document] views])
+			id<ViViewController> otherDocView;
+			for (otherDocView in [[viewController document] views])
 				if ([otherDocView tabController] != tabController)
 					break;
 			if (otherDocView != nil)
 				continue;
 
-			[set addObject:[docView document]];
+			[set addObject:[viewController document]];
 		}
 	}
 
@@ -1310,10 +1306,10 @@ static ViWindowController	*currentWindowController = nil;
 	return YES;
 }
 
-- (ViDocument *)splitVertically:(BOOL)isVertical
-                        andOpen:(id)filenameOrURL
-             orSwitchToDocument:(ViDocument *)doc
-		allowReusedView:(BOOL)allowReusedView
+- (id<ViViewController>)splitVertically:(BOOL)isVertical
+                                andOpen:(id)filenameOrURL
+                     orSwitchToDocument:(ViDocument *)doc
+                        allowReusedView:(BOOL)allowReusedView
 {
 	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
 	BOOL newDoc = YES;
@@ -1357,15 +1353,15 @@ static ViWindowController	*currentWindowController = nil;
 		if (allowReusedView && !newDoc) {
 			/* Check if the tab already has a view for this document. */
 			for (id<ViViewController> v in tabController.views)
-				if ([v isKindOfClass:[ViDocumentView class]] &&
-				    [(ViDocumentView *)v document] == doc) {
+				if ([v respondsToSelector:@selector(document)] &&
+				    [v document] == doc) {
 					newDocView = v;
 					break;
 				}
 		}
 		if (newDocView == nil)
 			newDocView = [tabController splitView:viewController
-						     withView:[doc makeViewInWindow:[self window]]
+						     withView:[doc makeView]
 						   vertically:isVertical];
 		[self selectDocumentView:newDocView];
 
@@ -1379,15 +1375,15 @@ static ViWindowController	*currentWindowController = nil;
 			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
 		}
 
-		return doc;
+		return newDocView;
 	}
 
 	return nil;
 }
 
-- (ViDocument *)splitVertically:(BOOL)isVertical
-                        andOpen:(id)filenameOrURL
-             orSwitchToDocument:(ViDocument *)doc
+- (id<ViViewController>)splitVertically:(BOOL)isVertical
+                                andOpen:(id)filenameOrURL
+                     orSwitchToDocument:(ViDocument *)doc
 {
 	return [self splitVertically:isVertical
 			     andOpen:filenameOrURL

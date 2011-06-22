@@ -19,7 +19,7 @@ main(int argc, char **argv)
 
 	fp = fopen(argv[1], "r");
 	if (fp == NULL)
-		err(1, argv[1]);
+		err(1, "%s", argv[1]);
 
 	size_t r = fread(buf, 1, 4096, fp);
 	if (!feof(fp))

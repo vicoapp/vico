@@ -12,8 +12,8 @@
 {
 	if ((self = [super init]) != nil) {
 		connData = [NSMutableData data];
-		dataCallback = Block_copy(aDataCallback);
-		completionCallback = Block_copy(aCompletionCallback);
+		dataCallback = [aDataCallback copy];
+		completionCallback = [aCompletionCallback copy];
 		request = [NSURLRequest requestWithURL:aURL];
 		conn = [NSURLConnection connectionWithRequest:request
 						     delegate:self];

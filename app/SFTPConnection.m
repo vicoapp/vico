@@ -806,7 +806,7 @@ resp2txt(int type)
 - (SFTPRequest *)realpath:(NSString *)path
 	       onResponse:(void (^)(NSString *, NSDictionary *, NSError *))responseCallback
 {
-	void (^originalCallback)(NSString *, NSDictionary *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSString *, NSDictionary *, NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REALPATH format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		uint32_t count;
@@ -839,7 +839,7 @@ resp2txt(int type)
 
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_INIT format:NULL];
 	req.onCancel = ^(SFTPRequest *req) {
 		originalCallback([ViError operationCancelled]);
@@ -1000,7 +1000,7 @@ resp2txt(int type)
 	DEBUG(@"url = [%@]", url);
 	url = [self normalizeURL:url];
 
-	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_LSTAT format:"s", [url path]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSDictionary *attributes;
@@ -1022,7 +1022,7 @@ resp2txt(int type)
 - (SFTPRequest *)fileExistsAtURL:(NSURL *)url
 		      onResponse:(void (^)(NSURL *, BOOL, NSError *))responseCallback
 {
-	void (^originalCallback)(NSURL *, BOOL, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSURL *, BOOL, NSError *) = [responseCallback copy];
 
 	return [self attributesOfItemAtURL:url onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error) {
@@ -1051,7 +1051,7 @@ resp2txt(int type)
 - (SFTPRequest *)closeHandle:(NSData *)handle
 		  onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 
 	SFTPRequest *req = [self addRequest:SSH2_FXP_CLOSE format:"d", handle];
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -1071,7 +1071,7 @@ resp2txt(int type)
 {
 	NSURL *url = [self normalizeURL:aURL];
 
-	void (^originalCallback)(NSArray *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSArray *, NSError *) = [responseCallback copy];
 
 	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", [url path]];
 	openRequest.onCancel = ^(SFTPRequest *req) { originalCallback(nil, [ViError operationCancelled]); };
@@ -1091,7 +1091,7 @@ resp2txt(int type)
 		NSMutableArray *entries = [NSMutableArray array];
 
 		void (^cancelfun)(SFTPRequest *);
-		cancelfun = Block_copy(^(SFTPRequest *req) {
+		cancelfun = ^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 			[self closeHandle:handle
 			       onResponse:^(NSError *error) {
@@ -1099,11 +1099,12 @@ resp2txt(int type)
 					INFO(@"failed to close file after cancel: %@",
 					    [error localizedDescription]);
 			}];
-		});
+		};
+		cancelfun = [cancelfun copy];
 
 		/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
 		__block void (^readfun)(SFTPMessage *);
-		readfun = Block_copy(^(SFTPMessage *msg) {
+		readfun = ^(SFTPMessage *msg) {
 			NSError *error;
 			uint32_t count;
 			if (msg.type == SSH2_FXP_STATUS) {
@@ -1152,7 +1153,8 @@ resp2txt(int type)
 			req.onResponse = readfun;
 			req.onCancel = cancelfun;
 			openRequest.subRequest = req;
-		});
+		};
+		readfun = [readfun copy];
 
 		/* Request a batch of names. */
 		SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
@@ -1167,7 +1169,7 @@ resp2txt(int type)
 - (SFTPRequest *)createDirectory:(NSString *)path
 		      onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"pa", path, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
@@ -1227,7 +1229,7 @@ resp2txt(int type)
 	else
 		mode = SSH2_FXF_READ;
 
-	void (^originalCallback)(NSData *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSData *, NSError *) = [responseCallback copy];
 
 	SFTPRequest *req = [self addRequest:SSH2_FXP_OPEN format:"sua", path, mode, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
@@ -1254,7 +1256,7 @@ resp2txt(int type)
 				onData:(void (^)(NSData *))dataCallback
 			    onResponse:(void (^)(NSURL *, NSDictionary *, NSError *))responseCallback
 {
-	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = [responseCallback copy];
 	__block SFTPRequest *statRequest = nil;
 
 	void (^fun)(NSURL *, NSDictionary *, NSError *) = ^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
@@ -1277,7 +1279,7 @@ resp2txt(int type)
 			__block uint32_t len = transfer_buflen;
 
 			void (^cancelfun)(SFTPRequest *);
-			cancelfun = Block_copy(^(SFTPRequest *req) {
+			cancelfun = ^(SFTPRequest *req) {
 				DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 				originalCallback(normalizedURL, attributes, [ViError operationCancelled]);
 				[self closeHandle:handle
@@ -1286,10 +1288,11 @@ resp2txt(int type)
 						INFO(@"failed to close file after cancel: %@",
 						    [error localizedDescription]);
 				}];
-			});
+			};
+			cancelfun = [cancelfun copy];
 
 			__block void (^readfun)(SFTPMessage *);
-			readfun = Block_copy(^(SFTPMessage *msg) {
+			readfun = ^(SFTPMessage *msg) {
 				NSError *error;
 				if (msg.type == SSH2_FXP_STATUS) {
 					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
@@ -1357,7 +1360,8 @@ resp2txt(int type)
 					req.onCancel = cancelfun;
 					statRequest.subRequest = req;
 				}
-			});
+			};
+			readfun = [readfun copy];
 
 			/* Dispatch first read request. */
 			DEBUG(@"requesting %u bytes at offset %lu", len, offset);
@@ -1386,7 +1390,7 @@ resp2txt(int type)
 		     toFile:(NSString *)path
 		 onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	__block SFTPRequest *openRequest = nil;
 
 	void (^fun)(NSData *, NSError *) = ^(NSData *handle, NSError *error) {
@@ -1396,7 +1400,7 @@ resp2txt(int type)
 		}
 
 		void (^cancelfun)(SFTPRequest *);
-		cancelfun = Block_copy(^(SFTPRequest *req) {
+		cancelfun = ^(SFTPRequest *req) {
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 			responseCallback([ViError operationCancelled]);
 			[self closeHandle:handle
@@ -1405,12 +1409,13 @@ resp2txt(int type)
 					INFO(@"failed to close file after cancel: %@",
 					    [error localizedDescription]);
 			}];
-		});
+		};
+		cancelfun = [cancelfun copy];
 
 		__block uint64_t offset = 0;
 
 		__block void (^writefun)(SFTPMessage *);
-		writefun = Block_copy(^(SFTPMessage *msg) {
+		writefun = ^(SFTPMessage *msg) {
 			NSError *error;
 			if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 				originalCallback(error);
@@ -1445,7 +1450,8 @@ resp2txt(int type)
 			req.onResponse = writefun;
 			req.onCancel = cancelfun;
 			openRequest.subRequest = req;
-		});
+		};
+		writefun = [writefun copy];
 
 		/* Dispatch first read request. */
 		uint32_t len = transfer_buflen;
@@ -1468,7 +1474,7 @@ resp2txt(int type)
 - (SFTPRequest *)removeItemAtPath:(NSString *)path
 		       onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REMOVE format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
@@ -1484,7 +1490,7 @@ resp2txt(int type)
 - (SFTPRequest *)removeItemsAtURLs:(NSArray *)urls
 		       onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	NSMutableArray *mutableURLs = [urls mutableCopy];
 
 	/* Dispatch all requests at once. */
@@ -1506,7 +1512,7 @@ resp2txt(int type)
 			   toPath:(NSString *)newPath
 		       onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_RENAME format:"ss", oldPath, newPath];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
@@ -1524,7 +1530,7 @@ resp2txt(int type)
 				     toPath:(NSString *)newPath
 				 onResponse:(void (^)(NSError *))responseCallback
 {
-	void (^originalCallback)(NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSError *) = [responseCallback copy];
 	__block SFTPRequest *renameRequest = nil;
 	if ([self hasPosixRename]) {
 		/*
@@ -1586,7 +1592,7 @@ resp2txt(int type)
 {
 	NSURL *url = [self normalizeURL:aURL];
 
-	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = Block_copy(responseCallback);
+	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = [responseCallback copy];
 	__block SFTPRequest *uploadRequest = nil;
 
 	void (^fun)(NSError *) = ^(NSError *error) {

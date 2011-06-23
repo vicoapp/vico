@@ -1111,6 +1111,8 @@ static ViWindowController	*currentWindowController = nil;
 - (void)switchToLastDocument
 {
 	/* Make sure the previous document is still registered in the document controller. */
+	if (previousDocument == nil)
+		return;
 	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
 		DEBUG(@"previous document %@ not listed", previousDocument);
 		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]
@@ -1122,6 +1124,8 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)selectLastDocument
 {
+	if (previousDocument == nil)
+		return;
 	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
 		DEBUG(@"previous document %@ not listed", previousDocument);
 		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]

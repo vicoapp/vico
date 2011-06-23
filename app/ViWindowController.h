@@ -46,7 +46,7 @@
 	ViDocument *initialDocument;
 	id<ViViewController> initialViewController;
 	NSMutableArray *documents;
-	ViDocument *previousDocument;
+	__weak ViDocument *previousDocument;
 	__weak ViDocumentView *previousDocumentView;
 	ViParser *parser;
 	ViProject *project;
@@ -81,7 +81,7 @@
 @property(nonatomic,readonly) ViTagStack *tagStack;
 @property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
-@property(nonatomic,readonly) ViDocument *previousDocument;
+@property(nonatomic,readonly) __weak ViDocument *previousDocument;
 @property(nonatomic,readwrite,assign) NSURL *baseURL;
 @property(nonatomic,readonly) ViSymbolController *symbolController;
 

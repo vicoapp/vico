@@ -40,19 +40,19 @@
 
 @interface ViEvent : NSObject
 {
-	id owner;
 	NuBlock *expression;
 	NSInteger eventId;
 }
-- (id)initWithExpression:(NuBlock *)anExpression owner:(id)anOwner;
-@property (nonatomic,readonly) id owner;
+- (id)initWithExpression:(NuBlock *)anExpression;
 @property (nonatomic,readonly) NuBlock *expression;
 @property (nonatomic,readonly) NSInteger eventId;
 @end
 
 @interface ViEventManager : NSObject
 {
-	NSMutableDictionary *_events;
+	// keys are event names (strings)
+	NSMutableDictionary *_anonymous_events;	// values are NSMutableArrays of ViEvents
+	NSMutableDictionary *_owned_events;	// values are NSMapTables, map keys are owner objects, values are NSMutableArrays of ViEvents
 }
 
 + (ViEventManager *)defaultManager;

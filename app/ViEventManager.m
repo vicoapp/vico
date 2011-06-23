@@ -6,15 +6,18 @@
 static NSInteger nextEventId = 0;
 
 @implementation ViEvent
-@synthesize owner, expression, eventId;
-- (id)initWithExpression:(NuBlock *)anExpression owner:(id)anOwner
+@synthesize expression, eventId;
+- (id)initWithExpression:(NuBlock *)anExpression
 {
 	if ((self = [super init]) != nil) {
 		expression = anExpression;
-		owner = anOwner;
 		eventId = nextEventId++;
 	}
 	return self;
+}
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<ViEvent %p: %li>", self, eventId];
 }
 @end
 
@@ -22,6 +25,7 @@ static NSInteger nextEventId = 0;
 
 + (ViEventManager *)defaultManager
 {
+	return nil;
 	static ViEventManager *defaultManager = nil;
 	if (defaultManager == nil)
 		defaultManager = [[ViEventManager alloc] init];
@@ -31,9 +35,30 @@ static NSInteger nextEventId = 0;
 - (id)init
 {
 	if ((self = [super init]) != nil) {
-		_events = [NSMutableDictionary dictionary];
+		_anonymous_events = [NSMutableDictionary dictionary];
+		_owned_events = [NSMutableDictionary dictionary];
 	}
 	return self;
+}
+
+- (void)emitCallbacks:(id)callbacks withArglist:(NuCell *)arglist
+{
+	for (ViEvent *ev in callbacks) {
+		DEBUG(@"evaluating expression: %@ with arguments %@",
+		    [ev.expression stringValue], arglist);
+		@try {
+#ifndef NO_DEBUG
+			id result =
+#endif
+			[ev.expression evalWithArguments:arglist
+						 context:[ev.expression context]];
+			DEBUG(@"expression returned %@", result);
+		}
+		@catch (NSException *exception) {
+			INFO(@"got exception %@ while evaluating expression:\n%@",
+			    [exception name], [exception reason]);
+		}
+	}
 }
 
 - (void)emit:(NSString *)event for:(id)owner withArguments:(id)arguments
@@ -41,10 +66,6 @@ static NSInteger nextEventId = 0;
 	DEBUG(@"emitting event %@ for %@", event, owner);
 
 	if (event == nil)
-		return;
-
-	NSMutableArray *callbacks = [_events objectForKey:[event lowercaseString]];
-	if (callbacks == nil)
 		return;
 
 	if (arguments == nil)
@@ -58,22 +79,17 @@ static NSInteger nextEventId = 0;
 		return;
 	}
 
-	for (ViEvent *ev in callbacks) {
-		if (ev.owner == nil || [owner isEqual:ev.owner]) {
-			DEBUG(@"evaluating expression: %@ with arguments %@",
-			    [ev.expression stringValue], arglist);
-			@try {
-#ifndef NO_DEBUG
-				id result =
-#endif
-				[ev.expression evalWithArguments:arglist
-							 context:[ev.expression context]];
-				DEBUG(@"expression returned %@", result);
-			}
-			@catch (NSException *exception) {
-				INFO(@"got exception %@ while evaluating expression:\n%@",
-				    [exception name], [exception reason]);
-			}
+	NSString *key = [event lowercaseString];
+	NSMutableArray *callbacks = [_anonymous_events objectForKey:key];
+	if (callbacks)
+		[self emitCallbacks:callbacks withArglist:arglist];
+
+	if (owner) {
+		NSMapTable *owners = [_owned_events objectForKey:key];
+		if (owners) {
+			NSMutableArray *callbacks = [owners objectForKey:owner];
+			if (callbacks)
+				[self emitCallbacks:callbacks withArglist:arglist];
 		}
 	}
 }
@@ -125,14 +141,30 @@ static NSInteger nextEventId = 0;
 		return -1;
 
 	NSString *key = [event lowercaseString];
-	NSMutableArray *callbacks = [_events objectForKey:key];
-	if (callbacks == nil) {
-		callbacks = [NSMutableArray array];
-		[_events setObject:callbacks forKey:key];
+	NSMutableArray *callbacks = nil;
+	if (owner == nil) {
+		callbacks = [_anonymous_events objectForKey:key];
+		if (callbacks == nil) {
+			callbacks = [NSMutableArray array];
+			[_anonymous_events setObject:callbacks forKey:key];
+		}
+	} else {
+		NSMapTable *owners = [_owned_events objectForKey:key];
+		if (owners == nil) {
+			owners = [NSMapTable mapTableWithWeakToStrongObjects];
+			[_owned_events setObject:owners forKey:key];
+		}
+
+		callbacks = [owners objectForKey:owner];
+		if (callbacks == nil) {
+			callbacks = [NSMutableArray array];
+			[owners setObject:callbacks forKey:owner];
+		}
 	}
 
-	ViEvent *ev = [[ViEvent alloc] initWithExpression:expression owner:owner];
+	ViEvent *ev = [[ViEvent alloc] initWithExpression:expression];
 	[callbacks addObject:ev];
+
 	return ev.eventId;
 }
 
@@ -146,14 +178,12 @@ static NSInteger nextEventId = 0;
 	if (event == nil)
 		return;
 
-	NSMutableArray *callbacks = [_events objectForKey:[event lowercaseString]];
-	for (NSUInteger i = 0; i < [callbacks count];) {
-		ViEvent *ev = [callbacks objectAtIndex:i];
-		if (owner == nil || [owner isEqual:ev.owner])
-			[callbacks removeObjectAtIndex:i];
-		else
-			++i;
-	}
+	NSString *key = [event lowercaseString];
+	if (owner == nil)
+		[_anonymous_events removeObjectForKey:key];
+	else
+		[[_owned_events objectForKey:key] removeObjectForKey:owner];
+
 }
 
 - (void)clear:(NSString *)event
@@ -163,8 +193,13 @@ static NSInteger nextEventId = 0;
 
 - (void)clearFor:(id)owner
 {
-	for (NSString *event in [_events allKeys])
-		[self clear:event for:owner];
+	if (owner == nil) {
+		[_anonymous_events removeAllObjects];
+		[_owned_events removeAllObjects];
+	} else {
+		for (NSMapTable *owners in [_owned_events allValues])
+			[owners removeObjectForKey:owner];
+	}
 }
 
 - (void)clear
@@ -177,13 +212,24 @@ static NSInteger nextEventId = 0;
 	if (eventId < 0)
 		return;
 
-	for (NSString *event in [_events allKeys]) {
-		NSMutableArray *events = [_events objectForKey:event];
+	for (NSMutableArray *events in [_anonymous_events allValues]) {
 		for (NSUInteger i = 0; i < [events count]; i++) {
 			ViEvent *ev = [events objectAtIndex:i];
 			if (ev.eventId == eventId) {
 				[events removeObjectAtIndex:i];
-				break;
+				return;
+			}
+		}
+	}
+
+	for (NSMapTable *owners in [_owned_events allValues]) {
+		for (NSMutableArray *events in [owners objectEnumerator]) {
+			for (NSUInteger i = 0; i < [events count]; i++) {
+				ViEvent *ev = [events objectAtIndex:i];
+				if (ev.eventId == eventId) {
+					[events removeObjectAtIndex:i];
+					return;
+				}
 			}
 		}
 	}

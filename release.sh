@@ -5,11 +5,15 @@ if test -z "$tag"; then
 	version="r$(hg id -n -r tip)"
 	tag=tip
 else
-	version=$(echo $tag | sed -e 's/^V//' -e 's/_/./g' )
+	version=$2
+	if test -z "$version"; then
+		echo "missing version"
+		exit 1
+	fi
 fi
 
 echo tag is $tag
-echo version = $version
+echo version is $version
 
 dir=build.vico-$version
 echo build directory is $dir

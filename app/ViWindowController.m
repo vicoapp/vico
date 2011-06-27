@@ -1918,12 +1918,16 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 			ViDocument *doc;
 			doc = [[ViDocumentController sharedDocumentController]
 				openDocumentWithContentsOfURL:url
-						      display:YES
+						      display:NO
 							error:&error];
 			if (error)
 				MESSAGE(@"%@: %@", url, [error localizedDescription]);
-			else
+			else {
+				[doc addWindowController:self];
+				[self addDocument:doc];
+				[self switchToDocument:doc];
 				return YES;
+			}
 		}
 	}
 

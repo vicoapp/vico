@@ -256,11 +256,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return self;
 }
 
-- (void)finalize
-{
-	[super finalize];
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath
 		      ofObject:(id)object
 			change:(NSDictionary *)change

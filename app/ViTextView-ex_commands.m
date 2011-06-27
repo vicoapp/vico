@@ -1,5 +1,6 @@
 #import "ViTextView.h"
 #import "ViAppController.h"
+#import "ViEventManager.h"
 
 @implementation ViTextView (ex_commands)
 
@@ -103,7 +104,13 @@
 
 	NSString *script = [[[self textStorage] string] substringWithRange:range];
 	NSError *error = nil;
-	id result = [[NSApp delegate] eval:script error:&error];
+	NuParser *parser = [[NuParser alloc] init];
+	[[NSApp delegate] loadStandardModules:[parser context]];
+	[parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
+	id result = [[NSApp delegate] eval:script
+				withParser:parser
+				  bindings:nil
+				     error:&error];
 	if (error) {
 		MESSAGE(@"%@", [error localizedDescription]);
 		return NO;

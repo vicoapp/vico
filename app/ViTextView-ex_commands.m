@@ -3,69 +3,67 @@
 
 @implementation ViTextView (ex_commands)
 
-- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange
+- (NSInteger)resolveExAddress:(struct ex_address *)addr
+		   relativeTo:(NSInteger)relline
 {
-	NSUInteger begin_line, end_line;
 	ViMark *m = nil;
 	ViTextStorage *storage = [self textStorage];
+	NSInteger line = -1;
 
-	switch (command.addr1->type) {
+	switch (addr->type) {
 	case EX_ADDR_ABS:
-		if (command.addr1->addr.abs.line == -1)
-			begin_line = [storage lineCount];
+		if (addr->addr.abs.line == -1)
+			line = [storage lineCount];
 		else
-			begin_line = command.addr1->addr.abs.line;
+			line = addr->addr.abs.line;
 		break;
-	case EX_ADDR_RELATIVE:
 	case EX_ADDR_CURRENT:
-		begin_line = [self currentLine];
+		line = [self currentLine];
 		break;
 	case EX_ADDR_MARK:
-		m = [self markNamed:command.addr1->addr.mark];
+		m = [self markNamed:addr->addr.mark];
 		if (m == nil) {
-			MESSAGE(@"Mark %C: not set", command.addr1->addr.mark);
-			return NO;
+			MESSAGE(@"Mark %C: not set", addr->addr.mark);
+			return -1;
 		}
-		begin_line = m.line;
+		line = m.line;
+		break;
+	case EX_ADDR_RELATIVE:
+		if (relline < 0)
+			line = [self currentLine];
+		else
+			line = relline;
 		break;
 	case EX_ADDR_NONE:
 	default:
-		return NO;
+		if (relline < 0)
+			return -1;
+		line = relline;
 		break;
 	}
 
-	begin_line += command.addr1->offset;
-	if ([storage locationForStartOfLine:begin_line] == -1ULL)
-		return NO;
+	line += addr->offset;
 
-	switch (command.addr2->type) {
-	case EX_ADDR_ABS:
-		if (command.addr2->addr.abs.line == -1)
-			end_line = [storage lineCount];
-		else
-			end_line = command.addr2->addr.abs.line;
-		break;
-	case EX_ADDR_CURRENT:
-		end_line = [self currentLine];
-		break;
-	case EX_ADDR_MARK:
-		m = [self markNamed:command.addr2->addr.mark];
-		if (m == nil) {
-			MESSAGE(@"Mark %C: not set", command.addr2->addr.mark);
-			return NO;
-		}
-		end_line = m.line;
-		break;
-	case EX_ADDR_RELATIVE:
-	case EX_ADDR_NONE:
-		end_line = begin_line;
-		break;
-	default:
-		return NO;
-	}
+	if ([storage locationForStartOfLine:line] == -1ULL)
+		return -1;
 
-	end_line += command.addr2->offset;
-	if ([storage locationForStartOfLine:end_line] == -1ULL)
+	return line;
+}
+
+- (NSInteger)resolveExAddress:(struct ex_address *)addr
+{
+	return [self resolveExAddress:addr relativeTo:-1];
+}
+
+- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange
+{
+	NSInteger begin_line, end_line;
+
+	begin_line = [self resolveExAddress:command.addr1];
+	if (begin_line < 0)
+		return NO;
+	end_line = [self resolveExAddress:command.addr2 relativeTo:begin_line];
+	if (end_line < 0)
 		return NO;
 
 	*outRange = NSMakeRange(begin_line, end_line - begin_line);
@@ -182,6 +180,87 @@
 	}
 
 	final_location = [[self textStorage] firstNonBlankForLineAtLocation:range.location];
+	return YES;
+}
+
+- (BOOL)ex_yank:(ExCommand *)command
+{
+	NSRange range;
+	if (![self resolveExAddresses:command intoRange:&range])
+		return NO;
+
+	[self yankToRegister:command.reg range:range];
+	return YES;
+}
+
+- (BOOL)ex_delete:(ExCommand *)command
+{
+	NSRange range;
+	if (![self resolveExAddresses:command intoRange:&range])
+		return NO;
+
+	[self cutToRegister:command.reg range:range];
+	return YES;
+}
+
+- (BOOL)ex_copy:(ExCommand *)command
+{
+	NSRange range;
+	if (![self resolveExAddresses:command intoRange:&range])
+		return NO;
+
+	NSInteger destline = [self resolveExAddress:command.line];
+	if (destline < 0)
+		return NO;
+	if (destline > 0)
+		++destline;
+
+	NSString *content = [[[self textStorage] string] substringWithRange:range];
+	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
+	if (destloc == -1)
+		destloc = [[self textStorage] length];
+	[self insertString:content atLocation:destloc];
+
+	final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + [content length]];
+
+	return YES;
+}
+
+- (BOOL)ex_move:(ExCommand *)command
+{
+	NSRange lineRange, range;
+	if (![self resolveExAddresses:command intoLineRange:&lineRange])
+		return NO;
+	if (![self resolveExAddresses:command intoRange:&range])
+		return NO;
+
+	NSInteger destline = [self resolveExAddress:command.line];
+	if (destline < 0)
+		return NO;
+
+	if (destline >= lineRange.location && destline < NSMaxRange(lineRange)) {
+		MESSAGE(@"Can't move lines into themselves");
+		return NO;
+	}
+
+	if (destline > 0)
+		++destline;
+
+	NSString *content = [[[self textStorage] string] substringWithRange:range];
+	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
+	if (destloc == -1)
+		destloc = [[self textStorage] length];
+
+	if (destloc > range.location) {
+		[self insertString:content atLocation:destloc];
+		[self deleteRange:range undoGroup:YES];
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc];
+	} else {
+		[self deleteRange:range undoGroup:YES];
+		[self insertString:content atLocation:destloc];
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + range.length];
+	}
+
 	return YES;
 }
 

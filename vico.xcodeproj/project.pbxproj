@@ -1748,7 +1748,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\nREPO_VERSION=$(/opt/local/bin/hg identify -n $SOURCE_ROOT)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\nif test $BUILD_STYLE == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n";
+			shellScript = "set -x\nREPO_VERSION=$(hg identify -n $SOURCE_ROOT)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\nif test $BUILD_STYLE == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

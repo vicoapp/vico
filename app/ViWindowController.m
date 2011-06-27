@@ -1890,7 +1890,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		}
 	}];
 
-	return YES;
+	return NO; /* XXX: this is wrong, but needed to keep -keyManager:evaluateCommand: in ViTextView overwrite the message with -updateStatus. */
 }
 
 - (BOOL)ex_pwd:(ExCommand *)command

@@ -377,39 +377,23 @@ int logIndent = 0;
  */
 - (void)insertString:(NSString *)aString
           atLocation:(NSUInteger)aLocation
-           undoGroup:(BOOL)undoGroup
 {
-	[self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:aString undoGroup:undoGroup];
-}
-
-- (void)insertString:(NSString *)aString atLocation:(NSUInteger)aLocation
-{
-	[self insertString:aString atLocation:aLocation undoGroup:YES];
+	[self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:aString undoGroup:YES];
 }
 
 - (void)insertString:(NSString *)aString
 {
-	[self insertString:aString atLocation:[self caret] undoGroup:YES];
-}
-
-- (void)deleteRange:(NSRange)aRange undoGroup:(BOOL)undoGroup
-{
-	[self replaceCharactersInRange:aRange withString:@"" undoGroup:undoGroup];
+	[self insertString:aString atLocation:[self caret]];
 }
 
 - (void)deleteRange:(NSRange)aRange
 {
-	[self deleteRange:aRange undoGroup:NO];
-}
-
-- (void)replaceRange:(NSRange)aRange withString:(NSString *)aString undoGroup:(BOOL)undoGroup
-{
-	[self replaceCharactersInRange:aRange withString:aString undoGroup:undoGroup];
+	[self replaceCharactersInRange:aRange withString:@"" undoGroup:YES];
 }
 
 - (void)replaceRange:(NSRange)aRange withString:(NSString *)aString
 {
-	[self replaceRange:aRange withString:aString undoGroup:YES];
+	[self replaceCharactersInRange:aRange withString:aString undoGroup:YES];
 }
 
 - (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString forTabstop:(ViTabstop *)tabstop
@@ -859,7 +843,7 @@ int logIndent = 0;
                 range:(NSRange)cutRange
 {
 	[self yankToRegister:regName range:cutRange];
-	[self deleteRange:cutRange undoGroup:YES];
+	[self deleteRange:cutRange];
 	[self setMark:']' atLocation:cutRange.location];
 }
 

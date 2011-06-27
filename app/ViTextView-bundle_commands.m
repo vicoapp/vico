@@ -238,9 +238,9 @@
 			[self setNormalMode];
 
 		if ([outputFormat isEqualToString:@"replaceSelectedText"])
-			[self replaceRange:selectedRange withString:outputText undoGroup:NO];
+			[self replaceRange:selectedRange withString:outputText];
 		else if ([outputFormat isEqualToString:@"replaceDocument"])
-			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText undoGroup:NO];
+			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText];
 		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 			// [self addToolTipRect: owner:outputText userData:nil];
@@ -289,10 +289,10 @@
 				}
 			}
 		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
-			[self insertString:outputText atLocation:[self caret] undoGroup:NO];
+			[self insertString:outputText atLocation:[self caret]];
 			[self setCaret:[self caret] + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
-			[self insertString:outputText atLocation:NSMaxRange(selectedRange) undoGroup:NO];
+			[self insertString:outputText atLocation:NSMaxRange(selectedRange)];
 			[self setCaret:NSMaxRange(selectedRange) + [outputText length]];
 		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
 			NSRange r;

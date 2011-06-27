@@ -35,5 +35,6 @@
 - (void)openSymbolListTemporarily:(BOOL)temporary;
 - (void)closeSymbolList;
 - (BOOL)symbolListVisible;
+- (void)symbolsUpdate:(NSTimer *)aTimer;
 
 @end

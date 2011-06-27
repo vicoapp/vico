@@ -60,16 +60,15 @@
 	 */
 	if ([macro.mapping isExpression]) {
 		NuBlock *expression = macro.mapping.expression;
-		NSMutableDictionary *callingContext = [[expression context] mutableCopy];
-		[[NSApp delegate] exportGlobals:callingContext];
-		DEBUG(@"evaling with calling context %@", callingContext);
+		DEBUG(@"evaling with calling context %@", [expression context]);
 		@try {
-			id result = [[expression body] evalWithContext:callingContext];
+			id result = [[expression body] evalWithContext:[expression context]];
 			DEBUG(@"got result %@, class %@", result, NSStringFromClass([result class]));
 			return [result respondsToSelector:@selector(boolValue)] && [result boolValue];
 		}
 		@catch (NSException *exception) {
 			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
+			INFO(@"context was: %@", [expression context]);
 			[self presentError:[ViError errorWithFormat:@"Got exception %@: %@",
 			    [exception name], [exception reason]]];
 			recursionLevel = 0;

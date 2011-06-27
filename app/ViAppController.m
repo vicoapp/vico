@@ -334,38 +334,11 @@ extern BOOL makeNewWindowInsteadOfTab;
 #pragma mark -
 #pragma mark Script evaluation
 
-/* Set some convenient global objects. */
-- (void)exportGlobals:(NSMutableDictionary *)context
-{
-	NuSymbolTable *symbolTable = [NuSymbolTable sharedSymbolTable];
-
-	ViWindowController *winCon = [ViWindowController currentWindowController];
-	if (winCon) {
-		[context setObject:winCon forKey:[symbolTable symbolWithString:@"window"]];
-		if (winCon.explorer)
-			[context setObject:winCon.explorer forKey:[symbolTable symbolWithString:@"explorer"]];
-		id<ViViewController> view = [winCon currentView];
-		if (view) {
-			[context setObject:view forKey:[symbolTable symbolWithString:@"view"]];
-			if ([view isKindOfClass:[ViDocumentView class]]) {
-				ViTextView *textView = [(ViDocumentView *)view textView];
-				[context setObject:textView forKey:[symbolTable symbolWithString:@"text"]];
-			}
-		}
-		ViDocument *doc = [winCon currentDocument];
-		if (doc)
-			[context setObject:doc forKey:[symbolTable symbolWithString:@"document"]];
-	}
-
-	[context setObject:[ViEventManager defaultManager] forKey:[symbolTable symbolWithString:@"eventManager"]];
-}
-
 - (void)loadStandardModules:(NSMutableDictionary *)context
 {
 	[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"nibtools"      fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
 	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
 }
@@ -375,8 +348,6 @@ withParser:(NuParser *)parser
   bindings:(NSDictionary *)bindings
      error:(NSError **)outError
 {
-	[self exportGlobals:[parser context]];
-
 	DEBUG(@"additional bindings: %@", bindings);
 	for (NSString *key in [bindings allKeys])
 		if ([key isKindOfClass:[NSString class]])

@@ -39,7 +39,7 @@
 		(@shellCommand exitWithObject:ret)
 		(set @shellCommand nil)))
 
-((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
+(NSApp activateIgnoringOtherApps:YES)
 
 (set target ((ShellMenuDelegate alloc) initWithShell:shellCommand))
 
@@ -62,7 +62,6 @@
 		(item setRepresentedObject:obj)) )))
 
 ; this pops up the menu at the carets location in the current text view
-(text popUpContextMenu:menu)
+((current-text) popUpContextMenu:menu)
 (unless (target itemSelected)
 	(shellCommand exitWithError:1))
-	

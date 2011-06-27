@@ -54,7 +54,6 @@ additionalBindings:(NSDictionary *)bindings
 @property(nonatomic,readonly) NSMenu *encodingMenu;
 @property (nonatomic, readonly) TISInputSourceRef original_input_source;
 
-- (void)exportGlobals:(NSMutableDictionary *)context;
 - (void)loadStandardModules:(NSMutableDictionary *)context;
 - (id)eval:(NSString *)script
 withParser:(NuParser *)parser

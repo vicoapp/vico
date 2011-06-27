@@ -38,6 +38,8 @@
 	(shellCommand log:"missing choices")
 	(shellCommand exitWithError:1)
 (else
+	(set text (current-text))
+	(set window (current-window))
 	; (shellCommand log:"choices are: #{(choices description)}")
 	(set range `(,(- (text caret) (initial_filter length)) ,(initial_filter length)))
 	(unless (initial_filter)
@@ -46,7 +48,7 @@
 			(set range wordRange)
 			(set initial_filter (((text textStorage) string) substringWithRange:range)) ))
 	; (shellCommand log:"initial filter is #{initial_filter} in range #{range}")
-	((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
+	(NSApp activateIgnoringOtherApps:YES)
 	(set cc (ViCompletionController sharedController))
 	(set prefixLength (initial_filter length))
 	(set completions (choices map: (do (choice)

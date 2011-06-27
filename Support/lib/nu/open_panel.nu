@@ -14,9 +14,7 @@
 ; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
-
-(load "vico")
+(NSApp activateIgnoringOtherApps:YES)
 
 (set openPanel (NSOpenPanel openPanel))
 (unless (defined options)
@@ -34,7 +32,7 @@
 (if NO ;(window window)
 	(then
 		; This currently crashes
-		(openPanel beginSheetModalForWindow:(window window) completionHandler:(cblock void ((int) returnValue)
+		(openPanel beginSheetModalForWindow:((current-window) window) completionHandler:(cblock void ((int) returnValue)
 			;(shellCommand log:"modal panel returned value #{returnValue}")
 			(if (eq returnValue 1)
 				(shellCommand exitWithObject:(openPanel URLs))
@@ -45,7 +43,5 @@
 		;(shellCommand log:"return value is #{returnValue}")
 		(if (eq returnValue 1)
 			(shellCommand exitWithObject:(openPanel URLs))
-			(else
-				(shellCommand exitWithError:1)) )
-		))
+			(else (shellCommand exitWithError:1)) ) ))
 

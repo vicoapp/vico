@@ -14,7 +14,7 @@
 ; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
+(NSApp activateIgnoringOtherApps:YES)
 
 (unless (defined buttonTitles)
 	(set buttonTitles (NSArray arrayWithList:'("OK" "Cancel"))))

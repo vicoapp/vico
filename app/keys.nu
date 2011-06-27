@@ -1,11 +1,3 @@
-(set ViMapSetsDot 1)
-(set ViMapNeedMotion 2)
-(set ViMapIsMotion 4)
-(set ViMapLineMode 8)
-(set ViMapNeedArgument 16)
-
-(puts "loading key mappings")
-
 ;; arrow motions, also valid in insert mode
 (set amap (ViMap mapWithName:"arrowMap"))
 (amap setKey:"<right>" toMotion:"move_right_and_wrap:")
@@ -480,27 +472,27 @@
 
 ; move to EOL and insert statement terminator
 ((ViMap insertMap) map:"<alt-cmd-cr>" toExpression:(do ()
-	(let (term (or ((text environment) objectForKey:"TM_LINE_TERMINATOR") ";"))
-		(text input:"<esc>A#{term}"))))
+	(let (term (or (((current-text) environment) objectForKey:"TM_LINE_TERMINATOR") ";"))
+		((current-text) input:"<esc>A#{term}"))))
 ; move to EOL and insert statement terminator + newline
 ((ViMap insertMap) map:"<shift-cmd-cr>" to:"<alt-cmd-cr><esc>o" recursively:YES scope:nil)
 
 ; switch buffer, w/fuzzy completion
 ((ViMap normalMap) map:"<ctrl-s>" toExpression:(do ()
-	(if ((NSUserDefaults standardUserDefaults) boolForKey:"prefertabs")
+	(if ((user-defaults) boolForKey:"prefertabs")
 		; if we prefer documents in tabs, switch to an open tab, or open a new tab
-		(text input:":tbuffer <ctrl-f>")
+		((current-text) input:":tbuffer <ctrl-f>")
 		(else
 			; we prefer to open documents in the same view
-			(text input:":buffer <ctrl-f>"))) ))
+			((current-text) input:":buffer <ctrl-f>"))) ))
 
 ; reveal current document in explorer
 ((ViMap normalMap) map:"<ctrl-cmd-r>" toExpression:(do ()
-	(if (document fileURL)
-		(if ((window explorer) selectItemWithURL:(document fileURL))
-			((window explorer) focusExplorer:nil)
+	(if ((current-document) fileURL)
+		(if ((current-explorer) selectItemWithURL:((current-document) fileURL))
+			((current-explorer) focusExplorer:nil)
 			(YES)
-			(else (window showMessage:"#{((document fileURL) lastPathComponent)} not found in explorer"))) )))
+			(else ((current-window) showMessage:"#{((document fileURL) lastPathComponent)} not found in explorer"))) )))
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")

@@ -52,5 +52,6 @@
 		(@parameters removeObjectForKey:"controller")
 		(@shellCommand exitWithObject:@parameters)))
 
-((NSApplication sharedApplication) activateIgnoringOtherApps:YES)
+(NSApp activateIgnoringOtherApps:YES)
 ((ShellNibOwner alloc) initWithNibPath:nibFile parameters:params shell:shellCommand)
+

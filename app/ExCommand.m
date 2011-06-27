@@ -1,6 +1,7 @@
 #import "ExCommand.h"
 #import "ViError.h"
 #import "NSScanner-additions.h"
+#import "ViCommon.h"
 #include "logging.h"
 
 @interface ExCommand (private)

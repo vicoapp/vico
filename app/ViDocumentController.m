@@ -23,6 +23,11 @@
 	[invocation setArgument:&flag atIndex:3];
 	[invocation setArgument:&closeAllContextInfo atIndex:4];
 	[invocation invokeWithTarget:closeAllDelegate];
+
+	closeAllSet = nil;
+	closeAllDelegate = nil;
+	closeAllSelector = NULL;
+	closeAllContextInfo = NULL;
 }
 
 - (void)closeNextDocumentInWindow:(NSWindow *)window

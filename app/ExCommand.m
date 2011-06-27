@@ -41,11 +41,6 @@ struct ex_command ex_commands[] = {
 		"S",
 		@"[line [,line]] ! command",
 		@"filter lines through commands or run commands"},
-	/* C_HASH */
-	{@"#",		@"ex_number",	EX_ADDR2|EX_CLRFLAG,
-		"ca1",
-		@"[line [,line]] # [count] [l]",
-		@"display numbered lines"},
 	/* C_SUBAGAIN */
 	{@"&",		@"ex_subagain",	EX_ADDR2,
 		"s",
@@ -54,18 +49,13 @@ struct ex_command ex_commands[] = {
 	/* C_STAR */
 	{@"*",		@"ex_at",		0,
 		"b",
-		@"* [buffer]",
-		@"execute a buffer"},
+		@"* [register]",
+		@"execute contents of a register as an Ex command"},
 	/* C_SHIFTL */
 	{@"<",		@"ex_shiftl",	EX_ADDR2|EX_AUTOPRINT,
 		"ca1",
 		@"[line [,line]] <[<...] [count] [flags]",
 		@"shift lines left"},
-	/* C_EQUAL */
-	{@"=",		@"ex_equal",	EX_ADDR1|EX_ADDR_ZERO|EX_ADDR_ZERODEF,
-		"1",
-		@"[line] = [flags]",
-		@"display line number"},
 	/* C_SHIFTR */
 	{@">",		@"ex_shiftr",	EX_ADDR2|EX_AUTOPRINT,
 		"ca1",
@@ -74,18 +64,8 @@ struct ex_command ex_commands[] = {
 	/* C_AT */
 	{@"@",		@"ex_at",		EX_ADDR2,
 		"b",
-		@"@ [buffer]",
-		@"execute a buffer"},
-	/* C_APPEND */
-	{@"append",	@"ex_append",	EX_ADDR1|EX_ADDR_ZERO|EX_ADDR_ZERODEF,
-		"!",
-		@"[line] a[ppend][!]",
-		@"append input to a line"},
-	/* C_ARGS */
-	{@"args",	@"ex_args",	0,
-		"",
-		@"ar[gs]",
-		@"display file argument list"},
+		@"@ [register]",
+		@"execute contents of a register as an Ex command"},
 	{@"b",	@"ex_buffer",	0,
 		"s",
 		@"b[uffer] bufname",
@@ -98,11 +78,6 @@ struct ex_command ex_commands[] = {
 		"s",
 		@"b[uffer] bufname",
 		@"edit another open document in the current view"},
-	/* C_CHANGE */
-	{@"change",	@"ex_change",	EX_ADDR2|EX_ADDR_ZERODEF,
-		"!ca",
-		@"[line [,line]] c[hange][!] [count]",
-		@"change lines to input"},
 	/* C_CD */
 	{@"cd",		@"ex_cd",		0,
 		"!f1o",
@@ -133,11 +108,6 @@ struct ex_command ex_commands[] = {
 		"bca1",
 		@"[line [,line]] d[elete][flags] [buffer] [count] [flags]",
 		@"delete lines from the file"},
-	/* C_DISPLAY */
-	{@"display",	@"ex_display",	0,
-		"w1r",
-		@"display b[uffers] | c[onnections] | s[creens] | t[ags]",
-		@"display buffers, connections, screens or tags"},
 	/* C_EDIT */
 	{@"edit",	@"ex_edit",	EX_NEWSCREEN,
 		"f1o",
@@ -151,31 +121,11 @@ struct ex_command ex_commands[] = {
 		"s",
 		@"export var=[value]",
 		@"export an environment variable"},
-	/* C_EXUSAGE */
-	{@"exusage",	@"ex_usage",	0,
-		"w1o",
-		@"[exu]sage [command]",
-		@"display ex command usage statement"},
-	/* C_FILE */
-	{@"file",	@"ex_file",	0,
-		"f1o",
-		@"f[ile] [name]",
-		@"display (and optionally set) file name"},
 	/* C_GLOBAL */
 	{@"global",	@"ex_global",	EX_ADDR2_ALL,
 		"!s",
 		@"[line [,line]] g[lobal][!] [;/]RE[;/] [commands]",
 		@"execute a global command on lines matching an RE"},
-	/* C_HELP */
-	{@"help",	@"ex_help",	0,
-		"",
-		@"he[lp]",
-		@"display help statement"},
-	/* C_INSERT */
-	{@"insert",	@"ex_insert",	EX_ADDR1|EX_ADDR_ZERO|EX_ADDR_ZERODEF,
-		"!",
-		@"[line] i[nsert][!]",
-		@"insert input before a line"},
 	/* C_JOIN */
 	{@"join",	@"ex_join",	EX_ADDR2|EX_AUTOPRINT,
 		"!ca1",
@@ -205,19 +155,14 @@ struct ex_command ex_commands[] = {
 		"f1o",
 		@"new [file]",
 		@"edit a new file in a new horizontal split"},
-	/* C_NUMBER */
-	{@"number",	@"ex_number",	EX_ADDR2|EX_CLRFLAG,
-		"ca1",
-		@"[line [,line]] nu[mber] [count] [l]",
-		@"change display to number lines"},
 	/* C_PUT */
-	{@"put",		@"ex_put",	
+	{@"put",		@"ex_put",
 		EX_ADDR1|EX_AUTOPRINT|EX_ADDR_ZERO|EX_ADDR_ZERODEF,
 		"b",
 		@"[line] pu[t] [buffer]",
 		@"append a cut buffer to the line"},
 	/* C_PWD */
-	{@"pwd",		@"ex_pwd",	
+	{@"pwd",		@"ex_pwd",
 		0,
 		"",
 		@"pw[d]",
@@ -255,11 +200,6 @@ struct ex_command ex_commands[] = {
 		"w1r",
 		@"setf[iletype] syntax name",
 		@"set the file type (eg, 'source.perl' or just 'perl')"},
-	/* C_SHELL */
-	{@"shell",	@"ex_shell",	EX_SECURE,
-		"",
-		@"sh[ell]",
-		@"suspend editing and run a shell"},
 	{@"split",	@"ex_split",	0,
 		"f1o",
 		@"sp[lit] file",
@@ -306,11 +246,6 @@ struct ex_command ex_commands[] = {
 		"s",
 		@"tb[uffer] bufname",
 		@"edit another open document in a new tab"},
-	/* C_UNDO */
-	{@"undo",	@"ex_undo",	EX_AUTOPRINT,
-		"",
-		@"u[ndo]",
-		@"undo the most recent change"},
 	/* C_UNMAP */
 	{@"unmap",	@"ex_unmap",	0,
 		"!w1r",
@@ -330,11 +265,6 @@ struct ex_command ex_commands[] = {
 		"",
 		@"version",
 		@"display the program version information"},
-	/* C_VIUSAGE */
-	{@"viusage",	@"ex_viusage",	0,
-		"w1o",
-		@"[viu]sage [key]",
-		@"display vi key usage statement"},
 	{@"vnew",	@"ex_vnew",	0,
 		"f1o",
 		@"vne[w] [file]",
@@ -368,11 +298,6 @@ struct ex_command ex_commands[] = {
 		"bca",
 		@"[line [,line]] ya[nk] [buffer] [count]",
 		@"copy lines to a cut buffer"},
-	/* C_Z */
-	{@"z",		@"ex_z",		EX_ADDR1,
-		"3c01",
-		@"[line] z [-|.|+|^|=] [count] [flags]",
-		@"display different screens of the file"},
 	/* C_SUBTILDE */
 	{@"~",		@"ex_subtilde",	EX_ADDR2,
 		"s",
@@ -411,31 +336,12 @@ ex_cmd_find(NSString *cmd)
 @synthesize words;
 @synthesize pattern;
 @synthesize replacement;
-
-- (struct ex_address *)addr1
-{
-	return &addr1;
-}
-
-- (struct ex_address *)addr2
-{
-	return &addr2;
-}
-
-- (struct ex_address *)line
-{
-	return &line;
-}
+@synthesize reg;
+@synthesize addr1, addr2, line;
 
 - (NSString *)method
 {
 	return command ? command->method : nil;
-}
-
-- (ExCommand *)init
-{
-	self = [super init];
-	return self;
 }
 
 - (ExCommand *)initWithString:(NSString *)string
@@ -449,51 +355,54 @@ ex_cmd_find(NSString *cmd)
 }
 
 + (BOOL)parseRange:(NSScanner *)scan
-       intoAddress:(struct ex_address *)addr
+       intoAddress:(ExAddress **)outAddr
 {
-	addr->type = EX_ADDR_NONE;
-	addr->offset = 0;
+	ExAddress *addr = [[ExAddress alloc] init];
 
 	[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
 	NSCharacterSet *signSet = [NSCharacterSet characterSetWithCharactersInString:@"+-^"];
 
+	NSString *pattern;
+	NSInteger lineno;
+
 	if (![signSet characterIsMember:[[scan string] characterAtIndex:[scan scanLocation]]] &&
-	    [scan scanInt:&addr->addr.abs.line])
+	    [scan scanInteger:&lineno])
 	{
-		addr->addr.abs.column = 1;
-		addr->type = EX_ADDR_ABS;
+		addr.line = lineno;
+		addr.type = ExAddressAbsolute;
 	}
 	else if ([scan scanString:@"$" intoString:nil])
 	{
-		addr->addr.abs.line = -1;
-		addr->addr.abs.column = 1;
-		addr->type = EX_ADDR_ABS;
+		addr.line = -1;
+		addr.type = ExAddressAbsolute;
 	}
 	else if ([scan scanString:@"'" intoString:nil] && ![scan isAtEnd])
 	{
-		addr->addr.mark = [[scan string] characterAtIndex:[scan scanLocation]];
+		addr.mark = [[scan string] characterAtIndex:[scan scanLocation]];
 		[scan setScanLocation:[scan scanLocation] + 1];
-		addr->type = EX_ADDR_MARK;
+		addr.type = ExAddressMark;
 	}
 	else if ([scan scanString:@"/" intoString:nil])
 	{
 		// FIXME: doesn't handle escaped '/'
-		[scan scanUpToString:@"/" intoString:&addr->addr.search.pattern];
+		[scan scanUpToString:@"/" intoString:&pattern];
 		[scan scanString:@"/" intoString:nil];
-		addr->type = EX_ADDR_SEARCH;
-		addr->addr.search.backwards = NO;
+		addr.type = ExAddressSearch;
+		addr.pattern = pattern;
+		addr.backwards = NO;
 	}
 	else if ([scan scanString:@"?" intoString:nil])
 	{
 		// FIXME: doesn't handle escaped '?'
-		[scan scanUpToString:@"?" intoString:&addr->addr.search.pattern];
+		[scan scanUpToString:@"?" intoString:&pattern];
 		[scan scanString:@"?" intoString:nil];
-		addr->addr.search.backwards = YES;
-		addr->type = EX_ADDR_SEARCH;
+		addr.type = ExAddressSearch;
+		addr.pattern = pattern;
+		addr.backwards = YES;
 	}
 	else if ([scan scanString:@"." intoString:nil])
 	{
-		addr->type = EX_ADDR_CURRENT;
+		addr.type = ExAddressCurrent;
 	}
 
         /* Skip whitespace. */
@@ -508,10 +417,8 @@ ex_cmd_find(NSString *cmd)
 	while (![scan isAtEnd] &&
 	       [offsetSet characterIsMember:[[scan string] characterAtIndex:[scan scanLocation]]])
 	{
-		if (addr->type == EX_ADDR_NONE)
-		{
-			addr->type = EX_ADDR_RELATIVE;
-		}
+		if (addr.type == ExAddressNone)
+			addr.type = ExAddressRelative;
 
 		/* From nvi
 		 * Evaluate an offset, defined as:
@@ -542,17 +449,14 @@ ex_cmd_find(NSString *cmd)
 
 		BOOL has_sign = NO;
 		unichar sign = [[scan string] characterAtIndex:[scan scanLocation]];
-		if ([signSet characterIsMember:sign])
-		{
+		if ([signSet characterIsMember:sign]) {
 			[scan setScanLocation:[scan scanLocation] + 1];
 			has_sign = YES;
-		}
-		else
+		} else
 			sign = '+';
 
 		int offset = 0;
-		if (![scan scanInt:&offset])
-		{
+		if (![scan scanInt:&offset]) {
 			if (!has_sign)
 				break;
 			offset = 1;
@@ -560,21 +464,23 @@ ex_cmd_find(NSString *cmd)
 
 		if (sign != '+')
 			offset = -offset;
-		addr->offset += offset;
+		addr.offset += offset;
 
 		/* Skip whitespace. */
 		[scan scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 	}
 
-	return addr->type != EX_ADDR_NONE;
+	if (outAddr)
+		*outAddr = addr;
+	return addr.type != ExAddressNone;
 }
 
 
 // FIXME: should handle more than two addresses (discard)
 
 + (int)parseRange:(NSScanner *)scan
-      intoAddress:(struct ex_address *)addr1
-     otherAddress:(struct ex_address *)addr2
+      intoAddress:(ExAddress **)addr1
+     otherAddress:(ExAddress **)addr2
 {
         /* From nvi:
          * Parse comma or semi-colon delimited line specs.
@@ -602,8 +508,7 @@ ex_cmd_find(NSString *cmd)
 	int naddr = 0;
 	//state = ADDR_NONE;
 
-	if ([[scan string] characterAtIndex:[scan scanLocation]] == '%')
-	{
+	if ([[scan string] characterAtIndex:[scan scanLocation]] == '%') {
 		/* From nvi:
 		 * !!!
 		 * A percent character addresses all of the lines in
@@ -616,15 +521,13 @@ ex_cmd_find(NSString *cmd)
 		 */
 		[scan setScanLocation:[scan scanLocation] + 1];
 
-		addr1->type = EX_ADDR_ABS;
-		addr1->addr.abs.line = 1;
-		addr1->addr.abs.column = 1;
-		addr1->offset = 0;
+		*addr1 = [[ExAddress alloc] init];
+		(*addr1).type = ExAddressAbsolute;
+		(*addr1).line = 1;
 
-		addr2->type = EX_ADDR_ABS;
-		addr2->addr.abs.line = -1;
-		addr2->addr.abs.column = 1;
-		addr2->offset = 0;
+		*addr2 = [[ExAddress alloc] init];
+		(*addr2).type = ExAddressAbsolute;
+		(*addr2).line = -1;
 
 		// FIXME: check for more addresses (which is an error)
 		return 2;
@@ -942,13 +845,15 @@ ex_cmd_find(NSString *cmd)
 		{
 		case 0:                         /* Default cursor/empty file. */
 			naddr = 1;
-			addr1.type = EX_ADDR_CURRENT;
+			addr1 = [[ExAddress alloc] init];
+			addr1.type = ExAddressCurrent;
 			break;
 		case 1:
 			break;
 		case 2:				/* Lose the first address. */
 			naddr = 1;
 			addr1 = addr2;
+			addr2 = nil;
 			break;
 		}
 		break;
@@ -961,13 +866,14 @@ ex_cmd_find(NSString *cmd)
 		if (naddr == 0)			/* Default entire/empty file. */
 		{
 			naddr = 2;
-			addr1.type = EX_ADDR_ABS;
-			addr1.addr.abs.line = 1;
-			addr1.addr.abs.column = 1;
+			addr1 = [[ExAddress alloc] init];
+			addr1.type = ExAddressAbsolute;
+			addr1.line = 1;
 			addr1.offset = 0;
-			addr2.type = EX_ADDR_ABS;
-			addr2.addr.abs.line = -1;	/* last line */
-			addr2.addr.abs.column = 1;
+
+			addr2 = [[ExAddress alloc] init];
+			addr2.type = ExAddressAbsolute;
+			addr2.line = -1;	/* last line */
 			addr2.offset = 0;
 		}
 		/* FALLTHROUGH */
@@ -975,10 +881,12 @@ ex_cmd_find(NSString *cmd)
 two_addr:	switch (naddr)
 		{
 		case 0:                         /* Default cursor/empty file. */
-			naddr = 1;
-			addr1.type = EX_ADDR_CURRENT;
-			break;
+			addr1 = [[ExAddress alloc] init];
+			addr1.type = ExAddressCurrent;
+			/* FALLTHROUGH */
 		case 1:				/* Default to first address. */
+			naddr = 2;
+			addr2 = [addr1 copy];
 			break;
 		case 2:
 			break;
@@ -990,7 +898,7 @@ two_addr:	switch (naddr)
 		break;
 	}
 
-	line.type = EX_ADDR_NONE;
+	line.type = ExAddressNone;
 
 	if (endContext) {
 		if (strchr(command->syntax, 'f') || strchr(command->syntax, 'S')) {
@@ -1120,23 +1028,45 @@ end_case23:		break;
 				if ((c == '+' || c == '-' || c == '^' || c == '#') &&
 				    strchr(p, '1') != NULL)
 					break;
-	
+
 				/*
 				 * !!!
 				 * Digits can't be buffer names in ex commands, or the
 				 * command "d2" would be a delete into buffer '2', and
 				 * not a two-line deletion.
 				 */
-				if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:c]) {
-					buffer = c;
+				if (![[NSCharacterSet decimalDigitCharacterSet] characterIsMember:c]) {
+					reg = c;
 					flags |= E_C_BUFFER;
 					[scan setScanLocation:[scan scanLocation] + 1];
 				}
 			}
 			break;
 		case 'c':				/* count [01+a] */
-#if 0
 			++p;
+			[scan scanInteger:&count];
+			if (count == 0 && *p != '0') {
+				if (outError)
+					*outError = [ViError errorWithFormat:@"Count may not be zero"];
+				return NO;
+			}
+
+			/*
+			 * Counts as address offsets occur in commands taking
+			 * two addresses.  Historic vi practice was to use
+			 * the count as an offset from the *second* address.
+			 *
+			 * Set a count flag; some underlying commands (see
+			 * join) do different things with counts than with
+			 * line addresses.
+			 */
+			if (*p == 'a') {
+				addr1 = [addr2 copy];
+				addr2.offset += IMAX(0, count - 1);
+			}
+			flags |= E_C_COUNT;
+
+#if 0
 			/* Validate any signed value. */
 			if (!isdigit(*ecp->cp) && (*p != '+' ||
 			    (*ecp->cp != '+' && *ecp->cp != '-')))

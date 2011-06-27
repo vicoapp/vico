@@ -1,3 +1,5 @@
+#import "ExAddress.h"
+
 /* From nvi:
  */
 #define EX_ADDR1         0x00000001      /* One address. */
@@ -45,43 +47,12 @@ struct ex_command
 
 extern struct ex_command ex_commands[];
 
-#define EX_ADDR_NONE		0
-#define EX_ADDR_ABS		1
-#define EX_ADDR_SEARCH		2
-#define EX_ADDR_MARK		3
-#define EX_ADDR_CURRENT		4
-#define EX_ADDR_RELATIVE	5
-
-struct ex_address
-{
-	int type;
-	int offset;
-	union
-	{
-		struct
-		{
-			int line;
-			int column;
-		} abs;
-
-		struct
-		{
-			NSString *pattern;
-			BOOL backwards;
-		} search;
-
-		int mark;
-	} addr;
-};
-
 @interface ExCommand : NSObject
 {
 	struct ex_command *command;
 	int naddr;
-	struct ex_address addr1;
+	ExAddress *addr1, *addr2, *line;
 	BOOL addr2_relative_addr1; // true if semicolon used between addr1 and addr2
-	struct ex_address addr2;
-	struct ex_address line;
 	unsigned flags;
 	NSString *name;
 
@@ -94,27 +65,26 @@ struct ex_address
 	NSArray *words;
 
 	NSInteger flagoff;
-	unichar buffer;
+	unichar reg;
 	NSInteger count;
 }
 
-- (ExCommand *)init;
 - (ExCommand *)initWithString:(NSString *)string;
 - (BOOL)parse:(NSString*)string
- contextAtEnd:(int*)endContext
+ contextAtEnd:(int *)endContext
         error:(NSError **)outError;
-- (BOOL)parse:(NSString*)string
+- (BOOL)parse:(NSString *)string
         error:(NSError **)outError;
 + (BOOL)parseRange:(NSScanner *)scan
-       intoAddress:(struct ex_address *)addr;
+       intoAddress:(ExAddress **)addr;
 + (int)parseRange:(NSScanner *)scan
-      intoAddress:(struct ex_address *)addr1
-     otherAddress:(struct ex_address *)addr2;
+      intoAddress:(ExAddress **)addr1
+     otherAddress:(ExAddress **)addr2;
 
 @property(nonatomic,readonly) int naddr;
-@property(nonatomic,readonly) struct ex_address *addr1;
-@property(nonatomic,readonly) struct ex_address *addr2;
-@property(nonatomic,readonly) struct ex_address *line;
+@property(nonatomic,readonly) ExAddress *addr1;
+@property(nonatomic,readonly) ExAddress *addr2;
+@property(nonatomic,readonly) ExAddress *line;
 @property(nonatomic,readonly) struct ex_command *command;
 @property(nonatomic,readonly) unsigned flags;
 @property(nonatomic,readonly) NSString *name;
@@ -125,5 +95,6 @@ struct ex_address
 @property(nonatomic,readonly) NSString *pattern;
 @property(nonatomic,readonly) NSString *replacement;
 @property(nonatomic,readonly) NSArray *words;
+@property(nonatomic,readonly) unichar reg;
 
 @end

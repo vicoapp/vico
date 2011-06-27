@@ -4,38 +4,38 @@
 
 @implementation ViTextView (ex_commands)
 
-- (NSInteger)resolveExAddress:(struct ex_address *)addr
+- (NSInteger)resolveExAddress:(ExAddress *)addr
 		   relativeTo:(NSInteger)relline
 {
 	ViMark *m = nil;
 	ViTextStorage *storage = [self textStorage];
 	NSInteger line = -1;
 
-	switch (addr->type) {
-	case EX_ADDR_ABS:
-		if (addr->addr.abs.line == -1)
+	switch (addr.type) {
+	case ExAddressAbsolute:
+		if (addr.line == -1)
 			line = [storage lineCount];
 		else
-			line = addr->addr.abs.line;
+			line = addr.line;
 		break;
-	case EX_ADDR_CURRENT:
+	case ExAddressCurrent:
 		line = [self currentLine];
 		break;
-	case EX_ADDR_MARK:
-		m = [self markNamed:addr->addr.mark];
+	case ExAddressMark:
+		m = [self markNamed:addr.mark];
 		if (m == nil) {
-			MESSAGE(@"Mark %C: not set", addr->addr.mark);
+			MESSAGE(@"Mark %C: not set", addr.mark);
 			return -1;
 		}
 		line = m.line;
 		break;
-	case EX_ADDR_RELATIVE:
+	case ExAddressRelative:
 		if (relline < 0)
 			line = [self currentLine];
 		else
 			line = relline;
 		break;
-	case EX_ADDR_NONE:
+	case ExAddressNone:
 	default:
 		if (relline < 0)
 			return -1;
@@ -43,7 +43,7 @@
 		break;
 	}
 
-	line += addr->offset;
+	line += addr.offset;
 
 	if ([storage locationForStartOfLine:line] == -1ULL)
 		return -1;
@@ -51,7 +51,7 @@
 	return line;
 }
 
-- (NSInteger)resolveExAddress:(struct ex_address *)addr
+- (NSInteger)resolveExAddress:(ExAddress *)addr
 {
 	return [self resolveExAddress:addr relativeTo:-1];
 }
@@ -207,6 +207,8 @@
 		return NO;
 
 	[self cutToRegister:command.reg range:range];
+	final_location = [[self textStorage] firstNonBlankForLineAtLocation:range.location];
+
 	return YES;
 }
 
@@ -260,12 +262,12 @@
 
 	if (destloc > range.location) {
 		[self insertString:content atLocation:destloc];
-		[self deleteRange:range undoGroup:YES];
-		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc];
+		[self deleteRange:range];
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc - 1];
 	} else {
-		[self deleteRange:range undoGroup:YES];
+		[self deleteRange:range];
 		[self insertString:content atLocation:destloc];
-		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + range.length];
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + range.length - 1];
 	}
 
 	return YES;

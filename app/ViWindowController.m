@@ -682,6 +682,8 @@ static ViWindowController	*currentWindowController = nil;
 		[[openFilesButton menu] removeItemAtIndex:ndx];
 	[documents removeObject:document];
 	[document removeWindowController:self];
+	[document removeObserver:symbolController forKeyPath:@"symbols"];
+	[[symbolController nextRunloop] symbolsUpdate:nil];
 }
 
 - (void)closeDocumentView:(id<ViViewController>)viewController

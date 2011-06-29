@@ -18,13 +18,22 @@ tail()
 EOF
 }
 
+echo "# Index" > index.md
+echo "" >> index.md
+
 while test -n "$1"; do
 	file=$1
 	title=$(sed -n '/^# /{s///;p;q;}' "$1")
 	echo "converting $file with title '$title'" >&2
+	html="$(basename "${file%.*}.html")"
 	(head "$file" "$title"
 	 perl $HOME/bin/Markdown.pl --html4tags "$file"
-	 tail) > "$(basename "${file%.*}.html")"
+	 tail) > $html
+	echo "  * [$title]($html)" >> index.md
 	shift
 done
+
+(head index.md Index
+ perl $HOME/bin/Markdown.pl --html4tags index.md
+ tail) > index.html
 

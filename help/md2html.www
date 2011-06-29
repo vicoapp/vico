@@ -1,0 +1,30 @@
+#!/bin/sh
+
+head()
+{
+	file=$1
+	title=$2
+
+cat <<EOF
+<!--#set var="title" value="$title" -->
+<!--#include file="/book/shared/head.shtml" -->
+EOF
+}
+
+tail()
+{
+	cat <<EOF
+<!--#include file="/book/shared/tail.shtml" -->
+EOF
+}
+
+while test -n "$1"; do
+	file=$1
+	title=$(sed -n '/^# /{s///;p;q;}' "$1")
+	echo "converting $file with title '$title'" >&2
+	(head "$file" "$title"
+	 perl $HOME/bin/Markdown.pl --html4tags "$file"
+	 tail) > "$(basename "${file%.*}.html")"
+	shift
+done
+

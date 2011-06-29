@@ -43,6 +43,14 @@ help:
 	cd $(HELP_EN) && $(HELP_SRC)/md2html $(HELP_SRC)/*.md
 	hiutil -vg -s en -Caf $(HELP_EN)/Vico.helpindex $(HELP_EN)
 
+WWW_HELP_DST = $(CURDIR)/help/www
+WWW_HELP_EN  = $(WWW_HELP_DST)/en
+wwwhelp:
+	rm -rf $(CURDIR)/help/www
+	mkdir -p $(WWW_HELP_EN)
+	cp -rf $(HELP_SRC)/shared $(WWW_HELP_DST)
+	cd $(WWW_HELP_EN) && $(HELP_SRC)/md2html.www $(HELP_SRC)/*.md
+
 synchelp: help
 	rsync -avr $(HELP_DST)/ www.vicoapp.com:/var/www/vicoapp.com/help
 

@@ -13,10 +13,14 @@ REQUESTED
   normally. Also if pasting back (P) on the last line, it pastes both
   blank and the line.
 
+* @godDLL: can I have a preference to open new files that were opened
+  externally (double-click in Finder, vicotool, etc) not in a new tab, not
+  in current view, but in a new window?
+
 * vim text objects, especially i[, a] and it, at
 * vicotool --line 1
 * R (replace mode)
-
+* * and # command should set / register
 
 URGENT
 ========
@@ -29,7 +33,7 @@ URGENT
 * undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
-
+* ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 
 BUGS
 ====

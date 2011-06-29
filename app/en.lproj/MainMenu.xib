@@ -1131,7 +1131,7 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="250341445">
 									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Symbol List</string>
+									<string key="NSTitle">Navigate Symbol List</string>
 									<string key="NSKeyEquiv">y</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1159,7 +1159,7 @@
 								</object>
 								<object class="NSMenuItem" id="228274561">
 									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">File Explorer</string>
+									<string key="NSTitle">Navigate File Explorer</string>
 									<string key="NSKeyEquiv">e</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -3537,22 +3537,14 @@
 							<string>filterIndicator</string>
 							<string>filterLabel</string>
 							<string>filterSheet</string>
-							<string>messageField</string>
-							<string>projectDelegate</string>
-							<string>statusbar</string>
 							<string>window</string>
-							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSProgressIndicator</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
-							<string>NSTextField</string>
-							<string>ProjectDelegate</string>
-							<string>NSTextField</string>
 							<string>NSWindow</string>
-							<string>ViWindowController</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -3562,11 +3554,7 @@
 							<string>filterIndicator</string>
 							<string>filterLabel</string>
 							<string>filterSheet</string>
-							<string>messageField</string>
-							<string>projectDelegate</string>
-							<string>statusbar</string>
 							<string>window</string>
-							<string>windowController</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3583,24 +3571,8 @@
 								<string key="candidateClassName">NSWindow</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">messageField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">projectDelegate</string>
-								<string key="candidateClassName">ProjectDelegate</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">statusbar</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">window</string>
 								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">windowController</string>
-								<string key="candidateClassName">ViWindowController</string>
 							</object>
 						</object>
 					</object>

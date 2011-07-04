@@ -179,6 +179,8 @@
 - (BOOL)ex_split:(ExCommand *)command;
 - (BOOL)ex_vsplit:(ExCommand *)command;
 - (BOOL)ex_buffer:(ExCommand *)command;
+- (BOOL)ex_export:(ExCommand *)command;
+- (void)ex_quit:(ExCommand *)command;
 
 @end
 

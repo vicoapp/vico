@@ -624,6 +624,7 @@ static ViWindowController	*currentWindowController = nil;
 		[(ViDocument *)doc closeAndWindow:(intptr_t)contextInfo];
 }
 
+/* almost, but not quite, like :quit */
 - (IBAction)closeCurrent:(id)sender
 {
 	id<ViViewController> viewController = [self currentView];
@@ -750,8 +751,7 @@ static ViWindowController	*currentWindowController = nil;
 				DEBUG(@"closed last view of document %@, closing document", doc);
 				[doc close];
 			} else {
-				DEBUG(@"closed last view of document %@ in this window, unlisting document", doc);
-				[self unlistDocument:doc];
+				DEBUG(@"document %@ has more views open", doc);
 			}
 		}
 	}
@@ -2239,6 +2239,42 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	DEBUG(@"static environment is now %@", env);
 
 	return YES;
+}
+
+- (void)ex_quit:(ExCommand *)command
+{
+	id<ViViewController> viewController = [self currentView];
+	if ([tabView numberOfTabViewItems] > 1 || [[[[self currentView] tabController] views] count] > 1) {
+		[self closeDocumentView:viewController
+		       canCloseDocument:NO
+			 canCloseWindow:NO];
+	} else {
+		if ((command.flags & E_C_FORCE) == E_C_FORCE) {
+			ViDocument *doc;
+			while ((doc = [documents lastObject]) != nil) {
+				/* Check if this document is open in another window. */
+				BOOL openElsewhere = NO;
+				for (NSWindow *window in [NSApp windows]) {
+					ViWindowController *wincon = [window windowController];
+					if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
+						continue;
+					if ([[wincon documents] containsObject:doc]) {
+						openElsewhere = YES;
+						break;
+					}
+				}
+
+				if (openElsewhere)
+					[self unlistDocument:doc];
+				else
+					[doc closeAndWindow:YES];
+			}
+			[[self window] close];
+		} else
+			[[self window] performClose:nil];
+	}
+
+	// FIXME: quit/hide app if last window?
 }
 
 @end

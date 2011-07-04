@@ -1545,7 +1545,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self fileURL]];
+	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self fileURL] ?: [self displayName]];
 }
 
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation
@@ -1720,25 +1720,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[windowController closeDocument:self andWindow:NO];
 }
 
-- (void)ex_quit:(ExCommand *)command
-{
-	if ((command.flags & E_C_FORCE) == E_C_FORCE)
-		[self closeAndWindow:YES];
-	else
-		[windowController closeDocument:self andWindow:YES];
-	// FIXME: quit app if last window?
-}
-
 - (void)ex_wq:(ExCommand *)command
 {
 	[self ex_write:command];
-	[self ex_quit:command];
+	[[self windowController] ex_quit:command];
 }
 
 - (void)ex_xit:(ExCommand *)command
 {
 	[self ex_write:command];
-	[self ex_quit:command];
+	[[self windowController] ex_quit:command];
 }
 
 @end

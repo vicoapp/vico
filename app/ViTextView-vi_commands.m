@@ -2486,6 +2486,55 @@
 
 #pragma mark -
 
+- (void)toggleCaseOfRange:(NSRange)range
+{
+	NSString *s = [[self textStorage] string];
+
+	NSMutableString *string = [[s substringWithRange:range] mutableCopy];
+
+	NSUInteger i;
+	for (i = 0; i < range.length; i++) {
+		NSRange chRange = NSMakeRange(i, 1);
+		NSString *ch = [string substringWithRange:chRange];
+		NSString *uc = [ch uppercaseString];
+		if ([ch isEqualToString:uc]) {
+			NSString *lc = [ch lowercaseString];
+			if (![ch isEqualToString:lc])
+				[string replaceCharactersInRange:chRange withString:lc];
+		} else {
+			[string replaceCharactersInRange:chRange withString:uc];
+		}
+	}
+	[self replaceRange:range withString:string];
+	final_location = end_location = IMIN(NSMaxRange(range), [s length] - 1);
+}
+
+/* syntax: [count]~ */
+- (BOOL)toggle_case:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+
+	NSUInteger end, eol;
+	[self getLineStart:NULL end:&end contentsEnd:&eol forLocation:start_location];
+	if (start_location + count > eol)
+		count = (int)(eol - start_location);
+
+	if (start_location + count > [[self textStorage] length])
+		return NO;
+	[self toggleCaseOfRange:NSMakeRange(start_location, count)];
+	if (final_location >= eol && eol != end)
+		final_location = eol - 1;
+	return YES;
+}
+
+/* syntax: g~motion */
+- (BOOL)toggle_case_op:(ViCommand *)command
+{
+	[self toggleCaseOfRange:affectedRange];
+	final_location = affectedRange.location;
+	return YES;
+}
+
 - (BOOL)uppercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];

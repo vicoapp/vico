@@ -584,6 +584,8 @@ static ViWindowController	*currentWindowController = nil;
 	ViDocument *doc;
 	while ((doc = [documents lastObject]) != nil)
 		[self unlistDocument:doc];
+
+	[[ViEventManager defaultManager] clearFor:self];
 }
 
 - (id<ViViewController>)currentView;
@@ -891,6 +893,9 @@ static ViWindowController	*currentWindowController = nil;
 			[self synchronizeWindowTitleWithDocumentName];
 #endif
 	}
+
+	ViDocumentTabController *tabController = [tabViewItem identifier];
+	[[ViEventManager defaultManager] clearFor:tabController];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

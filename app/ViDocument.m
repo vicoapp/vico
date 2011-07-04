@@ -831,6 +831,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[super close];
 	[[ViEventManager defaultManager] emitDelayed:ViEventDidCloseDocument for:self with:self, nil];
+	[[[ViEventManager defaultManager] nextRunloop] clearFor:self];
 }
 
 - (void)close

@@ -48,6 +48,7 @@
 		[[viewController document] removeView:viewController];
 	[views removeObject:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
+	[[ViEventManager defaultManager] clearFor:viewController];
 	if (viewController == previousView)
 		previousView = nil;
 }

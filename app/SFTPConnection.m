@@ -679,9 +679,11 @@ resp2txt(int type)
 		break;
 	case NSStreamEventErrorOccurred:
 		INFO(@"error on stream %@: %@", stream, [stream streamError]);
+		[self reportConnectionStatus:[NSString stringWithFormat:@"Lost connection to %@", [self title]]];
 		[self abort];
 		break;
 	case NSStreamEventEndEncountered:
+		[self reportConnectionStatus:[NSString stringWithFormat:@"Lost connection to %@", [self title]]];
 		DEBUG(@"EOF on stream %@", stream);
 		[self abort];
 		break;

@@ -109,7 +109,7 @@
     _cellMaxWidth = 280;
     _cellOptimumWidth = 130;
     style = [[PSMMetalTabStyle alloc] init];
-    _animate = YES;
+    _animate = NO;
 
     // the overflow button/menu
     NSRect overflowButtonRect = NSMakeRect([self frame].size.width - [style rightMarginForTabBarControl] + 1, 0, [style rightMarginForTabBarControl] - 1, [self frame].size.height);
@@ -443,7 +443,7 @@
     
     _isHidden = hide;
     _currentStep = 0;
-    if(!animate)
+    if (!animate)
         _currentStep = (int)kPSMHideAnimationSteps;
     
     float partnerOriginalHeight, partnerOriginalY, myOriginalHeight, myOriginalY, partnerTargetHeight, partnerTargetY, myTargetHeight, myTargetY;
@@ -503,7 +503,11 @@
 #endif
 
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:myOriginalY], @"myOriginalY", [NSNumber numberWithFloat:partnerOriginalY], @"partnerOriginalY", [NSNumber numberWithFloat:myOriginalHeight], @"myOriginalHeight", [NSNumber numberWithFloat:partnerOriginalHeight], @"partnerOriginalHeight", [NSNumber numberWithFloat:myTargetY], @"myTargetY", [NSNumber numberWithFloat:partnerTargetY], @"partnerTargetY", [NSNumber numberWithFloat:myTargetHeight], @"myTargetHeight", [NSNumber numberWithFloat:partnerTargetHeight], @"partnerTargetHeight", nil];
-    [NSTimer scheduledTimerWithTimeInterval:(1.0/20.0) target:self selector:@selector(animateShowHide:) userInfo:userInfo repeats:YES];
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:(1.0/20.0) target:self selector:@selector(animateShowHide:) userInfo:userInfo repeats:YES];
+    if (!animate) {
+	    [self animateShowHide:timer];
+	    [timer invalidate];
+    }
 }
 
 - (void)animateShowHide:(NSTimer *)timer
@@ -547,7 +551,7 @@
 
 - (void)enableAnimations
 {
-	_animate = YES;
+	// _animate = YES;
 }
 
 #pragma mark -
@@ -574,11 +578,11 @@
     }
 
     // hide/show? (these return if already in desired state)
-    if (_animate) {
+    if (_animate || 1) {
         if((_hideForSingleTab) && ([_cells count] <= 1)){
-            [self hideTabBar:YES animate:YES];
+            [self hideTabBar:YES animate:_animate];
         } else {
-            [self hideTabBar:NO animate:YES];
+            [self hideTabBar:NO animate:_animate];
         }
     }
 

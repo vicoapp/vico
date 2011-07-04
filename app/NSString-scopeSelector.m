@@ -72,10 +72,15 @@ tenpow(NSUInteger x)
 
 			NSUInteger reflength = [ref length];
 			match = YES;
-			for (i = k = 0; k < reflength && i < sel->length; i++, k++) {
-				if ([ref characterAtIndex:k] != sel->buf[i]) {
-					match = NO;
-					break;
+			if (sel->length > reflength) {
+				/* A selector that is longer than the scope can never match. */
+				match = NO;
+			} else {
+				for (i = k = 0; k < reflength && i < sel->length; i++, k++) {
+					if ([ref characterAtIndex:k] != sel->buf[i]) {
+						match = NO;
+						break;
+					}
 				}
 			}
 

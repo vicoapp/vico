@@ -3,6 +3,7 @@ REGRESSIONS
 
 * ctrl-^ (prev document) doesn't work with untitled files
 * ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
+! need to update / checkin changes in obj-c indent expression
 
 
 REQUESTED

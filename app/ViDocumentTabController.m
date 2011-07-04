@@ -8,13 +8,15 @@
 
 @implementation ViDocumentTabController
 
-@synthesize views, selectedView, previousView;
+@synthesize window, views, selectedView, previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialViewController
+		      window:(NSWindow *)aWindow;
 {
 	self = [super init];
 	if (self) {
 		views = [[NSMutableArray alloc] init];
+		window = aWindow;
 
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
 		splitView = [[NSSplitView alloc] initWithFrame:frame];

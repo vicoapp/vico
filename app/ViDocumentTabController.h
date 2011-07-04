@@ -35,15 +35,18 @@ enum ViViewOrderingMode {
 {
 	NSSplitView		*splitView;
 	NSMutableArray		*views;
+	NSWindow		*window;
 	id<ViViewController>	 selectedView;
 	id<ViViewController>	 previousView;
 }
 
 @property(nonatomic,readonly) NSArray *views;
+@property(nonatomic,readonly) NSWindow *window;
 @property(nonatomic,readwrite, assign) id<ViViewController> selectedView;
 @property(nonatomic,readwrite, assign) id<ViViewController> previousView;
 
-- (id)initWithViewController:(id<ViViewController>)initialView;
+- (id)initWithViewController:(id<ViViewController>)initialViewController
+		      window:(NSWindow *)aWindow;
 - (void)addView:(id<ViViewController>)aView;
 - (NSView *)view;
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController

@@ -201,12 +201,14 @@
 
 - (void)addDocument:(NSDocument *)document
 {
+	DEBUG(@"adding document %@", document);
 	[super addDocument:document];
 	[[ViEventManager defaultManager] emit:ViEventDidAddDocument for:nil with:document, nil];
 }
 
 - (void)removeDocument:(NSDocument *)document
 {
+	DEBUG(@"removing document %@", document);
 	[super removeDocument:document];
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
 }

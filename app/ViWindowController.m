@@ -32,6 +32,7 @@ static ViWindowController	*currentWindowController = nil;
 - (void)documentController:(NSDocumentController *)docController
 	       didCloseAll:(BOOL)didCloseAll
 	     tabController:(void *)tabController;
+- (void)unlistDocument:(ViDocument *)document;
 @end
 
 
@@ -287,7 +288,7 @@ static ViWindowController	*currentWindowController = nil;
 		return;
 	}
 
-	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:viewController];
+	ViDocumentTabController *tabController = [[ViDocumentTabController alloc] initWithViewController:viewController window:[self window]];
 
 	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
@@ -321,7 +322,7 @@ static ViWindowController	*currentWindowController = nil;
 	ViDocumentTabController *lastTabController = [[[tabBar representedTabViewItems] lastObject] identifier];
 	if ([self currentDocument] != nil &&
 	    [[self currentDocument] fileURL] == nil &&
-	    [document loader] != nil &&
+	    [document fileURL] != nil &&
 	    ![[self currentDocument] isDocumentEdited] &&
 	    [[lastTabController views] count] == 1 &&
 	    [self currentDocument] == [[[lastTabController views] objectAtIndex:0] document]) {
@@ -330,8 +331,9 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	[self addDocument:document];
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
-	    [tabView numberOfTabViewItems] == 0)
+	if (closeThisDocument == nil && (
+	    [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
+	    [tabView numberOfTabViewItems] == 0))
 		[self createTabForDocument:document];
 	else
 		[self switchToDocument:document];
@@ -548,11 +550,18 @@ static ViWindowController	*currentWindowController = nil;
 			continue;
 
 		/* Check if this document is open in another window. */
-		ViDocumentView *otherDocView;
-		for (otherDocView in [doc views])
-			if ([[otherDocView view] window] != window)
+		BOOL openElsewhere = NO;
+		for (NSWindow *window in [NSApp windows]) {
+			ViWindowController *wincon = [window windowController];
+			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
+				continue;
+			if ([[wincon documents] containsObject:doc]) {
+				openElsewhere = YES;
 				break;
-		if (otherDocView == nil)
+			}
+		}
+
+		if (!openElsewhere)
 			[set addObject:doc];
 	}
 
@@ -571,6 +580,9 @@ static ViWindowController	*currentWindowController = nil;
 	[[self project] close];
 	[windowControllers removeObject:self];
 	[tabBar setDelegate:nil];
+
+	for (ViDocument *doc in documents)
+		[self unlistDocument:doc];
 }
 
 - (id<ViViewController>)currentView;
@@ -619,7 +631,20 @@ static ViWindowController	*currentWindowController = nil;
 	/* If the current view is a document view, check if it's the last document view. */
 	if ([viewController respondsToSelector:@selector(document)]) {
 		ViDocument *doc = [viewController document];
-		if ([[doc views] count] == 1) {
+
+		/* Check if this document is open in another window. */
+		BOOL openElsewhere = NO;
+		for (NSWindow *window in [NSApp windows]) {
+			ViWindowController *wincon = [window windowController];
+			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
+				continue;
+			if ([[wincon documents] containsObject:doc]) {
+				openElsewhere = YES;
+				break;
+			}
+		}
+
+		if (!openElsewhere && [[doc views] count] == 1) {
 			[doc canCloseDocumentWithDelegate:self
 				      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
 					      contextInfo:(void *)(intptr_t)1];
@@ -681,7 +706,7 @@ static ViWindowController	*currentWindowController = nil;
 	if (ndx != -1)
 		[[openFilesButton menu] removeItemAtIndex:ndx];
 	[documents removeObject:document];
-	[document removeWindowController:self];
+	[document closeWindowController:self];
 	[document removeObserver:symbolController forKeyPath:@"symbols"];
 	[[symbolController nextRunloop] symbolsUpdate:nil];
 }
@@ -690,8 +715,9 @@ static ViWindowController	*currentWindowController = nil;
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow
 {
-	DEBUG(@"closing view controller %@, and document: %s, and window: %s",
-		viewController, canCloseDocument ? "YES" : "NO", canCloseWindow ? "YES" : "NO");
+	DEBUG(@"closing view controller %@, and document: %s, and window: %s, from window %@",
+		viewController, canCloseDocument ? "YES" : "NO", canCloseWindow ? "YES" : "NO",
+		[self window]);
 
 	if (viewController == nil)
 		[[self window] close];
@@ -704,19 +730,29 @@ static ViWindowController	*currentWindowController = nil;
 	/* If this was the last view of the document, close the document too. */
 	if (canCloseDocument && [viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocument *doc = [(ViDocumentView *)viewController document];
-		if ([[doc views] count] == 0) {
-			DEBUG(@"closed last view of document %@, closing document", doc);
-			[doc close];
+		/* Check if this document is open in another window. */
+		BOOL openElsewhere = NO;
+		for (NSWindow *window in [NSApp windows]) {
+			ViWindowController *wincon = [window windowController];
+			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
+				continue;
+			if ([[wincon documents] containsObject:doc]) {
+				openElsewhere = YES;
+				break;
+			}
+		}
+
+		if (openElsewhere) {
+			DEBUG(@"document %@ open in other windows", doc);
+			[self unlistDocument:doc];
 		} else {
-			int nViewsInWindow = 0;
-			for (ViDocumentView *docView in [doc views])
-				if ([[docView view] window] == [self window])
-					nViewsInWindow++;
-			if (nViewsInWindow == 0) {
+			if ([[doc views] count] == 0) {
+				DEBUG(@"closed last view of document %@, closing document", doc);
+				[doc close];
+			} else {
 				DEBUG(@"closed last view of document %@ in this window, unlisting document", doc);
 				[self unlistDocument:doc];
-			} else
-				DEBUG(@"got %i views in other windows", nViewsInWindow);
+			}
 		}
 	}
 
@@ -733,9 +769,14 @@ static ViWindowController	*currentWindowController = nil;
 				[self selectDocument:[documents objectAtIndex:0]];
 			else if (canCloseWindow)
 				[[self window] close];
-			else
-				[[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES
-													  error:nil];
+			else {
+				ViDocument *newDoc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO
+															       error:nil];
+				newDoc.isTemporary = YES;
+				[newDoc addWindowController:self];
+				[self addDocument:newDoc];
+				[self selectDocumentView:[self createTabForDocument:newDoc]];
+			}
 		}
 		[tabBar enableAnimations];
 	} else if (tabController == [self selectedTabController]) {
@@ -746,7 +787,7 @@ static ViWindowController	*currentWindowController = nil;
 
 /*
  * Called by the document when it closes.
- * Removes all views of the document.
+ * Removes all views of the document in this window.
  */
 - (void)didCloseDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow
 {
@@ -754,9 +795,17 @@ static ViWindowController	*currentWindowController = nil;
 
 	[self unlistDocument:document];
 
-	/* Close all views of the document. */
+	/* Close all views of the document in this window. */
 	ViDocumentView *docView;
-	while ((docView = [[document views] anyObject]) != nil)
+	NSMutableSet *set = [NSMutableSet set];
+	for (docView in [document views]) {
+		DEBUG(@"docview %@ in window %@", docView, [[docView tabController] window]);
+		if ([[docView tabController] window] == [self window])
+			[set addObject:docView];
+	}
+
+	DEBUG(@"closing remaining views in window %@: %@", [self window], set);
+	for (docView in set)
 		[self closeDocumentView:docView
 		       canCloseDocument:NO
 			 canCloseWindow:canCloseWindow];

@@ -93,6 +93,7 @@
 - (void)addView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
+- (void)closeWindowController:(ViWindowController *)aController;
 - (NSString *)title;
 - (void)setString:(NSString *)aString;
 - (void)closeAndWindow:(BOOL)canCloseWindow;

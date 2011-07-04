@@ -306,6 +306,27 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return windowController;
 }
 
+- (void)closeWindowController:(ViWindowController *)aController
+{
+	[self removeWindowController:aController];
+	if (aController == windowController) {
+		/*
+		 * XXX: This is a f*cking disaster!
+		 * Ask each windows' window controller if it contains this document.
+		 */
+		 windowController = nil;
+		for (NSWindow *window in [NSApp windows]) {
+			ViWindowController *wincon = [window windowController];
+			if (wincon == aController || ![wincon isKindOfClass:[ViWindowController class]])
+				continue;
+			if ([[wincon documents] containsObject:self]) {
+				windowController = wincon;
+				break;
+			}
+		}
+	}
+}
+
 - (void)addWindowController:(NSWindowController *)aController
 {
 	[super addWindowController:aController];
@@ -789,12 +810,25 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		closeCallback(code);
 
 	closed = YES;
-	[windowController didCloseDocument:self andWindow:canCloseWindow];
 
-	/* Remove the window controller so the document doesn't automatically
-	 * close the window.
-	 */
-	[self removeWindowController:windowController];
+	BOOL didCloseWindowController = YES;
+	while (didCloseWindowController) {
+		didCloseWindowController = NO;
+		for (NSWindow *window in [NSApp windows]) {
+			ViWindowController *wincon = [window windowController];
+			if (![wincon isKindOfClass:[ViWindowController class]])
+				continue;
+			if ([[wincon documents] containsObject:self]) {
+				[wincon didCloseDocument:self andWindow:canCloseWindow];
+				didCloseWindowController = YES;
+				break;
+			}
+		}
+	}
+
+	windowController = nil;
+	hiddenView = nil;
+
 	[super close];
 	[[ViEventManager defaultManager] emitDelayed:ViEventDidCloseDocument for:self with:self, nil];
 }
@@ -892,7 +926,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	NSRange r = [scope range];
 	if (r.location < charIndex) {
-		DEBUG(@"index = %u, r = %@", charIndex, NSStringFromRange(r));
 		r.length -= charIndex - r.location;
 		r.location = charIndex;
 	}

@@ -280,7 +280,12 @@
 
 - (void)applicationWillResignActive:(NSNotification *)aNotification
 {
-	TISSelectInputSource(original_input_source);
+	ViWindowController *wincon = [ViWindowController currentWindowController];
+	id<ViViewController> viewController = [wincon currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController textView] rememberNormalModeInputSource];
+
+		TISSelectInputSource(original_input_source);
 	DEBUG(@"selecting original input: %@",
 	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
 	[[ViEventManager defaultManager] emit:ViEventWillResignActive for:nil with:nil];

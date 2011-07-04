@@ -2367,6 +2367,16 @@ int logIndent = 0;
 	return env;
 }
 
+- (void)rememberNormalModeInputSource
+{
+	if (mode != ViInsertMode) {
+		TISInputSourceRef input = TISCopyCurrentKeyboardInputSource();
+		DEBUG(@"%p: remembering original normal input: %@", self,
+			TISGetInputSourceProperty(input, kTISPropertyLocalizedName));
+		original_normal_source = input;
+	}
+}
+
 /*
  * Called just before the mode is changed from ViInsertMode.
  */

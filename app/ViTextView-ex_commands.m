@@ -129,15 +129,16 @@
 	}
 
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
-	if ([command.string rangeOfString:@"i"].location != NSNotFound)
+	NSString *opts = command.string ?: @"";
+	if ([opts rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
 
 	BOOL reportMatches = NO;
-	if ([command.string rangeOfString:@"n"].location != NSNotFound)
+	if ([opts rangeOfString:@"n"].location != NSNotFound)
 		reportMatches = YES;
 
 	BOOL global = NO;
-	if ([command.string rangeOfString:@"g"].location != NSNotFound)
+	if ([opts rangeOfString:@"g"].location != NSNotFound)
 		global = YES;
 
 	ViRegexp *rx = nil;

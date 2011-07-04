@@ -278,9 +278,10 @@ static NSMutableDictionary *maps = nil;
 			if (rank == 0)
 				continue;
 
-			DEBUG(@"testing key [%@] against %@ (%s)",
+			DEBUG(@"testing key [%@] against %@ (%s) for selector %@ w/rank %llu in scope %@",
 			     keySequence, m,
-			     equalMatch ? "EQUAL" : (partialOrEqualMatch ? "PART+EQUAL" : "OVERFLOW+EQUAL"));
+			     equalMatch ? "EQUAL" : (partialOrEqualMatch ? "PART+EQUAL" : "OVERFLOW+EQUAL"),
+			     m.scopeSelector, rank, scope);
 
 			if (overflowOrEqualMatch && [m wantsKeys]) {
 				/*

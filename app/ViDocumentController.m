@@ -77,9 +77,10 @@
 		return;
 	}
 
+	NSWindow *window = [[(ViDocument *)doc windowController] window];
+
 	[doc close];
 
-	NSWindow *window = [[(ViDocument *)doc windowController] window];
 	if ([window attachedSheet] == nil)
 		[self closeNextDocumentInWindow:window];
 	else

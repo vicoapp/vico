@@ -227,10 +227,14 @@
 	id doc = [self documentForURL:absoluteURL];
 	if (doc) {
 		if (displayDocument) {
-			if ([doc windowController] == windowController)
-				[[doc windowController] selectDocument:doc];
-			else
-				[windowController addNewTab:doc];
+			if ([doc isKindOfClass:[ViDocument class]]) {
+				if ([doc windowController] == windowController)
+					[[doc windowController] selectDocument:doc];
+				else
+					[windowController addNewTab:doc];
+			} else if ([doc isKindOfClass:[ViProject class]]) {
+				[[[doc windowController] window] makeKeyAndOrderFront:nil];
+			}
 		}
 		return doc;
 	}

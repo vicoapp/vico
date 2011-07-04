@@ -232,9 +232,11 @@
 	}
 
 	NSMutableArray *emptyDocuments = [NSMutableArray array];
-	for (ViDocument *doc in filteredDocuments)
-		if ([doc filterSymbols:rx] == 0)
+	for (ViDocument *doc in filteredDocuments) {
+		if (![doc respondsToSelector:@selector(filterSymbols:)] ||
+		    [doc filterSymbols:rx] == 0)
 			[emptyDocuments addObject:doc];
+	}
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
 

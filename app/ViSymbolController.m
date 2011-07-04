@@ -40,10 +40,11 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == symbolFilterField)
+	if (view == symbolFilterField || view == [window fieldEditor:YES forObject:symbolFilterField])
 		[self openSymbolListTemporarily:YES];
-	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView])
+	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
 		[self closeSymbolList];
+	}
 }
 
 - (void)didSelectDocument:(ViDocument *)document
@@ -121,6 +122,11 @@
 		NSRect frame = [splitView frame];
 		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 		closeSymbolListAfterUse = NO;
+	}
+	if (hideToolbarAfterUse) {
+		NSToolbar *toolbar = [window toolbar];
+		[toolbar setVisible:NO];
+		hideToolbarAfterUse = NO;
 	}
 }
 
@@ -283,8 +289,13 @@
 		NSBeep();
 		return;
 	}
+	hideToolbarAfterUse = ![toolbar isVisible];
 	[toolbar setVisible:YES];
 	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
+		if (hideToolbarAfterUse) {
+			[toolbar setVisible:NO];
+			hideToolbarAfterUse = NO;
+		}
 		NSBeep();
 		return;
 	}
@@ -558,7 +569,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 		[cell setFont:[NSFont systemFontOfSize:11.0]];
 	else
 		[cell setFont:[NSFont systemFontOfSize:13.0]];
-		
+
 	return cell;
 }
 

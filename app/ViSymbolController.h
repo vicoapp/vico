@@ -18,6 +18,7 @@
 	NSMutableArray *filteredDocuments;
 	NSMutableDictionary *symbolFilterCache;
 	BOOL closeSymbolListAfterUse;
+	BOOL hideToolbarAfterUse;
 	NSInteger lastSelectedRow;
 	BOOL isFiltered;
 

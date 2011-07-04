@@ -63,6 +63,7 @@
 	ViRegexp *rx;
 
 	BOOL closeExplorerAfterUse;
+	BOOL hideToolbarAfterUse;
 	IBOutlet id delegate;
 	NSMutableArray *rootItems;
 	ViRegexp *skipRegex;

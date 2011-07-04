@@ -864,8 +864,13 @@
 		NSBeep();
 		return;
 	}
+	hideToolbarAfterUse = ![toolbar isVisible];
 	[toolbar setVisible:YES];
 	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
+		if (hideToolbarAfterUse) {
+			[toolbar setVisible:NO];
+			hideToolbarAfterUse = NO;
+		}
 		NSBeep();
 		return;
 	}
@@ -875,11 +880,18 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == filterField)
+	if (view == filterField || view == [window fieldEditor:YES forObject:filterField])
 		[self openExplorerTemporarily:YES];
-	else if ([view isKindOfClass:[NSView class]] && closeExplorerAfterUse && ![view isDescendantOf:explorerView]) {
-		[self closeExplorer];
-		closeExplorerAfterUse = NO;
+	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:explorerView]) {
+		if (closeExplorerAfterUse) {
+			[self closeExplorer];
+			closeExplorerAfterUse = NO;
+		}
+		if (hideToolbarAfterUse) {
+			NSToolbar *toolbar = [window toolbar];
+			[toolbar setVisible:NO];
+			hideToolbarAfterUse = NO;
+		}
 	}
 }
 
@@ -925,6 +937,11 @@
 	if (closeExplorerAfterUse) {
 		[self closeExplorer];
 		closeExplorerAfterUse = NO;
+	}
+	if (hideToolbarAfterUse) {
+		NSToolbar *toolbar = [window toolbar];
+		[toolbar setVisible:NO];
+		hideToolbarAfterUse = NO;
 	}
 	[self resetExplorerView];
 	[delegate focusEditor];

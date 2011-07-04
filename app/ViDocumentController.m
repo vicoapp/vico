@@ -9,6 +9,7 @@
 #import "TxmtURLProtocol.h"
 #import "ViURLManager.h"
 #import "ViEventManager.h"
+#import "ViProject.h"
 #include "logging.h"
 
 @implementation ViDocumentController

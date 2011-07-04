@@ -267,6 +267,7 @@ fd_read(CFSocketRef s,
 			CFRunLoopRemoveSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)runLoopMode);
 		CFSocketInvalidate(outputSocket);
 		outputSocket = NULL;
+		outputSource = NULL;
 		close(fd_out);
 		fd_out = -1;
 	}
@@ -284,6 +285,7 @@ fd_read(CFSocketRef s,
 			fd_out = -1;
 		}
 		inputSocket = NULL;
+		inputSource = NULL;
 		close(fd_in);
 		fd_in = -1;
 	}

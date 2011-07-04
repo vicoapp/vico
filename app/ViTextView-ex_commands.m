@@ -132,6 +132,14 @@
 	if ([command.string rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
 
+	BOOL reportMatches = NO;
+	if ([command.string rangeOfString:@"n"].location != NSNotFound)
+		reportMatches = YES;
+
+	BOOL global = NO;
+	if ([command.string rangeOfString:@"g"].location != NSNotFound)
+		global = YES;
+
 	ViRegexp *rx = nil;
 
 	/* compile the pattern regexp */
@@ -151,31 +159,57 @@
 	NSString *s = [storage string];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
+	NSUInteger numMatches = 0;
+	NSUInteger numLines = 0;
+
 	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
 		NSUInteger bol = [storage locationForStartOfLine:lineno];
 		NSUInteger end, eol;
 		[s getLineStart:NULL end:&end contentsEnd:&eol forRange:NSMakeRange(bol, 0)];
 
 		NSRange lineRange = NSMakeRange(bol, eol - bol);
-		NSString *value = [s substringWithRange:lineRange];
-		DEBUG(@"range %@ = %@", NSStringFromRange(lineRange), value);
-		NSString *replacedText = [tform transformValue:value
-						   withPattern:rx
-							format:command.replacement
-						       options:command.string
-							 error:&error];
-		if (error) {
-			MESSAGE(@"substitute failed: %@", [error localizedDescription]);
-			return NO;
-		}
 
-		if (replacedText != value)
-			[self replaceCharactersInRange:lineRange withString:replacedText];
+		if (reportMatches) {
+			if (global) {
+				NSArray *matches = [rx allMatchesInString:s range:lineRange];
+				NSUInteger nm = [matches count];
+				if (nm > 0) {
+					numMatches += nm;
+					numLines++;
+				}
+			} else {
+				ViRegexpMatch *match = [rx matchInString:s range:lineRange];
+				if (match) {
+					numMatches++;
+					numLines++;
+				}
+			}
+		} else {
+			NSString *value = [s substringWithRange:lineRange];
+			DEBUG(@"range %@ = %@", NSStringFromRange(lineRange), value);
+			NSString *replacedText = [tform transformValue:value
+							   withPattern:rx
+								format:command.replacement
+							       options:command.string
+								 error:&error];
+			if (error) {
+				MESSAGE(@"substitute failed: %@", [error localizedDescription]);
+				return NO;
+			}
+
+			if (replacedText != value)
+				[self replaceCharactersInRange:lineRange withString:replacedText];
+		}
 	}
 
-	[self endUndoGroup];
-	final_location = [storage locationForStartOfLine:NSMaxRange(exRange)];
-	return YES;
+	if (reportMatches) {
+		MESSAGE(@"%lu matches on %lu lines", numMatches, numLines);
+		return NO;
+	} else {
+		[self endUndoGroup];
+		final_location = [storage locationForStartOfLine:NSMaxRange(exRange)];
+		return YES;
+	}
 }
 
 - (BOOL)ex_number:(ExCommand *)command

@@ -398,7 +398,8 @@
 
 		command.motion = [ViCommand commandWithMapping:mapping count:count];
 		command.motion.operator = command;
-		command.isLineMode = command.motion.mapping.isLineMode;
+		if (!command.isLineMode)
+			command.isLineMode = command.motion.mapping.isLineMode;
 		count = 0;
 
 		if ([mapping needsArgument])

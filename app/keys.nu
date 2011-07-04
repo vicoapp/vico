@@ -338,6 +338,8 @@
 (sidemap setKey:"t" toAction:"tab_open:")
 (sidemap setKey:"v" toAction:"vsplit_open:")
 (sidemap setKey:"<cr>" toAction:"open:")
+(sidemap setKey:"<alt-up>" toMotion:"goto_line:" flags:ViMapLineMode parameter:NO scope:nil)
+(sidemap setKey:"<alt-down>" toMotion:"goto_line:" flags:ViMapLineMode parameter:YES scope:nil)
 
 ;; explorer map
 (set emap (ViMap explorerMap))
@@ -352,6 +354,13 @@
 (emap setKey:"<cmd-esc>" toMotion:"show_menu:")
 (emap setKey:"<ctrl-i>" toAction:"jumplist_forward:")
 (emap setKey:"<ctrl-o>" toAction:"jumplist_backward:")
+(emap map:"<cmd-up>" toExpression:(do ()
+	((current-window) browseURL:(((current-window) baseURL) URLByDeletingLastPathComponent))))
+(emap map:"<cmd-D>" toExpression:(do ()
+	((current-window) browseURL:(NSURL fileURLWithPath:("~/Desktop" stringByExpandingTildeInPath)))))
+(emap map:"<cmd-H>" toExpression:(do ()
+	((current-window) browseURL:(NSURL fileURLWithPath:("~" stringByExpandingTildeInPath)))))
+(emap map:"<cmd-down>" to:"<cr>")
 
 ;; symbol map
 (set smap (ViMap symbolMap))

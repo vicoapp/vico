@@ -42,6 +42,11 @@ struct ex_command ex_commands[] = {
 		"S",
 		@"[line [,line]] ! command",
 		@"filter lines through commands or run commands"},
+	/* C_HASH */
+	{@"#",		@"ex_number",	EX_ADDR2|EX_CLRFLAG,
+		"ca1",
+		@"[line [,line]] # [count] [l]",
+		@"display numbered lines"},
 	/* C_SUBAGAIN */
 	{@"&",		@"ex_subagain",	EX_ADDR2,
 		"s",

@@ -25,7 +25,6 @@ static NSInteger nextEventId = 0;
 
 + (ViEventManager *)defaultManager
 {
-	return nil;
 	static ViEventManager *defaultManager = nil;
 	if (defaultManager == nil)
 		defaultManager = [[ViEventManager alloc] init];

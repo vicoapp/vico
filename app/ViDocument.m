@@ -1716,7 +1716,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (void)ex_bdelete:(ExCommand *)command
 {
 	if ((command.flags & E_C_FORCE) == E_C_FORCE)
-		[self close];
+		[self closeAndWindow:NO];
 	else
 		[windowController closeDocument:self andWindow:NO];
 }

@@ -360,11 +360,11 @@
 (emap setKey:"<ctrl-i>" toAction:"jumplist_forward:")
 (emap setKey:"<ctrl-o>" toAction:"jumplist_backward:")
 (emap map:"<cmd-up>" toExpression:(do ()
-	((current-window) browseURL:(((current-window) baseURL) URLByDeletingLastPathComponent))))
+	((current-explorer) browseURL:(((current-window) baseURL) URLByDeletingLastPathComponent))))
 (emap map:"<cmd-D>" toExpression:(do ()
-	((current-window) browseURL:(NSURL fileURLWithPath:("~/Desktop" stringByExpandingTildeInPath)))))
+	((current-explorer) browseURL:(NSURL fileURLWithPath:("~/Desktop" stringByExpandingTildeInPath)))))
 (emap map:"<cmd-H>" toExpression:(do ()
-	((current-window) browseURL:(NSURL fileURLWithPath:("~" stringByExpandingTildeInPath)))))
+	((current-explorer) browseURL:(NSURL fileURLWithPath:("~" stringByExpandingTildeInPath)))))
 (emap map:"<cmd-down>" to:"<cr>")
 
 ;; symbol map

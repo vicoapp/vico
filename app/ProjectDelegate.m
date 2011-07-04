@@ -321,7 +321,7 @@
 			rootURL = aURL;
 			[windowController setBaseURL:aURL];
 
-			if (!jump)
+			if (!jump || ([[explorer selectedRowIndexes] count] == 0 && [window firstResponder] == explorer))
 				[self selectItemAtRow:0];
 		}
 	}];

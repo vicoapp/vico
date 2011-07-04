@@ -2157,15 +2157,19 @@
 		MESSAGE(@"Mark %C: the line was deleted", command.argument);
 		return NO;
 	}
-	final_location = bol;
+	end_location = bol;
 
 	if ([command.mapping.keyString isEqualToString:@"`"])	// XXX: use another selector!
 		[self gotoColumn:m.column fromLocation:bol];
 	else
-		final_location = [[self textStorage] skipWhitespaceFrom:final_location];
+		end_location = [[self textStorage] skipWhitespaceFrom:end_location];
 
-	[[self nextRunloop] showFindIndicatorForRange:NSMakeRange(final_location, 1)];
-	[self pushLocationOnJumpList:start_location];
+	if (!command.hasOperator) {
+		[[self nextRunloop] showFindIndicatorForRange:NSMakeRange(end_location, 1)];
+		[self pushLocationOnJumpList:start_location];
+	}
+
+	final_location = end_location;
 
 	return YES;
 }

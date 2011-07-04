@@ -1,9 +1,6 @@
 REGRESSIONS
 ===========
 
-* ctrl-^ (prev document) doesn't work with untitled files
-* ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
-! need to update / checkin changes in obj-c indent expression
 
 
 REQUESTED
@@ -51,18 +48,17 @@ BUGS
 * Downloading tmbundles seems to duplicate tab triggers (HN)
 * push marks
 * push jumps
+* ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 
 
 IMPORTANT
 =========
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
 * :q should terminate app on last document in last window?
-* installer for vicotool
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
 * Reload bundles!
-* dot should work with ! filters
 * :write !program
 * :read
 * :read !program
@@ -75,7 +71,6 @@ FEATURES
 ========
 * ability to direct stderr to other place than (or, separately from) stdout in bundle commands
 * Ability to edit tmbundles within the app (HN)
-* @fkoeppe: Option to synchronize selected file in File Explorer with currently selected file
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 * :mkdir command
 * completion expressions in nu

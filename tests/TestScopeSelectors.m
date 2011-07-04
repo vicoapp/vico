@@ -273,5 +273,10 @@
 	STAssertEquals([@"string $" matchesScopes:scopeCString], 0ULL, nil);
 }
 
+- (void)test052_SimplePrefixNonMatch
+{
+	STAssertEquals([@"source.c.foo.bar" matchesScopes:scopeCString], 0ULL, nil);
+}
+
 @end
 

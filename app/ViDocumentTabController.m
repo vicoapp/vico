@@ -226,7 +226,8 @@
 				while ([view isKindOfClass:[NSSplitView class]])
 					view = [[(NSSplitView *)view subviews] objectAtIndex:0];
 				[self setSelectedView:[self viewControllerForView:view]];
-			}
+			} else
+				[self setSelectedView:nil];
 		} else
 			[self setSelectedView:[self viewControllerForView:split]];
 	}

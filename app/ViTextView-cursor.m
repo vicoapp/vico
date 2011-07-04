@@ -101,8 +101,8 @@
 
 - (void)drawRect:(NSRect)aRect
 {
-	NSGraphicsContext *context = [NSGraphicsContext currentContext]; 
-	[context setShouldAntialias:antialias]; 
+	NSGraphicsContext *context = [NSGraphicsContext currentContext];
+	[context setShouldAntialias:antialias];
 	[super drawRect:aRect];
 	if ([[self window] firstResponder] == self)
 		[self updateInsertionPointInRect:aRect];

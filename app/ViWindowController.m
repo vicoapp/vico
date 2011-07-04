@@ -581,7 +581,8 @@ static ViWindowController	*currentWindowController = nil;
 	[windowControllers removeObject:self];
 	[tabBar setDelegate:nil];
 
-	for (ViDocument *doc in documents)
+	ViDocument *doc;
+	while ((doc = [documents lastObject]) != nil)
 		[self unlistDocument:doc];
 }
 

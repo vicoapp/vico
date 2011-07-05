@@ -37,7 +37,7 @@
 			if (fuzzySearch)
 				c = [ViCompletion completionWithContent:name fuzzyMatch:m];
 			else
-				c = [ViCompletion completionWithContent:name prefixLength:[word length]];
+				c = [ViCompletion completionWithContent:name];
 			[syntaxes addObject:c];
 		}
 	}

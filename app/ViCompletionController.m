@@ -10,6 +10,7 @@
 - (BOOL)complete_partially:(ViCommand *)command;
 - (void)acceptByKey:(NSInteger)termKey;
 - (BOOL)cancel:(ViCommand *)command;
+- (void)updateCompletions;
 @end
 
 @implementation ViCompletionController
@@ -86,6 +87,37 @@
 	}
 }
 
+- (void)completionResponse:(NSArray *)array error:(NSError *)error
+{
+	DEBUG(@"got completions: %@, error %@", array, error);
+	completions = array;
+	if ([completions count] == 0) {
+		if ([window isVisible]) {
+			[self cancel:nil];
+			return;
+		}
+	} else {
+		[self updateCompletions];
+		[self filterCompletions];
+		if ([filteredCompletions count] == 0) {
+			if ([window isVisible]) {
+				[self cancel:nil];
+				return;
+			}
+		} else if ([filteredCompletions count] == 1) {
+			if ([window isVisible]) {
+				[self acceptByKey:0];
+			} else
+				onlyCompletion = [filteredCompletions objectAtIndex:0];
+		}
+
+		/* Automatically insert common prefix among all possible completions.
+		 */
+		if ([options rangeOfString:@"p"].location != NSNotFound)
+			[self complete_partially:nil];
+	}
+}
+
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
 		      prefix:(NSString *)aPrefix
@@ -111,50 +143,34 @@
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(range), prefix, initialFilter, options);
 
-	__block ViCompletion *onlyCompletion = nil;
+	onlyCompletion = nil;
 
 	void (^onCompletionResponse)(NSArray *, NSError *) = ^(NSArray *array, NSError *error) {
-		DEBUG(@"got completions: %@, error %@", array, error);
-		completions = array;
-		if ([completions count] == 0) {
-			if ([window isVisible]) {
-				[self cancel:nil];
-				return;
-			}
-		} else {
-			[self filterCompletions];
-			if ([filteredCompletions count] == 0) {
-				if ([window isVisible]) {
-					[self cancel:nil];
-					return;
-				}
-			} else if ([filteredCompletions count] == 1) {
-				if ([window isVisible]) {
-					[self acceptByKey:0];
-				} else
-					onlyCompletion = [filteredCompletions objectAtIndex:0];
-			}
-
-			/* Automatically insert common prefix among all possible completions.
-			 */
-			if ([options rangeOfString:@"p"].location != NSNotFound)
-				[self complete_partially:nil];
-		}
+		[self completionResponse:array error:error];
 	};
 
 	completions = nil;
 	filteredCompletions = nil;
-	[aProvider completionsForString:prefix
-				options:options
-			     onResponse:onCompletionResponse];
+	if ([aProvider respondsToSelector:@selector(completionsForString:options:onResponse:)])
+		[aProvider completionsForString:prefix
+					options:options
+				     onResponse:onCompletionResponse];
+	else if ([aProvider respondsToSelector:@selector(completionsForString:options:target:action:)])
+		[aProvider completionsForString:prefix
+					options:options
+					 target:self
+					 action:@selector(completionResponse:error:)];
+	else {
+		INFO(@"Completion provider %@ doesn't respond to completionsForString:options:target:action:", aProvider);
+		return nil;
+	}
 
 	if (onlyCompletion) {
 		DEBUG(@"returning %@ as only completion", onlyCompletion);
 		return onlyCompletion;
 	}
 
-	if ((completions && [completions count] == 0) ||
-	    (filteredCompletions && [filteredCompletions count] == 0)) {
+	if ([completions count] == 0 || [filteredCompletions count] == 0) {
 		DEBUG(@"%s", "returning without completions");
 		return nil;
 	}
@@ -162,11 +178,8 @@
 	screenOrigin = origin;
 	upwards = (direction == 1);
 
-	[self filterCompletions];
-
-	if ([filteredCompletions count] > 0)
-		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-		       byExtendingSelection:NO];
+	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+	       byExtendingSelection:NO];
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
@@ -343,6 +356,14 @@
 	return YES;
 }
 
+- (void)updateCompletions
+{
+	for (ViCompletion *c in completions) {
+		c.prefixLength = prefixLength;
+		c.filterIsFuzzy = fuzzySearch;
+	}
+}
+
 - (BOOL)complete_partially:(ViCommand *)command
 {
 	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
@@ -366,12 +387,8 @@
 
 	range = NSMakeRange(range.location, [partialCompletion length]);
 	prefixLength = range.length;
-	NSMutableArray *array = [NSMutableArray array];
-	for (ViCompletion *c in filteredCompletions) {
-		c.prefixLength = prefixLength;
-		[array addObject:c];
-	}
-	[self setCompletions:array];
+	[self setCompletions:filteredCompletions];
+	[self updateCompletions];
 
 	return YES;
 }

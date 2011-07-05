@@ -43,7 +43,7 @@
 			if (fuzzySearch)
 				c = [ViCompletion completionWithContent:fn fuzzyMatch:m];
 			else
-				c = [ViCompletion completionWithContent:fn prefixLength:[word length]];
+				c = [ViCompletion completionWithContent:fn];
 			[buffers addObject:c];
 		}
 	}

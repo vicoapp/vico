@@ -137,11 +137,10 @@
 					s = [s stringByAppendingString:@"/"];
 
 				ViCompletion *c;
-				if (fuzzySearch) {
+				if (fuzzySearch)
 					c = [ViCompletion completionWithContent:s fuzzyMatch:m];
-					c.prefixLength = [path length];
-				} else
-					c = [ViCompletion completionWithContent:s prefixLength:[path length]];
+				else
+					c = [ViCompletion completionWithContent:s];
 				[matches addObject:c];
 			}
 		}

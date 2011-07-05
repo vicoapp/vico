@@ -15,10 +15,6 @@
 ; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-;
-; FIXME: This is currently broken!
-;
-
 (class TmCompletionProvider is NSObject
 	(unless ($TmProviderLoaded)
 		(set $TmProviderLoaded t)
@@ -29,10 +25,8 @@
 		(set @completions anArray)
 		(self))
 
-	; XXX: "I can't bridge this return type yet"
-	(- (void) completionsForString:(id) aString options:(id) options onResponse:(cblock void ((id) completions (id) err)) responseCallback is
-		(responseCallback @completions nil)
-		(nil)))
+	(- (void) completionsForString:(id) aString options:(id) options target:(id)target action:(SEL)action is
+		(target performSelector:action withObject:@completions withObject:nil) ))
 
 (unless (defined choices)
 	(shellCommand log:"missing choices")
@@ -50,19 +44,18 @@
 	; (shellCommand log:"initial filter is #{initial_filter} in range #{range}")
 	(NSApp activateIgnoringOtherApps:YES)
 	(set cc (ViCompletionController sharedController))
-	(set prefixLength (initial_filter length))
 	(set completions (choices map: (do (choice)
 		(set content (choice objectForKey:"match"))
 		(unless (content)
 			(set content (choice objectForKey:"display")))
-		(set c (ViCompletion completionWithContent:content prefixLength:prefixLength))
+		(set c (ViCompletion completionWithContent:content))
 		(c setRepresentedObject:choice)
 		(c))))
 	(set point ((text layoutManager) boundingRectForGlyphRange:`(,(text caret) 0)
 						   inTextContainer:(text textContainer)))
 	(set screenPoint ((window window) convertBaseToScreen:(text convertPointToBase:point)))
 	(set provider ((TmCompletionProvider alloc) initWithArray:completions))
-	(set choice (cc chooseFrom:provider range:range prefix:"" at:screenPoint options:"" direction:0 initialFilter:initial_filter))
+	(set choice (cc chooseFrom:provider range:range prefix:initial_filter at:screenPoint options:"f" direction:0 initialFilter:""))
 	; (shellCommand log:"got choice: #{(choice description)}")
 	; (shellCommand log:"termination character was: #{(NSString stringWithKeyCode:(cc terminatingKey))}")
 	(if (choice)

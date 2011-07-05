@@ -26,10 +26,10 @@
 @property (nonatomic, readwrite, assign) id representedObject;
 @property (nonatomic, readwrite, assign) NSColor *markColor;
 
-+ (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength;
++ (id)completionWithContent:(NSString *)aString;
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch;
 
-- (id)initWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength;
+- (id)initWithContent:(NSString *)aString;
 - (id)initWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch;
 
 - (NSAttributedString *)title;

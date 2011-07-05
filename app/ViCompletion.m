@@ -16,9 +16,9 @@ static NSCharacterSet *ucase = nil;
 @synthesize content, filterMatch, prefixLength, filterIsFuzzy, font, location;
 @synthesize representedObject, markColor;
 
-+ (id)completionWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
++ (id)completionWithContent:(NSString *)aString
 {
-	return [[ViCompletion alloc] initWithContent:aString prefixLength:aLength];
+	return [[ViCompletion alloc] initWithContent:aString];
 }
 
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
@@ -41,14 +41,6 @@ static NSCharacterSet *ucase = nil;
 			separators = [NSCharacterSet punctuationCharacterSet];
 			ucase = [NSCharacterSet uppercaseLetterCharacterSet];
 		}
-	}
-	return self;
-}
-
-- (id)initWithContent:(NSString *)aString prefixLength:(NSUInteger)aLength
-{
-	if ([self initWithContent:aString]) {
-		prefixLength = aLength;
 	}
 	return self;
 }
@@ -240,7 +232,7 @@ static NSCharacterSet *ucase = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViCompletion %@>", content];
+	return [NSString stringWithFormat:@"<ViCompletion %@/%lu>", content, prefixLength];
 }
 
 @end

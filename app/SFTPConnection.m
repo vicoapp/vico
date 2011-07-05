@@ -622,6 +622,7 @@ resp2txt(int type)
 {
 	DEBUG(@"got event %lu on stream %@", event, stream);
 
+	NSString *status;
 	const void *ptr;
 	NSUInteger len;
 
@@ -679,12 +680,15 @@ resp2txt(int type)
 		break;
 	case NSStreamEventErrorOccurred:
 		INFO(@"error on stream %@: %@", stream, [stream streamError]);
-		[self reportConnectionStatus:[NSString stringWithFormat:@"Lost connection to %@", [self title]]];
+		status = [NSString stringWithFormat:@"Lost connection to %@", [self title]];
+		[self reportConnectionStatus:status];
 		[self abort];
 		break;
 	case NSStreamEventEndEncountered:
-		[self reportConnectionStatus:[NSString stringWithFormat:@"Lost connection to %@", [self title]]];
 		DEBUG(@"EOF on stream %@", stream);
+		status = [NSString stringWithFormat:@"Lost connection to %@", [self title]];
+		[self reportConnectionStatus:status];
+		INFO(@"%@", status);
 		[self abort];
 		break;
 	}

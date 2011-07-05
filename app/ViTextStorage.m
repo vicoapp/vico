@@ -485,7 +485,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		location += ln->length;
 		line++;
 	}
- 
+
 	return line;
 }
 
@@ -566,7 +566,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSUInteger word_start = [self skipCharactersInSet:characterSet
 					     fromLocation:aLocation
 						 backward:YES];
-	if (word_start < aLocation && word_start > 0)
+	if (word_start < aLocation)
 		word_start += 1;
 
 	NSUInteger word_end = [self skipCharactersInSet:characterSet

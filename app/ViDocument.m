@@ -237,7 +237,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[loader setDelegate:self];
 
 	for (ViDocumentView *dv in views) {
-		ViTextView *tv = [dv innerView];
+		ViTextView *tv = [dv textView];
 		[tv setCaret:0];
 	}
 

@@ -1,4 +1,5 @@
 #import "ViFileURLHandler.h"
+#import "ViError.h"
 #include "logging.h"
 
 @interface ViFileDeferred : NSObject <ViDeferred>
@@ -38,6 +39,11 @@
 {
 	DEBUG(@"url = %@", aURL);
 
+	if (aURL == nil) {
+		aBlock(nil, [ViError errorWithFormat:@"Invalid argument."]);
+		return nil;
+	}
+
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		NSFileManager *fileman = [[NSFileManager alloc] init];
 		NSError *error = nil;
@@ -48,7 +54,10 @@
 			NSURL *u = [aURL URLByAppendingPathComponent:filename];
 			NSString *p = [u path];
 			attrs = [fileman attributesOfItemAtPath:p error:&error];
-			[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
+			if (attrs)
+				[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
+			else if (error)
+				break;
 		}
 
 		/* Schedule completion block on main queue. */

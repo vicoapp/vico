@@ -91,6 +91,8 @@
 - (void)showMessage:(NSString *)string;
 - (void)message:(NSString *)fmt, ...;
 - (void)message:(NSString *)fmt arguments:(va_list)ap;
+
+- (void)focusEditorDelayed:(id)sender;
 - (void)focusEditor;
 
 - (ViParser *)parser;

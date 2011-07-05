@@ -31,6 +31,7 @@ URGENT
 * split views top line is ANNOYINGLY changed when editing in another view
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 
+
 BUGS
 ====
 * jumps doesn't work in untitled files

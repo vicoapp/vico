@@ -9,8 +9,8 @@
 - (NSInteger)normalizedKeyCode
 {
 	// http://sigpipe.macromates.com/2005/09/24/deciphering-an-nsevent/
-	// given theEvent (NSEvent*) figure out what key 
-	// and modifiers we actually want to look at, 
+	// given theEvent (NSEvent*) figure out what key
+	// and modifiers we actually want to look at,
 	// to compare it with a menu key description
 
 	NSUInteger quals = [self modifierFlags];
@@ -47,6 +47,9 @@
 	}
 
 	if (!(quals & NSNumericPadKeyMask)) {
+		if ((0x20 < key && key < 0x7f) || key == 0x1E)
+			quals &= ~NSShiftKeyMask;
+
 		if ((quals & NSControlKeyMask)) {
 			if (key < 0x20 && ((key != 0x1B && key != 0x0D && key != 0x09 && key != 0x19) || key != without) &&
 			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)
@@ -61,14 +64,11 @@
 				key = without;
 		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
 			key = without;
-
-		if ((0x20 < key && key < 0x7f) || key == 0x1E)
-			quals &= ~NSShiftKeyMask;
 	}
 
 	if (key > 0 && key < 0x20 && key != 0x1B && key != 0x0D && key != 0x09)
 		quals &= ~NSControlKeyMask;
- 
+
 	unsigned int modifiers = quals & (NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask);
 
 	NSInteger enc = (modifiers | key);

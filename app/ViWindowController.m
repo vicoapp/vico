@@ -884,16 +884,6 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)tabView:(NSTabView *)aTabView didCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	// FIXME: check if there are hidden documents and display them in that case
-	if ([tabView numberOfTabViewItems] == 0) {
-#if 0
-		if ([self project] == nil)
-			[[self window] close];
-		else
-			[self synchronizeWindowTitleWithDocumentName];
-#endif
-	}
-
 	ViDocumentTabController *tabController = [tabViewItem identifier];
 	[[ViEventManager defaultManager] clearFor:tabController];
 }

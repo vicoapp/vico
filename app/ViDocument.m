@@ -236,6 +236,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"got deferred loader %@", loader);
 	[loader setDelegate:self];
 
+	for (ViDocumentView *dv in views) {
+		ViTextView *tv = [dv innerView];
+		[tv setCaret:0];
+	}
+
 	if (outError)
 		*outError = returnError;
 

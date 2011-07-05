@@ -138,7 +138,10 @@
 	prefix = aPrefix;
 	prefixLength = [aPrefix length];
 	options = optionString;
+	fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 	fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);
+	screenOrigin = origin;
+	upwards = (direction == 1);
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(range), prefix, initialFilter, options);
@@ -174,9 +177,6 @@
 		DEBUG(@"%s", "returning without completions");
 		return nil;
 	}
-
-	screenOrigin = origin;
-	upwards = (direction == 1);
 
 	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 	       byExtendingSelection:NO];

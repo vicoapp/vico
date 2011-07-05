@@ -47,6 +47,7 @@
 	NSUInteger prefixLength;
 	NSPoint screenOrigin;
 	BOOL upwards;
+	BOOL fuzzyTrigger;
 	BOOL fuzzySearch;
 }
 

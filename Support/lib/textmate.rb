@@ -26,7 +26,7 @@ module TextMate
       if options[:file]
         `#{VICO} #{e_sh(options[:file])}`
       end
-      `#{VICO} -e "(text gotoLine:#{options[:line]} column:#{options[:column]})((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"`
+      `#{VICO} -e "((current-text) gotoLine:#{options[:line]} column:#{options[:column]}) (NSApp activateIgnoringOtherApps:YES)"`
     end
 
     def require_cmd(command, message = nil)
@@ -90,7 +90,7 @@ module TextMate
     end
 
     def rescan_project
-      %x{#{VICO} -e '(explorer rescan:nil)'}
+      %x{#{VICO} -e '((current-explorer) rescan:nil)'}
     end
   end
 
@@ -184,7 +184,7 @@ module TextMate
       block.call(current_file)
     end
   end
-  
+
   def TextMate.each_text_file_in_project (&block)
     project_dir = ENV['TM_PROJECT_DIRECTORY']
     current_file = ENV['TM_FILEPATH']
@@ -195,14 +195,14 @@ module TextMate
       block.call(current_file)
     end
   end
-  
+
   # returns a array if all currently selected files or nil
   def TextMate.selected_files( tm_selected_files = ENV['TM_SELECTED_FILES'] )
     return nil  if tm_selected_files.nil? or tm_selected_files.empty?
     require 'shellwords'
     Shellwords.shellwords( tm_selected_files )
   end
-  
+
 end
 
 # if $0 == __FILE__ then

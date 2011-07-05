@@ -20,10 +20,10 @@ def my_popen3(*cmd) # returns [stdin, stdout, strerr, pid]
   pw = IO::pipe   # pipe[0] for read, pipe[1] for write
   pr = IO::pipe
   pe = IO::pipe
-  
+
   # F_SETOWN = 6, ideally this would be under Fcntl::F_SETOWN
   pw[0].fcntl(6, ENV['TM_PID'].to_i) if ENV.has_key? 'TM_PID'
-  
+
   pid = fork{
     pw[1].close
     STDIN.reopen(pw[0])
@@ -38,13 +38,13 @@ def my_popen3(*cmd) # returns [stdin, stdout, strerr, pid]
     pe[1].close
 
     tm_interactive_input = SUPPORT_LIB + '/tm_interactive_input.dylib'
-    if (File.exists? tm_interactive_input) 
+    if (File.exists? tm_interactive_input)
       dil = ENV['DYLD_INSERT_LIBRARIES']
       ENV['DYLD_INSERT_LIBRARIES'] = (dil) ? "#{tm_interactive_input}:#{dil}" : tm_interactive_input unless (dil =~ /#{tm_interactive_input}/)
       ENV['DYLD_FORCE_FLAT_NAMESPACE'] = "1"
       ENV['TM_INTERACTIVE_INPUT'] = 'AUTO|ECHO'
     end
-    
+
     exec(*cmd)
   }
 
@@ -146,23 +146,23 @@ class UserScript
   attr_reader :display_name, :path, :warning
   attr_reader :temp_file
   def initialize(content)
-    
+
     @warning = ''
     @content = content
     @hashbang = $1 if @content =~ /\A#!(.*)$/
-    
+
     @saved = true
     if ENV.has_key? 'TM_FILEPATH' then
       @path = ENV['TM_FILEPATH']
       @display_name = File.basename(@path)
-      %x{#{VICO} -e '(document saveDocument:nil)'}
+      %x{#{VICO} -e '((current-document) saveDocument:nil)'}
     else
       @saved = false
     end
   end
-  
+
   public
-    
+
     def executable
       # return the path to the executable that will run @content.
     end
@@ -186,7 +186,7 @@ class UserScript
       rd.fcntl(Fcntl::F_SETFD, 1)
       ENV['TM_ERROR_FD'] = wr.to_i.to_s
       if @saved
-        cmd = filter_cmd([executable, args, e_sh(@path), ARGV.to_a ].flatten) 
+        cmd = filter_cmd([executable, args, e_sh(@path), ARGV.to_a ].flatten)
         stdin, stdout, stderr, pid = my_popen3(cmd.join(" "))
         wr.close
         block.call(stdout, stderr, rd, pid)
@@ -285,7 +285,7 @@ HTML
     div.scriptmate a {
     	color: #FF5600;
     }
-    
+
     div#exception_report pre.snippet {
       margin:4pt;
       padding:4pt;

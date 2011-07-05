@@ -6,7 +6,7 @@ VICO = ENV['TM_APP_PATH'] + '/Contents/MacOS/vicotool' unless defined? VICO
 
 module TextMate
   class << self
-    # 
+    #
     # Calling TextMate.save_current_document ensures that one of the following hold true:
     #  1. If TM_FILEPATH is writeable, then the current document is saved.
     #     In this case, TM_FILEPATH, TM_FILENAME, TM_DISPLAYNAME are left as is.
@@ -16,15 +16,15 @@ module TextMate
     #       TM_FILEPATH, TM_FILENAME reflect the temporary file.
     #       TM_ORIG_FILEPATH and TM_ORIG_FILENAME will reflect the original unwriteable file.
     #       TM_DISPLAYNAME will be annotated by (M) to show that the file has not been saved.
-    #  3. If TM_FILEPATH is unset, the current document has never been saved.  
+    #  3. If TM_FILEPATH is unset, the current document has never been saved.
     #     The current document's content will be saved in a temporary file.
-    #     In this case: 
+    #     In this case:
     #       TM_FILEPATH, TM_FILENAME reflect the temporary file.
     #       TM_FILE_IS_UNTITLED will be set to “true”
     #       TM_DISPLAYNAME will be set to “untitled”
     #  There is a funny case where if a new file file has been created with `mate` but has
     #  not yet been saved.  In this case TM_FILEPATH is set, but no file exists at that
-    #  path.  If the directory is writeable, we touch the file and fall through to the 
+    #  path.  If the directory is writeable, we touch the file and fall through to the
     #  above cases.  If the directory is unwritable, we fall through without action.
     #
     # TextMate.save_current_document also accepts an optional `temp_ext` argument.  If
@@ -34,12 +34,12 @@ module TextMate
     # current document after you've called this method, do File.read(ENV['TM_FILEPATH']).
 
     def save_current_document(temp_ext='tmp')
-      
+
       doc, dst = STDIN.read, ENV['TM_FILEPATH']
       ENV['TM_DISPLAYNAME'] = ENV['TM_FILENAME']
-      
+
       unless dst.nil?
-        %x{#{VICO} -e '(document saveDocument:nil)'}
+        %x{#{VICO} -e '((current-document) saveDocument:nil)'}
         #FileUtils.touch(dst) unless File.exists?(dst) or not File.writable?(File.dirname(dst))
         #return if File.exists?(dst) and File.read(dst) == doc
         return

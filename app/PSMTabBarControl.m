@@ -424,7 +424,7 @@
     if(!_isHidden && !hide)
         return;
 
-    [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [[[self subviews] copy] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     _hideIndicators = YES;
 
     _isHidden = hide;
@@ -761,7 +761,6 @@
             [overflowMenu addItem:menuItem];
         }
     }
-
 
     // Overflow menu
     cellRect.origin.y = 0;

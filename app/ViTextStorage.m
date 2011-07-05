@@ -566,7 +566,8 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSUInteger word_start = [self skipCharactersInSet:characterSet
 					     fromLocation:aLocation
 						 backward:YES];
-	if (word_start < aLocation)
+	if (word_start < aLocation && ![characterSet characterIsMember:[[self string] characterAtIndex:word_start]])
+		/* We skipped past our word range. Back up. */
 		word_start += 1;
 
 	NSUInteger word_end = [self skipCharactersInSet:characterSet

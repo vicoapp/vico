@@ -47,10 +47,12 @@
 	}
 
 	if (!(quals & NSNumericPadKeyMask)) {
-		if ((0x20 < key && key < 0x7f) || key == 0x1E)
-			quals &= ~NSShiftKeyMask;
-
 		if ((quals & NSControlKeyMask)) {
+			/* Remove shift if it was used to generate a ctrl-[\]^_ */
+			if (key >= 0x1B && key < 0x20 &&
+			    (quals & NSDeviceIndependentModifierFlagsMask) == (NSControlKeyMask | NSShiftKeyMask))
+				quals &= ~NSShiftKeyMask;
+
 			if (key < 0x20 && ((key != 0x1B && key != 0x0D && key != 0x09 && key != 0x19) || key != without) &&
 			    (quals & NSDeviceIndependentModifierFlagsMask) == NSControlKeyMask)
 				/* only control pressed */
@@ -64,6 +66,9 @@
 				key = without;
 		} else if ((quals & (NSCommandKeyMask | NSShiftKeyMask)) == (NSCommandKeyMask | NSShiftKeyMask))
 			key = without;
+
+		if ((0x20 < key && key < 0x7f) || key == 0x1E)
+			quals &= ~NSShiftKeyMask;
 	}
 
 	if (key > 0 && key < 0x20 && key != 0x1B && key != 0x0D && key != 0x09)

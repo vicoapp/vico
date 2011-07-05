@@ -25,20 +25,13 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [_PSMTabBarOverflowPopUpImage release];
-	[_PSMTabBarOverflowDownPopUpImage release];
-    [super dealloc];
-}
-
 - (void)drawRect:(NSRect)rect
 {
     if(_PSMTabBarOverflowPopUpImage == nil){
         [super drawRect:rect];
         return;
     }
-	
+
     NSImage *image = (_down) ? _PSMTabBarOverflowDownPopUpImage : _PSMTabBarOverflowPopUpImage;
 	NSSize imageSize = [image size];
     rect.origin.x = NSMidX(rect) - (imageSize.width * 0.5);
@@ -62,28 +55,6 @@
 	_down = NO;
 	[self setNeedsDisplay:YES];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-#pragma mark -
-#pragma mark Archiving
-
-- (void)encodeWithCoder:(NSCoder *)aCoder {
-    [super encodeWithCoder:aCoder];
-    if ([aCoder allowsKeyedCoding]) {
-        [aCoder encodeObject:_PSMTabBarOverflowPopUpImage forKey:@"PSMTabBarOverflowPopUpImage"];
-        [aCoder encodeObject:_PSMTabBarOverflowDownPopUpImage forKey:@"PSMTabBarOverflowDownPopUpImage"];
-    }
-}
-
-- (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        if ([aDecoder allowsKeyedCoding]) {
-            _PSMTabBarOverflowPopUpImage = [[aDecoder decodeObjectForKey:@"PSMTabBarOverflowPopUpImage"] retain];
-            _PSMTabBarOverflowDownPopUpImage = [[aDecoder decodeObjectForKey:@"PSMTabBarOverflowDownPopUpImage"] retain];
-        }
-    }
-    return self;
 }
 
 @end

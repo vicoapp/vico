@@ -79,29 +79,4 @@
     [[self superview] setNeedsDisplay:YES]; // eliminates a drawing artifact
 }
 
-#pragma mark -
-#pragma mark Archiving
-
-- (void)encodeWithCoder:(NSCoder *)aCoder {
-    [super encodeWithCoder:aCoder];
-    if ([aCoder allowsKeyedCoding]) {
-        [aCoder encodeObject:_rolloverImage forKey:@"rolloverImage"];
-        [aCoder encodeObject:_usualImage forKey:@"usualImage"];
-        [aCoder encodeInteger:_myTrackingRectTag forKey:@"myTrackingRectTag"];
-    }
-}
-
-- (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        if ([aDecoder allowsKeyedCoding]) {
-            _rolloverImage = [[aDecoder decodeObjectForKey:@"rolloverImage"] retain];
-            _usualImage = [[aDecoder decodeObjectForKey:@"usualImage"] retain];
-            _myTrackingRectTag = [aDecoder decodeIntegerForKey:@"myTrackingRectTag"];
-        }
-    }
-    return self;
-}
-
-
 @end

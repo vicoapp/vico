@@ -229,6 +229,11 @@ int logIndent = 0;
 	[keyManager handleKeys:[@"\"+x" keyCodes]];
 }
 
+- (void)selectAll:(id)sender
+{
+	[keyManager handleKeys:[@"<esc>ggVG" keyCodes]];
+}
+
 - (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
               replacementStrings:(NSArray *)replacementStrings
 {

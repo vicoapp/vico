@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.SystemVersion">10K540</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1305</string>
-		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -668,13 +668,12 @@
 											</object>
 											<object class="NSMenuItem" id="583158037">
 												<reference key="NSMenu" ref="1042284489"/>
-												<string key="NSTitle">All (ggVG)(&lt;Esc&gt;ggVG)</string>
+												<string key="NSTitle">All</string>
 												<string key="NSKeyEquiv">a</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
 												<reference key="NSMixedImage" ref="258136346"/>
-												<int key="NSTag">4000</int>
 											</object>
 										</object>
 									</object>
@@ -703,6 +702,15 @@
 											<object class="NSMenuItem" id="860379634">
 												<reference key="NSMenu" ref="334114871"/>
 												<string key="NSTitle">Lower Case Word / Selection (guiw)(u)</string>
+												<string key="NSKeyEquiv"/>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="176968249"/>
+												<reference key="NSMixedImage" ref="258136346"/>
+												<int key="NSTag">4000</int>
+											</object>
+											<object class="NSMenuItem" id="97139470">
+												<reference key="NSMenu" ref="334114871"/>
+												<string key="NSTitle">Toggle Case Word / Selection (g~iw)(~)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
@@ -2742,6 +2750,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="980644365"/>
 							<reference ref="860379634"/>
+							<reference ref="97139470"/>
 						</object>
 						<reference key="parent" ref="660544200"/>
 					</object>
@@ -3004,6 +3013,11 @@
 						<reference key="object" ref="23794259"/>
 						<reference key="parent" ref="110575045"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">709</int>
+						<reference key="object" ref="97139470"/>
+						<reference key="parent" ref="334114871"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3228,6 +3242,7 @@
 					<string>703.IBPluginDependency</string>
 					<string>704.IBPluginDependency</string>
 					<string>705.IBPluginDependency</string>
+					<string>709.IBPluginDependency</string>
 					<string>72.IBPluginDependency</string>
 					<string>72.ImportedFromIB2</string>
 					<string>73.IBPluginDependency</string>
@@ -3474,6 +3489,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -3511,7 +3527,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">708</int>
+			<int key="maxID">709</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

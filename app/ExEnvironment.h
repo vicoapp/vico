@@ -14,7 +14,6 @@
 	IBOutlet NSTextField		*filterLabel;
 	BOOL				 filterDone;
 	BOOL				 filterFailed;
-	NSString			*filterCommand;
 
 	id				 filterTarget;
 	SEL				 filterSelector;

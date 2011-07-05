@@ -23,11 +23,8 @@
 
 	int			 fd_in, fd_out;
 	CFSocketRef		 inputSocket, outputSocket;
-	CFRunLoopSourceRef	 inputSource , outputSource;
+	CFRunLoopSourceRef	 inputSource, outputSource;
 	CFSocketContext		 inputContext, outputContext;
-
-	NSRunLoop		*runLoop;
-	NSString		*runLoopMode;
 }
 
 - (id)initWithReadDescriptor:(int)read_fd

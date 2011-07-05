@@ -13,8 +13,12 @@
 
 - (void)filterFinish
 {
-	DEBUG(@"wait until exit of command %@", filterCommand);
-	[filterTask waitUntilExit];
+	if (![filterTask isRunning])
+		DEBUG(@"task %@ is no longer running", filterTask);
+	else {
+		DEBUG(@"wait until exit of task %@", filterTask);
+		[filterTask waitUntilExit];
+	}
 	int status = [filterTask terminationStatus];
 	DEBUG(@"status = %d", status);
 
@@ -41,7 +45,6 @@
 	[invocation invokeWithTarget:filterTarget];
 
 	filterTask = nil;
-	filterCommand = nil;
 	filterOutput = nil;
 	filterTarget = nil;
 	filterContextInfo = nil;
@@ -87,9 +90,12 @@
 	case NSStreamEventHasSpaceAvailable:
 		/* All output data flushed. */
 		[filterStream shutdownWrite];
+		[[[filterTask standardInput] fileHandleForWriting] closeFile];
 		break;
 	case NSStreamEventErrorOccurred:
 		INFO(@"error on stream %@: %@", stream, [stream streamError]);
+		if ([window attachedSheet] != nil)
+			[NSApp endSheet:filterSheet returnCode:-1];
 		filterFailed = 1;
 		break;
 	case NSStreamEventEndEncountered:
@@ -110,13 +116,14 @@
 {
 	filterTask = task;
 
-	NSPipe *shellInput = [NSPipe pipe];
 	NSPipe *shellOutput = [NSPipe pipe];
+	NSPipe *shellInput = [NSPipe pipe];
 
 	[filterTask setStandardInput:shellInput];
 	[filterTask setStandardOutput:shellOutput];
 	//[filterTask setStandardError:shellOutput];
 
+	DEBUG(@"launching task %@", filterTask);
 	[filterTask launch];
 
 	// setup a new runloop mode
@@ -124,8 +131,6 @@
 	// schedule a timer to track how long the task takes to complete
 	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
 	// accept cancel button from sheet -> terminate task and cancel filter
-
-	NSString *mode = NSDefaultRunLoopMode; //ViFilterRunLoopMode;
 
 	filterStream = [[ViBufferedStream alloc] initWithTask:filterTask];
 	[filterStream setDelegate:self];
@@ -141,14 +146,14 @@
 	filterContextInfo = contextInfo;
 
 	/* schedule the read and write sources in the new runloop mode */
-	[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
+	[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
 	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
-
 	int done = 0;
 
 	for (;;) {
-		[[NSRunLoop currentRunLoop] runMode:mode beforeDate:limitDate];
+		DEBUG(@"running until %@", limitDate);
+		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:limitDate];
 		if ([limitDate timeIntervalSinceNow] <= 0) {
 			DEBUG(@"limit date %@ reached", limitDate);
 			break;
@@ -178,7 +183,6 @@
 		[filterLabel setStringValue:displayTitle];
 		[filterLabel setFont:[NSFont userFixedPitchFontOfSize:12.0]];
 		[filterIndicator startAnimation:self];
-		[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:mode];
 	}
 }
 

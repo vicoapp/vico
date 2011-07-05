@@ -1,8 +1,11 @@
 #include <sys/uio.h>
 #include <unistd.h>
+#include <vis.h>
 
 #import "ViBufferedStream.h"
 #include "logging.h"
+
+void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 @implementation ViStreamBuffer
 
@@ -59,6 +62,13 @@
 		[self shutdownRead];
 	} else {
 		DEBUG(@"read %zi bytes from fd %i", ret, fd_in);
+#ifndef NO_DEBUG
+		hexdump(buffer, ret, "read data:");
+		char *vis = malloc(ret*4+1);
+		strvisx(vis, buffer, ret, VIS_WHITE);
+		DEBUG(@"read data: %s", vis);
+		free(vis);
+#endif
 		buflen = ret;
 		if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
 			[[self delegate] stream:self handleEvent:NSStreamEventHasBytesAvailable];
@@ -81,8 +91,6 @@
 		}
 	}
 }
-
-void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 - (int)flush
 {
@@ -129,7 +137,10 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	if ([outputBuffers count] == 0)
 		return 0;
 
-	CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+	CFSocketCallBackType cbType = kCFSocketWriteCallBack;
+	if (outputSocket == inputSocket)
+		cbType |= kCFSocketReadCallBack;
+	CFSocketEnableCallBacks(outputSocket, cbType);
 	return 1;
 }
 
@@ -186,14 +197,17 @@ fd_read(CFSocketRef s,
 
 		int flags;
 		if (fd_in != -1) {
-			flags = fcntl(fd_in, F_GETFL, 0);
-			fcntl(fd_in, F_SETFL, flags | O_NONBLOCK);
+			if ((flags = fcntl(fd_in, F_GETFL, 0)) == -1) {
+				INFO(@"fcntl(%i, F_GETFL): %s", fd_in, strerror(errno));
+				return nil;
+			}
+			if (fcntl(fd_in, F_SETFL, flags | O_NONBLOCK) == -1) {
+				INFO(@"fcntl(%i, F_SETFL): %s", fd_in, strerror(errno));
+				return nil;
+			}
 
-			inputContext.version = 0;
+			bzero(&inputContext, sizeof(inputContext));
 			inputContext.info = self; /* user data passed to the callbacks */
-			inputContext.retain = NULL;
-			inputContext.release = NULL;
-			inputContext.copyDescription = NULL;
 
 			CFSocketCallBackType cbType = kCFSocketReadCallBack;
 			if (fd_out == fd_in)
@@ -208,6 +222,7 @@ fd_read(CFSocketRef s,
 				INFO(@"failed to create input CFSocket of fd %i", fd_in);
 				return nil;
 			}
+			CFSocketSetSocketFlags(inputSocket, kCFSocketAutomaticallyReenableReadCallBack);
 			inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, prio);
 
 			CFSocketEnableCallBacks(inputSocket, kCFSocketReadCallBack);
@@ -217,14 +232,17 @@ fd_read(CFSocketRef s,
 			if (fd_out == fd_in)
 				outputSocket = inputSocket;
 			else {
-				flags = fcntl(fd_out, F_GETFL, 0);
-				fcntl(fd_out, F_SETFL, flags | O_NONBLOCK);
+				if ((flags = fcntl(fd_out, F_GETFL, 0)) == -1) {
+					INFO(@"fcntl(%i, F_GETFL): %s", fd_out, strerror(errno));
+					return nil;
+				}
+				if (fcntl(fd_out, F_SETFL, flags | O_NONBLOCK) == -1) {
+					INFO(@"fcntl(%i, F_SETFL): %s", fd_out, strerror(errno));
+					return nil;
+				}
 
-				outputContext.version = 0;
+				bzero(&outputContext, sizeof(outputContext));
 				outputContext.info = self; /* user data passed to the callbacks */
-				outputContext.retain = NULL;
-				outputContext.release = NULL;
-				outputContext.copyDescription = NULL;
 
 				outputSocket = CFSocketCreateWithNative(
 					kCFAllocatorDefault,
@@ -236,6 +254,7 @@ fd_read(CFSocketRef s,
 					INFO(@"failed to create output CFSocket of fd %i", fd_out);
 					return nil;
 				}
+				CFSocketSetSocketFlags(outputSocket, 0);
 				outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, prio);
 			}
 		}
@@ -263,12 +282,13 @@ fd_read(CFSocketRef s,
 {
 	if (outputSource) {
 		DEBUG(@"shutting down write pipe %d", fd_out);
-		if (runLoopMode)
-			CFRunLoopRemoveSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)runLoopMode);
-		CFSocketInvalidate(outputSocket);
+		if ([outputBuffers count] > 0)
+			INFO(@"fd %i has %lu non-flushed buffers pending", fd_out, [outputBuffers count]);
+		CFSocketInvalidate(outputSocket); /* also removes the source from run loops */
+		CFRelease(outputSocket);
+		CFRelease(outputSource);
 		outputSocket = NULL;
 		outputSource = NULL;
-		close(fd_out);
 		fd_out = -1;
 	}
 }
@@ -277,16 +297,15 @@ fd_read(CFSocketRef s,
 {
 	if (inputSource) {
 		DEBUG(@"shutting down read pipe %d", fd_in);
-		if (runLoopMode)
-			CFRunLoopRemoveSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)runLoopMode);
-		CFSocketInvalidate(inputSocket);
+		CFSocketInvalidate(inputSocket); /* also removes the source from run loops */
 		if (outputSocket == inputSocket) {
 			outputSocket = NULL;
 			fd_out = -1;
 		}
+		CFRelease(inputSocket);
+		CFRelease(inputSource);
 		inputSocket = NULL;
 		inputSource = NULL;
-		close(fd_in);
 		fd_in = -1;
 	}
 }
@@ -301,20 +320,18 @@ fd_read(CFSocketRef s,
 {
 	DEBUG(@"adding to mode %@", mode);
 	if (inputSource)
-		CFRunLoopAddSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], inputSource, (CFStringRef)mode);
 	if (outputSource)
-		CFRunLoopAddSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
-	runLoopMode = mode;
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], outputSource, (CFStringRef)mode);
 }
 
 - (void)removeFromRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"removing from mode %@", mode);
 	if (inputSource)
-		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), inputSource, (CFStringRef)mode);
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], inputSource, (CFStringRef)mode);
 	if (outputSource)
-		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), outputSource, (CFStringRef)mode);
-	runLoopMode = nil;
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], outputSource, (CFStringRef)mode);
 }
 
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len
@@ -337,18 +354,26 @@ fd_read(CFSocketRef s,
 - (void)write:(const void *)buf length:(NSUInteger)length
 {
 	if (outputSocket && length > 0) {
-		DEBUG(@"enqueueing %lu bytes", length);
+		DEBUG(@"enqueueing %lu bytes on fd %i", length, CFSocketGetNative(outputSocket));
 		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
-		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+
+		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
+		if (outputSocket == inputSocket)
+			cbType |= kCFSocketReadCallBack;
+		CFSocketEnableCallBacks(outputSocket, cbType);
 	}
 }
 
 - (void)writeData:(NSData *)data
 {
 	if (outputSocket && [data length] > 0) {
-		DEBUG(@"enqueueing %lu bytes", [data length]);
+		DEBUG(@"enqueueing %lu bytes on fd %i", [data length], CFSocketGetNative(outputSocket));
 		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
-		CFSocketEnableCallBacks(outputSocket, kCFSocketWriteCallBack);
+
+		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
+		if (outputSocket == inputSocket)
+			cbType |= kCFSocketReadCallBack;
+		CFSocketEnableCallBacks(outputSocket, cbType);
 	}
 }
 

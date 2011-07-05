@@ -139,8 +139,8 @@
 - (void)cancelSymbolList
 {
 	[self resetSymbolList];
+	[windowController focusEditorDelayed:nil];
 	[self closeSymbolList];
-	[windowController focusEditor];
 }
 
 - (IBAction)gotoSymbolAction:(id)sender

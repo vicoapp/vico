@@ -814,7 +814,6 @@
 	return YES;
 }
 
-/* FIXME: do this when filter field loses focus */
 - (void)resetExplorerView
 {
 	[filterField setStringValue:@""];
@@ -934,6 +933,7 @@
 
 - (void)cancelExplorer
 {
+	[delegate focusEditorDelayed:nil];
 	if (closeExplorerAfterUse) {
 		[self closeExplorer];
 		closeExplorerAfterUse = NO;
@@ -944,7 +944,6 @@
 		hideToolbarAfterUse = NO;
 	}
 	[self resetExplorerView];
-	[delegate focusEditor];
 }
 
 - (void)expandItems:(NSArray *)items

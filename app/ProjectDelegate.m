@@ -879,9 +879,11 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == filterField || view == [window fieldEditor:YES forObject:filterField])
+	if (view == filterField)
 		[self openExplorerTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:explorerView]) {
+		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
+			return;
 		if (closeExplorerAfterUse) {
 			[self closeExplorer];
 			closeExplorerAfterUse = NO;

@@ -40,9 +40,11 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == symbolFilterField || view == [window fieldEditor:YES forObject:symbolFilterField])
+	if (view == symbolFilterField)
 		[self openSymbolListTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
+		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
+			return;
 		[self closeSymbolList];
 	}
 }

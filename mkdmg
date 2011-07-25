@@ -9,13 +9,7 @@ fi
 
 echo "Building version $VERSION (repo version $REPO_VERSION)"
 
-EXPIRATION=0
-if test "$VERSION" = "r$REPO_VERSION"; then
-	# expire in two weeks
-	EXPIRATION=$(date -v +4w +%s)
-fi
-
-xcodebuild -scheme archive -configuration Snapshot EXPIRATION=$EXPIRATION || exit
+xcodebuild -scheme archive -configuration Snapshot || exit
 
 TMPDMG=vico-tmp.dmg
 /bin/rm -f $TMPDMG

@@ -27,7 +27,6 @@ hg clone -u $tag . "$dir" || exit 2
 
 # HACK!
 ln -s ../Nu.framework "$dir"
-ln -s ../Sparkle.framework "$dir"
 
 (cd $dir && ./mkdmg $version) || exit 3
 

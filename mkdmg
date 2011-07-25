@@ -9,7 +9,7 @@ fi
 
 echo "Building version $VERSION (repo version $REPO_VERSION)"
 
-xcodebuild -scheme archive -configuration Snapshot || exit
+xcodebuild -target Vico -configuration Snapshot build || exit
 
 TMPDMG=vico-tmp.dmg
 /bin/rm -f $TMPDMG

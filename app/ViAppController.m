@@ -85,6 +85,80 @@
 	return supportDirectory;
 }
 
+#ifdef TRIAL_VERSION
+#include <openssl/md5.h>
+int
+updateMeta(void)
+{
+	NSUserDefaults *userDefs = [NSUserDefaults standardUserDefaults];
+
+	int left = 0;
+	time_t last = 0;
+	id daysLeft = [userDefs objectForKey:@"left"];
+	id lastDayUsed = [userDefs objectForKey:@"last"];
+	NSData *hash = [userDefs dataForKey:@"meta"];
+	time_t now = time(NULL);
+
+	if (daysLeft == nil || lastDayUsed == nil || hash == nil) {
+		if (daysLeft == nil && lastDayUsed == nil && hash == nil) {
+			/*
+			 * This is the first run.
+			 */
+			left = 16;
+		}
+	} else if (![daysLeft respondsToSelector:@selector(intValue)] ||
+		   ![lastDayUsed respondsToSelector:@selector(integerValue)] ||
+		    [hash length] != MD5_DIGEST_LENGTH) {
+		/* Weird value. */
+		left = 0;
+	} else {
+		left = [daysLeft intValue];
+		last = [lastDayUsed integerValue] + 1311334235;
+		if (left < 0 || left > 15 || last < 0 /*|| last + 3600*2 > now*/) {
+			/* Weird value. */
+			left = 0;
+		} else {
+			MD5_CTX ctx;
+			bzero(&ctx, sizeof(ctx));
+			MD5_Init(&ctx);
+			MD5_Update(&ctx, &left, sizeof(left));
+			MD5_Update(&ctx, &last, sizeof(last));
+			uint8_t md[MD5_DIGEST_LENGTH];
+			MD5_Final(md, &ctx);
+			if (bcmp(md, [hash bytes], MD5_DIGEST_LENGTH) != 0) {
+				/* Hash does NOT correspond to the value. */
+				left = 0;
+			}
+		}
+	}
+
+	if (left > 0) {
+		struct tm tm_last, tm_now;
+		localtime_r(&last, &tm_last);
+		localtime_r(&now, &tm_now);
+		if (tm_last.tm_yday != tm_now.tm_yday || tm_last.tm_year != tm_now.tm_year) {
+			--left;
+			[userDefs setInteger:left forKey:@"left"];
+			[userDefs setInteger:now - 1311334235 forKey:@"last"];
+			MD5_CTX ctx;
+			bzero(&ctx, sizeof(ctx));
+			MD5_Init(&ctx);
+			MD5_Update(&ctx, &left, sizeof(left));
+			MD5_Update(&ctx, &now, sizeof(now));
+			uint8_t md[MD5_DIGEST_LENGTH];
+			MD5_Final(md, &ctx);
+			[userDefs setObject:[NSData dataWithBytes:md length:MD5_DIGEST_LENGTH]
+				     forKey:@"meta"];
+		}
+	}
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViTrialDaysChangedNotification
+							    object:[NSNumber numberWithInt:left]];
+
+	return left;
+}
+#endif
+
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
 #if defined(DEBUG_BUILD)
@@ -197,31 +271,33 @@
 	timersub(&launch_done, &launch_start, &launch_diff);
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
-#if defined(SNAPSHOT_BUILD) && defined(EXPIRATION) && EXPIRATION > 0
-#warning Enabling time-based expiration of development build
-	time_t expire_at = EXPIRATION;
-	DEBUG(@"checking expiration date at %s", ctime(&expire_at));
+#ifdef TRIAL_VERSION
+#warning Enabling used-time-based expiration of trial version
 	NSAlert *alert = [[NSAlert alloc] init];
-	if (time(NULL) > expire_at) {
-		[alert setMessageText:@"This development version has expired."];
-		[alert addButtonWithTitle:@"Quit"];
-		[alert addButtonWithTitle:@"Download new version"];
-		[alert setInformativeText:@"Development versions have a limited validity period for you to test the program. This version has now expired, but you can download a new version for another period."];
+	int left = updateMeta();
+	if (left <= 0) {
+		[alert setMessageText:@"This trial version has expired."];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setInformativeText:@"Evaluation is now limited to 15 minutes."];
+		NSUInteger ret = [alert runModal];
+		[NSTimer scheduledTimerWithTimeInterval:15*60
+						 target:self
+					       selector:@selector(m:)
+					       userInfo:nil
+						repeats:NO];
+	} else {
+		[alert setMessageText:@"This is a trial version."];
+		[alert addButtonWithTitle:@"Try Vico"];
+		[alert addButtonWithTitle:@"Buy Vico"];
+		[alert setInformativeText:[NSString stringWithFormat:@"Vico will expire after %i day%s of use.", left, left == 1 ? "" : "s"]];
 		NSUInteger ret = [alert runModal];
 		if (ret == NSAlertSecondButtonReturn)
-			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
-		exit(7);
-	} else if (![userDefs boolForKey:@"devVersionInfoSuppress"]) {
-		[alert setMessageText:@"This is a development version."];
-		[alert addButtonWithTitle:@"OK"];
-		NSString *expireAt = [[NSDate dateWithTimeIntervalSince1970:expire_at] descriptionWithLocale:[NSLocale currentLocale]];
-		[alert setInformativeText:[NSString stringWithFormat:@"Development versions have a limited validity period for you to test the program. This version expires at %@. If you want to continue testing after this, you are welcome to download a new version.", expireAt]];
-		[alert setShowsSuppressionButton:YES];
-		[alert runModal];
-		if ([[alert suppressionButton] state] == NSOnState) {
-			// Suppress this alert from now on.
-			[userDefs setBool:YES forKey:@"devVersionInfoSuppress"];
-		}
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://itunes.com/mac/vico"]];
+		mTimer = [NSTimer scheduledTimerWithTimeInterval:1*60
+							  target:self
+							selector:@selector(m:)
+							userInfo:nil
+							 repeats:YES];
 	}
 #endif
 
@@ -255,6 +331,30 @@
 
 	[[ViEventManager defaultManager] emit:ViEventDidFinishLaunching for:nil with:nil];
 }
+
+#ifdef TRIAL_VERSION
+- (void)m:(NSTimer *)timer
+{
+	int left = updateMeta();
+	if (left <= 0) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"This trial version has expired."];
+		[alert addButtonWithTitle:@"Buy Vico"];
+		[alert addButtonWithTitle:@"Quit"];
+		NSUInteger ret = [alert runModal];
+		if (ret == NSAlertFirstButtonReturn)
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://itunes.com/mac/vico"]];
+
+		[NSApp terminate:nil];
+		if (mTimer == nil)
+			mTimer = [NSTimer scheduledTimerWithTimeInterval:1*60
+								  target:self
+								selector:@selector(m:)
+								userInfo:nil
+								 repeats:YES];
+	}
+}
+#endif
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
 		      ofObject:(id)object

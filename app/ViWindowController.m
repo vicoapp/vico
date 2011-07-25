@@ -111,8 +111,60 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)windowDidResize:(NSNotification *)notification
 {
+#ifdef TRIAL_VERSION
+	if (nagTitle) {
+		NSView *view = [[[self window] contentView] superview];
+		NSRect rect = [nagTitle frame];
+		rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
+		rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
+		[nagTitle setFrame:rect];
+	}
+#endif
+
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
+
+#ifdef TRIAL_VERSION
+- (void)metaChanged:(NSNotification *)notification
+{
+	int left = [[notification object] intValue];
+	NSString *s;
+	if (left <= 0)
+		s = @"Expired evaluation copy";
+	else
+		s = [NSString stringWithFormat:@"%i day%s remaining", left, left == 1 ? "" : "s"];
+
+	NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
+	[attrs setObject:[NSFont titleBarFontOfSize:10.0] forKey:NSFontAttributeName];
+
+	NSColor *c1 = [NSColor grayColor];
+	NSColor *c2 = [NSColor redColor];
+	NSColor *c;
+	if (left >= 8)
+		c = c1;
+	else
+		c = [c2 blendedColorWithFraction:(CGFloat)(left < 0 ? 0 : left)/12.0 ofColor:c1];
+	[attrs setObject:c forKey:NSForegroundColorAttributeName];
+
+	NSView *view = [[[self window] contentView] superview];
+	NSRect rect;
+	rect.size = [s sizeWithAttributes:attrs];
+	rect.size.width += 10;
+	rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
+	rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
+
+	if (nagTitle == nil) {
+		nagTitle = [[NSTextField alloc] initWithFrame:rect];
+		[nagTitle setDrawsBackground:NO];
+		[nagTitle setEditable:NO];
+		[nagTitle setBezeled:NO];
+		[nagTitle setTextColor:[NSColor blackColor]];
+		[view addSubview:nagTitle];
+	} else
+		[nagTitle setFrame:rect];
+	[nagTitle setStringValue:[[NSAttributedString alloc] initWithString:s attributes:attrs]];
+}
+#endif
 
 - (void)tearDownBundleMenu:(NSNotification *)notification
 {
@@ -152,22 +204,29 @@ static ViWindowController	*currentWindowController = nil;
 - (void)windowDidLoad
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(firstResponderChanged:)
-                                            name:ViFirstResponderChangedNotification
-                                          object:nil];
+						 selector:@selector(firstResponderChanged:)
+						     name:ViFirstResponderChangedNotification
+						   object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(caretChanged:)
-                                            name:ViCaretChangedNotification
-                                          object:nil];
+						 selector:@selector(caretChanged:)
+						     name:ViCaretChangedNotification
+						   object:nil];
+#ifdef TRIAL_VERSION
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(metaChanged:)
+						     name:ViTrialDaysChangedNotification
+						   object:nil];
+	updateMeta();
+#endif
 
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
 	[bookmarksButtonCell setImage:[NSImage imageNamed:@"bookmark"]];
 
 	[bundleButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(setupBundleMenu:)
-                                            name:NSPopUpButtonWillPopUpNotification
-                                          object:bundleButton];
+						 selector:@selector(setupBundleMenu:)
+						     name:NSPopUpButtonWillPopUpNotification
+						   object:bundleButton];
 
 	[[tabBar addTabButton] setTarget:self];
 	[[tabBar addTabButton] setAction:@selector(addNewDocumentTab:)];

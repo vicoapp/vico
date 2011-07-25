@@ -29,6 +29,9 @@
 	IBOutlet ViBgView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 	IBOutlet NSTextField *messageField;
+#ifdef TRIAL_VERSION
+	NSTextField *nagTitle;
+#endif
 
 	IBOutlet NSPopUpButton *openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;

@@ -28,6 +28,10 @@ additionalBindings:(NSDictionary *)bindings
 
 @end
 
+#ifdef TRIAL_VERSION
+int updateMeta(void);
+#endif
+
 @interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
 {
 	IBOutlet NSMenu *encodingMenu;
@@ -49,6 +53,10 @@ additionalBindings:(NSDictionary *)bindings
 	BOOL				 busy;
 	NSString			*exString;
 	ViTextView			*fieldEditor;
+
+#ifdef TRIAL_VERSION
+	NSTimer *mTimer;
+#endif
 }
 
 @property(nonatomic,readonly) NSMenu *encodingMenu;

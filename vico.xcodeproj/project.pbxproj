@@ -1658,7 +1658,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if test \"$CONFIGURATION\" = \"Debug\"; then\n    echo \"ignoring downloading bundle repo in $CONFIGURATION build\"\n    exit 0\nfi\n\nUSERS=\"vicoapp textmate kswedberg\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
-			showEnvVarsInLog = 1;
+			showEnvVarsInLog = 0;
 		};
 		9A26068A13531066002C86FB /* Generate receipt validation fingerprints */ = {
 			isa = PBXShellScriptBuildPhase;

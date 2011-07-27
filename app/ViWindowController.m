@@ -2207,18 +2207,26 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 			return;
 		}
 
+		BOOL turnoff = NO;
+		BOOL toggle = NO;
 		NSString *name;
 		if (equals != NSNotFound)
 			name = [var substringToIndex:equals];
 		else if (qmark != NSNotFound)
 			name = [var substringToIndex:qmark];
-		else
+		else {
 			name = var;
 
-		BOOL turnoff = NO;
-		if ([name hasPrefix:@"no"]) {
-			name = [name substringFromIndex:2];
-			turnoff = YES;
+			if ([name hasPrefix:@"no"]) {
+				name = [name substringFromIndex:2];
+				turnoff = YES;
+			} else if ([name hasPrefix:@"inv"]) {
+				name = [name substringFromIndex:3];
+				toggle = YES;
+			} else if ([name hasSuffix:@"!"]) {
+				name = [name substringToIndex:[name length] - 1];
+				toggle = YES;
+			}
 		}
 
 		if ([name isEqualToString:@"all"]) {
@@ -2252,6 +2260,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 				return;
 			}
 
+			if (toggle)
+				turnoff = [[NSUserDefaults standardUserDefaults] boolForKey:defaults_name];
 			[[NSUserDefaults standardUserDefaults] setInteger:turnoff ? NSOffState : NSOnState forKey:defaults_name];
 		} else {
 			if (equals == NSNotFound) {

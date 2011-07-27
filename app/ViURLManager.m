@@ -350,9 +350,11 @@ void mycallback(
 	for (NSString *p in pathsBeingWatched)
 		if ([path hasPrefix:p]) {
 			DEBUG(@"URL %@ is already being watched", aURL);
+			CFRelease(pathsBeingWatched);
 			return YES;
 		}
 
+	CFRelease(pathsBeingWatched);
 	return NO;
 }
 
@@ -368,8 +370,15 @@ void mycallback(
 		}
 
 		NSURL *url = [NSURL URLWithString:key];
-		if ([url isFileURL])
-			[paths addObject:[url path]];
+		if ([url isFileURL]) {
+			NSError *error = nil;
+			if ([url checkResourceIsReachableAndReturnError:&error])
+				[paths addObject:[url path]];
+			else {
+				INFO(@"url %@ is not reachable: %@", url, [error localizedDescription]);
+				[self flushCachedContentsOfDirectoryAtURL:url];
+			}
+		}
 	}
 
 	DEBUG(@"paths = %@", paths);
@@ -399,8 +408,10 @@ void mycallback(
 		kFSEventStreamCreateFlagWatchRoot
 	);
 
-	FSEventStreamScheduleWithRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-	FSEventStreamStart(evstream);
+	if (evstream != NULL) {
+		FSEventStreamScheduleWithRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		FSEventStreamStart(evstream);
+	}
 }
 
 - (void)monitorDirectoryAtURL:(NSURL *)aURL

@@ -2,8 +2,10 @@ REGRESSIONS
 ===========
 
 
-REQUESTED
-=========
+URGENT
+========
+
+* list ctrl-s in menus
 
 * When deleting (dd) last line and pasting it in other place, blank
   line is pasted, while if pasting back to the last line - it pastes
@@ -18,9 +20,9 @@ REQUESTED
 * vicotool --line 1
 * R (replace mode)
 * * and # command should set / register
+* i_CTRL-o (execute one normal mode command in insert mode)
+* i_CTRL-\_CTRL-o (execute one normal mode command in insert mode, don't move the cursor)
 
-URGENT
-========
 * should check all documents for external changes when app becomes active again
 * check map error in excessKeys.nu (re vs r duplicate mapping)
 * "&" in :s replace part should expand to whole match
@@ -91,6 +93,7 @@ FEATURES
 * symbol list should use same filtering algorithm as file explorer
 * implement R
 * implement c-w in insert mode
+* implement c-u in insert mode (vim: delete to beginning-of-line)
 * :normal!
 * project shell variables
 * draw marks in gutter view

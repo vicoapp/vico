@@ -566,7 +566,13 @@
 	if (returnCode != NSAlertFirstButtonReturn)
 		return;
 
-	NSArray *urls = contextInfo;
+	NSMutableArray *urls = [[NSMutableArray alloc] init];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ProjectFile *pf = [self fileForItem:item];
+		[urls addObject:pf.url];
+	}];
 
 	[[ViURLManager defaultManager] removeItemsAtURLs:urls onCompletion:^(NSError *error) {
 		if (error != nil)
@@ -592,19 +598,12 @@
 
 - (IBAction)removeFiles:(id)sender
 {
-	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[urls addObject:pf.url];
-	}];
-
-	if ([urls count] == 0)
+	NSInteger nselected = [[self clickedIndexes] count];
+	if (nselected == 0)
 		return;
 
-	BOOL isLocal = [[urls objectAtIndex:0] isFileURL];
-	char *pluralS = ([urls count] == 1 ? "" : "s");
+	BOOL isLocal = [rootURL isFileURL];
+	char *pluralS = (nselected == 1 ? "" : "s");
 
 	NSAlert *alert = [[NSAlert alloc] init];
 	if (isLocal)
@@ -614,17 +613,17 @@
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
 	if (isLocal) {
-		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be moved to the trash.", [urls count], pluralS]];
+		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be moved to the trash.", nselected, pluralS]];
 		[alert setAlertStyle:NSWarningAlertStyle];
 	} else {
-		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be deleted immediately. This operation cannot be undone!", [urls count], pluralS]];
+		[alert setInformativeText:[NSString stringWithFormat:@"%lu file%s will be deleted immediately. This operation cannot be undone!", nselected, pluralS]];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 	}
 
 	[alert beginSheetModalForWindow:window
 			  modalDelegate:self
 			 didEndSelector:@selector(removeAlertDidEnd:returnCode:contextInfo:)
-			    contextInfo:urls];
+			    contextInfo:nil];
 }
 
 - (IBAction)rescan:(id)sender
@@ -657,7 +656,7 @@
 
 - (IBAction)revealInFinder:(id)sender
 {
-	__block NSMutableArray *urls = [[NSMutableArray alloc] init];
+	NSMutableArray *urls = [[NSMutableArray alloc] init];
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];

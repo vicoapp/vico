@@ -318,7 +318,8 @@ updateMeta(void)
 						     name:NSMenuDidEndTrackingNotification
 						   object:[NSApp mainMenu]];
 
-	if ([[self window] respondsToSelector:@selector(toggleFullScreen:)]) {
+	NSWindow *dummyWindow = [[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:0 backing:0 defer:YES];
+	if ([dummyWindow respondsToSelector:@selector(toggleFullScreen:)]) {
 		[viewMenu addItem:[NSMenuItem separatorItem]];
 		NSMenuItem *item = [viewMenu addItemWithTitle:@"Enter Full Screen" action:@selector(toggleFullScreen:) keyEquivalent:@"f"];
 		[item setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];

@@ -1909,9 +1909,10 @@
 	final_location = start_location;
 	[self changeIndentation:1
 			inRange:affectedRange
-		    updateCaret:&final_location
+		    updateCaret:NULL
 		 alignToTabstop:NO
 	       indentEmptyLines:NO];
+	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;
 }
 
@@ -1924,9 +1925,10 @@
 	final_location = start_location;
 	[self changeIndentation:-1
 			inRange:affectedRange
-		    updateCaret:&final_location
+		    updateCaret:NULL
 		 alignToTabstop:NO
 	       indentEmptyLines:NO];
+	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;
 }
 
@@ -2535,19 +2537,21 @@
 	return YES;
 }
 
+/* syntax: gU motion */
 - (BOOL)uppercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
 	[self replaceRange:affectedRange withString:[string uppercaseString]];
-	final_location = end_location = start_location;
+	final_location = end_location = affectedRange.location;
 	return YES;
 }
 
+/* syntax: gu motion */
 - (BOOL)lowercase:(ViCommand *)command
 {
 	NSString *string = [[[self textStorage] string] substringWithRange:affectedRange];
 	[self replaceRange:affectedRange withString:[string lowercaseString]];
-	final_location = end_location = start_location;
+	final_location = end_location = affectedRange.location;
 	return YES;
 }
 

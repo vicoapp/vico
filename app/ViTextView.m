@@ -605,7 +605,7 @@ int logIndent = 0;
 	NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:location] integerValue];
 	if (smartIndent && ![self shouldIgnoreIndentAtLocation:bol]) {
 		if ([self shouldIncreaseIndentAtLocation:bol] ||
-		    [self shouldIncreaseIndentOnceAtLocation:bol]) {
+		    ([self shouldIncreaseIndentOnceAtLocation:bol] && ![self shouldIncreaseIndentAtLocation:location])) {
 			DEBUG(@"increase indent at %lu", bol);
 			len += shiftWidth;
 		} else {
@@ -621,11 +621,11 @@ int logIndent = 0;
 				} else
 					break;
 			}
+		}
 
-			if ([self shouldDecreaseIndentAtLocation:location]) {
-				DEBUG(@"decrease indent at %lu", location);
-				len -= shiftWidth;
-			}
+		if ([self shouldDecreaseIndentAtLocation:location]) {
+			DEBUG(@"decrease indent at %lu", location);
+			len -= shiftWidth;
 		}
 	}
 

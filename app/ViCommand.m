@@ -3,7 +3,7 @@
 @implementation ViCommand
 
 @synthesize mapping;
-@synthesize count;
+@synthesize count, saved_count;
 @synthesize fromDot;
 @synthesize argument;
 @synthesize reg;

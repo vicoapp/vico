@@ -1803,6 +1803,14 @@ int logIndent = 0;
 		final_location = [[self textStorage] firstNonBlankForLineAtLocation:final_location];
 	}
 
+	if (ok && command.isLineMode && !command.isMotion && mode == ViVisualMode) {
+		command.saved_count = [[self textStorage] lineNumberAtLocation:l2] - [[self textStorage] lineNumberAtLocation:l1] + 1;
+		// else {
+		//	command.motion = [ViCommand commandWithMapping:move_right count:l2 - l1];
+		// }
+		INFO(@"set saved_count to %lu", command.saved_count);
+	}
+
 	if (leaveVisualMode && mode == ViVisualMode) {
 		/* If the command didn't itself leave visual mode, do it now. */
 		[self setNormalMode];

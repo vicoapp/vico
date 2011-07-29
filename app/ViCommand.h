@@ -20,6 +20,7 @@
 
 @property(nonatomic,readonly) ViMapping *mapping;
 @property(nonatomic,readwrite) int count;
+@property(nonatomic,readwrite) int saved_count;
 @property(nonatomic,readwrite) BOOL fromDot;
 @property(nonatomic,readwrite) BOOL isLineMode;
 @property(nonatomic,readonly) BOOL isMotion;

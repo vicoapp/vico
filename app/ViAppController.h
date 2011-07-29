@@ -35,6 +35,7 @@ int updateMeta(void);
 @interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
 {
 	IBOutlet NSMenu *encodingMenu;
+	IBOutlet NSMenu *viewMenu;
 	IBOutlet NSTextField *scriptInput;
 	IBOutlet NSTextView *scriptOutput;
 	IBOutlet NSMenuItem *closeDocumentMenuItem;

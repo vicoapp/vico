@@ -318,6 +318,12 @@ updateMeta(void)
 						     name:NSMenuDidEndTrackingNotification
 						   object:[NSApp mainMenu]];
 
+	if ([[self window] respondsToSelector:@selector(toggleFullScreen:)]) {
+		[viewMenu addItem:[NSMenuItem separatorItem]];
+		NSMenuItem *item = [viewMenu addItemWithTitle:@"Enter Full Screen" action:@selector(toggleFullScreen:) keyEquivalent:@"f"];
+		[item setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
+	}
+
 	NSString *siteFile = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"];
 	NSString *siteScript = [NSString stringWithContentsOfFile:siteFile
 							 encoding:NSUTF8StringEncoding

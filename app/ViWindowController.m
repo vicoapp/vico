@@ -256,6 +256,8 @@ static ViWindowController	*currentWindowController = nil;
 
 	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
 
+	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+
 	[[self window] makeKeyAndOrderFront:self];
 	[symbolsView setSourceHighlight:YES];
 	[explorerView setSourceHighlight:YES];

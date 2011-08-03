@@ -136,6 +136,8 @@ ToolbarHeightForWindow(NSWindow *window)
 	NSView *view = nil;
 	NSString *identifier;
 
+	forceSwitchToItem = nil;
+
 	/*
 	 * If the call is from a toolbar button, the sender will be an
 	 * NSToolbarItem and we will need to fetch its itemIdentifier.

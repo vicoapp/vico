@@ -31,6 +31,7 @@ api:
 		--output doc \
 		--create-html \
 		--no-create-docset \
+		--merge-categories \
 		app/ViRegisterManager.h \
 		app/ViScope.h \
 		app/ViWindowController.h \

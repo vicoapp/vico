@@ -164,7 +164,7 @@
  */
 - (ViDocument *)currentDocument;
 
-/**
+/*?
  * @returns The currently selected tab controller.
  */
 - (ViDocumentTabController *)selectedTabController;

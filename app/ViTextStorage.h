@@ -37,6 +37,10 @@ struct skip
 };
 TAILQ_HEAD(skiplist, skip);
 
+/** Text storage.
+ *
+ * Line numbers are 1-based. Columns are zero-based.
+ */
 @interface ViTextStorage : NSTextStorage
 {
 	NSMutableAttributedString	*attributedString;
@@ -59,10 +63,32 @@ TAILQ_HEAD(skiplist, skip);
 - (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
                              length:(NSUInteger *)lengthPtr
                         contentsEnd:(NSUInteger *)eolPtr;
+
+/** Find the start location of a line.
+ * @param aLineNumber The line number to lookup.
+ * @returns The location for the start of the given line.
+ */
 - (NSInteger)locationForStartOfLine:(NSUInteger)aLineNumber;
+
+/** Return the range of a line.
+ * @param lineNumber The line number to return the range for.
+ * @returns The range of the line, or (`NSNotFound`, `0`) if the
+ * lineNumber is invalid.
+ */
 - (NSRange)rangeOfLine:(NSUInteger)lineNumber;
+
 - (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation;
+
+/** Find the line number of a location.
+ * @param aLocation The location of the line number to return.
+ * @returns The line number at a given location. Returns 0 if the
+ * document is empty.
+ */
 - (NSUInteger)lineNumberAtLocation:(NSUInteger)aLocation;
+
+/** Return the number of lines.
+ * @returns The number of lines, or zero if the document is empty.
+ */
 - (NSUInteger)lineCount;
 
 - (NSUInteger)skipCharactersInSet:(NSCharacterSet *)characterSet
@@ -100,16 +126,42 @@ TAILQ_HEAD(skiplist, skip);
 - (NSString *)wordAtLocation:(NSUInteger)aLocation;
 
 - (NSUInteger)columnOffsetAtLocation:(NSUInteger)aLocation;
+
+/** Find the column of a location.
+ * @param aLocation The location to check for column.
+ * @returns The logical column from the start of the line.
+ * @bug This method always uses the default tab size when determining the column.
+ */
 - (NSUInteger)columnAtLocation:(NSUInteger)aLocation;
+
 - (NSUInteger)locationForColumn:(NSUInteger)column
                    fromLocation:(NSUInteger)aLocation
                       acceptEOL:(BOOL)acceptEOL;
 
 - (NSRange)rangeOfLineAtLocation:(NSUInteger)aLocation;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
+
+/** Determine if a line is blank.
+ * @param aLocation A location on the line to check.
+ * @returns YES if the line at the given location is blank.
+ */
 - (BOOL)isBlankLineAtLocation:(NSUInteger)aLocation;
+
+/** Find the range of leading whitespace on a line.
+ * @param aLocation A location on the line to check.
+ * @returns A range of leading whitespace for the given line.
+ * Returns (`NSNotFound`, `0`) if `aLocation` is beyond the end of the document.
+ */
 - (NSRange)rangeOfLeadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
+
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
+
+/** Find the first non-blank character on a line.
+ * @param aLocation A location on the line to check.
+ * @returns The location of the first non-blank character on the given line.
+ * If the line is blank (no non-blanks found), then the location of the end of the line is returned.
+ * Returns `NSNotFound` if `aLocation` is beyond the end of the document.
+ */
 - (NSUInteger)firstNonBlankForLineAtLocation:(NSUInteger)aLocation;
 
 @end

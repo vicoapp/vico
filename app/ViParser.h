@@ -11,6 +11,9 @@ typedef enum {
 	ViParserNeedChar		/* for ftFTr */
 } ViParserState;
 
+/** A parser for vi commands.
+ *
+ */
 @interface ViParser : NSObject
 {
 	ViMap *defaultMap;
@@ -43,6 +46,10 @@ typedef enum {
 	id text;
 }
 
+/** Initialize a new key parser.
+ * @param aMap The default map to use when mapping keys.
+ * @see ViMap
+ */
 - (ViParser *)initWithDefaultMap:(ViMap *)aMap;
 
 - (id)pushKey:(NSInteger)keyCode;
@@ -57,13 +64,31 @@ typedef enum {
 - (id)timeoutInScope:(ViScope *)scope
                error:(NSError **)outError;
 
+/** Reset the parser.
+ *
+ * Parser state is reset and any partial keys are discarded.  The key
+ * map is reset to the default map defined when the parser was created.
+ */
 - (void)reset;
 
+/** Change the current key map.
+ * @param aMap A new key map that should be used to parse following keys.
+ */
 - (void)setMap:(ViMap *)aMap;
+
 - (void)setVisualMap;
 - (void)setInsertMap;
 - (void)setExplorerMap;
+
+/**
+ * @returns YES if there are partial keys received.
+ */
 - (BOOL)partial;
+
+/**
+ * @returns The current keys being parsed, or the empty string if not
+ * partial keys received.
+ */
 - (NSString *)keyString;
 
 @property(nonatomic,readwrite) BOOL nviStyleUndo;

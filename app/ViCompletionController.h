@@ -25,7 +25,7 @@
                      inRange:(NSRange)range;
 @end
 
-@interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate>
+@interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ViCompletionView *tableView;

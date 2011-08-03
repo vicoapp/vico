@@ -23,6 +23,34 @@ test_scopes:
 	export OTHER_TEST_FLAGS="-SenTest TestScopeSelectors" && \
 	xcodebuild -configuration Debug -target Tests
 
+api:
+	appledoc --project-name "Vico API" \
+		--project-company "Martin Hedenfalk" \
+		--company-id se.bzero \
+		--no-repeat-first-par \
+		--output doc \
+		--create-html \
+		--no-create-docset \
+		app/ViRegisterManager.h \
+		app/ViScope.h \
+		app/ViWindowController.h \
+		app/ViDocumentTabController.h \
+		app/ViMap.h \
+		app/ViEventManager.h \
+		app/ViTextView.h \
+		app/ViTextStorage.h \
+		app/ViKeyManager.h \
+		app/ViParser.h \
+		app/ViCommand.h \
+		app/ViDocument.h \
+		app/ViMark.h \
+		app/ViLanguage.h \
+		app/ViPreferencePane.h \
+		app/ViPreferencesController.h \
+		app/NSEvent-keyAdditions.h \
+		app/NSView-additions.h \
+		app/NSString-additions.h
+
 release: test
 	./release.sh
 

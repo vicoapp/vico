@@ -31,7 +31,7 @@
 - (NSImage *)icon;
 @end
 
-@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate>
+@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ExEnvironment *environment;

@@ -3,6 +3,8 @@
 
 @class ViBundle;
 
+/** A language syntax.
+ */
 @interface ViLanguage : NSObject
 {
 	ViBundle *bundle;
@@ -13,13 +15,24 @@
 }
 
 @property(nonatomic,readonly) ViBundle *bundle;
+
+/** The top-level scope of the language. */
 @property(nonatomic,readonly) ViScope *scope;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle;
 - (NSArray *)fileTypes;
 - (NSString *)firstLineMatch;
+
+/**
+ * @returns  The scope name of the language.
+ */
 - (NSString *)name;
+
+/**
+ * @returns The display name of the language.
+ */
 - (NSString *)displayName;
+
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;

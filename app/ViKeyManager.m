@@ -19,7 +19,7 @@
 
 @synthesize parser, target;
 
-- (ViKeyManager *)initWithTarget:(id)aTarget
+- (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                           parser:(ViParser *)aParser
 {
 	if ((self = [super init]) != nil) {
@@ -29,7 +29,7 @@
 	return self;
 }
 
-- (ViKeyManager *)initWithTarget:(id)aTarget
+- (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                       defaultMap:(ViMap *)map
 {
 	return [self initWithTarget:aTarget
@@ -56,7 +56,6 @@
 
 	/*
 	 * Evaluate macro as a Nu expression.
-	 * Result is discarded.
 	 */
 	if ([macro.mapping isExpression]) {
 		NuBlock *expression = macro.mapping.expression;

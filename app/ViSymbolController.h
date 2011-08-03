@@ -3,7 +3,7 @@
 @class ViDocument;
 @class ViWindowController;
 
-@interface ViSymbolController : NSObject <NSOutlineViewDataSource>
+@interface ViSymbolController : NSObject <NSOutlineViewDataSource, ViKeyManagerTarget>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ViWindowController *windowController;

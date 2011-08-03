@@ -25,7 +25,6 @@ static ViWindowController	*currentWindowController = nil;
 - (void)updateJumplistNavigator;
 - (void)didSelectDocument:(ViDocument *)document;
 - (void)didSelectViewController:(id<ViViewController>)viewController;
-- (ViDocumentTabController *)selectedTabController;
 - (void)closeDocumentView:(id<ViViewController>)viewController
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow;

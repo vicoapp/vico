@@ -1,6 +1,8 @@
 #import "ViMap.h"
 #import "ViMacro.h"
 
+/** A generated vi command.
+ */
 @interface ViCommand : NSObject
 {
 	ViMapping *mapping;
@@ -18,20 +20,41 @@
 	NSUInteger finalLocation;
 }
 
+/** The mapping that describes the action. */
 @property(nonatomic,readonly) ViMapping *mapping;
+
+/** Any count given to the command. */
 @property(nonatomic,readwrite) int count;
+
 @property(nonatomic,readwrite) int saved_count;
 @property(nonatomic,readwrite) BOOL fromDot;
+
+/** YES if the mapped action operates on whole lines. */
 @property(nonatomic,readwrite) BOOL isLineMode;
+
+/** YES if the mapped action is a motion command. */
 @property(nonatomic,readonly) BOOL isMotion;
+
+/** YES if the mapped action is a motion component for an operator. */
 @property(nonatomic,readonly) BOOL hasOperator;
+
+/** The argument, if any. Only applicable if the mapping specified the ViMapNeedArgument flag. */
 @property(nonatomic,readwrite) unichar argument;
+
+/** The register, if anyn. */
 @property(nonatomic,readwrite) unichar reg;
+
+/** The motion command, if this command is an operator action. */
 @property(nonatomic,readwrite) ViCommand *motion;
+
+/** The operator command, if this command is a motion component. */
 @property(nonatomic,readwrite) ViCommand *operator;
+
 @property(nonatomic,readwrite) id text;
+
 @property(nonatomic,readwrite) NSRange affectedRange;
 @property(nonatomic,readwrite) NSUInteger finalLocation;
+
 @property(nonatomic,readwrite) ViMacro *macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping
@@ -40,10 +63,8 @@
                          count:(int)aCount;
 
 - (SEL)action;
-- (BOOL)isMotion;
 - (BOOL)isUndo;
 - (BOOL)isDot;
-- (BOOL)hasOperator;
 - (ViCommand *)dotCopy;
 
 @end

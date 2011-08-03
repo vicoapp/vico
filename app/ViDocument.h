@@ -8,6 +8,8 @@
 @class ViTextView;
 @class ExCommand;
 
+/** A document.
+ */
 @interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate, ViViewDocument>
 {
 	NSMutableSet *views;
@@ -71,13 +73,27 @@
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property(nonatomic,readonly) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
+
+/** Return the ViTextStorage object. */
 @property(nonatomic,readonly) ViTextStorage *textStorage;
 
 - (void)message:(NSString *)fmt, ...;
 - (ExEnvironment *)environment;
 - (NSDictionary *)typingAttributes;
 
+/** Return a scriptable text view.
+ *
+ * The returned text view is not visible.
+ *
+ * @returns A scriptable text view.
+ */
+- (ViTextView *)text;
+
 - (IBAction)toggleLineNumbers:(id)sender;
+
+/** Get the language syntax.
+ * @returns The language syntax currently in use, or `nil` if no language configured.
+ */
 - (ViLanguage *)language;
 - (IBAction)setLanguageAction:(id)sender;
 - (void)setLanguageAndRemember:(ViLanguage *)lang;
@@ -89,6 +105,7 @@
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
 - (ViDocumentView *)makeView;
+- (ViDocumentView *)cloneView:(ViDocumentView *)oldView;
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)addView:(ViDocumentView *)aDocumentView;
 - (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
@@ -98,9 +115,27 @@
 - (void)setString:(NSString *)aString;
 - (void)closeAndWindow:(BOOL)canCloseWindow;
 
+/** @name Working with scopes */
+
+/** Return the scope at a given location.
+ * @param aLocation The location of the scope.
+ * @returns The scope at the given location, or nil of aLocation is not valid or no language syntax available.
+ */
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation;
+
+/** Find the best matching scope selector.
+ * @param scopeSelectors Scope selectors to test.
+ * @param aLocation The location of the scope.
+ * @returns The scope selector with the highest matching rank at the given location.
+ */
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
                      atLocation:(NSUInteger)aLocation;
+
+/** Find the range where a scope selector matches.
+ * @param scopeSelector Scope selectors to test.
+ * @param aLocation A location where the scope selector matches.
+ * @returns The whole range where the scope selector matches, possibly with different ranks.
+ */
 - (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector
                      atLocation:(NSUInteger)aLocation;
 - (NSRange)rangeOfScopeSelector:(NSString *)scopeSelector

@@ -1260,6 +1260,11 @@ int logIndent = 0;
 	}
 }
 
+- (void)setInsertMode
+{
+	[self setInsertMode:nil];
+}
+
 #pragma mark -
 #pragma mark Input handling and command evaluation
 

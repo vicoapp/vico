@@ -69,6 +69,9 @@ IMPORTANT
 
 FEATURES
 ========
+* @jtregunna: can you make it so we don't get a file changed
+              notification when the file hashes are the same? ie, switching branches
+              in a git repo
 * ability to direct stderr to other place than (or, separately from) stdout in bundle commands
 * Ability to edit tmbundles within the app (HN)
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
@@ -88,6 +91,7 @@ FEATURES
 * convert horizontal split to vertical and vice versa
 * :e# => open alternate file
 * set incsearch
+* set hlsearch
 * set listchars
 * symbol list should use same filtering algorithm as file explorer
 * implement R

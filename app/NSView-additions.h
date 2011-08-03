@@ -1,5 +1,6 @@
 @class ViCommand;
 
+/** Convenience NSView functions. */
 @interface NSView (additions)
 /** Find the target for a command action.
  *

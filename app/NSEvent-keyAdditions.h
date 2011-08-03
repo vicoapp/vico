@@ -1,3 +1,4 @@
+/** Convenience NSEvent functions. */
 @interface NSEvent (keyAdditions)
 
 /**

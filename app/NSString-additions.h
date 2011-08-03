@@ -1,3 +1,4 @@
+/** Convenience NSString functions. */
 @interface NSString (additions)
 
 /** Count lines.

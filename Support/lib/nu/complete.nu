@@ -59,7 +59,7 @@
 	; (shellCommand log:"got choice: #{(choice description)}")
 	; (shellCommand log:"termination character was: #{(NSString stringWithKeyCode:(cc terminatingKey))}")
 	(if (choice)
-		(text replaceCharactersInRange:(cc range) withString:(choice content))
+		(text replaceRange:(cc range) withString:(choice content))
 		(text setCaret:(+ (first (cc range)) ((choice content) length)))
 		(set result (NSMutableDictionary dictionary))
 		(result setObject:(choice representedObject) forKey:"representedObject")

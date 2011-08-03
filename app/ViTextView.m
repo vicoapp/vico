@@ -1804,7 +1804,7 @@ int logIndent = 0;
 	}
 
 	if (ok && command.isLineMode && !command.isMotion && mode == ViVisualMode) {
-		command.saved_count = [[self textStorage] lineNumberAtLocation:l2] - [[self textStorage] lineNumberAtLocation:l1] + 1;
+		command.saved_count = (int)([[self textStorage] lineNumberAtLocation:l2] - [[self textStorage] lineNumberAtLocation:l1] + 1);
 		// else {
 		//	command.motion = [ViCommand commandWithMapping:move_right count:l2 - l1];
 		// }

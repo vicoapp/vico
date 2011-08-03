@@ -445,7 +445,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSRange)rangeOfLine:(NSUInteger)lineNumber
 {
-	NSRange r;
+	NSRange r = NSMakeRange(NSNotFound, 0);
 	r.location = [self locationForStartOfLine:lineNumber length:&r.length contentsEnd:nil];
 	return r;
 }

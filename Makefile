@@ -24,6 +24,7 @@ test_scopes:
 	xcodebuild -configuration Debug -target Tests
 
 api:
+	rm -rf doc/html
 	appledoc --project-name "Vico API" \
 		--project-company "Martin Hedenfalk" \
 		--company-id se.bzero \
@@ -51,6 +52,9 @@ api:
 		app/NSEvent-keyAdditions.h \
 		app/NSView-additions.h \
 		app/NSString-additions.h
+
+syncapi: api
+	rsync -av --delete  doc/html/ www:/var/www/feedback.vicoapp.com/public/api
 
 release: test
 	./release.sh

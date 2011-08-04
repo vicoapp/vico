@@ -134,6 +134,7 @@
 
 - (void)awakeFromNib
 {
+	explorer.strictIndentation = YES;
 	explorer.keyManager = [[ViKeyManager alloc] initWithTarget:self
 							defaultMap:[ViMap explorerMap]];
 	[explorer setTarget:self];

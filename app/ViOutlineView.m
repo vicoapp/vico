@@ -5,7 +5,7 @@
 
 @implementation ViOutlineView
 
-@synthesize keyManager, lastSelectedRow;
+@synthesize keyManager, lastSelectedRow, strictIndentation;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
@@ -290,6 +290,30 @@
 		[keyManager runAsMacro:@"<ctrl-o>"];
 	else if ([event deltaX] < 0)
 		[keyManager runAsMacro:@"<ctrl-i>"];
+}
+
+#pragma mark -
+
+- (NSRect)frameOfCellAtColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex
+{
+	NSRect frame = [super frameOfCellAtColumn:columnIndex row:rowIndex];
+	if (strictIndentation) {
+		NSInteger level = [self levelForRow:rowIndex];
+		NSInteger diff = 15 + level * [self indentationPerLevel] - frame.origin.x;
+		frame.origin.x += diff;
+		frame.size.width -= diff;
+	}
+	return frame;
+}
+
+- (NSRect)frameOfOutlineCellAtRow:(NSInteger)rowIndex
+{
+	NSRect frame = [super frameOfOutlineCellAtRow:rowIndex];
+	if (strictIndentation) {
+		NSInteger level = [self levelForRow:rowIndex];
+		frame.origin.x = 4 + level * [self indentationPerLevel];
+	}
+	return frame;
 }
 
 @end

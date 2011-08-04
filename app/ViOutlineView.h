@@ -4,10 +4,12 @@
 {
 	ViKeyManager *keyManager;
 	NSInteger lastSelectedRow;
+	BOOL strictIndentation;
 }
 
 @property (nonatomic, readwrite, assign) ViKeyManager *keyManager;
 @property (nonatomic, readwrite) NSInteger lastSelectedRow;
+@property (nonatomic, readwrite) BOOL strictIndentation;
 
 - (BOOL)move_down:(ViCommand *)command;
 - (BOOL)move_up:(ViCommand *)command;

@@ -602,6 +602,9 @@ static ViWindowController	*currentWindowController = nil;
 	}
 #endif
 
+	if ([documents count] == 0)
+		return YES;
+
 	NSMutableSet *set = [[NSMutableSet alloc] init];
 	for (ViDocument *doc in documents) {
 		if ([set containsObject:doc])

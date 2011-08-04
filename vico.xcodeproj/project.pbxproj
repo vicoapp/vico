@@ -1718,7 +1718,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "BUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\n  repo=\"vicoapp-$bundle.tmbundle\"\n  #url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\n  url=\"$HOME/src/vico/Bundles/$repo\"\n  test \"$CONFIGURATION\" = \"Debug\" -a -d \"$BUNDLEDIR/$repo\" && continue\n  rm -rf \"$BUNDLEDIR/$repo\"\n  git clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo/.git\"\ndone\n";
+			shellScript = "BUNDLES=\"c css diff html java javascript json objective-c perl php python ruby-on-rails ruby shellscript source sql text xml yaml\"\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nfor bundle in $BUNDLES; do\n  repo=\"vicoapp-$bundle.tmbundle\"\n  #url=\"https://github.com/vicoapp/$bundle.tmbundle.git\"\n  url=\"$HOME/src/vico/Bundles/$repo\"\n  rsync -av --delete --exclude \".git\" $url $BUNDLEDIR\n#test \"$CONFIGURATION\" = \"Debug\" -a -d \"$BUNDLEDIR/$repo\" && continue\n# rm -rf \"$BUNDLEDIR/$repo\"\n# git clone --depth 1 \"$url\" \"$BUNDLEDIR/$repo\"\n  rm -rf \"$BUNDLEDIR/$repo/.git\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {

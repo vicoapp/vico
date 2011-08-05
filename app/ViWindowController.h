@@ -1,6 +1,5 @@
 #import "ViTagStack.h"
 #import "ViTagsDatabase.h"
-#import "ViBgView.h"
 #import "ViJumpList.h"
 #import "ExEnvironment.h"
 #import "ViToolbarPopUpButtonCell.h"
@@ -27,7 +26,7 @@
 	IBOutlet NSTabView *tabView;
 	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
 	IBOutlet NSView *mainView;
-	IBOutlet ViBgView *explorerView;
+	IBOutlet NSView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 	IBOutlet NSTextField *messageField;
 #ifdef TRIAL_VERSION
@@ -68,7 +67,7 @@
 	// symbol list
 	IBOutlet ViSymbolController *symbolController;
 	IBOutlet NSImageView *symbolsResizeView;
-	IBOutlet ViBgView *symbolsView;
+	IBOutlet NSView *symbolsView;
 
 	ViJumpList *jumpList;
 	BOOL jumping;

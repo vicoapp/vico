@@ -258,8 +258,6 @@ static ViWindowController	*currentWindowController = nil;
 	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 
 	[[self window] makeKeyAndOrderFront:self];
-	[symbolsView setSourceHighlight:YES];
-	[explorerView setSourceHighlight:YES];
 	[symbolsView setNeedsDisplay:YES];
 	[explorerView setNeedsDisplay:YES];
 

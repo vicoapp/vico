@@ -67,7 +67,6 @@
 		9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30D13310C430023C5B7 /* TMFileURLProtocol.m */; };
 		9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */; };
 		9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31113310C450023C5B7 /* ViAppController.m */; };
-		9A2EF39213310CB80023C5B7 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31313310C460023C5B7 /* ViBgView.m */; };
 		9A2EF39313310CB80023C5B7 /* ViBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31513310C470023C5B7 /* ViBundle.m */; };
 		9A2EF39413310CB80023C5B7 /* ViBundleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31713310C480023C5B7 /* ViBundleCommand.m */; };
 		9A2EF39513310CB80023C5B7 /* ViBundleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF31913310C4A0023C5B7 /* ViBundleItem.m */; };
@@ -491,8 +490,6 @@
 		9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TxmtURLProtocol.m; sourceTree = "<group>"; };
 		9A2EF31013310C440023C5B7 /* ViAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViAppController.h; sourceTree = "<group>"; };
 		9A2EF31113310C450023C5B7 /* ViAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViAppController.m; sourceTree = "<group>"; };
-		9A2EF31213310C450023C5B7 /* ViBgView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBgView.h; sourceTree = "<group>"; };
-		9A2EF31313310C460023C5B7 /* ViBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBgView.m; sourceTree = "<group>"; };
 		9A2EF31413310C460023C5B7 /* ViBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBundle.h; sourceTree = "<group>"; };
 		9A2EF31513310C470023C5B7 /* ViBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBundle.m; sourceTree = "<group>"; };
 		9A2EF31613310C480023C5B7 /* ViBundleCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBundleCommand.h; sourceTree = "<group>"; };
@@ -1269,8 +1266,6 @@
 				9A2EF30F13310C440023C5B7 /* TxmtURLProtocol.m */,
 				9A2EF31013310C440023C5B7 /* ViAppController.h */,
 				9A2EF31113310C450023C5B7 /* ViAppController.m */,
-				9A2EF31213310C450023C5B7 /* ViBgView.h */,
-				9A2EF31313310C460023C5B7 /* ViBgView.m */,
 				9A2EF31413310C460023C5B7 /* ViBundle.h */,
 				9A2EF31513310C470023C5B7 /* ViBundle.m */,
 				9A2EF31613310C480023C5B7 /* ViBundleCommand.h */,
@@ -1799,7 +1794,6 @@
 				9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */,
 				9A2EF39013310CB80023C5B7 /* TxmtURLProtocol.m in Sources */,
 				9A2EF39113310CB80023C5B7 /* ViAppController.m in Sources */,
-				9A2EF39213310CB80023C5B7 /* ViBgView.m in Sources */,
 				9A2EF39313310CB80023C5B7 /* ViBundle.m in Sources */,
 				9A2EF39413310CB80023C5B7 /* ViBundleCommand.m in Sources */,
 				9A2EF39513310CB80023C5B7 /* ViBundleItem.m in Sources */,

@@ -37,7 +37,6 @@ BUGS
 ====
 * jumps doesn't work in untitled files
 * bundle commands time out when presenting ui
-* get rid of ViBgView
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
 * caret location is messed up after undo of bundle command

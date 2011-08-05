@@ -1,5 +1,4 @@
 #import "ViRegexp.h"
-#import "ViBgView.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViOutlineView.h"
 #import "ViJumpList.h"
@@ -39,7 +38,7 @@
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
 	IBOutlet NSSplitView *splitView;
-	IBOutlet ViBgView *explorerView;
+	IBOutlet NSView *explorerView;
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;

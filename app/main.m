@@ -22,12 +22,8 @@ main(int argc, char *argv[])
 	ptrace(PT_DENY_ATTACH, 0, 0, 0);
 #endif
 
-	[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
-	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
-	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
-	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:nil];
-	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
-	[Nu loadNuFile:@"keys"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"vico" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"keys" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 
 #if defined(RELEASE_BUILD)
 #warning Including receipt validation code

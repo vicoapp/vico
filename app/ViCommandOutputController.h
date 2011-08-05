@@ -1,15 +1,15 @@
-#import "ViDocumentTabController.h"
+#import "ViTabController.h"
 #import "ViTextView.h"
 #import "ViWebView.h"
 
 @interface ViCommandOutputController : NSObject <ViViewController>
 {
 	IBOutlet ViWebView *webView;
-	ViDocumentTabController *tabController;
+	ViTabController *tabController;
 	NSString *title;
 }
 
-@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readwrite, assign) ViTabController *tabController;
 
 - (ViCommandOutputController *)initWithHTMLString:(NSString *)content;
 - (NSView *)view;

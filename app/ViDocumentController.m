@@ -1,5 +1,4 @@
 #import "ViDocumentController.h"
-#import "ViDocumentTabController.h"
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViWindowController.h"

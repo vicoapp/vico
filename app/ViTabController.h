@@ -1,5 +1,5 @@
 @class ViDocument;
-@class ViDocumentTabController;
+@class ViTabController;
 
 typedef enum ViViewOrderingMode ViViewOrderingMode;
 
@@ -23,7 +23,7 @@ enum ViViewOrderingMode {
 /** The inner NSView will be made key when the view gets focus. */
 @property(nonatomic,readonly) NSView *innerView;
 /** The containing tab controller. */
-@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readwrite, assign) ViTabController *tabController;
 /** The title of the split view. */
 - (NSString *)title;
 @optional
@@ -70,7 +70,7 @@ enum ViViewOrderingMode {
 
 /*? A controller of a tab.
  */
-@interface ViDocumentTabController : NSObject
+@interface ViTabController : NSObject
 {
 	NSSplitView		*splitView;
 	NSMutableArray		*views;

@@ -6,7 +6,7 @@
 #import "ViSymbol.h"
 #import "ViSymbolController.h"
 #import "ViURLManager.h"
-#import "ViDocumentTabController.h"
+#import "ViTabController.h"
 #import "ViTextView.h"
 
 @class PSMTabBarControl;
@@ -165,7 +165,7 @@
 /*?
  * @returns The currently selected tab controller.
  */
-- (ViDocumentTabController *)selectedTabController;
+- (ViTabController *)selectedTabController;
 
 - (ViDocument *)documentForURL:(NSURL *)url;
 

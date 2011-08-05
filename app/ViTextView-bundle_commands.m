@@ -246,7 +246,7 @@
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			id<ViViewController> viewController = [[[self window] windowController] currentView];
-			ViDocumentTabController *tabController = [viewController tabController];
+			ViTabController *tabController = [viewController tabController];
 			id<ViViewController> webView = nil;
 			/* Try to reuse any existing web view in the current tab. */
 			for (webView in [tabController views]) {

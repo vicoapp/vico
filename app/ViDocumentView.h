@@ -1,6 +1,6 @@
 #import "ViTextView.h"
 #import "ViDocument.h"
-#import "ViDocumentTabController.h"
+#import "ViTabController.h"
 
 // XXX: actually a view _controller_
 @interface ViDocumentView : NSObject <ViViewController>
@@ -9,13 +9,13 @@
 	IBOutlet NSView *innerView;
 	IBOutlet NSScrollView *scrollView;
 	ViDocument *document;
-	ViDocumentTabController *tabController;
+	ViTabController *tabController;
 }
 
 @property(nonatomic,readonly) id<ViViewDocument> document;
 @property(nonatomic,readonly) NSView *view;
 @property(nonatomic,readonly) NSView *innerView;
-@property(nonatomic,readwrite, assign) ViDocumentTabController *tabController;
+@property(nonatomic,readwrite, assign) ViTabController *tabController;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument;
 - (ViTextView *)textView;

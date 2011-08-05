@@ -1,12 +1,12 @@
-#import "ViDocumentTabController.h"
+#import "ViTabController.h"
 #import "ViDocumentView.h"
 #import "ViEventManager.h"
 
-@interface ViDocumentTabController (private)
+@interface ViTabController (private)
 - (void)normalizeViewsRecursively:(id)split;
 @end
 
-@implementation ViDocumentTabController
+@implementation ViTabController
 
 @synthesize window, views, selectedView, previousView;
 

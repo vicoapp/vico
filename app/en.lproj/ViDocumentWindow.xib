@@ -590,6 +590,7 @@
 													<string key="NSFrame">{{36, 4}, {746, 14}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="584565200">
 														<int key="NSCellFlags">68288064</int>
@@ -1306,6 +1307,7 @@
 						<string key="NSFrame">{{135, 0}, {15, 23}}</string>
 						<reference key="NSSuperview" ref="244902241"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<int key="NSViewLayerContentsRedrawPolicy">2</int>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="170643560">
@@ -3076,7 +3078,6 @@
 				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="100151.CustomClassName">ViSplitView</string>
 				<string key="100151.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100184.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100250.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

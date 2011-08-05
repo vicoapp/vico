@@ -2,7 +2,6 @@
 #import "ViBgView.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViOutlineView.h"
-#import "ViSplitView.h"
 #import "ViJumpList.h"
 
 #include <CoreServices/CoreServices.h>
@@ -39,7 +38,7 @@
 	IBOutlet ViOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
-	IBOutlet ViSplitView *splitView;
+	IBOutlet NSSplitView *splitView;
 	IBOutlet ViBgView *explorerView;
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;

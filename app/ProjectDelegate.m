@@ -1517,7 +1517,7 @@ doCommandBySelector:(SEL)aSelector
 objectValueForTableColumn:(NSTableColumn *)tableColumn
            byItem:(id)item
 {
-	if (isFiltered)
+	if ([item isKindOfClass:[ViCompletion class]])
 		return [(ViCompletion *)item title];
 	else
 		return [(ProjectFile *)item name];

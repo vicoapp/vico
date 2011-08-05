@@ -942,6 +942,8 @@ int logIndent = 0;
 		return NO;
 	}
 
+	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
+
 	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string]
 					       options:rx_options];
 
@@ -1003,7 +1005,6 @@ int logIndent = 0;
 
 		keyManager.parser.last_search_pattern = pattern;
 		keyManager.parser.last_search_options = 0;
-		[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 		if ([self findPattern:pattern options:0]) {
 			[self setCaret:final_location];
 			return YES;
@@ -1030,7 +1031,6 @@ int logIndent = 0;
 
 		keyManager.parser.last_search_pattern = pattern;
 		keyManager.parser.last_search_options = ViSearchOptionBackwards;
-		[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 		if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
 			[self setCaret:final_location];
 			return YES;

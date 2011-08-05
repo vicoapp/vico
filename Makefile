@@ -36,7 +36,7 @@ api:
 		app/ViRegisterManager.h \
 		app/ViScope.h \
 		app/ViWindowController.h \
-		app/ViDocumentTabController.h \
+		app/ViTabController.h \
 		app/ViMap.h \
 		app/ViEventManager.h \
 		app/ViTextView.h \

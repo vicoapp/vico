@@ -68,7 +68,7 @@ enum ViViewOrderingMode {
 - (BOOL)isDocumentEdited;
 @end
 
-/*? A controller of a tab.
+/** A controller of a tab.
  */
 @interface ViTabController : NSObject
 {
@@ -80,7 +80,7 @@ enum ViViewOrderingMode {
 }
 
 @property(nonatomic,readonly) NSArray *views;
-/*? The window this tab belongs to. */
+/** The window this tab belongs to. */
 @property(nonatomic,readonly) NSWindow *window;
 @property(nonatomic,readwrite, assign) id<ViViewController> selectedView;
 @property(nonatomic,readwrite, assign) id<ViViewController> previousView;
@@ -90,25 +90,25 @@ enum ViViewOrderingMode {
 - (void)addView:(id<ViViewController>)aView;
 - (NSView *)view;
 
-/*? @name Splitting views */
+/** @name Splitting views */
 
-/*? Splits a view and displays another view.
+/** Splits a view and displays another view.
  * @param viewController The view that should be split.
  * @param newViewController The view that should be displayed.
  * @param isVertical YES if the split is vertical, NO if horizontal.
- * @returns newViewController or nil on failure.
+ * @returns newViewController or `nil` on failure.
  */
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController
                          withView:(id<ViViewController>)newViewController
                        vertically:(BOOL)isVertical;
 
-/*? Splits a view and displays a clone of the view.
+/** Splits a view and displays a clone of the view.
  *
  * The view controller must have an associated document that can clone views.
  *
  * @param viewController The view that should be split.
  * @param isVertical YES if the split is vertical, NO if horizontal.
- * @returns The new view controller or nil on failure.
+ * @returns The new view controller or `nil` on failure.
  */
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController
                        vertically:(BOOL)isVertical;

@@ -2,13 +2,16 @@ syntax: glob
 
 build
 *.dmg
-Sparkle.framework
 .*.swp
 .DS_Store
 *.orig
 onig-5.9.2
 scope_selector.*
 help/Vico.help
-Nu.framework
+help/www
+*.framework*
 Bundles/*.tmbundle
 vico.xcodeproj/xcuserdata
+doc
+vico-hg-*.tar.gz*
+vico-*.xml

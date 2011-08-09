@@ -1512,7 +1512,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview
 {
-	if (sender == splitView)
+	if (subview == explorerView || subview == symbolsView)
 		return YES;
 	return NO;
 }
@@ -1556,48 +1556,17 @@ constrainMaxCoordinate:(CGFloat)proposedMax
 shouldCollapseSubview:(NSView *)subview
 forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
 {
-	if (sender == splitView)
-	{
-		// collapse both side views, but not the edit view
-		if (subview == explorerView || subview == symbolsView)
-			return YES;
-	}
+	// collapse both side views, but not the main view
+	if (subview == explorerView || subview == symbolsView)
+		return YES;
 	return NO;
 }
 
-- (void)splitView:(id)sender resizeSubviewsWithOldSize:(NSSize)oldSize
+- (BOOL)splitView:(NSSplitView *)splitView shouldAdjustSizeOfSubview:(NSView *)subview
 {
-	if (sender != splitView)
-		return;
-
-	NSUInteger nsubviews = [[sender subviews] count];
-	if (nsubviews < 2) {
-		// the side views have not been added yet
-		[sender adjustSubviews];
-		return;
-	}
-
-	NSRect newFrame = [sender frame];
-	float dividerThickness = [sender dividerThickness];
-
-	NSInteger explorerWidth = 0;
-	if ([sender isSubviewCollapsed:explorerView])
-		explorerWidth = 0;
-	else
-		explorerWidth = [explorerView frame].size.width;
-
-	NSRect symbolsFrame = [symbolsView frame];
-	NSInteger symbolsWidth = symbolsFrame.size.width;
-	if ([sender isSubviewCollapsed:symbolsView])
-		symbolsWidth = 0;
-
-	/* Keep the symbol sidebar in constant width. */
-	NSRect mainFrame = [mainView frame];
-	mainFrame.size.width = newFrame.size.width - (explorerWidth + symbolsWidth + (nsubviews-2)*dividerThickness);
-	mainFrame.size.height = newFrame.size.height;
-
-	[mainView setFrame:mainFrame];
-	[sender adjustSubviews];
+	if (subview == explorerView || subview == symbolsView)
+		return NO;
+	return YES;
 }
 
 - (NSRect)splitView:(NSSplitView *)sender

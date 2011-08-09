@@ -118,16 +118,22 @@
 				 start:aLocation];
 }
 
-- (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange
+- (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange options:(int)options
 {
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	[aString getCharacters:chars range:aRange];
 	ViRegexpMatch *match = [self matchInCharacters:chars
+					       options:options
 	                                         range:NSMakeRange(0, aRange.length)
 	                                         start:aRange.location];
 
 	free(chars);
 	return match;
+}
+
+- (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange
+{
+	return [self matchInString:aString range:aRange options:0];
 }
 
 - (ViRegexpMatch *)matchInString:(NSString *)aString

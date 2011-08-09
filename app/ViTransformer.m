@@ -187,13 +187,18 @@
 	id text = value;
 	BOOL copied = NO;
 	NSUInteger begin = 0;
-	for (;;) {
+	while (begin < [text length]) {
 		NSRange r = NSMakeRange(begin, [text length] - begin);
 		DEBUG(@"matching rx %@ in range %@ in string [%@]",
 		    rx, NSStringFromRange(r), text);
 		if (r.length == 0)
 			break;
-		ViRegexpMatch *m = [rx matchInString:text range:r];
+		int opts = 0;
+		if (begin > 0)
+			opts |= ONIG_OPTION_NOTBOL;
+		if (NSMaxRange(r) < [text length])
+			opts |= ONIG_OPTION_NOTEOL;
+		ViRegexpMatch *m = [rx matchInString:text range:r options:opts];
 		DEBUG(@"m = %@", m);
 		if (m == nil)
 			break;
@@ -216,15 +221,16 @@
 				return nil;
 			expFormat = @"";
 		}
-		begin = r.location + [expFormat length];
-		if (begin == r.location && r.length == 0 && begin < [text length])
-			++begin; /* prevent infinite loops */
 		DEBUG(@"replace range %@ in string [%@] with expanded format [%@]",
 		    NSStringFromRange(r), text, expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];
 
 		if (!global)
 			break;
+
+		begin = r.location + [expFormat length];
+		if (r.length == 0)
+			++begin; /* prevent infinite loops with zero-length matches */
 	}
 	DEBUG(@"transformed [%@] -> [%@]", value, text);
 	return text;

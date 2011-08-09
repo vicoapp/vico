@@ -137,9 +137,10 @@
 	if ([opts rangeOfString:@"n"].location != NSNotFound)
 		reportMatches = YES;
 
-	BOOL global = NO;
-	if ([opts rangeOfString:@"g"].location != NSNotFound)
-		global = YES;
+	BOOL global = [[NSUserDefaults standardUserDefaults] boolForKey:@"gdefault"];
+	NSUInteger num_g = [opts occurrencesOfCharacter:'g'];
+	while (num_g--)
+		global = !global;
 
 	ViRegexp *rx = nil;
 

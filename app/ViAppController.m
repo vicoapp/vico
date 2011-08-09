@@ -205,6 +205,7 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"antialias",
 	    [NSNumber numberWithBool:YES], @"prefertabs",
 	    [NSNumber numberWithBool:NO], @"cursorline",
+	    [NSNumber numberWithBool:NO], @"gdefault",
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:12.0], @"fontsize",
 	    @"Monaco", @"fontname",

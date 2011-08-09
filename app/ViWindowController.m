@@ -2143,6 +2143,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"wrap", @"wrap",
 		@"smarttab", @"sta",
 
+		@"gdefault", @"gd",
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",
 		@"prefertabs", @"prefertabs",
@@ -2166,8 +2167,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
-	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", nil];
-	static NSString *usage = @"usage: se[t] [option[=[value]]...] [nooption ...] [option? ...] [all]";
+	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
+	    nil];
 
 	NSString *var;
 	for (var in command.words) {

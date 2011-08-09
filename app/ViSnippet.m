@@ -274,7 +274,7 @@
 					value = [self transformValue:(value ?: @"")
 					                 withPattern:rx
 					                      format:format
-					                     options:options
+							      global:([options rangeOfString:@"g"].location != NSNotFound)
 					                       error:outError];
 					if (value == nil)
 						return NO;
@@ -546,7 +546,7 @@
 			value = [self transformValue:value
 			                 withPattern:ts.rx
 			                      format:ts.format
-			                     options:ts.options
+					      global:([ts.options rangeOfString:@"g"].location != NSNotFound)
 			                       error:outError];
 			if (outError && *outError)
 				return NO;

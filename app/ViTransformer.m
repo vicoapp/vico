@@ -120,7 +120,7 @@
 
 			NSString *conditionalString = [format substringFromIndex:[scan scanLocation]];
 			NSUInteger len = 0;
-			NSString *insertion = [self expandFormat:conditionalString 
+			NSString *insertion = [self expandFormat:conditionalString
 			                               withMatch:m
 			                               stopChars:@":)"
 			                          originalString:value
@@ -181,7 +181,7 @@
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
-                     options:(NSString *)options
+                      global:(BOOL)global
                        error:(NSError **)outError
 {
 	id text = value;
@@ -223,7 +223,7 @@
 		    NSStringFromRange(r), text, expFormat);
 		[text replaceCharactersInRange:r withString:expFormat];
 
-		if (options == nil || [options rangeOfString:@"g"].location == NSNotFound)
+		if (!global)
 			break;
 	}
 	DEBUG(@"transformed [%@] -> [%@]", value, text);

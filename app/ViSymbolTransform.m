@@ -68,7 +68,7 @@
 		trSymbol = [self transformValue:trSymbol
 		                    withPattern:rx
 		                         format:[tr objectAtIndex:1]
-		                        options:[tr objectAtIndex:2]
+		                         global:([[tr objectAtIndex:2] rangeOfString:@"g"].location != NSNotFound)
 		                          error:nil];
 	}
 

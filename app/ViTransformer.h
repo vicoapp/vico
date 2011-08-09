@@ -7,7 +7,7 @@
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
-                     options:(NSString *)options
+                      global:(BOOL)global
                        error:(NSError **)outError;
 
 @end

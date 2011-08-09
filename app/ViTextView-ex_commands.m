@@ -191,7 +191,7 @@
 			NSString *replacedText = [tform transformValue:value
 							   withPattern:rx
 								format:command.replacement
-							       options:command.string
+								global:global
 								 error:&error];
 			if (error) {
 				MESSAGE(@"substitute failed: %@", [error localizedDescription]);

@@ -7,7 +7,11 @@
 	void		*closeAllContextInfo;
 	BOOL		 closeAllWindows;
 	NSMutableSet	*closeAllSet;
+	NSMutableDictionary *openDocs;
 }
+
+- (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)aDocument;
+- (id)documentForURLQuick:(NSURL *)absoluteURL;
 
 - (void)closeAllDocumentsInSet:(NSMutableSet *)set
 		  withDelegate:(id)delegate

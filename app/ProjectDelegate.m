@@ -1539,12 +1539,12 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
  dataCellForTableColumn:(NSTableColumn *)tableColumn
                    item:(id)item
 {
-	NSDocumentController *docController = [NSDocumentController sharedDocumentController];
+	ViDocumentController *docController = [ViDocumentController sharedDocumentController];
 	NSInteger row = [explorer rowForItem:item];
 	NSCell *cell = [tableColumn dataCellForRow:row];
 	if (cell) {
 		ProjectFile *pf = [self fileForItem:item];
-		ViDocument *doc = [docController documentForURL:pf.url];
+		ViDocument *doc = [docController documentForURLQuick:pf.url];
 		if ([doc isDocumentEdited])
 			[(MHTextIconCell *)cell setModified:YES];
 		else

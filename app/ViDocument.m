@@ -788,6 +788,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if ([absoluteURL isEqual:[self fileURL]])
 		return;
 
+	[[ViDocumentController sharedDocumentController] updateURL:absoluteURL ofDocument:self];
+
 	[[ViEventManager defaultManager] emit:ViEventWillChangeURL for:self with:self, absoluteURL, nil];
 	[self willChangeValueForKey:@"title"];
 	[super setFileURL:absoluteURL];

@@ -204,6 +204,11 @@
 {
 	DEBUG(@"adding document %@", document);
 	[super addDocument:document];
+	if ([document fileURL]) {
+		if (openDocs == nil)
+			openDocs = [NSMutableDictionary dictionary];
+		[openDocs setObject:document forKey:[document fileURL]];
+	}
 	[[ViEventManager defaultManager] emit:ViEventDidAddDocument for:nil with:document, nil];
 }
 
@@ -211,7 +216,27 @@
 {
 	DEBUG(@"removing document %@", document);
 	[super removeDocument:document];
+	if ([document fileURL])
+		[openDocs removeObjectForKey:[document fileURL]];
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
+}
+
+- (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)document
+{
+	if ([document fileURL])
+		[openDocs removeObjectForKey:[document fileURL]];
+	if (aURL) {
+		if (openDocs == nil)
+			openDocs = [NSMutableDictionary dictionary];
+		[openDocs setObject:document forKey:aURL];
+	}
+}
+
+- (id)documentForURLQuick:(NSURL *)absoluteURL
+{
+	if (absoluteURL == nil)
+		return nil;
+	return [openDocs objectForKey:absoluteURL];
 }
 
 - (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL

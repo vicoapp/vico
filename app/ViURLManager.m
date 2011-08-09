@@ -249,7 +249,7 @@
 {
 	DEBUG(@"caching contents of URL %@", aURL);
 
-	NSString *key = [[aURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
 	[directoryCache setObject:contents forKey:key];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
 							    object:self
@@ -369,7 +369,7 @@ void mycallback(
 			continue;
 		}
 
-		NSURL *url = [NSURL URLWithString:key];
+		NSURL *url = [NSURL URLWithString:[key stringByAppendingString:@"/"]];
 		if ([url isFileURL]) {
 			NSError *error = nil;
 			if ([url checkResourceIsReachableAndReturnError:&error])

@@ -3,6 +3,22 @@
 
 @implementation NSScanner (additions)
 
+- (unichar)peek
+{
+	if ([self isAtEnd])
+		return 0;
+	return [[self string] characterAtIndex:[self scanLocation]];
+}
+
+- (BOOL)expectCharacter:(unichar)ch
+{
+	if ([self peek] == ch) {
+		[self setScanLocation:[self scanLocation] + 1];
+		return YES;
+	}
+	return NO;
+}
+
 - (BOOL)scanCharacter:(unichar *)ch
 {
 	if ([self isAtEnd])
@@ -13,9 +29,9 @@
 	return YES;
 }
 
-- (BOOL)scanUpToUnescapedCharacter:(unichar)toChar
-                        intoString:(NSString **)string
-                      stripEscapes:(BOOL)stripEscapes
+- (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet
+			       intoString:(NSString **)string
+			     stripEscapes:(BOOL)stripEscapes
 {
 	NSMutableString *s = [NSMutableString string];
 	unichar ch;
@@ -29,7 +45,7 @@
 				[s appendFormat:@"%C", ch];
 			} else
 				[s appendString:@"\\"];
-		} else if (ch == toChar) {
+		} else if ([toCharSet characterIsMember:ch]) {
 			/* Don't swallow the end character. */
 			gotChar = YES;
 			[self setScanLocation:[self scanLocation] - 1];
@@ -44,6 +60,15 @@
 	DEBUG(@"scanned escaped string [%@]", s);
 
 	return gotChar ? YES : NO;
+}
+
+- (BOOL)scanUpToUnescapedCharacter:(unichar)toChar
+                        intoString:(NSString **)string
+                      stripEscapes:(BOOL)stripEscapes
+{
+	return [self scanUpToUnescapedCharacterFromSet:[NSCharacterSet characterSetWithRange:NSMakeRange(toChar, 1)]
+					    intoString:string
+					  stripEscapes:stripEscapes];
 }
 
 - (BOOL)scanUpToUnescapedCharacter:(unichar)toChar
@@ -217,6 +242,11 @@ failed:
 	} else if (intoKeyCode)
 		*intoKeyCode = ch;
 	return YES;
+}
+
+- (void)skipWhitespace
+{
+	[self scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
 }
 
 @end

@@ -10,6 +10,13 @@
 
 @implementation ViFileDeferred
 @synthesize delegate;
++ (ViFileDeferred *)sharedDeferred
+{
+	static ViFileDeferred *sharedDeferred = nil;
+	if (sharedDeferred == nil)
+		sharedDeferred = [[ViFileDeferred alloc] init];
+	return sharedDeferred;
+}
 - (void)cancel
 {
 }
@@ -66,7 +73,7 @@
 		});
 	});
 
-	return [[ViFileDeferred alloc] init];
+	return [ViFileDeferred sharedDeferred];
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL
@@ -84,6 +91,7 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
+	aURL = [aURL URLByStandardizingPath];
 	NSString *path = [aURL relativePath];
 	if ([path length] == 0)
 		path = NSHomeDirectory();

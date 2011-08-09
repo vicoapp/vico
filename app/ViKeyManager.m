@@ -179,7 +179,7 @@
 	if ([target respondsToSelector:shouldSel]) {
 		NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [target methodSignatureForSelector:shouldSel]];
+		    [(NSObject *)target methodSignatureForSelector:shouldSel]];
 		[invocation setSelector:shouldSel];
 		[invocation setArgument:&self atIndex:2];
 		[invocation setArgument:&keyNum atIndex:3];

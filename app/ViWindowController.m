@@ -348,7 +348,7 @@ static ViWindowController	*currentWindowController = nil;
 
 	ViTabController *tabController = [[ViTabController alloc] initWithViewController:viewController window:[self window]];
 
-	NSTabViewItem *tabItem = [[NSTabViewItem alloc] initWithIdentifier:tabController];
+	NSTabViewItem *tabItem = [(NSTabViewItem *)[NSTabViewItem alloc] initWithIdentifier:tabController];
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
@@ -377,7 +377,7 @@ static ViWindowController	*currentWindowController = nil;
 	 * If current document is untitled and unchanged and the rightmost tab, replace it.
 	 */
 	ViDocument *closeThisDocument = nil;
-	ViTabController *lastTabController = [[[tabBar representedTabViewItems] lastObject] identifier];
+	ViTabController *lastTabController = [(NSTabViewItem *)[[tabBar representedTabViewItems] lastObject] identifier];
 	if ([self currentDocument] != nil &&
 	    [[self currentDocument] fileURL] == nil &&
 	    [document fileURL] != nil &&

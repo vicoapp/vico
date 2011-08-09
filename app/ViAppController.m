@@ -529,7 +529,7 @@ additionalBindings:(NSDictionary *)bindings
 
 	NSProxy<ViShellThingProtocol> *backChannel = nil;
 	if (channelName)
-		backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
+		backChannel = (NSProxy<ViShellThingProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
 
 	NSURL *url;
 	if ([pathOrURL isKindOfClass:[NSURL class]])

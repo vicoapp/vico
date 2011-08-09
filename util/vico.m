@@ -129,8 +129,8 @@ main(int argc, char **argv)
 		errx(1, "can't both evaluate script and wait for document");
 
 	NSString *connName = [NSString stringWithFormat:@"vico.%u", (unsigned int)getuid()];
-	proxy = [NSConnection rootProxyForConnectionWithRegisteredName:connName
-	                                                          host:nil];
+	proxy = (NSProxy<ViShellCommandProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:connName
+												     host:nil];
 	if (proxy == nil) {
 		/* failed to connect, try to start it */
 		CFStringRef bundle_id = CFSTR("se.bzero.Vico");
@@ -139,8 +139,8 @@ main(int argc, char **argv)
 		    LSOpenFSRef(&appRef, NULL) == 0) {
 			for (i = 0; i < 50 && proxy == nil; i++) {
 				usleep(200000); // sleep for 0.2 seconds
-				proxy = [NSConnection rootProxyForConnectionWithRegisteredName:connName
-											  host:nil];
+				proxy = (NSProxy<ViShellCommandProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:connName
+															     host:nil];
 			}
 		}
 		if (proxy == nil)

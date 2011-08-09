@@ -401,8 +401,16 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                              length:(NSUInteger *)lengthPtr
                         contentsEnd:(NSUInteger *)eolPtr
 {
-	if (lineNumber == 0)
-		return 0;
+	if (lineNumber == 0) {
+		if (lineCount == 0) {
+			if (lengthPtr)
+				*lengthPtr = 0;
+			if (eolPtr)
+				*eolPtr = 0;
+			return 0;
+		}
+		lineNumber++;
+	}
 
 	/* Line numbers are 1-based. Line indexes are 0-based. */
 	NSUInteger lineIndex = lineNumber - 1;
@@ -446,7 +454,9 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 - (NSRange)rangeOfLine:(NSUInteger)lineNumber
 {
 	NSRange r = NSMakeRange(NSNotFound, 0);
-	r.location = [self locationForStartOfLine:lineNumber length:&r.length contentsEnd:nil];
+	NSUInteger eol;
+	r.location = [self locationForStartOfLine:lineNumber length:NULL contentsEnd:&eol];
+	r.length = eol - r.location;
 	return r;
 }
 

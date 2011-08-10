@@ -91,7 +91,6 @@
 
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
-	aURL = [aURL URLByStandardizingPath];
 	NSString *path = [aURL relativePath];
 	if ([path length] == 0)
 		path = NSHomeDirectory();
@@ -100,8 +99,8 @@
 	else if ([path hasPrefix:@"/~"])
 		path = [NSHomeDirectory() stringByAppendingPathComponent:[path substringFromIndex:2]];
 	else
-		return [aURL absoluteURL];
-	return [[NSURL fileURLWithPath:path] absoluteURL];
+		return [[aURL URLByStandardizingPath] absoluteURL];
+	return [[[NSURL fileURLWithPath:path] URLByStandardizingPath] absoluteURL];
 }
 
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL

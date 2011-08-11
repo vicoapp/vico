@@ -40,7 +40,6 @@ typedef enum {
 	ViCommand *last_ftFT_command;
 
 	// search state (XXX: move to "/ register?)
-	NSString *last_search_pattern;
 	int last_search_options;
 
 	id text;
@@ -93,7 +92,6 @@ typedef enum {
 
 @property(nonatomic,readwrite) BOOL nviStyleUndo;
 @property(nonatomic,readonly) ViCommand *last_ftFT_command;
-@property(nonatomic,readwrite, assign) NSString *last_search_pattern;
 @property(nonatomic,readwrite) int last_search_options;
 
 @end

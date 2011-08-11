@@ -16,7 +16,6 @@
 
 @synthesize nviStyleUndo;
 @synthesize last_ftFT_command;
-@synthesize last_search_pattern;
 @synthesize last_search_options;
 
 - (ViParser *)initWithDefaultMap:(ViMap *)aMap

@@ -2093,7 +2093,6 @@
 	NSString *word = [[self textStorage] wordAtLocation:start_location range:&wordRange];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		keyManager.parser.last_search_pattern = pattern;
 		keyManager.parser.last_search_options = options;
 		if (options == ViSearchOptionBackwards)
 			start_location = wordRange.location;

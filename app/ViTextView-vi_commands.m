@@ -2177,6 +2177,22 @@
 	return YES;
 }
 
+- (BOOL)vi_gi:(ViCommand *)command
+{
+	ViMark *m = [self markNamed:'^'];
+	if (m != nil) {
+		NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
+		if (bol != -1) {
+			final_location = [[self textStorage] locationForColumn:m.column
+								  fromLocation:bol
+								     acceptEOL:YES];
+		}
+	}
+
+	[self setInsertMode:command];
+	return YES;
+}
+
 #pragma mark -
 #pragma mark Text Objects
 

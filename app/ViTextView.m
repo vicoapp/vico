@@ -1649,6 +1649,7 @@ int logIndent = 0;
 
 		inputKeys = [NSMutableArray array];
 		start_location = end_location = [self caret];
+		[self setMark:'^' atLocation:start_location];
 		[self move_left:nil];
 	}
 

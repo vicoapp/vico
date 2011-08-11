@@ -236,6 +236,7 @@
 ;; <C-w> prefix
 (nmap include:wmap)
 ;; g prefix
+(nmap setKey:"gi" toEditAction:"vi_gi:")
 (nmap setKey:"gU" toOperator:"uppercase:")
 (nmap setKey:"gUgU" toEditAction:"uppercase:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gu" toOperator:"lowercase:")

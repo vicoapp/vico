@@ -306,6 +306,8 @@
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display jump:(BOOL)jump
 {
+	NSParameterAssert(aURL);
+
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];

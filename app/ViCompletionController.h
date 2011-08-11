@@ -29,6 +29,7 @@
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ViCompletionView *tableView;
+	IBOutlet NSTextField *label;
 
 	id<ViCompletionProvider> provider;
 	NSMutableArray *completions;

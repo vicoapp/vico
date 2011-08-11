@@ -59,7 +59,7 @@
 
 	DEBUG(@"got %lu completions, row height is %f",
 	    [filteredCompletions count], [tableView rowHeight]);
-	winsz.height = [filteredCompletions count] * ([tableView rowHeight] + 2);
+	winsz.height = [filteredCompletions count] * ([tableView rowHeight] + 2) + [label bounds].size.height;
 
 	NSScreen *screen = [NSScreen mainScreen];
 	NSSize scrsz = [screen visibleFrame].size;
@@ -274,6 +274,11 @@
 
 - (void)filterCompletions
 {
+	if (fuzzySearch)
+		[label setStringValue:[NSString stringWithFormat:@"fuzzy filter: %@", filter]];
+	else
+		[label setStringValue:[NSString stringWithFormat:@"prefix filter: %@%@", prefix, filter]];
+
 	ViRegexp *rx = nil;
 	if ([filter length] > 0) {
 		NSMutableString *pattern = [NSMutableString string];

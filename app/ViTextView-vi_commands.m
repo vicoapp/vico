@@ -337,7 +337,7 @@
 		NSRange range = [(NSValue *)contextInfo rangeValue];
 		[self replaceRange:range withString:outputText];
 		[self endUndoGroup];
-		final_location = range.location + [outputText length];
+		final_location = range.location;
 		[self setCaret:final_location];
 	} else
 		MESSAGE(@"filter exited with status %i", status);
@@ -345,6 +345,7 @@
 
 - (void)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand
 {
+	DEBUG(@"filter range %@ through command %@", NSStringFromRange(range), shellCommand);
 	if ([shellCommand length] == 0 || range.length == 0)
 		return;
 

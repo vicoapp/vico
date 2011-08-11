@@ -1,16 +1,23 @@
+* se om man kan tvinga fram att alltid ha en newline på sista raden
+
+* regression: can't :edit a directory
+
+* regression: word completion includes current word
+
+* regression: pwd doesn't work (ex.messages not kept)
+
 * don't overwrite read-only files!
 
 * expand % and # in ex arguments w/syntax 'x'
 * :e# => open alternate file
 
+* go back to last focused document when closing a document
+
 ! Must store bundles in a dictionary, should NOT duplicate bundles with same bundle UUID!
 * Downloading tmbundles seems to duplicate tab triggers (HN)
 
-! cmd-y cmd-Y focuses file search field
-
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)
-* add cmd-+/- (inc/dec fontsize) in view menu
 
 
 

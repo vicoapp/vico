@@ -263,8 +263,8 @@ static ViWindowController	*currentWindowController = nil;
 	[explorerView setNeedsDisplay:YES];
 
 	NSRect frame = [splitView frame];
-	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1]; // Symbol list not shown on first launch
-	[splitView setAutosaveName:@"ProjectSymbolSplitView"];
+	[splitView setPosition:0 ofDividerAtIndex:0]; // Explorer not shown on launch
+	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1]; // Symbol list not shown on launch
 
 	if ([self project] != nil) {
 		[self setBaseURL:[[self project] initialURL]];

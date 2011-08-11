@@ -418,6 +418,8 @@
 (cmap setKey:"<space>" toAction:"accept:")
 (cmap setKey:"<ctrl-y>" toAction:"accept:")
 (cmap setKey:"<ctrl-n>" toAction:"move_down:")
+(cmap setKey:"<ctrl-j>" toAction:"move_down:")
+(cmap setKey:"<ctrl-k>" toAction:"move_up:")
 (cmap setKey:"<ctrl-p>" toAction:"move_up:")
 (cmap setKey:"<down>" toAction:"move_down:")
 (cmap setKey:"<up>" toAction:"move_up:")

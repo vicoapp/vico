@@ -246,6 +246,9 @@
 (nmap setKey:"gq" toOperator:"format:")
 (nmap setKey:"gqgq" toEditAction:"format:" flags:ViMapLineMode parameter:nil scope:nil)
 
+(nmap map:"ZZ" to:":xit<cr>")
+(nmap map:"ZQ" to:":q!<cr>")
+
 
 ;; operator map
 (set omap (ViMap operatorMap))

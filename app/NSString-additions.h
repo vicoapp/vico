@@ -28,5 +28,10 @@
  * @returns An array of NSNumbers representing key codes.
  */
 - (NSArray *)keyCodes;
+
+/**
+ * @returns YES if the string is in uppercase.
+ */
+- (BOOL)isUppercase;
 @end
 

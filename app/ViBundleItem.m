@@ -1,4 +1,5 @@
 #import "ViBundleCommand.h"
+#import "NSString-additions.h"
 #include "logging.h"
 
 @implementation ViBundleItem
@@ -75,8 +76,7 @@
 				keyCode = keyCode - 'a' + 1;
 			}
 
-			if ([keyEquivalent isEqualToString:[keyEquivalent uppercaseString]] &&
-			    ![keyEquivalent isEqualToString:[keyEquivalent lowercaseString]])
+			if ([keyEquivalent isUppercase])
 				keyflags |= NSShiftKeyMask;
 
 			/* Same test as in keyDown: */

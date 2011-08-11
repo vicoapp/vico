@@ -123,5 +123,11 @@
 	return keyArray;
 }
 
+- (BOOL)isUppercase
+{
+	return [self isEqualToString:[self uppercaseString]] &&
+	      ![self isEqualToString:[self lowercaseString]];
+}
+
 @end
 

@@ -916,6 +916,7 @@
 {
 	width = [[[splitView subviews] objectAtIndex:0] bounds].size.width;
 	[splitView setPosition:0.0 ofDividerAtIndex:0];
+	[delegate focusEditor];
 }
 
 - (IBAction)toggleExplorer:(id)sender

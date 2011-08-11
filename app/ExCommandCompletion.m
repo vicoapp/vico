@@ -1,5 +1,5 @@
 #import "ExCommandCompletion.h"
-#import "ExCommand.h"
+#import "ExMap.h"
 #include "logging.h"
 
 @implementation ExCommandCompletion
@@ -26,9 +26,8 @@
 						options:rx_options];
 
 	NSMutableArray *commands = [NSMutableArray array];
-	int i;
-	for (i = 0; ex_commands[i].name; i++) {
-		NSString *name = ex_commands[i].name;
+	for (ExMapping *mapping in [ExMap defaultMap].mappings) {
+		NSString *name = mapping.name;
 		ViRegexpMatch *m = nil;
 		if (pattern == nil || (m = [rx matchInString:name]) != nil) {
 			ViCompletion *c;
@@ -46,3 +45,4 @@
 }
 
 @end
+

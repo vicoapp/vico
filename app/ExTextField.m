@@ -1,7 +1,7 @@
 #import "ExTextField.h"
 #import "ViThemeStore.h"
 #import "ViTextView.h"
-#import "ExCommand.h"
+#import "ExParser.h"
 #include "logging.h"
 
 @interface NSObject (private)
@@ -42,8 +42,8 @@
 	current = nil;
 	historyIndex = -1;
 
-	[editor setCaret:0];
 	[editor setInsertMode:nil];
+	[editor setCaret:0];
 
 	running = YES;
 	return [super becomeFirstResponder];
@@ -124,33 +124,29 @@
 
 - (BOOL)ex_complete:(ViCommand *)command
 {
-	int context = 0;
-
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 
-	ExCommand *ex = [[ExCommand alloc] init];
+	id<ViCompletionProvider> provider = nil;
+	NSRange range;
 	NSError *error = nil;
-	[ex parse:[self stringValue] contextAtEnd:&context error:&error];
+	[[ExParser sharedParser] parse:[self stringValue]
+				 caret:[editor caret]
+			    completion:&provider
+				 range:&range
+				 error:&error];
 
-	switch (context) {
-	case EX_CTX_FAIL:
-		break;
-	case EX_CTX_NONE:
-		break;
-	case EX_CTX_COMMAND:
-		return [editor complete_ex_command:command];
-		break;
-	case EX_CTX_FILE:
-		return [editor complete_path:command];
-		break;
-	case EX_CTX_BUFFER:
-		return [editor complete_buffer:command];
-		break;
-	case EX_CTX_SYNTAX:
-		return [editor complete_syntax:command];
-		break;
-	}
-	return NO;
+	DEBUG(@"completion provider is %@", provider);
+	if (provider == nil)
+		return NO;
+
+	DEBUG(@"completion range is %@", NSStringFromRange(range));
+	NSString *word = [[[editor textStorage] string] substringWithRange:range];
+	DEBUG(@"completing word [%@]", word);
+
+	return [editor presentCompletionsOf:word
+			       fromProvider:provider
+				  fromRange:range
+				    options:command.mapping.parameter];
 }
 
 - (void)textDidEndEditing:(NSNotification *)aNotification

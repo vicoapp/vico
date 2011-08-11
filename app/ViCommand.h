@@ -16,8 +16,8 @@
 	unichar argument;
 	unichar reg;
 	id text;
-	NSRange affectedRange;
-	NSUInteger finalLocation;
+	NSRange range;
+	NSInteger caret;
 }
 
 /** The mapping that describes the action. */
@@ -41,7 +41,7 @@
 /** The argument, if any. Only applicable if the mapping specified the ViMapNeedArgument flag. */
 @property(nonatomic,readwrite) unichar argument;
 
-/** The register, if anyn. */
+/** The register, if any. */
 @property(nonatomic,readwrite) unichar reg;
 
 /** The motion command, if this command is an operator action. */
@@ -52,8 +52,8 @@
 
 @property(nonatomic,readwrite) id text;
 
-@property(nonatomic,readwrite) NSRange affectedRange;
-@property(nonatomic,readwrite) NSUInteger finalLocation;
+@property(nonatomic,readwrite) NSRange range;
+@property(nonatomic,readwrite) NSInteger caret;
 
 @property(nonatomic,readwrite) ViMacro *macro;
 

@@ -11,7 +11,7 @@
 @synthesize text;
 @synthesize isLineMode;
 @synthesize operator;
-@synthesize affectedRange, finalLocation;
+@synthesize range, caret;
 @synthesize macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount

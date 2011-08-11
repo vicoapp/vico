@@ -10,7 +10,7 @@
 
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)
-
+* add cmd-+/- (inc/dec fontsize) in view menu
 
 
 

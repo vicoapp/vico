@@ -137,10 +137,14 @@ int logIndent = 0;
 
 - (void)documentDidLoad:(ViDocument *)aDocument
 {
+	if (initial_ex_command)
+		[self evalExString:initial_ex_command];
 	if (initial_line >= 0)
 		[self gotoLine:initial_line column:initial_column];
 	if (initial_find_pattern)
 		[self findPattern:initial_find_pattern options:initial_find_options];
+
+	initial_ex_command = nil;
 	initial_line = -1;
 	initial_find_pattern = nil;
 }
@@ -1016,16 +1020,18 @@ int logIndent = 0;
 		command.text = pattern;
 	}
 
-	if (pattern) {
-		if ([pattern length] == 0)
-			pattern = keyManager.parser.last_search_pattern;
+	if ([pattern length] == 0)
+		pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+	if ([pattern length] == 0) {
+		// return [ViError message:@"No previous search pattern"];
+		MESSAGE(@"No previous search pattern");
+		return NO;
+	}
 
-		keyManager.parser.last_search_pattern = pattern;
-		keyManager.parser.last_search_options = 0;
-		if ([self findPattern:pattern options:0]) {
-			[self setCaret:final_location];
-			return YES;
-		}
+	keyManager.parser.last_search_options = 0;
+	if ([self findPattern:pattern options:0]) {
+		[self setCaret:final_location];
+		return YES;
 	}
 
 	return NO;
@@ -1042,16 +1048,18 @@ int logIndent = 0;
 		command.text = pattern;
 	}
 
-	if (pattern) {
-		if ([pattern length] == 0)
-			pattern = keyManager.parser.last_search_pattern;
+	if ([pattern length] == 0)
+		pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+	if ([pattern length] == 0) {
+		// return [ViError message:@"No previous search pattern"];
+		MESSAGE(@"No previous search pattern");
+		return NO;
+	}
 
-		keyManager.parser.last_search_pattern = pattern;
-		keyManager.parser.last_search_options = ViSearchOptionBackwards;
-		if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
-			[self setCaret:final_location];
-			return YES;
-		}
+	keyManager.parser.last_search_options = ViSearchOptionBackwards;
+	if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
+		[self setCaret:final_location];
+		return YES;
 	}
 
 	return NO;
@@ -1060,8 +1068,8 @@ int logIndent = 0;
 /* syntax: n */
 - (BOOL)repeat_find:(ViCommand *)command
 {
-	NSString *pattern = keyManager.parser.last_search_pattern;
-	if (pattern == nil) {
+	NSString *pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+	if ([pattern length] == 0) {
 		MESSAGE(@"No previous search pattern");
 		return NO;
 	}
@@ -1072,8 +1080,8 @@ int logIndent = 0;
 /* syntax: N */
 - (BOOL)repeat_find_backward:(ViCommand *)command
 {
-	NSString *pattern = keyManager.parser.last_search_pattern;
-	if (pattern == nil) {
+	NSString *pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+	if ([pattern length] == 0) {
 		MESSAGE(@"No previous search pattern");
 		return NO;
 	}

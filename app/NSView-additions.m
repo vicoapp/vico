@@ -1,6 +1,7 @@
 #import "NSView-additions.h"
 #import "ViWindowController.h"
 #import "ViAppController.h"
+#import "ExParser.h"
 
 @interface NSObject (private)
 - (id)delegate;
@@ -52,14 +53,81 @@
 	return nil;
 }
 
-- (NSString *)getExStringForCommand:(ViCommand *)command
+- (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	NSString *exString = nil;
 	if ([self window])
-		exString = [[[self window] windowController] getExStringInteractivelyForCommand:command];
+		exString = [[[self window] windowController] getExStringInteractivelyForCommand:command prefix:prefix];
 	else
-		exString = [[NSApp delegate] getExStringForCommand:command];
+		exString = [[NSApp delegate] getExStringForCommand:command prefix:prefix];
 	return exString;
+}
+
+- (NSString *)getExStringForCommand:(ViCommand *)command
+{
+	return [self getExStringForCommand:command prefix:nil];
+}
+
+- (BOOL)evalExCommand:(ExCommand *)ex
+{
+	id result = nil;
+
+	if (ex == nil)
+		return YES;
+
+	DEBUG(@"eval ex command %@", ex);
+
+	if (ex.mapping.expression) {
+		NuBlock *expression = ex.mapping.expression;
+		NSUInteger requiredArgs = [[expression parameters] count];
+		NuCell *arglist = nil;
+		if (requiredArgs > 0)
+			arglist = [[NSArray arrayWithObject:ex] list];
+		DEBUG(@"evaling with calling context %@ and arguments %@", [expression context], arglist);
+		@try {
+			result = [expression evalWithArguments:arglist
+						       context:[expression context]];
+		}
+		@catch (NSException *exception) {
+			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
+			INFO(@"context was: %@", [expression context]);
+			MESSAGE(@"Got exception %@: %@", [exception name], [exception reason]);
+			return NO;
+		}
+	} else {
+		id target = [self targetForSelector:ex.mapping.action];
+		if (target == nil) {
+			MESSAGE(@"The %@ command is not implemented.", ex.mapping.name);
+			return NO;
+		} else {
+			@try {
+				result = [target performSelector:ex.mapping.action withObject:ex];
+			}
+			@catch (NSException *exception) {
+				INFO(@"got exception %@ while evaluating ex command %@:\n%@",
+					[exception name], ex.mapping.name, [exception reason]);
+				MESSAGE(@"Got exception %@: %@", [exception name], [exception reason]);
+				return NO;
+			}
+		}
+	}
+
+	DEBUG(@"got result %@, class %@", result, NSStringFromClass([result class]));
+	if (result == nil || [result isKindOfClass:[NSNull class]]) {
+		return YES;
+	} else if ([result isKindOfClass:[NSError class]]) {
+		DEBUG(@"%@", [result localizedDescription]);
+		MESSAGE(@"%@", [result localizedDescription]);
+		return NO;
+#if 1
+	} else if ([result isKindOfClass:[NSString class]]) {
+		[ex message:result];
+		// MESSAGE(@"%@", result);
+		return YES;
+#endif
+	} else if ([result respondsToSelector:@selector(boolValue)] && [result boolValue])
+		return YES;
+	return NO;
 }
 
 @end

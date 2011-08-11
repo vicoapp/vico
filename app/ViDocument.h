@@ -114,6 +114,7 @@
 - (NSString *)title;
 - (void)setString:(NSString *)aString;
 - (void)closeAndWindow:(BOOL)canCloseWindow;
+- (BOOL)isEntireFileLoaded;
 
 /** @name Working with scopes */
 
@@ -144,8 +145,5 @@
 
 - (void)endUndoGroup;
 - (void)beginUndoGroup;
-
-- (BOOL)ex_write:(ExCommand *)command;
-- (BOOL)ex_setfiletype:(ExCommand *)command;
 
 @end

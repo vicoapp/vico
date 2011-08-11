@@ -244,19 +244,15 @@
 - (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command;
 
-- (BOOL)ex_cd:(ExCommand *)command;
-- (BOOL)ex_pwd:(ExCommand *)command;
-- (BOOL)ex_close:(ExCommand *)command;
-- (BOOL)ex_edit:(ExCommand *)command;
-- (BOOL)ex_tabedit:(ExCommand *)command;
-- (BOOL)ex_new:(ExCommand *)command;
-- (BOOL)ex_tabnew:(ExCommand *)command;
-- (BOOL)ex_vnew:(ExCommand *)command;
-- (BOOL)ex_split:(ExCommand *)command;
-- (BOOL)ex_vsplit:(ExCommand *)command;
-- (BOOL)ex_buffer:(ExCommand *)command;
-- (BOOL)ex_export:(ExCommand *)command;
-- (void)ex_quit:(ExCommand *)command;
+- (id)ex_pwd:(ExCommand *)command;
+- (id)ex_quit:(ExCommand *)command;
+- (id)ex_close:(ExCommand *)command;
+- (id)ex_edit:(ExCommand *)command;
+- (id)ex_tabedit:(ExCommand *)command;
+- (id)ex_new:(ExCommand *)command;
+- (id)ex_vnew:(ExCommand *)command;
+- (id)ex_split:(ExCommand *)command;
+- (id)ex_vsplit:(ExCommand *)command;
 
 @end
 

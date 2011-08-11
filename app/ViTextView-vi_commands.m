@@ -8,6 +8,7 @@
 #import "ViWindowController.h"
 #import "ViCompletionController.h"
 #import "ViDocumentView.h"
+#import "ExParser.h"
 #import "ExEnvironment.h"
 #import "ViDocumentController.h"
 #import "NSString-additions.h"
@@ -2568,6 +2569,59 @@
 	return YES;
 }
 
+- (BOOL)evalExString:(NSString *)exline
+{
+	if (![[self document] isEntireFileLoaded]) {
+		initial_ex_command = exline;
+		return YES;
+	}
+
+	NSError *error = nil;
+	ExCommand *ex = [[ExParser sharedParser] parse:exline error:&error];
+	if (error) {
+		DEBUG(@"ex command failed with error %@", error);
+		MESSAGE(@"%@", [error localizedDescription]);
+		return NO;
+	}
+
+	DEBUG(@"parsed ex command %@", ex);
+
+	for (;ex; ex = ex.nextCommand) {
+		NSRange lineRange;
+		DEBUG(@"resolving addresses %@ , %@", ex.addr1, ex.addr2);
+		if ([self resolveExAddresses:ex intoLineRange:&lineRange error:&error] == NO) {
+			MESSAGE(@"%@", [error localizedDescription]);
+			return NO;
+		}
+		ex.lineRange = lineRange;
+		ex.range = [self characterRangeForLineRange:lineRange];
+
+		ExAddress *lineAddress = ex.lineAddress;
+		if (lineAddress) {
+			DEBUG(@"resolving line addresses %@", ex.lineAddress);
+			NSInteger line = [self resolveExAddress:ex.lineAddress error:&error];
+			if (error) {
+				MESSAGE(@"%@", [error localizedDescription]);
+				return NO;
+			}
+			ex.line = line;
+		}
+
+		ex.caret = final_location;
+		if (![self evalExCommand:ex]) {
+			DEBUG(@"ex command failed: %@", ex);
+			return NO;
+		}
+		DEBUG(@"messages: %@", ex.messages);
+		if ([ex.messages count] > 0)
+			MESSAGE(@"%@", [ex.messages lastObject]);
+		final_location = ex.caret;
+		[self setCaret:ex.caret];
+	}
+
+	return YES;
+}
+
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
@@ -2586,21 +2640,7 @@
 
 	// XXX: scope for ex command?
 
-	NSError *error = nil;
-	ExCommand *ex = [[ExCommand alloc] init];
-	if ([ex parse:exline error:&error]) {
-		if (ex.command == nil)
-			/* do nothing */ return YES;
-		SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
-		id target = [self targetForSelector:selector];
-		if (target == nil)
-			MESSAGE(@"The %@ command is not implemented.", ex.name);
-		else
-			return (BOOL)[target performSelector:selector withObject:ex];
-	} else if (error)
-		MESSAGE(@"%@", [error localizedDescription]);
-
-	return NO;
+	return [self evalExString:exline];
 }
 
 #pragma mark -

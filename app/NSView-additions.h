@@ -1,4 +1,5 @@
 @class ViCommand;
+@class ExCommand;
 
 /** Convenience NSView functions. */
 @interface NSView (additions)
@@ -19,5 +20,8 @@
  */
 - (id)targetForSelector:(SEL)action;
 
+- (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringForCommand:(ViCommand *)command;
+- (BOOL)evalExCommand:(ExCommand *)ex;
+
 @end

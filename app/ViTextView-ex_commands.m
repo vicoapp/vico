@@ -1,11 +1,15 @@
 #import "ViTextView.h"
 #import "ViAppController.h"
 #import "ViEventManager.h"
+#import "ViError.h"
+#import "NSString-additions.h"
+#import "ViRegisterManager.h"
 
 @implementation ViTextView (ex_commands)
 
 - (NSInteger)resolveExAddress:(ExAddress *)addr
 		   relativeTo:(NSInteger)relline
+			error:(NSError **)outError
 {
 	ViMark *m = nil;
 	ViTextStorage *storage = [self textStorage];
@@ -24,7 +28,8 @@
 	case ExAddressMark:
 		m = [self markNamed:addr.mark];
 		if (m == nil) {
-			MESSAGE(@"Mark %C: not set", addr.mark);
+			if (outError)
+				*outError = [ViError errorWithFormat:@"Mark %C: not set", addr.mark];
 			return -1;
 		}
 		line = m.line;
@@ -35,6 +40,42 @@
 		else
 			line = relline;
 		break;
+	case ExAddressSearch:
+	{
+		if (relline < 0)
+			relline = [self currentLine];
+
+		NSString *pattern = addr.pattern;
+		if ([pattern length] == 0)
+			pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+		if ([pattern length] == 0) {
+			if (outError)
+				*outError = [ViError message:@"No previous search pattern"];
+			return -1;
+		}
+
+		NSInteger start = [storage locationForStartOfLine:relline + (addr.backwards ? 0 : 1)];
+		if (start == -1LL)
+			start = [storage length];
+		NSError *error = nil;
+		NSRange r = [self rangeOfPattern:pattern
+				    fromLocation:start
+					 forward:!addr.backwards
+					   error:&error];
+		if (error) {
+			if (outError)
+				*outError = error;
+			return -1;
+		}
+
+		if (r.location == NSNotFound) {
+			MESSAGE(@"Pattern not found");
+			return -1;
+		}
+
+		line = [storage lineNumberAtLocation:r.location];
+		break;
+	}
 	case ExAddressNone:
 	default:
 		if (relline < 0)
@@ -45,37 +86,52 @@
 
 	line += addr.offset;
 
-	if ([storage locationForStartOfLine:line] == -1ULL)
+	if ([storage locationForStartOfLine:line] == -1ULL) {
+		if (outError)
+			*outError = [ViError errorWithFormat:@"Invalid line address %li", line];
 		return -1;
+	}
 
 	return line;
 }
 
-- (NSInteger)resolveExAddress:(ExAddress *)addr
+- (NSInteger)resolveExAddress:(ExAddress *)addr error:(NSError **)outError
 {
-	return [self resolveExAddress:addr relativeTo:-1];
+	return [self resolveExAddress:addr relativeTo:-1 error:outError];
 }
 
-- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange
+- (BOOL)resolveExAddresses:(ExCommand *)command
+	     intoLineRange:(NSRange *)outRange
+		     error:(NSError **)outError
 {
 	NSInteger begin_line, end_line;
 
-	begin_line = [self resolveExAddress:command.addr1];
+	if (command.addr1 == nil || command.addr2 == nil) {
+		*outRange = NSMakeRange(NSNotFound, 0);
+		return YES;
+	}
+
+	begin_line = [self resolveExAddress:command.addr1 error:outError];
 	if (begin_line < 0)
 		return NO;
-	end_line = [self resolveExAddress:command.addr2 relativeTo:begin_line];
+	end_line = [self resolveExAddress:command.addr2 relativeTo:begin_line error:outError];
 	if (end_line < 0)
 		return NO;
+
+	if (end_line < begin_line) {
+		NSInteger tmp = end_line;
+		end_line = begin_line;
+		begin_line = tmp;
+	}
 
 	*outRange = NSMakeRange(begin_line, end_line - begin_line);
 	return YES;
 }
 
-- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange
+- (NSRange)characterRangeForLineRange:(NSRange)lineRange
 {
-	NSRange lineRange;
-	if ([self resolveExAddresses:command intoLineRange:&lineRange] == NO)
-		return NO;
+	if (lineRange.location == NSNotFound)
+		return lineRange;
 
 	ViTextStorage *storage = [self textStorage];
 	NSUInteger beg = [storage locationForStartOfLine:lineRange.location];
@@ -83,53 +139,52 @@
 
 	/* end location should include the contents of the end_line */
 	[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
-	*outRange = NSMakeRange(beg, end - beg);
+	return NSMakeRange(beg, end - beg);
+}
+
+- (BOOL)resolveExAddresses:(ExCommand *)command
+		 intoRange:(NSRange *)outRange
+		     error:(NSError **)outError
+{
+	NSRange lineRange;
+	if ([self resolveExAddresses:command intoLineRange:&lineRange error:outError] == NO)
+		return NO;
+
+	*outRange = [self characterRangeForLineRange:lineRange];
 	return YES;
 }
 
-- (BOOL)ex_bang:(ExCommand *)command
+- (id)ex_bang:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
-	[self filterRange:range throughCommand:command.string];
-	return YES;
+	if (command.naddr == 0)
+		return [ViError message:@"Non-filtering version of ! not implemented"];
+	[self filterRange:command.range throughCommand:command.arg]; // XXX: should return error on failure
+	command.caret = final_location; // XXX: need better way to return filtered range
+	return nil;
 }
 
-- (BOOL)ex_eval:(ExCommand *)command
+- (id)ex_eval:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
-
-	NSString *script = [[[self textStorage] string] substringWithRange:range];
+	NSString *script = [[[self textStorage] string] substringWithRange:command.range];
 	NSError *error = nil;
 	NuParser *parser = [[NuParser alloc] init];
 	[[NSApp delegate] loadStandardModules:[parser context]];
 	[parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
-	id result = [[NSApp delegate] eval:script
-				withParser:parser
-				  bindings:nil
-				     error:&error];
-	if (error) {
-		MESSAGE(@"%@", [error localizedDescription]);
-		return NO;
-	}
-
-	MESSAGE(@"%@", result);
-	return YES;
+	[[NSApp delegate] eval:script
+		    withParser:parser
+		      bindings:nil
+			 error:&error];
+	if (error)
+		return error;
+	return nil;
 }
 
-- (BOOL)ex_s:(ExCommand *)command
+- (id)ex_substitute:(ExCommand *)command
 {
-	NSRange exRange;
-	if (![self resolveExAddresses:command intoLineRange:&exRange]) {
-		MESSAGE(@"Invalid addresses");
-		return NO;
-	}
+	NSRange exRange = command.lineRange;
 
-	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
-	NSString *opts = command.string ?: @"";
+	unsigned rx_options = 0;
+	NSString *opts = command.arg ?: @"";
 	if ([opts rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
 
@@ -142,21 +197,23 @@
 	while (num_g--)
 		global = !global;
 
-	ViRegexp *rx = nil;
+	NSString *pattern = command.pattern;
+	if ([pattern length] == 0)
+		pattern = [[ViRegisterManager sharedManager] contentOfRegister:'/'];
+	if ([pattern length] == 0)
+		return [ViError message:@"No previous search pattern"];
 
-	/* compile the pattern regexp */
-	@try {
-		rx = [[ViRegexp alloc] initWithString:command.pattern
-					      options:rx_options];
-	}
-	@catch(NSException *exception) {
-		MESSAGE(@"Invalid search pattern: %@", exception);
-		return NO;
-	}
+	NSError *error = nil;
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
+						options:rx_options
+						  error:&error];
+	if (error)
+		return error;
+
+	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
 	ViTransformer *tform = [[ViTransformer alloc] init];
-	NSError *error = nil;
 
 	NSString *s = [storage string];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
@@ -165,11 +222,7 @@
 	NSUInteger numLines = 0;
 
 	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
-		NSUInteger bol = [storage locationForStartOfLine:lineno];
-		NSUInteger end, eol;
-		[s getLineStart:NULL end:&end contentsEnd:&eol forRange:NSMakeRange(bol, 0)];
-
-		NSRange lineRange = NSMakeRange(bol, eol - bol);
+		NSRange lineRange = [storage rangeOfLine:lineno];
 
 		if (reportMatches) {
 			if (global) {
@@ -194,10 +247,8 @@
 								format:command.replacement
 								global:global
 								 error:&error];
-			if (error) {
-				MESSAGE(@"substitute failed: %@", [error localizedDescription]);
-				return NO;
-			}
+			if (error)
+				return error;
 
 			if (replacedText != value)
 				[self replaceCharactersInRange:lineRange withString:replacedText];
@@ -205,108 +256,76 @@
 	}
 
 	if (reportMatches) {
-		MESSAGE(@"%lu matches on %lu lines", numMatches, numLines);
-		return NO;
+		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 	} else {
 		[self endUndoGroup];
-		final_location = [storage locationForStartOfLine:NSMaxRange(exRange)];
-		return YES;
+		command.caret = [storage locationForStartOfLine:NSMaxRange(exRange)];
+		return nil;
 	}
 }
 
-- (BOOL)ex_number:(ExCommand *)command
+- (id)ex_goto:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range]) {
-		MESSAGE(@"Invalid address");
-		return NO;
-	}
-
-	final_location = [[self textStorage] firstNonBlankForLineAtLocation:range.location];
-	return YES;
+	// XXX: What if two address given?
+	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:command.range.location];
+	return nil;
 }
 
-- (BOOL)ex_yank:(ExCommand *)command
+- (id)ex_yank:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
-
-	[self yankToRegister:command.reg range:range];
-	return YES;
+	[self yankToRegister:command.reg range:command.range];
+	return nil;
 }
 
-- (BOOL)ex_delete:(ExCommand *)command
+- (id)ex_delete:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
-
-	[self cutToRegister:command.reg range:range];
-	final_location = [[self textStorage] firstNonBlankForLineAtLocation:range.location];
-
-	return YES;
+	[self cutToRegister:command.reg range:command.range];
+	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:command.range.location];
+	return nil;
 }
 
-- (BOOL)ex_copy:(ExCommand *)command
+- (id)ex_copy:(ExCommand *)command
 {
-	NSRange range;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
-
-	NSInteger destline = [self resolveExAddress:command.line];
-	if (destline < 0)
-		return NO;
+	NSInteger destline = command.line;
 	if (destline > 0)
 		++destline;
 
-	NSString *content = [[[self textStorage] string] substringWithRange:range];
+	NSString *content = [[[self textStorage] string] substringWithRange:command.range];
 	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
 	if (destloc == -1)
 		destloc = [[self textStorage] length];
 	[self insertString:content atLocation:destloc];
 
-	final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + [content length]];
-
-	return YES;
+	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc + [content length]];
+	return nil;
 }
 
-- (BOOL)ex_move:(ExCommand *)command
+- (id)ex_move:(ExCommand *)command
 {
-	NSRange lineRange, range;
-	if (![self resolveExAddresses:command intoLineRange:&lineRange])
-		return NO;
-	if (![self resolveExAddresses:command intoRange:&range])
-		return NO;
+	NSInteger destline = command.line;
 
-	NSInteger destline = [self resolveExAddress:command.line];
-	if (destline < 0)
-		return NO;
-
-	if (destline >= lineRange.location && destline < NSMaxRange(lineRange)) {
-		MESSAGE(@"Can't move lines into themselves");
-		return NO;
-	}
+	if (destline >= command.lineRange.location && destline < NSMaxRange(command.lineRange))
+		return [ViError message:@"Can't move lines into themselves"];
 
 	if (destline > 0)
 		++destline;
 
-	NSString *content = [[[self textStorage] string] substringWithRange:range];
+	NSString *content = [[[self textStorage] string] substringWithRange:command.range];
 	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
 	if (destloc == -1)
 		destloc = [[self textStorage] length];
 
-	if (destloc > range.location) {
+	if (destloc > command.range.location) {
 		[self insertString:content atLocation:destloc];
-		[self deleteRange:range];
-		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc - 1];
+		[self deleteRange:command.range];
+		command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc - 1];
 	} else {
-		[self deleteRange:range];
+		[self deleteRange:command.range];
 		[self insertString:content atLocation:destloc];
-		final_location = [[self textStorage] firstNonBlankForLineAtLocation:destloc + range.length - 1];
+		command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc + command.range.length - 1];
 	}
 
-	return YES;
+	return nil;
 }
 
 @end

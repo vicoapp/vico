@@ -234,6 +234,7 @@
 		9A43471813313894002B04DE /* vico.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A43471613313874002B04DE /* vico.1 */; };
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
 		9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4DB02D13B898B400FAE096 /* ExAddress.m */; };
+		9A57990113F0189A00191109 /* ex.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A57990013F0189A00191109 /* ex.nu */; };
 		9A5DD69A13430176006981AE /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
 		9A5DD69E134326A6006981AE /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
 		9A5DD6A013435F0D006981AE /* TestKeyCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69F13435F0D006981AE /* TestKeyCodes.m */; };
@@ -265,6 +266,8 @@
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
+		9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E013EC341C0040DB4E /* ExMap.m */; };
+		9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E113EC341C0040DB4E /* ExParser.m */; };
 		9AD68D4E13A3583100126E32 /* ViEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4D13A3583100126E32 /* ViEventManager.m */; };
 		9AD68D5013A4083A00126E32 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */; };
 		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
@@ -740,6 +743,7 @@
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A4DB02C13B898B400FAE096 /* ExAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExAddress.h; sourceTree = "<group>"; };
 		9A4DB02D13B898B400FAE096 /* ExAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExAddress.m; sourceTree = "<group>"; };
+		9A57990013F0189A00191109 /* ex.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ex.nu; sourceTree = "<group>"; };
 		9A5DD69813430176006981AE /* ViKeyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViKeyManager.h; sourceTree = "<group>"; };
 		9A5DD69913430176006981AE /* ViKeyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViKeyManager.m; sourceTree = "<group>"; };
 		9A5DD69C134326A6006981AE /* ViRegisterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViRegisterManager.h; sourceTree = "<group>"; };
@@ -790,6 +794,9 @@
 		9ACAA94013707177001FC553 /* ViFileCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileCompletion.m; sourceTree = "<group>"; };
 		9ACAA94113707177001FC553 /* ViWordCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWordCompletion.h; sourceTree = "<group>"; };
 		9ACAA94213707177001FC553 /* ViWordCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWordCompletion.m; sourceTree = "<group>"; };
+		9ACFF8DF13EC341C0040DB4E /* ExMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExMap.h; sourceTree = "<group>"; };
+		9ACFF8E013EC341C0040DB4E /* ExMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExMap.m; sourceTree = "<group>"; };
+		9ACFF8E113EC341C0040DB4E /* ExParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExParser.m; sourceTree = "<group>"; };
 		9AD68D4C13A3583100126E32 /* ViEventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViEventManager.h; sourceTree = "<group>"; };
 		9AD68D4D13A3583100126E32 /* ViEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViEventManager.m; sourceTree = "<group>"; };
 		9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
@@ -947,6 +954,7 @@
 		9A2EF29A133109C20023C5B7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9A57990013F0189A00191109 /* ex.nu */,
 				9AB10BAB13408B6600D81D33 /* keys.nu */,
 				9A5EE40013366DC0002E82B1 /* vico.nu */,
 				9A2EF29B133109C20023C5B7 /* Vico-Info.plist */,
@@ -1147,6 +1155,9 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9ACFF8DF13EC341C0040DB4E /* ExMap.h */,
+				9ACFF8E013EC341C0040DB4E /* ExMap.m */,
+				9ACFF8E113EC341C0040DB4E /* ExParser.m */,
 				9A4DB02C13B898B400FAE096 /* ExAddress.h */,
 				9A4DB02D13B898B400FAE096 /* ExAddress.m */,
 				9AA48E4B13A60C10009CC5D7 /* NSURL-additions.h */,
@@ -1621,6 +1632,7 @@
 				9AAF73E2135C931600D75E1E /* Credits.txt in Resources */,
 				9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */,
 				9A8CDE8313AB355F00F771AB /* WaitProgress.xib in Resources */,
+				9A57990113F0189A00191109 /* ex.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1952,6 +1964,8 @@
 				9AA48E4F13A60C10009CC5D7 /* NSURL-additions.m in Sources */,
 				9AA48E5013A60C10009CC5D7 /* NSView-additions.m in Sources */,
 				9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */,
+				9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */,
+				9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

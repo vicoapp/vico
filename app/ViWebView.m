@@ -3,8 +3,7 @@
 #import "ViWindowController.h"
 #import "NSEvent-keyAdditions.h"
 #import "NSView-additions.h"
-#import "ExCommand.h"
-#import "ExEnvironment.h"
+#import "ExParser.h"
 #include "logging.h"
 
 #define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
@@ -183,18 +182,18 @@
 		return NO;
 
 	NSError *error = nil;
-	ExCommand *ex = [[ExCommand alloc] init];
-	if ([ex parse:exline error:&error]) {
-		if (ex.command == nil)
-			/* do nothing */ return YES;
-		SEL selector = NSSelectorFromString([NSString stringWithFormat:@"%@:", ex.command->method]);
-		id target = [self targetForSelector:selector];
-		if (target == nil)
-			MESSAGE(@"The %@ command is not implemented.", ex.name);
-		else
-			return (BOOL)[target performSelector:selector withObject:ex];
-	} else if (error)
+	ExCommand *ex = [[ExParser sharedParser] parse:exline error:&error];
+	if (error) {
 		MESSAGE(@"%@", [error localizedDescription]);
+		return NO;
+	}
+
+	if ([self evalExCommand:ex]) {
+		command.caret = ex.caret;
+		if ([ex.messages count] > 0)
+			MESSAGE(@"%@", [ex.messages lastObject]);
+		return YES;
+	}
 
 	return NO;
 }

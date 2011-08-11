@@ -66,6 +66,7 @@
 	BOOL			 highlightCursorLine;
 
 	NSInteger		 saved_column;
+	NSString		*initial_ex_command;
 	NSInteger		 initial_line, initial_column;
 	NSString		*initial_find_pattern;
 	unsigned		 initial_find_options;
@@ -248,6 +249,10 @@
  */
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 
+- (NSRange)rangeOfPattern:(NSString *)pattern
+	     fromLocation:(NSUInteger)start
+		  forward:(BOOL)forwardSearch
+		    error:(NSError **)outError;
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options;
 
 /** @name Manipulating text */
@@ -379,6 +384,11 @@
 - (BOOL)yank:(ViCommand *)command;
 - (BOOL)jumplist_forward:(ViCommand *)command;
 - (BOOL)jumplist_backward:(ViCommand *)command;
+- (BOOL)evalExString:(NSString *)exline;
+- (BOOL)presentCompletionsOf:(NSString *)string
+		fromProvider:(id<ViCompletionProvider>)provider
+		   fromRange:(NSRange)range
+		     options:(NSString *)options;
 - (BOOL)complete_keyword:(ViCommand *)command;
 - (BOOL)complete_path:(ViCommand *)command;
 - (BOOL)complete_buffer:(ViCommand *)command;
@@ -387,12 +397,18 @@
 @end
 
 @interface ViTextView (ex_commands)
-- (BOOL)resolveExAddresses:(ExCommand *)command intoLineRange:(NSRange *)outRange;
-- (BOOL)resolveExAddresses:(ExCommand *)command intoRange:(NSRange *)outRange;
-- (BOOL)ex_bang:(ExCommand *)command;
-- (BOOL)ex_eval:(ExCommand *)command;
-- (BOOL)ex_s:(ExCommand *)command;
-- (BOOL)ex_number:(ExCommand *)command;
+- (NSInteger)resolveExAddress:(ExAddress *)addr
+		   relativeTo:(NSInteger)relline
+			error:(NSError **)outError;
+- (NSInteger)resolveExAddress:(ExAddress *)addr
+			error:(NSError **)outError;
+- (BOOL)resolveExAddresses:(ExCommand *)command
+	     intoLineRange:(NSRange *)outRange
+		     error:(NSError **)outError;
+- (BOOL)resolveExAddresses:(ExCommand *)command
+		 intoRange:(NSRange *)outRange
+		     error:(NSError **)outError;
+- (NSRange)characterRangeForLineRange:(NSRange)lineRange;
 @end
 
 @interface ViTextView (bundleCommands)

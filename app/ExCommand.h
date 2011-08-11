@@ -1,3 +1,4 @@
+#import "ExMap.h"
 #import "ExAddress.h"
 
 /* From nvi:
@@ -8,11 +9,11 @@
 #define EX_ADDR2_NONE    0x00000008      /* Zero/two addresses; zero == none. */
 #define EX_ADDR_ZERO     0x00000010      /* 0 is a legal addr1. */
 #define EX_ADDR_ZERODEF  0x00000020      /* 0 is default addr1 of empty files. */
-#define EX_AUTOPRINT     0x00000040      /* Command always sets autoprint. */
-#define EX_CLRFLAG       0x00000080      /* Clear the print (#, l, p) flags. */
-#define EX_NEWSCREEN     0x00000100      /* Create a new screen. */
-#define EX_SECURE        0x00000200      /* Permission denied if O_SECURE set. */
-#define EX_VIONLY        0x00000400      /* Meaningful only in vi. */
+
+
+
+
+
 
 #define E_C_BUFFER      0x00001         /* Buffer name specified. */
 #define E_C_CARAT       0x00002         /*  ^ flag. */
@@ -35,66 +36,100 @@
 #define EX_CTX_BUFFER	4
 #define EX_CTX_SYNTAX	5
 
-struct ex_command
-{
-	NSString *name;
-	NSString *method;
-	unsigned flags;
-	const char *syntax;
-	NSString *usage;
-	NSString *help;
-};
+@class ExMapping;
 
-extern struct ex_command ex_commands[];
-
+/** A generated ex command.
+ */
 @interface ExCommand : NSObject
 {
-	struct ex_command *command;
-	int naddr;
-	ExAddress *addr1, *addr2, *line;
-	BOOL addr2_relative_addr1; // true if semicolon used between addr1 and addr2
-	unsigned flags;
-	NSString *name;
+	NSString *cmdline;
+
+	ExMapping *mapping;
+	ExCommand *nextCommand;
+
+	// ex addresses
+	NSUInteger naddr;
+	ExAddress *addr1, *addr2, *lineAddress;
+	// resolved addresses
+	NSRange range, lineRange;
+	NSUInteger line;
+
+	BOOL force;
+	BOOL append;
+	BOOL filter;
 
 	// arguments (depending on the command)
-	NSString *filename;
-	NSString *arg_string;
+	NSString *arg;
+	NSString *plus_command;
+
+	// regexp arguments
 	NSString *pattern;
 	NSString *replacement;
-	NSString *plus_command;
-	NSArray *words;
+	NSString *options;
 
-	NSInteger flagoff;
 	unichar reg;
 	NSInteger count;
+
+	NSInteger caret;
+
+	NSMutableArray *messages;
 }
 
-- (ExCommand *)initWithString:(NSString *)string;
-- (BOOL)parse:(NSString*)string
- contextAtEnd:(int *)endContext
-        error:(NSError **)outError;
-- (BOOL)parse:(NSString *)string
-        error:(NSError **)outError;
-+ (BOOL)parseRange:(NSScanner *)scan
-       intoAddress:(ExAddress **)addr;
-+ (int)parseRange:(NSScanner *)scan
-      intoAddress:(ExAddress **)addr1
-     otherAddress:(ExAddress **)addr2;
+- (ExCommand *)initWithMapping:(ExMapping *)aMapping;
 
-@property(nonatomic,readonly) int naddr;
-@property(nonatomic,readonly) ExAddress *addr1;
-@property(nonatomic,readonly) ExAddress *addr2;
-@property(nonatomic,readonly) ExAddress *line;
-@property(nonatomic,readonly) struct ex_command *command;
-@property(nonatomic,readonly) unsigned flags;
-@property(nonatomic,readonly) NSString *name;
-@property(nonatomic,readonly) NSString *filename;
-@property(nonatomic,readonly) NSString *string;
-@property(nonatomic,readonly) NSString *method;
-@property(nonatomic,readonly) NSString *plus_command;
-@property(nonatomic,readonly) NSString *pattern;
-@property(nonatomic,readonly) NSString *replacement;
-@property(nonatomic,readonly) NSArray *words;
-@property(nonatomic,readonly) unichar reg;
+@property(nonatomic,readonly) NSArray *messages;
+
+/** The mapping that describes the action. */
+@property(nonatomic,readonly) ExMapping *mapping;
+
+/** Number of addresses given in the range. */
+@property(nonatomic,readwrite) NSUInteger naddr;
+
+/** First range address. */
+@property(nonatomic,assign,readwrite) ExAddress *addr1;
+
+/** Second range address. */
+@property(nonatomic,assign,readwrite) ExAddress *addr2;
+
+/** Target line address. */
+@property(nonatomic,assign,readwrite) ExAddress *lineAddress;
+
+@property (nonatomic,readwrite) NSRange range;
+@property (nonatomic,readwrite) NSRange lineRange;
+@property (nonatomic,readwrite) NSUInteger line;
+
+/** Count argument. */
+@property(nonatomic,assign,readwrite) NSInteger count;
+
+/** YES if `!` flag specified. */
+@property(nonatomic,readwrite) BOOL force;
+
+/** YES if `>>` flag specified. */
+@property(nonatomic,readwrite) BOOL append;
+
+/** YES if filtering (as in :read !ls or :write !wc). */
+@property(nonatomic,readwrite) BOOL filter;
+
+/** Next ex command separated with a bar (`|`). */
+@property(nonatomic,assign,readwrite) ExCommand *nextCommand;
+
+/** Extra argument string. */
+@property(nonatomic,assign,readwrite) NSString *arg;
+
+@property(nonatomic,assign,readwrite) NSString *plus_command;
+
+@property(nonatomic,assign,readwrite) NSString *pattern;
+@property(nonatomic,assign,readwrite) NSString *replacement;
+@property(nonatomic,assign,readwrite) NSString *options;
+
+/** Destination register, or 0 if none specified. */
+@property(nonatomic,readwrite) unichar reg;
+
+/** If set, specifies final location of caret after command returns. */
+@property(nonatomic,readwrite) NSInteger caret;
+
+- (NSArray *)args;
+- (void)message:(NSString *)message;
 
 @end
+

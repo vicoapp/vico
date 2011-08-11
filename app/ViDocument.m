@@ -247,6 +247,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	return returnError == nil ? YES : NO;
 }
 
+- (BOOL)isEntireFileLoaded
+{
+	return (loader == nil);
+}
+
 - (id)initWithContentsOfURL:(NSURL *)absoluteURL
                      ofType:(NSString *)typeName
                       error:(NSError **)outError
@@ -1619,25 +1624,24 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark -
 #pragma mark Ex actions
 
-- (BOOL)ex_write:(ExCommand *)command
+- (id)ex_write:(ExCommand *)command
 {
 	DEBUG(@"got %i addresses", command.naddr);
-	if ([command.string hasPrefix:@">>"]) {
-		[self message:@"Appending not yet supported"];
-		return NO;
-	}
+	if (command.naddr > 0)
+		return [ViError message:@"Partial writing not yet supported"];
 
-	if ([command.string length] == 0) {
+	if (command.append)
+		return [ViError message:@"Appending not yet supported"];
+
+	if ([command.arg length] == 0) {
 		[self saveDocument:self];
 	} else {
 		__block NSError *error = nil;
-		NSURL *newURL = [[ViDocumentController sharedDocumentController] normalizePath:command.string
+		NSURL *newURL = [[ViDocumentController sharedDocumentController] normalizePath:command.arg
                                                                                     relativeTo:windowController.baseURL
                                                                                          error:&error];
-		if (error != nil) {
-			[NSApp presentError:error];
-			return NO;
-		}
+		if (error != nil)
+			return error;
 
 		id<ViDeferred> deferred;
 		ViURLManager *urlman = [ViURLManager defaultManager];
@@ -1658,39 +1662,28 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		else
 			[deferred wait];
 
-		if (error) {
-			[self message:@"%@", [error localizedDescription]];
-			return NO;
-		}
+		if (error)
+			return error;
 
-		if (normalizedURL && ![[attributes fileType] isEqualToString:NSFileTypeRegular]) {
-			[self message:@"%@ is not a regular file", normalizedURL];
-			return NO;
-		}
+		if (normalizedURL && ![[attributes fileType] isEqualToString:NSFileTypeRegular])
+			return [ViError errorWithFormat:@"%@ is not a regular file", normalizedURL];
 
-		if (normalizedURL && (command.flags & E_C_FORCE) != E_C_FORCE) {
-			[self message:@"File exists (add ! to override)"];
-			return NO;
-		}
+		if (normalizedURL && !command.force)
+			return [ViError message:@"File exists (add ! to override)"];
 
 		if ([self saveToURL:newURL
                              ofType:nil
                    forSaveOperation:NSSaveAsOperation
-                              error:&error] == NO) {
-			[self message:@"%@", [error localizedDescription]];
-			return NO;
-		}
+                              error:&error] == NO)
+			return error;
 	}
 
-	return YES;
+	return nil;
 }
 
-- (BOOL)ex_setfiletype:(ExCommand *)command
+- (id)ex_setfiletype:(ExCommand *)command
 {
-	if ([command.words count] != 1)
-		return NO;
-
-	NSString *langScope = [command.words objectAtIndex:0];
+	NSString *langScope = command.arg;
 	NSString *pattern = [NSString stringWithFormat:@"(^|\\.)%@(\\.|$)", [ViRegexp escape:langScope]];
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
 	NSMutableSet *matches = [NSMutableSet set];
@@ -1706,38 +1699,31 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}
 
-	if ([matches count] == 0) {
-		[self message:@"Unknown syntax %@", langScope];
-		return NO;
-	} else if ([matches count] > 1) {
-		[self message:@"More than one match for %@", langScope];
-		DEBUG(@"matches: %@", matches);
-		return NO;
-	}
+	if ([matches count] == 0)
+		return [ViError errorWithFormat:@"Unknown syntax %@", langScope];
+	else if ([matches count] > 1)
+		return [ViError errorWithFormat:@"More than one match for %@", langScope];
 
 	[self setLanguageAndRemember:[matches anyObject]];
-	return YES;
+	return nil;
 }
 
-/* syntax: bd[elete] bufname */
-- (void)ex_bdelete:(ExCommand *)command
+- (id)ex_wq:(ExCommand *)command
 {
-	if ((command.flags & E_C_FORCE) == E_C_FORCE)
-		[self closeAndWindow:NO];
-	else
-		[windowController closeDocument:self andWindow:NO];
+	id ret = [self ex_write:command];
+	if (ret)
+		return ret;
+	return [[self windowController] ex_quit:command];
 }
 
-- (void)ex_wq:(ExCommand *)command
+- (id)ex_xit:(ExCommand *)command
 {
-	[self ex_write:command];
-	[[self windowController] ex_quit:command];
-}
-
-- (void)ex_xit:(ExCommand *)command
-{
-	[self ex_write:command];
-	[[self windowController] ex_quit:command];
+	if ([self isDocumentEdited]) {
+		id ret = [self ex_write:command];
+		if (ret)
+			return ret;
+	}
+	return [[self windowController] ex_quit:command];
 }
 
 @end

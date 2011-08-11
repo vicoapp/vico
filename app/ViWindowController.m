@@ -17,6 +17,7 @@
 #import "ViEventManager.h"
 #import "NSURL-additions.h"
 #import "ExCommand.h"
+#import "ViError.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -1804,22 +1805,22 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (BOOL)window_close:(ViCommand *)command
 {
-	return [self ex_close:nil];
+	return [self ex_close:nil] == nil;
 }
 
 - (BOOL)window_split:(ViCommand *)command
 {
-	return [self ex_split:nil];
+	return [self ex_split:nil] == nil;
 }
 
 - (BOOL)window_vsplit:(ViCommand *)command
 {
-	return [self ex_vsplit:nil];
+	return [self ex_vsplit:nil] == nil;
 }
 
 - (BOOL)window_new:(ViCommand *)command
 {
-	return [self ex_new:nil];
+	return [self ex_new:nil] == nil;
 }
 
 - (BOOL)window_totab:(ViCommand *)command
@@ -1950,6 +1951,9 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (NSURL *)parseExFilename:(NSString *)filename
 {
+	if (filename == nil)
+		return nil;
+
 	NSError *error = nil;
 	NSString *trimmed = [filename stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSURL *url = [[ViDocumentController sharedDocumentController] normalizePath:trimmed
@@ -1963,166 +1967,162 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return url;
 }
 
-- (BOOL)ex_cd:(ExCommand *)command
+- (id)ex_cd:(ExCommand *)command
 {
-	NSString *path = command.filename ?: @"~";
+	NSString *path = command.arg ?: @"~";
+	__block NSError *retError = nil;
+	__block BOOL sync = YES;
 	[self checkBaseURL:[self parseExFilename:path] onCompletion:^(NSURL *url, NSError *error) {
+		retError = error;
 		if (url && !error) {
 			[self setBaseURL:url];
-			[self ex_pwd:nil];
+			if (sync)
+				[self ex_pwd:command];
+			else
+				[self message:@"%@", [self displayBaseURL]];
 			[projectDelegate browseURL:url andDisplay:NO];
 		}
 	}];
+	sync = NO;
 
-	return NO; /* XXX: this is wrong, but needed to keep -keyManager:evaluateCommand: in ViTextView overwrite the message with -updateStatus. */
+	return retError;
 }
 
-- (BOOL)ex_pwd:(ExCommand *)command
+- (id)ex_pwd:(ExCommand *)command
 {
-	MESSAGE(@"%@", [self displayBaseURL]);
-	return NO; /* XXX: this is wrong, but needed to keep -keyManager:evaluateCommand: in ViTextView overwrite the message with -updateStatus. */
+	[command message:[self displayBaseURL]];
+	return nil;
 }
 
-- (BOOL)ex_close:(ExCommand *)command
+- (id)ex_close:(ExCommand *)command
 {
-	BOOL didClose = [self closeCurrentViewUnlessLast];
-	if (!didClose)
-		MESSAGE(@"Cannot close last window");
-	return didClose;
+	if (![self closeCurrentViewUnlessLast])
+		return [ViError message:@"Cannot close last window"];
+	return nil;
 }
 
-- (BOOL)ex_edit:(ExCommand *)command
+- (id)ex_edit:(ExCommand *)command
 {
-	if (command.filename == nil)
-		/* Re-open current file. Check E_C_FORCE in flags. */ ;
-	else {
-		NSURL *url = [self parseExFilename:command.filename];
-		if (url) {
-			NSError *error = nil;
-			ViDocument *doc;
-			doc = [[ViDocumentController sharedDocumentController]
-				openDocumentWithContentsOfURL:url
-						      display:NO
-							error:&error];
-			if (error)
-				MESSAGE(@"%@: %@", url, [error localizedDescription]);
-			else {
-				[doc addWindowController:self];
-				[self addDocument:doc];
-				[self switchToDocument:doc];
-				return YES;
-			}
-		}
-	}
-
-	return NO;
-}
-
-- (BOOL)ex_tabedit:(ExCommand *)command
-{
-	if (command.filename == nil)
-		/* Re-open current file. Check E_C_FORCE in flags. */ ;
-	else {
-		NSURL *url = [self parseExFilename:command.filename];
-		if (url) {
-			NSError *error = nil;
-			ViDocument *doc;
-			doc = [[ViDocumentController sharedDocumentController]
-				openDocumentWithContentsOfURL:url
-						      display:NO
-							error:&error];
-			if (error) {
-				MESSAGE(@"%@: %@", url, [error localizedDescription]);
-			} else if (doc) {
-				[doc addWindowController:self];
-				[self addDocument:doc];
-				[self createTabForDocument:doc];
-				return YES;
-			}
-		}
-	}
-
-	return NO;
-}
-
-- (BOOL)ex_new:(ExCommand *)command
-{
-	return [self splitVertically:NO
-                             andOpen:[self parseExFilename:command.filename]
-                  orSwitchToDocument:nil] != nil;
-}
-
-- (BOOL)ex_tabnew:(ExCommand *)command
-{
+	ViDocumentController *docController = [ViDocumentController sharedDocumentController];
 	NSError *error = nil;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController]
-	    openUntitledDocumentAndDisplay:NO error:&error];
-	if (error) {
-		MESSAGE(@"%@", [error localizedDescription]);
-		return NO;
+	id<ViViewController> viewController = nil;
+
+	if (command.arg == nil)
+		/* Re-open current file. Check E_C_FORCE in flags. */ ;
+	else {
+		NSURL *url = [self parseExFilename:command.arg];
+		if (url) {
+			ViDocument *doc;
+			doc = [docController openDocumentWithContentsOfURL:url
+								   display:NO
+								     error:&error];
+			if (doc) {
+				[doc addWindowController:self];
+				[self addDocument:doc];
+				viewController = [self switchToDocument:doc];
+			}
+		}
 	}
-	doc.isTemporary = YES;
-	[doc addWindowController:self];
-	[self addDocument:doc];
-	[self createTabForDocument:doc];
 
-	return YES;
+	if (error == nil && command.plus_command && viewController) {
+		ViTextView *text = (ViTextView *)[viewController innerView];
+		if (![text evalExString:command.plus_command])
+			return [NSNumber numberWithBool:NO];
+	}
+
+	return error;
 }
 
-- (BOOL)ex_vnew:(ExCommand *)command
+- (id)ex_tabedit:(ExCommand *)command
 {
-	return [self splitVertically:YES
-                             andOpen:[self parseExFilename:command.filename]
-                  orSwitchToDocument:nil] != nil;
-	return NO;
+	ViDocument *doc = nil;
+	NSError *error = nil;
+	ViDocumentController *docController = [ViDocumentController sharedDocumentController];
+
+	if (command.arg == nil) {
+		doc = [docController openUntitledDocumentAndDisplay:NO
+							      error:&error];
+		if (doc)
+			doc.isTemporary = YES;
+	} else {
+		NSURL *url = [self parseExFilename:command.arg];
+		if (url)
+			doc = [docController openDocumentWithContentsOfURL:url
+								   display:NO
+								     error:&error];
+	}
+
+	if (doc) {
+		[doc addWindowController:self];
+		[self addDocument:doc];
+		ViDocumentView *docView = [self createTabForDocument:doc];
+
+		if (command.plus_command && docView) {
+			ViTextView *text = (ViTextView *)[docView innerView];
+			if (![text evalExString:command.plus_command])
+				return [NSNumber numberWithBool:NO];
+		}
+	}
+
+	return error;
 }
 
-- (BOOL)ex_split:(ExCommand *)command
+// FIXME: new, vnew, split and vsplit can all take a +excommand argument
+
+- (id)ex_new:(ExCommand *)command
 {
 	return [self splitVertically:NO
-                             andOpen:[self parseExFilename:command.filename]
-                  orSwitchToDocument:[self currentDocument]] != nil;
-	return NO;
+                             andOpen:[self parseExFilename:command.arg]
+                  orSwitchToDocument:nil] ? nil : [NSNumber numberWithBool:NO];
 }
 
-- (BOOL)ex_vsplit:(ExCommand *)command
+- (id)ex_vnew:(ExCommand *)command
 {
 	return [self splitVertically:YES
-                             andOpen:[self parseExFilename:command.filename]
-                  orSwitchToDocument:[self currentDocument]] != nil;
-	return NO;
+                             andOpen:[self parseExFilename:command.arg]
+                  orSwitchToDocument:nil] ? nil : [NSNumber numberWithBool:NO];
 }
 
-- (BOOL)ex_buffer:(ExCommand *)command
+- (id)ex_split:(ExCommand *)command
 {
-	if ([command.string length] == 0) {
-		[self message:@"Missing buffer name"];
-		return NO;
-	}
+	return [self splitVertically:NO
+                             andOpen:[self parseExFilename:command.arg]
+                  orSwitchToDocument:[self currentDocument]] ? nil : [NSNumber numberWithBool:NO];
+}
+
+- (id)ex_vsplit:(ExCommand *)command
+{
+	return [self splitVertically:YES
+                             andOpen:[self parseExFilename:command.arg]
+                  orSwitchToDocument:[self currentDocument]] ? nil : [NSNumber numberWithBool:NO];
+}
+
+- (id)ex_buffer:(ExCommand *)command
+{
+	if (command.arg == nil)
+		return nil;
+		// return [ViError message:@"Missing buffer name"];
 
 	NSMutableArray *matches = [NSMutableArray array];
 
 	ViDocument *doc = nil;
 	for (doc in [self documents]) {
 		if ([doc fileURL] &&
-		    [[[doc fileURL] absoluteString] rangeOfString:command.string
+		    [[[doc fileURL] absoluteString] rangeOfString:command.arg
 							  options:NSCaseInsensitiveSearch].location != NSNotFound)
 			[matches addObject:doc];
 	}
 
-	if ([matches count] == 0) {
-		[self message:@"No matching buffer for %@", command.string];
-		return NO;
-	} else if ([matches count] > 1) {
-		[self message:@"More than one match for %@", command.string];
-		return NO;
-	}
+	if ([matches count] == 0)
+		return [ViError errorWithFormat:@"No matching buffer for %@", command.arg];
+	else if ([matches count] > 1)
+		return [ViError errorWithFormat:@"More than one match for %@", command.arg];
 
 	doc = [matches objectAtIndex:0];
-	if ([command.command->name hasPrefix:@"b"]) {
+	if ([command.mapping.name hasPrefix:@"b"]) {
 		if ([self currentDocument] != doc)
 			[self switchToDocument:doc];
-	} else if ([command.command->name isEqualToString:@"tbuffer"]) {
+	} else if ([command.mapping.name isEqualToString:@"tbuffer"]) {
 		ViDocumentView *docView = [self viewForDocument:doc];
 		if (docView == nil)
 			[self createTabForDocument:doc];
@@ -2130,15 +2130,49 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 			[self selectDocumentView:docView];
 	} else
 		/* otherwise it's either sbuffer or vbuffer */
-		[self splitVertically:[command.command->name isEqualToString:@"vbuffer"]
+		[self splitVertically:[command.mapping.name isEqualToString:@"vbuffer"]
                               andOpen:nil
                    orSwitchToDocument:doc
                       allowReusedView:NO];
 
-	return YES;
+	return nil;
 }
 
-- (void)ex_set:(ExCommand *)command
+/* syntax: bd[elete] bufname */
+- (id)ex_bdelete:(ExCommand *)command
+{
+	if (command.arg) {
+		ViDocument *doc = nil;
+		NSMutableSet *matches = [NSMutableSet set];
+		for (doc in [self documents]) {
+			if ([doc fileURL] &&
+			    [[[doc fileURL] absoluteString] rangeOfString:command.arg
+								  options:NSCaseInsensitiveSearch].location != NSNotFound)
+				[matches addObject:doc];
+		}
+
+		if ([matches count] == 0)
+			return [ViError errorWithFormat:@"No matching buffer for %@", command.arg];
+		else if ([matches count] > 1)
+			return [ViError errorWithFormat:@"More than one match for %@", command.arg];
+
+		doc = [matches anyObject];
+		if (command.force)
+			[doc closeAndWindow:NO];
+		else
+			[[ViWindowController currentWindowController] closeDocument:doc andWindow:NO];
+	} else {
+		if ([self currentDocument] == nil)
+			return [ViError message:@"No current document."];
+		if (command.force)
+			[[self currentDocument] closeAndWindow:NO];
+		else
+			[[ViWindowController currentWindowController] closeDocument:[self currentDocument] andWindow:NO];
+	}
+	return nil;
+}
+
+- (id)ex_set:(ExCommand *)command
 {
 	NSDictionary *variables = [NSDictionary dictionaryWithObjectsAndKeys:
 		@"shiftwidth", @"sw",
@@ -2180,13 +2214,11 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	    nil];
 
 	NSString *var;
-	for (var in command.words) {
+	for (var in command.args) {
 		NSUInteger equals = [var rangeOfString:@"="].location;
 		NSUInteger qmark = [var rangeOfString:@"?"].location;
-		if (equals == 0 || qmark == 0) {
-			[self message:usage];
-			return;
-		}
+		if (equals == 0 || qmark == 0)
+			return [ViError message:@"se[t] [option[=[value]]...] [nooption ...] [invoption ...] [option! ...] [option? ...] [all]"];
 
 		BOOL turnoff = NO;
 		BOOL toggle = NO;
@@ -2210,36 +2242,30 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 			}
 		}
 
-		if ([name isEqualToString:@"all"]) {
-			[self message:@"'set all' not implemented."];
-			return;
-		}
+		if ([name isEqualToString:@"all"])
+			return [ViError message:@"'set all' not implemented."];
 
 		NSString *defaults_name = [variables objectForKey:name];
 		if (defaults_name == nil && [[variables allValues] containsObject:name])
 			defaults_name = name;
 
-		if (defaults_name == nil) {
-			[self message:@"set: no %@ option: 'set all' gives all option values.", name];
-			return;
-		}
+		if (defaults_name == nil)
+			return [ViError errorWithFormat:@"set: no %@ option: 'set all' gives all option values.", name];
 
 		if (qmark != NSNotFound) {
 			if ([booleans containsObject:defaults_name]) {
 				NSInteger val = [[NSUserDefaults standardUserDefaults] integerForKey:defaults_name];
-				[self message:[NSString stringWithFormat:@"%@%@", val == NSOffState ? @"no" : @"", defaults_name]];
+				[command message:[NSString stringWithFormat:@"%@%@", val == NSOffState ? @"no" : @"", defaults_name]];
 			} else {
 				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
-				[self message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
+				[command message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
 			}
 			continue;
 		}
 
 		if ([booleans containsObject:defaults_name]) {
-			if (equals != NSNotFound) {
-				[self message:@"set: [no]%@ option doesn't take a value", defaults_name];
-				return;
-			}
+			if (equals != NSNotFound)
+				return [ViError errorWithFormat:@"set: [no]%@ option doesn't take a value", defaults_name];
 
 			if (toggle)
 				turnoff = [[NSUserDefaults standardUserDefaults] boolForKey:defaults_name];
@@ -2247,26 +2273,28 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		} else {
 			if (equals == NSNotFound) {
 				NSString *val = [[NSUserDefaults standardUserDefaults] stringForKey:defaults_name];
-				[self message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
+				[command message:[NSString stringWithFormat:@"%@=%@", defaults_name, val]];
 			} else {
 				NSString *val = [var substringFromIndex:equals + 1];
 				[[NSUserDefaults standardUserDefaults] setObject:val forKey:defaults_name];
 			}
 		}
 	}
+
+	return nil;
 }
 
-- (BOOL)ex_export:(ExCommand *)command
+- (id)ex_export:(ExCommand *)command
 {
-	if (command.string == nil)
-		return NO;
+	if (command.arg == nil)
+		return nil;
 
-	NSScanner *scan = [NSScanner scannerWithString:command.string];
+	NSScanner *scan = [NSScanner scannerWithString:command.arg];
 	NSString *variable, *value = nil;
 
 	if (![scan scanUpToString:@"=" intoString:&variable] ||
 	    ![scan scanString:@"=" intoString:nil])
-		return NO;
+		return [ViError message:@"Missing equal sign."];
 
 	if (![scan isAtEnd])
 		value = [[scan string] substringFromIndex:[scan scanLocation]];
@@ -2281,46 +2309,44 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		[env removeObjectForKey:value];
 
 	[defs setObject:env forKey:@"environment"];
-
 	DEBUG(@"static environment is now %@", env);
 
-	return YES;
+	return nil;
 }
 
-- (void)ex_quit:(ExCommand *)command
+- (id)ex_quit:(ExCommand *)command
 {
 	id<ViViewController> viewController = [self currentView];
 	if ([tabView numberOfTabViewItems] > 1 || [[[[self currentView] tabController] views] count] > 1) {
 		[self closeDocumentView:viewController
 		       canCloseDocument:NO
 			 canCloseWindow:NO];
-	} else {
-		if ((command.flags & E_C_FORCE) == E_C_FORCE) {
-			ViDocument *doc;
-			while ((doc = [documents lastObject]) != nil) {
-				/* Check if this document is open in another window. */
-				BOOL openElsewhere = NO;
-				for (NSWindow *window in [NSApp windows]) {
-					ViWindowController *wincon = [window windowController];
-					if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
-						continue;
-					if ([[wincon documents] containsObject:doc]) {
-						openElsewhere = YES;
-						break;
-					}
+	} else if (command.force) {
+		ViDocument *doc;
+		while ((doc = [documents lastObject]) != nil) {
+			/* Check if this document is open in another window. */
+			BOOL openElsewhere = NO;
+			for (NSWindow *window in [NSApp windows]) {
+				ViWindowController *wincon = [window windowController];
+				if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
+					continue;
+				if ([[wincon documents] containsObject:doc]) {
+					openElsewhere = YES;
+					break;
 				}
-
-				if (openElsewhere)
-					[self unlistDocument:doc];
-				else
-					[doc closeAndWindow:YES];
 			}
-			[[self window] close];
-		} else
-			[[self window] performClose:nil];
-	}
+
+			if (openElsewhere)
+				[self unlistDocument:doc];
+			else
+				[doc closeAndWindow:YES];
+		}
+		[[self window] close];
+	} else
+		[[self window] performClose:nil];
 
 	// FIXME: quit/hide app if last window?
+	return nil;
 }
 
 @end

@@ -24,6 +24,7 @@ main(int argc, char *argv[])
 
 	[Nu loadNuFile:@"vico" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 	[Nu loadNuFile:@"keys" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"ex"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 
 #if defined(RELEASE_BUILD)
 #warning Including receipt validation code

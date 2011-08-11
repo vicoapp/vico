@@ -1733,23 +1733,34 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 #pragma mark -
 #pragma mark Vi actions
 
-- (BOOL)increase_fontsize:(ViCommand *)command
+- (BOOL)changeFontSize:(BOOL)bigger
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSInteger fs;
-	NSInteger delta = 1;
-	if ([command.mapping.parameter respondsToSelector:@selector(integerValue)])
-		delta = [command.mapping.parameter integerValue];
-	if (delta == 0)
-		delta = 1;
-	if (command.count == 0)
-		fs = [defs integerForKey:@"fontsize"] + delta;
-	else
-		fs = command.count;
+	NSInteger fs = [defs integerForKey:@"fontsize"] + (bigger ? 1 : -1);
 	if (fs <= 1)
 		return NO;
 	[defs setInteger:fs forKey:@"fontsize"];
 	return YES;
+}
+
+- (IBAction)increaseFontsizeAction:(id)sender
+{
+	[self changeFontSize:YES];
+}
+
+- (IBAction)decreaseFontsizeAction:(id)sender
+{
+	[self changeFontSize:NO];
+}
+
+- (BOOL)increase_fontsize:(ViCommand *)command
+{
+	return [self changeFontSize:YES];
+}
+
+- (BOOL)decrease_fontsize:(ViCommand *)command
+{
+	return [self changeFontSize:NO];
 }
 
 - (BOOL)window_left:(ViCommand *)command

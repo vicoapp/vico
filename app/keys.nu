@@ -229,8 +229,8 @@
 (nmap setKey:"~" toEditAction:"toggle_case:")
 (nmap setKey:"@" toAction:"execute_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
-(nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
-(nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)
+;(nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
+;(nmap setKey:"<cmd-->" toAction:"decrease_fontsize:")
 (nmap setKey:"<cmd-z>" toAction:"undo:")
 (nmap setKey:"<cmd-Z>" toAction:"redo:")
 ;; <C-w> prefix

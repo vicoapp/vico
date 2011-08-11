@@ -234,6 +234,9 @@
 - (IBAction)searchFiles:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
 
+- (IBAction)increaseFontsizeAction:(id)sender;
+- (IBAction)decreaseFontsizeAction:(id)sender;
+
 - (void)browseURL:(NSURL *)url;
 
 - (void)setBaseURL:(NSURL *)url;

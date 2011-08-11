@@ -3,14 +3,6 @@
 
 @implementation ViBufferCompletion
 
-- (id)initWithWindowController:(ViWindowController *)aWindowController
-{
-	if ((self = [super init]) != nil) {
-		windowController = aWindowController;
-	}
-	return self;
-}
-
 - (id<ViDeferred>)completionsForString:(NSString *)word
 			       options:(NSString *)options
 			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
@@ -21,7 +13,8 @@
 	DEBUG(@"completing buffer [%@] w/options %@", word, options);
 
 	NSMutableString *pattern = [NSMutableString string];
-	if ([word length] == 0)
+	NSUInteger wordlen = [word length];
+	if (wordlen == 0)
 		pattern = nil;
 	else if (fuzzyTrigger)
 		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"."];
@@ -33,7 +26,7 @@
 						options:rx_options];
 
 	NSMutableArray *buffers = [NSMutableArray array];
-	for (ViDocument *doc in [windowController documents]) {
+	for (ViDocument *doc in [[ViWindowController currentWindowController] documents]) {
 		NSString *fn = [[doc fileURL] absoluteString];
 		if (fn == nil)
 			continue;
@@ -42,8 +35,10 @@
 			ViCompletion *c;
 			if (fuzzySearch)
 				c = [ViCompletion completionWithContent:fn fuzzyMatch:m];
-			else
+			else {
 				c = [ViCompletion completionWithContent:fn];
+				c.prefixLength = wordlen;
+			}
 			[buffers addObject:c];
 		}
 	}

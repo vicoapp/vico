@@ -1,26 +1,27 @@
 #import "ViWordCompletion.h"
+#import "ViWindowController.h"
 #include "logging.h"
 
 @implementation ViWordCompletion
-
-- (ViWordCompletion *)initWithTextStorage:(ViTextStorage *)aTextStorage
-			       atLocation:(NSUInteger)aLocation
-{
-	if ((self = [super init]) != nil) {
-		textStorage = aTextStorage;
-		currentLocation = aLocation;
-	}
-	return self;
-}
 
 - (id<ViDeferred>)completionsForString:(NSString *)word
 			       options:(NSString *)options
 			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
 {
+	ViTextView *text = (ViTextView *)[[[ViWindowController currentWindowController] currentView] innerView];
+	if (![text isKindOfClass:[ViTextView class]]) {
+		responseCallback(nil, nil);
+		return nil;
+	}
+
+	ViTextStorage *textStorage = [text textStorage];
+	NSUInteger currentLocation = [text caret];
+
 	BOOL fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 	NSString *pattern;
-	if (word == nil) {
+	NSUInteger wordlen = [word length];
+	if (wordlen == 0) {
 		pattern = @"\\b\\w{3,}";
 	} else if (fuzzyTrigger) { /* Fuzzy completion trigger. */
 		pattern = [NSMutableString string];
@@ -52,8 +53,10 @@
 		ViCompletion *c;
 		if (fuzzySearch)
 			c = [ViCompletion completionWithContent:content fuzzyMatch:m];
-		else
+		else {
 			c = [ViCompletion completionWithContent:content];
+			c.prefixLength = wordlen;
+		}
 		c.location = r.location;
 		[uniq addObject:c];
 	}

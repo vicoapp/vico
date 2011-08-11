@@ -3,9 +3,6 @@
 
 @interface ViBufferCompletion : NSObject <ViCompletionProvider>
 {
-	ViWindowController *windowController;
 }
-
-- (id)initWithWindowController:(ViWindowController *)aWindowController;
 
 @end

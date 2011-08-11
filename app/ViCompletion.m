@@ -232,7 +232,7 @@ static NSCharacterSet *ucase = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViCompletion %@/%lu>", content, prefixLength];
+	return [NSString stringWithFormat:@"<ViCompletion %@/%lu ~%@>", content, prefixLength, filterMatch];
 }
 
 @end

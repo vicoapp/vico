@@ -1,16 +1,9 @@
 #import "ViFileCompletion.h"
 #import "ViError.h"
+#import "ViWindowController.h"
 #include "logging.h"
 
 @implementation ViFileCompletion
-
-- (ViFileCompletion *)initWithRelativeURL:(NSURL *)aURL
-{
-	if ((self = [super init]) != nil) {
-		relURL = aURL;
-	}
-	return self;
-}
 
 - (void)appendFilter:(NSString *)string toPattern:(NSMutableString *)pattern
 {
@@ -27,6 +20,7 @@
 			       options:(NSString *)options
 			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
 {
+	NSURL *relURL = [[ViWindowController currentWindowController] baseURL];
 	DEBUG(@"relURL is %@", relURL);
 	NSString *basePath = nil;
 	NSURL *baseURL = nil;
@@ -139,8 +133,10 @@
 				ViCompletion *c;
 				if (fuzzySearch)
 					c = [ViCompletion completionWithContent:s fuzzyMatch:m];
-				else
+				else {
 					c = [ViCompletion completionWithContent:s];
+					c.prefixLength = [basePath length] + r.length;
+				}
 				[matches addObject:c];
 			}
 		}

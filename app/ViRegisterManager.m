@@ -43,6 +43,9 @@
 	if (regName == '_')
 		return;
 
+	if (content == nil)
+		content = @"";
+
 	if (regName == '*' || regName == '+') {
 		NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
 		[pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil]

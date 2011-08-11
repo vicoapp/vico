@@ -272,6 +272,7 @@
 		9AD68D5013A4083A00126E32 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */; };
 		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
 		9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
+		9AFC857A13F432A600B4FF09 /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AFC857913F432A600B4FF09 /* header.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -803,6 +804,7 @@
 		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
 		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
 		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
+		9AFC857913F432A600B4FF09 /* header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = header.png; path = Images/header.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1373,6 +1375,7 @@
 		9A4346A813311673002B04DE /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9AFC857913F432A600B4FF09 /* header.png */,
 				9A4346A913311694002B04DE /* actionbarbg.png */,
 				9A4346AA13311694002B04DE /* actionmenu.png */,
 				9A4346AB13311694002B04DE /* add.png */,
@@ -1633,6 +1636,7 @@
 				9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */,
 				9A8CDE8313AB355F00F771AB /* WaitProgress.xib in Resources */,
 				9A57990113F0189A00191109 /* ex.nu in Resources */,
+				9AFC857A13F432A600B4FF09 /* header.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

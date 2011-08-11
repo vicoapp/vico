@@ -1,5 +1,6 @@
 {
 	"meta.function" = function;
+	"meta.interface-or-protocol meta.function" = header;
 	"meta.method" = function;
 	"meta.class" = class;
 	"meta.interface-or-protocol" = class;

@@ -1891,7 +1891,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	ex_busy = NO;
 }
 
-- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command
+- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	ViMacro *macro = command.macro;
 
@@ -1905,6 +1905,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	[messageField setHidden:YES];
 	[statusbar setHidden:NO];
+	[statusbar setSelectable:NO];
 	[statusbar setEditable:YES];
 	[statusbar setStringValue:@""];
 	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12]];
@@ -1913,15 +1914,17 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	 */
 	[[self window] makeFirstResponder:statusbar];
 
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:statusbar];
+	[editor setString:prefix ?: @""];
+	[editor setCaret:[[editor textStorage] length]];
+
 	if (macro) {
 		NSInteger keyCode;
-		ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:statusbar];
 		while (ex_busy && (keyCode = [macro pop]) != -1)
 			[editor.keyManager handleKey:keyCode];
 	}
 
 	if (ex_busy) {
-
 		ex_modal = YES;
 		[NSApp runModalForWindow:[self window]];
 		ex_modal = NO;
@@ -1937,6 +1940,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return exString;
 }
 
+- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command
+{
+	return [self getExStringInteractivelyForCommand:command prefix:nil];
+}
 
 #pragma mark -
 #pragma mark Ex actions

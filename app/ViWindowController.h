@@ -241,6 +241,7 @@
 	onCompletion:(void (^)(NSURL *url, NSError *error))aBlock;
 - (NSString *)displayBaseURL;
 
+- (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command;
 
 - (BOOL)ex_cd:(ExCommand *)command;

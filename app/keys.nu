@@ -298,7 +298,6 @@
 (vmap setKey:"=" toEditAction:"indent:" flags:ViMapLineMode parameter:nil scope:nil)
 (vmap setKey:":" toAction:"ex_command:")
 (vmap setKey:"~" toEditAction:"toggle_case_op:")
-(vmap map:":" to:":'<,'>")
 (vmap setKey:"<esc>" toAction:"normal_mode:")
 (vmap setKey:"<c-b>" toMotion:"backward_screen:")
 (vmap setKey:"<c-d>" toMotion:"scroll_downward:")

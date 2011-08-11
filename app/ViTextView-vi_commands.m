@@ -2571,9 +2571,14 @@
 /* syntax: : */
 - (BOOL)ex_command:(ViCommand *)command
 {
-	[self updateStatus]; // clear any previous message
-
-	NSString *exline = [self getExStringForCommand:command];
+	NSString *prefix = nil;
+	if (mode == ViVisualMode)
+		prefix = @"'<,'>";
+	else if (command.count == 1)
+		prefix = @".";
+	else if (command.count > 1)
+		prefix = [NSString stringWithFormat:@".,.+%li", command.count - 1];
+	NSString *exline = [self getExStringForCommand:command prefix:prefix];
 	if (exline == nil)
 		return NO;
 

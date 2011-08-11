@@ -1,3 +1,19 @@
+* don't overwrite read-only files!
+
+* expand % and # in ex arguments w/syntax 'x'
+* :e# => open alternate file
+
+! Must store bundles in a dictionary, should NOT duplicate bundles with same bundle UUID!
+* Downloading tmbundles seems to duplicate tab triggers (HN)
+
+! cmd-y cmd-Y focuses file search field
+
+* list ctrl-s in menus
+* list ctrl-n in menus (and other completions)
+
+
+
+
 
 * can we map ys to a new operator (surround), with y{motion} still working?
 
@@ -10,17 +26,6 @@
 * less lame notification of modified documents in tabs (don't append * in title!)
 
 * replace ViError class with NSError category
-* ": register (last ex command)
-
-! Must store bundles in a dictionary, should NOT duplicate bundles with same bundle UUID!
-* Downloading tmbundles seems to duplicate tab triggers (HN)
-
-* don't overwrite read-only files!
-
-* list ctrl-s in menus
-* list ctrl-n in menus (and other completions)
-
-! cmd-y cmd-Y focuses file search field
 
 * When deleting (dd) last line and pasting it in other place, blank
   line is pasted, while if pasting back to the last line - it pastes
@@ -93,7 +98,6 @@
 * honor bundle ordering when showing ambiguous items menu
 * move split views relative each other
 * convert horizontal split to vertical and vice versa
-* :e# => open alternate file
 * set incsearch
 * set hlsearch
 * set listchars

@@ -104,6 +104,9 @@
 			[NSApp endSheet:filterSheet returnCode:0];
 		filterDone = YES;
 		break;
+	case ViStreamEventWriteEndEncountered:
+		DEBUG(@"EOF on write stream %@; we keep reading", stream);
+		break;
 	}
 }
 

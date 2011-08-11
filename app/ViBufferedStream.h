@@ -1,3 +1,5 @@
+#define ViStreamEventWriteEndEncountered 4711
+
 @interface ViStreamBuffer : NSObject
 {
 	NSData *data;
@@ -31,6 +33,7 @@
 	     writeDescriptor:(int)write_fd
 		    priority:(int)prio;
 - (id)initWithTask:(NSTask *)task;
+- (BOOL)bidirectional;
 
 - (BOOL)hasBytesAvailable;
 - (BOOL)hasSpaceAvailable;

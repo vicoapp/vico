@@ -118,9 +118,14 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	DEBUG(@"flushing %i buffers, total %lu bytes", i, tot);
 
 	if ((n = writev(fd_out, iov, i)) == -1) {
-		if (errno == EAGAIN || errno == ENOBUFS ||
-		    errno == EINTR)	/* try later */
+		int saved_errno = errno;
+		DEBUG(@"writev failed with errno %s (%i, %i?)", strerror(saved_errno), saved_errno, EPIPE);
+		if (saved_errno == EAGAIN || saved_errno == ENOBUFS ||
+		    saved_errno == EINTR)	/* try later */
 			return 0;
+		else if (saved_errno == EPIPE)
+			/* treat a broken pipe as connection closed; we might still have stuff to read */
+			return -2;
 		else
 			return -1;
 	}
@@ -162,8 +167,20 @@ fd_write(CFSocketRef s,
 			[[stream delegate] stream:stream handleEvent:NSStreamEventErrorOccurred];
 		[stream shutdownWrite];
 	} else if (ret == -2) {
-		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)])
-			[[stream delegate] stream:stream handleEvent:NSStreamEventEndEncountered];
+		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)]) {
+			/*
+			 * We got a broken pipe on the write stream. If we have different sockets
+			 * for read and write, generate a special write-end event, otherwise we
+			 * use a regular EOF event. The write-end event allows us to keep reading
+			 * data buffered in the socket (ie, not yet received by the application).
+			 *
+			 * The usecase is when filtering through a non-filter like 'ls'.
+			 */
+			if ([stream bidirectional])
+				[[stream delegate] stream:stream handleEvent:NSStreamEventEndEncountered];
+			else
+				[[stream delegate] stream:stream handleEvent:ViStreamEventWriteEndEncountered];
+		}
 		[stream shutdownWrite];
 	}
 }
@@ -181,6 +198,12 @@ fd_read(CFSocketRef s,
 		ViBufferedStream *stream = info;
 		[stream read];
 	}
+}
+
+/* Returns YES if one bidirectional socket is in use, NO if two unidirectional sockets (a pipe pair) is used. */
+- (BOOL)bidirectional
+{
+	return (inputSocket == outputSocket);
 }
 
 - (id)initWithReadDescriptor:(int)read_fd
@@ -210,8 +233,10 @@ fd_read(CFSocketRef s,
 			inputContext.info = self; /* user data passed to the callbacks */
 
 			CFSocketCallBackType cbType = kCFSocketReadCallBack;
-			if (fd_out == fd_in)
+			if (fd_out == fd_in) {
+				/* bidirectional socket, we read and write on the same socket */
 				cbType |= kCFSocketWriteCallBack;
+			}
 			inputSocket = CFSocketCreateWithNative(
 				kCFAllocatorDefault,
 				fd_in,
@@ -229,9 +254,11 @@ fd_read(CFSocketRef s,
 		}
 
 		if (fd_out != -1) {
-			if (fd_out == fd_in)
+			if (fd_out == fd_in) {
+				/* bidirectional socket */
 				outputSocket = inputSocket;
-			else {
+			} else {
+				/* unidirectional socket, we read and write on different sockets */
 				if ((flags = fcntl(fd_out, F_GETFL, 0)) == -1) {
 					INFO(@"fcntl(%i, F_GETFL): %s", fd_out, strerror(errno));
 					return nil;
@@ -291,6 +318,11 @@ fd_read(CFSocketRef s,
 		outputSource = NULL;
 		fd_out = -1;
 	}
+	/*
+	 * If outputSource is NULL, we either have already closed the write socket,
+	 * or we have a bidirectional socket. XXX: should we call shutdown(2) if
+	 * full-duplex bidirectional socket?
+	 */
 }
 
 - (void)shutdownRead
@@ -299,6 +331,10 @@ fd_read(CFSocketRef s,
 		DEBUG(@"shutting down read pipe %d", fd_in);
 		CFSocketInvalidate(inputSocket); /* also removes the source from run loops */
 		if (outputSocket == inputSocket) {
+			/*
+                         * XXX: this also shuts down the write part for
+                         * full-duplex bidirectional sockets.
+			 */
 			outputSocket = NULL;
 			fd_out = -1;
 		}

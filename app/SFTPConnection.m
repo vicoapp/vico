@@ -685,6 +685,7 @@ resp2txt(int type)
 		[self abort];
 		break;
 	case NSStreamEventEndEncountered:
+	case ViStreamEventWriteEndEncountered:
 		DEBUG(@"EOF on stream %@", stream);
 		status = [NSString stringWithFormat:@"Lost connection to %@", [self title]];
 		[self reportConnectionStatus:status];

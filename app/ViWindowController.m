@@ -2144,6 +2144,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"smarttab", @"sta",
 
 		@"gdefault", @"gd",
+		@"wrapscan", @"ws",
 		@"showguide", @"sg",
 		@"guidecolumn", @"gc",
 		@"prefertabs", @"prefertabs",
@@ -2168,6 +2169,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
 	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
+	    @"wrapscan",
 	    nil];
 
 	NSString *var;

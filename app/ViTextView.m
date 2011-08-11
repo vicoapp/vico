@@ -911,12 +911,15 @@ int logIndent = 0;
 #pragma mark -
 #pragma mark Searching
 
-- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
+- (NSRange)rangeOfPattern:(NSString *)pattern
+	     fromLocation:(NSUInteger)start
+		  forward:(BOOL)forwardSearch
+		    error:(NSError **)outError
 {
-	if (document.loader) {
-		initial_find_pattern = pattern;
-		initial_find_options = find_options;
-		return YES;
+	if ([pattern length] == 0) {
+		if (outError)
+			*outError = [ViError message:@"Empty search pattern"];
+		return NSMakeRange(NSNotFound, 0);
 	}
 
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
@@ -927,19 +930,14 @@ int logIndent = 0;
 			rx_options |= ONIG_OPTION_IGNORECASE;
 	}
 
-	ViRegexp *rx = nil;
-
-	/* compile the pattern regexp */
-	@try
-	{
-		rx = [[ViRegexp alloc] initWithString:pattern
-					      options:rx_options];
-	}
-	@catch(NSException *exception)
-	{
-		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
-		MESSAGE(@"Invalid search pattern: %@", exception);
-		return NO;
+	NSError *error = nil;
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
+						options:rx_options
+						  error:&error];
+	if (error) {
+		if (outError)
+			*outError = error;
+		return NSMakeRange(NSNotFound, 0);
 	}
 
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
@@ -947,45 +945,64 @@ int logIndent = 0;
 	NSArray *foundMatches = [rx allMatchesInString:[[self textStorage] string]
 					       options:rx_options];
 
-	if ([foundMatches count] == 0) {
-		MESSAGE(@"Pattern not found");
-	} else {
-		[self pushLocationOnJumpList:start_location];
-
+	if ([foundMatches count] > 0) {
 		ViRegexpMatch *match, *nextMatch = nil;
 		for (match in foundMatches) {
 			NSRange r = [match rangeOfMatchedString];
-			if (find_options == 0) {
-				if (nextMatch == nil && r.location > start_location) {
+			if (forwardSearch) {
+				if (r.location > start) {
 					nextMatch = match;
 					break;
 				}
-			} else if (r.location < start_location) {
+			} else if (r.location < start) {
 				nextMatch = match;
-			}
+			} else if (r.location >= start)
+				break;
 		}
 
-		if (nextMatch == nil) {
-			if (find_options == 0)
+		if (nextMatch == nil && [defs boolForKey:@"wrapscan"]) {
+			if (forwardSearch)
 				nextMatch = [foundMatches objectAtIndex:0];
 			else
 				nextMatch = [foundMatches lastObject];
-
 			MESSAGE(@"Search wrapped");
 		}
 
-		if (nextMatch) {
-			NSRange r = [nextMatch rangeOfMatchedString];
-			[self scrollRangeToVisible:r];
-			final_location = end_location = r.location;
-			[self setCaret:final_location];
-			[[self nextRunloop] showFindIndicatorForRange:[nextMatch rangeOfMatchedString]];
-		}
+		if (nextMatch)
+			return [nextMatch rangeOfMatchedString];
+	}
 
+	return NSMakeRange(NSNotFound, 0);
+}
+
+- (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
+{
+	if (document.loader) {
+		initial_find_pattern = pattern;
+		initial_find_options = find_options;
 		return YES;
 	}
 
-	return NO;
+	NSError *error = nil;
+	NSRange r = [self rangeOfPattern:pattern
+			    fromLocation:start_location
+				 forward:find_options == 0
+				   error:&error];
+	if (error) {
+		MESSAGE(@"Invalid search pattern: %@", [error localizedDescription]);
+		return NO;
+	}
+
+	if (r.location == NSNotFound)
+		return NO;
+
+	[self pushLocationOnJumpList:start_location];
+	[self scrollRangeToVisible:r];
+	final_location = end_location = r.location;
+	[self setCaret:final_location];
+	[[self nextRunloop] showFindIndicatorForRange:r];
+
+	return YES;
 }
 
 /* syntax: /regexp */

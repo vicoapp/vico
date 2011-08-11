@@ -36,7 +36,7 @@
 
 - (void)finalize
 {
-	if (client)
+	if (client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
 		CFRelease(client);
 	[super finalize];
 }
@@ -82,11 +82,14 @@
 	/*
 	 * Workaround for bug in NSURLRequest:
 	 * http://stackoverflow.com/questions/1112869/how-to-avoid-reference-count-underflow-in-nscfurlprotocolbridge-in-custom-nsurlp/4679837#4679837
+	 *
+	 * Seems to be fixed in Lion, so we should only workaround this on Snow Leopard.
 	 */
-	if (client)
+	if (client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
 		CFRelease(client);
 	client = [self client];
-	CFRetain(client);
+	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
+		CFRetain(client);
 
 	NSURLRequest *request = [self request];
 	NSURL *url = [request URL];

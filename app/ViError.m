@@ -50,6 +50,11 @@
 	return err;
 }
 
++ (NSError *)message:(NSString *)message
+{
+	return [ViError errorWithObject:message];
+}
+
 + (NSError *)errorWithCode:(NSInteger)code format:(NSString *)fmt, ...
 {
 	va_list ap;

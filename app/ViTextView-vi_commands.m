@@ -2620,6 +2620,7 @@
 		     options:(NSString *)options
 {
 	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
+	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
@@ -2632,11 +2633,11 @@
 	ViCompletion *selection;
 	selection = [cc chooseFrom:provider
 			     range:range
-			    prefix:string
+			    prefix:fuzzyTrigger ? nil : string
 				at:[[self window] convertBaseToScreen:[self convertPointToBase:point]]
 			   options:options
 			 direction:(positionAbove ? 1 : 0)
-		     initialFilter:nil];
+		     initialFilter:fuzzyTrigger ? string : nil];
 	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
 	if (selection)
 		[self insertSnippet:selection.content inRange:cc.range];
@@ -2669,10 +2670,8 @@
 		range = NSMakeRange([self caret], 0);
 	}
 
-	ViWordCompletion *provider = [[ViWordCompletion alloc] initWithTextStorage:[self textStorage]
-									atLocation:range.location];
 	return [self presentCompletionsOf:word
-			     fromProvider:provider
+			     fromProvider:[[ViWordCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -2688,9 +2687,8 @@
 		range = NSMakeRange([self caret], 0);
 	}
 
-	NSURL *relURL = [(ViWindowController *)[[self window] windowController] baseURL];
 	return [self presentCompletionsOf:path
-			     fromProvider:[[ViFileCompletion alloc] initWithRelativeURL:relURL]
+			     fromProvider:[[ViFileCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -2708,7 +2706,7 @@
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[ViBufferCompletion alloc] initWithWindowController:[[self window] windowController]]
+			     fromProvider:[[ViBufferCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }

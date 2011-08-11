@@ -64,7 +64,7 @@
 	}
 
 	[registers setObject:content forKey:[self nameOfRegister:regName]];
-	if (regName != 0 && regName != '"' && regName != '/')
+	if (regName != 0 && regName != '"' && regName != '/' && regName != ':')
 		[registers setObject:content forKey:[self nameOfRegister:0]];
 }
 
@@ -78,6 +78,8 @@
 		return @"current file";
 	else if (regName == '#')
 		return @"alternate file";
+	else if (regName == ':')
+		return @"last ex command";
 	else
 		return [NSString stringWithFormat:@"%C", regName];
 }

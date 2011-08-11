@@ -227,6 +227,7 @@
 (nmap setKey:"!" toOperator:"filter:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"." toAction:"dot:")
 (nmap setKey:"~" toEditAction:"toggle_case:")
+(nmap setKey:"@" toAction:"execute_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"<delete>" toEditAction:"delete_forward:")
 (nmap setKey:"<cmd-+>" toAction:"increase_fontsize:")
 (nmap setKey:"<cmd-->" toAction:"increase_fontsize:" flags:0 parameter:-1 scope:nil)

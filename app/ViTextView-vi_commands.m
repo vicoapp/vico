@@ -2816,4 +2816,37 @@
 	return YES;
 }
 
+- (BOOL)execute_register:(ViCommand *)command
+{
+	unichar reg = command.argument;
+	if (reg == '%' || reg == '#') {
+		MESSAGE(@"Invalid register name '%C'", reg);
+		return NO;
+	}
+
+	ViRegisterManager *regs = [ViRegisterManager sharedManager];
+
+	if (reg == '@') {
+		reg = regs.lastExecutedRegister;
+		if (reg == 0) {
+			MESSAGE(@"No previously used register");
+			return NO;
+		}
+	}
+
+	NSString *content = [regs contentOfRegister:reg];
+	if (content == nil) {
+		MESSAGE(@"The %@ register is empty",
+		    [[ViRegisterManager sharedManager] nameOfRegister:reg]);
+		return NO;
+	}
+
+	int count = IMAX(command.count, 1);
+	while (count--)
+		if (![self input:content])
+			return NO;
+
+	return YES;
+}
+
 @end

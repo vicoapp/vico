@@ -9,13 +9,17 @@
  * - `%` -- The URL of the current document.
  * - `#` -- The URL of the alternate document.
  * - `/` -- The last search term.
+ * - `:` -- The last entered ex command.
  * - `_` (underscore) -- The null register; anything stored in this register is discarded.
  */
 
 @interface ViRegisterManager : NSObject
 {
 	NSMutableDictionary	*registers;
+	unichar			 lastExecutedRegister;
 }
+
+@property (nonatomic) unichar lastExecutedRegister;
 
 /** Returns the global shared register manager.
  */

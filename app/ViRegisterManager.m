@@ -4,6 +4,8 @@
 
 @implementation ViRegisterManager
 
+@synthesize lastExecutedRegister;
+
 + (id)sharedManager
 {
 	static ViRegisterManager *sharedManager = nil;

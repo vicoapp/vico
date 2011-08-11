@@ -76,6 +76,7 @@ withParser:(NuParser *)parser
 - (IBAction)visitWebsite:(id)sender;
 - (IBAction)editSiteScript:(id)sender;
 
+- (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringForCommand:(ViCommand *)command;
 
 @end

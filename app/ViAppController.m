@@ -738,7 +738,7 @@ additionalBindings:(NSDictionary *)bindings
 	return YES;
 }
 
-- (NSString *)getExStringForCommand:(ViCommand *)command
+- (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	ViMacro *macro = command.macro;
 
@@ -756,7 +756,7 @@ additionalBindings:(NSDictionary *)bindings
 			fieldEditor = [ViTextView makeFieldEditor];
 		[fieldEditor setInsertMode:nil];
 		[fieldEditor setCaret:0];
-		[fieldEditor setString:@""];
+		[fieldEditor setString:prefix ?: @""];
 		[fieldEditor setDelegate:self];
 		while (busy && (keyCode = [macro pop]) != -1)
 			[fieldEditor.keyManager handleKey:keyCode];
@@ -768,6 +768,11 @@ additionalBindings:(NSDictionary *)bindings
 	}
 
 	return exString;
+}
+
+- (NSString *)getExStringForCommand:(ViCommand *)command
+{
+	return [self getExStringForCommand:command prefix:nil];
 }
 
 @end

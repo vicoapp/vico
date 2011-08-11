@@ -712,7 +712,7 @@
 {
 	NSUInteger bol, eol, end;
 	[self getLineStart:&bol end:&end contentsEnd:&eol];
-	if (end == eol) {
+	if (end == eol || end == [[self textStorage] length]) {
 		MESSAGE(@"No following lines to join");
 		return NO;
 	}

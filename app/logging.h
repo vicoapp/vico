@@ -26,3 +26,11 @@ extern int logIndent;
 	} while(0)
 
 #endif
+
+#define DEBUG_FINALIZE()		\
+- (void)finalize			\
+{					\
+	INFO(@"self = %@", self);	\
+	[super finalize];		\
+}
+

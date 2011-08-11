@@ -6,8 +6,6 @@
 #import "ExParser.h"
 #include "logging.h"
 
-#define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
-
 @implementation ViWebView
 
 - (void)awakeFromNib

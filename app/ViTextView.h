@@ -17,7 +17,7 @@
 
 #include <Carbon/carbon.h>
 
-#define MESSAGE(fmt, ...)	[[[self window] windowController] message:fmt, ## __VA_ARGS__]
+#define MESSAGE(fmt, ...)	[(ViWindowController *)[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
 @class ViDocumentView;
 @class ViWindowController;

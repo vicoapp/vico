@@ -18,6 +18,7 @@
 	id text;
 	NSRange range;
 	NSInteger caret;
+	NSMutableArray *messages;
 }
 
 /** The mapping that describes the action. */
@@ -52,6 +53,8 @@
 
 @property(nonatomic,readwrite) id text;
 
+@property(nonatomic,readonly) NSMutableArray *messages;
+
 @property(nonatomic,readwrite) NSRange range;
 @property(nonatomic,readwrite) NSInteger caret;
 
@@ -66,5 +69,6 @@
 - (BOOL)isUndo;
 - (BOOL)isDot;
 - (ViCommand *)dotCopy;
+- (void)message:(NSString *)message;
 
 @end

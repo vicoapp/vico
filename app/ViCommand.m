@@ -1,4 +1,5 @@
 #import "ViCommand.h"
+#include "logging.h"
 
 @implementation ViCommand
 
@@ -13,6 +14,7 @@
 @synthesize operator;
 @synthesize range, caret;
 @synthesize macro;
+@synthesize messages;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
@@ -81,6 +83,16 @@
 	else
 		return [NSString stringWithFormat:@"<ViCommand %@: %@ * %i>",
 		    mapping.keyString, NSStringFromSelector(mapping.action), count];
+}
+
+- (void)message:(NSString *)message
+{
+	DEBUG(@"got message %@", message);
+	if (message == nil)
+		return;
+	if (messages == nil)
+		messages = [NSMutableArray array];
+	[messages addObject:message];
 }
 
 @end

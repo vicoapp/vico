@@ -1,10 +1,26 @@
-REGRESSIONS
-===========
 
-URGENT
-========
+* can we map ys to a new operator (surround), with y{motion} still working?
+
+* let untitled documents have a custom title:
+  -> untitled documents should show up in ctrl-s completions
+  -> commands can re-use special buffers (ie, a *finger* buffer, or a *shell* buffer)
+
+* order fuzzy search results wrt last opened/used time
+
+* less lame notification of modified documents in tabs (don't append * in title!)
+
+* replace ViError class with NSError category
+* ": register (last ex command)
+
+! Must store bundles in a dictionary, should NOT duplicate bundles with same bundle UUID!
+* Downloading tmbundles seems to duplicate tab triggers (HN)
+
+* don't overwrite read-only files!
 
 * list ctrl-s in menus
+* list ctrl-n in menus (and other completions)
+
+! cmd-y cmd-Y focuses file search field
 
 * When deleting (dd) last line and pasting it in other place, blank
   line is pasted, while if pasting back to the last line - it pastes
@@ -23,36 +39,29 @@ URGENT
 
 * should check all documents for external changes when app becomes active again
 * check map error in excessKeys.nu (re vs r duplicate mapping)
-* "&" in :s replace part should expand to whole match
+* "&" in :s replace part should expand to whole match? (use $0 for now)
 * explorer flickers when opening new windows!
 * bundle commands not repeatable with dot
-* undo manager messed up after undo and repeat of bundle command!
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 
-
-BUGS
-====
 * jumps doesn't work in untitled files
+* when renaming a file in the explorer, selection should follow after re-sorting
 * bundle commands time out when presenting ui
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
-* caret location is messed up after undo of bundle command
+? caret location is messed up after undo of bundle command
 * jumpy selection in symbol list when clicking symbol
 * vi always has a newline at EOF
 * searching is slow on large files, naïve implementation
 * yk and yj commands don't position caret correctly
-* Downloading tmbundles seems to duplicate tab triggers (HN)
 * push marks
 * push jumps
 * ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 
-
-IMPORTANT
-=========
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
-* :q should terminate app on last document in last window?
+? :q should terminate app on last document in last window?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
@@ -64,9 +73,6 @@ IMPORTANT
 * support a count in C and h commands
 * highlight caret after goto line
 
-
-FEATURES
-========
 * o in visual mode should move to opposite side of selection
 * @jtregunna: can you make it so we don't get a file changed
               notification when the file hashes are the same? ie, switching branches
@@ -77,7 +83,6 @@ FEATURES
 * :mkdir command
 * completion expressions in nu
 * zt, zz, zb (scroll cursor to top, center, bottom)
-* ZZ and ZQ
 * p/P with a count
 * J with visual selection, and J with a count
 * +/- commands
@@ -107,6 +112,7 @@ FEATURES
 * 0<C-D> in insert mode removes all indentation
 * g$ and g0 and g^
 
+* ODB Editor suite
 
 LONG TERM FEATURES
 ==================
@@ -128,7 +134,8 @@ LONG TERM FEATURES
 
 IDEAS
 =====
-* ODB Editor suite? why?
-* make vi keys preferred over bundle key equivalents?
-:command calling for bundle commands? arguments?
+* define vi commands for bundle actions when loading a bundle in order to unify key handling between vi and bundles
+  * should be able to undefine them when the bundle is unloaded / disabled
+  * probably need a "source" attribute on a ViMapping to tell it who defined it (bundle, site.nu, default keys.nu, other, preference window)
+* ex :command calling for bundle commands? arguments?
 

@@ -2578,6 +2578,10 @@
 	if (exline == nil)
 		return NO;
 
+	[[ViRegisterManager sharedManager] setContent:exline ofRegister:':'];
+
+	// XXX: scope for ex command?
+
 	NSError *error = nil;
 	ExCommand *ex = [[ExCommand alloc] init];
 	if ([ex parse:exline error:&error]) {

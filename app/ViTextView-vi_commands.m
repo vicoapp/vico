@@ -1908,7 +1908,7 @@
 - (BOOL)shift_right:(ViCommand *)command
 {
 	final_location = start_location;
-	[self changeIndentation:1
+	[self changeIndentation:(mode == ViVisualMode ? IMAX(1, command.count) : 1)
 			inRange:affectedRange
 		    updateCaret:NULL
 		 alignToTabstop:NO
@@ -1924,7 +1924,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL];
 
 	final_location = start_location;
-	[self changeIndentation:-1
+	[self changeIndentation:(mode == ViVisualMode ? IMIN(-1, -command.count) : -1)
 			inRange:affectedRange
 		    updateCaret:NULL
 		 alignToTabstop:NO

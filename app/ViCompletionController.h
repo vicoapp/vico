@@ -31,7 +31,7 @@
 	IBOutlet ViCompletionView *tableView;
 
 	id<ViCompletionProvider> provider;
-	NSArray *completions;
+	NSMutableArray *completions;
 	NSString *options;
 	NSString *prefix;
 

@@ -90,7 +90,41 @@
 - (void)completionResponse:(NSArray *)array error:(NSError *)error
 {
 	DEBUG(@"got completions: %@, error %@", array, error);
-	completions = array;
+	completions = [NSMutableArray arrayWithArray:array];
+
+	NSUInteger ndropped = 0;
+	for (NSUInteger i = 0; i < [completions count];) {
+		id c = [completions objectAtIndex:i];
+		if ([c isKindOfClass:[NSString class]]) {
+			/*
+			 * For strings, do initial prefix filtering here.
+			 */
+			if (prefix && [c rangeOfString:prefix options:NSCaseInsensitiveSearch|NSAnchoredSearch].location == NSNotFound)
+				[completions removeObjectAtIndex:i];
+			else {
+				c = [ViCompletion completionWithContent:c];
+				[completions replaceObjectAtIndex:i++ withObject:c];
+			}
+		} else if ([c isKindOfClass:[ViCompletion class]]) {
+			/*
+			 * If prefix length not set (correctly), do initial prefix filtering here.
+			 * Prefix length is updated for all items below.
+			 */
+			ViCompletion *cp = c;
+			if (prefix && cp.prefixLength != prefixLength &&
+			    [cp.content rangeOfString:prefix options:NSCaseInsensitiveSearch|NSAnchoredSearch].location == NSNotFound)
+				[completions removeObjectAtIndex:i];
+			else
+				++i;
+		} else {
+			[completions removeObjectAtIndex:i];
+			++ndropped;
+		}
+	}
+
+	if (ndropped > 0)
+		INFO(@"dropped %lu invalid completions (expected NSString or ViCompletion objects)", ndropped);
+
 	if ([completions count] == 0) {
 		if ([window isVisible]) {
 			[self cancel:nil];
@@ -154,6 +188,7 @@
 
 	completions = nil;
 	filteredCompletions = nil;
+	DEBUG(@"fetching completions for %@ w/options %@", prefix, options);
 	if ([aProvider respondsToSelector:@selector(completionsForString:options:onResponse:)])
 		[aProvider completionsForString:prefix
 					options:options
@@ -205,7 +240,7 @@
 	return longestMatch;
 }
 
-- (void)setCompletions:(NSArray *)newCompletions
+- (void)setCompletions:(NSMutableArray *)newCompletions
 {
 	filter = [NSMutableString string];
 	filteredCompletions = nil;

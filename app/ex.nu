@@ -37,7 +37,7 @@
 ;(ex define:"version"		syntax:""	as:"ex_version:")
 (ex define:"vsplit"		syntax:"e1x"	as:"ex_vsplit:")
 (ex define:"vnew"		syntax:"e1x"	as:"ex_vnew:")
-(ex define:"write"		syntax:"r%!f>e1x" as:"ex_write:")
+(ex define:'("write" "w")	syntax:"r%!f>e1x" as:"ex_write:")
 (ex define:"wq"			syntax:"r%!e1x"	as:"ex_wq:")
 (ex define:'("xit" "exit")	syntax:"r%!e1x"	as:"ex_xit:")
 (ex define:"yank"		syntax:"rRc"	as:"ex_yank:")

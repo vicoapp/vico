@@ -1,5 +1,6 @@
 @interface NSScanner (additions)
 - (unichar)peek;
+- (void)inc;
 - (BOOL)expectCharacter:(unichar)ch;
 - (BOOL)scanCharacter:(unichar *)ch;
 - (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet

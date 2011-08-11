@@ -10,10 +10,16 @@
 	return [[self string] characterAtIndex:[self scanLocation]];
 }
 
+- (void)inc
+{
+	if (![self isAtEnd])
+		[self setScanLocation:[self scanLocation] + 1];
+}
+
 - (BOOL)expectCharacter:(unichar)ch
 {
 	if ([self peek] == ch) {
-		[self setScanLocation:[self scanLocation] + 1];
+		[self inc];
 		return YES;
 	}
 	return NO;
@@ -25,7 +31,7 @@
 		return NO;
 	if (ch)
 		*ch = [[self string] characterAtIndex:[self scanLocation]];
-	[self setScanLocation:[self scanLocation] + 1];
+	[self inc];
 	return YES;
 }
 

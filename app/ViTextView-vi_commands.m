@@ -463,15 +463,6 @@
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:affectedRange.location];
 
-	/* If a line mode range includes the last line, also include the newline before the first line.
-	 * This way delete doesn't leave an empty line.
-	 */
-	if (command.isLineMode && NSMaxRange(affectedRange) == [[self textStorage] length] && bol > 0) {
-		affectedRange.location--;	// FIXME: what about using CRLF at end-of-lines?
-		affectedRange.length++;
-		DEBUG(@"after including newline before first line: affected range: %@", NSStringFromRange(affectedRange));
-	}
-
 	[self cutToRegister:command.reg range:affectedRange];
 
 	// correct caret position if we deleted the last character(s) on the line

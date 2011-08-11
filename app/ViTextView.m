@@ -331,6 +331,41 @@ int logIndent = 0;
 	}
 }
 
+- (BOOL)autoNewline
+{
+	if ([self isFieldEditor])
+		return NO;
+	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+		return NO;
+
+	NSString *s = [[self textStorage] string];
+	NSUInteger len = [s length];
+	if (len == 0)
+		return NO;
+
+	unichar lastchar = [s characterAtIndex:len-1];
+	if (![[NSCharacterSet newlineCharacterSet] characterIsMember:lastchar]) {
+		NSRange r = NSMakeRange(len, 0);
+		[self recordReplacementOfRange:r withLength:1];
+		[[self textStorage] replaceCharactersInRange:r withString:@"\n"];
+		r.length = 1;
+		[[self textStorage] setAttributes:[self typingAttributes] range:r];
+		[[[self layoutManager] nextRunloop]  addTemporaryAttribute:ViAutoNewlineAttributeName
+						      value:[NSNumber numberWithInt:1]
+					  forCharacterRange:r];
+		return YES;
+	} else if (len == 1) {
+		if ([[[self layoutManager] nextRunloop] temporaryAttribute:ViAutoNewlineAttributeName
+					    atCharacterIndex:0
+					      effectiveRange:NULL]) {
+			NSRange r = NSMakeRange(0, 1);
+			[self recordReplacementOfRange:r withLength:0];
+			[[self textStorage] replaceCharactersInRange:r withString:@""];
+			return YES;
+		}
+	}
+}
+
 - (void)replaceCharactersInRange:(NSRange)aRange
                       withString:(NSString *)aString
                        undoGroup:(BOOL)undoGroup
@@ -372,8 +407,8 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
-
 	[self setMark:'.' atLocation:aRange.location];
+	[self autoNewline];
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
@@ -425,6 +460,8 @@ int logIndent = 0;
 		DEBUG(@"modify_start_location %lu -> %lu", modify_start_location, modify_start_location + delta);
 		modify_start_location += delta;
 	}
+
+	[self autoNewline];
 }
 
 - (unichar)characterAtIndex:(NSUInteger)location

@@ -1,5 +1,3 @@
-* se om man kan tvinga fram att alltid ha en newline på sista raden
-
 * regression: can't :edit a directory
 
 * regression: word completion includes current word
@@ -33,11 +31,6 @@
 * less lame notification of modified documents in tabs (don't append * in title!)
 
 * replace ViError class with NSError category
-
-* When deleting (dd) last line and pasting it in other place, blank
-  line is pasted, while if pasting back to the last line - it pastes
-  normally. Also if pasting back (P) on the last line, it pastes both
-  blank and the line.
 
 * @godDLL: can I have a preference to open new files that were opened
   externally (double-click in Finder, vicotool, etc) not in a new tab, not

@@ -3,6 +3,7 @@
 
 #define ViSmartPairAttributeName @"ViSmartPair"
 #define ViAutoIndentAttributeName @"ViAutoIndent"
+#define ViAutoNewlineAttributeName @"ViAutoNewline"
 #define ViContinuationAttributeName @"ViContinuation"
 
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"

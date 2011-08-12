@@ -999,7 +999,8 @@
 	}
 
 	NSRange lineRange;
-	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
+	NSUInteger loc = IMIN([self caret], [[self textStorage] length] - 1);
+	NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:loc];
 	[[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 	if (lineRange.location == 0) {
 		MESSAGE(@"Already at the beginning of the file");

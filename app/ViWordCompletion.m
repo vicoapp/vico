@@ -14,13 +14,14 @@
 		return nil;
 	}
 
+	NSUInteger wordlen = [word length];
+
 	ViTextStorage *textStorage = [text textStorage];
-	NSUInteger currentLocation = [text caret];
+	NSUInteger currentLocation = [text caret] - wordlen;
 
 	BOOL fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 	NSString *pattern;
-	NSUInteger wordlen = [word length];
 	if (wordlen == 0) {
 		pattern = @"\\b\\w{3,}";
 	} else if (fuzzyTrigger) { /* Fuzzy completion trigger. */
@@ -43,6 +44,7 @@
 	NSArray *foundMatches = [rx allMatchesInString:[textStorage string]
 					       options:rx_options];
 
+	NSMutableSet *uniqWords = [NSMutableSet set];
 	NSMutableSet *uniq = [NSMutableSet set];
 	for (ViRegexpMatch *m in foundMatches) {
 		NSRange r = [m rangeOfMatchedString];
@@ -50,6 +52,8 @@
 			/* Don't include the word we're about to complete. */
 			continue;
 		NSString *content = [[textStorage string] substringWithRange:r];
+		if ([uniqWords containsObject:content])
+			continue;
 		ViCompletion *c;
 		if (fuzzySearch)
 			c = [ViCompletion completionWithContent:content fuzzyMatch:m];
@@ -59,6 +63,7 @@
 		}
 		c.location = r.location;
 		[uniq addObject:c];
+		[uniqWords addObject:content];
 	}
 
 	BOOL sortDescending = ([options rangeOfString:@"d"].location != NSNotFound);

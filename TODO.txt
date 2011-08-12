@@ -1,7 +1,5 @@
 * regression: can't :edit a directory
 
-* regression: word completion includes current word
-
 * regression: pwd doesn't work (ex.messages not kept)
 
 * don't overwrite read-only files!

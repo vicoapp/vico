@@ -8,6 +8,7 @@
 ;(ex define:">"			syntax:"rc"	as:"ex_shift_right:")
 ((ex define:'("buffer" "b")	syntax:"E1"	as:"ex_buffer:")	setCompletion:(ViBufferCompletion new))
 ((ex define:"sbuffer"		syntax:"E1"	as:"ex_buffer:")	setCompletion:(ViBufferCompletion new))
+((ex define:"vbuffer"		syntax:"E1"	as:"ex_buffer:")	setCompletion:(ViBufferCompletion new))
 ((ex define:"tbuffer"		syntax:"E1"	as:"ex_buffer:")	setCompletion:(ViBufferCompletion new))
 ((ex define:"bdelete"		syntax:"!e1"	as:"ex_bdelete:")	setCompletion:(ViBufferCompletion new))
 (ex define:'("cd" "chdir")	syntax:"!e1x"	as:"ex_cd:")

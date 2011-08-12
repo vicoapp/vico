@@ -238,6 +238,7 @@ static ViWindowController	*currentWindowController = nil;
 	[tabBar setShowAddTabButton:YES];
 	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update for this to work without NSTabview
 
+	[[self window] setOpaque:NO];
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
 

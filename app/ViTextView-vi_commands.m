@@ -340,8 +340,10 @@
 		[self endUndoGroup];
 		final_location = range.location;
 		[self setCaret:final_location];
-	} else
+	} else {
 		MESSAGE(@"filter exited with status %i", status);
+		keepMessagesHack = YES;
+	}
 }
 
 - (void)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand
@@ -2616,13 +2618,16 @@
 		}
 
 		ex.caret = final_location;
-		if (![self evalExCommand:ex]) {
+		BOOL ok = [self evalExCommand:ex];
+		DEBUG(@"messages: %@", ex.messages);
+		if ([ex.messages count] > 0) {
+			MESSAGE(@"%@", [ex.messages lastObject]);
+			keepMessagesHack = YES;
+		}
+		if (!ok) {
 			DEBUG(@"ex command failed: %@", ex);
 			return NO;
 		}
-		DEBUG(@"messages: %@", ex.messages);
-		if ([ex.messages count] > 0)
-			MESSAGE(@"%@", [ex.messages lastObject]);
 		final_location = ex.caret;
 		[self setCaret:ex.caret];
 	}

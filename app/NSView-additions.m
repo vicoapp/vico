@@ -91,13 +91,13 @@
 		@catch (NSException *exception) {
 			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
 			INFO(@"context was: %@", [expression context]);
-			MESSAGE(@"Got exception %@: %@", [exception name], [exception reason]);
+			[ex message:[NSString stringWithFormat:@"Got exception %@: %@", [exception name], [exception reason]]];
 			return NO;
 		}
 	} else {
 		id target = [self targetForSelector:ex.mapping.action];
 		if (target == nil) {
-			MESSAGE(@"The %@ command is not implemented.", ex.mapping.name);
+			[ex message:[NSString stringWithFormat:@"The %@ command is not implemented.", ex.mapping.name]];
 			return NO;
 		} else {
 			@try {
@@ -106,7 +106,7 @@
 			@catch (NSException *exception) {
 				INFO(@"got exception %@ while evaluating ex command %@:\n%@",
 					[exception name], ex.mapping.name, [exception reason]);
-				MESSAGE(@"Got exception %@: %@", [exception name], [exception reason]);
+				[ex message:[NSString stringWithFormat:@"Got exception %@: %@", [exception name], [exception reason]]];
 				return NO;
 			}
 		}
@@ -116,15 +116,13 @@
 	if (result == nil || [result isKindOfClass:[NSNull class]]) {
 		return YES;
 	} else if ([result isKindOfClass:[NSError class]]) {
-		DEBUG(@"%@", [result localizedDescription]);
-		MESSAGE(@"%@", [result localizedDescription]);
+		DEBUG(@"got error: %@", [result localizedDescription]);
+		[ex message:[result localizedDescription]];
 		return NO;
-#if 1
 	} else if ([result isKindOfClass:[NSString class]]) {
+		/* FIXME: I'm not sure we should handle returned strings this way... */
 		[ex message:result];
-		// MESSAGE(@"%@", result);
 		return YES;
-#endif
 	} else if ([result respondsToSelector:@selector(boolValue)] && [result boolValue])
 		return YES;
 	return NO;

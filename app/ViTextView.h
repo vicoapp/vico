@@ -50,6 +50,7 @@
 	NSRange			 affectedRange;
 	NSUInteger		 start_location, end_location, final_location;
 	NSUInteger		 modify_start_location;
+	BOOL			 keepMessagesHack;
 
 	NSRange			 snippetMatchRange;
 

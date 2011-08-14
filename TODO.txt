@@ -1,6 +1,6 @@
-* regression: can't :edit a directory
+! vertical splits are buggy
 
-* regression: pwd doesn't work (ex.messages not kept)
+* regression: can't :edit a directory
 
 * don't overwrite read-only files!
 

@@ -364,6 +364,8 @@ int logIndent = 0;
 			return YES;
 		}
 	}
+
+	return NO;
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange
@@ -1909,8 +1911,9 @@ int logIndent = 0;
 	if (!replayingInput)
 		[self scrollToCaret];
 
-	if (ok)
+	if (ok && !keepMessagesHack)
 		[self updateStatus];
+	keepMessagesHack = NO;
 
 	return ok;
 }

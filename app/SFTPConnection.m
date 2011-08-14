@@ -1177,7 +1177,7 @@ resp2txt(int type)
 		      onResponse:(void (^)(NSError *))responseCallback
 {
 	void (^originalCallback)(NSError *) = [responseCallback copy];
-	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"pa", path, [NSDictionary dictionary]];
+	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"sa", path, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])

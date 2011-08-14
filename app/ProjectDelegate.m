@@ -642,19 +642,12 @@
 		parent = rootURL;
 
 	[self rescanURL:parent];
+}
 
-#if 0
-	NSInteger row = [explorer selectedRow];
-
-	NSURL *url = rootURL;
+- (IBAction)flushCache:(id)sender
+{
 	[[ViURLManager defaultManager] flushDirectoryCache];
-	[self browseURL:url];
-
-	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-		byExtendingSelection:NO];
-	[explorer scrollRowToVisible:row];
-	explorer.lastSelectedRow = row;
-#endif
+	[self browseURL:rootURL andDisplay:YES jump:NO];
 }
 
 - (IBAction)revealInFinder:(id)sender
@@ -812,6 +805,19 @@
 	     [menuItem action] == @selector(newFolder:) ||
 	     [menuItem action] == @selector(newDocument:)))
 		return NO;
+
+	if ([menuItem action] == @selector(rescan:)) {
+		ProjectFile *pf = [explorer itemAtRow:[explorer selectedRow]];
+		if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
+			pf = [explorer parentForItem:pf];
+
+		NSURL *parent;
+		if (pf)
+			parent = [pf url];
+		else
+			parent = rootURL;
+		[menuItem setTitle:[NSString stringWithFormat:@"Rescan folder \"%@\"", [[parent path] lastPathComponent]]];
+	}
 
 	return YES;
 }

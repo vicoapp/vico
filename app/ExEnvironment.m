@@ -22,6 +22,8 @@
 	int status = [filterTask terminationStatus];
 	DEBUG(@"status = %d", status);
 
+	[filterStream close];
+
 	if (filterFailed)
 		status = -1;
 

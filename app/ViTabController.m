@@ -112,7 +112,7 @@
 
 	if ([split isVertical] == isVertical) {
 		// Just add another view to this split
-		[split addSubview:[newViewController view]];
+		[split addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
 		[split adjustSubviews];
 		[self normalizeSplitView:split];
 	} else {
@@ -128,7 +128,7 @@
 		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 		[split replaceSubview:view with:newSplit];
 		[newSplit addSubview:view];
-		[newSplit addSubview:[newViewController view]];
+		[newSplit addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
 		[newSplit adjustSubviews];
 		[self normalizeSplitView:newSplit];
 	}

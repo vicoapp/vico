@@ -148,7 +148,7 @@
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
 
-	explorerView.sourceHighlight = YES;
+	explorerView.backgroundColor = [explorer backgroundColor];
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"explorecaseignore"

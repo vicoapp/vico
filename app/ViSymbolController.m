@@ -37,7 +37,7 @@
 
 	separatorCell = [[ViSeparatorCell alloc] init];
 
-	symbolsView.sourceHighlight = YES;
+	symbolsView.backgroundColor = [symbolView backgroundColor];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(firstResponderChanged:)

@@ -1,6 +1,6 @@
 @interface ViBgView : NSView
 {
-	BOOL sourceHighlight;
+	NSColor *backgroundColor;
 }
-@property(nonatomic,readwrite) BOOL sourceHighlight;
+@property (nonatomic,readwrite,assign) NSColor *backgroundColor;
 @end

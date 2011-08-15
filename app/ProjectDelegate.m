@@ -919,6 +919,8 @@
 		[self explorerClick:sender];
 }
 
+#if 0
+
 - (void)showAltFilterField
 {
 	if ([altFilterField isHidden]) {
@@ -937,7 +939,7 @@
 		[[altFilterField animator] setFrame:NSMakeRect(1, explorerFrame.size.height - 23, explorerFrame.size.width - 2, 22)];
 
 		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
-		animation.delegate = nil;
+		animation.delegate = self;
 
 		[NSAnimationContext endGrouping];
 	}
@@ -954,7 +956,6 @@
 			[[altFilterField cell] calcDrawInfo:[altFilterField frame]];
 		}
 	}
-	isHidingAltFilterField = NO;
 }
 
 - (void)hideAltFilterField
@@ -981,6 +982,32 @@
 		[NSAnimationContext endGrouping];
 	}
 }
+
+#else
+
+- (void)showAltFilterField
+{
+	if ([altFilterField isHidden]) {
+		NSRect explorerFrame = [explorerView frame];
+		NSRect frame = [scrollView frame];
+		frame.size.height = explorerFrame.size.height - 23 - 24;
+		[scrollView setFrame:frame];
+                [altFilterField setHidden:NO];
+	}
+}
+
+- (void)hideAltFilterField
+{
+	if (![altFilterField isHidden]) {
+		NSRect explorerFrame = [explorerView frame];
+		NSRect frame = [scrollView frame];
+		frame.size.height = explorerFrame.size.height - 23;
+		[scrollView setFrame:frame];
+                [altFilterField setHidden:YES];
+	}
+}
+
+#endif
 
 - (IBAction)searchFiles:(id)sender
 {
@@ -1154,8 +1181,10 @@
 
 - (IBAction)filterFiles:(id)sender
 {
-	NSString *filter = [filterField stringValue];
-	if ([filter length] == 0)
+	NSString *filter;
+	if ([altFilterField isHidden])
+		filter = [filterField stringValue];
+	else
 		filter = [altFilterField stringValue];
 
 	if ([filter length] == 0) {

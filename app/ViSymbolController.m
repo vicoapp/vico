@@ -9,6 +9,7 @@
 #import "ViWindow.h"
 
 @interface ViSymbolController (private)
+- (BOOL)symbolListIsOpen;
 - (void)showAltFilterField;
 - (void)hideAltFilterField;
 @end
@@ -51,12 +52,15 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == symbolFilterField || view == altFilterField)
+	if (view == symbolFilterField || view == altSymbolFilterField)
 		[self openSymbolListTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
 			return;
-		[self closeSymbolList];
+		if (closeSymbolListAfterUse) {
+			[self closeSymbolList];
+			closeSymbolListAfterUse = NO;
+		}
 		[self hideAltFilterField];
 	}
 }
@@ -87,12 +91,6 @@
 	}
 }
 
-- (BOOL)symbolListVisible
-{
-	NSView *view = [[splitView subviews] objectAtIndex:2];
-	return ![splitView isSubviewCollapsed:view];
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary *)change
@@ -104,7 +102,7 @@
 	dirty = YES;
 	[reloadTimer invalidate];
 
-	if ([self symbolListVisible])
+	if ([self symbolListIsOpen])
 		reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
 							       target:self
 							     selector:@selector(symbolsUpdate:)
@@ -132,26 +130,28 @@
 
 - (void)closeSymbolList
 {
-	if (closeSymbolListAfterUse) {
-		NSRect frame = [splitView frame];
-		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
-		closeSymbolListAfterUse = NO;
-	}
+	width = [symbolsView frame].size.width;
+	NSRect frame = [splitView frame];
+	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
+	[windowController focusEditor];
 }
 
 - (void)resetSymbolList
 {
 	[symbolFilterField setStringValue:@""];
-	[altFilterField setStringValue:@""];
+	[altSymbolFilterField setStringValue:@""];
 	[self hideAltFilterField];
 	[self filterSymbols:symbolFilterField];
 }
 
 - (void)cancelSymbolList
 {
-	[self resetSymbolList];
 	[windowController focusEditorDelayed:nil];
-	[self closeSymbolList];
+	if (closeSymbolListAfterUse) {
+		[self closeSymbolList];
+		closeSymbolListAfterUse = NO;
+	}
+	[self resetSymbolList];
 }
 
 - (IBAction)gotoSymbolAction:(id)sender
@@ -267,38 +267,40 @@
 
 - (void)filterSymbols
 {
-	if ([altFilterField isHidden])
+	if ([altSymbolFilterField isHidden])
 		[self filterSymbols:symbolFilterField];
 	else
-		[self filterSymbols:altFilterField];
+		[self filterSymbols:altSymbolFilterField];
+}
+
+- (BOOL)symbolListIsOpen
+{
+	return ![splitView isSubviewCollapsed:symbolsView];
+}
+
+- (void)openSymbolListTemporarily:(BOOL)temporarily
+{
+	if (![self symbolListIsOpen]) {
+		if (temporarily)
+			closeSymbolListAfterUse = YES;
+		NSRect frame = [splitView frame];
+		[splitView setPosition:frame.size.width - width ofDividerAtIndex:1];
+	}
 }
 
 - (IBAction)toggleSymbolList:(id)sender
 {
-	NSView *view = [[splitView subviews] objectAtIndex:2];
-	NSRect frame = [splitView frame];
-	if ([splitView isSubviewCollapsed:view]) {
-		if (dirty)
-			[self symbolsUpdate:nil];
-		[splitView setPosition:NSWidth(frame) - width ofDividerAtIndex:1];
-	} else {
-		width = [view bounds].size.width;
-		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
-	}
+	if ([self symbolListIsOpen])
+		[self closeSymbolList];
+	else
+		[self openSymbolListTemporarily:NO];
 }
 
-- (void)openSymbolListTemporarily:(BOOL)temporary
-{
-	NSView *view = [[splitView subviews] objectAtIndex:2];
-	if ([splitView isSubviewCollapsed:view]) {
-		closeSymbolListAfterUse = YES;
-		[self toggleSymbolList:nil];
-	}
-}
+#if 0
 
 - (void)showAltFilterField
 {
-	if ([altFilterField isHidden]) {
+	if ([altSymbolFilterField isHidden]) {
 		isHidingAltFilterField = NO;
 		[NSAnimationContext beginGrouping];
 		[[NSAnimationContext currentContext] setDuration:0.1];
@@ -309,12 +311,12 @@
 		frame.size.height = symbolsFrame.size.height - 23 - 24;
 		[[scrollView animator] setFrame:frame];
 
-		[altFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 1, symbolsFrame.size.width - 2, 0)];
-		[altFilterField setHidden:NO];
-		[[altFilterField animator] setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
+		[altSymbolFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 1, symbolsFrame.size.width - 2, 0)];
+		[altSymbolFilterField setHidden:NO];
+		[[altSymbolFilterField animator] setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
 
-		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
-		animation.delegate = nil;
+		CAAnimation *animation = [altSymbolFilterField animationForKey:@"frameOrigin"];
+		animation.delegate = self;
 
 		[NSAnimationContext endGrouping];
 	}
@@ -324,19 +326,18 @@
 {
 	if (flag) {
 		if (isHidingAltFilterField)
-			[altFilterField setHidden:YES];
+			[altSymbolFilterField setHidden:YES];
 		else {
 			NSRect symbolsFrame = [symbolsView frame];
-			[altFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
-			[[altFilterField cell] calcDrawInfo:[altFilterField frame]];
+			[altSymbolFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
+			[[altSymbolFilterField cell] calcDrawInfo:[altSymbolFilterField frame]];
 		}
 	}
-	isHidingAltFilterField = NO;
 }
 
 - (void)hideAltFilterField
 {
-	if (![altFilterField isHidden]) {
+	if (![altSymbolFilterField isHidden]) {
 		isHidingAltFilterField = YES;
 		[NSAnimationContext beginGrouping];
 		[[NSAnimationContext currentContext] setDuration:0.1];
@@ -347,17 +348,43 @@
 		frame.size.height = symbolsFrame.size.height - 23;
 		[[scrollView animator] setFrame:frame];
 
-		NSRect altFrame = [altFilterField frame];
+		NSRect altFrame = [altSymbolFilterField frame];
 		altFrame.size.height = 2;
 		altFrame.origin = NSMakePoint(1, symbolsFrame.size.height - 1);
-		[[altFilterField animator] setFrame:altFrame];
+		[[altSymbolFilterField animator] setFrame:altFrame];
 
-		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
+		CAAnimation *animation = [altSymbolFilterField animationForKey:@"frameOrigin"];
 		animation.delegate = self;
 
 		[NSAnimationContext endGrouping];
 	}
 }
+
+#else
+
+- (void)showAltFilterField
+{
+	if ([altSymbolFilterField isHidden]) {
+		NSRect symbolsFrame = [symbolsView frame];
+		NSRect frame = [scrollView frame];
+		frame.size.height = symbolsFrame.size.height - 23 - 24;
+		[scrollView setFrame:frame];
+                [altSymbolFilterField setHidden:NO];
+	}
+}
+
+- (void)hideAltFilterField
+{
+	if (![altSymbolFilterField isHidden]) {
+		NSRect symbolsFrame = [symbolsView frame];
+		NSRect frame = [scrollView frame];
+		frame.size.height = symbolsFrame.size.height - 23;
+		[scrollView setFrame:frame];
+                [altSymbolFilterField setHidden:YES];
+	}
+}
+
+#endif
 
 - (IBAction)searchSymbol:(id)sender
 {
@@ -365,19 +392,14 @@
 	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:symbolFilterField];
 	} else {
-		[window makeFirstResponder:altFilterField];
+		[window makeFirstResponder:altSymbolFilterField];
 		[self showAltFilterField];
 	}
 }
 
 - (IBAction)focusSymbols:(id)sender
 {
-	NSView *view = [[splitView subviews] objectAtIndex:2];
-	if ([splitView isSubviewCollapsed:view]) {
-		closeSymbolListAfterUse = YES;
-		[self toggleSymbolList:nil];
-	}
-
+	[self openSymbolListTemporarily:YES];
 	[window makeFirstResponder:symbolView];
 }
 
@@ -388,7 +410,7 @@
        textView:(NSTextView *)textView
 doCommandBySelector:(SEL)aSelector
 {
-	if (sender != symbolFilterField && sender != altFilterField)
+	if (sender != symbolFilterField && sender != altSymbolFilterField)
 		return NO;
 
 	if (aSelector == @selector(insertNewline:)) { // enter
@@ -444,14 +466,14 @@ doCommandBySelector:(SEL)aSelector
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter;
-	if ([altFilterField isHidden])
+	if ([altSymbolFilterField isHidden])
 		filter = [symbolFilterField stringValue];
 	else
-		filter = [altFilterField stringValue];
+		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
-		[altFilterField setStringValue:@""];
+		[altSymbolFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */
@@ -461,8 +483,7 @@ doCommandBySelector:(SEL)aSelector
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:[windowController currentView]];
 
-	[self closeSymbolList];
-	[windowController focusEditor];
+	[self cancelSymbolList];
 	return YES;
 }
 
@@ -477,14 +498,14 @@ doCommandBySelector:(SEL)aSelector
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter;
-	if ([altFilterField isHidden])
+	if ([altSymbolFilterField isHidden])
 		filter = [symbolFilterField stringValue];
 	else
-		filter = [altFilterField stringValue];
+		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
-		[altFilterField setStringValue:@""];
+		[altSymbolFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */
@@ -496,7 +517,7 @@ doCommandBySelector:(SEL)aSelector
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:[windowController currentView]];
 
-	[self closeSymbolList];
+	[self cancelSymbolList];
 }
 
 - (BOOL)split_open:(ViCommand *)command
@@ -527,14 +548,14 @@ doCommandBySelector:(SEL)aSelector
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter;
-	if ([altFilterField isHidden])
+	if ([altSymbolFilterField isHidden])
 		filter = [symbolFilterField stringValue];
 	else
-		filter = [altFilterField stringValue];
+		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
-		[altFilterField setStringValue:@""];
+		[altSymbolFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */
@@ -543,7 +564,7 @@ doCommandBySelector:(SEL)aSelector
 	if (symbol)
 		[windowController gotoSymbol:symbol inView:docView];
 
-	[self closeSymbolList];
+	[self cancelSymbolList];
 	return YES;
 }
 

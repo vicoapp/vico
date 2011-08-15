@@ -10,7 +10,7 @@
 	IBOutlet ViWindowController *windowController;
 	IBOutlet ViOutlineView *symbolView;
 	IBOutlet NSSearchField *symbolFilterField;
-	IBOutlet NSSearchField *altFilterField;
+	IBOutlet NSSearchField *altSymbolFilterField;
 	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
 	IBOutlet ViBgView *symbolsView;
 	IBOutlet NSToolbarItem *searchToolbarItem;
@@ -38,7 +38,7 @@
 - (IBAction)focusSymbols:(id)sender;
 - (void)openSymbolListTemporarily:(BOOL)temporary;
 - (void)closeSymbolList;
-- (BOOL)symbolListVisible;
+- (BOOL)symbolListIsOpen;
 - (void)symbolsUpdate:(NSTimer *)aTimer;
 
 @end

@@ -623,7 +623,7 @@ additionalBindings:(NSDictionary *)bindings
 			else
 				[item setTitle:@"Show File Explorer"];
 		} else if (item == showSymbolListMenuItem) {
-			if (isDocWindow && [[windowController symbolController] symbolListVisible])
+			if (isDocWindow && [[windowController symbolController] symbolListIsOpen])
 				[item setTitle:@"Hide Symbol List"];
 			else
 				[item setTitle:@"Show Symbol List"];

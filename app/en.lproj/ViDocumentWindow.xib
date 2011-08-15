@@ -86,11 +86,9 @@
 							<string key="NSToolbarItemPaletteLabel">Search Symbols</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSSearchField" key="NSToolbarItemView" id="386026254">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">290</int>
 								<string key="NSFrame">{{0, 14}, {150, 22}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSSearchFieldCell" key="NSCell" id="843846799">
 									<int key="NSCellFlags">343539264</int>
@@ -171,11 +169,9 @@
 							<string key="NSToolbarItemPaletteLabel">Symbol List</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSButton" key="NSToolbarItemView" id="241432242">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{18, 14}, {33, 25}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<int key="NSTag">102</int>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="364245931">
@@ -215,11 +211,9 @@
 							<string key="NSToolbarItemPaletteLabel">Open files</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSPopUpButton" key="NSToolbarItemView" id="560856931">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{0, 14}, {200, 25}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<int key="NSTag">101</int>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSPopUpButtonCell" key="NSCell" id="993252389">
@@ -266,11 +260,9 @@
 							<string key="NSToolbarItemPaletteLabel">Jumplist</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSSegmentedControl" key="NSToolbarItemView" id="917346266">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{0, 14}, {60, 25}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<int key="NSTag">103</int>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSSegmentedCell" key="NSCell" id="976780760">
@@ -324,11 +316,9 @@
 							<string key="NSToolbarItemPaletteLabel">Explorer</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSButton" key="NSToolbarItemView" id="69192991">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{10, 14}, {33, 25}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<int key="NSTag">104</int>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="10690366">
@@ -368,11 +358,9 @@
 							<string key="NSToolbarItemPaletteLabel">Search Files</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSSearchField" key="NSToolbarItemView" id="495051577">
-								<reference key="NSNextResponder"/>
+								<nil key="NSNextResponder"/>
 								<int key="NSvFlags">290</int>
 								<string key="NSFrame">{{0, 14}, {144, 22}}</string>
-								<reference key="NSSuperview"/>
-								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSSearchFieldCell" key="NSCell" id="729951497">
 									<int key="NSCellFlags">343014976</int>
@@ -2449,14 +2437,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">altFilterField</string>
-						<reference key="source" ref="687101210"/>
-						<reference key="destination" ref="953307252"/>
-					</object>
-					<int key="connectionID">100755</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="953307252"/>
 						<reference key="destination" ref="687101210"/>
@@ -2478,6 +2458,14 @@
 						<reference key="destination" ref="953307252"/>
 					</object>
 					<int key="connectionID">100759</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">altSymbolFilterField</string>
+						<reference key="source" ref="687101210"/>
+						<reference key="destination" ref="953307252"/>
+					</object>
+					<int key="connectionID">100761</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3459,7 +3447,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100759</int>
+			<int key="maxID">100761</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3799,7 +3787,7 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="altFilterField">NSSearchField</string>
+						<string key="altSymbolFilterField">NSSearchField</string>
 						<string key="scrollView">NSScrollView</string>
 						<string key="searchToolbarItem">NSToolbarItem</string>
 						<string key="splitView">NSSplitView</string>
@@ -3810,8 +3798,8 @@
 						<string key="windowController">ViWindowController</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="altFilterField">
-							<string key="name">altFilterField</string>
+						<object class="IBToOneOutletInfo" key="altSymbolFilterField">
+							<string key="name">altSymbolFilterField</string>
 							<string key="candidateClassName">NSSearchField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="scrollView">

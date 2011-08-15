@@ -15,6 +15,7 @@
 #import "ViCommon.h"
 #import "NSURL-additions.h"
 #import "ViBgView.h"
+#import "ViWindow.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -984,7 +985,7 @@
 - (IBAction)searchFiles:(id)sender
 {
 	NSToolbar *toolbar = [window toolbar];
-	if ([toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
+	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:filterField];
 	} else {
 		[window makeFirstResponder:altFilterField];

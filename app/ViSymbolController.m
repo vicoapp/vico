@@ -6,6 +6,7 @@
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViBgView.h"
+#import "ViWindow.h"
 
 @interface ViSymbolController (private)
 - (void)showAltFilterField;
@@ -361,7 +362,7 @@
 - (IBAction)searchSymbol:(id)sender
 {
 	NSToolbar *toolbar = [window toolbar];
-	if ([toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
+	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:symbolFilterField];
 	} else {
 		[window makeFirstResponder:altFilterField];

@@ -35,4 +35,9 @@
 	[[self windowController] selectPreviousTab:sender];
 }
 
+- (BOOL)isFullScreen
+{
+	return ([self styleMask] & NSFullScreenWindowMask) == NSFullScreenWindowMask;
+}
+
 @end

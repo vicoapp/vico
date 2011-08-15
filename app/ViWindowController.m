@@ -543,21 +543,15 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)checkBaseURL:(NSURL *)url onCompletion:(void (^)(NSURL *url, NSError *error))aBlock
 {
-//	if (error == nil && [[url lastPathComponent] isEqualToString:@""])
-//		url = [NSURL URLWithString:[conn home] relativeToURL:url];
-
 	id<ViDeferred> deferred = [[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
 		if (error)
-			[self message:@"%@: %@", [url absoluteString], [error localizedDescription]];
+			aBlock(nil, [ViError errorWithFormat:@"%@: %@", [url path], [error localizedDescription]]);
 		else if (normalizedURL == nil)
-			[self message:@"%@: no such file or directory", [url absoluteString]];
+			aBlock(nil, [ViError errorWithFormat:@"%@: no such file or directory", [url path]]);
 		else if (!isDirectory)
-			[self message:@"%@: not a directory", [normalizedURL absoluteString]];
-		else {
-			aBlock(normalizedURL, error);
-			return;
-		}
-		aBlock(nil, error);
+			aBlock(nil, [ViError errorWithFormat:@"%@: not a directory", [normalizedURL path]]);
+		else
+			aBlock(normalizedURL, nil);
 	}];
 	[deferred setDelegate:self];
 }

@@ -1309,6 +1309,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	ViDocumentView *dv;
 	for (dv in views)
 		[self enableLineNumbers:flag forScrollView:[[dv textView] enclosingScrollView]];
+	if (hiddenView)
+		[self enableLineNumbers:flag forScrollView:[[hiddenView textView] enclosingScrollView]];
 }
 
 - (IBAction)toggleLineNumbers:(id)sender

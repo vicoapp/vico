@@ -722,6 +722,10 @@ resp2txt(int type)
 		switch (*p) {
 		case 's': /* string */
 			s = va_arg(ap, NSString *);
+			if (s == NULL) {
+				INFO(@"%s", "NULL parameter");
+				return nil;
+			}
 			string = [s UTF8String];
 			len = (uint32_t)strlen(string); /* XXX: doesn't allow null bytes */
 			tmp = CFSwapInt32HostToBig(len);
@@ -998,6 +1002,7 @@ resp2txt(int type)
 		path = [home stringByAppendingPathComponent:[path substringFromIndex:2]];
 	else
 		return [aURL absoluteURL];
+	path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	return [[NSURL URLWithString:path relativeToURL:aURL] absoluteURL];
 }
 
@@ -1006,6 +1011,11 @@ resp2txt(int type)
 {
 	DEBUG(@"url = [%@]", url);
 	url = [self normalizeURL:url];
+
+	if (url == nil) {
+		responseCallback(nil, nil, [ViError errorWithFormat:@"nil URL passed"]);
+		return nil;
+	}
 
 	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:remoteVersion == 0 ? SSH2_FXP_STAT_VERSION_0 : SSH2_FXP_LSTAT format:"s", [url path]];

@@ -331,7 +331,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		 * XXX: This is a f*cking disaster!
 		 * Ask each windows' window controller if it contains this document.
 		 */
-		 windowController = nil;
+		windowController = nil;
 		for (NSWindow *window in [NSApp windows]) {
 			ViWindowController *wincon = [window windowController];
 			if (wincon == aController || ![wincon isKindOfClass:[ViWindowController class]])
@@ -851,6 +851,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super close];
 	[[ViEventManager defaultManager] emitDelayed:ViEventDidCloseDocument for:self with:self, nil];
 	[[[ViEventManager defaultManager] nextRunloop] clearFor:self];
+
+	[textStorage setDelegate:nil];
 }
 
 - (void)close

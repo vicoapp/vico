@@ -70,6 +70,13 @@
 	BOOL isFiltering;
 
 	ViJumpList *history;
+
+        /*
+         * Since we can't pass an object through a void* contextInfo and
+         * expect the object to survive garbage collection, store a strong
+         * reference here.
+         */
+	NSMutableSet *contextObjects;
 }
 
 @property(nonatomic,readwrite,assign) id delegate;

@@ -117,6 +117,7 @@
 		[history setDelegate:self];
 		font = [NSFont systemFontOfSize:11.0];
 		expandedSet = [NSMutableSet set];
+		contextObjects = [NSMutableSet set];
 		width = 200.0;
 	}
 	return self;
@@ -562,6 +563,20 @@
 	}
 }
 
+- (void)deletedOpenDocumentsAlertDidEnd:(NSAlert *)alert
+			     returnCode:(NSInteger)returnCode
+			    contextInfo:(void *)contextInfo
+{
+	NSMutableSet *openDocs = contextInfo; // object survived because we also stored a strong reference in contextObjects
+
+	if (returnCode != NSAlertFirstButtonReturn) {
+		for (ViDocument *doc in openDocs)
+			[doc closeAndWindow:NO];
+	}
+
+	[contextObjects removeObject:openDocs];
+}
+
 - (void)removeAlertDidEnd:(NSAlert *)alert
                returnCode:(NSInteger)returnCode
               contextInfo:(void *)contextInfo
@@ -582,6 +597,7 @@
 			[NSApp presentError:error];
 
 		NSMutableSet *set = [NSMutableSet set];
+		NSMutableSet *openDocs = [NSMutableSet set];
 		for (NSURL *url in urls) {
 			id item = [self findItemWithURL:url];
 			id parent = [explorer parentForItem:item];
@@ -589,6 +605,11 @@
 				[set addObject:rootURL];
 			else
 				[set addObject:[parent url]];
+
+			ViDocumentController *docController = [ViDocumentController sharedDocumentController];
+			ViDocument *doc = [docController documentForURLQuick:url];
+			if (doc)
+				[openDocs addObject:doc];
 		}
 
 		for (NSURL *url in set)
@@ -596,6 +617,30 @@
 
 		if (isFiltered)
 			[self resetExplorerView];
+		[self cancelExplorer];
+
+		for (ViDocument *doc in openDocs) {
+			[doc updateChangeCount:NSChangeReadOtherContents];
+			doc.isTemporary = YES;
+		}
+
+		NSUInteger nopen = [openDocs count];
+		if (nopen > 0) {
+			const char *pluralS = (nopen == 1 ? "" : "s");
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:[NSString stringWithFormat:@"Do you want to keep the deleted document%s open?", pluralS]];
+			[alert addButtonWithTitle:[NSString stringWithFormat:@"Keep document%s open", pluralS]];
+			[alert addButtonWithTitle:[NSString stringWithFormat:@"Close deleted document%s", pluralS]];
+			[alert setInformativeText:[NSString stringWithFormat:@"%lu open document%s was deleted. Any unsaved changes will be lost if the document%s %s closed.", nopen, pluralS, pluralS, nopen == 1 ? "is" : "are"]];
+			[alert setAlertStyle:NSWarningAlertStyle];
+
+			[contextObjects addObject:openDocs];
+			[alert beginSheetModalForWindow:window
+					  modalDelegate:self
+					 didEndSelector:@selector(deletedOpenDocumentsAlertDidEnd:returnCode:contextInfo:)
+					    contextInfo:openDocs];
+
+		}
 	}];
 }
 

@@ -39,6 +39,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
 - (void)updateTabSize;
 - (void)updateWrapping;
+- (void)eachTextView:(void (^)(ViTextView *))callback;
 @end
 
 @implementation ViDocument
@@ -225,10 +226,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[[ViEventManager defaultManager] emitDelayed:ViEventDidLoadDocument for:self with:self, nil];
 			[self message:@"%@: %lu lines", [self title], [textStorage lineCount]];
 
-			for (ViDocumentView *dv in views) {
-				ViTextView *tv = [dv textView];
+			[self eachTextView:^(ViTextView *tv) {
 				[tv documentDidLoad:self];
-			}
+			}];
 		}
 	};
 
@@ -243,10 +243,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	DEBUG(@"got deferred loader %@", loader);
 	[loader setDelegate:self];
 
-	for (ViDocumentView *dv in views) {
-		ViTextView *tv = [dv textView];
+	[self eachTextView:^(ViTextView *tv) {
 		[tv setCaret:0];
-	}
+	}];
 
 	if (outError)
 		*outError = returnError;
@@ -290,11 +289,11 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		   [keyPath isEqualToString:@"fontname"])
 		[self setTypingAttributes];
 	else if ([keyPath isEqualToString:@"list"]) {
-		for (ViDocumentView *dv in views) {
-			ViLayoutManager *lm = (ViLayoutManager *)[[dv textView] layoutManager];
+		[self eachTextView:^(ViTextView *tv) {
+			ViLayoutManager *lm = (ViLayoutManager *)[tv layoutManager];
 			[lm setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
 			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
-		}
+		}];
 	}
 }
 
@@ -361,6 +360,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	[self addWindowController:winCon];
 	[winCon addNewTab:self];
+}
+
+- (void)eachTextView:(void (^)(ViTextView *))callback
+{
+	for (ViDocumentView *docView in views)
+		callback([docView innerView]);
+	if (hiddenView)
+		callback([hiddenView innerView]);
 }
 
 - (void)removeView:(ViDocumentView *)aDocumentView
@@ -915,11 +922,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
                 atEnd:(BOOL)flag
 {
-	for (ViDocumentView *dv in views) {
-		ViTextView *tv = [dv textView];
-		if ([tv isKindOfClass:[ViTextView class]])
-			[tv invalidateCaretRect];
-	}
+	[self eachTextView:^(ViTextView *tv) {
+		[tv invalidateCaretRect];
+	}];
 }
 
 - (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager
@@ -991,8 +996,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	/* Invalidate all document views. */
 	NSRange r = NSMakeRange(0, [textStorage length]);
-	for (ViDocumentView *dv in views)
-		[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:r];
+	[self eachTextView:^(ViTextView *tv) {
+		[[tv layoutManager] invalidateDisplayForCharacterRange:r];
+	}];
 
 	if (language == nil) {
 		syntaxParser = nil;
@@ -1030,9 +1036,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	[syntaxParser parseContext:ctx];
 
 	// Invalidate the layout(s).
-	if (ctx.restarting)
-		for (ViDocumentView *dv in views)
-			[[[dv textView] layoutManager] invalidateDisplayForCharacterRange:range];
+	if (ctx.restarting) {
+		[self eachTextView:^(ViTextView *tv) {
+			[[tv layoutManager] invalidateDisplayForCharacterRange:range];
+		}];
+	}
 
 	[self invalidateSymbolsInRange:range];
 
@@ -1306,11 +1314,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)enableLineNumbers:(BOOL)flag
 {
-	ViDocumentView *dv;
-	for (dv in views)
-		[self enableLineNumbers:flag forScrollView:[[dv textView] enclosingScrollView]];
-	if (hiddenView)
-		[self enableLineNumbers:flag forScrollView:[[hiddenView textView] enclosingScrollView]];
+	[self eachTextView:^(ViTextView *tv) {
+		[self enableLineNumbers:flag forScrollView:[tv enclosingScrollView]];
+	}];
 }
 
 - (IBAction)toggleLineNumbers:(id)sender
@@ -1323,9 +1329,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)setWrapping:(BOOL)flag
 {
-	ViDocumentView *dv;
-	for (dv in views)
-		[[dv textView] setWrapping:flag];
+	[self eachTextView:^(ViTextView *tv) {
+		[tv setWrapping:flag];
+	}];
 }
 
 - (NSDictionary *)typingAttributes
@@ -1383,8 +1389,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if ([defs boolForKey:@"showguide"] == NSOnState)
 		pageGuideColumn = [defs integerForKey:@"guidecolumn"];
 
-	for (ViDocumentView *dv in views)
-		[[dv textView] setPageGuide:pageGuideColumn];
+	[self eachTextView:^(ViTextView *tv) {
+		[tv setPageGuide:pageGuideColumn];
+	}];
 }
 
 - (void)message:(NSString *)fmt, ...

@@ -3,6 +3,12 @@
 #import "ViSeparatorCell.h"
 #import "ViDocument.h"
 #import "ViDocumentView.h"
+#import "ViBgView.h"
+
+@interface ViSymbolController (private)
+- (void)showAltFilterField;
+- (void)hideAltFilterField;
+@end
 
 @implementation ViSymbolController
 
@@ -31,6 +37,8 @@
 
 	separatorCell = [[ViSeparatorCell alloc] init];
 
+	symbolsView.sourceHighlight = YES;
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(firstResponderChanged:)
 						     name:ViFirstResponderChangedNotification
@@ -40,12 +48,13 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == symbolFilterField)
+	if (view == symbolFilterField || view == altFilterField)
 		[self openSymbolListTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
 			return;
 		[self closeSymbolList];
+		[self hideAltFilterField];
 	}
 }
 
@@ -125,16 +134,13 @@
 		[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 		closeSymbolListAfterUse = NO;
 	}
-	if (hideToolbarAfterUse) {
-		NSToolbar *toolbar = [window toolbar];
-		[toolbar setVisible:NO];
-		hideToolbarAfterUse = NO;
-	}
 }
 
 - (void)resetSymbolList
 {
 	[symbolFilterField setStringValue:@""];
+	[altFilterField setStringValue:@""];
+	[self hideAltFilterField];
 	[self filterSymbols:symbolFilterField];
 }
 
@@ -258,7 +264,10 @@
 
 - (void)filterSymbols
 {
-	[self filterSymbols:symbolFilterField];
+	if ([altFilterField isHidden])
+		[self filterSymbols:symbolFilterField];
+	else
+		[self filterSymbols:altFilterField];
 }
 
 - (IBAction)toggleSymbolList:(id)sender
@@ -284,24 +293,35 @@
 	}
 }
 
+- (void)showAltFilterField
+{
+	if ([altFilterField isHidden]) {
+		[altFilterField setHidden:NO];
+		NSRect frame = [scrollView frame];
+		frame.size.height -= 24;
+		[scrollView setFrame:frame];
+	}
+}
+
+- (void)hideAltFilterField
+{
+	if (![altFilterField isHidden]) {
+		[altFilterField setHidden:YES];
+		NSRect frame = [scrollView frame];
+		frame.size.height += 24;
+		[scrollView setFrame:frame];
+	}
+}
+
 - (IBAction)searchSymbol:(id)sender
 {
 	NSToolbar *toolbar = [window toolbar];
-	if (![[toolbar items] containsObject:searchToolbarItem]) {
-		NSBeep();
-		return;
+	if ([toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
+		[window makeFirstResponder:symbolFilterField];
+	} else {
+		[window makeFirstResponder:altFilterField];
+		[self showAltFilterField];
 	}
-	hideToolbarAfterUse = ![toolbar isVisible];
-	[toolbar setVisible:YES];
-	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
-		if (hideToolbarAfterUse) {
-			[toolbar setVisible:NO];
-			hideToolbarAfterUse = NO;
-		}
-		NSBeep();
-		return;
-	}
-	[window makeFirstResponder:symbolFilterField];
 }
 
 - (IBAction)focusSymbols:(id)sender
@@ -322,7 +342,7 @@
        textView:(NSTextView *)textView
 doCommandBySelector:(SEL)aSelector
 {
-	if (sender != symbolFilterField)
+	if (sender != symbolFilterField && sender != altFilterField)
 		return NO;
 
 	if (aSelector == @selector(insertNewline:)) { // enter
@@ -360,7 +380,7 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)find:(ViCommand *)command
 {
-	[window makeFirstResponder:symbolFilterField];
+	[self searchSymbol:nil];
 	return YES;
 }
 
@@ -377,10 +397,15 @@ doCommandBySelector:(SEL)aSelector
 	}
 
 	// remember what symbol we selected from the filtered set
-	NSString *filter = [symbolFilterField stringValue];
+	NSString *filter;
+	if ([altFilterField isHidden])
+		filter = [symbolFilterField stringValue];
+	else
+		filter = [altFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
+		[altFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */
@@ -405,10 +430,15 @@ doCommandBySelector:(SEL)aSelector
 		doc = [(ViSymbol *)symbol document];
 
 	// remember what symbol we selected from the filtered set
-	NSString *filter = [symbolFilterField stringValue];
+	NSString *filter;
+	if ([altFilterField isHidden])
+		filter = [symbolFilterField stringValue];
+	else
+		filter = [altFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
+		[altFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */
@@ -450,10 +480,15 @@ doCommandBySelector:(SEL)aSelector
 	}
 
 	// remember what symbol we selected from the filtered set
-	NSString *filter = [symbolFilterField stringValue];
+	NSString *filter;
+	if ([altFilterField isHidden])
+		filter = [symbolFilterField stringValue];
+	else
+		filter = [altFilterField stringValue];
 	if (symbol && [filter length] > 0) {
 		[symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
+		[altFilterField setStringValue:@""];
 	}
 
 	windowController.jumping = YES; /* XXX: need better API! */

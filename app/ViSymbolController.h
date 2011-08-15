@@ -2,6 +2,7 @@
 
 @class ViDocument;
 @class ViWindowController;
+@class ViBgView;
 
 @interface ViSymbolController : NSObject <NSOutlineViewDataSource, ViKeyManagerTarget>
 {
@@ -9,16 +10,17 @@
 	IBOutlet ViWindowController *windowController;
 	IBOutlet ViOutlineView *symbolView;
 	IBOutlet NSSearchField *symbolFilterField;
+	IBOutlet NSSearchField *altFilterField;
 	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
-	IBOutlet NSView *symbolsView;
+	IBOutlet ViBgView *symbolsView;
 	IBOutlet NSToolbarItem *searchToolbarItem;
+	IBOutlet NSScrollView *scrollView;
 
 	CGFloat width;
 	NSCell *separatorCell;
 	NSMutableArray *filteredDocuments;
 	NSMutableDictionary *symbolFilterCache;
 	BOOL closeSymbolListAfterUse;
-	BOOL hideToolbarAfterUse;
 	NSInteger lastSelectedRow;
 	BOOL isFiltered;
 

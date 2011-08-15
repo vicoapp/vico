@@ -12,6 +12,7 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViCommon.h"
 #import "NSURL-additions.h"
+#import "ViBgView.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -36,6 +37,8 @@
      andRenameURL:(NSURL *)renameURL;
 - (void)rescanURL:(NSURL *)aURL;
 - (void)resetExplorerView;
+- (void)showAltFilterField;
+- (void)hideAltFilterField;
 @end
 
 @implementation ProjectFile
@@ -144,6 +147,8 @@
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
+
+	explorerView.sourceHighlight = YES;
 
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"explorecaseignore"
@@ -870,6 +875,8 @@
 - (void)resetExplorerView
 {
 	[filterField setStringValue:@""];
+	[altFilterField setStringValue:@""];
+	[self hideAltFilterField];
 	[self filterFiles:self];
 }
 
@@ -909,30 +916,41 @@
 		[self explorerClick:sender];
 }
 
+- (void)showAltFilterField
+{
+	if ([altFilterField isHidden]) {
+		[altFilterField setHidden:NO];
+		NSRect frame = [scrollView frame];
+		frame.size.height -= 24;
+		[scrollView setFrame:frame];
+	}
+}
+
+- (void)hideAltFilterField
+{
+	if (![altFilterField isHidden]) {
+		[altFilterField setHidden:YES];
+		NSRect frame = [scrollView frame];
+		frame.size.height += 24;
+		[scrollView setFrame:frame];
+	}
+}
+
 - (IBAction)searchFiles:(id)sender
 {
 	NSToolbar *toolbar = [window toolbar];
-	if (![[toolbar items] containsObject:searchToolbarItem]) {
-		NSBeep();
-		return;
+	if ([toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
+		[window makeFirstResponder:filterField];
+	} else {
+		[window makeFirstResponder:altFilterField];
+		[self showAltFilterField];
 	}
-	hideToolbarAfterUse = ![toolbar isVisible];
-	[toolbar setVisible:YES];
-	if (![[toolbar visibleItems] containsObject:searchToolbarItem]) {
-		if (hideToolbarAfterUse) {
-			[toolbar setVisible:NO];
-			hideToolbarAfterUse = NO;
-		}
-		NSBeep();
-		return;
-	}
-	[window makeFirstResponder:filterField];
 }
 
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	if (view == filterField)
+	if (view == filterField || view == altFilterField)
 		[self openExplorerTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:explorerView]) {
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
@@ -941,11 +959,7 @@
 			[self closeExplorer];
 			closeExplorerAfterUse = NO;
 		}
-		if (hideToolbarAfterUse) {
-			NSToolbar *toolbar = [window toolbar];
-			[toolbar setVisible:NO];
-			hideToolbarAfterUse = NO;
-		}
+		[self hideAltFilterField];
 	}
 }
 
@@ -993,11 +1007,6 @@
 	if (closeExplorerAfterUse) {
 		[self closeExplorer];
 		closeExplorerAfterUse = NO;
-	}
-	if (hideToolbarAfterUse) {
-		NSToolbar *toolbar = [window toolbar];
-		[toolbar setVisible:NO];
-		hideToolbarAfterUse = NO;
 	}
 	[self resetExplorerView];
 }
@@ -1100,6 +1109,8 @@
 - (IBAction)filterFiles:(id)sender
 {
 	NSString *filter = [filterField stringValue];
+	if ([filter length] == 0)
+		filter = [altFilterField stringValue];
 
 	if ([filter length] == 0) {
 		isFiltered = NO;
@@ -1186,7 +1197,7 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)find:(ViCommand *)command
 {
-	[window makeFirstResponder:filterField];
+	[self searchFiles:nil];
 	return YES;
 }
 

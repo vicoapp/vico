@@ -7,6 +7,7 @@
 
 @class ViWindowController;
 @class ExEnvironment;
+@class ViBgView;
 
 @interface ProjectFile : NSObject
 {
@@ -37,8 +38,9 @@
 	IBOutlet ViOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;
 	IBOutlet NSSearchField *filterField;
+	IBOutlet NSSearchField *altFilterField;
 	IBOutlet NSSplitView *splitView;
-	IBOutlet NSView *explorerView;
+	IBOutlet ViBgView *explorerView;
 	IBOutlet NSWindow *sftpConnectView;
 	IBOutlet NSForm *sftpConnectForm;
 	IBOutlet NSScrollView *scrollView;
@@ -61,7 +63,6 @@
 	ViRegexp *rx;
 
 	BOOL closeExplorerAfterUse;
-	BOOL hideToolbarAfterUse;
 	IBOutlet id delegate;
 	NSMutableArray *rootItems;
 	ViRegexp *skipRegex;

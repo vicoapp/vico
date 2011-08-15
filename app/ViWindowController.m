@@ -18,6 +18,7 @@
 #import "NSURL-additions.h"
 #import "ExCommand.h"
 #import "ViError.h"
+#import "ViBgView.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;

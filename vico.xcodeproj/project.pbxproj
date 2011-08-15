@@ -233,6 +233,7 @@
 		9A43471513313854002B04DE /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; };
 		9A43471813313894002B04DE /* vico.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A43471613313874002B04DE /* vico.1 */; };
 		9A43471E13313DA3002B04DE /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A43471D13313DA0002B04DE /* ApplicationServices.framework */; };
+		9A4A01C213F94D3F00CCDBA6 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */; };
 		9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4DB02D13B898B400FAE096 /* ExAddress.m */; };
 		9A57990113F0189A00191109 /* ex.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A57990013F0189A00191109 /* ex.nu */; };
 		9A5DD69A13430176006981AE /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
@@ -742,6 +743,9 @@
 		9A434719133138AA002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		9A4A01BF13F94D3F00CCDBA6 /* ExParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExParser.h; sourceTree = "<group>"; };
+		9A4A01C013F94D3F00CCDBA6 /* ViBgView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBgView.h; sourceTree = "<group>"; };
+		9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBgView.m; sourceTree = "<group>"; };
 		9A4DB02C13B898B400FAE096 /* ExAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExAddress.h; sourceTree = "<group>"; };
 		9A4DB02D13B898B400FAE096 /* ExAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExAddress.m; sourceTree = "<group>"; };
 		9A57990013F0189A00191109 /* ex.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ex.nu; sourceTree = "<group>"; };
@@ -1157,9 +1161,12 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9A4A01C013F94D3F00CCDBA6 /* ViBgView.h */,
+				9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */,
 				9ACFF8DF13EC341C0040DB4E /* ExMap.h */,
 				9ACFF8E013EC341C0040DB4E /* ExMap.m */,
 				9ACFF8E113EC341C0040DB4E /* ExParser.m */,
+				9A4A01BF13F94D3F00CCDBA6 /* ExParser.h */,
 				9A4DB02C13B898B400FAE096 /* ExAddress.h */,
 				9A4DB02D13B898B400FAE096 /* ExAddress.m */,
 				9AA48E4B13A60C10009CC5D7 /* NSURL-additions.h */,
@@ -1970,6 +1977,7 @@
 				9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */,
 				9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */,
 				9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */,
+				9A4A01C213F94D3F00CCDBA6 /* ViBgView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

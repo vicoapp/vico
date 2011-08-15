@@ -17,6 +17,7 @@
 @class ViProject;
 @class ViParser;
 @class ExCommand;
+@class ViBgView;
 
 /** A ViWindowController object manages a document window.
  */
@@ -26,7 +27,7 @@
 	IBOutlet NSTabView *tabView;
 	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
 	IBOutlet NSView *mainView;
-	IBOutlet NSView *explorerView;
+	IBOutlet ViBgView *explorerView;
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 	IBOutlet NSTextField *messageField;
 #ifdef TRIAL_VERSION

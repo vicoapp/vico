@@ -48,14 +48,13 @@
 	if (self) {
 		[NSApp setDelegate:self];
 		[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-							  andSelector:@selector(getUrl:withReplyEvent:)
-							forEventClass:kInternetEventClass
-							   andEventID:kAEGetURL];
+								   andSelector:@selector(getUrl:withReplyEvent:)
+								 forEventClass:kInternetEventClass
+								    andEventID:kAEGetURL];
 	}
 	return self;
 }
 
-// Application Delegate method
 // stops the application from creating an untitled document on load
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {

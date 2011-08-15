@@ -298,6 +298,11 @@ static ViWindowController	*currentWindowController = nil;
 	return nil;
 }
 
+- (NSApplicationPresentationOptions)window:(NSWindow *)window willUseFullScreenPresentationOptions:(NSApplicationPresentationOptions)proposedOptions
+{
+	return proposedOptions | NSApplicationPresentationAutoHideToolbar;
+}
+
 - (IBAction)addNewDocumentTab:(id)sender
 {
 	[[NSDocumentController sharedDocumentController] newDocument:self];

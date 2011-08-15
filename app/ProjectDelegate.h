@@ -69,6 +69,7 @@
 
 	BOOL isFiltered;
 	BOOL isFiltering;
+	BOOL isHidingAltFilterField;
 
 	ViJumpList *history;
 

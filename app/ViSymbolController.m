@@ -1,3 +1,5 @@
+#import <Quartz/Quartz.h>
+
 #import "ViSymbolController.h"
 #import "MHTextIconCell.h"
 #import "ViSeparatorCell.h"
@@ -296,20 +298,63 @@
 - (void)showAltFilterField
 {
 	if ([altFilterField isHidden]) {
-		[altFilterField setHidden:NO];
+		isHidingAltFilterField = NO;
+		[NSAnimationContext beginGrouping];
+		[[NSAnimationContext currentContext] setDuration:0.1];
+
+		NSRect symbolsFrame = [symbolsView frame];
+
 		NSRect frame = [scrollView frame];
-		frame.size.height -= 24;
-		[scrollView setFrame:frame];
+		frame.size.height = symbolsFrame.size.height - 23 - 24;
+		[[scrollView animator] setFrame:frame];
+
+		[altFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 1, symbolsFrame.size.width - 2, 0)];
+		[altFilterField setHidden:NO];
+		[[altFilterField animator] setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
+
+		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
+		animation.delegate = nil;
+
+		[NSAnimationContext endGrouping];
 	}
+}
+
+- (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag
+{
+	if (flag) {
+		if (isHidingAltFilterField)
+			[altFilterField setHidden:YES];
+		else {
+			NSRect symbolsFrame = [symbolsView frame];
+			[altFilterField setFrame:NSMakeRect(1, symbolsFrame.size.height - 23, symbolsFrame.size.width - 2, 22)];
+			[[altFilterField cell] calcDrawInfo:[altFilterField frame]];
+		}
+	}
+	isHidingAltFilterField = NO;
 }
 
 - (void)hideAltFilterField
 {
 	if (![altFilterField isHidden]) {
-		[altFilterField setHidden:YES];
+		isHidingAltFilterField = YES;
+		[NSAnimationContext beginGrouping];
+		[[NSAnimationContext currentContext] setDuration:0.1];
+
+		NSRect symbolsFrame = [symbolsView frame];
+
 		NSRect frame = [scrollView frame];
-		frame.size.height += 24;
-		[scrollView setFrame:frame];
+		frame.size.height = symbolsFrame.size.height - 23;
+		[[scrollView animator] setFrame:frame];
+
+		NSRect altFrame = [altFilterField frame];
+		altFrame.size.height = 2;
+		altFrame.origin = NSMakePoint(1, symbolsFrame.size.height - 1);
+		[[altFilterField animator] setFrame:altFrame];
+
+		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
+		animation.delegate = self;
+
+		[NSAnimationContext endGrouping];
 	}
 }
 

@@ -26,6 +26,7 @@
 
 	NSTimer *reloadTimer;
 	BOOL dirty;
+	BOOL isHidingAltFilterField;
 }
 
 - (void)filterSymbols;

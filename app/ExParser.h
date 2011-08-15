@@ -19,4 +19,6 @@
 - (ExCommand *)parse:(NSString *)string
 	       error:(NSError **)outError;
 
+- (NSString *)expand:(NSString *)string error:(NSError **)outError;
+
 @end

@@ -1,11 +1,10 @@
+* cw<cmd-v> and repeat inserts pasteboard twice
+
 ! vertical splits are buggy
 
-* regression: can't :edit a directory
+* can't :edit a directory (was buggy in 1.1 too)
 
 * don't overwrite read-only files!
-
-* expand % and # in ex arguments w/syntax 'x'
-* :e# => open alternate file
 
 * go back to last focused document when closing a document
 

@@ -4,6 +4,9 @@
 - (BOOL)expectCharacter:(unichar)ch;
 - (BOOL)scanCharacter:(unichar *)ch;
 - (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet
+			   appendToString:(NSMutableString *)string
+			     stripEscapes:(BOOL)stripEscapes;
+- (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet
 			       intoString:(NSString **)string
 			     stripEscapes:(BOOL)stripEscapes;
 - (BOOL)scanUpToUnescapedCharacter:(unichar)toChar

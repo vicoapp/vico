@@ -36,10 +36,9 @@
 }
 
 - (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet
-			       intoString:(NSString **)string
+			   appendToString:(NSMutableString *)s
 			     stripEscapes:(BOOL)stripEscapes
 {
-	NSMutableString *s = [NSMutableString string];
 	unichar ch;
 	BOOL gotChar = NO;
 
@@ -60,12 +59,20 @@
 			[s appendFormat:@"%C", ch];
 	}
 
-	if (string)
-		*string = s;
-
 	DEBUG(@"scanned escaped string [%@]", s);
 
 	return gotChar ? YES : NO;
+}
+
+- (BOOL)scanUpToUnescapedCharacterFromSet:(NSCharacterSet *)toCharSet
+			       intoString:(NSString **)string
+			     stripEscapes:(BOOL)stripEscapes
+{
+	NSMutableString *s = [NSMutableString string];
+	BOOL ret = [self scanUpToUnescapedCharacterFromSet:toCharSet appendToString:s stripEscapes:stripEscapes];
+	if (string)
+		*string = s;
+	return ret;
 }
 
 - (BOOL)scanUpToUnescapedCharacter:(unichar)toChar

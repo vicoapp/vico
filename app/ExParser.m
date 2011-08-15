@@ -6,6 +6,7 @@
 #import "ViCommon.h"
 #import "ExCommandCompletion.h"
 #import "ViFileCompletion.h"
+#import "ViRegisterManager.h"
 #include "logging.h"
 
 @interface ExParser (private)
@@ -14,6 +15,7 @@
 + (int)parseRange:(NSScanner *)scan
       intoAddress:(ExAddress **)addr1
      otherAddress:(ExAddress **)addr2;
+- (NSString *)expand:(NSString *)string error:(NSError **)outError;
 @end
 
 @implementation ExParser
@@ -675,7 +677,7 @@
 		NSUInteger pipeStart = [scan scanLocation];
 		if ([scan scanUpToUnescapedCharacter:'\n'
 					   intoString:&arg
-					 stripEscapes:YES]) {
+					 stripEscapes:!expandFiles]) {
 			[scan scanCharacter:nil]; // eat the newline
 		}
 		NSUInteger pipeEnd = [scan scanLocation];
@@ -690,7 +692,7 @@
 		NSUInteger argStart = [scan scanLocation];
 		if ([scan scanUpToUnescapedCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"|\""]
 						 intoString:&arg
-					       stripEscapes:YES]) {
+					       stripEscapes:!expandFiles]) {
 			unichar endChar;
 			[scan scanCharacter:&endChar]; // eat the pipe or "
 			if (endChar == '|') {
@@ -727,8 +729,13 @@
 		}
 	}
 
-	if ([arg length] > 0)
+	if ([arg length] > 0) {
+		if (expandFiles) {
+			if ((arg = [self expand:arg error:outError]) == nil)
+				return nil;
+		}
 		command.arg = arg;
+	}
 	DEBUG(@"extra arg: [%@]", command.arg);
 
 	BOOL requireExtra = ([mapping.syntax occurrencesOfCharacter:'E'] > 0);
@@ -769,6 +776,78 @@
 - (ExCommand *)parse:(NSString *)string error:(NSError **)outError
 {
 	return [self parse:string caret:-1 completion:NULL range:NULL error:outError];
+}
+
+- (NSString *)expand:(NSString *)string error:(NSError **)outError
+{
+	static NSCharacterSet *xset = nil;
+	if (xset == nil)
+		xset = [NSCharacterSet characterSetWithCharactersInString:@"%#"];
+	if ([string rangeOfCharacterFromSet:xset].location == NSNotFound)
+		return string;
+
+	ViRegisterManager *regs = [ViRegisterManager sharedManager];
+	NSMutableString *xs = [NSMutableString string];
+	NSScanner *scan = [NSScanner scannerWithString:string];
+	while ([scan scanUpToUnescapedCharacterFromSet:xset appendToString:xs stripEscapes:YES]) {
+		unichar ch;
+		[scan scanCharacter:&ch];
+		NSString *rs = [regs contentOfRegister:ch];
+		NSURL *url;
+		if (rs == nil || (url = [NSURL URLWithString:rs]) == nil) {
+			if (outError) {
+				if (ch == '#')
+					*outError = [ViError message:@"No alternate file name to substitute for '#'"];
+				else
+					*outError = [ViError message:@"Empty file name in substitution"];
+			}
+			return nil;
+		}
+
+		while ([scan expectCharacter:':']) {
+			if (![scan scanCharacter:&ch]) {
+				[xs appendString:rs];
+				[xs appendString:@":"];
+				return xs;
+			}
+
+			if (ch == 'p') {
+				if (url)
+					url = [[ViURLManager defaultManager] normalizeURL:url];
+				else
+					url = [[ViURLManager defaultManager] normalizeURL:[NSURL fileURLWithPath:rs]];
+				rs = [url path];
+				url = nil;
+			} else if (ch == 'h') {
+				if (url) {
+					url = [url URLByDeletingLastPathComponent];
+					rs = [url absoluteString];
+				} else
+					rs = [rs stringByDeletingLastPathComponent];
+			} else if (ch == 't') {
+				if (url)
+					rs = [url lastPathComponent];
+				else
+					rs = [rs lastPathComponent];
+				url = nil;
+			} else if (ch == 'e') {
+				if (url)
+					rs = [url pathExtension];
+				else
+					rs = [rs pathExtension];
+				url = nil;
+			} else if (ch == 'r') {
+				if (url) {
+					url = [url URLByDeletingPathExtension];
+					rs = [url absoluteString];
+				} else
+					rs = [rs stringByDeletingPathExtension];
+			}
+		}
+
+		[xs appendString:rs];
+	}
+	return xs;
 }
 
 @end

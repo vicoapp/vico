@@ -142,8 +142,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
 	end_location = final_location = bol;
 
-	if (NSMaxRange(range) < [[self textStorage] length])
-	{
+	if (NSMaxRange(range) < [[self textStorage] length]) {
 		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
 		NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
 		[clipView scrollToPoint:topPoint];
@@ -151,6 +150,88 @@
 	}
 
 	return YES;
+}
+
+- (BOOL)reposition:(ViCommand *)command anchor:(int)anchor keepColumn:(BOOL)keepColumn
+{
+	NSScrollView *scrollView = [self enclosingScrollView];
+	NSClipView *clipView = [scrollView contentView];
+
+	NSUInteger topLine;
+	if (command.count == 0) {
+		topLine = [self currentLine];
+	} else {
+		topLine = command.count;
+		if (topLine >= [[self textStorage] lineCount])
+			topLine = [[self textStorage] lineCount];
+	}
+
+	NSUInteger topLineLocation = [[self textStorage] locationForStartOfLine:topLine];
+	if (keepColumn) {
+		NSUInteger column = [self currentScreenColumn];
+		NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:topLineLocation];
+		[self gotoScreenColumn:column fromGlyphIndex:glyphIndex];
+	} else 
+		final_location = [[self textStorage] firstNonBlankForLineAtLocation:topLineLocation];
+
+	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1) actualCharacterRange:NULL];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange inTextContainer:[self textContainer]];
+	NSRect bounds = [clipView bounds];
+	NSPoint p;
+	p.x = bounds.origin.x;
+
+	if (anchor == 0) /* top */
+		p.y = rect.origin.y;
+	else if (anchor == 1) /* bottom */
+		p.y = NSMaxY(rect) - bounds.size.height;
+	else if (anchor == 2) /* middle */
+		p.y = rect.origin.y + rect.size.height / 2.0 - bounds.size.height / 2.0;
+
+	if (p.y < 0)
+		p.y = 0;
+
+	[clipView scrollToPoint:p];
+	[scrollView reflectScrolledClipView:clipView];
+
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
+
+	return YES;
+}
+
+/* [count]z<cr> */
+- (BOOL)reposition_top_bol:(ViCommand *)command
+{
+	return [self reposition:command anchor:0 keepColumn:NO];
+}
+
+/* [count]zt */
+- (BOOL)reposition_top:(ViCommand *)command
+{
+	return [self reposition:command anchor:0 keepColumn:YES];
+}
+
+/* [count]z- */
+- (BOOL)reposition_bottom_bol:(ViCommand *)command
+{
+	return [self reposition:command anchor:1 keepColumn:NO];
+}
+
+/* [count]zb */
+- (BOOL)reposition_bottom:(ViCommand *)command
+{
+	return [self reposition:command anchor:1 keepColumn:YES];
+}
+
+/* [count]z. */
+- (BOOL)reposition_middle_bol:(ViCommand *)command
+{
+	return [self reposition:command anchor:2 keepColumn:NO];
+}
+
+/* [count]zz */
+- (BOOL)reposition_middle:(ViCommand *)command
+{
+	return [self reposition:command anchor:2 keepColumn:YES];
 }
 
 /* syntax: <ctrl-e> */
@@ -197,8 +278,7 @@
 	// check if first line is visible
 	NSUInteger first_end;
 	[self getLineStart:NULL end:&first_end contentsEnd:NULL forLocation:0];
-	if (range.location < first_end)
-	{
+	if (range.location < first_end) {
 		MESSAGE(@"Already at the beginning of the file");
 		return NO;
 	}
@@ -1679,6 +1759,7 @@
 
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
 	end_location = final_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 	return YES;
@@ -1741,7 +1822,7 @@
 	DEBUG(@"setting top point to %@", NSStringFromPoint(topPoint));
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
-
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
 	/* Now place the caret numberOfScreenLinesToScroll lines below current caret. */
 	glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];
@@ -1821,6 +1902,7 @@
 
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
 	return YES;
 }
@@ -1883,7 +1965,7 @@
 	DEBUG(@"setting top point to %@", NSStringFromPoint(topPoint));
 	[clipView scrollToPoint:topPoint];
 	[scrollView reflectScrolledClipView:clipView];
-
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
 	/* Now place the caret numberOfScreenLinesToScroll lines above current caret. */
 	glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:[self caret]];

@@ -247,6 +247,13 @@
 (nmap setKey:"gT" toAction:"previous_tab:")
 (nmap setKey:"gq" toOperator:"format:")
 (nmap setKey:"gqgq" toEditAction:"format:" flags:ViMapLineMode parameter:nil scope:nil)
+;; z prefix
+(nmap setKey:"zt" toAction:"reposition_top:")
+(nmap setKey:"z<cr>" toAction:"reposition_top_bol:")
+(nmap setKey:"zb" toAction:"reposition_bottom:")
+(nmap setKey:"z-" toAction:"reposition_bottom_bol:")
+(nmap setKey:"zz" toAction:"reposition_middle:")
+(nmap setKey:"z." toAction:"reposition_middle_bol:")
 
 (nmap map:"ZZ" to:":xit<cr>")
 (nmap map:"ZQ" to:":q!<cr>")

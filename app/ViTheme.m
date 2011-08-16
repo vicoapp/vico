@@ -17,6 +17,11 @@
 		return nil;
 	}
 
+	if ([[self name] length] == 0) {
+		INFO(@"Missing 'name' in theme %@", aPath);
+		return nil;
+	}
+
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *preferences = [theme objectForKey:@"settings"];
 	NSDictionary *preference;

@@ -305,7 +305,9 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
+#ifdef TRIAL_VERSION
 	[nagTitle setHidden:YES];
+#endif
 	[[ViEventManager defaultManager] emit:ViEventWillEnterFullScreen for:self with:self, nil];
 }
 
@@ -316,7 +318,9 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+#ifdef TRIAL_VERSION
 	[nagTitle setHidden:NO];
+#endif
 	[[ViEventManager defaultManager] emit:ViEventWillExitFullScreen for:self with:self, nil];
 }
 

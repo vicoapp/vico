@@ -283,7 +283,7 @@
 	doc = [super openDocumentWithContentsOfURL:url
 					   display:displayDocument
 					     error:outError];
-	if (doc && !displayDocument) {
+	if (doc && !displayDocument && ![doc isKindOfClass:[ViProject class]]) {
 		[doc addWindowController:windowController];
 		[windowController addDocument:doc];
 	}

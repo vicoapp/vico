@@ -324,6 +324,9 @@ static ViWindowController	*currentWindowController = nil;
 	if ([documents containsObject:document])
 		return;
 
+	if ([document isKindOfClass:[ViProject class]])
+		return;
+
 	NSArray *items = [[openFilesButton menu] itemArray];
 	NSInteger ndx;
 	for (ndx = 0; ndx < [items count]; ndx++)
@@ -2030,9 +2033,13 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 								   display:NO
 								     error:&error];
 			if (doc) {
-				[doc addWindowController:self];
-				[self addDocument:doc];
-				viewController = [self switchToDocument:doc];
+				if ([doc isKindOfClass:[ViProject class]]) {
+					[[doc nextRunloop] makeWindowControllers];
+				} else {
+					[doc addWindowController:self];
+					[self addDocument:doc];
+					viewController = [self switchToDocument:doc];
+				}
 			}
 		}
 	}
@@ -2066,14 +2073,17 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	}
 
 	if (doc) {
-		[doc addWindowController:self];
-		[self addDocument:doc];
-		ViDocumentView *docView = [self createTabForDocument:doc];
-
-		if (command.plus_command && docView) {
-			ViTextView *text = (ViTextView *)[docView innerView];
-			if (![text evalExString:command.plus_command])
-				return [NSNumber numberWithBool:NO];
+		if ([doc isKindOfClass:[ViProject class]]) {
+			[[doc nextRunloop] makeWindowControllers];
+		} else {
+			[doc addWindowController:self];
+			[self addDocument:doc];
+			ViDocumentView *docView = [self createTabForDocument:doc];
+			if (command.plus_command && docView) {
+				ViTextView *text = (ViTextView *)[docView innerView];
+				if (![text evalExString:command.plus_command])
+					return [NSNumber numberWithBool:NO];
+			}
 		}
 	}
 

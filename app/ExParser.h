@@ -48,4 +48,11 @@
  */
 - (NSString *)expand:(NSString *)string error:(NSError **)outError;
 
++ (BOOL)parseRange:(NSScanner *)scan
+       intoAddress:(ExAddress **)addr;
+
++ (int)parseRange:(NSScanner *)scan
+      intoAddress:(ExAddress **)addr1
+     otherAddress:(ExAddress **)addr2;
+
 @end

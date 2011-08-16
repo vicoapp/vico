@@ -285,6 +285,8 @@
 			closeSymbolListAfterUse = YES;
 		NSRect frame = [splitView frame];
 		[splitView setPosition:frame.size.width - width ofDividerAtIndex:1];
+		if (dirty)
+			[self symbolsUpdate:nil];
 	}
 }
 

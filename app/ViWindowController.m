@@ -1598,6 +1598,11 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return resizeRect;
 }
 
+- (void)splitView:(NSSplitView *)aSplitView resizeSubviewsWithOldSize:(NSSize)oldSize
+{
+	[aSplitView adjustSubviews];
+}
+
 #pragma mark -
 #pragma mark Symbol List
 

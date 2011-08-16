@@ -9,15 +9,6 @@
 #import "ViRegisterManager.h"
 #include "logging.h"
 
-@interface ExParser (private)
-+ (BOOL)parseRange:(NSScanner *)scan
-       intoAddress:(ExAddress **)addr;
-+ (int)parseRange:(NSScanner *)scan
-      intoAddress:(ExAddress **)addr1
-     otherAddress:(ExAddress **)addr2;
-- (NSString *)expand:(NSString *)string error:(NSError **)outError;
-@end
-
 @implementation ExParser
 
 @synthesize map;

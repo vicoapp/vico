@@ -316,12 +316,12 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+	[nagTitle setHidden:NO];
 	[[ViEventManager defaultManager] emit:ViEventWillExitFullScreen for:self with:self, nil];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
-	[nagTitle setHidden:NO];
 	[[ViEventManager defaultManager] emit:ViEventDidExitFullScreen for:self with:self, nil];
 }
 

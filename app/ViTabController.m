@@ -105,11 +105,17 @@
 		return nil;
 	}
 
-	if ([[split subviews] count] == 1 && [split isVertical] != isVertical)
+	DEBUG(@"adding view %@ = %@", [newViewController view], newViewController);
+	DEBUG(@"subviews = %@", [split subviews]);
+
+	if ([[split subviews] count] == 1 && [split isVertical] != isVertical) {
 		[split setVertical:isVertical];
+		[splitView adjustSubviews];
+	}
 
 	[self addView:newViewController];
 
+	DEBUG(@"subviews = %@", [split subviews]);
 	if ([split isVertical] == isVertical) {
 		// Just add another view to this split
 		[split addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
@@ -131,8 +137,10 @@
 		[newSplit addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
 		[newSplit adjustSubviews];
 		[self normalizeSplitView:newSplit];
+		DEBUG(@"newSplit subviews = %@", [newSplit subviews]);
 	}
 
+	DEBUG(@"subviews = %@", [split subviews]);
 	return newViewController;
 }
 
@@ -163,11 +171,14 @@
 		[self didChangeValueForKey:@"selectedView"];
 	}
 
+	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newViewController view], newViewController);
+
 	/*
 	 * Remember all subview sizes so we can restore the position
 	 * of the dividers after replacing the view.
 	 */
 	NSSplitView *split = (NSSplitView *)[[viewController view] superview];
+	DEBUG(@"subviews = %@", [split subviews]);
 	NSUInteger c = [[split subviews] count];
 	NSMutableArray *sizes = [NSMutableArray arrayWithCapacity:c];
 	for (NSView *view in [split subviews]) {
@@ -178,6 +189,7 @@
 	}
 
 	[split replaceSubview:[viewController view] with:[newViewController view]];
+	DEBUG(@"subviews = %@", [split subviews]);
 
 	/*
 	 * Now restore the divider positions.
@@ -191,6 +203,7 @@
 		[split setPosition:pos ofDividerAtIndex:i++];
 		pos += [split dividerThickness];
 	}
+	[splitView adjustSubviews];
 
 	return newViewController;
 }
@@ -199,9 +212,13 @@
 {
 	[self removeView:viewController];
 
+	DEBUG(@"close view %@ = %@", [viewController view], viewController);
+
 	id split = [[viewController view] superview];
+	DEBUG(@"subviews = %@", [split subviews]);
 	NSUInteger ndx = [[split subviews] indexOfObject:[viewController view]];
 	[[viewController view] removeFromSuperview];
+	DEBUG(@"subviews = %@", [split subviews]);
 
 	if ([[split subviews] count] == 1) {
 		id superSplit = [split superview];

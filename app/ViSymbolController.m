@@ -52,6 +52,7 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
+	DEBUG(@"view = %@ (%@ or %@?)", view, symbolFilterField, altSymbolFilterField);
 	if (view == symbolFilterField || view == altSymbolFilterField)
 		[self openSymbolListTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
@@ -159,10 +160,15 @@
 	id item = [symbolView itemAtRow:[symbolView selectedRow]];
 
 	// remember what symbol we selected from the filtered set
-	NSString *filter = [symbolFilterField stringValue];
+	NSString *filter;
+	if ([altSymbolFilterField isHidden])
+		filter = [altSymbolFilterField stringValue];
+	else
+		filter = [symbolFilterField stringValue];
 	if ([filter length] > 0 && [item isKindOfClass:[ViSymbol class]]) {
 		[symbolFilterCache setObject:[item symbol] forKey:filter];
 		[symbolFilterField setStringValue:@""];
+		[altSymbolFilterField setStringValue:@""];
 	}
 
 	if ([item isKindOfClass:[ViDocument class]])
@@ -390,6 +396,7 @@
 
 - (IBAction)searchSymbol:(id)sender
 {
+	[self openSymbolListTemporarily:YES];
 	NSToolbar *toolbar = [window toolbar];
 	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:symbolFilterField];

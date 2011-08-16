@@ -1,10 +1,5 @@
 * :/search doesn't work with 'nowrapscan'
 
-* ex message bug:
-  - issue unknown ex command :asdfasdf
-  - search for a non-existing string: /qwetqerqert
-  => the asdfasdf command is unknown
-
 * search with 'nowrapscan' should issue 'not found' message
 
 * xcode/Run throws exception:

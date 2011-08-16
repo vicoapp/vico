@@ -1036,8 +1036,10 @@ int logIndent = 0;
 		return NO;
 	}
 
-	if (r.location == NSNotFound)
+	if (r.location == NSNotFound) {
+		MESSAGE(@"Pattern not found");
 		return NO;
+	}
 
 	[self pushLocationOnJumpList:start_location];
 	[self scrollRangeToVisible:r];

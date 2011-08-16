@@ -365,14 +365,14 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (void)eachTextView:(void (^)(ViTextView *))callback
 {
 	for (ViDocumentView *docView in views) {
-		ViTextView *view = [docView innerView];
+		NSView *view = [docView innerView];
 		if ([view isKindOfClass:[ViTextView class]])
-			callback(view);
+			callback((ViTextView *)view);
 	}
 	if (hiddenView) {
-		ViTextView *view = [docView innerView];
+		NSView *view = [hiddenView innerView];
 		if ([view isKindOfClass:[ViTextView class]])
-			callback(view);
+			callback((ViTextView *)view);
 	}
 }
 

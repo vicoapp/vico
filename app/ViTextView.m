@@ -1876,11 +1876,12 @@ int logIndent = 0;
 	}
 
 	if (ok && command.isLineMode && !command.isMotion && mode == ViVisualMode) {
+		// FIXME: should set motion to emulate line mode if operator is not line mode but visual_line_mode is set
 		command.saved_count = (int)([[self textStorage] lineNumberAtLocation:l2] - [[self textStorage] lineNumberAtLocation:l1] + 1);
 		// else {
-		//	command.motion = [ViCommand commandWithMapping:move_right count:l2 - l1];
+		//	command.motion = [ViCommand commandWithMapping:move_down count:l2 - l1];
 		// }
-		INFO(@"set saved_count to %lu", command.saved_count);
+		DEBUG(@"set saved_count to %lu", command.saved_count);
 	}
 
 	if (leaveVisualMode && mode == ViVisualMode) {

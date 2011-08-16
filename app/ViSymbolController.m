@@ -367,7 +367,7 @@
 	if ([altSymbolFilterField isHidden]) {
 		NSRect symbolsFrame = [symbolsView frame];
 		NSRect frame = [scrollView frame];
-		frame.size.height = symbolsFrame.size.height - 23 - 24;
+		frame.size.height = symbolsFrame.size.height - 23 - 22 - 3;
 		[scrollView setFrame:frame];
                 [altSymbolFilterField setHidden:NO];
 	}

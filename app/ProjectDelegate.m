@@ -931,12 +931,12 @@
 		NSRect explorerFrame = [explorerView frame];
 
 		NSRect frame = [scrollView frame];
-		frame.size.height = explorerFrame.size.height - 23 - 24;
+		frame.size.height = explorerFrame.size.height - 23 - 25;
 		[[scrollView animator] setFrame:frame];
 
-		[altFilterField setFrame:NSMakeRect(1, explorerFrame.size.height - 1, explorerFrame.size.width - 2, 0)];
+		[altFilterField setFrame:NSMakeRect(1, explorerFrame.size.height - 2, explorerFrame.size.width - 2, 0)];
 		[altFilterField setHidden:NO];
-		[[altFilterField animator] setFrame:NSMakeRect(1, explorerFrame.size.height - 23, explorerFrame.size.width - 2, 22)];
+		[[altFilterField animator] setFrame:NSMakeRect(1, explorerFrame.size.height - 24, explorerFrame.size.width - 2, 22)];
 
 		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
 		animation.delegate = self;
@@ -952,7 +952,7 @@
 			[altFilterField setHidden:YES];
 		else {
 			NSRect explorerFrame = [explorerView frame];
-			[altFilterField setFrame:NSMakeRect(1, explorerFrame.size.height - 23, explorerFrame.size.width - 2, 22)];
+			[altFilterField setFrame:NSMakeRect(1, explorerFrame.size.height - 24, explorerFrame.size.width - 2, 22)];
 			[[altFilterField cell] calcDrawInfo:[altFilterField frame]];
 		}
 	}
@@ -968,12 +968,12 @@
 		NSRect explorerFrame = [explorerView frame];
 
 		NSRect frame = [scrollView frame];
-		frame.size.height = explorerFrame.size.height - 23;
+		frame.size.height = explorerFrame.size.height - 24;
 		[[scrollView animator] setFrame:frame];
 
 		NSRect altFrame = [altFilterField frame];
 		altFrame.size.height = 0;
-		altFrame.origin = NSMakePoint(1, explorerFrame.size.height - 1);
+		altFrame.origin = NSMakePoint(1, explorerFrame.size.height - 2);
 		[[altFilterField animator] setFrame:altFrame];
 
 		CAAnimation *animation = [altFilterField animationForKey:@"frameOrigin"];
@@ -990,7 +990,7 @@
 	if ([altFilterField isHidden]) {
 		NSRect explorerFrame = [explorerView frame];
 		NSRect frame = [scrollView frame];
-		frame.size.height = explorerFrame.size.height - 23 - 24;
+		frame.size.height = explorerFrame.size.height - 23 - 22 - 3;
 		[scrollView setFrame:frame];
                 [altFilterField setHidden:NO];
 	}

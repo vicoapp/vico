@@ -91,10 +91,6 @@
 // drag support
 - (NSImage*)dragImageForRect:(NSRect)cellFrame;
 
-// archiving
-- (void)encodeWithCoder:(NSCoder *)aCoder;
-- (id)initWithCoder:(NSCoder *)aDecoder;
-
 @end
 
 @interface PSMTabBarControl (CellAccessors)

@@ -15,7 +15,4 @@
     BOOL            _down;
 }
 
-// archiving
-- (void)encodeWithCoder:(NSCoder *)aCoder;
-- (id)initWithCoder:(NSCoder *)aDecoder;
 @end

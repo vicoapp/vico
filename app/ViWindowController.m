@@ -303,6 +303,28 @@ static ViWindowController	*currentWindowController = nil;
 	return proposedOptions | NSApplicationPresentationAutoHideToolbar;
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+	[nagTitle setHidden:YES];
+	[[ViEventManager defaultManager] emit:ViEventWillEnterFullScreen for:self with:self, nil];
+}
+
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+	[[ViEventManager defaultManager] emit:ViEventDidEnterFullScreen for:self with:self, nil];
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+	[[ViEventManager defaultManager] emit:ViEventWillExitFullScreen for:self with:self, nil];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+	[nagTitle setHidden:NO];
+	[[ViEventManager defaultManager] emit:ViEventDidExitFullScreen for:self with:self, nil];
+}
+
 - (IBAction)addNewDocumentTab:(id)sender
 {
 	[[NSDocumentController sharedDocumentController] newDocument:self];

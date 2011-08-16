@@ -33,6 +33,10 @@
 #define ViEventDidSelectView @"didSelectView" // window, view
 #define ViEventWillSelectTab @"willSelectTab" // window, tabController
 #define ViEventDidSelectTab @"didSelectTab" // window, tabController
+#define ViEventWillEnterFullScreen  @"willEnterFullScreen" // window
+#define ViEventDidEnterFullScreen  @"didEnterFullScreen" // window
+#define ViEventWillExitFullScreen  @"willExitFullScreen" // window
+#define ViEventDidExitFullScreen  @"didExitFullScreen" // window
 
 // Tabcontroller events
 #define ViEventDidAddView @"didAddView" // view

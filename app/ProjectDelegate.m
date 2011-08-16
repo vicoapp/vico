@@ -589,16 +589,12 @@
                returnCode:(NSInteger)returnCode
               contextInfo:(void *)contextInfo
 {
-	if (returnCode != NSAlertFirstButtonReturn)
-		return;
+	NSMutableArray *urls = contextInfo; // object survived because we also stored a strong reference in contextObjects
 
-	NSMutableArray *urls = [[NSMutableArray alloc] init];
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[urls addObject:pf.url];
-	}];
+	if (returnCode != NSAlertFirstButtonReturn) {
+		[contextObjects removeObject:urls];
+		return;
+	}
 
 	[[ViURLManager defaultManager] removeItemsAtURLs:urls onCompletion:^(NSError *error) {
 		if (error != nil)
@@ -650,12 +646,23 @@
 
 		}
 	}];
+
+	[contextObjects removeObject:urls];
 }
 
 - (IBAction)removeFiles:(id)sender
 {
-	NSInteger nselected = [[self clickedIndexes] count];
-	if (nselected == 0)
+	NSIndexSet *set = [self clickedIndexes];
+	NSInteger nselected = [set count];
+
+	NSMutableArray *urls = [[NSMutableArray alloc] init];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ProjectFile *pf = [self fileForItem:item];
+		[urls addObject:pf.url];
+	}];
+
+	if ([urls count] == 0)
 		return;
 
 	BOOL isLocal = [rootURL isFileURL];
@@ -676,10 +683,11 @@
 		[alert setAlertStyle:NSCriticalAlertStyle];
 	}
 
+	[contextObjects addObject:urls];
 	[alert beginSheetModalForWindow:window
 			  modalDelegate:self
 			 didEndSelector:@selector(removeAlertDidEnd:returnCode:contextInfo:)
-			    contextInfo:nil];
+			    contextInfo:urls];
 }
 
 - (IBAction)rescan:(id)sender
@@ -1052,7 +1060,7 @@
 
 - (void)closeExplorer
 {
-	width = [[[splitView subviews] objectAtIndex:0] bounds].size.width;
+	width = [explorerView frame].size.width;
 	[splitView setPosition:0.0 ofDividerAtIndex:0];
 	[delegate focusEditor];
 }

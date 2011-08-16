@@ -1,3 +1,14 @@
+* :/search doesn't work with 'nowrapscan'
+
+* @@ doesn't work (no prev used reg)
+
+* ex message bug:
+  - issue unknown ex command :asdfasdf
+  - search for a non-existing string: /qwetqerqert
+  => the asdfasdf command is unknown
+
+* search with 'nowrapscan' should issue 'not found' message
+
 * xcode/Run throws exception:
 2011-08-15 13:42:56.959 Vico[3043:403] [<__NSCFString 0x4016dcec0> valueForUndefinedKey:]: this class is not key value coding-compliant for the key title.
 2011-08-15 13:42:56.967 Vico[3043:403] (

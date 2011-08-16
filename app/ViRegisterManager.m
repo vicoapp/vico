@@ -48,7 +48,7 @@
 	if (content == nil)
 		content = @"";
 
-	if (regName == '*' || regName == '+') {
+	if (regName == '*' || regName == '+' || (regName == 0 && [[NSUserDefaults standardUserDefaults] boolForKey:@"clipboard"])) {
 		NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
 		[pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil]
 				   owner:nil];

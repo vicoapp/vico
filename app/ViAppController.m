@@ -206,6 +206,7 @@ updateMeta(void)
 	    [NSNumber numberWithBool:NO], @"cursorline",
 	    [NSNumber numberWithBool:NO], @"gdefault",
 	    [NSNumber numberWithBool:YES], @"wrapscan",
+	    [NSNumber numberWithBool:NO], @"clipboard",
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:12.0], @"fontsize",
 	    @"Monaco", @"fontname",

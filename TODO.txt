@@ -138,7 +138,6 @@
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 * :mkdir command
 * completion expressions in nu
-* zt, zz, zb (scroll cursor to top, center, bottom)
 * p/P with a count
 * J with visual selection, and J with a count
 * +/- commands

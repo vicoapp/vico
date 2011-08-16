@@ -1,3 +1,53 @@
+* xcode/Run throws exception:
+2011-08-15 13:42:56.959 Vico[3043:403] [<__NSCFString 0x4016dcec0> valueForUndefinedKey:]: this class is not key value coding-compliant for the key title.
+2011-08-15 13:42:56.967 Vico[3043:403] (
+	0   CoreFoundation                      0x00007fff8f53a986 __exceptionPreprocess + 198
+	1   libobjc.A.dylib                     0x00007fff8a789d5e objc_exception_throw + 43
+	2   CoreFoundation                      0x00007fff8f5c45a9 -[NSException raise] + 9
+	3   Foundation                          0x00007fff8dedce6f -[NSObject(NSKeyValueCoding) valueForUndefinedKey:] + 240
+	4   Foundation                          0x00007fff8de13d96 _NSGetUsingKeyValueGetter + 108
+	5   Foundation                          0x00007fff8de13d1d -[NSObject(NSKeyValueCoding) valueForKey:] + 392
+	6   Foundation                          0x00007fff8de3379e -[NSObject(NSKeyValueCoding) valueForKeyPath:] + 348
+	7   AppKit                              0x00007fff8b52ded5 -[NSArrayController _multipleValueForKeyPath:atIndex:] + 84
+	8   AppKit                              0x00007fff8b52bbac -[_NSControllerArrayProxy _valueForKeyPath:ofObjectAtIndex:] + 29
+	9   AppKit                              0x00007fff8b294be2 -[NSBinder _valueForKeyPath:ofObject:mode:raisesForNotApplicableKeys:] + 710
+	10  AppKit                              0x00007fff8b54216c -[NSBinder valueForBinding:atIndex:resolveMarkersToPlaceholders:] + 434
+	11  AppKit                              0x00007fff8b8dfe71 -[NSValueBinder _referenceBindingValueAtIndex:] + 35
+	12  AppKit                              0x00007fff8b497235 -[NSValueBinder _adjustObject:mode:observedController:observedKeyPath:context:editableState:adjustState:] + 857
+	13  AppKit                              0x00007fff8b8dfaee -[NSValueBinder updateTableColumnDataCell:forDisplayAtIndex:] + 145
+	14  AppKit                              0x00007fff8b847731 -[NSTextValueBinder updateTableColumnDataCell:forDisplayAtIndex:] + 79
+	15  AppKit                              0x00007fff8b91f30d -[_NSBindingAdaptor tableColumn:willDisplayCell:row:] + 112
+	16  AppKit                              0x00007fff8b345948 -[NSTableView preparedCellAtColumn:row:] + 654
+	17  AppKit                              0x00007fff8b356787 -[NSTableView _drawContentsAtRow:column:withCellFrame:] + 42
+	18  AppKit                              0x00007fff8b354cbe -[NSTableView drawRow:clipRect:] + 1647
+	19  AppKit                              0x00007fff8b35449b -[NSTableView drawRowIndexes:clipRect:] + 565
+	20  AppKit                              0x00007fff8b3526f3 -[NSTableView drawRect:] + 1390
+	21  AppKit                              0x00007fff8b2b9768 -[NSView _drawRect:clip:] + 3758
+	22  AppKit                              0x00007fff8b2e7131 -[NSView _recursiveDisplayAllDirtyWithLockFocus:visRect:] + 1583
+	23  AppKit                              0x00007fff8b2e755d -[NSView _recursiveDisplayAllDirtyWithLockFocus:visRect:] + 2651
+	24  AppKit                              0x00007fff8b2e755d -[NSView _recursiveDisplayAllDirtyWithLockFocus:visRect:] + 2651
+	25  AppKit                              0x00007fff8b2e755d -[NSView _recursiveDisplayAllDirtyWithLockFocus:visRect:] + 2651
+	26  AppKit                              0x00007fff8b2e755d -[NSView _recursiveDisplayAllDirtyWithLockFocus:visRect:] + 2651
+	27  AppKit                              0x00007fff8b2b6d46 -[NSView _recursiveDisplayRectIfNeededIgnoringOpacity:isVisibleRect:rectIsVisibleRectForView:topView:] + 1032
+	28  AppKit                              0x00007fff8b2b623c -[NSThemeFrame _recursiveDisplayRectIfNeededIgnoringOpacity:isVisibleRect:rectIsVisibleRectForView:topView:] + 270
+	29  AppKit                              0x00007fff8b2b164a -[NSView _displayRectIgnoringOpacity:isVisibleRect:rectIsVisibleRectForView:] + 4755
+	30  AppKit                              0x00007fff8b2aa093 -[NSView displayIfNeeded] + 1676
+	31  AppKit                              0x00007fff8b2a97d3 _handleWindowNeedsDisplayOrLayoutOrUpdateConstraints + 648
+	32  CoreFoundation                      0x00007fff8f4fa647 __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__ + 23
+	33  CoreFoundation                      0x00007fff8f4fa5a6 __CFRunLoopDoObservers + 374
+	34  CoreFoundation                      0x00007fff8f4cf889 __CFRunLoopRun + 825
+	35  CoreFoundation                      0x00007fff8f4cf216 CFRunLoopRunSpecific + 230
+	36  HIToolbox                           0x00007fff849c94ff RunCurrentEventLoopInMode + 277
+	37  HIToolbox                           0x00007fff849d0c21 ReceiveNextEventCommon + 355
+	38  HIToolbox                           0x00007fff849d0aae BlockUntilNextEventMatchingListInMode + 62
+	39  AppKit                              0x00007fff8b26e191 _DPSNextEvent + 659
+	40  AppKit                              0x00007fff8b26da95 -[NSApplication nextEventMatchingMask:untilDate:inMode:dequeue:] + 135
+	41  AppKit                              0x00007fff8b26a3d6 -[NSApplication run] + 463
+	42  AppKit                              0x00007fff8b4e852a NSApplicationMain + 867
+	43  Vico                                0x0000000100002983 main + 275
+	44  Vico                                0x0000000100001944 start + 52
+)
+
 * cw<cmd-v> and repeat inserts pasteboard twice
 
 ! vertical splits are buggy

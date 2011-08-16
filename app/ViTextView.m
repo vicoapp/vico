@@ -350,12 +350,12 @@ int logIndent = 0;
 		[[self textStorage] replaceCharactersInRange:r withString:@"\n"];
 		r.length = 1;
 		[[self textStorage] setAttributes:[self typingAttributes] range:r];
-		[[[self layoutManager] nextRunloop]  addTemporaryAttribute:ViAutoNewlineAttributeName
-						      value:[NSNumber numberWithInt:1]
-					  forCharacterRange:r];
+		[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoNewlineAttributeName
+								    value:[NSNumber numberWithInt:1]
+							forCharacterRange:r];
 		return YES;
 	} else if (len == 1) {
-		if ([[[self layoutManager] nextRunloop] temporaryAttribute:ViAutoNewlineAttributeName
+		if ([[self layoutManager] temporaryAttribute:ViAutoNewlineAttributeName
 					    atCharacterIndex:0
 					      effectiveRange:NULL]) {
 			NSRange r = NSMakeRange(0, 1);

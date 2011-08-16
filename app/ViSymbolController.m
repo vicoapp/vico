@@ -115,7 +115,7 @@
 	dirty = NO;
 	reloadTimer = nil;
 
-	[self filterSymbols:symbolFilterField];
+	[self filterSymbols];
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
 		[symbolView collapseItem:nil collapseChildren:YES];
 		[symbolView expandItem:[windowController currentDocument]];

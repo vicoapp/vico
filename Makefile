@@ -51,7 +51,10 @@ api:
 		app/ViPreferencesController.h \
 		app/NSEvent-keyAdditions.h \
 		app/NSView-additions.h \
-		app/NSString-additions.h
+		app/NSString-additions.h \
+		app/ExParser.h \
+		app/ExCommand.h \
+		app/ExMap.h
 
 syncapi: api
 	rsync -av --delete  doc/html/ www:/var/www/feedback.vicoapp.com/public/api

@@ -94,8 +94,19 @@
 /** Target line address. */
 @property(nonatomic,assign,readwrite) ExAddress *lineAddress;
 
+/** Resolved character range of affected text. */
 @property (nonatomic,readwrite) NSRange range;
+
+/** Resolved line range of affected text.
+ *
+ * `lineRange.location` specifies a line number, and `lineRange.lenght` number of affected lines.
+ */
 @property (nonatomic,readwrite) NSRange lineRange;
+
+/** Resolved target line number.
+ *
+ * This is an absolute line number.
+ */
 @property (nonatomic,readwrite) NSUInteger line;
 
 /** Count argument. */
@@ -107,7 +118,7 @@
 /** YES if `>>` flag specified. */
 @property(nonatomic,readwrite) BOOL append;
 
-/** YES if filtering (as in :read !ls or :write !wc). */
+/** YES if filtering (as in `:read !ls` or `:write !wc`). */
 @property(nonatomic,readwrite) BOOL filter;
 
 /** Next ex command separated with a bar (`|`). */
@@ -116,10 +127,14 @@
 /** Extra argument string. */
 @property(nonatomic,assign,readwrite) NSString *arg;
 
+/** Ex command string for the `+` argument (as in `:edit +cmd file`). */
 @property(nonatomic,assign,readwrite) NSString *plus_command;
 
+/** Regular expression pattern. */
 @property(nonatomic,assign,readwrite) NSString *pattern;
+/** Replacement template string for `:s` command. */
 @property(nonatomic,assign,readwrite) NSString *replacement;
+/** Regular expression option string for `:s` command. */
 @property(nonatomic,assign,readwrite) NSString *options;
 
 /** Destination register, or 0 if none specified. */
@@ -129,6 +144,13 @@
 @property(nonatomic,readwrite) NSInteger caret;
 
 - (NSArray *)args;
+
+/** Return a message to caller.
+ *
+ * The last message will be shown in the ex command line after command returns.
+ *
+ * @param message The message to display.
+ */
 - (void)message:(NSString *)message;
 
 @end

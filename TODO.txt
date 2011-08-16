@@ -1,7 +1,5 @@
 * :/search doesn't work with 'nowrapscan'
 
-* @@ doesn't work (no prev used reg)
-
 * ex message bug:
   - issue unknown ex command :asdfasdf
   - search for a non-existing string: /qwetqerqert

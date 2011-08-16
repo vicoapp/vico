@@ -2845,7 +2845,8 @@
 			MESSAGE(@"No previously used register");
 			return NO;
 		}
-	}
+	} else
+		regs.lastExecutedRegister = reg;
 
 	NSString *content = [regs contentOfRegister:reg];
 	if (content == nil) {

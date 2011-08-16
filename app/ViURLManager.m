@@ -155,7 +155,9 @@
 - (id<ViDeferred>)removeItemsAtURLs:(NSArray *)urls
 		       onCompletion:(void (^)(NSError *))aBlock
 {
-	NSURL *firstURL = [urls objectAtIndex:0];
+	NSURL *firstURL = nil;
+	if ([urls count] > 0)
+		firstURL = [urls objectAtIndex:0];
 	if (firstURL == nil) {
 		aBlock(nil);
 		return nil;

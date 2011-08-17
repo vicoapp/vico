@@ -75,6 +75,7 @@ withParser:(NuParser *)parser
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)visitWebsite:(id)sender;
 - (IBAction)editSiteScript:(id)sender;
+- (IBAction)installTerminalHelper:(id)sender;
 
 - (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringForCommand:(ViCommand *)command;

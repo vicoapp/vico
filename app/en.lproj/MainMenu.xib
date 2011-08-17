@@ -1406,6 +1406,14 @@
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
 								</object>
+								<object class="NSMenuItem" id="389238211">
+									<reference key="NSMenu" ref="374024848"/>
+									<string key="NSTitle">Install Terminal Helper</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+								</object>
 								<object class="NSMenuItem" id="158918307">
 									<reference key="NSMenu" ref="374024848"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -2014,6 +2022,14 @@
 					</object>
 					<int key="connectionID">715</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">installTerminalHelper:</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="389238211"/>
+					</object>
+					<int key="connectionID">717</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2349,6 +2365,7 @@
 							<reference ref="238773614"/>
 							<reference ref="158918307"/>
 							<reference ref="746745624"/>
+							<reference ref="389238211"/>
 						</object>
 						<reference key="parent" ref="391199113"/>
 						<string key="objectName">2</string>
@@ -3089,6 +3106,11 @@
 						<reference key="object" ref="728495723"/>
 						<reference key="parent" ref="466310130"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">716</int>
+						<reference key="object" ref="389238211"/>
+						<reference key="parent" ref="374024848"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3244,6 +3266,7 @@
 					<string>711.IBPluginDependency</string>
 					<string>712.IBPluginDependency</string>
 					<string>713.IBPluginDependency</string>
+					<string>716.IBPluginDependency</string>
 					<string>72.IBPluginDependency</string>
 					<string>73.IBPluginDependency</string>
 					<string>75.IBPluginDependency</string>
@@ -3418,6 +3441,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -3432,7 +3456,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">715</int>
+			<int key="maxID">717</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3907,6 +3931,7 @@
 							<string>actionButton</string>
 							<string>actionButtonCell</string>
 							<string>actionMenu</string>
+							<string>altFilterField</string>
 							<string>delegate</string>
 							<string>environment</string>
 							<string>explorer</string>
@@ -3926,10 +3951,11 @@
 							<string>NSPopUpButton</string>
 							<string>ViToolbarPopUpButtonCell</string>
 							<string>NSMenu</string>
+							<string>NSSearchField</string>
 							<string>id</string>
 							<string>ExEnvironment</string>
 							<string>ViOutlineView</string>
-							<string>NSView</string>
+							<string>ViBgView</string>
 							<string>NSSearchField</string>
 							<string>NSProgressIndicator</string>
 							<string>NSScrollView</string>
@@ -3948,6 +3974,7 @@
 							<string>actionButton</string>
 							<string>actionButtonCell</string>
 							<string>actionMenu</string>
+							<string>altFilterField</string>
 							<string>delegate</string>
 							<string>environment</string>
 							<string>explorer</string>
@@ -3977,6 +4004,10 @@
 								<string key="candidateClassName">NSMenu</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">altFilterField</string>
+								<string key="candidateClassName">NSSearchField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">delegate</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -3990,7 +4021,7 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">explorerView</string>
-								<string key="candidateClassName">NSView</string>
+								<string key="candidateClassName">ViBgView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">filterField</string>
@@ -4043,11 +4074,13 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
+							<string>installTerminalHelper:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -4058,6 +4091,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
+							<string>installTerminalHelper:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
@@ -4065,6 +4099,10 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">editSiteScript:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">installTerminalHelper:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4164,6 +4202,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">ViBgView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ViBgView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ViDocumentController</string>
 					<string key="superclassName">NSDocumentController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -4232,6 +4278,8 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>altSymbolFilterField</string>
+							<string>scrollView</string>
 							<string>searchToolbarItem</string>
 							<string>splitView</string>
 							<string>symbolFilterField</string>
@@ -4242,6 +4290,8 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSSearchField</string>
+							<string>NSScrollView</string>
 							<string>NSToolbarItem</string>
 							<string>NSSplitView</string>
 							<string>NSSearchField</string>
@@ -4255,6 +4305,8 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>altSymbolFilterField</string>
+							<string>scrollView</string>
 							<string>searchToolbarItem</string>
 							<string>splitView</string>
 							<string>symbolFilterField</string>
@@ -4265,6 +4317,14 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">altSymbolFilterField</string>
+								<string key="candidateClassName">NSSearchField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">scrollView</string>
+								<string key="candidateClassName">NSScrollView</string>
+							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">searchToolbarItem</string>
 								<string key="candidateClassName">NSToolbarItem</string>

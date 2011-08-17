@@ -445,6 +445,12 @@ extern BOOL makeNewWindowInsteadOfTab;
 #endif
 }
 
+- (IBAction)installTerminalHelper:(id)sender
+{
+	NSString *locBookName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleHelpBookName"];
+	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"terminalUsage" inBook:locBookName];
+}
+
 #pragma mark -
 #pragma mark Script evaluation
 

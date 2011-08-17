@@ -1,5 +1,7 @@
 # Terminal usage
 
+<a name="terminalUsage"></a>
+
 Vico includes a command line tool that can be used to launch vico from
 the shell.
 

@@ -42,6 +42,7 @@
 - (void)shutdownRead;
 
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len;
+- (NSData *)data;
 
 - (void)write:(const void *)buf length:(NSUInteger)length;
 - (void)writeData:(NSData *)data;

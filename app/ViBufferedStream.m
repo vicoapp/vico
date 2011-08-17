@@ -293,10 +293,23 @@ fd_read(CFSocketRef s,
 {
 	NSPipe *stdin = [task standardInput];
 	NSPipe *stdout = [task standardOutput];
-	if (![stdin isKindOfClass:[NSPipe class]] || ![stdout isKindOfClass:[NSPipe class]])
+	int fdin, fdout;
+	if ([stdout isKindOfClass:[NSPipe class]])
+		fdin = [[stdout fileHandleForReading] fileDescriptor];
+	else if ([stdout isKindOfClass:[NSFileHandle class]])
+		fdin = [stdout fileDescriptor];
+	else
 		return nil;
-	return [self initWithReadDescriptor:[[stdout fileHandleForReading] fileDescriptor]
-			    writeDescriptor:[[stdin fileHandleForWriting] fileDescriptor]
+
+	if ([stdin isKindOfClass:[NSPipe class]])
+		fdout = [[stdin fileHandleForWriting] fileDescriptor];
+	else if ([stdin isKindOfClass:[NSFileHandle class]])
+		fdout = [stdin fileDescriptor];
+	else
+		return nil;
+
+	return [self initWithReadDescriptor:fdin
+			    writeDescriptor:fdout
 				   priority:5];
 }
 
@@ -375,6 +388,11 @@ fd_read(CFSocketRef s,
 	*buf = buffer;
 	*len = buflen;
 	return YES;
+}
+
+- (NSData *)data
+{
+	return [NSData dataWithBytes:buffer length:buflen];
 }
 
 - (BOOL)hasBytesAvailable

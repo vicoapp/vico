@@ -59,7 +59,7 @@
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
 			return;
 		if (closeSymbolListAfterUse) {
-			[self closeSymbolList];
+			[self closeSymbolListAndFocusEditor:NO];
 			closeSymbolListAfterUse = NO;
 		}
 		[self hideAltFilterField];
@@ -129,12 +129,18 @@
 	}
 }
 
-- (void)closeSymbolList
+- (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor
 {
 	width = [symbolsView frame].size.width;
 	NSRect frame = [splitView frame];
 	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
-	[windowController focusEditor];
+	if (focusEditor)
+		[windowController focusEditor];
+}
+
+- (void)closeSymbolList
+{
+	[self closeSymbolListAndFocusEditor:YES];
 }
 
 - (void)resetSymbolList
@@ -401,8 +407,8 @@
 	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:symbolFilterField];
 	} else {
-		[window makeFirstResponder:altSymbolFilterField];
 		[self showAltFilterField];
+		[window makeFirstResponder:altSymbolFilterField];
 	}
 }
 

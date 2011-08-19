@@ -1000,7 +1000,7 @@
 		NSRect frame = [scrollView frame];
 		frame.size.height = explorerFrame.size.height - 23 - 22 - 3;
 		[scrollView setFrame:frame];
-                [altFilterField setHidden:NO];
+		[altFilterField setHidden:NO];
 	}
 }
 
@@ -1011,7 +1011,7 @@
 		NSRect frame = [scrollView frame];
 		frame.size.height = explorerFrame.size.height - 23;
 		[scrollView setFrame:frame];
-                [altFilterField setHidden:YES];
+		[altFilterField setHidden:YES];
 	}
 }
 
@@ -1023,8 +1023,8 @@
 	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:filterField];
 	} else {
-		[window makeFirstResponder:altFilterField];
 		[self showAltFilterField];
+		[window makeFirstResponder:altFilterField];
 	}
 }
 
@@ -1037,7 +1037,7 @@
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
 			return;
 		if (closeExplorerAfterUse) {
-			[self closeExplorer];
+			[self closeExplorerAndFocusEditor:NO];
 			closeExplorerAfterUse = NO;
 		}
 		[self hideAltFilterField];
@@ -1058,11 +1058,17 @@
 	}
 }
 
-- (void)closeExplorer
+- (void)closeExplorerAndFocusEditor:(BOOL)focusEditor
 {
 	width = [explorerView frame].size.width;
 	[splitView setPosition:0.0 ofDividerAtIndex:0];
-	[delegate focusEditor];
+	if (focusEditor)
+		[delegate focusEditor];
+}
+
+- (void)closeExplorer
+{
+	[self closeExplorerAndFocusEditor:YES];
 }
 
 - (IBAction)toggleExplorer:(id)sender

@@ -23,6 +23,7 @@
 	BOOL closeSymbolListAfterUse;
 	NSInteger lastSelectedRow;
 	BOOL isFiltered;
+	BOOL symbolUpdateDuringFiltering;
 
 	NSTimer *reloadTimer;
 	BOOL dirty;

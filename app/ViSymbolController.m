@@ -9,6 +9,7 @@
 #import "ViWindow.h"
 
 @interface ViSymbolController (private)
+- (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor;
 - (BOOL)symbolListIsOpen;
 - (void)showAltFilterField;
 - (void)hideAltFilterField;
@@ -116,16 +117,31 @@
 	dirty = NO;
 	reloadTimer = nil;
 
-	[self filterSymbols];
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
-		[symbolView collapseItem:nil collapseChildren:YES];
-		[symbolView expandItem:[windowController currentDocument]];
-	}
+	symbolUpdateDuringFiltering = isFiltered;
+	id selectedItem = nil;
+	if (symbolUpdateDuringFiltering)
+		selectedItem = [symbolView itemAtRow:[symbolView selectedRow]];
 
-	id<ViViewController> viewController = [windowController currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocumentView *docView = viewController;
-		[self updateSelectedSymbolForLocation:[[docView textView] caret]];
+	[self filterSymbols];
+
+	if (symbolUpdateDuringFiltering) {
+		NSInteger row = [symbolView rowForItem:selectedItem];
+		if (row != -1LL) {
+			[symbolView scrollRowToVisible:row];
+			[symbolView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+				byExtendingSelection:NO];
+		}
+	} else {
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"autocollapse"] == YES) {
+			[symbolView collapseItem:nil collapseChildren:YES];
+			[symbolView expandItem:[windowController currentDocument]];
+		}
+
+		id<ViViewController> viewController = [windowController currentView];
+		if ([viewController isKindOfClass:[ViDocumentView class]]) {
+			ViDocumentView *docView = viewController;
+			[self updateSelectedSymbolForLocation:[[docView textView] caret]];
+		}
 	}
 }
 
@@ -269,11 +285,13 @@
 	[filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
 
-	if ([filter length] > 0) {
-		[symbolView expandItem:nil expandChildren:YES];
-		[self selectFirstMatchingSymbolForFilter:filter];
-	} else {
-		[self didSelectDocument:[windowController currentDocument]];
+	if (!symbolUpdateDuringFiltering) {
+		if (isFiltered) {
+			[symbolView expandItem:nil expandChildren:YES];
+			[self selectFirstMatchingSymbolForFilter:filter];
+		} else {
+			[self didSelectDocument:[windowController currentDocument]];
+		}
 	}
 }
 

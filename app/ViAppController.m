@@ -577,25 +577,56 @@ additionalBindings:(NSDictionary *)bindings
 - (void)beginTrackingMainMenu:(NSNotification *)notification
 {
 	menuTrackedKeyWindow = [NSApp keyWindow];
+	trackingMainMenu = YES;
 }
 
 - (void)endTrackingMainMenu:(NSNotification *)notification
 {
 	menuTrackedKeyWindow = nil;
+	trackingMainMenu = NO;
 }
 
-/*
- * XXX: this is called on every key event, can we only call it when the menu is shown?
- */
+- (NSWindow *)keyWindowBeforeMainMenuTracking
+{
+	return menuTrackedKeyWindow ?: [NSApp keyWindow];
+}
+
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
-
-	NSWindow *keyWindow = menuTrackedKeyWindow;
-	if (keyWindow == nil)
-		keyWindow = [NSApp keyWindow];
+	NSWindow *keyWindow = [self keyWindowBeforeMainMenuTracking];
 	ViWindowController *windowController = [keyWindow windowController];
 	BOOL isDocWindow = [windowController isKindOfClass:[ViWindowController class]];
+
+	/*
+	 * Revert cmd-w to its original behaviour for non-document windows.
+	 */
+	if (isDocWindow) {
+		[closeWindowMenuItem setKeyEquivalent:@"W"];
+		[closeTabMenuItem setKeyEquivalent:@"w"];
+		[closeDocumentMenuItem setKeyEquivalent:@"w"];
+	} else {
+		[closeWindowMenuItem setKeyEquivalent:@"w"];
+		[closeTabMenuItem setKeyEquivalent:@""];
+		[closeDocumentMenuItem setKeyEquivalent:@""];
+	}
+
+	/*
+	 * Insert the current document in the title for "Close Document".
+	 */
+	id<ViViewController> viewController = [[ViWindowController currentWindowController] currentView];
+	if (viewController == nil || !isDocWindow)
+		[closeDocumentMenuItem setTitle:@"Close Document"];
+	else
+		[closeDocumentMenuItem setTitle:[NSString stringWithFormat:@"Close \"%@\"", [viewController title]]];
+
+	/*
+         * If we're not tracking the main menu, but got triggered by a
+         * key event, don't update displayed menu items.
+	 */
+	if (!trackingMainMenu)
+		return;
+
+	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
 	BOOL hasSelection = NO;
 	NSWindow *window = [[NSApplication sharedApplication] mainWindow];
@@ -605,20 +636,7 @@ additionalBindings:(NSDictionary *)bindings
 		hasSelection = YES;
 
 	for (NSMenuItem *item in [menu itemArray]) {
-		if (item == closeDocumentMenuItem) {
-			id<ViViewController> viewController = [[ViWindowController currentWindowController] currentView];
-			if (viewController == nil || !isDocWindow)
-				[item setTitle:@"Close Document"];
-			else
-				[item setTitle:[NSString stringWithFormat:@"Close \"%@\"", [viewController title]]];
-			continue;
-		} else if (item == closeWindowMenuItem) {
-			if (isDocWindow)
-				[item setKeyEquivalent:@"W"];
-			else
-				[item setKeyEquivalent:@"w"];
-			continue;
-		} else if (item == closeTabMenuItem) {
+		if (item == closeTabMenuItem) {
 			if (isDocWindow)
 				[item setKeyEquivalent:@"w"];
 			else

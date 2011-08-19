@@ -48,6 +48,7 @@ int updateMeta(void);
 	TISInputSourceRef original_input_source;
 	BOOL recently_launched;
 	NSWindow *menuTrackedKeyWindow;
+	BOOL trackingMainMenu;
 
 	// input of scripted ex commands
 	// XXX: in search of a better place (refugees from ExEnvironment)
@@ -79,5 +80,7 @@ withParser:(NuParser *)parser
 
 - (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringForCommand:(ViCommand *)command;
+
+- (NSWindow *)keyWindowBeforeMainMenuTracking;
 
 @end

@@ -982,12 +982,10 @@ static ViWindowController	*currentWindowController = nil;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	NSWindow *keyWindow = [NSApp keyWindow];
+	NSWindow *keyWindow = [[NSApp delegate] keyWindowBeforeMainMenuTracking];
 	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
 
-	if (isDocWindow || [menuItem action] == @selector(performClose:))
-		return YES;
-	return NO;
+	return isDocWindow;
 }
 
 #pragma mark -

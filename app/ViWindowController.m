@@ -1439,7 +1439,7 @@ static ViWindowController	*currentWindowController = nil;
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
 {
 	id<ViViewController> viewController, otherViewController;
-	if ([aView conformsToProtocol:@protocol(ViViewController)])
+	if ([aView respondsToSelector:@selector(tabController)])
 		viewController = aView;
 	else
 		viewController = [self viewControllerForView:aView];

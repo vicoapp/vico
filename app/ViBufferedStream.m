@@ -289,6 +289,11 @@ fd_read(CFSocketRef s,
 	return self;
 }
 
++ (id)streamWithTask:(NSTask *)task
+{
+	return [[ViBufferedStream alloc] initWithTask:task];
+}
+
 - (id)initWithTask:(NSTask *)task
 {
 	NSPipe *stdin = [task standardInput];

@@ -29,6 +29,8 @@
 	CFSocketContext		 inputContext, outputContext;
 }
 
++ (id)streamWithTask:(NSTask *)task;
+
 - (id)initWithReadDescriptor:(int)read_fd
 	     writeDescriptor:(int)write_fd
 		    priority:(int)prio;

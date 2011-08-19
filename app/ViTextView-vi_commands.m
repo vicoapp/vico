@@ -1645,8 +1645,10 @@
 - (BOOL)insert_bol:(ViCommand *)command
 {
 	NSString *s = [[self textStorage] string];
-	if([s length] == 0)
+	if([s length] == 0) {
+		[self setInsertMode:command];
 		return YES;
+	}
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 

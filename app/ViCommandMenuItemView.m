@@ -1,5 +1,7 @@
 #import "ViCommandMenuItemView.h"
 #import "NSScanner-additions.h"
+#import "NSObject+SPInvocationGrabbing.h"
+#import "NSEvent-keyAdditions.h"
 #include "logging.h"
 
 @implementation ViCommandMenuItemView : NSView
@@ -142,7 +144,7 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	BOOL enabled =  [[self enclosingMenuItem] isEnabled];
+	BOOL enabled = [[self enclosingMenuItem] isEnabled];
 	BOOL highlighted = [[self enclosingMenuItem] isHighlighted];
 
 	if (enabled && highlighted) {
@@ -175,18 +177,36 @@
 	[commandTitle drawAtPoint:p withAttributes:attributes];
 }
 
-- (void)mouseUp:(NSEvent*)event
+- (void)performAction
 {
 	NSMenuItem *item = [self enclosingMenuItem];
 	if (![item isEnabled])
 		return;
 
 	NSMenu *menu = [item menu];
-	// XXX: that (id) is not a nice cast!
-	[menu performSelector:@selector(performActionForItemAtIndex:)
-		   withObject:(id)[menu indexOfItem:item]
-		   afterDelay:0.0];
+	NSInteger itemIndex = [menu indexOfItem:item];
+
 	[menu cancelTracking];
+	[[menu nextRunloop] performActionForItemAtIndex:itemIndex];
+	[[menu nextRunloop] update];
+
+	// XXX: Hack to force the menuitem to loose the highlight
+	[[menu nextRunloop] removeItemAtIndex:itemIndex];
+	[[menu nextRunloop] insertItem:item atIndex:itemIndex];
+}
+
+- (void)mouseUp:(NSEvent *)event
+{
+	[self performAction];
+}
+
+- (void)keyDown:(NSEvent *)event
+{
+	NSUInteger keyCode = [event normalizedKeyCode];
+	if (keyCode == 0xa || keyCode == 0xd || keyCode == ' ')
+		[self performAction];
+	else
+		[super keyDown:event];
 }
 
 @end

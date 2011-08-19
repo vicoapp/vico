@@ -1,3 +1,5 @@
+* when symbol list updates while filtering, KEEP THE SELECTED ENTRY!
+
 * :/search doesn't work with 'nowrapscan'
 
 * search with 'nowrapscan' should issue 'not found' message

@@ -250,6 +250,11 @@
  */
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 
+- (NSInteger)matchCharacter:(unichar)matchChar
+                 atLocation:(NSUInteger)location
+              withCharacter:(unichar)otherChar
+                    forward:(BOOL)forward;
+
 - (NSRange)rangeOfPattern:(NSString *)pattern
 	     fromLocation:(NSUInteger)start
 		  forward:(BOOL)forwardSearch

@@ -77,6 +77,13 @@ TAILQ_HEAD(skiplist, skip);
  */
 - (NSRange)rangeOfLine:(NSUInteger)lineNumber;
 
+/** Return the range of a line.
+ * @param aLocation The location of a character on the line to return the range for.
+ * @returns The range of the line, or (`NSNotFound`, `0`) if the
+ * location is invalid.
+ */
+- (NSRange)rangeOfLineAtLocation:(NSUInteger)aLocation;
+
 - (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation;
 
 /** Find the line number of a location.
@@ -138,7 +145,6 @@ TAILQ_HEAD(skiplist, skip);
                    fromLocation:(NSUInteger)aLocation
                       acceptEOL:(BOOL)acceptEOL;
 
-- (NSRange)rangeOfLineAtLocation:(NSUInteger)aLocation;
 - (NSString *)lineForLocation:(NSUInteger)aLocation;
 
 /** Determine if a line is blank.

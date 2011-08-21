@@ -302,6 +302,74 @@
 	return YES;
 }
 
+- (NSInteger)matchCharacter:(unichar)matchChar
+                 atLocation:(NSUInteger)location
+              withCharacter:(unichar)otherChar
+                    forward:(BOOL)forward
+{
+	NSUInteger length = [[self textStorage] length];
+
+	/* Special case: check if inside a string or comment. */
+	ViScope *openingScope = [document scopeAtLocation:location];
+	NSRange specialScopeRange;
+	BOOL inSpecialScope = ([@"string" match:openingScope] > 0);
+	if (inSpecialScope) {
+		specialScopeRange = [document rangeOfScopeSelector:@"string"
+							atLocation:location];
+	} else {
+		inSpecialScope = ([@"comment" match:openingScope ] > 0);
+		if (inSpecialScope)
+			specialScopeRange = [document rangeOfScopeSelector:@"comment"
+								atLocation:location];
+	}
+
+	/* Lookup the matching character and prepare search. */
+	NSInteger startOffset, endOffset = 0;
+	int delta = 1;
+	if (forward) {
+		startOffset = location + 1;
+		if (inSpecialScope)
+			endOffset = NSMaxRange(specialScopeRange) - 1;
+		else
+			endOffset = length;
+	} else {
+		startOffset = location - 1;
+		if (inSpecialScope)
+			endOffset = specialScopeRange.location;
+		delta = -1;
+	}
+
+	// search for matching character
+	NSString *string = [[self textStorage] string];
+	int level = 1;
+	NSInteger offset;
+	for (offset = startOffset; delta > 0 ? offset <= endOffset : offset >= endOffset; offset += delta) {
+		if (offset >= length)
+			break;
+		unichar c = [string characterAtIndex:offset];
+		if (c == matchChar || c == otherChar) {
+			/* Ignore match if scopes don't match. */
+			if (!inSpecialScope) {
+				ViScope *scope = [document scopeAtLocation:offset];
+				if ([@"string | comment" match:scope])
+					continue;
+			}
+
+			if (c == matchChar)
+				level++;
+			else
+				level--;
+
+			if (level == 0)
+				break;
+		}
+	}
+
+	if (level > 0)
+		return -1LL;
+	return offset;
+}
+
 /* syntax: % */
 - (BOOL)move_to_match:(ViCommand *)command
 {
@@ -321,79 +389,34 @@
 		return NO;
 	}
 
-	/* Special case: check if inside a string or comment. */
-	ViScope *openingScope = [document scopeAtLocation:openingRange.location];
-	BOOL inSpecialScope;
-	NSRange specialScopeRange;
-
-	inSpecialScope = ([@"string" match:openingScope] > 0);
-	if (inSpecialScope) {
-		specialScopeRange = [document rangeOfScopeSelector:@"string"
-							atLocation:openingRange.location];
-	} else {
-		inSpecialScope = ([@"comment" match:openingScope ] > 0);
-		if (inSpecialScope)
-			specialScopeRange = [document rangeOfScopeSelector:@"comment"
-								atLocation:openingRange.location];
-	}
-
 	/* Lookup the matching character and prepare search. */
+	BOOL forward;
 	NSString *match = [[[self textStorage] string] substringWithRange:openingRange];
 	unichar matchChar = [match characterAtIndex:0];
 	unichar otherChar;
-	NSInteger startOffset, endOffset = 0;
-	int delta = 1;
 	NSRange r = [parens rangeOfString:match];
 	if (r.location % 2 == 0) {
 		// search forward
 		otherChar = [parens characterAtIndex:r.location + 1];
-		startOffset = openingRange.location + 1;
-		if (inSpecialScope)
-			endOffset = NSMaxRange(specialScopeRange);
-		else
-			endOffset = [[self textStorage] length];
+		forward = YES;
 	} else {
 		// search backwards
 		otherChar = [parens characterAtIndex:r.location - 1];
-		startOffset = openingRange.location - 1;
-		if (inSpecialScope)
-			endOffset = specialScopeRange.location;
-		delta = -1;
+		forward = NO;
 	}
 
-	// search for matching character
-	int level = 1;
-	NSInteger offset;
-	for (offset = startOffset; delta > 0 ? offset <= endOffset : offset >= endOffset; offset += delta) {
-		if (offset >= [[self textStorage] length])
-			break;
-		unichar c = [[[self textStorage] string] characterAtIndex:offset];
-		if (c == matchChar || c == otherChar) {
-			/* Ignore match if scopes don't match. */
-			if (!inSpecialScope) {
-				ViScope *scope = [document scopeAtLocation:offset];
-				if ([@"string | comment" match:scope])
-					continue;
-			}
+	NSInteger matchLocation = [self matchCharacter:matchChar
+					    atLocation:openingRange.location
+					 withCharacter:otherChar
+					       forward:forward];
 
-			if (c == matchChar)
-				level++;
-			else
-				level--;
-
-			if (level == 0)
-				break;
-		}
-	}
-
-	if (level > 0) {
+	if (matchLocation < 0) {
 		MESSAGE(@"Matching character not found");
 		return NO;
 	}
 
 	[self pushLocationOnJumpList:start_location];
-
-	final_location = end_location = offset;
+	final_location = end_location = matchLocation;
 
 	/*
 	 * Adjust the start/end location to include the begin/end match.
@@ -403,7 +426,7 @@
 	    (command.operator.action == @selector(delete:) ||
 	     command.operator.action == @selector(change:) ||
 	     command.operator.action == @selector(yank:))) {
-		if (delta == 1)
+		if (forward)
 			end_location++;
 		else
 			start_location++;

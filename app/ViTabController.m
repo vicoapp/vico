@@ -11,7 +11,7 @@
 @synthesize window, views, selectedView, previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialViewController
-		      window:(NSWindow *)aWindow;
+		      window:(NSWindow *)aWindow
 {
 	self = [super init];
 	if (self) {

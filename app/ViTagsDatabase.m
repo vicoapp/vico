@@ -99,9 +99,9 @@
 		    [scan scanCharactersFromSet:tabSet intoString:nil] &&
 		    [scan scanString:@"/" intoString:nil] &&
 		    [scan scanUpToUnescapedCharacter:'/' intoString:&pattern stripEscapes:YES]) {
-			NSURL *path = [baseURL URLByAppendingPathComponent:file];
-			DEBUG(@"got symbol [%@] in file [%@], pattern [%@]", symbol, path, pattern);
-			[tags setObject:[NSArray arrayWithObjects:path, pattern, nil] forKey:symbol];
+			NSURL *url = [baseURL URLWithRelativeString:file];
+			DEBUG(@"got symbol [%@] in file [%@], pattern [%@]", symbol, url, pattern);
+			[tags setObject:[NSArray arrayWithObjects:url, pattern, nil] forKey:symbol];
 		} else
 			DEBUG(@"skipping tags line [%@]", line);
 	}

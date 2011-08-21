@@ -92,7 +92,7 @@ syntax menu
   externally (double-click in Finder, vicotool, etc) not in a new tab, not
   in current view, but in a new window?
 
-* vim text objects, especially i[, a] and it, at
+* vim tag text objects (it, at)
 * vicotool --line 1
 * R (replace mode)
 * i_CTRL-o (execute one normal mode command in insert mode)

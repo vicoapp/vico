@@ -250,11 +250,6 @@
  */
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 
-- (NSInteger)matchCharacter:(unichar)matchChar
-                 atLocation:(NSUInteger)location
-              withCharacter:(unichar)otherChar
-                    forward:(BOOL)forward;
-
 - (NSRange)rangeOfPattern:(NSString *)pattern
 	     fromLocation:(NSUInteger)start
 		  forward:(BOOL)forwardSearch
@@ -390,6 +385,10 @@
 - (BOOL)yank:(ViCommand *)command;
 - (BOOL)jumplist_forward:(ViCommand *)command;
 - (BOOL)jumplist_backward:(ViCommand *)command;
+- (NSInteger)matchCharacter:(unichar)matchChar
+                 atLocation:(NSUInteger)location
+              withCharacter:(unichar)otherChar
+                    forward:(BOOL)forward;
 - (BOOL)evalExString:(NSString *)exline;
 - (BOOL)presentCompletionsOf:(NSString *)string
 		fromProvider:(id<ViCompletionProvider>)provider

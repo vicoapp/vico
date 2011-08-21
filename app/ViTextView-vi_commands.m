@@ -307,6 +307,10 @@
               withCharacter:(unichar)otherChar
                     forward:(BOOL)forward
 {
+	/* Special case: already on the other matching character. */
+	if ([self characterAtIndex:location] == otherChar)
+		return location;
+
 	NSUInteger length = [[self textStorage] length];
 
 	/* Special case: check if inside a string or comment. */
@@ -2581,14 +2585,96 @@
 	return [self select_string:command inclusive:YES];
 }
 
+- (BOOL)selectBlock:(ViCommand *)command
+         atLocation:(NSUInteger)location
+              match:(unichar)matchChar
+               with:(unichar)otherChar
+          inclusive:(BOOL)isInclusive
+{
+	NSInteger startMatch = [self matchCharacter:otherChar
+					 atLocation:location
+				      withCharacter:matchChar
+					    forward:NO];
+	if (startMatch < 0)
+		return NO;
+
+	NSInteger endMatch = [self matchCharacter:matchChar
+				       atLocation:startMatch
+				    withCharacter:otherChar
+					  forward:YES];
+
+	if (endMatch < 0)
+		return NO;
+
+	if (!isInclusive) {
+		++startMatch;
+		if (endMatch > startMatch)
+			--endMatch;
+	}
+
+	if (mode == ViVisualMode && startMatch == visual_start_location && endMatch == start_location) {
+		int d = (isInclusive ? 0 : 1);
+		if (startMatch > d && [self selectBlock:command atLocation:startMatch-1-d match:matchChar with:otherChar inclusive:isInclusive])
+			return YES;
+	}
+
+	/*
+	 * Adjust the start/end location to include the begin/end match.
+	 * Do this when % is used as motion component in a non-line-oriented editing command.
+	 */
+	if (command.hasOperator &&
+	    (command.operator.action == @selector(delete:) ||
+	     command.operator.action == @selector(change:) ||
+	     command.operator.action == @selector(yank:)))
+		endMatch++;
+
+	start_location = startMatch;
+	end_location = endMatch;
+	if (mode == ViVisualMode)
+		visual_start_location = start_location;
+	final_location = end_location;
+
+	return YES;
+}
+
+- (BOOL)select_inner_block:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'(' with:')' inclusive:NO];
+}
+
+- (BOOL)select_outer_block:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'(' with:')' inclusive:YES];
+}
+
 - (BOOL)select_inner_bracket:(ViCommand *)command
 {
-	return NO;
+	return [self selectBlock:command atLocation:start_location match:'[' with:']' inclusive:NO];
+}
+
+- (BOOL)select_outer_bracket:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'[' with:']' inclusive:YES];
+}
+
+- (BOOL)select_inner_angle_bracket:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'<' with:'>' inclusive:NO];
+}
+
+- (BOOL)select_outer_angle_bracket:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'<' with:'>' inclusive:YES];
 }
 
 - (BOOL)select_inner_brace:(ViCommand *)command
 {
-	return NO;
+	return [self selectBlock:command atLocation:start_location match:'{' with:'}' inclusive:NO];
+}
+
+- (BOOL)select_outer_brace:(ViCommand *)command
+{
+	return [self selectBlock:command atLocation:start_location match:'{' with:'}' inclusive:YES];
 }
 
 - (BOOL)select_inner_scope:(ViCommand *)command

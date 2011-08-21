@@ -1900,13 +1900,9 @@ int logIndent = 0;
 				[self deselectSnippet];
 		}
 	}
-	if (mode == ViVisualMode) {
-		NSRange sel = [self selectedRange];
-		/* Text objects can extend visual selection in both directions. */
-		if (sel.length <= 1 && start_location != sel.location)
-			visual_start_location = start_location;
+
+	if (mode == ViVisualMode)
 		[self setVisualSelection];
-	}
 
 	if (mode != ViInsertMode)
 		[self endUndoGroup];

@@ -2492,8 +2492,9 @@
 		location = bol;
 	}
 
-	if ([self selectedRange].length <= 1)
-		start_location = location;
+	if (location < visual_start_location)
+		visual_start_location = location;
+	start_location = location;
 	end_location = location;
 
 	for (location = end; end < [[self textStorage] length]; location = end) {
@@ -2569,7 +2570,7 @@
 	NSRange range = [document rangeOfScopeSelector:selector atLocation:location];
 	DEBUG(@"range = %@", NSStringFromRange(range));
 
-	start_location = range.location;
+	visual_start_location =	start_location = range.location;
 	end_location = NSMaxRange(range);
 	final_location = end_location - 1;
 	return YES;
@@ -2630,8 +2631,10 @@
 
 	start_location = startMatch;
 	end_location = endMatch;
-	if (mode == ViVisualMode)
+	if (mode == ViVisualMode) {
 		visual_start_location = start_location;
+		visual_line_mode = NO;
+	}
 	final_location = end_location;
 
 	return YES;

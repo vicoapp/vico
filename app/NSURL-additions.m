@@ -22,5 +22,11 @@ static NSCharacterSet *slashSet = nil;
 	return [s1 hasPrefix:s2];
 }
 
+- (NSURL *)URLWithRelativeString:(NSString *)string
+{
+	return [[NSURL URLWithString:[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+		       relativeToURL:self] absoluteURL];
+}
+
 @end
 

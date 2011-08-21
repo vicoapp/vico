@@ -42,6 +42,7 @@
 - (void)resetExplorerView;
 - (void)showAltFilterField;
 - (void)hideAltFilterField;
+- (void)closeExplorerAndFocusEditor:(BOOL)focusEditor;
 @end
 
 @implementation ProjectFile

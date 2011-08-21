@@ -755,7 +755,7 @@ int logIndent = 0;
 				n -= n % shiftWidth;
 		}
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-		if ([[self textStorage] isBlankLineAtLocation:bol] && !indentEmptyLines)
+		if (!indentEmptyLines && [[self textStorage] isBlankLineAtLocation:bol])
 			/* should not indent empty lines when using the < or > operators. */
 			newIndent = indent;
 

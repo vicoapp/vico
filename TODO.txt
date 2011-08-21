@@ -1,3 +1,7 @@
+* scriptable settings with :set
+
+* "Open all with current extension as..." from sublime in language
+syntax menu
 * :/search doesn't work with 'nowrapscan'
 
 * search with 'nowrapscan' should issue 'not found' message
@@ -53,6 +57,7 @@
 )
 
 * cw<cmd-v> and repeat inserts pasteboard twice
+* repeating completed text should not re-trigger completion!
 
 ! vertical splits are buggy
 

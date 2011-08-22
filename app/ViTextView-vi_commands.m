@@ -2360,6 +2360,8 @@
 		end_location = NSMaxRange(range);
 	}
 
+	if (visual_start_location > start_location)
+		visual_start_location = start_location;
 	visual_line_mode = NO;
 	final_location = end_location - 1;
 	return YES;
@@ -2455,6 +2457,8 @@
 		}
 	}
 
+	if (visual_start_location > start_location)
+		visual_start_location = start_location;
 	visual_line_mode = NO;
 	final_location = end_location - 1;
 	return YES;

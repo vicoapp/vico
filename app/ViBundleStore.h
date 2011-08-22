@@ -6,7 +6,7 @@
 @interface ViBundleStore : NSObject
 {
 	NSMutableDictionary *languages;
-	NSMutableArray *bundles;
+	NSMutableDictionary *bundles;
 	NSMutableDictionary *cachedPreferences;
 }
 + (NSString *)bundlesDirectory;

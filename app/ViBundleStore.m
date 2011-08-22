@@ -13,8 +13,7 @@ static NSString *bundlesDirectory = nil;
 + (NSString *)bundlesDirectory
 {
 	if (bundlesDirectory == nil)
-		bundlesDirectory = [[NSString stringWithFormat:@"%@/Bundles",
-		    [ViAppController supportDirectory]] stringByExpandingTildeInPath];
+		bundlesDirectory = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"Bundles"];
 	return bundlesDirectory;
 }
 
@@ -33,7 +32,20 @@ static NSString *bundlesDirectory = nil;
 	ViBundle *bundle = [[ViBundle alloc] initWithDirectory:bundleDirectory];
 	if (bundle == nil)
 		return NO;
-	[bundles addObject:bundle];
+
+	NSString *uuid = [bundle uuid];
+	ViBundle *oldBundle = [bundles objectForKey:uuid];
+	if (oldBundle) {
+		INFO(@"replacing bundle %@ with %@", oldBundle, bundle);
+		for (ViLanguage *lang in [oldBundle languages])
+			[languages removeObjectForKey:[lang name]];
+		/* Reset cached preferences to remove any pref in oldBundle. */
+		cachedPreferences = [NSMutableDictionary dictionary];
+		/* FIXME: remove any defined languages in oldBundle, re-compile/clear cache for dependent languages. */
+		/* FIXME: clear cache for theme attributes? */
+	}
+
+	[bundles setObject:bundle forKey:[bundle uuid]];
 
 	for (ViLanguage *lang in [bundle languages])
 		[languages setObject:lang forKey:[lang name]];
@@ -55,7 +67,7 @@ static NSString *bundlesDirectory = nil;
 - (void)initLanguages
 {
 	languages = [NSMutableDictionary dictionary];
-	bundles = [NSMutableArray array];
+	bundles = [NSMutableDictionary dictionary];
 
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 	[self addBundlesFromBundleDirectory:[ViBundleStore bundlesDirectory]];
@@ -146,12 +158,12 @@ static NSString *bundlesDirectory = nil;
 
 - (NSArray *)allBundles
 {
-	return bundles;
+	return [bundles allValues];
 }
 
 - (ViBundle *)bundleWithName:(NSString *)name
 {
-	for (ViBundle *b in bundles)
+	for (ViBundle *b in [self allBundles])
 		if ([[b name] isEqualToString:name])
 			return b;
 	return nil;
@@ -159,10 +171,7 @@ static NSString *bundlesDirectory = nil;
 
 - (ViBundle *)bundleWithUUID:(NSString *)uuid
 {
-	for (ViBundle *b in bundles)
-		if ([[b uuid] isEqualToString:uuid])
-			return b;
-	return nil;
+	return [bundles objectForKey:uuid];
 }
 
 /*
@@ -178,11 +187,10 @@ static NSString *bundlesDirectory = nil;
 	result = [[NSMutableDictionary alloc] init];
 	[cachedPreferences setObject:result forKey:cacheKey];
 
-	ViBundle *bundle;
-	for (bundle in bundles) {
+	for (ViBundle *bundle in [self allBundles]) {
 		NSDictionary *p = [bundle preferenceItems:prefsNames];
 		if (p)
-			[result addEntriesFromDictionary:p];	// XXX: need to do this in two levels? (since items in p are also dictionaries...)
+			[result addEntriesFromDictionary:p];
 	}
 
 	return result;
@@ -200,8 +208,7 @@ static NSString *bundlesDirectory = nil;
 	result = [[NSMutableDictionary alloc] init];
 	[cachedPreferences setObject:result forKey:prefsName];
 
-	ViBundle *bundle;
-	for (bundle in bundles) {
+	for (ViBundle *bundle in [self allBundles]) {
 		NSDictionary *p = [bundle preferenceItem:prefsName];
 		if (p)
 			[result addEntriesFromDictionary:p];
@@ -215,7 +222,7 @@ static NSString *bundlesDirectory = nil;
 	NSMutableDictionary *result = nil;
 	u_int64_t rank = 0ULL;
 
-	for (ViBundle *bundle in bundles) {
+	for (ViBundle *bundle in [self allBundles]) {
 		NSArray *preferences = bundle.preferences;
 		for (NSDictionary *preference in preferences) {
 			NSString *scopeSelector = [preference objectForKey:@"scope"];
@@ -267,7 +274,7 @@ static NSString *bundlesDirectory = nil;
 	u_int64_t highest_rank = 0ULL;
 	NSUInteger longestMatch = 0ULL;
 
-	for (ViBundle *bundle in bundles)
+	for (ViBundle *bundle in [self allBundles])
 		for (ViBundleItem *item in [bundle items])
 			if ([item tabTrigger] &&
 			    [prefix hasSuffix:[item tabTrigger]] &&
@@ -312,7 +319,7 @@ static NSString *bundlesDirectory = nil;
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
 
-	for (ViBundle *bundle in bundles)
+	for (ViBundle *bundle in [self allBundles])
 		for (ViBundleItem *item in [bundle items])
 			if ([item keyCode] == keyCode &&
 			    ([item mode] == ViAnyMode || [item mode] == mode)) {
@@ -337,8 +344,7 @@ static NSString *bundlesDirectory = nil;
 
 - (BOOL)isBundleLoaded:(NSString *)name
 {
-	ViBundle *bundle;
-	for (bundle in bundles)
+	for (ViBundle *bundle in [self allBundles])
 		if ([[bundle path] rangeOfString:name].location != NSNotFound)
 			return YES;
 	return NO;

@@ -52,6 +52,7 @@
 	NSDictionary *symbolTransforms;
 	NSDictionary *symbolIcons;
 
+	NSRange matchingParenRange;
 	ViSnippet *snippet;
 
 	id didSaveDelegate;
@@ -73,6 +74,7 @@
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property(nonatomic,readonly) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
+@property(nonatomic,readwrite) NSRange matchingParenRange;
 
 /** Return the ViTextStorage object. */
 @property(nonatomic,readonly) ViTextStorage *textStorage;

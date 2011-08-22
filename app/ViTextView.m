@@ -1358,6 +1358,50 @@ int logIndent = 0;
 	return NO;
 }
 
+- (void)highlightCharacter:(unichar)matchChar
+                atLocation:(NSUInteger)location
+             withCharacter:(unichar)otherChar
+                   forward:(BOOL)forward
+{
+	NSInteger matchLocation = [self matchCharacter:matchChar
+					    atLocation:location
+					 withCharacter:otherChar
+					       forward:forward];
+	if (matchLocation < 0)
+		return;
+
+	document.matchingParenRange = NSMakeRange(matchLocation, 1);
+	// [self showFindIndicatorForRange:matchingParenRange];
+}
+
+- (void)highlightSmartPairAtLocation:(NSUInteger)location
+{
+	document.matchingParenRange = NSMakeRange(NSNotFound, 0);
+	if (mode == ViInsertMode && location > 0)
+		location--;
+	if (location >= [[self textStorage] length])
+		return;
+
+	unichar ch = [self characterAtIndex:location];
+
+	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:location];
+	for (NSArray *pair in smartTypingPairs) {
+		unichar pair0 = [[pair objectAtIndex:0] characterAtIndex:0];
+		unichar pair1 = [[pair objectAtIndex:1] characterAtIndex:0];
+
+		if (pair0 == pair1)
+			continue;
+
+		if (pair0 == ch) {
+			[self highlightCharacter:pair0 atLocation:location withCharacter:pair1 forward:YES];
+			break;
+		} else if (pair1 == ch) {
+			[self highlightCharacter:pair1 atLocation:location withCharacter:pair0 forward:NO];
+			break;
+		}
+	}
+}
+
 - (BOOL)handleSmartPair:(NSString *)characters
 {
 	if ([[self preference:@"smartpair"] integerValue] == 0)
@@ -1914,6 +1958,9 @@ int logIndent = 0;
 		[self updateStatus];
 	keepMessagesHack = NO;
 
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"matchparen"])
+		[self highlightSmartPairAtLocation:[self caret]];
+
 	return ok;
 }
 
@@ -2247,6 +2294,9 @@ int logIndent = 0;
 	}
 
 	[self updateStatus];
+
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"matchparen"])
+		[self highlightSmartPairAtLocation:[self caret]];
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent

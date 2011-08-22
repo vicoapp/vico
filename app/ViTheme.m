@@ -10,8 +10,8 @@
 	if(self == nil)
 		return nil;
 
-	scopeSelectorCache = [[NSMutableDictionary alloc] init];	
-	theme = [NSDictionary dictionaryWithContentsOfFile:aPath];
+	scopeSelectorCache = [[NSMutableDictionary alloc] init];
+	theme = [NSMutableDictionary dictionaryWithContentsOfFile:aPath];
 	if (![theme isKindOfClass:[NSDictionary class]]) {
 		INFO(@"failed to parse theme %@", aPath);
 		return nil;
@@ -24,11 +24,22 @@
 
 	themeAttributes = [[NSMutableDictionary alloc] init];
 	NSArray *preferences = [theme objectForKey:@"settings"];
-	NSDictionary *preference;
-	for (preference in preferences) {
+	for (NSDictionary *preference in preferences) {
 		if ([preference objectForKey:@"name"] == nil) {
 			/* Settings for the default scope. */
 			defaultSettings = [preference objectForKey:@"settings"];
+			if (![defaultSettings isKindOfClass:[NSDictionary class]])
+				continue;
+
+			id value;
+			if ((value = [defaultSettings objectForKey:@"smartPairMatch"]) != nil && [value isKindOfClass:[NSDictionary class]]) {
+				/* Settings for the matching pair highlight. */
+				smartPairMatchAttributes = [[NSMutableDictionary alloc] init];
+				[ViBundle normalizeSettings:value intoDictionary:smartPairMatchAttributes];
+				if ([smartPairMatchAttributes count] == 0)
+					smartPairMatchAttributes = nil;
+			}
+
 			[ViBundle normalizePreference:preference intoDictionary:defaultSettings];
 			continue;
 		}
@@ -51,6 +62,16 @@
 	return [theme objectForKey:@"name"];
 }
 
+- (NSDictionary *)smartPairMatchAttributes
+{
+	if (smartPairMatchAttributes == nil) {
+//		smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[self selectionColor]
+//								       forKey:NSBackgroundColorAttributeName];
+		smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleThick]
+								       forKey:NSUnderlineStyleAttributeName];
+	}
+	return smartPairMatchAttributes;
+}
 
 /*
  * From the textmate manual:

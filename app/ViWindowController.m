@@ -2257,13 +2257,15 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"formatprg", @"fp",
 		@"cursorline", @"cul",
 		@"clipboard", @"cb",
+		@"matchparen", @"matchparen",
+		@"linebreak", @"lbr",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
 	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
-	    @"wrapscan", @"clipboard",
+	    @"wrapscan", @"clipboard", @"matchparen", @"linebreak",
 	    nil];
 
 	NSString *var;

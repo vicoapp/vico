@@ -56,6 +56,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 @synthesize closeCallback;
 @synthesize ignoreChangeCountNotification;
 @synthesize textStorage;
+@synthesize matchingParenRange;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
@@ -74,8 +75,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[userDefaults addObserver:self forKeyPath:@"tabstop" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"fontsize" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"fontname" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"linebreak" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"wrap" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"list" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"matchparen" options:0 context:NULL];
 
 		textStorage = [[ViTextStorage alloc] init];
 		[textStorage setDelegate:self];
@@ -286,7 +289,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	else if ([keyPath isEqualToString:@"tabstop"]) {
 		[self updateTabSize];
 	} else if ([keyPath isEqualToString:@"fontsize"] ||
-		   [keyPath isEqualToString:@"fontname"])
+		   [keyPath isEqualToString:@"fontname"] ||
+		   [keyPath isEqualToString:@"linebreak"])
 		[self setTypingAttributes];
 	else if ([keyPath isEqualToString:@"list"]) {
 		[self eachTextView:^(ViTextView *tv) {
@@ -294,6 +298,13 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[lm setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
 			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [textStorage length])];
 		}];
+	} else if ([keyPath isEqualToString:@"matchparen"]) {
+		if ([userDefaults boolForKey:keyPath])
+			[self eachTextView:^(ViTextView *tv) {
+				[tv highlightSmartPairAtLocation:[tv caret]];
+			}];
+		else
+			[self setMatchingParenRange:NSMakeRange(NSNotFound, 0)];
 	}
 }
 
@@ -301,6 +312,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 {
 	[self updateWrapping];
 	[self updateTabSize];
+	[self setTypingAttributes];
 }
 
 #pragma mark -
@@ -933,6 +945,21 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}];
 }
 
+- (void)setMatchingParenRange:(NSRange)range
+{
+	if (matchingParenRange.location != NSNotFound)
+		[self eachTextView:^(ViTextView *tv) {
+			[[tv layoutManager] invalidateDisplayForCharacterRange:matchingParenRange];
+		}];
+
+	matchingParenRange = range;
+
+	if (matchingParenRange.location != NSNotFound)
+		[self eachTextView:^(ViTextView *tv) {
+			[[tv layoutManager] invalidateDisplayForCharacterRange:matchingParenRange];
+		}];
+}
+
 - (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager
    shouldUseTemporaryAttributes:(NSDictionary *)attrs
              forDrawingToScreen:(BOOL)toScreen
@@ -994,6 +1021,40 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 		DEBUG(@"merged attributes = %@", mergedAttributes);
 	}
+
+	/*
+	 * If we're highlighting a matching paren, merge in attributes
+	 * to mark the paren.
+	 */
+	sel = matchingParenRange;
+
+	if (NSIntersectionRange(r, sel).length > 0) {
+		DEBUG(@"matching paren range %@", NSStringFromRange(sel));
+		if (sel.location > r.location)
+			r.length = sel.location - r.location;
+		else {
+			if (mergedAttributes == nil)
+				mergedAttributes = [[NSMutableDictionary alloc] initWithDictionary:attributes];
+			[mergedAttributes addEntriesFromDictionary:[theme smartPairMatchAttributes]];
+			/*[mergedAttributes setObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleDouble]
+					     forKey:NSUnderlineStyleAttributeName];
+			[mergedAttributes setObject:[theme selectionColor]
+					     forKey:NSBackgroundColorAttributeName];*/
+			/*
+			 * Adjust *effectiveCharRange if r != sel
+			 */
+			if (NSMaxRange(sel) < NSMaxRange(r))
+				r.length = NSMaxRange(sel) - r.location;
+		}
+		DEBUG(@"merged %@ with %@ -> %@",
+		    NSStringFromRange(sel),
+		    NSStringFromRange(*effectiveCharRange),
+		    NSStringFromRange(r));
+		*effectiveCharRange = r;
+
+		DEBUG(@"merged attributes = %@", mergedAttributes);
+	}
+
 
 	return mergedAttributes ?: attributes;
 }
@@ -1161,6 +1222,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			language = nil;
 			[self updateTabSize];
 			[self updateWrapping];
+			[self setTypingAttributes];
 			[self highlightEverything];
 			[[ViEventManager defaultManager] emitDelayed:ViEventDidChangeSyntax for:self with:self, [NSNull null], nil];
 		}
@@ -1178,6 +1240,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		symbolTransforms = [[ViBundleStore defaultStore] preferenceItem:@"symbolTransformation"];
 		[self updateTabSize];
 		[self updateWrapping];
+		[self setTypingAttributes];
 		[self highlightEverything];
 		[[ViEventManager defaultManager] emitDelayed:ViEventDidChangeSyntax for:self with:self, lang ?: [NSNull null], nil];
 	}
@@ -1364,6 +1427,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	 *  at integral multiples of this distance."
 	 */
 	[style setDefaultTabInterval:tabSizeInPoints.width];
+
+	if ([[ViPreferencePaneEdit valueForKey:@"linebreak" inScope:language.scope] boolValue])
+		[style setLineBreakMode:NSLineBreakByWordWrapping];
+	else
+		[style setLineBreakMode:NSLineBreakByCharWrapping];
 
 	typingAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
 	    style, NSParagraphStyleAttributeName,

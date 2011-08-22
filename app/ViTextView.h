@@ -328,6 +328,8 @@
  */
 - (id)preference:(NSString *)name atLocation:(NSUInteger)aLocation;
 
+- (void)highlightSmartPairAtLocation:(NSUInteger)location;
+
 /**
  * @returns A bundle preference at the current location.
  * @param name The name of the Bundle Preference (eg, `shellVariables`)

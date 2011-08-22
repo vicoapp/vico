@@ -2,10 +2,11 @@
 
 @interface ViTheme : NSObject
 {
-	NSDictionary *theme;
+	NSMutableDictionary *theme;
 	NSMutableDictionary *themeAttributes;
 	NSMutableDictionary *scopeSelectorCache;
 	NSMutableDictionary *defaultSettings;
+	NSMutableDictionary *smartPairMatchAttributes;
 	NSColor *backgroundColor;
 	NSColor *foregroundColor;
 	NSColor *caretColor;
@@ -17,6 +18,7 @@
 - (id)initWithPath:(NSString *)aPath;
 - (NSString *)name;
 - (NSDictionary *)attributesForScope:(ViScope *)scope inBundle:(ViBundle *)bundle;
+- (NSDictionary *)smartPairMatchAttributes;
 - (NSColor *)backgroundColor;
 - (NSColor *)foregroundColor;
 - (NSColor *)caretColor;

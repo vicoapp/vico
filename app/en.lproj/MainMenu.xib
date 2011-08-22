@@ -764,7 +764,7 @@
 												<reference key="NSMixedImage" ref="258136346"/>
 												<int key="NSTag">4000</int>
 											</object>
-											<object class="NSMenuItem" id="1066219290">
+											<object class="NSMenuItem" id="333926586">
 												<reference key="NSMenu" ref="1042284489"/>
 												<string key="NSTitle">[ Block ] (vi[)(i[)</string>
 												<string key="NSKeyEquiv"/>
@@ -773,7 +773,7 @@
 												<reference key="NSMixedImage" ref="258136346"/>
 												<int key="NSTag">4000</int>
 											</object>
-											<object class="NSMenuItem" id="629221671">
+											<object class="NSMenuItem" id="690693801">
 												<reference key="NSMenu" ref="1042284489"/>
 												<string key="NSTitle">&lt; Block &gt; (vi&lt;)(i&lt;)</string>
 												<string key="NSKeyEquiv"/>
@@ -842,7 +842,7 @@
 												<reference key="NSMixedImage" ref="258136346"/>
 												<int key="NSTag">4000</int>
 											</object>
-											<object class="NSMenuItem" id="197667969">
+											<object class="NSMenuItem" id="230920395">
 												<reference key="NSMenu" ref="334114871"/>
 												<bool key="NSIsDisabled">YES</bool>
 												<bool key="NSIsSeparator">YES</bool>
@@ -852,18 +852,18 @@
 												<reference key="NSOnImage" ref="176968249"/>
 												<reference key="NSMixedImage" ref="258136346"/>
 											</object>
-											<object class="NSMenuItem" id="374217369">
+											<object class="NSMenuItem" id="207297268">
 												<reference key="NSMenu" ref="334114871"/>
-												<string key="NSTitle">Expand Tabs to Spaces (:%!expand&lt;cr&gt;)(!expand&lt;cr&gt;)</string>
+												<string key="NSTitle">Tabs to Spaces (:%!expand&lt;cr&gt;)(!expand&lt;cr&gt;)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
 												<reference key="NSMixedImage" ref="258136346"/>
 												<int key="NSTag">4000</int>
 											</object>
-											<object class="NSMenuItem" id="434493750">
+											<object class="NSMenuItem" id="133570436">
 												<reference key="NSMenu" ref="334114871"/>
-												<string key="NSTitle">Unexpand Spaces to Tabs (:%!unexpand&lt;cr&gt;)(!unexpand&lt;cr&gt;)</string>
+												<string key="NSTitle">Spaces to Tabs (:%!unexpand&lt;cr&gt;)(!unexpand&lt;cr&gt;)</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="176968249"/>
@@ -3229,9 +3229,9 @@
 							<reference ref="670726447"/>
 							<reference ref="583158037"/>
 							<reference ref="462589538"/>
-							<reference ref="1066219290"/>
+							<reference ref="333926586"/>
 							<reference ref="1018563354"/>
-							<reference ref="629221671"/>
+							<reference ref="690693801"/>
 						</object>
 						<reference key="parent" ref="1051860091"/>
 					</object>
@@ -3287,9 +3287,9 @@
 							<reference ref="980644365"/>
 							<reference ref="860379634"/>
 							<reference ref="97139470"/>
-							<reference ref="197667969"/>
-							<reference ref="374217369"/>
-							<reference ref="434493750"/>
+							<reference ref="230920395"/>
+							<reference ref="207297268"/>
+							<reference ref="133570436"/>
 						</object>
 						<reference key="parent" ref="660544200"/>
 					</object>
@@ -3869,27 +3869,27 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">788</int>
-						<reference key="object" ref="1066219290"/>
+						<reference key="object" ref="333926586"/>
 						<reference key="parent" ref="1042284489"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">789</int>
-						<reference key="object" ref="629221671"/>
+						<reference key="object" ref="690693801"/>
 						<reference key="parent" ref="1042284489"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">790</int>
-						<reference key="object" ref="197667969"/>
+						<reference key="object" ref="230920395"/>
 						<reference key="parent" ref="334114871"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">791</int>
-						<reference key="object" ref="374217369"/>
+						<reference key="object" ref="207297268"/>
 						<reference key="parent" ref="334114871"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">792</int>
-						<reference key="object" ref="434493750"/>
+						<reference key="object" ref="133570436"/>
 						<reference key="parent" ref="334114871"/>
 					</object>
 				</object>

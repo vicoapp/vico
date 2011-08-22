@@ -55,6 +55,15 @@
 	[self setNeedsDisplayInRect:lineHighlightRect];
 	oldCaretRect = caretRect;
 	oldLineHighlightRect = lineHighlightRect;
+
+	caretBlinkState = YES;
+	[caretBlinkTimer invalidate];
+	if ([[self window] firstResponder] == self && (caretBlinkMode & mode) != 0)
+		caretBlinkTimer = [NSTimer scheduledTimerWithTimeInterval:caretBlinkTime
+					target:self
+				      selector:@selector(blinkCaret:)
+				      userInfo:nil
+				       repeats:YES];
 }
 
 - (void)updateCaret
@@ -67,6 +76,12 @@
 	[[ViEventManager defaultManager] emitDelayed:ViEventCaretDidMove for:self with:self, nil];
 }
 
+- (void)blinkCaret:(NSTimer *)aTimer
+{
+	caretBlinkState = !caretBlinkState;
+	[self setNeedsDisplayInRect:caretRect];
+}
+
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
 	if (NSIntersectsRect(lineHighlightRect, aRect)) {
@@ -76,7 +91,7 @@
 		}
 	}
 
-	if (NSIntersectsRect(caretRect, aRect)) {
+	if (caretBlinkState && NSIntersectsRect(caretRect, aRect)) {
 		if ([self isFieldEditor]) {
 			caretRect.size.width = 1;
 		} else if (mode == ViInsertMode) {
@@ -137,6 +152,7 @@
 		original_normal_source = input;
 	}
 
+	[caretBlinkTimer invalidate];
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
 	return [super resignFirstResponder];

@@ -2260,6 +2260,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"matchparen", @"matchparen",
 		@"flashparen", @"flashparen",
 		@"linebreak", @"lbr",
+		@"blinktime", @"blinktime",
+		@"blinkmode", @"blinkmode",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:

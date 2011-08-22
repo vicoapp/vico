@@ -24,6 +24,43 @@
 
 #include <sys/time.h>
 
+@interface caretBlinkModeTransformer : NSValueTransformer
+{
+}
+@end
+
+@implementation caretBlinkModeTransformer
++ (Class)transformedValueClass { return [NSString class]; }
++ (BOOL)allowsReverseTransformation { return YES; }
+- (id)init { return [super init]; }
+- (id)transformedValue:(id)value
+{
+	if ([value isKindOfClass:[NSNumber class]]) {
+		switch ([value intValue]) {
+		case ViInsertMode:
+			return @"insert";
+		case ViNormalMode | ViVisualMode:
+			return @"normal";
+		case ViInsertMode | ViNormalMode | ViVisualMode:
+			return @"both";
+		default:
+			return @"none";
+		}
+	} else if ([value isKindOfClass:[NSString class]]) {
+		if ([value isEqualToString:@"insert"])
+			return [NSNumber numberWithInt:ViInsertMode];
+		else if ([value isEqualToString:@"normal"])
+			return [NSNumber numberWithInt:ViNormalMode | ViVisualMode];
+		else if ([value isEqualToString:@"both"])
+			return [NSNumber numberWithInt:ViInsertMode | ViNormalMode | ViVisualMode];
+		else
+			return [NSNumber numberWithInt:0];
+	}
+
+	return nil;
+}
+@end
+
 @implementation ViAppController
 
 @synthesize encodingMenu;
@@ -51,6 +88,9 @@
 								   andSelector:@selector(getUrl:withReplyEvent:)
 								 forEventClass:kInternetEventClass
 								    andEventID:kAEGetURL];
+
+		[NSValueTransformer setValueTransformer:[[caretBlinkModeTransformer alloc] init]
+						forName:@"caretBlinkModeTransformer"];
 	}
 	return self;
 }
@@ -212,6 +252,8 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"linebreak",
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:12.0], @"fontsize",
+	    [NSNumber numberWithFloat:0.75], @"blinktime",
+	    @"none", @"blinkmode",
 	    @"Monaco", @"fontname",
 	    @"vim", @"undostyle",
 	    @"Sunset", @"theme",

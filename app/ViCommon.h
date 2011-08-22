@@ -29,5 +29,5 @@
 #endif
 #define IMIN(a, b)  (((NSInteger)a) < ((NSInteger)b) ? (a) : (b))
 
-typedef enum { ViCommandMode, ViNormalMode = ViCommandMode, ViInsertMode, ViVisualMode, ViAnyMode } ViMode;
+typedef enum { ViNormalMode = 1, ViInsertMode = 2, ViVisualMode = 4, ViAnyMode = 0xFF } ViMode;
 

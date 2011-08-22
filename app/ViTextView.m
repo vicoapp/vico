@@ -63,6 +63,7 @@ int logIndent = 0;
 	keyManager = [[ViKeyManager alloc] initWithTarget:self
 					       parser:aParser];
 
+	mode = ViNormalMode;
 	document = aDocument;
 	undoManager = [document undoManager];
 	if (undoManager == nil)
@@ -104,21 +105,24 @@ int logIndent = 0;
 	else
 		[[self layoutManager] setAllowsNonContiguousLayout:NO];
 
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"theme"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"antialias"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	antialias = [[NSUserDefaults standardUserDefaults] boolForKey:@"antialias"];
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults addObserver:self forKeyPath:@"theme" options:NSKeyValueObservingOptionNew context:NULL];
+	[defaults addObserver:self forKeyPath:@"antialias" options:NSKeyValueObservingOptionNew context:NULL];
+	[defaults addObserver:self forKeyPath:@"cursorline" options:NSKeyValueObservingOptionNew context:NULL];
+	[defaults addObserver:self forKeyPath:@"blinkmode" options:NSKeyValueObservingOptionNew context:NULL];
+	[defaults addObserver:self forKeyPath:@"blinktime" options:NSKeyValueObservingOptionNew context:NULL];
 
-	[[NSUserDefaults standardUserDefaults] addObserver:self
-						forKeyPath:@"cursorline"
-						   options:NSKeyValueObservingOptionNew
-						   context:NULL];
-	highlightCursorLine = [[NSUserDefaults standardUserDefaults] boolForKey:@"cursorline"];
+	antialias = [defaults boolForKey:@"antialias"];
+	highlightCursorLine = [defaults boolForKey:@"cursorline"];
+
+	caretBlinkTime = [defaults floatForKey:@"blinktime"];
+	NSString *blinkmode = [defaults stringForKey:@"blinkmode"];
+	if ([blinkmode isEqualToString:@"insert"])
+		caretBlinkMode = ViInsertMode;
+	else if ([blinkmode isEqualToString:@"normal"])
+		caretBlinkMode = ViNormalMode | ViVisualMode;
+	else if ([blinkmode isEqualToString:@"both"])
+		caretBlinkMode = ViInsertMode | ViNormalMode | ViVisualMode;
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(textStorageDidChangeLines:)
@@ -159,8 +163,9 @@ int logIndent = 0;
 			change:(NSDictionary *)change
 		       context:(void *)context
 {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	if ([keyPath isEqualToString:@"antialias"]) {
-		antialias = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
+		antialias = [defaults boolForKey:keyPath];
 		[self setNeedsDisplayInRect:[self bounds]];
 	} else if ([keyPath isEqualToString:@"theme"]) {
 		/*
@@ -172,8 +177,22 @@ int logIndent = 0;
 		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
 		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [[self textStorage] length])];
 	} else if ([keyPath isEqualToString:@"cursorline"]) {
-		highlightCursorLine = [[NSUserDefaults standardUserDefaults] boolForKey:keyPath];
+		highlightCursorLine = [defaults boolForKey:keyPath];
 		[self invalidateCaretRect];
+	} else if ([keyPath isEqualToString:@"blinktime"]) {
+		caretBlinkTime = [defaults floatForKey:@"blinktime"];
+		[self updateCaret];
+	} else if ([keyPath isEqualToString:@"blinkmode"]) {
+		NSString *blinkmode = [defaults stringForKey:@"blinkmode"];
+		if ([blinkmode isEqualToString:@"insert"])
+			caretBlinkMode = ViInsertMode;
+		else if ([blinkmode isEqualToString:@"normal"])
+			caretBlinkMode = ViNormalMode | ViVisualMode;
+		else if ([blinkmode isEqualToString:@"both"])
+			caretBlinkMode = ViInsertMode | ViNormalMode | ViVisualMode;
+		else
+			caretBlinkMode = 0;
+		[self updateCaret];
 	}
 }
 

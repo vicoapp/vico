@@ -4,9 +4,9 @@
 
 (global NSNotFound -1)
 
-(global ViNormalMode 0)
-(global ViInsertMode 1)
-(global ViVisualMode 2)
+(global ViNormalMode 1)
+(global ViInsertMode 2)
+(global ViVisualMode 4)
 
 (global ViMapSetsDot 1)
 (global ViMapNeedMotion 2)

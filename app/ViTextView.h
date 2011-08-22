@@ -56,7 +56,7 @@
 
 	NSUndoManager		*undoManager;
 
-	// block cursor
+	// block caret
 	NSUInteger		 caret;
 	NSRect			 caretRect;
 	NSRect			 lineHighlightRect;
@@ -65,6 +65,12 @@
 	NSColor			*caretColor;
 	NSColor			*lineHighlightColor;
 	BOOL			 highlightCursorLine;
+
+	// caret blinking
+	NSUInteger		 caretBlinkMode;
+	CGFloat			 caretBlinkTime;
+	BOOL			 caretBlinkState;
+	NSTimer			*caretBlinkTimer;
 
 	NSInteger		 saved_column;
 	NSString		*initial_ex_command;

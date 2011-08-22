@@ -93,7 +93,7 @@ syntax menu
   in current view, but in a new window?
 
 * vim tag text objects (it, at)
-* vicotool --line 1
+* vicotool +excmd file
 * R (replace mode)
 * i_CTRL-o (execute one normal mode command in insert mode)
 * i_CTRL-\_CTRL-o (execute one normal mode command in insert mode, don't move the cursor)
@@ -108,7 +108,6 @@ syntax menu
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 
 * jumps doesn't work in untitled files
-* when renaming a file in the explorer, selection should follow after re-sorting
 * bundle commands time out when presenting ui
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing

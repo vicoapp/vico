@@ -1442,6 +1442,15 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
+	NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
+	NSMutableSet *selectedItems = [NSMutableSet set];
+	[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ProjectFile *pf = [self fileForItem:item];
+		if (pf)
+			[selectedItems addObject:pf];
+	}];
+
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
 
@@ -1459,6 +1468,13 @@ doCommandBySelector:(SEL)aSelector
 	if (!isFiltered) {
 		[explorer reloadData];
 		[self resetExpandedItems];
+
+		NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
+		for (ProjectFile *pf in selectedItems)
+			[set addIndex:[self rowForItemWithURL:pf.url]];
+		[explorer selectRowIndexes:set byExtendingSelection:NO];
+		[explorer scrollRowToVisible:[set lastIndex]];
+		[explorer scrollRowToVisible:[set firstIndex]];
 	}
 }
 
@@ -1631,6 +1647,7 @@ doCommandBySelector:(SEL)aSelector
 			[file setURL:newurl];
 			[doc setFileURL:newurl];
 			[explorer reloadData];
+
 			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
 		}
 	}];

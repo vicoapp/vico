@@ -2258,6 +2258,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"cursorline", @"cul",
 		@"clipboard", @"cb",
 		@"matchparen", @"matchparen",
+		@"flashparen", @"flashparen",
 		@"linebreak", @"lbr",
 		nil];
 
@@ -2265,7 +2266,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
 	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
-	    @"wrapscan", @"clipboard", @"matchparen", @"linebreak",
+	    @"wrapscan", @"clipboard", @"matchparen", @"flashparen", @"linebreak",
 	    nil];
 
 	NSString *var;

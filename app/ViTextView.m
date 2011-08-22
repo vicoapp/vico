@@ -1370,8 +1370,11 @@ int logIndent = 0;
 	if (matchLocation < 0)
 		return;
 
-	document.matchingParenRange = NSMakeRange(matchLocation, 1);
-	// [self showFindIndicatorForRange:matchingParenRange];
+	NSRange r = NSMakeRange(matchLocation, 1);
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"flashparen"])
+		[self showFindIndicatorForRange:r];
+	else
+		document.matchingParenRange = r;
 }
 
 - (void)highlightSmartPairAtLocation:(NSUInteger)location

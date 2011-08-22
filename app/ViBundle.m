@@ -207,6 +207,10 @@
 			INFO(@"delta bundles not implemented, at %@", bundleDirectory);
 			return nil;
 		}
+		if ([info objectForKey:@"uuid"] == nil) {
+			INFO(@"missing uuid in info.plist in bundle %@", bundleDirectory);
+			return nil;
+		}
 
 		languages = [NSMutableArray array];
 		preferences = [NSMutableArray array];

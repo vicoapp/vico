@@ -23,6 +23,8 @@
 @property(nonatomic,readonly) NSArray *preferences;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
++ (void)normalizeSettings:(NSDictionary *)settings
+	   intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)normalizePreference:(NSDictionary *)preference
              intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)setupEnvironment:(NSMutableDictionary *)env

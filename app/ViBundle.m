@@ -34,17 +34,11 @@
 					 alpha:(float)a/255.0];
 }
 
-+ (void)normalizePreference:(NSDictionary *)preference
-             intoDictionary:(NSMutableDictionary *)normalizedPreference
++ (void)normalizeSettings:(NSDictionary *)settings
+	   intoDictionary:(NSMutableDictionary *)normalizedPreference
 {
-	NSDictionary *settings = [preference objectForKey:@"settings"];
-	if (settings == nil) {
-		INFO(@"missing settings dictionary in preference: %@", preference);
-		return;
-	}
-
 	if (normalizedPreference == nil) {
-		INFO(@"missing normalized preference dictionary in preference: %@", preference);
+		INFO(@"%s", "missing normalized preference dictionary");
 		return;
 	}
 
@@ -66,10 +60,11 @@
 						 forKey:NSBackgroundColorAttributeName];
 	}
 
+	NSUInteger underlineStyle = NSUnderlineStyleNone;
+
 	if ((value = [settings objectForKey:@"fontStyle"]) != nil) {
 		if ([value rangeOfString:@"underline"].location != NSNotFound)
-			[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
-						 forKey:NSUnderlineStyleAttributeName];
+			underlineStyle = NSUnderlineStyleSingle;
 		if ([value rangeOfString:@"italic"].location != NSNotFound)
 			[normalizedPreference setObject:[NSNumber numberWithFloat:0.3]
 						 forKey:NSObliquenessAttributeName];
@@ -79,8 +74,7 @@
 	}
 
 	if ([settings objectForKey:@"underline"] != nil)
-		[normalizedPreference setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle]
-					 forKey:NSUnderlineStyleAttributeName];
+		underlineStyle = NSUnderlineStyleSingle;
 
 	if ([settings objectForKey:@"italic"] != nil)
 		[normalizedPreference setObject:[NSNumber numberWithFloat:0.3]
@@ -89,6 +83,75 @@
 	if ([settings objectForKey:@"bold"] != nil)
 		[normalizedPreference setObject:[NSNumber numberWithFloat:-3.0]
 					 forKey:NSStrokeWidthAttributeName];
+
+	if ((value = [settings objectForKey:@"underlineColor"]) != nil)
+		if ((color = [self hashRGBToColor:value]) != nil)
+			[normalizedPreference setObject:color
+						 forKey:NSUnderlineColorAttributeName];
+
+	if ((value = [settings objectForKey:@"underlineStyle"]) != nil) {
+		if ([value rangeOfString:@"single"].location != NSNotFound)
+			underlineStyle = NSUnderlineStyleSingle;
+		else if ([value rangeOfString:@"double"].location != NSNotFound)
+			underlineStyle = NSUnderlineStyleDouble;
+		else if ([value rangeOfString:@"thick"].location != NSNotFound)
+			underlineStyle = NSUnderlineStyleThick;
+	}
+
+	if (underlineStyle != NSUnderlineStyleNone)
+		[normalizedPreference setObject:[NSNumber numberWithUnsignedInteger:underlineStyle]
+					 forKey:NSUnderlineStyleAttributeName];
+
+	NSShadow *shadow = nil;
+
+	if ((value = [settings objectForKey:@"shadowColor"]) != nil) {
+		if ((color = [self hashRGBToColor:value]) != nil) {
+			if (shadow == nil)
+				shadow = [[NSShadow alloc] init];
+			[shadow setShadowColor:color];
+		}
+	}
+
+	if ((value = [settings objectForKey:@"shadowBlurRadius"]) != nil && [value respondsToSelector:@selector(floatValue)]) {
+		CGFloat radius = [value floatValue];
+		if (radius >= 0) {
+			if (shadow == nil)
+				shadow = [[NSShadow alloc] init];
+			[shadow setShadowBlurRadius:radius];
+		}
+	}
+
+	if ((value = [settings objectForKey:@"shadowVerticalOffset"]) != nil && [value respondsToSelector:@selector(floatValue)]) {
+		if (shadow == nil)
+			shadow = [[NSShadow alloc] init];
+		NSSize offset = [shadow shadowOffset];
+		offset.height = [value floatValue];
+		[shadow setShadowOffset:offset];
+	}
+
+	if ((value = [settings objectForKey:@"shadowHorizontalOffset"]) != nil && [value respondsToSelector:@selector(floatValue)]) {
+		if (shadow == nil)
+			shadow = [[NSShadow alloc] init];
+		NSSize offset = [shadow shadowOffset];
+		offset.width = [value floatValue];
+		[shadow setShadowOffset:offset];
+	}
+
+	if (shadow)
+		[normalizedPreference setObject:shadow
+					 forKey:NSShadowAttributeName];
+}
+
++ (void)normalizePreference:(NSDictionary *)preference
+             intoDictionary:(NSMutableDictionary *)normalizedPreference
+{
+	NSDictionary *settings = [preference objectForKey:@"settings"];
+	if (![settings isKindOfClass:[NSDictionary class]]) {
+		INFO(@"missing settings dictionary in preference: %@", preference);
+		return;
+	}
+
+	[self normalizeSettings:settings intoDictionary:normalizedPreference];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env

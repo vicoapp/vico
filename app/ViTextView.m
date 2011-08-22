@@ -2288,16 +2288,6 @@ int logIndent = 0;
 	[self updateStatus];
 }
 
-- (void)mouseUp:(NSEvent *)theEvent
-{
-#if 0
-	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSUInteger location = [self characterIndexForInsertionAtPoint:point];
-	DEBUG(@"dragged from location %lu -> %lu", visual_start_location, location);
-	// [self setCaret:location];
-#endif
-}
-
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	NSMenu *menu = [self menuForEvent:theEvent];

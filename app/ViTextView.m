@@ -2058,13 +2058,14 @@ int logIndent = 0;
 {
 	DEBUG(@"got keyDown event: %p = %@", theEvent, theEvent);
 
+	BOOL hadMarkedText = [self hasMarkedText];
 	handlingKey = YES;
 	[super keyDown:theEvent];
 	handlingKey = NO;
 	DEBUG(@"done interpreting key events, inserted key = %s",
 	    insertedKey ? "YES" : "NO");
 
-	if (!insertedKey && ![self hasMarkedText]) {
+	if (!insertedKey && !hadMarkedText && ![self hasMarkedText]) {
 		DEBUG(@"decoding event %@", theEvent);
 		[keyManager keyDown:theEvent inScope:[document scopeAtLocation:[self caret]]];
 	}
@@ -2081,8 +2082,6 @@ int logIndent = 0;
 		/* Add the key to the input replay queue. */
 		[inputKeys addObject:keyNum];
 	}
-
-//	[proxy emit:@"keyDown" with:self, keyCode, nil];
 
 	/*
 	 * Find and perform bundle commands. Show a menu with commands

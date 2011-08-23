@@ -16,6 +16,7 @@
 #import "NSURL-additions.h"
 #import "ViBgView.h"
 #import "ViWindow.h"
+#import "ViEventManager.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -1464,6 +1465,8 @@ doCommandBySelector:(SEL)aSelector
 		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, rootURL);
 		return;
 	}
+
+	[[ViEventManager defaultManager] emit:ViEventExplorerURLUpdated for:self with:self, url, nil];
 
 	if (!isFiltered) {
 		[explorer reloadData];

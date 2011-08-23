@@ -42,6 +42,10 @@
 #define ViEventDidAddView @"didAddView" // view
 #define ViEventDidCloseView @"didCloseView" // view
 
+// Other events
+#define ViEventDirectoryChanged @"directoryChanged" // url
+#define ViEventExplorerURLUpdated @"explorerURLUpdated" // explorer, url
+
 @interface ViEvent : NSObject
 {
 	NuBlock *expression;

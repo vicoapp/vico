@@ -2,6 +2,7 @@
 #import "ViError.h"
 #import "ViCommon.h"
 #import "NSObject+SPInvocationGrabbing.h"
+#import "ViEventManager.h"
 
 /* XXX: this is butt ugly! */
 #import "ViWindowController.h"
@@ -287,6 +288,8 @@
 		/* FS events does a better job for local files. */
 		return;
 	}
+
+	[[ViEventManager defaultManager] emit:ViEventDirectoryChanged for:nil with:aURL, nil];
 
 	if (![self directoryIsCachedAtURL:aURL])
 		return;

@@ -16,7 +16,7 @@
 			INFO(@"%s", "missing ex mapping name");
 			return nil;
 		}
-		names = namesArray;
+		names = [namesArray mutableCopy];
 		syntax = aSyntax;
 		scopeSelector = aScopeSelector ?: @"";
 	}
@@ -48,6 +48,17 @@
 - (NSString *)name
 {
 	return [names objectAtIndex:0];
+}
+
+- (void)addAlias:(NSString *)aName
+{
+	[names addObject:aName];
+}
+
+- (void)removeAlias:(NSString *)aName
+{
+	if ([names count] > 1)
+		[names removeObject:aName];
 }
 
 - (int)matchesName:(NSString *)name exactly:(BOOL)exactMatch

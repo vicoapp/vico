@@ -7,7 +7,7 @@
  */
 @interface ExMapping : NSObject
 {
-	NSArray *names;
+	NSMutableArray *names;
 	NSString *scopeSelector;
 
 	NSString *syntax;
@@ -53,6 +53,9 @@
 @property(nonatomic, readonly) NuBlock *expression;
 @property(nonatomic, readonly) SEL action;
 @property(nonatomic, assign, readwrite) id<ViCompletionProvider> completion;
+
+- (void)addAlias:(NSString *)aName;
+- (void)removeAlias:(NSString *)aName;
 
 - (ExMapping *)initWithNames:(NSArray *)nameArray
 		      syntax:(NSString *)aSyntax

@@ -290,9 +290,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		[self updateTabSize];
 	} else if ([keyPath isEqualToString:@"fontsize"] ||
 		   [keyPath isEqualToString:@"fontname"] ||
-		   [keyPath isEqualToString:@"linebreak"])
+		   [keyPath isEqualToString:@"linebreak"]) {
 		[self setTypingAttributes];
-	else if ([keyPath isEqualToString:@"list"]) {
+		[self updatePageGuide];
+	} else if ([keyPath isEqualToString:@"list"]) {
 		[self eachTextView:^(ViTextView *tv) {
 			ViLayoutManager *lm = (ViLayoutManager *)[tv layoutManager];
 			[lm setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];

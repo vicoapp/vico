@@ -1263,6 +1263,8 @@ int logIndent = 0;
 	if ([self hasMarkedText] && [ranges count] == 1 && !stillSelectingFlag &&
 	    firstRange.length == 0 && firstRange.location != caret)
 		[self setCaret:firstRange.location updateSelection:NO];
+	else if (mode == ViInsertMode)
+		[self setCaret:firstRange.location updateSelection:NO];
 }
 
 - (void)setVisualSelection

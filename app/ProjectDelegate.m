@@ -116,6 +116,7 @@
 
 @synthesize delegate;
 @synthesize outlineView = explorer;
+@synthesize rootURL;
 
 - (id)init
 {

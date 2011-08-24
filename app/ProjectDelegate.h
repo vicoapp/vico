@@ -83,6 +83,7 @@
 
 @property(nonatomic,readwrite,assign) id delegate;
 @property(nonatomic,readonly) ViOutlineView *outlineView;
+@property(nonatomic,readonly) NSURL *rootURL;
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;

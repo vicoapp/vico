@@ -160,6 +160,11 @@ TAILQ_HEAD(skiplist, skip);
  */
 - (NSRange)rangeOfLeadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 
+/** Return the leading whitespace on a line.
+ * @param aLocation A location on the line to check.
+ * @returns The leading whitespace for the given line.
+ * Returns `nil` if `aLocation` is beyond the end of the document.
+ */
 - (NSString *)leadingWhitespaceForLineAtLocation:(NSUInteger)aLocation;
 
 /** Find the first non-blank character on a line.

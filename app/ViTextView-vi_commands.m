@@ -894,6 +894,38 @@
 	return YES;
 }
 
+/* syntax: <ctrl-u> */
+- (BOOL)delete_bol:(ViCommand *)command
+{
+	if (start_location == 0) {
+		MESSAGE(@"Already at the beginning of the file");
+		return NO;
+	}
+
+	NSRange range;
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+
+	if (start_location == bol) {
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol - 1];
+		range = NSMakeRange(eol, bol - eol);
+	} else {
+		NSUInteger nonblank = [[self textStorage] firstNonBlankForLineAtLocation:start_location];
+		ViMark *bocMark = [self markNamed:'[']; // beginning-of-change
+		NSUInteger boc = bocMark.location;
+		if (boc < start_location && boc > nonblank)
+			range = NSMakeRange(boc, start_location - boc);
+		else if (nonblank > bol && nonblank < start_location)
+			range = NSMakeRange(nonblank, start_location - nonblank);
+		else
+			range = NSMakeRange(bol, start_location - bol);
+	}
+
+	[self deleteRange:range];
+	final_location = range.location;
+	return YES;
+}
+
 /* syntax: [buffer]D */
 - (BOOL)delete_eol:(ViCommand *)command
 {

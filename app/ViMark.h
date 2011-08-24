@@ -2,6 +2,7 @@
  */
 @interface ViMark : NSObject
 {
+	NSUInteger location;
 	NSUInteger line, column;
 }
 
@@ -9,7 +10,9 @@
 @property(nonatomic,readonly) NSUInteger line;
 /** The column of the mark. */
 @property(nonatomic,readonly) NSUInteger column;
+/** The character index of the mark. */
+@property(nonatomic,readonly) NSUInteger location;
 
-- (ViMark *)initWithLine:(NSUInteger)aLine column:(NSUInteger)aColumn;
+- (ViMark *)initWithLocation:(NSUInteger)aLocation line:(NSUInteger)aLine column:(NSUInteger)aColumn;
 
 @end

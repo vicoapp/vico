@@ -296,7 +296,7 @@ int logIndent = 0;
 {
 	NSUInteger lineno = [[self textStorage] lineNumberAtLocation:aLocation];
 	NSUInteger column = [[self textStorage] columnAtLocation:aLocation];
-	ViMark *m = [[ViMark alloc] initWithLine:lineno column:column];
+	ViMark *m = [[ViMark alloc] initWithLocation:aLocation line:lineno column:column];
 	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", name]];
 }
 

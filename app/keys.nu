@@ -53,6 +53,7 @@
 (imap setKey:"<c-t>" toAction:"increase_indent:")
 (imap setKey:"<c-h>" toAction:"input_backspace:")
 (imap setKey:"<c-r>" toAction:"input_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(imap setKey:"<c-u>" toAction:"delete_bol:")
 (imap setKey:"<bs>" toAction:"input_backspace:")
 (imap setKey:"<tab>" toAction:"input_tab:")
 (imap setKey:"<c-j>" toAction:"input_newline:")

@@ -2,10 +2,10 @@
 
 @implementation ViMark
 
-- (ViMark *)initWithLine:(NSUInteger)aLine column:(NSUInteger)aColumn
+- (ViMark *)initWithLocation:(NSUInteger)aLocation line:(NSUInteger)aLine column:(NSUInteger)aColumn
 {
-	if ((self = [super init]) != nil)
-	{
+	if ((self = [super init]) != nil) {
+		location = aLocation;
 		line = aLine;
 		column = aColumn;
 	}
@@ -15,5 +15,6 @@
 
 @synthesize line;
 @synthesize column;
+@synthesize location;
 
 @end

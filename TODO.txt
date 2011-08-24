@@ -1,3 +1,8 @@
+* bring back explorer / folder bookmarks
+
+* implement c-w in insert mode, alias as <alt-delete>
+* implement c-u in insert mode (vim: delete to beginning-of-line), alias as <cmd-delete>
+
 * "Install Terminal Helper" doesn't find the help link
 
 * ex command "+$" raises exception
@@ -116,8 +121,6 @@ syntax menu
 * set listchars
 * symbol list should use same filtering algorithm as file explorer
 * implement R
-* implement c-w in insert mode
-* implement c-u in insert mode (vim: delete to beginning-of-line)
 * :normal!
 * project shell variables
 * draw marks in gutter view

@@ -1,7 +1,6 @@
 * bring back explorer / folder bookmarks
 
-* implement c-w in insert mode, alias as <alt-delete>
-* implement c-u in insert mode (vim: delete to beginning-of-line), alias as <cmd-delete>
+* implement c-w in insert mode, alias as <alt-backspace>
 
 * "Install Terminal Helper" doesn't find the help link
 

@@ -54,6 +54,7 @@
 (imap setKey:"<c-h>" toAction:"input_backspace:")
 (imap setKey:"<c-r>" toAction:"input_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (imap setKey:"<c-u>" toAction:"delete_bol:")
+(imap setKey:"<cmd-bs>" toAction:"delete_bol:")
 (imap setKey:"<bs>" toAction:"input_backspace:")
 (imap setKey:"<tab>" toAction:"input_tab:")
 (imap setKey:"<c-j>" toAction:"input_newline:")
@@ -70,7 +71,6 @@
 (imap map:"<cmd-z>" to:"<esc>u")
 (imap map:"<cmd-Z>" to:"<esc><cmd-Z>")
 (imap map:"<cmd-del>" to:"<esc>ax<esc>d$a")
-(imap map:"<cmd-bs>" to:"<esc>d0xi")
 
 
 ;; create a separate mapping for motion commands

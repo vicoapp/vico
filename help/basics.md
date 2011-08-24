@@ -16,6 +16,7 @@ a highly efficient text editing tool.
   * [Inserting text](insert.html)
   * [Movement Commands](movement.html)
   * [Deleting text](delete.html)
+  * [Changing text](change.html)
   * [Operator Commands](operators.html)
   * [Repeating changes](dot.html)
   * [Searching](searching.html)

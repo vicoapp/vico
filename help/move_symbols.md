@@ -3,7 +3,9 @@
 The <kbd>ctrl-]</kbd> key (in normal mode), jumps to the symbol under the caret.
 
 If you have a [tags](http://ctags.sourceforge.net/) file, Vico will try to
-lookup the current word as a tag.
+lookup the current word as a tag. The `tags` file should be placed in
+the windows current directory, ie the top-most directory displayed by
+the [explorer](explorer.html).
 
 If no tag was found, Vico tries to match the current word with a
 [symbol](symbols.html). If more than one match is found, you are presented with

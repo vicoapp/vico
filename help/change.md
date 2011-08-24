@@ -14,3 +14,6 @@ Use the <kbd>r</kbd> (replace) command to change a single character. Vico waits
 for you to type the new character. In [visual mode](visual.html), the
 <kbd>r</kbd> command changes the whole selection to the same character.
 
+The <kbd>s</kbd> (substitute) command replaces one, or, given a count,
+that many characters and then enters insert mode. The uppercase variant
+<kbd>S</kbd> is line-oriented and replaces one or more lines.

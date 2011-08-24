@@ -15,7 +15,8 @@ If you want to move a split view to a new tab, use <kbd>&lt;ctrl-w&gt;T</kbd>.
 To navigate between split views, use <kbd>&lt;ctrl-w&gt;</kbd> followed
 by a vi motion key (<kbd>hjkl</kbd>) or one of the arrow keys. The
 <kbd>&lt;ctrl-w&gt;w</kbd> command moves to the next split view. The
-<kbd>&lt;ctrl-w&gt;W</kbd> moves to the previous split view.
+<kbd>&lt;ctrl-w&gt;W</kbd> moves to the previous split view. Use
+<kbd>&lt;ctrl-w&gt;p</kbd> to toggle between the last focused split view.
 
 The [explorer](explorer.html) and [symbol list](symbols.html) can also be used
 to open files or symbols in split views.

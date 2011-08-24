@@ -536,12 +536,11 @@
 
 ; reveal current document in explorer
 ((ViMap normalMap) map:"<ctrl-cmd-r>" toExpression:(do ()
-	(let (url ((current-document) fileURL))
-		(if url
-			(if ((current-explorer) selectItemWithURL:url)
-				((current-explorer) focusExplorer:nil)
-				(YES)
-				(else ((current-window) showMessage:"#{(url lastPathComponent)} not found in explorer"))) ))))
+        (if (set url ((current-document) fileURL))
+                (if ((current-explorer) selectItemWithURL:url)
+                        ((current-explorer) focusExplorer:nil)
+                        (YES)
+                        (else ((current-window) showMessage:"#{(url lastPathComponent)} not found in explorer"))))))
 
 ; macros are not recursive by default (this will just shift j and k)
 ;(nmap map:"j" to:"k")

@@ -1967,6 +1967,9 @@ int logIndent = 0;
 			if (!NSLocationInRange(final_location, sel))
 				[self deselectSnippet];
 		}
+
+		if (!replayingInput)
+			[self scrollToCaret];
 	}
 
 	if (mode == ViVisualMode)
@@ -1974,9 +1977,6 @@ int logIndent = 0;
 
 	if (mode != ViInsertMode)
 		[self endUndoGroup];
-
-	if (!replayingInput)
-		[self scrollToCaret];
 
 	if (ok && !keepMessagesHack)
 		[self updateStatus];

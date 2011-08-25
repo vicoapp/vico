@@ -257,12 +257,8 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
-
 	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-
 	[[self window] makeKeyAndOrderFront:self];
-	[symbolsView setNeedsDisplay:YES];
-	[explorerView setNeedsDisplay:YES];
 
 	NSRect frame = [splitView frame];
 	[splitView setPosition:0 ofDividerAtIndex:0]; // Explorer not shown on launch
@@ -270,14 +266,13 @@ static ViWindowController	*currentWindowController = nil;
 
 	if ([self project] != nil) {
 		[self setBaseURL:[[self project] initialURL]];
-		[[projectDelegate nextRunloop] browseURL:[[self project] initialURL]];
+		[projectDelegate openExplorerTemporarily:NO];
 		/* This makes repeated open requests for the same URL always open a new window.
 		 * With this commented, the "project" is already opened, and no new window will be created.
 		[[self project] close];
 		project = nil;
 		*/
-	} else if ([projectDelegate explorerIsOpen])
-		[[projectDelegate nextRunloop] browseURL:baseURL];
+	}
 
 	[self updateJumplistNavigator];
 

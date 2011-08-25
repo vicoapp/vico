@@ -185,8 +185,6 @@
 						 selector:@selector(documentEditedChanged:)
 						     name:ViDocumentEditedChangedNotification
 						   object:nil];
-
-	[self browseURL:windowController.baseURL];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -1054,6 +1052,9 @@
 
 - (void)openExplorerTemporarily:(BOOL)temporarily
 {
+	if (rootURL == nil)
+		[self browseURL:windowController.baseURL andDisplay:NO];
+
 	if (![self explorerIsOpen]) {
 		if (temporarily)
 			closeExplorerAfterUse = YES;

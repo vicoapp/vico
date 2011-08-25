@@ -75,6 +75,8 @@
 ;; Restore normal Mac OS X keyboard actions in insert mode.
 (imap setKey:"<alt-bs>" toAction:"deleteWordBackward:")
 (imap setKey:"<alt-del>" toAction:"deleteWordForward:")
+(imap setKey:"<alt-left>" toAction:"moveWordLeft:")
+(imap setKey:"<alt-right>" toAction:"moveWordRight:")
 
 
 ;; create a separate mapping for motion commands

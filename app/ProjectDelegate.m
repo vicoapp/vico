@@ -691,19 +691,33 @@
 			    contextInfo:urls];
 }
 
+- (NSSet *)clickedParentURLs
+{
+	NSMutableSet *parentSet = [NSMutableSet set];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ProjectFile *pf = [self fileForItem:item];
+
+		if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
+			pf = [explorer parentForItem:pf];
+
+		NSURL *parent;
+		if (pf)
+			parent = [pf url];
+		else
+			parent = rootURL;
+
+		[parentSet addObject:parent];
+	}];
+
+	return parentSet;
+}
+
 - (IBAction)rescan:(id)sender
 {
-	ProjectFile *pf = [explorer itemAtRow:[explorer selectedRow]];
-	if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
-		pf = [explorer parentForItem:pf];
-
-	NSURL *parent;
-	if (pf)
-		parent = [pf url];
-	else
-		parent = rootURL;
-
-	[self rescanURL:parent];
+	for (NSURL *parent in [self clickedParentURLs])
+		[self rescanURL:parent];
 }
 
 - (IBAction)flushCache:(id)sender
@@ -858,6 +872,16 @@
 	     [menuItem action] == @selector(openWithFinder:)))
 		return NO;
 
+	if ([menuItem action] == @selector(rescan:)) {
+		NSSet *parentSet = [self clickedParentURLs];
+		if ([parentSet count] == 1)
+			[menuItem setTitle:[NSString stringWithFormat:@"Rescan folder \"%@\"", [[parentSet anyObject] lastPathComponent]]];
+		else
+			[menuItem setTitle:[NSString stringWithFormat:@"Rescan folders"]];
+		if ([parentSet count] == 0)
+			return NO;
+	}
+
 	/*
 	 * Some operations not applicable in filtered list.
 	 */
@@ -867,19 +891,6 @@
 	     [menuItem action] == @selector(newFolder:) ||
 	     [menuItem action] == @selector(newDocument:)))
 		return NO;
-
-	if ([menuItem action] == @selector(rescan:)) {
-		ProjectFile *pf = [explorer itemAtRow:[explorer selectedRow]];
-		if (![self outlineView:explorer isItemExpandable:pf] || ![explorer isItemExpanded:pf])
-			pf = [explorer parentForItem:pf];
-
-		NSURL *parent;
-		if (pf)
-			parent = [pf url];
-		else
-			parent = rootURL;
-		[menuItem setTitle:[NSString stringWithFormat:@"Rescan folder \"%@\"", [[parent path] lastPathComponent]]];
-	}
 
 	return YES;
 }

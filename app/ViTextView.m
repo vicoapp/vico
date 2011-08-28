@@ -31,6 +31,7 @@ int logIndent = 0;
 - (void)setVisualSelection;
 - (void)updateStatus;
 - (NSUInteger)removeTrailingAutoIndentForLineAtLocation:(NSUInteger)aLocation;
+- (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection;
 @end
 
 #pragma mark -
@@ -621,13 +622,21 @@ int logIndent = 0;
 		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
 		DEBUG(@"running indent expression:\n%@", expression);
 		NSError *error = nil;
+		/* Expressions depend on caret being set to the location in question. */
+		NSUInteger oldCaret = [self caret];
+		[self setCaret:aLocation updateSelection:NO];
 		id result = [[NSApp delegate] eval:expression error:&error];
-		if (error)
+		[self setCaret:oldCaret updateSelection:NO];
+		if (error) {
+			INFO(@"indent expression failed: %@", [error localizedDescription]);
 			MESSAGE(@"indent expression failed: %@", [error localizedDescription]);
+		}
 		else if ([result isKindOfClass:[NSNumber class]])
 			return [result integerValue];
-		else
+		else {
+			INFO(@"non-numeric result: got %@", NSStringFromClass([result class]));
 			MESSAGE(@"non-numeric result: got %@", NSStringFromClass([result class]));
+		}
 	}
 
 	return -1;

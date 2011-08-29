@@ -2330,6 +2330,22 @@
 	return YES;
 }
 
+- (BOOL)vi_gv:(ViCommand *)command
+{
+	ViMark *vs = [self markNamed:'<'];
+	ViMark *ve = [self markNamed:'>'];
+
+	if (vs && ve) {
+		visual_start_location = vs.location;
+		final_location = ve.location;
+	} else
+		visual_start_location = [self caret];
+
+	[self setVisualMode];
+	visual_line_mode = NO;
+	return TRUE;
+}
+
 #pragma mark -
 #pragma mark Text Objects
 

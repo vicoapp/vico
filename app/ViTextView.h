@@ -164,6 +164,9 @@
 - (void)setVisualMode;
 
 - (void)setInsertMode:(ViCommand *)command;
+
+/** Set insert mode.
+ */
 - (void)setInsertMode;
 
 /** Input a string of keys as a macro.
@@ -285,6 +288,12 @@
 - (void)replaceRange:(NSRange)aRange
           withString:(NSString *)aString;
 
+/** Insert newline and indent.
+ * @param aLocation The location of the newline character to insert.
+ * @param indentForward YES if the line following the newline should be indented.
+ *   NO if the line preceding the newline should be indented.
+ * @returns Returns `aLocation` adjusted for automatic indentation.
+ */
 - (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation
                         indentForward:(BOOL)indentForward;
 

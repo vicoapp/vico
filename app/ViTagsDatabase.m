@@ -1,6 +1,7 @@
 #import "ViTagsDatabase.h"
 #import "ViURLManager.h"
 #import "NSScanner-additions.h"
+#import "NSURL-additions.h"
 #include "logging.h"
 
 @interface ViTagsDatabase (private)

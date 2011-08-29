@@ -1528,14 +1528,14 @@ int logIndent = 0;
 					    atCharacterIndex:bol
 					      effectiveRange:&r]) {
 			DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
-			if ([self shouldDecreaseIndentAtLocation:bol]) {
-				[[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
-							     forCharacterRange:r];
-				NSString *indent = [self suggestedIndentAtLocation:bol];
-				NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
-				[self replaceCharactersInRange:curIndent withString:indent];
-				final_location += [indent length] - curIndent.length;
-			}
+                        NSString *indent = [self suggestedIndentAtLocation:bol];
+                        NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
+                        if (curIndent.length != [indent length]) {
+                                [[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
+                                                             forCharacterRange:r];
+                                [self replaceCharactersInRange:curIndent withString:indent];
+                                final_location += [indent length] - curIndent.length;
+                        }
 		}
 	}
 }

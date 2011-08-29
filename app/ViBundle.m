@@ -36,6 +36,7 @@
 
 + (void)normalizeSettings:(NSDictionary *)settings
 	   intoDictionary:(NSMutableDictionary *)normalizedPreference
+	       withParser:(NuParser *)aParser
 {
 	if (normalizedPreference == nil) {
 		INFO(@"%s", "missing normalized preference dictionary");
@@ -140,10 +141,36 @@
 	if (shadow)
 		[normalizedPreference setObject:shadow
 					 forKey:NSShadowAttributeName];
+
+	if ((value = [settings objectForKey:@"indentExpression"]) != nil) {
+		@try {
+			NuCell *cell = [aParser parse:value];
+			if (cell == nil)
+				INFO(@"Failed to parse indent expression: %@", value);
+			else {
+				NuBlock *code = [[NuBlock alloc] initWithParameters:[NuCell cellWithCar:nil cdr:nil]
+									       body:cell
+									    context:[aParser context]];
+				DEBUG(@"got code %@ (a %@)", code, NSStringFromClass([code class]));
+				[normalizedPreference setObject:code
+							 forKey:@"indentExpressionBlock"];
+			}
+		}
+		@catch (NSException *exception) {
+			INFO(@"Failed to parse indent expression: %@: %@", [exception name], [exception reason]);
+		}
+	}
+}
+
++ (void)normalizeSettings:(NSDictionary *)settings
+	   intoDictionary:(NSMutableDictionary *)normalizedPreference;
+{
+	[self normalizeSettings:settings intoDictionary:normalizedPreference withParser:nil];
 }
 
 + (void)normalizePreference:(NSDictionary *)preference
              intoDictionary:(NSMutableDictionary *)normalizedPreference
+                 withParser:(NuParser *)aParser
 {
 	NSDictionary *settings = [preference objectForKey:@"settings"];
 	if (![settings isKindOfClass:[NSDictionary class]]) {
@@ -151,7 +178,13 @@
 		return;
 	}
 
-	[self normalizeSettings:settings intoDictionary:normalizedPreference];
+	[self normalizeSettings:settings intoDictionary:normalizedPreference withParser:aParser];
+}
+
++ (void)normalizePreference:(NSDictionary *)preference
+             intoDictionary:(NSMutableDictionary *)normalizedPreference
+{
+        [self normalizePreference:preference intoDictionary:normalizedPreference withParser:nil];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env
@@ -308,7 +341,8 @@
 				}
 
 				[ViBundle normalizePreference:plist
-					       intoDictionary:[plist objectForKey:@"settings"]];
+					       intoDictionary:[plist objectForKey:@"settings"]
+                                                   withParser:parser];
 				[preferences addObject:plist];
 			}
 

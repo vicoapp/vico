@@ -24,6 +24,9 @@
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
 + (void)normalizeSettings:(NSDictionary *)settings
+	   intoDictionary:(NSMutableDictionary *)normalizedPreference
+               withParser:(NuParser *)aParser;
++ (void)normalizeSettings:(NSDictionary *)settings
 	   intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)normalizePreference:(NSDictionary *)preference
              intoDictionary:(NSMutableDictionary *)normalizedPreference;

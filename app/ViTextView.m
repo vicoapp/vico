@@ -615,28 +615,31 @@ int logIndent = 0;
 
 - (NSInteger)calculatedIndentLengthAtLocation:(NSUInteger)aLocation
 {
-	NSDictionary *indentExpressions = [[ViBundleStore defaultStore] preferenceItem:@"indentExpression"];
+	NSDictionary *indentExpressions = [[ViBundleStore defaultStore] preferenceItem:@"indentExpressionBlock"];
 	NSString *bestMatchingScope = [document bestMatchingScope:[indentExpressions allKeys] atLocation:aLocation];
 
 	if (bestMatchingScope) {
-		NSString *expression = [indentExpressions objectForKey:bestMatchingScope];
-		DEBUG(@"running indent expression:\n%@", expression);
-		NSError *error = nil;
+		NuBlock *expression = [indentExpressions objectForKey:bestMatchingScope];
+		DEBUG(@"running indent expression:\n%@", [expression stringValue]);
 		/* Expressions depend on caret being set to the location in question. */
 		NSUInteger oldCaret = [self caret];
 		[self setCaret:aLocation updateSelection:NO];
-		id result = [[NSApp delegate] eval:expression error:&error];
+
+		@try {
+			id result = [[expression body] evalWithContext:[expression context]];
+			DEBUG(@"got result %@, class %@", result, NSStringFromClass([result class]));
+			if ([result isKindOfClass:[NSNumber class]]) {
+				[self setCaret:oldCaret updateSelection:NO];
+				return [result integerValue];
+			}
+			INFO(@"non-numeric result from indent expression: got %@", NSStringFromClass([result class]));
+		}
+		@catch (NSException *exception) {
+			INFO(@"got exception %@ while evaluating indent expression:\n%@", [exception name], [exception reason]);
+			DEBUG(@"context was: %@", [expression context]);
+		}
+
 		[self setCaret:oldCaret updateSelection:NO];
-		if (error) {
-			INFO(@"indent expression failed: %@", [error localizedDescription]);
-			MESSAGE(@"indent expression failed: %@", [error localizedDescription]);
-		}
-		else if ([result isKindOfClass:[NSNumber class]])
-			return [result integerValue];
-		else {
-			INFO(@"non-numeric result: got %@", NSStringFromClass([result class]));
-			MESSAGE(@"non-numeric result: got %@", NSStringFromClass([result class]));
-		}
 	}
 
 	return -1;

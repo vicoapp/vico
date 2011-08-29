@@ -48,6 +48,7 @@
 	IBOutlet NSPopUpButton *actionButton;
 	IBOutlet NSProgressIndicator *progressIndicator;
 	IBOutlet NSToolbarItem *searchToolbarItem;
+	IBOutlet NSPathControl *pathControl;
 
 	NSURL *rootURL;
 	CGFloat width;

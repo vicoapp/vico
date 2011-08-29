@@ -1,0 +1,5 @@
+@interface ViPathCell : NSPathCell
+{
+}
+
+@end

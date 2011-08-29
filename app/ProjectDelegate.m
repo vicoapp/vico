@@ -17,6 +17,7 @@
 #import "ViBgView.h"
 #import "ViWindow.h"
 #import "ViEventManager.h"
+#import "ViPathComponentCell.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -185,6 +186,21 @@
 						 selector:@selector(documentEditedChanged:)
 						     name:ViDocumentEditedChangedNotification
 						   object:nil];
+
+	[pathControl setTarget:self];
+	[pathControl setAction:@selector(pathControlAction:)];
+
+	NSRect frame = [pathControl frame];
+	frame.size.height = 22;
+	[pathControl setFrame:frame];
+}
+
+- (void)pathControlAction:(id)sender
+{
+	NSPathComponentCell *cell = [sender clickedPathComponentCell];
+	NSURL *url = [cell URL];
+	if (url)
+		[self browseURL:url];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -331,6 +347,7 @@
 			[self filterFiles:self];
 			[explorer reloadData];
 			[self resetExpandedItems];
+			[pathControl setURL:aURL];
 			rootURL = aURL;
 			[windowController setBaseURL:aURL];
 
@@ -376,7 +393,9 @@
 {
 	NSUInteger zero = 0;
 	NSView *view = nil;
-	return [history backwardToURL:&rootURL line:&zero column:&zero view:&view];
+	BOOL ok = [history backwardToURL:&rootURL line:&zero column:&zero view:&view];
+	[pathControl setURL:rootURL];
+	return ok;
 }
 
 #pragma mark -

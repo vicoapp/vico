@@ -204,15 +204,22 @@ resp2txt(int type)
 	[NSApp stopModalWithCode:2];
 }
 
-- (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage
+- (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage limitDate:(NSDate *)limitDate
 {
 	waitRequest = self;
 
 	/* Run and block the UI for 2 seconds. */
-	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
 	while ([limitDate timeIntervalSinceNow] > 0) {
-		if (finished)
+		if (cancelled) {
+			DEBUG(@"request %@ was cancelled", self);
 			return;
+		}
+		if (finished) {
+			DEBUG(@"request %@ finished, waiting for subRequest %@", self, subRequest);
+			[subRequest waitInWindow:window message:waitMessage limitDate:limitDate];
+			return;
+		}
+		DEBUG(@"waiting for request %@ until %@", waitRequest, limitDate);
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:limitDate];
 	}
 
@@ -238,14 +245,20 @@ resp2txt(int type)
 	while (subRequest && !cancelled) {
 		DEBUG(@"waiting for subrequest %@", subRequest);
 		SFTPRequest *req = subRequest;
-		[req waitInWindow:window message:waitMessage];
+		[req waitInWindow:window message:waitMessage limitDate:limitDate];
 		if (subRequest == req) {
-			DEBUG(@"Warning: request %@ didn't reset subRequest after %@", self, req);
+			INFO(@"Warning: request %@ didn't reset subRequest after %@", self, req);
 			break;
 		}
 	}
 
 	DEBUG(@"request %@ is finished", self);
+}
+
+- (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage
+{
+	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
+	[self waitInWindow:window message:waitMessage limitDate:limitDate];
 }
 
 - (void)wait
@@ -1662,6 +1675,7 @@ resp2txt(int type)
 
 	uploadRequest = [self attributesOfItemAtURL:url
 					 onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+		DEBUG(@"got attributes %@, error %@ for url %@", attributes, error, normalizedURL);
 		if (error == nil && attributes) {
 			/* Upload to a random file, then rename it to our destination filename. */
 			NSString *randomFilename = [self randomFileAtDirectory:[[url path] stringByDeletingLastPathComponent]];

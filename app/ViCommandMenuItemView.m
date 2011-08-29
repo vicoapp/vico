@@ -1,5 +1,6 @@
 #import "ViCommandMenuItemView.h"
 #import "NSScanner-additions.h"
+#import "NSString-additions.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "NSEvent-keyAdditions.h"
 #include "logging.h"
@@ -8,67 +9,11 @@
 
 @synthesize command, title;
 
-/* Expands <special> to a nice visual representation.
- *
- * Format of the <special> keys are:
- *   <^@r> => control-command-r (apple style)
- *   <^@R> => shift-control-command-r (apple style)
- *   <c-r> => control-r (vim style)
- *   <C-R> => control-r (vim style)
- *   <Esc> => escape (vim style)
- *   <space> => space (vim style)
- *   ...
- */
-- (NSString *)expandSpecialKeys:(NSString *)string
-{
-	NSMutableString *s = [NSMutableString string];
-	NSScanner *scan = [NSScanner scannerWithString:string];
-	unichar ch;
-	while ([scan scanCharacter:&ch]) {
-		if (ch == '\\') {
-			/* Escaped character. */
-			if ([scan scanCharacter:&ch]) {
-				[s appendString:[NSString stringWithFormat:@"%C", ch]];
-			} else {
-				/* trailing backslash? treat as literal */
-				[s appendString:@"\\"];
-			}
-		} else if (ch == '<') {
-			NSString *special = nil;
-			if ([scan scanUpToUnescapedCharacter:'>' intoString:&special] &&
-			    [scan scanString:@">" intoString:nil]) {
-				DEBUG(@"parsing special key <%@>", special);
-				NSString *lcase = [special lowercaseString];
-				if ([lcase isEqualToString:@"cr"])
-					[s appendString:[NSString stringWithFormat:@"%C", 0x21A9]];
-				else if ([lcase isEqualToString:@"esc"])
-					[s appendString:[NSString stringWithFormat:@"%C", 0x238B]];
-				else if ([lcase hasPrefix:@"c-"]) {
-					/* control-key */
-					[s appendString:[NSString stringWithFormat:@"%C", 0x2303]];
-					[s appendString:[[special substringFromIndex:2] uppercaseString]];
-					if (![scan isAtEnd]) {
-						/* Add a thin space after a control-key sequence. */
-						[s appendString:[NSString stringWithFormat:@"%C", 0x2009]];
-					}
-				}
-			} else {
-				/* "<" without a ">", treat as literal */
-				if (special)
-					[s appendString:special];
-				[s appendString:@"<"];
-			}
-		} else
-			[s appendString:[NSString stringWithFormat:@"%C", ch]];
-	}
-	return s;
-}
-
 - (void)setCommand:(NSString *)aCommand
 {
 	NSSize oldSize = [commandTitle sizeWithAttributes:attributes];
 	command = aCommand;
-	commandTitle = [self expandSpecialKeys:command];
+	commandTitle = [command visualKeyString];
 	commandSize = [commandTitle sizeWithAttributes:attributes];
 
 	double dw = commandSize.width - oldSize.width;
@@ -105,7 +50,7 @@
 	double w, h;
 
 	command = aCommand;
-	commandTitle = [self expandSpecialKeys:command];
+	commandTitle = [command visualKeyString];
 
 	attributes = [NSMutableDictionary dictionaryWithObject:aFont
 							forKey:NSFontAttributeName];

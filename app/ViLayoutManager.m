@@ -11,7 +11,7 @@
 	if (self) {
 		newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
 		tabChar = [NSString stringWithFormat:@"%C", 0x21E5];
-		spaceChar = [NSString stringWithFormat:@"%C", 0x00B7];
+		spaceChar = @"･";
 	}
 	return self;
 }

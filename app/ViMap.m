@@ -596,28 +596,18 @@ toExpression:(id)expr
 		return;
 	}
 
-	NuBlock *code;
-	if ([expr isKindOfClass:[NSString class]]) {
-		id<NuParsing> parser = [Nu parser];
-		code = [parser parse:expr];
-		if (code == nil) {
-			INFO(@"failed to parse expression: %@", expr);
-			return;
-		}
-	} else if ([expr isKindOfClass:[NuBlock class]]) {
-		code = expr;
-	} else {
+	if (![expr isKindOfClass:[NuBlock class]]) {
 		INFO(@"unhandled expression of type %@", NSStringFromClass([expr class]));
 		return;
 	}
 
-	if ([[code parameters] count] > 0) {
+	if ([[expr parameters] count] > 0) {
 		INFO(@"parameters %@ will be ignored in expression map %@",
-		    [[code parameters] stringValue], keySequence);
+		    [[expr parameters] stringValue], keySequence);
 	}
 
 	[self addMapping:[ViMapping mappingWithKeySequence:keyCodes
-						expression:code
+						expression:expr
 						     scope:scopeSelector]];
 }
 

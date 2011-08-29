@@ -29,6 +29,11 @@
  */
 - (NSArray *)keyCodes;
 
++ (NSString *)visualStringWithKeyCode:(NSInteger)keyCode;
++ (NSString *)visualStringWithKeySequence:(NSArray *)keySequence;
++ (NSString *)visualStringWithKeyString:(NSString *)keyString;
+- (NSString *)visualKeyString;
+
 /**
  * @returns YES if the string is in uppercase.
  */

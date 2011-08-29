@@ -1,3 +1,44 @@
+* indent expressions always re-initializes the nu context (load std modules...)
+
+* p on blank line regression?
+2011-08-27 13:11:51.649 Vico[54791:60b] Exception detected while handling key input.
+2011-08-27 13:11:51.649 Vico[54791:60b] -[__NSCFString substringWithRange:]: Range or index out of bounds
+2011-08-27 13:11:51.654 Vico[54791:60b] (
+	0   CoreFoundation                      0x00007fff93524986 __exceptionPreprocess + 198
+	1   libobjc.A.dylib                     0x00007fff96b88d5e objc_exception_throw + 43
+	2   CoreFoundation                      0x00007fff935247ba +[NSException raise:format:arguments:] + 106
+	3   CoreFoundation                      0x00007fff93524744 +[NSException raise:format:] + 116
+	4   CoreFoundation                      0x00007fff934f5e3e -[__NSCFString substringWithRange:] + 110
+	5   Vico                                0x000000010009a5ee -[ViTextView recordReplacementOfRange:withLength:] + 174
+	6   Vico                                0x0000000100097be5 -[ViTextView replaceCharactersInRange:withString:undoGroup:] + 933
+	7   Vico                                0x0000000100097e3a -[ViTextView insertString:atLocation:] + 122
+	8   Vico                                0x0000000100085403 -[ViTextView(vi_commands) put_after:] + 755
+	9   CoreFoundation                      0x00007fff9351411d -[NSObject performSelector:withObject:] + 61
+	10  Vico                                0x00000001000a0dc4 -[ViTextView keyManager:evaluateCommand:] + 2580
+	11  CoreFoundation                      0x00007fff93516f51 -[NSObject performSelector:withObject:withObject:] + 65
+	12  Vico                                0x000000010010327c -[ViKeyManager evalCommand:] + 220
+	13  Vico                                0x00000001001036a0 -[ViKeyManager handleKey:allowMacros:inScope:fromMacro:excessKeys:error:] + 1024
+	14  Vico                                0x00000001001038bb -[ViKeyManager handleKey:inScope:] + 123
+	15  Vico                                0x00000001000a14e5 -[ViTextView insertText:replacementRange:] + 597
+	16  AppKit                              0x00007fff8e147444 -[NSKeyBindingManager(NSKeyBindingManager_MultiClients) flushTextForClient:] + 187
+	17  AppKit                              0x00007fff8e4992e3 -[NSTextInputContext handleEvent:] + 848
+	18  AppKit                              0x00007fff8e366790 -[NSView interpretKeyEvents:] + 248
+	19  AppKit                              0x00007fff8e2defa5 -[NSTextView keyDown:] + 691
+	20  Vico                                0x00000001000a192e -[ViTextView keyDown:] + 286
+	21  AppKit                              0x00007fff8ddc0ad2 -[NSWindow sendEvent:] + 7404
+	22  AppKit                              0x00007fff8dd58f19 -[NSApplication sendEvent:] + 5665
+	23  AppKit                              0x00007fff8dcef42b -[NSApplication run] + 548
+	24  AppKit                              0x00007fff8df6d52a NSApplicationMain + 867
+	25  Vico                                0x00000001000028b3 main + 275
+	26  Vico                                0x0000000100001874 start + 52
+)
+
+* vicotool as filter / read from stdin
+
+* inner block text object doesn't work within strings
+
+* show baseURL in window title!
+
 * bring back explorer / folder bookmarks
 
 * implement c-w in insert mode, alias as <alt-backspace>
@@ -9,10 +50,8 @@
 
 * regression: symbol search no longer focuses first match
 
-* scriptable settings with :set
+* "Open all with current extension as..." menu like sublime in language syntax menu
 
-* "Open all with current extension as..." from sublime in language
-syntax menu
 * :/search doesn't work with 'nowrapscan'
 
 * search with 'nowrapscan' should issue 'not found' message
@@ -37,8 +76,11 @@ syntax menu
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)
 
+* goto line (from ex, G works fine) doesn't push on jump list
 
+* document :s replacement syntax ($0, ${?0:bla} etc)
 
+* scriptable settings with :set
 
 * can we map ys to a new operator (surround), with y{motion} still working?
 
@@ -64,8 +106,6 @@ syntax menu
 
 * should check all documents for external changes when app becomes active again
 * check map error in excessKeys.nu (re vs r duplicate mapping)
-* "&" in :s replace part should expand to whole match? (use $0 for now)
-* explorer flickers when opening new windows!
 * bundle commands not repeatable with dot
 * :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
@@ -75,16 +115,13 @@ syntax menu
 * bundle commands time out when presenting ui
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
-? caret location is messed up after undo of bundle command
-* jumpy selection in symbol list when clicking symbol
 * searching is slow on large files, naïve implementation
-* yk and yj commands don't position caret correctly
 * push marks
 * push jumps
 * ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
-? :q should terminate app on last document in last window?
+* :q should optionally terminate / hide app on last document in last window?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
@@ -94,7 +131,6 @@ syntax menu
 * :read !program
 * :edit! => revert
 * support a count in C and h commands
-* highlight caret after goto line
 
 * o in visual mode should move to opposite side of selection
 * @jtregunna: can you make it so we don't get a file changed

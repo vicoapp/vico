@@ -48,6 +48,7 @@
 
 	// file system events
 	FSEventStreamRef evstream;
+	FSEventStreamEventId lastEventId;
 }
 + (ViURLManager *)defaultManager;
 - (void)registerHandler:(id<ViURLHandler>)handler;
@@ -55,5 +56,8 @@
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL;
 - (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL;
 - (BOOL)directoryIsCachedAtURL:(NSURL *)aURL;
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+			recursively:(BOOL)recursiveFlush
+			      force:(BOOL)force;
 - (void)notifyChangedDirectoryAtURL:(NSURL *)aURL;
 @end

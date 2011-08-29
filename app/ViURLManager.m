@@ -34,6 +34,7 @@
 		handlers = [NSMutableArray array];
 		directoryCache = [NSMutableDictionary dictionary];
 		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+		lastEventId = kFSEventStreamEventIdSinceNow;
 	}
 
 	return self;
@@ -280,34 +281,61 @@
 /* Called by ourselves whenever we know a directory has changed, e.g. when
  * creating a new document.
  */
-- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL force:(BOOL)force
+- (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
+			recursively:(BOOL)recursiveFlush
+			      force:(BOOL)force
 {
-	DEBUG(@"directory %@ has changed", aURL);
-
 	if (!force && [aURL isFileURL]) {
 		/* FS events does a better job for local files. */
 		return;
 	}
 
+	DEBUG(@"directory %@ has changed", aURL);
+
 	[[ViEventManager defaultManager] emit:ViEventDirectoryChanged for:nil with:aURL, nil];
 
-	if (![self directoryIsCachedAtURL:aURL])
+	if (!recursiveFlush) {
+		if (![self directoryIsCachedAtURL:aURL])
+			return;
+		[self flushCachedContentsOfDirectoryAtURL:aURL];
+		if ([self shouldRescanDirectoryAtURL:aURL]) {
+			[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
+				/* Any interested project explorer will get a notification. */
+				DEBUG(@"rescanned URL %@, error %@", aURL, error);
+			}];
+		} else if ([aURL isFileURL])
+			[self restartEvents]; /* To un-monitor the flushed directory. */
 		return;
+	}
 
-	[self flushCachedContentsOfDirectoryAtURL:aURL];
+	/* Recursively flush all descendant URLs.
+	 */
+	NSString *changedKey = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	BOOL restart = NO;
+	NSArray *keys = [[directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	for (NSUInteger i = 0; i < [keys count]; i++) {
+		NSString *key = [keys objectAtIndex:i];
+		if ([key hasPrefix:changedKey]) {
+			NSURL *url = [NSURL URLWithString:[key stringByAppendingString:@"/"]];
+			[self flushCachedContentsOfDirectoryAtURL:url];
 
-	if ([self shouldRescanDirectoryAtURL:aURL]) {
-		[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
-			/* Any interested project explorer will get a notification. */
-			DEBUG(@"rescanned URL %@, error %@", aURL, error);
-		}];
-	} else if ([aURL isFileURL])
+			if ([self shouldRescanDirectoryAtURL:url]) {
+				[self contentsOfDirectoryAtURL:url onCompletion:^(NSArray *contents, NSError *error) {
+					/* Any interested project explorer will get a notification. */
+					DEBUG(@"rescanned URL %@, error %@", url, error);
+				}];
+			} else
+				restart = YES;
+		}
+	}
+
+	if (restart && [aURL isFileURL])
 		[self restartEvents];
 }
 
 - (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
 {
-	[self notifyChangedDirectoryAtURL:aURL force:NO];
+	[self notifyChangedDirectoryAtURL:aURL recursively:YES force:NO];
 }
 
 #pragma mark -
@@ -317,6 +345,7 @@
 {
 	if (evstream) {
 		DEBUG(@"stopping fs events %@", FSEventStreamCopyDescription(evstream));
+		lastEventId = FSEventStreamGetLatestEventId(evstream);
 		FSEventStreamStop(evstream);
 		FSEventStreamUnscheduleFromRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 		FSEventStreamInvalidate(evstream);
@@ -341,7 +370,11 @@ void mycallback(
 		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
 											     length:strlen(paths[i])];
 		NSURL *url = [NSURL fileURLWithPath:path];
-		[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url force:YES];
+		NSUInteger flags = eventFlags[i];
+		DEBUG(@"URL %@ changed w/flags 0x%04x", url, eventFlags[i]);
+		[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url
+							  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs) | YES
+								force:YES];
 	}
 }
 
@@ -367,13 +400,15 @@ void mycallback(
 {
 	NSMutableArray *paths = [NSMutableArray array];
 	NSArray *keys = [[directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSString *lastKey = nil;
 	for (NSUInteger i = 0; i < [keys count]; i++) {
 		NSString *key = [keys objectAtIndex:i];
-		if (i > 0 && [key hasPrefix:[keys objectAtIndex:i - 1]]) {
-			DEBUG(@"%@ is a child of %@", key, [keys objectAtIndex:i - 1]);
+		if (lastKey && [key hasPrefix:lastKey]) {
+			DEBUG(@"%@ is a child of %@", key, lastKey);
 			continue;
 		}
 
+		lastKey = key;
 		NSURL *url = [NSURL URLWithString:[key stringByAppendingString:@"/"]];
 		if ([url isFileURL]) {
 			NSError *error = nil;
@@ -395,8 +430,10 @@ void mycallback(
 	[self stopEvents];
 
 	NSArray *paths = [self pathsToWatch];
-	if ([paths count] == 0)
+	if ([paths count] == 0) {
+		DEBUG(@"%s", "nothing to monitor");
 		return;
+	}
 
 	CFAbsoluteTime latency = 0.3; /* Latency in seconds */
 
@@ -404,11 +441,12 @@ void mycallback(
 	bzero(&ctx, sizeof(ctx));
 	ctx.info = self;
 
+	DEBUG(@"listening for events since %lu", lastEventId);
 	evstream = FSEventStreamCreate(NULL,
 		&mycallback,
 		&ctx,
 		(CFArrayRef)paths,
-		kFSEventStreamEventIdSinceNow,
+		lastEventId,
 		latency,
 		kFSEventStreamCreateFlagWatchRoot
 	);

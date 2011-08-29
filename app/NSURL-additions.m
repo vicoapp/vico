@@ -28,5 +28,12 @@ static NSCharacterSet *slashSet = nil;
 		       relativeToURL:self] absoluteURL];
 }
 
+- (NSString *)displayString
+{
+	if ([self isFileURL])
+		return [[self path] stringByAbbreviatingWithTildeInPath];
+	return [self absoluteString];
+}
+
 @end
 

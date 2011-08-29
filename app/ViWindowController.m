@@ -588,9 +588,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (NSString *)displayBaseURL
 {
-	if ([baseURL isFileURL])
-		return [[baseURL path] stringByAbbreviatingWithTildeInPath];
-	return [baseURL absoluteString];
+	return [baseURL displayString];
 }
 
 #pragma mark -

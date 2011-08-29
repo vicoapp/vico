@@ -491,6 +491,7 @@ resp2txt(int type)
 	if (flags & SSH2_FILEXFER_ATTR_ACMODTIME) {
 		if (![self getUnsigned:&atime] || ![self getUnsigned:&mtime])
 			return NO;
+		[attributes setObject:[NSDate dateWithTimeIntervalSince1970:atime] forKey:@"ViFileAccessDate"];
 		[attributes setObject:[NSDate dateWithTimeIntervalSince1970:mtime] forKey:NSFileModificationDate];
 	}
 
@@ -710,7 +711,7 @@ resp2txt(int type)
 	const char *p;
 	for (p = fmt; p && *p; p++) {
 		const void *string;
-		uint32_t len, tmp;
+		uint32_t len, tmp, flags;
 		NSString *s;
 		NSData *d;
 		uint32_t u;
@@ -753,24 +754,44 @@ resp2txt(int type)
 		case 'a': /* attributes dictionary */
 			a = va_arg(ap, NSDictionary *);
 			/* Serialize attributes. */
-			// XXX: assume empty attributes for now
-			tmp = 0;
-			[data appendBytes:&tmp length:sizeof(tmp)];
-#if 0
-			buffer_put_int(b, a->flags);
-			if (a->flags & SSH2_FILEXFER_ATTR_SIZE)
-				buffer_put_int64(b, a->size);
-			if (a->flags & SSH2_FILEXFER_ATTR_UIDGID) {
-				buffer_put_int(b, a->uid);
-				buffer_put_int(b, a->gid);
+			flags = 0;
+			if ([a fileGroupOwnerAccountID] && [a fileOwnerAccountID])
+				flags |= SSH2_FILEXFER_ATTR_UIDGID;
+			if ([a filePosixPermissions] != 0)
+				flags |= SSH2_FILEXFER_ATTR_PERMISSIONS;
+			if ([a objectForKey:@"ViFileAccessDate"] && [a fileModificationDate])
+				flags |= SSH2_FILEXFER_ATTR_ACMODTIME;
+			DEBUG(@"encoded attribute flags 0x%04x", flags);
+			u = CFSwapInt32HostToBig(flags);
+			[data appendBytes:&u length:sizeof(u)];
+			if (flags & SSH2_FILEXFER_ATTR_UIDGID) {
+				u = [[a fileOwnerAccountID] unsignedIntValue];
+				DEBUG(@"encoded uid %u", u);
+				u = CFSwapInt32HostToBig(u);
+				[data appendBytes:&u length:sizeof(u)];
+				u = [[a fileGroupOwnerAccountID] unsignedIntValue];
+				DEBUG(@"encoded gid %u", u);
+				u = CFSwapInt32HostToBig(u);
+				[data appendBytes:&u length:sizeof(u)];
 			}
-			if (a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS)
-				buffer_put_int(b, a->perm);
-			if (a->flags & SSH2_FILEXFER_ATTR_ACMODTIME) {
-				buffer_put_int(b, a->atime);
-				buffer_put_int(b, a->mtime);
+			if (flags & SSH2_FILEXFER_ATTR_PERMISSIONS) {
+				u = (uint32_t)[a filePosixPermissions];
+				DEBUG(@"encoded posix permissions 0%03o", u);
+				u = CFSwapInt32HostToBig(u);
+				[data appendBytes:&u length:sizeof(u)];
 			}
-#endif
+			if (flags & SSH2_FILEXFER_ATTR_ACMODTIME) {
+				NSDate *at = [a objectForKey:@"ViFileAccessDate"];
+				NSDate *mt = [a fileModificationDate];
+				u = [at timeIntervalSince1970];
+				DEBUG(@"encoded atime %u", u);
+				u = CFSwapInt32HostToBig(u);
+				[data appendBytes:&u length:sizeof(u)];
+				u = [mt timeIntervalSince1970];
+				DEBUG(@"encoded mtime %u", u);
+				u = CFSwapInt32HostToBig(u);
+				[data appendBytes:&u length:sizeof(u)];
+			}
 			break;
 		default:
 			INFO(@"internal error, got parameter %c", *p);
@@ -1043,7 +1064,7 @@ resp2txt(int type)
 
 	return [self attributesOfItemAtURL:url onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error) {
-			if ([error code] == SSH2_FX_NO_SUCH_FILE)
+			if ([error isFileNotFoundError])
 				error = nil;
 			originalCallback(nil, NO, error);
 			return;
@@ -1238,6 +1259,7 @@ resp2txt(int type)
 
 - (SFTPRequest *)openFile:(NSString *)path
 	       forWriting:(BOOL)isWrite
+	   withAttributes:(NSDictionary *)attributes
 	       onResponse:(void (^)(NSData *handle, NSError *error))responseCallback
 {
 	uint32_t mode;
@@ -1248,7 +1270,7 @@ resp2txt(int type)
 
 	void (^originalCallback)(NSData *, NSError *) = [responseCallback copy];
 
-	SFTPRequest *req = [self addRequest:SSH2_FXP_OPEN format:"sua", path, mode, [NSDictionary dictionary]];
+	SFTPRequest *req = [self addRequest:SSH2_FXP_OPEN format:"sua", path, mode, attributes];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		NSData *handle;
@@ -1291,7 +1313,10 @@ resp2txt(int type)
 		NSUInteger fileSize = [attributes fileSize]; /* may be zero */
 		statRequest.progress = 0.0;
 
-		statRequest.subRequest = [self openFile:[normalizedURL path] forWriting:NO onResponse:^(NSData *handle, NSError *error) {
+		statRequest.subRequest = [self openFile:[normalizedURL path]
+					     forWriting:NO
+					 withAttributes:[NSDictionary dictionary]
+					     onResponse:^(NSData *handle, NSError *error) {
 			__block uint64_t offset = 0;
 			__block uint32_t len = transfer_buflen;
 
@@ -1403,8 +1428,26 @@ resp2txt(int type)
 	return [aDirectory stringByAppendingPathComponent:[NSString stringWithUTF8String:tmp]];
 }
 
+- (SFTPRequest *)setAttributes:(NSDictionary *)attributes
+		      ofHandle:(NSData *)handle
+		    onResponse:(void (^)(NSError *))responseCallback
+{
+	void (^originalCallback)(NSError *) = [responseCallback copy];
+	SFTPRequest *req = [self addRequest:SSH2_FXP_FSETSTAT format:"da", handle, attributes];
+	req.onResponse = ^(SFTPMessage *msg) {
+		NSError *error;
+		if (![msg expectStatus:SSH2_FX_OK error:&error])
+			originalCallback(error);
+		else
+			originalCallback(nil);
+	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
+	return req;
+}
+
 - (SFTPRequest *)uploadData:(NSData *)data
 		     toFile:(NSString *)path
+	     withAttributes:(NSDictionary *)attributes
 		 onResponse:(void (^)(NSError *))responseCallback
 {
 	void (^originalCallback)(NSError *) = [responseCallback copy];
@@ -1447,11 +1490,16 @@ resp2txt(int type)
 			}
 
 			if (offset == [data length]) {
-				DEBUG(@"finished uploading %lu bytes, closing file", [data length]);
-				openRequest.subRequest = [self closeHandle:handle
-								onResponse:^(NSError *error) {
-					openRequest.subRequest = nil;
-					originalCallback(error);
+				DEBUG(@"finished uploading %lu bytes, setting file attributes", [data length]);
+				openRequest.subRequest = [self setAttributes:attributes
+								    ofHandle:handle
+								  onResponse:^(NSError *error) {
+					DEBUG(@"%s", "finished setting attributes, closing file");
+					openRequest.subRequest = [self closeHandle:handle
+									onResponse:^(NSError *error) {
+						openRequest.subRequest = nil;
+						originalCallback(error);
+					}];
 				}];
 				return;
 			}
@@ -1483,7 +1531,7 @@ resp2txt(int type)
 		openRequest.subRequest = req;
 	};
 
-	openRequest = [self openFile:path forWriting:YES onResponse:fun];
+	openRequest = [self openFile:path forWriting:YES withAttributes:attributes onResponse:fun];
 
 	return openRequest;
 }
@@ -1612,14 +1660,17 @@ resp2txt(int type)
 	void (^originalCallback)(NSURL *, NSDictionary *, NSError *) = [responseCallback copy];
 	__block SFTPRequest *uploadRequest = nil;
 
-	void (^fun)(NSError *) = ^(NSError *error) {
-		if (error && [error code] == SSH2_FX_FAILURE) {
-			/* File already exists. Probably. */
+	uploadRequest = [self attributesOfItemAtURL:url
+					 onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+		if (error == nil && attributes) {
 			/* Upload to a random file, then rename it to our destination filename. */
 			NSString *randomFilename = [self randomFileAtDirectory:[[url path] stringByDeletingLastPathComponent]];
+			/* Don't preserve the file modification date. We're like, uh, modifing the file. */
+			[(NSMutableDictionary *)attributes removeObjectForKey:NSFileModificationDate];
 			uploadRequest.subRequest = [self uploadData:data
-							   toFile:randomFilename
-						       onResponse:^(NSError *error) {
+							     toFile:randomFilename
+						     withAttributes:attributes
+							 onResponse:^(NSError *error) {
 				if (error) {
 					uploadRequest.subRequest = nil;
 					originalCallback(url, nil, error);
@@ -1635,23 +1686,26 @@ resp2txt(int type)
 					}];
 				}];
 			}];
-		} else {
-			/* It was a new file, upload successful. Or other error. */
-			if (error) {
-				uploadRequest.subRequest = nil;
-				originalCallback(url, nil, error);
-				return;
-			}
+		} else if ([error isFileNotFoundError]) {
+			uploadRequest.subRequest = [self uploadData:data toFile:[url path] withAttributes:[NSDictionary dictionary] onResponse:^(NSError *error) {
+				/* It was a new file, upload successful. Or other error. */
+				if (error) {
+					uploadRequest.subRequest = nil;
+					originalCallback(url, nil, error);
+					return;
+				}
 
-			uploadRequest.subRequest = [self attributesOfItemAtURL:url
-								    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
-				uploadRequest.subRequest = nil;
-				originalCallback(normalizedURL, attributes, error);
+				uploadRequest.subRequest = [self attributesOfItemAtURL:url
+									    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+					uploadRequest.subRequest = nil;
+					originalCallback(url, attributes, error);
+				}];
 			}];
+		} else {
+			uploadRequest.subRequest = nil;
+			originalCallback(url, nil, error);
 		}
-	};
-
-	uploadRequest = [self uploadData:data toFile:[url path] onResponse:fun];
+	}];
 
 	return uploadRequest;
 }

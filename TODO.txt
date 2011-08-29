@@ -1,37 +1,8 @@
-* regression: :write with zero lines: invalid line address 1
+* ex history seems to be broken, only returns one matching item with prefix
 
-* p on blank line regression?
-2011-08-27 13:11:51.649 Vico[54791:60b] Exception detected while handling key input.
-2011-08-27 13:11:51.649 Vico[54791:60b] -[__NSCFString substringWithRange:]: Range or index out of bounds
-2011-08-27 13:11:51.654 Vico[54791:60b] (
-	0   CoreFoundation                      0x00007fff93524986 __exceptionPreprocess + 198
-	1   libobjc.A.dylib                     0x00007fff96b88d5e objc_exception_throw + 43
-	2   CoreFoundation                      0x00007fff935247ba +[NSException raise:format:arguments:] + 106
-	3   CoreFoundation                      0x00007fff93524744 +[NSException raise:format:] + 116
-	4   CoreFoundation                      0x00007fff934f5e3e -[__NSCFString substringWithRange:] + 110
-	5   Vico                                0x000000010009a5ee -[ViTextView recordReplacementOfRange:withLength:] + 174
-	6   Vico                                0x0000000100097be5 -[ViTextView replaceCharactersInRange:withString:undoGroup:] + 933
-	7   Vico                                0x0000000100097e3a -[ViTextView insertString:atLocation:] + 122
-	8   Vico                                0x0000000100085403 -[ViTextView(vi_commands) put_after:] + 755
-	9   CoreFoundation                      0x00007fff9351411d -[NSObject performSelector:withObject:] + 61
-	10  Vico                                0x00000001000a0dc4 -[ViTextView keyManager:evaluateCommand:] + 2580
-	11  CoreFoundation                      0x00007fff93516f51 -[NSObject performSelector:withObject:withObject:] + 65
-	12  Vico                                0x000000010010327c -[ViKeyManager evalCommand:] + 220
-	13  Vico                                0x00000001001036a0 -[ViKeyManager handleKey:allowMacros:inScope:fromMacro:excessKeys:error:] + 1024
-	14  Vico                                0x00000001001038bb -[ViKeyManager handleKey:inScope:] + 123
-	15  Vico                                0x00000001000a14e5 -[ViTextView insertText:replacementRange:] + 597
-	16  AppKit                              0x00007fff8e147444 -[NSKeyBindingManager(NSKeyBindingManager_MultiClients) flushTextForClient:] + 187
-	17  AppKit                              0x00007fff8e4992e3 -[NSTextInputContext handleEvent:] + 848
-	18  AppKit                              0x00007fff8e366790 -[NSView interpretKeyEvents:] + 248
-	19  AppKit                              0x00007fff8e2defa5 -[NSTextView keyDown:] + 691
-	20  Vico                                0x00000001000a192e -[ViTextView keyDown:] + 286
-	21  AppKit                              0x00007fff8ddc0ad2 -[NSWindow sendEvent:] + 7404
-	22  AppKit                              0x00007fff8dd58f19 -[NSApplication sendEvent:] + 5665
-	23  AppKit                              0x00007fff8dcef42b -[NSApplication run] + 548
-	24  AppKit                              0x00007fff8df6d52a NSApplicationMain + 867
-	25  Vico                                0x00000001000028b3 main + 275
-	26  Vico                                0x0000000100001874 start + 52
-)
+* visual line + < + . (repeat) => extra lines are indented (not with > ?)
+
+* regression: :write with zero lines: invalid line address 1
 
 * vicotool as filter / read from stdin
 

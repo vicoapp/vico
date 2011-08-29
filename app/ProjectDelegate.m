@@ -1458,7 +1458,7 @@ doCommandBySelector:(SEL)aSelector
 {
 	NSURL *url = [[notification userInfo] objectForKey:@"URL"];
 
-	if (isFiltering || isExpandingTree || [self isEditing]) {
+	if (isExpandingTree || [self isEditing]) {
 		DEBUG(@"ignoring changes to directory %@", url);
 		return;
 	}
@@ -1475,14 +1475,17 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
-	NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
-	NSMutableSet *selectedItems = [NSMutableSet set];
-	[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf)
-			[selectedItems addObject:pf];
-	}];
+	NSMutableSet *selectedItems = nil;
+	if (!isFiltered) {
+		NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
+		selectedItems = [NSMutableSet set];
+		[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+			id item = [explorer itemAtRow:idx];
+			ProjectFile *pf = [self fileForItem:item];
+			if (pf)
+				[selectedItems addObject:pf];
+		}];
+	}
 
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];

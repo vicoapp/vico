@@ -1,11 +1,11 @@
 @interface ViRulerView : NSRulerView
 {
-	NSFont		*font;
-	NSColor		*color;
+        NSDictionary    *textAttributes;
 	NSColor		*backgroundColor;
 	NSPoint		 fromPoint;
 }
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;
+- (void)resetTextAttributes;
 
 @end

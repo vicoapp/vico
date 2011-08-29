@@ -1443,7 +1443,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	[textStorage setAttributes:typingAttributes range:r];
 
 	[self eachTextView:^(ViTextView *tv) {
-		[[[tv enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
+		[(ViRulerView *)[[tv enclosingScrollView] verticalRulerView] resetTextAttributes];
 	}];
 }
 

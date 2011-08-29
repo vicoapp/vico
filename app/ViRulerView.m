@@ -5,25 +5,28 @@
 #define DEFAULT_THICKNESS   22.0
 #define RULER_MARGIN        5.0
 
-@interface ViRulerView (Private)
-- (NSDictionary *)textAttributes;
-@end
-
 @implementation ViRulerView
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView
 {
 	if ((self = [super initWithScrollView:aScrollView orientation:NSVerticalRuler]) != nil) {
 		[self setClientView:[[self scrollView] documentView]];
-		font = [NSFont labelFontOfSize:[NSFont systemFontSizeForControlSize:NSMiniControlSize]];
-		color = [NSColor colorWithCalibratedWhite:0.42 alpha:1.0];
 		backgroundColor = [NSColor colorWithDeviceRed:(float)0xED/0xFF
 		                                        green:(float)0xED/0xFF
 		                                         blue:(float)0xED/0xFF
 		                                        alpha:1.0];
-		[self setRuleThickness:[self requiredThickness]];
+                [self resetTextAttributes];
 	}
 	return self;
+}
+
+- (void)resetTextAttributes
+{
+        textAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                [NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
+                [NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
+                nil];
+        [self setRuleThickness:[self requiredThickness]];
 }
 
 - (void)setClientView:(NSView *)aView
@@ -70,14 +73,6 @@
 	}
 }
 
-- (NSDictionary *)textAttributes
-{
-	return [NSDictionary dictionaryWithObjectsAndKeys:
-	    font, NSFontAttributeName, 
-	    color, NSForegroundColorAttributeName,
-	    nil];
-}
-
 - (CGFloat)requiredThickness
 {
 	NSUInteger	 lineCount, digits;
@@ -91,7 +86,7 @@
 		sampleString = [@"" stringByPaddingToLength:digits
                                                  withString:@"8"
                                             startingAtIndex:0];
-		stringSize = [sampleString sizeWithAttributes:[self textAttributes]];
+		stringSize = [sampleString sizeWithAttributes:textAttributes];
 		return ceilf(MAX(DEFAULT_THICKNESS, stringSize.width + RULER_MARGIN * 2));
 	}
 
@@ -130,8 +125,6 @@
 	nullRange = NSMakeRange(NSNotFound, 0);
 	yinset = [view textContainerInset].height;        
 	visibleRect = [[[self scrollView] contentView] bounds];
-
-	NSDictionary *textAttributes = [self textAttributes];
 	
 	// Find the characters that are currently visible
 	glyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect

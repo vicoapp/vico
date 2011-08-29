@@ -9,7 +9,9 @@
 	NSDictionary *attributes;
 }
 
+/** The range of characters this scope covers. */
 @property(nonatomic,readwrite) NSRange range;
+
 @property(nonatomic,readwrite,assign) NSArray *scopes;
 @property(nonatomic,readwrite,assign) NSDictionary *attributes;
 

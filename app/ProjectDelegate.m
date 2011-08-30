@@ -49,27 +49,40 @@
 
 @implementation ProjectFile
 
-@synthesize score, url, children, isDirectory;
+@synthesize score, url, children, isDirectory, isLink;
 
-- (id)initWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
+- (id)initWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary symbolicLink:(NSURL *)sURL symbolicAttributes:(NSDictionary *)sDictionary
 {
 	self = [super init];
 	if (self) {
 		attributes = aDictionary;
-		isDirectory = [[attributes fileType] isEqualToString:NSFileTypeDirectory];
+		symURL = sURL;
+		symAttributes = sDictionary;
 		[self setURL:aURL];
+		isLink = [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
+		if (isLink)
+			isDirectory = [[symAttributes fileType] isEqualToString:NSFileTypeDirectory];
+		else
+			isDirectory = [[attributes fileType] isEqualToString:NSFileTypeDirectory];
 	}
 	return self;
 }
 
-+ (id)fileWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
++ (id)fileWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary symbolicLink:(NSURL *)sURL symbolicAttributes:(NSDictionary *)sDictionary
 {
-	return [[ProjectFile alloc] initWithURL:aURL attributes:aDictionary];
+	return [[ProjectFile alloc] initWithURL:aURL attributes:aDictionary symbolicLink:sURL symbolicAttributes:sDictionary];
 }
 
 - (BOOL)hasCachedChildren
 {
 	return children != nil;
+}
+
+- (NSURL *)url
+{
+	if (isLink)
+		return symURL;
+	return url;
 }
 
 - (void)setURL:(NSURL *)aURL
@@ -95,12 +108,24 @@
 {
 	if (iconIsDirty) {
 		if ([url isFileURL])
-			icon = [[NSWorkspace sharedWorkspace] iconForFile:[url path]];
+			icon = [[NSWorkspace sharedWorkspace] iconForFile:[[self url] path]];
 		else if (isDirectory)
 			icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
 		else
-			icon = [[NSWorkspace sharedWorkspace] iconForFileType:[url pathExtension]];
+			icon = [[NSWorkspace sharedWorkspace] iconForFileType:[[self url] pathExtension]];
 		[icon setSize:NSMakeSize(16, 16)];
+
+		if (isLink) {
+			NSImage *aliasBadge = [NSImage imageNamed:@"AliasBadgeIcon"];
+			[icon lockFocus];
+			NSSize sz = [icon size];
+			[aliasBadge drawInRect:NSMakeRect(0, 0, sz.width, sz.height)
+				      fromRect:NSZeroRect
+				     operation:NSCompositeSourceOver
+				      fraction:1.0];
+			[icon unlockFocus];
+		}
+
 		iconIsDirty = NO;
 	}
 	return icon;
@@ -242,17 +267,18 @@
 	NSMutableArray *children = [NSMutableArray array];
 	for (NSArray *entry in files) {
 		NSString *filename = [entry objectAtIndex:0];
-		NSDictionary *attributes = [entry objectAtIndex:1];
 		if ([skipRegex matchInString:filename] == nil) {
-			NSURL *curl = [url URLByAppendingPathComponent:filename];
-			if ([curl isFileURL] && [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink]) {
-				/*
-				 * XXX: resolve symlinks for all URL types!
-				 */
-				NSURL *symurl = [curl URLByResolvingSymlinksInPath];
-				attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:nil];
+
+			NSDictionary *attributes = [entry objectAtIndex:1];
+			NSURL *symurl = nil;
+			NSDictionary *symattributes = nil;
+			if ([entry count] >= 4) {
+				symattributes = [entry objectAtIndex:3];
+				symurl = [entry objectAtIndex:2];
 			}
-			ProjectFile *pf = [ProjectFile fileWithURL:curl attributes:attributes];
+
+			NSURL *curl = [url URLByAppendingPathComponent:filename];
+			ProjectFile *pf = [ProjectFile fileWithURL:curl attributes:attributes symbolicLink:symurl symbolicAttributes:symattributes];
 			if ([pf isDirectory]) {
 				ProjectFile *oldPf = nil;
 				if (olditem)

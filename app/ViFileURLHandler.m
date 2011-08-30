@@ -57,12 +57,17 @@
 		NSArray *files = [fileman contentsOfDirectoryAtPath:[aURL path] error:&error];
 		NSMutableArray *contents = [NSMutableArray array];
 		for (NSString *filename in files) {
-			NSDictionary *attrs;
+			NSDictionary *attrs, *symattrs = nil;
+			NSURL *symurl = nil;
 			NSURL *u = [aURL URLByAppendingPathComponent:filename];
 			NSString *p = [u path];
 			attrs = [fileman attributesOfItemAtPath:p error:&error];
+			if (attrs && [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink]) {
+				symurl = [u URLByResolvingSymlinksInPath];
+				symattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:&error];
+			}
 			if (attrs)
-				[contents addObject:[NSArray arrayWithObjects:filename, attrs, nil]];
+				[contents addObject:[NSArray arrayWithObjects:filename, attrs, symurl, symattrs, nil]];
 			else if (error)
 				break;
 		}

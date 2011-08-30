@@ -1117,6 +1117,48 @@ resp2txt(int type)
 	return req;
 }
 
+- (SFTPRequest *)resolveSymlinksInEntries:(NSMutableArray *)entries
+			    relativeToURL:(NSURL *)aURL
+			     onCompletion:(void (^)(NSArray *, NSError *))completionCallback
+{
+	void (^originalCallback)(NSArray *, NSError *) = [completionCallback copy];
+
+	__block SFTPRequest *req = nil;
+	for (NSMutableArray *entry in entries) {
+		NSDictionary *attributes = [entry objectAtIndex:1];
+		if ([[attributes fileType] isEqualToString:NSFileTypeSymbolicLink] && [entry count] == 2) {
+			NSString *filename = [entry objectAtIndex:0];
+			req = [self realpath:filename onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
+				if (error)
+					originalCallback(nil, error);
+				else {
+					NSURL *url = [NSURL URLWithString:realPath relativeToURL:aURL];
+					req.subRequest = [self attributesOfItemAtURL:url
+									  onResponse:^(NSURL *normalizedURL, NSDictionary *realAttributes, NSError *error) {
+						if (error && ![error isFileNotFoundError])
+							originalCallback(nil, error);
+						else {
+							[entry addObject:[self normalizeURL:url]];
+							[entry addObject:realAttributes ?: [NSDictionary dictionary]];
+							req.subRequest = [self resolveSymlinksInEntries:entries
+											  relativeToURL:aURL
+											   onCompletion:originalCallback];
+						}
+					}];
+				}
+			}];
+			break;
+		}
+	}
+
+	if (req == nil) {
+		DEBUG(@"%s", "resolved all symlinks");
+		originalCallback(entries, nil);
+	}
+
+	return req;
+}
+
 - (SFTPRequest *)contentsOfDirectoryAtURL:(NSURL *)aURL
 				onResponse:(void (^)(NSArray *, NSError *))responseCallback
 {
@@ -1168,8 +1210,16 @@ resp2txt(int type)
 						openRequest.subRequest = nil;
 						if (error)
 							originalCallback(nil, error);
-						else
-							originalCallback(entries, nil);
+						else {
+							openRequest.subRequest = [self resolveSymlinksInEntries:entries
+												  relativeToURL:aURL
+												   onCompletion:^(NSArray *resolvedEntries, NSError *error) {
+								openRequest.subRequest = nil;
+								if (error)
+									resolvedEntries = nil;
+								originalCallback(resolvedEntries, error);
+							}];
+						}
 					}];
 				}
 				return;
@@ -1196,7 +1246,7 @@ resp2txt(int type)
 				if ([filename rangeOfString:@"/"].location != NSNotFound)
 					INFO(@"Ignoring suspect path \"%@\" during readdir of \"%@\"", filename, url);
 				else
-					[entries addObject:[NSArray arrayWithObjects:filename, attributes, nil]];
+					[entries addObject:[NSMutableArray arrayWithObjects:filename, attributes, nil]];
 			}
 
 			/* Request another batch of names. */

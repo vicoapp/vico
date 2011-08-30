@@ -272,6 +272,7 @@
 		9AD68D5013A4083A00126E32 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */; };
 		9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */; };
 		9AF140A8140A9C110075677F /* ViPathCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A7140A9C110075677F /* ViPathCell.m */; };
+		9AF29C24140CF511000CB1CB /* AliasBadgeIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */; };
 		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
 		9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
 		9AFC857A13F432A600B4FF09 /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AFC857913F432A600B4FF09 /* header.png */; };
@@ -808,6 +809,7 @@
 		9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathComponentCell.m; sourceTree = "<group>"; };
 		9AF140A6140A9C110075677F /* ViPathCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPathCell.h; sourceTree = "<group>"; };
 		9AF140A7140A9C110075677F /* ViPathCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathCell.m; sourceTree = "<group>"; };
+		9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AliasBadgeIcon.icns; path = Images/AliasBadgeIcon.icns; sourceTree = SOURCE_ROOT; };
 		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
 		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
 		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
@@ -1387,6 +1389,7 @@
 		9A4346A813311673002B04DE /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */,
 				9AFC857913F432A600B4FF09 /* header.png */,
 				9A4346A913311694002B04DE /* actionbarbg.png */,
 				9A4346AA13311694002B04DE /* actionmenu.png */,
@@ -1649,6 +1652,7 @@
 				9A8CDE8313AB355F00F771AB /* WaitProgress.xib in Resources */,
 				9A57990113F0189A00191109 /* ex.nu in Resources */,
 				9AFC857A13F432A600B4FF09 /* header.png in Resources */,
+				9AF29C24140CF511000CB1CB /* AliasBadgeIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

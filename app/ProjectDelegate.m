@@ -1534,12 +1534,14 @@ doCommandBySelector:(SEL)aSelector
 		[explorer reloadData];
 		[self resetExpandedItems];
 
-		NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-		for (ProjectFile *pf in selectedItems)
-			[set addIndex:[self rowForItemWithURL:pf.url]];
-		[explorer selectRowIndexes:set byExtendingSelection:NO];
-		[explorer scrollRowToVisible:[set lastIndex]];
-		[explorer scrollRowToVisible:[set firstIndex]];
+		if ([selectedItems count] > 0) {
+			NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
+			for (ProjectFile *pf in selectedItems)
+				[set addIndex:[self rowForItemWithURL:pf.url]];
+			[explorer selectRowIndexes:set byExtendingSelection:NO];
+			[explorer scrollRowToVisible:[set lastIndex]];
+			[explorer scrollRowToVisible:[set firstIndex]];
+		}
 	}
 }
 

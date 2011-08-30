@@ -85,7 +85,6 @@
 		9A2EF3A213310CB80023C5B7 /* ViLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33413310C610023C5B7 /* ViLayoutManager.m */; };
 		9A2EF3A413310CB80023C5B7 /* ViMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33813310C650023C5B7 /* ViMark.m */; };
 		9A2EF3A513310CB80023C5B7 /* ViOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33A13310C670023C5B7 /* ViOutlineView.m */; };
-		9A2EF3A613310CB80023C5B7 /* ViPathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33C13310C690023C5B7 /* ViPathControl.m */; };
 		9A2EF3A713310CB80023C5B7 /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33E13310C6B0023C5B7 /* ViPreferencesController.m */; };
 		9A2EF3A813310CB80023C5B7 /* ViProject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34013310C6E0023C5B7 /* ViProject.m */; };
 		9A2EF3A913310CB80023C5B7 /* ViRegexp.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34213310C700023C5B7 /* ViRegexp.m */; };
@@ -271,6 +270,8 @@
 		9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E113EC341C0040DB4E /* ExParser.m */; };
 		9AD68D4E13A3583100126E32 /* ViEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4D13A3583100126E32 /* ViEventManager.m */; };
 		9AD68D5013A4083A00126E32 /* ViTextView-ex_commands.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */; };
+		9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */; };
+		9AF140A8140A9C110075677F /* ViPathCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A7140A9C110075677F /* ViPathCell.m */; };
 		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
 		9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
 		9AFC857A13F432A600B4FF09 /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AFC857913F432A600B4FF09 /* header.png */; };
@@ -532,8 +533,6 @@
 		9A2EF33813310C650023C5B7 /* ViMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMark.m; sourceTree = "<group>"; };
 		9A2EF33913310C660023C5B7 /* ViOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViOutlineView.h; sourceTree = "<group>"; };
 		9A2EF33A13310C670023C5B7 /* ViOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViOutlineView.m; sourceTree = "<group>"; };
-		9A2EF33B13310C680023C5B7 /* ViPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPathControl.h; sourceTree = "<group>"; };
-		9A2EF33C13310C690023C5B7 /* ViPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathControl.m; sourceTree = "<group>"; };
 		9A2EF33D13310C6A0023C5B7 /* ViPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencesController.h; sourceTree = "<group>"; };
 		9A2EF33E13310C6B0023C5B7 /* ViPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencesController.m; sourceTree = "<group>"; };
 		9A2EF33F13310C6D0023C5B7 /* ViProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViProject.h; sourceTree = "<group>"; };
@@ -805,6 +804,10 @@
 		9AD68D4C13A3583100126E32 /* ViEventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViEventManager.h; sourceTree = "<group>"; };
 		9AD68D4D13A3583100126E32 /* ViEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViEventManager.m; sourceTree = "<group>"; };
 		9AD68D4F13A4083A00126E32 /* ViTextView-ex_commands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViTextView-ex_commands.m"; sourceTree = "<group>"; };
+		9AF140A2140A8D0B0075677F /* ViPathComponentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPathComponentCell.h; sourceTree = "<group>"; };
+		9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathComponentCell.m; sourceTree = "<group>"; };
+		9AF140A6140A9C110075677F /* ViPathCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPathCell.h; sourceTree = "<group>"; };
+		9AF140A7140A9C110075677F /* ViPathCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathCell.m; sourceTree = "<group>"; };
 		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
 		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
 		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
@@ -1161,6 +1164,10 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AF140A6140A9C110075677F /* ViPathCell.h */,
+				9AF140A7140A9C110075677F /* ViPathCell.m */,
+				9AF140A2140A8D0B0075677F /* ViPathComponentCell.h */,
+				9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */,
 				9A4A01C013F94D3F00CCDBA6 /* ViBgView.h */,
 				9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */,
 				9ACFF8DF13EC341C0040DB4E /* ExMap.h */,
@@ -1321,8 +1328,6 @@
 				9A2EF33813310C650023C5B7 /* ViMark.m */,
 				9A2EF33913310C660023C5B7 /* ViOutlineView.h */,
 				9A2EF33A13310C670023C5B7 /* ViOutlineView.m */,
-				9A2EF33B13310C680023C5B7 /* ViPathControl.h */,
-				9A2EF33C13310C690023C5B7 /* ViPathControl.m */,
 				9A2EF33D13310C6A0023C5B7 /* ViPreferencesController.h */,
 				9A2EF33E13310C6B0023C5B7 /* ViPreferencesController.m */,
 				9A2EF33F13310C6D0023C5B7 /* ViProject.h */,
@@ -1835,7 +1840,6 @@
 				9A2EF3A213310CB80023C5B7 /* ViLayoutManager.m in Sources */,
 				9A2EF3A413310CB80023C5B7 /* ViMark.m in Sources */,
 				9A2EF3A513310CB80023C5B7 /* ViOutlineView.m in Sources */,
-				9A2EF3A613310CB80023C5B7 /* ViPathControl.m in Sources */,
 				9A2EF3A713310CB80023C5B7 /* ViPreferencesController.m in Sources */,
 				9A2EF3A813310CB80023C5B7 /* ViProject.m in Sources */,
 				9A2EF3A913310CB80023C5B7 /* ViRegexp.m in Sources */,
@@ -1978,6 +1982,8 @@
 				9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */,
 				9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */,
 				9A4A01C213F94D3F00CCDBA6 /* ViBgView.m in Sources */,
+				9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */,
+				9AF140A8140A9C110075677F /* ViPathCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

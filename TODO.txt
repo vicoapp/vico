@@ -1,31 +1,17 @@
+* explorer spinner is hidden by new path control
+* don't overwrite read-only files!
+* push marks
 * ex history seems to be broken, only returns one matching item with prefix
-
 * visual line + < + . (repeat) => extra lines are indented (not with > ?)
-
 * regression: :write with zero lines: invalid line address 1
-
-* vicotool as filter / read from stdin
-
 * inner block text object doesn't work within strings
-
 * show baseURL in window title!
-
-* bring back explorer / folder bookmarks
-
 * implement c-w in insert mode, alias as <alt-backspace>
-
-* "Install Terminal Helper" doesn't find the help link
-
 * ex command "+$" raises exception
-* move statusbar / ex command line to each document view
-
 * regression: symbol search no longer focuses first match
-
-* "Open all with current extension as..." menu like sublime in language syntax menu
-
 * :/search doesn't work with 'nowrapscan'
-
 * search with 'nowrapscan' should issue 'not found' message
+* go back to last focused document when closing a document
 
 * xcode/Run throws exception:
 2011-08-15 13:42:56.959 Vico[3043:403] [<__NSCFString 0x4016dcec0> valueForUndefinedKey:]: this class is not key value coding-compliant for the key title.
@@ -40,29 +26,24 @@
 
 ! vertical splits are buggy
 
-* don't overwrite read-only files!
-
-* go back to last focused document when closing a document
-
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)
 
+* vicotool as filter / read from stdin
 * goto line (from ex, G works fine) doesn't push on jump list
-
 * document :s replacement syntax ($0, ${?0:bla} etc)
-
 * scriptable settings with :set
-
 * can we map ys to a new operator (surround), with y{motion} still working?
+* notion of <leader> key in maps
 
+* "Open all with current extension as..." menu like sublime in language syntax menu
+* bring back explorer / folder bookmarks
 * let untitled documents have a custom title:
   -> untitled documents should show up in ctrl-s completions
   -> commands can re-use special buffers (ie, a *finger* buffer, or a *shell* buffer)
 
 * order fuzzy search results wrt last opened/used time
-
 * less lame notification of modified documents in tabs (don't append * in title!)
-
 * replace ViError class with NSError category
 
 * @godDLL: can I have a preference to open new files that were opened
@@ -82,12 +63,12 @@
 * split views top line is ANNOYINGLY changed when editing in another view
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 
+* move statusbar / ex command line to each document view
 * jumps doesn't work in untitled files
 * bundle commands time out when presenting ui
 * switch undo direction after bundle command
 * o and O commands with a count does the wrong thing
 * searching is slow on large files, naïve implementation
-* push marks
 * push jumps
 * ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 
@@ -110,7 +91,6 @@
 * ability to direct stderr to other place than (or, separately from) stdout in bundle commands
 * Ability to edit tmbundles within the app (HN)
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
-* :mkdir command
 * completion expressions in nu
 * p/P with a count
 * J with visual selection, and J with a count

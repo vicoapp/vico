@@ -75,6 +75,8 @@
 
 	ViJumpList *history;
 
+	NSMutableDictionary *badges;
+
         /*
          * Since we can't pass an object through a void* contextInfo and
          * expect the object to survive garbage collection, store a strong

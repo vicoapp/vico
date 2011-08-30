@@ -154,6 +154,7 @@
 		expandedSet = [NSMutableSet set];
 		contextObjects = [NSMutableSet set];
 		width = 200.0;
+		badges = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -1771,6 +1772,27 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	return 20;
 }
 
+- (void)setBadge:(NSImage *)image forURL:(NSURL *)url
+{
+	NSParameterAssert(image);
+	NSParameterAssert(url);
+	[image setSize:NSMakeSize(16, 16)];
+	[badges setObject:image forKey:[url absoluteURL]];
+	[explorer reloadData];
+}
+
+- (void)setBadges:(NSDictionary *)dictionary
+{
+	badges = [dictionary mutableCopy];
+	[explorer reloadData];
+}
+
+- (void)clearBadges
+{
+	[badges removeAllObjects];
+	[explorer reloadData];
+}
+
 - (NSCell *)outlineView:(NSOutlineView *)outlineView
  dataCellForTableColumn:(NSTableColumn *)tableColumn
                    item:(id)item
@@ -1785,6 +1807,8 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 			[(MHTextIconCell *)cell setModified:YES];
 		else
 			[(MHTextIconCell *)cell setModified:NO];
+
+		[(MHTextIconCell *)cell setBadge:[badges objectForKey:pf.url]];
 		[cell setFont:font];
 		[cell setImage:[pf icon]];
 	}

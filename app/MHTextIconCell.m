@@ -9,6 +9,7 @@
 
 @synthesize image;
 @synthesize modified;
+@synthesize badge;
 
 - (void)editWithFrame:(NSRect)aRect
                inView:(NSView *)controlView
@@ -54,7 +55,6 @@
 	NSRect imageFrame;
 
 	if (image != nil) {
-
 		imageSize = [image size];
 		NSDivideRect(cellFrame, &imageFrame, &cellFrame, 4 + imageSize.width, NSMinXEdge);
 		if ([self drawsBackground]) {
@@ -72,6 +72,13 @@
 		[image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
 	}
 
+	if (badge != nil) {
+		NSSize badgeSize = [badge size];
+		NSPoint badgePoint = NSMakePoint(NSMaxX(cellFrame) - badgeSize.width, cellFrame.origin.y);
+		badgePoint.y += ceil((cellFrame.size.height + badgeSize.height) / 2);
+		[badge compositeToPoint:badgePoint operation:NSCompositeSourceOver];
+	}
+
 	if (modified) {
 		if (modImage == nil) {
 			modImage = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
@@ -86,13 +93,15 @@
 	CGFloat d = (cellFrame.size.height - [[self font] pointSize]) / 3.0;
 	cellFrame.origin.y += d;
 	cellFrame.size.height -= 2*d;
+	if (badge)
+		cellFrame.size.width -= 16;
 	[super drawWithFrame:cellFrame inView:controlView];
 }
 
 - (NSSize)cellSize
 {
 	NSSize cellSize = [super cellSize];
-	cellSize.width += (image ? [image size].width : 0) + 4;
+	cellSize.width += (image ? [image size].width : 0) + (badge ? [badge size].width : 0) + 4;
 	return cellSize;
 }
 

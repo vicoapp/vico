@@ -335,7 +335,7 @@
 
 - (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
 {
-	[self notifyChangedDirectoryAtURL:aURL recursively:YES force:NO];
+	[self notifyChangedDirectoryAtURL:aURL recursively:NO force:NO];
 }
 
 #pragma mark -
@@ -373,7 +373,7 @@ void mycallback(
 		NSUInteger flags = eventFlags[i];
 		DEBUG(@"URL %@ changed w/flags 0x%04x", url, eventFlags[i]);
 		[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url
-							  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs) | YES
+							  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs)
 								force:YES];
 	}
 }

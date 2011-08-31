@@ -52,6 +52,7 @@ usage(void)
 	printf("    -h            show this help\n");
 	printf("    -e string     evaluate the string as a Nu script\n");
 	printf("    -f file       read file and evaluate as a Nu script\n");
+	printf("    -n            open files in a new window\n");
 	printf("    -p params     read script parameters as a JSON string\n");
 	printf("    -p -          read script parameters as JSON from standard input\n");
 	printf("    -r            enter runloop (don't exit script immediately)\n");
@@ -75,10 +76,11 @@ main(int argc, char **argv)
 	BOOL					 runLoop = NO;
 	BOOL					 params_from_stdin = NO;
 	BOOL					 wait_for_close = NO;
+	BOOL					 new_window = NO;
 
 	bindings = [NSMutableDictionary dictionary];
 
-	while ((c = getopt(argc, argv, "e:f:hp:rw")) != -1) {
+	while ((c = getopt(argc, argv, "e:f:hnp:rw")) != -1) {
 		switch (c) {
 		case 'e':
 			eval_script = optarg;
@@ -89,6 +91,9 @@ main(int argc, char **argv)
 		case 'h':
 			usage();
 			return 0;
+		case 'n':
+			new_window = YES;
+			break;
 		case 'p':
 			if (strcmp(optarg, "-") == 0) {
 				params_from_stdin = YES;
@@ -223,6 +228,9 @@ main(int argc, char **argv)
 		if (!runLoop && [result length] > 0)
 			printf("%s\n", [result UTF8String]);
 	}
+
+	if (argc > 0 && new_window)
+		[proxy newProject:nil];
 
 	for (i = 0; i < argc; i++) {
 		NSString *path = [NSString stringWithUTF8String:argv[i]];

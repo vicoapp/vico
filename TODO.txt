@@ -1,17 +1,33 @@
+=== Before next version
+
 * explorer spinner is hidden by new path control
-* don't overwrite read-only files!
-* push marks
+  => move it, where!? auto-hide something else?
+
 * ex history seems to be broken, only returns one matching item with prefix
+* inner block text object doesn't work within strings
+
+
+=== Would be nice to have in next version
+* don't overwrite read-only files!
+* go back to last focused document when closing a document
+* push marks
 * visual line + < + . (repeat) => extra lines are indented (not with > ?)
 * regression: :write with zero lines: invalid line address 1
-* inner block text object doesn't work within strings
-* show baseURL in window title!
 * implement c-w in insert mode, alias as <alt-backspace>
-* ex command "+$" raises exception
 * regression: symbol search no longer focuses first match
+* should check all documents for external changes when app becomes active again
+
+* ctrl-y w/caret at bottom of screen causes rendering artifacts in line number view, and SLOWS DOWN the scrolling. WTF?
+
+
+=== Probably not in next version
+* show baseURL in window title!
+* ex command "+$" raises exception
 * :/search doesn't work with 'nowrapscan'
+
+
+* event for changed working directory (for updating scm status)
 * search with 'nowrapscan' should issue 'not found' message
-* go back to last focused document when closing a document
 
 * xcode/Run throws exception:
 2011-08-15 13:42:56.959 Vico[3043:403] [<__NSCFString 0x4016dcec0> valueForUndefinedKey:]: this class is not key value coding-compliant for the key title.
@@ -56,7 +72,6 @@
 * i_CTRL-o (execute one normal mode command in insert mode)
 * i_CTRL-\_CTRL-o (execute one normal mode command in insert mode, don't move the cursor)
 
-* should check all documents for external changes when app becomes active again
 * check map error in excessKeys.nu (re vs r duplicate mapping)
 * bundle commands not repeatable with dot
 * :*buffer doesn't push on jump list

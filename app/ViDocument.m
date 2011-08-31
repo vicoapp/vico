@@ -533,6 +533,18 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self continueSavingAfterError:error];
 }
 
+- (BOOL)shouldRunSavePanelWithAccessoryView
+{
+	/* Do not show the "File Formats" accessory view. */
+	return NO;
+}
+
+- (BOOL)prepareSavePanel:(NSSavePanel *)savePanel
+{
+	[savePanel setDirectoryURL:[[self windowController] baseURL]];
+	return YES;
+}
+
 - (void)saveDocumentWithDelegate:(id)delegate
 		 didSaveSelector:(SEL)selector
 		     contextInfo:(void *)contextInfo

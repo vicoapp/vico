@@ -18,7 +18,7 @@
 (ex define:'("edit" "e")	syntax:"!+e1x"	as:"ex_edit:")
 (ex define:"eval"		syntax:"r"	as:"ex_eval:")
 (ex define:"export"		syntax:"E"	as:"ex_export:")
-(ex define:'("global" "g")	syntax:"r%!/e|"	as:"ex_global:")
+;(ex define:'("global" "g")	syntax:"r%!/e|"	as:"ex_global:")
 ;(ex define:"join"		syntax:"r!c"	as:"ex_join:")
 ;(ex define:'("mark" "k")	syntax:"re1"	as:"ex_mark:")
 ;(ex define:"map"		syntax:"!e"	as:"ex_map:")

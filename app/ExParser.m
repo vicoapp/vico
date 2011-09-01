@@ -373,7 +373,7 @@
 				 */
 				addr1 = [[ExAddress alloc] init];
 				addr1.type = ExAddressAbsolute;
-				addr1.line = 1;
+				addr1.line = 0;
 				addr1.offset = 0;
 
 				addr2 = [[ExAddress alloc] init];

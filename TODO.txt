@@ -12,7 +12,7 @@
 * don't overwrite read-only files!
 * go back to last focused document when closing a document
 * push marks
-* implement c-w in insert mode, alias as <alt-backspace>
+* implement c-w in insert mode
 * regression: symbol search no longer focuses first match
 * should check all documents for external changes when app becomes active again
 
@@ -21,11 +21,9 @@
 
 === Probably not in next version
 * show baseURL in window title!
-* ex command "+$" raises exception
 * :/search doesn't work with 'nowrapscan'
 
 
-* event for changed working directory (for updating scm status)
 * search with 'nowrapscan' should issue 'not found' message
 
 * xcode/Run throws exception:

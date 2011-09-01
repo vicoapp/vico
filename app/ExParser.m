@@ -331,7 +331,7 @@
 		}
 	} else {
 		NSUInteger nameStart = [scan scanLocation];
-		NSCharacterSet *singleCharCommandSet = [NSCharacterSet characterSetWithCharactersInString:@"!#&*<=>@~"];
+		NSCharacterSet *singleCharCommandSet = [NSCharacterSet characterSetWithCharactersInString:@"!#&*<=>@~$"];
 		if ([singleCharCommandSet characterIsMember:ch]) {
 			name = [NSString stringWithCharacters:&ch length:1];
 			[scan inc];
@@ -349,8 +349,12 @@
 
 	mapping = [map lookup:name withScope:nil];
 	if (mapping == NULL) {
-		if (outError)
-			*outError = [ViError errorWithFormat:@"The %@ command is unknown", name];
+		if (outError) {
+			if (name)
+				*outError = [ViError errorWithFormat:@"The %@ command is unknown", name];
+			else
+				*outError = [ViError errorWithFormat:@"Failed to parse ex command"];
+		}
 		return nil;
 	}
 

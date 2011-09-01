@@ -115,11 +115,14 @@
 	u_int64_t rank = 0;
 	BOOL exactMatch = NO;
 
+	if ([aString length] == 0)
+		return nil;
+
 	for (ExMapping *m in mappings) {
 		/*
-                 * Check if the name match. We start with partial
-                 * matching. If an exact match is found, we continue
-                 * only considering exact matches.
+		 * Check if the name match. We start with partial
+		 * matching. If an exact match is found, we continue
+		 * only considering exact matches.
 		 */
 		int match;
 		if ((match = [m matchesName:aString exactly:exactMatch]) > 0) {

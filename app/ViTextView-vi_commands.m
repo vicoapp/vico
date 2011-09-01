@@ -305,6 +305,7 @@
 - (NSInteger)matchCharacter:(unichar)matchChar
                  atLocation:(NSUInteger)location
               withCharacter:(unichar)otherChar
+	     restrictScopes:(BOOL)restrictScopes
                     forward:(BOOL)forward
 {
 	/* Special case: already on the other matching character. */
@@ -314,17 +315,20 @@
 	NSUInteger length = [[self textStorage] length];
 
 	/* Special case: check if inside a string or comment. */
-	ViScope *openingScope = [document scopeAtLocation:location];
+	BOOL inSpecialScope = NO;
 	NSRange specialScopeRange;
-	BOOL inSpecialScope = ([@"string" match:openingScope] > 0);
-	if (inSpecialScope) {
-		specialScopeRange = [document rangeOfScopeSelector:@"string"
-							atLocation:location];
-	} else {
-		inSpecialScope = ([@"comment" match:openingScope ] > 0);
-		if (inSpecialScope)
-			specialScopeRange = [document rangeOfScopeSelector:@"comment"
+	if (restrictScopes) {
+		ViScope *openingScope = [document scopeAtLocation:location];
+		BOOL inSpecialScope = ([@"string" match:openingScope] > 0);
+		if (inSpecialScope) {
+			specialScopeRange = [document rangeOfScopeSelector:@"string"
 								atLocation:location];
+		} else {
+			inSpecialScope = ([@"comment" match:openingScope ] > 0);
+			if (inSpecialScope)
+				specialScopeRange = [document rangeOfScopeSelector:@"comment"
+									atLocation:location];
+		}
 	}
 
 	/* Lookup the matching character and prepare search. */
@@ -412,6 +416,7 @@
 	NSInteger matchLocation = [self matchCharacter:matchChar
 					    atLocation:openingRange.location
 					 withCharacter:otherChar
+					restrictScopes:YES
 					       forward:forward];
 
 	if (matchLocation < 0) {
@@ -2641,36 +2646,63 @@
 }
 
 - (BOOL)selectBlock:(ViCommand *)command
-         atLocation:(NSUInteger)location
+	    inRange:(NSRange)range
               match:(unichar)matchChar
                with:(unichar)otherChar
           inclusive:(BOOL)isInclusive
 {
+	DEBUG(@"range is %@", NSStringFromRange(range));
+
+	if (NSMaxRange(range) >= [[self textStorage] length])
+		return NO;
+
+	NSUInteger leftLocation = range.location;
+
+again:
+	DEBUG(@"looking for %C backwards from %lu", matchChar, leftLocation);
 	NSInteger startMatch = [self matchCharacter:otherChar
-					 atLocation:location
+					 atLocation:leftLocation
 				      withCharacter:matchChar
+				     restrictScopes:NO
 					    forward:NO];
+
 	if (startMatch < 0)
 		return NO;
 
+	DEBUG(@"looking for %C forward from %lu", otherChar, startMatch);
 	NSInteger endMatch = [self matchCharacter:matchChar
 				       atLocation:startMatch
 				    withCharacter:otherChar
+				   restrictScopes:YES
 					  forward:YES];
 
 	if (endMatch < 0)
 		return NO;
 
-	if (!isInclusive) {
-		++startMatch;
-		if (endMatch > startMatch)
-			--endMatch;
+	DEBUG(@"found start at %lu, end at %lu", startMatch, endMatch);
+
+	if (startMatch > range.location || endMatch + 1 < NSMaxRange(range)) {
+		/* We selected a smaller block inside the current range. Skip it and try again from the found start. */
+		DEBUG(@"%s", "found smaller range");
+		if (startMatch == 0)
+			return NO;
+		--leftLocation;
+		goto again;
 	}
 
-	if (mode == ViVisualMode && startMatch == visual_start_location && endMatch == start_location) {
-		int d = (isInclusive ? 0 : 1);
-		if (startMatch > d && [self selectBlock:command atLocation:startMatch-1-d match:matchChar with:otherChar inclusive:isInclusive])
-			return YES;
+	if (!isInclusive) {
+		++startMatch;
+		--endMatch;
+		DEBUG(@"adjusted found range %@", NSStringFromRange(NSMakeRange(startMatch, endMatch - startMatch + 1)));
+	}
+
+	if (startMatch == range.location && endMatch + 1 == NSMaxRange(range)) {
+		/* We selected the same range again. Try to extend the range. */
+		DEBUG(@"found same range %@", NSStringFromRange(NSMakeRange(startMatch, endMatch - startMatch + 1)));
+		if (startMatch == 0)
+			return NO;
+		--leftLocation;
+		goto again;
 	}
 
 	/*
@@ -2696,42 +2728,42 @@
 
 - (BOOL)select_inner_block:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'(' with:')' inclusive:NO];
+	return [self selectBlock:command inRange:affectedRange match:'(' with:')' inclusive:NO];
 }
 
 - (BOOL)select_outer_block:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'(' with:')' inclusive:YES];
+	return [self selectBlock:command inRange:affectedRange match:'(' with:')' inclusive:YES];
 }
 
 - (BOOL)select_inner_bracket:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'[' with:']' inclusive:NO];
+	return [self selectBlock:command inRange:affectedRange match:'[' with:']' inclusive:NO];
 }
 
 - (BOOL)select_outer_bracket:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'[' with:']' inclusive:YES];
+	return [self selectBlock:command inRange:affectedRange match:'[' with:']' inclusive:YES];
 }
 
 - (BOOL)select_inner_angle_bracket:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'<' with:'>' inclusive:NO];
+	return [self selectBlock:command inRange:affectedRange match:'<' with:'>' inclusive:NO];
 }
 
 - (BOOL)select_outer_angle_bracket:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'<' with:'>' inclusive:YES];
+	return [self selectBlock:command inRange:affectedRange match:'<' with:'>' inclusive:YES];
 }
 
 - (BOOL)select_inner_brace:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'{' with:'}' inclusive:NO];
+	return [self selectBlock:command inRange:affectedRange match:'{' with:'}' inclusive:NO];
 }
 
 - (BOOL)select_outer_brace:(ViCommand *)command
 {
-	return [self selectBlock:command atLocation:start_location match:'{' with:'}' inclusive:YES];
+	return [self selectBlock:command inRange:affectedRange match:'{' with:'}' inclusive:YES];
 }
 
 - (BOOL)select_inner_scope:(ViCommand *)command

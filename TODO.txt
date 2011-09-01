@@ -1,13 +1,12 @@
 === Before next version
 
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
+* b command skips too far!
 
 ! crash in explorer update
 
 * explorer spinner is hidden by new path control
   => move it, where!? auto-hide something else?
-
-* inner block text object doesn't work within strings
 
 
 === Would be nice to have in next version
@@ -43,6 +42,8 @@
 * repeating completed text should not re-trigger completion!
 
 ! vertical splits are buggy
+
+* splitting functions should accept an anchor argument (left, right, up, down)
 
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)

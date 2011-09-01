@@ -405,6 +405,7 @@
 - (NSInteger)matchCharacter:(unichar)matchChar
                  atLocation:(NSUInteger)location
               withCharacter:(unichar)otherChar
+	     restrictScopes:(BOOL)restrictScopes
                     forward:(BOOL)forward;
 - (BOOL)evalExString:(NSString *)exline;
 - (BOOL)presentCompletionsOf:(NSString *)string

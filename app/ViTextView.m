@@ -340,7 +340,7 @@ int logIndent = 0;
 		return;
 	}
 
-	NSUInteger caret = [self caret];
+	NSUInteger oldCaret = [self caret];
 	[[[self textStorage] mutableString] setString:aString ?: @""];
 	NSDictionary *attrs = [self typingAttributes];
 	if (attrs) {
@@ -348,7 +348,7 @@ int logIndent = 0;
 		[[self textStorage] setAttributes:attrs
 					    range:r];
 	}
-	[self setCaret:caret];
+	[self setCaret:oldCaret];
 }
 
 - (BOOL)autoNewline
@@ -1401,6 +1401,7 @@ int logIndent = 0;
 	NSInteger matchLocation = [self matchCharacter:matchChar
 					    atLocation:location
 					 withCharacter:otherChar
+					restrictScopes:YES
 					       forward:forward];
 	if (matchLocation < 0)
 		return;
@@ -1841,6 +1842,7 @@ int logIndent = 0;
 	start_location = [self caret];
 	end_location = start_location;
 	final_location = NSNotFound;
+	affectedRange = NSMakeRange(start_location, 0);
 	DEBUG(@"start_location = %u", start_location);
 
 	/* Set or reset the saved column for up/down movement. */

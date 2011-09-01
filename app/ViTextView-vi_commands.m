@@ -319,7 +319,7 @@
 	NSRange specialScopeRange;
 	if (restrictScopes) {
 		ViScope *openingScope = [document scopeAtLocation:location];
-		BOOL inSpecialScope = ([@"string" match:openingScope] > 0);
+		inSpecialScope = ([@"string" match:openingScope] > 0);
 		if (inSpecialScope) {
 			specialScopeRange = [document rangeOfScopeSelector:@"string"
 								atLocation:location];
@@ -336,13 +336,13 @@
 	int delta = 1;
 	if (forward) {
 		startOffset = location + 1;
-		if (inSpecialScope)
+		if (restrictScopes && inSpecialScope)
 			endOffset = NSMaxRange(specialScopeRange) - 1;
 		else
 			endOffset = length;
 	} else {
 		startOffset = location - 1;
-		if (inSpecialScope)
+		if (restrictScopes && inSpecialScope)
 			endOffset = specialScopeRange.location;
 		delta = -1;
 	}
@@ -357,7 +357,7 @@
 		unichar c = [string characterAtIndex:offset];
 		if (c == matchChar || c == otherChar) {
 			/* Ignore match if scopes don't match. */
-			if (!inSpecialScope) {
+			if (restrictScopes && !inSpecialScope) {
 				ViScope *scope = [document scopeAtLocation:offset];
 				if ([@"string | comment" match:scope])
 					continue;

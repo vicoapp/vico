@@ -340,15 +340,15 @@ int logIndent = 0;
 		return;
 	}
 
-	NSRange r = NSMakeRange(0, [[self textStorage] length]);
-	[[self textStorage] replaceCharactersInRange:r
-	                                  withString:aString];
+	NSUInteger caret = [self caret];
+	[[[self textStorage] mutableString] setString:aString ?: @""];
 	NSDictionary *attrs = [self typingAttributes];
 	if (attrs) {
-		r = NSMakeRange(0, [[self textStorage] length]);
+		NSRange r = NSMakeRange(0, [[self textStorage] length]);
 		[[self textStorage] setAttributes:attrs
 					    range:r];
 	}
+	[self setCaret:caret];
 }
 
 - (BOOL)autoNewline

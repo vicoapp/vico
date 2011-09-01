@@ -54,6 +54,8 @@
 	if (historyIndex == -1)
 		current = [self stringValue];
 
+	ViTextView *editor = (ViTextView *)[self currentEditor];
+
 	int i = historyIndex;
 	DEBUG(@"history index = %i, count = %lu, prefix = %@",
 	    historyIndex, [history count], prefix);
@@ -63,16 +65,18 @@
 		DEBUG(@"got item %@", item);
 		if ([prefix length] == 0 || [[item lowercaseString] hasPrefix:prefix]) {
 			DEBUG(@"insert item %@", item);
-			[self setStringValue:item];
-			[(ViTextView *)[self currentEditor] setInsertMode:nil];
+			// [self setStringValue:item];
+			[editor setString:item];
+			[editor setInsertMode:nil];
 			historyIndex = i;
 			return YES;
 		}
 	}
 
 	if (!upwards && i == 0) {
-		[self setStringValue:current];
-		[(ViTextView *)[self currentEditor] setInsertMode:nil];
+		// [self setStringValue:current];
+		[editor setString:current];
+		[editor setInsertMode:nil];
 		historyIndex = -1;
 		return YES;
 	}

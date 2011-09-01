@@ -1,9 +1,12 @@
 === Before next version
 
+* rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
+
+! crash in explorer update
+
 * explorer spinner is hidden by new path control
   => move it, where!? auto-hide something else?
 
-* ex history seems to be broken, only returns one matching item with prefix
 * inner block text object doesn't work within strings
 
 
@@ -12,7 +15,6 @@
 * go back to last focused document when closing a document
 * push marks
 * visual line + < + . (repeat) => extra lines are indented (not with > ?)
-* regression: :write with zero lines: invalid line address 1
 * implement c-w in insert mode, alias as <alt-backspace>
 * regression: symbol search no longer focuses first match
 * should check all documents for external changes when app becomes active again

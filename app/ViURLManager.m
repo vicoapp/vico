@@ -293,6 +293,14 @@
 	DEBUG(@"directory %@ has changed", aURL);
 
 	[[ViEventManager defaultManager] emit:ViEventDirectoryChanged for:nil with:aURL, nil];
+	for (NSWindow *window in [NSApp windows]) {
+		ViWindowController *wincon = [window windowController];
+		if ([wincon respondsToSelector:@selector(explorer)]) {
+			ProjectDelegate *explorer = [wincon explorer];
+			if ([explorer displaysURL:aURL])
+				[[ViEventManager defaultManager] emit:ViEventExplorerDirectoryChanged for:explorer with:explorer, aURL, nil];
+		}
+	}
 
 	if (!recursiveFlush) {
 		if (![self directoryIsCachedAtURL:aURL])

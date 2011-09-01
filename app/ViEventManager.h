@@ -44,7 +44,9 @@
 
 // Other events
 #define ViEventDirectoryChanged @"directoryChanged" // url
+#define ViEventExplorerDirectoryChanged @"explorerDirectoryChanged" // explorer, url
 #define ViEventExplorerURLUpdated @"explorerURLUpdated" // explorer, url
+#define ViEventExplorerRootChanged @"explorerRootChanged" // explorer, url
 
 @interface ViEvent : NSObject
 {

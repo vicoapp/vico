@@ -1,7 +1,6 @@
 === Before next version
 
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
-* b command skips too far!
 
 ! crash in explorer update
 

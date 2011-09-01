@@ -1635,7 +1635,7 @@
 			end_location = [[self textStorage] skipCharactersInSet:nonWordSet
 								  fromLocation:word_location
 								      backward:YES];
-			if (count == 0 && [wordSet characterIsMember:[s characterAtIndex:end_location]])
+			if (count == 0 && [[nonWordSet invertedSet] characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
 

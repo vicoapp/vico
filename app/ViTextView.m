@@ -1928,10 +1928,14 @@ int logIndent = 0;
 
 		l1 = bol;
 		l2 = end;
-		DEBUG(@"after line mode correction: %u -> %u (%u chars)",
-		    l1, l2, l2 - l1);
+		DEBUG(@"after line mode correction (count %i): %u -> %u (%u chars)",
+		    command.count, l1, l2, l2 - l1);
 	}
 	affectedRange = NSMakeRange(l1, l2 - l1);
+
+	int affected_lines = 0;
+	if (!command.isMotion && mode == ViVisualMode)
+		affected_lines = (int)([[self textStorage] lineNumberAtLocation:IMAX(l1,l2-1)] - [[self textStorage] lineNumberAtLocation:l1] + 1);
 
 	BOOL leaveVisualMode = NO;
 	if (mode == ViVisualMode && !command.isMotion &&
@@ -1961,9 +1965,9 @@ int logIndent = 0;
 
 	if (ok && command.isLineMode && !command.isMotion && mode == ViVisualMode) {
 		// FIXME: should set motion to emulate line mode if operator is not line mode but visual_line_mode is set
-		command.saved_count = (int)([[self textStorage] lineNumberAtLocation:l2] - [[self textStorage] lineNumberAtLocation:l1] + 1);
+		command.saved_count = affected_lines;
 		// else {
-		//	command.motion = [ViCommand commandWithMapping:move_down count:l2 - l1];
+		//	command.motion = [ViCommand commandWithMapping:move_down count:affected_lines];
 		// }
 		DEBUG(@"set saved_count to %lu", command.saved_count);
 	}

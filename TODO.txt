@@ -12,7 +12,6 @@
 * don't overwrite read-only files!
 * go back to last focused document when closing a document
 * push marks
-* visual line + < + . (repeat) => extra lines are indented (not with > ?)
 * implement c-w in insert mode, alias as <alt-backspace>
 * regression: symbol search no longer focuses first match
 * should check all documents for external changes when app becomes active again

@@ -817,6 +817,7 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	final_location = start_location;
 	[self changeIndentation:+1
 			inRange:NSMakeRange(bol, IMAX(eol - bol, 1))
 		    updateCaret:&final_location
@@ -829,6 +830,7 @@ int logIndent = 0;
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
+	final_location = start_location;
 	[self changeIndentation:-1
 			inRange:NSMakeRange(bol, eol - bol)
 		    updateCaret:&final_location
@@ -1774,7 +1776,7 @@ int logIndent = 0;
 		[self move_left:nil];
 	}
 
-	final_location = [self removeTrailingAutoIndentForLineAtLocation:final_location];
+	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];
 
 	[self deselectSnippet];
 
@@ -1838,7 +1840,7 @@ int logIndent = 0;
 	/* Default start- and end-location is the current location. */
 	start_location = [self caret];
 	end_location = start_location;
-	final_location = start_location;
+	final_location = NSNotFound;
 	DEBUG(@"start_location = %u", start_location);
 
 	/* Set or reset the saved column for up/down movement. */

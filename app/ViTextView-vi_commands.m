@@ -653,7 +653,8 @@
 	} else if (start_location < eol) {
 		// in contrast to move_right, we are allowed to move to EOL here
 		final_location = start_location + 1;
-	}
+	} else
+		final_location = start_location;
 
 	if (mode == ViVisualMode) {
 		[self yankToRegister:0 range:affectedRange];
@@ -786,6 +787,7 @@
 /* syntax: i */
 - (BOOL)insert:(ViCommand *)command
 {
+	final_location = start_location;
 	[self setInsertMode:command];
 	return YES;
 }
@@ -2901,6 +2903,7 @@
 
 	// XXX: scope for ex command?
 
+	final_location = start_location;
 	return [self evalExString:exline];
 }
 

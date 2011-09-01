@@ -122,4 +122,7 @@
 - (BOOL)isEditing;
 - (BOOL)displaysURL:(NSURL *)aURL;
 
+- (NSSet *)clickedURLs;
+- (NSSet *)clickedFolderURLs;
+
 @end

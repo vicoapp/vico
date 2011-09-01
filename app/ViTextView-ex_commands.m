@@ -184,7 +184,7 @@
 	NSRange exRange = command.lineRange;
 
 	unsigned rx_options = 0;
-	NSString *opts = command.arg ?: @"";
+	NSString *opts = command.options ?: @"";
 	if ([opts rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
 

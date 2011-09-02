@@ -134,6 +134,10 @@
 	[self resetInputSource];
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
+
+	// force updating of line number view
+	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
+
 	[self updateCaret];
 	return [super becomeFirstResponder];
 }

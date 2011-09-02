@@ -203,7 +203,7 @@
 
 	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];
 
-	NSString *line = [ts lineForLocation:[textView caret]];
+	NSString *line = [ts lineAtLocation:[textView caret]];
 	if (line)
 		[env setObject:line forKey:@"TM_CURRENT_LINE"];
 

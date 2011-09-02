@@ -501,7 +501,7 @@ int logIndent = 0;
 
 - (NSString *)line
 {
-	return [[self textStorage] lineForLocation:[self caret]];
+	return [[self textStorage] lineAtLocation:[self caret]];
 }
 
 #pragma mark -
@@ -553,7 +553,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -570,7 +570,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -587,7 +587,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -604,7 +604,7 @@ int logIndent = 0;
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineForLocation:aLocation];
+		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;

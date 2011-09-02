@@ -14,7 +14,6 @@
 * push marks
 * implement c-w in insert mode
 * regression: symbol search no longer focuses first match
-* should check all documents for external changes when app becomes active again
 
 * ctrl-y w/caret at bottom of screen causes rendering artifacts in line number view, and SLOWS DOWN the scrolling. WTF?
 

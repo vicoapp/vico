@@ -130,6 +130,11 @@ int logIndent = 0;
 						     name:ViTextStorageChangedLinesNotification
 						   object:[self textStorage]];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(frameDidChange:)
+						     name:NSViewFrameDidChangeNotification
+						   object:self];
+
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	[self setCaret:0];
 	[self updateStatus];
@@ -152,6 +157,11 @@ int logIndent = 0;
 	initial_ex_command = nil;
 	initial_line = -1;
 	initial_find_pattern = nil;
+}
+
+- (void)frameDidChange:(NSNotification *)notification
+{
+	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
 }
 
 - (ViTextStorage *)textStorage

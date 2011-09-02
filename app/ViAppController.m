@@ -665,8 +665,8 @@ additionalBindings:(NSDictionary *)bindings
 		[closeDocumentMenuItem setTitle:[NSString stringWithFormat:@"Close \"%@\"", [viewController title]]];
 
 	/*
-         * If we're not tracking the main menu, but got triggered by a
-         * key event, don't update displayed menu items.
+	 * If we're not tracking the main menu, but got triggered by a
+	 * key event, don't update displayed menu items.
 	 */
 	if (!trackingMainMenu)
 		return;

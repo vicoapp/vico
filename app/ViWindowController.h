@@ -75,6 +75,8 @@
 	IBOutlet NSSegmentedControl *jumplistNavigator;
 
 	ViDocumentView *currentView;
+
+	NSMutableSet *modifiedSet;
 }
 
 @property(nonatomic,readwrite, assign) NSMutableArray *documents;

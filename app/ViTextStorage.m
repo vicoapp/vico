@@ -451,15 +451,6 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	return location;
 }
 
-- (NSRange)rangeOfLine:(NSUInteger)lineNumber
-{
-	NSRange r = NSMakeRange(NSNotFound, 0);
-	NSUInteger eol;
-	r.location = [self locationForStartOfLine:lineNumber length:NULL contentsEnd:&eol];
-	r.length = eol - r.location;
-	return r;
-}
-
 - (NSInteger)locationForStartOfLine:(NSUInteger)lineNumber
 {
 	return [self locationForStartOfLine:lineNumber length:nil contentsEnd:nil];
@@ -736,10 +727,32 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	return NSMakeRange(bol, eol - bol);
 }
 
-- (NSString *)lineForLocation:(NSUInteger)aLocation
+- (NSString *)lineAtLocation:(NSUInteger)aLocation
 {
 	NSRange r = [self rangeOfLineAtLocation:aLocation];
 	if (r.location == NSNotFound)
+		return nil;
+	return [[self string] substringWithRange:r];
+}
+
+- (NSString *)lineForLocation:(NSUInteger)aLocation
+{
+	return [self lineAtLocation:aLocation];
+}
+
+- (NSRange)rangeOfLine:(NSUInteger)lineNumber
+{
+	NSRange r = NSMakeRange(NSNotFound, 0);
+	NSUInteger eol;
+	r.location = [self locationForStartOfLine:lineNumber length:NULL contentsEnd:&eol];
+	r.length = eol - r.location;
+	return r;
+}
+
+- (NSString *)line:(NSUInteger)lineNumber
+{
+	NSRange r = [self rangeOfLine:lineNumber];
+	if (r.location == -1LL)
 		return nil;
 	return [[self string] substringWithRange:r];
 }

@@ -84,6 +84,19 @@ TAILQ_HEAD(skiplist, skip);
  */
 - (NSRange)rangeOfLineAtLocation:(NSUInteger)aLocation;
 
+/** Return the content of the line at a given location.
+ * @param aLocation The location of a character on the line.
+ * @returns A copy of the line at the given location. The line does not contain the newline.
+ */
+- (NSString *)lineAtLocation:(NSUInteger)aLocation;
+- (NSString *)lineForLocation:(NSUInteger)aLocation;
+
+/** Return the content of a line.
+ * @param lineNumber The line number of the line. The first line is numbered 1.
+ * @returns A copy of the line, or nil if `lineNumber` is invalid. The line does not contain the newline.
+ */
+- (NSString *)line:(NSUInteger)lineNumber;
+
 - (NSUInteger)lineIndexAtLocation:(NSUInteger)aLocation;
 
 /** Find the line number of a location.
@@ -144,8 +157,6 @@ TAILQ_HEAD(skiplist, skip);
 - (NSUInteger)locationForColumn:(NSUInteger)column
                    fromLocation:(NSUInteger)aLocation
                       acceptEOL:(BOOL)acceptEOL;
-
-- (NSString *)lineForLocation:(NSUInteger)aLocation;
 
 /** Determine if a line is blank.
  * @param aLocation A location on the line to check.

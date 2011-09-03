@@ -262,7 +262,10 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",
 	    @"text.plain", @"defaultsyntax",
-	    [NSDictionary dictionaryWithObjectsAndKeys:@"__MyCompanyName__", @"TM_ORGANIZATION_NAME", @"rTbgqR B=.,?_A_a Q=_s>|", @"PARINIT", nil], @"environment",
+	    [NSDictionary dictionaryWithObjectsAndKeys:
+		@"__MyCompanyName__", @"TM_ORGANIZATION_NAME",
+		@"rTbgqR B=.,?_A_a Q=#/_s>|;", @"PARINIT",
+		nil], @"environment",
 	    nil]];
 
 	/* Initialize languages and themes. */

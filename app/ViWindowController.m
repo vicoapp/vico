@@ -1631,10 +1631,15 @@ static ViWindowController	*currentWindowController = nil;
 					break;
 				}
 		}
-		if (newDocView == nil)
-			newDocView = [tabController splitView:viewController
-						     withView:[doc makeView]
-						   vertically:isVertical];
+		if (newDocView == nil) {
+			if (tabController == nil) {
+				newDocView = [self createTabForDocument:doc];
+			} else {
+				newDocView = [tabController splitView:viewController
+							     withView:[doc makeView]
+							   vertically:isVertical];
+			}
+		}
 		[self selectDocumentView:newDocView];
 
 		if (!newDoc && [viewController isKindOfClass:[ViDocumentView class]]) {

@@ -68,8 +68,11 @@
 			return -1;
 		}
 
+		keyManager.parser.last_search_options = (addr.backwards ? ViSearchOptionBackwards : 0);
+
 		if (r.location == NSNotFound) {
-			MESSAGE(@"Pattern not found");
+			if (outError)
+				*outError = [ViError message:@"Pattern not found"];
 			return -1;
 		}
 

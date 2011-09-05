@@ -393,7 +393,9 @@
 				addr2 = [addr1 copy];
 			}
 		} else if (naddr == 1) {
-			addr2 = [addr1 copy];
+			/* Make addr2 same as addr1. */
+			addr2 = [[ExAddress alloc] init];
+			addr2.type = ExAddressNone;
 		}
 	} else {
 		addr1 = nil;

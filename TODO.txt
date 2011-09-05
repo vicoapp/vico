@@ -15,14 +15,14 @@
 * implement c-w in insert mode
 * regression: symbol search no longer focuses first match
 
-* ctrl-y w/caret at bottom of screen causes rendering artifacts in line number view, and SLOWS DOWN the scrolling. WTF?
-
 
 === Probably not in next version
+
 * show baseURL in window title!
+* cw<cmd-v> and repeat inserts pasteboard twice
+* repeating completed text should not re-trigger completion!
 * :/search doesn't work with 'nowrapscan'
-
-
+* ctrl-y w/caret at bottom of screen causes rendering artifacts in line number view, and SLOWS DOWN the scrolling. WTF?
 * search with 'nowrapscan' should issue 'not found' message
 
 * xcode/Run throws exception:
@@ -33,8 +33,6 @@
 	2   CoreFoundation                      0x00007fff8f5c45a9 -[NSException raise] + 9
 	3   Foundation                          0x00007fff8dedce6f -[NSObject(NSKeyValueCoding) valueForUndefinedKey:] + 240
 
-* cw<cmd-v> and repeat inserts pasteboard twice
-* repeating completed text should not re-trigger completion!
 
 ! vertical splits are buggy
 
@@ -44,7 +42,6 @@
 * list ctrl-n in menus (and other completions)
 
 * vicotool as filter / read from stdin
-* goto line (from ex, G works fine) doesn't push on jump list
 * document :s replacement syntax ($0, ${?0:bla} etc)
 * scriptable settings with :set
 * can we map ys to a new operator (surround), with y{motion} still working?

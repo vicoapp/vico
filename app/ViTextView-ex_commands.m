@@ -267,6 +267,7 @@
 - (id)ex_goto:(ExCommand *)command
 {
 	// XXX: What if two address given?
+	[self pushCurrentLocationOnJumpList];
 	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:command.range.location];
 	return nil;
 }

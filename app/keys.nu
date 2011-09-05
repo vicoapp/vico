@@ -421,6 +421,7 @@
 (xmap setKey:"<Del>" toAction:"input_forward_delete:")
 (xmap setKey:"<c-j>" toAction:"ex_execute:")
 (xmap setKey:"<c-m>" toAction:"ex_execute:")
+(xmap setKey:"<c-u>" toAction:"delete_bol:")
 (xmap setKey:"<c-v>" toAction:"literal_next:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (xmap setKey:"<c-r>" toAction:"input_register:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (xmap map:"<cmd-v>" to:"<ctrl-r>*")

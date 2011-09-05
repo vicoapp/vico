@@ -394,8 +394,6 @@
 			[[ViEventManager defaultManager] emit:ViEventExplorerRootChanged for:self with:self, rootURL, nil];
 		}
 	}];
-
-	explorer.lastSelectedRow = 0;
 }
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display
@@ -979,7 +977,7 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 
 	if ([set count] == 0) {
-		[self selectItemAtRow:explorer.lastSelectedRow];
+		[self selectItemAtRow:lastSelectedRow];
 		return;
 	}
 
@@ -1125,6 +1123,9 @@
 		}
 		[self hideAltFilterField];
 	}
+
+	if ([explorer selectedRow] != -1)
+		lastSelectedRow = [explorer selectedRow];
 }
 
 - (BOOL)explorerIsOpen
@@ -1165,12 +1166,13 @@
 	[self openExplorerTemporarily:YES];
 	[window makeFirstResponder:explorer];
 
-	[self selectItemAtRow:explorer.lastSelectedRow];
-	[explorer scrollRowToVisible:explorer.lastSelectedRow];
+	[self selectItemAtRow:lastSelectedRow];
+	[explorer scrollRowToVisible:lastSelectedRow];
 }
 
 - (void)cancelExplorer
 {
+	lastSelectedRow = [explorer selectedRow];
 	[delegate focusEditorDelayed:nil];
 	if (closeExplorerAfterUse) {
 		[self closeExplorerAndFocusEditor:YES];
@@ -1475,7 +1477,6 @@ doCommandBySelector:(SEL)aSelector
 	[explorer selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
 	      byExtendingSelection:NO];
 	[explorer scrollRowToVisible:row];
-	explorer.lastSelectedRow = row;
 
 	return YES;
 }

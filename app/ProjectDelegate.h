@@ -59,6 +59,8 @@
 	NSMutableSet *expandedSet;
 	BOOL isExpandingTree;
 
+	NSInteger lastSelectedRow;
+
 	// incremental file filtering
 	NSMutableArray *filteredItems;
 	NSMutableArray *itemsToFilter;

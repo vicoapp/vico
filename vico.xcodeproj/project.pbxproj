@@ -245,6 +245,8 @@
 		9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A66526F135B21D700A2F93C /* EditPrefs.xib */; };
 		9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */; };
 		9A665278135B288700A2F93C /* GeneralPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A665276135B288700A2F93C /* GeneralPrefs.xib */; };
+		9A7B1CF914151B0F00252451 /* NSOutlineView-vimotions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */; };
+		9A7B1CFA14151B0F00252451 /* NSTableView-vimotions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B1CF814151B0F00252451 /* NSTableView-vimotions.m */; };
 		9A880835141213D1001F8769 /* par.doc in Resources */ = {isa = PBXBuildFile; fileRef = 9A880833141213BE001F8769 /* par.doc */; };
 		9A8CDE8313AB355F00F771AB /* WaitProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A8CDE8113AB355F00F771AB /* WaitProgress.xib */; };
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
@@ -763,6 +765,10 @@
 		9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneEdit.h; sourceTree = "<group>"; };
 		9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneEdit.m; sourceTree = "<group>"; };
 		9A665277135B288700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GeneralPrefs.xib; sourceTree = "<group>"; };
+		9A7B1CF514151B0F00252451 /* NSOutlineView-vimotions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSOutlineView-vimotions.h"; sourceTree = "<group>"; };
+		9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSOutlineView-vimotions.m"; sourceTree = "<group>"; };
+		9A7B1CF714151B0F00252451 /* NSTableView-vimotions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTableView-vimotions.h"; sourceTree = "<group>"; };
+		9A7B1CF814151B0F00252451 /* NSTableView-vimotions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTableView-vimotions.m"; sourceTree = "<group>"; };
 		9A880833141213BE001F8769 /* par.doc */ = {isa = PBXFileReference; lastKnownFileType = text; path = par.doc; sourceTree = "<group>"; };
 		9A8CDE8213AB355F00F771AB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/WaitProgress.xib; sourceTree = "<group>"; };
 		9A9A63CB1339D0CA0053402A /* vico.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vico.icns; path = ../vico.icns; sourceTree = "<group>"; };
@@ -1169,6 +1175,10 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9A7B1CF514151B0F00252451 /* NSOutlineView-vimotions.h */,
+				9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */,
+				9A7B1CF714151B0F00252451 /* NSTableView-vimotions.h */,
+				9A7B1CF814151B0F00252451 /* NSTableView-vimotions.m */,
 				9AF140A6140A9C110075677F /* ViPathCell.h */,
 				9AF140A7140A9C110075677F /* ViPathCell.m */,
 				9AF140A2140A8D0B0075677F /* ViPathComponentCell.h */,
@@ -1992,6 +2002,8 @@
 				9A4A01C213F94D3F00CCDBA6 /* ViBgView.m in Sources */,
 				9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */,
 				9AF140A8140A9C110075677F /* ViPathCell.m in Sources */,
+				9A7B1CF914151B0F00252451 /* NSOutlineView-vimotions.m in Sources */,
+				9A7B1CFA14151B0F00252451 /* NSTableView-vimotions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

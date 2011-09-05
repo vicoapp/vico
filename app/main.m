@@ -13,6 +13,12 @@ pthread_mutex_t onig_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct timeval launch_start;
 
+void
+nu_log(NSString *msg)
+{
+	NSLog(@"%@", msg);
+}
+
 int
 main(int argc, char *argv[])
 {

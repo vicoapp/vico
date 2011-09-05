@@ -115,7 +115,7 @@
 - (IBAction)searchFiles:(id)sender;
 - (BOOL)explorerIsOpen;
 - (void)openExplorerTemporarily:(BOOL)temporarily;
-- (void)closeExplorer;
+- (void)closeExplorerAndFocusEditor:(BOOL)focusEditor;
 - (IBAction)focusExplorer:(id)sender;
 - (IBAction)toggleExplorer:(id)sender;
 - (void)cancelExplorer;

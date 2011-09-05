@@ -1783,7 +1783,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (IBAction)toggleSymbolList:(id)sender
 {
 	[symbolController toggleSymbolList:sender];
-	[self focusEditor];
 }
 
 - (IBAction)searchSymbol:(id)sender

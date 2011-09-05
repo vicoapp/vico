@@ -154,11 +154,6 @@
 		[windowController focusEditor];
 }
 
-- (void)closeSymbolList
-{
-	[self closeSymbolListAndFocusEditor:YES];
-}
-
 - (void)resetSymbolList
 {
 	[symbolFilterField setStringValue:@""];
@@ -171,7 +166,7 @@
 {
 	[windowController focusEditorDelayed:nil];
 	if (closeSymbolListAfterUse) {
-		[self closeSymbolList];
+		[self closeSymbolListAndFocusEditor:NO];
 		closeSymbolListAfterUse = NO;
 	}
 	[self resetSymbolList];
@@ -323,7 +318,7 @@
 - (IBAction)toggleSymbolList:(id)sender
 {
 	if ([self symbolListIsOpen])
-		[self closeSymbolList];
+		[self closeSymbolListAndFocusEditor:NO];
 	else
 		[self openSymbolListTemporarily:NO];
 }

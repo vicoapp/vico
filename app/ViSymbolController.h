@@ -38,7 +38,7 @@
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)focusSymbols:(id)sender;
 - (void)openSymbolListTemporarily:(BOOL)temporary;
-- (void)closeSymbolList;
+- (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor;
 - (BOOL)symbolListIsOpen;
 - (void)symbolsUpdate:(NSTimer *)aTimer;
 

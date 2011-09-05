@@ -1152,15 +1152,10 @@
 		[delegate focusEditor];
 }
 
-- (void)closeExplorer
-{
-	[self closeExplorerAndFocusEditor:YES];
-}
-
 - (IBAction)toggleExplorer:(id)sender
 {
 	if ([self explorerIsOpen])
-		[self closeExplorer];
+		[self closeExplorerAndFocusEditor:NO];
 	else
 		[self openExplorerTemporarily:NO];
 }
@@ -1178,7 +1173,7 @@
 {
 	[delegate focusEditorDelayed:nil];
 	if (closeExplorerAfterUse) {
-		[self closeExplorer];
+		[self closeExplorerAndFocusEditor:YES];
 		closeExplorerAfterUse = NO;
 	}
 	[self resetExplorerView];

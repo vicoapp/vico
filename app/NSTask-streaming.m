@@ -2,7 +2,7 @@
 
 @implementation NSTask (streaming)
 
-- (ViBufferedStream *)streamWithInput:(NSData *)stdinData
+- (ViBufferedStream *)scheduledStreamWithInput:(NSData *)stdinData
 {
 	if (stdinData)
 		[self setStandardInput:[NSPipe pipe]];

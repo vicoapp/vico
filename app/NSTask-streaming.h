@@ -2,6 +2,6 @@
 
 @interface NSTask (streaming)
 
-- (ViBufferedStream *)streamWithInput:(NSData *)stdinData;
+- (ViBufferedStream *)scheduledStreamWithInput:(NSData *)stdinData;
 
 @end

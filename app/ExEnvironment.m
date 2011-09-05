@@ -121,18 +121,10 @@
       displayTitle:(NSString *)displayTitle
 {
 	filterTask = task;
-
-	filterStream = [task streamWithInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
-
-	// setup a new runloop mode
-	// schedule read and write in this mode
-	// schedule a timer to track how long the task takes to complete
-	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
-	// accept cancel button from sheet -> terminate task and cancel filter
-
-	[filterStream setDelegate:self];
-
 	filterOutput = [NSMutableData data];
+
+	filterStream = [task scheduledStreamWithInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
+	[filterStream setDelegate:self];
 
 	filterDone = NO;
 	filterFailed = NO;

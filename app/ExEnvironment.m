@@ -2,6 +2,7 @@
 #import "ViCharsetDetector.h"
 #import "ViError.h"
 #import "ViCommon.h"
+#import "NSTask-streaming.h"
 #include "logging.h"
 
 @implementation ExEnvironment
@@ -121,15 +122,7 @@
 {
 	filterTask = task;
 
-	NSPipe *shellOutput = [NSPipe pipe];
-	NSPipe *shellInput = [NSPipe pipe];
-
-	[filterTask setStandardInput:shellInput];
-	[filterTask setStandardOutput:shellOutput];
-	//[filterTask setStandardError:shellOutput];
-
-	DEBUG(@"launching task %@", filterTask);
-	[filterTask launch];
+	filterStream = [task streamWithInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
 
 	// setup a new runloop mode
 	// schedule read and write in this mode
@@ -137,11 +130,9 @@
 	// if not finished within x seconds, show a modal sheet, re-adding the runloop sources to the modal sheet runloop(?)
 	// accept cancel button from sheet -> terminate task and cancel filter
 
-	filterStream = [[ViBufferedStream alloc] initWithTask:filterTask];
 	[filterStream setDelegate:self];
 
-	filterOutput = [NSMutableData dataWithCapacity:[inputText length]];
-	[filterStream writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
+	filterOutput = [NSMutableData data];
 
 	filterDone = NO;
 	filterFailed = NO;
@@ -149,9 +140,6 @@
 	filterTarget = target;
 	filterSelector = selector;
 	filterContextInfo = contextInfo;
-
-	/* schedule the read and write sources in the new runloop mode */
-	[filterStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
 	NSDate *limitDate = [NSDate dateWithTimeIntervalSinceNow:2.0];
 	int done = 0;

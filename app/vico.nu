@@ -23,6 +23,7 @@
 (global user-defaults (do () (NSUserDefaults standardUserDefaults)))
 
 (global eventManager (ViEventManager defaultManager))
+(global event-manager (ViEventManager defaultManager))
 (global NSApp (NSApplication sharedApplication))
 
 (global NSStreamEventNone 0)
@@ -32,22 +33,6 @@
 (global NSStreamEventErrorOccurred 8)
 (global NSStreamEventEndEncountered 16)
 (global ViStreamEventWriteEndEncountered 4711)
-
-(class NSTask
-	(- (id)streamWithInput:(id)stdinData is
-		(set stdout (NSPipe pipe))
-		(if (eq stdinData nil)
-			(set stdin (NSFileHandle fileHandleWithNullDevice))
-			(else (set stdin (NSPipe pipe))))
-		(self setStandardInput:stdin)
-		(self setStandardOutput:stdout)
-		(NSLog "launching #{(self launchPath)} with arguments #{((self arguments) description)}")
-		(self launch)
-		(NSLog "launched task with pid #{(self processIdentifier)}")
-		(set stream (ViBufferedStream streamWithTask:self))
-		(stream scheduleInRunLoop:(NSRunLoop currentRunLoop) forMode:NSDefaultRunLoopMode)
-		(stream)))
-
 
 (global NSLog (NuBridgedFunction functionWithName:"nu_log" signature:"v@"))
 (global puts (NuBridgedFunction functionWithName:"nu_log" signature:"v@"))

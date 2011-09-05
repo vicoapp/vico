@@ -266,6 +266,7 @@
 		9AB10BA8133F72E600D81D33 /* ViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BA5133F72E600D81D33 /* ViMap.m */; };
 		9AB10BAC13408B6600D81D33 /* keys.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AB10BAB13408B6600D81D33 /* keys.nu */; };
 		9AB10BAF1340BB4C00D81D33 /* TestViMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB10BAD1340BAE700D81D33 /* TestViMap.m */; };
+		9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F72A14153234000F3578 /* NSTask-streaming.m */; };
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
@@ -801,6 +802,8 @@
 		9AB10BA5133F72E600D81D33 /* ViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMap.m; sourceTree = "<group>"; };
 		9AB10BAB13408B6600D81D33 /* keys.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keys.nu; sourceTree = "<group>"; };
 		9AB10BAD1340BAE700D81D33 /* TestViMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViMap.m; sourceTree = "<group>"; };
+		9AB6F72914153234000F3578 /* NSTask-streaming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTask-streaming.h"; sourceTree = "<group>"; };
+		9AB6F72A14153234000F3578 /* NSTask-streaming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTask-streaming.m"; sourceTree = "<group>"; };
 		9ACAA93D13707177001FC553 /* ViBufferCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBufferCompletion.h; sourceTree = "<group>"; };
 		9ACAA93E13707177001FC553 /* ViBufferCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferCompletion.m; sourceTree = "<group>"; };
 		9ACAA93F13707177001FC553 /* ViFileCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileCompletion.h; sourceTree = "<group>"; };
@@ -1175,6 +1178,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AB6F72914153234000F3578 /* NSTask-streaming.h */,
+				9AB6F72A14153234000F3578 /* NSTask-streaming.m */,
 				9A7B1CF514151B0F00252451 /* NSOutlineView-vimotions.h */,
 				9A7B1CF614151B0F00252451 /* NSOutlineView-vimotions.m */,
 				9A7B1CF714151B0F00252451 /* NSTableView-vimotions.h */,
@@ -2004,6 +2009,7 @@
 				9AF140A8140A9C110075677F /* ViPathCell.m in Sources */,
 				9A7B1CF914151B0F00252451 /* NSOutlineView-vimotions.m in Sources */,
 				9A7B1CFA14151B0F00252451 /* NSTableView-vimotions.m in Sources */,
+				9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

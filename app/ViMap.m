@@ -763,6 +763,7 @@ toExpression:(id)expr
 - (void)include:(ViMap *)map
 {
 	DEBUG(@"including map %@ in map %@", map, self);
+	NSParameterAssert(map);
 	[includes addObject:map];
 }
 

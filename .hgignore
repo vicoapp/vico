@@ -15,3 +15,5 @@ vico.xcodeproj/xcuserdata
 doc
 vico-hg-*.tar.gz*
 vico-*.xml
+*.diff
+ChangeLog

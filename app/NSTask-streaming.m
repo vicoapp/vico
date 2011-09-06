@@ -1,8 +1,9 @@
 #import "NSTask-streaming.h"
+#include "logging.h"
 
 @implementation NSTask (streaming)
 
-- (ViBufferedStream *)scheduledStreamWithInput:(NSData *)stdinData
+- (ViBufferedStream *)scheduledStreamWithStandardInput:(NSData *)stdinData
 {
 	if (stdinData)
 		[self setStandardInput:[NSPipe pipe]];
@@ -10,9 +11,9 @@
 		[self setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
 	[self setStandardOutput:[NSPipe pipe]];
 
-        // NSLog("launching #{(self launchPath)} with arguments #{((self arguments) description)}");
+        DEBUG(@"launching %@ with arguments %@", [self launchPath], [self arguments]);
         [self launch];
-        // NSLog("launched task with pid #{(self processIdentifier)}");
+        DEBUG(@"launched task with pid %li", [self processIdentifier]);
 
 	ViBufferedStream *stream = [ViBufferedStream streamWithTask:self];
 	if (stdinData)

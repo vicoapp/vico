@@ -229,6 +229,14 @@
                                 andOpen:(id)filenameOrURL
                      orSwitchToDocument:(ViDocument *)doc
                         allowReusedView:(BOOL)allowReusedView;
+
+/** Split the current view and display another document.
+ * @param isVertical YES to split vertically, NO for a horizontal split.
+ * @param filenameOrURL A path (as an NSString) or a URL pointing to a document to open. The document may already be open.
+ * @returns The new split view, or an existing view if `filenameOrURL` is already open and visible in the same tab.
+ */
+- (id<ViViewController>)splitVertically:(BOOL)isVertical
+                                andOpen:(id)filenameOrURL;
 - (id<ViViewController>)splitVertically:(BOOL)isVertical
                                 andOpen:(id)filenameOrURL
                      orSwitchToDocument:(ViDocument *)doc;

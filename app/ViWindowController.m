@@ -1660,6 +1660,15 @@ static ViWindowController	*currentWindowController = nil;
 
 - (id<ViViewController>)splitVertically:(BOOL)isVertical
                                 andOpen:(id)filenameOrURL
+{
+	return [self splitVertically:isVertical
+			     andOpen:filenameOrURL
+		  orSwitchToDocument:nil
+		     allowReusedView:YES];
+}
+
+- (id<ViViewController>)splitVertically:(BOOL)isVertical
+                                andOpen:(id)filenameOrURL
                      orSwitchToDocument:(ViDocument *)doc
 {
 	return [self splitVertically:isVertical

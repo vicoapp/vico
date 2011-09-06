@@ -13,7 +13,7 @@
 * go back to last focused document when closing a document
 * push marks
 * implement c-w in insert mode
-* regression: symbol search no longer focuses first match
+* regression: symbol search no longer focuses first match when symbols are updated during filtering
 
 
 === Probably not in next version
@@ -82,7 +82,6 @@
 * ctrl-y scrolls weirdly with lots of control characters (glyph vs characters?)
 
 * define custom commands, see http://help.vicoapp.com/ideas/tag-text-objects-commands
-* :q should optionally terminate / hide app on last document in last window?
 * indented paste
 * showAsHtml + dontFollowOutput (?)
 * Reload themes!
@@ -123,7 +122,6 @@
   * close tab
   * close others
 * dynamic headIndent paragraph style dependent on line indentation
-* cdpath setting? looked at by :edit
 * 0<C-D> in insert mode removes all indentation
 * g$ and g0 and g^
 
@@ -140,9 +138,6 @@ LONG TERM FEATURES
 * block selection with ctrl-v + block editing
 * undo tree + visualisation (check out Gundo)
 * integrated terminal
-
-* project search
-* @lampshadish: All I need now is some sort of recursive-find-in-directory and I can switch. Maybe using #ack so it doesn't block like in TextMate.
 
 * @growt: Some neat git integration would be great, like coloring the line number of rows that changed or a diff-tool. but first things first
 

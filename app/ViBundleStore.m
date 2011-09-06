@@ -222,6 +222,9 @@ static NSString *bundlesDirectory = nil;
 	NSMutableDictionary *result = nil;
 	u_int64_t rank = 0ULL;
 
+	if (scope == nil)
+		return nil;
+
 	for (ViBundle *bundle in [self allBundles]) {
 		NSArray *preferences = bundle.preferences;
 		for (NSDictionary *preference in preferences) {

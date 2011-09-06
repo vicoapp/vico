@@ -492,6 +492,13 @@ static ViWindowController	*currentWindowController = nil;
 	va_end(ap);
 }
 
+- (NSDictionary *)environment
+{
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
+	[ViBundle setupEnvironment:env forTextView:nil window:[self window] bundle:nil];
+	return env;
+}
+
 #pragma mark -
 
 - (void)browseURL:(NSURL *)url

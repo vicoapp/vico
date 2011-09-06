@@ -102,6 +102,14 @@
 - (void)focusEditorDelayed:(id)sender;
 - (void)focusEditor;
 
+- (void)checkDocumentsChanged;
+
+/**
+ * @returns Bundle environment variables. No text-related variables will be set.
+ * @see [ViTextView environment]
+ */
+- (NSDictionary *)environment;
+
 - (ViParser *)parser;
 - (id<ViViewController>)viewControllerForView:(NSView *)aView;
 
@@ -111,6 +119,11 @@
  */
 - (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
 
+/* Return a view for a document.
+ * @param document The document to find a view for.
+ * @returns The most appropriate view for the given document.
+ * Returns nil if no view of the document is currently open.
+ */
 - (ViDocumentView *)viewForDocument:(ViDocument *)document;
 
 /*? Selects the most appropriate view for the given document.
@@ -128,8 +141,15 @@
  */
 - (NSArray *)documents;
 
+/** Create a new tab.
+ * @param viewController The view to display in the new tab.
+ */
 - (void)createTabWithViewController:(id<ViViewController>)viewController;
 
+/** Create a new tab.
+ * @param document The document to display in the new tab.
+ * @returns A new view of the document.
+ */
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document;
 
 - (void)didCloseDocument:(ViDocument *)document andWindow:(BOOL)canCloseWindow;
@@ -162,7 +182,7 @@
  */
 - (ViDocument *)currentDocument;
 
-/*?
+/**
  * @returns The currently selected tab controller.
  */
 - (ViTabController *)selectedTabController;

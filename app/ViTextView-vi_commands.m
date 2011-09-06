@@ -477,7 +477,7 @@
 	 * If environment is too big, the process fails with:
 	 * *** NSTask: Task create for path '/bin/bash' failed: 22, "Invalid argument".  Terminating temporary process.
 	 */
-	[ViBundle setupEnvironment:env forTextView:self selectedRange:NSMakeRange(0, 0)];
+	[ViBundle setupEnvironment:env forTextView:self selectedRange:NSMakeRange(0, 0) window:[self window] bundle:nil];
 	[task setEnvironment:env];
 
 	NSURL *baseURL = [(ViWindowController *)[[self window] windowController] baseURL];

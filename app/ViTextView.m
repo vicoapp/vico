@@ -2539,7 +2539,7 @@ int logIndent = 0;
 - (NSDictionary *)environment
 {
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
-	[ViBundle setupEnvironment:env forTextView:self];
+	[ViBundle setupEnvironment:env forTextView:self window:[self window] bundle:nil];
 	return env;
 }
 

@@ -34,15 +34,7 @@
 	}
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
-	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
-	[ViBundle setupEnvironment:env forTextView:self];
-
-	/* Additional bundle specific variables. */
-	if (bundle) {
-		[env setObject:[bundle path] forKey:@"TM_BUNDLE_PATH"];
-		NSString *bundleSupportPath = [bundle supportPath];
-		[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
-	}
+	[ViBundle setupEnvironment:env forTextView:self window:[self window] bundle:bundle];
 
 	[self endUndoGroup];
 	[self beginUndoGroup];

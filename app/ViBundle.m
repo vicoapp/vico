@@ -7,6 +7,7 @@
 #import "ViBundleStore.h"
 #import "ViAppController.h"
 #import "ViEventManager.h"
+#import "ProjectDelegate.h"
 #include "logging.h"
 
 @implementation ViBundle
@@ -190,75 +191,124 @@
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
 	   selectedRange:(NSRange)sel
+		  window:(NSWindow *)window
+		  bundle:(ViBundle *)bundle
 {
-	ViTextStorage *ts = [textView textStorage];
+	[env setObject:NSHomeDirectory() forKey:@"HOME"];
 
+	/* OS variables. */
+	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
+
+	/* Application-level variables.
+	 */
 	NSString *appPath = [[NSBundle mainBundle] bundlePath];
 	[env setObject:appPath forKey:@"TM_APP_PATH"];
-
-	[env setObject:[NSString stringWithFormat:@"%lu", (unsigned long)getpid()] forKey:@"TM_PID"];
-
 	NSString *supportPath = [appPath stringByAppendingPathComponent:@"Contents/Resources/Support"];
 	[env setObject:supportPath forKey:@"TM_SUPPORT_PATH"];
-
+	[env setObject:[NSString stringWithFormat:@"%lu", (unsigned long)getpid()] forKey:@"TM_PID"];
 	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];
-
-	NSString *line = [ts lineAtLocation:[textView caret]];
-	if (line)
-		[env setObject:line forKey:@"TM_CURRENT_LINE"];
-
-	NSString *word = [ts wordAtLocation:[textView caret] range:nil acceptAfter:YES];
-	if (word)
-		[env setObject:word forKey:@"TM_CURRENT_WORD" ];
-
-	NSURL *url = [[[textView window] windowController] baseURL];
-	if ([url isFileURL])
-		[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
-	[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
-
-	url = [textView.document fileURL];
-	if (url) {
-		if ([url isFileURL]) {
-			[env setObject:[[url path] stringByDeletingLastPathComponent] forKey:@"TM_DIRECTORY"];
-			[env setObject:[url path] forKey:@"TM_FILEPATH"];
-		}
-		[env setObject:[[url path] lastPathComponent] forKey:@"TM_FILENAME"];
-		[env setObject:[url absoluteString] forKey:@"TM_FILEURL"];
-	}
-
 	[env setObject:NSFullUserName() forKey:@"TM_FULLNAME"];
-	[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
-	[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
-	NSString *scope = [[[textView.document scopeAtLocation:[textView caret]] scopes] componentsJoinedByString:@" "];
-	if (scope)
-		[env setObject:scope forKey:@"TM_SCOPE"];
+	/* Text-view related variables.
+	 */
+	if (textView) {
+		ViTextStorage *ts = [textView textStorage];
 
-	if (sel.length > 0) {
-		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
-		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
+		NSString *line = [ts lineAtLocation:[textView caret]];
+		if (line)
+			[env setObject:line forKey:@"TM_CURRENT_LINE"];
 
-		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
-		[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+		NSString *word = [ts wordAtLocation:[textView caret] range:nil acceptAfter:YES];
+		if (word)
+			[env setObject:word forKey:@"TM_CURRENT_WORD"];
 
-		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
-		[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
+		[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:[textView caret]]] forKey:@"TM_LINE_INDEX"];
+		[env setObject:[NSString stringWithFormat:@"%li", [textView currentLine]] forKey:@"TM_LINE_NUMBER"];
 
-		[env setObject:[[ts string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
+		NSURL *url = [textView.document fileURL];
+		if (url) {
+			if ([url isFileURL]) {
+				[env setObject:[[url path] stringByDeletingLastPathComponent] forKey:@"TM_DIRECTORY"];
+				[env setObject:[url path] forKey:@"TM_FILEPATH"];
+			}
+			[env setObject:[[url path] lastPathComponent] forKey:@"TM_FILENAME"];
+			[env setObject:[url absoluteString] forKey:@"TM_FILEURL"];
+		}
+
+		NSString *scope = [[[textView.document scopeAtLocation:[textView caret]] scopes] componentsJoinedByString:@" "];
+		if (scope)
+			[env setObject:scope forKey:@"TM_SCOPE"];
+
+		if (sel.length > 0) {
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
+
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+
+			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
+
+			[env setObject:[[ts string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
+		}
 	}
 
-	// FIXME: TM_SELECTED_FILES
-	// FIXME: TM_SELECTED_FILE
+	/* File-related variables.
+	 */
+	ProjectDelegate *explorer = nil;
+	ViWindowController *windowController = [window windowController];
+	if ([windowController respondsToSelector:@selector(explorer)])
+		explorer = windowController.explorer;
+	if (explorer) {
+		NSURL *url = explorer.rootURL;
+		NSSet *selectedURLs = [explorer clickedURLs];
 
+		[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
+
+		NSMutableString *urls = [NSMutableString string];
+		for (url in selectedURLs) {
+			[urls appendFormat:[NSString stringWithFormat:@"'%@' ",
+			    [[url absoluteString] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]]];
+		}
+		[env setObject:[urls stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] forKey:@"TM_SELECTED_URLS"];
+
+		url = [selectedURLs anyObject];
+		if (url)
+			[env setObject:[url absoluteString] forKey:@"TM_SELECTED_URL"];
+
+		if ([url isFileURL]) {
+			[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
+
+			NSMutableString *paths = [NSMutableString string];
+			for (url in selectedURLs) {
+				[paths appendFormat:[NSString stringWithFormat:@"'%@' ",
+				    [[url path] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]]];
+			}
+			[env setObject:[paths stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] forKey:@"TM_SELECTED_FILES"];
+
+			url = [selectedURLs anyObject];
+			if (url)
+				[env setObject:[url path] forKey:@"TM_SELECTED_FILE"];
+		}
+	}
+
+	/* Bundle-specific variables.
+	*/
+	NSString *bundleSupportPath = nil;
+	if (bundle) {
+		[env setObject:[bundle path] forKey:@"TM_BUNDLE_PATH"];
+		bundleSupportPath = [bundle supportPath];
+		[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
+	}
+
+	/* User-defaults variables.
+	 */
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-
 	if ([defs integerForKey:@"expandtab"] == NSOnState)
 		[env setObject:@"YES" forKey:@"TM_SOFT_TABS" ];
 	else
 		[env setObject:@"NO" forKey:@"TM_SOFT_TABS" ];
-
 	[env setObject:[defs stringForKey:@"shiftwidth"] forKey:@"TM_TAB_SIZE"];
-	[env setObject:NSHomeDirectory() forKey:@"HOME"];
 
 	/* Some bundles check for dialog2 support by matching the DIALOG
 	 * environment variable with /2$/. This uses the new(er) infrastructure
@@ -277,12 +327,41 @@
 	NSDictionary *shellVariables = [[ViBundleStore defaultStore] shellVariablesForScope:[textView.document scopeAtLocation:[textView caret]]];
 	if (shellVariables)
 		[env addEntriesFromDictionary:shellVariables];
+
+	/* Augment PATH variable.
+	 */
+	NSString *path = [env objectForKey:@"PATH"];
+	if (path == nil)
+		path = [NSString stringWithCString:getenv("PATH") encoding:NSUTF8StringEncoding];
+	if (path == nil)
+		path = [NSString stringWithCString:getenv("PATH") encoding:NSISOLatin1StringEncoding];
+	if (path == nil)
+		path = @"/sbin:/usr/sbin:/bin:/usr/bin:/usr/X11R6/bin:/usr/local/sbin:/usr/local/bin";
+	[env setObject:[NSString stringWithFormat:@"%@:%@%s%@",
+		path,
+		[supportPath stringByAppendingPathComponent:@"bin"],
+		bundleSupportPath ? ":" : "",
+		bundleSupportPath ? [bundleSupportPath stringByAppendingPathComponent:@"bin"] : @""]
+	    forKey:@"PATH"];
 }
 
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
+		  window:(NSWindow *)aWindow
+		  bundle:(ViBundle *)bundle
 {
-	return [ViBundle setupEnvironment:env forTextView:textView selectedRange:[textView selectedRange]];
+	return [ViBundle setupEnvironment:env
+			      forTextView:textView
+			    selectedRange:[textView selectedRange]
+				   window:aWindow
+				   bundle:bundle];
+}
+
++ (NSDictionary *)environment
+{
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
+	[ViBundle setupEnvironment:env forTextView:nil window:nil bundle:nil];
+	return env;
 }
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory

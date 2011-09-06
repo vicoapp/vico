@@ -32,9 +32,13 @@
              intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
-	   selectedRange:(NSRange)sel;
+	   selectedRange:(NSRange)sel
+		  window:(NSWindow *)window
+		  bundle:(ViBundle *)bundle;
 + (void)setupEnvironment:(NSMutableDictionary *)env
-             forTextView:(ViTextView *)textView;
+             forTextView:(ViTextView *)textView
+		  window:(NSWindow *)aWindow
+		  bundle:(ViBundle *)bundle;
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory;
 - (NSString *)supportPath;
@@ -45,5 +49,11 @@
 - (NSMenu *)menuForScope:(ViScope *)scope
             hasSelection:(BOOL)hasSelection
                     font:(NSFont *)aFont;
+
+/**
+ * @returns Global bundle environment variables. No text- or file-related variables will be set.
+ * @see [ViTextView environment] and [ViWindowController environment]
+ */
++ (NSDictionary *)environment;
 
 @end

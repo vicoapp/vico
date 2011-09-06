@@ -1522,17 +1522,14 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
-	NSMutableSet *selectedItems = nil;
-	if (!isFiltered) {
-		NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
-		selectedItems = [NSMutableSet set];
-		[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-			id item = [explorer itemAtRow:idx];
-			ProjectFile *pf = [self fileForItem:item];
-			if (pf)
-				[selectedItems addObject:pf];
-		}];
-	}
+	NSMutableSet *selectedItems = [NSMutableSet set];
+	NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
+	[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ProjectFile *pf = [self fileForItem:item];
+		if (pf)
+			[selectedItems addObject:pf];
+	}];
 
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
@@ -1550,18 +1547,16 @@ doCommandBySelector:(SEL)aSelector
 
 	[[ViEventManager defaultManager] emit:ViEventExplorerURLUpdated for:self with:self, url, nil];
 
-	if (!isFiltered) {
-		[explorer reloadData];
-		[self resetExpandedItems];
+	[explorer reloadData];
+	[self resetExpandedItems];
 
-		if ([selectedItems count] > 0) {
-			NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-			for (ProjectFile *pf in selectedItems)
-				[set addIndex:[self rowForItemWithURL:pf.url]];
-			[explorer selectRowIndexes:set byExtendingSelection:NO];
-			[explorer scrollRowToVisible:[set lastIndex]];
-			[explorer scrollRowToVisible:[set firstIndex]];
-		}
+	if ([selectedItems count] > 0) {
+		NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
+		for (ProjectFile *pf in selectedItems)
+			[set addIndex:[self rowForItemWithURL:pf.url]];
+		[explorer selectRowIndexes:set byExtendingSelection:NO];
+		[explorer scrollRowToVisible:[set lastIndex]];
+		[explorer scrollRowToVisible:[set firstIndex]];
 	}
 }
 

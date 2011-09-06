@@ -110,6 +110,21 @@
 
 #pragma mark -
 
+/* Dummy interface to fool XCode into letting us use the same nib for
+ * different classes.
+ * Is there a better way?
+ */
+@interface ViCancellableDummy : NSObject
+{
+	/* Blocking for completion. */
+	IBOutlet NSWindow *waitWindow;
+	IBOutlet NSButton *cancelButton;
+	IBOutlet NSProgressIndicator *progressIndicator;
+	IBOutlet NSTextField *waitLabel;
+}
+- (IBAction)cancelTask:(id)sender;
+@end
+
 @class SFTPConnection;
 
 @interface SFTPRequest : NSObject <ViDeferred>
@@ -148,7 +163,7 @@
 	       onConnection:(SFTPConnection *)aConnection;
 
 - (void)response:(SFTPMessage *)msg;
-- (IBAction)cancelDeferred:(id)sender;
+- (IBAction)cancelTask:(id)sender;
 @end
 
 #pragma mark -

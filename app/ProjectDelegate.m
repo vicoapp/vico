@@ -4,7 +4,6 @@
 #import "logging.h"
 #import "MHTextIconCell.h"
 #import "ViWindowController.h"
-#import "ExEnvironment.h"
 #import "ViError.h"
 #import "NSString-additions.h"
 #import "ViDocumentController.h"

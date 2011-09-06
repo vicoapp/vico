@@ -6,7 +6,6 @@
 #include <CoreServices/CoreServices.h>
 
 @class ViWindowController;
-@class ExEnvironment;
 @class ViBgView;
 
 @interface ProjectFile : NSObject
@@ -34,7 +33,6 @@
 @interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget>
 {
 	IBOutlet NSWindow *window;
-	IBOutlet ExEnvironment *environment;
 	IBOutlet ViWindowController *windowController;
 	IBOutlet ViOutlineView *explorer;
 	IBOutlet NSMenu *actionMenu;

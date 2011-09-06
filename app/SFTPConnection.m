@@ -198,7 +198,7 @@ resp2txt(int type)
 	}
 }
 
-- (IBAction)cancelDeferred:(id)sender
+- (IBAction)cancelTask:(id)sender
 {
 	DEBUG(@"cancelling wait window %@ with code 2", waitWindow);
 	[NSApp stopModalWithCode:2];

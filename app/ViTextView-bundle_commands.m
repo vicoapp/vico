@@ -11,6 +11,7 @@
 #import "ViBundleSnippet.h"
 #import "ViWindowController.h"
 #import "ViDocumentController.h"
+#import "ViTaskRunner.h"
 
 @implementation ViTextView (bundleCommands)
 
@@ -135,45 +136,17 @@
 		[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
 	}
 
-	id shellInput;
-	if ([inputText length] > 0)
-		shellInput = [NSPipe pipe];
-	else
-		shellInput = [NSFileHandle fileHandleWithNullDevice];
-	NSPipe *shellOutput = [NSPipe pipe];
-
-	[task setStandardInput:shellInput];
-	[task setStandardOutput:shellOutput];
-
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
-	[env addEntriesFromDictionary:[[NSProcessInfo processInfo] environment]];
-	[ViBundle setupEnvironment:env forTextView:self];
-
-	/* Additional bundle specific variables. */
-	[env setObject:[[command bundle] path] forKey:@"TM_BUNDLE_PATH"];
-	NSString *bundleSupportPath = [[command bundle] supportPath];
-	[env setObject:bundleSupportPath forKey:@"TM_BUNDLE_SUPPORT"];
-
-	NSString *supportPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Support"];
-	NSString *path = [env objectForKey:@"PATH"];
-	if (path == nil)
-		path = [NSString stringWithCString:getenv("PATH") encoding:NSUTF8StringEncoding];
-	if (path == nil)
-		path = [NSString stringWithCString:getenv("PATH") encoding:NSISOLatin1StringEncoding];
-	[env setObject:[NSString stringWithFormat:@"%@:%@:%@",
-	      path,
-	      [supportPath stringByAppendingPathComponent:@"bin"],
-	      [bundleSupportPath stringByAppendingPathComponent:@"bin"]]
-	    forKey:@"PATH"];
+	[ViBundle setupEnvironment:env forTextView:self window:[self window] bundle:[command bundle]];
+	[task setEnvironment:env];
+	//DEBUG(@"environment: %@", env);
 
 	NSURL *baseURL = [[document fileURL] URLByDeletingLastPathComponent];
 	if ([baseURL isFileURL])
 		[task setCurrentDirectoryPath:[baseURL path]];
 	else
 		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
-	[task setEnvironment:env];
 
-	//DEBUG(@"environment: %@", env);
 	DEBUG(@"launching task command line [%@ %@]",
 	    [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
 
@@ -182,14 +155,16 @@
 	    [NSValue valueWithRange:inputRange], @"inputRange",
 	    [NSValue valueWithRange:selectedRange], @"selectedRange",
 	    nil];
-	SEL sel = @selector(bundleCommandFinishedWithStatus:standardOutput:contextInfo:);
+
 	document.busy = YES;
-	[[document environment] filterText:inputText
-			       throughTask:task
-				    target:self
-				  selector:sel
-			       contextInfo:info
-			      displayTitle:[command name]];
+	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+	[runner launchTask:task
+	 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
+     synchronouslyInWindow:[self window]
+		     title:[command name]
+		    target:self
+		  selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
+	       contextInfo:info];
 
 	if (fd != -1) {
 		unlink(templateFilename);
@@ -198,14 +173,15 @@
 	}
 }
 
-- (void)bundleCommandFinishedWithStatus:(int)status
-                         standardOutput:(NSString *)outputText
-                            contextInfo:(id)contextInfo
+- (void)bundleCommand:(ViTaskRunner *)runner
+   finishedWithStatus:(int)status
+	  contextInfo:(id)contextInfo
 {
 	NSDictionary *info = contextInfo;
 	ViBundleCommand *command = [info objectForKey:@"command"];
 	NSRange inputRange = [[info objectForKey:@"inputRange"] rangeValue];
 	NSRange selectedRange = [[info objectForKey:@"selectedRange"] rangeValue];
+	NSString *outputText = [runner stdoutString];
 
 	DEBUG(@"command %@ finished with status %i", [command name], status);
 	document.busy = NO;

@@ -9,7 +9,6 @@
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
 #import "ViRulerView.h"
-#import "ExEnvironment.h"
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
@@ -1493,11 +1492,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[windowController message:fmt arguments:ap];
 		va_end(ap);
 	}
-}
-
-- (ExEnvironment *)environment
-{
-	return [windowController environment];
 }
 
 #pragma mark -

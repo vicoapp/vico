@@ -9,10 +9,10 @@
 #import "ViCompletionController.h"
 #import "ViDocumentView.h"
 #import "ExParser.h"
-#import "ExEnvironment.h"
 #import "ViDocumentController.h"
 #import "NSString-additions.h"
 #import "NSView-additions.h"
+#import "ViTaskRunner.h"
 
 #import "ViFileCompletion.h"
 #import "ViWordCompletion.h"
@@ -444,11 +444,11 @@
 	return YES;
 }
 
-- (void)filterFinishedWithStatus:(int)status standardOutput:(NSString *)outputText contextInfo:(id)contextInfo
+- (void)filter:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
 {
 	if (status == 0) {
 		NSRange range = [(NSValue *)contextInfo rangeValue];
-		[self replaceRange:range withString:outputText];
+		[self replaceRange:range withString:runner.stdoutString];
 		[self endUndoGroup];
 		final_location = range.location;
 		[self setCaret:final_location];
@@ -486,12 +486,14 @@
 	else
 		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
 
-	[[document environment] filterText:inputText
-			       throughTask:task
-				    target:self
-				  selector:@selector(filterFinishedWithStatus:standardOutput:contextInfo:)
-			       contextInfo:[NSValue valueWithRange:range]
-			      displayTitle:shellCommand];
+	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+	[runner launchTask:task
+	 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
+     synchronouslyInWindow:[self window]
+		     title:shellCommand
+		    target:self
+		  selector:@selector(filter:finishedWithStatus:contextInfo:)
+	       contextInfo:[NSValue valueWithRange:range]];
 }
 
 /* syntax: [count]!motion command(s) */

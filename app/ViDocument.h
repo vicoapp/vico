@@ -80,7 +80,6 @@
 @property(nonatomic,readonly) ViTextStorage *textStorage;
 
 - (void)message:(NSString *)fmt, ...;
-- (ExEnvironment *)environment;
 - (NSDictionary *)typingAttributes;
 
 /** Return a scriptable text view.

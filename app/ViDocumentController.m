@@ -2,7 +2,6 @@
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViWindowController.h"
-#import "ExEnvironment.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViError.h"
 #import "TxmtURLProtocol.h"

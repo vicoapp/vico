@@ -1,7 +1,6 @@
 #import "ViTagStack.h"
 #import "ViTagsDatabase.h"
 #import "ViJumpList.h"
-#import "ExEnvironment.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViSymbol.h"
 #import "ViSymbolController.h"
@@ -38,7 +37,6 @@
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;
 	IBOutlet NSPopUpButton *bundleButton;
 
-	IBOutlet ExEnvironment *environment;
 	NSURL			*baseURL;
 
 	ViTextView *viFieldEditor;
@@ -80,7 +78,6 @@
 }
 
 @property(nonatomic,readwrite, assign) NSMutableArray *documents;
-@property(nonatomic,readonly) ExEnvironment *environment;
 @property(nonatomic,readonly) ViJumpList *jumpList;
 @property(nonatomic,readwrite, assign) ViProject *project;
 @property(nonatomic,readonly) ProjectDelegate *explorer;

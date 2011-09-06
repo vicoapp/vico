@@ -6,7 +6,6 @@
 #import "logging.h"
 #import "ViSyntaxParser.h"
 #import "ViSnippet.h"
-#import "ExEnvironment.h"
 #import "ViCommon.h"
 #import "ViTextStorage.h"
 #import "ViKeyManager.h"

@@ -112,7 +112,7 @@
 {
 	running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
-		[[self delegate] textField:self executeExCommand:nil];
+		[(NSObject *)[self delegate] textField:self executeExCommand:nil];
 	return YES;
 }
 
@@ -122,7 +122,7 @@
 	[self addToHistory:exCommand];
 	running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
-		[[self delegate] textField:self executeExCommand:exCommand];
+		[(NSObject *)[self delegate] textField:self executeExCommand:exCommand];
 	return YES;
 }
 

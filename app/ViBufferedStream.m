@@ -296,8 +296,7 @@ fd_read(CFSocketRef s,
 
 - (id)initWithTask:(NSTask *)task
 {
-	NSPipe *stdin = [task standardInput];
-	NSPipe *stdout = [task standardOutput];
+	id stdout = [task standardOutput];
 	int fdin, fdout;
 	if ([stdout isKindOfClass:[NSPipe class]])
 		fdin = [[stdout fileHandleForReading] fileDescriptor];
@@ -306,6 +305,7 @@ fd_read(CFSocketRef s,
 	else
 		return nil;
 
+	id stdin = [task standardInput];
 	if ([stdin isKindOfClass:[NSPipe class]])
 		fdout = [[stdin fileHandleForWriting] fileDescriptor];
 	else if ([stdin isKindOfClass:[NSFileHandle class]])

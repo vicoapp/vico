@@ -241,7 +241,7 @@
 			} else if ([obj2 isDirectory])
 				return (NSComparisonResult)NSOrderedDescending;
 		}
-		return [[obj1 name] compare:[obj2 name] options:sortOptions];
+		return [[obj1 displayName] compare:[obj2 displayName] options:sortOptions];
 	}];
 }
 

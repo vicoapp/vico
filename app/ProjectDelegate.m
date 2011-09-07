@@ -1445,7 +1445,7 @@ doCommandBySelector:(SEL)aSelector
 		file.children = children;
 	} else if ([url isEqualToURL:rootURL]) {
 		rootItems = children;
-		if (isFiltering)
+		if (!isFiltered || isFiltering)
 			[self filterFiles:self];
 	} else {
 		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, rootURL);

@@ -290,7 +290,7 @@
 		return;
 	}
 
-	DEBUG(@"directory %@ has changed", aURL);
+	DEBUG(@"directory %@ has changed, recursive = %s", aURL, recursiveFlush ? "YES" : "NO");
 
 	[[ViEventManager defaultManager] emit:ViEventDirectoryChanged for:nil with:aURL, nil];
 	for (NSWindow *window in [NSApp windows]) {

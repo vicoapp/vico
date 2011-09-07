@@ -173,6 +173,7 @@
 
 - (NSMutableArray *)filteredContents:(NSArray *)files ofDirectory:(NSURL *)url
 {
+	DEBUG(@"filtering files in %@", url);
 	if (files == nil)
 		return nil;
 
@@ -184,10 +185,11 @@
 			if ([file isDirectory]) {
 				ViFile *oldPf = nil;
 				if (olditem)
-					oldPf = [self findItemWithURL:file.url inItems:[olditem children]];
-				if (oldPf && [oldPf hasCachedChildren])
+					oldPf = [self findItemWithURL:file.url inItems:[[self fileForItem:olditem] children]];
+				if (oldPf && [oldPf hasCachedChildren]) {
+					DEBUG(@"re-using old children of file %@", oldPf);
 					file.children = oldPf.children;
-				else {
+				} else {
 					NSArray *contents = [[ViURLManager defaultManager] cachedContentsOfDirectoryAtURL:file.url];
 					file.children = [self filteredContents:contents
 								   ofDirectory:file.url];
@@ -274,7 +276,6 @@
 				[self openExplorerTemporarily:NO];
 			rootItems = children;
 			[self filterFiles:self];
-			[explorer reloadData];
 			[self resetExpandedItems];
 			[pathControl setURL:aURL];
 			rootURL = aURL;
@@ -557,7 +558,7 @@
 			if (parent == nil)
 				[set addObject:rootURL];
 			else
-				[set addObject:[parent url]];
+				[set addObject:[[self fileForItem:parent] url]];
 
 			ViDocumentController *docController = [ViDocumentController sharedDocumentController];
 			ViDocument *doc = [docController documentForURLQuick:url];
@@ -1333,24 +1334,28 @@ doCommandBySelector:(SEL)aSelector
 	[self resetExpandedItems:rootItems];
 }
 
-- (ViFile *)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items
+- (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items
 {
-	for (ViFile *file in items) {
+	for (id item in items) {
+		ViFile *file = [self fileForItem:item];
 		if ([file.url isEqualToURL:aURL] || [file.targetURL isEqualToURL:aURL])
-			return file;
+			return item;
 		if (file.isDirectory && [file hasCachedChildren]) {
-			ViFile *foundFile = [self findItemWithURL:aURL inItems:file.children];
-			if (foundFile)
-				return foundFile;
+			id foundItem = [self findItemWithURL:aURL inItems:file.children];
+			if (foundItem)
+				return foundItem;
 		}
 	}
 
 	return nil;
 }
 
-- (ViFile *)findItemWithURL:(NSURL *)aURL
+- (id)findItemWithURL:(NSURL *)aURL
 {
-	return [self findItemWithURL:aURL inItems:rootItems];
+	if (isFiltered)
+		return [self findItemWithURL:aURL inItems:filteredItems];
+	else
+		return [self findItemWithURL:aURL inItems:rootItems];
 }
 
 - (NSInteger)rowForItemWithURL:(NSURL *)aURL
@@ -1420,24 +1425,28 @@ doCommandBySelector:(SEL)aSelector
 		return;
 	}
 
-	NSMutableSet *selectedItems = [NSMutableSet set];
-	NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
-	[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ViFile *file = [self fileForItem:item];
-		if (file)
-			[selectedItems addObject:file];
-	}];
+	NSMutableSet *selectedURLs = [NSMutableSet set];
+	if (!isFiltered || isFiltering) {
+		NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
+		[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+			id item = [explorer itemAtRow:idx];
+			ViFile *file = [self fileForItem:item];
+			if (file)
+				[selectedURLs addObject:file.url];
+		}];
+	}
 
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
 
-	ViFile *file = [self findItemWithURL:url];
-	if (file) {
+	id item = [self findItemWithURL:url];
+	if (item) {
+		ViFile *file = [self fileForItem:item];
 		file.children = children;
 	} else if ([url isEqualToURL:rootURL]) {
 		rootItems = children;
-		[self filterFiles:self];
+		if (isFiltering)
+			[self filterFiles:self];
 	} else {
 		DEBUG(@"URL %@ not displayed in this explorer (root is %@)", url, rootURL);
 		return;
@@ -1448,10 +1457,10 @@ doCommandBySelector:(SEL)aSelector
 	[explorer reloadData];
 	[self resetExpandedItems];
 
-	if ([selectedItems count] > 0) {
+	if ([selectedURLs count] > 0) {
 		NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-		for (ViFile *file in selectedItems)
-			[set addIndex:[self rowForItemWithURL:file.url]];
+		for (NSURL *url in selectedURLs)
+			[set addIndex:[self rowForItemWithURL:url]];
 		[explorer selectRowIndexes:set byExtendingSelection:NO];
 		[explorer scrollRowToVisible:[set lastIndex]];
 		[explorer scrollRowToVisible:[set firstIndex]];
@@ -1493,9 +1502,9 @@ doCommandBySelector:(SEL)aSelector
 			[explorer expandItem:[self findItemWithURL:aURL]];
 
 			if (renameURL) {
-				ViFile *file = [self findItemWithURL:renameURL];
-				if (file) {
-					NSInteger row = [explorer rowForItem:file];
+				id item = [self findItemWithURL:renameURL];
+				if (item) {
+					NSInteger row = [explorer rowForItem:item];
 					[self selectItemAtRow:row];
 					[explorer editColumn:0 row:row withEvent:nil select:YES];
 				}

@@ -1,6 +1,7 @@
 #import "SFTPConnection.h"
 #import "ViError.h"
 #import "ViRegexp.h"
+#import "ViFile.h"
 
 #include "sys_queue.h"
 #include <sys/socket.h>
@@ -1124,31 +1125,36 @@ resp2txt(int type)
 	void (^originalCallback)(NSArray *, NSError *) = [completionCallback copy];
 
 	__block SFTPRequest *req = nil;
-	for (NSMutableArray *entry in entries) {
-		NSDictionary *attributes = [entry objectAtIndex:1];
-		if ([[attributes fileType] isEqualToString:NSFileTypeSymbolicLink] && [entry count] == 2) {
-			NSString *filename = [entry objectAtIndex:0];
-			req = [self realpath:filename onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
-				if (error)
-					originalCallback(nil, error);
-				else {
-					NSURL *url = [NSURL URLWithString:realPath relativeToURL:aURL];
-					req.subRequest = [self attributesOfItemAtURL:url
-									  onResponse:^(NSURL *normalizedURL, NSDictionary *realAttributes, NSError *error) {
-						if (error && ![error isFileNotFoundError])
-							originalCallback(nil, error);
-						else {
-							[entry addObject:[self normalizeURL:url]];
-							[entry addObject:realAttributes ?: [NSDictionary dictionary]];
-							req.subRequest = [self resolveSymlinksInEntries:entries
-											  relativeToURL:aURL
-											   onCompletion:originalCallback];
-						}
-					}];
-				}
-			}];
-			break;
-		}
+	for (ViFile *file in entries) {
+		if (file.targetAttributes)
+			continue; // We have already resolved symlinks in this file
+
+		req = [self realpath:file.path onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
+			NSURL *url = [NSURL URLWithString:realPath relativeToURL:aURL];
+			if (error)
+				originalCallback(nil, error);
+			else if (file.isLink) {
+				req.subRequest = [self attributesOfItemAtURL:url
+								  onResponse:^(NSURL *normalizedURL, NSDictionary *realAttributes, NSError *error) {
+					if (error && ![error isFileNotFoundError])
+						originalCallback(nil, error);
+					else {
+						[file setTargetURL:[self normalizeURL:url]
+							attributes:realAttributes ?: [NSDictionary dictionary]];
+						req.subRequest = [self resolveSymlinksInEntries:entries
+										  relativeToURL:aURL
+										   onCompletion:originalCallback];
+					}
+				}];
+			} else {
+				[file setTargetURL:[self normalizeURL:url]
+					attributes:[NSDictionary dictionary]];
+				req.subRequest = [self resolveSymlinksInEntries:entries
+								  relativeToURL:aURL
+								   onCompletion:originalCallback];
+			}
+		}];
+		break;
 	}
 
 	if (req == nil) {
@@ -1246,7 +1252,8 @@ resp2txt(int type)
 				if ([filename rangeOfString:@"/"].location != NSNotFound)
 					INFO(@"Ignoring suspect path \"%@\" during readdir of \"%@\"", filename, url);
 				else
-					[entries addObject:[NSMutableArray arrayWithObjects:filename, attributes, nil]];
+					[entries addObject:[ViFile fileWithURL:[url URLByAppendingPathComponent:filename]
+								    attributes:attributes]];
 			}
 
 			/* Request another batch of names. */
@@ -1634,6 +1641,30 @@ resp2txt(int type)
 	}
 
 	return req; /* XXX: only returns the last request. */
+}
+
+- (SFTPRequest *)moveItemAtURL:(NSURL *)srcURL
+			 toURL:(NSURL *)dstURL
+		    onResponse:(void (^)(NSURL *, NSError *))responseCallback
+{
+	void (^originalCallback)(NSURL *, NSError *) = [responseCallback copy];
+	SFTPRequest *req = [self addRequest:SSH2_FXP_RENAME format:"ss", [srcURL path], [dstURL path]];
+	req.onResponse = ^(SFTPMessage *msg) {
+		NSError *error;
+		if (![msg expectStatus:SSH2_FX_OK error:&error])
+			originalCallback(nil, error);
+		else {
+			req.subRequest = [self realpath:[dstURL path] onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
+				if (error)
+					originalCallback(nil, error);
+				else
+					originalCallback([[NSURL URLWithString:realPath relativeToURL:dstURL] absoluteURL], nil);
+			}];
+		}
+	};
+	req.onCancel = ^(SFTPRequest *req) { originalCallback(nil, [ViError operationCancelled]); };
+
+	return req;
 }
 
 - (SFTPRequest *)renameItemAtPath:(NSString *)oldPath

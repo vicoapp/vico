@@ -228,6 +228,10 @@
 - (SFTPRequest *)createDirectory:(NSString *)path
 		      onResponse:(void (^)(NSError *))responseCallback;
 
+- (SFTPRequest *)moveItemAtURL:(NSURL *)srcURL
+			 toURL:(NSURL *)dstURL
+		    onResponse:(void (^)(NSURL *, NSError *))responseCallback;
+
 - (SFTPRequest *)renameItemAtPath:(NSString *)oldPath
 			   toPath:(NSString *)newPath
 		       onResponse:(void (^)(NSError *))responseCallback;

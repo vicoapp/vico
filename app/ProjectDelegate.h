@@ -2,33 +2,12 @@
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViOutlineView.h"
 #import "ViJumpList.h"
+#import "ViFile.h"
 
 #include <CoreServices/CoreServices.h>
 
 @class ViWindowController;
 @class ViBgView;
-
-@interface ProjectFile : NSObject
-{
-	NSURL *url, *symURL;
-	NSDictionary *attributes, *symAttributes;
-	double score;
-	NSMutableArray *children;
-	NSString *name;
-	NSImage *icon;
-	BOOL nameIsDirty, iconIsDirty;
-	BOOL isDirectory, isLink;
-}
-@property(nonatomic,readwrite, assign) double score;
-@property(nonatomic,readonly) NSURL *url;
-@property(nonatomic,readwrite, assign) NSMutableArray *children;
-@property(nonatomic,readonly) BOOL isDirectory;
-@property(nonatomic,readonly) BOOL isLink;
-- (void)setURL:(NSURL *)aURL;
-- (BOOL)hasCachedChildren;
-- (NSString *)name;
-- (NSImage *)icon;
-@end
 
 @interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget>
 {

@@ -1,6 +1,7 @@
 #import "ViFileCompletion.h"
 #import "ViError.h"
 #import "ViWindowController.h"
+#import "ViFile.h"
 #include "logging.h"
 
 @implementation ViFileCompletion
@@ -103,31 +104,28 @@
 		}
 
 		NSMutableArray *matches = [NSMutableArray array];
-		for (NSArray *entry in directoryContents) {
-			NSString *filename = [entry objectAtIndex:0];
-			NSDictionary *attributes = [entry objectAtIndex:1];
-
+		for (ViFile *file in directoryContents) {
 			NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]),
-			    NSMakeRange(0, [filename length]));
+			    NSMakeRange(0, [file.name length]));
 			BOOL match;
 			ViRegexpMatch *m = nil;
 			if (fuzzyTrigger)
-				match = ((m = [rx matchInString:filename]) != nil);
+				match = ((m = [rx matchInString:file.name]) != nil);
 			else
-				match = [filename compare:suffix options:opts range:r] == NSOrderedSame;
+				match = [file.name compare:suffix options:opts range:r] == NSOrderedSame;
 
 			if (match) {
 				/* Only show dot-files if explicitly requested. */
-				if ([filename hasPrefix:@"."] && ![suffix hasPrefix:@"."])
+				if ([file.name hasPrefix:@"."] && ![suffix hasPrefix:@"."])
 					continue;
 
 				NSString *s;
 				if (isAbsoluteURL)
-					s = [[baseURL URLByAppendingPathComponent:filename] absoluteString];
+					s = [[baseURL URLByAppendingPathComponent:file.name] absoluteString];
 				else
-					s = [basePath stringByAppendingPathComponent:filename];
+					s = [basePath stringByAppendingPathComponent:file.name];
 
-				if ([[attributes fileType] isEqualToString:NSFileTypeDirectory])
+				if (file.isDirectory)
 					s = [s stringByAppendingString:@"/"];
 
 				ViCompletion *c;
@@ -145,4 +143,3 @@
 }
 
 @end
-

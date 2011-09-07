@@ -46,101 +46,6 @@
 - (void)closeExplorerAndFocusEditor:(BOOL)focusEditor;
 @end
 
-@implementation ProjectFile
-
-@synthesize score, url, children, isDirectory, isLink;
-
-- (id)initWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary symbolicLink:(NSURL *)sURL symbolicAttributes:(NSDictionary *)sDictionary
-{
-	self = [super init];
-	if (self) {
-		attributes = aDictionary;
-		symURL = sURL;
-		symAttributes = sDictionary;
-		[self setURL:aURL];
-		isLink = [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
-		if (isLink)
-			isDirectory = [[symAttributes fileType] isEqualToString:NSFileTypeDirectory];
-		else
-			isDirectory = [[attributes fileType] isEqualToString:NSFileTypeDirectory];
-	}
-	return self;
-}
-
-+ (id)fileWithURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary symbolicLink:(NSURL *)sURL symbolicAttributes:(NSDictionary *)sDictionary
-{
-	return [[ProjectFile alloc] initWithURL:aURL attributes:aDictionary symbolicLink:sURL symbolicAttributes:sDictionary];
-}
-
-- (BOOL)hasCachedChildren
-{
-	return children != nil;
-}
-
-- (NSURL *)realURL
-{
-	return url;
-}
-
-- (NSURL *)url
-{
-	if (isLink)
-		return symURL;
-	return url;
-}
-
-- (void)setURL:(NSURL *)aURL
-{
-	url = aURL;
-	nameIsDirty = YES;
-	iconIsDirty = YES;
-}
-
-- (NSString *)name
-{
-	if (nameIsDirty) {
-		if ([url isFileURL])
-			name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
-		else
-			name = [url lastPathComponent];
-		nameIsDirty = NO;
-	}
-	return name;
-}
-
-- (NSImage *)icon
-{
-	if (iconIsDirty) {
-		if ([url isFileURL])
-			icon = [[NSWorkspace sharedWorkspace] iconForFile:[[self url] path]];
-		else if (isDirectory)
-			icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
-		else
-			icon = [[NSWorkspace sharedWorkspace] iconForFileType:[[self url] pathExtension]];
-		[icon setSize:NSMakeSize(16, 16)];
-
-		if (isLink) {
-			NSImage *aliasBadge = [NSImage imageNamed:@"AliasBadgeIcon"];
-			[icon lockFocus];
-			NSSize sz = [icon size];
-			[aliasBadge drawInRect:NSMakeRect(0, 0, sz.width, sz.height)
-				      fromRect:NSZeroRect
-				     operation:NSCompositeSourceOver
-				      fraction:1.0];
-			[icon unlockFocus];
-		}
-
-		iconIsDirty = NO;
-	}
-	return icon;
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<ProjectFile: %@>", url];
-}
-
-@end
 
 @implementation ProjectDelegate
 
@@ -255,7 +160,7 @@
 	}
 }
 
-- (ProjectFile *)fileForItem:(id)item
+- (ViFile *)fileForItem:(id)item
 {
 	if ([item isKindOfClass:[ViCompletion class]])
 		return [(ViCompletion *)item representedObject];
@@ -270,37 +175,21 @@
 	id olditem = [self findItemWithURL:url];
 
 	NSMutableArray *children = [NSMutableArray array];
-	for (NSArray *entry in files) {
-		NSString *filename = [entry objectAtIndex:0];
-		if ([skipRegex matchInString:filename] == nil) {
-
-			NSDictionary *attributes = [entry objectAtIndex:1];
-			NSURL *symurl = nil;
-			NSDictionary *symattributes = nil;
-			if ([entry count] >= 4) {
-				symattributes = [entry objectAtIndex:3];
-				symurl = [entry objectAtIndex:2];
-			}
-
-			NSURL *curl = [url URLByAppendingPathComponent:filename];
-			ProjectFile *pf = [ProjectFile fileWithURL:curl
-							attributes:attributes
-						      symbolicLink:symurl
-						symbolicAttributes:symattributes];
-			if ([pf isDirectory]) {
-				ProjectFile *oldPf = nil;
+	for (ViFile *file in files) {
+		if ([skipRegex matchInString:file.name] == nil) {
+			if ([file isDirectory]) {
+				ViFile *oldPf = nil;
 				if (olditem)
-					oldPf = [self findItemWithURL:curl
-							      inItems:[olditem children]];
+					oldPf = [self findItemWithURL:file.url inItems:[olditem children]];
 				if (oldPf && [oldPf hasCachedChildren])
-					pf.children = oldPf.children;
+					file.children = oldPf.children;
 				else {
-					NSArray *contents = [[ViURLManager defaultManager] cachedContentsOfDirectoryAtURL:pf.url];
-					pf.children = [self filteredContents:contents
-								 ofDirectory:pf.url];
+					NSArray *contents = [[ViURLManager defaultManager] cachedContentsOfDirectoryAtURL:file.url];
+					file.children = [self filteredContents:contents
+								   ofDirectory:file.url];
 				}
 			}
-			[children addObject:pf];
+			[children addObject:file];
 		}
 	}
 
@@ -356,7 +245,7 @@
 {
 	[self sortProjectFiles:children];
 
-	for (ProjectFile *file in children)
+	for (ViFile *file in children)
 		if ([file hasCachedChildren] && [file isDirectory])
 			[self recursivelySortProjectFiles:[file children]];
 }
@@ -514,9 +403,9 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
-			[delegate gotoURL:pf.url];
+		ViFile *file = [self fileForItem:item];
+		if (file && !file.isDirectory) {
+			[delegate gotoURL:file.targetURL];
 			didOpen = YES;
 		}
 	}];
@@ -531,14 +420,14 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
+		ViFile *file = [self fileForItem:item];
+		if (file && !file.isDirectory) {
 			NSError *err = nil;
-			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:pf.url
+			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:file.targetURL
 														 display:NO
 														   error:&err];
 			if (err)
-				[windowController message:@"%@: %@", pf.url, [err localizedDescription]];
+				[windowController message:@"%@: %@", file.url, [err localizedDescription]];
 			else if (doc) {
 				[windowController createTabForDocument:doc];
 				didOpen = YES;
@@ -556,16 +445,16 @@
 	id item = [explorer itemAtRow:idx];
 	if (item == nil || [self outlineView:explorer isItemExpandable:item])
 		return;
-	ProjectFile *pf = [self fileForItem:item];
-	if (!pf)
+	ViFile *file = [self fileForItem:item];
+	if (!file)
 		return;
 	NSError *err = nil;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:pf.url
+	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:file.targetURL
 												 display:NO
 												   error:&err];
 
 	if (err)
-		[windowController message:@"%@: %@", pf.url, [err localizedDescription]];
+		[windowController message:@"%@: %@", file.url, [err localizedDescription]];
 	else if (doc)
 		[windowController switchToDocument:doc];
 	[self cancelExplorer];
@@ -577,10 +466,10 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
+		ViFile *file = [self fileForItem:item];
+		if (file && !file.isDirectory) {
 			[windowController splitVertically:NO
-						  andOpen:pf.url
+						  andOpen:file.url
 				       orSwitchToDocument:nil];
 			didOpen = YES;
 		}
@@ -596,10 +485,10 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf && ![self outlineView:explorer isItemExpandable:item]) {
+		ViFile *file = [self fileForItem:item];
+		if (file && !file.isDirectory) {
 			[windowController splitVertically:YES
-						  andOpen:pf.url
+						  andOpen:file.url
 				       orSwitchToDocument:nil];
 			didOpen = YES;
 		}
@@ -714,8 +603,8 @@
 	NSMutableArray *urls = [[NSMutableArray alloc] init];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[urls addObject:[pf realURL]];
+		ViFile *file = [self fileForItem:item];
+		[urls addObject:file.url];
 	}];
 
 	if ([urls count] == 0)
@@ -752,8 +641,8 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[urlSet addObject:pf.url];
+		ViFile *file = [self fileForItem:item];
+		[urlSet addObject:file.targetURL];
 	}];
 
 	return urlSet;
@@ -765,14 +654,14 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
+		ViFile *file = [self fileForItem:item];
 
-		if (![self outlineView:explorer isItemExpandable:pf] /*|| ![explorer isItemExpanded:pf]*/)
-			pf = [explorer parentForItem:pf];
+		if (!file.isDirectory)
+			file = [explorer parentForItem:file];
 
 		NSURL *parent;
-		if (pf)
-			parent = [pf realURL];
+		if (file)
+			parent = file.url;
 		else
 			parent = rootURL;
 
@@ -800,8 +689,8 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[urls addObject:[pf realURL]];
+		ViFile *file = [self fileForItem:item];
+		[urls addObject:file.url];
 	}];
 	[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:urls];
 }
@@ -811,8 +700,8 @@
 	NSIndexSet *set = [self clickedIndexes];
 	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		[[NSWorkspace sharedWorkspace] openURL:[pf realURL]];
+		ViFile *file = [self fileForItem:item];
+		[[NSWorkspace sharedWorkspace] openURL:file.url];
 	}];
 }
 
@@ -821,12 +710,13 @@
 	NSIndexSet *set = [self clickedIndexes];
 	NSURL *parent = nil;
 	if ([set count] == 1) {
-		ProjectFile *pf = [explorer itemAtRow:[set firstIndex]];
-		if ([pf isDirectory])
-			parent = [pf realURL];
+		ViFile *file = [explorer itemAtRow:[set firstIndex]];
+		if (file.isDirectory)
+			parent = file.url;
 		else
-			parent = [[explorer parentForItem:pf] realURL];
+			parent = [[explorer parentForItem:file] url];
 	}
+
 	if (parent == nil)
 		parent = rootURL;
 
@@ -846,12 +736,13 @@
 	NSIndexSet *set = [self clickedIndexes];
 	NSURL *parent = nil;
 	if ([set count] == 1) {
-		ProjectFile *pf = [explorer itemAtRow:[set firstIndex]];
-		if ([pf isDirectory])
-			parent = [pf realURL];
+		ViFile *file = [explorer itemAtRow:[set firstIndex]];
+		if (file.isDirectory)
+			parent = file.url;
 		else
-			parent = [[explorer parentForItem:pf] realURL];
+			parent = [[explorer parentForItem:file] url];
 	}
+
 	if (parent == nil)
 		parent = rootURL;
 
@@ -934,8 +825,8 @@
 	/*
 	 * Finder operations only implemented for file:// urls.
 	 */
-	 ProjectFile *pf = [self fileForItem:[explorer itemAtRow:[set firstIndex]]];
-	if (![pf.url isFileURL] &&
+	ViFile *file = [self fileForItem:[explorer itemAtRow:[set firstIndex]]];
+	if (![file.url isFileURL] &&
 	    ([menuItem action] == @selector(revealInFinder:) ||
 	     [menuItem action] == @selector(openWithFinder:)))
 		return NO;
@@ -983,7 +874,7 @@
 	if ([set count] > 1)
 		return;
 
-	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
+	id item = [explorer itemAtRow:[set firstIndex]];
 	if (item == nil)
 		return;
 
@@ -999,9 +890,10 @@
 	NSIndexSet *set = [explorer selectedRowIndexes];
 	if ([set count] > 1)
 		return;
-	ProjectFile *item = [explorer itemAtRow:[set firstIndex]];
-	if (item && [self outlineView:explorer isItemExpandable:item]) {
-		[self browseURL:[item url]];
+	id item = [explorer itemAtRow:[set firstIndex]];
+	ViFile *file = [self fileForItem:item];
+	if (file.isDirectory) {
+		[self browseURL:file.targetURL];
 		[self selectItemAtRow:0];
 	} else
 		[self explorerClick:sender];
@@ -1184,14 +1076,15 @@
 {
 	[self expandItems:items recursionLimit:3];
 
-	[filteredItems sortUsingComparator:^(id a, id b) {
-		ViCompletion *ca = a, *cb = b;
-		if (ca.score > cb.score)
-			return (NSComparisonResult)NSOrderedAscending;
-		else if (cb.score > ca.score)
-			return (NSComparisonResult)NSOrderedDescending;
-		return (NSComparisonResult)NSOrderedSame;
-		}];
+	if (isFiltering)
+		[filteredItems sortUsingComparator:^(id a, id b) {
+			ViCompletion *ca = a, *cb = b;
+			if (ca.score > cb.score)
+				return (NSComparisonResult)NSOrderedAscending;
+			else if (cb.score > ca.score)
+				return (NSComparisonResult)NSOrderedDescending;
+			return (NSComparisonResult)NSOrderedSame;
+			}];
 
 	[explorer reloadData];
 	if ([itemsToFilter count] > 0)
@@ -1203,27 +1096,27 @@
 	if (!isFiltering || [itemsToFilter count] == 0)
 		return;
 
-	ProjectFile *item = [itemsToFilter objectAtIndex:0];
+	ViFile *file = [itemsToFilter objectAtIndex:0];
 	[itemsToFilter removeObjectAtIndex:0];
 
-	if ([item hasCachedChildren]) {
-		[self expandItems:[item children]];
+	if ([file hasCachedChildren]) {
+		[self expandItems:file.children];
 		return;
 	}
 
-	[self childrenAtURL:[item url] onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:file.targetURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			/* schedule re-read of parent folder */
-			ProjectFile *parent = [explorer parentForItem:item];
+			ViFile *parent = [explorer parentForItem:file];
 			if (parent) {
 				DEBUG(@"scheduling re-read of parent item %@", parent);
 				[itemsToFilter addObject:parent];
 			} else
-				DEBUG(@"no parent for item %@", item);
+				DEBUG(@"no parent for item %@", file);
 		} else {
-			[item setChildren:children];
-			DEBUG(@"expanding children of item %@", item);
-			[self expandItems:[item children]];
+			file.children = children;
+			DEBUG(@"expanding children of item %@", file);
+			[self expandItems:file.children];
 		}
 	}];
 }
@@ -1235,23 +1128,22 @@
 	if (![base hasSuffix:@"/"])
 		prefixLength++;
 
-	for (ProjectFile *item in items) {
-		DEBUG(@"got item %@", item);
-		DEBUG(@"got item url %@", [item url]);
-		if ([self outlineView:explorer isItemExpandable:item]) {
-			if (recursionLimit > 0 && [item hasCachedChildren]) {
-				DEBUG(@"expanding children of item %@", item);
-				[self expandItems:[item children] recursionLimit:recursionLimit - 1];
+	for (ViFile *file in items) {
+		DEBUG(@"got file %@", file);
+		if (file.isDirectory) {
+			if (recursionLimit > 0 && [file hasCachedChildren]) {
+				DEBUG(@"expanding children of item %@", file);
+				[self expandItems:file.children recursionLimit:recursionLimit - 1];
 			} else
 				/* schedule in runloop */
-				[itemsToFilter addObject:item];
+				[itemsToFilter addObject:file];
 		} else {
 			ViRegexpMatch *m = nil;
-			NSString *p = [[[item realURL] path] substringFromIndex:prefixLength];
+			NSString *p = [file.path substringFromIndex:prefixLength];
 			if (rx == nil || (m = [rx matchInString:p]) != nil) {
 				ViCompletion *c = [ViCompletion completionWithContent:p fuzzyMatch:m];
 				c.font = font;
-				c.representedObject = item;
+				c.representedObject = file;
 				c.markColor = [NSColor blackColor];
 				[filteredItems addObject:c];
 			}
@@ -1419,13 +1311,15 @@ doCommandBySelector:(SEL)aSelector
 
 - (void)resetExpandedItems:(NSArray *)items
 {
-	for (id item in items) {
-		if ([self outlineView:explorer isItemExpandable:item]) {
-			ProjectFile *pf = item;
-			if ([expandedSet containsObject:pf.url])
-				[explorer expandItem:item];
-			if ([pf hasCachedChildren])
-				[self resetExpandedItems:pf.children];
+	if (isFiltered)
+		return;
+
+	for (ViFile *file in items) {
+		if (file.isDirectory) {
+			if ([expandedSet containsObject:file.url])
+				[explorer expandItem:file];
+			if ([file hasCachedChildren])
+				[self resetExpandedItems:file.children];
 		}
 	}
 }
@@ -1435,22 +1329,22 @@ doCommandBySelector:(SEL)aSelector
 	[self resetExpandedItems:rootItems];
 }
 
-- (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items
+- (ViFile *)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items
 {
-	for (id item in items) {
-		if ([[item url] isEqualToURL:aURL] || [[item realURL] isEqualToURL:aURL])
-			return item;
-		if ([self outlineView:explorer isItemExpandable:item] && [item hasCachedChildren]) {
-			id foundItem = [self findItemWithURL:aURL inItems:[item children]];
-			if (foundItem)
-				return foundItem;
+	for (ViFile *file in items) {
+		if ([file.url isEqualToURL:aURL] || [file.targetURL isEqualToURL:aURL])
+			return file;
+		if (file.isDirectory && [file hasCachedChildren]) {
+			ViFile *foundFile = [self findItemWithURL:aURL inItems:file.children];
+			if (foundFile)
+				return foundFile;
 		}
 	}
 
 	return nil;
 }
 
-- (id)findItemWithURL:(NSURL *)aURL
+- (ViFile *)findItemWithURL:(NSURL *)aURL
 {
 	return [self findItemWithURL:aURL inItems:rootItems];
 }
@@ -1460,7 +1354,7 @@ doCommandBySelector:(SEL)aSelector
 	id item = [self findItemWithURL:aURL];
 	if (item == nil)
 		return -1;
-	NSURL *parentURL = [[[self fileForItem:item] realURL] URLByDeletingLastPathComponent];
+	NSURL *parentURL = [[self fileForItem:item].url URLByDeletingLastPathComponent];
 	if (parentURL && ![parentURL isEqualToURL:rootURL]) {
 		NSInteger parentRow = [self rowForItemWithURL:parentURL];
 		if (parentRow != -1)
@@ -1526,17 +1420,17 @@ doCommandBySelector:(SEL)aSelector
 	NSIndexSet *selectedIndices = [explorer selectedRowIndexes];
 	[selectedIndices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 		id item = [explorer itemAtRow:idx];
-		ProjectFile *pf = [self fileForItem:item];
-		if (pf)
-			[selectedItems addObject:pf];
+		ViFile *file = [self fileForItem:item];
+		if (file)
+			[selectedItems addObject:file];
 	}];
 
 	DEBUG(@"updating contents of %@", url);
 	NSMutableArray *children = [self filteredContents:contents ofDirectory:url];
 
-	id item = [self findItemWithURL:url];
-	if (item) {
-		[item setChildren:children];
+	ViFile *file = [self findItemWithURL:url];
+	if (file) {
+		file.children = children;
 	} else if ([url isEqualToURL:rootURL]) {
 		rootItems = children;
 		[self filterFiles:self];
@@ -1552,8 +1446,8 @@ doCommandBySelector:(SEL)aSelector
 
 	if ([selectedItems count] > 0) {
 		NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-		for (ProjectFile *pf in selectedItems)
-			[set addIndex:[self rowForItemWithURL:pf.url]];
+		for (ViFile *file in selectedItems)
+			[set addIndex:[self rowForItemWithURL:file.url]];
 		[explorer selectRowIndexes:set byExtendingSelection:NO];
 		[explorer scrollRowToVisible:[set lastIndex]];
 		[explorer scrollRowToVisible:[set firstIndex]];
@@ -1581,7 +1475,8 @@ doCommandBySelector:(SEL)aSelector
 	NSURL *selectedURL = renameURL;
 	if (selectedURL == nil) {
 		id selectedItem = [explorer itemAtRow:[explorer selectedRow]];
-		selectedURL = [selectedItem url];
+		ViFile *selectedFile = [self fileForItem:selectedItem];
+		selectedURL = selectedFile.url;
 	}
 
 	[urlman flushCachedContentsOfDirectoryAtURL:aURL];
@@ -1594,13 +1489,13 @@ doCommandBySelector:(SEL)aSelector
 			[explorer expandItem:[self findItemWithURL:aURL]];
 
 			if (renameURL) {
-				id item = [self findItemWithURL:renameURL];
-				if (item) {
-					NSInteger row = [explorer rowForItem:item];
+				ViFile *file = [self findItemWithURL:renameURL];
+				if (file) {
+					NSInteger row = [explorer rowForItem:file];
 					[self selectItemAtRow:row];
 					[explorer editColumn:0 row:row withEvent:nil select:YES];
 				}
-			} else {
+			} else if (selectedURL) {
 				[self selectItemWithURL:selectedURL];
 			}
 		}
@@ -1665,20 +1560,20 @@ doCommandBySelector:(SEL)aSelector
 - (void)outlineViewItemWillExpand:(NSNotification *)notification
 {
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	ProjectFile *pf = [self fileForItem:item];
-	if ([pf hasCachedChildren])
+	ViFile *file = [self fileForItem:item];
+	if ([file hasCachedChildren])
 		return;
 
 	__block BOOL directoryContentsIsAsync = NO;
 	isExpandingTree = YES;
-	[self childrenAtURL:pf.url onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:file.url onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {
-			pf.children = children;
+			file.children = children;
 			if (directoryContentsIsAsync) {
 				[explorer reloadData];
-				[explorer expandItem:pf];
+				[explorer expandItem:file];
 			}
 		}
 	}];
@@ -1689,15 +1584,15 @@ doCommandBySelector:(SEL)aSelector
 - (void)outlineViewItemDidExpand:(NSNotification *)notification
 {
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	ProjectFile *pf = [self fileForItem:item];
-	[expandedSet addObject:pf.url];
+	ViFile *file = [self fileForItem:item];
+	[expandedSet addObject:file.url];
 }
 
 - (void)outlineViewItemDidCollapse:(NSNotification *)notification
 {
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
-	ProjectFile *pf = [self fileForItem:item];
-	[expandedSet removeObject:pf.url];
+	ViFile *file = [self fileForItem:item];
+	[expandedSet removeObject:file.url];
 }
 
 #pragma mark -
@@ -1708,26 +1603,31 @@ doCommandBySelector:(SEL)aSelector
      forTableColumn:(NSTableColumn *)tableColumn
 	     byItem:(id)item
 {
-	if (![object isKindOfClass:[NSString class]])
+	if (![object isKindOfClass:[NSString class]] || ![item isKindOfClass:[ViFile class]])
 		return;
 
-	ProjectFile *file = item;
-	NSURL *parentURL = [[file url] URLByDeletingLastPathComponent];
+	ViFile *file = item;
+	NSURL *parentURL = [file.url URLByDeletingLastPathComponent];
 	NSURL *newurl = [[parentURL URLByAppendingPathComponent:object] URLByStandardizingPath];
-	if ([[file url] isEqualToURL:newurl])
+	if ([file.url isEqualToURL:newurl])
 		return;
 
-	[[ViURLManager defaultManager] moveItemAtURL:[file url]
+	[[ViURLManager defaultManager] moveItemAtURL:file.url
 					       toURL:newurl
-					onCompletion:^(NSError *error) {
+					onCompletion:^(NSURL *normalizedURL, NSError *error) {
 		if (error) {
+			DEBUG(@"failed to rename %@: %@", file, error);
 			[NSApp presentError:error];
 			if ([error isFileNotFoundError])
 				[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
 		} else {
-			ViDocument *doc = [windowController documentForURL:[file url]];
+			DEBUG(@"updating renamed file %@ with new url %@ (really %@)", file, newurl, normalizedURL);
+			if (!file.isLink) {
+				ViDocument *doc = [windowController documentForURL:file.targetURL];
+				[doc setFileURL:normalizedURL];
+			}
 			[file setURL:newurl];
-			[doc setFileURL:newurl];
+			[file setTargetURL:normalizedURL];
 			[explorer reloadData];
 
 			[[ViURLManager defaultManager] notifyChangedDirectoryAtURL:parentURL];
@@ -1742,7 +1642,7 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return [filteredItems objectAtIndex:anIndex];
 
-	ProjectFile *pf = [self fileForItem:item];
+	ViFile *pf = [self fileForItem:item];
 	if (![pf hasCachedChildren])
 		return nil;
 	return [pf.children objectAtIndex:anIndex];
@@ -1751,7 +1651,7 @@ doCommandBySelector:(SEL)aSelector
 - (BOOL)outlineView:(NSOutlineView *)outlineView
    isItemExpandable:(id)item
 {
-	ProjectFile *pf = [self fileForItem:item];
+	ViFile *pf = [self fileForItem:item];
 	return [pf isDirectory];
 }
 
@@ -1761,7 +1661,7 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return [filteredItems count];
 
-	ProjectFile *pf = [self fileForItem:item];
+	ViFile *pf = [self fileForItem:item];
 	if (![pf hasCachedChildren])
 		return 0;
 	return [pf.children count];
@@ -1774,7 +1674,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	if ([item isKindOfClass:[ViCompletion class]])
 		return [(ViCompletion *)item title];
 	else
-		return [(ProjectFile *)item name];
+		return [(ViFile *)item displayName];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
@@ -1818,16 +1718,12 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	NSInteger row = [explorer rowForItem:item];
 	NSCell *cell = [tableColumn dataCellForRow:row];
 	if (cell) {
-		ProjectFile *pf = [self fileForItem:item];
-		ViDocument *doc = [docController documentForURLQuick:pf.url];
-		if ([doc isDocumentEdited])
-			[(MHTextIconCell *)cell setModified:YES];
-		else
-			[(MHTextIconCell *)cell setModified:NO];
-
-		[(MHTextIconCell *)cell setBadge:[badges objectForKey:pf.url]];
+		ViFile *file = [self fileForItem:item];
+		ViDocument *doc = [docController documentForURLQuick:file.targetURL];
+		[(MHTextIconCell *)cell setModified:[doc isDocumentEdited]];
+		[(MHTextIconCell *)cell setBadge:[badges objectForKey:file.url]];
 		[cell setFont:font];
-		[cell setImage:[pf icon]];
+		[cell setImage:[file icon]];
 	}
 
 	return cell;

@@ -267,6 +267,7 @@
 		9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F72A14153234000F3578 /* NSTask-streaming.m */; };
 		9AB6F72F14160751000F3578 /* WaitProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AB6F72D14160751000F3578 /* WaitProgress.xib */; };
 		9AB6F73214160F9B000F3578 /* ViTaskRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F73114160F9B000F3578 /* ViTaskRunner.m */; };
+		9AB6F74814164B0C000F3578 /* ViFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB6F74714164B0C000F3578 /* ViFile.m */; };
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
@@ -802,8 +803,10 @@
 		9AB6F72914153234000F3578 /* NSTask-streaming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTask-streaming.h"; sourceTree = "<group>"; };
 		9AB6F72A14153234000F3578 /* NSTask-streaming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTask-streaming.m"; sourceTree = "<group>"; };
 		9AB6F72E14160751000F3578 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/WaitProgress.xib; sourceTree = "<group>"; };
-		9AB6F73014160F9B000F3578 /* ViTaskRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ViTaskRunner.h; sourceTree = "<group>"; };
-		9AB6F73114160F9B000F3578 /* ViTaskRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; path = ViTaskRunner.m; sourceTree = "<group>"; };
+		9AB6F73014160F9B000F3578 /* ViTaskRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTaskRunner.h; sourceTree = "<group>"; };
+		9AB6F73114160F9B000F3578 /* ViTaskRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTaskRunner.m; sourceTree = "<group>"; };
+		9AB6F74614164B0C000F3578 /* ViFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFile.h; sourceTree = "<group>"; };
+		9AB6F74714164B0C000F3578 /* ViFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFile.m; sourceTree = "<group>"; };
 		9ACAA93D13707177001FC553 /* ViBufferCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBufferCompletion.h; sourceTree = "<group>"; };
 		9ACAA93E13707177001FC553 /* ViBufferCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViBufferCompletion.m; sourceTree = "<group>"; };
 		9ACAA93F13707177001FC553 /* ViFileCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileCompletion.h; sourceTree = "<group>"; };
@@ -1178,6 +1181,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AB6F74614164B0C000F3578 /* ViFile.h */,
+				9AB6F74714164B0C000F3578 /* ViFile.m */,
 				9AB6F73014160F9B000F3578 /* ViTaskRunner.h */,
 				9AB6F73114160F9B000F3578 /* ViTaskRunner.m */,
 				9AB6F72914153234000F3578 /* NSTask-streaming.h */,
@@ -2010,6 +2015,7 @@
 				9A7B1CFA14151B0F00252451 /* NSTableView-vimotions.m in Sources */,
 				9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */,
 				9AB6F73214160F9B000F3578 /* ViTaskRunner.m in Sources */,
+				9AB6F74814164B0C000F3578 /* ViFile.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

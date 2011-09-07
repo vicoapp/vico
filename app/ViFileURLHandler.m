@@ -1,5 +1,6 @@
 #import "ViFileURLHandler.h"
 #import "ViError.h"
+#import "ViFile.h"
 #include "logging.h"
 
 @interface ViFileDeferred : NSObject <ViDeferred>
@@ -61,13 +62,17 @@
 			NSURL *symurl = nil;
 			NSURL *u = [aURL URLByAppendingPathComponent:filename];
 			NSString *p = [u path];
+
 			attrs = [fileman attributesOfItemAtPath:p error:&error];
+			symurl = [u URLByResolvingSymlinksInPath];
 			if (attrs && [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink]) {
-				symurl = [u URLByResolvingSymlinksInPath];
-				symattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:&error];
+				DEBUG(@"resolved %@ -> %@", u, symurl);
+				if (symurl)
+					symattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:&error];
 			}
+
 			if (attrs)
-				[contents addObject:[NSArray arrayWithObjects:filename, attrs, symurl, symattrs, nil]];
+				[contents addObject:[ViFile fileWithURL:u attributes:attrs symbolicLink:symurl symbolicAttributes:symattrs]];
 			else if (error)
 				break;
 		}
@@ -135,12 +140,12 @@
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
 			  toURL:(NSURL *)dstURL
-		   onCompletion:(void (^)(NSError *))aBlock
+		   onCompletion:(void (^)(NSURL *, NSError *))aBlock
 {
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 	NSError *error = nil;
 	[fm moveItemAtURL:srcURL toURL:dstURL error:&error];
-	aBlock(error);
+	aBlock([dstURL URLByResolvingSymlinksInPath], error);
 	return nil;
 }
 

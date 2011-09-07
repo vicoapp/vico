@@ -137,10 +137,10 @@
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
 			  toURL:(NSURL *)dstURL
-		   onCompletion:(void (^)(NSError *))aBlock
+		   onCompletion:(void (^)(NSURL *, NSError *))aBlock
 {
 	if (![[srcURL scheme] isEqualToString:[dstURL scheme]]) {
-		aBlock([ViError errorWithFormat:@"Moving between different URL schemes not implemented (%@ => %@)",
+		aBlock(nil, [ViError errorWithFormat:@"Moving between different URL schemes not supported (%@ => %@)",
 		    [srcURL scheme], [dstURL scheme]]);
 		return nil;
 	}
@@ -149,7 +149,7 @@
 					      selector:@selector(moveItemAtURL:toURL:onCompletion:)];
 	if (handler)
 		return [handler moveItemAtURL:srcURL toURL:dstURL onCompletion:aBlock];
-	aBlock([ViError errorWithFormat:@"Unsupported URL scheme %@", [dstURL scheme]]);
+	aBlock(nil, [ViError errorWithFormat:@"Unsupported URL scheme %@", [dstURL scheme]]);
 	return nil;
 }
 

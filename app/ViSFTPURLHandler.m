@@ -77,16 +77,17 @@
 
 - (id<ViDeferred>)moveItemAtURL:(NSURL *)srcURL
 			  toURL:(NSURL *)dstURL
-		   onCompletion:(void (^)(NSError *error))aBlock
+		   onCompletion:(void (^)(NSURL *, NSError *error))aBlock
 {
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:srcURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:srcURL
+							onConnect:^(SFTPConnection *conn, NSError *error) {
 		if (!error)
-			return [conn renameItemAtPath:[srcURL path]
-					       toPath:[dstURL path]
-					   onResponse:aBlock];
-		aBlock(error);
+			return [conn moveItemAtURL:srcURL
+					     toURL:dstURL
+					onResponse:aBlock];
+		aBlock(nil, error);
 		return nil;
 	}];
 }

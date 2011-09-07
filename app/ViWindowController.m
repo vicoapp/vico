@@ -2048,6 +2048,12 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)switch_file:(ViCommand *)command
 {
 	DEBUG(@"previous document is %@", previousDocument);
+
+	// Update jumplist
+	NSView *view = [[self currentView] innerView];
+	if ([view respondsToSelector:@selector(pushCurrentLocationOnJumpList)])
+		[(ViTextView *)view pushCurrentLocationOnJumpList];
+
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"])
 		[self selectLastDocument];
 	else
@@ -2315,6 +2321,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		return [ViError errorWithFormat:@"No matching buffer for %@", command.arg];
 	else if ([matches count] > 1)
 		return [ViError errorWithFormat:@"More than one match for %@", command.arg];
+
+	NSView *view = [[self currentView] innerView];
+	if ([view respondsToSelector:@selector(pushCurrentLocationOnJumpList)])
+		[(ViTextView *)view pushCurrentLocationOnJumpList];
 
 	doc = [matches objectAtIndex:0];
 	if ([command.mapping.name hasPrefix:@"b"]) {

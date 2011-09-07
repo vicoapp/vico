@@ -1,5 +1,6 @@
 === Before next version
 
+* cmd-f (search) doesn't work until Find menu has been manually viewed once
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
 
 ! crash in explorer update
@@ -68,7 +69,6 @@
 
 * check map error in excessKeys.nu (re vs r duplicate mapping)
 * bundle commands not repeatable with dot
-* :*buffer doesn't push on jump list
 * split views top line is ANNOYINGLY changed when editing in another view
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
 

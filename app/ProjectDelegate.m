@@ -132,8 +132,12 @@
 
 - (void)pathControlAction:(id)sender
 {
+	NSURL *url = nil;
 	NSPathComponentCell *cell = [sender clickedPathComponentCell];
-	NSURL *url = [cell URL];
+	if (cell)
+		url = [cell URL];
+	else
+		url = [pathControl URL];
 	if (url)
 		[self browseURL:url];
 }

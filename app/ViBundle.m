@@ -259,7 +259,7 @@
 	ViWindowController *windowController = [window windowController];
 	if ([windowController respondsToSelector:@selector(explorer)])
 		explorer = windowController.explorer;
-	if (explorer) {
+	if (explorer && explorer.rootURL) {
 		NSURL *url = explorer.rootURL;
 		NSSet *selectedURLs = [explorer clickedURLs];
 

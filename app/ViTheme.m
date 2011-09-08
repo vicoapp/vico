@@ -240,6 +240,11 @@
 	                                   forKey:NSForegroundColorAttributeName];
 }
 
+- (BOOL)hasDarkBackground
+{
+	return ([[self backgroundColor] brightnessComponent] < 0.6);
+}
+
 - (NSString *)description
 {
 	return [theme description];

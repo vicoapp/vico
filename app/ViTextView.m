@@ -19,6 +19,8 @@
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
 
+#import <objc/runtime.h>
+
 int logIndent = 0;
 
 @interface ViTextView (private)
@@ -74,6 +76,10 @@ int logIndent = 0;
 	saved_column = -1;
 	snippetMatchRange.location = NSNotFound;
 	original_insert_source = [[NSApp delegate] original_input_source];
+
+	defaultIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(IBeamCursor)));
+	whiteIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(whiteIBeamCursor)));
+	backgroundIsDark = YES;
 
 	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
@@ -2245,6 +2251,9 @@ int logIndent = 0;
 	[self setInsertionPointColor:[aTheme caretColor]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[aTheme selectionColor]
 								    forKey:NSBackgroundColorAttributeName]];
+
+	backgroundIsDark = [aTheme hasDarkBackground];
+	[self setCursorColor];
 }
 
 - (NSFont *)font

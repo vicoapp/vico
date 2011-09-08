@@ -26,6 +26,7 @@
 - (NSColor *)selectionColor;
 - (NSColor *)invisiblesColor;
 - (NSString *)description;
+- (BOOL)hasDarkBackground;
 
 - (NSDictionary *)invisiblesAttributes;
 

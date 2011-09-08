@@ -71,6 +71,11 @@
 	BOOL			 caretBlinkState;
 	NSTimer			*caretBlinkTimer;
 
+	// white-on-black I-beam mouse cursor
+	IMP			 whiteIBeamCursorIMP;
+	IMP			 defaultIBeamCursorIMP;
+	BOOL			 backgroundIsDark;
+
 	NSInteger		 saved_column;
 	NSString		*initial_ex_command;
 	NSInteger		 initial_line, initial_column;
@@ -385,6 +390,7 @@
 @interface ViTextView (cursor)
 - (void)invalidateCaretRect;
 - (void)updateCaret;
+- (void)setCursorColor;
 @end
 
 @interface ViTextView (syntax)

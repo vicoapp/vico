@@ -2,6 +2,9 @@
 #import "ViThemeStore.h"
 #import "ViDocument.h"
 #import "ViEventManager.h"
+#import "NSObject+SPInvocationGrabbing.h"
+
+#import <objc/runtime.h>
 
 @implementation ViTextView (cursor)
 
@@ -139,6 +142,7 @@
 	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
 
 	[self updateCaret];
+	[self setCursorColor];
 	return [super becomeFirstResponder];
 }
 
@@ -159,7 +163,98 @@
 	[caretBlinkTimer invalidate];
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
+	[self setCursorColor];
 	return [super resignFirstResponder];
 }
 
+- (void)setCursorColor
+{
+	if (whiteIBeamCursorIMP && defaultIBeamCursorIMP) {
+		BOOL mouseInside = [self mouse:[self convertPoint:[[self window] mouseLocationOutsideOfEventStream]
+							 fromView:nil]
+					inRect:[self bounds]];
+
+		BOOL shouldBeWhite = mouseInside && backgroundIsDark && ![self isHidden];
+		Class class = [NSCursor class];
+
+		/*
+                 * Set method implementation directly;
+                 * whiteIBeamCursorIMP and defaultIBeamCursorIMP always
+                 * point to the same respective blocks of code.
+		 */
+		Method defaultIBeamCursorMethod = class_getClassMethod(class, @selector(IBeamCursor));
+		method_setImplementation(defaultIBeamCursorMethod, shouldBeWhite ? whiteIBeamCursorIMP : defaultIBeamCursorIMP);
+
+		NSCursor *currentCursor = [NSCursor currentCursor];
+		NSCursor *whiteCursor = whiteIBeamCursorIMP(class, @selector(whiteIBeamCursor));
+		NSCursor *defaultCursor = defaultIBeamCursorIMP(class, @selector(IBeamCursor));
+
+		/*
+                 * If the current cursor is set incorrectly, and it's an
+                 * IBeam cursor, then update it (IBeamCursor points to
+                 * our recently-set implementation).
+		 */
+		if ((currentCursor == whiteCursor) != shouldBeWhite &&
+		    (currentCursor == whiteCursor || currentCursor == defaultCursor))
+			[[NSCursor IBeamCursor] set];
+	}
+}
+
+- (void)mouseEntered:(NSEvent *)anEvent
+{
+	[self setCursorColor];
+}
+
+- (void)mouseExited:(NSEvent *)anEvent
+{
+	[self setCursorColor];
+}
+
+// Hiding or showing the view does not always produce mouseEntered/Exited events.
+- (void)viewDidUnhide
+{
+	[[self nextRunloop] setCursorColor];
+	[super viewDidUnhide];
+}
+
+- (void)viewDidHide
+{
+	[self setCursorColor];
+	[super viewDidHide];
+}
+
 @end
+
+@interface NSCursor (CursorColor)
++ (NSCursor *)whiteIBeamCursor;
+@end
+
+@implementation NSCursor (CursorColor)
+
++ (NSCursor *)defaultIBeamCursor
+{
+	static IMP defaultIBeamCursorIMP = NULL;
+	if (defaultIBeamCursorIMP == nil) {
+		defaultIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(IBeamCursor)));
+	}
+	return defaultIBeamCursorIMP([NSCursor class], @selector(IBeamCursor));
+}
+
++ (NSCursor *)whiteIBeamCursor
+{
+	static NSCursor *invertedIBeamCursor = nil;
+	if (!invertedIBeamCursor) {
+		NSCursor *iBeam = [NSCursor defaultIBeamCursor];
+		NSImage *iBeamImg = [[iBeam image] copy];
+		NSRect imgRect = {NSZeroPoint, [iBeamImg size]};
+		[iBeamImg lockFocus];
+		[[NSColor whiteColor] set];
+		NSRectFillUsingOperation(imgRect, NSCompositeSourceAtop);
+		[iBeamImg unlockFocus];
+		invertedIBeamCursor = [[NSCursor alloc] initWithImage:iBeamImg hotSpot:[iBeam hotSpot]];
+	}
+	return invertedIBeamCursor;	
+}
+
+@end
+

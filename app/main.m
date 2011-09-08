@@ -39,5 +39,8 @@ main(int argc, char *argv[])
 
 	signal(SIGPIPE, SIG_IGN);
 
+	/* Cache the default IBeam cursor implementation. */
+	[NSCursor defaultIBeamCursor];
+
 	return NSApplicationMain(argc, (const char **) argv);
 }

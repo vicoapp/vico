@@ -15,6 +15,7 @@
 * push marks
 * implement c-w in insert mode
 * regression: symbol search no longer focuses first match when symbols are updated during filtering
+* o in visual mode should move to opposite side of selection
 
 
 === Probably not in next version
@@ -92,7 +93,6 @@
 * :edit! => revert
 * support a count in C and h commands
 
-* o in visual mode should move to opposite side of selection
 * @jtregunna: can you make it so we don't get a file changed
               notification when the file hashes are the same? ie, switching branches
               in a git repo

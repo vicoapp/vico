@@ -7,7 +7,7 @@
 {
 	NSInteger row = [self selectedRow];
 	id item = [self itemAtRow:row];
-	if (item && [[self dataSource] outlineView:self isItemExpandable:item])
+	if (item)
 		[self expandItem:item];
 	return YES;
 }
@@ -19,8 +19,7 @@
 	id item = [self itemAtRow:row];
 	if (item == nil)
 		return NO;
-	if ([[self dataSource] outlineView:self isItemExpandable:item] &&
-	    [self isItemExpanded:item])
+	if ([self isItemExpanded:item])
 		[self collapseItem:item];
 	else {
 		id parent = [self parentForItem:item];

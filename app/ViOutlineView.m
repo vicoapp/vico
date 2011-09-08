@@ -7,6 +7,21 @@
 
 @synthesize keyManager, strictIndentation;
 
+- (void)awakeFromNib
+{
+	keyManager = [[ViKeyManager alloc] initWithTarget:self defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
+}
+
+- (BOOL)keyManager:(ViKeyManager *)keyManager
+   evaluateCommand:(ViCommand *)command
+{
+	id target = [self targetForSelector:command.action];
+	DEBUG(@"got target %@ for command %@", target, command);
+	if (target == nil)
+		return NO;
+	return (BOOL)[target performSelector:command.action withObject:command];
+}
+
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
 	if ([[self window] firstResponder] != self)

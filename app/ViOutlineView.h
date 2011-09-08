@@ -1,6 +1,6 @@
 #import "ViKeyManager.h"
 
-@interface ViOutlineView : NSOutlineView
+@interface ViOutlineView : NSOutlineView <ViKeyManagerTarget>
 {
 	ViKeyManager *keyManager;
 	BOOL strictIndentation;

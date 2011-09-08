@@ -15,6 +15,7 @@
 
 require 'erb'
 require 'cgi'
+require "#{ENV['TM_SUPPORT_PATH']}/lib/escape.rb"
 
 HTMLOUTPUT_TEMPLATE = <<-HTML
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -23,48 +24,32 @@ HTMLOUTPUT_TEMPLATE = <<-HTML
 <head>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <title><%= window_title %></title>
-  <% common_styles.each { |style| %>
-    <link rel="stylesheet" href="file://<%= support_path %>/themes/<%= style %>/style.css"   type="text/css" charset="utf-8" media="screen">
-  <% } %>
-  <% bundle_styles.each { |style| %>
-    <link rel="stylesheet" href="file://<%= bundle_support %>/css/<%= style %>/style.css"   type="text/css" charset="utf-8" media="screen">
-    <link rel="stylesheet" href="file://<%= bundle_support %>/css/<%= style %>/print.css"   type="text/css" charset="utf-8" media="print">
-  <% } %>
-  <link rel="stylesheet" href="file://<%= support_path %>/themes/default/print.css"   type="text/css" charset="utf-8" media="print">
-  <link rel="stylesheet" href="file://<%= user_path %>print.css"   type="text/css" charset="utf-8" media="print">
-  <% user_styles.each { |style| %>
-    <link rel="stylesheet" href="file://<%= user_path %><%= style %>/style.css"   type="text/css" charset="utf-8" media="screen">
-    <link rel="stylesheet" href="file://<%= user_path %><%= style %>/print.css"   type="text/css" charset="utf-8" media="print">
-  <% } %>
-  <script src="file://<%= support_path %>/script/default.js"    type="text/javascript" charset="utf-8"></script>
-  <script src="file://<%= support_path %>/script/webpreview.js" type="text/javascript" charset="utf-8"></script>
-  <script src="file://<%= support_path %>/script/sortable.js" type="text/javascript" charset="utf-8"></script>
-  <script type="text/javascript" charset="utf-8">
-    var image_path = "file://<%= support_path %>/images/";
-  </script>
-  <%= html_head %>
+  <%- themes[:screen].each do |theme| -%>
+  <link rel="stylesheet" href="file://<%= e_url theme[:path] %>/style.css" type="text/css" charset="utf-8" media="screen">
+  <%- end -%>
+  <%- themes[:print].each do |theme| -%>
+  <link rel="stylesheet" href="file://<%= e_url theme[:path] %>/print.css" type="text/css" charset="utf-8" media="print">
+  <%- end -%>
+  <script src="file://<%= e_url support_path %>/script/default.js"    type="text/javascript" charset="utf-8"></script>
+  <script src="file://<%= e_url support_path %>/script/webpreview.js" type="text/javascript" charset="utf-8"></script>
+  <script>var image_path = "file://<%= e_url support_path %>/images/";</script>
+  <script src="file://<%= e_url support_path %>/script/sortable.js"   type="text/javascript" charset="utf-8"></script>
+  <%= html_head -%>
 </head>
 <body id="tm_webpreview_body" class="<%= html_theme %>">
   <div id="tm_webpreview_header">
-    <img id="gradient" src="file://<%= theme_path %>/images/header.png" alt="header">
+    <img id="gradient" src="file://<%= e_url theme_path %>/images/header.png" alt="header">
     <p class="headline"><%= page_title %></p>
     <p class="type"><%= sub_title %></p>
-    <img id="teaser" src="file://<%= theme_path %>/images/teaser.png" alt="teaser">
+    <img id="teaser" src="file://<%= e_url theme_path %>/images/teaser.png" alt="teaser">
     <div id="theme_switcher">
       <form action="#" onsubmit="return false;">
         <div>
           Theme:        
           <select onchange="selectTheme(event);" id="theme_selector">
-            <optgroup label="TextMate">
-            <% common_styles.each { |style| %>
-              <option value="<%= style %>" title="<%= support_path %>/themes/"><%= style %></option>
-            <% } %>
-            </optgroup>
-            <optgroup label="User">
-            <% user_styles.each { |style| %>
-              <option value="<%= style %>" title="<%= user_path %>"><%= style %></option>
-            <% } %>
-            </optgroup>
+            <%- themes[:screen].reject { |e| e[:name].nil? }.sort { |lhs, rhs| lhs[:name] <=> rhs[:name] }.uniq.each do |theme| -%>
+            <option value="<%= theme[:class] %>" title="<%= theme[:path] %>"><%= theme[:name] %></option>
+            <%- end -%>
           </select>
         </div>
         <script type="text/javascript" charset="utf-8">
@@ -79,66 +64,68 @@ HTML
 module TextMate
   module HTMLOutput
     class << self
-      
       def show(options = { }, &block)
+        $stdout << header(options)
+        $stdout.sync = true
+        block.call($stdout)
+        $stdout << footer()
+      end
+
+      def header(options)
         window_title = options[:window_title] || options[:title]    || 'Window Title'
         page_title   = options[:page_title]   || options[:title]    || 'Page Title'
         sub_title    = options[:sub_title]    || ENV['TM_FILENAME'] || 'untitled'
-
-        support_path   = ENV['TM_SUPPORT_PATH']
-        bundle_support = ENV['TM_BUNDLE_SUPPORT']
-        user_path      = ENV['HOME'] + '/Library/Application Support/TextMate/Themes/Webpreview/'
-  
-        common_styles  = ['default'];
-        user_styles    = [];
-        bundle_styles  = bundle_support.nil? ? [] : ['default'];
-
-        Dir.foreach(user_path) { |file|
-          user_styles << file if File.exist?(user_path + file + '/style.css')
-        } if File.exist? user_path
-  
-        Dir.foreach(support_path + '/themes/') { |file|
-          next if file == 'default'
-          common_styles << file if File.exists?(support_path + "/themes/" + file + '/style.css')
-        }
-  
-        common_styles.each { |style|
-          next if style == 'default'
-          bundle_styles << style if File.directory?(bundle_support + '/css/' + style)
-        } unless bundle_support.nil?
-
         html_head    = options[:html_head]    || ''
 
         if options[:fix_href] && File.exist?(ENV['TM_FILEPATH'].to_s)
-          require "cgi"
-          html_head << "<base href='tm-file://#{CGI.escape(ENV['TM_FILEPATH'])}'>"
+          html_head << "<base href='file://#{e_url ENV['TM_FILEPATH']}'>\n"
         end
 
-        support_path   = support_path.sub(/ /, '%20')
-        bundle_support = bundle_support.sub(/ /, '%20') unless bundle_support.nil?
-        user_path      = user_path.sub(/ /, '%20')
-
-        html_theme     = selected_theme
-  
-        theme_path     = support_path + '/themes/'
-        if(user_styles.include?(html_theme))
-          theme_path = user_path + html_theme
-        elsif(common_styles.include?(html_theme))
-          theme_path += html_theme
-        else
-          theme_path += "default"
+        themes = collect_themes
+        html_theme = selected_theme
+        if dict = themes[:screen].find { |e| e[:class] == html_theme }
+          theme_path = dict[:path]
         end
+        support_path = ENV['TM_SUPPORT_PATH']
 
-        $stdout.sync = true
-        $stdout << ERB.new(HTMLOUTPUT_TEMPLATE).result(binding)
-  
-        block.call($stdout)
+        ERB.new(HTMLOUTPUT_TEMPLATE, 0, '%-<>').result(binding)
+      end
 
-        $stdout << "</div>\n</body>\n</html>"
+      def footer
+      	"  </div>\n</body>\n</html>"
       end
       
       private
       
+      def collect_themes
+        res  = { :screen => [ ], :print => [ ] }
+        seen = [ ]
+
+        paths = ENV['TM_THEME_PATH'].to_s.split(/:/)
+        paths << "#{ENV['TM_SUPPORT_PATH']}/themes"
+        paths << "#{ENV['TM_BUNDLE_SUPPORT']}/css" if ENV.has_key? 'TM_BUNDLE_SUPPORT'
+        paths << "#{ENV['HOME']}/Library/Application Support/TextMate/Themes/Webpreview"
+
+        paths.each do |path|
+          Dir.foreach(path) do |file|
+            name = $1.upcase + $2 if file =~ /^(.)(.*)$/
+            name = nil if seen.include?(file) || file == 'default'
+            seen << file
+
+            if File.exist?("#{path}/#{file}/style.css")
+              res[:screen] << { :name => name, :class => file, :path => "#{path}/#{file}" }
+            end
+
+            if File.exist?("#{path}/#{file}/print.css")
+              res[:print] << { :name => name, :class => file, :path => "#{path}/#{file}" }
+            end
+
+          end if File.exists? path
+        end
+
+        res
+      end
+
       def selected_theme
         res = %x{ defaults 2>/dev/null read com.macromates.textmate.webpreview SelectedTheme }.chomp
         $? == 0 ? res : 'bright'

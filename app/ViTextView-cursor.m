@@ -142,7 +142,7 @@
 	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
 
 	[self updateCaret];
-	[self setCursorColor];
+	[[self nextRunloop] setCursorColor];
 	return [super becomeFirstResponder];
 }
 
@@ -169,7 +169,7 @@
 
 - (void)setCursorColor
 {
-	if (whiteIBeamCursorIMP && defaultIBeamCursorIMP && ![self isFieldEditor]) {
+	if (![self isFieldEditor]) {
 		BOOL mouseInside = [self mouse:[self convertPoint:[[self window] mouseLocationOutsideOfEventStream]
 							 fromView:nil]
 					inRect:[self bounds]];
@@ -177,26 +177,27 @@
 		BOOL shouldBeWhite = mouseInside && backgroundIsDark && ![self isHidden];
 		Class class = [NSCursor class];
 
+		DEBUG(@"caret %s be white (bg is %s, mouse is %s, %shidden)",
+			shouldBeWhite ? "SHOULD" : "should NOT",
+			backgroundIsDark ? "dark" : "light",
+			mouseInside ? "inside" : "outside",
+			[self isHidden] ? "" : "not ");
+
 		/*
-                 * Set method implementation directly;
-                 * whiteIBeamCursorIMP and defaultIBeamCursorIMP always
-                 * point to the same respective blocks of code.
+		 * Change the IBeamCursor method implementation.
 		 */
+
+		IMP whiteIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class],
+			@selector(whiteIBeamCursor)));
+
 		Method defaultIBeamCursorMethod = class_getClassMethod(class, @selector(IBeamCursor));
-		method_setImplementation(defaultIBeamCursorMethod, shouldBeWhite ? whiteIBeamCursorIMP : defaultIBeamCursorIMP);
-
-		NSCursor *currentCursor = [NSCursor currentCursor];
-		NSCursor *whiteCursor = whiteIBeamCursorIMP(class, @selector(whiteIBeamCursor));
-		NSCursor *defaultCursor = defaultIBeamCursorIMP(class, @selector(IBeamCursor));
+		method_setImplementation(defaultIBeamCursorMethod,
+			shouldBeWhite ? whiteIBeamCursorIMP : [NSCursor defaultIBeamCursorImplementation]);
 
 		/*
-                 * If the current cursor is set incorrectly, and it's an
-                 * IBeam cursor, then update it (IBeamCursor points to
-                 * our recently-set implementation).
+		 * We always set the i-beam cursor.
 		 */
-		if ((currentCursor == whiteCursor) != shouldBeWhite &&
-		    (currentCursor == whiteCursor || currentCursor == defaultCursor))
-			[[NSCursor IBeamCursor] set];
+		[[NSCursor IBeamCursor] set];
 	}
 }
 
@@ -210,7 +211,7 @@
 	[self setCursorColor];
 }
 
-// Hiding or showing the view does not always produce mouseEntered/Exited events.
+/* Hiding or showing the view does not always produce mouseEntered/Exited events. */
 - (void)viewDidUnhide
 {
 	[[self nextRunloop] setCursorColor];
@@ -225,19 +226,19 @@
 
 @end
 
-@interface NSCursor (CursorColor)
-+ (NSCursor *)whiteIBeamCursor;
-@end
-
 @implementation NSCursor (CursorColor)
+
++ (IMP)defaultIBeamCursorImplementation
+{
+	static IMP defaultIBeamCursorIMP = NULL;
+	if (defaultIBeamCursorIMP == nil)
+		defaultIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(IBeamCursor)));
+	return defaultIBeamCursorIMP;
+}
 
 + (NSCursor *)defaultIBeamCursor
 {
-	static IMP defaultIBeamCursorIMP = NULL;
-	if (defaultIBeamCursorIMP == nil) {
-		defaultIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(IBeamCursor)));
-	}
-	return defaultIBeamCursorIMP([NSCursor class], @selector(IBeamCursor));
+	return [self defaultIBeamCursorImplementation]([NSCursor class], @selector(IBeamCursor));
 }
 
 + (NSCursor *)whiteIBeamCursor

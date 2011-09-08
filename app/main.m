@@ -9,6 +9,8 @@
 
 #include "receipt.h"
 
+#import "ViTextView.h"
+
 pthread_mutex_t onig_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct timeval launch_start;
@@ -40,7 +42,7 @@ main(int argc, char *argv[])
 	signal(SIGPIPE, SIG_IGN);
 
 	/* Cache the default IBeam cursor implementation. */
-	[NSCursor defaultIBeamCursor];
+	[NSCursor defaultIBeamCursorImplementation];
 
 	return NSApplicationMain(argc, (const char **) argv);
 }

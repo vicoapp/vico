@@ -77,10 +77,6 @@ int logIndent = 0;
 	snippetMatchRange.location = NSNotFound;
 	original_insert_source = [[NSApp delegate] original_input_source];
 
-	defaultIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(IBeamCursor)));
-	whiteIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class], @selector(whiteIBeamCursor)));
-	backgroundIsDark = YES;
-
 	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];

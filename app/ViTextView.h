@@ -72,8 +72,6 @@
 	NSTimer			*caretBlinkTimer;
 
 	// white-on-black I-beam mouse cursor
-	IMP			 whiteIBeamCursorIMP;
-	IMP			 defaultIBeamCursorIMP;
 	BOOL			 backgroundIsDark;
 
 	NSInteger		 saved_column;
@@ -445,3 +443,9 @@
 - (void)performBundleItems:(NSArray *)matches;
 @end
 
+
+@interface NSCursor (CursorColor)
++ (IMP)defaultIBeamCursorImplementation;
++ (NSCursor *)defaultIBeamCursor;
++ (NSCursor *)whiteIBeamCursor;
+@end

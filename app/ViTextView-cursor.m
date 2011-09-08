@@ -169,7 +169,7 @@
 
 - (void)setCursorColor
 {
-	if (whiteIBeamCursorIMP && defaultIBeamCursorIMP) {
+	if (whiteIBeamCursorIMP && defaultIBeamCursorIMP && ![self isFieldEditor]) {
 		BOOL mouseInside = [self mouse:[self convertPoint:[[self window] mouseLocationOutsideOfEventStream]
 							 fromView:nil]
 					inRect:[self bounds]];

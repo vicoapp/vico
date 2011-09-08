@@ -2204,9 +2204,14 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	NSError *error = nil;
 	id<ViViewController> viewController = nil;
 
-	if (command.arg == nil)
-		/* Re-open current file. Check E_C_FORCE in flags. */ ;
-	else {
+	if (command.arg == nil) {
+		/* Re-open current file if force flag specified (:e!). */
+		if (command.force) {
+			ViDocument *doc = [self currentDocument];
+			[doc revertDocumentToSaved:nil];
+			command.caret = 0;
+		}
+	} else {
 		NSURL *url = [self parseExFilename:command.arg];
 		if (url) {
 			ViDocument *doc;

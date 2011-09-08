@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>NSUserDefaultsController</string>
 			<string>NSMenu</string>
+			<string>NSUserDefaultsController</string>
 			<string>NSMenuItem</string>
 			<string>NSCustomObject</string>
 		</object>
@@ -230,7 +230,7 @@
 								</object>
 								<object class="NSMenuItem" id="595240833">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">New Vertical Split (:vnew&lt;cr&gt;)</string>
+									<string key="NSTitle">New Vertical Split (:vnew&lt;cr&gt;)(:&lt;c-u&gt;vnew&lt;cr&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -383,11 +383,12 @@
 								</object>
 								<object class="NSMenuItem" id="579971712">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Revert to Saved</string>
+									<string key="NSTitle">Revert to Saved (:edit!&lt;cr&gt;)(:&lt;c-u&gt;edit!&lt;cr&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
 									<reference key="NSMixedImage" ref="258136346"/>
+									<int key="NSTag">4000</int>
 								</object>
 								<object class="NSMenuItem" id="918286254">
 									<reference key="NSMenu" ref="720053764"/>
@@ -4341,71 +4342,6 @@
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">ExEnvironment</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">filterCancel:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">filterCancel:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">filterCancel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>filterIndicator</string>
-							<string>filterLabel</string>
-							<string>filterSheet</string>
-							<string>window</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSProgressIndicator</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSWindow</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>filterIndicator</string>
-							<string>filterLabel</string>
-							<string>filterSheet</string>
-							<string>window</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">filterIndicator</string>
-								<string key="candidateClassName">NSProgressIndicator</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">filterLabel</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">filterSheet</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">window</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ExEnvironment.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">FirstResponder</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4519,6 +4455,73 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSDocument</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>printDocument:</string>
+							<string>revertDocumentToSaved:</string>
+							<string>runPageLayout:</string>
+							<string>saveDocument:</string>
+							<string>saveDocumentAs:</string>
+							<string>saveDocumentTo:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>printDocument:</string>
+							<string>revertDocumentToSaved:</string>
+							<string>runPageLayout:</string>
+							<string>saveDocument:</string>
+							<string>saveDocumentAs:</string>
+							<string>saveDocumentTo:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">printDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">revertDocumentToSaved:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">runPageLayout:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocumentAs:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocumentTo:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/NSDocument.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -4745,10 +4748,10 @@
 							<string>actionMenu</string>
 							<string>altFilterField</string>
 							<string>delegate</string>
-							<string>environment</string>
 							<string>explorer</string>
 							<string>explorerView</string>
 							<string>filterField</string>
+							<string>pathControl</string>
 							<string>progressIndicator</string>
 							<string>scrollView</string>
 							<string>searchToolbarItem</string>
@@ -4765,10 +4768,10 @@
 							<string>NSMenu</string>
 							<string>NSSearchField</string>
 							<string>id</string>
-							<string>ExEnvironment</string>
 							<string>ViOutlineView</string>
 							<string>ViBgView</string>
 							<string>NSSearchField</string>
+							<string>NSPathControl</string>
 							<string>NSProgressIndicator</string>
 							<string>NSScrollView</string>
 							<string>NSToolbarItem</string>
@@ -4788,10 +4791,10 @@
 							<string>actionMenu</string>
 							<string>altFilterField</string>
 							<string>delegate</string>
-							<string>environment</string>
 							<string>explorer</string>
 							<string>explorerView</string>
 							<string>filterField</string>
+							<string>pathControl</string>
 							<string>progressIndicator</string>
 							<string>scrollView</string>
 							<string>searchToolbarItem</string>
@@ -4824,10 +4827,6 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">environment</string>
-								<string key="candidateClassName">ExEnvironment</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">explorer</string>
 								<string key="candidateClassName">ViOutlineView</string>
 							</object>
@@ -4838,6 +4837,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">filterField</string>
 								<string key="candidateClassName">NSSearchField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">pathControl</string>
+								<string key="candidateClassName">NSPathControl</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">progressIndicator</string>
@@ -4887,11 +4890,13 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
 							<string>installTerminalHelper:</string>
+							<string>performFindPanelAction:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -4904,6 +4909,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
 							<string>installTerminalHelper:</string>
+							<string>performFindPanelAction:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
@@ -4915,6 +4921,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">installTerminalHelper:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">performFindPanelAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -5313,7 +5323,6 @@
 							<string>bookmarksButtonCell</string>
 							<string>bundleButton</string>
 							<string>bundleButtonCell</string>
-							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
 							<string>mainView</string>
@@ -5334,7 +5343,6 @@
 							<string>ViToolbarPopUpButtonCell</string>
 							<string>NSPopUpButton</string>
 							<string>ViToolbarPopUpButtonCell</string>
-							<string>ExEnvironment</string>
 							<string>ViBgView</string>
 							<string>NSSegmentedControl</string>
 							<string>NSView</string>
@@ -5358,7 +5366,6 @@
 							<string>bookmarksButtonCell</string>
 							<string>bundleButton</string>
 							<string>bundleButtonCell</string>
-							<string>environment</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
 							<string>mainView</string>
@@ -5387,10 +5394,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">bundleButtonCell</string>
 								<string key="candidateClassName">ViToolbarPopUpButtonCell</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">environment</string>
-								<string key="candidateClassName">ExEnvironment</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">explorerView</string>

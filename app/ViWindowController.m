@@ -1756,9 +1756,9 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	NSRect frame = [sender frame];
 	NSRect resizeRect;
-	if (leftView == explorerView)
+	if (leftView == explorerView && [projectDelegate explorerIsOpen])
 		resizeRect = [projectResizeView frame];
-	else if (rightView == symbolsView) {
+	else if (rightView == symbolsView && [symbolController symbolListIsOpen]) {
 		resizeRect = [symbolsResizeView frame];
 		resizeRect.origin = [sender convertPoint:resizeRect.origin
 					        fromView:symbolsResizeView];

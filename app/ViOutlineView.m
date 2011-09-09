@@ -9,7 +9,8 @@
 
 - (void)awakeFromNib
 {
-	keyManager = [[ViKeyManager alloc] initWithTarget:self defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
+	if (keyManager == nil)
+		keyManager = [[ViKeyManager alloc] initWithTarget:self defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager

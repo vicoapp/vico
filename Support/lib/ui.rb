@@ -47,7 +47,7 @@ module TextMate
         raise "style must be one of #{types.inspect}" unless styles.include?(style)
 
         params = {'alertStyle' => style.to_s, 'messageTitle' => title, 'informativeText' => message, 'buttonTitles' => buttons}
-        button_index = %x{#{VICO} -r -f "#{NULIB}/alert.nu -p '#{params.to_json}'}.chomp.to_i
+        button_index = %x{#{VICO} -r -f "#{NULIB}/alert.nu" -p '#{params.to_json}'}.chomp.to_i
         buttons[button_index]
       end
 

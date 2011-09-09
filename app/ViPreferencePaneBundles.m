@@ -184,7 +184,8 @@
 		return;
 	}
 
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(name CONTAINS[cd] %@) OR (description CONTAINS[cd] %@)", filter, filter];
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(owner CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (description CONTAINS[cd] %@)",
+		filter, filter, filter];
 	[self setFilteredRepositories:[repositories filteredArrayUsingPredicate:predicate]];
 }
 

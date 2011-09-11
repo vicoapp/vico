@@ -214,4 +214,14 @@
 	return YES;
 }
 
+/* syntax: <cr> */
+- (BOOL)double_action:(ViCommand *)command
+{
+	SEL doubleAction = [self doubleAction];
+	if (doubleAction == NULL)
+		return NO;
+	[[self target] performSelector:doubleAction withObject:self];
+	return YES;
+}
+
 @end

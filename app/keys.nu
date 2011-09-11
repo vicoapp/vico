@@ -373,6 +373,7 @@
 (tabmap setKey:"j" toMotion:"move_down:")
 (tabmap setKey:"k" toMotion:"move_up:")
 (tabmap setKey:"l" toMotion:"move_right:")
+(tabmap setKey:"<cr>" toMotion:"double_action:")
 
 ;; sidebar navigation map (valid for explorer and symbol map)
 (set sidemap (ViMap mapWithName:"sidebarMap"))

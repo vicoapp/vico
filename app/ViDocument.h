@@ -4,6 +4,7 @@
 #import "ViURLManager.h"
 #import "ViScope.h"
 #import "ViDocumentView.h"
+#import "ViMarkManager.h"
 
 @class ViTextView;
 @class ExCommand;
@@ -44,6 +45,9 @@
 	BOOL ignoreEditing, closed;
 	ViSyntaxParser *syntaxParser;
 	ViSyntaxContext *nextContext;
+
+	// standard character marks
+	ViMarkStack *localMarks;
 
 	// symbol list
 	NSMutableArray *symbols;
@@ -146,5 +150,19 @@
 
 - (void)endUndoGroup;
 - (void)beginUndoGroup;
+
+/** @name Setting marks */
+
+/** Lookup a marked location.
+ * @param markName The name of the mark.
+ * @returns The named mark, or `nil` if not set.
+ */
+- (ViMark *)markNamed:(unichar)markName;
+
+/** Set a mark.
+ * @param name The name of the mark.
+ * @param aLocation The location to mark.
+ */
+- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 
 @end

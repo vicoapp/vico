@@ -19,6 +19,7 @@
 #import "ExCommand.h"
 #import "ViError.h"
 #import "ViBgView.h"
+#import "ViMark.h"
 
 static NSMutableArray		*windowControllers = nil;
 static ViWindowController	*currentWindowController = nil;
@@ -1427,6 +1428,17 @@ static ViWindowController	*currentWindowController = nil;
 		if ([url isEqual:[doc fileURL]])
 			return doc;
 	return nil;
+}
+
+- (void)gotoMark:(ViMark *)mark
+{
+	NSURL *url = mark.url;
+	if (url)
+		[self gotoURL:url line:mark.line column:mark.column];
+	else {
+		id<ViViewController> viewController = [self selectDocument:mark.document];
+		[(ViTextView *)[viewController innerView] gotoLine:mark.line column:mark.column];
+	}
 }
 
 - (BOOL)gotoURL:(NSURL *)url

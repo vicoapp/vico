@@ -91,8 +91,6 @@
 	NSMutableCharacterSet	*nonWordSet;
 	NSCharacterSet		*whitespace;
 
-	NSMutableDictionary	*marks; // XXX: move to document
-
 	CGFloat			 pageGuideX;
 	BOOL			 antialias;
 	BOOL			 hasUndoGroup;
@@ -247,19 +245,6 @@
 - (void)rulerView:(NSRulerView *)aRulerView
   selectFromPoint:(NSPoint)fromPoint
           toPoint:(NSPoint)toPoint;
-
-/** @name Setting marks */
-
-/** Lookup a marked location.
- * @param markName The name of the mark.
- * @returns The named mark, or `nil` if not set.
- */
-- (ViMark *)markNamed:(unichar)markName;
-/** Set a mark.
- * @param name The name of the mark.
- * @param aLocation The location to mark.
- */
-- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 
 - (NSRange)rangeOfPattern:(NSString *)pattern
 	     fromLocation:(NSUInteger)start

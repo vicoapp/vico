@@ -72,7 +72,6 @@ int logIndent = 0;
 	if (undoManager == nil)
 		undoManager = [[NSUndoManager alloc] init];
 	inputKeys = [NSMutableArray array];
-	marks = [NSMutableDictionary dictionary];
 	saved_column = -1;
 	snippetMatchRange.location = NSNotFound;
 	original_insert_source = [[NSApp delegate] original_input_source];
@@ -300,19 +299,6 @@ int logIndent = 0;
 	return NO;
 }
 
-- (ViMark *)markNamed:(unichar)markName
-{
-	return [marks objectForKey:[NSString stringWithFormat:@"%C", markName]];
-}
-
-- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation
-{
-	NSUInteger lineno = [[self textStorage] lineNumberAtLocation:aLocation];
-	NSUInteger column = [[self textStorage] columnAtLocation:aLocation];
-	ViMark *m = [[ViMark alloc] initWithLocation:aLocation line:lineno column:column];
-	[marks setObject:m forKey:[NSString stringWithFormat:@"%C", name]];
-}
-
 #pragma mark -
 #pragma mark Convenience methods
 
@@ -441,7 +427,7 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
-	[self setMark:'.' atLocation:aRange.location];
+	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
 }
 
@@ -484,7 +470,7 @@ int logIndent = 0;
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
-	[self setMark:'.' atLocation:aRange.location];
+	[[self document] setMark:'.' atLocation:aRange.location];
 
 	NSInteger delta = [aString length] - aRange.length;
 	if (modify_start_location > NSMaxRange(r)) {
@@ -928,8 +914,8 @@ int logIndent = 0;
 {
 	NSString *content = [[[self textStorage] string] substringWithRange:yankRange];
 	[[ViRegisterManager sharedManager] setContent:content ofRegister:regName];
-	[self setMark:'[' atLocation:yankRange.location];
-	[self setMark:']' atLocation:IMAX(yankRange.location, NSMaxRange(yankRange) - 1)];
+	[[self document] setMark:'[' atLocation:yankRange.location];
+	[[self document] setMark:']' atLocation:IMAX(yankRange.location, NSMaxRange(yankRange) - 1)];
 }
 
 - (void)cutToRegister:(unichar)regName
@@ -937,7 +923,7 @@ int logIndent = 0;
 {
 	[self yankToRegister:regName range:cutRange];
 	[self deleteRange:cutRange];
-	[self setMark:']' atLocation:cutRange.location];
+	[[self document] setMark:']' atLocation:cutRange.location];
 }
 
 #pragma mark -
@@ -1312,8 +1298,8 @@ int logIndent = 0;
 	} else
 		l2++;
 
-	[self setMark:'<' atLocation:l1];
-	[self setMark:'>' atLocation:IMAX(l1, l2 - 1)];
+	[[self document] setMark:'<' atLocation:l1];
+	[[self document] setMark:'>' atLocation:IMAX(l1, l2 - 1)];
 
 	NSRange sel = NSMakeRange(l1, l2 - l1);
 	[self setSelectedRange:sel];
@@ -1327,7 +1313,7 @@ int logIndent = 0;
 	    caret, final_location, [[self textStorage] length]);
 	[self switchToNormalInputSourceAndRemember:YES];
 	mode = ViNormalMode;
-	[self setMark:']' atLocation:end_location];
+	[[self document] setMark:']' atLocation:end_location];
 	[self endUndoGroup];
 }
 
@@ -1349,7 +1335,7 @@ int logIndent = 0;
 	[self switchToInsertInputSource];
 	mode = ViInsertMode;
 
-	[self setMark:'[' atLocation:end_location];
+	[[self document] setMark:'[' atLocation:end_location];
 
 	/*
 	 * Remember the command that entered insert mode. When leaving insert mode,
@@ -1785,7 +1771,7 @@ int logIndent = 0;
 
 		inputKeys = [NSMutableArray array];
 		start_location = end_location = [self caret];
-		[self setMark:'^' atLocation:start_location];
+		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
 	}
 

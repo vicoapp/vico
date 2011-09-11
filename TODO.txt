@@ -1,5 +1,6 @@
 === Before next version
 
+* zz, zt, zb leaves the status message with a 'z'
 * cmd-f (search) doesn't work until Find menu has been manually viewed once
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
 
@@ -20,6 +21,8 @@
 
 === Probably not in next version
 
+* don't highlight menu separators (pragma mark -) when following caret in symbol list
+* show vi command menu items in explorer menu, and symbol list menu (people do not read the help book)
 * objc 'log' snippet lacks ending parens (compared to TM)
 * show baseURL in window title!
 * cw<cmd-v> and repeat inserts pasteboard twice
@@ -38,6 +41,7 @@
 ! vertical splits are buggy
 
 * splitting functions should accept an anchor argument (left, right, up, down)
+* ctags should present menu for duplicate tags
 
 * list ctrl-s in menus
 * list ctrl-n in menus (and other completions)
@@ -103,7 +107,6 @@
 * p/P with a count
 * J with visual selection, and J with a count
 * +/- commands
-* global marks (A-Z)
 * open alternative file (.h/.c/.m)
 * :map commands
 * preference pane for editing macros?

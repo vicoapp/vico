@@ -920,7 +920,7 @@
 		range = NSMakeRange(eol, bol - eol);
 	} else {
 		NSUInteger nonblank = [[self textStorage] firstNonBlankForLineAtLocation:start_location];
-		ViMark *bocMark = [self markNamed:'[']; // beginning-of-change
+		ViMark *bocMark = [[self document] markNamed:'[']; // beginning-of-change
 		NSUInteger boc = bocMark.location;
 		if (boc < start_location && boc > nonblank)
 			range = NSMakeRange(boc, start_location - boc);
@@ -2287,7 +2287,7 @@
 /* syntax: m<char> */
 - (BOOL)set_mark:(ViCommand *)command
 {
-	[self setMark:command.argument atLocation:start_location];
+	[[self document] setMark:command.argument atLocation:start_location];
 	return YES;
 }
 
@@ -2295,10 +2295,19 @@
 /* syntax: `<char> */
 - (BOOL)move_to_mark:(ViCommand *)command
 {
-	ViMark *m = [self markNamed:command.argument];
+	ViMark *m = [[self document] markNamed:command.argument];
 	if (m == nil) {
 		MESSAGE(@"Mark %C: not set", command.argument);
 		return NO;
+	}
+
+	BOOL moveToColumn = ([command.mapping.keyString isEqualToString:@"`"]);	// XXX: use another selector!
+
+	if (m.document != [self document]) {
+		/* XXX: This is sooo weird! We're changing the first responder from the text view!? */
+		return [[[self window] windowController] gotoURL:m.document.fileURL
+							    line:m.line
+							  column:(moveToColumn ? m.column : 0)];
 	}
 
 	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
@@ -2308,7 +2317,7 @@
 	}
 	end_location = bol;
 
-	if ([command.mapping.keyString isEqualToString:@"`"])	// XXX: use another selector!
+	if (moveToColumn)	// XXX: use another selector!
 		[self gotoColumn:m.column fromLocation:bol];
 	else
 		end_location = [[self textStorage] skipWhitespaceFrom:end_location];
@@ -2325,7 +2334,7 @@
 
 - (BOOL)vi_gi:(ViCommand *)command
 {
-	ViMark *m = [self markNamed:'^'];
+	ViMark *m = [[self document] markNamed:'^'];
 	if (m != nil) {
 		NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
 		if (bol != -1) {
@@ -2341,8 +2350,8 @@
 
 - (BOOL)vi_gv:(ViCommand *)command
 {
-	ViMark *vs = [self markNamed:'<'];
-	ViMark *ve = [self markNamed:'>'];
+	ViMark *vs = [[self document] markNamed:'<'];
+	ViMark *ve = [[self document] markNamed:'>'];
 
 	if (vs && ve) {
 		visual_start_location = vs.location;

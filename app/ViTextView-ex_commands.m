@@ -26,7 +26,7 @@
 		line = [self currentLine];
 		break;
 	case ExAddressMark:
-		m = [self markNamed:addr.mark];
+		m = [[self document] markNamed:addr.mark];
 		if (m == nil) {
 			if (outError)
 				*outError = [ViError errorWithFormat:@"Mark %C: not set", addr.mark];

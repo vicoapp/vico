@@ -17,6 +17,7 @@
 @class ViParser;
 @class ExCommand;
 @class ViBgView;
+@class ViMark;
 
 /** A ViWindowController object manages a document window.
  */
@@ -219,6 +220,8 @@
  */
 - (BOOL)gotoURL:(NSURL *)url;
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
+
+- (void)gotoMark:(ViMark *)mark;
 
 - (IBAction)searchSymbol:(id)sender;
 - (void)gotoSymbol:(ViSymbol *)aSymbol;

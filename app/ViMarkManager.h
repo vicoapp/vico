@@ -1,0 +1,95 @@
+#import "ViMark.h"
+
+@interface ViMarkGroup : NSObject
+{
+	SEL groupSelector;
+	NSMutableDictionary *groups;
+}
+
+@property (nonatomic, readonly) NSArray *groups;
+
++ (ViMarkGroup *)markGroupWithSelector:(SEL)aSelector;
+- (ViMarkGroup *)initWithSelector:(SEL)aSelector;
+
+- (NSString *)attribute;
+- (void)rebuildFromMarks:(NSArray *)marks;
+- (void)addMark:(ViMark *)mark;
+- (void)removeMark:(ViMark *)mark;
+- (void)clear;
+
+@end
+
+
+
+
+@interface ViMarkList : NSObject
+{
+	NSMutableArray *marks;
+	NSMutableDictionary *marksByName;
+	NSInteger currentIndex;
+	NSMutableDictionary *groups;
+
+	id identifier;
+	NSImage *icon;
+}
+
+@property (nonatomic, readonly) NSArray *marks;
+
++ (ViMarkList *)markListWithIdentifier:(id)anIdentifier;
++ (ViMarkList *)markList;
+- (ViMarkList *)initWithIdentifier:(id)anIdentifier;
+
+- (void)clear;
+- (ViMark *)lookup:(NSString *)name;
+- (void)addMark:(ViMark *)mark;
+- (void)removeMark:(ViMark *)mark;
+
+- (void)rewind;
+- (NSUInteger)first;
+- (NSUInteger)last;
+- (void)setIndex:(NSUInteger)anIndex;
+- (ViMark *)next;
+- (ViMark *)previous;
+
+@end
+
+
+
+
+
+
+@interface ViMarkStack : NSObject
+{
+	NSString *name;
+	NSMutableArray *lists;
+	NSInteger currentIndex;
+}
+@property (nonatomic, readwrite, assign) NSString *name;
+@property (nonatomic, readonly) ViMarkList *list;
++ (ViMarkStack *)markStackWithName:(NSString *)name;
+- (ViMarkStack *)initWithName:(NSString *)name;
+- (ViMarkList *)makeList;
+- (void)clear;
+- (ViMarkList *)pop;
+- (ViMarkList *)push:(ViMarkList *)list;
+@end
+
+
+
+
+
+
+@interface ViMarkManager : NSObject
+{
+	NSMutableArray *stacks;
+	NSMutableDictionary *namedStacks; // keyed by name
+}
+
+@property (nonatomic, readonly) NSArray *stacks;
++ (ViMarkManager *)sharedManager;
+- (void)removeStack:(ViMarkStack *)stack;
+- (void)removeStackWithName:(NSString *)name;
+- (ViMarkStack *)makeStack;
+- (ViMarkStack *)stackWithName:(NSString *)name;
+
+@end

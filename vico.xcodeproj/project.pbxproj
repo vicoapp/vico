@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
 		9A260668134A1704002C86FB /* ViCompletionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260667134A1704002C86FB /* ViCompletionController.m */; };
 		9A26066B134A4F13002C86FB /* ViCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26066A134A4F13002C86FB /* ViCompletionView.m */; };
@@ -271,6 +272,8 @@
 		9ACAA94313707177001FC553 /* ViBufferCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA93E13707177001FC553 /* ViBufferCompletion.m */; };
 		9ACAA94413707177001FC553 /* ViFileCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94013707177001FC553 /* ViFileCompletion.m */; };
 		9ACAA94513707177001FC553 /* ViWordCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACAA94213707177001FC553 /* ViWordCompletion.m */; };
+		9ACFDFBE141A084700D4DBE1 /* MarkInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ACFDFBC141A084700D4DBE1 /* MarkInspector.xib */; };
+		9ACFDFC2141A089C00D4DBE1 /* ViMarkInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */; };
 		9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E013EC341C0040DB4E /* ExMap.m */; };
 		9ACFF8E313EC341C0040DB4E /* ExParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACFF8E113EC341C0040DB4E /* ExParser.m */; };
 		9AD68D4E13A3583100126E32 /* ViEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AD68D4D13A3583100126E32 /* ViEventManager.m */; };
@@ -390,6 +393,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9A0831961418FE9D00D1805D /* ViMarkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkManager.h; sourceTree = "<group>"; };
+		9A0831971418FE9D00D1805D /* ViMarkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMarkManager.m; sourceTree = "<group>"; };
 		9A26065C134849CC002C86FB /* ExTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExTextField.h; sourceTree = "<group>"; };
 		9A26065D134849CC002C86FB /* ExTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExTextField.m; sourceTree = "<group>"; };
 		9A260666134A1704002C86FB /* ViCompletionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViCompletionController.h; sourceTree = "<group>"; };
@@ -813,6 +818,9 @@
 		9ACAA94013707177001FC553 /* ViFileCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileCompletion.m; sourceTree = "<group>"; };
 		9ACAA94113707177001FC553 /* ViWordCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWordCompletion.h; sourceTree = "<group>"; };
 		9ACAA94213707177001FC553 /* ViWordCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViWordCompletion.m; sourceTree = "<group>"; };
+		9ACFDFBD141A084700D4DBE1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MarkInspector.xib; sourceTree = "<group>"; };
+		9ACFDFC0141A089C00D4DBE1 /* ViMarkInspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkInspector.h; sourceTree = "<group>"; };
+		9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMarkInspector.m; sourceTree = "<group>"; };
 		9ACFF8DF13EC341C0040DB4E /* ExMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExMap.h; sourceTree = "<group>"; };
 		9ACFF8E013EC341C0040DB4E /* ExMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExMap.m; sourceTree = "<group>"; };
 		9ACFF8E113EC341C0040DB4E /* ExParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExParser.m; sourceTree = "<group>"; };
@@ -1174,6 +1182,7 @@
 				9A2EF2A8133109C20023C5B7 /* MainMenu.xib */,
 				9A26066F134C50C3002C86FB /* CompletionWindow.xib */,
 				9AB6F72D14160751000F3578 /* WaitProgress.xib */,
+				9ACFDFBC141A084700D4DBE1 /* MarkInspector.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1181,6 +1190,10 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9ACFDFC0141A089C00D4DBE1 /* ViMarkInspector.h */,
+				9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */,
+				9A0831961418FE9D00D1805D /* ViMarkManager.h */,
+				9A0831971418FE9D00D1805D /* ViMarkManager.m */,
 				9AB6F74614164B0C000F3578 /* ViFile.h */,
 				9AB6F74714164B0C000F3578 /* ViFile.m */,
 				9AB6F73014160F9B000F3578 /* ViTaskRunner.h */,
@@ -1677,6 +1690,7 @@
 				9AF29C24140CF511000CB1CB /* AliasBadgeIcon.icns in Resources */,
 				9A880835141213D1001F8769 /* par.doc in Resources */,
 				9AB6F72F14160751000F3578 /* WaitProgress.xib in Resources */,
+				9ACFDFBE141A084700D4DBE1 /* MarkInspector.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2016,6 +2030,8 @@
 				9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */,
 				9AB6F73214160F9B000F3578 /* ViTaskRunner.m in Sources */,
 				9AB6F74814164B0C000F3578 /* ViFile.m in Sources */,
+				9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */,
+				9ACFDFC2141A089C00D4DBE1 /* ViMarkInspector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2201,6 +2217,14 @@
 				9AB6F72E14160751000F3578 /* en */,
 			);
 			name = WaitProgress.xib;
+			sourceTree = "<group>";
+		};
+		9ACFDFBC141A084700D4DBE1 /* MarkInspector.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9ACFDFBD141A084700D4DBE1 /* en */,
+			);
+			name = MarkInspector.xib;
 			sourceTree = "<group>";
 		};
 		9AF71075137BC12900EC858E /* AdvancedPrefs.xib */ = {

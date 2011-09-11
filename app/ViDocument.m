@@ -68,6 +68,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	if (self) {
 		symbols = [NSMutableArray array];
 		views = [NSMutableSet set];
+		localMarks = [[ViMarkManager sharedManager] makeStack];
+		localMarks.name = [NSString stringWithFormat:@"Local marks for document %p", self];
 
 		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		[userDefaults addObserver:self forKeyPath:@"number" options:0 context:NULL];
@@ -844,6 +846,9 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[super setFileURL:absoluteURL];
 	[self didChangeValueForKey:@"title"];
 	[self configureSyntax];
+
+	localMarks.name = [NSString stringWithFormat:@"Local marks in %@", [self title]];
+
 	[[ViEventManager defaultManager] emit:ViEventDidChangeURL for:self with:self, absoluteURL, nil];
 }
 
@@ -884,6 +889,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 	windowController = nil;
 	hiddenView = nil;
+
+	[[ViMarkManager sharedManager] removeStack:localMarks];
 
 	[super close];
 	[[ViEventManager defaultManager] emitDelayed:ViEventDidCloseDocument for:self with:self, nil];
@@ -1655,6 +1662,32 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}
 	[self didChangeValueForKey:@"symbols"];
+}
+
+#pragma mark Marks
+#pragma mark -
+
+- (ViMark *)markNamed:(unichar)key
+{
+	NSString *name = [NSString stringWithFormat:@"%C", key];
+	if ([name isUppercase])
+		return [[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list lookup:name];
+	return [localMarks.list lookup:name];
+}
+
+- (void)setMark:(unichar)key atLocation:(NSUInteger)aLocation
+{
+	NSString *name = [NSString stringWithFormat:@"%C", key];
+	ViMark *m = [localMarks.list lookup:name];
+	if (m)
+		[m setLocation:aLocation];
+	else {
+		m = [ViMark markWithDocument:self name:name location:aLocation];
+		[localMarks.list addMark:m];
+	}
+
+	if ([name isUppercase])
+		[[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list addMark:m];
 }
 
 #pragma mark -

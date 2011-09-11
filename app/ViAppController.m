@@ -17,6 +17,7 @@
 #import "ViCommandMenuItemView.h"
 #import "ViEventManager.h"
 #import "ProjectDelegate.h"
+#import "ViMarkInspector.h"
 
 #import "ViFileURLHandler.h"
 #import "ViSFTPURLHandler.h"
@@ -469,6 +470,11 @@ updateMeta(void)
 - (IBAction)showPreferences:(id)sender
 {
 	[[ViPreferencesController sharedPreferences] show];
+}
+
+- (IBAction)showMarkInspector:(id)sender
+{
+	[[ViMarkInspector sharedInspector] show];
 }
 
 extern BOOL makeNewWindowInsteadOfTab;

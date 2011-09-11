@@ -1791,6 +1791,15 @@
 								</object>
 								<object class="NSMenuItem" id="625202149">
 									<reference key="NSMenu" ref="835318025"/>
+									<string key="NSTitle">Show Mark Inspector</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+								</object>
+								<object class="NSMenuItem" id="860018733">
+									<reference key="NSMenu" ref="835318025"/>
 									<string key="NSTitle">Bring All to Front</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
@@ -1868,22 +1877,6 @@
 			<object class="NSCustomObject" id="219028828">
 				<string key="NSClassName">NSFontManager</string>
 			</object>
-			<object class="NSMenuItem" id="732373199">
-				<string key="NSTitle">Scroll Page Down (&lt;C-f&gt;)</string>
-				<string key="NSKeyEquiv"/>
-				<int key="NSMnemonicLoc">2147483647</int>
-				<reference key="NSOnImage" ref="176968249"/>
-				<reference key="NSMixedImage" ref="258136346"/>
-				<int key="NSTag">4000</int>
-			</object>
-			<object class="NSMenuItem" id="655773852">
-				<string key="NSTitle">Insert after End of Line (A)</string>
-				<string key="NSKeyEquiv"/>
-				<int key="NSMnemonicLoc">2147483647</int>
-				<reference key="NSOnImage" ref="176968249"/>
-				<reference key="NSMixedImage" ref="258136346"/>
-				<int key="NSTag">4000</int>
-			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
@@ -1895,14 +1888,6 @@
 						<reference key="destination" ref="1011231497"/>
 					</object>
 					<int key="connectionID">37</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">arrangeInFront:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="625202149"/>
-					</object>
-					<int key="connectionID">39</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2496,6 +2481,22 @@
 					</object>
 					<int key="connectionID">775</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">arrangeInFront:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="860018733"/>
+					</object>
+					<int key="connectionID">919</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showMarkInspector:</string>
+						<reference key="source" ref="1042301861"/>
+						<reference key="destination" ref="625202149"/>
+					</object>
+					<int key="connectionID">920</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2936,6 +2937,7 @@
 							<reference ref="262739524"/>
 							<reference ref="971371586"/>
 							<reference ref="393306656"/>
+							<reference ref="860018733"/>
 						</object>
 						<reference key="parent" ref="713487014"/>
 					</object>
@@ -3636,11 +3638,6 @@
 						<reference key="parent" ref="789758025"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">741</int>
-						<reference key="object" ref="732373199"/>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">742</int>
 						<reference key="object" ref="665308861"/>
 						<reference key="parent" ref="747765128"/>
@@ -3674,11 +3671,6 @@
 						<int key="objectID">749</int>
 						<reference key="object" ref="980563483"/>
 						<reference key="parent" ref="747765128"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">750</int>
-						<reference key="object" ref="655773852"/>
-						<reference key="parent" ref="0"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">751</int>
@@ -3893,6 +3885,11 @@
 						<reference key="object" ref="133570436"/>
 						<reference key="parent" ref="334114871"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">918</int>
+						<reference key="object" ref="860018733"/>
+						<reference key="parent" ref="835318025"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -4056,7 +4053,6 @@
 					<string>738.IBPluginDependency</string>
 					<string>739.IBPluginDependency</string>
 					<string>740.IBPluginDependency</string>
-					<string>741.IBPluginDependency</string>
 					<string>742.IBPluginDependency</string>
 					<string>744.IBPluginDependency</string>
 					<string>745.IBPluginDependency</string>
@@ -4065,7 +4061,6 @@
 					<string>748.IBPluginDependency</string>
 					<string>749.IBPluginDependency</string>
 					<string>75.IBPluginDependency</string>
-					<string>750.IBPluginDependency</string>
 					<string>751.IBPluginDependency</string>
 					<string>752.IBPluginDependency</string>
 					<string>756.IBPluginDependency</string>
@@ -4108,11 +4103,11 @@
 					<string>81.IBPluginDependency</string>
 					<string>82.IBPluginDependency</string>
 					<string>83.IBPluginDependency</string>
+					<string>918.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4336,7 +4331,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">792</int>
+			<int key="maxID">920</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4890,7 +4885,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
 							<string>installTerminalHelper:</string>
-							<string>performFindPanelAction:</string>
+							<string>showMarkInspector:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
@@ -4909,7 +4904,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editSiteScript:</string>
 							<string>installTerminalHelper:</string>
-							<string>performFindPanelAction:</string>
+							<string>showMarkInspector:</string>
 							<string>showPreferences:</string>
 							<string>visitWebsite:</string>
 						</object>
@@ -4924,7 +4919,7 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">performFindPanelAction:</string>
+								<string key="name">showMarkInspector:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

@@ -97,6 +97,9 @@
                          withView:(id<ViViewController>)newViewController
                        vertically:(BOOL)isVertical
 {
+	NSParameterAssert(viewController);
+	NSParameterAssert(newViewController);
+
 	NSView *view = [viewController view];
 
 	NSSplitView *split = (NSSplitView *)[view superview];

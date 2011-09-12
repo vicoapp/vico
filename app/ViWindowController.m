@@ -415,6 +415,7 @@ static ViWindowController	*currentWindowController = nil;
 	    [document fileURL] != nil &&
 	    ![[self currentDocument] isDocumentEdited] &&
 	    [[lastTabController views] count] == 1 &&
+	    [[[lastTabController views] objectAtIndex:0] respondsToSelector:@selector(document)] &&
 	    [self currentDocument] == [[[lastTabController views] objectAtIndex:0] document]) {
 		[tabBar disableAnimations];
 		closeThisDocument = [self currentDocument];

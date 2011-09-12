@@ -34,7 +34,7 @@ exit_create_new_document ()	{ echo -n "$1"; exit 207; }
 
 # force TM to refresh current file and project drawer
 rescan_project () {
-	$TM_APP_PATH/Contents/MacOS/vicotool -e "(explorer rescan_files:nil)"
+	$TM_APP_PATH/Contents/MacOS/vicotool -e "((current-explorer) rescan:nil)"
 }
 
 # use this as a filter (|pre) when you want 

@@ -217,13 +217,11 @@ CXX_SRCS = \
 
 XIBS = \
 	AdvancedPrefs.xib \
-	BundleEditor.xib \
 	BundlePrefs.xib \
 	CommandOutputWindow.xib \
 	CompletionWindow.xib \
 	EditPrefs.xib \
 	GeneralPrefs.xib \
-	KeyPrefs.xib \
 	MainMenu.xib \
 	MarkInspector.xib \
 	PreferenceWindow.xib \

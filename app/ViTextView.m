@@ -1229,6 +1229,9 @@ int logIndent = 0;
 
 - (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection
 {
+	if (location == NSNotFound)
+		return;
+
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)
 		length--;

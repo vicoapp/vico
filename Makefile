@@ -326,7 +326,7 @@ APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framew
 PAR_LDLIBS =
 
 # paths
-BUILDDIR=build/$(CONFIGURATION)
+BUILDDIR=./build/$(CONFIGURATION)
 OBJDIR=$(BUILDDIR)/obj
 DEPDIR=$(BUILDDIR)/dep
 APPDIR=$(BUILDDIR)/Vico.app
@@ -348,7 +348,7 @@ PAR_C_OBJS = $(addprefix $(OBJDIR)/,$(PAR_C_SRCS:.c=.o))
 PAR_OBJS = $(PAR_C_OBJS)
 NIBS = $(addprefix $(NIBDIR)/,$(XIBS:.xib=.nib))
 
-DEPS = -MMD -MT dependencies -MF $(addsuffix .d,$(basename $@))
+DEPS = -MMD -MT $@ -MF $(addsuffix .d,$(basename $@))
 
 $(OBJDIR)/%.o: %.m
 	$(CC) $(CFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
@@ -402,11 +402,8 @@ $(BINDIR)/par: $(PAR_OBJS)
 	mkdir -p $(BINDIR)
 	$(CC) $(LDFLAGS) $(PAR_LDLIBS) $^ -o $@
 
-debug:
-	xcodebuild -configuration Debug
-
-snapshot:
-	xcodebuild -configuration Snapshot
+# include automatic dependencies...
+-include $(OBJS:.o=.d)
 
 run: app
 	$(BINDIR)/Vico $(HOME)/src/vico

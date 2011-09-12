@@ -36,6 +36,7 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (BOOL)addData:(NSData *)data;
 - (void)invalidateSymbolsInRange:(NSRange)range;
 - (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
+- (void)pushMarks:(NSInteger)delta fromLocation:(NSUInteger)location;
 - (void)updateTabSize;
 - (void)updateWrapping;
 - (void)eachTextView:(void (^)(ViTextView *))callback;
@@ -1349,16 +1350,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	/*
 	 * Incrementally update the scope array.
 	 */
-	if (diff > 0) {
+	if (diff > 0)
 		[syntaxParser pushScopes:NSMakeRange(area.location, diff)];
-		// FIXME: also push jumps and marks
-	} else if (diff < 0) {
+	else if (diff < 0)
 		[syntaxParser pullScopes:NSMakeRange(area.location, -diff)];
-		// FIXME: also pull jumps and marks
-	}
 
-	if (diff != 0)
+	if (diff != 0) {
 		[self pushSymbols:diff fromLocation:area.location];
+		[self pushMarks:diff fromLocation:area.location];
+		// FIXME: also push jumps
+	}
 
 	// emit (delayed) event to Nu
 	[[ViEventManager defaultManager] emitDelayed:ViEventDidModifyDocument for:self with:self,
@@ -1688,6 +1689,45 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if ([name isUppercase])
 		[[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list addMark:m];
+}
+
+- (void)pushMarks:(NSInteger)delta fromLocation:(NSUInteger)location
+{
+	DEBUG(@"pushing marks from %lu", location);
+	NSMutableSet *toDelete = nil;
+	for (ViMark *mark in localMarks.list.marks) {
+		NSRange r = mark.range;
+		if (delta < 0) {
+			NSRange deletedRange = NSMakeRange(location, -delta);
+			if (r.location < location) {
+				/* the symbol isn't contained in the range */
+			} else if (NSIntersectionRange(deletedRange, r).length > 0) {
+				DEBUG(@"remove mark %@", mark);
+				if (toDelete == nil)
+					toDelete = [NSMutableSet set];
+				[toDelete addObject:mark];
+			} else {
+				/* we're past our range */
+				r.location += delta;
+				DEBUG(@"pushing mark %@ to %@", mark, NSStringFromRange(r));
+				[mark setRange:r];
+			}
+		} else { /* delta > 0 */
+			if (r.location >= location) {
+				r.location += delta;
+				DEBUG(@"pushing mark %@ to %@", mark, NSStringFromRange(r));
+				[mark setRange:r];
+			/*} else if (NSMaxRange(r) >= location) {
+				DEBUG(@"remove symbol %@", sym);
+				[symbols removeObjectAtIndex:i];*/
+			} else {
+				/* the symbol doesn't intersect the range */
+			}
+		}
+	}
+
+	for (ViMark *mark in toDelete)
+		[localMarks.list removeMark:mark];
 }
 
 #pragma mark -

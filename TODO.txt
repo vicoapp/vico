@@ -1,10 +1,8 @@
 === Before next version
 
-* zz, zt, zb leaves the status message with a 'z'
 * cmd-f (search) doesn't work until Find menu has been manually viewed once
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
-
-! crash in explorer update
+* marks should support ranges
 
 * explorer spinner is hidden by new path control
   => move it, where!? auto-hide something else?
@@ -13,7 +11,6 @@
 === Would be nice to have in next version
 * don't overwrite read-only files!
 * go back to last focused document when closing a document
-* push marks
 * implement c-w in insert mode
 * regression: symbol search no longer focuses first match when symbols are updated during filtering
 * o in visual mode should move to opposite side of selection

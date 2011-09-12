@@ -3,7 +3,7 @@
 
 @implementation ViMark
 
-@synthesize name, line, lineNumber, columnNumber, column, location;
+@synthesize name, line, lineNumber, columnNumber, column, location, range;
 @synthesize url, title, icon, document;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
@@ -41,6 +41,9 @@
 		line = aLine;
 		column = aColumn;
 
+		location = NSNotFound;
+		range = NSMakeRange(NSNotFound, 0);
+
 		lineNumber = [NSNumber numberWithUnsignedInteger:line];
 		columnNumber = [NSNumber numberWithUnsignedInteger:column];
 		document = [[NSDocumentController sharedDocumentController] documentForURL:url];
@@ -65,11 +68,14 @@
 - (void)setLocation:(NSUInteger)aLocation
 {
 	if (document) {
-		location = aLocation;
+		[self willChangeValueForKey:@"location"];
+		[self willChangeValueForKey:@"range"];
 		[self willChangeValueForKey:@"line"];
 		[self willChangeValueForKey:@"column"];
 		[self willChangeValueForKey:@"lineNumber"];
 		[self willChangeValueForKey:@"columnNumber"];
+		location = aLocation;
+		range = NSMakeRange(location, 1);
 		line = [[document textStorage] lineNumberAtLocation:aLocation];
 		column = [[document textStorage] columnAtLocation:aLocation];
 		lineNumber = [NSNumber numberWithUnsignedInteger:line];
@@ -78,7 +84,14 @@
 		[self didChangeValueForKey:@"lineNumber"];
 		[self didChangeValueForKey:@"column"];
 		[self didChangeValueForKey:@"line"];
+		[self didChangeValueForKey:@"range"];
+		[self didChangeValueForKey:@"location"];
 	}
+}
+
+- (void)setRange:(NSRange)aRange
+{
+	[self setLocation:aRange.location];
 }
 
 - (NSURL *)url

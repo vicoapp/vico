@@ -6,6 +6,7 @@
 {
 	NSString *name;
 	NSUInteger location;
+	NSRange range;
 	NSUInteger line, column;
 
 	NSNumber *lineNumber;
@@ -31,6 +32,8 @@
 @property(nonatomic,readonly) NSUInteger column;
 /** The character index of the mark, or NSNotFound if unknown. */
 @property(nonatomic,readonly) NSUInteger location;
+/** The range of the mark, or `{NSNotFound,0}` if unknown. */
+@property(nonatomic,readonly) NSRange range;
 /** The URL of the mark. */
 @property(nonatomic,readonly) NSURL *url;
 /** The icon of the mark. */
@@ -63,5 +66,6 @@
 		    location:(NSUInteger)aLocation;
 
 - (void)setLocation:(NSUInteger)aLocation;
+- (void)setRange:(NSRange)aRange;
 
 @end

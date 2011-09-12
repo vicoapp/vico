@@ -7,6 +7,7 @@
 #import "ViURLManager.h"
 #import "ViTabController.h"
 #import "ViTextView.h"
+#import "ViMarkManager.h"
 
 @class PSMTabBarControl;
 @class ViDocument;
@@ -68,6 +69,8 @@
 	IBOutlet ViSymbolController *symbolController;
 	IBOutlet NSImageView *symbolsResizeView;
 	IBOutlet NSView *symbolsView;
+
+	ViMarkStack *locationStack;
 
 	ViJumpList *jumpList;
 	BOOL jumping;
@@ -222,6 +225,7 @@
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
 - (void)gotoMark:(ViMark *)mark;
+- (ViMarkStack *)locationStack;
 
 - (IBAction)searchSymbol:(id)sender;
 - (void)gotoSymbol:(ViSymbol *)aSymbol;

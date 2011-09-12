@@ -179,7 +179,7 @@
 		NSUInteger column = [self currentScreenColumn];
 		NSUInteger glyphIndex = [[self layoutManager] glyphIndexForCharacterAtIndex:topLineLocation];
 		[self gotoScreenColumn:column fromGlyphIndex:glyphIndex];
-	} else 
+	} else
 		final_location = [[self textStorage] firstNonBlankForLineAtLocation:topLineLocation];
 
 	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1)
@@ -468,11 +468,11 @@
 	}
 }
 
-- (void)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand
+- (BOOL)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand
 {
 	DEBUG(@"filter range %@ through command %@", NSStringFromRange(range), shellCommand);
 	if ([shellCommand length] == 0 || range.length == 0)
-		return;
+		return NO;
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:range];
 
@@ -487,7 +487,11 @@
 	 * If environment is too big, the process fails with:
 	 * *** NSTask: Task create for path '/bin/bash' failed: 22, "Invalid argument".  Terminating temporary process.
 	 */
-	[ViBundle setupEnvironment:env forTextView:self selectedRange:NSMakeRange(0, 0) window:[self window] bundle:nil];
+	[ViBundle setupEnvironment:env
+		       forTextView:self
+		     selectedRange:NSMakeRange(0, 0)
+			    window:[self window]
+			    bundle:nil];
 	[task setEnvironment:env];
 
 	NSURL *baseURL = [(ViWindowController *)[[self window] windowController] baseURL];
@@ -504,6 +508,7 @@
 		    target:self
 		  selector:@selector(filter:finishedWithStatus:contextInfo:)
 	       contextInfo:[NSValue valueWithRange:range]];
+	return (runner.status == 0);
 }
 
 /* syntax: [count]!motion command(s) */
@@ -517,12 +522,7 @@
 		command.text = cmdline;
 	}
 
-	if (cmdline) {
-		[self filterRange:affectedRange throughCommand:cmdline];
-		return YES;
-	}
-
-	return NO;
+	return [self filterRange:affectedRange throughCommand:cmdline];
 }
 
 - (BOOL)format:(ViCommand *)command

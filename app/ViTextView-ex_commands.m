@@ -161,8 +161,8 @@
 {
 	if (command.naddr == 0)
 		return [ViError message:@"Non-filtering version of ! not implemented"];
-	[self filterRange:command.range throughCommand:command.arg]; // XXX: should return error on failure
-	command.caret = final_location; // XXX: need better way to return filtered range
+	if ([self filterRange:command.range throughCommand:command.arg])
+		command.caret = command.range.location;
 	return nil;
 }
 

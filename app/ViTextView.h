@@ -381,7 +381,7 @@
 @end
 
 @interface ViTextView (vi_commands)
-- (void)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand;
+- (BOOL)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand;
 - (BOOL)insert:(ViCommand *)command;
 - (BOOL)move_left:(ViCommand *)command;
 - (BOOL)move_right:(ViCommand *)command;

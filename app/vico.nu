@@ -24,6 +24,7 @@
 
 (global eventManager (ViEventManager defaultManager))
 (global event-manager (ViEventManager defaultManager))
+(global mark-manager (ViMarkManager sharedManager))
 (global NSApp (NSApplication sharedApplication))
 
 (global NSStreamEventNone 0)

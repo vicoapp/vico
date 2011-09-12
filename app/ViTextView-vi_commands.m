@@ -2956,7 +2956,6 @@ again:
 
 	// XXX: scope for ex command?
 
-	final_location = start_location;
 	return [self evalExString:exline];
 }
 

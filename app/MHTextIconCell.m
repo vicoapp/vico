@@ -9,7 +9,7 @@
 
 @synthesize image;
 @synthesize modified;
-@synthesize badge;
+@synthesize statusImage;
 
 - (void)editWithFrame:(NSRect)aRect
                inView:(NSView *)controlView
@@ -72,11 +72,11 @@
 		[image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
 	}
 
-	if (badge != nil) {
-		NSSize badgeSize = [badge size];
-		NSPoint badgePoint = NSMakePoint(NSMaxX(cellFrame) - badgeSize.width, cellFrame.origin.y);
-		badgePoint.y += ceil((cellFrame.size.height + badgeSize.height) / 2);
-		[badge compositeToPoint:badgePoint operation:NSCompositeSourceOver];
+	if (statusImage != nil) {
+		imageSize = [statusImage size];
+		NSPoint p = NSMakePoint(NSMaxX(cellFrame) - imageSize.width, cellFrame.origin.y);
+		p.y += ceil((cellFrame.size.height + imageSize.height) / 2);
+		[statusImage compositeToPoint:p operation:NSCompositeSourceOver];
 	}
 
 	if (modified) {
@@ -93,15 +93,15 @@
 	CGFloat d = (cellFrame.size.height - [[self font] pointSize]) / 3.0;
 	cellFrame.origin.y += d;
 	cellFrame.size.height -= 2*d;
-	if (badge)
-		cellFrame.size.width -= 16;
+	if (statusImage)
+		cellFrame.size.width -= [statusImage size].width;
 	[super drawWithFrame:cellFrame inView:controlView];
 }
 
 - (NSSize)cellSize
 {
 	NSSize cellSize = [super cellSize];
-	cellSize.width += (image ? [image size].width : 0) + (badge ? [badge size].width : 0) + 4;
+	cellSize.width += (image ? [image size].width : 0) + (statusImage ? [statusImage size].width : 0) + 4;
 	return cellSize;
 }
 

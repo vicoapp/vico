@@ -63,7 +63,7 @@
 		expandedSet = [NSMutableSet set];
 		contextObjects = [NSMutableSet set];
 		width = 200.0;
-		badges = [NSMutableDictionary dictionary];
+		statusImages = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -1702,24 +1702,23 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	return 20;
 }
 
-- (void)setBadge:(NSImage *)image forURL:(NSURL *)url
+- (void)setStatusImage:(NSImage *)image forURL:(NSURL *)url
 {
 	NSParameterAssert(image);
 	NSParameterAssert(url);
-	[image setSize:NSMakeSize(16, 16)];
-	[badges setObject:image forKey:[url absoluteURL]];
+	[statusImages setObject:image forKey:[url absoluteURL]];
 	[explorer reloadData];
 }
 
-- (void)setBadges:(NSDictionary *)dictionary
+- (void)setStatusImages:(NSDictionary *)dictionary
 {
-	badges = [dictionary mutableCopy];
+	statusImages = [dictionary mutableCopy];
 	[explorer reloadData];
 }
 
-- (void)clearBadges
+- (void)clearStatusImages
 {
-	[badges removeAllObjects];
+	[statusImages removeAllObjects];
 	[explorer reloadData];
 }
 
@@ -1734,7 +1733,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 		ViFile *file = [self fileForItem:item];
 		ViDocument *doc = [docController documentForURLQuick:file.targetURL];
 		[(MHTextIconCell *)cell setModified:[doc isDocumentEdited]];
-		[(MHTextIconCell *)cell setBadge:[badges objectForKey:file.url]];
+		[(MHTextIconCell *)cell setStatusImage:[statusImages objectForKey:file.url]];
 		[cell setFont:font];
 		[cell setImage:[file icon]];
 	}

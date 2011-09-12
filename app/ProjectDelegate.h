@@ -54,7 +54,7 @@
 
 	ViJumpList *history;
 
-	NSMutableDictionary *badges;
+	NSMutableDictionary *statusImages;
 
         /*
          * Since we can't pass an object through a void* contextInfo and

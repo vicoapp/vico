@@ -52,6 +52,7 @@
 			ViMark *mark = object;
 			ViWindowController *windowController = [ViWindowController currentWindowController];
 			[windowController gotoMark:mark];
+			[windowController showWindow:nil];
 		} else {
 			NSArray *nodes = [markListController selectedNodes];
 			INFO(@"got selected nodes %@", nodes);

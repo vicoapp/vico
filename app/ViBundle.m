@@ -264,6 +264,8 @@
 		NSSet *selectedURLs = [explorer clickedURLs];
 
 		[env setObject:[url absoluteString] forKey:@"TM_PROJECT_URL"];
+		if ([url isFileURL])
+			[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
 
 		NSMutableString *urls = [NSMutableString string];
 		for (url in selectedURLs) {
@@ -277,8 +279,6 @@
 			[env setObject:[url absoluteString] forKey:@"TM_SELECTED_URL"];
 
 		if ([url isFileURL]) {
-			[env setObject:[url path] forKey:@"TM_PROJECT_DIRECTORY"];
-
 			NSMutableString *paths = [NSMutableString string];
 			for (url in selectedURLs) {
 				[paths appendFormat:[NSString stringWithFormat:@"'%@' ",

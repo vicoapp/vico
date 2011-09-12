@@ -136,6 +136,16 @@ int logIndent = 0;
 						     name:NSViewFrameDidChangeNotification
 						   object:self];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(windowBecameKey:)
+						     name:NSWindowDidBecomeKeyNotification
+						   object:[self window]];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(windowResignedKey:)
+						     name:NSWindowDidResignKeyNotification
+						   object:[self window]];
+
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	[self setCaret:0];
 	[self updateStatus];

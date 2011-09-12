@@ -373,6 +373,7 @@
 @interface ViTextView (cursor)
 - (void)invalidateCaretRect;
 - (void)updateCaret;
+- (void)forceCursorColor:(BOOL)state;
 - (void)setCursorColor;
 @end
 

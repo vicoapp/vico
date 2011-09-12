@@ -163,8 +163,32 @@
 	[caretBlinkTimer invalidate];
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
-	[self setCursorColor];
+	[self forceCursorColor:NO];
 	return [super resignFirstResponder];
+}
+
+- (void)forceCursorColor:(BOOL)state
+{
+	/*
+	 * Change the IBeamCursor method implementation.
+	 */
+
+	if (![self isFieldEditor]) {
+		Class class = [NSCursor class];
+		IMP whiteIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class],
+			@selector(whiteIBeamCursor)));
+
+		DEBUG(@"setting %s cursor", state ? "WHITE" : "NORMAL");
+
+		Method defaultIBeamCursorMethod = class_getClassMethod(class, @selector(IBeamCursor));
+		method_setImplementation(defaultIBeamCursorMethod,
+			state ? whiteIBeamCursorIMP : [NSCursor defaultIBeamCursorImplementation]);
+
+		/*
+		 * We always set the i-beam cursor.
+		 */
+		[[NSCursor IBeamCursor] set];
+	}
 }
 
 - (void)setCursorColor
@@ -174,8 +198,7 @@
 							 fromView:nil]
 					inRect:[self bounds]];
 
-		BOOL shouldBeWhite = mouseInside && backgroundIsDark && ![self isHidden];
-		Class class = [NSCursor class];
+		BOOL shouldBeWhite = mouseInside && backgroundIsDark && ![self isHidden] && [[self window] isKeyWindow];
 
 		DEBUG(@"caret %s be white (bg is %s, mouse is %s, %shidden)",
 			shouldBeWhite ? "SHOULD" : "should NOT",
@@ -183,21 +206,7 @@
 			mouseInside ? "inside" : "outside",
 			[self isHidden] ? "" : "not ");
 
-		/*
-		 * Change the IBeamCursor method implementation.
-		 */
-
-		IMP whiteIBeamCursorIMP = method_getImplementation(class_getClassMethod([NSCursor class],
-			@selector(whiteIBeamCursor)));
-
-		Method defaultIBeamCursorMethod = class_getClassMethod(class, @selector(IBeamCursor));
-		method_setImplementation(defaultIBeamCursorMethod,
-			shouldBeWhite ? whiteIBeamCursorIMP : [NSCursor defaultIBeamCursorImplementation]);
-
-		/*
-		 * We always set the i-beam cursor.
-		 */
-		[[NSCursor IBeamCursor] set];
+		[self forceCursorColor:shouldBeWhite];
 	}
 }
 
@@ -208,7 +217,7 @@
 
 - (void)mouseExited:(NSEvent *)anEvent
 {
-	[self setCursorColor];
+	[self forceCursorColor:NO];
 }
 
 /* Hiding or showing the view does not always produce mouseEntered/Exited events. */
@@ -220,8 +229,18 @@
 
 - (void)viewDidHide
 {
-	[self setCursorColor];
+	[self forceCursorColor:NO];
 	[super viewDidHide];
+}
+
+- (void)windowBecameKey:(NSNotification *)notification
+{
+	[self setCursorColor];
+}
+
+- (void)windowResignedKey:(NSNotification *)notification
+{
+	[self forceCursorColor:NO];
 }
 
 @end

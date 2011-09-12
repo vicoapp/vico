@@ -97,11 +97,14 @@
 	NSClipView *clipView = [scrollView contentView];
 
         NSRect visibleRect = [clipView bounds];
-        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect
+							     inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange
+							 actualGlyphRange:NULL];
 	end_location = final_location = range.location;
 
-	NSRect highRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphRange.location, 1) inTextContainer:[self textContainer]];
+	NSRect highRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(glyphRange.location, 1)
+							  inTextContainer:[self textContainer]];
 	[clipView scrollToPoint:NSMakePoint(0, highRect.origin.y)];
 	[scrollView reflectScrolledClipView:clipView];
 
@@ -115,8 +118,10 @@
 
 	NSScrollView *scrollView = [self enclosingScrollView];
         NSRect visibleRect = [[scrollView contentView] bounds];
-        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect
+							     inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange
+							 actualGlyphRange:NULL];
 
 	NSUInteger highLine = [[self textStorage] lineNumberAtLocation:range.location];
 	NSUInteger lowLine = [[self textStorage] lineNumberAtLocation:NSMaxRange(range) - 1];
@@ -135,15 +140,18 @@
 	NSClipView *clipView = [scrollView contentView];
 
         NSRect visibleRect = [clipView bounds];
-        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect
+							     inTextContainer:[self textContainer]];
+        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange
+							 actualGlyphRange:NULL];
 
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
 	end_location = final_location = bol;
 
 	if (NSMaxRange(range) < [[self textStorage] length]) {
-		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1) inTextContainer:[self textContainer]];
+		NSRect lowRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(NSMaxRange(glyphRange) - 1, 1)
+								 inTextContainer:[self textContainer]];
 		NSPoint topPoint = NSMakePoint(0, lowRect.origin.y - visibleRect.size.height + lowRect.size.height);
 		[clipView scrollToPoint:topPoint];
 		[scrollView reflectScrolledClipView:clipView];
@@ -174,8 +182,10 @@
 	} else 
 		final_location = [[self textStorage] firstNonBlankForLineAtLocation:topLineLocation];
 
-	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1) actualCharacterRange:NULL];
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange inTextContainer:[self textContainer]];
+	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1)
+								 actualCharacterRange:NULL];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange
+						      inTextContainer:[self textContainer]];
 	NSRect bounds = [clipView bounds];
 	NSPoint p;
 	p.x = bounds.origin.x;

@@ -301,6 +301,8 @@
 	}
 
 	[self endUndoGroup];
+
+	[[ViWindowController currentWindowController] checkDocumentsChanged];
 }
 
 - (void)performBundleItem:(id)bundleItem

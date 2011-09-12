@@ -44,12 +44,11 @@
 - (void)addMark:(ViMark *)mark;
 - (void)removeMark:(ViMark *)mark;
 
-- (void)rewind;
-- (NSUInteger)first;
-- (NSUInteger)last;
-- (void)setIndex:(NSUInteger)anIndex;
+- (ViMark *)first;
+- (ViMark *)last;
 - (ViMark *)next;
 - (ViMark *)previous;
+- (ViMark *)current;
 
 @end
 

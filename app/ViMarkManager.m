@@ -108,7 +108,7 @@
 		marks = [NSMutableArray array];
 		marksByName = [NSMutableDictionary dictionary];
 		groups = [NSMutableDictionary dictionary];
-		currentIndex = -1;
+		currentIndex = NSNotFound;
 	}
 	return self;
 }
@@ -156,7 +156,7 @@
 - (void)removeMark:(ViMark *)mark
 {
 	[self willChangeValueForKey:@"marks"];
-	if (mark.name) 
+	if (mark.name)
 		[marksByName removeObjectForKey:mark.name];
 	[marks removeObject:mark]; // XXX: linear search!
 	[self didChangeValueForKey:@"marks"];
@@ -189,34 +189,53 @@
 	return [super valueForUndefinedKey:key];
 }
 
-- (void)rewind
+- (void)setSelectionIndexes:(NSIndexSet *)indexSet
 {
-	currentIndex = 0;
+	DEBUG(@"got selection indexes %@", indexSet);
+	currentIndex = [indexSet firstIndex];
 }
 
-- (NSUInteger)first
+- (NSIndexSet *)selectionIndexes
 {
-	return 0;
+	if (currentIndex >= 0 && currentIndex < [marks count])
+		return [NSIndexSet indexSetWithIndex:currentIndex];
+	return [NSIndexSet indexSet];
 }
 
-- (NSUInteger)last
+- (ViMark *)markAtIndex:(NSInteger)anIndex
 {
-	return [marks count] - 1;
-}
-
-- (void)setIndex:(NSUInteger)anIndex
-{
-	currentIndex = anIndex;
+	if (anIndex >= 0 && anIndex < [marks count]) {
+		[self willChangeValueForKey:@"selectionIndexes"];
+		currentIndex = anIndex;
+		[self didChangeValueForKey:@"selectionIndexes"];
+		return [marks objectAtIndex:currentIndex];
+	}
+	return nil;
 }
 
 - (ViMark *)next
 {
-	return nil;
+	return [self markAtIndex:currentIndex + 1];
 }
 
 - (ViMark *)previous
 {
-	return nil;
+	return [self markAtIndex:currentIndex - 1];
+}
+
+- (ViMark *)first
+{
+	return [self markAtIndex:0];
+}
+
+- (ViMark *)last
+{
+	return [self markAtIndex:[marks count] - 1];
+}
+
+- (ViMark *)current
+{
+	return [self markAtIndex:currentIndex];
 }
 
 - (NSString *)description

@@ -12,7 +12,6 @@
 === Would be nice to have in next version
 * don't overwrite read-only files!
 * implement c-w in insert mode
-* o in visual mode should move to opposite side of selection
 
 
 === Probably not in next version

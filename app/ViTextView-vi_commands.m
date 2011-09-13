@@ -88,6 +88,17 @@
 	return TRUE;
 }
 
+- (BOOL)visual_other:(ViCommand *)command
+{
+	if (mode != ViVisualMode)
+		return NO;
+
+	NSUInteger tmp = visual_start_location;
+	visual_start_location = [self caret];
+	final_location = tmp;
+	return YES;
+}
+
 /* syntax: [count]H */
 - (BOOL)move_high:(ViCommand *)command
 {

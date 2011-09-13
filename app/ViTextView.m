@@ -1968,6 +1968,7 @@ int logIndent = 0;
 	BOOL leaveVisualMode = NO;
 	if (mode == ViVisualMode && !command.isMotion &&
 	    command.action != @selector(visual:) &&
+	    command.action != @selector(visual_other:) &&
 	    command.action != @selector(visual_line:)) {
 		/* If in visual mode, edit commands leave visual mode. */
 		leaveVisualMode = YES;

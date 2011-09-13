@@ -653,6 +653,19 @@
 	return urlSet;
 }
 
+- (NSSet *)clickedFiles
+{
+	NSMutableSet *fileSet = [NSMutableSet set];
+	NSIndexSet *set = [self clickedIndexes];
+	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		id item = [explorer itemAtRow:idx];
+		ViFile *file = [self fileForItem:item];
+		[fileSet addObject:file];
+	}];
+
+	return fileSet;
+}
+
 - (NSSet *)clickedFolderURLs
 {
 	NSMutableSet *parentSet = [NSMutableSet set];

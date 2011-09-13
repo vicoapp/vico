@@ -103,5 +103,6 @@
 
 - (NSSet *)clickedURLs;
 - (NSSet *)clickedFolderURLs;
+- (NSSet *)clickedFiles;
 
 @end

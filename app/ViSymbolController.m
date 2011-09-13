@@ -145,6 +145,7 @@
 			[self updateSelectedSymbolForLocation:[[docView textView] caret]];
 		}
 	}
+	symbolUpdateDuringFiltering = NO;
 }
 
 - (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor

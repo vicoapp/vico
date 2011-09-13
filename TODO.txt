@@ -1,6 +1,7 @@
 === Before next version
 
-* cmd-f (search) doesn't work until Find menu has been manually viewed once
+* group by attribute != grouped display string
+
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
 * marks should support ranges
 
@@ -19,8 +20,6 @@
 === Probably not in next version
 
 * don't highlight menu separators (pragma mark -) when following caret in symbol list
-* show vi command menu items in explorer menu, and symbol list menu (people do not read the help book)
-* objc 'log' snippet lacks ending parens (compared to TM)
 * show baseURL in window title!
 * cw<cmd-v> and repeat inserts pasteboard twice
 * repeating completed text should not re-trigger completion!

@@ -83,5 +83,6 @@ withParser:(NuParser *)parser
 - (NSString *)getExStringForCommand:(ViCommand *)command;
 
 - (NSWindow *)keyWindowBeforeMainMenuTracking;
+- (void)forceUpdateMenu:(NSMenu *)menu;
 
 @end

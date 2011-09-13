@@ -309,6 +309,8 @@ updateMeta(void)
 	for (item in array)
 		[encodingMenu addItem:item];
 
+	[self forceUpdateMenu:[NSApp mainMenu]];
+
 	[TMFileURLProtocol registerProtocol];
 	[TxmtURLProtocol registerProtocol];
 
@@ -363,11 +365,11 @@ updateMeta(void)
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(beginTrackingMainMenu:)
 						     name:NSMenuDidBeginTrackingNotification
-						   object:[NSApp mainMenu]];
+						   object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(endTrackingMainMenu:)
 						     name:NSMenuDidEndTrackingNotification
-						   object:[NSApp mainMenu]];
+						   object:nil];
 
 	NSWindow *dummyWindow = [[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:0 backing:0 defer:YES];
 	if ([dummyWindow respondsToSelector:@selector(toggleFullScreen:)]) {
@@ -641,17 +643,22 @@ additionalBindings:(NSDictionary *)bindings
 }
 
 #pragma mark -
+#pragma mark Updating normal mode menu items
 
 - (void)beginTrackingMainMenu:(NSNotification *)notification
 {
-	menuTrackedKeyWindow = [NSApp keyWindow];
-	trackingMainMenu = YES;
+	if ([[notification object] delegate] == self) {
+		menuTrackedKeyWindow = [NSApp keyWindow];
+		trackingMainMenu = YES;
+	}
 }
 
 - (void)endTrackingMainMenu:(NSNotification *)notification
 {
-	menuTrackedKeyWindow = nil;
-	trackingMainMenu = NO;
+	if ([[notification object] delegate] == self) {
+		menuTrackedKeyWindow = nil;
+		trackingMainMenu = NO;
+	}
 }
 
 - (NSWindow *)keyWindowBeforeMainMenuTracking
@@ -696,6 +703,7 @@ additionalBindings:(NSDictionary *)bindings
 
 	ViRegexp *rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
+	/* Do we have a selection? */
 	BOOL hasSelection = NO;
 	NSWindow *window = [[NSApplication sharedApplication] mainWindow];
 	NSResponder *target = [window firstResponder];
@@ -798,6 +806,21 @@ additionalBindings:(NSDictionary *)bindings
 			[item setTag:4001];	/* mark as already updated */
 		}
 	}
+}
+
+- (void)forceUpdateMenu:(NSMenu *)menu
+{
+	trackingMainMenu = YES;
+
+	[self menuNeedsUpdate:menu];
+
+	for (NSMenuItem *item in [menu itemArray]) {
+		NSMenu *submenu = [item submenu];
+		if (submenu)
+			[self forceUpdateMenu:submenu];
+	}
+
+	trackingMainMenu = NO;
 }
 
 #pragma mark -

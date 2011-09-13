@@ -52,7 +52,7 @@
 	command = aCommand;
 	commandTitle = [command visualKeyString];
 
-	attributes = [NSMutableDictionary dictionaryWithObject:aFont
+	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0]
 							forKey:NSFontAttributeName];
 	titleSize = [aTitle sizeWithAttributes:attributes];
 	commandSize = [commandTitle sizeWithAttributes:attributes];
@@ -97,6 +97,8 @@
 		[[NSBezierPath bezierPathWithRect:[self bounds]] fill];
 	}
 
+	attributes = [NSMutableDictionary dictionaryWithObject:[[[self enclosingMenuItem] menu] font]
+							forKey:NSFontAttributeName];
 	if (!enabled)
 		[attributes setObject:[NSColor disabledControlTextColor]
 			       forKey:NSForegroundColorAttributeName];

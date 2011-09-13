@@ -2492,6 +2492,7 @@ int logIndent = 0;
 		    keyEquivalent:@""];
 
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:n];
+	[menu setFont:[NSFont menuFontOfSize:0]];
 
 	return menu;
 }

@@ -17,6 +17,7 @@
 #import "ViWindow.h"
 #import "ViEventManager.h"
 #import "ViPathComponentCell.h"
+#import "ViCommandMenuItemView.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -89,6 +90,8 @@
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
+	[actionMenu setDelegate:[NSApp delegate]];
+	[actionMenu setFont:[NSFont menuFontOfSize:0]];
 
 	explorerView.backgroundColor = [explorer backgroundColor];
 
@@ -347,6 +350,38 @@
 	                               clickCount:1
 	                                 pressure:0.0];
 	[NSMenu popUpContextMenu:actionMenu withEvent:ev forView:sender];
+}
+
+/* Takes a string of characters and creates a macro of it.
+ * Then feeds it into the key manager.
+ */
+- (BOOL)input:(NSString *)inputString
+{
+	NSArray *keys = [inputString keyCodes];
+	if (keys == nil) {
+		INFO(@"invalid key sequence: %@", inputString);
+		return NO;
+	}
+
+	BOOL interactive = (window != nil);
+	return [explorer.keyManager runAsMacro:inputString interactively:interactive];
+}
+
+- (IBAction)performNormalModeMenuItem:(id)sender
+{
+	if (explorer.keyManager.parser.partial) {
+		[[[window windowController] nextRunloop] message:@"Vi command interrupted."];
+		[explorer.keyManager.parser reset];
+	}
+
+	ViCommandMenuItemView *view = (ViCommandMenuItemView *)[sender view];
+	if (view) {
+		NSString *command = view.command;
+		if (command) {
+			DEBUG(@"performing command: %@", command);
+			[self input:command];
+		}
+	}
 }
 
 - (void)sftpSheetDidEnd:(NSWindow *)sheet

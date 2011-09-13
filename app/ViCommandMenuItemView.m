@@ -124,6 +124,24 @@
 	[commandTitle drawAtPoint:p withAttributes:attributes];
 }
 
+- (void)viewWillMoveToWindow:(NSWindow *)newWindow
+{
+	NSMenuItem *item = [self enclosingMenuItem];
+	[super viewWillMoveToWindow:newWindow];
+	DEBUG(@"item %@ moves to window %@", item, newWindow);
+
+	if (newWindow == nil) {
+		if ([item isEnabled]) {
+			NSMenu *menu = [item menu];
+			NSInteger itemIndex = [menu indexOfItem:item];
+
+			// XXX: Hack to force the menuitem to loose the highlight
+			[[menu nextRunloop] removeItemAtIndex:itemIndex];
+			[[menu nextRunloop] insertItem:item atIndex:itemIndex];
+		}
+	}
+}
+
 - (void)performAction
 {
 	NSMenuItem *item = [self enclosingMenuItem];
@@ -136,10 +154,6 @@
 	[menu cancelTracking];
 	[[menu nextRunloop] performActionForItemAtIndex:itemIndex];
 	[[menu nextRunloop] update];
-
-	// XXX: Hack to force the menuitem to loose the highlight
-	[[menu nextRunloop] removeItemAtIndex:itemIndex];
-	[[menu nextRunloop] insertItem:item atIndex:itemIndex];
 }
 
 - (void)mouseUp:(NSEvent *)event
@@ -147,9 +161,15 @@
 	[self performAction];
 }
 
+- (BOOL)acceptsFirstResponder
+{
+	return YES;
+}
+
 - (void)keyDown:(NSEvent *)event
 {
 	NSUInteger keyCode = [event normalizedKeyCode];
+
 	if (keyCode == 0xa || keyCode == 0xd || keyCode == ' ')
 		[self performAction];
 	else

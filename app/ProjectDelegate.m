@@ -937,8 +937,11 @@
 	if ([self outlineView:explorer isItemExpandable:item])
 		return;
 
-	// XXX: open in splits instead if alt key pressed?
-	[self openDocuments:sender];
+	/* Open in splits instead if alt key pressed. */
+	if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+		[self openInSplit:sender];
+	else
+		[self openDocuments:sender];
 }
 
 - (void)explorerDoubleClick:(id)sender

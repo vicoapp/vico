@@ -917,6 +917,9 @@
 
 - (void)explorerClick:(id)sender
 {
+	if ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)
+		return;
+
 	NSIndexSet *set = [explorer selectedRowIndexes];
 
 	if ([set count] == 0) {

@@ -467,6 +467,9 @@ updateMeta(void)
 	[[ViEventManager defaultManager] emit:ViEventDidBecomeActive for:nil with:nil];
 }
 
+#pragma mark -
+#pragma mark Interface actions
+
 - (IBAction)showPreferences:(id)sender
 {
 	[[ViPreferencesController sharedPreferences] show];
@@ -503,6 +506,17 @@ extern BOOL makeNewWindowInsteadOfTab;
 {
 	NSString *locBookName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleHelpBookName"];
 	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"terminalUsage" inBook:locBookName];
+}
+
+- (IBAction)visitWebsite:(id)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
+}
+
+- (IBAction)editSiteScript:(id)sender
+{
+	NSURL *siteURL = [NSURL fileURLWithPath:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"]];
+	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:siteURL display:YES error:nil];
 }
 
 #pragma mark -
@@ -784,17 +798,6 @@ additionalBindings:(NSDictionary *)bindings
 			[item setTag:4001];	/* mark as already updated */
 		}
 	}
-}
-
-- (IBAction)visitWebsite:(id)sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.vicoapp.com/"]];
-}
-
-- (IBAction)editSiteScript:(id)sender
-{
-	NSURL *siteURL = [NSURL fileURLWithPath:[[ViAppController supportDirectory] stringByAppendingPathComponent:@"site.nu"]];
-	[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:siteURL display:YES error:nil];
 }
 
 #pragma mark -

@@ -2229,7 +2229,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		if (command.force) {
 			ViDocument *doc = [self currentDocument];
 			[doc revertDocumentToSaved:nil];
-			command.caret = 0;
 		}
 	} else {
 		NSURL *url = [self parseExFilename:command.arg];

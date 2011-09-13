@@ -783,10 +783,10 @@ additionalBindings:(NSDictionary *)bindings
 					command = [title substringWithRange:(hasSelection ? nrange : vrange)];
 					DEBUG(@"disabled command is [%@]", command);
 					[item setEnabled:NO];
-					[item setAction:NULL];
 				} else {
 					[item setEnabled:YES];
-					[item setAction:@selector(performNormalModeMenuItem:)];
+					if ([item action] == NULL)
+						[item setAction:@selector(performNormalModeMenuItem:)];
 				}
 
 				ViCommandMenuItemView *view = (ViCommandMenuItemView *)[item view];

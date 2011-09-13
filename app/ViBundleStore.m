@@ -276,17 +276,27 @@ static NSString *bundlesDirectory = nil;
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
 	NSUInteger longestMatch = 0ULL;
+	NSUInteger prefixLength = [prefix length];
+	NSCharacterSet *atomicSnippetSet = [NSCharacterSet alphanumericCharacterSet];
 
 	for (ViBundle *bundle in [self allBundles])
 		for (ViBundleItem *item in [bundle items])
 			if ([item tabTrigger] &&
 			    [prefix hasSuffix:[item tabTrigger]] &&
 			    ([item mode] == ViAnyMode || [item mode] == mode)) {
+				NSUInteger triggerLength = [[item tabTrigger] length];
+
+				/*
+				 * "m" should NOT match the prefix "mm", but may match "#m".
+                                 */
+				if (prefixLength > triggerLength &&
+				    [atomicSnippetSet characterIsMember:[prefix characterAtIndex:prefixLength - triggerLength - 1]])
+					continue;
+
 				/*
 				 * Try to match as much of the tab trigger as possible.
 				 * Favor longer matching tab trigger words.
 				 */
-				NSUInteger triggerLength = [[item tabTrigger] length];
 				if (triggerLength > longestMatch) {
 					[matches removeAllObjects];
 					longestMatch = triggerLength;

@@ -152,5 +152,16 @@
 	return (position + 1 >= [jumps count]);
 }
 
+- (void)enumerateJumpsBackwardsUsingBlock:(void (^)(ViJump *jump, BOOL *stop))block
+{
+	NSInteger pos = position - 1;
+	DEBUG(@"navigating jumplist %@ backwards from %li", jumps, pos);
+	BOOL stop = NO;
+	while (!stop && pos >= 0) {
+		block([jumps objectAtIndex:pos], &stop);
+		--pos;
+	}
+}
+
 @end
 

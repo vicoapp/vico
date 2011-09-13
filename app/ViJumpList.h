@@ -43,5 +43,8 @@
                  line:(NSUInteger *)linePtr
                column:(NSUInteger *)columnPtr
                  view:(NSView **)viewPtr;
+
+- (void)enumerateJumpsBackwardsUsingBlock:(void (^)(ViJump *jump, BOOL *stop))block;
+
 @end
 

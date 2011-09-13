@@ -11,7 +11,6 @@
 
 === Would be nice to have in next version
 * don't overwrite read-only files!
-* go back to last focused document when closing a document
 * implement c-w in insert mode
 * regression: symbol search no longer focuses first match when symbols are updated during filtering
 * o in visual mode should move to opposite side of selection

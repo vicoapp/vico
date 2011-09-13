@@ -942,6 +942,19 @@ static ViWindowController	*currentWindowController = nil;
 	[[symbolController nextRunloop] symbolsUpdate:nil];
 }
 
+- (ViDocument *)previouslyActiveDocument
+{
+	DEBUG(@"returning previously active document (currently %@)", [self currentDocument]);
+	__block ViDocument *doc = nil;
+	[jumpList enumerateJumpsBackwardsUsingBlock:^(ViJump *jump, BOOL *stop) {
+		INFO(@"got jump %@", jump);
+		doc = [self documentForURL:jump.url];
+		if (doc)
+			*stop = YES;
+	}];
+	return doc ?: [documents lastObject];
+}
+
 - (void)closeDocumentView:(id<ViViewController>)viewController
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow
@@ -991,12 +1004,17 @@ static ViWindowController	*currentWindowController = nil;
 	if ([[tabController views] count] == 0) {
 		if ([tabView numberOfTabViewItems] == 1)
 			[tabBar disableAnimations];
+
+		ViDocument *previousDocument = [self previouslyActiveDocument];
+		BOOL preJumping = jumping;
+		jumping = NO;
 		[self closeTabController:tabController];
+		jumping = preJumping;
 
 		if ([tabView numberOfTabViewItems] == 0) {
 			DEBUG(@"closed last tab, got documents: %@", documents);
 			if ([documents count] > 0)
-				[self selectDocument:[documents objectAtIndex:0]];
+				[self selectDocument:previousDocument];
 			else if (canCloseWindow)
 				[[self window] close];
 			else {
@@ -1007,7 +1025,8 @@ static ViWindowController	*currentWindowController = nil;
 				[self addDocument:newDoc];
 				[self selectDocumentView:[self createTabForDocument:newDoc]];
 			}
-		}
+		} else
+			[self selectDocument:previousDocument];
 		[tabBar enableAnimations];
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.

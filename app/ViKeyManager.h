@@ -9,6 +9,8 @@
 @protocol ViKeyManagerTarget <NSObject>
 @optional
 
+- (ViScope *)currentScopeForKeyManager:(ViKeyManager *)aKeyManager;
+
 /** Intercept keys before parsing.
  * @param aKeyManager The key manager handling the event.
  * @param keyCode The key code that is being parsed.

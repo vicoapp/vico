@@ -309,7 +309,11 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
-	return [self performKeyEquivalent:theEvent inScope:nil];
+	ViScope *scope = nil;
+	if ([[self target] respondsToSelector:@selector(currentScopeForKeyManager:)])
+		scope = [[self target] performSelector:@selector(currentScopeForKeyManager:)
+					    withObject:self];
+	return [self performKeyEquivalent:theEvent inScope:scope];
 }
 
 - (void)keyDown:(NSEvent *)theEvent inScope:(ViScope *)scope
@@ -319,7 +323,12 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[self keyDown:theEvent inScope:nil];
+	ViScope *scope = nil;
+	if ([[self target] respondsToSelector:@selector(currentScopeForKeyManager:)])
+		scope = [[self target] performSelector:@selector(currentScopeForKeyManager:)
+					    withObject:self];
+	DEBUG(@"scope is %@", scope);
+	[self keyDown:theEvent inScope:scope];
 }
 
 @end

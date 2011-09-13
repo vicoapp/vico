@@ -19,6 +19,7 @@
 - (NSString *)inputOfType:(NSString *)type
                  command:(ViBundleCommand *)command
                    range:(NSRange *)rangePtr
+		envRange:(NSRange *)envRangePtr
 {
 	NSString *inputText = nil;
 
@@ -26,26 +27,34 @@
 		NSRange sel = [self selectedRange];
 		if (sel.length > 0) {
 			*rangePtr = sel;
+			*envRangePtr = sel;
 			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 		}
 	} else if ([type isEqualToString:@"document"] || type == nil) {
 		inputText = [[self textStorage] string];
 		*rangePtr = NSMakeRange(0, [[self textStorage] length]);
+		*envRangePtr = NSMakeRange(NSNotFound, 0);
 	} else if ([type isEqualToString:@"scope"]) {
 		*rangePtr = [document rangeOfScopeSelector:[command scopeSelector] atLocation:[self caret]];
+		*envRangePtr = *rangePtr;
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
 		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];
+		*envRangePtr = *rangePtr;
 	} else if ([type isEqualToString:@"line"]) {
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:[self caret]];
 		*rangePtr = NSMakeRange(bol, eol - bol);
+		*envRangePtr = *rangePtr;
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"character"]) {
 		if ([self caret] < [[self textStorage] length]) {
 			*rangePtr = NSMakeRange([self caret], 1);
+			*envRangePtr = *rangePtr;
 			inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 		}
+	} else {
+		*envRangePtr = NSMakeRange(NSNotFound, 0);
 	}
 
 	return inputText;
@@ -53,18 +62,22 @@
 
 - (NSString *)inputForCommand:(ViBundleCommand *)command
                        range:(NSRange *)rangePtr
+		    envRange:(NSRange *)envRangePtr
 {
 	NSString *inputText = [self inputOfType:[command input]
 	                                command:command
-	                                  range:rangePtr];
+	                                  range:rangePtr
+				       envRange:envRangePtr];
 	if (inputText == nil)
 		inputText = [self inputOfType:[command fallbackInput]
 		                      command:command
-		                        range:rangePtr];
+		                        range:rangePtr
+				     envRange:envRangePtr];
 
 	if (inputText == nil) {
 		inputText = @"";
 		*rangePtr = NSMakeRange([self caret], 0);
+		*envRangePtr = *rangePtr;
 	}
 
 	return inputText;
@@ -81,7 +94,8 @@
 	}
 
 	NSRange inputRange;
-	NSString *inputText = [self inputForCommand:command range:&inputRange];
+	NSRange envInputRange;
+	NSString *inputText = [self inputForCommand:command range:&inputRange envRange:&envInputRange];
 
 	NSRange selectedRange;
 	if ([[command input] isEqualToString:@"document"] ||
@@ -123,7 +137,7 @@
 		chmod(templateFilename, 0700);
 		NSFileManager *fm = [NSFileManager defaultManager];
 		shellCommand = [fm stringWithFileSystemRepresentation:templateFilename
-		                                               length:strlen(templateFilename)];
+							       length:strlen(templateFilename)];
 	}
 
 	DEBUG(@"input text = [%@], range = %@", inputText, NSStringFromRange(inputRange));
@@ -137,9 +151,17 @@
 	}
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
-	[ViBundle setupEnvironment:env forTextView:self window:[self window] bundle:[command bundle]];
+	[ViBundle setupEnvironment:env
+		       forTextView:self
+			inputRange:envInputRange
+			    window:[self window]
+			    bundle:[command bundle]];
 	[task setEnvironment:env];
-	//DEBUG(@"environment: %@", env);
+
+#ifndef NO_DEBUG
+	[env removeObjectForKey:@"PS1"];
+	DEBUG(@"environment: %@", env);
+#endif
 
 	NSURL *baseURL = [[document fileURL] URLByDeletingLastPathComponent];
 	if ([baseURL isFileURL])
@@ -213,11 +235,16 @@
 		if (mode == ViVisualMode)
 			[self setNormalMode];
 
-		if ([outputFormat isEqualToString:@"replaceSelectedText"])
+		NSUInteger lineno = [self currentLine];
+		NSUInteger column = [self currentColumn];
+
+		if ([outputFormat isEqualToString:@"replaceSelectedText"]) {
 			[self replaceRange:selectedRange withString:outputText];
-		else if ([outputFormat isEqualToString:@"replaceDocument"])
+			[self gotoLine:lineno column:column];
+		} else if ([outputFormat isEqualToString:@"replaceDocument"]) {
 			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText];
-		else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
+			[self gotoLine:lineno column:column];
+		} else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {

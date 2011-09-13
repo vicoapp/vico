@@ -190,7 +190,7 @@
 
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
-	   selectedRange:(NSRange)sel
+	      inputRange:(NSRange)inputRange
 		  window:(NSWindow *)window
 		  bundle:(ViBundle *)bundle
 {
@@ -239,18 +239,20 @@
 		if (scope)
 			[env setObject:scope forKey:@"TM_SCOPE"];
 
-		if (sel.length > 0) {
-			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_COLUMN"];
-			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_COLUMN"];
+		if (inputRange.location != NSNotFound) {
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:inputRange.location]] forKey:@"TM_INPUT_START_COLUMN"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(inputRange)]] forKey:@"TM_INPUT_END_COLUMN"];
 
-			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
-			[env setObject:[NSString stringWithFormat:@"%li", [ts columnAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:inputRange.location]] forKey:@"TM_INPUT_START_LINE_INDEX"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts columnOffsetAtLocation:NSMaxRange(inputRange)]] forKey:@"TM_INPUT_END_LINE_INDEX"];
 
-			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:sel.location]] forKey:@"TM_INPUT_START_LINE"];
-			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(sel)]] forKey:@"TM_INPUT_END_LINE"];
-
-			[env setObject:[[ts string] substringWithRange:sel] forKey:@"TM_SELECTED_TEXT"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:inputRange.location]] forKey:@"TM_INPUT_START_LINE"];
+			[env setObject:[NSString stringWithFormat:@"%li", [ts lineNumberAtLocation:NSMaxRange(inputRange)]] forKey:@"TM_INPUT_END_LINE"];
 		}
+
+		NSRange selectedRange = [textView selectedRange];
+		if (selectedRange.length > 0)
+			[env setObject:[[ts string] substringWithRange:selectedRange] forKey:@"TM_SELECTED_TEXT"];
 	}
 
 	/* File-related variables.
@@ -352,7 +354,7 @@
 {
 	return [ViBundle setupEnvironment:env
 			      forTextView:textView
-			    selectedRange:[textView selectedRange]
+			       inputRange:NSMakeRange(NSNotFound, 0)
 				   window:aWindow
 				   bundle:bundle];
 }

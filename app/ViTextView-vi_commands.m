@@ -487,9 +487,10 @@
 	 * If environment is too big, the process fails with:
 	 * *** NSTask: Task create for path '/bin/bash' failed: 22, "Invalid argument".  Terminating temporary process.
 	 */
+	[self setSelectedRange:NSMakeRange([self caret], 0)];
 	[ViBundle setupEnvironment:env
 		       forTextView:self
-		     selectedRange:NSMakeRange(0, 0)
+			inputRange:range
 			    window:[self window]
 			    bundle:nil];
 	[task setEnvironment:env];

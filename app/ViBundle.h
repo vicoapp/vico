@@ -32,7 +32,7 @@
              intoDictionary:(NSMutableDictionary *)normalizedPreference;
 + (void)setupEnvironment:(NSMutableDictionary *)env
              forTextView:(ViTextView *)textView
-	   selectedRange:(NSRange)sel
+	      inputRange:(NSRange)inputRange
 		  window:(NSWindow *)window
 		  bundle:(ViBundle *)bundle;
 + (void)setupEnvironment:(NSMutableDictionary *)env

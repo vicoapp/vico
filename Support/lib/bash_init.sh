@@ -46,7 +46,7 @@ pre () {
 }
 
 # this will check for the presence of a command and
-# prints an (HTML) error + exists if it's not there
+# prints an (HTML) error + exit if it's not there
 require_cmd () {
 	if ! type -p "$1" >/dev/null; then
 		cat <<HTML

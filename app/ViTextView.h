@@ -79,6 +79,7 @@
 	NSInteger		 initial_line, initial_column;
 	NSString		*initial_find_pattern;
 	unsigned		 initial_find_options;
+	NSInteger		 reverted_line, reverted_column;
 
 	// visual mode
 	NSUInteger		 visual_start_location;
@@ -124,6 +125,7 @@
  */
 - (ViTextStorage *)textStorage;
 
+- (void)prepareRevertDocument;
 - (void)documentDidLoad:(ViDocument *)aDocument;
 - (void)beginUndoGroup;
 - (void)endUndoGroup;

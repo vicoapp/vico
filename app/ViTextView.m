@@ -73,6 +73,7 @@ int logIndent = 0;
 		undoManager = [[NSUndoManager alloc] init];
 	inputKeys = [NSMutableArray array];
 	saved_column = -1;
+	reverted_line = -1;
 	snippetMatchRange.location = NSNotFound;
 	original_insert_source = [[NSApp delegate] original_input_source];
 
@@ -156,17 +157,33 @@ int logIndent = 0;
 	return [NSString stringWithFormat:@"<ViTextView %p: %@>", self, document];
 }
 
+- (void)prepareRevertDocument
+{
+	reverted_line = [self currentLine];
+	reverted_column = [self currentColumn];
+}
+
 - (void)documentDidLoad:(ViDocument *)aDocument
 {
-	if (initial_ex_command)
-		[self evalExString:initial_ex_command];
 	if (initial_line >= 0)
 		[self gotoLine:initial_line column:initial_column];
+	else if (reverted_line >= 0)
+		[self gotoLine:reverted_line column:reverted_column];
 	if (initial_find_pattern)
 		[self findPattern:initial_find_pattern options:initial_find_options];
 
+	NSUInteger len = [[self textStorage] length];
+	if ([self caret] >= len) {
+		[self setCaret:IMAX(0, len - 1)];
+		[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
+	}
+
+	if (initial_ex_command)
+		[self evalExString:initial_ex_command];
+
 	initial_ex_command = nil;
 	initial_line = -1;
+	reverted_line = -1;
 	initial_find_pattern = nil;
 }
 

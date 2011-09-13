@@ -241,16 +241,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 	[self setFileURL:absoluteURL];
 	[self setIsTemporary:YES]; /* Prevents triggering checkDocumentChanged in window controller. */
 
+	[self eachTextView:^(ViTextView *tv) {
+		[tv prepareRevertDocument];
+	}];
+
 	busy = YES;
 	loader = [[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
 							       onData:dataCallback
 							 onCompletion:completionCallback];
 	DEBUG(@"got deferred loader %@", loader);
 	[loader setDelegate:self];
-
-	[self eachTextView:^(ViTextView *tv) {
-		[tv setCaret:0];
-	}];
 
 	if (outError)
 		*outError = returnError;

@@ -71,5 +71,10 @@
 	return foundScopeSelector;
 }
 
+- (void)addScopeComponent:(NSString *)scopeComponent
+{
+	scopes = [scopes arrayByAddingObject:scopeComponent];
+}
+
 @end
 

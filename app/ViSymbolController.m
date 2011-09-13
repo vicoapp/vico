@@ -82,7 +82,8 @@
 		NSRange r = [symbol range];
 		if (r.location > aLocation)
 			break;
-		item = symbol;
+		if (![self isSeparatorItem:symbol])
+			item = symbol;
 	}
 
 	if (item) {

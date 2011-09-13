@@ -18,7 +18,6 @@
 
 === Probably not in next version
 
-* don't highlight menu separators (pragma mark -) when following caret in symbol list
 * show baseURL in window title!
 * cw<cmd-v> and repeat inserts pasteboard twice
 * repeating completed text should not re-trigger completion!

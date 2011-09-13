@@ -98,7 +98,6 @@
 * completion expressions in nu
 * p/P with a count
 * J with visual selection, and J with a count
-* +/- commands
 * open alternative file (.h/.c/.m)
 * :map commands
 * preference pane for editing macros?

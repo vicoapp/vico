@@ -1197,7 +1197,46 @@
 	return YES;
 }
 
-/* syntax: _ or ^ */
+/* syntax: [count]_ */
+- (BOOL)move_down_bol2:(ViCommand *)command
+{
+	int count = IMAX(command.count, 1);
+	NSUInteger end = start_location;
+
+	while (--count > 0) {
+		[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:end];
+		if (end >= [[self textStorage] length]) {
+			MESSAGE(@"Movement past the end-of-file");
+			return NO;
+		}
+	}
+
+	final_location = end_location = [[self textStorage] firstNonBlankForLineAtLocation:end];
+
+	return YES;
+}
+
+/* syntax: [count]+ or [count]enter */
+- (BOOL)move_down_bol:(ViCommand *)command
+{
+	if ([self move_down:command]) {
+		final_location = end_location = [[self textStorage] firstNonBlankForLineAtLocation:final_location];
+		return YES;
+	}
+	return NO;
+}
+
+/* syntax: [count]- */
+- (BOOL)move_up_bol:(ViCommand *)command
+{
+	if ([self move_up:command]) {
+		final_location = end_location = [[self textStorage] firstNonBlankForLineAtLocation:final_location];
+		return YES;
+	}
+	return NO;
+}
+
+/* syntax: ^ */
 - (BOOL)move_first_char:(ViCommand *)command
 {
 	[self getLineStart:&end_location end:NULL contentsEnd:NULL];

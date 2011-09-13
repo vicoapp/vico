@@ -1,6 +1,7 @@
 #import "ViOutlineView.h"
 #import "NSEvent-keyAdditions.h"
 #import "ViError.h"
+#import "NSView-additions.h"
 #include "logging.h"
 
 @implementation ViOutlineView
@@ -10,7 +11,8 @@
 - (void)awakeFromNib
 {
 	if (keyManager == nil)
-		keyManager = [[ViKeyManager alloc] initWithTarget:self defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
+		keyManager = [[ViKeyManager alloc] initWithTarget:self
+						       defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager

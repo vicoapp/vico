@@ -947,7 +947,6 @@ static ViWindowController	*currentWindowController = nil;
 	DEBUG(@"returning previously active document (currently %@)", [self currentDocument]);
 	__block ViDocument *doc = nil;
 	[jumpList enumerateJumpsBackwardsUsingBlock:^(ViJump *jump, BOOL *stop) {
-		INFO(@"got jump %@", jump);
 		doc = [self documentForURL:jump.url];
 		if (doc)
 			*stop = YES;

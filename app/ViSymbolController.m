@@ -13,6 +13,7 @@
 - (BOOL)symbolListIsOpen;
 - (void)showAltFilterField;
 - (void)hideAltFilterField;
+- (BOOL)isSeparatorItem:(id)item;
 @end
 
 @implementation ViSymbolController

@@ -543,7 +543,7 @@
 	if (mirror) {
 		value = mirror.value;
 		if (ts.rx) {
-			value = [self transformValue:value
+			value = [self transformValue:(value ?: @"")
 			                 withPattern:ts.rx
 			                      format:ts.format
 					      global:([ts.options rangeOfString:@"g"].location != NSNotFound)

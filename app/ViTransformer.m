@@ -187,12 +187,10 @@
 	id text = value;
 	BOOL copied = NO;
 	NSUInteger begin = 0;
-	while (begin < [text length]) {
+	while (begin <= [text length]) {
 		NSRange r = NSMakeRange(begin, [text length] - begin);
 		DEBUG(@"matching rx %@ in range %@ in string [%@]",
 		    rx, NSStringFromRange(r), text);
-		if (r.length == 0)
-			break;
 		int opts = 0;
 		if (begin > 0)
 			opts |= ONIG_OPTION_NOTBOL;

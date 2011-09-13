@@ -54,7 +54,14 @@
 @property(nonatomic, readonly) SEL action;
 @property(nonatomic, assign, readwrite) id<ViCompletionProvider> completion;
 
+/** Add an alias to an ex comand.
+ * @param aName The alias name that this command will respond to.
+ */
 - (void)addAlias:(NSString *)aName;
+
+/** Remove an alias from an ex comand.
+ * @param aName The alias name to remove.
+ */
 - (void)removeAlias:(NSString *)aName;
 
 - (ExMapping *)initWithNames:(NSArray *)nameArray

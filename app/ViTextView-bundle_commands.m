@@ -246,6 +246,7 @@
 			[self gotoLine:lineno column:column];
 		} else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
 			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
+			keepMessagesHack = YES;
 			// [self addToolTipRect: owner:outputText userData:nil];
 		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
 			id<ViViewController> viewController = [[[self window] windowController] currentView];

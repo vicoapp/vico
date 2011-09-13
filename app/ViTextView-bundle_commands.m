@@ -313,6 +313,7 @@
 				r = inputRange;
 			}
 			[self insertSnippet:outputText
+				  andIndent:NO
 			         fromBundle:[command bundle]
 			            inRange:r];
 		} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||

@@ -17,20 +17,28 @@
 }
 
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
+		   andIndent:(BOOL)indent
                   fromBundle:(ViBundle *)bundle
                      inRange:(NSRange)aRange
 {
 	DEBUG(@"insert snippet [%@] at %@", snippetString, NSStringFromRange(aRange));
-	// prepend leading whitespace to all newlines in the snippet string
-	NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aRange.location];
-	NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
-	NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n" withString:indentedNewline];
+	NSString *expandedSnippetString = snippetString;
+	if (indent) {
+		// prepend leading whitespace to all newlines in the snippet string
+		NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aRange.location];
+		NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
+		NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n"
+											   withString:indentedNewline
+											      options:0
+												range:NSMakeRange(0, IMAX(0, [snippetString length] - 1))];
 
-	NSString *expandedSnippetString = indentedSnippetString;
-	if ([[self preference:@"expandtab" atLocation:aRange.location] integerValue] == NSOnState) {
-		NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
-		NSString *tabString = [@"" stringByPaddingToLength:shiftWidth withString:@" " startingAtIndex:0];
-		expandedSnippetString = [indentedSnippetString stringByReplacingOccurrencesOfString:@"\t" withString:tabString];
+		expandedSnippetString = indentedSnippetString;
+		if ([[self preference:@"expandtab" atLocation:aRange.location] integerValue] == NSOnState) {
+			NSInteger shiftWidth = [[self preference:@"shiftwidth" atLocation:aRange.location] integerValue];
+			NSString *tabString = [@"" stringByPaddingToLength:shiftWidth withString:@" " startingAtIndex:0];
+			expandedSnippetString = [indentedSnippetString stringByReplacingOccurrencesOfString:@"\t" withString:tabString];
+		}
+		DEBUG(@"expanded snippet to [%@]", expandedSnippetString);
 	}
 
 	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
@@ -77,6 +85,7 @@
                      inRange:(NSRange)aRange
 {
 	return [self insertSnippet:snippetString
+			 andIndent:YES
 	                fromBundle:nil
 	                   inRange:aRange];
 }
@@ -85,6 +94,7 @@
                   atLocation:(NSUInteger)aLocation
 {
 	return [self insertSnippet:snippetString
+			 andIndent:YES
 	                fromBundle:nil
 	                   inRange:NSMakeRange(aLocation, 0)];
 }
@@ -92,6 +102,7 @@
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
 {
 	return [self insertSnippet:snippetString
+			 andIndent:YES
 	                fromBundle:nil
 	                   inRange:NSMakeRange([self caret], 0)];
 }
@@ -120,6 +131,7 @@
 		r = snippetMatchRange;
 
 	[self insertSnippet:[bundleSnippet content]
+		  andIndent:YES
 	         fromBundle:[bundleSnippet bundle]
 	            inRange:r];
 }

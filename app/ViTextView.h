@@ -350,6 +350,7 @@
 @interface ViTextView (snippets)
 - (void)cancelSnippet;
 - (ViSnippet *)insertSnippet:(NSString *)snippetString
+		   andIndent:(BOOL)indent
                   fromBundle:(ViBundle *)bundle
                      inRange:(NSRange)aRange;
 /** Insert a snippet, replacing the trigger word.

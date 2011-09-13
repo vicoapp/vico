@@ -266,6 +266,7 @@ RESOURCES = \
 	$(IMAGES) \
 	app/symbol-icons.plist \
 	$(NU) \
+	par/par.doc \
 	Credits.txt
 
 TOOL_OBJC_SRCS = \
@@ -364,9 +365,9 @@ $(NIBDIR)/%.nib: %.xib
 
 app: $(BINDIR)/Vico $(NIBS) $(BINDIR)/vicotool $(BINDIR)/par
 	cp -f app/Vico-Info.plist $(INFOPLIST)
-	rsync -a $(RESOURCES) $(RESDIR)
+	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
 	mkdir -p $(FWDIR)
-	rsync -a Nu.framework $(FWDIR)
+	rsync -a --delete --exclude ".git" Nu.framework $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 

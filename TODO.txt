@@ -1,5 +1,6 @@
 === Before next version
 
+* remove "invert match" option from ack search
 * group by attribute != grouped display string
 
 * rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?

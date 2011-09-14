@@ -18,6 +18,7 @@
 #import "ViEventManager.h"
 #import "ViPathComponentCell.h"
 #import "ViCommandMenuItemView.h"
+#import "NSMenu-additions.h"
 
 @interface ProjectDelegate (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
@@ -45,6 +46,7 @@
 - (void)showAltFilterField;
 - (void)hideAltFilterField;
 - (void)closeExplorerAndFocusEditor:(BOOL)focusEditor;
+- (NSIndexSet *)clickedIndexes;
 @end
 
 
@@ -90,7 +92,7 @@
 	[[sftpConnectForm cellAtIndex:1] setPlaceholderString:NSUserName()];
 	[actionButtonCell setImage:[NSImage imageNamed:@"actionmenu"]];
 	[actionButton setMenu:actionMenu];
-	[actionMenu setDelegate:[NSApp delegate]];
+	[actionMenu setDelegate:self];
 	[actionMenu setFont:[NSFont menuFontOfSize:0]];
 
 	explorerView.backgroundColor = [explorer backgroundColor];
@@ -332,7 +334,102 @@
 }
 
 #pragma mark -
-#pragma mark Explorer actions
+#pragma mark Action menu
+
+- (void)menuNeedsUpdate:(NSMenu *)menu
+{
+	[menu updateNormalModeMenuItemsWithSelection:NO];
+
+	for (NSMenuItem *item in [menu itemArray]) {
+		if ([item action] == @selector(rescan:)) {
+			NSSet *parentSet = [self clickedFolderURLs];
+			ViCommandMenuItemView *view = (ViCommandMenuItemView *)[item view];
+			if ([view isKindOfClass:[ViCommandMenuItemView class]]) {
+				if ([parentSet count] == 1)
+					[view setTitle:[NSString stringWithFormat:@"Rescan folder \"%@\"", [[parentSet anyObject] lastPathComponent]]];
+				else
+					[view setTitle:[NSString stringWithFormat:@"Rescan folders"]];
+				[item setTitle:view.title];
+			}
+		}
+	}
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	__block BOOL fail = NO;
+
+	NSIndexSet *set = [self clickedIndexes];
+
+	if ([menuItem action] == @selector(openInTab:) ||
+	    [menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(openInSplit:) ||
+	    [menuItem action] == @selector(openInVerticalSplit:)) {
+		/*
+		 * Selected files must be files, not directories.
+		 */
+		[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+			id item = [explorer itemAtRow:idx];
+			if (item == nil || [self outlineView:explorer isItemExpandable:item]) {
+				*stop = YES;
+				fail = YES;
+			}
+		}];
+		if (fail)
+			return NO;
+	}
+
+	/*
+	 * Some items only operate on a single entry.
+	 */
+	if ([set count] > 1 &&
+	   ([menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(renameFile:) ||
+	    [menuItem action] == @selector(openInSplit:) ||		/* XXX: Splitting multiple documents is disabled for now, buggy */
+	    [menuItem action] == @selector(openInVerticalSplit:)))
+		return NO;
+
+	/*
+	 * Some items need at least one selected entry.
+	 */
+	if ([set count] == 0 && [explorer clickedRow] == -1 &&
+	   ([menuItem action] == @selector(openInTab:) ||
+	    [menuItem action] == @selector(openInCurrentView:) ||
+	    [menuItem action] == @selector(openInSplit:) ||
+	    [menuItem action] == @selector(openInVerticalSplit:) ||
+	    [menuItem action] == @selector(renameFile:) ||
+	    [menuItem action] == @selector(removeFiles:) ||
+	    [menuItem action] == @selector(revealInFinder:) ||
+	    [menuItem action] == @selector(openWithFinder:)))
+		return NO;
+
+	/*
+	 * Finder operations only implemented for file:// urls.
+	 */
+	ViFile *file = [self fileForItem:[explorer itemAtRow:[set firstIndex]]];
+	if (![file.url isFileURL] &&
+	    ([menuItem action] == @selector(revealInFinder:) ||
+	     [menuItem action] == @selector(openWithFinder:)))
+		return NO;
+
+	if ([menuItem action] == @selector(rescan:)) {
+		if ([[self clickedFolderURLs] count] == 0)
+			return NO;
+	}
+
+	/*
+	 * Some operations not applicable in filtered list.
+	 */
+	if (isFiltered &&
+	    ([menuItem action] == @selector(rescan:) ||
+	     [menuItem action] == @selector(addSFTPLocation:) ||
+	     [menuItem action] == @selector(newFolder:) ||
+	     [menuItem action] == @selector(newDocument:)))
+		return NO;
+
+	return YES;
+}
+
 
 - (IBAction)actionMenu:(id)sender
 {
@@ -383,6 +480,9 @@
 		}
 	}
 }
+
+#pragma mark -
+#pragma mark Explorer actions
 
 - (void)sftpSheetDidEnd:(NSWindow *)sheet
              returnCode:(int)returnCode
@@ -825,86 +925,6 @@
 {
 	NSURL *url = [NSURL URLWithString:[sender titleOfSelectedItem]];
 	[self browseURL:url];
-}
-
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-	__block BOOL fail = NO;
-
-	NSIndexSet *set = [self clickedIndexes];
-
-	if ([menuItem action] == @selector(openInTab:) ||
-	    [menuItem action] == @selector(openInCurrentView:) ||
-	    [menuItem action] == @selector(openInSplit:) ||
-	    [menuItem action] == @selector(openInVerticalSplit:)) {
-		/*
-		 * Selected files must be files, not directories.
-		 */
-		[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-			id item = [explorer itemAtRow:idx];
-			if (item == nil || [self outlineView:explorer isItemExpandable:item]) {
-				*stop = YES;
-				fail = YES;
-			}
-		}];
-		if (fail)
-			return NO;
-	}
-
-	/*
-	 * Some items only operate on a single entry.
-	 */
-	if ([set count] > 1 &&
-	   ([menuItem action] == @selector(openInCurrentView:) ||
-	    [menuItem action] == @selector(renameFile:) ||
-	    [menuItem action] == @selector(openInSplit:) ||		/* XXX: Splitting multiple documents is disabled for now, buggy */
-	    [menuItem action] == @selector(openInVerticalSplit:)))
-		return NO;
-
-	/*
-	 * Some items need at least one selected entry.
-	 */
-	if ([set count] == 0 && [explorer clickedRow] == -1 &&
-	   ([menuItem action] == @selector(openInTab:) ||
-	    [menuItem action] == @selector(openInCurrentView:) ||
-	    [menuItem action] == @selector(openInSplit:) ||
-	    [menuItem action] == @selector(openInVerticalSplit:) ||
-	    [menuItem action] == @selector(renameFile:) ||
-	    [menuItem action] == @selector(removeFiles:) ||
-	    [menuItem action] == @selector(revealInFinder:) ||
-	    [menuItem action] == @selector(openWithFinder:)))
-		return NO;
-
-	/*
-	 * Finder operations only implemented for file:// urls.
-	 */
-	ViFile *file = [self fileForItem:[explorer itemAtRow:[set firstIndex]]];
-	if (![file.url isFileURL] &&
-	    ([menuItem action] == @selector(revealInFinder:) ||
-	     [menuItem action] == @selector(openWithFinder:)))
-		return NO;
-
-	if ([menuItem action] == @selector(rescan:)) {
-		NSSet *parentSet = [self clickedFolderURLs];
-		if ([parentSet count] == 1)
-			[menuItem setTitle:[NSString stringWithFormat:@"Rescan folder \"%@\"", [[parentSet anyObject] lastPathComponent]]];
-		else
-			[menuItem setTitle:[NSString stringWithFormat:@"Rescan folders"]];
-		if ([parentSet count] == 0)
-			return NO;
-	}
-
-	/*
-	 * Some operations not applicable in filtered list.
-	 */
-	if (isFiltered &&
-	    ([menuItem action] == @selector(rescan:) ||
-	     [menuItem action] == @selector(addSFTPLocation:) ||
-	     [menuItem action] == @selector(newFolder:) ||
-	     [menuItem action] == @selector(newDocument:)))
-		return NO;
-
-	return YES;
 }
 
 - (void)resetExplorerView

@@ -24,6 +24,7 @@ OBJC_SRCS = \
 	MHTextIconCell.m \
 	NSArray-patterns.m \
 	NSEvent-keyAdditions.m \
+	NSMenu-additions.m \
 	NSObject+SPInvocationGrabbing.m \
 	NSOutlineView-vimotions.m \
 	NSScanner-additions.m \
@@ -363,9 +364,11 @@ $(NIBDIR)/%.nib: %.xib
 	mkdir -p $(NIBDIR)
 	$(IBTOOL) --errors --warnings --notices --output-format human-readable-text --compile $@ $< --sdk $(SDK)
 
+.PHONY: app
 app: $(BINDIR)/Vico $(NIBS) $(BINDIR)/vicotool $(BINDIR)/par
 	cp -f app/Vico-Info.plist $(INFOPLIST)
 	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
+	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
 	rsync -a --delete --exclude ".git" Nu.framework $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)

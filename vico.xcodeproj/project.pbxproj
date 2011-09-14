@@ -235,6 +235,7 @@
 		9A4A01C213F94D3F00CCDBA6 /* ViBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4A01C113F94D3F00CCDBA6 /* ViBgView.m */; };
 		9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4DB02D13B898B400FAE096 /* ExAddress.m */; };
 		9A57990113F0189A00191109 /* ex.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A57990013F0189A00191109 /* ex.nu */; };
+		9A5A678C14207B83003E92EC /* NSMenu-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5A678B14207B83003E92EC /* NSMenu-additions.m */; };
 		9A5DD69A13430176006981AE /* ViKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69913430176006981AE /* ViKeyManager.m */; };
 		9A5DD69E134326A6006981AE /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
 		9A5DD6A013435F0D006981AE /* TestKeyCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69F13435F0D006981AE /* TestKeyCodes.m */; };
@@ -757,6 +758,8 @@
 		9A4DB02C13B898B400FAE096 /* ExAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExAddress.h; sourceTree = "<group>"; };
 		9A4DB02D13B898B400FAE096 /* ExAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExAddress.m; sourceTree = "<group>"; };
 		9A57990013F0189A00191109 /* ex.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ex.nu; sourceTree = "<group>"; };
+		9A5A678A14207B83003E92EC /* NSMenu-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMenu-additions.h"; sourceTree = "<group>"; };
+		9A5A678B14207B83003E92EC /* NSMenu-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMenu-additions.m"; sourceTree = "<group>"; };
 		9A5DD69813430176006981AE /* ViKeyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViKeyManager.h; sourceTree = "<group>"; };
 		9A5DD69913430176006981AE /* ViKeyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViKeyManager.m; sourceTree = "<group>"; };
 		9A5DD69C134326A6006981AE /* ViRegisterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViRegisterManager.h; sourceTree = "<group>"; };
@@ -1190,6 +1193,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9A5A678A14207B83003E92EC /* NSMenu-additions.h */,
+				9A5A678B14207B83003E92EC /* NSMenu-additions.m */,
 				9ACFDFC0141A089C00D4DBE1 /* ViMarkInspector.h */,
 				9ACFDFC1141A089C00D4DBE1 /* ViMarkInspector.m */,
 				9A0831961418FE9D00D1805D /* ViMarkManager.h */,
@@ -2032,6 +2037,7 @@
 				9AB6F74814164B0C000F3578 /* ViFile.m in Sources */,
 				9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */,
 				9ACFDFC2141A089C00D4DBE1 /* ViMarkInspector.m in Sources */,
+				9A5A678C14207B83003E92EC /* NSMenu-additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1296,7 +1296,7 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	/* Select any existing view of the document. */
-	if ([[document views] count] > 0) {
+	if ([document respondsToSelector:@selector(viewsw)] && [[document views] count] > 0) {
 		docView = [[document views] anyObject];
 		/*
 		 * If the tab with the document view contains more views

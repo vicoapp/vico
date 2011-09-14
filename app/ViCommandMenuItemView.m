@@ -32,6 +32,9 @@
 
 - (void)setTitle:(NSString *)aTitle
 {
+	if ([aTitle isEqualToString:title])
+		return;
+
 	NSSize oldSize = [title sizeWithAttributes:attributes];
 	title = aTitle;
 	titleSize = [title sizeWithAttributes:attributes];
@@ -129,6 +132,9 @@
 	NSMenuItem *item = [self enclosingMenuItem];
 	[super viewWillMoveToWindow:newWindow];
 	DEBUG(@"item %@ moves to window %@", item, newWindow);
+
+	if (newWindow)
+		[[self window] becomeKeyWindow];
 
 	if (newWindow == nil) {
 		if ([item isEnabled]) {

@@ -41,7 +41,6 @@
 
 - (void)addMark:(ViMark *)mark
 {
-	[self willChangeValueForKey:@"groups"];
 	id key = nil;
 	if ([mark respondsToSelector:groupSelector])
 		key = [mark performSelector:groupSelector];
@@ -49,16 +48,49 @@
 		key = [NSNull null];
 	ViMarkList *group = [groups objectForKey:key];
 	if (group == nil) {
+		[self willChangeValueForKey:@"groups"];
 		group = [ViMarkList markListWithIdentifier:key];
 		[groups setObject:group forKey:key];
+		[self didChangeValueForKey:@"groups"];
 	}
 	[group addMark:mark];
-	[self didChangeValueForKey:@"groups"];
+}
+
+- (void)addMarksFromArray:(NSArray *)marksToAdd
+{
+	NSMapTable *groupsToAdd = [NSMapTable mapTableWithWeakToStrongObjects];
+	BOOL didAddGroup = NO;
+	for (ViMark *mark in marksToAdd) {
+		id key = nil;
+		if ([mark respondsToSelector:groupSelector])
+			key = [mark performSelector:groupSelector];
+		if (key == nil)
+			key = [NSNull null];
+		ViMarkList *group = [groups objectForKey:key];
+		if (group == nil) {
+			if (!didAddGroup) {
+				[self willChangeValueForKey:@"groups"];
+				didAddGroup = YES;
+			}
+			group = [ViMarkList markListWithIdentifier:key];
+			[groups setObject:group forKey:key];
+		}
+
+		NSMutableArray *addArray = [groupsToAdd objectForKey:group];
+		if (addArray == nil) {
+			addArray = [NSMutableArray arrayWithObject:mark];
+			[groupsToAdd setObject:addArray forKey:group];
+		} else
+			[addArray addObject:mark];
+	}
+	for (ViMarkList *group in groupsToAdd)
+		[group addMarksFromArray:[groupsToAdd objectForKey:group]];
+	if (didAddGroup)
+		[self didChangeValueForKey:@"groups"];
 }
 
 - (void)removeMark:(ViMark *)mark
 {
-	[self willChangeValueForKey:@"groups"];
 	id key = nil;
 	if ([mark respondsToSelector:groupSelector])
 		key = [mark performSelector:groupSelector];
@@ -66,7 +98,11 @@
 		key = [NSNull null];
 	ViMarkList *group = [groups objectForKey:key];
 	[group removeMark:mark];
-	[self didChangeValueForKey:@"groups"];
+	if ([[group marks] count] == 0) {
+		[self willChangeValueForKey:@"groups"];
+		[groups removeObjectForKey:key];
+		[self didChangeValueForKey:@"groups"];
+	}
 }
 
 - (void)clear
@@ -121,10 +157,7 @@
 - (void)eachGroup:(void (^)(ViMarkGroup *))callback
 {
 	for (ViMarkGroup *group in [groups allValues]) {
-		NSString *key = [NSString stringWithFormat:@"group_by_%@", group.attribute];
-		[self willChangeValueForKey:key];
 		callback(group);
-		[self didChangeValueForKey:key];
 	}
 }
 
@@ -140,26 +173,58 @@
 
 - (void)addMark:(ViMark *)mark
 {
-	[self willChangeValueForKey:@"marks"];
+	NSUInteger lastIndex = [marks count];
+	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:lastIndex];
+	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 	if (mark.name) {
 		ViMark *oldMark = [marksByName objectForKey:mark.name];
-		if (oldMark)
+		if (oldMark) {
 			[marks removeObject:oldMark]; // XXX: linear search!
+			[self eachGroup:^(ViMarkGroup *group) { [group removeMark:oldMark]; }];
+		}
 		[marksByName setObject:mark forKey:mark.name];
 	}
 	[marks addObject:mark];
-	[self didChangeValueForKey:@"marks"];
+	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group addMark:mark]; }];
 }
 
+- (void)addMarksFromArray:(NSArray *)marksToAdd
+{
+	NSUInteger numToAdd = [marksToAdd count];
+	if (numToAdd == 0)
+		return;
+
+	NSUInteger lastIndex = [marks count];
+	NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(lastIndex, numToAdd)];
+	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
+	for (ViMark *mark in marksToAdd) {
+		if (mark.name) {
+			ViMark *oldMark = [marksByName objectForKey:mark.name];
+			if (oldMark)
+				[marks removeObject:oldMark]; // XXX: linear search!
+			[marksByName setObject:mark forKey:mark.name];
+		}
+	}
+	[marks addObjectsFromArray:marksToAdd];
+	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
+
+	[self eachGroup:^(ViMarkGroup *group) { [group addMarksFromArray:marksToAdd]; }];
+}
+
 - (void)removeMark:(ViMark *)mark
 {
-	[self willChangeValueForKey:@"marks"];
+	NSUInteger index = [marks indexOfObject:mark]; // XXX: linear search!
+	if (index == NSNotFound)
+		return;
+
+	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:index];
+	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
+	[marks removeObjectAtIndex:index];
 	if (mark.name)
 		[marksByName removeObjectForKey:mark.name];
-	[marks removeObject:mark]; // XXX: linear search!
-	[self didChangeValueForKey:@"marks"];
+	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group removeMark:mark]; }];
 }

@@ -14,6 +14,7 @@
 - (NSString *)attribute;
 - (void)rebuildFromMarks:(NSArray *)marks;
 - (void)addMark:(ViMark *)mark;
+- (void)addMarksFromArray:(NSArray *)marksToAdd;
 - (void)removeMark:(ViMark *)mark;
 - (void)clear;
 
@@ -28,7 +29,6 @@
 	NSMutableDictionary *marksByName;
 	NSInteger currentIndex;
 	NSMutableDictionary *groups;
-
 	id identifier;
 	NSImage *icon;
 }
@@ -42,6 +42,7 @@
 - (void)clear;
 - (ViMark *)lookup:(NSString *)name;
 - (void)addMark:(ViMark *)mark;
+- (void)addMarksFromArray:(NSArray *)marksToAdd;
 - (void)removeMark:(ViMark *)mark;
 
 - (ViMark *)first;

@@ -86,6 +86,7 @@
 - (IBAction)newDocument:(id)sender;
 - (IBAction)bookmarkFolder:(id)sender;
 - (IBAction)gotoBookmark:(id)sender;
+- (IBAction)flushCache:(id)sender;
 
 - (IBAction)acceptSftpSheet:(id)sender;
 - (IBAction)cancelSftpSheet:(id)sender;

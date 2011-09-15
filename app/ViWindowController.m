@@ -501,6 +501,18 @@ static ViWindowController	*currentWindowController = nil;
 	return env;
 }
 
+/* Reveal current document in explorer. */
+- (IBAction)revealCurrentDocument:(id)sender
+{
+	NSURL *url = [[self currentDocument] fileURL];
+	if (url == nil)
+		MESSAGE(@"Can't reveal untitled documents");
+	else if ([explorer selectItemWithURL:url])
+		[explorer focusExplorer:nil];
+	else
+		MESSAGE(@"%@ not found in explorer", [url lastPathComponent]);
+}
+
 #pragma mark -
 
 - (void)browseURL:(NSURL *)url

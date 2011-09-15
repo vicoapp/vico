@@ -272,6 +272,8 @@
 - (IBAction)increaseFontsizeAction:(id)sender;
 - (IBAction)decreaseFontsizeAction:(id)sender;
 
+- (IBAction)revealCurrentDocument:(id)sender;
+
 - (void)browseURL:(NSURL *)url;
 
 - (void)setBaseURL:(NSURL *)url;

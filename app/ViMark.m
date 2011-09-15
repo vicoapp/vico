@@ -1,5 +1,6 @@
 #import "ViMark.h"
 #import "ViDocument.h"
+#import "ViDocumentController.h"
 
 @implementation ViMark
 
@@ -46,7 +47,7 @@
 
 		lineNumber = [NSNumber numberWithUnsignedInteger:line];
 		columnNumber = [NSNumber numberWithUnsignedInteger:column];
-		document = [[NSDocumentController sharedDocumentController] documentForURL:url];
+		document = [[ViDocumentController sharedDocumentController] documentForURLQuick:url];
 	}
 
 	return self;

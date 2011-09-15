@@ -562,7 +562,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{400, 200}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSCustomView" id="402151357">
@@ -732,6 +732,7 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{800, 600}</string>
+					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="402151357"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -1085,7 +1086,7 @@
 					</object>
 					<object class="NSMenuItem" id="301946186">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">New document (N)</string>
+						<string key="NSTitle">New file (N)</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="759727656"/>

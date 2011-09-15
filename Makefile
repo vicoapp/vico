@@ -41,7 +41,6 @@ OBJC_SRCS = \
 	PSMTabBarCell.m \
 	PSMTabBarControl.m \
 	PSMTabDragAssistant.m \
-	ProjectDelegate.m \
 	SFTPConnection.m \
 	SFTPConnectionPool.m \
 	TMFileURLProtocol.m \
@@ -69,6 +68,7 @@ OBJC_SRCS = \
 	ViEventManager.m \
 	ViFile.m \
 	ViFileCompletion.m \
+	ViFileExplorer.m \
 	ViFileURLHandler.m \
 	ViHTTPURLHandler.m \
 	ViJumpList.m \

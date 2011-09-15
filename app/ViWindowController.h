@@ -12,7 +12,7 @@
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;
-@class ProjectDelegate;
+@class ViFileExplorer;
 @class ViResizeView;
 @class ViProject;
 @class ViParser;
@@ -62,7 +62,7 @@
 	NSString		*exString;
 
 	// project list
-	IBOutlet ProjectDelegate *projectDelegate;
+	IBOutlet ViFileExplorer *explorer;
 	IBOutlet NSImageView *projectResizeView;
 
 	// symbol list
@@ -84,7 +84,7 @@
 @property(nonatomic,readwrite, assign) NSMutableArray *documents;
 @property(nonatomic,readonly) ViJumpList *jumpList;
 @property(nonatomic,readwrite, assign) ViProject *project;
-@property(nonatomic,readonly) ProjectDelegate *explorer;
+@property(nonatomic,readonly) ViFileExplorer *explorer;
 @property(nonatomic,readonly) ViTagStack *tagStack;
 @property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */

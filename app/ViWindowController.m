@@ -3,7 +3,7 @@
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViProject.h"
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 #import "ViJumpList.h"
 #import "ViThemeStore.h"
 #import "ViBundleStore.h"
@@ -43,7 +43,7 @@ static ViWindowController	*currentWindowController = nil;
 
 @synthesize documents;
 @synthesize project;
-@synthesize explorer = projectDelegate;
+@synthesize explorer;
 @synthesize jumpList, jumping;
 @synthesize tagStack, tagsDatabase;
 @synthesize previousDocument;
@@ -266,7 +266,7 @@ static ViWindowController	*currentWindowController = nil;
 
 	if ([self project] != nil) {
 		[self setBaseURL:[[self project] initialURL]];
-		[projectDelegate openExplorerTemporarily:NO];
+		[explorer openExplorerTemporarily:NO];
 		/* This makes repeated open requests for the same URL always open a new window.
 		 * With this commented, the "project" is already opened, and no new window will be created.
 		[[self project] close];
@@ -505,7 +505,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)browseURL:(NSURL *)url
 {
-	[projectDelegate browseURL:url];
+	[explorer browseURL:url];
 }
 
 - (void)setBaseURL:(NSURL *)url
@@ -1794,7 +1794,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	NSRect frame = [sender frame];
 	NSRect resizeRect;
-	if (leftView == explorerView && [projectDelegate explorerIsOpen])
+	if (leftView == explorerView && [explorer explorerIsOpen])
 		resizeRect = [projectResizeView frame];
 	else if (rightView == symbolsView && [symbolController symbolListIsOpen]) {
 		resizeRect = [symbolsResizeView frame];
@@ -1871,23 +1871,23 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (IBAction)searchFiles:(id)sender
 {
-	[projectDelegate searchFiles:sender];
+	[explorer searchFiles:sender];
 }
 
 - (IBAction)focusExplorer:(id)sender
 {
-	[projectDelegate focusExplorer:sender];
+	[explorer focusExplorer:sender];
 }
 
 - (BOOL)focus_explorer:(ViCommand *)command
 {
-	[projectDelegate focusExplorer:nil];
+	[explorer focusExplorer:nil];
 	return YES;
 }
 
 - (IBAction)toggleExplorer:(id)sender
 {
-	[projectDelegate toggleExplorer:sender];
+	[explorer toggleExplorer:sender];
 }
 
 #pragma mark -
@@ -2215,7 +2215,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 				[self ex_pwd:command];
 			else
 				[self message:@"%@", [self displayBaseURL]];
-			[projectDelegate browseURL:url andDisplay:NO];
+			[explorer browseURL:url andDisplay:NO];
 		}
 	}];
 	sync = NO;

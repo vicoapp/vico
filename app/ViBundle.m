@@ -7,7 +7,7 @@
 #import "ViBundleStore.h"
 #import "ViAppController.h"
 #import "ViEventManager.h"
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 #include "logging.h"
 
 @implementation ViBundle
@@ -257,7 +257,7 @@
 
 	/* File-related variables.
 	 */
-	ProjectDelegate *explorer = nil;
+	ViFileExplorer *explorer = nil;
 	ViWindowController *windowController = [window windowController];
 	if ([windowController respondsToSelector:@selector(explorer)])
 		explorer = windowController.explorer;

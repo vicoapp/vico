@@ -1,6 +1,6 @@
 #import <Quartz/Quartz.h>
 
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 #import "logging.h"
 #import "MHTextIconCell.h"
 #import "ViWindowController.h"
@@ -20,7 +20,7 @@
 #import "ViCommandMenuItemView.h"
 #import "NSMenu-additions.h"
 
-@interface ProjectDelegate (private)
+@interface ViFileExplorer (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;
 - (NSString *)relativePathForItem:(NSDictionary *)item;
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
@@ -50,7 +50,7 @@
 @end
 
 
-@implementation ProjectDelegate
+@implementation ViFileExplorer
 
 @synthesize delegate;
 @synthesize outlineView = explorer;

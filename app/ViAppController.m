@@ -16,7 +16,7 @@
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
 #import "ViEventManager.h"
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 #import "ViMarkInspector.h"
 #import "NSMenu-additions.h"
 

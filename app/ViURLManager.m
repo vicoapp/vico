@@ -6,7 +6,7 @@
 
 /* XXX: this is butt ugly! */
 #import "ViWindowController.h"
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 
 #include "logging.h"
 
@@ -268,7 +268,7 @@
 	for (NSWindow *window in [NSApp windows]) {
 		ViWindowController *wincon = [window windowController];
 		if ([wincon respondsToSelector:@selector(explorer)]) {
-			ProjectDelegate *explorer = [wincon explorer];
+			ViFileExplorer *explorer = [wincon explorer];
 			if ([explorer displaysURL:aURL])
 				return YES;
 		}
@@ -296,7 +296,7 @@
 	for (NSWindow *window in [NSApp windows]) {
 		ViWindowController *wincon = [window windowController];
 		if ([wincon respondsToSelector:@selector(explorer)]) {
-			ProjectDelegate *explorer = [wincon explorer];
+			ViFileExplorer *explorer = [wincon explorer];
 			if ([explorer displaysURL:aURL])
 				[[ViEventManager defaultManager] emit:ViEventExplorerDirectoryChanged for:explorer with:explorer, aURL, nil];
 		}

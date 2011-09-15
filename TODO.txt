@@ -3,7 +3,6 @@
 * remove "invert match" option from ack search
 * group by attribute != grouped display string
 
-* rename ProjectDelegate to ViFileExplorer? ViProjectController? ViExplorer? ViFileController?
 * marks should support ranges
 
 * explorer spinner is hidden by new path control

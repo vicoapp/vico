@@ -1,6 +1,6 @@
 #import "ViProject.h"
 #import "logging.h"
-#import "ProjectDelegate.h"
+#import "ViFileExplorer.h"
 #import "ViDocumentController.h"
 #import "ViDocument.h"
 

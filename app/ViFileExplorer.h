@@ -9,7 +9,7 @@
 @class ViWindowController;
 @class ViBgView;
 
-@interface ProjectDelegate : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget, NSMenuDelegate>
+@interface ViFileExplorer : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget, NSMenuDelegate>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet ViWindowController *windowController;

@@ -71,9 +71,14 @@
 
 			modifierMask = keyflags;
 
-			if (keyflags == NSControlKeyMask && keyCode >= 'a' && keyCode < '~') {
-				keyflags = 0;
-				keyCode = keyCode - 'a' + 1;
+			if (keyflags == NSControlKeyMask) {
+				if (keyCode >= 'a' && keyCode <= 'z') {
+					keyflags = 0;
+					keyCode = keyCode - 'a' + 1;
+				} else if (keyCode >= '[' && keyCode <= '_') {
+					keyflags = 0;
+					keyCode = keyCode - 'A' + 1;
+				}
 			}
 
 			if ([keyEquivalent isUppercase])

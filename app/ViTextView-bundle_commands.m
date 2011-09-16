@@ -225,109 +225,104 @@
 		status = 0;
 	}
 
-	if (status != 0) {
-		MESSAGE(@"%@: exited with status %i", [command name], status);
-		DEBUG(@"command output: %@", outputText);
-	} else {
-		DEBUG(@"command output: %@", outputText);
-		DEBUG(@"output format: %@", outputFormat);
+	DEBUG(@"%@: exited with status %i", [command name], status);
+	DEBUG(@"command output: %@", outputText);
+	DEBUG(@"output format: %@", outputFormat);
 
-		if (mode == ViVisualMode)
-			[self setNormalMode];
+	if (mode == ViVisualMode)
+		[self setNormalMode];
 
-		NSUInteger lineno = [self currentLine];
-		NSUInteger column = [self currentColumn];
+	NSUInteger lineno = [self currentLine];
+	NSUInteger column = [self currentColumn];
 
-		if ([outputFormat isEqualToString:@"replaceSelectedText"]) {
-			[self replaceRange:selectedRange withString:outputText];
-			[self gotoLine:lineno column:column];
-		} else if ([outputFormat isEqualToString:@"replaceDocument"]) {
-			[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText];
-			[self gotoLine:lineno column:column];
-		} else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
-			MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
-			keepMessagesHack = YES;
-			// [self addToolTipRect: owner:outputText userData:nil];
-		} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-			id<ViViewController> viewController = [[[self window] windowController] currentView];
-			ViTabController *tabController = [viewController tabController];
-			id<ViViewController> webView = nil;
-			/* Try to reuse any existing web view in the current tab. */
-			for (webView in [tabController views]) {
-				if ([webView isKindOfClass:[ViCommandOutputController class]])
-					break;
-			}
+	if ([outputFormat isEqualToString:@"replaceSelectedText"]) {
+		[self replaceRange:selectedRange withString:outputText];
+		[self gotoLine:lineno column:column];
+	} else if ([outputFormat isEqualToString:@"replaceDocument"]) {
+		[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText];
+		[self gotoLine:lineno column:column];
+	} else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
+		MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
+		keepMessagesHack = YES;
+	} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
+		id<ViViewController> viewController = [[[self window] windowController] currentView];
+		ViTabController *tabController = [viewController tabController];
+		id<ViViewController> webView = nil;
+		/* Try to reuse any existing web view in the current tab. */
+		for (webView in [tabController views]) {
+			if ([webView isKindOfClass:[ViCommandOutputController class]])
+				break;
+		}
 
-			BOOL splitVertically = NO;
-			BOOL newWindow = NO;
-			NSString *htmlMode = [command htmlMode];
-			if (htmlMode == nil)
-				htmlMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHTMLMode"];
-			if ([htmlMode isEqualTo:@"split"])
-				splitVertically = NO;
-			else if ([htmlMode isEqualTo:@"vsplit"])
-				splitVertically = YES;
-			else if ([htmlMode isEqualTo:@"window"])
-				newWindow = YES;
+		BOOL splitVertically = NO;
+		BOOL newWindow = NO;
+		NSString *htmlMode = [command htmlMode];
+		if (htmlMode == nil)
+			htmlMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHTMLMode"];
+		if ([htmlMode isEqualTo:@"split"])
+			splitVertically = NO;
+		else if ([htmlMode isEqualTo:@"vsplit"])
+			splitVertically = YES;
+		else if ([htmlMode isEqualTo:@"window"])
+			newWindow = YES;
 
-			if (webView) {
-				[(ViCommandOutputController *)webView setContent:outputText];
-				[(ViCommandOutputController *)webView setTitle:[command name]];
-				[[[self window] windowController] selectDocumentView:webView];
+		if (webView) {
+			[(ViCommandOutputController *)webView setContent:outputText];
+			[(ViCommandOutputController *)webView setTitle:[command name]];
+			[[[self window] windowController] selectDocumentView:webView];
+		} else {
+			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
+			[oc setTitle:[command name]];
+
+			if (newWindow) {
+				ViWindowController *winCon = [[ViWindowController alloc] init];
+				[winCon createTabWithViewController:oc];
+				[winCon selectDocumentView:oc];
 			} else {
-				ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
-				[oc setTitle:[command name]];
-
-				if (newWindow) {
-					ViWindowController *winCon = [[ViWindowController alloc] init];
-					[winCon createTabWithViewController:oc];
-					[winCon selectDocumentView:oc];
-				} else {
-					if (viewController) {
-						[tabController splitView:viewController
-								withView:oc
-							      vertically:splitVertically];
-					} else
-						[[[self window] windowController] createTabWithViewController:oc];
-					[[[self window] windowController] selectDocumentView:oc];
-				}
+				if (viewController) {
+					[tabController splitView:viewController
+							withView:oc
+						      vertically:splitVertically];
+				} else
+					[[[self window] windowController] createTabWithViewController:oc];
+				[[[self window] windowController] selectDocumentView:oc];
 			}
-		} else if ([outputFormat isEqualToString:@"insertAsText"]) {
-			[self insertString:outputText atLocation:[self caret]];
-			[self setCaret:[self caret] + [outputText length]];
-		} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
-			[self insertString:outputText atLocation:NSMaxRange(selectedRange)];
-			[self setCaret:NSMaxRange(selectedRange) + [outputText length]];
-		} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
-			NSRange r;
-			/*
-			 * Seems TextMate replaces the snippet trigger range only
-			 * if input type is not "selection" or any fallback (line, word, ...).
-			 * Otherwise the selection is replaced... (?)
-			 */
-			if ([[command input] isEqualToString:@"document"] ||
-			    [[command input] isEqualToString:@"none"]) {
-				r = NSMakeRange([self caret], 0);
-			} else {
-				/* Replace the selection. */
-				r = inputRange;
-			}
-			[self insertSnippet:outputText
-				  andIndent:NO
-			         fromBundle:[command bundle]
-			            inRange:r];
-		} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
-		           [outputFormat isEqualToString:@"createNewDocument"]) {
-			id<ViViewController> viewController = [[[self window] windowController] splitVertically:NO
-													andOpen:nil
-											     orSwitchToDocument:nil];
-			ViDocument *doc = [viewController document];
-			[doc setString:outputText];
-		} else if ([outputFormat isEqualToString:@"discard"])
-			;
-		else
-			INFO(@"unknown output format: %@", outputFormat);
-	}
+		}
+	} else if ([outputFormat isEqualToString:@"insertAsText"]) {
+		[self insertString:outputText atLocation:[self caret]];
+		[self setCaret:[self caret] + [outputText length]];
+	} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
+		[self insertString:outputText atLocation:NSMaxRange(selectedRange)];
+		[self setCaret:NSMaxRange(selectedRange) + [outputText length]];
+	} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
+		NSRange r;
+		/*
+		 * Seems TextMate replaces the snippet trigger range only
+		 * if input type is not "selection" or any fallback (line, word, ...).
+		 * Otherwise the selection is replaced... (?)
+		 */
+		if ([[command input] isEqualToString:@"document"] ||
+		    [[command input] isEqualToString:@"none"]) {
+			r = NSMakeRange([self caret], 0);
+		} else {
+			/* Replace the selection. */
+			r = inputRange;
+		}
+		[self insertSnippet:outputText
+			  andIndent:NO
+			 fromBundle:[command bundle]
+			    inRange:r];
+	} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
+		   [outputFormat isEqualToString:@"createNewDocument"]) {
+		id<ViViewController> viewController = [[[self window] windowController] splitVertically:NO
+												andOpen:nil
+										     orSwitchToDocument:nil];
+		ViDocument *doc = [viewController document];
+		[doc setString:outputText];
+	} else if ([outputFormat isEqualToString:@"discard"])
+		;
+	else
+		INFO(@"unknown output format: %@", outputFormat);
 
 	[self endUndoGroup];
 

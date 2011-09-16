@@ -549,7 +549,7 @@
 	return prefsForScope;
 }
 
-- (NSMenu *)submenu:(NSDictionary *)menuLayout
+- (NSMenu *)submenu:(id)menuLayout
            withName:(NSString *)name
          inMainMenu:(NSDictionary *)mainMenu
            forScope:(ViScope *)scope
@@ -560,9 +560,21 @@
 	int matches = 0;
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
 	[menu setAutoenablesItems:NO];
-	NSDictionary *submenus = [mainMenu objectForKey:@"submenus"];
+	NSDictionary *submenus = nil;
+	if ([mainMenu isKindOfClass:[NSDictionary class]])
+		submenus = [mainMenu objectForKey:@"submenus"];
 
-	for (NSString *uuid in [menuLayout objectForKey:@"items"]) {
+	NSArray *menuItems = nil;
+	if ([menuLayout isKindOfClass:[NSDictionary class]]) {
+		menuItems = [menuLayout objectForKey:@"items"];
+		if (![menuItems isKindOfClass:[NSArray class]])
+			return nil;
+	} else if ([menuLayout isKindOfClass:[NSArray class]])
+		menuItems = menuLayout;
+	else
+		return nil;
+
+	for (NSString *uuid in menuItems) {
 		id op;
 		NSMenuItem *item;
 
@@ -617,7 +629,7 @@
 				INFO(@"unhandled bundle item %@", op);
 		} else {
 			NSDictionary *submenuLayout = [submenus objectForKey:uuid];
-			if (submenuLayout) {
+			if ([submenuLayout isKindOfClass:[NSDictionary class]]) {
 				NSUInteger submatches = 0;
 				NSMenu *submenu = [self submenu:submenuLayout
 				                       withName:[submenuLayout objectForKey:@"name"]
@@ -652,7 +664,12 @@
                     font:(NSFont *)aFont
 {
 	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
-	if (mainMenu == nil || ![mainMenu isKindOfClass:[NSDictionary class]])
+	if (mainMenu == nil) {
+		/* Fall back to simple list of bundle items. */
+		mainMenu = [info objectForKey:@"ordering"];
+		if (![mainMenu isKindOfClass:[NSArray class]])
+			return nil;
+	} else if (![mainMenu isKindOfClass:[NSDictionary class]])
 		return nil;
 
 	NSUInteger matches = 0;

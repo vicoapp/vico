@@ -1,4 +1,5 @@
-#include "ViJumpList.h"
+#import "ViJumpList.h"
+#import "ViCommon.h"
 #include "logging.h"
 
 #define MAX_JUMP_LOCATIONS 100
@@ -58,7 +59,7 @@
 	BOOL removedDuplicate = NO;
 	ViJump *jump = nil;
 	for (jump in jumps)
-		if ([[jump url] isEqual:url] && [jump line] == line)
+		if ([[jump url] isEqual:url] && IMAX(1, [jump line]) == IMAX(1, line))
 			break;
 
 	if (jump) {

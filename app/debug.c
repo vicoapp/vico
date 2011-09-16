@@ -26,7 +26,7 @@ void	 ldap_debug_elements(struct ber_element *root, int context,
 void
 hexdump(const void *data, size_t len, const char *fmt, ...)
 {
-	uint8_t *p = data;
+	const uint8_t *p = data;
 	va_list ap;
 
 	va_start(ap, fmt);

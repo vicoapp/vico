@@ -1470,13 +1470,14 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)gotoMark:(ViMark *)mark
 {
-	NSURL *url = mark.url;
-	if (url)
-		[self gotoURL:url line:mark.line column:mark.column];
-	else {
+	if (mark.document) {
 		id<ViViewController> viewController = [self selectDocument:mark.document];
-		[(ViTextView *)[viewController innerView] gotoLine:mark.line column:mark.column];
-	}
+		ViTextView *tv = (ViTextView *)[viewController innerView];
+		[tv setCaret:mark.range.location];
+		[tv scrollRangeToVisible:mark.range];
+		[[tv nextRunloop] showFindIndicatorForRange:mark.range];
+	} else if (mark.url)
+		[self gotoURL:mark.url line:mark.line column:mark.column];
 }
 
 - (BOOL)gotoURL:(NSURL *)url

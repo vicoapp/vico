@@ -1461,13 +1461,6 @@ static ViWindowController	*currentWindowController = nil;
 	return nil;
 }
 
-- (ViMarkStack *)locationStack
-{
-	if (locationStack == nil)
-		locationStack = [ViMarkStack markStackWithName:[NSString stringWithFormat:@"Location stack in window %p", self]];
-	return locationStack;
-}
-
 - (void)gotoMark:(ViMark *)mark
 {
 	if (mark.document) {

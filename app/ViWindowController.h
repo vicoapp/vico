@@ -70,8 +70,6 @@
 	IBOutlet NSImageView *symbolsResizeView;
 	IBOutlet NSView *symbolsView;
 
-	ViMarkStack *locationStack;
-
 	ViJumpList *jumpList;
 	BOOL jumping;
 	IBOutlet NSSegmentedControl *jumplistNavigator;
@@ -225,7 +223,6 @@
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
 - (void)gotoMark:(ViMark *)mark;
-- (ViMarkStack *)locationStack;
 
 - (IBAction)searchSymbol:(id)sender;
 - (void)gotoSymbol:(ViSymbol *)aSymbol;

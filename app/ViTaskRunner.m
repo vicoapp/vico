@@ -140,7 +140,7 @@ synchronouslyInWindow:(NSWindow *)aWindow
 	stdout = [NSMutableData data];
 	stderr = [NSMutableData data];
 
-	stream = [task scheduledStreamWithStandardInput:stdin];
+	stream = [task scheduledStreamWithStandardInput:stdin captureStandardError:YES];
 	[stream setDelegate:self];
 
 	status = -1;

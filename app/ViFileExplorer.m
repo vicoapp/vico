@@ -37,7 +37,6 @@
 - (NSInteger)rowForItemWithURL:(NSURL *)aURL;
 - (BOOL)selectItemAtRow:(NSInteger)row;
 - (BOOL)selectItem:(id)item;
-- (BOOL)selectItemWithURL:(NSURL *)aURL;
 - (void)rescanURL:(NSURL *)aURL
      onlyIfCached:(BOOL)cacheFlag
      andRenameURL:(NSURL *)renameURL;
@@ -429,7 +428,6 @@
 
 	return YES;
 }
-
 
 - (IBAction)actionMenu:(id)sender
 {

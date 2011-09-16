@@ -101,6 +101,7 @@
 - (void)cancelExplorer;
 - (BOOL)isEditing;
 - (BOOL)displaysURL:(NSURL *)aURL;
+- (BOOL)selectItemWithURL:(NSURL *)aURL;
 
 - (NSSet *)clickedURLs;
 - (NSSet *)clickedFolderURLs;

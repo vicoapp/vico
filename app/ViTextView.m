@@ -948,8 +948,10 @@ int logIndent = 0;
 - (void)cutToRegister:(unichar)regName
                 range:(NSRange)cutRange
 {
-	[self yankToRegister:regName range:cutRange];
+	NSString *content = [[[self textStorage] string] substringWithRange:cutRange];
+	[[ViRegisterManager sharedManager] setContent:content ofRegister:regName];
 	[self deleteRange:cutRange];
+	[[self document] setMark:'[' toRange:NSMakeRange(cutRange.location, 0)];
 	[[self document] setMark:']' atLocation:cutRange.location];
 }
 
@@ -1342,8 +1344,9 @@ int logIndent = 0;
 	DEBUG(@"setting normal mode, caret = %u, final_location = %u, length = %u",
 	    caret, final_location, [[self textStorage] length]);
 	[self switchToNormalInputSourceAndRemember:YES];
+	if (mode == ViInsertMode)
+		[[self document] setMark:']' atLocation:end_location];
 	mode = ViNormalMode;
-	[[self document] setMark:']' atLocation:end_location];
 	[self endUndoGroup];
 }
 
@@ -1365,7 +1368,8 @@ int logIndent = 0;
 	[self switchToInsertInputSource];
 	mode = ViInsertMode;
 
-	[[self document] setMark:'[' atLocation:end_location];
+	[[self document] setMark:'[' toRange:NSMakeRange(end_location, 0)];
+	[[self document] setMark:']' atLocation:end_location];
 
 	/*
 	 * Remember the command that entered insert mode. When leaving insert mode,

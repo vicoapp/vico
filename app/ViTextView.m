@@ -1483,39 +1483,40 @@ int logIndent = 0;
 	ViTextStorage *ts = [self textStorage];
 	NSString *string = [ts string];
 	NSUInteger length = [ts length];
-
+	NSArray *pair = nil;
+	""
 	DEBUG(@"testing %@ for smart pair", characters);
 
+	/*
+	 * Check if we're inserting the end character of a smart typing pair.
+	 * If so, just overwrite the end character.
+	 * Note: start and end characters might be the same (eg, "").
+	 */
+
+	if (start_location < length)
+		pair = [[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
+					       atCharacterIndex:start_location
+						 effectiveRange:NULL];
+	if ([pair isKindOfClass:[NSArray class]]) {
+		// NSString *pair0 = [pair objectAtIndex:0];
+		NSString *pair1 = [pair objectAtIndex:1];
+		if (/*[pair0 isEqualToString:characters] ||*/ [pair1 isEqualToString:characters]) {
+			final_location = start_location + [characters length];
+			return YES;
+		}
+	}
+
+	/*
+	 * Check for the start character of a smart typing pair.
+	 */
 	NSArray *smartTypingPairs = [self smartTypingPairsAtLocation:IMIN(start_location, length - 1)];
-	NSArray *pair;
 	for (pair in smartTypingPairs) {
 		NSString *pair0 = [pair objectAtIndex:0];
-		NSString *pair1 = [pair objectAtIndex:1];
-
-		DEBUG(@"got pairs %@ and %@ at %lu < %lu", pair0, pair1, start_location, length);
-
-		/*
-		 * Check if we're inserting the end character of a smart typing pair.
-		 * If so, just overwrite the end character.
-		 * Note: start and end characters might be the same (eg, "").
-		 */
-		if (start_location < length &&
-		    [characters isEqualToString:pair1] &&
-		    [[string substringWithRange:NSMakeRange(start_location, 1)]
-		     isEqualToString:pair1]) {
-			if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-						    atCharacterIndex:start_location
-						      effectiveRange:NULL]) {
-				foundSmartTypingPair = YES;
-				final_location = start_location + [pair1 length];
-			}
-			break;
-		}
-		// check for the start character of a smart typing pair
-		else if ([characters isEqualToString:pair0] && ![self shouldEndString:pair atLocation:start_location]) {
+		if ([characters isEqualToString:pair0] && ![self shouldEndString:pair atLocation:start_location]) {
+			NSString *pair1 = [pair objectAtIndex:1];
+			DEBUG(@"got pairs %@ and %@ at %lu < %lu", pair0, pair1, start_location, length);
 			/*
 			 * Only use if next character is not alphanumeric.
-			 * FIXME: ...and next character is not any start character of a smart pair?
 			 */
 			if (start_location >= length ||
 			    ![[NSCharacterSet alphanumericCharacterSet] characterIsMember:
@@ -1529,7 +1530,7 @@ int logIndent = 0;
 				NSRange r = NSMakeRange(start_location, [pair0 length] + [pair1 length]);
 				DEBUG(@"adding smart pair attr to %@", NSStringFromRange(r));
 				[[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName
-								      value:characters
+								      value:pair
 							  forCharacterRange:r];
 
 				final_location = start_location + [pair1 length];

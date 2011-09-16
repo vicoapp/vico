@@ -1,7 +1,6 @@
 # 1.3
 
 * marks as motions; check they still work, and allow global marks in same file
-* ruby || (pipes) doesn't allow overtyping
 
 * yellow highlight after goto mark in newly opened document
 * only show line number in mark inspector

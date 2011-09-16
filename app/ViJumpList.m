@@ -78,12 +78,15 @@
 	return removedDuplicate;
 }
 
-- (BOOL)gotoJumpAtPosition:(NSUInteger)aPosition
+- (BOOL)gotoJumpAtPosition:(NSInteger)aPosition
                        URL:(NSURL **)urlPtr
                       line:(NSUInteger *)linePtr
                     column:(NSUInteger *)columnPtr
                       view:(NSView **)viewPtr
 {
+	DEBUG(@"goto jump at position %li", aPosition);
+	if (aPosition < 0 || aPosition >= [jumps count])
+		return NO;
 	ViJump *jump = [jumps objectAtIndex:aPosition];
 	DEBUG(@"using jump %@", jump);
 	if (urlPtr)
@@ -121,12 +124,12 @@
                column:(NSUInteger *)columnPtr
                  view:(NSView **)viewPtr
 {
-	DEBUG(@"position = %u, count = %u", position, [jumps count]);
+	DEBUG(@"position = %li, count = %u", position, [jumps count]);
 	if (position <= 0)
 		return NO;
 
 	if (position >= [jumps count] && urlPtr && linePtr && columnPtr && viewPtr) {
-		NSUInteger savedPosition = position;
+		NSInteger savedPosition = position;
 		BOOL removedDuplicate = [self pushURL:*urlPtr
 						 line:*linePtr
 					       column:*columnPtr

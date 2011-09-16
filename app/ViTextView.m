@@ -2178,6 +2178,8 @@ int logIndent = 0;
 		[keyManager.parser reset];
 	}
 
+	start_location = [self caret];
+
 	if ([event deltaX] > 0)
 		rc = [self jumplist_backward:nil];
 	else if ([event deltaX] < 0)

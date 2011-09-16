@@ -1936,7 +1936,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	id<ViViewController> viewController = nil;
 	if (jump.view)
 		viewController = [self viewControllerForView:jump.view];
-	[self gotoURL:jump.url line:jump.line column:jump.column view:viewController];
+	[self gotoURL:jump.url line:IMAX(jump.line, 1) column:jump.column view:viewController];
 	jumping = NO;
 
 	ViTextView *tv = [(ViDocumentView *)[self currentView] textView];

@@ -33,6 +33,6 @@
 - (int)compareBegin:(ViScope *)otherContext;
 - (id)copyWithZone:(NSZone *)zone;
 
-- (void)addScopeComponent:(NSString *)scopeComponent;
+- (BOOL)addScopeComponent:(NSString *)scopeComponent;
 
 @end

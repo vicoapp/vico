@@ -71,9 +71,13 @@
 	return foundScopeSelector;
 }
 
-- (void)addScopeComponent:(NSString *)scopeComponent
+- (BOOL)addScopeComponent:(NSString *)scopeComponent
 {
-	scopes = [scopes arrayByAddingObject:scopeComponent];
+	if (![scopes containsObject:scopeComponent]) {
+		scopes = [scopes arrayByAddingObject:scopeComponent];
+		return YES;
+	}
+	return NO;
 }
 
 @end

@@ -3,13 +3,17 @@
 
 @implementation NSTask (streaming)
 
-- (ViBufferedStream *)scheduledStreamWithStandardInput:(NSData *)stdinData
+- (ViBufferedStream *)scheduledStreamWithStandardInput:(NSData *)stdinData captureStandardError:(BOOL)captureStderr
 {
 	if (stdinData)
 		[self setStandardInput:[NSPipe pipe]];
 	else
 		[self setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
-	[self setStandardOutput:[NSPipe pipe]];
+
+	NSPipe *stdout = [NSPipe pipe];
+	[self setStandardOutput:stdout];
+	if (captureStderr)
+		[self setStandardError:stdout];
 
         DEBUG(@"launching %@ with arguments %@", [self launchPath], [self arguments]);
         [self launch];
@@ -21,6 +25,11 @@
 
         [stream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 	return stream;
+}
+
+- (ViBufferedStream *)scheduledStreamWithStandardInput:(NSData *)stdinData
+{
+	return [self scheduledStreamWithStandardInput:stdinData captureStandardError:NO];
 }
 
 @end

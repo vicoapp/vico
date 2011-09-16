@@ -13,7 +13,10 @@
 {
 	self = [super init];
 	if (self) {
-		[NSBundle loadNibNamed:@"ViDocument" owner:self];
+		if (![NSBundle loadNibNamed:@"ViDocument" owner:self]) {
+			INFO(@"%s", "Failed to load nib \"ViDocument\"");
+			return nil;
+		}
 		document = aDocument;
 		[document addObserver:self
 		           forKeyPath:@"title"

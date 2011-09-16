@@ -48,7 +48,7 @@
 		(set content (or (choice objectForKey:"match") (choice objectForKey:"display")))
 		(set c (ViCompletion completionWithContent:content))
 		(c setRepresentedObject:choice)
-		(c))))
+		c)))
 	(set point ((text layoutManager) boundingRectForGlyphRange:`(,(text caret) 0)
 						   inTextContainer:(text textContainer)))
 	(set screenPoint ((window window) convertBaseToScreen:(text convertPointToBase:point)))

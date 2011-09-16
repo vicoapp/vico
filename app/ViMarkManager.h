@@ -41,6 +41,7 @@
 
 - (void)clear;
 - (ViMark *)lookup:(NSString *)name;
+- (NSUInteger)count;
 - (void)addMark:(ViMark *)mark;
 - (void)addMarksFromArray:(NSArray *)marksToAdd;
 - (void)removeMark:(ViMark *)mark;
@@ -81,6 +82,7 @@
 
 @interface ViMarkManager : NSObject
 {
+	NSMapTable *marksPerDocument; // keys are documents, values are NSHashTables of marks
 	NSMutableArray *stacks;
 	NSMutableDictionary *namedStacks; // keyed by name
 }
@@ -91,5 +93,9 @@
 - (void)removeStackWithName:(NSString *)name;
 - (ViMarkStack *)makeStack;
 - (ViMarkStack *)stackWithName:(NSString *)name;
+
+- (void)registerMark:(ViMark *)mark;
+- (void)unregisterMark:(ViMark *)mark;
+- (NSHashTable *)marksForDocument:(ViDocument *)document;
 
 @end

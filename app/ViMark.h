@@ -1,4 +1,5 @@
 @class ViDocument;
+@class ViMarkList;
 
 /** A marked location.
  */
@@ -18,6 +19,8 @@
 	NSString *groupName;
 	NSURL *url;
 	__weak ViDocument *document;
+
+	NSHashTable *lists;
 }
 
 /** The name of the mark. */
@@ -41,7 +44,7 @@
 /** The title of the mark. */
 @property(nonatomic,readwrite,assign) NSAttributedString *title;
 
-@property(nonatomic,readwrite,assign) __weak ViDocument *document;
+@property(nonatomic,readonly) __weak ViDocument *document;
 
 @property(nonatomic,readonly) NSString *groupName;
 
@@ -51,21 +54,25 @@
                   line:(NSUInteger)aLine
                 column:(NSUInteger)aColumn;
 
-+ (ViMark *)markWithDocument:(ViDocument *)aDocument
-			name:(NSString *)aName
-		    location:(NSUInteger)aLocation;
-
 - (ViMark *)initWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
 		  title:(id)aTitle
                   line:(NSUInteger)aLine
                 column:(NSUInteger)aColumn;
 
++ (ViMark *)markWithDocument:(ViDocument *)aDocument
+			name:(NSString *)aName
+		       range:(NSRange)aRange;
+
 - (ViMark *)initWithDocument:(ViDocument *)aDocument
 			name:(NSString *)aName
-		    location:(NSUInteger)aLocation;
+		       range:(NSRange)aRange;
 
 - (void)setLocation:(NSUInteger)aLocation;
 - (void)setRange:(NSRange)aRange;
+- (void)setDocument:(__weak ViDocument *)doc;
+
+- (void)remove;
+- (void)registerList:(ViMarkList *)list;
 
 @end

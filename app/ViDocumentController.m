@@ -208,6 +208,7 @@
 			openDocs = [NSMutableDictionary dictionary];
 		[openDocs setObject:document forKey:[document fileURL]];
 	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentAddedNotification object:document];
 	[[ViEventManager defaultManager] emit:ViEventDidAddDocument for:nil with:document, nil];
 }
 
@@ -217,6 +218,7 @@
 	[super removeDocument:document];
 	if ([document fileURL])
 		[openDocs removeObjectForKey:[document fileURL]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentRemovedNotification object:document];
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
 }
 

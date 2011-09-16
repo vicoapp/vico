@@ -185,6 +185,7 @@
 		[marksByName setObject:mark forKey:mark.name];
 	}
 	[marks addObject:mark];
+	[mark registerList:self];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group addMark:mark]; }];
@@ -206,6 +207,7 @@
 				[marks removeObject:oldMark]; // XXX: linear search!
 			[marksByName setObject:mark forKey:mark.name];
 		}
+		[mark registerList:self];
 	}
 	[marks addObjectsFromArray:marksToAdd];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
@@ -232,6 +234,11 @@
 - (ViMark *)lookup:(NSString *)aName
 {
 	return [marksByName objectForKey:aName];
+}
+
+- (NSUInteger)count
+{
+	return [marks count];
 }
 
 - (ViMarkGroup *)groupBy:(NSString *)selectorString
@@ -447,6 +454,7 @@ static ViMarkManager *sharedManager = nil;
 	if ((self = [super init]) != nil) {
 		stacks = [NSMutableArray array];
 		namedStacks = [NSMutableDictionary dictionary];
+		marksPerDocument = [NSMapTable mapTableWithWeakToStrongObjects];
 		DEBUG(@"created mark manager %@", self);
 		[self stackWithName:@"Global Marks"];
 		sharedManager = self;
@@ -507,6 +515,34 @@ static ViMarkManager *sharedManager = nil;
 {
 	DEBUG(@"request for key %@ in mark manager %@", key, self);
 	return [self stackWithName:key];
+}
+
+- (void)registerMark:(ViMark *)mark
+{
+	if (mark.document == nil)
+		return;
+
+	NSHashTable *marks = [marksPerDocument objectForKey:mark.document];
+	if (marks == nil) {
+		marks = [NSHashTable hashTableWithWeakObjects];
+		[marksPerDocument setObject:marks forKey:mark.document];
+	}
+	[marks addObject:mark];
+}
+
+- (void)unregisterMark:(ViMark *)mark
+{
+	if (mark.document == nil)
+		return;
+
+	NSHashTable *marks = [marksPerDocument objectForKey:mark.document];
+	if (marks)
+		[marks removeObject:mark];
+}
+
+- (NSHashTable *)marksForDocument:(ViDocument *)aDocument
+{
+	return [marksPerDocument objectForKey:aDocument];
 }
 
 @end

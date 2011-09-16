@@ -6,6 +6,9 @@
 #define ViAutoNewlineAttributeName @"ViAutoNewline"
 #define ViContinuationAttributeName @"ViContinuation"
 
+#define ViDocumentLoadedNotification @"ViDocumentLoadedNotification"
+#define ViDocumentAddedNotification @"ViDocumentAddedNotification"
+#define ViDocumentRemovedNotification @"ViDocumentRemovedNotification"
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
 #define ViDocumentEditedChangedNotification @"ViDocumentEditedChangedNotification "

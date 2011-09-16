@@ -228,12 +228,16 @@ BOOL makeNewWindowInsteadOfTab = NO;
 			[self setFileModificationDate:[attributes fileModificationDate]];
 			[self setIsTemporary:NO];
 			[self setFileURL:normalizedURL];
-			[[ViEventManager defaultManager] emitDelayed:ViEventDidLoadDocument for:self with:self, nil];
 			[self message:@"%@: %lu lines", [self title], [textStorage lineCount]];
 
 			[self eachTextView:^(ViTextView *tv) {
 				[tv documentDidLoad:self];
 			}];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentLoadedNotification 
+									    object:self];
+			[[ViEventManager defaultManager] emitDelayed:ViEventDidLoadDocument
+								 for:self
+								with:self, nil];
 		}
 	};
 
@@ -400,8 +404,10 @@ BOOL makeNewWindowInsteadOfTab = NO;
 
 - (void)addView:(ViDocumentView *)docView
 {
-	[views addObject:docView];
-	hiddenView = nil;
+	if (docView) {
+		[views addObject:docView];
+		hiddenView = nil;
+	}
 }
 
 - (ViTextView *)text
@@ -427,6 +433,8 @@ BOOL makeNewWindowInsteadOfTab = NO;
 		return hiddenView;
 
 	ViDocumentView *documentView = [[ViDocumentView alloc] initWithDocument:self];
+	if (documentView == nil)
+		return nil;
 	[self addView:documentView];
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -1338,6 +1346,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSRange area = [textStorage editedRange];
 	NSInteger diff = [textStorage changeInLength];
 
+	DEBUG(@"edited range %@, diff is %li", NSStringFromRange(area), diff);
+
 	if (ignoreEditing) {
 		DEBUG(@"ignoring changes in area %@", NSStringFromRange(area));
 		ignoreEditing = NO;
@@ -1676,14 +1686,14 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return [localMarks.list lookup:name];
 }
 
-- (void)setMark:(unichar)key atLocation:(NSUInteger)aLocation
+- (void)setMark:(unichar)key toRange:(NSRange)range
 {
 	NSString *name = [NSString stringWithFormat:@"%C", key];
 	ViMark *m = [localMarks.list lookup:name];
 	if (m)
-		[m setLocation:aLocation];
+		[m setRange:range];
 	else {
-		m = [ViMark markWithDocument:self name:name location:aLocation];
+		m = [ViMark markWithDocument:self name:name range:range];
 		[localMarks.list addMark:m];
 	}
 
@@ -1691,43 +1701,61 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list addMark:m];
 }
 
+- (void)setMark:(unichar)key atLocation:(NSUInteger)aLocation
+{
+	[self setMark:key toRange:NSMakeRange(aLocation, 1)];
+}
+
 - (void)pushMarks:(NSInteger)delta fromLocation:(NSUInteger)location
 {
 	DEBUG(@"pushing marks from %lu", location);
-	NSMutableSet *toDelete = nil;
-	for (ViMark *mark in localMarks.list.marks) {
+	NSHashTable *toDelete = nil;
+	for (ViMark *mark in [[ViMarkManager sharedManager] marksForDocument:self]) {
 		NSRange r = mark.range;
+		if (NSMaxRange(r) < location) {
+			/* The changed area is completely after the mark and doesn't affect it at all. */
+			continue;
+		}
+
+		/* The change was either completely before the mark (needs push/pull),
+		 * or the changed area intersects the mark.
+		 */
 		if (delta < 0) {
 			NSRange deletedRange = NSMakeRange(location, -delta);
-			if (r.location < location) {
-				/* the symbol isn't contained in the range */
-			} else if (NSIntersectionRange(deletedRange, r).length > 0) {
+
+			if (NSMaxRange(deletedRange) <= r.location) {
+				/* The changed area is completely before the mark. */
+				r.location += delta;
+				DEBUG(@"pushing mark %@ to %@", mark, NSStringFromRange(r));
+				[mark setRange:r];
+			} else if (NSEqualRanges(deletedRange, NSUnionRange(deletedRange, r)) &&
+				   NSMaxRange(r) > location) {
+				/*
+				 * The mark is completely contained within the changed area.
+				 * Remove the mark.
+				 */
 				DEBUG(@"remove mark %@", mark);
 				if (toDelete == nil)
-					toDelete = [NSMutableSet set];
+					toDelete = [NSHashTable hashTableWithOptions:0];
 				[toDelete addObject:mark];
 			} else {
-				/* we're past our range */
-				r.location += delta;
-				DEBUG(@"pushing mark %@ to %@", mark, NSStringFromRange(r));
-				[mark setRange:r];
+				/*
+				 * The changed area intersects the mark at either end.
+				 * FIXME: update the range or not?
+				 */
 			}
 		} else { /* delta > 0 */
-			if (r.location >= location) {
+			if (NSMaxRange(r) > location) {
+				/* The changed area is completely before the mark. */
 				r.location += delta;
 				DEBUG(@"pushing mark %@ to %@", mark, NSStringFromRange(r));
 				[mark setRange:r];
-			/*} else if (NSMaxRange(r) >= location) {
-				DEBUG(@"remove symbol %@", sym);
-				[symbols removeObjectAtIndex:i];*/
-			} else {
-				/* the symbol doesn't intersect the range */
 			}
 		}
 	}
 
 	for (ViMark *mark in toDelete)
-		[localMarks.list removeMark:mark];
+		[mark remove];
 }
 
 #pragma mark -

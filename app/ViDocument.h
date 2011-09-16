@@ -164,5 +164,6 @@
  * @param aLocation The location to mark.
  */
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
+- (void)setMark:(unichar)key toRange:(NSRange)range;
 
 @end

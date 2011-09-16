@@ -92,7 +92,6 @@
 		9A2EF3AB13310CB80023C5B7 /* ViScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34613310C750023C5B7 /* ViScope.m */; };
 		9A2EF3AD13310CB80023C5B7 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34A13310C790023C5B7 /* ViSeparatorCell.m */; };
 		9A2EF3AE13310CB80023C5B7 /* ViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34C13310C7C0023C5B7 /* ViSnippet.m */; };
-		9A2EF3B013310CB80023C5B7 /* ViSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35013310C810023C5B7 /* ViSymbol.m */; };
 		9A2EF3B113310CB80023C5B7 /* ViSymbolTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35213310C840023C5B7 /* ViSymbolTransform.m */; };
 		9A2EF3B213310CB80023C5B7 /* ViSyntaxContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35413310C860023C5B7 /* ViSyntaxContext.m */; };
 		9A2EF3B313310CB80023C5B7 /* ViSyntaxMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF35613310C890023C5B7 /* ViSyntaxMatch.m */; };
@@ -473,8 +472,8 @@
 		9A2EF2EC13310C340023C5B7 /* NSString-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-additions.m"; sourceTree = "<group>"; };
 		9A2EF2ED13310C350023C5B7 /* NSString-scopeSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString-scopeSelector.h"; sourceTree = "<group>"; };
 		9A2EF2EE13310C350023C5B7 /* NSString-scopeSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString-scopeSelector.m"; sourceTree = "<group>"; };
-		9A2EF2EF13310C350023C5B7 /* ViFileExplorer.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ViFileExplorer.h; sourceTree = "<group>"; };
-		9A2EF2F013310C360023C5B7 /* ViFileExplorer.m */ = {isa = PBXFileReference; fileEncoding = 4; path = ViFileExplorer.m; sourceTree = "<group>"; };
+		9A2EF2EF13310C350023C5B7 /* ViFileExplorer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFileExplorer.h; sourceTree = "<group>"; };
+		9A2EF2F013310C360023C5B7 /* ViFileExplorer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFileExplorer.m; sourceTree = "<group>"; };
 		9A2EF2F113310C360023C5B7 /* PSMMetalTabStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMMetalTabStyle.h; sourceTree = "<group>"; };
 		9A2EF2F213310C360023C5B7 /* PSMMetalTabStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSMMetalTabStyle.m; sourceTree = "<group>"; };
 		9A2EF2F313310C360023C5B7 /* PSMOverflowPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSMOverflowPopUpButton.h; sourceTree = "<group>"; };
@@ -557,8 +556,6 @@
 		9A2EF34A13310C790023C5B7 /* ViSeparatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSeparatorCell.m; sourceTree = "<group>"; };
 		9A2EF34B13310C7B0023C5B7 /* ViSnippet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSnippet.h; sourceTree = "<group>"; };
 		9A2EF34C13310C7C0023C5B7 /* ViSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSnippet.m; sourceTree = "<group>"; };
-		9A2EF34F13310C800023C5B7 /* ViSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbol.h; sourceTree = "<group>"; };
-		9A2EF35013310C810023C5B7 /* ViSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbol.m; sourceTree = "<group>"; };
 		9A2EF35113310C820023C5B7 /* ViSymbolTransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolTransform.h; sourceTree = "<group>"; };
 		9A2EF35213310C840023C5B7 /* ViSymbolTransform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolTransform.m; sourceTree = "<group>"; };
 		9A2EF35313310C850023C5B7 /* ViSyntaxContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSyntaxContext.h; sourceTree = "<group>"; };
@@ -1385,8 +1382,6 @@
 				9A2EF34A13310C790023C5B7 /* ViSeparatorCell.m */,
 				9A2EF34B13310C7B0023C5B7 /* ViSnippet.h */,
 				9A2EF34C13310C7C0023C5B7 /* ViSnippet.m */,
-				9A2EF34F13310C800023C5B7 /* ViSymbol.h */,
-				9A2EF35013310C810023C5B7 /* ViSymbol.m */,
 				9A2EF35113310C820023C5B7 /* ViSymbolTransform.h */,
 				9A2EF35213310C840023C5B7 /* ViSymbolTransform.m */,
 				9A2EF35313310C850023C5B7 /* ViSyntaxContext.h */,
@@ -1893,7 +1888,6 @@
 				9A2EF3AB13310CB80023C5B7 /* ViScope.m in Sources */,
 				9A2EF3AD13310CB80023C5B7 /* ViSeparatorCell.m in Sources */,
 				9A2EF3AE13310CB80023C5B7 /* ViSnippet.m in Sources */,
-				9A2EF3B013310CB80023C5B7 /* ViSymbol.m in Sources */,
 				9A2EF3B113310CB80023C5B7 /* ViSymbolTransform.m in Sources */,
 				9A2EF3B213310CB80023C5B7 /* ViSyntaxContext.m in Sources */,
 				9A2EF3B313310CB80023C5B7 /* ViSyntaxMatch.m in Sources */,

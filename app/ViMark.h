@@ -13,7 +13,7 @@
 	NSNumber *lineNumber;
 	NSNumber *columnNumber;
 
-	NSAttributedString *title;
+	id title;
 	NSImage *icon;
 
 	NSString *groupName;
@@ -41,8 +41,8 @@
 @property(nonatomic,readonly) NSURL *url;
 /** The icon of the mark. */
 @property(nonatomic,readwrite,assign) NSImage *icon;
-/** The title of the mark. */
-@property(nonatomic,readwrite,assign) NSAttributedString *title;
+/** The title of the mark. An NSString or an NSAttributedString. */
+@property(nonatomic,readwrite,assign) id title;
 
 @property(nonatomic,readonly) __weak ViDocument *document;
 

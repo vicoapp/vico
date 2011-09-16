@@ -100,7 +100,6 @@ OBJC_SRCS = \
 	ViScope.m \
 	ViSeparatorCell.m \
 	ViSnippet.m \
-	ViSymbol.m \
 	ViSymbolController.m \
 	ViSymbolTransform.m \
 	ViSyntaxCompletion.m \

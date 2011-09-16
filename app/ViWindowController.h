@@ -2,7 +2,6 @@
 #import "ViTagsDatabase.h"
 #import "ViJumpList.h"
 #import "ViToolbarPopUpButtonCell.h"
-#import "ViSymbol.h"
 #import "ViSymbolController.h"
 #import "ViURLManager.h"
 #import "ViTabController.h"
@@ -222,11 +221,10 @@
 - (BOOL)gotoURL:(NSURL *)url;
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
+- (void)gotoMark:(ViMark *)mark inView:(ViDocumentView *)docView;
 - (void)gotoMark:(ViMark *)mark;
 
 - (IBAction)searchSymbol:(id)sender;
-- (void)gotoSymbol:(ViSymbol *)aSymbol;
-- (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView;
 - (NSMutableArray *)symbolsFilteredByPattern:(NSString *)pattern;
 - (IBAction)toggleSymbolList:(id)sender;
 - (IBAction)focusSymbols:(id)sender;

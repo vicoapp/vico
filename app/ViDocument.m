@@ -35,7 +35,6 @@ BOOL makeNewWindowInsteadOfTab = NO;
 - (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data;
 - (BOOL)addData:(NSData *)data;
 - (void)invalidateSymbolsInRange:(NSRange)range;
-- (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location;
 - (void)pushMarks:(NSInteger)delta fromLocation:(NSUInteger)location;
 - (void)updateTabSize;
 - (void)updateWrapping;
@@ -1366,7 +1365,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[syntaxParser pullScopes:NSMakeRange(area.location, -diff)];
 
 	if (diff != 0) {
-		[self pushSymbols:diff fromLocation:area.location];
 		[self pushMarks:diff fromLocation:area.location];
 		// FIXME: also push jumps
 	}
@@ -1518,8 +1516,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSUInteger)filterSymbols:(ViRegexp *)rx
 {
 	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[symbols count]];
-	for (ViSymbol *s in symbols)
-		if ([rx matchInString:[s symbol]])
+	for (ViMark *s in symbols)
+		if ([rx matchInString:s.title])
 			[fs addObject:s];
 	[self setFilteredSymbols:fs];
 	return [fs count];
@@ -1550,7 +1548,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSUInteger i;
 	/* Remove old symbols in the range. Assumes the symbols are sorted on location. */
 	for (i = 0; i < [symbols count];) {
-		ViSymbol *sym = [symbols objectAtIndex:i];
+		ViMark *sym = [symbols objectAtIndex:i];
 		NSRange r = sym.range;
 		if (r.location > maxRange)
 			/* we're past our range */
@@ -1585,10 +1583,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					symbol = [tr transformSymbol:symbol];
 				}
 
-				ViSymbol *sym = [[ViSymbol alloc] initWithSymbol:symbol
-									document:self
-									   range:wholeRange
-									   image:img];
+				ViMark *sym = [ViMark markWithDocument:self
+								  name:nil
+								 range:wholeRange];
+				sym.icon = img;
+				sym.title = symbol;
 				DEBUG(@"adding symbol %@", sym);
 				[symbols addObject:sym];
 			}
@@ -1599,7 +1598,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					lastSelector = scopeSelector;
 					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
 					if (backRange.length > 0) {
-						DEBUG(@"EXTENDED WITH backRange = %@ from %@", NSStringFromRange(backRange), NSStringFromRange(range));
+						DEBUG(@"EXTENDED WITH backRange = %@ from %@",
+						    NSStringFromRange(backRange), NSStringFromRange(range));
 						wholeRange = NSUnionRange(range, backRange);
 					} else
 						wholeRange = range;
@@ -1613,16 +1613,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 
 	[symbols sortUsingComparator:^(id obj1, id obj2) {
-		ViSymbol *sym1 = obj1, *sym2 = obj2;
+		ViMark *sym1 = obj1, *sym2 = obj2;
 		return (NSComparisonResult)(sym1.range.location - sym2.range.location);
 	}];
 
 	if ([symbols count] > 0) {
 		// XXX: remove duplicates, ie hide bugs
 		NSUInteger i;
-		NSUInteger prevLocation = ((ViSymbol *)[symbols objectAtIndex:0]).range.location;
+		NSUInteger prevLocation = ((ViMark *)[symbols objectAtIndex:0]).range.location;
 		for (i = 1; i < [symbols count];) {
-			ViSymbol *sym = [symbols objectAtIndex:i];
+			ViMark *sym = [symbols objectAtIndex:i];
 			if (sym.range.location == prevLocation)
 				[symbols removeObjectAtIndex:i];
 			else {
@@ -1632,46 +1632,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}
 
-	[self didChangeValueForKey:@"symbols"];
-}
-
-- (void)pushSymbols:(NSInteger)delta fromLocation:(NSUInteger)location
-{
-	DEBUG(@"pushing symbols from %lu", location);
-	[self willChangeValueForKey:@"symbols"];
-	for (NSUInteger i = 0; i < [symbols count];) {
-		ViSymbol *sym = [symbols objectAtIndex:i];
-		NSRange r = sym.range;
-		if (delta < 0) {
-			NSRange deletedRange = NSMakeRange(location, -delta);
-			if (r.location < location) {
-				/* the symbol isn't contained in the range */
-				i++;
-			} else if (NSIntersectionRange(deletedRange, r).length > 0) {
-				DEBUG(@"remove symbol %@", sym);
-				[symbols removeObjectAtIndex:i];
-			} else {
-				/* we're past our range */
-				r.location += delta;
-				DEBUG(@"pushing symbol %@ to %@", sym, NSStringFromRange(r));
-				sym.range = r;
-				i++;
-			}
-		} else { /* delta > 0 */
-			if (r.location >= location) {
-				r.location += delta;
-				DEBUG(@"pushing symbol %@ to %@", sym, NSStringFromRange(r));
-				sym.range = r;
-				i++;
-			/*} else if (NSMaxRange(r) >= location) {
-				DEBUG(@"remove symbol %@", sym);
-				[symbols removeObjectAtIndex:i];*/
-			} else {
-				/* the symbol doesn't intersect the range */
-				i++;
-			}
-		}
-	}
 	[self didChangeValueForKey:@"symbols"];
 }
 

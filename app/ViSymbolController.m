@@ -79,8 +79,8 @@
 {
 	NSArray *symbols = [[windowController currentDocument] symbols];
 	id item = [windowController currentDocument];
-	for (ViSymbol *symbol in symbols) {
-		NSRange r = [symbol range];
+	for (ViMark *symbol in symbols) {
+		NSRange r = symbol.range;
 		if (r.location > aLocation)
 			break;
 		if (![self isSeparatorItem:symbol])
@@ -185,8 +185,8 @@
 		filter = [altSymbolFilterField stringValue];
 	else
 		filter = [symbolFilterField stringValue];
-	if ([filter length] > 0 && [item isKindOfClass:[ViSymbol class]]) {
-		[symbolFilterCache setObject:[item symbol] forKey:filter];
+	if ([filter length] > 0 && [item isKindOfClass:[ViMark class]]) {
+		[symbolFilterCache setObject:[item title] forKey:filter];
 		[symbolFilterField setStringValue:@""];
 		[altSymbolFilterField setStringValue:@""];
 	}
@@ -194,7 +194,7 @@
 	if ([item isKindOfClass:[ViDocument class]])
 		[windowController selectDocument:item];
 	else
-		[windowController gotoSymbol:item];
+		[windowController gotoMark:item];
 
 	[self cancelSymbolList];
 }
@@ -225,8 +225,8 @@
 		// check if the cached symbol is available, then select it
 		for (row = 0; row < [symbolView numberOfRows]; row++) {
 			id item = [symbolView itemAtRow:row];
-			if ([item isKindOfClass:[ViSymbol class]] &&
-			    [[item symbol] isEqualToString:symbol]) {
+			if ([item isKindOfClass:[ViMark class]] &&
+			    [[item title] isEqualToString:symbol]) {
 				[symbolView scrollRowToVisible:row];
 				[symbolView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
 					    byExtendingSelection:NO];
@@ -238,7 +238,7 @@
 	// skip past all document entries, selecting the first symbol
 	for (row = 0; row < [symbolView numberOfRows]; row++) {
 		id item = [symbolView itemAtRow:row];
-		if ([item isKindOfClass:[ViSymbol class]]) {
+		if ([item isKindOfClass:[ViMark class]]) {
 			[symbolView scrollRowToVisible:row];
 			[symbolView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
 				    byExtendingSelection:NO];
@@ -492,7 +492,7 @@ doCommandBySelector:(SEL)aSelector
 		doc = symbol;
 		symbol = nil;
 	} else {
-		doc = [(ViSymbol *)symbol document];
+		doc = [(ViMark *)symbol document];
 	}
 
 	// remember what symbol we selected from the filtered set
@@ -512,7 +512,7 @@ doCommandBySelector:(SEL)aSelector
 		[windowController switchToDocument:doc];
 	windowController.jumping = NO;
 	if (symbol)
-		[windowController gotoSymbol:symbol inView:[windowController currentView]];
+		[windowController gotoMark:symbol inView:[windowController currentView]];
 
 	[self cancelSymbolList];
 	return YES;
@@ -525,7 +525,7 @@ doCommandBySelector:(SEL)aSelector
 		doc = symbol;
 		symbol = nil;
 	} else
-		doc = [(ViSymbol *)symbol document];
+		doc = [(ViMark *)symbol document];
 
 	// remember what symbol we selected from the filtered set
 	NSString *filter;
@@ -546,7 +546,7 @@ doCommandBySelector:(SEL)aSelector
 	windowController.jumping = NO;
 
 	if (symbol)
-		[windowController gotoSymbol:symbol inView:[windowController currentView]];
+		[windowController gotoMark:symbol inView:[windowController currentView]];
 
 	[self cancelSymbolList];
 }
@@ -574,7 +574,7 @@ doCommandBySelector:(SEL)aSelector
 		doc = symbol;
 		symbol = nil;
 	} else {
-		doc = [(ViSymbol *)symbol document];
+		doc = [(ViMark *)symbol document];
 	}
 
 	// remember what symbol we selected from the filtered set
@@ -593,7 +593,7 @@ doCommandBySelector:(SEL)aSelector
 	ViDocumentView *docView = [windowController createTabForDocument:doc];
 	windowController.jumping = NO;
 	if (symbol)
-		[windowController gotoSymbol:symbol inView:docView];
+		[windowController gotoMark:symbol inView:docView];
 
 	[self cancelSymbolList];
 	return YES;
@@ -656,7 +656,7 @@ doCommandBySelector:(SEL)aSelector
 objectValueForTableColumn:(NSTableColumn *)tableColumn
            byItem:(id)item
 {
-	return [item displayName];
+	return [item title];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
@@ -669,8 +669,8 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 
 - (BOOL)isSeparatorItem:(id)item
 {
-	if ([item isKindOfClass:[ViSymbol class]] &&
-	    [[(ViSymbol *)item symbol] isEqualToString:@"-"])
+	if ([item isKindOfClass:[ViMark class]] &&
+	    [[(ViMark *)item title] isEqualToString:@"-"])
 		return YES;
 	return NO;
 }
@@ -694,8 +694,8 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 	else {
 		cell  = [tableColumn dataCellForRow:[symbolView rowForItem:item]];
 
-		if ([item respondsToSelector:@selector(image)])
-			[cell setImage:[item image]];
+		if ([item respondsToSelector:@selector(icon)])
+			[cell setImage:[item icon]];
 		else
 			[cell setImage:nil];
 	}

@@ -2144,7 +2144,7 @@
 - (void)gotoSymbol:(id)sender
 {
 	ViWindowController *windowController = [[self window] windowController];
-	ViSymbol *sym = sender;
+	ViMark *sym = sender;
 	if ([sender respondsToSelector:@selector(representedObject)])
 		sym = [sender representedObject];
 
@@ -2155,7 +2155,7 @@
 			  line:[self currentLine]
 			column:[self currentColumn]];
 
-	[windowController gotoSymbol:sym];
+	[windowController gotoMark:sym];
 	final_location = NSNotFound;
 }
 
@@ -2172,7 +2172,7 @@
 
 	if ([syms count] > 1) {
 		NSMutableArray *toRemove = [NSMutableArray array];
-		for (ViSymbol *sym in syms) {
+		for (ViMark *sym in syms) {
 			if (sym.document == document) {
 				NSRange range = sym.range;
 				NSUInteger lineno = [[self textStorage] lineNumberAtLocation:range.location];
@@ -2193,7 +2193,7 @@
 	} else {
 		/* Sort symbols per document. */
 		NSMapTable *docs = [NSMapTable mapTableWithStrongToStrongObjects];
-		for (ViSymbol *sym in syms) {
+		for (ViMark *sym in syms) {
 			NSMutableArray *a = [docs objectForKey:sym.document];
 			if (a == nil) {
 				a = [NSMutableArray array];
@@ -2214,11 +2214,11 @@
 				[item setEnabled:NO];
 			}
 
-			for (ViSymbol *sym in [docs objectForKey:doc]) {
+			for (ViMark *sym in [docs objectForKey:doc]) {
 				NSString *key = @"";
 				if (quickindex <= 10)
 					key = [NSString stringWithFormat:@"%i", quickindex % 10];
-				NSMenuItem *item = [menu addItemWithTitle:sym.displayName
+				NSMenuItem *item = [menu addItemWithTitle:sym.title
 								   action:@selector(gotoSymbol:)
 							    keyEquivalent:key];
 				[item setKeyEquivalentModifierMask:0];

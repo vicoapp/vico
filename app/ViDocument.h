@@ -1,5 +1,4 @@
 #import "ViWindowController.h"
-#import "ViSymbol.h"
 #import "ViTextStorage.h"
 #import "ViURLManager.h"
 #import "ViScope.h"

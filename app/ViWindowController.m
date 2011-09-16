@@ -1461,14 +1461,28 @@ static ViWindowController	*currentWindowController = nil;
 	return nil;
 }
 
+- (void)gotoMark:(ViMark *)mark inView:(ViDocumentView *)docView
+{
+	NSRange range = mark.range;
+	ViTextView *textView = [docView textView];
+	[textView setCaret:range.location];
+	[textView scrollRangeToVisible:range];
+	[[textView nextRunloop] showFindIndicatorForRange:range];
+}
+
 - (void)gotoMark:(ViMark *)mark
 {
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
+
 	if (mark.document) {
+		/* XXX: prevent pushing an extraneous jump on the list. */
+		// jumping = YES;
 		id<ViViewController> viewController = [self selectDocument:mark.document];
-		ViTextView *tv = (ViTextView *)[viewController innerView];
-		[tv setCaret:mark.range.location];
-		[tv scrollRangeToVisible:mark.range];
-		[[tv nextRunloop] showFindIndicatorForRange:mark.range];
+		// jumping = NO;
+
+		[self gotoMark:mark inView:viewController];
 	} else if (mark.url)
 		[self gotoURL:mark.url line:mark.line column:mark.column];
 }
@@ -1821,29 +1835,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 #pragma mark -
 #pragma mark Symbol List
 
-- (void)gotoSymbol:(ViSymbol *)aSymbol inView:(ViDocumentView *)docView
-{
-	NSRange range = aSymbol.range;
-	ViTextView *textView = [docView textView];
-	[textView setCaret:range.location];
-	[textView scrollRangeToVisible:range];
-	[[textView nextRunloop] showFindIndicatorForRange:range];
-}
-
-- (void)gotoSymbol:(ViSymbol *)aSymbol
-{
-	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]])
-		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
-
-	/* XXX: prevent pushing an extraneous jump on the list. */
-	jumping = YES;
-	ViDocumentView *docView = [self selectDocument:aSymbol.document];
-	jumping = NO;
-
-	[self gotoSymbol:aSymbol inView:docView];
-}
-
 - (IBAction)toggleSymbolList:(id)sender
 {
 	[symbolController toggleSymbolList:sender];
@@ -1866,8 +1857,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	NSMutableArray *syms = [NSMutableArray array];
 	for (ViDocument *doc in documents)
-		for (ViSymbol *s in doc.symbols)
-			if ([rx matchInString:s.symbol])
+		for (ViMark *s in doc.symbols)
+			if ([rx matchInString:s.title])
 				[syms addObject:s];
 
 	return syms;

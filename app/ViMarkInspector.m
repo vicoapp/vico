@@ -36,9 +36,9 @@
 	DEBUG(@"sender is %@, tag %lu", sender, [sender tag]);
 	ViMarkStack *stack = [[markStackController selectedObjects] lastObject];
 	if ([sender selectedSegment] == 0)
-		DEBUG(@"should goto previous list in stack %@", stack);
+		[stack previous];
 	else
-		DEBUG(@"should goto next list in stack %@", stack);
+		[stack next];
 }
 
 - (IBAction)gotoMark:(id)sender

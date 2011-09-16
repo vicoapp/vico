@@ -64,15 +64,21 @@
 	NSString *name;
 	NSMutableArray *lists;
 	NSInteger currentIndex;
+	NSInteger maxLists;
 }
 @property (nonatomic, readwrite, assign) NSString *name;
 @property (nonatomic, readonly) ViMarkList *list;
+@property (nonatomic, readwrite) NSInteger maxLists;
 + (ViMarkStack *)markStackWithName:(NSString *)name;
 - (ViMarkStack *)initWithName:(NSString *)name;
 - (ViMarkList *)makeList;
 - (void)clear;
-- (ViMarkList *)pop;
 - (ViMarkList *)push:(ViMarkList *)list;
+- (ViMarkList *)listAtIndex:(NSInteger)anIndex;
+- (ViMarkList *)next;
+- (ViMarkList *)previous;
+- (ViMarkList *)last;
+- (ViMarkList *)current;
 @end
 
 

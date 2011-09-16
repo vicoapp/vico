@@ -1,4 +1,5 @@
 #import "ViMarkManager.h"
+#import "ViCommon.h"
 #include "logging.h"
 
 @implementation ViMarkGroup
@@ -277,9 +278,11 @@
 - (ViMark *)markAtIndex:(NSInteger)anIndex
 {
 	if (anIndex >= 0 && anIndex < [marks count]) {
-		[self willChangeValueForKey:@"selectionIndexes"];
-		currentIndex = anIndex;
-		[self didChangeValueForKey:@"selectionIndexes"];
+		if (currentIndex != anIndex) {
+			[self willChangeValueForKey:@"selectionIndexes"];
+			currentIndex = anIndex;
+			[self didChangeValueForKey:@"selectionIndexes"];
+		}
 		return [marks objectAtIndex:currentIndex];
 	}
 	return nil;
@@ -358,7 +361,7 @@
 
 @implementation ViMarkStack
 
-@synthesize name;
+@synthesize name, maxLists;
 
 + (ViMarkStack *)markStackWithName:(NSString *)name
 {
@@ -369,6 +372,7 @@
 {
 	if ((self = [super init]) != nil) {
 		name = aName;
+		maxLists = 10;
 		[self clear];
 		[self makeList];
 		DEBUG(@"created mark stack %@", self);
@@ -376,24 +380,14 @@
 	return self;
 }
 
-- (ViMarkList *)pop
-{
-	ViMarkList *list = [lists lastObject];
-	if (list) {
-		[self willChangeValueForKey:@"list"];
-		[lists removeLastObject];
-		currentIndex = [lists count] - 1;
-		[self didChangeValueForKey:@"list"];
-	}
-	return list;
-}
-
 - (void)clear
 {
+	[self willChangeValueForKey:@"selectionIndexes"];
 	[self willChangeValueForKey:@"list"];
 	lists = [NSMutableArray array];
 	currentIndex = -1;
 	[self didChangeValueForKey:@"list"];
+	[self didChangeValueForKey:@"selectionIndexes"];
 }
 
 - (ViMarkList *)list
@@ -412,13 +406,105 @@
 	return [self push:[ViMarkList markList]];
 }
 
+- (void)trim
+{
+	while ([lists count] > maxLists && maxLists > 0) {
+		DEBUG(@"trimming list %@ at index 0", [lists objectAtIndex:0]);
+		[lists removeObjectAtIndex:0];
+	}
+	if (currentIndex >= [lists count]) {
+		currentIndex = [lists count] - 1;
+		DEBUG(@"adjusted currentIndex to %li", currentIndex);
+	}
+}
+
+- (void)setMaxLists:(NSInteger)num
+{
+	maxLists = IMAX(1, num);
+	if ([lists count] > maxLists) {
+		[self willChangeValueForKey:@"selectionIndexes"];
+		[self willChangeValueForKey:@"list"];
+		[self trim];
+		[self didChangeValueForKey:@"list"];
+		[self didChangeValueForKey:@"selectionIndexes"];
+	}
+}
+
 - (ViMarkList *)push:(ViMarkList *)list
 {
-	[lists addObject:list];
+	[self willChangeValueForKey:@"selectionIndexes"];
 	[self willChangeValueForKey:@"list"];
-	currentIndex = [lists count] - 1;
+
+	DEBUG(@"lists before push: %@, currentIndex = %li", lists, currentIndex);
+
+	if (++currentIndex < 0)
+		currentIndex = 0;
+
+	if (currentIndex >= [lists count]) {
+		DEBUG(@"appending list %@", list);
+		[lists addObject:list];
+		[self trim];
+	} else {
+		DEBUG(@"insert list %@ at index %li", list, currentIndex);
+		[lists replaceObjectAtIndex:currentIndex withObject:list];
+	}
+
 	[self didChangeValueForKey:@"list"];
+	[self didChangeValueForKey:@"selectionIndexes"];
+
+	DEBUG(@"lists after push: %@, currentIndex = %li", lists, currentIndex);
+
 	return list;
+}
+
+- (void)setSelectionIndexes:(NSIndexSet *)indexSet
+{
+	DEBUG(@"got selection indexes %@", indexSet);
+	[self willChangeValueForKey:@"list"];
+	currentIndex = [indexSet firstIndex];
+	[self didChangeValueForKey:@"list"];
+}
+
+- (NSIndexSet *)selectionIndexes
+{
+	if (currentIndex >= 0 && currentIndex < [lists count])
+		return [NSIndexSet indexSetWithIndex:currentIndex];
+	return [NSIndexSet indexSet];
+}
+
+- (ViMarkList *)listAtIndex:(NSInteger)anIndex
+{
+	if (anIndex >= 0 && anIndex < [lists count]) {
+		if (currentIndex != anIndex) {
+			[self willChangeValueForKey:@"selectionIndexes"];
+			[self willChangeValueForKey:@"list"];
+			currentIndex = anIndex;
+			[self didChangeValueForKey:@"list"];
+			[self didChangeValueForKey:@"selectionIndexes"];
+		}
+		return [lists objectAtIndex:currentIndex];
+	}
+	return nil;
+}
+
+- (ViMarkList *)next
+{
+	return [self listAtIndex:currentIndex + 1];
+}
+
+- (ViMarkList *)previous
+{
+	return [self listAtIndex:currentIndex - 1];
+}
+
+- (ViMarkList *)last
+{
+	return [self listAtIndex:[lists count] - 1];
+}
+
+- (ViMarkList *)current
+{
+	return [self listAtIndex:currentIndex];
 }
 
 - (NSString *)description

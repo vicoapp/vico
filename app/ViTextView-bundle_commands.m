@@ -15,7 +15,6 @@
 
 @implementation ViTextView (bundleCommands)
 
-
 - (NSString *)inputOfType:(NSString *)type
                  command:(ViBundleCommand *)command
                    range:(NSRange *)rangePtr
@@ -95,7 +94,9 @@
 
 	NSRange inputRange;
 	NSRange envInputRange;
-	NSString *inputText = [self inputForCommand:command range:&inputRange envRange:&envInputRange];
+	NSString *inputText = [self inputForCommand:command
+					      range:&inputRange
+					   envRange:&envInputRange];
 
 	NSRange selectedRange;
 	if ([[command input] isEqualToString:@"document"] ||
@@ -108,47 +109,7 @@
 
 	// FIXME: beforeRunningCommand
 
-	char *templateFilename = NULL;
-	int fd = -1;
-
-	NSString *shellCommand = [command command];
-	DEBUG(@"shell command = [%@]", shellCommand);
-	if ([shellCommand hasPrefix:@"#!"]) {
-		const char *tmpl = [[NSTemporaryDirectory()
-		    stringByAppendingPathComponent:@"vico_cmd.XXXXXXXXXX"]
-		    fileSystemRepresentation];
-		DEBUG(@"using template %s", tmpl);
-		templateFilename = strdup(tmpl);
-		fd = mkstemp(templateFilename);
-		if (fd == -1) {
-			NSLog(@"failed to open temporary file: %s", strerror(errno));
-			return;
-		}
-		const char *data = [shellCommand UTF8String];
-		ssize_t rc = write(fd, data, strlen(data));
-		DEBUG(@"wrote %i byte", rc);
-		if (rc == -1) {
-			NSLog(@"Failed to save temporary command file: %s", strerror(errno));
-			unlink(templateFilename);
-			close(fd);
-			free(templateFilename);
-			return;
-		}
-		chmod(templateFilename, 0700);
-		NSFileManager *fm = [NSFileManager defaultManager];
-		shellCommand = [fm stringWithFileSystemRepresentation:templateFilename
-							       length:strlen(templateFilename)];
-	}
-
 	DEBUG(@"input text = [%@], range = %@", inputText, NSStringFromRange(inputRange));
-
-	NSTask *task = [[[NSTask alloc] init] autorelease];
-	if (templateFilename)
-		[task setLaunchPath:shellCommand];
-	else {
-		[task setLaunchPath:@"/bin/bash"];
-		[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
-	}
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[ViBundle setupEnvironment:env
@@ -156,21 +117,16 @@
 			inputRange:envInputRange
 			    window:[self window]
 			    bundle:[command bundle]];
-	[task setEnvironment:env];
 
 #ifndef NO_DEBUG
 	[env removeObjectForKey:@"PS1"];
 	DEBUG(@"environment: %@", env);
 #endif
 
+	NSString *cwd = nil;
 	NSURL *baseURL = [[document fileURL] URLByDeletingLastPathComponent];
 	if ([baseURL isFileURL])
-		[task setCurrentDirectoryPath:[baseURL path]];
-	else
-		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
-
-	DEBUG(@"launching task command line [%@ %@]",
-	    [task launchPath], [[task arguments] componentsJoinedByString:@" "]);
+		cwd = [baseURL path];
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
 	    command, @"command",
@@ -179,21 +135,19 @@
 	    nil];
 
 	document.busy = YES;
-	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
-	[runner launchTask:task
-	 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
-     synchronouslyInWindow:[self window]
-		     title:[command name]
-		    target:self
-		  selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
-	       contextInfo:info];
-	[runner release];
-
-	if (fd != -1) {
-		unlink(templateFilename);
-		close(fd);
-		free(templateFilename);
-	}
+	NSError *error = nil;
+	[_taskRunner launchShellCommand:[command command]
+		      withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
+			    environment:env
+		       currentDirectory:cwd
+		 asynchronouslyInWindow:[self window]
+				  title:[command name]
+				 target:self
+			       selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
+			    contextInfo:info
+				  error:&error];
+	if (error)
+		MESSAGE(@"%@", [error localizedDescription]);
 }
 
 - (void)bundleCommand:(ViTaskRunner *)runner

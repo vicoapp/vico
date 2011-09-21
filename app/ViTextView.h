@@ -22,6 +22,7 @@
 @class ViWindowController;
 @class ViTextView;
 @class ViJumpList;
+@class ViTaskRunner;
 
 /** A text edit view.
  *
@@ -96,6 +97,9 @@
 	BOOL			 antialias;
 	BOOL			 hasUndoGroup;
 	int			 undo_direction;	// 0 = none, 1 = backward (normal undo), 2 = forward (redo)
+
+	// task runner for bundle commands
+	ViTaskRunner		*_taskRunner;
 }
 
 /** Associated key manager.

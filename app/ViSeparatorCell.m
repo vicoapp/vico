@@ -12,6 +12,7 @@
 	[path lineToPoint:NSMakePoint(NSWidth([controlView frame]) - 2, y)];
 	[path setLineWidth:0];
 	[path stroke];
+	[path release];
 }
 
 @end

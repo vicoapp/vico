@@ -2,7 +2,7 @@
 
 @interface ViBundleSnippet : ViBundleItem
 {
-	NSString	*content;
+	NSString	*_content;
 }
 
 @property(nonatomic,readonly) NSString *content;

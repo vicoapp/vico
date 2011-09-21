@@ -7,20 +7,22 @@
 
 @interface ViBundle : NSObject
 {
-	NSString *path;
-	NSMutableDictionary *info;
-	NSMutableArray *languages;
-	NSMutableArray *preferences;
-	NSMutableArray *items;
-	NSMutableDictionary *cachedPreferences;
-	NSMutableDictionary *uuids;
-	NuParser *parser;
+	NSString		*_path;
+	NSMutableDictionary	*_info;
+	NSMutableArray		*_languages;
+	NSMutableArray		*_preferences;
+	NSMutableArray		*_items;
+	NSMutableDictionary	*_cachedPreferences;
+	NSMutableDictionary	*_uuids;
+	NuParser		*_parser;
 }
 
 @property(nonatomic,readonly) NSMutableArray *languages;
 @property(nonatomic,readonly) NSString *path;
 @property(nonatomic,readonly) NSArray *items;
 @property(nonatomic,readonly) NSArray *preferences;
+@property(nonatomic,readonly) NSString *name;
+@property(nonatomic,readonly) NSString *uuid;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
 + (void)normalizeSettings:(NSDictionary *)settings
@@ -42,8 +44,6 @@
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory;
 - (NSString *)supportPath;
-- (NSString *)name;
-- (NSString *)uuid;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;
 - (NSMenu *)menuForScope:(ViScope *)scope

@@ -12,10 +12,10 @@
 
 @implementation ViBundle
 
-@synthesize languages;
-@synthesize path;
-@synthesize items;
-@synthesize preferences;
+@synthesize languages = _languages;
+@synthesize path = _path;
+@synthesize items = _items;
+@synthesize preferences = _preferences;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB
 {
@@ -139,9 +139,11 @@
 		[shadow setShadowOffset:offset];
 	}
 
-	if (shadow)
+	if (shadow) {
 		[normalizedPreference setObject:shadow
 					 forKey:NSShadowAttributeName];
+		[shadow release];
+	}
 
 	if ((value = [settings objectForKey:@"indentExpression"]) != nil) {
 		@try {
@@ -155,6 +157,7 @@
 				DEBUG(@"got code %@ (a %@)", code, NSStringFromClass([code class]));
 				[normalizedPreference setObject:code
 							 forKey:@"indentExpressionBlock"];
+				[code release];
 			}
 		}
 		@catch (NSException *exception) {
@@ -372,46 +375,53 @@
 	if (self) {
 		NSFileManager *fm = [NSFileManager defaultManager];
 		NSString *plistPath = [bundleDirectory stringByAppendingPathComponent:@"info.plist"];
-		if (![fm fileExistsAtPath:plistPath])
+		if (![fm fileExistsAtPath:plistPath]) {
+			[self release];
 			return nil;
+		}
 
-		info = [NSDictionary dictionaryWithContentsOfFile:plistPath];
-		if (info == nil || ![info isKindOfClass:[NSDictionary class]]) {
+		_info = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
+		if (_info == nil || ![_info isKindOfClass:[NSDictionary class]]) {
 			INFO(@"malformed info.plist in bundle %@", bundleDirectory);
+			[self release];
 			return nil;
 		}
-		if ([info objectForKey:@"isDelta"]) {
+		if ([_info objectForKey:@"isDelta"]) {
 			INFO(@"delta bundles not implemented, at %@", bundleDirectory);
+			[self release];
 			return nil;
 		}
-		if ([info objectForKey:@"uuid"] == nil) {
+		if ([_info objectForKey:@"uuid"] == nil) {
 			INFO(@"missing uuid in info.plist in bundle %@", bundleDirectory);
+			[self release];
 			return nil;
 		}
 
-		languages = [NSMutableArray array];
-		preferences = [NSMutableArray array];
-		cachedPreferences = [NSMutableDictionary dictionary];
-		uuids = [NSMutableDictionary dictionary];
-		items = [NSMutableArray array];
-		path = bundleDirectory;
+		_languages = [[NSMutableArray alloc] init];
+		_preferences = [[NSMutableArray alloc] init];
+		_cachedPreferences = [[NSMutableDictionary alloc] init];
+		_uuids = [[NSMutableDictionary alloc] init];
+		_items = [[NSMutableArray alloc] init];
+		_path = [bundleDirectory copy];
+		_parser = [[NuParser alloc] init];
 
-		parser = [[NuParser alloc] init];
-		[[NSApp delegate] loadStandardModules:[parser context]];
-		[parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
+		[[NSApp delegate] loadStandardModules:[_parser context]];
+		[_parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
 
-		NSString *dir = [path stringByAppendingPathComponent:@"Syntaxes"];
+		NSString *dir = [_path stringByAppendingPathComponent:@"Syntaxes"];
 		NSString *file;
 		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {
 			if ([file hasSuffix:@".tmLanguage"] || [file hasSuffix:@".plist"]) {
 				ViLanguage *language = [[ViLanguage alloc] initWithPath:[dir stringByAppendingPathComponent:file]
 									      forBundle:self];
-				if (language)
-					[languages addObject:language];
+				if (language) {
+					[_languages addObject:language];
+					[language release];
+				}
 			}
 		}
 
-		dir = [path stringByAppendingPathComponent:@"Preferences"];
+		dir = [_path stringByAppendingPathComponent:@"Preferences"];
 		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 			if ([file hasSuffix:@".plist"] || [file hasSuffix:@".tmPreferences"]) {
 				NSString *f = [dir stringByAppendingPathComponent:file];
@@ -423,11 +433,11 @@
 
 				[ViBundle normalizePreference:plist
 					       intoDictionary:[plist objectForKey:@"settings"]
-                                                   withParser:parser];
-				[preferences addObject:plist];
+                                                   withParser:_parser];
+				[_preferences addObject:plist];
 			}
 
-		dir = [path stringByAppendingPathComponent:@"Snippets"];
+		dir = [_path stringByAppendingPathComponent:@"Snippets"];
 		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 			if ([file hasSuffix:@".tmSnippet"] || [file hasSuffix:@".plist"])  {
 				NSString *f = [dir stringByAppendingPathComponent:file];
@@ -439,13 +449,13 @@
 				ViBundleSnippet *snippet = [(ViBundleSnippet *)[ViBundleSnippet alloc] initFromDictionary:plist
 														 inBundle:self];
 				if (snippet) {
-					[items addObject:snippet];
-					[uuids setObject:snippet forKey:[snippet uuid]];
+					[_items addObject:snippet];
+					[_uuids setObject:snippet forKey:snippet.uuid];
+					[snippet release];
 				}
-
 			}
 
-		dir = [path stringByAppendingPathComponent:@"Commands"];
+		dir = [_path stringByAppendingPathComponent:@"Commands"];
 		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL])
 			if ([file hasSuffix:@".tmCommand"] || [file hasSuffix:@".plist"]) {
 				NSString *f = [dir stringByAppendingPathComponent:file];
@@ -457,12 +467,13 @@
 				ViBundleCommand *command = [(ViBundleCommand *)[ViBundleCommand alloc] initFromDictionary:plist
 														 inBundle:self];
 				if (command) {
-					[items addObject:command];
-					[uuids setObject:command forKey:[command uuid]];
+					[_items addObject:command];
+					[_uuids setObject:command forKey:command.uuid];
+					[command release];
 				}
 			}
 
-		file = [path stringByAppendingPathComponent:@"main.nu"];
+		file = [_path stringByAppendingPathComponent:@"main.nu"];
 		BOOL isDir = NO;
 		if ([fm fileExistsAtPath:file isDirectory:&isDir] && !isDir) {
 			NSString *script = [NSString stringWithContentsOfFile:file
@@ -470,11 +481,11 @@
 									error:nil];
 			if (script) {
 				NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:
-				    path, @"bundlePath",
+				    _path, @"bundlePath",
 				    nil];
 				NSError *error = nil;
 				[[NSApp delegate] eval:script
-					    withParser:parser
+					    withParser:_parser
 					      bindings:bindings
 						 error:&error];
 				if (error)
@@ -485,27 +496,40 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_path release];
+	[_info release];
+	[_languages release];
+	[_preferences release];
+	[_items release];
+	[_cachedPreferences release];
+	[_uuids release];
+	[_parser release];
+	[super dealloc];
+}
+
 - (NSString *)supportPath
 {
-	return [path stringByAppendingPathComponent:@"Support"];
+	return [_path stringByAppendingPathComponent:@"Support"];
 }
 
 - (NSString *)name
 {
-	return [info objectForKey:@"name"];
+	return [_info objectForKey:@"name"];
 }
 
 - (NSString *)uuid
 {
-	return [info objectForKey:@"uuid"];
+	return [_info objectForKey:@"uuid"];
 }
 
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames
 {
 	NSMutableDictionary *prefsForScope = [NSMutableDictionary dictionary];
 
-	NSDictionary *prefs;
-	for (prefs in preferences) {
+	for (NSDictionary *prefs in _preferences) {
 		NSDictionary *settings = [prefs objectForKey:@"settings"];
 
 		NSMutableDictionary *prefsValues = nil;
@@ -535,8 +559,7 @@
 {
 	NSMutableDictionary *prefsForScope = [NSMutableDictionary dictionary];
 
-	NSDictionary *prefs;
-	for (prefs in preferences) {
+	for (NSDictionary *prefs in _preferences) {
 		NSDictionary *settings = [prefs objectForKey:@"settings"];
 		id prefsValue = [settings objectForKey:prefsName];
 		if (prefsValue) {
@@ -558,7 +581,7 @@
                font:(NSFont *)aFont
 {
 	int matches = 0;
-	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
+	NSMenu *menu = [[[NSMenu alloc] initWithTitle:name] autorelease];
 	[menu setAutoenablesItems:NO];
 	NSDictionary *submenus = nil;
 	if ([mainMenu isKindOfClass:[NSDictionary class]])
@@ -581,7 +604,7 @@
 		if ([uuid isEqualToString:@"------------------------------------"]) {
 			item = [NSMenuItem separatorItem];
 			[menu addItem:item];
-		} else if ((op = [uuids objectForKey:uuid]) != nil) {
+		} else if ((op = [_uuids objectForKey:uuid]) != nil) {
 			SEL selector = NULL;
 			if ([op isKindOfClass:[ViBundleItem class]]) {
 				NSString *scopeSelector = [op scopeSelector];
@@ -593,7 +616,7 @@
 
 				/* Replace "Thing / Selection" depending on hasSelection.
 				 */
-				NSMutableString *title = [[op name] mutableCopy];
+				NSMutableString *title = [[[op name] mutableCopy] autorelease];
 				NSRange r = [title rangeOfString:@" / Selection"];
 				if (r.location != NSNotFound) {
 					if (hasSelection) {
@@ -620,9 +643,9 @@
 				if ([tabTrigger length] > 0) {
 					/* Set a special view for drawing the tab trigger. */
 					ViCommandMenuItemView *view;
-					view = [[ViCommandMenuItemView alloc] initWithTitle:[op name]
-										 tabTrigger:tabTrigger
-										       font:aFont];
+					view = [[[ViCommandMenuItemView alloc] initWithTitle:[op name]
+										  tabTrigger:tabTrigger
+											font:aFont] autorelease];
 					[item setView:view];
 				}
 			} else
@@ -663,10 +686,10 @@
             hasSelection:(BOOL)hasSelection
                     font:(NSFont *)aFont
 {
-	NSDictionary *mainMenu = [info objectForKey:@"mainMenu"];
+	NSDictionary *mainMenu = [_info objectForKey:@"mainMenu"];
 	if (mainMenu == nil) {
 		/* Fall back to simple list of bundle items. */
-		mainMenu = [info objectForKey:@"ordering"];
+		mainMenu = [_info objectForKey:@"ordering"];
 		if (![mainMenu isKindOfClass:[NSArray class]])
 			return nil;
 	} else if (![mainMenu isKindOfClass:[NSDictionary class]])
@@ -686,7 +709,7 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViBundle %@ (%@)>", [self name], [self uuid]];
+	return [NSString stringWithFormat:@"<ViBundle %p: %@ (%@)>", self, [self name], [self uuid]];
 }
 
 @end

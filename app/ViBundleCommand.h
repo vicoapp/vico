@@ -2,12 +2,12 @@
 
 @interface ViBundleCommand : ViBundleItem
 {
-	NSString	*input;
-	NSString	*output;
-	NSString	*fallbackInput;
-	NSString	*beforeRunningCommand;
-	NSString	*command;
-	NSString	*htmlMode;
+	NSString	*_input;
+	NSString	*_output;
+	NSString	*_fallbackInput;
+	NSString	*_beforeRunningCommand;
+	NSString	*_command;
+	NSString	*_htmlMode;
 }
 
 @property(nonatomic,readonly) NSString *input;

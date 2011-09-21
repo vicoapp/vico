@@ -9,19 +9,21 @@ enum ExAddressType {
 
 @interface ExAddress : NSObject <NSCopying>
 {
-	enum ExAddressType type;
-	NSInteger offset;
-	NSInteger line;
-	NSString *pattern;
-	BOOL backwards;
-	unichar mark;
+	enum ExAddressType	 _type;
+	NSInteger		 _offset;
+	NSInteger		 _line;
+	NSString		*_pattern;
+	BOOL			 _backwards;
+	unichar			 _mark;
 }
 
-@property(nonatomic,readwrite,assign) enum ExAddressType type;
-@property(nonatomic,readwrite,assign) NSInteger offset;
-@property(nonatomic,readwrite,assign) NSInteger line;
-@property(nonatomic,readwrite,assign) NSString *pattern;
-@property(nonatomic,readwrite,assign) BOOL backwards;
-@property(nonatomic,readwrite,assign) unichar mark;
+@property(nonatomic,readwrite) enum ExAddressType type;
+@property(nonatomic,readwrite) NSInteger offset;
+@property(nonatomic,readwrite) NSInteger line;
+@property(nonatomic,readwrite,copy) NSString *pattern;
+@property(nonatomic,readwrite) BOOL backwards;
+@property(nonatomic,readwrite) unichar mark;
+
++ (ExAddress *)address;
 
 @end

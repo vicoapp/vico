@@ -56,7 +56,7 @@
 - (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	NSString *exString = nil;
-	if ([self window])
+	if ([[[self window] windowController] isKindOfClass:[ViWindowController class]])
 		exString = [[[self window] windowController] getExStringInteractivelyForCommand:command prefix:prefix];
 	else
 		exString = [[NSApp delegate] getExStringForCommand:command prefix:prefix];

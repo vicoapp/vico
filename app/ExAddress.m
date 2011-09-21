@@ -11,7 +11,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	ExAddress *copy = [[ExAddress allocWithZone:zone] init];
+	ExAddress *copy = [[[self class] allocWithZone:zone] init];
 	copy.type = _type;
 	copy.offset = _offset;
 	copy.line = _line;

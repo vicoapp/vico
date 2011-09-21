@@ -96,17 +96,21 @@
 	NSUInteger startLocation = [self scanLocation];
 
 	BOOL initial = YES;
-	NSMutableCharacterSet *shellVariableSet = [[NSMutableCharacterSet alloc] init];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
-	[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
+
+	static NSMutableCharacterSet *__shellVariableSet = nil;
+	if (__shellVariableSet == nil) {
+		__shellVariableSet = [[NSMutableCharacterSet alloc] init];
+		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
+		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
+		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
+	}
 
 	while (![self isAtEnd]) {
-		if (![self scanCharactersFromSet:shellVariableSet intoString:nil])
+		if (![self scanCharactersFromSet:__shellVariableSet intoString:nil])
 			break;
 
 		if (initial) {
-			[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('0', '9' - '0')]];
+			[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('0', '9' - '0')]];
 			initial = NO;
 		}
 	}

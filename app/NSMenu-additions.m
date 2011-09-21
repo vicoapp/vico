@@ -4,12 +4,12 @@
 
 @implementation NSMenu (additions)
 
-static ViRegexp *rx = nil;
+static ViRegexp *__rx = nil;
 
 - (void)updateNormalModeMenuItemsWithSelection:(BOOL)hasSelection
 {
-	if (rx ==  nil)
-		rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
+	if (__rx == nil)
+		__rx = [[ViRegexp alloc] initWithString:@" +\\((.*?)\\)( *\\((.*?)\\))?$"];
 
 	for (NSMenuItem *item in [self itemArray]) {
 		if ([item isHidden])
@@ -24,9 +24,9 @@ static ViRegexp *rx = nil;
 
 		if (title) {
 			DEBUG(@"updating menuitem %@, title %@", item, title);
-			ViRegexpMatch *m = [rx matchInString:title];
+			ViRegexpMatch *m = [__rx matchInString:title];
 			if (m && [m count] == 4) {
-				NSMutableString *newTitle = [title mutableCopy];
+				NSMutableString *newTitle = [[title mutableCopy] autorelease];
 				[newTitle replaceCharactersInRange:[m rangeOfMatchedString]
 							withString:@""];
 				DEBUG(@"title %@ -> %@, got %lu matches", title, newTitle, [m count]);
@@ -72,11 +72,12 @@ static ViRegexp *rx = nil;
 				}
 
 				ViCommandMenuItemView *view = (ViCommandMenuItemView *)[item view];
-				if (view == nil)
+				if (view == nil) {
 					view = [[ViCommandMenuItemView alloc] initWithTitle:newTitle
 										    command:command
 										       font:[self font]];
-				else {
+					[view autorelease];
+				} else {
 					view.title = newTitle;
 					view.command = command;
 				}

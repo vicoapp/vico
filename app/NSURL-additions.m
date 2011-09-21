@@ -2,23 +2,25 @@
 
 @implementation NSURL (equality)
 
-static NSCharacterSet *slashSet = nil;
+static NSCharacterSet *__slashSet = nil;
 
 - (BOOL)isEqualToURL:(NSURL *)otherURL
 {
-	if (slashSet == nil)
-		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
-	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	if (__slashSet == nil)
+		__slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
+
+	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:__slashSet];
+	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:__slashSet];
 	return [s1 isEqualToString:s2];
 }
 
 - (BOOL)hasPrefix:(NSURL *)prefixURL
 {
-	if (slashSet == nil)
-		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
-	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	if (__slashSet == nil)
+		__slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
+
+	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:__slashSet];
+	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:__slashSet];
 	return [s1 hasPrefix:s2];
 }
 

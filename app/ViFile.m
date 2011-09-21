@@ -1,31 +1,50 @@
 #import "ViFile.h"
+#include "logging.h"
 
 @implementation ViFile
 
-@synthesize url, targetURL, children, isDirectory, isLink, attributes, targetAttributes;
+@synthesize url = _url;
+@synthesize targetURL = _targetURL;
+@synthesize children = _children;
+@synthesize isDirectory = _isDirectory;
+@synthesize isLink = _isLink;
+@synthesize attributes = _attributes;
+@synthesize targetAttributes = _targetAttributes;
 
 - (id)initWithURL:(NSURL *)aURL
        attributes:(NSDictionary *)aDictionary
      symbolicLink:(NSURL *)sURL
 symbolicAttributes:(NSDictionary *)sDictionary
 {
-	self = [super init];
-	if (self) {
-		attributes = aDictionary;
-		isLink = [[attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
+	if ((self = [super init]) != nil) {
+		_attributes = [aDictionary retain];
+		_isLink = [[_attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
 		[self setURL:aURL];
 		[self setTargetURL:sURL attributes:sDictionary];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_url release];
+	[_targetURL release];
+	[_attributes release];
+	[_targetAttributes release];
+	[_children release];
+	[_name release];
+	[_displayName release];
+	[_icon release];
+	[super dealloc];
+}
+
 + (id)fileWithURL:(NSURL *)aURL
        attributes:(NSDictionary *)aDictionary
 {
-	return [[ViFile alloc] initWithURL:aURL
-				attributes:aDictionary
-			      symbolicLink:nil
-			symbolicAttributes:nil];
+	return [[[ViFile alloc] initWithURL:aURL
+				 attributes:aDictionary
+			       symbolicLink:nil
+			 symbolicAttributes:nil] autorelease];
 }
 
 + (id)fileWithURL:(NSURL *)aURL
@@ -33,109 +52,124 @@ symbolicAttributes:(NSDictionary *)sDictionary
      symbolicLink:(NSURL *)sURL
 symbolicAttributes:(NSDictionary *)sDictionary
 {
-	return [[ViFile alloc] initWithURL:aURL
-				attributes:aDictionary
-			      symbolicLink:sURL
-			symbolicAttributes:sDictionary];
+	return [[[ViFile alloc] initWithURL:aURL
+				 attributes:aDictionary
+			       symbolicLink:sURL
+			 symbolicAttributes:sDictionary] autorelease];
 }
 
 - (BOOL)hasCachedChildren
 {
-	return children != nil;
+	return _children != nil;
 }
 
 - (NSURL *)targetURL
 {
-	if (isLink)
-		return targetURL;
-	return targetURL ?: url;
+	if (_isLink)
+		return _targetURL;
+	return _targetURL ?: _url;
 }
 
 - (void)setURL:(NSURL *)aURL
 {
-	url = aURL;
-	nameIsDirty = YES;
-	displayNameIsDirty = YES;
-	iconIsDirty = YES;
+	[aURL retain];
+	[_url release];
+	_url = aURL;
+
+	_nameIsDirty = YES;
+	_displayNameIsDirty = YES;
+	_iconIsDirty = YES;
 }
 
 - (void)setTargetURL:(NSURL *)aURL
 {
-	targetURL = aURL;
-	iconIsDirty = YES;
+	[aURL retain];
+	[_targetURL release];
+	_targetURL = aURL;
+	_iconIsDirty = YES;
 }
 
 - (void)setTargetURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
 {
-	targetURL = aURL;
-	targetAttributes = aDictionary;
-	iconIsDirty = YES;
+	[aURL retain];
+	[_targetURL release];
+	_targetURL = aURL;
 
-	if (isLink)
-		isDirectory = [[targetAttributes fileType] isEqualToString:NSFileTypeDirectory];
+	[aDictionary retain];
+	[_targetAttributes release];
+	_targetAttributes = aDictionary;
+
+	_iconIsDirty = YES;
+
+	if (_isLink)
+		_isDirectory = [[_targetAttributes fileType] isEqualToString:NSFileTypeDirectory];
 	else
-		isDirectory = [[attributes fileType] isEqualToString:NSFileTypeDirectory];
+		_isDirectory = [[_attributes fileType] isEqualToString:NSFileTypeDirectory];
 }
 
 - (NSString *)path
 {
-	return [url path];
+	return [_url path];
 }
 
 - (NSString *)name
 {
-	if (nameIsDirty) {
-		name = [url lastPathComponent];
-		nameIsDirty = NO;
+	if (_nameIsDirty) {
+		[_name release];
+		_name = [[_url lastPathComponent] retain];
+		_nameIsDirty = NO;
 	}
-	return name;
+	return _name;
 }
 
 - (NSString *)displayName
 {
-	if (displayNameIsDirty) {
-		if ([url isFileURL])
-			displayName = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
+	if (_displayNameIsDirty) {
+		if ([_url isFileURL])
+			_displayName = [[[NSFileManager defaultManager] displayNameAtPath:[_url path]] retain];
 		else
-			displayName = [url lastPathComponent];
-		displayNameIsDirty = NO;
+			_displayName = [[_url lastPathComponent] retain];
+		_displayNameIsDirty = NO;
 	}
-	return displayName;
+	return _displayName;
 }
 
 - (NSImage *)icon
 {
-	if (iconIsDirty) {
-		if ([url isFileURL])
-			icon = [[NSWorkspace sharedWorkspace] iconForFile:[[self targetURL] path]];
-		else if (isDirectory)
-			icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
+	if (_iconIsDirty) {
+		[_icon release];
+		if ([_url isFileURL])
+			_icon = [[NSWorkspace sharedWorkspace] iconForFile:[[self targetURL] path]];
+		else if (_isDirectory)
+			_icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode('fldr')];
 		else
-			icon = [[NSWorkspace sharedWorkspace] iconForFileType:[[self targetURL] pathExtension]];
-		[icon setSize:NSMakeSize(16, 16)];
+			_icon = [[NSWorkspace sharedWorkspace] iconForFileType:[[self targetURL] pathExtension]];
+		[_icon setSize:NSMakeSize(16, 16)];
 
-		if (isLink) {
+		if (_isLink) {
+			_icon = [_icon copy];
 			NSImage *aliasBadge = [NSImage imageNamed:@"AliasBadgeIcon"];
-			[icon lockFocus];
-			NSSize sz = [icon size];
+			[_icon lockFocus];
+			NSSize sz = [_icon size];
 			[aliasBadge drawInRect:NSMakeRect(0, 0, sz.width, sz.height)
 				      fromRect:NSZeroRect
 				     operation:NSCompositeSourceOver
 				      fraction:1.0];
-			[icon unlockFocus];
-		}
+			[_icon unlockFocus];
+		} else
+			[_icon retain];
 
-		iconIsDirty = NO;
+		_iconIsDirty = NO;
 	}
-	return icon;
+	return _icon;
 }
 
 - (NSString *)description
 {
-	if (isLink)
-		return [NSString stringWithFormat:@"<ViFile: %@ -> %@%s>", url, targetURL, isDirectory ? "/" : ""];
+	if (_isLink)
+		return [NSString stringWithFormat:@"<ViFile: %@ -> %@%s>", _url, _targetURL, _isDirectory ? "/" : ""];
 	else
-		return [NSString stringWithFormat:@"<ViFile: %@%s>", url, isDirectory ? "/" : ""];
+		return [NSString stringWithFormat:@"<ViFile: %@%s>", _url, _isDirectory ? "/" : ""];
 }
 
 @end

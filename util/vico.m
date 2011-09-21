@@ -70,6 +70,7 @@ main(int argc, char **argv)
 	NSFileHandle				*handle;
 	NSMutableDictionary			*bindings = nil;
 	NSDictionary				*params;
+	NSAutoreleasePool			*pool;
 	const char				*eval_script = NULL;
 	const char				*eval_file = NULL;
 	int					 i, c;
@@ -78,6 +79,7 @@ main(int argc, char **argv)
 	BOOL					 wait_for_close = NO;
 	BOOL					 new_window = NO;
 
+	pool = [[NSAutoreleasePool alloc] init];
 	bindings = [NSMutableDictionary dictionary];
 
 	while ((c = getopt(argc, argv, "e:f:hnp:rw")) != -1) {
@@ -262,6 +264,8 @@ main(int argc, char **argv)
 			printf("%s\n", [returnJSON UTF8String]);
 		}
 	}
+
+	[pool release];
 
 	return returnCode;
 }

@@ -6,10 +6,10 @@
 
 + (NSCharacterSet *)reservedCharacters
 {
-	static NSCharacterSet *reservedCharacters = nil;
-	if (reservedCharacters == nil)
-		reservedCharacters = [NSCharacterSet characterSetWithCharactersInString:@".{[()|\\+?*^$"];
-	return reservedCharacters;
+	static NSCharacterSet *__reservedCharacters = nil;
+	if (__reservedCharacters == nil)
+		__reservedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@".{[()|\\+?*^$"] retain];
+	return __reservedCharacters;
 }
 
 + (BOOL)needEscape:(unichar)ch
@@ -34,6 +34,21 @@
 	return [self escape:string inRange:NSMakeRange(0, [string length])];
 }
 
++ (ViRegexp *)regexpWithString:(NSString *)aString
+{
+	return [[[ViRegexp alloc] initWithString:aString] autorelease];
+}
+
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options
+{
+	return [[[ViRegexp alloc] initWithString:aString options:options] autorelease];
+}
+
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options error:(NSError **)outError
+{
+	return [[[ViRegexp alloc] initWithString:aString options:options error:outError] autorelease];
+}
+
 - (ViRegexp *)initWithString:(NSString *)aString
 {
 	return [self initWithString:aString options:0 error:nil];
@@ -50,8 +65,10 @@
                        error:(NSError **)outError
 {
 	self = [super init];
+	if (self == nil)
+		return nil;
 
-	_pattern = aString;
+	_pattern = [aString retain]; // XXX: should copy, but we use it only for -description:
 
 	size_t len = [aString length] * sizeof(unichar);
 	unichar *pattern = malloc(len);
@@ -64,7 +81,7 @@
 	enc = ONIG_ENCODING_UTF16_LE;
 #endif
 	OnigErrorInfo einfo;
-	int r = onig_new(&regex, (const UChar *)pattern,
+	int r = onig_new(&_regex, (const UChar *)pattern,
 	    (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP,
 	    enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
@@ -81,10 +98,18 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	if (_regex)
+		onig_free(_regex);
+	[_pattern release];
+	[super dealloc];
+}
+
 - (void)finalize
 {
-	if (regex)
-		onig_free(regex);
+	if (_regex)
+		onig_free(_regex);
 	[super finalize];
 }
 
@@ -99,7 +124,7 @@
 	const unsigned char *start = str + aRange.location * sizeof(unichar);
 	const unsigned char *end = start + aRange.length * sizeof(unichar);
 
-	int r = onig_search(regex, str, end, start, end, region,
+	int r = onig_search(_regex, str, end, start, end, region,
 	    ONIG_OPTION_FIND_NOT_EMPTY | options);
 	if (r >= 0)
 		return [ViRegexpMatch regexpMatchWithRegion:region
@@ -165,7 +190,7 @@
 			break;
 
 		if (matches == nil)
-			matches = [[NSMutableArray alloc] init];
+			matches = [NSMutableArray array];
 		[matches addObject:match];
 
 		NSRange r = [match rangeOfMatchedString];
@@ -245,16 +270,17 @@
 + (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion
                            startLocation:(NSUInteger)aLocation
 {
-	return [[ViRegexpMatch alloc] initWithRegion:aRegion
-				       startLocation:aLocation];
+	return [[[ViRegexpMatch alloc] initWithRegion:aRegion
+					startLocation:aLocation] autorelease];
 }
 
 - (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion
                     startLocation:(NSUInteger)aLocation
 {
-	self = [super init];
-	startLocation = aLocation;
-	region = aRegion;
+	if ((self = [super init]) != nil) {
+		startLocation = aLocation;
+		_region = aRegion;
+	}
 	return self;
 }
 
@@ -265,23 +291,29 @@
 
 - (NSRange)rangeOfSubstringAtIndex:(NSUInteger)idx
 {
-	if (idx >= region->num_regs || region->beg[idx] == -1)
+	if (idx >= _region->num_regs || _region->beg[idx] == -1)
 		return NSMakeRange(NSNotFound, 0);
 
-	return NSMakeRange(startLocation + (region->beg[idx] / sizeof(unichar)),
-	                   (region->end[idx] - region->beg[idx]) / sizeof(unichar));
+	return NSMakeRange(startLocation + (_region->beg[idx] / sizeof(unichar)),
+	                   (_region->end[idx] - _region->beg[idx]) / sizeof(unichar));
 }
 
 - (NSUInteger)count
 {
-	return region->num_regs;
+	return _region->num_regs;
+}
+
+- (void)dealloc
+{
+	if (_region)
+		onig_region_free(_region, 1);
+	[super dealloc];
 }
 
 - (void)finalize
 {
-	if (region)
-		onig_region_free(region, 1);
-
+	if (_region)
+		onig_region_free(_region, 1);
 	[super finalize];
 }
 

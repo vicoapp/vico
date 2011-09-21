@@ -2,8 +2,8 @@
 
 @interface ViRegexpMatch : NSObject
 {
-	OnigRegion *region;
-	NSUInteger startLocation;
+	OnigRegion	*_region;
+	NSUInteger	 _startLocation;
 }
 
 @property(nonatomic,readonly) NSUInteger startLocation;
@@ -19,14 +19,18 @@
 
 @interface ViRegexp : NSObject
 {
-	NSString *_pattern;
-	OnigRegex regex;
+	NSString	*_pattern;
+	OnigRegex	 _regex;
 }
 
 + (NSCharacterSet *)reservedCharacters;
 + (BOOL)needEscape:(unichar)ch;
 + (NSString *)escape:(NSString *)string inRange:(NSRange)range;
 + (NSString *)escape:(NSString *)string;
+
++ (ViRegexp *)regexpWithString:(NSString *)aString;
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options;
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options error:(NSError **)outError;
 
 - (ViRegexp *)initWithString:(NSString *)aString;
 - (ViRegexp *)initWithString:(NSString *)aString options:(int)options;

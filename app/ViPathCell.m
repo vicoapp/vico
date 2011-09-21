@@ -25,7 +25,7 @@
         NSURL *homeURL = [[ViURLManager defaultManager] normalizeURL:[NSURL URLWithString:@"~" relativeToURL:url]];
 
         while (![[url path] isEqualToString:@"/"]) {
-                ViPathComponentCell *cell = [[ViPathComponentCell alloc] initTextCell:[url lastPathComponent]];
+                ViPathComponentCell *cell = [[[ViPathComponentCell alloc] initTextCell:[url lastPathComponent]] autorelease];
                 [cell setURL:url];
                 [cell setFont:[self font]];
                 [components insertObject:cell atIndex:0];
@@ -43,7 +43,7 @@
                 url = [url URLByDeletingLastPathComponent];
         }
 
-        ViPathComponentCell *cell = [[ViPathComponentCell alloc] initTextCell:[url host]];
+        ViPathComponentCell *cell = [[[ViPathComponentCell alloc] initTextCell:[url host]] autorelease];
         [cell setImage:[NSImage imageNamed:NSImageNameNetwork]];
         [cell setURL:url];
         [cell setFont:[self font]];

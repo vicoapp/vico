@@ -1,6 +1,6 @@
 @interface TxmtURLProtocol : NSURLProtocol
 {
-	id<NSURLProtocolClient> client;
+	id<NSURLProtocolClient> _client;
 }
 + (void)registerProtocol;
 + (NSURL *)parseURL:(NSURL *)url intoLineNumber:(NSNumber **)outLineNumber;

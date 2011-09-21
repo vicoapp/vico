@@ -6,10 +6,10 @@
 	
 + (void)registerProtocol
 {
-	static BOOL inited = NO;
-	if (!inited) {
+	static BOOL __inited = NO;
+	if (!__inited) {
 		[NSURLProtocol registerClass:[TxmtURLProtocol class]];
-		inited = YES;
+		__inited = YES;
 	}
 }
 
@@ -36,9 +36,16 @@
 
 - (void)finalize
 {
-	if (client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRelease(client);
+	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
+		CFRelease(_client);
 	[super finalize];
+}
+
+- (void)dealloc
+{
+	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
+		CFRelease(_client);
+	[super dealloc];
 }
 
 + (NSURL *)parseURL:(NSURL *)url intoLineNumber:(NSNumber **)outLineNumber
@@ -85,11 +92,11 @@
 	 *
 	 * Seems to be fixed in Lion, so we should only workaround this on Snow Leopard.
 	 */
-	if (client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRelease(client);
-	client = [self client];
+	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
+		CFRelease(_client);
+	_client = [self client];
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRetain(client);
+		CFRetain(_client);
 
 	NSURLRequest *request = [self request];
 	NSURL *url = [request URL];
@@ -114,7 +121,7 @@
 	 */
 
 	NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable userInfo:nil];
-	[client URLProtocol:self didFailWithError:error];
+	[_client URLProtocol:self didFailWithError:error];
 }
 
 - (void)stopLoading

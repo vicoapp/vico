@@ -1,6 +1,6 @@
 @interface TMFileURLProtocol : NSURLProtocol
 {
-	id<NSURLProtocolClient> client;
+	id<NSURLProtocolClient> _client;
 }
 + (void)registerProtocol;
 @end

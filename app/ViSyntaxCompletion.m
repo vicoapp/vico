@@ -22,8 +22,8 @@
 		pattern = [NSString stringWithFormat:@"^%@.*", word];
 
 	unsigned rx_options = ONIG_OPTION_IGNORECASE;
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-						options:rx_options];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern
+					options:rx_options];
 
 	NSMutableArray *syntaxes = [NSMutableArray array];
 	NSArray *languages = [[ViBundleStore defaultStore] languages];

@@ -79,7 +79,7 @@
 		[pattern appendString:@"^"];
 		[self appendFilter:suffix toPattern:pattern];
 		[pattern appendString:@".*$"];
-		rx = [[ViRegexp alloc] initWithString:pattern options:ONIG_OPTION_IGNORECASE];
+		rx = [ViRegexp regexpWithString:pattern options:ONIG_OPTION_IGNORECASE];
 	}
 
 	DEBUG(@"suffix = [%@], rx = [%@], url = %@", suffix, rx, url);

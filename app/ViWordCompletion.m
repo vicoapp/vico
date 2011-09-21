@@ -39,8 +39,8 @@
 
 	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL | ONIG_OPTION_IGNORECASE;
 	ViRegexp *rx;
-	rx = [[ViRegexp alloc] initWithString:pattern
-				      options:rx_options];
+	rx = [ViRegexp regexpWithString:pattern
+				options:rx_options];
 	NSArray *foundMatches = [rx allMatchesInString:[textStorage string]
 					       options:rx_options];
 

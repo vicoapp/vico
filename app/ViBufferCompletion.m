@@ -22,8 +22,7 @@
 		pattern = [NSString stringWithFormat:@"^%@.*", word];
 
 	unsigned rx_options = ONIG_OPTION_IGNORECASE;
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-						options:rx_options];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern options:rx_options];
 
 	NSMutableArray *buffers = [NSMutableArray array];
 	for (ViDocument *doc in [[ViWindowController currentWindowController] documents]) {

@@ -2,32 +2,40 @@
 
 @interface ViStreamBuffer : NSObject
 {
-	NSData *data;
-	const void *ptr;
-	NSUInteger left;
-	NSUInteger length;
+	NSData		*_data;
+	const void	*_ptr;
+	NSUInteger	 _left;
+	NSUInteger	 _length;
 }
+
 @property (nonatomic, readonly) const void *ptr;
 @property (nonatomic, readonly) NSUInteger left;
 @property (nonatomic, readonly) NSUInteger length;
+
 - (ViStreamBuffer *)initWithBuffer:(const void *)buffer length:(NSUInteger)aLength;
 - (ViStreamBuffer *)initWithData:(NSData *)aData;
+
 @end
+
+
+
 
 @interface ViBufferedStream : NSStream
 {
-	char			 buffer[64*1024];
-	ssize_t			 buflen;
+	char			 _buffer[64*1024];
+	ssize_t			 _buflen;
 
-	id<NSStreamDelegate>	 delegate;
+	id<NSStreamDelegate>	 _delegate;
 
-	NSMutableArray		*outputBuffers;
+	NSMutableArray		*_outputBuffers;
 
-	int			 fd_in, fd_out;
-	CFSocketRef		 inputSocket, outputSocket;
-	CFRunLoopSourceRef	 inputSource, outputSource;
-	CFSocketContext		 inputContext, outputContext;
+	int			 _fd_in, _fd_out;
+	CFSocketRef		 _inputSocket, _outputSocket;
+	CFRunLoopSourceRef	 _inputSource, _outputSource;
+	CFSocketContext		 _inputContext, _outputContext;
 }
+
+@property (nonatomic,readwrite,assign) id<NSStreamDelegate> delegate;
 
 + (id)streamWithTask:(NSTask *)task;
 

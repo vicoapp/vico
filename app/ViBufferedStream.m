@@ -9,14 +9,16 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 @implementation ViStreamBuffer
 
-@synthesize ptr, left, length;
+@synthesize ptr = _ptr;
+@synthesize left = _left;
+@synthesize length = _length;
 
 - (ViStreamBuffer *)initWithData:(NSData *)aData
 {
 	if ((self = [super init]) != nil) {
-		data = aData;
-		ptr = [data bytes];
-		length = left = [data length];
+		_data = [aData retain];
+		_ptr = [_data bytes];
+		_length = _left = [_data length];
 	}
 	return self;
 }
@@ -24,52 +26,62 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 - (ViStreamBuffer *)initWithBuffer:(const void *)buffer length:(NSUInteger)aLength
 {
 	if ((self = [super init]) != nil) {
-		ptr = buffer;
-		length = left = aLength;
+		_ptr = buffer;
+		_length = _left = aLength;
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_data release];
+	[super dealloc];
+}
+
 - (void)setConsumed:(NSUInteger)size
 {
-	ptr += size;
-	left -= size;
-	DEBUG(@"consumed %lu bytes of buffer, %lu bytes left", size, left);
+	_ptr += size;
+	_left -= size;
+	DEBUG(@"consumed %lu bytes of buffer, %lu bytes left", size, _left);
 }
 
 @end
 
+
 #pragma mark -
+
 
 @implementation ViBufferedStream
 
+@synthesize delegate = _delegate;
+
 - (void)read
 {
-	DEBUG(@"reading on fd %d", fd_in);
+	DEBUG(@"reading on fd %d", _fd_in);
 
-	buflen = 0;
-	ssize_t ret = read(fd_in, buffer, sizeof(buffer));
+	_buflen = 0;
+	ssize_t ret = read(_fd_in, _buffer, sizeof(_buffer));
 	if (ret <= 0) {
 		if (ret == 0) {
-			DEBUG(@"read EOF from fd %d", fd_in);
+			DEBUG(@"read EOF from fd %d", _fd_in);
 			if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
 				[[self delegate] stream:self handleEvent:NSStreamEventEndEncountered];
 		} else {
-			DEBUG(@"read(%d) failed: %s", fd_in, strerror(errno));
+			DEBUG(@"read(%d) failed: %s", _fd_in, strerror(errno));
 			if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
 				[[self delegate] stream:self handleEvent:NSStreamEventErrorOccurred];
 		}
 		[self shutdownRead];
 	} else {
-		DEBUG(@"read %zi bytes from fd %i", ret, fd_in);
+		DEBUG(@"read %zi bytes from fd %i", ret, _fd_in);
 #ifndef NO_DEBUG
-		hexdump(buffer, ret, "read data:");
+		hexdump(_buffer, ret, "read data:");
 		char *vis = malloc(ret*4+1);
-		strvisx(vis, buffer, ret, VIS_WHITE);
+		strvisx(vis, _buffer, ret, VIS_WHITE);
 		DEBUG(@"read data: %s", vis);
 		free(vis);
 #endif
-		buflen = ret;
+		_buflen = ret;
 		if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
 			[[self delegate] stream:self handleEvent:NSStreamEventHasBytesAvailable];
 	}
@@ -81,10 +93,10 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 	DEBUG(@"draining %lu bytes", size);
 
-	while (size > 0 && (buf = [outputBuffers objectAtIndex:0]) != nil) {
+	while (size > 0 && (buf = [_outputBuffers objectAtIndex:0]) != nil) {
 		if (size >= buf.length) {
 			size -= buf.length;
-			[outputBuffers removeObjectAtIndex:0];
+			[_outputBuffers removeObjectAtIndex:0];
 		} else {
 			[buf setConsumed:size];
 			break;
@@ -99,7 +111,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	ssize_t		 n;
 	NSUInteger tot = 0;
 
-	for (ViStreamBuffer *buf in outputBuffers) {
+	for (ViStreamBuffer *buf in _outputBuffers) {
 		if (i >= IOV_MAX)
 			break;
 		iov[i].iov_base = (void *)buf.ptr;
@@ -117,7 +129,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 	DEBUG(@"flushing %i buffers, total %lu bytes", i, tot);
 
-	if ((n = writev(fd_out, iov, i)) == -1) {
+	if ((n = writev(_fd_out, iov, i)) == -1) {
 		int saved_errno = errno;
 		DEBUG(@"writev failed with errno %s (%i, %i?)", strerror(saved_errno), saved_errno, EPIPE);
 		if (saved_errno == EAGAIN || saved_errno == ENOBUFS ||
@@ -130,7 +142,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 			return -1;
 	}
 
-	DEBUG(@"writev(%d) returned %zi", fd_out, n);
+	DEBUG(@"writev(%d) returned %zi", _fd_out, n);
 
 	if (n == 0) {			/* connection closed */
 		errno = 0;
@@ -139,13 +151,13 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 	[self drain:n];
 
-	if ([outputBuffers count] == 0)
+	if ([_outputBuffers count] == 0)
 		return 0;
 
 	CFSocketCallBackType cbType = kCFSocketWriteCallBack;
-	if (outputSocket == inputSocket)
+	if (_outputSocket == _inputSocket)
 		cbType |= kCFSocketReadCallBack;
-	CFSocketEnableCallBacks(outputSocket, cbType);
+	CFSocketEnableCallBacks(_outputSocket, cbType);
 	return 1;
 }
 
@@ -203,7 +215,7 @@ fd_read(CFSocketRef s,
 /* Returns YES if one bidirectional socket is in use, NO if two unidirectional sockets (a pipe pair) is used. */
 - (BOOL)bidirectional
 {
-	return (inputSocket == outputSocket);
+	return (_inputSocket == _outputSocket);
 }
 
 - (id)initWithReadDescriptor:(int)read_fd
@@ -213,76 +225,76 @@ fd_read(CFSocketRef s,
 	DEBUG(@"init with read fd %d, write fd %d", read_fd, write_fd);
 
 	if ((self = [super init]) != nil) {
-		fd_in = read_fd;
-		fd_out = write_fd;
+		_fd_in = read_fd;
+		_fd_out = write_fd;
 
-		outputBuffers = [NSMutableArray array];
+		_outputBuffers = [[NSMutableArray alloc] init];
 
 		int flags;
-		if (fd_in != -1) {
-			if ((flags = fcntl(fd_in, F_GETFL, 0)) == -1) {
-				INFO(@"fcntl(%i, F_GETFL): %s", fd_in, strerror(errno));
+		if (_fd_in != -1) {
+			if ((flags = fcntl(_fd_in, F_GETFL, 0)) == -1) {
+				INFO(@"fcntl(%i, F_GETFL): %s", _fd_in, strerror(errno));
 				return nil;
 			}
-			if (fcntl(fd_in, F_SETFL, flags | O_NONBLOCK) == -1) {
-				INFO(@"fcntl(%i, F_SETFL): %s", fd_in, strerror(errno));
+			if (fcntl(_fd_in, F_SETFL, flags | O_NONBLOCK) == -1) {
+				INFO(@"fcntl(%i, F_SETFL): %s", _fd_in, strerror(errno));
 				return nil;
 			}
 
-			bzero(&inputContext, sizeof(inputContext));
-			inputContext.info = self; /* user data passed to the callbacks */
+			bzero(&_inputContext, sizeof(_inputContext));
+			_inputContext.info = self; /* user data passed to the callbacks */
 
 			CFSocketCallBackType cbType = kCFSocketReadCallBack;
-			if (fd_out == fd_in) {
+			if (_fd_out == _fd_in) {
 				/* bidirectional socket, we read and write on the same socket */
 				cbType |= kCFSocketWriteCallBack;
 			}
-			inputSocket = CFSocketCreateWithNative(
+			_inputSocket = CFSocketCreateWithNative(
 				kCFAllocatorDefault,
-				fd_in,
+				_fd_in,
 				cbType,
 				fd_read,
-				&inputContext);
-			if (inputSocket == NULL) {
-				INFO(@"failed to create input CFSocket of fd %i", fd_in);
+				&_inputContext);
+			if (_inputSocket == NULL) {
+				INFO(@"failed to create input CFSocket of fd %i", _fd_in);
 				return nil;
 			}
-			CFSocketSetSocketFlags(inputSocket, kCFSocketAutomaticallyReenableReadCallBack);
-			inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, inputSocket, prio);
+			CFSocketSetSocketFlags(_inputSocket, kCFSocketAutomaticallyReenableReadCallBack);
+			_inputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _inputSocket, prio);
 
-			CFSocketEnableCallBacks(inputSocket, kCFSocketReadCallBack);
+			CFSocketEnableCallBacks(_inputSocket, kCFSocketReadCallBack);
 		}
 
-		if (fd_out != -1) {
-			if (fd_out == fd_in) {
+		if (_fd_out != -1) {
+			if (_fd_out == _fd_in) {
 				/* bidirectional socket */
-				outputSocket = inputSocket;
+				_outputSocket = _inputSocket;
 			} else {
 				/* unidirectional socket, we read and write on different sockets */
-				if ((flags = fcntl(fd_out, F_GETFL, 0)) == -1) {
-					INFO(@"fcntl(%i, F_GETFL): %s", fd_out, strerror(errno));
+				if ((flags = fcntl(_fd_out, F_GETFL, 0)) == -1) {
+					INFO(@"fcntl(%i, F_GETFL): %s", _fd_out, strerror(errno));
 					return nil;
 				}
-				if (fcntl(fd_out, F_SETFL, flags | O_NONBLOCK) == -1) {
-					INFO(@"fcntl(%i, F_SETFL): %s", fd_out, strerror(errno));
+				if (fcntl(_fd_out, F_SETFL, flags | O_NONBLOCK) == -1) {
+					INFO(@"fcntl(%i, F_SETFL): %s", _fd_out, strerror(errno));
 					return nil;
 				}
 
-				bzero(&outputContext, sizeof(outputContext));
-				outputContext.info = self; /* user data passed to the callbacks */
+				bzero(&_outputContext, sizeof(_outputContext));
+				_outputContext.info = self; /* user data passed to the callbacks */
 
-				outputSocket = CFSocketCreateWithNative(
+				_outputSocket = CFSocketCreateWithNative(
 					kCFAllocatorDefault,
-					fd_out,
+					_fd_out,
 					kCFSocketWriteCallBack,
 					fd_write,
-					&outputContext);
-				if (outputSocket == NULL) {
-					INFO(@"failed to create output CFSocket of fd %i", fd_out);
+					&_outputContext);
+				if (_outputSocket == NULL) {
+					INFO(@"failed to create output CFSocket of fd %i", _fd_out);
 					return nil;
 				}
-				CFSocketSetSocketFlags(outputSocket, 0);
-				outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, outputSocket, prio);
+				CFSocketSetSocketFlags(_outputSocket, 0);
+				_outputSource = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _outputSocket, prio);
 			}
 		}
 	}
@@ -291,7 +303,7 @@ fd_read(CFSocketRef s,
 
 + (id)streamWithTask:(NSTask *)task
 {
-	return [[ViBufferedStream alloc] initWithTask:task];
+	return [[[ViBufferedStream alloc] initWithTask:task] autorelease];
 }
 
 - (id)initWithTask:(NSTask *)task
@@ -325,19 +337,19 @@ fd_read(CFSocketRef s,
 
 - (void)shutdownWrite
 {
-	if (outputSource) {
-		DEBUG(@"shutting down write pipe %d", fd_out);
-		if ([outputBuffers count] > 0)
-			INFO(@"fd %i has %lu non-flushed buffers pending", fd_out, [outputBuffers count]);
-		CFSocketInvalidate(outputSocket); /* also removes the source from run loops */
-		CFRelease(outputSocket);
-		CFRelease(outputSource);
-		outputSocket = NULL;
-		outputSource = NULL;
-		fd_out = -1;
+	if (_outputSource) {
+		DEBUG(@"shutting down write pipe %d", _fd_out);
+		if ([_outputBuffers count] > 0)
+			INFO(@"fd %i has %lu non-flushed buffers pending", _fd_out, [_outputBuffers count]);
+		CFSocketInvalidate(_outputSocket); /* also removes the source from run loops */
+		CFRelease(_outputSocket);
+		CFRelease(_outputSource);
+		_outputSocket = NULL;
+		_outputSource = NULL;
+		_fd_out = -1;
 	}
 	/*
-	 * If outputSource is NULL, we either have already closed the write socket,
+	 * If _outputSource is NULL, we either have already closed the write socket,
 	 * or we have a bidirectional socket. XXX: should we call shutdown(2) if
 	 * full-duplex bidirectional socket?
 	 */
@@ -345,22 +357,22 @@ fd_read(CFSocketRef s,
 
 - (void)shutdownRead
 {
-	if (inputSource) {
-		DEBUG(@"shutting down read pipe %d", fd_in);
-		CFSocketInvalidate(inputSocket); /* also removes the source from run loops */
-		if (outputSocket == inputSocket) {
+	if (_inputSource) {
+		DEBUG(@"shutting down read pipe %d", _fd_in);
+		CFSocketInvalidate(_inputSocket); /* also removes the source from run loops */
+		if (_outputSocket == _inputSocket) {
 			/*
                          * XXX: this also shuts down the write part for
                          * full-duplex bidirectional sockets.
 			 */
-			outputSocket = NULL;
-			fd_out = -1;
+			_outputSocket = NULL;
+			_fd_out = -1;
 		}
-		CFRelease(inputSocket);
-		CFRelease(inputSource);
-		inputSocket = NULL;
-		inputSource = NULL;
-		fd_in = -1;
+		CFRelease(_inputSocket);
+		CFRelease(_inputSource);
+		_inputSocket = NULL;
+		_inputSource = NULL;
+		_fd_in = -1;
 	}
 }
 
@@ -373,36 +385,36 @@ fd_read(CFSocketRef s,
 - (void)scheduleInRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"adding to mode %@", mode);
-	if (inputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], inputSource, (CFStringRef)mode);
-	if (outputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], outputSource, (CFStringRef)mode);
+	if (_inputSource)
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)mode);
+	if (_outputSource)
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)mode);
 }
 
 - (void)removeFromRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"removing from mode %@", mode);
-	if (inputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], inputSource, (CFStringRef)mode);
-	if (outputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], outputSource, (CFStringRef)mode);
+	if (_inputSource)
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)mode);
+	if (_outputSource)
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)mode);
 }
 
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len
 {
-	*buf = buffer;
-	*len = buflen;
+	*buf = _buffer;
+	*len = _buflen;
 	return YES;
 }
 
 - (NSData *)data
 {
-	return [NSData dataWithBytes:buffer length:buflen];
+	return [NSData dataWithBytes:_buffer length:_buflen];
 }
 
 - (BOOL)hasBytesAvailable
 {
-	return buflen > 0;
+	return _buflen > 0;
 }
 
 - (BOOL)hasSpaceAvailable
@@ -412,38 +424,28 @@ fd_read(CFSocketRef s,
 
 - (void)write:(const void *)buf length:(NSUInteger)length
 {
-	if (outputSocket && length > 0) {
-		DEBUG(@"enqueueing %lu bytes on fd %i", length, CFSocketGetNative(outputSocket));
-		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
+	if (_outputSocket && length > 0) {
+		DEBUG(@"enqueueing %lu bytes on fd %i", length, CFSocketGetNative(_outputSocket));
+		[_outputBuffers addObject:[[[ViStreamBuffer alloc] initWithBuffer:buf length:length] autorelease]];
 
 		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
-		if (outputSocket == inputSocket)
+		if (_outputSocket == _inputSocket)
 			cbType |= kCFSocketReadCallBack;
-		CFSocketEnableCallBacks(outputSocket, cbType);
+		CFSocketEnableCallBacks(_outputSocket, cbType);
 	}
 }
 
-- (void)writeData:(NSData *)data
+- (void)writeData:(NSData *)aData
 {
-	if (outputSocket && [data length] > 0) {
-		DEBUG(@"enqueueing %lu bytes on fd %i", [data length], CFSocketGetNative(outputSocket));
-		[outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:data]];
+	if (_outputSocket && [aData length] > 0) {
+		DEBUG(@"enqueueing %lu bytes on fd %i", [aData length], CFSocketGetNative(_outputSocket));
+		[_outputBuffers addObject:[[[ViStreamBuffer alloc] initWithData:aData] autorelease]];
 
 		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
-		if (outputSocket == inputSocket)
+		if (_outputSocket == _inputSocket)
 			cbType |= kCFSocketReadCallBack;
-		CFSocketEnableCallBacks(outputSocket, cbType);
+		CFSocketEnableCallBacks(_outputSocket, cbType);
 	}
-}
-
-- (void)setDelegate:(id<NSStreamDelegate>)aDelegate
-{
-	delegate = aDelegate;
-}
-
-- (id<NSStreamDelegate>)delegate
-{
-	return delegate;
 }
 
 - (id)propertyForKey:(NSString *)key

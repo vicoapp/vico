@@ -45,7 +45,7 @@
 {
 	va_list ap;
 	va_start(ap, fmt);
-	NSError *err = [ViError errorWithObject:[[NSString alloc] initWithFormat:fmt arguments:ap]];
+	NSError *err = [ViError errorWithObject:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]];
 	va_end(ap);
 	return err;
 }
@@ -59,7 +59,7 @@
 {
 	va_list ap;
 	va_start(ap, fmt);
-	NSError *err = [ViError errorWithObject:[[NSString alloc] initWithFormat:fmt arguments:ap]
+	NSError *err = [ViError errorWithObject:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]
 					   code:code];
 	va_end(ap);
 	return err;

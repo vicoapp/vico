@@ -4,8 +4,12 @@
 
 @implementation ExMapping
 
-@synthesize names, syntax, scopeSelector, expression, action;
-@synthesize completion;
+@synthesize names = _names;
+@synthesize syntax = _syntax;
+@synthesize scopeSelector = _scopeSelector;
+@synthesize expression = _expression;
+@synthesize action = _action;
+@synthesize completion = _completion;
 
 - (ExMapping *)initWithNames:(NSArray *)namesArray
 		      syntax:(NSString *)aSyntax
@@ -16,9 +20,9 @@
 			INFO(@"%s", "missing ex mapping name");
 			return nil;
 		}
-		names = [namesArray mutableCopy];
-		syntax = aSyntax;
-		scopeSelector = aScopeSelector ?: @"";
+		_names = [namesArray mutableCopy];
+		_syntax = [aSyntax copy];
+		_scopeSelector = [aScopeSelector copy] ?: [@"" retain];
 	}
 	return self;
 }
@@ -29,7 +33,7 @@
                        scope:(NSString *)aScopeSelector
 {
 	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector]) != nil) {
-		expression = anExpression;
+		_expression = [anExpression retain];
 	}
 	return self;
 }
@@ -40,32 +44,46 @@
                        scope:(NSString *)aScopeSelector
 {
 	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector]) != nil) {
-		action = anAction;
+		_action = anAction;
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_names release];
+	[_scopeSelector release];
+	[_syntax release];
+	[_parameter release];
+	[_completion release];
+	[_expression release];
+	[_usage release];
+	[_help release];
+	[super dealloc];
+}
+
 - (NSString *)name
 {
-	return [names objectAtIndex:0];
+	return [_names objectAtIndex:0];
 }
 
 - (void)addAlias:(NSString *)aName
 {
-	[names addObject:aName];
+	/* XXX: when adding an alias, shouldn't we check for duplicate mappings in the same map? */
+	[_names addObject:aName];
 }
 
 - (void)removeAlias:(NSString *)aName
 {
-	if ([names count] > 1)
-		[names removeObject:aName];
+	if ([_names count] > 1)
+		[_names removeObject:aName];
 }
 
 - (int)matchesName:(NSString *)name exactly:(BOOL)exactMatch
 {
 	NSUInteger len = [name length];
 	int match = 0;
-	for (NSString *n in names) {
+	for (NSString *n in _names) {
 		if (exactMatch ? [name isEqualToString:n] : [n hasPrefix:name]) {
 			if (len == [n length])
 				return 2; /* exact match */
@@ -77,34 +95,40 @@
 
 - (NSString *)description
 {
-	if ([scopeSelector length] > 0)
+	if ([_scopeSelector length] > 0)
 		return [NSString stringWithFormat:@"<ExMapping %@(%@): %@>",
-		    self.name, scopeSelector, expression ? [expression stringValue] : NSStringFromSelector(action)];
+		    self.name, _scopeSelector, _expression ? [_expression stringValue] : NSStringFromSelector(_action)];
 	else
 		return [NSString stringWithFormat:@"<ExMapping %@: %@>",
-		    self.name, expression ? [expression stringValue] : NSStringFromSelector(action)];
+		    self.name, _expression ? [_expression stringValue] : NSStringFromSelector(_action)];
 }
 
 @end
 
 @implementation ExMap
 
-@synthesize mappings;
+@synthesize mappings = _mappings;
 
 - (ExMap *)init
 {
 	if ((self = [super init]) != nil) {
-		mappings = [NSMutableArray new];
+		_mappings = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_mappings release];
+	[super dealloc];
+}
+
 + (ExMap *)defaultMap
 {
-	static ExMap *defaultMap = nil;
-	if (defaultMap == nil)
-		defaultMap = [[ExMap alloc] init];
-	return defaultMap;
+	static ExMap *__defaultMap = nil;
+	if (__defaultMap == nil)
+		__defaultMap = [[ExMap alloc] init];
+	return __defaultMap;
 }
 
 - (ExMapping *)lookup:(NSString *)aString
@@ -118,7 +142,7 @@
 	if ([aString length] == 0)
 		return nil;
 
-	for (ExMapping *m in mappings) {
+	for (ExMapping *m in _mappings) {
 		/*
 		 * Check if the name match. We start with partial
 		 * matching. If an exact match is found, we continue
@@ -167,7 +191,7 @@
 {
 	DEBUG(@"adding ex command %@", mapping);
 	ExMapping *old = nil;
-	for (ExMapping *m in mappings) {
+	for (ExMapping *m in _mappings) {
 		if ([m.scopeSelector isEqualToString:mapping.scopeSelector]) {
 			for (NSString *n in mapping.names) {
 				if ([m matchesName:n exactly:YES]) {
@@ -182,9 +206,9 @@
 
 	if (old) {
 		DEBUG(@"replacing previous ex command %@ w/same scope %@", old, old.scopeSelector);
-		[mappings removeObject:old];
+		[_mappings removeObject:old];
 	}
-	[mappings addObject:mapping];
+	[_mappings addObject:mapping];
 }
 
 - (ExMapping *)define:(id)aName
@@ -220,8 +244,10 @@
 		return nil;
 	}
 
-	if (m)
+	if (m) {
 		[self addMapping:m];
+		[m release];
+	}
 
 	return m;
 }

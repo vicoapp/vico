@@ -7,20 +7,20 @@
  */
 @interface ExMapping : NSObject
 {
-	NSMutableArray *names;
-	NSString *scopeSelector;
+	NSMutableArray		*_names;
+	NSString		*_scopeSelector;
 
-	NSString *syntax;
-	NSUInteger flags;
-	id parameter;
+	NSString		*_syntax;
+	NSUInteger		 _flags;
+	id			 _parameter;
 
-	id<ViCompletionProvider> completion;
+	id<ViCompletionProvider> _completion;
 
-	SEL action;
-	NuBlock *expression;
+	SEL			 _action;
+	NuBlock			*_expression;
 
-	NSString *usage;
-	NSString *help;
+	NSString		*_usage;
+	NSString		*_help;
 }
 
 /** The primary name of this command. */
@@ -52,7 +52,7 @@
 @property(nonatomic, readonly) NSString *scopeSelector;
 @property(nonatomic, readonly) NuBlock *expression;
 @property(nonatomic, readonly) SEL action;
-@property(nonatomic, assign, readwrite) id<ViCompletionProvider> completion;
+@property(nonatomic, readwrite, retain) id<ViCompletionProvider> completion;
 
 /** Add an alias to an ex comand.
  * @param aName The alias name that this command will respond to.
@@ -75,12 +75,15 @@
                       scope:(NSString *)aScopeSelector;
 @end
 
+
+
+
 /**
  * A collection of ex command definitions.
  */
 @interface ExMap : NSObject
 {
-	NSMutableArray *mappings;
+	NSMutableArray	*_mappings;
 }
 
 @property (nonatomic,readonly) NSMutableArray *mappings;

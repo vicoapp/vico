@@ -3,18 +3,30 @@
 
 @implementation ViScope
 
-@synthesize range;
-@synthesize scopes;
-@synthesize attributes;
+@synthesize range = _range;
+@synthesize scopes = _scopes;
+@synthesize attributes = _attributes;
+
++ (ViScope *)scopeWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
+{
+	return [[[ViScope alloc] initWithScopes:scopesArray range:aRange] autorelease];
+}
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray
                       range:(NSRange)aRange
 {
 	if ((self = [super init]) != nil) {
-		scopes = scopesArray;
-		range = aRange;
+		_scopes = [scopesArray retain]; // XXX: retain or copy?
+		_range = aRange;
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_scopes release];
+	[_attributes release];
+	[super dealloc];
 }
 
 - (int)compareBegin:(ViScope *)otherContext
@@ -22,14 +34,14 @@
 	if (self == otherContext)
 		return 0;
 
-	if (range.location < otherContext.range.location)
+	if (_range.location < otherContext.range.location)
 		return -1;
-	if (range.location > otherContext.range.location)
+	if (_range.location > otherContext.range.location)
 		return 1;
 
-	if (range.length > otherContext.range.length)
+	if (_range.length > otherContext.range.length)
 		return -1;
-	if (range.length < otherContext.range.length)
+	if (_range.length < otherContext.range.length)
 		return 1;
 
 	return 0;
@@ -38,20 +50,20 @@
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViScope %p %@: %@>",
-	    self, NSStringFromRange(range),
-	    [scopes componentsJoinedByString:@" "]];
+	    self, NSStringFromRange(_range),
+	    [_scopes componentsJoinedByString:@" "]];
 }
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	return [[ViScope alloc] initWithScopes:scopes range:range];
+	return [[[self class] allocWithZone:zone] initWithScopes:_scopes range:_range];
 }
 
 - (u_int64_t)match:(NSString *)scopeSelector
 {
 	if (scopeSelector == nil)
 		return 1ULL;
-	return [scopeSelector matchesScopes:scopes];
+	return [scopeSelector matchesScopes:_scopes];
 }
 
 - (NSString *)bestMatch:(NSArray *)scopeSelectors
@@ -73,8 +85,8 @@
 
 - (BOOL)addScopeComponent:(NSString *)scopeComponent
 {
-	if (![scopes containsObject:scopeComponent]) {
-		scopes = [scopes arrayByAddingObject:scopeComponent];
+	if (![_scopes containsObject:scopeComponent]) {
+		[self setScopes:[_scopes arrayByAddingObject:scopeComponent]];
 		return YES;
 	}
 	return NO;

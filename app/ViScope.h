@@ -4,17 +4,18 @@
 
 @interface ViScope : NSObject <NSCopying>
 {
-	NSRange range;
-	NSArray *scopes;
-	NSDictionary *attributes;
+	NSRange		 _range;
+	NSArray		*_scopes;
+	NSDictionary	*_attributes;
 }
 
 /** The range of characters this scope covers. */
 @property(nonatomic,readwrite) NSRange range;
 
-@property(nonatomic,readwrite,assign) NSArray *scopes;
-@property(nonatomic,readwrite,assign) NSDictionary *attributes;
+@property(nonatomic,readwrite,retain) NSArray *scopes;
+@property(nonatomic,readwrite,retain) NSDictionary *attributes;
 
++ (ViScope *)scopeWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
 
 /** @name Matching scope selectors */
@@ -31,7 +32,6 @@
 - (NSString *)bestMatch:(NSArray *)scopeSelectors;
 
 - (int)compareBegin:(ViScope *)otherContext;
-- (id)copyWithZone:(NSZone *)zone;
 
 - (BOOL)addScopeComponent:(NSString *)scopeComponent;
 

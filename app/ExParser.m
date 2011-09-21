@@ -11,28 +11,34 @@
 
 @implementation ExParser
 
-@synthesize map;
+@synthesize map = _map;
 
 - (ExParser *)init
 {
 	if ((self = [super init]) != nil) {
-		map = [ExMap defaultMap];
+		_map = [[ExMap defaultMap] retain];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_map release];
+	[super dealloc];
+}
+
 + (ExParser *)sharedParser
 {
-	static ExParser *sharedParser = nil;
-	if (sharedParser == nil)
-		sharedParser = [[ExParser alloc] init];
-	return sharedParser;
+	static ExParser *__sharedParser = nil;
+	if (__sharedParser == nil)
+		__sharedParser = [[ExParser alloc] init];
+	return __sharedParser;
 }
 
 + (BOOL)parseRange:(NSScanner *)scan
        intoAddress:(ExAddress **)outAddr
 {
-	ExAddress *addr = [[ExAddress alloc] init];
+	ExAddress *addr = [ExAddress address];
 
 	[scan setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
 	NSCharacterSet *signSet = [NSCharacterSet characterSetWithCharactersInString:@"+-^"];
@@ -196,11 +202,11 @@
 		 */
 		[scan inc];
 
-		*addr1 = [[ExAddress alloc] init];
+		*addr1 = [ExAddress address];
 		(*addr1).type = ExAddressAbsolute;
 		(*addr1).line = 1;
 
-		*addr2 = [[ExAddress alloc] init];
+		*addr2 = [ExAddress address];
 		(*addr2).type = ExAddressAbsolute;
 		(*addr2).line = -1;
 
@@ -324,7 +330,7 @@
 		name = @"#";
 		if (completionLocation == [scan scanLocation]) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[ExCommandCompletion alloc] init];
+				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange([scan scanLocation], 0);
 			return nil;
@@ -340,14 +346,14 @@
 		NSUInteger nameEnd = [scan scanLocation];
 		if (completionLocation >= nameStart && completionLocation <= nameEnd) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[ExCommandCompletion alloc] init];
+				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(nameStart, completionLocation - nameStart);
 			return nil;
 		}
 	}
 
-	mapping = [map lookup:name withScope:nil];
+	mapping = [_map lookup:name withScope:nil];
 	if (mapping == NULL) {
 		if (outError) {
 			if (name)
@@ -365,7 +371,7 @@
 		return nil;
 	}
 
-	command = [[ExCommand alloc] initWithMapping:mapping];
+	command = [ExCommand commandWithMapping:mapping];
 	command.naddr = naddr;
 
 	/* Set default addresses. */
@@ -375,12 +381,12 @@
 				/*
 				 * Default to whole file.
 				 */
-				addr1 = [[ExAddress alloc] init];
+				addr1 = [ExAddress address];
 				addr1.type = ExAddressAbsolute;
 				addr1.line = 0;
 				addr1.offset = 0;
 
-				addr2 = [[ExAddress alloc] init];
+				addr2 = [ExAddress address];
 				addr2.type = ExAddressAbsolute;
 				addr2.line = -1;	/* last line */
 				addr2.offset = 0;
@@ -388,13 +394,13 @@
 				/*
 				 * Default to current line.
 				 */
-				addr1 = [[ExAddress alloc] init];
+				addr1 = [ExAddress address];
 				addr1.type = ExAddressCurrent;
-				addr2 = [addr1 copy];
+				addr2 = [[addr1 copy] autorelease];
 			}
 		} else if (naddr == 1) {
 			/* Make addr2 same as addr1. */
-			addr2 = [[ExAddress alloc] init];
+			addr2 = [ExAddress address];
 			addr2.type = ExAddressNone;
 		}
 	} else {
@@ -505,7 +511,7 @@
 		// XXX: this could be better, recursive parsing?
 		if (completionLocation == [scan scanLocation]) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[ExCommandCompletion alloc] init];
+				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(completionLocation, 0);
 			return nil;
@@ -610,7 +616,7 @@
                                  * used as a line range offset from the
                                  * last address.
 				 */
-				addr1 = [addr2 copy];
+				addr1 = [[addr2 copy] autorelease];
 				addr2.offset += count - 1;
 				DEBUG(@"%@ -> %@", addr1, addr2);
 			} else
@@ -680,7 +686,7 @@
 		NSUInteger pipeEnd = [scan scanLocation];
 		if (completionLocation >= pipeStart && completionLocation <= pipeEnd) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[ViFileCompletion alloc] init];
+				*completionProviderPtr = [[[ViFileCompletion alloc] init] autorelease];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(completionLocation, 0); // XXX: this is wrong!
 			return nil;
@@ -716,7 +722,7 @@
 		if (completionLocation >= argStart && completionLocation <= argEnd) {
 			if (completionProviderPtr) {
 				if (mapping.completion == nil && expandFiles)
-					*completionProviderPtr = [[ViFileCompletion alloc] init];
+					*completionProviderPtr = [[[ViFileCompletion alloc] init] autorelease];
 				else
 					*completionProviderPtr = mapping.completion;
 			}
@@ -777,16 +783,16 @@
 
 - (NSString *)expand:(NSString *)string error:(NSError **)outError
 {
-	static NSCharacterSet *xset = nil;
-	if (xset == nil)
-		xset = [NSCharacterSet characterSetWithCharactersInString:@"%#"];
-	if ([string rangeOfCharacterFromSet:xset].location == NSNotFound)
+	static NSCharacterSet *__xset = nil;
+	if (__xset == nil)
+		__xset = [[NSCharacterSet characterSetWithCharactersInString:@"%#"] retain];
+	if ([string rangeOfCharacterFromSet:__xset].location == NSNotFound)
 		return string;
 
 	ViRegisterManager *regs = [ViRegisterManager sharedManager];
 	NSMutableString *xs = [NSMutableString string];
 	NSScanner *scan = [NSScanner scannerWithString:string];
-	while ([scan scanUpToUnescapedCharacterFromSet:xset appendToString:xs stripEscapes:YES]) {
+	while ([scan scanUpToUnescapedCharacterFromSet:__xset appendToString:xs stripEscapes:YES]) {
 		unichar ch;
 		[scan scanCharacter:&ch];
 		NSString *rs = [regs contentOfRegister:ch];

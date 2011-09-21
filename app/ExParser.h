@@ -5,10 +5,10 @@
  */
 @interface ExParser : NSObject
 {
-	ExMap *map;
+	ExMap	*_map;
 }
 
-@property (nonatomic, assign, readwrite) ExMap *map;
+@property(nonatomic,readwrite,retain) ExMap *map;
 
 /** @returns A shared ex parser instance. */
 + (ExParser *)sharedParser;

@@ -27,9 +27,9 @@
 
 struct rb_entry
 {
-    RB_ENTRY(rb_entry) entry;
-    id obj;
-    SEL compareSelector;
+	RB_ENTRY(rb_entry)		 entry;
+	id				 obj;
+	SEL				 compareSelector;
 };
 
 /* This is an objective-c wrapper around sys_tree. sys_tree is a red-black tree
@@ -38,10 +38,12 @@ struct rb_entry
 
 @interface MHSysTree : NSObject
 {
-    unsigned nitems;
-    RB_HEAD(id_tree, rb_entry) root;
-    SEL compareSelector;
-    NSMutableSet *hack;
+	unsigned			 _nitems;
+	RB_HEAD(id_tree, rb_entry)	 _root;
+	SEL				 _compareSelector;
+#ifdef __OBJC_GC__
+	NSMutableSet			*_strongRefs;
+#endif
 }
 
 int id_cmp(struct rb_entry *a, struct rb_entry *b);

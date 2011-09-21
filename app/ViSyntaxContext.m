@@ -3,19 +3,22 @@
 
 @implementation ViSyntaxContext
 
-@synthesize characters;
-@synthesize range;
-@synthesize lineOffset;
-@synthesize restarting;
-@synthesize cancelled;
+@synthesize characters = _characters;
+@synthesize range = _range;
+@synthesize lineOffset = _lineOffset;
+@synthesize restarting = _restarting;
+@synthesize cancelled = _cancelled;
+
++ (ViSyntaxContext *)syntaxContextWithLine:(NSUInteger)line
+{
+	return [[[ViSyntaxContext alloc] initWithLine:line] autorelease];
+}
 
 - (ViSyntaxContext *)initWithLine:(NSUInteger)line
 {
-	self = [super init];
-	if (self)
-	{
-		lineOffset = line;
-		restarting = YES;
+	if ((self = [super init]) != nil) {
+		_lineOffset = line;
+		_restarting = YES;
 	}
 	return self;
 }
@@ -25,21 +28,26 @@
 				   line:(NSUInteger)line
 			     restarting:(BOOL)flag
 {
-	self = [super init];
-	if (self)
-	{
-		characters = chars;
-		range = aRange;
-		lineOffset = line;
-		restarting = flag;
+	if ((self = [super init]) != nil) {
+		_characters = chars;
+		_range = aRange;
+		_lineOffset = line;
+		_restarting = flag;
 	}
 	return self;
 }
 
 - (void)finalize
 {
-	free(characters);
+	free(_characters);
 	[super finalize];
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	free(_characters);
+	[super dealloc];
 }
 
 @end

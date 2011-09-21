@@ -4,71 +4,78 @@
 
 @implementation ViLanguage
 
-@synthesize bundle, scope;
+@synthesize bundle = _bundle;
+@synthesize scope = _scope;
 
-- (ViRegexp *)compileRegexp:(NSString *)pattern
+- (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle
 {
-	ViRegexp *regexp = nil;
-	@try
-	{
-		regexp = [[ViRegexp alloc] initWithString:pattern];
-	}
-	@catch (NSException *exception)
-	{
-		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
-		regexp = nil;
+	if ((self = [super init]) != nil) {
+		_bundle = aBundle;	// XXX: not retained!
+		_compiled = NO;
+		_language = [[NSMutableDictionary dictionaryWithContentsOfFile:aPath] mutableCopy];
+		if (![_language isKindOfClass:[NSDictionary class]]) {
+			INFO(@"%@: failed to load plist", aPath);
+			[self release];
+			return nil;
+		}
+		_languagePatterns = [[_language objectForKey:@"patterns"] retain];
+		if (![_languagePatterns isKindOfClass:[NSArray class]]) {
+			INFO(@"%@: failed to load plist", aPath);
+			[self release];
+			return nil;
+		}
+
+		if ([[self name] length] > 0)
+			_scope = [[ViScope alloc] initWithScopes:[NSArray arrayWithObject:[self name]]
+							   range:NSMakeRange(0, 0)];
 	}
 
-	return regexp;
+	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_language release];
+	[_languagePatterns release];
+	[_scope release];
+	[super dealloc];
 }
 
 - (ViRegexp *)compileRegexp:(NSString *)pattern
  withBackreferencesToRegexp:(ViRegexpMatch *)beginMatch
                   matchText:(const unichar *)matchText
 {
-	ViRegexp *regexp = nil;
-	@try
-	{
-		NSMutableString *expandedPattern = [[NSMutableString alloc] initWithString:pattern];
-		if (beginMatch)
-		{
-			DEBUG(@"*************** expanding pattern with %i captures:", [beginMatch count]);
-			DEBUG(@"** original pattern = [%@]", pattern);
-			int i;
-			for (i = 1; i <= [beginMatch count]; i++)
-			{
-				NSRange captureRange = [beginMatch rangeOfSubstringAtIndex:i];
-				captureRange.location -= [beginMatch startLocation];
-				NSString *capture = [NSString stringWithCharacters:matchText + captureRange.location length:captureRange.length];
-				if (capture)
-				{
-					NSString *backref = [NSString stringWithFormat:@"\\%i", i];
-					DEBUG(@"**** replacing [%@] with [%@]", backref, capture);
-					[expandedPattern replaceOccurrencesOfString:backref
-									 withString:capture
-									    options:0
-									      range:NSMakeRange(0, [expandedPattern length])];
-				}
-			}
-			DEBUG(@"** expanded pattern = [%@]", expandedPattern);
+	if (beginMatch == nil)
+		return [ViRegexp regexpWithString:pattern];
+
+	NSMutableString *expandedPattern = [NSMutableString stringWithString:pattern];
+	DEBUG(@"*************** expanding pattern with %i captures:", [beginMatch count]);
+	DEBUG(@"** original pattern = [%@]", pattern);
+	for (NSUInteger i = 1; i <= [beginMatch count]; i++) {
+		NSRange captureRange = [beginMatch rangeOfSubstringAtIndex:i];
+		captureRange.location -= [beginMatch startLocation];
+		NSString *capture = [NSString stringWithCharacters:matchText + captureRange.location
+							    length:captureRange.length];
+		if (capture) {
+			NSString *backref = [NSString stringWithFormat:@"\\%lu", i];
+			DEBUG(@"**** replacing [%@] with [%@]", backref, capture);
+			[expandedPattern replaceOccurrencesOfString:backref
+							 withString:capture
+							    options:0
+							      range:NSMakeRange(0, [expandedPattern length])];
 		}
-
-		regexp = [[ViRegexp alloc] initWithString:expandedPattern];
 	}
-	@catch (NSException *exception)
-	{
-		INFO(@"***** FAILED TO COMPILE REGEXP ***** [%@], exception = [%@]", pattern, exception);
-		regexp = nil;
-	}
+	DEBUG(@"** expanded pattern = [%@]", expandedPattern);
 
-	return regexp;
+	return [ViRegexp regexpWithString:expandedPattern];
 }
 
 - (void)compileRegexp:(NSString *)rule inPattern:(NSMutableDictionary *)d
 {
-	if ([d objectForKey:rule])
-	{
-		ViRegexp *regexp = [self compileRegexp:[d objectForKey:rule]];
+	NSString *rulePattern = [d objectForKey:rule];
+	if ([rulePattern isKindOfClass:[NSString class]]) {
+		ViRegexp *regexp = [ViRegexp regexpWithString:rulePattern];
 		if (regexp)
 			[d setObject:regexp forKey:[NSString stringWithFormat:@"%@Regexp", rule]];
 	}
@@ -79,13 +86,10 @@
 	if (patterns == nil)
 		return;
 
-	ViRegexp *hasBackRefs = [[ViRegexp alloc] initWithString:@"\\\\([1-9]|k<.*?>)"];
+	ViRegexp *hasBackRefs = [ViRegexp regexpWithString:@"\\\\([1-9]|k<.*?>)"];
 
-	NSMutableDictionary *d;
-	for (d in patterns)
-	{
-		if ([[d objectForKey:@"disabled"] intValue] == 1)
-		{
+	for (NSMutableDictionary *d in patterns) {
+		if ([[d objectForKey:@"disabled"] intValue] == 1) {
 			[d removeAllObjects];
 			continue;
 		}
@@ -98,8 +102,7 @@
 
 		// recursively compile sub-patterns, if any
 		NSArray *subPatterns = [d objectForKey:@"patterns"];
-		if (subPatterns)
-		{
+		if ([subPatterns isKindOfClass:[NSArray class]]) {
 			//INFO(@"compiling sub-patterns for scope [%@]", [d objectForKey:@"name"]);
 			[self compilePatterns:subPatterns];
 		}
@@ -109,58 +112,39 @@
 - (void)compile
 {
 	DEBUG(@"start compiling language [%@]", [self name]);
-	[self compilePatterns:languagePatterns];
-	[self compilePatterns:[[language objectForKey:@"repository"] allValues]];
-	compiled = YES;
+	[self compilePatterns:_languagePatterns];
+	NSDictionary *repository = [_language objectForKey:@"repository"];
+	if ([repository isKindOfClass:[NSDictionary class]])
+		[self compilePatterns:[repository allValues]];
+	_compiled = YES;
 	DEBUG(@"finished compiling language [%@]", [self name]);
-}
-
-- (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle
-{
-	self = [super init];
-	if (self == nil)
-		return nil;
-
-	bundle = aBundle;
-	compiled = NO;
-	language = [[NSMutableDictionary dictionaryWithContentsOfFile:aPath] mutableCopy];
-	if (![language isKindOfClass:[NSDictionary class]]) {
-		INFO(@"%@: failed to load plist", aPath);
-		return nil;
-	}
-	languagePatterns = [language objectForKey:@"patterns"];	
-
-	if ([[self name] length] > 0)
-		scope = [[ViScope alloc] initWithScopes:[NSArray arrayWithObject:[self name]] range:NSMakeRange(0, 0)];
-
-	return self;
 }
 
 - (NSArray *)patterns
 {
-	if (!compiled)
+	if (!_compiled)
 		[self compile];
-	return [self expandedPatternsForPattern:language];
+	return [self expandedPatternsForPattern:_language];
 }
 
 - (NSArray *)fileTypes
 {
-	return [language objectForKey:@"fileTypes"];
+	return [_language objectForKey:@"fileTypes"];
 }
 
 - (NSString *)firstLineMatch
 {
-	return [language objectForKey:@"firstLineMatch"];
+	return [_language objectForKey:@"firstLineMatch"];
 }
 
 - (NSString *)name
 {
-	return [language objectForKey:@"scopeName"];
+	return [_language objectForKey:@"scopeName"];
 }
 
 - (NSString *)displayName
 {
-	return [language objectForKey:@"name"];
+	return [_language objectForKey:@"name"];
 }
 
 - (NSString *)description
@@ -173,13 +157,10 @@
 	// DEBUG(@"expanding %i patterns from language %@, baseLanguage = %@", [patterns count], [self name], [baseLanguage name]);
 
 	NSMutableArray *expandedPatterns = [NSMutableArray array];
-	NSMutableDictionary *pattern;
-	for (pattern in patterns)
-	{
+	for (NSMutableDictionary *pattern in patterns) {
 		// DEBUG(@"  expanding pattern %@", pattern);
 		NSString *include = [pattern objectForKey:@"include"];
-		if (include == nil)
-		{
+		if (![include isKindOfClass:[NSString class]]) {
 			// just add this pattern directly
 			// set a reference to the language so we can find the correct repository later on
 			[pattern setObject:self forKey:@"language"];
@@ -188,35 +169,29 @@
 		}
 
 		// expand this pattern
-		if ([include hasPrefix:@"#"])
-		{
+		if ([include hasPrefix:@"#"]) {
 			// fetch pattern from repository
 			NSString *patternName = [include substringFromIndex:1];
-			NSMutableDictionary *includePattern = [[language objectForKey:@"repository"] objectForKey:patternName];
-			// DEBUG(@"including [%@] with %i patterns from repository of language %@", patternName, [includePattern count], [self name]);
-			if (includePattern)
-			{
+			NSMutableDictionary *includePattern = [[_language objectForKey:@"repository"] objectForKey:patternName];
+			if ([includePattern isKindOfClass:[NSDictionary class]]) {
 				// DEBUG(@"includePattern = [%@]", includePattern);
 				int n = 1;
 				for (NSString *key in [includePattern allKeys])
 					if ([key hasPrefix:@"expandedPatterns."] || [key isEqualToString:@"comment"])
 						++n;
 
-				if ([includePattern count] == n && [includePattern objectForKey:@"patterns"])
-				{
+				if ([includePattern count] == n && [includePattern objectForKey:@"patterns"]) {
 					// this pattern is just a collection of other patterns
 					// no endless loop because expandedPatternsForPattern caches the first recursion
 					// DEBUG(@"expanding pattern collection %@", patternName);
-					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern baseLanguage:baseLanguage]];
-				}
-				else
-				{
+					[expandedPatterns addObjectsFromArray:[self expandedPatternsForPattern:includePattern
+												  baseLanguage:baseLanguage]];
+				} else {
 					// this pattern is a real pattern (possibly with sub-patterns)
-					[includePattern setObject:self forKey:@"language"];
+					[includePattern setObject:self forKey:@"language"]; // XXX: circular reference
 					[expandedPatterns addObject:includePattern];
 				}
-			}
-			else
+			} else
 				INFO(@"***** pattern [%@] NOT FOUND in repository for language [%@] *****", patternName, [self name]);
 		}
 		else if ([include isEqualToString:@"$base"])

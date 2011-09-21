@@ -53,6 +53,7 @@
 	NSMutableArray			*_tabstops;
 	NSDictionary			*_environment;
 	BOOL				 _finished;
+	NSMutableString			*_shellOutput;
 }
 
 @property(nonatomic,readonly) NSRange range;

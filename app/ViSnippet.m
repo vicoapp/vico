@@ -6,7 +6,8 @@
 #import "ViBundle.h"
 #import "ViError.h"
 #import "NSScanner-additions.h"
-#import "logging.h"
+#import "ViTaskRunner.h"
+#include "logging.h"
 
 
 @implementation ViTabstop
@@ -40,6 +41,21 @@
 @synthesize currentTabStop = _currentTabStop;
 @synthesize finished = _finished;
 
+- (void)snippetTask:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)ctx
+{
+	if (status != 0)
+		DEBUG(@"%@: exited with status %i", runner, status);
+	[_shellOutput release];
+	_shellOutput = [[NSMutableString alloc] initWithData:[runner standardOutput]
+						    encoding:NSUTF8StringEncoding];
+
+	if ([_shellOutput length] > 0)
+		[_shellOutput replaceOccurrencesOfString:@"\n"
+					      withString:@""
+						 options:0
+						   range:NSMakeRange([_shellOutput length] - 1, 1)];
+}
+
 - (NSMutableString *)runShellCommand:(NSString *)shellCommand
                            withInput:(NSString *)inputText
                                error:(NSError **)outError
@@ -49,88 +65,30 @@
 	if ([shellCommand length] == 0)
 		return [NSMutableString stringWithString:@""];
 
-	NSTask *task = [[[NSTask alloc] init] autorelease];
-	char *templateFilename = NULL;
-	int fd = -1;
-
-	if ([shellCommand hasPrefix:@"#!"]) {
-		const char *tmpl = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"vico_cmd.XXXXXXXXXX"] fileSystemRepresentation];
-		templateFilename = strdup(tmpl);
-		fd = mkstemp(templateFilename);
-		DEBUG(@"using template %s", templateFilename);
-		if (fd == -1) {
-			if (outError)
-				*outError = [ViError errorWithFormat:@"Failed to open temporary file: %s", strerror(errno)];
-			return NO;
-		}
-		const char *data = [shellCommand UTF8String];
-		ssize_t rc = write(fd, data, strlen(data));
-		DEBUG(@"wrote %i byte", rc);
-		if (rc == -1) {
-			if (outError)
-				*outError = [ViError errorWithFormat:@"Failed to save temporary command file: %s", strerror(errno)];
-			unlink(templateFilename);
-			close(fd);
-			free(templateFilename);
-			return NO;
-		}
-		chmod(templateFilename, 0700);
-		shellCommand = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:templateFilename length:strlen(templateFilename)];
-	}
-
-	if (templateFilename)
-		[task setLaunchPath:shellCommand];
-	else {
-		[task setLaunchPath:@"/bin/bash"];
-		[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
-	}
-
-	NSPipe *shellInput = [NSPipe pipe];
-	NSPipe *shellOutput = [NSPipe pipe];
-
-	[task setStandardInput:shellInput];
-	[task setStandardOutput:shellOutput];
-	[task setStandardError:shellOutput];
-
 	NSMutableDictionary *env = [_environment mutableCopy];
 	for (ViTabstop *ts in _tabstops) {
 		if (ts.mirror == nil)
-			[env setObject:(ts.value ?: @"") forKey:[NSString stringWithFormat:@"TM_TABSTOP_%i", ts.num]];
+			[env setObject:(ts.value ?: @"")
+				forKey:[NSString stringWithFormat:@"TM_TABSTOP_%i", ts.num]];
 	}
 	[env setObject:([self string] ?: @"") forKey:@"TM_SNIPPET"];
 	DEBUG(@"shell environment is %@", env);
-	[task setEnvironment:env];
+
+	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+	[runner launchShellCommand:shellCommand
+		 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
+		       environment:env
+		  currentDirectory:nil
+	    asynchronouslyInWindow:nil
+			     title:shellCommand
+			    target:self
+			  selector:@selector(snippetTask:finishedWithStatus:contextInfo:)
+		       contextInfo:nil
+			     error:outError];
+	[runner release];
 	[env release];
 
-	[task launch];
-	[[shellInput fileHandleForWriting] writeData:[inputText dataUsingEncoding:NSUTF8StringEncoding]];
-	[[shellInput fileHandleForWriting] closeFile];
-	[task waitUntilExit];
-
-#ifndef NO_DEBUG
-	int status = [task terminationStatus];
-	if (status != 0)
-		DEBUG(@"%@: exited with status %i", shellCommand, status);
-#endif
-
-	NSData *outputData = [[shellOutput fileHandleForReading] readDataToEndOfFile];
-	NSMutableString *outputText = [[[NSMutableString alloc] initWithData:outputData
-								    encoding:NSUTF8StringEncoding] autorelease];
-
-	if ([outputText length] > 0)
-		[outputText replaceOccurrencesOfString:@"\n"
-		                            withString:@""
-		                               options:0
-		                                 range:NSMakeRange([outputText length] - 1, 1)];
-
-	if (fd != -1) {
-		unlink(templateFilename);
-		close(fd);
-		free(templateFilename);
-	}
-
-	DEBUG(@"output is [%@]", outputText);
-	return outputText;
+	return [_shellOutput autorelease];
 }
 
 - (NSMutableString *)parseString:(NSString *)aString

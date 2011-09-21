@@ -20,7 +20,6 @@ OBJC_SRCS = \
 	ExMap.m \
 	ExParser.m \
 	ExTextField.m \
-	MHSysTree.m \
 	MHTextIconCell.m \
 	NSArray-patterns.m \
 	NSEvent-keyAdditions.m \

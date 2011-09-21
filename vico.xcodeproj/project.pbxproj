@@ -45,7 +45,6 @@
 		9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D513310AF90023C5B7 /* WebKit.framework */; };
 		9A2EF37513310CB80023C5B7 /* ber.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D713310C320023C5B7 /* ber.c */; };
 		9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2DB13310C320023C5B7 /* ExCommand.m */; };
-		9A2EF37B13310CB80023C5B7 /* MHSysTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E213310C330023C5B7 /* MHSysTree.m */; };
 		9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E413310C330023C5B7 /* MHTextIconCell.m */; };
 		9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E613310C330023C5B7 /* NSArray-patterns.m */; };
 		9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E813310C340023C5B7 /* NSObject+SPInvocationGrabbing.m */; };
@@ -458,8 +457,6 @@
 		9A2EF2DA13310C320023C5B7 /* ExCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommand.h; sourceTree = "<group>"; };
 		9A2EF2DB13310C320023C5B7 /* ExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommand.m; sourceTree = "<group>"; };
 		9A2EF2E013310C320023C5B7 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
-		9A2EF2E113310C330023C5B7 /* MHSysTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MHSysTree.h; sourceTree = "<group>"; };
-		9A2EF2E213310C330023C5B7 /* MHSysTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MHSysTree.m; sourceTree = "<group>"; };
 		9A2EF2E313310C330023C5B7 /* MHTextIconCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MHTextIconCell.h; sourceTree = "<group>"; };
 		9A2EF2E413310C330023C5B7 /* MHTextIconCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MHTextIconCell.m; sourceTree = "<group>"; };
 		9A2EF2E513310C330023C5B7 /* NSArray-patterns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray-patterns.h"; sourceTree = "<group>"; };
@@ -1286,8 +1283,6 @@
 				9A2EF2DA13310C320023C5B7 /* ExCommand.h */,
 				9A2EF2DB13310C320023C5B7 /* ExCommand.m */,
 				9A2EF2E013310C320023C5B7 /* logging.h */,
-				9A2EF2E113310C330023C5B7 /* MHSysTree.h */,
-				9A2EF2E213310C330023C5B7 /* MHSysTree.m */,
 				9A2EF2E313310C330023C5B7 /* MHTextIconCell.h */,
 				9A2EF2E413310C330023C5B7 /* MHTextIconCell.m */,
 				9A2EF2E513310C330023C5B7 /* NSArray-patterns.h */,
@@ -1842,7 +1837,6 @@
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
 				9A2EF37513310CB80023C5B7 /* ber.c in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
-				9A2EF37B13310CB80023C5B7 /* MHSysTree.m in Sources */,
 				9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */,
 				9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */,
 				9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */,

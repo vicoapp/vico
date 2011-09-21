@@ -1,6 +1,5 @@
 #import "ViSyntaxContext.h"
 #import "ViSyntaxMatch.h"
-#import "MHSysTree.h"
 #import "ViLanguage.h"
 
 @interface ViSyntaxParser : NSObject

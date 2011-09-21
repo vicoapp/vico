@@ -4,22 +4,28 @@
 
 @implementation ViRegisterManager
 
-@synthesize lastExecutedRegister;
+@synthesize lastExecutedRegister = _lastExecutedRegister;
 
 + (id)sharedManager
 {
-	static ViRegisterManager *sharedManager = nil;
-	if (sharedManager == nil)
-		sharedManager = [[ViRegisterManager alloc] init];
-	return sharedManager;
+	static ViRegisterManager *__sharedManager = nil;
+	if (__sharedManager == nil)
+		__sharedManager = [[ViRegisterManager alloc] init];
+	return __sharedManager;
 }
 
 - (id)init
 {
 	if ((self = [super init]) != nil) {
-		registers = [NSMutableDictionary dictionary];
+		_registers = [[NSMutableDictionary alloc] init];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_registers release];
+	[super dealloc];
 }
 
 - (NSString *)contentOfRegister:(unichar)regName
@@ -37,7 +43,7 @@
 
 	if (regName >= 'A' && regName <= 'Z')
 		regName = tolower(regName);
-	return [registers objectForKey:[self nameOfRegister:regName]];
+	return [_registers objectForKey:[self nameOfRegister:regName]];
 }
 
 - (void)setContent:(NSString *)content ofRegister:(unichar)regName
@@ -63,9 +69,9 @@
 			content = [currentContent stringByAppendingString:content];
 	}
 
-	[registers setObject:content forKey:[self nameOfRegister:regName]];
+	[_registers setObject:content forKey:[self nameOfRegister:regName]];
 	if (regName != 0 && regName != '"' && regName != '/' && regName != ':')
-		[registers setObject:content forKey:[self nameOfRegister:0]];
+		[_registers setObject:content forKey:[self nameOfRegister:0]];
 }
 
 - (NSString *)nameOfRegister:(unichar)regName

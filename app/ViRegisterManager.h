@@ -15,8 +15,8 @@
 
 @interface ViRegisterManager : NSObject
 {
-	NSMutableDictionary	*registers;
-	unichar			 lastExecutedRegister;
+	NSMutableDictionary	*_registers;
+	unichar			 _lastExecutedRegister;
 }
 
 @property (nonatomic) unichar lastExecutedRegister;

@@ -42,39 +42,42 @@
  */
 @interface ExCommand : NSObject
 {
-	NSString *cmdline;
+	NSString		*_cmdline;
 
-	ExMapping *mapping;
-	ExCommand *nextCommand;
+	ExMapping		*_mapping;
+	ExCommand		*_nextCommand;
 
 	// ex addresses
-	NSUInteger naddr;
-	ExAddress *addr1, *addr2, *lineAddress;
+	NSUInteger		 _naddr;
+	ExAddress		*_addr1;
+	ExAddress		*_addr2;
+	ExAddress		*_lineAddress;
 	// resolved addresses
-	NSRange range, lineRange;
-	NSUInteger line;
+	NSRange			 _range;
+	NSRange			 _lineRange;
+	NSUInteger		 _line;
 
-	BOOL force;
-	BOOL append;
-	BOOL filter;
+	BOOL			 _force;
+	BOOL			 _append;
+	BOOL			 _filter;
 
 	// arguments (depending on the command)
-	NSString *arg;
-	NSString *plus_command;
+	NSString		*_arg;
+	NSString		*_plus_command;
 
 	// regexp arguments
-	NSString *pattern;
-	NSString *replacement;
-	NSString *options;
+	NSString		*_pattern;
+	NSString		*_replacement;
+	NSString		*_options;
 
-	unichar reg;
-	NSInteger count;
+	unichar			 _reg;
+	NSInteger		 _count;
 
-	NSInteger caret;
-
-	NSMutableArray *messages;
+	NSInteger		 _caret;
+	NSMutableArray		*_messages;
 }
 
++ (ExCommand *)commandWithMapping:(ExMapping *)aMapping;
 - (ExCommand *)initWithMapping:(ExMapping *)aMapping;
 
 @property(nonatomic,readonly) NSArray *messages;
@@ -86,13 +89,13 @@
 @property(nonatomic,readwrite) NSUInteger naddr;
 
 /** First range address. */
-@property(nonatomic,assign,readwrite) ExAddress *addr1;
+@property(nonatomic,readwrite,retain) ExAddress *addr1;
 
 /** Second range address. */
-@property(nonatomic,assign,readwrite) ExAddress *addr2;
+@property(nonatomic,readwrite,retain) ExAddress *addr2;
 
 /** Target line address. */
-@property(nonatomic,assign,readwrite) ExAddress *lineAddress;
+@property(nonatomic,readwrite,retain) ExAddress *lineAddress;
 
 /** Resolved character range of affected text. */
 @property (nonatomic,readwrite) NSRange range;
@@ -110,7 +113,7 @@
 @property (nonatomic,readwrite) NSUInteger line;
 
 /** Count argument. */
-@property(nonatomic,assign,readwrite) NSInteger count;
+@property(nonatomic,readwrite) NSInteger count;
 
 /** YES if `!` flag specified. */
 @property(nonatomic,readwrite) BOOL force;
@@ -122,20 +125,20 @@
 @property(nonatomic,readwrite) BOOL filter;
 
 /** Next ex command separated with a bar (`|`). */
-@property(nonatomic,assign,readwrite) ExCommand *nextCommand;
+@property(nonatomic,readwrite,retain) ExCommand *nextCommand;
 
 /** Extra argument string. */
-@property(nonatomic,assign,readwrite) NSString *arg;
+@property(nonatomic,readwrite,copy) NSString *arg;
 
 /** Ex command string for the `+` argument (as in `:edit +cmd file`). */
-@property(nonatomic,assign,readwrite) NSString *plus_command;
+@property(nonatomic,readwrite,copy) NSString *plus_command;
 
 /** Regular expression pattern. */
-@property(nonatomic,assign,readwrite) NSString *pattern;
+@property(nonatomic,readwrite,copy) NSString *pattern;
 /** Replacement template string for `:s` command. */
-@property(nonatomic,assign,readwrite) NSString *replacement;
+@property(nonatomic,readwrite,copy) NSString *replacement;
 /** Regular expression option string for `:s` command. */
-@property(nonatomic,assign,readwrite) NSString *options;
+@property(nonatomic,readwrite,copy) NSString *options;
 
 /** Destination register, or 0 if none specified. */
 @property(nonatomic,readwrite) unichar reg;

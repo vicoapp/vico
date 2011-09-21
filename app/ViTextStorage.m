@@ -14,10 +14,9 @@ static NSMutableCharacterSet *wordSet = nil;
 
 - (id)init
 {
-	self = [super init];
-	if (self) {
-		attributedString = [[NSMutableAttributedString alloc] init];
-		TAILQ_INIT(&skiphead);
+	if ((self = [super init]) != nil) {
+		_attributedString = [[NSMutableAttributedString alloc] init];
+		TAILQ_INIT(&_skiphead);
 	}
 	return self;
 }
@@ -26,17 +25,38 @@ static NSMutableCharacterSet *wordSet = nil;
 {
 	/* Free the skiplist. */
 	struct skip *skip;
-	while ((skip = TAILQ_FIRST(&skiphead)) != NULL) {
+	while ((skip = TAILQ_FIRST(&_skiphead)) != NULL) {
 		struct line *ln;
 		while ((ln = TAILQ_FIRST(&skip->lines)) != NULL) {
 			TAILQ_REMOVE(&skip->lines, ln, next);
 			free(ln);
 		}
-		TAILQ_REMOVE(&skiphead, skip, next);
+		TAILQ_REMOVE(&_skiphead, skip, next);
 		free(skip);
 	}
 
 	[super finalize];
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+
+	/* Free the skiplist. */
+	struct skip *skip;
+	while ((skip = TAILQ_FIRST(&_skiphead)) != NULL) {
+		struct line *ln;
+		while ((ln = TAILQ_FIRST(&skip->lines)) != NULL) {
+			TAILQ_REMOVE(&skip->lines, ln, next);
+			free(ln);
+		}
+		TAILQ_REMOVE(&_skiphead, skip, next);
+		free(skip);
+	}
+
+	[_attributedString release];
+
+	[super dealloc];
 }
 
 - (NSString *)description
@@ -46,7 +66,7 @@ static NSMutableCharacterSet *wordSet = nil;
 
 - (NSString *)string
 {
-	return [attributedString string];
+	return [_attributedString string];
 }
 
 static inline struct skip *
@@ -103,13 +123,13 @@ skip_split(struct skiplist *head, struct skip *left)
 	struct line	*newln;
 	NSUInteger	 offset;
 
-	skip = skip_for_line(&skiphead, lineIndex, &offset);
+	skip = skip_for_line(&_skiphead, lineIndex, &offset);
 
 	if (skip == NULL) {
 		/* This is the very first skip partition. */
 		skip = calloc(1, sizeof(*skip));
 		TAILQ_INIT(&skip->lines);
-		TAILQ_INSERT_TAIL(&skiphead, skip, next);
+		TAILQ_INSERT_TAIL(&_skiphead, skip, next);
 	}
 
 	/*
@@ -130,14 +150,14 @@ skip_split(struct skiplist *head, struct skip *left)
 
 	skip->length += length;
 	skip->nlines++;
-	lineCount++;
+	_lineCount++;
 
 	/*
 	 * If we've reached the limit of a partition, split it in
 	 * two equally sized partitions.
 	 */
 	if (skip->nlines > MAXSKIPSIZE)
-		skip_split(&skiphead, skip);
+		skip_split(&_skiphead, skip);
 }
 
 static void
@@ -160,7 +180,7 @@ debug_skiplist(struct skiplist *head)
 
 -  (void)debug
 {
-	debug_skiplist(&skiphead);
+	debug_skiplist(&_skiphead);
 }
 
 static void
@@ -205,7 +225,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	struct line	*ln;
 	NSUInteger	 offset;
 
-	skip = skip_for_line(&skiphead, lineIndex, &offset);
+	skip = skip_for_line(&_skiphead, lineIndex, &offset);
 	DEBUG(@"skip %p has offset %lu, and %lu lines", skip, offset, skip->nlines);
 
 	/* Find the line to remove. */
@@ -215,7 +235,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 	if (ln == NULL) {
 		INFO(@"line %lu not found in skip partition %p!", lineIndex, skip);
-		debug_skiplist(&skiphead);
+		debug_skiplist(&_skiphead);
 		assert(0);
 	}
 
@@ -234,25 +254,25 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 		struct skip *right_neighbour = TAILQ_NEXT(skip, next);
 
 		if (right_neighbour && right_neighbour->nlines < MERGESKIPSIZE)
-			skip_merge_right(&skiphead, skip, right_neighbour, skip->nlines);
+			skip_merge_right(&_skiphead, skip, right_neighbour, skip->nlines);
 		else if (left_neighbour && left_neighbour->nlines < MERGESKIPSIZE)
-			skip_merge_left(&skiphead, skip, left_neighbour, skip->nlines);
+			skip_merge_left(&_skiphead, skip, left_neighbour, skip->nlines);
 		else {
 			/* Do a partial merge. Move lines from left or right. */
 			if (right_neighbour) {
 				if (left_neighbour) {
 					if (right_neighbour->nlines > left_neighbour->nlines)
-						skip_merge_left(&skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
+						skip_merge_left(&_skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
 					else
-						skip_merge_right(&skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
+						skip_merge_right(&_skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
 				} else
-					skip_merge_left(&skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
+					skip_merge_left(&_skiphead, right_neighbour, skip, (right_neighbour->nlines - skip->nlines) / 2);
 			} else if (left_neighbour)
-				skip_merge_right(&skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
+				skip_merge_right(&_skiphead, left_neighbour, skip, (left_neighbour->nlines - skip->nlines) / 2);
 		}
 	}
 
-	lineCount--;
+	_lineCount--;
 }
 
 - (void)replaceLine:(NSUInteger)lineIndex
@@ -263,7 +283,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	struct line	*ln;
 	NSUInteger	 offset;
 
-	skip = skip_for_line(&skiphead, lineIndex, &offset);
+	skip = skip_for_line(&_skiphead, lineIndex, &offset);
 
 	/* Find the line to replace. */
 	TAILQ_FOREACH(ln, &skip->lines, next)
@@ -294,7 +314,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSUInteger location = aRange.location;
 	NSUInteger bol, eol, end;
 
-	DEBUG(@"changing line index %lu, got %lu lines", lineIndex, lineCount);
+	DEBUG(@"changing line index %lu, got %lu lines", lineIndex, _lineCount);
 
 	if (aRange.length > 0) /* delete or replace */
 		/* Remove affected _whole_ lines. */
@@ -306,7 +326,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			if (end > NSMaxRange(aRange))
 				/* Line only partially affected, just update after modification. */
 				break;
-			if (lineIndex >= lineCount)
+			if (lineIndex >= _lineCount)
 				break;
 			DEBUG(@"remove line %lu: had length %li at location %lu, end at %lu",
 			    lineIndex, end - bol, bol, end);
@@ -316,11 +336,11 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			linesChanged++;
 		}
 
-	[attributedString replaceCharactersInRange:aRange withString:str];
+	[_attributedString replaceCharactersInRange:aRange withString:str];
 
 	/* Update partially affected line. */
 	location = aRange.location;
-	if (lineIndex < lineCount) {
+	if (lineIndex < _lineCount) {
 		[[self string] getLineStart:&bol
 					end:&end
 				contentsEnd:&eol
@@ -357,7 +377,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 			linesChanged++;
 		}
 	}
-//	debug_skiplist(&skiphead);
+//	debug_skiplist(&_skiphead);
 
 	DEBUG(@"changed %li lines (removed %lu, inserted %lu) from line index %lu",
 	    linesChanged, linesRemoved, linesAdded, firstLineIndex);
@@ -383,14 +403,14 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSDictionary *)attributesAtIndex:(unsigned)anIndex effectiveRange:(NSRangePointer)aRangePtr
 {
-	if (anIndex >= [attributedString length])
+	if (anIndex >= [_attributedString length])
 		return nil;
-	return [attributedString attributesAtIndex:anIndex effectiveRange:aRangePtr];
+	return [_attributedString attributesAtIndex:anIndex effectiveRange:aRangePtr];
 }
 
 - (void)setAttributes:(NSDictionary *)attributes range:(NSRange)aRange
 {
-	[attributedString setAttributes:attributes range:aRange];
+	[_attributedString setAttributes:attributes range:aRange];
 	[self edited:NSTextStorageEditedAttributes range:aRange changeInLength:0];
 }
 
@@ -402,7 +422,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                         contentsEnd:(NSUInteger *)eolPtr
 {
 	if (lineNumber == 0) {
-		if (lineCount == 0) {
+		if (_lineCount == 0) {
 			if (lengthPtr)
 				*lengthPtr = 0;
 			if (eolPtr)
@@ -415,14 +435,14 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	/* Line numbers are 1-based. Line indexes are 0-based. */
 	NSUInteger lineIndex = lineNumber - 1;
 
-	if (lineIndex >= lineCount)
+	if (lineIndex >= _lineCount)
 		return -1LL;
 
 	NSInteger location = 0, line = 0;
 
 	/* Find the skip partition. */
 	struct skip *skip;
-	TAILQ_FOREACH(skip, &skiphead, next) {
+	TAILQ_FOREACH(skip, &_skiphead, next) {
 		if (line + skip->nlines > lineIndex)
 			break;
 		line += skip->nlines;
@@ -468,7 +488,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	NSUInteger line = 0;
 	NSUInteger location = 0;
 	struct skip *skip;
-	TAILQ_FOREACH(skip, &skiphead, next) {
+	TAILQ_FOREACH(skip, &_skiphead, next) {
 		if (location + skip->length >= aLocation)
 			break;
 		line += skip->nlines;
@@ -499,7 +519,7 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 
 - (NSUInteger)lineCount
 {
-	return lineCount;
+	return _lineCount;
 }
 
 #pragma mark -
@@ -603,13 +623,13 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                  extraCharacters:(NSString *)extraCharacters
 {
 	if (wordSet == nil) {
-		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
+		wordSet = [[NSMutableCharacterSet characterSetWithCharactersInString:@"_"] retain];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	}
 	NSMutableCharacterSet *set = wordSet;
 
 	if (extraCharacters) {
-		set = [wordSet mutableCopy];
+		set = [[wordSet mutableCopy] autorelease];
 		[set formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:extraCharacters]];
 	}
 

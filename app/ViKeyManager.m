@@ -99,7 +99,7 @@
 		NSArray *excessKeys = nil;
 		if ([km handleKey:keyCode
 		      allowMacros:macro.mapping.recursive
-			  inScope:nil
+			  inScope:[self currentScope]
 			fromMacro:macro
 		       excessKeys:&excessKeys
 			    error:&error] == NO || error) {
@@ -307,13 +307,19 @@
 	return YES;
 }
 
-- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+- (ViScope *)currentScope
 {
 	ViScope *scope = nil;
 	if ([[self target] respondsToSelector:@selector(currentScopeForKeyManager:)])
 		scope = [[self target] performSelector:@selector(currentScopeForKeyManager:)
 					    withObject:self];
-	return [self performKeyEquivalent:theEvent inScope:scope];
+	DEBUG(@"scope is %@", scope);
+	return scope;
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)theEvent
+{
+	return [self performKeyEquivalent:theEvent inScope:[self currentScope]];
 }
 
 - (void)keyDown:(NSEvent *)theEvent inScope:(ViScope *)scope
@@ -323,12 +329,7 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	ViScope *scope = nil;
-	if ([[self target] respondsToSelector:@selector(currentScopeForKeyManager:)])
-		scope = [[self target] performSelector:@selector(currentScopeForKeyManager:)
-					    withObject:self];
-	DEBUG(@"scope is %@", scope);
-	[self keyDown:theEvent inScope:scope];
+	[self keyDown:theEvent inScope:[self currentScope]];
 }
 
 @end

@@ -129,6 +129,8 @@
 - (void)handleKeys:(NSArray *)keys;
 - (void)handleKeys:(NSArray *)keys inScope:(ViScope *)scope;
 
+- (ViScope *)currentScope;
+
 - (BOOL)runAsMacro:(NSString *)inputString interactively:(BOOL)interactiveFlag;
 - (BOOL)runAsMacro:(NSString *)inputString;
 @end

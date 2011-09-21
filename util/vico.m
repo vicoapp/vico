@@ -28,7 +28,7 @@ id returnObject = nil;
 - (void)exitWithObject:(id)obj
 {
 	keepRunning = NO;
-	returnObject = obj;
+	returnObject = [obj retain];
 }
 
 - (void)exitWithError:(int)code

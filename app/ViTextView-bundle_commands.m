@@ -142,7 +142,7 @@
 
 	DEBUG(@"input text = [%@], range = %@", inputText, NSStringFromRange(inputRange));
 
-	NSTask *task = [[NSTask alloc] init];
+	NSTask *task = [[[NSTask alloc] init] autorelease];
 	if (templateFilename)
 		[task setLaunchPath:shellCommand];
 	else {
@@ -187,6 +187,7 @@
 		    target:self
 		  selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
 	       contextInfo:info];
+	[runner release];
 
 	if (fd != -1) {
 		unlink(templateFilename);
@@ -271,11 +272,11 @@
 			[(ViCommandOutputController *)webView setTitle:[command name]];
 			[[[self window] windowController] selectDocumentView:webView];
 		} else {
-			ViCommandOutputController *oc = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
+			ViCommandOutputController *oc = [[[ViCommandOutputController alloc] initWithHTMLString:outputText] autorelease];
 			[oc setTitle:[command name]];
 
 			if (newWindow) {
-				ViWindowController *winCon = [[ViWindowController alloc] init];
+				ViWindowController *winCon = [[[ViWindowController alloc] init] autorelease];
 				[winCon createTabWithViewController:oc];
 				[winCon selectDocumentView:oc];
 			} else {
@@ -349,7 +350,7 @@
 	if ([matches count] == 1) {
 		[self performBundleItem:[matches objectAtIndex:0]];
 	} else if ([matches count] > 1) {
-		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
+		NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Bundle commands"] autorelease];
 		[menu setAllowsContextMenuPlugIns:NO];
 		int quickindex = 1;
 		for (ViBundleItem *c in matches) {

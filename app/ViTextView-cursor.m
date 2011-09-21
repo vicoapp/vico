@@ -87,13 +87,6 @@
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	if (NSIntersectsRect(lineHighlightRect, aRect)) {
-		if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
-			[lineHighlightColor set];
-			[[NSBezierPath bezierPathWithRect:lineHighlightRect] fill];
-		}
-	}
-
 	if (caretBlinkState && NSIntersectsRect(caretRect, aRect)) {
 		if ([self isFieldEditor]) {
 			caretRect.size.width = 1;
@@ -114,6 +107,17 @@
 		else
 			[caretColor set];
 		[[NSBezierPath bezierPathWithRect:caretRect] fill];
+	}
+}
+
+- (void)drawViewBackgroundInRect:(NSRect)rect
+{
+	[super drawViewBackgroundInRect:rect];
+	if (NSIntersectsRect(lineHighlightRect, rect)) {
+		if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
+			[lineHighlightColor set];
+			[[NSBezierPath bezierPathWithRect:lineHighlightRect] fill];
+		}
 	}
 }
 

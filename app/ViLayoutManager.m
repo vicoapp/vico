@@ -3,22 +3,31 @@
 
 @implementation ViLayoutManager
 
-@synthesize invisiblesAttributes;
+@synthesize invisiblesAttributes = _invisiblesAttributes;
 
 - (id)init
 {
-	self = [super init];
-	if (self) {
-		newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
-		tabChar = [NSString stringWithFormat:@"%C", 0x21E5];
-		spaceChar = @"･";
+	if ((self = [super init]) != nil) {
+		_newlineChar = [[NSString stringWithFormat:@"%C", 0x21A9] retain];
+		_tabChar = [[NSString stringWithFormat:@"%C", 0x21E5] retain];
+		_spaceChar = [@"･" retain];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_newlineChar release];
+	[_tabChar release];
+	[_spaceChar release];
+	[_invisiblesAttributes release];
+	[super dealloc];
+}
+
 - (void)drawGlyphsForGlyphRange:(NSRange)glyphRange atPoint:(NSPoint)containerOrigin
 {
-	if (showInvisibles) {
+	if (_showInvisibles) {
 		NSString *completeString = [[self textStorage] string];
 		NSUInteger lengthToRedraw = NSMaxRange(glyphRange);
 		NSUInteger glyphIndex;
@@ -30,13 +39,13 @@
 
 			switch (ch) {
 			case '\n':
-				visibleChar = newlineChar;
+				visibleChar = _newlineChar;
 				break;
 			case '\t':
-				visibleChar = tabChar;
+				visibleChar = _tabChar;
 				break;
 			case ' ':
-				visibleChar = spaceChar;
+				visibleChar = _spaceChar;
 				break;
 			}
 
@@ -45,7 +54,7 @@
 				NSRect glyphFragment = [self lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
 				pointToDrawAt.x += glyphFragment.origin.x;
 				pointToDrawAt.y = glyphFragment.origin.y;
-				[visibleChar drawAtPoint:pointToDrawAt withAttributes:invisiblesAttributes];
+				[visibleChar drawAtPoint:pointToDrawAt withAttributes:_invisiblesAttributes];
 			}
 		}
 	}
@@ -55,12 +64,12 @@
 
 - (void)setShowsInvisibleCharacters:(BOOL)flag
 {
-	showInvisibles = flag;
+	_showInvisibles = flag;
 }
 
 - (BOOL)showsInvisibleCharacters
 {
-	return showInvisibles;
+	return _showInvisibles;
 }
 
 @end

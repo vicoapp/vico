@@ -1,11 +1,10 @@
 @interface ViLayoutManager : NSLayoutManager
 {
-	BOOL showInvisibles;
-	NSDictionary *invisiblesAttributes;
-
-	NSString *newlineChar;
-	NSString *tabChar;
-	NSString *spaceChar;
+	BOOL		 _showInvisibles;
+	NSDictionary	*_invisiblesAttributes;
+	NSString	*_newlineChar;
+	NSString	*_tabChar;
+	NSString	*_spaceChar;
 }
 
 @property(nonatomic,readwrite,copy) NSDictionary *invisiblesAttributes;

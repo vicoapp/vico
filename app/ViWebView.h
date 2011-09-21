@@ -4,8 +4,10 @@
 
 @interface ViWebView : WebView <ViKeyManagerTarget>
 {
-	ViKeyManager *keyManager;
+	ViKeyManager *_keyManager;
 }
+
+@property (nonatomic,readwrite,retain) ViKeyManager *keyManager;
 
 @end
 

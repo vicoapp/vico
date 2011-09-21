@@ -8,22 +8,30 @@
 
 @implementation ViWebView
 
+@synthesize keyManager = _keyManager;
+
 - (void)awakeFromNib
 {
-	keyManager = [[ViKeyManager alloc] initWithTarget:self
-					       defaultMap:[ViMap mapWithName:@"webMap"]];
+	[self setKeyManager:[ViKeyManager keyManagerWithTarget:self
+						    defaultMap:[ViMap mapWithName:@"webMap"]]];
+}
+
+- (void)dealloc
+{
+	[_keyManager release];
+	[super dealloc];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
 	if ([[self window] firstResponder] != self)
 		return NO;
-	return [keyManager performKeyEquivalent:theEvent];
+	return [_keyManager performKeyEquivalent:theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[keyManager keyDown:theEvent];
+	[_keyManager keyDown:theEvent];
 }
 
 - (void)swipeWithEvent:(NSEvent *)event

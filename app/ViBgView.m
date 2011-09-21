@@ -2,12 +2,12 @@
 
 @implementation ViBgView
 
-@synthesize backgroundColor;
+@synthesize backgroundColor = _backgroundColor;
 
 - (void)drawRect:(NSRect)rect
 {
-	if (backgroundColor) {
-		[backgroundColor set];
+	if (_backgroundColor) {
+		[_backgroundColor set];
 		NSRectFill([self bounds]);
 	}
 }

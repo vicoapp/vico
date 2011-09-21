@@ -1,6 +1,6 @@
 @interface ViBgView : NSView
 {
-	NSColor *backgroundColor;
+	NSColor *_backgroundColor;
 }
-@property (nonatomic,readwrite,assign) NSColor *backgroundColor;
+@property (nonatomic,readwrite,retain) NSColor *backgroundColor;
 @end

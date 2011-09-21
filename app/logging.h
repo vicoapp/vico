@@ -27,10 +27,16 @@ extern int logIndent;
 
 #endif
 
+#ifdef NO_DEBUG
+# define DEBUG_FINALIZE()
+# define DEBUG_DEALLOC()
+#else
+# define DEBUG_DEALLOC() DEBUG(@"%p", self)
 #define DEBUG_FINALIZE()		\
 - (void)finalize			\
 {					\
 	INFO(@"self = %@", self);	\
 	[super finalize];		\
 }
+#endif
 

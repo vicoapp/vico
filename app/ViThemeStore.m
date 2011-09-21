@@ -30,7 +30,7 @@
 	if (defaultTheme == nil) {
 		defaultTheme = [self themeWithName:@"Sunset"];
 		if (defaultTheme == nil)
-			defaultTheme = [[themes allValues] objectAtIndex:0];
+			defaultTheme = [[_themes allValues] objectAtIndex:0];
 	}
 
 	return defaultTheme;
@@ -38,17 +38,17 @@
 
 + (ViThemeStore *)defaultStore
 {
-	static ViThemeStore *defaultStore = nil;
-	if (defaultStore == nil)
-		defaultStore = [[ViThemeStore alloc] init];
-	return defaultStore;
+	static ViThemeStore *__defaultStore = nil;
+	if (__defaultStore == nil)
+		__defaultStore = [[ViThemeStore alloc] init];
+	return __defaultStore;
 }
 
 - (void)addThemeWithPath:(NSString *)path
 {
-	ViTheme *theme = [[ViTheme alloc] initWithPath:path];
+	ViTheme *theme = [[[ViTheme alloc] initWithPath:path] autorelease];
 	if (theme)
-		[themes setObject:theme forKey:[theme name]];
+		[_themes setObject:theme forKey:[theme name]];
 }
 
 - (void)addThemesFromBundleDirectory:(NSString *)aPath
@@ -66,9 +66,8 @@
 
 - (id)init
 {
-	self = [super init];
-	if (self) {
-		themes = [[NSMutableDictionary alloc] init];
+	if ((self = [super init]) != nil) {
+		_themes = [[NSMutableDictionary alloc] init];
 
 		[self addThemesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Themes"]];
 
@@ -88,12 +87,12 @@
 
 - (NSArray *)availableThemes
 {
-	return [themes allKeys];
+	return [_themes allKeys];
 }
 
 - (ViTheme *)themeWithName:(NSString *)aName
 {
-	return [themes objectForKey:aName];
+	return [_themes objectForKey:aName];
 }
 
 @end

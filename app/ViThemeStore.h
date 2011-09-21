@@ -2,8 +2,9 @@
 
 @interface ViThemeStore : NSObject
 {
-	NSMutableDictionary *themes;
+	NSMutableDictionary *_themes;
 }
+
 + (ViTheme *)defaultTheme;
 + (NSFont *)font;
 + (ViThemeStore *)defaultStore;

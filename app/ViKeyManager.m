@@ -17,40 +17,61 @@
 
 @implementation ViKeyManager
 
-@synthesize parser, target;
+@synthesize parser = _parser;
+@synthesize target = _target;
+
++ (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
+				parser:(ViParser *)aParser
+{
+	return [[[ViKeyManager alloc] initWithTarget:aTarget parser:aParser] autorelease];
+}
+
++ (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
+			    defaultMap:(ViMap *)map
+{
+	return [[[ViKeyManager alloc] initWithTarget:aTarget defaultMap:map] autorelease];
+}
 
 - (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                           parser:(ViParser *)aParser
 {
 	if ((self = [super init]) != nil) {
-		parser = aParser;
-		target = aTarget;
+		_parser = [aParser retain];
+		_target = aTarget; // XXX: not retained!
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_parser release];
+	[_keyTimeout release];
+	[super dealloc];
 }
 
 - (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                       defaultMap:(ViMap *)map
 {
 	return [self initWithTarget:aTarget
-			     parser:[[ViParser alloc] initWithDefaultMap:map]];
+			     parser:[ViParser parserWithDefaultMap:map]];
 }
 
 - (void)presentError:(NSError *)error
 {
-	if ([target respondsToSelector:@selector(keyManager:presentError:)])
-		[target performSelector:@selector(keyManager:presentError:)
-			     withObject:self
-			     withObject:error];
+	if ([_target respondsToSelector:@selector(keyManager:presentError:)])
+		[_target performSelector:@selector(keyManager:presentError:)
+			      withObject:self
+			      withObject:error];
 }
 
 - (BOOL)runMacro:(ViMacro *)macro interactively:(BOOL)interactiveFlag
 {
 	DEBUG(@"running macro %@ %sinteractively", macro, interactiveFlag ? "" : "NOT ");
 
-	if (++recursionLevel > 1000) {
+	if (++_recursionLevel > 1000) {
 		[self presentError:[ViError errorWithFormat:@"Recursive mapping."]];
-		recursionLevel = 0;
+		_recursionLevel = 0;
 		return NO;
 	}
 
@@ -70,7 +91,7 @@
 			INFO(@"context was: %@", [expression context]);
 			[self presentError:[ViError errorWithFormat:@"Got exception %@: %@",
 			    [exception name], [exception reason]]];
-			recursionLevel = 0;
+			_recursionLevel = 0;
 			return NO;
 		}
 	}
@@ -119,7 +140,7 @@
 		}
 	}
 
-	recursionLevel = 0;
+	_recursionLevel = 0;
 	return YES;
 }
 
@@ -149,10 +170,10 @@
 		return [self runMacro:command];
 
 	SEL action = @selector(keyManager:evaluateCommand:);
-	if ([target respondsToSelector:action])
-		return (BOOL)[target performSelector:action
-					  withObject:self
-					  withObject:command];
+	if ([_target respondsToSelector:action])
+		return (BOOL)[_target performSelector:action
+					   withObject:self
+					   withObject:command];
 
 	return NO;
 }
@@ -164,8 +185,9 @@
        excessKeys:(NSArray **)excessKeys
             error:(NSError **)outError
 {
-	[keyTimeout invalidate];
-	keyTimeout = nil;
+	[_keyTimeout invalidate];
+	[_keyTimeout release];
+	_keyTimeout = nil;
 
 	DEBUG(@"handling key %li (%@) in scope %@", keyCode, [NSString stringWithKeyCode:keyCode], scope);
 
@@ -176,15 +198,15 @@
 	}
 
 	SEL shouldSel = @selector(keyManager:shouldParseKey:inScope:);
-	if ([target respondsToSelector:shouldSel]) {
+	if ([_target respondsToSelector:shouldSel]) {
 		NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [(NSObject *)target methodSignatureForSelector:shouldSel]];
+		    [(NSObject *)_target methodSignatureForSelector:shouldSel]];
 		[invocation setSelector:shouldSel];
 		[invocation setArgument:&self atIndex:2];
 		[invocation setArgument:&keyNum atIndex:3];
 		[invocation setArgument:&scope atIndex:4];
-		[invocation invokeWithTarget:target];
+		[invocation invokeWithTarget:_target];
 		NSNumber *shouldRet;
 		[invocation getReturnValue:&shouldRet];
 		if ([shouldRet boolValue] == NO)
@@ -193,12 +215,12 @@
 
 	NSError *error = nil;
 	BOOL timeout = NO;
-	id command = [parser pushKey:keyCode
-			 allowMacros:allowMacros
-			       scope:scope
-			     timeout:&timeout
-			  excessKeys:excessKeys
-			       error:&error];
+	id command = [_parser pushKey:keyCode
+			  allowMacros:allowMacros
+				scope:scope
+			      timeout:&timeout
+			   excessKeys:excessKeys
+				error:&error];
 	if (command) {
 		if ([command isKindOfClass:[ViCommand class]])
 			[command setMacro:callingMacro];
@@ -208,16 +230,18 @@
 			*outError = error;
 		return NO;
 	} else {
-		if ([target respondsToSelector:@selector(keyManager:partialKeyString:)])
-			[target performSelector:@selector(keyManager:partialKeyString:)
-				     withObject:self
-				     withObject:parser.keyString];
-		if (timeout && callingMacro == nil)
-			keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
-								       target:self
-								     selector:@selector(keyTimedOut:)
-								     userInfo:scope
-								      repeats:NO];
+		if ([_target respondsToSelector:@selector(keyManager:partialKeyString:)])
+			[_target performSelector:@selector(keyManager:partialKeyString:)
+				      withObject:self
+				      withObject:_parser.keyString];
+		if (timeout && callingMacro == nil) {
+			[_keyTimeout release];
+			_keyTimeout = [[NSTimer scheduledTimerWithTimeInterval:1.0
+									target:self
+								      selector:@selector(keyTimedOut:)
+								      userInfo:scope
+								       repeats:NO] retain];
+		}
 	}
 
 	return YES;
@@ -276,7 +300,7 @@
 {
 	NSError *error = nil;
 	ViScope *scope = [timer userInfo];
-	id command = [parser timeoutInScope:scope error:&error];
+	id command = [_parser timeoutInScope:scope error:&error];
 	if (command)
 		[self evalCommand:command];
 	else if (error)
@@ -285,7 +309,7 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(ViScope *)scope
 {
-	BOOL partial = parser.partial;
+	BOOL partial = _parser.partial;
 	NSError *error = nil;
 	NSArray *excessKeys = nil;
 	[self handleKey:[theEvent normalizedKeyCode]

@@ -56,21 +56,26 @@
  */
 @interface ViKeyManager : NSObject
 {
-	ViMode mode;
-	ViParser *parser;
-	id<ViKeyManagerTarget> target;
-	NSTimer *keyTimeout;
-	NSInteger recursionLevel;
+	ViParser			*_parser;
+	__weak id<ViKeyManagerTarget>	 _target;
+	NSTimer				*_keyTimeout;
+	NSInteger			 _recursionLevel;
 }
 
-/** The vi key parser. See ViParser. */
-@property(nonatomic,readwrite,assign) ViParser *parser;
+/** The vi key parser used by the key manager.
+ * @see ViParser.
+ */
+@property(nonatomic,readwrite,retain) ViParser *parser;
+
 /** The target object that evaluates the parsed commands. Should conform
  * to the ViKeyManagerTarget protocol.
  */
-@property(nonatomic,readwrite,assign) id<ViKeyManagerTarget> target;
+@property(nonatomic,readwrite,assign) __weak id<ViKeyManagerTarget> target; // XXX: not retained!
 
 /** @name Initializing */
+
++ (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
+				parser:(ViParser *)aParser;
 
 /** Initialize a new key manager with a target object and a key parser.
  *
@@ -81,6 +86,9 @@
  */
 - (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                           parser:(ViParser *)aParser;
+
++ (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
+			    defaultMap:(ViMap *)map;
 
 /** Initialize a new key manager with a target object and a default key map.
  * @param aTarget The target of generated commands.

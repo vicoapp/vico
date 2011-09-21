@@ -3,86 +3,108 @@
 
 @implementation ViCommand
 
-@synthesize mapping;
-@synthesize count, saved_count;
-@synthesize fromDot;
-@synthesize argument;
-@synthesize reg;
-@synthesize motion;
-@synthesize text;
-@synthesize isLineMode;
-@synthesize operator;
-@synthesize range, caret;
-@synthesize macro;
-@synthesize messages;
+@synthesize mapping = _mapping;
+@synthesize count = _count;
+@synthesize saved_count = _saved_count;
+@synthesize fromDot = _fromDot;
+@synthesize argument = _argument;
+@synthesize reg = _reg;
+@synthesize motion = _motion;
+@synthesize text = _text;
+@synthesize isLineMode = _isLineMode;
+@synthesize operator = _operator;
+@synthesize range = _range;
+@synthesize caret = _caret;
+@synthesize macro = _macro;
+@synthesize messages = _messages;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
-	return [[ViCommand alloc] initWithMapping:aMapping count:aCount];
+	return [[[ViCommand alloc] initWithMapping:aMapping count:aCount] autorelease];
 }
 
 - (ViCommand *)initWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
 	if ((self = [super init]) != nil) {
-		mapping = aMapping;
-		isLineMode = mapping.isLineMode;
-		count = saved_count = aCount;
+		_mapping = [aMapping retain];
+		_isLineMode = _mapping.isLineMode;
+		_count = _saved_count = aCount;
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_mapping release];
+	[_motion setOperator:nil];
+	[_motion release];
+	[_macro release];
+	[_messages release];
+	[super dealloc];
+}
+
 - (SEL)action
 {
-	return mapping.action;
+	return _mapping.action;
 }
 
 - (BOOL)isLineMode
 {
-	return isLineMode;
+	return _isLineMode;
 }
 
 - (BOOL)isMotion
 {
-	return [mapping isMotion];
+	return [_mapping isMotion];
 }
 
 - (BOOL)hasOperator
 {
-	return operator != nil;
+	return _operator != nil;
 }
 
 - (BOOL)isUndo
 {
-	return mapping.action == @selector(vi_undo:);
+	return _mapping.action == @selector(vi_undo:);
 }
 
 - (BOOL)isDot
 {
-	return mapping.action == @selector(dot:);
+	return _mapping.action == @selector(dot:);
 }
 
-- (ViCommand *)dotCopy
+- (id)copyWithZone:(NSZone *)zone
 {
-	ViCommand *copy = [ViCommand commandWithMapping:mapping count:saved_count];
-	copy.fromDot = YES;
-	copy.isLineMode = isLineMode;
-	copy.argument = argument;
-	copy.reg = reg;
-	copy.motion = [motion dotCopy];
-	copy.operator = operator;
-	copy.text = [text copy];
+	ViCommand *copy = [[ViCommand allocWithZone:zone] initWithMapping:_mapping count:_saved_count];
+
+	/* Set the fromDot flag. 
+	 * We copy commands mainly for the dot command. This flag is necessary for
+	 * the nvi undo style as it needs to know if a command is a dot repeat or not.
+	 */
+	[copy setFromDot:YES];
+
+	[copy setIsLineMode:_isLineMode];
+	[copy setArgument:_argument];
+	[copy setReg:_reg];
+	if (_motion) {
+		ViCommand *motionCopy = [[_motion copy] autorelease];
+		[motionCopy setOperator:copy];
+		[copy setMotion:motionCopy];
+	} else
+		[copy setOperator:_operator];
+	[copy setText:_text];
 
 	return copy;
 }
 
 - (NSString *)description
 {
-	if (motion)
+	if (_motion)
 		return [NSString stringWithFormat:@"<ViCommand %@: %@ * %i, motion = %@>",
-		    mapping.keyString, NSStringFromSelector(mapping.action), count, motion];
+		    _mapping.keyString, NSStringFromSelector(_mapping.action), _count, _motion];
 	else
 		return [NSString stringWithFormat:@"<ViCommand %@: %@ * %i>",
-		    mapping.keyString, NSStringFromSelector(mapping.action), count];
+		    _mapping.keyString, NSStringFromSelector(_mapping.action), _count];
 }
 
 - (void)message:(NSString *)message
@@ -90,9 +112,9 @@
 	DEBUG(@"got message %@", message);
 	if (message == nil)
 		return;
-	if (messages == nil)
-		messages = [NSMutableArray array];
-	[messages addObject:message];
+	if (_messages == nil)
+		_messages = [[NSMutableArray alloc] init];
+	[_messages addObject:message];
 }
 
 @end

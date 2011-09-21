@@ -3,22 +3,22 @@
 
 /** A generated vi command.
  */
-@interface ViCommand : NSObject
+@interface ViCommand : NSObject <NSCopying>
 {
-	ViMapping *mapping;
-	ViCommand *motion;
-	ViCommand *operator;
-	ViMacro *macro;
-	BOOL fromDot;
-	BOOL isLineMode;
-	int count;
-	int saved_count;
-	unichar argument;
-	unichar reg;
-	id text;
-	NSRange range;
-	NSInteger caret;
-	NSMutableArray *messages;
+	ViMapping		*_mapping;
+	ViCommand		*_motion;
+	__weak ViCommand	*_operator;	// XXX: not retained!
+	ViMacro			*_macro;
+	BOOL			 _fromDot;
+	BOOL			 _isLineMode;
+	int			 _count;
+	int			 _saved_count;
+	unichar			 _argument;
+	unichar			 _reg;
+	id			 _text;
+	NSRange			 _range;
+	NSInteger		 _caret;
+	NSMutableArray		*_messages;
 }
 
 /** The mapping that describes the action. */
@@ -46,19 +46,19 @@
 @property(nonatomic,readwrite) unichar reg;
 
 /** The motion command, if this command is an operator action. */
-@property(nonatomic,readwrite) ViCommand *motion;
+@property(nonatomic,readwrite,retain) ViCommand *motion;
 
 /** The operator command, if this command is a motion component. */
-@property(nonatomic,readwrite) ViCommand *operator;
+@property(nonatomic,readwrite,assign) __weak ViCommand *operator;
 
-@property(nonatomic,readwrite) id text;
+@property(nonatomic,readwrite,copy) id text;
 
 @property(nonatomic,readonly) NSMutableArray *messages;
 
 @property(nonatomic,readwrite) NSRange range;
 @property(nonatomic,readwrite) NSInteger caret;
 
-@property(nonatomic,readwrite) ViMacro *macro;
+@property(nonatomic,readwrite,retain) ViMacro *macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping
                             count:(int)aCount;
@@ -68,7 +68,6 @@
 - (SEL)action;
 - (BOOL)isUndo;
 - (BOOL)isDot;
-- (ViCommand *)dotCopy;
 - (void)message:(NSString *)message;
 
 @end

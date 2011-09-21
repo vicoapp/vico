@@ -23,17 +23,17 @@
  */
 @interface ViMapping : NSObject
 {
-	NSArray *keySequence;
-	NSString *keyString;
-	NSString *scopeSelector;
+	NSArray		*_keySequence;
+	NSString	*_keyString;
+	NSString	*_scopeSelector;
 
-	SEL action;
-	NSUInteger flags;
-	id parameter;
+	SEL		 _action;
+	NSUInteger	 _flags;
+	id		 _parameter;
 
-	BOOL recursive;
-	NSString *macro;
-	NuBlock *expression;
+	BOOL		 _recursive;
+	NSString	*_macro;
+	NuBlock		*_expression;
 }
 
 /** @name Getting mapping attributes */
@@ -172,19 +172,19 @@
  */
 @interface ViMap : NSObject
 {
-	NSString *name;
-	NSMutableArray *actions;
-	NSMutableSet *includes;
-	ViMap *operatorMap;
-	SEL defaultAction;
-	BOOL acceptsCounts; /* Default is YES. Disabled for insertMap. */
+	NSString	*_name;
+	NSMutableArray	*_actions;
+	NSMutableSet	*_includes;
+	ViMap		*_operatorMap;
+	SEL		 _defaultAction;
+	BOOL		 _acceptsCounts; /* Default is YES. Disabled for insertMap. */
 }
 
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSArray *actions;
 
 /** Assign a map to be used by operator actions. */
-@property (nonatomic, readwrite, assign) ViMap *operatorMap;
+@property (nonatomic, readwrite, retain) ViMap *operatorMap;
 
 /** If YES, leading digits acts as count to commands.
  * If NO, digits are treated as normal commands.

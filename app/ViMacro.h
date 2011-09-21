@@ -2,9 +2,9 @@
 
 @interface ViMacro : NSObject
 {
-	NSMutableArray	*keys;
-	NSUInteger	 ip;
-	ViMapping	*mapping;
+	NSMutableArray	*_keys;
+	NSUInteger	 _ip;
+	ViMapping	*_mapping;
 }
 
 @property(nonatomic,readonly) ViMapping *mapping;

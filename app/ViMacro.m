@@ -1,44 +1,52 @@
 #import "ViMacro.h"
 #import "NSString-additions.h"
+#include "logging.h"
 
 @implementation ViMacro
 
-@synthesize mapping;
+@synthesize mapping = _mapping;
 
 + (id)macroWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys
 {
-	return [[ViMacro alloc] initWithMapping:aMapping prefix:prefixKeys];
+	return [[[ViMacro alloc] initWithMapping:aMapping prefix:prefixKeys] autorelease];
 }
 
 - (id)initWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys
 {
 	if ((self = [super init])) {
-		mapping = aMapping;
-		ip = 0;
-		keys = [[aMapping.macro keyCodes] mutableCopy];
+		_mapping = [aMapping retain];
+		_ip = 0;
+		_keys = [[aMapping.macro keyCodes] mutableCopy];
 		if ([prefixKeys count] > 0)
-			[keys replaceObjectsInRange:NSMakeRange(0, 0) withObjectsFromArray:prefixKeys];
+			[_keys replaceObjectsInRange:NSMakeRange(0, 0) withObjectsFromArray:prefixKeys];
 	}
 
 	return self;
 }
 
+- (void)dealloc
+{
+	[_mapping release];
+	[_keys release];
+	[super dealloc];
+}
+
 - (void)push:(NSNumber *)keyCode
 {
-	[keys insertObject:keyCode atIndex:ip];
+	[_keys insertObject:keyCode atIndex:_ip];
 }
 
 - (NSInteger)pop
 {
-	if (ip >= [keys count])
+	if (_ip >= [_keys count])
 		return -1LL;
-	return [[keys objectAtIndex:ip++] integerValue];
+	return [[_keys objectAtIndex:_ip++] integerValue];
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViMacro: %@>",
-	    [NSString stringWithKeySequence:keys]];
+	return [NSString stringWithFormat:@"<ViMacro %p: %@>",
+	    self, [NSString stringWithKeySequence:_keys]];
 }
 
 @end

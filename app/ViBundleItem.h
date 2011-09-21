@@ -3,22 +3,22 @@
 
 @interface ViBundleItem : NSObject
 {
-	ViBundle	*bundle;
-	NSString	*uuid;
-	NSString	*name;
-	NSString	*scopeSelector;
-	ViMode		 mode;
+	__weak ViBundle	*_bundle;	// XXX: not retained!
+	NSString	*_uuid;
+	NSString	*_name;
+	NSString	*_scopeSelector;
+	ViMode		 _mode;
 
 	/* used in menus */
-	NSString	*tabTrigger;
-	NSString	*keyEquivalent;
-	NSUInteger	 modifierMask;
+	NSString	*_tabTrigger;
+	NSString	*_keyEquivalent;
+	NSUInteger	 _modifierMask;
 
 	/* used when matching keys */
-	NSInteger	 keyCode;
+	NSInteger	 _keyCode;
 }
 
-@property(nonatomic,readonly) ViBundle *bundle;
+@property(nonatomic,readonly) __weak ViBundle *bundle;
 @property(nonatomic,readonly) NSString *uuid;
 @property(nonatomic,readonly) NSString *name;
 @property(nonatomic,readonly) NSString *scopeSelector;

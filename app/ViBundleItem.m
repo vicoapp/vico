@@ -4,49 +4,48 @@
 
 @implementation ViBundleItem
 
-@synthesize bundle;
-@synthesize uuid;
-@synthesize name;
-@synthesize scopeSelector;
-@synthesize mode;
-@synthesize keyEquivalent;
-@synthesize modifierMask;
-@synthesize keyCode;
-@synthesize tabTrigger;
+@synthesize bundle = _bundle;
+@synthesize uuid = _uuid;
+@synthesize name = _name;
+@synthesize scopeSelector = _scopeSelector;
+@synthesize mode = _mode;
+@synthesize keyEquivalent = _keyEquivalent;
+@synthesize modifierMask = _modifierMask;
+@synthesize keyCode = _keyCode;
+@synthesize tabTrigger = _tabTrigger;
 
 - (ViBundleItem *)initFromDictionary:(NSDictionary *)dict
                             inBundle:(ViBundle *)aBundle
 {
-	self = [super init];
-	if (self) {
-		bundle = aBundle;
+	if ((self = [super init]) != nil) {
+		_bundle = aBundle;	// XXX: not retained!
 
-		name = [dict objectForKey:@"name"];
-		scopeSelector = [dict objectForKey:@"scope"];
-		uuid = [dict objectForKey:@"uuid"];
-		tabTrigger = [dict objectForKey:@"tabTrigger"];
+		_name = [[dict objectForKey:@"name"] retain];
+		_scopeSelector = [[dict objectForKey:@"scope"] retain];
+		_uuid = [[dict objectForKey:@"uuid"] retain];
+		_tabTrigger = [[dict objectForKey:@"tabTrigger"] retain];
 
-		/* extension: 'insert', 'normal' or 'visual' mode */
+		/* extension: 'any', 'insert', 'normal' or 'visual' mode */
 		NSString *m = [dict objectForKey:@"mode"];
 		if (m == nil || [m isEqualToString:@"any"])
-			mode = ViAnyMode;
+			_mode = ViAnyMode;
 		else if ([m isEqualToString:@"insert"])
-			mode = ViInsertMode;
+			_mode = ViInsertMode;
 		else if ([m isEqualToString:@"normal"] || [m isEqualToString:@"command"])
-			mode = ViNormalMode;
+			_mode = ViNormalMode;
 		else if ([m isEqualToString:@"visual"])
-			mode = ViVisualMode;
+			_mode = ViVisualMode;
 		else {
-			INFO(@"unknown mode %@", m);
-			return nil;
+			INFO(@"unknown mode %@, using any mode", m);
+			_mode = ViAnyMode;
 		}
 
 		NSString *key = [dict objectForKey:@"keyEquivalent"];
 		if ([key length] > 0) {
 			NSRange r = NSMakeRange([key length] - 1, 1);
 			unsigned int keyflags = 0;
-			keyCode = [key characterAtIndex:r.location];
-			keyEquivalent = [key substringWithRange:r];
+			_keyCode = [key characterAtIndex:r.location];
+			_keyEquivalent = [[key substringWithRange:r] retain];
 			for (int i = 0; i < [key length] - 1; i++) {
 				unichar c = [key characterAtIndex:i];
 				switch (c)
@@ -69,54 +68,65 @@
 				}
 			}
 
-			modifierMask = keyflags;
+			_modifierMask = keyflags;
 
 			if (keyflags == NSControlKeyMask) {
-				if (keyCode >= 'a' && keyCode <= 'z') {
+				if (_keyCode >= 'a' && _keyCode <= 'z') {
 					keyflags = 0;
-					keyCode = keyCode - 'a' + 1;
-				} else if (keyCode >= '[' && keyCode <= '_') {
+					_keyCode = _keyCode - 'a' + 1;
+				} else if (_keyCode >= '[' && _keyCode <= '_') {
 					keyflags = 0;
-					keyCode = keyCode - 'A' + 1;
+					_keyCode = _keyCode - 'A' + 1;
 				}
 			}
 
-			if ([keyEquivalent isUppercase])
+			if ([_keyEquivalent isUppercase])
 				keyflags |= NSShiftKeyMask;
 
 			/* Same test as in keyDown: */
-			if ((0x20 < keyCode && keyCode < 0x7f) || keyCode == 0x1E)
+			if ((0x20 < _keyCode && _keyCode < 0x7f) || _keyCode == 0x1E)
 				keyflags &= ~NSShiftKeyMask;
 
-			keyCode |= keyflags;
+			_keyCode |= keyflags;
 
 			DEBUG(@"parsed key equivalent [%@] as [%@] keycode 0x%04x,"
 			    " flags 0x%04X: s=%s, c=%s, a=%s, C=%s, name is %@",
-			    key, keyEquivalent, keyCode, keyflags,
+			    key, _keyEquivalent, _keyCode, keyflags,
 			    (keyflags & NSShiftKeyMask) ? "YES" : "NO",
 			    (keyflags & NSControlKeyMask) ? "YES" : "NO",
 			    (keyflags & NSAlternateKeyMask) ? "YES" : "NO",
-			    (keyflags & NSCommandKeyMask) ? "YES" : "NO", name);
+			    (keyflags & NSCommandKeyMask) ? "YES" : "NO", _name);
 		
-			if (keyCode == 0x1B) {
+			if (_keyCode == 0x1B) {
 				/* Prevent mapping of escape. */
-				INFO(@"refusing to map <esc> to bundle command %@", name);
-				keyEquivalent = @"";
-				keyCode = -1;
+				INFO(@"refusing to map <esc> to bundle command %@", _name);
+				_keyEquivalent = @"";
+				_keyCode = -1;
 			}
 		} else {
-			keyEquivalent = @"";
-			keyCode = -1;
+			_keyEquivalent = @"";
+			_keyCode = -1;
 		}
 	}
 
 	return self;
 }
 
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_uuid release];
+	[_name release];
+	[_scopeSelector release];
+	[_keyEquivalent release];
+	[_tabTrigger release];
+	[super dealloc];
+}
+
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<%@: %p, %@, scope %@>",
-	    NSStringFromClass([self class]), self, name, scopeSelector];
+	    NSStringFromClass([self class]), self, _name, _scopeSelector];
 }
 
 @end

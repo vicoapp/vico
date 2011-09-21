@@ -2,13 +2,20 @@
 
 @interface ViSyntaxMatch : NSObject
 {
-	ViRegexpMatch *beginMatch;
-	ViRegexpMatch *endMatch;
-	NSMutableDictionary *pattern;
-	int patternIndex;
-	NSUInteger beginLocation;
-	NSUInteger beginLength;
+	ViRegexpMatch		*_beginMatch;
+	ViRegexpMatch		*_endMatch;
+	NSMutableDictionary	*_pattern;
+	int			 _patternIndex;
+	NSUInteger		 _beginLocation;
+	NSUInteger		 _beginLength;
 }
+
+@property(nonatomic,readonly) int patternIndex;
+@property(nonatomic,readonly) NSMutableDictionary *pattern;
+@property(nonatomic,readwrite) NSUInteger beginLocation;
+@property(nonatomic,readonly) NSUInteger beginLength;
+@property(nonatomic,readonly) ViRegexpMatch *beginMatch;
+@property(nonatomic,readwrite,retain) ViRegexpMatch *endMatch;
 
 - (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i;
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)match;
@@ -18,15 +25,6 @@
 - (NSRange)matchedRange;
 - (BOOL)isSingleLineMatch;
 - (NSString *)description;
-- (void)setEndMatch:(ViRegexpMatch *)aMatch;
-- (void)setBeginLocation:(NSUInteger)aLocation;
-
-@property(nonatomic,readonly) int patternIndex;
-@property(nonatomic,readonly) NSMutableDictionary *pattern;
-@property(nonatomic,readonly) NSUInteger beginLocation;
-@property(nonatomic,readonly) NSUInteger beginLength;
-@property(nonatomic,readonly) ViRegexpMatch *beginMatch;
-@property(nonatomic,readonly) ViRegexpMatch *endMatch;
 
 @end
 

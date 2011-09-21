@@ -2,86 +2,86 @@
 
 @implementation ViSyntaxMatch
 
-@synthesize patternIndex;
-@synthesize pattern;
-@synthesize beginLocation;
-@synthesize beginLength;
-@synthesize beginMatch;
-@synthesize endMatch;
+@synthesize patternIndex = _patternIndex;
+@synthesize pattern = _pattern;
+@synthesize beginLocation = _beginLocation;
+@synthesize beginLength = _beginLength;
+@synthesize beginMatch = _beginMatch;
+@synthesize endMatch = _endMatch;
 
 - (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i
 {
-	self = [super init];
-	if (self)
-	{
-		beginMatch = aMatch;
-		pattern = aPattern;
-		patternIndex = i;
-		if (aMatch)
-		{
-			beginLocation = [aMatch rangeOfMatchedString].location;
-			beginLength = [aMatch rangeOfMatchedString].length;
+	if ((self = [super init]) != nil) {
+		_beginMatch = [aMatch retain];
+		_pattern = [aPattern retain];
+		_patternIndex = i;
+		if (aMatch) {
+			_beginLocation = [aMatch rangeOfMatchedString].location;
+			_beginLength = [aMatch rangeOfMatchedString].length;
 		}
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_beginMatch release];
+	[_endMatch release];
+	[_pattern release];
+	[super dealloc];
+}
+
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)anotherMatch
 {
-	if ([self beginLocation] < [anotherMatch beginLocation])
+	if (_beginLocation < anotherMatch.beginLocation)
 		return NSOrderedAscending;
-	if ([self beginLocation] > [anotherMatch beginLocation])
+	if (_beginLocation > anotherMatch.beginLocation)
 		return NSOrderedDescending;
-	if ([self patternIndex] < [anotherMatch patternIndex])
+	if (_patternIndex < anotherMatch.patternIndex)
 		return NSOrderedAscending;
-	if ([self patternIndex] > [anotherMatch patternIndex])
+	if (_patternIndex > anotherMatch.patternIndex)
 		return NSOrderedDescending;
 	return NSOrderedSame;
 }
 
 - (ViRegexp *)endRegexp
 {
-	return [pattern objectForKey:@"endRegexp"];
-}
-
-- (void)setEndMatch:(ViRegexpMatch *)aMatch
-{
-	endMatch = aMatch;
+	return [_pattern objectForKey:@"endRegexp"];
 }
 
 - (void)setBeginLocation:(NSUInteger)aLocation
 {
 	// used for continued multi-line matches
-	beginLocation = aLocation;
-	beginLength = 0;
+	_beginLocation = aLocation;
+	_beginLength = 0;
 }
 
 - (NSUInteger)endLocation
 {
-	if (endMatch)
-		return NSMaxRange([endMatch rangeOfMatchedString]);
+	if (_endMatch)
+		return NSMaxRange([_endMatch rangeOfMatchedString]);
 	else
-		return NSMaxRange([beginMatch rangeOfMatchedString]); // FIXME: ???
+		return NSMaxRange([_beginMatch rangeOfMatchedString]); // FIXME: ???
 }
 
 - (NSString *)scope
 {
-	return [pattern objectForKey:@"name"];
+	return [_pattern objectForKey:@"name"];
 }
 
 - (NSRange)matchedRange
 {
-	return NSMakeRange([self beginLocation], [self endLocation] - [self beginLocation]);
+	return NSMakeRange(_beginLocation, [self endLocation] - _beginLocation);
 }
 
 - (BOOL)isSingleLineMatch
 {
-	return [pattern objectForKey:@"begin"] == nil;
+	return [_pattern objectForKey:@"begin"] == nil;
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"ViSyntaxMatch: scope = %@", [self scope]];
+	return [NSString stringWithFormat:@"<ViSyntaxMatch: scope = %@>", [self scope]];
 }
 
 @end

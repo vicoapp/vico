@@ -205,7 +205,7 @@
 		if (r.location == NSNotFound)
 			break;
 		if (!copied) {
-			text = [value mutableCopy];
+			text = [[value mutableCopy] autorelease];
 			copied = YES;
 		}
 		NSString *expFormat = [self expandFormat:format

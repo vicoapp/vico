@@ -5,22 +5,23 @@
  */
 @interface ViMark : NSObject
 {
-	NSString *name;
-	NSUInteger location;
-	NSRange range;
-	NSUInteger line, column;
+	NSString	*_name;
+	NSUInteger	 _location;
+	NSRange		 _range;
+	NSUInteger	 _line;
+	NSUInteger	 _column;
 
-	NSNumber *lineNumber;
-	NSNumber *columnNumber;
+	NSNumber	*_lineNumber;
+	NSNumber	*_columnNumber;
 
-	id title;
-	NSImage *icon;
+	id		 _title;
+	NSImage		*_icon;
 
-	NSString *groupName;
-	NSURL *url;
-	__weak ViDocument *document;
+	NSString	*_groupName;
+	NSURL		*_url;
+	ViDocument	*_document;
 
-	NSHashTable *lists;
+	NSHashTable	*_lists; // XXX: lists are not retained!
 }
 
 /** The name of the mark. */
@@ -40,11 +41,11 @@
 /** The URL of the mark. */
 @property(nonatomic,readonly) NSURL *url;
 /** The icon of the mark. */
-@property(nonatomic,readwrite,assign) NSImage *icon;
+@property(nonatomic,readwrite,retain) NSImage *icon;
 /** The title of the mark. An NSString or an NSAttributedString. */
-@property(nonatomic,readwrite,assign) id title;
+@property(nonatomic,readwrite,retain) id title;
 
-@property(nonatomic,readonly) __weak ViDocument *document;
+@property(nonatomic,readwrite,retain) ViDocument *document;
 
 @property(nonatomic,readonly) NSString *groupName;
 
@@ -70,7 +71,7 @@
 
 - (void)setLocation:(NSUInteger)aLocation;
 - (void)setRange:(NSRange)aRange;
-- (void)setDocument:(__weak ViDocument *)doc;
+- (void)setURL:(NSURL *)url;
 
 - (void)remove;
 - (void)registerList:(ViMarkList *)list;

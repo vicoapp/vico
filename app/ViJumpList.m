@@ -5,42 +5,73 @@
 #define MAX_JUMP_LOCATIONS 100
 
 @implementation ViJump
-@synthesize url;
-@synthesize line;
-@synthesize column;
-@synthesize view;
+
+@synthesize url = _url;
+@synthesize line = _line;
+@synthesize column = _column;
+@synthesize view = _view;
+
 - (ViJump *)initWithURL:(NSURL *)aURL
                    line:(NSUInteger)aLine
                  column:(NSUInteger)aColumn
                    view:(NSView *)aView
 {
-	self = [super init];
-	if (self) {
-		url = aURL;
-		line = aLine;
-		column = aColumn;
-		view = aView;
+	if ((self = [super init]) != nil) {
+		_url = [aURL retain];
+		_line = aLine;
+		_column = aColumn;
+
+		_view = aView; // XXX: not retained!
+		if (_view)
+			[[NSNotificationCenter defaultCenter] addObserver:self
+								 selector:@selector(viewClosed:)
+								     name:ViViewClosedNotification
+								   object:_view];
 	}
 	return self;
+}
+
+- (void)viewClosed:(NSNotification *)notification
+{
+	INFO(@"view %@ closed", [notification object]);
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	_view = nil;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_url release];
+	[super dealloc];
 }
 
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViJump %p, %@ %u:%u>",
-	    self, [url absoluteString], line, column];
+	    self, [_url absoluteString], _line, _column];
 }
+
 @end
+
+
+
 
 @implementation ViJumpList
 
-@synthesize delegate;
+@synthesize delegate = _delegate;
 
 - (ViJumpList *)init
 {
-	self = [super init];
-	if (self)
-		jumps = [[NSMutableArray alloc] init];
+	if ((self = [super init]) != nil)
+		_jumps = [[NSMutableArray alloc] init];
 	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_jumps release];
+	[super dealloc];
 }
 
 - (BOOL)pushURL:(NSURL *)url
@@ -51,29 +82,29 @@
 	if (url == nil)
 		return NO;
 
-	if ([jumps count] >= MAX_JUMP_LOCATIONS)
-		[jumps removeObjectAtIndex:0];
+	if ([_jumps count] >= MAX_JUMP_LOCATIONS)
+		[_jumps removeObjectAtIndex:0];
 
 	DEBUG(@"pushing %@ %lu:%lu", url, line, column);
 
 	BOOL removedDuplicate = NO;
 	ViJump *jump = nil;
-	for (jump in jumps)
+	for (jump in _jumps)
 		if ([[jump url] isEqual:url] && IMAX(1, [jump line]) == IMAX(1, line))
 			break;
 
 	if (jump) {
 		DEBUG(@"removing duplicate jump %@", jump);
-		[jumps removeObject:jump];
+		[_jumps removeObject:jump];
 		removedDuplicate = YES;
 	}
 
-	jump = [[ViJump alloc] initWithURL:url line:line column:column view:aView];
-	[jumps addObject:jump];
-	position = [jumps count];
-	DEBUG(@"jumps = %@, position = %u", jumps, position);
+	jump = [[[ViJump alloc] initWithURL:url line:line column:column view:aView] autorelease];
+	[_jumps addObject:jump];
+	_position = [_jumps count];
+	DEBUG(@"jumps = %@, position = %u", _jumps, _position);
 
-	[delegate jumpList:self added:jump];
+	[_delegate jumpList:self added:jump];
 
 	return removedDuplicate;
 }
@@ -85,9 +116,9 @@
                       view:(NSView **)viewPtr
 {
 	DEBUG(@"goto jump at position %li", aPosition);
-	if (aPosition < 0 || aPosition >= [jumps count])
+	if (aPosition < 0 || aPosition >= [_jumps count])
 		return NO;
-	ViJump *jump = [jumps objectAtIndex:aPosition];
+	ViJump *jump = [_jumps objectAtIndex:aPosition];
 	DEBUG(@"using jump %@", jump);
 	if (urlPtr)
 		*urlPtr = jump.url;
@@ -97,9 +128,9 @@
 		*columnPtr = jump.column;
 	if (viewPtr)
 		*viewPtr = jump.view;
-	DEBUG(@"jumps = %@, position = %u", jumps, position);
+	DEBUG(@"jumps = %@, position = %u", _jumps, _position);
 
-	[delegate jumpList:self goto:jump];
+	[_delegate jumpList:self goto:jump];
 
 	return YES;
 }
@@ -109,10 +140,10 @@
               column:(NSUInteger *)columnPtr
                 view:(NSView **)viewPtr
 {
-	DEBUG(@"position = %u, count = %u", position, [jumps count]);
-	if (position + 1 >= [jumps count])
+	DEBUG(@"position = %u, count = %u", _position, [_jumps count]);
+	if (_position + 1 >= [_jumps count])
 		return NO;
-	return [self gotoJumpAtPosition:++position
+	return [self gotoJumpAtPosition:++_position
 				    URL:urlPtr
 				   line:linePtr
 				 column:columnPtr
@@ -124,22 +155,22 @@
                column:(NSUInteger *)columnPtr
                  view:(NSView **)viewPtr
 {
-	DEBUG(@"position = %li, count = %u", position, [jumps count]);
-	if (position <= 0)
+	DEBUG(@"position = %li, count = %u", _position, [_jumps count]);
+	if (_position <= 0)
 		return NO;
 
-	if (position >= [jumps count] && urlPtr && linePtr && columnPtr && viewPtr) {
-		NSInteger savedPosition = position;
+	if (_position >= [_jumps count] && urlPtr && linePtr && columnPtr && viewPtr) {
+		NSInteger savedPosition = _position;
 		BOOL removedDuplicate = [self pushURL:*urlPtr
 						 line:*linePtr
 					       column:*columnPtr
 						 view:*viewPtr];
-		position = savedPosition;
+		_position = savedPosition;
 		if (removedDuplicate)
-			position--;
+			_position--;
 	}
 
-	return [self gotoJumpAtPosition:--position
+	return [self gotoJumpAtPosition:--_position
 				    URL:urlPtr
 				   line:linePtr
 				 column:columnPtr
@@ -148,21 +179,21 @@
 
 - (BOOL)atBeginning
 {
-	return (position <= 0);
+	return (_position <= 0);
 }
 
 - (BOOL)atEnd
 {
-	return (position + 1 >= [jumps count]);
+	return (_position + 1 >= [_jumps count]);
 }
 
 - (void)enumerateJumpsBackwardsUsingBlock:(void (^)(ViJump *jump, BOOL *stop))block
 {
-	NSInteger pos = position - 1;
-	DEBUG(@"navigating jumplist %@ backwards from %li", jumps, pos);
+	NSInteger pos = _position - 1;
+	DEBUG(@"navigating jumplist %@ backwards from %li", _jumps, pos);
 	BOOL stop = NO;
 	while (!stop && pos >= 0) {
-		block([jumps objectAtIndex:pos], &stop);
+		block([_jumps objectAtIndex:pos], &stop);
 		--pos;
 	}
 }

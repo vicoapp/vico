@@ -6,36 +6,40 @@
 
 + (ViMarkGroup *)markGroupWithSelector:(SEL)aSelector
 {
-	return [[ViMarkGroup alloc] initWithSelector:aSelector];
+	return [[[ViMarkGroup alloc] initWithSelector:aSelector] autorelease];
 }
 
 - (ViMarkGroup *)initWithSelector:(SEL)aSelector
 {
 	if ((self = [super init]) != nil) {
-		groupSelector = aSelector;
-		groups = [NSMutableDictionary dictionary];
+		_groupSelector = aSelector;
+		_groups = [[NSMutableDictionary alloc] init];
 		DEBUG(@"created group %@", self);
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_groups release];
+	[super dealloc];
+}
+
 - (NSString *)attribute
 {
-	return NSStringFromSelector(groupSelector);
+	return NSStringFromSelector(_groupSelector);
 }
 
 - (NSArray *)groups
 {
-	return [groups allValues];
+	return [_groups allValues];
 }
 
 - (void)rebuildFromMarks:(NSArray *)marks
 {
-	[self willChangeValueForKey:@"groups"];
 	[self clear];
-	for (ViMark *mark in marks)
-		[self addMark:mark];
-	[self didChangeValueForKey:@"groups"];
+	[self addMarksFromArray:marks];
 
 	DEBUG(@"grouped by attribute %@: %@", [self attribute], [self groups]);
 }
@@ -43,15 +47,15 @@
 - (void)addMark:(ViMark *)mark
 {
 	id key = nil;
-	if ([mark respondsToSelector:groupSelector])
-		key = [mark performSelector:groupSelector];
+	if ([mark respondsToSelector:_groupSelector])
+		key = [mark performSelector:_groupSelector];
 	if (key == nil)
 		key = [NSNull null];
-	ViMarkList *group = [groups objectForKey:key];
+	ViMarkList *group = [_groups objectForKey:key];
 	if (group == nil) {
 		[self willChangeValueForKey:@"groups"];
 		group = [ViMarkList markListWithIdentifier:key];
-		[groups setObject:group forKey:key];
+		[_groups setObject:group forKey:key];
 		[self didChangeValueForKey:@"groups"];
 	}
 	[group addMark:mark];
@@ -63,18 +67,18 @@
 	BOOL didAddGroup = NO;
 	for (ViMark *mark in marksToAdd) {
 		id key = nil;
-		if ([mark respondsToSelector:groupSelector])
-			key = [mark performSelector:groupSelector];
+		if ([mark respondsToSelector:_groupSelector])
+			key = [mark performSelector:_groupSelector];
 		if (key == nil)
 			key = [NSNull null];
-		ViMarkList *group = [groups objectForKey:key];
+		ViMarkList *group = [_groups objectForKey:key];
 		if (group == nil) {
 			if (!didAddGroup) {
 				[self willChangeValueForKey:@"groups"];
 				didAddGroup = YES;
 			}
 			group = [ViMarkList markListWithIdentifier:key];
-			[groups setObject:group forKey:key];
+			[_groups setObject:group forKey:key];
 		}
 
 		NSMutableArray *addArray = [groupsToAdd objectForKey:group];
@@ -93,24 +97,26 @@
 - (void)removeMark:(ViMark *)mark
 {
 	id key = nil;
-	if ([mark respondsToSelector:groupSelector])
-		key = [mark performSelector:groupSelector];
+	if ([mark respondsToSelector:_groupSelector])
+		key = [mark performSelector:_groupSelector];
 	if (key == nil)
 		key = [NSNull null];
-	ViMarkList *group = [groups objectForKey:key];
+	ViMarkList *group = [_groups objectForKey:key];
 	[group removeMark:mark];
 	if ([[group marks] count] == 0) {
 		[self willChangeValueForKey:@"groups"];
-		[groups removeObjectForKey:key];
+		[_groups removeObjectForKey:key];
 		[self didChangeValueForKey:@"groups"];
 	}
 }
 
 - (void)clear
 {
-	[self willChangeValueForKey:@"groups"];
-	[groups removeAllObjects];
-	[self didChangeValueForKey:@"groups"];
+	if ([_groups count] > 0) {
+		[self willChangeValueForKey:@"groups"];
+		[_groups removeAllObjects];
+		[self didChangeValueForKey:@"groups"];
+	}
 }
 
 - (NSString *)description
@@ -126,28 +132,39 @@
 
 @implementation ViMarkList
 
-@synthesize marks;
+@synthesize marks = _marks;
 
 + (ViMarkList *)markListWithIdentifier:(id)anIdentifier
 {
-	return [[ViMarkList alloc] initWithIdentifier:anIdentifier];
+	return [[[ViMarkList alloc] initWithIdentifier:anIdentifier] autorelease];
 }
 
 + (ViMarkList *)markList
 {
-	return [[ViMarkList alloc] init];
+	return [[[ViMarkList alloc] init] autorelease];
 }
 
 - (ViMarkList *)initWithIdentifier:(id)anIdentifier
 {
 	if ((self = [super init]) != nil) {
-		identifier = anIdentifier;
-		marks = [NSMutableArray array];
-		marksByName = [NSMutableDictionary dictionary];
-		groups = [NSMutableDictionary dictionary];
-		currentIndex = NSNotFound;
+		_identifier = [anIdentifier retain]; // XXX: copy?
+		_marks = [[NSMutableArray alloc] init];
+		_marksByName = [[NSMutableDictionary alloc] init];
+		_groups = [[NSMutableDictionary alloc] init];
+		_currentIndex = NSNotFound;
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_identifier release];
+	[_marks release];
+	[_marksByName release];
+	[_groups release];
+	[_icon release];
+	[super dealloc];
 }
 
 - (ViMarkList *)init
@@ -157,35 +174,37 @@
 
 - (void)eachGroup:(void (^)(ViMarkGroup *))callback
 {
-	for (ViMarkGroup *group in [groups allValues]) {
+	for (ViMarkGroup *group in [_groups allValues]) {
 		callback(group);
 	}
 }
 
 - (void)clear
 {
-	[self willChangeValueForKey:@"marks"];
-	[marks removeAllObjects];
-	[marksByName removeAllObjects];
-	[self didChangeValueForKey:@"marks"];
+	if ([_marks count] > 0) {
+		[self willChangeValueForKey:@"marks"];
+		[_marks removeAllObjects];
+		[_marksByName removeAllObjects];
+		[self didChangeValueForKey:@"marks"];
+	}
 
 	[self eachGroup:^(ViMarkGroup *group) { [group clear]; }];
 }
 
 - (void)addMark:(ViMark *)mark
 {
-	NSUInteger lastIndex = [marks count];
+	NSUInteger lastIndex = [_marks count];
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:lastIndex];
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 	if (mark.name) {
-		ViMark *oldMark = [marksByName objectForKey:mark.name];
+		ViMark *oldMark = [_marksByName objectForKey:mark.name];
 		if (oldMark) {
-			[marks removeObject:oldMark]; // XXX: linear search!
+			[_marks removeObject:oldMark]; // XXX: linear search!
 			[self eachGroup:^(ViMarkGroup *group) { [group removeMark:oldMark]; }];
 		}
-		[marksByName setObject:mark forKey:mark.name];
+		[_marksByName setObject:mark forKey:mark.name];
 	}
-	[marks addObject:mark];
+	[_marks addObject:mark];
 	[mark registerList:self];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
@@ -198,19 +217,19 @@
 	if (numToAdd == 0)
 		return;
 
-	NSUInteger lastIndex = [marks count];
+	NSUInteger lastIndex = [_marks count];
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(lastIndex, numToAdd)];
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 	for (ViMark *mark in marksToAdd) {
 		if (mark.name) {
-			ViMark *oldMark = [marksByName objectForKey:mark.name];
+			ViMark *oldMark = [_marksByName objectForKey:mark.name];
 			if (oldMark)
-				[marks removeObject:oldMark]; // XXX: linear search!
-			[marksByName setObject:mark forKey:mark.name];
+				[_marks removeObject:oldMark]; // XXX: linear search!
+			[_marksByName setObject:mark forKey:mark.name];
 		}
 		[mark registerList:self];
 	}
-	[marks addObjectsFromArray:marksToAdd];
+	[_marks addObjectsFromArray:marksToAdd];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group addMarksFromArray:marksToAdd]; }];
@@ -218,15 +237,15 @@
 
 - (void)removeMark:(ViMark *)mark
 {
-	NSUInteger index = [marks indexOfObject:mark]; // XXX: linear search!
+	NSUInteger index = [_marks indexOfObject:mark]; // XXX: linear search!
 	if (index == NSNotFound)
 		return;
 
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:index];
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
-	[marks removeObjectAtIndex:index];
+	[_marks removeObjectAtIndex:index];
 	if (mark.name)
-		[marksByName removeObjectForKey:mark.name];
+		[_marksByName removeObjectForKey:mark.name];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group removeMark:mark]; }];
@@ -234,21 +253,21 @@
 
 - (ViMark *)lookup:(NSString *)aName
 {
-	return [marksByName objectForKey:aName];
+	return [_marksByName objectForKey:aName];
 }
 
 - (NSUInteger)count
 {
-	return [marks count];
+	return [_marks count];
 }
 
 - (ViMarkGroup *)groupBy:(NSString *)selectorString
 {
-	ViMarkGroup *group = [groups objectForKey:selectorString];
+	ViMarkGroup *group = [_groups objectForKey:selectorString];
 	if (group == nil) {
 		group = [ViMarkGroup markGroupWithSelector:NSSelectorFromString(selectorString)];
-		[group rebuildFromMarks:marks];
-		[groups setObject:group forKey:selectorString];
+		[group rebuildFromMarks:_marks];
+		[_groups setObject:group forKey:selectorString];
 	}
 	DEBUG(@"returning group %@", group);
 	return group;
@@ -265,37 +284,37 @@
 - (void)setSelectionIndexes:(NSIndexSet *)indexSet
 {
 	DEBUG(@"got selection indexes %@", indexSet);
-	currentIndex = [indexSet firstIndex];
+	_currentIndex = [indexSet firstIndex];
 }
 
 - (NSIndexSet *)selectionIndexes
 {
-	if (currentIndex >= 0 && currentIndex < [marks count])
-		return [NSIndexSet indexSetWithIndex:currentIndex];
+	if (_currentIndex >= 0 && _currentIndex < [_marks count])
+		return [NSIndexSet indexSetWithIndex:_currentIndex];
 	return [NSIndexSet indexSet];
 }
 
 - (ViMark *)markAtIndex:(NSInteger)anIndex
 {
-	if (anIndex >= 0 && anIndex < [marks count]) {
-		if (currentIndex != anIndex) {
+	if (anIndex >= 0 && anIndex < [_marks count]) {
+		if (_currentIndex != anIndex) {
 			[self willChangeValueForKey:@"selectionIndexes"];
-			currentIndex = anIndex;
+			_currentIndex = anIndex;
 			[self didChangeValueForKey:@"selectionIndexes"];
 		}
-		return [marks objectAtIndex:currentIndex];
+		return [_marks objectAtIndex:_currentIndex];
 	}
 	return nil;
 }
 
 - (ViMark *)next
 {
-	return [self markAtIndex:currentIndex + 1];
+	return [self markAtIndex:_currentIndex + 1];
 }
 
 - (ViMark *)previous
 {
-	return [self markAtIndex:currentIndex - 1];
+	return [self markAtIndex:_currentIndex - 1];
 }
 
 - (ViMark *)first
@@ -305,27 +324,27 @@
 
 - (ViMark *)last
 {
-	return [self markAtIndex:[marks count] - 1];
+	return [self markAtIndex:[_marks count] - 1];
 }
 
 - (ViMark *)current
 {
-	return [self markAtIndex:currentIndex];
+	return [self markAtIndex:_currentIndex];
 }
 
 - (NSString *)description
 {
-	if (identifier)
-		return [NSString stringWithFormat:@"<ViMarkList (%@): %lu marks>", identifier, [marks count]];
+	if (_identifier)
+		return [NSString stringWithFormat:@"<ViMarkList (%@): %lu marks>", _identifier, [_marks count]];
 	else
-		return [NSString stringWithFormat:@"<ViMarkList %p: %lu marks>", self, [marks count]];
+		return [NSString stringWithFormat:@"<ViMarkList %p: %lu marks>", self, [_marks count]];
 }
 
 #pragma mark -
 
 - (id)title
 {
-	return [identifier description];
+	return [_identifier description];
 }
 
 - (BOOL)isLeaf
@@ -361,40 +380,52 @@
 
 @implementation ViMarkStack
 
-@synthesize name, maxLists;
+@synthesize name = _name;
+@synthesize maxLists = _maxLists;
 
 + (ViMarkStack *)markStackWithName:(NSString *)name
 {
-	return [[ViMarkStack alloc] initWithName:name];
+	return [[[ViMarkStack alloc] initWithName:name] autorelease];
 }
 
 - (ViMarkStack *)initWithName:(NSString *)aName
 {
 	if ((self = [super init]) != nil) {
-		name = aName;
-		maxLists = 10;
-		[self clear];
+		_name = [aName copy];
+		_lists = [[NSMutableArray alloc] init];
+		_currentIndex = -1;
+		_maxLists = 10;
 		[self makeList];
 		DEBUG(@"created mark stack %@", self);
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_name release];
+	[_lists release];
+	[super dealloc];
+}
+
 - (void)clear
 {
-	[self willChangeValueForKey:@"selectionIndexes"];
-	[self willChangeValueForKey:@"list"];
-	lists = [NSMutableArray array];
-	currentIndex = -1;
-	[self didChangeValueForKey:@"list"];
-	[self didChangeValueForKey:@"selectionIndexes"];
+	if ([_lists count] > 0) {
+		[self willChangeValueForKey:@"selectionIndexes"];
+		[self willChangeValueForKey:@"list"];
+		[_lists removeAllObjects];
+		_currentIndex = -1;
+		[self didChangeValueForKey:@"list"];
+		[self didChangeValueForKey:@"selectionIndexes"];
+	}
 }
 
 - (ViMarkList *)list
 {
-	if (currentIndex >= 0) {
-		DEBUG(@"returning list at index %li for stack %@", currentIndex, self);
-		return [lists objectAtIndex:currentIndex];
+	if (_currentIndex >= 0) {
+		DEBUG(@"returning list at index %li for stack %@", _currentIndex, self);
+		return [_lists objectAtIndex:_currentIndex];
 	}
 
 	DEBUG(@"no lists added in stack %@", self);
@@ -408,20 +439,20 @@
 
 - (void)trim
 {
-	while ([lists count] > maxLists && maxLists > 0) {
-		DEBUG(@"trimming list %@ at index 0", [lists objectAtIndex:0]);
-		[lists removeObjectAtIndex:0];
+	while ([_lists count] > _maxLists && _maxLists > 0) {
+		DEBUG(@"trimming list %@ at index 0", [_lists objectAtIndex:0]);
+		[_lists removeObjectAtIndex:0];
 	}
-	if (currentIndex >= [lists count]) {
-		currentIndex = [lists count] - 1;
-		DEBUG(@"adjusted currentIndex to %li", currentIndex);
+	if (_currentIndex >= [_lists count]) {
+		_currentIndex = [_lists count] - 1;
+		DEBUG(@"adjusted currentIndex to %li", _currentIndex);
 	}
 }
 
 - (void)setMaxLists:(NSInteger)num
 {
-	maxLists = IMAX(1, num);
-	if ([lists count] > maxLists) {
+	_maxLists = IMAX(1, num);
+	if ([_lists count] > _maxLists) {
 		[self willChangeValueForKey:@"selectionIndexes"];
 		[self willChangeValueForKey:@"list"];
 		[self trim];
@@ -435,24 +466,24 @@
 	[self willChangeValueForKey:@"selectionIndexes"];
 	[self willChangeValueForKey:@"list"];
 
-	DEBUG(@"lists before push: %@, currentIndex = %li", lists, currentIndex);
+	DEBUG(@"lists before push: %@, currentIndex = %li", _lists, _currentIndex);
 
-	if (++currentIndex < 0)
-		currentIndex = 0;
+	if (++_currentIndex < 0)
+		_currentIndex = 0;
 
-	if (currentIndex >= [lists count]) {
+	if (_currentIndex >= [_lists count]) {
 		DEBUG(@"appending list %@", list);
-		[lists addObject:list];
+		[_lists addObject:list];
 		[self trim];
 	} else {
-		DEBUG(@"insert list %@ at index %li", list, currentIndex);
-		[lists replaceObjectAtIndex:currentIndex withObject:list];
+		DEBUG(@"insert list %@ at index %li", list, _currentIndex);
+		[_lists replaceObjectAtIndex:_currentIndex withObject:list];
 	}
 
 	[self didChangeValueForKey:@"list"];
 	[self didChangeValueForKey:@"selectionIndexes"];
 
-	DEBUG(@"lists after push: %@, currentIndex = %li", lists, currentIndex);
+	DEBUG(@"lists after push: %@, currentIndex = %li", _lists, _currentIndex);
 
 	return list;
 }
@@ -461,55 +492,55 @@
 {
 	DEBUG(@"got selection indexes %@", indexSet);
 	[self willChangeValueForKey:@"list"];
-	currentIndex = [indexSet firstIndex];
+	_currentIndex = [indexSet firstIndex];
 	[self didChangeValueForKey:@"list"];
 }
 
 - (NSIndexSet *)selectionIndexes
 {
-	if (currentIndex >= 0 && currentIndex < [lists count])
-		return [NSIndexSet indexSetWithIndex:currentIndex];
+	if (_currentIndex >= 0 && _currentIndex < [_lists count])
+		return [NSIndexSet indexSetWithIndex:_currentIndex];
 	return [NSIndexSet indexSet];
 }
 
 - (ViMarkList *)listAtIndex:(NSInteger)anIndex
 {
-	if (anIndex >= 0 && anIndex < [lists count]) {
-		if (currentIndex != anIndex) {
+	if (anIndex >= 0 && anIndex < [_lists count]) {
+		if (_currentIndex != anIndex) {
 			[self willChangeValueForKey:@"selectionIndexes"];
 			[self willChangeValueForKey:@"list"];
-			currentIndex = anIndex;
+			_currentIndex = anIndex;
 			[self didChangeValueForKey:@"list"];
 			[self didChangeValueForKey:@"selectionIndexes"];
 		}
-		return [lists objectAtIndex:currentIndex];
+		return [_lists objectAtIndex:_currentIndex];
 	}
 	return nil;
 }
 
 - (ViMarkList *)next
 {
-	return [self listAtIndex:currentIndex + 1];
+	return [self listAtIndex:_currentIndex + 1];
 }
 
 - (ViMarkList *)previous
 {
-	return [self listAtIndex:currentIndex - 1];
+	return [self listAtIndex:_currentIndex - 1];
 }
 
 - (ViMarkList *)last
 {
-	return [self listAtIndex:[lists count] - 1];
+	return [self listAtIndex:[_lists count] - 1];
 }
 
 - (ViMarkList *)current
 {
-	return [self listAtIndex:currentIndex];
+	return [self listAtIndex:_currentIndex];
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViMarkStack %p: %@, list %li/%lu>", self, name, currentIndex, [lists count]];
+	return [NSString stringWithFormat:@"<ViMarkStack %p: %@, list %li/%lu>", self, _name, _currentIndex, [_lists count]];
 }
 
 @end
@@ -520,55 +551,61 @@
 
 @implementation ViMarkManager
 
-@synthesize stacks;
+@synthesize stacks = _stacks;
 
-static ViMarkManager *sharedManager = nil;
+static ViMarkManager *__sharedManager = nil;
 
 + (ViMarkManager *)sharedManager
 {
-	if (sharedManager == nil)
-		sharedManager = [[ViMarkManager alloc] init];
-	return sharedManager;
+	if (__sharedManager == nil)
+		__sharedManager = [[ViMarkManager alloc] init];
+	return __sharedManager;
 }
 
 - (ViMarkManager *)init
 {
-	DEBUG(@"self is %@, sharedManager is %@", self, sharedManager);
-	if (sharedManager)
-		return sharedManager;
+	DEBUG(@"self is %@, sharedManager is %@", self, __sharedManager);
+	if (__sharedManager)
+		return __sharedManager;
 
 	if ((self = [super init]) != nil) {
-		stacks = [NSMutableArray array];
-		namedStacks = [NSMutableDictionary dictionary];
-		marksPerDocument = [NSMapTable mapTableWithWeakToStrongObjects];
+		_stacks = [[NSMutableArray alloc] init];
+		_namedStacks = [[NSMutableDictionary alloc] init];
 		DEBUG(@"created mark manager %@", self);
 		[self stackWithName:@"Global Marks"];
-		sharedManager = self;
+		__sharedManager = self;
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_stacks release];
+	[_namedStacks release];
+	[super dealloc];
 }
 
 // This shouldn't be called
 - (ViMarkManager *)initWithCoder:(NSCoder *)aCoder
 {
-	DEBUG(@"self is %@, sharedManager is %@", self, sharedManager);
-	if (sharedManager)
-		return sharedManager;
+	DEBUG(@"self is %@, sharedManager is %@", self, __sharedManager);
+	if (__sharedManager)
+		return __sharedManager;
 	return [self init];
 }
 
 - (void)removeStack:(ViMarkStack *)stack
 {
 	[self willChangeValueForKey:@"stacks"];
-	[stacks removeObject:stack];
+	[_stacks removeObject:stack];
 	[self didChangeValueForKey:@"stacks"];
 }
 
 - (void)removeStackWithName:(NSString *)name
 {
-	ViMarkStack *stack = [namedStacks objectForKey:name];
+	ViMarkStack *stack = [_namedStacks objectForKey:name];
 	if (stack) {
-		[namedStacks removeObjectForKey:name];
+		[_namedStacks removeObjectForKey:name];
 		[self removeStack:stack];
 	}
 }
@@ -576,7 +613,7 @@ static ViMarkManager *sharedManager = nil;
 - (ViMarkStack *)addStack:(ViMarkStack *)stack
 {
 	[self willChangeValueForKey:@"stacks"];
-	[stacks addObject:stack];
+	[_stacks addObject:stack];
 	[self didChangeValueForKey:@"stacks"];
 	return stack;
 }
@@ -588,12 +625,12 @@ static ViMarkManager *sharedManager = nil;
 
 - (ViMarkStack *)stackWithName:(NSString *)name
 {
-	ViMarkStack *stack = [namedStacks objectForKey:name];
+	ViMarkStack *stack = [_namedStacks objectForKey:name];
 	if (stack)
 		return stack;
 
 	stack = [ViMarkStack markStackWithName:name];
-	[namedStacks setObject:stack forKey:name];
+	[_namedStacks setObject:stack forKey:name];
 	return [self addStack:stack];
 }
 
@@ -601,34 +638,6 @@ static ViMarkManager *sharedManager = nil;
 {
 	DEBUG(@"request for key %@ in mark manager %@", key, self);
 	return [self stackWithName:key];
-}
-
-- (void)registerMark:(ViMark *)mark
-{
-	if (mark.document == nil)
-		return;
-
-	NSHashTable *marks = [marksPerDocument objectForKey:mark.document];
-	if (marks == nil) {
-		marks = [NSHashTable hashTableWithWeakObjects];
-		[marksPerDocument setObject:marks forKey:mark.document];
-	}
-	[marks addObject:mark];
-}
-
-- (void)unregisterMark:(ViMark *)mark
-{
-	if (mark.document == nil)
-		return;
-
-	NSHashTable *marks = [marksPerDocument objectForKey:mark.document];
-	if (marks)
-		[marks removeObject:mark];
-}
-
-- (NSHashTable *)marksForDocument:(ViDocument *)aDocument
-{
-	return [marksPerDocument objectForKey:aDocument];
 }
 
 @end

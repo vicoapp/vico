@@ -2,8 +2,8 @@
 
 @interface ViMarkGroup : NSObject
 {
-	SEL groupSelector;
-	NSMutableDictionary *groups;
+	SEL			 _groupSelector;
+	NSMutableDictionary	*_groups;
 }
 
 @property (nonatomic, readonly) NSArray *groups;
@@ -25,12 +25,12 @@
 
 @interface ViMarkList : NSObject
 {
-	NSMutableArray *marks;
-	NSMutableDictionary *marksByName;
-	NSInteger currentIndex;
-	NSMutableDictionary *groups;
-	id identifier;
-	NSImage *icon;
+	NSMutableArray		*_marks;
+	NSMutableDictionary	*_marksByName;
+	NSInteger		 _currentIndex;
+	NSMutableDictionary	*_groups;
+	id			 _identifier;
+	NSImage			*_icon;
 }
 
 @property (nonatomic, readonly) NSArray *marks;
@@ -61,14 +61,16 @@
 
 @interface ViMarkStack : NSObject
 {
-	NSString *name;
-	NSMutableArray *lists;
-	NSInteger currentIndex;
-	NSInteger maxLists;
+	NSString	*_name;
+	NSMutableArray	*_lists;
+	NSInteger	 _currentIndex;
+	NSInteger	 _maxLists;
 }
-@property (nonatomic, readwrite, assign) NSString *name;
+
+@property (nonatomic, readwrite, copy) NSString *name;
 @property (nonatomic, readonly) ViMarkList *list;
 @property (nonatomic, readwrite) NSInteger maxLists;
+
 + (ViMarkStack *)markStackWithName:(NSString *)name;
 - (ViMarkStack *)initWithName:(NSString *)name;
 - (ViMarkList *)makeList;
@@ -79,6 +81,7 @@
 - (ViMarkList *)previous;
 - (ViMarkList *)last;
 - (ViMarkList *)current;
+
 @end
 
 
@@ -88,20 +91,16 @@
 
 @interface ViMarkManager : NSObject
 {
-	NSMapTable *marksPerDocument; // keys are documents, values are NSHashTables of marks
-	NSMutableArray *stacks;
-	NSMutableDictionary *namedStacks; // keyed by name
+	NSMutableArray		*_stacks;
+	NSMutableDictionary	*_namedStacks; // keyed by name
 }
 
 @property (nonatomic, readonly) NSArray *stacks;
+
 + (ViMarkManager *)sharedManager;
 - (void)removeStack:(ViMarkStack *)stack;
 - (void)removeStackWithName:(NSString *)name;
 - (ViMarkStack *)makeStack;
 - (ViMarkStack *)stackWithName:(NSString *)name;
-
-- (void)registerMark:(ViMark *)mark;
-- (void)unregisterMark:(ViMark *)mark;
-- (NSHashTable *)marksForDocument:(ViDocument *)document;
 
 @end

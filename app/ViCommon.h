@@ -9,6 +9,7 @@
 #define ViDocumentLoadedNotification @"ViDocumentLoadedNotification"
 #define ViDocumentAddedNotification @"ViDocumentAddedNotification"
 #define ViDocumentRemovedNotification @"ViDocumentRemovedNotification"
+#define ViViewClosedNotification @"ViViewClosedNotification "
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
 #define ViDocumentEditedChangedNotification @"ViDocumentEditedChangedNotification "

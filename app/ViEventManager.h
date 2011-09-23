@@ -50,8 +50,8 @@
 
 @interface ViEvent : NSObject
 {
-	NuBlock *expression;
-	NSInteger eventId;
+	NuBlock		*_expression;
+	NSInteger	 _eventId;
 }
 - (id)initWithExpression:(NuBlock *)anExpression;
 @property (nonatomic,readonly) NuBlock *expression;

@@ -3,41 +3,63 @@
 #import "Nu/Nu.h"
 #include "logging.h"
 
-static NSInteger nextEventId = 0;
+static NSInteger __nextEventId = 0;
 
 @implementation ViEvent
-@synthesize expression, eventId;
+
+@synthesize expression = _expression;
+@synthesize eventId = _eventId;
+
 - (id)initWithExpression:(NuBlock *)anExpression
 {
 	if ((self = [super init]) != nil) {
-		expression = anExpression;
-		eventId = nextEventId++;
+		_expression = [anExpression retain];
+		_eventId = ++__nextEventId;
 	}
 	return self;
 }
+
+- (void)dealloc
+{
+	[_expression release];
+	[super dealloc];
+}
+
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViEvent %p: %li>", self, eventId];
+	return [NSString stringWithFormat:@"<ViEvent %p: %li>", self, _eventId];
 }
+
 @end
+
+
+
+
 
 @implementation ViEventManager
 
 + (ViEventManager *)defaultManager
 {
-	static ViEventManager *defaultManager = nil;
-	if (defaultManager == nil)
-		defaultManager = [[ViEventManager alloc] init];
-	return defaultManager;
+	static ViEventManager *__defaultManager = nil;
+	if (__defaultManager == nil)
+		__defaultManager = [[ViEventManager alloc] init];
+	return __defaultManager;
 }
 
 - (id)init
 {
 	if ((self = [super init]) != nil) {
-		_anonymous_events = [NSMutableDictionary dictionary];
-		_owned_events = [NSMutableDictionary dictionary];
+		_anonymous_events = [[NSMutableDictionary alloc] init];
+		_owned_events = [[NSMutableDictionary alloc] init];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_anonymous_events release];
+	[_owned_events release];
+	[super dealloc];
 }
 
 - (void)emitCallbacks:(id)callbacks withArglist:(NuCell *)arglist
@@ -150,7 +172,7 @@ static NSInteger nextEventId = 0;
 	} else {
 		NSMapTable *owners = [_owned_events objectForKey:key];
 		if (owners == nil) {
-			owners = [NSMapTable mapTableWithWeakToStrongObjects];
+			owners = [NSMapTable mapTableWithWeakToStrongObjects]; // XXX: owners must explicitly remove themselves in MRC
 			[_owned_events setObject:owners forKey:key];
 		}
 
@@ -163,6 +185,7 @@ static NSInteger nextEventId = 0;
 
 	ViEvent *ev = [[ViEvent alloc] initWithExpression:expression];
 	[callbacks addObject:ev];
+	[ev release];
 
 	return ev.eventId;
 }
@@ -192,12 +215,15 @@ static NSInteger nextEventId = 0;
 
 - (void)clearFor:(id)owner
 {
+	DEBUG(@"clear event for owner %@", owner);
 	if (owner == nil) {
 		[_anonymous_events removeAllObjects];
 		[_owned_events removeAllObjects];
 	} else {
-		for (NSMapTable *owners in [_owned_events allValues])
+		for (NSMapTable *owners in [_owned_events objectEnumerator]) {
+			DEBUG(@"remove %@ from %@", owner, owners);
 			[owners removeObjectForKey:owner];
+		}
 	}
 }
 

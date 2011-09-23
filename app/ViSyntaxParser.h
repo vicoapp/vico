@@ -5,28 +5,25 @@
 @interface ViSyntaxParser : NSObject
 {
 	// configuration
-	ViLanguage *language;
+	ViLanguage	*_language;
 
 	// persistent state
-	NSMutableArray *continuationsState;
-	NSMutableArray *continuations;
-	NSMutableArray *scopeArray;
+	NSMutableArray	*_continuations;
+	NSMutableArray	*_scopeArray;
 
 	// per-request state
-	const unichar *chars;
-	NSUInteger offset;
-	ViSyntaxContext *context;
-
-	BOOL ignoreEditing;
+	const unichar	*_chars;
+	NSUInteger	 _offset;
+	ViSyntaxContext	*_context;
 
 	// statistics
-	unsigned regexps_tried;
-	unsigned regexps_overlapped;
-	unsigned regexps_matched;
-	unsigned regexps_cached;
+	unsigned	 _regexps_tried;
+	unsigned	 _regexps_overlapped;
+	unsigned	 _regexps_matched;
+	unsigned	 _regexps_cached;
 }
 
-@property(nonatomic,readwrite) BOOL ignoreEditing;
++ (ViSyntaxParser *)syntaxParserWithLanguage:(ViLanguage *)aLanguage;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
 - (void)parseContext:(ViSyntaxContext *)aContext;

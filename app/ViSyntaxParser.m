@@ -11,23 +11,34 @@
 
 @implementation ViSyntaxParser
 
-@synthesize ignoreEditing;
-
-- (NSArray *)scopeArray
++ (ViSyntaxParser *)syntaxParserWithLanguage:(ViLanguage *)aLanguage
 {
-	return scopeArray;
+	return [[[ViSyntaxParser alloc] initWithLanguage:aLanguage] autorelease];
 }
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage
 {
-	self = [super init];
-	if (self)
-	{
-		language = aLanguage;
-		scopeArray = [[NSMutableArray alloc] init];
-		continuations = [[NSMutableArray alloc] init];
+	if ((self = [super init]) != nil) {
+		_language = [aLanguage retain];
+		_scopeArray = [[NSMutableArray alloc] init];
+		_continuations = [[NSMutableArray alloc] init];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[_context release];
+	[_language release];
+	[_scopeArray release];
+	[_continuations release];
+	[super dealloc];
+}
+
+- (NSArray *)scopeArray
+{
+	return _scopeArray;
 }
 
 #pragma mark -
@@ -37,17 +48,17 @@
 {
 	if (continuedMatches) {
 		DEBUG(@"setting continuation matches at line %u to %@", lineno, continuedMatches);
-		while ([continuations count] < lineno)
-			[continuations addObject:[NSArray array]];
-		[continuations replaceObjectAtIndex:(lineno - 1) withObject:continuedMatches];
+		while ([_continuations count] < lineno)
+			[_continuations addObject:[NSArray array]];
+		[_continuations replaceObjectAtIndex:(lineno - 1) withObject:continuedMatches];
 	}
 }
 
 - (NSArray *)continuedMatchesForLine:(NSUInteger)lineno
 {
 	NSArray *continuedMatches = nil;
-	if (lineno > 0 && [continuations count] >= lineno)
-		continuedMatches = [continuations objectAtIndex:(lineno - 1)];
+	if (lineno > 0 && [_continuations count] >= lineno)
+		continuedMatches = [_continuations objectAtIndex:(lineno - 1)];
 	
 	DEBUG(@"continuation scopes at line %u = %@", lineno, continuedMatches);
 	return continuedMatches;
@@ -56,28 +67,28 @@
 - (void)pushContinuations:(NSUInteger)changedLines
            fromLineNumber:(NSUInteger)lineNumber
 {
-	if (lineNumber >= [continuations count])
+	if (lineNumber >= [_continuations count])
 		return;
 
 	NSArray *prev;
 	if (lineNumber == 0)
 		prev = [NSArray array];
 	else
-		prev = [continuations objectAtIndex:(lineNumber - 1)];
+		prev = [_continuations objectAtIndex:(lineNumber - 1)];
 
 	DEBUG(@"pushing %i continuations after line %i, copying scopes %@",
 	    changedLines, lineNumber, prev);
 
-	while (changedLines-- && lineNumber < [continuations count])
-		[continuations insertObject:[prev copy] atIndex:lineNumber];
+	while (changedLines-- && lineNumber < [_continuations count])
+		[_continuations insertObject:[[prev copy] autorelease] atIndex:lineNumber];
 }
 
 - (void)pullContinuations:(NSUInteger)changedLines
            fromLineNumber:(NSUInteger)lineNumber
 {
 	DEBUG(@"pulling %i continuations at line %i", changedLines, lineNumber);
-	while (changedLines-- && lineNumber < [continuations count])
-		[continuations removeObjectAtIndex:lineNumber];
+	while (changedLines-- && lineNumber < [_continuations count])
+		[_continuations removeObjectAtIndex:lineNumber];
 }
 
 #pragma mark -
@@ -89,20 +100,20 @@
 {
 	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
 
-	if (affectedRange.location >= [scopeArray count])
+	if (affectedRange.location >= [_scopeArray count])
 		return;
 
 	NSRange r;
-	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
+	ViScope *sleft = [_scopeArray objectAtIndex:affectedRange.location];
 	r = [sleft range];
 	if (r.location < affectedRange.location && NSMaxRange(r) > affectedRange.location) {
 		DEBUG(@"sleft = %@", sleft);
 		// must split scope in left and right part
 		NSRange rightRange = NSMakeRange(affectedRange.location, NSMaxRange(r) - affectedRange.location);
-		ViScope *sright = [[ViScope alloc] initWithScopes:[sleft scopes] range:rightRange];
+		ViScope *sright = [ViScope scopeWithScopes:[sleft scopes] range:rightRange];
 		NSUInteger j;
 		for (j = affectedRange.location; j < NSMaxRange(r); j++)
-			[scopeArray replaceObjectAtIndex:j withObject:sright];
+			[_scopeArray replaceObjectAtIndex:j withObject:sright];
 		r.length = affectedRange.location - r.location;
 		[sleft setRange:r];
 		DEBUG(@"updated sleft = %@", sleft);
@@ -111,12 +122,12 @@
 
 	NSUInteger i = affectedRange.location;
 	NSUInteger n = affectedRange.length;
-	ViScope *scope = [[ViScope alloc] initWithScopes:[NSArray array] range:affectedRange];
+	ViScope *scope = [ViScope scopeWithScopes:[NSArray array] range:affectedRange];
 	while (n--)
-		[scopeArray insertObject:scope atIndex:i];
+		[_scopeArray insertObject:scope atIndex:i];
 
-	for (i = NSMaxRange(affectedRange); i < [scopeArray count];) {
-		ViScope *s = [scopeArray objectAtIndex:i];
+	for (i = NSMaxRange(affectedRange); i < [_scopeArray count];) {
+		ViScope *s = [_scopeArray objectAtIndex:i];
 		r = [s range];
 		r.location += affectedRange.length;
 		DEBUG(@"%@ -> %@", s, NSStringFromRange(r));
@@ -129,10 +140,10 @@
 {
 	DEBUG(@"range = %@", NSStringFromRange(affectedRange));
 
-	if (affectedRange.location >= [scopeArray count])
+	if (affectedRange.location >= [_scopeArray count])
 		return;
 
-	ViScope *sleft = [scopeArray objectAtIndex:affectedRange.location];
+	ViScope *sleft = [_scopeArray objectAtIndex:affectedRange.location];
 	NSRange r = [sleft range];
 	if (NSMaxRange(r) > affectedRange.location) {
 		DEBUG(@"sleft = %@", sleft);
@@ -145,9 +156,9 @@
 		DEBUG(@"shortened sleft = %@", sleft);
 	}
 
-	if ([scopeArray count] > NSMaxRange(affectedRange))
+	if ([_scopeArray count] > NSMaxRange(affectedRange))
 	{
-		ViScope *sright = [scopeArray objectAtIndex:NSMaxRange(affectedRange)];
+		ViScope *sright = [_scopeArray objectAtIndex:NSMaxRange(affectedRange)];
 		if (sright != sleft && [sright range].location < NSMaxRange(affectedRange))
 		{
 			// problem if NSMaxRange(sright) < NSMaxRange(affectedRange) (BUG!)
@@ -169,14 +180,14 @@
 		}
 	}
 
-	if ([scopeArray count] <= affectedRange.location)
+	if ([_scopeArray count] <= affectedRange.location)
 		return;
-	[scopeArray removeObjectsInRange:NSIntersectionRange(affectedRange, NSMakeRange(0, [scopeArray count]))];
+	[_scopeArray removeObjectsInRange:NSIntersectionRange(affectedRange, NSMakeRange(0, [_scopeArray count]))];
 
 	NSUInteger i;
-	for (i = affectedRange.location; i < [scopeArray count];)
+	for (i = affectedRange.location; i < [_scopeArray count];)
 	{
-		ViScope *s = [scopeArray objectAtIndex:i];
+		ViScope *s = [_scopeArray objectAtIndex:i];
 		r = [s range];
 		if (r.location > affectedRange.location)
 		{
@@ -200,26 +211,26 @@
 - (void)setScopes:(NSArray *)aScopeArray inRange:(NSRange)aRange additive:(BOOL)additive
 {
 	NSUInteger c = [aScopeArray count];
-	if (c == 0 || aRange.length == 0 || aRange.location > [scopeArray count])
+	if (c == 0 || aRange.length == 0 || aRange.location > [_scopeArray count])
 		return;
 
 	DEBUG(@"-- got scope [%@] in range %@", [aScopeArray componentsJoinedByString:@" "], NSStringFromRange(aRange));
 
 	ViScope *scope = nil;
 	if (!additive)
-		scope = [[ViScope alloc] initWithScopes:aScopeArray range:aRange];
+		scope = [ViScope scopeWithScopes:aScopeArray range:aRange];
 
 	NSUInteger i;
 	for (i = aRange.location; i < NSMaxRange(aRange); i++) {
 		if (additive) {
-			NSArray *oldScopes = [[scopeArray objectAtIndex:i] scopes];
-			scope = [[ViScope alloc] initWithScopes:[oldScopes arrayByAddingObjectsFromArray:aScopeArray] range:NSMakeRange(i, 1)];
+			NSArray *oldScopes = [[_scopeArray objectAtIndex:i] scopes];
+			scope = [ViScope scopeWithScopes:[oldScopes arrayByAddingObjectsFromArray:aScopeArray] range:NSMakeRange(i, 1)];
 		}
 
-		if (i == [scopeArray count])
-			[scopeArray insertObject:scope atIndex:i];
+		if (i == [_scopeArray count])
+			[_scopeArray insertObject:scope atIndex:i];
 		else
-			[scopeArray replaceObjectAtIndex:i withObject:scope];
+			[_scopeArray replaceObjectAtIndex:i withObject:scope];
 	}
 }
 
@@ -227,20 +238,20 @@
 {
 	DEBUG(@"updating scope ranges in range %@", NSStringFromRange(updateRange));
 
-	if (updateRange.location >= [scopeArray count])
+	if (updateRange.location >= [_scopeArray count])
 		return;
 
-	NSMutableSet *set = [[NSMutableSet alloc] init];
+	NSMutableSet *set = [NSMutableSet set];
 
 	NSUInteger i;
 	NSRange beginRange;
-	ViScope *begin = [scopeArray objectAtIndex:updateRange.location];
+	ViScope *begin = [_scopeArray objectAtIndex:updateRange.location];
 
 	// backtrack the first match to get the range right
 	i = updateRange.location;
 	for (;;)
 	{
-		ViScope *s = [scopeArray objectAtIndex:i];
+		ViScope *s = [_scopeArray objectAtIndex:i];
 		if (s != begin && ![[begin scopes] isEqualToStringArray:[s scopes]])
 		{
 			i++;
@@ -255,7 +266,7 @@
 			break;
 		}
 		if (s != begin)
-			[scopeArray replaceObjectAtIndex:i withObject:begin];
+			[_scopeArray replaceObjectAtIndex:i withObject:begin];
 		if (i == 0)
 			break;
 		--i;
@@ -264,51 +275,41 @@
 	beginRange = NSMakeRange(i, updateRange.location - i);
 	DEBUG(@"beginRange = %@, begin = %@", NSStringFromRange(beginRange), begin);
 
-	for (i = updateRange.location; i < [scopeArray count]; i++)
-	{
-		ViScope *s = [scopeArray objectAtIndex:i];
-		if (s == begin || [[begin scopes] isEqualToStringArray:[s scopes]])
-		{
+	for (i = updateRange.location; i < [_scopeArray count]; i++) {
+		ViScope *s = [_scopeArray objectAtIndex:i];
+		if (s == begin || [[begin scopes] isEqualToStringArray:[s scopes]]) {
 			beginRange.length++;
 			if (s != begin)
-				[scopeArray replaceObjectAtIndex:i withObject:begin];
-		}
-		else if (i >= NSMaxRange(updateRange) && [s range].location == i)
-		{
+				[_scopeArray replaceObjectAtIndex:i withObject:begin];
+		} else if (i >= NSMaxRange(updateRange) && [s range].location == i) {
 			DEBUG(@"stopping at %i: %@", i, s);
 			NSRange r = [s range];
-			if (r.location < i)
-			{
+			if (r.location < i) {
 				[s setRange:NSMakeRange(i, NSMaxRange(r) - i)];
 				DEBUG(@"adjusting scope at %i: %@", i, s);
 			}
 			break;
-		}
-		else
-		{
-			if (begin)
-			{
+		} else {
+			if (begin) {
 				[begin setRange:beginRange];
 				DEBUG(@"%@", begin);
 				[set addObject:begin];
 			}
 			begin = s;
 			beginRange = NSMakeRange(i, 1);
-			if ([set containsObject:begin])
-			{
-				begin = [[ViScope alloc] initWithScopes:[s scopes] range:[s range]];
-				[scopeArray replaceObjectAtIndex:i withObject:begin];
+			if ([set containsObject:begin]) {
+				begin = [ViScope scopeWithScopes:[s scopes] range:[s range]];
+				[_scopeArray replaceObjectAtIndex:i withObject:begin];
 			}
 		}
 	}
 
-	if (begin)
-	{
+	if (begin) {
 		[begin setRange:beginRange];
 		DEBUG(@"%@", begin);
 	}
 
-	DEBUG(@"done");
+	DEBUG(@"%s", "done");
 
 #if 0
 	gettimeofday(&stop_time, NULL);
@@ -332,12 +333,10 @@
 		return;
 
 	NSString *key;
-	for (key in [captures allKeys])
-	{
+	for (key in [captures allKeys]) {
 		NSDictionary *capture = [captures objectForKey:key];
 		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
-		if (r.length > 0)
-		{
+		if (r.length > 0) {
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
 			[self setScopes:[NSArray arrayWithObject:[capture objectForKey:@"name"]] inRange:r additive:YES];
 		}
@@ -365,26 +364,26 @@
 	      [beginMatch scope], aRange.location, aRange.length);
 
 	ViRegexp *endRegexp = [beginMatch endRegexp];
-	if (endRegexp == nil)
-	{
-		endRegexp = [language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
-			 withBackreferencesToRegexp:[beginMatch beginMatch]
-			                  matchText:chars];
+	if (endRegexp == nil) {
+		endRegexp = [_language compileRegexp:[[beginMatch pattern] objectForKey:@"end"]
+			  withBackreferencesToRegexp:[beginMatch beginMatch]
+					   matchText:_chars];
 	}
 
-	if (endRegexp == nil)
-	{
-		DEBUG(@"!!!!!!!!! no end regexp?");
+	if (endRegexp == nil) {
+		DEBUG(@"%s", "!!!!!!!!! no end regexp?");
 		return nil;
 	}
 
 	// get all matches, one might be overlapped by a subpattern
-	regexps_tried++;
 	NSArray *matches = nil;
-	aRange.location -= offset;
-	matches = [endRegexp allMatchesInCharacters:chars range:aRange start:offset];
+	aRange.location -= _offset;
+	matches = [endRegexp allMatchesInCharacters:_chars range:aRange start:_offset];
 
-	regexps_matched += [matches count];
+#ifdef STATISTICS
+	_regexps_tried++;
+	_regexps_matched += [matches count];
+#endif
 
 	return matches;
 }
@@ -408,27 +407,24 @@
 	NSArray *topScopes = [self scopesFromMatches:openMatches withoutContentForMatch:nil];
 
 	// keep an array of matches so we can sort it in order to skip overlapping matches
-	NSMutableArray *matchingPatterns = [[NSMutableArray alloc] init];
+	NSMutableArray *matchingPatterns = [NSMutableArray array];
 	NSMutableDictionary *pattern;
 
 	ViSyntaxMatch *topOpenMatch = [openMatches lastObject];
-	if (topOpenMatch)
-	{
+	if (topOpenMatch) {
 		NSArray *endMatches = [self endMatchesForBeginMatch:topOpenMatch inRange:aRange];
 		DEBUG(@"found %u possible end matches to scope [%@]", [endMatches count], [topOpenMatch scope]);
-		ViRegexpMatch *match;
-		for (match in endMatches)
-		{
+		for (ViRegexpMatch *match in endMatches) {
 			ViSyntaxMatch *m = [[ViSyntaxMatch alloc] initWithMatch:match andPattern:[topOpenMatch pattern] atIndex:0];
 			[m setEndMatch:match];
 			[matchingPatterns addObject:m];
+			[m release];
 		}
 	}
 
-	NSRange rxRange = NSMakeRange(aRange.location - offset, aRange.length);
+	NSRange rxRange = NSMakeRange(aRange.location - _offset, aRange.length);
 	int i = 0; // patterns in textmate bundles are ordered so we need to keep track of the index in the patterns array
-	for (pattern in patterns)
-	{
+	for (pattern in patterns) {
 		/* Match all patterns against this range.
 		 */
 		ViRegexp *regexp = [pattern objectForKey:@"matchRegexp"];
@@ -437,10 +433,12 @@
 		if (regexp == nil)
 			continue;
 		NSArray *matches;
-		regexps_tried++;
-		matches = [regexp allMatchesInCharacters:chars range:rxRange start:offset];
+		matches = [regexp allMatchesInCharacters:_chars range:rxRange start:_offset];
 
-		regexps_matched += [matches count];
+#ifdef STATISTICS
+		_regexps_tried++;
+		_regexps_matched += [matches count];
+#endif
 
 		if ([matches count] == 0)
 			DEBUG(@"  matching against pattern %@", [pattern objectForKey:@"name"]);
@@ -448,13 +446,12 @@
 			DEBUG(@"  matching against pattern %@ = %i matches",
 			    [pattern objectForKey:@"name"], [matches count]);
 
-		ViRegexpMatch *match;
-		for (match in matches)
-		{
+		for (ViRegexpMatch *match in matches) {
 			ViSyntaxMatch *viMatch = [[ViSyntaxMatch alloc] initWithMatch:match
 									   andPattern:pattern
 									      atIndex:i];
 			[matchingPatterns addObject:viMatch];
+			[viMatch release];
 		}
 
 		++i;
@@ -464,28 +461,25 @@
 	DEBUG(@"applying %u matches in range %u + %u",
 	    [matchingPatterns count], aRange.location, aRange.length);
 	NSUInteger lastLocation = aRange.location;
-	ViSyntaxMatch *aMatch;
-	for (aMatch in matchingPatterns)
-	{
-		if ([aMatch beginLocation] < lastLocation)
-		{
+	for (ViSyntaxMatch *aMatch in matchingPatterns) {
+		if ([aMatch beginLocation] < lastLocation) {
 			// skip overlapping matches
-			regexps_overlapped++;
+#ifdef STATISTICS
+			_regexps_overlapped++;
+#endif
 			DEBUG(@"skipping overlapping match for [%@] at %u + %u",
 			    [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			continue;
 		}
 
-		if ([aMatch beginLocation] > lastLocation)
-		{
+		if ([aMatch beginLocation] > lastLocation) {
 			// Apply current scopes before adding the new match
 			[self setScopes:topScopes
 				inRange:NSMakeRange(lastLocation, [aMatch beginLocation] - lastLocation)
 			       additive:NO];
 		}
 
-		if ([aMatch isSingleLineMatch])
-		{
+		if ([aMatch isSingleLineMatch]) {
 			DEBUG(@"got match on [%@] at %u + %u (subpattern)",
 			      [aMatch scope],
 			      [[aMatch beginMatch] rangeOfMatchedString].location,
@@ -495,9 +489,7 @@
 				[self setScopes:[NSArray arrayWithObject:[aMatch scope]] inRange:[aMatch matchedRange] additive:YES];
 			/* We might not have a scope for the whole match. There is probably only captures, which is ok. */
 			[self highlightCapturesInMatch:aMatch];
-		}
-		else if ([aMatch endMatch])
-		{
+		} else if ([aMatch endMatch]) {
 			ViRegexpMatch *endMatch = [aMatch endMatch];
 			[topOpenMatch setEndMatch:endMatch];
 			DEBUG(@"got end match on [%@] at %u + %u",
@@ -510,8 +502,7 @@
 			[self highlightEndCapturesInMatch:aMatch];
 
 			// pop one or more open matches off the stack and return the rest
-			while ([openMatches count] > 0)
-			{
+			while ([openMatches count] > 0) {
 				openMatches = [openMatches subarrayWithRange:NSMakeRange(0, [openMatches count] - 1)];
 				topOpenMatch = [openMatches lastObject];
 				if (topOpenMatch == nil)
@@ -533,9 +524,7 @@
 
 			DEBUG(@"returning %i continuation matches", [openMatches count]);
 			return [openMatches count] > 0 ? openMatches : nil;
-		}
-		else
-		{
+		} else {
 			DEBUG(@"got begin match on [%@] at %u + %u", [aMatch scope], [aMatch beginLocation], [aMatch beginLength]);
 			NSArray *newTopScopes = [aMatch scope] ? [topScopes arrayByAddingObject:[aMatch scope]] : topScopes;
 			[self setScopes:newTopScopes inRange:[[aMatch beginMatch] rangeOfMatchedString] additive:NO];
@@ -545,26 +534,25 @@
 			range.length = NSMaxRange(aRange) - range.location;
 			logIndent++;
 			BOOL tmpEOL = NO;
-			NSArray *continuationMatches = [self applyPatterns:[language expandedPatternsForPattern:[aMatch pattern]]
+			NSArray *continuationMatches = [self applyPatterns:[_language expandedPatternsForPattern:[aMatch pattern]]
 								   inRange:range
 							       openMatches:[openMatches arrayByAddingObject:aMatch]
 								reachedEOL:&tmpEOL];
 			logIndent--;
 			// need to highlight captures _after_ the main pattern has been highlighted
 			[self highlightBeginCapturesInMatch:aMatch];
-			if (tmpEOL == YES)
-			{
+			if (tmpEOL == YES) {
 				if (reachedEOL)
 					*reachedEOL = YES;
 				DEBUG(@"returning %i continuation matches", [continuationMatches count]);
 				return continuationMatches;
 			}
 		}
+
 		lastLocation = [aMatch endLocation];
 		// just stop if we passed our line range
-		if (lastLocation >= NSMaxRange(aRange))
-		{
-			DEBUG(@"skipping further matches as we passed our line range");
+		if (lastLocation >= NSMaxRange(aRange)) {
+			DEBUG(@"%s", "skipping further matches as we passed our line range");
 			break;
 		}
 	}
@@ -576,8 +564,7 @@ done:
 	if (reachedEOL)
 		*reachedEOL = YES;
 
-	if (openMatches)
-	{
+	if (openMatches) {
 		DEBUG(@"returning %i continuation matches", [openMatches count]);
 		return openMatches;
 	}
@@ -587,8 +574,8 @@ done:
 - (NSArray *)scopesFromMatches:(NSArray *)matches withoutContentForMatch:(ViSyntaxMatch *)skipContentMatch
 {
 	NSMutableArray *scopes = [[NSMutableArray alloc] initWithCapacity:[matches count] + 1];
-	if ([[language name] length] > 0)
-		[scopes addObject:[language name]];
+	if ([[_language name] length] > 0)
+		[scopes addObject:[_language name]];
 	for (ViSyntaxMatch *m in matches) {
 		if ([[m scope] length] > 0)
 			[scopes addObject:[m scope]];
@@ -600,7 +587,7 @@ done:
 	}
 
 	DEBUG(@"got scopes [%@]", [scopes componentsJoinedByString:@" "]);
-	return scopes;
+	return [scopes autorelease];
 }
 
 - (NSArray *)highlightLineInRange:(NSRange)aRange
@@ -611,21 +598,17 @@ done:
 
 	// should we continue on multi-line matches?
 	BOOL reachedEOL = NO;
-	while ([continuedMatches count] > 0)
-	{
+	while ([continuedMatches count] > 0) {
 		DEBUG(@"continuing with match [%@] (of %i total) at %@",
 		    [[continuedMatches lastObject] scope],
 		    [continuedMatches count], NSStringFromRange(aRange));
 
-		ViSyntaxMatch *m;
-		for (m in continuedMatches)
-		{
+		for (ViSyntaxMatch *m in continuedMatches)
 			[m setBeginLocation:aRange.location];
-		}
 
 		ViSyntaxMatch *topMatch = [continuedMatches lastObject];
 
-		continuedMatches = [self applyPatterns:[language expandedPatternsForPattern:[topMatch pattern]]
+		continuedMatches = [self applyPatterns:[_language expandedPatternsForPattern:[topMatch pattern]]
 					       inRange:aRange
 					   openMatches:continuedMatches
 					    reachedEOL:&reachedEOL];
@@ -642,7 +625,7 @@ done:
 	}
 
 	// search top-level patterns
-	return [self applyPatterns:[language patterns]
+	return [self applyPatterns:[_language patterns]
 	                   inRange:aRange
 	               openMatches:[NSArray array]
 	                reachedEOL:nil];
@@ -650,44 +633,43 @@ done:
 
 - (void)parseContext:(ViSyntaxContext *)aContext
 {
-#if 0
+#ifdef STATISTICS
 	struct timeval start;
 	struct timeval stop_time;
 	struct timeval diff;
 	gettimeofday(&start, NULL);
+
+	_regexps_tried = 0;
+	_regexps_overlapped = 0;
+	_regexps_matched = 0;
+	_regexps_cached = 0;
 #endif
 
-	context = aContext;
+	[_context release];
+	_context = [aContext retain];
 
-	regexps_tried = 0;
-	regexps_overlapped = 0;
-	regexps_matched = 0;
-	regexps_cached = 0;
-
-	[[NSGarbageCollector defaultCollector] disable];
-
-	offset = context.range.location;
-	chars = context.characters;
-	NSUInteger lineno = context.lineOffset;
+	_offset = _context.range.location;
+	_chars = _context.characters;
+	NSUInteger lineno = _context.lineOffset;
 
 	DEBUG(@"parsing line %u (%u -> %u)",
-		context.lineOffset,
-		context.range.location,
-		NSMaxRange(context.range));
+		_context.lineOffset,
+		_context.range.location,
+		NSMaxRange(_context.range));
 
 	NSArray *continuedMatches = [self continuedMatchesForLine:lineno - 1];
 
-	NSUInteger nextRange = offset;
-	NSUInteger maxRange = NSMaxRange(context.range);
+	NSUInteger nextRange = _offset;
+	NSUInteger maxRange = NSMaxRange(_context.range);
 
 	// highlight each line separately
 	for (;;)
 	{
 		unichar ch = '\0';
 		NSUInteger end = nextRange;
-		while (end < maxRange && (ch = chars[end - offset]) != '\n' && ch != '\r')
+		while (end < maxRange && (ch = _chars[end - _offset]) != '\n' && ch != '\r')
 			++end;
-		if (ch == '\r' && end + 1 < maxRange && chars[end + 1 - offset] == '\n')
+		if (ch == '\r' && end + 1 < maxRange && _chars[end + 1 - _offset] == '\n')
 			++end;
 		if (end < maxRange)
 			++end;
@@ -701,36 +683,34 @@ done:
 		if (line.length > 3000) {
 			/* Extremely large lines result in beachballing. */
 			NSRange overflow = NSMakeRange(line.location + 3000, line.length - 3000);
-			[self setScopes:[NSArray arrayWithObject:[language name]]
+			[self setScopes:[NSArray arrayWithObject:_language.name]
 			        inRange:overflow
 			       additive:NO];
 			line.length = 3000;
 		}
 
 		DEBUG(@"---> line number %i (%u -> %u, w/offset %u, length %u)",
-		    lineno, nextRange, end, offset, end - nextRange);
+		    lineno, nextRange, end, _offset, end - nextRange);
 
 		continuedMatches = [self highlightLineInRange:line continueWithMatches:continuedMatches];
 		nextRange = end;
 
 		NSArray *endMatches = [self continuedMatchesForLine:lineno];
+		BOOL equalMatches = (endMatches && [continuedMatches isEqualToPatternArray:endMatches]);
 		[self setContinuation:continuedMatches forLine:lineno];
+		// endMatches is now replaced and invalid (released)
+		endMatches = nil;
 
-		if (nextRange >= maxRange)
-		{
-			if (endMatches == nil || ![continuedMatches isEqualToPatternArray:endMatches])
-			{
+		if (nextRange >= maxRange) {
+			if (!equalMatches) {
 				DEBUG(@"detected changed line end matches in incremental mode at line %u", lineno);
 				/* Signal that we must continue re-parsing lines following this line.
 				 */
-				context.lineOffset = lineno + 1;
+				_context.lineOffset = lineno + 1;
 			}
 			break;
-		}
-		else if (context.restarting)
-		{
-			if (endMatches && [continuedMatches isEqualToPatternArray:endMatches])
-			{
+		} else if (_context.restarting) {
+			if (equalMatches) {
 				DEBUG(@"detected matching line end matches, stopping at line %u", lineno);
 				break;
 			}
@@ -739,21 +719,20 @@ done:
 		lineno++;
 	}
 
-#if 0
+#ifdef STATISTICS
 	gettimeofday(&stop_time, NULL);
 	timersub(&stop_time, &start, &diff);
 	unsigned ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
 	DEBUG(@"regexps tried: %u, matched: %u, overlapped: %u, cached: %u  => %u lines in %.3f s",
-		regexps_tried, regexps_matched, regexps_overlapped, regexps_cached, lineno + 1, (float)ms / 1000.0);
+		_regexps_tried, _regexps_matched, _regexps_overlapped, _regexps_cached, lineno + 1, (float)ms / 1000.0);
 #endif
 
-	[context setRange:NSMakeRange(offset, nextRange - offset)];
-	chars = NULL;
+	[_context setRange:NSMakeRange(_offset, nextRange - _offset)];
+	_chars = NULL;
 
-	[self updateScopeRangesInRange:[context range]];
-
-	[[NSGarbageCollector defaultCollector] enable];
-	[[NSGarbageCollector defaultCollector] collectIfNeeded];
+	[self updateScopeRangesInRange:[_context range]];
+	[_context release];
+	_context = nil;
 }
 
 @end

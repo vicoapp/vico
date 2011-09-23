@@ -2,10 +2,10 @@
 
 @interface ExTextField : NSTextField
 {
-	NSMutableArray		*history;
-	int			 historyIndex;
-	NSString		*current;
-	BOOL			 running;
+	NSMutableArray		*_history;
+	int			 _historyIndex;
+	NSString		*_current;
+	BOOL			 _running;
 }
 
 - (BOOL)ex_cancel:(ViCommand *)command;

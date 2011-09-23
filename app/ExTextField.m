@@ -13,25 +13,34 @@
 - (void)awakeFromNib
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	history = [NSMutableArray arrayWithArray:[defs arrayForKey:@"exhistory"]];
-	if (history == nil)
-		history = [NSMutableArray array];
-	DEBUG(@"loaded %lu lines from history", [history count]);
+	NSArray *exhistory = [defs arrayForKey:@"exhistory"];
+	if (exhistory)
+		_history = [exhistory mutableCopy];
+	else
+		_history = [[NSMutableArray alloc] init];
+	DEBUG(@"loaded %lu lines from history", [_history count]);
+}
+
+- (void)dealloc
+{
+	[_history release];
+	[_current release];
+	[super dealloc];
 }
 
 - (void)addToHistory:(NSString *)line
 {
 	/* Add the command to the history. */
-	NSUInteger i = [history indexOfObject:line];
+	NSUInteger i = [_history indexOfObject:line];
 	if (i != NSNotFound)
-		[history removeObjectAtIndex:i];
-	[history insertObject:line atIndex:0];
-	while ([history count] > 100)
-		[history removeLastObject];
+		[_history removeObjectAtIndex:i];
+	[_history insertObject:line atIndex:0];
+	while ([_history count] > 100)
+		[_history removeLastObject];
 
-	DEBUG(@"history = %@", history);
+	DEBUG(@"history = %@", _history);
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	[defs setObject:history forKey:@"exhistory"];
+	[defs setObject:_history forKey:@"exhistory"];
 }
 
 - (BOOL)becomeFirstResponder
@@ -39,45 +48,48 @@
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 	DEBUG(@"using field editor %@", editor);
 
-	current = nil;
-	historyIndex = -1;
+	[_current release];
+	_current = nil;
+	_historyIndex = -1;
 
 	[editor setInsertMode:nil];
 	[editor setCaret:0];
 
-	running = YES;
+	_running = YES;
 	return [super becomeFirstResponder];
 }
 
 - (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix
 {
-	if (historyIndex == -1)
-		current = [self stringValue];
+	if (_historyIndex == -1) {
+		[_current release];
+		_current = [[self stringValue] copy];
+	}
 
 	ViTextView *editor = (ViTextView *)[self currentEditor];
 
-	int i = historyIndex;
+	int i = _historyIndex;
 	DEBUG(@"history index = %i, count = %lu, prefix = %@",
-	    historyIndex, [history count], prefix);
-	while (upwards ? i + 1 < [history count] : i > 0) {
+	    _historyIndex, [_history count], prefix);
+	while (upwards ? i + 1 < [_history count] : i > 0) {
 		i += (upwards ? +1 : -1);
-		NSString *item = [history objectAtIndex:i];
+		NSString *item = [_history objectAtIndex:i];
 		DEBUG(@"got item %@", item);
 		if ([prefix length] == 0 || [[item lowercaseString] hasPrefix:prefix]) {
 			DEBUG(@"insert item %@", item);
 			// [self setStringValue:item];
 			[editor setString:item];
 			[editor setInsertMode:nil];
-			historyIndex = i;
+			_historyIndex = i;
 			return YES;
 		}
 	}
 
 	if (!upwards && i == 0) {
-		// [self setStringValue:current];
-		[editor setString:current];
+		// [self setStringValue:_current];
+		[editor setString:_current];
 		[editor setInsertMode:nil];
-		historyIndex = -1;
+		_historyIndex = -1;
 		return YES;
 	}
 
@@ -110,7 +122,7 @@
 
 - (BOOL)ex_cancel:(ViCommand *)command
 {
-	running = NO;
+	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:nil];
 	return YES;
@@ -120,7 +132,7 @@
 {
 	NSString *exCommand = [self stringValue];
 	[self addToHistory:exCommand];
-	running = NO;
+	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:exCommand];
 	return YES;
@@ -155,7 +167,7 @@
 
 - (void)textDidEndEditing:(NSNotification *)aNotification
 {
-	if (running)
+	if (_running)
 		[self ex_cancel:nil];
 	else
 		[super textDidEndEditing:aNotification];

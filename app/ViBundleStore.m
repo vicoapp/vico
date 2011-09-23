@@ -7,24 +7,41 @@
 
 @implementation ViBundleStore
 
-static ViBundleStore *defaultStore = nil;
-static NSString *bundlesDirectory = nil;
-
 + (NSString *)bundlesDirectory
 {
-	if (bundlesDirectory == nil)
-		bundlesDirectory = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"Bundles"];
-	return bundlesDirectory;
+	static NSString *__bundlesDirectory = nil;
+	if (__bundlesDirectory == nil)
+		__bundlesDirectory = [[[ViAppController supportDirectory] stringByAppendingPathComponent:@"Bundles"] retain];
+	return __bundlesDirectory;
+}
+
++ (ViBundleStore *)defaultStore
+{
+	static ViBundleStore *__defaultStore = nil;
+	if (__defaultStore == nil) {
+		__defaultStore = [[ViBundleStore alloc] init];
+		[__defaultStore initLanguages];
+	}
+	return __defaultStore;
 }
 
 - (id)init
 {
 	self = [super init];
 	if (self) {
-		languages = [NSMutableDictionary dictionary];
-		cachedPreferences = [NSMutableDictionary dictionary];
+		_languages = [[NSMutableDictionary alloc] init];
+		_bundles = [[NSMutableDictionary alloc] init];
+		_cachedPreferences = [[NSMutableDictionary alloc] init];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_languages release];
+	[_bundles release];
+	[_cachedPreferences release];
+	[super dealloc];
 }
 
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory
@@ -33,22 +50,23 @@ static NSString *bundlesDirectory = nil;
 	if (bundle == nil)
 		return NO;
 
-	NSString *uuid = [bundle uuid];
-	ViBundle *oldBundle = [bundles objectForKey:uuid];
+	ViBundle *oldBundle = [_bundles objectForKey:bundle.uuid];
 	if (oldBundle) {
 		INFO(@"replacing bundle %@ with %@", oldBundle, bundle);
-		for (ViLanguage *lang in [oldBundle languages])
-			[languages removeObjectForKey:[lang name]];
+		for (ViLanguage *lang in oldBundle.languages)
+			[_languages removeObjectForKey:lang.name];
 		/* Reset cached preferences to remove any pref in oldBundle. */
-		cachedPreferences = [NSMutableDictionary dictionary];
+		[_cachedPreferences release];
+		_cachedPreferences = [[NSMutableDictionary alloc] init];
 		/* FIXME: remove any defined languages in oldBundle, re-compile/clear cache for dependent languages. */
 		/* FIXME: clear cache for theme attributes? */
 	}
 
-	[bundles setObject:bundle forKey:[bundle uuid]];
+	[_bundles setObject:bundle forKey:bundle.uuid];
+	[bundle release];
 
-	for (ViLanguage *lang in [bundle languages])
-		[languages setObject:lang forKey:[lang name]];
+	for (ViLanguage *lang in bundle.languages)
+		[_languages setObject:lang forKey:lang.name];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViBundleStoreBundleLoadedNotification
 							    object:self
@@ -61,39 +79,28 @@ static NSString *bundlesDirectory = nil;
 {
 	NSArray *subdirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:aPath error:NULL];
 	for (NSString *subdir in subdirs)
-		[self loadBundleFromDirectory:[NSString stringWithFormat:@"%@/%@", aPath, subdir]];
+		[self loadBundleFromDirectory:[aPath stringByAppendingPathComponent:subdir]];
 }
 
 - (void)initLanguages
 {
-	languages = [NSMutableDictionary dictionary];
-	bundles = [NSMutableDictionary dictionary];
-
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 	[self addBundlesFromBundleDirectory:[ViBundleStore bundlesDirectory]];
-}
-
-+ (ViBundleStore *)defaultStore
-{
-	if (defaultStore == nil) {
-		defaultStore = [[ViBundleStore alloc] init];
-		[defaultStore initLanguages];
-	}
-	return defaultStore;
 }
 
 - (ViLanguage *)languageForFirstLine:(NSString *)firstLine
 {
 	ViLanguage *language;
 	for (language in [self languages]) {
-		NSString *firstLineMatch = [language firstLineMatch];
+		NSString *firstLineMatch = language.firstLineMatch;
 		if (firstLineMatch == nil)
 			continue;
 
-		ViRegexp *rx = [[ViRegexp alloc] initWithString:firstLineMatch];
-		if ([rx matchInString:firstLine]) {
-			DEBUG(@"Using language %@ for first line [%@]", [language name], firstLine);
-			DEBUG(@"Using bundle %@", [[language bundle] name]);
+		ViRegexp *rx = [ViRegexp regexpWithString:firstLineMatch];
+		BOOL match = ([rx matchInString:firstLine] != nil);
+		if (match) {
+			DEBUG(@"Using language %@ for first line [%@]", language.name, firstLine);
+			DEBUG(@"Using bundle %@", language.bundle.name);
 			return language;
 		}
 	}
@@ -105,21 +112,17 @@ static NSString *bundlesDirectory = nil;
 - (ViLanguage *)languageForFilename:(NSString *)aPath
 {
 	NSCharacterSet *pathSeparators = [NSCharacterSet characterSetWithCharactersInString:@"./"];
-	ViLanguage *language;
 
-	for (language in [self languages]) {
-		NSArray *fileTypes = [language fileTypes];
-		NSString *fileType;
-
-		for (fileType in fileTypes) {
+	for (ViLanguage *language in [self languages]) {
+		for (NSString *fileType in [language fileTypes]) {
 			NSUInteger path_len = [aPath length];
 			NSUInteger ftype_len = [fileType length];
 
 			if ([aPath hasSuffix:fileType] &&
 			    (path_len == ftype_len ||
 			     [pathSeparators characterIsMember:[aPath characterAtIndex:path_len - ftype_len - 1]])) {
-				DEBUG(@"Using language %@ for file %@", [language name], aPath);
-				DEBUG(@"Using bundle %@", [[language bundle] name]);
+				DEBUG(@"Using language %@ for file %@", language.name, aPath);
+				DEBUG(@"Using bundle %@", language.bundle.name);
 				return language;
 			}
 		}
@@ -140,38 +143,38 @@ static NSString *bundlesDirectory = nil;
 
 - (ViLanguage *)languageWithScope:(NSString *)scopeName
 {
-	return [languages objectForKey:scopeName];
+	return [_languages objectForKey:scopeName];
 }
 
 - (NSArray *)languages
 {
-	return [languages allValues];
+	return [_languages allValues];
 }
 
 - (NSArray *)sortedLanguages
 {
-	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc]
-	    initWithKey:@"displayName" ascending:YES];
+	NSSortDescriptor *descriptor = [[[NSSortDescriptor alloc]
+	    initWithKey:@"displayName" ascending:YES] autorelease];
 	return [[self languages] sortedArrayUsingDescriptors:
 	    [NSArray arrayWithObject:descriptor]];
 }
 
 - (NSArray *)allBundles
 {
-	return [bundles allValues];
+	return [_bundles allValues];
 }
 
 - (ViBundle *)bundleWithName:(NSString *)name
 {
 	for (ViBundle *b in [self allBundles])
-		if ([[b name] isEqualToString:name])
+		if ([b.name isEqualToString:name])
 			return b;
 	return nil;
 }
 
 - (ViBundle *)bundleWithUUID:(NSString *)uuid
 {
-	return [bundles objectForKey:uuid];
+	return [_bundles objectForKey:uuid];
 }
 
 /*
@@ -180,12 +183,12 @@ static NSString *bundlesDirectory = nil;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames
 {
 	NSString *cacheKey = [prefsNames componentsJoinedByString:@","];
-	NSMutableDictionary *result = [cachedPreferences objectForKey:cacheKey];
+	NSMutableDictionary *result = [_cachedPreferences objectForKey:cacheKey];
 	if (result)
 		return result;
 
-	result = [[NSMutableDictionary alloc] init];
-	[cachedPreferences setObject:result forKey:cacheKey];
+	result = [NSMutableDictionary dictionary];
+	[_cachedPreferences setObject:result forKey:cacheKey];
 
 	for (ViBundle *bundle in [self allBundles]) {
 		NSDictionary *p = [bundle preferenceItems:prefsNames];
@@ -201,12 +204,12 @@ static NSString *bundlesDirectory = nil;
  */
 - (NSDictionary *)preferenceItem:(NSString *)prefsName
 {
-	NSMutableDictionary *result = [cachedPreferences objectForKey:prefsName];
+	NSMutableDictionary *result = [_cachedPreferences objectForKey:prefsName];
 	if (result)
 		return result;
 
-	result = [[NSMutableDictionary alloc] init];
-	[cachedPreferences setObject:result forKey:prefsName];
+	result = [NSMutableDictionary dictionary];
+	[_cachedPreferences setObject:result forKey:prefsName];
 
 	for (ViBundle *bundle in [self allBundles]) {
 		NSDictionary *p = [bundle preferenceItem:prefsName];
@@ -226,10 +229,9 @@ static NSString *bundlesDirectory = nil;
 		return nil;
 
 	for (ViBundle *bundle in [self allBundles]) {
-		NSArray *preferences = bundle.preferences;
-		for (NSDictionary *preference in preferences) {
+		for (NSDictionary *preference in bundle.preferences) {
 			NSString *scopeSelector = [preference objectForKey:@"scope"];
-			if (scopeSelector == nil)
+			if (![scopeSelector isKindOfClass:[NSString class]])
 				scopeSelector = @"";
 			u_int64_t r = [scopeSelector match:scope];
 			if (r == 0 || r < rank)
@@ -281,10 +283,10 @@ static NSString *bundlesDirectory = nil;
 
 	for (ViBundle *bundle in [self allBundles])
 		for (ViBundleItem *item in [bundle items])
-			if ([item tabTrigger] &&
-			    [prefix hasSuffix:[item tabTrigger]] &&
-			    ([item mode] == ViAnyMode || [item mode] == mode)) {
-				NSUInteger triggerLength = [[item tabTrigger] length];
+			if (item.tabTrigger &&
+			    [prefix hasSuffix:item.tabTrigger] &&
+			    (item.mode == ViAnyMode || item.mode == mode)) {
+				NSUInteger triggerLength = [item.tabTrigger length];
 
 				/*
 				 * "m" should NOT match the prefix "mm", but may match "#m".
@@ -303,7 +305,7 @@ static NSString *bundlesDirectory = nil;
 				} else if (triggerLength < longestMatch)
 					continue;
 
-				NSString *scopeSelector = [item scopeSelector];
+				NSString *scopeSelector = item.scopeSelector;
 				u_int64_t rank;
 				if (scopeSelector == nil)
 					rank = 1ULL;
@@ -332,11 +334,11 @@ static NSString *bundlesDirectory = nil;
 	NSMutableArray *matches = nil;
 	u_int64_t highest_rank = 0ULL;
 
-	for (ViBundle *bundle in [self allBundles])
-		for (ViBundleItem *item in [bundle items])
-			if ([item keyCode] == keyCode &&
-			    ([item mode] == ViAnyMode || [item mode] == mode)) {
-				NSString *scopeSelector = [item scopeSelector];
+	for (ViBundle *bundle in [self allBundles]) {
+		for (ViBundleItem *item in [bundle items]) {
+			if (item.keyCode == keyCode &&
+			    (item.mode == ViAnyMode || item.mode == mode)) {
+				NSString *scopeSelector = item.scopeSelector;
 				u_int64_t rank;
 				if (scopeSelector == nil)
 					rank = 1ULL;
@@ -351,14 +353,16 @@ static NSString *bundlesDirectory = nil;
 						[matches addObject:item];
 				}
 			}
+		}
+	}
 
 	return matches;
 }
 
-- (BOOL)isBundleLoaded:(NSString *)name
+- (BOOL)isBundleLoaded:(NSString *)name // XXX: this is sooo fragile!
 {
 	for (ViBundle *bundle in [self allBundles])
-		if ([[bundle path] rangeOfString:name].location != NSNotFound)
+		if ([bundle.path rangeOfString:name].location != NSNotFound)
 			return YES;
 	return NO;
 }

@@ -5,12 +5,14 @@
 
 @interface ViBundleStore : NSObject
 {
-	NSMutableDictionary *languages;
-	NSMutableDictionary *bundles;
-	NSMutableDictionary *cachedPreferences;
+	NSMutableDictionary *_languages;
+	NSMutableDictionary *_bundles;
+	NSMutableDictionary *_cachedPreferences;
 }
+
 + (NSString *)bundlesDirectory;
 + (ViBundleStore *)defaultStore;
+
 - (ViLanguage *)languageForFirstLine:(NSString *)firstLine;
 - (ViLanguage *)languageForFilename:(NSString *)aPath;
 - (ViLanguage *)languageWithScope:(NSString *)scopeName;
@@ -32,5 +34,6 @@
                        inMode:(ViMode)mode;
 - (BOOL)isBundleLoaded:(NSString *)name;
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory;
+- (void)initLanguages;
 
 @end

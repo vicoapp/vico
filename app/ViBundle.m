@@ -405,9 +405,6 @@
 		_path = [bundleDirectory copy];
 		_parser = [[NuParser alloc] init];
 
-		[[NSApp delegate] loadStandardModules:[_parser context]];
-		[_parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
-
 		NSString *dir = [_path stringByAppendingPathComponent:@"Syntaxes"];
 		NSString *file;
 		for (file in [fm contentsOfDirectoryAtPath:dir error:NULL]) {

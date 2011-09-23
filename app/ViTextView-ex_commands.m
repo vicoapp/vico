@@ -171,8 +171,6 @@
 	NSString *script = [[[self textStorage] string] substringWithRange:command.range];
 	NSError *error = nil;
 	NuParser *parser = [[NuParser alloc] init];
-	[[NSApp delegate] loadStandardModules:[parser context]];
-	[parser setValue:[ViEventManager defaultManager] forKey:@"eventManager"];
 	[[NSApp delegate] eval:script
 		    withParser:parser
 		      bindings:nil

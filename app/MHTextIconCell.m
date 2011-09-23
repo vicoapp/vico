@@ -7,9 +7,33 @@
 
 @implementation MHTextIconCell
 
-@synthesize image;
-@synthesize modified;
-@synthesize statusImage;
+@synthesize image = _image;
+@synthesize modified = _modified;
+@synthesize statusImage = _statusImage;
+@synthesize modImage = _modImage;
+
+- (void)dealloc
+{
+	[_image release];
+	[_modImage release];
+	[_statusImage release];
+	[super dealloc];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+	// NSCopyObject() horror story!
+	// http://robnapier.net/blog/implementing-nscopying-439
+	// MHTextIconCell *copy = (MHTextIconCell *)[super copyWithZone:zone];
+	MHTextIconCell *copy = [[[self class] allocWithZone:zone] initTextCell:[self stringValue]];
+	copy.image = self.image;
+	copy.modified = self.modified;
+	copy.statusImage = self.statusImage;
+	copy.modImage = self.modImage;
+	[copy setFont:[self font]];
+	[copy setTextColor:[self textColor]];
+	return copy;
+}
 
 - (void)editWithFrame:(NSRect)aRect
                inView:(NSView *)controlView
@@ -18,7 +42,7 @@
                 event:(NSEvent *)theEvent
 {
 	NSRect textFrame, imageFrame;
-	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [image size].width, NSMinXEdge);
+	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [_image size].width, NSMinXEdge);
 	CGFloat d = (aRect.size.height - [[self font] pointSize]) / 3.0;
 	textFrame.origin.y += d;
 	textFrame.size.height -= 2*d;
@@ -37,7 +61,7 @@
                  length:(NSInteger)selLength
 {
 	NSRect textFrame, imageFrame;
-	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [image size].width, NSMinXEdge);
+	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [_image size].width, NSMinXEdge);
 	CGFloat d = (aRect.size.height - [[self font] pointSize]) / 3.0;
 	textFrame.origin.y += d;
 	textFrame.size.height -= 2*d;
@@ -54,8 +78,8 @@
 	NSSize imageSize;
 	NSRect imageFrame;
 
-	if (image != nil) {
-		imageSize = [image size];
+	if (_image != nil) {
+		imageSize = [_image size];
 		NSDivideRect(cellFrame, &imageFrame, &cellFrame, 4 + imageSize.width, NSMinXEdge);
 		if ([self drawsBackground]) {
 			[[self backgroundColor] set];
@@ -69,39 +93,38 @@
 		else
 			imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
 
-		[image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
+		[_image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
 	}
 
-	if (statusImage != nil) {
-		imageSize = [statusImage size];
+	if (_statusImage != nil) {
+		imageSize = [_statusImage size];
 		NSPoint p = NSMakePoint(NSMaxX(cellFrame) - imageSize.width, cellFrame.origin.y);
 		p.y += ceil((cellFrame.size.height + imageSize.height) / 2);
-		[statusImage compositeToPoint:p operation:NSCompositeSourceOver];
+		[_statusImage compositeToPoint:p operation:NSCompositeSourceOver];
 	}
 
-	if (modified) {
-		if (modImage == nil) {
-			modImage = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
-			modImageSize = [modImage size];
-		}
+	if (_modified) {
+		if (_modImage == nil)
+			_modImage = [[NSImage imageNamed:NSImageNameStatusPartiallyAvailable] retain];
 		NSPoint modPoint = cellFrame.origin;
+		NSSize modImageSize = [_modImage size];
 		modPoint.y += ceil((cellFrame.size.height + modImageSize.height) / 2);
 		modPoint.x = imageFrame.origin.x - modImageSize.width;
-		[modImage compositeToPoint:modPoint operation:NSCompositeSourceOver];
+		[_modImage compositeToPoint:modPoint operation:NSCompositeSourceOver];
 	}
 
 	CGFloat d = (cellFrame.size.height - [[self font] pointSize]) / 3.0;
 	cellFrame.origin.y += d;
 	cellFrame.size.height -= 2*d;
-	if (statusImage)
-		cellFrame.size.width -= [statusImage size].width;
+	if (_statusImage)
+		cellFrame.size.width -= [_statusImage size].width;
 	[super drawWithFrame:cellFrame inView:controlView];
 }
 
 - (NSSize)cellSize
 {
 	NSSize cellSize = [super cellSize];
-	cellSize.width += (image ? [image size].width : 0) + (statusImage ? [statusImage size].width : 0) + 4;
+	cellSize.width += (_image ? [_image size].width : 0) + (_statusImage ? [_statusImage size].width : 0) + 4;
 	return cellSize;
 }
 

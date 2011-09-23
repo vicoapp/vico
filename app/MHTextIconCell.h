@@ -1,13 +1,14 @@
 @interface MHTextIconCell : NSTextFieldCell
 {
-	NSImage *image;
-	NSImage *modImage;
-	NSImage *statusImage;
-	NSSize modImageSize;
-	BOOL modified;
+	NSImage	*_image;
+	NSImage	*_modImage;
+	NSImage	*_statusImage;
+	BOOL	 _modified;
 }
-@property(nonatomic,readwrite,assign) NSImage *image;
-@property(nonatomic,readwrite,assign) NSImage *statusImage;
+
+@property(nonatomic,readwrite,retain) NSImage *image;
+@property(nonatomic,readwrite,retain) NSImage *statusImage;
+@property(nonatomic,readwrite,retain) NSImage *modImage;
 @property(nonatomic,readwrite) BOOL modified;
 
 @end

@@ -235,13 +235,11 @@
 	[self eachGroup:^(ViMarkGroup *group) { [group addMarksFromArray:marksToAdd]; }];
 }
 
-- (void)removeMark:(ViMark *)mark
+- (void)removeMarkAtIndex:(NSUInteger)index
 {
-	NSUInteger index = [_marks indexOfObject:mark]; // XXX: linear search!
-	if (index == NSNotFound)
-		return;
-
+	ViMark *mark = [_marks objectAtIndex:index];
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:index];
+
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 	[_marks removeObjectAtIndex:index];
 	if (mark.name)
@@ -249,6 +247,14 @@
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group removeMark:mark]; }];
+}
+
+- (void)removeMark:(ViMark *)mark
+{
+	NSUInteger index = [_marks indexOfObject:mark]; // XXX: linear search!
+	if (index == NSNotFound)
+		return;
+	[self removeMarkAtIndex:index];
 }
 
 - (ViMark *)lookup:(NSString *)aName
@@ -330,6 +336,25 @@
 - (ViMark *)current
 {
 	return [self markAtIndex:_currentIndex];
+}
+
+- (void)push:(ViMark *)mark
+{
+	DEBUG(@"pushing mark %@", mark);
+	[self addMark:mark];
+	[self last];
+}
+
+- (ViMark *)pop
+{
+	ViMark *mark = nil;
+	if (_currentIndex >= 0 && _currentIndex < [_marks count]) {
+		mark = [[_marks objectAtIndex:_currentIndex] retain];
+		[self removeMarkAtIndex:_currentIndex];
+		[self last];
+	}
+	DEBUG(@"popped mark %@", mark);
+	return mark;
 }
 
 - (NSString *)description

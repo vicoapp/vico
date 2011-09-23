@@ -44,6 +44,7 @@
 - (NSUInteger)count;
 - (void)addMark:(ViMark *)mark;
 - (void)addMarksFromArray:(NSArray *)marksToAdd;
+- (void)removeMarkAtIndex:(NSUInteger)index;
 - (void)removeMark:(ViMark *)mark;
 
 - (ViMark *)first;
@@ -51,6 +52,9 @@
 - (ViMark *)next;
 - (ViMark *)previous;
 - (ViMark *)current;
+
+- (void)push:(ViMark *)mark;
+- (ViMark *)pop;
 
 @end
 

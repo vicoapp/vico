@@ -38,3 +38,6 @@
 (global NSLog (NuBridgedFunction functionWithName:"nu_log" signature:"v@"))
 (global puts (NuBridgedFunction functionWithName:"nu_log" signature:"v@"))
 
+(global NSMaxRange (do (range) (+ (range first) (range second))))
+(global NSBackwardsSearch 4)
+

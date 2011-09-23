@@ -1,6 +1,6 @@
 @interface ViToolbarPopUpButtonCell : NSPopUpButtonCell
 {
-	NSImage *image;
+	NSImage *_image;
 }
 @end
 

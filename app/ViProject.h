@@ -2,8 +2,8 @@
 
 @interface ViProject : NSDocument
 {
-	ViWindowController *windowController;
-	NSURL *initialURL;
+	ViWindowController	*_windowController;
+	NSURL			*_initialURL;
 }
 
 @property(nonatomic,readonly) NSURL *initialURL;

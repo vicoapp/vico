@@ -6,27 +6,34 @@
 
 @implementation ViProject
 
-@synthesize initialURL;
-@synthesize windowController;
+@synthesize initialURL = _initialURL;
+@synthesize windowController = _windowController;
 
 - (NSString *)title
 {
-	return [[initialURL path] lastPathComponent];
+	return [[_initialURL path] lastPathComponent];
 }
 
 - (void)makeWindowControllers
 {
-	windowController = [[ViWindowController alloc] init];
-	[self addWindowController:windowController];
-	[windowController setProject:self];
-	[windowController browseURL:initialURL];
+	_windowController = [[ViWindowController alloc] init];
+	[self addWindowController:_windowController];
+	[_windowController setProject:self];
+	[_windowController browseURL:_initialURL];
 	ViDocument *doc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
 	[doc setIsTemporary:YES];
 }
 
+- (void)dealloc
+{
+	[_windowController release];
+	[_initialURL release];
+	[super dealloc];
+}
+
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
-	initialURL = url;
+	_initialURL = [url retain];
 	return YES;
 }
 

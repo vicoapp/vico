@@ -138,6 +138,7 @@
 	for (; line <= lastLine; line++) {
 		NSUInteger location = [textStorage locationForStartOfLine:line];
 
+		rectCount = 0;
 		rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(location, 0)
                                      withinSelectedCharacterRange:nullRange
                                                   inTextContainer:container

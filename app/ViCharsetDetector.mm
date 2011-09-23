@@ -54,18 +54,12 @@ ViDataDetector::Report(const char *aCharset)
 
 @implementation ViCharsetDetector
 
-- (id)init
-{
-	self = [super init];
-	return self;
-}
-
 + (ViCharsetDetector *)defaultDetector
 {
-	static ViCharsetDetector *defaultDetector = nil;
-	if (defaultDetector == nil)
-		defaultDetector = [[ViCharsetDetector alloc] init];
-	return defaultDetector;
+	static ViCharsetDetector *__defaultDetector = nil;
+	if (__defaultDetector == nil)
+		__defaultDetector = [[ViCharsetDetector alloc] init];
+	return __defaultDetector;
 }
 
 - (NSStringEncoding)encodingForData:(NSData *)data

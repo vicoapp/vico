@@ -1,6 +1,7 @@
 #import "ViMark.h"
 #import "ViMarkManager.h"
 #import "ViDocument.h"
+#import "ViDocumentView.h"
 #import "ViDocumentController.h"
 
 @implementation ViMark
@@ -16,6 +17,7 @@
 @synthesize title = _title;
 @synthesize icon = _icon;
 @synthesize document = _document;
+@synthesize view = _view;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
@@ -37,6 +39,15 @@
 	return [[[ViMark alloc] initWithDocument:aDocument
 					    name:aName
 					   range:aRange] autorelease];
+}
+
++ (ViMark *)markWithView:(ViDocumentView *)aDocumentView
+		    name:(NSString *)aName
+		   range:(NSRange)aRange
+{
+	return [[[ViMark alloc] initWithView:aDocumentView
+					name:aName
+				       range:aRange] autorelease];
 }
 
 - (ViMark *)initWithURL:(NSURL *)aURL
@@ -76,6 +87,7 @@
 		       range:(NSRange)aRange
 {
 	if ((self = [super init]) != nil) {
+		DEBUG(@"got document %@", aDocument);
 		_document = [aDocument retain];
 		_name = [aName retain];
 		[self setRange:aRange];
@@ -88,6 +100,30 @@
 	}
 
 	return self;
+}
+
+- (ViMark *)initWithView:(ViDocumentView *)aDocumentView
+		    name:(NSString *)aName
+		   range:(NSRange)aRange
+{
+	if ((self = [self initWithDocument:(ViDocument *)aDocumentView.document
+				      name:aName
+				     range:aRange]) != nil) {
+		DEBUG(@"got view %@", aDocumentView);
+		_view = aDocumentView; // XXX: not retained!
+		[[NSNotificationCenter defaultCenter] addObserver:self
+							 selector:@selector(viewClosed:)
+							     name:ViViewClosedNotification
+							   object:_view];
+	}
+	return self;
+}
+
+- (void)viewClosed:(NSNotification *)notification
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	_view = nil;
+	DEBUG(@"view %@ closed for mark %@", [notification object], self);
 }
 
 - (void)dealloc
@@ -128,6 +164,7 @@
 	[doc retain];
 	[_document release];
 	_document = doc;
+	_view = nil;
 
 	if (_document == nil)
 		return;
@@ -258,9 +295,10 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViMark %@: %@, %lu:%lu %@>",
+	return [NSString stringWithFormat:@"<ViMark %p (%@): %@, %lu:%lu %@>",
+		self,
 		_name ?: _title,
-		_document ? [_document description] : [_url description],
+		_view ? [_view description] : (_document ? [_document description] : [_url description]),
 		_line, _column, NSStringFromRange(_range)];
 }
 

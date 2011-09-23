@@ -1,27 +1,29 @@
 @class ViDocument;
 @class ViMarkList;
+@class ViDocumentView;
 
 /** A marked location.
  */
 @interface ViMark : NSObject
 {
-	NSString	*_name;
-	NSUInteger	 _location;
-	NSRange		 _range;
-	NSUInteger	 _line;
-	NSUInteger	 _column;
+	NSString		*_name;
+	NSUInteger		 _location;
+	NSRange			 _range;
+	NSUInteger		 _line;
+	NSUInteger		 _column;
 
-	NSNumber	*_lineNumber;
-	NSNumber	*_columnNumber;
+	NSNumber		*_lineNumber;
+	NSNumber		*_columnNumber;
 
-	id		 _title;
-	NSImage		*_icon;
+	id			 _title;
+	NSImage			*_icon;
 
-	NSString	*_groupName;
-	NSURL		*_url;
-	ViDocument	*_document;
+	NSString		*_groupName;
+	NSURL			*_url;
+	ViDocument		*_document;
+	__weak ViDocumentView	*_view;
 
-	NSHashTable	*_lists; // XXX: lists are not retained!
+	NSHashTable		*_lists; // XXX: lists are not retained!
 }
 
 /** The name of the mark. */
@@ -46,6 +48,7 @@
 @property(nonatomic,readwrite,retain) id title;
 
 @property(nonatomic,readwrite,retain) ViDocument *document;
+@property(nonatomic,readonly) ViDocumentView *view;
 
 @property(nonatomic,readonly) NSString *groupName;
 
@@ -68,6 +71,14 @@
 - (ViMark *)initWithDocument:(ViDocument *)aDocument
 			name:(NSString *)aName
 		       range:(NSRange)aRange;
+
++ (ViMark *)markWithView:(ViDocumentView *)aDocumentView
+		    name:(NSString *)aName
+		   range:(NSRange)aRange;
+
+- (ViMark *)initWithView:(ViDocumentView *)aDocumentView
+		    name:(NSString *)aName
+		   range:(NSRange)aRange;
 
 - (void)setLocation:(NSUInteger)aLocation;
 - (void)setRange:(NSRange)aRange;

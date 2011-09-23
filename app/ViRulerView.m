@@ -1,6 +1,7 @@
 #import "ViRulerView.h"
 #import "ViTextView.h"
-#import "logging.h"
+#import "ViThemeStore.h"
+#include "logging.h"
 
 #define DEFAULT_THICKNESS   22.0
 #define RULER_MARGIN        5.0
@@ -11,18 +12,28 @@
 {
 	if ((self = [super initWithScrollView:aScrollView orientation:NSVerticalRuler]) != nil) {
 		[self setClientView:[[self scrollView] documentView]];
-		backgroundColor = [NSColor colorWithDeviceRed:(float)0xED/0xFF
-		                                        green:(float)0xED/0xFF
-		                                         blue:(float)0xED/0xFF
-		                                        alpha:1.0];
+		_backgroundColor = [NSColor colorWithDeviceRed:(float)0xED/0xFF
+							 green:(float)0xED/0xFF
+							  blue:(float)0xED/0xFF
+							 alpha:1.0];
+		[_backgroundColor retain];
                 [self resetTextAttributes];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[_textAttributes release];
+	[_backgroundColor release];
+	[super dealloc];
+}
+
 - (void)resetTextAttributes
 {
-        textAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+	[_textAttributes release];
+        _textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
                 [NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
                 nil];
@@ -84,9 +95,9 @@
 		lineCount = [[(ViTextView *)view textStorage] lineCount];
 		digits = (unsigned)log10(lineCount) + 1;
 		sampleString = [@"" stringByPaddingToLength:digits
-                                                 withString:@"8"
-                                            startingAtIndex:0];
-		stringSize = [sampleString sizeWithAttributes:textAttributes];
+						 withString:@"8"
+					    startingAtIndex:0];
+		stringSize = [sampleString sizeWithAttributes:_textAttributes];
 		return ceilf(MAX(DEFAULT_THICKNESS, stringSize.width + RULER_MARGIN * 2));
 	}
 
@@ -97,7 +108,7 @@
 {
 	NSRect bounds = [self bounds];
 
-	[backgroundColor set];
+	[_backgroundColor set];
 	NSRectFill(bounds);
 
 	[[NSColor colorWithCalibratedWhite:0.58 alpha:1.0] set];
@@ -128,9 +139,9 @@
 	
 	// Find the characters that are currently visible
 	glyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect
-	                                      inTextContainer:container];
+					      inTextContainer:container];
 	range = [layoutManager characterRangeForGlyphRange:glyphRange
-	                                  actualGlyphRange:NULL];
+					  actualGlyphRange:NULL];
 
 	NSUInteger line = [textStorage lineNumberAtLocation:range.location];
 	NSUInteger lastLine = [textStorage lineNumberAtLocation:NSMaxRange(range)];
@@ -140,9 +151,9 @@
 
 		rectCount = 0;
 		rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(location, 0)
-                                     withinSelectedCharacterRange:nullRange
-                                                  inTextContainer:container
-                                                        rectCount:&rectCount];
+				     withinSelectedCharacterRange:nullRange
+						  inTextContainer:container
+							rectCount:&rectCount];
 
 		if (rectCount > 0) {
 			// Note that the ruler view is only as tall as the visible
@@ -150,7 +161,7 @@
 			ypos = yinset + NSMinY(rects[0]) - NSMinY(visibleRect);
 
 			labelText = [NSString stringWithFormat:@"%d", line];
-			stringSize = [labelText sizeWithAttributes:textAttributes];
+			stringSize = [labelText sizeWithAttributes:_textAttributes];
 
 			// Draw string flush right, centered vertically within the line
 			NSRect rect;
@@ -159,7 +170,7 @@
 			rect.size.width = NSWidth(bounds) - RULER_MARGIN * 2.0;
 			rect.size.height = NSHeight(rects[0]);
 
-			[labelText drawInRect:rect withAttributes:textAttributes];
+			[labelText drawInRect:rect withAttributes:_textAttributes];
 		}
 	}
 }
@@ -168,9 +179,9 @@
 {
 	id view = [self clientView];
 	if ([view isKindOfClass:[ViTextView class]]) {
-		fromPoint = [view convertPoint:[theEvent locationInWindow] fromView:nil];
-		fromPoint.x = 0;
-		[(ViTextView *)view rulerView:self selectFromPoint:fromPoint toPoint:fromPoint];
+		_fromPoint = [view convertPoint:[theEvent locationInWindow] fromView:nil];
+		_fromPoint.x = 0;
+		[(ViTextView *)view rulerView:self selectFromPoint:_fromPoint toPoint:_fromPoint];
 	}
 }
 
@@ -180,7 +191,7 @@
 	if ([view isKindOfClass:[ViTextView class]]) {
 		NSPoint toPoint = [view convertPoint:[theEvent locationInWindow] fromView:nil];
 		toPoint.x = 0;
-		[(ViTextView *)view rulerView:self selectFromPoint:fromPoint toPoint:toPoint];
+		[(ViTextView *)view rulerView:self selectFromPoint:_fromPoint toPoint:toPoint];
 	}
 }
 

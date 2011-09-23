@@ -1,8 +1,8 @@
 @interface ViRulerView : NSRulerView
 {
-        NSDictionary    *textAttributes;
-	NSColor		*backgroundColor;
-	NSPoint		 fromPoint;
+        NSDictionary    *_textAttributes;
+	NSColor		*_backgroundColor;
+	NSPoint		 _fromPoint;
 }
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;

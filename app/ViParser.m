@@ -14,17 +14,38 @@
 
 @implementation ViParser
 
-@synthesize nviStyleUndo;
-@synthesize last_ftFT_command;
-@synthesize last_search_options;
+@synthesize nviStyleUndo = _nviStyleUndo;
+@synthesize lastLineSearchCommand = _lastLineSearchCommand;
+@synthesize lastSearchOptions = _lastSearchOptions;
+@synthesize map = _map;
+@synthesize command = _command;
+@synthesize dotCommand = _dotCommand;
+@synthesize lastCommand = _lastCommand;
+
++ (ViParser *)parserWithDefaultMap:(ViMap *)aMap
+{
+	return [[[ViParser alloc] initWithDefaultMap:aMap] autorelease];
+}
 
 - (ViParser *)initWithDefaultMap:(ViMap *)aMap
 {
 	if ((self = [super init]) != nil) {
-		defaultMap = aMap;
+		_defaultMap = [aMap retain];
 		[self reset];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_defaultMap release];
+	[_map release];
+	[_command release];
+	[_dotCommand release];
+	[_lastCommand release];
+	[_keySequence release];
+	[_totalKeySequence release];
+	[super dealloc];
 }
 
 - (id)fail:(NSError **)outError
@@ -37,6 +58,7 @@
 		NSString *msg = [[NSString alloc] initWithFormat:fmt
 						       arguments:ap];
 		*outError = [ViError errorWithObject:msg code:code];
+		[msg release];
 		va_end(ap);
 	}
 	[self reset];
@@ -47,10 +69,10 @@
  */
 - (ViCommand *)completeWithError:(NSError **)outError
 {
-	DEBUG(@"complete, command = %@, motion = %li", command, command.motion);
-	remainingExcessKeysPtr = nil;
+	DEBUG(@"complete, command = %@, motion = %li", _command, _command.motion);
+	_remainingExcessKeysPtr = nil;
 
-	if ([command isDot]) {
+	if ([_command isDot]) {
 		/* From nvi:
 		 * !!!
 		 * If a '.' is immediately entered after an undo command, we
@@ -58,60 +80,60 @@
 		 * is necessary because 'u' can't set the dot command -- see
 		 * vi/v_undo.c:v_undo for details.
 		 */
-		if (nviStyleUndo && [last_command isUndo])
-			command = [last_command dotCopy];
-		else if (dot_command == nil)
+		if (_nviStyleUndo && [_lastCommand isUndo])
+			[self setCommand:[[_lastCommand copy] autorelease]];
+		else if (_dotCommand == nil)
 			return [self fail:outError
 				     with:ViErrorParserNoDot
 				  message:@"No command to repeat."];
 		else {
-			int dot_count = command.count;
-			command = [dot_command dotCopy];
+			int dot_count = _command.count;
+			[self setCommand:[[_dotCommand copy] autorelease]];
 			if (dot_count > 0) {
 				DEBUG(@"override count %i/%i with %i",
-				    command.count, command.motion.count, dot_count);
-				command.count = dot_count;
-				command.motion.count = 0;
+				    _command.count, _command.motion.count, dot_count);
+				_command.count = dot_count;
+				_command.motion.count = 0;
 			}
 		}
-	} else if (command.action == @selector(move_til_char:) ||
-	    command.action == @selector(move_to_char:) ||
-	    command.action == @selector(move_back_til_char:) ||
-	    command.action == @selector(move_back_to_char:)) {
-		last_ftFT_command = command;
-	} else if (command.motion.action == @selector(move_til_char:) ||
-	    command.motion.action == @selector(move_to_char:) ||
-	    command.motion.action == @selector(move_back_til_char:) ||
-	    command.motion.action == @selector(move_back_to_char:)) {
-		last_ftFT_command = command;
+	} else if (_command.action == @selector(move_til_char:) ||
+	    _command.action == @selector(move_to_char:) ||
+	    _command.action == @selector(move_back_til_char:) ||
+	    _command.action == @selector(move_back_to_char:)) {
+		[self setLastLineSearchCommand:_command];
+	} else if (_command.motion.action == @selector(move_til_char:) ||
+	    _command.motion.action == @selector(move_to_char:) ||
+	    _command.motion.action == @selector(move_back_til_char:) ||
+	    _command.motion.action == @selector(move_back_to_char:)) {
+		[self setLastLineSearchCommand:_command];
 	}
 
-	last_command = command;
+	[self setLastCommand:_command];
 
-	if ((command.mapping.flags & ViMapSetsDot) == ViMapSetsDot) {
+	if ((_command.mapping.flags & ViMapSetsDot) == ViMapSetsDot) {
 		/* set the dot command */
-		dot_command = command;
+		[self setDotCommand:_command];
 	}
 
-	if (command.count > 0 && command.motion && command.motion.count > 0) {
+	if (_command.count > 0 && _command.motion && _command.motion.count > 0) {
 		/* From nvi:
 		 * A count may be provided both to the command and to the motion, in
 		 * which case the count is multiplicative.  For example, "3y4y" is the
 		 * same as "12yy".  This count is provided to the motion command and
 		 * not to the regular function.
 		 */
-		command.motion.count = command.count * command.motion.count;
-		command.count = 0;
-	} else if (command.count > 0 && command.motion && command.motion.count == 0) {
+		_command.motion.count = _command.count * _command.motion.count;
+		_command.count = 0;
+	} else if (_command.count > 0 && _command.motion && _command.motion.count == 0) {
 		/*
 		 * If a count is given to an operator command, attach the count
 		 * to the motion command instead.
 		 */
-		command.motion.count = command.count;
-		command.count = 0;
+		_command.motion.count = _command.count;
+		_command.count = 0;
 	}
 
-	ViCommand *ret = command;
+	ViCommand *ret = [[_command retain] autorelease];
 	[self reset];
 	return ret;
 }
@@ -130,7 +152,7 @@
 				 allowMacros:allowMacros
 				       scope:scope
 				     timeout:timeoutPtr
-				  excessKeys:remainingExcessKeysPtr
+				  excessKeys:_remainingExcessKeysPtr
 				       error:&error];
 		if (c == nil && error) {
 			if (outError)
@@ -141,8 +163,8 @@
 
 		if (c) {
 			/* XXX: what if we have more excess keys? Error or warning? */
-			if (i + 1 < [excessKeys count] && remainingExcessKeysPtr)
-				*remainingExcessKeysPtr = [excessKeys subarrayWithRange:NSMakeRange(i + 1, [excessKeys count] - (i + 1))];
+			if (i + 1 < [excessKeys count] && _remainingExcessKeysPtr)
+				*_remainingExcessKeysPtr = [excessKeys subarrayWithRange:NSMakeRange(i + 1, [excessKeys count] - (i + 1))];
 			return c;
 		}
 	}
@@ -153,7 +175,7 @@
 - (id)timeoutInScope:(ViScope *)scope
                error:(NSError **)outError
 {
-	remainingExcessKeysPtr = nil;
+	_remainingExcessKeysPtr = nil;
 	return [self handleKeySequenceInScope:scope
 				  allowMacros:YES	/* XXX: ? */
 				   didTimeout:YES
@@ -178,75 +200,75 @@
    excessKeys:(NSArray **)excessKeysPtr
         error:(NSError **)outError
 {
-	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], state);
+	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], _state);
 
-	remainingExcessKeysPtr = excessKeysPtr;
+	_remainingExcessKeysPtr = excessKeysPtr;
 
 	NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
-	[totalKeySequence addObject:keyNum];
+	[_totalKeySequence addObject:keyNum];
 
 	unichar singleKey = 0;
 	if ((keyCode & 0xFFFF0000) == 0)
 		singleKey = keyCode & 0x0000FFFF;
 
-	if (state == ViParserNeedChar) {
+	if (_state == ViParserNeedChar) {
 		if (!singleKey) {
 			/* Got a key equivalent as argument. */
 			return [self fail:outError
 				     with:ViErrorParserInvalidArgument
 				  message:@"Invalid argument: %@", [NSString stringWithKeyCode:keyCode]];
 		}
-		if (command.motion)
-			command.motion.argument = singleKey;
+		if (_command.motion)
+			_command.motion.argument = singleKey;
 		else
-			command.argument = singleKey;
+			_command.argument = singleKey;
 		return [self completeWithError:outError];
-	} else if (state == ViParserNeedRegister) {
+	} else if (_state == ViParserNeedRegister) {
 		if (!singleKey) {
 			/* Got a key equivalent as register. */
 			return [self fail:outError
 				     with:ViErrorParserInvalidRegister
 				  message:@"Invalid register: %@", [NSString stringWithKeyCode:keyCode]];
 		}
-		if (reg) {
+		if (_reg) {
 			/* nvi says: "Only one buffer may be specified." */
 			return [self fail:outError
 				     with:ViErrorParserMultipleRegisters
 				  message:@"Only one register may be specified."];
 		}
-		reg = singleKey;
-		state = ViParserInitialState;
+		_reg = singleKey;
+		_state = ViParserInitialState;
 		return nil;
 	}
 
 	/* XXX: this makes it impossible to map " (but who would want to?) */
-	if (singleKey == '"' && [map acceptsCounts]) {
+	if (singleKey == '"' && [_map acceptsCounts]) {
 		/* Expecting a register. */
-		if (state == ViParserInitialState) {
-			state = ViParserNeedRegister;
+		if (_state == ViParserInitialState) {
+			_state = ViParserNeedRegister;
 			return nil;
-		} else if (state == ViParserNeedMotion) {
+		} else if (_state == ViParserNeedMotion) {
 			/* nvi says: "Buffers should be specified before the command." */
 			return [self fail:outError
 				     with:ViErrorParserRegisterOrder
 				  message:@"Registers should be specified"
 					   " before the command."];
 		} else
-			DEBUG(@"got register in state %d ?", state);
+			DEBUG(@"got register in state %d ?", _state);
 	}
 
-	if (map == NULL)
-		map = defaultMap;
+	if (_map == nil)
+		[self setMap:_defaultMap];
 
 	/* Check if it's a repeat count, unless we're in the insert map. */
 	/* FIXME: only in initial and operator-pending state, right? */
 	/* FIXME: Some multi-key commands accepts counts in between, eg ctrl-w */
-	if ([map acceptsCounts]) {
+	if ([_map acceptsCounts]) {
 		/*
 		 * Conditionally include '0' as a repeat count only
 		 * if it's not the first digit.
 		 */
-		if (singleKey >= '1' - (count > 0 ? 1 : 0) && singleKey <= '9') {
+		if (singleKey >= '1' - (_count > 0 ? 1 : 0) && singleKey <= '9') {
 			/*
 			 * If we're in an partial/ambiguous command, test if the
 			 * count results in an unambiguous command that needs an
@@ -254,50 +276,50 @@
 			 * an argument.
 			 */
 			BOOL useCount = YES;
-			if (state == ViParserPartialCommand) {
-				NSArray *testSequence = [keySequence arrayByAddingObject:keyNum];
-				ViMapping *mapping = [map lookupKeySequence:testSequence
-								  withScope:scope
-								allowMacros:allowMacros
-								 excessKeys:nil
-								    timeout:nil
-								      error:nil];
+			if (_state == ViParserPartialCommand) {
+				NSArray *testSequence = [_keySequence arrayByAddingObject:keyNum];
+				ViMapping *mapping = [_map lookupKeySequence:testSequence
+								   withScope:scope
+								 allowMacros:allowMacros
+								  excessKeys:nil
+								     timeout:nil
+								       error:nil];
 				if ([mapping needsArgument])
 					useCount = NO;
 			}
 
 			if (useCount) {
-				count *= 10;
-				count += singleKey - '0';
-				DEBUG(@"count is now %i", count);
+				_count *= 10;
+				_count += singleKey - '0';
+				DEBUG(@"count is now %i", _count);
 				return nil;
 			}
 		}
 	}
 
-	if (state == ViParserNeedMotion &&
-	    keyCode == [[command.mapping.keySequence lastObject] integerValue]) {
+	if (_state == ViParserNeedMotion &&
+	    keyCode == [[_command.mapping.keySequence lastObject] integerValue]) {
 		/*
 		 * Operators can be doubled to imply the current line.
 		 * Do this by setting the line mode flag.
 		 */
-		command.isLineMode = YES;
+		_command.isLineMode = YES;
 		/*
 		 * We might get another count, but we don't have a motion
 		 * command, so do any updating here. This duplicates the
 		 * work done in completeWithError:.
 		 * Example: 2d3d = 6dd
 		 */
-		if (count) {
-			if (command.count)
-				command.count = command.count * count;
+		if (_count) {
+			if (_command.count)
+				_command.count = _command.count * _count;
 			else
-				command.count = count;
+				_command.count = _count;
 		}
 		return [self completeWithError:outError];
 	}
 
-	[keySequence addObject:keyNum];
+	[_keySequence addObject:keyNum];
 	return [self handleKeySequenceInScope:scope
 				  allowMacros:allowMacros
 				   didTimeout:NO
@@ -314,12 +336,12 @@
 	NSError *error = nil;
 	NSArray *excessKeys = nil;
 	BOOL timeout = didTimeout;
-	ViMapping *mapping = [map lookupKeySequence:keySequence
-					  withScope:scope
-					allowMacros:allowMacros
-					 excessKeys:&excessKeys
-					    timeout:&timeout
-					      error:&error];
+	ViMapping *mapping = [_map lookupKeySequence:_keySequence
+					   withScope:scope
+					 allowMacros:allowMacros
+					  excessKeys:&excessKeys
+					     timeout:&timeout
+					       error:&error];
 	if (timeoutPtr)
 		*timeoutPtr = timeout;
 	if (mapping == nil) {
@@ -331,10 +353,10 @@
 		}
 
 		/* Multiple matches, we need more keys to disambiguate. */
-		if (state == ViParserInitialState)
-			state = ViParserPartialCommand;
-		else if (state == ViParserNeedMotion)
-			state = ViParserPartialMotion;
+		if (_state == ViParserInitialState)
+			_state = ViParserPartialCommand;
+		else if (_state == ViParserNeedMotion)
+			_state = ViParserPartialMotion;
 		return nil;
 	}
 
@@ -354,8 +376,8 @@
 		 */
 
 		/* totalKeySequence - keySequence = macro prefix */
-		NSRange r = NSMakeRange(0, [totalKeySequence count] - [keySequence count]);
-		NSArray *prefix = [totalKeySequence subarrayWithRange:r];
+		NSRange r = NSMakeRange(0, [_totalKeySequence count] - [_keySequence count]);
+		NSArray *prefix = [_totalKeySequence subarrayWithRange:r];
 
 		ViMacro *macro = [ViMacro macroWithMapping:mapping
 						    prefix:prefix];
@@ -364,30 +386,32 @@
 		return macro;
 	}
 
-	keySequence = [NSMutableArray array];
+	[_keySequence release];
+	_keySequence = [[NSMutableArray alloc] init];
 
-	if (state == ViParserInitialState || state == ViParserPartialCommand) {
-		command = [ViCommand commandWithMapping:mapping count:count];
-		count = 0;
+	if (_state == ViParserInitialState || _state == ViParserPartialCommand) {
+		[_command release]; // XXX: should already be nil from [reset], right?
+		_command = [[ViCommand alloc] initWithMapping:mapping count:_count];
+		_count = 0;
 		// FIXME: check if a register is valid for the mapping?
-		command.reg = reg;
+		_command.reg = _reg;
 		if ([mapping isOperator]) {
-			state = ViParserNeedMotion;
-			if ((map = map.operatorMap) == nil) {
+			_state = ViParserNeedMotion;
+			if (_map.operatorMap == nil)
 				return [self fail:outError
 					     with:ViErrorParserNoOperatorMap
 					  message:@"No operator map for map %@.",
-						 [map name]];
-			}
-			DEBUG(@"%@ is an operator, using operatorMap", mapping);
+						 _map.name];
+			[self setMap:_map.operatorMap];
+			DEBUG(@"%@ is an operator, using operatorMap %@", mapping, _map);
 		} else if ([mapping needsArgument])
-			state = ViParserNeedChar;
+			_state = ViParserNeedChar;
 		else {
-			if (remainingExcessKeysPtr)
-				*remainingExcessKeysPtr = excessKeys;
+			if (_remainingExcessKeysPtr)
+				*_remainingExcessKeysPtr = excessKeys;
 			return [self completeWithError:outError];
 		}
-	} else if (state == ViParserNeedMotion || state == ViParserPartialMotion) {
+	} else if (_state == ViParserNeedMotion || _state == ViParserPartialMotion) {
 		DEBUG(@"got motion command %@", mapping);
 		if (![mapping isMotion])
 			return [self fail:outError
@@ -395,24 +419,24 @@
 				  message:@"%@ may not be used as a motion command.",
 					 mapping.keyString];
 
-		command.motion = [ViCommand commandWithMapping:mapping count:count];
-		command.motion.operator = command;
-		if (!command.isLineMode)
-			command.isLineMode = command.motion.mapping.isLineMode;
-		count = 0;
+		_command.motion = [ViCommand commandWithMapping:mapping count:_count];
+		[_command.motion setOperator:_command];
+		if (!_command.isLineMode)
+			_command.isLineMode = _command.motion.mapping.isLineMode;
+		_count = 0;
 
 		if ([mapping needsArgument])
-			state = ViParserNeedChar;
+			_state = ViParserNeedChar;
 		else {
-			if (remainingExcessKeysPtr)
-				*remainingExcessKeysPtr = excessKeys;
+			if (_remainingExcessKeysPtr)
+				*_remainingExcessKeysPtr = excessKeys;
 			return [self completeWithError:outError];
 		}
 	} else
 		return [self fail:outError
 			     with:ViErrorParserInternal
 			  message:@"Internal error in key parser with map %@.",
-				[map name]];
+				_map.name];
 
 	/* If we got excess keys from the map, parse them now. */
 	return [self pushExcessKeys:excessKeys
@@ -425,43 +449,47 @@
 - (void)reset
 {
 	DEBUG(@"%s", "resetting");
-	keySequence = [NSMutableArray array];
-	totalKeySequence = [NSMutableArray array];
-	command = nil;
-	state = ViParserInitialState;
-	count = 0;
-	map = defaultMap;
-	reg = 0;
+	[_keySequence release];
+	_keySequence = [[NSMutableArray alloc] init];
+
+	[_totalKeySequence removeAllObjects];
+
+	[_command release];
+	_command = nil;
+
+	_state = ViParserInitialState;
+	_count = 0;
+
+	[_defaultMap retain];
+	[_map release];
+	_map = _defaultMap;
+
+	_reg = 0;
 }
 
 - (BOOL)partial
 {
-	return [totalKeySequence count] > 0;
-}
-
-- (void)setMap:(ViMap *)aMap
-{
-	map = aMap;
+	return [_totalKeySequence count] > 0;
 }
 
 - (void)setVisualMap
 {
-	map = [ViMap visualMap];
+	[self setMap:[ViMap visualMap]];
 }
 
 - (void)setInsertMap
 {
-	map = [ViMap insertMap];
+	[self setMap:[ViMap insertMap]];
 }
 
 - (void)setExplorerMap
 {
-	map = [ViMap explorerMap];
+	[self setMap:[ViMap explorerMap]];
 }
 
 - (NSString *)keyString
 {
-	return [NSString stringWithKeySequence:totalKeySequence];
+	return [NSString stringWithKeySequence:_totalKeySequence];
 }
 
 @end

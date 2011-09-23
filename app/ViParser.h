@@ -16,34 +16,47 @@ typedef enum {
  */
 @interface ViParser : NSObject
 {
-	ViMap *defaultMap;
-	ViMap *map;
+	ViMap		*_defaultMap;
+	ViMap		*_map;
 
-	ViParserState state;
+	ViParserState	 _state;
 
-	NSMutableArray *keySequence;
-	NSMutableArray *totalKeySequence;
+	NSMutableArray	*_keySequence;
+	NSMutableArray	*_totalKeySequence;
 
-	NSArray **remainingExcessKeysPtr;
+	NSArray		**_remainingExcessKeysPtr; // XXX: not retained
 
-	ViCommand *command;
-	unichar reg; /* register */
-	int count;
+	ViCommand	*_command;
+	unichar		 _reg; /* register */
+	int		 _count;
 
 	/* dot state */
-	ViCommand *dot_command;
+	ViCommand	*_dotCommand;
 
 	/* Used for nvi-style undo. */
-	BOOL nviStyleUndo;
-	ViCommand *last_command;
+	BOOL		 _nviStyleUndo;
+	ViCommand	*_lastCommand;
 
-	ViCommand *last_ftFT_command;
+	ViCommand	*_lastLineSearchCommand;
 
 	// search state (XXX: move to "/ register?)
-	int last_search_options;
-
-	id text;
+	int		 _lastSearchOptions;
 }
+
+/** Change the current key map.
+ * @param aMap A new key map that should be used to parse following keys.
+ */
+@property(nonatomic,readwrite,retain) ViMap *map;
+
+@property(nonatomic,readwrite) BOOL nviStyleUndo;
+@property(nonatomic,readwrite) int lastSearchOptions;
+
+@property(nonatomic,readwrite,retain) ViCommand *command;
+@property(nonatomic,readwrite,retain) ViCommand *dotCommand;
+@property(nonatomic,readwrite,retain) ViCommand *lastCommand;
+@property(nonatomic,readwrite,retain) ViCommand *lastLineSearchCommand;
+
++ (ViParser *)parserWithDefaultMap:(ViMap *)aMap;
 
 /** Initialize a new key parser.
  * @param aMap The default map to use when mapping keys.
@@ -70,11 +83,6 @@ typedef enum {
  */
 - (void)reset;
 
-/** Change the current key map.
- * @param aMap A new key map that should be used to parse following keys.
- */
-- (void)setMap:(ViMap *)aMap;
-
 - (void)setVisualMap;
 - (void)setInsertMap;
 - (void)setExplorerMap;
@@ -89,9 +97,5 @@ typedef enum {
  * partial keys received.
  */
 - (NSString *)keyString;
-
-@property(nonatomic,readwrite) BOOL nviStyleUndo;
-@property(nonatomic,readonly) ViCommand *last_ftFT_command;
-@property(nonatomic,readwrite) int last_search_options;
 
 @end

@@ -1,6 +1,6 @@
 @interface ViRulerView : NSRulerView
 {
-        NSDictionary    *_textAttributes;
+	NSDictionary	*_textAttributes;
 	NSColor		*_backgroundColor;
 	NSPoint		 _fromPoint;
 }

@@ -17,7 +17,7 @@
 							  blue:(float)0xED/0xFF
 							 alpha:1.0];
 		[_backgroundColor retain];
-                [self resetTextAttributes];
+		[self resetTextAttributes];
 	}
 	return self;
 }
@@ -33,11 +33,11 @@
 - (void)resetTextAttributes
 {
 	[_textAttributes release];
-        _textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
-                [NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
-                nil];
-        [self setRuleThickness:[self requiredThickness]];
+	_textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+		[NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
+		[NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
+		nil];
+	[self setRuleThickness:[self requiredThickness]];
 }
 
 - (void)setClientView:(NSView *)aView
@@ -48,16 +48,16 @@
 	if (oldClientView != aView &&
 	    [oldClientView isKindOfClass:[NSTextView class]])
 		[notificationCenter removeObserver:self
-		                              name:ViTextStorageChangedLinesNotification
-		                            object:[(NSTextView *)oldClientView textStorage]];
+					      name:ViTextStorageChangedLinesNotification
+					    object:[(NSTextView *)oldClientView textStorage]];
 
 	[super setClientView:aView];
 
 	if (aView != nil && [aView isKindOfClass:[NSTextView class]])
 		[notificationCenter addObserver:self
-		                       selector:@selector(textStorageDidChangeLines:)
-		                           name:ViTextStorageChangedLinesNotification
-		                         object:[(NSTextView *)aView textStorage]];
+				       selector:@selector(textStorageDidChangeLines:)
+					   name:ViTextStorageChangedLinesNotification
+					 object:[(NSTextView *)aView textStorage]];
 }
 
 - (void)textStorageDidChangeLines:(NSNotification *)notification
@@ -113,7 +113,7 @@
 
 	[[NSColor colorWithCalibratedWhite:0.58 alpha:1.0] set];
 	[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMaxX(bounds) - 0.5, NSMinY(bounds))
-                                  toPoint:NSMakePoint(NSMaxX(bounds) - 0.5, NSMaxY(bounds))];
+				  toPoint:NSMakePoint(NSMaxX(bounds) - 0.5, NSMaxY(bounds))];
 
 	id view = [self clientView];
 	if (![view isKindOfClass:[ViTextView class]])

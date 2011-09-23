@@ -5,22 +5,46 @@
 
 @synthesize invisiblesAttributes = _invisiblesAttributes;
 
-- (id)init
+- (void)setInvisiblesAttributes:(NSDictionary *)attributes
 {
-	if ((self = [super init]) != nil) {
-		_newlineChar = [[NSString stringWithFormat:@"%C", 0x21A9] retain];
-		_tabChar = [[NSString stringWithFormat:@"%C", 0x21E5] retain];
-		_spaceChar = [@"･" retain];
-	}
-	return self;
+	[attributes retain];
+	[_invisiblesAttributes release];
+	_invisiblesAttributes = attributes;
+
+	NSString *newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
+	NSString *tabChar = [NSString stringWithFormat:@"%C", 0x21E5];
+	NSString *spaceChar = @"･";
+
+	[_newlineImage release];
+	[_tabImage release];
+	[_spaceImage release];
+
+	NSSize sz = [newlineChar sizeWithAttributes:_invisiblesAttributes];
+	_newlineImage = [[NSImage alloc] initWithSize:sz];
+	[_newlineImage lockFocusFlipped:NO];
+	[newlineChar drawAtPoint:NSMakePoint(0,0) withAttributes:_invisiblesAttributes];
+	[_newlineImage unlockFocus];
+
+	sz = [tabChar sizeWithAttributes:_invisiblesAttributes];
+	_tabImage = [[NSImage alloc] initWithSize:sz];
+	[_tabImage lockFocusFlipped:NO];
+	[tabChar drawAtPoint:NSMakePoint(0,0) withAttributes:_invisiblesAttributes];
+	[_tabImage unlockFocus];
+
+	sz = [spaceChar sizeWithAttributes:_invisiblesAttributes];
+	_spaceImage = [[NSImage alloc] initWithSize:sz];
+	[_spaceImage lockFocusFlipped:NO];
+	[spaceChar drawAtPoint:NSMakePoint(0,0) withAttributes:_invisiblesAttributes];
+	[_spaceImage unlockFocus];
+
 }
 
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_newlineChar release];
-	[_tabChar release];
-	[_spaceChar release];
+	[_newlineImage release];
+	[_tabImage release];
+	[_spaceImage release];
 	[_invisiblesAttributes release];
 	[super dealloc];
 }
@@ -35,26 +59,33 @@
 		for (glyphIndex = glyphRange.location; glyphIndex < lengthToRedraw; glyphIndex++) {
 			NSUInteger charIndex = [self characterIndexForGlyphAtIndex:glyphIndex];
 			unichar ch = [completeString characterAtIndex:charIndex];
-			NSString *visibleChar = nil;
+			NSImage *visibleImage = nil;
 
 			switch (ch) {
 			case '\n':
-				visibleChar = _newlineChar;
+				visibleImage = _newlineImage;
 				break;
 			case '\t':
-				visibleChar = _tabChar;
+				visibleImage = _tabImage;
 				break;
 			case ' ':
-				visibleChar = _spaceChar;
+				visibleImage = _spaceImage;
 				break;
 			}
 
-			if (visibleChar) {
-				NSPoint pointToDrawAt = [self locationForGlyphAtIndex:glyphIndex];
+			if (visibleImage) {
+				NSRect r;
+				r.origin = [self locationForGlyphAtIndex:glyphIndex];
 				NSRect glyphFragment = [self lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
-				pointToDrawAt.x += glyphFragment.origin.x;
-				pointToDrawAt.y = glyphFragment.origin.y;
-				[visibleChar drawAtPoint:pointToDrawAt withAttributes:_invisiblesAttributes];
+				r.origin.x += glyphFragment.origin.x;
+				r.origin.y = glyphFragment.origin.y;
+				r.size = [visibleImage size];
+				[visibleImage drawInRect:r
+						fromRect:NSZeroRect
+					       operation:NSCompositeSourceOver
+						fraction:1.0
+					  respectFlipped:YES
+						   hints:nil];
 			}
 		}
 	}

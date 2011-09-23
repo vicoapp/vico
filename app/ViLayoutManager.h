@@ -2,9 +2,9 @@
 {
 	BOOL		 _showInvisibles;
 	NSDictionary	*_invisiblesAttributes;
-	NSString	*_newlineChar;
-	NSString	*_tabChar;
-	NSString	*_spaceChar;
+	NSImage		*_newlineImage;
+	NSImage		*_tabImage;
+	NSImage		*_spaceImage;
 }
 
 @property(nonatomic,readwrite,copy) NSDictionary *invisiblesAttributes;

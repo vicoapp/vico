@@ -8,35 +8,46 @@
 
 @implementation ViTabController
 
-@synthesize window, views, selectedView, previousView;
+@synthesize window = _window;
+@synthesize views = _views;
+@synthesize selectedView = _selectedView;
+@synthesize previousView = _previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialViewController
 		      window:(NSWindow *)aWindow
 {
-	self = [super init];
-	if (self) {
-		views = [[NSMutableArray alloc] init];
-		window = aWindow;
+	if ((self = [super init]) != nil) {
+		_views = [[NSMutableArray alloc] init];
+		_window = [aWindow retain];
 
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
-		splitView = [[NSSplitView alloc] initWithFrame:frame];
-		[splitView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-		[splitView setDividerStyle:NSSplitViewDividerStylePaneSplitter];
+		_splitView = [[NSSplitView alloc] initWithFrame:frame];
+		[_splitView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[_splitView setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 
-		[splitView addSubview:[initialViewController view]];
-		[splitView adjustSubviews];
+		[_splitView addSubview:[initialViewController view]];
+		[_splitView adjustSubviews];
 
 		[self addView:initialViewController];
-
-		selectedView = initialViewController;
+		[self setSelectedView:initialViewController];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[[ViEventManager defaultManager] clearFor:self];
+	[_views release];
+	[_window release];
+	[_splitView release];
+	[super dealloc];
 }
 
 - (void)addView:(id<ViViewController>)viewController
 {
 	[viewController setTabController:self];
-	[views addObject:viewController];
+	[_views addObject:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidAddView for:viewController with:viewController, nil];
 	if ([viewController respondsToSelector:@selector(document)])
 		[[viewController document] addView:viewController];
@@ -44,20 +55,25 @@
 
 - (void)removeView:(id<ViViewController>)viewController
 {
+	[viewController retain];
+	DEBUG(@"remove view %@", viewController);
 	if ([viewController respondsToSelector:@selector(document)])
 		[[viewController document] removeView:viewController];
-	[views removeObject:viewController];
+	[_views removeObject:viewController];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViViewClosedNotification
+							    object:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
 	[[ViEventManager defaultManager] clearFor:viewController];
-	if (viewController == previousView)
-		previousView = nil;
+	if (viewController == _previousView)
+		[self setPreviousView:nil];
+	[viewController release];
 }
 
 - (NSSet *)documents
 {
-	NSMutableSet *set = [[NSMutableSet alloc] init];
+	NSMutableSet *set = [NSMutableSet set];
 
-	for (id<ViViewController> viewController in views) {
+	for (id<ViViewController> viewController in _views) {
 		if ([viewController isKindOfClass:[ViDocumentView class]]) {
 			ViDocumentView *docView = viewController;
 			ViDocument *document = [docView document];
@@ -71,7 +87,7 @@
 
 - (NSView *)view
 {
-	return splitView;
+	return _splitView;
 }
 
 - (void)normalizeSplitView:(NSSplitView *)split
@@ -113,7 +129,7 @@
 
 	if ([[split subviews] count] == 1 && [split isVertical] != isVertical) {
 		[split setVertical:isVertical];
-		[splitView adjustSubviews];
+		[_splitView adjustSubviews];
 	}
 
 	[self addView:newViewController];
@@ -131,7 +147,7 @@
 		 */
 		NSRect frame = [view frame];
 		frame.origin = NSMakePoint(0, 0);
-		NSSplitView *newSplit = [[NSSplitView alloc] initWithFrame:frame];
+		NSSplitView *newSplit = [[[NSSplitView alloc] initWithFrame:frame] autorelease];
 		[newSplit setVertical:isVertical];
 		[newSplit setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];
@@ -168,11 +184,8 @@
 	[self addView:newViewController];
 	[self removeView:viewController];
 
-	if (selectedView == viewController) {
-		[self willChangeValueForKey:@"selectedView"];
-		selectedView = newViewController;
-		[self didChangeValueForKey:@"selectedView"];
-	}
+	if (_selectedView == viewController)
+		[self setSelectedView:newViewController];
 
 	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newViewController view], newViewController);
 
@@ -206,7 +219,7 @@
 		[split setPosition:pos ofDividerAtIndex:i++];
 		pos += [split dividerThickness];
 	}
-	[splitView adjustSubviews];
+	[_splitView adjustSubviews];
 
 	return newViewController;
 }
@@ -237,7 +250,7 @@
 		[self normalizeSplitView:split];
 	}
 
-	if (selectedView == viewController) {
+	if (_selectedView == viewController) {
 		if ([split isMemberOfClass:[NSSplitView class]]) {
 			NSUInteger c = [[split subviews] count];
 			if (c > 0) {
@@ -260,7 +273,7 @@
 
 	while (closed) {
 		closed = NO;
-		for (id<ViViewController> otherView in views) {
+		for (id<ViViewController> otherView in _views) {
 			if (otherView != viewController) {
 				[self closeView:otherView];
 				closed = YES;
@@ -411,7 +424,7 @@
 
 - (void)normalizeAllViews
 {
-	[self normalizeViewsRecursively:splitView];
+	[self normalizeViewsRecursively:_splitView];
 }
 
 @end

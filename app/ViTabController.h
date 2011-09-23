@@ -23,12 +23,12 @@ enum ViViewOrderingMode {
 /** The inner NSView will be made key when the view gets focus. */
 @property(nonatomic,readonly) NSView *innerView;
 /** The containing tab controller. */
-@property(nonatomic,readwrite, assign) ViTabController *tabController;
+@property(nonatomic,readwrite,assign) ViTabController *tabController;
 /** The title of the split view. */
 - (NSString *)title;
 @optional
 /** The document that is being displayed, if available. */
-- (id<ViViewDocument>)document;
+@property(nonatomic,readwrite,assign) id<ViViewDocument> document;
 @end
 
 /** A document which can have multiple views.
@@ -72,18 +72,18 @@ enum ViViewOrderingMode {
  */
 @interface ViTabController : NSObject
 {
-	NSSplitView		*splitView;
-	NSMutableArray		*views;
-	NSWindow		*window;
-	id<ViViewController>	 selectedView;
-	id<ViViewController>	 previousView;
+	NSSplitView		*_splitView;
+	NSMutableArray		*_views;
+	NSWindow		*_window;
+	id<ViViewController>	 _selectedView;
+	id<ViViewController>	 _previousView;
 }
 
 @property(nonatomic,readonly) NSArray *views;
 /** The window this tab belongs to. */
 @property(nonatomic,readonly) NSWindow *window;
-@property(nonatomic,readwrite, assign) id<ViViewController> selectedView;
-@property(nonatomic,readwrite, assign) id<ViViewController> previousView;
+@property(nonatomic,readwrite,retain) id<ViViewController> selectedView;
+@property(nonatomic,readwrite,retain) id<ViViewController> previousView;
 
 - (id)initWithViewController:(id<ViViewController>)initialViewController
 		      window:(NSWindow *)aWindow;

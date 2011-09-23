@@ -7,17 +7,22 @@
 
 @implementation ViCommandMenuItemView : NSView
 
-@synthesize command, title;
+@synthesize command = _command;
+@synthesize title = _title;
+@synthesize attributes = _attributes;
 
 - (void)setCommand:(NSString *)aCommand
 {
-	NSSize oldSize = [commandTitle sizeWithAttributes:attributes];
-	command = aCommand;
-	commandTitle = [command visualKeyString];
-	commandSize = [commandTitle sizeWithAttributes:attributes];
+	NSSize oldSize = [_commandTitle sizeWithAttributes:_attributes];
+	[aCommand retain];
+	[_command release];
+	_command = aCommand;
+	[_commandTitle release];
+	_commandTitle = [[_command visualKeyString] retain];
+	_commandSize = [_commandTitle sizeWithAttributes:_attributes];
 
-	double dw = commandSize.width - oldSize.width;
-	double dh = commandSize.height - oldSize.height;
+	double dw = _commandSize.width - oldSize.width;
+	double dh = _commandSize.height - oldSize.height;
 
 	NSRect frame = [self frame];
 	frame.size.width += dw;
@@ -32,15 +37,17 @@
 
 - (void)setTitle:(NSString *)aTitle
 {
-	if ([aTitle isEqualToString:title])
+	if ([aTitle isEqualToString:_title])
 		return;
 
-	NSSize oldSize = [title sizeWithAttributes:attributes];
-	title = aTitle;
-	titleSize = [title sizeWithAttributes:attributes];
+	NSSize oldSize = [_title sizeWithAttributes:_attributes];
+	[aTitle retain];
+	[_title release];
+	_title = aTitle;
+	_titleSize = [_title sizeWithAttributes:_attributes];
 
-	double dw = titleSize.width - oldSize.width;
-	double dh = titleSize.height - oldSize.height;
+	double dw = _titleSize.width - oldSize.width;
+	double dh = _titleSize.height - oldSize.height;
 
 	NSRect frame = [self frame];
 	frame.size.width += dw;
@@ -50,34 +57,37 @@
 
 - (id)initWithTitle:(NSString *)aTitle command:(NSString *)aCommand font:(NSFont *)aFont
 {
-	double w, h;
+	if ((self = [super initWithFrame:NSMakeRect(0, 0, 100, 20)]) != nil) {
+		double w, h;
 
-	command = aCommand;
-	commandTitle = [command visualKeyString];
+		_command = [aCommand retain];
+		_commandTitle = [[_command visualKeyString] retain];
 
-	attributes = [NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0]
-							forKey:NSFontAttributeName];
-	titleSize = [aTitle sizeWithAttributes:attributes];
-	commandSize = [commandTitle sizeWithAttributes:attributes];
-	disabledColor = [NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF
-						  green:(CGFloat)0xE5/0xFF
-						   blue:(CGFloat)0xE5/0xFF
-						  alpha:1.0];
-	highlightColor = [NSColor colorWithCalibratedRed:(CGFloat)0x2B/0xFF
-						   green:(CGFloat)0x41/0xFF
-						    blue:(CGFloat)0xD3/0xFF
-						   alpha:1.0];
-	normalColor = [NSColor colorWithCalibratedRed:(CGFloat)0xD5/0xFF
-						green:(CGFloat)0xD5/0xFF
-						 blue:(CGFloat)0xD5/0xFF
-						alpha:1.0];
+		[self setAttributes:[NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0]
+								       forKey:NSFontAttributeName]];
+		_titleSize = [aTitle sizeWithAttributes:_attributes];
+		_commandSize = [_commandTitle sizeWithAttributes:_attributes];
+		_disabledColor = [NSColor colorWithCalibratedRed:(CGFloat)0xE5/0xFF
+							   green:(CGFloat)0xE5/0xFF
+							    blue:(CGFloat)0xE5/0xFF
+							   alpha:1.0];
+		_highlightColor = [NSColor colorWithCalibratedRed:(CGFloat)0x2B/0xFF
+							    green:(CGFloat)0x41/0xFF
+							     blue:(CGFloat)0xD3/0xFF
+							    alpha:1.0];
+		_normalColor = [NSColor colorWithCalibratedRed:(CGFloat)0xD5/0xFF
+							 green:(CGFloat)0xD5/0xFF
+							  blue:(CGFloat)0xD5/0xFF
+							 alpha:1.0];
+		[_disabledColor retain];
+		[_highlightColor retain];
+		[_normalColor retain];
 
-	h = titleSize.height + 1;
-	w = 20 + titleSize.width + 30 + commandSize.width + 15;
+		h = _titleSize.height + 1;
+		w = 20 + _titleSize.width + 30 + _commandSize.width + 15;
+		[self setFrame:NSMakeRect(0, 0, w, h)];
 
-	self = [super initWithFrame:NSMakeRect(0, 0, w, h)];
-	if (self) {
-		title = aTitle;
+		_title = [aTitle retain];
 		[self setAutoresizingMask:NSViewWidthSizable];
 	}
 	return self;
@@ -90,6 +100,18 @@
 			      font:aFont];
 }
 
+- (void)dealloc
+{
+	[_attributes release];
+	[_command release];
+	[_commandTitle release];
+	[_title release];
+	[_disabledColor release];
+	[_highlightColor release];
+	[_normalColor release];
+	[super dealloc];
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
 	BOOL enabled = [[self enclosingMenuItem] isEnabled];
@@ -100,31 +122,31 @@
 		[[NSBezierPath bezierPathWithRect:[self bounds]] fill];
 	}
 
-	attributes = [NSMutableDictionary dictionaryWithObject:[[[self enclosingMenuItem] menu] font]
-							forKey:NSFontAttributeName];
+	[self setAttributes:[NSMutableDictionary dictionaryWithObject:[[[self enclosingMenuItem] menu] font]
+							       forKey:NSFontAttributeName]];
 	if (!enabled)
-		[attributes setObject:[NSColor disabledControlTextColor]
-			       forKey:NSForegroundColorAttributeName];
+		[_attributes setObject:[NSColor disabledControlTextColor]
+				forKey:NSForegroundColorAttributeName];
 	else if (highlighted)
-		[attributes setObject:[NSColor selectedMenuItemTextColor]
-			       forKey:NSForegroundColorAttributeName];
+		[_attributes setObject:[NSColor selectedMenuItemTextColor]
+				forKey:NSForegroundColorAttributeName];
 	else
-		[attributes setObject:[NSColor controlTextColor]
-			       forKey:NSForegroundColorAttributeName];
-	[title drawAtPoint:NSMakePoint(21, 1) withAttributes:attributes];
+		[_attributes setObject:[NSColor controlTextColor]
+				forKey:NSForegroundColorAttributeName];
+	[_title drawAtPoint:NSMakePoint(21, 1) withAttributes:_attributes];
 
 	NSRect b = [self bounds];
-	NSPoint p = NSMakePoint(b.size.width - commandSize.width - 15, 1);
-	NSRect bg = NSMakeRect(p.x - 4, p.y, commandSize.width + 8, commandSize.height);
+	NSPoint p = NSMakePoint(b.size.width - _commandSize.width - 15, 1);
+	NSRect bg = NSMakeRect(p.x - 4, p.y, _commandSize.width + 8, _commandSize.height);
 	if (!enabled)
-		[disabledColor set];
+		[_disabledColor set];
 	else if (highlighted)
-		[highlightColor set];
+		[_highlightColor set];
 	else
-		[normalColor set];
+		[_normalColor set];
 	[[NSBezierPath bezierPathWithRoundedRect:bg xRadius:6 yRadius:6] fill];
 
-	[commandTitle drawAtPoint:p withAttributes:attributes];
+	[_commandTitle drawAtPoint:p withAttributes:_attributes];
 }
 
 - (void)viewWillMoveToWindow:(NSWindow *)newWindow

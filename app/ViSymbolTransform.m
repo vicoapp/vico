@@ -7,10 +7,8 @@
 
 - (ViSymbolTransform *)initWithTransformationString:(NSString *)aString
 {
-	self = [super init];
-	if (self)
-	{
-		transformations = [[NSMutableArray alloc] init];
+	if ((self = [super init]) != nil) {
+		_transformations = [[NSMutableArray alloc] init];
 
 		NSScanner *scan = [NSScanner scannerWithString:aString];
 		NSCharacterSet *skipSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
@@ -39,13 +37,13 @@
 				if (options == nil)
 					options = @"";
 
-				ViRegexp *rx = [[ViRegexp alloc] initWithString:regexp];
+				ViRegexp *rx = [ViRegexp regexpWithString:regexp];
 				if (rx == nil) {
 					INFO(@"invalid regexp: %@", regexp);
 					return nil;
 				}
 
-				[transformations addObject:[NSArray arrayWithObjects:rx, format, options, nil]];
+				[_transformations addObject:[NSArray arrayWithObjects:rx, format, options, nil]];
 				[scan scanString:@";" intoString:nil];
 			} else if (ch == '#') {
 				// skip comments
@@ -59,11 +57,17 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	[_transformations release];
+	[super dealloc];
+}
+
 - (NSString *)transformSymbol:(NSString *)aSymbol
 {
 	NSString *trSymbol = aSymbol;
 	NSArray *tr;
-	for (tr in transformations) {
+	for (tr in _transformations) {
 		ViRegexp *rx = [tr objectAtIndex:0];
 		trSymbol = [self transformValue:trSymbol
 		                    withPattern:rx

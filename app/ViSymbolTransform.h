@@ -2,7 +2,7 @@
 
 @interface ViSymbolTransform : ViTransformer
 {
-	NSMutableArray *transformations;
+	NSMutableArray *_transformations;
 }
 
 - (ViSymbolTransform *)initWithTransformationString:(NSString *)aString;

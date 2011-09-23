@@ -1,6 +1,7 @@
 #import "ViRulerView.h"
 #import "ViTextView.h"
 #import "ViThemeStore.h"
+#import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
 
 #define DEFAULT_THICKNESS   22.0
@@ -27,6 +28,8 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[_textAttributes release];
 	[_backgroundColor release];
+	for (int i = 0; i < 10; i++)
+		[_digits[i] release];
 	[super dealloc];
 }
 
@@ -37,7 +40,23 @@
 		[NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
 		[NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
 		nil];
+
+	_digitSize = [@"8" sizeWithAttributes:_textAttributes];
+
 	[self setRuleThickness:[self requiredThickness]];
+
+	for (int i = 0; i < 10; i++) {
+		NSString *s = [NSString stringWithFormat:@"%i", i];
+		NSSize sz = [s sizeWithAttributes:_textAttributes];
+		NSImage *img = [[NSImage alloc] initWithSize:sz];
+		[img lockFocusFlipped:NO];
+		[_backgroundColor set];
+		NSRectFill(NSMakeRect(0, 0, sz.width, sz.height));
+		[s drawAtPoint:NSMakePoint(0,0) withAttributes:_textAttributes];
+		[img unlockFocus];
+		[_digits[i] release];
+		_digits[i] = img;
+	}
 }
 
 - (void)setClientView:(NSView *)aView
@@ -75,33 +94,39 @@
 
 	CGFloat thickness;
 	thickness = [self requiredThickness];
-	if (thickness != [self ruleThickness]) {
-		SEL sel = @selector(setRuleThickness:);
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&thickness atIndex:2];
-		[invocation performSelector:@selector(invokeWithTarget:) withObject:self afterDelay:0.0];
-	}
+	if (thickness != [self ruleThickness])
+		[[self nextRunloop] setRuleThickness:thickness];
 }
 
 - (CGFloat)requiredThickness
 {
 	NSUInteger	 lineCount, digits;
-	NSString	*sampleString;
-	NSSize		 stringSize;
 
 	id view = [self clientView];
 	if ([view isKindOfClass:[ViTextView class]]) {
 		lineCount = [[(ViTextView *)view textStorage] lineCount];
 		digits = (unsigned)log10(lineCount) + 1;
-		sampleString = [@"" stringByPaddingToLength:digits
-						 withString:@"8"
-					    startingAtIndex:0];
-		stringSize = [sampleString sizeWithAttributes:_textAttributes];
-		return ceilf(MAX(DEFAULT_THICKNESS, stringSize.width + RULER_MARGIN * 2));
+		return ceilf(MAX(DEFAULT_THICKNESS, _digitSize.width * digits + RULER_MARGIN * 2));
 	}
 
 	return 0;
+}
+
+- (void)drawLineNumber:(NSUInteger)line inRect:(NSRect)rect
+{
+	do {
+		NSUInteger rem = line % 10;
+		line = line / 10;
+
+		rect.origin.x -= _digitSize.width;
+
+		[_digits[rem] drawInRect:rect
+				fromRect:NSZeroRect
+			       operation:NSCompositeSourceOver
+				fraction:1.0
+			  respectFlipped:YES
+				   hints:nil];
+	} while (line > 0);
 }
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect
@@ -134,9 +159,12 @@
 	container = [view textContainer];
 	textStorage = [(ViTextView *)view textStorage];
 	nullRange = NSMakeRange(NSNotFound, 0);
-	yinset = [view textContainerInset].height;        
+	yinset = [view textContainerInset].height;
 	visibleRect = [[[self scrollView] contentView] bounds];
-	
+
+	if (layoutManager == nil)
+		return;
+
 	// Find the characters that are currently visible
 	glyphRange = [layoutManager glyphRangeForBoundingRect:visibleRect
 					      inTextContainer:container];
@@ -144,34 +172,42 @@
 					  actualGlyphRange:NULL];
 
 	NSUInteger line = [textStorage lineNumberAtLocation:range.location];
-	NSUInteger lastLine = [textStorage lineNumberAtLocation:NSMaxRange(range)];
+	NSUInteger location = range.location;
 
-	for (; line <= lastLine; line++) {
-		NSUInteger location = [textStorage locationForStartOfLine:line];
+	if (location >= NSMaxRange(range)) {
+		// Draw line number "0" in empty documents
 
-		rectCount = 0;
-		rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(location, 0)
-				     withinSelectedCharacterRange:nullRange
-						  inTextContainer:container
-							rectCount:&rectCount];
+		ypos = yinset - NSMinY(visibleRect);
+		// Draw digits flush right, centered vertically within the line
+		NSRect r;
+		r.origin.x = NSWidth(bounds) - RULER_MARGIN;
+		r.origin.y = ypos + 1.0;
+		r.size = _digitSize;
 
-		if (rectCount > 0) {
-			// Note that the ruler view is only as tall as the visible
-			// portion. Need to compensate for the clipview's coordinates.
-			ypos = yinset + NSMinY(rects[0]) - NSMinY(visibleRect);
+		[self drawLineNumber:0 inRect:r];
+		return;
+	}
 
-			labelText = [NSString stringWithFormat:@"%d", line];
-			stringSize = [labelText sizeWithAttributes:_textAttributes];
+	for (; location < NSMaxRange(range); line++) {
+		NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:location];
+		NSRect rect = [layoutManager lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
 
-			// Draw string flush right, centered vertically within the line
-			NSRect rect;
-			rect.origin.x = NSWidth(bounds) - stringSize.width - RULER_MARGIN;
-			rect.origin.y = ypos + (NSHeight(rects[0]) - stringSize.height) / 2.0 - 1.0;
-			rect.size.width = NSWidth(bounds) - RULER_MARGIN * 2.0;
-			rect.size.height = NSHeight(rects[0]);
+		// Note that the ruler view is only as tall as the visible
+		// portion. Need to compensate for the clipview's coordinates.
+		ypos = yinset + NSMinY(rect) - NSMinY(visibleRect);
 
-			[labelText drawInRect:rect withAttributes:_textAttributes];
-		}
+		// Draw digits flush right, centered vertically within the line
+		NSRect r;
+		r.origin.x = NSWidth(bounds) - RULER_MARGIN;
+		r.origin.y = ypos + (NSHeight(rect) - _digitSize.height) / 2.0 - 1.0;
+		r.size = _digitSize;
+
+		[self drawLineNumber:line inRect:r];
+
+		[[textStorage string] getLineStart:NULL
+					       end:&location
+				       contentsEnd:NULL
+					  forRange:NSMakeRange(location, 0)];
 	}
 }
 

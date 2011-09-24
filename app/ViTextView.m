@@ -102,6 +102,9 @@ int logIndent = 0;
 	[self setUsesFontPanel:NO];
 	[self setDrawsBackground:YES];
 
+	// Add two pixel space at top of text container
+	[self setTextContainerInset:NSMakeSize(0, 2)];
+
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
 	if ([[self textStorage] lineCount] > 3000)
 		[[self layoutManager] setAllowsNonContiguousLayout:YES];

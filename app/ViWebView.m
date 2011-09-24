@@ -64,16 +64,8 @@
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
-	DEBUG(@"command is %@", command);
 	MESSAGE(@""); // erase any previous message
-	id target = [self targetForSelector:command.action];
-	if (target == nil) {
-		MESSAGE(@"Command %@ not implemented.",
-		    command.mapping.keyString);
-		return NO;
-	}
-
-	return (BOOL)[target performSelector:command.action withObject:command];
+	return [self performCommand:command];
 }
 
 - (BOOL)scrollPage:(BOOL)isPageScroll

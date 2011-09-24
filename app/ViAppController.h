@@ -25,6 +25,7 @@ additionalBindings:(NSDictionary *)bindings
              andWait:(BOOL)waitFlag
          backChannel:(NSString *)channelName;
 - (NSError *)openURL:(NSString *)pathOrURL;
+- (IBAction)newProject:(id)sender;
 
 @end
 
@@ -34,37 +35,37 @@ int updateMeta(void);
 
 @interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
 {
-	IBOutlet NSMenu *encodingMenu;
-	IBOutlet NSMenu *viewMenu;
-	IBOutlet NSTextField *scriptInput;
-	IBOutlet NSTextView *scriptOutput;
-	IBOutlet NSMenuItem *closeDocumentMenuItem;
-	IBOutlet NSMenuItem *closeWindowMenuItem;
-	IBOutlet NSMenuItem *closeTabMenuItem;
-	IBOutlet NSMenuItem *showFileExplorerMenuItem;
-	IBOutlet NSMenuItem *showSymbolListMenuItem;
-	NSConnection *shellConn;
+	IBOutlet NSMenu		*encodingMenu;
+	IBOutlet NSMenu		*viewMenu;
+	IBOutlet NSTextField	*scriptInput;
+	IBOutlet NSTextView	*scriptOutput;
+	IBOutlet NSMenuItem	*closeDocumentMenuItem;
+	IBOutlet NSMenuItem	*closeWindowMenuItem;
+	IBOutlet NSMenuItem	*closeTabMenuItem;
+	IBOutlet NSMenuItem	*showFileExplorerMenuItem;
+	IBOutlet NSMenuItem	*showSymbolListMenuItem;
+	NSConnection		*shellConn;
 
-	TISInputSourceRef original_input_source;
-	BOOL recently_launched;
-	NSWindow *menuTrackedKeyWindow;
-	BOOL trackingMainMenu;
+	TISInputSourceRef	 original_input_source;
+	BOOL			 _recently_launched;
+	NSWindow		*_menuTrackedKeyWindow;
+	BOOL			 _trackingMainMenu;
 
 	// input of scripted ex commands
 	// XXX: in search of a better place (refugees from ExEnvironment)
-	BOOL				 busy;
-	NSString			*exString;
-	ViTextView			*fieldEditor;
+	BOOL			 _busy;
+	NSString		*_exString;
+	ViTextStorage		*_fieldEditorStorage;
+	ViTextView		*_fieldEditor;
 
 #ifdef TRIAL_VERSION
-	NSTimer *mTimer;
+	NSTimer			*mTimer;
 #endif
 }
 
 @property(nonatomic,readonly) NSMenu *encodingMenu;
-@property (nonatomic, readonly) TISInputSourceRef original_input_source;
+@property(nonatomic,readonly) TISInputSourceRef original_input_source;
 
-- (void)loadStandardModules:(NSMutableDictionary *)context;
 - (id)eval:(NSString *)script
 withParser:(NuParser *)parser
   bindings:(NSDictionary *)bindings

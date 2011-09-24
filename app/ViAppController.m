@@ -91,10 +91,16 @@
 								 forEventClass:kInternetEventClass
 								    andEventID:kAEGetURL];
 
-		[NSValueTransformer setValueTransformer:[[caretBlinkModeTransformer alloc] init]
+		[NSValueTransformer setValueTransformer:[[[caretBlinkModeTransformer alloc] init] autorelease]
 						forName:@"caretBlinkModeTransformer"];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_fieldEditor release];
+	[super dealloc];
 }
 
 // stops the application from creating an untitled document on load
@@ -114,16 +120,16 @@
 
 + (NSString *)supportDirectory
 {
-	static NSString *supportDirectory = nil;
-	if (supportDirectory == nil) {
+	static NSString *__supportDirectory = nil;
+	if (__supportDirectory == nil) {
 		NSURL *url = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
 								    inDomain:NSUserDomainMask
 							   appropriateForURL:nil
 								      create:YES
 								       error:nil];
-		supportDirectory = [[url path] stringByAppendingPathComponent:@"Vico"];
+		__supportDirectory = [[[url path] stringByAppendingPathComponent:@"Vico"] retain];
 	}
-	return supportDirectory;
+	return __supportDirectory;
 }
 
 #ifdef TRIAL_VERSION
@@ -209,7 +215,7 @@ updateMeta(void)
 	original_input_source = TISCopyCurrentKeyboardInputSource();
 	DEBUG(@"remembering original input: %@",
 	    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
-	recently_launched = YES;
+	_recently_launched = YES;
 
 	[[NSFileManager defaultManager] createDirectoryAtPath:[ViAppController supportDirectory]
 				  withIntermediateDirectories:YES
@@ -297,15 +303,16 @@ updateMeta(void)
 					   keyEquivalent:@""];
 		[item setRepresentedObject:[NSNumber numberWithUnsignedLong:*encoding]];
 		[array addObject:item];
+		[item release];
 		encoding++;
 	}
 
-	[[ViURLManager defaultManager] registerHandler:[[ViFileURLHandler alloc] init]];
-	[[ViURLManager defaultManager] registerHandler:[[ViSFTPURLHandler alloc] init]];
-	[[ViURLManager defaultManager] registerHandler:[[ViHTTPURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[[ViFileURLHandler alloc] init] autorelease]];
+	[[ViURLManager defaultManager] registerHandler:[[[ViSFTPURLHandler alloc] init] autorelease]];
+	[[ViURLManager defaultManager] registerHandler:[[[ViHTTPURLHandler alloc] init] autorelease]];
 
-	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title"
-	                                                      ascending:YES];
+	NSSortDescriptor *sdesc = [[[NSSortDescriptor alloc] initWithKey:@"title"
+	                                                       ascending:YES] autorelease];
 	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
 	for (item in array)
 		[encodingMenu addItem:item];
@@ -357,11 +364,11 @@ updateMeta(void)
 
 	/* Register default preference panes. */
 	ViPreferencesController *prefs = [ViPreferencesController sharedPreferences];
-	[prefs registerPane:[[ViPreferencePaneGeneral alloc] init]];
-	[prefs registerPane:[[ViPreferencePaneEdit alloc] init]];
-	[prefs registerPane:[[ViPreferencePaneTheme alloc] init]];
-	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
-	[prefs registerPane:[[ViPreferencePaneAdvanced alloc] init]];
+	[prefs registerPane:[[[ViPreferencePaneGeneral alloc] init] autorelease]];
+	[prefs registerPane:[[[ViPreferencePaneEdit alloc] init] autorelease]];
+	[prefs registerPane:[[[ViPreferencePaneTheme alloc] init] autorelease]];
+	[prefs registerPane:[[[ViPreferencePaneBundles alloc] init] autorelease]];
+	[prefs registerPane:[[[ViPreferencePaneAdvanced alloc] init] autorelease]];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(beginTrackingMainMenu:)
@@ -454,12 +461,12 @@ updateMeta(void)
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification
 {
-	if (!recently_launched) {
+	if (!_recently_launched) {
 		original_input_source = TISCopyCurrentKeyboardInputSource();
 		DEBUG(@"remembering original input: %@",
 		    TISGetInputSourceProperty(original_input_source, kTISPropertyLocalizedName));
 	}
-	recently_launched = NO;
+	_recently_launched = NO;
 
 	ViWindowController *wincon = [ViWindowController currentWindowController];
 	id<ViViewController> viewController = [wincon currentView];
@@ -483,7 +490,7 @@ updateMeta(void)
 	[[ViMarkInspector sharedInspector] show];
 }
 
-extern BOOL makeNewWindowInsteadOfTab;
+extern BOOL __makeNewWindowInsteadOfTab;
 
 - (IBAction)newProject:(id)sender
 {
@@ -500,7 +507,7 @@ extern BOOL makeNewWindowInsteadOfTab;
 		[alert runModal];
 	}
 #else
-	makeNewWindowInsteadOfTab = YES;
+	__makeNewWindowInsteadOfTab = YES;
 	[[ViDocumentController sharedDocumentController] newDocument:sender];
 #endif
 }
@@ -524,15 +531,6 @@ extern BOOL makeNewWindowInsteadOfTab;
 
 #pragma mark -
 #pragma mark Script evaluation
-
-- (void)loadStandardModules:(NSMutableDictionary *)context
-{
-	[Nu loadNuFile:@"nu"            fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"bridgesupport" fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"cocoa"         fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"cblocks"       fromBundleWithIdentifier:@"nu.programming.framework" withContext:context];
-	[Nu loadNuFile:@"vico"          fromBundleWithIdentifier:@"se.bzero.Vico" withContext:context];
-}
 
 - (id)eval:(NSString *)script
 withParser:(NuParser *)parser
@@ -571,8 +569,7 @@ withParser:(NuParser *)parser
 - (id)eval:(NSString *)script
      error:(NSError **)outError
 {
-	NuParser *parser = [[NuParser alloc] init];
-	[self loadStandardModules:[parser context]];
+	NuParser *parser = [[[NuParser alloc] init] autorelease];
 	return [self eval:script withParser:parser bindings:nil error:outError];
 }
 
@@ -584,8 +581,7 @@ additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName
 {
-	NuParser *parser = [[NuParser alloc] init];
-	[self loadStandardModules:[parser context]];
+	NuParser *parser = [[[NuParser alloc] init] autorelease];
 
 	if (channelName) {
 		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
@@ -648,19 +644,20 @@ additionalBindings:(NSDictionary *)bindings
 
 - (void)beginTrackingMainMenu:(NSNotification *)notification
 {
-	menuTrackedKeyWindow = [NSApp keyWindow];
-	trackingMainMenu = YES;
+	_menuTrackedKeyWindow = [[NSApp keyWindow] retain];
+	_trackingMainMenu = YES;
 }
 
 - (void)endTrackingMainMenu:(NSNotification *)notification
 {
-	menuTrackedKeyWindow = nil;
-	trackingMainMenu = NO;
+	[_menuTrackedKeyWindow release];
+	_menuTrackedKeyWindow = nil;
+	_trackingMainMenu = NO;
 }
 
 - (NSWindow *)keyWindowBeforeMainMenuTracking
 {
-	return menuTrackedKeyWindow ?: [NSApp keyWindow];
+	return _menuTrackedKeyWindow ?: [NSApp keyWindow];
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
@@ -695,7 +692,7 @@ additionalBindings:(NSDictionary *)bindings
 	 * If we're not tracking the main menu, but got triggered by a
 	 * key event, don't update displayed menu items.
 	 */
-	if (!trackingMainMenu)
+	if (!_trackingMainMenu)
 		return;
 
 	/* Do we have a selection? */
@@ -731,7 +728,7 @@ additionalBindings:(NSDictionary *)bindings
 
 - (void)forceUpdateMenu:(NSMenu *)menu
 {
-	trackingMainMenu = YES;
+	_trackingMainMenu = YES;
 
 	[self menuNeedsUpdate:menu];
 
@@ -741,7 +738,7 @@ additionalBindings:(NSDictionary *)bindings
 			[self forceUpdateMenu:submenu];
 	}
 
-	trackingMainMenu = NO;
+	_trackingMainMenu = NO;
 }
 
 #pragma mark -
@@ -749,17 +746,17 @@ additionalBindings:(NSDictionary *)bindings
 
 - (BOOL)ex_cancel:(ViCommand *)command
 {
-	if (busy)
+	if (_busy)
 		[NSApp stopModalWithCode:2];
 	return YES;
 }
 
 - (BOOL)ex_execute:(ViCommand *)command
 {
-	exString = [[fieldEditor textStorage] string];
-	if (busy)
+	_exString = [[[_fieldEditor textStorage] string] copy];
+	if (_busy)
 		[NSApp stopModalWithCode:0];
-	busy = NO;
+	_busy = NO;
 	return YES;
 }
 
@@ -767,32 +764,34 @@ additionalBindings:(NSDictionary *)bindings
 {
 	ViMacro *macro = command.macro;
 
-	if (busy) {
+	if (_busy) {
 		INFO(@"%s", "can't handle nested ex commands!");
 		return nil;
 	}
 
-	busy = YES;
-	exString = nil;
+	_busy = YES;
+	_exString = nil;
 
 	if (macro) {
 		NSInteger keyCode;
-		if (fieldEditor == nil)
-			fieldEditor = [ViTextView makeFieldEditor];
-		[fieldEditor setInsertMode:nil];
-		[fieldEditor setCaret:0];
-		[fieldEditor setString:prefix ?: @""];
-		[fieldEditor setDelegate:self];
-		while (busy && (keyCode = [macro pop]) != -1)
-			[fieldEditor.keyManager handleKey:keyCode];
+		if (_fieldEditor == nil) {
+			_fieldEditorStorage = [[ViTextStorage alloc] init];
+			_fieldEditor = [[ViTextView makeFieldEditorWithTextStorage:_fieldEditorStorage] retain];
+		}
+		[_fieldEditor setInsertMode:nil];
+		[_fieldEditor setCaret:0];
+		[_fieldEditor setString:prefix ?: @""];
+		[_fieldEditor setDelegate:self];
+		while (_busy && (keyCode = [macro pop]) != -1)
+			[_fieldEditor.keyManager handleKey:keyCode];
 	}
 
-	if (busy) {
-		busy = NO;
+	if (_busy) {
+		_busy = NO;
 		return nil;
 	}
 
-	return exString;
+	return [_exString autorelease];
 }
 
 - (NSString *)getExStringForCommand:(ViCommand *)command

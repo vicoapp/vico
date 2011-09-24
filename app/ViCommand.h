@@ -69,5 +69,6 @@
 - (BOOL)isUndo;
 - (BOOL)isDot;
 - (void)message:(NSString *)message;
+- (BOOL)performWithTarget:(id)target;
 
 @end

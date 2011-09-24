@@ -43,6 +43,13 @@
 	[super dealloc];
 }
 
+- (BOOL)performWithTarget:(id)target
+{
+	if (target == nil)
+		return NO;
+        return (BOOL)[target performSelector:_mapping.action withObject:self];
+}
+
 - (SEL)action
 {
 	return _mapping.action;

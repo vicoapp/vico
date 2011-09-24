@@ -20,6 +20,15 @@
 @synthesize view = _view;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
+{
+	return [[[ViMark alloc] initWithURL:aURL
+				       name:nil
+				      title:nil
+				       line:0
+				     column:0] autorelease];
+}
+
++ (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
                  title:(id)aTitle
                   line:(NSUInteger)aLine
@@ -56,6 +65,11 @@
                   line:(NSUInteger)aLine
                 column:(NSUInteger)aColumn
 {
+	if (aURL == nil) {
+		[self release];
+		return nil;
+	}
+
 	if ((self = [super init]) != nil) {
 		_url = [aURL retain];
 		_name = [aName retain];
@@ -77,6 +91,7 @@
 								 selector:@selector(documentAdded:)
 								     name:ViDocumentLoadedNotification
 								   object:nil];
+		DEBUG(@"init %@", self);
 	}
 
 	return self;
@@ -86,8 +101,12 @@
 			name:(NSString *)aName
 		       range:(NSRange)aRange
 {
+	if (aDocument == nil) {
+		[self release];
+		return nil;
+	}
+
 	if ((self = [super init]) != nil) {
-		DEBUG(@"got document %@", aDocument);
 		_document = [aDocument retain];
 		_name = [aName retain];
 		[self setRange:aRange];
@@ -97,6 +116,7 @@
 							   object:_document];
 
 		[self.document registerMark:self];
+		DEBUG(@"init %@", self);
 	}
 
 	return self;
@@ -106,29 +126,36 @@
 		    name:(NSString *)aName
 		   range:(NSRange)aRange
 {
+	if (aDocumentView == nil) {
+		[self release];
+		return nil;
+	}
+
 	if ((self = [self initWithDocument:(ViDocument *)aDocumentView.document
 				      name:aName
 				     range:aRange]) != nil) {
-		DEBUG(@"got view %@", aDocumentView);
 		_view = aDocumentView; // XXX: not retained!
 		[[NSNotificationCenter defaultCenter] addObserver:self
 							 selector:@selector(viewClosed:)
 							     name:ViViewClosedNotification
 							   object:_view];
+		DEBUG(@"init %@", self);
 	}
 	return self;
 }
 
 - (void)viewClosed:(NSNotification *)notification
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+							name:ViViewClosedNotification
+						      object:_view];
 	_view = nil;
 	DEBUG(@"view %@ closed for mark %@", [notification object], self);
 }
 
 - (void)dealloc
 {
-	DEBUG_DEALLOC();
+	// DEBUG_DEALLOC();
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -196,6 +223,7 @@
 
 - (void)documentRemoved:(NSNotification *)notification
 {
+	DEBUG(@"document %@ was removed (expecting %@)", [notification object], _document);
 	if ([notification object] != _document)
 		return;
 

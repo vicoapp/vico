@@ -52,6 +52,8 @@
 
 @property(nonatomic,readonly) NSString *groupName;
 
++ (ViMark *)markWithURL:(NSURL *)aURL;
+
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
                  title:(id)aTitle

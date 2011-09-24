@@ -591,7 +591,7 @@ static ViMarkManager *__sharedManager = nil;
 {
 	DEBUG(@"self is %@, sharedManager is %@", self, __sharedManager);
 	if (__sharedManager)
-		return __sharedManager;
+		return [__sharedManager retain];
 
 	if ((self = [super init]) != nil) {
 		_stacks = [[NSMutableArray alloc] init];
@@ -608,15 +608,6 @@ static ViMarkManager *__sharedManager = nil;
 	[_stacks release];
 	[_namedStacks release];
 	[super dealloc];
-}
-
-// This shouldn't be called
-- (ViMarkManager *)initWithCoder:(NSCoder *)aCoder
-{
-	DEBUG(@"self is %@, sharedManager is %@", self, __sharedManager);
-	if (__sharedManager)
-		return __sharedManager;
-	return [self init];
 }
 
 - (void)removeStack:(ViMarkStack *)stack

@@ -4,17 +4,27 @@
 
 @implementation ViCommandOutputController
 
-@synthesize tabController;
+@synthesize tabController = _tabController;
+@synthesize title = _title;
 
 - (ViCommandOutputController *)initWithHTMLString:(NSString *)content
 {
-	self = [super init];
-	if (self) {
-		[NSBundle loadNibNamed:@"CommandOutputWindow" owner:self];
+	if ((self = [super init]) != nil) {
+		if (![NSBundle loadNibNamed:@"CommandOutputWindow" owner:self]) {
+			[self release];
+			return NO;
+		}
 		[self setContent:content];
-		[self setTitle:@"command output"];
+		_title = [@"command output" retain];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[_title release];
+	[webView release]; // Top-level nib object
+	[super dealloc];
 }
 
 - (NSView *)view
@@ -25,16 +35,6 @@
 - (NSView *)innerView
 {
 	return webView;
-}
-
-- (void)setTitle:(NSString *)aTitle
-{
-	title = aTitle;
-}
-
-- (NSString *)title
-{
-	return title;
 }
 
 - (void)setContent:(NSString *)content

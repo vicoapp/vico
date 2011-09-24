@@ -6,35 +6,32 @@
 
 @implementation ViOutlineView
 
-@synthesize keyManager, strictIndentation;
+@synthesize keyManager = _keyManager;
+@synthesize strictIndentation = _strictIndentation;
 
 - (void)awakeFromNib
 {
-	if (keyManager == nil)
-		keyManager = [[ViKeyManager alloc] initWithTarget:self
-						       defaultMap:[ViMap mapWithName:@"tableNavigationMap"]];
+	if (_keyManager == nil)
+		[self setKeyManager:[ViKeyManager keyManagerWithTarget:self
+							    defaultMap:[ViMap mapWithName:@"tableNavigationMap"]]];
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
-	id target = [self targetForSelector:command.action];
-	DEBUG(@"got target %@ for command %@", target, command);
-	if (target == nil)
-		return NO;
-	return (BOOL)[target performSelector:command.action withObject:command];
+	return [self performCommand:command];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
 	if ([[self window] firstResponder] != self)
 		return NO;
-	return [keyManager performKeyEquivalent:theEvent];
+	return [_keyManager performKeyEquivalent:theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[keyManager keyDown:theEvent];
+	[_keyManager keyDown:theEvent];
 }
 
 #pragma mark -
@@ -42,11 +39,11 @@
 - (void)swipeWithEvent:(NSEvent *)event
 {
 	DEBUG(@"got swipe event %@", event);
-	[keyManager.parser reset];
+	[_keyManager.parser reset];
 	if ([event deltaX] > 0)
-		[keyManager runAsMacro:@"<ctrl-o>"];
+		[_keyManager runAsMacro:@"<ctrl-o>"];
 	else if ([event deltaX] < 0)
-		[keyManager runAsMacro:@"<ctrl-i>"];
+		[_keyManager runAsMacro:@"<ctrl-i>"];
 }
 
 #pragma mark -
@@ -54,7 +51,7 @@
 - (NSRect)frameOfCellAtColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex
 {
 	NSRect frame = [super frameOfCellAtColumn:columnIndex row:rowIndex];
-	if (strictIndentation) {
+	if (_strictIndentation) {
 		NSInteger level = [self levelForRow:rowIndex];
 		NSInteger diff = 15 + level * [self indentationPerLevel] - frame.origin.x;
 		frame.origin.x += diff;
@@ -66,7 +63,7 @@
 - (NSRect)frameOfOutlineCellAtRow:(NSInteger)rowIndex
 {
 	NSRect frame = [super frameOfOutlineCellAtRow:rowIndex];
-	if (strictIndentation) {
+	if (_strictIndentation) {
 		NSInteger level = [self levelForRow:rowIndex];
 		frame.origin.x = 4 + level * [self indentationPerLevel];
 	}

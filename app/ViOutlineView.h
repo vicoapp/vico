@@ -2,11 +2,11 @@
 
 @interface ViOutlineView : NSOutlineView <ViKeyManagerTarget>
 {
-	ViKeyManager *keyManager;
-	BOOL strictIndentation;
+	ViKeyManager	*_keyManager;
+	BOOL		 _strictIndentation;
 }
 
-@property (nonatomic, readwrite, assign) ViKeyManager *keyManager;
+@property (nonatomic, readwrite, retain) ViKeyManager *keyManager;
 @property (nonatomic, readwrite) BOOL strictIndentation;
 
 @end

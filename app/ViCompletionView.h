@@ -2,9 +2,9 @@
 
 @interface ViCompletionView : NSTableView
 {
-	ViKeyManager *keyManager;
+	ViKeyManager *_keyManager;
 }
 
-@property (nonatomic, readwrite, assign) ViKeyManager *keyManager;
+@property (nonatomic, readwrite, retain) ViKeyManager *keyManager;
 
 @end

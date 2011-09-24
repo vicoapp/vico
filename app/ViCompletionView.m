@@ -5,18 +5,18 @@
 
 @implementation ViCompletionView
 
-@synthesize keyManager;
+@synthesize keyManager = _keyManager;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {
 	if ([[self window] firstResponder] != self)
 		return NO;
-	return [keyManager performKeyEquivalent:theEvent];
+	return [_keyManager performKeyEquivalent:theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[keyManager keyDown:theEvent];
+	[_keyManager keyDown:theEvent];
 }
 
 @end

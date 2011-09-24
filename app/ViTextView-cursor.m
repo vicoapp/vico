@@ -23,7 +23,9 @@
 		caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
 	}
 
-	caretRect.origin.y += 2; // text container inset is {0, 2}
+	NSSize inset = [self textContainerInset];
+	caretRect.origin.x += inset.width;
+	caretRect.origin.y += inset.height;
 
 	if (NSWidth(caretRect) == 0)
 		caretRect.size.width = 7; // XXX

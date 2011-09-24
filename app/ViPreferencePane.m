@@ -2,26 +2,39 @@
 
 @implementation ViPreferencePane
 
-@synthesize name = paneName, icon, view;
+@synthesize name = _paneName;
+@synthesize icon = _icon;
+@synthesize view;
 
 - (id)initWithNib:(NSNib *)nib
              name:(NSString *)aName
              icon:(NSImage *)anIcon
 {
 	if ((self = [super init]) != nil) {
-		paneName = aName;
-		icon = anIcon;
-		[nib instantiateNibWithOwner:self topLevelObjects:nil];
+		if (![nib instantiateNibWithOwner:self topLevelObjects:nil]) {
+			[self release];
+			return nil;
+		}
+		_paneName = [aName copy];
+		_icon = [anIcon retain];
 	}
 
 	return self;
+}
+
+- (void)dealloc
+{
+	[_paneName release];
+	[_icon release];
+	[view release];
+	[super dealloc];
 }
 
 - (id)initWithNibName:(NSString *)nibName
                  name:(NSString *)aName
                  icon:(NSImage *)anIcon
 {
-	return [self initWithNib:[[NSNib alloc] initWithNibNamed:nibName bundle:nil]
+	return [self initWithNib:[[[NSNib alloc] initWithNibNamed:nibName bundle:nil] autorelease]
 			    name:aName
 			    icon:anIcon];
 }

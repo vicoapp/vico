@@ -23,15 +23,15 @@ ToolbarHeightForWindow(NSWindow *window)
 
 + (ViPreferencesController *)sharedPreferences
 {
-	static ViPreferencesController *sharedPreferencesController = nil;
-	if (sharedPreferencesController == nil)
-		sharedPreferencesController = [[ViPreferencesController alloc] init];
-	return sharedPreferencesController;
+	static ViPreferencesController *__sharedPreferencesController = nil;
+	if (__sharedPreferencesController == nil)
+		__sharedPreferencesController = [[ViPreferencesController alloc] init];
+	return __sharedPreferencesController;
 }
 
 - (id<ViPreferencePane>)paneWithName:(NSString *)name
 {
-	for (id<ViPreferencePane> pane in panes)
+	for (id<ViPreferencePane> pane in _panes)
 		if ([name isEqualToString:[pane name]])
 			return pane;
 	return nil;
@@ -41,16 +41,16 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	NSString *name = [pane name];
 	if ([self paneWithName:name] == nil) {
-		[panes addObject:pane];
-		NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:name];
+		[_panes addObject:pane];
+		NSToolbarItem *item = [[[NSToolbarItem alloc] initWithItemIdentifier:name] autorelease];
 		[item setLabel:name];
 		[item setTarget:self];
 		[item setAction:@selector(switchToItem:)];
 		[item setImage:[pane icon]];
-		[toolbarItems setObject:item forKey:name];
+		[_toolbarItems setObject:item forKey:name];
 
 		[[[self window] toolbar] insertItemWithItemIdentifier:name
-							      atIndex:[panes count] - 1];
+							      atIndex:[_panes count] - 1];
 
 		NSString *lastPrefPane = [[NSUserDefaults standardUserDefaults]
 		    objectForKey:@"lastPrefPane"];
@@ -62,12 +62,20 @@ ToolbarHeightForWindow(NSWindow *window)
 - (id)init
 {
 	if ((self = [super initWithWindowNibName:@"PreferenceWindow"])) {
-		blankView = [[NSView alloc] init];
-		panes = [NSMutableArray array];
-		toolbarItems = [NSMutableDictionary dictionary];
+		_blankView = [[NSView alloc] init];
+		_panes = [[NSMutableArray alloc] init];
+		_toolbarItems = [[NSMutableDictionary alloc] init];
 	}
 
 	return self;
+}
+
+- (void)dealloc
+{
+	[_blankView release];
+	[_panes release];
+	[_toolbarItems release];
+	[super dealloc];
 }
 
 - (void)windowDidLoad
@@ -76,16 +84,12 @@ ToolbarHeightForWindow(NSWindow *window)
 	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorMoveToActiveSpace];
 	[self setWindowFrameAutosaveName:@"PreferenceWindow"];
 
-	if (forceSwitchToItem)
-		[self switchToItem:forceSwitchToItem];
-	else {
-		/* Load last viewed pane. */
-		NSString *lastPrefPane = [[NSUserDefaults standardUserDefaults]
-		    objectForKey:@"lastPrefPane"];
-		if (lastPrefPane == nil)
-			lastPrefPane = @"General";
-		[self switchToItem:lastPrefPane];
-	}
+	/* Load last viewed pane. */
+	NSString *lastPrefPane = [[NSUserDefaults standardUserDefaults]
+	    objectForKey:@"lastPrefPane"];
+	if (lastPrefPane == nil)
+		lastPrefPane = @"General";
+	[self switchToItem:lastPrefPane];
 }
 
 - (void)show
@@ -126,7 +130,7 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	NSSize newSize = [view frame].size;
 
-	[[self window] setContentView:blankView];
+	[[self window] setContentView:_blankView];
 	[self resizeWindowToSize:newSize];
 	[[self window] setContentView:view];
 }
@@ -135,8 +139,6 @@ ToolbarHeightForWindow(NSWindow *window)
 {
 	NSView *view = nil;
 	NSString *identifier;
-
-	forceSwitchToItem = nil;
 
 	/*
 	 * If the call is from a toolbar button, the sender will be an
@@ -164,7 +166,6 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (void)showItem:(NSString *)item
 {
-	forceSwitchToItem = item;
 	[self show];
 	[self switchToItem:item];
 }
@@ -174,14 +175,14 @@ ToolbarHeightForWindow(NSWindow *window)
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-	return [toolbarItems allKeys];
+	return [_toolbarItems allKeys];
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
      itemForItemIdentifier:(NSString *)itemIdentifier
  willBeInsertedIntoToolbar:(BOOL)flag
 {
-	return [toolbarItems objectForKey:itemIdentifier];
+	return [_toolbarItems objectForKey:itemIdentifier];
 }
 
 

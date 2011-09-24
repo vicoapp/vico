@@ -21,13 +21,13 @@
 		NSMutableArray *a = [NSMutableArray array];
 		NSArray *usernames = [array sortedArrayUsingSelector:@selector(compare:)];
 		for (NSString *username in usernames)
-			[a addObject:[NSMutableDictionary dictionaryWithObject:[username mutableCopy] forKey:@"username"]];
+			[a addObject:[NSMutableDictionary dictionaryWithObject:[[username mutableCopy] autorelease] forKey:@"username"]];
 		return a;
 	} else if ([[array objectAtIndex:0] isKindOfClass:[NSDictionary class]]) {
 		/* Convert an array of dictionaries with "username" keys to an array of strings. */
 		NSMutableArray *a = [NSMutableArray array];
 		for (NSDictionary *dict in array)
-			[a addObject:[[dict objectForKey:@"username"] mutableCopy]];
+			[a addObject:[[[dict objectForKey:@"username"] mutableCopy] autorelease]];
 		[a sortUsingSelector:@selector(compare:)];
 		return a;
 	}
@@ -41,41 +41,50 @@
 + (BOOL)allowsReverseTransformation { return NO; }
 - (id)init {
 	self = [super init];
-	installedIcon = [NSImage imageNamed:NSImageNameStatusAvailable];
+	_installedIcon = [[NSImage imageNamed:NSImageNameStatusAvailable] retain];
 	return self;
+}
+- (void)dealloc
+{
+	[_installedIcon release];
+	[super dealloc];
 }
 - (id)transformedValue:(id)value
 {
 	if ([value isEqualToString:@"Installed"])
-		return installedIcon;
+		return _installedIcon;
 	return nil;
 }
 @end
 
 @implementation ViPreferencePaneBundles
 
+@synthesize filteredRepositories = _filteredRepositories;
+
 - (id)init
 {
 	self = [super initWithNibName:@"BundlePrefs"
 				 name:@"Bundles"
 				 icon:[NSImage imageNamed:NSImageNameNetwork]];
+	if (self == nil)
+		return nil;
 
-	repositories = [NSMutableArray array];
-	repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*(tmbundle|textmate-bundle)$)"
-					      options:ONIG_OPTION_IGNORECASE];
+	_repositories = [[NSMutableArray alloc] init];
+	_repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*(tmbundle|textmate-bundle)$)"
+					       options:ONIG_OPTION_IGNORECASE];
 
 	/* Show an icon in the status column of the repository table. */
-	[NSValueTransformer setValueTransformer:[[statusIconTransformer alloc] init]
+	[NSValueTransformer setValueTransformer:[[[statusIconTransformer alloc] init] autorelease]
 					forName:@"statusIconTransformer"];
 
-	[NSValueTransformer setValueTransformer:[[repoUserTransformer alloc] init]
+	[NSValueTransformer setValueTransformer:[[[repoUserTransformer alloc] init] autorelease]
 					forName:@"repoUserTransformer"];
 
 	/* Sort repositories by installed status, then by name. */
-	NSSortDescriptor *statusSort = [[NSSortDescriptor alloc] initWithKey:@"status"
-								   ascending:NO];
-	NSSortDescriptor *nameSort = [[NSSortDescriptor alloc] initWithKey:@"name"
-								 ascending:YES];
+	NSSortDescriptor *statusSort = [[[NSSortDescriptor alloc] initWithKey:@"status"
+								    ascending:NO] autorelease];
+	NSSortDescriptor *nameSort = [[[NSSortDescriptor alloc] initWithKey:@"name"
+								  ascending:YES] autorelease];
 	[bundlesController setSortDescriptors:[NSArray arrayWithObjects:statusSort, nameSort, nil]];
 
 	NSArray *repoUsers = [[NSUserDefaults standardUserDefaults] arrayForKey:@"bundleRepoUsers"];
@@ -86,6 +95,24 @@
 	[bundlesTable setTarget:self];
 
 	return self;
+}
+
+- (void)dealloc
+{
+	[_repositories release];
+	[_repoNameRx release];
+	[_previousRepoUsers release];
+	[_userData release];
+	[_userConnection release];
+	[_installConnection release];
+	[_installPipe release];
+	[_installTask release];
+	// Release top-level nib objects
+	[bundlesController release];
+	[repoUsersController release];
+	[progressSheet release];
+	[selectRepoSheet release];
+	[super dealloc];
 }
 
 - (NSString *)repoPathForUser:(NSString *)username readonly:(BOOL)readonly
@@ -114,28 +141,28 @@
 {
 	NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:@"LastBundleRepoReload"];
 	if (date) {
-		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
 		[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
 		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available. Last updated %@.",
 		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count],
-		    [repositories count], [dateFormatter stringFromDate:date]]];
+		    [_repositories count], [dateFormatter stringFromDate:date]]];
 	} else {
 		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available.",
-		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count], [repositories count]]];
+		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count], [_repositories count]]];
 	}
 }
 
 - (void)loadBundlesFromRepo:(NSString *)username
 {
 	/* Remove any existing repositories owned by this user. */
-	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
+	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
 
 	NSString *path = [self repoPathForUser:username readonly:YES];
 	if (path == nil)
 		return;
 	NSData *JSONData = [NSData dataWithContentsOfFile:path];
-	NSString *JSONString = [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
+	NSString *JSONString = [[[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding] autorelease];
 	NSDictionary *dict = [JSONString JSONValue];
 	if (![dict isKindOfClass:[NSDictionary class]]) {
 		INFO(@"%s", "failed to parse JSON");
@@ -145,10 +172,10 @@
 	NSArray *userBundles = [dict objectForKey:@"repositories"];
 
 	/* Remove any non-tmbundle repositories. */
-	[repositories addObjectsFromArray:userBundles];
-	[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"(name ENDSWITH \"tmbundle\") OR (name ENDSWITH \"textmate-bundle\")"]];
+	[_repositories addObjectsFromArray:userBundles];
+	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"(name ENDSWITH \"tmbundle\") OR (name ENDSWITH \"textmate-bundle\")"]];
 
-	for (NSMutableDictionary *bundle in repositories) {
+	for (NSMutableDictionary *bundle in _repositories) {
 		NSString *name = [bundle objectForKey:@"name"];
 		NSString *owner = [bundle objectForKey:@"owner"];
 		NSString *status = @"";
@@ -158,7 +185,7 @@
 
 		/* Set displayName based on name, but trim any trailing .tmbundle. */
 		NSString *displayName = [bundle objectForKey:@"name"];
-		ViRegexpMatch *m = [repoNameRx matchInString:displayName];
+		ViRegexpMatch *m = [_repoNameRx matchInString:displayName];
 		if (m)
 			displayName = [displayName stringByReplacingCharactersInRange:[m rangeOfSubstringAtIndex:1] withString:@""];
 		[bundle setObject:[displayName capitalizedString] forKey:@"displayName"];
@@ -171,22 +198,17 @@
 #pragma mark -
 #pragma mark Filtering GitHub bundle repositories
 
-- (void)setFilteredRepositories:(NSArray *)anArray
-{
-	filteredRepositories = anArray;
-}
-
 - (IBAction)filterRepositories:(id)sender
 {
 	NSString *filter = [sender stringValue];
 	if ([filter length] == 0) {
-		[self setFilteredRepositories:repositories];
+		[self setFilteredRepositories:_repositories];
 		return;
 	}
 
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(owner CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (description CONTAINS[cd] %@)",
 		filter, filter, filter];
-	[self setFilteredRepositories:[repositories filteredArrayUsingPredicate:predicate]];
+	[self setFilteredRepositories:[_repositories filteredArrayUsingPredicate:predicate]];
 }
 
 #pragma mark -
@@ -202,7 +224,7 @@
 	[NSApp endSheet:selectRepoSheet];
 
 	/* Remove repositories for any deleted users. */
-	for (NSDictionary *prevUser in previousRepoUsers) {
+	for (NSDictionary *prevUser in _previousRepoUsers) {
 		NSString *prevOwner = [prevUser objectForKey:@"username"];
 		BOOL found = NO;
 		for (NSDictionary *repoUser in [repoUsersController arrangedObjects]) {
@@ -212,16 +234,16 @@
 			}
 		}
 		if (!found) {
-			[repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", prevOwner]];
+			[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", prevOwner]];
 			[self filterRepositories:repoFilterField];
 		}
 	}
 
 	/* Reload repositories for any added users. */
-	NSMutableArray *newUsers = [[NSMutableArray alloc] init];
+	NSMutableArray *newUsers = [NSMutableArray array];
 	for (NSDictionary *repoUser in [repoUsersController arrangedObjects]) {
 		BOOL found = NO;
-		for (NSDictionary *prevUser in previousRepoUsers) {
+		for (NSDictionary *prevUser in _previousRepoUsers) {
 			if ([[repoUser objectForKey:@"username"] isEqualToString:[prevUser objectForKey:@"username"]]) {
 				found = YES;
 				break;
@@ -235,7 +257,9 @@
 
 - (IBAction)selectRepositories:(id)sender
 {
-	previousRepoUsers = [[repoUsersController arrangedObjects] copy];
+	[_previousRepoUsers release];
+	_previousRepoUsers = [[repoUsersController arrangedObjects] copy];
+
 	[NSApp beginSheet:selectRepoSheet
 	   modalForWindow:[view window]
 	    modalDelegate:self
@@ -257,25 +281,25 @@
 - (void)progressSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
 	[sheet orderOut:self];
-	progressCancelled = NO;
+	_progressCancelled = NO;
 }
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
 	[self cancelProgressSheet:nil];
-	NSDictionary *repoUser = [processQueue lastObject];
+	NSDictionary *repoUser = [_processQueue lastObject];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to load %@'s repository: %@",
 	    [repoUser objectForKey:@"username"], [error localizedDescription]]];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)download
 {
-	NSDictionary *repoUser = [processQueue lastObject];
+	NSDictionary *repoUser = [_processQueue lastObject];
 	[self loadBundlesFromRepo:[repoUser objectForKey:@"username"]];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"LastBundleRepoReload"];
 
-	[processQueue removeLastObject];
-	if ([processQueue count] == 0)
+	[_processQueue removeLastObject];
+	if ([_processQueue count] == 0)
 		[NSApp endSheet:progressSheet];
 	else
 		[self reloadNextUser];
@@ -287,19 +311,23 @@
 	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0) {
 		[progressIndicator setIndeterminate:NO];
 		[progressIndicator setMaxValue:expectedContentLength];
-		[progressIndicator setDoubleValue:receivedContentLength];
+		[progressIndicator setDoubleValue:_receivedContentLength];
 	}
 }
 
 - (void)resetProgressIndicator
 {
-	receivedContentLength = 0;
+	_receivedContentLength = 0;
 	[progressButton setTitle:@"Cancel"];
 	[progressButton setKeyEquivalent:@""];
 	[progressIndicator setIndeterminate:YES];
 	[progressIndicator startAnimation:self];
-	installConnection = nil;
-	repoDownload = nil;
+
+	[_installConnection release];
+	_installConnection = nil;
+
+	[_repoDownload release];
+	_repoDownload = nil;
 }
 
 - (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
@@ -309,31 +337,36 @@
 
 - (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
-	receivedContentLength += length;
-	[progressIndicator setDoubleValue:receivedContentLength];
+	_receivedContentLength += length;
+	[progressIndicator setDoubleValue:_receivedContentLength];
 }
 
 - (IBAction)cancelProgressSheet:(id)sender
 {
-	if (progressCancelled) {
+	if (_progressCancelled) {
 		[NSApp endSheet:progressSheet];
 		return;
 	}
 
 	/* This action is connected to both repo downloads and bundle installation. */
-	if (installConnection) {
-		[installConnection cancel];
-		[installTask terminate];
-		installConnection = nil;
-	} else if (userConnection) {
-		[userConnection cancel];
-		userConnection = nil;
+	if (_installConnection) {
+		[_installConnection cancel];
+		[_installTask terminate];
+		[_installConnection release];
+		[_installTask release];
+		_installConnection = nil;
+		_installTask = nil;
+	} else if (_userConnection) {
+		[_userConnection cancel];
+		[_userConnection release];
+		_userConnection = nil;
 	} else {
-		[repoDownload cancel];
-		repoDownload = nil;
+		[_repoDownload cancel];
+		[_repoDownload release];
+		_repoDownload = nil;
 	}
 
-	progressCancelled = YES;
+	_progressCancelled = YES;
 	[progressButton setTitle:@"OK"];
 	[progressButton setKeyEquivalent:@"\r"];
 	[progressIndicator stopAnimation:self];
@@ -342,11 +375,11 @@
 
 - (void)reloadNextUser
 {
-	NSDictionary *repo = [processQueue lastObject];
+	NSDictionary *repo = [_processQueue lastObject];
 	NSString *username = [repo objectForKey:@"username"];
 	if ([username length] == 0) {
-		[processQueue removeLastObject];
-		if ([processQueue count] == 0)
+		[_processQueue removeLastObject];
+		if ([_processQueue count] == 0)
 			[NSApp endSheet:progressSheet];
 		else
 			[self reloadNextUser];
@@ -355,9 +388,15 @@
 	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Loading user %@...", username]];
 	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/user/show/%@", username]];
-	userConnection = [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-	userData = [[NSMutableData alloc] init];
-	installConnection = nil;
+
+	[_userConnection release];
+	_userConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+
+	[_userData release];
+	_userData = [[NSMutableData alloc] init];
+
+	[_installConnection release];
+	_installConnection = nil;
 }
 
 - (void)reloadRepositoriesFromUsers:(NSArray *)users
@@ -372,7 +411,8 @@
 	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
-	processQueue = [NSMutableArray arrayWithArray:users];
+	[_processQueue release];
+	_processQueue = [[NSMutableArray alloc] initWithArray:users];
 	[self reloadNextUser];
 }
 
@@ -387,49 +427,55 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
 	[self cancelProgressSheet:nil];
-	NSMutableDictionary *repo = [processQueue lastObject];
-	if (connection == installConnection) {
+	NSMutableDictionary *repo = [_processQueue lastObject];
+	if (connection == _installConnection) {
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"displayName"], [error localizedDescription]]];
-		[installTask terminate];
-	} else if (connection == userConnection) {
+		[_installTask terminate];
+		[_installTask release];
+		_installTask = nil;
+	} else if (connection == _userConnection) {
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"username"], [error localizedDescription]]];
 	}
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-	receivedContentLength += [data length];
-	if (connection == installConnection) {
-		[progressIndicator setDoubleValue:receivedContentLength];
+	_receivedContentLength += [data length];
+	if (connection == _installConnection) {
+		[progressIndicator setDoubleValue:_receivedContentLength];
 		@try {
-			[[installPipe fileHandleForWriting] writeData:data];
+			[[_installPipe fileHandleForWriting] writeData:data];
 		}
 		@catch (NSException *exception) {
-			[installConnection cancel];
-			[installTask terminate];
+			[_installConnection cancel];
+			[_installTask terminate];
+			[_installTask release];
+			_installTask = nil;
 
 			[self cancelProgressSheet:nil];
-			NSMutableDictionary *repo = [processQueue lastObject];
+			NSMutableDictionary *repo = [_processQueue lastObject];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Installation of %@ failed when unpacking.", [repo objectForKey:@"displayName"]]];
 		}
-	} else if (connection == userConnection) {
-		[userData appendData:data];
+	} else if (connection == _userConnection) {
+		[_userData appendData:data];
 	}
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-	if (connection == installConnection)
+	if (connection == _installConnection)
 		[self setExpectedContentLengthFromResponse:response];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	if (connection == userConnection) {
-		NSMutableDictionary *repo = [processQueue lastObject];
+	if (connection == _userConnection) {
+		NSMutableDictionary *repo = [_processQueue lastObject];
 		NSString *username = [repo objectForKey:@"username"];
 
-		NSString *JSONString = [[NSString alloc] initWithData:userData encoding:NSUTF8StringEncoding];
+		NSString *JSONString = [[[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding] autorelease];
+		[_userData release];
+		_userData = nil;
 		NSDictionary *dict = [JSONString JSONValue];
 		if (![dict isKindOfClass:[NSDictionary class]]) {
 			[self cancelProgressSheet:nil];
@@ -453,18 +499,18 @@
 		}
 
 		DEBUG(@"loading repositories from %@", url);
-		repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-		[repoDownload setDestination:[self repoPathForUser:username readonly:NO] allowOverwrite:YES];
+		_repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+		[_repoDownload setDestination:[self repoPathForUser:username readonly:NO] allowOverwrite:YES];
 		return;
 	}
 
-	[[installPipe fileHandleForWriting] closeFile];
+	[[_installPipe fileHandleForWriting] closeFile];
 
-	[installTask waitUntilExit];
-	int status = [installTask terminationStatus];
+	[_installTask waitUntilExit];
+	int status = [_installTask terminationStatus];
 	[progressIndicator setIndeterminate:YES];
 
-	NSMutableDictionary *repo = [processQueue lastObject];
+	NSMutableDictionary *repo = [_processQueue lastObject];
 	NSString *owner = [repo objectForKey:@"owner"];
 	NSString *name = [repo objectForKey:@"name"];
 	NSString *displayName = [repo objectForKey:@"displayName"];
@@ -523,8 +569,8 @@
 		return;
 	}
 
-	[processQueue removeLastObject];
-	if ([processQueue count] == 0)
+	[_processQueue removeLastObject];
+	if ([_processQueue count] == 0)
 		[NSApp endSheet:progressSheet];
 	else
 		[self installNextBundle];
@@ -532,7 +578,7 @@
 
 - (void)installNextBundle
 {
-	NSMutableDictionary *repo = [processQueue lastObject];
+	NSMutableDictionary *repo = [_processQueue lastObject];
 
 	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Downloading and installing %@ (by %@)...",
@@ -557,15 +603,17 @@
 		return;
 	}
 
-	installTask = [[NSTask alloc] init];
-	[installTask setLaunchPath:@"/usr/bin/tar"];
-	[installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", downloadDirectory, nil]];
+	[_installTask release];
+	_installTask = [[NSTask alloc] init];
+	[_installTask setLaunchPath:@"/usr/bin/tar"];
+	[_installTask setArguments:[NSArray arrayWithObjects:@"-x", @"-C", downloadDirectory, nil]];
 
-	installPipe = [NSPipe pipe];
-	[installTask setStandardInput:installPipe];
+	[_installPipe release];
+	_installPipe = [[NSPipe alloc] init];
+	[_installTask setStandardInput:_installPipe];
 
 	@try {
-		[installTask launch];
+		[_installTask launch];
 	}
 	@catch (NSException *exception) {
 		[self cancelProgressSheet:nil];
@@ -575,7 +623,9 @@
 	}
 
 	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/tarball/master", [repo objectForKey:@"url"]]];
-	installConnection = [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+
+	[_installConnection release];
+	_installConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
 }
 
 - (IBAction)installBundles:(id)sender
@@ -590,7 +640,8 @@
 	   didEndSelector:@selector(progressSheetDidEnd:returnCode:contextInfo:)
 	      contextInfo:nil];
 
-	processQueue = [NSMutableArray arrayWithArray:selectedBundles];
+	[_processQueue release];
+	_processQueue = [[NSMutableArray alloc] initWithArray:selectedBundles];
 	[self installNextBundle];
 }
 

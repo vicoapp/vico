@@ -9,6 +9,8 @@
 	self = [super initWithNibName:@"ThemePrefs"
 				 name:@"Fonts & Colors"
 				 icon:[NSImage imageNamed:NSImageNameColorPanel]];
+	if (self == nil)
+		return nil;
 
 	ViThemeStore *ts = [ViThemeStore defaultStore];
 	NSArray *themes = [ts availableThemes];

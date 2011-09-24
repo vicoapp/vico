@@ -22,7 +22,7 @@
 
 - (id)init
 {
-	preferences = [NSMutableSet set];
+	_preferences = [[NSMutableSet alloc] init];
 
 	self = [super initWithNibName:@"EditPrefs"
 				 name:@"Editing"
@@ -38,13 +38,19 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	[_preferences release];
+	[super dealloc];
+}
+
 - (IBAction)selectScope:(id)sender
 {
 	[scopeButton selectItem:sender];
 	[revertButton setEnabled:[sender tag] != -2];
 
-	DEBUG(@"refreshing preferences %@", preferences);
-	for (NSString *key in preferences) {
+	DEBUG(@"refreshing preferences %@", _preferences);
+	for (NSString *key in _preferences) {
 		[self willChangeValueForKey:key];
 		[self didChangeValueForKey:key];
 	}
@@ -63,13 +69,12 @@
 		return;
 
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
+	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
 	if (prefs == nil)
 		prefs = [NSMutableDictionary dictionary];
-	NSMutableDictionary *scopedPrefs = [[prefs objectForKey:scope] mutableCopy];
 
-	scopedPrefs = [NSMutableDictionary dictionary];
-	for (NSString *key in preferences)
+	NSMutableDictionary *scopedPrefs = [NSMutableDictionary dictionary];
+	for (NSString *key in _preferences)
 		[scopedPrefs setObject:[defs objectForKey:key] forKey:key];
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];
@@ -80,7 +85,7 @@
 - (void)deletePreferenceScope:(NSString *)scope
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
+	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
 	if (prefs == nil)
 		return;
 	[prefs removeObjectForKey:scope];
@@ -110,7 +115,7 @@
 
 - (IBAction)revertPreferenceScope:(id)sender
 {
-	NSAlert *alert = [[NSAlert alloc] init];
+	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
 	[alert setMessageText:@"Do you want to delete this scope or copy from defaults?"];
 	[alert addButtonWithTitle:@"Copy"];
 	[alert addButtonWithTitle:@"Delete"];
@@ -206,8 +211,8 @@
 
 - (id)valueForUndefinedKey:(NSString *)key
 {
-	if (![preferences containsObject:key])
-		[preferences addObject:key];
+	if (![_preferences containsObject:key])
+		[_preferences addObject:key];
 
 	if ([[scopeButton selectedItem] tag] == -2) {
 		DEBUG(@"getting default preference %@", key);
@@ -233,8 +238,8 @@
 	NSString *scope = [scopeButton titleOfSelectedItem];
 	DEBUG(@"setting preference %@ to %@ in scope %@", key, value, scope);
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
-	NSMutableDictionary *scopedPrefs = [[prefs objectForKey:scope] mutableCopy];
+	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
+	NSMutableDictionary *scopedPrefs = [[[prefs objectForKey:scope] mutableCopy] autorelease];
 	[scopedPrefs setObject:value forKey:key];
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];

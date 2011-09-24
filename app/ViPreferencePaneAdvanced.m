@@ -16,8 +16,8 @@
 		}];
 		for (NSString *key in keys) {
 			[a addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-				[key mutableCopy], @"name",
-				[[dict objectForKey:key] mutableCopy], @"value",
+				[[key mutableCopy] autorelease], @"name",
+				[[[dict objectForKey:key] mutableCopy] autorelease], @"value",
 				nil]];
 		}
 		return a;
@@ -27,8 +27,8 @@
 		}];
 		NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 		for (NSDictionary *pair in a) {
-			NSMutableString *key = [[pair objectForKey:@"name"] mutableCopy];
-			NSMutableString *value = [[pair objectForKey:@"value"] mutableCopy];
+			NSMutableString *key = [[[pair objectForKey:@"name"] mutableCopy] autorelease];
+			NSMutableString *value = [[[pair objectForKey:@"value"] mutableCopy] autorelease];
 			[dict setObject:value forKey:key];
 		}
 		return dict;
@@ -45,9 +45,10 @@
 	self = [super initWithNibName:@"AdvancedPrefs"
 				 name:@"Advanced"
 				 icon:[NSImage imageNamed:NSImageNameAdvanced]];
-
-	[NSValueTransformer setValueTransformer:[[environmentVariableTransformer alloc] init]
-					forName:@"environmentVariableTransformer"];
+	if (self != nil) {
+		[NSValueTransformer setValueTransformer:[[[environmentVariableTransformer alloc] init] autorelease]
+						forName:@"environmentVariableTransformer"];
+	}
 
 	return self;
 }
@@ -55,8 +56,8 @@
 - (IBAction)addVariable:(id)sender
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-		[@"name" mutableCopy], @"name",
-		[@"value" mutableCopy], @"value",
+		[[@"name" mutableCopy] autorelease], @"name",
+		[[@"value" mutableCopy] autorelease], @"value",
 		nil];
 
 	[arrayController addObject:dict];

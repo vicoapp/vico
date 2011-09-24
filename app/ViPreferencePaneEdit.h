@@ -3,14 +3,14 @@
 
 @interface ViPreferencePaneEdit : ViPreferencePane
 {
-	IBOutlet NSWindow *newPrefScopeSheet;
-	IBOutlet NSPopUpButton *prefLanguage;
-	IBOutlet NSTextField *prefScope;
-	IBOutlet NSPopUpButton *scopeButton;
-	IBOutlet NSButton *revertButton;
-	IBOutlet NSButton *newScopeButton;
+	IBOutlet NSWindow	*newPrefScopeSheet;
+	IBOutlet NSPopUpButton	*prefLanguage;
+	IBOutlet NSTextField	*prefScope;
+	IBOutlet NSPopUpButton	*scopeButton;
+	IBOutlet NSButton	*revertButton;
+	IBOutlet NSButton	*newScopeButton;
 
-	NSMutableSet *preferences;
+	NSMutableSet		*_preferences;
 }
 
 + (id)valueForKey:(NSString *)key inScope:(ViScope *)scope;

@@ -16,15 +16,10 @@
  */
 @interface ViPreferencesController : NSWindowController <NSToolbarDelegate>
 {
-	NSView *blankView;
-	NSString *forceSwitchToItem;
-	NSMutableArray *panes;
-	NSMutableDictionary *toolbarItems;
-
-#if 0
-	IBOutlet NSPopUpButton *insertModeInputSources;
-	IBOutlet NSPopUpButton *normalModeInputSources;
-#endif
+	NSView			*_blankView;
+	NSString		*_forceSwitchToItem;
+	NSMutableArray		*_panes;
+	NSMutableDictionary	*_toolbarItems;
 }
 
 /** @returns The globally shared preferences controller.

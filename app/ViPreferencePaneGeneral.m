@@ -33,9 +33,11 @@
 	self = [super initWithNibName:@"GeneralPrefs"
 				 name:@"General"
 				 icon:[NSImage imageNamed:NSImageNamePreferencesGeneral]];
+	if (self == nil)
+		return nil;
 
 	/* Convert between tags and undo style strings (vim and nvi). */
-	[NSValueTransformer setValueTransformer:[[undoStyleTagTransformer alloc] init]
+	[NSValueTransformer setValueTransformer:[[[undoStyleTagTransformer alloc] init] autorelease]
 					forName:@"undoStyleTagTransformer"];
 
 	[defaultSyntaxButton removeAllItems];

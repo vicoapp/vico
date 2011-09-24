@@ -4,9 +4,9 @@
  */
 @interface ViPreferencePane : NSObject <ViPreferencePane>
 {
-	NSString *paneName;
-	NSImage *icon;
-	IBOutlet NSView *view;
+	NSString	*_paneName;
+	NSImage		*_icon;
+	IBOutlet NSView	*view;
 }
 
 @property (nonatomic, readonly) NSString *name;

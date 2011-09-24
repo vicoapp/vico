@@ -7,41 +7,43 @@
 
 @interface statusIconTransformer : NSValueTransformer
 {
-	NSImage *installedIcon;
+	NSImage	*_installedIcon;
 }
 @end
 
 @interface ViPreferencePaneBundles : ViPreferencePane
 {
-	IBOutlet NSTextField *bundlesInfo;
-	IBOutlet NSArrayController *bundlesController;
-	IBOutlet NSArrayController *repoUsersController;
-	IBOutlet NSTableView *bundlesTable;
-	IBOutlet NSTableView *repoUsersTable;
-	IBOutlet NSWindow *selectRepoSheet;
-	IBOutlet NSWindow *progressSheet;
-	IBOutlet NSButton *progressButton;
-	IBOutlet NSProgressIndicator *progressIndicator;
-	IBOutlet NSTextField *progressDescription;
-	IBOutlet NSSearchField *repoFilterField;
+	IBOutlet NSTextField		*bundlesInfo;
+	IBOutlet NSArrayController	*bundlesController;
+	IBOutlet NSArrayController	*repoUsersController;
+	IBOutlet NSTableView		*bundlesTable;
+	IBOutlet NSTableView		*repoUsersTable;
+	IBOutlet NSWindow		*selectRepoSheet;
+	IBOutlet NSWindow		*progressSheet;
+	IBOutlet NSButton		*progressButton;
+	IBOutlet NSProgressIndicator	*progressIndicator;
+	IBOutlet NSTextField		*progressDescription;
+	IBOutlet NSSearchField		*repoFilterField;
 
-	long long receivedContentLength;
-	BOOL progressCancelled;
-	NSMutableArray *processQueue;
+	long long			 _receivedContentLength;
+	BOOL				 _progressCancelled;
+	NSMutableArray			*_processQueue;
 
-	ViRegexp *repoNameRx;
-	NSMutableArray *repositories;
-	NSArray *filteredRepositories;
-	NSArray *previousRepoUsers;
-	NSURLDownload *repoDownload;
+	ViRegexp			*_repoNameRx;
+	NSMutableArray			*_repositories;
+	NSArray				*_filteredRepositories;
+	NSArray				*_previousRepoUsers;
+	NSURLDownload			*_repoDownload;
 
-	NSURLConnection *userConnection;
-	NSMutableData *userData;
+	NSURLConnection			*_userConnection;
+	NSMutableData			*_userData;
 
-	NSTask *installTask;
-	NSPipe *installPipe;
-	NSURLConnection *installConnection;
+	NSTask				*_installTask;
+	NSPipe				*_installPipe;
+	NSURLConnection			*_installConnection;
 }
+
+@property (nonatomic,readwrite,retain) NSArray *filteredRepositories;
 
 - (IBAction)filterRepositories:(id)sender;
 - (IBAction)reloadRepositories:(id)sender;

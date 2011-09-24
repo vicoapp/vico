@@ -15,25 +15,29 @@
 - (void)callCloseAllDelegateShouldTerminate:(BOOL)flag
 {
 	DEBUG(@"should%s terminate", flag ? "" : " NOT");
-	DEBUG(@"calling delegate %@ selector %@", closeAllDelegate, NSStringFromSelector(closeAllSelector));
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[closeAllDelegate methodSignatureForSelector:closeAllSelector]];
-	[invocation setSelector:closeAllSelector];
+	DEBUG(@"calling delegate %@ selector %@", _closeAllDelegate, NSStringFromSelector(_closeAllSelector));
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[_closeAllDelegate methodSignatureForSelector:_closeAllSelector]];
+	[invocation setSelector:_closeAllSelector];
 	[invocation setArgument:&self atIndex:2];
 	[invocation setArgument:&flag atIndex:3];
-	[invocation setArgument:&closeAllContextInfo atIndex:4];
-	[invocation invokeWithTarget:closeAllDelegate];
+	[invocation setArgument:&_closeAllContextInfo atIndex:4];
+	[invocation invokeWithTarget:_closeAllDelegate];
 
-	closeAllSet = nil;
-	closeAllDelegate = nil;
-	closeAllSelector = NULL;
-	closeAllContextInfo = NULL;
+	[_closeAllSet release];
+	_closeAllSet = nil;
+
+	[_closeAllDelegate release];
+	_closeAllDelegate = nil;
+
+	_closeAllSelector = NULL;
+	_closeAllContextInfo = NULL;
 }
 
 - (void)closeNextDocumentInWindow:(NSWindow *)window
 {
 	DEBUG(@"window %@", window);
 
-	if (window != nil && closeAllWindows && [[(ViWindowController *)[window windowController] documents] count] == 0)
+	if (window != nil && _closeAllWindows && [[(ViWindowController *)[window windowController] documents] count] == 0)
 		window = nil;	/* Proceed with next window. */
 
 	ViWindowController *windowController = nil;
@@ -44,7 +48,7 @@
 		windowController = [window windowController];
 
 	if ([[windowController documents] count] > 0) {
-		ViDocument *doc = [[windowController documents] objectAtIndex:0];
+		ViDocument *doc = [[windowController documents] anyObject];
 		[windowController selectDocument:doc];
 		[doc canCloseDocumentWithDelegate:self
 			      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
@@ -96,10 +100,10 @@
 			  contextInfo:(void *)contextInfo
 {
 	DEBUG(@"%s", "closing all documents");
-	closeAllDelegate = delegate;
-	closeAllSelector = didCloseAllSelector;
-	closeAllContextInfo = contextInfo;
-	closeAllWindows = YES;
+	_closeAllDelegate = [delegate retain];
+	_closeAllSelector = didCloseAllSelector;
+	_closeAllContextInfo = contextInfo;
+	_closeAllWindows = YES;
 	[self closeNextDocumentInWindow:nil];
 }
 
@@ -157,7 +161,7 @@
 							name:NSWindowDidEndSheetNotification
 						      object:window];
 
-	[self closeNextDocumentInSet:closeAllSet force:YES];
+	[self closeNextDocumentInSet:_closeAllSet force:YES];
 }
 
 - (void)document:(NSDocument *)doc shouldCloseForSet:(BOOL)shouldClose contextInfo:(void *)contextInfo
@@ -168,8 +172,8 @@
 	}
 
 	[doc close];
-	[closeAllSet removeObject:doc];
-	[self closeNextDocumentInSet:closeAllSet force:NO];
+	[_closeAllSet removeObject:doc];
+	[self closeNextDocumentInSet:_closeAllSet force:NO];
 }
 
 /*
@@ -180,10 +184,12 @@
 	   didCloseAllSelector:(SEL)didCloseAllSelector
 		   contextInfo:(void *)contextInfo
 {
-	closeAllSet = set;
-	closeAllDelegate = delegate;
-	closeAllSelector = didCloseAllSelector;
-	closeAllContextInfo = contextInfo;
+	[_closeAllSet release];
+	_closeAllSet = [set retain];
+
+	_closeAllDelegate = [delegate retain];
+	_closeAllSelector = didCloseAllSelector;
+	_closeAllContextInfo = contextInfo;
 
 	DEBUG(@"closing documents in set %@", set);
 
@@ -204,9 +210,9 @@
 	DEBUG(@"adding document %@", document);
 	[super addDocument:document];
 	if ([document fileURL]) {
-		if (openDocs == nil)
-			openDocs = [NSMutableDictionary dictionary];
-		[openDocs setObject:document forKey:[document fileURL]];
+		if (_openDocs == nil)
+			_openDocs = [[NSMutableDictionary alloc] init];
+		[_openDocs setObject:document forKey:[document fileURL]];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentAddedNotification object:document];
 	[[ViEventManager defaultManager] emit:ViEventDidAddDocument for:nil with:document, nil];
@@ -217,7 +223,7 @@
 	DEBUG(@"removing document %@", document);
 	[super removeDocument:document];
 	if ([document fileURL])
-		[openDocs removeObjectForKey:[document fileURL]];
+		[_openDocs removeObjectForKey:[document fileURL]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentRemovedNotification object:document];
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
 }
@@ -225,11 +231,11 @@
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)document
 {
 	if ([document fileURL])
-		[openDocs removeObjectForKey:[document fileURL]];
+		[_openDocs removeObjectForKey:[document fileURL]];
 	if (aURL) {
-		if (openDocs == nil)
-			openDocs = [NSMutableDictionary dictionary];
-		[openDocs setObject:document forKey:aURL];
+		if (_openDocs == nil)
+			_openDocs = [[NSMutableDictionary alloc] init];
+		[_openDocs setObject:document forKey:aURL];
 	}
 }
 
@@ -237,7 +243,7 @@
 {
 	if (absoluteURL == nil)
 		return nil;
-	return [openDocs objectForKey:absoluteURL];
+	return [_openDocs objectForKey:absoluteURL];
 }
 
 - (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL

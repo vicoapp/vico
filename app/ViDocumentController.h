@@ -2,12 +2,12 @@
 
 @interface ViDocumentController : NSDocumentController
 {
-	id		 closeAllDelegate;
-	SEL		 closeAllSelector;
-	void		*closeAllContextInfo;
-	BOOL		 closeAllWindows;
-	NSMutableSet	*closeAllSet;
-	NSMutableDictionary *openDocs;
+	id			 _closeAllDelegate;
+	SEL			 _closeAllSelector;
+	void			*_closeAllContextInfo;
+	BOOL			 _closeAllWindows;
+	NSMutableSet		*_closeAllSet;
+	NSMutableDictionary	*_openDocs;
 }
 
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)aDocument;

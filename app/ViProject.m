@@ -26,6 +26,7 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_windowController release];
 	[_initialURL release];
 	[super dealloc];

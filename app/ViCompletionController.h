@@ -1,6 +1,5 @@
 #import "ViCompletionView.h"
 #import "ViCompletion.h"
-#import "ViThemeStore.h"
 #import "ViURLManager.h"
 
 @protocol ViCompletionProvider <NSObject>
@@ -27,37 +26,34 @@
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
 {
-	IBOutlet NSWindow *window;
-	IBOutlet ViCompletionView *tableView;
-	IBOutlet NSTextField *label;
+	IBOutlet NSWindow		*window;
+	IBOutlet ViCompletionView	*tableView;
+	IBOutlet NSTextField		*label;
 
-	id<ViCompletionProvider> provider;
-	NSMutableArray *completions;
-	NSString *options;
-	NSString *prefix;
-
-	ViCompletion *onlyCompletion;
-	NSMutableArray *filteredCompletions;
-	ViCompletion *selection;
-	ViTheme *theme;
-	NSMutableString *filter;
-	NSMutableParagraphStyle *matchParagraphStyle;
-	id<ViCompletionDelegate> delegate;
-	NSInteger terminatingKey;
-	NSRange range;
-	NSUInteger prefixLength;
-	NSPoint screenOrigin;
-	BOOL upwards;
-	BOOL fuzzyTrigger;
-	BOOL fuzzySearch;
+	id<ViCompletionProvider>	 _provider;
+	NSMutableArray			*_completions;
+	NSString			*_options;
+	NSString			*_prefix;
+	NSUInteger			 _prefixLength;
+	ViCompletion			*_onlyCompletion;
+	NSMutableArray			*_filteredCompletions;
+	ViCompletion			*_selection;
+	NSMutableString			*_filter;
+	// NSMutableParagraphStyle	*_matchParagraphStyle;
+	id<ViCompletionDelegate>	 _delegate;
+	NSInteger			 _terminatingKey;
+	NSRange				 _range;
+	NSPoint				 _screenOrigin;
+	BOOL				 _upwards;
+	BOOL				 _fuzzySearch;
 }
 
 @property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
-@property (nonatomic, readwrite, assign) NSArray *completions;
+@property (nonatomic, readwrite, retain) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;
-@property (nonatomic, readwrite, assign) NSString *filter;
+@property (nonatomic, readwrite, retain) NSString *filter;
 
 + (id)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;
@@ -72,5 +68,13 @@
 		     options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter;
+
+- (void)updateBounds;
+- (void)filterCompletions;
+- (BOOL)complete_partially:(ViCommand *)command;
+- (void)acceptByKey:(NSInteger)termKey;
+- (BOOL)cancel:(ViCommand *)command;
+- (void)updateCompletions;
+- (void)reset;
 
 @end

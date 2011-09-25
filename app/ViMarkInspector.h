@@ -2,9 +2,9 @@
 
 @interface ViMarkInspector : NSWindowController
 {
-	IBOutlet NSTreeController *markListController;
-	IBOutlet NSArrayController *markStackController;
-	IBOutlet ViOutlineView *outlineView;
+	IBOutlet NSTreeController	*markListController; // Top-level nib object
+	IBOutlet NSArrayController	*markStackController; // Top-level nibobj
+	IBOutlet ViOutlineView		*outlineView;
 }
 
 + (ViMarkInspector *)sharedInspector;

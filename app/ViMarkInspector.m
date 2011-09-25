@@ -7,10 +7,10 @@
 
 + (ViMarkInspector *)sharedInspector
 {
-	static ViMarkInspector *sharedInspector = nil;
-	if (sharedInspector == nil)
-		sharedInspector = [[ViMarkInspector alloc] init];
-	return sharedInspector;
+	static ViMarkInspector *__sharedInspector = nil;
+	if (__sharedInspector == nil)
+		__sharedInspector = [[ViMarkInspector alloc] init];
+	return __sharedInspector;
 }
 
 - (id)init
@@ -18,6 +18,13 @@
 	if ((self = [super initWithWindowNibName:@"MarkInspector"])) {
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[markListController release];
+	[markStackController release];
+	[super dealloc];
 }
 
 - (void)awakeFromNib

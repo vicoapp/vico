@@ -6,19 +6,24 @@
 
 - (SFTPConnectionPool *)init
 {
-	self = [super init];
-	if (self) {
-		connections = [NSMutableDictionary dictionary];
+	if ((self = [super init]) != nil) {
+		_connections = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_connections release];
+	[super dealloc];
+}
+
 + (SFTPConnectionPool *)sharedPool
 {
-	static SFTPConnectionPool *sharedPool = nil;
-	if (sharedPool == nil)
-		sharedPool = [[SFTPConnectionPool alloc] init];
-	return sharedPool;
+	static SFTPConnectionPool *__sharedPool = nil;
+	if (__sharedPool == nil)
+		__sharedPool = [[SFTPConnectionPool alloc] init];
+	return __sharedPool;
 }
 
 - (NSString *)connectionKeyForURL:(NSURL *)aURL
@@ -32,7 +37,7 @@
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
 	NSString *key = [self connectionKeyForURL:aURL];
-	SFTPConnection *conn = [connections objectForKey:key];
+	SFTPConnection *conn = [_connections objectForKey:key];
 	if (conn && [conn connected])
 		return [conn normalizeURL:aURL];
 	return aURL;
@@ -46,21 +51,21 @@
 		    [ViError errorWithFormat:@"missing hostname in URL %@", url]);
 
 	NSString *key = [self connectionKeyForURL:url];
-	SFTPConnection *conn = [connections objectForKey:key];
+	SFTPConnection *conn = [_connections objectForKey:key];
 
 	if (conn && [conn closed]) {
 		DEBUG(@"connection %@ is closed", conn);
-		[connections removeObjectForKey:key];
+		[_connections removeObjectForKey:key];
 		conn = nil;
 	}
 
 	if (conn == nil) {
 		NSError *error = nil;
-		conn = [[SFTPConnection alloc] initWithURL:url error:&error];
+		conn = [[[SFTPConnection alloc] initWithURL:url error:&error] autorelease];
 		if (conn == nil || error)
 			return connectCallback(nil, error);
 
-		[connections setObject:conn forKey:key];
+		[_connections setObject:conn forKey:key];
 
 		__block SFTPRequest *initRequest = nil;
 		void (^initCallback)(NSError *) = ^(NSError *error) {

@@ -3,7 +3,7 @@
 
 @interface SFTPConnectionPool : NSObject
 {
-	NSMutableDictionary *connections;
+	NSMutableDictionary *_connections;
 }
 
 + (SFTPConnectionPool *)sharedPool;

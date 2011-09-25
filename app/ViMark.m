@@ -13,6 +13,7 @@
 @synthesize column = _column;
 @synthesize location = _location;
 @synthesize range = _range;
+@synthesize rangeString = _rangeString;
 @synthesize url = _url;
 @synthesize title = _title;
 @synthesize icon = _icon;
@@ -82,6 +83,7 @@
 
 		_location = NSNotFound;
 		_range = NSMakeRange(NSNotFound, 0);
+		_rangeStringIsDirty = YES;
 
 		ViDocument *doc = [[ViDocumentController sharedDocumentController] documentForURLQuick:_url];
 		if (doc)
@@ -168,6 +170,7 @@
 	[_url release];
 	[_document release];
 	[_lists release];
+	[_rangeString release];
 	[super dealloc];
 }
 
@@ -193,8 +196,11 @@
 	_document = doc;
 	_view = nil;
 
-	if (_document == nil)
+	if (![_document isKindOfClass:[ViDocument class]]) {
+		if (doc)
+			INFO(@"got non-document %@ for mark %@", doc, self);
 		return;
+	}
 
 	NSUInteger eol = 0;
 	NSInteger loc = [[_document textStorage] locationForStartOfLine:_line
@@ -251,13 +257,11 @@
 - (void)setRange:(NSRange)aRange
 {
 	if (_document) {
-		[self willChangeValueForKey:@"location"];
 		[self willChangeValueForKey:@"range"];
-		[self willChangeValueForKey:@"line"];
-		[self willChangeValueForKey:@"column"];
-		[self willChangeValueForKey:@"lineNumber"];
-		[self willChangeValueForKey:@"columnNumber"];
+		[self willChangeValueForKey:@"rangeString"];
+
 		_range = aRange;
+		_rangeStringIsDirty = YES;
 		_location = _range.location;
 		_line = [[_document textStorage] lineNumberAtLocation:_location];
 		_column = [[_document textStorage] columnOffsetAtLocation:_location] + 1;
@@ -267,13 +271,22 @@
 		[_columnNumber release];
 		_columnNumber = [[NSNumber alloc] initWithUnsignedInteger:_column];
 
-		[self didChangeValueForKey:@"columnNumber"];
-		[self didChangeValueForKey:@"lineNumber"];
-		[self didChangeValueForKey:@"column"];
-		[self didChangeValueForKey:@"line"];
+		[self didChangeValueForKey:@"rangeString"];
 		[self didChangeValueForKey:@"range"];
-		[self didChangeValueForKey:@"location"];
 	}
+}
+
+- (NSString *)rangeString
+{
+	if (_rangeStringIsDirty) {
+		[_rangeString release];
+		if (_range.location != NSNotFound)
+			_rangeString = [NSStringFromRange(_range) retain];
+		else
+			_rangeString = [[NSString alloc] initWithFormat:@"%lu:%lu", _line, _column];
+		_rangeStringIsDirty = NO;
+	}
+	return _rangeString;
 }
 
 - (NSURL *)url

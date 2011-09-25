@@ -12,6 +12,9 @@
 	NSUInteger		 _line;
 	NSUInteger		 _column;
 
+	NSString		*_rangeString;
+	BOOL			 _rangeStringIsDirty;
+
 	NSNumber		*_lineNumber;
 	NSNumber		*_columnNumber;
 
@@ -40,6 +43,8 @@
 @property(nonatomic,readonly) NSUInteger location;
 /** The range of the mark, or `{NSNotFound,0}` if unknown. */
 @property(nonatomic,readonly) NSRange range;
+/** The range of the mark as a string, or `nil` if unknown. */
+@property(nonatomic,readonly) NSString *rangeString;
 /** The URL of the mark. */
 @property(nonatomic,readonly) NSURL *url;
 /** The icon of the mark. */

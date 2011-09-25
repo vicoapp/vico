@@ -9,6 +9,7 @@
 #import "PSMMetalTabStyle.h"
 #import "PSMTabBarCell.h"
 #import "PSMTabBarControl.h"
+#include "logging.h"
 
 #define kPSMMetalObjectCounterRadius 7.0
 #define kPSMMetalCounterMinWidth 20
@@ -27,15 +28,27 @@
 {
     if((self = [super init]))
     {
-        metalCloseButton = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front"]];
-        metalCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Pressed"]];
-        metalCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Rollover"]];
+        _metalCloseButton = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front"]];
+        _metalCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Pressed"]];
+        _metalCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Rollover"]];
 
         _addTabButtonImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetal"]];
         _addTabButtonPressedImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalPressed"]];
         _addTabButtonRolloverImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalRollover"]];
     }
     return self;
+}
+
+- (void)dealloc
+{
+	INFO(@"%p", self);
+	[_metalCloseButton release];
+	[_metalCloseButtonDown release];
+	[_metalCloseButtonOver release];
+	[_addTabButtonImage release];
+	[_addTabButtonPressedImage release];
+	[_addTabButtonRolloverImage release];
+	[super dealloc];
 }
 
 #pragma mark -
@@ -81,7 +94,7 @@
     }
 
     NSRect result;
-    result.size = [metalCloseButton size];
+    result.size = [_metalCloseButton size];
     result.origin.x = cellFrame.origin.x + MARGIN_X;
     result.origin.y = cellFrame.origin.y + MARGIN_Y + 2.0;
 
@@ -106,7 +119,7 @@
     result.origin.y = cellFrame.origin.y + MARGIN_Y;
 
     if([cell hasCloseButton] && ![cell isCloseButtonSuppressed])
-        result.origin.x += [metalCloseButton size].width + kPSMTabBarCellPadding;
+        result.origin.x += [_metalCloseButton size].width + kPSMTabBarCellPadding;
 
     if([cell state] == NSOnState){
         result.origin.y += 1;
@@ -169,7 +182,7 @@
 
     // close button?
     if([cell hasCloseButton] && ![cell isCloseButtonSuppressed])
-        resultWidth += [metalCloseButton size].width + kPSMTabBarCellPadding;
+        resultWidth += [_metalCloseButton size].width + kPSMTabBarCellPadding;
 
     // icon?
     if([cell hasIcon])
@@ -201,7 +214,7 @@
 
     // close button?
     if ([cell hasCloseButton] && ![cell isCloseButtonSuppressed])
-        resultWidth += [metalCloseButton size].width + kPSMTabBarCellPadding;
+        resultWidth += [_metalCloseButton size].width + kPSMTabBarCellPadding;
 
     // icon?
     if([cell hasIcon])
@@ -364,9 +377,9 @@
         NSRect closeButtonRect = [cell closeButtonRectForFrame:cellFrame];
         NSImage * closeButton = nil;
 
-        closeButton = metalCloseButton;
-        if ([cell closeButtonOver]) closeButton = metalCloseButtonOver;
-        if ([cell closeButtonPressed]) closeButton = metalCloseButtonDown;
+        closeButton = _metalCloseButton;
+        if ([cell closeButtonOver]) closeButton = _metalCloseButtonOver;
+        if ([cell closeButtonPressed]) closeButton = _metalCloseButtonDown;
 
         closeButtonSize = [closeButton size];
         if ([controlView isFlipped]) {
@@ -451,14 +464,14 @@
         attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
         NSRange range = NSMakeRange(0, [contents length]);
         [attrStr addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:11.0] range:range];
-        NSMutableParagraphStyle *centeredParagraphStyle = nil;
-        if (!centeredParagraphStyle) {
-            centeredParagraphStyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] retain];
-            [centeredParagraphStyle setAlignment:NSCenterTextAlignment];
-        }
+
+	NSMutableParagraphStyle *centeredParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[centeredParagraphStyle setAlignment:NSCenterTextAlignment];
         [attrStr addAttribute:NSParagraphStyleAttributeName value:centeredParagraphStyle range:range];
         [attrStr drawInRect:labelRect];
-        return;
+	[centeredParagraphStyle release];
+
+	return;
     }
 
     // draw cells

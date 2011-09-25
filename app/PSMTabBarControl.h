@@ -79,9 +79,9 @@ enum {
     IBOutlet id                 delegate;
 }
 
-@property(nonatomic,readwrite, assign) NSTabView *tabView;
+@property(nonatomic,readwrite, retain) NSTabView *tabView;
 @property(nonatomic,readwrite, assign) id delegate;
-@property(nonatomic,readwrite, assign) id partnerView;
+@property(nonatomic,readwrite, retain) id partnerView;
 
 // control characteristics
 + (NSBundle *)bundle;

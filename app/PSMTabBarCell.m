@@ -66,6 +66,13 @@
     return self;
 }
 
+- (void)dealloc
+{
+	[_indicator removeFromSuperviewWithoutNeedingDisplay];
+	[_indicator release];
+	[super dealloc];
+}
+
 #pragma mark -
 #pragma mark Accessors
 
@@ -318,16 +325,16 @@
     if(([self state] == NSOnState) && ([[_myControlView styleName] isEqualToString:@"Metal"]))
         cellFrame.size.width += 1.0;
     [_myControlView lockFocus];
-    NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame];
+    NSBitmapImageRep *rep = [[[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame] autorelease];
     [_myControlView unlockFocus];
-    NSImage *image = [[NSImage alloc] initWithSize:[rep size]];
+    NSImage *image = [[[NSImage alloc] initWithSize:[rep size]] autorelease];
     [image addRepresentation:rep];
-    NSImage *returnImage = [[NSImage alloc] initWithSize:[rep size]];
+    NSImage *returnImage = [[[NSImage alloc] initWithSize:[rep size]] autorelease];
     [returnImage lockFocus];
     [image compositeToPoint:NSMakePoint(0.0, 0.0) operation:NSCompositeSourceOver fraction:0.7];
     [returnImage unlockFocus];
     if(![[self indicator] isHidden]){
-        NSImage *indicatorImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"pi"]];
+        NSImage *indicatorImage = [[[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"pi"]] autorelease];
         [returnImage lockFocus];
         NSPoint indicatorPoint = NSMakePoint([self frame].size.width - MARGIN_X - kPSMTabBarIndicatorWidth, MARGIN_Y);
         if(([self state] == NSOnState) && ([[_myControlView styleName] isEqualToString:@"Metal"]))

@@ -6,28 +6,28 @@
 
 @interface ViSymbolController : NSObject <NSOutlineViewDataSource, ViKeyManagerTarget>
 {
-	IBOutlet NSWindow *window;
-	IBOutlet ViWindowController *windowController;
-	IBOutlet ViOutlineView *symbolView;
-	IBOutlet NSSearchField *symbolFilterField;
-	IBOutlet NSSearchField *altSymbolFilterField;
-	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
-	IBOutlet ViBgView *symbolsView;
-	IBOutlet NSToolbarItem *searchToolbarItem;
-	IBOutlet NSScrollView *scrollView;
+	IBOutlet NSWindow		*window;
+	IBOutlet ViWindowController	*windowController;
+	IBOutlet ViOutlineView		*symbolView;
+	IBOutlet NSSearchField		*symbolFilterField;
+	IBOutlet NSSearchField		*altSymbolFilterField;
+	IBOutlet NSSplitView		*splitView; // Split between explorer, main and symbol views
+	IBOutlet ViBgView		*symbolsView;
+	IBOutlet NSToolbarItem		*searchToolbarItem;
+	IBOutlet NSScrollView		*scrollView;
 
-	CGFloat width;
-	NSCell *separatorCell;
-	NSMutableArray *filteredDocuments;
-	NSMutableDictionary *symbolFilterCache;
-	BOOL closeSymbolListAfterUse;
-	NSInteger lastSelectedRow;
-	BOOL isFiltered;
-	BOOL symbolUpdateDuringFiltering;
+	CGFloat				 _width;
+	NSCell				*_separatorCell;
+	NSMutableArray			*_filteredDocuments;
+	NSMutableDictionary		*_symbolFilterCache;
+	BOOL				 _closeSymbolListAfterUse;
+	NSInteger			 _lastSelectedRow;
+	BOOL				 _isFiltered;
+	BOOL				 _symbolUpdateDuringFiltering;
 
-	NSTimer *reloadTimer;
-	BOOL dirty;
-	BOOL isHidingAltFilterField;
+	NSTimer				*_reloadTimer;
+	BOOL				 _dirty;
+	// BOOL				 _isHidingAltFilterField;
 }
 
 - (void)filterSymbols;
@@ -41,5 +41,11 @@
 - (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor;
 - (BOOL)symbolListIsOpen;
 - (void)symbolsUpdate:(NSTimer *)aTimer;
+
+- (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor;
+- (BOOL)symbolListIsOpen;
+- (void)showAltFilterField;
+- (void)hideAltFilterField;
+- (BOOL)isSeparatorItem:(id)item;
 
 @end

@@ -8,40 +8,40 @@
 #import "ViBgView.h"
 #import "ViWindow.h"
 
-@interface ViSymbolController (private)
-- (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor;
-- (BOOL)symbolListIsOpen;
-- (void)showAltFilterField;
-- (void)hideAltFilterField;
-- (BOOL)isSeparatorItem:(id)item;
-@end
-
 @implementation ViSymbolController
 
 - (id)init
 {
 	if ((self = [super init]) != nil) {
-		symbolFilterCache = [NSMutableDictionary dictionary];
-		width = 200.0;
+		_symbolFilterCache = [[NSMutableDictionary alloc] init];
+		_width = 200.0;
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[_separatorCell release];
+	[_symbolFilterCache release];
+	[super dealloc];
+}
+
 - (void)awakeFromNib
 {
-	symbolView.keyManager = [[ViKeyManager alloc] initWithTarget:self
-							      defaultMap:[ViMap symbolMap]];
+	symbolView.keyManager = [ViKeyManager keyManagerWithTarget:self
+							defaultMap:[ViMap symbolMap]];
 
 	[symbolView setTarget:self];
 	[symbolView setDoubleAction:@selector(gotoSymbolAction:)];
 	[symbolView setAction:@selector(gotoSymbolAction:)];
 
-	NSCell *cell = [[MHTextIconCell alloc] init];
+	NSCell *cell = [[[MHTextIconCell alloc] init] autorelease];
 	[[symbolView outlineTableColumn] setDataCell:cell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
 
-	separatorCell = [[ViSeparatorCell alloc] init];
+	_separatorCell = [[ViSeparatorCell alloc] init];
 
 	symbolsView.backgroundColor = [symbolView backgroundColor];
 
@@ -60,9 +60,9 @@
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
 		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
 			return;
-		if (closeSymbolListAfterUse) {
+		if (_closeSymbolListAfterUse) {
 			[self closeSymbolListAndFocusEditor:NO];
-			closeSymbolListAfterUse = NO;
+			_closeSymbolListAfterUse = NO;
 		}
 		[self hideAltFilterField];
 	}
@@ -103,30 +103,35 @@
 	if (![keyPath isEqualToString:@"symbols"])
 		return;
 
-	dirty = YES;
-	[reloadTimer invalidate];
+	_dirty = YES;
+	[_reloadTimer invalidate];
+	[_reloadTimer release];
 
 	if ([self symbolListIsOpen])
-		reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
-							       target:self
-							     selector:@selector(symbolsUpdate:)
-							     userInfo:nil
-							      repeats:NO];
+		_reloadTimer = [[NSTimer scheduledTimerWithTimeInterval:0.1
+								 target:self
+							       selector:@selector(symbolsUpdate:)
+							       userInfo:nil
+								repeats:NO] retain];
+	else
+		_reloadTimer = nil;
 }
 
 - (void)symbolsUpdate:(NSTimer *)aTimer
 {
-	dirty = NO;
-	reloadTimer = nil;
+	_dirty = NO;
 
-	symbolUpdateDuringFiltering = isFiltered;
+	[_reloadTimer release];
+	_reloadTimer = nil;
+
+	_symbolUpdateDuringFiltering = _isFiltered;
 	id selectedItem = nil;
-	if (symbolUpdateDuringFiltering)
+	if (_symbolUpdateDuringFiltering)
 		selectedItem = [symbolView itemAtRow:[symbolView selectedRow]];
 
 	[self filterSymbols];
 
-	if (symbolUpdateDuringFiltering) {
+	if (_symbolUpdateDuringFiltering) {
 		NSInteger row = [symbolView rowForItem:selectedItem];
 		if (row != -1LL) {
 			[symbolView scrollRowToVisible:row];
@@ -145,12 +150,12 @@
 			[self updateSelectedSymbolForLocation:[[docView textView] caret]];
 		}
 	}
-	symbolUpdateDuringFiltering = NO;
+	_symbolUpdateDuringFiltering = NO;
 }
 
 - (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor
 {
-	width = [symbolsView frame].size.width;
+	_width = [symbolsView frame].size.width;
 	NSRect frame = [splitView frame];
 	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];
 	if (focusEditor)
@@ -167,10 +172,10 @@
 
 - (void)cancelSymbolList
 {
-	[windowController focusEditorDelayed:nil];
-	if (closeSymbolListAfterUse) {
+	[windowController focusEditorDelayed];
+	if (_closeSymbolListAfterUse) {
 		[self closeSymbolListAndFocusEditor:NO];
-		closeSymbolListAfterUse = NO;
+		_closeSymbolListAfterUse = NO;
 	}
 	[self resetSymbolList];
 }
@@ -186,7 +191,7 @@
 	else
 		filter = [symbolFilterField stringValue];
 	if ([filter length] > 0 && [item isKindOfClass:[ViMark class]]) {
-		[symbolFilterCache setObject:[item title] forKey:filter];
+		[_symbolFilterCache setObject:[item title] forKey:filter];
 		[symbolFilterField setStringValue:@""];
 		[altSymbolFilterField setStringValue:@""];
 	}
@@ -213,14 +218,14 @@
 		return NO;
 	}
 
-	return (BOOL)[target performSelector:command.action withObject:command];
+	return [command performWithTarget:target];
 }
 
 - (void)selectFirstMatchingSymbolForFilter:(NSString *)filter
 {
 	NSUInteger row;
 
-	NSString *symbol = [symbolFilterCache objectForKey:filter];
+	NSString *symbol = [_symbolFilterCache objectForKey:filter];
 	if (symbol) {
 		// check if the cached symbol is available, then select it
 		for (row = 0; row < [symbolView numberOfRows]; row++) {
@@ -252,9 +257,9 @@
 	NSString *filter = [sender stringValue];
 
 	if ([filter length] == 0)
-		isFiltered = NO;
+		_isFiltered = NO;
 	else
-		isFiltered = YES;
+		_isFiltered = YES;
 
 	NSMutableString *pattern = [NSMutableString string];
 	int i;
@@ -262,29 +267,30 @@
 		[pattern appendFormat:@".*%C", [filter characterAtIndex:i]];
 	[pattern appendString:@".*"];
 
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-					        options:ONIG_OPTION_IGNORECASE];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern
+					  options:ONIG_OPTION_IGNORECASE];
 
-	filteredDocuments = [NSMutableArray arrayWithArray:windowController.documents];
+	[_filteredDocuments release];
+	_filteredDocuments = [[NSMutableArray alloc] initWithArray:[windowController.documents allObjects]];
 
 	// make sure the current document is displayed first in the symbol list
 	ViDocument *currentDocument = [windowController currentDocument];
 	if (currentDocument) {
-		[filteredDocuments removeObject:currentDocument];
-		[filteredDocuments insertObject:currentDocument atIndex:0];
+		[_filteredDocuments removeObject:currentDocument];
+		[_filteredDocuments insertObject:currentDocument atIndex:0];
 	}
 
 	NSMutableArray *emptyDocuments = [NSMutableArray array];
-	for (ViDocument *doc in filteredDocuments) {
+	for (ViDocument *doc in _filteredDocuments) {
 		if (![doc respondsToSelector:@selector(filterSymbols:)] ||
 		    [doc filterSymbols:rx] == 0)
 			[emptyDocuments addObject:doc];
 	}
-	[filteredDocuments removeObjectsInArray:emptyDocuments];
+	[_filteredDocuments removeObjectsInArray:emptyDocuments];
 	[symbolView reloadData];
 
-	if (!symbolUpdateDuringFiltering) {
-		if (isFiltered) {
+	if (!_symbolUpdateDuringFiltering) {
+		if (_isFiltered) {
 			[symbolView expandItem:nil expandChildren:YES];
 			[self selectFirstMatchingSymbolForFilter:filter];
 		} else {
@@ -310,10 +316,10 @@
 {
 	if (![self symbolListIsOpen]) {
 		if (temporarily)
-			closeSymbolListAfterUse = YES;
+			_closeSymbolListAfterUse = YES;
 		NSRect frame = [splitView frame];
-		[splitView setPosition:frame.size.width - width ofDividerAtIndex:1];
-		if (dirty)
+		[splitView setPosition:frame.size.width - _width ofDividerAtIndex:1];
+		if (_dirty)
 			[self symbolsUpdate:nil];
 	}
 }
@@ -331,7 +337,7 @@
 - (void)showAltFilterField
 {
 	if ([altSymbolFilterField isHidden]) {
-		isHidingAltFilterField = NO;
+		_isHidingAltFilterField = NO;
 		[NSAnimationContext beginGrouping];
 		[[NSAnimationContext currentContext] setDuration:0.1];
 
@@ -355,7 +361,7 @@
 - (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag
 {
 	if (flag) {
-		if (isHidingAltFilterField)
+		if (_isHidingAltFilterField)
 			[altSymbolFilterField setHidden:YES];
 		else {
 			NSRect symbolsFrame = [symbolsView frame];
@@ -368,7 +374,7 @@
 - (void)hideAltFilterField
 {
 	if (![altSymbolFilterField isHidden]) {
-		isHidingAltFilterField = YES;
+		_isHidingAltFilterField = YES;
 		[NSAnimationContext beginGrouping];
 		[[NSAnimationContext currentContext] setDuration:0.1];
 
@@ -460,7 +466,7 @@ doCommandBySelector:(SEL)aSelector
 				    byExtendingSelection:NO];
 		return YES;
 	} else if (aSelector == @selector(cancelOperation:)) { // escape
-		if (isFiltered) {
+		if (_isFiltered) {
 			[window makeFirstResponder:symbolView];
 			/* make sure something is selected */
 			if ([symbolView selectedRow] == -1)
@@ -502,7 +508,7 @@ doCommandBySelector:(SEL)aSelector
 	else
 		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
-		[symbolFilterCache setObject:symbol forKey:filter];
+		[_symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
 		[altSymbolFilterField setStringValue:@""];
 	}
@@ -512,7 +518,7 @@ doCommandBySelector:(SEL)aSelector
 		[windowController switchToDocument:doc];
 	windowController.jumping = NO;
 	if (symbol)
-		[windowController gotoMark:symbol inView:[windowController currentView]];
+		[windowController gotoMark:symbol];
 
 	[self cancelSymbolList];
 	return YES;
@@ -534,7 +540,7 @@ doCommandBySelector:(SEL)aSelector
 	else
 		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
-		[symbolFilterCache setObject:symbol forKey:filter];
+		[_symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
 		[altSymbolFilterField setStringValue:@""];
 	}
@@ -546,7 +552,7 @@ doCommandBySelector:(SEL)aSelector
 	windowController.jumping = NO;
 
 	if (symbol)
-		[windowController gotoMark:symbol inView:[windowController currentView]];
+		[windowController gotoMark:symbol];
 
 	[self cancelSymbolList];
 }
@@ -584,7 +590,7 @@ doCommandBySelector:(SEL)aSelector
 	else
 		filter = [altSymbolFilterField stringValue];
 	if (symbol && [filter length] > 0) {
-		[symbolFilterCache setObject:symbol forKey:filter];
+		[_symbolFilterCache setObject:symbol forKey:filter];
 		[symbolFilterField setStringValue:@""];
 		[altSymbolFilterField setStringValue:@""];
 	}
@@ -593,7 +599,7 @@ doCommandBySelector:(SEL)aSelector
 	ViDocumentView *docView = [windowController createTabForDocument:doc];
 	windowController.jumping = NO;
 	if (symbol)
-		[windowController gotoMark:symbol inView:docView];
+		[windowController gotoMark:symbol];
 
 	[self cancelSymbolList];
 	return YES;
@@ -607,7 +613,7 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)cancel_or_reset:(ViCommand *)command
 {
-	if (isFiltered)
+	if (_isFiltered)
 		[self resetSymbolList];
 	else
 		[self cancelSymbolList];
@@ -628,7 +634,7 @@ doCommandBySelector:(SEL)aSelector
            ofItem:(id)item
 {
 	if (item == nil)
-		return [filteredDocuments objectAtIndex:anIndex];
+		return [_filteredDocuments objectAtIndex:anIndex];
 	return [[(ViDocument *)item filteredSymbols] objectAtIndex:anIndex];
 }
 
@@ -644,7 +650,7 @@ doCommandBySelector:(SEL)aSelector
   numberOfChildrenOfItem:(id)item
 {
 	if (item == nil)
-		return [filteredDocuments count];
+		return [_filteredDocuments count];
 
 	if ([item isKindOfClass:[ViDocument class]])
 		return [[(ViDocument *)item filteredSymbols] count];
@@ -690,7 +696,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 {
 	NSCell *cell;
 	if ([self isSeparatorItem:item])
-		cell = separatorCell;
+		cell = _separatorCell;
 	else {
 		cell  = [tableColumn dataCellForRow:[symbolView rowForItem:item]];
 

@@ -4,15 +4,6 @@
 
 @implementation ViSFTPURLHandler
 
-- (id)init
-{
-	if ((self = [super init]) != nil) {
-		;
-	}
-
-	return self;
-}
-
 - (BOOL)respondsToURL:(NSURL *)aURL
 {
 	return [[aURL scheme] isEqualToString:@"sftp"];

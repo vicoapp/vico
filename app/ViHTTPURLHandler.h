@@ -2,15 +2,16 @@
 
 @interface ViHTTPDeferred : NSObject <ViDeferred>
 {
-	NSURLConnection *conn;
-	NSURLRequest *request;
-	NSMutableData *connData;
-	void (^dataCallback)(NSData *);
-	void (^completionCallback)(NSURL *, NSDictionary *, NSError *);
-	NSUInteger receivedContentLength;
-	NSInteger expectedContentLength;
-	id<ViDeferredDelegate> delegate;
-	BOOL finished;
+	NSURLConnection		*_conn;
+	NSURLRequest		*_request;
+	NSMutableData		*_connData;
+	NSUInteger		 _receivedContentLength;
+	NSInteger		 _expectedContentLength;
+	id<ViDeferredDelegate>	 _delegate;
+	BOOL			 _finished;
+
+	void (^_dataCallback)(NSData *);
+	void (^_completionCallback)(NSURL *, NSDictionary *, NSError *);
 }
 
 - (void)cancel;

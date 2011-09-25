@@ -4,44 +4,65 @@
 
 @implementation ViHTTPDeferred
 
-@synthesize delegate;
+@synthesize delegate = _delegate;
 
 - (id)initWithURL:(NSURL *)aURL
 	   onData:(void (^)(NSData *))aDataCallback
      onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aCompletionCallback
 {
 	if ((self = [super init]) != nil) {
-		connData = [NSMutableData data];
-		dataCallback = [aDataCallback copy];
-		completionCallback = [aCompletionCallback copy];
-		request = [NSURLRequest requestWithURL:aURL];
-		conn = [NSURLConnection connectionWithRequest:request
-						     delegate:self];
-		DEBUG(@"conn = %@", conn);
+		_connData = [[NSMutableData alloc] init];
+		_dataCallback = [aDataCallback copy];
+		_completionCallback = [aCompletionCallback copy];
+		_request = [[NSURLRequest alloc] initWithURL:aURL];
+		_conn = [[NSURLConnection alloc] initWithRequest:_request
+							delegate:self];
+		DEBUG(@"conn = %@", _conn);
 	}
 	return self;
 }
 
+- (void)dealloc
+{
+	[_connData release];
+	[_dataCallback release];
+	[_completionCallback release];
+	[_request release];
+	[_conn release];
+	[super dealloc];
+}
+
 - (void)finishWithError:(NSError *)error
 {
-	DEBUG(@"finished on conn %@, callback %p, error %@", conn, completionCallback, error);
+	DEBUG(@"finished on conn %@, callback %p, error %@", _conn, _completionCallback, error);
 
-	if (completionCallback) {
+	if (_completionCallback) {
 		NSDictionary *attributes = nil;
-		if (!error && [[request URL] isFileURL]) {
+		if (!error && [[_request URL] isFileURL]) {
 			NSFileManager *fm = [[NSFileManager alloc] init];
-			attributes = [fm attributesOfItemAtPath:[[request URL] path]
+			attributes = [fm attributesOfItemAtPath:[[_request URL] path]
 							  error:&error];
+			[fm release];
 		}
-		completionCallback([request URL], attributes, error);
+		_completionCallback([_request URL], attributes, error);
 	}
 
-	completionCallback = NULL;
-	dataCallback = NULL;
-	connData = nil;
-	conn = nil;
-	request = nil;
-	finished = YES;
+	[_completionCallback release];
+	_completionCallback = NULL;
+
+	[_dataCallback release];
+	_dataCallback = NULL;
+
+	[_connData release];
+	_connData = nil;
+
+	[_request release];
+	_request = nil;
+
+	[_conn release];
+	_conn = nil;
+
+	_finished = YES;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -51,27 +72,27 @@
 	if ([response isKindOfClass:[NSHTTPURLResponse class]])
 		DEBUG(@"http headers: %@", [(NSHTTPURLResponse *)response allHeaderFields]);
 #endif
-	expectedContentLength = [response expectedContentLength];
+	_expectedContentLength = [response expectedContentLength];
 #ifndef NO_DEBUG
-	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0)
-		DEBUG(@"expecting %lld bytes", expectedContentLength);
+	if (_expectedContentLength != NSURLResponseUnknownLength && _expectedContentLength > 0)
+		DEBUG(@"expecting %lld bytes", _expectedContentLength);
 #endif
 }
 
 - (CGFloat)progress
 {
-	if (expectedContentLength != NSURLResponseUnknownLength && expectedContentLength > 0)
-		return (CGFloat)receivedContentLength / (CGFloat)expectedContentLength;
+	if (_expectedContentLength != NSURLResponseUnknownLength && _expectedContentLength > 0)
+		return (CGFloat)_receivedContentLength / (CGFloat)_expectedContentLength;
 	return -1.0;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-	receivedContentLength += [data length];
+	_receivedContentLength += [data length];
 	DEBUG(@"received %lu bytes: %.1f%%", [data length], [self progress] * 100);
-	[connData appendData:data];
-	if (dataCallback)
-		dataCallback(data);
+	[_connData appendData:data];
+	if (_dataCallback)
+		_dataCallback(data);
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -87,7 +108,7 @@
 
 - (void)cancel
 {
-	[conn cancel];
+	[_conn cancel];
 
 	/* Prevent error display. */
 	[self finishWithError:[NSError errorWithDomain:NSCocoaErrorDomain
@@ -97,7 +118,7 @@
 
 - (void)wait
 {
-	while (!finished) {
+	while (!_finished) {
 		DEBUG(@"request %@ not finished yet", self);
 		[[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
 	}
@@ -108,14 +129,6 @@
 
 
 @implementation ViHTTPURLHandler
-
-- (id)init
-{
-	if ((self = [super init]) != nil) {
-	}
-
-	return self;
-}
 
 - (BOOL)respondsToURL:(NSURL *)aURL
 {
@@ -138,7 +151,7 @@
 	ViHTTPDeferred *deferred = [[ViHTTPDeferred alloc] initWithURL:aURL
 								onData:dataCallback
 							  onCompletion:completionCallback];
-	return deferred;
+	return [deferred autorelease];
 }
 
 @end

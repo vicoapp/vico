@@ -286,7 +286,7 @@
 		return NO;
 	}
 
-	return (BOOL)[self performSelector:command.action withObject:command];
+	return [command performWithTarget:self];
 }
 
 + (void)appendFilter:(NSString *)string

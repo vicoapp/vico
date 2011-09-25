@@ -11,57 +11,57 @@
 
 @interface ViFileExplorer : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate, ViJumpListDelegate, ViKeyManagerTarget, NSMenuDelegate>
 {
-	IBOutlet NSWindow *window;
-	IBOutlet ViWindowController *windowController;
-	IBOutlet ViOutlineView *explorer;
-	IBOutlet NSMenu *actionMenu;
-	IBOutlet NSSearchField *filterField;
-	IBOutlet NSSearchField *altFilterField;
-	IBOutlet NSSplitView *splitView;
-	IBOutlet ViBgView *explorerView;
-	IBOutlet NSWindow *sftpConnectView;
-	IBOutlet NSForm *sftpConnectForm;
-	IBOutlet NSScrollView *scrollView;
+	IBOutlet NSWindow		*window;
+	IBOutlet ViWindowController	*windowController;
+	IBOutlet ViOutlineView		*explorer;
+	IBOutlet NSMenu			*actionMenu;
+	IBOutlet NSSearchField		*filterField;
+	IBOutlet NSSearchField		*altFilterField;
+	IBOutlet NSSplitView		*splitView;
+	IBOutlet ViBgView		*explorerView;
+	IBOutlet NSWindow		*sftpConnectView;
+	IBOutlet NSForm			*sftpConnectForm;
+	IBOutlet NSScrollView		*scrollView;
 	IBOutlet ViToolbarPopUpButtonCell *actionButtonCell;
-	IBOutlet NSPopUpButton *actionButton;
-	IBOutlet NSProgressIndicator *progressIndicator;
-	IBOutlet NSToolbarItem *searchToolbarItem;
-	IBOutlet NSPathControl *pathControl;
+	IBOutlet NSPopUpButton		*actionButton;
+	IBOutlet NSProgressIndicator	*progressIndicator;
+	IBOutlet NSToolbarItem		*searchToolbarItem;
+	IBOutlet NSPathControl		*pathControl;
+	IBOutlet id			 delegate;
 
-	NSURL *rootURL;
-	CGFloat width;
-	NSFont *font;
+	NSURL				*_rootURL;
+	CGFloat				 _width;
+	NSFont				*_font;
 
 	// remembering expanded state
-	NSMutableSet *expandedSet;
-	BOOL isExpandingTree;
+	NSMutableSet			*_expandedSet;
+	BOOL				 _isExpandingTree;
 
-	NSInteger lastSelectedRow;
+	NSInteger			 _lastSelectedRow;
 
 	// incremental file filtering
-	NSMutableArray *filteredItems;
-	NSMutableArray *itemsToFilter;
-	ViRegexp *rx;
+	NSMutableArray			*_filteredItems;
+	NSMutableArray			*_itemsToFilter;
+	ViRegexp			*_rx;
 
-	BOOL closeExplorerAfterUse;
-	IBOutlet id delegate;
-	NSMutableArray *rootItems;
-	ViRegexp *skipRegex;
+	BOOL				 _closeExplorerAfterUse;
+	NSMutableArray			*_rootItems;
+	ViRegexp			*_skipRegex;
 
-	BOOL isFiltered;
-	BOOL isFiltering;
-	BOOL isHidingAltFilterField;
+	BOOL				 _isFiltered;
+	BOOL				 _isFiltering;
+	// BOOL				 _isHidingAltFilterField;
 
-	ViJumpList *history;
+	ViJumpList			*_history;
 
-	NSMutableDictionary *statusImages;
+	NSMutableDictionary		*_statusImages;
 
         /*
          * Since we can't pass an object through a void* contextInfo and
          * expect the object to survive garbage collection, store a strong
          * reference here.
          */
-	NSMutableSet *contextObjects;
+	NSMutableSet			*_contextObjects; // XXX: not needed without GC (but maybe with ARC in the future?)
 }
 
 @property(nonatomic,readwrite,assign) id delegate;

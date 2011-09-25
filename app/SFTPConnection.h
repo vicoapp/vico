@@ -88,14 +88,16 @@
 
 @interface SFTPMessage : NSObject
 {
-	uint8_t		 type;
-	uint32_t	 requestId;
-	NSData		*data;
-	const void	*ptr;
+	uint8_t		 _type;
+	uint32_t	 _requestId;
+	NSData		*_data;
+	const void	*_ptr;
 }
+
 @property (nonatomic, readonly) uint8_t type;
 @property (nonatomic, readonly) uint32_t requestId;
 @property (nonatomic, readonly) NSData *data;
+
 + (SFTPMessage *)messageWithData:(NSData *)someData;
 - (SFTPMessage *)initWithData:(NSData *)someData;
 
@@ -108,7 +110,9 @@
 - (BOOL)getAttributes:(NSDictionary **)ret;
 @end
 
+
 #pragma mark -
+
 
 /* Dummy interface to fool XCode into letting us use the same nib for
  * different classes.
@@ -127,33 +131,39 @@
 
 @class SFTPConnection;
 
+
+#pragma mark -
+
+
 @interface SFTPRequest : NSObject <ViDeferred>
 {
-	uint32_t requestId;
-	uint32_t requestType;
-	void (^responseCallback)(SFTPMessage *);
-	void (^cancelCallback)(SFTPRequest *);
-	SFTPConnection *connection;
-	BOOL cancelled;
-	BOOL finished;
-	SFTPRequest *subRequest;
-	CGFloat progress;
-	id<ViDeferredDelegate> delegate;
+	uint32_t			 _requestId;
+	uint32_t			 _requestType;
+	SFTPConnection			*_connection;
+	BOOL				 _cancelled;
+	BOOL				 _finished;
+	SFTPRequest			*_subRequest;
+	CGFloat				 _progress;
+	id<ViDeferredDelegate>		 _delegate;
 
 	/* Blocking for completion. */
-	IBOutlet NSWindow *waitWindow;
-	IBOutlet NSButton *cancelButton;
-	IBOutlet NSProgressIndicator *progressIndicator;
-	IBOutlet NSTextField *waitLabel;
-	SFTPRequest *waitRequest;
+	IBOutlet NSWindow		*waitWindow;
+	IBOutlet NSButton		*cancelButton;
+	IBOutlet NSProgressIndicator	*progressIndicator;
+	IBOutlet NSTextField		*waitLabel;
+	SFTPRequest			*_waitRequest;
+
+	void (^_responseCallback)(SFTPMessage *);
+	void (^_cancelCallback)(SFTPRequest *);
 }
+
 @property (nonatomic, copy) void (^onResponse)(SFTPMessage *);
 @property (nonatomic, copy) void (^onCancel)(SFTPRequest *);
-@property (nonatomic, readwrite, assign) SFTPRequest *subRequest;
+@property (nonatomic, readwrite, retain) SFTPRequest *subRequest;
 @property (nonatomic, readonly) BOOL cancelled;
 @property (nonatomic, readwrite) CGFloat progress;
 @property (nonatomic, readonly) uint32_t requestId;
-@property (nonatomic, readwrite, assign) SFTPRequest *waitRequest;
+@property (nonatomic, readwrite, retain) SFTPRequest *waitRequest;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type
@@ -164,49 +174,49 @@
 
 - (void)response:(SFTPMessage *)msg;
 - (IBAction)cancelTask:(id)sender;
+
 @end
+
 
 #pragma mark -
 
+
 @interface SFTPConnection : NSObject <NSStreamDelegate>
 {
-	NSString *host;
-	NSString *user;
-	NSNumber *port;
-	NSString *home;		/* home directory == current directory on connect */
+	NSString		*_host;
+	NSString		*_user;
+	NSNumber		*_port;
+	NSString		*_home;		/* home directory == current directory on connect */
 
-	id delegate;
+	id			 _delegate;
 
-	NSTask *ssh_task;
-	NSPipe *ssh_input;
-	NSPipe *ssh_output;
-	NSPipe *ssh_error;
+	NSTask			*_ssh_task;
 
-	int remoteVersion;
+	int			 _remoteVersion;
 
 	/* Outstanding requests, keyed on request ID. */
-	NSMutableDictionary *requests;
+	NSMutableDictionary	*_requests;
 	/* The initial INIT request does not have a request ID. */
-	SFTPRequest *initRequest;
+	SFTPRequest		*_initRequest;
 
-	NSMutableData *inbuf;
-	NSMutableData *errbuf;
+	NSMutableData		*_inbuf;
+	NSMutableData		*_errbuf;
 
-	ViBufferedStream *sshPipe;
-	ViBufferedStream *errStream;
+	ViBufferedStream	*_sshPipe;
+	ViBufferedStream	*_errStream;
 
-	uint32_t nextRequestId;
-	uint32_t transfer_buflen;
+	uint32_t		 _nextRequestId;
+	uint32_t		 _transfer_buflen;
 
-#define SFTP_EXT_POSIX_RENAME	0x00000001
-#define SFTP_EXT_STATVFS	0x00000002
-#define SFTP_EXT_FSTATVFS	0x00000004
-	uint32_t exts;
+#define SFTP_EXT_POSIX_RENAME	 0x00000001
+#define SFTP_EXT_STATVFS	 0x00000002
+#define SFTP_EXT_FSTATVFS	 0x00000004
+	uint32_t		 _exts;
 }
 
 @property(nonatomic,readonly) NSString *host;
 @property(nonatomic,readonly) NSString *user;
-@property(nonatomic,readonly) NSString *home;
+@property(nonatomic,readwrite,retain) NSString *home;
 @property(nonatomic,readonly) NSString *title;
 
 - (SFTPConnection *)initWithURL:(NSURL *)url error:(NSError **)outError;

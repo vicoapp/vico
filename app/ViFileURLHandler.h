@@ -2,7 +2,7 @@
 
 @interface ViFileURLHandler : NSObject <ViURLHandler>
 {
-	NSFileManager *fm;
+	NSFileManager *_fm;
 }
 
 @end

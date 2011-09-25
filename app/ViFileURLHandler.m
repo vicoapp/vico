@@ -13,10 +13,10 @@
 @synthesize delegate;
 + (ViFileDeferred *)sharedDeferred
 {
-	static ViFileDeferred *sharedDeferred = nil;
-	if (sharedDeferred == nil)
-		sharedDeferred = [[ViFileDeferred alloc] init];
-	return sharedDeferred;
+	static ViFileDeferred *__sharedDeferred = nil;
+	if (__sharedDeferred == nil)
+		__sharedDeferred = [[ViFileDeferred alloc] init];
+	return __sharedDeferred;
 }
 - (void)cancel
 {
@@ -31,10 +31,16 @@
 - (id)init
 {
 	if ((self = [super init]) != nil) {
-		fm = [[NSFileManager alloc] init];
+		_fm = [[NSFileManager alloc] init];
 	}
 
 	return self;
+}
+
+- (void)dealloc
+{
+	[_fm release];
+	[super dealloc];
 }
 
 - (BOOL)respondsToURL:(NSURL *)aURL
@@ -52,6 +58,13 @@
 		return nil;
 	}
 
+	/*
+         * The aBlock argument is typically a stack block literal and
+         * can't be automatically retained without moving it to the
+         * heap.
+	 */
+	void (^blockCopy)(NSArray *, NSError *) = [[aBlock copy] autorelease];
+
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		NSFileManager *fileman = [[NSFileManager alloc] init];
 		NSError *error = nil;
@@ -68,18 +81,22 @@
 			if (attrs && [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink]) {
 				DEBUG(@"resolved %@ -> %@", u, symurl);
 				if (symurl)
-					symattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:[symurl path] error:&error];
+					symattrs = [fileman attributesOfItemAtPath:[symurl path] error:&error];
 			}
 
 			if (attrs)
-				[contents addObject:[ViFile fileWithURL:u attributes:attrs symbolicLink:symurl symbolicAttributes:symattrs]];
+				[contents addObject:[ViFile fileWithURL:u
+                                                             attributes:attrs
+                                                           symbolicLink:symurl
+                                                     symbolicAttributes:symattrs]];
 			else if (error)
 				break;
 		}
+		[fileman release];
 
 		/* Schedule completion block on main queue. */
 		dispatch_sync(dispatch_get_main_queue(), ^{
-			aBlock(contents, error);
+			blockCopy(contents, error);
 		});
 	});
 
@@ -91,10 +108,10 @@
 {
 	DEBUG(@"url = %@", aURL);
 	NSError *error = nil;
-	[fm createDirectoryAtPath:[aURL path]
-      withIntermediateDirectories:YES
-		       attributes:nil
-			    error:&error];
+	[_fm createDirectoryAtPath:[aURL path]
+       withIntermediateDirectories:YES
+			attributes:nil
+			     error:&error];
 	aBlock(error);
 	return nil;
 }
@@ -119,7 +136,7 @@
 	DEBUG(@"url = %@", aURL);
 	NSError *error = nil;
 	NSURL *url = [self normalizeURL:aURL];
-	NSDictionary *attributes = [fm attributesOfItemAtPath:[url path] error:&error];
+	NSDictionary *attributes = [_fm attributesOfItemAtPath:[url path] error:&error];
 	if (error || attributes == nil)
 		aBlock(nil, nil, error);
 	else
@@ -133,7 +150,7 @@
 	DEBUG(@"url = %@", aURL);
 	BOOL result, isDirectory;
 	NSURL *url = [self normalizeURL:aURL];
-	result = [fm fileExistsAtPath:[url path] isDirectory:&isDirectory];
+	result = [_fm fileExistsAtPath:[url path] isDirectory:&isDirectory];
 	aBlock(result ? url : nil, isDirectory, nil);
 	return nil;
 }
@@ -144,7 +161,7 @@
 {
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 	NSError *error = nil;
-	[fm moveItemAtURL:srcURL toURL:dstURL error:&error];
+	[_fm moveItemAtURL:srcURL toURL:dstURL error:&error];
 	aBlock([dstURL URLByResolvingSymlinksInPath], error);
 	return nil;
 }
@@ -182,7 +199,7 @@
 	NSError *error = nil;
 	[data writeToURL:aURL options:NSDataWritingAtomic error:&error];
 	NSURL *normalizedURL = [self normalizeURL:aURL];
-	NSDictionary *attributes = [fm attributesOfItemAtPath:[normalizedURL path] error:&error];
+	NSDictionary *attributes = [_fm attributesOfItemAtPath:[normalizedURL path] error:&error];
 	aBlock(normalizedURL, attributes, error);
 	return nil;
 }

@@ -1,5 +1,6 @@
 #import "TxmtURLProtocol.h"
 #import "ViDocument.h"
+#import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
 
 @implementation TxmtURLProtocol
@@ -104,16 +105,9 @@
 	NSNumber *lineNumber = nil;
 	NSURL *openURL = [TxmtURLProtocol parseURL:url intoLineNumber:&lineNumber];
 	if (openURL) {
-		SEL sel = @selector(gotoURL:lineNumber:);
-		ViWindowController *winCon = [ViWindowController currentWindowController];
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[winCon methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&openURL atIndex:2];
-		[invocation setArgument:&lineNumber atIndex:3];
-		[invocation retainArguments];
-		[invocation performSelectorOnMainThread:@selector(invokeWithTarget:)
-					     withObject:winCon
-					  waitUntilDone:NO];
+		ViMark *m = [ViMark markWithURL:openURL line:[lineNumber unsignedIntegerValue] column:0];
+		ViWindowController *windowController = [ViWindowController currentWindowController];
+		[windowController performSelectorOnMainThread:@selector(gotoMark:) withObject:m waitUntilDone:NO];
 	}
 
 	/*

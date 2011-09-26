@@ -27,15 +27,19 @@ extern int logIndent;
 
 #endif
 
-#ifdef NO_DEBUG
+#define NO_MEM_DEBUG
+
+#ifdef NO_MEM_DEBUG
+# define MEMDEBUG(fmt, ...)
 # define DEBUG_FINALIZE()
 # define DEBUG_DEALLOC()
 #else
-# define DEBUG_DEALLOC() DEBUG(@"%p", self)
-#define DEBUG_FINALIZE()		\
+# define MEMDEBUG INFO
+# define DEBUG_DEALLOC() MEMDEBUG(@"%p", self)
+# define DEBUG_FINALIZE()		\
 - (void)finalize			\
 {					\
-	INFO(@"self = %@", self);	\
+	MEMDEBUG(@"%p", self);		\
 	[super finalize];		\
 }
 #endif

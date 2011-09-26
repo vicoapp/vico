@@ -1,6 +1,7 @@
 #import "ViFileURLHandler.h"
 #import "ViError.h"
 #import "ViFile.h"
+#import "NSURL-additions.h"
 #include "logging.h"
 
 @interface ViFileDeferred : NSObject <ViDeferred>
@@ -59,9 +60,9 @@
 	}
 
 	/*
-         * The aBlock argument is typically a stack block literal and
-         * can't be automatically retained without moving it to the
-         * heap.
+	 * The aBlock argument is typically a stack block literal and
+	 * can't be automatically retained without moving it to the
+	 * heap.
 	 */
 	void (^blockCopy)(NSArray *, NSError *) = [[aBlock copy] autorelease];
 
@@ -78,18 +79,18 @@
 			NSString *p = [u path];
 
 			attrs = [fileman attributesOfItemAtPath:p error:&error];
-			symurl = [u URLByResolvingSymlinksInPath];
-			if (attrs && [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink]) {
-				DEBUG(@"resolved %@ -> %@", u, symurl);
+			BOOL isAlias = NO;
+			symurl = [u URLByResolvingSymlinksAndAliases:&isAlias];
+			if (attrs && (isAlias || [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink])) {
 				if (symurl)
 					symattrs = [fileman attributesOfItemAtPath:[symurl path] error:&error];
 			}
 
 			if (attrs)
 				[contents addObject:[ViFile fileWithURL:u
-                                                             attributes:attrs
-                                                           symbolicLink:symurl
-                                                     symbolicAttributes:symattrs]];
+							     attributes:attrs
+							   symbolicLink:symurl
+						     symbolicAttributes:symattrs]];
 			else if (error)
 				break;
 		}

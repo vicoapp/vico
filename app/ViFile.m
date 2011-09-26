@@ -101,6 +101,8 @@ symbolicAttributes:(NSDictionary *)sDictionary
 	_targetAttributes = aDictionary;
 
 	_iconIsDirty = YES;
+	if (!_isLink)
+		_isLink = (_targetAttributes != nil);
 
 	if (_isLink)
 		_isDirectory = [[_targetAttributes fileType] isEqualToString:NSFileTypeDirectory];

@@ -1702,7 +1702,7 @@ doCommandBySelector:(SEL)aSelector
 
 	__block BOOL directoryContentsIsAsync = NO;
 	_isExpandingTree = YES;
-	[self childrenAtURL:file.url onCompletion:^(NSMutableArray *children, NSError *error) {
+	[self childrenAtURL:file.targetURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error)
 			[NSApp presentError:error];
 		else {

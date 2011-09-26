@@ -16,6 +16,12 @@
 							    defaultMap:[ViMap mapWithName:@"tableNavigationMap"]]];
 }
 
+- (void)dealloc
+{
+	[self setKeyManager:nil];
+	[super dealloc];
+}
+
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {

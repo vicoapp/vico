@@ -2,6 +2,8 @@
 (class NuCell
 	(- (id) proxyForJson is (self array)))
 
+(load "cocoa")
+
 (global NSNotFound -1)
 
 (global ViNormalMode 1)
@@ -40,4 +42,16 @@
 
 (global NSMaxRange (do (range) (+ (range first) (range second))))
 (global NSBackwardsSearch 4)
+
+(global ViViewPositionDefault 0)
+(global ViViewPositionReplace 1)
+(global ViViewPositionTab 2)
+(global ViViewPositionSplitLeft 3)
+(global ViViewPositionSplitRight 4)
+(global ViViewPositionSplitAbove 5)
+(global ViViewPositionSplitBelow 6)
+
+(bridge constant NSImageNameStatusAvailable "@")
+(bridge constant NSImageNameStatusPartiallyAvailable "@")
+(bridge constant NSImageNameStatusUnavailable "@")
 

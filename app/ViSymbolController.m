@@ -21,9 +21,14 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
+
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[_separatorCell release];
 	[_symbolFilterCache release];
+	[_filteredDocuments release];
+	[_reloadTimer invalidate];
+	[_reloadTimer release];
 	[super dealloc];
 }
 
@@ -49,6 +54,16 @@
 						 selector:@selector(firstResponderChanged:)
 						     name:ViFirstResponderChangedNotification
 						   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(documentRemoved:)
+						     name:ViDocumentRemovedNotification
+						   object:nil];
+}
+
+- (void)documentRemoved:(NSNotification *)notification
+{
+	[self symbolsUpdate:nil];
 }
 
 - (void)firstResponderChanged:(NSNotification *)notification

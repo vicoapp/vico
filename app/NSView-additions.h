@@ -20,6 +20,8 @@
  */
 - (id)targetForSelector:(SEL)action;
 
+- (BOOL)performCommand:(ViCommand *)command;
+
 - (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix;
 - (NSString *)getExStringForCommand:(ViCommand *)command;
 - (BOOL)evalExCommand:(ExCommand *)ex;

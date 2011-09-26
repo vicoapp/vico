@@ -53,6 +53,11 @@
 	return nil;
 }
 
+- (BOOL)performCommand:(ViCommand *)command
+{
+	return [command performWithTarget:[self targetForSelector:[command action]]];
+}
+
 - (NSString *)getExStringForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	NSString *exString = nil;

@@ -53,7 +53,7 @@
 @property(nonatomic,readwrite,retain) id title;
 
 @property(nonatomic,readwrite,retain) ViDocument *document;
-@property(nonatomic,readonly) ViDocumentView *view;
+@property(nonatomic,readonly) __weak ViDocumentView *view;
 
 @property(nonatomic,readonly) NSString *groupName;
 

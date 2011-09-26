@@ -1,4 +1,5 @@
 #import "NSURL-additions.h"
+#include "logging.h"
 
 @implementation NSURL (equality)
 
@@ -35,6 +36,45 @@ static NSCharacterSet *__slashSet = nil;
 	if ([self isFileURL])
 		return [[self path] stringByAbbreviatingWithTildeInPath];
 	return [self absoluteString];
+}
+
+/*
+ * Copied from a post by Sean McBride.
+ * http://www.cocoabuilder.com/archive/cocoa/301899-dealing-with-alias-files-finding-url-to-target-file.html
+ */
+- (NSURL *)URLByResolvingSymlinksAndAliases:(BOOL *)isAliasPtr
+{
+	NSURL *resultURL = [self URLByResolvingSymlinksInPath];
+
+	NSError *error = nil;
+	NSNumber *isAliasFile = nil;
+	BOOL success = [resultURL getResourceValue:&isAliasFile
+					    forKey:NSURLIsAliasFileKey
+					     error:&error];
+	if (success && [isAliasFile boolValue]) {
+		if (isAliasPtr)
+			*isAliasPtr = YES;
+		NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:resultURL
+								      error:&error];
+		if (bookmarkData) {
+			BOOL isStale = NO;
+			NSURLBookmarkResolutionOptions options =
+			    (NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting);
+
+			NSURL *resolvedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+								       options:options
+								 relativeToURL:nil
+							   bookmarkDataIsStale:&isStale
+									 error:&error];
+			if (resolvedURL) {
+				resultURL = resolvedURL;
+				INFO(@"resolved %@ -> %@", self, resultURL);
+			}
+		}
+	} else if (isAliasPtr)
+		*isAliasPtr = NO;
+
+	return resultURL;
 }
 
 @end

@@ -3,4 +3,5 @@
 - (BOOL)hasPrefix:(NSURL *)prefixURL;
 - (NSURL *)URLWithRelativeString:(NSString *)string;
 - (NSString *)displayString;
+- (NSURL *)URLByResolvingSymlinksAndAliases:(BOOL *)isAliasPtr;
 @end

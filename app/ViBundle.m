@@ -212,6 +212,10 @@
 	[env setObject:[supportPath stringByAppendingPathComponent:@"lib/bash_init.sh"] forKey:@"BASH_ENV"];
 	[env setObject:NSFullUserName() forKey:@"TM_FULLNAME"];
 
+	// TextMate 2 moves the CommitWindow app into an SCM bundle and makes git, hg and other bundles require it.
+	// The SCM bundle then export the TM_SCM_COMMIT_WINDOW variable for other bundles to use.
+	[env setObject:[supportPath stringByAppendingPathComponent:@"/bin/CommitWindow.app/Contents/MacOS/CommitWindow"] forKey:@"TM_SCM_COMMIT_WINDOW"];
+
 	/* Text-view related variables.
 	 */
 	if (textView) {

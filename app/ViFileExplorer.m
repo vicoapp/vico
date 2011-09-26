@@ -578,7 +578,7 @@
 	return set;
 }
 
-- (IBAction)openDocuments:(id)sender
+- (void)openInPosition:(ViViewPosition)position
 {
 	__block BOOL didOpen = NO;
 	NSIndexSet *set = [self clickedIndexes];
@@ -586,97 +586,38 @@
 		id item = [explorer itemAtRow:idx];
 		ViFile *file = [self fileForItem:item];
 		if (file && !file.isDirectory) {
-			[delegate gotoURL:file.targetURL];
+			[windowController gotoMark:[ViMark markWithURL:file.url] positioned:position];
 			didOpen = YES;
 		}
 	}];
 
 	if (didOpen)
 		[self cancelExplorer];
+}
+
+- (IBAction)openDocuments:(id)sender
+{
+	[self openInPosition:ViViewPositionDefault];
 }
 
 - (IBAction)openInTab:(id)sender
 {
-	__block BOOL didOpen = NO;
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ViFile *file = [self fileForItem:item];
-		if (file && !file.isDirectory) {
-			NSError *err = nil;
-			ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:file.targetURL
-														 display:NO
-														   error:&err];
-			if (err)
-				[windowController message:@"%@: %@", file.url, [err localizedDescription]];
-			else if (doc) {
-				[windowController createTabForDocument:doc];
-				didOpen = YES;
-			}
-		}
-	}];
-
-	if (didOpen)
-		[self cancelExplorer];
+	[self openInPosition:ViViewPositionTab];
 }
 
 - (IBAction)openInCurrentView:(id)sender
 {
-	NSUInteger idx = [[self clickedIndexes] firstIndex];
-	id item = [explorer itemAtRow:idx];
-	if (item == nil || [self outlineView:explorer isItemExpandable:item])
-		return;
-	ViFile *file = [self fileForItem:item];
-	if (!file)
-		return;
-	NSError *err = nil;
-	ViDocument *doc = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:file.targetURL
-												 display:NO
-												   error:&err];
-
-	if (err)
-		[windowController message:@"%@: %@", file.url, [err localizedDescription]];
-	else if (doc)
-		[windowController switchToDocument:doc];
-	[self cancelExplorer];
+	[self openInPosition:ViViewPositionReplace];
 }
 
 - (IBAction)openInSplit:(id)sender
 {
-	__block BOOL didOpen = NO;
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ViFile *file = [self fileForItem:item];
-		if (file && !file.isDirectory) {
-			[windowController splitVertically:NO
-						  andOpen:file.url
-				       orSwitchToDocument:nil];
-			didOpen = YES;
-		}
-	}];
-
-	if (didOpen)
-		[self cancelExplorer];
+	[self openInPosition:ViViewPositionSplitAbove];
 }
 
-- (IBAction)openInVerticalSplit:(id)sender;
+- (IBAction)openInVerticalSplit:(id)sender
 {
-	__block BOOL didOpen = NO;
-	NSIndexSet *set = [self clickedIndexes];
-	[set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-		id item = [explorer itemAtRow:idx];
-		ViFile *file = [self fileForItem:item];
-		if (file && !file.isDirectory) {
-			[windowController splitVertically:YES
-						  andOpen:file.url
-				       orSwitchToDocument:nil];
-			didOpen = YES;
-		}
-	}];
-
-	if (didOpen)
-		[self cancelExplorer];
+	[self openInPosition:ViViewPositionSplitLeft];
 }
 
 - (IBAction)renameFile:(id)sender

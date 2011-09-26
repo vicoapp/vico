@@ -32,7 +32,7 @@
 		MESSAGE(@"Already at end of jumplist");
 		return NO;
 	}
-	return [windowController gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
+	return [windowController gotoMark:jump positioned:ViViewPositionDefault recordJump:NO];
 }
 
 /* syntax: [count]<ctrl-o> */
@@ -45,7 +45,7 @@
 		MESSAGE(@"Already at beginning of jumplist");
 		return NO;
 	}
-	return [windowController gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
+	return [windowController gotoMark:jump positioned:ViViewPositionDefault recordJump:NO];
 }
 
 /* syntax: v */
@@ -2347,32 +2347,21 @@
 	}
 
 	BOOL moveToColumn = ([command.mapping.keyString isEqualToString:@"`"]);	// XXX: use another selector!
+	if (!moveToColumn)
+		m = [ViMark markWithURL:m.url line:m.line column:0];
 
 	if (m.document != [self document]) {
-		/* XXX: This is sooo weird! We're changing the first responder from the text view!? */
-		return [[[self window] windowController] gotoURL:m.document.fileURL
-							    line:m.line
-							  column:(moveToColumn ? m.column : 0)];
-	}
-
-	NSInteger bol = [[self textStorage] locationForStartOfLine:m.line];
-	if (bol == -1) {
-		MESSAGE(@"Mark %C: the line was deleted", command.argument);
+		/* Motion components can't change document. */
+		if ([[[self window] windowController] gotoMark:m] && !command.hasOperator)
+			return YES;
 		return NO;
 	}
-	end_location = bol;
 
-	if (moveToColumn)	// XXX: use another selector!
-		[self gotoColumn:m.column fromLocation:bol];
-	else
-		end_location = [[self textStorage] skipWhitespaceFrom:end_location];
+	if (!moveToColumn)
+		[m setLocation:[[self textStorage] skipWhitespaceFrom:m.location]];
 
-	if (!command.hasOperator) {
-		[[self nextRunloop] showFindIndicatorForRange:NSMakeRange(end_location, 1)];
-		[self pushLocationOnJumpList:start_location];
-	}
-
-	final_location = end_location;
+	[self gotoMark:m];
+	end_location = [self caret];
 
 	return YES;
 }

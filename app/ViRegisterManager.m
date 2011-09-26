@@ -37,7 +37,7 @@
 	} else if (regName == '%') {
 		return [[[[ViWindowController currentWindowController] currentDocument] fileURL] absoluteString];
 	} else if (regName == '#') {
-		return [[[[ViWindowController currentWindowController] previousDocument] fileURL] absoluteString];
+		return [[[ViWindowController currentWindowController] alternateURL] absoluteString];
 	} else if (regName == '_')
 		return @"";
 

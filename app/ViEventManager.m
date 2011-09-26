@@ -62,7 +62,7 @@ static NSInteger __nextEventId = 0;
 	[super dealloc];
 }
 
-- (void)emitCallbacks:(id)callbacks withArglist:(NuCell *)arglist
+- (void)emitCallbacks:(id)callbacks forEvent:(NSString *)event withArglist:(NuCell *)arglist
 {
 	for (ViEvent *ev in callbacks) {
 		DEBUG(@"evaluating expression: %@ with arguments %@",
@@ -76,8 +76,8 @@ static NSInteger __nextEventId = 0;
 			DEBUG(@"expression returned %@", result);
 		}
 		@catch (NSException *exception) {
-			INFO(@"got exception %@ while evaluating expression:\n%@",
-			    [exception name], [exception reason]);
+			INFO(@"got exception %@ while evaluating expression for event %@:\n%@\n%@",
+			    [exception name], event, [exception reason], [exception callStackSymbols]);
 		}
 	}
 }
@@ -103,14 +103,14 @@ static NSInteger __nextEventId = 0;
 	NSString *key = [event lowercaseString];
 	NSMutableArray *callbacks = [_anonymous_events objectForKey:key];
 	if (callbacks)
-		[self emitCallbacks:callbacks withArglist:arglist];
+		[self emitCallbacks:callbacks forEvent:event withArglist:arglist];
 
 	if (owner) {
 		NSMapTable *owners = [_owned_events objectForKey:key];
 		if (owners) {
 			NSMutableArray *callbacks = [owners objectForKey:owner];
 			if (callbacks)
-				[self emitCallbacks:callbacks withArglist:arglist];
+				[self emitCallbacks:callbacks forEvent:event withArglist:arglist];
 		}
 	}
 }

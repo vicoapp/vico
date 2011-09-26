@@ -21,8 +21,8 @@
 #import "ViBgView.h"
 #import "ViMark.h"
 
-static NSMutableArray		*windowControllers = nil;
-static ViWindowController	*currentWindowController = nil;
+static NSMutableArray			*__windowControllers = nil;
+static __weak ViWindowController	*__currentWindowController = nil; // XXX: not retained!
 
 @interface ViWindowController ()
 - (void)updateJumplistNavigator;
@@ -35,72 +35,130 @@ static ViWindowController	*currentWindowController = nil;
 	       didCloseAll:(BOOL)didCloseAll
 	     tabController:(void *)tabController;
 - (void)unlistDocument:(ViDocument *)document;
+- (void)willChangeCurrentView;
+- (void)didChangeCurrentView;
 @end
 
 
 #pragma mark -
 @implementation ViWindowController
 
-@synthesize documents;
-@synthesize project;
-@synthesize explorer;
-@synthesize jumpList, jumping;
-@synthesize tagStack, tagsDatabase;
-@synthesize previousDocument;
-@synthesize baseURL;
-@synthesize symbolController;
+@synthesize documents = _documents;
+@synthesize project = _project;
+@synthesize explorer = explorer;
+@synthesize jumpList = _jumpList;
+@synthesize jumping = _jumping;
+@synthesize alternateMark = _alternateMark;
+@synthesize alternateMarkCandidate = _alternateMarkCandidate;
+@synthesize baseURL = _baseURL;
+@synthesize symbolController = _symbolController;
+@synthesize parser = _parser;
 
 + (ViWindowController *)currentWindowController
 {
-	if (currentWindowController == nil)
-		[[ViWindowController alloc] init];
-	return currentWindowController;
-}
-
-+ (NSWindow *)currentMainWindow
-{
-	if (currentWindowController)
-		return [currentWindowController window];
-	else if ([windowControllers count] > 0)
-		return [[windowControllers objectAtIndex:0] window];
-	else
-		return nil;
+	if (__currentWindowController == nil)
+		return [[[ViWindowController alloc] init] autorelease];
+	return __currentWindowController;
 }
 
 - (id)init
 {
-	self = [super initWithWindowNibName:@"ViDocumentWindow"];
-	if (self) {
-		isLoaded = NO;
-		if (windowControllers == nil)
-			windowControllers = [NSMutableArray array];
-		[windowControllers addObject:self];
-		currentWindowController = self;
-		documents = [NSMutableArray array];
-		jumpList = [[ViJumpList alloc] init];
-		[jumpList setDelegate:self];
-		parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
-		tagStack = [[ViTagStack alloc] init];
+	if ((self = [super initWithWindowNibName:@"ViDocumentWindow"]) != nil) {
+		_isLoaded = NO;
+		if (__windowControllers == nil)
+			__windowControllers = [[NSMutableArray alloc] init];
+		[__windowControllers addObject:self];
+		__currentWindowController = self;
+		_documents = [[NSMutableSet alloc] init];
+		_jumpList = [[ViJumpList alloc] init];
+		[_jumpList setDelegate:self];
+		_parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
+		_tagStack = [[[ViMarkManager sharedManager] stackWithName:[NSString stringWithFormat:@"Tag Stack for window %p", self]] retain];
+		[_tagStack setMaxLists:1];
 		[self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+		MEMDEBUG(@"init %@", self);
 	}
 
 	return self;
 }
 
-- (ViTagsDatabase *)tagsDatabase
+DEBUG_FINALIZE();
+
+- (void)dealloc
 {
-	if (![[tagsDatabase baseURL] isEqualToURL:baseURL])
-		tagsDatabase = nil;
+	DEBUG_DEALLOC();
 
-	if (tagsDatabase == nil)
-		tagsDatabase = [[ViTagsDatabase alloc] initWithBaseURL:baseURL];
+	[[ViEventManager defaultManager] clearFor:self];
 
-	return tagsDatabase;
+	[[self window] unbind:@"title"];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"undostyle"];
+
+	NSArray *items = [[openFilesButton menu] itemArray];
+	if ([items count] > 0) {
+		MEMDEBUG(@"Got remaining items in open files menu: %@", items);
+	}
+
+	// INFO(@"closing window %@, got %lu document left: %@", self, [_documents count], _documents);
+	// for (ViDocument *doc in _documents)
+	// 	[doc removeObserver:symbolController forKeyPath:@"symbols"];
+
+	[_checkURLDeferred setDelegate:nil];
+	[_checkURLDeferred cancel];
+	[_checkURLDeferred release];
+
+	[_baseURL release];
+	[_viFieldEditor release];
+	[_viFieldEditorStorage release];
+	[_tagStack release];
+	[_tagsDatabase release];
+	[_documents release];
+	[_parser release];
+	[_project release];
+	[_jumpList setDelegate:nil];
+	[_jumpList release];
+	[_currentView release];
+	[_modifiedSet release];
+
+	// ?
+	[_initialDocument release];
+	[_initialViewController release];
+
+	[_alternateMark release];
+	[_alternateMarkCandidate release];
+
+#ifdef TRIAL_VERSION
+	[_nagTitle release];
+#endif
+
+	/*
+	 * Top-level nib objects released by super NSWindowController
+	 */
+
+	[super dealloc];
 }
 
-- (ViParser *)parser
+- (NSString *)description
 {
-	return parser;
+	return [NSString stringWithFormat:@"<ViWindowController %p: %@>", self, _baseURL];
+}
+
+- (ViMarkList *)tagStack
+{
+	return [_tagStack list];
+}
+
+- (ViTagsDatabase *)tagsDatabase
+{
+	if (![[_tagsDatabase baseURL] isEqualToURL:_baseURL]) {
+		[_tagsDatabase release];
+		_tagsDatabase = nil;
+	}
+
+	if (_tagsDatabase == nil)
+		_tagsDatabase = [[ViTagsDatabase alloc] initWithBaseURL:_baseURL];
+
+	return _tagsDatabase;
 }
 
 - (void)getMoreBundles:(id)sender
@@ -113,12 +171,12 @@ static ViWindowController	*currentWindowController = nil;
 - (void)windowDidResize:(NSNotification *)notification
 {
 #ifdef TRIAL_VERSION
-	if (nagTitle) {
+	if (_nagTitle) {
 		NSView *view = [[[self window] contentView] superview];
-		NSRect rect = [nagTitle frame];
+		NSRect rect = [_nagTitle frame];
 		rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
 		rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
-		[nagTitle setFrame:rect];
+		[_nagTitle setFrame:rect];
 	}
 #endif
 
@@ -154,22 +212,22 @@ static ViWindowController	*currentWindowController = nil;
 	rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
 	rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
 
-	if (nagTitle == nil) {
-		nagTitle = [[NSTextField alloc] initWithFrame:rect];
-		[nagTitle setDrawsBackground:NO];
-		[nagTitle setEditable:NO];
-		[nagTitle setBezeled:NO];
-		[nagTitle setTextColor:[NSColor blackColor]];
-		[view addSubview:nagTitle];
+	if (_nagTitle == nil) {
+		_nagTitle = [[NSTextField alloc] initWithFrame:rect];
+		[_nagTitle setDrawsBackground:NO];
+		[_nagTitle setEditable:NO];
+		[_nagTitle setBezeled:NO];
+		[_nagTitle setTextColor:[NSColor blackColor]];
+		[view addSubview:_nagTitle];
 	} else
-		[nagTitle setFrame:rect];
-	[nagTitle setStringValue:[[NSAttributedString alloc] initWithString:s attributes:attrs]];
+		[_nagTitle setFrame:rect];
+	[_nagTitle setStringValue:[[[NSAttributedString alloc] initWithString:s attributes:attrs] autorelease]];
 }
 #endif
 
 - (void)tearDownBundleMenu:(NSNotification *)notification
 {
-	NSMenu *menu = (NSMenu *)[notification object];
+	NSMenu *menu = [notification object];
 
 	/*
 	 * Must remove the bundle menu items, otherwise the key equivalents
@@ -197,9 +255,9 @@ static ViWindowController	*currentWindowController = nil;
 	[bundleButton setMenu:menu];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
-                                        selector:@selector(tearDownBundleMenu:)
-                                            name:NSMenuDidEndTrackingNotification
-                                          object:menu];
+						 selector:@selector(tearDownBundleMenu:)
+						     name:NSMenuDidEndTrackingNotification
+						   object:menu];
 }
 
 - (void)windowDidLoad
@@ -246,14 +304,16 @@ static ViWindowController	*currentWindowController = nil;
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
 
-	isLoaded = YES;
-	if (initialDocument) {
-		[self addNewTab:initialDocument];
-		initialDocument = nil;
+	_isLoaded = YES;
+	if (_initialDocument) {
+		[self addNewTab:_initialDocument];
+		[_initialDocument release];
+		_initialDocument = nil;
 	}
-	if (initialViewController) {
-		[self createTabWithViewController:initialViewController];
-		initialViewController = nil;
+	if (_initialViewController) {
+		[self createTabWithViewController:_initialViewController];
+		[_initialViewController release];
+		_initialViewController = nil;
 	}
 
 	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
@@ -269,14 +329,14 @@ static ViWindowController	*currentWindowController = nil;
 		[explorer openExplorerTemporarily:NO];
 		/* This makes repeated open requests for the same URL always open a new window.
 		 * With this commented, the "project" is already opened, and no new window will be created.
+		 */
 		[[self project] close];
-		project = nil;
-		*/
+		_project = nil;
 	}
 
 	[self updateJumplistNavigator];
 
-	[parser setNviStyleUndo:[[[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"] isEqualToString:@"nvi"]];
+	[_parser setNviStyleUndo:[[[NSUserDefaults standardUserDefaults] stringForKey:@"undostyle"] isEqualToString:@"nvi"]];
 	[[NSUserDefaults standardUserDefaults] addObserver:self
 						forKeyPath:@"undostyle"
 						   options:NSKeyValueObservingOptionNew
@@ -286,14 +346,17 @@ static ViWindowController	*currentWindowController = nil;
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject
 {
 	if ([anObject isKindOfClass:[ExTextField class]]) {
-		if (viFieldEditor == nil)
-			viFieldEditor = [ViTextView makeFieldEditor];
-		return viFieldEditor;
+		if (_viFieldEditor == nil) {
+			_viFieldEditorStorage = [[ViTextStorage alloc] init];
+			_viFieldEditor = [[ViTextView makeFieldEditorWithTextStorage:_viFieldEditorStorage] retain];
+		}
+		return _viFieldEditor;
 	}
 	return nil;
 }
 
-- (NSApplicationPresentationOptions)window:(NSWindow *)window willUseFullScreenPresentationOptions:(NSApplicationPresentationOptions)proposedOptions
+- (NSApplicationPresentationOptions)window:(NSWindow *)window
+      willUseFullScreenPresentationOptions:(NSApplicationPresentationOptions)proposedOptions
 {
 	return proposedOptions | NSApplicationPresentationAutoHideToolbar;
 }
@@ -301,7 +364,7 @@ static ViWindowController	*currentWindowController = nil;
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
 #ifdef TRIAL_VERSION
-	[nagTitle setHidden:YES];
+	[_nagTitle setHidden:YES];
 #endif
 	[[ViEventManager defaultManager] emit:ViEventWillEnterFullScreen for:self with:self, nil];
 }
@@ -314,7 +377,7 @@ static ViWindowController	*currentWindowController = nil;
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
 #ifdef TRIAL_VERSION
-	[nagTitle setHidden:NO];
+	[_nagTitle setHidden:NO];
 #endif
 	[[ViEventManager defaultManager] emit:ViEventWillExitFullScreen for:self with:self, nil];
 }
@@ -336,13 +399,13 @@ static ViWindowController	*currentWindowController = nil;
 {
 	if ([keyPath isEqualToString:@"undostyle"]) {
 		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
-		[parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
+		[_parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
 	}
 }
 
 - (void)addDocument:(ViDocument *)document
 {
-	if ([documents containsObject:document])
+	if ([_documents containsObject:document])
 		return;
 
 	if ([document isKindOfClass:[ViProject class]])
@@ -361,7 +424,7 @@ static ViWindowController	*currentWindowController = nil;
 	[item setRepresentedObject:document];
 	[item bind:@"title" toObject:document withKeyPath:@"title" options:nil];
 
-	[documents addObject:document];
+	[_documents addObject:document];
 
 	/* Update symbol table. */
 	[symbolController filterSymbols];
@@ -370,12 +433,12 @@ static ViWindowController	*currentWindowController = nil;
 
 /* Create a new document tab.
  */
-- (void)createTabWithViewController:(id<ViViewController>)viewController
+- (ViTabController *)createTabWithViewController:(id<ViViewController>)viewController
 {
-	if (!isLoaded) {
+	if (!_isLoaded) {
 		/* Defer until NIB is loaded. */
-		initialViewController = viewController;
-		return;
+		_initialViewController = [viewController retain];
+		return nil;
 	}
 
 	ViTabController *tabController = [[ViTabController alloc] initWithViewController:viewController window:[self window]];
@@ -384,8 +447,10 @@ static ViWindowController	*currentWindowController = nil;
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
+	[tabItem release];
 	[tabView selectTabViewItem:tabItem];
 	[self focusEditor];
+	return [tabController autorelease];
 }
 
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document
@@ -399,9 +464,9 @@ static ViWindowController	*currentWindowController = nil;
  */
 - (void)addNewTab:(ViDocument *)document
 {
-	if (!isLoaded) {
+	if (!_isLoaded) {
 		/* Defer until NIB is loaded. */
-		initialDocument = document;
+		_initialDocument = [document retain];
 		return;
 	}
 
@@ -435,7 +500,7 @@ static ViWindowController	*currentWindowController = nil;
 	}
 }
 
-- (void)focusEditorDelayed:(id)sender
+- (void)focusEditorDelayed
 {
 	if ([self currentView])
 		[[self window] makeFirstResponder:[[self currentView] innerView]];
@@ -443,21 +508,12 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)focusEditor
 {
-	[self performSelector:@selector(focusEditorDelayed:)
-	           withObject:nil
-	           afterDelay:0.0];
-}
-
-- (ViTagStack *)sharedTagStack
-{
-	if (tagStack == nil)
-		tagStack = [[ViTagStack alloc] init];
-	return tagStack;
+	[[self nextRunloop] focusEditorDelayed];
 }
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotification
 {
-	currentWindowController = self;
+	__currentWindowController = self;
 	[self checkDocumentsChanged];
 }
 
@@ -483,7 +539,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)message:(NSString *)fmt arguments:(va_list)ap
 {
-	[messageField setStringValue:[[NSString alloc] initWithFormat:fmt arguments:ap]];
+	[messageField setStringValue:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]];
 }
 
 - (void)message:(NSString *)fmt, ...
@@ -526,7 +582,8 @@ static ViWindowController	*currentWindowController = nil;
 		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"]
 			     relativeToURL:url];
 
-	baseURL = [url absoluteURL];
+	[_baseURL release];
+	_baseURL = [[url absoluteURL] retain];
 }
 
 - (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage
@@ -536,22 +593,30 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)checkBaseURL:(NSURL *)url onCompletion:(void (^)(NSURL *url, NSError *error))aBlock
 {
-	id<ViDeferred> deferred = [[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
+	if (_checkURLDeferred) {
+		[_checkURLDeferred setDelegate:nil];
+		[_checkURLDeferred cancel];
+		[_checkURLDeferred release];
+	}
+
+	void (^blockCopy)(NSURL *, NSError *) = [[aBlock copy] autorelease];
+	_checkURLDeferred = [[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
 		if (error)
-			aBlock(nil, [ViError errorWithFormat:@"%@: %@", [url path], [error localizedDescription]]);
+			blockCopy(nil, [ViError errorWithFormat:@"%@: %@", [url path], [error localizedDescription]]);
 		else if (normalizedURL == nil)
-			aBlock(nil, [ViError errorWithFormat:@"%@: no such file or directory", [url path]]);
+			blockCopy(nil, [ViError errorWithFormat:@"%@: no such file or directory", [url path]]);
 		else if (!isDirectory)
-			aBlock(nil, [ViError errorWithFormat:@"%@: not a directory", [normalizedURL path]]);
+			blockCopy(nil, [ViError errorWithFormat:@"%@: not a directory", [normalizedURL path]]);
 		else
-			aBlock(normalizedURL, nil);
+			blockCopy(normalizedURL, nil);
 	}];
-	[deferred setDelegate:self];
+	[_checkURLDeferred retain]; // must retain so deferred doesn't call a dealloced delegate. Cancel in dealloc.
+	[_checkURLDeferred setDelegate:self];
 }
 
 - (NSString *)displayBaseURL
 {
-	return [baseURL displayString];
+	return [_baseURL displayString];
 }
 
 #pragma mark -
@@ -559,7 +624,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)alertModifiedDocuments
 {
-	NSUInteger nmodified = [modifiedSet count];
+	NSUInteger nmodified = [_modifiedSet count];
 	if (nmodified == 0)
 		return;
 
@@ -571,7 +636,7 @@ static ViWindowController	*currentWindowController = nil;
 	/* Check if the current view contains a modified document. */
 	id<ViViewController> viewController = [self currentView];
 	if ([viewController respondsToSelector:@selector(document)] &&
-	    [modifiedSet containsObject:[viewController document]])
+	    [_modifiedSet containsObject:[viewController document]])
 		document = [viewController document];
 
 	/* Check if current tab has a view of a modified document. */
@@ -579,18 +644,18 @@ static ViWindowController	*currentWindowController = nil;
 		ViTabController *tabController = [self selectedTabController];
 		for (viewController in [tabController views])
 			if ([viewController respondsToSelector:@selector(document)] &&
-			    [modifiedSet containsObject:[viewController document]]) {
+			    [_modifiedSet containsObject:[viewController document]]) {
 				document = [viewController document];
 				break;
 			}
 	}
 
 	if (document == nil)
-		document = [modifiedSet anyObject];
+		document = [_modifiedSet anyObject];
 
 	[self selectDocument:document];
 
-	NSAlert *alert = [[NSAlert alloc] init];
+	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
 	if (nmodified == 1)
 		[alert setMessageText:[NSString stringWithFormat:@"The document \"%@\", has been changed by another application since you opened or saved it.",
 			[[document fileURL] lastPathComponent]]];
@@ -613,9 +678,9 @@ static ViWindowController	*currentWindowController = nil;
 - (void)revertAllModified
 {
 	ViDocument *document;
-	while ((document = [modifiedSet anyObject]) != nil) {
+	while ((document = [_modifiedSet anyObject]) != nil) {
 		NSError *error = nil;
-		[modifiedSet removeObject:document];
+		[_modifiedSet removeObject:document];
 		[document revertToContentsOfURL:[document fileURL]
 					 ofType:[document fileType]
 					  error:&error];
@@ -673,7 +738,7 @@ static ViWindowController	*currentWindowController = nil;
 
 	if (returnCode == NSAlertFirstButtonReturn) {
 		NSError *error = nil;
-		[modifiedSet removeObject:document];
+		[_modifiedSet removeObject:document];
 		[document revertToContentsOfURL:[document fileURL]
 					 ofType:[document fileType]
 					  error:&error];
@@ -690,21 +755,23 @@ static ViWindowController	*currentWindowController = nil;
 		[self revertAllModified];
 	} else if ((returnCode == NSAlertThirdButtonReturn && nbuttons == 4) ||
 	           (returnCode == NSAlertSecondButtonReturn && nbuttons == 2)) {
-		[modifiedSet removeObject:document];
+		[_modifiedSet removeObject:document];
 		document.isTemporary = YES;
 		[self alertModifiedDocuments];
 	} else if (returnCode == NSAlertThirdButtonReturn + 1 && nbuttons == 4) {
-		for (document in modifiedSet)
+		for (document in _modifiedSet)
 			document.isTemporary = YES;
-		modifiedSet = nil;
+		[_modifiedSet release];
+		_modifiedSet = nil;
 	}
 }
 
 - (void)checkDocumentsChanged
 {
 	NSMutableSet *deletedSet = [NSMutableSet set];
-	modifiedSet = [NSMutableSet set];
-	for (ViDocument *document in documents) {
+	[_modifiedSet release];
+	_modifiedSet = [[NSMutableSet alloc] init];
+	for (ViDocument *document in _documents) {
 		if (document.isTemporary || ![[document fileURL] isFileURL])
 			continue;
 
@@ -721,7 +788,7 @@ static ViWindowController	*currentWindowController = nil;
 			NSDate *modificationDate = [attributes fileModificationDate];
 			if ([[document fileModificationDate] compare:modificationDate] == NSOrderedAscending) {
 				[document updateChangeCount:NSChangeReadOtherContents];
-				[modifiedSet addObject:document];
+				[_modifiedSet addObject:document];
 			}
 		}
 	}
@@ -761,28 +828,19 @@ static ViWindowController	*currentWindowController = nil;
 		ViTabController *tabController = [item identifier];
 		[self documentController:[ViDocumentController sharedDocumentController]
 			     didCloseAll:YES
-			   tabController:tabController];
+			   tabController:[tabController retain]];
 	}
 }
 
 - (BOOL)windowShouldClose:(id)window
 {
-	DEBUG(@"documents = %@", documents);
+	DEBUG(@"documents = %@", _documents);
 
-#if 0
-	/* Close the current document first to avoid unecessary document switching. */
-	if ([[self currentDocument] isDocumentEdited]) {
-		[[self currentDocument] close];
-		if ([documents count] == 0)
-			return YES;
-	}
-#endif
-
-	if ([documents count] == 0)
+	if ([_documents count] == 0)
 		return YES;
 
-	NSMutableSet *set = [[NSMutableSet alloc] init];
-	for (ViDocument *doc in documents) {
+	NSMutableSet *set = [NSMutableSet set];
+	for (ViDocument *doc in _documents) {
 		if ([set containsObject:doc])
 			continue;
 		if (![doc isDocumentEdited])
@@ -813,30 +871,34 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-	if (currentWindowController == self)
-		currentWindowController = nil;
-	DEBUG(@"will close, got documents: %@", documents);
+	if (__currentWindowController == self)
+		__currentWindowController = nil;
+	DEBUG(@"will close %@", self);
 	[[self project] close];
-	[windowControllers removeObject:self];
-	[tabBar setDelegate:nil];
+	[__windowControllers removeObject:self];
+	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
+	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
 	ViDocument *doc;
-	while ((doc = [documents lastObject]) != nil)
+	while ((doc = [_documents anyObject]) != nil)
 		[self unlistDocument:doc];
 
-	[[ViEventManager defaultManager] clearFor:self];
+	[self setCurrentView:nil];
+	[[self window] setDelegate:nil];
 }
 
-- (id<ViViewController>)currentView;
+- (id<ViViewController>)currentView
 {
-	return currentView;
+	return _currentView;
 }
 
 - (void)setCurrentView:(id<ViViewController>)viewController
 {
-	if ([currentView respondsToSelector:@selector(document)])
-		previousDocumentView = currentView;
-	currentView = viewController;
+	[self willChangeCurrentView]; // if it wasn't called before
+	[viewController retain];
+	[_currentView release];
+	_currentView = viewController;
+	[self didChangeCurrentView];
 }
 
 /*
@@ -851,10 +913,7 @@ static ViWindowController	*currentWindowController = nil;
 		NSTabViewItem *item = [tabView tabViewItemAtIndex:ndx];
 		[tabView removeTabViewItem:item];
 		[self tabView:tabView didCloseTabViewItem:item];
-#ifndef NO_DEBUG
-		if ([[tabController views] count] > 0)
-			DEBUG(@"WARNING: got %lu views left in tab", [[tabController views] count]);
-#endif
+		// tabController is now released (invalid)
 	}
 }
 
@@ -871,7 +930,7 @@ static ViWindowController	*currentWindowController = nil;
 {
 	id<ViViewController> viewController = [self currentView];
 
-	/* If the current view is a document view, check if it's the last document view. */
+	/* If the current view is a document view, check if it's the last view for the document. */
 	if ([viewController respondsToSelector:@selector(document)]) {
 		ViDocument *doc = [viewController document];
 
@@ -948,22 +1007,21 @@ static ViWindowController	*currentWindowController = nil;
 	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
 	if (ndx != -1)
 		[[openFilesButton menu] removeItemAtIndex:ndx];
-	[documents removeObject:document];
+	[_documents removeObject:document];
 	[document closeWindowController:self];
 	[document removeObserver:symbolController forKeyPath:@"symbols"];
-	[[symbolController nextRunloop] symbolsUpdate:nil];
 }
 
 - (ViDocument *)previouslyActiveDocument
 {
 	DEBUG(@"returning previously active document (currently %@)", [self currentDocument]);
 	__block ViDocument *doc = nil;
-	[jumpList enumerateJumpsBackwardsUsingBlock:^(ViJump *jump, BOOL *stop) {
+	[_jumpList enumerateJumpsBackwardsUsingBlock:^(ViMark *jump, BOOL *stop) {
 		doc = [self documentForURL:jump.url];
 		if (doc)
 			*stop = YES;
 	}];
-	return doc ?: [documents lastObject];
+	return doc ?: [_documents anyObject];
 }
 
 - (void)closeDocumentView:(id<ViViewController>)viewController
@@ -977,14 +1035,19 @@ static ViWindowController	*currentWindowController = nil;
 	if (viewController == nil)
 		[[self window] close];
 
-	if (viewController == currentView)
+	[self willChangeCurrentView];
+	if (viewController == [self currentView])
 		[self setCurrentView:nil];
 
-	[[viewController tabController] closeView:viewController];
+	ViDocument *doc = nil;
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		doc = [(ViDocumentView *)viewController document];
+
+	ViTabController *tabController = [viewController tabController];
+	[tabController closeView:viewController]; // releases viewController
 
 	/* If this was the last view of the document, close the document too. */
-	if (canCloseDocument && [viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocument *doc = [(ViDocumentView *)viewController document];
+	if (canCloseDocument && doc) {
 		/* Check if this document is open in another window. */
 		BOOL openElsewhere = NO;
 		for (NSWindow *window in [NSApp windows]) {
@@ -1011,20 +1074,20 @@ static ViWindowController	*currentWindowController = nil;
 	}
 
 	/* If this was the last view in the tab, close the tab too. */
-	ViTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 0) {
 		if ([tabView numberOfTabViewItems] == 1)
 			[tabBar disableAnimations];
 
 		ViDocument *prevdoc = [self previouslyActiveDocument];
-		BOOL preJumping = jumping;
-		jumping = NO;
+		DEBUG(@"got previously active document %@", prevdoc);
+		BOOL preJumping = _jumping;
+		_jumping = NO;
 		[self closeTabController:tabController];
-		jumping = preJumping;
+		_jumping = preJumping;
 
 		if ([tabView numberOfTabViewItems] == 0) {
-			DEBUG(@"closed last tab, got documents: %@", documents);
-			if ([documents count] > 0)
+			DEBUG(@"closed last tab, got documents: %@", _documents);
+			if ([_documents count] > 0)
 				[self selectDocument:prevdoc];
 			else if (canCloseWindow)
 				[[self window] close];
@@ -1036,8 +1099,10 @@ static ViWindowController	*currentWindowController = nil;
 				[self addDocument:newDoc];
 				[self selectDocumentView:[self createTabForDocument:newDoc]];
 			}
-		} else
+		} else {
+			DEBUG(@"got prevdoc %@", prevdoc);
 			[self selectDocument:prevdoc];
+		}
 		[tabBar enableAnimations];
 	} else if (tabController == [self selectedTabController]) {
 		// Select another document view.
@@ -1075,7 +1140,7 @@ static ViWindowController	*currentWindowController = nil;
 	       didCloseAll:(BOOL)didCloseAll
 	     tabController:(void *)tabController
 {
-	DEBUG(@"force close all views in tab %@: %s", tabController, didCloseAll ? "YES" : "NO");
+	DEBUG(@"force close all views in tab %@: %s", (ViTabController *)tabController, didCloseAll ? "YES" : "NO");
 	if (didCloseAll) {
 		/* Close any views left in this tab. Do not ask for confirmation. */
 		while ([[(ViTabController *)tabController views] count] > 0)
@@ -1083,6 +1148,7 @@ static ViWindowController	*currentWindowController = nil;
 			       canCloseDocument:YES
 				 canCloseWindow:YES];
 	}
+	[(ViTabController *)tabController release];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
@@ -1097,8 +1163,6 @@ static ViWindowController	*currentWindowController = nil;
 	 * For any document that can't directly be closed, ask the user.
 	 */
 
-	NSMutableSet *set = [[NSMutableSet alloc] init];
-
 	DEBUG(@"closing tab controller %@", tabController);
 
 	/* If closing the last tab, close the window. */
@@ -1106,6 +1170,8 @@ static ViWindowController	*currentWindowController = nil;
 		[[self window] performClose:nil];
 		return NO;
 	}
+
+	NSMutableSet *set = [NSMutableSet set];
 
 	/* Close all documents in this tab. */
 	id<ViViewController> viewController;
@@ -1130,7 +1196,7 @@ static ViWindowController	*currentWindowController = nil;
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
 							    didCloseAllSelector:@selector(documentController:didCloseAll:tabController:)
-								    contextInfo:tabController];
+								    contextInfo:[tabController retain]];
 
 	return NO;
 }
@@ -1142,7 +1208,8 @@ static ViWindowController	*currentWindowController = nil;
 - (void)tabView:(NSTabView *)aTabView didCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	ViTabController *tabController = [tabViewItem identifier];
-	[[ViEventManager defaultManager] clearFor:tabController];
+	[tabViewItem unbind:@"label"];
+	[tabViewItem setIdentifier:nil];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
@@ -1161,16 +1228,16 @@ static ViWindowController	*currentWindowController = nil;
 	NSView *view = [notification object];
 	id<ViViewController> viewController = [self viewControllerForView:view];
 	if (viewController) {
-		if (parser.partial) {
+		if (_parser.partial) {
 			[self message:@"Vi command interrupted."];
-			[parser reset];
+			[_parser reset];
 		}
 		[self didSelectViewController:viewController];
 	}
 
-	if (ex_modal && view != statusbar) {
+	if (_exModal && view != statusbar) {
 		[NSApp abortModal];
-		ex_modal = NO;
+		_exModal = NO;
 	}
 }
 
@@ -1201,6 +1268,42 @@ static ViWindowController	*currentWindowController = nil;
 	[[ViEventManager defaultManager] emit:ViEventDidSelectDocument for:self with:self, document, nil];
 }
 
+- (NSURL *)alternateURL
+{
+	return _alternateMark.url;
+}
+
+- (ViDocument *)alternateDocument
+{
+	return _alternateMark.document;
+}
+
+- (void)willChangeCurrentView
+{
+	if (_alternateMarkCandidate == nil &&
+	    [[self currentView] isKindOfClass:[ViDocumentView class]]) {
+		[self setAlternateMarkCandidate:[(ViTextView *)[[self currentView] innerView] currentMark]];
+		_alternateMarkCandidate.title = @"_alternateMarkCandidate";
+	}
+}
+
+- (void)didChangeCurrentView
+{
+	id<ViViewController> viewController = [self currentView];
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *docView = (ViDocumentView *)viewController;
+
+		if (![_alternateMarkCandidate.url isEqual:[(ViDocument *)docView.document fileURL]]) {
+			DEBUG(@"previous document mark %@ -> %@", _alternateMark, _alternateMarkCandidate);
+			[self setAlternateMark:_alternateMarkCandidate];
+			_alternateMark.title = @"_alternateMark";
+		}
+	}
+
+	[_alternateMarkCandidate release];
+	_alternateMarkCandidate = nil;
+}
+
 - (void)didSelectViewController:(id<ViViewController>)viewController
 {
 	DEBUG(@"did select view %@", viewController);
@@ -1210,19 +1313,9 @@ static ViWindowController	*currentWindowController = nil;
 
 	[[ViEventManager defaultManager] emit:ViEventWillSelectView for:self with:self, viewController, nil];
 
-	/* Update the previous document pointer. */
-	id<ViViewController> prevView = [self currentView];
-	if ([prevView isKindOfClass:[ViDocumentView class]]) {
-		ViDocument *doc = [(ViDocumentView *)prevView document];
-		if (doc != previousDocument) {
-			DEBUG(@"previous document %@ -> %@", previousDocument, doc);
-			previousDocument = doc;
-		}
-	}
-
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocumentView *docView = viewController;
-		if (!jumping)
+		if (!_jumping)
 			[[docView textView] pushCurrentLocationOnJumpList];
 		[self didSelectDocument:[docView document]];
 		[symbolController updateSelectedSymbolForLocation:[[docView textView] caret]];
@@ -1231,9 +1324,9 @@ static ViWindowController	*currentWindowController = nil;
 	ViTabController *tabController = [viewController tabController];
 	[tabController setSelectedView:viewController];
 
-	if (tabController == [currentView tabController] &&
-	    currentView != [tabController previousView]) {
-		[tabController setPreviousView:currentView];
+	if (tabController == [[self currentView] tabController] &&
+	    _currentView != [tabController previousView]) {
+		[tabController setPreviousView:_currentView];
 	}
 
 	[self setCurrentView:viewController];
@@ -1246,6 +1339,7 @@ static ViWindowController	*currentWindowController = nil;
  */
 - (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController
 {
+	DEBUG(@"selecting document view %@", viewController);
 	ViTabController *tabController = [viewController tabController];
 
 	NSInteger ndx = [tabView indexOfTabViewItemWithIdentifier:tabController];
@@ -1263,6 +1357,7 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)tabView:(NSTabView *)aTabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
+	[self willChangeCurrentView];
 	ViTabController *tabController = [tabViewItem identifier];
 	[[ViEventManager defaultManager] emit:ViEventWillSelectTab for:self with:self, tabController, nil];
 }
@@ -1280,7 +1375,7 @@ static ViWindowController	*currentWindowController = nil;
  */
 - (ViDocumentView *)viewForDocument:(ViDocument *)document
 {
-	if (!isLoaded || document == nil)
+	if (!_isLoaded || document == nil)
 		return nil;
 
 	ViDocumentView *docView = nil;
@@ -1300,15 +1395,8 @@ static ViWindowController	*currentWindowController = nil;
 		    [[(ViDocumentView *)viewController document] isEqual:document])
 			return viewController;
 
-	/* Check if the previous document view holds the document. */
-	if ([previousDocumentView document] == document) {
-		/* Is it still visible? */
-		if ([[document views] containsObject:previousDocumentView])
-			return previousDocumentView;
-	}
-
 	/* Select any existing view of the document. */
-	if ([document respondsToSelector:@selector(viewsw)] && [[document views] count] > 0) {
+	if ([document respondsToSelector:@selector(views)] && [[document views] count] > 0) {
 		docView = [[document views] anyObject];
 		/*
 		 * If the tab with the document view contains more views
@@ -1332,8 +1420,13 @@ static ViWindowController	*currentWindowController = nil;
  */
 - (ViDocumentView *)selectDocument:(ViDocument *)document
 {
-	if (!isLoaded || document == nil)
+	if (!_isLoaded || document == nil)
 		return nil;
+
+	if (![_documents containsObject:document]) {
+		[document addWindowController:self];
+		[self addDocument:document];
+	}
 
 	ViDocumentView *docView = [self viewForDocument:document];
 	if (docView)
@@ -1400,6 +1493,11 @@ static ViWindowController	*currentWindowController = nil;
 	if (doc == nil)
 		return nil;
 
+	if (![_documents containsObject:doc]) {
+		[doc addWindowController:self];
+		[self addDocument:doc];
+	}
+
 	if ([[self currentView] isKindOfClass:[ViDocumentView class]] &&
 	    [[(ViDocumentView *)[self currentView] document] isEqual:doc])
 		return [self currentView];
@@ -1412,29 +1510,12 @@ static ViWindowController	*currentWindowController = nil;
 
 - (void)switchToLastDocument
 {
-	/* Make sure the previous document is still registered in the document controller. */
-	if (previousDocument == nil)
-		return;
-	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
-		DEBUG(@"previous document %@ not listed", previousDocument);
-		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]
-													  display:NO
-													    error:nil];
-	}
-	[self switchToDocument:previousDocument];
+	[self gotoMark:_alternateMark forceReplaceCurrentView:YES recordJump:YES];
 }
 
 - (void)selectLastDocument
 {
-	if (previousDocument == nil)
-		return;
-	if (![[[ViDocumentController sharedDocumentController] documents] containsObject:previousDocument]) {
-		DEBUG(@"previous document %@ not listed", previousDocument);
-		previousDocument = [[ViDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[previousDocument fileURL]
-													  display:NO
-													    error:nil];
-	}
-	[self selectDocument:previousDocument];
+	[self gotoMark:_alternateMark];
 }
 
 - (ViTabController *)selectedTabController
@@ -1455,36 +1536,66 @@ static ViWindowController	*currentWindowController = nil;
 
 - (ViDocument *)documentForURL:(NSURL *)url
 {
-	for (ViDocument *doc in documents)
+	for (ViDocument *doc in _documents)
 		if ([url isEqual:[doc fileURL]])
 			return doc;
 	return nil;
 }
 
-- (void)gotoMark:(ViMark *)mark inView:(ViDocumentView *)docView
+- (BOOL)gotoMark:(ViMark *)mark forceReplaceCurrentView:(BOOL)forceSwitchView recordJump:(BOOL)isJump
 {
-	NSRange range = mark.range;
-	ViTextView *textView = [docView textView];
-	[textView setCaret:range.location];
-	[textView scrollRangeToVisible:range];
-	[[textView nextRunloop] showFindIndicatorForRange:range];
-}
+	if (mark == nil)
+		return NO;
 
-- (void)gotoMark:(ViMark *)mark
-{
+	/* XXX: prevent pushing an extraneous jump on the list. */
+	_jumping = !isJump;
+
 	id<ViViewController> viewController = [self currentView];
-	if ([viewController isKindOfClass:[ViDocumentView class]])
+	if (!_jumping && [viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
 
-	if (mark.document) {
-		/* XXX: prevent pushing an extraneous jump on the list. */
-		// jumping = YES;
-		id<ViViewController> viewController = [self selectDocument:mark.document];
-		// jumping = NO;
+	DEBUG(@"goto mark %@ (force switching: %s)", mark, forceSwitchView ? "YES" : "NO");
 
-		[self gotoMark:mark inView:viewController];
-	} else if (mark.url)
-		[self gotoURL:mark.url line:mark.line column:mark.column];
+	/* XXX: Set a flag telling didSelectDocument: that we're currently navigating the jump list.
+	 * This prevents us from pushing an extraneous jump on the list.
+	 */
+	[[mark retain] autorelease];
+
+	if (mark.view) {
+		viewController = [self selectDocumentView:mark.view];
+	} else if (mark.document) {
+		if (forceSwitchView || [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] == NO)
+			viewController = [self switchToDocument:mark.document];
+		else
+			viewController = [self selectDocument:mark.document];
+	} else if (mark.url) {
+		NSError *error = nil;
+		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
+		ViDocument *doc = [ctrl openDocumentWithContentsOfURL:mark.url
+							      display:!forceSwitchView
+								error:&error];
+		if (error) {
+			[NSApp presentError:error];
+			_jumping = NO;
+			return NO;
+		}
+
+		if (forceSwitchView || [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] == NO)
+			viewController = [self switchToDocument:doc];
+		else
+			viewController = [self selectDocument:doc];
+	} else {
+		_jumping = NO;
+		return NO;
+	}
+
+	_jumping = NO;
+	return [(ViTextView *)[viewController innerView] gotoMark:mark];
+}
+
+- (BOOL)gotoMark:(ViMark *)mark
+{
+	return [self gotoMark:mark forceReplaceCurrentView:NO recordJump:YES];
 }
 
 - (BOOL)gotoURL:(NSURL *)url
@@ -1493,6 +1604,7 @@ static ViWindowController	*currentWindowController = nil;
            view:(ViDocumentView *)docView
 {
 	ViDocument *document = [self documentForURL:url];
+	DEBUG(@"goto url %@: doc  %@", url, document);
 	if (document == nil) {
 		NSError *error = nil;
 		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
@@ -1501,6 +1613,13 @@ static ViWindowController	*currentWindowController = nil;
 			[NSApp presentError:error];
 			return NO;
 		}
+	}
+
+	// Update jumplist
+	if (!_jumping) {
+		NSView *view = [[self currentView] innerView];
+		if ([view respondsToSelector:@selector(pushCurrentLocationOnJumpList)])
+			[(ViTextView *)view pushCurrentLocationOnJumpList];
 	}
 
 	if (docView == nil)
@@ -1617,8 +1736,10 @@ static ViWindowController	*currentWindowController = nil;
 		return NO;
 	}
 
+	[viewController retain];
 	[tabController closeView:viewController];
 	[self createTabWithViewController:viewController];
+	[viewController release];
 	return YES;
 }
 
@@ -1657,7 +1778,7 @@ static ViWindowController	*currentWindowController = nil;
 			url = filenameOrURL;
 		else
 			url = [ctrl normalizePath:filenameOrURL
-				       relativeTo:baseURL
+				       relativeTo:_baseURL
 					    error:&err];
 		if (url && !err) {
 			doc = [ctrl documentForURL:url];
@@ -1852,11 +1973,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (NSMutableArray *)symbolsFilteredByPattern:(NSString *)pattern
 {
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-						options:ONIG_OPTION_IGNORECASE];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern options:ONIG_OPTION_IGNORECASE];
 
 	NSMutableArray *syms = [NSMutableArray array];
-	for (ViDocument *doc in documents)
+	for (ViDocument *doc in _documents)
 		for (ViMark *s in doc.symbols)
 			if ([rx matchInString:s.title])
 				[syms addObject:s];
@@ -1892,56 +2012,37 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (IBAction)navigateJumplist:(id)sender
 {
-	NSURL *url, **urlPtr = nil;
-	NSUInteger line, *linePtr = NULL, column, *columnPtr = NULL;
-	NSView **viewPtr = NULL;
+	ViMark *here = nil;
 
 	id<ViViewController> viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViTextView *tv = [(ViDocumentView *)viewController textView];
 		if (tv == nil)
 			return;
-		url = [[self document] fileURL];
-		line = [[tv textStorage] lineNumberAtLocation:[tv caret]];
-		column = [[tv textStorage] columnAtLocation:[tv caret]];
-		urlPtr = &url;
-		linePtr = &line;
-		columnPtr = &column;
-		viewPtr = &tv;
+		here = [tv currentMark];
 	}
 
 	if ([sender selectedSegment] == 0)
-		[jumpList backwardToURL:urlPtr line:linePtr column:columnPtr view:viewPtr];
+		[self gotoMark:[_jumpList backwardFrom:here] forceReplaceCurrentView:NO recordJump:NO];
 	else
-		[jumpList forwardToURL:NULL line:NULL column:NULL view:NULL];
+		[self gotoMark:[_jumpList forward] forceReplaceCurrentView:NO recordJump:NO];
 }
 
 - (void)updateJumplistNavigator
 {
-	[jumplistNavigator setEnabled:![jumpList atEnd] forSegment:1];
-	[jumplistNavigator setEnabled:![jumpList atBeginning] forSegment:0];
+	[jumplistNavigator setEnabled:![_jumpList atEnd] forSegment:1];
+	[jumplistNavigator setEnabled:![_jumpList atBeginning] forSegment:0];
 }
 
-- (void)jumpList:(ViJumpList *)aJumpList added:(ViJump *)jump
+- (void)jumpList:(ViJumpList *)aJumpList added:(ViMark *)jump
 {
 	[self updateJumplistNavigator];
 }
 
-- (void)jumpList:(ViJumpList *)aJumpList goto:(ViJump *)jump
+- (void)jumpList:(ViJumpList *)aJumpList goto:(ViMark *)jump
 {
-	/* XXX: Set a flag telling didSelectDocument: that we're currently navigating the jump list.
-	 * This prevents us from pushing an extraneous jump on the list.
-	 */
-	jumping = YES;
-	id<ViViewController> viewController = nil;
-	if (jump.view)
-		viewController = [self viewControllerForView:jump.view];
-	[self gotoURL:jump.url line:IMAX(jump.line, 1) column:jump.column view:viewController];
-	jumping = NO;
-
-	ViTextView *tv = [(ViDocumentView *)[self currentView] textView];
-	[[tv nextRunloop] showFindIndicatorForRange:NSMakeRange(tv.caret, 1)];
-	[self updateJumplistNavigator];
+	// [self gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
+	[self updateJumplistNavigator]; // observe _tagStack.list.selectionIndexes instead
 }
 
 #pragma mark -
@@ -1979,22 +2080,22 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (BOOL)window_left:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewLeft relativeTo:currentView];
+	return [self selectViewAtPosition:ViViewLeft relativeTo:[self currentView]];
 }
 
 - (BOOL)window_down:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewDown relativeTo:currentView];
+	return [self selectViewAtPosition:ViViewDown relativeTo:[self currentView]];
 }
 
 - (BOOL)window_up:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewUp relativeTo:currentView];
+	return [self selectViewAtPosition:ViViewUp relativeTo:[self currentView]];
 }
 
 - (BOOL)window_right:(ViCommand *)command
 {
-	return [self selectViewAtPosition:ViViewRight relativeTo:currentView];
+	return [self selectViewAtPosition:ViViewRight relativeTo:[self currentView]];
 }
 
 - (BOOL)window_last:(ViCommand *)command
@@ -2082,7 +2183,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 /* syntax: ctrl-^ */
 - (BOOL)switch_file:(ViCommand *)command
 {
-	DEBUG(@"previous document is %@", previousDocument);
+	DEBUG(@"previous document mark is %@", _alternateMark);
 
 	// Update jumplist
 	NSView *view = [[self currentView] innerView];
@@ -2115,26 +2216,26 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (void)textField:(ExTextField *)textField executeExCommand:(NSString *)exCommand
 {
 	if (exCommand) {
-		exString = exCommand;
-		if (ex_modal)
+		_exString = [exCommand copy];
+		if (_exModal)
 			[NSApp abortModal];
-	} else if (ex_modal)
+	} else if (_exModal)
 		[NSApp abortModal];
 
-	ex_busy = NO;
+	_exBusy = NO;
 }
 
 - (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command prefix:(NSString *)prefix
 {
 	ViMacro *macro = command.macro;
 
-	if (ex_busy) {
+	if (_exBusy) {
 		INFO(@"%s", "can't handle nested ex commands!");
 		return nil;
 	}
 
-	ex_busy = YES;
-	exString = nil;
+	_exBusy = YES;
+	_exString = nil;
 
 	[messageField setHidden:YES];
 	[statusbar setHidden:NO];
@@ -2153,15 +2254,15 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	if (macro) {
 		NSInteger keyCode;
-		while (ex_busy && (keyCode = [macro pop]) != -1)
+		while (_exBusy && (keyCode = [macro pop]) != -1)
 			[editor.keyManager handleKey:keyCode];
 	}
 
-	if (ex_busy) {
-		ex_modal = YES;
+	if (_exBusy) {
+		_exModal = YES;
 		[NSApp runModalForWindow:[self window]];
-		ex_modal = NO;
-		ex_busy = NO;
+		_exModal = NO;
+		_exBusy = NO;
 	}
 
 	[statusbar setStringValue:@""];
@@ -2170,7 +2271,9 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[messageField setHidden:NO];
 	[self focusEditor];
 
-	return exString;
+	NSString *ret = [_exString autorelease];
+	_exString = nil;
+	return ret;
 }
 
 - (NSString *)getExStringInteractivelyForCommand:(ViCommand *)command
@@ -2189,7 +2292,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	NSError *error = nil;
 	NSString *trimmed = [filename stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSURL *url = [[ViDocumentController sharedDocumentController] normalizePath:trimmed
-									 relativeTo:baseURL
+									 relativeTo:_baseURL
 									      error:&error];
 	if (error) {
 		[self message:@"%@: %@", trimmed, [error localizedDescription]];
@@ -2576,7 +2679,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 			 canCloseWindow:NO];
 	} else if (command.force) {
 		ViDocument *doc;
-		while ((doc = [documents lastObject]) != nil) {
+		while ((doc = [_documents anyObject]) != nil) {
 			/* Check if this document is open in another window. */
 			BOOL openElsewhere = NO;
 			for (NSWindow *window in [NSApp windows]) {

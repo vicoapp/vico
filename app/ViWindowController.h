@@ -1,4 +1,3 @@
-#import "ViTagStack.h"
 #import "ViTagsDatabase.h"
 #import "ViJumpList.h"
 #import "ViToolbarPopUpButtonCell.h"
@@ -23,84 +22,90 @@
  */
 @interface ViWindowController : NSWindowController <ViJumpListDelegate, NSTextFieldDelegate, NSWindowDelegate, NSToolbarDelegate, ViDeferredDelegate>
 {
-	IBOutlet PSMTabBarControl *tabBar;
-	IBOutlet NSTabView *tabView;
-	IBOutlet NSSplitView *splitView; // Split between explorer, main and symbol views
-	IBOutlet NSView *mainView;
-	IBOutlet ViBgView *explorerView;
+	IBOutlet PSMTabBarControl	*tabBar;
+	IBOutlet NSTabView		*tabView;
+	IBOutlet NSSplitView		*splitView; // Split between explorer, main and symbol views
+	IBOutlet NSView			*mainView;
+	IBOutlet ViBgView		*explorerView;		// Top-level nib object
+	IBOutlet NSWindow		*sftpConnectView;	// Top-level nib object
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
-	IBOutlet NSTextField *messageField;
+	IBOutlet NSTextField		*messageField;
 #ifdef TRIAL_VERSION
-	NSTextField *nagTitle;
+	NSTextField			*_nagTitle;
 #endif
 
-	IBOutlet NSPopUpButton *openFilesButton;
+	IBOutlet NSPopUpButton		*openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;
-	IBOutlet NSPopUpButton *bundleButton;
+	IBOutlet NSPopUpButton		*bundleButton;
 
-	NSURL			*baseURL;
+	NSURL				*_baseURL;
 
-	ViTextView *viFieldEditor;
+	ViTextStorage			*_viFieldEditorStorage;
+	ViTextView			*_viFieldEditor;
 
-	ViTagStack *tagStack;
-	ViTagsDatabase *tagsDatabase;
+	ViMarkStack			*_tagStack;
+	ViTagsDatabase			*_tagsDatabase;
 
-	BOOL isLoaded;
-	ViDocument *initialDocument;
-	id<ViViewController> initialViewController;
-	NSMutableArray *documents;
-	__weak ViDocument *previousDocument;
-	__weak ViDocumentView *previousDocumentView;
-	ViParser *parser;
-	ViProject *project;
+	BOOL				 _isLoaded;
+	ViDocument			*_initialDocument;
+	id<ViViewController>		 _initialViewController;
+	NSMutableSet			*_documents;
+	ViParser			*_parser;
+	ViProject			*_project;
+
+	ViMark				*_alternateMarkCandidate;
+	ViMark				*_alternateMark;
 
 	// ex command line
-	IBOutlet NSTextField	*statusbar;
-	BOOL			 ex_busy;
-	BOOL			 ex_modal;
-	NSString		*exString;
+	IBOutlet NSTextField		*statusbar;
+	BOOL				 _exBusy;
+	BOOL				 _exModal;
+	NSString			*_exString;
 
 	// project list
-	IBOutlet ViFileExplorer *explorer;
-	IBOutlet NSImageView *projectResizeView;
+	IBOutlet ViFileExplorer		*explorer;		// Top-level nib object
+	IBOutlet NSImageView		*projectResizeView;
+	IBOutlet NSMenu			*explorerActionMenu;	// Top-level nib object
 
 	// symbol list
-	IBOutlet ViSymbolController *symbolController;
-	IBOutlet NSImageView *symbolsResizeView;
-	IBOutlet NSView *symbolsView;
+	IBOutlet ViSymbolController	*symbolController;	// Top-level nib object
+	IBOutlet NSImageView		*symbolsResizeView;
+	IBOutlet NSView			*symbolsView;		// Top-level nib object
 
-	ViJumpList *jumpList;
-	BOOL jumping;
-	IBOutlet NSSegmentedControl *jumplistNavigator;
+	ViJumpList			*_jumpList;
+	BOOL				 _jumping;
+	IBOutlet NSSegmentedControl	*jumplistNavigator;
 
-	ViDocumentView *currentView;
+	ViDocumentView			*_currentView;
 
-	NSMutableSet *modifiedSet;
+	NSMutableSet			*_modifiedSet;
+
+	id<ViDeferred>			 _checkURLDeferred;
 }
 
-@property(nonatomic,readwrite, assign) NSMutableArray *documents;
+@property(nonatomic,readwrite,retain) NSMutableSet *documents;
 @property(nonatomic,readonly) ViJumpList *jumpList;
-@property(nonatomic,readwrite, assign) ViProject *project;
+@property(nonatomic,readwrite,retain) ViProject *project;
 @property(nonatomic,readonly) ViFileExplorer *explorer;
-@property(nonatomic,readonly) ViTagStack *tagStack;
+@property(nonatomic,readonly) ViMarkList *tagStack;
 @property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
-@property(nonatomic,readonly) __weak ViDocument *previousDocument;
-@property(nonatomic,readwrite,assign) NSURL *baseURL;
+@property(nonatomic,readwrite,retain) NSURL *baseURL;
 @property(nonatomic,readonly) ViSymbolController *symbolController;
+@property(nonatomic,readonly) ViParser *parser;
+@property(nonatomic,readwrite,retain) ViMark *alternateMarkCandidate;
+@property(nonatomic,readwrite,retain) ViMark *alternateMark;
 
 /**
  * @returns The currently active window controller.
  */
 + (ViWindowController *)currentWindowController;
 
-+ (NSWindow *)currentMainWindow;
-
 - (void)showMessage:(NSString *)string;
 - (void)message:(NSString *)fmt, ...;
 - (void)message:(NSString *)fmt arguments:(va_list)ap;
 
-- (void)focusEditorDelayed:(id)sender;
+- (void)focusEditorDelayed;
 - (void)focusEditor;
 
 - (void)checkDocumentsChanged;
@@ -111,7 +116,6 @@
  */
 - (NSDictionary *)environment;
 
-- (ViParser *)parser;
 - (id<ViViewController>)viewControllerForView:(NSView *)aView;
 
 /*? Selects the tab holding the given document view and focuses the view.
@@ -140,12 +144,13 @@
 /**
  * @returns The documents open in the window.
  */
-- (NSArray *)documents;
+- (NSSet *)documents;
 
 /** Create a new tab.
  * @param viewController The view to display in the new tab.
+ * @returns a ViTabController object managing the new tab.
  */
-- (void)createTabWithViewController:(id<ViViewController>)viewController;
+- (ViTabController *)createTabWithViewController:(id<ViViewController>)viewController;
 
 /** Create a new tab.
  * @param document The document to display in the new tab.
@@ -182,6 +187,9 @@
  * @returns The currently focused document, or `nil` if no document is focused.
  */
 - (ViDocument *)currentDocument;
+
+- (ViDocument *)alternateDocument;
+- (NSURL *)alternateURL;
 
 /**
  * @returns The currently selected tab controller.
@@ -221,8 +229,8 @@
 - (BOOL)gotoURL:(NSURL *)url;
 - (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
-- (void)gotoMark:(ViMark *)mark inView:(ViDocumentView *)docView;
-- (void)gotoMark:(ViMark *)mark;
+- (BOOL)gotoMark:(ViMark *)mark forceReplaceCurrentView:(BOOL)forceSwitchView recordJump:(BOOL)isJump;
+- (BOOL)gotoMark:(ViMark *)mark;
 
 - (IBAction)searchSymbol:(id)sender;
 - (NSMutableArray *)symbolsFilteredByPattern:(NSString *)pattern;

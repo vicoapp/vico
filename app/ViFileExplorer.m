@@ -71,6 +71,8 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
+
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

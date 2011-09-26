@@ -3,6 +3,7 @@
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViDocumentController.h"
+#import "NSURL-additions.h"
 
 @implementation ViMark
 
@@ -28,10 +29,21 @@
 }
 
 + (ViMark *)markWithURL:(NSURL *)aURL
+		   line:(NSUInteger)aLine
+		 column:(NSUInteger)aColumn
+{
+	return [[[ViMark alloc] initWithURL:aURL
+				       name:nil
+				      title:nil
+				       line:aLine
+				     column:aColumn] autorelease];
+}
+
++ (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
-                 title:(id)aTitle
-                  line:(NSUInteger)aLine
-                column:(NSUInteger)aColumn
+		  title:(id)aTitle
+		   line:(NSUInteger)aLine
+		 column:(NSUInteger)aColumn
 {
 	return [[[ViMark alloc] initWithURL:aURL
 				       name:aName
@@ -61,8 +73,8 @@
 - (ViMark *)initWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
 		  title:(id)aTitle
-                  line:(NSUInteger)aLine
-                column:(NSUInteger)aColumn
+		   line:(NSUInteger)aLine
+		 column:(NSUInteger)aColumn
 {
 	if (aURL == nil) {
 		[self release];
@@ -70,7 +82,7 @@
 	}
 
 	if ((self = [super init]) != nil) {
-		_url = [aURL retain];
+		_url = [[aURL URLByResolvingSymlinksAndAliases:nil] retain];
 		_name = [aName retain];
 		_title = [aTitle retain];
 
@@ -142,6 +154,20 @@
 	return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+	self = [[self class] allocWithZone:zone];
+	if (_view)
+		self = [self initWithView:_view name:_name range:_range];
+	else if (_document)
+		self = [self initWithDocument:_document name:_name range:_range];
+	else
+		self = [self initWithURL:_url name:_name title:_title line:_line column:_column];
+	self.title = _title;
+	self.icon = _icon;
+	return self;
+}
+
 - (void)viewClosed:(NSNotification *)notification
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self
@@ -171,6 +197,7 @@
 - (void)documentAdded:(NSNotification *)notification
 {
 	ViDocument *doc = [notification object];
+	DEBUG(@"added document %@ (expecting url %@)", doc, _url);
 	if (![doc isKindOfClass:[ViDocument class]])
 		return;
 	if (![[doc fileURL] isEqual:_url])
@@ -292,7 +319,7 @@
 {
 	[url retain];
 	[_url release];
-	_url = url;
+	_url = [url URLByResolvingSymlinksAndAliases:nil];
 }
 
 - (NSString *)groupName

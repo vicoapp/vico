@@ -4,7 +4,7 @@
 
 /** A marked location.
  */
-@interface ViMark : NSObject
+@interface ViMark : NSObject <NSCopying>
 {
 	NSString		*_name;
 	NSUInteger		 _location;
@@ -51,6 +51,10 @@
 @property(nonatomic,readonly) NSString *groupName;
 
 + (ViMark *)markWithURL:(NSURL *)aURL;
+
++ (ViMark *)markWithURL:(NSURL *)aURL
+		   line:(NSUInteger)aLine
+		 column:(NSUInteger)aColumn;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName

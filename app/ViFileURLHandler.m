@@ -66,6 +66,7 @@
 	void (^blockCopy)(NSArray *, NSError *) = [[aBlock copy] autorelease];
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		NSFileManager *fileman = [[NSFileManager alloc] init];
 		NSError *error = nil;
 		NSArray *files = [fileman contentsOfDirectoryAtPath:[aURL path] error:&error];
@@ -98,6 +99,7 @@
 		dispatch_sync(dispatch_get_main_queue(), ^{
 			blockCopy(contents, error);
 		});
+		[pool drain];
 	});
 
 	return [ViFileDeferred sharedDeferred];

@@ -3,57 +3,59 @@
 #import "ViCommon.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViEventManager.h"
+#include "logging.h"
 
 /* XXX: this is butt ugly! */
 #import "ViWindowController.h"
 #import "ViFileExplorer.h"
 
-#include "logging.h"
-
-@interface ViURLManager (private)
-- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL;
-- (void)monitorDirectoryAtURL:(NSURL *)aURL;
-- (void)restartEvents;
-- (void)stopEvents;
-@end
-
 @implementation ViURLManager
 
 + (ViURLManager *)defaultManager
 {
-	static id defaultManager = nil;
-	if (defaultManager == nil) {
-		defaultManager = [[ViURLManager alloc] init];
+	static id __defaultManager = nil;
+	if (__defaultManager == nil) {
+		__defaultManager = [[ViURLManager alloc] init];
 	}
-	return defaultManager;
+	return __defaultManager;
 }
 
 - (ViURLManager *)init
 {
 	if ((self = [super init]) != nil) {
-		handlers = [NSMutableArray array];
-		directoryCache = [NSMutableDictionary dictionary];
-		slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
-		lastEventId = kFSEventStreamEventIdSinceNow;
+		_handlers = [[NSMutableArray alloc] init];
+		_directoryCache = [[NSMutableDictionary alloc] init];
+		_slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
+		_lastEventId = kFSEventStreamEventIdSinceNow;
 	}
 
 	return self;
 }
 
+- (void)dealloc
+{
+	[self stopEvents];
+	[_handlers release];
+	[_directoryCache release];
+	[_slashSet release];
+	[super dealloc];
+}
+
 - (void)finalize
 {
 	[self stopEvents];
+	[super finalize];
 }
 
 - (void)registerHandler:(id<ViURLHandler>)handler
 {
-	[handlers addObject:handler];
+	[_handlers addObject:handler];
 }
 
 - (id<ViURLHandler>)handlerForURL:(NSURL *)aURL
 {
 	id<ViURLHandler> handler;
-	for (handler in handlers)
+	for (handler in _handlers)
 		if ([handler respondsToURL:aURL])
 			return handler;
 
@@ -65,7 +67,7 @@
 			 selector:(SEL)aSelector
 {
 	id<ViURLHandler> handler;
-	for (handler in handlers)
+	for (handler in _handlers)
 		if ([handler respondsToSelector:aSelector] &&
 		    [handler respondsToURL:aURL])
 			return handler;
@@ -95,17 +97,24 @@
 					      selector:@selector(contentsOfDirectoryAtURL:onCompletion:)];
 	if (handler) {
 		NSURL *normalizedURL = [self normalizeURL:aURL];
-		NSArray *contents = [self cachedContentsOfDirectoryAtURL:aURL];
-		if (contents) {
-			completionCallback(contents, nil);
+		NSArray *cachedContents = [self cachedContentsOfDirectoryAtURL:aURL];
+		if (cachedContents) {
+			completionCallback(cachedContents, nil);
 			return nil;
 		}
 
 		DEBUG(@"reading contents of %@", normalizedURL);
-		return [handler contentsOfDirectoryAtURL:normalizedURL onCompletion:^(NSArray *contents, NSError *error) {
+                /*
+                 * The completionCallback argument is typically a stack
+                 * block literal and can't be automatically retained
+                 * without moving it to the heap.
+		 */
+		void (^completionCallbackCopy)(NSArray *, NSError *) = [[completionCallback copy] autorelease];
+		return [handler contentsOfDirectoryAtURL:normalizedURL
+					    onCompletion:^(NSArray *contents, NSError *error) {
 			if (contents && !error)
 				[self cacheContents:contents forDirectoryAtURL:normalizedURL];
-			completionCallback(contents, error);
+			completionCallbackCopy(contents, error);
 		}];
 	}
 
@@ -227,14 +236,14 @@
 
 - (void)flushDirectoryCache
 {
-	directoryCache = [NSMutableDictionary dictionary];
+	[_directoryCache removeAllObjects];
 	[self restartEvents];
 }
 
 - (NSArray *)cachedContentsOfDirectoryAtURL:(NSURL *)aURL
 {
-	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	return [directoryCache objectForKey:key];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:_slashSet];
+	return [_directoryCache objectForKey:key];
 }
 
 - (BOOL)directoryIsCachedAtURL:(NSURL *)aURL
@@ -245,16 +254,16 @@
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL
 {
 	DEBUG(@"flushing cache for %@", aURL);
-	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	[directoryCache removeObjectForKey:key];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:_slashSet];
+	[_directoryCache removeObjectForKey:key];
 }
 
 - (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL
 {
 	DEBUG(@"caching contents of URL %@", aURL);
 
-	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
-	[directoryCache setObject:contents forKey:key];
+	NSString *key = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:_slashSet];
+	[_directoryCache setObject:contents forKey:key];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViURLContentsCachedNotification
 							    object:self
 							  userInfo:[NSDictionary dictionaryWithObject:aURL
@@ -318,9 +327,9 @@
 
 	/* Recursively flush all descendant URLs.
 	 */
-	NSString *changedKey = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:slashSet];
+	NSString *changedKey = [[[self normalizeURL:aURL] absoluteString] stringByTrimmingCharactersInSet:_slashSet];
 	BOOL restart = NO;
-	NSArray *keys = [[directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *keys = [[_directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	for (NSUInteger i = 0; i < [keys count]; i++) {
 		NSString *key = [keys objectAtIndex:i];
 		if ([key hasPrefix:changedKey]) {
@@ -351,14 +360,14 @@
 
 - (void)stopEvents
 {
-	if (evstream) {
-		DEBUG(@"stopping fs events %@", FSEventStreamCopyDescription(evstream));
-		lastEventId = FSEventStreamGetLatestEventId(evstream);
-		FSEventStreamStop(evstream);
-		FSEventStreamUnscheduleFromRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-		FSEventStreamInvalidate(evstream);
-		FSEventStreamRelease(evstream);
-		evstream = NULL;
+	if (_evstream) {
+		DEBUG(@"stopping fs events %@", FSEventStreamCopyDescription(_evstream));
+		_lastEventId = FSEventStreamGetLatestEventId(_evstream);
+		FSEventStreamStop(_evstream);
+		FSEventStreamUnscheduleFromRunLoop(_evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		FSEventStreamInvalidate(_evstream);
+		FSEventStreamRelease(_evstream);
+		_evstream = NULL;
 	}
 }
 
@@ -388,11 +397,11 @@ void mycallback(
 
 - (BOOL)URLIsMonitored:(NSURL *)aURL
 {
-	if (evstream == NULL)
+	if (_evstream == NULL)
 		return NO;
 
 	NSString *path = [aURL path];
-	NSArray *pathsBeingWatched = (NSArray *)FSEventStreamCopyPathsBeingWatched(evstream);
+	NSArray *pathsBeingWatched = (NSArray *)FSEventStreamCopyPathsBeingWatched(_evstream);
 	for (NSString *p in pathsBeingWatched)
 		if ([path hasPrefix:p]) {
 			DEBUG(@"URL %@ is already being watched", aURL);
@@ -407,7 +416,7 @@ void mycallback(
 - (NSArray *)pathsToWatch
 {
 	NSMutableArray *paths = [NSMutableArray array];
-	NSArray *keys = [[directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *keys = [[_directoryCache allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	NSString *lastKey = nil;
 	for (NSUInteger i = 0; i < [keys count]; i++) {
 		NSString *key = [keys objectAtIndex:i];
@@ -449,19 +458,19 @@ void mycallback(
 	bzero(&ctx, sizeof(ctx));
 	ctx.info = self;
 
-	DEBUG(@"listening for events since %lu", lastEventId);
-	evstream = FSEventStreamCreate(NULL,
+	DEBUG(@"listening for events since %lu", _lastEventId);
+	_evstream = FSEventStreamCreate(NULL,
 		&mycallback,
 		&ctx,
 		(CFArrayRef)paths,
-		lastEventId,
+		_lastEventId,
 		latency,
 		kFSEventStreamCreateFlagWatchRoot
 	);
 
-	if (evstream != NULL) {
-		FSEventStreamScheduleWithRunLoop(evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-		FSEventStreamStart(evstream);
+	if (_evstream != NULL) {
+		FSEventStreamScheduleWithRunLoop(_evstream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		FSEventStreamStart(_evstream);
 	}
 }
 

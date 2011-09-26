@@ -5,16 +5,20 @@
 - (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage;
 @end
 
+
+
 @protocol ViDeferred <NSObject>
 @required
 - (void)cancel;
 - (void)wait;
-@property (nonatomic, readwrite, assign) id<ViDeferredDelegate> delegate;
+@property(nonatomic,readwrite,assign) id<ViDeferredDelegate> delegate;
 
 @optional
 - (void)waitInWindow:(NSWindow *)window message:(NSString *)waitMessage;
 - (CGFloat)progress;
 @end
+
+
 
 @protocol ViURLHandler <NSObject>
 @required
@@ -40,17 +44,21 @@
 - (id<ViDeferred>)removeItemAtURL:(NSURL *)aURL onCompletion:(void (^)(NSError *))aBlock;
 @end
 
+
+
 @interface ViURLManager : NSObject <ViURLHandler>
 {
-	NSMutableArray *handlers;
-	NSMutableDictionary *directoryCache;
-	NSCharacterSet *slashSet;
+	NSMutableArray		*_handlers;
+	NSMutableDictionary	*_directoryCache;
+	NSCharacterSet		*_slashSet;
 
 	// file system events
-	FSEventStreamRef evstream;
-	FSEventStreamEventId lastEventId;
+	FSEventStreamRef	 _evstream;
+	FSEventStreamEventId	 _lastEventId;
 }
+
 + (ViURLManager *)defaultManager;
+
 - (void)registerHandler:(id<ViURLHandler>)handler;
 - (void)flushDirectoryCache;
 - (void)flushCachedContentsOfDirectoryAtURL:(NSURL *)aURL;
@@ -60,4 +68,10 @@
 			recursively:(BOOL)recursiveFlush
 			      force:(BOOL)force;
 - (void)notifyChangedDirectoryAtURL:(NSURL *)aURL;
+
+- (void)cacheContents:(NSArray *)contents forDirectoryAtURL:(NSURL *)aURL;
+- (void)monitorDirectoryAtURL:(NSURL *)aURL;
+- (void)restartEvents;
+- (void)stopEvents;
+
 @end

@@ -15,9 +15,6 @@
 	NSString		*_rangeString;
 	BOOL			 _rangeStringIsDirty;
 
-	NSNumber		*_lineNumber;
-	NSNumber		*_columnNumber;
-
 	id			 _title;
 	NSImage			*_icon;
 
@@ -33,10 +30,6 @@
 @property(nonatomic,readonly) NSString *name;
 /** The line number of the mark. */
 @property(nonatomic,readonly) NSUInteger line;
-/** The line number of the mark as an NSNumber object. */
-@property(nonatomic,readonly) NSNumber *lineNumber;
-/** The column number of the mark as an NSNumber object. */
-@property(nonatomic,readonly) NSNumber *columnNumber;
 /** The column of the mark. */
 @property(nonatomic,readonly) NSUInteger column;
 /** The character index of the mark, or NSNotFound if unknown. */

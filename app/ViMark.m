@@ -8,8 +8,6 @@
 
 @synthesize name = _name;
 @synthesize line = _line;
-@synthesize lineNumber = _lineNumber;
-@synthesize columnNumber = _columnNumber;
 @synthesize column = _column;
 @synthesize location = _location;
 @synthesize range = _range;
@@ -78,8 +76,6 @@
 
 		_line = aLine;
 		_column = aColumn;
-		_lineNumber = [[NSNumber alloc] initWithUnsignedInteger:_line];
-		_columnNumber = [[NSNumber alloc] initWithUnsignedInteger:_column];
 
 		_location = NSNotFound;
 		_range = NSMakeRange(NSNotFound, 0);
@@ -162,8 +158,6 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	[_name release];
-	[_lineNumber release];
-	[_columnNumber release];
 	[_title release];
 	[_icon release];
 	[_groupName release];
@@ -259,6 +253,7 @@
 	if (_document) {
 		[self willChangeValueForKey:@"range"];
 		[self willChangeValueForKey:@"rangeString"];
+		[self willChangeValueForKey:@"line"];
 
 		_range = aRange;
 		_rangeStringIsDirty = YES;
@@ -266,11 +261,7 @@
 		_line = [[_document textStorage] lineNumberAtLocation:_location];
 		_column = [[_document textStorage] columnOffsetAtLocation:_location] + 1;
 
-		[_lineNumber release];
-		_lineNumber = [[NSNumber alloc] initWithUnsignedInteger:_line];
-		[_columnNumber release];
-		_columnNumber = [[NSNumber alloc] initWithUnsignedInteger:_column];
-
+		[self didChangeValueForKey:@"line"];
 		[self didChangeValueForKey:@"rangeString"];
 		[self didChangeValueForKey:@"range"];
 	}
@@ -280,9 +271,9 @@
 {
 	if (_rangeStringIsDirty) {
 		[_rangeString release];
-		if (_range.location != NSNotFound)
-			_rangeString = [NSStringFromRange(_range) retain];
-		else
+		// if (_range.location != NSNotFound)
+		// 	_rangeString = [NSStringFromRange(_range) retain];
+		// else
 			_rangeString = [[NSString alloc] initWithFormat:@"%lu:%lu", _line, _column];
 		_rangeStringIsDirty = NO;
 	}

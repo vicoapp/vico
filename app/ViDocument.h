@@ -12,72 +12,81 @@
  */
 @interface ViDocument : NSDocument <NSTextViewDelegate, NSLayoutManagerDelegate, NSTextStorageDelegate, ViDeferredDelegate, ViViewDocument>
 {
-	NSMutableSet *views;
-	ViDocumentView *hiddenView;
-	ViTextView *scriptView;
+	NSMutableSet		*_views;
+	ViDocumentView		*_hiddenView;
+	ViTextView		*_scriptView;
 
-	ViBundle *bundle;
-	ViLanguage *language;
-	ViTheme *theme;
+	ViBundle		*_bundle;
+	ViLanguage		*_language;
+	ViTheme			*_theme;
 
-	NSInteger tabSize; /* scope-specific */
-	BOOL wrap; /* scope-specific */
+	NSInteger		 _tabSize; /* scope-specific */
+	BOOL			 _wrap; /* scope-specific */
 
 	/* Set when opening a new file from the ex command line. */
-	BOOL isTemporary;
+	BOOL			 _isTemporary;
 
-	BOOL hasUndoGroup;
-	BOOL ignoreChangeCountNotification; // XXX: this is a hack
+	BOOL			 _hasUndoGroup;
+	BOOL			 _ignoreChangeCountNotification; // XXX: this is a hack
 
-	id<ViDeferred> loader;
-	BOOL busy;
+	id<ViDeferred>		 _loader;
+	BOOL			 _busy;
 
-	ViTextStorage *textStorage;
-	NSDictionary *typingAttributes;
-	ViWindowController *windowController;
-	NSString *readContent;
-	NSStringEncoding encoding;
-	NSStringEncoding forcedEncoding;
-	BOOL retrySaveOperation;
+	ViTextStorage		*_textStorage;
+	NSDictionary		*_typingAttributes;
+	ViWindowController	*_windowController;
+	NSString		*_readContent;
+	NSStringEncoding	 _encoding;
+	NSStringEncoding	 _forcedEncoding;
+	BOOL			 _retrySaveOperation;
 
 	// language parsing and highlighting
-	BOOL ignoreEditing, closed;
-	ViSyntaxParser *syntaxParser;
-	ViSyntaxContext *nextContext;
+	BOOL			 _ignoreEditing;
+	BOOL			 _closed;
+	ViSyntaxParser		*_syntaxParser;
+	ViSyntaxContext		*_nextContext;
 
 	// standard character marks
-	ViMarkStack *localMarks;
+	ViMarkStack		*_localMarks;
+	NSMutableSet		*_marks; // All marks associated with this document
 
 	// symbol list
-	NSMutableArray *symbols;
-	NSArray *filteredSymbols;
-	NSDictionary *symbolScopes;
-	NSDictionary *symbolTransforms;
-	NSDictionary *symbolIcons;
+	NSMutableArray		*_symbols;
+	NSArray			*_filteredSymbols;
+	NSDictionary		*_symbolScopes;
+	NSDictionary		*_symbolTransforms;
+	NSDictionary		*_symbolIcons;
 
-	NSRange matchingParenRange;
-	ViSnippet *snippet;
+	NSRange			 _matchingParenRange;
+	ViSnippet		*_snippet;
 
-	id didSaveDelegate;
-	SEL didSaveSelector;
-	void *didSaveContext;
+	id			 _didSaveDelegate;
+	SEL			 _didSaveSelector;
+	void			*_didSaveContext;
 
 	/* Called when the document closes. code is 0 if document saved successfully. */
-	void (^closeCallback)(int code);
+	void (^_closeCallback)(int code);
 }
 
-@property(nonatomic,readwrite, assign) ViSnippet *snippet;
+@property(nonatomic,readwrite,retain) ViSnippet *snippet;
 @property(nonatomic,readonly) NSSet *views;
-@property(nonatomic,readonly) ViBundle *bundle;
-@property(nonatomic,readonly) NSArray *symbols;
-@property(nonatomic,readwrite, assign) NSArray *filteredSymbols;
+@property(nonatomic,readwrite,retain) ViBundle *bundle;
+@property(nonatomic,readwrite,retain) ViTheme *theme;
+@property(nonatomic,readonly) ViLanguage *language;
+@property(nonatomic,readwrite,retain) NSArray *symbols;
+@property(nonatomic,readwrite,retain) NSArray *filteredSymbols;
+@property(nonatomic,readwrite,retain) NSDictionary *symbolScopes;
+@property(nonatomic,readwrite,retain) NSDictionary *symbolTransforms;
 @property(nonatomic,readonly) NSStringEncoding encoding;
-@property(nonatomic,readwrite, assign) BOOL isTemporary;
+@property(nonatomic,readwrite) BOOL isTemporary;
 @property(nonatomic,readwrite) BOOL busy;
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
-@property(nonatomic,readonly) id<ViDeferred> loader;
+@property(nonatomic,readwrite,retain) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
 @property(nonatomic,readwrite) NSRange matchingParenRange;
+@property(nonatomic,readwrite,retain) ViDocumentView *hiddenView;
+@property(nonatomic,readwrite,retain) ViSyntaxParser *syntaxParser;
+@property(nonatomic,readonly) NSSet *marks;
 
 /** Return the ViTextStorage object. */
 @property(nonatomic,readonly) ViTextStorage *textStorage;
@@ -98,7 +107,6 @@
 /** Get the language syntax.
  * @returns The language syntax currently in use, or `nil` if no language configured.
  */
-- (ViLanguage *)language;
 - (IBAction)setLanguageAction:(id)sender;
 - (void)setLanguageAndRemember:(ViLanguage *)lang;
 - (void)setLanguage:(ViLanguage *)lang;
@@ -164,5 +172,8 @@
  */
 - (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
 - (void)setMark:(unichar)key toRange:(NSRange)range;
+
+- (void)registerMark:(ViMark *)mark;
+- (void)unregisterMark:(ViMark *)mark;
 
 @end

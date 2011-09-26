@@ -1,5 +1,6 @@
 #import "ViWindow.h"
 #import "ViCommon.h"
+#include "logging.h"
 
 @implementation ViWindow
 
@@ -13,6 +14,14 @@
 	}
 
 	return NO;
+}
+
+DEBUG_FINALIZE();
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[super dealloc];
 }
 
 - (BOOL)isFullScreen

@@ -29,13 +29,23 @@
 	if ([_jumps count] >= MAX_JUMP_LOCATIONS)
 		[_jumps removeObjectAtIndex:0];
 
-	DEBUG(@"pushing %@", jump);
+	DEBUG(@"pushing %@", newJump);
+	DEBUG(@"called from %@", [NSThread callStackSymbols]);
 
 	BOOL removedDuplicate = NO;
 	ViMark *jump = nil;
 	if (newJump)
 		for (jump in _jumps)
 			if ([jump.url isEqual:newJump.url] && IMAX(1, jump.line) == IMAX(1, newJump.line))
+				break;
+
+	/* XXX: ugly hack. Jumps in untitled files that have closed have a nil url.
+	 * Replace the initial jump in the first untitled file.
+	 * Should probably be automatically removed (by [ViMark remove]) if using a ViMarkList instead of a ViJumpList.
+	 */
+	if (newJump && jump == nil)
+		for (jump in _jumps)
+			if (jump.url == nil && IMAX(1, jump.line) == IMAX(1, newJump.line))
 				break;
 
 	if (jump) {

@@ -25,31 +25,27 @@
 /* syntax: [count]<ctrl-i> */
 - (BOOL)jumplist_forward:(ViCommand *)command
 {
-	ViJumpList *jumplist = [[[self window] windowController] jumpList];
-	BOOL ok = [jumplist forwardToURL:NULL line:NULL column:NULL view:NULL];
-	if (!ok) {
+	ViWindowController *windowController = [[self window] windowController];
+	ViJumpList *jumplist = [windowController jumpList];
+	ViMark *jump = [jumplist forward];
+	if (jump == nil) {
 		MESSAGE(@"Already at end of jumplist");
 		return NO;
 	}
-
-	return YES;
+	return [windowController gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
 }
 
 /* syntax: [count]<ctrl-o> */
 - (BOOL)jumplist_backward:(ViCommand *)command
 {
-	NSURL *url = [document fileURL];
-	NSUInteger line = [[self textStorage] lineNumberAtLocation:start_location];
-	NSUInteger column = [[self textStorage] columnAtLocation:start_location];
-	NSView *view = self;
-	ViJumpList *jumplist = [[[self window] windowController] jumpList];
-	BOOL ok = [jumplist backwardToURL:&url line:&line column:&column view:&view];
-	if (!ok) {
+	ViWindowController *windowController = [[self window] windowController];
+	ViJumpList *jumplist = [windowController jumpList];
+	ViMark *jump = [jumplist backwardFrom:[self currentMark]];
+	if (jump == nil) {
 		MESSAGE(@"Already at beginning of jumplist");
 		return NO;
 	}
-
-	return YES;
+	return [windowController gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
 }
 
 /* syntax: v */
@@ -487,7 +483,7 @@
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:range];
 
-	NSTask *task = [[NSTask alloc] init];
+	NSTask *task = [[[NSTask alloc] init] autorelease];
 	[task setLaunchPath:@"/bin/bash"];
 	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
 
@@ -512,10 +508,10 @@
 	else
 		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
 
-	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+	ViTaskRunner *runner = [[[ViTaskRunner alloc] init] autorelease];
 	[runner launchTask:task
 	 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
-     synchronouslyInWindow:[self window]
+    asynchronouslyInWindow:nil
 		     title:shellCommand
 		    target:self
 		  selector:@selector(filter:finishedWithStatus:contextInfo:)
@@ -896,7 +892,7 @@
 	[self getLineStart:NULL end:&end2 contentsEnd:&eol2 forLocation:end];
 
 	if (eol2 == end || bol == eol ||
-	    [whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
+	    [_whitespace characterIsMember:[[[self textStorage] string] characterAtIndex:eol-1]])
 	{
 		/* From nvi: Empty lines just go away. */
 		NSRange r = NSMakeRange(eol, end - eol);
@@ -1325,7 +1321,7 @@
 /* syntax: [count]; */
 - (BOOL)repeat_line_search_forward:(ViCommand *)command
 {
-	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
+	ViCommand *c = [[_keyManager.parser.lastLineSearchCommand copy] autorelease];
 	if (c == nil) {
 		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
@@ -1349,7 +1345,7 @@
 /* syntax: [count], */
 - (BOOL)repeat_line_search_backward:(ViCommand *)command
 {
-	ViCommand *c = [keyManager.parser.last_ftFT_command dotCopy];
+	ViCommand *c = [[_keyManager.parser.lastLineSearchCommand copy] autorelease];
 	if (c == nil) {
 		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
@@ -1507,29 +1503,29 @@
 			undo_direction = (undo_direction == 1 ? 2 : 1);
 
 		if (undo_direction == 1) {
-			if (![undoManager canUndo]) {
+			if (![_undoManager canUndo]) {
 				MESSAGE(@"No changes to undo");
 				return NO;
 			}
 			[[self textStorage] beginEditing];
-			[undoManager undo];
+			[_undoManager undo];
 			[[self textStorage] endEditing];
 		} else {
-			if (![undoManager canRedo]) {
+			if (![_undoManager canRedo]) {
 				MESSAGE(@"No changes to re-do");
 				return NO;
 			}
 			[[self textStorage] beginEditing];
-			[undoManager redo];
+			[_undoManager redo];
 			[[self textStorage] endEditing];
 		}
 	} else {
-		if (![undoManager canUndo]) {
+		if (![_undoManager canUndo]) {
 			MESSAGE(@"No changes to undo");
 			return NO;
 		}
 		[[self textStorage] beginEditing];
-		[undoManager undo];
+		[_undoManager undo];
 		[[self textStorage] endEditing];
 	}
 
@@ -1546,11 +1542,11 @@
 	if ([undoStyle isEqualToString:@"nvi"])
 		return NO;
 
-	if (![undoManager canRedo]) {
+	if (![_undoManager canRedo]) {
 		MESSAGE(@"No changes to re-do");
 		return NO;
 	}
-	[undoManager redo];
+	[_undoManager redo];
 
 	return YES;
 }
@@ -1584,14 +1580,14 @@
 		if (word_location >= [[self textStorage] length])
 			break;
 		unichar ch = [s characterAtIndex:word_location];
-		if (!bigword && [wordSet characterIsMember:ch]) {
+		if (!bigword && [_wordSet characterIsMember:ch]) {
 			// skip word-chars and whitespace
-			end_location = [[self textStorage] skipCharactersInSet:wordSet
+			end_location = [[self textStorage] skipCharactersInSet:_wordSet
 								  fromLocation:word_location
 								      backward:NO];
-		} else if (![whitespace characterIsMember:ch]) {
+		} else if (![_whitespace characterIsMember:ch]) {
 			// inside non-word-chars
-			end_location = [[self textStorage] skipCharactersInSet:bigword ? [whitespace invertedSet] : nonWordSet
+			end_location = [[self textStorage] skipCharactersInSet:bigword ? [_whitespace invertedSet] : _nonWordSet
 								  fromLocation:word_location
 								      backward:NO];
 		} else if (command.hasOperator &&
@@ -1661,8 +1657,8 @@
          * character before the current one, it sets word "state" for the
          * 'b' command.
          */
-	if ([whitespace characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:whitespace
+	if ([_whitespace characterIsMember:ch]) {
+		end_location = [[self textStorage] skipCharactersInSet:_whitespace
 							  fromLocation:end_location
 							      backward:YES];
 		if (end_location == 0) {
@@ -1681,29 +1677,29 @@
 		ch = [s characterAtIndex:word_location];
 
 		if (bigword) {
-			end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet]
+			end_location = [[self textStorage] skipCharactersInSet:[_whitespace invertedSet]
 								  fromLocation:word_location
 								      backward:YES];
-			if (count == 0 && [whitespace characterIsMember:[s characterAtIndex:end_location]])
+			if (count == 0 && [_whitespace characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
-		} else if ([wordSet characterIsMember:ch]) {
+		} else if ([_wordSet characterIsMember:ch]) {
 			// skip word-chars and whitespace
-			end_location = [[self textStorage] skipCharactersInSet:wordSet
+			end_location = [[self textStorage] skipCharactersInSet:_wordSet
 								  fromLocation:word_location
 								      backward:YES];
-			if (count == 0 && ![wordSet characterIsMember:[s characterAtIndex:end_location]])
+			if (count == 0 && ![_wordSet characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		} else {
 			// inside non-word-chars
-			end_location = [[self textStorage] skipCharactersInSet:nonWordSet
+			end_location = [[self textStorage] skipCharactersInSet:_nonWordSet
 								  fromLocation:word_location
 								      backward:YES];
-			if (count == 0 && [[nonWordSet invertedSet] characterIsMember:[s characterAtIndex:end_location]])
+			if (count == 0 && [[_nonWordSet invertedSet] characterIsMember:[s characterAtIndex:end_location]])
 				end_location++;
 		}
 
 		if (count > 0)
-			end_location = [[self textStorage] skipCharactersInSet:whitespace
+			end_location = [[self textStorage] skipCharactersInSet:_whitespace
 								  fromLocation:end_location
 								      backward:YES];
 	}
@@ -1733,8 +1729,8 @@
 	 * it.  (This doesn't count as a word move.)  Stay at the character
 	 * past the current one, it sets word "state" for the 'e' command.
 	 */
-	if ([whitespace characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:whitespace
+	if ([_whitespace characterIsMember:ch]) {
+		end_location = [[self textStorage] skipCharactersInSet:_whitespace
 							  fromLocation:end_location
 							      backward:NO];
 		if (end_location == [s length]) {
@@ -1747,19 +1743,19 @@
 
 	ch = [s characterAtIndex:end_location];
 	if (bigword) {
-		end_location = [[self textStorage] skipCharactersInSet:[whitespace invertedSet]
+		end_location = [[self textStorage] skipCharactersInSet:[_whitespace invertedSet]
 							  fromLocation:end_location backward:NO];
 		if (!command.hasOperator && mode != ViInsertMode)
 			end_location--;
-	} else if ([wordSet characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:wordSet
+	} else if ([_wordSet characterIsMember:ch]) {
+		end_location = [[self textStorage] skipCharactersInSet:_wordSet
 							  fromLocation:end_location
 							      backward:NO];
 		if (!command.hasOperator && mode != ViInsertMode)
 			end_location--;
 	} else {
 		// inside non-word-chars
-		end_location = [[self textStorage] skipCharactersInSet:nonWordSet
+		end_location = [[self textStorage] skipCharactersInSet:_nonWordSet
 							  fromLocation:end_location
 							      backward:NO];
 		if (!command.hasOperator && mode != ViInsertMode)
@@ -1782,7 +1778,7 @@
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
 
 	unichar ch = [s characterAtIndex:bol];
-	if ([whitespace characterIsMember:ch]) {
+	if ([_whitespace characterIsMember:ch]) {
 		// skip leading whitespace
 		end_location = [[self textStorage] skipWhitespaceFrom:bol toLocation:eol];
 	}
@@ -2148,15 +2144,8 @@
 	if ([sender respondsToSelector:@selector(representedObject)])
 		sym = [sender representedObject];
 
-	ViTagStack *stack = windowController.tagStack;
-	NSURL *url = [document fileURL];
-	if (url)
-		[stack pushURL:url
-			  line:[self currentLine]
-			column:[self currentColumn]];
-
+	[windowController.tagStack push:[self currentMark]];
 	[windowController gotoMark:sym];
-	final_location = NSNotFound;
 }
 
 - (BOOL)jump_symbol:(ViCommand *)command
@@ -2203,7 +2192,7 @@
 		}
 		BOOL multiDocs = [docs count] > 1;
 
-		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Symbol matches"];
+		NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Symbol matches"] autorelease];
 		[menu setAllowsContextMenuPlugIns:NO];
 		int quickindex = 1;
 		for (ViDocument *doc in docs) {
@@ -2239,22 +2228,20 @@
 {
 	ViWindowController *windowController = [[self window] windowController];
 	ViTagsDatabase *db = windowController.tagsDatabase;
-	ViTagStack *stack = windowController.tagStack;
+	ViMarkList *stack = windowController.tagStack;
 
-	if (db == nil) {
+	if (db == nil)
 		return [self jump_symbol:command];
-	}
 
 	NSString *word = [[self textStorage] wordAtLocation:start_location];
 	if (word) {
 		[db lookup:word onCompletion:^(NSArray *tag, NSError *error) {
+			DEBUG(@"got tag %@, error %@", tag, error);
 			if (tag) {
-				NSURL *url = [document fileURL];
-				if (url)
-					[stack pushURL:url line:[self currentLine] column:[self currentColumn]];
+				[stack push:[self currentMark]];
 				[self pushCurrentLocationOnJumpList];
 
-				url = [tag objectAtIndex:0];
+				NSURL *url = [tag objectAtIndex:0];
 
 				if (![windowController gotoURL:url])
 					return;
@@ -2282,12 +2269,9 @@
 - (BOOL)pop_tag:(ViCommand *)command
 {
 	ViWindowController *windowController = [[self window] windowController];
-	ViTagStack *stack = windowController.tagStack;
-	NSDictionary *tag = [stack pop];
+	ViMark *tag = [windowController.tagStack pop];
 	if (tag) {
-		[windowController gotoURL:[tag objectForKey:@"url"]
-				     line:[[tag objectForKey:@"line"] unsignedIntegerValue]
-				   column:[[tag objectForKey:@"column"] unsignedIntegerValue]];
+		[windowController gotoMark:tag];
 	} else {
 		MESSAGE(@"The tag stack is empty");
 		return NO;
@@ -2301,7 +2285,7 @@
 	NSString *word = [[self textStorage] wordAtLocation:start_location range:&wordRange];
 	if (word) {
 		NSString *pattern = [NSString stringWithFormat:@"\\b%@\\b", word];
-		keyManager.parser.last_search_options = options;
+		_keyManager.parser.lastSearchOptions = options;
 		if (options == ViSearchOptionBackwards)
 			start_location = wordRange.location;
 		return [self findPattern:pattern options:options];
@@ -2444,7 +2428,7 @@
 
 	BOOL first = YES;
 	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
-	NSCharacterSet *bigwordSet = [whitespace invertedSet];
+	NSCharacterSet *bigwordSet = [_whitespace invertedSet];
 	int count = IMAX(command.count, 1);
 	while (count--) {
 		if (location >= [ts length])
@@ -2466,12 +2450,12 @@
 		NSCharacterSet *set = nil;
 		if (bigword && [bigwordSet characterIsMember:ch])
 			set = bigwordSet;
-		else if (!bigword && [wordSet characterIsMember:ch])
-			set = wordSet;
+		else if (!bigword && [_wordSet characterIsMember:ch])
+			set = _wordSet;
 		else if ([ws characterIsMember:ch])
 			set = ws;
 		else
-			set = nonWordSet;
+			set = _nonWordSet;
 
 		NSRange range = [ts rangeOfCharactersFromSet:set
 						  atLocation:location
@@ -2516,7 +2500,7 @@
 
 	BOOL first = YES;
 	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet]; /* without newlines */
-	NSCharacterSet *bigwordSet = [whitespace invertedSet];
+	NSCharacterSet *bigwordSet = [_whitespace invertedSet];
 	BOOL gotWhitespace = NO;
 	int count = IMAX(command.count, 1);
 	int n = 0;
@@ -2542,8 +2526,8 @@
 			set = bigwordSet;
 			if (count-- == 0)
 				break;
-		} else if (!bigword && [wordSet characterIsMember:ch]) {
-			set = wordSet;
+		} else if (!bigword && [_wordSet characterIsMember:ch]) {
+			set = _wordSet;
 			if (count-- == 0)
 				break;
 		} else if ([ws characterIsMember:ch]) {
@@ -2551,7 +2535,7 @@
 			if (first || count == 0)
 				gotWhitespace = YES;
 		} else {
-			set = nonWordSet;
+			set = _nonWordSet;
 			if (count-- == 0)
 				break;
 		}
@@ -2936,7 +2920,7 @@ again:
 - (BOOL)evalExString:(NSString *)exline
 {
 	if (![[self document] isEntireFileLoaded]) {
-		initial_ex_command = exline;
+		[self setInitialExCommand:exline];
 		return YES;
 	}
 
@@ -3061,7 +3045,7 @@ again:
 			final_location++;
 		} /* otherwise it's a <special> key code, ignore it */
 	} else if (termKey == 0x0D && [self isFieldEditor]) {
-		[keyManager handleKey:termKey];
+		[_keyManager handleKey:termKey];
 	}
 
 	if (selection == nil)
@@ -3082,7 +3066,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[ViWordCompletion alloc] init]
+			     fromProvider:[[[ViWordCompletion alloc] init] autorelease]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3099,7 +3083,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:path
-			     fromProvider:[[ViFileCompletion alloc] init]
+			     fromProvider:[[[ViFileCompletion alloc] init] autorelease]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3117,7 +3101,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[ViBufferCompletion alloc] init]
+			     fromProvider:[[[ViBufferCompletion alloc] init] autorelease]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3135,7 +3119,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[ExCommandCompletion alloc] init]
+			     fromProvider:[[[ExCommandCompletion alloc] init] autorelease]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3154,7 +3138,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[ViSyntaxCompletion alloc] init]
+			     fromProvider:[[[ViSyntaxCompletion alloc] init] autorelease]
 				fromRange:range
 				  options:command.mapping.parameter];
 }

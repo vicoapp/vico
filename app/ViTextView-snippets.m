@@ -41,7 +41,7 @@
 		DEBUG(@"expanded snippet to [%@]", expandedSnippetString);
 	}
 
-	NSMutableDictionary *env = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *env = [NSMutableDictionary dictionary];
 	[ViBundle setupEnvironment:env forTextView:self window:[self window] bundle:bundle];
 
 	[self endUndoGroup];
@@ -51,11 +51,11 @@
 	snippetMatchRange.location = NSNotFound;
 
 	NSError *error = nil;
-	ViSnippet *snippet = [[ViSnippet alloc] initWithString:expandedSnippetString
-	                                            atLocation:aRange.location
-	                                              delegate:self
-	                                           environment:env
-	                                                 error:&error];
+	ViSnippet *snippet = [[[ViSnippet alloc] initWithString:expandedSnippetString
+						     atLocation:aRange.location
+						       delegate:self
+						    environment:env
+							  error:&error] autorelease];
 	if (snippet == nil) {
 		MESSAGE(@"%@", [error localizedDescription]);
 		final_location = aRange.location;

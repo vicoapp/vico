@@ -37,7 +37,7 @@
 	if (caretRect.origin.x == 0)
 		caretRect.origin.x = 5;
 
-	if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode) {
+	if (highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
 		NSRange lineRange;
 		if (length == 0) {
 			lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
@@ -63,14 +63,17 @@
 	oldCaretRect = caretRect;
 	oldLineHighlightRect = lineHighlightRect;
 
-	caretBlinkState = YES;
-	[caretBlinkTimer invalidate];
-	if ([[self window] firstResponder] == self && (caretBlinkMode & mode) != 0)
-		caretBlinkTimer = [NSTimer scheduledTimerWithTimeInterval:caretBlinkTime
-					target:self
-				      selector:@selector(blinkCaret:)
-				      userInfo:nil
-				       repeats:YES];
+	_caretBlinkState = YES;
+	[_caretBlinkTimer invalidate];
+	[_caretBlinkTimer release];
+	if ([[self window] firstResponder] == self && (caretBlinkMode & mode) != 0) {
+		_caretBlinkTimer = [[NSTimer scheduledTimerWithTimeInterval:caretBlinkTime
+								     target:self
+								   selector:@selector(blinkCaret:)
+								   userInfo:nil
+								    repeats:YES] retain];
+	} else
+		_caretBlinkTimer = nil;
 }
 
 - (void)updateCaret
@@ -85,13 +88,13 @@
 
 - (void)blinkCaret:(NSTimer *)aTimer
 {
-	caretBlinkState = !caretBlinkState;
+	_caretBlinkState = !_caretBlinkState;
 	[self setNeedsDisplayInRect:caretRect];
 }
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	if (caretBlinkState && NSIntersectsRect(caretRect, aRect)) {
+	if (_caretBlinkState && NSIntersectsRect(caretRect, aRect)) {
 		if ([self isFieldEditor]) {
 			caretRect.size.width = 1;
 		} else if (mode == ViInsertMode) {
@@ -109,7 +112,7 @@
 		if ([self isFieldEditor])
 			[[NSColor blackColor] set];
 		else
-			[caretColor set];
+			[_caretColor set];
 		[[NSBezierPath bezierPathWithRect:caretRect] fill];
 	}
 }
@@ -118,8 +121,8 @@
 {
 	[super drawViewBackgroundInRect:rect];
 	if (NSIntersectsRect(lineHighlightRect, rect)) {
-		if (highlightCursorLine && lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
-			[lineHighlightColor set];
+		if (highlightCursorLine && _lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
+			[_lineHighlightColor set];
 			[[NSBezierPath bezierPathWithRect:lineHighlightRect] fill];
 		}
 	}
@@ -168,7 +171,10 @@
 		original_normal_source = input;
 	}
 
-	[caretBlinkTimer invalidate];
+	[_caretBlinkTimer invalidate];
+	[_caretBlinkTimer release];
+	_caretBlinkTimer = nil;
+
 	[self setNeedsDisplayInRect:oldLineHighlightRect];
 	[self setNeedsDisplayInRect:oldCaretRect];
 	[self forceCursorColor:NO];

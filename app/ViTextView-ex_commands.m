@@ -68,7 +68,7 @@
 			return -1;
 		}
 
-		keyManager.parser.last_search_options = (addr.backwards ? ViSearchOptionBackwards : 0);
+		_keyManager.parser.lastSearchOptions = (addr.backwards ? ViSearchOptionBackwards : 0);
 
 		if (r.location == NSNotFound) {
 			if (outError)
@@ -175,6 +175,7 @@
 		    withParser:parser
 		      bindings:nil
 			 error:&error];
+	[parser release];
 	if (error)
 		return error;
 	return nil;
@@ -205,16 +206,16 @@
 		return [ViError message:@"No previous search pattern"];
 
 	NSError *error = nil;
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-						options:rx_options
-						  error:&error];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern
+					  options:rx_options
+					    error:&error];
 	if (error)
 		return error;
 
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
-	ViTransformer *tform = [[ViTransformer alloc] init];
+	ViTransformer *tform = [[[ViTransformer alloc] init] autorelease];
 
 	NSString *s = [storage string];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));

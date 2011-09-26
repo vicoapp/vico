@@ -30,31 +30,43 @@
 @interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget>
 {
 	ViDocument		*document;
+	// .busy
+	// .snippet
+	// .loader (check if being loaded)
+	// .matchingParenRange
+	// marks (setMark, markNamed, ...)
+	// scopes
+	// typingAttributes
+	// fileURL (for pushing on jump list)
+	// .language (for action menu)
+	// encoding (show_info)
 
 	TISInputSourceRef	 original_insert_source;
 	TISInputSourceRef	 original_normal_source;
 
 	ViMode			 mode;
-	ViKeyManager		*keyManager;
+	ViKeyManager		*_keyManager;
 
 	/* Command that entered insert mode. Used to set the inserted
 	 * text for the dot command. */
-	ViCommand		*lastEditCommand;
+	ViCommand		*_lastEditCommand;
 
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
-	NSMutableArray		*inputKeys; // used for replaying input
+	NSMutableArray		*_inputKeys; // used for replaying input
 
 	// FIXME: move these to the ViCommand as properties
 	NSRange			 affectedRange;
-	NSUInteger		 start_location, end_location, final_location;
+	NSUInteger		 start_location;
+	NSUInteger		 end_location;
+	NSUInteger		 final_location;
 	NSUInteger		 modify_start_location;
 	BOOL			 keepMessagesHack;
 
 	NSRange			 snippetMatchRange;
 
-	NSUndoManager		*undoManager;
+	NSUndoManager		*_undoManager;
 
 	// block caret
 	NSUInteger		 caret;
@@ -62,36 +74,37 @@
 	NSRect			 lineHighlightRect;
 	NSRect			 oldCaretRect;
 	NSRect			 oldLineHighlightRect;
-	NSColor			*caretColor;
-	NSColor			*lineHighlightColor;
+	NSColor			*_caretColor;
+	NSColor			*_lineHighlightColor;
 	BOOL			 highlightCursorLine;
 
 	// caret blinking
 	NSUInteger		 caretBlinkMode;
 	CGFloat			 caretBlinkTime;
-	BOOL			 caretBlinkState;
-	NSTimer			*caretBlinkTimer;
+	BOOL			 _caretBlinkState;
+	NSTimer			*_caretBlinkTimer;
 
 	// white-on-black I-beam mouse cursor
 	BOOL			 backgroundIsDark;
 
 	NSInteger		 saved_column;
-	NSString		*initial_ex_command;
+	NSString		*_initialExCommand;
 	NSInteger		 initial_line, initial_column;
-	NSString		*initial_find_pattern;
+	ViMark			*_initialMark;
+	NSString		*_initialFindPattern;
 	unsigned		 initial_find_options;
 	NSInteger		 reverted_line, reverted_column;
 
 	// visual mode
 	NSUInteger		 visual_start_location;
 	BOOL			 visual_line_mode;
-	int			 selection_affinity; /* 1 = char, 2 = word, 3 = line */
+	int			 _selection_affinity; /* 1 = char, 2 = word, 3 = line */
 
-	BOOL			 showingContextMenu;
+	BOOL			 _showingContextMenu;
 
-	NSMutableCharacterSet	*wordSet;
-	NSMutableCharacterSet	*nonWordSet;
-	NSCharacterSet		*whitespace;
+	NSMutableCharacterSet	*_wordSet;
+	NSMutableCharacterSet	*_nonWordSet;
+	NSCharacterSet		*_whitespace;
 
 	CGFloat			 pageGuideX;
 	BOOL			 antialias;
@@ -102,9 +115,17 @@
 	ViTaskRunner		*_taskRunner;
 }
 
+@property (nonatomic,readwrite,copy) NSString *initialFindPattern;
+@property (nonatomic,readwrite,copy) NSString *initialExCommand;
+@property (nonatomic,readwrite,retain) NSColor *caretColor;
+@property (nonatomic,readwrite,retain) NSColor *lineHighlightColor;
+@property (nonatomic,readwrite,retain) ViCommand *lastEditCommand;
+@property (nonatomic,readwrite,retain) NSUndoManager *undoManager;
+@property (nonatomic,readwrite,retain) ViMark *initialMark;
+
 /** Associated key manager.
  */
-@property(nonatomic,readwrite,assign) ViKeyManager *keyManager;
+@property(nonatomic,readwrite,retain) ViKeyManager *keyManager;
 
 /** Associated document.
  */
@@ -119,7 +140,7 @@
  */
 @property(nonatomic,readwrite) BOOL visual_line_mode;
 
-+ (ViTextView *)makeFieldEditor;
++ (ViTextView *)makeFieldEditorWithTextStorage:(ViTextStorage *)textStorage;
 
 - (void)initWithDocument:(ViDocument *)aDocument
                 viParser:(ViParser *)aParser;
@@ -227,6 +248,8 @@
  */
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column;
 
+- (BOOL)gotoMark:(ViMark *)mark;
+
 /** Get the character at a location.
  * @param location The location to check.
  * @returns The character at the given location, or 0 if location is invalid.
@@ -242,6 +265,9 @@
  * @returns The content of the current line.
  */
 - (NSString *)line;
+
+- (ViMark *)markAtLocation:(NSUInteger)location;
+- (ViMark *)currentMark;
 
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;

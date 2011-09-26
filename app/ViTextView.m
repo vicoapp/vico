@@ -18,6 +18,8 @@
 #import "ViLayoutManager.h"
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
+#import "ViTaskRunner.h"
+#import "ViEventManager.h"
 
 #import <objc/runtime.h>
 
@@ -40,51 +42,63 @@ int logIndent = 0;
 
 @implementation ViTextView
 
-@synthesize keyManager;
+@synthesize keyManager = _keyManager;
 @synthesize document;
 @synthesize mode;
 @synthesize visual_line_mode;
+@synthesize initialFindPattern = _initialFindPattern;
+@synthesize initialExCommand = _initialExCommand;
+@synthesize caretColor = _caretColor;
+@synthesize lineHighlightColor = _lineHighlightColor;
+@synthesize lastEditCommand = _lastEditCommand;
+@synthesize undoManager = _undoManager;
+@synthesize initialMark = _initialMark;
 
-+ (ViTextView *)makeFieldEditor
++ (ViTextView *)makeFieldEditorWithTextStorage:(ViTextStorage *)textStorage
 {
-	ViTextStorage *textStorage = [[ViTextStorage alloc] init];
-	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
+	ViLayoutManager *layoutManager = [[[ViLayoutManager alloc] init] autorelease];
 	[textStorage addLayoutManager:layoutManager];
-	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
+	NSTextContainer *container = [[[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)] autorelease];
 	[layoutManager addTextContainer:container];
 	[layoutManager setShowsControlCharacters:YES];
 	NSRect frame = NSMakeRect(0, 0, 100, 10);
 	ViTextView *editor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
-	ViParser *fieldParser = [[ViParser alloc] initWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
+	ViParser *fieldParser = [ViParser parserWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
 	[editor initWithDocument:nil viParser:fieldParser];
 	[editor setFieldEditor:YES];
-	return editor;
+	return [editor autorelease];
 }
 
 - (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
 {
-	keyManager = [[ViKeyManager alloc] initWithTarget:self
-					       parser:aParser];
+	MEMDEBUG(@"init %p", self);
+	[self setKeyManager:[ViKeyManager keyManagerWithTarget:self parser:aParser]];
 
 	mode = ViNormalMode;
-	document = aDocument;
-	undoManager = [document undoManager];
-	if (undoManager == nil)
-		undoManager = [[NSUndoManager alloc] init];
-	inputKeys = [NSMutableArray array];
+	document = [aDocument retain];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(documentRemoved:)
+						     name:ViDocumentRemovedNotification
+						   object:document];
+
+	_undoManager = [[document undoManager] retain];
+	if (_undoManager == nil)
+		_undoManager = [[NSUndoManager alloc] init];
+	_inputKeys = [[NSMutableArray alloc] init];
 	saved_column = -1;
 	reverted_line = -1;
 	snippetMatchRange.location = NSNotFound;
 	original_insert_source = [[NSApp delegate] original_input_source];
+	_taskRunner = [[ViTaskRunner alloc] init];
 
-	wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
-	[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
-	whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	_wordSet = [[NSMutableCharacterSet characterSetWithCharactersInString:@"_"] retain];
+	[_wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
+	_whitespace = [[NSCharacterSet whitespaceAndNewlineCharacterSet] retain];
 
-	nonWordSet = [[NSMutableCharacterSet alloc] init];
-	[nonWordSet formUnionWithCharacterSet:wordSet];
-	[nonWordSet formUnionWithCharacterSet:whitespace];
-	[nonWordSet invert];
+	_nonWordSet = [[NSMutableCharacterSet alloc] init];
+	[_nonWordSet formUnionWithCharacterSet:_wordSet];
+	[_nonWordSet formUnionWithCharacterSet:_whitespace];
+	[_nonWordSet invert];
 
 	[self setRichText:NO];
 	[self setImportsGraphics:NO];
@@ -156,9 +170,60 @@ int logIndent = 0;
 	[self updateStatus];
 }
 
+DEBUG_FINALIZE();
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+
+	[[ViEventManager defaultManager] clearFor:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults removeObserver:self forKeyPath:@"theme"];
+	[defaults removeObserver:self forKeyPath:@"antialias"];
+	[defaults removeObserver:self forKeyPath:@"cursorline"];
+	[defaults removeObserver:self forKeyPath:@"blinkmode"];
+	[defaults removeObserver:self forKeyPath:@"blinktime"];
+
+	[document release];
+	[_keyManager setTarget:nil];
+	[_keyManager release];
+	[_lastEditCommand release];
+	[_inputKeys release];
+	[_undoManager release];
+	[_caretColor release];
+	[_lineHighlightColor release];
+	[_caretBlinkTimer release];
+
+	[_initialExCommand release];
+	[_initialFindPattern release];
+
+	[_wordSet release];
+	[_whitespace release];
+	[_nonWordSet release];
+
+	[super dealloc];
+}
+
+- (void)documentRemoved:(NSNotification *)notification
+{
+	if ([notification object] != document)
+		return;
+
+	DEBUG(@"document removed %@ from text view %@", document, self);
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+							name:ViDocumentRemovedNotification
+						      object:document];
+
+	[document release];
+	document = nil;
+}
+
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViTextView %p: %@>", self, document];
+	return [NSString stringWithFormat:@"<ViTextView %p>", self];
 }
 
 - (void)prepareRevertDocument
@@ -167,14 +232,33 @@ int logIndent = 0;
 	reverted_column = [self currentColumn];
 }
 
+- (BOOL)gotoMark:(ViMark *)mark
+{
+	if (![document isEntireFileLoaded]) {
+		[self setInitialMark:mark];
+	} else {
+		NSRange range = mark.range;
+		if (range.location >= [[self textStorage] length])
+			return NO;
+		[self setCaret:range.location];
+		[self scrollRangeToVisible:range];
+		[[self nextRunloop] showFindIndicatorForRange:range];
+	}
+	return YES;
+}
+
 - (void)documentDidLoad:(ViDocument *)aDocument
 {
 	if (initial_line >= 0)
 		[self gotoLine:initial_line column:initial_column];
 	else if (reverted_line >= 0)
 		[self gotoLine:reverted_line column:reverted_column];
-	if (initial_find_pattern)
-		[self findPattern:initial_find_pattern options:initial_find_options];
+
+	if (_initialMark)
+		[self gotoMark:_initialMark];
+
+	if (_initialFindPattern)
+		[self findPattern:_initialFindPattern options:initial_find_options];
 
 	NSUInteger len = [[self textStorage] length];
 	if ([self caret] >= len) {
@@ -182,13 +266,15 @@ int logIndent = 0;
 		[self scrollRangeToVisible:NSMakeRange(final_location, 0)];
 	}
 
-	if (initial_ex_command)
-		[self evalExString:initial_ex_command];
+	if (_initialExCommand)
+		[self evalExString:_initialExCommand];
 
-	initial_ex_command = nil;
 	initial_line = -1;
 	reverted_line = -1;
-	initial_find_pattern = nil;
+
+	[self setInitialExCommand:nil];
+	[self setInitialFindPattern:nil];
+	[self setInitialMark:nil];
 }
 
 - (void)frameDidChange:(NSNotification *)notification
@@ -266,9 +352,9 @@ int logIndent = 0;
 	if (toIndex == NSNotFound)
 		return;
 
-	if (keyManager.parser.partial) {
+	if (_keyManager.parser.partial) {
 		MESSAGE(@"Vi command interrupted.");
-		[keyManager.parser reset];
+		[_keyManager.parser reset];
 	}
 
 	visual_start_location = fromIndex;
@@ -282,22 +368,22 @@ int logIndent = 0;
 
 - (void)copy:(id)sender
 {
-	[keyManager handleKeys:[@"\"+y" keyCodes]];
+	[_keyManager handleKeys:[@"\"+y" keyCodes]];
 }
 
 - (void)paste:(id)sender
 {
-	[keyManager handleKeys:[@"\"+P" keyCodes]];
+	[_keyManager handleKeys:[@"\"+P" keyCodes]];
 }
 
 - (void)cut:(id)sender
 {
-	[keyManager handleKeys:[@"\"+x" keyCodes]];
+	[_keyManager handleKeys:[@"\"+x" keyCodes]];
 }
 
 - (void)selectAll:(id)sender
 {
-	[keyManager handleKeys:[@"<esc>ggVG" keyCodes]];
+	[_keyManager handleKeys:[@"<esc>ggVG" keyCodes]];
 }
 
 - (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
@@ -533,6 +619,28 @@ int logIndent = 0;
 	return [[self textStorage] lineAtLocation:[self caret]];
 }
 
+- (ViMark *)markAtLocation:(NSUInteger)location
+{
+	ViWindowController *windowController = [[self window] windowController];
+	NSRange r = NSMakeRange(location, 0);
+	if (r.location < [[self textStorage] length])
+		r.length = 1;
+	id<ViViewController> viewController = [windowController viewControllerForView:self];
+	if (viewController)
+		return [ViMark markWithView:viewController
+				       name:nil
+				      range:r];
+	else
+		return [ViMark markWithDocument:document
+					   name:nil
+					  range:r];
+}
+
+- (ViMark *)currentMark
+{
+	return [self markAtLocation:[self caret]];
+}
+
 #pragma mark -
 #pragma mark Indentation
 
@@ -581,7 +689,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -598,7 +706,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -615,7 +723,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -632,7 +740,7 @@ int logIndent = 0;
 
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
-		ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern];
+		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
 		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
@@ -877,7 +985,7 @@ int logIndent = 0;
 	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];
-	[undoManager undo];
+	[_undoManager undo];
 	[[self textStorage] endEditing];
 	[self setCaret:final_location];
 }
@@ -888,7 +996,7 @@ int logIndent = 0;
 	[self cancelSnippet];
 	[self setNormalMode];
 	[[self textStorage] beginEditing];
-	[undoManager redo];
+	[_undoManager redo];
 	[[self textStorage] endEditing];
 	[self setCaret:final_location];
 }
@@ -899,7 +1007,7 @@ int logIndent = 0;
 		[document endUndoGroup];
 	else if (hasUndoGroup) {
 		DEBUG(@"%s", "====================> Ending undo-group");
-		[undoManager endUndoGrouping];
+		[_undoManager endUndoGrouping];
 		hasUndoGroup = NO;
 	}
 }
@@ -910,7 +1018,7 @@ int logIndent = 0;
 		[document beginUndoGroup];
 	else if (!hasUndoGroup) {
 		DEBUG(@"%s", "====================> Beginning undo-group");
-		[undoManager beginUndoGrouping];
+		[_undoManager beginUndoGrouping];
 		hasUndoGroup = YES;
 	}
 }
@@ -933,8 +1041,8 @@ int logIndent = 0;
 	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
 	DEBUG(@"pushing replacement of range %@ (string [%@]) with %@ onto undo stack",
 	    NSStringFromRange(aRange), s, NSStringFromRange(newRange));
-	[[undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange];
-	[undoManager setActionName:@"replace text"];
+	[[_undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange];
+	[_undoManager setActionName:@"replace text"];
 }
 
 #pragma mark -
@@ -993,7 +1101,7 @@ int logIndent = 0;
 
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column
 {
-	if (document.loader) {
+	if (![document isEntireFileLoaded]) {
 		initial_line = line;
 		initial_column = column;
 		return YES;
@@ -1038,9 +1146,9 @@ int logIndent = 0;
 	}
 
 	NSError *error = nil;
-	ViRegexp *rx = [[ViRegexp alloc] initWithString:pattern
-						options:rx_options
-						  error:&error];
+	ViRegexp *rx = [ViRegexp regexpWithString:pattern
+					  options:rx_options
+					    error:&error];
 	if (error) {
 		if (outError)
 			*outError = error;
@@ -1084,8 +1192,8 @@ int logIndent = 0;
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	if (document.loader) {
-		initial_find_pattern = pattern;
+	if (![document isEntireFileLoaded]) {
+		[self setInitialFindPattern:pattern];
 		initial_find_options = find_options;
 		return YES;
 	}
@@ -1133,7 +1241,7 @@ int logIndent = 0;
 		return NO;
 	}
 
-	keyManager.parser.last_search_options = 0;
+	_keyManager.parser.lastSearchOptions = 0;
 	if ([self findPattern:pattern options:0]) {
 		[self setCaret:final_location];
 		return YES;
@@ -1161,7 +1269,7 @@ int logIndent = 0;
 		return NO;
 	}
 
-	keyManager.parser.last_search_options = ViSearchOptionBackwards;
+	_keyManager.parser.lastSearchOptions = ViSearchOptionBackwards;
 	if ([self findPattern:pattern options:ViSearchOptionBackwards]) {
 		[self setCaret:final_location];
 		return YES;
@@ -1179,7 +1287,7 @@ int logIndent = 0;
 		return NO;
 	}
 
-	return [self findPattern:pattern options:keyManager.parser.last_search_options];
+	return [self findPattern:pattern options:_keyManager.parser.lastSearchOptions];
 }
 
 /* syntax: N */
@@ -1191,7 +1299,7 @@ int logIndent = 0;
 		return NO;
 	}
 
-	int options = keyManager.parser.last_search_options;
+	int options = _keyManager.parser.lastSearchOptions;
 	if (options & ViSearchOptionBackwards)
 		options &= ~ViSearchOptionBackwards;
 	else
@@ -1271,7 +1379,7 @@ int logIndent = 0;
 	}
 
 	initial_line = -1;
-	initial_find_pattern = nil;
+	[self setInitialFindPattern:nil];
 }
 
 - (void)setCaret:(NSUInteger)location
@@ -1302,7 +1410,7 @@ int logIndent = 0;
                  affinity:(NSSelectionAffinity)affinity
            stillSelecting:(BOOL)stillSelectingFlag
 {
-	if (showingContextMenu) /* XXX: not used anymore? */
+	if (_showingContextMenu) /* XXX: not used anymore? */
 		return;
 
 	[super setSelectedRanges:ranges affinity:affinity stillSelecting:stillSelectingFlag];
@@ -1380,7 +1488,7 @@ int logIndent = 0;
 	 * we update this command with the inserted text (or keys, actually). This
 	 * is used for repeating the insertion with the dot command.
 	 */
-	lastEditCommand = command;
+	[self setLastEditCommand:command];
 
 	if (command) {
 		if (command.text) {
@@ -1389,8 +1497,8 @@ int logIndent = 0;
 			int count = IMAX(1, command.count);
 			int i;
 			for (i = 0; i < count; i++)
-				[keyManager handleKeys:command.text
-					       inScope:[document scopeAtLocation:end_location]];
+				[_keyManager handleKeys:command.text
+						inScope:[document scopeAtLocation:end_location]];
 			[self normal_mode:command];
 			replayingInput = NO;
 		}
@@ -1488,7 +1596,7 @@ int logIndent = 0;
 	NSString *string = [ts string];
 	NSUInteger length = [ts length];
 	NSArray *pair = nil;
-	""
+
 	DEBUG(@"testing %@ for smart pair", characters);
 
 	/*
@@ -1789,7 +1897,7 @@ int logIndent = 0;
 			 * Remember the typed keys so we can repeat it
 			 * with the dot command.
 			 */
-			[lastEditCommand setText:inputKeys];
+			[_lastEditCommand setText:_inputKeys];
 
 			/*
 			 * A count given to the command that started insert
@@ -1797,18 +1905,18 @@ int logIndent = 0;
 			 * inserted text.
 			 */
 			DEBUG(@"last edit command is %@, got %lu input keys",
-			    lastEditCommand, [inputKeys count]);
-			int count = IMAX(1, lastEditCommand.count);
+			    _lastEditCommand, [_inputKeys count]);
+			int count = IMAX(1, _lastEditCommand.count);
 			if (count > 1) {
 				replayingInput = YES;
 				for (int i = 1; i < count; i++)
-					[keyManager handleKeys:inputKeys
-						       inScope:[document scopeAtLocation:[self caret]]];
+					[_keyManager handleKeys:_inputKeys
+							inScope:[document scopeAtLocation:[self caret]]];
 				replayingInput = NO;
 			}
 		}
 
-		inputKeys = [NSMutableArray array];
+		[_inputKeys removeAllObjects];
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
@@ -1911,8 +2019,7 @@ int logIndent = 0;
 		 * Run the motion command and record the start and end locations.
 		 */
 		DEBUG(@"perform motion command %@", command.motion);
-		if (![motion_target performSelector:command.motion.action
-					 withObject:command.motion])
+		if (![command.motion performWithTarget:motion_target])
 			/* the command failed */
 			return NO;
 	}
@@ -1985,7 +2092,7 @@ int logIndent = 0;
 
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
-	BOOL ok = (NSUInteger)[target performSelector:command.action withObject:command];
+	BOOL ok = [command performWithTarget:target];
 
 	if (ok && command.isLineMode && !command.isMotion &&
 	    command.action != @selector(yank:) &&
@@ -2077,8 +2184,8 @@ int logIndent = 0;
 	if (replacementRange.location == NSNotFound) {
 		NSInteger i;
 		for (i = 0; i < [string length]; i++)
-			[keyManager handleKey:[string characterAtIndex:i]
-				      inScope:[document scopeAtLocation:[self caret]]];
+			[_keyManager handleKey:[string characterAtIndex:i]
+				       inScope:[document scopeAtLocation:[self caret]]];
 		insertedKey = YES;
 	}
 }
@@ -2110,8 +2217,8 @@ int logIndent = 0;
 	if ([self hasMarkedText])
 		return [super performKeyEquivalent:theEvent];
 
-	return [keyManager performKeyEquivalent:theEvent
-					inScope:[document scopeAtLocation:[self caret]]];
+	return [_keyManager performKeyEquivalent:theEvent
+					 inScope:[document scopeAtLocation:[self caret]]];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -2127,7 +2234,7 @@ int logIndent = 0;
 
 	if (!insertedKey && !hadMarkedText && ![self hasMarkedText]) {
 		DEBUG(@"decoding event %@", theEvent);
-		[keyManager keyDown:theEvent inScope:[document scopeAtLocation:[self caret]]];
+		[_keyManager keyDown:theEvent inScope:[document scopeAtLocation:[self caret]]];
 	}
 	insertedKey = NO;
 }
@@ -2140,14 +2247,14 @@ int logIndent = 0;
 
 	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
 		/* Add the key to the input replay queue. */
-		[inputKeys addObject:keyNum];
+		[_inputKeys addObject:keyNum];
 	}
 
 	/*
 	 * Find and perform bundle commands. Show a menu with commands
 	 * if multiple matches found.
 	 */
-	if (!keyManager.parser.partial && ![self isFieldEditor]) {
+	if (!_keyManager.parser.partial && ![self isFieldEditor]) {
 		NSArray *matches = [[ViBundleStore defaultStore] itemsWithKeyCode:keyCode
 								    matchingScope:scope
 									   inMode:mode];
@@ -2159,9 +2266,9 @@ int logIndent = 0;
 		}
 
 		if (mode == ViVisualMode)
-			[keyManager.parser setVisualMap];
+			[_keyManager.parser setVisualMap];
 		else if (mode == ViInsertMode)
-			[keyManager.parser setInsertMap];
+			[_keyManager.parser setInsertMap];
 	}
 
 	return [NSNumber numberWithBool:YES];
@@ -2176,11 +2283,11 @@ int logIndent = 0;
 	if ([event deltaX] != 0) {
 		if (mode == ViInsertMode) {
 			MESSAGE(@"Swipe event interrupted text insert mode.");
-			[self normal_mode:lastEditCommand];
-		} else if (keyManager.parser.partial)
+			[self normal_mode:_lastEditCommand];
+		} else if (_keyManager.parser.partial)
 			MESSAGE(@"Vi command interrupted.");
 		keep_message = YES;
-		[keyManager.parser reset];
+		[_keyManager.parser reset];
 	}
 
 	start_location = [self caret];
@@ -2206,7 +2313,7 @@ int logIndent = 0;
 	}
 
 	BOOL interactive = ([self window] != nil || [self isFieldEditor]);
-	return [keyManager runAsMacro:inputString interactively:interactive];
+	return [_keyManager runAsMacro:inputString interactively:interactive];
 }
 
 #pragma mark -
@@ -2232,6 +2339,7 @@ int logIndent = 0;
 	else {
 		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[ViThemeStore font], NSFontAttributeName, nil];
 		CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
+		[sizeAttribute release];
 		pageGuideX = (sizeOfCharacter * (pageGuideValue + 1)) - 1.5;
 		// -1.5 to put it between the two characters and draw only on one pixel and
 		// not two (as the system draws it in a special way), and that's also why the
@@ -2268,8 +2376,8 @@ int logIndent = 0;
 
 - (void)setTheme:(ViTheme *)aTheme
 {
-	caretColor = [aTheme caretColor];
-	lineHighlightColor = [aTheme lineHighlightColor];
+	[self setCaretColor:[aTheme caretColor]];
+	[self setLineHighlightColor:[aTheme lineHighlightColor]];
 	[self setBackgroundColor:[aTheme backgroundColor]];
 	[[self enclosingScrollView] setBackgroundColor:[aTheme backgroundColor]];
 	[self setInsertionPointColor:[aTheme caretColor]];
@@ -2329,10 +2437,7 @@ int logIndent = 0;
 - (void)pushLocationOnJumpList:(NSUInteger)aLocation
 {
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];
-	[jumplist pushURL:[document fileURL]
-		     line:[[self textStorage] lineNumberAtLocation:aLocation]
-		   column:[[self textStorage] columnAtLocation:aLocation]
-		     view:self];
+	[jumplist push:[self markAtLocation:aLocation]];
 }
 
 - (void)pushCurrentLocationOnJumpList
@@ -2352,13 +2457,13 @@ int logIndent = 0;
 		visual_start_location = eol - 1;
 	DEBUG(@"clicked %li times at location %lu", [theEvent clickCount], visual_start_location);
 
-	selection_affinity = (int)[theEvent clickCount];
-	if (selection_affinity <= 1)
-		selection_affinity = 1;
-	else if (selection_affinity > 3)
-		selection_affinity = 3;
+	_selection_affinity = (int)[theEvent clickCount];
+	if (_selection_affinity <= 1)
+		_selection_affinity = 1;
+	else if (_selection_affinity > 3)
+		_selection_affinity = 3;
 
-	if (selection_affinity == 2) {
+	if (_selection_affinity == 2) {
 		/* align to word boundaries */
 		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
 								  acceptAfter:NO];
@@ -2370,8 +2475,8 @@ int logIndent = 0;
 	} else if (visual_start_location != [self caret])
 		[self setCaret:visual_start_location];
 
-	if (selection_affinity > 1) {
-		visual_line_mode = (selection_affinity == 3);
+	if (_selection_affinity > 1) {
+		visual_line_mode = (_selection_affinity == 3);
 		[self setVisualMode];
 		[self setVisualSelection];
 	} else {
@@ -2392,11 +2497,11 @@ int logIndent = 0;
 	DEBUG(@"dragged from location %lu -> %lu", visual_start_location, location);
 
 	if (mode != ViVisualMode) {
-		visual_line_mode = (selection_affinity == 3);
+		visual_line_mode = (_selection_affinity == 3);
 		[self setVisualMode];
 	}
 
-	if (selection_affinity == 2) {
+	if (_selection_affinity == 2) {
 		/* align to word boundaries */
 		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
 								  acceptAfter:NO];
@@ -2471,7 +2576,7 @@ int logIndent = 0;
 
 	ViLanguage *curLang = [document language];
 
-	submenu = [[NSMenu alloc] initWithTitle:@"Language syntax"];
+	submenu = [[[NSMenu alloc] initWithTitle:@"Language syntax"] autorelease];
 	item = [menu insertItemWithTitle:@"Language syntax"
 				  action:NULL
 			   keyEquivalent:@""
@@ -2522,9 +2627,9 @@ int logIndent = 0;
 
 - (IBAction)performNormalModeMenuItem:(id)sender
 {
-	if (keyManager.parser.partial) {
+	if (_keyManager.parser.partial) {
 		[[[[self window] windowController] nextRunloop] message:@"Vi command interrupted."];
-		[keyManager.parser reset];
+		[_keyManager.parser reset];
 	}
 
 	ViCommandMenuItemView *view = (ViCommandMenuItemView *)[sender view];
@@ -2541,9 +2646,9 @@ int logIndent = 0;
 
 - (BOOL)show_bundle_menu:(ViCommand *)command
 {
-	showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
+	_showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
 	[self rightMouseDown:[self popUpContextEvent]];
-	showingContextMenu = NO;
+	_showingContextMenu = NO;
 	return YES;
 }
 
@@ -2565,9 +2670,9 @@ int logIndent = 0;
 
 - (void)popUpContextMenu:(NSMenu *)menu
 {
-	showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
+	_showingContextMenu = YES;	/* XXX: this disables the selection caused by NSMenu. */
 	[NSMenu popUpContextMenu:menu withEvent:[self popUpContextEvent] forView:self];
-	showingContextMenu = NO;
+	_showingContextMenu = NO;
 }
 
 - (NSDictionary *)environment

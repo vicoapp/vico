@@ -27,6 +27,7 @@ symbolicAttributes:(NSDictionary *)sDictionary
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_url release];
 	[_targetURL release];
 	[_attributes release];

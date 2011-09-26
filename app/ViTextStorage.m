@@ -23,6 +23,9 @@ static NSMutableCharacterSet *wordSet = nil;
 
 - (void)finalize
 {
+#ifndef NO_MEM_DEBUG
+	INFO(@"%p", self);
+#endif
 	/* Free the skiplist. */
 	struct skip *skip;
 	while ((skip = TAILQ_FIRST(&_skiphead)) != NULL) {

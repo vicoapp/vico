@@ -65,7 +65,7 @@
 				<int key="NSWindowStyleMask">4367</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{340, 173}, {800, 600}}</string>
-				<int key="NSWTFlags">1886912512</int>
+				<int key="NSWTFlags">813170688</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">ViWindow</string>
 				<object class="NSToolbar" key="NSViewClass" id="659594053">
@@ -562,7 +562,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{400, 200}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSCustomView" id="402151357">
@@ -570,6 +570,7 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{0, 578}, {800, 22}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
+							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="892226745"/>
 							<string key="NSClassName">PSMTabBarControl</string>
 						</object>
@@ -590,6 +591,8 @@
 													<int key="NSvFlags">290</int>
 													<string key="NSFrame">{{36, 4}, {746, 14}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
+													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="584565200">
 														<int key="NSCellFlags">68288064</int>
@@ -618,6 +621,7 @@
 													<int key="NSvFlags">-2147483358</int>
 													<string key="NSFrame">{{31, 2}, {749, 19}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
+													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="311339436"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="180256402">
@@ -645,6 +649,7 @@
 													<int key="NSvFlags">292</int>
 													<string key="NSFrameSize">{31, 23}</string>
 													<reference key="NSSuperview" ref="773548491"/>
+													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="24397800"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSPopUpButtonCell" key="NSCell" id="934984888">
@@ -684,6 +689,7 @@
 													</set>
 													<string key="NSFrameSize">{800, 23}</string>
 													<reference key="NSSuperview" ref="773548491"/>
+													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="203483497"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSImageCell" key="NSCell" id="101616384">
@@ -705,6 +711,7 @@
 													<int key="NSvFlags">18</int>
 													<string key="NSFrame">{{0, 23}, {800, 555}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
+													<reference key="NSWindow"/>
 													<array class="NSMutableArray" key="NSTabViewItems"/>
 													<reference key="NSFont" ref="844670655"/>
 													<int key="NSTvFlags">6</int>
@@ -713,18 +720,21 @@
 											</array>
 											<string key="NSFrameSize">{800, 578}</string>
 											<reference key="NSSuperview" ref="1001936949"/>
+											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="144287302"/>
 											<string key="NSClassName">NSView</string>
 										</object>
 									</array>
 									<string key="NSFrameSize">{800, 578}</string>
 									<reference key="NSSuperview" ref="892226745"/>
+									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="773548491"/>
 									<string key="NSClassName">NSView</string>
 								</object>
 							</array>
 							<string key="NSFrameSize">{800, 578}</string>
 							<reference key="NSSuperview" ref="568628114"/>
+							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="1001936949"/>
 							<bool key="NSIsVertical">YES</bool>
 							<int key="NSDividerStyle">2</int>
@@ -732,6 +742,8 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{800, 600}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="402151357"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -744,7 +756,7 @@
 				<string key="NSClassName">ViFileExplorer</string>
 			</object>
 			<object class="NSCustomView" id="342887108">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSearchField" id="953307252">
@@ -996,6 +1008,7 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{150, 489}</string>
+				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="709866892"/>
 				<string key="NSClassName">ViBgView</string>
 			</object>
@@ -1076,7 +1089,7 @@
 					</object>
 					<object class="NSMenuItem" id="611460060">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">New folder (n)</string>
+						<string key="NSTitle">New folder (N)</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="759727656"/>
@@ -1085,7 +1098,7 @@
 					</object>
 					<object class="NSMenuItem" id="301946186">
 						<reference key="NSMenu" ref="214436382"/>
-						<string key="NSTitle">New file (N)</string>
+						<string key="NSTitle">New file (n)</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="759727656"/>
@@ -1192,7 +1205,7 @@
 				</array>
 			</object>
 			<object class="NSCustomView" id="244902241">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSearchField" id="308464751">
@@ -1489,6 +1502,7 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{150, 389}</string>
+				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="590321826"/>
 				<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				<string key="NSClassName">ViBgView</string>
@@ -1503,7 +1517,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="727288555">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSForm" id="444062109">
@@ -1511,6 +1525,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 60}, {342, 82}}</string>
 							<reference key="NSSuperview" ref="727288555"/>
+							<reference key="NSNextKeyView" ref="724780029"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">3</int>
 							<int key="NSNumCols">1</int>
@@ -1610,6 +1625,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{194, 12}, {82, 32}}</string>
 							<reference key="NSSuperview" ref="727288555"/>
+							<reference key="NSNextKeyView" ref="398528244"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="404552052">
 								<int key="NSCellFlags">67239424</int>
@@ -1630,6 +1646,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 150}, {242, 17}}</string>
 							<reference key="NSSuperview" ref="727288555"/>
+							<reference key="NSNextKeyView" ref="444062109"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="475647259">
 								<int key="NSCellFlags">68288064</int>
@@ -1643,6 +1660,8 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{382, 187}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSNextKeyView" ref="391641068"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{9.9999998e+12, 9.9999998e+12}</string>
@@ -2360,6 +2379,22 @@
 						<reference key="destination" ref="869772944"/>
 					</object>
 					<int key="connectionID">100770</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sftpConnectView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="353834376"/>
+					</object>
+					<int key="connectionID">100772</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">explorerActionMenu</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="214436382"/>
+					</object>
+					<int key="connectionID">100773</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3292,7 +3327,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100770</int>
+			<int key="maxID">100773</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3763,12 +3798,14 @@
 						<string key="bundleButton">NSPopUpButton</string>
 						<string key="bundleButtonCell">ViToolbarPopUpButtonCell</string>
 						<string key="explorer">ViFileExplorer</string>
+						<string key="explorerActionMenu">NSMenu</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="jumplistNavigator">NSSegmentedControl</string>
 						<string key="mainView">NSView</string>
 						<string key="messageField">NSTextField</string>
 						<string key="openFilesButton">NSPopUpButton</string>
 						<string key="projectResizeView">NSImageView</string>
+						<string key="sftpConnectView">NSWindow</string>
 						<string key="splitView">NSSplitView</string>
 						<string key="statusbar">NSTextField</string>
 						<string key="symbolController">ViSymbolController</string>
@@ -3794,6 +3831,10 @@
 							<string key="name">explorer</string>
 							<string key="candidateClassName">ViFileExplorer</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="explorerActionMenu">
+							<string key="name">explorerActionMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="explorerView">
 							<string key="name">explorerView</string>
 							<string key="candidateClassName">ViBgView</string>
@@ -3817,6 +3858,10 @@
 						<object class="IBToOneOutletInfo" key="projectResizeView">
 							<string key="name">projectResizeView</string>
 							<string key="candidateClassName">NSImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sftpConnectView">
+							<string key="name">sftpConnectView</string>
+							<string key="candidateClassName">NSWindow</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="splitView">
 							<string key="name">splitView</string>

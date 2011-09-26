@@ -41,7 +41,7 @@
 
 - (void)dealloc
 {
-	INFO(@"%p", self);
+	DEBUG_DEALLOC();
 	[_metalCloseButton release];
 	[_metalCloseButtonDown release];
 	[_metalCloseButtonOver release];

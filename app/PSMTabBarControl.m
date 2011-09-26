@@ -163,7 +163,8 @@
 
 - (void)dealloc
 {
-	INFO(@"dealloc %p", self);
+	DEBUG_DEALLOC();
+
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	INFO(@"removing remaining cells: %@", _cells);

@@ -13,16 +13,22 @@
 
 - (id)initWithFrame:(NSRect)frameRect pullsDown:(BOOL)flag
 {
-    self=[super initWithFrame:frameRect pullsDown:YES];
-    if (self) {
-        [self setBezelStyle:NSRegularSquareBezelStyle];
-        [self setBordered:NO];
-        [self setTitle:@""];
-        [self setPreferredEdge:NSMaxXEdge];
-        _PSMTabBarOverflowPopUpImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"overflowImage"]];
+	if ((self = [super initWithFrame:frameRect pullsDown:YES]) != nil) {
+		[self setBezelStyle:NSRegularSquareBezelStyle];
+		[self setBordered:NO];
+		[self setTitle:@""];
+		[self setPreferredEdge:NSMaxXEdge];
+		_PSMTabBarOverflowPopUpImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"overflowImage"]];
 		_PSMTabBarOverflowDownPopUpImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"overflowImagePressed"]];
-    }
-    return self;
+	}
+	return self;
+}
+
+- (void)dealloc
+{
+	[_PSMTabBarOverflowPopUpImage release];
+	[_PSMTabBarOverflowDownPopUpImage release];
+	[super dealloc];
 }
 
 - (void)drawRect:(NSRect)rect

@@ -10,30 +10,14 @@
 
 @implementation PSMRolloverButton
 
-// the regular image
-- (void)setUsualImage:(NSImage *)newImage
-{
-    [newImage retain];
-    [_usualImage release];
-    _usualImage = newImage;
-    [self setImage:_usualImage];
-}
+@synthesize rolloverImage = _rolloverImage;
+@synthesize usualImage = _usualImage;
 
-- (NSImage *)usualImage
+- (void)dealloc
 {
-    return _usualImage;
-}
-
-- (void)setRolloverImage:(NSImage *)newImage
-{
-    [newImage retain];
-    [_rolloverImage release];
-    _rolloverImage = newImage;
-}
-
-- (NSImage *)rolloverImage
-{
-    return _rolloverImage;
+	[_rolloverImage release];
+	[_usualImage release];
+	[super dealloc];
 }
 
 - (void)addTrackingRect

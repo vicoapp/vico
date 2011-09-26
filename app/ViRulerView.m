@@ -25,6 +25,7 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[_textAttributes release];
 	[_backgroundColor release];

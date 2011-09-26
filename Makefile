@@ -106,7 +106,6 @@ OBJC_SRCS = \
 	ViSyntaxMatch.m \
 	ViSyntaxParser.m \
 	ViTabController.m \
-	ViTagStack.m \
 	ViTagsDatabase.m \
 	ViTaskRunner.m \
 	ViTextStorage.m \
@@ -409,6 +408,16 @@ $(BINDIR)/par: $(PAR_OBJS)
 
 run: app
 	$(BINDIR)/Vico $(HOME)/src/vico
+
+leaks: app
+	# MallocStackLoggingNoCompact=YES
+	MallocStackLogging=YES \
+	  $(BINDIR)/Vico $(HOME)/src/vico
+
+zombie: app
+	# MallocStackLoggingNoCompact=YES
+	NSZombieEnabled=YES NSDebugEnabled=YES \
+	  $(BINDIR)/Vico $(HOME)/src/vico
 
 build: test
 	rm -rf build/Snapshot/Vico.app

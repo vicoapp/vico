@@ -214,6 +214,8 @@
 - (void)switchToLastDocument;
 - (void)switchToDocumentAction:(id)sender;
 
+- (id<ViViewController>)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position;
+
 /** Open a document and go to a specific point in the file.
  * @param url The URL of the document to open. The document may already be opened.
  * @param line The line number to jump to, or `0` to not jump to any line.
@@ -227,9 +229,9 @@
  * @returns YES if the document could be opened.
  */
 - (BOOL)gotoURL:(NSURL *)url;
-- (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber;
 
-- (BOOL)gotoMark:(ViMark *)mark forceReplaceCurrentView:(BOOL)forceSwitchView recordJump:(BOOL)isJump;
+- (BOOL)gotoMark:(ViMark *)mark positioned:(ViViewPosition)viewPosition recordJump:(BOOL)isJump;
+- (BOOL)gotoMark:(ViMark *)mark positioned:(ViViewPosition)viewPosition;
 - (BOOL)gotoMark:(ViMark *)mark;
 
 - (IBAction)searchSymbol:(id)sender;

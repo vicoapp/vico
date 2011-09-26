@@ -470,34 +470,7 @@ DEBUG_FINALIZE();
 		return;
 	}
 
-	/*
-	 * If current document is untitled and unchanged and the rightmost tab, replace it.
-	 */
-	ViDocument *closeThisDocument = nil;
-	ViTabController *lastTabController = [(NSTabViewItem *)[[tabBar representedTabViewItems] lastObject] identifier];
-	if ([self currentDocument] != nil &&
-	    [[self currentDocument] fileURL] == nil &&
-	    [document fileURL] != nil &&
-	    ![[self currentDocument] isDocumentEdited] &&
-	    [[lastTabController views] count] == 1 &&
-	    [[[lastTabController views] objectAtIndex:0] respondsToSelector:@selector(document)] &&
-	    [self currentDocument] == [[[lastTabController views] objectAtIndex:0] document]) {
-		[tabBar disableAnimations];
-		closeThisDocument = [self currentDocument];
-	}
-
-	[self addDocument:document];
-	if (closeThisDocument == nil && (
-	    [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
-	    [tabView numberOfTabViewItems] == 0))
-		[self createTabForDocument:document];
-	else
-		[self switchToDocument:document];
-
-	if (closeThisDocument) {
-		[closeThisDocument closeAndWindow:NO];
-		[tabBar enableAnimations];
-	}
+	[self displayDocument:document positioned:ViViewPositionDefault];
 }
 
 - (void)focusEditorDelayed
@@ -1510,7 +1483,7 @@ DEBUG_FINALIZE();
 
 - (void)switchToLastDocument
 {
-	[self gotoMark:_alternateMark forceReplaceCurrentView:YES recordJump:YES];
+	[self gotoMark:_alternateMark positioned:ViViewPositionReplace];
 }
 
 - (void)selectLastDocument
@@ -1542,7 +1515,79 @@ DEBUG_FINALIZE();
 	return nil;
 }
 
-- (BOOL)gotoMark:(ViMark *)mark forceReplaceCurrentView:(BOOL)forceSwitchView recordJump:(BOOL)isJump
+- (id<ViViewController>)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position
+{
+	if (![_documents containsObject:doc]) {
+		[doc addWindowController:self];
+		[self addDocument:doc];
+	}
+
+	id<ViViewController> viewController = nil;
+	BOOL prefertabs = [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"];
+
+	/* Can't replace named or edited documents, or documents with multiple views. */
+#define CLOSE_CANDIDATE_INVALID(doc) \
+	(doc == nil || [doc fileURL] || [doc isDocumentEdited] || [[doc views] count] > 1)
+
+	if (position == ViViewPositionReplace || position == ViViewPositionDefault || position == ViViewPositionTab) {
+		/*
+		 * Find a suitable untitled and unchanged document we can replace.
+		 * Don't replace an untitled document with another untitled document.
+		 */
+		ViDocument *closeThisDocument = nil;
+		ViTabController *tabController = [self selectedTabController];
+		BOOL forceSwitch = NO;
+		if ([doc fileURL]) {
+			if ((position == ViViewPositionTab || (position == ViViewPositionDefault && prefertabs))) {
+				/* Try current document. */
+				if ([[tabController views] count] == 1 &&
+				    [[[tabController views] objectAtIndex:0] respondsToSelector:@selector(document)])
+					closeThisDocument = [[[tabController views] objectAtIndex:0] document];
+				if (CLOSE_CANDIDATE_INVALID(closeThisDocument)) {
+					closeThisDocument = nil;
+					/* Try document in last tab. */
+					tabController = [(NSTabViewItem *)[[tabBar representedTabViewItems] lastObject] identifier];
+					if ([[tabController views] count] == 1 &&
+					    [[[tabController views] objectAtIndex:0] respondsToSelector:@selector(document)])
+						closeThisDocument = [[[tabController views] objectAtIndex:0] document];
+				} else
+					forceSwitch = YES;
+			} else {
+				/* Otherwise we're switching the current view to the document. */
+				/* Try the current document. */
+				closeThisDocument = [self currentDocument];
+			}
+		}
+
+		if (CLOSE_CANDIDATE_INVALID(closeThisDocument))
+			closeThisDocument = nil;
+
+		if (closeThisDocument)
+			[tabBar disableAnimations];
+
+		if (forceSwitch || position == ViViewPositionReplace || (position == ViViewPositionDefault && !prefertabs))
+			viewController = [self switchToDocument:doc];
+		else if (position == ViViewPositionTab)
+			viewController = [self createTabForDocument:doc];
+		else
+			viewController = [self selectDocument:doc];
+
+		if (closeThisDocument) {
+			[closeThisDocument closeAndWindow:NO];
+			[tabBar enableAnimations];
+		}
+	} else {
+		ViTabController *tabController = [[self currentView] tabController];
+		viewController = [tabController splitView:[self currentView]
+						 withView:[doc makeView]
+						 position:position];
+		[self selectDocumentView:viewController];
+	}
+
+	return viewController;
+}
+
+- (BOOL)gotoMark:(ViMark *)mark positioned:(ViViewPosition)viewPosition recordJump:(BOOL)isJump
 {
 	if (mark == nil)
 		return NO;
@@ -1554,7 +1599,7 @@ DEBUG_FINALIZE();
 	if (!_jumping && [viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
 
-	DEBUG(@"goto mark %@ (force switching: %s)", mark, forceSwitchView ? "YES" : "NO");
+	DEBUG(@"goto mark %@", mark);
 
 	/* XXX: Set a flag telling didSelectDocument: that we're currently navigating the jump list.
 	 * This prevents us from pushing an extraneous jump on the list.
@@ -1562,90 +1607,55 @@ DEBUG_FINALIZE();
 	[[mark retain] autorelease];
 
 	if (mark.view) {
+		/* Go to an existing view. View position is ignored. */
 		viewController = [self selectDocumentView:mark.view];
-	} else if (mark.document) {
-		if (forceSwitchView || [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] == NO)
-			viewController = [self switchToDocument:mark.document];
-		else
-			viewController = [self selectDocument:mark.document];
-	} else if (mark.url) {
-		NSError *error = nil;
-		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
-		ViDocument *doc = [ctrl openDocumentWithContentsOfURL:mark.url
-							      display:!forceSwitchView
-								error:&error];
-		if (error) {
-			[NSApp presentError:error];
-			_jumping = NO;
-			return NO;
+	} else {
+		ViDocument *doc = mark.document;
+		if (doc == nil) {
+			if (mark.url == nil) {
+				_jumping = NO;
+				return NO;
+			}
+
+			NSError *error = nil;
+			ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
+			doc = [ctrl openDocumentWithContentsOfURL:mark.url
+							  display:NO
+							    error:&error];
+			if (error) {
+				[NSApp presentError:error];
+				_jumping = NO;
+				return NO;
+			}
 		}
 
-		if (forceSwitchView || [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] == NO)
-			viewController = [self switchToDocument:doc];
-		else
-			viewController = [self selectDocument:doc];
-	} else {
-		_jumping = NO;
-		return NO;
+		viewController = [self displayDocument:doc positioned:viewPosition];
 	}
 
 	_jumping = NO;
 	return [(ViTextView *)[viewController innerView] gotoMark:mark];
 }
 
+- (BOOL)gotoMark:(ViMark *)mark positioned:(ViViewPosition)viewPosition
+{
+	return [self gotoMark:mark positioned:viewPosition recordJump:YES];
+}
+
 - (BOOL)gotoMark:(ViMark *)mark
 {
-	return [self gotoMark:mark forceReplaceCurrentView:NO recordJump:YES];
+	return [self gotoMark:mark positioned:ViViewPositionDefault recordJump:YES];
 }
 
 - (BOOL)gotoURL:(NSURL *)url
            line:(NSUInteger)line
          column:(NSUInteger)column
-           view:(ViDocumentView *)docView
 {
-	ViDocument *document = [self documentForURL:url];
-	DEBUG(@"goto url %@: doc  %@", url, document);
-	if (document == nil) {
-		NSError *error = nil;
-		ViDocumentController *ctrl = [NSDocumentController sharedDocumentController];
-		document = [ctrl openDocumentWithContentsOfURL:url display:YES error:&error];
-		if (error) {
-			[NSApp presentError:error];
-			return NO;
-		}
-	}
-
-	// Update jumplist
-	if (!_jumping) {
-		NSView *view = [[self currentView] innerView];
-		if ([view respondsToSelector:@selector(pushCurrentLocationOnJumpList)])
-			[(ViTextView *)view pushCurrentLocationOnJumpList];
-	}
-
-	if (docView == nil)
-		docView = [self selectDocument:document];
-	else
-		[self selectDocumentView:docView];
-
-	if (line > 0)
-		[[docView textView] gotoLine:line column:column];
-
-	return YES;
-}
-
-- (BOOL)gotoURL:(NSURL *)url line:(NSUInteger)line column:(NSUInteger)column
-{
-	return [self gotoURL:url line:line column:column view:nil];
-}
-
-- (BOOL)gotoURL:(NSURL *)url lineNumber:(NSNumber *)lineNumber
-{
-	return [self gotoURL:url line:[lineNumber unsignedIntegerValue] column:0];
+	return [self gotoMark:[ViMark markWithURL:url line:line column:column]];
 }
 
 - (BOOL)gotoURL:(NSURL *)url
 {
-	return [self gotoURL:url line:0 column:0];
+	return [self gotoMark:[ViMark markWithURL:url]];
 }
 
 #pragma mark -
@@ -2023,9 +2033,9 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	}
 
 	if ([sender selectedSegment] == 0)
-		[self gotoMark:[_jumpList backwardFrom:here] forceReplaceCurrentView:NO recordJump:NO];
+		[self gotoMark:[_jumpList backwardFrom:here] positioned:ViViewPositionDefault recordJump:NO];
 	else
-		[self gotoMark:[_jumpList forward] forceReplaceCurrentView:NO recordJump:NO];
+		[self gotoMark:[_jumpList forward] positioned:ViViewPositionDefault recordJump:NO];
 }
 
 - (void)updateJumplistNavigator
@@ -2041,7 +2051,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (void)jumpList:(ViJumpList *)aJumpList goto:(ViMark *)jump
 {
-	// [self gotoMark:jump forceReplaceCurrentView:NO recordJump:NO];
+	// [self gotoMark:jump positioned:ViViewPositionDefault recordJump:NO];
 	[self updateJumplistNavigator]; // observe _tagStack.list.selectionIndexes instead
 }
 

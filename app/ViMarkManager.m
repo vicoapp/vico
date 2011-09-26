@@ -397,6 +397,11 @@
 	return NSNotFound;
 }
 
+- (NSString *)rangeString
+{
+	return nil;
+}
+
 @end
 
 

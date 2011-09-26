@@ -110,8 +110,8 @@
 }
 
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController
-                         withView:(id<ViViewController>)newViewController
-                       vertically:(BOOL)isVertical
+			 withView:(id<ViViewController>)newViewController
+			 position:(ViViewPosition)position
 {
 	NSParameterAssert(viewController);
 	NSParameterAssert(newViewController);
@@ -127,6 +127,13 @@
 	DEBUG(@"adding view %@ = %@", [newViewController view], newViewController);
 	DEBUG(@"subviews = %@", [split subviews]);
 
+	BOOL isVertical = (position == ViViewPositionSplitLeft || position == ViViewPositionSplitRight);
+	NSWindowOrderingMode mode;
+	if (isVertical)
+		mode = (position == ViViewPositionSplitLeft ? NSWindowBelow : NSWindowAbove);
+	else
+		mode = (position == ViViewPositionSplitAbove ? NSWindowBelow : NSWindowAbove);
+
 	if ([[split subviews] count] == 1 && [split isVertical] != isVertical) {
 		[split setVertical:isVertical];
 		[_splitView adjustSubviews];
@@ -137,7 +144,9 @@
 	DEBUG(@"subviews = %@", [split subviews]);
 	if ([split isVertical] == isVertical) {
 		// Just add another view to this split
-		[split addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
+		[split addSubview:[newViewController view]
+		       positioned:mode
+		       relativeTo:view];
 		[split adjustSubviews];
 		[self normalizeSplitView:split];
 	} else {
@@ -153,7 +162,9 @@
 		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];
 		[split replaceSubview:view with:newSplit];
 		[newSplit addSubview:view];
-		[newSplit addSubview:[newViewController view] positioned:NSWindowBelow relativeTo:view];
+		[newSplit addSubview:[newViewController view]
+			  positioned:mode
+			  relativeTo:view];
 		[newSplit adjustSubviews];
 		[self normalizeSplitView:newSplit];
 		DEBUG(@"newSplit subviews = %@", [newSplit subviews]);
@@ -161,6 +172,15 @@
 
 	DEBUG(@"subviews = %@", [split subviews]);
 	return newViewController;
+}
+
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController
+                         withView:(id<ViViewController>)newViewController
+                       vertically:(BOOL)isVertical
+{
+	return [self splitView:viewController
+		      withView:newViewController
+		      position:isVertical ? ViViewPositionSplitLeft : ViViewPositionSplitAbove];
 }
 
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController

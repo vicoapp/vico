@@ -1,7 +1,18 @@
 @class ViDocument;
 @class ViTabController;
 
+typedef enum ViViewPosition ViViewPosition;
 typedef enum ViViewOrderingMode ViViewOrderingMode;
+
+enum ViViewPosition {
+	ViViewPositionDefault,
+	ViViewPositionReplace,
+	ViViewPositionTab,
+	ViViewPositionSplitLeft,
+	ViViewPositionSplitRight,
+	ViViewPositionSplitAbove,
+	ViViewPositionSplitBelow
+};
 
 /** Ordering of views. */
 enum ViViewOrderingMode {
@@ -101,6 +112,16 @@ enum ViViewOrderingMode {
 - (id<ViViewController>)splitView:(id<ViViewController>)viewController
                          withView:(id<ViViewController>)newViewController
                        vertically:(BOOL)isVertical;
+
+/** Splits a view and displays another view.
+ * @param viewController The view that should be split.
+ * @param newViewController The view that should be displayed.
+ * @param position The position of the split (left, right, above or below)
+ * @returns newViewController or `nil` on failure.
+ */
+- (id<ViViewController>)splitView:(id<ViViewController>)viewController
+			 withView:(id<ViViewController>)newViewController
+			 position:(ViViewPosition)position;
 
 /** Splits a view and displays a clone of the view.
  *

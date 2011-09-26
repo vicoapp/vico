@@ -12,5 +12,11 @@
 	}
 }
 
+- (void)dealloc
+{
+	[_backgroundColor release];
+	[super dealloc];
+}
+
 @end
 

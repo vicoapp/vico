@@ -208,6 +208,13 @@ updateMeta(void)
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+	/* Cache the default IBeam cursor implementation. */
+	[NSCursor defaultIBeamCursorImplementation];
+
+	[Nu loadNuFile:@"vico" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"keys" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"ex"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+
 #if defined(DEBUG_BUILD)
 	[NSApp activateIgnoringOtherApps:YES];
 #endif
@@ -581,7 +588,7 @@ additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName
 {
-	NuParser *parser = [[[NuParser alloc] init] autorelease];
+	NuParser *parser = [[NuParser alloc] init];
 
 	if (channelName) {
 		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
@@ -592,6 +599,7 @@ additionalBindings:(NSDictionary *)bindings
 	id result = [self eval:script withParser:parser bindings:bindings error:&error];
 	if (error && errorString)
 		*errorString = [error localizedDescription];
+	[parser release];
 
 	if ([result isKindOfClass:[NSNull class]])
 		return nil;

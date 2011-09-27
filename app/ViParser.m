@@ -31,6 +31,7 @@
 {
 	if ((self = [super init]) != nil) {
 		_defaultMap = [aMap retain];
+		_totalKeySequence = [[NSMutableArray alloc] init];
 		[self reset];
 	}
 	return self;

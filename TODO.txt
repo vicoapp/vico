@@ -1,7 +1,6 @@
 # 1.3
 
 * rename in file explorer is borken
-* textview doesn't print partial keys in statusbar anymore
 * can't assume ack's output is in newline chunks
 * closing with prefertabs=YES re-opens immediately!?
 * marks as motions; check they still work, and allow global marks in same file

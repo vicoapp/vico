@@ -167,7 +167,6 @@
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-	INFO(@"removing remaining cells: %@", _cells);
 	for (PSMTabBarCell *cell in _cells)
 		[self removeTabForCell:cell];
 	[_cells release];

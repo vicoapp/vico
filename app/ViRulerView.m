@@ -43,17 +43,18 @@
 		nil];
 
 	_digitSize = [@"8" sizeWithAttributes:_textAttributes];
+	_digitSize.width += 1.0;
+	_digitSize.height += 1.0;
 
 	[self setRuleThickness:[self requiredThickness]];
 
 	for (int i = 0; i < 10; i++) {
 		NSString *s = [NSString stringWithFormat:@"%i", i];
-		NSSize sz = [s sizeWithAttributes:_textAttributes];
-		NSImage *img = [[NSImage alloc] initWithSize:sz];
+		NSImage *img = [[NSImage alloc] initWithSize:_digitSize];
 		[img lockFocusFlipped:NO];
 		[_backgroundColor set];
-		NSRectFill(NSMakeRect(0, 0, sz.width, sz.height));
-		[s drawAtPoint:NSMakePoint(0,0) withAttributes:_textAttributes];
+		NSRectFill(NSMakeRect(0, 0, _digitSize.width, _digitSize.height));
+		[s drawAtPoint:NSMakePoint(0.5,0.5) withAttributes:_textAttributes];
 		[img unlockFocus];
 		[_digits[i] release];
 		_digits[i] = img;
@@ -199,8 +200,8 @@
 
 		// Draw digits flush right, centered vertically within the line
 		NSRect r;
-		r.origin.x = NSWidth(bounds) - RULER_MARGIN;
-		r.origin.y = ypos + (NSHeight(rect) - _digitSize.height) / 2.0 - 1.0;
+		r.origin.x = floor(NSWidth(bounds) - RULER_MARGIN);
+		r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 - 1.0);
 		r.size = _digitSize;
 
 		[self drawLineNumber:line inRect:r];

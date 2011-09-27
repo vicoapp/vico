@@ -1961,6 +1961,12 @@ DEBUG_FINALIZE();
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
+	DEBUG(@"eval command %@ from key sequence %@", command, [NSString stringWithKeySequence:command.keySequence]);
+	if (mode == ViInsertMode && !replayingInput && command.action != @selector(normal_mode:)) {
+		/* Add the key to the input replay queue. */
+		[_inputKeys addObjectsFromArray:command.keySequence];
+	}
+
 	id target = [self targetForSelector:command.action];
 	if (target == nil) {
 		MESSAGE(@"Command %@ not implemented.",
@@ -2244,11 +2250,6 @@ DEBUG_FINALIZE();
 		 inScope:(ViScope *)scope
 {
 	NSInteger keyCode = [keyNum integerValue];
-
-	if (mode == ViInsertMode && !replayingInput && keyCode != 0x1B) {
-		/* Add the key to the input replay queue. */
-		[_inputKeys addObject:keyNum];
-	}
 
 	/*
 	 * Find and perform bundle commands. Show a menu with commands

@@ -76,8 +76,6 @@
 ## Bugs
 
 * unicode characters in line and cursor sits over 2 chars
-
-* cw<cmd-v> and repeat inserts pasteboard twice
 * repeating completed text should not re-trigger completion!
 
 * xcode/Run throws exception:

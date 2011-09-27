@@ -1723,6 +1723,8 @@
 	}
 	unichar ch = [s characterAtIndex:end_location];
 
+	int count = IMAX(command.count, 1);
+
 	/* From nvi:
 	 * !!!
 	 * If in whitespace, or the next character is whitespace, move past
@@ -1741,26 +1743,30 @@
 
 	BOOL bigword = [command.mapping.keyString isEqualToString:@"E"];	// XXX: use another selector!
 
-	ch = [s characterAtIndex:end_location];
-	if (bigword) {
-		end_location = [[self textStorage] skipCharactersInSet:[_whitespace invertedSet]
-							  fromLocation:end_location backward:NO];
-		if (!command.hasOperator && mode != ViInsertMode)
-			end_location--;
-	} else if ([_wordSet characterIsMember:ch]) {
-		end_location = [[self textStorage] skipCharactersInSet:_wordSet
-							  fromLocation:end_location
-							      backward:NO];
-		if (!command.hasOperator && mode != ViInsertMode)
-			end_location--;
-	} else {
-		// inside non-word-chars
-		end_location = [[self textStorage] skipCharactersInSet:_nonWordSet
-							  fromLocation:end_location
-							      backward:NO];
-		if (!command.hasOperator && mode != ViInsertMode)
-			end_location--;
+	while (count--) {
+		ch = [s characterAtIndex:end_location];
+		if (bigword) {
+			end_location = [[self textStorage] skipCharactersInSet:[_whitespace invertedSet]
+								  fromLocation:end_location backward:NO];
+		} else if ([_wordSet characterIsMember:ch]) {
+			end_location = [[self textStorage] skipCharactersInSet:_wordSet
+								  fromLocation:end_location
+								      backward:NO];
+		} else {
+			// inside non-word-chars
+			end_location = [[self textStorage] skipCharactersInSet:_nonWordSet
+								  fromLocation:end_location
+								      backward:NO];
+		}
+
+		if (count > 0)
+			end_location = [[self textStorage] skipCharactersInSet:_whitespace
+								  fromLocation:end_location
+								      backward:NO];
 	}
+
+	if (!command.hasOperator && mode != ViInsertMode)
+		end_location--;
 
 	final_location = end_location;
 	return YES;

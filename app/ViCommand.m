@@ -17,6 +17,7 @@
 @synthesize caret = _caret;
 @synthesize macro = _macro;
 @synthesize messages = _messages;
+@synthesize keySequence = _keySequence;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
@@ -40,6 +41,7 @@
 	[_motion release];
 	[_macro release];
 	[_messages release];
+	[_keySequence release];
 	[super dealloc];
 }
 

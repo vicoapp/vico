@@ -19,6 +19,7 @@
 	NSRange			 _range;
 	NSInteger		 _caret;
 	NSMutableArray		*_messages;
+	NSArray			*_keySequence;
 }
 
 /** The mapping that describes the action. */
@@ -38,6 +39,9 @@
 
 /** YES if the mapped action is a motion component for an operator. */
 @property(nonatomic,readonly) BOOL hasOperator;
+
+/** The total key sequence that generated this command. */
+@property(nonatomic,readwrite,copy) NSArray *keySequence;
 
 /** The argument, if any. Only applicable if the mapping specified the ViMapNeedArgument flag. */
 @property(nonatomic,readwrite) unichar argument;

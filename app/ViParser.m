@@ -134,6 +134,8 @@
 		_command.count = 0;
 	}
 
+	_command.keySequence = _totalKeySequence;
+
 	ViCommand *ret = [[_command retain] autorelease];
 	[self reset];
 	return ret;

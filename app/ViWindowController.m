@@ -73,8 +73,6 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 		_jumpList = [[ViJumpList alloc] init];
 		[_jumpList setDelegate:self];
 		_parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
-		_tagStack = [[[ViMarkManager sharedManager] stackWithName:[NSString stringWithFormat:@"Tag Stack for window %p", self]] retain];
-		[_tagStack setMaxLists:1];
 		[self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
 		MEMDEBUG(@"init %@", self);
 	}
@@ -262,6 +260,9 @@ DEBUG_FINALIZE();
 
 - (void)windowDidLoad
 {
+	_tagStack = [[[ViMarkManager sharedManager] stackWithName:[NSString stringWithFormat:@"Tag Stack for window %p", self]] retain];
+	[_tagStack setMaxLists:1];
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(firstResponderChanged:)
 						     name:ViFirstResponderChangedNotification
@@ -858,6 +859,7 @@ DEBUG_FINALIZE();
 
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
+	[[ViMarkManager sharedManager] removeStack:_tagStack];
 }
 
 - (id<ViViewController>)currentView

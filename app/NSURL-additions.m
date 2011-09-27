@@ -68,7 +68,7 @@ static NSCharacterSet *__slashSet = nil;
 									 error:&error];
 			if (resolvedURL) {
 				resultURL = resolvedURL;
-				INFO(@"resolved %@ -> %@", self, resultURL);
+				DEBUG(@"resolved %@ -> %@", self, resultURL);
 			}
 		}
 	} else if (isAliasPtr)

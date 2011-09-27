@@ -32,6 +32,11 @@
 				*outError = [ViError errorWithFormat:@"Mark %C: not set", addr.mark];
 			return -1;
 		}
+		if (m.document != [self document]) {
+			if (outError)
+				*outError = [ViError errorWithFormat:@"Mark %C: not local mark", addr.mark];
+			return -1;
+		}
 		line = m.line;
 		break;
 	case ExAddressRelative:

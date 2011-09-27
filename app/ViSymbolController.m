@@ -195,7 +195,7 @@
 	[self resetSymbolList];
 }
 
-- (IBAction)gotoSymbolAction:(id)sender
+- (void)gotoSymbolByPosition:(ViViewPosition)position
 {
 	id item = [symbolView itemAtRow:[symbolView selectedRow]];
 
@@ -211,12 +211,20 @@
 		[altSymbolFilterField setStringValue:@""];
 	}
 
+	ViMark *m = (ViMark *)item;
 	if ([item isKindOfClass:[ViDocument class]])
-		[windowController selectDocument:item];
-	else
-		[windowController gotoMark:item];
+		m = [ViMark markWithURL:[(ViDocument *)item fileURL]];
+	[windowController gotoMark:m positioned:position];
 
 	[self cancelSymbolList];
+}
+
+- (IBAction)gotoSymbolAction:(id)sender
+{
+	if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+		[self gotoSymbolByPosition:ViViewPositionSplitAbove];
+	else
+		[self gotoSymbolByPosition:ViViewPositionDefault];
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager
@@ -506,123 +514,31 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)switch_open:(ViCommand *)command
 {
-	id symbol = [symbolView itemAtRow:[symbolView selectedRow]];
-
-	ViDocument *doc;
-	if ([symbol isKindOfClass:[ViDocument class]]) {
-		doc = symbol;
-		symbol = nil;
-	} else {
-		doc = [(ViMark *)symbol document];
-	}
-
-	// remember what symbol we selected from the filtered set
-	NSString *filter;
-	if ([altSymbolFilterField isHidden])
-		filter = [symbolFilterField stringValue];
-	else
-		filter = [altSymbolFilterField stringValue];
-	if (symbol && [filter length] > 0) {
-		[_symbolFilterCache setObject:symbol forKey:filter];
-		[symbolFilterField setStringValue:@""];
-		[altSymbolFilterField setStringValue:@""];
-	}
-
-	windowController.jumping = YES; /* XXX: need better API! */
-	if ([windowController currentDocument] != doc)
-		[windowController switchToDocument:doc];
-	windowController.jumping = NO;
-	if (symbol)
-		[windowController gotoMark:symbol];
-
-	[self cancelSymbolList];
+	[self gotoSymbolByPosition:ViViewPositionReplace];
 	return YES;
-}
-
-- (void)splitVertically:(BOOL)isVertical andGotoSymbol:(id)symbol
-{
-	ViDocument *doc;
-	if ([symbol isKindOfClass:[ViDocument class]]) {
-		doc = symbol;
-		symbol = nil;
-	} else
-		doc = [(ViMark *)symbol document];
-
-	// remember what symbol we selected from the filtered set
-	NSString *filter;
-	if ([altSymbolFilterField isHidden])
-		filter = [symbolFilterField stringValue];
-	else
-		filter = [altSymbolFilterField stringValue];
-	if (symbol && [filter length] > 0) {
-		[_symbolFilterCache setObject:symbol forKey:filter];
-		[symbolFilterField setStringValue:@""];
-		[altSymbolFilterField setStringValue:@""];
-	}
-
-	windowController.jumping = YES; /* XXX: need better API! */
-	[windowController splitVertically:isVertical
-				  andOpen:nil
-		       orSwitchToDocument:doc];
-	windowController.jumping = NO;
-
-	if (symbol)
-		[windowController gotoMark:symbol];
-
-	[self cancelSymbolList];
 }
 
 - (BOOL)split_open:(ViCommand *)command
 {
-	id item = [symbolView itemAtRow:[symbolView selectedRow]];
-	[self splitVertically:NO andGotoSymbol:item];
+	[self gotoSymbolByPosition:ViViewPositionSplitAbove];
 	return YES;
 }
 
 - (BOOL)vsplit_open:(ViCommand *)command
 {
-	id item = [symbolView itemAtRow:[symbolView selectedRow]];
-	[self splitVertically:YES andGotoSymbol:item];
+	[self gotoSymbolByPosition:ViViewPositionSplitLeft];
 	return YES;
 }
 
 - (BOOL)tab_open:(ViCommand *)command
 {
-	id symbol = [symbolView itemAtRow:[symbolView selectedRow]];
-
-	ViDocument *doc;
-	if ([symbol isKindOfClass:[ViDocument class]]) {
-		doc = symbol;
-		symbol = nil;
-	} else {
-		doc = [(ViMark *)symbol document];
-	}
-
-	// remember what symbol we selected from the filtered set
-	NSString *filter;
-	if ([altSymbolFilterField isHidden])
-		filter = [symbolFilterField stringValue];
-	else
-		filter = [altSymbolFilterField stringValue];
-	if (symbol && [filter length] > 0) {
-		[_symbolFilterCache setObject:symbol forKey:filter];
-		[symbolFilterField setStringValue:@""];
-		[altSymbolFilterField setStringValue:@""];
-	}
-
-	windowController.jumping = YES; /* XXX: need better API! */
-	ViDocumentView *docView = [windowController createTabForDocument:doc];
-	windowController.jumping = NO;
-	if (symbol)
-		[windowController gotoMark:symbol];
-
-	[self cancelSymbolList];
+	[self gotoSymbolByPosition:ViViewPositionTab];
 	return YES;
 }
 
 - (BOOL)open:(ViCommand *)command
 {
-	[self gotoSymbolAction:nil];
+	[self gotoSymbolByPosition:ViViewPositionDefault];
 	return YES;
 }
 

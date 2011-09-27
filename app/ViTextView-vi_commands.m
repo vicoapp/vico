@@ -315,6 +315,7 @@
 	NSRect bounds = [clipView bounds];
 	[clipView scrollToPoint:NSMakePoint(bounds.origin.x, rect.origin.y)];
 	[scrollView reflectScrolledClipView:clipView];
+	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
 	return YES;
 }

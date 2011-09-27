@@ -27,9 +27,11 @@ extern int logIndent;
 
 #endif
 
-#define NO_MEM_DEBUG
+#ifndef FORCE_MEMDEBUG
+# define NO_MEMDEBUG
+#endif
 
-#ifdef NO_MEM_DEBUG
+#ifdef NO_MEMDEBUG
 # define MEMDEBUG(fmt, ...)
 # define DEBUG_FINALIZE()
 # define DEBUG_DEALLOC()

@@ -2,18 +2,15 @@
 
 * rename in file explorer is borken
 * closing with prefertabs=YES re-opens immediately!?
-* group by attribute != grouped display string
-
-* implement c-w in insert mode
-
-* explorer spinner is hidden by new path control
-  => move it, where!? auto-hide something else?
 
 ## errata
 
+* group by attribute != grouped display string
 * can't assume ack's output is in newline chunks
-? don't overwrite read-only files!
-? show baseURL in window title!
+* don't overwrite read-only files!
+* show baseURL in window title!
+* explorer spinner is hidden by new path control
+  => move it, where!? auto-hide something else?
 
 
 # 1.4: focus on textmate bundles and nu scripting

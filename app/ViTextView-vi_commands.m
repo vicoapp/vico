@@ -922,6 +922,57 @@
 	return YES;
 }
 
+/* syntax: <ctrl-w> */
+- (BOOL)delete_word:(ViCommand *)command
+{
+	if (start_location == 0) {
+		MESSAGE(@"Already at the beginning of the file");
+		return NO;
+	}
+
+	NSRange range;
+	NSUInteger bol, eol;
+	[self getLineStart:&bol end:NULL contentsEnd:NULL];
+
+	if (start_location == bol) {
+		[self getLineStart:NULL end:NULL contentsEnd:&eol forLocation:bol - 1];
+		range = NSMakeRange(eol, bol - eol);
+	} else {
+		NSUInteger word_start = start_location - 1;
+
+		/* Skip initial whitespace. */
+		unichar ch = [self characterAtIndex:word_start];
+		if ([_whitespace characterIsMember:ch])
+			word_start = [[self textStorage] skipCharactersInSet:_whitespace
+								fromLocation:word_start
+								    backward:YES];
+		ch = [self characterAtIndex:word_start];
+		if ([_wordSet characterIsMember:ch])
+			word_start = [[self textStorage] skipCharactersInSet:_wordSet
+								fromLocation:word_start
+								    backward:YES];
+		else
+			word_start = [[self textStorage] skipCharactersInSet:_nonWordSet
+								fromLocation:word_start
+								    backward:YES];
+		if (word_start > 0)
+			++word_start; // back up to the first character
+
+		ViMark *bocMark = [[self document] markNamed:'[']; // beginning-of-change
+		NSUInteger boc = bocMark.location;
+		if (boc < start_location && boc > word_start)
+			range = NSMakeRange(boc, start_location - boc);
+		else if (word_start > bol && word_start < start_location)
+			range = NSMakeRange(word_start, start_location - word_start);
+		else
+			range = NSMakeRange(bol, start_location - bol);
+	}
+
+	[self deleteRange:range];
+	final_location = range.location;
+	return YES;
+}
+
 /* syntax: <ctrl-u> */
 - (BOOL)delete_bol:(ViCommand *)command
 {

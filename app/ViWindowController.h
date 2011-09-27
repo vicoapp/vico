@@ -131,14 +131,6 @@
  */
 - (ViDocumentView *)viewForDocument:(ViDocument *)document;
 
-/*? Selects the most appropriate view for the given document.
- *
- * Will change current tab if no view of the document is visible in the current tab.
- *
- * @param aDocument The document to select.
- *
- * @returns The view of the selected document.
- */
 - (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
 
 /**
@@ -201,19 +193,14 @@
 - (IBAction)selectNextTab:(id)sender;
 - (IBAction)selectPreviousTab:(id)sender;
 - (void)selectTabAtIndex:(NSInteger)anIndex;
-- (void)selectLastDocument;
 
 - (IBAction)navigateJumplist:(id)sender;
 
-/*? Switch to another document.
- * @param doc The document to display.
- * @returns The new view of the document.
- */
 - (id<ViViewController>)switchToDocument:(ViDocument *)doc;
 
-- (void)switchToLastDocument;
 - (void)switchToDocumentAction:(id)sender;
 
+/* FIXME: document -displayDocument:positioned: */
 - (id<ViViewController>)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position;
 
 /** Open a document and go to a specific point in the file.

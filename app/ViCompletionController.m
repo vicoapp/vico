@@ -380,7 +380,7 @@
 	[_options release];
 	_options = nil;
 
-	[self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
+	// [self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
 - (void)acceptByKey:(NSInteger)termKey

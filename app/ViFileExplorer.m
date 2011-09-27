@@ -194,6 +194,13 @@
 	}
 }
 
+- (NSURL *)rootURL
+{
+	if (_rootURL == nil)
+		return windowController.baseURL;
+	return _rootURL;
+}
+
 - (ViFile *)fileForItem:(id)item
 {
 	if ([item isKindOfClass:[ViCompletion class]])

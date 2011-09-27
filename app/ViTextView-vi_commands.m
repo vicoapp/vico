@@ -2351,10 +2351,12 @@
 		m = [ViMark markWithURL:m.url line:m.line column:0];
 
 	if (m.document != [self document]) {
-		/* Motion components can't change document. */
-		if ([[[self window] windowController] gotoMark:m] && !command.hasOperator)
-			return YES;
-		return NO;
+		/* Motion components don't work across documents. */
+		if (command.hasOperator) {
+			MESSAGE(@"Mark %C: not local mark", command.argument);
+			return NO;
+		}
+		return [[[self window] windowController] gotoMark:m];
 	}
 
 	if (!moveToColumn)

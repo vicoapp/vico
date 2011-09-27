@@ -1483,16 +1483,6 @@ DEBUG_FINALIZE();
 	return [self selectDocumentView:viewController];
 }
 
-- (void)switchToLastDocument
-{
-	[self gotoMark:_alternateMark positioned:ViViewPositionReplace];
-}
-
-- (void)selectLastDocument
-{
-	[self gotoMark:_alternateMark];
-}
-
 - (ViTabController *)selectedTabController
 {
 	return [[tabView selectedTabViewItem] identifier];
@@ -1601,11 +1591,8 @@ DEBUG_FINALIZE();
 	if (!_jumping && [viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
 
-	DEBUG(@"goto mark %@", mark);
+	DEBUG(@"goto mark %@ (view is %@)", mark, mark.view);
 
-	/* XXX: Set a flag telling didSelectDocument: that we're currently navigating the jump list.
-	 * This prevents us from pushing an extraneous jump on the list.
-	 */
 	[[mark retain] autorelease];
 
 	if (mark.view) {
@@ -2195,17 +2182,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 /* syntax: ctrl-^ */
 - (BOOL)switch_file:(ViCommand *)command
 {
-	DEBUG(@"previous document mark is %@", _alternateMark);
-
-	// Update jumplist
-	NSView *view = [[self currentView] innerView];
-	if ([view respondsToSelector:@selector(pushCurrentLocationOnJumpList)])
-		[(ViTextView *)view pushCurrentLocationOnJumpList];
-
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"])
-		[self selectLastDocument];
-	else
-		[self switchToLastDocument];
+	DEBUG(@"alternate mark is %@", _alternateMark);
+	[self gotoMark:_alternateMark positioned:ViViewPositionDefault];
 	return YES;
 }
 
@@ -2368,13 +2346,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 								   display:NO
 								     error:&error];
 			if (doc) {
-				if ([doc isKindOfClass:[ViProject class]]) {
+				if ([doc isKindOfClass:[ViProject class]])
 					[[doc nextRunloop] makeWindowControllers];
-				} else {
-					[doc addWindowController:self];
-					[self addDocument:doc];
-					viewController = [self switchToDocument:doc];
-				}
+				else
+					viewController = [self displayDocument:doc positioned:ViViewPositionReplace];
 			}
 		}
 	}
@@ -2411,9 +2386,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		if ([doc isKindOfClass:[ViProject class]]) {
 			[[doc nextRunloop] makeWindowControllers];
 		} else {
-			[doc addWindowController:self];
-			[self addDocument:doc];
-			ViDocumentView *docView = [self createTabForDocument:doc];
+			ViDocumentView *docView = [self displayDocument:doc positioned:ViViewPositionTab];
 			if (command.plus_command && docView) {
 				ViTextView *text = (ViTextView *)[docView innerView];
 				if (![text evalExString:command.plus_command])
@@ -2481,21 +2454,18 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		[(ViTextView *)view pushCurrentLocationOnJumpList];
 
 	doc = [matches objectAtIndex:0];
+	ViViewPosition position = ViViewPositionDefault;
+
 	if ([command.mapping.name hasPrefix:@"b"]) {
-		if ([self currentDocument] != doc)
-			[self switchToDocument:doc];
-	} else if ([command.mapping.name isEqualToString:@"tbuffer"]) {
-		ViDocumentView *docView = [self viewForDocument:doc];
-		if (docView == nil)
-			[self createTabForDocument:doc];
-		else
-			[self selectDocumentView:docView];
-	} else
-		/* otherwise it's either sbuffer or vbuffer */
-		[self splitVertically:[command.mapping.name isEqualToString:@"vbuffer"]
-                              andOpen:nil
-                   orSwitchToDocument:doc
-                      allowReusedView:NO];
+		if ([self currentDocument] == doc)
+			return nil;
+		position = ViViewPositionReplace;
+	} else if ([command.mapping.name isEqualToString:@"vbuffer"])
+		position = ViViewPositionSplitLeft;
+	else if ([command.mapping.name isEqualToString:@"sbuffer"])
+		position = ViViewPositionSplitAbove;
+
+	[self displayDocument:doc positioned:position];
 
 	return nil;
 }

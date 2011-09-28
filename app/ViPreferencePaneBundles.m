@@ -70,7 +70,7 @@
 		return nil;
 
 	_repositories = [[NSMutableArray alloc] init];
-	_repoNameRx = [[ViRegexp alloc] initWithString:@"([^[:alnum:]]*(tmbundle|textmate-bundle)$)"
+	_repoNameRx = [[ViRegexp alloc] initWithString:@"(\\W*(tm|textmate|vico)\\W*bundle)$"
 					       options:ONIG_OPTION_IGNORECASE];
 
 	/* Show an icon in the status column of the repository table. */
@@ -169,13 +169,21 @@
 		return;
 	}
 
-	NSArray *userBundles = [dict objectForKey:@"repositories"];
+	[_repositories addObjectsFromArray:[dict objectForKey:@"repositories"]];
 
-	/* Remove any non-tmbundle repositories. */
-	[_repositories addObjectsFromArray:userBundles];
-	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"(name ENDSWITH \"tmbundle\") OR (name ENDSWITH \"textmate-bundle\")"]];
+	for (NSUInteger i = 0; i < [_repositories count];) {
+		NSMutableDictionary *bundle = [_repositories objectAtIndex:i];
 
-	for (NSMutableDictionary *bundle in _repositories) {
+		/* Set displayName based on name, but trim any trailing .tmbundle. */
+		NSString *displayName = [bundle objectForKey:@"name"];
+		ViRegexpMatch *m = [_repoNameRx matchInString:displayName];
+		if (m == nil) {
+			/* Remove any non-bundle repositories. */
+			[_repositories removeObjectAtIndex:i];
+			continue;
+		}
+		++i;
+
 		NSString *name = [bundle objectForKey:@"name"];
 		NSString *owner = [bundle objectForKey:@"owner"];
 		NSString *status = @"";
@@ -183,11 +191,7 @@
 			status = @"Installed";
 		[bundle setObject:status forKey:@"status"];
 
-		/* Set displayName based on name, but trim any trailing .tmbundle. */
-		NSString *displayName = [bundle objectForKey:@"name"];
-		ViRegexpMatch *m = [_repoNameRx matchInString:displayName];
-		if (m)
-			displayName = [displayName stringByReplacingCharactersInRange:[m rangeOfSubstringAtIndex:1] withString:@""];
+		displayName = [displayName stringByReplacingCharactersInRange:[m rangeOfSubstringAtIndex:1] withString:@""];
 		[bundle setObject:[displayName capitalizedString] forKey:@"displayName"];
 	}
 

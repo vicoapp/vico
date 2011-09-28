@@ -432,11 +432,7 @@
 	/*
 	 * Some items only operate on a single entry.
 	 */
-	if ([set count] > 1 &&
-	   ([menuItem action] == @selector(openInCurrentView:) ||
-	    [menuItem action] == @selector(renameFile:) ||
-	    [menuItem action] == @selector(openInSplit:) ||		/* XXX: Splitting multiple documents is disabled for now, buggy */
-	    [menuItem action] == @selector(openInVerticalSplit:)))
+	if ([set count] > 1 && [menuItem action] == @selector(renameFile:))
 		return NO;
 
 	/*

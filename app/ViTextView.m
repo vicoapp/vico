@@ -238,6 +238,8 @@ DEBUG_FINALIZE();
 		[self setInitialMark:mark];
 	} else {
 		NSRange range = mark.range;
+		if (mark.line < 0)
+			return YES;
 		if (range.location >= [[self textStorage] length])
 			return NO;
 		[self setCaret:range.location];

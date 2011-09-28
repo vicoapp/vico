@@ -9,8 +9,8 @@
 	NSString		*_name;
 	NSUInteger		 _location;
 	NSRange			 _range;
-	NSUInteger		 _line;
-	NSUInteger		 _column;
+	NSInteger		 _line;
+	NSInteger		 _column;
 
 	NSString		*_rangeString;
 	BOOL			 _rangeStringIsDirty;
@@ -29,9 +29,9 @@
 /** The name of the mark. */
 @property(nonatomic,readonly) NSString *name;
 /** The line number of the mark. */
-@property(nonatomic,readonly) NSUInteger line;
+@property(nonatomic,readonly) NSInteger line;
 /** The column of the mark. */
-@property(nonatomic,readonly) NSUInteger column;
+@property(nonatomic,readonly) NSInteger column;
 /** The character index of the mark, or NSNotFound if unknown. */
 @property(nonatomic,readonly) NSUInteger location;
 /** The range of the mark, or `{NSNotFound,0}` if unknown. */
@@ -53,20 +53,20 @@
 + (ViMark *)markWithURL:(NSURL *)aURL;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
-		   line:(NSUInteger)aLine
-		 column:(NSUInteger)aColumn;
+		   line:(NSInteger)aLine
+		 column:(NSInteger)aColumn;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
                  title:(id)aTitle
-                  line:(NSUInteger)aLine
-                column:(NSUInteger)aColumn;
+                  line:(NSInteger)aLine
+                column:(NSInteger)aColumn;
 
 - (ViMark *)initWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
 		  title:(id)aTitle
-                  line:(NSUInteger)aLine
-                column:(NSUInteger)aColumn;
+                  line:(NSInteger)aLine
+                column:(NSInteger)aColumn;
 
 + (ViMark *)markWithDocument:(ViDocument *)aDocument
 			name:(NSString *)aName

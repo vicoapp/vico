@@ -24,13 +24,13 @@
 	return [[[ViMark alloc] initWithURL:aURL
 				       name:nil
 				      title:nil
-				       line:0
-				     column:0] autorelease];
+				       line:-1
+				     column:-1] autorelease];
 }
 
 + (ViMark *)markWithURL:(NSURL *)aURL
-		   line:(NSUInteger)aLine
-		 column:(NSUInteger)aColumn
+		   line:(NSInteger)aLine
+		 column:(NSInteger)aColumn
 {
 	return [[[ViMark alloc] initWithURL:aURL
 				       name:nil
@@ -42,8 +42,8 @@
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
 		  title:(id)aTitle
-		   line:(NSUInteger)aLine
-		 column:(NSUInteger)aColumn
+		   line:(NSInteger)aLine
+		 column:(NSInteger)aColumn
 {
 	return [[[ViMark alloc] initWithURL:aURL
 				       name:aName
@@ -73,8 +73,8 @@
 - (ViMark *)initWithURL:(NSURL *)aURL
 		   name:(NSString *)aName
 		  title:(id)aTitle
-		   line:(NSUInteger)aLine
-		 column:(NSUInteger)aColumn
+		   line:(NSInteger)aLine
+		 column:(NSInteger)aColumn
 {
 	if (aURL == nil) {
 		[self release];
@@ -223,20 +223,24 @@
 		return;
 	}
 
-	NSUInteger eol = 0;
-	NSInteger loc = [[_document textStorage] locationForStartOfLine:_line
-								length:NULL
-							   contentsEnd:&eol];
-	DEBUG(@"got line %lu => location %li", _line, loc);
-	if (loc < 0)
-		_location = IMAX(0, [[_document textStorage] length] - 1);
+	if (_line < 0)
+		_range = NSMakeRange(NSNotFound, 0);
 	else {
-		_location = loc + IMAX(0, _column - 1);
-		if (_location > eol)
-			_location = eol;
-	}
+		NSUInteger eol = 0;
+		NSInteger loc = [[_document textStorage] locationForStartOfLine:_line
+									length:NULL
+								   contentsEnd:&eol];
+		DEBUG(@"got line %lu => location %li", _line, loc);
+		if (loc < 0)
+			_location = IMAX(0, [[_document textStorage] length] - 1);
+		else {
+			_location = loc + IMAX(0, _column - 1);
+			if (_location > eol)
+				_location = eol;
+		}
 
-	_range = NSMakeRange(_location, 1);
+		_range = NSMakeRange(_location, 1);
+	}
 
 	DEBUG(@"got document %@, %lu:%lu => location %lu", _document, _line, _column, _location);
 
@@ -301,6 +305,9 @@
 		// if (_range.location != NSNotFound)
 		// 	_rangeString = [NSStringFromRange(_range) retain];
 		// else
+		if (_line < 0)
+			_rangeString = nil;
+		else
 			_rangeString = [[NSString alloc] initWithFormat:@"%lu:%lu", _line, _column];
 		_rangeStringIsDirty = NO;
 	}

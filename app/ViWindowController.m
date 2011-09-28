@@ -1259,12 +1259,16 @@ DEBUG_FINALIZE();
 	    [[self currentView] isKindOfClass:[ViDocumentView class]]) {
 		[self setAlternateMarkCandidate:[(ViTextView *)[[self currentView] innerView] currentMark]];
 		_alternateMarkCandidate.title = @"_alternateMarkCandidate";
+		DEBUG(@"alt mark candidate is %@", _alternateMarkCandidate);
 	}
 }
 
 - (void)didChangeCurrentView
 {
 	id<ViViewController> viewController = [self currentView];
+	if (viewController == nil)
+		return;
+
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocumentView *docView = (ViDocumentView *)viewController;
 

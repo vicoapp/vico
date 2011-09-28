@@ -97,8 +97,9 @@
 - (void)compileSkipPattern
 {
 	NSError *error = nil;
+	NSString *pattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
 	[_skipRegex release];
-	_skipRegex = [[ViRegexp alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"] options:0 error:&error];
+	_skipRegex = [[ViRegexp alloc] initWithString:pattern options:0 error:&error];
 	if (error) {
 		[windowController message:@"Invalid regular expression in skipPattern: %@", [error localizedDescription]];
 		[_skipRegex release];

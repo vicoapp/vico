@@ -94,8 +94,8 @@
 - (NSDictionary *)smartPairMatchAttributes
 {
 	if (_smartPairMatchAttributes == nil) {
-//		_smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[self _selectionColor]
-//								        forKey:NSBackgroundColorAttributeName];
+		// _smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[self selectionColor]
+		// 						        forKey:NSBackgroundColorAttributeName];
 		_smartPairMatchAttributes = [[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleDouble]
 									 forKey:NSUnderlineStyleAttributeName] retain];
 	}

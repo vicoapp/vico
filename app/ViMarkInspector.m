@@ -62,7 +62,7 @@
 			[windowController showWindow:nil];
 		} else {
 			NSArray *nodes = [markListController selectedNodes];
-			INFO(@"got selected nodes %@", nodes);
+			DEBUG(@"got selected nodes %@", nodes);
 			id node = [nodes lastObject];
 			if ([outlineView isItemExpanded:node])
 				[outlineView collapseItem:node];

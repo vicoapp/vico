@@ -12,6 +12,7 @@
 #import "ViDocumentController.h"
 #import "NSString-additions.h"
 #import "NSView-additions.h"
+#import "NSArray-patterns.h"
 #import "ViTaskRunner.h"
 
 #import "ViFileCompletion.h"
@@ -3102,6 +3103,16 @@ again:
 	return YES;
 }
 
+- (void)removeFromInputKeys:(ViCommand *)command
+{
+	NSArray *keySequence = command.keySequence;
+	DEBUG(@"remove %@ from %@", keySequence, _inputKeys);
+	if ([_inputKeys hasSuffix:keySequence]) {
+		NSRange r = NSMakeRange([_inputKeys count] - [keySequence count], [keySequence count]);
+		[_inputKeys removeObjectsInRange:r];
+	}
+}
+
 - (BOOL)complete_keyword:(ViCommand *)command
 {
 	NSRange range;
@@ -3113,6 +3124,9 @@ again:
 		word = @"";
 		range = NSMakeRange([self caret], 0);
 	}
+
+	// FIXME: replace completion command keys (<c-n> or <c-x><c-n>) with the completed text
+	// [self removeFromInputKeys:command];
 
 	return [self presentCompletionsOf:word
 			     fromProvider:[[[ViWordCompletion alloc] init] autorelease]

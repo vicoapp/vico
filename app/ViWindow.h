@@ -2,5 +2,6 @@
 {
 }
 - (BOOL)isFullScreen;
+- (id)firstResponderOrDelegate;
 @end
 

@@ -1060,7 +1060,8 @@
 - (IBAction)searchFiles:(id)sender
 {
 	NSToolbar *toolbar = [window toolbar];
-	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] && [[toolbar items] containsObject:searchToolbarItem]) {
+	if (![(ViWindow *)window isFullScreen] && [toolbar isVisible] &&
+	    [[toolbar items] containsObject:searchToolbarItem]) {
 		[window makeFirstResponder:filterField];
 	} else {
 		[self showAltFilterField];
@@ -1071,11 +1072,12 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
+	if ([view isKindOfClass:[NSTextView class]] && view == [[view window] fieldEditor:NO forObject:nil])
+		view = (NSView *)[(NSTextView *)view delegate];
+
 	if (view == filterField || view == altFilterField)
 		[self openExplorerTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:explorerView]) {
-		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
-			return;
 		if (_closeExplorerAfterUse) {
 			[self closeExplorerAndFocusEditor:NO];
 			_closeExplorerAfterUse = NO;
@@ -1106,6 +1108,13 @@
 
 - (void)closeExplorerAndFocusEditor:(BOOL)focusEditor
 {
+	if (!focusEditor) {
+		/* Force focusing the editor if current focus is on filter field. */
+		if ([window firstResponderOrDelegate] == altFilterField ||
+		    [window firstResponderOrDelegate] == filterField)
+			focusEditor = YES;
+	}
+
 	_width = [explorerView frame].size.width;
 	[splitView setPosition:0.0 ofDividerAtIndex:0];
 	if (focusEditor)

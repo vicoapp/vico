@@ -69,12 +69,12 @@
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	DEBUG(@"view = %@ (%@ or %@?)", view, symbolFilterField, altSymbolFilterField);
+	if ([view isKindOfClass:[NSTextView class]] && view == [[view window] fieldEditor:NO forObject:nil])
+		view = (NSView *)[(NSTextView *)view delegate];
+
 	if (view == symbolFilterField || view == altSymbolFilterField)
 		[self openSymbolListTemporarily:YES];
 	else if ([view isKindOfClass:[NSView class]] && ![view isDescendantOf:symbolsView]) {
-		if ([view isKindOfClass:[NSTextView class]] && [(NSTextView *)view isFieldEditor])
-			return;
 		if (_closeSymbolListAfterUse) {
 			[self closeSymbolListAndFocusEditor:NO];
 			_closeSymbolListAfterUse = NO;
@@ -170,6 +170,13 @@
 
 - (void)closeSymbolListAndFocusEditor:(BOOL)focusEditor
 {
+	if (!focusEditor) {
+		/* Force focusing the editor if current focus is on filter field. */
+		if ([window firstResponderOrDelegate] == altSymbolFilterField ||
+		    [window firstResponderOrDelegate] == symbolFilterField)
+			focusEditor = YES;
+	}
+
 	_width = [symbolsView frame].size.width;
 	NSRect frame = [splitView frame];
 	[splitView setPosition:NSWidth(frame) ofDividerAtIndex:1];

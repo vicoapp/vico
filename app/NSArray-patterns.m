@@ -42,5 +42,18 @@
 	return YES;
 }
 
+- (BOOL)hasSuffix:(NSArray *)otherArray
+{
+	NSInteger j = [self count] - [otherArray count];
+	if (j < 0)
+		return NO;
+
+	for (NSInteger i = 0; i < [otherArray count]; i++)
+		if (![[self objectAtIndex:j] isEqual:[otherArray objectAtIndex:i]])
+			return NO;
+
+	return YES;
+}
+
 @end
 

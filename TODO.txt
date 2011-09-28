@@ -132,6 +132,7 @@
 * scriptable settings with :set
 * notion of <leader> key in maps
 
+* vico should read tmDelta files
 * "Open all with current extension as..." menu like sublime in language syntax menu
 * let untitled documents have a custom title:
   -> untitled documents should show up in ctrl-s completions
@@ -154,6 +155,8 @@
 * switch undo direction after bundle command
 
 * indented paste
+* textmate drag commands
+* auto-hide statusbar
 
 * @jtregunna: can you make it so we don't get a file changed
               notification when the file hashes are the same? ie, switching branches

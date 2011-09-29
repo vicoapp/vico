@@ -280,6 +280,7 @@
 		9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A3140A8D0B0075677F /* ViPathComponentCell.m */; };
 		9AF140A8140A9C110075677F /* ViPathCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF140A7140A9C110075677F /* ViPathCell.m */; };
 		9AF29C24140CF511000CB1CB /* AliasBadgeIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */; };
+		9AF6A7031434ABB200FB373B /* NSWindow-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF6A7021434ABB200FB373B /* NSWindow-additions.m */; };
 		9AF71077137BC12900EC858E /* AdvancedPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AF71075137BC12900EC858E /* AdvancedPrefs.xib */; };
 		9AF7107B137BC31300EC858E /* ViPreferencePaneAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */; };
 		9AFC857A13F432A600B4FF09 /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AFC857913F432A600B4FF09 /* header.png */; };
@@ -829,6 +830,8 @@
 		9AF140A6140A9C110075677F /* ViPathCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPathCell.h; sourceTree = "<group>"; };
 		9AF140A7140A9C110075677F /* ViPathCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPathCell.m; sourceTree = "<group>"; };
 		9AF29C23140CF511000CB1CB /* AliasBadgeIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AliasBadgeIcon.icns; path = Images/AliasBadgeIcon.icns; sourceTree = SOURCE_ROOT; };
+		9AF6A7011434ABB200FB373B /* NSWindow-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWindow-additions.h"; sourceTree = "<group>"; };
+		9AF6A7021434ABB200FB373B /* NSWindow-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWindow-additions.m"; sourceTree = "<group>"; };
 		9AF71076137BC12900EC858E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AdvancedPrefs.xib; sourceTree = "<group>"; };
 		9AF71079137BC31300EC858E /* ViPreferencePaneAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneAdvanced.h; sourceTree = "<group>"; };
 		9AF7107A137BC31300EC858E /* ViPreferencePaneAdvanced.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViPreferencePaneAdvanced.m; sourceTree = "<group>"; };
@@ -1187,6 +1190,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AF6A7011434ABB200FB373B /* NSWindow-additions.h */,
+				9AF6A7021434ABB200FB373B /* NSWindow-additions.m */,
 				9A5A678A14207B83003E92EC /* NSMenu-additions.h */,
 				9A5A678B14207B83003E92EC /* NSMenu-additions.m */,
 				9ACFDFC0141A089C00D4DBE1 /* ViMarkInspector.h */,
@@ -2026,6 +2031,7 @@
 				9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */,
 				9ACFDFC2141A089C00D4DBE1 /* ViMarkInspector.m in Sources */,
 				9A5A678C14207B83003E92EC /* NSMenu-additions.m in Sources */,
+				9AF6A7031434ABB200FB373B /* NSWindow-additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

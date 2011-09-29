@@ -33,6 +33,7 @@ OBJC_SRCS = \
 	NSTask-streaming.m \
 	NSURL-additions.m \
 	NSView-additions.m \
+        NSWindow-additions.m \
 	PSMMetalTabStyle.m \
 	PSMOverflowPopUpButton.m \
 	PSMProgressIndicator.m \

@@ -113,12 +113,16 @@
 		[_modImage compositeToPoint:modPoint operation:NSCompositeSourceOver];
 	}
 
-	CGFloat d = (cellFrame.size.height - [[self font] pointSize]) / 3.0;
+	NSSize sz = [[self attributedStringValue] size];
+	CGFloat d = (cellFrame.size.height - sz.height) / 2.0;
 	cellFrame.origin.y += d;
 	cellFrame.size.height -= 2*d;
 	if (_statusImage)
 		cellFrame.size.width -= [_statusImage size].width;
-	[super drawWithFrame:cellFrame inView:controlView];
+	cellFrame.size.width -= 4;
+	cellFrame.origin.x += 2;
+	[[self attributedStringValue] drawInRect:cellFrame];
+	// [super drawWithFrame:cellFrame inView:controlView];
 }
 
 - (NSSize)cellSize

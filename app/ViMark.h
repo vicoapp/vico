@@ -17,6 +17,7 @@
 
 	id			 _title;
 	NSImage			*_icon;
+	id			 _representedObject;
 
 	NSString		*_groupName;
 	NSURL			*_url;
@@ -44,6 +45,8 @@
 @property(nonatomic,readwrite,retain) NSImage *icon;
 /** The title of the mark. An NSString or an NSAttributedString. */
 @property(nonatomic,readwrite,retain) id title;
+/** A custom user-defined object associated with the mark. */
+@property(nonatomic,readwrite,retain) id representedObject;
 
 @property(nonatomic,readwrite,retain) ViDocument *document;
 @property(nonatomic,readonly) __weak ViDocumentView *view;

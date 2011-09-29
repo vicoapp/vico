@@ -18,6 +18,7 @@
 @synthesize icon = _icon;
 @synthesize document = _document;
 @synthesize view = _view;
+@synthesize representedObject = _representedObject;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {

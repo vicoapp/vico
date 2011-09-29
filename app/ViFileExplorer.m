@@ -590,7 +590,7 @@
 		id item = [explorer itemAtRow:idx];
 		ViFile *file = [self fileForItem:item];
 		if (file && !file.isDirectory) {
-			[windowController gotoMark:[ViMark markWithURL:file.url] positioned:position];
+			[windowController gotoMark:[ViMark markWithURL:file.targetURL] positioned:position];
 			didOpen = YES;
 		}
 	}];
@@ -800,7 +800,7 @@
 
 		NSURL *parent;
 		if (file)
-			parent = file.url;
+			parent = file.targetURL;
 		else
 			parent = _rootURL;
 

@@ -1289,7 +1289,6 @@
 doCommandBySelector:(SEL)aSelector
 {
 	if ([self isEditing]) {
-		INFO(@"sender is %@, selector %@, textview %@", sender, NSStringFromSelector(aSelector), textView);
 		if (aSelector == @selector(cancelOperation:)) { // escape
 			[explorer abortEditing];
 			[window makeFirstResponder:explorer];

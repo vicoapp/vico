@@ -22,16 +22,15 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	// NSCopyObject() horror story!
+	// NSCopyObject() horror story!?
 	// http://robnapier.net/blog/implementing-nscopying-439
-	// MHTextIconCell *copy = (MHTextIconCell *)[super copyWithZone:zone];
-	MHTextIconCell *copy = [[[self class] allocWithZone:zone] initTextCell:[self stringValue]];
-	copy.image = self.image;
-	copy.modified = self.modified;
-	copy.statusImage = self.statusImage;
-	copy.modImage = self.modImage;
-	[copy setFont:[self font]];
-	[copy setTextColor:[self textColor]];
+	MHTextIconCell *copy = (MHTextIconCell *)[super copyWithZone:zone];
+        // Why do we have to refer to the instance variables directly?
+        // Why can't we use [copy setImage:]?
+	copy->_image = [_image retain];
+	copy->_modified = _modified;
+	copy->_statusImage = [_statusImage retain];
+	copy->_modImage = [_modImage retain];
 	return copy;
 }
 
@@ -43,9 +42,12 @@
 {
 	NSRect textFrame, imageFrame;
 	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [_image size].width, NSMinXEdge);
-	CGFloat d = (aRect.size.height - [[self font] pointSize]) / 3.0;
-	textFrame.origin.y += d;
-	textFrame.size.height -= 2*d;
+	NSSize sz = [[self attributedStringValue] size];
+	CGFloat d = (textFrame.size.height - sz.height) / 2.0;
+	if (d > 0) {
+		textFrame.origin.y += d;
+		textFrame.size.height -= 2*d;
+	}
 	[super editWithFrame:textFrame
                       inView:controlView
                       editor:textObj
@@ -62,9 +64,12 @@
 {
 	NSRect textFrame, imageFrame;
 	NSDivideRect(aRect, &imageFrame, &textFrame, 4 + [_image size].width, NSMinXEdge);
-	CGFloat d = (aRect.size.height - [[self font] pointSize]) / 3.0;
-	textFrame.origin.y += d;
-	textFrame.size.height -= 2*d;
+	NSSize sz = [[self attributedStringValue] size];
+	CGFloat d = (textFrame.size.height - sz.height) / 2.0;
+	if (d > 0) {
+		textFrame.origin.y += d;
+		textFrame.size.height -= 2*d;
+	}
 	[super selectWithFrame:textFrame
                         inView:controlView
                         editor:textObj
@@ -115,14 +120,15 @@
 
 	NSSize sz = [[self attributedStringValue] size];
 	CGFloat d = (cellFrame.size.height - sz.height) / 2.0;
-	cellFrame.origin.y += d;
-	cellFrame.size.height -= 2*d;
+	if (d > 0) {
+		cellFrame.origin.y += d;
+		cellFrame.size.height -= 2*d;
+	}
 	if (_statusImage)
 		cellFrame.size.width -= [_statusImage size].width;
 	cellFrame.size.width -= 4;
 	cellFrame.origin.x += 2;
 	[[self attributedStringValue] drawInRect:cellFrame];
-	// [super drawWithFrame:cellFrame inView:controlView];
 }
 
 - (NSSize)cellSize

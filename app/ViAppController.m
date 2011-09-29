@@ -272,7 +272,7 @@ updateMeta(void)
 	    @"Monaco", @"fontname",
 	    @"vim", @"undostyle",
 	    @"Sunset", @"theme",
-	    @"(^\\.(?!(htaccess|(git|hg|cvs)ignore))|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
+	    @"(^\\.(?!(htaccess|(git|hg|cvs)ignore)$)|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
 	    [NSArray arrayWithObjects:@"vicoapp", @"textmate", @"kswedberg", nil], @"bundleRepoUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",

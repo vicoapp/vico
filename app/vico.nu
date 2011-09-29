@@ -16,6 +16,8 @@
 (global ViMapLineMode 8)
 (global ViMapNeedArgument 16)
 
+(global ViRegexpIgnoreCase 1)
+
 (global current-window (do () (ViWindowController currentWindowController)))
 (global current-explorer (do () ((current-window) explorer)))
 (global current-document (do () ((current-window) currentDocument)))

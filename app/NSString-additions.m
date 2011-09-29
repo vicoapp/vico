@@ -196,6 +196,12 @@
 	      ![self isEqualToString:[self lowercaseString]];
 }
 
+- (BOOL)isLowercase
+{
+	return [self isEqualToString:[self lowercaseString]] &&
+	      ![self isEqualToString:[self uppercaseString]];
+}
+
 /* Expands <special> to a nice visual representation.
  *
  * Format of the <special> keys are:

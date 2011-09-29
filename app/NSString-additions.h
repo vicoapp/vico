@@ -38,5 +38,10 @@
  * @returns YES if the string is in uppercase.
  */
 - (BOOL)isUppercase;
+
+/**
+ * @returns YES if the string is in lowercase.
+ */
+- (BOOL)isLowercase;
 @end
 

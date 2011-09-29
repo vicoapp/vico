@@ -24,6 +24,9 @@
 	}
 
 	NSSize inset = [self textContainerInset];
+	NSPoint origin = [self textContainerOrigin];
+	caretRect.origin.x += origin.x;
+	caretRect.origin.y += origin.y;
 	caretRect.origin.x += inset.width;
 	caretRect.origin.y += inset.height;
 

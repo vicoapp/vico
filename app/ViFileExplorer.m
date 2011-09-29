@@ -19,6 +19,7 @@
 #import "ViPathComponentCell.h"
 #import "ViCommandMenuItemView.h"
 #import "NSMenu-additions.h"
+#import "NSWindow-additions.h"
 
 @interface ViFileExplorer (private)
 - (void)recursivelySortProjectFiles:(NSMutableArray *)children;

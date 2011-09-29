@@ -7,6 +7,7 @@
 #import "ViDocumentView.h"
 #import "ViBgView.h"
 #import "ViWindow.h"
+#import "NSWindow-additions.h"
 
 @implementation ViSymbolController
 

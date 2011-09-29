@@ -116,10 +116,6 @@ int logIndent = 0;
 	[self setUsesFontPanel:NO];
 	[self setDrawsBackground:YES];
 
-	// Add two pixel space at top of text container
-	if (aDocument)
-		[self setTextContainerInset:NSMakeSize(0, 2)];
-
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
 	if ([[self textStorage] lineCount] > 3000)
 		[[self layoutManager] setAllowsNonContiguousLayout:YES];
@@ -169,6 +165,18 @@ int logIndent = 0;
 	[self setCaret:0];
 	[self updateStatus];
 }
+
+- (NSPoint)textContainerOrigin
+{
+	NSPoint origin = [super textContainerOrigin];
+	if (![self isFieldEditor]) {
+		// Add two pixel space at top of text container.
+		// XXX: using -setTextContainerInset proved to be too buggy.
+		origin.y += 2;
+	}
+	return origin;
+}
+
 
 DEBUG_FINALIZE();
 

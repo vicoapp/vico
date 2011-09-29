@@ -1,4 +1,3 @@
-#define FORCE_DEBUG
 #import "SFTPConnection.h"
 #import "ViError.h"
 #import "ViRegexp.h"

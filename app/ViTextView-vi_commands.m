@@ -14,6 +14,7 @@
 #import "NSView-additions.h"
 #import "NSArray-patterns.h"
 #import "ViTaskRunner.h"
+#import "NSURL-additions.h"
 
 #import "ViFileCompletion.h"
 #import "ViWordCompletion.h"
@@ -2372,10 +2373,8 @@
 
 	if (url == nil)
 		path = @"[untitled]";
-	else if ([url isFileURL])
-		path = [[url path] stringByAbbreviatingWithTildeInPath];
 	else
-		path = [url absoluteString];
+		path = [url displayString];
 
 	MESSAGE(@"%@: %s: line %u of %u [%.0f%%] %@ syntax, %@ encoding",
 	 path,

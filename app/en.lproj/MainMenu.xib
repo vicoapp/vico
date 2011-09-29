@@ -1800,6 +1800,7 @@
 								</object>
 								<object class="NSMenuItem" id="625202149">
 									<reference key="NSMenu" ref="835318025"/>
+									<bool key="NSIsHidden">YES</bool>
 									<string key="NSTitle">Show Mark Inspector</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
@@ -4762,6 +4763,7 @@
 							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
 							<string>filterFiles:</string>
+							<string>flushCache:</string>
 							<string>focusExplorer:</string>
 							<string>gotoBookmark:</string>
 							<string>newDocument:</string>
@@ -4801,6 +4803,7 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -4813,6 +4816,7 @@
 							<string>bookmarkFolder:</string>
 							<string>cancelSftpSheet:</string>
 							<string>filterFiles:</string>
+							<string>flushCache:</string>
 							<string>focusExplorer:</string>
 							<string>gotoBookmark:</string>
 							<string>newDocument:</string>
@@ -4853,6 +4857,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">filterFiles:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">flushCache:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -5351,12 +5359,14 @@
 							<string>bundleButton</string>
 							<string>bundleButtonCell</string>
 							<string>explorer</string>
+							<string>explorerActionMenu</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
 							<string>mainView</string>
 							<string>messageField</string>
 							<string>openFilesButton</string>
 							<string>projectResizeView</string>
+							<string>sftpConnectView</string>
 							<string>splitView</string>
 							<string>statusbar</string>
 							<string>symbolController</string>
@@ -5371,12 +5381,14 @@
 							<string>NSPopUpButton</string>
 							<string>ViToolbarPopUpButtonCell</string>
 							<string>ViFileExplorer</string>
+							<string>NSMenu</string>
 							<string>ViBgView</string>
 							<string>NSSegmentedControl</string>
 							<string>NSView</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSImageView</string>
+							<string>NSWindow</string>
 							<string>NSSplitView</string>
 							<string>NSTextField</string>
 							<string>ViSymbolController</string>
@@ -5394,12 +5406,14 @@
 							<string>bundleButton</string>
 							<string>bundleButtonCell</string>
 							<string>explorer</string>
+							<string>explorerActionMenu</string>
 							<string>explorerView</string>
 							<string>jumplistNavigator</string>
 							<string>mainView</string>
 							<string>messageField</string>
 							<string>openFilesButton</string>
 							<string>projectResizeView</string>
+							<string>sftpConnectView</string>
 							<string>splitView</string>
 							<string>statusbar</string>
 							<string>symbolController</string>
@@ -5427,6 +5441,10 @@
 								<string key="candidateClassName">ViFileExplorer</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">explorerActionMenu</string>
+								<string key="candidateClassName">NSMenu</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">explorerView</string>
 								<string key="candidateClassName">ViBgView</string>
 							</object>
@@ -5449,6 +5467,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">projectResizeView</string>
 								<string key="candidateClassName">NSImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">sftpConnectView</string>
+								<string key="candidateClassName">NSWindow</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">splitView</string>

@@ -501,22 +501,8 @@ extern BOOL __makeNewWindowInsteadOfTab;
 
 - (IBAction)newProject:(id)sender
 {
-#if 0
-	NSError *error = nil;
-	NSDocument *proj = [[NSDocumentController sharedDocumentController] makeUntitledDocumentOfType:@"Project" error:&error];
-	if (proj) {
-		[[NSDocumentController sharedDocumentController] addDocument:proj];
-		[proj makeWindowControllers];
-		[proj showWindows];
-	}
-	else {
-		NSAlert *alert = [NSAlert alertWithError:error];
-		[alert runModal];
-	}
-#else
 	__makeNewWindowInsteadOfTab = YES;
 	[[ViDocumentController sharedDocumentController] newDocument:sender];
-#endif
 }
 
 - (IBAction)installTerminalHelper:(id)sender

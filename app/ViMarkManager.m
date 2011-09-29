@@ -133,6 +133,7 @@
 @implementation ViMarkList
 
 @synthesize marks = _marks;
+@synthesize userParameter = _userParameter;
 
 + (ViMarkList *)markListWithIdentifier:(id)anIdentifier
 {
@@ -164,6 +165,7 @@
 	[_marksByName release];
 	[_groups release];
 	[_icon release];
+	[_userParameter release];
 	[super dealloc];
 }
 
@@ -338,6 +340,16 @@
 	return [self markAtIndex:_currentIndex];
 }
 
+- (BOOL)atBeginning
+{
+	return (_currentIndex <= 0);
+}
+
+- (BOOL)atEnd
+{
+	return (_currentIndex + 1 >= [_marks count]);
+}
+
 - (void)push:(ViMark *)mark
 {
 	DEBUG(@"pushing mark %@", mark);
@@ -491,6 +503,22 @@
 	}
 }
 
+- (void)removeListAtIndex:(NSUInteger)index
+{
+	if (index < [_lists count]) {
+		BOOL changeSelection = (_currentIndex <= index);
+		if (changeSelection)
+			[self willChangeValueForKey:@"selectionIndexes"];
+		[self willChangeValueForKey:@"list"];
+		[_lists removeObjectAtIndex:index];
+		if (changeSelection)
+			_currentIndex--; // this may set _currentIndex to -1
+		[self didChangeValueForKey:@"list"];
+		if (changeSelection)
+			[self didChangeValueForKey:@"selectionIndexes"];
+	}
+}
+
 - (ViMarkList *)push:(ViMarkList *)list
 {
 	[self willChangeValueForKey:@"selectionIndexes"];
@@ -566,6 +594,16 @@
 - (ViMarkList *)current
 {
 	return [self listAtIndex:_currentIndex];
+}
+
+- (BOOL)atBeginning
+{
+	return (_currentIndex <= 0);
+}
+
+- (BOOL)atEnd
+{
+	return (_currentIndex + 1 >= [_lists count]);
 }
 
 - (NSString *)description

@@ -31,9 +31,11 @@
 	NSMutableDictionary	*_groups;
 	id			 _identifier;
 	NSImage			*_icon;
+	id			 _userParameter;
 }
 
 @property (nonatomic, readonly) NSArray *marks;
+@property (nonatomic, readwrite, retain) id userParameter;
 
 + (ViMarkList *)markListWithIdentifier:(id)anIdentifier;
 + (ViMarkList *)markList;
@@ -52,6 +54,8 @@
 - (ViMark *)next;
 - (ViMark *)previous;
 - (ViMark *)current;
+- (BOOL)atBeginning;
+- (BOOL)atEnd;
 
 - (void)push:(ViMark *)mark;
 - (ViMark *)pop;
@@ -79,12 +83,16 @@
 - (ViMarkStack *)initWithName:(NSString *)name;
 - (ViMarkList *)makeList;
 - (void)clear;
+- (void)setMaxLists:(NSInteger)num;
+- (void)removeListAtIndex:(NSUInteger)index;
 - (ViMarkList *)push:(ViMarkList *)list;
 - (ViMarkList *)listAtIndex:(NSInteger)anIndex;
 - (ViMarkList *)next;
 - (ViMarkList *)previous;
 - (ViMarkList *)last;
 - (ViMarkList *)current;
+- (BOOL)atBeginning;
+- (BOOL)atEnd;
 
 @end
 

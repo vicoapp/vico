@@ -90,7 +90,6 @@ DEBUG_FINALIZE();
 
 	[[ViEventManager defaultManager] clearFor:self];
 
-	[[self window] unbind:@"title"];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"undostyle"];
 
@@ -319,7 +318,6 @@ DEBUG_FINALIZE();
 		_initialViewController = nil;
 	}
 
-	[[self window] bind:@"title" toObject:self withKeyPath:@"currentView.title" options:nil];
 	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	[[self window] makeKeyAndOrderFront:self];
 
@@ -388,6 +386,15 @@ DEBUG_FINALIZE();
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
 	[[ViEventManager defaultManager] emit:ViEventDidExitFullScreen for:self with:self, nil];
+}
+
+- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
+{
+	NSURL *url = [[self document] fileURL];
+	if (url == nil)
+		return displayName;
+	return [NSString stringWithFormat:@"%@  (%@)",
+		displayName, [[url URLByDeletingLastPathComponent] displayString]];
 }
 
 - (IBAction)addNewDocumentTab:(id)sender
@@ -560,6 +567,7 @@ DEBUG_FINALIZE();
 
 	[_baseURL release];
 	_baseURL = [[url absoluteURL] retain];
+	[self synchronizeWindowTitleWithDocumentName];
 }
 
 - (void)deferred:(id<ViDeferred>)deferred status:(NSString *)statusMessage

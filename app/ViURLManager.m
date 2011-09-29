@@ -90,6 +90,14 @@
 	return aURL;
 }
 
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL
+{
+	id<ViURLHandler> handler = [self handlerForURL:aURL selector:@selector(stringByAbbreviatingWithTildeInPath:)];
+	if (handler)
+		return [handler stringByAbbreviatingWithTildeInPath:aURL];
+	return [aURL absoluteString];
+}
+
 - (id<ViDeferred>)contentsOfDirectoryAtURL:(NSURL *)aURL
 			      onCompletion:(void (^)(NSArray *, NSError *))completionCallback
 {

@@ -9,6 +9,7 @@
 + (SFTPConnectionPool *)sharedPool;
 
 - (NSURL *)normalizeURL:(NSURL *)aURL;
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL;
 
 - (id<ViDeferred>)connectionWithURL:(NSURL *)url
 			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback;

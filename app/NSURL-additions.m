@@ -1,4 +1,5 @@
 #import "NSURL-additions.h"
+#import "ViURLManager.h"
 #include "logging.h"
 
 @implementation NSURL (equality)
@@ -33,9 +34,7 @@ static NSCharacterSet *__slashSet = nil;
 
 - (NSString *)displayString
 {
-	if ([self isFileURL])
-		return [[self path] stringByAbbreviatingWithTildeInPath];
-	return [self absoluteString];
+	return [[ViURLManager defaultManager] stringByAbbreviatingWithTildeInPath:self];
 }
 
 /*

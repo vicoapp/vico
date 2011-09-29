@@ -26,6 +26,7 @@
 - (NSURL *)normalizeURL:(NSURL *)aURL;
 
 @optional
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL;
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
 			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock;
 - (id<ViDeferred>)fileExistsAtURL:(NSURL *)aURL

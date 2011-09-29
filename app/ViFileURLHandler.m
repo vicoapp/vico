@@ -133,6 +133,11 @@
 	return [[[NSURL fileURLWithPath:path] URLByStandardizingPath] absoluteURL];
 }
 
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL
+{
+	return [[aURL path] stringByAbbreviatingWithTildeInPath];
+}
+
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
 			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {

@@ -43,6 +43,15 @@
 	return aURL;
 }
 
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL
+{
+	NSString *key = [self connectionKeyForURL:aURL];
+	SFTPConnection *conn = [_connections objectForKey:key];
+	if (conn && [conn connected])
+		return [conn stringByAbbreviatingWithTildeInPath:aURL];
+	return aURL;
+}
+
 - (id<ViDeferred>)connectionWithURL:(NSURL *)url
 			  onConnect:(SFTPRequest *(^)(SFTPConnection *, NSError *))connectCallback
 {

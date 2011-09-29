@@ -2,6 +2,7 @@
 #import "ViError.h"
 #import "ViRegexp.h"
 #import "ViFile.h"
+#import "NSURL-additions.h"
 
 #include "sys_queue.h"
 #include <sys/socket.h>
@@ -1095,6 +1096,15 @@ resp2txt(int type)
 		return [aURL absoluteURL];
 	path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	return [[NSURL URLWithString:path relativeToURL:aURL] absoluteURL];
+}
+
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL
+{
+	NSString *path = [aURL path];
+	if (_home && [path hasPrefix:_home])
+		path = [path stringByReplacingCharactersInRange:NSMakeRange(0, [_home length]) withString:@"~"];
+	return [NSString stringWithFormat:@"%@%s%@%s%@:%@",
+	    _user ? _user : @"", _user ? "@" : "", _host, _port ? ":" : "", _port ? _port : @"", path];
 }
 
 - (SFTPRequest *)attributesOfItemAtURL:(NSURL *)url

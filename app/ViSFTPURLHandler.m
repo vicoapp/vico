@@ -14,6 +14,11 @@
 	return [[SFTPConnectionPool sharedPool] normalizeURL:aURL];
 }
 
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL
+{
+	return [[SFTPConnectionPool sharedPool] stringByAbbreviatingWithTildeInPath:aURL];
+}
+
 - (id<ViDeferred>)attributesOfItemAtURL:(NSURL *)aURL
 			   onCompletion:(void (^)(NSURL *, NSDictionary *, NSError *))aBlock
 {

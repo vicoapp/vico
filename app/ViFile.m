@@ -19,6 +19,14 @@ symbolicAttributes:(NSDictionary *)sDictionary
 	if ((self = [super init]) != nil) {
 		_attributes = [aDictionary retain];
 		_isLink = [[_attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
+		if (!_isLink && [aURL isFileURL]) {
+			NSNumber *isAliasFile = nil;
+			BOOL success = [aURL getResourceValue:&isAliasFile
+						       forKey:NSURLIsAliasFileKey
+							error:nil];
+			if (success && [isAliasFile boolValue])
+				_isLink = YES;
+		}
 		[self setURL:aURL];
 		[self setTargetURL:sURL attributes:sDictionary];
 	}
@@ -101,8 +109,6 @@ symbolicAttributes:(NSDictionary *)sDictionary
 	_targetAttributes = aDictionary;
 
 	_iconIsDirty = YES;
-	if (!_isLink)
-		_isLink = (_targetAttributes != nil);
 
 	if (_isLink)
 		_isDirectory = [[_targetAttributes fileType] isEqualToString:NSFileTypeDirectory];

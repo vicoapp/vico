@@ -56,8 +56,10 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 
 + (ViWindowController *)currentWindowController
 {
-	if (__currentWindowController == nil)
-		return [[[ViWindowController alloc] init] autorelease];
+	// if (__currentWindowController == nil) {
+	// 	ViWindowController *windowController = [[[ViWindowController alloc] init] autorelease];
+	// 	[windowController window]; // trigger immediate NIB loading
+	// }
 	return __currentWindowController;
 }
 
@@ -2044,7 +2046,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (void)jumpList:(ViJumpList *)aJumpList goto:(ViMark *)jump
 {
-	// [self gotoMark:jump positioned:ViViewPositionDefault recordJump:NO];
 	[self updateJumplistNavigator]; // observe _tagStack.list.selectionIndexes instead
 }
 

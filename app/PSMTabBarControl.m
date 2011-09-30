@@ -55,6 +55,8 @@
 - (PSMTabBarCell *)lastVisibleTab;
 - (int)numberOfVisibleTabs;
 
+- (void)animateShowHide:(NSTimer *)timer;
+
 @end
 
 @implementation PSMTabBarControl
@@ -773,10 +775,10 @@
             [menuItem setRepresentedObject:[cell representedObject]];
             [cell setIsInOverflowMenu:YES];
             [[cell indicator] removeFromSuperview];
-            if ([[cell representedObject] isEqualTo:[tabView selectedTabViewItem]])
+            if ([(NSTabViewItem *)[cell representedObject] isEqualTo:[tabView selectedTabViewItem]])
                 [menuItem setState:NSOnState];
             if([cell hasIcon])
-                [menuItem setImage:[[[[cell representedObject] identifier] content] icon]];
+                [menuItem setImage:[[[(NSTabViewItem *)[cell representedObject] identifier] content] icon]];
             if([cell count] > 0)
                 [menuItem setTitle:[[menuItem title] stringByAppendingFormat:@" (%d)",[cell count]]];
             [overflowMenu addItem:menuItem];

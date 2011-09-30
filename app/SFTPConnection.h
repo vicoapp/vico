@@ -267,5 +267,6 @@
 - (BOOL)closed;
 - (BOOL)connected;
 - (NSURL *)normalizeURL:(NSURL *)aURL;
+- (NSString *)stringByAbbreviatingWithTildeInPath:(NSURL *)aURL;
 
 @end

@@ -257,12 +257,14 @@
 /**
  * Deprecated declarations.
  */
+#if 0
 #if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
 # define NS_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER) && (_MSC_VER >= 1300)
 # define NS_DEPRECATED __declspec(deprecated)
 #else
 # define NS_DEPRECATED
+#endif
 #endif
 
 /**

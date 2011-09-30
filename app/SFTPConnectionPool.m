@@ -49,7 +49,7 @@
 	SFTPConnection *conn = [_connections objectForKey:key];
 	if (conn && [conn connected])
 		return [conn stringByAbbreviatingWithTildeInPath:aURL];
-	return aURL;
+	return [aURL absoluteString];
 }
 
 - (id<ViDeferred>)connectionWithURL:(NSURL *)url

@@ -27,8 +27,8 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 @interface ViWindowController ()
 - (void)updateJumplistNavigator;
 - (void)didSelectDocument:(ViDocument *)document;
-- (void)didSelectViewController:(id<ViViewController>)viewController;
-- (void)closeDocumentView:(id<ViViewController>)viewController
+- (void)didSelectViewController:(ViViewController *)viewController;
+- (void)closeDocumentView:(ViViewController *)viewController
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow;
 - (void)documentController:(NSDocumentController *)docController
@@ -241,9 +241,10 @@ DEBUG_FINALIZE();
 
 - (void)setupBundleMenu:(NSNotification *)notification
 {
-	if (![[self currentView] isKindOfClass:[ViDocumentView class]])
+	ViViewController *viewController = [self currentView];
+	if (![viewController isKindOfClass:[ViDocumentView class]])
 		return;
-	ViDocumentView *docView = [self currentView];
+	ViDocumentView *docView = (ViDocumentView *)viewController;
 	ViTextView *textView = [docView textView];
 
 	NSEvent *ev = [textView popUpContextEvent];
@@ -443,7 +444,7 @@ DEBUG_FINALIZE();
 
 /* Create a new document tab.
  */
-- (ViTabController *)createTabWithViewController:(id<ViViewController>)viewController
+- (ViTabController *)createTabWithViewController:(ViViewController *)viewController
 {
 	if (!_isLoaded) {
 		/* Defer until NIB is loaded. */
@@ -502,10 +503,7 @@ DEBUG_FINALIZE();
 
 - (ViDocument *)currentDocument
 {
-	id<ViViewController> viewController = [self currentView];
-	if ([viewController respondsToSelector:@selector(document)])
-		return [viewController document];
-	return nil;
+	return [[self currentDocumentView] document];
 }
 
 - (void)caretChanged:(NSNotification *)notification
@@ -584,7 +582,8 @@ DEBUG_FINALIZE();
 	}
 
 	void (^blockCopy)(NSURL *, NSError *) = [[aBlock copy] autorelease];
-	_checkURLDeferred = [[ViURLManager defaultManager] fileExistsAtURL:url onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
+	_checkURLDeferred = [[ViURLManager defaultManager] fileExistsAtURL:url
+							      onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
 		if (error)
 			blockCopy(nil, [ViError errorWithFormat:@"%@: %@", [url path], [error localizedDescription]]);
 		else if (normalizedURL == nil)
@@ -618,18 +617,17 @@ DEBUG_FINALIZE();
 	ViDocument *document = nil;
 
 	/* Check if the current view contains a modified document. */
-	id<ViViewController> viewController = [self currentView];
-	if ([viewController respondsToSelector:@selector(document)] &&
-	    [_modifiedSet containsObject:[viewController document]])
-		document = [viewController document];
+	ViDocumentView *docView = [self currentDocumentView];
+	if (docView && [_modifiedSet containsObject:[docView document]])
+		document = [docView document];
 
 	/* Check if current tab has a view of a modified document. */
 	if (document == nil) {
 		ViTabController *tabController = [self selectedTabController];
-		for (viewController in [tabController views])
-			if ([viewController respondsToSelector:@selector(document)] &&
-			    [_modifiedSet containsObject:[viewController document]]) {
-				document = [viewController document];
+		for (ViViewController *viewController in [tabController views])
+			if ([viewController isKindOfClass:[ViDocumentView class]] &&
+			    [_modifiedSet containsObject:[(ViDocumentView *)viewController document]]) {
+				document = [(ViDocumentView *)viewController document];
 				break;
 			}
 	}
@@ -872,12 +870,19 @@ DEBUG_FINALIZE();
 	[[ViMarkManager sharedManager] removeStack:_tagStack];
 }
 
-- (id<ViViewController>)currentView
+- (ViDocumentView *)currentDocumentView
+{
+	if ([_currentView isKindOfClass:[ViDocumentView class]])
+		return (ViDocumentView *)_currentView;
+	return nil;
+}
+
+- (ViViewController *)currentView
 {
 	return _currentView;
 }
 
-- (void)setCurrentView:(id<ViViewController>)viewController
+- (void)setCurrentView:(ViViewController *)viewController
 {
 	[self willChangeCurrentView]; // if it wasn't called before
 	[viewController retain];
@@ -913,11 +918,11 @@ DEBUG_FINALIZE();
 /* almost, but not quite, like :quit */
 - (IBAction)closeCurrent:(id)sender
 {
-	id<ViViewController> viewController = [self currentView];
+	ViDocumentView *docView = [self currentDocumentView];
 
 	/* If the current view is a document view, check if it's the last view for the document. */
-	if ([viewController respondsToSelector:@selector(document)]) {
-		ViDocument *doc = [viewController document];
+	if (docView) {
+		ViDocument *doc = [docView document];
 
 		/* Check if this document is open in another window. */
 		BOOL openElsewhere = NO;
@@ -939,7 +944,7 @@ DEBUG_FINALIZE();
 		}
 	}
 
-	[self closeDocumentView:viewController
+	[self closeDocumentView:[self currentView]
 	       canCloseDocument:YES
 		 canCloseWindow:YES];
 }
@@ -975,9 +980,9 @@ DEBUG_FINALIZE();
  */
 - (BOOL)closeCurrentViewUnlessLast
 {
-	ViDocumentView *docView = [self currentView];
-	if ([tabView numberOfTabViewItems] > 1 || [[[docView tabController] views] count] > 1) {
-		[self closeDocumentView:docView
+	ViViewController *viewController = [self currentView];
+	if ([tabView numberOfTabViewItems] > 1 || [[viewController.tabController views] count] > 1) {
+		[self closeDocumentView:viewController
 		       canCloseDocument:NO
 			 canCloseWindow:NO];
 		return YES;
@@ -1009,7 +1014,7 @@ DEBUG_FINALIZE();
 	return doc ?: [_documents anyObject];
 }
 
-- (void)closeDocumentView:(id<ViViewController>)viewController
+- (void)closeDocumentView:(ViViewController *)viewController
 	 canCloseDocument:(BOOL)canCloseDocument
 	   canCloseWindow:(BOOL)canCloseWindow
 {
@@ -1156,27 +1161,18 @@ DEBUG_FINALIZE();
 		return NO;
 	}
 
-	NSMutableSet *set = [NSMutableSet set];
+	NSSet *set = [tabController representedObjectsOfClass:[ViDocument class] matchingCriteria:^(id obj) {
+		ViDocument *document = obj;
 
-	/* Close all documents in this tab. */
-	id<ViViewController> viewController;
-	for (viewController in [tabController views]) {
-		if ([viewController respondsToSelector:@selector(document)]) {
-			if ([set containsObject:[viewController document]])
-				continue;
-			if (![[viewController document] isDocumentEdited])
-				continue;
+		if (![document isDocumentEdited])
+			return NO;
 
-			id<ViViewController> otherDocView;
-			for (otherDocView in [[viewController document] views])
-				if ([otherDocView tabController] != tabController)
-					break;
-			if (otherDocView != nil)
-				continue;
-
-			[set addObject:[viewController document]];
-		}
-	}
+		ViDocumentView *otherDocView;
+		for (otherDocView in [document views])
+			if (otherDocView.tabController != tabController)
+				break;
+		return (otherDocView == nil);
+	}];
 
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
@@ -1192,7 +1188,6 @@ DEBUG_FINALIZE();
 
 - (void)tabView:(NSTabView *)aTabView didCloseTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	ViTabController *tabController = [tabViewItem identifier];
 	[tabViewItem unbind:@"label"];
 	[tabViewItem setIdentifier:nil];
 }
@@ -1211,7 +1206,7 @@ DEBUG_FINALIZE();
 - (void)firstResponderChanged:(NSNotification *)notification
 {
 	NSView *view = [notification object];
-	id<ViViewController> viewController = [self viewControllerForView:view];
+	ViViewController *viewController = [self viewControllerForView:view];
 	if (viewController) {
 		if (_parser.partial) {
 			[self message:@"Vi command interrupted."];
@@ -1232,7 +1227,7 @@ DEBUG_FINALIZE();
 		return;
 
 	// XXX: currentView is the *previously* current view
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		if ([(ViDocumentView *)viewController document] == document)
 			return;
@@ -1275,7 +1270,7 @@ DEBUG_FINALIZE();
 
 - (void)didChangeCurrentView
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return;
 
@@ -1293,7 +1288,7 @@ DEBUG_FINALIZE();
 	_alternateMarkCandidate = nil;
 }
 
-- (void)didSelectViewController:(id<ViViewController>)viewController
+- (void)didSelectViewController:(ViViewController *)viewController
 {
 	DEBUG(@"did select view %@", viewController);
 
@@ -1303,7 +1298,7 @@ DEBUG_FINALIZE();
 	[[ViEventManager defaultManager] emit:ViEventWillSelectView for:self with:self, viewController, nil];
 
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		ViDocumentView *docView = viewController;
+		ViDocumentView *docView = (ViDocumentView *)viewController;
 		if (!_jumping)
 			[[docView textView] pushCurrentLocationOnJumpList];
 		[self didSelectDocument:[docView document]];
@@ -1326,7 +1321,7 @@ DEBUG_FINALIZE();
 /*
  * Selects the tab holding the given document view and focuses the view.
  */
-- (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController
+- (ViViewController *)selectDocumentView:(ViViewController *)viewController
 {
 	DEBUG(@"selecting document view %@", viewController);
 	ViTabController *tabController = [viewController tabController];
@@ -1368,35 +1363,34 @@ DEBUG_FINALIZE();
 		return nil;
 
 	ViDocumentView *docView = nil;
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 
 	/* Check if the current view contains the document. */
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
-		docView = viewController;
+		docView = (ViDocumentView *)viewController;
 		if ([docView document] == document)
-			return viewController;
+			return docView;
 	}
 
 	/* Check if current tab has a view of the document. */
 	ViTabController *tabController = [self selectedTabController];
-	for (viewController in [tabController views])
-		if ([viewController isKindOfClass:[ViDocumentView class]] &&
-		    [[(ViDocumentView *)viewController document] isEqual:document])
-			return viewController;
+	docView = [tabController viewWithDocument:document];
+	if (docView)
+		return docView;
 
 	/* Select any existing view of the document. */
-	if ([document respondsToSelector:@selector(views)] && [[document views] count] > 0) {
+	if ([[document views] count] > 0) {
 		docView = [[document views] anyObject];
 		/*
 		 * If the tab with the document view contains more views
 		 * of the same document, prefer the selected view in the
 		 * (randomly) selected tab controller.
 		 */
-		id<ViViewController> selView = [[docView tabController] selectedView];
+		ViViewController *selView = [[docView tabController] selectedView];
 		if ([selView isKindOfClass:[ViDocumentView class]] &&
 		    [(ViDocumentView *)selView document] == document)
-			return [self selectDocumentView:selView];
-		return [self selectDocumentView:docView];
+			return (ViDocumentView *)selView;
+		return docView;
 	}
 
 	/* No open view for the given document. */
@@ -1419,7 +1413,7 @@ DEBUG_FINALIZE();
 
 	ViDocumentView *docView = [self viewForDocument:document];
 	if (docView)
-		return [self selectDocumentView:docView];
+		return (ViDocumentView *)[self selectDocumentView:docView];
 
 	/* No view exists of the document, create a new tab. */
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"] ||
@@ -1427,7 +1421,7 @@ DEBUG_FINALIZE();
 		docView = [self createTabForDocument:document];
 	else
 		docView = [self switchToDocument:document];
-	return [self selectDocumentView:docView];
+	return (ViDocumentView *)[self selectDocumentView:docView];
 }
 
 - (IBAction)selectNextTab:(id)sender
@@ -1477,7 +1471,7 @@ DEBUG_FINALIZE();
 		[tabView selectTabViewItem:[tabs objectAtIndex:anIndex]];
 }
 
-- (id<ViViewController>)switchToDocument:(ViDocument *)doc
+- (ViDocumentView *)switchToDocument:(ViDocument *)doc
 {
 	if (doc == nil)
 		return nil;
@@ -1489,12 +1483,12 @@ DEBUG_FINALIZE();
 
 	if ([[self currentView] isKindOfClass:[ViDocumentView class]] &&
 	    [[(ViDocumentView *)[self currentView] document] isEqual:doc])
-		return [self currentView];
+		return (ViDocumentView *)[self currentView];
 
 	ViTabController *tabController = [self selectedTabController];
-	id<ViViewController> viewController = [tabController replaceView:[self currentView]
-							    withDocument:doc];
-	return [self selectDocumentView:viewController];
+	ViDocumentView *docView = [tabController replaceView:[self currentView]
+						withDocument:doc];
+	return (ViDocumentView *)[self selectDocumentView:docView];
 }
 
 - (ViTabController *)selectedTabController
@@ -1521,14 +1515,14 @@ DEBUG_FINALIZE();
 	return nil;
 }
 
-- (id<ViViewController>)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position
+- (ViDocumentView *)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position
 {
 	if (![_documents containsObject:doc]) {
 		[doc addWindowController:self];
 		[self addDocument:doc];
 	}
 
-	id<ViViewController> viewController = nil;
+	ViDocumentView *docView = nil;
 	BOOL prefertabs = [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"];
 
 	/* Can't replace named or edited documents, or documents with multiple views. */
@@ -1572,11 +1566,11 @@ DEBUG_FINALIZE();
 			[tabBar disableAnimations];
 
 		if (forceSwitch || position == ViViewPositionReplace || (position == ViViewPositionDefault && !prefertabs))
-			viewController = [self switchToDocument:doc];
+			docView = [self switchToDocument:doc];
 		else if (position == ViViewPositionTab)
-			viewController = [self createTabForDocument:doc];
+			docView = [self createTabForDocument:doc];
 		else
-			viewController = [self selectDocument:doc];
+			docView = [self selectDocument:doc];
 
 		if (closeThisDocument) {
 			[closeThisDocument closeAndWindow:NO];
@@ -1584,13 +1578,13 @@ DEBUG_FINALIZE();
 		}
 	} else {
 		ViTabController *tabController = [[self currentView] tabController];
-		viewController = [tabController splitView:[self currentView]
-						 withView:[doc makeView]
-						 position:position];
-		[self selectDocumentView:viewController];
+		docView = (ViDocumentView *)[tabController splitView:[self currentView]
+							    withView:[doc makeView]
+							  positioned:position];
+		[self selectDocumentView:docView];
 	}
 
-	return viewController;
+	return docView;
 }
 
 - (BOOL)gotoMark:(ViMark *)mark positioned:(ViViewPosition)viewPosition recordJump:(BOOL)isJump
@@ -1601,7 +1595,7 @@ DEBUG_FINALIZE();
 	/* XXX: prevent pushing an extraneous jump on the list. */
 	_jumping = !isJump;
 
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (!_jumping && [viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] pushCurrentLocationOnJumpList];
 
@@ -1666,7 +1660,7 @@ DEBUG_FINALIZE();
 
 - (IBAction)splitViewHorizontally:(id)sender
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return;
 
@@ -1680,7 +1674,7 @@ DEBUG_FINALIZE();
 
 - (IBAction)splitViewVertically:(id)sender
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return;
 
@@ -1692,14 +1686,14 @@ DEBUG_FINALIZE();
 	}
 }
 
-- (id<ViViewController>)viewControllerForView:(NSView *)aView
+- (ViViewController *)viewControllerForView:(NSView *)aView
 {
 	if (aView == nil)
 		return nil;
 
 	NSArray *tabs = [tabBar representedTabViewItems];
 	for (NSTabViewItem *item in tabs) {
-		id<ViViewController> viewController = [[item identifier] viewControllerForView:aView];
+		ViViewController *viewController = [[item identifier] viewControllerForView:aView];
 		if (viewController)
 			return viewController;
 	}
@@ -1713,7 +1707,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)normalizeSplitViewSizesInCurrentTab
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return NO;
 
@@ -1724,7 +1718,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)closeOtherViews
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return NO;
 
@@ -1739,7 +1733,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)moveCurrentViewToNewTab
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if (viewController == nil)
 		return NO;
 
@@ -1763,7 +1757,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
 {
-	id<ViViewController> viewController, otherViewController;
+	ViViewController *viewController, *otherViewController;
 	if ([aView respondsToSelector:@selector(tabController)])
 		viewController = aView;
 	else
@@ -1776,10 +1770,10 @@ DEBUG_FINALIZE();
 	return YES;
 }
 
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL
-                     orSwitchToDocument:(ViDocument *)doc
-                        allowReusedView:(BOOL)allowReusedView
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL
+		 orSwitchToDocument:(ViDocument *)doc
+		    allowReusedView:(BOOL)allowReusedView
 {
 	ViDocumentController *ctrl = [ViDocumentController sharedDocumentController];
 	BOOL newDoc = YES;
@@ -1817,25 +1811,20 @@ DEBUG_FINALIZE();
 		[doc addWindowController:self];
 		[self addDocument:doc];
 
-		id<ViViewController> viewController = [self currentView];
+		ViViewController *viewController = [self currentView];
 		ViTabController *tabController = [viewController tabController];
 		ViDocumentView *newDocView = nil;
 		if (allowReusedView && !newDoc) {
 			/* Check if the tab already has a view for this document. */
-			for (id<ViViewController> v in tabController.views)
-				if ([v respondsToSelector:@selector(document)] &&
-				    [v document] == doc) {
-					newDocView = v;
-					break;
-				}
+			newDocView = [tabController viewWithDocument:doc];
 		}
 		if (newDocView == nil) {
 			if (tabController == nil) {
 				newDocView = [self createTabForDocument:doc];
 			} else {
-				newDocView = [tabController splitView:viewController
-							     withView:[doc makeView]
-							   vertically:isVertical];
+				newDocView = (ViDocumentView *)[tabController splitView:viewController
+									       withView:[doc makeView]
+									     vertically:isVertical];
 			}
 		}
 		[self selectDocumentView:newDocView];
@@ -1845,7 +1834,7 @@ DEBUG_FINALIZE();
 			 * If we're splitting a document, position
 			 * the caret in the new view appropriately.
 			 */
-			ViDocumentView *docView = viewController;
+			ViDocumentView *docView = (ViDocumentView *)viewController;
 			[[newDocView textView] setCaret:[[docView textView] caret]];
 			[[newDocView textView] scrollRangeToVisible:NSMakeRange([[docView textView] caret], 0)];
 		}
@@ -1856,8 +1845,8 @@ DEBUG_FINALIZE();
 	return nil;
 }
 
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL
 {
 	return [self splitVertically:isVertical
 			     andOpen:filenameOrURL
@@ -1865,9 +1854,9 @@ DEBUG_FINALIZE();
 		     allowReusedView:YES];
 }
 
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL
-                     orSwitchToDocument:(ViDocument *)doc
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL
+		 orSwitchToDocument:(ViDocument *)doc;
 {
 	return [self splitVertically:isVertical
 			     andOpen:filenameOrURL
@@ -2027,7 +2016,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
 	ViMark *here = nil;
 
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViTextView *tv = [(ViDocumentView *)viewController textView];
 		if (tv == nil)
@@ -2113,7 +2102,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)window_last:(ViCommand *)command
 {
 	ViTabController *tabController = [[self currentView] tabController];
-	id<ViViewController> prevView = tabController.previousView;
+	ViViewController *prevView = tabController.previousView;
 	if (prevView == nil)
 		return NO;
 	[self selectDocumentView:prevView];
@@ -2123,8 +2112,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)window_next:(ViCommand *)command
 {
 	ViTabController *tabController = [[self currentView] tabController];
-	id<ViViewController> nextView = [tabController nextViewClockwise:YES
-							      relativeTo:[[self currentView] view]];
+	ViViewController *nextView = [tabController nextViewClockwise:YES
+							   relativeTo:[[self currentView] view]];
 	if (nextView == nil)
 		return NO;
 	[self selectDocumentView:nextView];
@@ -2134,8 +2123,8 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)window_previous:(ViCommand *)command
 {
 	ViTabController *tabController = [[self currentView] tabController];
-	id<ViViewController> nextView = [tabController nextViewClockwise:NO
-							      relativeTo:[[self currentView] view]];
+	ViViewController *nextView = [tabController nextViewClockwise:NO
+							   relativeTo:[[self currentView] view]];
 	if (nextView == nil)
 		return NO;
 	[self selectDocumentView:nextView];
@@ -2343,7 +2332,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 {
 	ViDocumentController *docController = [ViDocumentController sharedDocumentController];
 	NSError *error = nil;
-	id<ViViewController> viewController = nil;
+	ViViewController *viewController = nil;
 
 	if (command.arg == nil) {
 		/* Re-open current file if force flag specified (:e!). */
@@ -2667,7 +2656,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 - (id)ex_quit:(ExCommand *)command
 {
-	id<ViViewController> viewController = [self currentView];
+	ViViewController *viewController = [self currentView];
 	if ([tabView numberOfTabViewItems] > 1 || [[[[self currentView] tabController] views] count] > 1) {
 		[self closeDocumentView:viewController
 		       canCloseDocument:NO

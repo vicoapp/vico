@@ -147,7 +147,7 @@ DEBUG_FINALIZE();
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-	for (id<ViViewController> view in _views) {
+	for (ViDocumentView *view in _views) {
 		MEMDEBUG(@"got remaining view %@", view);
 		[_textStorage removeLayoutManager:[(ViTextView *)[view innerView] layoutManager]];
 		[view setDocument:nil];

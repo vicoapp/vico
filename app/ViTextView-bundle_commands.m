@@ -200,9 +200,9 @@
 		MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 		keepMessagesHack = YES;
 	} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
-		id<ViViewController> viewController = [[[self window] windowController] currentView];
+		ViViewController *viewController = [[[self window] windowController] currentView];
 		ViTabController *tabController = [viewController tabController];
-		id<ViViewController> webView = nil;
+		ViViewController *webView = nil;
 		/* Try to reuse any existing web view in the current tab. */
 		for (webView in [tabController views]) {
 			if ([webView isKindOfClass:[ViCommandOutputController class]])
@@ -269,10 +269,10 @@
 			    inRange:r];
 	} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
 		   [outputFormat isEqualToString:@"createNewDocument"]) {
-		id<ViViewController> viewController = [[[self window] windowController] splitVertically:NO
-												andOpen:nil
-										     orSwitchToDocument:nil];
-		ViDocument *doc = [viewController document];
+		ViDocumentView *docView = [[[self window] windowController] splitVertically:NO
+										    andOpen:nil
+									 orSwitchToDocument:nil];
+		ViDocument *doc = [docView document];
 		[doc setString:outputText];
 	} else if ([outputFormat isEqualToString:@"discard"])
 		;

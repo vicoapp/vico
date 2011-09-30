@@ -121,6 +121,7 @@ OBJC_SRCS = \
 	ViToolbarPopUpButtonCell.m \
 	ViTransformer.m \
 	ViURLManager.m \
+	ViViewController.m \
 	ViWebView.m \
 	ViWindow.m \
 	ViWindowController.m \
@@ -286,16 +287,6 @@ CC = clang
 CXX = clang++
 IBTOOL = /Developer/usr/bin/ibtool
 
-# warning flags
-CFLAGS	+= -Wreturn-type \
-	   -Wparentheses \
-	   -Wswitch \
-	   -Wno-unused-parameter \
-	   -Wunused-variable \
-	   -Wunused-value \
-	   -Wshorten-64-to-32
-CFLAGS	+= -Wall
-
 REPO_VERSION := $(shell MACOSX_DEPLOYMENT_TARGET="" hg identify -n .)
 
 ifeq ($(CONFIGURATION),DEBUG)
@@ -307,6 +298,16 @@ CFLAGS = -Os -DRELEASE_BUILD=1
 SHORT_VERSION = $(shell cat version.h)
 ARCH_CFLAGS = -arch x86_64 -arch i386
 endif
+
+# warning flags
+CFLAGS	+= -Wreturn-type \
+	   -Wparentheses \
+	   -Wswitch \
+	   -Wno-unused-parameter \
+	   -Wunused-variable \
+	   -Wunused-value
+	   #-Wshorten-64-to-32
+CFLAGS	+= -Wall -Werror
 
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 
@@ -448,28 +449,30 @@ api:
 		--create-html \
 		--no-create-docset \
 		--merge-categories \
-		app/ViRegisterManager.h \
-		app/ViScope.h \
-		app/ViWindowController.h \
-		app/ViTabController.h \
-		app/ViMap.h \
-		app/ViEventManager.h \
-		app/ViTextView.h \
-		app/ViTextStorage.h \
-		app/ViKeyManager.h \
-		app/ViParser.h \
+		app/ExCommand.h \
+		app/ExMap.h \
+		app/ExParser.h \
+		app/NSEvent-keyAdditions.h \
+		app/NSString-additions.h \
+		app/NSView-additions.h \
 		app/ViCommand.h \
 		app/ViDocument.h \
-		app/ViMark.h \
+		app/ViDocumentView.h \
+		app/ViEventManager.h \
+		app/ViKeyManager.h \
 		app/ViLanguage.h \
+		app/ViMap.h \
+		app/ViMark.h \
+		app/ViParser.h \
 		app/ViPreferencePane.h \
 		app/ViPreferencesController.h \
-		app/NSEvent-keyAdditions.h \
-		app/NSView-additions.h \
-		app/NSString-additions.h \
-		app/ExParser.h \
-		app/ExCommand.h \
-		app/ExMap.h
+		app/ViRegisterManager.h \
+		app/ViScope.h \
+		app/ViTabController.h \
+		app/ViTextStorage.h \
+		app/ViTextView.h \
+		app/ViViewController.h \
+		app/ViWindowController.h
 
 syncapi: api
 	rsync -av --delete  doc/html/ www:/var/www/feedback.vicoapp.com/public/api

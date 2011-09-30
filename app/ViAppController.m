@@ -456,7 +456,7 @@ updateMeta(void)
 - (void)applicationWillResignActive:(NSNotification *)aNotification
 {
 	ViWindowController *wincon = [ViWindowController currentWindowController];
-	id<ViViewController> viewController = [wincon currentView];
+	ViViewController *viewController = [wincon currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]])
 		[[(ViDocumentView *)viewController textView] rememberNormalModeInputSource];
 
@@ -476,7 +476,7 @@ updateMeta(void)
 	_recently_launched = NO;
 
 	ViWindowController *wincon = [ViWindowController currentWindowController];
-	id<ViViewController> viewController = [wincon currentView];
+	ViViewController *viewController = [wincon currentView];
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		[[(ViDocumentView *)viewController textView] resetInputSource];
 	}
@@ -676,7 +676,7 @@ additionalBindings:(NSDictionary *)bindings
 	/*
 	 * Insert the current document in the title for "Close Document".
 	 */
-	id<ViViewController> viewController = [[ViWindowController currentWindowController] currentView];
+	ViViewController *viewController = [[ViWindowController currentWindowController] currentView];
 	if (viewController == nil || !isDocWindow)
 		[closeDocumentMenuItem setTitle:@"Close Document"];
 	else

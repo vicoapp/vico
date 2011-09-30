@@ -160,11 +160,9 @@
 			[symbolView expandItem:[windowController currentDocument]];
 		}
 
-		id<ViViewController> viewController = [windowController currentView];
-		if ([viewController isKindOfClass:[ViDocumentView class]]) {
-			ViDocumentView *docView = viewController;
-			[self updateSelectedSymbolForLocation:[[docView textView] caret]];
-		}
+		ViViewController *viewController = [windowController currentView];
+		if ([viewController isKindOfClass:[ViDocumentView class]])
+			[self updateSelectedSymbolForLocation:[[(ViDocumentView *)viewController textView] caret]];
 	}
 	_symbolUpdateDuringFiltering = NO;
 }

@@ -1,5 +1,7 @@
 @class ViDocument;
 @class ViTabController;
+@class ViViewController;
+@class ViDocumentView;
 
 typedef enum ViViewPosition ViViewPosition;
 typedef enum ViViewOrderingMode ViViewOrderingMode;
@@ -24,23 +26,7 @@ enum ViViewOrderingMode {
 	ViViewLast
 };
 
-@protocol ViViewDocument;
 
-/** Controller object wrapping a split view.
- */
-@protocol ViViewController <NSObject>
-/** The NSView that should be displayed in the split. */
-@property(nonatomic,readonly) NSView *view;
-/** The inner NSView will be made key when the view gets focus. */
-@property(nonatomic,readonly) NSView *innerView;
-/** The containing tab controller. */
-@property(nonatomic,readwrite,assign) ViTabController *tabController;
-/** The title of the split view. */
-- (NSString *)title;
-@optional
-/** The document that is being displayed, if available. */
-@property(nonatomic,readwrite,assign) id<ViViewDocument> document;
-@end
 
 /** A document which can have multiple views.
  */
@@ -48,17 +34,17 @@ enum ViViewOrderingMode {
 /** Add a view to the set of visible views.
  * @param viewController The view to add.
  */
-- (void)addView:(id<ViViewController>)viewController;
+- (void)addView:(ViViewController *)viewController;
 
 /** Remove a view from the set of visible views.
  * @param viewController The view to remove.
  */
-- (void)removeView:(id<ViViewController>)viewController;
+- (void)removeView:(ViViewController *)viewController;
 
 /** Create a new view of the document.
  * @returns The newly created view of the document.
  */
-- (id<ViViewController>)makeView;
+- (ViViewController *)makeView;
 
 /** Create a new view of the document by cloning an existing view.
  *
@@ -66,7 +52,7 @@ enum ViViewOrderingMode {
  * @param oldView The view that is being cloned.
  * @returns The newly created view of the document.
  */
-- (id<ViViewController>)cloneView:(id<ViViewController>)oldView;
+- (ViViewController *)cloneView:(ViViewController *)oldView;
 
 /**
  * @returns The set of visible views of the document.
@@ -79,6 +65,9 @@ enum ViViewOrderingMode {
 - (BOOL)isDocumentEdited;
 @end
 
+
+
+
 /** A controller of a tab.
  */
 @interface ViTabController : NSObject
@@ -86,19 +75,19 @@ enum ViViewOrderingMode {
 	NSSplitView		*_splitView;
 	NSMutableArray		*_views;
 	NSWindow		*_window;
-	id<ViViewController>	 _selectedView;
-	id<ViViewController>	 _previousView;
+	ViViewController	*_selectedView;
+	ViViewController	*_previousView;
 }
 
 @property(nonatomic,readonly) NSArray *views;
 /** The window this tab belongs to. */
 @property(nonatomic,readonly) NSWindow *window;
-@property(nonatomic,readwrite,retain) id<ViViewController> selectedView;
-@property(nonatomic,readwrite,retain) id<ViViewController> previousView;
+@property(nonatomic,readwrite,retain) ViViewController *selectedView;
+@property(nonatomic,readwrite,retain) ViViewController *previousView;
 
-- (id)initWithViewController:(id<ViViewController>)initialViewController
+- (id)initWithViewController:(ViViewController *)initialViewController
 		      window:(NSWindow *)aWindow;
-- (void)addView:(id<ViViewController>)aView;
+- (void)addView:(ViViewController *)aView;
 - (NSView *)view;
 
 /** @name Splitting views */
@@ -109,9 +98,9 @@ enum ViViewOrderingMode {
  * @param isVertical YES if the split is vertical, NO if horizontal.
  * @returns newViewController or `nil` on failure.
  */
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-                         withView:(id<ViViewController>)newViewController
-                       vertically:(BOOL)isVertical;
+- (ViViewController *)splitView:(ViViewController *)viewController
+		       withView:(ViViewController *)newViewController
+		     vertically:(BOOL)isVertical;
 
 /** Splits a view and displays another view.
  * @param viewController The view that should be split.
@@ -119,9 +108,9 @@ enum ViViewOrderingMode {
  * @param position The position of the split (left, right, above or below)
  * @returns newViewController or `nil` on failure.
  */
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-			 withView:(id<ViViewController>)newViewController
-			 position:(ViViewPosition)position;
+- (ViViewController *)splitView:(ViViewController *)viewController
+		       withView:(ViViewController *)newViewController
+		     positioned:(ViViewPosition)position;
 
 /** Splits a view and displays a clone of the view.
  *
@@ -131,23 +120,28 @@ enum ViViewOrderingMode {
  * @param isVertical YES if the split is vertical, NO if horizontal.
  * @returns The new view controller or `nil` on failure.
  */
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-                       vertically:(BOOL)isVertical;
+- (ViViewController *)splitView:(ViViewController *)viewController
+		     vertically:(BOOL)isVertical;
 
-- (id<ViViewController>)replaceView:(id<ViViewController>)aView
-                       withDocument:(ViDocument *)document;
+- (ViDocumentView *)replaceView:(ViViewController *)viewController
+		   withDocument:(ViDocument *)document;
 
-- (void)closeView:(id<ViViewController>)viewController;
+- (void)closeView:(ViViewController *)viewController;
 
-- (void)closeViewsOtherThan:(id<ViViewController>)viewController;
+- (void)closeViewsOtherThan:(ViViewController *)viewController;
+
+- (NSSet *)representedObjectsOfClass:(Class)class matchingCriteria:(BOOL (^)(id))block;
 - (NSSet *)documents;
 
-- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position
-                            relativeTo:(NSView *)aView;
+- (ViViewController *)viewOfClass:(Class)class withRepresentedObject:(id)repObj;
+- (ViDocumentView *)viewWithDocument:(ViDocument *)document;
 
-- (id<ViViewController>)nextViewClockwise:(BOOL)clockwise
-			       relativeTo:(NSView *)view;
-- (id<ViViewController>)viewControllerForView:(NSView *)aView;
+- (ViViewController *)viewAtPosition:(ViViewOrderingMode)position
+			  relativeTo:(NSView *)aView;
+
+- (ViViewController *)nextViewClockwise:(BOOL)clockwise
+			     relativeTo:(NSView *)view;
+- (ViViewController *)viewControllerForView:(NSView *)aView;
 - (void)normalizeAllViews;
 
 @end

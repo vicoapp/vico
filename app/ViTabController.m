@@ -13,7 +13,7 @@
 @synthesize selectedView = _selectedView;
 @synthesize previousView = _previousView;
 
-- (id)initWithViewController:(id<ViViewController>)initialViewController
+- (id)initWithViewController:(ViViewController *)initialViewController
 		      window:(NSWindow *)aWindow
 {
 	if ((self = [super init]) != nil) {
@@ -44,21 +44,18 @@
 	[super dealloc];
 }
 
-- (void)addView:(id<ViViewController>)viewController
+- (void)addView:(ViViewController *)viewController
 {
 	[viewController setTabController:self];
 	[_views addObject:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidAddView for:viewController with:viewController, nil];
-	if ([viewController respondsToSelector:@selector(document)])
-		[[viewController document] addView:viewController];
 }
 
-- (void)removeView:(id<ViViewController>)viewController
+- (void)removeView:(ViViewController *)viewController
 {
 	[viewController retain];
 	DEBUG(@"remove view %@", viewController);
-	if ([viewController respondsToSelector:@selector(document)])
-		[[viewController document] removeView:viewController];
+	[viewController setTabController:nil];
 	[_views removeObject:viewController];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViViewClosedNotification
 							    object:viewController];
@@ -69,20 +66,41 @@
 	[viewController release];
 }
 
-- (NSSet *)documents
+- (NSSet *)representedObjectsOfClass:(Class)class matchingCriteria:(BOOL (^)(id))block
 {
 	NSMutableSet *set = [NSMutableSet set];
 
-	for (id<ViViewController> viewController in _views) {
-		if ([viewController isKindOfClass:[ViDocumentView class]]) {
-			ViDocumentView *docView = viewController;
-			ViDocument *document = [docView document];
-			if (![set containsObject:document])
-				[set addObject:document];
+	for (ViViewController *viewController in _views) {
+		id obj = [viewController representedObject];
+		if ([obj isKindOfClass:class]) {
+			if (block == nil || block(obj))
+				[set addObject:obj];
 		}
 	}
 
 	return set;
+}
+
+- (NSSet *)documents
+{
+	return [self representedObjectsOfClass:[ViDocument class]
+			      matchingCriteria:nil];
+}
+
+- (ViViewController *)viewOfClass:(Class)class withRepresentedObject:(id)repObj
+{
+	for (ViViewController *viewController in _views) {
+		if ([viewController isKindOfClass:class] &&
+		    [viewController representedObject] == repObj)
+			return viewController;
+	}
+	return nil;
+}
+
+- (ViDocumentView *)viewWithDocument:(ViDocument *)document
+{
+	return (ViDocumentView *)[self viewOfClass:[ViDocumentView class]
+			     withRepresentedObject:document];
 }
 
 - (NSView *)view
@@ -109,9 +127,9 @@
 		[split setPosition:pos ofDividerAtIndex:i - 1];
 }
 
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-			 withView:(id<ViViewController>)newViewController
-			 position:(ViViewPosition)position
+- (ViViewController *)splitView:(ViViewController *)viewController
+		       withView:(ViViewController *)newViewController
+		     positioned:(ViViewPosition)position
 {
 	NSParameterAssert(viewController);
 	NSParameterAssert(newViewController);
@@ -174,40 +192,41 @@
 	return newViewController;
 }
 
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-                         withView:(id<ViViewController>)newViewController
-                       vertically:(BOOL)isVertical
+- (ViViewController *)splitView:(ViViewController *)viewController
+		       withView:(ViViewController *)newViewController
+		     vertically:(BOOL)isVertical
 {
 	return [self splitView:viewController
 		      withView:newViewController
-		      position:isVertical ? ViViewPositionSplitLeft : ViViewPositionSplitAbove];
+		    positioned:isVertical ? ViViewPositionSplitLeft : ViViewPositionSplitAbove];
 }
 
-- (id<ViViewController>)splitView:(id<ViViewController>)viewController
-                       vertically:(BOOL)isVertical
+- (ViViewController *)splitView:(ViViewController *)viewController
+		     vertically:(BOOL)isVertical
 {
-	if (![viewController respondsToSelector:@selector(document)])
+	if (![viewController isKindOfClass:[ViDocumentView class]])
 		return nil;
 
-	id<ViViewController> newView = [[viewController document] cloneView:viewController];
+	ViDocumentView *docView = (ViDocumentView *)viewController;
+	ViViewController *newView = [[docView document] cloneView:docView];
 	if (![self splitView:viewController withView:newView vertically:isVertical])
 		return nil;
 
 	return newView;
 }
 
-- (id<ViViewController>)replaceView:(id<ViViewController>)viewController
-                       withDocument:(id<ViViewDocument>)document
+- (ViDocumentView *)replaceView:(ViViewController *)viewController
+		   withDocument:(ViDocument *)document
 {
-	id<ViViewController> newViewController = [document makeView];
+	ViDocumentView *newDocView = [document makeView];
 
-	[self addView:newViewController];
+	[self addView:newDocView];
 	[self removeView:viewController];
 
 	if (_selectedView == viewController)
-		[self setSelectedView:newViewController];
+		[self setSelectedView:newDocView];
 
-	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newViewController view], newViewController);
+	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newDocView view], newDocView);
 
 	/*
 	 * Remember all subview sizes so we can restore the position
@@ -224,7 +243,7 @@
 			[sizes addObject:[NSNumber numberWithFloat:[view bounds].size.height]];
 	}
 
-	[split replaceSubview:[viewController view] with:[newViewController view]];
+	[split replaceSubview:[viewController view] with:[newDocView view]];
 	DEBUG(@"subviews = %@", [split subviews]);
 
 	/*
@@ -241,10 +260,10 @@
 	}
 	[_splitView adjustSubviews];
 
-	return newViewController;
+	return newDocView;
 }
 
-- (void)closeView:(id<ViViewController>)viewController
+- (void)closeView:(ViViewController *)viewController
 {
 	[self removeView:viewController];
 
@@ -287,13 +306,13 @@
 	}
 }
 
-- (void)closeViewsOtherThan:(id<ViViewController>)viewController
+- (void)closeViewsOtherThan:(ViViewController *)viewController
 {
 	BOOL closed = YES;
 
 	while (closed) {
 		closed = NO;
-		for (id<ViViewController> otherView in _views) {
+		for (ViViewController *otherView in _views) {
 			if (otherView != viewController) {
 				[self closeView:otherView];
 				closed = YES;
@@ -303,9 +322,9 @@
 	}
 }
 
-- (id<ViViewController>)viewControllerForView:(NSView *)aView
+- (ViViewController *)viewControllerForView:(NSView *)aView
 {
-	for (id<ViViewController> viewController in [self views])
+	for (ViViewController *viewController in [self views])
 		if ([viewController view] == aView ||
 		    [viewController innerView] == aView)
 			return viewController;
@@ -314,8 +333,8 @@
 }
 
 - (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view
-                                    isVertical:(BOOL)isVertical
-                                         index:(NSInteger *)indexPtr
+				    isVertical:(BOOL)isVertical
+					 index:(NSInteger *)indexPtr
 {
 	NSView *sup;
 	while (view != nil && ![view isMemberOfClass:[NSTabView class]]) {
@@ -332,7 +351,7 @@
 }
 
 - (NSSplitView *)containingSplitViewRelativeTo:(NSView *)view
-                                         index:(NSInteger *)indexPtr
+					 index:(NSInteger *)indexPtr
 {
 	NSView *sup;
 	while (view != nil && ![view isMemberOfClass:[NSTabView class]]) {
@@ -349,7 +368,7 @@
 }
 
 - (NSView *)containedViewRelativeToView:(NSView *)view
-                                 anchor:(ViViewOrderingMode)anchor
+				 anchor:(ViViewOrderingMode)anchor
 {
 	if ([view isMemberOfClass:[NSSplitView class]]) {
 		if (anchor == ViViewLast ||
@@ -363,8 +382,8 @@
 		return view;
 }
 
-- (id<ViViewController>)viewAtPosition:(ViViewOrderingMode)position
-                            relativeTo:(NSView *)view
+- (ViViewController *)viewAtPosition:(ViViewOrderingMode)position
+			  relativeTo:(NSView *)view
 {
 	if (view == nil)
 		return nil;
@@ -396,8 +415,8 @@
 	return nil;
 }
 
-- (id<ViViewController>)nextViewClockwise:(BOOL)clockwise
-			       relativeTo:(NSView *)view
+- (ViViewController *)nextViewClockwise:(BOOL)clockwise
+			     relativeTo:(NSView *)view
 {
 	DEBUG(@"view = %@", view);
 	NSInteger ndx;
@@ -420,7 +439,7 @@
 		view = [subviews objectAtIndex:newIndex];
 		return [self viewControllerForView:[self containedViewRelativeToView:view anchor:anchor]];
 	} else {
-		id<ViViewController> nextView = [self nextViewClockwise:clockwise relativeTo:split];
+		ViViewController *nextView = [self nextViewClockwise:clockwise relativeTo:split];
 		if (nextView)
 			return nextView;
 

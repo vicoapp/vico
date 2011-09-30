@@ -635,9 +635,9 @@ DEBUG_FINALIZE();
 	NSRange r = NSMakeRange(location, 0);
 	if (r.location < [[self textStorage] length])
 		r.length = 1;
-	id<ViViewController> viewController = [windowController viewControllerForView:self];
-	if (viewController)
-		return [ViMark markWithView:viewController
+	ViViewController *viewController = [windowController viewControllerForView:self];
+	if ([viewController isKindOfClass:[ViDocumentView class]])
+		return [ViMark markWithView:(ViDocumentView *)viewController
 				       name:nil
 				      range:r];
 	else

@@ -48,7 +48,7 @@
 
 	BOOL				 _isLoaded;
 	ViDocument			*_initialDocument;
-	id<ViViewController>		 _initialViewController;
+	ViViewController		*_initialViewController;
 	NSMutableSet			*_documents;
 	ViParser			*_parser;
 	ViProject			*_project;
@@ -76,7 +76,7 @@
 	BOOL				 _jumping;
 	IBOutlet NSSegmentedControl	*jumplistNavigator;
 
-	ViDocumentView			*_currentView;
+	ViViewController		*_currentView;
 
 	NSMutableSet			*_modifiedSet;
 
@@ -116,13 +116,13 @@
  */
 - (NSDictionary *)environment;
 
-- (id<ViViewController>)viewControllerForView:(NSView *)aView;
+- (ViViewController *)viewControllerForView:(NSView *)aView;
 
 /*? Selects the tab holding the given document view and focuses the view.
  * @param viewController The view controller to focus.
  * @returns The selected view controller.
  */
-- (id<ViViewController>)selectDocumentView:(id<ViViewController>)viewController;
+- (ViViewController *)selectDocumentView:(ViViewController *)viewController;
 
 /* Return a view for a document.
  * @param document The document to find a view for.
@@ -142,7 +142,7 @@
  * @param viewController The view to display in the new tab.
  * @returns a ViTabController object managing the new tab.
  */
-- (ViTabController *)createTabWithViewController:(id<ViViewController>)viewController;
+- (ViTabController *)createTabWithViewController:(ViViewController *)viewController;
 
 /** Create a new tab.
  * @param document The document to display in the new tab.
@@ -171,9 +171,14 @@
 /**
  * @returns The currently focused view.
  */
-- (id<ViViewController>)currentView;
+- (ViViewController *)currentView;
 
-- (void)setCurrentView:(id<ViViewController>)viewController;
+- (void)setCurrentView:(ViViewController *)viewController;
+
+/**
+ * @returns The currently focused view, or `nil` if the view is not a document view.
+ */
+- (ViDocumentView *)currentDocumentView;
 
 /**
  * @returns The currently focused document, or `nil` if no document is focused.
@@ -196,12 +201,12 @@
 
 - (IBAction)navigateJumplist:(id)sender;
 
-- (id<ViViewController>)switchToDocument:(ViDocument *)doc;
+- (ViDocumentView *)switchToDocument:(ViDocument *)doc;
 
 - (void)switchToDocumentAction:(id)sender;
 
 /* FIXME: document -displayDocument:positioned: */
-- (id<ViViewController>)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position;
+- (ViDocumentView *)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position;
 
 /** Open a document and go to a specific point in the file.
  * @param url The URL of the document to open. The document may already be opened.
@@ -241,21 +246,21 @@
  * @param allowReusedView YES to focus an already visible view for the given document. NO to always create a new split view.
  * @returns The new split view.
  */
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL
-                     orSwitchToDocument:(ViDocument *)doc
-                        allowReusedView:(BOOL)allowReusedView;
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL
+		 orSwitchToDocument:(ViDocument *)doc
+		    allowReusedView:(BOOL)allowReusedView;
 
 /** Split the current view and display another document.
  * @param isVertical YES to split vertically, NO for a horizontal split.
  * @param filenameOrURL A path (as an NSString) or a URL pointing to a document to open. The document may already be open.
  * @returns The new split view, or an existing view if `filenameOrURL` is already open and visible in the same tab.
  */
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL;
-- (id<ViViewController>)splitVertically:(BOOL)isVertical
-                                andOpen:(id)filenameOrURL
-                     orSwitchToDocument:(ViDocument *)doc;
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL;
+- (ViDocumentView *)splitVertically:(BOOL)isVertical
+			    andOpen:(id)filenameOrURL
+		 orSwitchToDocument:(ViDocument *)doc;
 
 // proxies to the project delegate
 - (IBAction)searchFiles:(id)sender;

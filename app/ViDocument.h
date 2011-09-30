@@ -31,6 +31,7 @@
 
 	id<ViDeferred>		 _loader;
 	BOOL			 _busy;
+	BOOL			 _modified;
 
 	ViTextStorage		*_textStorage;
 	NSDictionary		*_typingAttributes;
@@ -80,6 +81,7 @@
 @property(nonatomic,readonly) NSStringEncoding encoding;
 @property(nonatomic,readwrite) BOOL isTemporary;
 @property(nonatomic,readwrite) BOOL busy;
+@property(nonatomic,readwrite,getter=isModified) BOOL modified;
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
 @property(nonatomic,readwrite,retain) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;

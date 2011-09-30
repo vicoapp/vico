@@ -26,17 +26,20 @@
 
 - (id) init
 {
-    if((self = [super init]))
-    {
-        _metalCloseButton = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front"]];
-        _metalCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Pressed"]];
-        _metalCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Rollover"]];
+	if ((self = [super init])) {
+		_metalCloseButton = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front"]];
+		_metalCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Pressed"]];
+		_metalCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabClose_Front_Rollover"]];
 
-        _addTabButtonImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetal"]];
-        _addTabButtonPressedImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalPressed"]];
-        _addTabButtonRolloverImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalRollover"]];
-    }
-    return self;
+		_metalCloseModifiedButton = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabCloseModified_Front"]];
+		_metalCloseModifiedButtonDown = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabCloseModified_Front_Pressed"]];
+		_metalCloseModifiedButtonOver = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabCloseModified_Front_Rollover"]];
+
+		_addTabButtonImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetal"]];
+		_addTabButtonPressedImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalPressed"]];
+		_addTabButtonRolloverImage = [[NSImage alloc] initByReferencingFile:[[PSMTabBarControl bundle] pathForImageResource:@"TabNewMetalRollover"]];
+	}
+	return self;
 }
 
 - (void)dealloc
@@ -45,6 +48,9 @@
 	[_metalCloseButton release];
 	[_metalCloseButtonDown release];
 	[_metalCloseButtonOver release];
+	[_metalCloseModifiedButton release];
+	[_metalCloseModifiedButtonDown release];
+	[_metalCloseModifiedButtonOver release];
 	[_addTabButtonImage release];
 	[_addTabButtonPressedImage release];
 	[_addTabButtonRolloverImage release];
@@ -368,81 +374,87 @@
 
 - (void)drawInteriorWithTabCell:(PSMTabBarCell *)cell inView:(NSView*)controlView
 {
-    NSRect cellFrame = [cell frame];
-    float labelPosition = cellFrame.origin.x + MARGIN_X;
+	NSRect cellFrame = [cell frame];
+	float labelPosition = cellFrame.origin.x + MARGIN_X;
 
-    // close button
-    if ([cell hasCloseButton] && ![cell isCloseButtonSuppressed]) {
-        NSSize closeButtonSize = NSZeroSize;
-        NSRect closeButtonRect = [cell closeButtonRectForFrame:cellFrame];
-        NSImage * closeButton = nil;
+	// close button
+	if ([cell hasCloseButton] && ![cell isCloseButtonSuppressed]) {
+		NSSize closeButtonSize = NSZeroSize;
+		NSRect closeButtonRect = [cell closeButtonRectForFrame:cellFrame];
+		NSImage * closeButton = nil;
 
-        closeButton = _metalCloseButton;
-        if ([cell closeButtonOver]) closeButton = _metalCloseButtonOver;
-        if ([cell closeButtonPressed]) closeButton = _metalCloseButtonDown;
+		if (cell.isModified) {
+			closeButton = _metalCloseModifiedButton;
+			if ([cell closeButtonOver]) closeButton = _metalCloseModifiedButtonOver;
+			if ([cell closeButtonPressed]) closeButton = _metalCloseModifiedButtonDown;
+		} else {
+			closeButton = _metalCloseButton;
+			if ([cell closeButtonOver]) closeButton = _metalCloseButtonOver;
+			if ([cell closeButtonPressed]) closeButton = _metalCloseButtonDown;
+		}
 
-        closeButtonSize = [closeButton size];
-        if ([controlView isFlipped]) {
-            closeButtonRect.origin.y += closeButtonRect.size.height;
-        }
+		closeButtonSize = [closeButton size];
+		if ([controlView isFlipped]) {
+			closeButtonRect.origin.y += closeButtonRect.size.height;
+		}
 
-        [closeButton compositeToPoint:closeButtonRect.origin operation:NSCompositeSourceOver fraction:1.0];
+		[closeButton compositeToPoint:closeButtonRect.origin operation:NSCompositeSourceOver fraction:1.0];
 
-        // scoot label over
-        labelPosition += closeButtonSize.width + kPSMTabBarCellPadding;
-    }
+		// scoot label over
+		labelPosition += closeButtonSize.width + kPSMTabBarCellPadding;
+	}
 
-    // icon
-    if([cell hasIcon]){
-        NSRect iconRect = [self iconRectForTabCell:cell];
-        NSImage *icon = [[[[cell representedObject] identifier] content] icon];
-        if ([controlView isFlipped]) {
-            iconRect.origin.y = cellFrame.size.height - iconRect.origin.y;
-        }
-        [icon compositeToPoint:iconRect.origin operation:NSCompositeSourceOver fraction:1.0];
+	// icon
+	if([cell hasIcon]){
+		NSRect iconRect = [self iconRectForTabCell:cell];
+		NSImage *icon = [[[[cell representedObject] identifier] content] icon];
+		if ([controlView isFlipped]) {
+			iconRect.origin.y = cellFrame.size.height - iconRect.origin.y;
+		}
+		[icon compositeToPoint:iconRect.origin operation:NSCompositeSourceOver fraction:1.0];
 
-        // scoot label over
-        labelPosition += iconRect.size.width + kPSMTabBarCellPadding;
-    }
+		// scoot label over
+		labelPosition += iconRect.size.width + kPSMTabBarCellPadding;
+	}
 
-    // object counter
-    if([cell count] > 0){
-        [[NSColor colorWithCalibratedWhite:0.3 alpha:0.6] set];
-        NSBezierPath *path = [NSBezierPath bezierPath];
-        NSRect myRect = [self objectCounterRectForTabCell:cell];
-        if([cell state] == NSOnState)
-            myRect.origin.y -= 1.0;
-        [path moveToPoint:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y)];
-        [path lineToPoint:NSMakePoint(myRect.origin.x + myRect.size.width - kPSMMetalObjectCounterRadius, myRect.origin.y)];
-        [path appendBezierPathWithArcWithCenter:NSMakePoint(myRect.origin.x + myRect.size.width - kPSMMetalObjectCounterRadius, myRect.origin.y + kPSMMetalObjectCounterRadius) radius:kPSMMetalObjectCounterRadius startAngle:270.0 endAngle:90.0];
-        [path lineToPoint:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y + myRect.size.height)];
-        [path appendBezierPathWithArcWithCenter:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y + kPSMMetalObjectCounterRadius) radius:kPSMMetalObjectCounterRadius startAngle:90.0 endAngle:270.0];
-        [path fill];
+	// object counter
+	if([cell count] > 0){
+		[[NSColor colorWithCalibratedWhite:0.3 alpha:0.6] set];
+		NSBezierPath *path = [NSBezierPath bezierPath];
+		NSRect myRect = [self objectCounterRectForTabCell:cell];
+		if([cell state] == NSOnState)
+			myRect.origin.y -= 1.0;
+		[path moveToPoint:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y)];
+		[path lineToPoint:NSMakePoint(myRect.origin.x + myRect.size.width - kPSMMetalObjectCounterRadius, myRect.origin.y)];
+		[path appendBezierPathWithArcWithCenter:NSMakePoint(myRect.origin.x + myRect.size.width - kPSMMetalObjectCounterRadius, myRect.origin.y + kPSMMetalObjectCounterRadius) radius:kPSMMetalObjectCounterRadius startAngle:270.0 endAngle:90.0];
+		[path lineToPoint:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y + myRect.size.height)];
+		[path appendBezierPathWithArcWithCenter:NSMakePoint(myRect.origin.x + kPSMMetalObjectCounterRadius, myRect.origin.y + kPSMMetalObjectCounterRadius) radius:kPSMMetalObjectCounterRadius startAngle:90.0 endAngle:270.0];
+		[path fill];
 
-        // draw attributed string centered in area
-        NSRect counterStringRect;
-        NSAttributedString *counterString = [self attributedObjectCountValueForTabCell:cell];
-        counterStringRect.size = [counterString size];
-        counterStringRect.origin.x = myRect.origin.x + ((myRect.size.width - counterStringRect.size.width) / 2.0) + 0.25;
-        counterStringRect.origin.y = myRect.origin.y + ((myRect.size.height - counterStringRect.size.height) / 2.0) + 0.5;
-        [counterString drawInRect:counterStringRect];
-    }
+		// draw attributed string centered in area
+		NSRect counterStringRect;
+		NSAttributedString *counterString = [self attributedObjectCountValueForTabCell:cell];
+		counterStringRect.size = [counterString size];
+		counterStringRect.origin.x = myRect.origin.x + ((myRect.size.width - counterStringRect.size.width) / 2.0) + 0.25;
+		counterStringRect.origin.y = myRect.origin.y + ((myRect.size.height - counterStringRect.size.height) / 2.0) + 0.5;
+		[counterString drawInRect:counterStringRect];
+	}
 
-    // label rect
-    NSRect labelRect;
-    labelRect.origin.x = labelPosition;
-    labelRect.size.width = cellFrame.size.width - (labelRect.origin.x - cellFrame.origin.x) - kPSMTabBarCellPadding;
-    labelRect.size.height = cellFrame.size.height;
-    labelRect.origin.y = cellFrame.origin.y + MARGIN_Y;
+	// label rect
+	NSRect labelRect;
+	labelRect.origin.x = labelPosition;
+	labelRect.size.width = cellFrame.size.width - (labelRect.origin.x - cellFrame.origin.x) - kPSMTabBarCellPadding;
+	labelRect.size.height = cellFrame.size.height;
+	labelRect.origin.y = cellFrame.origin.y + MARGIN_Y;
 
-    if(![[cell indicator] isHidden])
-        labelRect.size.width -= (kPSMTabBarIndicatorWidth + kPSMTabBarCellPadding);
+	if(![[cell indicator] isHidden])
+		labelRect.size.width -= (kPSMTabBarIndicatorWidth + kPSMTabBarCellPadding);
 
-    if([cell count] > 0)
-        labelRect.size.width -= ([self objectCounterRectForTabCell:cell].size.width + kPSMTabBarCellPadding);
+	if([cell count] > 0)
+		labelRect.size.width -= ([self objectCounterRectForTabCell:cell].size.width + kPSMTabBarCellPadding);
 
-    // label
-    [[cell attributedStringValue] drawInRect:labelRect];
+	// label
+	[[cell attributedStringValue] drawInRect:labelRect];
 }
 
 - (void)drawTabBar:(PSMTabBarControl *)bar inRect:(NSRect)rect

@@ -62,6 +62,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 @synthesize hiddenView = _hiddenView;
 @synthesize syntaxParser = _syntaxParser;
 @synthesize marks = _marks;
+@synthesize modified = _modified;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
@@ -250,7 +251,7 @@ DEBUG_FINALIZE();
 	void (^completionCallback)(NSURL *, NSDictionary *, NSError *error) = ^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		DEBUG(@"error is %@", error);
 		returnError = error;
-		_busy = NO;
+		[self setBusy:NO];
 		[self setLoader:nil];
 		if (error) {
 			/* If the file doesn't exist, treat it as an untitled file. */
@@ -313,7 +314,7 @@ DEBUG_FINALIZE();
 		[tv prepareRevertDocument];
 	}];
 
-	_busy = YES;
+	[self setBusy:YES];
 	[self setLoader:[[ViURLManager defaultManager] dataWithContentsOfURL:absoluteURL
 								      onData:dataCallback
 								onCompletion:completionCallback]];
@@ -910,9 +911,6 @@ DEBUG_FINALIZE();
 			displayName = [[self fileURL] host];
 	}
 
-	if ([self isDocumentEdited])
-		return [NSString stringWithFormat:@"%@ •", displayName];
-
 	return displayName;
 }
 
@@ -926,14 +924,11 @@ DEBUG_FINALIZE();
 	}
 	BOOL edited = [self isDocumentEdited];
 	[super updateChangeCount:changeType];
-	if (edited != [self isDocumentEdited]) {
-		[self willChangeValueForKey:@"title"];
-		[self didChangeValueForKey:@"title"];
-
+	[self setModified:[self isDocumentEdited]];
+	if (edited != _modified)
 		[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentEditedChangedNotification
 								    object:self
 								  userInfo:nil];
-	}
 }
 
 - (void)setFileURL:(NSURL *)absoluteURL

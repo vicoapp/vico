@@ -239,6 +239,9 @@ IMAGES = \
 	Images/TabClose_Front.tif \
 	Images/TabClose_Front_Pressed.tif \
 	Images/TabClose_Front_Rollover.tif \
+	Images/TabCloseModified_Front.png \
+	Images/TabCloseModified_Front_Pressed.png \
+	Images/TabCloseModified_Front_Rollover.png \
 	Images/TabNewMetal.png \
 	Images/TabNewMetalPressed.png \
 	Images/TabNewMetalRollover.png \

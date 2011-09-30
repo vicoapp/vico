@@ -11,12 +11,16 @@
 #import "PSMTabStyle.h"
 #import "PSMProgressIndicator.h"
 #import "PSMTabDragAssistant.h"
+#include "logging.h"
 
 
 @implementation PSMTabBarCell
 
+@synthesize modified = _modified;
+
 #pragma mark -
 #pragma mark Creation/Destruction
+
 - (id)initWithControlView:(PSMTabBarControl *)controlView
 {
     self = [super init];
@@ -29,6 +33,7 @@
         _indicator = [[PSMProgressIndicator alloc] initWithFrame:NSMakeRect(0.0,0.0,kPSMTabBarIndicatorWidth,kPSMTabBarIndicatorWidth)];
         [_indicator setStyle:NSProgressIndicatorSpinningStyle];
         [_indicator setAutoresizingMask:NSViewMinYMargin];
+	[_indicator setControlSize:NSSmallControlSize];
         _hasCloseButton = YES;
         _isCloseButtonSuppressed = NO;
         _count = 0;

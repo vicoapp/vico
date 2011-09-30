@@ -8,6 +8,8 @@
 @synthesize innerView = _innerView;
 @synthesize document = _document;
 @synthesize tabController = _tabController;
+@synthesize processing = _processing;
+@synthesize modified = _modified;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
 {
@@ -34,14 +36,20 @@
 - (void)setDocument:(ViDocument *)document
 {
 	DEBUG(@"set document %@ -> %@", _document, document);
+	[self unbind:@"processing"];
+	[self unbind:@"modified"];
 	[_document removeObserver:self forKeyPath:@"title"];
 	[document retain];
 	[_document release];
 	_document = document;
-	[_document addObserver:self
-		    forKeyPath:@"title"
-		       options:NSKeyValueObservingOptionNew
-		       context:nil];
+	if (_document) {
+		[_document addObserver:self
+			    forKeyPath:@"title"
+			       options:NSKeyValueObservingOptionNew
+			       context:nil];
+		[self bind:@"processing" toObject:_document withKeyPath:@"busy" options:nil];
+		[self bind:@"modified" toObject:_document withKeyPath:@"modified" options:nil];
+	}
 }
 
 - (NSString *)description

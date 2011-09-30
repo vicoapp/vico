@@ -7,7 +7,6 @@
 * group by attribute != grouped display string
 * can't assume ack's output is in newline chunks
 * don't overwrite read-only files!
-* show baseURL in window title!
 * explorer spinner is hidden by new path control
   => move it, where!? auto-hide something else?
 
@@ -39,7 +38,6 @@
 * convert horizontal split to vertical and vice versa
 * @kamens: Any way to resize splits w/ key bindings? Like <c-w>_ or <c-w>+
 
-* less lame notification of modified documents in tabs (don't append * in title!)
 * bring back explorer / folder bookmarks
 * ctags should present menu for duplicate tags
 * draw marks in gutter view

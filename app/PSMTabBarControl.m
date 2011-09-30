@@ -13,6 +13,7 @@
 #import "PSMTabStyle.h"
 #import "PSMMetalTabStyle.h"
 #import "PSMTabDragAssistant.h"
+#import "ViTabController.h"
 #include "logging.h"
 
 @interface PSMTabBarControl (Private)
@@ -349,57 +350,51 @@
 
 #pragma mark -
 #pragma mark Functionality
+
 - (void)addTabViewItem:(NSTabViewItem *)item
 {
-    // create cell
-    PSMTabBarCell *cell = [[[PSMTabBarCell alloc] initWithControlView:self] autorelease];
-    [cell setRepresentedObject:item];
-    // bind the indicator to the represented object's status (if it exists)
-    [[cell indicator] setHidden:YES];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(isProcessing)]){
-                NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
-                [bindingOptions setObject:NSNegateBooleanTransformerName forKey:@"NSValueTransformerName"];
-                [[cell indicator] bind:@"animate" toObject:[item identifier] withKeyPath:@"selection.isProcessing" options:nil];
-                [[cell indicator] bind:@"hidden" toObject:[item identifier] withKeyPath:@"selection.isProcessing" options:bindingOptions];
-                [[item identifier] addObserver:self forKeyPath:@"selection.isProcessing" options:0 context:nil];
-            }
-        }
-    }
+	// create cell
+	PSMTabBarCell *cell = [[[PSMTabBarCell alloc] initWithControlView:self] autorelease];
+	[cell setRepresentedObject:item];
 
-    // bind for the existence of an icon
-    [cell setHasIcon:NO];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(icon)]){
-                NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
-                [bindingOptions setObject:NSIsNotNilTransformerName forKey:@"NSValueTransformerName"];
-                [cell bind:@"hasIcon" toObject:[item identifier] withKeyPath:@"selection.icon" options:bindingOptions];
-                [[item identifier] addObserver:self forKeyPath:@"selection.icon" options:0 context:nil];
-            }
-        }
-    }
+	// bind the indicator to the represented object's status (if it exists)
+	[[cell indicator] setHidden:NO];
+	ViTabController *tabController = [item identifier];
+	if (tabController != nil) {
+		NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
+		[bindingOptions setObject:NSNegateBooleanTransformerName forKey:@"NSValueTransformerName"];
+		[[cell indicator] bind:@"animate" toObject:tabController withKeyPath:@"selectedView.processing" options:nil];
+		[[cell indicator] bind:@"hidden" toObject:tabController withKeyPath:@"selectedView.processing" options:bindingOptions];
+		[tabController addObserver:self forKeyPath:@"selectedView.processing" options:0 context:nil];
 
-    // bind for the existence of a counter
-    [cell setCount:0];
-    if([item identifier] != nil){
-        if([[item identifier] respondsToSelector:@selector(content)]){
-            if([[[[cell representedObject] identifier] content] respondsToSelector:@selector(objectCount)]){
-                [cell bind:@"count" toObject:[item identifier] withKeyPath:@"selection.objectCount" options:nil];
-                [[item identifier] addObserver:self forKeyPath:@"selection.objectCount" options:0 context:nil];
-            }
-        }
-    }
+#if 0
+		// bind for the existence of an icon
+		[cell setHasIcon:NO];
+		NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
+		[bindingOptions setObject:NSIsNotNilTransformerName forKey:@"NSValueTransformerName"];
+		[cell bind:@"hasIcon" toObject:tabController withKeyPath:@"selectedView.icon" options:bindingOptions];
+		[tabController addObserver:self forKeyPath:@"selectedView.icon" options:0 context:nil];
 
-    // bind my string value to the label on the represented tab
-    [cell bind:@"title" toObject:item withKeyPath:@"label" options:nil];
+		// bind for the existence of a counter
+		[cell setCount:0];
+		[cell bind:@"count" toObject:tabController withKeyPath:@"selection.objectCount" options:nil];
+		[tabController addObserver:self forKeyPath:@"selection.objectCount" options:0 context:nil];
+#endif
 
-    // add to collection
-    [_cells addObject:cell];
-    if([_cells count] == [tabView numberOfTabViewItems]){
-        [self update]; // don't update unless all are accounted for!
-    }
+		// bind for modified state
+		[cell setModified:NO];
+		[cell bind:@"modified" toObject:tabController withKeyPath:@"selectedView.modified" options:nil];
+		[tabController addObserver:self forKeyPath:@"selectedView.modified" options:0 context:nil];
+	}
+
+	// bind my string value to the label on the represented tab
+	[cell bind:@"title" toObject:item withKeyPath:@"label" options:nil];
+
+	// add to collection
+	[_cells addObject:cell];
+	if([_cells count] == [tabView numberOfTabViewItems]){
+		[self update]; // don't update unless all are accounted for!
+	}
 }
 
 - (void)removeTabForCell:(PSMTabBarCell *)cell
@@ -412,6 +407,7 @@
 	[cell unbind:@"hasIcon"];
 	[cell unbind:@"title"];
 	[cell unbind:@"count"];
+	[cell unbind:@"modified"];
 
 	// remove indicator
 	if ([[self subviews] containsObject:[cell indicator]])
@@ -433,8 +429,8 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    // the progress indicator, label, icon, or count has changed - must redraw
-    [self update];
+	// the progress indicator, label, icon, count or modified state has changed - must redraw
+	[self update];
 }
 
 #pragma mark -

@@ -33,7 +33,10 @@
     BOOL                _isCloseButtonSuppressed;
     BOOL                _hasIcon;
     int                 _count;
+    BOOL		_modified;
 }
+
+@property (readwrite,getter=isModified) BOOL modified;
 
 // creation/destruction
 - (id)initWithControlView:(PSMTabBarControl *)controlView;

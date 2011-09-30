@@ -13,7 +13,7 @@
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)aDocument;
 - (id)documentForURLQuick:(NSURL *)absoluteURL;
 
-- (void)closeAllDocumentsInSet:(NSMutableSet *)set
+- (void)closeAllDocumentsInSet:(NSSet *)set
 		  withDelegate:(id)delegate
 	   didCloseAllSelector:(SEL)didCloseAllSelector
 		   contextInfo:(void *)contextInfo;

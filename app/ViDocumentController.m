@@ -179,13 +179,13 @@
 /*
  * Called by a ViWindowController when it wants to close a set of documents.
  */
-- (void)closeAllDocumentsInSet:(NSMutableSet *)set
+- (void)closeAllDocumentsInSet:(NSSet *)set
 		  withDelegate:(id)delegate
 	   didCloseAllSelector:(SEL)didCloseAllSelector
 		   contextInfo:(void *)contextInfo
 {
 	[_closeAllSet release];
-	_closeAllSet = [set retain];
+	_closeAllSet = [set mutableCopy];
 
 	_closeAllDelegate = [delegate retain];
 	_closeAllSelector = didCloseAllSelector;
@@ -193,7 +193,7 @@
 
 	DEBUG(@"closing documents in set %@", set);
 
-	[self closeNextDocumentInSet:set force:NO];
+	[self closeNextDocumentInSet:_closeAllSet force:NO];
 }
 
 - (BOOL)supportedURLScheme:(NSURL *)url

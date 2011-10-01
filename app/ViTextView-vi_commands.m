@@ -2201,7 +2201,7 @@
 {
 	ViWindowController *windowController = [[self window] windowController];
 	ViMark *sym = sender;
-	if ([sender respondsToSelector:@selector(representedObject)])
+	if ([sender isKindOfClass:[NSMenuItem class]])
 		sym = [sender representedObject];
 
 	[windowController.tagStack push:[self currentMark]];

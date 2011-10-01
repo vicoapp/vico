@@ -170,13 +170,13 @@
 	if (status >= 200 && status <= 207) {
 		NSArray *overrideOutputFormat = [NSArray arrayWithObjects:
 			@"discard",
-			@"replaceSelectedText",
-			@"replaceDocument",
-			@"insertAsText",
-			@"insertAsSnippet",
-			@"showAsHTML",
-			@"showAsTooltip",
-			@"createNewDocument",
+			@"replaceselectedtext",
+			@"replacedocument",
+			@"insertastext",
+			@"insertassnippet",
+			@"showashtml",
+			@"showastooltip",
+			@"createnewdocument",
 			nil];
 		outputFormat = [overrideOutputFormat objectAtIndex:status - 200];
 		status = 0;
@@ -192,16 +192,16 @@
 	NSUInteger lineno = [self currentLine];
 	NSUInteger column = [self currentColumn];
 
-	if ([outputFormat isEqualToString:@"replaceSelectedText"]) {
+	if ([outputFormat isEqualToString:@"replaceselectedtext"]) {
 		[self replaceRange:selectedRange withString:outputText];
 		[self gotoLine:lineno column:column];
-	} else if ([outputFormat isEqualToString:@"replaceDocument"]) {
+	} else if ([outputFormat isEqualToString:@"replacedocument"]) {
 		[self replaceRange:NSMakeRange(0, [[self textStorage] length]) withString:outputText];
 		[self gotoLine:lineno column:column];
-	} else if ([outputFormat isEqualToString:@"showAsTooltip"]) {
+	} else if ([outputFormat isEqualToString:@"showastooltip"]) {
 		MESSAGE(@"%@", [outputText stringByReplacingOccurrencesOfString:@"\n" withString:@" "]);
 		keepMessagesHack = YES;
-	} else if ([outputFormat isEqualToString:@"showAsHTML"]) {
+	} else if ([outputFormat isEqualToString:@"showashtml"]) {
 		ViViewController *viewController = [[[self window] windowController] currentView];
 		ViTabController *tabController = [viewController tabController];
 		ViViewController *webView = nil;
@@ -245,13 +245,13 @@
 				[[[self window] windowController] selectDocumentView:oc];
 			}
 		}
-	} else if ([outputFormat isEqualToString:@"insertAsText"]) {
+	} else if ([outputFormat isEqualToString:@"insertastext"]) {
 		[self insertString:outputText atLocation:[self caret]];
 		[self setCaret:[self caret] + [outputText length]];
-	} else if ([outputFormat isEqualToString:@"afterSelectedText"]) {
+	} else if ([outputFormat isEqualToString:@"afterselectedtext"]) {
 		[self insertString:outputText atLocation:NSMaxRange(selectedRange)];
 		[self setCaret:NSMaxRange(selectedRange) + [outputText length]];
-	} else if ([outputFormat isEqualToString:@"insertAsSnippet"]) {
+	} else if ([outputFormat isEqualToString:@"insertassnippet"]) {
 		NSRange r;
 		/*
 		 * Seems TextMate replaces the snippet trigger range only
@@ -269,8 +269,8 @@
 			  andIndent:NO
 			 fromBundle:[command bundle]
 			    inRange:r];
-	} else if ([outputFormat isEqualToString:@"openAsNewDocument"] ||
-		   [outputFormat isEqualToString:@"createNewDocument"]) {
+	} else if ([outputFormat isEqualToString:@"openasnewdocument"] ||
+		   [outputFormat isEqualToString:@"createnewdocument"]) {
 		ViDocumentView *docView = [[[self window] windowController] splitVertically:NO
 										    andOpen:nil
 									 orSwitchToDocument:nil];

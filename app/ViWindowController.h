@@ -131,8 +131,6 @@
  */
 - (ViDocumentView *)viewForDocument:(ViDocument *)document;
 
-- (ViDocumentView *)selectDocument:(ViDocument *)aDocument;
-
 /**
  * @returns The documents open in the window.
  */
@@ -201,12 +199,11 @@
 
 - (IBAction)navigateJumplist:(id)sender;
 
-- (ViDocumentView *)switchToDocument:(ViDocument *)doc;
-
 - (void)switchToDocumentAction:(id)sender;
 
 /* FIXME: document -displayDocument:positioned: */
 - (ViDocumentView *)displayDocument:(ViDocument *)doc positioned:(ViViewPosition)position;
+- (ViDocumentView *)displayDocument:(ViDocument *)doc;
 
 /** Open a document and go to a specific point in the file.
  * @param url The URL of the document to open. The document may already be opened.

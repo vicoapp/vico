@@ -7,12 +7,15 @@ typedef enum ViViewPosition ViViewPosition;
 typedef enum ViViewOrderingMode ViViewOrderingMode;
 
 enum ViViewPosition {
-	ViViewPositionDefault,
+	ViViewPositionDefault = 0,
+	ViViewPositionPreferred,
 	ViViewPositionReplace,
 	ViViewPositionTab,
 	ViViewPositionSplitLeft,
+	ViViewPositionSplitVertical = ViViewPositionSplitLeft,
 	ViViewPositionSplitRight,
 	ViViewPositionSplitAbove,
+	ViViewPositionSplitHorizontal = ViViewPositionSplitAbove,
 	ViViewPositionSplitBelow
 };
 

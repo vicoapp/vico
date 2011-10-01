@@ -272,7 +272,7 @@ DEBUG_FINALIZE();
 				[self setCloseCallback:nil];
 			} else {
 				/* Make sure this document has focus, then show an alert sheet. */
-				[_windowController selectDocument:self];
+				[_windowController displayDocument:self positioned:ViViewPositionDefault];
 				[self setFileURL:nil];
 
 				NSAlert *alert = [[[NSAlert alloc] init] autorelease];
@@ -397,7 +397,7 @@ DEBUG_FINALIZE();
 - (void)showWindows
 {
 	[super showWindows];
-	[_windowController selectDocument:self];
+	[_windowController displayDocument:self positioned:ViViewPositionDefault];
 }
 
 - (ViWindowController *)windowController

@@ -49,7 +49,7 @@
 
 	if ([[windowController documents] count] > 0) {
 		ViDocument *doc = [[windowController documents] anyObject];
-		[windowController selectDocument:doc];
+		[windowController displayDocument:doc positioned:ViViewPositionDefault];
 		[doc canCloseDocumentWithDelegate:self
 			      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
 				      contextInfo:NULL];
@@ -139,7 +139,7 @@
 		window = [[doc windowController] window];
 
 	if (force || [window attachedSheet] == nil) {
-		[[doc windowController] selectDocument:doc];
+		[[doc windowController] displayDocument:doc positioned:ViViewPositionDefault];
 		/*
 		 * Schedule next close sheet in the event loop right after the windowcontroller has selected the document.
 		 */
@@ -262,7 +262,8 @@
 		if (displayDocument) {
 			if ([doc isKindOfClass:[ViDocument class]]) {
 				if ([doc windowController] == windowController)
-					[[doc windowController] selectDocument:doc];
+					[[doc windowController] displayDocument:doc
+								     positioned:ViViewPositionDefault];
 				else
 					[windowController addNewTab:doc];
 			} else if ([doc isKindOfClass:[ViProject class]]) {

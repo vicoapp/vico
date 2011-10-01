@@ -46,6 +46,9 @@
 
 - (void)addView:(ViViewController *)viewController
 {
+	if (viewController == nil)
+		return;
+
 	[viewController setTabController:self];
 	[_views addObject:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidAddView for:viewController with:viewController, nil];
@@ -53,6 +56,9 @@
 
 - (void)removeView:(ViViewController *)viewController
 {
+	if (viewController == nil)
+		return;
+
 	[viewController retain];
 	DEBUG(@"remove view %@", viewController);
 	[viewController setTabController:nil];
@@ -219,14 +225,19 @@
 		   withDocument:(ViDocument *)document
 {
 	ViDocumentView *newDocView = [document makeView];
+	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newDocView view], newDocView);
 
 	[self addView:newDocView];
+	if (viewController == nil) {
+		[_splitView addSubview:[newDocView view]];
+		[self setSelectedView:newDocView];
+		return newDocView;
+	}
+
 	[self removeView:viewController];
 
 	if (_selectedView == viewController)
 		[self setSelectedView:newDocView];
-
-	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newDocView view], newDocView);
 
 	/*
 	 * Remember all subview sizes so we can restore the position

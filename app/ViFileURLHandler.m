@@ -6,25 +6,61 @@
 
 @interface ViFileDeferred : NSObject <ViDeferred>
 {
-	id<ViDeferredDelegate> delegate;
+	BOOL			 _finished;
+	id<ViDeferredDelegate>	 _delegate;
+	void (^_completionHandler)(NSArray *, NSError *);
 }
++ (ViFileDeferred *)deferredWithHandler:(void (^)(NSArray *, NSError *))handler;
+- (ViFileDeferred *)initWithHandler:(void (^)(NSArray *, NSError *))handler;
+- (void)finishWithContents:(NSArray *)contents error:(NSError *)error;
 @end
 
 @implementation ViFileDeferred
-@synthesize delegate;
-+ (ViFileDeferred *)sharedDeferred
+
+@synthesize delegate = _delegate;
+
++ (ViFileDeferred *)deferredWithHandler:(void (^)(NSArray *, NSError *))handler
 {
-	static ViFileDeferred *__sharedDeferred = nil;
-	if (__sharedDeferred == nil)
-		__sharedDeferred = [[ViFileDeferred alloc] init];
-	return __sharedDeferred;
+	return [[[self alloc] initWithHandler:handler] autorelease];
 }
+
+- (ViFileDeferred *)initWithHandler:(void (^)(NSArray *, NSError *))handler
+{
+	if ((self = [super init]) != nil) {
+		_completionHandler = [handler copy];
+	}
+	return self;
+}
+
+- (void)dealloc
+{
+	[self cancel];
+	[super dealloc];
+}
+
 - (void)cancel
 {
+	[_completionHandler release];
+	_completionHandler = nil;
+	_finished = YES;
 }
+
+- (void)finishWithContents:(NSArray *)contents error:(NSError *)error
+{
+	if (_completionHandler)
+		_completionHandler(contents, error);
+	[self cancel];
+}
+
 - (void)wait
 {
+	while (!_finished) {
+		DEBUG(@"request %@ not finished yet", self);
+		[[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode
+				      beforeDate:[NSDate distantFuture]];
+	}
 }
+
 @end
 
 @implementation ViFileURLHandler
@@ -59,12 +95,7 @@
 		return nil;
 	}
 
-	/*
-	 * The aBlock argument is typically a stack block literal and
-	 * can't be automatically retained without moving it to the
-	 * heap.
-	 */
-	void (^blockCopy)(NSArray *, NSError *) = [[aBlock copy] autorelease];
+	ViFileDeferred *deferred = [ViFileDeferred deferredWithHandler:aBlock];
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -98,12 +129,12 @@
 
 		/* Schedule completion block on main queue. */
 		dispatch_sync(dispatch_get_main_queue(), ^{
-			blockCopy(contents, error);
+			[deferred finishWithContents:contents error:error];
 		});
 		[pool drain];
 	});
 
-	return [ViFileDeferred sharedDeferred];
+	return deferred;
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL

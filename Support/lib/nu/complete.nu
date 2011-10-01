@@ -25,8 +25,7 @@
 		(set @completions anArray)
 		(self))
 
-	(- (void) completionsForString:(id) aString options:(id) options target:(id)target action:(SEL)action is
-		(target performSelector:action withObject:@completions withObject:nil) ))
+        (- (id)completionsForString:(id)aString options:(id)options is @completions))
 
 (unless (defined choices)
 	(shellCommand log:"missing choices")

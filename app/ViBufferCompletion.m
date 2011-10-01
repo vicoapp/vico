@@ -3,9 +3,9 @@
 
 @implementation ViBufferCompletion
 
-- (id<ViDeferred>)completionsForString:(NSString *)word
-			       options:(NSString *)options
-			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
+- (NSArray *)completionsForString:(NSString *)word
+			  options:(NSString *)options
+			    error:(NSError **)outError
 {
 	BOOL fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
@@ -42,9 +42,7 @@
 		}
 	}
 
-	responseCallback(buffers, nil);
-
-	return nil;
+	return buffers;
 }
 
 @end

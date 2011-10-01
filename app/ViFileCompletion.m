@@ -17,9 +17,9 @@
 	}
 }
 
-- (id<ViDeferred>)completionsForString:(NSString *)path
-			       options:(NSString *)options
-			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
+- (NSArray *)completionsForString:(NSString *)path
+			  options:(NSString *)options
+			    error:(NSError **)outError
 {
 	NSURL *relURL = [[ViWindowController currentWindowController] baseURL];
 	DEBUG(@"relURL is %@", relURL);
@@ -32,8 +32,8 @@
 		url = [NSURL URLWithString:
 		    [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 		if (url == nil) {
-			responseCallback(nil, [ViError errorWithFormat:
-			    @"failed to parse url %@", path]);
+			if (outError)
+				*outError = [ViError errorWithFormat:@"failed to parse url %@", path];
 			return nil;
 		}
 		if ([[url path] length] == 0) {
@@ -97,13 +97,17 @@
 
 	ViURLManager *um = [ViURLManager defaultManager];
 
-	return [um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *directoryContents, NSError *error) {
-		if (error) {
-			responseCallback(nil, error);
+	__block NSMutableArray *matches = nil;
+	__block NSError *error = nil;
+
+	id<ViDeferred> deferred = [um contentsOfDirectoryAtURL:url
+						  onCompletion:^(NSArray *directoryContents, NSError *err) {
+		if (err) {
+			error = [err retain];
 			return;
 		}
 
-		NSMutableArray *matches = [NSMutableArray array];
+		matches = [[NSMutableArray alloc] init];
 		for (ViFile *file in directoryContents) {
 			NSRange r = NSIntersectionRange(NSMakeRange(0, [suffix length]),
 			    NSMakeRange(0, [file.name length]));
@@ -138,8 +142,12 @@
 				[matches addObject:c];
 			}
 		}
-		responseCallback(matches, nil);
 	}];
+
+	[deferred wait];
+	if (outError && error)
+		*outError = [error autorelease];
+	return [matches autorelease];
 }
 
 @end

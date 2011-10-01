@@ -1,16 +1,18 @@
 #import "ViWordCompletion.h"
 #import "ViWindowController.h"
+#import "ViError.h"
 #include "logging.h"
 
 @implementation ViWordCompletion
 
-- (id<ViDeferred>)completionsForString:(NSString *)word
-			       options:(NSString *)options
-			    onResponse:(void (^)(NSArray *, NSError *))responseCallback
+- (NSArray *)completionsForString:(NSString *)word
+			  options:(NSString *)options
+			    error:(NSError **)outError
 {
-	ViTextView *text = (ViTextView *)[[[ViWindowController currentWindowController] currentView] innerView];
-	if (![text isKindOfClass:[ViTextView class]]) {
-		responseCallback(nil, nil);
+	ViTextView *text = [[[ViWindowController currentWindowController] currentDocumentView] textView];
+	if (text == nil) {
+		if (outError)
+			*outError = [ViError message:@"Word completion only defined for text views"];
 		return nil;
 	}
 
@@ -82,10 +84,8 @@
 		}
 		return (NSComparisonResult)NSOrderedSame;
 	};
-	NSArray *completions = [[uniq allObjects] sortedArrayUsingComparator:sortByLocation];
 
-	responseCallback(completions, nil);
-	return nil;
+	return [[uniq allObjects] sortedArrayUsingComparator:sortByLocation];
 }
 
 @end

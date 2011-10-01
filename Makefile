@@ -370,6 +370,7 @@ $(NIBDIR)/%.nib: %.xib
 app: $(BINDIR)/Vico $(NIBS) $(BINDIR)/vicotool $(BINDIR)/par
 	cp -f app/Vico-Info.plist $(INFOPLIST)
 	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
+	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
 	rsync -a --delete --exclude ".git" Nu.framework $(FWDIR)

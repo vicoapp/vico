@@ -3,14 +3,12 @@
 #import "ViURLManager.h"
 
 @protocol ViCompletionProvider <NSObject>
+- (NSArray *)completionsForString:(NSString *)string
+			  options:(NSString *)options
+			    error:(NSError **)outError;
 @optional
-- (id<ViDeferred>)completionsForString:(NSString *)path
-			       options:(NSString *)options
-			    onResponse:(void (^)(NSArray *completions, NSError *error))responseCallback;
-- (id<ViDeferred>)completionsForString:(NSString *)path
-			       options:(NSString *)options
-				target:(id)target
-				action:(SEL)action;
+- (NSArray *)completionsForString:(NSString *)string
+			  options:(NSString *)options;
 @end
 
 @class ViCompletionController;

@@ -112,7 +112,7 @@
 			/*
 			 * For strings, do initial prefix filtering here.
 			 */
-			if (_prefix && [c rangeOfString:_prefix options:NSCaseInsensitiveSearch|NSAnchoredSearch].location == NSNotFound)
+			if ([_prefix length] > 0 && [c rangeOfString:_prefix options:NSCaseInsensitiveSearch|NSAnchoredSearch].location == NSNotFound)
 				[_completions removeObjectAtIndex:i];
 			else {
 				c = [ViCompletion completionWithContent:c];
@@ -178,6 +178,9 @@
 	_terminatingKey = 0;
 	[self reset];
 
+	[_onlyCompletion release];
+	_onlyCompletion = nil;
+
 	if (initialFilter)
 		_filter = [initialFilter mutableCopy];
 	else
@@ -196,25 +199,19 @@
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);
 
-	void (^onCompletionResponse)(NSArray *, NSError *) = ^(NSArray *array, NSError *error) {
-		[self completionResponse:array error:error];
-	};
-
 	DEBUG(@"fetching completions for %@ w/options %@", _prefix, _options);
-	if ([_provider respondsToSelector:@selector(completionsForString:options:onResponse:)])
-		[_provider completionsForString:_prefix
-					options:_options
-				     onResponse:onCompletionResponse];
-	else if ([_provider respondsToSelector:@selector(completionsForString:options:target:action:)])
-		[_provider completionsForString:_prefix
-					options:_options
-					 target:self
-					 action:@selector(completionResponse:error:)];
-	else {
-		INFO(@"Completion provider %@ doesn't respond to completionsForString:options:target:action:", _provider);
+	NSError *error = nil;
+	NSArray *result = nil;
+	if ([_provider respondsToSelector:@selector(completionsForString:options:error:)])
+		result = [_provider completionsForString:_prefix options:_options error:&error];
+	else
+		result = [_provider completionsForString:_prefix options:_options];
+	if (error) {
+		INFO(@"Completion provider %@ returned error %@", _provider, error);
 		[self reset];
 		return nil;
 	}
+	[self completionResponse:result error:nil];
 
 	if (_onlyCompletion) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
@@ -482,6 +479,7 @@
 		return NO;
 
 	_range = NSMakeRange(_range.location, [partialCompletion length]);
+	DEBUG(@"_range => %@", NSStringFromRange(_range));
 	_prefixLength = _range.length;
 	[self setCompletions:_filteredCompletions];
 	[self updateCompletions];

@@ -102,8 +102,10 @@
 	if ([[command input] isEqualToString:@"document"] ||
 	    [[command input] isEqualToString:@"none"]) {
 		selectedRange = [self selectedRange];
-		if (selectedRange.length == 0)
+		if (selectedRange.length == 0) {
 			selectedRange = NSMakeRange([self caret], 0);
+			envInputRange = NSMakeRange(NSNotFound, 0);
+		}
 	} else
 		selectedRange = inputRange;
 

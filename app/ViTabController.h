@@ -126,8 +126,8 @@ enum ViViewOrderingMode {
 - (ViViewController *)splitView:(ViViewController *)viewController
 		     vertically:(BOOL)isVertical;
 
-- (ViDocumentView *)replaceView:(ViViewController *)viewController
-		   withDocument:(ViDocument *)document;
+- (ViViewController *)replaceView:(ViViewController *)viewController
+			 withView:(ViViewController *)newViewController;
 
 - (void)closeView:(ViViewController *)viewController;
 

@@ -118,6 +118,7 @@
 - (void)updatePageGuide;
 - (NSUInteger)filterSymbols:(ViRegexp *)rx;
 - (void)dispatchSyntaxParserWithRange:(NSRange)aRange restarting:(BOOL)flag;
+- (ViDocumentView *)makeViewWithParser:(ViParser *)aParser;
 - (ViDocumentView *)makeView;
 - (ViDocumentView *)cloneView:(ViDocumentView *)oldView;
 - (void)removeView:(ViDocumentView *)aDocumentView;

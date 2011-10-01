@@ -466,7 +466,7 @@ DEBUG_FINALIZE();
 
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document
 {
-	ViDocumentView *docView = [document makeView];
+	ViDocumentView *docView = [document makeViewWithParser:_parser];
 	[self createTabWithViewController:docView];
 	return docView;
 }
@@ -1491,14 +1491,14 @@ DEBUG_FINALIZE();
 		 * This should only happen when the last view is closed in a window.
 		 */
 		DEBUG(@"no views in tab %@, creating new view for document %@", tabController, doc);
-		docView = [tabController replaceView:nil
-					withDocument:doc];
+		docView = (ViDocumentView *)[tabController replaceView:nil
+							      withView:[doc makeViewWithParser:_parser]];
 	} else if (position >= ViViewPositionSplitLeft && position <= ViViewPositionSplitBelow) {
 		/*
 		 * Splitting never replaces an untitled document.
 		 */
 		docView = (ViDocumentView *)[tabController splitView:[self currentView]
-							    withView:[doc makeView]
+							    withView:[doc makeViewWithParser:_parser]
 							  positioned:position];
 	} else {
 		/*
@@ -1552,8 +1552,8 @@ DEBUG_FINALIZE();
 			if ([[[self currentDocumentView] document] isEqual:doc])
 				docView = [self currentDocumentView];
 			else
-				docView = [tabController replaceView:[self currentView]
-							withDocument:doc];
+				docView = (ViDocumentView *)[tabController replaceView:[self currentView]
+									      withView:[doc makeViewWithParser:_parser]];
 		} else if (position == ViViewPositionTab || (position == ViViewPositionPreferred && prefertabs)) {
 			docView = [self createTabForDocument:doc];
 		}

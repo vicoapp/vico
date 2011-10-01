@@ -512,10 +512,11 @@ DEBUG_FINALIZE();
 	return _scriptView;
 }
 
-- (ViDocumentView *)makeView
+- (ViDocumentView *)makeViewWithParser:(ViParser *)aParser
 {
 	if (_hiddenView) {
 		DEBUG(@"returning hidden view %@", _hiddenView);
+		_hiddenView.textView.keyManager.parser = aParser;
 		return _hiddenView;
 	}
 
@@ -547,7 +548,7 @@ DEBUG_FINALIZE();
 	ViTextView *textView = [[[ViTextView alloc] initWithFrame:frame textContainer:container] autorelease];
 	[documentView replaceTextView:textView];
 
-	[textView initWithDocument:self viParser:[_windowController parser]];
+	[textView initWithDocument:self viParser:aParser];
 
 	[self enableLineNumbers:[userDefaults boolForKey:@"number"]
 	          forScrollView:[textView enclosingScrollView]];
@@ -557,6 +558,11 @@ DEBUG_FINALIZE();
 	[[ViEventManager defaultManager] emit:ViEventDidMakeView for:self with:self, documentView, textView, nil];
 
 	return documentView;
+}
+
+- (ViDocumentView *)makeView
+{
+	return [self makeViewWithParser:[_windowController parser]];
 }
 
 - (ViDocumentView *)cloneView:(ViDocumentView *)oldView

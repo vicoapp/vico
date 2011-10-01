@@ -221,23 +221,22 @@
 	return newView;
 }
 
-- (ViDocumentView *)replaceView:(ViViewController *)viewController
-		   withDocument:(ViDocument *)document
+- (ViViewController *)replaceView:(ViViewController *)viewController
+			 withView:(ViViewController *)newViewController
 {
-	ViDocumentView *newDocView = [document makeView];
-	DEBUG(@"replace view %@ with view %@ = %@", [viewController view], [newDocView view], newDocView);
+	DEBUG(@"replace view %@ with view %@", viewController, newViewController);
 
-	[self addView:newDocView];
+	[self addView:newViewController];
 	if (viewController == nil) {
-		[_splitView addSubview:[newDocView view]];
-		[self setSelectedView:newDocView];
-		return newDocView;
+		[_splitView addSubview:[newViewController view]];
+		[self setSelectedView:newViewController];
+		return newViewController;
 	}
 
 	[self removeView:viewController];
 
 	if (_selectedView == viewController)
-		[self setSelectedView:newDocView];
+		[self setSelectedView:newViewController];
 
 	/*
 	 * Remember all subview sizes so we can restore the position
@@ -254,7 +253,7 @@
 			[sizes addObject:[NSNumber numberWithFloat:[view bounds].size.height]];
 	}
 
-	[split replaceSubview:[viewController view] with:[newDocView view]];
+	[split replaceSubview:[viewController view] with:[newViewController view]];
 	DEBUG(@"subviews = %@", [split subviews]);
 
 	/*
@@ -271,7 +270,7 @@
 	}
 	[_splitView adjustSubviews];
 
-	return newDocView;
+	return newViewController;
 }
 
 - (void)closeView:(ViViewController *)viewController

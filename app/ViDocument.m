@@ -63,6 +63,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 @synthesize syntaxParser = _syntaxParser;
 @synthesize marks = _marks;
 @synthesize modified = _modified;
+@synthesize localMarks = _localMarks;
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
@@ -1754,7 +1755,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	return [_localMarks.list lookup:name];
 }
 
-- (void)setMark:(unichar)key toRange:(NSRange)range
+- (ViMark *)setMark:(unichar)key toRange:(NSRange)range
 {
 	NSString *name = [NSString stringWithFormat:@"%C", key];
 	ViMark *m = [_localMarks.list lookup:name];
@@ -1767,11 +1768,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if ([name isUppercase])
 		[[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list addMark:m];
+
+	return m;
 }
 
-- (void)setMark:(unichar)key atLocation:(NSUInteger)aLocation
+- (ViMark *)setMark:(unichar)key atLocation:(NSUInteger)aLocation
 {
-	[self setMark:key toRange:NSMakeRange(aLocation, 1)];
+	return [self setMark:key toRange:NSMakeRange(aLocation, 1)];
 }
 
 - (void)pushMarks:(NSInteger)delta fromLocation:(NSUInteger)location

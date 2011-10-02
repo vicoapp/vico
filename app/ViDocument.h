@@ -49,7 +49,7 @@
 
 	// standard character marks
 	ViMarkStack		*_localMarks;
-	NSMutableSet		*_marks; // All marks associated with this document
+	NSMutableSet		*_marks; // All marks associated with this document. XXX: don't retain!?
 
 	// symbol list
 	NSMutableArray		*_symbols;
@@ -89,6 +89,7 @@
 @property(nonatomic,readwrite,retain) ViDocumentView *hiddenView;
 @property(nonatomic,readwrite,retain) ViSyntaxParser *syntaxParser;
 @property(nonatomic,readonly) NSSet *marks;
+@property(nonatomic,readonly) ViMarkStack *localMarks;
 
 /** Return the ViTextStorage object. */
 @property(nonatomic,readonly) ViTextStorage *textStorage;
@@ -173,8 +174,8 @@
  * @param name The name of the mark.
  * @param aLocation The location to mark.
  */
-- (void)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
-- (void)setMark:(unichar)key toRange:(NSRange)range;
+- (ViMark *)setMark:(unichar)name atLocation:(NSUInteger)aLocation;
+- (ViMark *)setMark:(unichar)key toRange:(NSRange)range;
 
 - (void)registerMark:(ViMark *)mark;
 - (void)unregisterMark:(ViMark *)mark;

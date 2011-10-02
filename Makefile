@@ -306,8 +306,10 @@ CFLAGS	+= -Wreturn-type \
 	   -Wno-unused-parameter \
 	   -Wunused-variable \
 	   -Wunused-value
-	   #-Wshorten-64-to-32
 CFLAGS	+= -Wall -Werror
+
+# oniguruma, par, and lemon has too many of these issues
+OBJCFLAGS = -Wshorten-64-to-32
 
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 
@@ -355,9 +357,9 @@ NIBS = $(addprefix $(NIBDIR)/,$(XIBS:.xib=.nib))
 DEPS = -MMD -MT $@ -MF $(addsuffix .d,$(basename $@))
 
 $(OBJDIR)/%.o: %.m
-	$(CC) $(CFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
+	$(CC) $(CFLAGS) $(OBJCFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.mm
-	$(CXX) $(CFLAGS) $(OBJCXXPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
+	$(CXX) $(CFLAGS) $(OBJCFLAGS) $(OBJCXXPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.cpp

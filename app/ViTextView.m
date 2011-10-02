@@ -495,14 +495,14 @@ DEBUG_FINALIZE();
 		[[self textStorage] replaceCharactersInRange:r withString:@"\n"];
 		r.length = 1;
 		[[self textStorage] setAttributes:[self typingAttributes] range:r];
-		[[[self layoutManager] nextRunloop] addTemporaryAttribute:ViAutoNewlineAttributeName
-								    value:[NSNumber numberWithInt:1]
-							forCharacterRange:r];
+		[[self textStorage] addAttribute:ViAutoNewlineAttributeName
+					   value:[NSNumber numberWithInt:1]
+					   range:r];
 		return YES;
 	} else if (len == 1) {
-		if ([[self layoutManager] temporaryAttribute:ViAutoNewlineAttributeName
-					    atCharacterIndex:0
-					      effectiveRange:NULL]) {
+		if ([[self textStorage] attribute:ViAutoNewlineAttributeName
+					  atIndex:0
+				   effectiveRange:NULL]) {
 			NSRange r = NSMakeRange(0, 1);
 			[self recordReplacementOfRange:r withLength:0];
 			[[self textStorage] replaceCharactersInRange:r withString:@""];
@@ -875,9 +875,9 @@ DEBUG_FINALIZE();
 	aLocation = [self removeTrailingAutoIndentForLineAtLocation:aLocation];
 
 	NSRange smartRange;
-	if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-				    atCharacterIndex:aLocation
-				      effectiveRange:&smartRange] && smartRange.length > 1 && smartRange.location == aLocation - 1)
+	if ([[self textStorage] attribute:ViSmartPairAttributeName
+				  atIndex:aLocation
+			   effectiveRange:&smartRange] && smartRange.length > 1 && smartRange.location == aLocation - 1)
 	{
 		// assumes indentForward
 		[self insertString:[NSString stringWithFormat:@"\n\n%@", leading_whitespace] atLocation:aLocation];
@@ -894,9 +894,9 @@ DEBUG_FINALIZE();
 			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
 			[self replaceCharactersInRange:curIndent withString:leading_whitespace];
 			NSRange autoIndentRange = NSMakeRange(curIndent.location, [leading_whitespace length]);
-			[[self layoutManager] addTemporaryAttribute:ViAutoIndentAttributeName
-							      value:[NSNumber numberWithInt:1]
-						  forCharacterRange:autoIndentRange];
+			[[self textStorage] addAttribute:ViAutoIndentAttributeName
+						   value:[NSNumber numberWithInt:1]
+						   range:autoIndentRange];
 			return aLocation + autoIndentRange.length;
 		}
 	}
@@ -1616,9 +1616,9 @@ DEBUG_FINALIZE();
 	 */
 
 	if (start_location < length)
-		pair = [[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-					       atCharacterIndex:start_location
-						 effectiveRange:NULL];
+		pair = [[self textStorage] attribute:ViSmartPairAttributeName
+					     atIndex:start_location
+				      effectiveRange:NULL];
 	if ([pair isKindOfClass:[NSArray class]]) {
 		// NSString *pair0 = [pair objectAtIndex:0];
 		NSString *pair1 = [pair objectAtIndex:1];
@@ -1651,9 +1651,9 @@ DEBUG_FINALIZE();
 
 				NSRange r = NSMakeRange(start_location, [pair0 length] + [pair1 length]);
 				DEBUG(@"adding smart pair attr to %@", NSStringFromRange(r));
-				[[self layoutManager] addTemporaryAttribute:ViSmartPairAttributeName
-								      value:pair
-							  forCharacterRange:r];
+				[[self textStorage] addAttribute:ViSmartPairAttributeName
+							   value:pair
+							   range:r];
 
 				final_location = start_location + [pair1 length];
 				break;
@@ -1685,18 +1685,19 @@ DEBUG_FINALIZE();
 		NSUInteger bol, eol;
 		[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:start_location];
 		NSRange r;
-		if ([[self layoutManager] temporaryAttribute:ViAutoIndentAttributeName
-					    atCharacterIndex:bol
-					      effectiveRange:&r]) {
-			DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
-                        NSString *indent = [self suggestedIndentAtLocation:bol];
-                        NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
-                        if (curIndent.length != [indent length]) {
-                                [[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
-                                                             forCharacterRange:r];
-                                [self replaceCharactersInRange:curIndent withString:indent];
-                                final_location += [indent length] - curIndent.length;
-                        }
+		if ([[self textStorage] attribute:ViAutoIndentAttributeName
+					  atIndex:bol
+				   effectiveRange:&r]) {
+			DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu",
+			    NSStringFromRange(r), bol, eol);
+			NSString *indent = [self suggestedIndentAtLocation:bol];
+			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
+			if (curIndent.length != [indent length]) {
+				[[self textStorage] removeAttribute:ViAutoIndentAttributeName
+							      range:r];
+				[self replaceCharactersInRange:curIndent withString:indent];
+				final_location += [indent length] - curIndent.length;
+			}
 		}
 	}
 }
@@ -1830,9 +1831,9 @@ DEBUG_FINALIZE();
 
 	/* check if we're deleting the first character in a smart pair */
 	NSRange r;
-	if ([[self layoutManager] temporaryAttribute:ViSmartPairAttributeName
-				    atCharacterIndex:start_location
-				      effectiveRange:&r]) {
+	if ([[self textStorage] attribute:ViSmartPairAttributeName
+				  atIndex:start_location
+			   effectiveRange:&r]) {
 		DEBUG(@"found smart pair in range %@", NSStringFromRange(r));
 		if (r.location == start_location - 1 && r.length == 2) {
 			[self deleteRange:NSMakeRange(start_location - 1, 2)];
@@ -1884,12 +1885,13 @@ DEBUG_FINALIZE();
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol forLocation:aLocation];
 	NSRange r;
-	if ([[self layoutManager] temporaryAttribute:ViAutoIndentAttributeName
-				    atCharacterIndex:bol
-				      effectiveRange:&r]) {
-		DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu", NSStringFromRange(r), bol, eol);
-		[[self layoutManager] removeTemporaryAttribute:ViAutoIndentAttributeName
-					     forCharacterRange:r];
+	if ([[self textStorage] attribute:ViAutoIndentAttributeName
+				  atIndex:bol
+			   effectiveRange:&r]) {
+		DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu",
+		    NSStringFromRange(r), bol, eol);
+		[[self textStorage] removeAttribute:ViAutoIndentAttributeName
+					      range:r];
 		if (r.location == bol && NSMaxRange(r) == eol) {
 			[self replaceCharactersInRange:NSMakeRange(bol, eol - bol) withString:@""];
 			return bol;

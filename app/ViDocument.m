@@ -366,6 +366,7 @@ DEBUG_FINALIZE();
 			ViLayoutManager *lm = (ViLayoutManager *)[tv layoutManager];
 			[lm setInvisiblesAttributes:[_theme invisiblesAttributes]];
 			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [_textStorage length])];
+			[tv updateFont];
 		}];
 		[self setTypingAttributes];
 		[self updatePageGuide];

@@ -77,6 +77,7 @@
 	NSColor			*_caretColor;
 	NSColor			*_lineHighlightColor;
 	BOOL			 highlightCursorLine;
+	NSSize			 _characterSize;
 
 	// caret blinking
 	NSUInteger		 caretBlinkMode;
@@ -404,6 +405,7 @@
 @end
 
 @interface ViTextView (cursor)
+- (void)updateFont;
 - (void)invalidateCaretRect;
 - (void)updateCaret;
 - (void)forceCursorColor:(BOOL)state;

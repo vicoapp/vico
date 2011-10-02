@@ -8,6 +8,13 @@
 
 @implementation ViTextView (cursor)
 
+- (void)updateFont
+{
+	_characterSize = [@"a" sizeWithAttributes:[NSDictionary dictionaryWithObject:[ViThemeStore font]
+									      forKey:NSFontAttributeName]];
+	[self invalidateCaretRect];
+}
+
 - (void)invalidateCaretRect
 {
 	NSLayoutManager *lm = [self layoutManager];
@@ -31,12 +38,13 @@
 	caretRect.origin.y += inset.height;
 
 	if (NSWidth(caretRect) == 0)
-		caretRect.size.width = 7; // XXX
+		caretRect.size = _characterSize;
+
 	if (len == 0) {
 		// XXX: at EOF
-		caretRect.size.height = 16;
-		caretRect.size.width = 7;
+		caretRect.size = _characterSize;
 	}
+
 	if (caretRect.origin.x == 0)
 		caretRect.origin.x = 5;
 
@@ -106,10 +114,10 @@
 			unichar c = [[[self textStorage] string] characterAtIndex:caret];
 			if (c == '\t') {
 				// place cursor at end of tab, like vi does
-				caretRect.origin.x += caretRect.size.width - 7;
+				caretRect.origin.x += caretRect.size.width - _characterSize.width;
 			}
 			if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
-				caretRect.size.width = 7; // FIXME: adjust to chosen font, calculated from 'a' for example
+				caretRect.size = _characterSize;
 		}
 
 		if ([self isFieldEditor])

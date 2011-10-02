@@ -34,6 +34,8 @@
 
 @protocol ViSnippetDelegate <NSObject>
 - (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string forTabstop:(ViTabstop *)tabstop;
+- (void)beginUpdatingSnippet:(ViSnippet *)snippet;
+- (void)endUpdatingSnippet:(ViSnippet *)snippet;
 - (NSString *)string;
 @end
 

@@ -613,6 +613,16 @@ DEBUG_FINALIZE();
 	[self autoNewline];
 }
 
+- (void)beginUpdatingSnippet:(ViSnippet *)snippet
+{
+	[[self textStorage] beginEditing];
+}
+
+- (void)endUpdatingSnippet:(ViSnippet *)snippet
+{
+	[[self textStorage] endEditing];
+}
+
 - (unichar)characterAtIndex:(NSUInteger)location
 {
 	NSString *s = [[self textStorage] string];

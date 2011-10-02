@@ -519,16 +519,20 @@
 			NSMutableString *s = ts.parent.value;
 			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), value, s);
-			[s replaceCharactersInRange:r withString:value];
-			DEBUG(@"string -> [%@]", s);
-			[self updateTabstop:ts.parent error:outError];
+			if (![value isEqualToString:[s substringWithRange:r]]) {
+				[s replaceCharactersInRange:r withString:value];
+				DEBUG(@"string -> [%@]", s);
+				[self updateTabstop:ts.parent error:outError];
+			}
 		} else {
 			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
 			    ts.num, NSStringFromRange(r), value, [_delegate string]);
 			r.location += _beginLocation;
-			[_delegate snippet:self replaceCharactersInRange:r withString:value forTabstop:ts];
+			if (![value isEqualToString:[[_delegate string] substringWithRange:r]]) {
+				[_delegate snippet:self replaceCharactersInRange:r withString:value forTabstop:ts];
+				DEBUG(@"string -> [%@]", [_delegate string]);
+			}
 			r.location -= _beginLocation;
-			DEBUG(@"string -> [%@]", [_delegate string]);
 		}
 
 		NSInteger delta = [value length] - r.length;
@@ -543,12 +547,17 @@
 
 - (BOOL)updateTabstopsError:(NSError **)outError
 {
+	[_delegate beginUpdatingSnippet:self];
+	BOOL ret = YES;
 	for (ViTabstop *ts in _tabstops) {
-		if (![self updateTabstop:ts error:outError])
-			return NO;
+		if (![self updateTabstop:ts error:outError]) {
+			ret = NO;
+			break;
+		}
 	}
+	[_delegate endUpdatingSnippet:self];
 
-	return YES;
+	return ret;
 }
 
 - (void)removeNestedIn:(ViTabstop *)parent

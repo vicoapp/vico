@@ -117,7 +117,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 		/*
 		 * Disable automatic undo groups created in each pass of the run loop.
 		 * This duplicates our own undo grouping and makes the document never
-		 * regain is un-edited state.
+		 * regain its un-edited state.
 		 */
 		[[self undoManager] setGroupsByEvent:NO];
 

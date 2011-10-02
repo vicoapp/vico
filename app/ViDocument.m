@@ -362,6 +362,11 @@ DEBUG_FINALIZE();
 	} else if ([keyPath isEqualToString:@"fontsize"] ||
 		   [keyPath isEqualToString:@"fontname"] ||
 		   [keyPath isEqualToString:@"linebreak"]) {
+		[self eachTextView:^(ViTextView *tv) {
+			ViLayoutManager *lm = (ViLayoutManager *)[tv layoutManager];
+			[lm setInvisiblesAttributes:[_theme invisiblesAttributes]];
+			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [_textStorage length])];
+		}];
 		[self setTypingAttributes];
 		[self updatePageGuide];
 	} else if ([keyPath isEqualToString:@"list"]) {

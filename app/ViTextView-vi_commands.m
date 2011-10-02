@@ -1874,7 +1874,7 @@
 
 	// correct caret position if we deleted the last character(s) on the line
 	end_location = modify_start_location;
-	--eol;
+	eol -= del.length;
 	if (end_location == eol && eol > bol)
 		--end_location;
 	final_location = end_location;

@@ -1,7 +1,5 @@
 # 1.3
 
-* closing with prefertabs=YES re-opens immediately!?
-
 ## errata
 
 * group by attribute != grouped display string

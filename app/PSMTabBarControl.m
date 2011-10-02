@@ -752,7 +752,7 @@
             [cell setIsInOverflowMenu:NO];
 
             // indicator
-            if(![[cell indicator] isHidden] && !_hideIndicators){
+            if(![[cell indicator] isHidden] && !_hideIndicators && !_isHidden){
                 [[cell indicator] setFrame:[cell indicatorRectForFrame:cellRect]];
                 if(![[self subviews] containsObject:[cell indicator]]){
                     [self addSubview:[cell indicator]];

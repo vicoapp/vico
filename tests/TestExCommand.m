@@ -1,14 +1,23 @@
 #import "TestExCommand.h"
-#import "ExParser.h"
 
 @implementation TestExCommand
 
-- (void)test010_SetCommand
+- (void)setUp
+{
+	ex = nil;
+}
+
+- (void)parse:(NSString *)string
 {
 	NSError *error = nil;
-	ExCommand *ex = [[ExParser sharedParser] parse:@"w" error:&error];
+	ex = [[ExParser sharedParser] parse:string error:&error];
 	STAssertNotNil(ex, nil);
 	STAssertNil(error, nil);
+}
+
+- (void)test010_SetCommand
+{
+	[self parse:@"w"];
 	STAssertEqualObjects(ex.mapping.name, @"write", nil);
 	STAssertEquals(ex.mapping.action, @selector(ex_write:), nil);
 }
@@ -16,7 +25,7 @@
 - (void)test011_NonexistentSimpleCommand
 {
 	NSError *error = nil;
-	ExCommand *ex = [[ExParser sharedParser] parse:@"foo bar baz" error:&error];
+	ex = [[ExParser sharedParser] parse:@"foo bar baz" error:&error];
 	STAssertNil(ex, nil);
 	STAssertNotNil(error, nil);
 }
@@ -217,21 +226,14 @@
 
 - (void)test40_singleComment
 {
-	NSError *error = nil;
-	ExCommand *ex = [[ExParser sharedParser] parse:@":\"foo|set" error:&error];
-	// "
-	STAssertNotNil(ex, nil);
-	STAssertNil(error, nil);
+	[self parse:@":\"foo|set"];
 	STAssertEqualObjects(ex.mapping.name, @"#", nil);
 	STAssertTrue(ex.mapping.action == @selector(ex_goto:), nil);
 }
 
 - (void)test50_AddressExtraColonCommand
 {
-	NSError *error = nil;
-	ExCommand *ex = [[ExParser sharedParser] parse:@":3,5:eval" error:&error];
-	STAssertNotNil(ex, nil);
-	STAssertNil(error, nil);
+	[self parse:@":3,5:eval"];
 	STAssertEquals(ex.naddr, 2ULL, nil);
 	STAssertNotNil(ex.addr1, nil);
 	STAssertNotNil(ex.addr2, nil);
@@ -243,22 +245,18 @@
 
 - (void)test60_semicolonDelimitedRange
 {
-	NSError *error = nil;
-	ExCommand *ex = [[ExParser sharedParser] parse:@"  :3;/pattern/d" error:&error];
-	STAssertNotNil(ex, nil);
-	STAssertNil(error, nil);
+	[self parse:@"  :3;/pattern/d"];
 	STAssertEqualObjects(ex.mapping.name, @"delete", nil);
 	STAssertEquals(ex.mapping.action, @selector(ex_delete:), nil);
 
 	STAssertEquals(ex.naddr, 2ULL, nil);
-	STAssertEquals([ex addr1].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex addr1].line, 3LL, nil);
-	STAssertEquals([ex addr1].offset, 0LL, nil);
-	STAssertEquals([ex addr2].type, ExAddressSearch, nil);
-	STAssertEqualObjects([ex addr2].pattern, @"pattern", nil);
-	STAssertEquals([ex addr2].backwards, NO, nil);
-	STAssertEquals([ex addr2].offset, 0LL, nil);
-
+	STAssertEquals(ex.addr1.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.addr1.line, 3LL, nil);
+	STAssertEquals(ex.addr1.offset, 0LL, nil);
+	STAssertEquals(ex.addr2.type, ExAddressSearch, nil);
+	STAssertEqualObjects(ex.addr2.pattern, @"pattern", nil);
+	STAssertEquals(ex.addr2.backwards, NO, nil);
+	STAssertEquals(ex.addr2.offset, 0LL, nil);
 }
 
 #if 0
@@ -291,73 +289,67 @@
 	STAssertEqualObjects(ex.method, @"ex_global", nil);
 	STAssertEqualObjects(ex.string, @"/pattern/:p", nil);
 }
+#endif
 
 - (void)test70_CopyToLineZero
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"-,+t0"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"t", nil);
-	STAssertEqualObjects(ex.method, @"ex_copy", nil);
+	[self parse:@"-,+t0"];
+	STAssertEqualObjects(ex.mapping.name, @"copy", nil); // 'copy' is aliased as 't'
+	STAssertEquals(ex.mapping.action, @selector(ex_copy:), nil);
 	STAssertEquals(ex.naddr, 2ULL, nil);
-	STAssertEquals([ex line].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex line].line, 0LL, nil);
-	STAssertEquals([ex line].offset, 0LL, nil);
+	STAssertEquals(ex.lineAddress.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.lineAddress.line, 0LL, nil);
+	STAssertEquals(ex.lineAddress.offset, 0LL, nil);
 }
 
 - (void)test70_MoveCommandWithDestinationAddress
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"20,.m$"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"m", nil);
-	STAssertEqualObjects(ex.method, @"ex_move", nil);
+	[self parse:@"20,.m$"];
+	STAssertEqualObjects(ex.mapping.name, @"move", nil);
+	STAssertEquals(ex.mapping.action, @selector(ex_move:), nil);
 	STAssertEquals(ex.naddr, 2ULL, nil);
-	STAssertEquals([ex addr1].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex addr2].type, ExAddressCurrent, nil);
-	STAssertEquals([ex line].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex line].line, -1LL, nil);
-	STAssertEquals([ex line].offset, 0LL, nil);
+	STAssertEquals(ex.addr1.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.addr2.type, ExAddressCurrent, nil);
+	STAssertEquals(ex.lineAddress.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.lineAddress.line, -1LL, nil);
+	STAssertEquals(ex.lineAddress.offset, 0LL, nil);
 }
 
 - (void)test70_MoveCommandWithDestinationAddressAndOffset
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"226,$m.-2"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"m", nil);
-	STAssertEqualObjects(ex.method, @"ex_move", nil);
+	[self parse:@"226,$m.-2"];
+	STAssertEqualObjects(ex.mapping.name, @"move", nil);
+	STAssertEquals(ex.mapping.action, @selector(ex_move:), nil);
 	STAssertEquals(ex.naddr, 2ULL, nil);
-	STAssertEquals([ex addr1].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex addr2].type, ExAddressAbsolute, nil);
-	STAssertEquals([ex line].type, ExAddressCurrent, nil);
-	STAssertEquals([ex line].offset, -2LL, nil);
+	STAssertEquals(ex.addr1.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.addr2.type, ExAddressAbsolute, nil);
+	STAssertEquals(ex.lineAddress.type, ExAddressCurrent, nil);
+	STAssertEquals(ex.lineAddress.offset, -2LL, nil);
 }
 
 - (void)test70_EditCommandWithPlusCommand
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"edit +25|s/abc/ABC/ file.c"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"edit", nil);
-	STAssertEqualObjects(ex.method, @"ex_edit", nil);
+	[self parse:@"edit +25|s/abc/ABC/ file.c"];
+	STAssertEqualObjects(ex.mapping.name, @"edit", nil);
+	STAssertEquals(ex.mapping.action, @selector(ex_edit:), nil);
 	STAssertEqualObjects(ex.plus_command, @"25|s/abc/ABC/", nil);
-	STAssertEqualObjects(ex.filename, @"file.c", nil);
+	STAssertEqualObjects(ex.arg, @"file.c", nil);
 }
 
 - (void)test80_BangCommand
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"!ls"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"!", nil);
-	STAssertEqualObjects(ex.method, @"ex_bang", nil);
-	STAssertEqualObjects(ex.string, @"ls", nil);
+	[self parse:@"!ls"];
+	STAssertEqualObjects(ex.mapping.name, @"!", nil);
+	STAssertEquals(ex.mapping.action, @selector(ex_bang:), nil);
+	STAssertEqualObjects(ex.arg, @"ls", nil);
 }
 
 - (void)test80_BangCommandWithShellPipe
 {
-	ExCommand *ex = [[ExCommand alloc] initWithString:@"!ls -1 | grep .m"];
-	STAssertNotNil(ex, nil);
-	STAssertEqualObjects(ex.name, @"!", nil);
-	STAssertEqualObjects(ex.method, @"ex_bang", nil);
-	STAssertEqualObjects(ex.string, @"ls -1 | grep .m", nil);
+	[self parse:@"!ls -1 | grep .m"];
+	STAssertEqualObjects(ex.mapping.name, @"!", nil);
+	STAssertEquals(ex.mapping.action, @selector(ex_bang:), nil);
+	STAssertEqualObjects(ex.arg, @"ls -1 | grep .m", nil);
 }
-#endif
 
 @end

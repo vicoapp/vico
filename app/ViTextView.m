@@ -244,7 +244,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)gotoMark:(ViMark *)mark
 {
-	if (![document isEntireFileLoaded]) {
+	if (document && ![document isEntireFileLoaded]) {
 		[self setInitialMark:mark];
 	} else {
 		NSRange range = mark.range;
@@ -1113,7 +1113,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)gotoLine:(NSUInteger)line column:(NSUInteger)column
 {
-	if (![document isEntireFileLoaded]) {
+	if (document && ![document isEntireFileLoaded]) {
 		initial_line = line;
 		initial_column = column;
 		return YES;
@@ -1204,7 +1204,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)findPattern:(NSString *)pattern options:(unsigned)find_options
 {
-	if (![document isEntireFileLoaded]) {
+	if (document && ![document isEntireFileLoaded]) {
 		[self setInitialFindPattern:pattern];
 		initial_find_options = find_options;
 		return YES;

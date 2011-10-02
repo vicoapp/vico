@@ -3211,6 +3211,7 @@ again:
 	NSUInteger endLocation = NSMaxRange(affectedRange);
 	NSUInteger loc = affectedRange.location;
 	NSUInteger bol;
+	[[self textStorage] beginEditing];
 	while (loc < endLocation) {
 		DEBUG(@"indenting line %lu at %lu", [[self textStorage] lineNumberAtLocation:loc], loc);
 		[self getLineStart:&bol end:&loc contentsEnd:NULL forLocation:loc];
@@ -3224,6 +3225,7 @@ again:
 		loc += delta;
 		endLocation += delta;
 	}
+	[[self textStorage] endEditing];
 
 	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;

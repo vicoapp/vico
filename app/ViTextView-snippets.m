@@ -46,6 +46,7 @@
 
 	[self endUndoGroup];
 	[self beginUndoGroup];
+	[[self textStorage] beginEditing];
 	[self deleteRange:aRange];
 
 	snippetMatchRange.location = NSNotFound;
@@ -56,6 +57,7 @@
 						       delegate:self
 						    environment:env
 							  error:&error] autorelease];
+	[[self textStorage] endEditing];
 	if (snippet == nil) {
 		MESSAGE(@"%@", [error localizedDescription]);
 		final_location = aRange.location;

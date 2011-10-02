@@ -125,6 +125,8 @@
 	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:nil];
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	[editor endUndoGroup];
 	return YES;
 }
 
@@ -135,6 +137,8 @@
 	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:exCommand];
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	[editor endUndoGroup];
 	return YES;
 }
 

@@ -1457,10 +1457,9 @@
 {
 	NSUInteger bol, eol;
 	[self getLineStart:&bol end:NULL contentsEnd:&eol];
-	if (start_location < eol) {
+	if (start_location < eol)
 		start_location += 1;
-		final_location = end_location = start_location;
-	}
+	final_location = end_location = start_location;
 	[self setInsertMode:command];
 	return YES;
 }

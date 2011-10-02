@@ -2397,6 +2397,8 @@
 
 /* syntax: '<char> */
 /* syntax: `<char> */
+/* syntax: g'<char> */
+/* syntax: g`<char> */
 - (BOOL)move_to_mark:(ViCommand *)command
 {
 	ViMark *m = [[self document] markNamed:command.argument];
@@ -2405,7 +2407,8 @@
 		return NO;
 	}
 
-	BOOL moveToColumn = ([command.mapping.keyString isEqualToString:@"`"]);	// XXX: use another selector!
+	BOOL recordJump = ![command.mapping.keyString hasPrefix:@"g"];	// XXX: use another selector!
+	BOOL moveToColumn = [command.mapping.keyString isEqualToString:@"`"];	// XXX: use another selector!
 	if (!moveToColumn)
 		m = [ViMark markWithURL:m.url line:m.line column:0];
 
@@ -2415,12 +2418,16 @@
 			MESSAGE(@"Mark %C: not local mark", command.argument);
 			return NO;
 		}
-		return [[[self window] windowController] gotoMark:m];
+		return [[[self window] windowController] gotoMark:m
+						       positioned:ViViewPositionDefault
+						       recordJump:recordJump];
 	}
 
 	if (!moveToColumn)
 		[m setLocation:[[self textStorage] skipWhitespaceFrom:m.location]];
 
+	if (recordJump && !command.hasOperator)
+		[self pushCurrentLocationOnJumpList];
 	[self gotoMark:m];
 	end_location = [self caret];
 

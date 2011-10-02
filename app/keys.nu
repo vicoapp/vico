@@ -129,6 +129,8 @@
 (mmap setKey:"%" toMotion:"move_to_match:")
 (mmap setKey:"'" toMotion:"move_to_mark:" flags:(| ViMapNeedArgument ViMapLineMode) parameter:nil scope:nil)
 (mmap setKey:"`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
+(mmap setKey:"g'" toMotion:"move_to_mark:" flags:(| ViMapNeedArgument ViMapLineMode) parameter:nil scope:nil)
+(mmap setKey:"g`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
 
 
 ;; text objects in operator and visual maps

@@ -1798,14 +1798,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 				[mark setRange:r];
 			} else if (NSEqualRanges(deletedRange, NSUnionRange(deletedRange, r)) &&
 				   NSMaxRange(r) > location) {
-				/*
-				 * The mark is completely contained within the changed area.
-				 * Remove the mark.
-				 */
-				DEBUG(@"remove mark %@", mark);
-				if (toDelete == nil)
-					toDelete = [NSHashTable hashTableWithOptions:0];
-				[toDelete addObject:mark];
+				if (!mark.persistent) {
+					/*
+					 * The mark is completely contained within the changed area.
+					 * Remove the mark.
+					 */
+					DEBUG(@"remove mark %@", mark);
+					if (toDelete == nil)
+						toDelete = [NSHashTable hashTableWithOptions:0];
+					[toDelete addObject:mark];
+				}
 			} else {
 				/*
 				 * The changed area intersects the mark at either end.

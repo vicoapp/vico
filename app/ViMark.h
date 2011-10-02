@@ -11,6 +11,7 @@
 	NSRange			 _range;
 	NSInteger		 _line;
 	NSInteger		 _column;
+	BOOL			 _persistent;
 
 	NSString		*_rangeString;
 	BOOL			 _rangeStringIsDirty;
@@ -47,6 +48,8 @@
 @property(nonatomic,readwrite,retain) id title;
 /** A custom user-defined object associated with the mark. */
 @property(nonatomic,readwrite,retain) id representedObject;
+/** If NO, the mark is automatically removed when the text range is removed. Default is YES. */
+@property(nonatomic,readwrite) BOOL persistent;
 
 @property(nonatomic,readwrite,retain) ViDocument *document;
 @property(nonatomic,readonly) __weak ViDocumentView *view;

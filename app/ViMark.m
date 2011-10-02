@@ -19,6 +19,7 @@
 @synthesize document = _document;
 @synthesize view = _view;
 @synthesize representedObject = _representedObject;
+@synthesize persistent = _persistent;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {
@@ -86,6 +87,7 @@
 		_url = [[aURL URLByResolvingSymlinksAndAliases:nil] retain];
 		_name = [aName retain];
 		_title = [aTitle retain];
+		_persistent = YES;
 
 		_line = aLine;
 		_column = aColumn;
@@ -118,6 +120,7 @@
 	}
 
 	if ((self = [super init]) != nil) {
+		_persistent = YES;
 		_document = [aDocument retain];
 		_name = [aName retain];
 		[self setRange:aRange];
@@ -166,6 +169,7 @@
 		self = [self initWithURL:_url name:_name title:_title line:_line column:_column];
 	self.title = _title;
 	self.icon = _icon;
+	self.persistent = _persistent;
 	return self;
 }
 
@@ -309,7 +313,8 @@
 		if (_line < 0)
 			_rangeString = nil;
 		else
-			_rangeString = [[NSString alloc] initWithFormat:@"%lu:%lu", _line, _column];
+			_rangeString = [[NSString alloc] initWithFormat:@"%lu:%lu %@",
+			    _line, _column, NSStringFromRange(_range)];
 		_rangeStringIsDirty = NO;
 	}
 	return _rangeString;

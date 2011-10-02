@@ -97,23 +97,25 @@
 
 	BOOL initial = YES;
 
-	static NSMutableCharacterSet *__shellVariableSet = nil;
-	if (__shellVariableSet == nil) {
-		__shellVariableSet = [[NSMutableCharacterSet alloc] init];
-		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
-		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
-		[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
+	NSMutableCharacterSet *shellVariableSet = nil;
+	if (shellVariableSet == nil) {
+		shellVariableSet = [[NSMutableCharacterSet alloc] init];
+		[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('a', 'z' - 'a')]];
+		[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('A', 'Z' - 'A')]];
+		[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"_"]];
 	}
 
 	while (![self isAtEnd]) {
-		if (![self scanCharactersFromSet:__shellVariableSet intoString:nil])
+		if (![self scanCharactersFromSet:shellVariableSet intoString:nil])
 			break;
 
 		if (initial) {
-			[__shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('0', '9' - '0')]];
+			[shellVariableSet formUnionWithCharacterSet:[NSCharacterSet characterSetWithRange:NSMakeRange('0', '9' - '0')]];
 			initial = NO;
 		}
 	}
+
+	[shellVariableSet release];
 
 	if ([self scanLocation] == startLocation)
 		return NO;

@@ -16,6 +16,8 @@
 	NSString		*_rangeString;
 	BOOL			 _rangeStringIsDirty;
 
+	BOOL			 _recentlyRestored;
+
 	id			 _title;
 	NSImage			*_icon;
 	id			 _representedObject;
@@ -50,6 +52,8 @@
 @property(nonatomic,readwrite,retain) id representedObject;
 /** If NO, the mark is automatically removed when the text range is removed. Default is YES. */
 @property(nonatomic,readwrite) BOOL persistent;
+
+@property(nonatomic,readwrite) BOOL recentlyRestored;
 
 @property(nonatomic,readwrite,retain) ViDocument *document;
 @property(nonatomic,readonly) __weak ViDocumentView *view;

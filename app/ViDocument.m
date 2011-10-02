@@ -1782,6 +1782,14 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	DEBUG(@"pushing marks from %lu", location);
 	NSHashTable *toDelete = nil;
 	for (ViMark *mark in _marks) {
+
+		// XXX: weird hack. avoid pushing already updated marks
+		// that was just restored from undo.
+		if (mark.recentlyRestored) {
+			mark.recentlyRestored = NO;
+			continue;
+		}
+
 		NSRange r = mark.range;
 		if (NSMaxRange(r) < location) {
 			/* The changed area is completely after the mark and doesn't affect it at all. */
@@ -1810,7 +1818,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					if (toDelete == nil)
 						toDelete = [NSHashTable hashTableWithOptions:0];
 					[toDelete addObject:mark];
-				}
+				} else
+					DEBUG(@"keeping persistent mark %@", mark);
 			} else {
 				/*
 				 * The changed area intersects the mark at either end.
@@ -1845,7 +1854,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViDocument %p: %@>", self, [self fileURL] ?: [self displayName]];
+	return [NSString stringWithFormat:@"<ViDocument %p: %@>",
+	    self, [[self fileURL] displayString] ?: [self displayName]];
 }
 
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation

@@ -20,6 +20,7 @@
 @synthesize view = _view;
 @synthesize representedObject = _representedObject;
 @synthesize persistent = _persistent;
+@synthesize recentlyRestored = _recentlyRestored ;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {

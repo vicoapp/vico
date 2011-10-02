@@ -1460,7 +1460,7 @@ DEBUG_FINALIZE();
 	} else
 		l2++;
 
-	[[self document] setMark:'<' atLocation:l1];
+	[[self document] setMark:'<' toRange:NSMakeRange(l1, 0)];
 	[[self document] setMark:'>' atLocation:IMAX(l1, l2 - 1)];
 
 	NSRange sel = NSMakeRange(l1, l2 - l1);

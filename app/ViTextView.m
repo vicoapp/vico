@@ -82,8 +82,10 @@ int logIndent = 0;
 						   object:document];
 
 	_undoManager = [[document undoManager] retain];
-	if (_undoManager == nil)
+	if (_undoManager == nil) {
 		_undoManager = [[NSUndoManager alloc] init];
+		[_undoManager setGroupsByEvent:NO];
+	}
 	_inputKeys = [[NSMutableArray alloc] init];
 	saved_column = -1;
 	reverted_line = -1;

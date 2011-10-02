@@ -589,7 +589,10 @@ DEBUG_FINALIZE();
 	[self replaceCharactersInRange:aRange withString:aString undoGroup:YES];
 }
 
-- (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString forTabstop:(ViTabstop *)tabstop
+- (void)snippet:(ViSnippet *)snippet
+replaceCharactersInRange:(NSRange)aRange
+     withString:(NSString *)aString
+     forTabstop:(ViTabstop *)tabstop
 {
 	DEBUG(@"replace range %@ with [%@] for tab %@, currentTabStop = %@, tabRange = %@",
 	    NSStringFromRange(aRange), aString, tabstop, snippet.currentTabStop, NSStringFromRange(snippet.tabRange));

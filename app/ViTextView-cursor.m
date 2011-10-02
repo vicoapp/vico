@@ -26,8 +26,13 @@
 	if (length == 0) {
 		caretRect.origin = NSMakePoint(0, 0);
 	} else {
-		NSRange r = [lm glyphRangeForCharacterRange:NSMakeRange(caret, len) actualCharacterRange:NULL];
-		caretRect = [lm boundingRectForGlyphRange:r inTextContainer:[self textContainer]];
+		NSUInteger rectCount = 0;
+		NSRectArray rects = [lm rectArrayForCharacterRange:NSMakeRange(caret, len)
+				      withinSelectedCharacterRange:NSMakeRange(NSNotFound, 0)
+						   inTextContainer:[self textContainer]
+							 rectCount:&rectCount];
+		if (rectCount > 0)
+			caretRect = rects[0];
 	}
 
 	NSSize inset = [self textContainerInset];
@@ -296,7 +301,8 @@
 		[[NSColor whiteColor] set];
 		NSRectFillUsingOperation(imgRect, NSCompositeSourceAtop);
 		[iBeamImg unlockFocus];
-		__invertedIBeamCursor = [[NSCursor alloc] initWithImage:iBeamImg hotSpot:[iBeam hotSpot]];
+		__invertedIBeamCursor = [[NSCursor alloc] initWithImage:iBeamImg
+								hotSpot:[iBeam hotSpot]];
 		[iBeamImg release];
 	}
 	return __invertedIBeamCursor;	

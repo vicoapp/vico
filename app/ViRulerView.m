@@ -59,6 +59,8 @@
 		[_digits[i] release];
 		_digits[i] = img;
 	}
+
+	[self setNeedsDisplay:YES];
 }
 
 - (void)setClientView:(NSView *)aView
@@ -179,7 +181,7 @@
 		// Draw digits flush right, centered vertically within the line
 		NSRect r;
 		r.origin.x = NSWidth(bounds) - RULER_MARGIN;
-		r.origin.y = ypos /*- 1.0*/;
+		r.origin.y = ypos + 2.0;
 		r.size = _digitSize;
 
 		[self drawLineNumber:0 inRect:r];
@@ -197,7 +199,7 @@
 		// Draw digits flush right, centered vertically within the line
 		NSRect r;
 		r.origin.x = floor(NSWidth(bounds) - RULER_MARGIN);
-		r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 /*- 2.0*/);
+		r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
 		r.size = _digitSize;
 
 		[self drawLineNumber:line inRect:r];

@@ -934,6 +934,7 @@ DEBUG_FINALIZE();
 	NSRange delta_offset = NSMakeRange(0, 0);
 	BOOL has_delta_offset = NO;
 
+	[[self textStorage] beginEditing];
 	while (bol < NSMaxRange(aRange)) {
 		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
 		NSUInteger n = [self lengthOfIndentString:indent];
@@ -968,6 +969,7 @@ DEBUG_FINALIZE();
 		if (bol == NSNotFound)
 			break;
 	}
+	[[self textStorage] endEditing];
 
 	return delta_offset;
 }

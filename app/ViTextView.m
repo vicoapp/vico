@@ -480,7 +480,7 @@ DEBUG_FINALIZE();
 {
 	if ([self isFieldEditor])
 		return NO;
-	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+	if ([_undoManager isUndoing] || [_undoManager isRedoing])
 		return NO;
 
 	NSString *s = [[self textStorage] string];

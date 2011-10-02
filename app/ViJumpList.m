@@ -29,6 +29,7 @@
 	if ([_jumps count] >= MAX_JUMP_LOCATIONS)
 		[_jumps removeObjectAtIndex:0];
 
+	newJump.title = @"jump";
 	DEBUG(@"pushing %@", newJump);
 	DEBUG(@"called from %@", [NSThread callStackSymbols]);
 

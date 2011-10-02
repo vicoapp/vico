@@ -1047,7 +1047,7 @@ DEBUG_FINALIZE();
 	}
 }
 
-- (void)undoReplaceOfString:(NSString *)aString inRange:(NSRange)aRange
+- (void)undoReplacementOfString:(NSString *)aString inRange:(NSRange)aRange restoreMarks:(NSSet *)marks
 {
 	DEBUG(@"undoing replacement of string %@ in range %@", aString, NSStringFromRange(aRange));
 	[self replaceCharactersInRange:aRange withString:aString undoGroup:NO];
@@ -1057,15 +1057,43 @@ DEBUG_FINALIZE();
 	[self getLineStart:&bol end:&end contentsEnd:&eol forLocation:final_location];
 	if (final_location >= eol && final_location > bol)
 		final_location = eol - 1;
+
+	for (ViMark *m in marks) {
+		DEBUG(@"restore local mark %@", m);
+		[[self document].localMarks.list addMark:m];
+		[[self document] registerMark:m];
+		if ([m.name isUppercase])
+			[[[ViMarkManager sharedManager] stackWithName:@"Global Marks"].list addMark:m];
+		m.recentlyRestored = YES;
+	}
 }
 
 - (void)recordReplacementOfRange:(NSRange)aRange withLength:(NSUInteger)aLength
 {
 	NSRange newRange = NSMakeRange(aRange.location, aLength);
+
+	NSMutableSet *deletedMarks = nil;
+	if (aLength < aRange.length) {
+		/* If we're deleting text, check if we're deleting a mark. */
+		NSRange delRange = NSMakeRange(aRange.location + aLength, aRange.length - aLength);
+		for (ViMark *m in [self document].localMarks.list.marks) {
+			if (!m.persistent &&
+			    m.range.location >= delRange.location &&
+			    NSMaxRange(m.range) <= NSMaxRange(delRange)) {
+				DEBUG(@"deleted range %@ contains mark %@", NSStringFromRange(delRange), m);
+				if (deletedMarks == nil)
+					deletedMarks = [NSMutableSet set];
+				[deletedMarks addObject:m];
+			}
+		}
+	}
+
 	NSString *s = [[[self textStorage] string] substringWithRange:aRange];
 	DEBUG(@"pushing replacement of range %@ (string [%@]) with %@ onto undo stack",
 	    NSStringFromRange(aRange), s, NSStringFromRange(newRange));
-	[[_undoManager prepareWithInvocationTarget:self] undoReplaceOfString:s inRange:newRange];
+	[[_undoManager prepareWithInvocationTarget:self] undoReplacementOfString:s
+					   inRange:newRange
+				      restoreMarks:deletedMarks];
 	[_undoManager setActionName:@"replace text"];
 }
 

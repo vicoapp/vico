@@ -208,6 +208,7 @@
 	}
 	[_marks addObject:mark];
 	[mark registerList:self];
+	DEBUG(@"added mark %@", mark);
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group addMark:mark]; }];
@@ -243,9 +244,10 @@
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndex:index];
 
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
-	[_marks removeObjectAtIndex:index];
+	DEBUG(@"remove mark %@", mark);
 	if (mark.name)
 		[_marksByName removeObjectForKey:mark.name];
+	[_marks removeObjectAtIndex:index];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"marks"];
 
 	[self eachGroup:^(ViMarkGroup *group) { [group removeMark:mark]; }];

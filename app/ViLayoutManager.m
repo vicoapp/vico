@@ -1,4 +1,5 @@
 #import "ViLayoutManager.h"
+#import "ViThemeStore.h"
 #include "logging.h"
 
 @implementation ViLayoutManager
@@ -9,7 +10,10 @@
 {
 	[attributes retain];
 	[_invisiblesAttributes release];
-	_invisiblesAttributes = attributes;
+	_invisiblesAttributes = [attributes mutableCopy];
+	[attributes release];
+
+	[_invisiblesAttributes setObject:[ViThemeStore font] forKey:NSFontAttributeName];
 
 	NSString *newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
 	NSString *tabChar = [NSString stringWithFormat:@"%C", 0x21E5];

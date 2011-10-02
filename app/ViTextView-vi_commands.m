@@ -2390,7 +2390,8 @@
 /* syntax: m<char> */
 - (BOOL)set_mark:(ViCommand *)command
 {
-	[[self document] setMark:command.argument atLocation:start_location];
+	ViMark *m = [[self document] setMark:command.argument atLocation:start_location];
+	m.persistent = NO;
 	return YES;
 }
 

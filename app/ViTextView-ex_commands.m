@@ -228,6 +228,8 @@
 	NSUInteger numMatches = 0;
 	NSUInteger numLines = 0;
 
+	NSUInteger lastReplacedLine = NSNotFound;
+
 	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
 		NSRange lineRange = [storage rangeOfLine:lineno];
 
@@ -257,10 +259,21 @@
 			if (error)
 				return error;
 
-			if (replacedText != value)
+			if (replacedText != value) {
+				if (lastReplacedLine == NSNotFound) {
+					[storage beginEditing];
+					lastReplacedLine = lineno;
+				}
 				[self replaceCharactersInRange:lineRange withString:replacedText];
+			} else if (lastReplacedLine != NSNotFound) {
+				[storage endEditing];
+				lastReplacedLine = NSNotFound;
+			}
 		}
 	}
+
+	if (lastReplacedLine != NSNotFound)
+		[[self textStorage] endEditing];
 
 	if (reportMatches) {
 		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];

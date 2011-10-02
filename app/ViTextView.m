@@ -1149,13 +1149,7 @@ DEBUG_FINALIZE();
 		return NSMakeRange(NSNotFound, 0);
 	}
 
-	unsigned rx_options = ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
-	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	if ([defs integerForKey:@"ignorecase"] == NSOnState) {
-		if ([defs integerForKey:@"smartcase"] == NSOffState ||
-		    [pattern rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location == NSNotFound)
-			rx_options |= ONIG_OPTION_IGNORECASE;
-	}
+	unsigned rx_options = [ViRegexp defaultOptionsForString:pattern] | ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 
 	NSError *error = nil;
 	ViRegexp *rx = [ViRegexp regexpWithString:pattern
@@ -1187,7 +1181,7 @@ DEBUG_FINALIZE();
 				break;
 		}
 
-		if (nextMatch == nil && [defs boolForKey:@"wrapscan"]) {
+		if (nextMatch == nil && [[NSUserDefaults standardUserDefaults] boolForKey:@"wrapscan"]) {
 			if (forwardSearch)
 				nextMatch = [foundMatches objectAtIndex:0];
 			else

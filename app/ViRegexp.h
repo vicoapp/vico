@@ -23,6 +23,8 @@
 	OnigRegex	 _regex;
 }
 
++ (BOOL)shouldIgnoreCaseForString:(NSString *)string;
++ (int)defaultOptionsForString:(NSString *)string;
 + (NSCharacterSet *)reservedCharacters;
 + (BOOL)needEscape:(unichar)ch;
 + (NSString *)escape:(NSString *)string inRange:(NSRange)range;

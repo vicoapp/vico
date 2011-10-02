@@ -4,6 +4,21 @@
 
 @implementation ViRegexp
 
++ (BOOL)shouldIgnoreCaseForString:(NSString *)string
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	return ([defs integerForKey:@"ignorecase"] == NSOnState &&
+	       ([defs integerForKey:@"smartcase"] == NSOffState ||
+		[string rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location == NSNotFound));
+}
+
++ (int)defaultOptionsForString:(NSString *)string
+{
+	if ([self shouldIgnoreCaseForString:string])
+		return ONIG_OPTION_IGNORECASE;
+	return 0;
+}
+
 + (NSCharacterSet *)reservedCharacters
 {
 	static NSCharacterSet *__reservedCharacters = nil;

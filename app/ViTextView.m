@@ -1365,18 +1365,25 @@ replaceCharactersInRange:(NSRange)aRange
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 	NSLayoutManager *layoutManager = [self layoutManager];
-        NSRect visibleRect = [clipView bounds];
-	NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:[self caret]];
+	NSRect visibleRect = [clipView bounds];
 	BOOL atEOL = ([self caret] >= [[self textStorage] length]);
-	NSRect rect = [layoutManager boundingRectForGlyphRange:NSMakeRange(glyphIndex, atEOL ? 0 : 1)
-	                                       inTextContainer:[self textContainer]];
+
+	NSUInteger rectCount = 0;
+	NSRectArray rects = [layoutManager rectArrayForCharacterRange:NSMakeRange(caret, atEOL ? 0 : 1)
+					 withinSelectedCharacterRange:NSMakeRange(NSNotFound, 0)
+						      inTextContainer:[self textContainer]
+							    rectCount:&rectCount];
+	if (rectCount == 0)
+		return;
+
+	NSRect rect = rects[0];
 
 	if (atEOL)
 		rect.size.width = 1;
 	else {
 		unichar c = [[[self textStorage] string] characterAtIndex:[self caret]];
 		if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
-			rect.size.width = 7;
+			rect.size.width = _characterSize.width;
 	}
 
 	NSPoint topPoint;

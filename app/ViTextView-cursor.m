@@ -69,6 +69,7 @@
 			lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
 							  inTextContainer:[self textContainer]];
 			lineHighlightRect.size.width = 10000;
+			lineHighlightRect.origin.x = 0;
 		}
 	}
 

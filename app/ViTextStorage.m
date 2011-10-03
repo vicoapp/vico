@@ -306,7 +306,11 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	 * Update our line number data structure.
 	 */
 	NSInteger diff = [str length] - aRange.length;
-	DEBUG(@"edited range = %@, diff = %li, str = [%@]", NSStringFromRange(aRange), diff, str);
+	DEBUG(@"edited range = %@, diff = %li, str = [%@]",
+		NSStringFromRange(aRange), diff, str);
+
+	if (str == nil)
+		str = @"";
 
 	NSUInteger lineIndex = [self lineIndexAtLocation:aRange.location];
 	NSUInteger firstLineIndex = lineIndex;

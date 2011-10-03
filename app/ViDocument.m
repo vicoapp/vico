@@ -1708,8 +1708,10 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			}
 			lastSelector = nil;
 
-			for (NSString *scopeSelector in _symbolScopes) {
-				if ([scopeSelector match:scope] > 0) {
+			NSString *scopeSelector = [scope bestMatch:[_symbolScopes allKeys]];
+			if (scopeSelector) {
+				id obj = [_symbolScopes objectForKey:scopeSelector];
+				if ([obj isKindOfClass:[NSNumber class]] && [obj boolValue]) {
 					lastSelector = scopeSelector;
 					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
 					if (backRange.length > 0) {
@@ -1719,7 +1721,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					} else
 						wholeRange = range;
 					img = [self matchSymbolIconForScope:scope];
-					break;
 				}
 			}
 		}

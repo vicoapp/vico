@@ -1138,9 +1138,9 @@ DEBUG_FINALIZE();
 			[self closeDocumentView:[[(ViTabController *)tabController views] objectAtIndex:0]
 			       canCloseDocument:YES
 				 canCloseWindow:YES];
+		[(ViTabController *)tabController release];
+		[self closeTabController:(ViTabController *)tabController];
 	}
-	[(ViTabController *)tabController release];
-	[self closeTabController:(ViTabController *)tabController];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem

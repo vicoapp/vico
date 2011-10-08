@@ -32,7 +32,7 @@ while test -n "$1"; do
 	echo "converting $file with title '$title'" >&2
 	(head "$file" "$title"
 	 perl $HOME/bin/Markdown.pl --html4tags "$file"
-	 tail) > "$(basename "${file%.*}.html")"
+	 tail)
 	shift
 done
 

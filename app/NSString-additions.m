@@ -112,7 +112,7 @@
 	case NSPageDownFunctionKey:
 		key = @"pagedown"; break;*/
 	case NSHomeFunctionKey:
-		key = 0x2199;
+		key = 0x2199; break;
 	case NSEndFunctionKey:
 		key = 0x2197; break;
 /*	case NSInsertFunctionKey:
@@ -141,7 +141,7 @@
 	} else if (modifiers && [[NSString stringWithFormat:@"%C", key] isUppercase])
 		modifiers |= NSShiftKeyMask;
 
-	NSString *encodedKey = [NSMutableString string];
+	NSString *encodedKey;
 	if (modifiers) {
 		encodedKey = [NSString stringWithFormat:@"%@%@%@%@%@",
 		    (modifiers & NSShiftKeyMask) ? [NSString stringWithFormat:@"%C", 0x21E7] : @"",

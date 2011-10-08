@@ -179,7 +179,6 @@
 			@"createnewdocument",
 			nil];
 		outputFormat = [overrideOutputFormat objectAtIndex:status - 200];
-		status = 0;
 	}
 
 	DEBUG(@"%@: exited with status %i", [command name], status);

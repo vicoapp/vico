@@ -43,7 +43,7 @@
 
 	if (ch == 0x19 && keycode == kVK_Tab) {
 		/* apparently shift-control-tab sends a ctrl-y on my keyboard */
-		ch = without = 0x09;
+		without = 0x09;
 	}
 
 	if (!(quals & NSNumericPadKeyMask)) {

@@ -5,8 +5,8 @@
 	NSURLConnection		*_conn;
 	NSURLRequest		*_request;
 	NSMutableData		*_connData;
-	NSUInteger		 _receivedContentLength;
-	NSInteger		 _expectedContentLength;
+	unsigned long long	 _receivedContentLength;
+	long long		 _expectedContentLength;
 	id<ViDeferredDelegate>	 _delegate;
 	BOOL			 _finished;
 

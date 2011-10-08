@@ -208,6 +208,8 @@
  */
 + (ViMap *)mapWithName:(NSString *)mapName;
 
+- (ViMap *)initWithName:(NSString *)aName;
+
 /** @name Predefined standard maps */
 
 /**

@@ -1452,7 +1452,7 @@ resp2txt(int type)
 			return;
 		}
 
-		NSUInteger fileSize = [attributes fileSize]; /* may be zero */
+		unsigned long long fileSize = [attributes fileSize]; /* may be zero */
 		statRequest.progress = 0.0;
 
 		statRequest.subRequest = [self openFile:[normalizedURL path]

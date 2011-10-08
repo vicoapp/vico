@@ -152,13 +152,12 @@
 	NSTextContainer         *container;
 	ViTextStorage		*textStorage;
 	NSRect                  visibleRect;
-	NSRange                 range, glyphRange, nullRange;
+	NSRange                 range, glyphRange;
 	CGFloat                 ypos, yinset;
 
 	layoutManager = [view layoutManager];
 	container = [view textContainer];
 	textStorage = [(ViTextView *)view textStorage];
-	nullRange = NSMakeRange(NSNotFound, 0);
 	yinset = [view textContainerInset].height;
 	visibleRect = [[[self scrollView] contentView] bounds];
 

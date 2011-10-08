@@ -11,7 +11,7 @@
 }
 @end
 
-@interface ViPreferencePaneBundles : ViPreferencePane
+@interface ViPreferencePaneBundles : ViPreferencePane <NSURLDownloadDelegate>
 {
 	IBOutlet NSTextField		*bundlesInfo;
 	IBOutlet NSArrayController	*bundlesController;

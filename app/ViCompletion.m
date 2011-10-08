@@ -49,7 +49,7 @@ static NSCharacterSet *__ucase = nil;
 
 - (id)initWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
-	if ([self initWithContent:aString]) {
+	if ((self = [self initWithContent:aString]) != nil) {
 		_filterMatch = [aMatch retain];
 		_filterIsFuzzy = YES;
 	}

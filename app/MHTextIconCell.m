@@ -81,7 +81,7 @@
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	NSSize imageSize;
-	NSRect imageFrame;
+	NSRect imageFrame = NSZeroRect;
 
 	if (_image != nil) {
 		imageSize = [_image size];

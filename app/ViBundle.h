@@ -8,7 +8,7 @@
 @interface ViBundle : NSObject
 {
 	NSString		*_path;
-	NSMutableDictionary	*_info;
+	NSDictionary		*_info;
 	NSMutableArray		*_languages;
 	NSMutableArray		*_preferences;
 	NSMutableArray		*_items;

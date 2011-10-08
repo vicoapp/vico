@@ -205,6 +205,8 @@
 		p.y = NSMaxY(rect) - bounds.size.height;
 	else if (anchor == 2) /* middle */
 		p.y = rect.origin.y + rect.size.height / 2.0 - bounds.size.height / 2.0;
+	else
+		p.y = 0;
 
 	if (p.y < 0)
 		p.y = 0;
@@ -1996,7 +1998,7 @@
 
 	NSUInteger numberOfScreenLinesToScroll = numberOfScreenLines / 2;
 	glyphIndex = glyphRange.location;
-	NSRect lineRect;
+	NSRect lineRect = NSZeroRect;
 	for (NSUInteger i = 0; i < numberOfScreenLinesToScroll; i++) {
 		lineRect = [[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
 		glyphIndex = NSMaxRange(lineRange);
@@ -2139,7 +2141,7 @@
 	NSUInteger numberOfScreenLinesToScroll = numberOfScreenLines / 2;
 
 	glyphIndex = glyphRange.location;
-	NSRect lineRect;
+	NSRect lineRect = NSZeroRect;
 	for (NSUInteger i = 0; i < numberOfScreenLinesToScroll && glyphIndex > 0; i++) {
 		lineRect = [[self layoutManager] lineFragmentRectForGlyphAtIndex:glyphIndex - 1 effectiveRange:&lineRange];
 		glyphIndex = lineRange.location;

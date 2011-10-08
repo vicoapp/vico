@@ -14,10 +14,20 @@
 		storage = [NSMutableString string];
 	return self;
 }
+
 - (void)snippet:(ViSnippet *)snippet replaceCharactersInRange:(NSRange)range withString:(NSString *)string forTabstop:(ViTabstop *)tabstop
 {
 	[storage replaceCharactersInRange:range withString:string];
 }
+
+- (void)beginUpdatingSnippet:(ViSnippet *)snippet
+{
+}
+
+- (void)endUpdatingSnippet:(ViSnippet *)snippet
+{
+}
+
 - (NSString *)string
 {
 	return storage;

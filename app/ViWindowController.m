@@ -51,7 +51,7 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 @synthesize alternateMark = _alternateMark;
 @synthesize alternateMarkCandidate = _alternateMarkCandidate;
 @synthesize baseURL = _baseURL;
-@synthesize symbolController = _symbolController;
+@synthesize symbolController;
 @synthesize parser = _parser;
 
 + (ViWindowController *)currentWindowController

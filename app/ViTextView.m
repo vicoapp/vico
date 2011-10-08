@@ -2200,7 +2200,8 @@ replaceCharactersInRange:(NSRange)aRange
 
 		if (!replayingInput)
 			[self scrollToCaret];
-	}
+	} else
+		[self updateCaret];
 
 	if (mode == ViVisualMode)
 		[self setVisualSelection];

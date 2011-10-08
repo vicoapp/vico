@@ -347,7 +347,7 @@ updateMeta(void)
 		[alert setMessageText:@"This trial version has expired."];
 		[alert addButtonWithTitle:@"OK"];
 		[alert setInformativeText:@"Evaluation is now limited to 15 minutes."];
-		NSUInteger ret = [alert runModal];
+		[alert runModal];
 		[NSTimer scheduledTimerWithTimeInterval:15*60
 						 target:self
 					       selector:@selector(m:)

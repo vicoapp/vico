@@ -441,8 +441,6 @@
 (xmap setKey:"<left>" toAction:"move_left:")
 (xmap setKey:"<home>" toAction:"move_first_char:")
 (xmap setKey:"<end>" toAction:"move_eol:")
-(xmap setKey:"<alt-right>" toAction:"end_of_word:")
-(xmap setKey:"<alt-left>" toAction:"word_backward:")
 (xmap setKey:"<ctrl-right>" toAction:"move_eol:")
 (xmap setKey:"<ctrl-left>" toAction:"move_bol:")
 (xmap setKey:"<cmd-right>" toAction:"move_eol:")
@@ -454,6 +452,11 @@
 (xmap setKey:"<ctrl-d>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
 (xmap setKey:"<tab>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
 (xmap setKey:"<ctrl-f>" toAction:"ex_complete:" flags:0 parameter:"Ffpa" scope:nil)
+;; Restore normal Mac OS X keyboard actions in insert mode.
+(xmap setKey:"<alt-bs>" toAction:"deleteWordBackward:")
+(xmap setKey:"<alt-del>" toAction:"deleteWordForward:")
+(xmap setKey:"<alt-left>" toAction:"moveWordLeft:")
+(xmap setKey:"<alt-right>" toAction:"moveWordRight:")
 
 
 ;; a map for the completion list, similar to vim's ctrl-x mode

@@ -1,6 +1,11 @@
+ARCH ?= x86_64
 CONFIGURATION ?= DEBUG
 
-VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par $(BUILDDIR)
+VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help $(DERIVEDDIR)
+#$(BUILDDIR) 
+
+.SUFFIXES:
+#.SUFFIXES: .c .cpp .o .m .mm .h .html .md .xib .nib
 
 JSON_OBJC_SRCS = \
 	NSObject+JSON.m \
@@ -134,7 +139,6 @@ OBJCXX_SRCS = \
 
 C_SRCS = \
 	ber.c \
-	debug.c \
 	regcomp.c \
 	regenc.c \
 	regerror.c \
@@ -180,13 +184,16 @@ C_SRCS = \
 	utf32_le.c \
 	utf8.c
 
-GENERATED_C_SRCS = \
+DERIVED_C_SRCS = \
 	scope_selector.c
+
+DEBUG_C_SRCS = \
+	debug.c \
 
 RELEASE_C_SRCS = \
 	receipt.c
 
-ALL_C_SRCS = $($(CONFIGURATION)_C_SRCS) $(C_SRCS) $(GENERATED_C_SRCS)
+ALL_C_SRCS = $($(CONFIGURATION)_C_SRCS) $(C_SRCS) $(DERIVED_C_SRCS)
 
 CXX_SRCS = \
 	CharDistribution.cpp \
@@ -276,12 +283,48 @@ TOOL_OBJC_SRCS = \
 	vico.m \
 	$(JSON_OBJC_SRCS)
 
+LEMON_C_SRCS = \
+	lemon.c
+
 PAR_C_SRCS = \
 	buffer.c \
 	charset.c \
 	errmsg.c \
 	par.c \
 	reformat.c
+
+XORKEY_C_SRCS = \
+	xorkey.c
+
+HELP_SRCS = \
+	basics.md \
+	change.md \
+	change_indent.md \
+	delete.md \
+	dot.md \
+	ex.md \
+	ex_cmds.md \
+	ex_ranges.md \
+	explorer.md \
+	indent_settings.md \
+	insert.md \
+	jumplist.md \
+	line_search.md \
+	move_chars.md \
+	move_lines.md \
+	move_symbols.md \
+	move_words.md \
+	movement.md \
+	open_line.md \
+	operators.md \
+	remote.md \
+	scrolling.md \
+	searching.md \
+	splits.md \
+	ssh_keygen.md \
+	symbols.md \
+	terminal.md \
+	visual.md
 
 CC = clang
 CXX = clang++
@@ -291,13 +334,22 @@ REPO_VERSION := $(shell MACOSX_DEPLOYMENT_TARGET="" hg identify -n .)
 
 ifeq ($(CONFIGURATION),DEBUG)
 SHORT_VERSION = r$(REPO_VERSION)
-CFLAGS = -O0 -DDEBUG_BUILD=1 -gdwarf-2
-ARCH_CFLAGS = -arch x86_64
+CFLAGS = -O0 -DDEBUG_BUILD=1
+OBJCFLAGS =
+ARCHS = $(ARCH)
 else
-CFLAGS = -Os -DRELEASE_BUILD=1
-SHORT_VERSION = $(shell cat version.h)
-ARCH_CFLAGS = -arch x86_64 -arch i386
+CFLAGS = -Os -DRELEASE_BUILD=1 -DNDEBUG
+SHORT_VERSION := $(shell cat version.h)
+
+# I'm not sure what this does, but xcode uses them
+OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
+		   "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
+		   "-DIBAction=void)__attribute__((ibaction)"
+
+ARCHS = i386 x86_64
 endif
+
+CFLAGS += -fvisibility=hidden -gdwarf-2
 
 # warning flags
 CFLAGS	+= -Wreturn-type \
@@ -305,36 +357,36 @@ CFLAGS	+= -Wreturn-type \
 	   -Wswitch \
 	   -Wno-unused-parameter \
 	   -Wunused-variable \
-	   -Wunused-value
+	   -Wunused-value \
+           -Wno-sign-conversion
 CFLAGS	+= -Wall -Werror
 
 # oniguruma, par, and lemon has too many of these issues
-OBJCFLAGS = -Wshorten-64-to-32
+OBJCFLAGS += -Wshorten-64-to-32
 
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 
-ARCH_CFLAGS += -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks -fobjc-gc-only
+ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks -fobjc-gc-only
 CFLAGS	+= $(ARCH_CFLAGS)
 LDFLAGS	+= $(ARCH_CFLAGS)
 
 OBJCPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objc.pth
 OBJCXXPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objcxx.pth
-CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -F.
-
-#OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
-#		   "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
-#		   "-DIBAction=void)__attribute__((ibaction)"
-
+CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F.
 LDFLAGS	+= -F.
 
 TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
 APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framework Cocoa -framework Nu
 PAR_LDLIBS =
+XORKEY_LDLIBS =
 
 # paths
 BUILDDIR=./build/$(CONFIGURATION)
-OBJDIR=$(BUILDDIR)/obj
-DEPDIR=$(BUILDDIR)/dep
+OBJDIR=$(BUILDDIR)/obj/$(ARCH)
+OBJDIR_32=$(BUILDDIR)/obj/i386
+OBJDIR_64=$(BUILDDIR)/obj/x86_64
+DEPDIR=$(BUILDDIR)/dep/$(ARCH)
+DERIVEDDIR=$(BUILDDIR)/derived/$(SHORT_VERSION)
 APPDIR=$(BUILDDIR)/Vico.app
 BINDIR=$(APPDIR)/Contents/MacOS
 RESDIR=$(APPDIR)/Contents/Resources
@@ -352,7 +404,12 @@ TOOL_OBJC_OBJS = $(addprefix $(OBJDIR)/,$(TOOL_OBJC_SRCS:.m=.o))
 TOOL_OBJS = $(TOOL_OBJC_OBJS)
 PAR_C_OBJS = $(addprefix $(OBJDIR)/,$(PAR_C_SRCS:.c=.o))
 PAR_OBJS = $(PAR_C_OBJS)
+LEMON_C_OBJS = $(addprefix $(OBJDIR)/,$(LEMON_C_SRCS:.c=.o))
+LEMON_OBJS = $(LEMON_C_OBJS)
+XORKEY_C_OBJS = $(addprefix $(OBJDIR)/,$(XORKEY_C_SRCS:.c=.o))
+XORKEY_OBJS = $(XORKEY_C_OBJS)
 NIBS = $(addprefix $(NIBDIR)/,$(XIBS:.xib=.nib))
+HELP_HTMLS = $(addprefix $(HELP_EN)/,$(HELP_SRCS:.md=.html))
 
 DEPS = -MMD -MT $@ -MF $(addsuffix .d,$(basename $@))
 
@@ -367,49 +424,109 @@ $(OBJDIR)/%.o: %.cpp
 $(NIBDIR)/%.nib: %.xib
 	mkdir -p $(NIBDIR)
 	$(IBTOOL) --errors --warnings --notices --output-format human-readable-text --compile $@ $< --sdk $(SDK)
+$(HELP_EN)/%.html: %.md
+	mkdir -p $(@D)
+	help/md2html $< > $@
+%.html: %.md
+	mkdir -p $(@D)
+	help/md2html $< > $@
+
 
 .PHONY: app
-app: $(BINDIR)/Vico $(NIBS) $(BINDIR)/vicotool $(BINDIR)/par
+app: $(NIBS) $(RESOURCES) app/Vico-Info.plist $(RESDIR)/Vico.help
+	for arch in $(ARCHS); do \
+		$(MAKE) binaries ARCH=$$arch; \
+	done
+	mkdir -p $(BINDIR)
+	if test "$(ARCH)" = "$(ARCHS)"; then \
+		cp $(OBJDIR)/Vico $(BINDIR); \
+		cp $(OBJDIR)/vicotool $(BINDIR); \
+		cp $(OBJDIR)/par $(BINDIR); \
+	else \
+		lipo -create $(OBJDIR_32)/Vico $(OBJDIR_64)/Vico -output $(BINDIR)/Vico; \
+		lipo -create $(OBJDIR_32)/vicotool $(OBJDIR_64)/vicotool -output $(BINDIR)/vicotool; \
+		lipo -create $(OBJDIR_32)/par $(OBJDIR_64)/par -output $(BINDIR)/par; \
+		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vicp.app.dSYM; \
+	fi
 	cp -f app/Vico-Info.plist $(INFOPLIST)
 	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
+	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
 	rsync -a --delete --exclude ".git" Nu.framework $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 
+binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
+
 $(OBJC_OBJS): $(OBJDIR)/Vico-prefix.objc.pth
 $(OBJCXX_SRCS): $(OBJDIR)/Vico-prefix.objcxx.pth
 
 $(OBJDIR)/Vico-prefix.objc.pth: app/Vico-prefix.pch
 	mkdir -p $(OBJDIR)
-	$(CC) -x objective-c-header $(ARCH_CFLAGS) $< -o $@
+	$(CC) -x objective-c-header $(CFLAGS) $(OBJCFLAGS) $< -o $@
 
 $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 	mkdir -p $(OBJDIR)
-	$(CC) -x objective-c++-header $(ARCH_CFLAGS) $< -o $@
+	$(CC) -x objective-c++-header $(CFLAGS) $(OBJCFLAGS) $< -o $@
 
-$(OBJDIR)/lemon: lemon.o
+$(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-app/scope_selector.c: scope_selector.lemon $(OBJDIR)/lemon
+APP_CERT_NAME = "3rd Party Mac Developer Application: Martin Hedenfalk" 
+INST_CERT_NAME = "3rd Party Mac Developer Installer: Martin Hedenfalk" 
+
+pkg: app
+	strip -s app/saved_symbols $(BINDIR)/Vico
+	strip $(BINDIR)/vicotool
+	strip $(BINDIR)/par
+	chown -RH "martinh:staff" $(APPDIR)
+	chmod -RH u+w,go-w,a+rX $(APPDIR)
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(APPDIR)
+	productbuild --component $(APPDIR) /Applications \
+		     --sign $(INST_CERT_NAME) \
+		     --product $(INFOPLIST) \
+		     $(BUILDDIR)/Vico.pkg
+
+install: pkg
+	sudo installer -store -pkg $(BUILDDIR)/Vico.pkg -target /
+
+$(DERIVEDDIR)/scope_selector.c: scope_selector.lemon $(OBJDIR)/lemon
 	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $<
 
-$(BINDIR)/Vico: $(OBJS)
-	mkdir -p $(BINDIR)
+$(OBJDIR)/Vico: $(OBJS)
+	mkdir -p $(OBJDIR)
 	$(CXX) $(LDFLAGS) $(LDLIBS) $(APP_LDLIBS) $^ -o $@
 	install_name_tool -change Nu.framework/Versions/A/Nu \
 	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \
-	    $(BINDIR)/Vico
+	    $(OBJDIR)/Vico
 
-$(BINDIR)/vicotool: $(TOOL_OBJS)
-	mkdir -p $(BINDIR)
+$(OBJDIR)/vicotool: $(TOOL_OBJS)
+	mkdir -p $(OBJDIR)
 	$(CC) $(LDFLAGS) $(TOOL_LDLIBS) $^ -o $@
 
-$(BINDIR)/par: $(PAR_OBJS)
-	mkdir -p $(BINDIR)
+$(OBJDIR)/par: $(PAR_OBJS)
+	mkdir -p $(OBJDIR)
 	$(CC) $(LDFLAGS) $(PAR_LDLIBS) $^ -o $@
+
+$(OBJDIR)/xorkey: $(XORKEY_OBJS)
+	mkdir -p $(OBJDIR)
+	$(CC) $(LDFLAGS) $(XORKEY_LDLIBS) $^ -o $@
+
+
+app/receipt.c: $(DERIVEDDIR)/AppleIncRootCertificate.h $(DERIVEDDIR)/bundle_fingerprint.h 
+
+$(DERIVEDDIR)/bundle_fingerprint.h:
+	mkdir -p $(DERIVEDDIR)
+	@echo "Using version $(SHORT_VERSION) for receipt validation"
+	/bin/echo -n "se.bzero.Vico$(SHORT_VERSION)" | openssl sha1 -binary | app/b2h > $(DERIVEDDIR)/bundle_fingerprint.h
+
+$(DERIVEDDIR)/AppleIncRootCertificate.h: app/AppleIncRootCertificate.cer $(OBJDIR)/xorkey
+	mkdir -p $(DERIVEDDIR)
+	$(OBJDIR)/xorkey app/AppleIncRootCertificate.cer > $(DERIVEDDIR)/AppleIncRootCertificate.h
+
 
 # include automatic dependencies...
 -include $(OBJS:.o=.d)
@@ -486,26 +603,37 @@ release: test
 TARDATE := $(shell date +%Y%m%d%H)
 TARBALL  = vico-hg-$(TARDATE).tar.gz
 tarball:
-	tar zcvf $(TARBALL) .hg && \
-	gpg -r martin -e $(TARBALL) && \
+	tar zcvf $(TARBALL) .hg
+	gpg -r martin -e $(TARBALL)
 	rm $(TARBALL)
 
 upload_tarball: tarball
 	scp $(TARBALL).gpg mx.bzero.se:
 
-HELP_SRC = $(CURDIR)/help
-HELP_DST = $(CURDIR)/help/Vico.help/Contents/Resources
-HELP_EN  = $(HELP_DST)/English.lproj
-help:
-	rm -rf $(CURDIR)/help/Vico.help
+HELP_FILES = \
+	index.html \
+	$(HELP_SRCS) \
+	shared/help.css \
+	shared/icon_hand.png \
+	shared/icon_hand_32.png \
+	shared/icon_hand_64.png \
+	help-Info.plist \
+	help-InfoPlist.strings
+
+HELP_RESDIR = $(RESDIR)/Vico.help/Contents/Resources
+HELP_EN = $(HELP_RESDIR)/English.lproj
+$(RESDIR)/Vico.help: $(HELP_FILES)
 	mkdir -p $(HELP_EN)
-	cp -f $(HELP_SRC)/index.html $(HELP_EN)/VicoHelp.html
-	cp -rf $(HELP_SRC)/shared $(HELP_DST)
-	cp -f $(HELP_SRC)/help-Info.plist $(HELP_DST)/../Info.plist
-	cp -f $(HELP_SRC)/help-InfoPlist.strings $(HELP_EN)/InfoPlist.strings
-	cd $(HELP_EN) && $(HELP_SRC)/md2html $(HELP_SRC)/*.md
+	cp -f help/index.html $(HELP_EN)/VicoHelp.html
+	rsync -a help/shared $(HELP_RESDIR)
+	cp -f help/help-Info.plist $(HELP_RESDIR)/../Info.plist
+	cp -f help/help-InfoPlist.strings $(HELP_EN)/InfoPlist.strings
+	for md in $(HELP_SRCS); do \
+		./help/md2html help/$$md > $(HELP_EN)/$${md%.md}.html; \
+	done
 	hiutil -vg -s en -Caf $(HELP_EN)/Vico.helpindex $(HELP_EN)
 
+HELP_SRC = help
 WWW_HELP_DST = $(CURDIR)/help/www
 WWW_HELP_EN  = $(WWW_HELP_DST)/en
 wwwhelp:
@@ -515,7 +643,7 @@ wwwhelp:
 	cd $(WWW_HELP_EN) && $(HELP_SRC)/md2html.www $(HELP_SRC)/*.md
 
 synchelp: help
-	rsync -avr $(HELP_DST)/ www.vicoapp.com:/var/www/vicoapp.com/help
+	rsync -avr $(HELP_RESDIR)/ www.vicoapp.com:/var/www/vicoapp.com/help
 
 clean:
 	rm -rf $(OBJDIR) $(APPDIR)
@@ -523,4 +651,4 @@ clean:
 distclean:
 	rm -rf $(BUILDDIR)
 
-.PHONY: build help clean
+.PHONY: build clean

@@ -2285,6 +2285,7 @@
 					oniguruma,
 					universalchardet,
 				);
+				KEEP_PRIVATE_EXTERNS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -2445,6 +2446,7 @@
 					oniguruma,
 					universalchardet,
 				);
+				KEEP_PRIVATE_EXTERNS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -2477,6 +2479,7 @@
 					oniguruma,
 					universalchardet,
 				);
+				KEEP_PRIVATE_EXTERNS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;

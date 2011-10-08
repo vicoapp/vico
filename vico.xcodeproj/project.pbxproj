@@ -15,7 +15,7 @@
 		9A260671134C50C3002C86FB /* CompletionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A26066F134C50C3002C86FB /* CompletionWindow.xib */; };
 		9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260673134DF8D7002C86FB /* ViCompletion.m */; };
 		9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
-		9A26068113530FF3002C86FB /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A26068013530FF3002C86FB /* main.c */; };
+		9A26068113530FF3002C86FB /* xorkey.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A26068013530FF3002C86FB /* xorkey.c */; };
 		9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */; };
 		9A2606A4135B17F2002C86FB /* ThemePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606A2135B17F2002C86FB /* ThemePrefs.xib */; };
 		9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A7135B1924002C86FB /* ViPreferencePane.m */; };
@@ -409,7 +409,7 @@
 		9A26067613505AEF002C86FB /* ViSymbolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolController.h; sourceTree = "<group>"; };
 		9A26067713505AEF002C86FB /* ViSymbolController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolController.m; sourceTree = "<group>"; };
 		9A26067D13530FF3002C86FB /* xorkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xorkey; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A26068013530FF3002C86FB /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		9A26068013530FF3002C86FB /* xorkey.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xorkey.c; sourceTree = "<group>"; };
 		9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
 		9A2606A3135B17F2002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThemePrefs.xib; sourceTree = "<group>"; };
 		9A2606A6135B1924002C86FB /* ViPreferencePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePane.h; sourceTree = "<group>"; };
@@ -895,7 +895,7 @@
 		9A26067F13530FF3002C86FB /* xorkey */ = {
 			isa = PBXGroup;
 			children = (
-				9A26068013530FF3002C86FB /* main.c */,
+				9A26068013530FF3002C86FB /* xorkey.c */,
 			);
 			path = xorkey;
 			sourceTree = "<group>";
@@ -1818,7 +1818,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A26068113530FF3002C86FB /* main.c in Sources */,
+				9A26068113530FF3002C86FB /* xorkey.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

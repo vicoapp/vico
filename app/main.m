@@ -31,7 +31,6 @@ main(int argc, char *argv[])
 #endif
 
 #if defined(RELEASE_BUILD)
-#warning Including receipt validation code
 	receipt_validate_bundle([[[NSBundle mainBundle] bundlePath] fileSystemRepresentation]);
 #endif
 

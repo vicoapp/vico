@@ -280,7 +280,7 @@
 
 @implementation ViRegexpMatch
 
-@synthesize startLocation;
+@synthesize startLocation = _startLocation;
 
 + (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion
                            startLocation:(NSUInteger)aLocation
@@ -293,7 +293,7 @@
                     startLocation:(NSUInteger)aLocation
 {
 	if ((self = [super init]) != nil) {
-		startLocation = aLocation;
+		_startLocation = aLocation;
 		_region = aRegion;
 	}
 	return self;
@@ -309,7 +309,7 @@
 	if (idx >= _region->num_regs || _region->beg[idx] == -1)
 		return NSMakeRange(NSNotFound, 0);
 
-	return NSMakeRange(startLocation + (_region->beg[idx] / sizeof(unichar)),
+	return NSMakeRange(_startLocation + (_region->beg[idx] / sizeof(unichar)),
 	                   (_region->end[idx] - _region->beg[idx]) / sizeof(unichar));
 }
 

@@ -554,6 +554,31 @@ $(APPDIR)/Contents/PkgInfo: app/Vico-Info.plist
 	/bin/echo -n "$(CF_PKGTYPE)$(CF_SIGNATURE)" > $@
 	eval `stat -s $@` && test $$st_size -eq 8
 
+
+TMPDMG		= $(BUILDDIR)/vico-tmp.dmg
+VOLNAME		= vico-$(SHORT_VERSION)
+DMG		= $(BUILDDIR)/$(VOLNAME).dmg
+DMGDIR		= "$(BUILDDIR)/Vico $(SHORT_VERSION)"
+APPCAST_BASE	= "http://www.vicoapp.com/relnotes"
+DOWNLOAD_BASE	= "http://www.vicoapp.com/download"
+KSIZE		= $(shell du -ks $(APPDIR) | cut -f1)
+SIZE		= $(shell $$(($(KSIZE) * 1024)) )
+
+dmg: $(DMG)
+
+$(DMG): app
+	@echo "Creating disk image $(VOLNAME)"
+	/bin/rm -rf $(TMPDMG) $(DMGDIR) $(DMG)
+	mkdir -p $(DMGDIR)
+	/bin/cp -a $(APPDIR) $(DMGDIR)
+	ln -s /Applications $(DMGDIR)/Applications
+	hdiutil makehybrid -o $(TMPDMG) $(DMGDIR) -hfs
+	hdiutil convert -format UDBZ $(TMPDMG) -o $(DMG)
+	/bin/rm -rf $(TMPDMG) $(DMGDIR)
+	ls -lh $(DMG)
+	@echo "scp $(DMG) vicoapp.com:/var/www/vicoapp.com/download"
+
+
 # include automatic dependencies...
 -include $(OBJS:.o=.d)
 

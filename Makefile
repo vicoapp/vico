@@ -37,7 +37,7 @@ OBJC_SRCS = \
 	NSTask-streaming.m \
 	NSURL-additions.m \
 	NSView-additions.m \
-        NSWindow-additions.m \
+	NSWindow-additions.m \
 	PSMMetalTabStyle.m \
 	PSMOverflowPopUpButton.m \
 	PSMProgressIndicator.m \
@@ -492,7 +492,7 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APP
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
-	rsync -a --delete --exclude ".git" --exclude ".DS_Store" Nu.framework $(FWDIR)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(shell readlink Nu.framework || echo Nu.framework) $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 

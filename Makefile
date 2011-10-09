@@ -279,6 +279,13 @@ RESOURCES = \
 	par/par.doc \
 	Credits.txt
 
+ifneq ($(CONFIGURATION),DEBUG)
+
+BUNDLE_USERS = vicoapp textmate kswedberg
+BUNDLE_REPOS = $(addprefix $(RESDIR)/,$(addsuffix -bundles.json,$(BUNDLE_USERS)))
+.PHONY: $(BUNDLE_REPOS)
+endif
+
 TOOL_OBJC_SRCS = \
 	vico.m \
 	$(JSON_OBJC_SRCS)
@@ -435,7 +442,7 @@ $(HELP_EN)/%.html: %.md
 
 
 .PHONY: app
-app: $(NIBS) $(RESOURCES) app/Vico-Info.plist $(RESDIR)/Vico.help
+app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APPDIR)/Contents/PkgInfo
 	for arch in $(ARCHS); do \
 		$(MAKE) binaries ARCH=$$arch; \
 	done
@@ -453,13 +460,12 @@ app: $(NIBS) $(RESOURCES) app/Vico-Info.plist $(RESDIR)/Vico.help
 	install_name_tool -change Nu.framework/Versions/A/Nu \
 	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \
 	    $(BINDIR)/Vico
-	cp -f app/Vico-Info.plist $(INFOPLIST)
-	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
-	rsync -a --delete --exclude ".git" Nu.framework $(FWDIR)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" Nu.framework $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 
@@ -517,6 +523,15 @@ $(OBJDIR)/xorkey: $(XORKEY_OBJS)
 	mkdir -p $(OBJDIR)
 	$(CC) $(LDFLAGS) $(XORKEY_LDLIBS) $^ -o $@
 
+%-bundles.json:
+	mkdir -p $(@D)
+	@echo "downloading bundle repository for $(*F)"
+	if curl -s "http://github.com/api/v2/json/user/show/$(*F)" | grep -q '"type":"Organization"'; then \
+		repourl="http://github.com/api/v2/json/organizations/$(*F)/public_repositories"; \
+	else \
+		repourl="http://github.com/api/v2/json/repos/show/$(*F)"; \
+	fi; \
+	curl --fail -s $$repourl > $@
 
 app/receipt.c: $(DERIVEDDIR)/AppleIncRootCertificate.h $(DERIVEDDIR)/bundle_fingerprint.h 
 
@@ -529,6 +544,15 @@ $(DERIVEDDIR)/AppleIncRootCertificate.h: app/AppleIncRootCertificate.cer $(OBJDI
 	mkdir -p $(DERIVEDDIR)
 	$(OBJDIR)/xorkey app/AppleIncRootCertificate.cer > $(DERIVEDDIR)/AppleIncRootCertificate.h
 
+
+$(INFOPLIST): app/Vico-Info.plist
+	cp -f $< $@
+
+CF_PKGTYPE = $(shell /usr/libexec/PlistBuddy -c "Print :CFBundlePackageType" app/Vico-Info.plist)
+CF_SIGNATURE = $(shell /usr/libexec/PlistBuddy -c "Print :CFBundleSignature" app/Vico-Info.plist)
+$(APPDIR)/Contents/PkgInfo: app/Vico-Info.plist
+	/bin/echo -n "$(CF_PKGTYPE)$(CF_SIGNATURE)" > $@
+	eval `stat -s $@` && test $$st_size -eq 8
 
 # include automatic dependencies...
 -include $(OBJS:.o=.d)
@@ -627,7 +651,7 @@ HELP_EN = $(HELP_RESDIR)/English.lproj
 $(RESDIR)/Vico.help: $(HELP_FILES)
 	mkdir -p $(HELP_EN)
 	cp -f help/index.html $(HELP_EN)/VicoHelp.html
-	rsync -a help/shared $(HELP_RESDIR)
+	rsync -a --delete --exclude ".DS_Store" help/shared $(HELP_RESDIR)
 	cp -f help/help-Info.plist $(HELP_RESDIR)/../Info.plist
 	cp -f help/help-InfoPlist.strings $(HELP_EN)/InfoPlist.strings
 	for md in $(HELP_SRCS); do \

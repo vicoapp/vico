@@ -472,7 +472,7 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APP
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
 
 $(OBJC_OBJS): $(OBJDIR)/Vico-prefix.objc.pth
-$(OBJCXX_SRCS): $(OBJDIR)/Vico-prefix.objcxx.pth
+$(OBJCXX_OBJS): $(OBJDIR)/Vico-prefix.objcxx.pth
 
 $(OBJDIR)/Vico-prefix.objc.pth: app/Vico-prefix.pch
 	mkdir -p $(OBJDIR)

@@ -1,11 +1,10 @@
 ARCH ?= x86_64
 CONFIGURATION ?= DEBUG
 
-VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help $(DERIVEDDIR)
+VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
 #$(BUILDDIR) 
 
 .SUFFIXES:
-#.SUFFIXES: .c .cpp .o .m .mm .h .html .md .xib .nib
 
 JSON_OBJC_SRCS = \
 	NSObject+JSON.m \

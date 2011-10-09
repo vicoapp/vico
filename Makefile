@@ -485,7 +485,7 @@ $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 $(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-NSString-scopeSelector.m: $(DERIVEDDIR)/scope_selector.h
+$(OBJDIR)/NSString-scopeSelector.o: $(DERIVEDDIR)/scope_selector.h
 
 APP_CERT_NAME = "3rd Party Mac Developer Application: Martin Hedenfalk" 
 INST_CERT_NAME = "3rd Party Mac Developer Installer: Martin Hedenfalk" 

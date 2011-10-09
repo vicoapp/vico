@@ -334,11 +334,11 @@ REPO_VERSION := $(shell MACOSX_DEPLOYMENT_TARGET="" hg identify -n .)
 
 ifeq ($(CONFIGURATION),DEBUG)
 SHORT_VERSION = r$(REPO_VERSION)
-CFLAGS = -O0 -DDEBUG_BUILD=1
+CFLAGS = -O0
 OBJCFLAGS =
 ARCHS = $(ARCH)
 else
-CFLAGS = -Os -DRELEASE_BUILD=1 -DNDEBUG
+CFLAGS = -Os -DNDEBUG
 SHORT_VERSION := $(shell cat version.h)
 
 # I'm not sure what this does, but xcode uses them
@@ -348,6 +348,8 @@ OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
 
 ARCHS = i386 x86_64
 endif
+
+CFLAGS += -D$(CONFIGURATION)_BUILD=1
 
 CFLAGS += -fvisibility=hidden -gdwarf-2
 
@@ -448,6 +450,9 @@ app: $(NIBS) $(RESOURCES) app/Vico-Info.plist $(RESDIR)/Vico.help
 		lipo -create $(OBJDIR_32)/par $(OBJDIR_64)/par -output $(BINDIR)/par; \
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vicp.app.dSYM; \
 	fi
+	install_name_tool -change Nu.framework/Versions/A/Nu \
+	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \
+	    $(BINDIR)/Vico
 	cp -f app/Vico-Info.plist $(INFOPLIST)
 	rsync -a --delete --exclude ".git" $(RESOURCES) $(RESDIR)
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
@@ -499,9 +504,6 @@ $(DERIVEDDIR)/scope_selector.c: scope_selector.lemon $(OBJDIR)/lemon
 $(OBJDIR)/Vico: $(OBJS)
 	mkdir -p $(OBJDIR)
 	$(CXX) $(LDFLAGS) $(LDLIBS) $(APP_LDLIBS) $^ -o $@
-	install_name_tool -change Nu.framework/Versions/A/Nu \
-	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \
-	    $(OBJDIR)/Vico
 
 $(OBJDIR)/vicotool: $(TOOL_OBJS)
 	mkdir -p $(OBJDIR)

@@ -1017,6 +1017,11 @@ DEBUG_FINALIZE();
 
 	[super close];
 	[[ViEventManager defaultManager] emit:ViEventDidCloseDocument for:self with:self, nil];
+
+        if ([self isDocumentEdited])
+		[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentEditedChangedNotification
+								    object:self
+								  userInfo:nil];
 }
 
 - (void)close

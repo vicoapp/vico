@@ -14,6 +14,7 @@
 pthread_mutex_t onig_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct timeval launch_start;
+extern BOOL openUntitledDocument;
 
 __attribute__((visibility("default"))) void
 nu_log(NSString *msg)
@@ -35,6 +36,11 @@ main(int argc, char *argv[])
 #endif
 
 	signal(SIGPIPE, SIG_IGN);
+
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-skip-untitled") == 0)
+			openUntitledDocument = NO;
+	}
 
 	return NSApplicationMain(argc, (const char **) argv);
 }

@@ -131,6 +131,8 @@ main(int argc, char **argv)
 		errx(6, "can't wait for multiple files");
 	if (argc == 0 && wait_for_close)
 		errx(6, "no document to wait for");
+	if (runLoop && eval_script == nil && eval_file == nil)
+		errx(6, "no script to wait for");
 
 	if (wait_for_close && (eval_script || eval_file))
 		errx(1, "can't both evaluate script and wait for document");
@@ -142,14 +144,28 @@ main(int argc, char **argv)
 		/* failed to connect, try to start it */
 		CFStringRef bundle_id = CFSTR("se.bzero.Vico");
 		FSRef appRef;
-		if (LSFindApplicationForInfo(kLSUnknownCreator, bundle_id, NULL, &appRef, NULL) == 0 &&
-		    LSOpenFSRef(&appRef, NULL) == 0) {
-			for (i = 0; i < 50 && proxy == nil; i++) {
-				usleep(200000); // sleep for 0.2 seconds
-				proxy = (NSProxy<ViShellCommandProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:connName
-															     host:nil];
-			}
+		LSApplicationParameters params;
+		bzero(&params, sizeof(params));
+		params.flags = kLSLaunchNoParams;
+		if (LSFindApplicationForInfo(kLSUnknownCreator, bundle_id, NULL, &appRef, NULL) != 0)
+			errx(1, "failed to find Vico");
+
+		params.application = &appRef;
+
+		if (argc > 0) {
+			const void *values[] = { CFSTR("-skip-untitled") };
+			params.argv = CFArrayCreate(NULL, values, 1, &kCFTypeArrayCallBacks);
 		}
+
+		if (LSOpenApplication(&params, NULL) != 0)
+			errx(1, "failed to start Vico");
+
+		for (i = 0; i < 50 && proxy == nil; i++) {
+			usleep(200000); // sleep for 0.2 seconds
+			proxy = (NSProxy<ViShellCommandProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:connName
+														     host:nil];
+		}
+
 		if (proxy == nil)
 			errx(1, "failed to connect");
 	}
@@ -178,7 +194,6 @@ main(int argc, char **argv)
 		if (script == nil)
 			errx(2, "invalid UTF8 encoding");
 	}
-
 
 	if (params_from_stdin) {
 		handle = [NSFileHandle fileHandleWithStandardInput];

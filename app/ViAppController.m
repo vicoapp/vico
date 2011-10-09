@@ -26,6 +26,8 @@
 
 #include <sys/time.h>
 
+BOOL openUntitledDocument = YES;
+
 @interface caretBlinkModeTransformer : NSValueTransformer
 {
 }
@@ -106,7 +108,9 @@
 // stops the application from creating an untitled document on load
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-	return YES;
+	BOOL ret = openUntitledDocument;
+	openUntitledDocument = YES;
+	return ret;
 }
 
 - (void)newBundleLoaded:(NSNotification *)notification

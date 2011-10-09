@@ -268,6 +268,34 @@ IMAGES = \
 	Images/tag.png \
 	vico.icns
 
+VICO_BUNDLES = \
+	ack
+
+TM_BUNDLES = \
+	c \
+	css \
+	diff \
+	html \
+	java \
+	javascript \
+	json \
+	objective-c \
+	perl \
+	php \
+	python \
+	ruby-on-rails \
+	ruby \
+	shellscript \
+	source \
+	sql \
+	text \
+	xml \
+	yaml
+
+BUNDLES = \
+	$(addsuffix, .vico-bundle,$(VICO_BUNDLES)) \
+	$(addsuffix, .tmbundle,$(VICO_BUNDLES))
+
 RESOURCES = \
 	Support \
 	Themes \
@@ -653,20 +681,19 @@ syncapi: api
 TAG		?= tip
 RELEASE_DIR	 = build/$(CONFIGURATION)-$(TAG)
 
-release:
+.PHONY: checkout
+checkout:
 	@echo release directory is $(RELEASE_DIR)
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
 	hg clone -u $(TAG) . $(RELEASE_DIR)
 	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
+	rsync -a $(CURDIR)/Bundles/ $(RELEASE_DIR)/Bundles
+
+release: checkout
 	$(MAKE) -C $(RELEASE_DIR) pkg
 
-snapshot:
-	@echo release directory is $(RELEASE_DIR)
-	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
-	@echo checking out sources for '$(TAG)'
-	hg clone -u $(TAG) . $(RELEASE_DIR)
-	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
+snapshot: checkout
 	$(MAKE) -C $(RELEASE_DIR) dmg
 
 TARDATE := $(shell date +%Y%m%d%H)

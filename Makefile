@@ -485,6 +485,8 @@ $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 $(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
+NSString-scopeSelector.m: $(DERIVEDDIR)/scope_selector.h
+
 APP_CERT_NAME = "3rd Party Mac Developer Application: Martin Hedenfalk" 
 INST_CERT_NAME = "3rd Party Mac Developer Installer: Martin Hedenfalk" 
 
@@ -504,8 +506,9 @@ pkg: app
 install: pkg
 	sudo installer -store -pkg $(BUILDDIR)/Vico.pkg -target /
 
-$(DERIVEDDIR)/scope_selector.c: scope_selector.lemon $(OBJDIR)/lemon
-	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $<
+$(DERIVEDDIR)/scope_selector.c $(DERIVEDDIR)/scope_selector.h: scope_selector.lemon $(OBJDIR)/lemon
+	mkdir -p $(@D)
+	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $< && mv $(<D)/$(basename $(<F)).[ch] $(@D)
 
 $(OBJDIR)/Vico: $(OBJS)
 	mkdir -p $(OBJDIR)
@@ -648,8 +651,24 @@ api:
 syncapi: api
 	rsync -av --delete  doc/html/ www:/var/www/feedback.vicoapp.com/public/api
 
-release: test
-	./release.sh
+TAG		?= tip
+RELEASE_DIR	 = build/$(CONFIGURATION)-$(TAG)
+
+release:
+	@echo release directory is $(RELEASE_DIR)
+	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
+	@echo checking out sources for '$(TAG)'
+	hg clone -u $(TAG) . $(RELEASE_DIR)
+	ln -s ../Nu.framework $(RELEASE_DIR)
+	$(MAKE) -C $(RELEASE_DIR) pkg
+
+snapshot:
+	@echo release directory is $(RELEASE_DIR)
+	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
+	@echo checking out sources for '$(TAG)'
+	hg clone -u $(TAG) . $(RELEASE_DIR)
+	ln -s ../Nu.framework $(RELEASE_DIR)
+	$(MAKE) -C $(RELEASE_DIR) dmg
 
 TARDATE := $(shell date +%Y%m%d%H)
 TARBALL  = vico-hg-$(TARDATE).tar.gz

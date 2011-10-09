@@ -172,7 +172,8 @@
 	if (!focusEditor) {
 		/* Force focusing the editor if current focus is on filter field. */
 		if ([window firstResponderOrDelegate] == altSymbolFilterField ||
-		    [window firstResponderOrDelegate] == symbolFilterField)
+		    [window firstResponderOrDelegate] == symbolFilterField ||
+		    [window firstResponder] == symbolView)
 			focusEditor = YES;
 	}
 

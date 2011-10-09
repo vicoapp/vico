@@ -1109,7 +1109,8 @@
 	if (!focusEditor) {
 		/* Force focusing the editor if current focus is on filter field. */
 		if ([window firstResponderOrDelegate] == altFilterField ||
-		    [window firstResponderOrDelegate] == filterField)
+		    [window firstResponderOrDelegate] == filterField ||
+		    [window firstResponder] == explorer)
 			focusEditor = YES;
 	}
 

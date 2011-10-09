@@ -482,7 +482,7 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APP
 		lipo -create $(OBJDIR_32)/Vico $(OBJDIR_64)/Vico -output $(BINDIR)/Vico; \
 		lipo -create $(OBJDIR_32)/vicotool $(OBJDIR_64)/vicotool -output $(BINDIR)/vicotool; \
 		lipo -create $(OBJDIR_32)/par $(OBJDIR_64)/par -output $(BINDIR)/par; \
-		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vicp.app.dSYM; \
+		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
 	install_name_tool -change Nu.framework/Versions/A/Nu \
 	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \

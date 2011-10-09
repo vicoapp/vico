@@ -510,6 +510,8 @@ $(DERIVEDDIR)/scope_selector.c $(DERIVEDDIR)/scope_selector.h: scope_selector.le
 	mkdir -p $(@D)
 	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $< && mv $(<D)/$(basename $(<F)).[ch] $(@D)
 
+$(OBJDIR)/scope_selector.o: $(DERIVEDDIR)/scope_selector.c $(DERIVEDDIR)/scope_selector.h
+
 $(OBJDIR)/Vico: $(OBJS)
 	mkdir -p $(OBJDIR)
 	$(CXX) $(LDFLAGS) $(LDLIBS) $(APP_LDLIBS) $^ -o $@
@@ -659,7 +661,7 @@ release:
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
 	hg clone -u $(TAG) . $(RELEASE_DIR)
-	ln -s ../Nu.framework $(RELEASE_DIR)
+	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
 	$(MAKE) -C $(RELEASE_DIR) pkg
 
 snapshot:
@@ -667,7 +669,7 @@ snapshot:
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
 	hg clone -u $(TAG) . $(RELEASE_DIR)
-	ln -s ../Nu.framework $(RELEASE_DIR)
+	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
 	$(MAKE) -C $(RELEASE_DIR) dmg
 
 TARDATE := $(shell date +%Y%m%d%H)

@@ -11,6 +11,7 @@ help/Vico.help
 help/www
 *.framework*
 Bundles/*.tmbundle
+Bundles/*.vico-bundle
 vico.xcodeproj/xcuserdata
 doc
 vico-hg-*.tar.gz*

@@ -484,8 +484,6 @@ $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 $(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-$(OBJDIR)/NSString-scopeSelector.o: $(DERIVEDDIR)/scope_selector.h
-
 APP_CERT_NAME = "3rd Party Mac Developer Application: Martin Hedenfalk" 
 INST_CERT_NAME = "3rd Party Mac Developer Installer: Martin Hedenfalk" 
 
@@ -505,11 +503,11 @@ pkg: app
 install: pkg
 	sudo installer -store -pkg $(BUILDDIR)/Vico.pkg -target /
 
-$(DERIVEDDIR)/scope_selector.c $(DERIVEDDIR)/scope_selector.h: scope_selector.lemon $(OBJDIR)/lemon
+app/scope_selector.c app/scope_selector.h: scope_selector.lemon $(OBJDIR)/lemon
 	mkdir -p $(@D)
-	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $< && mv $(<D)/$(basename $(<F)).[ch] $(@D)
+	LEMPAR=lemon/lempar.c $(OBJDIR)/lemon -s $<
 
-$(OBJDIR)/scope_selector.o: $(DERIVEDDIR)/scope_selector.c $(DERIVEDDIR)/scope_selector.h
+$(OBJDIR)/NSString-scopeSelector.o: app/scope_selector.h
 
 $(OBJDIR)/Vico: $(OBJS)
 	mkdir -p $(OBJDIR)

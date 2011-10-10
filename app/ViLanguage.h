@@ -12,7 +12,10 @@
 	NSMutableArray		*_languagePatterns;
 	BOOL			 _compiled;
 	ViScope			*_scope;
+	NSString		*_uuid;
 }
+
+@property(nonatomic,readonly) NSString *uuid;
 
 @property(nonatomic,readonly) __weak ViBundle *bundle;
 

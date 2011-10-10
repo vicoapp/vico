@@ -6,6 +6,7 @@
 
 @synthesize bundle = _bundle;
 @synthesize scope = _scope;
+@synthesize uuid = _uuid;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle
 {
@@ -18,6 +19,14 @@
 			[self release];
 			return nil;
 		}
+
+		_uuid = [[_language objectForKey:@"uuid"] retain];
+		if (_uuid == nil) {
+			INFO(@"missing uuid in language %@", aPath);
+			[self release];
+			return nil;
+		}
+
 		_languagePatterns = [[_language objectForKey:@"patterns"] retain];
 		if (![_languagePatterns isKindOfClass:[NSArray class]]) {
 			INFO(@"%@: failed to load plist", aPath);

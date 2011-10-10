@@ -1198,7 +1198,8 @@ resp2txt(int type)
 
 		req = [self realpath:file.path onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
 			[req autorelease];
-			NSURL *url = [NSURL URLWithString:realPath relativeToURL:aURL];
+			NSURL *url = [NSURL URLWithString:[realPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+					    relativeToURL:aURL];
 			if (error)
 				originalCallback(nil, error);
 			else if (file.isLink) {

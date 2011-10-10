@@ -44,7 +44,7 @@
 	[super dealloc];
 }
 
-- (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory
+- (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory loadPluginCode:(BOOL)loadPluginCode
 {
 	ViBundle *bundle = [[ViBundle alloc] initWithDirectory:bundleDirectory];
 	if (bundle == nil)
@@ -68,6 +68,9 @@
 	for (ViLanguage *lang in bundle.languages)
 		[_languages setObject:lang forKey:lang.name];
 
+	if (loadPluginCode)
+		[bundle loadPluginCode];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViBundleStoreBundleLoadedNotification
 							    object:self
 							  userInfo:[NSDictionary dictionaryWithObject:bundle forKey:@"bundle"]];
@@ -75,17 +78,26 @@
 	return YES;
 }
 
+- (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory
+{
+	return [self loadBundleFromDirectory:bundleDirectory loadPluginCode:YES];
+}
+
 - (void)addBundlesFromBundleDirectory:(NSString *)aPath
 {
 	NSArray *subdirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:aPath error:NULL];
 	for (NSString *subdir in subdirs)
-		[self loadBundleFromDirectory:[aPath stringByAppendingPathComponent:subdir]];
+		[self loadBundleFromDirectory:[aPath stringByAppendingPathComponent:subdir]
+			       loadPluginCode:NO];
 }
 
 - (void)initLanguages
 {
 	[self addBundlesFromBundleDirectory:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/Bundles"]];
 	[self addBundlesFromBundleDirectory:[ViBundleStore bundlesDirectory]];
+
+	for (ViBundle *bundle in [self allBundles])
+		[bundle loadPluginCode];
 }
 
 - (ViLanguage *)languageForFirstLine:(NSString *)firstLine

@@ -473,28 +473,37 @@
 					[command release];
 				}
 			}
+	}
+	return self;
+}
 
-		file = [_path stringByAppendingPathComponent:@"main.nu"];
-		BOOL isDir = NO;
-		if ([fm fileExistsAtPath:file isDirectory:&isDir] && !isDir) {
-			NSString *script = [NSString stringWithContentsOfFile:file
-								     encoding:NSUTF8StringEncoding
-									error:nil];
-			if (script) {
-				NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:
-				    _path, @"bundlePath",
-				    nil];
-				NSError *error = nil;
-				[[NSApp delegate] eval:script
-					    withParser:_parser
-					      bindings:bindings
-						 error:&error];
-				if (error)
-					INFO(@"%@: %@", file, [error localizedDescription]);
+- (BOOL)loadPluginCode
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSString *file = [_path stringByAppendingPathComponent:@"main.nu"];
+	BOOL isDir = NO;
+	if ([fm fileExistsAtPath:file isDirectory:&isDir] && !isDir) {
+		NSString *script = [NSString stringWithContentsOfFile:file
+							     encoding:NSUTF8StringEncoding
+								error:nil];
+		if (script) {
+			INFO(@"loading plugin code for bundle %@", _path);
+			NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:
+				_path, @"bundlePath",
+				nil];
+			NSError *error = nil;
+			[[NSApp delegate] eval:script
+				    withParser:_parser
+				      bindings:bindings
+					 error:&error];
+			if (error) {
+				INFO(@"%@: %@", file, [error localizedDescription]);
+				return NO;
 			}
 		}
 	}
-	return self;
+
+	return YES;
 }
 
 - (void)dealloc

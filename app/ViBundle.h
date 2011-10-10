@@ -43,6 +43,7 @@
 		  bundle:(ViBundle *)bundle;
 
 - (ViBundle *)initWithDirectory:(NSString *)bundleDirectory;
+- (BOOL)loadPluginCode;
 - (NSString *)supportPath;
 - (NSDictionary *)preferenceItem:(NSString *)prefsName;
 - (NSDictionary *)preferenceItems:(NSArray *)prefsNames;

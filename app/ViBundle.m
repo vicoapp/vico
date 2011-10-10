@@ -434,7 +434,7 @@
 
 				[ViBundle normalizePreference:plist
 					       intoDictionary:[plist objectForKey:@"settings"]
-                                                   withParser:_parser];
+						   withParser:_parser];
 				[_preferences addObject:plist];
 			}
 

@@ -1502,9 +1502,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		/* Change at EOL, include another line to make sure
 		 * we get the line continuations right. */
 		[[_textStorage string] getLineStart:NULL
-		                               end:&end
-		                       contentsEnd:NULL
-		                          forRange:NSMakeRange(end, 0)];
+						end:&end
+					contentsEnd:NULL
+					   forRange:NSMakeRange(end, 0)];
 	}
 	area.location = bol;
 	area.length = end - bol;
@@ -1562,7 +1562,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSString *tab = [@"" stringByPaddingToLength:_tabSize withString:@" " startingAtIndex:0];
 
 	NSDictionary *attrs = [NSDictionary dictionaryWithObject:[ViThemeStore font]
-	                                                  forKey:NSFontAttributeName];
+							  forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
 
 	NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
@@ -1950,8 +1950,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	} else {
 		__block NSError *error = nil;
 		NSURL *newURL = [[ViDocumentController sharedDocumentController] normalizePath:command.arg
-                                                                                    relativeTo:_windowController.baseURL
-                                                                                         error:&error];
+										    relativeTo:_windowController.baseURL
+											 error:&error];
 		if (error != nil)
 			return error;
 
@@ -1988,9 +1988,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			return [ViError message:@"File exists (add ! to override)"];
 
 		if ([self saveToURL:newURL
-                             ofType:nil
-                   forSaveOperation:NSSaveAsOperation
-                              error:&error] == NO)
+			     ofType:nil
+		   forSaveOperation:NSSaveAsOperation
+			      error:&error] == NO)
 			return error;
 	}
 

@@ -487,7 +487,7 @@
 							     encoding:NSUTF8StringEncoding
 								error:nil];
 		if (script) {
-			INFO(@"loading plugin code for bundle %@", _path);
+			DEBUG(@"loading plugin code for bundle %@", _path);
 			NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:
 				_path, @"bundlePath",
 				nil];

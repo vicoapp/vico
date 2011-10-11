@@ -381,6 +381,11 @@ OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
 		   "-DIBAction=void)__attribute__((ibaction)"
 
 ARCHS = i386 x86_64
+
+ifeq ($(CONFIGURATION),SNAPSHOT)
+CFLAGS += -DTRIAL_VERSION
+endif
+
 endif
 
 CFLAGS += -D$(CONFIGURATION)_BUILD=1

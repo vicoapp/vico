@@ -2717,6 +2717,14 @@ replaceCharactersInRange:(NSRange)aRange
 {
 	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
 							inTextContainer:[self textContainer]].origin;
+
+	NSSize inset = [self textContainerInset];
+	NSPoint origin = [self textContainerOrigin];
+	point.x += origin.x;
+	point.y += origin.y;
+	point.x += inset.width;
+	point.y += inset.height;
+
 	NSEvent *ev = [NSEvent mouseEventWithType:NSRightMouseDown
 			  location:[self convertPoint:point toView:nil]
 		     modifierFlags:0

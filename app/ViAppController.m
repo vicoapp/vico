@@ -344,7 +344,6 @@ updateMeta(void)
 	INFO(@"launched after %fs", launch_diff.tv_sec + (float)launch_diff.tv_usec / 1000000);
 
 #ifdef TRIAL_VERSION
-#warning Enabling used-time-based expiration of trial version
 	NSAlert *alert = [[NSAlert alloc] init];
 	int left = updateMeta();
 	if (left <= 0) {

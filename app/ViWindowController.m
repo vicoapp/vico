@@ -220,7 +220,7 @@ DEBUG_FINALIZE();
 		[view addSubview:_nagTitle];
 	} else
 		[_nagTitle setFrame:rect];
-	[_nagTitle setStringValue:[[[NSAttributedString alloc] initWithString:s attributes:attrs] autorelease]];
+	[_nagTitle setAttributedStringValue:[[[NSAttributedString alloc] initWithString:s attributes:attrs] autorelease]];
 }
 #endif
 

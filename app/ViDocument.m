@@ -1716,7 +1716,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			NSString *scopeSelector = [scope bestMatch:[_symbolScopes allKeys]];
 			if (scopeSelector) {
 				id obj = [_symbolScopes objectForKey:scopeSelector];
-				if ([obj isKindOfClass:[NSNumber class]] && [obj boolValue]) {
+				if ([obj respondsToSelector:@selector(boolValue)] && [obj boolValue]) {
 					lastSelector = scopeSelector;
 					NSRange backRange = [self rangeOfScopeSelector:scopeSelector forward:NO fromLocation:i];
 					if (backRange.length > 0) {

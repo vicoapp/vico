@@ -163,8 +163,8 @@ DEBUG_FINALIZE();
 - (void)getMoreBundles:(id)sender
 {
 	[[ViPreferencesController sharedPreferences] performSelector:@selector(showItem:)
-                                                          withObject:@"Bundles"
-                                                          afterDelay:0.01];
+							  withObject:@"Bundles"
+							  afterDelay:0.01];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
@@ -235,8 +235,8 @@ DEBUG_FINALIZE();
 	[menu removeAllItems];
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self
-                                                        name:NSMenuDidEndTrackingNotification
-                                                      object:menu];
+							name:NSMenuDidEndTrackingNotification
+						      object:menu];
 }
 
 - (void)setupBundleMenu:(NSNotification *)notification

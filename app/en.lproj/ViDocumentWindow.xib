@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
 		<string key="IBDocument.SystemVersion">11B26</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
 		<string key="IBDocument.AppKitVersion">1138</string>
 		<string key="IBDocument.HIToolboxVersion">566.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1617</string>
+			<string key="NS.object.0">1938</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSSegmentedControl</string>
@@ -50,7 +50,10 @@
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
-		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
+		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="580458321">
 			<object class="NSCustomObject" id="512844837">
 				<string key="NSClassName">ViWindowController</string>
@@ -550,7 +553,7 @@
 						<reference ref="609551135"/>
 						<reference ref="309334595"/>
 					</array>
-					<array class="NSMutableArray" key="NSToolbarIBDefaultItems">
+					<array key="NSToolbarIBDefaultItems">
 						<reference ref="454463503"/>
 						<reference ref="883442420"/>
 						<reference ref="867670213"/>
@@ -738,7 +741,7 @@
 							<reference key="NSNextKeyView" ref="1001936949"/>
 							<bool key="NSIsVertical">YES</bool>
 							<int key="NSDividerStyle">2</int>
-							<string key="NSAutosaveName">ProjectSplitView</string>
+							<string key="NSAutosaveName"/>
 						</object>
 					</array>
 					<string key="NSFrameSize">{800, 600}</string>
@@ -756,7 +759,7 @@
 				<string key="NSClassName">ViFileExplorer</string>
 			</object>
 			<object class="NSCustomView" id="342887108">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSearchField" id="953307252">
@@ -1008,7 +1011,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{150, 489}</string>
-				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="709866892"/>
 				<string key="NSClassName">ViBgView</string>
 			</object>
@@ -1205,7 +1207,7 @@
 				</array>
 			</object>
 			<object class="NSCustomView" id="244902241">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSearchField" id="308464751">
@@ -1502,7 +1504,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{150, 389}</string>
-				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="590321826"/>
 				<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				<string key="NSClassName">ViBgView</string>
@@ -1517,7 +1518,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="727288555">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSForm" id="444062109">
@@ -1660,7 +1661,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{382, 187}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="391641068"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -1694,14 +1694,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="892226745"/>
-						<reference key="destination" ref="512844837"/>
-					</object>
-					<int key="connectionID">100180</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">symbolsView</string>
 						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="342887108"/>
@@ -1715,6 +1707,182 @@
 						<reference key="destination" ref="701209205"/>
 					</object>
 					<int key="connectionID">100273</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">explorerView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="244902241"/>
+					</object>
+					<int key="connectionID">100372</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">projectDelegate</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="869772944"/>
+					</object>
+					<int key="connectionID">100379</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">projectResizeView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="630815511"/>
+					</object>
+					<int key="connectionID">100380</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">openFilesButton</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="560856931"/>
+					</object>
+					<int key="connectionID">100468</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleSymbolList:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="241432242"/>
+					</object>
+					<int key="connectionID">100477</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">navigateJumplist:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="917346266"/>
+					</object>
+					<int key="connectionID">100518</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">jumplistNavigator</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="917346266"/>
+					</object>
+					<int key="connectionID">100519</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleExplorer:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="69192991"/>
+					</object>
+					<int key="connectionID">100543</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">mainView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="1001936949"/>
+					</object>
+					<int key="connectionID">100607</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">tabView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="144287302"/>
+					</object>
+					<int key="connectionID">100608</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">tabBar</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="402151357"/>
+					</object>
+					<int key="connectionID">100609</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">bundleButton</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="203483497"/>
+					</object>
+					<int key="connectionID">100654</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">bundleButtonCell</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="934984888"/>
+					</object>
+					<int key="connectionID">100655</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">messageField</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="311339436"/>
+					</object>
+					<int key="connectionID">100677</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">statusbar</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="24397800"/>
+					</object>
+					<int key="connectionID">100678</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">symbolController</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="687101210"/>
+					</object>
+					<int key="connectionID">100699</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">explorer</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="869772944"/>
+					</object>
+					<int key="connectionID">100770</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sftpConnectView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="353834376"/>
+					</object>
+					<int key="connectionID">100772</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">explorerActionMenu</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="214436382"/>
+					</object>
+					<int key="connectionID">100773</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="275939982"/>
+						<reference key="destination" ref="869772944"/>
+					</object>
+					<int key="connectionID">100343</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">initialFirstResponder</string>
+						<reference key="source" ref="275939982"/>
+						<reference key="destination" ref="144287302"/>
+					</object>
+					<int key="connectionID">100622</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="892226745"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100180</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1734,59 +1902,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="275939982"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100343</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">explorerView</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="244902241"/>
-					</object>
-					<int key="connectionID">100372</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">explorer</string>
 						<reference key="source" ref="869772944"/>
 						<reference key="destination" ref="373574305"/>
 					</object>
 					<int key="connectionID">100373</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="373574305"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100374</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="373574305"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100375</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">projectDelegate</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100379</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">projectResizeView</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="630815511"/>
-					</object>
-					<int key="connectionID">100380</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1845,60 +1965,12 @@
 					<int key="connectionID">100459</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">openFilesButton</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="560856931"/>
-					</object>
-					<int key="connectionID">100468</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleSymbolList:</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="241432242"/>
-					</object>
-					<int key="connectionID">100477</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">navigateJumplist:</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="917346266"/>
-					</object>
-					<int key="connectionID">100518</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">jumplistNavigator</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="917346266"/>
-					</object>
-					<int key="connectionID">100519</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleExplorer:</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="69192991"/>
-					</object>
-					<int key="connectionID">100543</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">addSFTPLocation:</string>
 						<reference key="source" ref="869772944"/>
 						<reference key="destination" ref="177080514"/>
 					</object>
 					<int key="connectionID">100576</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">menu</string>
-						<reference key="source" ref="373574305"/>
-						<reference key="destination" ref="214436382"/>
-					</object>
-					<int key="connectionID">100577</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1990,67 +2062,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">tabView</string>
-						<reference key="source" ref="402151357"/>
-						<reference key="destination" ref="144287302"/>
-					</object>
-					<int key="connectionID">100603</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="144287302"/>
-						<reference key="destination" ref="402151357"/>
-					</object>
-					<int key="connectionID">100605</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="402151357"/>
-						<reference key="destination" ref="512844837"/>
-					</object>
-					<int key="connectionID">100606</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">mainView</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="1001936949"/>
-					</object>
-					<int key="connectionID">100607</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">tabView</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="144287302"/>
-					</object>
-					<int key="connectionID">100608</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">tabBar</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="402151357"/>
-					</object>
-					<int key="connectionID">100609</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">explorerView</string>
 						<reference key="source" ref="869772944"/>
 						<reference key="destination" ref="244902241"/>
 					</object>
 					<int key="connectionID">100619</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">initialFirstResponder</string>
-						<reference key="source" ref="275939982"/>
-						<reference key="destination" ref="144287302"/>
-					</object>
-					<int key="connectionID">100622</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2069,22 +2085,6 @@
 					<int key="connectionID">100650</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">bundleButton</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="203483497"/>
-					</object>
-					<int key="connectionID">100654</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">bundleButtonCell</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="934984888"/>
-					</object>
-					<int key="connectionID">100655</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">rescan:</string>
 						<reference key="source" ref="869772944"/>
@@ -2093,20 +2093,148 @@
 					<int key="connectionID">100656</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.explorecaseignore</string>
-						<reference key="source" ref="335797165"/>
-						<reference key="destination" ref="150299444"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="335797165"/>
-							<reference key="NSDestination" ref="150299444"/>
-							<string key="NSLabel">value: values.explorecaseignore</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.explorecaseignore</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">progressIndicator</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="1000356792"/>
 					</object>
-					<int key="connectionID">100661</int>
+					<int key="connectionID">100710</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">filterFiles:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="495051577"/>
+					</object>
+					<int key="connectionID">100716</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">filterField</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="495051577"/>
+					</object>
+					<int key="connectionID">100724</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">searchToolbarItem</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="454463503"/>
+					</object>
+					<int key="connectionID">100728</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">flushCache:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="363416553"/>
+					</object>
+					<int key="connectionID">100744</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">filterFiles:</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="308464751"/>
+					</object>
+					<int key="connectionID">100750</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">altFilterField</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="308464751"/>
+					</object>
+					<int key="connectionID">100752</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">pathControl</string>
+						<reference key="source" ref="869772944"/>
+						<reference key="destination" ref="169363982"/>
+					</object>
+					<int key="connectionID">100766</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="1068059475"/>
+						<reference key="destination" ref="687101210"/>
+					</object>
+					<int key="connectionID">100704</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="1068059475"/>
+						<reference key="destination" ref="687101210"/>
+					</object>
+					<int key="connectionID">100705</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="373574305"/>
+						<reference key="destination" ref="869772944"/>
+					</object>
+					<int key="connectionID">100374</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="373574305"/>
+						<reference key="destination" ref="869772944"/>
+					</object>
+					<int key="connectionID">100375</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">menu</string>
+						<reference key="source" ref="373574305"/>
+						<reference key="destination" ref="214436382"/>
+					</object>
+					<int key="connectionID">100577</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">tabView</string>
+						<reference key="source" ref="402151357"/>
+						<reference key="destination" ref="144287302"/>
+					</object>
+					<int key="connectionID">100603</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="402151357"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100606</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">partnerView</string>
+						<reference key="source" ref="402151357"/>
+						<reference key="destination" ref="892226745"/>
+					</object>
+					<int key="connectionID">100729</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="144287302"/>
+						<reference key="destination" ref="402151357"/>
+					</object>
+					<int key="connectionID">100605</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="24397800"/>
+						<reference key="destination" ref="512844837"/>
+					</object>
+					<int key="connectionID">100730</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -2125,20 +2253,20 @@
 					<int key="connectionID">100663</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">messageField</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="311339436"/>
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.explorecaseignore</string>
+						<reference key="source" ref="335797165"/>
+						<reference key="destination" ref="150299444"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="335797165"/>
+							<reference key="NSDestination" ref="150299444"/>
+							<string key="NSLabel">value: values.explorecaseignore</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.explorecaseignore</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
 					</object>
-					<int key="connectionID">100677</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">statusbar</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="24397800"/>
-					</object>
-					<int key="connectionID">100678</int>
+					<int key="connectionID">100661</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2155,14 +2283,6 @@
 						<reference key="destination" ref="512844837"/>
 					</object>
 					<int key="connectionID">100696</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">symbolController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="687101210"/>
-					</object>
-					<int key="connectionID">100699</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2189,68 +2309,12 @@
 					<int key="connectionID">100703</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="1068059475"/>
-						<reference key="destination" ref="687101210"/>
-					</object>
-					<int key="connectionID">100704</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="1068059475"/>
-						<reference key="destination" ref="687101210"/>
-					</object>
-					<int key="connectionID">100705</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">progressIndicator</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="1000356792"/>
-					</object>
-					<int key="connectionID">100710</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">filterFiles:</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="495051577"/>
-					</object>
-					<int key="connectionID">100716</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="495051577"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100717</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="386026254"/>
-						<reference key="destination" ref="687101210"/>
-					</object>
-					<int key="connectionID">100721</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">filterSymbols:</string>
 						<reference key="source" ref="687101210"/>
 						<reference key="destination" ref="386026254"/>
 					</object>
 					<int key="connectionID">100722</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">filterField</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="495051577"/>
-					</object>
-					<int key="connectionID">100724</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2278,70 +2342,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">searchToolbarItem</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="454463503"/>
-					</object>
-					<int key="connectionID">100728</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">partnerView</string>
-						<reference key="source" ref="402151357"/>
-						<reference key="destination" ref="892226745"/>
-					</object>
-					<int key="connectionID">100729</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="24397800"/>
-						<reference key="destination" ref="512844837"/>
-					</object>
-					<int key="connectionID">100730</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">flushCache:</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="363416553"/>
-					</object>
-					<int key="connectionID">100744</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">filterFiles:</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="308464751"/>
-					</object>
-					<int key="connectionID">100750</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="308464751"/>
-						<reference key="destination" ref="869772944"/>
-					</object>
-					<int key="connectionID">100751</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">altFilterField</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="308464751"/>
-					</object>
-					<int key="connectionID">100752</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="953307252"/>
-						<reference key="destination" ref="687101210"/>
-					</object>
-					<int key="connectionID">100757</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">scrollView</string>
 						<reference key="source" ref="687101210"/>
 						<reference key="destination" ref="709866892"/>
@@ -2366,35 +2366,35 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">pathControl</string>
-						<reference key="source" ref="869772944"/>
-						<reference key="destination" ref="169363982"/>
-					</object>
-					<int key="connectionID">100766</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">explorer</string>
-						<reference key="source" ref="512844837"/>
+						<string key="label">delegate</string>
+						<reference key="source" ref="495051577"/>
 						<reference key="destination" ref="869772944"/>
 					</object>
-					<int key="connectionID">100770</int>
+					<int key="connectionID">100717</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">sftpConnectView</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="353834376"/>
+						<string key="label">delegate</string>
+						<reference key="source" ref="386026254"/>
+						<reference key="destination" ref="687101210"/>
 					</object>
-					<int key="connectionID">100772</int>
+					<int key="connectionID">100721</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">explorerActionMenu</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="214436382"/>
+						<string key="label">delegate</string>
+						<reference key="source" ref="308464751"/>
+						<reference key="destination" ref="869772944"/>
 					</object>
-					<int key="connectionID">100773</int>
+					<int key="connectionID">100751</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="953307252"/>
+						<reference key="destination" ref="687101210"/>
+					</object>
+					<int key="connectionID">100757</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3904,10 +3904,6 @@
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<real value="1060" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1060" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>

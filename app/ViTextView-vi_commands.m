@@ -552,21 +552,20 @@
 {
 	int count = IMAX(command.count, 1);
 
-	NSUInteger cur;
-	[self getLineStart:NULL end:&cur contentsEnd:NULL];
+	NSUInteger cur = start_location;
 
-	NSUInteger bol = cur, end, eol = 0;
-	for (; eol < [[self textStorage] length];) {
-		[self getLineStart:&bol end:&eol contentsEnd:&end forLocation:cur];
-		if (([[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0) {
-			// empty or blank line, we're done
-			break;
-		}
-		cur = eol;
+	while (count--) {
+		/* Skip blank lines. */
+		while (cur < [[self textStorage] length] && [[self textStorage] isBlankLineAtLocation:cur])
+			[self getLineStart:NULL end:&cur contentsEnd:NULL forLocation:cur];
+
+		/* Skip non-blank lines. */
+		while (cur < [[self textStorage] length] && ![[self textStorage] isBlankLineAtLocation:cur])
+			[self getLineStart:NULL end:&cur contentsEnd:NULL forLocation:cur];
 	}
 
 	[self pushLocationOnJumpList:start_location];
-	end_location = final_location = bol;
+	end_location = final_location = cur;
 	return YES;
 }
 
@@ -575,23 +574,20 @@
 {
 	int count = IMAX(command.count, 1);
 
-	NSUInteger cur;
-	[self getLineStart:&cur end:NULL contentsEnd:NULL];
+	NSUInteger cur = start_location;
 
-	NSUInteger bol = 0, end;
-	for (; cur > 0;)
-	{
-		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:cur - 1];
-		if ((bol == end || [[self textStorage] isBlankLineAtLocation:bol]) && --count <= 0)
-		{
-			// empty or blank line, we're done
-			break;
-		}
-		cur = bol;
+	while (count--) {
+		/* Skip blank lines. */
+		while (cur > 0 && [[self textStorage] isBlankLineAtLocation:cur])
+			[self getLineStart:&cur end:NULL contentsEnd:NULL forLocation:cur - 1];
+
+		/* Skip non-blank lines. */
+		while (cur > 0 && ![[self textStorage] isBlankLineAtLocation:cur])
+			[self getLineStart:&cur end:NULL contentsEnd:NULL forLocation:cur - 1];
 	}
 
 	[self pushLocationOnJumpList:start_location];
-	end_location = final_location = bol;
+	end_location = final_location = cur;
 	return YES;
 }
 

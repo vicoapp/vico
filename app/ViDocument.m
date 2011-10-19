@@ -915,6 +915,12 @@ DEBUG_FINALIZE();
 	[self revertDocumentToSaved:nil];
 }
 
+- (void)setDisplayName:(NSString *)displayNameOrNil
+{
+	[super setDisplayName:displayNameOrNil];
+	[_windowController synchronizeWindowTitleWithDocumentName];
+}
+
 - (NSString *)title
 {
 	NSString *displayName = [self displayName];

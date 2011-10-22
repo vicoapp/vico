@@ -527,6 +527,18 @@ pkg: app
 	chown -RH "martinh:staff" $(APPDIR)
 	chmod -RH u+w,go-w,a+rX $(APPDIR)
 	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(FWDIR)/Nu.framework/Versions/A
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/vicotool
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/par
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/bin/CommitWindow.app
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/lib/osx/plist.bundle
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Bundles/vicoapp-objective-c.tmbundle/Support/bin/inspectClass
+	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(APPDIR)
 	productbuild --component $(APPDIR) /Applications \
 		     --sign $(INST_CERT_NAME) \

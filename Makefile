@@ -526,8 +526,8 @@ pkg: app
 	strip $(BINDIR)/par
 	chown -RH "martinh:staff" $(APPDIR)
 	chmod -RH u+w,go-w,a+rX $(APPDIR)
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(FWDIR)/Nu.framework/Versions/A
+#	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+#	    codesign -v --force --sign $(APP_CERT_NAME) $(FWDIR)/Nu.framework/Versions/A
 	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/vicotool
 	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \

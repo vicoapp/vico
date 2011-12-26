@@ -34,6 +34,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_data release];
 	[super dealloc];
 }
@@ -54,6 +55,14 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 @implementation ViBufferedStream
 
 @synthesize delegate = _delegate;
+
+- (void)dealloc
+{
+	DEBUG_DEALLOC();
+	[self close];
+	[_outputBuffers release];
+	[super dealloc];
+}
 
 - (void)read
 {
@@ -204,9 +213,9 @@ fd_read(CFSocketRef s,
 	const void *data,
 	void *info)
 {
-	if (callbackType == kCFSocketWriteCallBack)
+	if (callbackType == kCFSocketWriteCallBack) {
 		fd_write(s, callbackType, address, data, info);
-	else {
+	} else {
 		ViBufferedStream *stream = info;
 		[stream read];
 	}

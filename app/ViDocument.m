@@ -1148,9 +1148,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if (NSIntersectionRange(r, sel).length > 0) {
 		DEBUG(@"selected snippet range %@", NSStringFromRange(sel));
-		if (sel.location > r.location)
+		if (sel.location > r.location) {
 			r.length = sel.location - r.location;
-		else {
+		} else {
 			if (mergedAttributes == nil)
 				mergedAttributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
 			[mergedAttributes setObject:[_theme selectionColor]
@@ -1178,9 +1178,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	if (NSIntersectionRange(r, sel).length > 0) {
 		DEBUG(@"matching paren range %@", NSStringFromRange(sel));
-		if (sel.location > r.location)
+		if (sel.location > r.location) {
 			r.length = sel.location - r.location;
-		else {
+		} else {
 			if (mergedAttributes == nil)
 				mergedAttributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
 			[mergedAttributes addEntriesFromDictionary:[_theme smartPairMatchAttributes]];
@@ -1879,11 +1879,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation
 {
 	NSArray *scopeArray = [_syntaxParser scopeArray];
-	if ([scopeArray count] > aLocation)
+	if ([scopeArray count] > aLocation) {
 		/* XXX: must retain + autorelease because the scopeArray may
 		 * be emptied or changed and the scope would be released.
 		 */
 		return [[[scopeArray objectAtIndex:aLocation] retain] autorelease];
+	}
 	return [[_language.scope retain] autorelease];
 }
 

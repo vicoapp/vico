@@ -265,12 +265,12 @@
 	[_filter release];
 	_filter = [[NSMutableString alloc] init];
 
-	[_filteredCompletions release];
-	_filteredCompletions = nil;
-
 	[newCompletions retain];
 	[_completions release];
 	_completions = newCompletions;
+
+	[_filteredCompletions release];
+	_filteredCompletions = nil;
 
 	[self filterCompletions];
 }

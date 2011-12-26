@@ -20,7 +20,7 @@
 @synthesize view = _view;
 @synthesize representedObject = _representedObject;
 @synthesize persistent = _persistent;
-@synthesize recentlyRestored = _recentlyRestored ;
+@synthesize recentlyRestored = _recentlyRestored;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {
@@ -333,7 +333,7 @@
 {
 	[url retain];
 	[_url release];
-	_url = [url URLByResolvingSymlinksAndAliases:nil];
+	_url = [[url URLByResolvingSymlinksAndAliases:nil] retain];
 }
 
 - (NSString *)groupName

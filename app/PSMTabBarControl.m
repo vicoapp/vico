@@ -401,7 +401,7 @@
 
 - (void)removeTabForCell:(PSMTabBarCell *)cell
 {
-	DEBUG(@"remove cell %@", cell);
+	MEMDEBUG(@"remove cell %@", cell);
 
 	// unbind
 	[[cell indicator] unbind:@"animate"];
@@ -410,6 +410,9 @@
 	[cell unbind:@"title"];
 	[cell unbind:@"count"];
 	[cell unbind:@"modified"];
+
+	[[(NSTabViewItem *)[cell representedObject] identifier] removeObserver:self forKeyPath:@"selectedView.modified"];
+	[[(NSTabViewItem *)[cell representedObject] identifier] removeObserver:self forKeyPath:@"selectedView.processing"];
 
 	// remove indicator
 	if ([[self subviews] containsObject:[cell indicator]])

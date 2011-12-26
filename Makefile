@@ -407,7 +407,7 @@ OBJCFLAGS += -Wshorten-64-to-32
 
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 
-ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks -fobjc-gc-only
+ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
 CFLAGS	+= $(ARCH_CFLAGS)
 LDFLAGS	+= $(ARCH_CFLAGS)
 

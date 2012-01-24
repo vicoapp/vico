@@ -857,7 +857,6 @@ DEBUG_FINALIZE();
 		__currentWindowController = nil;
 	DEBUG(@"will close %@", self);
 	[[self project] close];
-	[__windowControllers removeObject:self];
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
@@ -868,6 +867,7 @@ DEBUG_FINALIZE();
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
 	[[ViMarkManager sharedManager] removeStack:_tagStack];
+	[__windowControllers removeObject:self];
 }
 
 - (ViDocumentView *)currentDocumentView

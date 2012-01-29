@@ -1,5 +1,6 @@
 #import "NSString-additions.h"
 #import "NSScanner-additions.h"
+#import "ViTransformer.h"
 #include "logging.h"
 
 @implementation NSString (additions)
@@ -144,10 +145,10 @@
 	NSString *encodedKey;
 	if (modifiers) {
 		encodedKey = [NSString stringWithFormat:@"%@%@%@%@%@",
-		    (modifiers & NSShiftKeyMask) ? [NSString stringWithFormat:@"%C", 0x21E7] : @"",
-		    (modifiers & NSControlKeyMask) ? [NSString stringWithFormat:@"%C", 0x2303] : @"",
-		    (modifiers & NSAlternateKeyMask) ? [NSString stringWithFormat:@"%C", 0x2325] : @"",
 		    (modifiers & NSCommandKeyMask) ? [NSString stringWithFormat:@"%C", 0x2318] : @"",
+		    (modifiers & NSAlternateKeyMask) ? [NSString stringWithFormat:@"%C", 0x2325] : @"",
+		    (modifiers & NSControlKeyMask) ? [NSString stringWithFormat:@"%C", 0x2303] : @"",
+		    (modifiers & NSShiftKeyMask) ? [NSString stringWithFormat:@"%C", 0x21E7] : @"",
 		    special ?: [[NSString stringWithFormat:@"%C", key] uppercaseString]];
 	} else if (special)
 		encodedKey = special;
@@ -235,6 +236,13 @@
 - (NSString *)visualKeyString
 {
 	return [NSString visualStringWithKeySequence:[self keyCodes]];
+}
+
+- (NSString *)titleize
+{
+	ViTransformer *transformer = [[[ViTransformer alloc] init] autorelease];
+	ViRegexp *rx = [ViRegexp regexpWithString:@"(_|^|(?=[[:upper:]]))([[:alpha:]][[:lower:]]+)(:$)?"];
+	return [[transformer transformValue:self withPattern:rx format:@"$2 " global:YES error:nil] capitalizedString];
 }
 
 @end

@@ -43,5 +43,7 @@
  * @returns YES if the string is in lowercase.
  */
 - (BOOL)isLowercase;
+
+- (NSString *)titleize;
 @end
 

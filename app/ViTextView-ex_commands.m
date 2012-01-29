@@ -180,6 +180,7 @@
 		    withParser:parser
 		      bindings:nil
 			 error:&error];
+	[parser close];
 	[parser release];
 	if (error)
 		return error;

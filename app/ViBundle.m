@@ -516,6 +516,7 @@
 	[_items release];
 	[_cachedPreferences release];
 	[_uuids release];
+	[_parser close];
 	[_parser release];
 	[super dealloc];
 }

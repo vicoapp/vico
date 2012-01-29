@@ -2,6 +2,10 @@
 #import "Nu/Nu.h"
 #import <Carbon/Carbon.h>
 
+@interface NuParser (fix)
+- (void)close;
+@end
+
 @class ViRegexp;
 
 @protocol ViShellThingProtocol <NSObject>

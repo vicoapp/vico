@@ -565,8 +565,11 @@ withParser:(NuParser *)parser
 - (id)eval:(NSString *)script
      error:(NSError **)outError
 {
-	NuParser *parser = [[[NuParser alloc] init] autorelease];
-	return [self eval:script withParser:parser bindings:nil error:outError];
+	NuParser *parser = [[NuParser alloc] init];
+	id ret = [self eval:script withParser:parser bindings:nil error:outError];
+	[parser close];
+	[parser release];
+	return ret;
 }
 
 #pragma mark -
@@ -588,6 +591,7 @@ additionalBindings:(NSDictionary *)bindings
 	id result = [self eval:script withParser:parser bindings:bindings error:&error];
 	if (error && errorString)
 		*errorString = [error localizedDescription];
+	[parser close];
 	[parser release];
 
 	if ([result isKindOfClass:[NSNull class]])

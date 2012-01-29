@@ -278,10 +278,10 @@
  * @param recursiveFlag YES if the macro should be evaluated recursively.
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  */
-- (void)map:(NSString *)keySequence
-         to:(NSString *)macro
-recursively:(BOOL)recursiveFlag
-      scope:(NSString *)scopeSelector;
+- (ViMapping *)map:(NSString *)keySequence
+		to:(NSString *)macro
+       recursively:(BOOL)recursiveFlag
+	     scope:(NSString *)scopeSelector;
 
 /** Map a key sequence to a macro non-recursively.
  * @param keySequence The key sequence to map.
@@ -289,16 +289,16 @@ recursively:(BOOL)recursiveFlag
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  * @see map:to:recursively:scope:
  */
-- (void)map:(NSString *)keySequence
-         to:(NSString *)macro
-      scope:(NSString *)scopeSelector;
+- (ViMapping *)map:(NSString *)keySequence
+		to:(NSString *)macro
+	     scope:(NSString *)scopeSelector;
 
 /** Globally map a key sequence to a macro non-recursively.
  * @param keySequence The key sequence to map.
  * @param macro The key sequence that make up the macro.
  * @see map:to:scope:
  */
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
          to:(NSString *)macro;
 
 /** @name Mapping Nu expressions */
@@ -308,7 +308,7 @@ recursively:(BOOL)recursiveFlag
  * @param expr A Nu anonymous function (`do` block) with zero arguments. See the [Nu documentation](http://programming.nu/operators#functions).
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  */
-- (void)map:(NSString *)keySequence toExpression:(id)expr scope:(NSString *)scopeSelector;
+- (ViMapping *)map:(NSString *)keySequence toExpression:(id)expr scope:(NSString *)scopeSelector;
 
 /** Map a key sequence to a Nu expression.
  *
@@ -318,7 +318,7 @@ recursively:(BOOL)recursiveFlag
  * @param expr A Nu anonymous function (`do` block) with zero arguments. See the [Nu documentation](http://programming.nu/operators#functions).
  * @see map:toExpression:scope:
  */
-- (void)map:(NSString *)keySequence toExpression:(id)expr;
+- (ViMapping *)map:(NSString *)keySequence toExpression:(id)expr;
 
 /** @name Mapping keys to actions */
 
@@ -329,7 +329,7 @@ recursively:(BOOL)recursiveFlag
  * @param param Any parameter that should be passed to the command.
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
       toAction:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -343,7 +343,7 @@ recursively:(BOOL)recursiveFlag
  * @param selector The selector of the action.
  * @see setKey:toAction:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
       toAction:(SEL)selector;
 
 /** Map a key sequence to a motion action.
@@ -354,7 +354,7 @@ recursively:(BOOL)recursiveFlag
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  * @see setKey:toAction:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
       toMotion:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -368,7 +368,7 @@ recursively:(BOOL)recursiveFlag
  * @param selector The selector of the action.
  * @see setKey:toMotion:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
       toMotion:(SEL)selector;
 
 /** Map a key sequence to an edit action.
@@ -379,7 +379,7 @@ recursively:(BOOL)recursiveFlag
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  * @see setKey:toAction:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
   toEditAction:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -393,7 +393,7 @@ recursively:(BOOL)recursiveFlag
  * @param selector The selector of the action.
  * @see setKey:toEditAction:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
   toEditAction:(SEL)selector;
 
 /** Map a key sequence to an operator action.
@@ -404,7 +404,7 @@ recursively:(BOOL)recursiveFlag
  * @param scopeSelector A scope selector limiting where this key sequence is applicable, or nil for no limit.
  * @see setKey:toAction:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
     toOperator:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -418,7 +418,7 @@ recursively:(BOOL)recursiveFlag
  * @param selector The selector of the action.
  * @see setKey:toOperator:flags:parameter:scope:
  */
-- (void)setKey:(NSString *)keyDescription
+- (ViMapping *)setKey:(NSString *)keyDescription
     toOperator:(SEL)selector;
 
 /** @name Unmapping keys */

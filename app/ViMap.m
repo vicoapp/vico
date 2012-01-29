@@ -561,7 +561,7 @@ static NSMutableDictionary *__maps = nil;
 	return m;
 }
 
-- (void)addMapping:(ViMapping *)nm
+- (ViMapping *)addMapping:(ViMapping *)nm
 {
 	for (ViMapping *m in _actions)
 		if ([m.keySequence isEqual:nm.keySequence] &&
@@ -575,9 +575,10 @@ static NSMutableDictionary *__maps = nil;
 
 	[_actions addObject:nm];
 	DEBUG(@"added mapping %@", nm);
+	return nm;
 }
 
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
          to:(NSString *)macro
 recursively:(BOOL)recursiveFlag
       scope:(NSString *)scopeSelector
@@ -585,46 +586,46 @@ recursively:(BOOL)recursiveFlag
 	NSArray *keyCodes = [keySequence keyCodes];
 	if (keyCodes == nil) {
 		INFO(@"invalid key sequence: %@", keySequence);
-		return;
+		return nil;
 	}
-	[self addMapping:[ViMapping mappingWithKeySequence:keyCodes
+	return [self addMapping:[ViMapping mappingWithKeySequence:keyCodes
 						     macro:macro
 						 recursive:recursiveFlag
 						     scope:scopeSelector]];
 }
 
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
          to:(NSString *)macro
       scope:(NSString *)scopeSelector
 {
-	[self map:keySequence
+	return [self map:keySequence
 	       to:macro
       recursively:NO
 	    scope:scopeSelector];
 }
 
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
          to:(NSString *)macro
 {
-	[self map:keySequence
+	return [self map:keySequence
 	       to:macro
       recursively:NO
 	    scope:nil];
 }
 
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
 toExpression:(id)expr
       scope:(NSString *)scopeSelector
 {
 	NSArray *keyCodes = [keySequence keyCodes];
 	if (keyCodes == nil) {
 		INFO(@"invalid key sequence: %@", keySequence);
-		return;
+		return nil;
 	}
 
 	if (![expr isKindOfClass:[NuBlock class]]) {
 		INFO(@"unhandled expression of type %@", NSStringFromClass([expr class]));
-		return;
+		return nil;
 	}
 
 	if ([[expr parameters] count] > 0) {
@@ -632,15 +633,15 @@ toExpression:(id)expr
 		    [[expr parameters] stringValue], keySequence);
 	}
 
-	[self addMapping:[ViMapping mappingWithKeySequence:keyCodes
+	return [self addMapping:[ViMapping mappingWithKeySequence:keyCodes
 						expression:expr
 						     scope:scopeSelector]];
 }
 
-- (void)map:(NSString *)keySequence
+- (ViMapping *)map:(NSString *)keySequence
 toExpression:(id)expr
 {
-	[self map:keySequence toExpression:expr scope:nil];
+	return [self map:keySequence toExpression:expr scope:nil];
 }
 
 - (void)unmap:(NSString *)keySequence
@@ -689,7 +690,7 @@ toExpression:(id)expr
 	[self unset:keySequence scope:nil];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
       toAction:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -698,88 +699,88 @@ toExpression:(id)expr
 	NSArray *keyCodes = [keySequence keyCodes];
 	if (keyCodes == nil) {
 		INFO(@"invalid key sequence: %@", keySequence);
-		return;
+		return nil;
 	}
-	[self addMapping:[ViMapping mappingWithKeySequence:keyCodes
+	return [self addMapping:[ViMapping mappingWithKeySequence:keyCodes
 						    action:selector
 						     flags:flags
 						 parameter:param
 						     scope:scopeSelector]];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
       toAction:(SEL)selector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	    toAction:selector
 	       flags:0
 	   parameter:nil
 	       scope:nil];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
       toMotion:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
          scope:(NSString *)scopeSelector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	    toAction:selector
 	       flags:flags|ViMapIsMotion
 	   parameter:param
 	       scope:scopeSelector];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
       toMotion:(SEL)selector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	    toMotion:selector
 	       flags:0
 	   parameter:nil
 	       scope:nil];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
   toEditAction:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
          scope:(NSString *)scopeSelector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	    toAction:selector
 	       flags:flags|ViMapSetsDot
 	   parameter:param
 	       scope:scopeSelector];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
   toEditAction:(SEL)selector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	toEditAction:selector
 	       flags:0
 	   parameter:nil
 	       scope:nil];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
     toOperator:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
          scope:(NSString *)scopeSelector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	toEditAction:selector
 	       flags:flags|ViMapNeedMotion
 	   parameter:param
 	       scope:scopeSelector];
 }
 
-- (void)setKey:(NSString *)keySequence
+- (ViMapping *)setKey:(NSString *)keySequence
     toOperator:(SEL)selector
 {
-	[self setKey:keySequence
+	return [self setKey:keySequence
 	  toOperator:selector
 	       flags:0
 	   parameter:nil

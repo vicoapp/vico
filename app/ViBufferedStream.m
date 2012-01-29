@@ -215,7 +215,7 @@ fd_read(CFSocketRef s,
 {
 	if (callbackType == kCFSocketWriteCallBack) {
 		fd_write(s, callbackType, address, data, info);
-	} else {
+	} else if (callbackType == kCFSocketReadCallBack) {
 		ViBufferedStream *stream = info;
 		[stream read];
 	}

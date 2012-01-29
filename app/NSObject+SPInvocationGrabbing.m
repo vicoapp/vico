@@ -2,13 +2,18 @@
 #import <execinfo.h>
 
 #pragma mark Invocation grabbing
+
 @interface SPInvocationGrabber ()
 @property (readwrite, retain, nonatomic) id object;
 @property (readwrite, retain, nonatomic) NSInvocation *invocation;
-
 @end
 
 @implementation SPInvocationGrabber
+
+@synthesize object = _object;
+@synthesize invocation = _invocation;
+@synthesize backgroundAfterForward, onMainAfterForward, waitUntilDone;
+
 - (id)initWithObject:(id)obj
 {
 	return [self initWithObject:obj stacktraceSaving:NO];
@@ -28,13 +33,11 @@
 -(void)dealloc
 {
 	free(frameStrings);
-	self.object = nil;
-	self.invocation = nil;
+	[_object release];
+	[_invocation release];
 	[super dealloc];
 }
-@synthesize invocation = _invocation, object = _object;
 
-@synthesize backgroundAfterForward, onMainAfterForward, waitUntilDone;
 - (void)runInBackground
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

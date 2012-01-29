@@ -1,0 +1,5 @@
+*.swp
+app/scope_selector.[ch]
+app/scope_selector.out
+build
+Nu.framework

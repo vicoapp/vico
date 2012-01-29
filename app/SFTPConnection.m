@@ -1378,8 +1378,9 @@ resp2txt(int type)
 {
 	[self close];
 	DEBUG(@"cancelling outstanding requests: %@", _requests);
-	for (SFTPRequest *req in [_requests objectEnumerator])
+	for (SFTPRequest *req in [_requests allValues]) {
 		[req cancel];
+	}
 	[_requests removeAllObjects];
 }
 

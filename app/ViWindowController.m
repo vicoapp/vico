@@ -1588,7 +1588,7 @@ DEBUG_FINALIZE();
 
 	[[mark retain] autorelease];
 
-	if (mark.view) {
+	if (mark.view && [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"]) {
 		/* Go to an existing view. View position is ignored. */
 		viewController = [self selectDocumentView:mark.view];
 	} else {
@@ -2163,7 +2163,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)switch_file:(ViCommand *)command
 {
 	DEBUG(@"alternate mark is %@", _alternateMark);
-	[self gotoMark:_alternateMark positioned:ViViewPositionDefault];
+	[self gotoMark:_alternateMark positioned:ViViewPositionPreferred];
 	return YES;
 }
 

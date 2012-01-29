@@ -53,8 +53,11 @@
 	ViBundle *oldBundle = [_bundles objectForKey:bundle.uuid];
 	if (oldBundle) {
 		INFO(@"replacing bundle %@ with %@", oldBundle, bundle);
-		for (ViLanguage *lang in oldBundle.languages)
-			[_languages removeObjectForKey:lang.name];
+		for (ViLanguage *lang in oldBundle.languages) {
+			if (lang.name) {
+				[_languages removeObjectForKey:lang.name];
+			}
+		}
 		/* Reset cached preferences to remove any pref in oldBundle. */
 		[_cachedPreferences release];
 		_cachedPreferences = [[NSMutableDictionary alloc] init];
@@ -65,8 +68,11 @@
 	[_bundles setObject:bundle forKey:bundle.uuid];
 	[bundle release];
 
-	for (ViLanguage *lang in bundle.languages)
-		[_languages setObject:lang forKey:lang.name];
+	for (ViLanguage *lang in bundle.languages) {
+		if (lang.name) {
+			[_languages setObject:lang forKey:lang.name];
+		}
+	}
 
 	if (loadPluginCode)
 		[bundle loadPluginCode];

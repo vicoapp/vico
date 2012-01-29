@@ -2,7 +2,6 @@ ARCH ?= x86_64
 CONFIGURATION ?= DEBUG
 
 VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
-#$(BUILDDIR) 
 
 .SUFFIXES:
 
@@ -38,6 +37,7 @@ OBJC_SRCS = \
 	NSURL-additions.m \
 	NSView-additions.m \
 	NSWindow-additions.m \
+	Nu.m \
 	PSMMetalTabStyle.m \
 	PSMOverflowPopUpButton.m \
 	PSMProgressIndicator.m \
@@ -239,7 +239,25 @@ XIBS = \
 NU = \
 	app/ex.nu \
 	app/keys.nu \
-	app/vico.nu
+	app/vico.nu \
+	nu/beautify.nu \
+	nu/bridgesupport.nu \
+	nu/cblocks.nu \
+	nu/cocoa.nu \
+	nu/console.nu \
+	nu/coredata.nu \
+	nu/doc.nu \
+	nu/fscript.nu \
+	nu/generate.nu \
+	nu/help.nu \
+	nu/match.nu \
+	nu/math.nu \
+	nu/menu.nu \
+	nu/nibtools.nu \
+	nu/nu.nu \
+	nu/template.nu \
+	nu/test.nu
+
 
 IMAGES = \
 	Images/AliasBadgeIcon.icns \
@@ -417,7 +435,7 @@ CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F.
 LDFLAGS	+= -F.
 
 TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
-APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framework Cocoa -framework Nu
+APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framework Cocoa
 PAR_LDLIBS =
 XORKEY_LDLIBS =
 
@@ -489,15 +507,12 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APP
 		lipo -create $(OBJDIR_32)/par $(OBJDIR_64)/par -output $(BINDIR)/par; \
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
-	install_name_tool -change Nu.framework/Versions/A/Nu \
-	    @executable_path/../Frameworks/Nu.framework/Versions/A/Nu \
-	    $(BINDIR)/Vico
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	mkdir -p $(FWDIR)
-	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(shell readlink Nu.framework || echo Nu.framework) $(FWDIR)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 
@@ -526,8 +541,6 @@ pkg: app
 	strip $(BINDIR)/par
 	chown -RH "martinh:staff" $(APPDIR)
 	chmod -RH u+w,go-w,a+rX $(APPDIR)
-#	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
-#	    codesign -v --force --sign $(APP_CERT_NAME) $(FWDIR)/Nu.framework/Versions/A
 	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/vicotool
 	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
@@ -704,7 +717,6 @@ checkout:
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
 	git clone $(TAG) . $(RELEASE_DIR)
-	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
 	rsync -a $(CURDIR)/Bundles/ $(RELEASE_DIR)/Bundles
 
 release: checkout

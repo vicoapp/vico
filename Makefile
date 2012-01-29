@@ -364,7 +364,7 @@ CC = clang
 CXX = clang++
 IBTOOL = /Developer/usr/bin/ibtool
 
-REPO_VERSION := $(shell MACOSX_DEPLOYMENT_TARGET="" hg identify -n .)
+REPO_VERSION := $(git log --oneline | wc -l | sed 's/ //g')
 
 ifeq ($(CONFIGURATION),DEBUG)
 SHORT_VERSION = r$(REPO_VERSION)
@@ -703,7 +703,7 @@ checkout:
 	@echo release directory is $(RELEASE_DIR)
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
-	hg clone -u $(TAG) . $(RELEASE_DIR)
+	git clone $(TAG) . $(RELEASE_DIR)
 	ln -s $(CURDIR)/Nu.framework $(RELEASE_DIR)
 	rsync -a $(CURDIR)/Bundles/ $(RELEASE_DIR)/Bundles
 
@@ -714,9 +714,9 @@ snapshot: checkout
 	$(MAKE) -C $(RELEASE_DIR) dmg
 
 TARDATE := $(shell date +%Y%m%d%H)
-TARBALL  = vico-hg-$(TARDATE).tar.gz
+TARBALL  = vico-git-$(TARDATE).tar.gz
 tarball:
-	tar zcvf $(TARBALL) .hg
+	tar zcvf $(TARBALL) .git
 	gpg -r martin -e $(TARBALL)
 	rm $(TARBALL)
 

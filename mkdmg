@@ -1,6 +1,6 @@
 #!/bin/sh
 
-REPO_VERSION=$(hg id -n)
+REPO_VERSION=$(git log --oneline | wc -l | sed 's/ //g')
 VERSION=$1
 if test -z "$VERSION"; then
 	echo "missing version"

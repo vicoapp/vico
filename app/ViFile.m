@@ -135,6 +135,7 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (NSString *)displayName
 {
 	if (_displayNameIsDirty) {
+		[_displayName release];
 		if ([_url isFileURL])
 			_displayName = [[[NSFileManager defaultManager] displayNameAtPath:[_url path]] retain];
 		else

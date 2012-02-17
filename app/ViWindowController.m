@@ -1065,6 +1065,7 @@ DEBUG_FINALIZE();
 
 	/* If this was the last view in the tab, close the tab too. */
 	if ([[tabController views] count] == 0) {
+		[tabBar retain];
 		if ([tabView numberOfTabViewItems] == 1)
 			[tabBar disableAnimations];
 
@@ -1093,8 +1094,8 @@ DEBUG_FINALIZE();
 			_jumping = preJumping;
 		}
 
-
 		[tabBar enableAnimations];
+		[tabBar release];
 	} else if (tabController == [self selectedTabController]) {
 		/* Select another document view in the same tab. */
 		[self selectDocumentView:tabController.selectedView];
@@ -1138,8 +1139,8 @@ DEBUG_FINALIZE();
 			[self closeDocumentView:[[(ViTabController *)tabController views] objectAtIndex:0]
 			       canCloseDocument:YES
 				 canCloseWindow:YES];
-		[(ViTabController *)tabController release];
 		[self closeTabController:(ViTabController *)tabController];
+		[(ViTabController *)tabController release];
 	}
 }
 

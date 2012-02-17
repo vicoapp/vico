@@ -1,6 +1,6 @@
 #import "ViLanguage.h"
 #import "ViCommon.h"
-#import "Nu/Nu.h"
+#import "Nu.h"
 
 @class ViBundleCommand;
 @class ViTextView;

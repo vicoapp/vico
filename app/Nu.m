@@ -255,6 +255,7 @@ static bool nu_valueIsTrue(id value)
 
 @end
 
+#if 0
 int NuMain(int argc, const char *argv[])
 {
     @autoreleasepool {        
@@ -355,6 +356,7 @@ int NuMain(int argc, const char *argv[])
     }
     return 0;
 }
+#endif
 
 static void transplant_nu_methods(Class destination, Class source)
 {
@@ -376,8 +378,8 @@ void NuInit()
     if (initialized) {
         return;
     }
-    initialized = YES;        
-    @autoreleasepool {            
+    initialized = YES;
+    @autoreleasepool {
         // as a convenience, we set a file static variable to nil.
         Nu__null = [NSNull null];
         

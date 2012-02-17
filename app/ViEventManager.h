@@ -1,4 +1,4 @@
-#import "Nu/Nu.h"
+#import "Nu.h"
 
 // Document Controller events
 #define ViEventDidFinishLaunching @"didFinishLaunching" // nil

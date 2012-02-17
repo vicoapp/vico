@@ -1,5 +1,5 @@
 #import "ViTextView.h"
-#import "Nu/Nu.h"
+#import "Nu.h"
 #import <Carbon/Carbon.h>
 
 @interface NuParser (fix)

@@ -1,4 +1,4 @@
-#import <Nu/Nu.h>
+#import "Nu.h"
 
 #include <sys/types.h>
 #include <sys/ptrace.h>
@@ -36,6 +36,8 @@ main(int argc, char *argv[])
 #endif
 
 	signal(SIGPIPE, SIG_IGN);
+
+	NuInit();
 
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-skip-untitled") == 0)

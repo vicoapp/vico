@@ -1,4 +1,4 @@
-#import <Nu/Nu.h>
+#import "Nu.h"
 #import "ViScope.h"
 #import "ViCompletionController.h"
 

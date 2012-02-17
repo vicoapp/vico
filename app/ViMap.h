@@ -1,4 +1,4 @@
-#import "Nu/Nu.h"
+#import "Nu.h"
 #import "ViScope.h"
 
 #define ViMapSetsDot		1ULL

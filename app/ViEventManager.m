@@ -1,6 +1,6 @@
 #import "ViEventManager.h"
 #import "NSObject+SPInvocationGrabbing.h"
-#import "Nu/Nu.h"
+#import "Nu.h"
 #include "logging.h"
 
 static NSInteger __nextEventId = 0;

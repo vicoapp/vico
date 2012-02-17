@@ -16,6 +16,7 @@
 		_groups = [[NSMutableDictionary alloc] init];
 		DEBUG(@"created group %@", self);
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -154,6 +155,7 @@
 		_groups = [[NSMutableDictionary alloc] init];
 		_currentIndex = NSNotFound;
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -442,6 +444,7 @@
 		[self makeList];
 		DEBUG(@"created mark stack %@", self);
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -645,11 +648,13 @@ static ViMarkManager *__sharedManager = nil;
 		[self stackWithName:@"Global Marks"];
 		__sharedManager = self;
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_stacks release];
 	[_namedStacks release];
 	[super dealloc];

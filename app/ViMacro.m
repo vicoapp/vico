@@ -21,11 +21,13 @@
 			[_keys replaceObjectsInRange:NSMakeRange(0, 0) withObjectsFromArray:prefixKeys];
 	}
 
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_mapping release];
 	[_keys release];
 	[super dealloc];

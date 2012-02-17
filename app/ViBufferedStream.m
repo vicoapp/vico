@@ -20,6 +20,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 		_ptr = [_data bytes];
 		_length = _left = [_data length];
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -29,6 +30,7 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 		_ptr = buffer;
 		_length = _left = aLength;
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -307,6 +309,7 @@ fd_read(CFSocketRef s,
 			}
 		}
 	}
+	DEBUG_INIT();
 	return self;
 }
 

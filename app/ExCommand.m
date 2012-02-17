@@ -36,11 +36,13 @@
 	if ((self = [super init]) != nil) {
 		_mapping = [aMapping retain];
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_cmdline release];
 	[_mapping release];
 	[_nextCommand release];

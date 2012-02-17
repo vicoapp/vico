@@ -125,6 +125,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 		MEMDEBUG(@"init %@", self);
 	}
 
+	DEBUG_INIT();
 	return self;
 }
 

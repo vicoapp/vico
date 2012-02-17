@@ -13,6 +13,7 @@
 		[self loadView]; // Force loading of NIB
 		[self setDocument:aDocument];
 	}
+	DEBUG_INIT();
 	return self;
 }
 

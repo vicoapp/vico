@@ -19,11 +19,13 @@
 							delegate:self];
 		DEBUG(@"conn = %@", _conn);
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_connData release];
 	[_dataCallback release];
 	[_completionCallback release];

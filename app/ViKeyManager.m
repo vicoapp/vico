@@ -39,6 +39,7 @@
 		_parser = [aParser retain];
 		_target = aTarget; // XXX: not retained!
 	}
+	DEBUG_INIT();
 	return self;
 }
 

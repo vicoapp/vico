@@ -14,10 +14,12 @@
 	if (_keyManager == nil)
 		[self setKeyManager:[ViKeyManager keyManagerWithTarget:self
 							    defaultMap:[ViMap mapWithName:@"tableNavigationMap"]]];
+	DEBUG_INIT();
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[self setKeyManager:nil];
 	[super dealloc];
 }

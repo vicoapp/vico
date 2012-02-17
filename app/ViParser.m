@@ -34,11 +34,13 @@
 		_totalKeySequence = [[NSMutableArray alloc] init];
 		[self reset];
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_defaultMap release];
 	[_map release];
 	[_command release];

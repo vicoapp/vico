@@ -67,6 +67,7 @@
 		_width = 200.0;
 		_statusImages = [[NSMutableDictionary alloc] init];
 	}
+	DEBUG_INIT();
 	return self;
 }
 

@@ -14,6 +14,7 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_image release];
 	[_modImage release];
 	[_statusImage release];

@@ -18,11 +18,13 @@
 	if ((self = [super init]) != nil) {
 		_map = [[ExMap defaultMap] retain];
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_map release];
 	[super dealloc];
 }

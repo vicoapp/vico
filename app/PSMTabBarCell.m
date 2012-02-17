@@ -39,6 +39,7 @@
         _count = 0;
         _isPlaceholder = NO;
     }
+    DEBUG_INIT();
     return self;
 }
 
@@ -68,11 +69,13 @@
 
     }
 
+    DEBUG_INIT();
     return self;
 }
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[_indicator removeFromSuperviewWithoutNeedingDisplay];
 	[_indicator release];
 	[super dealloc];

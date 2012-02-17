@@ -34,6 +34,7 @@
 
 - (void)dealloc
 {
+	DEBUG_DEALLOC();
 	[self stopEvents];
 	[_handlers release];
 	[_directoryCache release];

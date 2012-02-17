@@ -14,6 +14,7 @@
 {
 	if ((self = [super init]) != nil)
 		_jumps = [[NSMutableArray alloc] init];
+	DEBUG_INIT();
 	return self;
 }
 

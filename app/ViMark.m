@@ -105,9 +105,9 @@
 								 selector:@selector(documentAdded:)
 								     name:ViDocumentLoadedNotification
 								   object:nil];
-		DEBUG(@"init %@", self);
 	}
 
+	DEBUG_INIT();
 	return self;
 }
 
@@ -131,9 +131,9 @@
 							   object:_document];
 
 		[self.document registerMark:self];
-		DEBUG(@"init %@", self);
 	}
 
+	DEBUG_INIT();
 	return self;
 }
 
@@ -154,7 +154,6 @@
 							 selector:@selector(viewClosed:)
 							     name:ViViewClosedNotification
 							   object:_view];
-		DEBUG(@"init %@", self);
 	}
 	return self;
 }
@@ -185,7 +184,7 @@
 
 - (void)dealloc
 {
-	// DEBUG_DEALLOC();
+	DEBUG_DEALLOC();
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 

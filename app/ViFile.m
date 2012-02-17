@@ -30,6 +30,7 @@ symbolicAttributes:(NSDictionary *)sDictionary
 		[self setURL:aURL];
 		[self setTargetURL:sURL attributes:sDictionary];
 	}
+	MEMDEBUG(@"%p", self);
 	return self;
 }
 

@@ -161,6 +161,7 @@
         [self registerForDraggedTypes:[NSArray arrayWithObjects: @"PSMTabBarControlItemPBType", nil]];
     }
     [self setTarget:self];
+    DEBUG_INIT();
     return self;
 }
 

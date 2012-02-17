@@ -39,6 +39,7 @@
 							   range:NSMakeRange(0, 0)];
 	}
 
+	DEBUG_INIT();
 	return self;
 }
 

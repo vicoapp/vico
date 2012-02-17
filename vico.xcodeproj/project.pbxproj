@@ -237,8 +237,6 @@
 		9A5DD69E134326A6006981AE /* ViRegisterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69D134326A6006981AE /* ViRegisterManager.m */; };
 		9A5DD6A013435F0D006981AE /* TestKeyCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD69F13435F0D006981AE /* TestKeyCodes.m */; };
 		9A5DD6B213445C80006981AE /* ViMacro.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5DD6B113445C80006981AE /* ViMacro.m */; };
-		9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
-		9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5EE3FA1333A13A002E82B1 /* Nu.framework */; };
 		9A5EE40113366DC0002E82B1 /* vico.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9A5EE40013366DC0002E82B1 /* vico.nu */; };
 		9A665271135B21D700A2F93C /* EditPrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A66526F135B21D700A2F93C /* EditPrefs.xib */; };
 		9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A665274135B22E300A2F93C /* ViPreferencePaneEdit.m */; };
@@ -249,6 +247,24 @@
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AA48E4F13A60C10009CC5D7 /* NSURL-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4C13A60C10009CC5D7 /* NSURL-additions.m */; };
 		9AA48E5013A60C10009CC5D7 /* NSView-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4E13A60C10009CC5D7 /* NSView-additions.m */; };
+		9AA9272714D5B55900F0E02F /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA9272614D5B55900F0E02F /* Nu.m */; };
+		9AA9273914D5B58E00F0E02F /* beautify.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272814D5B58E00F0E02F /* beautify.nu */; };
+		9AA9273A14D5B58E00F0E02F /* bridgesupport.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272914D5B58E00F0E02F /* bridgesupport.nu */; };
+		9AA9273B14D5B58E00F0E02F /* cblocks.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272A14D5B58E00F0E02F /* cblocks.nu */; };
+		9AA9273C14D5B58E00F0E02F /* cocoa.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272B14D5B58E00F0E02F /* cocoa.nu */; };
+		9AA9273D14D5B58E00F0E02F /* console.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272C14D5B58E00F0E02F /* console.nu */; };
+		9AA9273E14D5B58E00F0E02F /* coredata.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272D14D5B58E00F0E02F /* coredata.nu */; };
+		9AA9273F14D5B58E00F0E02F /* doc.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272E14D5B58E00F0E02F /* doc.nu */; };
+		9AA9274014D5B58E00F0E02F /* fscript.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272F14D5B58E00F0E02F /* fscript.nu */; };
+		9AA9274114D5B58E00F0E02F /* generate.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273014D5B58E00F0E02F /* generate.nu */; };
+		9AA9274214D5B58E00F0E02F /* help.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273114D5B58E00F0E02F /* help.nu */; };
+		9AA9274314D5B58E00F0E02F /* match.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273214D5B58E00F0E02F /* match.nu */; };
+		9AA9274414D5B58E00F0E02F /* math.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273314D5B58E00F0E02F /* math.nu */; };
+		9AA9274514D5B58E00F0E02F /* menu.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273414D5B58E00F0E02F /* menu.nu */; };
+		9AA9274614D5B58E00F0E02F /* nibtools.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273514D5B58E00F0E02F /* nibtools.nu */; };
+		9AA9274714D5B58E00F0E02F /* nu.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273614D5B58E00F0E02F /* nu.nu */; };
+		9AA9274814D5B58E00F0E02F /* template.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273714D5B58E00F0E02F /* template.nu */; };
+		9AA9274914D5B58E00F0E02F /* test.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9273814D5B58E00F0E02F /* test.nu */; };
 		9AAD5D5C1393C33A00FDFFA6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */; };
 		9AAD5D601395717A00FDFFA6 /* ExCommandCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD5D5F1395717A00FDFFA6 /* ExCommandCompletion.m */; };
 		9AAD5D631395736900FDFFA6 /* ViSyntaxCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD5D621395736900FDFFA6 /* ViSyntaxCompletion.m */; };
@@ -385,7 +401,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9A5EE3FC1333A151002E82B1 /* Nu.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -760,7 +775,6 @@
 		9A5DD69F13435F0D006981AE /* TestKeyCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyCodes.m; sourceTree = "<group>"; };
 		9A5DD6B013445C80006981AE /* ViMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMacro.h; sourceTree = "<group>"; };
 		9A5DD6B113445C80006981AE /* ViMacro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMacro.m; sourceTree = "<group>"; };
-		9A5EE3FA1333A13A002E82B1 /* Nu.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Nu.framework; sourceTree = "<group>"; };
 		9A5EE40013366DC0002E82B1 /* vico.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vico.nu; sourceTree = "<group>"; };
 		9A665270135B21D700A2F93C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/EditPrefs.xib; sourceTree = "<group>"; };
 		9A665273135B22E300A2F93C /* ViPreferencePaneEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePaneEdit.h; sourceTree = "<group>"; };
@@ -776,6 +790,25 @@
 		9AA48E4C13A60C10009CC5D7 /* NSURL-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL-additions.m"; sourceTree = "<group>"; };
 		9AA48E4D13A60C10009CC5D7 /* NSView-additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView-additions.h"; sourceTree = "<group>"; };
 		9AA48E4E13A60C10009CC5D7 /* NSView-additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView-additions.m"; sourceTree = "<group>"; };
+		9AA9272514D5B55900F0E02F /* Nu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nu.h; sourceTree = "<group>"; };
+		9AA9272614D5B55900F0E02F /* Nu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nu.m; sourceTree = "<group>"; };
+		9AA9272814D5B58E00F0E02F /* beautify.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = beautify.nu; path = nu/beautify.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272914D5B58E00F0E02F /* bridgesupport.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = bridgesupport.nu; path = nu/bridgesupport.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272A14D5B58E00F0E02F /* cblocks.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cblocks.nu; path = nu/cblocks.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272B14D5B58E00F0E02F /* cocoa.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cocoa.nu; path = nu/cocoa.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272C14D5B58E00F0E02F /* console.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = console.nu; path = nu/console.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272D14D5B58E00F0E02F /* coredata.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = coredata.nu; path = nu/coredata.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272E14D5B58E00F0E02F /* doc.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doc.nu; path = nu/doc.nu; sourceTree = SOURCE_ROOT; };
+		9AA9272F14D5B58E00F0E02F /* fscript.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = fscript.nu; path = nu/fscript.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273014D5B58E00F0E02F /* generate.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = generate.nu; path = nu/generate.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273114D5B58E00F0E02F /* help.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = help.nu; path = nu/help.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273214D5B58E00F0E02F /* match.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = match.nu; path = nu/match.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273314D5B58E00F0E02F /* math.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = math.nu; path = nu/math.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273414D5B58E00F0E02F /* menu.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = menu.nu; path = nu/menu.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273514D5B58E00F0E02F /* nibtools.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = nibtools.nu; path = nu/nibtools.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273614D5B58E00F0E02F /* nu.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = nu.nu; path = nu/nu.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273714D5B58E00F0E02F /* template.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = template.nu; path = nu/template.nu; sourceTree = SOURCE_ROOT; };
+		9AA9273814D5B58E00F0E02F /* test.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test.nu; path = nu/test.nu; sourceTree = SOURCE_ROOT; };
 		9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		9AAD5D5E1395717A00FDFFA6 /* ExCommandCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommandCompletion.h; sourceTree = "<group>"; };
 		9AAD5D5F1395717A00FDFFA6 /* ExCommandCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommandCompletion.m; sourceTree = "<group>"; };
@@ -861,7 +894,6 @@
 				9AAD5D5C1393C33A00FDFFA6 /* Carbon.framework in Frameworks */,
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
 				9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */,
-				9A5EE3FB1333A13A002E82B1 /* Nu.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -923,7 +955,6 @@
 				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9AAF73F3135F3BDF00D75E1E /* Vico.help */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
-				9A5EE3FA1333A13A002E82B1 /* Nu.framework */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
 				9A43471B13313B0A002B04DE /* AppKit.framework */,
 				9A434719133138AA002B04DE /* ApplicationServices.framework */,
@@ -1163,6 +1194,23 @@
 		9A434699133115AB002B04DE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9AA9272814D5B58E00F0E02F /* beautify.nu */,
+				9AA9272914D5B58E00F0E02F /* bridgesupport.nu */,
+				9AA9272A14D5B58E00F0E02F /* cblocks.nu */,
+				9AA9272B14D5B58E00F0E02F /* cocoa.nu */,
+				9AA9272C14D5B58E00F0E02F /* console.nu */,
+				9AA9272D14D5B58E00F0E02F /* coredata.nu */,
+				9AA9272E14D5B58E00F0E02F /* doc.nu */,
+				9AA9272F14D5B58E00F0E02F /* fscript.nu */,
+				9AA9273014D5B58E00F0E02F /* generate.nu */,
+				9AA9273114D5B58E00F0E02F /* help.nu */,
+				9AA9273214D5B58E00F0E02F /* match.nu */,
+				9AA9273314D5B58E00F0E02F /* math.nu */,
+				9AA9273414D5B58E00F0E02F /* menu.nu */,
+				9AA9273514D5B58E00F0E02F /* nibtools.nu */,
+				9AA9273614D5B58E00F0E02F /* nu.nu */,
+				9AA9273714D5B58E00F0E02F /* template.nu */,
+				9AA9273814D5B58E00F0E02F /* test.nu */,
 				9AAF73E1135C931600D75E1E /* Credits.txt */,
 				9A9A63CB1339D0CA0053402A /* vico.icns */,
 				9A4346D71331239E002B04DE /* symbol-icons.plist */,
@@ -1190,6 +1238,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				9AA9272514D5B55900F0E02F /* Nu.h */,
+				9AA9272614D5B55900F0E02F /* Nu.m */,
 				9AF6A7051435BAA300FB373B /* ViViewController.h */,
 				9AF6A7061435BAA300FB373B /* ViViewController.m */,
 				9AF6A7011434ABB200FB373B /* NSWindow-additions.h */,
@@ -1545,7 +1595,6 @@
 				9A2EF28D133109C10023C5B7 /* Resources */,
 				9AAF73F7135F5D5500D75E1E /* Build help bundle */,
 				9A4346EE13312853002B04DE /* Copy Executables */,
-				9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */,
 			);
 			buildRules = (
 				9A2EF41D133110A20023C5B7 /* PBXBuildRule */,
@@ -1691,6 +1740,23 @@
 				9A880835141213D1001F8769 /* par.doc in Resources */,
 				9AB6F72F14160751000F3578 /* WaitProgress.xib in Resources */,
 				9ACFDFBE141A084700D4DBE1 /* MarkInspector.xib in Resources */,
+				9AA9273914D5B58E00F0E02F /* beautify.nu in Resources */,
+				9AA9273A14D5B58E00F0E02F /* bridgesupport.nu in Resources */,
+				9AA9273B14D5B58E00F0E02F /* cblocks.nu in Resources */,
+				9AA9273C14D5B58E00F0E02F /* cocoa.nu in Resources */,
+				9AA9273D14D5B58E00F0E02F /* console.nu in Resources */,
+				9AA9273E14D5B58E00F0E02F /* coredata.nu in Resources */,
+				9AA9273F14D5B58E00F0E02F /* doc.nu in Resources */,
+				9AA9274014D5B58E00F0E02F /* fscript.nu in Resources */,
+				9AA9274114D5B58E00F0E02F /* generate.nu in Resources */,
+				9AA9274214D5B58E00F0E02F /* help.nu in Resources */,
+				9AA9274314D5B58E00F0E02F /* match.nu in Resources */,
+				9AA9274414D5B58E00F0E02F /* math.nu in Resources */,
+				9AA9274514D5B58E00F0E02F /* menu.nu in Resources */,
+				9AA9274614D5B58E00F0E02F /* nibtools.nu in Resources */,
+				9AA9274714D5B58E00F0E02F /* nu.nu in Resources */,
+				9AA9274814D5B58E00F0E02F /* template.nu in Resources */,
+				9AA9274914D5B58E00F0E02F /* test.nu in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1751,21 +1817,6 @@
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9A5EE3FD1333A164002E82B1 /* Re-link Nu framework */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Re-link Nu framework";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "install_name_tool -change \"Nu.framework/Versions/A/Nu\" \"@executable_path/../Frameworks/Nu.framework/Versions/A/Nu\" $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$TARGET_NAME\n";
-			showEnvVarsInLog = 0;
-		};
 		9AAF73DC135C4A4600D75E1E /* Checkout bundles from GitHub */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1779,7 +1830,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "RESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nrsync -a --delete --exclude \".git\" $BUNDLES $BUNDLEDIR\n";
-			showEnvVarsInLog = 0;
 		};
 		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2032,6 +2082,7 @@
 				9A5A678C14207B83003E92EC /* NSMenu-additions.m in Sources */,
 				9AF6A7031434ABB200FB373B /* NSWindow-additions.m in Sources */,
 				9AF6A7071435BAA300FB373B /* ViViewController.m in Sources */,
+				9AA9272714D5B55900F0E02F /* Nu.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

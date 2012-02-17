@@ -35,9 +35,11 @@ extern int logIndent;
 # define MEMDEBUG(fmt, ...)
 # define DEBUG_FINALIZE()
 # define DEBUG_DEALLOC()
+# define DEBUG_INIT()
 #else
 # define MEMDEBUG INFO
-# define DEBUG_DEALLOC() MEMDEBUG(@"%p", self)
+# define DEBUG_DEALLOC() MEMDEBUG(@"%p free", self)
+# define DEBUG_INIT() MEMDEBUG(@"%p init", self)
 # define DEBUG_FINALIZE()		\
 - (void)finalize			\
 {					\

@@ -12,7 +12,7 @@
 		[string rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location == NSNotFound));
 }
 
-+ (int)defaultOptionsForString:(NSString *)string
++ (NSInteger)defaultOptionsForString:(NSString *)string
 {
 	if ([self shouldIgnoreCaseForString:string])
 		return ONIG_OPTION_IGNORECASE;
@@ -54,12 +54,12 @@
 	return [[[ViRegexp alloc] initWithString:aString] autorelease];
 }
 
-+ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(NSInteger)options
 {
 	return [[[ViRegexp alloc] initWithString:aString options:options] autorelease];
 }
 
-+ (ViRegexp *)regexpWithString:(NSString *)aString options:(int)options error:(NSError **)outError
++ (ViRegexp *)regexpWithString:(NSString *)aString options:(NSInteger)options error:(NSError **)outError
 {
 	return [[[ViRegexp alloc] initWithString:aString options:options error:outError] autorelease];
 }
@@ -70,13 +70,13 @@
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString
-                    options:(int)options
+                    options:(NSInteger)options
 {
 	return [self initWithString:aString options:options error:nil];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString
-                     options:(int)options
+                     options:(NSInteger)options
                        error:(NSError **)outError
 {
 	self = [super init];
@@ -97,7 +97,7 @@
 #endif
 	OnigErrorInfo einfo;
 	int r = onig_new(&_regex, (const UChar *)pattern,
-	    (const UChar *)pattern + len, options | ONIG_OPTION_CAPTURE_GROUP,
+	    (const UChar *)pattern + len, (unsigned int)options | ONIG_OPTION_CAPTURE_GROUP,
 	    enc, ONIG_SYNTAX_RUBY, &einfo);
 	free(pattern);
 	if (r != ONIG_NORMAL) {
@@ -129,7 +129,7 @@
 }
 
 - (ViRegexpMatch *)matchInCharacters:(const unichar *)chars
-                             options:(int)options
+                             options:(NSInteger)options
                                range:(NSRange)aRange
                                start:(NSUInteger)aLocation
 {
@@ -140,7 +140,7 @@
 	const unsigned char *end = start + aRange.length * sizeof(unichar);
 
 	int r = onig_search(_regex, str, end, start, end, region,
-	    ONIG_OPTION_FIND_NOT_EMPTY | options);
+	    ONIG_OPTION_FIND_NOT_EMPTY | (unsigned int)options);
 	if (r >= 0)
 		return [ViRegexpMatch regexpMatchWithRegion:region
 					      startLocation:aLocation];
@@ -158,7 +158,7 @@
 				 start:aLocation];
 }
 
-- (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange options:(int)options
+- (ViRegexpMatch *)matchInString:(NSString *)aString range:(NSRange)aRange options:(NSInteger)options
 {
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
 	[aString getCharacters:chars range:aRange];
@@ -189,7 +189,7 @@
 }
 
 - (NSArray *)allMatchesInCharacters:(const unichar *)chars
-                            options:(int)options
+                            options:(NSInteger)options
                               range:(NSRange)aRange
                               start:(NSUInteger)aLocation
 {
@@ -227,7 +227,7 @@
 }
 
 - (NSArray *)allMatchesInString:(NSString *)aString
-                        options:(int)options
+                        options:(NSInteger)options
                           range:(NSRange)aRange
 {
 	unichar *chars = malloc(aRange.length * sizeof(unichar));
@@ -241,7 +241,7 @@
 }
 
 - (NSArray *)allMatchesInString:(NSString *)aString
-                        options:(int)options
+                        options:(NSInteger)options
 {
 	return [self allMatchesInString:aString
 				options:0

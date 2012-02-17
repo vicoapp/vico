@@ -1193,7 +1193,7 @@ replaceCharactersInRange:(NSRange)aRange
 		return NSMakeRange(NSNotFound, 0);
 	}
 
-	unsigned rx_options = [ViRegexp defaultOptionsForString:pattern] | ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
+	NSInteger rx_options = [ViRegexp defaultOptionsForString:pattern] | ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 
 	NSError *error = nil;
 	ViRegexp *rx = [ViRegexp regexpWithString:pattern

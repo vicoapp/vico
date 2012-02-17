@@ -39,7 +39,7 @@
 
 	DEBUG(@"searching for %@", pattern);
 
-	unsigned rx_options = [ViRegexp defaultOptionsForString:pattern] | ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
+	NSInteger rx_options = [ViRegexp defaultOptionsForString:pattern] | ONIG_OPTION_NOTBOL | ONIG_OPTION_NOTEOL;
 	ViRegexp *rx;
 	rx = [ViRegexp regexpWithString:pattern
 				options:rx_options];

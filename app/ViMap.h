@@ -26,6 +26,7 @@
 	NSArray		*_keySequence;
 	NSString	*_keyString;
 	NSString	*_scopeSelector;
+	NSString	*_title;
 
 	SEL		 _action;
 	NSUInteger	 _flags;
@@ -46,6 +47,9 @@
 
 /** An array of NSNumbers that make up the key sequence. */
 @property (nonatomic, readonly) NSArray *keySequence;
+
+/** Short description of the command. */
+@property (nonatomic, readwrite, copy) NSString *title;
 
 /** The editor action. */
 @property (nonatomic, readonly) SEL action;

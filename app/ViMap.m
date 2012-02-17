@@ -16,6 +16,7 @@
 @synthesize recursive = _recursive;
 @synthesize macro = _macro;
 @synthesize parameter = _parameter;
+@synthesize title = _title;
 @synthesize expression = _expression;
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence

@@ -40,6 +40,7 @@
 	[_motion setOperator:nil];
 	[_motion release];
 	[_macro release];
+	[_text release];
 	[_messages release];
 	[_keySequence release];
 	[super dealloc];

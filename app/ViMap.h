@@ -440,4 +440,7 @@
  */
 - (void)unmap:(NSString *)keySequence;
 
+- (void)exclude:(ViMap *)map;
+- (void)remove;
+
 @end

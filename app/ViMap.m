@@ -795,4 +795,18 @@ toExpression:(id)expr
 	[_includes addObject:map];
 }
 
+- (void)exclude:(ViMap *)map
+{
+	NSParameterAssert(map);
+	[_includes removeObject:map];
+}
+
+- (void)remove
+{
+	[__maps removeObjectForKey:_name];
+	for (ViMap *map in [__maps objectEnumerator]) {
+		[map exclude:self];
+	}
+}
+
 @end

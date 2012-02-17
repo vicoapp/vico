@@ -528,7 +528,8 @@
 
 - (NSString *)name
 {
-	return [_info objectForKey:@"name"];
+	NSString *name = [_info objectForKey:@"name"];
+	return name ?: [self uuid];
 }
 
 - (NSString *)uuid

@@ -196,6 +196,7 @@
 	[_document release];
 	[_lists release];
 	[_rangeString release];
+	[_representedObject release];
 	[super dealloc];
 }
 

@@ -143,7 +143,7 @@
 
 + (ViMarkList *)markList
 {
-	return [[[ViMarkList alloc] init] autorelease];
+	return [ViMarkList markListWithIdentifier:nil];
 }
 
 - (ViMarkList *)initWithIdentifier:(id)anIdentifier

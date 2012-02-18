@@ -157,6 +157,11 @@
 	return [_language objectForKey:@"name"];
 }
 
+- (NSString *)injectionSelector
+{
+	return [_language objectForKey:@"injectionSelector"];
+}
+
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<ViLanguage %p: %@ (%@)>", self, [self name], [self displayName]];

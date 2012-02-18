@@ -37,6 +37,8 @@
  */
 @property (nonatomic, readonly) NSString *displayName;
 
+@property (nonatomic, readonly) NSString *injectionSelector;
+
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern baseLanguage:(ViLanguage *)baseLanguage;

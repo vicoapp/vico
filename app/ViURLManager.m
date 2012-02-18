@@ -68,10 +68,12 @@
 			 selector:(SEL)aSelector
 {
 	id<ViURLHandler> handler;
-	for (handler in _handlers)
+	for (handler in _handlers) {
 		if ([handler respondsToSelector:aSelector] &&
-		    [handler respondsToURL:aURL])
+		    [handler respondsToURL:aURL]) {
 			return handler;
+		}
+	}
 
 	DEBUG(@"no handler found for URL %@ and selector %@",
 	    aURL, NSStringFromSelector(aSelector));

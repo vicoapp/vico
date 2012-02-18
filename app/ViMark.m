@@ -87,8 +87,8 @@
 
 	if ((self = [super init]) != nil) {
 		_url = [[aURL URLByResolvingSymlinksAndAliases:nil] retain];
-		_name = [aName retain];
-		_title = [aTitle retain];
+		_name = [aName copy];
+		_title = [aTitle copy];
 		_persistent = YES;
 
 		_line = aLine;
@@ -161,17 +161,18 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	self = [[self class] allocWithZone:zone];
-	if (_view)
-		self = [self initWithView:_view name:_name range:_range];
-	else if (_document)
-		self = [self initWithDocument:_document name:_name range:_range];
-	else
-		self = [self initWithURL:_url name:_name title:_title line:_line column:_column];
-	self.title = _title;
-	self.icon = _icon;
-	self.persistent = _persistent;
-	return self;
+	ViMark *copy = [[self class] allocWithZone:zone];
+	if (_view) {
+		copy = [copy initWithView:_view name:_name range:_range];
+	} else if (_document) {
+		copy = [copy initWithDocument:_document name:_name range:_range];
+	} else {
+		copy = [copy initWithURL:_url name:_name title:_title line:_line column:_column];
+	}
+	copy.title = _title;
+	copy.icon = _icon;
+	copy.persistent = _persistent;
+	return copy;
 }
 
 - (void)viewClosed:(NSNotification *)notification

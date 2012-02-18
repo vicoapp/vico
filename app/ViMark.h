@@ -49,7 +49,7 @@
 /** The icon of the mark. */
 @property(nonatomic,readwrite,retain) NSImage *icon;
 /** The title of the mark. An NSString or an NSAttributedString. */
-@property(nonatomic,readwrite,retain) id title;
+@property(nonatomic,readwrite,copy) id title;
 /** A custom user-defined object associated with the mark. */
 @property(nonatomic,readwrite,retain) id representedObject;
 /** If NO, the mark is automatically removed when the text range is removed. Default is YES. */

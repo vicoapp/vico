@@ -492,7 +492,7 @@ $(HELP_EN)/%.html: %.md
 
 
 .PHONY: app
-app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) $(RESDIR)/Vico.help $(APPDIR)/Contents/PkgInfo
+app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/PkgInfo
 	for arch in $(ARCHS); do \
 		$(MAKE) binaries ARCH=$$arch; \
 	done
@@ -745,9 +745,10 @@ HELP_FILES = \
 	help-Info.plist \
 	help-InfoPlist.strings
 
+help: $(DERIVEDDIR)/help.stamp
 HELP_RESDIR = $(RESDIR)/Vico.help/Contents/Resources
 HELP_EN = $(HELP_RESDIR)/English.lproj
-$(RESDIR)/Vico.help: $(HELP_FILES)
+$(DERIVEDDIR)/help.stamp: $(HELP_FILES)
 	mkdir -p $(HELP_EN)
 	cp -f help/index.html $(HELP_EN)/VicoHelp.html
 	rsync -a --delete --exclude ".DS_Store" help/shared $(HELP_RESDIR)
@@ -757,6 +758,7 @@ $(RESDIR)/Vico.help: $(HELP_FILES)
 		./help/md2html help/$$md > $(HELP_EN)/$${md%.md}.html; \
 	done
 	hiutil -vg -s en -Caf $(HELP_EN)/Vico.helpindex $(HELP_EN)
+	touch $(DERIVEDDIR)/help.stamp
 
 HELP_SRC = help
 WWW_HELP_DST = $(CURDIR)/help/www

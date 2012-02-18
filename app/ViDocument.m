@@ -1778,9 +1778,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	NSString *name = [NSString stringWithFormat:@"%C", key];
 	ViMark *m = [_localMarks.list lookup:name];
-	if (m)
+	if (m) {
 		[m setRange:range];
-	else {
+	} else {
 		m = [ViMark markWithDocument:self name:name range:range];
 		[_localMarks.list addMark:m];
 	}

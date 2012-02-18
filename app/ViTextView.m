@@ -2500,6 +2500,9 @@ replaceCharactersInRange:(NSRange)aRange
 {
 	ViJumpList *jumplist = [[[self window] windowController] jumpList];
 	[jumplist push:[self markAtLocation:aLocation]];
+
+	[[self document] setMark:'\'' atLocation:aLocation];
+	[[self document] setMark:'`' atLocation:aLocation];
 }
 
 - (void)pushCurrentLocationOnJumpList

@@ -2411,8 +2411,15 @@
 
 	BOOL recordJump = ![command.mapping.keyString hasPrefix:@"g"];	// XXX: use another selector!
 	BOOL moveToColumn = [command.mapping.keyString isEqualToString:@"`"];	// XXX: use another selector!
-	if (!moveToColumn)
+
+	BOOL isLatestJumpMark = (command.argument == '\'' || command.argument == '`');
+
+	if (!moveToColumn) {
 		m = [ViMark markWithURL:m.url line:m.line column:0];
+	} else if (isLatestJumpMark) {
+		/* Need to copy the mark as it's modified by pushCurrentLocationOnJumpList/setMark below. */
+		m = [[m copy] autorelease];
+	}
 
 	if (m.document != [self document]) {
 		/* Motion components don't work across documents. */
@@ -2425,11 +2432,18 @@
 						       recordJump:recordJump];
 	}
 
-	if (!moveToColumn)
+	if (!moveToColumn) {
 		[m setLocation:[[self textStorage] skipWhitespaceFrom:m.location]];
+	}
 
-	if (recordJump && !command.hasOperator)
+	if (recordJump && !command.hasOperator) {
 		[self pushCurrentLocationOnJumpList];
+	} else if (isLatestJumpMark) {
+		/* Update ' and ` mark even if not updating the jump list. */
+		[[self document] setMark:'\'' atLocation:[self caret]];
+		[[self document] setMark:'`' atLocation:[self caret]];
+	}
+
 	[self gotoMark:m];
 	end_location = [self caret];
 

@@ -382,7 +382,7 @@ CC = clang
 CXX = clang++
 IBTOOL = /Developer/usr/bin/ibtool
 
-REPO_VERSION := $(git log --oneline | wc -l | sed 's/ //g')
+REPO_VERSION := $(shell git log --oneline | wc -l | sed 's/ //g')
 
 ifeq ($(CONFIGURATION),DEBUG)
 SHORT_VERSION = r$(REPO_VERSION)

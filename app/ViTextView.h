@@ -70,13 +70,13 @@
 
 	// block caret
 	NSUInteger		 caret;
-	NSRect			 caretRect;
-	NSRect			 lineHighlightRect;
-	NSRect			 oldCaretRect;
-	NSRect			 oldLineHighlightRect;
+	NSRect			 _caretRect;
+	NSRect			 _lineHighlightRect;
+	NSRect			 _oldCaretRect;
+	NSRect			 _oldLineHighlightRect;
 	NSColor			*_caretColor;
 	NSColor			*_lineHighlightColor;
-	BOOL			 highlightCursorLine;
+	BOOL			 _highlightCursorLine;
 	NSSize			 _characterSize;
 
 	// caret blinking

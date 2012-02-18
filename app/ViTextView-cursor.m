@@ -24,7 +24,7 @@
 	if (caret + 1 >= length)
 		len = 0;
 	if (length == 0) {
-		caretRect.origin = NSMakePoint(0, 0);
+		_caretRect.origin = NSMakePoint(0, 0);
 	} else {
 		NSUInteger rectCount = 0;
 		NSRectArray rects = [lm rectArrayForCharacterRange:NSMakeRange(caret, len)
@@ -32,31 +32,31 @@
 						   inTextContainer:[self textContainer]
 							 rectCount:&rectCount];
 		if (rectCount > 0)
-			caretRect = rects[0];
+			_caretRect = rects[0];
 	}
 
 	NSSize inset = [self textContainerInset];
 	NSPoint origin = [self textContainerOrigin];
-	caretRect.origin.x += origin.x;
-	caretRect.origin.y += origin.y;
-	caretRect.origin.x += inset.width;
-	caretRect.origin.y += inset.height;
+	_caretRect.origin.x += origin.x;
+	_caretRect.origin.y += origin.y;
+	_caretRect.origin.x += inset.width;
+	_caretRect.origin.y += inset.height;
 
-	if (NSWidth(caretRect) == 0)
-		caretRect.size = _characterSize;
+	if (NSWidth(_caretRect) == 0)
+		_caretRect.size = _characterSize;
 
 	if (len == 0) {
 		// XXX: at EOF
-		caretRect.size = _characterSize;
+		_caretRect.size = _characterSize;
 	}
 
-	if (caretRect.origin.x == 0)
-		caretRect.origin.x = 5;
+	if (_caretRect.origin.x == 0)
+		_caretRect.origin.x = 5;
 
-	if (highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
+	if (_highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
 		NSRange lineRange;
 		if (length == 0) {
-			lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
+			_lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
 		} else {
 			NSUInteger glyphIndex = [lm glyphIndexForCharacterAtIndex:IMIN(caret, length - 1)];
 			[lm lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
@@ -66,19 +66,19 @@
 					lineRange.length -= 1;
 			}
 
-			lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
+			_lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
 							  inTextContainer:[self textContainer]];
-			lineHighlightRect.size.width = 10000;
-			lineHighlightRect.origin.x = 0;
+			_lineHighlightRect.size.width = 10000;
+			_lineHighlightRect.origin.x = 0;
 		}
 	}
 
-	[self setNeedsDisplayInRect:oldCaretRect];
-	[self setNeedsDisplayInRect:caretRect];
-	[self setNeedsDisplayInRect:oldLineHighlightRect];
-	[self setNeedsDisplayInRect:lineHighlightRect];
-	oldCaretRect = caretRect;
-	oldLineHighlightRect = lineHighlightRect;
+	[self setNeedsDisplayInRect:_oldCaretRect];
+	[self setNeedsDisplayInRect:_caretRect];
+	[self setNeedsDisplayInRect:_oldLineHighlightRect];
+	[self setNeedsDisplayInRect:_lineHighlightRect];
+	_oldCaretRect = _caretRect;
+	_oldLineHighlightRect = _lineHighlightRect;
 
 	_caretBlinkState = YES;
 	[_caretBlinkTimer invalidate];
@@ -106,41 +106,41 @@
 - (void)blinkCaret:(NSTimer *)aTimer
 {
 	_caretBlinkState = !_caretBlinkState;
-	[self setNeedsDisplayInRect:caretRect];
+	[self setNeedsDisplayInRect:_caretRect];
 }
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	if (_caretBlinkState && NSIntersectsRect(caretRect, aRect)) {
+	if (_caretBlinkState && NSIntersectsRect(_caretRect, aRect)) {
 		if ([self isFieldEditor]) {
-			caretRect.size.width = 1;
+			_caretRect.size.width = 1;
 		} else if (mode == ViInsertMode) {
-			caretRect.size.width = 2;
+			_caretRect.size.width = 2;
 		} else if (caret < [[self textStorage] length]) {
 			unichar c = [[[self textStorage] string] characterAtIndex:caret];
 			if (c == '\t') {
 				// place cursor at end of tab, like vi does
-				caretRect.origin.x += caretRect.size.width - _characterSize.width;
+				_caretRect.origin.x += _caretRect.size.width - _characterSize.width;
 			}
 			if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
-				caretRect.size = _characterSize;
+				_caretRect.size = _characterSize;
 		}
 
 		if ([self isFieldEditor])
 			[[NSColor blackColor] set];
 		else
 			[_caretColor set];
-		[[NSBezierPath bezierPathWithRect:caretRect] fill];
+		[[NSBezierPath bezierPathWithRect:_caretRect] fill];
 	}
 }
 
 - (void)drawViewBackgroundInRect:(NSRect)rect
 {
 	[super drawViewBackgroundInRect:rect];
-	if (NSIntersectsRect(lineHighlightRect, rect)) {
-		if (highlightCursorLine && _lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
+	if (NSIntersectsRect(_lineHighlightRect, rect)) {
+		if (_highlightCursorLine && _lineHighlightColor && mode != ViVisualMode && ![self isFieldEditor]) {
 			[_lineHighlightColor set];
-			[[NSBezierPath bezierPathWithRect:lineHighlightRect] fill];
+			[[NSBezierPath bezierPathWithRect:_lineHighlightRect] fill];
 		}
 	}
 }
@@ -163,8 +163,8 @@
 - (BOOL)becomeFirstResponder
 {
 	[self resetInputSource];
-	[self setNeedsDisplayInRect:oldLineHighlightRect];
-	[self setNeedsDisplayInRect:oldCaretRect];
+	[self setNeedsDisplayInRect:_oldLineHighlightRect];
+	[self setNeedsDisplayInRect:_oldCaretRect];
 
 	// force updating of line number view
 	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
@@ -192,8 +192,8 @@
 	[_caretBlinkTimer release];
 	_caretBlinkTimer = nil;
 
-	[self setNeedsDisplayInRect:oldLineHighlightRect];
-	[self setNeedsDisplayInRect:oldCaretRect];
+	[self setNeedsDisplayInRect:_oldLineHighlightRect];
+	[self setNeedsDisplayInRect:_oldCaretRect];
 	[self forceCursorColor:NO];
 	return [super resignFirstResponder];
 }

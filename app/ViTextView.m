@@ -132,7 +132,7 @@ int logIndent = 0;
 	[defaults addObserver:self forKeyPath:@"blinktime" options:NSKeyValueObservingOptionNew context:NULL];
 
 	antialias = [defaults boolForKey:@"antialias"];
-	highlightCursorLine = [defaults boolForKey:@"cursorline"];
+	_highlightCursorLine = [defaults boolForKey:@"cursorline"];
 
 	caretBlinkTime = [defaults floatForKey:@"blinktime"];
 	NSString *blinkmode = [defaults stringForKey:@"blinkmode"];
@@ -320,7 +320,7 @@ DEBUG_FINALIZE();
 		[lm setInvisiblesAttributes:[theme invisiblesAttributes]];
 		[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [[self textStorage] length])];
 	} else if ([keyPath isEqualToString:@"cursorline"]) {
-		highlightCursorLine = [defaults boolForKey:keyPath];
+		_highlightCursorLine = [defaults boolForKey:keyPath];
 		[self invalidateCaretRect];
 	} else if ([keyPath isEqualToString:@"blinktime"]) {
 		caretBlinkTime = [defaults floatForKey:@"blinktime"];

@@ -608,8 +608,9 @@ DEBUG_FINALIZE();
 - (void)alertModifiedDocuments
 {
 	NSUInteger nmodified = [_modifiedSet count];
-	if (nmodified == 0)
+	if (nmodified == 0) {
 		return;
+	}
 
 	// Choose the most appropriate document from the set of modified documents.
 	// Try to minimize the number of document switches.
@@ -618,39 +619,45 @@ DEBUG_FINALIZE();
 
 	/* Check if the current view contains a modified document. */
 	ViDocumentView *docView = [self currentDocumentView];
-	if (docView && [_modifiedSet containsObject:[docView document]])
+	if (docView && [_modifiedSet containsObject:[docView document]]) {
 		document = [docView document];
+	}
 
 	/* Check if current tab has a view of a modified document. */
 	if (document == nil) {
 		ViTabController *tabController = [self selectedTabController];
-		for (ViViewController *viewController in [tabController views])
+		for (ViViewController *viewController in [tabController views]) {
 			if ([viewController isKindOfClass:[ViDocumentView class]] &&
 			    [_modifiedSet containsObject:[(ViDocumentView *)viewController document]]) {
 				document = [(ViDocumentView *)viewController document];
 				break;
 			}
+		}
 	}
 
-	if (document == nil)
+	if (document == nil) {
 		document = [_modifiedSet anyObject];
+	}
 
 	[self displayDocument:document positioned:ViViewPositionDefault];
 
 	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-	if (nmodified == 1)
+	if (nmodified == 1) {
 		[alert setMessageText:[NSString stringWithFormat:@"The document \"%@\", has been changed by another application since you opened or saved it.",
 			[[document fileURL] lastPathComponent]]];
-	else
+	} else {
 		[alert setMessageText:[NSString stringWithFormat:@"The document \"%@\", and %lu other documents, has been changed by another application since you opened or saved it.",
 			[[document fileURL] lastPathComponent], nmodified - 1]];
+	}
 	[alert setInformativeText:@"Do you want to keep the open version or revert to the document on disk?"];
 	[alert addButtonWithTitle:[NSString stringWithFormat:@"Revert %@", [[document fileURL] lastPathComponent]]];
-	if (nmodified > 1)
+	if (nmodified > 1) {
 		[alert addButtonWithTitle:@"Revert all"];
+	}
 	[alert addButtonWithTitle:[NSString stringWithFormat:@"Keep %@", [[document fileURL] lastPathComponent]]];
-	if (nmodified > 1)
+	if (nmodified > 1) {
 		[alert addButtonWithTitle:@"Keep all"];
+	}
 	[alert beginSheetModalForWindow:[self window]
 			  modalDelegate:self
 			 didEndSelector:@selector(documentChangedAlertDidEnd:returnCode:contextInfo:)
@@ -684,10 +691,11 @@ DEBUG_FINALIZE();
 {
 	[[alert window] orderOut:self];
 	intptr_t state = (intptr_t)contextInfo;
-	if (state == 0) // alert next modified document
+	if (state == 0) { // alert next modified document
 		[self alertModifiedDocuments];
-	else if (state == 1) // revert all modified documents
+	} else if (state == 1) { // revert all modified documents
 		[self revertAllModified];
+	}
 }
 
 - (void)documentsDeletedAlertDidEnd:(NSAlert *)alert
@@ -731,8 +739,9 @@ DEBUG_FINALIZE();
 					       didEndSelector:@selector(revertFailedAlertDidEnd:returnCode:contextInfo:)
 						  contextInfo:(void *)(intptr_t)0];
 			[document updateChangeCount:NSChangeReadOtherContents];
-		} else
+		} else {
 			[self alertModifiedDocuments];
+		}
 	} else if (returnCode == NSAlertSecondButtonReturn && nbuttons == 4) {
 		[self revertAllModified];
 	} else if ((returnCode == NSAlertThirdButtonReturn && nbuttons == 4) ||
@@ -754,18 +763,20 @@ DEBUG_FINALIZE();
 	[_modifiedSet release];
 	_modifiedSet = [[NSMutableSet alloc] init];
 	for (ViDocument *document in _documents) {
-		if (document.isTemporary || ![[document fileURL] isFileURL])
+		if (document.isTemporary || ![[document fileURL] isFileURL]) {
 			continue;
+		}
 
 		NSError *error = nil;
 		NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[[document fileURL] path] error:&error];
 		if (error) {
 			[document updateChangeCount:NSChangeReadOtherContents];
 			document.isTemporary = YES;
-			if ([error isFileNotFoundError])
+			if ([error isFileNotFoundError]) {
 				[deletedSet addObject:document];
-			else
+			} else {
 				INFO(@"failed to stat %@: %@", [[document fileURL] path], [error localizedDescription]);
+			}
 		} else {
 			NSDate *modificationDate = [attributes fileModificationDate];
 			if ([[document fileModificationDate] compare:modificationDate] == NSOrderedAscending) {
@@ -782,16 +793,18 @@ DEBUG_FINALIZE();
 		if (ndeleted == 1) {
 			[alert setMessageText:[NSString stringWithFormat:@"The document \"%@\" was deleted from disk by another application.",
 				[[[deletedSet anyObject] fileURL] lastPathComponent]]];
-		} else
+		} else {
 			[alert setMessageText:[NSString stringWithFormat:@"%lu document%s was deleted from disk by another application.",
 				ndeleted, pluralS]];
+		}
 		[alert setInformativeText:[NSString stringWithFormat:@"The document%s remain%s open.", pluralS, ndeleted == 1 ? "s" : ""]];
 		[alert beginSheetModalForWindow:[self window]
 				  modalDelegate:self
 				 didEndSelector:@selector(documentsDeletedAlertDidEnd:returnCode:contextInfo:)
 				    contextInfo:nil];
-	} else
+	} else {
 		[self alertModifiedDocuments];
+	}
 }
 
 #pragma mark -

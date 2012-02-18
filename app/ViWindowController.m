@@ -759,6 +759,7 @@ DEBUG_FINALIZE();
 
 - (void)checkDocumentsChanged
 {
+	BOOL askAllModified = [[NSUserDefaults standardUserDefaults] boolForKey:@"alwaysAskModifiedDocument"];
 	NSMutableSet *deletedSet = [NSMutableSet set];
 	[_modifiedSet release];
 	_modifiedSet = [[NSMutableSet alloc] init];
@@ -780,8 +781,18 @@ DEBUG_FINALIZE();
 		} else {
 			NSDate *modificationDate = [attributes fileModificationDate];
 			if ([[document fileModificationDate] compare:modificationDate] == NSOrderedAscending) {
-				[document updateChangeCount:NSChangeReadOtherContents];
-				[_modifiedSet addObject:document];
+				if ([document isDocumentEdited] || askAllModified) {
+					[document updateChangeCount:NSChangeReadOtherContents];
+					[_modifiedSet addObject:document];
+				} else {
+					[document revertToContentsOfURL:[document fileURL]
+								 ofType:[document fileType]
+								  error:&error];
+					if (error) {
+						[[NSAlert alertWithError:error] runModal];
+						[document updateChangeCount:NSChangeReadOtherContents];
+					}
+				}
 			}
 		}
 	}

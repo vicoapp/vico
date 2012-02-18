@@ -1,4 +1,16 @@
-# 1.3
+# 1.3.x bugfix release
+
+- :quit doesn't work with tabs
+- remove garbage collection, if stable enough
+
+* R
+* scm status (only the icons, no file explorer bundle commands)
+
+* create keymaps for bundle commands; use standard key manager for bundle commands
+* allow duplicates key mappings => present popup menu
+
+* :bwipeout command (:bdelete + remove from jumplist)
+
 
 ## errata
 
@@ -41,6 +53,8 @@
 * draw marks in gutter view
 * preference pane for editing macros?
 
+* alter status string in ex bar
+
 * switchable/scriptable sidebar panels + flexible placement (left/right) + joined (horizontally split at same side)
     * split explorer that only shows a subset of files, based on scope, eg all scm.* files
     * scriptable sidebar view that shows a mark stack, eg Ack Results or the errorlist / locationlist
@@ -56,6 +70,7 @@
 
 # 1.6: focus on project stuff
 
+* support for .tm_properties files from TM2 ?
 * project shell variables
 * drag'n'drop to explorer could create a symlink in the filesystem
 * hide certain files/folders + remember in a project setting
@@ -70,7 +85,6 @@
 
 ## Bugs
 
-* unicode characters in line and cursor sits over 2 chars
 * repeating completed text should not re-trigger completion!
 
 * xcode/Run throws exception:
@@ -113,11 +127,11 @@
 * set incsearch
 * set hlsearch
 * set listchars
-* implement R
 * :normal!
 * 0<C-D> in insert mode removes all indentation
 * g$ and g0 and g^
 * Ctrl+X and Ctrl+A decremented/incremented a number
+? non-filtering version of :!
 
 
 
@@ -145,6 +159,7 @@
 * check map error in excessKeys.nu (re vs r duplicate mapping)
 * split views top line is ANNOYINGLY changed when editing in another view
 * ctrl-^ with 'noprefertabs' should probably keep lastDocument per view, not per window
+  same with the whole jumplist; do as vim: make a copy of the jumplist in new views
 
 * bundle commands time out when presenting ui
 * switch undo direction after bundle command
@@ -159,6 +174,7 @@
 * open alternative file (.h/.c/.m)
 * symbol list should use same filtering algorithm as file explorer
 * dynamic headIndent paragraph style dependent on line indentation
+* soft wrap at guide column, not at window
 
 * ODB Editor suite
 
@@ -168,7 +184,7 @@
 
 * syntax / scope inspector, like in espresso.app
   * remove show_scope: and shift-ctrl-p mapping
-* scope injection
+* implement scope injection from TM2
 * preview location while searching/traversing symbol list
   - esc cancels, go back to before
   - enter/click shows yellow highlight

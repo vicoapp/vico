@@ -1,6 +1,7 @@
 @class ViDocument;
 @class ViMarkList;
 @class ViDocumentView;
+@class ViScope;
 
 /** A marked location.
  */
@@ -19,6 +20,7 @@
 	BOOL			 _recentlyRestored;
 
 	id			 _title;
+	NSArray			*_scopes;
 	NSImage			*_icon;
 	id			 _representedObject;
 
@@ -52,6 +54,8 @@
 @property(nonatomic,readwrite,retain) id representedObject;
 /** If NO, the mark is automatically removed when the text range is removed. Default is YES. */
 @property(nonatomic,readwrite) BOOL persistent;
+/** Additional scopes for the marked range. */
+@property(nonatomic,readwrite,retain) NSArray *scopes;
 
 @property(nonatomic,readwrite) BOOL recentlyRestored;
 

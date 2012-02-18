@@ -21,6 +21,7 @@
 @synthesize representedObject = _representedObject;
 @synthesize persistent = _persistent;
 @synthesize recentlyRestored = _recentlyRestored;
+@synthesize scopes = _scopes;
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {
@@ -197,6 +198,7 @@
 	[_lists release];
 	[_rangeString release];
 	[_representedObject release];
+	[_scopes release];
 	[super dealloc];
 }
 

@@ -293,6 +293,7 @@ DEBUG_FINALIZE();
 - (void)frameDidChange:(NSNotification *)notification
 {
 	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
+	[[self layoutManager] invalidateDisplayForCharacterRange:NSMakeRange([self caret], 1)];
 }
 
 - (ViTextStorage *)textStorage

@@ -1,4 +1,5 @@
 #import "ViBgView.h"
+#include "logging.h"
 
 @implementation ViBgView
 

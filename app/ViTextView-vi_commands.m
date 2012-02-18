@@ -294,10 +294,12 @@
 	NSClipView *clipView = [scrollView contentView];
 
 	NSRect visibleRect = [clipView bounds];
-	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
+	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect
+							     inTextContainer:[self textContainer]];
+	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange
+							 actualGlyphRange:NULL];
 
-	// check if first line is visible
+	/* Check if first line is visible. */
 	NSUInteger first_end;
 	[self getLineStart:NULL end:&first_end contentsEnd:NULL forLocation:0];
 	if (range.location < first_end) {
@@ -305,20 +307,22 @@
 		return NO;
 	}
 
-	// check if caret is on the last line
-	NSUInteger last_bol;
-	[self getLineStart:&last_bol end:NULL contentsEnd:NULL forLocation:NSMaxRange(range) - 1];
-	if (start_location >= last_bol)
-		[self move_up:command];
-
-	// get the line above the first visible line
+	/* Get the line above the first visible line. */
 	NSUInteger bol;
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:range.location];
 	[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:bol - 1];
 
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(bol, 1) inTextContainer:[self textContainer]];
-	NSRect bounds = [clipView bounds];
-	[clipView scrollToPoint:NSMakePoint(bounds.origin.x, rect.origin.y)];
+	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(bol, 1)
+						      inTextContainer:[self textContainer]];
+
+	/* Check if caret will be moved outside the visible area. */
+	NSRect caretRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange(start_location, 1)
+							   inTextContainer:[self textContainer]];
+	if (rect.origin.y + visibleRect.size.height < NSMaxY(caretRect)) {
+		[self move_up:command];
+	}
+
+	[clipView scrollToPoint:NSMakePoint(visibleRect.origin.x, rect.origin.y)];
 	[scrollView reflectScrolledClipView:clipView];
 	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 

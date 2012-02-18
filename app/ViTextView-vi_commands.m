@@ -261,21 +261,22 @@
 	NSScrollView *scrollView = [self enclosingScrollView];
 	NSClipView *clipView = [scrollView contentView];
 
-        NSRect visibleRect = [clipView bounds];
-        NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
-        NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
-
-	// check if last line is visible
-	if (NSMaxRange(range) >= [[self textStorage] length]) {
-		MESSAGE(@"Already at end-of-file");
-		return NO;
-	}
+	NSRect visibleRect = [clipView bounds];
+	NSRange glyphRange = [[self layoutManager] glyphRangeForBoundingRect:visibleRect inTextContainer:[self textContainer]];
+	NSRange range = [[self layoutManager] characterRangeForGlyphRange:glyphRange actualGlyphRange:NULL];
 
 	NSUInteger end;
 	[self getLineStart:NULL end:&end contentsEnd:NULL forLocation:range.location];
 
-	if (start_location < end)
+	/* Check if the top line is the last line in the file. */
+	if (end >= [[self textStorage] length]) {
+		MESSAGE(@"Already at end-of-file");
+		return NO;
+	}
+
+	if (start_location < end) {
 		[self move_down:command];
+	}
 
 	NSRange nextLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(end, 1) actualCharacterRange:NULL];
 	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:nextLineGlyphRange inTextContainer:[self textContainer]];

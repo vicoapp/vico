@@ -43,37 +43,21 @@ static NSCharacterSet *__slashSet = nil;
  */
 - (NSURL *)URLByResolvingSymlinksAndAliases:(BOOL *)isAliasPtr
 {
-	NSURL *resultURL = [self URLByResolvingSymlinksInPath];
-
-	NSError *error = nil;
-	NSNumber *isAliasFile = nil;
-	BOOL success = [resultURL getResourceValue:&isAliasFile
-					    forKey:NSURLIsAliasFileKey
-					     error:&error];
-	if (success && [isAliasFile boolValue]) {
-		if (isAliasPtr)
+	NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:self error:NULL];
+	if (bookmarkData) {
+		NSURL *resolvedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+							       options:(NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting)
+							 relativeToURL:nil
+						   bookmarkDataIsStale:NULL
+								 error:NULL];
+		if (isAliasPtr) {
 			*isAliasPtr = YES;
-		NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:resultURL
-								      error:&error];
-		if (bookmarkData) {
-			BOOL isStale = NO;
-			NSURLBookmarkResolutionOptions options =
-			    (NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting);
-
-			NSURL *resolvedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
-								       options:options
-								 relativeToURL:nil
-							   bookmarkDataIsStale:&isStale
-									 error:&error];
-			if (resolvedURL) {
-				resultURL = resolvedURL;
-				DEBUG(@"resolved %@ -> %@", self, resultURL);
-			}
 		}
-	} else if (isAliasPtr)
+		return resolvedURL;
+	} else if (isAliasPtr) {
 		*isAliasPtr = NO;
-
-	return resultURL;
+	}
+	return [self URLByResolvingSymlinksInPath];
 }
 
 @end

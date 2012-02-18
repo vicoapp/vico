@@ -1,0 +1,67 @@
+# New in version 1.3.1
+
+* Externally modified documents that aren't edited in Vico are now automatically reverted.
+  To go back to the old behaviour of always asking if Vico should revert a document:
+  $ defaults write se.bzero.vico alwaysAskModifiedDocument -bool true
+
+
+# New in version 1.3
+
+* Project search using Ack
+* Highlighting of matching smart pairs
+* Added `zt`, `zb` and `zz` commands; scrolls the screen relative the caret position
+* Block text objects added: `i[`, `ib`, `iB` and `i<`, as well as the 'a' counterparts
+* "Breadcrumbs" folder navigation in file explorer
+* Support for Finder aliases in the file explorer
+* Added setting for blinking caret
+* Added boolean 'clipboard' setting; when enabled (default off), yanks by default into '+' register (the clipboard)
+* Ctrl-u and ctrl-w recognized in insert mode
+* Standard Cocoa alt-backspace / alt-delete keys recognized in insert mode
+* Command line helper can now open files in new windows with -n option
+* Themes with dark backgrounds now use a white I-beam mouse cursor
+* Added the `gv` command (re-select last selection)
+* Global (uppercase) marks jump between files
+* Mark locations are adjusted for inserted/deleted text
+* All open documents can now be reverted at once when externally modified
+* Added `+` and `-` commands
+* Word completion now honors the `ignorecase` and `smartcase` settings
+
+## Bugfixes
+
+* Fixed delete problem with non-western input methods
+* Fixed weird caret size and position with RTL unicode characters
+* Copied bundles no longer results in duplicate bundle commands
+* Fixed enabling of certain menu items, and make vi menu items respond to key events
+* Tags files with absolute paths are now recognized
+* Fixed cases where filesystem changes wasn't noticed by the file explorer
+* Better handling of symlinked folders in the file explorer
+* Make line number font size follow editor font size
+* The '=' command now indents properly over multiple lines
+* Tweaks for better TextMate bundle compatibility
+* `:edit!` now reverts the open document
+* Preserve POSIX permissions and uid/gid when saving over SFTP
+* Command-clicking in explorer now selects the file
+
+(changed, but not visible / yet usable for the user)
+! Added themeing of underline style and color as well as text shadow
+
+
+
+# New in version 1.2
+
+* Lion compatibility bugs fixed
+* Lion fullscreen support
+* Fuzzy find no longer requires the toolbar to be visible
+* Improved indentation behaviour (should match TextMate behaviour more closely)
+* Shift operators (`<` and `>`) now honors a count in visual mode
+* Added `gdefault` setting (use `:set gdefault`) -- makes `:s` always use `g` option (globally replace all occurrences on a line)
+* Support transparent backgrounds in themes
+* Reworked ex command parsing; allow for customizing and adding of new user-defined ex commands
+* Added `gi` vi command; enter insert mode where insert mode was last exited)
+* Fix creating new folders for SFTP
+* Shows .htaccess and version control .ignore files in explorer by default
+
+* added `wrapscan` setting (enabled by default, use `:set nowrapscan` to turn it off) -- makes searches wrap around to beginning of document
+* added `@` vi command; execute content of a register as vi normal mode -- `q` is still missing, but you can yank into a register
+* expand `%` and `#` characters in ex edit commands
+* `:set` can now toggle boolean variables with `:set var!` or `:set invvar`

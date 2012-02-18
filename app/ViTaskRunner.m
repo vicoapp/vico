@@ -260,6 +260,7 @@ asynchronouslyInWindow:(NSWindow *)aWindow
 		if (fd == -1) {
 			if (outError)
 				*outError = [ViError errorWithFormat:@"Failed to open temporary file: %s", strerror(errno)];
+			free(templateFilename);
 			return NO;
 		}
 		const char *data = [shellCommand UTF8String];

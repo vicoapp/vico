@@ -10339,12 +10339,13 @@ static NuProfiler *defaultProfiler = nil;
  Returns the part of the target string that matched the subpattern at the given index or nil if it wasn't matched. The subpatterns are indexed in order of their opening parentheses, 0 is the entire pattern, 1 is the first capturing subpattern, and so on. */
 - (NSString *)groupAtIndex:(int)i {
     NSRange range = [self rangeOfSubstringAtIndex:i];
-    NSString *string = [self associatedObjectForKey:@"string"];
-    if (string) {
-        return [string substringWithRange:range];
-    } else {
-        return nil;
+    if (range.location != NSNotFound) {
+        NSString *string = [self associatedObjectForKey:@"string"];
+        if (string) {
+            return [string substringWithRange:range];
+        }
     }
+    return nil;
 }
 
 /*!

@@ -327,14 +327,13 @@
 - (NSURL *)url
 {
 	/* The URL of the document can change. */
-	if (_document && [_document fileURL])
+	if ([_document fileURL])
 		return [_document fileURL];
 	return _url;
 }
 
 - (void)setURL:(NSURL *)url
 {
-	[url retain];
 	[_url release];
 	_url = [[url URLByResolvingSymlinksAndAliases:nil] retain];
 }

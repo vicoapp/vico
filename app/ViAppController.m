@@ -533,10 +533,16 @@ withParser:(NuParser *)parser
   bindings:(NSDictionary *)bindings
      error:(NSError **)outError
 {
+	if (parser == nil) {
+		parser = [Nu sharedParser];
+	}
+
 	DEBUG(@"additional bindings: %@", bindings);
-	for (NSString *key in [bindings allKeys])
-		if ([key isKindOfClass:[NSString class]])
+	for (NSString *key in [bindings allKeys]) {
+		if ([key isKindOfClass:[NSString class]]) {
 			[parser setValue:[bindings objectForKey:key] forKey:key];
+		}
+	}
 
 	DEBUG(@"evaluating script: {{{ %@ }}}", script);
 
@@ -576,10 +582,7 @@ withParser:(NuParser *)parser
 - (id)eval:(NSString *)script
      error:(NSError **)outError
 {
-	NuParser *parser = [[NuParser alloc] init];
-	id ret = [self eval:script withParser:parser bindings:nil error:outError];
-	[parser close];
-	[parser release];
+	id ret = [self eval:script withParser:nil bindings:nil error:outError];
 	return ret;
 }
 
@@ -591,7 +594,7 @@ additionalBindings:(NSDictionary *)bindings
        errorString:(NSString **)errorString
        backChannel:(NSString *)channelName
 {
-	NuParser *parser = [[NuParser alloc] init];
+	NuParser *parser = [Nu sharedParser];
 
 	if (channelName) {
 		NSDistantObject *backChannel = [NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
@@ -602,8 +605,6 @@ additionalBindings:(NSDictionary *)bindings
 	id result = [self eval:script withParser:parser bindings:bindings error:&error];
 	if (error && errorString)
 		*errorString = [error localizedDescription];
-	[parser close];
-	[parser release];
 
 	if ([result isKindOfClass:[NSNull class]])
 		return nil;

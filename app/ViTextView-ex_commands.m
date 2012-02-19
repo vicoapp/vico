@@ -175,13 +175,10 @@
 {
 	NSString *script = [[[self textStorage] string] substringWithRange:command.range];
 	NSError *error = nil;
-	NuParser *parser = [[NuParser alloc] init];
 	[[NSApp delegate] eval:script
-		    withParser:parser
+		    withParser:nil
 		      bindings:nil
 			 error:&error];
-	[parser close];
-	[parser release];
 	if (error)
 		return error;
 	return nil;

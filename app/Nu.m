@@ -536,7 +536,7 @@ id _nulist(id firstObject, ...)
         }
     }
     else {
-        if ([bundleIdentifier isEqual:@"nu.programming.framework"]) {
+        if ([bundleIdentifier isEqual:@"se.bzero.Vico"]) {
             // try to read it if it's baked in
             
             @try

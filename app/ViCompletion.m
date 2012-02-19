@@ -64,6 +64,7 @@ static NSCharacterSet *__ucase = nil;
 	[_font release];
 	[_markColor release];
 	[_titleParagraphStyle release];
+	[_representedObject release];
 	[super dealloc];
 }
 

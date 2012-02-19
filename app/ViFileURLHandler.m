@@ -2,6 +2,7 @@
 #import "ViError.h"
 #import "ViFile.h"
 #import "NSURL-additions.h"
+#import "NSObject+SPInvocationGrabbing.h"
 #include "logging.h"
 
 @interface ViFileDeferred : NSObject <ViDeferred>
@@ -128,9 +129,7 @@
 		[fileman release];
 
 		/* Schedule completion block on main queue. */
-		dispatch_sync(dispatch_get_main_queue(), ^{
-			[deferred finishWithContents:contents error:error];
-		});
+		[[deferred onMainAsync:NO] finishWithContents:contents error:error];
 		[pool drain];
 	});
 

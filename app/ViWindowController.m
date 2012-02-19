@@ -2364,10 +2364,24 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 								   display:NO
 								     error:&error];
 			if (doc) {
-				if ([doc isKindOfClass:[ViProject class]])
-					[[doc nextRunloop] makeWindowControllers];
-				else
+				if ([doc isKindOfClass:[ViProject class]]) {
+					ViTabController *tabController = [self selectedTabController];
+					if ([tabView numberOfTabViewItems] <= 1 &&
+					    [[tabController views] count] <= 1 &&
+					    [_documents count] <= 1 &&
+					    [[_documents anyObject] fileURL] == nil &&
+					    ![[_documents anyObject] isDocumentEdited]) {
+						/* Just change project directory. */
+						[doc close];
+						[self setBaseURL:url];
+						[self ex_pwd:command];
+						[explorer browseURL:url andDisplay:NO];
+					} else {
+						[[doc nextRunloop] makeWindowControllers];
+					}
+				} else {
 					viewController = [self displayDocument:doc positioned:ViViewPositionReplace];
+				}
 			}
 		}
 	}

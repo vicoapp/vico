@@ -148,9 +148,9 @@
 	if ((value = [settings objectForKey:@"indentExpression"]) != nil) {
 		@try {
 			NuCell *cell = [aParser parse:value];
-			if (cell == nil)
+			if (cell == nil || [aParser incomplete]) {
 				INFO(@"Failed to parse indent expression: %@", value);
-			else {
+			} else {
 				NuBlock *code = [[NuBlock alloc] initWithParameters:[NuCell cellWithCar:nil cdr:nil]
 									       body:cell
 									    context:[aParser context]];
@@ -163,6 +163,7 @@
 		@catch (NSException *exception) {
 			INFO(@"Failed to parse indent expression: %@: %@", [exception name], [exception reason]);
 		}
+		[aParser reset];
 	}
 }
 

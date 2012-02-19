@@ -544,8 +544,17 @@ withParser:(NuParser *)parser
 	@try {
 		id code = [parser parse:script];
 		if (code == nil) {
-			if (outError)
+			if (outError) {
 				*outError = [ViError errorWithFormat:@"parse failed"];
+			}
+			[parser reset];
+			return nil;
+		}
+		if ([parser incomplete]) {
+			if (outError) {
+				*outError = [ViError errorWithFormat:@"incomplete input"];
+			}
+			[parser reset];
 			return nil;
 		}
 
@@ -554,11 +563,13 @@ withParser:(NuParser *)parser
 	}
 	@catch (NSException *exception) {
 		INFO(@"%@: %@", [exception name], [exception reason]);
-		if (outError)
+		if (outError) {
 			*outError = [ViError errorWithFormat:@"Got exception %@: %@", [exception name], [exception reason]];
+		}
 		return nil;
 	}
 
+	[parser reset];
 	return result;
 }
 

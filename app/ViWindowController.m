@@ -1026,16 +1026,21 @@ DEBUG_FINALIZE();
 	[document removeObserver:symbolController forKeyPath:@"symbols"];
 }
 
-- (ViDocument *)previouslyActiveDocument
+- (ViDocument *)previouslyActiveDocumentVisible:(BOOL)visible
 {
 	DEBUG(@"returning previously active document (currently %@)", [self currentDocument]);
-	__block ViDocument *doc = nil;
+	__block ViDocument *found = nil;
 	[_jumpList enumerateJumpsBackwardsUsingBlock:^(ViMark *jump, BOOL *stop) {
-		doc = [self documentForURL:jump.url];
-		if (doc)
+		DEBUG(@"got jump %@", jump);
+		ViDocument *doc = jump.document;
+		if (doc && doc != [self currentDocument] && [_documents containsObject:doc] &&
+		    (!visible || [[doc views] count] > 0)) {
+			found = doc;
 			*stop = YES;
+		}
 	}];
-	return doc ?: [_documents anyObject];
+	DEBUG(@"got previously active document %@", found);
+	return found;
 }
 
 - (void)closeDocumentView:(ViViewController *)viewController
@@ -1048,6 +1053,8 @@ DEBUG_FINALIZE();
 
 	if (viewController == nil)
 		[[self window] close];
+
+	ViDocument *prevdoc = [self previouslyActiveDocumentVisible:!canCloseDocument];
 
 	[self willChangeCurrentView];
 	if (viewController == [self currentView])
@@ -1093,24 +1100,30 @@ DEBUG_FINALIZE();
 		if ([tabView numberOfTabViewItems] == 1)
 			[tabBar disableAnimations];
 
-		ViDocument *prevdoc = [self previouslyActiveDocument];
 		DEBUG(@"got previously active document %@", prevdoc);
 
-		if ([tabView numberOfTabViewItems] == 1) {
+		if ([tabView numberOfTabViewItems] <= 1) {
 			DEBUG(@"closed last tab, got documents: %@", _documents);
-			if (prevdoc)
-				[self displayDocument:prevdoc positioned:ViViewPositionReplace];
-			else if (canCloseWindow)
+			if (prevdoc == nil) {
+				prevdoc = [_documents anyObject];
+				DEBUG(@"now got previously active document %@", prevdoc);
+			}
+
+			if (canCloseWindow) {
 				[[self window] close];
-			else {
+			} else if (prevdoc) {
+				[self displayDocument:prevdoc positioned:ViViewPositionReplace];
+			} else {
 				ViDocument *newDoc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO
 															       error:nil];
 				newDoc.isTemporary = YES;
 				[self displayDocument:newDoc positioned:ViViewPositionReplace];
 			}
 		} else {
-			DEBUG(@"got prevdoc %@", prevdoc);
-			[self displayDocument:prevdoc positioned:ViViewPositionDefault];
+			if (!canCloseWindow) {
+				DEBUG(@"got prevdoc %@", prevdoc);
+				[self displayDocument:prevdoc positioned:ViViewPositionDefault];
+			}
 
 			BOOL preJumping = _jumping;
 			_jumping = NO;

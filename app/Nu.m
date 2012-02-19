@@ -67,6 +67,7 @@
 
 #import "Nu.h"
 #import "ViTransformer.h"
+#import "PLBlockIMP.h"
 
 #define IS_NOT_NULL(xyz) ((xyz) && (((id) (xyz)) != Nu__null))
 
@@ -5082,7 +5083,7 @@ static void nu_handler(void *return_value, struct nu_handler_description *handle
 @end
 
 static IMP handler_returning_void(void *userdata) {
-    return imp_implementationWithBlock(^(id receiver, ...) {
+    return pl_imp_implementationWithBlock(^(id receiver, ...) {
         struct nu_handler_description description;
         description.handler = NULL;
         description.description = userdata;
@@ -5095,7 +5096,7 @@ static IMP handler_returning_void(void *userdata) {
 #define MAKE_HANDLER_WITH_TYPE(type) \
 static IMP handler_returning_ ## type (void* userdata) \
 { \
-return imp_implementationWithBlock(^(id receiver, ...) { \
+return pl_imp_implementationWithBlock(^(id receiver, ...) { \
 struct nu_handler_description description; \
 description.handler = NULL; \
 description.description = userdata; \

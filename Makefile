@@ -1,7 +1,13 @@
 ARCH ?= x86_64
 CONFIGURATION ?= DEBUG
 
-VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
+ifeq ($(ARCH),i386)
+BITS = 32
+else
+BITS = 64
+endif
+
+VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help plblockimp/Source plblockimp/Source/x86_$(BITS) $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
 
 .SUFFIXES:
 
@@ -181,7 +187,15 @@ C_SRCS = \
 	utf16_le.c \
 	utf32_be.c \
 	utf32_le.c \
-	utf8.c
+	utf8.c \
+	trampoline_table.c \
+	blockimp.c \
+	blockimp_x86_$(BITS)_config.c \
+	blockimp_x86_$(BITS)_stret_config.c
+
+S_SRCS = \
+	blockimp_x86_$(BITS).s \
+	blockimp_x86_$(BITS)_stret.s
 
 DERIVED_C_SRCS = \
 	scope_selector.c
@@ -423,6 +437,8 @@ CFLAGS	+= -Wall -Werror
 # oniguruma, par, and lemon has too many of these issues
 OBJCFLAGS += -Wshorten-64-to-32
 
+CFLAGS += -DPL_BLOCKIMP_PRIVATE
+
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 
 ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
@@ -431,7 +447,7 @@ LDFLAGS	+= $(ARCH_CFLAGS)
 
 OBJCPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objc.pth
 OBJCXXPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objcxx.pth
-CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F.
+CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F. -Iplblockimp/Source
 LDFLAGS	+= -F.
 
 TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
@@ -457,8 +473,9 @@ NIBDIR=$(RESDIR)/en.lproj
 OBJC_OBJS = $(addprefix $(OBJDIR)/,$(OBJC_SRCS:.m=.o))
 OBJCXX_OBJS = $(addprefix $(OBJDIR)/,$(OBJCXX_SRCS:.mm=.o))
 C_OBJS = $(addprefix $(OBJDIR)/,$(ALL_C_SRCS:.c=.o))
+S_OBJS = $(addprefix $(OBJDIR)/,$(S_SRCS:.s=.o))
 CXX_OBJS = $(addprefix $(OBJDIR)/,$(CXX_SRCS:.cpp=.o))
-OBJS = $(OBJC_OBJS) $(OBJCXX_OBJS) $(C_OBJS) $(CXX_OBJS)
+OBJS = $(OBJC_OBJS) $(OBJCXX_OBJS) $(C_OBJS) $(CXX_OBJS) $(S_OBJS)
 TOOL_OBJC_OBJS = $(addprefix $(OBJDIR)/,$(TOOL_OBJC_SRCS:.m=.o))
 TOOL_OBJS = $(TOOL_OBJC_OBJS)
 PAR_C_OBJS = $(addprefix $(OBJDIR)/,$(PAR_C_SRCS:.c=.o))
@@ -478,6 +495,8 @@ $(OBJDIR)/%.o: %.mm
 	$(CXX) $(CFLAGS) $(OBJCFLAGS) $(OBJCXXPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
+$(OBJDIR)/%.o: %.s
+	$(CC) -x assembler-with-cpp $(CFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(NIBDIR)/%.nib: %.xib
@@ -511,8 +530,6 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
-	mkdir -p $(FWDIR)
-	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(FWDIR)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 
@@ -604,6 +621,20 @@ $(DERIVEDDIR)/AppleIncRootCertificate.h: app/AppleIncRootCertificate.cer $(OBJDI
 	mkdir -p $(DERIVEDDIR)
 	$(OBJDIR)/xorkey app/AppleIncRootCertificate.cer > $(DERIVEDDIR)/AppleIncRootCertificate.h
 
+blockimp.c: $(DERIVEDDIR)/blockimp_x86_$(BITS).h
+$(DERIVEDDIR)/blockimp_x86_$(BITS).h \
+$(DERIVEDDIR)/blockimp_x86_$(BITS).s \
+$(DERIVEDDIR)/blockimp_x86_$(BITS)_config.c: blockimp_x86_$(BITS).tramp blockimp_x86_$(BITS)_stret.tramp
+	mkdir -p $(DERIVEDDIR)
+	@echo "Generating trampolines for arch $(ARCH)"
+	pushd plblockimp/Source/x86_$(BITS) && \
+	for inp in $^; do \
+		echo "Generating trampolines: $$inp"; \
+		CURRENT_ARCH=$(ARCH) \
+		INPUT_FILE_PATH=$$(basename $$inp) \
+		INPUT_FILE_BASE=$${INPUT_FILE_PATH%.tramp} \
+		"$(CURDIR)/plblockimp/Other Sources/gentramp.sh" $(CURDIR)/$(DERIVEDDIR); \
+	done && popd
 
 $(INFOPLIST): app/Vico-Info.plist
 	cp -f $< $@

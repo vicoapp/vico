@@ -1,5 +1,21 @@
+(let ((amap (ViMap mapWithName:"arrowMap"))
+      (gmap (ViMap mapWithName:"genericMap"))
+      (imap (ViMap insertMap))
+      (mmap (ViMap mapWithName:"motionMap"))
+      (tmap (ViMap mapWithName:"textObjectsMap"))
+      (wmap (ViMap mapWithName:"windowMap"))
+      (nmap (ViMap normalMap))
+      (omap (ViMap operatorMap))
+      (vmap (ViMap visualMap))
+      (webmap (ViMap mapWithName:"webMap"))
+      (tabmap (ViMap mapWithName:"tableNavigationMap"))
+      (sidemap (ViMap mapWithName:"sidebarMap"))
+      (emap (ViMap explorerMap))
+      (smap (ViMap symbolMap))
+      (xmap (ViMap mapWithName:"exCommandMap"))
+      (cmap (ViMap completionMap)))
+
 ;; arrow motions, also valid in insert mode
-(set amap (ViMap mapWithName:"arrowMap"))
 (amap setKey:"<right>" toMotion:"move_right_and_wrap:")
 (amap setKey:"<left>" toMotion:"move_left_and_wrap:")
 (amap setKey:"<down>" toMotion:"move_down_soft:" flags:ViMapLineMode parameter:nil scope:nil)
@@ -21,7 +37,6 @@
 
 
 ;; generic commands, valid in most maps
-(set gmap (ViMap mapWithName:"genericMap"))
 (gmap setKey:"<cmd-1>" toAction:"switch_tab:" flags:0 parameter:0 scope:nil)
 (gmap setKey:"<cmd-2>" toAction:"switch_tab:" flags:0 parameter:1 scope:nil)
 (gmap setKey:"<cmd-3>" toAction:"switch_tab:" flags:0 parameter:2 scope:nil)
@@ -44,7 +59,6 @@
 
 
 ;; insert map
-(set imap (ViMap insertMap))
 (imap setDefaultAction:"input_character:")
 (imap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (imap include:amap)
@@ -82,7 +96,6 @@
 
 ;; create a separate mapping for motion commands
 ;; and include it in the normal, operator and visual maps
-(set mmap (ViMap mapWithName:"motionMap"))
 (mmap include:amap)
 (mmap setKey:"<c-h>" toMotion:"move_left:")
 (mmap setKey:"<c-j>" toMotion:"move_down:" flags:ViMapLineMode parameter:nil scope:nil)
@@ -134,7 +147,6 @@
 
 
 ;; text objects in operator and visual maps
-(set tmap (ViMap mapWithName:"textObjectsMap"))
 (tmap setKey:"iw" toMotion:"select_inner_word:")
 (tmap setKey:"aw" toMotion:"select_outer_word:")
 (tmap setKey:"iW" toMotion:"select_inner_bigword:")
@@ -171,7 +183,6 @@
 
 
 ;; c-w prefix map for managing split views
-(set wmap (ViMap mapWithName:"windowMap"))
 (wmap setKey:"<c-w><c-h>" toAction:"window_left:")
 (wmap setKey:"<c-w><c-j>" toAction:"window_down:")
 (wmap setKey:"<c-w><c-k>" toAction:"window_up:")
@@ -205,7 +216,6 @@
 
 
 ;; normal map
-(set nmap (ViMap normalMap))
 (nmap setOperatorMap:(ViMap operatorMap))
 (nmap include:gmap)
 (nmap include:mmap)
@@ -293,7 +303,6 @@
 
 
 ;; operator map
-(set omap (ViMap operatorMap))
 (omap include:mmap)
 (omap include:tmap)
 (omap setKey:"vj" toMotion:"move_down:")
@@ -302,7 +311,6 @@
 
 
 ;; visual map
-(set vmap (ViMap visualMap))
 (vmap include:gmap)
 (vmap include:tmap)
 (vmap include:mmap)
@@ -351,12 +359,10 @@
 
 
 ;; command HTML output map
-(set webmap (ViMap mapWithName:"webMap"))
 (webmap setOperatorMap:(ViMap operatorMap))
 (webmap include:(ViMap normalMap))
 
 ;; navigation map for tables
-(set tabmap (ViMap mapWithName:"tableNavigationMap"))
 (tabmap setKey:"<down>" toMotion:"move_down:")
 (tabmap setKey:"<up>" toMotion:"move_up:")
 (tabmap setKey:"<left>" toMotion:"move_left:")
@@ -382,7 +388,6 @@
 (tabmap setKey:"<cr>" toMotion:"double_action:")
 
 ;; sidebar navigation map (valid for explorer and symbol map)
-(set sidemap (ViMap mapWithName:"sidebarMap"))
 (sidemap include:gmap)
 (sidemap include:tabmap)
 (sidemap setKey:"/" toMotion:"find:")
@@ -397,7 +402,6 @@
 (sidemap setKey:"<alt-down>" toMotion:"goto_line:" flags:ViMapLineMode parameter:YES scope:nil)
 
 ;; explorer map
-(set emap (ViMap explorerMap))
 (emap include:sidemap)
 (emap setKey:"<c-l>" toAction:"rescan_files:")
 (emap setKey:"N" toAction:"new_folder:")
@@ -418,11 +422,9 @@
 (emap map:"<cmd-down>" to:"<cr>")
 
 ;; symbol map
-(set smap (ViMap symbolMap))
 (smap include:sidemap)
 
 ;; ex command line text field map
-(set xmap (ViMap mapWithName:"exCommandMap"))
 (xmap setDefaultAction:"input_character:")
 (xmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (xmap setKey:"<esc>" toAction:"ex_cancel:")
@@ -460,7 +462,6 @@
 
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
-(set cmap (ViMap completionMap))
 (cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (cmap setDefaultAction:"filter:")
 (cmap setKey:"<esc>" toAction:"cancel:")
@@ -566,3 +567,4 @@
 ;(nmap map:"l" to:"h" recursively:YES scope:nil)
 ; this will cause unbound recursion and will abort after 1000 iterations
 
+)

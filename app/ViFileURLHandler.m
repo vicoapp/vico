@@ -152,7 +152,9 @@
 - (NSURL *)normalizeURL:(NSURL *)aURL
 {
 	NSString *path = [aURL relativePath];
-	if ([path length] == 0)
+	if ([aURL isFileReferenceURL]) {
+		path = [aURL path];
+	} else if ([path length] == 0)
 		path = NSHomeDirectory();
 	else if ([path hasPrefix:@"~"])
 		path = [NSHomeDirectory() stringByAppendingPathComponent:[path substringFromIndex:1]];

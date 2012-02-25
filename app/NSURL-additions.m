@@ -43,18 +43,27 @@ static NSCharacterSet *__slashSet = nil;
  */
 - (NSURL *)URLByResolvingSymlinksAndAliases:(BOOL *)isAliasPtr
 {
-	NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:self error:NULL];
-	if (bookmarkData) {
-		NSURL *resolvedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
-							       options:(NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting)
-							 relativeToURL:nil
-						   bookmarkDataIsStale:NULL
-								 error:NULL];
-		if (isAliasPtr) {
-			*isAliasPtr = YES;
+	if ([self isFileURL]) {
+		NSNumber *isAliasFile = nil;
+		BOOL success = [self getResourceValue:&isAliasFile
+					       forKey:NSURLIsAliasFileKey
+						error:NULL];
+		if (success && [isAliasFile boolValue]) {
+			NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:self error:NULL];
+			if (bookmarkData) {
+				NSURL *resolvedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+									       options:(NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting)
+									 relativeToURL:nil
+								   bookmarkDataIsStale:NULL
+										 error:NULL];
+				if (isAliasPtr) {
+					*isAliasPtr = YES;
+				}
+				return [[[NSURL fileURLWithPath:[resolvedURL path]] URLByStandardizingPath] absoluteURL];
+			}
 		}
-		return resolvedURL;
-	} else if (isAliasPtr) {
+	}
+	if (isAliasPtr) {
 		*isAliasPtr = NO;
 	}
 	return [self URLByResolvingSymlinksInPath];

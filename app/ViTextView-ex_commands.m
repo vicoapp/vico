@@ -4,6 +4,7 @@
 #import "ViError.h"
 #import "NSString-additions.h"
 #import "ViRegisterManager.h"
+#import "NSView-additions.h"
 
 @implementation ViTextView (ex_commands)
 
@@ -164,8 +165,15 @@
 
 - (id)ex_bang:(ExCommand *)command
 {
-	if (command.naddr == 0)
-		return [ViError message:@"Non-filtering version of ! not implemented"];
+	if (command.naddr == 0) {
+		ExMapping *shell = [[ExMap defaultMap] lookup:@"shell"];
+		if (shell == nil) {
+			return [ViError message:@"Non-filtering version of ! not implemented"];
+		}
+		ExCommand *shellCommand = [ExCommand commandWithMapping:shell];
+		shellCommand.arg = command.arg;
+		[self evalExCommand:shellCommand];
+	}
 	if ([self filterRange:command.range throughCommand:command.arg])
 		command.caret = command.range.location;
 	return nil;

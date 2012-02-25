@@ -668,6 +668,11 @@ replaceCharactersInRange:(NSRange)aRange
 	return [self markAtLocation:[self caret]];
 }
 
+- (BOOL)atEOF
+{
+	return [self caret] >= [[self textStorage] length];
+}
+
 #pragma mark -
 #pragma mark Indentation
 

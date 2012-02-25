@@ -270,6 +270,8 @@
 - (ViMark *)markAtLocation:(NSUInteger)location;
 - (ViMark *)currentMark;
 
+- (BOOL)atEOF;
+
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setWrapping:(BOOL)flag;

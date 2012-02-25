@@ -12,6 +12,7 @@
 {
 	_characterSize = [@"a" sizeWithAttributes:[NSDictionary dictionaryWithObject:[ViThemeStore font]
 									      forKey:NSFontAttributeName]];
+
 	[self invalidateCaretRect];
 }
 
@@ -21,18 +22,22 @@
 	ViTextStorage *ts = [self textStorage];
 	NSUInteger length = [ts length];
 	int len = 1;
-	if (caret + 1 >= length)
+
+	if ([self atEOF]) {
 		len = 0;
-	if (length == 0) {
-		_caretRect.origin = NSMakePoint(0, 0);
-	} else {
+	}
+
+	_caretRect = NSMakeRect(0, 0, 0, 0);
+
+	if (length > 0) {
 		NSUInteger rectCount = 0;
 		NSRectArray rects = [lm rectArrayForCharacterRange:NSMakeRange(caret, len)
 				      withinSelectedCharacterRange:NSMakeRange(NSNotFound, 0)
 						   inTextContainer:[self textContainer]
 							 rectCount:&rectCount];
-		if (rectCount > 0)
+		if (rectCount > 0) {
 			_caretRect = rects[0];
+		}
 	}
 
 	NSSize inset = [self textContainerInset];
@@ -42,21 +47,33 @@
 	_caretRect.origin.x += inset.width;
 	_caretRect.origin.y += inset.height;
 
-	if (NSWidth(_caretRect) == 0)
-		_caretRect.size = _characterSize;
-
-	if (len == 0) {
-		// XXX: at EOF
+	if (NSWidth(_caretRect) == 0) {
 		_caretRect.size = _characterSize;
 	}
 
-	if (_caretRect.origin.x == 0)
+	if (_caretRect.origin.x == 0) {
 		_caretRect.origin.x = 5;
+	}
+
+	if ([self isFieldEditor]) {
+		_caretRect.size.width = 1;
+	} else if (mode == ViInsertMode) {
+		_caretRect.size.width = 2;
+	} else if (len > 0) {
+		unichar c = [[ts string] characterAtIndex:caret];
+		if (c == '\t') {
+			/* Place cursor at end of tab, like vi does. */
+			_caretRect.origin.x += _caretRect.size.width - _characterSize.width;
+		}
+		if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C) {
+			_caretRect.size.width = _characterSize.width;
+		}
+	}
 
 	if (_highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
 		NSRange lineRange;
 		if (length == 0) {
-			_lineHighlightRect = NSMakeRect(0, 0, 10000, 16);
+			_lineHighlightRect = NSMakeRect(0, 0, 10000, _characterSize.height);
 		} else {
 			NSUInteger glyphIndex = [lm glyphIndexForCharacterAtIndex:IMIN(caret, length - 1)];
 			[lm lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
@@ -89,15 +106,16 @@
 								   selector:@selector(blinkCaret:)
 								   userInfo:nil
 								    repeats:YES] retain];
-	} else
+	} else {
 		_caretBlinkTimer = nil;
+	}
 }
 
 - (void)updateCaret
 {
 	[self invalidateCaretRect];
 
-	// update selection in symbol list
+	/* Update selection in symbol list. */
 	NSNotification *notification = [NSNotification notificationWithName:ViCaretChangedNotification object:self];
 	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 	[[ViEventManager defaultManager] emitDelayed:ViEventCaretDidMove for:self with:self, nil];
@@ -113,23 +131,10 @@
 {
 	if (_caretBlinkState && NSIntersectsRect(_caretRect, aRect)) {
 		if ([self isFieldEditor]) {
-			_caretRect.size.width = 1;
-		} else if (mode == ViInsertMode) {
-			_caretRect.size.width = 2;
-		} else if (caret < [[self textStorage] length]) {
-			unichar c = [[[self textStorage] string] characterAtIndex:caret];
-			if (c == '\t') {
-				// place cursor at end of tab, like vi does
-				_caretRect.origin.x += _caretRect.size.width - _characterSize.width;
-			}
-			if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C)
-				_caretRect.size = _characterSize;
-		}
-
-		if ([self isFieldEditor])
 			[[NSColor blackColor] set];
-		else
+		} else {
 			[_caretColor set];
+		}
 		[[NSBezierPath bezierPathWithRect:_caretRect] fill];
 	}
 }
@@ -150,8 +155,9 @@
 	NSGraphicsContext *context = [NSGraphicsContext currentContext];
 	[context setShouldAntialias:antialias];
 	[super drawRect:aRect];
-	if ([[self window] firstResponder] == self)
+	if ([[self window] firstResponder] == self) {
 		[self updateInsertionPointInRect:aRect];
+	}
 	[self drawPageGuideInRect:aRect];
 }
 
@@ -166,7 +172,7 @@
 	[self setNeedsDisplayInRect:_oldLineHighlightRect];
 	[self setNeedsDisplayInRect:_oldCaretRect];
 
-	// force updating of line number view
+	/* Force updating of line number view. */
 	[[[self enclosingScrollView] verticalRulerView] setNeedsDisplay:YES];
 
 	[self updateCaret];

@@ -272,6 +272,7 @@
 
 - (BOOL)atEOF;
 
+- (void)enclosingFrameDidChange:(NSNotification *)notification;
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
 - (void)setWrapping:(BOOL)flag;

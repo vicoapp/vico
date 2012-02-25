@@ -25,6 +25,7 @@
 
 // Text events
 #define ViEventCaretDidMove @"caretDidMove" // text
+#define ViEventTextFrameDidChange @"textFrameDidChange" // text, size
 
 // Window events
 #define ViEventWillSelectDocument @"willSelectDocument" // window, doc

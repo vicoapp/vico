@@ -154,6 +154,11 @@ int logIndent = 0;
 						   object:self];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(enclosingFrameDidChange:)
+						     name:NSViewFrameDidChangeNotification
+						   object:[self enclosingScrollView]];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(windowBecameKey:)
 						     name:NSWindowDidBecomeKeyNotification
 						   object:[self window]];
@@ -288,6 +293,19 @@ DEBUG_FINALIZE();
 	[self setInitialExCommand:nil];
 	[self setInitialFindPattern:nil];
 	[self setInitialMark:nil];
+}
+
+- (NSSize)frameSizeInCharacters
+{
+	NSRect rect = [[self enclosingScrollView] frame];
+	return NSMakeSize(rect.size.width / _characterSize.width, rect.size.height / _characterSize.height);
+}
+
+- (void)enclosingFrameDidChange:(NSNotification *)notification
+{
+	[[ViEventManager defaultManager] emit:ViEventTextFrameDidChange
+					  for:self
+					 with:self, [NSValue valueWithSize:[self frameSizeInCharacters]], nil];
 }
 
 - (void)frameDidChange:(NSNotification *)notification

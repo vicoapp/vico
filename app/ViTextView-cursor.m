@@ -14,6 +14,7 @@
 									      forKey:NSFontAttributeName]];
 
 	[self invalidateCaretRect];
+	[self enclosingFrameDidChange:nil];
 }
 
 - (void)invalidateCaretRect

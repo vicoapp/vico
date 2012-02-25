@@ -4,13 +4,6 @@
 - remove garbage collection, if stable enough
 
 * R
-* scm status (only the icons, no file explorer bundle commands)
-
-* create keymaps for bundle commands; use standard key manager for bundle commands
-* allow duplicates key mappings => present popup menu
-
-* :bwipeout command (:bdelete + remove from jumplist)
-
 
 ## errata
 
@@ -22,6 +15,10 @@
 
 
 # 1.4: focus on textmate bundles and nu scripting
+
+* scm status (only the icons, no file explorer bundle commands)
+* create keymaps for bundle commands; use standard key manager for bundle commands
+* allow duplicates key mappings => present popup menu
 
 * explorer bundle commands (scm stuff)
 

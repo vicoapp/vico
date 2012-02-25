@@ -904,7 +904,6 @@ resp2txt(int type)
 
 		if (![msg expectType:SSH2_FXP_NAME error:&error]) {
 			originalCallback(nil, nil, error);
-			[self close];
 		} else if (![msg getUnsigned:&count]) {
 			originalCallback(nil, nil, [ViError message:@"SFTP protocol error"]);
 			[self close];

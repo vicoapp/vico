@@ -972,6 +972,10 @@ DEBUG_FINALIZE();
 
 - (void)closeAndWindow:(BOOL)canCloseWindow
 {
+	if (_closed) {
+		DEBUG(@"already closed document %@", self);
+		return;
+	}
 	int code = 1; /* not saved */
 
 	[[ViEventManager defaultManager] emit:ViEventWillCloseDocument for:self with:self, nil];

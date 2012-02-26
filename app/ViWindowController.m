@@ -1026,15 +1026,16 @@ DEBUG_FINALIZE();
 	[document removeObserver:symbolController forKeyPath:@"symbols"];
 }
 
-- (ViDocument *)previouslyActiveDocumentVisible:(BOOL)visible
+- (ViDocument *)previouslyActiveDocumentVisible:(BOOL)mustBeVisible
 {
-	DEBUG(@"returning previously active document (currently %@)", [self currentDocument]);
+	DEBUG(@"returning previously active document (currently %@) (%s be visible)",
+	    [self currentDocument], mustBeVisible ? "MUST" : "must NOT");
 	__block ViDocument *found = nil;
 	[_jumpList enumerateJumpsBackwardsUsingBlock:^(ViMark *jump, BOOL *stop) {
 		DEBUG(@"got jump %@", jump);
 		ViDocument *doc = jump.document;
 		if (doc && doc != [self currentDocument] && [_documents containsObject:doc] &&
-		    (!visible || [[doc views] count] > 0)) {
+		    (!mustBeVisible || [[doc views] count] > 0)) {
 			found = doc;
 			*stop = YES;
 		}
@@ -1120,10 +1121,8 @@ DEBUG_FINALIZE();
 				[self displayDocument:newDoc positioned:ViViewPositionReplace];
 			}
 		} else {
-			if (!canCloseWindow) {
-				DEBUG(@"got prevdoc %@", prevdoc);
-				[self displayDocument:prevdoc positioned:ViViewPositionDefault];
-			}
+			DEBUG(@"got prevdoc %@", prevdoc);
+			[self displayDocument:prevdoc positioned:ViViewPositionDefault];
 
 			BOOL preJumping = _jumping;
 			_jumping = NO;

@@ -203,6 +203,13 @@
 
 		[self drawLineNumber:line inRect:r];
 
+                /* Protect against an improbable (but possible due to
+                 * preceeding exceptions in undo manager) out-of-bounds
+                 * reference here.
+		 */
+		if (location >= [textStorage length]) {
+			break;
+		}
 		[[textStorage string] getLineStart:NULL
 					       end:&location
 				       contentsEnd:NULL

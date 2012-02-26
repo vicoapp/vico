@@ -1192,8 +1192,9 @@ resp2txt(int type)
 
 	__block SFTPRequest *req = nil;
 	for (ViFile *file in entries) {
-		if (file.targetAttributes)
+		if (file.targetAttributes || !file.isLink) {
 			continue; // We have already resolved symlinks in this file
+		}
 
 		req = [self realpath:file.path onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
 			[req autorelease];

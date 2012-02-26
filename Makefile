@@ -437,7 +437,8 @@ CFLAGS	+= -Wall -Werror
 # oniguruma, par, and lemon has too many of these issues
 OBJCFLAGS += -Wshorten-64-to-32
 
-CFLAGS += -DPL_BLOCKIMP_PRIVATE
+# Flags for PLBlockIMP
+CFLAGS += -DPL_BLOCKIMP_PRIVATE -DSUPPORT_APPLE_FALLACK
 
 SDK = /Developer/SDKs/MacOSX10.7.sdk
 

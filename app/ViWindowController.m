@@ -1160,7 +1160,7 @@ DEBUG_FINALIZE();
 	DEBUG(@"closing remaining views in window %@: %@", [self window], set);
 	for (docView in set)
 		[self closeDocumentView:docView
-		       canCloseDocument:NO /* The document is already being closed. */
+		       canCloseDocument:YES /* The document is already being closed. */
 			 canCloseWindow:canCloseWindow];
 }
 

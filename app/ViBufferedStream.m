@@ -75,12 +75,14 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	if (ret <= 0) {
 		if (ret == 0) {
 			DEBUG(@"read EOF from fd %d", _fd_in);
-			if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
-				[[self delegate] stream:self handleEvent:NSStreamEventEndEncountered];
+			if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+				[_delegate stream:self handleEvent:NSStreamEventEndEncountered];
+			}
 		} else {
 			DEBUG(@"read(%d) failed: %s", _fd_in, strerror(errno));
-			if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
-				[[self delegate] stream:self handleEvent:NSStreamEventErrorOccurred];
+			if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+				[_delegate stream:self handleEvent:NSStreamEventErrorOccurred];
+			}
 		}
 		[self shutdownRead];
 	} else {
@@ -93,8 +95,9 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 		free(vis);
 #endif
 		_buflen = ret;
-		if ([[self delegate] respondsToSelector:@selector(stream:handleEvent:)])
-			[[self delegate] stream:self handleEvent:NSStreamEventHasBytesAvailable];
+		if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+			[_delegate stream:self handleEvent:NSStreamEventHasBytesAvailable];
+		}
 	}
 }
 
@@ -123,8 +126,9 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	NSUInteger tot = 0;
 
 	for (ViStreamBuffer *buf in _outputBuffers) {
-		if (i >= IOV_MAX)
+		if (i >= IOV_MAX) {
 			break;
+		}
 		iov[i].iov_base = (void *)buf.ptr;
 		iov[i].iov_len = buf.left;
 		tot += buf.left;
@@ -135,8 +139,9 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 #endif
 	}
 
-	if (tot == 0)
+	if (tot == 0) {
 		return 0;
+	}
 
 	DEBUG(@"flushing %i buffers, total %lu bytes", i, tot);
 
@@ -144,13 +149,14 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 		int saved_errno = errno;
 		DEBUG(@"writev failed with errno %s (%i, %i?)", strerror(saved_errno), saved_errno, EPIPE);
 		if (saved_errno == EAGAIN || saved_errno == ENOBUFS ||
-		    saved_errno == EINTR)	/* try later */
+		    saved_errno == EINTR) {	/* try later */
 			return 0;
-		else if (saved_errno == EPIPE)
+		} else if (saved_errno == EPIPE) {
 			/* treat a broken pipe as connection closed; we might still have stuff to read */
 			return -2;
-		else
+		} else {
 			return -1;
+		}
 	}
 
 	DEBUG(@"writev(%d) returned %zi", _fd_out, n);
@@ -162,14 +168,48 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 
 	[self drain:n];
 
-	if ([_outputBuffers count] == 0)
+	if ([_outputBuffers count] == 0) {
 		return 0;
+	}
 
 	CFSocketCallBackType cbType = kCFSocketWriteCallBack;
-	if (_outputSocket == _inputSocket)
+	if (_outputSocket == _inputSocket) {
 		cbType |= kCFSocketReadCallBack;
+	}
 	CFSocketEnableCallBacks(_outputSocket, cbType);
 	return 1;
+}
+
+- (void)write
+{
+	int ret = [self flush];
+	if (ret == 0) { /* all output buffers flushed to socket */
+		if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+			[_delegate stream:self handleEvent:NSStreamEventHasSpaceAvailable];
+		}
+	} else if (ret == -1) {
+		if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+			[_delegate stream:self handleEvent:NSStreamEventErrorOccurred];
+		}
+		[self shutdownWrite];
+	} else if (ret == -2) {
+		if ([_delegate respondsToSelector:@selector(stream:handleEvent:)]) {
+			/*
+			 * We got a broken pipe on the write stream. If we have different sockets
+			 * for read and write, generate a special write-end event, otherwise we
+			 * use a regular EOF event. The write-end event allows us to keep reading
+			 * data buffered in the socket (ie, not yet received by the application).
+			 *
+			 * The usecase is when filtering through a non-filter like 'ls'.
+			 */
+			if ([self bidirectional]) {
+				[_delegate stream:self handleEvent:NSStreamEventEndEncountered];
+			} else {
+				[_delegate stream:self handleEvent:ViStreamEventWriteEndEncountered];
+			}
+		}
+		[self shutdownWrite];
+	}
 }
 
 static void
@@ -179,33 +219,10 @@ fd_write(CFSocketRef s,
 	 const void *data,
 	 void *info)
 {
-	ViBufferedStream *stream = info;
-
-	int ret = [stream flush];
-	if (ret == 0) { /* all output buffers flushed to socket */
-		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)])
-			[[stream delegate] stream:stream handleEvent:NSStreamEventHasSpaceAvailable];
-	} else if (ret == -1) {
-		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)])
-			[[stream delegate] stream:stream handleEvent:NSStreamEventErrorOccurred];
-		[stream shutdownWrite];
-	} else if (ret == -2) {
-		if ([[stream delegate] respondsToSelector:@selector(stream:handleEvent:)]) {
-			/*
-			 * We got a broken pipe on the write stream. If we have different sockets
-			 * for read and write, generate a special write-end event, otherwise we
-			 * use a regular EOF event. The write-end event allows us to keep reading
-			 * data buffered in the socket (ie, not yet received by the application).
-			 *
-			 * The usecase is when filtering through a non-filter like 'ls'.
-			 */
-			if ([stream bidirectional])
-				[[stream delegate] stream:stream handleEvent:NSStreamEventEndEncountered];
-			else
-				[[stream delegate] stream:stream handleEvent:ViStreamEventWriteEndEncountered];
-		}
-		[stream shutdownWrite];
-	}
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	ViBufferedStream *stream = [[(ViBufferedStream *)info retain] autorelease];
+	[stream write];
+	[pool release];
 }
 
 static void
@@ -215,12 +232,17 @@ fd_read(CFSocketRef s,
 	const void *data,
 	void *info)
 {
-	if (callbackType == kCFSocketWriteCallBack) {
-		fd_write(s, callbackType, address, data, info);
-	} else if (callbackType == kCFSocketReadCallBack) {
-		ViBufferedStream *stream = info;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	ViBufferedStream *stream = [[(ViBufferedStream *)info retain] autorelease];
+	switch (callbackType) {
+	case kCFSocketReadCallBack:
 		[stream read];
+		break;
+	case kCFSocketWriteCallBack:
+		[stream write];
+		break;
 	}
+	[pool release];
 }
 
 /* Returns YES if one bidirectional socket is in use, NO if two unidirectional sockets (a pipe pair) is used. */
@@ -322,20 +344,22 @@ fd_read(CFSocketRef s,
 {
 	id stdout = [task standardOutput];
 	int fdin, fdout;
-	if ([stdout isKindOfClass:[NSPipe class]])
+	if ([stdout isKindOfClass:[NSPipe class]]) {
 		fdin = [[stdout fileHandleForReading] fileDescriptor];
-	else if ([stdout isKindOfClass:[NSFileHandle class]])
+	} else if ([stdout isKindOfClass:[NSFileHandle class]]) {
 		fdin = [stdout fileDescriptor];
-	else
+	} else {
 		return nil;
+	}
 
 	id stdin = [task standardInput];
-	if ([stdin isKindOfClass:[NSPipe class]])
+	if ([stdin isKindOfClass:[NSPipe class]]) {
 		fdout = [[stdin fileHandleForWriting] fileDescriptor];
-	else if ([stdin isKindOfClass:[NSFileHandle class]])
+	} else if ([stdin isKindOfClass:[NSFileHandle class]]) {
 		fdout = [stdin fileDescriptor];
-	else
+	} else {
 		return nil;
+	}
 
 	return [self initWithReadDescriptor:fdin
 			    writeDescriptor:fdout
@@ -351,8 +375,9 @@ fd_read(CFSocketRef s,
 {
 	if (_outputSource) {
 		DEBUG(@"shutting down write pipe %d", _fd_out);
-		if ([_outputBuffers count] > 0)
+		if ([_outputBuffers count] > 0) {
 			INFO(@"fd %i has %lu non-flushed buffers pending", _fd_out, [_outputBuffers count]);
+		}
 		CFSocketInvalidate(_outputSocket); /* also removes the source from run loops */
 		CFRelease(_outputSocket);
 		CFRelease(_outputSource);

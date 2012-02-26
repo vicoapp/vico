@@ -1110,10 +1110,10 @@ DEBUG_FINALIZE();
 				DEBUG(@"now got previously active document %@", prevdoc);
 			}
 
-			if (canCloseWindow) {
-				[[self window] close];
-			} else if (prevdoc) {
+			if (prevdoc) {
 				[self displayDocument:prevdoc positioned:ViViewPositionReplace];
+			} else if (canCloseWindow) {
+				[[self window] close];
 			} else {
 				ViDocument *newDoc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:NO
 															       error:nil];

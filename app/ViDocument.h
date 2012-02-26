@@ -16,6 +16,8 @@
 	ViDocumentView		*_hiddenView;
 	ViTextView		*_scriptView;
 
+	NSMutableDictionary	*_associatedViews;
+
 	ViBundle		*_bundle;
 	ViLanguage		*_language;
 	ViTheme			*_theme;
@@ -179,5 +181,8 @@
 
 - (void)registerMark:(ViMark *)mark;
 - (void)unregisterMark:(ViMark *)mark;
+
+- (void)associateView:(ViViewController *)viewController forKey:(NSString *)key;
+- (NSSet *)associatedViewsForKey:(NSString *)key;
 
 @end

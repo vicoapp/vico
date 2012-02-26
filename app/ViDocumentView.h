@@ -3,7 +3,7 @@
 #import "ViViewController.h"
 
 /** A ViViewController that manages a split view for a ViDocument.
- * @see ViDocumentView.
+ * @see ViViewController.
  */
 @interface ViDocumentView : ViViewController
 {

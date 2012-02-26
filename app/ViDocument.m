@@ -179,6 +179,7 @@ DEBUG_FINALIZE();
 	[_closeCallback release];
 	[_textStorage release];
 	[_loader release];
+	[_associatedViews release];
 
 	[super dealloc];
 }
@@ -1767,8 +1768,48 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	[self didChangeValueForKey:@"symbols"];
 }
 
-#pragma mark Marks
 #pragma mark -
+#pragma mark Associated views (preview and stuff)
+
+- (void)associatedViewClosed:(NSNotification *)notification
+{
+	ViViewController *viewController = [notification object];
+	INFO(@"removing associated view %@", viewController);
+	for (NSMutableSet *set in [_associatedViews objectEnumerator]) {
+		[set removeObject:viewController];
+	}
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+							name:ViViewClosedNotification
+						      object:viewController];
+}
+
+- (void)associateView:(ViViewController *)viewController forKey:(NSString *)key
+{
+	NSMutableSet *set;
+
+	if (_associatedViews == nil) {
+		_associatedViews = [[NSMutableDictionary alloc] init];
+	}
+	set = [_associatedViews objectForKey:key];
+	if (set == nil) {
+		set = [[NSMutableSet alloc] init];
+		[_associatedViews setObject:set forKey:key];
+	}
+	[set addObject:viewController];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(associatedViewClosed:)
+						     name:ViViewClosedNotification
+						   object:viewController];
+}
+
+- (NSSet *)associatedViewsForKey:(NSString *)key
+{
+	return [_associatedViews objectForKey:key];
+}
+
+#pragma mark -
+#pragma mark Marks
 
 - (ViMark *)markNamed:(unichar)key
 {

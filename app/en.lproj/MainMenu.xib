@@ -1597,6 +1597,15 @@
 									<reference key="NSMixedImage" ref="258136346"/>
 									<int key="NSTag">4000</int>
 								</object>
+								<object class="NSMenuItem" id="401469791">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Move View to New Window (&lt;c-w&gt;D)</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="176968249"/>
+									<reference key="NSMixedImage" ref="258136346"/>
+									<int key="NSTag">4000</int>
+								</object>
 								<object class="NSMenuItem" id="291259573">
 									<reference key="NSMenu" ref="466310130"/>
 									<string key="NSTitle">Select Split View</string>
@@ -2333,6 +2342,14 @@
 					<int key="connectionID">922</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">moveCurrentViewToNewWindowAction:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="401469791"/>
+					</object>
+					<int key="connectionID">928</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="835318025"/>
@@ -3028,6 +3045,7 @@
 							<reference ref="179838899"/>
 							<reference ref="728495723"/>
 							<reference ref="291259573"/>
+							<reference ref="401469791"/>
 						</object>
 						<reference key="parent" ref="586577488"/>
 					</object>
@@ -3945,6 +3963,11 @@
 						<reference key="object" ref="271694415"/>
 						<reference key="parent" ref="1042284489"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">926</int>
+						<reference key="object" ref="401469791"/>
+						<reference key="parent" ref="466310130"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -4163,9 +4186,11 @@
 					<string>921.IBPluginDependency</string>
 					<string>923.IBPluginDependency</string>
 					<string>925.IBPluginDependency</string>
+					<string>926.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4392,7 +4417,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">925</int>
+			<int key="maxID">928</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

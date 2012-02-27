@@ -189,6 +189,7 @@
 (wmap setKey:"<c-w><c-l>" toAction:"window_right:")
 (wmap setKey:"<c-w><c-n>" toAction:"window_new:")
 (wmap setKey:"<c-w>T" toAction:"window_totab:")
+(wmap setKey:"<c-w>D" toAction:"window_towindow:")
 (wmap setKey:"<c-w>c" toAction:"window_close:")
 (wmap setKey:"<c-w><c-c>" toAction:"window_close:")
 (wmap setKey:"<c-w>h" toAction:"window_left:")

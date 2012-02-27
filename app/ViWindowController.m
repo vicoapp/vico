@@ -1803,6 +1803,47 @@ DEBUG_FINALIZE();
 	[self moveCurrentViewToNewTab];
 }
 
+
+extern BOOL __makeNewWindowInsteadOfTab;
+- (BOOL)moveCurrentViewToNewWindow
+{
+	ViViewController *viewController = [self currentView];
+	if (viewController == nil)
+		return NO;
+
+	ViTabController *tabController = [viewController tabController];
+
+	if ([[tabBar representedTabViewItems] count] <= 1 && [[tabController views] count] == 1) {
+		[self message:@"Already only one view"];
+		return NO;
+	}
+
+	[viewController retain];
+	[tabController detachView:viewController];
+
+	__makeNewWindowInsteadOfTab = YES;
+	ViWindowController *winCon = [[[ViWindowController alloc] init] autorelease];
+	__makeNewWindowInsteadOfTab = NO;
+
+	[winCon setBaseURL:[self baseURL]];
+	[winCon createTabWithViewController:viewController];
+	[[winCon window] makeKeyAndOrderFront:nil];
+
+	if ([[tabController views] count] == 0) {
+		[self closeTabController:tabController];
+	} else {
+		[self selectDocumentView:tabController.selectedView];
+	}
+
+	[viewController release];
+	return YES;
+}
+
+- (IBAction)moveCurrentViewToNewWindowAction:(id)sender
+{
+	[self moveCurrentViewToNewWindow];
+}
+
 - (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
 {
 	ViViewController *viewController, *otherViewController;
@@ -2195,6 +2236,11 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 - (BOOL)window_totab:(ViCommand *)command
 {
 	return [self moveCurrentViewToNewTab];
+}
+
+- (BOOL)window_towindow:(ViCommand *)command
+{
+	return [self moveCurrentViewToNewWindow];
 }
 
 - (BOOL)window_normalize:(ViCommand *)command

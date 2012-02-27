@@ -20,4 +20,12 @@
 	return [self view];
 }
 
+- (void)attach
+{
+}
+
+- (void)detach
+{
+}
+
 @end

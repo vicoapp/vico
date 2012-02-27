@@ -129,6 +129,7 @@ enum ViViewOrderingMode {
 - (ViViewController *)replaceView:(ViViewController *)viewController
 			 withView:(ViViewController *)newViewController;
 
+- (void)detachView:(ViViewController *)viewController;
 - (void)closeView:(ViViewController *)viewController;
 
 - (void)closeViewsOtherThan:(ViViewController *)viewController;

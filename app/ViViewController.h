@@ -26,4 +26,7 @@
  */
 @property (nonatomic,readwrite) BOOL processing;
 
+- (void)attach;
+- (void)detach;
+
 @end

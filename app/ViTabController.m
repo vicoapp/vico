@@ -51,24 +51,41 @@
 
 	[viewController setTabController:self];
 	[_views addObject:viewController];
+
+	[viewController attach];
 	[[ViEventManager defaultManager] emit:ViEventDidAddView for:viewController with:viewController, nil];
+}
+
+- (void)unlistView:(ViViewController *)viewController
+{
+	DEBUG(@"unlist view %@", viewController);
+	if (viewController == nil) {
+		return;
+	}
+
+	[viewController retain];
+	[_views removeObject:viewController];
+	[viewController setTabController:nil];
+	if (viewController == _previousView) {
+		[self setPreviousView:nil];
+	}
+	[viewController release];
 }
 
 - (void)removeView:(ViViewController *)viewController
 {
-	if (viewController == nil)
+	DEBUG(@"remove view %@", viewController);
+	if (viewController == nil) {
 		return;
+	}
 
 	[viewController retain];
-	DEBUG(@"remove view %@", viewController);
-	[viewController setTabController:nil];
-	[_views removeObject:viewController];
+	[self unlistView:viewController];
+	[viewController detach];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViViewClosedNotification
 							    object:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
 	[[ViEventManager defaultManager] clearFor:viewController];
-	if (viewController == _previousView)
-		[self setPreviousView:nil];
 	[viewController release];
 }
 
@@ -273,11 +290,10 @@
 	return newViewController;
 }
 
-- (void)closeView:(ViViewController *)viewController
+- (void)detachView:(ViViewController *)viewController
 {
-	[self removeView:viewController];
-
-	DEBUG(@"close view %@ = %@", [viewController view], viewController);
+	DEBUG(@"detach view %@ = %@", [viewController view], viewController);
+	[self unlistView:viewController];
 
 	id split = [[viewController view] superview];
 	DEBUG(@"subviews = %@", [split subviews]);
@@ -314,6 +330,13 @@
 		} else
 			[self setSelectedView:[self viewControllerForView:split]];
 	}
+}
+
+- (void)closeView:(ViViewController *)viewController
+{
+	DEBUG(@"close view %@ = %@", [viewController view], viewController);
+	[self removeView:viewController];
+	[self detachView:viewController];
 }
 
 - (void)closeViewsOtherThan:(ViViewController *)viewController

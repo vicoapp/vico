@@ -1787,12 +1787,12 @@ DEBUG_FINALIZE();
 
 	ViTabController *tabController = [viewController tabController];
 	if ([[tabController views] count] == 1) {
-		[self message:@"Already only one window"];
+		[self message:@"Already only one view"];
 		return NO;
 	}
 
 	[viewController retain];
-	[tabController closeView:viewController];
+	[tabController detachView:viewController];
 	[self createTabWithViewController:viewController];
 	[viewController release];
 	return YES;

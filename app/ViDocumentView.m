@@ -49,10 +49,16 @@
 - (void)setTabController:(ViTabController *)tabController
 {
 	[super setTabController:tabController];
-	if (tabController)
-		[[self document] addView:self];
-	else
-		[[self document] removeView:self];
+}
+
+- (void)attach
+{
+	[[self document] addView:self];
+}
+
+- (void)detach
+{
+	[[self document] removeView:self];
 }
 
 - (NSString *)description

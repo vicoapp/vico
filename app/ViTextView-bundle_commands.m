@@ -203,47 +203,45 @@
 	} else if ([outputFormat isEqualToString:@"showashtml"]) {
 		ViViewController *viewController = [[[self window] windowController] currentView];
 		ViTabController *tabController = [viewController tabController];
-		ViViewController *webView = nil;
-		/* Try to reuse any existing web view in the current tab. */
-		for (webView in [tabController views]) {
-			if ([webView isKindOfClass:[ViCommandOutputController class]])
-				break;
-		}
+		ViCommandOutputController *webView = nil;
 
-		BOOL splitVertically = NO;
-		BOOL newWindow = NO;
-		NSString *htmlMode = [command htmlMode];
-		if (htmlMode == nil)
-			htmlMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHTMLMode"];
-		if ([htmlMode isEqualTo:@"split"])
-			splitVertically = NO;
-		else if ([htmlMode isEqualTo:@"vsplit"])
-			splitVertically = YES;
-		else if ([htmlMode isEqualTo:@"window"])
-			newWindow = YES;
-
+		/* Try to reuse any existing web view. */
+		NSSet *associatedViews = [document associatedViewsForKey:command.uuid];
+		webView = [associatedViews anyObject];
 		if (webView) {
-			[(ViCommandOutputController *)webView setContent:outputText];
-			[(ViCommandOutputController *)webView setTitle:[command name]];
-			[[[self window] windowController] selectDocumentView:webView];
+			[webView setContent:outputText];
+			[webView setTitle:[command name]];
 		} else {
-			ViCommandOutputController *oc = [[[ViCommandOutputController alloc] initWithHTMLString:outputText] autorelease];
-			[oc setTitle:[command name]];
+			BOOL splitVertically = NO;
+			BOOL newWindow = NO;
+			NSString *htmlMode = [command htmlMode];
+			if (htmlMode == nil)
+				htmlMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHTMLMode"];
+			if ([htmlMode isEqualTo:@"split"])
+				splitVertically = NO;
+			else if ([htmlMode isEqualTo:@"vsplit"])
+				splitVertically = YES;
+			else if ([htmlMode isEqualTo:@"window"])
+				newWindow = YES;
+
+			webView = [[[ViCommandOutputController alloc] initWithHTMLString:outputText] autorelease];
+			[webView setTitle:[command name]];
+			[document associateView:webView forKey:command.uuid];
 
 			if (newWindow) {
 				ViWindowController *winCon = [[[ViWindowController alloc] init] autorelease];
-				[winCon createTabWithViewController:oc];
-				[winCon selectDocumentView:oc];
+				[winCon createTabWithViewController:webView];
+				[winCon selectDocumentView:webView];
 			} else {
 				if (viewController) {
 					[tabController splitView:viewController
-							withView:oc
+							withView:webView
 						      vertically:splitVertically];
 				} else
-					[[[self window] windowController] createTabWithViewController:oc];
-				[[[self window] windowController] selectDocumentView:oc];
+					[[[self window] windowController] createTabWithViewController:webView];
 			}
 		}
+		[[[[webView tabController] window] windowController] selectDocumentView:webView];
 	} else if ([outputFormat isEqualToString:@"insertastext"]) {
 		[self insertString:outputText atLocation:[self caret]];
 		[self setCaret:[self caret] + [outputText length]];

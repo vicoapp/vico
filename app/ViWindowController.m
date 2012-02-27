@@ -454,6 +454,11 @@ DEBUG_FINALIZE();
 
 	ViTabController *tabController = [[ViTabController alloc] initWithViewController:viewController window:[self window]];
 
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		/* Make sure the document is registered in this window. */
+		[self addDocument:[(ViDocumentView *)viewController document]];
+	}
+
 	NSTabViewItem *tabItem = [(NSTabViewItem *)[NSTabViewItem alloc] initWithIdentifier:tabController];
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];

@@ -664,6 +664,7 @@ static ViMarkManager *__sharedManager = nil;
 {
 	[self willChangeValueForKey:@"stacks"];
 	[_stacks removeObject:stack];
+	[_namedStacks removeObjectForKey:stack.name];
 	[self didChangeValueForKey:@"stacks"];
 }
 
@@ -671,7 +672,6 @@ static ViMarkManager *__sharedManager = nil;
 {
 	ViMarkStack *stack = [_namedStacks objectForKey:name];
 	if (stack) {
-		[_namedStacks removeObjectForKey:name];
 		[self removeStack:stack];
 	}
 }

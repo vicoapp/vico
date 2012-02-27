@@ -493,7 +493,7 @@ DEBUG_FINALIZE();
 
 - (void)addView:(ViDocumentView *)docView
 {
-	if (docView) {
+	if (docView && ![_views containsObject:docView]) {
 		[_views addObject:docView];
 		[self setHiddenView:nil];
 	}

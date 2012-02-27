@@ -211,6 +211,7 @@ DEBUG_FINALIZE();
 	[_caretColor release];
 	[_lineHighlightColor release];
 	[_caretBlinkTimer release];
+	[_taskRunner release];
 
 	[_initialExCommand release];
 	[_initialFindPattern release];

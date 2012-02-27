@@ -518,15 +518,14 @@
 	else
 		[task setCurrentDirectoryPath:NSTemporaryDirectory()];
 
-	ViTaskRunner *runner = [[[ViTaskRunner alloc] init] autorelease];
-	[runner launchTask:task
-	 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
-    asynchronouslyInWindow:nil
-		     title:shellCommand
-		    target:self
-		  selector:@selector(filter:finishedWithStatus:contextInfo:)
-	       contextInfo:[NSValue valueWithRange:range]];
-	return (runner.status == 0);
+	[_taskRunner launchTask:task
+	      withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
+	 asynchronouslyInWindow:nil
+			  title:shellCommand
+			 target:self
+		       selector:@selector(filter:finishedWithStatus:contextInfo:)
+		    contextInfo:[NSValue valueWithRange:range]];
+	return (_taskRunner.status == 0);
 }
 
 /* syntax: [count]!motion command(s) */

@@ -1041,9 +1041,11 @@ DEBUG_FINALIZE();
 	NSInteger ndx = [[openFilesButton menu] indexOfItemWithRepresentedObject:document];
 	if (ndx != -1)
 		[[openFilesButton menu] removeItemAtIndex:ndx];
-	[_documents removeObject:document];
-	[document closeWindowController:self];
-	[document removeObserver:symbolController forKeyPath:@"symbols"];
+	if ([_documents containsObject:document]) {
+		[_documents removeObject:document];
+		[document closeWindowController:self];
+		[document removeObserver:symbolController forKeyPath:@"symbols"];
+	}
 }
 
 - (void)closeOrUnlistDocument:(ViDocument *)document unlessVisible:(BOOL)unlessVisible
@@ -1529,8 +1531,7 @@ DEBUG_FINALIZE();
 		return nil;
 
 	/* Make sure the document is registered in this window. */
-	if (![_documents containsObject:doc])
-		[self addDocument:doc];
+	[self addDocument:doc];
 
 	ViDocumentView *docView = nil;
 	BOOL prefertabs = [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"];

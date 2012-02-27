@@ -37,6 +37,8 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 - (void)unlistDocument:(ViDocument *)document;
 - (void)willChangeCurrentView;
 - (void)didChangeCurrentView;
+- (void)closeTabController:(ViTabController *)tabController;
+- (void)closeOrUnlistDocument:(ViDocument *)document unlessVisible:(BOOL)unlessVisible;
 @end
 
 
@@ -826,6 +828,26 @@ DEBUG_FINALIZE();
 #pragma mark -
 #pragma mark Document closing
 
+- (void)closeAllViews
+{
+	/* Close down all documents. */
+	ViDocument *doc;
+	while ((doc = [_documents anyObject]) != nil) {
+		[self closeOrUnlistDocument:doc unlessVisible:NO];
+	}
+
+	/* Close down all tabs. */
+	while ([tabView numberOfTabViewItems] > 0) {
+		NSTabViewItem *item = [tabView tabViewItemAtIndex:0];
+		ViTabController *tabController = [item identifier];
+		/* Close any views left in this tab. Do not ask for confirmation. */
+		while ([[tabController views] count] > 0) {
+			[tabController closeView:[[tabController views] objectAtIndex:0]];
+		}
+		[self closeTabController:tabController];
+	}
+}
+
 - (void)documentController:(NSDocumentController *)docController
                didCloseAll:(BOOL)didCloseAll
                contextInfo:(void *)contextInfo
@@ -834,13 +856,8 @@ DEBUG_FINALIZE();
 	if (!didCloseAll)
 		return;
 
-	while ([tabView numberOfTabViewItems] > 0) {
-		NSTabViewItem *item = [tabView tabViewItemAtIndex:0];
-		ViTabController *tabController = [item identifier];
-		[self documentController:[ViDocumentController sharedDocumentController]
-			     didCloseAll:YES
-			   tabController:[tabController retain]];
-	}
+	[self closeAllViews];
+	[[self window] close];
 }
 
 - (BOOL)windowShouldClose:(id)window
@@ -889,9 +906,7 @@ DEBUG_FINALIZE();
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
-	ViDocument *doc;
-	while ((doc = [_documents anyObject]) != nil)
-		[self unlistDocument:doc];
+	[self closeAllViews];
 
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
@@ -1031,6 +1046,34 @@ DEBUG_FINALIZE();
 	[document removeObserver:symbolController forKeyPath:@"symbols"];
 }
 
+- (void)closeOrUnlistDocument:(ViDocument *)document unlessVisible:(BOOL)unlessVisible
+{
+	/* Check if this document is open in another window. */
+	BOOL openElsewhere = NO;
+	for (NSWindow *window in [NSApp windows]) {
+		ViWindowController *wincon = [window windowController];
+		if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]]) {
+			continue;
+		}
+		if ([[wincon documents] containsObject:document]) {
+			openElsewhere = YES;
+			break;
+		}
+	}
+
+	if ([[document views] count] == 0 || !unlessVisible) {
+		DEBUG(@"closed last view of document %@, closing document", document);
+		if (openElsewhere) {
+			DEBUG(@"document %@ open in other windows", document);
+			[self unlistDocument:document];
+		} else {
+			[document close];
+		}
+	} else {
+		DEBUG(@"document %@ has more views open: %@", document, [document views]);
+	}
+}
+
 - (ViDocument *)previouslyActiveDocumentVisible:(BOOL)mustBeVisible
 {
 	DEBUG(@"returning previously active document (currently %@) (%s be visible)",
@@ -1075,29 +1118,7 @@ DEBUG_FINALIZE();
 
 	/* If this was the last view of the document, close the document too. */
 	if (canCloseDocument && doc) {
-		/* Check if this document is open in another window. */
-		BOOL openElsewhere = NO;
-		for (NSWindow *window in [NSApp windows]) {
-			ViWindowController *wincon = [window windowController];
-			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
-				continue;
-			if ([[wincon documents] containsObject:doc]) {
-				openElsewhere = YES;
-				break;
-			}
-		}
-
-		if (openElsewhere) {
-			DEBUG(@"document %@ open in other windows", doc);
-			[self unlistDocument:doc];
-		} else {
-			if ([[doc views] count] == 0) {
-				DEBUG(@"closed last view of document %@, closing document", doc);
-				[doc close];
-			} else {
-				DEBUG(@"document %@ has more views open: %@", doc, [doc views]);
-			}
-		}
+		[self closeOrUnlistDocument:doc unlessVisible:YES];
 	}
 
 	/* If this was the last view in the tab, close the tab too. */

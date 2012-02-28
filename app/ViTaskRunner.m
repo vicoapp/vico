@@ -29,14 +29,16 @@
 			return nil;
 		}
 	}
+	DEBUG_INIT();
 	return self;
 }
 
 - (void)dealloc
 {
-	INFO(@"%p", self);
-	if ([_task isRunning])
+	DEBUG_DEALLOC();
+	if ([_task isRunning]) {
 		kill([_task processIdentifier], SIGKILL);
+	}
 	[_task release];
 	[_window release];
 	[_stream release];

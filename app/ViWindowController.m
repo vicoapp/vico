@@ -860,6 +860,22 @@ DEBUG_FINALIZE();
 	[[self window] close];
 }
 
+/* Check if a document is open in another window. */
+- (BOOL)documentOpenElsewhere:(ViDocument *)document
+{
+	for (NSWindow *window in [NSApp windows]) {
+		ViWindowController *wincon = [window windowController];
+		if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]]) {
+			continue;
+		}
+		if ([[wincon documents] containsObject:document]) {
+			return YES;
+		}
+	}
+
+	return NO;
+}
+
 - (BOOL)windowShouldClose:(id)window
 {
 	DEBUG(@"documents = %@", _documents);
@@ -869,25 +885,15 @@ DEBUG_FINALIZE();
 
 	NSMutableSet *set = [NSMutableSet set];
 	for (ViDocument *doc in _documents) {
-		if ([set containsObject:doc])
+		if ([set containsObject:doc]) {
 			continue;
-		if (![doc isDocumentEdited])
-			continue;
-
-		/* Check if this document is open in another window. */
-		BOOL openElsewhere = NO;
-		for (NSWindow *window in [NSApp windows]) {
-			ViWindowController *wincon = [window windowController];
-			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
-				continue;
-			if ([[wincon documents] containsObject:doc]) {
-				openElsewhere = YES;
-				break;
-			}
 		}
-
-		if (!openElsewhere)
+		if (![doc isDocumentEdited]) {
+			continue;
+		}
+		if (![self documentOpenElsewhere:doc]) {
 			[set addObject:doc];
+		}
 	}
 
 	[[ViDocumentController sharedDocumentController] closeAllDocumentsInSet:set
@@ -907,7 +913,6 @@ DEBUG_FINALIZE();
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
 	[self closeAllViews];
-
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
 	[_tagStack clear];
@@ -968,20 +973,7 @@ DEBUG_FINALIZE();
 	/* If the current view is a document view, check if it's the last view for the document. */
 	if (docView) {
 		ViDocument *doc = [docView document];
-
-		/* Check if this document is open in another window. */
-		BOOL openElsewhere = NO;
-		for (NSWindow *window in [NSApp windows]) {
-			ViWindowController *wincon = [window windowController];
-			if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
-				continue;
-			if ([[wincon documents] containsObject:doc]) {
-				openElsewhere = YES;
-				break;
-			}
-		}
-
-		if (!openElsewhere && [[doc views] count] == 1) {
+		if (![self documentOpenElsewhere:doc] && [[doc views] count] == 1) {
 			[doc canCloseDocumentWithDelegate:self
 				      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
 					      contextInfo:(void *)(intptr_t)1];
@@ -1051,22 +1043,9 @@ DEBUG_FINALIZE();
 
 - (void)closeOrUnlistDocument:(ViDocument *)document unlessVisible:(BOOL)unlessVisible
 {
-	/* Check if this document is open in another window. */
-	BOOL openElsewhere = NO;
-	for (NSWindow *window in [NSApp windows]) {
-		ViWindowController *wincon = [window windowController];
-		if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]]) {
-			continue;
-		}
-		if ([[wincon documents] containsObject:document]) {
-			openElsewhere = YES;
-			break;
-		}
-	}
-
 	if ([[document views] count] == 0 || !unlessVisible) {
 		DEBUG(@"closed last view of document %@, closing document", document);
-		if (openElsewhere) {
+		if ([self documentOpenElsewhere:document]) {
 			DEBUG(@"document %@ open in other windows", document);
 			[self unlistDocument:document];
 		} else {
@@ -2767,26 +2746,16 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	} else if (command.force) {
 		ViDocument *doc;
 		while ((doc = [_documents anyObject]) != nil) {
-			/* Check if this document is open in another window. */
-			BOOL openElsewhere = NO;
-			for (NSWindow *window in [NSApp windows]) {
-				ViWindowController *wincon = [window windowController];
-				if (wincon == self || ![wincon isKindOfClass:[ViWindowController class]])
-					continue;
-				if ([[wincon documents] containsObject:doc]) {
-					openElsewhere = YES;
-					break;
-				}
-			}
-
-			if (openElsewhere)
+			if ([self documentOpenElsewhere:doc]) {
 				[self unlistDocument:doc];
-			else
+			} else {
 				[doc closeAndWindow:YES];
+			}
 		}
 		[[self window] close];
-	} else
+	} else {
 		[[self window] performClose:nil];
+	}
 
 	// FIXME: quit/hide app if last window?
 	return nil;

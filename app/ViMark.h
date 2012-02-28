@@ -104,5 +104,6 @@
 
 - (void)remove;
 - (void)registerList:(ViMarkList *)list;
+- (void)unregisterList:(ViMarkList *)list;
 
 @end

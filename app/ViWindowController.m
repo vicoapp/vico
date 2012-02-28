@@ -910,6 +910,7 @@ DEBUG_FINALIZE();
 
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
+	[_tagStack clear];
 	[[ViMarkManager sharedManager] removeStack:_tagStack];
 	[__windowControllers removeObject:self];
 }

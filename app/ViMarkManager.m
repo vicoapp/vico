@@ -187,7 +187,12 @@
 {
 	if ([_marks count] > 0) {
 		[self willChangeValueForKey:@"marks"];
-		[_marks removeAllObjects];
+		ViMark *m;
+		while ([_marks count] > 0) {
+			m = [_marks objectAtIndex:0];
+			[m unregisterList:self];
+			[_marks removeObjectAtIndex:0];
+		}
 		[_marksByName removeAllObjects];
 		[self didChangeValueForKey:@"marks"];
 	}
@@ -461,6 +466,9 @@
 	if ([_lists count] > 0) {
 		[self willChangeValueForKey:@"selectionIndexes"];
 		[self willChangeValueForKey:@"list"];
+		for (ViMarkList *list in _lists) {
+			[list clear];
+		}
 		[_lists removeAllObjects];
 		_currentIndex = -1;
 		[self didChangeValueForKey:@"list"];

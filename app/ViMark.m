@@ -355,7 +355,12 @@
 {
 	if (_lists == nil)
 		_lists = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:10];
-	[_lists addObject:list]; // XXX: this does NOT retain the list
+	[_lists addObject:list]; // XXX: this ACTUALLY DOES retain the list
+}
+
+- (void)unregisterList:(ViMarkList *)list
+{
+	[_lists removeObject:list];
 }
 
 - (BOOL)isLeaf

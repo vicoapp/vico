@@ -65,8 +65,8 @@
 	for (NSUInteger i = 1; i <= [beginMatch count]; i++) {
 		NSRange captureRange = [beginMatch rangeOfSubstringAtIndex:i];
 		captureRange.location -= [beginMatch startLocation];
-		NSString *capture = [NSString stringWithCharacters:matchText + captureRange.location
-							    length:captureRange.length];
+		NSString *capture = [ViRegexp escape:[NSString stringWithCharacters:matchText + captureRange.location
+									     length:captureRange.length]];
 		if (capture) {
 			NSString *backref = [NSString stringWithFormat:@"\\%lu", i];
 			DEBUG(@"**** replacing [%@] with [%@]", backref, capture);

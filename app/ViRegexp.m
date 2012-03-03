@@ -107,6 +107,7 @@
 			DEBUG(@"pattern failed: %s", s);
 			*outError = [ViError errorWithFormat:@"%s", s];
 		}
+		[self release];
 		return nil;
 	}
 

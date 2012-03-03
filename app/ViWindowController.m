@@ -1051,9 +1051,20 @@ DEBUG_FINALIZE();
 	}
 }
 
+- (NSSet *)viewsOfDocument:(ViDocument *)document
+{
+	NSMutableSet *set = [NSMutableSet set];
+	for (ViDocumentView *view in [document views]) {
+		if ([[view tabController] window] == [self window]) {
+			[set addObject:view];
+		}
+	}
+	return set;
+}
+
 - (void)closeOrUnlistDocument:(ViDocument *)document unlessVisible:(BOOL)unlessVisible
 {
-	if ([[document views] count] == 0 || !unlessVisible) {
+	if ([[self viewsOfDocument:document] count] == 0 || !unlessVisible) {
 		DEBUG(@"closed last view of document %@, closing document", document);
 		if ([self documentOpenElsewhere:document]) {
 			DEBUG(@"document %@ open in other windows", document);
@@ -1062,7 +1073,7 @@ DEBUG_FINALIZE();
 			[document close];
 		}
 	} else {
-		DEBUG(@"document %@ has more views open: %@", document, [document views]);
+		DEBUG(@"document %@ has more views open: %@", document, [self viewsOfDocument:document]);
 	}
 }
 

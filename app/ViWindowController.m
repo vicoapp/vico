@@ -830,6 +830,9 @@ DEBUG_FINALIZE();
 
 - (void)closeAllViews
 {
+	DEBUG(@"close all views in window controller %@", self);
+	DEBUG(@"documents = %@", _documents);
+
 	/* Close down all documents. */
 	ViDocument *doc;
 	while ((doc = [_documents anyObject]) != nil) {
@@ -853,8 +856,9 @@ DEBUG_FINALIZE();
                contextInfo:(void *)contextInfo
 {
 	DEBUG(@"force closing all views: %s", didCloseAll ? "YES" : "NO");
-	if (!didCloseAll)
+	if (!didCloseAll) {
 		return;
+	}
 
 	[self closeAllViews];
 	[[self window] close];
@@ -905,8 +909,14 @@ DEBUG_FINALIZE();
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-	if (__currentWindowController == self)
+	if (_isClosing) {
+		DEBUG(@"%s", "avoiding recursive window closing");
+		return;
+	}
+	_isClosing = YES;
+	if (__currentWindowController == self) {
 		__currentWindowController = nil;
+	}
 	DEBUG(@"will close %@", self);
 	[[self project] close];
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);

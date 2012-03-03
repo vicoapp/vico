@@ -47,6 +47,7 @@
 	ViTagsDatabase			*_tagsDatabase;
 
 	BOOL				 _isLoaded;
+	BOOL				 _isClosing;
 	ViDocument			*_initialDocument;
 	ViViewController		*_initialViewController;
 	NSMutableSet			*_documents;

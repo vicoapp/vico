@@ -1153,7 +1153,7 @@
 {
 	[self expandItems:items recursionLimit:3];
 
-	if (_isFiltering)
+	if (_isFiltering) {
 		[_filteredItems sortUsingComparator:^(id a, id b) {
 			ViCompletion *ca = a, *cb = b;
 			if (ca.score > cb.score)
@@ -1161,7 +1161,8 @@
 			else if (cb.score > ca.score)
 				return (NSComparisonResult)NSOrderedDescending;
 			return (NSComparisonResult)NSOrderedSame;
-			}];
+		}];
+	}
 
 	[explorer reloadData];
 	if ([_itemsToFilter count] > 0)
@@ -1216,7 +1217,15 @@
 				[_itemsToFilter addObject:file];
 		} else {
 			ViRegexpMatch *m = nil;
-			NSString *p = [file.path substringFromIndex:prefixLength];
+			NSString *p;
+			if ([file.path hasPrefix:base]) {
+				p = [file.path substringFromIndex:prefixLength];
+			} else {
+				/* This happens when there are symlinked directories. */
+				NSString *commonPrefix = [file.path commonPrefixWithString:base
+										   options:NSCaseInsensitiveSearch];
+				p = [file.path substringFromIndex:[commonPrefix length]];
+			}
 			if (_rx == nil || (m = [_rx matchInString:p]) != nil) {
 				ViCompletion *c = [ViCompletion completionWithContent:p fuzzyMatch:m];
 				c.font = _font;

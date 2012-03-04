@@ -32,7 +32,9 @@ main(int argc, char *argv[])
 #endif
 
 #if defined(RELEASE_BUILD)
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	receipt_validate_bundle([[[NSBundle mainBundle] bundlePath] fileSystemRepresentation]);
+	[pool drain];
 #endif
 
 	signal(SIGPIPE, SIG_IGN);

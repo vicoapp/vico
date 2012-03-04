@@ -1774,7 +1774,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (void)associatedViewClosed:(NSNotification *)notification
 {
 	ViViewController *viewController = [notification object];
-	INFO(@"removing associated view %@", viewController);
+	DEBUG(@"removing associated view %@", viewController);
 	for (NSMutableSet *set in [_associatedViews objectEnumerator]) {
 		[set removeObject:viewController];
 	}
@@ -2096,4 +2096,3 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 }
 
 @end
-

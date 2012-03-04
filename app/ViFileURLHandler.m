@@ -96,10 +96,10 @@
 		return nil;
 	}
 
-	ViFileDeferred *deferred = [ViFileDeferred deferredWithHandler:aBlock];
+//	ViFileDeferred *deferred = [ViFileDeferred deferredWithHandler:aBlock];
 
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+//	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+//		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		NSFileManager *fileman = [[NSFileManager alloc] init];
 		NSError *error = nil;
 		NSArray *files = [fileman contentsOfDirectoryAtPath:[aURL path] error:&error];
@@ -114,26 +114,30 @@
 			BOOL isAlias = NO;
 			symurl = [u URLByResolvingSymlinksAndAliases:&isAlias];
 			if (attrs && (isAlias || [[attrs fileType] isEqualToString:NSFileTypeSymbolicLink])) {
-				if (symurl)
+				if (symurl) {
 					symattrs = [fileman attributesOfItemAtPath:[symurl path] error:&error];
+				}
 			}
 
-			if (attrs)
+			if (attrs) {
 				[contents addObject:[ViFile fileWithURL:u
 							     attributes:attrs
 							   symbolicLink:symurl
 						     symbolicAttributes:symattrs]];
-			else if (error)
+			} else if (error) {
 				break;
+			}
 		}
 		[fileman release];
 
 		/* Schedule completion block on main queue. */
-		[[deferred onMainAsync:NO] finishWithContents:contents error:error];
-		[pool drain];
-	});
+//		[[deferred onMainAsync:NO] finishWithContents:contents error:error];
+//		[pool drain];
+//	});
+	aBlock(contents, error);
 
-	return deferred;
+//	return deferred;
+	return nil;
 }
 
 - (id<ViDeferred>)createDirectoryAtURL:(NSURL *)aURL

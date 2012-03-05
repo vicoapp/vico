@@ -413,11 +413,14 @@ OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
 		   "-DIBAction=void)__attribute__((ibaction)"
 
 ARCHS = i386 x86_64
+endif
+
+ifeq ($(CONFIGURATION),BETA)
+SHORT_VERSION = r$(REPO_VERSION)
+endif
 
 ifeq ($(CONFIGURATION),SNAPSHOT)
 CFLAGS += -DTRIAL_VERSION
-endif
-
 endif
 
 CFLAGS += -D$(CONFIGURATION)_BUILD=1
@@ -455,6 +458,16 @@ TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
 APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framework Cocoa
 PAR_LDLIBS =
 XORKEY_LDLIBS =
+
+# Use Sparkle updates for all but release builds
+ifneq ($(CONFIGURATION),RELEASE)
+CFLAGS += -DUSE_SPARKLE
+FRAMEWORKS = \
+	Sparkle.framework
+APP_LDLIBS += -framework Sparkle
+else
+FRAMEWORKS =
+endif
 
 # paths
 BUILDDIR=./build/$(CONFIGURATION)
@@ -528,11 +541,16 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
+	if test -n "$(FRAMEWORKS)"; then rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(FRAMEWORKS) $(FWDIR); fi
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
+ifeq ($(CONFIGURATION),RELEASE)
+	/usr/libexec/PlistBuddy -c "Delete :SUPublicDSAKeyFile" $(INFOPLIST)
+	/usr/libexec/PlistBuddy -c "Delete :SUFeedURL" $(INFOPLIST)
+endif
 
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
 

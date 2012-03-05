@@ -48,6 +48,7 @@ int updateMeta(void);
 	IBOutlet NSMenuItem	*closeTabMenuItem;
 	IBOutlet NSMenuItem	*showFileExplorerMenuItem;
 	IBOutlet NSMenuItem	*showSymbolListMenuItem;
+	IBOutlet NSMenuItem	*checkForUpdatesMenuItem;
 	NSConnection		*shellConn;
 
 	TISInputSourceRef	 original_input_source;

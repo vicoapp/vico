@@ -7,7 +7,7 @@
 
 - (void)cancelSnippet
 {
-	ViSnippet *snippet = document.snippet;
+	ViSnippet *snippet = [[document.snippet retain] autorelease];
 	if (snippet) {
 		DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
 		document.snippet = nil;

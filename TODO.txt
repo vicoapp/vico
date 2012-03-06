@@ -1,9 +1,4 @@
-# 1.3.x bugfix release
-
-- :quit doesn't work with tabs
-- remove garbage collection, if stable enough
-
-* R
+# 1.3.1 bugfix release
 
 ## errata
 
@@ -12,6 +7,11 @@
 * don't overwrite read-only files!
 * explorer spinner is hidden by new path control
   => move it, where!? auto-hide something else?
+
+
+# 1.3.1 bugfix release
+
+* implement R
 
 
 # 1.4: focus on textmate bundles and nu scripting

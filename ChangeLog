@@ -13,6 +13,7 @@
 * Caret screen update artifacts fixed.
 * Implement detaching of split views to new windows (bound to <ctrl-w>D)
 * <command-n> now opens a new window (<command-shift-N> opens a new untitled document)
+* Fix a crash in the file explorer when filtering symlinked directories.
 
 
 # New in version 1.3

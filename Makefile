@@ -748,8 +748,8 @@ checkout:
 	@echo release directory is $(RELEASE_DIR)
 	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
 	@echo checking out sources for '$(TAG)'
-	git clone $(TAG) . $(RELEASE_DIR)
-	rsync -a $(CURDIR)/Bundles/ $(RELEASE_DIR)/Bundles
+	git clone . $(RELEASE_DIR)
+	cd $(RELEASE_DIR) && git co $(TAG) && git submodule update --init
 
 release: checkout
 	$(MAKE) -C $(RELEASE_DIR) pkg

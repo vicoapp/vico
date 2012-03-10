@@ -289,8 +289,9 @@
 		ViWindowController *wincon = [window windowController];
 		if ([wincon respondsToSelector:@selector(explorer)]) {
 			ViFileExplorer *explorer = [wincon explorer];
-			if ([explorer displaysURL:aURL])
+			if ([explorer displaysURL:aURL]) {
 				return YES;
+			}
 		}
 	}
 
@@ -312,27 +313,32 @@
 
 	DEBUG(@"directory %@ has changed, recursive = %s", aURL, recursiveFlush ? "YES" : "NO");
 
+	// XXX: Why is this event not triggered by the file explorer itself!?
 	[[ViEventManager defaultManager] emit:ViEventDirectoryChanged for:nil with:aURL, nil];
 	for (NSWindow *window in [NSApp windows]) {
 		ViWindowController *wincon = [window windowController];
 		if ([wincon respondsToSelector:@selector(explorer)]) {
 			ViFileExplorer *explorer = [wincon explorer];
 			if ([explorer displaysURL:aURL])
-				[[ViEventManager defaultManager] emit:ViEventExplorerDirectoryChanged for:explorer with:explorer, aURL, nil];
+				[[ViEventManager defaultManager] emit:ViEventExplorerDirectoryChanged
+								  for:explorer
+								 with:explorer, aURL, nil];
 		}
 	}
 
 	if (!recursiveFlush) {
-		if (![self directoryIsCachedAtURL:aURL])
+		if (![self directoryIsCachedAtURL:aURL]) {
 			return;
+		}
 		[self flushCachedContentsOfDirectoryAtURL:aURL];
 		if ([self shouldRescanDirectoryAtURL:aURL]) {
 			[self contentsOfDirectoryAtURL:aURL onCompletion:^(NSArray *contents, NSError *error) {
 				/* Any interested project explorer will get a notification. */
 				DEBUG(@"rescanned URL %@, error %@", aURL, error);
 			}];
-		} else if ([aURL isFileURL])
+		} else if ([aURL isFileURL]) {
 			[self restartEvents]; /* To un-monitor the flushed directory. */
+		}
 		return;
 	}
 
@@ -352,13 +358,15 @@
 					/* Any interested project explorer will get a notification. */
 					DEBUG(@"rescanned URL %@, error %@", url, error);
 				}];
-			} else
+			} else {
 				restart = YES;
+			}
 		}
 	}
 
-	if (restart && [aURL isFileURL])
+	if (restart && [aURL isFileURL]) {
 		[self restartEvents];
+	}
 }
 
 - (void)notifyChangedDirectoryAtURL:(NSURL *)aURL
@@ -413,12 +421,13 @@ void mycallback(
 
 	NSString *path = [aURL path];
 	NSArray *pathsBeingWatched = (NSArray *)FSEventStreamCopyPathsBeingWatched(_evstream);
-	for (NSString *p in pathsBeingWatched)
+	for (NSString *p in pathsBeingWatched) {
 		if ([path hasPrefix:p]) {
 			DEBUG(@"URL %@ is already being watched", aURL);
 			CFRelease(pathsBeingWatched);
 			return YES;
 		}
+	}
 
 	CFRelease(pathsBeingWatched);
 	return NO;

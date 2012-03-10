@@ -166,10 +166,11 @@ resp2txt(int type)
 		DEBUG(@"got wait response %@ for %@", msg, _waitRequest);
 	}
 
-	if (_responseCallback)
+	if (_responseCallback) {
 		_responseCallback(msg);
-	else
+	} else {
 		DEBUG(@"NULL response callback for request id %u", _requestId);
+	}
 	_finished = YES;
 
 	if (gotWaitResponse) {
@@ -1284,15 +1285,16 @@ resp2txt(int type)
 					openRequest.subRequest = [self closeHandle:handle
 									onResponse:^(NSError *error) {
 						openRequest.subRequest = nil;
-						if (error)
+						if (error) {
 							originalCallback(nil, error);
-						else {
+						} else {
 							openRequest.subRequest = [self resolveSymlinksInEntries:entries
 												  relativeToURL:aURL
 												   onCompletion:^(NSArray *resolvedEntries, NSError *error) {
 								openRequest.subRequest = nil;
-								if (error)
+								if (error) {
 									resolvedEntries = nil;
+								}
 								originalCallback(resolvedEntries, error);
 							}];
 						}
@@ -1351,10 +1353,11 @@ resp2txt(int type)
 	SFTPRequest *req = [self addRequest:SSH2_FXP_MKDIR format:"sa", path, [NSDictionary dictionary]];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
-		if (![msg expectStatus:SSH2_FX_OK error:&error])
+		if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 			originalCallback(error);
-		else
+		} else {
 			originalCallback(nil);
+		}
 	};
 	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	return req;
@@ -1406,10 +1409,11 @@ resp2txt(int type)
 	       onResponse:(void (^)(NSData *handle, NSError *error))responseCallback
 {
 	uint32_t mode;
-	if (isWrite)
+	if (isWrite) {
 		mode = SSH2_FXF_WRITE|SSH2_FXF_CREAT|SSH2_FXF_EXCL;
-	else
+	} else {
 		mode = SSH2_FXF_READ;
+	}
 
 	void (^originalCallback)(NSData *, NSError *) = [[responseCallback copy] autorelease];
 
@@ -1523,20 +1527,24 @@ resp2txt(int type)
 				}
 
 				DEBUG(@"got %lu bytes of data, requested %u", [data length], len);
-				if (dataCallback)
+				if (dataCallback) {
 					dataCallback(data);
+				}
 				offset += [data length];
-				if (fileSize > 0)
+				if (fileSize > 0) {
 					statRequest.progress = (CGFloat)offset / (CGFloat)fileSize;
-				else
+				} else {
 					statRequest.progress = -1.0; /* unknown/indefinite progress */
+				}
 
 				/* Data callback may have cancelled us. */
-				if (statRequest.cancelled)
+				if (statRequest.cancelled) {
 					return;
+				}
 
-				if ([data length] < len)
+				if ([data length] < len) {
 					len = (uint32_t)[data length];
+				}
 
 				/* Dispatch next read request. */
 				for (int i = 0; i < 1/*max_req*/; i++) {
@@ -1580,10 +1588,11 @@ resp2txt(int type)
 	SFTPRequest *req = [self addRequest:SSH2_FXP_FSETSTAT format:"da", handle, attributes];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
-		if (![msg expectStatus:SSH2_FX_OK error:&error])
+		if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 			originalCallback(error);
-		else
+		} else {
 			originalCallback(nil);
+		}
 	};
 	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	return req;
@@ -1651,8 +1660,9 @@ resp2txt(int type)
 
 			/* Dispatch next read request. */
 			uint32_t len = _transfer_buflen;
-			if (offset + len > [data length])
+			if (offset + len > [data length]) {
 				len = (uint32_t)([data length] - offset);
+			}
 			NSData *chunk = [NSData dataWithBytesNoCopy:(void *)[data bytes] + offset length:len freeWhenDone:NO];
 			DEBUG(@"writing %u bytes at offset %lu", len, offset);
 			SFTPRequest *req = [self addRequest:SSH2_FXP_WRITE format:"dqd", handle, offset, chunk];
@@ -1665,8 +1675,9 @@ resp2txt(int type)
 
 		/* Dispatch first read request. */
 		uint32_t len = _transfer_buflen;
-		if (offset + len > [data length])
+		if (offset + len > [data length]) {
 			len = (uint32_t)([data length] - offset);
+		}
 		NSData *chunk = [NSData dataWithBytesNoCopy:(void *)[data bytes] + offset length:len freeWhenDone:NO];
 		DEBUG(@"writing %u bytes at offset %lu", len, offset);
 		SFTPRequest *req = [self addRequest:SSH2_FXP_WRITE format:"dqd", handle, offset, chunk];
@@ -1688,10 +1699,11 @@ resp2txt(int type)
 	SFTPRequest *req = [self addRequest:SSH2_FXP_REMOVE format:"s", path];
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
-		if (![msg expectStatus:SSH2_FX_OK error:&error])
+		if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 			originalCallback(error);
-		else
+		} else {
 			originalCallback(nil);
+		}
 	};
 	req.onCancel = ^(SFTPRequest *req) { originalCallback([ViError operationCancelled]); };
 	return req;
@@ -1708,10 +1720,12 @@ resp2txt(int type)
 	for (NSURL *url in mutableURLs) {
 		req = [self removeItemAtPath:[url path] onResponse:^(NSError *error) {
 			[mutableURLs removeObject:url];
-			if (error)
+			if (error) {
 				originalCallback(error);
-			if ([mutableURLs count] == 0)
+			}
+			if ([mutableURLs count] == 0) {
 				originalCallback(nil);
+			}
 		}];
 	}
 
@@ -1905,4 +1919,3 @@ resp2txt(int type)
 }
 
 @end
-

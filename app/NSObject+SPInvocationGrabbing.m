@@ -19,18 +19,18 @@
 	return [self initWithObject:obj stacktraceSaving:NO];
 }
 
--(id)initWithObject:(id)obj stacktraceSaving:(BOOL)saveStack
+- (id)initWithObject:(id)obj stacktraceSaving:(BOOL)saveStack
 {
-	self.object = obj;
-
-	if (saveStack) {
-		[self saveBacktrace];
+	if ((self = [super init]) != nil) {
+		_object = [obj retain];
+		if (saveStack) {
+			[self saveBacktrace];
+		}
 	}
-
 	return self;
 }
 
--(void)dealloc
+- (void)dealloc
 {
 	free(frameStrings);
 	[_object release];
@@ -66,15 +66,15 @@
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)inSelector
 {
 	NSMethodSignature *signature = [super methodSignatureForSelector:inSelector];
-	if (signature == NULL)
+	if (signature == NULL) {
 		signature = [_object methodSignatureForSelector:inSelector];
+	}
     
 	return signature;
 }
 
 - (void)invoke
 {
-
 	@try {
 		[_invocation invoke];
 	}
@@ -89,14 +89,14 @@
 	self.object = nil;
 }
 
--(void)saveBacktrace
+- (void)saveBacktrace
 {
 	void *backtraceFrames[128];
 	frameCount = backtrace(&backtraceFrames[0], 128);
 	frameStrings = backtrace_symbols(&backtraceFrames[0], frameCount);
 }
 
--(void)printBacktrace
+- (void)printBacktrace
 {
 	for (int x = 3; x < frameCount; x++) {
 		if (frameStrings[x] == NULL) {
@@ -105,15 +105,18 @@
 		printf("%s\n", frameStrings[x]);
 	}
 }
+
 @end
 
+
 @implementation NSObject (SPInvocationGrabbing)
--(id)grab
+
+- (id)grab
 {
 	return [[[SPInvocationGrabber alloc] initWithObject:self] autorelease];
 }
 
--(id)invokeAfter:(NSTimeInterval)delta
+- (id)invokeAfter:(NSTimeInterval)delta
 {
 	id grabber = [self grab];
 	[NSTimer scheduledTimerWithTimeInterval:delta target:grabber selector:@selector(invoke) userInfo:nil repeats:NO];
@@ -125,14 +128,14 @@
 	return [self invokeAfter:0];
 }
 
--(id)inBackground
+- (id)inBackground
 {
 	SPInvocationGrabber *grabber = [self grab];
 	grabber.backgroundAfterForward = YES;
 	return grabber;
 }
 
--(id)onMainAsync:(BOOL)async
+- (id)onMainAsync:(BOOL)async
 {
 	SPInvocationGrabber *grabber = [self grab];
 	grabber.onMainAfterForward = YES;

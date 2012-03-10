@@ -402,6 +402,7 @@ void mycallback(
 	char **paths = eventPaths;
 	ViURLManager *urlManager = clientCallBackInfo;
 
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	for (i = 0; i < numEvents; i++) {
 		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
 											     length:strlen(paths[i])];
@@ -412,6 +413,7 @@ void mycallback(
 							  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs)
 								force:YES];
 	}
+	[pool drain];
 }
 
 - (BOOL)URLIsMonitored:(NSURL *)aURL

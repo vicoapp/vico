@@ -401,22 +401,38 @@ DEBUG_FINALIZE();
 
 - (void)copy:(id)sender
 {
-	[_keyManager handleKeys:[@"\"+y" keyCodes]];
+	if ([self isFieldEditor]) {
+		[super copy:sender];
+	} else {
+		[_keyManager handleKeys:[@"\"+y" keyCodes]];
+	}
 }
 
 - (void)paste:(id)sender
 {
-	[_keyManager handleKeys:[@"\"+P" keyCodes]];
+	if ([self isFieldEditor]) {
+		[super paste:sender];
+	} else {
+		[_keyManager handleKeys:[@"\"+P" keyCodes]];
+	}
 }
 
 - (void)cut:(id)sender
 {
-	[_keyManager handleKeys:[@"\"+x" keyCodes]];
+	if ([self isFieldEditor]) {
+		NSBeep();
+	} else {
+		[_keyManager handleKeys:[@"\"+x" keyCodes]];
+	}
 }
 
 - (void)selectAll:(id)sender
 {
-	[_keyManager handleKeys:[@"<esc>ggVG" keyCodes]];
+	if ([self isFieldEditor]) {
+		[super selectAll:sender];
+	} else {
+		[_keyManager handleKeys:[@"<esc>ggVG" keyCodes]];
+	}
 }
 
 - (BOOL)shouldChangeTextInRanges:(NSArray *)affectedRanges
@@ -2716,6 +2732,10 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (IBAction)performNormalModeMenuItem:(id)sender
 {
+	if ([self isFieldEditor]) {
+		return;
+	}
+
 	if (_keyManager.parser.partial) {
 		[[[[self window] windowController] nextRunloop] message:@"Vi command interrupted."];
 		[_keyManager.parser reset];

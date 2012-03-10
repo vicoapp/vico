@@ -143,6 +143,7 @@ resp2txt(int type)
 		_requestType = type;
 		_connection = [aConnection retain];
 	}
+	DEBUG_INIT();
 	return self;
 }
 
@@ -1201,28 +1202,26 @@ resp2txt(int type)
 			[req autorelease];
 			NSURL *url = [NSURL URLWithString:[realPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 					    relativeToURL:aURL];
-			if (error)
+			if (error) {
 				originalCallback(nil, error);
-			else if (file.isLink) {
-				req.subRequest = [self attributesOfItemAtURL:url
-								  onResponse:^(NSURL *normalizedURL, NSDictionary *realAttributes, NSError *error) {
-					if (error && ![error isFileNotFoundError])
-						originalCallback(nil, error);
-					else {
-						[file setTargetURL:[self normalizeURL:url]
-							attributes:realAttributes ?: [NSDictionary dictionary]];
-						req.subRequest = [self resolveSymlinksInEntries:entries
-										  relativeToURL:aURL
-										   onCompletion:originalCallback];
-					}
-				}];
-			} else {
-				[file setTargetURL:[self normalizeURL:url]
-					attributes:[NSDictionary dictionary]];
-				req.subRequest = [self resolveSymlinksInEntries:entries
-								  relativeToURL:aURL
-								   onCompletion:originalCallback];
+				return;
 			}
+
+			__block SFTPRequest *subreq = nil;
+			subreq = [self attributesOfItemAtURL:url
+							  onResponse:^(NSURL *normalizedURL, NSDictionary *realAttributes, NSError *error) {
+				[subreq autorelease];
+				if (error && ![error isFileNotFoundError]) {
+					originalCallback(nil, error);
+					return;
+				}
+				[file setTargetURL:[self normalizeURL:url]
+					attributes:realAttributes ?: [NSDictionary dictionary]];
+				subreq.subRequest = [self resolveSymlinksInEntries:entries
+								     relativeToURL:aURL
+								      onCompletion:originalCallback];
+			}];
+			req.subRequest = [subreq retain];
 		}];
 		[req retain];
 		break;
@@ -1461,10 +1460,12 @@ resp2txt(int type)
 		unsigned long long fileSize = [attributes fileSize]; /* may be zero */
 		statRequest.progress = 0.0;
 
+		[statRequest retain];
 		statRequest.subRequest = [self openFile:[normalizedURL path]
 					     forWriting:NO
 					 withAttributes:[NSDictionary dictionary]
 					     onResponse:^(NSData *handle, NSError *error) {
+			[statRequest autorelease];
 			__block uint64_t offset = 0;
 			__block uint32_t len = _transfer_buflen;
 
@@ -1481,8 +1482,11 @@ resp2txt(int type)
 			};
 			cancelfun = [[cancelfun copy] autorelease];
 
+			__block SFTPRequest *readRequest = nil;
 			__block void (^readfun)(SFTPMessage *);
 			readfun = ^(SFTPMessage *msg) {
+				[statRequest autorelease];
+				[readRequest autorelease];
 				NSError *error;
 				if (msg.type == SSH2_FXP_STATUS) {
 					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
@@ -1529,17 +1533,21 @@ resp2txt(int type)
 				DEBUG(@"got %lu bytes of data, requested %u", [data length], len);
 				if (dataCallback) {
 					dataCallback(data);
+					DEBUG(@"dataCallback returned, statRequest = %p", statRequest);
 				}
+
+				/* Data callback may have cancelled us. */
+				if (statRequest.cancelled) {
+					DEBUG(@"dataCallback cancelled statRequest %p", statRequest);
+					[statRequest retain]; // XXX: WTF!? Obviously we have serious retain count problems!
+					return;
+				}
+
 				offset += [data length];
 				if (fileSize > 0) {
 					statRequest.progress = (CGFloat)offset / (CGFloat)fileSize;
 				} else {
 					statRequest.progress = -1.0; /* unknown/indefinite progress */
-				}
-
-				/* Data callback may have cancelled us. */
-				if (statRequest.cancelled) {
-					return;
 				}
 
 				if ([data length] < len) {
@@ -1549,20 +1557,24 @@ resp2txt(int type)
 				/* Dispatch next read request. */
 				for (int i = 0; i < 1/*max_req*/; i++) {
 					DEBUG(@"requesting %u bytes at offset %lu", len, offset);
-					SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
-					req.onResponse = readfun;
-					req.onCancel = cancelfun;
-					statRequest.subRequest = req;
+					readRequest = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
+					readRequest.onResponse = readfun;
+					readRequest.onCancel = cancelfun;
+					statRequest.subRequest = readRequest;
+					[readRequest retain];
+					[statRequest retain];
 				}
 			};
 			readfun = [[readfun copy] autorelease];
 
 			/* Dispatch first read request. */
 			DEBUG(@"requesting %u bytes at offset %lu", len, offset);
-			SFTPRequest *req = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
-			req.onResponse = readfun;
-			req.onCancel = cancelfun;
-			statRequest.subRequest = req;
+			readRequest = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
+			readRequest.onResponse = readfun;
+			readRequest.onCancel = cancelfun;
+			statRequest.subRequest = readRequest;
+			[readRequest retain];
+			[statRequest retain];
 		}];
 	};
 

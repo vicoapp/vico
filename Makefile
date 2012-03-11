@@ -394,7 +394,7 @@ HELP_SRCS = \
 
 CC = clang
 CXX = clang++
-IBTOOL = /Developer/usr/bin/ibtool
+IBTOOL = /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool
 
 REPO_VERSION := $(shell git log --oneline | wc -l | sed 's/ //g')
 
@@ -440,7 +440,7 @@ OBJCFLAGS += -Wshorten-64-to-32
 # Flags for PLBlockIMP
 CFLAGS += -DPL_BLOCKIMP_PRIVATE -DSUPPORT_APPLE_FALLACK
 
-SDK = /Developer/SDKs/MacOSX10.7.sdk
+SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
 ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
 CFLAGS	+= $(ARCH_CFLAGS)

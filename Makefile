@@ -550,8 +550,9 @@ $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 $(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-APP_CERT_NAME = "3rd Party Mac Developer Application: Martin Hedenfalk" 
-INST_CERT_NAME = "3rd Party Mac Developer Installer: Martin Hedenfalk" 
+APP_CERT_NAME = "8b57f037b82ff6d2edb512ddf4be3c18cb596da9"
+INST_CERT_NAME = "93ba947f3e64d1c6ce83d701adb8e9be62ad8690"
+CODESIGN_ALLOCATE = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"
 
 pkg: app
 	strip -s app/saved_symbols $(BINDIR)/Vico
@@ -559,17 +560,17 @@ pkg: app
 	strip $(BINDIR)/par
 	chown -RH "martinh:staff" $(APPDIR)
 	chmod -RH u+w,go-w,a+rX $(APPDIR)
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/vicotool
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/par
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/bin/CommitWindow.app
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/lib/osx/plist.bundle
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Bundles/vicoapp-objective-c.tmbundle/Support/bin/inspectClass
-	env CODESIGN_ALLOCATE=/Developer/usr/bin/codesign_allocate \
+	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
 	    codesign -v --force --sign $(APP_CERT_NAME) $(APPDIR)
 	productbuild --component $(APPDIR) /Applications \
 		     --sign $(INST_CERT_NAME) \

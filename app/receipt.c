@@ -114,7 +114,7 @@ receipt_validate(const char *receipt_path)
 	u_int8_t		 mac[6];
 	struct ber		 ber;
 	SHA_CTX			 guid_hash;
-	struct ber_element	*root, *attr;
+	struct ber_element	*root, *top_root, *ver_root, *attr;
 	FILE			*fp;
 	void			*value, *payload;
 	PKCS7			*p7;
@@ -228,8 +228,9 @@ receipt_validate(const char *receipt_path)
 	DPRINTF("got %zu bytes of payload", len);
 
 	ber_set_readbuf(&ber, payload, len);
-	if ((root = ber_read_elements(&ber, NULL)) == NULL)
+	if ((top_root = ber_read_elements(&ber, NULL)) == NULL)
 		_exit(173);
+	root = top_root;
 
 	// oid should be 1.2.840.113549.1.7.2
 	// content_type should be 1.2.840.113549.1.7.1
@@ -268,15 +269,16 @@ receipt_validate(const char *receipt_path)
 			SHA1_Update(&bundle_ctx, bundle_id, root->be_len);
 			bundle_id = value;
 			bundle_id_len = len;
+			ber_free_elements(root);
 		} else if (type == 3) {
 			ber_set_readbuf(&ber, value, len);
-			if ((root = ber_read_elements(&ber, NULL)) == NULL)
+			if ((ver_root = ber_read_elements(&ber, NULL)) == NULL)
 				exit(173);
-			if (ber_scanf(root, "U", &value) == -1)
+			if (ber_scanf(ver_root, "U", &value) == -1)
 				_exit(173);
 			DPRINTF("application version: %s", (char *)value);
 			bundle_ver = value;
-			bundle_ver_len = root->be_len;
+			bundle_ver_len = ver_root->be_len;
 		} else if (type == 4) {
 			HEXDUMP(value, len, "opaque value");
 			opaque_buf = value;
@@ -316,6 +318,16 @@ receipt_validate(const char *receipt_path)
 		DPRINTF("guid hash doesn't match");
 		_Exit(173);
 	}
+
+	ber_free_elements(top_root);
+	if (ver_root) {
+		ber_free_elements(ver_root);
+	}
+	X509_STORE_free(store);
+	X509_free(Apple);
+	PKCS7_free(p7);
+	BIO_free(b_root_ca);
+	BIO_free(b_out);
 }
 
 void

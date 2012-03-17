@@ -28,7 +28,7 @@
 	[super dealloc];
 }
 
-- (NSString *)contentOfRegister:(unichar)regName
+- (NSString *)_contentOfRegister:(unichar)regName
 {
 	if (regName == '*' || regName == '+') {
 		NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
@@ -44,6 +44,11 @@
 	if (regName >= 'A' && regName <= 'Z')
 		regName = tolower(regName);
 	return [_registers objectForKey:[self nameOfRegister:regName]];
+}
+
+- (NSString *)contentOfRegister:(unichar)regName
+{
+	return [[[self _contentOfRegister:regName] retain] autorelease];
 }
 
 - (void)setContent:(NSString *)content ofRegister:(unichar)regName
@@ -64,7 +69,7 @@
 	/* Uppercase registers append. */
 	if (regName >= 'A' && regName <= 'Z') {
 		regName = tolower(regName);
-		NSString *currentContent = [self contentOfRegister:regName];
+		NSString *currentContent = [self _contentOfRegister:regName];
 		if (currentContent)
 			content = [currentContent stringByAppendingString:content];
 	}

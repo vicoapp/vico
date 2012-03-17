@@ -31,6 +31,7 @@
 		[self addView:initialViewController];
 		[self setSelectedView:initialViewController];
 	}
+	DEBUG_INIT();
 	return self;
 }
 

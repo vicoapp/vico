@@ -402,7 +402,7 @@
 
 - (void)removeTabForCell:(PSMTabBarCell *)cell
 {
-	MEMDEBUG(@"remove cell %@", cell);
+	DEBUG(@"remove cell %@", cell);
 
 	// unbind
 	[[cell indicator] unbind:@"animate"];

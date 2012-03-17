@@ -78,9 +78,8 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 		[_jumpList setDelegate:self];
 		_parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 		[self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
-		MEMDEBUG(@"init %@", self);
 	}
-
+	DEBUG_INIT();
 	return self;
 }
 
@@ -1182,15 +1181,17 @@ DEBUG_FINALIZE();
 	NSMutableSet *set = [NSMutableSet set];
 	for (docView in [document views]) {
 		DEBUG(@"docview %@ in window %@", docView, [[docView tabController] window]);
-		if ([[docView tabController] window] == [self window])
+		if ([[docView tabController] window] == [self window]) {
 			[set addObject:docView];
+		}
 	}
 
 	DEBUG(@"closing remaining views in window %@: %@", [self window], set);
-	for (docView in set)
+	for (docView in set) {
 		[self closeDocumentView:docView
 		       canCloseDocument:YES /* The document is already being closed. */
 			 canCloseWindow:canCloseWindow];
+	}
 }
 
 - (void)documentController:(NSDocumentController *)docController

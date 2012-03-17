@@ -360,5 +360,7 @@
 	<string>sparkle_pub.pem</string>
 	<key>SUFeedURL</key>
 	<string>http://www.vicoapp.com/appcast.xml</string>
+	<key>SFBCrashReporterCrashSubmissionURL</key>
+	<string>http://crash.vicoapp.com/handle_crash_report.php</string>
 </dict>
 </plist>

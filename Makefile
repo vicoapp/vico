@@ -338,8 +338,23 @@ RESOURCES = \
 	par/par.doc \
 	Credits.txt
 
-ifneq ($(CONFIGURATION),DEBUG)
+ifeq ($(CONFIGURATION),BETA)
+CRASH_REPORTER = 1
+endif
+ifeq ($(CONFIGURATION),SNAPSHOT)
+CRASH_REPORTER = 1
+endif
 
+ifeq ($(CRASH_REPORTER),1)
+OBJC_SRCS += \
+	GenerateFormData.m \
+	SFBCrashReporter.m \
+	SFBCrashReporterWindowController.m \
+	SFBSystemInformation.m
+XIBS += SFBCrashReporterWindow.xib
+endif
+
+ifneq ($(CONFIGURATION),DEBUG)
 BUNDLE_USERS = vicoapp textmate kswedberg
 BUNDLE_REPOS = $(addprefix $(RESDIR)/,$(addsuffix -bundles.json,$(BUNDLE_USERS)))
 .PHONY: $(BUNDLE_REPOS)
@@ -455,18 +470,21 @@ CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F. -Iplb
 LDFLAGS	+= -F.
 
 TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
-APP_LDLIBS = -lcrypto -lresolv -lffi -framework Carbon -framework WebKit -framework Cocoa
+APP_LDLIBS = -lcrypto -lresolv -lffi
+APP_FRAMEWORKS = Carbon WebKit Cocoa
 PAR_LDLIBS =
 XORKEY_LDLIBS =
 
 # Use Sparkle updates for all but release builds
 ifneq ($(CONFIGURATION),RELEASE)
 CFLAGS += -DUSE_SPARKLE
-FRAMEWORKS = \
-	Sparkle.framework
-APP_LDLIBS += -framework Sparkle
-else
-FRAMEWORKS =
+APP_FRAMEWORKS += Sparkle
+endif
+
+# Crash Reporter requires AddressBook framework for getting the users email address
+ifeq ($(CRASH_REPORTER),1)
+APP_FRAMEWORKS += AddressBook
+CFLAGS += -DCRASH_REPORTER=1
 endif
 
 # paths
@@ -541,7 +559,9 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
-	if test -n "$(FRAMEWORKS)"; then rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(FRAMEWORKS) $(FWDIR); fi
+ifneq ($(CONFIGURATION),RELEASE)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" Sparkle.framework $(FWDIR)
+endif
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
@@ -550,6 +570,7 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 ifeq ($(CONFIGURATION),RELEASE)
 	/usr/libexec/PlistBuddy -c "Delete :SUPublicDSAKeyFile" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Delete :SUFeedURL" $(INFOPLIST)
+	/usr/libexec/PlistBuddy -c "Delete :SFBCrashReporterCrashSubmissionURL" $(INFOPLIST)
 endif
 
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
@@ -606,7 +627,7 @@ $(OBJDIR)/NSString-scopeSelector.o: app/scope_selector.h
 
 $(OBJDIR)/Vico: $(OBJS)
 	mkdir -p $(OBJDIR)
-	$(CXX) $(LDFLAGS) $(LDLIBS) $(APP_LDLIBS) $^ -o $@
+	$(CXX) $(LDFLAGS) $(LDLIBS) $(APP_LDLIBS) $(addprefix -framework ,$(APP_FRAMEWORKS)) $^ -o $@
 
 $(OBJDIR)/vicotool: $(TOOL_OBJS)
 	mkdir -p $(OBJDIR)

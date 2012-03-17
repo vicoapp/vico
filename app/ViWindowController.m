@@ -1195,13 +1195,28 @@ DEBUG_FINALIZE();
 	DEBUG(@"force close all views in tab %@: %s", (ViTabController *)tabController, didCloseAll ? "YES" : "NO");
 	if (didCloseAll) {
 		/* Close any views left in this tab. Do not ask for confirmation. */
-		while ([[(ViTabController *)tabController views] count] > 0)
-			[self closeDocumentView:[[(ViTabController *)tabController views] objectAtIndex:0]
-			       canCloseDocument:YES
-				 canCloseWindow:YES];
+		while ([[(ViTabController *)tabController views] count] > 0) {
+			ViViewController *viewController = [[(ViTabController *)tabController views] objectAtIndex:0];
+			[self willChangeCurrentView];
+			if (viewController == [self currentView]) {
+				[self setCurrentView:nil];
+			}
+
+			ViDocument *doc = nil;
+			if ([viewController isKindOfClass:[ViDocumentView class]]) {
+				doc = [(ViDocumentView *)viewController document];
+			}
+
+			[(ViTabController *)tabController closeView:viewController]; // releases viewController
+
+			/* If this was the last view of the document, close the document too. */
+			if (doc) {
+				[self closeOrUnlistDocument:doc unlessVisible:YES];
+			}
+		}
 		[self closeTabController:(ViTabController *)tabController];
-		[(ViTabController *)tabController release];
 	}
+	[(ViTabController *)tabController release];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem

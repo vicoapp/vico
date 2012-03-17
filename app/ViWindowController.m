@@ -1125,10 +1125,6 @@ DEBUG_FINALIZE();
 
 	/* If this was the last view in the tab, close the tab too. */
 	if ([[tabController views] count] == 0) {
-		[tabBar retain];
-		if ([tabView numberOfTabViewItems] == 1)
-			[tabBar disableAnimations];
-
 		DEBUG(@"got previously active document %@", prevdoc);
 
 		if ([tabView numberOfTabViewItems] <= 1) {
@@ -1157,9 +1153,7 @@ DEBUG_FINALIZE();
 			[self closeTabController:tabController];
 			_jumping = preJumping;
 		}
-
-		[tabBar enableAnimations];
-		[tabBar release];
+		/* XXX: do not reference self here, we might have closed the window and deallocated the window contorller! */
 	} else if (tabController == [self selectedTabController]) {
 		/* Select another document view in the same tab. */
 		[self selectDocumentView:tabController.selectedView];

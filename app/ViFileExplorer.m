@@ -1450,24 +1450,33 @@ doCommandBySelector:(SEL)aSelector
 	return YES;
 }
 
-- (void)resetExpandedItems:(NSArray *)items
+- (void)resetExpandedItems:(NSArray *)items alreadyExpanded:(NSMutableSet *)doneSet
 {
-	if (_isFiltered)
+	if (_isFiltered) {
 		return;
+	}
+
+	/*
+         * The doneSet is needed to break infinitie recursion due to
+         * file system loops with symlinks.
+	 */
 
 	for (ViFile *file in items) {
-		if (file.isDirectory) {
-			if ([_expandedSet containsObject:file.url])
+		if (file.isDirectory && ![doneSet containsObject:file]) {
+			[doneSet addObject:file];
+			if ([_expandedSet containsObject:file.url]) {
 				[explorer expandItem:file];
-			if ([file hasCachedChildren])
-				[self resetExpandedItems:file.children];
+			}
+			if ([file hasCachedChildren]) {
+				[self resetExpandedItems:file.children alreadyExpanded:doneSet];
+			}
 		}
 	}
 }
 
 - (void)resetExpandedItems
 {
-	[self resetExpandedItems:_rootItems];
+	[self resetExpandedItems:_rootItems alreadyExpanded:[NSMutableSet set]];
 }
 
 - (id)findItemWithURL:(NSURL *)aURL inItems:(NSArray *)items

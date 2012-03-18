@@ -692,7 +692,7 @@ DEBUG_FINALIZE();
 		_didSaveContext = contextInfo;
 
 		if (!error && attributes && ![[attributes fileType] isEqualToString:NSFileTypeRegular])
-			error = [ViError errorWithFormat:@"%@ is not a regular file.", [[self fileURL] lastPathComponent]];
+			error = [[ViError errorWithFormat:@"%@ is not a regular file.", [[self fileURL] lastPathComponent]] retain];
 
 		if (!error && attributes && ![[attributes fileModificationDate] isEqual:[self fileModificationDate]]) {
 			NSAlert *alert = [[[NSAlert alloc] init] autorelease];
@@ -704,8 +704,9 @@ DEBUG_FINALIZE();
 					  modalDelegate:self
 					 didEndSelector:@selector(fileModifiedAlertDidEnd:returnCode:contextInfo:)
 					    contextInfo:nil];
-		} else
+		} else {
 			[self continueSavingAfterError:error];
+		}
 		[error release];
 		[attributes release];
 	} else

@@ -717,6 +717,9 @@ $(DMG): app
 run: app
 	$(BINDIR)/Vico $(HOME)/src/vico
 
+gdb: app
+	gdb $(BINDIR)/Vico
+
 leaks: app
 	# MallocStackLoggingNoCompact=YES
 	MallocStackLogging=YES \

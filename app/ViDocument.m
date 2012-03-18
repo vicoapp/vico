@@ -673,10 +673,11 @@ DEBUG_FINALIZE();
 		ViURLManager *urlman = [ViURLManager defaultManager];
 		id<ViDeferred> deferred = [urlman attributesOfItemAtURL:[self fileURL]
 							   onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
-			if (_err && ![_err isFileNotFoundError])
+			if (_err && ![_err isFileNotFoundError]) {
 				error = [_err retain];
-			else
+			} else {
 				attributes = [_attrs retain];
+			}
 		}];
 
 		if ([deferred respondsToSelector:@selector(waitInWindow:message:)])
@@ -756,7 +757,7 @@ DEBUG_FINALIZE();
 						    toURL:url
 					     onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error) {
-			returnError = [[error retain] autorelease];
+			returnError = [error retain];
 		} else {
 			[self message:@"%@: wrote %lu byte", normalizedURL, [data length]];
 			if (saveOperation == NSSaveOperation || saveOperation == NSSaveAsOperation) {
@@ -787,6 +788,7 @@ DEBUG_FINALIZE();
 	if (returnError) {
 		if (outError)
 			*outError = returnError;
+		[returnError autorelease];
 		return NO;
 	}
 

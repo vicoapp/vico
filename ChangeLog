@@ -2,6 +2,7 @@
 
 * Fixed a crash when closing document windows
 * Fixed a crash when pasting text in visual mode
+* Prevent symlink loops in file explorer
 * Fixed an uncaught exception when closing another tab by clicking the X icon
 * Added support for submitting crash reports
 

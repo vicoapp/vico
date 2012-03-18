@@ -218,70 +218,70 @@ main(int argc, char **argv)
 		[backConn registerName:backChannelName];
 	}
 
-	if (script) {
-		NSString *errStr = nil;
-		NSString *result = nil;
-		@try {
+	@try {
+
+		if (script) {
+			NSString *errStr = nil;
+			NSString *result = nil;
 			result = [proxy eval:script
 			  additionalBindings:bindings
-			         errorString:&errStr
-			         backChannel:backChannelName];
-		}
-		@catch (NSException *exception) {
-			NSString *msg = [NSString stringWithFormat:@"%@: %@",
-			    [exception name], [exception reason]];
-			/* We don't print the callStackSymbols, as
-			 * they are not useful (they will just point
-			 * to [NSConnection sendInvocation:]).
-			 */
-			fprintf(stderr, "%s\n", [msg UTF8String]);
-			return 5;
+				 errorString:&errStr
+				 backChannel:backChannelName];
+
+			if (errStr) {
+				fprintf(stderr, "%s\n", [errStr UTF8String]);
+				return 3;
+			}
+			if (!runLoop && [result length] > 0)
+				printf("%s\n", [result UTF8String]);
 		}
 
-		if (errStr) {
-			fprintf(stderr, "%s\n", [errStr UTF8String]);
-			return 3;
+		if (argc > 0 && new_window)
+			[proxy newProject:nil];
+
+		for (i = 0; i < argc; i++) {
+			NSString *path = [NSString stringWithUTF8String:argv[i]];
+			if ([path rangeOfString:@"://"].location == NSNotFound) {
+				path = [path stringByExpandingTildeInPath];
+				if (![path isAbsolutePath])
+					path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
+				path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
+			}
+			error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];
+			if (error)
+				errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
 		}
-		if (!runLoop && [result length] > 0)
-			printf("%s\n", [result UTF8String]);
+
+		if (argc == 0 && script == nil) {
+			/* just make it first responder */
+			[proxy eval:@"((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"
+			      error:nil];
+		}
+
+		if ((runLoop && script) || wait_for_close) {
+			NSRunLoop *loop = [NSRunLoop currentRunLoop];
+			while (keepRunning && [loop runMode:NSDefaultRunLoopMode
+						 beforeDate:[NSDate distantFuture]])
+				;
+
+			if (returnObject != nil) {
+				NSString *returnJSON = [returnObject JSONRepresentation];
+				printf("%s\n", [returnJSON UTF8String]);
+			}
+		}
 	}
-
-	if (argc > 0 && new_window)
-		[proxy newProject:nil];
-
-	for (i = 0; i < argc; i++) {
-		NSString *path = [NSString stringWithUTF8String:argv[i]];
-		if ([path rangeOfString:@"://"].location == NSNotFound) {
-			path = [path stringByExpandingTildeInPath];
-			if (![path isAbsolutePath])
-				path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
-			path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
-		}
-		error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];
-		if (error)
-			errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
-	}
-
-	if (argc == 0 && script == nil) {
-		/* just make it first responder */
-		[proxy eval:@"((NSApplication sharedApplication) activateIgnoringOtherApps:YES)"
-		      error:nil];
-	}
-
-	if ((runLoop && script) || wait_for_close) {
-		NSRunLoop *loop = [NSRunLoop currentRunLoop];
-		while (keepRunning && [loop runMode:NSDefaultRunLoopMode
-				         beforeDate:[NSDate distantFuture]])
-			;
-
-		if (returnObject != nil) {
-			NSString *returnJSON = [returnObject JSONRepresentation];
-			printf("%s\n", [returnJSON UTF8String]);
-		}
+	@catch (NSException *exception) {
+		NSString *msg = [NSString stringWithFormat:@"%@: %@",
+		    [exception name], [exception reason]];
+		/* We don't print the callStackSymbols, as
+		 * they are not useful (they will just point
+		 * to [NSConnection sendInvocation:]).
+		 */
+		fprintf(stderr, "%s\n", [msg UTF8String]);
+		return 5;
 	}
 
 	[pool release];
 
 	return returnCode;
 }
-

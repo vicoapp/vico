@@ -1,0 +1,11 @@
+<item>
+    <title>Version @SHORT_VERSION@</title>
+    <sparkle:releaseNotesLink>@RELNOTES_LINK@.html</sparkle:releaseNotesLink>
+    <pubDate>@DATE@</pubDate>
+    <enclosure url="@DOWNLOAD_FILE@"
+	       sparkle:version="@REPO_VERSION@"
+	       sparkle:shortVersionString="@SHORT_VERSION@"
+	       sparkle:dsaSignature="@SIGNATURE@"
+	       length="@SIZE@"
+	       type="application/octet-stream" />
+</item>

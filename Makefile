@@ -479,6 +479,7 @@ XORKEY_LDLIBS =
 ifneq ($(CONFIGURATION),RELEASE)
 CFLAGS += -DUSE_SPARKLE
 APP_FRAMEWORKS += Sparkle
+RESOURCES += sparkle_pub.pem
 endif
 
 # Crash Reporter requires AddressBook framework for getting the users email address
@@ -689,12 +690,16 @@ $(APPDIR)/Contents/PkgInfo: app/Vico-Info.plist
 
 TMPDMG		= $(BUILDDIR)/vico-tmp.dmg
 VOLNAME		= vico-$(SHORT_VERSION)
-DMG		= $(BUILDDIR)/$(VOLNAME).dmg
+DMGFILE		= $(VOLNAME).dmg
+DMG		= $(BUILDDIR)/$(DMGFILE)
 DMGDIR		= "$(BUILDDIR)/Vico $(SHORT_VERSION)"
-APPCAST_BASE	= "http://www.vicoapp.com/relnotes"
-DOWNLOAD_BASE	= "http://www.vicoapp.com/download"
+APPCAST_BASE	= http://www.vicoapp.com/relnotes
+DOWNLOAD_BASE	= http://www.vicoapp.com/download
 KSIZE		= $(shell du -ks $(APPDIR) | cut -f1)
-SIZE		= $(shell $$(($(KSIZE) * 1024)) )
+SIZE		= $(shell echo $$(($(KSIZE) * 1024)) )
+SPARKLE_PKEY	= sparkle_priv.pem
+SIGNATURE	= $(shell /usr/bin/openssl dgst -sha1 -binary < $(DMG) | /usr/bin/openssl dgst -dss1 -sign $(SPARKLE_PKEY) | /usr/bin/openssl enc -base64)
+APPCAST_XML	= $(DMG).xml
 
 dmg: $(DMG)
 
@@ -708,8 +713,16 @@ $(DMG): app
 	hdiutil convert -format UDBZ $(TMPDMG) -o $(DMG)
 	/bin/rm -rf $(TMPDMG) $(DMGDIR)
 	ls -lh $(DMG)
+	#### Create and sign a zip file for automatic updates.
+	@sed -e 's,@SHORT_VERSION@,$(SHORT_VERSION),g' \
+	    -e 's,@REPO_VERSION@,$(REPO_VERSION),g' \
+	    -e 's,@RELNOTES_LINK@,$(APPCAST_BASE)/$(SHORT_VERSION),g' \
+	    -e 's/@DATE@/$(shell LC_TIME=en_US date +"%a, %d %b %G %T %z")/g' \
+	    -e 's,@DOWNLOAD_FILE@,$(DOWNLOAD_BASE)/$(DMGFILE),g' \
+	    -e 's,@SIGNATURE@,$(SIGNATURE),g' \
+	    -e 's,@SIZE@,$(SIZE),g' < appcast.xml.in > $(APPCAST_XML)
+	@cat $(APPCAST_XML)
 	@echo "scp $(DMG) vicoapp.com:/var/www/vicoapp.com/download"
-
 
 # include automatic dependencies...
 -include $(OBJS:.o=.d)

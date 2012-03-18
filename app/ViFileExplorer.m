@@ -211,11 +211,46 @@
 	return item;
 }
 
+- (BOOL)detectLoopByFile:(ViFile *)file inRoot:(NSURL *)rootURL
+{
+	if ([rootURL hasPrefix:file.targetURL]) {
+		return YES;
+	}
+
+	if (file.isLink) {
+		/*
+                 * A symlinked directory is safe if it points outside
+                 * the explorer root (but not directly to a parent),
+                 * strictly forwards or to the same directory level.
+		 */
+
+		NSURL *parentURL = [file.url URLByDeletingLastPathComponent];
+		if ([file.targetURL hasPrefix:rootURL] && ![file.targetURL hasPrefix:parentURL]) {
+			return YES;
+		}
+
+		if (![rootURL isEqual:_rootURL] && ![[rootURL path] isEqualToString:@"/"]) {
+			return [self detectLoopByFile:file inRoot:[rootURL URLByDeletingLastPathComponent]];
+		}
+	}
+	return NO;
+}
+
+- (BOOL)detectLoopByFile:(ViFile *)file
+{
+	if (_rootURL == nil) {
+		return NO;
+	}
+
+	return [self detectLoopByFile:file inRoot:_rootURL];
+}
+
 - (NSMutableArray *)filteredContents:(NSArray *)files ofDirectory:(NSURL *)url
 {
 	DEBUG(@"filtering files in %@", url);
-	if (files == nil)
+	if (files == nil) {
 		return nil;
+	}
 
 	id olditem = [self findItemWithURL:url];
 
@@ -223,9 +258,15 @@
 	for (ViFile *file in files) {
 		if ([_skipRegex matchInString:file.name] == nil) {
 			if ([file isDirectory]) {
+				if ([self detectLoopByFile:file inRoot:url]) {
+					DEBUG(@"avoiding loop by %@", file);
+					continue;
+				}
 				ViFile *oldPf = nil;
-				if (olditem)
-					oldPf = [self findItemWithURL:file.url inItems:[[self fileForItem:olditem] children]];
+				if (olditem) {
+					oldPf = [self findItemWithURL:file.url
+							      inItems:[[self fileForItem:olditem] children]];
+				}
 				if (oldPf && [oldPf hasCachedChildren]) {
 					DEBUG(@"re-using old children of file %@", oldPf);
 					file.children = oldPf.children;
@@ -1203,8 +1244,9 @@
 {
 	NSString *base = [_rootURL path];
 	NSUInteger prefixLength = [base length];
-	if (![base hasSuffix:@"/"])
+	if (![base hasSuffix:@"/"]) {
 		prefixLength++;
+	}
 
 	for (ViFile *file in items) {
 		DEBUG(@"got file %@", file);
@@ -1212,9 +1254,10 @@
 			if (recursionLimit > 0 && [file hasCachedChildren]) {
 				DEBUG(@"expanding children of item %@", file);
 				[self expandItems:file.children recursionLimit:recursionLimit - 1];
-			} else
+			} else {
 				/* schedule in runloop */
 				[_itemsToFilter addObject:file];
+			}
 		} else {
 			ViRegexpMatch *m = nil;
 			NSString *p;
@@ -1425,12 +1468,14 @@ doCommandBySelector:(SEL)aSelector
 {
 	for (id item in items) {
 		ViFile *file = [self fileForItem:item];
-		if ([file.url isEqualToURL:aURL] || [file.targetURL isEqualToURL:aURL])
+		if ([file.url isEqualToURL:aURL] || [file.targetURL isEqualToURL:aURL]) {
 			return item;
+		}
 		if (file.isDirectory && [file hasCachedChildren]) {
 			id foundItem = [self findItemWithURL:aURL inItems:file.children];
-			if (foundItem)
+			if (foundItem) {
 				return foundItem;
+			}
 		}
 	}
 
@@ -1577,7 +1622,7 @@ doCommandBySelector:(SEL)aSelector
 	if (selectedURL == nil) {
 		id selectedItem = [explorer itemAtRow:[explorer selectedRow]];
 		ViFile *selectedFile = [self fileForItem:selectedItem];
-		selectedURL = selectedFile.url;
+		selectedURL = [[selectedFile.url retain] autorelease];
 	}
 
 	[urlman flushCachedContentsOfDirectoryAtURL:aURL];
@@ -1662,15 +1707,16 @@ doCommandBySelector:(SEL)aSelector
 {
 	id item = [[notification userInfo] objectForKey:@"NSObject"];
 	ViFile *file = [self fileForItem:item];
-	if ([file hasCachedChildren])
+	if ([file hasCachedChildren]) {
 		return;
+	}
 
 	__block BOOL directoryContentsIsAsync = NO;
 	_isExpandingTree = YES;
 	[self childrenAtURL:file.targetURL onCompletion:^(NSMutableArray *children, NSError *error) {
-		if (error)
+		if (error) {
 			[NSApp presentError:error];
-		else {
+		} else {
 			file.children = children;
 			if (directoryContentsIsAsync) {
 				[explorer reloadData];

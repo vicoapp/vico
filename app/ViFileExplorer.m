@@ -348,10 +348,18 @@
 {
 	NSParameterAssert(aURL);
 
+	NSURL *prevRootURL = [_rootURL retain];
+
+	[aURL retain];
+	[_rootURL release];
+	_rootURL = aURL;
+
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert runModal];
+			[_rootURL release];
+			_rootURL = prevRootURL;
 		} else {
 			if (jump)
 				[_history push:[ViMark markWithURL:_rootURL]];
@@ -362,13 +370,11 @@
 			[_rootItems release];
 			_rootItems = children;
 
+			[prevRootURL release];
+
 			[self filterFiles:self];
 			[self resetExpandedItems];
 			[pathControl setURL:aURL];
-
-			[aURL retain];
-			[_rootURL release];
-			_rootURL = aURL;
 
 			[windowController setBaseURL:_rootURL];
 

@@ -178,9 +178,9 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (NSString *)description
 {
 	if (_isLink)
-		return [NSString stringWithFormat:@"<ViFile: %@ -> %@%s>", _url, _targetURL, _isDirectory ? "/" : ""];
+		return [NSString stringWithFormat:@"<ViFile %p: %@ -> %@%s>", self, _url, _targetURL, _isDirectory ? "/" : ""];
 	else
-		return [NSString stringWithFormat:@"<ViFile: %@%s>", _url, _isDirectory ? "/" : ""];
+		return [NSString stringWithFormat:@"<ViFile %p: %@%s>", self, _url, _isDirectory ? "/" : ""];
 }
 
 @end

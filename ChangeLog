@@ -2,8 +2,10 @@
 
 * Fixed a crash when closing document windows
 * Fixed a crash when pasting text in visual mode
+* Fixed a crash when saving fails due to permission denied
+* Fixed a crash when closing another tab by clicking the X icon
+* Fixed a crash when fuzzy filtering files
 * Prevent symlink loops in file explorer
-* Fixed an uncaught exception when closing another tab by clicking the X icon
 * Added support for submitting crash reports
 
 

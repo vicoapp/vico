@@ -1221,7 +1221,7 @@
 	if (!_isFiltering || [_itemsToFilter count] == 0)
 		return;
 
-	ViFile *file = [_itemsToFilter objectAtIndex:0];
+	ViFile *file = [[[_itemsToFilter objectAtIndex:0] retain] autorelease];
 	[_itemsToFilter removeObjectAtIndex:0];
 
 	if ([file hasCachedChildren]) {

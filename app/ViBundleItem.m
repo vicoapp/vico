@@ -25,6 +25,12 @@
 		_uuid = [[dict objectForKey:@"uuid"] retain];
 		_tabTrigger = [[dict objectForKey:@"tabTrigger"] retain];
 
+		if (_uuid == nil) {
+			INFO(@"missing uuid in bundle item %@", _name);
+			[self release];
+			return nil;
+		}
+
 		/* extension: 'any', 'insert', 'normal' or 'visual' mode */
 		NSString *m = [dict objectForKey:@"mode"];
 		if (m == nil || [m isEqualToString:@"any"])

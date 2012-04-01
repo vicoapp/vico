@@ -1491,8 +1491,10 @@ resp2txt(int type)
 				if (msg.type == SSH2_FXP_STATUS) {
 					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
 						originalCallback(normalizedURL, attributes, error);
+						[statRequest retain];
 						[self closeHandle:handle
 						       onResponse:^(NSError *error) {
+							[statRequest autorelease];
 							if (error)
 								INFO(@"failed to close file after read error: %@",
 								    [error localizedDescription]);
@@ -1501,8 +1503,10 @@ resp2txt(int type)
 						return;
 					}
 					DEBUG(@"%s", "got EOF, closing handle");
+					[statRequest retain];
 					statRequest.subRequest = [self closeHandle:handle
 									onResponse:^(NSError *error) {
+						[statRequest autorelease];
 						statRequest.subRequest = nil;
 						originalCallback(normalizedURL, attributes, error);
 					}];

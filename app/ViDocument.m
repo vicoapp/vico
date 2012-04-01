@@ -1051,7 +1051,11 @@ DEBUG_FINALIZE();
 {
 	DEBUG(@"should close window controller %@?", aWindowController);
 
-	// BOOL flag = [[(ViWindowController *)aWindowController documents] count] == 0;
+	/*
+	 * Invoke the selector with an unconditional NO flag.
+	 * Instead we trigger the window to close, which checks all
+	 * documents in the window.
+	 */
 	BOOL flag = NO;
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[delegate methodSignatureForSelector:shouldCloseSelector]];
 	[invocation setSelector:shouldCloseSelector];
@@ -1060,8 +1064,10 @@ DEBUG_FINALIZE();
 	[invocation setArgument:&contextInfo atIndex:4];
 	[invocation invokeWithTarget:delegate];
 
-	if ([(ViWindowController *)aWindowController windowShouldClose:[aWindowController window]])
-		[[aWindowController window] close];
+	/* This also closes the window if all documents get closed.
+	 * See -documentController:didCloseAll:contextInfo:.
+	 */
+	[(ViWindowController *)aWindowController windowShouldClose:[aWindowController window]];
 }
 
 #pragma mark -

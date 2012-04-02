@@ -8,12 +8,15 @@ static NSCharacterSet *__slashSet = nil;
 
 - (BOOL)isEqualToURL:(NSURL *)otherURL
 {
+	return [self isEqual:otherURL];
+#if 0
 	if (__slashSet == nil)
 		__slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
 
 	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:__slashSet];
 	NSString *s2 = [[otherURL absoluteString] stringByTrimmingCharactersInSet:__slashSet];
 	return [s1 isEqualToString:s2];
+#endif
 }
 
 - (BOOL)hasPrefix:(NSURL *)prefixURL

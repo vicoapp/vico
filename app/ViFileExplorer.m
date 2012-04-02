@@ -1483,7 +1483,7 @@ doCommandBySelector:(SEL)aSelector
 {
 	for (id item in items) {
 		ViFile *file = [self fileForItem:item];
-		if ([file.url isEqualToURL:aURL] || [file.targetURL isEqualToURL:aURL]) {
+		if ([file.url isEqual:aURL] || [file.targetURL isEqual:aURL]) {
 			return item;
 		}
 		if (file.isDirectory && [file hasCachedChildren]) {
@@ -1511,7 +1511,7 @@ doCommandBySelector:(SEL)aSelector
 	if (item == nil)
 		return -1;
 	NSURL *parentURL = [[self fileForItem:item].url URLByDeletingLastPathComponent];
-	if (parentURL && ![parentURL isEqualToURL:_rootURL]) {
+	if (parentURL && ![parentURL isEqual:_rootURL]) {
 		NSInteger parentRow = [self rowForItemWithURL:parentURL];
 		if (parentRow != -1)
 			[explorer expandItem:[explorer itemAtRow:parentRow]];
@@ -1547,7 +1547,7 @@ doCommandBySelector:(SEL)aSelector
 
 - (BOOL)displaysURL:(NSURL *)aURL
 {
-	return [_rootURL isEqualToURL:aURL] ||
+	return [_rootURL isEqual:aURL] ||
 	       [self findItemWithURL:aURL] != nil;
 }
 
@@ -1590,7 +1590,7 @@ doCommandBySelector:(SEL)aSelector
 	if (item) {
 		ViFile *file = [self fileForItem:item];
 		file.children = children;
-	} else if ([url isEqualToURL:_rootURL]) {
+	} else if ([url isEqual:_rootURL]) {
 		[_rootItems release];
 		_rootItems = [children retain];
 		if (!_isFiltered || _isFiltering)
@@ -1771,7 +1771,7 @@ doCommandBySelector:(SEL)aSelector
 	ViFile *file = item;
 	NSURL *parentURL = [file.url URLByDeletingLastPathComponent];
 	NSURL *newurl = [[parentURL URLByAppendingPathComponent:object] URLByStandardizingPath];
-	if ([file.url isEqualToURL:newurl])
+	if ([file.url isEqual:newurl])
 		return;
 
 	[[ViURLManager defaultManager] moveItemAtURL:file.url

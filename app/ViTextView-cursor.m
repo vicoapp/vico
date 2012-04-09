@@ -72,23 +72,7 @@
 	}
 
 	if (_highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
-		NSRange lineRange;
-		if (length == 0) {
-			_lineHighlightRect = NSMakeRect(0, 0, 10000, _characterSize.height);
-		} else {
-			NSUInteger glyphIndex = [lm glyphIndexForCharacterAtIndex:IMIN(caret, length - 1)];
-			[lm lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:&lineRange];
-			if (lineRange.length > 0) {
-				NSUInteger eol = [lm characterIndexForGlyphAtIndex:NSMaxRange(lineRange) - 1];
-				if ([[ts string] characterAtIndex:eol] == '\n') // XXX: what about other line endings?
-					lineRange.length -= 1;
-			}
-
-			_lineHighlightRect = [lm boundingRectForGlyphRange:lineRange
-							  inTextContainer:[self textContainer]];
-			_lineHighlightRect.size.width = 10000;
-			_lineHighlightRect.origin.x = 0;
-		}
+		_lineHighlightRect = NSMakeRect(0, _caretRect.origin.y, 10000, _caretRect.size.height);
 	}
 
 	[self setNeedsDisplayInRect:_oldCaretRect];

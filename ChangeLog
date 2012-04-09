@@ -2,6 +2,8 @@
 
 * Fixed a crash when using ctags over SFTP.
 * Fixed a crash when creating new files over SFTP.
+* Make line highlight centered vertically around the cursor.
+* Fixed stability issue when closing windows.
 * Require UUID in bundle items, allows loading incomplete bundles.
 
 

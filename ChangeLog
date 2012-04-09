@@ -1,6 +1,7 @@
 # New in version 1.3.3
 
 * Fixed a crash when using ctags over SFTP.
+* Fixed a crash when creating new files over SFTP.
 * Require UUID in bundle items, allows loading incomplete bundles.
 
 

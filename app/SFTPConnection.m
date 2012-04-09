@@ -1631,6 +1631,7 @@ resp2txt(int type)
 
 		void (^cancelfun)(SFTPRequest *);
 		cancelfun = ^(SFTPRequest *req) {
+			[openRequest autorelease];
 			DEBUG(@"%@ cancelled, closing handle %@", req, handle);
 			responseCallback([ViError operationCancelled]);
 			[self closeHandle:handle
@@ -1646,6 +1647,7 @@ resp2txt(int type)
 
 		__block void (^writefun)(SFTPMessage *);
 		writefun = ^(SFTPMessage *msg) {
+			[openRequest autorelease];
 			NSError *error;
 			if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 				originalCallback(error);
@@ -1701,6 +1703,7 @@ resp2txt(int type)
 		req.onResponse = writefun;
 		req.onCancel = cancelfun;
 		openRequest.subRequest = req;
+		[openRequest retain];
 	};
 
 	openRequest = [self openFile:path forWriting:YES withAttributes:attributes onResponse:fun];
@@ -1870,27 +1873,35 @@ resp2txt(int type)
 			NSString *randomFilename = [self randomFileAtDirectory:[[url path] stringByDeletingLastPathComponent]];
 			/* Don't preserve the file modification date. We're like, uh, modifing the file. */
 			[(NSMutableDictionary *)attributes removeObjectForKey:NSFileModificationDate];
+			[uploadRequest retain];
 			uploadRequest.subRequest = [self uploadData:data
 							     toFile:randomFilename
 						     withAttributes:attributes
 							 onResponse:^(NSError *error) {
+				[uploadRequest autorelease];
 				if (error) {
 					uploadRequest.subRequest = nil;
 					originalCallback(url, nil, error);
 					return;
 				}
+				[uploadRequest retain];
 				uploadRequest.subRequest = [self atomicallyRenameItemAtPath:randomFilename
 										     toPath:[url path]
 										 onResponse:^(NSError *error) {
+					[uploadRequest autorelease];
+					[uploadRequest retain];
 					uploadRequest.subRequest = [self attributesOfItemAtURL:url
 										    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+						[uploadRequest autorelease];
 						uploadRequest.subRequest = nil;
 						originalCallback(normalizedURL, attributes, error);
 					}];
 				}];
 			}];
 		} else if ([error isFileNotFoundError]) {
+			[uploadRequest retain];
 			uploadRequest.subRequest = [self uploadData:data toFile:[url path] withAttributes:[NSDictionary dictionary] onResponse:^(NSError *error) {
+				[uploadRequest autorelease];
 				/* It was a new file, upload successful. Or other error. */
 				if (error) {
 					uploadRequest.subRequest = nil;
@@ -1898,8 +1909,10 @@ resp2txt(int type)
 					return;
 				}
 
+				[uploadRequest retain];
 				uploadRequest.subRequest = [self attributesOfItemAtURL:url
 									    onResponse:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
+					[uploadRequest autorelease];
 					uploadRequest.subRequest = nil;
 					originalCallback(url, attributes, error);
 				}];

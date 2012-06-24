@@ -19,12 +19,8 @@
 #import "ViFileExplorer.h"
 #import "ViMarkInspector.h"
 #import "NSMenu-additions.h"
-#ifdef USE_SPARKLE
-# import <Sparkle/SUUpdater.h>
-#endif
-#ifdef CRASH_REPORTER
+#import <Sparkle/SUUpdater.h>
 #import "SFBCrashReporter.h"
-#endif
 
 #import "ViFileURLHandler.h"
 #import "ViSFTPURLHandler.h"
@@ -225,17 +221,10 @@ updateMeta(void)
 	[Nu loadNuFile:@"keys" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 	[Nu loadNuFile:@"ex"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 
-#ifdef CRASH_REPORTER
 	[SFBCrashReporter checkForNewCrashes];
-#endif
 
-
-#ifdef USE_SPARKLE
 	[checkForUpdatesMenuItem setAction:@selector(checkForUpdates:)];
 	[checkForUpdatesMenuItem setTarget:[SUUpdater sharedUpdater]];
-#else
-	[[checkForUpdatesMenuItem menu] removeItem:checkForUpdatesMenuItem];
-#endif
 
 #if defined(DEBUG_BUILD)
 	[NSApp activateIgnoringOtherApps:YES];

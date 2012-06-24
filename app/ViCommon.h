@@ -17,10 +17,6 @@
 #define ViTextStorageChangedLinesNotification @"ViTextStorageChangedLinesNotification"
 #define ViEditPreferenceChangedNotification @"ViEditPreferenceChangedNotification"
 
-#ifdef TRIAL_VERSION
-# define ViTrialDaysChangedNotification @"ViMetaChangedNotification"
-#endif
-
 #define ViFilterRunLoopMode @"ViFilterRunLoopMode"
 
 #ifdef IMAX

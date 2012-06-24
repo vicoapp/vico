@@ -7,7 +7,7 @@ else
 BITS = 64
 endif
 
-VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par xorkey help plblockimp/Source plblockimp/Source/x86_$(BITS) $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
+VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par help plblockimp/Source plblockimp/Source/x86_$(BITS) $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
 
 .SUFFIXES:
 
@@ -143,7 +143,6 @@ OBJCXX_SRCS = \
 	ViCharsetDetector.mm
 
 C_SRCS = \
-	ber.c \
 	regcomp.c \
 	regenc.c \
 	regerror.c \
@@ -199,12 +198,6 @@ S_SRCS = \
 
 DERIVED_C_SRCS = \
 	scope_selector.c
-
-DEBUG_C_SRCS = \
-	debug.c \
-
-RELEASE_C_SRCS = \
-	receipt.c
 
 ALL_C_SRCS = $($(CONFIGURATION)_C_SRCS) $(C_SRCS) $(DERIVED_C_SRCS)
 
@@ -338,21 +331,13 @@ RESOURCES = \
 	par/par.doc \
 	Credits.txt
 
-ifeq ($(CONFIGURATION),BETA)
-CRASH_REPORTER = 1
-endif
-ifeq ($(CONFIGURATION),SNAPSHOT)
-CRASH_REPORTER = 1
-endif
-
-ifeq ($(CRASH_REPORTER),1)
+# Include sources for crash reporter
 OBJC_SRCS += \
 	GenerateFormData.m \
 	SFBCrashReporter.m \
 	SFBCrashReporterWindowController.m \
 	SFBSystemInformation.m
 XIBS += SFBCrashReporterWindow.xib
-endif
 
 ifneq ($(CONFIGURATION),DEBUG)
 BUNDLE_USERS = vicoapp textmate kswedberg
@@ -373,9 +358,6 @@ PAR_C_SRCS = \
 	errmsg.c \
 	par.c \
 	reformat.c
-
-XORKEY_C_SRCS = \
-	xorkey.c
 
 HELP_SRCS = \
 	basics.md \
@@ -473,20 +455,13 @@ TOOL_LDLIBS = -framework ApplicationServices -framework Foundation
 APP_LDLIBS = -lcrypto -lresolv -lffi
 APP_FRAMEWORKS = Carbon WebKit Cocoa
 PAR_LDLIBS =
-XORKEY_LDLIBS =
 
-# Use Sparkle updates for all but release builds
-ifneq ($(CONFIGURATION),RELEASE)
-CFLAGS += -DUSE_SPARKLE
+# Use Sparkle updates for all builds
 APP_FRAMEWORKS += Sparkle
 RESOURCES += sparkle_pub.pem
-endif
 
 # Crash Reporter requires AddressBook framework for getting the users email address
-ifeq ($(CRASH_REPORTER),1)
 APP_FRAMEWORKS += AddressBook
-CFLAGS += -DCRASH_REPORTER=1
-endif
 
 # paths
 BUILDDIR=./build/$(CONFIGURATION)
@@ -515,8 +490,6 @@ PAR_C_OBJS = $(addprefix $(OBJDIR)/,$(PAR_C_SRCS:.c=.o))
 PAR_OBJS = $(PAR_C_OBJS)
 LEMON_C_OBJS = $(addprefix $(OBJDIR)/,$(LEMON_C_SRCS:.c=.o))
 LEMON_OBJS = $(LEMON_C_OBJS)
-XORKEY_C_OBJS = $(addprefix $(OBJDIR)/,$(XORKEY_C_SRCS:.c=.o))
-XORKEY_OBJS = $(XORKEY_C_OBJS)
 NIBS = $(addprefix $(NIBDIR)/,$(XIBS:.xib=.nib))
 HELP_HTMLS = $(addprefix $(HELP_EN)/,$(HELP_SRCS:.md=.html))
 
@@ -560,19 +533,12 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
-ifneq ($(CONFIGURATION),RELEASE)
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" Sparkle.framework $(FWDIR)
-endif
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
-ifeq ($(CONFIGURATION),RELEASE)
-	/usr/libexec/PlistBuddy -c "Delete :SUPublicDSAKeyFile" $(INFOPLIST)
-	/usr/libexec/PlistBuddy -c "Delete :SUFeedURL" $(INFOPLIST)
-	/usr/libexec/PlistBuddy -c "Delete :SFBCrashReporterCrashSubmissionURL" $(INFOPLIST)
-endif
 
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
 
@@ -638,10 +604,6 @@ $(OBJDIR)/par: $(PAR_OBJS)
 	mkdir -p $(OBJDIR)
 	$(CC) $(LDFLAGS) $(PAR_LDLIBS) $^ -o $@
 
-$(OBJDIR)/xorkey: $(XORKEY_OBJS)
-	mkdir -p $(OBJDIR)
-	$(CC) $(LDFLAGS) $(XORKEY_LDLIBS) $^ -o $@
-
 %-bundles.json:
 	mkdir -p $(@D)
 	@echo "downloading bundle repository for $(*F)"
@@ -651,17 +613,6 @@ $(OBJDIR)/xorkey: $(XORKEY_OBJS)
 		repourl="http://github.com/api/v2/json/repos/show/$(*F)"; \
 	fi; \
 	curl --fail -s $$repourl > $@
-
-app/receipt.c: $(DERIVEDDIR)/AppleIncRootCertificate.h $(DERIVEDDIR)/bundle_fingerprint.h 
-
-$(DERIVEDDIR)/bundle_fingerprint.h:
-	mkdir -p $(DERIVEDDIR)
-	@echo "Using version $(SHORT_VERSION) for receipt validation"
-	/bin/echo -n "se.bzero.Vico$(SHORT_VERSION)" | openssl sha1 -binary | app/b2h > $(DERIVEDDIR)/bundle_fingerprint.h
-
-$(DERIVEDDIR)/AppleIncRootCertificate.h: app/AppleIncRootCertificate.cer $(OBJDIR)/xorkey
-	mkdir -p $(DERIVEDDIR)
-	$(OBJDIR)/xorkey app/AppleIncRootCertificate.cer > $(DERIVEDDIR)/AppleIncRootCertificate.h
 
 blockimp.c: $(DERIVEDDIR)/blockimp_x86_$(BITS).h
 $(DERIVEDDIR)/blockimp_x86_$(BITS).h \
@@ -817,11 +768,6 @@ TARDATE := $(shell date +%Y%m%d%H)
 TARBALL  = vico-git-$(TARDATE).tar.gz
 tarball:
 	tar zcvf $(TARBALL) .git
-	gpg -r martin -e $(TARBALL)
-	rm $(TARBALL)
-
-upload_tarball: tarball
-	scp $(TARBALL).gpg mx.bzero.se:
 
 HELP_FILES = \
 	index.html \

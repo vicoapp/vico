@@ -30,9 +30,6 @@
 	IBOutlet NSWindow		*sftpConnectView;	// Top-level nib object
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
 	IBOutlet NSTextField		*messageField;
-#ifdef TRIAL_VERSION
-	NSTextField			*_nagTitle;
-#endif
 
 	IBOutlet NSPopUpButton		*openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;

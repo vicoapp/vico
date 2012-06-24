@@ -127,10 +127,6 @@ DEBUG_FINALIZE();
 	[_alternateMark release];
 	[_alternateMarkCandidate release];
 
-#ifdef TRIAL_VERSION
-	[_nagTitle release];
-#endif
-
 	/*
 	 * Top-level nib objects released by super NSWindowController
 	 */
@@ -170,60 +166,8 @@ DEBUG_FINALIZE();
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-#ifdef TRIAL_VERSION
-	if (_nagTitle) {
-		NSView *view = [[[self window] contentView] superview];
-		NSRect rect = [_nagTitle frame];
-		rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
-		rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
-		[_nagTitle setFrame:rect];
-	}
-#endif
-
 	[[self window] saveFrameUsingName:@"MainDocumentWindow"];
 }
-
-#ifdef TRIAL_VERSION
-- (void)metaChanged:(NSNotification *)notification
-{
-	int left = [[notification object] intValue];
-	NSString *s;
-	if (left <= 0)
-		s = @"Expired evaluation copy";
-	else
-		s = [NSString stringWithFormat:@"%i day%s remaining", left, left == 1 ? "" : "s"];
-
-	NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
-	[attrs setObject:[NSFont titleBarFontOfSize:10.0] forKey:NSFontAttributeName];
-
-	NSColor *c1 = [NSColor grayColor];
-	NSColor *c2 = [NSColor redColor];
-	NSColor *c;
-	if (left >= 8)
-		c = c1;
-	else
-		c = [c2 blendedColorWithFraction:(CGFloat)(left < 0 ? 0 : left)/12.0 ofColor:c1];
-	[attrs setObject:c forKey:NSForegroundColorAttributeName];
-
-	NSView *view = [[[self window] contentView] superview];
-	NSRect rect;
-	rect.size = [s sizeWithAttributes:attrs];
-	rect.size.width += 10;
-	rect.origin.x = NSMaxX([view frame]) - rect.size.width - 35;
-	rect.origin.y = NSMaxY([view frame]) - rect.size.height - (19 - rect.size.height);
-
-	if (_nagTitle == nil) {
-		_nagTitle = [[NSTextField alloc] initWithFrame:rect];
-		[_nagTitle setDrawsBackground:NO];
-		[_nagTitle setEditable:NO];
-		[_nagTitle setBezeled:NO];
-		[_nagTitle setTextColor:[NSColor blackColor]];
-		[view addSubview:_nagTitle];
-	} else
-		[_nagTitle setFrame:rect];
-	[_nagTitle setAttributedStringValue:[[[NSAttributedString alloc] initWithString:s attributes:attrs] autorelease]];
-}
-#endif
 
 - (void)tearDownBundleMenu:(NSNotification *)notification
 {
@@ -274,13 +218,6 @@ DEBUG_FINALIZE();
 						 selector:@selector(caretChanged:)
 						     name:ViCaretChangedNotification
 						   object:nil];
-#ifdef TRIAL_VERSION
-	[[NSNotificationCenter defaultCenter] addObserver:self
-						 selector:@selector(metaChanged:)
-						     name:ViTrialDaysChangedNotification
-						   object:nil];
-	updateMeta();
-#endif
 
 	[[[self window] toolbar] setShowsBaselineSeparator:NO];
 	[bookmarksButtonCell setImage:[NSImage imageNamed:@"bookmark"]];
@@ -366,9 +303,6 @@ DEBUG_FINALIZE();
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-#ifdef TRIAL_VERSION
-	[_nagTitle setHidden:YES];
-#endif
 	[[ViEventManager defaultManager] emit:ViEventWillEnterFullScreen for:self with:self, nil];
 }
 
@@ -379,9 +313,6 @@ DEBUG_FINALIZE();
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-#ifdef TRIAL_VERSION
-	[_nagTitle setHidden:NO];
-#endif
 	[[ViEventManager defaultManager] emit:ViEventWillExitFullScreen for:self with:self, nil];
 }
 

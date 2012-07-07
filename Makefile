@@ -794,7 +794,7 @@ $(DERIVEDDIR)/help.stamp: $(HELP_FILES)
 	hiutil -vg -s en -Caf $(HELP_EN)/Vico.helpindex $(HELP_EN)
 	touch $(DERIVEDDIR)/help.stamp
 
-HELP_SRC = help
+HELP_SRC = $(CURDIR)/help
 WWW_HELP_DST = $(CURDIR)/help/www
 WWW_HELP_EN  = $(WWW_HELP_DST)/en
 wwwhelp:
@@ -802,6 +802,9 @@ wwwhelp:
 	mkdir -p $(WWW_HELP_EN)
 	cp -rf $(HELP_SRC)/shared $(WWW_HELP_DST)
 	cd $(WWW_HELP_EN) && $(HELP_SRC)/md2html.www $(HELP_SRC)/*.md
+
+syncwwwhelp: wwwhelp
+	rsync -avr $(WWW_HELP_DST)/ www.vicoapp.com:/var/www/vicoapp.com/help/
 
 synchelp: help
 	rsync -avr $(HELP_RESDIR)/ www.vicoapp.com:/var/www/vicoapp.com/help

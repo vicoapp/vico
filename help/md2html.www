@@ -1,39 +1,41 @@
 #!/bin/sh
 
+MARKDOWN_PL=${MARKDOWN:-$HOME/bin/Markdown.pl}
+MARKDOWN="perl $MARKDOWN_PL --html4tags"
+
 head()
 {
 	file=$1
 	title=$2
 
-cat <<EOF
+	cat <<EOF
 <!--#set var="title" value="$title" -->
-<!--#include file="/book/shared/head.shtml" -->
+<!--#include virtual="/inc/head.shtml" -->
 EOF
 }
 
 tail()
 {
 	cat <<EOF
-<!--#include file="/book/shared/tail.shtml" -->
+<!--#include virtual="/inc/tail.shtml" -->
 EOF
 }
 
-echo "# Index" > index.md
+echo "# Help Index" > index.md
 echo "" >> index.md
 
 while test -n "$1"; do
 	file=$1
 	title=$(sed -n '/^# /{s///;p;q;}' "$1")
 	echo "converting $file with title '$title'" >&2
-	html="$(basename "${file%.*}.html")"
+	html="$(basename "${file%.*}.shtml")"
 	(head "$file" "$title"
-	 perl $HOME/bin/Markdown.pl --html4tags "$file"
+	 sed 's/(\([^:.]*\)\.html)/(\1.shtml)/g' "$file" | $MARKDOWN
 	 tail) > $html
 	echo "  * [$title]($html)" >> index.md
 	shift
 done
 
 (head index.md Index
- perl $HOME/bin/Markdown.pl --html4tags index.md
- tail) > index.html
-
+ $MARKDOWN index.md
+ tail) > index.shtml

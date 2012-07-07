@@ -14,4 +14,3 @@ to that line number. For example, <kbd>10G</kbd> jumps to line number
 to the first line if no count is given.
 
   * [Movement](movement.html)
-

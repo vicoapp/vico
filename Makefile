@@ -7,7 +7,9 @@ else
 BITS = 64
 endif
 
-VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon util par help plblockimp/Source plblockimp/Source/x86_$(BITS) $(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
+VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon \
+	util par help plblockimp/Source plblockimp/Source/x86_$(BITS) \
+	$(shell mkdir -p $(DERIVEDDIR) && echo $(DERIVEDDIR))
 
 .SUFFIXES:
 
@@ -319,8 +321,9 @@ TM_BUNDLES = \
 
 BUNDLES = \
 	$(addsuffix, .vico-bundle,$(VICO_BUNDLES)) \
-	$(addsuffix, .tmbundle,$(VICO_BUNDLES))
+	$(addsuffix, .tmbundle,$(TM_BUNDLES))
 
+# Resource files are rsync'd to the application bundle
 RESOURCES = \
 	Support \
 	Themes \
@@ -340,7 +343,7 @@ OBJC_SRCS += \
 XIBS += SFBCrashReporterWindow.xib
 
 ifneq ($(CONFIGURATION),DEBUG)
-BUNDLE_USERS = vicoapp textmate kswedberg
+BUNDLE_USERS = vicoapp textmate
 BUNDLE_REPOS = $(addprefix $(RESDIR)/,$(addsuffix -bundles.json,$(BUNDLE_USERS)))
 .PHONY: $(BUNDLE_REPOS)
 endif
@@ -389,38 +392,23 @@ HELP_SRCS = \
 	terminal.md \
 	visual.md
 
+XCODEROOT = $(shell xcode-select -print-path)
+
 CC = clang
 CXX = clang++
-IBTOOL = /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool
+IBTOOL = $(XCODEROOT)/usr/bin/ibtool
 
 REPO_VERSION := $(shell git log --oneline | wc -l | sed 's/ //g')
+SHORT_VERSION = r$(REPO_VERSION)
 
 ifeq ($(CONFIGURATION),DEBUG)
-SHORT_VERSION = r$(REPO_VERSION)
 CFLAGS = -O0
 OBJCFLAGS =
 ARCHS = $(ARCH)
 else
 CFLAGS = -Os -DNDEBUG
-SHORT_VERSION := $(shell cat version.h)
-
-# I'm not sure what this does, but xcode uses them
-OBJCPPFLAGS	+= "-DIBOutlet=__attribute__((iboutlet))" \
-		   "-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
-		   "-DIBAction=void)__attribute__((ibaction)"
-
 ARCHS = i386 x86_64
 endif
-
-ifeq ($(CONFIGURATION),BETA)
-SHORT_VERSION = r$(REPO_VERSION)
-endif
-
-ifeq ($(CONFIGURATION),SNAPSHOT)
-CFLAGS += -DTRIAL_VERSION
-endif
-
-CFLAGS += -D$(CONFIGURATION)_BUILD=1
 
 CFLAGS += -fvisibility=hidden -gdwarf-2
 
@@ -438,9 +426,9 @@ CFLAGS	+= -Wall -Werror
 OBJCFLAGS += -Wshorten-64-to-32
 
 # Flags for PLBlockIMP
-CFLAGS += -DPL_BLOCKIMP_PRIVATE -DSUPPORT_APPLE_FALLACK
+CFLAGS += -DPL_BLOCKIMP_PRIVATE
 
-SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+SDK = $(XCODEROOT)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
 ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
 CFLAGS	+= $(ARCH_CFLAGS)
@@ -493,8 +481,8 @@ LEMON_OBJS = $(LEMON_C_OBJS)
 NIBS = $(addprefix $(NIBDIR)/,$(XIBS:.xib=.nib))
 HELP_HTMLS = $(addprefix $(HELP_EN)/,$(HELP_SRCS:.md=.html))
 
+# Build rules
 DEPS = -MMD -MT $@ -MF $(addsuffix .d,$(basename $@))
-
 $(OBJDIR)/%.o: %.m
 	$(CC) $(CFLAGS) $(OBJCFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.mm
@@ -507,17 +495,18 @@ $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(NIBDIR)/%.nib: %.xib
 	mkdir -p $(NIBDIR)
-	$(IBTOOL) --errors --warnings --notices --output-format human-readable-text --compile $@ $< --sdk $(SDK)
+	$(IBTOOL) --errors --warnings --notices \
+		  --output-format human-readable-text \
+		  --compile $@ $< \
+		  --sdk $(SDK)
 $(HELP_EN)/%.html: %.md
-	mkdir -p $(@D)
-	help/md2html $< > $@
-%.html: %.md
 	mkdir -p $(@D)
 	help/md2html $< > $@
 
 
 .PHONY: app
-app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/PkgInfo
+app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help \
+     $(APPDIR)/Contents/PkgInfo submodules
 	for arch in $(ARCHS); do \
 		$(MAKE) binaries ARCH=$$arch; \
 	done
@@ -540,6 +529,11 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help $(APPDIR)/Contents/P
 	/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(REPO_VERSION)" $(INFOPLIST)
 	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(SHORT_VERSION)" $(INFOPLIST)
 
+submodules: $(BUILDDIR)/gitmodules.stamp
+$(BUILDDIR)/gitmodules.stamp:
+	git submodule update --init --recursive -- .
+	touch $@
+
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
 
 $(OBJC_OBJS): $(OBJDIR)/Vico-prefix.objc.pth
@@ -555,36 +549,6 @@ $(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
 
 $(OBJDIR)/lemon: $(LEMON_OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
-
-APP_CERT_NAME = "8b57f037b82ff6d2edb512ddf4be3c18cb596da9"
-INST_CERT_NAME = "93ba947f3e64d1c6ce83d701adb8e9be62ad8690"
-CODESIGN_ALLOCATE = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"
-
-pkg: app
-	strip -s app/saved_symbols $(BINDIR)/Vico
-	strip $(BINDIR)/vicotool
-	strip $(BINDIR)/par
-	chown -RH "martinh:staff" $(APPDIR)
-	chmod -RH u+w,go-w,a+rX $(APPDIR)
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/vicotool
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(BINDIR)/par
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/bin/CommitWindow.app
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Support/lib/osx/plist.bundle
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(RESDIR)/Bundles/vicoapp-objective-c.tmbundle/Support/bin/inspectClass
-	env CODESIGN_ALLOCATE=$(CODESIGN_ALLOCATE) \
-	    codesign -v --force --sign $(APP_CERT_NAME) $(APPDIR)
-	productbuild --component $(APPDIR) /Applications \
-		     --sign $(INST_CERT_NAME) \
-		     --product $(INFOPLIST) \
-		     $(BUILDDIR)/Vico.pkg
-
-install: pkg
-	sudo installer -store -pkg $(BUILDDIR)/Vico.pkg -target /
 
 app/scope_selector.c app/scope_selector.h: scope_selector.lemon $(OBJDIR)/lemon
 	mkdir -p $(@D)
@@ -607,27 +571,29 @@ $(OBJDIR)/par: $(PAR_OBJS)
 %-bundles.json:
 	mkdir -p $(@D)
 	@echo "downloading bundle repository for $(*F)"
-	if curl -s "http://github.com/api/v2/json/user/show/$(*F)" | grep -q '"type":"Organization"'; then \
-		repourl="http://github.com/api/v2/json/organizations/$(*F)/public_repositories"; \
+	if curl -s "https://api.github.com/users/$(*F)" | grep -q '"type":"Organization"'; then \
+		repourl="https://api.github.com/orgs/$(*F)/repos"; \
 	else \
-		repourl="http://github.com/api/v2/json/repos/show/$(*F)"; \
+		repourl="https://api.github.com/users/$(*F)/repos"; \
 	fi; \
 	curl --fail -s $$repourl > $@
 
-blockimp.c: $(DERIVEDDIR)/blockimp_x86_$(BITS).h
+$(OBJDIR)/blockimp.o: $(DERIVEDDIR)/blockimp_x86_$(BITS).h
 $(DERIVEDDIR)/blockimp_x86_$(BITS).h \
 $(DERIVEDDIR)/blockimp_x86_$(BITS).s \
-$(DERIVEDDIR)/blockimp_x86_$(BITS)_config.c: blockimp_x86_$(BITS).tramp blockimp_x86_$(BITS)_stret.tramp
+$(DERIVEDDIR)/blockimp_x86_$(BITS)_stret.s \
+$(DERIVEDDIR)/blockimp_x86_$(BITS)_config.c \
+$(DERIVEDDIR)/blockimp_x86_$(BITS)_stret_config.c: blockimp_x86_$(BITS).tramp blockimp_x86_$(BITS)_stret.tramp
 	mkdir -p $(DERIVEDDIR)
 	@echo "Generating trampolines for arch $(ARCH)"
-	pushd plblockimp/Source/x86_$(BITS) && \
+	cd plblockimp/Source/x86_$(BITS) && \
 	for inp in $^; do \
 		echo "Generating trampolines: $$inp"; \
 		CURRENT_ARCH=$(ARCH) \
 		INPUT_FILE_PATH=$$(basename $$inp) \
 		INPUT_FILE_BASE=$${INPUT_FILE_PATH%.tramp} \
-		"$(CURDIR)/plblockimp/Other Sources/gentramp.sh" $(CURDIR)/$(DERIVEDDIR); \
-	done && popd
+		"$(CURDIR)/plblockimp/Other Sources/gentramp.sh" $(DERIVEDDIR); \
+	done
 
 $(INFOPLIST): app/Vico-Info.plist
 	cp -f $< $@
@@ -649,11 +615,12 @@ DOWNLOAD_BASE	= http://www.vicoapp.com/download
 KSIZE		= $(shell du -ks $(APPDIR) | cut -f1)
 SIZE		= $(shell echo $$(($(KSIZE) * 1024)) )
 SPARKLE_PKEY	= sparkle_priv.pem
-SIGNATURE	= $(shell /usr/bin/openssl dgst -sha1 -binary < $(DMG) | /usr/bin/openssl dgst -dss1 -sign $(SPARKLE_PKEY) | /usr/bin/openssl enc -base64)
+SIGNATURE	= $(shell /usr/bin/openssl dgst -sha1 -binary < $(DMG) | \
+		    /usr/bin/openssl dgst -dss1 -sign $(SPARKLE_PKEY) | \
+		    /usr/bin/openssl enc -base64)
 APPCAST_XML	= $(DMG).xml
 
 dmg: $(DMG)
-
 $(DMG): app
 	@echo "Creating disk image $(VOLNAME)"
 	/bin/rm -rf $(TMPDMG) $(DMGDIR) $(DMG)
@@ -664,7 +631,9 @@ $(DMG): app
 	hdiutil convert -format UDBZ $(TMPDMG) -o $(DMG)
 	/bin/rm -rf $(TMPDMG) $(DMGDIR)
 	ls -lh $(DMG)
-	#### Create and sign a zip file for automatic updates.
+
+#### Create and sign a zip file for automatic updates.
+appcast: $(DMG)
 	@sed -e 's,@SHORT_VERSION@,$(SHORT_VERSION),g' \
 	    -e 's,@REPO_VERSION@,$(REPO_VERSION),g' \
 	    -e 's,@RELNOTES_LINK@,$(APPCAST_BASE)/$(SHORT_VERSION),g' \
@@ -673,30 +642,41 @@ $(DMG): app
 	    -e 's,@SIGNATURE@,$(SIGNATURE),g' \
 	    -e 's,@SIZE@,$(SIZE),g' < appcast.xml.in > $(APPCAST_XML)
 	@cat $(APPCAST_XML)
-	@echo "scp $(DMG) vicoapp.com:/var/www/vicoapp.com/download"
+
+RELEASE_TAG	?= $(shell git rev-parse --short HEAD)
+RELEASE_DIR	 = build/$(CONFIGURATION)-$(RELEASE_TAG)
+
+.PHONY: checkout
+checkout:
+	@echo release directory is $(RELEASE_DIR)
+	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
+	@echo checking out sources for '$(RELEASE_TAG)'
+	git clone . $(RELEASE_DIR)
+	cd $(RELEASE_DIR) && git co $(RELEASE_TAG)
+
+release: checkout
+	$(MAKE) -C $(RELEASE_DIR) appcast
 
 # include automatic dependencies...
 -include $(OBJS:.o=.d)
 
+# convenience targets
 run: app
-	$(BINDIR)/Vico $(HOME)/src/vico
+	$(BINDIR)/Vico $(CURDIR)
 
 gdb: app
 	gdb $(BINDIR)/Vico
 
 leaks: app
-	# MallocStackLoggingNoCompact=YES
 	MallocStackLogging=YES \
-	  $(BINDIR)/Vico $(HOME)/src/vico
+	  $(BINDIR)/Vico $(CURDIR)
 
 zombie: app
-	# MallocStackLoggingNoCompact=YES
 	NSZombieEnabled=YES NSDebugEnabled=YES \
-	  $(BINDIR)/Vico $(HOME)/src/vico
+	  $(BINDIR)/Vico $(CURDIR)
 
-build: test
-	rm -rf build/Snapshot/Vico.app
-	xcodebuild -scheme archive -configuration Snapshot
+
+
 
 test:
 	xcodebuild -configuration Debug -target Tests
@@ -747,27 +727,8 @@ api:
 syncapi: api
 	rsync -av --delete  doc/html/ www:/var/www/feedback.vicoapp.com/public/api
 
-TAG		?= tip
-RELEASE_DIR	 = build/$(CONFIGURATION)-$(TAG)
-
-.PHONY: checkout
-checkout:
-	@echo release directory is $(RELEASE_DIR)
-	@if test -d $(RELEASE_DIR); then echo "release directory already exists"; exit 1; fi
-	@echo checking out sources for '$(TAG)'
-	git clone . $(RELEASE_DIR)
-	cd $(RELEASE_DIR) && git co $(TAG) && git submodule update --init
-
-release: checkout
-	$(MAKE) -C $(RELEASE_DIR) pkg
-
-snapshot: checkout
-	$(MAKE) -C $(RELEASE_DIR) dmg
-
-TARDATE := $(shell date +%Y%m%d%H)
-TARBALL  = vico-git-$(TARDATE).tar.gz
 tarball:
-	tar zcvf $(TARBALL) .git
+	git archive --prefix=vico-$(RELEASE_TAG)/ $(RELEASE_TAG) > vico-$(RELEASE_TAG).tar.gz
 
 HELP_FILES = \
 	index.html \

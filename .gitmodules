@@ -61,3 +61,6 @@
 [submodule "plblockimp"]
 	path = plblockimp
 	url = https://github.com/landonf/plblockimp.git
+[submodule "sparkle"]
+	path = sparkle
+	url = https://github.com/andymatuschak/Sparkle.git

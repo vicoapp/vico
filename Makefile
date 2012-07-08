@@ -447,12 +447,16 @@ PAR_LDLIBS =
 # Use Sparkle updates for all builds
 APP_FRAMEWORKS += Sparkle
 RESOURCES += sparkle_pub.pem
+SPARKLE_FWDIR = $(BUILDDIR)/sparkle
+SPARKLE_FW = $(SPARKLE_FWDIR)/Sparkle.framework
+CPPFLAGS += -F$(SPARKLE_FWDIR)
+LDFLAGS += -F$(SPARKLE_FWDIR)
 
 # Crash Reporter requires AddressBook framework for getting the users email address
 APP_FRAMEWORKS += AddressBook
 
 # paths
-BUILDDIR=./build/$(CONFIGURATION)
+BUILDDIR=$(CURDIR)/build/$(CONFIGURATION)
 OBJDIR=$(BUILDDIR)/obj/$(ARCH)
 OBJDIR_32=$(BUILDDIR)/obj/i386
 OBJDIR_64=$(BUILDDIR)/obj/x86_64
@@ -506,7 +510,7 @@ $(HELP_EN)/%.html: %.md
 
 .PHONY: app
 app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help \
-     $(APPDIR)/Contents/PkgInfo submodules
+     $(APPDIR)/Contents/PkgInfo submodules $(SPARKLE_FW)
 	for arch in $(ARCHS); do \
 		$(MAKE) binaries ARCH=$$arch; \
 	done
@@ -522,7 +526,7 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help \
 		dsymutil $(BINDIR)/Vico -o $(BUILDDIR)/Vico.app.dSYM; \
 	fi
 	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(RESOURCES) $(RESDIR)
-	rsync -a --delete --exclude ".git" --exclude ".DS_Store" Sparkle.framework $(FWDIR)
+	rsync -a --delete --exclude ".git" --exclude ".DS_Store" $(SPARKLE_FW) $(FWDIR)
 	cp -f app/en.lproj/Credits.rtf $(RESDIR)/en.lproj/Credits.rtf
 	cp -f app/en.lproj/InfoPlist.strings $(RESDIR)/en.lproj/InfoPlist.strings
 	# find $(RESDIR)/Bundles \( -iname "*.plist" -or -iname "*.tmCommand" -or -iname "*.tmSnippet" -or -iname "*.tmPreferences" \) -exec /usr/bin/plutil -convert binary1 "{}" \;
@@ -532,6 +536,15 @@ app: $(NIBS) $(RESOURCES) $(BUNDLE_REPOS) $(INFOPLIST) help \
 submodules: $(BUILDDIR)/gitmodules.stamp
 $(BUILDDIR)/gitmodules.stamp:
 	git submodule update --init --recursive -- .
+	touch $@
+
+$(SPARKLE_FW): $(BUILDDIR)/sparkle/Sparkle.stamp
+$(BUILDDIR)/sparkle/Sparkle.stamp:
+	xcodebuild -project "$(CURDIR)/sparkle/Sparkle.xcodeproj" \
+		   -target Sparkle -configuration Release -parallelizeTargets \
+		   CONFIGURATION_BUILD_DIR="$(BUILDDIR)/sparkle" \
+		   OBJROOT="$(BUILDDIR)/sparkle" \
+		   SYMROOT="$(BUILDDIR)/sparkle"
 	touch $@
 
 binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par

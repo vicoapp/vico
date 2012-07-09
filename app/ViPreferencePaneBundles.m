@@ -188,14 +188,12 @@
 		return;
 	NSData *JSONData = [NSData dataWithContentsOfFile:path];
 	NSString *JSONString = [[[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding] autorelease];
-	NSDictionary *dict = [JSONString JSONValue];
-	if (![dict isKindOfClass:[NSDictionary class]]) {
+	NSArray *arry = [JSONString JSONValue];
+	if (![arry isKindOfClass:[NSArray class]]) {
 		INFO(@"%s", "failed to parse JSON");
 		return;
 	}
-
-	[_repositories addObjectsFromArray:[dict objectForKey:@"repositories"]];
-
+	[_repositories addObjectsFromArray: arry];
 	for (NSUInteger i = 0; i < [_repositories count];) {
 		NSMutableDictionary *bundle = [_repositories objectAtIndex:i];
 
@@ -208,6 +206,7 @@
 			continue;
 		}
 		++i;
+    NSLog(@"%@", bundle);
 
 		NSString *name = [bundle objectForKey:@"name"];
 		NSString *owner = [bundle objectForKey:@"owner"];
@@ -416,7 +415,7 @@
 
 	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Loading user %@...", username]];
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/user/show/%@", username]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/users/%@", username]];
 
 	[_userConnection release];
 	_userConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
@@ -516,11 +515,11 @@
 
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Loading repositories from %@...", username]];
 		NSURL *url;
-		NSString *type = [[dict objectForKey:@"user"] objectForKey:@"type"];
+		NSString *type = [dict objectForKey:@"type"];
 		if ([type isEqualToString:@"User"])
-			url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/repos/show/%@", username]];
+			url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/users/%@/repos", username]];
 		else if ([type isEqualToString:@"Organization"])
-			url = [NSURL URLWithString:[NSString stringWithFormat:@"http://github.com/api/v2/json/organizations/%@/public_repositories", username]];
+			url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/orgs/%@/repos", username]];
 		else {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Unknown type %@ of user %@", type, username]];

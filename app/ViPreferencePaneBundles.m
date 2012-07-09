@@ -181,7 +181,7 @@
 - (void)loadBundlesFromRepo:(NSString *)username
 {
 	/* Remove any existing repositories owned by this user. */
-	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", username]];
+	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner.login == %@", username]];
 
 	NSString *path = [self repoPathForUser:username readonly:YES];
 	if (path == nil)
@@ -206,10 +206,9 @@
 			continue;
 		}
 		++i;
-    NSLog(@"%@", bundle);
 
 		NSString *name = [bundle objectForKey:@"name"];
-		NSString *owner = [bundle objectForKey:@"owner"];
+		NSString *owner = [[bundle objectForKey:@"owner"] objectForKey:@"login"];
 		NSString *status = @"";
 		if ([[ViBundleStore defaultStore] isBundleLoaded:[NSString stringWithFormat:@"%@-%@", owner, name]])
 			status = @"Installed";
@@ -234,7 +233,7 @@
 		return;
 	}
 
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(owner CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (description CONTAINS[cd] %@)",
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(owner.login CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (description CONTAINS[cd] %@)",
 		filter, filter, filter];
 	[self setFilteredRepositories:[_repositories filteredArrayUsingPredicate:predicate]];
 }
@@ -262,7 +261,7 @@
 			}
 		}
 		if (!found) {
-			[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner == %@", prevOwner]];
+			[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner.login == %@", prevOwner]];
 			[self filterRepositories:repoFilterField];
 		}
 	}
@@ -539,7 +538,7 @@
 	[progressIndicator setIndeterminate:YES];
 
 	NSMutableDictionary *repo = [_processQueue lastObject];
-	NSString *owner = [repo objectForKey:@"owner"];
+	NSString *owner = [[repo objectForKey:@"owner"] objectForKey:@"login"];
 	NSString *name = [repo objectForKey:@"name"];
 	NSString *displayName = [repo objectForKey:@"displayName"];
 
@@ -610,7 +609,7 @@
 
 	[self resetProgressIndicator];
 	[progressDescription setStringValue:[NSString stringWithFormat:@"Downloading and installing %@ (by %@)...",
-	    [repo objectForKey:@"name"], [repo objectForKey:@"owner"]]];
+	    [repo objectForKey:@"name"], [[repo objectForKey:@"owner"] objectForKey:@"login"]]];
 
 	/*
 	 * Move away any existing (temporary) bundle directory.

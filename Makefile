@@ -394,8 +394,8 @@ HELP_SRCS = \
 
 XCODEROOT = $(shell xcode-select -print-path)
 
-CC = clang
-CXX = clang++
+CC = xcrun clang
+CXX = xcrun clang++
 IBTOOL = $(XCODEROOT)/usr/bin/ibtool
 
 REPO_VERSION := $(shell git log --oneline | wc -l | sed 's/ //g')

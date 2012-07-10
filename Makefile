@@ -396,7 +396,7 @@ XCODEROOT = $(shell xcode-select -print-path)
 
 CC = xcrun clang
 CXX = xcrun clang++
-IBTOOL = $(XCODEROOT)/usr/bin/ibtool
+IBTOOL = xcrun ibtool
 
 REPO_VERSION := $(shell git log --oneline | wc -l | sed 's/ //g')
 SHORT_VERSION = r$(REPO_VERSION)

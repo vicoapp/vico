@@ -37,6 +37,8 @@
 
 @implementation ViDocumentController
 
+@synthesize developMenu;
+
 - (void)callCloseAllDelegateShouldTerminate:(BOOL)flag
 {
 	DEBUG(@"should%s terminate", flag ? "" : " NOT");
@@ -251,6 +253,10 @@
 		[_openDocs removeObjectForKey:[document fileURL]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViDocumentRemovedNotification object:document];
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
+}
+
+- (void)showDevelopMenu:(BOOL)doShow {
+    [developMenu setHidden:! doShow];
 }
 
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)document

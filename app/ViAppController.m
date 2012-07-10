@@ -309,6 +309,7 @@ updateMeta(void)
 	    @"vim", @"undostyle",
 	    @"Sunset", @"theme",
 	    @"(^\\.(?!(htaccess|(git|hg|cvs)ignore)$)|^(CVS|_darcs|\\.svn|\\.git)$|~$|\\.(bak|o|pyc|gz|tgz|zip|dmg|pkg)$)", @"skipPattern",
+	    [NSNumber numberWithBool:NO], @"includedevelopmenu",
 	    [NSArray arrayWithObjects:@"vicoapp", @"textmate", @"kswedberg", nil], @"bundleRepoUsers",
 	    [NSNumber numberWithBool:YES], @"explorecaseignore",
 	    [NSNumber numberWithBool:NO], @"exploresortfolders",

@@ -256,7 +256,7 @@
 }
 
 - (void)showDevelopMenu:(BOOL)doShow {
-    [developMenu setHidden:! doShow];
+    [self.developMenu setHidden:! doShow];
 }
 
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)document

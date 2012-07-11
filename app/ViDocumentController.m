@@ -255,7 +255,8 @@
 	[[ViEventManager defaultManager] emit:ViEventDidRemoveDocument for:nil with:document, nil];
 }
 
-- (void)showDevelopMenu:(BOOL)doShow {
+- (void)showDevelopMenu:(BOOL)doShow
+{
     [self.developMenu setHidden:! doShow];
 }
 

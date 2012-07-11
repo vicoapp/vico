@@ -404,7 +404,7 @@
 	self = [super init];
 	if (self) {
 		NSFileManager *fm = [NSFileManager defaultManager];
-        NSString *bundleDirectory = [unexpandedBundleDirectory stringByExpandingTildeInPath];
+		NSString *bundleDirectory = [unexpandedBundleDirectory stringByExpandingTildeInPath];
 		NSString *plistPath = [bundleDirectory  stringByAppendingPathComponent:@"info.plist"];
 		if (![fm fileExistsAtPath:plistPath]) {
 			[self release];

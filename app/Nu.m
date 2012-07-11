@@ -4942,9 +4942,10 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
 
 @end
 
-@implementation NSInputStream (Nu)
+@implementation NSInputStream(Nu)
 
-- (NSData *)readData {
+- (NSData *)readData
+{
     NSUInteger bufferLength = 255;
     uint8_t buffer[bufferLength];
     NSInteger bytesRead = 0;
@@ -4961,9 +4962,10 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
 
 @end
 
-@implementation NSOutputStream (Nu)
+@implementation NSOutputStream(Nu)
 
-- (int)writeData:(NSData *)data {
+- (int)writeData:(NSData *)data
+{
     NSInteger bytesWritten = 0;
     NSInteger totalBytesWritten = 0;
     NSInteger remainingBytes = [data length];

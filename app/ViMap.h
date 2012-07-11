@@ -31,11 +31,12 @@
 // TODO but not the second, and then we need one again.
 // TODO This describes the way macro recording works as q<register>
 // TODO followed by just q to end recording.
-#define ViMapSetsDot		1ULL
-#define ViMapNeedMotion		2ULL
-#define ViMapIsMotion		4ULL
-#define ViMapLineMode		8ULL
-#define ViMapNeedArgument	16ULL
+#define ViMapSetsDot			1ULL
+#define ViMapNeedMotion			2ULL
+#define ViMapIsMotion			4ULL
+#define ViMapLineMode			8ULL
+#define ViMapNeedArgument		16ULL
+#define ViMapNoArgumentOnToggle	32ULL
 
 /** A mapping of a key sequence to an editor action, macro or Nu expression.
  *
@@ -118,6 +119,9 @@
 
 /** YES if the mapping is an editor action that needs a character argument, like the vi `f` command. */
 - (BOOL)needsArgument;
+
+/** YES if the mapping is an editor action that does not need a character argument every other invocation, like the vim `q` command. */
+- (BOOL)noArgumentOnToggle;
 
 - (BOOL)wantsKeys;
 

@@ -2421,12 +2421,13 @@
 	return YES;
 }
 
+/* syntax: q<char> to start, q to end */
 - (BOOL)toggle_record_macro:(ViCommand *)command
 {
 	if ([_keyManager isRecordingMacro]) {
 		[_keyManager stopRecordingMacroAndSave];
 	} else {
-		[_keyManager startRecordingMacro:[command reg]];
+		[_keyManager startRecordingMacro:[command argument]];
 	}
 
 	return YES;

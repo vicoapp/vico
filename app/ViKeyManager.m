@@ -203,9 +203,6 @@ static ViKeyManager *macroRecorder = nil;
 
 - (void)startRecordingMacro:(unichar)reg
 {
-	// TODO
-	// A global can track any key manager that is currently
-	// recording a macro so others can forward on their keystrokes.
 	if (! self.isRecordingMacro) {
 		self.isRecordingMacro = YES;
 		_pendingMacroRegister = reg;
@@ -225,9 +222,9 @@ static ViKeyManager *macroRecorder = nil;
 	if (self.isRecordingMacro) {
 		self.isRecordingMacro = NO;
 
-		// TODO Fix this when we switch the closing command to just q.
+		// Strip out the last character, as it will be the terminating q.
 		NSString *macroContents =
-		    [NSString stringWithString:[_recordedKeys substringToIndex:([_recordedKeys length] - 2)]];
+		    [NSString stringWithString:[_recordedKeys substringToIndex:([_recordedKeys length] - 1)]];
 		[_recordedKeys deleteCharactersInRange:NSMakeRange(0,[_recordedKeys length])];
 
 		[[ViRegisterManager sharedManager] setContent:macroContents ofRegister:_pendingMacroRegister];

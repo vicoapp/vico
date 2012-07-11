@@ -61,6 +61,7 @@ typedef enum {
 	/* Used for nvi-style undo. */
 	BOOL		 _nviStyleUndo;
 	ViCommand	*_lastCommand;
+	ViCommand	*_lastToggleCommand;
 
 	ViCommand	*_lastLineSearchCommand;
 
@@ -79,6 +80,7 @@ typedef enum {
 @property(nonatomic,readwrite,retain) ViCommand *command;
 @property(nonatomic,readwrite,retain) ViCommand *dotCommand;
 @property(nonatomic,readwrite,retain) ViCommand *lastCommand;
+@property(nonatomic,readwrite,retain) ViCommand *lastToggleCommand;
 @property(nonatomic,readwrite,retain) ViCommand *lastLineSearchCommand;
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap;

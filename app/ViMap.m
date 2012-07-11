@@ -171,6 +171,11 @@
 	return has_flag(ViMapNeedArgument);
 }
 
+- (BOOL)noArgumentOnToggle
+{
+	return has_flag(ViMapNoArgumentOnToggle);
+}
+
 - (BOOL)wantsKeys
 {
 	return [self isOperator] || [self needsArgument];

@@ -46,6 +46,7 @@
 @synthesize command = _command;
 @synthesize dotCommand = _dotCommand;
 @synthesize lastCommand = _lastCommand;
+@synthesize lastToggleCommand = _lastToggleCommand;
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap
 {
@@ -137,6 +138,14 @@
 	}
 
 	[self setLastCommand:_command];
+
+	if ([_command.mapping noArgumentOnToggle]) {
+		if (_lastToggleCommand && [_lastToggleCommand.mapping.keySequence isEqual:_command.mapping.keySequence]) {
+			[self setLastToggleCommand:nil];
+		} else if (! _lastToggleCommand) {
+			[self setLastToggleCommand:_command];
+		}
+	}
 
 	if ((_command.mapping.flags & ViMapSetsDot) == ViMapSetsDot) {
 		/* set the dot command */
@@ -434,7 +443,7 @@
 						 _map.name];
 			[self setMap:_map.operatorMap];
 			DEBUG(@"%@ is an operator, using operatorMap %@", mapping, _map);
-		} else if ([mapping needsArgument])
+		} else if ([mapping needsArgument] && (! [mapping noArgumentOnToggle] || ! _lastToggleCommand || (! [[[_lastToggleCommand mapping] keySequence] isEqual:[mapping keySequence]])))
 			_state = ViParserNeedChar;
 		else {
 			if (_remainingExcessKeysPtr)

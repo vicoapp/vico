@@ -1791,9 +1791,9 @@
 									<reference key="NSMixedImage" ref="258136346"/>
 									<int key="NSTag">4000</int>
 								</object>
-								<object class="NSMenuItem" id="710777662">
+								<object class="NSMenuItem" id="551971093">
 									<reference key="NSMenu" ref="590862891"/>
-									<string key="NSTitle">Evaluate File / Selection (:%eval)(:eval)</string>
+									<string key="NSTitle">Evaluate File / Selection (:%eval&lt;cr&gt;)(:eval&lt;cr&gt;)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="176968249"/>
@@ -4088,7 +4088,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="540746582"/>
 							<reference ref="683366070"/>
-							<reference ref="710777662"/>
+							<reference ref="551971093"/>
 						</object>
 						<reference key="parent" ref="849737169"/>
 					</object>
@@ -4104,7 +4104,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1065</int>
-						<reference key="object" ref="710777662"/>
+						<reference key="object" ref="551971093"/>
 						<reference key="parent" ref="590862891"/>
 					</object>
 				</object>

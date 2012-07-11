@@ -42,7 +42,7 @@
     (ex define:'("xit" "exit")  syntax:"r%!e1x" as:"ex_xit:")
     (ex define:"yank"           syntax:"rRc"    as:"ex_yank:")
 
-    ; We can define this in straight Nu.
+    ; We can define these in straight Nu.
     (set console nil)
     (ex define:"console"        syntax:""
       as:(do (command)
@@ -51,4 +51,13 @@
           (set console ((NuConsoleWindowController alloc) init)))
 
         (console toggleConsole:nil)))
+
+    (ex define:"reloadbundle" syntax:"e1x"
+      as:(do (command)
+        (let (path
+               (if ((command arg) length)
+                 (command arg)
+                 (else
+                      ((current-window) displayBaseURL))))
+          ((ViBundleStore defaultStore) loadBundleFromDirectory:path))))
 )

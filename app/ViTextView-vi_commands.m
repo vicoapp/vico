@@ -2421,6 +2421,17 @@
 	return YES;
 }
 
+- (BOOL)toggle_record_macro:(ViCommand *)command
+{
+	if ([_keyManager isRecordingMacro]) {
+		[_keyManager stopRecordingMacroAndSave];
+	} else {
+		[_keyManager startRecordingMacro:[command reg]];
+	}
+
+	return YES;
+}
+
 /* syntax: '<char> */
 /* syntax: `<char> */
 /* syntax: g'<char> */

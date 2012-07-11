@@ -29,6 +29,7 @@
 #import "ViError.h"
 #import "ViMacro.h"
 #import "ViAppController.h"
+#import "ViRegisterManager.h"
 #include "logging.h"
 
 @interface ViKeyManager (private)
@@ -44,6 +45,7 @@
 
 @synthesize parser = _parser;
 @synthesize target = _target;
+@synthesize isRecordingMacro = _isRecordingMacro;
 
 + (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
 				parser:(ViParser *)aParser
@@ -63,6 +65,8 @@
 	if ((self = [super init]) != nil) {
 		_parser = [aParser retain];
 		_target = aTarget; // XXX: not retained!
+
+        _recordedKeys = [[NSMutableString stringWithCapacity:0] retain];
 	}
 	DEBUG_INIT();
 	return self;
@@ -73,6 +77,7 @@
 	DEBUG_DEALLOC();
 	[_parser release];
 	[_keyTimeout release];
+	[_recordedKeys release];
 	[super dealloc];
 }
 
@@ -190,6 +195,33 @@
 	return [self runAsMacro:inputString interactively:YES];
 }
 
+- (void)startRecordingMacro:(unichar)reg
+{
+	// TODO
+	// A global can track any key manager that is currently
+	// recording a macro so others can forward on their keystrokes.
+	if (! self.isRecordingMacro) {
+		self.isRecordingMacro = YES;
+		_pendingMacroRegister = reg;
+    }
+}
+
+- (void)stopRecordingMacroAndSave
+{
+	if (self.isRecordingMacro) {
+		self.isRecordingMacro = NO;
+
+		// TODO Fix this when we switch the closing command to just q.
+		NSString *macroContents =
+		    [NSString stringWithString:[_recordedKeys substringToIndex:([_recordedKeys length] - 2)]];
+		[_recordedKeys deleteCharactersInRange:NSMakeRange(0,[_recordedKeys length])];
+
+		[[ViRegisterManager sharedManager] setContent:macroContents ofRegister:_pendingMacroRegister];
+
+        _pendingMacroRegister = 0;
+	}
+}
+
 - (BOOL)evalCommand:(id)command
 {
 	if ([command isKindOfClass:[ViMacro class]])
@@ -214,6 +246,10 @@
 	[_keyTimeout invalidate];
 	[_keyTimeout release];
 	_keyTimeout = nil;
+
+	if (self.isRecordingMacro) {
+	    [_recordedKeys appendString:[NSString stringWithKeyCode:keyCode]];
+	}
 
 	DEBUG(@"handling key %li (%@) in scope %@", keyCode, [NSString stringWithKeyCode:keyCode], scope);
 

@@ -26,6 +26,11 @@
 #import "Nu.h"
 #import "ViScope.h"
 
+// TODO ViMapNeedArgumentBeforeToggle
+// TODO This means we need an argument for the first invocation
+// TODO but not the second, and then we need one again.
+// TODO This describes the way macro recording works as q<register>
+// TODO followed by just q to end recording.
 #define ViMapSetsDot		1ULL
 #define ViMapNeedMotion		2ULL
 #define ViMapIsMotion		4ULL

@@ -175,6 +175,8 @@
 
 /** Start recording a macro to be saved in the given register. */
 - (void)startRecordingMacro:(unichar)reg;
+/** Adds the given key string to the currently recording macro. */
+- (void)recordKeyForMacro:(NSInteger)key;
 /** Stop recording the macro and save its contents to the appropriate register.
  */
 - (void)stopRecordingMacroAndSave;

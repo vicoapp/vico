@@ -43,6 +43,8 @@
 
 @implementation ViKeyManager
 
+static ViKeyManager *macroRecorder = nil;
+
 @synthesize parser = _parser;
 @synthesize target = _target;
 @synthesize isRecordingMacro = _isRecordingMacro;
@@ -74,6 +76,10 @@
 
 - (void)dealloc
 {
+	if (self.isRecordingMacro) {
+		[self stopRecordingMacroAndSave];
+	}
+
 	DEBUG_DEALLOC();
 	[_parser release];
 	[_keyTimeout release];
@@ -203,7 +209,15 @@
 	if (! self.isRecordingMacro) {
 		self.isRecordingMacro = YES;
 		_pendingMacroRegister = reg;
+		macroRecorder = self;
     }
+}
+
+- (void)recordKeyForMacro:(NSInteger)keyCode
+{
+	if (self.isRecordingMacro) {
+		[_recordedKeys appendString:[NSString stringWithKeyCode:keyCode]];
+	}
 }
 
 - (void)stopRecordingMacroAndSave
@@ -218,7 +232,8 @@
 
 		[[ViRegisterManager sharedManager] setContent:macroContents ofRegister:_pendingMacroRegister];
 
-        _pendingMacroRegister = 0;
+		_pendingMacroRegister = 0;
+		macroRecorder = nil;
 	}
 }
 
@@ -247,8 +262,8 @@
 	[_keyTimeout release];
 	_keyTimeout = nil;
 
-	if (self.isRecordingMacro) {
-	    [_recordedKeys appendString:[NSString stringWithKeyCode:keyCode]];
+	if (macroRecorder) {
+		[macroRecorder recordKeyForMacro:keyCode];
 	}
 
 	DEBUG(@"handling key %li (%@) in scope %@", keyCode, [NSString stringWithKeyCode:keyCode], scope);

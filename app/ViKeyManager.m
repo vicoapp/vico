@@ -29,6 +29,7 @@
 #import "ViError.h"
 #import "ViMacro.h"
 #import "ViAppController.h"
+#import "ViRegisterManager.h"
 #include "logging.h"
 
 @interface ViKeyManager (private)
@@ -42,8 +43,11 @@
 
 @implementation ViKeyManager
 
+static ViKeyManager *macroRecorder = nil;
+
 @synthesize parser = _parser;
 @synthesize target = _target;
+@synthesize isRecordingMacro = _isRecordingMacro;
 
 + (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
 				parser:(ViParser *)aParser
@@ -63,6 +67,8 @@
 	if ((self = [super init]) != nil) {
 		_parser = [aParser retain];
 		_target = aTarget; // XXX: not retained!
+
+        _recordedKeys = [[NSMutableString stringWithCapacity:0] retain];
 	}
 	DEBUG_INIT();
 	return self;
@@ -70,9 +76,14 @@
 
 - (void)dealloc
 {
+	if (self.isRecordingMacro) {
+		[self stopRecordingMacroAndSave];
+	}
+
 	DEBUG_DEALLOC();
 	[_parser release];
 	[_keyTimeout release];
+	[_recordedKeys release];
 	[super dealloc];
 }
 
@@ -190,6 +201,39 @@
 	return [self runAsMacro:inputString interactively:YES];
 }
 
+- (void)startRecordingMacro:(unichar)reg
+{
+	if (! self.isRecordingMacro) {
+		self.isRecordingMacro = YES;
+		_pendingMacroRegister = reg;
+		macroRecorder = self;
+    }
+}
+
+- (void)recordKeyForMacro:(NSInteger)keyCode
+{
+	if (self.isRecordingMacro) {
+		[_recordedKeys appendString:[NSString stringWithKeyCode:keyCode]];
+	}
+}
+
+- (void)stopRecordingMacroAndSave
+{
+	if (self.isRecordingMacro) {
+		self.isRecordingMacro = NO;
+
+		// Strip out the last character, as it will be the terminating q.
+		NSString *macroContents =
+		    [NSString stringWithString:[_recordedKeys substringToIndex:([_recordedKeys length] - 1)]];
+		[_recordedKeys deleteCharactersInRange:NSMakeRange(0,[_recordedKeys length])];
+
+		[[ViRegisterManager sharedManager] setContent:macroContents ofRegister:_pendingMacroRegister];
+
+		_pendingMacroRegister = 0;
+		macroRecorder = nil;
+	}
+}
+
 - (BOOL)evalCommand:(id)command
 {
 	if ([command isKindOfClass:[ViMacro class]])
@@ -214,6 +258,10 @@
 	[_keyTimeout invalidate];
 	[_keyTimeout release];
 	_keyTimeout = nil;
+
+	if (macroRecorder) {
+		[macroRecorder recordKeyForMacro:keyCode];
+	}
 
 	DEBUG(@"handling key %li (%@) in scope %@", keyCode, [NSString stringWithKeyCode:keyCode], scope);
 

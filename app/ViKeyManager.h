@@ -85,6 +85,10 @@
 	__weak id<ViKeyManagerTarget>	 _target;
 	NSTimer				*_keyTimeout;
 	NSInteger			 _recursionLevel;
+
+    BOOL                 _isRecordingMacro;
+    NSMutableString     *_recordedKeys;
+    unichar              _pendingMacroRegister;
 }
 
 /** The vi key parser used by the key manager.
@@ -96,6 +100,8 @@
  * to the ViKeyManagerTarget protocol.
  */
 @property(nonatomic,readwrite,assign) __weak id<ViKeyManagerTarget> target; // XXX: not retained!
+
+@property(nonatomic,readwrite) BOOL isRecordingMacro;
 
 /** @name Initializing */
 
@@ -166,5 +172,13 @@
 
 - (BOOL)runAsMacro:(NSString *)inputString interactively:(BOOL)interactiveFlag;
 - (BOOL)runAsMacro:(NSString *)inputString;
+
+/** Start recording a macro to be saved in the given register. */
+- (void)startRecordingMacro:(unichar)reg;
+/** Adds the given key string to the currently recording macro. */
+- (void)recordKeyForMacro:(NSInteger)key;
+/** Stop recording the macro and save its contents to the appropriate register.
+ */
+- (void)stopRecordingMacroAndSave;
 @end
 

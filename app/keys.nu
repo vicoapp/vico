@@ -255,7 +255,9 @@
 (nmap setKey:"i" toEditAction:"insert:")
 (nmap setKey:"m" toAction:"set_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"o" toEditAction:"open_line_below:")
+
 (nmap setKey:"p" toEditAction:"put_after:")
+(nmap setKey:"q" toAction:"toggle_record_macro:" flags:(| ViMapNeedArgument ViMapNoArgumentOnToggle) parameter:nil scope:nil)
 (nmap setKey:"r" toEditAction:"replace:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"r<ctrl-v>" toEditAction:"replace_literal:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (nmap setKey:"s" toEditAction:"substitute:")
@@ -337,6 +339,7 @@
 (vmap setKey:"gT" toAction:"previous_tab:")
 (vmap setKey:"gq" toEditAction:"format:")
 (vmap setKey:"o" toEditAction:"visual_other:")
+(vmap setKey:"q" toAction:"toggle_record_macro:" flags:(| ViMapNeedArgument ViMapNoArgumentOnToggle) parameter:nil scope:nil)
 (vmap setKey:"p" toEditAction:"put_after:")
 (vmap setKey:"r" toEditAction:"replace:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (vmap setKey:"s" toEditAction:"substitute:")

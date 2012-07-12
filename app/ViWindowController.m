@@ -1205,7 +1205,7 @@ DEBUG_FINALIZE();
 		for (otherDocView in [document views])
 			if (otherDocView.tabController != tabController)
 				break;
-		return (otherDocView == nil);
+		return (BOOL)(otherDocView == nil);
 	}];
 
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set

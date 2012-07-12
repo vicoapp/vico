@@ -57,7 +57,7 @@
 
 - (void)setTabTrigger:(NSString *)aTabTrigger
 {
-	[self setCommand:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]];
+	[self setCommand:[aTabTrigger stringByAppendingFormat:@"%C", (unichar)0x21E5]];
 }
 
 - (void)setTitle:(NSString *)aTitle
@@ -121,7 +121,7 @@
 - (id)initWithTitle:(NSString *)aTitle tabTrigger:(NSString *)aTabTrigger font:(NSFont *)aFont
 {
 	return [self initWithTitle:aTitle
-			   command:[aTabTrigger stringByAppendingFormat:@"%C", 0x21E5]
+			   command:[aTabTrigger stringByAppendingFormat:@"%C", (unichar)0x21E5]
 			      font:aFont];
 }
 

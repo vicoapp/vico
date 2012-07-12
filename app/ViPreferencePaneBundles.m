@@ -169,11 +169,11 @@
 		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
 		[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
-		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available. Last updated %@.",
+		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %lu available. Last updated %@.",
 		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count],
 		    [_repositories count], [dateFormatter stringFromDate:date]]];
 	} else {
-		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %u available.",
+		[bundlesInfo setStringValue:[NSString stringWithFormat:@"%u installed, %lu available.",
 		    (unsigned)[[[ViBundleStore defaultStore] allBundles] count], [_repositories count]]];
 	}
 }

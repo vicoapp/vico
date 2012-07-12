@@ -98,7 +98,7 @@
 		special = [NSString stringWithFormat:@"f%i", key - NSF1FunctionKey + 1];
 
 	if (key < 0x20 && key > 0 && key != 0x1B && key != 0x0D && key != 0x09)
-		special = [[NSString stringWithFormat:@"ctrl-%C", key + 'A' - 1] lowercaseString];
+		special = [[NSString stringWithFormat:@"ctrl-%C", (unichar)(key + 'A' - 1)] lowercaseString];
 
 	NSString *encodedKey;
 	if (modifiers) {
@@ -170,10 +170,10 @@
 	NSString *encodedKey;
 	if (modifiers) {
 		encodedKey = [NSString stringWithFormat:@"%@%@%@%@%@",
-		    (modifiers & NSCommandKeyMask) ? [NSString stringWithFormat:@"%C", 0x2318] : @"",
-		    (modifiers & NSAlternateKeyMask) ? [NSString stringWithFormat:@"%C", 0x2325] : @"",
-		    (modifiers & NSControlKeyMask) ? [NSString stringWithFormat:@"%C", 0x2303] : @"",
-		    (modifiers & NSShiftKeyMask) ? [NSString stringWithFormat:@"%C", 0x21E7] : @"",
+		    (modifiers & NSCommandKeyMask) ? [NSString stringWithFormat:@"%C", (unichar)0x2318] : @"",
+		    (modifiers & NSAlternateKeyMask) ? [NSString stringWithFormat:@"%C", (unichar)0x2325] : @"",
+		    (modifiers & NSControlKeyMask) ? [NSString stringWithFormat:@"%C", (unichar)0x2303] : @"",
+		    (modifiers & NSShiftKeyMask) ? [NSString stringWithFormat:@"%C", (unichar)0x21E7] : @"",
 		    special ?: [[NSString stringWithFormat:@"%C", key] uppercaseString]];
 	} else if (special)
 		encodedKey = special;

@@ -459,7 +459,7 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	[_filter appendString:[NSString stringWithFormat:@"%C", keyCode]];
+	[_filter appendString:[NSString stringWithFormat:@"%C", (unichar)keyCode]];
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;

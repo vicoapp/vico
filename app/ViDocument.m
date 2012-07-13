@@ -53,8 +53,8 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 @interface ViDocument (internal)
 - (void)highlightEverything;
 - (void)setWrapping:(BOOL)flag;
-- (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
-- (void)enableLineNumbers:(BOOL)flag;
+- (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative forScrollView:(NSScrollView *)aScrollView;
+- (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative;
 - (void)setTypingAttributes;
 - (NSString *)suggestEncoding:(NSStringEncoding *)outEncoding forData:(NSData *)data;
 - (BOOL)addData:(NSData *)data;
@@ -106,6 +106,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 
 		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		[userDefaults addObserver:self forKeyPath:@"number" options:0 context:NULL];
+		[userDefaults addObserver:self forKeyPath:@"relativenumber" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"tabstop" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"fontsize" options:0 context:NULL];
 		[userDefaults addObserver:self forKeyPath:@"fontname" options:0 context:NULL];
@@ -164,6 +165,7 @@ DEBUG_FINALIZE();
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	[userDefaults removeObserver:self forKeyPath:@"number"];
+	[userDefaults removeObserver:self forKeyPath:@"relativenumber"];
 	[userDefaults removeObserver:self forKeyPath:@"tabstop"];
 	[userDefaults removeObserver:self forKeyPath:@"fontsize"];
 	[userDefaults removeObserver:self forKeyPath:@"fontname"];
@@ -381,8 +383,10 @@ DEBUG_FINALIZE();
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
 	if ([keyPath isEqualToString:@"number"])
-		[self enableLineNumbers:[userDefaults boolForKey:keyPath]];
-	else if ([keyPath isEqualToString:@"wrap"])
+		[self enableLineNumbers:[userDefaults boolForKey:keyPath] relative:[userDefaults boolForKey:@"relativenumber"]];
+	else if ([keyPath isEqualToString:@"relativenumber"]) {
+		[self enableLineNumbers:[userDefaults boolForKey:@"number"] relative:[userDefaults boolForKey:keyPath]];
+	} else if ([keyPath isEqualToString:@"wrap"])
 		[self updateWrapping];
 	else if ([keyPath isEqualToString:@"tabstop"]) {
 		[self updateTabSize];
@@ -585,6 +589,7 @@ DEBUG_FINALIZE();
 	[textView initWithDocument:self viParser:aParser];
 
 	[self enableLineNumbers:[userDefaults boolForKey:@"number"]
+	               relative:[userDefaults boolForKey:@"relativenumber"]
 	          forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
 	[textView setWrapping:_wrap];
@@ -1561,12 +1566,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark -
 #pragma mark Line numbers
 
-- (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView
+- (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative forScrollView:(NSScrollView *)aScrollView
 {
 	if (flag) {
 		ViRulerView *lineNumberView = [[ViRulerView alloc] initWithScrollView:aScrollView];
 		[aScrollView setVerticalRulerView:lineNumberView];
 		[lineNumberView release];
+		[lineNumberView setRelative:relative];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];
@@ -1574,16 +1580,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[aScrollView setRulersVisible:NO];
 }
 
-- (void)enableLineNumbers:(BOOL)flag
+- (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative
 {
 	[self eachTextView:^(ViTextView *tv) {
-		[self enableLineNumbers:flag forScrollView:[tv enclosingScrollView]];
+		[self enableLineNumbers:flag relative:relative forScrollView:[tv enclosingScrollView]];
 	}];
 }
 
 - (IBAction)toggleLineNumbers:(id)sender
 {
-	[self enableLineNumbers:[sender state] == NSOffState];
+	[self enableLineNumbers:[sender state] == NSOffState relative:[[NSUserDefaults standardUserDefaults] boolForKey:@"relativenumber"]];
 }
 
 #pragma mark -

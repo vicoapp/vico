@@ -2608,6 +2608,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"number", @"nu",
 		@"number", @"num",
 		@"number", @"numb",
+		@"relativenumber", @"rnu",
 		@"autocollapse", @"ac",  // automatically collapses other documents in the symbol list
 		@"hidetab", @"ht",  // hide tab bar for single tabs
 		@"fontsize", @"fs",
@@ -2628,9 +2629,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
-	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
-	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
-	    @"wrapscan", @"clipboard", @"matchparen", @"flashparen", @"linebreak",
+	    @"relativenumber", @"autocollapse", @"hidetab", @"shjwguide", @"searchincr",
+	    @"smartindent", @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs",
+	    @"cursorline", @"gdefault", @"wrapscan", @"clipboard", @"matchparen",
+	    @"flashparen", @"linebreak",
 	    nil];
 
 	NSString *var;

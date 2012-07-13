@@ -287,6 +287,7 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"expandtab",
 	    [NSNumber numberWithBool:YES], @"smarttab",
 	    [NSNumber numberWithBool:YES], @"number",
+	    [NSNumber numberWithBool:NO], @"relativenumber",
 	    [NSNumber numberWithBool:YES], @"autocollapse",
 	    [NSNumber numberWithBool:YES], @"hidetab",
 	    [NSNumber numberWithBool:YES], @"searchincr",

@@ -67,6 +67,7 @@
 							 alpha:1.0];
 		[_backgroundColor retain];
 		[self resetTextAttributes];
+		_relative = NO;
 	}
 	return self;
 }
@@ -80,6 +81,15 @@
 	for (int i = 0; i < 10; i++)
 		[_digits[i] release];
 	[super dealloc];
+}
+
+- (void)setRelative:(BOOL)flag
+{
+	if (_relative != flag) {
+		_relative = flag;
+
+		[self setNeedsDisplay:YES];
+	}
 }
 
 - (void)resetTextAttributes
@@ -117,18 +127,27 @@
 	id oldClientView = [self clientView];
 
 	if (oldClientView != aView &&
-	    [oldClientView isKindOfClass:[NSTextView class]])
+	    [oldClientView isKindOfClass:[NSTextView class]]) {
 		[notificationCenter removeObserver:self
 					      name:ViTextStorageChangedLinesNotification
 					    object:[(NSTextView *)oldClientView textStorage]];
+		[notificationCenter removeObserver:self
+					      name:ViCaretChangedNotification
+					    object:oldClientView];
+	}
 
 	[super setClientView:aView];
 
-	if (aView != nil && [aView isKindOfClass:[NSTextView class]])
+	if (aView != nil && [aView isKindOfClass:[NSTextView class]]) {
 		[notificationCenter addObserver:self
 				       selector:@selector(textStorageDidChangeLines:)
 					   name:ViTextStorageChangedLinesNotification
 					 object:[(NSTextView *)aView textStorage]];
+		[notificationCenter addObserver:self
+				       selector:@selector(caretDidChange:)
+					   name:ViCaretChangedNotification
+					 object:aView];
+	}
 }
 
 - (void)textStorageDidChangeLines:(NSNotification *)notification
@@ -150,6 +169,13 @@
 		[[self nextRunloop] setRuleThickness:thickness];
 }
 
+- (void)caretDidChange:(NSNotification *)notification
+{
+	if (_relative) {
+		[self setNeedsDisplay:YES];
+	}
+}
+
 - (CGFloat)requiredThickness
 {
 	NSUInteger	 lineCount, digits;
@@ -164,11 +190,13 @@
 	return 0;
 }
 
-- (void)drawLineNumber:(NSUInteger)line inRect:(NSRect)rect
+- (void)drawLineNumber:(NSInteger)line inRect:(NSRect)rect
 {
+	NSUInteger absoluteLine = ABS(line);
+
 	do {
-		NSUInteger rem = line % 10;
-		line = line / 10;
+		NSUInteger rem = absoluteLine % 10;
+		absoluteLine = absoluteLine / 10;
 
 		rect.origin.x -= _digitSize.width;
 
@@ -178,7 +206,7 @@
 				fraction:1.0
 			  respectFlipped:YES
 				   hints:nil];
-	} while (line > 0);
+	} while (absoluteLine > 0);
 }
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect
@@ -196,6 +224,7 @@
 	if (![view isKindOfClass:[ViTextView class]])
 		return;
 
+	ViTextView              *textView = (ViTextView *)view;
 	NSLayoutManager         *layoutManager;
 	NSTextContainer         *container;
 	ViTextStorage		*textStorage;
@@ -205,7 +234,7 @@
 
 	layoutManager = [view layoutManager];
 	container = [view textContainer];
-	textStorage = [(ViTextView *)view textStorage];
+	textStorage = [textView textStorage];
 	yinset = [view textContainerInset].height;
 	visibleRect = [[[self scrollView] contentView] bounds];
 
@@ -235,6 +264,7 @@
 		return;
 	}
 
+	NSUInteger currentLine = _relative ? [textView currentLine] : 0;
 	for (; location < NSMaxRange(range); line++) {
 		NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:location];
 		NSRect rect = [layoutManager lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
@@ -249,7 +279,10 @@
 		r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
 		r.size = _digitSize;
 
-		[self drawLineNumber:line inRect:r];
+		NSUInteger numberToDraw = line;
+		if (_relative)
+			numberToDraw -= currentLine;
+		[self drawLineNumber:numberToDraw inRect:r];
 
                 /* Protect against an improbable (but possible due to
                  * preceeding exceptions in undo manager) out-of-bounds

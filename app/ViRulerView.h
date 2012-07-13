@@ -30,7 +30,11 @@
 	NSPoint			 _fromPoint;
 	NSImage			*_digits[10];
 	NSSize			 _digitSize;
+
+	BOOL				 _relative;
 }
+
+- (void)setRelative:(BOOL)flag;
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;
 - (void)resetTextAttributes;

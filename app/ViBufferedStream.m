@@ -612,6 +612,11 @@ fd_read(CFSocketRef s,
 	}
 }
 
+- (void)writeString:(NSString *)aString
+{
+	[self writeData:[aString dataUsingEncoding:NSUTF8StringEncoding]];
+}
+
 - (id)propertyForKey:(NSString *)key
 {
 	DEBUG(@"key is %@", key);

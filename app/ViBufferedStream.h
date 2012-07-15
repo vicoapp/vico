@@ -92,5 +92,6 @@
 
 - (void)write:(const void *)buf length:(NSUInteger)length;
 - (void)writeData:(NSData *)data;
+- (void)writeString:(NSString *)aString;
 
 @end

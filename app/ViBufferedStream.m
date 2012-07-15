@@ -23,11 +23,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/uio.h>
+#include <sys/un.h>
+#include <netdb.h>
+
 #include <unistd.h>
 #include <vis.h>
 
 #import "ViBufferedStream.h"
+#import "ViError.h"
 #include "logging.h"
 
 @implementation ViStreamBuffer
@@ -382,6 +388,109 @@ fd_read(CFSocketRef s,
 	return [self initWithReadDescriptor:fdin
 			    writeDescriptor:fdout
 				   priority:5];
+}
+
+- (id)initWithNode:(NSString *)node
+           service:(NSString *)service
+              type:(int)socktype
+            family:(int)family
+          protocol:(int)proto
+	     error:(NSError **)outError
+{
+	struct sockaddr_un addr;
+	struct addrinfo hints;
+	struct addrinfo *ai, *ai0;
+	int res, fd;
+
+	if (family == AF_UNSPEC && [node hasPrefix:@"/"]) {
+		family = AF_UNIX;
+	}
+
+	if (family == AF_UNIX) {
+		memset(&addr, 0, sizeof(addr));
+		addr.sun_family = AF_UNIX;
+		if (strlcpy(addr.sun_path, [node UTF8String], sizeof(addr.sun_path)) >= sizeof(addr.sun_path)) {
+			if (outError) {
+				*outError = [ViError errorWithFormat:@"Path truncated."];
+			}
+			[self release];
+			return nil;
+		}
+		fd = socket(family, socktype, proto);
+		if (fd >= 0 && connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+			close(fd);
+			fd = -1;
+		}
+	} else {
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = family;
+		hints.ai_socktype = socktype;
+		hints.ai_protocol = proto;
+
+		/* This does blocking DNS resolving. */
+		res = getaddrinfo([node UTF8String], [service UTF8String], &hints, &ai0);
+		if (res != 0) {
+			if (outError) {
+				*outError = [ViError errorWithFormat:@"%@", gai_strerror(res)];
+			}
+			[self release];
+			return nil;
+		}
+
+		for (ai = ai0; ai; ai = ai->ai_next) {
+			fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+			if (fd < 0) {
+				continue;
+			}
+			if (connect(fd, ai->ai_addr, ai->ai_addrlen) < 0) {
+				close(fd);
+				fd = -1;
+				continue;
+			}
+			break;
+		}
+		freeaddrinfo(ai0);
+	}
+
+	if (fd < 0) {
+		if (outError) {
+			*outError = [ViError errorWithFormat:@"Failed to connect to %@:%@: %@", node, service, strerror(errno)];
+		}
+		[self release];
+		return nil;
+	}
+
+	return [self initWithReadDescriptor:fd writeDescriptor:fd priority:5];
+}
+
+- (id)initWithHost:(NSString *)host port:(int)port
+{
+	return [self initWithNode:host
+			  service:[NSString stringWithFormat:@"%i", port]
+			     type:SOCK_STREAM
+			   family:0
+			 protocol:0
+			    error:nil];
+}
+
++ (id)streamWithHost:(NSString *)host port:(int)port
+{
+	return [[[self alloc] initWithHost:host port:port] autorelease];
+}
+
+- (id)initWithLocalSocket:(NSString *)file
+{
+	return [self initWithNode:file
+			  service:nil
+			     type:SOCK_STREAM
+			   family:AF_UNIX
+			 protocol:0
+			    error:nil];
+}
+
++ (id)streamWithLocalSocket:(NSString *)file
+{
+	return [[[self alloc] initWithLocalSocket:file] autorelease];
 }
 
 - (void)open

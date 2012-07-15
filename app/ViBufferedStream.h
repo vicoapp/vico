@@ -70,6 +70,17 @@
 - (id)initWithTask:(NSTask *)task;
 - (BOOL)bidirectional;
 
+- (id)initWithNode:(NSString *)node
+           service:(NSString *)service
+              type:(int)socktype
+            family:(int)family
+          protocol:(int)proto
+	     error:(NSError **)outError;
+- (id)initWithHost:(NSString *)host port:(int)port;
++ (id)streamWithHost:(NSString *)host port:(int)port;
+- (id)initWithLocalSocket:(NSString *)file;
++ (id)streamWithLocalSocket:(NSString *)file;
+
 - (BOOL)hasBytesAvailable;
 - (BOOL)hasSpaceAvailable;
 

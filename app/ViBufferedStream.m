@@ -30,8 +30,6 @@
 #import "ViBufferedStream.h"
 #include "logging.h"
 
-void	 hexdump(const void *data, size_t len, const char *fmt, ...);
-
 @implementation ViStreamBuffer
 
 @synthesize ptr = _ptr;
@@ -113,7 +111,6 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 	} else {
 		DEBUG(@"read %zi bytes from fd %i", ret, _fd_in);
 #ifndef NO_DEBUG
-		hexdump(_buffer, ret, "read data:");
 		char *vis = malloc(ret*4+1);
 		strvisx(vis, _buffer, ret, VIS_WHITE);
 		DEBUG(@"read data: %s", vis);
@@ -158,10 +155,6 @@ void	 hexdump(const void *data, size_t len, const char *fmt, ...);
 		iov[i].iov_len = buf.left;
 		tot += buf.left;
 		i++;
-
-#ifndef NO_DEBUG
-		hexdump(buf.ptr, buf.left, "enqueueing buffer:");
-#endif
 	}
 
 	if (tot == 0) {

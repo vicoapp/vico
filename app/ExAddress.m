@@ -61,7 +61,7 @@
 	switch (_type) {
 	default:
 	case ExAddressNone:
-		return [NSString stringWithFormat:@"<ExAddress %p: none>", self, _offset];
+		return [NSString stringWithFormat:@"<ExAddress %p: none>", self];
 	case ExAddressAbsolute:
 		return [NSString stringWithFormat:@"<ExAddress %p: line %li, offset %li>", self, _line, _offset];
 	case ExAddressSearch:

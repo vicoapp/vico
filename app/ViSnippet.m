@@ -50,7 +50,7 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViTabstop %i@%@: [%@], pipe: [%@], parent: %@, mirror of: %@>",
+	return [NSString stringWithFormat:@"<ViTabstop %ld@%@: [%@], pipe: [%@], parent: %@, mirror of: %@>",
 	    _num, NSStringFromRange(_range), _value, _filter, _parent, _mirror];
 }
 @end
@@ -94,7 +94,7 @@
 	for (ViTabstop *ts in _tabstops) {
 		if (ts.mirror == nil)
 			[env setObject:(ts.value ?: @"")
-				forKey:[NSString stringWithFormat:@"TM_TABSTOP_%i", ts.num]];
+				forKey:[NSString stringWithFormat:@"TM_TABSTOP_%ld", ts.num]];
 	}
 	[env setObject:([self string] ?: @"") forKey:@"TM_SNIPPET"];
 	DEBUG(@"shell environment is %@", env);

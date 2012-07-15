@@ -151,7 +151,7 @@
 - (ViDocumentView *)cloneView:(ViDocumentView *)oldView;
 - (void)removeView:(ViDocumentView *)aDocumentView;
 - (void)addView:(ViDocumentView *)aDocumentView;
-- (void)enableLineNumbers:(BOOL)flag forScrollView:(NSScrollView *)aScrollView;
+- (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative forScrollView:(NSScrollView *)aScrollView;
 - (ViWindowController *)windowController;
 - (void)closeWindowController:(ViWindowController *)aController;
 - (NSString *)title;

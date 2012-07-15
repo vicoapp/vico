@@ -552,11 +552,11 @@ binaries: $(OBJDIR)/Vico $(OBJDIR)/vicotool $(OBJDIR)/par
 $(OBJC_OBJS): $(OBJDIR)/Vico-prefix.objc.pth
 $(OBJCXX_OBJS): $(OBJDIR)/Vico-prefix.objcxx.pth
 
-$(OBJDIR)/Vico-prefix.objc.pth: app/Vico-prefix.pch
+$(OBJDIR)/Vico-prefix.objc.pth: app/Vico-Prefix.pch
 	mkdir -p $(OBJDIR)
 	$(CC) -x objective-c-header $(CFLAGS) $(OBJCFLAGS) $< -o $@
 
-$(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-prefix.pch
+$(OBJDIR)/Vico-prefix.objcxx.pth: app/Vico-Prefix.pch
 	mkdir -p $(OBJDIR)
 	$(CC) -x objective-c++-header $(CFLAGS) $(OBJCFLAGS) $< -o $@
 

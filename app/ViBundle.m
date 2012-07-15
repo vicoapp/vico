@@ -304,8 +304,8 @@
 
 		NSMutableString *urls = [NSMutableString string];
 		for (url in selectedURLs) {
-			[urls appendFormat:[NSString stringWithFormat:@"'%@' ",
-			    [[url absoluteString] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]]];
+			[urls appendFormat:@"'%@' ",
+			    [[url absoluteString] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]];
 		}
 		[env setObject:[urls stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] forKey:@"TM_SELECTED_URLS"];
 
@@ -316,8 +316,8 @@
 		if ([url isFileURL]) {
 			NSMutableString *paths = [NSMutableString string];
 			for (url in selectedURLs) {
-				[paths appendFormat:[NSString stringWithFormat:@"'%@' ",
-				    [[url path] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]]];
+				[paths appendFormat:@"'%@' ",
+				    [[url path] stringByReplacingOccurrencesOfString:@"'" withString:@"'\\''"]];
 			}
 			[env setObject:[paths stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] forKey:@"TM_SELECTED_FILES"];
 

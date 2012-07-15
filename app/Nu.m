@@ -629,7 +629,7 @@ id _nulist(id firstObject, ...)
         if (lastParameter && ([[lastParameter stringValue] characterAtIndex:0] == '*')) {
             if (numberOfArguments < (numberOfParameters - 1)) {
                 [NSException raise:@"NuIncorrectNumberOfArguments"
-                            format:@"Incorrect number of arguments to block. Received %d but expected %d or more: %@",
+                            format:@"Incorrect number of arguments to block. Received %lu but expected %lu or more: %@",
                  numberOfArguments,
                  numberOfParameters - 1,
                  [parameters stringValue]];
@@ -637,7 +637,7 @@ id _nulist(id firstObject, ...)
         }
         else {
             [NSException raise:@"NuIncorrectNumberOfArguments"
-                        format:@"Incorrect number of arguments to block. Received %d but expected %d: %@",
+                        format:@"Incorrect number of arguments to block. Received %lu but expected %lu: %@",
              numberOfArguments,
              numberOfParameters,
              [parameters stringValue]];
@@ -733,7 +733,7 @@ static id getObjectFromContext(id context, id symbol)
     NSUInteger numberOfParameters = [parameters length];
     if (numberOfArguments != numberOfParameters) {
         [NSException raise:@"NuIncorrectNumberOfArguments"
-                    format:@"Incorrect number of arguments to method. Received %d but expected %d, %@",
+                    format:@"Incorrect number of arguments to method. Received %lu but expected %lu, %@",
          numberOfArguments,
          numberOfParameters,
          [parameters stringValue]];
@@ -1674,7 +1674,7 @@ static static void raise_argc_exception(SEL s, NSUInteger count, NSUInteger give
 {
     if (given != count) {
         [NSException raise:@"NuIncorrectNumberOfArguments"
-                    format:@"Incorrect number of arguments to selector %s. Received %d but expected %d",
+                    format:@"Incorrect number of arguments to selector %s. Received %lu but expected %lu",
          sel_getName(s),
          given,
          count];
@@ -6177,7 +6177,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 - (NSString *) stringValue
 {
-    return [NSString stringWithFormat:@"<%s:%x>", class_getName(object_getClass(self)), (long) self];
+    return [NSString stringWithFormat:@"<%s:%lx>", class_getName(object_getClass(self)), (long) self];
 }
 
 - (id) car
@@ -10184,7 +10184,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"name:%@ start:%f", name, start];
+    return [NSString stringWithFormat:@"name:%@ start:%qu", name, start];
 }
 
 @end

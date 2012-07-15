@@ -39,7 +39,7 @@
 #import "ViMark.h"
 #import "ExCommand.h"
 
-#include <Carbon/carbon.h>
+#include <Carbon/Carbon.h>
 
 #define MESSAGE(fmt, ...)	[(ViWindowController *)[[self window] windowController] message:fmt, ## __VA_ARGS__]
 

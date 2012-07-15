@@ -3091,7 +3091,7 @@ again:
 	else if (command.count == 1)
 		prefix = @".";
 	else if (command.count > 1)
-		prefix = [NSString stringWithFormat:@".,.+%li", command.count - 1];
+		prefix = [NSString stringWithFormat:@".,.+%i", command.count - 1];
 	NSString *exline = [self getExStringForCommand:command prefix:prefix];
 	if (exline == nil)
 		return NO;
@@ -3150,7 +3150,7 @@ again:
 	if (termKey >= 0x20 && termKey < 0xFFFF) {
 		NSString *special = [NSString stringWithKeyCode:termKey];
 		if ([special length] == 1) {
-			[self insertString:[NSString stringWithFormat:@"%C", termKey]];
+			[self insertString:[NSString stringWithFormat:@"%C", (unichar)termKey]];
 			final_location++;
 		} /* otherwise it's a <special> key code, ignore it */
 	} else if (termKey == 0x0D && [self isFieldEditor]) {

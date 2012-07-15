@@ -184,7 +184,7 @@
 - (NSString *)description
 {
 	if ([self isAction])
-		return [NSString stringWithFormat:@"<ViMapping %@: \"%@\", flags 0x%02x>",
+		return [NSString stringWithFormat:@"<ViMapping %@: \"%@\", flags 0x%02lx>",
 		    _keyString, NSStringFromSelector(_action), _flags];
 	else if ([self isExpression])
 		return [NSString stringWithFormat:@"<ViMapping %@: nu expression>",

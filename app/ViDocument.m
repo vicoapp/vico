@@ -219,7 +219,7 @@ DEBUG_FINALIZE();
 	if (string == nil)
 		string = [self suggestEncoding:NULL forData:data];
 
-	return ([string rangeOfString:[NSString stringWithFormat:@"%C", 0]].location != NSNotFound);
+	return ([string rangeOfString:[NSString stringWithFormat:@"%C", (unichar)0]].location != NSNotFound);
 }
 
 - (void)openFailedAlertDidEnd:(NSAlert *)alert

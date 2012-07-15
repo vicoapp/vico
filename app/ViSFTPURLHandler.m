@@ -49,7 +49,7 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn attributesOfItemAtURL:aURL onResponse:aBlock];
 		aBlock(nil, nil, error);
@@ -62,7 +62,7 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn fileExistsAtURL:aURL onResponse:aBlock];
 		aBlock(nil, NO, error);
@@ -75,7 +75,7 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn contentsOfDirectoryAtURL:aURL onResponse:aBlock];
 		aBlock(nil, error);
@@ -88,7 +88,7 @@
 {
 	DEBUG(@"url = %@", aURL);
 
-	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^(SFTPConnection *conn, NSError *error) {
+	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn createDirectory:[aURL path] onResponse:aBlock];
 		aBlock(error);
@@ -103,7 +103,7 @@
 	DEBUG(@"%@ -> %@", srcURL, dstURL);
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:srcURL
-							onConnect:^(SFTPConnection *conn, NSError *error) {
+							onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn moveItemAtURL:srcURL
 					     toURL:dstURL
@@ -119,7 +119,7 @@
 	DEBUG(@"url = %@", aURL);
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-							onConnect:^(SFTPConnection *conn, NSError *error) {
+							onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn removeItemAtPath:[aURL path] onResponse:aBlock];
 		aBlock(error);
@@ -131,7 +131,7 @@
 		       onCompletion:(void (^)(NSError *))aBlock
 {
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:[urls objectAtIndex:0]
-							onConnect:^(SFTPConnection *conn, NSError *error) {
+							onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn removeItemsAtURLs:urls onResponse:aBlock];
 		aBlock(error);
@@ -146,7 +146,7 @@
 	DEBUG(@"url = %@", aURL);
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-							onConnect:^(SFTPConnection *conn, NSError *error) {
+							onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn dataWithContentsOfURL:aURL
 						    onData:dataCallback
@@ -163,7 +163,7 @@
 	DEBUG(@"url = %@", aURL);
 
 	return [[SFTPConnectionPool sharedPool] connectionWithURL:aURL
-							onConnect:^(SFTPConnection *conn, NSError *error) {
+							onConnect:^SFTPRequest *(SFTPConnection *conn, NSError *error) {
 		if (!error)
 			return [conn writeDataSafely:data toURL:aURL onResponse:aBlock];
 		aBlock(nil, nil, error);

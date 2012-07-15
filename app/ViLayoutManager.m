@@ -40,8 +40,8 @@
 
 	[_invisiblesAttributes setObject:[ViThemeStore font] forKey:NSFontAttributeName];
 
-	NSString *newlineChar = [NSString stringWithFormat:@"%C", 0x21A9];
-	NSString *tabChar = [NSString stringWithFormat:@"%C", 0x21E5];
+	NSString *newlineChar = [NSString stringWithFormat:@"%C", (unichar)0x21A9];
+	NSString *tabChar = [NSString stringWithFormat:@"%C", (unichar)0x21E5];
 	NSString *spaceChar = @"･";
 
 	[_newlineImage release];

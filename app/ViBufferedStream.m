@@ -555,6 +555,11 @@ fd_read(CFSocketRef s,
 		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)mode);
 }
 
+- (void)schedule
+{
+        [self scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
 - (void)removeFromRunLoop:(NSRunLoop *)aRunLoop forMode:(NSString *)mode
 {
 	DEBUG(@"removing from mode %@", mode);

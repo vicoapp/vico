@@ -87,6 +87,8 @@
 - (void)shutdownWrite;
 - (void)shutdownRead;
 
+- (void)schedule;
+
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len;
 - (NSData *)data;
 

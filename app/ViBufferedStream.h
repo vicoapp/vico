@@ -70,16 +70,30 @@
 - (id)initWithTask:(NSTask *)task;
 - (BOOL)bidirectional;
 
+- (id)initWithNode:(NSString *)node
+           service:(NSString *)service
+              type:(int)socktype
+            family:(int)family
+          protocol:(int)proto
+	     error:(NSError **)outError;
+- (id)initWithHost:(NSString *)host port:(int)port;
++ (id)streamWithHost:(NSString *)host port:(int)port;
+- (id)initWithLocalSocket:(NSString *)file;
++ (id)streamWithLocalSocket:(NSString *)file;
+
 - (BOOL)hasBytesAvailable;
 - (BOOL)hasSpaceAvailable;
 
 - (void)shutdownWrite;
 - (void)shutdownRead;
 
+- (void)schedule;
+
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len;
 - (NSData *)data;
 
 - (void)write:(const void *)buf length:(NSUInteger)length;
 - (void)writeData:(NSData *)data;
+- (void)writeString:(NSString *)aString;
 
 @end

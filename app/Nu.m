@@ -4942,6 +4942,49 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
 
 @end
 
+@implementation NSInputStream(Nu)
+
+- (NSData *)readData
+{
+    NSUInteger bufferLength = 255;
+    uint8_t buffer[bufferLength];
+    NSInteger bytesRead = 0;
+    NSMutableData *data = [NSMutableData dataWithLength:0];
+
+    do {
+        bytesRead = [self read:buffer maxLength:bufferLength];
+
+        [data appendBytes:buffer length:bytesRead];
+    } while (bytesRead && bytesRead == bufferLength);
+
+    return data;
+}
+
+@end
+
+@implementation NSOutputStream(Nu)
+
+- (int)writeData:(NSData *)data
+{
+    NSInteger bytesWritten = 0;
+    NSInteger totalBytesWritten = 0;
+    NSInteger remainingBytes = [data length];
+    const void* bytes = [data bytes];
+
+    do {
+        totalBytesWritten += bytesWritten;
+        remainingBytes -= bytesWritten;
+
+        bytesWritten = [self write:&bytes[totalBytesWritten] maxLength:remainingBytes];
+    } while (bytesWritten > 0 && bytesWritten != remainingBytes);
+
+    if (bytesWritten >= 0)
+        return (int)[data length];
+    else
+        return (int)bytesWritten;
+}
+
+@end
 
 #pragma mark - NuHandler.m
 

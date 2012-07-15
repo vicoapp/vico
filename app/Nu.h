@@ -1212,6 +1212,25 @@
 + (int) fileExistsNamed:(NSString *) filename;
 @end
 
+/*!
+ @category NSInputStream (Nu)
+ @abstract NSInputStream extensions for Nu programming.
+ */
+@interface NSInputStream (Nu)
+/*! Read available data from this stream as an NSData object. */
+- (NSData *)readData;
+@end
+
+/*!
+ @category NSInputStream (Nu)
+ @abstract NSInputStream extensions for Nu programming.
+ */
+@interface NSOutputStream (Nu)
+/*! Write NSData object to this stream. */
+- (int)writeData:(NSData *)data;
+@end
+
+
 #pragma mark -
 #pragma mark Regular Expressions
 

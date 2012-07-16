@@ -103,7 +103,13 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
 		[_jumpList setDelegate:self];
 		_parser = [[ViParser alloc] initWithDefaultMap:[ViMap normalMap]];
 		[self setBaseURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+
+        [[NSUserDefaults standardUserDefaults] addObserver:self
+                                                forKeyPath:@"includedevelopmenu"
+                                                   options:0
+                                                   context:NULL];
 	}
+
 	DEBUG_INIT();
 	return self;
 }
@@ -118,6 +124,7 @@ DEBUG_FINALIZE();
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"undostyle"];
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"includedevelopmenu"];
 
 	NSArray *items = [[openFilesButton menu] itemArray];
 	if ([items count] > 0) {
@@ -368,6 +375,10 @@ DEBUG_FINALIZE();
 	if ([keyPath isEqualToString:@"undostyle"]) {
 		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
 		[_parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
+	} else if ([keyPath isEqualToString:@"includedevelopmenu"]) {
+        BOOL showMenu = [[NSUserDefaults standardUserDefaults] boolForKey:@"includedevelopmenu"];
+
+        [[ViDocumentController sharedDocumentController] showDevelopMenu:showMenu];
 	}
 }
 

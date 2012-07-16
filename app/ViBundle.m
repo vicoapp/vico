@@ -399,12 +399,13 @@
 	return env;
 }
 
-- (ViBundle *)initWithDirectory:(NSString *)bundleDirectory
+- (ViBundle *)initWithDirectory:(NSString *)unexpandedBundleDirectory
 {
 	self = [super init];
 	if (self) {
 		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *plistPath = [bundleDirectory stringByAppendingPathComponent:@"info.plist"];
+		NSString *bundleDirectory = [unexpandedBundleDirectory stringByExpandingTildeInPath];
+		NSString *plistPath = [bundleDirectory  stringByAppendingPathComponent:@"info.plist"];
 		if (![fm fileExistsAtPath:plistPath]) {
 			[self release];
 			return nil;

@@ -35,6 +35,10 @@
 	NSMutableDictionary	*_openDocs;
 }
 
+@property (nonatomic,assign) IBOutlet NSMenuItem *developMenu;
+
+- (void)showDevelopMenu:(BOOL)doShow;
+
 - (void)updateURL:(NSURL *)aURL ofDocument:(NSDocument *)aDocument;
 - (id)documentForURLQuick:(NSURL *)absoluteURL;
 

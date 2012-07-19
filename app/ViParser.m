@@ -27,6 +27,7 @@
 #import "ViError.h"
 #import "NSString-additions.h"
 #import "ViMacro.h"
+#import "ViRegisterManager.h"
 #import "logging.h"
 
 @interface ViParser (private)
@@ -47,6 +48,7 @@
 @synthesize dotCommand = _dotCommand;
 @synthesize lastCommand = _lastCommand;
 @synthesize lastToggleCommand = _lastToggleCommand;
+@synthesize isRecordingMacro = _isRecordingMacro;
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap
 {
@@ -59,6 +61,9 @@
 		_defaultMap = [aMap retain];
 		_totalKeySequence = [[NSMutableArray alloc] init];
 		[self reset];
+
+		_recordedKeys = [[NSMutableString stringWithCapacity:0] retain];
+		_pendingMacroRegister = 0;
 	}
 	DEBUG_INIT();
 	return self;
@@ -66,6 +71,10 @@
 
 - (void)dealloc
 {
+	if (self.isRecordingMacro) {
+		[self stopRecordingMacroAndSave];
+	}
+
 	DEBUG_DEALLOC();
 	[_defaultMap release];
 	[_map release];
@@ -74,6 +83,7 @@
 	[_lastCommand release];
 	[_keySequence release];
 	[_totalKeySequence release];
+	[_recordedKeys release];
 	[super dealloc];
 }
 
@@ -222,6 +232,30 @@
 				        error:outError];
 }
 
+- (void)startRecordingMacro:(unichar)reg
+{
+	if (! self.isRecordingMacro) {
+		self.isRecordingMacro = YES;
+		_pendingMacroRegister = reg;
+	}
+}
+
+- (void)stopRecordingMacroAndSave
+{
+	if (self.isRecordingMacro) {
+		self.isRecordingMacro = NO;
+
+		// Strip out the last character, as it will be the terminating q.
+		NSString *macroContents =
+		    [NSString stringWithString:[_recordedKeys substringToIndex:([_recordedKeys length] - 1)]];
+		[_recordedKeys deleteCharactersInRange:NSMakeRange(0,[_recordedKeys length])];
+
+		[[ViRegisterManager sharedManager] setContent:macroContents ofRegister:_pendingMacroRegister];
+
+		_pendingMacroRegister = 0;
+	}
+}
+
 - (id)pushKey:(NSInteger)keyCode
 {
 	return [self pushKey:keyCode
@@ -240,6 +274,10 @@
         error:(NSError **)outError
 {
 	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], _state);
+
+	if (self.isRecordingMacro) {
+		[_recordedKeys appendString:[NSString stringWithKeyCode:keyCode]];
+	}
 
 	_remainingExcessKeysPtr = excessKeysPtr;
 

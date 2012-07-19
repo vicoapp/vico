@@ -67,6 +67,11 @@ typedef enum {
 
 	// search state (XXX: move to "/ register?)
 	int		 _lastSearchOptions;
+
+	// Macro recording.
+	BOOL                 _isRecordingMacro;
+	NSMutableString     *_recordedKeys;
+	unichar              _pendingMacroRegister;
 }
 
 /** Change the current key map.
@@ -82,6 +87,8 @@ typedef enum {
 @property(nonatomic,readwrite,retain) ViCommand *lastCommand;
 @property(nonatomic,readwrite,retain) ViCommand *lastToggleCommand;
 @property(nonatomic,readwrite,retain) ViCommand *lastLineSearchCommand;
+
+@property(nonatomic,readwrite) BOOL isRecordingMacro;
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap;
 
@@ -102,6 +109,12 @@ typedef enum {
 
 - (id)timeoutInScope:(ViScope *)scope
                error:(NSError **)outError;
+
+/** Start recording a macro to be saved in the given register. */
+- (void)startRecordingMacro:(unichar)reg;
+/** Stop recording the macro and save its contents to the appropriate register.
+ */
+- (void)stopRecordingMacroAndSave;
 
 /** Reset the parser.
  *

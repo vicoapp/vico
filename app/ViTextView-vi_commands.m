@@ -2200,10 +2200,9 @@
 	final_location = start_location;
 	[self changeIndentation:(mode == ViVisualMode ? IMAX(1, command.count) : 1)
 			inRange:affectedRange
-		    updateCaret:NULL
+		    updateCaret:&final_location
 		 alignToTabstop:NO
 	       indentEmptyLines:NO];
-	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;
 }
 
@@ -2216,10 +2215,9 @@
 	final_location = start_location;
 	[self changeIndentation:(mode == ViVisualMode ? IMIN(-1, -command.count) : -1)
 			inRange:affectedRange
-		    updateCaret:NULL
+		    updateCaret:&final_location
 		 alignToTabstop:NO
 	       indentEmptyLines:NO];
-	final_location = [[self textStorage] firstNonBlankForLineAtLocation:affectedRange.location];
 	return YES;
 }
 

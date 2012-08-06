@@ -2214,6 +2214,8 @@ replaceCharactersInRange:(NSRange)aRange
 
 	BOOL leaveVisualMode = NO;
 	if (mode == ViVisualMode && !command.isMotion &&
+	    command.action != @selector(shift_right:) &&
+	    command.action != @selector(shift_left:) &&
 	    command.action != @selector(visual:) &&
 	    command.action != @selector(visual_other:) &&
 	    command.action != @selector(visual_line:)) {

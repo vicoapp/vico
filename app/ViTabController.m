@@ -194,6 +194,11 @@
 	DEBUG(@"adding view %@ = %@", [newViewController view], newViewController);
 	DEBUG(@"subviews = %@", [split subviews]);
 
+    BOOL splitright = [[NSUserDefaults standardUserDefaults] boolForKey:@"splitright"];
+    if(splitright == NSOnState){
+      position = ViViewPositionSplitRight;
+    }
+
 	BOOL isVertical = (position == ViViewPositionSplitLeft || position == ViViewPositionSplitRight);
 	NSWindowOrderingMode mode;
 	if (isVertical)

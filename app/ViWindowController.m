@@ -2613,13 +2613,14 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		@"linebreak", @"lbr",
 		@"blinktime", @"blinktime",
 		@"blinkmode", @"blinkmode",
+        @"splitright", @"spr",
 		nil];
 
 	NSArray *booleans = [NSArray arrayWithObjects:
 	    @"autoindent", @"expandtab", @"smartpair", @"ignorecase", @"smartcase", @"number",
 	    @"autocollapse", @"hidetab", @"showguide", @"searchincr", @"smartindent",
 	    @"wrap", @"antialias", @"list", @"smarttab", @"prefertabs", @"cursorline", @"gdefault",
-	    @"wrapscan", @"clipboard", @"matchparen", @"flashparen", @"linebreak",
+	    @"wrapscan", @"clipboard", @"matchparen", @"flashparen", @"linebreak", @"splitright",
 	    nil];
 
 	NSString *var;

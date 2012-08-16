@@ -304,6 +304,7 @@ updateMeta(void)
 	    [NSNumber numberWithInt:80], @"guidecolumn",
 	    [NSNumber numberWithFloat:12.0], @"fontsize",
 	    [NSNumber numberWithFloat:0.75], @"blinktime",
+	    [NSNumber numberWithBool:NO], @"splitright",
 	    @"none", @"blinkmode",
 	    @"Monaco", @"fontname",
 	    @"vim", @"undostyle",

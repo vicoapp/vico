@@ -1,5 +1,4 @@
 (let ((ex (ExMap defaultMap)))
-    (ex define:"!"              syntax:"rex|"   as:"ex_bang:")
     (ex define:"#"              syntax:"rc"     as:"ex_goto:")
     ;(ex define:"&"             syntax:"em"     as:"ex_subagain:")
     ;(ex define:'("*" "@")      syntax:"R"      as:"ex_at:")

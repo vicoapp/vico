@@ -72,7 +72,8 @@ id returnObject = nil;
 void
 usage(void)
 {
-	printf("syntax: vicotool [-hrw] [-e string] [-f file] [-p params] [file ...]\n");
+	printf("syntax: vicotool [options] [file ...]    edit specified file(s)\n");
+	printf("    or: vicotool [options] -             read text from stdin\n");
 	printf("options:\n");
 	printf("    -h            show this help\n");
 	printf("    -e string     evaluate the string as a Nu script\n");

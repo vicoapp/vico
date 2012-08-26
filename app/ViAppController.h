@@ -54,6 +54,10 @@ additionalBindings:(NSDictionary *)bindings
              andWait:(BOOL)waitFlag
          backChannel:(NSString *)channelName;
 - (NSError *)openURL:(NSString *)pathOrURL;
+- (NSError *)newDocumentWithData:(NSData *)data
+                         andWait:(BOOL)waitFlag
+                     backChannel:(NSString *)channelName;
+- (NSError *)newDocumentWithData:(NSData *)data;
 - (IBAction)newProject:(id)sender;
 
 @end

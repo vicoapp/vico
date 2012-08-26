@@ -156,6 +156,7 @@
 - (void)closeWindowController:(ViWindowController *)aController;
 - (NSString *)title;
 - (void)setString:(NSString *)aString;
+- (void)setData:(NSData *)data;
 - (void)closeAndWindow:(BOOL)canCloseWindow;
 - (BOOL)isEntireFileLoaded;
 

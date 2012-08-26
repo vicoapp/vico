@@ -266,6 +266,14 @@ main(int argc, char **argv)
 
 		for (i = 0; i < argc; i++) {
 			NSString *path = [NSString stringWithUTF8String:argv[i]];
+
+			if (i == 0 && [path isEqualToString:@"-"]) {
+				handle = [NSFileHandle fileHandleWithStandardInput];
+				NSData *data = [handle readDataToEndOfFile];
+				[proxy newDocumentWithData:data andWait:wait_for_close backChannel:backChannelName];
+				break;
+			}
+				
 			if ([path rangeOfString:@"://"].location == NSNotFound) {
 				path = [path stringByExpandingTildeInPath];
 				if (![path isAbsolutePath])

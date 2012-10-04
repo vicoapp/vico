@@ -27,6 +27,7 @@
 #import "ViJumpList.h"
 #import "ViToolbarPopUpButtonCell.h"
 #import "ViSymbolController.h"
+#import "ViStatusView.h"
 #import "ViURLManager.h"
 #import "ViTabController.h"
 #import "ViTextView.h"
@@ -54,7 +55,7 @@
 	IBOutlet ViBgView		*explorerView;		// Top-level nib object
 	IBOutlet NSWindow		*sftpConnectView;	// Top-level nib object
 	IBOutlet ViToolbarPopUpButtonCell *bookmarksButtonCell;
-	IBOutlet NSTextField		*messageField;
+	IBOutlet ViStatusView		*messageView;
 
 	IBOutlet NSPopUpButton		*openFilesButton;
 	IBOutlet ViToolbarPopUpButtonCell *bundleButtonCell;

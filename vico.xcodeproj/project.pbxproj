@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
 		9A260668134A1704002C86FB /* ViCompletionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260667134A1704002C86FB /* ViCompletionController.m */; };
@@ -408,6 +409,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		17F2E3C715E0499800F81089 /* ViStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViStatusView.h; sourceTree = "<group>"; };
+		17F2E3C815E0499800F81089 /* ViStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViStatusView.m; sourceTree = "<group>"; };
 		9A0831961418FE9D00D1805D /* ViMarkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkManager.h; sourceTree = "<group>"; };
 		9A0831971418FE9D00D1805D /* ViMarkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViMarkManager.m; sourceTree = "<group>"; };
 		9A26065C134849CC002C86FB /* ExTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExTextField.h; sourceTree = "<group>"; };
@@ -1238,6 +1241,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				17F2E3C715E0499800F81089 /* ViStatusView.h */,
+				17F2E3C815E0499800F81089 /* ViStatusView.m */,
 				9AA9272514D5B55900F0E02F /* Nu.h */,
 				9AA9272614D5B55900F0E02F /* Nu.m */,
 				9AF6A7051435BAA300FB373B /* ViViewController.h */,
@@ -2083,6 +2088,7 @@
 				9AF6A7031434ABB200FB373B /* NSWindow-additions.m in Sources */,
 				9AF6A7071435BAA300FB373B /* ViViewController.m in Sources */,
 				9AA9272714D5B55900F0E02F /* Nu.m in Sources */,
+				17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2362,6 +2368,7 @@
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "app/Vico-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2555,6 +2562,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
 				INFOPLIST_FILE = "app/Vico-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2584,6 +2592,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "app/Vico-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",

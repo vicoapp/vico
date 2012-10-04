@@ -488,12 +488,32 @@ DEBUG_FINALIZE();
 
 - (void)showMessage:(NSString *)string
 {
-	[messageField setStringValue:string];
+	[messageView setMessage:string];
 }
 
 - (void)message:(NSString *)fmt arguments:(va_list)ap
 {
-	[messageField setStringValue:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]];
+	//[messageView setMessage:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]];
+
+	ViStatusLabel *label = [[ViStatusLabel alloc] initWithText:@"BOOM"];
+	ViStatusLabel *label2 = [[ViStatusLabel alloc] initWithText:@"BAM"];
+
+	ViStatusLabel *centerLabel = [[ViStatusLabel alloc] initWithText:@"Test it out"];
+	centerLabel.alignment = @"center";
+
+	ViStatusLabel *rightLabel = [[ViStatusLabel alloc] initWithText:@"BAM"];
+	ViStatusLabel *rightLabel2 = [[ViStatusLabel alloc] initWithText:@"SLAM"];
+
+	/*NSString *separator = @"%=";
+
+	NSTextField *field3 = [[NSTextField alloc] init];
+	[field3 setBezeled:NO];
+	[field3 setDrawsBackground:NO];
+	[field3 setEditable:NO];
+	[field3 setSelectable:NO];
+	[field3 setStringValue:@"BAZAM"];*/
+
+	[messageView setStatusComponents:[NSArray arrayWithObjects:label, label2, centerLabel, @"%=", rightLabel, rightLabel2, nil]];
 }
 
 - (void)message:(NSString *)fmt, ...
@@ -2295,7 +2315,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	_exBusy = YES;
 	_exString = nil;
 
-	[messageField setHidden:YES];
+	[messageView setHidden:YES];
 	[statusbar setHidden:NO];
 	[statusbar setSelectable:NO];
 	[statusbar setEditable:YES];
@@ -2326,7 +2346,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[statusbar setStringValue:@""];
 	[statusbar setEditable:NO];
 	[statusbar setHidden:YES];
-	[messageField setHidden:NO];
+	[messageView setHidden:NO];
 	[self focusEditor];
 
 	NSString *ret = [_exString autorelease];

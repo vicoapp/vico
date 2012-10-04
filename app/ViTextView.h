@@ -206,7 +206,6 @@
 - (void)gotoScreenColumn:(NSUInteger)column fromGlyphIndex:(NSUInteger)glyphIndex;
 
 - (void)resetSelection;
-- (void)updateStatus;
 
 /** Set normal mode.
  */

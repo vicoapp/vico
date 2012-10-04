@@ -101,6 +101,11 @@
 			[self setNormalMode];
 			[self resetSelection];
 			return NO;
+		} else {
+			// Trigger a notification that the mode changed. Otherwise,
+			// anyone watching for mode changes will still think we're in
+			// regular visual mode.
+			[self setVisualMode];
 		}
 	} else {
 		visual_start_location = [self caret];

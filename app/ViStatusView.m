@@ -312,3 +312,42 @@
 }
 
 @end
+
+@implementation ViStatusNotificationLabel
+
+@synthesize notificationTransformer = _notificationTransformer;
+
++ (ViStatusNotificationLabel *)statusLabelForNotification:(NSString *)notification withTransformer:(NotificationTransformer)transformer
+{
+	return [[self alloc] initWithNotification:notification transformer:transformer];
+}
+
+- (ViStatusNotificationLabel *)initWithNotification:(NSString *)notification transformer:(NotificationTransformer)transformer
+{
+	if (self = [super initWithText:@""]) {
+		self.notificationTransformer = transformer;
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
+									             selector:@selector(changeOccurred:)
+		                                             name:notification
+		                                           object:nil];
+	}
+
+	return self;
+}
+
+- (void)changeOccurred:(NSNotification *)notification
+{
+	[self.control setStringValue:(self.notificationTransformer(notification))];
+	isCacheValid = false;
+	[self adjustSize];
+}
+
+- (void)dealloc
+{
+	[self.notificationTransformer release];
+
+	[super dealloc];
+}
+
+@end

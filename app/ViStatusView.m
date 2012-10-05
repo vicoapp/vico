@@ -64,11 +64,17 @@
 
 	[_messageField setStringValue:message];
 	[_messageField setHidden:NO];
+
+	for (ViStatusComponent *component in _components)
+		[component.control setHidden:YES];
 }
 
 - (void)hideMessage
 {
 	[_messageField setHidden:YES];
+
+	for (ViStatusComponent *component in _components)
+		[component.control setHidden:NO];
 }
 
 #pragma mark --

@@ -255,6 +255,9 @@
 	_cachedX = _control.frame.origin.x;
 
 	isCacheValid = true;
+
+	NSNotification *notification = [NSNotification notificationWithName:ViStatusLineUpdatedNotification object:nil];
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 
 - (NSUInteger)controlX

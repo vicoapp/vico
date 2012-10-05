@@ -41,6 +41,7 @@
 #define ViURLContentsCachedNotification @"ViURLContentsCachedNotification"
 #define ViTextStorageChangedLinesNotification @"ViTextStorageChangedLinesNotification"
 #define ViEditPreferenceChangedNotification @"ViEditPreferenceChangedNotification"
+#define ViStatusLineUpdatedNotification @"ViStatusLineUpdatedNotification"
 
 #define ViFilterRunLoopMode @"ViFilterRunLoopMode"
 

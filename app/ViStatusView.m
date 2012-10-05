@@ -341,9 +341,15 @@
 
 - (void)changeOccurred:(NSNotification *)notification
 {
-	[self.control setStringValue:(self.notificationTransformer(notification))];
-	isCacheValid = false;
-	[self adjustSize];
+	NSString *currentValue = [self.control stringValue];
+	NSString *newValue = self.notificationTransformer(notification);
+
+	// Only make a real update if the new value is different.
+	if (! [currentValue isEqualToString:newValue]) {
+		[self.control setStringValue:(self.notificationTransformer(notification))];
+		isCacheValid = false;
+		[self adjustSize];
+	}
 }
 
 - (void)dealloc

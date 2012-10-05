@@ -33,11 +33,15 @@
 	NSTextField *_messageField;
 }
 
+- (void)awakeFromNib;
+
 - (void)initMessageField;
 - (void)setMessage:(NSString *)message;
 
 - (void)setPatternString:(NSString *)pattern;
 - (void)setStatusComponents:(NSArray *)components;
+
+- (void)statusComponentChanged:(NSNotification *)notification;
 
 - (void)dealloc;
 

@@ -23,19 +23,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ViCommon.h"
 #import "ViStatusView.h"
 
 @implementation ViStatusView
 
-- (ViStatusView *)init
+- (void)awakeFromNib
 {
-	if (self = [super init]) {
-		_messageField = nil;
+	_messageField = nil;
 
-		[self setAutoresizesSubviews:YES];
-	}
+	[self setAutoresizesSubviews:YES];
 
-	return self;
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(statusComponentChanged:)
+												 name:ViStatusLineUpdatedNotification
+											   object:nil];
 }
 
 #pragma mark --
@@ -135,12 +137,19 @@
 	_components = components;
 }
 
+- (void)statusComponentChanged:(NSNotification *)notification
+{
+	[self hideMessage];
+}
+
 #pragma mark --
 #pragma mark Housekeeping
 
 - (void)dealloc
 {
 	[_components makeObjectsPerformSelector:@selector(release)];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	[super dealloc];
 }

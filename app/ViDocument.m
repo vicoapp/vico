@@ -357,6 +357,15 @@ DEBUG_FINALIZE();
 	return returnError == nil ? YES : NO;
 }
 
+- (void)setBusy:(BOOL)value
+{
+	_busy = value;
+
+	// Also post a mode change notification.
+	NSNotification *notification = [NSNotification notificationWithName:ViModeChangedNotification object:self];
+	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+}
+
 - (BOOL)isEntireFileLoaded
 {
 	return (_loader == nil);

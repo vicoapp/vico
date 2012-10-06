@@ -113,6 +113,26 @@ typedef NSString *(^NotificationTransformer)(NSNotification *);
 
 @end
 
+typedef NSAttributedString *(^AttributedNotificationTransformer)(NSNotification *);
+
+@interface ViStatusNotificationAttributedLabel : ViStatusLabel
+{
+	AttributedNotificationTransformer _notificationTransformer;
+}
+
+@property (nonatomic,copy) AttributedNotificationTransformer notificationTransformer;
+
++ (ViStatusNotificationAttributedLabel *)statusLabelForNotification:(NSString *)notification withTransformer:(AttributedNotificationTransformer)transformer;
+
+- (ViStatusNotificationAttributedLabel *)init;
+
+- (ViStatusNotificationAttributedLabel *)initWithNotification:(NSString *)notification transformer:(AttributedNotificationTransformer)transformer;
+
+- (void)changeOccurred:(NSNotification *)notification;
+
+- (void)dealloc;
+
+@end
 
 // ViStatusCursorLabel
 // ViStatusModeLabel

@@ -388,9 +388,64 @@
 
 	// Only make a real update if the new value is different.
 	if (! [currentValue isEqualToString:newValue]) {
-		[self.control setStringValue:(self.notificationTransformer(notification))];
-		isCacheValid = false;
-		[self adjustSize];
+		[self.control setStringValue:newValue];
+		[self invalidateSize];
+	}
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self.notificationTransformer release];
+
+	[super dealloc];
+}
+
+@end
+
+@implementation ViStatusNotificationAttributedLabel
+
+@synthesize notificationTransformer = _notificationTransformer;
+
++ (ViStatusNotificationAttributedLabel *)statusLabelForNotification:(NSString *)notification withTransformer:(AttributedNotificationTransformer)transformer
+{
+	return [[ViStatusNotificationAttributedLabel alloc] initWithNotification:notification transformer:transformer];
+}
+
+- (ViStatusNotificationAttributedLabel *)init {
+	if (self = [super init]) {
+		NSTextField *field = (NSTextField *)self.control;
+
+		[field setAllowsEditingTextAttributes:YES];
+	}
+
+	return self;
+}
+
+- (ViStatusNotificationAttributedLabel *)initWithNotification:(NSString *)notification transformer:(AttributedNotificationTransformer)transformer
+{
+	if (self = [super initWithText:@""]) {
+		self.notificationTransformer = transformer;
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
+									             selector:@selector(changeOccurred:)
+		                                             name:notification
+		                                           object:nil];
+	}
+
+	return self;
+}
+
+- (void)changeOccurred:(NSNotification *)notification
+{
+	NSAttributedString *currentValue = [self.control attributedStringValue];
+	NSAttributedString *newValue = self.notificationTransformer(notification);
+
+	// Only make a real update if the new value is different.
+	if (! [currentValue isEqualToAttributedString:newValue]) {
+	  NSLog(@"Setting value %@ on %@", newValue, self.control);
+		[self.control setAttributedStringValue:newValue];
+		[self invalidateSize];
 	}
 }
 

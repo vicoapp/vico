@@ -48,10 +48,10 @@
 
 @end
 
-#define ViStatusComponentAlignLeft @"left"
-#define ViStatusComponentAlignCenter @"center"
-#define ViStatusComponentAlignRight @"right"
-#define ViStatusComponentAlignAutomatic @"automatic"
+#define ViStatusComponentAlignLeft @"alignLeft"
+#define ViStatusComponentAlignCenter @"alignCenter"
+#define ViStatusComponentAlignRight @"alignRight"
+#define ViStatusComponentAlignAutomatic @"alignAutomatic"
 
 @interface ViStatusComponent : NSView
 {

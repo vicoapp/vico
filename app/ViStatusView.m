@@ -104,18 +104,18 @@
 
 	NSLog(@"Setting things to %@", components);
 
-	__block BOOL isLeftAligned = true;
+	__block NSString *currentAlignment = ViStatusComponentAlignLeft;
 	__block ViStatusComponent *lastComponent = nil;
 	[components enumerateObjectsUsingBlock:^(id component, NSUInteger i, BOOL *stop) {
 		if ([component isEqual:@"%="]) {
-			isLeftAligned = false;
+			currentAlignment = ViStatusComponentAlignRight;
 		}
 
 		if ([component isKindOfClass:[ViStatusComponent class]]) {
 			ViStatusComponent *statusComponent = (ViStatusComponent *)component;
 
-			if (! isLeftAligned) {
-				statusComponent.alignment = ViStatusComponentAlignRight;
+			if ([statusComponent.alignment isEqualToString:ViStatusComponentAlignAutomatic]) {
+				statusComponent.alignment = currentAlignment;
 			}
 
 			[component retain];
@@ -179,6 +179,7 @@
 		_previousComponent = nil;
 		_nextComponent = nil;
 		_control = nil;
+		_alignment = ViStatusComponentAlignAutomatic;
 	}
 
 	return self;
@@ -202,6 +203,12 @@
 - (void)addViewTo:(NSView *)parentView
 {
 	[parentView addSubview:_control];
+}
+
+- (void)invalidateSize
+{
+	isCacheValid = NO;
+	[self adjustSize];
 }
 
 - (void)adjustSize
@@ -265,14 +272,34 @@
 	}
 
 	[self.control setAutoresizingMask:resizingMask];
-	[self.control setFrame:CGRectMake(xPosition, 0, _cachedWidth, parentView.frame.size.height + 1)];
+	[self.control setFrame:CGRectMake(xPosition, 0, _cachedWidth, _control.frame.size.height)];
 
 	_cachedX = _control.frame.origin.x;
 
-	isCacheValid = true;
+	isCacheValid = YES;
 
 	NSNotification *notification = [NSNotification notificationWithName:ViStatusLineUpdatedNotification object:nil];
 	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
+
+	// Okay, now let's see if we need to invalidate anyone else.
+	NSLog(@"Checking for %@", self.alignment);
+	if ([self.alignment isEqualToString:ViStatusComponentAlignLeft]) {
+		ViStatusComponent *currentComponent = self.nextComponent;
+		NSLog(@"Invalidating size for %@", currentComponent);
+		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignLeft || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+			NSLog(@"Invalidating size for %@", currentComponent);
+			[currentComponent invalidateSize];
+
+			currentComponent = currentComponent.nextComponent;
+		}
+	} else if ([self.alignment isEqualToString:ViStatusComponentAlignRight]) {
+		ViStatusComponent *currentComponent = self.previousComponent;
+		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignRight || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+			[currentComponent invalidateSize];
+
+			currentComponent = currentComponent.previousComponent;
+		}
+	}
 }
 
 - (NSUInteger)controlX

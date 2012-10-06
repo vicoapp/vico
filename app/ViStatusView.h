@@ -75,6 +75,7 @@
 - (void)addViewTo:(NSView *)parentView;
 - (void)removeFromSuperview;
 
+- (void)invalidateSize;
 - (void)adjustSize;
 - (NSUInteger)controlX;
 - (NSUInteger)controlWidth;

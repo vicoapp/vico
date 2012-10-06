@@ -345,7 +345,7 @@ DEBUG_FINALIZE();
 				  modestr = "--VISUAL--";
 		  }
 
-		  return [NSString stringWithFormat:@"   %s", modestr];
+		  return [NSString stringWithFormat:@"    %s", modestr];
 	  }];
 
 	[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];

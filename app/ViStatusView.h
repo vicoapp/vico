@@ -40,6 +40,7 @@
 
 - (void)setPatternString:(NSString *)pattern;
 - (void)setStatusComponents:(NSArray *)components;
+- (NSArray *)statusComponents;
 
 - (void)statusComponentChanged:(NSNotification *)notification;
 
@@ -67,7 +68,7 @@
 @property (retain,readwrite) NSControl *control;
 @property (assign,readwrite,nonatomic) ViStatusComponent *nextComponent;
 @property (assign,readwrite,nonatomic) ViStatusComponent *previousComponent;
-@property (assign,readwrite,nonatomic) NSString *alignment;
+@property (retain,readwrite,nonatomic) NSString *alignment;
 
 - (ViStatusComponent *)init;
 - (ViStatusComponent *)initWithControl:(NSControl *)control;

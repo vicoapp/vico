@@ -196,6 +196,8 @@ int logIndent = 0;
 	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 	[self setCaret:0];
 	[self updateFont];
+
+	[self postModeChangedNotification];
 }
 
 - (NSPoint)textContainerOrigin

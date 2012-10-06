@@ -143,6 +143,11 @@
 	_components = components;
 }
 
+- (NSArray *)statusComponents
+{
+	return _components;
+}
+
 - (void)statusComponentChanged:(NSNotification *)notification
 {
 	[self hideMessage];
@@ -187,7 +192,7 @@
 
 - (ViStatusComponent *)initWithControl:(NSControl *)control
 {
-	if (self = [self init]) {
+	if (self = [ViStatusComponent init]) {
 		self.control = control;
 	}
 
@@ -251,7 +256,7 @@
 		NSUInteger startingPoint = centerPoint - (totalWidth / 2);
 
 		xPosition = startingPoint + prevWidth;
-	} else if (_alignment == ViStatusComponentAlignRight) {
+	} else if ([self.alignment isEqualToString:ViStatusComponentAlignRight]) {
 		resizingMask |= NSViewMinXMargin;
 
 		// For right, ask the next item for its x value. If we are the last
@@ -350,7 +355,7 @@
 - (ViStatusLabel *)initWithText:(NSString *)text
 {
 	if (self = [self init]) {
-		[_control setStringValue:text];
+		[self.control setStringValue:text];
 	}
 
 	return self;

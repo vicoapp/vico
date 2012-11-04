@@ -405,8 +405,12 @@
 	NSString *currentValue = [self.control stringValue];
 	NSString *newValue = @"";
 
+	ViStatusView *statusView = (ViStatusView *)[_control superview];
+
 	if (self.notificationTransformerBlock) {
-		NuCell *arguments = [[NSArray arrayWithObject:notification] list];
+		id args[2] = { statusView, notification };
+		if (! args[0]) args[0] = [NSNull null];
+		NuCell *arguments = [[NSArray arrayWithObjects:args count:2] list];
 
 		id result = [self.notificationTransformerBlock evalWithArguments:arguments context:[self.notificationTransformerBlock context]];
 
@@ -418,7 +422,7 @@
 			INFO(@"Expecting NSString for notification transformer result but got %@.", result);
 		}
 	} else {
-		NSString *result = self.notificationTransformer(notification);
+		NSString *result = self.notificationTransformer(statusView, notification);
 
 		if (! result) {
 			newValue = currentValue;
@@ -482,10 +486,10 @@
 - (void)changeOccurred:(NSNotification *)notification
 {
 	NSAttributedString *currentValue = [self.control attributedStringValue];
-	NSAttributedString *newValue = self.notificationTransformer((ViStatusView *)[self superview], notification);
+	NSAttributedString *newValue = self.notificationTransformer((ViStatusView *)[_control superview], notification);
 
 	// Only make a real update if the new value is different.
-	if (! [currentValue isEqualToAttributedString:newValue]) {
+	if (newValue && ! [currentValue isEqualToAttributedString:newValue]) {
 	  NSLog(@"Setting value %@ on %@", newValue, self.control);
 		[self.control setAttributedStringValue:newValue];
 		[self invalidateSize];

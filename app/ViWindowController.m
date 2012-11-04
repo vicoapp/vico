@@ -330,37 +330,37 @@ DEBUG_FINALIZE();
 		}
 	} else {
 		ViStatusNotificationLabel *caretLabel =
-		  [ViStatusNotificationLabel statusLabelForNotification:ViCaretChangedNotification
-												withTransformer:^(NSNotification *notification) {
-			  ViTextView *textView = (ViTextView *)[notification object];
+			[ViStatusNotificationLabel statusLabelForNotification:ViCaretChangedNotification
+												  withTransformer:^(ViStatusView *statusView, NSNotification *notification) {
+				ViTextView *textView = (ViTextView *)[notification object];
 
-			  return [NSString stringWithFormat:@"%lu,%lu",
-				  (unsigned long)[textView currentLine],
-				  (unsigned long)[textView currentColumn]];
+				return [NSString stringWithFormat:@"%lu,%lu",
+					(unsigned long)[textView currentLine],
+					(unsigned long)[textView currentColumn]];
 		  }];
 		ViStatusNotificationLabel *modeLabel =
-		  [ViStatusNotificationLabel statusLabelForNotification:ViModeChangedNotification
-												withTransformer:^(NSNotification *notification) {
-			  ViTextView *textView = (ViTextView *)[notification object];
-			  ViDocument *document = textView.document;
+			[ViStatusNotificationLabel statusLabelForNotification:ViModeChangedNotification
+												withTransformer:^(ViStatusView *statusView, NSNotification *notification) {
+				ViTextView *textView = (ViTextView *)[notification object];
+				ViDocument *document = textView.document;
 
-			  const char *modestr = "";
-			  if (document.busy) {
-				  modestr = "--BUSY--";
-			  } else if (textView.mode == ViInsertMode) {
-				  if (document.snippet)
-					  modestr = "--SNIPPET--";
-				  else
-					  modestr = "--INSERT--";
-			  } else if (textView.mode == ViVisualMode) {
-				  if (textView.visual_line_mode)
-					  modestr = "--VISUAL LINE--";
-				  else
-					  modestr = "--VISUAL--";
-			  }
+				const char *modestr = "";
+				if (document.busy) {
+					modestr = "--BUSY--";
+				} else if (textView.mode == ViInsertMode) {
+					if (document.snippet)
+						modestr = "--SNIPPET--";
+					else
+						modestr = "--INSERT--";
+				} else if (textView.mode == ViVisualMode) {
+					if (textView.visual_line_mode)
+						modestr = "--VISUAL LINE--";
+					else
+						modestr = "--VISUAL--";
+				}
 
-			  return [NSString stringWithFormat:@"    %s", modestr];
-		  }];
+				return [NSString stringWithFormat:@"    %s", modestr];
+			}];
 
 		[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];
 	}

@@ -96,7 +96,7 @@
 
 @end
 
-typedef NSString *(^NotificationTransformer)(NSNotification *);
+typedef NSString *(^NotificationTransformer)(ViStatusView *, NSNotification *);
 
 @interface ViStatusNotificationLabel : ViStatusLabel
 {
@@ -118,7 +118,7 @@ typedef NSString *(^NotificationTransformer)(NSNotification *);
 
 @end
 
-typedef NSAttributedString *(^AttributedNotificationTransformer)(NSNotification *);
+typedef NSAttributedString *(^AttributedNotificationTransformer)(ViStatusView *, NSNotification *);
 
 @interface ViStatusNotificationAttributedLabel : ViStatusLabel
 {

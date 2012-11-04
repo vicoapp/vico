@@ -346,7 +346,7 @@ DEBUG_FINALIZE();
 
 				// If this is the ex box (which has no superview) or this is not
 				// for the current window, we bail on out.
-				if (! [textView superview])
+				if (! [textView superview] || [statusView window] != [textView window])
 					return (id)nil;
 
 				const char *modestr = "";

@@ -10,6 +10,7 @@
   (let (text-view (notification object))
     (cond
       ((eq (text-view superview) nil) nil)
+      ((!= (text-view window) (status-view window)) nil)
       (else
         (let ((document (text-view document))
               (current-mode (text-view mode)))
@@ -32,7 +33,7 @@
 (function vi-status-mode-label ()
   ((ViStatusNotificationLabel alloc)
            initWithNotification:"ViModeChangedNotification"
-               transformerBlock:(do (notification) (mode-for-notification notification))))
+               transformerBlock:(do (status-view notification) (mode-for-notification status-view notification))))
 
 # Set up default status bar.
 ((NSApp delegate) setStatusSetupBlock:

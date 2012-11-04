@@ -410,13 +410,21 @@
 
 		id result = [self.notificationTransformerBlock evalWithArguments:arguments context:[self.notificationTransformerBlock context]];
 
-		if ([result isKindOfClass:[NSString class]]) {
+		if (! result) {
+			newValue = currentValue;
+		} else if ([result isKindOfClass:[NSString class]]) {
 			newValue = result;
 		} else {
-		  INFO(@"Expecting NSString for notification transformer result but got %@.", result);
+			INFO(@"Expecting NSString for notification transformer result but got %@.", result);
 		}
 	} else {
-		newValue = self.notificationTransformer(notification);
+		NSString *result = self.notificationTransformer(notification);
+
+		if (! result) {
+			newValue = currentValue;
+		} else {
+			newValue = result;
+		}
 	}
 
 	// Only make a real update if the new value is different.
@@ -474,7 +482,7 @@
 - (void)changeOccurred:(NSNotification *)notification
 {
 	NSAttributedString *currentValue = [self.control attributedStringValue];
-	NSAttributedString *newValue = self.notificationTransformer(notification);
+	NSAttributedString *newValue = self.notificationTransformer((ViStatusView *)[self superview], notification);
 
 	// Only make a real update if the new value is different.
 	if (! [currentValue isEqualToAttributedString:newValue]) {

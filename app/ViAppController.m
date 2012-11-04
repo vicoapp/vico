@@ -97,6 +97,8 @@ BOOL openUntitledDocument = YES;
 @synthesize encodingMenu;
 @synthesize original_input_source;
 
+@synthesize statusSetupBlock = _statusSetupBlock;
+
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
 	NSString *s = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
@@ -122,6 +124,8 @@ BOOL openUntitledDocument = YES;
 
 		[NSValueTransformer setValueTransformer:[[[caretBlinkModeTransformer alloc] init] autorelease]
 						forName:@"caretBlinkModeTransformer"];
+
+		_statusSetupBlock = nil;
 	}
 	return self;
 }

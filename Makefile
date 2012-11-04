@@ -250,6 +250,7 @@ NU = \
 	app/ex.nu \
 	app/keys.nu \
 	app/vico.nu \
+	app/status.nu \
 	nu/beautify.nu \
 	nu/bridgesupport.nu \
 	nu/cblocks.nu \

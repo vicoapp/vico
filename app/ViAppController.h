@@ -83,10 +83,14 @@ additionalBindings:(NSDictionary *)bindings
 	NSString		*_exString;
 	ViTextStorage		*_fieldEditorStorage;
 	ViTextView		*_fieldEditor;
+
+	NuBlock			*_statusSetupBlock;
 }
 
 @property(nonatomic,readonly) NSMenu *encodingMenu;
 @property(nonatomic,readonly) TISInputSourceRef original_input_source;
+
+@property(retain,readwrite) NuBlock *statusSetupBlock;
 
 - (id)eval:(NSString *)script
 withParser:(NuParser *)parser

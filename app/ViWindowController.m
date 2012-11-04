@@ -315,40 +315,55 @@ DEBUG_FINALIZE();
 						   context:NULL];
 
 	// Set up default status bar.
-	ViStatusNotificationLabel *caretLabel =
-	  [ViStatusNotificationLabel statusLabelForNotification:ViCaretChangedNotification
-											withTransformer:^(NSNotification *notification) {
-		  ViTextView *textView = (ViTextView *)[notification object];
+	NuBlock *statusSetupBlock = [[NSApp delegate] statusSetupBlock];
+	if (statusSetupBlock) {
+		NuCell *argument = [[NSArray arrayWithObject:messageView] list];
 
-		  return [NSString stringWithFormat:@"%lu,%lu",
-			  (unsigned long)[textView currentLine],
-			  (unsigned long)[textView currentColumn]];
-	  }];
-	ViStatusNotificationLabel *modeLabel =
-	  [ViStatusNotificationLabel statusLabelForNotification:ViModeChangedNotification
-											withTransformer:^(NSNotification *notification) {
-		  ViTextView *textView = (ViTextView *)[notification object];
-		  ViDocument *document = textView.document;
+		@try {
+			[statusSetupBlock evalWithArguments:argument
+										context:[statusSetupBlock context]];
+		}
+		@catch (NSException *exception) {
+			INFO(@"got exception %@ while evaluating expression:\n%@", [exception name], [exception reason]);
+			INFO(@"context was: %@", [statusSetupBlock context]);
+			[self message:[NSString stringWithFormat:@"Got exception %@: %@", [exception name], [exception reason]]];
+		}
+	} else {
+		ViStatusNotificationLabel *caretLabel =
+		  [ViStatusNotificationLabel statusLabelForNotification:ViCaretChangedNotification
+												withTransformer:^(NSNotification *notification) {
+			  ViTextView *textView = (ViTextView *)[notification object];
 
-		  const char *modestr = "";
-		  if (document.busy) {
-			  modestr = "--BUSY--";
-		  } else if (textView.mode == ViInsertMode) {
-			  if (document.snippet)
-				  modestr = "--SNIPPET--";
-			  else
-				  modestr = "--INSERT--";
-		  } else if (textView.mode == ViVisualMode) {
-			  if (textView.visual_line_mode)
-				  modestr = "--VISUAL LINE--";
-			  else
-				  modestr = "--VISUAL--";
-		  }
+			  return [NSString stringWithFormat:@"%lu,%lu",
+				  (unsigned long)[textView currentLine],
+				  (unsigned long)[textView currentColumn]];
+		  }];
+		ViStatusNotificationLabel *modeLabel =
+		  [ViStatusNotificationLabel statusLabelForNotification:ViModeChangedNotification
+												withTransformer:^(NSNotification *notification) {
+			  ViTextView *textView = (ViTextView *)[notification object];
+			  ViDocument *document = textView.document;
 
-		  return [NSString stringWithFormat:@"    %s", modestr];
-	  }];
+			  const char *modestr = "";
+			  if (document.busy) {
+				  modestr = "--BUSY--";
+			  } else if (textView.mode == ViInsertMode) {
+				  if (document.snippet)
+					  modestr = "--SNIPPET--";
+				  else
+					  modestr = "--INSERT--";
+			  } else if (textView.mode == ViVisualMode) {
+				  if (textView.visual_line_mode)
+					  modestr = "--VISUAL LINE--";
+				  else
+					  modestr = "--VISUAL--";
+			  }
 
-	[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];
+			  return [NSString stringWithFormat:@"    %s", modestr];
+		  }];
+
+		[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];
+	}
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject

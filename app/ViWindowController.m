@@ -334,6 +334,11 @@ DEBUG_FINALIZE();
 												  withTransformer:^(ViStatusView *statusView, NSNotification *notification) {
 				ViTextView *textView = (ViTextView *)[notification object];
 
+				// If this is the ex box (which has no superview) or this is not
+				// for the current window, we bail on out.
+				if ([statusView window] != [textView window])
+					return (id)nil;
+
 				return [NSString stringWithFormat:@"%lu,%lu",
 					(unsigned long)[textView currentLine],
 					(unsigned long)[textView currentColumn]];

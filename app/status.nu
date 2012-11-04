@@ -1,10 +1,13 @@
 (function vi-status-caret-label ()
   ((ViStatusNotificationLabel alloc)
-           initWithNotification:"ViCaretChangedNotification"
-               transformerBlock:
-                 (do (notification)
-                    (let (text-view (notification object))
-                      "#{(text-view currentLine)}, #{(text-view currentColumn)}"))))
+          initWithNotification:"ViCaretChangedNotification"
+              transformerBlock:
+                (do (status-view notification)
+                  (let (text-view (notification object))
+                    (if (!= (text-view window) (status-view window))
+                      nil
+                      (else
+                        "#{(text-view currentLine)}, #{(text-view currentColumn)}"))))))
 
 (function mode-for-notification (status-view notification)
   (let (text-view (notification object))

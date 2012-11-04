@@ -25,6 +25,7 @@
 
 #import "ViCommon.h"
 #import "ViStatusView.h"
+#import "logging.h"
 
 @implementation ViStatusView
 
@@ -287,12 +288,9 @@
 	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 
 	// Okay, now let's see if we need to invalidate anyone else.
-	NSLog(@"Checking for %@", self.alignment);
 	if ([self.alignment isEqualToString:ViStatusComponentAlignLeft]) {
 		ViStatusComponent *currentComponent = self.nextComponent;
-		NSLog(@"Invalidating size for %@", currentComponent);
 		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignLeft || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
-			NSLog(@"Invalidating size for %@", currentComponent);
 			[currentComponent invalidateSize];
 
 			currentComponent = currentComponent.nextComponent;
@@ -375,7 +373,23 @@
 - (ViStatusNotificationLabel *)initWithNotification:(NSString *)notification transformer:(NotificationTransformer)transformer
 {
 	if (self = [super initWithText:@""]) {
+		self.notificationTransformerBlock = nil;
 		self.notificationTransformer = transformer;
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
+									             selector:@selector(changeOccurred:)
+		                                             name:notification
+		                                           object:nil];
+	}
+
+	return self;
+}
+
+- (ViStatusNotificationLabel *)initWithNotification:(NSString *)notification transformerBlock:(NuBlock *)transformerBlock
+{
+	if (self = [super initWithText:@""]) {
+		self.notificationTransformerBlock = transformerBlock;
+		self.notificationTransformer = nil;
 
 		[[NSNotificationCenter defaultCenter] addObserver:self
 									             selector:@selector(changeOccurred:)
@@ -389,7 +403,21 @@
 - (void)changeOccurred:(NSNotification *)notification
 {
 	NSString *currentValue = [self.control stringValue];
-	NSString *newValue = self.notificationTransformer(notification);
+	NSString *newValue = @"";
+
+	if (self.notificationTransformerBlock) {
+		NuCell *arguments = [[NSArray arrayWithObject:notification] list];
+
+		id result = [self.notificationTransformerBlock evalWithArguments:arguments context:[self.notificationTransformerBlock context]];
+
+		if ([result isKindOfClass:[NSString class]]) {
+			newValue = result;
+		} else {
+		  INFO(@"Expecting NSString for notification transformer result but got %@.", result);
+		}
+	} else {
+		newValue = self.notificationTransformer(notification);
+	}
 
 	// Only make a real update if the new value is different.
 	if (! [currentValue isEqualToString:newValue]) {
@@ -401,7 +429,9 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	[self.notificationTransformer release];
+	[self.notificationTransformerBlock release];
 
 	[super dealloc];
 }

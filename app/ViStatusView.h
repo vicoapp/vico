@@ -26,6 +26,7 @@
 #define ViStatusStartRightAlignment
 
 #import <Cocoa/Cocoa.h>
+#import "Nu.h"
 
 @interface ViStatusView : NSView
 {
@@ -100,13 +101,16 @@ typedef NSString *(^NotificationTransformer)(NSNotification *);
 @interface ViStatusNotificationLabel : ViStatusLabel
 {
 	NotificationTransformer _notificationTransformer;
+	NuBlock *_notificationTransformerBlock;
 }
 
 @property (nonatomic,copy) NotificationTransformer notificationTransformer;
+@property (nonatomic,retain) NuBlock *notificationTransformerBlock;
 
 + (ViStatusNotificationLabel *)statusLabelForNotification:(NSString *)notification withTransformer:(NotificationTransformer)transformer;
 
 - (ViStatusNotificationLabel *)initWithNotification:(NSString *)notification transformer:(NotificationTransformer)transformer;
+- (ViStatusNotificationLabel *)initWithNotification:(NSString *)notification transformerBlock:(NuBlock *)transformerBlock;
 
 - (void)changeOccurred:(NSNotification *)notification;
 

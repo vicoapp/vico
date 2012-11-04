@@ -37,6 +37,7 @@
 #define ViFirstResponderChangedNotification @"ViFirstResponderChangedNotification"
 #define ViCaretChangedNotification @"ViCaretChangedNotification"
 #define ViModeChangedNotification @"ViModeChangedNotification"
+#define ViDocumentBusyChangedNotification @"ViDocumentBusyChangedNotification"
 #define ViDocumentEditedChangedNotification @"ViDocumentEditedChangedNotification "
 #define ViURLContentsCachedNotification @"ViURLContentsCachedNotification"
 #define ViTextStorageChangedLinesNotification @"ViTextStorageChangedLinesNotification"

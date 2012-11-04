@@ -362,7 +362,7 @@ DEBUG_FINALIZE();
 	_busy = value;
 
 	// Also post a mode change notification.
-	NSNotification *notification = [NSNotification notificationWithName:ViModeChangedNotification object:self];
+	NSNotification *notification = [NSNotification notificationWithName:ViDocumentBusyChangedNotification object:self];
 	[[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 

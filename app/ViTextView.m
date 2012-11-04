@@ -105,6 +105,10 @@ int logIndent = 0;
 						 selector:@selector(documentRemoved:)
 						     name:ViDocumentRemovedNotification
 						   object:document];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+						 selector:@selector(documentBusyChanged:)
+						     name:ViDocumentBusyChangedNotification
+						   object:document];
 
 	_undoManager = [[document undoManager] retain];
 	if (_undoManager == nil) {
@@ -262,6 +266,14 @@ DEBUG_FINALIZE();
 
 	[document release];
 	document = nil;
+}
+
+- (void)documentBusyChanged:(NSNotification *)notification
+{
+	if ([notification object] != document)
+		return;
+
+	[self postModeChangedNotification];
 }
 
 - (NSString *)description

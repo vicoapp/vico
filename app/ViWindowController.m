@@ -344,6 +344,11 @@ DEBUG_FINALIZE();
 				ViTextView *textView = (ViTextView *)[notification object];
 				ViDocument *document = textView.document;
 
+				// If this is the ex box (which has no superview) or this is not
+				// for the current window, we bail on out.
+				if (! [textView superview])
+					return (id)nil;
+
 				const char *modestr = "";
 				if (document.busy) {
 					modestr = "--BUSY--";

@@ -9,6 +9,7 @@
 (function mode-for-notification (status-view notification)
   (let (text-view (notification object))
     (cond
+      ((eq (text-view superview) nil) nil)
       (else
         (let ((document (text-view document))
               (current-mode (text-view mode)))

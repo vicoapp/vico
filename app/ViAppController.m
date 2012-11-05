@@ -246,9 +246,10 @@ updateMeta(void)
 	/* Cache the default IBeam cursor implementation. */
 	[NSCursor defaultIBeamCursorImplementation];
 
-	[Nu loadNuFile:@"vico" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
-	[Nu loadNuFile:@"keys" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
-	[Nu loadNuFile:@"ex"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"vico"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"keys"   fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"ex"     fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
+	[Nu loadNuFile:@"status" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 
 	[SFBCrashReporter checkForNewCrashes];
 

@@ -414,7 +414,7 @@
 
 		id result = [self.notificationTransformerBlock evalWithArguments:arguments context:[self.notificationTransformerBlock context]];
 
-		if (! result) {
+		if (! result || result == [NSNull null]) {
 			newValue = currentValue;
 		} else if ([result isKindOfClass:[NSString class]]) {
 			newValue = result;

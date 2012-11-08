@@ -2483,7 +2483,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 					    [[_documents anyObject] fileURL] == nil &&
 					    ![[_documents anyObject] isDocumentEdited]) {
 						/* Just change project directory. */
-						[doc close];
 						[self setBaseURL:url];
 						[self ex_pwd:command];
 						[explorer browseURL:url andDisplay:NO];

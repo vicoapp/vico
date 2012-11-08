@@ -299,11 +299,6 @@ DEBUG_FINALIZE();
 	if ([self project] != nil) {
 		[self setBaseURL:[[self project] initialURL]];
 		[explorer openExplorerTemporarily:NO];
-		/* This makes repeated open requests for the same URL always open a new window.
-		 * With this commented, the "project" is already opened, and no new window will be created.
-		 */
-		[[self project] close];
-		_project = nil;
 	}
 
 	[self updateJumplistNavigator];

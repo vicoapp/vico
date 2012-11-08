@@ -29,6 +29,9 @@
 {
 	ViWindowController	*_windowController;
 	NSURL			*_initialURL;
+	NSURL			*_dataURL;
+
+	NSDictionary 	*_projectInfo;
 }
 
 @property(nonatomic,readonly) NSURL *initialURL;

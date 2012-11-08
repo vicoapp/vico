@@ -471,6 +471,11 @@ DEBUG_FINALIZE();
 	[document addObserver:symbolController forKeyPath:@"symbols" options:0 context:NULL];
 }
 
+- (NSTabView *)tabView
+{
+	return tabView;
+}
+
 /* Create a new document tab.
  */
 - (ViTabController *)createTabWithViewController:(ViViewController *)viewController

@@ -160,6 +160,11 @@
  */
 - (NSSet *)documents;
 
+/**
+ * @returns The main tab view for the window.
+ */
+- (NSTabView *)tabView;
+
 /** Create a new tab.
  * @param viewController The view to display in the new tab.
  * @returns a ViTabController object managing the new tab.

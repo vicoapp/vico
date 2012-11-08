@@ -887,6 +887,7 @@ DEBUG_FINALIZE();
 		return;
 	}
 
+	[[self project] close];
 	[self closeAllViews];
 	[[self window] close];
 }
@@ -944,8 +945,8 @@ DEBUG_FINALIZE();
 	if (__currentWindowController == self) {
 		__currentWindowController = nil;
 	}
+
 	DEBUG(@"will close %@", self);
-	[[self project] close];
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
@@ -1584,7 +1585,6 @@ DEBUG_FINALIZE();
 		/*
 		 * Special case: if there are no tabs open, just create a new tab for
 		 * the document, regardless of positioning.
-		 * XXX: when can this happen?
 		 */
 		return [self createTabForDocument:doc];
 	} else if ([tabView numberOfTabViewItems] == 1 && [[tabController views] count] == 0) {

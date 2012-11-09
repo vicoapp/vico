@@ -40,6 +40,94 @@
 	return [[_initialURL path] lastPathComponent];
 }
 
+- (ViDocumentView *)makeSplit:(NSDictionary *)splitInfo selectedDocumentURL:(NSURL *)selectedDocumentURL topLevel:(BOOL)isTopLevel
+{
+	ViDocumentController *documentController = [ViDocumentController sharedDocumentController];
+	NSArray *documents = (NSArray *)[splitInfo objectForKey:@"documents"];
+	BOOL isVertical = [((NSNumber *)[splitInfo objectForKey:@"isVertical"]) boolValue];
+	// Here we map the index from the documents array to a
+	// ViViewController that corresponds to the ViDocumentView in that
+	// index. We only store that info for documents that are
+	// actually sub-splits. This is because we fully set up this level
+	// of split before going back to the subsplits and setting them up.
+	NSMutableDictionary *subSplitViewControllers = [NSMutableDictionary dictionaryWithCapacity:[documents count]];
+
+	__block ViDocumentView *documentViewToSelect = nil;
+	[documents enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger documentIndex, BOOL *stop) {
+		NSDictionary *documentProperties = (NSDictionary *)obj;
+		if ([documentProperties objectForKey:@"url"]) { // this is a regular document
+			NSURL *documentURL = [NSURL URLWithString:[documentProperties objectForKey:@"url"]];
+
+			ViDocumentView *documentView = nil;
+			if (documentIndex == [documents count] - 1) {
+				id possibleDocument = [documentController openDocumentWithContentsOfURL:documentURL display:NO error:nil];
+				if ([possibleDocument isKindOfClass:[ViDocument class]]) {
+					ViDocument *document = (ViDocument *)possibleDocument;
+
+					if (documentIndex != 0 && isTopLevel) {
+						[_windowController createTabForDocument:document];
+					}
+					if (! [[_windowController window] isKeyWindow]) {
+						[[_windowController window] makeKeyAndOrderFront:nil];
+					}
+					[_windowController displayDocument:document positioned:ViViewPositionReplace];
+
+					documentView = [_windowController viewForDocument:document];
+				}
+			} else {
+				documentView = [_windowController splitVertically:isVertical andOpen:documentURL];
+			}
+
+			if ([documentURL isEqual:selectedDocumentURL]) {
+				documentViewToSelect = documentView;
+			}
+			[[documentView textView] setCaret:[[documentProperties objectForKey:@"caret"] unsignedIntegerValue]];
+
+			// If we do this immediately, the scroll view resets to a 0
+			// scroll. So we wait for the next run loop to update the
+			// scroll position.
+			[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+				NSScrollView *scrollView = [[documentView textView] enclosingScrollView];
+				[[scrollView contentView] scrollToPoint:NSMakePoint([[documentProperties objectForKey:@"xScroll"] doubleValue],
+																	[[documentProperties objectForKey:@"yScroll"] doubleValue])];
+				[scrollView reflectScrolledClipView:[scrollView contentView]];
+			}];
+		} else { // this is information regarding an internal split
+			// We'll deal with these guys again in a minute to actually unpack them;
+			// for now, we're just handling this level of splits.
+			if (documentIndex == [documents count] - 1) { // if this is the first split, we need a placeholder document
+				ViDocument *untitledDoc = [documentController openUntitledDocumentAndDisplay:YES error:nil];
+				[untitledDoc setIsTemporary:YES];
+
+				[[untitledDoc views] anyObject]; // there should only be one of these
+			} else { // these guys will just re-use an already existing document
+				[_windowController splitVertically:isVertical andOpen:nil orSwitchToDocument:[_windowController currentDocument]];
+			}
+
+			[subSplitViewControllers setObject:[_windowController currentView] forKey:[NSNumber numberWithUnsignedInteger:documentIndex]];
+		}
+	}];
+
+	[subSplitViewControllers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+		NSUInteger index = [((NSNumber *)key) unsignedIntegerValue];
+		ViViewController *documentView = (ViViewController *)obj;
+
+		if (documentView) {
+			[_windowController selectDocumentView:documentView];
+			[self makeSplit:[documents objectAtIndex:index] selectedDocumentURL:selectedDocumentURL topLevel:NO];
+		}
+    }];
+
+	if ([documents count] <= 0 && isTopLevel) {
+		ViDocument *untitledDoc = [documentController openUntitledDocumentAndDisplay:NO error:nil];
+		[untitledDoc setIsTemporary:YES];
+
+		[_windowController createTabForDocument:untitledDoc];
+	}
+
+	return documentViewToSelect;
+}
+
 - (void)makeWindowControllers
 {
 	_windowController = [[ViWindowController alloc] init];
@@ -48,9 +136,6 @@
 	[_windowController browseURL:_initialURL];
 
 	// Do that shiz.
-	//ViTabController *tabController = [_windowController selectedTabController];
-	ViDocumentController *documentController = [ViDocumentController sharedDocumentController];
-	//NSArray *documents = (NSArray *)[_projectInfo objectForKey:@"documents"];
 	NSArray *tabs = (NSArray *)[_projectInfo objectForKey:@"tabs"];
 	NSURL *selectedDocumentURL = [NSURL URLWithString:[_projectInfo objectForKey:@"selectedDocument"]];
 	__block ViDocumentView *documentViewToSelect = nil;
@@ -58,73 +143,13 @@
 		[tabs enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger tabIndex, BOOL *stop) {
 			NSDictionary *tabInfo = (NSDictionary *)obj;
 			NSDictionary *rootSplit = (NSDictionary *)[tabInfo objectForKey:@"root"];
-			NSArray *documents = (NSArray *)[rootSplit objectForKey:@"documents"];
-			BOOL isVertical = [((NSNumber *)[rootSplit objectForKey:@"isVertical"]) boolValue];
 
-			[documents enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger documentIndex, BOOL *stop) {
-				NSDictionary *documentProperties = (NSDictionary *)obj;
-				if ([documentProperties objectForKey:@"url"]) { // this is a regular document
-					NSURL *documentURL = [NSURL URLWithString:[documentProperties objectForKey:@"url"]];
-
-					ViDocumentView *documentView = nil;
-					if (documentIndex == [documents count] - 1) {
-						id possibleDocument = [documentController openDocumentWithContentsOfURL:documentURL display:NO error:nil];
-						if ([possibleDocument isKindOfClass:[ViDocument class]]) {
-							ViDocument *document = (ViDocument *)possibleDocument;
-
-							if (documentIndex != 0) {
-								[_windowController createTabForDocument:document];
-							}
-							if (! [[_windowController window] isKeyWindow]) {
-								[[_windowController window] makeKeyAndOrderFront:nil];
-							}
-							[_windowController displayDocument:document positioned:ViViewPositionReplace];
-
-							documentView = [_windowController viewForDocument:document];
-						}
-					} else {
-						documentView = [_windowController splitVertically:isVertical andOpen:documentURL];
-					}
-
-					if ([documentURL isEqual:selectedDocumentURL]) {
-						documentViewToSelect = documentView;
-					}
-					[[documentView textView] setCaret:[[documentProperties objectForKey:@"caret"] unsignedIntegerValue]];
-
-					// If we do this immediately, the scroll view resets to a 0
-					// scroll. So we wait for the next run loop to update the
-					// scroll position.
-					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
-						NSScrollView *scrollView = [[documentView textView] enclosingScrollView];
-						[[scrollView contentView] scrollToPoint:NSMakePoint([[documentProperties objectForKey:@"xScroll"] doubleValue],
-																		    [[documentProperties objectForKey:@"yScroll"] doubleValue])];
-						[scrollView reflectScrolledClipView:[scrollView contentView]];
-					}];
-				} else { // this is information regarding an internal split
-					// We'll deal with these guys again in a minute to actually unpack them;
-					// for now, we're just handling this level of splits.
-					if (documentIndex == [documents count] - 1) { // if this is the first split, we need a placeholder document
-						ViDocument *untitledDoc = [documentController openUntitledDocumentAndDisplay:YES error:nil];
-						[untitledDoc setIsTemporary:YES];
-					} else if (isVertical) { // these guys will just use an already existing document
-						[_windowController splitViewVertically:nil];
-					} else {
-						[_windowController splitViewHorizontally:nil];
-					}
-				}
-			}];
-
-			if ([documents count] <= 0) {
-				ViDocument *untitledDoc = [documentController openUntitledDocumentAndDisplay:NO error:nil];
-				[untitledDoc setIsTemporary:YES];
-
-				[_windowController createTabForDocument:untitledDoc];
-			}
-
-			if (documentViewToSelect) {
-				[_windowController selectDocumentView:documentViewToSelect];
-			}
+			documentViewToSelect = [self makeSplit:rootSplit selectedDocumentURL:selectedDocumentURL topLevel:YES];
 		}];
+
+		if (documentViewToSelect) {
+			[_windowController selectDocumentView:documentViewToSelect];
+		}
 	}
 
 	if (! tabs || [tabs count] <= 0) {
@@ -177,9 +202,9 @@
 	NSMutableArray *documentProperties = [NSMutableArray arrayWithCapacity:[[split subviews] count]];
 	[[split subviews] eachBlock:^(id obj, BOOL *stop) {
 		NSView *view = (NSView *)obj;
-		__block ViDocument *document;
-		__block ViTextView *textView;
-		__block NSPoint scrollPoint;
+		__block ViDocument *document = nil;
+		__block ViTextView *textView = nil;
+		__block NSPoint scrollPoint = NSMakePoint(0, 0);
 
 		[viewControllers eachBlock:^(id obj, BOOL *stop) {
 			ViDocumentView *controller = (ViDocumentView *)obj;
@@ -209,7 +234,7 @@
 									  dimensionValue, relevantDimension,
 									  [NSNumber numberWithFloat:scrollPoint.x], @"xScroll",
 									  [NSNumber numberWithFloat:scrollPoint.y], @"yScroll",
-									  [NSNumber numberWithInteger:[textView caret]], @"caret",
+									  [NSNumber numberWithUnsignedInteger:[textView caret]], @"caret",
 									  nil];
 
 			[documentProperties addObject:viewProperties];

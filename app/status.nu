@@ -15,7 +15,6 @@
           (let ((current-value ((self control) stringValue))
                 (new-value (eval (cons transformer *args))))
               (if (and new-value (not (current-value isEqualToString:new-value)))
-                  (print "Setting label " (self control) " to " new-value)
                   ((self control) setStringValue:new-value)
                   (self invalidateSize))))))
 

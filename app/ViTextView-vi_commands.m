@@ -3122,11 +3122,15 @@ again:
 	/* Offset the completion window a bit. */
 	point.x += (positionAbove ? 0 : 5);
 	point.y += (positionAbove ? -3 : 15);
+
+	NSPoint windowPoint = [self convertPoint:point toView:nil];
+	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
+
 	ViCompletion *selection;
 	selection = [cc chooseFrom:provider
 			     range:range
 			    prefix:fuzzyTrigger ? nil : string
-				at:[[self window] convertBaseToScreen:[self convertPointToBase:point]]
+				at:screenPoint
 			   options:options
 			 direction:(positionAbove ? 1 : 0)
 		     initialFilter:fuzzyTrigger ? string : nil];

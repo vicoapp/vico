@@ -35,8 +35,14 @@
 
 - (void)updateFont
 {
-	_characterSize = [@"a" sizeWithAttributes:[NSDictionary dictionaryWithObject:[ViThemeStore font]
-									      forKey:NSFontAttributeName]];
+	if ([self font]) {
+		_characterSize = [@"a" sizeWithAttributes:[NSDictionary dictionaryWithObject:[self font]
+											  forKey:NSFontAttributeName]];
+	} else {
+		_characterSize = [@"a" sizeWithAttributes:[NSDictionary dictionaryWithObject:[ViThemeStore font]
+											  forKey:NSFontAttributeName]];
+	}
+
 
 	[self invalidateCaretRect];
 	[self enclosingFrameDidChange:nil];

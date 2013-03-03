@@ -81,7 +81,8 @@
 	ViMark				*_alternateMark;
 
 	// ex command line
-	IBOutlet NSTextField		*statusbar;
+	IBOutlet NSTextField		*exField;
+	IBOutlet NSView				*exWindow;
 	BOOL				 _exBusy;
 	BOOL				 _exModal;
 	NSString			*_exString;

@@ -1321,7 +1321,7 @@ DEBUG_FINALIZE();
 		[self didSelectViewController:viewController];
 	}
 
-	if (_exModal && view != statusbar) {
+	if (_exModal && view != exField) {
 		[NSApp abortModal];
 		_exModal = NO;
 	}
@@ -2357,17 +2357,17 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	_exString = nil;
 
 	[messageView setHidden:YES];
-	[statusbar setHidden:NO];
-	[statusbar setSelectable:NO];
-	[statusbar setEditable:YES];
-	[statusbar setStringValue:@""];
-	[statusbar setFont:[NSFont userFixedPitchFontOfSize:12]];
+	[exField setHidden:NO];
+ 	[exField setSelectable:NO];
+ 	[exField setEditable:YES];
+	[exField setStringValue:@""];
+
 	/*
 	 * The ExTextField resets the field editor when gaining focus (in becomeFirstResponder).
 	 */
-	[[self window] makeFirstResponder:statusbar];
+	[[self window] makeFirstResponder:exField];
 
-	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:statusbar];
+	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:exField];
 	[editor setString:prefix ?: @""];
 	[editor setCaret:[[editor textStorage] length]];
 
@@ -2384,9 +2384,9 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 		_exBusy = NO;
 	}
 
-	[statusbar setStringValue:@""];
-	[statusbar setEditable:NO];
-	[statusbar setHidden:YES];
+	[exField setStringValue:@""];
+	[exField setEditable:NO];
+	[exField setHidden:YES];
 	[messageView setHidden:NO];
 	[self focusEditor];
 

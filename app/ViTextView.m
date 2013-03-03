@@ -89,8 +89,8 @@ int logIndent = 0;
 	NSRect frame = NSMakeRect(0, 0, 100, 10);
 	ViTextView *editor = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 	ViParser *fieldParser = [ViParser parserWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
-	[editor initWithDocument:nil viParser:fieldParser];
 	[editor setFieldEditor:YES];
+	[editor initWithDocument:nil viParser:fieldParser];
 	return [editor autorelease];
 }
 
@@ -2520,13 +2520,17 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (NSFont *)font
 {
+	if ([self isFieldEditor])
+		return [super font];
 	return [ViThemeStore font];
 }
 
 - (void)setTypingAttributes:(NSDictionary *)attributes
 {
-	if ([self isFieldEditor])
+	if ([self isFieldEditor]) {
 		[super setTypingAttributes:attributes];
+		[self updateFont];
+	}
 }
 
 - (NSDictionary *)typingAttributes

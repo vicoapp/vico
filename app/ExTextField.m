@@ -73,6 +73,11 @@
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 	DEBUG(@"using field editor %@", editor);
 
+    NSRect superFrame = [[self superview] frame];
+    CGFloat superSuperWidth = [[[self superview] superview] bounds].size.width;
+    superFrame.size.width = superSuperWidth - 2 * (superFrame.origin.x);
+    [[self superview] setFrame:superFrame];
+
 	[_current release];
 	_current = nil;
 	_historyIndex = -1;

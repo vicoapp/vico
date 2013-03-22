@@ -229,7 +229,7 @@
 	NSView *parentView = [_control superview];
 	NSUInteger resizingMask = NSViewHeightSizable,
 	           xPosition = 0;
-	if (_alignment == ViStatusComponentAlignCenter) {
+	if ([_alignment isEqual:ViStatusComponentAlignCenter]) {
 		resizingMask |= NSViewMinXMargin | NSViewMaxXMargin;
 
 		// For center, we have to do math on all center aligned things
@@ -242,13 +242,13 @@
 		NSUInteger totalWidth = _cachedWidth;
 		NSUInteger prevWidth = 0;
 		ViStatusComponent *currentComponent = [self previousComponent];
-		while (currentComponent && ([currentComponent alignment] == ViStatusComponentAlignCenter || [currentComponent alignment] == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([[currentComponent alignment] isEqual:ViStatusComponentAlignCenter] || [[currentComponent alignment] isEqual:ViStatusComponentAlignAutomatic])) {
 			totalWidth += [currentComponent controlWidth];
 			prevWidth += [currentComponent controlWidth];
 			currentComponent = [currentComponent previousComponent];
 		}
 		currentComponent = [self nextComponent];
-		while (currentComponent && ([currentComponent alignment] == ViStatusComponentAlignCenter || [currentComponent alignment] == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([[currentComponent alignment] isEqual:ViStatusComponentAlignCenter] || [[currentComponent alignment] isEqual:ViStatusComponentAlignAutomatic])) {
 			totalWidth += [currentComponent controlWidth];
 			currentComponent = [currentComponent nextComponent];
 		}
@@ -290,14 +290,14 @@
 	// Okay, now let's see if we need to invalidate anyone else.
 	if ([self.alignment isEqualToString:ViStatusComponentAlignLeft]) {
 		ViStatusComponent *currentComponent = self.nextComponent;
-		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignLeft || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([currentComponent.alignment isEqual:ViStatusComponentAlignLeft] || [currentComponent.alignment isEqual:ViStatusComponentAlignAutomatic])) {
 			[currentComponent invalidateSize];
 
 			currentComponent = currentComponent.nextComponent;
 		}
 	} else if ([self.alignment isEqualToString:ViStatusComponentAlignRight]) {
 		ViStatusComponent *currentComponent = self.previousComponent;
-		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignRight || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([currentComponent.alignment isEqual:ViStatusComponentAlignRight] || [currentComponent.alignment isEqual:ViStatusComponentAlignAutomatic])) {
 			[currentComponent invalidateSize];
 
 			currentComponent = currentComponent.previousComponent;

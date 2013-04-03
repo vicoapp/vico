@@ -36,7 +36,7 @@
 }
 @end
 
-@interface ViPreferencePaneBundles : ViPreferencePane <NSURLDownloadDelegate>
+@interface ViPreferencePaneBundles : ViPreferencePane <NSURLConnectionDelegate>
 {
 	IBOutlet NSTextField		*bundlesInfo;
 	IBOutlet NSArrayController	*bundlesController;
@@ -58,7 +58,12 @@
 	NSMutableArray			*_repositories;
 	NSArray				*_filteredRepositories;
 	NSArray				*_previousRepoUsers;
-	NSURLDownload			*_repoDownload;
+	NSURL				*_repoURL;
+	int				_repoPage;
+	NSURLConnection			*_repoConnection;
+	NSMutableData			*_repoData;
+	NSMutableArray			*_repoJson;
+
 
 	NSURLConnection			*_userConnection;
 	NSMutableData			*_userData;

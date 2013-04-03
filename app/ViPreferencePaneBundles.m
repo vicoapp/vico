@@ -191,9 +191,9 @@
 		NSString *path = [self repoPathForUser:username readonly:YES];
 		if (path == nil)
 			return;
-		NSData *JSONData = [NSData dataWithContentsOfFile:path];
-		NSString *JSONString = [[[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding] autorelease];
-		NSArray *arry = [JSONString JSONValue];
+		NSData *jsonData = [NSData dataWithContentsOfFile:path];
+		NSString *jsonString = [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease];
+		NSArray *arry = [jsonString JSONValue];
 		if (![arry isKindOfClass:[NSArray class]]) {
 			INFO(@"%s", "failed to parse JSON");
 			return;
@@ -495,10 +495,10 @@
 		NSMutableDictionary *repo = [_processQueue lastObject];
 		NSString *username = [repo objectForKey:@"username"];
 
-		NSString *JSONString = [[[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *jsonString = [[[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding] autorelease];
 		[_userData release];
 		_userData = nil;
-		NSDictionary *dict = [JSONString JSONValue];
+		NSDictionary *dict = [jsonString JSONValue];
 		if (![dict isKindOfClass:[NSDictionary class]]) {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to parse data for user %@.", username]];
@@ -536,8 +536,8 @@
 	}
 
 	if (connection == _repoConnection) {
-		NSString *JSONString = [[[NSString alloc] initWithData:_repoData encoding:NSUTF8StringEncoding] autorelease];
-		NSArray *repoJson = [JSONString JSONValue];
+		NSString *jsonString = [[[NSString alloc] initWithData:_repoData encoding:NSUTF8StringEncoding] autorelease];
+		NSArray *repoJson = [jsonString JSONValue];
 		[_repoJson addObjectsFromArray:repoJson];
 
 		NSDictionary *repoUser = [_processQueue lastObject];

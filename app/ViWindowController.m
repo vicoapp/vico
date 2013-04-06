@@ -45,6 +45,7 @@
 #import "ViError.h"
 #import "ViBgView.h"
 #import "ViMark.h"
+#import "NSWindow-additions.h"
 
 static NSMutableArray			*__windowControllers = nil;
 static __weak ViWindowController	*__currentWindowController = nil; // XXX: not retained!
@@ -1005,6 +1006,8 @@ DEBUG_FINALIZE();
 /* almost, but not quite, like :quit */
 - (IBAction)closeCurrent:(id)sender
 {
+	BOOL canCloseWindow = !self.window.isFullScreen;
+
 	ViDocumentView *docView = [self currentDocumentView];
 
 	/* If the current view is a document view, check if it's the last view for the document. */
@@ -1013,14 +1016,14 @@ DEBUG_FINALIZE();
 		if (![self documentOpenElsewhere:doc] && [[doc views] count] == 1) {
 			[doc canCloseDocumentWithDelegate:self
 				      shouldCloseSelector:@selector(document:shouldClose:contextInfo:)
-					      contextInfo:(void *)(intptr_t)1];
+					      contextInfo:(void *)(intptr_t)canCloseWindow];
 			return;
 		}
 	}
 
 	[self closeDocumentView:[self currentView]
 	       canCloseDocument:YES
-		 canCloseWindow:YES];
+		 canCloseWindow:canCloseWindow];
 }
 
 - (IBAction)closeCurrentDocument:(id)sender

@@ -129,6 +129,10 @@
 	[_previousRepoUsers release];
 	[_userData release];
 	[_userConnection release];
+	[_repoURL release];
+	[_repoConnection release];
+	[_repoData release];
+	[_repoJson release];
 	[_installConnection release];
 	[_installPipe release];
 	[_installTask release];
@@ -183,17 +187,24 @@
 	/* Remove any existing repositories owned by this user. */
 	[_repositories filterUsingPredicate:[NSPredicate predicateWithFormat:@"NOT owner.login == %@", username]];
 
-	NSString *path = [self repoPathForUser:username readonly:YES];
-	if (path == nil)
-		return;
-	NSData *JSONData = [NSData dataWithContentsOfFile:path];
-	NSString *JSONString = [[[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding] autorelease];
-	NSArray *arry = [JSONString JSONValue];
-	if (![arry isKindOfClass:[NSArray class]]) {
-		INFO(@"%s", "failed to parse JSON");
-		return;
+	if (!_repoJson) {
+		NSString *path = [self repoPathForUser:username readonly:YES];
+		if (path == nil)
+			return;
+		NSData *jsonData = [NSData dataWithContentsOfFile:path];
+		NSString *jsonString = [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease];
+		NSArray *arry = [jsonString JSONValue];
+		if (![arry isKindOfClass:[NSArray class]]) {
+			INFO(@"%s", "failed to parse JSON");
+			return;
+		}
+		[_repositories addObjectsFromArray: arry];
+	} else {
+		NSString *path = [self repoPathForUser:username readonly:NO];
+		[[_repoJson JSONRepresentation] writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+		[_repositories addObjectsFromArray:_repoJson];
 	}
-	[_repositories addObjectsFromArray: arry];
+
 	for (NSUInteger i = 0; i < [_repositories count];) {
 		NSMutableDictionary *bundle = [_repositories objectAtIndex:i];
 
@@ -311,27 +322,6 @@
 	_progressCancelled = NO;
 }
 
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
-{
-	[self cancelProgressSheet:nil];
-	NSDictionary *repoUser = [_processQueue lastObject];
-	[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to load %@'s repository: %@",
-	    [repoUser objectForKey:@"username"], [error localizedDescription]]];
-}
-
-- (void)downloadDidFinish:(NSURLDownload *)download
-{
-	NSDictionary *repoUser = [_processQueue lastObject];
-	[self loadBundlesFromRepo:[repoUser objectForKey:@"username"]];
-	[[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"LastBundleRepoReload"];
-
-	[_processQueue removeLastObject];
-	if ([_processQueue count] == 0)
-		[NSApp endSheet:progressSheet];
-	else
-		[self reloadNextUser];
-}
-
 - (void)setExpectedContentLengthFromResponse:(NSURLResponse *)response
 {
 	long long expectedContentLength = [response expectedContentLength];
@@ -353,19 +343,10 @@
 	[_installConnection release];
 	_installConnection = nil;
 
-	[_repoDownload release];
-	_repoDownload = nil;
-}
-
-- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
-{
-	[self setExpectedContentLengthFromResponse:response];
-}
-
-- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
-{
-	_receivedContentLength += length;
-	[progressIndicator setDoubleValue:_receivedContentLength];
+	[_repoConnection release];
+	_repoConnection = nil;
+	[_repoData release];
+	_repoData = nil;
 }
 
 - (IBAction)cancelProgressSheet:(id)sender
@@ -388,9 +369,9 @@
 		[_userConnection release];
 		_userConnection = nil;
 	} else {
-		[_repoDownload cancel];
-		[_repoDownload release];
-		_repoDownload = nil;
+		[_repoConnection cancel];
+		[_repoConnection release];
+		_repoConnection = nil;
 	}
 
 	_progressCancelled = YES;
@@ -462,6 +443,11 @@
 		_installTask = nil;
 	} else if (connection == _userConnection) {
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Download of %@ failed: %@", [repo objectForKey:@"username"], [error localizedDescription]]];
+	} else if (connection == _repoConnection) {
+		[self cancelProgressSheet:nil];
+		NSDictionary *repoUser = [_processQueue lastObject];
+		[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to load %@'s repository: %@",
+						     [repoUser objectForKey:@"username"], [error localizedDescription]]];
 	}
 }
 
@@ -485,6 +471,11 @@
 		}
 	} else if (connection == _userConnection) {
 		[_userData appendData:data];
+	} else if (connection == _repoConnection) {
+		[_repoData appendData:data];
+
+		_receivedContentLength += data.length;
+		[progressIndicator setDoubleValue:_receivedContentLength];
 	}
 }
 
@@ -492,6 +483,10 @@
 {
 	if (connection == _installConnection)
 		[self setExpectedContentLengthFromResponse:response];
+
+	if (connection == _repoConnection) {
+		[self setExpectedContentLengthFromResponse:response];
+	}
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -500,10 +495,10 @@
 		NSMutableDictionary *repo = [_processQueue lastObject];
 		NSString *username = [repo objectForKey:@"username"];
 
-		NSString *JSONString = [[[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *jsonString = [[[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding] autorelease];
 		[_userData release];
 		_userData = nil;
-		NSDictionary *dict = [JSONString JSONValue];
+		NSDictionary *dict = [jsonString JSONValue];
 		if (![dict isKindOfClass:[NSDictionary class]]) {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to parse data for user %@.", username]];
@@ -513,21 +508,66 @@
 		DEBUG(@"got user %@: %@", username, dict);
 
 		[progressDescription setStringValue:[NSString stringWithFormat:@"Loading repositories from %@...", username]];
-		NSURL *url;
+
+		[_repoURL release];
+		_repoURL = nil;
 		NSString *type = [dict objectForKey:@"type"];
 		if ([type isEqualToString:@"User"])
-			url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/users/%@/repos", username]];
+			_repoURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/users/%@/repos", username]];
 		else if ([type isEqualToString:@"Organization"])
-			url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/orgs/%@/repos", username]];
+			_repoURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.github.com/orgs/%@/repos", username]];
 		else {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Unknown type %@ of user %@", type, username]];
 			return;
 		}
+		[_repoURL retain];
+		_repoPage = 1;
 
-		DEBUG(@"loading repositories from %@", url);
-		_repoDownload = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
-		[_repoDownload setDestination:[self repoPathForUser:username readonly:NO] allowOverwrite:YES];
+		DEBUG(@"loading repositories from %@", _repoURL);
+
+		[_repoJson release];
+		_repoJson = [NSMutableArray new];
+		[_repoData release];
+		_repoData = [NSMutableData new];
+		_repoConnection = [[NSURLConnection alloc] initWithRequest:
+				   [NSURLRequest requestWithURL:_repoURL] delegate:self startImmediately:YES];
+		return;
+	}
+
+	if (connection == _repoConnection) {
+		NSString *jsonString = [[[NSString alloc] initWithData:_repoData encoding:NSUTF8StringEncoding] autorelease];
+		NSArray *repoJson = [jsonString JSONValue];
+		[_repoJson addObjectsFromArray:repoJson];
+
+		NSDictionary *repoUser = [_processQueue lastObject];
+		[self loadBundlesFromRepo:[repoUser objectForKey:@"username"]];
+		[[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"LastBundleRepoReload"];
+
+		if (repoJson.count == 0) {
+			[_processQueue removeLastObject];
+			if ([_processQueue count] == 0) {
+				[NSApp endSheet:progressSheet];
+			} else {
+				[self reloadNextUser];
+			}
+		} else {
+			NSURL *noQueryURL = [[[NSURL alloc] initWithScheme:_repoURL.scheme
+								      host:_repoURL.host
+								      path:_repoURL.path] autorelease];
+			_repoPage++;
+			[_repoURL release];
+			_repoURL = [[NSURL URLWithString:
+				     [NSString stringWithFormat:@"%@?page=%d", noQueryURL.absoluteString, _repoPage]] retain];
+			DEBUG(@"Loading next page of repositories: %@", _repoURL);
+
+			[_repoData release];
+			_repoData = [NSMutableData new];
+			[_repoConnection release];
+			_repoConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:_repoURL]
+									  delegate:self startImmediately:YES];
+		}
+
 		return;
 	}
 

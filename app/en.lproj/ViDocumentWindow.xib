@@ -597,12 +597,45 @@
 											<array class="NSMutableArray" key="NSSubviews">
 												<object class="NSCustomView" id="581844326">
 													<reference key="NSNextResponder" ref="773548491"/>
-													<int key="NSvFlags">270</int>
+													<int key="NSvFlags">-2147483378</int>
 													<array class="NSMutableArray" key="NSSubviews">
+														<object class="NSTextField" id="260598959">
+															<reference key="NSNextResponder" ref="581844326"/>
+															<int key="NSvFlags">268</int>
+															<string key="NSFrame">{{9, 5}, {20, 28}}</string>
+															<reference key="NSSuperview" ref="581844326"/>
+															<reference key="NSWindow"/>
+															<reference key="NSNextKeyView" ref="24397800"/>
+															<string key="NSReuseIdentifierKey">_NS:1535</string>
+															<bool key="NSEnabled">YES</bool>
+															<object class="NSTextFieldCell" key="NSCell" id="273348903">
+																<int key="NSCellFlags">68157504</int>
+																<int key="NSCellFlags2">272630784</int>
+																<string key="NSContents">/</string>
+																<object class="NSFont" key="NSSupport" id="43075826">
+																	<string key="NSName">Monaco</string>
+																	<double key="NSSize">18</double>
+																	<int key="NSfFlags">16</int>
+																</object>
+																<string key="NSCellIdentifier">_NS:1535</string>
+																<reference key="NSControlView" ref="260598959"/>
+																<object class="NSColor" key="NSBackgroundColor" id="599665427">
+																	<int key="NSColorSpace">6</int>
+																	<string key="NSCatalogName">System</string>
+																	<string key="NSColorName">controlColor</string>
+																	<object class="NSColor" key="NSColor" id="488841785">
+																		<int key="NSColorSpace">3</int>
+																		<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+																	</object>
+																</object>
+																<reference key="NSTextColor" ref="1024489741"/>
+															</object>
+															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														</object>
 														<object class="NSTextField" id="24397800">
 															<reference key="NSNextResponder" ref="581844326"/>
-															<int key="NSvFlags">-2147483377</int>
-															<string key="NSFrame">{{7, 7}, {424, 29}}</string>
+															<int key="NSvFlags">270</int>
+															<string key="NSFrame">{{24, 7}, {407, 29}}</string>
 															<reference key="NSSuperview" ref="581844326"/>
 															<reference key="NSWindow"/>
 															<reference key="NSNextKeyView" ref="871222101"/>
@@ -611,11 +644,7 @@
 																<int key="NSCellFlags">-1804599231</int>
 																<int key="NSCellFlags2">33792</int>
 																<string key="NSContents">ohai</string>
-																<object class="NSFont" key="NSSupport">
-																	<string key="NSName">Monaco</string>
-																	<double key="NSSize">18</double>
-																	<int key="NSfFlags">16</int>
-																</object>
+																<reference key="NSSupport" ref="43075826"/>
 																<reference key="NSControlView" ref="24397800"/>
 																<bool key="NSDrawsBackground">YES</bool>
 																<reference key="NSBackgroundColor" ref="914134781"/>
@@ -632,7 +661,7 @@
 													<string key="NSFrame">{{81, 515}, {438, 43}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="24397800"/>
+													<reference key="NSNextKeyView" ref="260598959"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
 													<string key="NSClassName">NSView</string>
 												</object>
@@ -933,10 +962,7 @@
 														<int key="NSColorSpace">6</int>
 														<string key="NSCatalogName">System</string>
 														<string key="NSColorName">controlBackgroundColor</string>
-														<object class="NSColor" key="NSColor" id="488841785">
-															<int key="NSColorSpace">3</int>
-															<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-														</object>
+														<reference key="NSColor" ref="488841785"/>
 													</object>
 													<reference key="NSTextColor" ref="1024489741"/>
 												</object>
@@ -1620,12 +1646,7 @@
 							</object>
 							<int key="NSSelectedRow">-1</int>
 							<int key="NSSelectedCol">-1</int>
-							<object class="NSColor" key="NSBackgroundColor" id="599665427">
-								<int key="NSColorSpace">6</int>
-								<string key="NSCatalogName">System</string>
-								<string key="NSColorName">controlColor</string>
-								<reference key="NSColor" ref="488841785"/>
-							</object>
+							<reference key="NSBackgroundColor" ref="599665427"/>
 							<reference key="NSCellBackgroundColor" ref="336387416"/>
 							<reference key="NSFont" ref="844670655"/>
 						</object>
@@ -1890,6 +1911,22 @@
 						<reference key="destination" ref="24397800"/>
 					</object>
 					<int key="connectionID">100790</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">exPrefix</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="260598959"/>
+					</object>
+					<int key="connectionID">100794</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">exWindow</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="581844326"/>
+					</object>
+					<int key="connectionID">100795</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3202,6 +3239,7 @@
 						<int key="objectID">100791</int>
 						<reference key="object" ref="581844326"/>
 						<array class="NSMutableArray" key="children">
+							<reference ref="260598959"/>
 							<reference ref="24397800"/>
 						</array>
 						<reference key="parent" ref="773548491"/>
@@ -3219,6 +3257,19 @@
 						<int key="objectID">100601</int>
 						<reference key="object" ref="180256402"/>
 						<reference key="parent" ref="24397800"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100792</int>
+						<reference key="object" ref="260598959"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="273348903"/>
+						</array>
+						<reference key="parent" ref="581844326"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100793</int>
+						<reference key="object" ref="273348903"/>
+						<reference key="parent" ref="260598959"/>
 					</object>
 				</array>
 			</object>
@@ -3348,6 +3399,8 @@
 				<string key="100765.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100774.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100791.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100792.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100793.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="5.IBNSWindowAutoPositionCentersHorizontal"/>
 				<boolean value="YES" key="5.IBNSWindowAutoPositionCentersVertical"/>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3358,7 +3411,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100791</int>
+			<int key="maxID">100795</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3837,6 +3890,7 @@
 						<string key="bundleButton">NSPopUpButton</string>
 						<string key="bundleButtonCell">ViToolbarPopUpButtonCell</string>
 						<string key="exField">NSTextField</string>
+						<string key="exPrefix">NSTextField</string>
 						<string key="exWindow">NSView</string>
 						<string key="explorer">ViFileExplorer</string>
 						<string key="explorerActionMenu">NSMenu</string>
@@ -3869,6 +3923,10 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="exField">
 							<string key="name">exField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="exPrefix">
+							<string key="name">exPrefix</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="exWindow">

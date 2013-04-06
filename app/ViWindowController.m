@@ -2360,9 +2360,10 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	_exString = nil;
 
 	[messageView setHidden:YES];
-	[exField setHidden:NO];
- 	[exField setSelectable:NO];
- 	[exField setEditable:YES];
+	[exWindow setHidden:NO];
+	[exPrefix setStringValue:command.mapping.keyString];
+	[exField setSelectable:NO];
+	[exField setEditable:YES];
 	[exField setStringValue:@""];
 
 	/*
@@ -2389,7 +2390,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 
 	[exField setStringValue:@""];
 	[exField setEditable:NO];
-	[exField setHidden:YES];
+	[exWindow setHidden:YES];
 	[messageView setHidden:NO];
 	[self focusEditor];
 

@@ -107,7 +107,6 @@
 		DEBUG(@"got item %@", item);
 		if ([prefix length] == 0 || [[item lowercaseString] hasPrefix:prefix]) {
 			DEBUG(@"insert item %@", item);
-			// [self setStringValue:item];
 			[editor setString:item];
 			[editor setInsertMode:nil];
 			_historyIndex = i;
@@ -116,7 +115,6 @@
 	}
 
 	if (!upwards && i == 0) {
-		// [self setStringValue:_current];
 		[editor setString:_current];
 		[editor setInsertMode:nil];
 		_historyIndex = -1;

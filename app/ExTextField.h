@@ -27,8 +27,10 @@
 
 @interface ExTextField : NSTextField
 {
-	NSMutableArray		*_history;
-	int			 _historyIndex;
+	NSMutableArray		*_commandHistory;
+	NSMutableArray		*_searchHistory;
+	int			 _commandHistoryIndex;
+	int			 _searchHistoryIndex;
 	NSString		*_current;
 	BOOL			 _running;
 }

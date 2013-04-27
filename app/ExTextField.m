@@ -35,37 +35,82 @@
 
 @implementation ExTextField
 
+@synthesize exMode;
+
 - (void)awakeFromNib
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSArray *exhistory = [defs arrayForKey:@"exhistory"];
-	if (exhistory)
-		_history = [exhistory mutableCopy];
+	NSArray *exCommandHistory = [defs arrayForKey:@"exCommandHistory"];
+	NSArray *exSearchHistory = [defs arrayForKey:@"exSearchHistory"];
+
+	if (exCommandHistory)
+		_commandHistory = [exCommandHistory mutableCopy];
 	else
-		_history = [[NSMutableArray alloc] init];
+		_commandHistory = [[NSMutableArray alloc] init];
+
+	if (exSearchHistory)
+		_searchHistory = [exSearchHistory mutableCopy];
+	else
+		_searchHistory = [[NSMutableArray alloc] init];
+
 	DEBUG(@"loaded %lu lines from history", [_history count]);
 }
 
 - (void)dealloc
 {
-	[_history release];
+	[_commandHistory release];
+	[_searchHistory release];
 	[_current release];
 	[super dealloc];
 }
 
 - (void)addToHistory:(NSString *)line
 {
-	/* Add the command to the history. */
-	NSUInteger i = [_history indexOfObject:line];
-	if (i != NSNotFound)
-		[_history removeObjectAtIndex:i];
-	[_history insertObject:line atIndex:0];
-	while ([_history count] > 100)
-		[_history removeLastObject];
+	NSMutableArray *history = [self currentHistory];
 
-	DEBUG(@"history = %@", _history);
+	/* Add the command to the history. */
+	NSUInteger i = [history indexOfObject:line];
+	if (i != NSNotFound)
+		[history removeObjectAtIndex:i];
+	[history insertObject:line atIndex:0];
+	while ([history count] > 100)
+		[history removeLastObject];
+
+	DEBUG(@"history = %@", history);
+	[self updateCurrentHistoryWith:history];
+}
+
+- (NSMutableArray *)currentHistory
+{
+	if ([self.exMode isEqualToString:ViExModeCommand])
+		return _commandHistory;
+	else
+		return _searchHistory;
+}
+
+- (int)currentHistoryIndex
+{
+	if ([self.exMode isEqualToString:ViExModeCommand])
+		return _commandHistoryIndex;
+	else
+		return _searchHistoryIndex;
+}
+
+- (void)updateCurrentHistoryWith:(NSArray *)history
+{
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	[defs setObject:_history forKey:@"exhistory"];
+	if ([self.exMode isEqualToString:ViExModeCommand])
+		[defs setObject:history forKey:@"exCommandHistory"];
+	else
+		[defs setObject:history forKey:@"exSearchHistory"];
+}
+
+- (void)setCurrentHistoryIndex:(int)newIndex
+{
+	if ([self.exMode isEqualToString:ViExModeCommand])
+		_commandHistoryIndex = newIndex;
+	else
+		_searchHistoryIndex = newIndex;
 }
 
 - (BOOL)becomeFirstResponder
@@ -80,7 +125,7 @@
 
 	[_current release];
 	_current = nil;
-	_historyIndex = -1;
+	[self setCurrentHistoryIndex:-1];
 
 	[editor setInsertMode:nil];
 	[editor setCaret:0];
@@ -91,25 +136,25 @@
 
 - (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix
 {
-	if (_historyIndex == -1) {
+	if ([self currentHistoryIndex] == -1) {
 		[_current release];
 		_current = [[self stringValue] copy];
 	}
 
 	ViTextView *editor = (ViTextView *)[self currentEditor];
 
-	int i = _historyIndex;
+	int i = [self currentHistoryIndex];
 	DEBUG(@"history index = %i, count = %lu, prefix = %@",
-	    _historyIndex, [_history count], prefix);
-	while (upwards ? i + 1 < [_history count] : i > 0) {
+	    [self currentHistoryIndex], [[self currentHistory] count], prefix);
+	while (upwards ? i + 1 < [[self currentHistory] count] : i > 0) {
 		i += (upwards ? +1 : -1);
-		NSString *item = [_history objectAtIndex:i];
+		NSString *item = [[self currentHistory] objectAtIndex:i];
 		DEBUG(@"got item %@", item);
 		if ([prefix length] == 0 || [[item lowercaseString] hasPrefix:prefix]) {
 			DEBUG(@"insert item %@", item);
 			[editor setString:item];
 			[editor setInsertMode:nil];
-			_historyIndex = i;
+			[self setCurrentHistoryIndex:i];
 			return YES;
 		}
 	}
@@ -117,7 +162,7 @@
 	if (!upwards && i == 0) {
 		[editor setString:_current];
 		[editor setInsertMode:nil];
-		_historyIndex = -1;
+		[self setCurrentHistoryIndex:-1];
 		return YES;
 	}
 

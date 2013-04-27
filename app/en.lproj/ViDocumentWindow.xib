@@ -663,7 +663,7 @@
 													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="260598959"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
-													<string key="NSClassName">NSView</string>
+													<string key="NSClassName">ExCommandLine</string>
 												</object>
 												<object class="NSCustomView" id="147447636">
 													<reference key="NSNextResponder" ref="773548491"/>

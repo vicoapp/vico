@@ -46,6 +46,9 @@
 
 #define ViFilterRunLoopMode @"ViFilterRunLoopMode"
 
+#define ViExModeCommand @"ViExModeCommand"
+#define ViExModeSearch @"ViExModeSearch"
+
 #ifdef IMAX
 # undef IMAX
 #endif

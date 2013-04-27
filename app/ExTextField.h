@@ -33,6 +33,8 @@
 	BOOL			 _running;
 }
 
+@property (nonatomic,assign) NSString *exMode;
+
 - (BOOL)ex_cancel:(ViCommand *)command;
 - (BOOL)ex_execute:(ViCommand *)command;
 

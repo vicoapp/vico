@@ -2359,9 +2359,16 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	_exBusy = YES;
 	_exString = nil;
 
+	// Given these two, do we want to pass this through exWindow and
+	// make exWindow an ExWindow?
+	NSString *exMode = ViExModeSearch;
+	if ([command.mapping.keyString isEqualToString:@":"])
+	  exMode = ViExModeCommand;
+
 	[messageView setHidden:YES];
 	[exWindow setHidden:NO];
 	[exPrefix setStringValue:command.mapping.keyString];
+	[exField setExMode:exMode];
 	[exField setSelectable:NO];
 	[exField setEditable:YES];
 	[exField setStringValue:@""];

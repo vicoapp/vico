@@ -602,7 +602,7 @@
 														<object class="NSTextField" id="260598959">
 															<reference key="NSNextResponder" ref="581844326"/>
 															<int key="NSvFlags">268</int>
-															<string key="NSFrame">{{9, 5}, {20, 28}}</string>
+															<string key="NSFrame">{{14, 15}, {20, 28}}</string>
 															<reference key="NSSuperview" ref="581844326"/>
 															<reference key="NSWindow"/>
 															<reference key="NSNextKeyView" ref="24397800"/>
@@ -635,7 +635,7 @@
 														<object class="NSTextField" id="24397800">
 															<reference key="NSNextResponder" ref="581844326"/>
 															<int key="NSvFlags">270</int>
-															<string key="NSFrame">{{24, 7}, {407, 29}}</string>
+															<string key="NSFrame">{{34, 17}, {406, 29}}</string>
 															<reference key="NSSuperview" ref="581844326"/>
 															<reference key="NSWindow"/>
 															<reference key="NSNextKeyView" ref="871222101"/>
@@ -658,7 +658,7 @@
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														</object>
 													</array>
-													<string key="NSFrame">{{81, 515}, {438, 43}}</string>
+													<string key="NSFrame">{{76, 495}, {448, 63}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="260598959"/>
@@ -3889,7 +3889,7 @@
 						<string key="bookmarksButtonCell">ViToolbarPopUpButtonCell</string>
 						<string key="bundleButton">NSPopUpButton</string>
 						<string key="bundleButtonCell">ViToolbarPopUpButtonCell</string>
-						<string key="exField">NSTextField</string>
+						<string key="exField">ExTextField</string>
 						<string key="exPrefix">NSTextField</string>
 						<string key="exWindow">NSView</string>
 						<string key="explorer">ViFileExplorer</string>
@@ -3923,7 +3923,7 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="exField">
 							<string key="name">exField</string>
-							<string key="candidateClassName">NSTextField</string>
+							<string key="candidateClassName">ExTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="exPrefix">
 							<string key="name">exPrefix</string>

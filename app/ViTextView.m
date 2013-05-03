@@ -2323,6 +2323,10 @@ replaceCharactersInRange:(NSRange)aRange
 				       inScope:[document scopeAtLocation:[self caret]]];
 		insertedKey = YES;
 	}
+
+	if (insertedKey) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:NSTextDidChangeNotification object:self];
+	}
 }
 
 - (void)doCommandBySelector:(SEL)aSelector

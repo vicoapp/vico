@@ -59,6 +59,8 @@
 				c = [ViCompletion completionWithContent:name fuzzyMatch:m];
 			else
 				c = [ViCompletion completionWithContent:name];
+
+			[c setRepresentedObject:mapping];
 			[commands addObject:c];
 		}
 	}

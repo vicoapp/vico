@@ -25,6 +25,8 @@
 
 #import "ViCommand.h"
 
+@class ViTextView;
+
 @interface ExTextField : NSTextField
 {
 	NSMutableArray		*_commandHistory;
@@ -39,5 +41,7 @@
 
 - (BOOL)ex_cancel:(ViCommand *)command;
 - (BOOL)ex_execute:(ViCommand *)command;
+
+- (ViTextView *)editor;
 
 @end

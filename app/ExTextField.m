@@ -115,7 +115,7 @@
 
 - (BOOL)becomeFirstResponder
 {
-	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = [self editor];
 	DEBUG(@"using field editor %@", editor);
 
     NSRect superFrame = [[self superview] frame];
@@ -169,6 +169,10 @@
 	return NO;
 }
 
+- (ViTextView *)editor {
+	return (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+}
+
 - (BOOL)prev_history_ignoring_prefix:(ViCommand *)command
 {
 	return [self navigateHistory:YES prefix:nil];
@@ -198,7 +202,7 @@
 	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:nil];
-	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = [self editor];
 	[editor endUndoGroup];
 	return YES;
 }
@@ -210,14 +214,14 @@
 	_running = NO;
 	if ([[self delegate] respondsToSelector:@selector(textField:executeExCommand:)])
 		[(NSObject *)[self delegate] textField:self executeExCommand:exCommand];
-	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = [self editor];
 	[editor endUndoGroup];
 	return YES;
 }
 
 - (BOOL)ex_complete:(ViCommand *)command
 {
-	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
+	ViTextView *editor = [self editor];
 
 	id<ViCompletionProvider> provider = nil;
 	NSRange range;

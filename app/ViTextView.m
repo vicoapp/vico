@@ -1999,6 +1999,8 @@ replaceCharactersInRange:(NSRange)aRange
 	[self deleteRange:NSMakeRange(start_location - 1, 1)];
 	final_location = modify_start_location;
 
+	[[NSNotificationCenter defaultCenter] postNotificationName:NSTextDidChangeNotification object:self];
+
 	return YES;
 }
 

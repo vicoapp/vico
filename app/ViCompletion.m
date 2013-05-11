@@ -275,7 +275,12 @@ static NSCharacterSet *__ucase = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViCompletion %@/%lu ~%@>", _content, _prefixLength, _filterMatch];
+	NSString *baseString = [NSString stringWithFormat:@"ViCompletion %@/%lu ~%@", _content, _prefixLength, _filterMatch];
+
+	if (_representedObject)
+		return [NSString stringWithFormat:@"<%@ -> %@", baseString, _representedObject];
+	else
+		return [NSString stringWithFormat:@"<%@>", baseString];
 }
 
 @end

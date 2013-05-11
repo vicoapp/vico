@@ -1,4 +1,5 @@
 #import "ExCommandLine.h"
+#import "ExCommandCompletion.h"
 
 // Allow conversion of NSBezierPath to a CGPathRef.
 @implementation NSBezierPath (BezierPathQuartzUtilities)
@@ -58,9 +59,24 @@
 
 @implementation ExCommandLine
 
+@synthesize completionCandidates;
+
+- (void)awakeFromNib
+{
+	[[NSNotificationCenter defaultCenter]
+	  addObserver:self
+		selector:@selector(exFieldDidChange:)
+			name:NSControlTextDidChangeNotification
+		  object:exField];
+
+	[commandCompletionController bind:@"contentArray" toObject:self withKeyPath:@"completionCandidates" options:nil];
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
 	NSRect bounds = [self bounds];
+	NSInteger viewHeight = bounds.size.height;
+	bounds.size.height = CommandLineBaseHeight; // force the height
 	NSRect backgroundBounds = CGRectOffset(bounds, 10, 10);
 	backgroundBounds.size.width -= 25;
 	backgroundBounds.size.height -= 20;
@@ -102,9 +118,39 @@
 	CGSize shadowOffset = CGSizeMake(0,0);
 	CGContextSetShadow (viewContext, shadowOffset, 10);
 
-	CGContextDrawLayerAtPoint(viewContext, NSMakePoint(0,0), backgroundLayer);
+	CGContextDrawLayerAtPoint(viewContext, NSMakePoint(0,viewHeight - CommandLineBaseHeight), backgroundLayer);
 
 	CGContextRestoreGState(viewContext);
+}
+
+- (void)exFieldDidChange:(NSNotification *)notification
+{
+	// look up partial matches based on [exField stringValue]
+	// show options in a popup
+	NSString *soFar = [exField stringValue];
+	NSError *error = nil;
+
+	ExCommandCompletion *commandCompletion = [[[ExCommandCompletion alloc] init] autorelease];
+	NSArray *candidates = [commandCompletion completionsForString:soFar options:@"f" error:&error];
+
+	[self setCompletionCandidates:candidates];
+
+	NSRect currentFrame = [self frame];
+	NSInteger desiredHeight = currentFrame.size.height;
+	if ([candidates count] <= 0) {
+		[completionScrollView setHidden:YES];
+
+		desiredHeight = CommandLineBaseHeight;
+	} else {
+		[completionScrollView setHidden:NO];
+
+		desiredHeight = CommandLineBaseHeight + [completionView frame].size.height;
+	}
+
+	currentFrame.origin.y -= (desiredHeight - currentFrame.size.height);
+	currentFrame.size.height = desiredHeight;
+
+	[self setFrame:currentFrame];
 }
 
 @end

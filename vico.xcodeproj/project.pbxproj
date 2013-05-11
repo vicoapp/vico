@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		17C1B70C17310BBC008A851A /* ExCommandLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 17C1B70B17310BBC008A851A /* ExCommandLine.m */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
@@ -409,6 +410,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		17C1B70A17310BBC008A851A /* ExCommandLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExCommandLine.h; sourceTree = "<group>"; };
+		17C1B70B17310BBC008A851A /* ExCommandLine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExCommandLine.m; sourceTree = "<group>"; };
 		17F2E3C715E0499800F81089 /* ViStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViStatusView.h; sourceTree = "<group>"; };
 		17F2E3C815E0499800F81089 /* ViStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViStatusView.m; sourceTree = "<group>"; };
 		9A0831961418FE9D00D1805D /* ViMarkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkManager.h; sourceTree = "<group>"; };
@@ -1230,6 +1233,8 @@
 				9A2606A2135B17F2002C86FB /* ThemePrefs.xib */,
 				9A4346A013311615002B04DE /* ViDocument.xib */,
 				9A4346A213311615002B04DE /* ViDocumentWindow.xib */,
+				17C1B70A17310BBC008A851A /* ExCommandLine.h */,
+				17C1B70B17310BBC008A851A /* ExCommandLine.m */,
 				9A2EF2A8133109C20023C5B7 /* MainMenu.xib */,
 				9A26066F134C50C3002C86FB /* CompletionWindow.xib */,
 				9AB6F72D14160751000F3578 /* WaitProgress.xib */,
@@ -2089,6 +2094,7 @@
 				9AF6A7071435BAA300FB373B /* ViViewController.m in Sources */,
 				9AA9272714D5B55900F0E02F /* Nu.m in Sources */,
 				17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */,
+				17C1B70C17310BBC008A851A /* ExCommandLine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

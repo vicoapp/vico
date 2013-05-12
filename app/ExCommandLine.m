@@ -158,4 +158,27 @@
 	[self setFrame:currentFrame];
 }
 
+- (void)tableView:(NSTableView *)completionView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	ViCompletion* completion =
+	  (ViCompletion *)[[commandCompletionController arrangedObjects] objectAtIndex:row];
+
+	NSAttributedString *title = [completion title];
+	ExCommand *command = (ExCommand *)[completion representedObject];
+
+	NSMutableAttributedString *cellContent = 
+	  [[NSMutableAttributedString alloc] initWithString:
+		[NSString stringWithFormat:@"%@\n%@", [title string], [command description], nil]];
+
+	[cellContent addAttribute:NSFontAttributeName value:[NSFont userFixedPitchFontOfSize:12] range:NSMakeRange(0, [[title string] length])];
+	[cellContent addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:12] range:NSMakeRange([[title string] length] + 1, [[command description] length])];
+	[cellContent addAttribute:NSForegroundColorAttributeName value:[NSColor grayColor] range:NSMakeRange([[title string] length] + 1, [[command description] length])];
+
+	NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
+	[cellContent addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [[cellContent string] length])];
+
+	[cell setAttributedStringValue:cellContent];
+}
+
 @end

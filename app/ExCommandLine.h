@@ -2,7 +2,7 @@
 
 #define CommandLineBaseHeight 63
 
-@interface ExCommandLine : NSView
+@interface ExCommandLine : NSView <NSTableViewDelegate>
 {
 	IBOutlet ExTextField *exField;
 	IBOutlet NSScrollView *completionScrollView;

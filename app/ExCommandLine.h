@@ -11,11 +11,12 @@
 }
 
 @property (nonatomic,readwrite,assign) NSArray *completionCandidates;
+@property (nonatomic,readwrite,assign) BOOL closeOnResponderChange;
 
 - (void)awakeFromNib;
 
 - (void)drawRect:(NSRect)dirtyRect;
 
-- (void)exFieldDidChange:(NSNotification *)notification;
+- (void)focusCompletions;
 
 @end

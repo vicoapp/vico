@@ -246,12 +246,14 @@
 				    options:command.mapping.parameter];
 }
 
-- (void)textDidEndEditing:(NSNotification *)aNotification
+- (void)focus_completions:(ViCommand *)command
 {
-	if (_running)
-		[self ex_cancel:nil];
-	else
-		[super textDidEndEditing:aNotification];
+	[(ExCommandLine *)[self superview] focusCompletions];
+}
+
+- (BOOL)running
+{
+	return _running;
 }
 
 @end

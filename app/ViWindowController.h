@@ -23,6 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ExCommandLine.h"
 #import "ExTextField.h"
 #import "ViTagsDatabase.h"
 #import "ViJumpList.h"
@@ -84,7 +85,7 @@
 	// ex command line
     IBOutlet NSTextField        *exPrefix;
 	IBOutlet ExTextField		*exField;
-	IBOutlet NSView				*exWindow;
+	IBOutlet ExCommandLine		*exWindow;
 	BOOL				 _exBusy;
 	BOOL				 _exModal;
 	NSString			*_exString;

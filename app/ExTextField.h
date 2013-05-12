@@ -43,5 +43,6 @@
 - (BOOL)ex_execute:(ViCommand *)command;
 
 - (ViTextView *)editor;
+- (BOOL)running;
 
 @end

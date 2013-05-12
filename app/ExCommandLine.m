@@ -1,4 +1,5 @@
 #import "ExCommandLine.h"
+
 #import "ExCommandCompletion.h"
 
 // Allow conversion of NSBezierPath to a CGPathRef.
@@ -60,6 +61,16 @@
 @implementation ExCommandLine
 
 @synthesize completionCandidates;
+@synthesize closeOnResponderChange;
+
+- (ExCommandLine *)init
+{
+	if (self = [super init]) {
+		self.closeOnResponderChange = YES;
+	}
+
+	return self;
+}
 
 - (void)awakeFromNib
 {
@@ -67,6 +78,11 @@
 	  addObserver:self
 		selector:@selector(exFieldDidChange:)
 			name:NSControlTextDidChangeNotification
+		  object:exField];
+	[[NSNotificationCenter defaultCenter]
+	  addObserver:self
+		selector:@selector(exFieldDidEndEditing:)
+			name:NSControlTextDidEndEditingNotification
 		  object:exField];
 
 	[commandCompletionController bind:@"contentArray" toObject:self withKeyPath:@"completionCandidates" options:nil];
@@ -156,6 +172,20 @@
 	currentFrame.size.height = desiredHeight;
 
 	[self setFrame:currentFrame];
+}
+
+- (void)exFieldDidEndEditing:(NSNotification *)notification
+{
+	if ([exField running] && self.closeOnResponderChange) {
+		[exField ex_cancel:nil];
+	}
+}
+
+- (void)focusCompletions
+{
+	self.closeOnResponderChange = NO;
+	[[self window] makeFirstResponder:completionView];
+	self.closeOnResponderChange = YES;
 }
 
 - (void)tableView:(NSTableView *)completionView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row

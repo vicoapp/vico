@@ -609,6 +609,7 @@
 																	<reference key="NSNextResponder" ref="250498610"/>
 																	<int key="NSvFlags">2304</int>
 																	<array class="NSMutableArray" key="NSSubviews">
+																		<object class="NSTableView" id="466188620">
 																			<reference key="NSNextResponder" ref="676231705"/>
 																			<int key="NSvFlags">4352</int>
 																			<string key="NSFrameSize">{375, 98}</string>
@@ -719,6 +720,7 @@
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="466188620"/>
 																	<string key="NSReuseIdentifierKey">_NS:1195</string>
+																	<reference key="NSDocView" ref="466188620"/>
 																	<reference key="NSBGColor" ref="1041895481"/>
 																	<int key="NScvFlags">4</int>
 																</object>
@@ -4190,7 +4192,7 @@
 						<string key="bundleButtonCell">ViToolbarPopUpButtonCell</string>
 						<string key="exField">ExTextField</string>
 						<string key="exPrefix">NSTextField</string>
-						<string key="exWindow">NSView</string>
+						<string key="exWindow">ExCommandLine</string>
 						<string key="explorer">ViFileExplorer</string>
 						<string key="explorerActionMenu">NSMenu</string>
 						<string key="explorerView">ViBgView</string>
@@ -4230,7 +4232,7 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="exWindow">
 							<string key="name">exWindow</string>
-							<string key="candidateClassName">NSView</string>
+							<string key="candidateClassName">ExCommandLine</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="explorer">
 							<string key="name">explorer</string>

@@ -456,7 +456,7 @@
 (xmap setKey:"<pagedown>" toAction:"next_history_ignoring_prefix:")
 (xmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
 (xmap setKey:"<ctrl-d>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
-(xmap setKey:"<tab>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
+(xmap setKey:"<tab>" toAction:"focus_completions:" flags:0 parameter:"pa" scope:nil)
 (xmap setKey:"<ctrl-f>" toAction:"ex_complete:" flags:0 parameter:"Ffpa" scope:nil)
 ;; Restore normal Mac OS X keyboard actions in insert mode.
 (xmap setKey:"<alt-bs>" toAction:"deleteWordBackward:")

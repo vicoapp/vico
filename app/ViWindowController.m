@@ -1324,7 +1324,7 @@ DEBUG_FINALIZE();
 		[self didSelectViewController:viewController];
 	}
 
-	if (_exModal && view != exField) {
+	if (_exModal && view != exField && [exWindow closeOnResponderChange]) {
 		[NSApp abortModal];
 		_exModal = NO;
 	}

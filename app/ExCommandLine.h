@@ -1,4 +1,5 @@
 #import "ExTextField.h"
+#import "ExCompletionView.h"
 
 #define CommandLineBaseHeight 63
 
@@ -6,7 +7,7 @@
 {
 	IBOutlet ExTextField *exField;
 	IBOutlet NSScrollView *completionScrollView;
-	IBOutlet NSTableView *completionView;
+	IBOutlet ExCompletionView *completionView;
 	IBOutlet NSArrayController *commandCompletionController;
 }
 

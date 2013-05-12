@@ -32,6 +32,7 @@ OBJC_SRCS = \
 	ExParser.m \
 	ExTextField.m \
 	ExCommandLine.m \
+	ExCompletionView.m \
 	MHTextIconCell.m \
 	NSArray-patterns.m \
 	NSEvent-keyAdditions.m \

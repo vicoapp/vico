@@ -2456,6 +2456,22 @@
 					<int key="connectionID">100730</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">completionView</string>
+						<reference key="source" ref="24397800"/>
+						<reference key="destination" ref="466188620"/>
+					</object>
+					<int key="connectionID">100816</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">commandLine</string>
+						<reference key="source" ref="24397800"/>
+						<reference key="destination" ref="581844326"/>
+					</object>
+					<int key="connectionID">100817</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.exploresortfolders</string>
 						<reference key="source" ref="1056739065"/>
@@ -3690,7 +3706,7 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="commandCompletionController">NSArrayController</string>
 						<string key="completionScrollView">NSScrollView</string>
-						<string key="completionView">NSTableView</string>
+						<string key="completionView">ExCompletionView</string>
 						<string key="exField">ExTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -3704,7 +3720,7 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="completionView">
 							<string key="name">completionView</string>
-							<string key="candidateClassName">NSTableView</string>
+							<string key="candidateClassName">ExCompletionView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="exField">
 							<string key="name">exField</string>

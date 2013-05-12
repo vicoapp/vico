@@ -24,9 +24,11 @@
  */
 
 #import "ExTextField.h"
+
 #import "ViThemeStore.h"
 #import "ViTextView.h"
 #import "ExParser.h"
+#import "ExCommandLine.h"
 #include "logging.h"
 
 @interface NSObject (private)

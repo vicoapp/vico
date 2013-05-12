@@ -130,8 +130,13 @@
 	NSString *soFar = [exField stringValue];
 	NSError *error = nil;
 
-	ExCommandCompletion *commandCompletion = [[[ExCommandCompletion alloc] init] autorelease];
-	NSArray *candidates = [commandCompletion completionsForString:soFar options:@"f" error:&error];
+	NSArray *candidates;
+	if ([soFar length] > 0) {
+		ExCommandCompletion *commandCompletion = [[[ExCommandCompletion alloc] init] autorelease];
+		candidates = [commandCompletion completionsForString:soFar options:@"f" error:&error];
+	} else {
+		candidates = [NSArray array];
+	}
 
 	[self setCompletionCandidates:candidates];
 

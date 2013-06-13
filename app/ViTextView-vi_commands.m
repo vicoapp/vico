@@ -2429,10 +2429,11 @@
 /* syntax: q<char> to start, q to end */
 - (BOOL)toggle_record_macro:(ViCommand *)command
 {
-	if ([_keyManager isRecordingMacro]) {
-		[_keyManager stopRecordingMacroAndSave];
+	ViParser *parser = [[ViWindowController currentWindowController] parser];
+	if ([parser isRecordingMacro]) {
+		[parser stopRecordingMacroAndSave];
 	} else {
-		[_keyManager startRecordingMacro:[command argument]];
+		[parser startRecordingMacro:[command argument]];
 	}
 
 	return YES;

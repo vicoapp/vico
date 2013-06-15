@@ -293,12 +293,11 @@
 			if (replacedText != value) {
 				if (lastReplacedLine == NSNotFound) {
 					[storage beginEditing];
-					lastReplacedLine = lineno;
 				}
+
+				lastReplacedLine = lineno;
+
 				[self replaceCharactersInRange:lineRange withString:replacedText];
-			} else if (lastReplacedLine != NSNotFound) {
-				[storage endEditing];
-				lastReplacedLine = NSNotFound;
 			}
 		}
 	}
@@ -310,7 +309,10 @@
 		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 	} else {
 		[self endUndoGroup];
-		command.caret = [storage locationForStartOfLine:NSMaxRange(exRange)];
+
+		NSUInteger resultingLine = lastReplacedLine == NSNotFound ? NSMaxRange(exRange) : lastReplacedLine;
+		command.caret = [storage locationForStartOfLine:resultingLine];
+
 		return nil;
 	}
 }

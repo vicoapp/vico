@@ -310,6 +310,7 @@
 	} else {
 		[self endUndoGroup];
 
+		[self pushCurrentLocationOnJumpList];
 		NSUInteger resultingLine = lastReplacedLine == NSNotFound ? NSMaxRange(exRange) : lastReplacedLine;
 		command.caret = [storage locationForStartOfLine:resultingLine];
 

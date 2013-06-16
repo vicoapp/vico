@@ -209,52 +209,47 @@
                       global:(BOOL)global
                        error:(NSError **)outError
 {
-	id text = value;
 	BOOL copied = NO;
-	NSUInteger begin = 0;
-	while (begin <= [text length]) {
-		NSRange r = NSMakeRange(begin, [text length] - begin);
-		DEBUG(@"matching rx %@ in range %@ in string [%@]",
-		    rx, NSStringFromRange(r), text);
-		int opts = 0;
-		if (begin > 0)
-			opts |= ONIG_OPTION_NOTBOL;
-		if (NSMaxRange(r) < [text length])
-			opts |= ONIG_OPTION_NOTEOL;
-		ViRegexpMatch *m = [rx matchInString:text range:r options:opts];
-		DEBUG(@"m = %@", m);
-		if (m == nil)
-			break;
-		r = [m rangeOfMatchedString];
-		DEBUG(@"matched range %@", NSStringFromRange(r));
-		if (r.location == NSNotFound)
-			break;
+	id text = value;
+	ViRegexpMatch *match = [rx matchInString:value];
+	NSRange matchedRange;
+	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
 		if (!copied) {
 			text = [[value mutableCopy] autorelease];
 			copied = YES;
 		}
-		NSString *expFormat = [self expandFormat:format
-		                               withMatch:m
-		                               stopChars:@""
-		                          originalString:text
-		                           scannedLength:nil
-		                                   error:outError];
-		if (expFormat == nil) {
+
+		NSString *expandedFormat =
+		  [self expandFormat:format
+				   withMatch:match
+				   stopChars:@""
+			  originalString:text
+			   scannedLength:nil
+					   error:outError];
+
+		if (expandedFormat == nil) {
 			if (outError)
 				return nil;
-			expFormat = @"";
+
+			expandedFormat = @"";
 		}
-		DEBUG(@"replace range %@ in string [%@] with expanded format [%@]",
-		    NSStringFromRange(r), text, expFormat);
-		[text replaceCharactersInRange:r withString:expFormat];
 
-		if (!global)
-			break;
+		DEBUG(@"replace range %@ in string [%@] with expanded format [%@] from regex %@",
+		    NSStringFromRange(matchedRange), text, expandedFormat, rx);
+		[text replaceCharactersInRange:matchedRange withString:expandedFormat];
 
-		begin = r.location + [expFormat length];
-		if (r.length == 0)
-			++begin; /* prevent infinite loops with zero-length matches */
+		NSUInteger nextStart = matchedRange.location + expandedFormat.length;
+		if (!global) {
+		  nextStart = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
+		}
+
+		if (nextStart >= [text length]) {
+		  match = nil;
+		} else {
+		  match = [rx matchInString:text range:NSMakeRange(nextStart, [text length] - nextStart)];
+		}
 	}
+
 	DEBUG(@"transformed [%@] -> [%@]", value, text);
 	return text;
 }

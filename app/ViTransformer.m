@@ -204,10 +204,11 @@
 }
 
 - (NSString *)transformValue:(NSString *)value
-                 withPattern:(ViRegexp *)rx
-                      format:(NSString *)format
-                      global:(BOOL)global
-                       error:(NSError **)outError
+				 withPattern:(ViRegexp *)rx
+				      format:(NSString *)format
+					  global:(BOOL)global
+					   error:(NSError **)outError
+		   lastReplacedRange:(NSRange *)lastReplacedRange
 {
 	BOOL copied = NO;
 	id text = value;
@@ -237,6 +238,8 @@
 		DEBUG(@"replace range %@ in string [%@] with expanded format [%@] from regex %@",
 		    NSStringFromRange(matchedRange), text, expandedFormat, rx);
 		[text replaceCharactersInRange:matchedRange withString:expandedFormat];
+		if (lastReplacedRange)
+		  *lastReplacedRange = NSMakeRange(matchedRange.location, expandedFormat.length);
 
 		NSUInteger nextStart = matchedRange.location + expandedFormat.length;
 		if (!global) {
@@ -252,6 +255,21 @@
 
 	DEBUG(@"transformed [%@] -> [%@]", value, text);
 	return text;
+}
+
+- (NSString *)transformValue:(NSString *)value
+                 withPattern:(ViRegexp *)rx
+                      format:(NSString *)format
+                      global:(BOOL)global
+                       error:(NSError **)outError
+{
+	return
+	  [self transformValue:value
+			   withPattern:rx
+					format:format
+					global:global
+					 error:outError
+		 lastReplacedRange:nil];
 }
 
 @end

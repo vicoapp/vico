@@ -35,5 +35,12 @@
                       global:(BOOL)global
                        error:(NSError **)outError;
 
+- (NSString *)transformValue:(NSString *)value
+                 withPattern:(ViRegexp *)rx
+                      format:(NSString *)format
+                      global:(BOOL)global
+                       error:(NSError **)outError
+		   lastReplacedRange:(NSRange *)range;
+
 @end
 

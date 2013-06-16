@@ -225,6 +225,8 @@
 	NSString *opts = command.options ?: @"";
 	if ([opts rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
+	if ([opts rangeOfString:@"m"].location != NSNotFound)
+		rx_options |= ONIG_OPTION_MULTILINE;
 
 	BOOL reportMatches = NO;
 	if ([opts rangeOfString:@"n"].location != NSNotFound)

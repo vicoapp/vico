@@ -259,60 +259,32 @@
 	NSUInteger numMatches = 0;
 	NSUInteger numLines = 0;
 
-	NSUInteger lastReplacedLine = NSNotFound;
+	NSRange lastMatchedRange = NSMakeRange(NSNotFound, 0);
+	NSString *globalReplacedText =
+	  [tform transformValue:s
+				withPattern:rx
+					 format:command.replacement
+					 global:global
+					  error:&error
+		  lastReplacedRange:&lastMatchedRange];
 
-	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
-		NSRange lineRange = [storage rangeOfLine:lineno];
+	if (globalReplacedText != s) {
+		[storage beginEditing];
 
-		if (reportMatches) {
-			if (global) {
-				NSArray *matches = [rx allMatchesInString:s range:lineRange];
-				NSUInteger nm = [matches count];
-				if (nm > 0) {
-					numMatches += nm;
-					numLines++;
-				}
-			} else {
-				ViRegexpMatch *match = [rx matchInString:s range:lineRange];
-				if (match) {
-					numMatches++;
-					numLines++;
-				}
-			}
-		} else {
-			NSString *value = [s substringWithRange:lineRange];
-			DEBUG(@"range %@ = %@", NSStringFromRange(lineRange), value);
-			NSString *replacedText = [tform transformValue:value
-							   withPattern:rx
-								format:command.replacement
-								global:global
-								 error:&error];
-			if (error)
-				return error;
-
-			if (replacedText != value) {
-				if (lastReplacedLine == NSNotFound) {
-					[storage beginEditing];
-				}
-
-				lastReplacedLine = lineno;
-
-				[self replaceCharactersInRange:lineRange withString:replacedText];
-			}
-		}
+		[self replaceCharactersInRange:NSMakeRange(0, [s length]) withString:globalReplacedText];
 	}
-
-	if (lastReplacedLine != NSNotFound)
-		[[self textStorage] endEditing];
 
 	if (reportMatches) {
 		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 	} else {
+		[storage endEditing];
 		[self endUndoGroup];
 
 		[self pushCurrentLocationOnJumpList];
-		NSUInteger resultingLine = lastReplacedLine == NSNotFound ? NSMaxRange(exRange) : lastReplacedLine;
-		command.caret = [storage locationForStartOfLine:resultingLine];
+		command.caret =
+		  (lastMatchedRange.location == NSNotFound) ?
+			[storage locationForStartOfLine:MIN(NSMaxRange(exRange), [storage lineCount])] :
+			NSMaxRange(lastMatchedRange);
 
 		return nil;
 	}

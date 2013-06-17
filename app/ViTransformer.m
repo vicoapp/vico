@@ -204,13 +204,13 @@
 }
 
 - (void)affectedLines:(NSUInteger *)affectedLines
-		 replacements:(NSUInteger *)affectedReplacements
+		 replacements:(NSUInteger *)replacements
 whenTransformingValue:(NSString *)value
 		  withPattern:(ViRegexp *)rx
 			   global:(BOOL)global
 {
 	*affectedLines = 0;
-	*affectedReplacements = 0;
+	*replacements = 0;
 
 	ViRegexpMatch *match = [rx matchInString:value];
 	NSUInteger nextNewline = 0;
@@ -227,7 +227,7 @@ whenTransformingValue:(NSString *)value
 			nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
 		}
 		
-		(*affectedReplacements)++;
+		(*replacements)++;
 
 		if (nextStart >= [value length]) {
 		  match = nil;
@@ -243,10 +243,18 @@ whenTransformingValue:(NSString *)value
 					  global:(BOOL)global
 					   error:(NSError **)outError
 		   lastReplacedRange:(NSRange *)lastReplacedRange
+			   affectedLines:(NSUInteger *)affectedLines
+				replacements:(NSUInteger *)replacements
 {
+	if (affectedLines)
+		*affectedLines = 0;
+	if (replacements)
+		*replacements = 0;
+
 	BOOL copied = NO;
 	id text = value;
 	ViRegexpMatch *match = [rx matchInString:value];
+	NSUInteger nextNewline = 0;
 	NSRange matchedRange;
 	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
 		if (!copied) {
@@ -277,8 +285,19 @@ whenTransformingValue:(NSString *)value
 
 		NSUInteger nextStart = matchedRange.location + expandedFormat.length;
 		if (!global) {
-		  nextStart = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
+			if (affectedLines)
+				(*affectedLines)++;
+			
+			nextStart = nextNewline = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
+		} else if (nextStart > nextNewline) {
+			if (affectedLines)
+				(*affectedLines)++;
+
+			nextNewline = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
 		}
+
+		if (replacements)
+			(*replacements)++;
 
 		if (nextStart >= [text length]) {
 		  match = nil;
@@ -303,7 +322,9 @@ whenTransformingValue:(NSString *)value
 					format:format
 					global:global
 					 error:outError
-		 lastReplacedRange:nil];
+		 lastReplacedRange:nil
+			 affectedLines:nil
+			  replacements:nil];
 }
 
 @end

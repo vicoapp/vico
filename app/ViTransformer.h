@@ -30,7 +30,7 @@
 }
 
 - (void)affectedLines:(NSUInteger *)affectedLines
-		 replacements:(NSUInteger *)affectedReplacements
+		 replacements:(NSUInteger *)replacements
 whenTransformingValue:(NSString *)value
 		  withPattern:(ViRegexp *)rx
 			   global:(BOOL)global;
@@ -46,7 +46,9 @@ whenTransformingValue:(NSString *)value
                       format:(NSString *)format
                       global:(BOOL)global
                        error:(NSError **)outError
-		   lastReplacedRange:(NSRange *)range;
+		   lastReplacedRange:(NSRange *)range
+			   affectedLines:(NSUInteger *)affectedLines
+			    replacements:(NSUInteger *)replacements;
 
 @end
 

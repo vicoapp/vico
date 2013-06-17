@@ -258,17 +258,15 @@
 	NSString *string = [storage string];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
-	if (reportMatches) {
-		NSUInteger numMatches = 0;
-		NSUInteger numLines = 0;
+	NSUInteger numMatches = 0;
+	NSUInteger numLines = 0;
 
+	if (reportMatches) {
 		[transform affectedLines:&numLines
 					replacements:&numMatches
 		   whenTransformingValue:string
 					 withPattern:rx
 						  global:global]; 
-
-		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 	} else {
 		NSRange lastMatchedRange = NSMakeRange(NSNotFound, 0);
 		NSString *globalReplacedText =
@@ -277,7 +275,9 @@
 							 format:command.replacement
 							 global:global
 							  error:&error
-				  lastReplacedRange:&lastMatchedRange];
+				  lastReplacedRange:&lastMatchedRange
+					  affectedLines:&numLines
+					   replacements:&numMatches];
 
 		if (globalReplacedText != string) {
 			[storage beginEditing];
@@ -293,9 +293,9 @@
 		  (lastMatchedRange.location == NSNotFound) ?
 			[storage locationForStartOfLine:MIN(NSMaxRange(exRange), [storage lineCount])] :
 			NSMaxRange(lastMatchedRange);
-
-		return nil;
 	}
+
+	return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 }
 
 - (id)ex_goto:(ExCommand *)command

@@ -29,6 +29,12 @@
 {
 }
 
+- (void)affectedLines:(NSUInteger *)affectedLines
+		 replacements:(NSUInteger *)affectedReplacements
+whenTransformingValue:(NSString *)value
+		  withPattern:(ViRegexp *)rx
+			   global:(BOOL)global;
+
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format

@@ -203,6 +203,40 @@
 	return s;
 }
 
+- (void)affectedLines:(NSUInteger *)affectedLines
+		 replacements:(NSUInteger *)affectedReplacements
+whenTransformingValue:(NSString *)value
+		  withPattern:(ViRegexp *)rx
+			   global:(BOOL)global
+{
+	*affectedLines = 0;
+	*affectedReplacements = 0;
+
+	ViRegexpMatch *match = [rx matchInString:value];
+	NSUInteger nextNewline = 0;
+	NSRange matchedRange;
+	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
+		NSUInteger nextStart = NSMaxRange(matchedRange);
+		if (!global) {
+			(*affectedLines)++;
+			
+			nextStart = nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
+		} else if (nextStart > nextNewline) {
+			(*affectedLines)++;
+
+			nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
+		}
+		
+		(*affectedReplacements)++;
+
+		if (nextStart >= [value length]) {
+		  match = nil;
+		} else {
+		  match = [rx matchInString:value range:NSMakeRange(nextStart, [value length] - nextStart)];
+		}
+	}
+}
+
 - (NSString *)transformValue:(NSString *)value
 				 withPattern:(ViRegexp *)rx
 				      format:(NSString *)format

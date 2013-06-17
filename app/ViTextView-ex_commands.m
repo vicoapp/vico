@@ -253,32 +253,38 @@
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
-	ViTransformer *tform = [[[ViTransformer alloc] init] autorelease];
+	ViTransformer *transform = [[[ViTransformer alloc] init] autorelease];
 
-	NSString *s = [storage string];
+	NSString *string = [storage string];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
-	NSUInteger numMatches = 0;
-	NSUInteger numLines = 0;
-
-	NSRange lastMatchedRange = NSMakeRange(NSNotFound, 0);
-	NSString *globalReplacedText =
-	  [tform transformValue:s
-				withPattern:rx
-					 format:command.replacement
-					 global:global
-					  error:&error
-		  lastReplacedRange:&lastMatchedRange];
-
-	if (globalReplacedText != s) {
-		[storage beginEditing];
-
-		[self replaceCharactersInRange:NSMakeRange(0, [s length]) withString:globalReplacedText];
-	}
-
 	if (reportMatches) {
+		NSUInteger numMatches = 0;
+		NSUInteger numLines = 0;
+
+		[transform affectedLines:&numLines
+					replacements:&numMatches
+		   whenTransformingValue:string
+					 withPattern:rx
+						  global:global]; 
+
 		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 	} else {
+		NSRange lastMatchedRange = NSMakeRange(NSNotFound, 0);
+		NSString *globalReplacedText =
+		  [transform transformValue:string
+						withPattern:rx
+							 format:command.replacement
+							 global:global
+							  error:&error
+				  lastReplacedRange:&lastMatchedRange];
+
+		if (globalReplacedText != string) {
+			[storage beginEditing];
+
+			[self replaceCharactersInRange:NSMakeRange(0, [string length]) withString:globalReplacedText];
+		}
+
 		[storage endEditing];
 		[self endUndoGroup];
 

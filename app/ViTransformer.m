@@ -217,11 +217,14 @@ whenTransformingValue:(NSString *)value
 	NSRange matchedRange;
 	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
 		NSUInteger nextStart = NSMaxRange(matchedRange);
-		if (!global) {
+		if (matchedRange.length == 0)
+		  nextStart += 1;
+
+		if (!global && nextStart < value.length) {
 			(*affectedLines)++;
 			
 			nextStart = nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
-		} else if (nextStart > nextNewline) {
+		} else if (nextStart > nextNewline && nextStart < value.length) {
 			(*affectedLines)++;
 
 			nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
@@ -284,12 +287,15 @@ whenTransformingValue:(NSString *)value
 		  *lastReplacedRange = NSMakeRange(matchedRange.location, expandedFormat.length);
 
 		NSUInteger nextStart = matchedRange.location + expandedFormat.length;
-		if (!global) {
+		if (matchedRange.length == 0)
+		  nextStart += 1;
+
+		if (!global && nextStart < [text length]) {
 			if (affectedLines)
 				(*affectedLines)++;
 			
 			nextStart = nextNewline = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
-		} else if (nextStart > nextNewline) {
+		} else if (nextStart > nextNewline && nextStart < [text length]) {
 			if (affectedLines)
 				(*affectedLines)++;
 

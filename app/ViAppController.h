@@ -53,6 +53,7 @@ additionalBindings:(NSDictionary *)bindings
 - (NSError *)openURL:(NSString *)pathOrURL
              andWait:(BOOL)waitFlag
          backChannel:(NSString *)channelName;
+- (void)setStartupBasePath:(NSString *)basePath;
 - (NSError *)openURL:(NSString *)pathOrURL;
 - (IBAction)newProject:(id)sender;
 

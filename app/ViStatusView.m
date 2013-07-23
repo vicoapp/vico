@@ -32,6 +32,7 @@
 - (void)awakeFromNib
 {
 	_messageField = nil;
+	_canHideMessage = YES;
 
 	[self setAutoresizesSubviews:YES];
 
@@ -68,6 +69,15 @@
 
 	for (ViStatusComponent *component in _components)
 		[component.control setHidden:YES];
+
+	_canHideMessage = NO;
+
+	[self performSelectorOnMainThread:@selector(enableMessageHiding) withObject:nil waitUntilDone:NO];
+}
+
+- (void)enableMessageHiding
+{
+	_canHideMessage = YES;
 }
 
 - (void)hideMessage
@@ -151,7 +161,8 @@
 
 - (void)statusComponentChanged:(NSNotification *)notification
 {
-	[self hideMessage];
+	if (_canHideMessage)
+		[self hideMessage];
 }
 
 #pragma mark --

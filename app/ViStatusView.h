@@ -32,12 +32,15 @@
 {
 	NSArray *_components;
 	NSTextField *_messageField;
+
+	BOOL _canHideMessage;
 }
 
 - (void)awakeFromNib;
 
 - (void)initMessageField;
 - (void)setMessage:(NSString *)message;
+- (void)enableMessageHiding;
 
 - (void)setPatternString:(NSString *)pattern;
 - (void)setStatusComponents:(NSArray *)components;

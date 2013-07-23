@@ -255,7 +255,13 @@
 	ViTextStorage *storage = [self textStorage];
 	ViTransformer *transform = [[[ViTransformer alloc] init] autorelease];
 
-	NSString *string = [storage string];
+	NSInteger startLocation = [storage locationForStartOfLine:exRange.location];
+	NSRange replacementRange =
+	  NSMakeRange(
+		startLocation,
+		NSMaxRange([storage rangeOfLine:NSMaxRange(exRange)]) - startLocation
+	  );
+	NSString *string = [[storage string] substringWithRange:replacementRange];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
 	NSUInteger numMatches = 0;
@@ -282,7 +288,7 @@
 		if (globalReplacedText != string) {
 			[storage beginEditing];
 
-			[self replaceCharactersInRange:NSMakeRange(0, [string length]) withString:globalReplacedText];
+			[self replaceCharactersInRange:replacementRange withString:globalReplacedText];
 		}
 
 		[storage endEditing];
@@ -292,7 +298,7 @@
 		command.caret =
 		  (lastMatchedRange.location == NSNotFound) ?
 			[storage locationForStartOfLine:MIN(NSMaxRange(exRange), [storage lineCount])] :
-			NSMaxRange(lastMatchedRange);
+			NSMaxRange(lastMatchedRange) + startLocation;
 	}
 
 	return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];

@@ -44,6 +44,7 @@
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
 #import "ViTaskRunner.h"
+#import "ViWordCompletion.h"
 #import "ViEventManager.h"
 
 #import <objc/runtime.h>
@@ -1815,7 +1816,17 @@ replaceCharactersInRange:(NSRange)aRange
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:s
 			atLocation:start_location];
+
 		final_location = modify_start_location + 1;
+
+		NSRange wordRange;
+		NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		if ([word length] >= 2) {
+			[self presentCompletionsOf:word
+			      fromProvider:[[[ViWordCompletion alloc] init] autorelease]
+					fromRange:wordRange
+					  options:@"?"];
+		}
 		DEBUG(@"setting final location to %lu", final_location);
 	}
 

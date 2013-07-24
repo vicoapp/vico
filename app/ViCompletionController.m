@@ -218,6 +218,8 @@
 	_prefixLength = [aPrefix length];
 	_options = [optionString retain];
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
+	// Aggressive means we auto-select a unique suggestion.
+	BOOL aggressive = ([_options rangeOfString:@"?"].location == NSNotFound);
 	_screenOrigin = origin;
 	_upwards = (direction == 1);
 
@@ -238,7 +240,7 @@
 	}
 	[self completionResponse:result error:nil];
 
-	if (_onlyCompletion) {
+	if (_onlyCompletion && aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
 		[self reset];
 		ViCompletion *ret = [_onlyCompletion autorelease];

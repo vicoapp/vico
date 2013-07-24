@@ -3117,9 +3117,11 @@ again:
 {
 	DEBUG(@"insert partial completion [%@] in range %@, length = %lu",
 	    partialCompletion, NSStringFromRange(range), [[self textStorage] length]);
+
 	[self replaceRange:range withString:partialCompletion];
 	final_location = range.location + [partialCompletion length];
 	[self setCaret:final_location];
+
 	return YES;
 }
 

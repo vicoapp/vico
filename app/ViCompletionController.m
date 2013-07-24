@@ -415,6 +415,8 @@
 	if (row >= 0 && row < [_filteredCompletions count]) {
 		[_selection release];
 		_selection = [[_filteredCompletions objectAtIndex:row] retain];
+
+		_range = NSMakeRange(_range.location, [_selection.content length]);
 	}
 	[window orderOut:nil];
 	[NSApp stopModal];
@@ -503,6 +505,9 @@
 	if ([partialCompletion length] == 0)
 		return YES;
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
+
+	_range = NSMakeRange(_range.location, [partialCompletion length]);
+
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
 	    [(NSObject *)_delegate methodSignatureForSelector:sel]];
 	[invocation setSelector:sel];
@@ -515,7 +520,6 @@
 	if (!ret)
 		return NO;
 
-	_range = NSMakeRange(_range.location, [partialCompletion length]);
 	DEBUG(@"_range => %@", NSStringFromRange(_range));
 	_prefixLength = _range.length;
 	[self setCompletions:_filteredCompletions];

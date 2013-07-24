@@ -3155,7 +3155,7 @@ again:
 		     initialFilter:fuzzyTrigger ? string : nil];
 	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
 	if (selection)
-		[self insertSnippet:selection.content inRange:cc.range];
+		[self insertText:selection.content replacementRange:cc.range];
 
 	NSInteger termKey = cc.terminatingKey;
 	if (termKey >= 0x20 && termKey < 0xFFFF) {

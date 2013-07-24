@@ -45,6 +45,8 @@
 - (BOOL)completionController:(ViCompletionController *)completionController
      insertPartialCompletion:(NSString *)partialCompletion
                      inRange:(NSRange)range;
+- (void)completionController:(ViCompletionController *)completionController
+appendedStringWithoutCompleting:(NSString *)string;
 @end
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>

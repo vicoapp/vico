@@ -23,6 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "NSString-additions.h"
 #import "ViCompletionController.h"
 #import "ViCommand.h"
 #import "ViKeyManager.h"
@@ -461,13 +462,22 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	[_filter appendString:[NSString stringWithFormat:@"%C", (unichar)keyCode]];
+	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
+	[_filter appendString:string];
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;
 		[window orderOut:nil];
 		[NSApp abortModal];
 		return YES;
+	} else {
+		SEL sel = @selector(completionController:appendedStringWithoutCompleting:);
+		NSInvocation *invocation =
+		  [NSInvocation invocationWithMethodSignature:[(NSObject *)_delegate methodSignatureForSelector:sel]];
+		[invocation setSelector:sel];
+		[invocation setArgument:&self atIndex:2];
+		[invocation setArgument:&string atIndex:3];
+		[invocation invokeWithTarget:_delegate];
 	}
 
 	return YES;

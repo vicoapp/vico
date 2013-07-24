@@ -3171,6 +3171,11 @@ again:
 	return YES;
 }
 
+- (void)completionController:(ViCompletionController *)controller appendedStringWithoutCompleting:(NSString *)string
+{
+	[self insertString:string atLocation:[self caret]];
+}
+
 - (void)removeFromInputKeys:(ViCommand *)command
 {
 	NSArray *keySequence = command.keySequence;

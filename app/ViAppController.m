@@ -687,6 +687,11 @@ additionalBindings:(NSDictionary *)bindings
 	return error;
 }
 
+- (void)setStartupBasePath:(NSString *)basePath
+{
+	[[ViWindowController currentWindowController] setBaseURL:[NSURL fileURLWithPath:basePath]];
+}
+
 - (NSError *)openURL:(NSString *)pathOrURL
 {
 	return [self openURL:pathOrURL andWait:NO backChannel:nil];

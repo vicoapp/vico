@@ -472,7 +472,7 @@
 (cmap setKey:"<ctrl-e>" toAction:"cancel:")
 (cmap setKey:"<cr>" toAction:"accept:")
 (cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
-;(cmap setKey:"<space>" toAction:"accept:") TODO restore this conditionally based on as-you-typeness
+(cmap setKey:"<space>" toAction:"accept_if_not_autocompleting:")
 (cmap setKey:"<ctrl-y>" toAction:"accept:")
 (cmap setKey:"<ctrl-n>" toAction:"move_down:")
 (cmap setKey:"<ctrl-j>" toAction:"move_down:")

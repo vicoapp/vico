@@ -224,6 +224,7 @@
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
 	// Aggressive means we auto-select a unique suggestion.
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
+	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
 	_screenOrigin = origin;
 	_upwards = (direction == 1);
 
@@ -435,6 +436,19 @@
 	[window orderOut:nil];
 	[NSApp abortModal];
 	[self reset];
+
+	return YES;
+}
+
+- (BOOL)accept_if_not_autocompleting:(ViCommand *)command
+{
+	if (! _autocompleting) {
+		[self accept:command];
+	} else {
+		[_existingKeyManager handleKeys:command.keySequence];
+
+		[self cancel:command];
+	}
 
 	return YES;
 }

@@ -70,6 +70,7 @@
 	NSPoint				 _screenOrigin;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
+	BOOL				 _autocompleting;
 	BOOL				 _aggressive;
 }
 

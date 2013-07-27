@@ -2276,12 +2276,6 @@ replaceCharactersInRange:(NSRange)aRange
 	if (mode != ViInsertMode)
 		[self endUndoGroup];
 
-	/* TODO hm?
-	if (ok && !keepMessagesHack)
-		[self updateStatus];
-	keepMessagesHack = NO;
-	*/
-
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"matchparen"])
 		[self highlightSmartPairAtLocation:[self caret]];
 

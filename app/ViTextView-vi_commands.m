@@ -3168,17 +3168,6 @@ again:
 		[self insertSnippet:completion.content inRange:cc.range];
 	}
 
-	NSInteger termKey = cc.terminatingKey;
-	if (termKey >= 0x20 && termKey < 0xFFFF) {
-		NSString *special = [NSString stringWithKeyCode:termKey];
-		if ([special length] == 1) {
-			[self insertString:[NSString stringWithFormat:@"%C", (unichar)termKey]];
-			final_location++;
-		} /* otherwise it's a <special> key code, ignore it */
-	} else if (termKey == 0x0D && [self isFieldEditor]) {
-		[_keyManager handleKey:termKey];
-	}
-
 	if (completion == nil)
 		return NO;
 	return YES;

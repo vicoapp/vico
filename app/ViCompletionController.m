@@ -177,7 +177,7 @@
 				[self cancel:nil];
 				return;
 			}
-		} else if ([_filteredCompletions count] == 1) {
+		} else if ([_filteredCompletions count] == 1 && _aggressive) {
 			if ([window isVisible]) {
 				[self acceptByKey:0];
 			} else {
@@ -220,7 +220,7 @@
 	_options = [optionString retain];
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
 	// Aggressive means we auto-select a unique suggestion.
-	BOOL aggressive = ([_options rangeOfString:@"?"].location == NSNotFound);
+	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
 	_screenOrigin = origin;
 	_upwards = (direction == 1);
 
@@ -241,7 +241,7 @@
 	}
 	[self completionResponse:result error:nil];
 
-	if (_onlyCompletion && aggressive) {
+	if (_onlyCompletion && _aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
 		[self reset];
 		ViCompletion *ret = [_onlyCompletion autorelease];

@@ -71,6 +71,7 @@ appendedStringWithoutCompleting:(NSString *)string;
 	NSPoint				 _screenOrigin;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
+	BOOL				 _aggressive;
 }
 
 @property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;

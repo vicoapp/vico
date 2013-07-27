@@ -267,17 +267,19 @@ main(int argc, char **argv)
 		if (argc > 0 && new_window)
 			[proxy newProject:nil];
 
+		NSString *basePath = [[NSFileManager defaultManager] currentDirectoryPath];
+		if (! wasRunning) {
+			[proxy setStartupBasePath:basePath];
+		}
+
 		for (i = 0; i < argc; i++) {
 			NSString *path = [NSString stringWithUTF8String:argv[i]];
-			NSString *basePath = [[NSFileManager defaultManager] currentDirectoryPath];
 			if ([path rangeOfString:@"://"].location == NSNotFound) {
 				path = [path stringByExpandingTildeInPath];
 				if (![path isAbsolutePath])
 					path = [basePath stringByAppendingPathComponent:path];
 				path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
 			}
-			if (! wasRunning)
-				[proxy setStartupBasePath:basePath];
 			error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];
 			if (error)
 				errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);

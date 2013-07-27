@@ -45,8 +45,6 @@
 - (BOOL)completionController:(ViCompletionController *)completionController
      insertPartialCompletion:(NSString *)partialCompletion
                      inRange:(NSRange)range;
-- (void)completionController:(ViCompletionController *)completionController
-appendedStringWithoutCompleting:(NSString *)string;
 @end
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
@@ -63,6 +61,7 @@ appendedStringWithoutCompleting:(NSString *)string;
 	ViCompletion			*_onlyCompletion;
 	NSMutableArray			*_filteredCompletions;
 	ViCompletion			*_selection;
+	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
 	id<ViCompletionDelegate>	 _delegate;
@@ -89,9 +88,10 @@ appendedStringWithoutCompleting:(NSString *)string;
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
+					  prefix:(NSString *)aPrefix
                           at:(NSPoint)screenOrigin
-		     options:(NSString *)optionString
+		  existingKeyManager:(ViKeyManager *)existingKeyManager
+					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter;
 

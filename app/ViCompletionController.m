@@ -195,14 +195,17 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
+		              prefix:(NSString *)aPrefix
                           at:(NSPoint)origin
-		     options:(NSString *)optionString
+		  existingKeyManager:(ViKeyManager *)existingKeyManager
+					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter
 {
 	_terminatingKey = 0;
 	[self reset];
+
+	_existingKeyManager = [existingKeyManager retain];
 
 	[_onlyCompletion release];
 	_onlyCompletion = nil;
@@ -405,6 +408,9 @@
 	[_options release];
 	_options = nil;
 
+	[_existingKeyManager release];
+	_existingKeyManager = nil;
+
 	// [self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
@@ -443,6 +449,8 @@
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
 
+	[_existingKeyManager handleKeys:command.keySequence];
+
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
 	if ([_delegate respondsToSelector:sel]) {
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
@@ -472,14 +480,6 @@
 		[window orderOut:nil];
 		[NSApp abortModal];
 		return YES;
-	} else {
-		SEL sel = @selector(completionController:appendedStringWithoutCompleting:);
-		NSInvocation *invocation =
-		  [NSInvocation invocationWithMethodSignature:[(NSObject *)_delegate methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&string atIndex:3];
-		[invocation invokeWithTarget:_delegate];
 	}
 
 	return YES;

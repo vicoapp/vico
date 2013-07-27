@@ -3145,17 +3145,21 @@ again:
 	NSPoint windowPoint = [self convertPoint:point toView:nil];
 	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
 
-	ViCompletion *selection;
-	selection = [cc chooseFrom:provider
-			     range:range
-			    prefix:fuzzyTrigger ? nil : string
-				at:screenPoint
-			   options:options
-			 direction:(positionAbove ? 1 : 0)
-		     initialFilter:fuzzyTrigger ? string : nil];
+	ViCompletion *completion;
+	completion = [cc chooseFrom:provider
+						 range:range
+						prefix:fuzzyTrigger ? nil : string
+							at:screenPoint
+ 		    existingKeyManager:self.keyManager
+					   options:options
+					 direction:(positionAbove ? 1 : 0)
+				 initialFilter:fuzzyTrigger ? string : nil
+				];
+
 	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
-	if (selection)
-		[self insertSnippet:selection.content inRange:cc.range];
+	if (completion) {
+		[self insertSnippet:completion.content inRange:cc.range];
+	}
 
 	NSInteger termKey = cc.terminatingKey;
 	if (termKey >= 0x20 && termKey < 0xFFFF) {
@@ -3168,14 +3172,9 @@ again:
 		[_keyManager handleKey:termKey];
 	}
 
-	if (selection == nil)
+	if (completion == nil)
 		return NO;
 	return YES;
-}
-
-- (void)completionController:(ViCompletionController *)controller appendedStringWithoutCompleting:(NSString *)string
-{
-	[self insertString:string atLocation:[self caret]];
 }
 
 - (void)removeFromInputKeys:(ViCommand *)command

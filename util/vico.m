@@ -103,6 +103,7 @@ main(int argc, char **argv)
 	BOOL					 params_from_stdin = NO;
 	BOOL					 wait_for_close = NO;
 	BOOL					 new_window = NO;
+	BOOL wasRunning = YES;
 
 	pool = [[NSAutoreleasePool alloc] init];
 	bindings = [NSMutableDictionary dictionary];
@@ -166,6 +167,8 @@ main(int argc, char **argv)
 	proxy = (NSProxy<ViShellCommandProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:connName
 												     host:nil];
 	if (proxy == nil) {
+		wasRunning = NO;
+
 		/* failed to connect, try to start it */
 		CFStringRef bundle_id = CFSTR("se.bzero.Vico");
 		FSRef appRef;
@@ -264,12 +267,17 @@ main(int argc, char **argv)
 		if (argc > 0 && new_window)
 			[proxy newProject:nil];
 
+		NSString *basePath = [[NSFileManager defaultManager] currentDirectoryPath];
+		if (! wasRunning) {
+			[proxy setStartupBasePath:basePath];
+		}
+
 		for (i = 0; i < argc; i++) {
 			NSString *path = [NSString stringWithUTF8String:argv[i]];
 			if ([path rangeOfString:@"://"].location == NSNotFound) {
 				path = [path stringByExpandingTildeInPath];
 				if (![path isAbsolutePath])
-					path = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent:path];
+					path = [basePath stringByAppendingPathComponent:path];
 				path = [[[NSURL fileURLWithPath:path] URLByResolvingSymlinksInPath] absoluteString];
 			}
 			error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];

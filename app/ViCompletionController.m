@@ -247,7 +247,7 @@
 
 	if (_onlyCompletion && _aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
-		_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 		[self reset];
 
 		ViCompletion *ret = [_onlyCompletion autorelease];
@@ -426,7 +426,7 @@
 		[_selection release];
 		_selection = [[_filteredCompletions objectAtIndex:row] retain];
 
-		_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}
 	[window orderOut:nil];
 	[NSApp stopModal];
@@ -515,14 +515,13 @@
 	if ([partialCompletion length] == 0)
 		return YES;
 
-	_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
-
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
 	BOOL ret =
 	  [_delegate completionController:self insertPartialCompletion:partialCompletion inRange:_range];
 	if (!ret)
 		return NO;
 
+	_range = NSMakeRange(_range.location, [partialCompletion length]);
 	DEBUG(@"_range => %@", NSStringFromRange(_range));
 	_prefixLength = _range.length;
 	[self setCompletions:_filteredCompletions];

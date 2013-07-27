@@ -3130,6 +3130,9 @@ again:
 		   fromRange:(NSRange)range
 		     options:(NSString *)options
 {
+	if (_showingCompletionWindow)
+		return NO;
+
 	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
@@ -3145,6 +3148,8 @@ again:
 	NSPoint windowPoint = [self convertPoint:point toView:nil];
 	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
 
+	_showingCompletionWindow = YES;
+
 	ViCompletion *completion;
 	completion = [cc chooseFrom:provider
 						 range:range
@@ -3155,6 +3160,8 @@ again:
 					 direction:(positionAbove ? 1 : 0)
 				 initialFilter:fuzzyTrigger ? string : nil
 				];
+
+	_showingCompletionWindow = NO;
 
 	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
 	if (completion) {

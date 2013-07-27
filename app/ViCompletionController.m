@@ -423,7 +423,7 @@
 		[_selection release];
 		_selection = [[_filteredCompletions objectAtIndex:row] retain];
 
-		_range = NSMakeRange(_range.location, [_selection.content length]);
+		_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
 	}
 	[window orderOut:nil];
 	[NSApp stopModal];
@@ -518,19 +518,12 @@
 	    [ViCompletionController commonPrefixInCompletions:_filteredCompletions];
 	if ([partialCompletion length] == 0)
 		return YES;
+
+	_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
+
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
-
-	_range = NSMakeRange(_range.location, [partialCompletion length]);
-
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-	    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-	[invocation setSelector:sel];
-	[invocation setArgument:&self atIndex:2];
-	[invocation setArgument:&partialCompletion atIndex:3];
-	[invocation setArgument:&_range atIndex:4];
-	[invocation invokeWithTarget:_delegate];
-	BOOL ret;
-	[invocation getReturnValue:&ret];
+	BOOL ret =
+	  [_delegate completionController:self insertPartialCompletion:partialCompletion inRange:_range];
 	if (!ret)
 		return NO;
 

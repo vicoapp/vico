@@ -1819,13 +1819,19 @@ replaceCharactersInRange:(NSRange)aRange
 
 		final_location = modify_start_location + 1;
 
-		NSRange wordRange;
-		NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
-		if ([word length] >= 2) {
-			[self presentCompletionsOf:word
-			      fromProvider:[[[ViWordCompletion alloc] init] autorelease]
-					fromRange:wordRange
-					  options:@"?"];
+		if (! _showingCompletionWindow && [[self preference:@"autocomplete"] integerValue]) {
+		  NSRange wordRange;
+		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		  if ([word length] >= 2) {
+			  _showingCompletionWindow = YES;
+
+			  [self presentCompletionsOf:word
+					fromProvider:[[[ViWordCompletion alloc] init] autorelease]
+					  fromRange:wordRange
+						options:@"C?"];
+
+			  _showingCompletionWindow = NO;
+		  }
 		}
 		DEBUG(@"setting final location to %lu", final_location);
 	}

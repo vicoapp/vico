@@ -127,6 +127,7 @@
 	int			 _selection_affinity; /* 1 = char, 2 = word, 3 = line */
 
 	BOOL			 _showingContextMenu;
+	BOOL			 _showingCompletionWindow;
 
 	NSMutableCharacterSet	*_wordSet;
 	NSMutableCharacterSet	*_nonWordSet;

@@ -467,14 +467,7 @@
 
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
 	if ([_delegate respondsToSelector:sel]) {
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&keyCode atIndex:3];
-		[invocation invokeWithTarget:_delegate];
-		BOOL shouldTerminate;
-		[invocation getReturnValue:&shouldTerminate];
+		BOOL shouldTerminate = [_delegate completionController:self shouldTerminateForKey:keyCode];
 		if (shouldTerminate) {
 			[self acceptByKey:keyCode];
 			return YES;

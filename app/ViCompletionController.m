@@ -247,9 +247,12 @@
 
 	if (_onlyCompletion && _aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
+		_range = NSMakeRange(_range.location, [_filter length] + [_prefix length]);
 		[self reset];
+
 		ViCompletion *ret = [_onlyCompletion autorelease];
 		_onlyCompletion = nil;
+
 		return ret;
 	}
 

@@ -191,13 +191,8 @@
 - (id)ex_bang:(ExCommand *)command
 {
 	if (command.naddr == 0) {
-		ExMapping *shell = [[ExMap defaultMap] lookup:@"shell"];
-		if (shell == nil) {
-			return [ViError message:@"Non-filtering version of ! not implemented"];
-		}
-		ExCommand *shellCommand = [ExCommand commandWithMapping:shell];
-		shellCommand.arg = command.arg;
-		[self evalExCommand:shellCommand];
+		id target = [[self superview] targetForSelector:@selector(ex_bang:)];
+		return [target ex_bang:command];
 	}
 	if ([self filterRange:command.range throughCommand:command.arg])
 		command.caret = command.range.location;

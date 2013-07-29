@@ -92,6 +92,13 @@ BOOL openUntitledDocument = YES;
 }
 @end
 
+@interface ViAppController ()
+
+- (void)setCloseCallbackForDocument:(ViDocument* )document
+                toNotifyBackChannel:(NSString *)channelName;
+
+@end
+
 @implementation ViAppController
 
 @synthesize encodingMenu;
@@ -654,10 +661,6 @@ additionalBindings:(NSDictionary *)bindings
 {
 	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
 
-	NSProxy<ViShellThingProtocol> *backChannel = nil;
-	if (channelName)
-		backChannel = (NSProxy<ViShellThingProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
-
 	NSURL *url;
 	if ([pathOrURL isKindOfClass:[NSURL class]])
 		url = (NSURL *)pathOrURL;
@@ -669,16 +672,7 @@ additionalBindings:(NSDictionary *)bindings
 							display:YES
 							  error:&error];
 
-	if ([doc respondsToSelector:@selector(setCloseCallback:)]) {
-		[doc setCloseCallback:^(int code) {
-			@try {
-				[backChannel exitWithError:code];
-			}
-			@catch (NSException *exception) {
-				INFO(@"failed to notify vicotool: %@", exception);
-			}
-		}];
-	}
+	[self setCloseCallbackForDocument:doc toNotifyBackChannel:channelName];
 
 	if (doc)
 		[NSApp activateIgnoringOtherApps:YES];
@@ -694,6 +688,49 @@ additionalBindings:(NSDictionary *)bindings
 - (NSError *)openURL:(NSString *)pathOrURL
 {
 	return [self openURL:pathOrURL andWait:NO backChannel:nil];
+}
+
+- (NSError *)newDocumentWithData:(NSData *)data andWait:(BOOL)waitFlag backChannel:(NSString *)channelName
+{
+	NSError *error = nil;
+	
+	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
+
+	[docCon newDocument:nil];
+	ViWindowController *winCon = [ViWindowController currentWindowController];
+	ViDocument *doc = [winCon currentDocument];
+	[doc setData:data];
+
+	[self setCloseCallbackForDocument:doc toNotifyBackChannel:channelName];
+	
+	if (doc)
+		[NSApp activateIgnoringOtherApps:YES];
+
+	return error;
+}
+
+- (NSError *)newDocumentWithData:(NSData *)data;
+{
+	return [self newDocumentWithData:data andWait:NO backChannel:nil];
+}
+
+- (void)setCloseCallbackForDocument:(ViDocument* )document
+                toNotifyBackChannel:(NSString *)channelName
+{
+	NSProxy<ViShellThingProtocol> *backChannel = nil;
+	if (channelName)
+		backChannel = (NSProxy<ViShellThingProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
+
+	if ([document respondsToSelector:@selector(setCloseCallback:)] && backChannel) {
+		[document setCloseCallback:^(int code) {
+			@try {
+				[backChannel exitWithError:code];
+			}
+			@catch (NSException *exception) {
+				INFO(@"failed to notify vicotool: %@", exception);
+			}
+		}];
+	}
 }
 
 #pragma mark -

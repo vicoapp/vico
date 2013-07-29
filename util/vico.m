@@ -72,7 +72,8 @@ id returnObject = nil;
 void
 usage(void)
 {
-	printf("syntax: vicotool [-hrw] [-e string] [-f file] [-p params] [file ...]\n");
+	printf("syntax: vicotool [options] [file ...]    edit specified file(s)\n");
+	printf("    or: vicotool [options] -             read text from stdin\n");
 	printf("options:\n");
 	printf("    -h            show this help\n");
 	printf("    -e string     evaluate the string as a Nu script\n");
@@ -274,6 +275,14 @@ main(int argc, char **argv)
 
 		for (i = 0; i < argc; i++) {
 			NSString *path = [NSString stringWithUTF8String:argv[i]];
+
+			if (i == 0 && [path isEqualToString:@"-"]) {
+				handle = [NSFileHandle fileHandleWithStandardInput];
+				NSData *data = [handle readDataToEndOfFile];
+				[proxy newDocumentWithData:data andWait:wait_for_close backChannel:backChannelName];
+				break;
+			}
+				
 			if ([path rangeOfString:@"://"].location == NSNotFound) {
 				path = [path stringByExpandingTildeInPath];
 				if (![path isAbsolutePath])

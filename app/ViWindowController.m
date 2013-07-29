@@ -2650,17 +2650,6 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	return nil;
 }
 
-- (id)ex_bang:(ExCommand *)command
-{
-	// We only deal with zero-argument :! commands here.
-	if (command.naddr > 0)
-		return nil;
-
-	NSLog(@"And here we are...");
-
-	return nil;
-}
-
 - (id)ex_set:(ExCommand *)command
 {
 	NSDictionary *variables = [NSDictionary dictionaryWithObjectsAndKeys:

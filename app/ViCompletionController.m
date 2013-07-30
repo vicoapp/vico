@@ -435,6 +435,9 @@
 
 - (BOOL)cancel:(ViCommand *)command
 {
+	if (! _delegate)
+		return NO;
+
 	_terminatingKey = [[command.mapping.keySequence lastObject] integerValue];
 	[window orderOut:nil];
 	[NSApp abortModal];

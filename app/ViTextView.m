@@ -634,6 +634,11 @@ DEBUG_FINALIZE();
 	                            range:r];
 	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
+
+	if (aRange.length > 1 && [[self preference:@"autocomplete"] integerValue]) {
+		ViCompletionController *controller = [ViCompletionController sharedController];
+		[controller cancel:nil];
+	}
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
@@ -1823,10 +1828,16 @@ replaceCharactersInRange:(NSRange)aRange
 		  NSRange wordRange;
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
-			  [self presentCompletionsOf:word
-					fromProvider:[[[ViWordCompletion alloc] init] autorelease]
-					  fromRange:wordRange
-						options:@"C?"];
+			  BOOL completed =
+				[self presentCompletionsOf:word
+					  fromProvider:[[[ViWordCompletion alloc] init] autorelease]
+						fromRange:wordRange
+						  options:@"C?"];
+
+			  // If we didn't do anything further, no need to smartindent or
+			  // anything.
+			  if (! completed)
+				  return;
 		  }
 		}
 		DEBUG(@"setting final location to %lu", final_location);

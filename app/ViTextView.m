@@ -2096,6 +2096,11 @@ replaceCharactersInRange:(NSRange)aRange
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
+
+		// When leaving insert mode, if the completion window was up, close it.
+		ViCompletionController *completionController = [ViCompletionController sharedController];
+		if (completionController.delegate == self)
+			[completionController cancel:nil];
 	}
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];

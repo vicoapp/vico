@@ -33,6 +33,7 @@
 
 @implementation ViCompletionController
 
+@synthesize delegate = _delegate;
 @synthesize window;
 @synthesize completions = _completions;
 @synthesize terminatingKey = _terminatingKey;

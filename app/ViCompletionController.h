@@ -74,6 +74,7 @@
 	BOOL				 _aggressive;
 }
 
+@property (nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readwrite, retain) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;

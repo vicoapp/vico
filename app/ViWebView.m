@@ -74,10 +74,12 @@
 		MESSAGE(@""); // erase any previous message
 }
 
-- (void)keyManager:(ViKeyManager *)keyManager
+- (BOOL)keyManager:(ViKeyManager *)keyManager
   partialKeyString:(NSString *)keyString
 {
 	MESSAGE(@"%@", keyString);
+
+	return NO;
 }
 
 - (void)keyManager:(ViKeyManager *)aKeyManager

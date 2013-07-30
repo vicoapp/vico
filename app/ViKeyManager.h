@@ -71,7 +71,7 @@
  * @param keyManager The key manager handling the event.
  * @param keyString A string of partial keys.
  */
-- (void)keyManager:(ViKeyManager *)keyManager
+- (BOOL)keyManager:(ViKeyManager *)keyManager
   partialKeyString:(NSString *)keyString;
 @end
 

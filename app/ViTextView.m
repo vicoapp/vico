@@ -2343,10 +2343,12 @@ replaceCharactersInRange:(NSRange)aRange
 	MESSAGE(@"%@", [error localizedDescription]);
 }
 
-- (void)keyManager:(ViKeyManager *)aKeyManager
+- (BOOL)keyManager:(ViKeyManager *)aKeyManager
   partialKeyString:(NSString *)keyString
 {
 	MESSAGE(@"%@", keyString);
+
+	return NO;
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent

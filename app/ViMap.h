@@ -215,6 +215,7 @@
 	NSMutableSet	*_includes;
 	ViMap		*_operatorMap;
 	SEL		 _defaultAction;
+	SEL		 _defaultCatchallAction;
 	BOOL		 _acceptsCounts; /* Default is YES. Disabled for insertMap. */
 }
 
@@ -234,6 +235,11 @@
 
 /** If no mapping matches a key sequence, this action is called. */
 @property (nonatomic, readwrite) SEL defaultAction;
+/** If no mapping matches a key sequence, this action is called. Similar
+    to defaultAction, but defaultAction passes on most characters, while
+	defaultCatchallAction passes on all unmatched key sequences, no matter
+	what characters are involved. */
+@property (nonatomic, readwrite) SEL defaultCatchallAction;
 
 + (void)clearAll;
 + (NSArray *)allMaps;

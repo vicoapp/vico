@@ -3138,7 +3138,6 @@ again:
 
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
-	cc.delegate = self;
 	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
 							inTextContainer:[self textContainer]].origin;
 	/* Offset the completion window a bit. */
@@ -3155,6 +3154,7 @@ again:
 						 range:range
 						prefix:fuzzyTrigger ? nil : string
 							at:screenPoint
+					   delegate:self
  		    existingKeyManager:self.keyManager
 					   options:options
 					 direction:(positionAbove ? 1 : 0)

@@ -74,7 +74,6 @@
 	BOOL				 _aggressive;
 }
 
-@property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readwrite, retain) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
@@ -91,6 +90,7 @@
                        range:(NSRange)aRange
 					  prefix:(NSString *)aPrefix
                           at:(NSPoint)screenOrigin
+					delegate:(id<ViCompletionDelegate>)aDelegate
 		  existingKeyManager:(ViKeyManager *)existingKeyManager
 					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */

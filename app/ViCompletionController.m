@@ -33,7 +33,6 @@
 
 @implementation ViCompletionController
 
-@synthesize delegate = _delegate;
 @synthesize window;
 @synthesize completions = _completions;
 @synthesize terminatingKey = _terminatingKey;
@@ -197,6 +196,7 @@
                        range:(NSRange)aRange
 		              prefix:(NSString *)aPrefix
                           at:(NSPoint)origin
+					delegate:(id<ViCompletionDelegate>)aDelegate
 		  existingKeyManager:(ViKeyManager *)existingKeyManager
 					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
@@ -205,7 +205,8 @@
 	_terminatingKey = 0;
 	[self reset];
 
-	_existingKeyManager = [existingKeyManager retain];
+	_delegate = aDelegate;
+	_existingKeyManager = existingKeyManager;
 
 	[_onlyCompletion release];
 	_onlyCompletion = nil;
@@ -412,10 +413,9 @@
 	[_options release];
 	_options = nil;
 
-	[_existingKeyManager release];
 	_existingKeyManager = nil;
 
-	// [self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
+	_delegate = nil; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
 - (void)acceptByKey:(NSInteger)termKey

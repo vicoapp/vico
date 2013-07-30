@@ -634,11 +634,6 @@ DEBUG_FINALIZE();
 	                            range:r];
 	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
-
-	if (aRange.length > 1 && [[self preference:@"autocomplete"] integerValue]) {
-		ViCompletionController *controller = [ViCompletionController sharedController];
-		[controller cancel:nil];
-	}
 }
 
 - (void)replaceCharactersInRange:(NSRange)aRange withString:(NSString *)aString
@@ -1510,6 +1505,7 @@ replaceCharactersInRange:(NSRange)aRange
 		length--;
 	if (location > length)
 		location = IMAX(0, length);
+	NSInteger delta = ABS(caret - location);
 	caret = location;
 	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
@@ -1522,6 +1518,11 @@ replaceCharactersInRange:(NSRange)aRange
 
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
+
+	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
+		ViCompletionController *controller = [ViCompletionController sharedController];
+		[controller cancel:nil];
+	}
 }
 
 - (void)setCaret:(NSUInteger)location

@@ -444,6 +444,13 @@
 	[NSApp abortModal];
 	[self reset];
 
+	// If we cancel while autocompleting, we want the invoking key manager to 
+	// also get the key mapping, as we want escapes and Ctrl-[s and other
+	// mappings designed to get the user into insert mode to take effect no
+	// matter what.
+	if (command && _autocompleting)
+		[_existingKeyManager handleKeys:command.keySequence];
+
 	return YES;
 }
 

@@ -61,6 +61,7 @@
 	ViCompletion			*_onlyCompletion;
 	NSMutableArray			*_filteredCompletions;
 	ViCompletion			*_selection;
+	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
 	id<ViCompletionDelegate>	 _delegate;
@@ -69,9 +70,11 @@
 	NSPoint				 _screenOrigin;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
+	BOOL				 _autocompleting;
+	BOOL				 _aggressive;
 }
 
-@property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;
+@property (nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readwrite, retain) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
@@ -86,9 +89,11 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
+					  prefix:(NSString *)aPrefix
                           at:(NSPoint)screenOrigin
-		     options:(NSString *)optionString
+					delegate:(id<ViCompletionDelegate>)aDelegate
+		  existingKeyManager:(ViKeyManager *)existingKeyManager
+					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter;
 

@@ -584,6 +584,17 @@ static NSMutableDictionary *__maps = nil;
 						        scope:nil];
 			DEBUG(@"using default action %@", m);
 			return m;
+		} else if (error.code == ViErrorMapNotFound && _defaultCatchallAction) {
+			/* Something outside the regular range, which a catchall can handle. */
+			if (outError)
+				*outError = nil;
+			m = [ViMapping mappingWithKeySequence:keySequence
+						       action:_defaultCatchallAction
+						        flags:0
+						    parameter:nil
+						        scope:nil];
+			DEBUG(@"using default action %@", m);
+			return m;
 		}
 	}
 

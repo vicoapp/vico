@@ -305,6 +305,7 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"searchincr",
 	    [NSNumber numberWithBool:NO], @"showguide",
 	    [NSNumber numberWithBool:YES], @"wrap",
+	    [NSNumber numberWithBool:YES], @"autocomplete",
 	    [NSNumber numberWithBool:YES], @"antialias",
 	    [NSNumber numberWithBool:YES], @"prefertabs",
 	    [NSNumber numberWithBool:NO], @"cursorline",

@@ -23,6 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "NSString-additions.h"
 #import "ViCompletionController.h"
 #import "ViCommand.h"
 #import "ViKeyManager.h"
@@ -176,7 +177,7 @@
 				[self cancel:nil];
 				return;
 			}
-		} else if ([_filteredCompletions count] == 1) {
+		} else if ([_filteredCompletions count] == 1 && _aggressive) {
 			if ([window isVisible]) {
 				[self acceptByKey:0];
 			} else {
@@ -194,14 +195,19 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
+		              prefix:(NSString *)aPrefix
                           at:(NSPoint)origin
-		     options:(NSString *)optionString
+					delegate:(id<ViCompletionDelegate>)aDelegate
+		  existingKeyManager:(ViKeyManager *)existingKeyManager
+					 options:(NSString *)optionString
                    direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter
 {
 	_terminatingKey = 0;
 	[self reset];
+
+	_delegate = aDelegate;
+	_existingKeyManager = existingKeyManager;
 
 	[_onlyCompletion release];
 	_onlyCompletion = nil;
@@ -218,6 +224,9 @@
 	_prefixLength = [aPrefix length];
 	_options = [optionString retain];
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
+	// Aggressive means we auto-select a unique suggestion.
+	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
+	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
 	_screenOrigin = origin;
 	_upwards = (direction == 1);
 
@@ -238,11 +247,14 @@
 	}
 	[self completionResponse:result error:nil];
 
-	if (_onlyCompletion) {
+	if (_onlyCompletion && _aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 		[self reset];
+
 		ViCompletion *ret = [_onlyCompletion autorelease];
 		_onlyCompletion = nil;
+
 		return ret;
 	}
 
@@ -402,7 +414,9 @@
 	[_options release];
 	_options = nil;
 
-	// [self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
+	_existingKeyManager = nil;
+
+	_delegate = nil; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
 - (void)acceptByKey:(NSInteger)termKey
@@ -412,6 +426,8 @@
 	if (row >= 0 && row < [_filteredCompletions count]) {
 		[_selection release];
 		_selection = [[_filteredCompletions objectAtIndex:row] retain];
+
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}
 	[window orderOut:nil];
 	[NSApp stopModal];
@@ -420,10 +436,35 @@
 
 - (BOOL)cancel:(ViCommand *)command
 {
+	if (! _delegate)
+		return NO;
+
+	ViKeyManager *existingKeyManager = _existingKeyManager;
+
 	_terminatingKey = [[command.mapping.keySequence lastObject] integerValue];
 	[window orderOut:nil];
 	[NSApp abortModal];
 	[self reset];
+
+	// If we cancel while autocompleting, we want the invoking key manager to 
+	// also get the key mapping, as we want escapes and Ctrl-[s and other
+	// mappings designed to get the user into insert mode to take effect no
+	// matter what.
+	if (command && _autocompleting)
+		[existingKeyManager handleKeys:command.keySequence];
+
+	return YES;
+}
+
+- (BOOL)accept_if_not_autocompleting:(ViCommand *)command
+{
+	if (! _autocompleting) {
+		[self accept:command];
+	} else {
+		[_existingKeyManager handleKeys:command.keySequence];
+
+		[self cancel:command];
+	}
 
 	return YES;
 }
@@ -438,16 +479,11 @@
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
 
+	[_existingKeyManager handleKeys:command.keySequence];
+
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
 	if ([_delegate respondsToSelector:sel]) {
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&keyCode atIndex:3];
-		[invocation invokeWithTarget:_delegate];
-		BOOL shouldTerminate;
-		[invocation getReturnValue:&shouldTerminate];
+		BOOL shouldTerminate = [_delegate completionController:self shouldTerminateForKey:keyCode];
 		if (shouldTerminate) {
 			[self acceptByKey:keyCode];
 			return YES;
@@ -459,7 +495,8 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	[_filter appendString:[NSString stringWithFormat:@"%C", (unichar)keyCode]];
+	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
+	[_filter appendString:string];
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;
@@ -490,16 +527,10 @@
 	    [ViCompletionController commonPrefixInCompletions:_filteredCompletions];
 	if ([partialCompletion length] == 0)
 		return YES;
+
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-	    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-	[invocation setSelector:sel];
-	[invocation setArgument:&self atIndex:2];
-	[invocation setArgument:&partialCompletion atIndex:3];
-	[invocation setArgument:&_range atIndex:4];
-	[invocation invokeWithTarget:_delegate];
-	BOOL ret;
-	[invocation getReturnValue:&ret];
+	BOOL ret =
+	  [_delegate completionController:self insertPartialCompletion:partialCompletion inRange:_range];
 	if (!ret)
 		return NO;
 

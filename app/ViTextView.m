@@ -1835,6 +1835,8 @@ replaceCharactersInRange:(NSRange)aRange
 						fromRange:wordRange
 						  options:@"C?"];
 
+			  final_location = [self caret];
+
 			  // If we didn't do anything further, no need to smartindent or
 			  // anything.
 			  if (! completed)

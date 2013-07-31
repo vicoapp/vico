@@ -3165,7 +3165,15 @@ again:
 
 	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
 	if (completion) {
-		[self insertSnippet:completion.content inRange:cc.range];
+		// If we're currently in a snippet, don't nuke its bindings by trying to
+		// insert another one. It's far more likely that we just want to
+		// complete a word at this placeholder. Otherwise, go ahead and insert
+		// as a snippet.
+		if (document.snippet) {
+			[self replaceRange:cc.range withString:completion.content];
+		} else {
+			[self insertSnippet:completion.content inRange:cc.range];
+		}
 	}
 
 	if (completion == nil)

@@ -953,6 +953,12 @@ DEBUG_FINALIZE();
 	[self configureSyntax];
 }
 
+- (void)setData:(NSData *)data
+{
+	[self setString:@""];
+	[self addData:data];
+}
+
 - (void)setEncoding:(id)sender
 {
 	_forcedEncoding = [[sender representedObject] unsignedIntegerValue];

@@ -439,6 +439,8 @@
 	if (! _delegate)
 		return NO;
 
+	ViKeyManager *existingKeyManager = _existingKeyManager;
+
 	_terminatingKey = [[command.mapping.keySequence lastObject] integerValue];
 	[window orderOut:nil];
 	[NSApp abortModal];
@@ -449,7 +451,7 @@
 	// mappings designed to get the user into insert mode to take effect no
 	// matter what.
 	if (command && _autocompleting)
-		[_existingKeyManager handleKeys:command.keySequence];
+		[existingKeyManager handleKeys:command.keySequence];
 
 	return YES;
 }

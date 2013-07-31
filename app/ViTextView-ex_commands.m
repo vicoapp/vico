@@ -27,6 +27,8 @@
 #import "ViAppController.h"
 #import "ViEventManager.h"
 #import "ViError.h"
+#import "ViBundleCommand.h"
+#import "ViTaskRunner.h"
 #import "NSString-additions.h"
 #import "ViRegisterManager.h"
 #import "NSView-additions.h"
@@ -191,13 +193,43 @@
 - (id)ex_bang:(ExCommand *)command
 {
 	if (command.naddr == 0) {
-		ExMapping *shell = [[ExMap defaultMap] lookup:@"shell"];
-		if (shell == nil) {
-			return [ViError message:@"Non-filtering version of ! not implemented"];
-		}
-		ExCommand *shellCommand = [ExCommand commandWithMapping:shell];
-		shellCommand.arg = command.arg;
-		[self evalExCommand:shellCommand];
+		ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+		NSError *error = nil;
+		NSString *cwd = nil;
+		NSURL *baseURL = [[document fileURL] URLByDeletingLastPathComponent];
+		if ([baseURL isFileURL])
+			cwd = [baseURL path];
+		NSMutableDictionary *env = [NSMutableDictionary dictionary];
+		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+			[[ViBundleCommand alloc]
+				initFromDictionary:
+							 [NSDictionary dictionaryWithObjectsAndKeys:
+									command.arg, @"name",
+									command.arg, @"command",
+									@"showashtml", @"output",
+									@"ex_bang command", @"uuid", nil]
+					      inBundle:nil], @"command",
+			[NSValue valueWithRange:NSMakeRange(NSNotFound, 0)], @"inputRange",
+			[NSValue valueWithRange:NSMakeRange(NSNotFound, 0)], @"selectedRange",
+			nil];
+		[ViBundle setupEnvironment:env
+				   forTextView:self
+				inputRange:NSMakeRange(NSNotFound, 0)
+					window:[self window]
+					bundle:nil];
+		[runner launchShellCommand:command.arg
+				 withStandardInput:[[NSData alloc] init]
+					   environment:env
+				  currentDirectory:cwd
+			asynchronouslyInWindow:[self window]
+							 title:command.arg
+							target:self
+						  selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
+					   contextInfo:info
+							 error:&error];
+
+		if (error)
+			MESSAGE(@"%@", [error localizedDescription]);
 	}
 	if ([self filterRange:command.range throughCommand:command.arg])
 		command.caret = command.range.location;

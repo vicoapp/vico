@@ -269,10 +269,6 @@ main(int argc, char **argv)
 			[proxy newProject:nil];
 
 		NSString *basePath = [[NSFileManager defaultManager] currentDirectoryPath];
-		if (! wasRunning) {
-			[proxy setStartupBasePath:basePath];
-		}
-
 		for (i = 0; i < argc; i++) {
 			NSString *path = [NSString stringWithUTF8String:argv[i]];
 
@@ -292,6 +288,10 @@ main(int argc, char **argv)
 			error = [proxy openURL:path andWait:wait_for_close backChannel:backChannelName];
 			if (error)
 				errx(2, "%s: %s", argv[i], [[error localizedDescription] UTF8String]);
+		}
+
+		if (! wasRunning) {
+			[proxy setStartupBasePath:basePath];
 		}
 
 		if (argc == 0 && script == nil) {

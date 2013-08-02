@@ -1825,7 +1825,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 		final_location = modify_start_location + 1;
 
-		if (! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
 		  NSRange wordRange;
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {

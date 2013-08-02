@@ -461,8 +461,6 @@
 	if (! _autocompleting) {
 		[self accept:command];
 	} else {
-		[_existingKeyManager handleKeys:command.keySequence];
-
 		[self cancel:command];
 	}
 

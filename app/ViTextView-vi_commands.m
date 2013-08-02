@@ -3167,17 +3167,15 @@ again:
 
 	_showingCompletionWindow = NO;
 
-	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
+	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
 	if (completion) {
-		// If we're currently in a snippet, don't nuke its bindings by trying to
-		// insert another one. It's far more likely that we just want to
-		// complete a word at this placeholder. Otherwise, go ahead and insert
-		// as a snippet.
-		if (document.snippet) {
-			[self replaceRange:cc.range withString:completion.content];
-		} else {
-			[self insertSnippet:completion.content inRange:cc.range];
-		}
+		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
+		NSLog(@"[%@] from range %@ completing %@ gave range %@ with string [%@]", completion.content, NSStringFromRange(range), NSStringFromRange(cc.range), NSStringFromRange(NSMakeRange(cc.range.length, completion.content.length - cc.range.length)), completingString);
+
+		// We are basically replaying input here, because this is in no way literal input.
+		virtualInput = YES;
+		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+		virtualInput = NO;
 	}
 
 	if (completion == nil)

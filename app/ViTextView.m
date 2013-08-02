@@ -1829,6 +1829,11 @@ replaceCharactersInRange:(NSRange)aRange
 		  NSRange wordRange;
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
+			  // Update the caret before we present the completion dialog.
+			  // Otherwise it won'tupdate until the first thing typed into the
+			  // completion dialog.
+			  [self setCaret:final_location];
+
 			  BOOL completed =
 				[self presentCompletionsOf:word
 					  fromProvider:[[[ViWordCompletion alloc] init] autorelease]

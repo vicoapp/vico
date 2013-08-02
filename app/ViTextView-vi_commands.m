@@ -3122,9 +3122,12 @@ again:
 	DEBUG(@"insert partial completion [%@] in range %@, length = %lu",
 	    partialCompletion, NSStringFromRange(range), [[self textStorage] length]);
 
-	[self replaceRange:range withString:partialCompletion];
-	final_location = range.location + [partialCompletion length];
-	[self setCaret:final_location];
+	NSString *completingString = [partialCompletion substringWithRange:NSMakeRange(range.length, partialCompletion.length - range.length)];
+
+	// We are basically replaying input here, because this is in no way literal input.
+	virtualInput = YES;
+	[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+	virtualInput = NO;
 
 	return YES;
 }
@@ -3170,7 +3173,6 @@ again:
 	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
 	if (completion) {
 		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
-		NSLog(@"[%@] from range %@ completing %@ gave range %@ with string [%@]", completion.content, NSStringFromRange(range), NSStringFromRange(cc.range), NSStringFromRange(NSMakeRange(cc.range.length, completion.content.length - cc.range.length)), completingString);
 
 		// We are basically replaying input here, because this is in no way literal input.
 		virtualInput = YES;

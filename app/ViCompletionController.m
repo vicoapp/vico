@@ -546,7 +546,7 @@
 {
 	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
 
-	if (_fuzzySearch || ![_delegate respondsToSelector:sel])
+	if (_fuzzySearch || _autocompleting || ![_delegate respondsToSelector:sel])
 		return [self accept:command];
 
 	if (![self complete_partially:command])

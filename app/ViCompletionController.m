@@ -527,6 +527,7 @@
 		return YES;
 
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
+	_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	BOOL ret =
 	  [_delegate completionController:self insertPartialCompletion:partialCompletion inRange:_range];
 	if (!ret)

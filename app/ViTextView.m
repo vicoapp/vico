@@ -1915,11 +1915,15 @@ replaceCharactersInRange:(NSRange)aRange
 	// check if we're inside a snippet
 	ViSnippet *snippet = document.snippet;
 	if (snippet) {
-		[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
+		NSValue *rangeValue;
+		for (rangeValue in snippet.selectedRanges)
+			[[self layoutManager] invalidateDisplayForCharacterRange:[rangeValue rangeValue]];
 		if ([snippet advance]) {
 			[self endUndoGroup];
 			final_location = snippet.caret;
-			[[self layoutManager] invalidateDisplayForCharacterRange:snippet.selectedRange];
+			for (rangeValue in snippet.selectedRanges)
+				[[self layoutManager] invalidateDisplayForCharacterRange:[rangeValue rangeValue]];
+
 			return YES;
 		} else
 			[self cancelSnippet];

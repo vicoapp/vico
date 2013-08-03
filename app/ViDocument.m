@@ -1204,9 +1204,15 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	 * mark the snippet placeholders.
 	 */
 	NSMutableDictionary *mergedAttributes = nil;
-	NSRange sel = _snippet.selectedRange;
+	NSArray *selections = _snippet.selectedRanges;
 
-	if (NSIntersectionRange(r, sel).length > 0) {
+	NSUInteger matchingRangeIndex =
+		[selections indexOfObjectPassingTest:^BOOL(id aRange, NSUInteger i, BOOL *stop) {
+			NSRange range = [((NSValue *)aRange) rangeValue];
+			return NSIntersectionRange(r, range).length > 0;
+		}];
+	if (selections && matchingRangeIndex != NSNotFound) {
+		NSRange sel = [((NSValue *)[selections objectAtIndex:matchingRangeIndex]) rangeValue];
 		DEBUG(@"selected snippet range %@", NSStringFromRange(sel));
 		if (sel.location > r.location) {
 			r.length = sel.location - r.location;
@@ -1234,7 +1240,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	 * If we're highlighting a matching paren, merge in attributes
 	 * to mark the paren.
 	 */
-	sel = _matchingParenRange;
+	NSRange sel = _matchingParenRange;
 
 	if (NSIntersectionRange(r, sel).length > 0) {
 		DEBUG(@"matching paren range %@", NSStringFromRange(sel));

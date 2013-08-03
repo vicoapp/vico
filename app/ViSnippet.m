@@ -401,6 +401,7 @@
 {
 	DEBUG(@"deselecting tab range %@", NSStringFromRange(_selectedRange));
 	_selectedRange = NSMakeRange(NSNotFound, 0);
+	self.selectedRanges = [NSArray array];
 }
 
 - (void)filterTabstop:(ViTabstop *)ts
@@ -432,6 +433,32 @@
 	}
 
 	return candidate;
+}
+
+- (NSArray *)findMirrorsOf:(ViTabstop *)tabstop
+{
+	NSUInteger num = tabstop.num;
+	return [_tabstops objectsAtIndexes:[_tabstops indexesOfObjectsPassingTest:^BOOL(id aTabstop, NSUInteger i, BOOL *stop) {
+		ViTabstop *tabstop = (ViTabstop *)aTabstop;
+
+		return tabstop.mirror != nil && tabstop.num == num;
+	}]];
+}
+
+- (void)updateSelectedRanges {
+	NSMutableArray *allSelectedRanges = [NSMutableArray arrayWithObject:[NSValue valueWithRange:_selectedRange]];
+	[[self findMirrorsOf:_currentTabStop] enumerateObjectsUsingBlock:^(id aTabstop, NSUInteger i, BOOL *stop) {
+		ViTabstop *tabstop = (ViTabstop *)aTabstop;
+
+		NSRange trueRange = tabstop.range;
+		ViTabstop *parent = tabstop;
+		while ((parent = parent.parent)) {
+			trueRange = NSMakeRange(trueRange.location + parent.range.location, trueRange.length);
+		}
+
+		[allSelectedRanges addObject:[NSValue valueWithRange:trueRange]];
+	}];
+	self.selectedRanges = [NSArray arrayWithArray:allSelectedRanges];
 }
 
 - (BOOL)advance
@@ -470,6 +497,9 @@
 	if (_currentTabStop.parent)
 		_caret += [self parentLocation:_currentTabStop];
 	_selectedRange = NSMakeRange(_caret, r.length);
+
+	[self updateSelectedRanges];
+
 	_currentTabNum = nextTabNum;
 
 	DEBUG(@"tabstops = %@", _tabstops);
@@ -551,7 +581,7 @@
 			}
 		} else {
 			DEBUG(@"update tab stop %i range %@ with value [%@] in string [%@]",
-			    ts.num, NSStringFromRange(r), value, [_delegate string]);
+			    (int)ts.num, NSStringFromRange(r), value, [_delegate string]);
 			r.location += _beginLocation;
 			if (![value isEqualToString:[[_delegate string] substringWithRange:r]]) {
 				[_delegate snippet:self replaceCharactersInRange:r withString:value forTabstop:ts];
@@ -626,7 +656,13 @@
 	if (_currentTabStop.value == nil)
 		_currentTabStop.value = [NSMutableString string];
 	[_currentTabStop.value replaceCharactersInRange:normalizedRange withString:replacementString];
-	return [self updateTabstopsError:nil];
+
+	BOOL updateSuccessful = [self updateTabstopsError:nil];
+	if (updateSuccessful) {
+		[self updateSelectedRanges];
+	}
+
+	return updateSuccessful;
 }
 
 - (NSUInteger)parentLocation:(ViTabstop *)ts

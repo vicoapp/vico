@@ -77,6 +77,7 @@
 	NSRange				 _range;
 	NSUInteger			 _caret;
 	NSRange				 _selectedRange;
+	NSArray				 *_selectedRanges;
 	NSMutableArray			*_tabstops;
 	NSDictionary			*_environment;
 	BOOL				 _finished;
@@ -86,6 +87,7 @@
 @property(nonatomic,readonly) NSRange range;
 @property(nonatomic,readonly) NSUInteger caret;
 @property(nonatomic,readonly) NSRange selectedRange;
+@property(nonatomic,readwrite,retain) NSArray *selectedRanges;
 @property(nonatomic,readonly) BOOL finished;
 @property(nonatomic,readwrite,retain) ViTabstop *currentTabStop;
 

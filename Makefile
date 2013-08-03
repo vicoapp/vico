@@ -430,7 +430,7 @@ OBJCFLAGS += -Wshorten-64-to-32
 # Flags for PLBlockIMP
 CFLAGS += -DPL_BLOCKIMP_PRIVATE
 
-SDK = $(XCODEROOT)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+SDK = $(XCODEROOT)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 
 ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
 CFLAGS	+= $(ARCH_CFLAGS)

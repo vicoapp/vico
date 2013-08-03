@@ -265,6 +265,11 @@ fd_read(CFSocketRef s,
 	case kCFSocketWriteCallBack:
 		[stream write];
 		break;
+	case kCFSocketNoCallBack:
+	case kCFSocketAcceptCallBack:
+	case kCFSocketConnectCallBack:
+	case kCFSocketDataCallBack:
+		break;
 	}
 	[pool release];
 }

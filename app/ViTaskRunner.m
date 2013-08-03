@@ -151,7 +151,9 @@
 	const void *ptr;
 	NSUInteger len;
 
-	switch (event) {
+	// cast to int because ViStreamEventWriteEndEncountered is not declared
+	// part of the enum, and clang don't like that
+	switch ((int)event) {
 	case NSStreamEventNone:
 	case NSStreamEventOpenCompleted:
 	default:

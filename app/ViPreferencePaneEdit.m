@@ -69,8 +69,9 @@
 	[super dealloc];
 }
 
-- (IBAction)selectScope:(id)sender
+- (IBAction)selectScope:(id)aSender
 {
+	NSMenuItem *sender = (NSMenuItem *)aSender;
 	[scopeButton selectItem:sender];
 	[revertButton setEnabled:[sender tag] != -2];
 

@@ -43,6 +43,12 @@
 
 #define MESSAGE(fmt, ...)	[(ViWindowController *)[[self window] windowController] message:fmt, ## __VA_ARGS__]
 
+typedef NS_ENUM(NSInteger, ViExistingCaretsAction) {
+	ViExistingCaretsAdd,
+    ViExistingCaretsUpdate,
+    ViExistingCaretsClear
+};
+
 @class ViDocumentView;
 @class ViWindowController;
 @class ViTextView;
@@ -95,9 +101,12 @@
 	NSUndoManager		*_undoManager;
 
 	// block caret
+	NSMutableArray *carets;
 	NSUInteger		 caret;
+	NSMutableArray *_caretRects;
 	NSRect			 _caretRect;
 	NSRect			 _lineHighlightRect;
+	NSArray *_oldCaretRects;
 	NSRect			 _oldCaretRect;
 	NSRect			 _oldLineHighlightRect;
 	NSColor			*_caretColor;
@@ -235,6 +244,11 @@
  * @param location The location of the caret. Zero-based.
  */
 - (void)setCaret:(NSUInteger)location;
+
+/** Set the location of the caret with the given handling of other existing carets.
+ * @param location The location of the caret. Zero-based.
+ */
+- (void)setCaret:(NSUInteger)location existingCaretsAction:(ViExistingCaretsAction)existingCaretsAction;
 
 /** Scroll the view to the caret.
  *

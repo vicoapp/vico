@@ -111,6 +111,10 @@ int logIndent = 0;
 						     name:ViDocumentBusyChangedNotification
 						   object:document];
 
+	carets = [[NSMutableArray array] retain];
+	_caretRects = [[NSMutableArray array] retain];
+	_oldCaretRects = [[NSArray array] retain];
+
 	_undoManager = [[document undoManager] retain];
 	if (_undoManager == nil) {
 		_undoManager = [[NSUndoManager alloc] init];
@@ -243,6 +247,10 @@ DEBUG_FINALIZE();
 	[_lineHighlightColor release];
 	[_caretBlinkTimer release];
 	[_taskRunner release];
+
+	[carets release];
+	[_caretRects release];
+	[_oldCaretRects release];
 
 	[_initialExCommand release];
 	[_initialFindPattern release];
@@ -605,6 +613,36 @@ DEBUG_FINALIZE();
 
 	DEBUG(@"replace range %@ with string [%@]", NSStringFromRange(aRange), aString);
 
+	NSArray *orderedRanges;
+	if (NSLocationInRange(caret, aRange) || (aRange.length == 0 && caret == aRange.location)) {
+		NSInteger locationDiff = aRange.location - caret;
+
+		NSMutableArray *mutableRanges = [NSMutableArray array];
+		[carets enumerateObjectsUsingBlock:^(id caretValue, NSUInteger i, BOOL *stop) {
+			NSUInteger thisCaret = [(NSNumber *)caretValue unsignedIntegerValue];
+
+			[mutableRanges addObject:[NSValue valueWithRange:NSMakeRange(thisCaret + locationDiff, aRange.length)]];
+		}];
+
+		// We'll want to update things from the last in the document to the
+		// first, so that length changes in the later ones don't affect the
+		// earlier ranges.
+		[mutableRanges sortUsingComparator:^NSComparisonResult(NSValue *rangeValue1, NSValue *rangeValue2) {
+			NSRange range1 = [rangeValue1 rangeValue];
+			NSRange range2 = [rangeValue2 rangeValue];
+
+			return (
+				range1.location == range2.location ? NSOrderedSame :
+					range1.location < range2.location ? NSOrderedDescending :
+						NSOrderedAscending
+			);
+		}];
+
+		orderedRanges = mutableRanges;
+	} else {
+		orderedRanges = [NSArray arrayWithObject:[NSValue valueWithRange:aRange]];
+	}
+
 	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		/* If there is a selected snippet range, remove it first. */
@@ -627,11 +665,18 @@ DEBUG_FINALIZE();
 	if (undoGroup)
 		[self beginUndoGroup];
 
-	[self recordReplacementOfRange:aRange withLength:[aString length]];
-	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
-	NSRange r = NSMakeRange(aRange.location, [aString length]);
-	[[self textStorage] setAttributes:[self typingAttributes]
-	                            range:r];
+	[[self textStorage] beginEditing];
+	[orderedRanges enumerateObjectsUsingBlock:^(id rangeValue, NSUInteger i, BOOL *stop) {
+		NSRange range = [(NSValue *)rangeValue rangeValue];
+
+		NSLog(@"Processing %@", NSStringFromRange(range));
+		[self recordReplacementOfRange:range withLength:[aString length]];
+		[[self textStorage] replaceCharactersInRange:range withString:aString];
+		NSRange r = NSMakeRange(range.location, [aString length]);
+		[[self textStorage] setAttributes:[self typingAttributes]
+									range:r];
+	}];
+	[[self textStorage] endEditing];
 	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
 }
@@ -1495,20 +1540,55 @@ replaceCharactersInRange:(NSRange)aRange
 	}
 }
 
-- (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection
+- (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection existingCaretsAction:(ViExistingCaretsAction)existingCaretsAction
 {
 	if (location == NSNotFound)
 		return;
+
+	if (location == caret) {
+	  [self invalidateCaretRect];
+
+	  return;
+	}
 
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)
 		length--;
 	if (location > length)
 		location = IMAX(0, length);
-	NSInteger delta = ABS(caret - location);
+	NSInteger delta = location - caret;
 	caret = location;
 	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
+
+	if (existingCaretsAction == ViExistingCaretsClear) {
+		[carets removeAllObjects];
+		[carets addObject:[NSNumber numberWithUnsignedInteger:location]];
+	} else if (existingCaretsAction == ViExistingCaretsUpdate) {
+		NSMutableArray *updatedCarets = [NSMutableArray array];
+		[carets sortUsingComparator:^NSComparisonResult(NSNumber *caretNumber1, NSNumber *caretNumber2) {
+			NSUInteger caret1 = [caretNumber1 unsignedIntegerValue];
+			NSUInteger caret2 = [caretNumber2 unsignedIntegerValue];
+
+			return (
+				caret1 == caret2 ? NSOrderedSame :
+					caret1 < caret2 ? NSOrderedAscending :
+						NSOrderedDescending
+			);
+		}];
+		__block NSUInteger currentDelta = delta;
+		[carets enumerateObjectsUsingBlock:^(NSNumber *caretValue, NSUInteger i, BOOL *stop) {
+			NSUInteger thisCaret = [caretValue unsignedIntegerValue];
+
+			[updatedCarets addObject:[NSNumber numberWithUnsignedInteger:thisCaret + currentDelta]];
+			currentDelta += delta;
+		}];
+
+		[carets setArray:updatedCarets];
+	} else {
+		[carets addObject:[NSNumber numberWithUnsignedInteger:location]];
+	}
+
 	if (!replayingInput) {
 		if (updateSelection)
 			[self updateCaret];
@@ -1519,15 +1599,25 @@ replaceCharactersInRange:(NSRange)aRange
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
 
-	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
+	if (ABS(delta) > 1 && [[self preference:@"autocomplete"] integerValue]) {
 		ViCompletionController *controller = [ViCompletionController sharedController];
 		[controller cancel:nil];
 	}
 }
 
+- (void)setCaret:(NSUInteger)location updateSelection:(BOOL)updateSelection
+{
+	[self setCaret:location updateSelection:updateSelection existingCaretsAction:ViExistingCaretsClear];
+}
+
 - (void)setCaret:(NSUInteger)location
 {
 	[self setCaret:location updateSelection:YES];
+}
+
+- (void)setCaret:(NSUInteger)location existingCaretsAction:(ViExistingCaretsAction)existingCaretsAction
+{
+	[self setCaret:location updateSelection:YES existingCaretsAction:existingCaretsAction];
 }
 
 - (NSUInteger)caret
@@ -1562,8 +1652,9 @@ replaceCharactersInRange:(NSRange)aRange
 	if ([self hasMarkedText] && [ranges count] == 1 && !stillSelectingFlag &&
 	    firstRange.length == 0 && firstRange.location != caret)
 		[self setCaret:firstRange.location updateSelection:NO];
-	else if (mode == ViInsertMode)
-		[self setCaret:firstRange.location updateSelection:NO];
+	else if (mode == ViInsertMode) {
+		[self setCaret:firstRange.location updateSelection:NO existingCaretsAction:ViExistingCaretsUpdate];
+	}
 }
 
 - (void)setVisualSelection
@@ -1647,7 +1738,6 @@ replaceCharactersInRange:(NSRange)aRange
 	if (command) {
 		if (command.text) {
 			replayingInput = YES;
-			[self setCaret:end_location];
 			int count = IMAX(1, command.count);
 			int i;
 			for (i = 0; i < count; i++)
@@ -1830,9 +1920,9 @@ replaceCharactersInRange:(NSRange)aRange
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
 			  // Update the caret before we present the completion dialog.
-			  // Otherwise it won'tupdate until the first thing typed into the
+			  // Otherwise it won't update until the first thing typed into the
 			  // completion dialog.
-			  [self setCaret:final_location];
+			  [self setCaret:final_location existingCaretsAction:ViExistingCaretsUpdate];
 
 			  BOOL completed =
 				[self presentCompletionsOf:word
@@ -2298,7 +2388,11 @@ replaceCharactersInRange:(NSRange)aRange
 
 	DEBUG(@"final_location is %u", final_location);
 	if (final_location != NSNotFound) {
-		[self setCaret:final_location];
+		ViExistingCaretsAction action = ViExistingCaretsClear;
+		if (command.updatesAllCursors)
+			action = ViExistingCaretsUpdate;
+
+		[self setCaret:final_location existingCaretsAction:action];
 		ViSnippet *snippet = document.snippet;
 		if (snippet) {
 			NSRange sel = snippet.selectedRange;
@@ -2642,8 +2736,11 @@ replaceCharactersInRange:(NSRange)aRange
 			[self setCaret:NSMaxRange(wordRange) - 1];
 		} else
 			[self setCaret:visual_start_location];
-	} else if (visual_start_location != [self caret])
-		[self setCaret:visual_start_location];
+	} else if (visual_start_location != [self caret]) {
+		ViExistingCaretsAction action = ([theEvent modifierFlags] & NSCommandKeyMask) ? ViExistingCaretsAdd : ViExistingCaretsClear;
+
+		[self setCaret:visual_start_location updateSelection:NO existingCaretsAction:action];
+	}
 
 	if (_selection_affinity > 1) {
 		visual_line_mode = (_selection_affinity == 3);

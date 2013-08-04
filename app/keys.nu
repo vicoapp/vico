@@ -59,7 +59,7 @@
 
 
 ;; insert map
-(imap setDefaultAction:"input_character:")
+(imap setDefaultAction:"input_character:" flags:ViMapUpdatesAllCursors)
 (imap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (imap include:amap)
 (imap include:gmap)

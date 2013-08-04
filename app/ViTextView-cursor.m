@@ -42,7 +42,7 @@
 	[self enclosingFrameDidChange:nil];
 }
 
-- (void)invalidateCaretRect
+- (NSRect)invalidateCaretRectAt:(NSUInteger)aCaret
 {
 	NSLayoutManager *lm = [self layoutManager];
 	ViTextStorage *ts = [self textStorage];
@@ -53,59 +53,75 @@
 		len = 0;
 	}
 
-	_caretRect = NSMakeRect(0, 0, 0, 0);
+	NSRect aCaretRect = NSMakeRect(0, 0, 0, 0);
 
 	if (length > 0) {
 		NSUInteger rectCount = 0;
-		NSRectArray rects = [lm rectArrayForCharacterRange:NSMakeRange(caret, len)
+		NSRectArray rects = [lm rectArrayForCharacterRange:NSMakeRange(aCaret, len)
 				      withinSelectedCharacterRange:NSMakeRange(NSNotFound, 0)
 						   inTextContainer:[self textContainer]
 							 rectCount:&rectCount];
 		if (rectCount > 0) {
-			_caretRect = rects[0];
+			aCaretRect = rects[0];
 		}
 	}
 
 	NSSize inset = [self textContainerInset];
 	NSPoint origin = [self textContainerOrigin];
-	_caretRect.origin.x += origin.x;
-	_caretRect.origin.y += origin.y;
-	_caretRect.origin.x += inset.width;
-	_caretRect.origin.y += inset.height;
+	aCaretRect.origin.x += origin.x;
+	aCaretRect.origin.y += origin.y;
+	aCaretRect.origin.x += inset.width;
+	aCaretRect.origin.y += inset.height;
 
-	if (NSWidth(_caretRect) == 0) {
-		_caretRect.size = _characterSize;
+	if (NSWidth(aCaretRect) == 0) {
+		aCaretRect.size = _characterSize;
 	}
 
-	if (_caretRect.origin.x == 0) {
-		_caretRect.origin.x = 5;
+	if (aCaretRect.origin.x == 0) {
+		aCaretRect.origin.x = 5;
 	}
 
 	if ([self isFieldEditor]) {
-		_caretRect.size.width = 1;
+		aCaretRect.size.width = 1;
 	} else if (mode == ViInsertMode) {
-		_caretRect.size.width = 2;
+		aCaretRect.size.width = 2;
 	} else if (len > 0) {
-		unichar c = [[ts string] characterAtIndex:caret];
+		unichar c = [[ts string] characterAtIndex:aCaret];
 		if (c == '\t') {
 			/* Place cursor at end of tab, like vi does. */
-			_caretRect.origin.x += _caretRect.size.width - _characterSize.width;
+			aCaretRect.origin.x += aCaretRect.size.width - _characterSize.width;
 		}
 		if (c == '\t' || c == '\n' || c == '\r' || c == 0x0C) {
-			_caretRect.size.width = _characterSize.width;
+			aCaretRect.size.width = _characterSize.width;
 		}
 	}
 
 	if (_highlightCursorLine && _lineHighlightColor && mode != ViVisualMode) {
-		_lineHighlightRect = NSMakeRect(0, _caretRect.origin.y, 10000, _caretRect.size.height);
+		_lineHighlightRect = NSMakeRect(0, aCaretRect.origin.y, 10000, aCaretRect.size.height);
 	}
 
 	[self setNeedsDisplayInRect:_oldCaretRect];
-	[self setNeedsDisplayInRect:_caretRect];
+	[self setNeedsDisplayInRect:aCaretRect];
 	[self setNeedsDisplayInRect:_oldLineHighlightRect];
 	[self setNeedsDisplayInRect:_lineHighlightRect];
-	_oldCaretRect = _caretRect;
 	_oldLineHighlightRect = _lineHighlightRect;
+
+	return aCaretRect;
+}
+
+- (void)invalidateCaretRects
+{
+	[_caretRects removeAllObjects];
+	[carets enumerateObjectsUsingBlock:^(id aCaret, NSUInteger i, BOOL *yes) {
+		NSUInteger thisCaret = [(NSNumber *)aCaret unsignedIntegerValue];
+
+		NSRect rect = [self invalidateCaretRectAt:thisCaret];
+		[_caretRects addObject:[NSValue valueWithRect:rect]];
+		if (thisCaret == self.caret) {
+			_caretRect = rect;
+			_oldCaretRect = _caretRect;
+		}
+	}];
 
 	_caretBlinkState = YES;
 	[_caretBlinkTimer invalidate];
@@ -121,6 +137,11 @@
 	}
 }
 
+- (void)invalidateCaretRect
+{
+	[self invalidateCaretRects];
+}
+
 - (void)updateCaret
 {
 	[self invalidateCaretRect];
@@ -134,18 +155,32 @@
 - (void)blinkCaret:(NSTimer *)aTimer
 {
 	_caretBlinkState = !_caretBlinkState;
-	[self setNeedsDisplayInRect:_caretRect];
+	[_caretRects enumerateObjectsUsingBlock:^(id rectValue, NSUInteger i, BOOL *stop) {
+		NSRect caretRect = [(NSValue *)rectValue rectValue];
+
+		[self setNeedsDisplayInRect:caretRect];
+	}];
 }
 
 - (void)updateInsertionPointInRect:(NSRect)aRect
 {
-	if (_caretBlinkState && NSIntersectsRect(_caretRect, aRect)) {
-		if ([self isFieldEditor]) {
-			[[NSColor blackColor] set];
-		} else {
-			[_caretColor set];
-		}
-		[[NSBezierPath bezierPathWithRect:_caretRect] fill];
+	if (_caretBlinkState) {
+		NSIndexSet *intersectingRectIndexes = [_caretRects indexesOfObjectsPassingTest:^BOOL(id rectValue, NSUInteger i, BOOL *stop) {
+		  NSRect caretRect = [(NSValue *)rectValue rectValue];
+
+		  return NSIntersectsRect(caretRect, aRect);
+		}];
+
+		[[_caretRects objectsAtIndexes:intersectingRectIndexes] enumerateObjectsUsingBlock:^(id rectValue, NSUInteger i, BOOL *stop) {
+			NSRect intersectingRect = [(NSValue *)rectValue rectValue];
+
+			if ([self isFieldEditor]) {
+				[[NSColor blackColor] set];
+			} else {
+				[_caretColor set];
+			}
+			[[NSBezierPath bezierPathWithRect:intersectingRect] fill];
+		}];
 	}
 }
 

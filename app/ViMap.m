@@ -166,6 +166,11 @@
 	return has_flag(ViMapLineMode);
 }
 
+- (BOOL)updatesAllCursors
+{
+	return has_flag(ViMapUpdatesAllCursors);
+}
+
 - (BOOL)needsArgument
 {
 	return has_flag(ViMapNeedArgument);
@@ -579,7 +584,7 @@ static NSMutableDictionary *__maps = nil;
 				*outError = nil;
 			m = [ViMapping mappingWithKeySequence:keySequence
 						       action:_defaultAction
-						        flags:0
+						        flags:_defaultActionFlags
 						    parameter:nil
 						        scope:nil];
 			DEBUG(@"using default action %@", m);
@@ -730,6 +735,12 @@ toExpression:(id)expr
 - (void)unset:(NSString *)keySequence
 {
 	[self unset:keySequence scope:nil];
+}
+
+- (void)setDefaultAction:(SEL)action flags:(NSUInteger)flags
+{
+	[self setDefaultAction:action];
+	_defaultActionFlags = flags;
 }
 
 - (ViMapping *)setKey:(NSString *)keySequence

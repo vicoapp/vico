@@ -14,8 +14,9 @@
 (global ViMapNeedMotion 2)
 (global ViMapIsMotion 4)
 (global ViMapLineMode 8)
-(global ViMapNeedArgument 16)
-(global ViMapNoArgumentOnToggle 32)
+(global ViMapUpdatesAllCursors 16)
+(global ViMapNeedArgument 32)
+(global ViMapNoArgumentOnToggle 64)
 
 (global ViRegexpIgnoreCase 1)
 

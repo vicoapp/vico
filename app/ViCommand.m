@@ -93,6 +93,11 @@
 	return [_mapping isMotion];
 }
 
+- (BOOL)updatesAllCursors
+{
+	return [_mapping updatesAllCursors];
+}
+
 - (BOOL)hasOperator
 {
 	return _operator != nil;

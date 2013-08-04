@@ -35,8 +35,9 @@
 #define ViMapNeedMotion			2ULL
 #define ViMapIsMotion			4ULL
 #define ViMapLineMode			8ULL
-#define ViMapNeedArgument		16ULL
-#define ViMapNoArgumentOnToggle	32ULL
+#define ViMapUpdatesAllCursors  16ULL
+#define ViMapNeedArgument		32ULL
+#define ViMapNoArgumentOnToggle	64ULL
 
 /** A mapping of a key sequence to an editor action, macro or Nu expression.
  *
@@ -50,6 +51,7 @@
  * - `ViMapNeedMotion`: This command needs a following motion command (ie, it's an operator)
  * - `ViMapIsMotion`: This is a motion command
  * - `ViMapLineMode`: This command operates on whole lines
+ * - `ViMapUpdatesAllCursors`: This command updates all cursors when there are more than one
  * - `ViMapNeedArgument`: This command needs a following character argument
  */
 @interface ViMapping : NSObject
@@ -116,6 +118,9 @@
 
 /** YES if the mapping is an editor action that works on whole lines. */
 - (BOOL)isLineMode;
+
+/** YES if the mapping is an editor action that updates all cursors when there are more than one. */
+- (BOOL)updatesAllCursors;
 
 /** YES if the mapping is an editor action that needs a character argument, like the vi `f` command. */
 - (BOOL)needsArgument;
@@ -215,6 +220,7 @@
 	NSMutableSet	*_includes;
 	ViMap		*_operatorMap;
 	SEL		 _defaultAction;
+	NSUInteger _defaultActionFlags;
 	SEL		 _defaultCatchallAction;
 	BOOL		 _acceptsCounts; /* Default is YES. Disabled for insertMap. */
 }
@@ -306,6 +312,8 @@
  * @param map The other map to include in this map.
  */
 - (void)include:(ViMap *)map;
+
+- (void)setDefaultAction:(SEL)action flags:(NSUInteger)flags;
 
 - (ViMapping *)lookupKeySequence:(NSArray *)keySequence
                        withScope:(ViScope *)scope

@@ -36,6 +36,7 @@
 	ViMacro			*_macro;
 	BOOL			 _fromDot;
 	BOOL			 _isLineMode;
+	BOOL			 _updatesAllCursors;
 	int			 _count;
 	int			 _saved_count;
 	unichar			 _argument;
@@ -61,6 +62,9 @@
 
 /** YES if the mapped action is a motion command. */
 @property(nonatomic,readonly) BOOL isMotion;
+
+/** YES if the mapped action updates all cursors when there are more than one. */
+@property(nonatomic,readonly) BOOL updatesAllCursors;
 
 /** YES if the mapped action is a motion component for an operator. */
 @property(nonatomic,readonly) BOOL hasOperator;

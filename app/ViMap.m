@@ -772,6 +772,17 @@ toExpression:(id)expr
 }
 
 - (ViMapping *)setKey:(NSString *)keySequence
+      toAction:(SEL)selector
+		flags:(NSUInteger)flags
+{
+	return [self setKey:keySequence
+	    toAction:selector
+	       flags:flags
+	   parameter:nil
+	       scope:nil];
+}
+
+- (ViMapping *)setKey:(NSString *)keySequence
       toMotion:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -790,6 +801,17 @@ toExpression:(id)expr
 	return [self setKey:keySequence
 	    toMotion:selector
 	       flags:0
+	   parameter:nil
+	       scope:nil];
+}
+
+- (ViMapping *)setKey:(NSString *)keySequence
+			 toMotion:(SEL)selector
+			    flags:(NSUInteger)flags
+{
+	return [self setKey:keySequence
+	    toMotion:selector
+	       flags:flags
 	   parameter:nil
 	       scope:nil];
 }
@@ -818,6 +840,17 @@ toExpression:(id)expr
 }
 
 - (ViMapping *)setKey:(NSString *)keySequence
+		 toEditAction:(SEL)selector
+				flags:(NSUInteger)flags
+{
+	return [self setKey:keySequence
+	toEditAction:selector
+	       flags:flags
+	   parameter:nil
+	       scope:nil];
+}
+
+- (ViMapping *)setKey:(NSString *)keySequence
     toOperator:(SEL)selector
          flags:(NSUInteger)flags
      parameter:(id)param
@@ -836,6 +869,17 @@ toExpression:(id)expr
 	return [self setKey:keySequence
 	  toOperator:selector
 	       flags:0
+	   parameter:nil
+	       scope:nil];
+}
+
+- (ViMapping *)setKey:(NSString *)keySequence
+    toOperator:(SEL)selector
+	  flags:(NSUInteger)flags
+{
+	return [self setKey:keySequence
+	  toOperator:selector
+	       flags:flags
 	   parameter:nil
 	       scope:nil];
 }

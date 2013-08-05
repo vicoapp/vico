@@ -1738,6 +1738,8 @@ replaceCharactersInRange:(NSRange)aRange
 	if (command) {
 		if (command.text) {
 			replayingInput = YES;
+			ViExistingCaretsAction action = command.updatesAllCursors ? ViExistingCaretsUpdate : ViExistingCaretsClear;
+			[self setCaret:end_location existingCaretsAction:action];
 			int count = IMAX(1, command.count);
 			int i;
 			for (i = 0; i < count; i++)

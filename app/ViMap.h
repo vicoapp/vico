@@ -398,6 +398,19 @@
 - (ViMapping *)setKey:(NSString *)keyDescription
       toAction:(SEL)selector;
 
+/** Map a key sequence to an action with the given flags.
+ *
+ * This sets parameter to nil and empty scope selector.
+ *
+ * @param keyDescription The key sequence to map.
+ * @param selector The selector of the action.
+ * @param flags A combination of flags, or'd together.
+ * @see setKey:toAction:flags:parameter:scope:
+ */
+- (ViMapping *)setKey:(NSString *)keyDescription
+      toAction:(SEL)selector
+		flags:(NSUInteger)flags;
+
 /** Map a key sequence to a motion action.
  * @param keyDescription The key sequence to map. Can include special keys within angle brackets, like `<cmd-ctrl-up>`.
  * @param selector The selector of the action.
@@ -423,6 +436,20 @@
 - (ViMapping *)setKey:(NSString *)keyDescription
       toMotion:(SEL)selector;
 
+
+/** Map a key sequence to a motion action with the given flags.
+ *
+ * This sets parameter to `nil` and an empty scope selector.
+ *
+ * @param keyDescription The key sequence to map.
+ * @param selector The selector of the action.
+ * @param flags A combination of flags, or'd together. The `ViMapSetsDot` flag is always set.
+ * @see setKey:toMotion:flags:parameter:scope:
+ */
+- (ViMapping *)setKey:(NSString *)keyDescription
+      toMotion:(SEL)selector
+		flags:(NSUInteger)flags;
+
 /** Map a key sequence to an edit action.
  * @param keyDescription The key sequence to map. Can include special keys within angle brackets, like `<cmd-ctrl-up>`.
  * @param selector The selector of the action.
@@ -437,12 +464,25 @@
      parameter:(id)param
          scope:(NSString *)scopeSelector;
 
+
 /** Map a key sequence to an edit action.
  *
  * This sets flags to `ViMapSetsDot`, parameter to `nil` and an empty scope selector.
  *
  * @param keyDescription The key sequence to map.
  * @param selector The selector of the action.
+ * @see setKey:toEditAction:flags:parameter:scope:
+ */
+- (ViMapping *)setKey:(NSString *)keyDescription
+  toEditAction:(SEL)selector;
+
+/** Map a key sequence to an edit action with the given flags.
+ *
+ * This sets parameter to `nil` and an empty scope selector.
+ *
+ * @param keyDescription The key sequence to map.
+ * @param selector The selector of the action.
+ * @param flags A combination of flags, or'd together. The `ViMapSetsDot` flag is always set.
  * @see setKey:toEditAction:flags:parameter:scope:
  */
 - (ViMapping *)setKey:(NSString *)keyDescription
@@ -472,6 +512,19 @@
  */
 - (ViMapping *)setKey:(NSString *)keyDescription
     toOperator:(SEL)selector;
+
+/** Map a key sequence to an operator action with the given flags.
+ *
+ * This sets parameter to `nil` and an empty scope selector.
+ *
+ * @param keyDescription The key sequence to map.
+ * @param selector The selector of the action.
+ * @param flags A combination of flags, or'd together. The `ViMapNeedMotion` flag is always set.
+ * @see setKey:toOperator:flags:parameter:scope:
+ */
+- (ViMapping *)setKey:(NSString *)keyDescription
+    toOperator:(SEL)selector
+	  flags:(NSUInteger)flags;
 
 /** @name Unmapping keys */
 

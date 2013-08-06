@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/vicoapp/vico.png)](https://waffle.io/vicoapp/vico)  
 # Vico
 
 Vico is a programmers text editor with a strong focus on keyboard

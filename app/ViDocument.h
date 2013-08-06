@@ -29,6 +29,7 @@
 #import "ViScope.h"
 #import "ViDocumentView.h"
 #import "ViMarkManager.h"
+#import "ViCompletionController.h"
 
 @class ViTextView;
 @class ExCommand;
@@ -209,5 +210,10 @@
 
 - (void)associateView:(ViViewController *)viewController forKey:(NSString *)key;
 - (NSSet *)associatedViewsForKey:(NSString *)key;
+
+/** Can this document be omni completed? */
+- (BOOL)canOmniComplete;
+- (NSString *)completionStringAtLocation:(NSUInteger)location range:(NSRange *)range;
+- (id<ViCompletionProvider>)completionProviderAtLocation:(NSUInteger)location;
 
 @end

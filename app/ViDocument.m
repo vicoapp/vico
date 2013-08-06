@@ -47,6 +47,7 @@
 #import "ViDocumentController.h"
 #import "NSURL-additions.h"
 #import "ViTextView.h"
+#import "ViWordCompletion.h"
 
 BOOL __makeNewWindowInsteadOfTab = NO;
 
@@ -1855,6 +1856,46 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSSet *)associatedViewsForKey:(NSString *)key
 {
 	return [_associatedViews objectForKey:key];
+}
+
+#pragma mark -
+#pragma mark Omni completion
+
+- (BOOL)canOmniComplete
+{
+	return _language.omniCompletionFinderBlock && _language.omniCompletionBlock;
+}
+
+- (NSString *)completionStringAtLocation:(NSUInteger)location range:(NSRange *)range
+{
+	NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInteger:location], nil];
+	id retval = [_language.omniCompletionFinderBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
+	if ([retval isKindOfClass:[NuCell class]]) {
+		NuCell *returnedRange = (NuCell *)retval;
+		id rangeLocation = [returnedRange car];
+		NSUInteger location;
+		if ([rangeLocation isKindOfClass:[NuSymbol class]])
+			location = [(NSNumber *)[rangeLocation value] unsignedIntegerValue];
+		else
+			location = [rangeLocation unsignedIntegerValue];
+
+		NSUInteger length = [[[returnedRange cdr] car] unsignedIntegerValue]; 
+
+		*range = NSMakeRange(location, length);
+
+		NSString *storageString = [[self textStorage] string];
+		if (location + length >= [storageString length])
+			return @"";
+		else
+			return [[[self textStorage] string] substringWithRange:*range];
+	} else {
+		return @"";
+	}
+}
+
+- (id<ViCompletionProvider>)completionProviderAtLocation:(NSUInteger)location
+{
+	return [[[ViWordCompletion alloc] init] autorelease];
 }
 
 #pragma mark -

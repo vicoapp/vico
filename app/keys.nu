@@ -77,6 +77,7 @@
 (imap setKey:"<c-v>" toAction:"literal_next:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (imap setKey:"<c-n>" toAction:"complete_keyword:" flags:0 parameter:"p" scope:nil)	; add F to parameter for fuzzy keyword trigger
 (imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"pf" scope:nil)
+(imap setKey:"<c-x><c-o>" toAction:"complete_omni:" flags:0 parameter:"pf" scope:nil)
 (imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil) ; p parameter automatically inserts common prefix
 (imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"d" scope:nil)  ; d parameter sorts descending
 (imap setKey:"<Esc>" toAction:"normal_mode:")

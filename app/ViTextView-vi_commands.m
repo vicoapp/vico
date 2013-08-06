@@ -3212,6 +3212,21 @@ again:
 				  options:command.mapping.parameter];
 }
 
+- (BOOL)complete_omni:(ViCommand *)command
+{
+	if (document.canOmniComplete) {
+		NSRange completionRange;
+		NSString *completionString = [document completionStringAtLocation:start_location range:&completionRange];
+
+		return [self presentCompletionsOf:completionString
+							 fromProvider:[document completionProviderAtLocation:start_location]
+								fromRange:completionRange
+								  options:command.mapping.parameter];
+	} else {
+		return [self complete_keyword:command];
+	}
+}
+
 - (BOOL)complete_path:(ViCommand *)command
 {
 	NSRange range;

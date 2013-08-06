@@ -3117,9 +3117,14 @@ again:
 {
 	DEBUG(@"insert partial completion [%@] in range %@, length = %lu",
 	    partialCompletion, NSStringFromRange(range), [[self textStorage] length]);
-	[self replaceRange:range withString:partialCompletion];
-	final_location = range.location + [partialCompletion length];
-	[self setCaret:final_location];
+
+	NSString *completingString = [partialCompletion substringWithRange:NSMakeRange(range.length, partialCompletion.length - range.length)];
+
+	// We are basically replaying input here, because this is in no way literal input.
+	virtualInput = YES;
+	[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+	virtualInput = NO;
+
 	return YES;
 }
 
@@ -3128,12 +3133,14 @@ again:
 		   fromRange:(NSRange)range
 		     options:(NSString *)options
 {
+	if (_showingCompletionWindow)
+		return NO;
+
 	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
-	cc.delegate = self;
 	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
 							inTextContainer:[self textContainer]].origin;
 	/* Offset the completion window a bit. */
@@ -3143,30 +3150,33 @@ again:
 	NSPoint windowPoint = [self convertPoint:point toView:nil];
 	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
 
-	ViCompletion *selection;
-	selection = [cc chooseFrom:provider
-			     range:range
-			    prefix:fuzzyTrigger ? nil : string
-				at:screenPoint
-			   options:options
-			 direction:(positionAbove ? 1 : 0)
-		     initialFilter:fuzzyTrigger ? string : nil];
-	DEBUG(@"completion controller returned [%@] in range %@", selection, NSStringFromRange(cc.range));
-	if (selection)
-		[self insertSnippet:selection.content inRange:cc.range];
+	_showingCompletionWindow = YES;
 
-	NSInteger termKey = cc.terminatingKey;
-	if (termKey >= 0x20 && termKey < 0xFFFF) {
-		NSString *special = [NSString stringWithKeyCode:termKey];
-		if ([special length] == 1) {
-			[self insertString:[NSString stringWithFormat:@"%C", (unichar)termKey]];
-			final_location++;
-		} /* otherwise it's a <special> key code, ignore it */
-	} else if (termKey == 0x0D && [self isFieldEditor]) {
-		[_keyManager handleKey:termKey];
+	ViCompletion *completion;
+	completion = [cc chooseFrom:provider
+						 range:range
+						prefix:fuzzyTrigger ? nil : string
+							at:screenPoint
+					   delegate:self
+ 		    existingKeyManager:self.keyManager
+					   options:options
+					 direction:(positionAbove ? 1 : 0)
+				 initialFilter:fuzzyTrigger ? string : nil
+				];
+
+	_showingCompletionWindow = NO;
+
+	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
+	if (completion) {
+		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
+
+		// We are basically replaying input here, because this is in no way literal input.
+		virtualInput = YES;
+		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+		virtualInput = NO;
 	}
 
-	if (selection == nil)
+	if (completion == nil)
 		return NO;
 	return YES;
 }

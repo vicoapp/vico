@@ -25,6 +25,7 @@
 
 #import "ViRegexp.h"
 #import "ViScope.h"
+#import "Nu.h"
 
 @class ViBundle;
 
@@ -37,6 +38,8 @@
 	NSMutableArray		*_languagePatterns;
 	BOOL			 _compiled;
 	ViScope			*_scope;
+	NuBlock 		*_omniCompletionFinderBlock;
+	NuBlock 		*_omniCompletionBlock;
 	NSString		*_uuid;
 }
 
@@ -53,6 +56,9 @@
  * @returns  The scope name of the language.
  */
 @property (nonatomic, readonly) NSString *name;
+
+@property(nonatomic,readonly) NuBlock *omniCompletionFinderBlock;
+@property(nonatomic,readonly) NuBlock *omniCompletionBlock;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle;
 - (NSArray *)fileTypes;

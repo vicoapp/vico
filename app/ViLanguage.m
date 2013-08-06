@@ -26,12 +26,15 @@
 #import "ViLanguage.h"
 #import "ViBundleStore.h"
 #import "logging.h"
+#import "ViAppController.h"
 
 @implementation ViLanguage
 
 @synthesize bundle = _bundle;
 @synthesize scope = _scope;
 @synthesize uuid = _uuid;
+@synthesize omniCompletionFinderBlock = _omniCompletionFinderBlock;
+@synthesize omniCompletionBlock = _omniCompletionBlock;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle
 {
@@ -59,6 +62,52 @@
 			return nil;
 		}
 
+		_omniCompletionFinderBlock = nil;
+		_omniCompletionBlock = nil;
+		NSString *pathToOmniCompletion = [[_language objectForKey:@"omniCompletionFile"] autorelease];
+		if ([pathToOmniCompletion isKindOfClass:[NSString class]] ) {
+			NSString *pathToCompletions = [_bundle.path stringByAppendingPathComponent:@"Completions"];
+			NSString *fullPathToOmniCompletion = [pathToCompletions stringByAppendingPathComponent:pathToOmniCompletion];
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+
+			BOOL isDirectory = NO;
+			if ([fileManager fileExistsAtPath:fullPathToOmniCompletion isDirectory:&isDirectory] && ! isDirectory) {
+				NSString *nu = [NSString stringWithContentsOfFile:fullPathToOmniCompletion
+														 encoding:NSUTF8StringEncoding
+															error:nil];
+
+				if (nu) {
+					DEBUG(@"Loading omni completion for language %@", aPath);
+					NSDictionary *bindings = [NSDictionary dictionaryWithObjectsAndKeys:_bundle.path, @"_bundlePath", nil];
+					NSError *error = nil;
+					NuParser *parser = [[NuParser alloc] init];
+
+					[[NSApp delegate] eval:nu withParser:parser bindings:bindings error:&error];
+					if (error) {
+						INFO(@"%@: %@", fullPathToOmniCompletion, [error localizedDescription]);
+					} else {
+						@try {
+							id finder = [parser valueForKey:[NSString stringWithFormat:@"%@.completionRange", self.name, nil]];
+							id completion = [parser valueForKey:[NSString stringWithFormat:@"%@.completions", self.name, nil]];
+
+							if ([finder isKindOfClass:[NuBlock class]] && [completion isKindOfClass:[NuBlock class]]) {
+								_omniCompletionFinderBlock = [finder retain];
+								_omniCompletionBlock = [completion retain];
+							} else {
+								INFO(@"@.completionRange and/or %@.completions in file %@ were not functions.", self.name, self.name, fullPathToOmniCompletion);
+							}
+						} @catch (NSException *nuException) {
+							INFO(@"Could not find %@.completionRange and/or %@.completions in file %@.", self.name, self.name, fullPathToOmniCompletion);
+						}
+					}
+				} else {
+					INFO(@"Failed to load file %@ for omni completion.", fullPathToOmniCompletion);
+				}
+			} else {
+				INFO(@"Could not find file %@ for omni completion.", fullPathToOmniCompletion);
+			}
+		}
+
 		if ([[self name] length] > 0)
 			_scope = [[ViScope alloc] initWithScopes:[NSArray arrayWithObject:[self name]]
 							   range:NSMakeRange(0, 0)];
@@ -74,6 +123,8 @@
 	[_language release];
 	[_languagePatterns release];
 	[_scope release];
+	[_omniCompletionFinderBlock release];
+	[_omniCompletionBlock release];
 	[super dealloc];
 }
 

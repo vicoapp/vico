@@ -1895,6 +1895,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (id<ViCompletionProvider>)completionProviderAtLocation:(NSUInteger)location
 {
+	NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInteger:location], @"", nil];
+	id retval = [_language.omniCompletionBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
+	NSLog(@"Check that: %@", retval);
 	return [[[ViWordCompletion alloc] init] autorelease];
 }
 

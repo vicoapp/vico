@@ -47,7 +47,7 @@
 #import "ViDocumentController.h"
 #import "NSURL-additions.h"
 #import "ViTextView.h"
-#import "ViWordCompletion.h"
+#import "ViArrayCompletion.h"
 
 BOOL __makeNewWindowInsteadOfTab = NO;
 
@@ -1896,9 +1896,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (id<ViCompletionProvider>)completionProviderAtLocation:(NSUInteger)location
 {
 	NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInteger:location], @"", nil];
-	id retval = [_language.omniCompletionBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
-	NSLog(@"Check that: %@", retval);
-	return [[[ViWordCompletion alloc] init] autorelease];
+	NSArray *retval = [_language.omniCompletionBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
+
+	return [[ViArrayCompletion arrayCompletionWithArray:retval] autorelease];
 }
 
 #pragma mark -

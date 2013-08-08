@@ -58,6 +58,7 @@ OBJC_SRCS = \
 	TMFileURLProtocol.m \
 	TxmtURLProtocol.m \
 	ViAppController.m \
+	ViArrayCompletion.m \
 	ViBgView.m \
 	ViBufferCompletion.m \
 	ViBufferedStream.m \

@@ -31,9 +31,19 @@
 - (NSArray *)completionsForString:(NSString *)string
 			  options:(NSString *)options
 			    error:(NSError **)outError;
+
 @optional
+
 - (NSArray *)completionsForString:(NSString *)string
 			  options:(NSString *)options;
+@end
+
+@protocol ViCompletionReceiver <NSObject>
+- (void)completionResponse:(NSArray *)completions error:(NSError *)error;
+@end
+
+@protocol ViAsyncCompletionProvider <ViCompletionProvider>
+- (void)setCompletionReceiver:(id<ViCompletionReceiver>)completionReceiver;
 @end
 
 @class ViCompletionController;
@@ -47,7 +57,7 @@
                      inRange:(NSRange)range;
 @end
 
-@interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
+@interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget, ViCompletionReceiver>
 {
 	IBOutlet NSWindow		*window;
 	IBOutlet ViCompletionView	*tableView;

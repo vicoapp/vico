@@ -83,6 +83,7 @@ OBJC_SRCS = \
 	ViFileCompletion.m \
 	ViFileExplorer.m \
 	ViFileURLHandler.m \
+	ViGCDAsyncCompletionProvider.m \
 	ViHTTPURLHandler.m \
 	ViJumpList.m \
 	ViKeyManager.m \

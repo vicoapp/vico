@@ -1896,9 +1896,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (id<ViCompletionProvider>)completionProviderAtLocation:(NSUInteger)location
 {
 	NSArray *args = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInteger:location], @"", nil];
-	NSArray *retval = [_language.omniCompletionBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
+	id<ViCompletionProvider> provider = [_language.omniCompletionBlock evalWithArguments:[args list] context:[NSMutableDictionary dictionary]];
 
-	return [[ViArrayCompletion arrayCompletionWithArray:retval] autorelease];
+	return provider;
 }
 
 #pragma mark -

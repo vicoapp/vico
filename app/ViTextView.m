@@ -44,6 +44,7 @@
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
 #import "ViTaskRunner.h"
+#import "ViWordCompletion.h"
 #import "ViEventManager.h"
 
 #import <objc/runtime.h>
@@ -1504,6 +1505,7 @@ replaceCharactersInRange:(NSRange)aRange
 		length--;
 	if (location > length)
 		location = IMAX(0, length);
+	NSInteger delta = ABS(caret - location);
 	caret = location;
 	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
@@ -1516,6 +1518,11 @@ replaceCharactersInRange:(NSRange)aRange
 
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
+
+	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
+		ViCompletionController *controller = [ViCompletionController sharedController];
+		[controller cancel:nil];
+	}
 }
 
 - (void)setCaret:(NSUInteger)location
@@ -1815,7 +1822,32 @@ replaceCharactersInRange:(NSRange)aRange
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:s
 			atLocation:start_location];
+
 		final_location = modify_start_location + 1;
+
+		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		  NSRange wordRange;
+		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		  if ([word length] >= 2) {
+			  // Update the caret before we present the completion dialog.
+			  // Otherwise it won'tupdate until the first thing typed into the
+			  // completion dialog.
+			  [self setCaret:final_location];
+
+			  BOOL completed =
+				[self presentCompletionsOf:word
+					  fromProvider:[[[ViWordCompletion alloc] init] autorelease]
+						fromRange:wordRange
+						  options:@"C?"];
+
+			  final_location = [self caret];
+
+			  // If we didn't do anything further, no need to smartindent or
+			  // anything.
+			  if (! completed)
+				  return;
+		  }
+		}
 		DEBUG(@"setting final location to %lu", final_location);
 	}
 
@@ -2071,6 +2103,11 @@ replaceCharactersInRange:(NSRange)aRange
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
+
+		// When leaving insert mode, if the completion window was up, close it.
+		ViCompletionController *completionController = [ViCompletionController sharedController];
+		if (completionController.delegate == self)
+			[completionController cancel:nil];
 	}
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];
@@ -2330,10 +2367,12 @@ replaceCharactersInRange:(NSRange)aRange
 	MESSAGE(@"%@", [error localizedDescription]);
 }
 
-- (void)keyManager:(ViKeyManager *)aKeyManager
+- (BOOL)keyManager:(ViKeyManager *)aKeyManager
   partialKeyString:(NSString *)keyString
 {
 	MESSAGE(@"%@", keyString);
+
+	return NO;
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent

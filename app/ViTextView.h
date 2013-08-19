@@ -79,6 +79,7 @@
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
+	BOOL			 virtualInput;  // true when input is happening not from the keyboard (e.g., from completion)
 	NSMutableArray		*_inputKeys; // used for replaying input
 
 	// FIXME: move these to the ViCommand as properties
@@ -127,6 +128,7 @@
 	int			 _selection_affinity; /* 1 = char, 2 = word, 3 = line */
 
 	BOOL			 _showingContextMenu;
+	BOOL			 _showingCompletionWindow;
 
 	NSMutableCharacterSet	*_wordSet;
 	NSMutableCharacterSet	*_nonWordSet;

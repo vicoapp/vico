@@ -3141,7 +3141,7 @@ again:
 
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
-	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
+	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length - 1, 0)
 							inTextContainer:[self textContainer]].origin;
 	/* Offset the completion window a bit. */
 	point.x += (positionAbove ? 0 : 5);

@@ -3141,11 +3141,11 @@ again:
 
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
-	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length - 1, 0)
-							inTextContainer:[self textContainer]].origin;
+        NSRect boundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) inTextContainer:[self textContainer]];
+	NSPoint point = boundingRect.origin;
+
 	/* Offset the completion window a bit. */
-	point.x += (positionAbove ? 0 : 5);
-	point.y += (positionAbove ? -3 : 15);
+	point.y += (positionAbove ? -3 : boundingRect.size.height);
 
 	NSPoint windowPoint = [self convertPoint:point toView:nil];
 	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];

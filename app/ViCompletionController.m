@@ -31,7 +31,9 @@
 #import "ViThemeStore.h"
 #include "logging.h"
 
-@implementation ViCompletionController
+@implementation ViCompletionController {
+	BOOL _positionCompletionsBelowPrefix;
+}
 
 @synthesize delegate = _delegate;
 @synthesize window;
@@ -88,6 +90,7 @@
 
 - (void)updateBounds
 {
+	NSLog(@"Updating bounds");
 	NSSize winsz = NSMakeSize(0, 0);
 	for (ViCompletion *c in _filteredCompletions) {
 		NSSize sz = [c.title size];
@@ -119,14 +122,15 @@
 	NSUInteger numberOfRows = MIN([_filteredCompletions count], maxNumberOfRows);
 	winsz.height = numberOfRows * ([tableView rowHeight] + 2) + [label bounds].size.height;
 
-	/* Determine if we need to show the list above or below. Default is below.*/
-	BOOL showBelow = YES;
+	/* Determine if we need to show the completions above or below. Default is below.*/
 	if (winsz.height > _prefixScreenRect.origin.y) {
-		showBelow = NO;
+		_positionCompletionsBelowPrefix = NO;
+	} else {
+		_positionCompletionsBelowPrefix = YES;
 	}
 	
 	/* Now we set the frame. */
-	if (showBelow) {
+	if (_positionCompletionsBelowPrefix) {
 		if (origin.y < winsz.height) {
 			origin.y = winsz.height + 5;
 		}
@@ -136,7 +140,7 @@
 		}
 	}
 
-	origin.x -= 3; // To align with the character. Hack, but computing the actual alignment is hard. :-/
+	origin.x -= 3; // Align with the character. Hack, but computing the value is hard. :-/
 
 	if (origin.x + winsz.width > screenSize.width) {
 		origin.x = screenSize.width - winsz.width;
@@ -144,7 +148,7 @@
 
 	NSRect frame = [window frame];
 	frame.origin = origin;
-	if (showBelow) {
+	if (_positionCompletionsBelowPrefix) {
 		frame.origin.y -= winsz.height;
 	} else {
 		frame.origin.y += _prefixScreenRect.size.height;
@@ -294,8 +298,15 @@
 		return nil;
 	}
 
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+	NSLog(@"setting selection");
+	if (_positionCompletionsBelowPrefix) {
+		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
 	       byExtendingSelection:NO];
+	} else {
+		NSUInteger numberOfRows = [self numberOfRowsInTableView:tableView];
+		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:numberOfRows - 1]
+	       byExtendingSelection:NO];
+	}
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];

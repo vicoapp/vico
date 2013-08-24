@@ -103,10 +103,10 @@
 	NSPoint origin = _prefixScreenRect.origin;
 
 	/* 
-	We now set the maximum allowable size. We want to be able to show the list either above
-	or below the current position, and still have the current line visible.
-
-	For a nice user interface, the following things must fit on half the screen:
+	We want to be able to show the list (either above or below the current position),
+	and still have the current line visible. We can do it easily if the constrain the
+	completions to half the screen. This means the following must fit in half the
+	screen.
 
 	- The label with the filter.
 	- The completions.
@@ -232,7 +232,6 @@
 					delegate:(id<ViCompletionDelegate>)aDelegate
 		  existingKeyManager:(ViKeyManager *)existingKeyManager
 					 options:(NSString *)optionString
-                   direction:(int)direction /* 0 = down, 1 = up */
                initialFilter:(NSString *)initialFilter
 {
 	_terminatingKey = 0;
@@ -260,7 +259,6 @@
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
 	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
 	_prefixScreenRect = prefixRect;
-	_upwards = (direction == 1);
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);

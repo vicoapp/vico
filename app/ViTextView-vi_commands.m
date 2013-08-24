@@ -3136,13 +3136,11 @@ again:
 	if (_showingCompletionWindow)
 		return NO;
 
-	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
 	
 
 	/* Present a list to choose from. */
-	ViCompletionController *cc = [ViCompletionController sharedController];
 	NSRect boundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
 														  inTextContainer:[self textContainer]];
 	NSRect windowRect = [self convertRect:boundingRect toView:nil];
@@ -3150,16 +3148,15 @@ again:
 
 	_showingCompletionWindow = YES;
 
-	ViCompletion *completion;
-	completion = [cc chooseFrom:provider
-						 range:range
-						prefix:fuzzyTrigger ? nil : string
-			  prefixScreenRect:screenRect
-					  delegate:self
- 		    existingKeyManager:self.keyManager
-					   options:options
-					 direction:(positionAbove ? 1 : 0)
-				 initialFilter:fuzzyTrigger ? string : nil];
+	ViCompletionController *cc = [ViCompletionController sharedController];
+	ViCompletion *completion = [cc chooseFrom:provider
+										range:range
+									   prefix:fuzzyTrigger ? nil : string
+						     prefixScreenRect:screenRect
+									 delegate:self
+						   existingKeyManager:self.keyManager
+									  options:options
+								initialFilter:fuzzyTrigger ? string : nil];
 
 	_showingCompletionWindow = NO;
 

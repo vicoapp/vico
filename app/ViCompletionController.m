@@ -137,8 +137,10 @@
 	}
 
 	if (origin.x + winsz.width > screenSize.width) {
-		origin.x = screenSize.width - winsz.width - 5;
+		origin.x = screenSize.width - winsz.width;
 	}
+
+	origin.x -= 3; // To align with the character. Hack, but computing the actual alignment is hard. :-/
 
 	NSRect frame = [window frame];
 	frame.origin = origin;

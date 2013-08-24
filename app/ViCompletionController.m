@@ -97,27 +97,57 @@
 
 	DEBUG(@"got %lu completions, row height is %f",
 	    [_filteredCompletions count], [tableView rowHeight]);
-	winsz.height = [_filteredCompletions count] * ([tableView rowHeight] + 2) + [label bounds].size.height;
 
 	NSScreen *screen = [NSScreen mainScreen];
-	NSSize scrsz = [screen visibleFrame].size;
-	NSPoint origin = _screenOrigin;
-	if (winsz.height > scrsz.height / 2)
-		winsz.height = scrsz.height / 2;
-	if (_upwards) {
-		if (origin.y + winsz.height > scrsz.height)
-			origin.y = scrsz.height - winsz.height - 5;
-	} else {
-		if (origin.y < winsz.height)
-			origin.y = winsz.height + 5;
+	NSSize screenSize = [screen visibleFrame].size;
+	NSPoint origin = _prefixScreenRect.origin;
+
+	/* 
+	We now set the maximum allowable size. We want to be able to show the list either above
+	or below the current position, and still have the current line visible.
+
+	For a nice user interface, the following things must fit on half the screen:
+
+	- The label with the filter.
+	- The completions.
+	- The current text line.
+	*/
+	NSUInteger maxNumberOfRows = (NSUInteger)(screenSize.height 
+												- label.bounds.size.height
+												- _prefixScreenRect.size.height)
+											 / tableView.rowHeight;
+	NSUInteger numberOfRows = MIN([_filteredCompletions count], maxNumberOfRows);
+	winsz.height = numberOfRows * ([tableView rowHeight] + 2) + [label bounds].size.height;
+
+	/* Determine if we need to show the list above or below. Default is below.*/
+	BOOL showBelow = YES;
+	if (winsz.height > _prefixScreenRect.origin.y) {
+		showBelow = NO;
 	}
-	if (origin.x + winsz.width > scrsz.width)
-		origin.x = scrsz.width - winsz.width - 5;
+	
+	/* Now we set the frame. */
+	if (showBelow) {
+		if (origin.y < winsz.height) {
+			origin.y = winsz.height + 5;
+		}
+	} else {
+		if (origin.y + winsz.height > screenSize.height) {
+			origin.y = screenSize.height - winsz.height - 5;
+		}
+	}
+
+	if (origin.x + winsz.width > screenSize.width) {
+		origin.x = screenSize.width - winsz.width - 5;
+	}
 
 	NSRect frame = [window frame];
 	frame.origin = origin;
-	if (!_upwards)
+	if (showBelow) {
 		frame.origin.y -= winsz.height;
+	} else {
+		frame.origin.y += _prefixScreenRect.size.height;
+	}
+
 	frame.size = winsz;
 	if (!NSEqualRects(frame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
@@ -196,7 +226,7 @@
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
 		              prefix:(NSString *)aPrefix
-                          at:(NSPoint)origin
+			prefixScreenRect:(NSRect)prefixRect
 					delegate:(id<ViCompletionDelegate>)aDelegate
 		  existingKeyManager:(ViKeyManager *)existingKeyManager
 					 options:(NSString *)optionString
@@ -227,7 +257,7 @@
 	// Aggressive means we auto-select a unique suggestion.
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
 	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
-	_screenOrigin = origin;
+	_prefixScreenRect = prefixRect;
 	_upwards = (direction == 1);
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",

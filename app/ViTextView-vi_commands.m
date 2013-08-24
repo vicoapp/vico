@@ -3139,16 +3139,14 @@ again:
 	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
+	
+
 	/* Present a list to choose from. */
 	ViCompletionController *cc = [ViCompletionController sharedController];
-	NSRect boundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) inTextContainer:[self textContainer]];
-	NSPoint point = boundingRect.origin;
-
-	/* Offset the completion window a bit. */
-	point.y += (positionAbove ? -3 : boundingRect.size.height);
-
-	NSPoint windowPoint = [self convertPoint:point toView:nil];
-	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
+	NSRect boundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
+														  inTextContainer:[self textContainer]];
+	NSRect windowRect = [self convertRect:boundingRect toView:nil];
+	NSRect screenRect = [self.window convertRectToScreen:windowRect];
 
 	_showingCompletionWindow = YES;
 
@@ -3156,13 +3154,12 @@ again:
 	completion = [cc chooseFrom:provider
 						 range:range
 						prefix:fuzzyTrigger ? nil : string
-							at:screenPoint
-					   delegate:self
+			  prefixScreenRect:screenRect
+					  delegate:self
  		    existingKeyManager:self.keyManager
 					   options:options
 					 direction:(positionAbove ? 1 : 0)
-				 initialFilter:fuzzyTrigger ? string : nil
-				];
+				 initialFilter:fuzzyTrigger ? string : nil];
 
 	_showingCompletionWindow = NO;
 

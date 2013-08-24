@@ -99,7 +99,7 @@
 	    [_filteredCompletions count], [tableView rowHeight]);
 
 	NSScreen *screen = [NSScreen mainScreen];
-	NSSize screenSize = [screen visibleFrame].size;
+	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
 	NSPoint origin = _prefixScreenRect.origin;
 
 	/* 
@@ -112,7 +112,7 @@
 	- The completions.
 	- The current text line.
 	*/
-	NSUInteger maxNumberOfRows = (NSUInteger)(screenSize.height 
+	NSUInteger maxNumberOfRows = (NSUInteger)((screenSize.height / 2)
 												- label.bounds.size.height
 												- _prefixScreenRect.size.height)
 											 / tableView.rowHeight;
@@ -136,11 +136,11 @@
 		}
 	}
 
+	origin.x -= 3; // To align with the character. Hack, but computing the actual alignment is hard. :-/
+
 	if (origin.x + winsz.width > screenSize.width) {
 		origin.x = screenSize.width - winsz.width;
 	}
-
-	origin.x -= 3; // To align with the character. Hack, but computing the actual alignment is hard. :-/
 
 	NSRect frame = [window frame];
 	frame.origin = origin;

@@ -90,7 +90,6 @@
 
 - (void)updateBounds
 {
-	NSLog(@"Updating bounds");
 	NSSize winsz = NSMakeSize(0, 0);
 	for (ViCompletion *c in _filteredCompletions) {
 		NSSize sz = [c.title size];
@@ -298,15 +297,13 @@
 		return nil;
 	}
 
-	NSLog(@"setting selection");
-	if (_positionCompletionsBelowPrefix) {
-		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-	       byExtendingSelection:NO];
-	} else {
-		NSUInteger numberOfRows = [self numberOfRowsInTableView:tableView];
-		[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:numberOfRows - 1]
-	       byExtendingSelection:NO];
+	NSUInteger selectedIndex = 0;
+	if (!_positionCompletionsBelowPrefix) {
+		selectedIndex = [self numberOfRowsInTableView:tableView] - 1;
 	}
+	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedIndex]
+	   byExtendingSelection:NO];
+	[tableView scrollRowToVisible:selectedIndex];
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
@@ -648,7 +645,8 @@
 objectValueForTableColumn:(NSTableColumn *)aTableColumn
             row:(NSInteger)rowIndex
 {
-	return [(ViCompletion *)[_filteredCompletions objectAtIndex:rowIndex] title];
+	NSUInteger index = _positionCompletionsBelowPrefix ? rowIndex : _filteredCompletions.count - 1 - rowIndex; 
+	return [(ViCompletion *)[_filteredCompletions objectAtIndex:index] title];
 }
 
 @end

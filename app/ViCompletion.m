@@ -42,6 +42,7 @@ static NSCharacterSet *__ucase = nil;
 @synthesize representedObject = _representedObject;
 @synthesize markColor = _markColor;
 @synthesize title = _title;
+@synthesize isCurrentChoice = _isCurrentChoice;
 
 + (id)completionWithContent:(NSString *)aString
 {
@@ -101,15 +102,13 @@ static NSCharacterSet *__ucase = nil;
 		return;
 
 	NSRange grayRange = NSMakeRange(0, _prefixLength);
-	if (_filterMatch && !_filterIsFuzzy)
+	if (_filterMatch && !_filterIsFuzzy) {
 		grayRange.length = _filterMatch.rangeOfMatchedString.length;
+	}
+
 	NSColor *gray = [NSColor grayColor];
 
 	[self setTitle:[[[NSMutableAttributedString alloc] initWithString:_content] autorelease]];
-	if (grayRange.length > 0)
-		[_title addAttribute:NSForegroundColorAttributeName
-			       value:gray
-			       range:grayRange];
 
 	[_title addAttribute:NSFontAttributeName
 		       value:_font
@@ -118,6 +117,30 @@ static NSCharacterSet *__ucase = nil;
 	[_title addAttribute:NSParagraphStyleAttributeName
 		       value:_titleParagraphStyle
 		       range:NSMakeRange(0, [_title length])];
+
+	NSRange regularRange = NSMakeRange(grayRange.length, _title.length - grayRange.length);
+	if (_isCurrentChoice) {
+		/* Make it white so we can read easier on the selected background. */
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor whiteColor]
+			       range:regularRange];
+
+		if (grayRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:[NSColor lightGrayColor]
+					   range:grayRange];
+		}
+	} else {
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor blackColor]
+			       range:regularRange];
+
+		if (grayRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:gray
+					   range:grayRange];
+		}
+	}
 
 	if (_filterMatch && _filterIsFuzzy) {
 		/* Mark sub-matches with bold red. */
@@ -241,6 +264,11 @@ static NSCharacterSet *__ucase = nil;
 	[aFont retain];
 	[_font release];
 	_font = aFont;
+	_titleIsDirty = YES;
+}
+
+- (void)setIsCurrentChoice:(BOOL)isChoice {
+	_isCurrentChoice = isChoice;
 	_titleIsDirty = YES;
 }
 

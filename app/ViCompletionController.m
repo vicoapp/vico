@@ -93,8 +93,8 @@
 	NSSize winsz = NSMakeSize(0, 0);
 	for (ViCompletion *c in _filteredCompletions) {
 		NSSize sz = [c.title size];
-		if (sz.width + 20 > winsz.width)
-			winsz.width = sz.width + 20;
+		if (sz.width + 50 > winsz.width)
+			winsz.width = sz.width + 50;
 	}
 
 	DEBUG(@"got %lu completions, row height is %f",
@@ -297,13 +297,13 @@
 		return nil;
 	}
 
-	NSUInteger selectedIndex = 0;
+	NSInteger initialSelectionIndex = 0;
 	if (!_positionCompletionsBelowPrefix) {
-		selectedIndex = [self numberOfRowsInTableView:tableView] - 1;
+		initialSelectionIndex = [self numberOfRowsInTableView:tableView] - 1;
 	}
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedIndex]
-	   byExtendingSelection:NO];
-	[tableView scrollRowToVisible:selectedIndex];
+
+	[self selectCompletionRowWithDelegateCalls:initialSelectionIndex];
+	[tableView scrollRowToVisible:initialSelectionIndex];
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
@@ -599,27 +599,37 @@
 - (BOOL)move_up:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
-	if (row == -1)
+	if (row == -1) {
 		row = 0;
-	else if (row == 0)
+	} else if (row == 0) {
 		return NO;
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:--row]
-	       byExtendingSelection:NO];
-	[tableView scrollRowToVisible:row];
-	return YES;
+	}
+
+	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:--row];
+	if (selectionSuccessful) {
+		[tableView scrollRowToVisible:row];
+		return YES;
+	}
+
+	return NO;
 }
 
 - (BOOL)move_down:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
-	if (row == -1)
+	if (row == -1) {
 		row = 0;
-	else if (row + 1 >= [tableView numberOfRows])
+	} else if (row + 1 >= [tableView numberOfRows]) {
 		return NO;
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:++row]
-	       byExtendingSelection:NO];
-	[tableView scrollRowToVisible:row];
-	return YES;
+	}
+
+	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:++row];
+	if (selectionSuccessful) {
+		[tableView scrollRowToVisible:row];
+		return YES;
+	}
+
+	return NO;
 }
 
 - (BOOL)toggle_fuzzy:(ViCommand *)command
@@ -649,4 +659,54 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	return [(ViCompletion *)[_filteredCompletions objectAtIndex:index] title];
 }
 
+#pragma mark - NSTableViewDelegate
+/* ------------------IMPORTANT NOTE---------------------
+   THESE DELEGATE METHODS ARE NOT CALLED BY THE SYSTEM
+   DURING MOVE-UP & MOVE-DOWN KEY PRESSES.
+
+   The calls are manually inserted into the move_up:
+   and move_down: method via a call to
+   -selectCompletionRowWithDelegateCalls:
+
+   If you need more delegate calls to be processed, make
+   sure you add them there.
+   -----------------------------------------------------*/
+   
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+	NSInteger newSelection = [tableView selectedRow];
+	if (newSelection < 0) {
+		return;
+	}
+
+	NSUInteger equivalentIndex = _positionCompletionsBelowPrefix ? newSelection : _filteredCompletions.count - 1 - newSelection; 
+	ViCompletion *completion = [_filteredCompletions objectAtIndex:equivalentIndex];
+	completion.isCurrentChoice = YES;
+}
+
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)tv {
+	NSInteger oldSelection = [tableView selectedRow];
+	if (oldSelection < 0) {
+		return YES;
+	}
+	NSInteger equivalentIndex = _positionCompletionsBelowPrefix ? oldSelection : _filteredCompletions.count - 1 - oldSelection; 
+
+	ViCompletion *completion = [_filteredCompletions objectAtIndex:equivalentIndex];
+	completion.isCurrentChoice = NO;
+
+	return YES;
+}
+
+#pragma mark - Helpers
+- (BOOL)selectCompletionRowWithDelegateCalls:(NSInteger)completionRow {
+	if (![tableView.delegate selectionShouldChangeInTableView:tableView]) {
+		return NO;
+	}
+	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:completionRow]
+	       byExtendingSelection:NO];
+
+	/* Calling the delegate directly, but that's a weird delegate call anyway. */
+	[tableView.delegate tableViewSelectionDidChange:nil];
+
+	return YES;
+}
 @end

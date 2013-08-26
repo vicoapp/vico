@@ -465,7 +465,7 @@
 	NSInteger row = [tableView selectedRow];
 	if (row >= 0 && row < [_filteredCompletions count]) {
 		[_selection release];
-		_selection = [[_filteredCompletions objectAtIndex:row] retain];
+		_selection = [[self completionForRow:row] retain];
 
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}
@@ -674,7 +674,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
    
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
 	NSInteger newSelection = [tableView selectedRow];
-	if (newSelection < 0) {
+	if (newSelection < 0 || newSelection >= _filteredCompletions.count) {
 		return;
 	}
 
@@ -684,7 +684,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)tv {
 	NSInteger oldSelection = [tableView selectedRow];
-	if (oldSelection < 0) {
+	if (oldSelection < 0 || oldSelection >= _filteredCompletions.count) {
 		return YES;
 	}
 

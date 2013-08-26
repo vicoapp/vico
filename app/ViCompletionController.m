@@ -610,10 +610,9 @@
 	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:--row];
 	if (selectionSuccessful) {
 		[tableView scrollRowToVisible:row];
-		return YES;
 	}
 
-	return NO;
+	return selectionSuccessful;
 }
 
 - (BOOL)move_down:(ViCommand *)command
@@ -628,10 +627,9 @@
 	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:++row];
 	if (selectionSuccessful) {
 		[tableView scrollRowToVisible:row];
-		return YES;
 	}
 
-	return NO;
+	return selectionSuccessful;
 }
 
 - (BOOL)toggle_fuzzy:(ViCommand *)command

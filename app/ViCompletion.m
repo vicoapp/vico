@@ -101,9 +101,9 @@ static NSCharacterSet *__ucase = nil;
 	if (_prefixLength > [_content length])
 		return;
 
-	NSRange grayRange = NSMakeRange(0, _prefixLength);
+	NSRange matchedRange = NSMakeRange(0, _prefixLength);
 	if (_filterMatch && !_filterIsFuzzy) {
-		grayRange.length = _filterMatch.rangeOfMatchedString.length;
+		matchedRange.length = _filterMatch.rangeOfMatchedString.length;
 	}
 
 	NSColor *gray = [NSColor grayColor];
@@ -118,27 +118,27 @@ static NSCharacterSet *__ucase = nil;
 		       value:_titleParagraphStyle
 		       range:NSMakeRange(0, [_title length])];
 
-	NSRange regularRange = NSMakeRange(grayRange.length, _title.length - grayRange.length);
+	NSRange completionRange = NSMakeRange(matchedRange.length, _title.length - matchedRange.length);
 	if (_isCurrentChoice) {
 		/* Make it white so we can read easier on the selected background. */
 		[_title addAttribute:NSForegroundColorAttributeName
 			       value:[NSColor whiteColor]
-			       range:regularRange];
+			       range:completionRange];
 
-		if (grayRange.length > 0) {
+		if (matchedRange.length > 0) {
 			[_title addAttribute:NSForegroundColorAttributeName
 					   value:[NSColor lightGrayColor]
-					   range:grayRange];
+					   range:matchedRange];
 		}
 	} else {
 		[_title addAttribute:NSForegroundColorAttributeName
 			       value:[NSColor blackColor]
-			       range:regularRange];
+			       range:completionRange];
 
-		if (grayRange.length > 0) {
+		if (matchedRange.length > 0) {
 			[_title addAttribute:NSForegroundColorAttributeName
 					   value:gray
-					   range:grayRange];
+					   range:matchedRange];
 		}
 	}
 

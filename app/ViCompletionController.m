@@ -124,6 +124,10 @@
 	NSUInteger numberOfRows = MIN([_filteredCompletions count], maxNumberOfRows);
 	winsz.height = numberOfRows * ([tableView rowHeight] + 2) + [label bounds].size.height;
 
+	/* Set the window size, which is independent of origin. */
+	NSRect windowFrame = [window frame];
+	windowFrame.size = winsz;
+
 	/* Determine if we need to show the completions above or below. Default is below.*/
 	if (winsz.height > _prefixScreenRect.origin.y) {
 		_positionCompletionsBelowPrefix = NO;
@@ -131,7 +135,7 @@
 		_positionCompletionsBelowPrefix = YES;
 	}
 	
-	/* Now we set the frame. */
+	/* Now we compute the origin. */
 	if (_positionCompletionsBelowPrefix) {
 		if (origin.y < winsz.height) {
 			origin.y = winsz.height + 5;
@@ -148,18 +152,16 @@
 		origin.x = screenSize.width - winsz.width;
 	}
 
-	NSRect frame = [window frame];
-	frame.origin = origin;
+	windowFrame.origin = origin;
 	if (_positionCompletionsBelowPrefix) {
-		frame.origin.y -= winsz.height;
+		windowFrame.origin.y -= winsz.height;
 	} else {
-		frame.origin.y += _prefixScreenRect.size.height;
+		windowFrame.origin.y += _prefixScreenRect.size.height;
 	}
 
-	frame.size = winsz;
-	if (!NSEqualRects(frame, [window frame])) {
+	if (!NSEqualRects(windowFrame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
-		[window setFrame:frame display:YES];
+		[window setFrame:windowFrame display:YES];
 	}
 }
 

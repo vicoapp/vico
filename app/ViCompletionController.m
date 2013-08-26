@@ -33,7 +33,6 @@
 
 @implementation ViCompletionController {
 	BOOL _positionCompletionsBelowPrefix;
-	NSRect _exclusionScreenRect;
 }
 
 @synthesize delegate = _delegate;
@@ -232,12 +231,11 @@
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
 		              prefix:(NSString *)aPrefix
-			   exclusionRect:(NSRect)exclusionRect
+			prefixScreenRect:(NSRect)prefixRect
 					delegate:(id<ViCompletionDelegate>)aDelegate
 		  existingKeyManager:(ViKeyManager *)existingKeyManager
 					 options:(NSString *)optionString
-               initialFilter:(NSString *)initialFilter
-{
+               initialFilter:(NSString *)initialFilter {
 	_terminatingKey = 0;
 	[self reset];
 
@@ -262,7 +260,7 @@
 	// Aggressive means we auto-select a unique suggestion.
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
 	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
-	_prefixScreenRect = exclusionRect;
+	_prefixScreenRect = prefixRect;
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);

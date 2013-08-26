@@ -126,10 +126,7 @@
 	/* Set the window size, which is independent of origin. */
 	NSRect windowFrame = [window frame];
 	windowFrame.size = winsz;
-
-	if ([NSApp modalWindow] != window) {
-		windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size];
-	}
+	windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size];
 	
 	if (!NSEqualRects(windowFrame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
@@ -694,11 +691,16 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 
 	NSScreen *screen = [NSScreen mainScreen];
 	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
-	/* Determine if we need to show the completions above or below. Default is below.*/
-	if (winsz.height > _prefixScreenRect.origin.y) {
-		_positionCompletionsBelowPrefix = NO;
-	} else {
-		_positionCompletionsBelowPrefix = YES;
+	/*
+	If this is the first time the window appears, determine if we need to show
+	the completions above or below. Default is below.
+	*/
+	if ([NSApp modalWindow] != window) {
+		if (winsz.height > _prefixScreenRect.origin.y) {
+			_positionCompletionsBelowPrefix = NO;
+		} else {
+			_positionCompletionsBelowPrefix = YES;
+		}
 	}
 	
 	/* Now we compute the origin. */

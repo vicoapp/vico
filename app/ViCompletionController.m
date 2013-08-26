@@ -629,8 +629,7 @@
 objectValueForTableColumn:(NSTableColumn *)aTableColumn
             row:(NSInteger)rowIndex
 {
-	NSUInteger index = _positionCompletionsBelowPrefix ? rowIndex : _filteredCompletions.count - 1 - rowIndex; 
-	return [(ViCompletion *)[_filteredCompletions objectAtIndex:index] title];
+	return [self completionForRow:rowIndex].title;
 }
 
 #pragma mark - NSTableViewDelegate

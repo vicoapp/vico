@@ -398,6 +398,8 @@
 		}];
 
 	[tableView reloadData];
+	NSInteger selectionRow = _positionCompletionsBelowPrefix ? 0 : _filteredCompletions.count - 1;
+	[self selectCompletionRowWithDelegateCalls:selectionRow];
 	[self updateBounds];
 }
 

@@ -3141,10 +3141,10 @@ again:
 	
 
 	/* Present a list to choose from. */
-	NSRect boundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
+	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
 														  inTextContainer:[self textContainer]];
-	NSRect windowRect = [self convertRect:boundingRect toView:nil];
-	NSRect screenRect = [self.window convertRectToScreen:windowRect];
+	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
+	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
 	_showingCompletionWindow = YES;
 
@@ -3152,7 +3152,7 @@ again:
 	ViCompletion *completion = [cc chooseFrom:provider
 										range:range
 									   prefix:fuzzyTrigger ? nil : string
-						     prefixScreenRect:screenRect
+							 prefixScreenRect:prefixScreenRect
 									 delegate:self
 						   existingKeyManager:self.keyManager
 									  options:options

@@ -107,12 +107,15 @@
 	/* 
 	We want to be able to show the list (either above or below the current position),
 	and still have the current line visible. We can do it easily if the constrain the
-	completions to half the screen. This means the following must fit in half the
-	screen.
+	size of the completion window to half the screen. This means the following must
+	fit on half the screen:
 
 	- The label with the filter.
-	- The completions.
+	- The displayed completions.
 	- The current text line.
+
+	Note that all completions will still be available; users will simply need to
+	scroll.
 	*/
 	NSUInteger maxNumberOfRows = (NSUInteger)((screenSize.height / 2)
 												- label.bounds.size.height

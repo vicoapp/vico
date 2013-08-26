@@ -273,18 +273,11 @@ static ViKeyManager *macroRecorder = nil;
 
 	SEL shouldSel = @selector(keyManager:shouldParseKey:inScope:);
 	if ([_target respondsToSelector:shouldSel]) {
-		NSNumber *keyNum = [NSNumber numberWithInteger:keyCode];
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [(NSObject *)_target methodSignatureForSelector:shouldSel]];
-		[invocation setSelector:shouldSel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&keyNum atIndex:3];
-		[invocation setArgument:&scope atIndex:4];
-		[invocation invokeWithTarget:_target];
-		NSNumber *shouldRet;
-		[invocation getReturnValue:&shouldRet];
-		if ([shouldRet boolValue] == NO)
-			return YES; /* target handled the key already */
+		if (![_target keyManager:self 
+				  shouldParseKey:[NSNumber numberWithInteger:keyCode]
+						 inScope:scope]) {
+			return YES; // the target handled the key already.
+		}
 	}
 
 	NSError *error = nil;

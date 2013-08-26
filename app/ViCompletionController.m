@@ -678,8 +678,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 		return;
 	}
 
-	NSUInteger equivalentIndex = _positionCompletionsBelowPrefix ? newSelection : _filteredCompletions.count - 1 - newSelection; 
-	ViCompletion *completion = [_filteredCompletions objectAtIndex:equivalentIndex];
+	ViCompletion *completion = [self completionForRow:newSelection];
 	completion.isCurrentChoice = YES;
 }
 
@@ -688,12 +687,17 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	if (oldSelection < 0) {
 		return YES;
 	}
-	NSInteger equivalentIndex = _positionCompletionsBelowPrefix ? oldSelection : _filteredCompletions.count - 1 - oldSelection; 
 
-	ViCompletion *completion = [_filteredCompletions objectAtIndex:equivalentIndex];
+	ViCompletion *completion = [self completionForRow:oldSelection];
 	completion.isCurrentChoice = NO;
 
 	return YES;
+}
+
+
+- (ViCompletion *)completionForRow:(NSInteger)row {
+	NSInteger equivalentIndex = _positionCompletionsBelowPrefix ? row : _filteredCompletions.count - 1 - row; 
+	return [_filteredCompletions objectAtIndex:equivalentIndex];
 }
 
 #pragma mark - Helpers

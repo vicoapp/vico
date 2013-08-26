@@ -102,7 +102,6 @@
 
 	NSScreen *screen = [NSScreen mainScreen];
 	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
-	NSPoint origin = _prefixScreenRect.origin;
 
 	/* 
 	We want to be able to show the list (either above or below the current position),
@@ -128,37 +127,10 @@
 	NSRect windowFrame = [window frame];
 	windowFrame.size = winsz;
 
-	/* Determine if we need to show the completions above or below. Default is below.*/
-	if (winsz.height > _prefixScreenRect.origin.y) {
-		_positionCompletionsBelowPrefix = NO;
-	} else {
-		_positionCompletionsBelowPrefix = YES;
+	if ([NSApp modalWindow] != window) {
+		windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size];
 	}
 	
-	/* Now we compute the origin. */
-	if (_positionCompletionsBelowPrefix) {
-		if (origin.y < winsz.height) {
-			origin.y = winsz.height + 5;
-		}
-	} else {
-		if (origin.y + winsz.height > screenSize.height) {
-			origin.y = screenSize.height - winsz.height - 5;
-		}
-	}
-
-	origin.x -= 3; // Align with the character. Hack, but computing the value is hard. :-/
-
-	if (origin.x + winsz.width > screenSize.width) {
-		origin.x = screenSize.width - winsz.width;
-	}
-
-	windowFrame.origin = origin;
-	if (_positionCompletionsBelowPrefix) {
-		windowFrame.origin.y -= winsz.height;
-	} else {
-		windowFrame.origin.y += _prefixScreenRect.size.height;
-	}
-
 	if (!NSEqualRects(windowFrame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
 		[window setFrame:windowFrame display:YES];
@@ -714,5 +686,44 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	[tableView.delegate tableViewSelectionDidChange:nil];
 
 	return YES;
+}
+
+- (NSPoint)computeWindowOriginForSize:(NSSize)winsz {
+	NSPoint origin = _prefixScreenRect.origin;
+
+	NSScreen *screen = [NSScreen mainScreen];
+	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
+	/* Determine if we need to show the completions above or below. Default is below.*/
+	if (winsz.height > _prefixScreenRect.origin.y) {
+		_positionCompletionsBelowPrefix = NO;
+	} else {
+		_positionCompletionsBelowPrefix = YES;
+	}
+	
+	/* Now we compute the origin. */
+	if (_positionCompletionsBelowPrefix) {
+		if (origin.y < winsz.height) {
+			origin.y = winsz.height + 5;
+		}
+	} else {
+		if (origin.y + winsz.height > screenSize.height) {
+			origin.y = screenSize.height - winsz.height - 5;
+		}
+	}
+
+	origin.x -= 3; // Align with the character. Hack, but computing the value is hard. :-/
+
+	if (origin.x + winsz.width > screenSize.width) {
+		origin.x = screenSize.width - winsz.width;
+	}
+
+	if (_positionCompletionsBelowPrefix) {
+		origin.y -= winsz.height;
+	} else {
+		origin.y += _prefixScreenRect.size.height;
+	}
+
+	return origin;
+
 }
 @end

@@ -506,8 +506,20 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
-	[_filter appendString:string];
+	if (keyCode != 0x7F) {
+		/* This is not a backspace. */
+		NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
+		[_filter appendString:string];
+	} else if (_filter.length > 0) {
+		[_filter deleteCharactersInRange:NSMakeRange(_filter.length - 1, 1)];
+	} else {
+		/* This backspace goes beyond the filter into the prefix. Dismiss the window. */
+		_terminatingKey = keyCode;
+		[window orderOut:nil];
+		[NSApp abortModal];
+		return YES;
+	}
+
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;

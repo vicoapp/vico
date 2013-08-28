@@ -658,28 +658,21 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
    
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
 	NSInteger newSelection = [tableView selectedRow];
-	if (newSelection < 0 || newSelection >= _filteredCompletions.count) {
-		return;
-	}
-
-	ViCompletion *completion = [self completionForRow:newSelection];
-	completion.isCurrentChoice = YES;
+	[self completionForRow:newSelection].isCurrentChoice = YES;
 }
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)tv {
 	NSInteger oldSelection = [tableView selectedRow];
-	if (oldSelection < 0 || oldSelection >= _filteredCompletions.count) {
-		return YES;
-	}
-
-	ViCompletion *completion = [self completionForRow:oldSelection];
-	completion.isCurrentChoice = NO;
+	[self completionForRow:oldSelection].isCurrentChoice = NO;
 
 	return YES;
 }
 
 
 - (ViCompletion *)completionForRow:(NSInteger)row {
+	if (row < 0 || row >= _filteredCompletions.count) {
+		return nil;
+	}
 	NSInteger equivalentIndex = _positionCompletionsBelowPrefix ? row : _filteredCompletions.count - 1 - row; 
 	return [_filteredCompletions objectAtIndex:equivalentIndex];
 }

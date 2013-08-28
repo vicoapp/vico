@@ -46,6 +46,7 @@
 @property (nonatomic, readwrite, retain) ViRegexpMatch *filterMatch;
 @property (nonatomic, readwrite) NSUInteger prefixLength;
 @property (nonatomic, readwrite) BOOL filterIsFuzzy;
+@property (nonatomic, readwrite) BOOL isCurrentChoice;
 @property (nonatomic, readwrite, retain) NSFont *font;
 @property (nonatomic, readwrite) NSUInteger location;
 @property (nonatomic, readwrite, retain) id representedObject;

@@ -3136,33 +3136,27 @@ again:
 	if (_showingCompletionWindow)
 		return NO;
 
-	BOOL positionAbove = ([options rangeOfString:@"a"].location != NSNotFound);
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
-	/* Present a list to choose from. */
-	ViCompletionController *cc = [ViCompletionController sharedController];
-	NSPoint point = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret], 0)
-							inTextContainer:[self textContainer]].origin;
-	/* Offset the completion window a bit. */
-	point.x += (positionAbove ? 0 : 5);
-	point.y += (positionAbove ? -3 : 15);
+	
 
-	NSPoint windowPoint = [self convertPoint:point toView:nil];
-	NSPoint screenPoint = [self.window convertBaseToScreen:windowPoint];
+	/* Present a list to choose from. */
+	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
+														  inTextContainer:[self textContainer]];
+	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
+	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
 	_showingCompletionWindow = YES;
 
-	ViCompletion *completion;
-	completion = [cc chooseFrom:provider
-						 range:range
-						prefix:fuzzyTrigger ? nil : string
-							at:screenPoint
-					   delegate:self
- 		    existingKeyManager:self.keyManager
-					   options:options
-					 direction:(positionAbove ? 1 : 0)
-				 initialFilter:fuzzyTrigger ? string : nil
-				];
+	ViCompletionController *cc = [ViCompletionController sharedController];
+	ViCompletion *completion = [cc chooseFrom:provider
+										range:range
+									   prefix:fuzzyTrigger ? nil : string
+							 prefixScreenRect:prefixScreenRect
+									 delegate:self
+						   existingKeyManager:self.keyManager
+									  options:options
+								initialFilter:fuzzyTrigger ? string : nil];
 
 	_showingCompletionWindow = NO;
 

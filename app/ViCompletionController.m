@@ -489,7 +489,6 @@
 - (BOOL)filter:(ViCommand *)command
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
-
 	[_existingKeyManager handleKeys:command.keySequence];
 
 	SEL sel = @selector(completionController:shouldTerminateForKey:);

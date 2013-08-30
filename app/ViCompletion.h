@@ -47,6 +47,7 @@
 @property (nonatomic, readwrite) NSUInteger prefixLength;
 @property (nonatomic, readwrite) BOOL filterIsFuzzy;
 @property (nonatomic, readwrite, strong) NSFont *font;
+@property (nonatomic, readwrite) BOOL isCurrentChoice;
 @property (nonatomic, readwrite) NSUInteger location;
 @property (nonatomic, readwrite, strong) id representedObject;
 @property (nonatomic, readwrite, strong) NSColor *markColor;

@@ -67,7 +67,7 @@
 	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
 	NSInteger			 _terminatingKey;
 	NSRange				 _range;
-	NSPoint				 _screenOrigin;
+	NSRect				 _prefixScreenRect;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
 	BOOL				 _autocompleting;
@@ -89,12 +89,11 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-					  prefix:(NSString *)aPrefix
-                          at:(NSPoint)screenOrigin
-					delegate:(id<ViCompletionDelegate>)aDelegate
-		  existingKeyManager:(ViKeyManager *)existingKeyManager
-					 options:(NSString *)optionString
-                   direction:(int)direction /* 0 = down, 1 = up */
+                      prefix:(NSString *)aPrefix
+            prefixScreenRect:(NSRect)prefixRect
+                    delegate:(id<ViCompletionDelegate>)aDelegate
+          existingKeyManager:(ViKeyManager *)existingKeyManager
+                     options:(NSString *)optionString
                initialFilter:(NSString *)initialFilter;
 
 - (void)updateBounds;

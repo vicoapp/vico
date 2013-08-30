@@ -42,6 +42,7 @@ static NSCharacterSet *__ucase = nil;
 @synthesize representedObject = _representedObject;
 @synthesize markColor = _markColor;
 @synthesize title = _title;
+@synthesize isCurrentChoice = _isCurrentChoice;
 
 + (id)completionWithContent:(NSString *)aString
 {
@@ -89,16 +90,14 @@ static NSCharacterSet *__ucase = nil;
 	if (_prefixLength > [_content length])
 		return;
 
-	NSRange grayRange = NSMakeRange(0, _prefixLength);
-	if (_filterMatch && !_filterIsFuzzy)
-		grayRange.length = _filterMatch.rangeOfMatchedString.length;
+	NSRange matchedRange = NSMakeRange(0, _prefixLength);
+	if (_filterMatch && !_filterIsFuzzy) {
+		matchedRange.length = _filterMatch.rangeOfMatchedString.length;
+	}
+
 	NSColor *gray = [NSColor grayColor];
 
 	[self setTitle:[[NSMutableAttributedString alloc] initWithString:_content]];
-	if (grayRange.length > 0)
-		[_title addAttribute:NSForegroundColorAttributeName
-			       value:gray
-			       range:grayRange];
 
 	[_title addAttribute:NSFontAttributeName
 		       value:_font
@@ -107,6 +106,30 @@ static NSCharacterSet *__ucase = nil;
 	[_title addAttribute:NSParagraphStyleAttributeName
 		       value:_titleParagraphStyle
 		       range:NSMakeRange(0, [_title length])];
+
+	NSRange completionRange = NSMakeRange(matchedRange.length, _title.length - matchedRange.length);
+	if (_isCurrentChoice) {
+		/* Make it white so we can read easier on the selected background. */
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor whiteColor]
+			       range:completionRange];
+
+		if (matchedRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:[NSColor lightGrayColor]
+					   range:matchedRange];
+		}
+	} else {
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor blackColor]
+			       range:completionRange];
+
+		if (matchedRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:gray
+					   range:matchedRange];
+		}
+	}
 
 	if (_filterMatch && _filterIsFuzzy) {
 		/* Mark sub-matches with bold red. */
@@ -226,6 +249,11 @@ static NSCharacterSet *__ucase = nil;
 - (void)setFont:(NSFont *)aFont
 {
 	_font = aFont;
+	_titleIsDirty = YES;
+}
+
+- (void)setIsCurrentChoice:(BOOL)isChoice {
+	_isCurrentChoice = isChoice;
 	_titleIsDirty = YES;
 }
 

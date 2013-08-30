@@ -286,10 +286,10 @@ static ViKeyManager *macroRecorder = nil;
 			*outError = error;
 		return NO;
 	} else {
-		if ([target respondsToSelector:@selector(keyManager:partialKeyString:)])
-			[target performSelector:@selector(keyManager:partialKeyString:)
-				      withObject:self
-				      withObject:parser.keyString];
+		if ([target respondsToSelector:@selector(keyManager:partialKeyString:)]) {
+			[target keyManager:self partialKeyString:parser.keyString];
+		}
+
 		if (timeout && callingMacro == nil) {
 			_keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
 									target:self

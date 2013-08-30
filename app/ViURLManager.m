@@ -442,12 +442,10 @@ void mycallback(
 	for (NSString *p in pathsBeingWatched) {
 		if ([path hasPrefix:p]) {
 			DEBUG(@"URL %@ is already being watched", aURL);
-			CFRelease((__bridge CFTypeRef)(pathsBeingWatched));
 			return YES;
 		}
 	}
 
-	CFRelease((__bridge CFTypeRef)(pathsBeingWatched));
 	return NO;
 }
 

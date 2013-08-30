@@ -50,7 +50,6 @@
 {
 	if ((self = [super init]) != nil) {
 		if (![NSBundle loadNibNamed:@"WaitProgress" owner:self]) {
-			[self release];
 			return nil;
 		}
 	}
@@ -64,15 +63,7 @@
 	if ([_task isRunning]) {
 		kill([_task processIdentifier], SIGKILL);
 	}
-	[_task release];
-	[_window release];
-	[_stream release];
-	[_stdout release];
-	[_stderr release];
-	[_contextInfo release];
-	[_target release];
-	[waitWindow release]; // Top-level nib object
-	[super dealloc];
+	 // Top-level nib object
 }
 
 - (NSString *)stdoutString
@@ -89,7 +80,7 @@
 		outputText = [[NSString alloc] initWithData:_stdout encoding:encoding];
 	}
 
-	return [outputText autorelease];
+	return outputText;
 }
 
 - (void)finish
@@ -106,12 +97,7 @@
 	[_stream close];
 
 	if (_target && _selector) {
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[_target methodSignatureForSelector:_selector]];
-		[invocation setSelector:_selector];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&_status atIndex:3];
-		[invocation setArgument:&_contextInfo atIndex:4];
-		[invocation invokeWithTarget:_target];
+		[_target taskRunner:self finishedWithStatus:_status contextInfo:_contextInfo];
 	}
 
 	[self setContextInfo:nil];
@@ -195,8 +181,7 @@
  withStandardInput:(NSData *)stdin
 asynchronouslyInWindow:(NSWindow *)aWindow
 	     title:(NSString *)displayTitle
-	    target:(id)aTarget
-	  selector:(SEL)aSelector
+	    target:(id<ViTaskRunnerTarget>)aTarget
        contextInfo:(id)contextObject
 {
 	NSParameterAssert(displayTitle);
@@ -213,7 +198,6 @@ asynchronouslyInWindow:(NSWindow *)aWindow
 	_done = NO;
 	_failed = NO;
 	_cancelled = NO;
-	_selector = aSelector;
 
 	[self setStream:[_task scheduledStreamWithStandardInput:stdin captureStandardError:YES]];
 	[_stream setDelegate:self];
@@ -270,8 +254,7 @@ asynchronouslyInWindow:(NSWindow *)aWindow
 	  currentDirectory:(NSString *)currentDirectory
     asynchronouslyInWindow:(NSWindow *)aWindow
 		     title:(NSString *)displayTitle
-		    target:(id)aTarget
-		  selector:(SEL)aSelector
+		    target:(id<ViTaskRunnerTarget>)aTarget
 	       contextInfo:(id)contextObject
 		     error:(NSError **)outError
 {
@@ -309,7 +292,7 @@ asynchronouslyInWindow:(NSWindow *)aWindow
 							       length:strlen(templateFilename)];
 	}
 
-	NSTask *task = [[[NSTask alloc] init] autorelease];
+	NSTask *task = [[NSTask alloc] init];
 	if (templateFilename)
 		[task setLaunchPath:shellCommand];
 	else {
@@ -328,7 +311,6 @@ asynchronouslyInWindow:(NSWindow *)aWindow
     asynchronouslyInWindow:aWindow
 		     title:displayTitle
 		    target:aTarget
-		  selector:aSelector
 	       contextInfo:contextObject];
 
 	if (fd != -1) {

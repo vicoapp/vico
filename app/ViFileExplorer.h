@@ -38,7 +38,7 @@
 {
 	IBOutlet NSWindow		*window;
 	IBOutlet ViWindowController	*windowController;
-	IBOutlet ViOutlineView		*explorer;
+	IBOutlet ViOutlineView		*__weak explorer;
 	IBOutlet NSMenu			*actionMenu;
 	IBOutlet NSSearchField		*filterField;
 	IBOutlet NSSearchField		*altFilterField;
@@ -52,9 +52,9 @@
 	IBOutlet NSProgressIndicator	*progressIndicator;
 	IBOutlet NSToolbarItem		*searchToolbarItem;
 	IBOutlet NSPathControl		*pathControl;
-	IBOutlet id			 delegate;
+	IBOutlet id			 __unsafe_unretained delegate;
 
-	NSURL				*_rootURL;
+	NSURL				*__weak _rootURL;
 	CGFloat				 _width;
 	NSFont				*_font;
 
@@ -89,9 +89,9 @@
 	NSMutableSet			*_contextObjects; // XXX: not needed without GC (but maybe with ARC in the future?)
 }
 
-@property(nonatomic,readwrite,assign) id delegate;
-@property(nonatomic,readonly) ViOutlineView *outlineView;
-@property(nonatomic,readonly) NSURL *rootURL;
+@property(nonatomic,readwrite,unsafe_unretained) id delegate;
+@property(weak, nonatomic,readonly) ViOutlineView *outlineView;
+@property(weak, nonatomic,readonly) NSURL *rootURL;
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;

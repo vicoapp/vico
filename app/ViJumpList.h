@@ -40,7 +40,7 @@
 	__weak id<ViJumpListDelegate>	 _delegate; // XXX: not retained!
 }
 
-@property(nonatomic,readwrite,assign) __weak id<ViJumpListDelegate> delegate;
+@property(nonatomic,readwrite,weak) id<ViJumpListDelegate> delegate;
 
 - (BOOL)push:(ViMark *)newJump;
 

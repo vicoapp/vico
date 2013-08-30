@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1730CE0717CF058D00A1DA2C /* AddressBook.framework */; };
+		1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */; };
+		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		17D8A10517C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		17D8A10717C846F1000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
+		17D8A10817C846F1000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
+		17D8A10917C846F1000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; };
+		17D8A11717C85300000C25C6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17D8A11617C852FF000C25C6 /* Sparkle.framework */; };
+		17D8A12817CF0354000C25C6 /* SFBCrashReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */; };
+		17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
+		17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
@@ -16,8 +28,6 @@
 		9A260671134C50C3002C86FB /* CompletionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A26066F134C50C3002C86FB /* CompletionWindow.xib */; };
 		9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A260673134DF8D7002C86FB /* ViCompletion.m */; };
 		9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26067713505AEF002C86FB /* ViSymbolController.m */; };
-		9A26068113530FF3002C86FB /* xorkey.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A26068013530FF3002C86FB /* xorkey.c */; };
-		9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */; };
 		9A2606A4135B17F2002C86FB /* ThemePrefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A2606A2135B17F2002C86FB /* ThemePrefs.xib */; };
 		9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A7135B1924002C86FB /* ViPreferencePane.m */; };
 		9A2606AD135B1924002C86FB /* ViPreferencePaneGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2606A9135B1924002C86FB /* ViPreferencePaneGeneral.m */; };
@@ -44,11 +54,10 @@
 		9A2EF2D113310AD70023C5B7 /* TestViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */; };
 		9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */; };
 		9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF2D513310AF90023C5B7 /* WebKit.framework */; };
-		9A2EF37513310CB80023C5B7 /* ber.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2D713310C320023C5B7 /* ber.c */; };
 		9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2DB13310C320023C5B7 /* ExCommand.m */; };
 		9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E413310C330023C5B7 /* MHTextIconCell.m */; };
 		9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E613310C330023C5B7 /* NSArray-patterns.m */; };
-		9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E813310C340023C5B7 /* NSObject+SPInvocationGrabbing.m */; };
+		9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2E813310C340023C5B7 /* NSObject+SPInvocationGrabbing.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9A2EF37F13310CB80023C5B7 /* NSScanner-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EA13310C340023C5B7 /* NSScanner-additions.m */; };
 		9A2EF38013310CB80023C5B7 /* NSString-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EC13310C340023C5B7 /* NSString-additions.m */; };
 		9A2EF38113310CB80023C5B7 /* NSString-scopeSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2EE13310C350023C5B7 /* NSString-scopeSelector.m */; };
@@ -60,7 +69,6 @@
 		9A2EF38713310CB80023C5B7 /* PSMTabBarCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FA13310C390023C5B7 /* PSMTabBarCell.m */; };
 		9A2EF38813310CB80023C5B7 /* PSMTabBarControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FC13310C3A0023C5B7 /* PSMTabBarControl.m */; };
 		9A2EF38913310CB80023C5B7 /* PSMTabDragAssistant.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2FE13310C3A0023C5B7 /* PSMTabDragAssistant.m */; };
-		9A2EF38A13310CB80023C5B7 /* receipt.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30013310C3B0023C5B7 /* receipt.c */; };
 		9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30313310C3D0023C5B7 /* scope_selector.lemon */; };
 		9A2EF38C13310CB80023C5B7 /* SFTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30513310C3E0023C5B7 /* SFTPConnection.m */; };
 		9A2EF38D13310CB80023C5B7 /* SFTPConnectionPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF30713310C3F0023C5B7 /* SFTPConnectionPool.m */; };
@@ -211,14 +219,14 @@
 		9A4346EB13312710002B04DE /* vico.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346EA13312710002B04DE /* vico.m */; };
 		9A4346EF13312861002B04DE /* vicotool in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vicotool */; };
 		9A4347041331383C002B04DE /* NSObject+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F31331383C002B04DE /* NSObject+JSON.m */; };
-		9A4347051331383C002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
-		9A4347061331383C002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
-		9A4347071331383C002B04DE /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F91331383C002B04DE /* SBJsonStreamParserAdapter.m */; };
-		9A4347081331383C002B04DE /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FB1331383C002B04DE /* SBJsonStreamParserState.m */; };
-		9A4347091331383C002B04DE /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FD1331383C002B04DE /* SBJsonStreamWriter.m */; };
-		9A43470A1331383C002B04DE /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FF1331383C002B04DE /* SBJsonStreamWriterState.m */; };
-		9A43470B1331383C002B04DE /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347011331383C002B04DE /* SBJsonTokeniser.m */; };
-		9A43470C1331383C002B04DE /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; };
+		9A4347051331383C002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A4347061331383C002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A4347071331383C002B04DE /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F91331383C002B04DE /* SBJsonStreamParserAdapter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A4347081331383C002B04DE /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FB1331383C002B04DE /* SBJsonStreamParserState.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A4347091331383C002B04DE /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FD1331383C002B04DE /* SBJsonStreamWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A43470A1331383C002B04DE /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346FF1331383C002B04DE /* SBJsonStreamWriterState.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A43470B1331383C002B04DE /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347011331383C002B04DE /* SBJsonTokeniser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		9A43470C1331383C002B04DE /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4347031331383C002B04DE /* SBJsonWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9A43470D13313854002B04DE /* NSObject+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F31331383C002B04DE /* NSObject+JSON.m */; };
 		9A43470E13313854002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
 		9A43470F13313854002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
@@ -248,7 +256,7 @@
 		9A9A63CC1339D0CA0053402A /* vico.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9A9A63CB1339D0CA0053402A /* vico.icns */; };
 		9AA48E4F13A60C10009CC5D7 /* NSURL-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4C13A60C10009CC5D7 /* NSURL-additions.m */; };
 		9AA48E5013A60C10009CC5D7 /* NSView-additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA48E4E13A60C10009CC5D7 /* NSView-additions.m */; };
-		9AA9272714D5B55900F0E02F /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA9272614D5B55900F0E02F /* Nu.m */; };
+		9AA9272714D5B55900F0E02F /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA9272614D5B55900F0E02F /* Nu.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9AA9273914D5B58E00F0E02F /* beautify.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272814D5B58E00F0E02F /* beautify.nu */; };
 		9AA9273A14D5B58E00F0E02F /* bridgesupport.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272914D5B58E00F0E02F /* bridgesupport.nu */; };
 		9AA9273B14D5B58E00F0E02F /* cblocks.nu in Resources */ = {isa = PBXBuildFile; fileRef = 9AA9272A14D5B58E00F0E02F /* cblocks.nu */; };
@@ -318,13 +326,6 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
-		9A2606881353105C002C86FB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9A26067C13530FF3002C86FB;
-			remoteInfo = xorkey;
-		};
 		9A288E361398EAD200258451 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
@@ -356,15 +357,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9A26067B13530FF3002C86FB /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		9A2EF40E13310F4D0023C5B7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -409,6 +401,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1730CE0717CF058D00A1DA2C /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		1730CE0917CF05D100A1DA2C /* GenerateFormData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerateFormData.h; sourceTree = "<group>"; };
+		1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenerateFormData.m; sourceTree = "<group>"; };
+		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
+		17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = json/SBJsonStreamParserAccumulator.h; sourceTree = SOURCE_ROOT; };
+		17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = json/SBJsonStreamParserAccumulator.m; sourceTree = SOURCE_ROOT; };
+		17D8A0FF17C842B7000C25C6 /* SBJsonStreamTokeniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamTokeniser.h; path = json/SBJsonStreamTokeniser.h; sourceTree = SOURCE_ROOT; };
+		17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamTokeniser.m; path = json/SBJsonStreamTokeniser.m; sourceTree = SOURCE_ROOT; };
+		17D8A10117C842B7000C25C6 /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterAccumulator.h; path = json/SBJsonStreamWriterAccumulator.h; sourceTree = SOURCE_ROOT; };
+		17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterAccumulator.m; path = json/SBJsonStreamWriterAccumulator.m; sourceTree = SOURCE_ROOT; };
+		17D8A11617C852FF000C25C6 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug/Sparkle.framework"; sourceTree = "<group>"; };
+		17D8A12217CF0354000C25C6 /* SFBCrashReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBCrashReporter.h; sourceTree = "<group>"; };
+		17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBCrashReporter.m; sourceTree = "<group>"; };
+		17D8A12417CF0354000C25C6 /* SFBCrashReporterWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBCrashReporterWindowController.h; sourceTree = "<group>"; };
+		17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBCrashReporterWindowController.m; sourceTree = "<group>"; };
+		17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBSystemInformation.h; sourceTree = "<group>"; };
+		17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBSystemInformation.m; sourceTree = "<group>"; };
 		17F2E3C715E0499800F81089 /* ViStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViStatusView.h; sourceTree = "<group>"; };
 		17F2E3C815E0499800F81089 /* ViStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViStatusView.m; sourceTree = "<group>"; };
 		9A0831961418FE9D00D1805D /* ViMarkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkManager.h; sourceTree = "<group>"; };
@@ -426,8 +435,6 @@
 		9A260673134DF8D7002C86FB /* ViCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViCompletion.m; sourceTree = "<group>"; };
 		9A26067613505AEF002C86FB /* ViSymbolController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSymbolController.h; sourceTree = "<group>"; };
 		9A26067713505AEF002C86FB /* ViSymbolController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViSymbolController.m; sourceTree = "<group>"; };
-		9A26067D13530FF3002C86FB /* xorkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xorkey; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A26068013530FF3002C86FB /* xorkey.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xorkey.c; sourceTree = "<group>"; };
 		9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
 		9A2606A3135B17F2002C86FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThemePrefs.xib; sourceTree = "<group>"; };
 		9A2606A6135B1924002C86FB /* ViPreferencePane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViPreferencePane.h; sourceTree = "<group>"; };
@@ -460,7 +467,7 @@
 		9A2EF2A0133109C20023C5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A2EF2A3133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		9A2EF2A9133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		9A2EF2B0133109C20023C5B7 /* tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = tests.octest; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A2EF2B0133109C20023C5B7 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF2B6133109C20023C5B7 /* tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "tests-Info.plist"; sourceTree = "<group>"; };
 		9A2EF2B8133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9A2EF2BA133109C20023C5B7 /* tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tests-Prefix.pch"; sourceTree = "<group>"; };
@@ -875,14 +882,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9A26067A13530FF3002C86FB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9A2606871353104A002C86FB /* libcrypto.0.9.8.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9A288E1B1398EA6F00258451 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -894,6 +893,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */,
+				17D8A11717C85300000C25C6 /* Sparkle.framework in Frameworks */,
 				9AAD5D5C1393C33A00FDFFA6 /* Carbon.framework in Frameworks */,
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
 				9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */,
@@ -927,12 +928,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9A26067F13530FF3002C86FB /* xorkey */ = {
+		17D8A12117CF0330000C25C6 /* SFBCrash */ = {
 			isa = PBXGroup;
 			children = (
-				9A26068013530FF3002C86FB /* xorkey.c */,
+				1730CE0917CF05D100A1DA2C /* GenerateFormData.h */,
+				1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */,
+				17D8A12217CF0354000C25C6 /* SFBCrashReporter.h */,
+				17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */,
+				17D8A12417CF0354000C25C6 /* SFBCrashReporterWindowController.h */,
+				17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */,
+				17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */,
+				17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */,
 			);
-			path = xorkey;
+			name = SFBCrash;
 			sourceTree = "<group>";
 		};
 		9A288E201398EA7000258451 /* par */ = {
@@ -955,6 +963,8 @@
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
+				1730CE0717CF058D00A1DA2C /* AddressBook.framework */,
+				17D8A11617C852FF000C25C6 /* Sparkle.framework */,
 				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9AAF73F3135F3BDF00D75E1E /* Vico.help */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
@@ -965,7 +975,6 @@
 				9A2EF2B4133109C20023C5B7 /* Tests */,
 				9A2EF41213310F4D0023C5B7 /* lemon */,
 				9A4346E11331257A002B04DE /* shell tool */,
-				9A26067F13530FF3002C86FB /* xorkey */,
 				9A288E201398EA7000258451 /* par */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
@@ -976,10 +985,9 @@
 			isa = PBXGroup;
 			children = (
 				9A2EF28F133109C10023C5B7 /* Vico.app */,
-				9A2EF2B0133109C20023C5B7 /* tests.octest */,
+				9A2EF2B0133109C20023C5B7 /* Tests.octest */,
 				9A2EF41013310F4D0023C5B7 /* lemon */,
 				9A4346DD1331257A002B04DE /* vicotool */,
-				9A26067D13530FF3002C86FB /* xorkey */,
 				9A288E1E1398EA6F00258451 /* par */,
 			);
 			name = Products;
@@ -1009,6 +1017,7 @@
 		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				17D8A12117CF0330000C25C6 /* SFBCrash */,
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
 				9A2EF4361331147C0023C5B7 /* Mozilla Universal charset detector */,
 				9A4346F01331381B002B04DE /* json */,
@@ -1527,6 +1536,13 @@
 		9A4346F01331381B002B04DE /* json */ = {
 			isa = PBXGroup;
 			children = (
+				17D8A0FC17C842B7000C25C6 /* SBJson.h */,
+				17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */,
+				17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */,
+				17D8A0FF17C842B7000C25C6 /* SBJsonStreamTokeniser.h */,
+				17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */,
+				17D8A10117C842B7000C25C6 /* SBJsonStreamWriterAccumulator.h */,
+				17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */,
 				9A4346F11331383C002B04DE /* JSON.h */,
 				9A4346F21331383C002B04DE /* NSObject+JSON.h */,
 				9A4346F31331383C002B04DE /* NSObject+JSON.m */,
@@ -1553,23 +1569,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9A26067C13530FF3002C86FB /* xorkey */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9A26068313530FF3002C86FB /* Build configuration list for PBXNativeTarget "xorkey" */;
-			buildPhases = (
-				9A26067913530FF3002C86FB /* Sources */,
-				9A26067A13530FF3002C86FB /* Frameworks */,
-				9A26067B13530FF3002C86FB /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = xorkey;
-			productName = xorkey;
-			productReference = 9A26067D13530FF3002C86FB /* xorkey */;
-			productType = "com.apple.product-type.tool";
-		};
 		9A288E1D1398EA6F00258451 /* par */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */;
@@ -1591,7 +1590,6 @@
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
 			buildPhases = (
 				9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */,
-				9A26068A13531066002C86FB /* Generate receipt validation fingerprints */,
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
 				9A2EF28C133109C10023C5B7 /* Frameworks */,
@@ -1606,7 +1604,6 @@
 			);
 			dependencies = (
 				9A288E371398EAD200258451 /* PBXTargetDependency */,
-				9A2606891353105C002C86FB /* PBXTargetDependency */,
 				9A4346ED1331284C002B04DE /* PBXTargetDependency */,
 				9A2EF41C13310F9B0023C5B7 /* PBXTargetDependency */,
 			);
@@ -1631,7 +1628,7 @@
 			);
 			name = Tests;
 			productName = tests;
-			productReference = 9A2EF2B0133109C20023C5B7 /* tests.octest */;
+			productReference = 9A2EF2B0133109C20023C5B7 /* Tests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 		9A2EF40F13310F4D0023C5B7 /* lemon */ = {
@@ -1673,6 +1670,9 @@
 /* Begin PBXProject section */
 		9A2EF286133109C10023C5B7 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
 			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -1689,7 +1689,6 @@
 				9A2EF2AF133109C20023C5B7 /* Tests */,
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
 				9A4346DC1331257A002B04DE /* vicotool */,
-				9A26067C13530FF3002C86FB /* xorkey */,
 				9A288E1D1398EA6F00258451 /* par */,
 			);
 		};
@@ -1791,23 +1790,6 @@
 			shellScript = "if test \"$CONFIGURATION\" = \"Debug\"; then\n    echo \"ignoring downloading bundle repo in $CONFIGURATION build\"\n    exit 0\nfi\n\nUSERS=\"vicoapp textmate kswedberg\"\n\nfor user in $USERS; do\necho \"download bundle repository for $user\"\nif curl -s \"http://github.com/api/v2/json/user/show/$user\" | grep -q '\"type\":\"Organization\"'; then\nrepourl=\"http://github.com/api/v2/json/organizations/$user/public_repositories\"\nelse\nrepourl=\"http://github.com/api/v2/json/repos/show/$user\"\nfi\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nmkdir -p $RESOURCE_DIR\ncurl -s $repourl > $RESOURCE_DIR/$user-bundles.json\ndone\n";
 			showEnvVarsInLog = 0;
 		};
-		9A26068A13531066002C86FB /* Generate receipt validation fingerprints */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Generate receipt validation fingerprints";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/bundle_fingerprint.h",
-				"$(DERIVED_FILE_DIR)/AppleIncRootCertificate.h",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -x\nSHORT_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" ${TARGET_BUILD_DIR}/${INFOPLIST_PATH})\necho \"Using version $SHORT_VERSION for receipt validation\"\necho -n \"se.bzero.Vico${SHORT_VERSION}\" | openssl sha1 -binary | ${SOURCE_ROOT}/app/b2h > ${DERIVED_FILE_DIR}/bundle_fingerprint.h\n${BUILT_PRODUCTS_DIR}/xorkey ${SOURCE_ROOT}/app/AppleIncRootCertificate.cer > ${DERIVED_FILE_DIR}/AppleIncRootCertificate.h\n";
-			showEnvVarsInLog = 0;
-		};
 		9A2EF2AE133109C20023C5B7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1869,14 +1851,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		9A26067913530FF3002C86FB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9A26068113530FF3002C86FB /* xorkey.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9A288E1A1398EA6F00258451 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1895,7 +1869,6 @@
 			files = (
 				9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */,
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
-				9A2EF37513310CB80023C5B7 /* ber.c in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
 				9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */,
 				9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */,
@@ -1911,7 +1884,6 @@
 				9A2EF38713310CB80023C5B7 /* PSMTabBarCell.m in Sources */,
 				9A2EF38813310CB80023C5B7 /* PSMTabBarControl.m in Sources */,
 				9A2EF38913310CB80023C5B7 /* PSMTabDragAssistant.m in Sources */,
-				9A2EF38A13310CB80023C5B7 /* receipt.c in Sources */,
 				9A2EF38C13310CB80023C5B7 /* SFTPConnection.m in Sources */,
 				9A2EF38D13310CB80023C5B7 /* SFTPConnectionPool.m in Sources */,
 				9A2EF38F13310CB80023C5B7 /* TMFileURLProtocol.m in Sources */,
@@ -2089,6 +2061,13 @@
 				9AF6A7071435BAA300FB373B /* ViViewController.m in Sources */,
 				9AA9272714D5B55900F0E02F /* Nu.m in Sources */,
 				17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */,
+				17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */,
+				17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */,
+				17D8A10517C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				17D8A12817CF0354000C25C6 /* SFBCrashReporter.m in Sources */,
+				17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */,
+				17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */,
+				1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2129,17 +2108,15 @@
 				9A43471413313854002B04DE /* SBJsonTokeniser.m in Sources */,
 				9A43471513313854002B04DE /* SBJsonWriter.m in Sources */,
 				9A4346EB13312710002B04DE /* vico.m in Sources */,
+				17D8A10717C846F1000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */,
+				17D8A10817C846F1000C25C6 /* SBJsonStreamTokeniser.m in Sources */,
+				17D8A10917C846F1000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9A2606891353105C002C86FB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9A26067C13530FF3002C86FB /* xorkey */;
-			targetProxy = 9A2606881353105C002C86FB /* PBXContainerItemProxy */;
-		};
 		9A288E371398EAD200258451 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9A288E1D1398EA6F00258451 /* par */;
@@ -2295,34 +2272,11 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		9A26068413530FF3002C86FB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		9A26068513530FF3002C86FB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		9A26068B135316F7002C86FB /* Snapshot */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2333,7 +2287,7 @@
 					"TRIAL_VERSION=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2344,7 +2298,7 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -2356,19 +2310,30 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2376,6 +2341,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Snapshot;
@@ -2385,6 +2351,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
@@ -2427,18 +2394,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
-			};
-			name = Snapshot;
-		};
-		9A260690135316F7002C86FB /* Snapshot */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 			};
 			name = Snapshot;
 		};
@@ -2486,6 +2441,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2496,7 +2452,7 @@
 					"DEBUG_BUILD=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2507,7 +2463,7 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -2520,6 +2476,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2530,7 +2487,7 @@
 					"VERSION=1.0",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2541,7 +2498,7 @@
 					universalchardet,
 				);
 				KEEP_PRIVATE_EXTERNS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				TEST_AFTER_BUILD = YES;
@@ -2552,23 +2509,36 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "app/Vico-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
 					"-lffi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2577,11 +2547,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2591,8 +2566,15 @@
 					"NDEBUG=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = (
+					json,
+					sftp,
+					oniguruma,
+					universalchardet,
+					Sparkle,
+				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2600,6 +2582,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
+				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2609,6 +2592,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2631,6 +2615,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
@@ -2706,16 +2691,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9A26068313530FF3002C86FB /* Build configuration list for PBXNativeTarget "xorkey" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9A26068413530FF3002C86FB /* Debug */,
-				9A26068513530FF3002C86FB /* Release */,
-				9A260690135316F7002C86FB /* Snapshot */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Snapshot;
-		};
 		9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

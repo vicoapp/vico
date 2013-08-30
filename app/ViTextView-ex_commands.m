@@ -253,7 +253,7 @@
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
-	ViTransformer *transform = [[[ViTransformer alloc] init] autorelease];
+	ViTransformer *transform = [[ViTransformer alloc] init];
 
 	NSInteger startLocation = [storage locationForStartOfLine:exRange.location];
 	NSRange replacementRange =

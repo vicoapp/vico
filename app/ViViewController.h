@@ -30,13 +30,13 @@
  */
 @interface ViViewController : NSViewController
 {
-	ViTabController	*_tabController;
+	ViTabController	*__weak _tabController;
 	BOOL		 _modified;
 	BOOL		 _processing;
 }
 
 /** The ViTabController this view belongs to. */
-@property (nonatomic,readwrite,assign) ViTabController *tabController;
+@property (nonatomic,readwrite,weak) ViTabController *tabController;
 
 /** The inner NSView will be made key when the view gets focus. */
 @property (nonatomic,readonly) NSView *innerView;

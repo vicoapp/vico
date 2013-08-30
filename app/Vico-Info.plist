@@ -310,7 +310,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>dummy</string>
+	<string>1.4</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -346,21 +346,19 @@
 			</array>
 		</dict>
 	</array>
-	<key>CFBundleVersion</key>
-	<string>dummy</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.6.6</string>
+	<string>10.8.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>sparkle_pub.pem</string>
-	<key>SUFeedURL</key>
-	<string>http://www.vicoapp.com/appcast.xml</string>
 	<key>SFBCrashReporterCrashSubmissionURL</key>
 	<string>http://crash.vicoapp.com/handle_crash_report.php</string>
+	<key>SUFeedURL</key>
+	<string>http://www.vicoapp.com/appcast.xml</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>sparkle_pub.pem</string>
 </dict>
 </plist>

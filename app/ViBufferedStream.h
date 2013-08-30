@@ -50,7 +50,7 @@
 	char			 _buffer[64*1024];
 	ssize_t			 _buflen;
 
-	id<NSStreamDelegate>	 _delegate;
+	id<NSStreamDelegate>	 __unsafe_unretained _delegate;
 
 	NSMutableArray		*_outputBuffers;
 
@@ -60,7 +60,7 @@
 	CFSocketContext		 _inputContext, _outputContext;
 }
 
-@property (nonatomic,readwrite,assign) id<NSStreamDelegate> delegate;
+@property (nonatomic,readwrite,unsafe_unretained) id<NSStreamDelegate> delegate;
 
 + (id)streamWithTask:(NSTask *)task;
 

@@ -46,12 +46,6 @@
 	DEBUG(@"loaded %lu lines from history", [_history count]);
 }
 
-- (void)dealloc
-{
-	[_history release];
-	[_current release];
-	[super dealloc];
-}
 
 - (void)addToHistory:(NSString *)line
 {
@@ -73,7 +67,6 @@
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 	DEBUG(@"using field editor %@", editor);
 
-	[_current release];
 	_current = nil;
 	_historyIndex = -1;
 
@@ -87,7 +80,6 @@
 - (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix
 {
 	if (_historyIndex == -1) {
-		[_current release];
 		_current = [[self stringValue] copy];
 	}
 

@@ -30,6 +30,10 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//#if !__has_feature(objc_arc)
+//#error "This source file must be compiled with ARC enabled!"
+//#endif
+
 #import "SBJsonStreamParserAdapter.h"
 
 @interface SBJsonStreamParserAdapter ()
@@ -44,7 +48,7 @@
 @implementation SBJsonStreamParserAdapter
 
 @synthesize delegate;
-@synthesize skip;
+@synthesize levelsToSkip;
 
 #pragma mark Housekeeping
 
@@ -59,11 +63,6 @@
 	return self;
 }	
 
-- (void)dealloc {
-	[keyStack release];
-	[stack release];
-	[super dealloc];
-}
 
 #pragma mark Private methods
 
@@ -100,13 +99,9 @@
 			
 		case SBJsonStreamParserAdapterNone:
 			if ([obj isKindOfClass:[NSArray class]]) {
-				if (delegate && [delegate respondsToSelector:@selector(parser:foundArray:)]) {
-                    [delegate parser:parser foundArray:obj];
-                }
+				[delegate parser:parser foundArray:obj];
 			} else {
-				if (delegate && [delegate respondsToSelector:@selector(parser:foundObject:)]) {
-                    [delegate parser:parser foundObject:obj];
-                }
+				[delegate parser:parser foundObject:obj];
 			}				
 			break;
 
@@ -119,8 +114,8 @@
 #pragma mark Delegate methods
 
 - (void)parserFoundObjectStart:(SBJsonStreamParser*)parser {
-	if (++depth > skip) {
-		dict = [[NSMutableDictionary new] autorelease];
+	if (++depth > self.levelsToSkip) {
+		dict = [NSMutableDictionary new];
 		[stack addObject:dict];
 		currentType = SBJsonStreamParserAdapterObject;
 	}
@@ -131,28 +126,26 @@
 }
 
 - (void)parserFoundObjectEnd:(SBJsonStreamParser*)parser {
-	if (depth-- > skip) {
-		id value = [dict retain];
+	if (depth-- > self.levelsToSkip) {
+		id value = dict;
 		[self pop];
 		[self parser:parser found:value];
-		[value release];
 	}
 }
 
 - (void)parserFoundArrayStart:(SBJsonStreamParser*)parser {
-	if (++depth > skip) {
-		array = [[NSMutableArray new] autorelease];
+	if (++depth > self.levelsToSkip) {
+		array = [NSMutableArray new];
 		[stack addObject:array];
 		currentType = SBJsonStreamParserAdapterArray;
 	}
 }
 
 - (void)parserFoundArrayEnd:(SBJsonStreamParser*)parser {
-	if (depth-- > skip) {
-		id value = [array retain];
+	if (depth-- > self.levelsToSkip) {
+		id value = array;
 		[self pop];
 		[self parser:parser found:value];
-		[value release];
 	}
 }
 

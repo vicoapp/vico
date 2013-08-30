@@ -50,7 +50,7 @@
 	if ((self = [super init]) != nil) {
 		_handlers = [[NSMutableArray alloc] init];
 		_directoryCache = [[NSMutableDictionary alloc] init];
-		_slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
+		_slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
 		_lastEventId = kFSEventStreamEventIdSinceNow;
 	}
 
@@ -61,17 +61,8 @@
 {
 	DEBUG_DEALLOC();
 	[self stopEvents];
-	[_handlers release];
-	[_directoryCache release];
-	[_slashSet release];
-	[super dealloc];
 }
 
-- (void)finalize
-{
-	[self stopEvents];
-	[super finalize];
-}
 
 - (void)registerHandler:(id<ViURLHandler>)handler
 {
@@ -145,7 +136,7 @@
                  * block literal and can't be automatically retained
                  * without moving it to the heap.
 		 */
-		void (^completionCallbackCopy)(NSArray *, NSError *) = [[completionCallback copy] autorelease];
+		void (^completionCallbackCopy)(NSArray *, NSError *) = [completionCallback copy];
 		return [handler contentsOfDirectoryAtURL:normalizedURL
 					    onCompletion:^(NSArray *contents, NSError *error) {
 			if (contents && !error)
@@ -425,20 +416,20 @@ void mycallback(
 {
 	int i;
 	char **paths = eventPaths;
-	ViURLManager *urlManager = clientCallBackInfo;
+	ViURLManager *urlManager = (__bridge ViURLManager *)(clientCallBackInfo);
 
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	for (i = 0; i < numEvents; i++) {
-		NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
-											     length:strlen(paths[i])];
-		NSURL *url = [NSURL fileURLWithPath:path];
-		NSUInteger flags = eventFlags[i];
-		DEBUG(@"URL %@ changed w/flags 0x%04x", url, eventFlags[i]);
-		[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url
-							  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs)
-								force:YES];
-	}
-	[pool drain];
+	@autoreleasepool {
+		for (i = 0; i < numEvents; i++) {
+			NSString *path = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:paths[i]
+													 length:strlen(paths[i])];
+			NSURL *url = [NSURL fileURLWithPath:path];
+			NSUInteger flags = eventFlags[i];
+			DEBUG(@"URL %@ changed w/flags 0x%04x", url, eventFlags[i]);
+			[[urlManager nextRunloop] notifyChangedDirectoryAtURL:url
+								  recursively:(flags & kFSEventStreamEventFlagMustScanSubDirs)
+									force:YES];
+		}
+	};
 }
 
 - (BOOL)URLIsMonitored:(NSURL *)aURL
@@ -447,16 +438,16 @@ void mycallback(
 		return NO;
 
 	NSString *path = [aURL path];
-	NSArray *pathsBeingWatched = (NSArray *)FSEventStreamCopyPathsBeingWatched(_evstream);
+	NSArray *pathsBeingWatched = (NSArray *)CFBridgingRelease(FSEventStreamCopyPathsBeingWatched(_evstream));
 	for (NSString *p in pathsBeingWatched) {
 		if ([path hasPrefix:p]) {
 			DEBUG(@"URL %@ is already being watched", aURL);
-			CFRelease(pathsBeingWatched);
+			CFRelease((__bridge CFTypeRef)(pathsBeingWatched));
 			return YES;
 		}
 	}
 
-	CFRelease(pathsBeingWatched);
+	CFRelease((__bridge CFTypeRef)(pathsBeingWatched));
 	return NO;
 }
 
@@ -503,13 +494,13 @@ void mycallback(
 
 	struct FSEventStreamContext ctx;
 	bzero(&ctx, sizeof(ctx));
-	ctx.info = self;
+	ctx.info = (__bridge void *)(self);
 
 	DEBUG(@"listening for events since %lu", _lastEventId);
 	_evstream = FSEventStreamCreate(NULL,
 		&mycallback,
 		&ctx,
-		(CFArrayRef)paths,
+		(__bridge CFArrayRef)paths,
 		_lastEventId,
 		latency,
 		kFSEventStreamCreateFlagWatchRoot

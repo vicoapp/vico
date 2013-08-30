@@ -66,11 +66,10 @@
 @synthesize currentTabStop = _currentTabStop;
 @synthesize finished = _finished;
 
-- (void)snippetTask:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)ctx
+- (void)taskRunner:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)ctx
 {
 	if (status != 0)
 		DEBUG(@"%@: exited with status %i", runner, status);
-	[_shellOutput release];
 	_shellOutput = [[NSMutableString alloc] initWithData:[runner standardOutput]
 						    encoding:NSUTF8StringEncoding];
 
@@ -100,20 +99,18 @@
 	DEBUG(@"shell environment is %@", env);
 
 	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
+	__weak id<ViTaskRunnerTarget> targetSelf = (id<ViTaskRunnerTarget>)self;
 	[runner launchShellCommand:shellCommand
 		 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
 		       environment:env
 		  currentDirectory:nil
 	    asynchronouslyInWindow:nil
 			     title:shellCommand
-			    target:self
-			  selector:@selector(snippetTask:finishedWithStatus:contextInfo:)
+			    target:targetSelf
 		       contextInfo:nil
 			     error:outError];
-	[runner release];
-	[env release];
 
-	return [_shellOutput autorelease];
+	return _shellOutput;
 }
 
 - (NSMutableString *)parseString:(NSString *)aString
@@ -165,7 +162,6 @@
 				ts.parent = parentTabstop;
 				ts.index = [_tabstops count];
 				[_tabstops addObject:ts];
-				[ts release];
 				if (tabStop > _maxTabNum)
 					_maxTabNum = tabStop;
 			} else if ([scan scanShellVariableIntoString:&variable]) {
@@ -389,13 +385,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_currentTabStop release];
-	[_tabstops release];
-	[_environment release];
-	[super dealloc];
-}
 
 - (void)deselect
 {

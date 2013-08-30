@@ -129,7 +129,7 @@ BOOL openUntitledDocument = YES;
 								 forEventClass:kInternetEventClass
 								    andEventID:kAEGetURL];
 
-		[NSValueTransformer setValueTransformer:[[[caretBlinkModeTransformer alloc] init] autorelease]
+		[NSValueTransformer setValueTransformer:[[caretBlinkModeTransformer alloc] init]
 						forName:@"caretBlinkModeTransformer"];
 
 		_statusSetupBlock = nil;
@@ -137,11 +137,6 @@ BOOL openUntitledDocument = YES;
 	return self;
 }
 
-- (void)dealloc
-{
-	[_fieldEditor release];
-	[super dealloc];
-}
 
 // stops the application from creating an untitled document on load
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
@@ -169,7 +164,7 @@ BOOL openUntitledDocument = YES;
 							   appropriateForURL:nil
 								      create:YES
 								       error:nil];
-		__supportDirectory = [[[url path] stringByAppendingPathComponent:@"Vico"] retain];
+		__supportDirectory = [[url path] stringByAppendingPathComponent:@"Vico"];
 	}
 	return __supportDirectory;
 }
@@ -361,16 +356,15 @@ updateMeta(void)
 					   keyEquivalent:@""];
 		[item setRepresentedObject:[NSNumber numberWithUnsignedLong:*encoding]];
 		[array addObject:item];
-		[item release];
 		encoding++;
 	}
 
-	[[ViURLManager defaultManager] registerHandler:[[[ViFileURLHandler alloc] init] autorelease]];
-	[[ViURLManager defaultManager] registerHandler:[[[ViSFTPURLHandler alloc] init] autorelease]];
-	[[ViURLManager defaultManager] registerHandler:[[[ViHTTPURLHandler alloc] init] autorelease]];
+	[[ViURLManager defaultManager] registerHandler:[[ViFileURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViSFTPURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViHTTPURLHandler alloc] init]];
 
-	NSSortDescriptor *sdesc = [[[NSSortDescriptor alloc] initWithKey:@"title"
-	                                                       ascending:YES] autorelease];
+	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title"
+	                                                       ascending:YES];
 	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
 	for (item in array)
 		[encodingMenu addItem:item];
@@ -421,11 +415,11 @@ updateMeta(void)
 
 	/* Register default preference panes. */
 	ViPreferencesController *prefs = [ViPreferencesController sharedPreferences];
-	[prefs registerPane:[[[ViPreferencePaneGeneral alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneEdit alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneTheme alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneBundles alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneAdvanced alloc] init] autorelease]];
+	[prefs registerPane:[[ViPreferencePaneGeneral alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneEdit alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneTheme alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneAdvanced alloc] init]];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(beginTrackingMainMenu:)
@@ -739,13 +733,12 @@ additionalBindings:(NSDictionary *)bindings
 
 - (void)beginTrackingMainMenu:(NSNotification *)notification
 {
-	_menuTrackedKeyWindow = [[NSApp keyWindow] retain];
+	_menuTrackedKeyWindow = [NSApp keyWindow];
 	_trackingMainMenu = YES;
 }
 
 - (void)endTrackingMainMenu:(NSNotification *)notification
 {
-	[_menuTrackedKeyWindow release];
 	_menuTrackedKeyWindow = nil;
 	_trackingMainMenu = NO;
 }
@@ -871,7 +864,7 @@ additionalBindings:(NSDictionary *)bindings
 		NSInteger keyCode;
 		if (_fieldEditor == nil) {
 			_fieldEditorStorage = [[ViTextStorage alloc] init];
-			_fieldEditor = [[ViTextView makeFieldEditorWithTextStorage:_fieldEditorStorage] retain];
+			_fieldEditor = [ViTextView makeFieldEditorWithTextStorage:_fieldEditorStorage];
 		}
 		[_fieldEditor setInsertMode:nil];
 		[_fieldEditor setCaret:0];
@@ -886,7 +879,7 @@ additionalBindings:(NSDictionary *)bindings
 		return nil;
 	}
 
-	return [_exString autorelease];
+	return _exString;
 }
 
 - (NSString *)getExStringForCommand:(ViCommand *)command

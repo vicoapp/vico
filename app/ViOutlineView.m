@@ -45,8 +45,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[self setKeyManager:nil];
-	[super dealloc];
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager

@@ -91,7 +91,7 @@
 		}
 	}
 
-	return [crashFolderPaths autorelease];
+	return crashFolderPaths;
 }
 
 + (NSArray *) crashLogPaths
@@ -109,7 +109,7 @@
 				[paths addObject:[crashLogDirectory stringByAppendingPathComponent:file]];
 	}
 
-	return [paths autorelease];
+	return paths;
 }
 
 @end

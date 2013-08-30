@@ -41,8 +41,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_backgroundColor release];
-	[super dealloc];
 }
 
 @end

@@ -46,8 +46,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_jumps release];
-	[super dealloc];
 }
 
 - (BOOL)push:(ViMark *)newJump

@@ -45,28 +45,28 @@ static NSCharacterSet *__ucase = nil;
 
 + (id)completionWithContent:(NSString *)aString
 {
-	return [[[ViCompletion alloc] initWithContent:aString] autorelease];
+	return [[ViCompletion alloc] initWithContent:aString];
 }
 
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
-	return [[[ViCompletion alloc] initWithContent:aString fuzzyMatch:aMatch] autorelease];
+	return [[ViCompletion alloc] initWithContent:aString fuzzyMatch:aMatch];
 }
 
 - (id)initWithContent:(NSString *)aString
 {
 	if ((self = [super init]) != nil) {
 		_content = [aString copy];
-		_font = [[NSFont userFixedPitchFontOfSize:12] retain];
+		_font = [NSFont userFixedPitchFontOfSize:12];
 		_titleParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[_titleParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
-		_markColor = [[NSColor redColor] retain];
+		_markColor = [NSColor redColor];
 		_titleIsDirty = YES;
 		_scoreIsDirty = YES;
 
 		if (__separators == nil) {
-			__separators = [[NSCharacterSet punctuationCharacterSet] retain];
-			__ucase = [[NSCharacterSet uppercaseLetterCharacterSet] retain];
+			__separators = [NSCharacterSet punctuationCharacterSet];
+			__ucase = [NSCharacterSet uppercaseLetterCharacterSet];
 		}
 	}
 	return self;
@@ -75,23 +75,12 @@ static NSCharacterSet *__ucase = nil;
 - (id)initWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
 	if ((self = [self initWithContent:aString]) != nil) {
-		_filterMatch = [aMatch retain];
+		_filterMatch = aMatch;
 		_filterIsFuzzy = YES;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_content release];
-	[_title release];
-	[_filterMatch release];
-	[_font release];
-	[_markColor release];
-	[_titleParagraphStyle release];
-	[_representedObject release];
-	[super dealloc];
-}
 
 - (void)updateTitle
 {
@@ -105,7 +94,7 @@ static NSCharacterSet *__ucase = nil;
 		grayRange.length = _filterMatch.rangeOfMatchedString.length;
 	NSColor *gray = [NSColor grayColor];
 
-	[self setTitle:[[[NSMutableAttributedString alloc] initWithString:_content] autorelease]];
+	[self setTitle:[[NSMutableAttributedString alloc] initWithString:_content]];
 	if (grayRange.length > 0)
 		[_title addAttribute:NSForegroundColorAttributeName
 			       value:gray
@@ -223,8 +212,6 @@ static NSCharacterSet *__ucase = nil;
 
 - (void)setFilterMatch:(ViRegexpMatch *)m
 {
-	[m retain];
-	[_filterMatch release];
 	_filterMatch = m;
 	_titleIsDirty = YES;
 	_scoreIsDirty = YES;
@@ -238,8 +225,6 @@ static NSCharacterSet *__ucase = nil;
 
 - (void)setFont:(NSFont *)aFont
 {
-	[aFont retain];
-	[_font release];
 	_font = aFont;
 	_titleIsDirty = YES;
 }

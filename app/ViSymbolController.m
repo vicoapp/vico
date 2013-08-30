@@ -50,12 +50,7 @@
 	DEBUG_DEALLOC();
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[_separatorCell release];
-	[_symbolFilterCache release];
-	[_filteredDocuments release];
 	[_reloadTimer invalidate];
-	[_reloadTimer release];
-	[super dealloc];
 }
 
 - (void)awakeFromNib
@@ -67,7 +62,7 @@
 	[symbolView setDoubleAction:@selector(gotoSymbolAction:)];
 	[symbolView setAction:@selector(gotoSymbolAction:)];
 
-	NSCell *cell = [[[MHTextIconCell alloc] init] autorelease];
+	NSCell *cell = [[MHTextIconCell alloc] init];
 	[[symbolView outlineTableColumn] setDataCell:cell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];
@@ -146,14 +141,13 @@
 
 	_dirty = YES;
 	[_reloadTimer invalidate];
-	[_reloadTimer release];
 
 	if ([self symbolListIsOpen])
-		_reloadTimer = [[NSTimer scheduledTimerWithTimeInterval:0.1
+		_reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
 								 target:self
 							       selector:@selector(symbolsUpdate:)
 							       userInfo:nil
-								repeats:NO] retain];
+								repeats:NO];
 	else
 		_reloadTimer = nil;
 }
@@ -162,7 +156,6 @@
 {
 	_dirty = NO;
 
-	[_reloadTimer release];
 	_reloadTimer = nil;
 
 	_symbolUpdateDuringFiltering = _isFiltered;
@@ -325,7 +318,6 @@
 	ViRegexp *rx = [ViRegexp regexpWithString:pattern
 					  options:ONIG_OPTION_IGNORECASE];
 
-	[_filteredDocuments release];
 	_filteredDocuments = [[NSMutableArray alloc] initWithArray:[windowController.documents allObjects]];
 
 	// make sure the current document is displayed first in the symbol list

@@ -82,11 +82,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_transformations release];
-	[super dealloc];
-}
 
 - (NSString *)transformSymbol:(NSString *)aSymbol
 {

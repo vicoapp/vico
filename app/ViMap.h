@@ -56,7 +56,7 @@
 {
 	NSArray		*_keySequence;
 	NSString	*_keyString;
-	NSString	*_scopeSelector;
+	NSString	*__weak _scopeSelector;
 	NSString	*_title;
 
 	SEL		 _action;
@@ -71,7 +71,7 @@
 /** @name Getting mapping attributes */
 
 /** The scope this mapping applies to. */
-@property (nonatomic, readonly) NSString *scopeSelector;
+@property (weak, nonatomic, readonly) NSString *scopeSelector;
 
 /** A string describing the key sequence. */
 @property (nonatomic, readonly) NSString *keyString;
@@ -223,7 +223,7 @@
 @property (nonatomic, readonly) NSArray *actions;
 
 /** Assign a map to be used by operator actions. */
-@property (nonatomic, readwrite, retain) ViMap *operatorMap;
+@property (nonatomic, readwrite, strong) ViMap *operatorMap;
 
 /** If YES, leading digits acts as count to commands.
  * If NO, digits are treated as normal commands.

@@ -47,12 +47,12 @@
 /** The top-level scope of the language. */
 @property(nonatomic,readonly) ViScope *scope;
 
-@property (nonatomic, readonly) NSString *firstLineMatch;
+@property (weak, nonatomic, readonly) NSString *firstLineMatch;
 
 /**
  * @returns  The scope name of the language.
  */
-@property (nonatomic, readonly) NSString *name;
+@property (weak, nonatomic, readonly) NSString *name;
 
 - (id)initWithPath:(NSString *)aPath forBundle:(ViBundle *)aBundle;
 - (NSArray *)fileTypes;
@@ -60,9 +60,9 @@
 /**
  * @returns The display name of the language.
  */
-@property (nonatomic, readonly) NSString *displayName;
+@property (weak, nonatomic, readonly) NSString *displayName;
 
-@property (nonatomic, readonly) NSString *injectionSelector;
+@property (weak, nonatomic, readonly) NSString *injectionSelector;
 
 - (NSArray *)patterns;
 - (NSArray *)expandedPatternsForPattern:(NSMutableDictionary *)pattern;

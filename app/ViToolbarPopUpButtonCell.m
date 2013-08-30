@@ -30,15 +30,10 @@
 
 - (void)setImage:(NSImage *)anImage
 {
-	_image = [anImage retain];
+	_image = anImage;
 	[_image setFlipped:YES];
 }
 
-- (void)dealloc
-{
-	[_image release];
-	[super dealloc];
-}
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {

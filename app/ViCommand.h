@@ -75,10 +75,10 @@
 @property(nonatomic,readwrite) unichar reg;
 
 /** The motion command, if this command is an operator action. */
-@property(nonatomic,readwrite,retain) ViCommand *motion;
+@property(nonatomic,readwrite,strong) ViCommand *motion;
 
 /** The operator command, if this command is a motion component. */
-@property(nonatomic,readwrite,assign) __weak ViCommand *operator;
+@property(nonatomic,readwrite,weak) ViCommand *operator;
 
 @property(nonatomic,readwrite,copy) id text;
 
@@ -87,7 +87,7 @@
 @property(nonatomic,readwrite) NSRange range;
 @property(nonatomic,readwrite) NSInteger caret;
 
-@property(nonatomic,readwrite,retain) ViMacro *macro;
+@property(nonatomic,readwrite,strong) ViMacro *macro;
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping
                             count:(int)aCount;

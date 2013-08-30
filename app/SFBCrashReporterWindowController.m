@@ -50,7 +50,7 @@
 	[[windowController window] center];
 	[windowController showWindow:self];
 
-	[windowController release], windowController = nil;
+	windowController = nil;
 }
 
 // Should not be called directly by anyone except this class
@@ -61,19 +61,15 @@
 
 - (void) dealloc
 {
-	[_emailAddress release], _emailAddress = nil;
-	[_crashLogPath release], _crashLogPath = nil;
-	[_submissionURL release], _submissionURL = nil;
-	[_urlConnection release], _urlConnection = nil;
-	[_responseData release], _responseData = nil;
-
-	[super dealloc];
+	_emailAddress = nil;
+	_crashLogPath = nil;
+	_submissionURL = nil;
+	_urlConnection = nil;
+	_responseData = nil;
 }
 
 - (void) windowDidLoad
 {
-	[self retain];
-
 	// Set the window's title
 	NSString *applicationName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
 	NSString *applicationShortVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
@@ -95,15 +91,6 @@
 
 	// Select the comments text
 	[_commentsTextView setSelectedRange:NSMakeRange(0, NSUIntegerMax)];
-}
-
-- (void) windowWillClose:(NSNotification *)notification
-{
-
-#pragma unused(notification)
-
-	// Ensure we don't leak memory
-	[self autorelease];
 }
 
 #pragma mark Action Methods
@@ -208,7 +195,7 @@
 
 		[formValues setObject:[NSNumber numberWithBool:YES] forKey:@"systemInformationIncluded"];
 
-		[systemInformation release], systemInformation = nil;
+		systemInformation = nil;
 	}
 	else
 		[formValues setObject:[NSNumber numberWithBool:NO] forKey:@"systemInformationIncluded"];
@@ -264,8 +251,8 @@
 	// Include the date and time
 	[formValues setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"date"];
 		
-	[localeToUse release], localeToUse = nil;
-	[dateFormatter release], dateFormatter = nil;
+	localeToUse = nil;
+	dateFormatter = nil;
 	
 	// Generate the form data
 	NSString *boundary = @"0xKhTmLbOuNdArY";
@@ -374,9 +361,9 @@
 	NSString *responseString = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
 	BOOL responseOK = [responseString isEqualToString:@"ok"];
 
-	[responseString release], responseString = nil;
-	[_urlConnection release], _urlConnection = nil;
-	[_responseData release], _responseData = nil;
+	responseString = nil;
+	_urlConnection = nil;
+	_responseData = nil;
 	
 	if(responseOK) {
 		// Create our own instance since this method could be called from a background thread
@@ -393,7 +380,7 @@
 		if(![fileManager removeItemAtPath:self.crashLogPath error:&error])
 			NSLog(@"SFBCrashReporter error: Unable to delete the submitted crash log (%@): %@", [self.crashLogPath lastPathComponent], [error localizedDescription]);
 
-		[fileManager release], fileManager = nil;
+		fileManager = nil;
 		
 		// Even though the log wasn't deleted, submission was still successful
 		[self performSelectorOnMainThread: @selector(showSubmissionSucceededSheet) withObject:nil waitUntilDone:NO];
@@ -412,8 +399,8 @@
 
 #pragma unused(connection)
 
-	[_urlConnection release], _urlConnection = nil;
-	[_responseData release], _responseData = nil;
+	_urlConnection = nil;
+	_responseData = nil;
 
 	[self performSelectorOnMainThread:@selector(showSubmissionFailedSheet:) withObject:error waitUntilDone:NO];
 }

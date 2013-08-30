@@ -114,13 +114,13 @@
 @property(nonatomic,readwrite) NSUInteger naddr;
 
 /** First range address. */
-@property(nonatomic,readwrite,retain) ExAddress *addr1;
+@property(nonatomic,readwrite,strong) ExAddress *addr1;
 
 /** Second range address. */
-@property(nonatomic,readwrite,retain) ExAddress *addr2;
+@property(nonatomic,readwrite,strong) ExAddress *addr2;
 
 /** Target line address. */
-@property(nonatomic,readwrite,retain) ExAddress *lineAddress;
+@property(nonatomic,readwrite,strong) ExAddress *lineAddress;
 
 /** Resolved character range of affected text. */
 @property (nonatomic,readwrite) NSRange range;
@@ -150,7 +150,7 @@
 @property(nonatomic,readwrite) BOOL filter;
 
 /** Next ex command separated with a bar (`|`). */
-@property(nonatomic,readwrite,retain) ExCommand *nextCommand;
+@property(nonatomic,readwrite,strong) ExCommand *nextCommand;
 
 /** Extra argument string. */
 @property(nonatomic,readwrite,copy) NSString *arg;

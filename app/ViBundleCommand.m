@@ -38,31 +38,20 @@
 - (ViBundleCommand *)initFromDictionary:(NSDictionary *)dict inBundle:(ViBundle *)aBundle
 {
 	if ((self = (ViBundleCommand *)[super initFromDictionary:dict inBundle:aBundle]) != nil) {
-		_input = [[[dict objectForKey:@"input"] lowercaseString] retain];
-		_output = [[[dict objectForKey:@"output"] lowercaseString] retain];
-		_fallbackInput = [[[dict objectForKey:@"fallbackInput"] lowercaseString] retain];
-		_beforeRunningCommand = [[dict objectForKey:@"beforeRunningCommand"] retain];
-		_command = [[dict objectForKey:@"command"] retain];
+		_input = [[dict objectForKey:@"input"] lowercaseString];
+		_output = [[dict objectForKey:@"output"] lowercaseString];
+		_fallbackInput = [[dict objectForKey:@"fallbackInput"] lowercaseString];
+		_beforeRunningCommand = [dict objectForKey:@"beforeRunningCommand"];
+		_command = [dict objectForKey:@"command"];
 		if (_command == nil) {
 			INFO(@"missing command in bundle item %@", self.name);
-			[self release];
 			return nil;
 		}
-		_htmlMode = [[[dict objectForKey:@"htmlMode"] lowercaseString] retain];
+		_htmlMode = [[dict objectForKey:@"htmlMode"] lowercaseString];
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_input release];
-	[_output release];
-	[_fallbackInput release];
-	[_beforeRunningCommand release];
-	[_command release];
-	[_htmlMode release];
-	[super dealloc];
-}
 
 @end
 

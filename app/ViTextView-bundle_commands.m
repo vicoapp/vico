@@ -170,14 +170,13 @@
 		 asynchronouslyInWindow:[self window]
 				  title:[command name]
 				 target:self
-			       selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
 			    contextInfo:info
 				  error:&error];
 	if (error)
 		MESSAGE(@"%@", [error localizedDescription]);
 }
 
-- (void)bundleCommand:(ViTaskRunner *)runner
+- (void)taskRunner:(ViTaskRunner *)runner
    finishedWithStatus:(int)status
 	  contextInfo:(id)contextInfo
 {
@@ -249,12 +248,12 @@
 			else if ([htmlMode isEqualTo:@"window"])
 				newWindow = YES;
 
-			webView = [[[ViCommandOutputController alloc] initWithHTMLString:outputText] autorelease];
+			webView = [[ViCommandOutputController alloc] initWithHTMLString:outputText];
 			[webView setTitle:[command name]];
 			[document associateView:webView forKey:command.uuid];
 
 			if (newWindow) {
-				ViWindowController *winCon = [[[ViWindowController alloc] init] autorelease];
+				ViWindowController *winCon = [[ViWindowController alloc] init];
 				[winCon createTabWithViewController:webView];
 				[winCon selectDocumentView:webView];
 			} else {
@@ -328,7 +327,7 @@
 	if ([matches count] == 1) {
 		[self performBundleItem:[matches objectAtIndex:0]];
 	} else if ([matches count] > 1) {
-		NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Bundle commands"] autorelease];
+		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Bundle commands"];
 		[menu setAllowsContextMenuPlugIns:NO];
 		int quickindex = 1;
 		for (ViBundleItem *c in matches) {

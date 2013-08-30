@@ -94,12 +94,12 @@
 /** The vi key parser used by the key manager.
  * @see ViParser.
  */
-@property(nonatomic,readwrite,retain) ViParser *parser;
+@property(nonatomic,readwrite,strong) ViParser *parser;
 
 /** The target object that evaluates the parsed commands. Should conform
  * to the ViKeyManagerTarget protocol.
  */
-@property(nonatomic,readwrite,assign) __weak id<ViKeyManagerTarget> target; // XXX: not retained!
+@property(nonatomic,readwrite,weak) id<ViKeyManagerTarget> target; // XXX: not retained!
 
 @property(nonatomic,readwrite) BOOL isRecordingMacro;
 

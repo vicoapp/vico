@@ -87,12 +87,12 @@
 	NSString			*_exString;
 
 	// project list
-	IBOutlet ViFileExplorer		*explorer;		// Top-level nib object
+	IBOutlet ViFileExplorer		*__weak explorer;		// Top-level nib object
 	IBOutlet NSImageView		*projectResizeView;
 	IBOutlet NSMenu			*explorerActionMenu;	// Top-level nib object
 
 	// symbol list
-	IBOutlet ViSymbolController	*symbolController;	// Top-level nib object
+	IBOutlet ViSymbolController	*__weak symbolController;	// Top-level nib object
 	IBOutlet NSImageView		*symbolsResizeView;
 	IBOutlet NSView			*symbolsView;		// Top-level nib object
 
@@ -107,18 +107,18 @@
 	id<ViDeferred>			 _checkURLDeferred;
 }
 
-@property(nonatomic,readwrite,retain) NSMutableSet *documents;
+@property(nonatomic,readwrite,strong) NSMutableSet *documents;
 @property(nonatomic,readonly) ViJumpList *jumpList;
-@property(nonatomic,readwrite,retain) ViProject *project;
-@property(nonatomic,readonly) ViFileExplorer *explorer;
-@property(nonatomic,readonly) ViMarkList *tagStack;
-@property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
+@property(nonatomic,readwrite,strong) ViProject *project;
+@property(weak, nonatomic,readonly) ViFileExplorer *explorer;
+@property(weak, nonatomic,readonly) ViMarkList *tagStack;
+@property(weak, nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
-@property(nonatomic,readwrite,retain) NSURL *baseURL;
-@property(nonatomic,readonly) ViSymbolController *symbolController;
+@property(nonatomic,readwrite,strong) NSURL *baseURL;
+@property(weak, nonatomic,readonly) ViSymbolController *symbolController;
 @property(nonatomic,readonly) ViParser *parser;
-@property(nonatomic,readwrite,retain) ViMark *alternateMarkCandidate;
-@property(nonatomic,readwrite,retain) ViMark *alternateMark;
+@property(nonatomic,readwrite,strong) ViMark *alternateMarkCandidate;
+@property(nonatomic,readwrite,strong) ViMark *alternateMark;
 
 /**
  * @returns The currently active window controller.

@@ -41,11 +41,6 @@
 						    defaultMap:[ViMap mapWithName:@"webMap"]]];
 }
 
-- (void)dealloc
-{
-	[_keyManager release];
-	[super dealloc];
-}
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
 {

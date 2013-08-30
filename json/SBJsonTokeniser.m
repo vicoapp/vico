@@ -72,8 +72,7 @@
 
 - (void)dealloc {
 	self.error = nil;
-	[buf release];
-	[illegalCharacterSet release];
+	
 	[super dealloc];
 }
 
@@ -174,7 +173,7 @@ again: while (i < len) {
 		[data appendBytes:&c length:1];
 	}
 	
-	return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+	return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
 

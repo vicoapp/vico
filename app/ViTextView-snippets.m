@@ -32,7 +32,7 @@
 
 - (void)cancelSnippet
 {
-	ViSnippet *snippet = [[document.snippet retain] autorelease];
+	ViSnippet *snippet = document.snippet;
 	if (snippet) {
 		DEBUG(@"cancel snippet in range %@", NSStringFromRange(snippet.range));
 		document.snippet = nil;
@@ -77,11 +77,11 @@
 	snippetMatchRange.location = NSNotFound;
 
 	NSError *error = nil;
-	ViSnippet *snippet = [[[ViSnippet alloc] initWithString:expandedSnippetString
+	ViSnippet *snippet = [[ViSnippet alloc] initWithString:expandedSnippetString
 						     atLocation:aRange.location
 						       delegate:self
 						    environment:env
-							  error:&error] autorelease];
+							  error:&error];
 	[[self textStorage] endEditing];
 	if (snippet == nil) {
 		MESSAGE(@"%@", [error localizedDescription]);

@@ -25,10 +25,10 @@
 
 @interface ViFile : NSObject
 {
-	NSURL		*_url;
-	NSURL		*_targetURL;
+	NSURL		*__weak _url;
+	NSURL		*__weak _targetURL;
 	NSDictionary	*_attributes;
-	NSDictionary	*_targetAttributes;
+	NSDictionary	*__weak _targetAttributes;
 	NSMutableArray	*_children;
 	NSString	*_name;
 	NSString	*_displayName;
@@ -40,17 +40,17 @@
 	BOOL		 _isLink;
 }
 
-@property(nonatomic,readonly) NSURL *url;
-@property(nonatomic,readonly) NSURL *targetURL;
+@property(weak, nonatomic,readonly) NSURL *url;
+@property(weak, nonatomic,readonly) NSURL *targetURL;
 @property(nonatomic,readonly) NSDictionary *attributes;
-@property(nonatomic,readonly) NSDictionary *targetAttributes;
-@property(nonatomic,readwrite,retain) NSMutableArray *children;
+@property(weak, nonatomic,readonly) NSDictionary *targetAttributes;
+@property(nonatomic,readwrite,strong) NSMutableArray *children;
 @property(nonatomic,readonly) BOOL isDirectory;
 @property(nonatomic,readonly) BOOL isLink;
-@property(nonatomic,readonly) NSString *name;
-@property(nonatomic,readonly) NSString *displayName;
-@property(nonatomic,readonly) NSString *path;
-@property(nonatomic,readonly) NSImage *icon;
+@property(weak, nonatomic,readonly) NSString *name;
+@property(weak, nonatomic,readonly) NSString *displayName;
+@property(weak, nonatomic,readonly) NSString *path;
+@property(weak, nonatomic,readonly) NSImage *icon;
 
 + (id)fileWithURL:(NSURL *)aURL
        attributes:(NSDictionary *)aDictionary;

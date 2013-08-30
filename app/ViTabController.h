@@ -110,8 +110,8 @@ enum ViViewOrderingMode {
 @property(nonatomic,readonly) NSArray *views;
 /** The window this tab belongs to. */
 @property(nonatomic,readonly) NSWindow *window;
-@property(nonatomic,readwrite,retain) ViViewController *selectedView;
-@property(nonatomic,readwrite,retain) ViViewController *previousView;
+@property(nonatomic,readwrite,strong) ViViewController *selectedView;
+@property(nonatomic,readwrite,strong) ViViewController *previousView;
 
 - (id)initWithViewController:(ViViewController *)initialViewController
 		      window:(NSWindow *)aWindow;

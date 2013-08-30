@@ -265,8 +265,8 @@ static ViKeyManager *macroRecorder = nil;
 
 	SEL shouldSel = @selector(keyManager:shouldParseKey:inScope:);
 	if ([target respondsToSelector:shouldSel]) {
-		if ([target keyManager:self shouldParseKey:@(keyCode) inScope:scope])
-			return YES; /* target handled the key already */
+		if (! [target keyManager:self shouldParseKey:@(keyCode) inScope:scope])
+			return YES;
 	}
 
 	NSError *error = nil;

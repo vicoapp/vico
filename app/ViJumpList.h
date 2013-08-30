@@ -37,10 +37,10 @@
 {
 	NSMutableArray			*_jumps;
 	NSInteger			 _position;
-	__weak id<ViJumpListDelegate>	 _delegate; // XXX: not retained!
+	id<ViJumpListDelegate>	 _delegate;
 }
 
-@property(nonatomic,readwrite,weak) id<ViJumpListDelegate> delegate;
+@property(nonatomic,readwrite,strong) id<ViJumpListDelegate> delegate;
 
 - (BOOL)push:(ViMark *)newJump;
 

@@ -44,7 +44,7 @@
 	NSMutableDictionary	*_associatedViews;
 
 	ViBundle		*_bundle;
-	ViLanguage		*__weak _language;
+	ViLanguage		*_language;
 	ViTheme			*_theme;
 
 	NSInteger		 _tabSize; /* scope-specific */
@@ -100,7 +100,7 @@
 @property(nonatomic,readonly) NSSet *views;
 @property(nonatomic,readwrite,strong) ViBundle *bundle;
 @property(nonatomic,readwrite,strong) ViTheme *theme;
-@property(weak, nonatomic,readonly) ViLanguage *language;
+@property(nonatomic,readonly,strong) ViLanguage *language;
 @property(nonatomic,readwrite,strong) NSArray *symbols;
 @property(nonatomic,readwrite,strong) NSArray *filteredSymbols;
 @property(nonatomic,readwrite,strong) NSDictionary *symbolScopes;

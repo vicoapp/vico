@@ -32,7 +32,7 @@
 {
 	ViMapping		*_mapping;
 	ViCommand		*_motion;
-	__weak ViCommand	*_operator;	// XXX: not retained!
+	ViCommand	*_operator;
 	ViMacro			*_macro;
 	BOOL			 _fromDot;
 	BOOL			 _isLineMode;
@@ -78,7 +78,7 @@
 @property(nonatomic,readwrite,strong) ViCommand *motion;
 
 /** The operator command, if this command is a motion component. */
-@property(nonatomic,readwrite,weak) ViCommand *operator;
+@property(nonatomic,readwrite,strong) ViCommand *operator;
 
 @property(nonatomic,readwrite,copy) id text;
 

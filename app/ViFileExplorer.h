@@ -38,7 +38,7 @@
 {
 	IBOutlet NSWindow		*window;
 	IBOutlet ViWindowController	*windowController;
-	IBOutlet ViOutlineView		*__weak explorer;
+	IBOutlet ViOutlineView		*explorer;
 	IBOutlet NSMenu			*actionMenu;
 	IBOutlet NSSearchField		*filterField;
 	IBOutlet NSSearchField		*altFilterField;
@@ -54,7 +54,7 @@
 	IBOutlet NSPathControl		*pathControl;
 	IBOutlet id			 __unsafe_unretained delegate;
 
-	NSURL				*__weak _rootURL;
+	NSURL				*_rootURL;
 	CGFloat				 _width;
 	NSFont				*_font;
 
@@ -90,8 +90,8 @@
 }
 
 @property(nonatomic,readwrite,unsafe_unretained) id delegate;
-@property(weak, nonatomic,readonly) ViOutlineView *outlineView;
-@property(weak, nonatomic,readonly) NSURL *rootURL;
+@property(nonatomic,readonly) ViOutlineView *outlineView;
+@property(nonatomic,readonly) NSURL *rootURL;
 
 - (void)browseURL:(NSURL *)aURL andDisplay:(BOOL)display;
 - (void)browseURL:(NSURL *)aURL;

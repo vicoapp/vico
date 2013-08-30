@@ -37,7 +37,7 @@
 #import "ViPreferencePaneAdvanced.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
-#import "JSON.h"
+#import "SBJson.h"
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
 #import "ViEventManager.h"
@@ -649,7 +649,9 @@ additionalBindings:(NSDictionary *)bindings
 
 	if ([result isKindOfClass:[NSNull class]])
 		return nil;
-	return [result JSONRepresentation];
+	
+	SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+	return [writer stringWithObject:result];
 }
 
 - (NSError *)openURL:(NSString *)pathOrURL andWait:(BOOL)waitFlag backChannel:(NSString *)channelName

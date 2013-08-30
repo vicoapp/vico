@@ -71,15 +71,31 @@
 - (id)objectWithData:(NSData*)data;
 
 /**
- Parse string and return the represented dictionary or array.
+ Return the object represented by the given string
 
- Calls objectWithData: internally.
-
- @param string An NSString containing JSON text.
+ This method converts its input to an NSData object containing UTF8 and calls -objectWithData: with it.
 
  @return The NSArray or NSDictionary represented by the object, or nil if an error occured.
  */
-- (id)objectWithString:(NSString *)string;
+- (id)objectWithString:(NSString *)repr;
+
+/**
+ Return the object represented by the given string
+
+ This method calls objectWithString: internally. If an error occurs, and if error
+ is not nil, it creates an NSError object and returns this through its second argument.
+
+ @param jsonText the json string to parse
+ @param error pointer to an NSError object to populate on error
+
+ @return The NSArray or NSDictionary represented by the object, or nil if an error occured.
+
+ @warning Deprecated in Version 3.2; will be removed in 4.0
+
+ */
+
+- (id)objectWithString:(NSString*)jsonText
+                 error:(NSError**)error __attribute__ ((deprecated));
 
 @end
 

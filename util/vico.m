@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 #import "ViAppController.h"
-#import "JSON.h"
+#import "SBJson.h"
 
 BOOL keepRunning = YES;
 int returnCode = 0;
@@ -85,6 +85,11 @@ usage(void)
 	printf("    -w            wait for document to close\n");
 }
 
+id jsonValueFor(NSString *json) {
+	SBJsonParser *parser = [[SBJsonParser alloc] init];
+	return [parser objectWithString:json];
+}
+
 int
 main(int argc, char **argv)
 {
@@ -128,7 +133,7 @@ main(int argc, char **argv)
 				} else {
 					if ((json = [NSString stringWithUTF8String:optarg]) == nil)
 						errx(1, "parameters not proper UTF8");
-					if ((params = [json JSONValue]) == nil)
+					if ((params = jsonValueFor(json)) == nil)
 						errx(1, "parameters not proper JSON");
 					if (![params isKindOfClass:[NSDictionary class]])
 						errx(1, "parameters not a JSON object");
@@ -230,7 +235,9 @@ main(int argc, char **argv)
 				errx(2, "stdin: read failure");
 			if ((json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]) == nil)
 				errx(1, "parameters not proper UTF8");
-			if ((params = [json JSONValue]) == nil)
+			
+			SBJsonParser *parser = [[SBJsonParser alloc] init];
+			if ((params = [parser objectWithString:json]) == nil)
 				errx(1, "parameters not proper JSON");
 			if (![params isKindOfClass:[NSDictionary class]])
 				errx(1, "parameters not a JSON object");
@@ -306,7 +313,8 @@ main(int argc, char **argv)
 					;
 
 				if (returnObject != nil) {
-					NSString *returnJSON = [returnObject JSONRepresentation];
+					SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+					NSString *returnJSON = [writer stringWithObject:returnObject];
 					printf("%s\n", [returnJSON UTF8String]);
 				}
 			}

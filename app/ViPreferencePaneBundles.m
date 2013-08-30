@@ -25,7 +25,7 @@
 
 #import "ViPreferencePaneBundles.h"
 #import "ViBundleStore.h"
-#import "JSON.h"
+#import "SBJson.h"
 #include "logging.h"
 
 @implementation repoUserTransformer
@@ -167,15 +167,20 @@
 			return;
 		NSData *jsonData = [NSData dataWithContentsOfFile:path];
 		NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-		NSArray *arry = [jsonString JSONValue];
+		
+		SBJsonParser *parser = [[SBJsonParser alloc] init];
+		NSArray *arry = [parser objectWithString:jsonString];
 		if (![arry isKindOfClass:[NSArray class]]) {
-			INFO(@"%s", "failed to parse JSON");
+			INFO(@"%s: %@", "failed to parse JSON, error was ", parser.error);
 			return;
 		}
 		[_repositories addObjectsFromArray: arry];
 	} else {
 		NSString *path = [self repoPathForUser:username readonly:NO];
-		[[_repoJson JSONRepresentation] writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+		
+		SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+		NSString *json =[writer stringWithObject:_repoJson];
+		[json writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL];
 		[_repositories addObjectsFromArray:_repoJson];
 	}
 
@@ -457,7 +462,9 @@
 
 		NSString *jsonString = [[NSString alloc] initWithData:_userData encoding:NSUTF8StringEncoding];
 		_userData = nil;
-		NSDictionary *dict = [jsonString JSONValue];
+		
+		SBJsonParser *parser = [[SBJsonParser alloc] init];
+		NSDictionary *dict = [parser objectWithString:jsonString];
 		if (![dict isKindOfClass:[NSDictionary class]]) {
 			[self cancelProgressSheet:nil];
 			[progressDescription setStringValue:[NSString stringWithFormat:@"Failed to parse data for user %@.", username]];
@@ -492,7 +499,9 @@
 
 	if (connection == _repoConnection) {
 		NSString *jsonString = [[NSString alloc] initWithData:_repoData encoding:NSUTF8StringEncoding];
-		NSArray *repoJson = [jsonString JSONValue];
+		
+		SBJsonParser *parser = [[SBJsonParser alloc] init];
+		NSArray *repoJson = [parser objectWithString:jsonString];
 		[_repoJson addObjectsFromArray:repoJson];
 
 		NSDictionary *repoUser = [_processQueue lastObject];

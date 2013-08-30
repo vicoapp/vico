@@ -30,9 +30,9 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//#if !__has_feature(objc_arc)
-//#error "This source file must be compiled with ARC enabled!"
-//#endif
+#if !__has_feature(objc_arc)
+#error "This source file must be compiled with ARC enabled!"
+#endif
 
 #import "SBJsonStreamWriterState.h"
 #import "SBJsonStreamWriter.h"

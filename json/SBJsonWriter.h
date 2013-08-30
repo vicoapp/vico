@@ -82,7 +82,7 @@
 @property (copy) NSComparator sortKeysComparator;
 
 /**
- Generates string with JSON representation for the given object.
+ Return JSON representation for the given object.
 
  Returns a string containing JSON representation of the passed in value, or nil on error.
  If nil is returned and error is not NULL, *error can be interrogated to find the cause of the error.
@@ -92,12 +92,28 @@
 - (NSString*)stringWithObject:(id)value;
 
 /**
- Generates JSON representation for the given object.
+ Return JSON representation for the given object.
 
  Returns an NSData object containing JSON represented as UTF8 text, or nil on error.
 
  @param value any instance that can be represented as JSON text.
  */
 - (NSData*)dataWithObject:(id)value;
+
+/**
+ Return JSON representation (or fragment) for the given object.
+
+ Returns a string containing JSON representation of the passed in value, or nil on error.
+ If nil is returned and error is not NULL, *error can be interrogated to find the cause of the error.
+
+ @param value any instance that can be represented as a JSON fragment
+ @param error pointer to object to be populated with NSError on failure
+
+  @warning Deprecated in Version 3.2; will be removed in 4.0
+
+ */
+- (NSString*)stringWithObject:(id)value
+                        error:(NSError**)error __attribute__ ((deprecated));
+
 
 @end

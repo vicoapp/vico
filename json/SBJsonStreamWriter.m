@@ -30,13 +30,14 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//#if !__has_feature(objc_arc)
-//#error "This source file must be compiled with ARC enabled!"
-//#endif
+#if !__has_feature(objc_arc)
+#error "This source file must be compiled with ARC enabled!"
+#endif
 
 #import "SBJsonStreamWriter.h"
 #import "SBJsonStreamWriterState.h"
 
+static NSNumber *kNotANumber;
 static NSNumber *kTrue;
 static NSNumber *kFalse;
 static NSNumber *kPositiveInfinity;
@@ -54,6 +55,7 @@ static NSNumber *kNegativeInfinity;
 @synthesize sortKeysComparator;
 
 + (void)initialize {
+	kNotANumber = [NSDecimalNumber notANumber];
     kPositiveInfinity = [NSNumber numberWithDouble:+HUGE_VAL];
     kNegativeInfinity = [NSNumber numberWithDouble:-HUGE_VAL];
     kTrue = [NSNumber numberWithBool:YES];
@@ -338,7 +340,7 @@ static const char *strForChar(int c) {
 		self.error = @"-Infinity is not a valid number in JSON";
 		return NO;
 
-	} else if (isnan([number doubleValue])) {
+	} else if ([kNotANumber isEqualToNumber:number]) {
 		self.error = @"NaN is not a valid number in JSON";
 		return NO;
 	}
@@ -354,10 +356,15 @@ static const char *strForChar(int c) {
 		case 'C': case 'I': case 'S': case 'L': case 'Q':
 			len = snprintf(num, sizeof num, "%llu", [number unsignedLongLongValue]);
 			break;
-		case 'f': case 'd': default: {
-            len = snprintf(num, sizeof num, "%.17g", [number doubleValue]);
+		case 'f': case 'd': default:
+			if ([number isKindOfClass:[NSDecimalNumber class]]) {
+				char const *utf8 = [[number stringValue] UTF8String];
+				[delegate writer:self appendBytes:utf8 length: strlen(utf8)];
+				[state transitionState:self];
+				return YES;
+			}
+			len = snprintf(num, sizeof num, "%.17g", [number doubleValue]);
 			break;
-        }
 	}
 	[delegate writer:self appendBytes:num length: len];
 	[state transitionState:self];

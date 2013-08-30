@@ -15,21 +15,20 @@ VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon \
 
 NO_ARC_OBJC_SRCS = \
 	NSObject+SPInvocationGrabbing.m \
-	Nu.m \
-	$(JSON_OBJC_SRCS)
+	Nu.m
 
 JSON_OBJC_SRCS = \
-	NSObject+JSON.m \
 	SBJsonParser.m \
 	SBJsonStreamParser.m \
 	SBJsonStreamParserAdapter.m \
 	SBJsonStreamParserAccumulator.m \
-	SBJsonStreamParserTokeniser.m \
-	SBJsonStreamParserWriterAccumulator.m \
+	SBJsonStreamParserAdapter.m \
 	SBJsonStreamParserState.m \
 	SBJsonStreamWriter.m \
+	SBJsonStreamWriterAccumulator.m \
 	SBJsonStreamWriterState.m \
 	SBJsonTokeniser.m \
+	SBJsonUTF8Stream.m \
 	SBJsonWriter.m
 
 OBJC_SRCS = \
@@ -145,6 +144,7 @@ OBJC_SRCS = \
 	ViWindow.m \
 	ViWindowController.m \
 	ViWordCompletion.m \
+	$(JSON_OBJC_SRCS) \
 	main.m
 
 OBJCXX_SRCS = \

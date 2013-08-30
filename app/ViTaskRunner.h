@@ -65,6 +65,7 @@
 @property (nonatomic, readonly) BOOL cancelled;
 
 - (NSString *)stdoutString;
+- (NSString *)stderrString;
 
 - (void)launchTask:(NSTask *)aTask
  withStandardInput:(NSData *)stdin

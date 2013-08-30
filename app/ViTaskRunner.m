@@ -68,19 +68,29 @@
 
 - (NSString *)stdoutString
 {
+	return [self stringWithData:_stdout];
+}
+
+- (NSString *)stderrString
+{
+	return [self stringWithData:_stderr];
+}
+
+- (NSString *)stringWithData:(NSData *)data
+{
 	/* Try to auto-detect the encoding. */
-	NSStringEncoding encoding = [[ViCharsetDetector defaultDetector] encodingForData:_stdout];
+	NSStringEncoding encoding = [[ViCharsetDetector defaultDetector] encodingForData:data];
 	if (encoding == 0)
-		/* Try UTF-8 if auto-detecting fails. */
+	/* Try UTF-8 if auto-detecting fails. */
 		encoding = NSUTF8StringEncoding;
-	NSString *outputText = [[NSString alloc] initWithData:_stdout encoding:encoding];
+	NSString *outputText = [[NSString alloc] initWithData:data encoding:encoding];
 	if (outputText == nil) {
 		/* If all else fails, use iso-8859-1. */
 		encoding = NSISOLatin1StringEncoding;
-		outputText = [[NSString alloc] initWithData:_stdout encoding:encoding];
+		outputText = [[NSString alloc] initWithData:data encoding:encoding];
 	}
-
-	return outputText;
+	
+	return outputText;	
 }
 
 - (void)finish

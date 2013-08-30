@@ -45,7 +45,6 @@
 	BOOL			 _failed;
 	BOOL			 _cancelled;
 	id<ViTaskRunnerTarget> _target;
-	SEL			 _selector;
 	id			 _contextInfo;
 
 	/* Blocking for completion. */

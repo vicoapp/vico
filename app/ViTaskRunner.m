@@ -96,7 +96,7 @@
 
 	[_stream close];
 
-	if (_target && _selector) {
+	if (_target) {
 		[_target taskRunner:self finishedWithStatus:_status contextInfo:_contextInfo];
 	}
 

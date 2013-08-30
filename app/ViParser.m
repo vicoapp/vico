@@ -158,8 +158,9 @@
 
 	_command.keySequence = _totalKeySequence;
 
+	ViCommand *ret = _command;
 	[self reset];
-	return _command;
+	return ret;
 }
 
 - (id)pushExcessKeys:(NSArray *)excessKeys

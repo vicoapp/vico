@@ -511,6 +511,7 @@
 		[self setCaret:final_location];
 	} else {
 		MESSAGE(@"filter exited with status %i", status);
+		DEBUG(@"filter existed with status %i, said %@\n%@", runner.stdoutString, runner.stderrString);
 		keepMessagesHack = YES;
 	}
 }

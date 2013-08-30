@@ -155,7 +155,15 @@
 	if ([baseURL isFileURL])
 		cwd = [baseURL path];
 
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+	NSDictionary *info =
+		@{
+			@"type": @"bundleCommand",
+			@"command": command,
+			@"inputRange": [NSValue valueWithRange:inputRange],
+			@"selectedRange": [NSValue valueWithRange:selectedRange]
+		};
+	
+	[NSDictionary dictionaryWithObjectsAndKeys:
 	    command, @"command",
 	    [NSValue valueWithRange:inputRange], @"inputRange",
 	    [NSValue valueWithRange:selectedRange], @"selectedRange",
@@ -176,7 +184,7 @@
 		MESSAGE(@"%@", [error localizedDescription]);
 }
 
-- (void)taskRunner:(ViTaskRunner *)runner
+- (void)bundleCommand:(ViTaskRunner *)runner
    finishedWithStatus:(int)status
 	  contextInfo:(id)contextInfo
 {

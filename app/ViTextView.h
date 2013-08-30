@@ -49,10 +49,16 @@
 @class ViTextView;
 @class ViJumpList;
 
+@protocol ViTextViewTaskRunnerHandlers
+@optional
+- (void)filter:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo;
+- (void)bundleCommand:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo;
+@end
+
 /** A text edit view.
  *
  */
-@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
 {
 	ViDocument		*document;
 	// .busy

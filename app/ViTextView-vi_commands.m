@@ -501,10 +501,10 @@
 	return YES;
 }
 
-- (void)taskRunner:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
+- (void)filter:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
 {
 	if (status == 0) {
-		NSRange range = [(NSValue *)contextInfo rangeValue];
+		NSRange range = [(NSValue *)contextInfo[@"range"] rangeValue];
 		[self replaceRange:range withString:runner.stdoutString];
 		[self endUndoGroup];
 		final_location = range.location;
@@ -552,9 +552,13 @@
 	[_taskRunner launchTask:task
 	      withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
 	 asynchronouslyInWindow:nil
-			  title:shellCommand
-			 target:self
-		    contextInfo:[NSValue valueWithRange:range]];
+					  title:shellCommand
+					 target:self
+				contextInfo:@{
+								@"type": @"filter",
+								@"range": [NSValue valueWithRange:range]
+							 }];
+
 	return (_taskRunner.status == 0);
 }
 

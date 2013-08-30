@@ -1422,6 +1422,20 @@ replaceCharactersInRange:(NSRange)aRange
 }
 
 #pragma mark -
+#pragma mark Task runner handling
+
+- (void)taskRunner:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
+{
+	if ([contextInfo[@"type"] isEqual:@"filter"]) {
+		[self filter:runner finishedWithStatus:status contextInfo:contextInfo];
+	} else if ([contextInfo[@"type"] isEqual:@"bundleCommand"]) {
+		[self bundleCommand:runner finishedWithStatus:status contextInfo:contextInfo];
+	} else {
+		DEBUG(@"unexpected task runner callback with context info %@ and status %i", contextInfo, runner);
+	}
+}
+
+#pragma mark -
 #pragma mark Caret and selection handling
 
 - (void)scrollToCaret

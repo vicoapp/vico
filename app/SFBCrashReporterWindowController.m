@@ -119,17 +119,10 @@
 
 #pragma unused(sender)
 
-	// Note: it is odd to use UTF8String here instead of fileSystemRepresentation, but FSPathMakeRef is explicitly
-	// documented to take an UTF-8 C string
-	FSRef ref;
-	OSStatus err = FSPathMakeRef((const UInt8 *)[self.crashLogPath UTF8String], &ref, NULL);
-	if(noErr == err) {
-		err = FSMoveObjectToTrashSync(&ref, NULL, kFSFileOperationDefaultOptions);
-		if(noErr != err)
-			NSLog(@"SFBCrashReporter: Unable to move %@ to trash: %li", self.crashLogPath, (long)err);
-	}
-	else
-		NSLog(@"SFBCrashReporter: Unable to create FSRef for file %@", self.crashLogPath);
+	NSError *error;
+	[[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:self.crashLogPath] resultingItemURL:nil error:&error];
+	if (error)
+		NSLog(@"SFBCrashReporter: Unable to move %@ to trash: %@", self.crashLogPath, error);
 
 	[[self window] orderOut:self];
 }

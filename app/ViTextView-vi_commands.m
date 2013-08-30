@@ -2276,7 +2276,7 @@
 		[self gotoSymbol:[syms objectAtIndex:0]];
 	} else {
 		/* Sort symbols per document. */
-		NSMapTable *docs = [NSMapTable mapTableWithStrongToStrongObjects];
+		NSMapTable *docs = [NSMapTable strongToStrongObjectsMapTable];
 		for (ViMark *sym in syms) {
 			NSMutableArray *a = [docs objectForKey:sym.document];
 			if (a == nil) {

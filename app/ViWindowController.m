@@ -1259,7 +1259,7 @@ DEBUG_FINALIZE();
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
 							    didCloseAllSelector:@selector(documentController:didCloseAll:tabController:)
-								    contextInfo:CFBridgingRetain(tabController)];
+								    contextInfo:(__bridge_retained void *)tabController];
 
 	return NO;
 }

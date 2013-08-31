@@ -31,12 +31,12 @@
 {
 	NSString	*_paneName;
 	NSImage		*_icon;
-	IBOutlet NSView	*__weak view;
+	IBOutlet NSView	* view;
 }
 
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSImage *icon;
-@property (weak, nonatomic, readonly) NSView *view;
+@property (nonatomic, readonly) NSView *view;
 
 /** Initialize a preference pane.
  * @param nib A Nib object. The Nib will be instantiated with the receiver as owner.

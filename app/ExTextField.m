@@ -74,7 +74,14 @@
 	[editor setCaret:0];
 
 	_running = YES;
-	return [super becomeFirstResponder];
+	
+	BOOL result = [super becomeFirstResponder];
+
+	// This little bit of hackery brought to you by a confoundingly
+	// misaligned field editor. We should fix this better.
+	[editor setFrame:NSMakeRect(0, -5, editor.frame.size.width, editor.frame.size.height)];
+	
+	return result;
 }
 
 - (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix

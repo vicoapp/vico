@@ -49,7 +49,7 @@
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
 {
-	IBOutlet NSWindow		*__weak window;
+	IBOutlet NSWindow		* window;
 	IBOutlet ViCompletionView	*tableView;
 	IBOutlet NSTextField		*label;
 
@@ -75,7 +75,7 @@
 }
 
 @property (unsafe_unretained, nonatomic, readonly) id<ViCompletionDelegate> delegate;
-@property (weak, nonatomic, readonly) NSWindow *window;
+@property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readwrite, strong) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;

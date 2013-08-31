@@ -52,7 +52,7 @@
 	NSString		*_groupName;
 	NSURL			*_url;
 	ViDocument		*_document;
-	__weak ViDocumentView	*_view;
+	ViDocumentView	*_view;
 
 	NSHashTable		*_lists; // XXX: lists are not retained!
 }
@@ -85,7 +85,7 @@
 @property(nonatomic,readwrite) BOOL recentlyRestored;
 
 @property(nonatomic,readwrite,strong) ViDocument *document;
-@property(nonatomic,readonly) __weak ViDocumentView *view;
+@property(nonatomic,readonly) ViDocumentView *view;
 
 @property(weak, nonatomic,readonly) NSString *groupName;
 

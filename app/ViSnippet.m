@@ -334,7 +334,7 @@
 
 - (ViSnippet *)initWithString:(NSString *)aString
                    atLocation:(NSUInteger)aLocation
-                     delegate:(__weak id<ViSnippetDelegate>)aDelegate
+                     delegate:(id<ViSnippetDelegate>)aDelegate
                   environment:(NSDictionary *)env
                         error:(NSError **)outError
 {
@@ -366,7 +366,7 @@
 	_beginLocation = aLocation;
 	_range = NSMakeRange(_beginLocation, [string length]);
 
-	_delegate = aDelegate; // XXX: not retained!
+	_delegate = aDelegate;
 	[_delegate snippet:self replaceCharactersInRange:NSMakeRange(aLocation, 0) withString:string forTabstop:nil];
 
 	DEBUG(@"tabstops = %@", _tabstops);

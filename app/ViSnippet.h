@@ -73,7 +73,7 @@
 	ViTabstop			*_currentTabStop;
 	NSUInteger			 _currentTabNum;
 	NSUInteger			 _maxTabNum;
-	__weak id<ViSnippetDelegate>	 _delegate;	// XXX: not retained!
+	id<ViSnippetDelegate>	 _delegate;
 	NSRange				 _range;
 	NSUInteger			 _caret;
 	NSRange				 _selectedRange;

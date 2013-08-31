@@ -99,7 +99,7 @@
 	DEBUG(@"shell environment is %@", env);
 
 	ViTaskRunner *runner = [[ViTaskRunner alloc] init];
-	__weak id<ViTaskRunnerTarget> targetSelf = (id<ViTaskRunnerTarget>)self;
+	id<ViTaskRunnerTarget> targetSelf = (id<ViTaskRunnerTarget>)self;
 	[runner launchShellCommand:shellCommand
 		 withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
 		       environment:env

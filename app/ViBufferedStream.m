@@ -87,7 +87,6 @@
 
 - (void)dealloc
 {
-	DEBUG_DEALLOC();
 	[self close];
 }
 
@@ -239,10 +238,8 @@ fd_write(CFSocketRef s,
 	 const void *data,
 	 void *info)
 {
-	@autoreleasepool {
-		ViBufferedStream *stream = (ViBufferedStream *)CFBridgingRelease(info);
-		[stream write];
-	}
+	ViBufferedStream *stream = (__bridge ViBufferedStream *)info;
+	[stream write];
 }
 
 static void
@@ -252,9 +249,8 @@ fd_read(CFSocketRef s,
 	const void *data,
 	void *info)
 {
-	@autoreleasepool {
-		ViBufferedStream *stream = (ViBufferedStream *)CFBridgingRelease(info);
-		switch (callbackType) {
+	ViBufferedStream *stream = (__bridge ViBufferedStream *)info;
+	switch (callbackType) {
 		case kCFSocketReadCallBack:
 			[stream read];
 			break;
@@ -266,7 +262,6 @@ fd_read(CFSocketRef s,
 		case kCFSocketConnectCallBack:
 		case kCFSocketDataCallBack:
 			break;
-		}
 	}
 }
 

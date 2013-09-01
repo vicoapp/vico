@@ -205,18 +205,6 @@ int logIndent = 0;
 	[self postModeChangedNotification];
 }
 
-- (NSPoint)textContainerOrigin
-{
-	NSPoint origin = [super textContainerOrigin];
-	if (![self isFieldEditor]) {
-		// Add two pixel space at top of text container.
-		// XXX: using -setTextContainerInset proved to be too buggy.
-		origin.y += 2;
-	}
-	return origin;
-}
-
-
 DEBUG_FINALIZE();
 
 - (void)dealloc

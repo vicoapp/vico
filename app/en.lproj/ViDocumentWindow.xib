@@ -608,7 +608,7 @@
 												<object class="NSTextField" id="24397800">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">-2147483358</int>
-													<string key="NSFrame">{{31, 2.5}, {766, 18}}</string>
+													<string key="NSFrame">{{31, 2.5}, {766, 20}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="147447636"/>
@@ -660,6 +660,7 @@
 															<array class="NSMutableArray" key="NSMenuItems"/>
 															<reference key="NSMenuFont" ref="844670655"/>
 														</object>
+														<int key="NSSelectedIndex">-1</int>
 														<bool key="NSPullDown">YES</bool>
 														<int key="NSPreferredEdge">3</int>
 														<bool key="NSUsesItemFromMenu">YES</bool>

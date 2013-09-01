@@ -24,6 +24,7 @@
  */
 
 #import "ExTextField.h"
+#import "ViBundleStore.h"
 #import "ViThemeStore.h"
 #import "ViTextView.h"
 #import "ExParser.h"
@@ -73,14 +74,19 @@
 	[editor setInsertMode:nil];
 	[editor setCaret:0];
 
+	ViTheme *defaultTheme = [[ViThemeStore defaultStore] defaultTheme];
+
+	[self setBackgroundColor:[defaultTheme backgroundColor]];
+
 	_running = YES;
 	
 	BOOL result = [super becomeFirstResponder];
 
-	// This little bit of hackery brought to you by a confoundingly
-	// misaligned field editor. We should fix this better.
-	[editor setTextContainerInset:NSMakeSize(3, -1)];
-	
+	editor.textContainerInset = NSMakeSize(3, 1);
+	editor.theme = defaultTheme;
+	ViLanguage *exLanguage = [[ViBundleStore defaultStore] languageWithScope:@"vico.ex"];
+	editor.document.syntaxParser = [ViSyntaxParser syntaxParserWithLanguage:exLanguage];
+
 	return result;
 }
 

@@ -65,7 +65,6 @@
 							 green:(float)0xED/0xFF
 							  blue:(float)0xED/0xFF
 							 alpha:1.0];
-		[_backgroundColor retain];
 		[self resetTextAttributes];
 		_relative = NO;
 	}
@@ -76,11 +75,8 @@
 {
 	DEBUG_DEALLOC();
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[_textAttributes release];
-	[_backgroundColor release];
 	for (int i = 0; i < 10; i++)
-		[_digits[i] release];
-	[super dealloc];
+		;
 }
 
 - (void)setRelative:(BOOL)flag
@@ -94,7 +90,6 @@
 
 - (void)resetTextAttributes
 {
-	[_textAttributes release];
 	_textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0.8 * [[ViThemeStore font] pointSize]], NSFontAttributeName, 
 		[NSColor colorWithCalibratedWhite:0.42 alpha:1.0], NSForegroundColorAttributeName,
@@ -114,7 +109,6 @@
 		NSRectFill(NSMakeRect(0, 0, _digitSize.width, _digitSize.height));
 		[s drawAtPoint:NSMakePoint(0.5,0.5) withAttributes:_textAttributes];
 		[img unlockFocus];
-		[_digits[i] release];
 		_digits[i] = img;
 	}
 

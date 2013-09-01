@@ -37,8 +37,8 @@
 - (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i
 {
 	if ((self = [super init]) != nil) {
-		_beginMatch = [aMatch retain];
-		_pattern = [aPattern retain];
+		_beginMatch = aMatch;
+		_pattern = aPattern;
 		_patternIndex = i;
 		if (aMatch) {
 			_beginLocation = [aMatch rangeOfMatchedString].location;
@@ -48,13 +48,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_beginMatch release];
-	[_endMatch release];
-	[_pattern release];
-	[super dealloc];
-}
 
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)anotherMatch
 {

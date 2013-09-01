@@ -4,3 +4,4 @@ app/scope_selector.out
 build
 Nu.framework
 vico.xcodeproj/*
+.DS_Store

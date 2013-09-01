@@ -1,3 +1,30 @@
+(class ViStatusEventLabel is ViStatusLabel
+  (ivar (id) transformer
+        (int) handler-id)
+
+  (+ statusLabelForEvent:(id)event withTransformer:(id)transformer is
+    ((self alloc) initWithEvent:event transformer:transformer))
+
+  (- initWithEvent:(id)event transformer:(id)transformer is
+    (super init)
+
+    (set @handler-id
+      (event-manager
+        on:event
+        do:(do (*args)
+          (let ((current-value ((self control) stringValue))
+                (new-value (eval (cons transformer *args))))
+              (if (and new-value (not (current-value isEqualToString:new-value)))
+                  ((self control) setStringValue:new-value)
+                  (self invalidateSize))))))
+
+    self)
+
+  (- (void)dealloc is
+    (event-manager remove:@handler-id)
+
+    (super dealloc)))
+
 (function vi-status-caret-label ()
   ((ViStatusNotificationLabel alloc)
           initWithNotification:"ViCaretChangedNotification"
@@ -37,6 +64,20 @@
   ((ViStatusNotificationLabel alloc)
            initWithNotification:"ViModeChangedNotification"
                transformerBlock:(do (status-view notification) (mode-for-notification status-view notification))))
+
+(function filename-for-event (window document)
+  (let (url (document fileURL))
+      (if url
+         (url displayString)
+         (else
+               "[untitled]"))))
+
+(function vi-status-filename-label ()
+  (ViStatusEventLabel statusLabelForEvent:"didSelectDocument" withTransformer:filename-for-event))
+
+(set $vi-status-caret-label vi-status-caret-label)
+(set $vi-status-mode-label vi-status-mode-label)
+(set $vi-status-filename-label vi-status-filename-label)
 
 # Set up default status bar.
 ((NSApp delegate) setStatusSetupBlock:

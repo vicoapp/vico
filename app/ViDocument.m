@@ -100,7 +100,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 	if ((self = [super init]) != nil) {
 		_symbols = [[NSMutableArray alloc] init];
 		_views = [[NSMutableSet alloc] init];
-		_localMarks = [[[ViMarkManager sharedManager] makeStack] retain];
+		_localMarks = [[ViMarkManager sharedManager] makeStack];
 		_localMarks.name = [NSString stringWithFormat:@"Local marks for document %p", self];
 		_marks = [[NSMutableSet alloc] init];
 
@@ -138,7 +138,7 @@ BOOL __makeNewWindowInsteadOfTab = NO;
 		_forcedEncoding = 0;
 		_encoding = NSUTF8StringEncoding;
 
-		_theme = [[[ViThemeStore defaultStore] defaultTheme] retain];
+		_theme = [[ViThemeStore defaultStore] defaultTheme];
 		[self setTypingAttributes];
 
 		/*
@@ -182,40 +182,15 @@ DEBUG_FINALIZE();
 		[view setDocument:nil];
 	}
 	[_hiddenView setDocument:nil];
-	[_views release];
-	[_hiddenView release];
 
-	[_scriptView release];
-	[_bundle release];
-	[_language release];
-	[_theme release];
-	[_typingAttributes release];
-	[_windowController release];
-	[_readContent release];
-	[_syntaxParser release];
-	[_nextContext release];
-	[_localMarks release];
-	[_marks release];
-	[_symbols release];
-	[_filteredSymbols release];
-	[_symbolScopes release];
-	[_symbolTransforms release];
-	[_symbolIcons release];
-	[_snippet release];
-	[_didSaveDelegate release];
-	[_closeCallback release];
-	[_textStorage release];
-	[_loader release];
-	[_associatedViews release];
 
-	[super dealloc];
 }
 
 - (BOOL)dataAppearsBinary:(NSData *)data
 {
 	NSString *string = nil;
 	if (_forcedEncoding)
-		string = [[[NSString alloc] initWithData:data encoding:_forcedEncoding] autorelease];
+		string = [[NSString alloc] initWithData:data encoding:_forcedEncoding];
 	if (string == nil)
 		string = [self suggestEncoding:NULL forData:data];
 
@@ -254,7 +229,6 @@ DEBUG_FINALIZE();
 			[alert addButtonWithTitle:@"Cancel"];
 			[alert setInformativeText:@"Are you sure you want to continue opening the file?"];
 			NSUInteger ret = [alert runModal];
-			[alert release];
 			if (ret == NSAlertSecondButtonReturn) {
 				DEBUG(@"cancelling deferred %@", _loader);
 				[_loader cancel];
@@ -305,7 +279,7 @@ DEBUG_FINALIZE();
 				[_windowController displayDocument:self positioned:ViViewPositionDefault];
 				[self setFileURL:nil];
 
-				NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:[NSString stringWithFormat:@"Couldn't open %@",
 					normalizedURL]];
 				[alert addButtonWithTitle:@"OK"];
@@ -454,7 +428,6 @@ DEBUG_FINALIZE();
 
 - (void)closeWindowController:(ViWindowController *)aController
 {
-	[aController retain];
 	[self removeWindowController:aController]; // XXX: does this release aController ?
 	if (aController == _windowController) {
 		/*
@@ -462,27 +435,23 @@ DEBUG_FINALIZE();
 		 * Find a new default window controller.
 		 * Ask each windows' window controller if it contains this document.
 		 */
-		[_windowController release];
 		_windowController = nil;
 		for (NSWindow *window in [NSApp windows]) {
 			ViWindowController *wincon = [window windowController];
 			if (wincon == aController || ![wincon isKindOfClass:[ViWindowController class]])
 				continue;
 			if ([[wincon documents] containsObject:self]) {
-				_windowController = [wincon retain];
+				_windowController = wincon;
 				break;
 			}
 		}
 	}
-	[aController release];
 }
 
 - (void)addWindowController:(NSWindowController *)aController
 {
 	[super addWindowController:aController];
 
-	[aController retain];
-	[_windowController release];
 	_windowController = (ViWindowController *)aController;
 }
 
@@ -490,12 +459,12 @@ DEBUG_FINALIZE();
 {
 	ViWindowController *winCon = nil;
 	if (__makeNewWindowInsteadOfTab) {
-		winCon = [[[ViWindowController alloc] init] autorelease];
+		winCon = [[ViWindowController alloc] init];
 		__makeNewWindowInsteadOfTab = NO;
 	} else {
 		winCon = [ViWindowController currentWindowController];
 		if (winCon == nil)
-			winCon = [[[ViWindowController alloc] init] autorelease];
+			winCon = [[ViWindowController alloc] init];
 	}
 
 	[self addWindowController:winCon];
@@ -542,14 +511,12 @@ DEBUG_FINALIZE();
 	if (_scriptView == nil) {
 		ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
 		[_textStorage addLayoutManager:layoutManager];
-		[layoutManager release];
 
 		[layoutManager setDelegate:self];
 
 		NSRect frame = NSMakeRect(0, 0, 10, 10);
 		NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
 		[layoutManager addTextContainer:container];
-		[container release];
 
 		_scriptView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 		[_scriptView initWithDocument:self viParser:[ViParser parserWithDefaultMap:[ViMap normalMap]]];
@@ -571,14 +538,13 @@ DEBUG_FINALIZE();
 	if (documentView == nil)
 		return nil;
 	[self addView:documentView];
-	[documentView release];
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
 	/*
 	 * Recreate the text system hierarchy with our text storage and layout manager.
 	 */
-	ViLayoutManager *layoutManager = [[[ViLayoutManager alloc] init] autorelease];
+	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
 	[_textStorage addLayoutManager:layoutManager];
 	[layoutManager setDelegate:self];
 	[layoutManager setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
@@ -587,12 +553,12 @@ DEBUG_FINALIZE();
 
 	NSView *innerView = [documentView innerView];
 	NSRect frame = [innerView frame];
-	NSTextContainer *container = [[[NSTextContainer alloc] initWithContainerSize:frame.size] autorelease];
+	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:frame.size];
 	[layoutManager addTextContainer:container];
 	[container setWidthTracksTextView:YES];
 	[container setHeightTracksTextView:YES];
 
-	ViTextView *textView = [[[ViTextView alloc] initWithFrame:frame textContainer:container] autorelease];
+	ViTextView *textView = [[ViTextView alloc] initWithFrame:frame textContainer:container];
 	[documentView replaceTextView:textView];
 
 	[textView initWithDocument:self viParser:aParser];
@@ -665,16 +631,17 @@ DEBUG_FINALIZE();
 
 	DEBUG(@"calling delegate %@ with selector %@", _didSaveDelegate, NSStringFromSelector(_didSaveSelector));
 	if (_didSaveDelegate && _didSaveSelector) {
+		ViDocument __unsafe_unretained *thisDocument = self;
+
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
 		    [_didSaveDelegate methodSignatureForSelector:_didSaveSelector]];
 		[invocation setSelector:_didSaveSelector];
-		[invocation setArgument:&self atIndex:2];
+		[invocation setArgument:&thisDocument atIndex:2];
 		[invocation setArgument:&didSave atIndex:3];
 		[invocation setArgument:&_didSaveContext atIndex:4];
 		[invocation invokeWithTarget:_didSaveDelegate];
 	}
 
-	[_didSaveDelegate release];
 	_didSaveDelegate = nil;
 	_didSaveSelector = nil;
 	_didSaveContext = NULL;
@@ -713,9 +680,9 @@ DEBUG_FINALIZE();
 		id<ViDeferred> deferred = [urlman attributesOfItemAtURL:[self fileURL]
 							   onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
 			if (_err && ![_err isFileNotFoundError]) {
-				error = [_err retain];
+				error = _err;
 			} else {
-				attributes = [_attrs retain];
+				attributes = _attrs;
 			}
 		}];
 
@@ -727,15 +694,15 @@ DEBUG_FINALIZE();
 			[deferred wait];
 		DEBUG(@"done getting attributes of %@, error is %@", [self fileURL], error);
 
-		_didSaveDelegate = [delegate retain];
+		_didSaveDelegate = delegate;
 		_didSaveSelector = selector;
 		_didSaveContext = contextInfo;
 
 		if (!error && attributes && ![[attributes fileType] isEqualToString:NSFileTypeRegular])
-			error = [[ViError errorWithFormat:@"%@ is not a regular file.", [[self fileURL] lastPathComponent]] retain];
+			error = [ViError errorWithFormat:@"%@ is not a regular file.", [[self fileURL] lastPathComponent]];
 
 		if (!error && attributes && ![[attributes fileModificationDate] isEqual:[self fileModificationDate]]) {
-			NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:@"This document’s file has been changed by another application since you opened or saved it."];
 			[alert addButtonWithTitle:@"Don't Save"];
 			[alert addButtonWithTitle:@"Save"];
@@ -747,8 +714,6 @@ DEBUG_FINALIZE();
 		} else {
 			[self continueSavingAfterError:error];
 		}
-		[error release];
-		[attributes release];
 	} else
 		[super saveDocumentWithDelegate:delegate
 				didSaveSelector:selector
@@ -796,7 +761,7 @@ DEBUG_FINALIZE();
 						    toURL:url
 					     onCompletion:^(NSURL *normalizedURL, NSDictionary *attributes, NSError *error) {
 		if (error) {
-			returnError = [error retain];
+			returnError = error;
 		} else {
 			[self message:@"%@: wrote %lu byte", normalizedURL, [data length]];
 			if (saveOperation == NSSaveOperation || saveOperation == NSSaveAsOperation) {
@@ -827,7 +792,6 @@ DEBUG_FINALIZE();
 	if (returnError) {
 		if (outError)
 			*outError = returnError;
-		[returnError autorelease];
 		return NO;
 	}
 
@@ -889,7 +853,7 @@ DEBUG_FINALIZE();
 	if (outEncoding)
 		*outEncoding = enc;
 
-	return [string autorelease];
+	return string;
 }
 
 - (BOOL)addData:(NSData *)data
@@ -897,7 +861,7 @@ DEBUG_FINALIZE();
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSString *aString = nil;
 	if (_forcedEncoding != 0) {
-		aString = [[[NSString alloc] initWithData:data encoding:_forcedEncoding] autorelease];
+		aString = [[NSString alloc] initWithData:data encoding:_forcedEncoding];
 		if (aString == nil) {
 			NSString *description = [NSString stringWithFormat:
 			    @"The file can't be interpreted in %@ encoding.",
@@ -910,7 +874,7 @@ DEBUG_FINALIZE();
 			    nil];
 			NSError *err = [NSError errorWithDomain:ViErrorDomain code:2 userInfo:userInfo];
 			[self presentError:err];
-			aString = [[[NSString alloc] initWithData:data encoding:_encoding] autorelease];
+			aString = [[NSString alloc] initWithData:data encoding:_encoding];
 		} else {
 			_encoding = _forcedEncoding;
 
@@ -951,6 +915,12 @@ DEBUG_FINALIZE();
 	/* Force incremental syntax parsing. */
 	[self setLanguage:nil];
 	[self configureSyntax];
+}
+
+- (void)setData:(NSData *)data
+{
+	[self setString:@""];
+	[self addData:data];
 }
 
 - (void)setEncoding:(id)sender
@@ -1096,9 +1066,11 @@ DEBUG_FINALIZE();
 	 * documents in the window.
 	 */
 	BOOL flag = NO;
+	ViDocument __unsafe_unretained *thisDocument = self;
+
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[delegate methodSignatureForSelector:shouldCloseSelector]];
 	[invocation setSelector:shouldCloseSelector];
-	[invocation setArgument:&self atIndex:2];
+	[invocation setArgument:&thisDocument atIndex:2];
 	[invocation setArgument:&flag atIndex:3];
 	[invocation setArgument:&contextInfo atIndex:4];
 	[invocation invokeWithTarget:delegate];
@@ -1328,8 +1300,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			[_nextContext setCancelled:YES];
 		}
 
-		[ctx retain];
-		[_nextContext release];
 		_nextContext = ctx;
 
 		[self performSelector:@selector(restartSyntaxParsingWithContext:)
@@ -1354,7 +1324,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (void)restartSyntaxParsingWithContext:(ViSyntaxContext *)context
 {
-	[_nextContext release];
 	_nextContext = nil;
 
 	if (context.cancelled || _closed) {
@@ -1421,7 +1390,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[self message:@"Disabling syntax highlighting for large document."];
 		if (_language) {
 			[[ViEventManager defaultManager] emit:ViEventWillChangeSyntax for:self with:self, [NSNull null], nil];
-			[_language release];
 			_language = nil;
 			[self updateTabSize];
 			[self updateWrapping];
@@ -1438,8 +1406,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (lang != _language) {
 		[[ViEventManager defaultManager] emit:ViEventWillChangeSyntax for:self with:self, lang ?: [NSNull null], nil];
 
-		[lang retain];
-		[_language release];
 		_language = lang;
 
 		[self setBundle:_language.bundle];
@@ -1580,7 +1546,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (flag) {
 		ViRulerView *lineNumberView = [[ViRulerView alloc] initWithScrollView:aScrollView];
 		[aScrollView setVerticalRulerView:lineNumberView];
-		[lineNumberView release];
 		[lineNumberView setRelative:relative];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
@@ -1626,7 +1591,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 							  forKey:NSFontAttributeName];
 	NSSize tabSizeInPoints = [tab sizeWithAttributes:attrs];
 
-	NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 	// remove all previous tab stops
 	for (NSTextTab *tabStop in [style tabStops])
 		[style removeTabStop:tabStop];
@@ -1641,7 +1606,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	else
 		[style setLineBreakMode:NSLineBreakByCharWrapping];
 
-	[_typingAttributes release];
 	_typingAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
 	    style, NSParagraphStyleAttributeName,
 	    [ViThemeStore font], NSFontAttributeName,
@@ -1695,7 +1659,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSUInteger)filterSymbols:(ViRegexp *)rx
 {
-	NSMutableArray *fs = [[[NSMutableArray alloc] initWithCapacity:[_symbols count]] autorelease];
+	NSMutableArray *fs = [[NSMutableArray alloc] initWithCapacity:[_symbols count]];
 	for (ViMark *s in _symbols)
 		if ([rx matchInString:s.title])
 			[fs addObject:s];
@@ -1761,7 +1725,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					ViSymbolTransform *tr = [[ViSymbolTransform alloc]
 					    initWithTransformationString:transform];
 					symbol = [tr transformSymbol:symbol];
-					[tr release];
 				}
 
 				ViMark *sym = [ViMark markWithDocument:self
@@ -1978,9 +1941,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		/* XXX: must retain + autorelease because the scopeArray may
 		 * be emptied or changed and the scope would be released.
 		 */
-		return [[[scopeArray objectAtIndex:aLocation] retain] autorelease];
+		return [scopeArray objectAtIndex:aLocation];
 	}
-	return [[_language.scope retain] autorelease];
+	return _language.scope;
 }
 
 - (NSString *)bestMatchingScope:(NSArray *)scopeSelectors
@@ -2063,15 +2026,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		__block NSURL *normalizedURL = nil;
 		deferred = [urlman attributesOfItemAtURL:newURL
 				      onCompletion:^(NSURL *_url, NSDictionary *_attrs, NSError *_err) {
-			normalizedURL = [_url retain];
-			attributes = [_attrs retain];
+			normalizedURL = _url;
+			attributes = _attrs;
 			if (![_err isFileNotFoundError])
-				error = [_err retain];
+				error = _err;
 		}];
-
-		[normalizedURL autorelease];
-		[attributes autorelease];
-		[error autorelease];
 
 		if ([deferred respondsToSelector:@selector(waitInWindow:message:)])
 			[deferred waitInWindow:[_windowController window]

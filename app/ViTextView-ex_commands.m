@@ -225,6 +225,8 @@
 	NSString *opts = command.options ?: @"";
 	if ([opts rangeOfString:@"i"].location != NSNotFound)
 		rx_options |= ONIG_OPTION_IGNORECASE;
+	if ([opts rangeOfString:@"m"].location != NSNotFound)
+		rx_options |= ONIG_OPTION_MULTILINE;
 
 	BOOL reportMatches = NO;
 	if ([opts rangeOfString:@"n"].location != NSNotFound)
@@ -251,68 +253,55 @@
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
-	ViTransformer *tform = [[[ViTransformer alloc] init] autorelease];
+	ViTransformer *transform = [[ViTransformer alloc] init];
 
-	NSString *s = [storage string];
+	NSInteger startLocation = [storage locationForStartOfLine:exRange.location];
+	NSRange replacementRange =
+	  NSMakeRange(
+		startLocation,
+		NSMaxRange([storage rangeOfLine:NSMaxRange(exRange)]) - startLocation
+	  );
+	NSString *string = [[storage string] substringWithRange:replacementRange];
 	DEBUG(@"ex range is %@", NSStringFromRange(exRange));
 
 	NSUInteger numMatches = 0;
 	NSUInteger numLines = 0;
 
-	NSUInteger lastReplacedLine = NSNotFound;
-
-	for (NSUInteger lineno = exRange.location; lineno <= NSMaxRange(exRange); lineno++) {
-		NSRange lineRange = [storage rangeOfLine:lineno];
-
-		if (reportMatches) {
-			if (global) {
-				NSArray *matches = [rx allMatchesInString:s range:lineRange];
-				NSUInteger nm = [matches count];
-				if (nm > 0) {
-					numMatches += nm;
-					numLines++;
-				}
-			} else {
-				ViRegexpMatch *match = [rx matchInString:s range:lineRange];
-				if (match) {
-					numMatches++;
-					numLines++;
-				}
-			}
-		} else {
-			NSString *value = [s substringWithRange:lineRange];
-			DEBUG(@"range %@ = %@", NSStringFromRange(lineRange), value);
-			NSString *replacedText = [tform transformValue:value
-							   withPattern:rx
-								format:command.replacement
-								global:global
-								 error:&error];
-			if (error)
-				return error;
-
-			if (replacedText != value) {
-				if (lastReplacedLine == NSNotFound) {
-					[storage beginEditing];
-					lastReplacedLine = lineno;
-				}
-				[self replaceCharactersInRange:lineRange withString:replacedText];
-			} else if (lastReplacedLine != NSNotFound) {
-				[storage endEditing];
-				lastReplacedLine = NSNotFound;
-			}
-		}
-	}
-
-	if (lastReplacedLine != NSNotFound)
-		[[self textStorage] endEditing];
-
 	if (reportMatches) {
-		return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
+		[transform affectedLines:&numLines
+					replacements:&numMatches
+		   whenTransformingValue:string
+					 withPattern:rx
+						  global:global]; 
 	} else {
+		NSRange lastMatchedRange = NSMakeRange(NSNotFound, 0);
+		NSString *globalReplacedText =
+		  [transform transformValue:string
+						withPattern:rx
+							 format:command.replacement
+							 global:global
+							  error:&error
+				  lastReplacedRange:&lastMatchedRange
+					  affectedLines:&numLines
+					   replacements:&numMatches];
+
+		if (globalReplacedText != string) {
+			[storage beginEditing];
+
+			[self replaceCharactersInRange:replacementRange withString:globalReplacedText];
+		}
+
+		[storage endEditing];
 		[self endUndoGroup];
-		command.caret = [storage locationForStartOfLine:NSMaxRange(exRange)];
-		return nil;
+
+		[self pushCurrentLocationOnJumpList];
+		command.caret =
+		  (lastMatchedRange.location == NSNotFound) ?
+			[storage locationForStartOfLine:MIN(NSMaxRange(exRange), [storage lineCount])] :
+			NSMaxRange(lastMatchedRange) + startLocation;
 	}
+
+	return [NSString stringWithFormat:@"%lu matches on %lu lines", numMatches, numLines];
 }
 
 - (id)ex_goto:(ExCommand *)command

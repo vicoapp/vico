@@ -47,7 +47,7 @@
 		}
 		_names = [namesArray mutableCopy];
 		_syntax = [aSyntax copy];
-		_scopeSelector = [aScopeSelector copy] ?: [@"" retain];
+		_scopeSelector = [aScopeSelector copy] ?: @"";
 	}
 	return self;
 }
@@ -58,7 +58,7 @@
                        scope:(NSString *)aScopeSelector
 {
 	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector]) != nil) {
-		_expression = [anExpression retain];
+		_expression = anExpression;
 	}
 	return self;
 }
@@ -74,18 +74,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_names release];
-	[_scopeSelector release];
-	[_syntax release];
-	[_parameter release];
-	[_completion release];
-	[_expression release];
-	[_usage release];
-	[_help release];
-	[super dealloc];
-}
 
 - (NSString *)name
 {
@@ -142,11 +130,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_mappings release];
-	[super dealloc];
-}
 
 + (ExMap *)defaultMap
 {
@@ -271,7 +254,6 @@
 
 	if (m) {
 		[self addMapping:m];
-		[m release];
 	}
 
 	return m;

@@ -35,7 +35,7 @@
 	NSMutableDictionary	*_openDocs;
 }
 
-@property (nonatomic,assign) IBOutlet NSMenuItem *developMenu;
+@property (nonatomic,weak) IBOutlet NSMenuItem *developMenu;
 
 - (void)showDevelopMenu:(BOOL)doShow;
 

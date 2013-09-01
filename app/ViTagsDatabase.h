@@ -32,8 +32,8 @@
 }
 
 @property(nonatomic,readonly) NSURL *baseURL;
-@property(nonatomic,readwrite,retain) NSDate *modificationDate;
-@property(nonatomic,readwrite,retain) NSURL *databaseURL;
+@property(nonatomic,readwrite,strong) NSDate *modificationDate;
+@property(nonatomic,readwrite,strong) NSURL *databaseURL;
 
 - (ViTagsDatabase *)initWithBaseURL:(NSURL *)aURL;
 - (void)lookup:(NSString *)symbol

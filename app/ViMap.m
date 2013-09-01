@@ -50,11 +50,11 @@
 			    parameter:(id)param
 				scope:(NSString *)aSelector
 {
-	return [[[ViMapping alloc] initWithKeySequence:aKeySequence
+	return [[ViMapping alloc] initWithKeySequence:aKeySequence
 						action:anAction
 						 flags:flags
 					     parameter:param
-						 scope:aSelector] autorelease];
+						 scope:aSelector];
 }
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
@@ -62,19 +62,19 @@
 			    recursive:(BOOL)recursiveFlag
 				scope:(NSString *)aSelector
 {
-	return [[[ViMapping alloc] initWithKeySequence:aKeySequence
+	return [[ViMapping alloc] initWithKeySequence:aKeySequence
 						 macro:aMacro
 					     recursive:recursiveFlag
-						 scope:aSelector] autorelease];
+						 scope:aSelector];
 }
 
 + (ViMapping *)mappingWithKeySequence:(NSArray *)aKeySequence
 			   expression:(NuBlock *)expr
 				scope:(NSString *)aSelector
 {
-	return [[[ViMapping alloc] initWithKeySequence:aKeySequence
+	return [[ViMapping alloc] initWithKeySequence:aKeySequence
 					    expression:expr
-						 scope:aSelector] autorelease];
+						 scope:aSelector];
 }
 
 - (ViMapping *)initWithKeySequence:(NSArray *)aKeySequence
@@ -84,12 +84,12 @@
 			     scope:(NSString *)aSelector
 {
 	if ((self = [super init]) != nil) {
-		_keySequence = [aKeySequence retain];
+		_keySequence = aKeySequence;
 		_action = anAction;
 		_flags = actionFlags;
-		_scopeSelector = aSelector ? [aSelector copy] : [@"" retain];
-		_keyString = [[NSString stringWithKeySequence:_keySequence] retain];
-		_parameter = [param retain];
+		_scopeSelector = aSelector ? [aSelector copy] : @"";
+		_keyString = [NSString stringWithKeySequence:_keySequence];
+		_parameter = param;
 	}
 	return self;
 }
@@ -100,11 +100,11 @@
 			     scope:(NSString *)aSelector
 {
 	if ((self = [super init]) != nil) {
-		_keySequence = [aKeySequence retain];
+		_keySequence = aKeySequence;
 		_macro = [aMacro copy];
 		_recursive = recursiveFlag;
-		_scopeSelector = aSelector ? [aSelector copy] : [@"" retain];
-		_keyString = [[NSString stringWithKeySequence:_keySequence] retain];
+		_scopeSelector = aSelector ? [aSelector copy] : @"";
+		_keyString = [NSString stringWithKeySequence:_keySequence];
 	}
 	return self;
 }
@@ -114,25 +114,15 @@
 			     scope:(NSString *)aSelector
 {
 	if ((self = [super init]) != nil) {
-		_keySequence = [aKeySequence retain];
-		_expression = [anExpression retain];
+		_keySequence = aKeySequence;
+		_expression = anExpression;
 		_recursive = NO;
-		_scopeSelector = aSelector ? [aSelector copy] : [@"" retain];
-		_keyString = [[NSString stringWithKeySequence:_keySequence] retain];
+		_scopeSelector = aSelector ? [aSelector copy] : @"";
+		_keyString = [NSString stringWithKeySequence:_keySequence];
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_keySequence release];
-	[_keyString release];
-	[_scopeSelector release];
-	[_parameter release];
-	[_macro release];
-	[_expression release];
-	[super dealloc];
-}
 
 #define has_flag(flag) ((_flags & flag) == flag)
 
@@ -229,7 +219,7 @@ static NSMutableDictionary *__maps = nil;
 
 	ViMap *map = [__maps objectForKey:mapName];
 	if (map == nil) {
-		map = [[[ViMap alloc] initWithName:mapName] autorelease];
+		map = [[ViMap alloc] initWithName:mapName];
 		[__maps setObject:map forKey:mapName];
 	}
 
@@ -274,7 +264,7 @@ static NSMutableDictionary *__maps = nil;
 - (ViMap *)initWithName:(NSString *)aName
 {
 	if ((self = [super init]) != nil) {
-		_name = [aName retain];
+		_name = aName;
 		_actions = [[NSMutableArray alloc] init];
 		_includes = [[NSMutableSet alloc] init];
 		_acceptsCounts = YES;
@@ -282,14 +272,6 @@ static NSMutableDictionary *__maps = nil;
 	return self;
 }
 
-- (void)dealloc
-{
-	[_name release];
-	[_actions release];
-	[_includes release];
-	[_operatorMap release];
-	[super dealloc];
-}
 
 - (NSString *)description
 {
@@ -579,6 +561,17 @@ static NSMutableDictionary *__maps = nil;
 				*outError = nil;
 			m = [ViMapping mappingWithKeySequence:keySequence
 						       action:_defaultAction
+						        flags:0
+						    parameter:nil
+						        scope:nil];
+			DEBUG(@"using default action %@", m);
+			return m;
+		} else if (error.code == ViErrorMapNotFound && _defaultCatchallAction) {
+			/* Something outside the regular range, which a catchall can handle. */
+			if (outError)
+				*outError = nil;
+			m = [ViMapping mappingWithKeySequence:keySequence
+						       action:_defaultCatchallAction
 						        flags:0
 						    parameter:nil
 						        scope:nil];

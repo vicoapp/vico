@@ -32,6 +32,7 @@
 - (void)awakeFromNib
 {
 	_messageField = nil;
+	_canHideMessage = YES;
 
 	[self setAutoresizesSubviews:YES];
 
@@ -46,7 +47,7 @@
 
 - (void)initMessageField
 {
-	_messageField = [[[NSTextField alloc] init] retain];
+	_messageField = [[NSTextField alloc] init];
 	[_messageField setBezeled:NO];
 	[_messageField setDrawsBackground:NO];
 	[_messageField setEditable:NO];
@@ -68,6 +69,15 @@
 
 	for (ViStatusComponent *component in _components)
 		[component.control setHidden:YES];
+
+	_canHideMessage = NO;
+
+	[self performSelectorOnMainThread:@selector(enableMessageHiding) withObject:nil waitUntilDone:NO];
+}
+
+- (void)enableMessageHiding
+{
+	_canHideMessage = YES;
 }
 
 - (void)hideMessage
@@ -100,7 +110,6 @@
 		if ([component respondsToSelector:@selector(removeFromSuperview)]) {
 			[component removeFromSuperview];
 		}
-		[component release];
 	}];
 
 	NSLog(@"Setting things to %@", components);
@@ -118,8 +127,6 @@
 			if ([statusComponent.alignment isEqualToString:ViStatusComponentAlignAutomatic]) {
 				statusComponent.alignment = currentAlignment;
 			}
-
-			[component retain];
 
 			if (lastComponent) {
 				lastComponent.nextComponent = statusComponent;
@@ -139,8 +146,6 @@
 		}
 	}];
 
-	[_components release];
-	[components retain];
 	_components = components;
 }
 
@@ -151,7 +156,8 @@
 
 - (void)statusComponentChanged:(NSNotification *)notification
 {
-	[self hideMessage];
+	if (_canHideMessage)
+		[self hideMessage];
 }
 
 #pragma mark --
@@ -159,11 +165,7 @@
 
 - (void)dealloc
 {
-	[_components makeObjectsPerformSelector:@selector(release)];
-
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
-	[super dealloc];
 }
 
 @end
@@ -173,42 +175,37 @@
 
 @implementation ViStatusComponent
 
-@synthesize control = _control;
-@synthesize nextComponent = _nextComponent;
-@synthesize previousComponent = _previousComponent;
-@synthesize alignment = _alignment;
+@synthesize control;
+@synthesize nextComponent, previousComponent, alignment;
 
 - (ViStatusComponent *)init
 {
 	if (self = [super init]) {
 		isCacheValid = NO;
-		_previousComponent = nil;
-		_nextComponent = nil;
-		_control = nil;
-		_alignment = ViStatusComponentAlignAutomatic;
+		alignment = ViStatusComponentAlignAutomatic;
 	}
 
 	return self;
 }
 
-- (ViStatusComponent *)initWithControl:(NSControl *)control
+- (ViStatusComponent *)initWithControl:(NSControl *)aControl
 {
 	if (self = [ViStatusComponent init]) {
-		self.control = control;
+		self.control = aControl;
 	}
 
 	return self;
 }
 
-- (void)addViewTo:(NSView *)parentView withAlignment:(NSString *)alignment
+- (void)addViewTo:(NSView *)parentView withAlignment:(NSString *)anAlignment
 {
-	_alignment = alignment;
+	alignment = anAlignment;
 	[self addViewTo:parentView];
 }
 
 - (void)addViewTo:(NSView *)parentView
 {
-	[parentView addSubview:_control];
+	[parentView addSubview:control];
 }
 
 - (void)invalidateSize
@@ -221,15 +218,15 @@
 {
 	// If the cache is still valid or we have no superview, don't
 	// try to do any math or cache values.
-	if (isCacheValid || ! [_control superview]) return;
+	if (isCacheValid || ! [control superview]) return;
 
-	[_control sizeToFit];
-	_cachedWidth = _control.frame.size.width;
+	[control sizeToFit];
+	_cachedWidth = control.frame.size.width;
 
-	NSView *parentView = [_control superview];
+	NSView *parentView = [control superview];
 	NSUInteger resizingMask = NSViewHeightSizable,
 	           xPosition = 0;
-	if (_alignment == ViStatusComponentAlignCenter) {
+	if ([alignment isEqual:ViStatusComponentAlignCenter]) {
 		resizingMask |= NSViewMinXMargin | NSViewMaxXMargin;
 
 		// For center, we have to do math on all center aligned things
@@ -242,13 +239,13 @@
 		NSUInteger totalWidth = _cachedWidth;
 		NSUInteger prevWidth = 0;
 		ViStatusComponent *currentComponent = [self previousComponent];
-		while (currentComponent && ([currentComponent alignment] == ViStatusComponentAlignCenter || [currentComponent alignment] == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([[currentComponent alignment] isEqual:ViStatusComponentAlignCenter] || [[currentComponent alignment] isEqual:ViStatusComponentAlignAutomatic])) {
 			totalWidth += [currentComponent controlWidth];
 			prevWidth += [currentComponent controlWidth];
 			currentComponent = [currentComponent previousComponent];
 		}
 		currentComponent = [self nextComponent];
-		while (currentComponent && ([currentComponent alignment] == ViStatusComponentAlignCenter || [currentComponent alignment] == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([[currentComponent alignment] isEqual:ViStatusComponentAlignCenter] || [[currentComponent alignment] isEqual:ViStatusComponentAlignAutomatic])) {
 			totalWidth += [currentComponent controlWidth];
 			currentComponent = [currentComponent nextComponent];
 		}
@@ -278,9 +275,9 @@
 	}
 
 	[self.control setAutoresizingMask:resizingMask];
-	[self.control setFrame:CGRectMake(xPosition, 0, _cachedWidth, _control.frame.size.height)];
+	[self.control setFrame:CGRectMake(xPosition, 0, _cachedWidth, control.frame.size.height)];
 
-	_cachedX = _control.frame.origin.x;
+	_cachedX = control.frame.origin.x;
 
 	isCacheValid = YES;
 
@@ -290,14 +287,14 @@
 	// Okay, now let's see if we need to invalidate anyone else.
 	if ([self.alignment isEqualToString:ViStatusComponentAlignLeft]) {
 		ViStatusComponent *currentComponent = self.nextComponent;
-		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignLeft || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([currentComponent.alignment isEqual:ViStatusComponentAlignLeft] || [currentComponent.alignment isEqual:ViStatusComponentAlignAutomatic])) {
 			[currentComponent invalidateSize];
 
 			currentComponent = currentComponent.nextComponent;
 		}
 	} else if ([self.alignment isEqualToString:ViStatusComponentAlignRight]) {
 		ViStatusComponent *currentComponent = self.previousComponent;
-		while (currentComponent && (currentComponent.alignment == ViStatusComponentAlignRight || currentComponent.alignment == ViStatusComponentAlignAutomatic)) {
+		while (currentComponent && ([currentComponent.alignment isEqual:ViStatusComponentAlignRight] || [currentComponent.alignment isEqual:ViStatusComponentAlignAutomatic])) {
 			[currentComponent invalidateSize];
 
 			currentComponent = currentComponent.previousComponent;
@@ -321,14 +318,7 @@
 
 - (void)removeFromSuperview
 {
-	[_control removeFromSuperview];
-}
-
-- (void)dealloc
-{
-	[_control release];
-
-	[super dealloc];
+	[control removeFromSuperview];
 }
 
 @end
@@ -405,7 +395,7 @@
 	NSString *currentValue = [self.control stringValue];
 	NSString *newValue = @"";
 
-	ViStatusView *statusView = (ViStatusView *)[_control superview];
+	ViStatusView *statusView = (ViStatusView *)[self.control superview];
 
 	if (self.notificationTransformerBlock) {
 		id args[2] = { statusView, notification };
@@ -441,11 +431,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
-	[self.notificationTransformer release];
-	[self.notificationTransformerBlock release];
-
-	[super dealloc];
 }
 
 @end
@@ -486,7 +471,7 @@
 - (void)changeOccurred:(NSNotification *)notification
 {
 	NSAttributedString *currentValue = [self.control attributedStringValue];
-	NSAttributedString *newValue = self.notificationTransformer((ViStatusView *)[_control superview], notification);
+	NSAttributedString *newValue = self.notificationTransformer((ViStatusView *)[self.control superview], notification);
 
 	// Only make a real update if the new value is different.
 	if (newValue && ! [currentValue isEqualToAttributedString:newValue]) {
@@ -499,9 +484,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self.notificationTransformer release];
-
-	[super dealloc];
 }
 
 @end

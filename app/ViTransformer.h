@@ -29,11 +29,26 @@
 {
 }
 
+- (void)affectedLines:(NSUInteger *)affectedLines
+		 replacements:(NSUInteger *)replacements
+whenTransformingValue:(NSString *)value
+		  withPattern:(ViRegexp *)rx
+			   global:(BOOL)global;
+
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
                       global:(BOOL)global
                        error:(NSError **)outError;
+
+- (NSString *)transformValue:(NSString *)value
+                 withPattern:(ViRegexp *)rx
+                      format:(NSString *)format
+                      global:(BOOL)global
+                       error:(NSError **)outError
+		   lastReplacedRange:(NSRange *)range
+			   affectedLines:(NSUInteger *)affectedLines
+			    replacements:(NSUInteger *)replacements;
 
 @end
 

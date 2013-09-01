@@ -29,7 +29,7 @@
 
 @implementation ViDocumentView
 
-@synthesize innerView = _innerView;
+@synthesize innerView;
 
 - (ViDocumentView *)initWithDocument:(ViDocument *)aDocument
 {
@@ -47,7 +47,6 @@
 	DEBUG_DEALLOC();
 	if ([self representedObject] != nil)
 		[self setDocument:nil];
-	[super dealloc];
 }
 
 - (ViDocument *)document
@@ -94,14 +93,14 @@
 
 - (ViTextView *)textView
 {
-	return (ViTextView *)_innerView;
+	return (ViTextView *)innerView;
 }
 
 - (void)replaceTextView:(ViTextView *)textView
 {
-	[_innerView removeFromSuperview];
-	_innerView = textView;
-	[_scrollView setDocumentView:_innerView];
+	[innerView removeFromSuperview];
+	innerView = textView;
+	[_scrollView setDocumentView:innerView];
 	[textView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 	[textView setMinSize:NSMakeSize(83, 0)];
 	[textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];

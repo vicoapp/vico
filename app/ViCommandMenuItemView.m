@@ -39,11 +39,8 @@
 - (void)setCommand:(NSString *)aCommand
 {
 	NSSize oldSize = [_commandTitle sizeWithAttributes:_attributes];
-	[aCommand retain];
-	[_command release];
 	_command = aCommand;
-	[_commandTitle release];
-	_commandTitle = [[_command visualKeyString] retain];
+	_commandTitle = [_command visualKeyString];
 	_commandSize = [_commandTitle sizeWithAttributes:_attributes];
 
 	double dw = _commandSize.width - oldSize.width;
@@ -66,8 +63,6 @@
 		return;
 
 	NSSize oldSize = [_title sizeWithAttributes:_attributes];
-	[aTitle retain];
-	[_title release];
 	_title = aTitle;
 	_titleSize = [_title sizeWithAttributes:_attributes];
 
@@ -85,8 +80,8 @@
 	if ((self = [super initWithFrame:NSMakeRect(0, 0, 100, 20)]) != nil) {
 		double w, h;
 
-		_command = [aCommand retain];
-		_commandTitle = [[_command visualKeyString] retain];
+		_command = aCommand;
+		_commandTitle = [_command visualKeyString];
 
 		[self setAttributes:[NSMutableDictionary dictionaryWithObject:[NSFont menuBarFontOfSize:0]
 								       forKey:NSFontAttributeName]];
@@ -104,15 +99,12 @@
 							 green:(CGFloat)0xD5/0xFF
 							  blue:(CGFloat)0xD5/0xFF
 							 alpha:1.0];
-		[_disabledColor retain];
-		[_highlightColor retain];
-		[_normalColor retain];
 
 		h = _titleSize.height + 1;
 		w = 20 + _titleSize.width + 30 + _commandSize.width + 15;
 		[self setFrame:NSMakeRect(0, 0, w, h)];
 
-		_title = [aTitle retain];
+		_title = aTitle;
 		[self setAutoresizingMask:NSViewWidthSizable];
 	}
 	return self;
@@ -125,17 +117,6 @@
 			      font:aFont];
 }
 
-- (void)dealloc
-{
-	[_attributes release];
-	[_command release];
-	[_commandTitle release];
-	[_title release];
-	[_disabledColor release];
-	[_highlightColor release];
-	[_normalColor release];
-	[super dealloc];
-}
 
 - (void)drawRect:(NSRect)dirtyRect
 {

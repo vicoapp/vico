@@ -184,11 +184,11 @@
 
 @property (nonatomic, copy) void (^onResponse)(SFTPMessage *);
 @property (nonatomic, copy) void (^onCancel)(SFTPRequest *);
-@property (nonatomic, readwrite, retain) SFTPRequest *subRequest;
+@property (nonatomic, readwrite, strong) SFTPRequest *subRequest;
 @property (nonatomic, readonly) BOOL cancelled;
 @property (nonatomic, readwrite) CGFloat progress;
 @property (nonatomic, readonly) uint32_t requestId;
-@property (nonatomic, readwrite, retain) SFTPRequest *waitRequest;
+@property (nonatomic, readwrite, strong) SFTPRequest *waitRequest;
 
 + (SFTPRequest *)requestWithId:(uint32_t)reqId
 			ofType:(uint32_t)type
@@ -241,8 +241,8 @@
 
 @property(nonatomic,readonly) NSString *host;
 @property(nonatomic,readonly) NSString *user;
-@property(nonatomic,readwrite,retain) NSString *home;
-@property(nonatomic,readonly) NSString *title;
+@property(nonatomic,readwrite,strong) NSString *home;
+@property(weak, nonatomic,readonly) NSString *title;
 
 - (SFTPConnection *)initWithURL:(NSURL *)url error:(NSError **)outError;
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback;

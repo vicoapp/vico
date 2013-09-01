@@ -46,24 +46,6 @@ static NSMutableCharacterSet *wordSet = nil;
 	return self;
 }
 
-- (void)finalize
-{
-	DEBUG_DEALLOC();
-
-	/* Free the skiplist. */
-	struct skip *skip;
-	while ((skip = TAILQ_FIRST(&_skiphead)) != NULL) {
-		struct line *ln;
-		while ((ln = TAILQ_FIRST(&skip->lines)) != NULL) {
-			TAILQ_REMOVE(&skip->lines, ln, next);
-			free(ln);
-		}
-		TAILQ_REMOVE(&_skiphead, skip, next);
-		free(skip);
-	}
-
-	[super finalize];
-}
 
 - (void)dealloc
 {
@@ -81,9 +63,7 @@ static NSMutableCharacterSet *wordSet = nil;
 		free(skip);
 	}
 
-	[_attributedString release];
 
-	[super dealloc];
 }
 
 - (NSString *)description
@@ -654,13 +634,13 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
                  extraCharacters:(NSString *)extraCharacters
 {
 	if (wordSet == nil) {
-		wordSet = [[NSMutableCharacterSet characterSetWithCharactersInString:@"_"] retain];
+		wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 		[wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
 	}
 	NSMutableCharacterSet *set = wordSet;
 
 	if (extraCharacters) {
-		set = [[wordSet mutableCopy] autorelease];
+		set = [wordSet mutableCopy];
 		[set formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:extraCharacters]];
 	}
 

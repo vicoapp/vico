@@ -167,7 +167,6 @@
 	if (shadow) {
 		[normalizedPreference setObject:shadow
 					 forKey:NSShadowAttributeName];
-		[shadow release];
 	}
 
 	if ((value = [settings objectForKey:@"indentExpression"]) != nil) {
@@ -182,7 +181,6 @@
 				DEBUG(@"got code %@ (a %@)", code, NSStringFromClass([code class]));
 				[normalizedPreference setObject:code
 							 forKey:@"indentExpressionBlock"];
-				[code release];
 			}
 		}
 		@catch (NSException *exception) {
@@ -407,24 +405,20 @@
 		NSString *bundleDirectory = [unexpandedBundleDirectory stringByExpandingTildeInPath];
 		NSString *plistPath = [bundleDirectory  stringByAppendingPathComponent:@"info.plist"];
 		if (![fm fileExistsAtPath:plistPath]) {
-			[self release];
 			return nil;
 		}
 
 		_info = [[NSDictionary alloc] initWithContentsOfFile:plistPath];
 		if (_info == nil || ![_info isKindOfClass:[NSDictionary class]]) {
 			INFO(@"malformed info.plist in bundle %@", bundleDirectory);
-			[self release];
 			return nil;
 		}
 		if ([_info objectForKey:@"isDelta"]) {
 			INFO(@"delta bundles not implemented, at %@", bundleDirectory);
-			[self release];
 			return nil;
 		}
 		if ([_info objectForKey:@"uuid"] == nil) {
 			INFO(@"missing uuid in info.plist in bundle %@", bundleDirectory);
-			[self release];
 			return nil;
 		}
 
@@ -444,7 +438,6 @@
 									      forBundle:self];
 				if (language) {
 					[_languages addObject:language];
-					[language release];
 				}
 			}
 		}
@@ -479,7 +472,6 @@
 				if (snippet) {
 					[_items addObject:snippet];
 					[_uuids setObject:snippet forKey:snippet.uuid];
-					[snippet release];
 				}
 			}
 
@@ -497,7 +489,6 @@
 				if (command) {
 					[_items addObject:command];
 					[_uuids setObject:command forKey:command.uuid];
-					[command release];
 				}
 			}
 	}
@@ -536,16 +527,7 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_path release];
-	[_info release];
-	[_languages release];
-	[_preferences release];
-	[_items release];
-	[_cachedPreferences release];
-	[_uuids release];
 	[_parser close];
-	[_parser release];
-	[super dealloc];
 }
 
 - (NSString *)supportPath
@@ -620,7 +602,7 @@
                font:(NSFont *)aFont
 {
 	int matches = 0;
-	NSMenu *menu = [[[NSMenu alloc] initWithTitle:name] autorelease];
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:name];
 	[menu setAutoenablesItems:NO];
 	NSDictionary *submenus = nil;
 	if ([mainMenu isKindOfClass:[NSDictionary class]])
@@ -655,7 +637,7 @@
 
 				/* Replace "Thing / Selection" depending on hasSelection.
 				 */
-				NSMutableString *title = [[[op name] mutableCopy] autorelease];
+				NSMutableString *title = [[op name] mutableCopy];
 				NSRange r = [title rangeOfString:@" / Selection"];
 				if (r.location != NSNotFound) {
 					if (hasSelection) {
@@ -682,9 +664,9 @@
 				if ([tabTrigger length] > 0) {
 					/* Set a special view for drawing the tab trigger. */
 					ViCommandMenuItemView *view;
-					view = [[[ViCommandMenuItemView alloc] initWithTitle:[op name]
+					view = [[ViCommandMenuItemView alloc] initWithTitle:[op name]
 										  tabTrigger:tabTrigger
-											font:aFont] autorelease];
+											font:aFont];
 					[item setView:view];
 				}
 			} else

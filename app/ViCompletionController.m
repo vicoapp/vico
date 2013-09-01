@@ -23,6 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "NSString-additions.h"
 #import "ViCompletionController.h"
 #import "ViCommand.h"
 #import "ViKeyManager.h"
@@ -30,7 +31,9 @@
 #import "ViThemeStore.h"
 #include "logging.h"
 
-@implementation ViCompletionController
+@implementation ViCompletionController {
+	BOOL _positionCompletionsBelowPrefix;
+}
 
 @synthesize delegate = _delegate;
 @synthesize window;
@@ -51,7 +54,6 @@
 {
 	if ((self = [super init])) {
 		if (![NSBundle loadNibNamed:@"CompletionWindow" owner:self]) {
-			[self release];
 			return nil;
 		}
 
@@ -70,64 +72,56 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[window release]; // Top-level nib object
-	[_provider release];
-	[_completions release];
-	[_options release];
-	[_prefix release];
-	[_onlyCompletion release];
-	[_filteredCompletions release];
-	[_selection release];
-	[_filter release];
-	// [_matchParagraphStyle release];
-	[super dealloc];
-}
 
 - (void)updateBounds
 {
 	NSSize winsz = NSMakeSize(0, 0);
 	for (ViCompletion *c in _filteredCompletions) {
 		NSSize sz = [c.title size];
-		if (sz.width + 20 > winsz.width)
-			winsz.width = sz.width + 20;
+		if (sz.width + 50 > winsz.width)
+			winsz.width = sz.width + 50;
 	}
 
 	DEBUG(@"got %lu completions, row height is %f",
 	    [_filteredCompletions count], [tableView rowHeight]);
-	winsz.height = [_filteredCompletions count] * ([tableView rowHeight] + 2) + [label bounds].size.height;
 
 	NSScreen *screen = [NSScreen mainScreen];
-	NSSize scrsz = [screen visibleFrame].size;
-	NSPoint origin = _screenOrigin;
-	if (winsz.height > scrsz.height / 2)
-		winsz.height = scrsz.height / 2;
-	if (_upwards) {
-		if (origin.y + winsz.height > scrsz.height)
-			origin.y = scrsz.height - winsz.height - 5;
-	} else {
-		if (origin.y < winsz.height)
-			origin.y = winsz.height + 5;
-	}
-	if (origin.x + winsz.width > scrsz.width)
-		origin.x = scrsz.width - winsz.width - 5;
+	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
 
-	NSRect frame = [window frame];
-	frame.origin = origin;
-	if (!_upwards)
-		frame.origin.y -= winsz.height;
-	frame.size = winsz;
-	if (!NSEqualRects(frame, [window frame])) {
+	/* 
+	We want to be able to show the list (either above or below the current position),
+	and still have the current line visible. We can do it easily if the constrain the
+	size of the completion window to half the screen. This means the following must
+	fit on half the screen:
+
+	- The label with the filter.
+	- The displayed completions.
+	- The current text line.
+
+	Note that all completions will still be available; users will simply need to
+	scroll.
+	*/
+	NSUInteger maxNumberOfRows = (NSUInteger)((screenSize.height / 2)
+												- label.bounds.size.height
+												- _prefixScreenRect.size.height)
+											 / tableView.rowHeight;
+	NSUInteger numberOfRows = MIN([_filteredCompletions count], maxNumberOfRows);
+	winsz.height = numberOfRows * ([tableView rowHeight] + 2) + [label bounds].size.height;
+
+	/* Set the window size, which is independent of origin. */
+	NSRect windowFrame = [window frame];
+	windowFrame.size = winsz;
+	windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size];
+	
+	if (!NSEqualRects(windowFrame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
-		[window setFrame:frame display:YES];
+		[window setFrame:windowFrame display:YES];
 	}
 }
 
 - (void)completionResponse:(NSArray *)array error:(NSError *)error
 {
 	DEBUG(@"got completions: %@, error %@", array, error);
-	[_completions release];
 	_completions = [[NSMutableArray alloc] initWithArray:array];
 
 	NSUInteger ndropped = 0;
@@ -176,12 +170,11 @@
 				[self cancel:nil];
 				return;
 			}
-		} else if ([_filteredCompletions count] == 1) {
+		} else if ([_filteredCompletions count] == 1 && _aggressive) {
 			if ([window isVisible]) {
 				[self acceptByKey:0];
 			} else {
-				[_onlyCompletion release];
-				_onlyCompletion = [[_filteredCompletions objectAtIndex:0] retain];
+				_onlyCompletion = [_filteredCompletions objectAtIndex:0];
 			}
 		}
 
@@ -194,16 +187,18 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
-                          at:(NSPoint)origin
-		     options:(NSString *)optionString
-                   direction:(int)direction /* 0 = down, 1 = up */
-               initialFilter:(NSString *)initialFilter
-{
+		              prefix:(NSString *)aPrefix
+			prefixScreenRect:(NSRect)prefixRect
+					delegate:(id<ViCompletionDelegate>)aDelegate
+		  existingKeyManager:(ViKeyManager *)existingKeyManager
+					 options:(NSString *)optionString
+               initialFilter:(NSString *)initialFilter {
 	_terminatingKey = 0;
 	[self reset];
 
-	[_onlyCompletion release];
+	_delegate = aDelegate;
+	_existingKeyManager = existingKeyManager;
+
 	_onlyCompletion = nil;
 
 	if (initialFilter)
@@ -211,15 +206,17 @@
 	else
 		_filter = [[NSMutableString alloc] init];
 
-	_provider = [aProvider retain];
+	_provider = aProvider;
 
 	_range = aRange;
-	_prefix = [aPrefix retain];
+	_prefix = aPrefix;
 	_prefixLength = [aPrefix length];
-	_options = [optionString retain];
+	_options = optionString;
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
-	_screenOrigin = origin;
-	_upwards = (direction == 1);
+	// Aggressive means we auto-select a unique suggestion.
+	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
+	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
+	_prefixScreenRect = prefixRect;
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);
@@ -238,11 +235,14 @@
 	}
 	[self completionResponse:result error:nil];
 
-	if (_onlyCompletion) {
+	if (_onlyCompletion && _aggressive) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 		[self reset];
-		ViCompletion *ret = [_onlyCompletion autorelease];
+
+		ViCompletion *ret = _onlyCompletion;
 		_onlyCompletion = nil;
+
 		return ret;
 	}
 
@@ -252,8 +252,13 @@
 		return nil;
 	}
 
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
-	       byExtendingSelection:NO];
+	NSInteger initialSelectionIndex = 0;
+	if (!_positionCompletionsBelowPrefix) {
+		initialSelectionIndex = [self numberOfRowsInTableView:tableView] - 1;
+	}
+
+	[self selectCompletionRowWithDelegateCalls:initialSelectionIndex];
+	[tableView scrollRowToVisible:initialSelectionIndex];
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
@@ -262,7 +267,7 @@
 
 	if (code == NSRunAbortedResponse)
 		return nil;
-	ViCompletion *ret = [_selection autorelease];
+	ViCompletion *ret = _selection;
 	_selection = nil;
 	return ret;
 }
@@ -287,14 +292,10 @@
 
 - (void)setCompletions:(NSMutableArray *)newCompletions
 {
-	[_filter release];
 	_filter = [[NSMutableString alloc] init];
 
-	[newCompletions retain];
-	[_completions release];
 	_completions = newCompletions;
 
-	[_filteredCompletions release];
 	_filteredCompletions = nil;
 
 	[self filterCompletions];
@@ -346,7 +347,6 @@
 					options:ONIG_OPTION_IGNORECASE];
 	}
 
-	[_filteredCompletions release];
 	_filteredCompletions = [[NSMutableArray alloc] init];
 
 	for (ViCompletion *c in _completions) {
@@ -372,37 +372,34 @@
 		}];
 
 	[tableView reloadData];
+	NSInteger selectionRow = _positionCompletionsBelowPrefix ? 0 : _filteredCompletions.count - 1;
+	[self selectCompletionRowWithDelegateCalls:selectionRow];
 	[self updateBounds];
 }
 
 - (void)setFilter:(NSString *)aString
 {
-	[_filter release];
 	_filter = [aString mutableCopy];
 	[self filterCompletions];
 }
 
 - (void)reset
 {
-	[_completions release];
 	_completions = nil;
 
-	[_filteredCompletions release];
 	_filteredCompletions = nil;
 
-	[_filter release];
 	_filter = nil;
 
-	[_provider release];
 	_provider = nil;
 
-	[_prefix release];
 	_prefix = nil;
 
-	[_options release];
 	_options = nil;
 
-	// [self setDelegate:nil]; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
+	_existingKeyManager = nil;
+
+	_delegate = nil; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
 - (void)acceptByKey:(NSInteger)termKey
@@ -410,8 +407,10 @@
 	_terminatingKey = termKey;
 	NSInteger row = [tableView selectedRow];
 	if (row >= 0 && row < [_filteredCompletions count]) {
-		[_selection release];
-		_selection = [[_filteredCompletions objectAtIndex:row] retain];
+		_selection = [_filteredCompletions objectAtIndex:row];
+		_selection = [self completionForRow:row];
+
+		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}
 	[window orderOut:nil];
 	[NSApp stopModal];
@@ -420,10 +419,33 @@
 
 - (BOOL)cancel:(ViCommand *)command
 {
+	if (! _delegate)
+		return NO;
+
+	ViKeyManager *existingKeyManager = _existingKeyManager;
+
 	_terminatingKey = [[command.mapping.keySequence lastObject] integerValue];
 	[window orderOut:nil];
 	[NSApp abortModal];
 	[self reset];
+
+	// If we cancel while autocompleting, we want the invoking key manager to 
+	// also get the key mapping, as we want escapes and Ctrl-[s and other
+	// mappings designed to get the user into insert mode to take effect no
+	// matter what.
+	if (command && _autocompleting)
+		[existingKeyManager handleKeys:command.keySequence];
+
+	return YES;
+}
+
+- (BOOL)accept_if_not_autocompleting:(ViCommand *)command
+{
+	if (! _autocompleting) {
+		[self accept:command];
+	} else {
+		[self cancel:command];
+	}
 
 	return YES;
 }
@@ -438,16 +460,11 @@
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
 
+	[_existingKeyManager handleKeys:command.keySequence];
+
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
 	if ([_delegate respondsToSelector:sel]) {
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-		    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-		[invocation setSelector:sel];
-		[invocation setArgument:&self atIndex:2];
-		[invocation setArgument:&keyCode atIndex:3];
-		[invocation invokeWithTarget:_delegate];
-		BOOL shouldTerminate;
-		[invocation getReturnValue:&shouldTerminate];
+		BOOL shouldTerminate = [_delegate completionController:self shouldTerminateForKey:keyCode];
 		if (shouldTerminate) {
 			[self acceptByKey:keyCode];
 			return YES;
@@ -459,7 +476,8 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	[_filter appendString:[NSString stringWithFormat:@"%C", (unichar)keyCode]];
+	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
+	[_filter appendString:string];
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;
@@ -490,16 +508,11 @@
 	    [ViCompletionController commonPrefixInCompletions:_filteredCompletions];
 	if ([partialCompletion length] == 0)
 		return YES;
+
 	DEBUG(@"common prefix is [%@], range is %@", partialCompletion, NSStringFromRange(_range));
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-	    [(NSObject *)_delegate methodSignatureForSelector:sel]];
-	[invocation setSelector:sel];
-	[invocation setArgument:&self atIndex:2];
-	[invocation setArgument:&partialCompletion atIndex:3];
-	[invocation setArgument:&_range atIndex:4];
-	[invocation invokeWithTarget:_delegate];
-	BOOL ret;
-	[invocation getReturnValue:&ret];
+	_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
+	BOOL ret =
+	  [_delegate completionController:self insertPartialCompletion:partialCompletion inRange:_range];
 	if (!ret)
 		return NO;
 
@@ -516,7 +529,7 @@
 {
 	SEL sel = @selector(completionController:insertPartialCompletion:inRange:);
 
-	if (_fuzzySearch || ![_delegate respondsToSelector:sel])
+	if (_fuzzySearch || _autocompleting || ![_delegate respondsToSelector:sel])
 		return [self accept:command];
 
 	if (![self complete_partially:command])
@@ -531,27 +544,35 @@
 - (BOOL)move_up:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
-	if (row == -1)
+	if (row == -1) {
 		row = 0;
-	else if (row == 0)
+	} else if (row == 0) {
 		return NO;
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:--row]
-	       byExtendingSelection:NO];
-	[tableView scrollRowToVisible:row];
-	return YES;
+	}
+
+	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:--row];
+	if (selectionSuccessful) {
+		[tableView scrollRowToVisible:row];
+	}
+
+	return selectionSuccessful;
 }
 
 - (BOOL)move_down:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
-	if (row == -1)
+	if (row == -1) {
 		row = 0;
-	else if (row + 1 >= [tableView numberOfRows])
+	} else if (row + 1 >= [tableView numberOfRows]) {
 		return NO;
-	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:++row]
-	       byExtendingSelection:NO];
-	[tableView scrollRowToVisible:row];
-	return YES;
+	}
+
+	BOOL selectionSuccessful = [self selectCompletionRowWithDelegateCalls:++row];
+	if (selectionSuccessful) {
+		[tableView scrollRowToVisible:row];
+	}
+
+	return selectionSuccessful;
 }
 
 - (BOOL)toggle_fuzzy:(ViCommand *)command
@@ -577,7 +598,98 @@
 objectValueForTableColumn:(NSTableColumn *)aTableColumn
             row:(NSInteger)rowIndex
 {
-	return [(ViCompletion *)[_filteredCompletions objectAtIndex:rowIndex] title];
+	return [self completionForRow:rowIndex].title;
 }
 
+#pragma mark - NSTableViewDelegate
+/* ------------------IMPORTANT NOTE---------------------
+   THESE DELEGATE METHODS ARE NOT CALLED BY THE SYSTEM
+   DURING MOVE-UP & MOVE-DOWN KEY PRESSES.
+
+   The calls are manually inserted into the move_up:
+   and move_down: method via a call to
+   -selectCompletionRowWithDelegateCalls:
+
+   If you need more delegate calls to be processed, make
+   sure you add them there.
+   -----------------------------------------------------*/
+   
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+	NSInteger newSelection = [tableView selectedRow];
+	[self completionForRow:newSelection].isCurrentChoice = YES;
+}
+
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)tv {
+	NSInteger oldSelection = [tableView selectedRow];
+	[self completionForRow:oldSelection].isCurrentChoice = NO;
+
+	return YES;
+}
+
+
+- (ViCompletion *)completionForRow:(NSInteger)row {
+	if (row < 0 || row >= _filteredCompletions.count) {
+		return nil;
+	}
+	NSInteger equivalentIndex = _positionCompletionsBelowPrefix ? row : _filteredCompletions.count - 1 - row; 
+	return [_filteredCompletions objectAtIndex:equivalentIndex];
+}
+
+#pragma mark - Helpers
+- (BOOL)selectCompletionRowWithDelegateCalls:(NSInteger)completionRow {
+	if (![tableView.delegate selectionShouldChangeInTableView:tableView]) {
+		return NO;
+	}
+	[tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:completionRow]
+	       byExtendingSelection:NO];
+
+	/* Calling the delegate directly, but that's a weird delegate call anyway. */
+	[tableView.delegate tableViewSelectionDidChange:nil];
+
+	return YES;
+}
+
+- (NSPoint)computeWindowOriginForSize:(NSSize)winsz {
+	NSPoint origin = _prefixScreenRect.origin;
+
+	NSScreen *screen = [NSScreen mainScreen];
+	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
+	/*
+	If this is the first time the window appears, determine if we need to show
+	the completions above or below. Default is below.
+	*/
+	if ([NSApp modalWindow] != window) {
+		if (winsz.height > _prefixScreenRect.origin.y) {
+			_positionCompletionsBelowPrefix = NO;
+		} else {
+			_positionCompletionsBelowPrefix = YES;
+		}
+	}
+	
+	/* Now we compute the origin. */
+	if (_positionCompletionsBelowPrefix) {
+		if (origin.y < winsz.height) {
+			origin.y = winsz.height + 5;
+		}
+	} else {
+		if (origin.y + winsz.height > screenSize.height) {
+			origin.y = screenSize.height - winsz.height - 5;
+		}
+	}
+
+	origin.x -= 3; // Align with the character. Hack, but computing the value is hard. :-/
+
+	if (origin.x + winsz.width > screenSize.width) {
+		origin.x = screenSize.width - winsz.width;
+	}
+
+	if (_positionCompletionsBelowPrefix) {
+		origin.y -= winsz.height;
+	} else {
+		origin.y += _prefixScreenRect.size.height;
+	}
+
+	return origin;
+
+}
 @end

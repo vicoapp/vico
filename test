@@ -1,0 +1,12 @@
+2013-07-27 11:36:42.802 Vico[53194:303] -[ViBundleItem initFromDictionary:inBundle:]:133: refusing to map <esc> to bundle command Unnumbered Equation
+2013-07-27 11:36:42.807 Vico[53194:303] -[ViBundleStore loadBundleFromDirectory:loadPluginCode:]:80: replacing bundle <ViBundle 0x10140fa20: Ack (10FB5B6B-E43F-4CB0-AEF3-933E74BF4A73)> with <ViBundle 0x10836f080: Ack (10FB5B6B-E43F-4CB0-AEF3-933E74BF4A73)>
+2013-07-27 11:36:42.812 Vico[53194:303] -[ViBundleSnippet initFromDictionary:inBundle:]:38: missing snippet content in bundle item { override in empty embedded
+2013-07-27 11:36:42.826 Vico[53194:303] -[ViAppController eval:withParser:bindings:error:]:611: NuUndefinedSuperclass: undefined superclass PHBTask
+2013-07-27 11:36:42.827 Vico[53194:303] -[ViBundle loadPluginCode]:527: /Users/Shadowfiend/Library/Application Support/Vico/Bundles/Shadowfiend-simple-build-tool.tmbundle/main.nu: Got exception NuUndefinedSuperclass: undefined superclass PHBTask
+2013-07-27 11:36:43.592 Vico[53194:303] -[ViAppController applicationWillFinishLaunching:]:384: launched after 1.000549s
+2013-07-27 11:36:43.837 Vico[53194:303] -[ViMark setDocument:]:256: got non-document <ViProject: 0x1038bb460> for mark <ViMark 0x1082e5860 ((null)): <ViProject: 0x1038bb460>, 18446744073709551615:18446744073709551615 {9223372036854775807, 0}>
+2013-07-27 11:36:43.842 Vico[53194:303] Setting things to (
+    "<ViStatusNotificationLabel: 0x10113c800>",
+    "<ViStatusNotificationLabel: 0x10ac06370>"
+)
+make: *** [run] Interrupt: 2

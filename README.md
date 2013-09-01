@@ -1,4 +1,4 @@
-# Vico
+# Vico [![Stories in Ready](https://badge.waffle.io/vicoapp/vico.png)](https://waffle.io/vicoapp/vico)  
 
 Vico is a programmers text editor with a strong focus on keyboard
 control. Vico uses vi key bindings to let you keep your fingers on the

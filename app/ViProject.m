@@ -161,14 +161,11 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_windowController release];
-	[_initialURL release];
-	[super dealloc];
 }
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
-	_initialURL = [url retain];
+	_initialURL = url;
 
 	NSMutableString *urlForPath = [NSMutableString stringWithString:[url absoluteString]];
 	[urlForPath replaceOccurrencesOfString:@"_" withString:@"__" options:0 range:NSMakeRange(0, [urlForPath length])];

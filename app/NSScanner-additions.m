@@ -140,7 +140,6 @@
 		}
 	}
 
-	[shellVariableSet release];
 
 	if ([self scanLocation] == startLocation)
 		return NO;

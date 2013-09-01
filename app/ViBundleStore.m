@@ -36,7 +36,7 @@
 {
 	static NSString *__bundlesDirectory = nil;
 	if (__bundlesDirectory == nil)
-		__bundlesDirectory = [[[ViAppController supportDirectory] stringByAppendingPathComponent:@"Bundles"] retain];
+		__bundlesDirectory = [[ViAppController supportDirectory] stringByAppendingPathComponent:@"Bundles"];
 	return __bundlesDirectory;
 }
 
@@ -61,13 +61,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_languages release];
-	[_bundles release];
-	[_cachedPreferences release];
-	[super dealloc];
-}
 
 - (BOOL)loadBundleFromDirectory:(NSString *)bundleDirectory loadPluginCode:(BOOL)loadPluginCode
 {
@@ -84,14 +77,12 @@
 			}
 		}
 		/* Reset cached preferences to remove any pref in oldBundle. */
-		[_cachedPreferences release];
 		_cachedPreferences = [[NSMutableDictionary alloc] init];
 		/* FIXME: remove any defined languages in oldBundle, re-compile/clear cache for dependent languages. */
 		/* FIXME: clear cache for theme attributes? */
 	}
 
 	[_bundles setObject:bundle forKey:bundle.uuid];
-	[bundle release];
 
 	for (ViLanguage *lang in bundle.languages) {
 		if (lang.name) {
@@ -196,8 +187,8 @@
 
 - (NSArray *)sortedLanguages
 {
-	NSSortDescriptor *descriptor = [[[NSSortDescriptor alloc]
-	    initWithKey:@"displayName" ascending:YES] autorelease];
+	NSSortDescriptor *descriptor = [[NSSortDescriptor alloc]
+	    initWithKey:@"displayName" ascending:YES];
 	return [[self languages] sortedArrayUsingDescriptors:
 	    [NSArray arrayWithObject:descriptor]];
 }

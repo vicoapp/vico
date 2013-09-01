@@ -109,13 +109,12 @@
 
 	_caretBlinkState = YES;
 	[_caretBlinkTimer invalidate];
-	[_caretBlinkTimer release];
 	if ([[self window] firstResponder] == self && (caretBlinkMode & mode) != 0) {
-		_caretBlinkTimer = [[NSTimer scheduledTimerWithTimeInterval:caretBlinkTime
+		_caretBlinkTimer = [NSTimer scheduledTimerWithTimeInterval:caretBlinkTime
 								     target:self
 								   selector:@selector(blinkCaret:)
 								   userInfo:nil
-								    repeats:YES] retain];
+								    repeats:YES];
 	} else {
 		_caretBlinkTimer = nil;
 	}
@@ -205,7 +204,6 @@
 	}
 
 	[_caretBlinkTimer invalidate];
-	[_caretBlinkTimer release];
 	_caretBlinkTimer = nil;
 
 	[self setNeedsDisplayInRect:_oldLineHighlightRect];
@@ -320,7 +318,6 @@
 		[iBeamImg unlockFocus];
 		__invertedIBeamCursor = [[NSCursor alloc] initWithImage:iBeamImg
 								hotSpot:[iBeam hotSpot]];
-		[iBeamImg release];
 	}
 	return __invertedIBeamCursor;	
 }

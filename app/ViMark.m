@@ -50,22 +50,22 @@
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 {
-	return [[[ViMark alloc] initWithURL:aURL
+	return [[ViMark alloc] initWithURL:aURL
 				       name:nil
 				      title:nil
 				       line:-1
-				     column:-1] autorelease];
+				     column:-1];
 }
 
 + (ViMark *)markWithURL:(NSURL *)aURL
 		   line:(NSInteger)aLine
 		 column:(NSInteger)aColumn
 {
-	return [[[ViMark alloc] initWithURL:aURL
+	return [[ViMark alloc] initWithURL:aURL
 				       name:nil
 				      title:nil
 				       line:aLine
-				     column:aColumn] autorelease];
+				     column:aColumn];
 }
 
 + (ViMark *)markWithURL:(NSURL *)aURL
@@ -74,29 +74,29 @@
 		   line:(NSInteger)aLine
 		 column:(NSInteger)aColumn
 {
-	return [[[ViMark alloc] initWithURL:aURL
+	return [[ViMark alloc] initWithURL:aURL
 				       name:aName
 				      title:aTitle
 				       line:aLine
-				     column:aColumn] autorelease];
+				     column:aColumn];
 }
 
 + (ViMark *)markWithDocument:(ViDocument *)aDocument
 			name:(NSString *)aName
 		       range:(NSRange)aRange
 {
-	return [[[ViMark alloc] initWithDocument:aDocument
+	return [[ViMark alloc] initWithDocument:aDocument
 					    name:aName
-					   range:aRange] autorelease];
+					   range:aRange];
 }
 
 + (ViMark *)markWithView:(ViDocumentView *)aDocumentView
 		    name:(NSString *)aName
 		   range:(NSRange)aRange
 {
-	return [[[ViMark alloc] initWithView:aDocumentView
+	return [[ViMark alloc] initWithView:aDocumentView
 					name:aName
-				       range:aRange] autorelease];
+				       range:aRange];
 }
 
 - (ViMark *)initWithURL:(NSURL *)aURL
@@ -106,12 +106,11 @@
 		 column:(NSInteger)aColumn
 {
 	if (aURL == nil) {
-		[self release];
 		return nil;
 	}
 
 	if ((self = [super init]) != nil) {
-		_url = [[aURL URLByResolvingSymlinksAndAliases:nil] retain];
+		_url = [aURL URLByResolvingSymlinksAndAliases:nil];
 		_name = [aName copy];
 		_title = [aTitle copy];
 		_persistent = YES;
@@ -142,14 +141,13 @@
 		       range:(NSRange)aRange
 {
 	if (aDocument == nil) {
-		[self release];
 		return nil;
 	}
 
 	if ((self = [super init]) != nil) {
 		_persistent = YES;
-		_document = [aDocument retain];
-		_name = [aName retain];
+		_document = aDocument;
+		_name = aName;
 		[self setRange:aRange];
 		[[NSNotificationCenter defaultCenter] addObserver:self
 							 selector:@selector(documentRemoved:)
@@ -168,7 +166,6 @@
 		   range:(NSRange)aRange
 {
 	if (aDocumentView == nil) {
-		[self release];
 		return nil;
 	}
 
@@ -215,17 +212,6 @@
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-	[_name release];
-	[_title release];
-	[_icon release];
-	[_groupName release];
-	[_url release];
-	[_document release];
-	[_lists release];
-	[_rangeString release];
-	[_representedObject release];
-	[_scopes release];
-	[super dealloc];
 }
 
 - (void)documentAdded:(NSNotification *)notification
@@ -246,8 +232,6 @@
 
 - (void)setDocument:(ViDocument *)doc
 {
-	[doc retain];
-	[_document release];
 	_document = doc;
 	_view = nil;
 
@@ -335,7 +319,6 @@
 - (NSString *)rangeString
 {
 	if (_rangeStringIsDirty) {
-		[_rangeString release];
 		// if (_range.location != NSNotFound)
 		// 	_rangeString = [NSStringFromRange(_range) retain];
 		// else
@@ -359,8 +342,7 @@
 
 - (void)setURL:(NSURL *)url
 {
-	[_url release];
-	_url = [[url URLByResolvingSymlinksAndAliases:nil] retain];
+	_url = [url URLByResolvingSymlinksAndAliases:nil];
 }
 
 - (NSString *)groupName

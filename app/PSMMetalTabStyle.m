@@ -46,16 +46,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_metalCloseButton release];
-	[_metalCloseButtonDown release];
-	[_metalCloseButtonOver release];
-	[_metalCloseModifiedButton release];
-	[_metalCloseModifiedButtonDown release];
-	[_metalCloseModifiedButtonOver release];
-	[_addTabButtonImage release];
-	[_addTabButtonPressedImage release];
-	[_addTabButtonRolloverImage release];
-	[super dealloc];
 }
 
 #pragma mark -
@@ -251,12 +241,12 @@
 {
     NSMutableAttributedString *attrStr;
     NSFontManager *fm = [NSFontManager sharedFontManager];
-    NSNumberFormatter *nf = [[[NSNumberFormatter alloc] init] autorelease];
+    NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
     [nf setLocalizesFormat:YES];
     [nf setFormat:@"0"];
     [nf setHasThousandSeparators:YES];
     NSString *contents = [nf stringFromNumber:[NSNumber numberWithInt:[cell count]]];
-    attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
+    attrStr = [[NSMutableAttributedString alloc] initWithString:contents];
     NSRange range = NSMakeRange(0, [contents length]);
 
     // Add font attribute
@@ -270,7 +260,7 @@
 {
     NSMutableAttributedString *attrStr;
     NSString *contents = [cell stringValue];
-    attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
+    attrStr = [[NSMutableAttributedString alloc] initWithString:contents];
     NSRange range = NSMakeRange(0, [contents length]);
 
     // Add font attribute
@@ -297,7 +287,7 @@
     // Paragraph Style for Truncating Long Text
     static NSMutableParagraphStyle *TruncatingTailParagraphStyle = nil;
     if (!TruncatingTailParagraphStyle) {
-        TruncatingTailParagraphStyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] retain];
+        TruncatingTailParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [TruncatingTailParagraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
         [TruncatingTailParagraphStyle setAlignment:NSCenterTextAlignment];
     }
@@ -474,7 +464,7 @@
         labelRect.origin.y += 4.0;
         NSMutableAttributedString *attrStr;
         NSString *contents = @"PSMTabBarControl";
-        attrStr = [[[NSMutableAttributedString alloc] initWithString:contents] autorelease];
+        attrStr = [[NSMutableAttributedString alloc] initWithString:contents];
         NSRange range = NSMakeRange(0, [contents length]);
         [attrStr addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:11.0] range:range];
 
@@ -482,7 +472,6 @@
 	[centeredParagraphStyle setAlignment:NSCenterTextAlignment];
         [attrStr addAttribute:NSParagraphStyleAttributeName value:centeredParagraphStyle range:range];
         [attrStr drawInRect:labelRect];
-	[centeredParagraphStyle release];
 
 	return;
     }

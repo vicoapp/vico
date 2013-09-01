@@ -203,60 +203,134 @@
 	return s;
 }
 
+- (void)affectedLines:(NSUInteger *)affectedLines
+		 replacements:(NSUInteger *)replacements
+whenTransformingValue:(NSString *)value
+		  withPattern:(ViRegexp *)rx
+			   global:(BOOL)global
+{
+	*affectedLines = 0;
+	*replacements = 0;
+
+	ViRegexpMatch *match = [rx matchInString:value];
+	NSUInteger nextNewline = 0;
+	NSRange matchedRange;
+	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
+		NSUInteger nextStart = NSMaxRange(matchedRange);
+		if (matchedRange.length == 0)
+		  nextStart += 1;
+
+		if (!global && nextStart < value.length) {
+			(*affectedLines)++;
+			
+			nextStart = nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
+		} else if (nextStart > nextNewline && nextStart < value.length) {
+			(*affectedLines)++;
+
+			nextNewline = [value rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [value length] - nextStart)].location;
+		}
+		
+		(*replacements)++;
+
+		if (nextStart >= [value length]) {
+		  match = nil;
+		} else {
+		  match = [rx matchInString:value range:NSMakeRange(nextStart, [value length] - nextStart)];
+		}
+	}
+}
+
+- (NSString *)transformValue:(NSString *)value
+				 withPattern:(ViRegexp *)rx
+				      format:(NSString *)format
+					  global:(BOOL)global
+					   error:(NSError **)outError
+		   lastReplacedRange:(NSRange *)lastReplacedRange
+			   affectedLines:(NSUInteger *)affectedLines
+				replacements:(NSUInteger *)replacements
+{
+	if (affectedLines)
+		*affectedLines = 0;
+	if (replacements)
+		*replacements = 0;
+
+	BOOL copied = NO;
+	id text = value;
+	ViRegexpMatch *match = [rx matchInString:value];
+	NSUInteger nextNewline = 0;
+	NSRange matchedRange;
+	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
+		if (!copied) {
+			text = [value mutableCopy];
+			copied = YES;
+		}
+
+		NSString *expandedFormat =
+		  [self expandFormat:format
+				   withMatch:match
+				   stopChars:@""
+			  originalString:text
+			   scannedLength:nil
+					   error:outError];
+
+		if (expandedFormat == nil) {
+			if (outError)
+				return nil;
+
+			expandedFormat = @"";
+		}
+
+		DEBUG(@"replace range %@ in string [%@] with expanded format [%@] from regex %@",
+		    NSStringFromRange(matchedRange), text, expandedFormat, rx);
+		[text replaceCharactersInRange:matchedRange withString:expandedFormat];
+		if (lastReplacedRange)
+		  *lastReplacedRange = NSMakeRange(matchedRange.location, expandedFormat.length);
+
+		NSUInteger nextStart = matchedRange.location + expandedFormat.length;
+		if (matchedRange.length == 0)
+		  nextStart += 1;
+
+		if (!global && nextStart < [text length]) {
+			if (affectedLines)
+				(*affectedLines)++;
+			
+			nextStart = nextNewline = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
+		} else if (nextStart > nextNewline && nextStart < [text length]) {
+			if (affectedLines)
+				(*affectedLines)++;
+
+			nextNewline = [text rangeOfString:@"\n" options:0 range:NSMakeRange(nextStart, [text length] - nextStart)].location;
+		}
+
+		if (replacements)
+			(*replacements)++;
+
+		if (nextStart >= [text length]) {
+		  match = nil;
+		} else {
+		  match = [rx matchInString:text range:NSMakeRange(nextStart, [text length] - nextStart)];
+		}
+	}
+
+	DEBUG(@"transformed [%@] -> [%@]", value, text);
+	return text;
+}
+
 - (NSString *)transformValue:(NSString *)value
                  withPattern:(ViRegexp *)rx
                       format:(NSString *)format
                       global:(BOOL)global
                        error:(NSError **)outError
 {
-	id text = value;
-	BOOL copied = NO;
-	NSUInteger begin = 0;
-	while (begin <= [text length]) {
-		NSRange r = NSMakeRange(begin, [text length] - begin);
-		DEBUG(@"matching rx %@ in range %@ in string [%@]",
-		    rx, NSStringFromRange(r), text);
-		int opts = 0;
-		if (begin > 0)
-			opts |= ONIG_OPTION_NOTBOL;
-		if (NSMaxRange(r) < [text length])
-			opts |= ONIG_OPTION_NOTEOL;
-		ViRegexpMatch *m = [rx matchInString:text range:r options:opts];
-		DEBUG(@"m = %@", m);
-		if (m == nil)
-			break;
-		r = [m rangeOfMatchedString];
-		DEBUG(@"matched range %@", NSStringFromRange(r));
-		if (r.location == NSNotFound)
-			break;
-		if (!copied) {
-			text = [[value mutableCopy] autorelease];
-			copied = YES;
-		}
-		NSString *expFormat = [self expandFormat:format
-		                               withMatch:m
-		                               stopChars:@""
-		                          originalString:text
-		                           scannedLength:nil
-		                                   error:outError];
-		if (expFormat == nil) {
-			if (outError)
-				return nil;
-			expFormat = @"";
-		}
-		DEBUG(@"replace range %@ in string [%@] with expanded format [%@]",
-		    NSStringFromRange(r), text, expFormat);
-		[text replaceCharactersInRange:r withString:expFormat];
-
-		if (!global)
-			break;
-
-		begin = r.location + [expFormat length];
-		if (r.length == 0)
-			++begin; /* prevent infinite loops with zero-length matches */
-	}
-	DEBUG(@"transformed [%@] -> [%@]", value, text);
-	return text;
+	return
+	  [self transformValue:value
+			   withPattern:rx
+					format:format
+					global:global
+					 error:outError
+		 lastReplacedRange:nil
+			 affectedLines:nil
+			  replacements:nil];
 }
 
 @end

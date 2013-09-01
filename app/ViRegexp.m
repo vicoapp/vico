@@ -48,7 +48,7 @@
 {
 	static NSCharacterSet *__reservedCharacters = nil;
 	if (__reservedCharacters == nil)
-		__reservedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@".{[()|\\+?*^$"] retain];
+		__reservedCharacters = [NSCharacterSet characterSetWithCharactersInString:@".{[()|\\+?*^$"];
 	return __reservedCharacters;
 }
 
@@ -76,17 +76,17 @@
 
 + (ViRegexp *)regexpWithString:(NSString *)aString
 {
-	return [[[ViRegexp alloc] initWithString:aString] autorelease];
+	return [[ViRegexp alloc] initWithString:aString];
 }
 
 + (ViRegexp *)regexpWithString:(NSString *)aString options:(NSInteger)options
 {
-	return [[[ViRegexp alloc] initWithString:aString options:options] autorelease];
+	return [[ViRegexp alloc] initWithString:aString options:options];
 }
 
 + (ViRegexp *)regexpWithString:(NSString *)aString options:(NSInteger)options error:(NSError **)outError
 {
-	return [[[ViRegexp alloc] initWithString:aString options:options error:outError] autorelease];
+	return [[ViRegexp alloc] initWithString:aString options:options error:outError];
 }
 
 - (ViRegexp *)initWithString:(NSString *)aString
@@ -108,7 +108,7 @@
 	if (self == nil)
 		return nil;
 
-	_pattern = [aString retain]; // XXX: should copy, but we use it only for -description:
+	_pattern = aString; // XXX: should copy, but we use it only for -description:
 
 	size_t len = [aString length] * sizeof(unichar);
 	unichar *pattern = malloc(len);
@@ -132,7 +132,6 @@
 			DEBUG(@"pattern failed: %s", s);
 			*outError = [ViError errorWithFormat:@"%s", s];
 		}
-		[self release];
 		return nil;
 	}
 
@@ -143,16 +142,8 @@
 {
 	if (_regex)
 		onig_free(_regex);
-	[_pattern release];
-	[super dealloc];
 }
 
-- (void)finalize
-{
-	if (_regex)
-		onig_free(_regex);
-	[super finalize];
-}
 
 - (ViRegexpMatch *)matchInCharacters:(const unichar *)chars
                              options:(NSInteger)options
@@ -311,8 +302,8 @@
 + (ViRegexpMatch *)regexpMatchWithRegion:(OnigRegion *)aRegion
                            startLocation:(NSUInteger)aLocation
 {
-	return [[[ViRegexpMatch alloc] initWithRegion:aRegion
-					startLocation:aLocation] autorelease];
+	return [[ViRegexpMatch alloc] initWithRegion:aRegion
+					startLocation:aLocation];
 }
 
 - (ViRegexpMatch *)initWithRegion:(OnigRegion *)aRegion
@@ -348,15 +339,8 @@
 {
 	if (_region)
 		onig_region_free(_region, 1);
-	[super dealloc];
 }
 
-- (void)finalize
-{
-	if (_region)
-		onig_region_free(_region, 1);
-	[super finalize];
-}
 
 - (NSString *)description
 {

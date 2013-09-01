@@ -53,5 +53,5 @@ GenerateFormData(NSDictionary *formValues, NSString *boundary)
 
 	[result appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSASCIIStringEncoding]];
 
-	return [result autorelease];
+	return result;
 }

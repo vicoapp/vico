@@ -81,17 +81,9 @@
 			if ([documentURL isEqual:selectedDocumentURL]) {
 				documentViewToSelect = documentView;
 			}
-			[[documentView textView] setCaret:[[documentProperties objectForKey:@"caret"] unsignedIntegerValue]];
 
-			// If we do this immediately, the scroll view resets to a 0
-			// scroll. So we wait for the next run loop to update the
-			// scroll position.
-			[[NSOperationQueue mainQueue] addOperationWithBlock:^{
-				NSScrollView *scrollView = [[documentView textView] enclosingScrollView];
-				[[scrollView contentView] scrollToPoint:NSMakePoint([[documentProperties objectForKey:@"xScroll"] doubleValue],
-																	[[documentProperties objectForKey:@"yScroll"] doubleValue])];
-				[scrollView reflectScrolledClipView:[scrollView contentView]];
-			}];
+			[[documentView textView] gotoLine:[[documentProperties objectForKey:@"line"] unsignedIntegerValue]
+									   column:[[documentProperties objectForKey:@"column"] unsignedIntegerValue]];
 		} else { // this is information regarding an internal split
 			// We'll deal with these guys again in a minute to actually unpack them;
 			// for now, we're just handling this level of splits.
@@ -200,7 +192,6 @@
 		NSView *view = (NSView *)obj;
 		__block ViDocument *document = nil;
 		__block ViTextView *textView = nil;
-		__block NSPoint scrollPoint = NSMakePoint(0, 0);
 
 		[viewControllers eachBlock:^(id obj, BOOL *stop) {
 			ViDocumentView *controller = (ViDocumentView *)obj;
@@ -208,7 +199,6 @@
 			if ([controller view] == view) {
 				document = [controller document];
 				textView = [controller textView];
-				scrollPoint = [[textView enclosingScrollView] documentVisibleRect].origin;
 				*stop = YES;
 			}
 		}];
@@ -224,14 +214,15 @@
 				dimensionValue = [NSNumber numberWithFloat:[view bounds].size.height];
 			}
 
+			ViTextStorage *storage = [textView textStorage];
+			NSUInteger caret = [textView caret];
 			NSDictionary *viewProperties =
-				[NSDictionary dictionaryWithObjectsAndKeys:
-									  [[document fileURL] absoluteString], @"url",
-									  dimensionValue, relevantDimension,
-									  [NSNumber numberWithFloat:scrollPoint.x], @"xScroll",
-									  [NSNumber numberWithFloat:scrollPoint.y], @"yScroll",
-									  [NSNumber numberWithUnsignedInteger:[textView caret]], @"caret",
-									  nil];
+				@{
+				  @"url": [[document fileURL] absoluteString],
+				  @"line": @([storage lineNumberAtLocation:caret]),
+				  @"column": @([storage columnAtLocation:caret]),
+				  relevantDimension: dimensionValue
+				};
 
 			[documentProperties addObject:viewProperties];
 		} else if ([view isKindOfClass:[NSSplitView class]]) {

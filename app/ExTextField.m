@@ -82,7 +82,7 @@
 	
 	BOOL result = [super becomeFirstResponder];
 
-	editor.textContainerInset = NSMakeSize(3, 1);
+	editor.textContainerInset = NSMakeSize(0, 1);
 	editor.theme = defaultTheme;
 	ViLanguage *exLanguage = [[ViBundleStore defaultStore] languageWithScope:@"vico.ex"];
 	editor.document.syntaxParser = [ViSyntaxParser syntaxParserWithLanguage:exLanguage];

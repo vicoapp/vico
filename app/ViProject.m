@@ -231,11 +231,10 @@
 	}];
 
 	
-	return
-		[NSDictionary dictionaryWithObjectsAndKeys:
-									documentProperties, @"documents",
-									[NSNumber numberWithBool:[split isVertical]], @"isVertical",
-									nil];
+	return @{
+		@"documents": documentProperties,
+		@"isVertical": @([split isVertical]),
+	};
 }
 
 - (NSArray *)structureOfTabs:(NSTabView *)tabView
@@ -247,11 +246,10 @@
 		ViTabController *tabController = (ViTabController *)[item identifier];
 		NSArray *viewControllers = [tabController views];
 
-		NSDictionary *tabViewProps =
-			[NSDictionary dictionaryWithObjectsAndKeys:
-										[self structureOfSplit:split viewControllers:viewControllers], @"root",
-										[[((ViDocument *)[[tabController selectedView] representedObject]) fileURL] absoluteString], @"selectedDocument",
-										nil];
+		NSDictionary *tabViewProps = @{
+			@"root": [self structureOfSplit:split viewControllers:viewControllers],
+			@"selectedDocument": [[((ViDocument *)[[tabController selectedView] representedObject]) fileURL] absoluteString],
+		}
 
 		[tabViewProperties addObject:tabViewProps];
 	}];

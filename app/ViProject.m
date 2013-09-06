@@ -177,10 +177,9 @@
 			appropriateForURL:nil
 					   create:YES
 						error:nil] URLByAppendingPathComponent:@"Vico"];
-	_dataURL = [[supportDirectory URLByAppendingPathComponent:urlForPath] retain];
+	_dataURL = [supportDirectory URLByAppendingPathComponent:urlForPath];
 
-	_projectInfo = [[NSDictionary dictionaryWithContentsOfURL:_dataURL] retain];
-	NSLog(@"Project info %@ _dataURL: %@", _dataURL, _projectInfo);
+	_projectInfo = [NSDictionary dictionaryWithContentsOfURL:_dataURL];
 	if (! _projectInfo)
 		_projectInfo = [NSDictionary dictionary];
 

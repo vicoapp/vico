@@ -505,7 +505,6 @@
 	if (keyCode > 0xFFFF) /* ignore key equivalents? */
 		return NO;
 
-	/* This is not a backspace. */
 	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
 	[_filter appendString:string];
 

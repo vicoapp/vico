@@ -259,6 +259,8 @@
 
 - (void)close
 {
+	// Note: these are all open buffers, not just buffers that have views on
+	// them in the open tabs/splits.
 	NSSet *documentURLs = [[self.windowController documents] mapBlock:^(id obj, BOOL *stop) {
 		  ViDocument *document = (ViDocument *)obj;
 
@@ -267,17 +269,15 @@
 
 	NSArray *tabs = [self structureOfTabs:[self.windowController tabView]];
 	
-	//windowController documents // the set of documents that are open
-	//windowController splitView // follow recursively to extract the current visible documents/sizes
 	//windowController jumpList // the jump list/history
 	//windowController tagStack // the list of marks
 	// and also the currently focused item and caret
 
-	_projectInfo =
-	  [NSDictionary dictionaryWithObjectsAndKeys:
-								  [documentURLs allObjects], @"documents",
-								  tabs, @"tabs",
-								  nil];
+	_projectInfo = @{
+		@"documents": [documentURLs allObjects],
+		@"tabs": tabs
+	};
+
 	[_projectInfo writeToURL:_dataURL atomically:YES];
 
 	[super close];

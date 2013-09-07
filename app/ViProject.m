@@ -120,12 +120,12 @@
 	return documentViewToSelect;
 }
 
-- (void)makeWindowControllers
+- (BOOL)showInWindow:(ViWindowController *)aWindowController
 {
-	_windowController = [[ViWindowController alloc] init];
-	[self addWindowController:_windowController];
-	[_windowController setProject:self];
-	[_windowController browseURL:_initialURL];
+	_windowController = aWindowController;
+	[self addWindowController:aWindowController];
+	[aWindowController setProject:self];
+	[aWindowController browseURL:_initialURL];
 
 	// Do that shiz.
 	NSArray *tabs = (NSArray *)[_projectInfo objectForKey:@"tabs"];
@@ -140,13 +140,22 @@
 		}];
 
 		if (documentViewToSelect) {
-			[_windowController selectDocumentView:documentViewToSelect];
+			[aWindowController selectDocumentView:documentViewToSelect];
 		}
+
+		return YES;
 	}
 
-	if (! tabs || [tabs count] <= 0) {
-	  ViDocument *doc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
-	  [doc setIsTemporary:YES];
+	return NO;
+}
+
+- (void)makeWindowControllers
+{
+	BOOL createdTabs = [self showInWindow:[[ViWindowController alloc] init]];
+
+	if (! createdTabs) {
+		ViDocument *doc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
+		[doc setIsTemporary:YES];
 	}
 }
 
@@ -249,7 +258,7 @@
 		NSDictionary *tabViewProps = @{
 			@"root": [self structureOfSplit:split viewControllers:viewControllers],
 			@"selectedDocument": [[((ViDocument *)[[tabController selectedView] representedObject]) fileURL] absoluteString],
-		}
+		};
 
 		[tabViewProperties addObject:tabViewProps];
 	}];

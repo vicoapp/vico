@@ -2451,10 +2451,20 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 					    [_documents count] <= 1 &&
 					    [[_documents anyObject] fileURL] == nil &&
 					    ![[_documents anyObject] isDocumentEdited]) {
-						/* Just change project directory. */
+						/* Switch projects */
+						ViProject *project = (ViProject *)doc;
+
+						[self.project close];
+
 						[self setBaseURL:url];
 						[self ex_pwd:command];
-						[explorer browseURL:url andDisplay:NO];
+
+						NSTabViewItem *existingTab = [[self tabView] selectedTabViewItem];
+						BOOL createdTabs = [project showInWindow:self];
+
+						if (createdTabs) {
+							[[self tabView] removeTabViewItem:existingTab];
+						}
 					} else {
 						[[doc nextRunloop] makeWindowControllers];
 					}

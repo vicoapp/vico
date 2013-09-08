@@ -64,7 +64,7 @@
 				if ([possibleDocument isKindOfClass:[ViDocument class]]) {
 					ViDocument *document = (ViDocument *)possibleDocument;
 
-					if (documentIndex != 0 && isTopLevel) {
+					if (isTopLevel) {
 						[_windowController createTabForDocument:document];
 					}
 					if (! [[_windowController window] isKeyWindow]) {

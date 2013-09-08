@@ -865,8 +865,6 @@ DEBUG_FINALIZE();
 		return;
 	}
 
-	[[self project] close];
-	[self closeAllViews];
 	[[self window] close];
 }
 

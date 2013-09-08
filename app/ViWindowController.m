@@ -928,6 +928,7 @@ DEBUG_FINALIZE();
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
+	[self.project close];
 	[self closeAllViews];
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];

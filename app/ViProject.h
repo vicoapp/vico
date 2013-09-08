@@ -46,4 +46,6 @@
  */
 - (BOOL)showInWindow:(ViWindowController *)aWindowController;
 
+- (void)projectWindowDidLoad:(NSNotification *)aNotification;
+
 @end

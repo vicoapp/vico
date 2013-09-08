@@ -350,6 +350,8 @@ DEBUG_FINALIZE();
 
 		[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];
 	}
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViWindowDidLoad object:self];
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject

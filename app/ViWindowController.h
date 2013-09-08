@@ -33,6 +33,8 @@
 #import "ViTextView.h"
 #import "ViMarkManager.h"
 
+#define ViWindowDidLoad @"ViWindowDidLoad"
+
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;

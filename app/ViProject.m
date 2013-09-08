@@ -149,14 +149,35 @@
 	return NO;
 }
 
-- (void)makeWindowControllers
+- (void)showOrDefaultInWindow:(ViWindowController *)aWindowController
 {
-	BOOL createdTabs = [self showInWindow:[[ViWindowController alloc] init]];
+	BOOL createdTabs = [self showInWindow:aWindowController];
 
 	if (! createdTabs) {
 		ViDocument *doc = [[ViDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:nil];
 		[doc setIsTemporary:YES];
 	}
+}
+
+- (void)makeWindowControllers
+{
+	ViWindowController *controller = [[ViWindowController alloc] init];
+	[controller setProject:self];
+
+	if ([controller isWindowLoaded]) {
+		[self showOrDefaultInWindow:controller];
+	} else {
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(projectWindowDidLoad:) name:ViWindowDidLoad object:nil];
+
+		[controller window]; // Noop fetch to initialize the window
+	}
+}
+
+- (void)projectWindowDidLoad:(NSNotification *)aNotification
+{
+	[self showOrDefaultInWindow:[aNotification object]];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)dealloc

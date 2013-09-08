@@ -484,6 +484,8 @@ DEBUG_FINALIZE();
 {
 	ViDocumentView *docView = [document makeViewWithParser:_parser];
 	[self createTabWithViewController:docView];
+	[self selectDocumentView:docView];
+
 	return docView;
 }
 

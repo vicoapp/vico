@@ -17,6 +17,11 @@ from the ex command line with tab completion. Jumping to symbols is easy
 with the symbol list, or use ctags to find the definition under the
 cursor. Ctags even works remotely over SFTP.
 
+## Project Information
+
+Project information currently lives on the Github wiki at https://github.com/vicoapp/vico/wiki .
+If you're looking for how to build Vico, see below.
+
 
 ## Building
 

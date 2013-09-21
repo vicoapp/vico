@@ -1280,7 +1280,7 @@ typedef void (^WritefunType)(SFTPMessage *);
 		/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
 		__block ReadfunType readfun;
 		__weak ReadfunType innerReadfun;
-		innerReadfun = ^(SFTPMessage *msg) {
+		readfun = innerReadfun = ^(SFTPMessage *msg) {
 			NSError *error;
 			uint32_t count;
 			if (msg.type == SSH2_FXP_STATUS) {
@@ -1340,7 +1340,6 @@ typedef void (^WritefunType)(SFTPMessage *);
 			req.onCancel = cancelfun;
 			innerOpenRequest.subRequest = req;
 		};
-		readfun = [innerReadfun copy];
 
 		/* Request a batch of names. */
 		SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
@@ -1486,7 +1485,7 @@ typedef void (^WritefunType)(SFTPMessage *);
 			__block SFTPRequest *readRequest = nil;
 			__block ReadfunType readfun;
 			__weak ReadfunType innerReadfun;
-			innerReadfun = ^(SFTPMessage *msg) {
+			readfun = innerReadfun = ^(SFTPMessage *msg) {
 				NSError *error;
 				if (msg.type == SSH2_FXP_STATUS) {
 					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
@@ -1563,7 +1562,6 @@ typedef void (^WritefunType)(SFTPMessage *);
 					statRequest.subRequest = readRequest;
 				}
 			};
-			readfun = [innerReadfun copy];
 
 			/* Dispatch first read request. */
 			DEBUG(@"requesting %u bytes at offset %lu", len, offset);
@@ -1638,7 +1636,7 @@ typedef void (^WritefunType)(SFTPMessage *);
 		__block WritefunType writefun;
 		__weak WritefunType innerWritefun;
 		__weak SFTPConnection *connection = self;
-		innerWritefun = ^(SFTPMessage *msg) {
+		writefun = innerWritefun = ^(SFTPMessage *msg) {
 			NSError *error;
 			if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 				originalCallback(error);
@@ -1680,7 +1678,6 @@ typedef void (^WritefunType)(SFTPMessage *);
 			req.onCancel = cancelfun;
 			openRequest.subRequest = req;
 		};
-		writefun = [innerWritefun copy];
 
 		/* Dispatch first read request. */
 		uint32_t len = _transfer_buflen;

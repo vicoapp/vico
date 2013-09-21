@@ -31,7 +31,7 @@
 	BOOL		 _strictIndentation;
 }
 
-@property (nonatomic, readwrite, retain) ViKeyManager *keyManager;
+@property (nonatomic, readwrite, strong) ViKeyManager *keyManager;
 @property (nonatomic, readwrite) BOOL strictIndentation;
 
 @end

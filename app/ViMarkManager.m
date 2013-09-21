@@ -31,7 +31,7 @@
 
 + (ViMarkGroup *)markGroupWithSelector:(SEL)aSelector
 {
-	return [[[ViMarkGroup alloc] initWithSelector:aSelector] autorelease];
+	return [[ViMarkGroup alloc] initWithSelector:aSelector];
 }
 
 - (ViMarkGroup *)initWithSelector:(SEL)aSelector
@@ -48,8 +48,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_groups release];
-	[super dealloc];
 }
 
 - (NSString *)attribute
@@ -73,8 +71,14 @@
 - (void)addMark:(ViMark *)mark
 {
 	id key = nil;
-	if ([mark respondsToSelector:_groupSelector])
+	if ([mark respondsToSelector:_groupSelector]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+		
 		key = [mark performSelector:_groupSelector];
+	
+#pragma clang diagnostic pop
+	}
 	if (key == nil)
 		key = [NSNull null];
 	ViMarkList *group = [_groups objectForKey:key];
@@ -89,12 +93,18 @@
 
 - (void)addMarksFromArray:(NSArray *)marksToAdd
 {
-	NSMapTable *groupsToAdd = [NSMapTable mapTableWithWeakToStrongObjects];
+	NSMapTable *groupsToAdd = [NSMapTable weakToStrongObjectsMapTable];
 	BOOL didAddGroup = NO;
 	for (ViMark *mark in marksToAdd) {
 		id key = nil;
-		if ([mark respondsToSelector:_groupSelector])
+		if ([mark respondsToSelector:_groupSelector]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+			
 			key = [mark performSelector:_groupSelector];
+			
+#pragma clang diagnostic pop
+		}
 		if (key == nil)
 			key = [NSNull null];
 		ViMarkList *group = [_groups objectForKey:key];
@@ -123,8 +133,14 @@
 - (void)removeMark:(ViMark *)mark
 {
 	id key = nil;
-	if ([mark respondsToSelector:_groupSelector])
+	if ([mark respondsToSelector:_groupSelector]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+		
 		key = [mark performSelector:_groupSelector];
+		
+#pragma clang diagnostic pop
+	}
 	if (key == nil)
 		key = [NSNull null];
 	ViMarkList *group = [_groups objectForKey:key];
@@ -163,7 +179,7 @@
 
 + (ViMarkList *)markListWithIdentifier:(id)anIdentifier
 {
-	return [[[ViMarkList alloc] initWithIdentifier:anIdentifier] autorelease];
+	return [[ViMarkList alloc] initWithIdentifier:anIdentifier];
 }
 
 + (ViMarkList *)markList
@@ -174,7 +190,7 @@
 - (ViMarkList *)initWithIdentifier:(id)anIdentifier
 {
 	if ((self = [super init]) != nil) {
-		_identifier = [anIdentifier retain]; // XXX: copy?
+		_identifier = anIdentifier; // XXX: copy?
 		_marks = [[NSMutableArray alloc] init];
 		_marksByName = [[NSMutableDictionary alloc] init];
 		_groups = [[NSMutableDictionary alloc] init];
@@ -187,13 +203,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_identifier release];
-	[_marks release];
-	[_marksByName release];
-	[_groups release];
-	[_icon release];
-	[_userParameter release];
-	[super dealloc];
 }
 
 - (ViMarkList *)init
@@ -395,7 +404,7 @@
 {
 	ViMark *mark = nil;
 	if (_currentIndex >= 0 && _currentIndex < [_marks count]) {
-		mark = [[_marks objectAtIndex:_currentIndex] retain];
+		mark = [_marks objectAtIndex:_currentIndex];
 		[self removeMarkAtIndex:_currentIndex];
 		[self last];
 	}
@@ -461,7 +470,7 @@
 
 + (ViMarkStack *)markStackWithName:(NSString *)name
 {
-	return [[[ViMarkStack alloc] initWithName:name] autorelease];
+	return [[ViMarkStack alloc] initWithName:name];
 }
 
 - (ViMarkStack *)initWithName:(NSString *)aName
@@ -481,9 +490,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_name release];
-	[_lists release];
-	[super dealloc];
 }
 
 - (void)clear
@@ -672,7 +678,7 @@ static ViMarkManager *__sharedManager = nil;
 {
 	DEBUG(@"self is %@, sharedManager is %@", self, __sharedManager);
 	if (__sharedManager)
-		return [__sharedManager retain];
+		return __sharedManager;
 
 	if ((self = [super init]) != nil) {
 		_stacks = [[NSMutableArray alloc] init];
@@ -688,9 +694,6 @@ static ViMarkManager *__sharedManager = nil;
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_stacks release];
-	[_namedStacks release];
-	[super dealloc];
 }
 
 - (void)removeStack:(ViMarkStack *)stack

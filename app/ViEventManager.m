@@ -38,17 +38,12 @@ static NSInteger __nextEventId = 0;
 - (id)initWithExpression:(NuBlock *)anExpression
 {
 	if ((self = [super init]) != nil) {
-		_expression = [anExpression retain];
+		_expression = anExpression;
 		_eventId = ++__nextEventId;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_expression release];
-	[super dealloc];
-}
 
 - (NSString *)description
 {
@@ -80,12 +75,6 @@ static NSInteger __nextEventId = 0;
 	return self;
 }
 
-- (void)dealloc
-{
-	[_anonymous_events release];
-	[_owned_events release];
-	[super dealloc];
-}
 
 - (void)emitCallbacks:(id)callbacks forEvent:(NSString *)event withArglist:(NuCell *)arglist
 {
@@ -197,7 +186,7 @@ static NSInteger __nextEventId = 0;
 	} else {
 		NSMapTable *owners = [_owned_events objectForKey:key];
 		if (owners == nil) {
-			owners = [NSMapTable mapTableWithWeakToStrongObjects]; // XXX: owners must explicitly remove themselves in MRC
+			owners = [NSMapTable weakToStrongObjectsMapTable]; // XXX: owners must explicitly remove themselves in MRC
 			[_owned_events setObject:owners forKey:key];
 		}
 
@@ -210,7 +199,6 @@ static NSInteger __nextEventId = 0;
 
 	ViEvent *ev = [[ViEvent alloc] initWithExpression:expression];
 	[callbacks addObject:ev];
-	[ev release];
 
 	return ev.eventId;
 }

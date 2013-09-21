@@ -67,7 +67,7 @@ ToolbarHeightForWindow(NSWindow *window)
 	NSString *name = [pane name];
 	if ([self paneWithName:name] == nil) {
 		[_panes addObject:pane];
-		NSToolbarItem *item = [[[NSToolbarItem alloc] initWithItemIdentifier:name] autorelease];
+		NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:name];
 		[item setLabel:name];
 		[item setTarget:self];
 		[item setAction:@selector(switchToItem:)];
@@ -95,13 +95,6 @@ ToolbarHeightForWindow(NSWindow *window)
 	return self;
 }
 
-- (void)dealloc
-{
-	[_blankView release];
-	[_panes release];
-	[_toolbarItems release];
-	[super dealloc];
-}
 
 - (void)windowDidLoad
 {

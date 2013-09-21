@@ -138,33 +138,16 @@ DEBUG_FINALIZE();
 
 	[_checkURLDeferred setDelegate:nil];
 	[_checkURLDeferred cancel];
-	[_checkURLDeferred release];
 
-	[_baseURL release];
-	[_viFieldEditor release];
-	[_viFieldEditorStorage release];
-	[_tagStack release];
-	[_tagsDatabase release];
-	[_documents release];
-	[_parser release];
-	[_project release];
 	[_jumpList setDelegate:nil];
-	[_jumpList release];
-	[_currentView release];
-	[_modifiedSet release];
 
 	// ?
-	[_initialDocument release];
-	[_initialViewController release];
 
-	[_alternateMark release];
-	[_alternateMarkCandidate release];
 
 	/*
 	 * Top-level nib objects released by super NSWindowController
 	 */
 
-	[super dealloc];
 }
 
 - (NSString *)description
@@ -180,7 +163,6 @@ DEBUG_FINALIZE();
 - (ViTagsDatabase *)tagsDatabase
 {
 	if (![[_tagsDatabase baseURL] isEqualToURL:_baseURL]) {
-		[_tagsDatabase release];
 		_tagsDatabase = nil;
 	}
 
@@ -240,7 +222,7 @@ DEBUG_FINALIZE();
 
 - (void)windowDidLoad
 {
-	_tagStack = [[[ViMarkManager sharedManager] stackWithName:[NSString stringWithFormat:@"Tag Stack for window %p", self]] retain];
+	_tagStack = [[ViMarkManager sharedManager] stackWithName:[NSString stringWithFormat:@"Tag Stack for window %p", self]];
 	[_tagStack setMaxLists:1];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -281,12 +263,10 @@ DEBUG_FINALIZE();
 	_isLoaded = YES;
 	if (_initialDocument) {
 		[self addNewTab:_initialDocument];
-		[_initialDocument release];
 		_initialDocument = nil;
 	}
 	if (_initialViewController) {
 		[self createTabWithViewController:_initialViewController];
-		[_initialViewController release];
 		_initialViewController = nil;
 	}
 
@@ -382,7 +362,7 @@ DEBUG_FINALIZE();
 	if ([anObject isKindOfClass:[ExTextField class]]) {
 		if (_viFieldEditor == nil) {
 			_viFieldEditorStorage = [[ViTextStorage alloc] init];
-			_viFieldEditor = [[ViTextView makeFieldEditorWithTextStorage:_viFieldEditorStorage] retain];
+			_viFieldEditor = [ViTextView makeFieldEditorWithTextStorage:_viFieldEditorStorage];
 		}
 		return _viFieldEditor;
 	}
@@ -478,7 +458,7 @@ DEBUG_FINALIZE();
 {
 	if (!_isLoaded) {
 		/* Defer until NIB is loaded. */
-		_initialViewController = [viewController retain];
+		_initialViewController = viewController;
 		return nil;
 	}
 
@@ -493,10 +473,9 @@ DEBUG_FINALIZE();
 	[tabItem bind:@"label" toObject:tabController withKeyPath:@"selectedView.title" options:nil];
 	[tabItem setView:[tabController view]];
 	[tabView addTabViewItem:tabItem];
-	[tabItem release];
 	[tabView selectTabViewItem:tabItem];
 	[self focusEditor];
-	return [tabController autorelease];
+	return tabController;
 }
 
 - (ViDocumentView *)createTabForDocument:(ViDocument *)document
@@ -512,7 +491,7 @@ DEBUG_FINALIZE();
 {
 	if (!_isLoaded) {
 		/* Defer until NIB is loaded. */
-		_initialDocument = [document retain];
+		_initialDocument = document;
 		return;
 	}
 
@@ -555,7 +534,7 @@ DEBUG_FINALIZE();
 
 - (void)message:(NSString *)fmt arguments:(va_list)ap
 {
-	[messageView setMessage:[[[NSString alloc] initWithFormat:fmt arguments:ap] autorelease]];
+	[messageView setMessage:[[NSString alloc] initWithFormat:fmt arguments:ap]];
 }
 
 - (void)message:(NSString *)fmt, ...
@@ -598,8 +577,7 @@ DEBUG_FINALIZE();
 		url = [NSURL URLWithString:[[url lastPathComponent] stringByAppendingString:@"/"]
 			     relativeToURL:url];
 
-	[_baseURL release];
-	_baseURL = [[url absoluteURL] retain];
+	_baseURL = [url absoluteURL];
 	[self synchronizeWindowTitleWithDocumentName];
 }
 
@@ -613,10 +591,9 @@ DEBUG_FINALIZE();
 	if (_checkURLDeferred) {
 		[_checkURLDeferred setDelegate:nil];
 		[_checkURLDeferred cancel];
-		[_checkURLDeferred release];
 	}
 
-	void (^blockCopy)(NSURL *, NSError *) = [[aBlock copy] autorelease];
+	void (^blockCopy)(NSURL *, NSError *) = [aBlock copy];
 	_checkURLDeferred = [[ViURLManager defaultManager] fileExistsAtURL:url
 							      onCompletion:^(NSURL *normalizedURL, BOOL isDirectory, NSError *error) {
 		if (error)
@@ -628,7 +605,7 @@ DEBUG_FINALIZE();
 		else
 			blockCopy(normalizedURL, nil);
 	}];
-	[_checkURLDeferred retain]; // must retain so deferred doesn't call a dealloced delegate. Cancel in dealloc.
+	 // must retain so deferred doesn't call a dealloced delegate. Cancel in dealloc.
 	[_checkURLDeferred setDelegate:self];
 }
 
@@ -676,7 +653,7 @@ DEBUG_FINALIZE();
 
 	[self displayDocument:document positioned:ViViewPositionDefault];
 
-	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+	NSAlert *alert = [[NSAlert alloc] init];
 	if (nmodified == 1) {
 		[alert setMessageText:[NSString stringWithFormat:@"The document \"%@\", has been changed by another application since you opened or saved it.",
 			[[document fileURL] lastPathComponent]]];
@@ -696,7 +673,7 @@ DEBUG_FINALIZE();
 	[alert beginSheetModalForWindow:[self window]
 			  modalDelegate:self
 			 didEndSelector:@selector(documentChangedAlertDidEnd:returnCode:contextInfo:)
-			    contextInfo:document];
+			    contextInfo:(__bridge void *)(document)];
 }
 
 - (void)revertAllModified
@@ -745,7 +722,7 @@ DEBUG_FINALIZE();
 			returnCode:(NSInteger)returnCode
 		       contextInfo:(void *)contextInfo
 {
-	ViDocument *document = contextInfo;
+	ViDocument *document = (__bridge ViDocument *)(contextInfo);
 
 	// 1. revert document
 	// 2. revert all documents
@@ -787,7 +764,6 @@ DEBUG_FINALIZE();
 	} else if (returnCode == NSAlertThirdButtonReturn + 1 && nbuttons == 4) {
 		for (document in _modifiedSet)
 			document.isTemporary = YES;
-		[_modifiedSet release];
 		_modifiedSet = nil;
 	}
 }
@@ -796,7 +772,6 @@ DEBUG_FINALIZE();
 {
 	BOOL askAllModified = [[NSUserDefaults standardUserDefaults] boolForKey:@"alwaysAskModifiedDocument"];
 	NSMutableSet *deletedSet = [NSMutableSet set];
-	[_modifiedSet release];
 	_modifiedSet = [[NSMutableSet alloc] init];
 	for (ViDocument *document in _documents) {
 		if (document.isTemporary || ![[document fileURL] isFileURL]) {
@@ -931,7 +906,7 @@ DEBUG_FINALIZE();
 	[[ViDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
 							    didCloseAllSelector:@selector(documentController:didCloseAll:contextInfo:)
-								    contextInfo:window];
+								    contextInfo:(__bridge void *)(window)];
 	return NO;
 }
 
@@ -973,8 +948,6 @@ DEBUG_FINALIZE();
 - (void)setCurrentView:(ViViewController *)viewController
 {
 	[self willChangeCurrentView]; // if it wasn't called before
-	[viewController retain];
-	[_currentView release];
 	_currentView = viewController;
 	[self didChangeCurrentView];
 }
@@ -1223,11 +1196,12 @@ DEBUG_FINALIZE();
 	       didCloseAll:(BOOL)didCloseAll
 	     tabController:(void *)tabController
 {
+	ViTabController *myTabController = (__bridge ViTabController *)tabController;
 	DEBUG(@"force close all views in tab %@: %s", (ViTabController *)tabController, didCloseAll ? "YES" : "NO");
 	if (didCloseAll) {
 		/* Close any views left in this tab. Do not ask for confirmation. */
-		while ([[(ViTabController *)tabController views] count] > 0) {
-			ViViewController *viewController = [[(ViTabController *)tabController views] objectAtIndex:0];
+		while ([[myTabController views] count] > 0) {
+			ViViewController *viewController = [[myTabController views] objectAtIndex:0];
 			[self willChangeCurrentView];
 			if (viewController == [self currentView]) {
 				[self setCurrentView:nil];
@@ -1238,16 +1212,15 @@ DEBUG_FINALIZE();
 				doc = [(ViDocumentView *)viewController document];
 			}
 
-			[(ViTabController *)tabController closeView:viewController]; // releases viewController
+			[myTabController closeView:viewController]; // releases viewController
 
 			/* If this was the last view of the document, close the document too. */
 			if (doc) {
 				[self closeOrUnlistDocument:doc unlessVisible:YES];
 			}
 		}
-		[self closeTabController:(ViTabController *)tabController];
+		[self closeTabController:myTabController];
 	}
-	[(ViTabController *)tabController release];
 }
 
 - (BOOL)tabView:(NSTabView *)aTabView shouldCloseTabViewItem:(NSTabViewItem *)tabViewItem
@@ -1286,7 +1259,7 @@ DEBUG_FINALIZE();
 	[[NSDocumentController sharedDocumentController] closeAllDocumentsInSet:set
 								   withDelegate:self
 							    didCloseAllSelector:@selector(documentController:didCloseAll:tabController:)
-								    contextInfo:[tabController retain]];
+								    contextInfo:(__bridge_retained void *)tabController];
 
 	return NO;
 }
@@ -1390,7 +1363,6 @@ DEBUG_FINALIZE();
 		}
 	}
 
-	[_alternateMarkCandidate release];
 	_alternateMarkCandidate = nil;
 }
 
@@ -1692,8 +1664,6 @@ DEBUG_FINALIZE();
 
 	DEBUG(@"goto mark %@ (view is %@)", mark, mark.view);
 
-	[[mark retain] autorelease];
-
 	if (mark.view && [[NSUserDefaults standardUserDefaults] boolForKey:@"prefertabs"]) {
 		/* Go to an existing view. View position is ignored. */
 		viewController = [self selectDocumentView:mark.view];
@@ -1834,10 +1804,8 @@ DEBUG_FINALIZE();
 		return NO;
 	}
 
-	[viewController retain];
 	[tabController detachView:viewController];
 	[self createTabWithViewController:viewController];
-	[viewController release];
 	return YES;
 }
 
@@ -1861,11 +1829,10 @@ extern BOOL __makeNewWindowInsteadOfTab;
 		return NO;
 	}
 
-	[viewController retain];
 	[tabController detachView:viewController];
 
 	__makeNewWindowInsteadOfTab = YES;
-	ViWindowController *winCon = [[[ViWindowController alloc] init] autorelease];
+	ViWindowController *winCon = [[ViWindowController alloc] init];
 	__makeNewWindowInsteadOfTab = NO;
 
 	[winCon setBaseURL:[self baseURL]];
@@ -1878,7 +1845,6 @@ extern BOOL __makeNewWindowInsteadOfTab;
 		[self selectDocumentView:tabController.selectedView];
 	}
 
-	[viewController release];
 	return YES;
 }
 
@@ -2393,7 +2359,7 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 	[messageView setHidden:NO];
 	[self focusEditor];
 
-	NSString *ret = [_exString autorelease];
+	NSString *ret = _exString;
 	_exString = nil;
 	return ret;
 }

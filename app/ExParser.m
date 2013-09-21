@@ -41,7 +41,7 @@
 - (ExParser *)init
 {
 	if ((self = [super init]) != nil) {
-		_map = [[ExMap defaultMap] retain];
+		_map = [ExMap defaultMap];
 	}
 	DEBUG_INIT();
 	return self;
@@ -50,8 +50,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_map release];
-	[super dealloc];
 }
 
 + (ExParser *)sharedParser
@@ -357,7 +355,7 @@
 		name = @"#";
 		if (completionLocation == [scan scanLocation]) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
+				*completionProviderPtr = [[ExCommandCompletion alloc] init];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange([scan scanLocation], 0);
 			return nil;
@@ -373,7 +371,7 @@
 		NSUInteger nameEnd = [scan scanLocation];
 		if (completionLocation >= nameStart && completionLocation <= nameEnd) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
+				*completionProviderPtr = [[ExCommandCompletion alloc] init];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(nameStart, completionLocation - nameStart);
 			return nil;
@@ -423,7 +421,7 @@
 				 */
 				addr1 = [ExAddress address];
 				addr1.type = ExAddressCurrent;
-				addr2 = [[addr1 copy] autorelease];
+				addr2 = [addr1 copy];
 			}
 		} else if (naddr == 1) {
 			/* Make addr2 same as addr1. */
@@ -538,7 +536,7 @@
 		// XXX: this could be better, recursive parsing?
 		if (completionLocation == [scan scanLocation]) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[[ExCommandCompletion alloc] init] autorelease];
+				*completionProviderPtr = [[ExCommandCompletion alloc] init];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(completionLocation, 0);
 			return nil;
@@ -643,7 +641,7 @@
                                  * used as a line range offset from the
                                  * last address.
 				 */
-				addr1 = [[addr2 copy] autorelease];
+				addr1 = [addr2 copy];
 				addr2.offset += count - 1;
 				DEBUG(@"%@ -> %@", addr1, addr2);
 			} else
@@ -713,7 +711,7 @@
 		NSUInteger pipeEnd = [scan scanLocation];
 		if (completionLocation >= pipeStart && completionLocation <= pipeEnd) {
 			if (completionProviderPtr)
-				*completionProviderPtr = [[[ViFileCompletion alloc] init] autorelease];
+				*completionProviderPtr = [[ViFileCompletion alloc] init];
 			if (completionRangePtr)
 				*completionRangePtr = NSMakeRange(completionLocation, 0); // XXX: this is wrong!
 			return nil;
@@ -749,7 +747,7 @@
 		if (completionLocation >= argStart && completionLocation <= argEnd) {
 			if (completionProviderPtr) {
 				if (mapping.completion == nil && expandFiles)
-					*completionProviderPtr = [[[ViFileCompletion alloc] init] autorelease];
+					*completionProviderPtr = [[ViFileCompletion alloc] init];
 				else
 					*completionProviderPtr = mapping.completion;
 			}
@@ -812,7 +810,7 @@
 {
 	static NSCharacterSet *__xset = nil;
 	if (__xset == nil)
-		__xset = [[NSCharacterSet characterSetWithCharactersInString:@"%#"] retain];
+		__xset = [NSCharacterSet characterSetWithCharactersInString:@"%#"];
 	if ([string rangeOfCharacterFromSet:__xset].location == NSNotFound)
 		return string;
 

@@ -54,8 +54,6 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (void)setSourceTabBar:(PSMTabBarControl *)tabBar
 {
-    [tabBar retain];
-    [_sourceTabBar release];
     _sourceTabBar = tabBar;
 }
 
@@ -66,8 +64,6 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (void)setDestinationTabBar:(PSMTabBarControl *)tabBar
 {
-    [tabBar retain];
-    [_destinationTabBar release];
     _destinationTabBar = tabBar;
 }
 
@@ -78,8 +74,6 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (void)setDraggedCell:(PSMTabBarCell *)cell
 {
-    [cell retain];
-    [_draggedCell release];
     _draggedCell = cell;
 }
 
@@ -120,8 +114,6 @@ static PSMTabDragAssistant *sharedDragAssistant = nil;
 
 - (void)setTargetCell:(PSMTabBarCell *)cell
 {
-    [cell retain];
-    [_targetCell release];
     _targetCell = cell;
 }
 
@@ -328,7 +320,7 @@ layout:
     [self distributePlaceholdersInTabBar:control];
     // replace dragged cell with a placeholder, and clean up surrounding cells
     int cellIndex = (int)[[control cells] indexOfObject:cell];
-    PSMTabBarCell *pc = [[[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:YES inControlView:control] autorelease];
+    PSMTabBarCell *pc = [[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:YES inControlView:control];
     [[control cells] replaceObjectAtIndex:cellIndex withObject:pc];
     [[control cells] removeObjectAtIndex:(cellIndex + 1)];
     [[control cells] removeObjectAtIndex:(cellIndex - 1)];
@@ -339,11 +331,11 @@ layout:
 {
     int i, numVisibleTabs = [control numberOfVisibleTabs];
     for(i = 0; i < numVisibleTabs; i++){
-        PSMTabBarCell *pc = [[[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:NO inControlView:control] autorelease]; 
+        PSMTabBarCell *pc = [[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:NO inControlView:control]; 
         [[control cells] insertObject:pc atIndex:(2 * i)];
     }
     if(numVisibleTabs > 0){
-        PSMTabBarCell *pc = [[[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:NO inControlView:control] autorelease];
+        PSMTabBarCell *pc = [[PSMTabBarCell alloc] initPlaceholderWithFrame:[[self draggedCell] frame] expanded:NO inControlView:control];
         if([[control cells] count] > (2 * numVisibleTabs)){
             [[control cells] insertObject:pc atIndex:(2 * numVisibleTabs)];
         } else {
@@ -388,16 +380,16 @@ layout:
     //self = [super initWithCoder:aDecoder];
     //if (self) {
         if ([aDecoder allowsKeyedCoding]) {
-            _sourceTabBar = [[aDecoder decodeObjectForKey:@"sourceTabBar"] retain];
-            _destinationTabBar = [[aDecoder decodeObjectForKey:@"destinationTabBar"] retain];
-            _participatingTabBars = [[aDecoder decodeObjectForKey:@"participatingTabBars"] retain];
-            _draggedCell = [[aDecoder decodeObjectForKey:@"draggedCell"] retain];
+            _sourceTabBar = [aDecoder decodeObjectForKey:@"sourceTabBar"];
+            _destinationTabBar = [aDecoder decodeObjectForKey:@"destinationTabBar"];
+            _participatingTabBars = [aDecoder decodeObjectForKey:@"participatingTabBars"];
+            _draggedCell = [aDecoder decodeObjectForKey:@"draggedCell"];
             _draggedCellIndex = [aDecoder decodeIntForKey:@"draggedCellIndex"];
             _isDragging = [aDecoder decodeBoolForKey:@"isDragging"];
-            _animationTimer = [[aDecoder decodeObjectForKey:@"animationTimer"] retain];
-            _sineCurveWidths = [[aDecoder decodeObjectForKey:@"sineCurveWidths"] retain];
+            _animationTimer = [aDecoder decodeObjectForKey:@"animationTimer"];
+            _sineCurveWidths = [aDecoder decodeObjectForKey:@"sineCurveWidths"];
             _currentMouseLoc = [aDecoder decodePointForKey:@"currentMouseLoc"];
-            _targetCell = [[aDecoder decodeObjectForKey:@"targetCell"] retain];
+            _targetCell = [aDecoder decodeObjectForKey:@"targetCell"];
         }
     //}
     return self;

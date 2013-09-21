@@ -46,8 +46,8 @@
 @property(nonatomic,readonly) NSString *path;
 @property(nonatomic,readonly) NSArray *items;
 @property(nonatomic,readonly) NSArray *preferences;
-@property(nonatomic,readonly) NSString *name;
-@property(nonatomic,readonly) NSString *uuid;
+@property(weak, nonatomic,readonly) NSString *name;
+@property(weak, nonatomic,readonly) NSString *uuid;
 
 + (NSColor *)hashRGBToColor:(NSString *)hashRGB;
 + (void)normalizeSettings:(NSDictionary *)settings

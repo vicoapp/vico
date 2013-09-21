@@ -86,7 +86,7 @@
 	if ((self = [super init]) != nil) {
 		_history = [[ViJumpList alloc] init];
 		[_history setDelegate:self];
-		_font = [[NSFont systemFontOfSize:11.0] retain];
+		_font = [NSFont systemFontOfSize:11.0];
 		_expandedSet = [[NSMutableSet alloc] init];
 		_contextObjects = [[NSMutableSet alloc] init];
 		_width = 200.0;
@@ -107,29 +107,15 @@
 	[defaults removeObserver:self forKeyPath:@"exploresortfolders"];
 	[defaults removeObserver:self forKeyPath:@"skipPattern"];
 
-	[_rootURL release];
-	[_history release];
-	[_font release];
-	[_expandedSet release];
-	[_contextObjects release];
-	[_statusImages release];
-	[_filteredItems release];
-	[_itemsToFilter release];
-	[_rx release];
-	[_skipRegex release];
-	[_rootItems release];
-	[super dealloc];
 }
 
 - (void)compileSkipPattern
 {
 	NSError *error = nil;
 	NSString *pattern = [[NSUserDefaults standardUserDefaults] stringForKey:@"skipPattern"];
-	[_skipRegex release];
 	_skipRegex = [[ViRegexp alloc] initWithString:pattern options:0 error:&error];
 	if (error) {
 		[windowController message:@"Invalid regular expression in skipPattern: %@", [error localizedDescription]];
-		[_skipRegex release];
 		_skipRegex = nil;
 	}
 }
@@ -206,7 +192,6 @@
 {
 	if ([keyPath isEqualToString:@"skipPattern"]) {
 		[self compileSkipPattern];
-		[_rootItems release];
 		_rootItems = nil;
 		[explorer reloadData];
 		[self browseURL:_rootURL];
@@ -315,7 +300,7 @@
 	ViURLManager *um = [ViURLManager defaultManager];
 
 	// make a retainable copy on the heap
-	void (^blockCopy)(NSMutableArray *, NSError *) = [[aBlock copy] autorelease];
+	void (^blockCopy)(NSMutableArray *, NSError *) = [aBlock copy];
 	id<ViDeferred> deferred = [um contentsOfDirectoryAtURL:url onCompletion:^(NSArray *files, NSError *error) {
 		[progressIndicator setHidden:YES];
 		[progressIndicator stopAnimation:nil];
@@ -373,17 +358,14 @@
 {
 	NSParameterAssert(aURL);
 
-	NSURL *prevRootURL = [_rootURL retain];
+	NSURL *prevRootURL = _rootURL;
 
-	[aURL retain];
-	[_rootURL release];
 	_rootURL = aURL;
 
 	[self childrenAtURL:aURL onCompletion:^(NSMutableArray *children, NSError *error) {
 		if (error) {
 			NSAlert *alert = [NSAlert alertWithError:error];
 			[alert runModal];
-			[_rootURL release];
 			_rootURL = prevRootURL;
 		} else {
 			if (jump)
@@ -391,11 +373,8 @@
 			if (display)
 				[self openExplorerTemporarily:NO];
 
-			[children retain];
-			[_rootItems release];
 			_rootItems = children;
 
-			[prevRootURL release];
 
 			[self filterFiles:self];
 			[self resetExpandedItems];
@@ -720,7 +699,7 @@
 			     returnCode:(NSInteger)returnCode
 			    contextInfo:(void *)contextInfo
 {
-	NSMutableSet *openDocs = contextInfo; // object survived because we also stored a strong reference in _contextObjects
+	NSMutableSet *openDocs = (__bridge NSMutableSet *)contextInfo; // object survived because we also stored a strong reference in _contextObjects
 
 	if (returnCode != NSAlertFirstButtonReturn) {
 		for (ViDocument *doc in openDocs)
@@ -734,7 +713,7 @@
                returnCode:(NSInteger)returnCode
               contextInfo:(void *)contextInfo
 {
-	NSMutableArray *urls = contextInfo; // object survived because we also stored a strong reference in _contextObjects
+	NSMutableArray *urls = (__bridge NSMutableArray *)contextInfo; // object survived because we also stored a strong reference in _contextObjects
 
 	if (returnCode != NSAlertFirstButtonReturn) {
 		[_contextObjects removeObject:urls];
@@ -787,7 +766,7 @@
 			[alert beginSheetModalForWindow:window
 					  modalDelegate:self
 					 didEndSelector:@selector(deletedOpenDocumentsAlertDidEnd:returnCode:contextInfo:)
-					    contextInfo:openDocs];
+					    contextInfo:(__bridge void *)(openDocs)];
 
 		}
 	}];
@@ -832,7 +811,7 @@
 	[alert beginSheetModalForWindow:window
 			  modalDelegate:self
 			 didEndSelector:@selector(removeAlertDidEnd:returnCode:contextInfo:)
-			    contextInfo:urls];
+			    contextInfo:(__bridge void *)urls];
 }
 
 - (NSSet *)clickedURLs
@@ -1246,7 +1225,7 @@
 	if (!_isFiltering || [_itemsToFilter count] == 0)
 		return;
 
-	ViFile *file = [[[_itemsToFilter objectAtIndex:0] retain] autorelease];
+	ViFile *file = [_itemsToFilter objectAtIndex:0];
 	[_itemsToFilter removeObjectAtIndex:0];
 
 	if ([file hasCachedChildren]) {
@@ -1338,7 +1317,6 @@
 	if ([filter length] == 0) {
 		_isFiltered = NO;
 		_isFiltering = NO;
-		[_filteredItems release];
 		_filteredItems = [[NSMutableArray alloc] initWithArray:_rootItems];
 		[explorer reloadData];
 		[self resetExpandedItems];
@@ -1350,14 +1328,11 @@
 		[self appendFilter:filter toPattern:pattern fuzzyClass:@"[^/]"];
 		[pattern appendString:@"[^/]*$"];
 
-		[_rx release];
 		_rx = [[ViRegexp alloc] initWithString:pattern
 					       options:ONIG_OPTION_IGNORECASE];
 
-		[_filteredItems release];
 		_filteredItems = [[NSMutableArray alloc] init];
 
-		[_itemsToFilter release];
 		_itemsToFilter = [[NSMutableArray alloc] init];
 
 		_isFiltered = YES;
@@ -1616,8 +1591,7 @@ doCommandBySelector:(SEL)aSelector
 		ViFile *file = [self fileForItem:item];
 		file.children = children;
 	} else if ([url isEqual:_rootURL]) {
-		[_rootItems release];
-		_rootItems = [children retain];
+		_rootItems = children;
 		if (!_isFiltered || _isFiltering)
 			[self filterFiles:self];
 	} else {
@@ -1662,7 +1636,7 @@ doCommandBySelector:(SEL)aSelector
 	if (selectedURL == nil) {
 		id selectedItem = [explorer itemAtRow:[explorer selectedRow]];
 		ViFile *selectedFile = [self fileForItem:selectedItem];
-		selectedURL = [[selectedFile.url retain] autorelease];
+		selectedURL = selectedFile.url;
 	}
 
 	[urlman flushCachedContentsOfDirectoryAtURL:aURL];
@@ -1886,7 +1860,6 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 
 - (void)setStatusImages:(NSDictionary *)dictionary
 {
-	[_statusImages release];
 	_statusImages = [dictionary mutableCopy];
 	[explorer reloadData];
 }

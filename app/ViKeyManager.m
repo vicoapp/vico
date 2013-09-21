@@ -45,30 +45,29 @@
 
 static ViKeyManager *macroRecorder = nil;
 
-@synthesize parser = _parser;
-@synthesize target = _target;
+@synthesize parser, target;
 @synthesize isRecordingMacro = _isRecordingMacro;
 
 + (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
 				parser:(ViParser *)aParser
 {
-	return [[[ViKeyManager alloc] initWithTarget:aTarget parser:aParser] autorelease];
+	return [[ViKeyManager alloc] initWithTarget:aTarget parser:aParser];
 }
 
 + (ViKeyManager *)keyManagerWithTarget:(id<ViKeyManagerTarget>)aTarget
 			    defaultMap:(ViMap *)map
 {
-	return [[[ViKeyManager alloc] initWithTarget:aTarget defaultMap:map] autorelease];
+	return [[ViKeyManager alloc] initWithTarget:aTarget defaultMap:map];
 }
 
 - (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
                           parser:(ViParser *)aParser
 {
 	if ((self = [super init]) != nil) {
-		_parser = [aParser retain];
-		_target = aTarget; // XXX: not retained!
+		parser = aParser;
+		target = aTarget;
 
-        _recordedKeys = [[NSMutableString stringWithCapacity:0] retain];
+        _recordedKeys = [NSMutableString stringWithCapacity:0];
 	}
 	DEBUG_INIT();
 	return self;
@@ -81,10 +80,6 @@ static ViKeyManager *macroRecorder = nil;
 	}
 
 	DEBUG_DEALLOC();
-	[_parser release];
-	[_keyTimeout release];
-	[_recordedKeys release];
-	[super dealloc];
 }
 
 - (ViKeyManager *)initWithTarget:(id<ViKeyManagerTarget>)aTarget
@@ -96,8 +91,8 @@ static ViKeyManager *macroRecorder = nil;
 
 - (void)presentError:(NSError *)error
 {
-	if ([_target respondsToSelector:@selector(keyManager:presentError:)])
-		[_target performSelector:@selector(keyManager:presentError:)
+	if ([target respondsToSelector:@selector(keyManager:presentError:)])
+		[target performSelector:@selector(keyManager:presentError:)
 			      withObject:self
 			      withObject:error];
 }
@@ -240,10 +235,8 @@ static ViKeyManager *macroRecorder = nil;
 		return [self runMacro:command];
 
 	SEL action = @selector(keyManager:evaluateCommand:);
-	if ([_target respondsToSelector:action])
-		return (BOOL)[_target performSelector:action
-					   withObject:self
-					   withObject:command];
+	if ([target respondsToSelector:action])
+		return [target keyManager:self evaluateCommand:command];
 
 	return NO;
 }
@@ -252,11 +245,10 @@ static ViKeyManager *macroRecorder = nil;
       allowMacros:(BOOL)allowMacros
           inScope:(ViScope *)scope
 	fromMacro:(ViMacro *)callingMacro
-       excessKeys:(NSArray **)excessKeys
+       excessKeys:(NSArray * __strong *)excessKeys
             error:(NSError **)outError
 {
 	[_keyTimeout invalidate];
-	[_keyTimeout release];
 	_keyTimeout = nil;
 
 	if (macroRecorder) {
@@ -272,17 +264,14 @@ static ViKeyManager *macroRecorder = nil;
 	}
 
 	SEL shouldSel = @selector(keyManager:shouldParseKey:inScope:);
-	if ([_target respondsToSelector:shouldSel]) {
-		if (![_target keyManager:self 
-				  shouldParseKey:[NSNumber numberWithInteger:keyCode]
-						 inScope:scope]) {
-			return YES; // the target handled the key already.
-		}
+	if ([target respondsToSelector:shouldSel]) {
+		if (! [target keyManager:self shouldParseKey:@(keyCode) inScope:scope])
+			return YES;
 	}
 
 	NSError *error = nil;
 	BOOL timeout = NO;
-	id command = [_parser pushKey:keyCode
+	id command = [parser pushKey:keyCode
 			  allowMacros:allowMacros
 				scope:scope
 			      timeout:&timeout
@@ -297,17 +286,16 @@ static ViKeyManager *macroRecorder = nil;
 			*outError = error;
 		return NO;
 	} else {
-		if ([_target respondsToSelector:@selector(keyManager:partialKeyString:)]) {
-			[_target keyManager:self partialKeyString:_parser.keyString];
+		if ([target respondsToSelector:@selector(keyManager:partialKeyString:)]) {
+			[target keyManager:self partialKeyString:parser.keyString];
 		}
 
 		if (timeout && callingMacro == nil) {
-			[_keyTimeout release];
-			_keyTimeout = [[NSTimer scheduledTimerWithTimeInterval:1.0
+			_keyTimeout = [NSTimer scheduledTimerWithTimeInterval:1.0
 									target:self
 								      selector:@selector(keyTimedOut:)
 								      userInfo:scope
-								       repeats:NO] retain];
+								       repeats:NO];
 		}
 	}
 
@@ -367,7 +355,7 @@ static ViKeyManager *macroRecorder = nil;
 {
 	NSError *error = nil;
 	ViScope *scope = [timer userInfo];
-	id command = [_parser timeoutInScope:scope error:&error];
+	id command = [parser timeoutInScope:scope error:&error];
 	if (command)
 		[self evalCommand:command];
 	else if (error)
@@ -376,7 +364,7 @@ static ViKeyManager *macroRecorder = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent inScope:(ViScope *)scope
 {
-	BOOL partial = _parser.partial;
+	BOOL partial = parser.partial;
 	NSError *error = nil;
 	NSArray *excessKeys = nil;
 	[self handleKey:[theEvent normalizedKeyCode]

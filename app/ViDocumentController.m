@@ -43,17 +43,17 @@
 {
 	DEBUG(@"should%s terminate", flag ? "" : " NOT");
 	DEBUG(@"calling delegate %@ selector %@", _closeAllDelegate, NSStringFromSelector(_closeAllSelector));
+	ViDocumentController __unsafe_unretained *thisController = self;
+	
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[_closeAllDelegate methodSignatureForSelector:_closeAllSelector]];
 	[invocation setSelector:_closeAllSelector];
-	[invocation setArgument:&self atIndex:2];
+	[invocation setArgument:&thisController atIndex:2];
 	[invocation setArgument:&flag atIndex:3];
 	[invocation setArgument:&_closeAllContextInfo atIndex:4];
 	[invocation invokeWithTarget:_closeAllDelegate];
 
-	[_closeAllSet release];
 	_closeAllSet = nil;
 
-	[_closeAllDelegate release];
 	_closeAllDelegate = nil;
 
 	_closeAllSelector = NULL;
@@ -127,7 +127,7 @@
 			  contextInfo:(void *)contextInfo
 {
 	DEBUG(@"%s", "closing all documents");
-	_closeAllDelegate = [delegate retain];
+	_closeAllDelegate = delegate;
 	_closeAllSelector = didCloseAllSelector;
 	_closeAllContextInfo = contextInfo;
 	_closeAllWindows = YES;
@@ -211,10 +211,9 @@
 	   didCloseAllSelector:(SEL)didCloseAllSelector
 		   contextInfo:(void *)contextInfo
 {
-	[_closeAllSet release];
 	_closeAllSet = [set mutableCopy];
 
-	_closeAllDelegate = [delegate retain];
+	_closeAllDelegate = delegate;
 	_closeAllSelector = didCloseAllSelector;
 	_closeAllContextInfo = contextInfo;
 

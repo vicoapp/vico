@@ -47,14 +47,9 @@
 
 + (ExAddress *)address
 {
-	return [[[ExAddress alloc] init] autorelease];
+	return [[ExAddress alloc] init];
 }
 
-- (void)dealloc
-{
-	[_pattern release];
-	[super dealloc];
-}
 
 - (NSString *)description
 {

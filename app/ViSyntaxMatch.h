@@ -40,7 +40,7 @@
 @property(nonatomic,readwrite) NSUInteger beginLocation;
 @property(nonatomic,readonly) NSUInteger beginLength;
 @property(nonatomic,readonly) ViRegexpMatch *beginMatch;
-@property(nonatomic,readwrite,retain) ViRegexpMatch *endMatch;
+@property(nonatomic,readwrite,strong) ViRegexpMatch *endMatch;
 
 - (id)initWithMatch:(ViRegexpMatch *)aMatch andPattern:(NSMutableDictionary *)aPattern atIndex:(int)i;
 - (NSComparisonResult)sortByLocation:(ViSyntaxMatch *)match;

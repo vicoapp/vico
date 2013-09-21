@@ -71,7 +71,7 @@
 
 - (void)addThemeWithPath:(NSString *)path
 {
-	ViTheme *theme = [[[ViTheme alloc] initWithPath:path] autorelease];
+	ViTheme *theme = [[ViTheme alloc] initWithPath:path];
 	if (theme)
 		[_themes setObject:theme forKey:[theme name]];
 }

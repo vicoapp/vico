@@ -28,7 +28,7 @@
 
 @interface ViBundleItem : NSObject
 {
-	__weak ViBundle	*_bundle;	// XXX: not retained!
+	ViBundle	*_bundle;
 	NSString	*_uuid;
 	NSString	*_name;
 	NSString	*_scopeSelector;
@@ -43,7 +43,7 @@
 	NSInteger	 _keyCode;
 }
 
-@property(nonatomic,readonly) __weak ViBundle *bundle;
+@property(nonatomic,readonly) ViBundle *bundle;
 @property(nonatomic,readonly) NSString *uuid;
 @property(nonatomic,readonly) NSString *name;
 @property(nonatomic,readonly) NSString *scopeSelector;

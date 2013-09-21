@@ -44,7 +44,7 @@
 @property(nonatomic,readonly) NSURL *targetURL;
 @property(nonatomic,readonly) NSDictionary *attributes;
 @property(nonatomic,readonly) NSDictionary *targetAttributes;
-@property(nonatomic,readwrite,retain) NSMutableArray *children;
+@property(nonatomic,readwrite,strong) NSMutableArray *children;
 @property(nonatomic,readonly) BOOL isDirectory;
 @property(nonatomic,readonly) BOOL isLink;
 @property(nonatomic,readonly) NSString *name;

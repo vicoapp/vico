@@ -32,7 +32,6 @@
  */
 @interface ViDocumentView : ViViewController
 {
-	IBOutlet NSView		*_innerView;
 	IBOutlet NSScrollView	*_scrollView;
 }
 

@@ -24,12 +24,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_PSMTabBarOverflowPopUpImage release];
-	[_PSMTabBarOverflowDownPopUpImage release];
-	[super dealloc];
-}
 
 - (void)drawRect:(NSRect)rect
 {

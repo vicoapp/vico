@@ -38,20 +38,12 @@
 - (ViTagsDatabase *)initWithBaseURL:(NSURL *)aURL
 {
 	if ((self = [super init]) != nil) {
-		_baseURL = [aURL retain];
+		_baseURL = aURL;
 		_tags = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_baseURL release];
-	[_tags release];
-	[_modificationDate release];
-	[_databaseURL release];
-	[super dealloc];
-}
 
 - (void)onOpen:(void (^)(NSError *error))aBlock
 {
@@ -135,7 +127,6 @@
 		} else
 			DEBUG(@"skipping tags line [%@]", line);
 	}
-	[strdata release];
 }
 
 - (void)onDatabaseChanged:(void (^)(NSError *error))aBlock

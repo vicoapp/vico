@@ -43,15 +43,15 @@
 }
 
 @property (nonatomic, readonly) NSString *content;
-@property (nonatomic, readwrite, retain) ViRegexpMatch *filterMatch;
+@property (nonatomic, readwrite, strong) ViRegexpMatch *filterMatch;
 @property (nonatomic, readwrite) NSUInteger prefixLength;
 @property (nonatomic, readwrite) BOOL filterIsFuzzy;
+@property (nonatomic, readwrite, strong) NSFont *font;
 @property (nonatomic, readwrite) BOOL isCurrentChoice;
-@property (nonatomic, readwrite, retain) NSFont *font;
 @property (nonatomic, readwrite) NSUInteger location;
-@property (nonatomic, readwrite, retain) id representedObject;
-@property (nonatomic, readwrite, retain) NSColor *markColor;
-@property (nonatomic, readwrite, retain) NSAttributedString *title;
+@property (nonatomic, readwrite, strong) id representedObject;
+@property (nonatomic, readwrite, strong) NSColor *markColor;
+@property (nonatomic, readwrite, strong) NSAttributedString *title;
 @property (nonatomic, readonly) double score;
 
 + (id)completionWithContent:(NSString *)aString;

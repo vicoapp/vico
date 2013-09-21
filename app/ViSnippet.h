@@ -44,13 +44,13 @@
 @property(readwrite) NSInteger num;
 @property(readwrite) NSUInteger index;
 @property(readwrite) NSRange range;
-@property(readwrite,retain) ViTabstop *parent;
-@property(readwrite,retain) ViTabstop *mirror;
-@property(readwrite,retain) ViRegexp *rx;
-@property(readwrite,retain) NSString *format;
-@property(readwrite,retain) NSString *options;
-@property(readwrite,retain) NSString *filter;
-@property(readwrite,retain) NSMutableString *value;
+@property(readwrite,strong) ViTabstop *parent;
+@property(readwrite,strong) ViTabstop *mirror;
+@property(readwrite,strong) ViRegexp *rx;
+@property(readwrite,strong) NSString *format;
+@property(readwrite,strong) NSString *options;
+@property(readwrite,strong) NSString *filter;
+@property(readwrite,strong) NSMutableString *value;
 
 @end
 
@@ -73,7 +73,7 @@
 	ViTabstop			*_currentTabStop;
 	NSUInteger			 _currentTabNum;
 	NSUInteger			 _maxTabNum;
-	__weak id<ViSnippetDelegate>	 _delegate;	// XXX: not retained!
+	id<ViSnippetDelegate>	 _delegate;
 	NSRange				 _range;
 	NSUInteger			 _caret;
 	NSRange				 _selectedRange;
@@ -87,7 +87,7 @@
 @property(nonatomic,readonly) NSUInteger caret;
 @property(nonatomic,readonly) NSRange selectedRange;
 @property(nonatomic,readonly) BOOL finished;
-@property(nonatomic,readwrite,retain) ViTabstop *currentTabStop;
+@property(nonatomic,readwrite,strong) ViTabstop *currentTabStop;
 
 - (ViSnippet *)initWithString:(NSString *)aString
                    atLocation:(NSUInteger)aLocation

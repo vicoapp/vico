@@ -131,7 +131,12 @@
 			return NO;
 		} else {
 			@try {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+				
 				result = [target performSelector:ex.mapping.action withObject:ex];
+				
+#pragma clang diagnostic pop
 			}
 			@catch (NSException *exception) {
 				INFO(@"got exception %@ while evaluating ex command %@:\n%@",

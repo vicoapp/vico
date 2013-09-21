@@ -73,7 +73,7 @@
 	NSURLConnection			*_installConnection;
 }
 
-@property (nonatomic,readwrite,retain) NSArray *filteredRepositories;
+@property (nonatomic,readwrite,strong) NSArray *filteredRepositories;
 
 - (IBAction)filterRepositories:(id)sender;
 - (IBAction)reloadRepositories:(id)sender;

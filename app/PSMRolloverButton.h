@@ -15,8 +15,8 @@
     NSTrackingRectTag   _myTrackingRectTag;
 }
 
-@property (nonatomic,readwrite,retain) NSImage *rolloverImage;
-@property (nonatomic,readwrite,retain) NSImage *usualImage;
+@property (nonatomic,readwrite,strong) NSImage *rolloverImage;
+@property (nonatomic,readwrite,strong) NSImage *usualImage;
 
 // tracking rect for mouse events
 - (void)addTrackingRect;

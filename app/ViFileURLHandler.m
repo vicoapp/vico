@@ -43,11 +43,11 @@
 
 @implementation ViFileDeferred
 
-@synthesize delegate = _delegate;
+@synthesize delegate;
 
 + (ViFileDeferred *)deferredWithHandler:(void (^)(NSArray *, NSError *))handler
 {
-	return [[[self alloc] initWithHandler:handler] autorelease];
+	return [[self alloc] initWithHandler:handler];
 }
 
 - (ViFileDeferred *)initWithHandler:(void (^)(NSArray *, NSError *))handler
@@ -61,12 +61,10 @@
 - (void)dealloc
 {
 	[self cancel];
-	[super dealloc];
 }
 
 - (void)cancel
 {
-	[_completionHandler release];
 	_completionHandler = nil;
 	_finished = YES;
 }
@@ -100,11 +98,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_fm release];
-	[super dealloc];
-}
 
 - (BOOL)respondsToURL:(NSURL *)aURL
 {
@@ -153,7 +146,6 @@
 				break;
 			}
 		}
-		[fileman release];
 
 		/* Schedule completion block on main queue. */
 //		[[deferred onMainAsync:NO] finishWithContents:contents error:error];

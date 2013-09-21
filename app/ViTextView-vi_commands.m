@@ -504,13 +504,14 @@
 - (void)filter:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
 {
 	if (status == 0) {
-		NSRange range = [(NSValue *)contextInfo rangeValue];
+		NSRange range = [(NSValue *)contextInfo[@"range"] rangeValue];
 		[self replaceRange:range withString:runner.stdoutString];
 		[self endUndoGroup];
 		final_location = range.location;
 		[self setCaret:final_location];
 	} else {
 		MESSAGE(@"filter exited with status %i", status);
+		DEBUG(@"filter existed with status %i, said %@\n%@", runner.stdoutString, runner.stderrString);
 		keepMessagesHack = YES;
 	}
 }
@@ -523,7 +524,7 @@
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:range];
 
-	NSTask *task = [[[NSTask alloc] init] autorelease];
+	NSTask *task = [[NSTask alloc] init];
 	[task setLaunchPath:@"/bin/bash"];
 	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
 
@@ -551,10 +552,13 @@
 	[_taskRunner launchTask:task
 	      withStandardInput:[inputText dataUsingEncoding:NSUTF8StringEncoding]
 	 asynchronouslyInWindow:nil
-			  title:shellCommand
-			 target:self
-		       selector:@selector(filter:finishedWithStatus:contextInfo:)
-		    contextInfo:[NSValue valueWithRange:range]];
+					  title:shellCommand
+					 target:self
+				contextInfo:@{
+								@"type": @"filter",
+								@"range": [NSValue valueWithRange:range]
+							 }];
+
 	return (_taskRunner.status == 0);
 }
 
@@ -1407,7 +1411,7 @@
 /* syntax: [count]; */
 - (BOOL)repeat_line_search_forward:(ViCommand *)command
 {
-	ViCommand *c = [[_keyManager.parser.lastLineSearchCommand copy] autorelease];
+	ViCommand *c = [_keyManager.parser.lastLineSearchCommand copy];
 	if (c == nil) {
 		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
@@ -1431,7 +1435,7 @@
 /* syntax: [count], */
 - (BOOL)repeat_line_search_backward:(ViCommand *)command
 {
-	ViCommand *c = [[_keyManager.parser.lastLineSearchCommand copy] autorelease];
+	ViCommand *c = [_keyManager.parser.lastLineSearchCommand copy];
 	if (c == nil) {
 		MESSAGE(@"No previous F, f, T or t search");
 		return NO;
@@ -2272,7 +2276,7 @@
 		[self gotoSymbol:[syms objectAtIndex:0]];
 	} else {
 		/* Sort symbols per document. */
-		NSMapTable *docs = [NSMapTable mapTableWithStrongToStrongObjects];
+		NSMapTable *docs = [NSMapTable strongToStrongObjectsMapTable];
 		for (ViMark *sym in syms) {
 			NSMutableArray *a = [docs objectForKey:sym.document];
 			if (a == nil) {
@@ -2283,7 +2287,7 @@
 		}
 		BOOL multiDocs = [docs count] > 1;
 
-		NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Symbol matches"] autorelease];
+		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Symbol matches"];
 		[menu setAllowsContextMenuPlugIns:NO];
 		int quickindex = 1;
 		for (ViDocument *doc in docs) {
@@ -2459,7 +2463,7 @@
 		m = [ViMark markWithURL:m.url line:m.line column:0];
 	} else if (isLatestJumpMark) {
 		/* Need to copy the mark as it's modified by pushCurrentLocationOnJumpList/setMark below. */
-		m = [[m copy] autorelease];
+		m = [m copy];
 	}
 
 	if (m.document != [self document]) {
@@ -3201,7 +3205,7 @@ again:
 	// [self removeFromInputKeys:command];
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[[ViWordCompletion alloc] init] autorelease]
+			     fromProvider:[[ViWordCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3218,7 +3222,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:path
-			     fromProvider:[[[ViFileCompletion alloc] init] autorelease]
+			     fromProvider:[[ViFileCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3236,7 +3240,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[[ViBufferCompletion alloc] init] autorelease]
+			     fromProvider:[[ViBufferCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3254,7 +3258,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[[ExCommandCompletion alloc] init] autorelease]
+			     fromProvider:[[ExCommandCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }
@@ -3273,7 +3277,7 @@ again:
 	}
 
 	return [self presentCompletionsOf:word
-			     fromProvider:[[[ViSyntaxCompletion alloc] init] autorelease]
+			     fromProvider:[[ViSyntaxCompletion alloc] init]
 				fromRange:range
 				  options:command.mapping.parameter];
 }

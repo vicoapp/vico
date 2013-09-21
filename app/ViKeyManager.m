@@ -92,9 +92,7 @@ static ViKeyManager *macroRecorder = nil;
 - (void)presentError:(NSError *)error
 {
 	if ([target respondsToSelector:@selector(keyManager:presentError:)])
-		[target performSelector:@selector(keyManager:presentError:)
-			      withObject:self
-			      withObject:error];
+		[target keyManager:self presentError:error];
 }
 
 - (BOOL)runMacro:(ViMacro *)macro interactively:(BOOL)interactiveFlag

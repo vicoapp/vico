@@ -54,7 +54,6 @@
 {
 	if ((self = [super init])) {
 		if (![NSBundle loadNibNamed:@"CompletionWindow" owner:self]) {
-			[self release];
 			return nil;
 		}
 
@@ -73,20 +72,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[window release]; // Top-level nib object
-	[_provider release];
-	[_completions release];
-	[_options release];
-	[_prefix release];
-	[_onlyCompletion release];
-	[_filteredCompletions release];
-	[_selection release];
-	[_filter release];
-	// [_matchParagraphStyle release];
-	[super dealloc];
-}
 
 - (void)updateBounds
 {
@@ -137,7 +122,6 @@
 - (void)completionResponse:(NSArray *)array error:(NSError *)error
 {
 	DEBUG(@"got completions: %@, error %@", array, error);
-	[_completions release];
 	_completions = [[NSMutableArray alloc] initWithArray:array];
 
 	NSUInteger ndropped = 0;
@@ -190,8 +174,7 @@
 			if ([window isVisible]) {
 				[self acceptByKey:0];
 			} else {
-				[_onlyCompletion release];
-				_onlyCompletion = [[_filteredCompletions objectAtIndex:0] retain];
+				_onlyCompletion = [_filteredCompletions objectAtIndex:0];
 			}
 		}
 
@@ -216,7 +199,6 @@
 	_delegate = aDelegate;
 	_existingKeyManager = existingKeyManager;
 
-	[_onlyCompletion release];
 	_onlyCompletion = nil;
 
 	if (initialFilter)
@@ -224,12 +206,12 @@
 	else
 		_filter = [[NSMutableString alloc] init];
 
-	_provider = [aProvider retain];
+	_provider = aProvider;
 
 	_range = aRange;
-	_prefix = [aPrefix retain];
+	_prefix = aPrefix;
 	_prefixLength = [aPrefix length];
-	_options = [optionString retain];
+	_options = optionString;
 	_fuzzySearch = ([_options rangeOfString:@"f"].location != NSNotFound);
 	// Aggressive means we auto-select a unique suggestion.
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
@@ -258,7 +240,7 @@
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 		[self reset];
 
-		ViCompletion *ret = [_onlyCompletion autorelease];
+		ViCompletion *ret = _onlyCompletion;
 		_onlyCompletion = nil;
 
 		return ret;
@@ -285,7 +267,7 @@
 
 	if (code == NSRunAbortedResponse)
 		return nil;
-	ViCompletion *ret = [_selection autorelease];
+	ViCompletion *ret = _selection;
 	_selection = nil;
 	return ret;
 }
@@ -310,14 +292,10 @@
 
 - (void)setCompletions:(NSMutableArray *)newCompletions
 {
-	[_filter release];
 	_filter = [[NSMutableString alloc] init];
 
-	[newCompletions retain];
-	[_completions release];
 	_completions = newCompletions;
 
-	[_filteredCompletions release];
 	_filteredCompletions = nil;
 
 	[self filterCompletions];
@@ -369,7 +347,6 @@
 					options:ONIG_OPTION_IGNORECASE];
 	}
 
-	[_filteredCompletions release];
 	_filteredCompletions = [[NSMutableArray alloc] init];
 
 	for (ViCompletion *c in _completions) {
@@ -402,29 +379,22 @@
 
 - (void)setFilter:(NSString *)aString
 {
-	[_filter release];
 	_filter = [aString mutableCopy];
 	[self filterCompletions];
 }
 
 - (void)reset
 {
-	[_completions release];
 	_completions = nil;
 
-	[_filteredCompletions release];
 	_filteredCompletions = nil;
 
-	[_filter release];
 	_filter = nil;
 
-	[_provider release];
 	_provider = nil;
 
-	[_prefix release];
 	_prefix = nil;
 
-	[_options release];
 	_options = nil;
 
 	_existingKeyManager = nil;
@@ -437,8 +407,8 @@
 	_terminatingKey = termKey;
 	NSInteger row = [tableView selectedRow];
 	if (row >= 0 && row < [_filteredCompletions count]) {
-		[_selection release];
-		_selection = [[self completionForRow:row] retain];
+		_selection = [_filteredCompletions objectAtIndex:row];
+		_selection = [self completionForRow:row];
 
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}

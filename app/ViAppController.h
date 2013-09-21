@@ -65,7 +65,7 @@ additionalBindings:(NSDictionary *)bindings
 
 @interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
 {
-	IBOutlet NSMenu		*encodingMenu;
+	IBOutlet NSMenu		*__weak encodingMenu;
 	IBOutlet NSMenu		*viewMenu;
 	IBOutlet NSTextField	*scriptInput;
 	IBOutlet NSTextView	*scriptOutput;
@@ -92,10 +92,10 @@ additionalBindings:(NSDictionary *)bindings
 	NuBlock			*_statusSetupBlock;
 }
 
-@property(nonatomic,readonly) NSMenu *encodingMenu;
+@property(weak, nonatomic,readonly) NSMenu *encodingMenu;
 @property(nonatomic,readonly) TISInputSourceRef original_input_source;
 
-@property(retain,readwrite) NuBlock *statusSetupBlock;
+@property(strong,readwrite) NuBlock *statusSetupBlock;
 
 - (id)eval:(NSString *)script
 withParser:(NuParser *)parser

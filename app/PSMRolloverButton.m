@@ -13,12 +13,6 @@
 @synthesize rolloverImage = _rolloverImage;
 @synthesize usualImage = _usualImage;
 
-- (void)dealloc
-{
-	[_rolloverImage release];
-	[_usualImage release];
-	[super dealloc];
-}
 
 - (void)addTrackingRect
 {

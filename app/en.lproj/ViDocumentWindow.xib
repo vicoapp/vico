@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12C54</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
-		<string key="IBDocument.AppKitVersion">1187.34</string>
-		<string key="IBDocument.HIToolboxVersion">625.00</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">2840</string>
@@ -608,13 +608,13 @@
 												<object class="NSTextField" id="24397800">
 													<reference key="NSNextResponder" ref="773548491"/>
 													<int key="NSvFlags">-2147483358</int>
-													<string key="NSFrame">{{31, 2.5}, {766, 18}}</string>
+													<string key="NSFrame">{{31, 2.5}, {766, 20}}</string>
 													<reference key="NSSuperview" ref="773548491"/>
 													<reference key="NSWindow"/>
 													<reference key="NSNextKeyView" ref="147447636"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="180256402">
-														<int key="NSCellFlags">-1804599231</int>
+														<int key="NSCellFlags">-1808793535</int>
 														<int key="NSCellFlags2">268469248</int>
 														<string key="NSContents"/>
 														<object class="NSFont" key="NSSupport">
@@ -660,6 +660,7 @@
 															<array class="NSMutableArray" key="NSMenuItems"/>
 															<reference key="NSMenuFont" ref="844670655"/>
 														</object>
+														<int key="NSSelectedIndex">-1</int>
 														<bool key="NSPullDown">YES</bool>
 														<int key="NSPreferredEdge">3</int>
 														<bool key="NSUsesItemFromMenu">YES</bool>
@@ -738,7 +739,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="402151357"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMinSize">{400, 271}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">documentWindow</string>
@@ -1681,7 +1682,7 @@
 					<string key="NSFrameSize">{382, 187}</string>
 					<reference key="NSNextKeyView" ref="391641068"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -3360,15 +3361,10 @@
 					<string key="className">PSMTabBarControl</string>
 					<string key="superclassName">NSControl</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="delegate">id</string>
 						<string key="partnerView">id</string>
 						<string key="tabView">NSTabView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="delegate">
-							<string key="name">delegate</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="partnerView">
 							<string key="name">partnerView</string>
 							<string key="candidateClassName">id</string>
@@ -3513,7 +3509,6 @@
 						<string key="actionButtonCell">ViToolbarPopUpButtonCell</string>
 						<string key="actionMenu">NSMenu</string>
 						<string key="altFilterField">NSSearchField</string>
-						<string key="delegate">id</string>
 						<string key="explorer">ViOutlineView</string>
 						<string key="explorerView">ViBgView</string>
 						<string key="filterField">NSSearchField</string>
@@ -3543,10 +3538,6 @@
 						<object class="IBToOneOutletInfo" key="altFilterField">
 							<string key="name">altFilterField</string>
 							<string key="candidateClassName">NSSearchField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="delegate">
-							<string key="name">delegate</string>
-							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="explorer">
 							<string key="name">explorer</string>

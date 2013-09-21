@@ -42,7 +42,7 @@
 symbolicAttributes:(NSDictionary *)sDictionary
 {
 	if ((self = [super init]) != nil) {
-		_attributes = [aDictionary retain];
+		_attributes = aDictionary;
 		_isLink = [[_attributes fileType] isEqualToString:NSFileTypeSymbolicLink];
 		if (!_isLink && [aURL isFileURL]) {
 			NSNumber *isAliasFile = nil;
@@ -62,24 +62,15 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_url release];
-	[_targetURL release];
-	[_attributes release];
-	[_targetAttributes release];
-	[_children release];
-	[_name release];
-	[_displayName release];
-	[_icon release];
-	[super dealloc];
 }
 
 + (id)fileWithURL:(NSURL *)aURL
        attributes:(NSDictionary *)aDictionary
 {
-	return [[[ViFile alloc] initWithURL:aURL
+	return [[ViFile alloc] initWithURL:aURL
 				 attributes:aDictionary
 			       symbolicLink:nil
-			 symbolicAttributes:nil] autorelease];
+			 symbolicAttributes:nil];
 }
 
 + (id)fileWithURL:(NSURL *)aURL
@@ -87,10 +78,10 @@ symbolicAttributes:(NSDictionary *)sDictionary
      symbolicLink:(NSURL *)sURL
 symbolicAttributes:(NSDictionary *)sDictionary
 {
-	return [[[ViFile alloc] initWithURL:aURL
+	return [[ViFile alloc] initWithURL:aURL
 				 attributes:aDictionary
 			       symbolicLink:sURL
-			 symbolicAttributes:sDictionary] autorelease];
+			 symbolicAttributes:sDictionary];
 }
 
 - (BOOL)hasCachedChildren
@@ -107,8 +98,6 @@ symbolicAttributes:(NSDictionary *)sDictionary
 
 - (void)setURL:(NSURL *)aURL
 {
-	[aURL retain];
-	[_url release];
 	_url = aURL;
 
 	_nameIsDirty = YES;
@@ -118,20 +107,14 @@ symbolicAttributes:(NSDictionary *)sDictionary
 
 - (void)setTargetURL:(NSURL *)aURL
 {
-	[aURL retain];
-	[_targetURL release];
 	_targetURL = aURL;
 	_iconIsDirty = YES;
 }
 
 - (void)setTargetURL:(NSURL *)aURL attributes:(NSDictionary *)aDictionary
 {
-	[aURL retain];
-	[_targetURL release];
 	_targetURL = aURL;
 
-	[aDictionary retain];
-	[_targetAttributes release];
 	_targetAttributes = aDictionary;
 
 	_iconIsDirty = YES;
@@ -150,8 +133,7 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (NSString *)name
 {
 	if (_nameIsDirty) {
-		[_name release];
-		_name = [[_url lastPathComponent] retain];
+		_name = [_url lastPathComponent];
 		_nameIsDirty = NO;
 	}
 	return _name;
@@ -160,11 +142,10 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (NSString *)displayName
 {
 	if (_displayNameIsDirty) {
-		[_displayName release];
 		if ([_url isFileURL])
-			_displayName = [[[NSFileManager defaultManager] displayNameAtPath:[_url path]] retain];
+			_displayName = [[NSFileManager defaultManager] displayNameAtPath:[_url path]];
 		else
-			_displayName = [[_url lastPathComponent] retain];
+			_displayName = [_url lastPathComponent];
 		_displayNameIsDirty = NO;
 	}
 	return _displayName;
@@ -173,7 +154,6 @@ symbolicAttributes:(NSDictionary *)sDictionary
 - (NSImage *)icon
 {
 	if (_iconIsDirty) {
-		[_icon release];
 		if ([_url isFileURL])
 			_icon = [[NSWorkspace sharedWorkspace] iconForFile:[[self targetURL] path]];
 		else if (_isDirectory)
@@ -193,7 +173,7 @@ symbolicAttributes:(NSDictionary *)sDictionary
 				      fraction:1.0];
 			[_icon unlockFocus];
 		} else
-			[_icon retain];
+			;
 
 		_iconIsDirty = NO;
 	}

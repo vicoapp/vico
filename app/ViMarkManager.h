@@ -31,7 +31,7 @@
 	NSMutableDictionary	*_groups;
 }
 
-@property (nonatomic, readonly) NSArray *groups;
+@property (weak, nonatomic, readonly) NSArray *groups;
 
 + (ViMarkGroup *)markGroupWithSelector:(SEL)aSelector;
 - (ViMarkGroup *)initWithSelector:(SEL)aSelector;
@@ -60,7 +60,7 @@
 }
 
 @property (nonatomic, readonly) NSArray *marks;
-@property (nonatomic, readwrite, retain) id userParameter;
+@property (nonatomic, readwrite, strong) id userParameter;
 
 + (ViMarkList *)markListWithIdentifier:(id)anIdentifier;
 + (ViMarkList *)markList;
@@ -101,7 +101,7 @@
 }
 
 @property (nonatomic, readwrite, copy) NSString *name;
-@property (nonatomic, readonly) ViMarkList *list;
+@property (weak, nonatomic, readonly) ViMarkList *list;
 @property (nonatomic, readwrite) NSInteger maxLists;
 
 + (ViMarkStack *)markStackWithName:(NSString *)name;

@@ -33,7 +33,7 @@
 	ExMap	*_map;
 }
 
-@property(nonatomic,readwrite,retain) ExMap *map;
+@property(nonatomic,readwrite,strong) ExMap *map;
 
 /** @returns A shared ex parser instance. */
 + (ExParser *)sharedParser;

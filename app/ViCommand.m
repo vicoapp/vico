@@ -46,13 +46,13 @@
 
 + (ViCommand *)commandWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
-	return [[[ViCommand alloc] initWithMapping:aMapping count:aCount] autorelease];
+	return [[ViCommand alloc] initWithMapping:aMapping count:aCount];
 }
 
 - (ViCommand *)initWithMapping:(ViMapping *)aMapping count:(int)aCount
 {
 	if ((self = [super init]) != nil) {
-		_mapping = [aMapping retain];
+		_mapping = aMapping;
 		_isLineMode = _mapping.isLineMode;
 		_count = _saved_count = aCount;
 	}
@@ -61,21 +61,20 @@
 
 - (void)dealloc
 {
-	[_mapping release];
 	[_motion setOperator:nil];
-	[_motion release];
-	[_macro release];
-	[_text release];
-	[_messages release];
-	[_keySequence release];
-	[super dealloc];
 }
 
 - (BOOL)performWithTarget:(id)target
 {
 	if (target == nil)
 		return NO;
+	
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+	
         return (BOOL)[target performSelector:_mapping.action withObject:self];
+	
+#pragma clang diagnostic pop
 }
 
 - (SEL)action
@@ -122,7 +121,7 @@
 	[copy setArgument:_argument];
 	[copy setReg:_reg];
 	if (_motion) {
-		ViCommand *motionCopy = [[_motion copy] autorelease];
+		ViCommand *motionCopy = [_motion copy];
 		[motionCopy setOperator:copy];
 		[copy setMotion:motionCopy];
 	} else

@@ -33,13 +33,13 @@
 
 + (id)macroWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys
 {
-	return [[[ViMacro alloc] initWithMapping:aMapping prefix:prefixKeys] autorelease];
+	return [[ViMacro alloc] initWithMapping:aMapping prefix:prefixKeys];
 }
 
 - (id)initWithMapping:(ViMapping *)aMapping prefix:(NSArray *)prefixKeys
 {
 	if ((self = [super init])) {
-		_mapping = [aMapping retain];
+		_mapping = aMapping;
 		_ip = 0;
 		_keys = [[aMapping.macro keyCodes] mutableCopy];
 		if ([prefixKeys count] > 0)
@@ -53,9 +53,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_mapping release];
-	[_keys release];
-	[super dealloc];
 }
 
 - (void)push:(NSNumber *)keyCode

@@ -46,8 +46,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_jumps release];
-	[super dealloc];
 }
 
 - (BOOL)push:(ViMark *)newJump
@@ -103,7 +101,7 @@
 {
 	DEBUG(@"position = %li, count = %u", _position, [_jumps count]);
 	if (_position <= 0)
-		return NO;
+		return nil;
 
 	if (_position >= [_jumps count] && fromJump) {
 		NSInteger savedPosition = _position;

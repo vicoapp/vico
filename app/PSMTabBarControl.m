@@ -72,7 +72,7 @@
 {
     static NSBundle *__bundle = nil;
     if (!__bundle)
-	    __bundle = [[NSBundle bundleForClass:[PSMTabBarControl class]] retain];
+	    __bundle = [NSBundle bundleForClass:[PSMTabBarControl class]];
     return __bundle;
 }
 
@@ -98,7 +98,6 @@
 
 - (void)initAddedProperties
 {
-	[_cells release];
 	_cells = [[NSMutableArray alloc] initWithCapacity:10];
 
 	// default config
@@ -113,7 +112,6 @@
 	_cellMinWidth = 100;
 	_cellMaxWidth = 280;
 	_cellOptimumWidth = 130;
-	[style release];
 	style = [[PSMMetalTabStyle alloc] init];
 	_animate = NO;
 
@@ -173,14 +171,6 @@
 
 	for (PSMTabBarCell *cell in _cells)
 		[self removeTabForCell:cell];
-	[_cells release];
-	[_overflowPopUpButton release];
-	[_addTabButton release];
-	[style release];
-	[tabView release];
-	[partnerView release];
-	[_lastMouseDownEvent release];
-	[super dealloc];
 }
 
 - (void)awakeFromNib
@@ -216,8 +206,6 @@
 
 - (void)setLastMouseDownEvent:(NSEvent *)event
 {
-	[event retain];
-	[_lastMouseDownEvent release];
 	_lastMouseDownEvent = event;
 }
 
@@ -233,7 +221,6 @@
 
 - (void)setStyleNamed:(NSString *)name
 {
-	[style release];
 	style = [[PSMMetalTabStyle alloc] init];
 
 	// restyle add tab button
@@ -357,7 +344,7 @@
 - (void)addTabViewItem:(NSTabViewItem *)item
 {
 	// create cell
-	PSMTabBarCell *cell = [[[PSMTabBarCell alloc] initWithControlView:self] autorelease];
+	PSMTabBarCell *cell = [[PSMTabBarCell alloc] initWithControlView:self];
 	[cell setRepresentedObject:item];
 
 	// bind the indicator to the represented object's status (if it exists)
@@ -451,7 +438,7 @@
     if(!_isHidden && !hide)
         return;
 
-    [[[[self subviews] copy] autorelease] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [[[self subviews] copy] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     _hideIndicators = YES;
 
     _isHidden = hide;
@@ -771,10 +758,10 @@
             // set up menu items
             NSMenuItem *menuItem;
             if(overflowMenu == nil){
-                overflowMenu = [[[NSMenu alloc] initWithTitle:@"TITLE"] autorelease];
+                overflowMenu = [[NSMenu alloc] initWithTitle:@"TITLE"];
                 [overflowMenu insertItemWithTitle:@"FIRST" action:nil keyEquivalent:@"" atIndex:0]; // Because the overflowPupUpButton is a pull down menu
             }
-            menuItem = [[[NSMenuItem alloc] initWithTitle:[[cell attributedStringValue] string] action:@selector(overflowMenuAction:) keyEquivalent:@""] autorelease];
+            menuItem = [[NSMenuItem alloc] initWithTitle:[[cell attributedStringValue] string] action:@selector(overflowMenuAction:) keyEquivalent:@""];
             [menuItem setTarget:self];
             [menuItem setRepresentedObject:[cell representedObject]];
             [cell setIsInOverflowMenu:YES];
@@ -1001,7 +988,7 @@
 		}
 	}
 
-	id representedObject = [[sender representedObject] retain];
+	id representedObject = [sender representedObject];
 
 	if ([[self delegate] respondsToSelector:@selector(tabView:willCloseTabViewItem:)])
 		[[self delegate] tabView:tabView willCloseTabViewItem:representedObject];
@@ -1011,7 +998,6 @@
 	if ([[self delegate] respondsToSelector:@selector(tabView:didCloseTabViewItem:)])
 		[[self delegate] tabView:tabView didCloseTabViewItem:representedObject];
 
-	[representedObject release];
 }
 
 - (void)tabClick:(id)sender
@@ -1125,7 +1111,7 @@
     NSArray *tabItems = [tabView tabViewItems];
     // go through cells, remove any whose representedObjects are not in [tabView tabViewItems]
     PSMTabBarCell *cell;
-    for(cell in [[_cells copy] autorelease])
+    for(cell in [_cells copy])
     {
         if(![tabItems containsObject:[cell representedObject]]){
             [self removeTabForCell:cell];

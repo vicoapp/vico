@@ -49,7 +49,7 @@
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
 {
-	IBOutlet NSWindow		*window;
+	IBOutlet NSWindow		* window;
 	IBOutlet ViCompletionView	*tableView;
 	IBOutlet NSTextField		*label;
 
@@ -64,7 +64,7 @@
 	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
-	id<ViCompletionDelegate>	 _delegate;
+	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
 	NSInteger			 _terminatingKey;
 	NSRange				 _range;
 	NSRect				 _prefixScreenRect;
@@ -74,12 +74,12 @@
 	BOOL				 _aggressive;
 }
 
-@property (nonatomic, readonly) id<ViCompletionDelegate> delegate;
+@property (unsafe_unretained, nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
-@property (nonatomic, readwrite, retain) NSArray *completions;
+@property (nonatomic, readwrite, strong) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;
-@property (nonatomic, readwrite, retain) NSString *filter;
+@property (nonatomic, readwrite, strong) NSString *filter;
 
 + (id)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;

@@ -45,7 +45,7 @@
 - (ViStreamBuffer *)initWithData:(NSData *)aData
 {
 	if ((self = [super init]) != nil) {
-		_data = [aData retain];
+		_data = aData;
 		_ptr = [_data bytes];
 		_length = _left = [_data length];
 	}
@@ -66,8 +66,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_data release];
-	[super dealloc];
 }
 
 - (void)setConsumed:(NSUInteger)size
@@ -89,10 +87,7 @@
 
 - (void)dealloc
 {
-	DEBUG_DEALLOC();
 	[self close];
-	[_outputBuffers release];
-	[super dealloc];
 }
 
 - (void)read
@@ -243,10 +238,8 @@ fd_write(CFSocketRef s,
 	 const void *data,
 	 void *info)
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	ViBufferedStream *stream = [[(ViBufferedStream *)info retain] autorelease];
+	ViBufferedStream *stream = (__bridge ViBufferedStream *)info;
 	[stream write];
-	[pool release];
 }
 
 static void
@@ -256,17 +249,20 @@ fd_read(CFSocketRef s,
 	const void *data,
 	void *info)
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	ViBufferedStream *stream = [[(ViBufferedStream *)info retain] autorelease];
+	ViBufferedStream *stream = (__bridge ViBufferedStream *)info;
 	switch (callbackType) {
-	case kCFSocketReadCallBack:
-		[stream read];
-		break;
-	case kCFSocketWriteCallBack:
-		[stream write];
-		break;
+		case kCFSocketReadCallBack:
+			[stream read];
+			break;
+		case kCFSocketWriteCallBack:
+			[stream write];
+			break;
+		case kCFSocketNoCallBack:
+		case kCFSocketAcceptCallBack:
+		case kCFSocketConnectCallBack:
+		case kCFSocketDataCallBack:
+			break;
 	}
-	[pool release];
 }
 
 /* Returns YES if one bidirectional socket is in use, NO if two unidirectional sockets (a pipe pair) is used. */
@@ -299,7 +295,7 @@ fd_read(CFSocketRef s,
 			}
 
 			bzero(&_inputContext, sizeof(_inputContext));
-			_inputContext.info = self; /* user data passed to the callbacks */
+			_inputContext.info = (__bridge void *)(self); /* user data passed to the callbacks */
 
 			CFSocketCallBackType cbType = kCFSocketReadCallBack;
 			if (_fd_out == _fd_in) {
@@ -338,7 +334,7 @@ fd_read(CFSocketRef s,
 				}
 
 				bzero(&_outputContext, sizeof(_outputContext));
-				_outputContext.info = self; /* user data passed to the callbacks */
+				_outputContext.info = (__bridge void *)(self); /* user data passed to the callbacks */
 
 				_outputSocket = CFSocketCreateWithNative(
 					kCFAllocatorDefault,
@@ -361,7 +357,7 @@ fd_read(CFSocketRef s,
 
 + (id)streamWithTask:(NSTask *)task
 {
-	return [[[ViBufferedStream alloc] initWithTask:task] autorelease];
+	return [[ViBufferedStream alloc] initWithTask:task];
 }
 
 - (id)initWithTask:(NSTask *)task
@@ -413,7 +409,6 @@ fd_read(CFSocketRef s,
 			if (outError) {
 				*outError = [ViError errorWithFormat:@"Path truncated."];
 			}
-			[self release];
 			return nil;
 		}
 		fd = socket(family, socktype, proto);
@@ -433,7 +428,6 @@ fd_read(CFSocketRef s,
 			if (outError) {
 				*outError = [ViError errorWithFormat:@"%@", gai_strerror(res)];
 			}
-			[self release];
 			return nil;
 		}
 
@@ -456,7 +450,6 @@ fd_read(CFSocketRef s,
 		if (outError) {
 			*outError = [ViError errorWithFormat:@"Failed to connect to %@:%@: %@", node, service, strerror(errno)];
 		}
-		[self release];
 		return nil;
 	}
 
@@ -475,7 +468,7 @@ fd_read(CFSocketRef s,
 
 + (id)streamWithHost:(NSString *)host port:(int)port
 {
-	return [[[self alloc] initWithHost:host port:port] autorelease];
+	return [[self alloc] initWithHost:host port:port];
 }
 
 - (id)initWithLocalSocket:(NSString *)file
@@ -490,7 +483,7 @@ fd_read(CFSocketRef s,
 
 + (id)streamWithLocalSocket:(NSString *)file
 {
-	return [[[self alloc] initWithLocalSocket:file] autorelease];
+	return [[self alloc] initWithLocalSocket:file];
 }
 
 - (void)open
@@ -550,9 +543,9 @@ fd_read(CFSocketRef s,
 {
 	DEBUG(@"adding to mode %@", mode);
 	if (_inputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)mode);
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)CFBridgingRetain(mode));
 	if (_outputSource)
-		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)mode);
+		CFRunLoopAddSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)CFBridgingRetain(mode));
 }
 
 - (void)schedule
@@ -564,9 +557,9 @@ fd_read(CFSocketRef s,
 {
 	DEBUG(@"removing from mode %@", mode);
 	if (_inputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)mode);
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _inputSource, (CFStringRef)CFBridgingRetain(mode));
 	if (_outputSource)
-		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)mode);
+		CFRunLoopRemoveSource([aRunLoop getCFRunLoop], _outputSource, (CFStringRef)CFBridgingRetain(mode));
 }
 
 - (BOOL)getBuffer:(const void **)buf length:(NSUInteger *)len
@@ -595,7 +588,7 @@ fd_read(CFSocketRef s,
 {
 	if (_outputSocket && length > 0) {
 		DEBUG(@"enqueueing %lu bytes on fd %i", length, CFSocketGetNative(_outputSocket));
-		[_outputBuffers addObject:[[[ViStreamBuffer alloc] initWithBuffer:buf length:length] autorelease]];
+		[_outputBuffers addObject:[[ViStreamBuffer alloc] initWithBuffer:buf length:length]];
 
 		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
 		if (_outputSocket == _inputSocket)
@@ -608,7 +601,7 @@ fd_read(CFSocketRef s,
 {
 	if (_outputSocket && [aData length] > 0) {
 		DEBUG(@"enqueueing %lu bytes on fd %i", [aData length], CFSocketGetNative(_outputSocket));
-		[_outputBuffers addObject:[[[ViStreamBuffer alloc] initWithData:aData] autorelease]];
+		[_outputBuffers addObject:[[ViStreamBuffer alloc] initWithData:aData]];
 
 		CFSocketCallBackType cbType = kCFSocketWriteCallBack;
 		if (_outputSocket == _inputSocket)

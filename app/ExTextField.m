@@ -24,6 +24,7 @@
  */
 
 #import "ExTextField.h"
+#import "ViBundleStore.h"
 #import "ViThemeStore.h"
 #import "ViTextView.h"
 #import "ExParser.h"
@@ -46,12 +47,6 @@
 	DEBUG(@"loaded %lu lines from history", [_history count]);
 }
 
-- (void)dealloc
-{
-	[_history release];
-	[_current release];
-	[super dealloc];
-}
 
 - (void)addToHistory:(NSString *)line
 {
@@ -73,21 +68,31 @@
 	ViTextView *editor = (ViTextView *)[[self window] fieldEditor:YES forObject:self];
 	DEBUG(@"using field editor %@", editor);
 
-	[_current release];
 	_current = nil;
 	_historyIndex = -1;
 
 	[editor setInsertMode:nil];
 	[editor setCaret:0];
 
+	ViTheme *defaultTheme = [[ViThemeStore defaultStore] defaultTheme];
+
+	[self setBackgroundColor:[defaultTheme backgroundColor]];
+
 	_running = YES;
-	return [super becomeFirstResponder];
+	
+	BOOL result = [super becomeFirstResponder];
+
+	editor.textContainerInset = NSMakeSize(0, 1);
+	editor.theme = defaultTheme;
+	ViLanguage *exLanguage = [[ViBundleStore defaultStore] languageWithScope:@"vico.ex"];
+	editor.document.syntaxParser = [ViSyntaxParser syntaxParserWithLanguage:exLanguage];
+
+	return result;
 }
 
 - (BOOL)navigateHistory:(BOOL)upwards prefix:(NSString *)prefix
 {
 	if (_historyIndex == -1) {
-		[_current release];
 		_current = [[self stringValue] copy];
 	}
 

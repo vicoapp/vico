@@ -37,8 +37,8 @@
 /** The range of characters this scope covers. */
 @property(nonatomic,readwrite) NSRange range;
 
-@property(nonatomic,readwrite,retain) NSArray *scopes;
-@property(nonatomic,readwrite,retain) NSDictionary *attributes;
+@property(nonatomic,readwrite,strong) NSArray *scopes;
+@property(nonatomic,readwrite,strong) NSDictionary *attributes;
 
 + (ViScope *)scopeWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;
 - (ViScope *)initWithScopes:(NSArray *)scopesArray range:(NSRange)aRange;

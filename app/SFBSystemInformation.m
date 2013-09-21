@@ -50,7 +50,7 @@ static NSString * stringForMIB(int *mib, u_int mib_length, NSError **error)
 		return nil;
 	}
 
-	return [result autorelease];
+	return result;
 }
 
 static NSNumber * intForMIB(int *mib, u_int mib_length, NSError **error)
@@ -195,7 +195,7 @@ static NSNumber * int64ForSysctlName(const char *name, NSError **error)
 		default:						familyName = nil;													break;
 	}
 
-	return [[familyName retain] autorelease];
+	return familyName;
 }
 
 - (NSString *) systemVersion

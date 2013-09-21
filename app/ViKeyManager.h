@@ -81,8 +81,6 @@
  */
 @interface ViKeyManager : NSObject
 {
-	ViParser			*_parser;
-	__weak id<ViKeyManagerTarget>	 _target;
 	NSTimer				*_keyTimeout;
 	NSInteger			 _recursionLevel;
 
@@ -94,12 +92,12 @@
 /** The vi key parser used by the key manager.
  * @see ViParser.
  */
-@property(nonatomic,readwrite,retain) ViParser *parser;
+@property(nonatomic,readwrite) ViParser *parser;
 
 /** The target object that evaluates the parsed commands. Should conform
  * to the ViKeyManagerTarget protocol.
  */
-@property(nonatomic,readwrite,assign) __weak id<ViKeyManagerTarget> target; // XXX: not retained!
+@property(nonatomic,readwrite) id<ViKeyManagerTarget> target;
 
 @property(nonatomic,readwrite) BOOL isRecordingMacro;
 

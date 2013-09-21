@@ -52,7 +52,7 @@
 	IBOutlet NSProgressIndicator	*progressIndicator;
 	IBOutlet NSToolbarItem		*searchToolbarItem;
 	IBOutlet NSPathControl		*pathControl;
-	IBOutlet id			 delegate;
+	IBOutlet id			 __unsafe_unretained delegate;
 
 	NSURL				*_rootURL;
 	CGFloat				 _width;
@@ -89,7 +89,7 @@
 	NSMutableSet			*_contextObjects; // XXX: not needed without GC (but maybe with ARC in the future?)
 }
 
-@property(nonatomic,readwrite,assign) id delegate;
+@property(nonatomic,readwrite,unsafe_unretained) id delegate;
 @property(nonatomic,readonly) ViOutlineView *outlineView;
 @property(nonatomic,readonly) NSURL *rootURL;
 

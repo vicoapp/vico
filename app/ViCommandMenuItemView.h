@@ -38,7 +38,7 @@
 
 @property (nonatomic, readonly) NSString *command;
 @property (nonatomic, readonly) NSString *title;
-@property (nonatomic, readwrite, retain) NSMutableDictionary *attributes;
+@property (nonatomic, readwrite, strong) NSMutableDictionary *attributes;
 
 - (id)initWithTitle:(NSString *)aTitle
 	    command:(NSString *)aCommand

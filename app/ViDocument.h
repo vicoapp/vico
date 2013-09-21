@@ -96,25 +96,25 @@
 	void (^_closeCallback)(int code);
 }
 
-@property(nonatomic,readwrite,retain) ViSnippet *snippet;
+@property(nonatomic,readwrite,strong) ViSnippet *snippet;
 @property(nonatomic,readonly) NSSet *views;
-@property(nonatomic,readwrite,retain) ViBundle *bundle;
-@property(nonatomic,readwrite,retain) ViTheme *theme;
-@property(nonatomic,readonly) ViLanguage *language;
-@property(nonatomic,readwrite,retain) NSArray *symbols;
-@property(nonatomic,readwrite,retain) NSArray *filteredSymbols;
-@property(nonatomic,readwrite,retain) NSDictionary *symbolScopes;
-@property(nonatomic,readwrite,retain) NSDictionary *symbolTransforms;
+@property(nonatomic,readwrite,strong) ViBundle *bundle;
+@property(nonatomic,readwrite,strong) ViTheme *theme;
+@property(nonatomic,readonly,strong) ViLanguage *language;
+@property(nonatomic,readwrite,strong) NSArray *symbols;
+@property(nonatomic,readwrite,strong) NSArray *filteredSymbols;
+@property(nonatomic,readwrite,strong) NSDictionary *symbolScopes;
+@property(nonatomic,readwrite,strong) NSDictionary *symbolTransforms;
 @property(nonatomic,readonly) NSStringEncoding encoding;
 @property(nonatomic,readwrite) BOOL isTemporary;
 @property(nonatomic,readwrite) BOOL busy;
 @property(nonatomic,readwrite,getter=isModified) BOOL modified;
 @property(nonatomic,readwrite,copy) void (^closeCallback)(int);
-@property(nonatomic,readwrite,retain) id<ViDeferred> loader;
+@property(nonatomic,readwrite,strong) id<ViDeferred> loader;
 @property(nonatomic,readwrite) BOOL ignoreChangeCountNotification;
 @property(nonatomic,readwrite) NSRange matchingParenRange;
-@property(nonatomic,readwrite,retain) ViDocumentView *hiddenView;
-@property(nonatomic,readwrite,retain) ViSyntaxParser *syntaxParser;
+@property(nonatomic,readwrite,strong) ViDocumentView *hiddenView;
+@property(nonatomic,readwrite,strong) ViSyntaxParser *syntaxParser;
 @property(nonatomic,readonly) NSSet *marks;
 @property(nonatomic,readonly) ViMarkStack *localMarks;
 

@@ -43,7 +43,7 @@
 {
 	if ((self = [super init]) != nil) {
 		_views = [[NSMutableArray alloc] init];
-		_window = [aWindow retain];
+		_window = aWindow;
 
 		NSRect frame = NSMakeRect(0, 0, 100, 100);
 		_splitView = [[NSSplitView alloc] initWithFrame:frame];
@@ -64,10 +64,6 @@
 {
 	DEBUG_DEALLOC();
 	[[ViEventManager defaultManager] clearFor:self];
-	[_views release];
-	[_window release];
-	[_splitView release];
-	[super dealloc];
 }
 
 - (void)addView:(ViViewController *)viewController
@@ -89,13 +85,11 @@
 		return;
 	}
 
-	[viewController retain];
 	[_views removeObject:viewController];
 	[viewController setTabController:nil];
 	if (viewController == _previousView) {
 		[self setPreviousView:nil];
 	}
-	[viewController release];
 }
 
 - (void)removeView:(ViViewController *)viewController
@@ -105,14 +99,12 @@
 		return;
 	}
 
-	[viewController retain];
 	[self unlistView:viewController];
 	[viewController detach];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViViewClosedNotification
 							    object:viewController];
 	[[ViEventManager defaultManager] emit:ViEventDidCloseView for:viewController with:viewController, nil];
 	[[ViEventManager defaultManager] clearFor:viewController];
-	[viewController release];
 }
 
 - (NSSet *)representedObjectsOfClass:(Class)class matchingCriteria:(BOOL (^)(id))block
@@ -223,7 +215,7 @@
 		 */
 		NSRect frame = [view frame];
 		frame.origin = NSMakePoint(0, 0);
-		NSSplitView *newSplit = [[[NSSplitView alloc] initWithFrame:frame] autorelease];
+		NSSplitView *newSplit = [[NSSplitView alloc] initWithFrame:frame];
 		[newSplit setVertical:isVertical];
 		[newSplit setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 		[newSplit setDividerStyle:NSSplitViewDividerStylePaneSplitter];

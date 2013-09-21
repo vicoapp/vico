@@ -36,7 +36,7 @@
 
 + (ViSyntaxContext *)syntaxContextWithLine:(NSUInteger)line
 {
-	return [[[ViSyntaxContext alloc] initWithLine:line] autorelease];
+	return [[ViSyntaxContext alloc] initWithLine:line];
 }
 
 - (ViSyntaxContext *)initWithLine:(NSUInteger)line
@@ -62,17 +62,11 @@
 	return self;
 }
 
-- (void)finalize
-{
-	free(_characters);
-	[super finalize];
-}
 
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
 	free(_characters);
-	[super dealloc];
 }
 
 @end

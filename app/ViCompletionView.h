@@ -30,6 +30,6 @@
 	ViKeyManager *_keyManager;
 }
 
-@property (nonatomic, readwrite, retain) ViKeyManager *keyManager;
+@property (nonatomic, readwrite, strong) ViKeyManager *keyManager;
 
 @end

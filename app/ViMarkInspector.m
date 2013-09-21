@@ -45,12 +45,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[markListController release];
-	[markStackController release];
-	[super dealloc];
-}
 
 - (void)awakeFromNib
 {

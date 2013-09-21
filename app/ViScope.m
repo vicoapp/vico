@@ -34,25 +34,19 @@
 
 + (ViScope *)scopeWithScopes:(NSArray *)scopesArray range:(NSRange)aRange
 {
-	return [[[ViScope alloc] initWithScopes:scopesArray range:aRange] autorelease];
+	return [[ViScope alloc] initWithScopes:scopesArray range:aRange];
 }
 
 - (ViScope *)initWithScopes:(NSArray *)scopesArray
                       range:(NSRange)aRange
 {
 	if ((self = [super init]) != nil) {
-		_scopes = [scopesArray retain]; // XXX: retain or copy?
+		_scopes = scopesArray; // XXX: retain or copy?
 		_range = aRange;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_scopes release];
-	[_attributes release];
-	[super dealloc];
-}
 
 - (int)compareBegin:(ViScope *)otherContext
 {

@@ -36,30 +36,22 @@
              icon:(NSImage *)anIcon
 {
 	if ((self = [super init]) != nil) {
-		if (![nib instantiateNibWithOwner:self topLevelObjects:nil]) {
-			[self release];
+		if (![nib instantiateWithOwner:self topLevelObjects:nil]) {
 			return nil;
 		}
 		_paneName = [aName copy];
-		_icon = [anIcon retain];
+		_icon = anIcon;
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-	[_paneName release];
-	[_icon release];
-	[view release];
-	[super dealloc];
-}
 
 - (id)initWithNibName:(NSString *)nibName
                  name:(NSString *)aName
                  icon:(NSImage *)anIcon
 {
-	return [self initWithNib:[[[NSNib alloc] initWithNibNamed:nibName bundle:nil] autorelease]
+	return [self initWithNib:[[NSNib alloc] initWithNibNamed:nibName bundle:nil]
 			    name:aName
 			    icon:anIcon];
 }

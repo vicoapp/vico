@@ -265,7 +265,7 @@
 
 - (NSString *)titleize
 {
-	ViTransformer *transformer = [[[ViTransformer alloc] init] autorelease];
+	ViTransformer *transformer = [[ViTransformer alloc] init];
 	ViRegexp *rx = [ViRegexp regexpWithString:@"(_|^|(?=[[:upper:]]))([[:alpha:]][[:lower:]]+)(:$)?"];
 	return [[transformer transformValue:self withPattern:rx format:@"$2 " global:YES error:nil] capitalizedString];
 }

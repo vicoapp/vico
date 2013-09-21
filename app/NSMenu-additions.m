@@ -51,7 +51,7 @@ static ViRegexp *__rx = nil;
 			DEBUG(@"updating menuitem %@, title %@", item, title);
 			ViRegexpMatch *m = [__rx matchInString:title];
 			if (m && [m count] == 4) {
-				NSMutableString *newTitle = [[title mutableCopy] autorelease];
+				NSMutableString *newTitle = [title mutableCopy];
 				[newTitle replaceCharactersInRange:[m rangeOfMatchedString]
 							withString:@""];
 				DEBUG(@"title %@ -> %@, got %lu matches", title, newTitle, [m count]);
@@ -101,7 +101,6 @@ static ViRegexp *__rx = nil;
 					view = [[ViCommandMenuItemView alloc] initWithTitle:newTitle
 										    command:command
 										       font:[self font]];
-					[view autorelease];
 				} else {
 					view.title = newTitle;
 					view.command = command;

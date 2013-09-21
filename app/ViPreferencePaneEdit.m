@@ -63,14 +63,10 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_preferences release];
-	[super dealloc];
-}
 
-- (IBAction)selectScope:(id)sender
+- (IBAction)selectScope:(id)aSender
 {
+	NSMenuItem *sender = (NSMenuItem *)aSender;
 	[scopeButton selectItem:sender];
 	[revertButton setEnabled:[sender tag] != -2];
 
@@ -94,7 +90,7 @@
 		return;
 
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
+	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
 	if (prefs == nil)
 		prefs = [NSMutableDictionary dictionary];
 
@@ -110,7 +106,7 @@
 - (void)deletePreferenceScope:(NSString *)scope
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
+	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
 	if (prefs == nil)
 		return;
 	[prefs removeObjectForKey:scope];
@@ -140,7 +136,7 @@
 
 - (IBAction)revertPreferenceScope:(id)sender
 {
-	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+	NSAlert *alert = [[NSAlert alloc] init];
 	[alert setMessageText:@"Do you want to delete this scope or copy from defaults?"];
 	[alert addButtonWithTitle:@"Copy"];
 	[alert addButtonWithTitle:@"Delete"];
@@ -263,8 +259,8 @@
 	NSString *scope = [scopeButton titleOfSelectedItem];
 	DEBUG(@"setting preference %@ to %@ in scope %@", key, value, scope);
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary *prefs = [[[defs dictionaryForKey:@"scopedPreferences"] mutableCopy] autorelease];
-	NSMutableDictionary *scopedPrefs = [[[prefs objectForKey:scope] mutableCopy] autorelease];
+	NSMutableDictionary *prefs = [[defs dictionaryForKey:@"scopedPreferences"] mutableCopy];
+	NSMutableDictionary *scopedPrefs = [[prefs objectForKey:scope] mutableCopy];
 	[scopedPrefs setObject:value forKey:key];
 	[prefs setObject:scopedPrefs forKey:scope];
 	[defs setObject:prefs forKey:@"scopedPreferences"];

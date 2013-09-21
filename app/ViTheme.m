@@ -31,7 +31,7 @@
 
 + (id)themeWithPath:(NSString *)aPath
 {
-	return [[[ViTheme alloc] initWithPath:aPath] autorelease];
+	return [[ViTheme alloc] initWithPath:aPath];
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -43,13 +43,11 @@
 	_theme = [[NSMutableDictionary alloc] initWithContentsOfFile:aPath];
 	if (![_theme isKindOfClass:[NSDictionary class]]) {
 		INFO(@"failed to parse theme %@", aPath);
-		[self release];
 		return nil;
 	}
 
 	if ([[self name] length] == 0) {
 		INFO(@"Missing 'name' in theme %@", aPath);
-		[self release];
 		return nil;
 	}
 
@@ -62,8 +60,6 @@
 			NSMutableDictionary *tmp = [preference objectForKey:@"settings"];
 			if (![tmp isKindOfClass:[NSDictionary class]])
 				continue;
-			[tmp retain];
-			[_defaultSettings release];
 			_defaultSettings = tmp;
 
 			id value;
@@ -72,7 +68,6 @@
 				_smartPairMatchAttributes = [[NSMutableDictionary alloc] init];
 				[ViBundle normalizeSettings:value intoDictionary:_smartPairMatchAttributes];
 				if ([_smartPairMatchAttributes count] == 0) {
-					[_smartPairMatchAttributes release];
 					_smartPairMatchAttributes = nil;
 				}
 			}
@@ -89,27 +84,11 @@
 		[ViBundle normalizePreference:preference intoDictionary:attrs];
 
 		[_themeAttributes setObject:attrs forKey:scopeSelector];
-		[attrs release];
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-	[_theme release];
-	[_themeAttributes release];
-	[_scopeSelectorCache release];
-	[_defaultSettings release];
-	[_smartPairMatchAttributes release];
-	[_backgroundColor release];
-	[_foregroundColor release];
-	[_caretColor release];
-	[_lineHighlightColor release];
-	[_selectionColor release];
-	[_invisiblesColor release];
-	[super dealloc];
-}
 
 - (NSString *)name
 {
@@ -121,8 +100,8 @@
 	if (_smartPairMatchAttributes == nil) {
 		// _smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[self selectionColor]
 		// 						        forKey:NSBackgroundColorAttributeName];
-		_smartPairMatchAttributes = [[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleDouble]
-									 forKey:NSUnderlineStyleAttributeName] retain];
+		_smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleDouble]
+									 forKey:NSUnderlineStyleAttributeName];
 	}
 	return _smartPairMatchAttributes;
 }
@@ -228,7 +207,6 @@
 		_backgroundColor = [_defaultSettings objectForKey:NSBackgroundColorAttributeName];
 		if (_backgroundColor == nil)
 			_backgroundColor = [[NSColor whiteColor] colorWithAlphaComponent:1.0];
-		[_backgroundColor retain];
 	}
 	return _backgroundColor;
 }
@@ -239,7 +217,6 @@
 		_foregroundColor = [_defaultSettings objectForKey:NSForegroundColorAttributeName];
 		if (_foregroundColor == nil)
 			_foregroundColor = [[NSColor blackColor] colorWithAlphaComponent:1.0];
-		[_foregroundColor retain];
 	}
 	return _foregroundColor;
 }
@@ -249,7 +226,6 @@
 	if (_lineHighlightColor == nil) {
 		_lineHighlightColor = [self colorWithName:@"lineHighlight"
 						orDefault:[_caretColor colorWithAlphaComponent:0.1]];
-		[_lineHighlightColor retain];
 	}
 	return _lineHighlightColor;
 }
@@ -263,7 +239,6 @@
 								       alpha:0.5];
 		_caretColor = [self colorWithName:@"caret" orDefault:defaultCaretColor];
 		_caretColor = [_caretColor colorWithAlphaComponent:0.5];
-		[_caretColor retain];
 	}
 	return _caretColor;
 }
@@ -273,7 +248,6 @@
 	if (_selectionColor == nil) {
 		NSColor *bg = [self colorWithName:@"selection" orDefault:[[NSColor blueColor] colorWithAlphaComponent:0.5]];
 		_selectionColor = [[self backgroundColor] blendedColorWithFraction:[bg alphaComponent] ofColor:bg];
-		[_selectionColor retain];
 	}
 	return _selectionColor;
 }
@@ -288,7 +262,6 @@
 		_invisiblesColor = [self colorWithName:@"invisibles" orDefault:defaultInvisiblesColor];
 		if ([_invisiblesColor alphaComponent] > 0.5)
 			_invisiblesColor = [_invisiblesColor colorWithAlphaComponent:0.5];
-		[_invisiblesColor retain];
 	}
 	return _invisiblesColor;
 }

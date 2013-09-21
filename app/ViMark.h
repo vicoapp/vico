@@ -52,7 +52,7 @@
 	NSString		*_groupName;
 	NSURL			*_url;
 	ViDocument		*_document;
-	__weak ViDocumentView	*_view;
+	ViDocumentView	*_view;
 
 	NSHashTable		*_lists; // XXX: lists are not retained!
 }
@@ -72,22 +72,22 @@
 /** The URL of the mark. */
 @property(nonatomic,readonly) NSURL *url;
 /** The icon of the mark. */
-@property(nonatomic,readwrite,retain) NSImage *icon;
+@property(nonatomic,readwrite,strong) NSImage *icon;
 /** The title of the mark. An NSString or an NSAttributedString. */
 @property(nonatomic,readwrite,copy) id title;
 /** A custom user-defined object associated with the mark. */
-@property(nonatomic,readwrite,retain) id representedObject;
+@property(nonatomic,readwrite,strong) id representedObject;
 /** If NO, the mark is automatically removed when the text range is removed. Default is YES. */
 @property(nonatomic,readwrite) BOOL persistent;
 /** Additional scopes for the marked range. */
-@property(nonatomic,readwrite,retain) NSArray *scopes;
+@property(nonatomic,readwrite,strong) NSArray *scopes;
 
 @property(nonatomic,readwrite) BOOL recentlyRestored;
 
-@property(nonatomic,readwrite,retain) ViDocument *document;
-@property(nonatomic,readonly) __weak ViDocumentView *view;
+@property(nonatomic,readwrite,strong) ViDocument *document;
+@property(nonatomic,readonly) ViDocumentView *view;
 
-@property(nonatomic,readonly) NSString *groupName;
+@property(weak, nonatomic,readonly) NSString *groupName;
 
 + (ViMark *)markWithURL:(NSURL *)aURL;
 

@@ -459,7 +459,6 @@
 - (BOOL)filter:(ViCommand *)command
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
-
 	[_existingKeyManager handleKeys:command.keySequence];
 
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
@@ -478,6 +477,7 @@
 
 	NSString *string = [NSString stringWithFormat:@"%C", (unichar)keyCode];
 	[_filter appendString:string];
+
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
 		_terminatingKey = keyCode;
@@ -486,6 +486,28 @@
 		return YES;
 	}
 
+	return YES;
+}
+
+- (BOOL)backspace:(ViCommand *)command {
+	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
+	[_existingKeyManager handleKeys:command.keySequence];
+	if (_filter.length > 0) {
+		[_filter deleteCharactersInRange:NSMakeRange(_filter.length - 1, 1)];
+		[self filterCompletions];
+	} else {
+		/* This backspace goes beyond the filter into the prefix. Dismiss the window. */
+		_terminatingKey = keyCode;
+		[window orderOut:nil];
+		[NSApp abortModal];
+	}
+
+	if ([_filteredCompletions count] == 0) {
+		_terminatingKey = keyCode;
+		[window orderOut:nil];
+		[NSApp abortModal];
+		return YES;
+	}
 	return YES;
 }
 

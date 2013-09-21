@@ -92,9 +92,7 @@ static ViKeyManager *macroRecorder = nil;
 - (void)presentError:(NSError *)error
 {
 	if ([target respondsToSelector:@selector(keyManager:presentError:)])
-		[target performSelector:@selector(keyManager:presentError:)
-			      withObject:self
-			      withObject:error];
+		[target keyManager:self presentError:error];
 }
 
 - (BOOL)runMacro:(ViMacro *)macro interactively:(BOOL)interactiveFlag
@@ -265,7 +263,7 @@ static ViKeyManager *macroRecorder = nil;
 
 	SEL shouldSel = @selector(keyManager:shouldParseKey:inScope:);
 	if ([target respondsToSelector:shouldSel]) {
-		if (! [target keyManager:self shouldParseKey:@(keyCode) inScope:scope])
+		if (! [[target keyManager:self shouldParseKey:@(keyCode) inScope:scope] boolValue])
 			return YES;
 	}
 

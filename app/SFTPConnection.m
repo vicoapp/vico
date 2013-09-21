@@ -138,6 +138,8 @@ resp2txt(int type)
 	/* NOTREACHED */
 }
 
+typedef void (^ReadfunType)(SFTPMessage *);
+typedef void (^WritefunType)(SFTPMessage *);
 
 @implementation SFTPRequest
 
@@ -944,7 +946,9 @@ resp2txt(int type)
 - (SFTPRequest *)onConnect:(void (^)(NSError *))responseCallback
 {
 	void (^originalCallback)(NSError *) = [responseCallback copy];
-	SFTPRequest *req = [self addRequest:SSH2_FXP_INIT format:NULL];
+	SFTPRequest *methodReq = [self addRequest:SSH2_FXP_INIT format:NULL];
+	__weak SFTPRequest *req = methodReq;
+
 	req.onCancel = ^(SFTPRequest *req) {
 		originalCallback([ViError operationCancelled]);
 		[self abort];
@@ -1244,6 +1248,7 @@ resp2txt(int type)
 	void (^originalCallback)(NSArray *, NSError *) = [responseCallback copy];
 
 	SFTPRequest *openRequest = [self addRequest:SSH2_FXP_OPENDIR format:"s", [url path]];
+	__weak SFTPRequest *innerOpenRequest = openRequest;
 	openRequest.onCancel = ^(SFTPRequest *req) { originalCallback(nil, [ViError operationCancelled]); };
 	openRequest.onResponse = ^(SFTPMessage *msg) {
 		NSData *handle;
@@ -1273,25 +1278,26 @@ resp2txt(int type)
 		cancelfun = [cancelfun copy];
 
 		/* Response callback that repeatedly calls SSH2_FXP_READDIR. */
-		__block void (^readfun)(SFTPMessage *);
-		readfun = ^(SFTPMessage *msg) {
+		__block ReadfunType readfun;
+		__weak ReadfunType innerReadfun;
+		innerReadfun = ^(SFTPMessage *msg) {
 			NSError *error;
 			uint32_t count;
 			if (msg.type == SSH2_FXP_STATUS) {
 				if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
-					openRequest.subRequest = nil;
+					innerOpenRequest.subRequest = nil;
 					originalCallback(nil, error);
 				} else {
-					openRequest.subRequest = [self closeHandle:handle
+					innerOpenRequest.subRequest = [self closeHandle:handle
 									onResponse:^(NSError *error) {
-						openRequest.subRequest = nil;
+						innerOpenRequest.subRequest = nil;
 						if (error) {
 							originalCallback(nil, error);
 						} else {
-							openRequest.subRequest = [self resolveSymlinksInEntries:entries
+							innerOpenRequest.subRequest = [self resolveSymlinksInEntries:entries
 												  relativeToURL:aURL
 												   onCompletion:^(NSArray *resolvedEntries, NSError *error) {
-								openRequest.subRequest = nil;
+								innerOpenRequest.subRequest = nil;
 								if (error) {
 									resolvedEntries = nil;
 								}
@@ -1302,7 +1308,7 @@ resp2txt(int type)
 				}
 				return;
 			} else if (msg.type != SSH2_FXP_NAME || ![msg getUnsigned:&count]) {
-				openRequest.subRequest = nil;
+				innerOpenRequest.subRequest = nil;
 				originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 				[self close];
 				return;
@@ -1314,7 +1320,7 @@ resp2txt(int type)
 				if (![msg getString:&filename] ||
 				    ![msg getString:NULL] || /* ignore longname */
 				    ![msg getAttributes:&attributes]) {
-					openRequest.subRequest = nil;
+					innerOpenRequest.subRequest = nil;
 					originalCallback(nil, [ViError errorWithFormat:@"SFTP protocol error"]);
 					[self close];
 					return;
@@ -1330,17 +1336,17 @@ resp2txt(int type)
 
 			/* Request another batch of names. */
 			SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
-			req.onResponse = readfun;
+			req.onResponse = innerReadfun;
 			req.onCancel = cancelfun;
-			openRequest.subRequest = req;
+			innerOpenRequest.subRequest = req;
 		};
-		readfun = [readfun copy];
+		readfun = [innerReadfun copy];
 
 		/* Request a batch of names. */
 		SFTPRequest *req = [self addRequest:SSH2_FXP_READDIR format:"d", handle];
 		req.onResponse = readfun;
 		req.onCancel = cancelfun;
-		openRequest.subRequest = req;
+		innerOpenRequest.subRequest = req;
 	};
 
 	return openRequest;
@@ -1478,8 +1484,9 @@ resp2txt(int type)
 			cancelfun = [cancelfun copy];
 
 			__block SFTPRequest *readRequest = nil;
-			__block void (^readfun)(SFTPMessage *);
-			readfun = ^(SFTPMessage *msg) {
+			__block ReadfunType readfun;
+			__weak ReadfunType innerReadfun;
+			innerReadfun = ^(SFTPMessage *msg) {
 				NSError *error;
 				if (msg.type == SSH2_FXP_STATUS) {
 					if (![msg expectStatus:SSH2_FX_EOF error:&error]) {
@@ -1551,12 +1558,12 @@ resp2txt(int type)
 				for (int i = 0; i < 1/*max_req*/; i++) {
 					DEBUG(@"requesting %u bytes at offset %lu", len, offset);
 					readRequest = [self addRequest:SSH2_FXP_READ format:"dqu", handle, offset, len];
-					readRequest.onResponse = readfun;
+					readRequest.onResponse = innerReadfun;
 					readRequest.onCancel = cancelfun;
 					statRequest.subRequest = readRequest;
 				}
 			};
-			readfun = [readfun copy];
+			readfun = [innerReadfun copy];
 
 			/* Dispatch first read request. */
 			DEBUG(@"requesting %u bytes at offset %lu", len, offset);
@@ -1628,12 +1635,14 @@ resp2txt(int type)
 
 		__block uint64_t offset = 0;
 
-		__block void (^writefun)(SFTPMessage *);
-		writefun = ^(SFTPMessage *msg) {
+		__block WritefunType writefun;
+		__weak WritefunType innerWritefun;
+		__weak SFTPConnection *connection = self;
+		innerWritefun = ^(SFTPMessage *msg) {
 			NSError *error;
 			if (![msg expectStatus:SSH2_FX_OK error:&error]) {
 				originalCallback(error);
-				[self closeHandle:handle
+				[connection closeHandle:handle
 				       onResponse:^(NSError *error) {
 					if (error)
 						INFO(@"failed to close file after write error: %@",
@@ -1649,7 +1658,7 @@ resp2txt(int type)
 								    ofHandle:handle
 								  onResponse:^(NSError *error) {
 					DEBUG(@"%s", "finished setting attributes, closing file");
-					openRequest.subRequest = [self closeHandle:handle
+					openRequest.subRequest = [connection closeHandle:handle
 									onResponse:^(NSError *error) {
 						openRequest.subRequest = nil;
 						originalCallback(error);
@@ -1667,11 +1676,11 @@ resp2txt(int type)
 			DEBUG(@"writing %u bytes at offset %lu", len, offset);
 			SFTPRequest *req = [self addRequest:SSH2_FXP_WRITE format:"dqd", handle, offset, chunk];
 			offset += len;
-			req.onResponse = writefun;
+			req.onResponse = innerWritefun;
 			req.onCancel = cancelfun;
 			openRequest.subRequest = req;
 		};
-		writefun = [writefun copy];
+		writefun = [innerWritefun copy];
 
 		/* Dispatch first read request. */
 		uint32_t len = _transfer_buflen;
@@ -1738,12 +1747,13 @@ resp2txt(int type)
 {
 	void (^originalCallback)(NSURL *, NSError *) = [responseCallback copy];
 	SFTPRequest *req = [self addRequest:SSH2_FXP_RENAME format:"ss", [srcURL path], [dstURL path]];
+	__weak SFTPRequest *innerReq = req;
 	req.onResponse = ^(SFTPMessage *msg) {
 		NSError *error;
 		if (![msg expectStatus:SSH2_FX_OK error:&error])
 			originalCallback(nil, error);
 		else {
-			req.subRequest = [self realpath:[dstURL path] onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
+			innerReq.subRequest = [self realpath:[dstURL path] onResponse:^(NSString *realPath, NSDictionary *dummyAttributes, NSError *error) {
 				if (error)
 					originalCallback(nil, error);
 				else

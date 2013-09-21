@@ -37,7 +37,7 @@
       allowMacros:(BOOL)allowMacros
           inScope:(ViScope *)scope
 	fromMacro:(ViMacro *)callingMacro
-       excessKeys:(NSArray **)excessKeys
+       excessKeys:(NSArray * __strong *)excessKeys
             error:(NSError **)outError;
 @end
 

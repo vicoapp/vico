@@ -524,8 +524,12 @@
 
 	NSString *inputText = [[[self textStorage] string] substringWithRange:range];
 
+	NSString *shell = [[[NSProcessInfo processInfo] environment] objectForKey:@"SHELL"];
+	if (! [[NSFileManager defaultManager] isExecutableFileAtPath:shell])
+		shell = @"/bin/bash";
+
 	NSTask *task = [[NSTask alloc] init];
-	[task setLaunchPath:@"/bin/bash"];
+	[task setLaunchPath:shell];
 	[task setArguments:[NSArray arrayWithObjects:@"-c", shellCommand, nil]];
 
 	NSMutableDictionary *env = [NSMutableDictionary dictionary];
@@ -3203,6 +3207,8 @@ again:
 
 	// FIXME: replace completion command keys (<c-n> or <c-x><c-n>) with the completed text
 	// [self removeFromInputKeys:command];
+
+	NSLog(@"Doin' it right...");
 
 	return [self presentCompletionsOf:word
 			     fromProvider:[[ViWordCompletion alloc] init]

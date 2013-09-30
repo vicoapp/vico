@@ -132,9 +132,8 @@
 	NSURL *selectedDocumentURL = [NSURL URLWithString:[_projectInfo objectForKey:@"selectedDocument"]];
 	__block ViDocumentView *documentViewToSelect = nil;
 	if (tabs && [tabs count] > 0) {
-		[tabs enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger tabIndex, BOOL *stop) {
-			NSDictionary *tabInfo = (NSDictionary *)obj;
-			NSDictionary *rootSplit = (NSDictionary *)[tabInfo objectForKey:@"root"];
+		[tabs enumerateObjectsUsingBlock:^(NSDictionary *tabInfo, NSUInteger tabIndex, BOOL *stop) {
+			NSDictionary *rootSplit = [tabInfo objectForKey:@"root"];
 
 			documentViewToSelect = [self makeSplit:rootSplit selectedDocumentURL:selectedDocumentURL topLevel:YES];
 		}];

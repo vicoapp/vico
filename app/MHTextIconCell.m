@@ -40,10 +40,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_image release];
-	[_modImage release];
-	[_statusImage release];
-	[super dealloc];
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -53,10 +49,10 @@
 	MHTextIconCell *copy = (MHTextIconCell *)[super copyWithZone:zone];
         // Why do we have to refer to the instance variables directly?
         // Why can't we use [copy setImage:]?
-	copy->_image = [_image retain];
+	copy->_image = _image;
 	copy->_modified = _modified;
-	copy->_statusImage = [_statusImage retain];
-	copy->_modImage = [_modImage retain];
+	copy->_statusImage = _statusImage;
+	copy->_modImage = _modImage;
 	return copy;
 }
 
@@ -136,7 +132,7 @@
 
 	if (_modified) {
 		if (_modImage == nil)
-			_modImage = [[NSImage imageNamed:NSImageNameStatusPartiallyAvailable] retain];
+			_modImage = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
 		NSPoint modPoint = cellFrame.origin;
 		NSSize modImageSize = [_modImage size];
 		modPoint.y += ceil((cellFrame.size.height + modImageSize.height) / 2);

@@ -261,7 +261,7 @@ whenTransformingValue:(NSString *)value
 	NSRange matchedRange;
 	while (match && (matchedRange = [match rangeOfMatchedString]).location != NSNotFound) {
 		if (!copied) {
-			text = [[value mutableCopy] autorelease];
+			text = [value mutableCopy];
 			copied = YES;
 		}
 

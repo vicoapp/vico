@@ -47,7 +47,7 @@ static NSCharacterSet *__slashSet = nil;
 - (BOOL)hasPrefix:(NSURL *)prefixURL
 {
 	if (__slashSet == nil)
-		__slashSet = [[NSCharacterSet characterSetWithCharactersInString:@"/"] retain];
+		__slashSet = [NSCharacterSet characterSetWithCharactersInString:@"/"];
 
 	NSString *s1 = [[self absoluteString] stringByTrimmingCharactersInSet:__slashSet];
 	NSString *s2 = [[prefixURL absoluteString] stringByTrimmingCharactersInSet:__slashSet];

@@ -29,7 +29,7 @@
 
 @implementation ViHTTPDeferred
 
-@synthesize delegate = _delegate;
+@synthesize delegate;
 
 - (id)initWithURL:(NSURL *)aURL
 	   onData:(void (^)(NSData *))aDataCallback
@@ -51,12 +51,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_connData release];
-	[_dataCallback release];
-	[_completionCallback release];
-	[_request release];
-	[_conn release];
-	[super dealloc];
 }
 
 - (void)finishWithError:(NSError *)error
@@ -69,24 +63,18 @@
 			NSFileManager *fm = [[NSFileManager alloc] init];
 			attributes = [fm attributesOfItemAtPath:[[_request URL] path]
 							  error:&error];
-			[fm release];
 		}
 		_completionCallback([_request URL], attributes, error);
 	}
 
-	[_completionCallback release];
 	_completionCallback = NULL;
 
-	[_dataCallback release];
 	_dataCallback = NULL;
 
-	[_connData release];
 	_connData = nil;
 
-	[_request release];
 	_request = nil;
 
-	[_conn release];
 	_conn = nil;
 
 	_finished = YES;
@@ -178,7 +166,7 @@
 	ViHTTPDeferred *deferred = [[ViHTTPDeferred alloc] initWithURL:aURL
 								onData:dataCallback
 							  onCompletion:completionCallback];
-	return [deferred autorelease];
+	return deferred;
 }
 
 @end

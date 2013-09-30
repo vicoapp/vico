@@ -59,20 +59,16 @@
 
 @interface ViStatusComponent : NSView
 {
-	NSControl *_control;
-	ViStatusComponent *_nextComponent;
-	ViStatusComponent *_previousComponent;
-	NSString *_alignment;
-
 	NSUInteger _cachedX;
 	NSUInteger _cachedWidth;
 	BOOL isCacheValid;
 }
 
-@property (retain,readwrite) NSControl *control;
-@property (assign,readwrite,nonatomic) ViStatusComponent *nextComponent;
-@property (assign,readwrite,nonatomic) ViStatusComponent *previousComponent;
-@property (retain,readwrite,nonatomic) NSString *alignment;
+@property (strong,readwrite) NSControl *control;
+@property (weak,readwrite,nonatomic) ViStatusComponent *nextComponent;
+@property (weak,readwrite,nonatomic) ViStatusComponent *previousComponent;
+@property (strong,readwrite,nonatomic) NSString *alignment;
+@property (nonatomic,strong) NSView *view;
 
 - (ViStatusComponent *)init;
 - (ViStatusComponent *)initWithControl:(NSControl *)control;
@@ -84,10 +80,6 @@
 - (void)adjustSize;
 - (NSUInteger)controlX;
 - (NSUInteger)controlWidth;
-
-- (void)dealloc;
-
-@property (nonatomic,retain) NSView *view;
 
 @end
 
@@ -108,7 +100,7 @@ typedef NSString *(^NotificationTransformer)(ViStatusView *, NSNotification *);
 }
 
 @property (nonatomic,copy) NotificationTransformer notificationTransformer;
-@property (nonatomic,retain) NuBlock *notificationTransformerBlock;
+@property (nonatomic,strong) NuBlock *notificationTransformerBlock;
 
 + (ViStatusNotificationLabel *)statusLabelForNotification:(NSString *)notification withTransformer:(NotificationTransformer)transformer;
 

@@ -52,14 +52,11 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_windowController release];
-	[_initialURL release];
-	[super dealloc];
 }
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
-	_initialURL = [url retain];
+	_initialURL = url;
 	return YES;
 }
 

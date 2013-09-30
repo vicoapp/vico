@@ -455,9 +455,9 @@
 (xmap setKey:"<up>" toAction:"prev_history:")
 (xmap setKey:"<pagedown>" toAction:"next_history_ignoring_prefix:")
 (xmap setKey:"<pageup>" toAction:"prev_history_ignoring_prefix:")
-(xmap setKey:"<ctrl-d>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
-(xmap setKey:"<tab>" toAction:"ex_complete:" flags:0 parameter:"pa" scope:nil)
-(xmap setKey:"<ctrl-f>" toAction:"ex_complete:" flags:0 parameter:"Ffpa" scope:nil)
+(xmap setKey:"<ctrl-d>" toAction:"ex_complete:" flags:0 parameter:"p" scope:nil)
+(xmap setKey:"<tab>" toAction:"ex_complete:" flags:0 parameter:"p" scope:nil)
+(xmap setKey:"<ctrl-f>" toAction:"ex_complete:" flags:0 parameter:"Ffp" scope:nil)
 ;; Restore normal Mac OS X keyboard actions in insert mode.
 (xmap setKey:"<alt-bs>" toAction:"deleteWordBackward:")
 (xmap setKey:"<alt-del>" toAction:"deleteWordForward:")
@@ -467,12 +467,12 @@
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
 (cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
-(cmap setDefaultAction:"filter:")
+(cmap setDefaultCatchallAction:"filter:")
 (cmap setKey:"<esc>" toAction:"cancel:")
 (cmap setKey:"<ctrl-e>" toAction:"cancel:")
 (cmap setKey:"<cr>" toAction:"accept:")
 (cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
-(cmap setKey:"<space>" toAction:"accept:")
+(cmap setKey:"<space>" toAction:"accept_if_not_autocompleting:")
 (cmap setKey:"<ctrl-y>" toAction:"accept:")
 (cmap setKey:"<ctrl-n>" toAction:"move_down:")
 (cmap setKey:"<ctrl-j>" toAction:"move_down:")
@@ -480,6 +480,7 @@
 (cmap setKey:"<ctrl-p>" toAction:"move_up:")
 (cmap setKey:"<down>" toAction:"move_down:")
 (cmap setKey:"<up>" toAction:"move_up:")
+(cmap setKey:"<bs>" toAction:"backspace:")
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 

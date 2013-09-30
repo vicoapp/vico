@@ -50,31 +50,18 @@
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap
 {
-	return [[[ViParser alloc] initWithDefaultMap:aMap] autorelease];
+	return [[ViParser alloc] initWithDefaultMap:aMap];
 }
 
 - (ViParser *)initWithDefaultMap:(ViMap *)aMap
 {
 	if ((self = [super init]) != nil) {
-		_defaultMap = [aMap retain];
+		_defaultMap = aMap;
 		_totalKeySequence = [[NSMutableArray alloc] init];
 		[self reset];
 	}
 	DEBUG_INIT();
 	return self;
-}
-
-- (void)dealloc
-{
-	DEBUG_DEALLOC();
-	[_defaultMap release];
-	[_map release];
-	[_command release];
-	[_dotCommand release];
-	[_lastCommand release];
-	[_keySequence release];
-	[_totalKeySequence release];
-	[super dealloc];
 }
 
 - (id)fail:(NSError **)outError
@@ -87,7 +74,6 @@
 		NSString *msg = [[NSString alloc] initWithFormat:fmt
 						       arguments:ap];
 		*outError = [ViError errorWithObject:msg code:code];
-		[msg release];
 		va_end(ap);
 	}
 	[self reset];
@@ -110,14 +96,14 @@
 		 * vi/v_undo.c:v_undo for details.
 		 */
 		if (_nviStyleUndo && [_lastCommand isUndo])
-			[self setCommand:[[_lastCommand copy] autorelease]];
+			[self setCommand:[_lastCommand copy]];
 		else if (_dotCommand == nil)
 			return [self fail:outError
 				     with:ViErrorParserNoDot
 				  message:@"No command to repeat."];
 		else {
 			int dot_count = _command.count;
-			[self setCommand:[[_dotCommand copy] autorelease]];
+			[self setCommand:[_dotCommand copy]];
 			if (dot_count > 0) {
 				DEBUG(@"override count %i/%i with %i",
 				    _command.count, _command.motion.count, dot_count);
@@ -172,7 +158,7 @@
 
 	_command.keySequence = _totalKeySequence;
 
-	ViCommand *ret = [[_command retain] autorelease];
+	ViCommand *ret = _command;
 	[self reset];
 	return ret;
 }
@@ -236,7 +222,7 @@
   allowMacros:(BOOL)allowMacros
         scope:(ViScope *)scope
       timeout:(BOOL *)timeoutPtr
-   excessKeys:(NSArray **)excessKeysPtr
+   excessKeys:(NSArray * __strong *)excessKeysPtr
         error:(NSError **)outError
 {
 	DEBUG(@"got key 0x%04x, or %@ in state %d", keyCode, [NSString stringWithKeyCode:keyCode], _state);
@@ -425,11 +411,9 @@
 		return macro;
 	}
 
-	[_keySequence release];
 	_keySequence = [[NSMutableArray alloc] init];
 
 	if (_state == ViParserInitialState || _state == ViParserPartialCommand) {
-		[_command release]; // XXX: should already be nil from [reset], right?
 		_command = [[ViCommand alloc] initWithMapping:mapping count:_count];
 		_count = 0;
 		// FIXME: check if a register is valid for the mapping?
@@ -488,19 +472,15 @@
 - (void)reset
 {
 	DEBUG(@"%s", "resetting");
-	[_keySequence release];
 	_keySequence = [[NSMutableArray alloc] init];
 
 	[_totalKeySequence removeAllObjects];
 
-	[_command release];
 	_command = nil;
 
 	_state = ViParserInitialState;
 	_count = 0;
 
-	[_defaultMap retain];
-	[_map release];
 	_map = _defaultMap;
 
 	_reg = 0;

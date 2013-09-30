@@ -36,7 +36,7 @@
 }
 
 /** The ViTabController this view belongs to. */
-@property (nonatomic,readwrite,assign) ViTabController *tabController;
+@property (nonatomic,readwrite) ViTabController *tabController;
 
 /** The inner NSView will be made key when the view gets focus. */
 @property (nonatomic,readonly) NSView *innerView;

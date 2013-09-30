@@ -56,7 +56,7 @@
 {
 	NSArray		*_keySequence;
 	NSString	*_keyString;
-	NSString	*_scopeSelector;
+	NSString	*__weak _scopeSelector;
 	NSString	*_title;
 
 	SEL		 _action;
@@ -71,7 +71,7 @@
 /** @name Getting mapping attributes */
 
 /** The scope this mapping applies to. */
-@property (nonatomic, readonly) NSString *scopeSelector;
+@property (weak, nonatomic, readonly) NSString *scopeSelector;
 
 /** A string describing the key sequence. */
 @property (nonatomic, readonly) NSString *keyString;
@@ -215,6 +215,7 @@
 	NSMutableSet	*_includes;
 	ViMap		*_operatorMap;
 	SEL		 _defaultAction;
+	SEL		 _defaultCatchallAction;
 	BOOL		 _acceptsCounts; /* Default is YES. Disabled for insertMap. */
 }
 
@@ -222,7 +223,7 @@
 @property (nonatomic, readonly) NSArray *actions;
 
 /** Assign a map to be used by operator actions. */
-@property (nonatomic, readwrite, retain) ViMap *operatorMap;
+@property (nonatomic, readwrite, strong) ViMap *operatorMap;
 
 /** If YES, leading digits acts as count to commands.
  * If NO, digits are treated as normal commands.
@@ -234,6 +235,11 @@
 
 /** If no mapping matches a key sequence, this action is called. */
 @property (nonatomic, readwrite) SEL defaultAction;
+/** If no mapping matches a key sequence, this action is called. Similar
+    to defaultAction, but defaultAction passes on most characters, while
+	defaultCatchallAction passes on all unmatched key sequences, no matter
+	what characters are involved. */
+@property (nonatomic, readwrite) SEL defaultCatchallAction;
 
 + (void)clearAll;
 + (NSArray *)allMaps;

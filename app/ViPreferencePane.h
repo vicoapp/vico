@@ -31,7 +31,7 @@
 {
 	NSString	*_paneName;
 	NSImage		*_icon;
-	IBOutlet NSView	*view;
+	IBOutlet NSView	* view;
 }
 
 @property (nonatomic, readonly) NSString *name;

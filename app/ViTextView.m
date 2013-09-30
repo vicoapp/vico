@@ -44,6 +44,7 @@
 #import "NSView-additions.h"
 #import "ViPreferencePaneEdit.h"
 #import "ViTaskRunner.h"
+#import "ViWordCompletion.h"
 #import "ViEventManager.h"
 
 #import <objc/runtime.h>
@@ -81,9 +82,9 @@ int logIndent = 0;
 
 + (ViTextView *)makeFieldEditorWithTextStorage:(ViTextStorage *)textStorage
 {
-	ViLayoutManager *layoutManager = [[[ViLayoutManager alloc] init] autorelease];
+	ViLayoutManager *layoutManager = [[ViLayoutManager alloc] init];
 	[textStorage addLayoutManager:layoutManager];
-	NSTextContainer *container = [[[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)] autorelease];
+	NSTextContainer *container = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(100, 10)];
 	[layoutManager addTextContainer:container];
 	[layoutManager setShowsControlCharacters:YES];
 	NSRect frame = NSMakeRect(0, 0, 100, 10);
@@ -91,7 +92,7 @@ int logIndent = 0;
 	ViParser *fieldParser = [ViParser parserWithDefaultMap:[ViMap mapWithName:@"exCommandMap"]];
 	[editor initWithDocument:nil viParser:fieldParser];
 	[editor setFieldEditor:YES];
-	return [editor autorelease];
+	return editor;
 }
 
 - (void)initWithDocument:(ViDocument *)aDocument viParser:(ViParser *)aParser
@@ -100,7 +101,7 @@ int logIndent = 0;
 	[self setKeyManager:[ViKeyManager keyManagerWithTarget:self parser:aParser]];
 
 	mode = ViNormalMode;
-	document = [aDocument retain];
+	document = aDocument;
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(documentRemoved:)
 						     name:ViDocumentRemovedNotification
@@ -110,7 +111,7 @@ int logIndent = 0;
 						     name:ViDocumentBusyChangedNotification
 						   object:document];
 
-	_undoManager = [[document undoManager] retain];
+	_undoManager = [document undoManager];
 	if (_undoManager == nil) {
 		_undoManager = [[NSUndoManager alloc] init];
 		[_undoManager setGroupsByEvent:NO];
@@ -122,9 +123,9 @@ int logIndent = 0;
 	original_insert_source = [[NSApp delegate] original_input_source];
 	_taskRunner = [[ViTaskRunner alloc] init];
 
-	_wordSet = [[NSMutableCharacterSet characterSetWithCharactersInString:@"_"] retain];
+	_wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];
 	[_wordSet formUnionWithCharacterSet:[NSCharacterSet alphanumericCharacterSet]];
-	_whitespace = [[NSCharacterSet whitespaceAndNewlineCharacterSet] retain];
+	_whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
 
 	_nonWordSet = [[NSMutableCharacterSet alloc] init];
 	[_nonWordSet formUnionWithCharacterSet:_wordSet];
@@ -204,18 +205,6 @@ int logIndent = 0;
 	[self postModeChangedNotification];
 }
 
-- (NSPoint)textContainerOrigin
-{
-	NSPoint origin = [super textContainerOrigin];
-	if (![self isFieldEditor]) {
-		// Add two pixel space at top of text container.
-		// XXX: using -setTextContainerInset proved to be too buggy.
-		origin.y += 2;
-	}
-	return origin;
-}
-
-
 DEBUG_FINALIZE();
 
 - (void)dealloc
@@ -232,25 +221,10 @@ DEBUG_FINALIZE();
 	[defaults removeObserver:self forKeyPath:@"blinkmode"];
 	[defaults removeObserver:self forKeyPath:@"blinktime"];
 
-	[document release];
 	[_keyManager setTarget:nil];
-	[_keyManager release];
-	[_lastEditCommand release];
-	[_inputKeys release];
-	[_undoManager release];
-	[_caretColor release];
-	[_lineHighlightColor release];
-	[_caretBlinkTimer release];
-	[_taskRunner release];
 
-	[_initialExCommand release];
-	[_initialFindPattern release];
 
-	[_wordSet release];
-	[_whitespace release];
-	[_nonWordSet release];
 
-	[super dealloc];
 }
 
 - (void)documentRemoved:(NSNotification *)notification
@@ -264,7 +238,6 @@ DEBUG_FINALIZE();
 							name:ViDocumentRemovedNotification
 						      object:document];
 
-	[document release];
 	document = nil;
 }
 
@@ -1437,6 +1410,20 @@ replaceCharactersInRange:(NSRange)aRange
 }
 
 #pragma mark -
+#pragma mark Task runner handling
+
+- (void)taskRunner:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo
+{
+	if ([contextInfo[@"type"] isEqual:@"filter"]) {
+		[self filter:runner finishedWithStatus:status contextInfo:contextInfo];
+	} else if ([contextInfo[@"type"] isEqual:@"bundleCommand"]) {
+		[self bundleCommand:runner finishedWithStatus:status contextInfo:contextInfo];
+	} else {
+		DEBUG(@"unexpected task runner callback with context info %@ and status %i", contextInfo, runner);
+	}
+}
+
+#pragma mark -
 #pragma mark Caret and selection handling
 
 - (void)scrollToCaret
@@ -1504,6 +1491,7 @@ replaceCharactersInRange:(NSRange)aRange
 		length--;
 	if (location > length)
 		location = IMAX(0, length);
+	NSInteger delta = ABS(caret - location);
 	caret = location;
 	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
@@ -1516,6 +1504,11 @@ replaceCharactersInRange:(NSRange)aRange
 
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
+
+	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
+		ViCompletionController *controller = [ViCompletionController sharedController];
+		[controller cancel:nil];
+	}
 }
 
 - (void)setCaret:(NSUInteger)location
@@ -1815,7 +1808,32 @@ replaceCharactersInRange:(NSRange)aRange
 		DEBUG(@"%s", "no smart typing pairs triggered");
 		[self insertString:s
 			atLocation:start_location];
+
 		final_location = modify_start_location + 1;
+
+		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		  NSRange wordRange;
+		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		  if ([word length] >= 2) {
+			  // Update the caret before we present the completion dialog.
+			  // Otherwise it won'tupdate until the first thing typed into the
+			  // completion dialog.
+			  [self setCaret:final_location];
+
+			  BOOL completed =
+				[self presentCompletionsOf:word
+					  fromProvider:[[ViWordCompletion alloc] init]
+						fromRange:wordRange
+						  options:@"C?"];
+
+			  final_location = [self caret];
+
+			  // If we didn't do anything further, no need to smartindent or
+			  // anything.
+			  if (! completed)
+				  return;
+		  }
+		}
 		DEBUG(@"setting final location to %lu", final_location);
 	}
 
@@ -2071,6 +2089,11 @@ replaceCharactersInRange:(NSRange)aRange
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
+
+		// When leaving insert mode, if the completion window was up, close it.
+		ViCompletionController *completionController = [ViCompletionController sharedController];
+		if (completionController.delegate == self)
+			[completionController cancel:nil];
 	}
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];
@@ -2330,10 +2353,12 @@ replaceCharactersInRange:(NSRange)aRange
 	MESSAGE(@"%@", [error localizedDescription]);
 }
 
-- (void)keyManager:(ViKeyManager *)aKeyManager
+- (BOOL)keyManager:(ViKeyManager *)aKeyManager
   partialKeyString:(NSString *)keyString
 {
 	MESSAGE(@"%@", keyString);
+
+	return NO;
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent
@@ -2463,7 +2488,6 @@ replaceCharactersInRange:(NSRange)aRange
 	else {
 		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:[ViThemeStore font], NSFontAttributeName, nil];
 		CGFloat sizeOfCharacter = [@" " sizeWithAttributes:sizeAttribute].width;
-		[sizeAttribute release];
 		pageGuideX = (sizeOfCharacter * (pageGuideValue + 1)) - 1.5;
 		// -1.5 to put it between the two characters and draw only on one pixel and
 		// not two (as the system draws it in a special way), and that's also why the
@@ -2700,7 +2724,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	ViLanguage *curLang = [document language];
 
-	submenu = [[[NSMenu alloc] initWithTitle:@"Language syntax"] autorelease];
+	submenu = [[NSMenu alloc] initWithTitle:@"Language syntax"];
 	item = [menu insertItemWithTitle:@"Language syntax"
 				  action:NULL
 			   keyEquivalent:@""
@@ -2866,7 +2890,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 		NSString *locale = [[NSLocale currentLocale] localeIdentifier];
 		if (locale)
-			ascii_input = TISCopyInputSourceForLanguage((CFStringRef)locale);
+			ascii_input = TISCopyInputSourceForLanguage((__bridge CFStringRef)locale);
 
 		/* Otherwise let the system provide an ASCII compatible input source.
 		 */

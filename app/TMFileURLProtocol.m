@@ -57,37 +57,12 @@
 	return request;
 }
 
-- (void)finalize
-{
-	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRelease(_client);
-	[super finalize];
-}
-
-- (void)dealloc
-{
-	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRelease(_client);
-	[super dealloc];
-}
-
 - (void)startLoading
 {
-	/*
-	 * Workaround for bug in NSURLRequest:
-	 * http://stackoverflow.com/questions/1112869/how-to-avoid-reference-count-underflow-in-nscfurlprotocolbridge-in-custom-nsurlp/4679837#4679837
-	 *
-	 * Seems to be fixed in Lion, so we should only workaround this on Snow Leopard.
-	 */
-	if (_client && floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-		CFRelease(_client);
-        _client = [self client];
-        CFRetain(_client);
-
 	NSURLRequest *request = [self request];
 	NSURL *url = [request URL];
 
-	NSFileManager *fm = [[[NSFileManager alloc] init] autorelease];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSInteger length = -1;
 
 	DEBUG(@"loading path [%@]", [url path]);
@@ -96,10 +71,10 @@
 		length = [data length];
 
 	DEBUG(@"responding with %li bytes of data", length);
-	NSURLResponse *response = [[[NSURLResponse alloc] initWithURL:url
+	NSURLResponse *response = [[NSURLResponse alloc] initWithURL:url
 		MIMEType:@"text/html"
 		expectedContentLength:length
-		textEncodingName:nil] autorelease];
+		textEncodingName:nil];
 
 	[_client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 	[_client URLProtocol:self didLoadData:data];

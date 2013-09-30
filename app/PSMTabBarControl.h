@@ -28,6 +28,9 @@ browsers.
 #define kPSMTabBarIconWidth 16.0
 #define kPSMHideAnimationSteps 2.0
 
+#import "PSMOverflowPopUpButton.h"
+#import "PSMRolloverButton.h"
+
 @class PSMOverflowPopUpButton;
 @class PSMRolloverButton;
 @class PSMTabBarCell;
@@ -76,12 +79,12 @@ enum {
     BOOL			_allowsDragBetweenWindows;
     
     // MVC help
-    IBOutlet id                 delegate;
+    IBOutlet id                 __unsafe_unretained delegate;
 }
 
-@property(nonatomic,readwrite, retain) NSTabView *tabView;
-@property(nonatomic,readwrite, assign) id delegate;
-@property(nonatomic,readwrite, retain) id partnerView;
+@property(nonatomic,readwrite, strong) NSTabView *tabView;
+@property(nonatomic,readwrite, unsafe_unretained) id delegate;
+@property(nonatomic,readwrite, strong) id partnerView;
 
 // control characteristics
 + (NSBundle *)bundle;

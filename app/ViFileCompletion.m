@@ -128,7 +128,7 @@
 	id<ViDeferred> deferred = [um contentsOfDirectoryAtURL:url
 						  onCompletion:^(NSArray *directoryContents, NSError *err) {
 		if (err) {
-			error = [err retain];
+			error = err;
 			return;
 		}
 
@@ -171,8 +171,8 @@
 
 	[deferred wait];
 	if (outError && error)
-		*outError = [error autorelease];
-	return [matches autorelease];
+		*outError = error;
+	return matches;
 }
 
 @end

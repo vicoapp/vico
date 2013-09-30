@@ -13,15 +13,22 @@ VPATH = app app/en.lproj json oniguruma oniguruma/enc universalchardet lemon \
 
 .SUFFIXES:
 
+NO_ARC_OBJC_SRCS = \
+	NSObject+SPInvocationGrabbing.m \
+	Nu.m
+
 JSON_OBJC_SRCS = \
-	NSObject+JSON.m \
 	SBJsonParser.m \
 	SBJsonStreamParser.m \
 	SBJsonStreamParserAdapter.m \
+	SBJsonStreamParserAccumulator.m \
+	SBJsonStreamParserAdapter.m \
 	SBJsonStreamParserState.m \
 	SBJsonStreamWriter.m \
+	SBJsonStreamWriterAccumulator.m \
 	SBJsonStreamWriterState.m \
 	SBJsonTokeniser.m \
+	SBJsonUTF8Stream.m \
 	SBJsonWriter.m
 
 OBJC_SRCS = \
@@ -35,7 +42,6 @@ OBJC_SRCS = \
 	NSArray-patterns.m \
 	NSEvent-keyAdditions.m \
 	NSMenu-additions.m \
-	NSObject+SPInvocationGrabbing.m \
 	NSOutlineView-vimotions.m \
 	NSScanner-additions.m \
 	NSString-additions.m \
@@ -45,7 +51,6 @@ OBJC_SRCS = \
 	NSURL-additions.m \
 	NSView-additions.m \
 	NSWindow-additions.m \
-	Nu.m \
 	PSMMetalTabStyle.m \
 	PSMOverflowPopUpButton.m \
 	PSMProgressIndicator.m \
@@ -139,8 +144,8 @@ OBJC_SRCS = \
 	ViWindow.m \
 	ViWindowController.m \
 	ViWordCompletion.m \
-	main.m \
-	$(JSON_OBJC_SRCS)
+	$(JSON_OBJC_SRCS) \
+	main.m
 
 OBJCXX_SRCS = \
 	ViCharsetDetector.mm
@@ -405,7 +410,7 @@ SHORT_VERSION = r$(REPO_VERSION)
 
 ifeq ($(CONFIGURATION),DEBUG)
 CFLAGS = -O0
-OBJCFLAGS =
+OBJCFLAGS = -fobjc-arc
 ARCHS = $(ARCH)
 else
 CFLAGS = -Os -DNDEBUG
@@ -430,13 +435,13 @@ OBJCFLAGS += -Wshorten-64-to-32
 # Flags for PLBlockIMP
 CFLAGS += -DPL_BLOCKIMP_PRIVATE
 
-SDK = $(XCODEROOT)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+SDK = $(XCODEROOT)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 
-ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.6 -fasm-blocks
+ARCH_CFLAGS = -arch $(ARCH) -isysroot $(SDK) -mmacosx-version-min=10.8 -fasm-blocks
 CFLAGS	+= $(ARCH_CFLAGS)
 LDFLAGS	+= $(ARCH_CFLAGS)
 
-OBJCPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objc.pth
+
 OBJCXXPPFLAGS = -include-pch $(OBJDIR)/Vico-prefix.objcxx.pth
 CPPFLAGS = -Iapp -Ijson -Ioniguruma -Iuniversalchardet -I$(DERIVEDDIR) -F. -Iplblockimp/Source
 LDFLAGS	+= -F.
@@ -472,7 +477,11 @@ INFOPLIST=$(APPDIR)/Contents/Info.plist
 NIBDIR=$(RESDIR)/en.lproj
  
 # object files
-OBJC_OBJS = $(addprefix $(OBJDIR)/,$(OBJC_SRCS:.m=.o))
+NO_ARC_OBJC_OBJS = $(addprefix $(OBJDIR)/,$(NO_ARC_OBJC_SRCS:.m=.o))
+$(NO_ARC_OBJC_OBJS): EXTRA_FLAGS := -fno-objc-arc
+ARC_OBJC_OBJS = $(addprefix $(OBJDIR)/,$(OBJC_SRCS:.m=.o))
+$(ARC_OBJC_OBJS): OBJCPPFLAGS := -include-pch $(OBJDIR)/Vico-prefix.objc.pth
+OBJC_OBJS = $(NO_ARC_OBJC_OBJS) $(ARC_OBJC_OBJS)
 OBJCXX_OBJS = $(addprefix $(OBJDIR)/,$(OBJCXX_SRCS:.mm=.o))
 C_OBJS = $(addprefix $(OBJDIR)/,$(ALL_C_SRCS:.c=.o))
 S_OBJS = $(addprefix $(OBJDIR)/,$(S_SRCS:.s=.o))
@@ -490,7 +499,7 @@ HELP_HTMLS = $(addprefix $(HELP_EN)/,$(HELP_SRCS:.md=.html))
 # Build rules
 DEPS = -MMD -MT $@ -MF $(addsuffix .d,$(basename $@))
 $(OBJDIR)/%.o: %.m
-	$(CC) $(CFLAGS) $(OBJCFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
+	$(CC) $(CFLAGS) $(OBJCFLAGS) $(OBJCPPFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.mm
 	$(CXX) $(CFLAGS) $(OBJCFLAGS) $(OBJCXXPPFLAGS) $(CPPFLAGS) $(DEPS) $< -c -o $@
 $(OBJDIR)/%.o: %.c

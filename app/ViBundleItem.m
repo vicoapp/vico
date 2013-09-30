@@ -45,14 +45,13 @@
 	if ((self = [super init]) != nil) {
 		_bundle = aBundle;	// XXX: not retained!
 
-		_name = [[dict objectForKey:@"name"] retain];
-		_scopeSelector = [[dict objectForKey:@"scope"] retain];
-		_uuid = [[dict objectForKey:@"uuid"] retain];
-		_tabTrigger = [[dict objectForKey:@"tabTrigger"] retain];
+		_name = [dict objectForKey:@"name"];
+		_scopeSelector = [dict objectForKey:@"scope"];
+		_uuid = [dict objectForKey:@"uuid"];
+		_tabTrigger = [dict objectForKey:@"tabTrigger"];
 
 		if (_uuid == nil) {
 			INFO(@"missing uuid in bundle item %@", _name);
-			[self release];
 			return nil;
 		}
 
@@ -76,7 +75,7 @@
 			NSRange r = NSMakeRange([key length] - 1, 1);
 			unsigned int keyflags = 0;
 			_keyCode = [key characterAtIndex:r.location];
-			_keyEquivalent = [[key substringWithRange:r] retain];
+			_keyEquivalent = [key substringWithRange:r];
 			for (int i = 0; i < [key length] - 1; i++) {
 				unichar c = [key characterAtIndex:i];
 				switch (c)
@@ -146,12 +145,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_uuid release];
-	[_name release];
-	[_scopeSelector release];
-	[_keyEquivalent release];
-	[_tabTrigger release];
-	[super dealloc];
 }
 
 - (NSString *)description

@@ -107,18 +107,18 @@
 	id<ViDeferred>			 _checkURLDeferred;
 }
 
-@property(nonatomic,readwrite,retain) NSMutableSet *documents;
+@property(nonatomic,readwrite,strong) NSMutableSet *documents;
 @property(nonatomic,readonly) ViJumpList *jumpList;
-@property(nonatomic,readwrite,retain) ViProject *project;
+@property(nonatomic,readwrite,strong) ViProject *project;
 @property(nonatomic,readonly) ViFileExplorer *explorer;
 @property(nonatomic,readonly) ViMarkList *tagStack;
 @property(nonatomic,readonly) ViTagsDatabase *tagsDatabase;
 @property(nonatomic,readwrite) BOOL jumping; /* XXX: need better API! */
-@property(nonatomic,readwrite,retain) NSURL *baseURL;
+@property(nonatomic,readwrite,strong) NSURL *baseURL;
 @property(nonatomic,readonly) ViSymbolController *symbolController;
 @property(nonatomic,readonly) ViParser *parser;
-@property(nonatomic,readwrite,retain) ViMark *alternateMarkCandidate;
-@property(nonatomic,readwrite,retain) ViMark *alternateMark;
+@property(nonatomic,readwrite,strong) ViMark *alternateMarkCandidate;
+@property(nonatomic,readwrite,strong) ViMark *alternateMark;
 
 /**
  * @returns The currently active window controller.

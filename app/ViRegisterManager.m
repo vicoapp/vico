@@ -47,11 +47,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_registers release];
-	[super dealloc];
-}
 
 - (NSString *)_contentOfRegister:(unichar)regName
 {
@@ -73,7 +68,7 @@
 
 - (NSString *)contentOfRegister:(unichar)regName
 {
-	return [[[self _contentOfRegister:regName] retain] autorelease];
+	return [self _contentOfRegister:regName];
 }
 
 - (void)setContent:(NSString *)content ofRegister:(unichar)regName

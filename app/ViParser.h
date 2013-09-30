@@ -49,7 +49,7 @@ typedef enum {
 	NSMutableArray	*_keySequence;
 	NSMutableArray	*_totalKeySequence;
 
-	NSArray		**_remainingExcessKeysPtr; // XXX: not retained
+	NSArray * __strong *_remainingExcessKeysPtr; // XXX: not retained
 
 	ViCommand	*_command;
 	unichar		 _reg; /* register */
@@ -72,16 +72,16 @@ typedef enum {
 /** Change the current key map.
  * @param aMap A new key map that should be used to parse following keys.
  */
-@property(nonatomic,readwrite,retain) ViMap *map;
+@property(nonatomic,readwrite,strong) ViMap *map;
 
 @property(nonatomic,readwrite) BOOL nviStyleUndo;
 @property(nonatomic,readwrite) int lastSearchOptions;
 
-@property(nonatomic,readwrite,retain) ViCommand *command;
-@property(nonatomic,readwrite,retain) ViCommand *dotCommand;
-@property(nonatomic,readwrite,retain) ViCommand *lastCommand;
-@property(nonatomic,readwrite,retain) ViCommand *lastToggleCommand;
-@property(nonatomic,readwrite,retain) ViCommand *lastLineSearchCommand;
+@property(nonatomic,readwrite,strong) ViCommand *command;
+@property(nonatomic,readwrite,strong) ViCommand *dotCommand;
+@property(nonatomic,readwrite,strong) ViCommand *lastCommand;
+@property(nonatomic,readwrite,strong) ViCommand *lastToggleCommand;
+@property(nonatomic,readwrite,strong) ViCommand *lastLineSearchCommand;
 
 + (ViParser *)parserWithDefaultMap:(ViMap *)aMap;
 
@@ -97,7 +97,7 @@ typedef enum {
   allowMacros:(BOOL)allowMacros
         scope:(ViScope *)scope
       timeout:(BOOL *)timeoutPtr
-   excessKeys:(NSArray **)excessKeysPtr
+   excessKeys:(NSArray * __strong *)excessKeysPtr
         error:(NSError **)outError;
 
 - (id)timeoutInScope:(ViScope *)scope

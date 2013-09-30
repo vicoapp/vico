@@ -37,7 +37,7 @@
 #import "ViPreferencePaneAdvanced.h"
 #import "TMFileURLProtocol.h"
 #import "TxmtURLProtocol.h"
-#import "JSON.h"
+#import "SBJson.h"
 #import "ViError.h"
 #import "ViCommandMenuItemView.h"
 #import "ViEventManager.h"
@@ -92,6 +92,13 @@ BOOL openUntitledDocument = YES;
 }
 @end
 
+@interface ViAppController ()
+
+- (void)setCloseCallbackForDocument:(ViDocument* )document
+                toNotifyBackChannel:(NSString *)channelName;
+
+@end
+
 @implementation ViAppController
 
 @synthesize encodingMenu;
@@ -122,7 +129,7 @@ BOOL openUntitledDocument = YES;
 								 forEventClass:kInternetEventClass
 								    andEventID:kAEGetURL];
 
-		[NSValueTransformer setValueTransformer:[[[caretBlinkModeTransformer alloc] init] autorelease]
+		[NSValueTransformer setValueTransformer:[[caretBlinkModeTransformer alloc] init]
 						forName:@"caretBlinkModeTransformer"];
 
 		_statusSetupBlock = nil;
@@ -130,11 +137,6 @@ BOOL openUntitledDocument = YES;
 	return self;
 }
 
-- (void)dealloc
-{
-	[_fieldEditor release];
-	[super dealloc];
-}
 
 // stops the application from creating an untitled document on load
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
@@ -162,7 +164,7 @@ BOOL openUntitledDocument = YES;
 							   appropriateForURL:nil
 								      create:YES
 								       error:nil];
-		__supportDirectory = [[[url path] stringByAppendingPathComponent:@"Vico"] retain];
+		__supportDirectory = [[url path] stringByAppendingPathComponent:@"Vico"];
 	}
 	return __supportDirectory;
 }
@@ -298,6 +300,7 @@ updateMeta(void)
 	    [NSNumber numberWithBool:YES], @"searchincr",
 	    [NSNumber numberWithBool:NO], @"showguide",
 	    [NSNumber numberWithBool:YES], @"wrap",
+	    [NSNumber numberWithBool:YES], @"autocomplete",
 	    [NSNumber numberWithBool:YES], @"antialias",
 	    [NSNumber numberWithBool:YES], @"prefertabs",
 	    [NSNumber numberWithBool:NO], @"cursorline",
@@ -353,16 +356,15 @@ updateMeta(void)
 					   keyEquivalent:@""];
 		[item setRepresentedObject:[NSNumber numberWithUnsignedLong:*encoding]];
 		[array addObject:item];
-		[item release];
 		encoding++;
 	}
 
-	[[ViURLManager defaultManager] registerHandler:[[[ViFileURLHandler alloc] init] autorelease]];
-	[[ViURLManager defaultManager] registerHandler:[[[ViSFTPURLHandler alloc] init] autorelease]];
-	[[ViURLManager defaultManager] registerHandler:[[[ViHTTPURLHandler alloc] init] autorelease]];
+	[[ViURLManager defaultManager] registerHandler:[[ViFileURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViSFTPURLHandler alloc] init]];
+	[[ViURLManager defaultManager] registerHandler:[[ViHTTPURLHandler alloc] init]];
 
-	NSSortDescriptor *sdesc = [[[NSSortDescriptor alloc] initWithKey:@"title"
-	                                                       ascending:YES] autorelease];
+	NSSortDescriptor *sdesc = [[NSSortDescriptor alloc] initWithKey:@"title"
+	                                                       ascending:YES];
 	[array sortUsingDescriptors:[NSArray arrayWithObject:sdesc]];
 	for (item in array)
 		[encodingMenu addItem:item];
@@ -413,11 +415,11 @@ updateMeta(void)
 
 	/* Register default preference panes. */
 	ViPreferencesController *prefs = [ViPreferencesController sharedPreferences];
-	[prefs registerPane:[[[ViPreferencePaneGeneral alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneEdit alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneTheme alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneBundles alloc] init] autorelease]];
-	[prefs registerPane:[[[ViPreferencePaneAdvanced alloc] init] autorelease]];
+	[prefs registerPane:[[ViPreferencePaneGeneral alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneEdit alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneTheme alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneBundles alloc] init]];
+	[prefs registerPane:[[ViPreferencePaneAdvanced alloc] init]];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 						 selector:@selector(beginTrackingMainMenu:)
@@ -647,16 +649,14 @@ additionalBindings:(NSDictionary *)bindings
 
 	if ([result isKindOfClass:[NSNull class]])
 		return nil;
-	return [result JSONRepresentation];
+	
+	SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+	return [writer stringWithObject:result];
 }
 
 - (NSError *)openURL:(NSString *)pathOrURL andWait:(BOOL)waitFlag backChannel:(NSString *)channelName
 {
 	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
-
-	NSProxy<ViShellThingProtocol> *backChannel = nil;
-	if (channelName)
-		backChannel = (NSProxy<ViShellThingProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
 
 	NSURL *url;
 	if ([pathOrURL isKindOfClass:[NSURL class]])
@@ -669,16 +669,7 @@ additionalBindings:(NSDictionary *)bindings
 							display:YES
 							  error:&error];
 
-	if ([doc respondsToSelector:@selector(setCloseCallback:)]) {
-		[doc setCloseCallback:^(int code) {
-			@try {
-				[backChannel exitWithError:code];
-			}
-			@catch (NSException *exception) {
-				INFO(@"failed to notify vicotool: %@", exception);
-			}
-		}];
-	}
+	[self setCloseCallbackForDocument:doc toNotifyBackChannel:channelName];
 
 	if (doc)
 		[NSApp activateIgnoringOtherApps:YES];
@@ -696,18 +687,60 @@ additionalBindings:(NSDictionary *)bindings
 	return [self openURL:pathOrURL andWait:NO backChannel:nil];
 }
 
+- (NSError *)newDocumentWithData:(NSData *)data andWait:(BOOL)waitFlag backChannel:(NSString *)channelName
+{
+	NSError *error = nil;
+	
+	ViDocumentController *docCon = [ViDocumentController sharedDocumentController];
+
+	[docCon newDocument:nil];
+	ViWindowController *winCon = [ViWindowController currentWindowController];
+	ViDocument *doc = [winCon currentDocument];
+	[doc setData:data];
+
+	[self setCloseCallbackForDocument:doc toNotifyBackChannel:channelName];
+	
+	if (doc)
+		[NSApp activateIgnoringOtherApps:YES];
+
+	return error;
+}
+
+- (NSError *)newDocumentWithData:(NSData *)data;
+{
+	return [self newDocumentWithData:data andWait:NO backChannel:nil];
+}
+
+- (void)setCloseCallbackForDocument:(ViDocument* )document
+                toNotifyBackChannel:(NSString *)channelName
+{
+	NSProxy<ViShellThingProtocol> *backChannel = nil;
+	if (channelName)
+		backChannel = (NSProxy<ViShellThingProtocol> *)[NSConnection rootProxyForConnectionWithRegisteredName:channelName host:nil];
+
+	if ([document respondsToSelector:@selector(setCloseCallback:)] && backChannel) {
+		[document setCloseCallback:^(int code) {
+			@try {
+				[backChannel exitWithError:code];
+			}
+			@catch (NSException *exception) {
+				INFO(@"failed to notify vicotool: %@", exception);
+			}
+		}];
+	}
+}
+
 #pragma mark -
 #pragma mark Updating normal mode menu items
 
 - (void)beginTrackingMainMenu:(NSNotification *)notification
 {
-	_menuTrackedKeyWindow = [[NSApp keyWindow] retain];
+	_menuTrackedKeyWindow = [NSApp keyWindow];
 	_trackingMainMenu = YES;
 }
 
 - (void)endTrackingMainMenu:(NSNotification *)notification
 {
-	[_menuTrackedKeyWindow release];
 	_menuTrackedKeyWindow = nil;
 	_trackingMainMenu = NO;
 }
@@ -833,7 +866,7 @@ additionalBindings:(NSDictionary *)bindings
 		NSInteger keyCode;
 		if (_fieldEditor == nil) {
 			_fieldEditorStorage = [[ViTextStorage alloc] init];
-			_fieldEditor = [[ViTextView makeFieldEditorWithTextStorage:_fieldEditorStorage] retain];
+			_fieldEditor = [ViTextView makeFieldEditorWithTextStorage:_fieldEditorStorage];
 		}
 		[_fieldEditor setInsertMode:nil];
 		[_fieldEditor setCaret:0];
@@ -848,7 +881,7 @@ additionalBindings:(NSDictionary *)bindings
 		return nil;
 	}
 
-	return [_exString autorelease];
+	return _exString;
 }
 
 - (NSString *)getExStringForCommand:(ViCommand *)command

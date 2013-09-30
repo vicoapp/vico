@@ -31,9 +31,9 @@
 	BOOL	 _modified;
 }
 
-@property(nonatomic,readwrite,retain) NSImage *image;
-@property(nonatomic,readwrite,retain) NSImage *statusImage;
-@property(nonatomic,readwrite,retain) NSImage *modImage;
+@property(nonatomic,readwrite,strong) NSImage *image;
+@property(nonatomic,readwrite,strong) NSImage *statusImage;
+@property(nonatomic,readwrite,strong) NSImage *modImage;
 @property(nonatomic,readwrite) BOOL modified;
 
 @end

@@ -62,7 +62,7 @@
 		return nil;
 
 	/* Convert between tags and undo style strings (vim and nvi). */
-	[NSValueTransformer setValueTransformer:[[[undoStyleTagTransformer alloc] init] autorelease]
+	[NSValueTransformer setValueTransformer:[[undoStyleTagTransformer alloc] init]
 					forName:@"undoStyleTagTransformer"];
 
 	[defaultSyntaxButton removeAllItems];

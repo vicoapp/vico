@@ -245,7 +245,14 @@
 	SEL doubleAction = [self doubleAction];
 	if (doubleAction == NULL)
 		return NO;
+	
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+
 	[[self target] performSelector:doubleAction withObject:self];
+	
+#pragma clang diagnostic pop
+	
 	return YES;
 }
 

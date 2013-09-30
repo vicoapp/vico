@@ -46,7 +46,6 @@ DEBUG_FINALIZE();
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[super dealloc];
 }
 
 @end

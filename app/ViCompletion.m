@@ -42,31 +42,32 @@ static NSCharacterSet *__ucase = nil;
 @synthesize representedObject = _representedObject;
 @synthesize markColor = _markColor;
 @synthesize title = _title;
+@synthesize isCurrentChoice = _isCurrentChoice;
 
 + (id)completionWithContent:(NSString *)aString
 {
-	return [[[ViCompletion alloc] initWithContent:aString] autorelease];
+	return [[ViCompletion alloc] initWithContent:aString];
 }
 
 + (id)completionWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
-	return [[[ViCompletion alloc] initWithContent:aString fuzzyMatch:aMatch] autorelease];
+	return [[ViCompletion alloc] initWithContent:aString fuzzyMatch:aMatch];
 }
 
 - (id)initWithContent:(NSString *)aString
 {
 	if ((self = [super init]) != nil) {
 		_content = [aString copy];
-		_font = [[NSFont userFixedPitchFontOfSize:12] retain];
+		_font = [NSFont userFixedPitchFontOfSize:12];
 		_titleParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[_titleParagraphStyle setLineBreakMode:NSLineBreakByTruncatingHead];
-		_markColor = [[NSColor redColor] retain];
+		_markColor = [NSColor redColor];
 		_titleIsDirty = YES;
 		_scoreIsDirty = YES;
 
 		if (__separators == nil) {
-			__separators = [[NSCharacterSet punctuationCharacterSet] retain];
-			__ucase = [[NSCharacterSet uppercaseLetterCharacterSet] retain];
+			__separators = [NSCharacterSet punctuationCharacterSet];
+			__ucase = [NSCharacterSet uppercaseLetterCharacterSet];
 		}
 	}
 	return self;
@@ -75,23 +76,12 @@ static NSCharacterSet *__ucase = nil;
 - (id)initWithContent:(NSString *)aString fuzzyMatch:(ViRegexpMatch *)aMatch
 {
 	if ((self = [self initWithContent:aString]) != nil) {
-		_filterMatch = [aMatch retain];
+		_filterMatch = aMatch;
 		_filterIsFuzzy = YES;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[_content release];
-	[_title release];
-	[_filterMatch release];
-	[_font release];
-	[_markColor release];
-	[_titleParagraphStyle release];
-	[_representedObject release];
-	[super dealloc];
-}
 
 - (void)updateTitle
 {
@@ -100,16 +90,14 @@ static NSCharacterSet *__ucase = nil;
 	if (_prefixLength > [_content length])
 		return;
 
-	NSRange grayRange = NSMakeRange(0, _prefixLength);
-	if (_filterMatch && !_filterIsFuzzy)
-		grayRange.length = _filterMatch.rangeOfMatchedString.length;
+	NSRange matchedRange = NSMakeRange(0, _prefixLength);
+	if (_filterMatch && !_filterIsFuzzy) {
+		matchedRange.length = _filterMatch.rangeOfMatchedString.length;
+	}
+
 	NSColor *gray = [NSColor grayColor];
 
-	[self setTitle:[[[NSMutableAttributedString alloc] initWithString:_content] autorelease]];
-	if (grayRange.length > 0)
-		[_title addAttribute:NSForegroundColorAttributeName
-			       value:gray
-			       range:grayRange];
+	[self setTitle:[[NSMutableAttributedString alloc] initWithString:_content]];
 
 	[_title addAttribute:NSFontAttributeName
 		       value:_font
@@ -118,6 +106,30 @@ static NSCharacterSet *__ucase = nil;
 	[_title addAttribute:NSParagraphStyleAttributeName
 		       value:_titleParagraphStyle
 		       range:NSMakeRange(0, [_title length])];
+
+	NSRange completionRange = NSMakeRange(matchedRange.length, _title.length - matchedRange.length);
+	if (_isCurrentChoice) {
+		/* Make it white so we can read easier on the selected background. */
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor whiteColor]
+			       range:completionRange];
+
+		if (matchedRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:[NSColor lightGrayColor]
+					   range:matchedRange];
+		}
+	} else {
+		[_title addAttribute:NSForegroundColorAttributeName
+			       value:[NSColor blackColor]
+			       range:completionRange];
+
+		if (matchedRange.length > 0) {
+			[_title addAttribute:NSForegroundColorAttributeName
+					   value:gray
+					   range:matchedRange];
+		}
+	}
 
 	if (_filterMatch && _filterIsFuzzy) {
 		/* Mark sub-matches with bold red. */
@@ -223,8 +235,6 @@ static NSCharacterSet *__ucase = nil;
 
 - (void)setFilterMatch:(ViRegexpMatch *)m
 {
-	[m retain];
-	[_filterMatch release];
 	_filterMatch = m;
 	_titleIsDirty = YES;
 	_scoreIsDirty = YES;
@@ -238,9 +248,12 @@ static NSCharacterSet *__ucase = nil;
 
 - (void)setFont:(NSFont *)aFont
 {
-	[aFont retain];
-	[_font release];
 	_font = aFont;
+	_titleIsDirty = YES;
+}
+
+- (void)setIsCurrentChoice:(BOOL)isChoice {
+	_isCurrentChoice = isChoice;
 	_titleIsDirty = YES;
 }
 

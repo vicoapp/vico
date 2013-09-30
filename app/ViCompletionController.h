@@ -49,7 +49,7 @@
 
 @interface ViCompletionController : NSObject <NSTableViewDataSource, NSTableViewDelegate, ViKeyManagerTarget>
 {
-	IBOutlet NSWindow		*window;
+	IBOutlet NSWindow		* window;
 	IBOutlet ViCompletionView	*tableView;
 	IBOutlet NSTextField		*label;
 
@@ -61,22 +61,25 @@
 	ViCompletion			*_onlyCompletion;
 	NSMutableArray			*_filteredCompletions;
 	ViCompletion			*_selection;
+	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
-	id<ViCompletionDelegate>	 _delegate;
+	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
 	NSInteger			 _terminatingKey;
 	NSRange				 _range;
-	NSPoint				 _screenOrigin;
+	NSRect				 _prefixScreenRect;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
+	BOOL				 _autocompleting;
+	BOOL				 _aggressive;
 }
 
-@property (nonatomic, readwrite, assign) id<ViCompletionDelegate> delegate;
+@property (unsafe_unretained, nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
-@property (nonatomic, readwrite, retain) NSArray *completions;
+@property (nonatomic, readwrite, strong) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;
-@property (nonatomic, readwrite, retain) NSString *filter;
+@property (nonatomic, readwrite, strong) NSString *filter;
 
 + (id)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;
@@ -86,10 +89,11 @@
 
 - (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
                        range:(NSRange)aRange
-		      prefix:(NSString *)aPrefix
-                          at:(NSPoint)screenOrigin
-		     options:(NSString *)optionString
-                   direction:(int)direction /* 0 = down, 1 = up */
+                      prefix:(NSString *)aPrefix
+            prefixScreenRect:(NSRect)prefixRect
+                    delegate:(id<ViCompletionDelegate>)aDelegate
+          existingKeyManager:(ViKeyManager *)existingKeyManager
+                     options:(NSString *)optionString
                initialFilter:(NSString *)initialFilter;
 
 - (void)updateBounds;

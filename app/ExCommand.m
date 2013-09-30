@@ -53,13 +53,13 @@
 
 + (ExCommand *)commandWithMapping:(ExMapping *)aMapping
 {
-	return [[[ExCommand alloc] initWithMapping:aMapping] autorelease];
+	return [[ExCommand alloc] initWithMapping:aMapping];
 }
 
 - (ExCommand *)initWithMapping:(ExMapping *)aMapping
 {
 	if ((self = [super init]) != nil) {
-		_mapping = [aMapping retain];
+		_mapping = aMapping;
 	}
 	DEBUG_INIT();
 	return self;
@@ -68,19 +68,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_cmdline release];
-	[_mapping release];
-	[_nextCommand release];
-	[_addr1 release];
-	[_addr2 release];
-	[_lineAddress release];
-	[_arg release];
-	[_plus_command release];
-	[_pattern release];
-	[_replacement release];
-	[_options release];
-	[_messages release];
-	[super dealloc];
 }
 
 - (NSArray *)args

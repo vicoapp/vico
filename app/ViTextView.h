@@ -37,6 +37,7 @@
 #import "ViDocument.h"
 #import "ViCompletionController.h"
 #import "ViMark.h"
+#import "ViTaskRunner.h"
 #import "ExCommand.h"
 
 #include <Carbon/Carbon.h>
@@ -47,12 +48,17 @@
 @class ViWindowController;
 @class ViTextView;
 @class ViJumpList;
-@class ViTaskRunner;
+
+@protocol ViTextViewTaskRunnerHandlers
+@optional
+- (void)filter:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo;
+- (void)bundleCommand:(ViTaskRunner *)runner finishedWithStatus:(int)status contextInfo:(id)contextInfo;
+@end
 
 /** A text edit view.
  *
  */
-@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
 {
 	ViDocument		*document;
 	// .busy
@@ -79,6 +85,7 @@
 	BOOL			 insertedKey; // true if insertText: called
 	BOOL			 handlingKey; // true while inside keyDown: method
 	BOOL			 replayingInput;  // true when dot command replays input
+	BOOL			 virtualInput;  // true when input is happening not from the keyboard (e.g., from completion)
 	NSMutableArray		*_inputKeys; // used for replaying input
 
 	// FIXME: move these to the ViCommand as properties
@@ -127,6 +134,7 @@
 	int			 _selection_affinity; /* 1 = char, 2 = word, 3 = line */
 
 	BOOL			 _showingContextMenu;
+	BOOL			 _showingCompletionWindow;
 
 	NSMutableCharacterSet	*_wordSet;
 	NSMutableCharacterSet	*_nonWordSet;
@@ -143,15 +151,15 @@
 
 @property (nonatomic,readwrite,copy) NSString *initialFindPattern;
 @property (nonatomic,readwrite,copy) NSString *initialExCommand;
-@property (nonatomic,readwrite,retain) NSColor *caretColor;
-@property (nonatomic,readwrite,retain) NSColor *lineHighlightColor;
-@property (nonatomic,readwrite,retain) ViCommand *lastEditCommand;
-@property (nonatomic,readwrite,retain) NSUndoManager *undoManager;
-@property (nonatomic,readwrite,retain) ViMark *initialMark;
+@property (nonatomic,readwrite,strong) NSColor *caretColor;
+@property (nonatomic,readwrite,strong) NSColor *lineHighlightColor;
+@property (nonatomic,readwrite,strong) ViCommand *lastEditCommand;
+@property (nonatomic,readwrite,strong) NSUndoManager *undoManager;
+@property (nonatomic,readwrite,strong) ViMark *initialMark;
 
 /** Associated key manager.
  */
-@property(nonatomic,readwrite,retain) ViKeyManager *keyManager;
+@property(nonatomic,readwrite,strong) ViKeyManager *keyManager;
 
 /** Associated document.
  */

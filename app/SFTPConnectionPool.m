@@ -37,11 +37,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[_connections release];
-	[super dealloc];
-}
 
 + (SFTPConnectionPool *)sharedPool
 {
@@ -95,13 +90,13 @@
 
 	if (conn == nil) {
 		NSError *error = nil;
-		conn = [[[SFTPConnection alloc] initWithURL:url error:&error] autorelease];
+		conn = [[SFTPConnection alloc] initWithURL:url error:&error];
 		if (conn == nil || error)
 			return connectCallback(nil, error);
 
 		[_connections setObject:conn forKey:key];
 
-		__block SFTPRequest *initRequest = nil;
+		__weak SFTPRequest *initRequest = nil;
 		void (^initCallback)(NSError *) = ^(NSError *error) {
 			initRequest.subRequest = connectCallback(conn, error);
 		};

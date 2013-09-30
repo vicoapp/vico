@@ -41,21 +41,18 @@
 		_language = [[NSMutableDictionary dictionaryWithContentsOfFile:aPath] mutableCopy];
 		if (![_language isKindOfClass:[NSDictionary class]]) {
 			INFO(@"%@: failed to load plist", aPath);
-			[self release];
 			return nil;
 		}
 
-		_uuid = [[_language objectForKey:@"uuid"] retain];
+		_uuid = [_language objectForKey:@"uuid"];
 		if (_uuid == nil) {
 			INFO(@"missing uuid in language %@", aPath);
-			[self release];
 			return nil;
 		}
 
-		_languagePatterns = [[_language objectForKey:@"patterns"] retain];
+		_languagePatterns = [_language objectForKey:@"patterns"];
 		if (![_languagePatterns isKindOfClass:[NSArray class]]) {
 			INFO(@"%@: failed to load plist", aPath);
-			[self release];
 			return nil;
 		}
 
@@ -71,10 +68,6 @@
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_language release];
-	[_languagePatterns release];
-	[_scope release];
-	[super dealloc];
 }
 
 - (ViRegexp *)compileRegexp:(NSString *)pattern

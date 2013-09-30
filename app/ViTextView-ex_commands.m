@@ -224,7 +224,6 @@
 			asynchronouslyInWindow:[self window]
 							 title:command.arg
 							target:self
-						  selector:@selector(bundleCommand:finishedWithStatus:contextInfo:)
 					   contextInfo:info
 							 error:&error];
 
@@ -285,7 +284,7 @@
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
 	ViTextStorage *storage = [self textStorage];
-	ViTransformer *transform = [[[ViTransformer alloc] init] autorelease];
+	ViTransformer *transform = [[ViTransformer alloc] init];
 
 	NSInteger startLocation = [storage locationForStartOfLine:exRange.location];
 	NSRange replacementRange =

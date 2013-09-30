@@ -33,10 +33,7 @@
 
 - (void)setInvisiblesAttributes:(NSDictionary *)attributes
 {
-	[attributes retain];
-	[_invisiblesAttributes release];
 	_invisiblesAttributes = [attributes mutableCopy];
-	[attributes release];
 
 	[_invisiblesAttributes setObject:[ViThemeStore font] forKey:NSFontAttributeName];
 
@@ -44,9 +41,6 @@
 	NSString *tabChar = [NSString stringWithFormat:@"%C", (unichar)0x21E5];
 	NSString *spaceChar = @"･";
 
-	[_newlineImage release];
-	[_tabImage release];
-	[_spaceImage release];
 
 	NSSize sz = [newlineChar sizeWithAttributes:_invisiblesAttributes];
 	_newlineImage = [[NSImage alloc] initWithSize:sz];
@@ -73,11 +67,6 @@ DEBUG_FINALIZE();
 - (void)dealloc
 {
 	DEBUG_DEALLOC();
-	[_newlineImage release];
-	[_tabImage release];
-	[_spaceImage release];
-	[_invisiblesAttributes release];
-	[super dealloc];
 }
 
 - (void)drawGlyphsForGlyphRange:(NSRange)glyphRange atPoint:(NSPoint)containerOrigin

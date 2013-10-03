@@ -66,4 +66,4 @@
 	url = https://github.com/landonf/plblockimp.git
 [submodule "sparkle"]
 	path = sparkle
-	url = https://github.com/andymatuschak/Sparkle.git
+	url = https://github.com/vicoapp/Sparkle.git

@@ -28,6 +28,8 @@
 
 #import "NSCollection-enumeration.h"
 #import "logging.h"
+
+#include "PSMTabBarControl.h"
 #import "ViFileExplorer.h"
 #import "ViDocumentController.h"
 #import "ViDocument.h"
@@ -268,10 +270,12 @@
 	};
 }
 
-- (NSArray *)structureOfTabs:(NSTabView *)tabView
+- (NSArray *)structureOfTabs:(PSMTabBarControl *)tabBar
 {
-	NSMutableArray *tabViewProperties = [NSMutableArray arrayWithCapacity:[[tabView tabViewItems] count]];
-	[[tabView tabViewItems] eachBlock:^(id obj, BOOL *stop) {
+	NSArray *tabViewItems = [tabBar representedTabViewItems];
+	NSMutableArray *tabViewProperties = [NSMutableArray arrayWithCapacity:[tabViewItems count]];
+
+	[tabViewItems eachBlock:^(id obj, BOOL *stop) {
 		NSTabViewItem *item = (NSTabViewItem *)obj;
 		NSSplitView *split = [item view];
 		ViTabController *tabController = (ViTabController *)[item identifier];
@@ -298,7 +302,7 @@
 		  return [[document fileURL] absoluteString];
 	  }];
 
-	NSArray *tabs = [self structureOfTabs:[self.windowController tabView]];
+	NSArray *tabs = [self structureOfTabs:[self.windowController tabBar]];
 	
 	//windowController jumpList // the jump list/history
 	//windowController tagStack // the list of marks

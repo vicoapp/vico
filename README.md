@@ -22,6 +22,8 @@ cursor. Ctags even works remotely over SFTP.
 Project information currently lives on the Github wiki at https://github.com/vicoapp/vico/wiki .
 If you're looking for how to build Vico, see below.
 
+Vico discussion is currently housed at https://discourse.hacklanta.com/category/vico.
+
 
 ## Building
 
@@ -54,6 +56,9 @@ Contributions from the community is encouraged.
 5. Push to your fork of the repository and then send a pull-request through Github for code review.
 
 		git push mine some-topic-branch
+		
+If you don't have code but want to discuss the editor, please feel free to post
+on the discussion boards at https://discourse.hacklanta.com/category/vico.
 
 ## License
 

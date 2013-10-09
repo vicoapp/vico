@@ -23,8 +23,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "NSCollection-enumeration.h"
+
 #import "ViProject.h"
+
+#import "NSCollection-enumeration.h"
 #import "logging.h"
 #import "ViFileExplorer.h"
 #import "ViDocumentController.h"

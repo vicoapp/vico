@@ -449,6 +449,11 @@ DEBUG_FINALIZE();
 	[document addObserver:symbolController forKeyPath:@"symbols" options:0 context:NULL];
 }
 
+- (PSMTabBarControl *)tabBar
+{
+	return tabBar;
+}
+
 - (NSTabView *)tabView
 {
 	return tabView;

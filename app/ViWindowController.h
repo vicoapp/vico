@@ -163,6 +163,11 @@
 - (NSSet *)documents;
 
 /**
+ * @returns The main tab bar for the window. Note that this is the only place you can get an accurate idea of the order of tabs!
+ */
+- (PSMTabBarControl *)tabBar;
+
+/**
  * @returns The main tab view for the window.
  */
 - (NSTabView *)tabView;

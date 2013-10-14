@@ -109,6 +109,10 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
                                                 forKeyPath:@"includedevelopmenu"
                                                    options:0
                                                    context:NULL];
+        [[NSUserDefaults standardUserDefaults] addObserver:self
+                                                forKeyPath:@"theme"
+                                                   options:NSKeyValueObservingOptionNew
+                                                   context:NULL];
 	}
 
 	DEBUG_INIT();
@@ -416,6 +420,14 @@ DEBUG_FINALIZE();
 	if ([keyPath isEqualToString:@"undostyle"]) {
 		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
 		[_parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
+	} else if ([keyPath isEqualToString:@"theme"]) {
+		ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]];
+
+		if ([[theme backgroundColor] alphaComponent] < 1.0) {
+			[[self window] setOpaque:NO];
+		} else {
+			[[self window] setOpaque:YES];
+		}
 	} else if ([keyPath isEqualToString:@"includedevelopmenu"]) {
         BOOL showMenu = [[NSUserDefaults standardUserDefaults] boolForKey:@"includedevelopmenu"];
 

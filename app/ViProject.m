@@ -281,10 +281,17 @@
 		ViTabController *tabController = (ViTabController *)[item identifier];
 		NSArray *viewControllers = [tabController views];
 
-		NSDictionary *tabViewProps = @{
-			@"root": [self structureOfSplit:split viewControllers:viewControllers],
-			@"selectedDocument": [[((ViDocument *)[[tabController selectedView] representedObject]) fileURL] absoluteString],
-		};
+		NSDictionary *tabViewProps;
+		if ([tabController selectedView]) {
+			tabViewProps = @{
+				@"root": [self structureOfSplit:split viewControllers:viewControllers],
+				@"selectedDocument": [[((ViDocument *)[[tabController selectedView] representedObject]) fileURL] absoluteString],
+			};
+		} else {
+			tabViewProps = @{
+				@"root": [self structureOfSplit:split viewControllers:viewControllers]
+			};
+		}
 
 		[tabViewProperties addObject:tabViewProps];
 	}];

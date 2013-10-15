@@ -29,9 +29,23 @@
 {
 	ViWindowController	*_windowController;
 	NSURL			*_initialURL;
+	NSURL			*_dataURL;
+
+	NSDictionary 	*_projectInfo;
 }
 
 @property(nonatomic,readonly) NSURL *initialURL;
 @property(nonatomic,readonly) ViWindowController *windowController;
+
+/**
+ * Sets up an empty ViWindowController with the last known set up of this
+ * project.
+ *
+ * Returns NO if no tabs were created (typically meaning there was no
+ * information known about this project), YES otherwise.
+ */
+- (BOOL)showInWindow:(ViWindowController *)aWindowController;
+
+- (void)projectWindowDidLoad:(NSNotification *)aNotification;
 
 @end

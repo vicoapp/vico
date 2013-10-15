@@ -280,11 +280,6 @@ DEBUG_FINALIZE();
 	if ([self project] != nil) {
 		[self setBaseURL:[[self project] initialURL]];
 		[explorer openExplorerTemporarily:NO];
-		/* This makes repeated open requests for the same URL always open a new window.
-		 * With this commented, the "project" is already opened, and no new window will be created.
-		 */
-		[[self project] close];
-		_project = nil;
 	}
 
 	[self updateJumplistNavigator];
@@ -355,6 +350,8 @@ DEBUG_FINALIZE();
 
 		[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];
 	}
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViWindowDidLoad object:self];
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)anObject
@@ -452,6 +449,16 @@ DEBUG_FINALIZE();
 	[document addObserver:symbolController forKeyPath:@"symbols" options:0 context:NULL];
 }
 
+- (PSMTabBarControl *)tabBar
+{
+	return tabBar;
+}
+
+- (NSTabView *)tabView
+{
+	return tabView;
+}
+
 /* Create a new document tab.
  */
 - (ViTabController *)createTabWithViewController:(ViViewController *)viewController
@@ -482,6 +489,8 @@ DEBUG_FINALIZE();
 {
 	ViDocumentView *docView = [document makeViewWithParser:_parser];
 	[self createTabWithViewController:docView];
+	[self selectDocumentView:docView];
+
 	return docView;
 }
 
@@ -863,7 +872,6 @@ DEBUG_FINALIZE();
 		return;
 	}
 
-	[self closeAllViews];
 	[[self window] close];
 }
 
@@ -920,11 +928,12 @@ DEBUG_FINALIZE();
 	if (__currentWindowController == self) {
 		__currentWindowController = nil;
 	}
+
 	DEBUG(@"will close %@", self);
-	[[self project] close];
 	MEMDEBUG(@"remaining window controllers: %@", __windowControllers);
 	MEMDEBUG(@"remaining tabs: %@", [tabBar representedTabViewItems]);
 
+	[self.project close];
 	[self closeAllViews];
 	[self setCurrentView:nil];
 	[[self window] setDelegate:nil];
@@ -1559,7 +1568,6 @@ DEBUG_FINALIZE();
 		/*
 		 * Special case: if there are no tabs open, just create a new tab for
 		 * the document, regardless of positioning.
-		 * XXX: when can this happen?
 		 */
 		return [self createTabForDocument:doc];
 	} else if ([tabView numberOfTabViewItems] == 1 && [[tabController views] count] == 0) {
@@ -2451,11 +2459,20 @@ additionalEffectiveRectOfDividerAtIndex:(NSInteger)dividerIndex
 					    [_documents count] <= 1 &&
 					    [[_documents anyObject] fileURL] == nil &&
 					    ![[_documents anyObject] isDocumentEdited]) {
-						/* Just change project directory. */
-						[doc close];
+						/* Switch projects */
+						ViProject *project = (ViProject *)doc;
+
+						[self.project close];
+
 						[self setBaseURL:url];
 						[self ex_pwd:command];
-						[explorer browseURL:url andDisplay:NO];
+
+						NSTabViewItem *existingTab = [[self tabView] selectedTabViewItem];
+						BOOL createdTabs = [project showInWindow:self];
+
+						if (createdTabs) {
+							[[self tabView] removeTabViewItem:existingTab];
+						}
 					} else {
 						[[doc nextRunloop] makeWindowControllers];
 					}

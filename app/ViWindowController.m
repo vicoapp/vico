@@ -436,6 +436,13 @@ DEBUG_FINALIZE();
 	} else {
 		[[self window] setOpaque:YES];
 	}
+
+	NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
+	if (keyWindow != [self window]) {
+		[[self window] makeKeyWindow];
+
+		[keyWindow makeKeyWindow];
+	}
 }
 
 - (void)addDocument:(ViDocument *)document

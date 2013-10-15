@@ -259,6 +259,7 @@ DEBUG_FINALIZE();
 
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
+	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
@@ -421,17 +422,19 @@ DEBUG_FINALIZE();
 		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
 		[_parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
 	} else if ([keyPath isEqualToString:@"theme"]) {
-		ViTheme *theme = [[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]];
-
-		if ([[theme backgroundColor] alphaComponent] < 1.0) {
-			[[self window] setOpaque:NO];
-		} else {
-			[[self window] setOpaque:YES];
-		}
+		[self setTheme:[[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]]];
 	} else if ([keyPath isEqualToString:@"includedevelopmenu"]) {
         BOOL showMenu = [[NSUserDefaults standardUserDefaults] boolForKey:@"includedevelopmenu"];
 
         [[ViDocumentController sharedDocumentController] showDevelopMenu:showMenu];
+	}
+}
+
+- (void)setTheme:(ViTheme *)aTheme {
+	if ([[aTheme backgroundColor] alphaComponent] < 1.0) {
+		[[self window] setOpaque:NO];
+	} else {
+		[[self window] setOpaque:YES];
 	}
 }
 

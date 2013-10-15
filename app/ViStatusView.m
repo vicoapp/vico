@@ -112,8 +112,6 @@
 		}
 	}];
 
-	NSLog(@"Setting things to %@", components);
-
 	__block NSString *currentAlignment = ViStatusComponentAlignLeft;
 	__block ViStatusComponent *lastComponent = nil;
 	[components enumerateObjectsUsingBlock:^(id component, NSUInteger i, BOOL *stop) {

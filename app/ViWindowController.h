@@ -33,6 +33,8 @@
 #import "ViTextView.h"
 #import "ViMarkManager.h"
 
+#define ViWindowDidLoad @"ViWindowDidLoad"
+
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;
@@ -159,6 +161,16 @@
  * @returns The documents open in the window.
  */
 - (NSSet *)documents;
+
+/**
+ * @returns The main tab bar for the window. Note that this is the only place you can get an accurate idea of the order of tabs!
+ */
+- (PSMTabBarControl *)tabBar;
+
+/**
+ * @returns The main tab view for the window.
+ */
+- (NSTabView *)tabView;
 
 /** Create a new tab.
  * @param viewController The view to display in the new tab.

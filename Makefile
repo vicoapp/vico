@@ -40,6 +40,7 @@ OBJC_SRCS = \
 	ExTextField.m \
 	MHTextIconCell.m \
 	NSArray-patterns.m \
+	NSCollection-enumeration.m \
 	NSEvent-keyAdditions.m \
 	NSMenu-additions.m \
 	NSOutlineView-vimotions.m \

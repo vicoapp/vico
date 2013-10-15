@@ -109,6 +109,10 @@ static __weak ViWindowController	*__currentWindowController = nil; // XXX: not r
                                                 forKeyPath:@"includedevelopmenu"
                                                    options:0
                                                    context:NULL];
+        [[NSUserDefaults standardUserDefaults] addObserver:self
+                                                forKeyPath:@"theme"
+                                                   options:NSKeyValueObservingOptionNew
+                                                   context:NULL];
 	}
 
 	DEBUG_INIT();
@@ -253,9 +257,9 @@ DEBUG_FINALIZE();
 	[tabBar setShowAddTabButton:YES];
 	[tabBar setAllowsDragBetweenWindows:NO]; // XXX: Must update for this to work without NSTabview
 
-	[[self window] setOpaque:NO];
 	[[self window] setDelegate:self];
 	[[self window] setFrameUsingName:@"MainDocumentWindow"];
+	[self setTheme:[[ViThemeStore defaultStore] defaultTheme]];
 
 	[splitView addSubview:explorerView positioned:NSWindowBelow relativeTo:mainView];
 	[splitView addSubview:symbolsView];
@@ -414,10 +418,27 @@ DEBUG_FINALIZE();
 	if ([keyPath isEqualToString:@"undostyle"]) {
 		NSString *newStyle = [change objectForKey:NSKeyValueChangeNewKey];
 		[_parser setNviStyleUndo:[newStyle isEqualToString:@"nvi"]];
+	} else if ([keyPath isEqualToString:@"theme"]) {
+		[self setTheme:[[ViThemeStore defaultStore] themeWithName:[change objectForKey:NSKeyValueChangeNewKey]]];
 	} else if ([keyPath isEqualToString:@"includedevelopmenu"]) {
         BOOL showMenu = [[NSUserDefaults standardUserDefaults] boolForKey:@"includedevelopmenu"];
 
         [[ViDocumentController sharedDocumentController] showDevelopMenu:showMenu];
+	}
+}
+
+- (void)setTheme:(ViTheme *)aTheme {
+	if ([[aTheme backgroundColor] alphaComponent] < 1.0) {
+		[[self window] setOpaque:NO];
+	} else {
+		[[self window] setOpaque:YES];
+	}
+
+	NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
+	if (keyWindow != [self window]) {
+		[[self window] makeKeyWindow];
+
+		[keyWindow makeKeyWindow];
 	}
 }
 

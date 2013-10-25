@@ -356,8 +356,13 @@
 	for (key in [captures allKeys]) {
 		NSDictionary *capture = [captures objectForKey:key];
 		NSRange r = [aMatch rangeOfSubstringAtIndex:[key intValue]];
-		if (r.length > 0 && [capture objectForKey:@"name"]) {
+		if (r.length > 0 && [capture objectForKey:@"patterns"]) {
+			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"patterns"], r.location, r.length);
+
+			[self applyPatterns:[capture objectForKey:@"patterns"] inRange:r openMatches:[NSArray array] reachedEOL:NO];
+		} else if (r.length > 0 && [capture objectForKey:@"name"]) {
 			DEBUG(@"got capture [%@] at %u + %u", [capture objectForKey:@"name"], r.location, r.length);
+
 			[self setScopes:[NSArray arrayWithObject:[capture objectForKey:@"name"]] inRange:r additive:YES];
 		}
 	}

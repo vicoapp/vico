@@ -1,69 +1,69 @@
 [submodule "Bundles/vicoapp-ack.vico-bundle"]
 	path = Bundles/vicoapp-ack.vico-bundle
-	url = git@github.com:vicoapp/ack.vico-bundle.git
+	url = https://github.com/vicoapp/ack.vico-bundle.git
 [submodule "Bundles/vicoapp-c.tmbundle"]
 	path = Bundles/vicoapp-c.tmbundle
-	url = git@github.com:vicoapp/c.tmbundle.git
+	url = https://github.com/vicoapp/c.tmbundle.git
 [submodule "Bundles/vicoapp-css.tmbundle"]
 	path = Bundles/vicoapp-css.tmbundle
-	url = git@github.com:vicoapp/css.tmbundle.git
+	url = https://github.com/vicoapp/css.tmbundle.git
 [submodule "Bundles/vicoapp-diff.tmbundle"]
 	path = Bundles/vicoapp-diff.tmbundle
-	url = git@github.com:vicoapp/diff.tmbundle.git
+	url = https://github.com/vicoapp/diff.tmbundle.git
 [submodule "Bundles/vicoapp-html.tmbundle"]
 	path = Bundles/vicoapp-html.tmbundle
-	url = git@github.com:vicoapp/html.tmbundle.git
+	url = https://github.com/vicoapp/html.tmbundle.git
 [submodule "Bundles/vicoapp-java.tmbundle"]
 	path = Bundles/vicoapp-java.tmbundle
-	url = git@github.com:vicoapp/java.tmbundle.git
+	url = https://github.com/vicoapp/java.tmbundle.git
 [submodule "Bundles/vicoapp-javascript.tmbundle"]
 	path = Bundles/vicoapp-javascript.tmbundle
-	url = git@github.com:vicoapp/javascript.tmbundle.git
+	url = https://github.com/vicoapp/javascript.tmbundle.git
 [submodule "Bundles/vicoapp-json.tmbundle"]
 	path = Bundles/vicoapp-json.tmbundle
-	url = git@github.com:vicoapp/json.tmbundle.git
+	url = https://github.com/vicoapp/json.tmbundle.git
 [submodule "Bundles/vicoapp-objective-c.tmbundle"]
 	path = Bundles/vicoapp-objective-c.tmbundle
-	url = git@github.com:vicoapp/objective-c.tmbundle.git
+	url = https://github.com/vicoapp/objective-c.tmbundle.git
 [submodule "Bundles/vicoapp-perl.tmbundle"]
 	path = Bundles/vicoapp-perl.tmbundle
-	url = git@github.com:vicoapp/perl.tmbundle.git
+	url = https://github.com/vicoapp/perl.tmbundle.git
 [submodule "Bundles/vicoapp-php.tmbundle"]
 	path = Bundles/vicoapp-php.tmbundle
-	url = git@github.com:vicoapp/php.tmbundle.git
+	url = https://github.com/vicoapp/php.tmbundle.git
 [submodule "Bundles/vicoapp-python.tmbundle"]
 	path = Bundles/vicoapp-python.tmbundle
-	url = git@github.com:vicoapp/python.tmbundle.git
+	url = https://github.com/vicoapp/python.tmbundle.git
 [submodule "Bundles/vicoapp-ruby-on-rails.tmbundle"]
 	path = Bundles/vicoapp-ruby-on-rails.tmbundle
-	url = git@github.com:vicoapp/ruby-on-rails.tmbundle.git
+	url = https://github.com/vicoapp/ruby-on-rails.tmbundle.git
 [submodule "Bundles/vicoapp-ruby.tmbundle"]
 	path = Bundles/vicoapp-ruby.tmbundle
-	url = git@github.com:vicoapp/ruby.tmbundle.git
+	url = https://github.com/vicoapp/ruby.tmbundle.git
 [submodule "Bundles/vicoapp-shellscript.tmbundle"]
 	path = Bundles/vicoapp-shellscript.tmbundle
-	url = git@github.com:vicoapp/shellscript.tmbundle.git
+	url = https://github.com/vicoapp/shellscript.tmbundle.git
 [submodule "Bundles/vicoapp-source.tmbundle"]
 	path = Bundles/vicoapp-source.tmbundle
-	url = git@github.com:vicoapp/source.tmbundle.git
+	url = https://github.com/vicoapp/source.tmbundle.git
 [submodule "Bundles/vicoapp-sql.tmbundle"]
 	path = Bundles/vicoapp-sql.tmbundle
-	url = git@github.com:vicoapp/sql.tmbundle.git
+	url = https://github.com/vicoapp/sql.tmbundle.git
 [submodule "Bundles/vicoapp-text.tmbundle"]
 	path = Bundles/vicoapp-text.tmbundle
-	url = git@github.com:vicoapp/text.tmbundle.git
+	url = https://github.com/vicoapp/text.tmbundle.git
 [submodule "Bundles/vicoapp-xml.tmbundle"]
 	path = Bundles/vicoapp-xml.tmbundle
-	url = git@github.com:vicoapp/xml.tmbundle.git
+	url = https://github.com/vicoapp/xml.tmbundle.git
 [submodule "Bundles/vicoapp-yaml.tmbundle"]
 	path = Bundles/vicoapp-yaml.tmbundle
-	url = git@github.com:vicoapp/yaml.tmbundle.git
-[submodule "Bundles/vicoapp-lua.tmbundle"]
-	path = Bundles/vicoapp-lua.tmbundle
-	url = git://github.com/vicoapp/lua.tmbundle.git
+	url = https://github.com/vicoapp/yaml.tmbundle.git
 [submodule "plblockimp"]
 	path = plblockimp
 	url = https://github.com/landonf/plblockimp.git
 [submodule "sparkle"]
 	path = sparkle
 	url = https://github.com/vicoapp/Sparkle.git
+[submodule "Bundles/vicoapp-lua.tmbundle"]
+	path = Bundles/vicoapp-lua.tmbundle
+	url = https://github.com/textmate/lua.tmbundle

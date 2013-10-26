@@ -60,7 +60,7 @@
 	url = git@github.com:vicoapp/yaml.tmbundle.git
 [submodule "Bundles/vicoapp-lua.tmbundle"]
 	path = Bundles/vicoapp-lua.tmbundle
-	url = https://github.com/textmate/lua.tmbundle.git
+	url = git://github.com/vicoapp/lua.tmbundle.git
 [submodule "plblockimp"]
 	path = plblockimp
 	url = https://github.com/landonf/plblockimp.git

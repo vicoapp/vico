@@ -253,10 +253,10 @@ updateMeta(void)
 	[Nu loadNuFile:@"ex"     fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 	[Nu loadNuFile:@"status" fromBundleWithIdentifier:@"se.bzero.Vico" withContext:nil];
 
-	[SFBCrashReporter checkForNewCrashes];
+	//[SFBCrashReporter checkForNewCrashes];
 
-	[checkForUpdatesMenuItem setAction:@selector(checkForUpdates:)];
-	[checkForUpdatesMenuItem setTarget:[SUUpdater sharedUpdater]];
+	//[checkForUpdatesMenuItem setAction:@selector(checkForUpdates:)];
+	//[checkForUpdatesMenuItem setTarget:[SUUpdater sharedUpdater]];
 
 #if defined(DEBUG_BUILD)
 	[NSApp activateIgnoringOtherApps:YES];

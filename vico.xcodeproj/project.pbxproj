@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1708FD06181D94720031BA3B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
 		1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1730CE0717CF058D00A1DA2C /* AddressBook.framework */; };
 		1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */; };
 		1730CE1117D1282900A1DA2C /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
@@ -20,7 +21,6 @@
 		17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
 		17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
 		17E66CAE17D12DAF006552F4 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
-		17E8AB55181CCFD200233393 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
@@ -448,7 +448,6 @@
 		17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamTokeniser.m; path = json/SBJsonStreamTokeniser.m; sourceTree = SOURCE_ROOT; };
 		17D8A10117C842B7000C25C6 /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterAccumulator.h; path = json/SBJsonStreamWriterAccumulator.h; sourceTree = SOURCE_ROOT; };
 		17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterAccumulator.m; path = json/SBJsonStreamWriterAccumulator.m; sourceTree = SOURCE_ROOT; };
-		17D8A11617C852FF000C25C6 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug/Sparkle.framework"; sourceTree = "<group>"; };
 		17D8A12217CF0354000C25C6 /* SFBCrashReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBCrashReporter.h; sourceTree = "<group>"; };
 		17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBCrashReporter.m; sourceTree = "<group>"; };
 		17D8A12417CF0354000C25C6 /* SFBCrashReporterWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBCrashReporterWindowController.h; sourceTree = "<group>"; };
@@ -923,7 +922,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				17E8AB55181CCFD200233393 /* Sparkle.framework in Frameworks */,
+				1708FD06181D94720031BA3B /* Sparkle.framework in Frameworks */,
 				1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */,
 				9AAD5D5C1393C33A00FDFFA6 /* Carbon.framework in Frameworks */,
 				9A2EF2D613310AF90023C5B7 /* WebKit.framework in Frameworks */,
@@ -1006,7 +1005,6 @@
 			isa = PBXGroup;
 			children = (
 				1730CE0717CF058D00A1DA2C /* AddressBook.framework */,
-				17D8A11617C852FF000C25C6 /* Sparkle.framework */,
 				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
 				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
@@ -2399,7 +2397,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2593,7 +2590,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2631,7 +2627,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../../Library/Developer/Xcode/DerivedData/Sparkle-eecbcmgaedqwlhfzpewxwbvveftd/Build/Products/Debug\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

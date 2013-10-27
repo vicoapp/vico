@@ -4,5 +4,4 @@ app/scope_selector.out
 build
 Nu.framework
 xcuserdata
-*.xccheckout
 .DS_Store

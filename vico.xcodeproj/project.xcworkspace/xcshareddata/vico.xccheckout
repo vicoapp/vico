@@ -11,49 +11,51 @@
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>07A8EB70-B592-42F0-9F56-07DC7A986050</key>
-		<string>https://github.com/vicoapp/objective-c.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/objective-c.tmbundle.git</string>
 		<key>0C1D4D6F-9196-4A9F-817A-33DAD16A8C8A</key>
-		<string>https://github.com/vicoapp/ruby.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/ruby.tmbundle.git</string>
 		<key>14482292-33AF-441D-AB9B-22380AD9DCA2</key>
-		<string>https://github.com/vicoapp/java.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/java.tmbundle.git</string>
 		<key>1554CA33-F37F-4AB9-A680-5C4E808CFCC3</key>
-		<string>https://github.com/vicoapp/ack.vico-bundle.git</string>
+		<string>ssh://github.com/vicoapp/ack.vico-bundle.git</string>
 		<key>247F5F1E-0C60-4C7B-A69E-0BF9C836D872</key>
-		<string>https://github.com/vicoapp/sql.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/sql.tmbundle.git</string>
 		<key>2A20FE26-275D-4D4B-935C-44129B7BEC91</key>
-		<string>https://github.com/vicoapp/javascript.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/javascript.tmbundle.git</string>
 		<key>4277DDB2-E660-4BC8-B4AC-C265BD52DE31</key>
-		<string>https://github.com/vicoapp/python.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/python.tmbundle.git</string>
 		<key>4912AAEB-5727-40CB-B6FA-583339D26ACD</key>
-		<string>https://github.com/vicoapp/perl.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/perl.tmbundle.git</string>
 		<key>4D14B273-3698-4B6D-B223-D41FD51B200B</key>
 		<string>https://github.com/textmate/lua.tmbundle.git</string>
 		<key>6E6081A7-30AA-4342-ABE0-5AEEB9131C08</key>
-		<string>https://github.com/vicoapp/source.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/source.tmbundle.git</string>
+		<key>89BD45F5-4E83-421C-95DD-AD36657F4744</key>
+		<string>https://github.com/vicoapp/Sparkle.git</string>
 		<key>8C06EF02-AA05-4871-88DF-22AD3C083429</key>
-		<string>https://github.com/vicoapp/json.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/json.tmbundle.git</string>
 		<key>9A7B89E5-F801-4946-8AB2-EA371FF18124</key>
-		<string>https://github.com/vicoapp/ruby-on-rails.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/ruby-on-rails.tmbundle.git</string>
 		<key>A2DAEFA9-39F5-4317-9F2F-E8038777346D</key>
-		<string>https://github.com/vicoapp/c.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/c.tmbundle.git</string>
 		<key>A9C467C3-795C-40EF-993C-9207BB6AB017</key>
-		<string>https://github.com/vicoapp/text.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/text.tmbundle.git</string>
 		<key>AA3922BB-6DED-4EE5-9126-725E2A5B34F6</key>
-		<string>https://github.com/vicoapp/html.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/html.tmbundle.git</string>
 		<key>B3D5B8B6-8377-46EE-BCA9-CBCBE19A47C0</key>
-		<string>https://github.com/vicoapp/xml.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/xml.tmbundle.git</string>
 		<key>B9DF4F9C-F221-4224-A223-390D2E8A0B44</key>
-		<string>https://github.com/vicoapp/css.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/css.tmbundle.git</string>
 		<key>C6C13D17-E8F5-4286-92C4-1A8F3D590AC0</key>
-		<string>https://github.com/vicoapp/diff.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/diff.tmbundle.git</string>
 		<key>DFC14E1E-EE36-45B9-BE28-483C6923EC78</key>
-		<string>https://github.com/vicoapp/shellscript.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/shellscript.tmbundle.git</string>
 		<key>EAB8C76B-969E-4C41-952C-A5C64094FE60</key>
 		<string>ssh://github.com/vicoapp/vico.git</string>
 		<key>F0A7EF5D-C1DF-4E56-A945-A919869A27D6</key>
-		<string>https://github.com/vicoapp/php.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/php.tmbundle.git</string>
 		<key>F9B3543E-656F-40A8-ADC9-E08FD63D23A1</key>
-		<string>https://github.com/vicoapp/yaml.tmbundle.git</string>
+		<string>ssh://github.com/vicoapp/yaml.tmbundle.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>vico.xcodeproj/project.xcworkspace</string>
@@ -79,6 +81,8 @@
 		<string>../../Bundles/vicoapp-lua.tmbundle</string>
 		<key>6E6081A7-30AA-4342-ABE0-5AEEB9131C08</key>
 		<string>../../Bundles/vicoapp-source.tmbundle</string>
+		<key>89BD45F5-4E83-421C-95DD-AD36657F4744</key>
+		<string>../../sparkle</string>
 		<key>8C06EF02-AA05-4871-88DF-22AD3C083429</key>
 		<string>../../Bundles/vicoapp-json.tmbundle</string>
 		<key>9A7B89E5-F801-4946-8AB2-EA371FF18124</key>
@@ -112,6 +116,14 @@
 	<string>EAB8C76B-969E-4C41-952C-A5C64094FE60</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>89BD45F5-4E83-421C-95DD-AD36657F4744</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sparkle</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>

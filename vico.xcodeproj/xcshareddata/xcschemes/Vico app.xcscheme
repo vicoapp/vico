@@ -39,9 +39,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <PathRunnable
-         FilePath = "/Users/Shadowfiend/github/vico/build/DEBUG/Vico.app">
-      </PathRunnable>
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "9A2EF28E133109C10023C5B7"
+            BuildableName = "Vico.app"
+            BlueprintName = "Vico"
+            ReferencedContainer = "container:vico.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

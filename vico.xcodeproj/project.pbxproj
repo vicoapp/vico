@@ -11,6 +11,7 @@
 		1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1730CE0717CF058D00A1DA2C /* AddressBook.framework */; };
 		1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */; };
 		1730CE1117D1282900A1DA2C /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
+		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
 		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
 		17D8A10517C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; };
@@ -425,10 +426,11 @@
 		};
 		9A43473013339CC6002B04DE /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;

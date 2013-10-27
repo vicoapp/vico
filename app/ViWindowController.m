@@ -319,7 +319,7 @@ DEBUG_FINALIZE();
 				if ([statusView window] != [textView window])
 					return (id)nil;
 
-				return [NSString stringWithFormat:@"%lu,%lu",
+				return (id)[NSString stringWithFormat:@"%lu,%lu",
 					(unsigned long)[textView currentLine],
 					(unsigned long)[textView currentColumn]];
 		  }];
@@ -349,7 +349,7 @@ DEBUG_FINALIZE();
 						modestr = "--VISUAL--";
 				}
 
-				return [NSString stringWithFormat:@"    %s", modestr];
+				return (id)[NSString stringWithFormat:@"    %s", modestr];
 			}];
 
 		[messageView setStatusComponents:[NSArray arrayWithObjects:caretLabel, modeLabel, nil]];

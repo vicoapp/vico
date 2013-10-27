@@ -321,7 +321,7 @@
 			outputFiles = (
 				"$(INPUT_FILE_DIR)/$(INPUT_FILE_BASE).c",
 			);
-			script = "LEMPAR=\"${PROJECT_DIR}/lemon/lempar.c\" ${TARGET_BUILD_DIR}/lemon -s ${INPUT_FILE_PATH}";
+			script = "LEMPAR=\"${PROJECT_DIR}/lemon/lempar.c\" \"${BUILT_PRODUCTS_DIR}/lemon\" -s \"${INPUT_FILE_PATH}\"";
 		};
 /* End PBXBuildRule section */
 

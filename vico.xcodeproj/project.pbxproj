@@ -1924,7 +1924,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "set -x\nREPO_VERSION=$(MACOSX_DEPLOYMENT_TARGET=\"\" git rev-parse --short HEAD)\nset -x FULL_INFOPLIST_PATH=\"${INSTALL_DIR}/${INFOPLIST_PATH}\"\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" \"${FULL_INFOPLIST_PATH}\"\nif test \"$CONFIGURATION\" == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" \"${FULL_INFOPLIST_PATH}\"\n";
+			shellScript = "set -x\nREPO_VERSION=$(MACOSX_DEPLOYMENT_TARGET=\"\" git rev-parse --short HEAD)\nset -x\nFULL_INFOPLIST_PATH=${INSTALL_DIR}/${INFOPLIST_PATH}\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" \"${FULL_INFOPLIST_PATH}\"\nif test \"$CONFIGURATION\" == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" \"${FULL_INFOPLIST_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

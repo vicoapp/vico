@@ -2424,7 +2424,7 @@
 					"-lffi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2658,7 +2658,7 @@
 					"-lffi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};

@@ -1626,10 +1626,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A2EF2C1133109C20023C5B7 /* Build configuration list for PBXNativeTarget "Vico" */;
 			buildPhases = (
-				9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */,
 				9A2EF28B133109C10023C5B7 /* Sources */,
 				9A43473013339CC6002B04DE /* Copy Frameworks */,
 				9A2EF28C133109C10023C5B7 /* Frameworks */,
+				9AAF73F81360A73600D75E1E /* Set version numbers in Info.plist */,
 				9A260675134F4F8F002C86FB /* Download bundle repo from GitHub */,
 				9AAF73DC135C4A4600D75E1E /* Checkout bundles from GitHub */,
 				9A2EF28D133109C10023C5B7 /* Resources */,
@@ -1926,7 +1926,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\nREPO_VERSION=$(MACOSX_DEPLOYMENT_TARGET=\"\" git rev-parse --short HEAD)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" ${INFOPLIST_PATH}\nif test \"$CONFIGURATION\" == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" ${INFOPLIST_PATH}\n";
+			shellScript = "set -x\nREPO_VERSION=$(MACOSX_DEPLOYMENT_TARGET=\"\" git rev-parse --short HEAD)\necho `pwd`\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REPO_VERSION\" \"${INSTALL_DIR}/${INFOPLIST_PATH}\"\nif test \"$CONFIGURATION\" == \"Release\"; then\n  SHORT_VERSION=$(cat $SOURCE_ROOT/version.h)\nelse\n  SHORT_VERSION=r$REPO_VERSION\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $SHORT_VERSION\" \"${INSTALL_DIR}/${INFOPLIST_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

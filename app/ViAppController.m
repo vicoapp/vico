@@ -44,7 +44,7 @@
 #import "ViFileExplorer.h"
 #import "ViMarkInspector.h"
 #import "NSMenu-additions.h"
-#import <Sparkle/SUUpdater.h>
+#import <Sparkle.h>
 #import "SFBCrashReporter.h"
 
 #import "ViFileURLHandler.h"

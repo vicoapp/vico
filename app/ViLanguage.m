@@ -109,6 +109,21 @@
 	}
 }
 
+#define MAYBE_COMPILE_SUBPATTERN(accessor) \
+		subPatterns = accessor; \
+		if ([subPatterns isKindOfClass:[NSArray class]]) { \
+			[self compilePatterns:subPatterns]; \
+		}
+#define MAYBE_COMPILE_CAPTURE_SUBPATTERN(subpatternString) \
+		capturesDictionary = [d objectForKey:subpatternString]; \
+		if (capturesDictionary) { \
+		  for (NSString *key in [capturesDictionary allKeys]) { \
+			NSDictionary *captureDictionary = [capturesDictionary objectForKey:key]; \
+			MAYBE_COMPILE_SUBPATTERN([captureDictionary objectForKey:@"patterns"]) \
+		  } \
+		}
+		
+
 - (void)compilePatterns:(NSArray *)patterns
 {
 	if (patterns == nil)
@@ -129,11 +144,12 @@
 		// else we must first substitute back references from the begin match before compiling end regexp
 
 		// recursively compile sub-patterns, if any
-		NSArray *subPatterns = [d objectForKey:@"patterns"];
-		if ([subPatterns isKindOfClass:[NSArray class]]) {
-			//INFO(@"compiling sub-patterns for scope [%@]", [d objectForKey:@"name"]);
-			[self compilePatterns:subPatterns];
-		}
+		NSArray *subPatterns = nil;
+		NSDictionary *capturesDictionary = nil;
+		MAYBE_COMPILE_SUBPATTERN([d objectForKey:@"patterns"]);
+		MAYBE_COMPILE_CAPTURE_SUBPATTERN(@"beginCaptures");
+		MAYBE_COMPILE_CAPTURE_SUBPATTERN(@"endCaptures");
+		MAYBE_COMPILE_CAPTURE_SUBPATTERN(@"captures");
 	}
 }
 

@@ -58,9 +58,6 @@
 [submodule "Bundles/vicoapp-yaml.tmbundle"]
 	path = Bundles/vicoapp-yaml.tmbundle
 	url = https://github.com/vicoapp/yaml.tmbundle.git
-[submodule "plblockimp"]
-	path = plblockimp
-	url = https://github.com/landonf/plblockimp.git
 [submodule "sparkle"]
 	path = sparkle
 	url = https://github.com/vicoapp/Sparkle.git

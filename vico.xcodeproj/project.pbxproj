@@ -11,6 +11,10 @@
 		1730CE0817CF058D00A1DA2C /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1730CE0717CF058D00A1DA2C /* AddressBook.framework */; };
 		1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */; };
 		1730CE1117D1282900A1DA2C /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
+		1732DAF9181EEC3600890055 /* NSCollection-enumeration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */; };
+		1732DAFA181EEC3600890055 /* status.nu in Resources */ = {isa = PBXBuildFile; fileRef = 1732DAF8181EEC3600890055 /* status.nu */; };
+		1732DB00181EF0C800890055 /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D11331182E002B04DE /* Bundles */; };
+		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
 		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
@@ -443,6 +447,10 @@
 		1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenerateFormData.m; sourceTree = "<group>"; };
 		1730CE0E17D1282800A1DA2C /* SBJsonUTF8Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonUTF8Stream.h; path = json/SBJsonUTF8Stream.h; sourceTree = SOURCE_ROOT; };
 		1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = json/SBJsonUTF8Stream.m; sourceTree = SOURCE_ROOT; };
+		1732DAF6181EEC3600890055 /* NSCollection-enumeration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCollection-enumeration.h"; sourceTree = "<group>"; };
+		1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCollection-enumeration.m"; sourceTree = "<group>"; };
+		1732DAF8181EEC3600890055 /* status.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = status.nu; path = app/status.nu; sourceTree = "<group>"; };
+		1732DB02181EF25000890055 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/SFBCrashReporterWindow.xib; sourceTree = "<group>"; };
 		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = json/SBJsonStreamParserAccumulator.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = json/SBJsonStreamParserAccumulator.m; sourceTree = SOURCE_ROOT; };
@@ -959,6 +967,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1732DB04181EF2C200890055 /* Cocoa Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				1732DAF6181EEC3600890055 /* NSCollection-enumeration.h */,
+				1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */,
+			);
+			name = "Cocoa Extensions";
+			sourceTree = "<group>";
+		};
 		17D8A12117CF0330000C25C6 /* SFBCrash */ = {
 			isa = PBXGroup;
 			children = (
@@ -970,6 +987,7 @@
 				17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */,
 				17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */,
 				17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */,
+				1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */,
 			);
 			name = SFBCrash;
 			sourceTree = "<group>";
@@ -1006,6 +1024,7 @@
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
+				1732DAF8181EEC3600890055 /* status.nu */,
 				1730CE0717CF058D00A1DA2C /* AddressBook.framework */,
 				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
@@ -1059,6 +1078,7 @@
 		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				1732DB04181EF2C200890055 /* Cocoa Extensions */,
 				17D8A12117CF0330000C25C6 /* SFBCrash */,
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
 				9A2EF4361331147C0023C5B7 /* Mozilla Universal charset detector */,
@@ -1780,6 +1800,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1732DB00181EF0C800890055 /* Bundles in Resources */,
 				9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */,
 				9A2EF2A4133109C20023C5B7 /* Credits.rtf in Resources */,
 				9A2EF2AA133109C20023C5B7 /* MainMenu.xib in Resources */,
@@ -1826,6 +1847,7 @@
 				9AB6F72F14160751000F3578 /* WaitProgress.xib in Resources */,
 				9ACFDFBE141A084700D4DBE1 /* MarkInspector.xib in Resources */,
 				9AA9273914D5B58E00F0E02F /* beautify.nu in Resources */,
+				1732DAFA181EEC3600890055 /* status.nu in Resources */,
 				9AA9273A14D5B58E00F0E02F /* bridgesupport.nu in Resources */,
 				9AA9273B14D5B58E00F0E02F /* cblocks.nu in Resources */,
 				9AA9273C14D5B58E00F0E02F /* cocoa.nu in Resources */,
@@ -1836,6 +1858,7 @@
 				9AA9274114D5B58E00F0E02F /* generate.nu in Resources */,
 				9AA9274214D5B58E00F0E02F /* help.nu in Resources */,
 				9AA9274314D5B58E00F0E02F /* match.nu in Resources */,
+				1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */,
 				9AA9274414D5B58E00F0E02F /* math.nu in Resources */,
 				9AA9274514D5B58E00F0E02F /* menu.nu in Resources */,
 				9AA9274614D5B58E00F0E02F /* nibtools.nu in Resources */,
@@ -1948,6 +1971,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1732DAF9181EEC3600890055 /* NSCollection-enumeration.m in Sources */,
 				9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */,
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
@@ -2221,6 +2245,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1732DB02181EF25000890055 /* en */,
+			);
+			name = SFBCrashReporterWindow.xib;
+			path = ..;
+			sourceTree = "<group>";
+		};
 		9A26066F134C50C3002C86FB /* CompletionWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

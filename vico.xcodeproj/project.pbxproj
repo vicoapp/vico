@@ -449,7 +449,7 @@
 		1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = json/SBJsonUTF8Stream.m; sourceTree = SOURCE_ROOT; };
 		1732DAF6181EEC3600890055 /* NSCollection-enumeration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCollection-enumeration.h"; sourceTree = "<group>"; };
 		1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCollection-enumeration.m"; sourceTree = "<group>"; };
-		1732DAF8181EEC3600890055 /* status.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = status.nu; path = app/status.nu; sourceTree = "<group>"; };
+		1732DAF8181EEC3600890055 /* status.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = status.nu; sourceTree = "<group>"; };
 		1732DB02181EF25000890055 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/SFBCrashReporterWindow.xib; sourceTree = "<group>"; };
 		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = json/SBJsonStreamParserAccumulator.h; sourceTree = SOURCE_ROOT; };
@@ -505,9 +505,6 @@
 		9A288E301398EA9C00258451 /* reformat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reformat.h; sourceTree = "<group>"; };
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		9A2EF296133109C20023C5B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		9A2EF297133109C20023C5B7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		9A2EF298133109C20023C5B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9A2EF29B133109C20023C5B7 /* Vico-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Vico-Info.plist"; sourceTree = "<group>"; };
 		9A2EF29D133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9A2EF29F133109C20023C5B7 /* Vico-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Prefix.pch"; sourceTree = "<group>"; };
@@ -807,8 +804,6 @@
 		9A4347021331383C002B04DE /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = json/SBJsonWriter.h; sourceTree = SOURCE_ROOT; };
 		9A4347031331383C002B04DE /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = json/SBJsonWriter.m; sourceTree = SOURCE_ROOT; };
 		9A43471613313874002B04DE /* vico.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; name = vico.1; path = util/vico.1; sourceTree = SOURCE_ROOT; };
-		9A434719133138AA002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
-		9A43471B13313B0A002B04DE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9A43471D13313DA0002B04DE /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		9A4A01BF13F94D3F00CCDBA6 /* ExParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExParser.h; sourceTree = "<group>"; };
 		9A4A01C013F94D3F00CCDBA6 /* ViBgView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViBgView.h; sourceTree = "<group>"; };
@@ -967,6 +962,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1721D46B181F4AB000E7BA1D /* Crash Reporting */ = {
+			isa = PBXGroup;
+			children = (
+				1730CE0717CF058D00A1DA2C /* AddressBook.framework */,
+			);
+			name = "Crash Reporting";
+			sourceTree = "<group>";
+		};
+		1721D46C181F4B0B00E7BA1D /* vicotool */ = {
+			isa = PBXGroup;
+			children = (
+				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
+				9A4346DF1331257A002B04DE /* Foundation.framework */,
+			);
+			name = vicotool;
+			sourceTree = "<group>";
+		};
 		1732DB04181EF2C200890055 /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1024,13 +1036,7 @@
 		9A2EF284133109C10023C5B7 = {
 			isa = PBXGroup;
 			children = (
-				1732DAF8181EEC3600890055 /* status.nu */,
-				1730CE0717CF058D00A1DA2C /* AddressBook.framework */,
-				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 				9A2606861353104A002C86FB /* libcrypto.0.9.8.dylib */,
-				9A43471D13313DA0002B04DE /* ApplicationServices.framework */,
-				9A43471B13313B0A002B04DE /* AppKit.framework */,
-				9A434719133138AA002B04DE /* ApplicationServices.framework */,
 				9A2EF299133109C20023C5B7 /* app */,
 				9A2EF2B4133109C20023C5B7 /* Tests */,
 				9A2EF41213310F4D0023C5B7 /* lemon */,
@@ -1057,22 +1063,13 @@
 		9A2EF292133109C20023C5B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1721D46B181F4AB000E7BA1D /* Crash Reporting */,
+				1721D46C181F4B0B00E7BA1D /* vicotool */,
 				9A2EF2D513310AF90023C5B7 /* WebKit.framework */,
 				9A2EF293133109C20023C5B7 /* Cocoa.framework */,
-				9A4346DF1331257A002B04DE /* Foundation.framework */,
-				9A2EF295133109C20023C5B7 /* Other Frameworks */,
+				9AAD5D5B1393C33A00FDFFA6 /* Carbon.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		9A2EF295133109C20023C5B7 /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				9A2EF296133109C20023C5B7 /* AppKit.framework */,
-				9A2EF297133109C20023C5B7 /* CoreData.framework */,
-				9A2EF298133109C20023C5B7 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
 		9A2EF299133109C20023C5B7 /* app */ = {
@@ -1283,6 +1280,7 @@
 				9AA9273414D5B58E00F0E02F /* menu.nu */,
 				9AA9273514D5B58E00F0E02F /* nibtools.nu */,
 				9AA9273614D5B58E00F0E02F /* nu.nu */,
+				1732DAF8181EEC3600890055 /* status.nu */,
 				9AA9273714D5B58E00F0E02F /* template.nu */,
 				9AA9273814D5B58E00F0E02F /* test.nu */,
 				9AAF73E1135C931600D75E1E /* Credits.txt */,
@@ -2404,6 +2402,7 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					json,
@@ -2571,6 +2570,7 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					json,
@@ -2604,6 +2604,7 @@
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					json,

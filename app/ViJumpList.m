@@ -106,12 +106,17 @@
 	if (_position >= [_jumps count] && fromJump) {
 		NSInteger savedPosition = _position;
 		BOOL removedDuplicate = [self push:fromJump];
+
 		_position = savedPosition;
 		if (removedDuplicate)
 			_position--;
 	}
 
-	return [_jumps objectAtIndex:--_position];
+	// Don't let position wrap around. Note that we should also probably fix
+	// the issue where a new document has a single item in the jumplist instead
+	// of no such items.
+	_position = _position == 0 ? _position : _position - 1;
+	return [_jumps objectAtIndex:_position];
 }
 
 - (BOOL)atBeginning

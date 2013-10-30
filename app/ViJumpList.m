@@ -82,7 +82,7 @@
 	if (newJump)
 		[_jumps addObject:newJump];
 	_position = [_jumps count];
-	DEBUG(@"jumps = %@, position = %u", _jumps, _position);
+	DEBUG(@"jumps = %@, position = %li", _jumps, (unsigned long)_position);
 
 	[_delegate jumpList:self added:newJump];
 
@@ -99,7 +99,7 @@
 
 - (ViMark *)backwardFrom:(ViMark *)fromJump
 {
-	DEBUG(@"position = %li, count = %u", _position, [_jumps count]);
+	DEBUG(@"position = %li, count = %li", (unsigned long)_position, (unsigned long)[_jumps count]);
 	if (_position <= 0)
 		return nil;
 

@@ -1919,6 +1919,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if test \"$CONFIGURATION\" = \"Debug\"; then\n    echo \"ignoring checkout bundles in $CONFIGURATION build\"\n    exit 0\nfi\n\nRESOURCE_DIR=$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\nBUNDLEDIR=\"$RESOURCE_DIR/Bundles\"\n\nmkdir -p \"$BUNDLEDIR\"\n\nrsync -a --delete --exclude \".git\" $BUNDLES $BUNDLEDIR\n";
+			showEnvVarsInLog = 0;
 		};
 		9AAF73F7135F5D5500D75E1E /* Build help bundle */ = {
 			isa = PBXShellScriptBuildPhase;

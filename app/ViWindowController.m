@@ -1719,6 +1719,10 @@ DEBUG_FINALIZE();
 		viewController = [self displayDocument:doc positioned:viewPosition];
 	}
 
+	if (_jumping) {
+		[self updateJumplistNavigator];
+	}
+
 	_jumping = NO;
 	return [(ViTextView *)[viewController innerView] gotoMark:mark];
 }

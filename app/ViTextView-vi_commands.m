@@ -202,7 +202,6 @@
 - (BOOL)reposition:(ViCommand *)command anchor:(int)anchor keepColumn:(BOOL)keepColumn
 {
 	NSScrollView *scrollView = [self enclosingScrollView];
-	NSClipView *clipView = [scrollView contentView];
 
 	NSUInteger topLine;
 	if (command.count == 0) {
@@ -223,26 +222,26 @@
 
 	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1)
 								 actualCharacterRange:NULL];
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange
+	NSRect glyphRect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange
 						      inTextContainer:[self textContainer]];
-	NSRect bounds = [clipView bounds];
+	NSRect visibleRect = [self visibleRect];
+
 	NSPoint p;
-	p.x = bounds.origin.x;
+	p.x = glyphRect.origin.x;
 
 	if (anchor == 0) /* top */
-		p.y = rect.origin.y;
+		p.y = glyphRect.origin.y;
 	else if (anchor == 1) /* bottom */
-		p.y = NSMaxY(rect) - bounds.size.height;
+		p.y = NSMaxY(glyphRect) - visibleRect.size.height;
 	else if (anchor == 2) /* middle */
-		p.y = rect.origin.y + rect.size.height / 2.0 - bounds.size.height / 2.0;
+		p.y = glyphRect.origin.y + glyphRect.size.height / 2.0 - visibleRect.size.height / 2.0;
 	else
 		p.y = 0;
 
 	if (p.y < 0)
 		p.y = 0;
 
-	[clipView scrollToPoint:p];
-	[scrollView reflectScrolledClipView:clipView];
+	[self scrollPoint:p];
 
 	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
@@ -3141,8 +3140,6 @@ again:
 		return NO;
 
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
-
-	
 
 	/* Present a list to choose from. */
 	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 

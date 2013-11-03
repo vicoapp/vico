@@ -3154,7 +3154,7 @@ again:
 										options:options
 								  initialFilter:fuzzyTrigger ? string : nil];
 
-	return YES;
+	return _showingCompletionWindow;
 }
 
 - (void)completionController:(ViCompletionController *)completionController

@@ -91,14 +91,14 @@
            toPattern:(NSMutableString *)pattern
           fuzzyClass:(NSString *)fuzzyClass;
 
-- (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
-                       range:(NSRange)aRange
-                      prefix:(NSString *)aPrefix
-            prefixScreenRect:(NSRect)prefixRect
-                    delegate:(id<ViCompletionDelegate>)aDelegate
-          existingKeyManager:(ViKeyManager *)existingKeyManager
-                     options:(NSString *)optionString
-               initialFilter:(NSString *)initialFilter;
+- (BOOL)chooseFrom:(id<ViCompletionProvider>)aProvider
+             range:(NSRange)aRange
+            prefix:(NSString *)aPrefix
+  prefixScreenRect:(NSRect)prefixRect
+          delegate:(id<ViCompletionDelegate>)aDelegate
+existingKeyManager:(ViKeyManager *)existingKeyManager
+           options:(NSString *)optionString
+     initialFilter:(NSString *)initialFilter;
 
 - (void)updateBounds;
 - (void)filterCompletions;

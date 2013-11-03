@@ -185,14 +185,15 @@
 	}
 }
 
-- (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
-                       range:(NSRange)aRange
-		              prefix:(NSString *)aPrefix
-			prefixScreenRect:(NSRect)prefixRect
-					delegate:(id<ViCompletionDelegate>)aDelegate
-		  existingKeyManager:(ViKeyManager *)existingKeyManager
-					 options:(NSString *)optionString
-               initialFilter:(NSString *)initialFilter {
+- (BOOL)chooseFrom:(id<ViCompletionProvider>)aProvider
+             range:(NSRange)aRange
+		    prefix:(NSString *)aPrefix
+  prefixScreenRect:(NSRect)prefixRect
+		  delegate:(id<ViCompletionDelegate>)aDelegate
+existingKeyManager:(ViKeyManager *)existingKeyManager
+		   options:(NSString *)optionString
+	 initialFilter:(NSString *)initialFilter {
+
 	_terminatingKey = 0;
 	[self reset];
 
@@ -231,7 +232,7 @@
 	if (error) {
 		INFO(@"Completion provider %@ returned error %@", _provider, error);
 		[self reset];
-		return nil;
+		return NO;
 	}
 	[self completionResponse:result error:nil];
 
@@ -243,13 +244,13 @@
 		ViCompletion *ret = _onlyCompletion;
 		_onlyCompletion = nil;
 
-		return ret;
+		return NO;
 	}
 
 	if ([_completions count] == 0 || [_filteredCompletions count] == 0) {
 		DEBUG(@"%s", "returning without completions");
 		[self reset];
-		return nil;
+		return NO;
 	}
 
 	NSInteger initialSelectionIndex = 0;
@@ -262,14 +263,8 @@
 
 	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
-	NSInteger code = [NSApp runModalForWindow:window];
-	[self reset];
 
-	if (code == NSRunAbortedResponse)
-		return nil;
-	ViCompletion *ret = _selection;
-	_selection = nil;
-	return ret;
+	return YES;
 }
 
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions

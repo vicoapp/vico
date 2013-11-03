@@ -241,7 +241,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 		[self reset];
 
-		ViCompletion *ret = _onlyCompletion;
+		[_delegate completionController:self didTerminateWithKey:-1 selectedCompletion:_onlyCompletion];
 		_onlyCompletion = nil;
 
 		return NO;

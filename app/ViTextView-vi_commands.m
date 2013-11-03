@@ -3147,17 +3147,15 @@ again:
 	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
 	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
-	_showingCompletionWindow = YES;
-
-	ViCompletionController *cc = [ViCompletionController sharedController];
-	ViCompletion *completion = [cc chooseFrom:provider
-										range:range
-									   prefix:fuzzyTrigger ? nil : string
-							 prefixScreenRect:prefixScreenRect
-									 delegate:self
-						   existingKeyManager:self.keyManager
-									  options:options
-								initialFilter:fuzzyTrigger ? string : nil];
+	_showingCompletionWindow =
+	  [[ViCompletionController sharedController] chooseFrom:provider
+										  range:range
+										 prefix:fuzzyTrigger ? nil : string
+							   prefixScreenRect:prefixScreenRect
+									   delegate:self
+							 existingKeyManager:self.keyManager
+										options:options
+								  initialFilter:fuzzyTrigger ? string : nil];
 
 	return YES;
 }

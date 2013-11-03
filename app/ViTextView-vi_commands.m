@@ -3159,21 +3159,27 @@ again:
 									  options:options
 								initialFilter:fuzzyTrigger ? string : nil];
 
+	return YES;
+}
+
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(NSString *)completion
+{
 	_showingCompletionWindow = NO;
 
-	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
+	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(completionController.range));
 	if (completion) {
-		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
+		NSRange completionRange = completionController.range;
+		// FIXME This should replace the entire completion range with the
+		// FIXME selected completion.
+		NSString *completingString = [completion.content substringWithRange:NSMakeRange(completionRange.length, completion.content.length - completionRange.length)];
 
 		// We are basically replaying input here, because this is in no way literal input.
 		virtualInput = YES;
 		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
 		virtualInput = NO;
 	}
-
-	if (completion == nil)
-		return NO;
-	return YES;
 }
 
 - (void)removeFromInputKeys:(ViCommand *)command

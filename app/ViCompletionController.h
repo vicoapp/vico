@@ -39,6 +39,10 @@
 @class ViCompletionController;
 
 @protocol ViCompletionDelegate <NSObject>
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(NSString *)selectedCompletion;
+
 @optional
 - (BOOL)completionController:(ViCompletionController *)completionController
        shouldTerminateForKey:(NSInteger)keyCode;

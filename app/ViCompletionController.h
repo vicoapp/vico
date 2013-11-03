@@ -41,7 +41,7 @@
 @protocol ViCompletionDelegate <NSObject>
 - (void)completionController:(ViCompletionController *)completionController
          didTerminateWithKey:(NSInteger)keyCode
-          selectedCompletion:(NSString *)selectedCompletion;
+          selectedCompletion:(ViCompletion *)selectedCompletion;
 
 @optional
 - (BOOL)completionController:(ViCompletionController *)completionController

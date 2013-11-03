@@ -3164,7 +3164,7 @@ again:
 
 - (void)completionController:(ViCompletionController *)completionController
          didTerminateWithKey:(NSInteger)keyCode
-          selectedCompletion:(NSString *)completion
+          selectedCompletion:(ViCompletion *)completion
 {
 	_showingCompletionWindow = NO;
 
@@ -3177,7 +3177,7 @@ again:
 
 		// We are basically replaying input here, because this is in no way literal input.
 		virtualInput = YES;
-		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(completionRange)]];
 		virtualInput = NO;
 	}
 }

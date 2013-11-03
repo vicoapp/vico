@@ -42,7 +42,7 @@
 @synthesize range = _range;
 @synthesize filter = _filter;
 
-+ (id)sharedController
++ (ViCompletionController *)sharedController
 {
 	static ViCompletionController *__sharedController = nil;
 	if (__sharedController == nil)

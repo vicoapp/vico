@@ -3157,6 +3157,13 @@ again:
 	return _showingCompletionWindow;
 }
 
+- (void)hideCompletionPopup
+{
+  ViCompletionController *controller = [ViCompletionController sharedController];
+  [controller cancel:nil];
+}
+
+
 - (void)completionController:(ViCompletionController *)completionController
          didTerminateWithKey:(NSInteger)keyCode
           selectedCompletion:(ViCompletion *)completion

@@ -471,6 +471,7 @@
 		fromProvider:(id<ViCompletionProvider>)provider
 		   fromRange:(NSRange)range
 		     options:(NSString *)options;
+- (void)hideCompletionPopup;
 - (void)completionController:(ViCompletionController *)completionController
          didTerminateWithKey:(NSInteger)keyCode
          selectedCompletions:(NSString *)selectedCompletion;

@@ -3136,9 +3136,6 @@ again:
 		   fromRange:(NSRange)range
 		     options:(NSString *)options
 {
-	if (_showingCompletionWindow)
-		return NO;
-
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
 	/* Present a list to choose from. */

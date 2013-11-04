@@ -1810,17 +1810,6 @@ replaceCharactersInRange:(NSRange)aRange
 			atLocation:start_location];
 
 		final_location = modify_start_location + 1;
-
-		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
-		  NSRange wordRange;
-		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
-		  if ([word length] >= 2) {
-			  [self presentCompletionsOf:word
-					fromProvider:[[ViWordCompletion alloc] init]
-					  fromRange:wordRange
-						options:@"C?"];
-		  }
-		}
 		DEBUG(@"setting final location to %lu", final_location);
 	}
 
@@ -2277,6 +2266,19 @@ replaceCharactersInRange:(NSRange)aRange
 
 		if (!replayingInput)
 			[self scrollToCaret];
+
+	  if (mode == ViInsertMode && ! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		NSRange wordRange;
+		NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		if ([word length] >= 2) {
+			[self presentCompletionsOf:word
+				  fromProvider:[[ViWordCompletion alloc] init]
+					fromRange:wordRange
+					  options:@"C?"];
+		} else {
+			[self hideCompletionPopup];
+		}
+	  }
 	} else
 		[self updateCaret];
 

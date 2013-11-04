@@ -467,15 +467,14 @@
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
 (cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
-(cmap setDefaultCatchallAction:"filter:")
-(cmap setKey:"<esc>" toAction:"cancel:")
-(cmap setKey:"<ctrl-e>" toAction:"cancel:")
-(cmap setKey:"<cr>" toAction:"accept:")
-(cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
-(cmap setKey:"<space>" toAction:"accept_if_not_autocompleting:")
-(cmap setKey:"<ctrl-y>" toAction:"accept:")
 (cmap setDefaultAction:"input_character:")
 (cmap include:imap)
+(cmap setKey:"<esc>" toAction:"cancel_completion:")
+(cmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
+(cmap setKey:"<cr>" toAction:"accept_completion:")
+(cmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
+(cmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
+(cmap setKey:"<ctrl-y>" toAction:"accept_completion:")
 (cmap setKey:"<ctrl-n>" toAction:"move_down:")
 (cmap setKey:"<ctrl-j>" toAction:"move_down:")
 (cmap setKey:"<ctrl-k>" toAction:"move_up:")

@@ -3157,10 +3157,26 @@ again:
 	return _showingCompletionWindow;
 }
 
+- (BOOL)cancel_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] cancel:command];
+}
+- (BOOL)accept_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept:command];
+}
+- (BOOL)accept_completion_or_complete_partially:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept_or_complete_partially:command];
+}
+- (BOOL)accept_completion_if_not_autocompleting:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept_if_not_autocompleting:command];
+}
+
 - (void)hideCompletionPopup
 {
-  ViCompletionController *controller = [ViCompletionController sharedController];
-  [controller cancel:nil];
+	[[ViCompletionController sharedController] cancel:nil];
 }
 
 

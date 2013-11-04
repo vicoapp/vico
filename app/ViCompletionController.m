@@ -236,13 +236,11 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	}
 	[self completionResponse:result error:nil];
 
-	if (_onlyCompletion && _aggressive) {
+	if (_onlyCompletion && (_aggressive || [_onlyCompletion.content isEqualToString:_prefix])) {
 		DEBUG(@"returning %@ as only completion", _onlyCompletion);
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
-		[self reset];
 
-		[_delegate completionController:self didTerminateWithKey:-1 selectedCompletion:_onlyCompletion];
-		_onlyCompletion = nil;
+		[self terminateWithKey:0 completion:_onlyCompletion];
 
 		return NO;
 	}
@@ -399,7 +397,6 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 
 - (void)acceptByKey:(NSInteger)termKey
 {
-	_terminatingKey = termKey;
 	NSInteger row = [tableView selectedRow];
 	if (row >= 0 && row < [_filteredCompletions count]) {
 		_selection = [_filteredCompletions objectAtIndex:row];
@@ -407,9 +404,8 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 
 		_range = NSMakeRange(_range.location, _prefixLength + [_filter length]);
 	}
-	[window orderOut:nil];
-	[NSApp stopModal];
-	[self reset];
+
+	[self terminateWithKey:termKey completion:_selection];
 }
 
 - (BOOL)cancel:(ViCommand *)command
@@ -417,21 +413,20 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	if (! _delegate)
 		return NO;
 
-	ViKeyManager *existingKeyManager = _existingKeyManager;
-
-	_terminatingKey = [[command.mapping.keySequence lastObject] integerValue];
-	[window orderOut:nil];
-	[NSApp abortModal];
-	[self reset];
-
-	// If we cancel while autocompleting, we want the invoking key manager to 
-	// also get the key mapping, as we want escapes and Ctrl-[s and other
-	// mappings designed to get the user into insert mode to take effect no
-	// matter what.
-	if (command && _autocompleting)
-		[existingKeyManager handleKeys:command.keySequence];
+	[self terminateWithKey:[[command.mapping.keySequence lastObject] integerValue] completion:nil];
 
 	return YES;
+}
+
+- (void)terminateWithKey:(NSInteger)terminatingKey completion:(ViCompletion *)completion
+{
+	_terminatingKey = terminatingKey;
+
+	[_delegate completionController:self didTerminateWithKey:_terminatingKey selectedCompletion:_selection];
+
+	[window orderOut:nil];
+
+	[self reset];
 }
 
 - (BOOL)accept_if_not_autocompleting:(ViCommand *)command
@@ -475,10 +470,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 
 	[self filterCompletions];
 	if ([_filteredCompletions count] == 0) {
-		_terminatingKey = keyCode;
-		[window orderOut:nil];
-		[NSApp abortModal];
-		return YES;
+		[self terminateWithKey:keyCode completion:nil];
 	}
 
 	return YES;

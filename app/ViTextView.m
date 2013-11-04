@@ -2405,8 +2405,13 @@ replaceCharactersInRange:(NSRange)aRange
 
 		if (mode == ViVisualMode)
 			[_keyManager.parser setVisualMap];
-		else if (mode == ViInsertMode)
-			[_keyManager.parser setInsertMap];
+		else if (mode == ViInsertMode) {
+			if (_showingCompletionWindow) {
+				[_keyManager.parser setMap:[ViMap completionMap]];
+			} else {
+				[_keyManager.parser setInsertMap];
+			}
+		}
 	}
 
 	return [NSNumber numberWithBool:YES];

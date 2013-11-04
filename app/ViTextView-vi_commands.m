@@ -3154,6 +3154,10 @@ again:
 										options:options
 								  initialFilter:fuzzyTrigger ? string : nil];
 
+	if (_showingCompletionWindow) {
+		[_keyManager.parser setMap:[ViMap completionMap]];
+	}
+
 	return _showingCompletionWindow;
 }
 
@@ -3185,6 +3189,10 @@ again:
           selectedCompletion:(ViCompletion *)completion
 {
 	_showingCompletionWindow = NO;
+
+	if (mode == ViInsertMode) {
+		[_keyManager.parser setMap:[ViMap insertMap]];
+	}
 
 	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(completionController.range));
 	if (completion) {

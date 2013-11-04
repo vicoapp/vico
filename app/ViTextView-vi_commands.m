@@ -3181,6 +3181,8 @@ again:
 		virtualInput = YES;
 		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(completionRange)]];
 		virtualInput = NO;
+	} else {
+		[[self keyManager] handleKey:keyCode inScope:[document scopeAtLocation:NSMaxRange(completionController.range)]];
 	}
 }
 

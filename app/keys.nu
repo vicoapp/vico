@@ -474,6 +474,8 @@
 (cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
 (cmap setKey:"<space>" toAction:"accept_if_not_autocompleting:")
 (cmap setKey:"<ctrl-y>" toAction:"accept:")
+(cmap setDefaultAction:"input_character:")
+(cmap include:imap)
 (cmap setKey:"<ctrl-n>" toAction:"move_down:")
 (cmap setKey:"<ctrl-j>" toAction:"move_down:")
 (cmap setKey:"<ctrl-k>" toAction:"move_up:")

@@ -85,7 +85,7 @@
 @property (nonatomic, readonly) NSRange range;
 @property (nonatomic, readwrite, strong) NSString *filter;
 
-+ (id)sharedController;
++ (ViCompletionController *)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;
 + (void)appendFilter:(NSString *)string
            toPattern:(NSMutableString *)pattern

@@ -105,6 +105,10 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 - (BOOL)complete_partially:(ViCommand *)command;
 - (void)acceptByKey:(NSInteger)termKey;
 - (BOOL)cancel:(ViCommand *)command;
+- (BOOL)accept:(ViCommand *)command;
+- (BOOL)accept_or_complete_partially:(ViCommand *)command;
+- (BOOL)accept_if_not_autocompleting:(ViCommand *)command;
+- (BOOL)accept_or_complete_partially:(ViCommand *)command;
 - (void)updateCompletions;
 - (void)reset;
 

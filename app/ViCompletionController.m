@@ -170,12 +170,8 @@
 				[self cancel:nil];
 				return;
 			}
-		} else if ([_filteredCompletions count] == 1 && _aggressive) {
-			if ([window isVisible]) {
-				[self acceptByKey:0];
-			} else {
-				_onlyCompletion = [_filteredCompletions objectAtIndex:0];
-			}
+		} else if ([_filteredCompletions count] == 1) {
+			_onlyCompletion = [_filteredCompletions objectAtIndex:0];
 		}
 
 		/* Automatically insert common prefix among all possible completions.

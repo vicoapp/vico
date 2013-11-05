@@ -418,7 +418,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 {
 	_terminatingKey = terminatingKey;
 
-	[_delegate completionController:self didTerminateWithKey:_terminatingKey selectedCompletion:_selection];
+	[_delegate completionController:self didTerminateWithKey:_terminatingKey selectedCompletion:completion];
 
 	[window orderOut:nil];
 

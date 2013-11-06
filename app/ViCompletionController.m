@@ -542,7 +542,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	return YES;
 }
 
-- (BOOL)move_up:(ViCommand *)command
+- (BOOL)select_previous_completion:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
 	if (row == -1) {
@@ -559,7 +559,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	return selectionSuccessful;
 }
 
-- (BOOL)move_down:(ViCommand *)command
+- (BOOL)select_next_completion:(ViCommand *)command
 {
 	NSUInteger row = [tableView selectedRow];
 	if (row == -1) {

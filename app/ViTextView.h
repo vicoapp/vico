@@ -58,7 +58,7 @@
 /** A text edit view.
  *
  */
-@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
 {
 	ViDocument		*document;
 	// .busy
@@ -455,7 +455,7 @@
 @interface ViTextView (syntax)
 @end
 
-@interface ViTextView (vi_commands)
+@interface ViTextView (vi_commands) <ViCompletionDelegate>
 - (BOOL)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand;
 - (BOOL)insert:(ViCommand *)command;
 - (BOOL)move_left:(ViCommand *)command;

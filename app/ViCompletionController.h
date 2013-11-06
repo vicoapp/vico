@@ -80,6 +80,7 @@
 
 @property (unsafe_unretained, nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
+@property (nonatomic, readonly) ViCompletionView *completionView;
 @property (nonatomic, readwrite, strong) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;

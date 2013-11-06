@@ -41,6 +41,7 @@
 @synthesize terminatingKey = _terminatingKey;
 @synthesize range = _range;
 @synthesize filter = _filter;
+@synthesize completionView = tableView;
 
 + (ViCompletionController *)sharedController
 {

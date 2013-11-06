@@ -5930,9 +5930,9 @@ static NSMutableDictionary *handlerWarehouse = nil;
     return self;
 }
 
-- (NSString *) name
+- (NSString *)name
 {
-    return m ? [NSString stringWithCString:(sel_getName(method_getName(m))) encoding:NSUTF8StringEncoding] : [NSNull null];
+    return m ? [NSString stringWithCString:(sel_getName(method_getName(m))) encoding:NSUTF8StringEncoding] : (NSString *)[NSNull null];
 }
 
 - (int) argumentCount
@@ -11248,7 +11248,7 @@ static NSArray *voidHTMLElements = nil;
 static NSDictionary *elementPrefixes = nil;
 
 + (void) initialize {
-    voidHTMLElements = [[NSSet setWithObjects:
+    voidHTMLElements = [[[NSSet setWithObjects:
                          @"area",
                          @"base",
                          @"br",
@@ -11265,7 +11265,7 @@ static NSDictionary *elementPrefixes = nil;
                          @"source",
                          @"track",
                          @"wbr",
-                         nil] retain];
+                         nil] allObjects] retain];
     elementPrefixes = [[NSDictionary dictionaryWithObjectsAndKeys:
                         @"<!DOCTYPE html>", @"html",
                         nil] retain];

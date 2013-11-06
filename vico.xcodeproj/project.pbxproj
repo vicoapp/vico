@@ -506,7 +506,7 @@
 		9A2EF28F133109C10023C5B7 /* Vico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vico.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A2EF293133109C20023C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9A2EF29B133109C20023C5B7 /* Vico-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Vico-Info.plist"; sourceTree = "<group>"; };
-		9A2EF29D133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9A2EF29D133109C20023C5B7 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9A2EF29F133109C20023C5B7 /* Vico-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Prefix.pch"; sourceTree = "<group>"; };
 		9A2EF2A0133109C20023C5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A2EF2A3133109C20023C5B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };

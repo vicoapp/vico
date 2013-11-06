@@ -154,7 +154,7 @@ static int digtoint(char c)
 
   if (!c) return -1;
   p = strchr(digits,c);
-  return  p  ?  p - digits  :  -1;
+  return  p  ?  (int)(p - digits)  :  -1;
 
   /* We can't simply return c - '0' because this is ANSI C code,  */
   /* so it has to work for any character set, not just ones which */
@@ -362,7 +362,7 @@ static wchar_t **readlines(
               }
             }
             else {
-              vlnlen = p - ln;
+              vlnlen = (int)(p - ln);
               vln = malloc((vlnlen + 1) * sizeof (wchar_t));
               if (!vln) {
                 wcscpy(errmsg,outofmem);
@@ -510,7 +510,7 @@ static void compresuflen(
         else
           break;
       }
-  *ppre = end - start;
+  *ppre = (int)(end - start);
 
   knownstart = *lines + *ppre;
   for (end = knownstart;  *end;  ++end);
@@ -537,7 +537,7 @@ static void compresuflen(
   }
   else
     while (end - start >= 2 && *start == L' ' && start[1] == L' ') ++start;
-  *psuf = end - start;
+  *psuf = (int)(end - start);
 }
 
 
@@ -676,7 +676,7 @@ static void setaffixes(
   int numin, pre, suf;
   const wchar_t *p;
 
-  numin = endline - inlines;
+  numin = (int)(endline - inlines);
 
   if ((*pprefix < 0 || *psuffix < 0)  &&  numin > hang + 1)
     compresuflen(inlines + hang, endline, bodychars, body, 0, 0, &pre, &suf);
@@ -685,7 +685,7 @@ static void setaffixes(
   if (numin == 1 && quote)
     while (*p && csmember (*p, quotechars))
       ++p;
-  *pafp = p - *inlines;
+  *pafp = (int)(p - *inlines);
   *pfs = props->s;
 
   if (*pprefix < 0)

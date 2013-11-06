@@ -1505,9 +1505,8 @@ replaceCharactersInRange:(NSRange)aRange
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
 
-	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
-		ViCompletionController *controller = [ViCompletionController sharedController];
-		[controller cancel:nil];
+	if (delta > 1 && _showingCompletionWindow) {
+		[self hideCompletionWindow];
 	}
 }
 

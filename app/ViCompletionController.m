@@ -53,7 +53,7 @@
 - (id)init
 {
 	if ((self = [super init])) {
-		if (![NSBundle loadNibNamed:@"CompletionWindow" owner:self]) {
+		if (![[NSBundle mainBundle] loadNibNamed:@"CompletionWindow" owner:self topLevelObjects:nil]) {
 			return nil;
 		}
 

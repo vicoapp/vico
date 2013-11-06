@@ -98,10 +98,10 @@
 - (NSDictionary *)smartPairMatchAttributes
 {
 	if (_smartPairMatchAttributes == nil) {
-		// _smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[self selectionColor]
-		// 						        forKey:NSBackgroundColorAttributeName];
-		_smartPairMatchAttributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:NSUnderlinePatternSolid | NSUnderlineStyleDouble]
-									 forKey:NSUnderlineStyleAttributeName];
+		_smartPairMatchAttributes =
+			[NSMutableDictionary dictionaryWithDictionary:@{
+															 NSUnderlineStyleAttributeName: @(NSUnderlinePatternSolid | NSUnderlineStyleDouble)
+														   }];
 	}
 	return _smartPairMatchAttributes;
 }

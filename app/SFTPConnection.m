@@ -268,7 +268,7 @@ typedef void (^WritefunType)(SFTPMessage *);
 	DEBUG(@"limitdate %@ reached, presenting cancellable sheet", limitDate);
 
 	/* Continue with a sheet with a cancel button. */
-	[NSBundle loadNibNamed:@"WaitProgress" owner:self];
+	[[NSBundle mainBundle] loadNibNamed:@"WaitProgress" owner:self topLevelObjects:nil];
 	[waitLabel setStringValue:waitMessage];
 	[progressIndicator startAnimation:nil];
 	[waitWindow setTitle:[NSString stringWithFormat:@"Waiting on %@", _connection.title]];

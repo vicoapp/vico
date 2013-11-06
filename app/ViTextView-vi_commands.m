@@ -3153,7 +3153,6 @@ again:
 										 prefix:fuzzyTrigger ? nil : string
 							   prefixScreenRect:prefixScreenRect
 									   delegate:self
-							 existingKeyManager:self.keyManager
 										options:options
 								  initialFilter:fuzzyTrigger ? string : nil];
 

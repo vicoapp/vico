@@ -187,7 +187,6 @@
 		    prefix:(NSString *)aPrefix
   prefixScreenRect:(NSRect)prefixRect
 		  delegate:(id<ViCompletionDelegate>)aDelegate
-existingKeyManager:(ViKeyManager *)existingKeyManager
 		   options:(NSString *)optionString
 	 initialFilter:(NSString *)initialFilter {
 
@@ -195,7 +194,6 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	[self reset];
 
 	_delegate = aDelegate;
-	_existingKeyManager = existingKeyManager;
 
 	_onlyCompletion = nil;
 
@@ -387,8 +385,6 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 
 	_options = nil;
 
-	_existingKeyManager = nil;
-
 	_delegate = nil; // delegate must be set for each completion, we don't want a lingering deallocated delegate to be called
 }
 
@@ -446,7 +442,6 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 - (BOOL)input_character:(ViCommand *)command
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
-	[_existingKeyManager handleKeys:command.keySequence];
 
 	SEL sel = @selector(completionController:shouldTerminateForKey:);
 	if ([_delegate respondsToSelector:sel]) {
@@ -475,7 +470,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 
 - (BOOL)input_backspace:(ViCommand *)command {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
-	[_existingKeyManager handleKeys:command.keySequence];
+
 	if (_filter.length > 0) {
 		[_filter deleteCharactersInRange:NSMakeRange(_filter.length - 1, 1)];
 		[self filterCompletions];

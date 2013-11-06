@@ -65,7 +65,6 @@
 	ViCompletion			*_onlyCompletion;
 	NSMutableArray			*_filteredCompletions;
 	ViCompletion			*_selection;
-	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
 	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
@@ -97,7 +96,6 @@
             prefix:(NSString *)aPrefix
   prefixScreenRect:(NSRect)prefixRect
           delegate:(id<ViCompletionDelegate>)aDelegate
-existingKeyManager:(ViKeyManager *)existingKeyManager
            options:(NSString *)optionString
      initialFilter:(NSString *)initialFilter;
 

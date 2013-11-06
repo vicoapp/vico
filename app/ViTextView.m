@@ -2235,6 +2235,9 @@ replaceCharactersInRange:(NSRange)aRange
 		leaveVisualMode = YES;
 	}
 
+	// Need to know if the completion was showing *before* we ran the command.
+	BOOL completionWasShowing = _showingCompletionWindow;
+
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = [command performWithTarget:target];
@@ -2282,6 +2285,14 @@ replaceCharactersInRange:(NSRange)aRange
 			[self scrollToCaret];
 	} else
 		[self updateCaret];
+
+	// We still want to forward commands defined on ViTextView to the
+	// completion controller when it's up, but we don't want double handling
+	// when the ViTextView didn't handle the keystroke (say, as with backspace).
+	ViCompletionController *completionController = [ViCompletionController sharedController];
+	if (completionWasShowing && target != completionController) {
+		[completionController keyManager:keyManager evaluateCommand:command];
+	}
 
 	if (mode == ViVisualMode)
 		[self setVisualSelection];

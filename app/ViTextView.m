@@ -2097,6 +2097,19 @@ replaceCharactersInRange:(NSRange)aRange
 	return YES;
 }
 
+- (id)targetForSelector:(SEL)action
+{
+	id target = [super targetForSelector:action];
+
+	// If the completion window is up and the text view couldn't handle this
+	// action, see if the completion window can.
+	if (! target && _showingCompletionWindow) {
+		target = [[ViCompletionController sharedController].completionView targetForSelector:action];
+	}
+
+	return target;
+}
+
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {

@@ -443,7 +443,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	return YES;
 }
 
-- (BOOL)filter:(ViCommand *)command
+- (BOOL)input_character:(ViCommand *)command
 {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
 	[_existingKeyManager handleKeys:command.keySequence];
@@ -473,7 +473,7 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 	return YES;
 }
 
-- (BOOL)backspace:(ViCommand *)command {
+- (BOOL)input_backspace:(ViCommand *)command {
 	NSInteger keyCode = [[command.mapping.keySequence lastObject] integerValue];
 	[_existingKeyManager handleKeys:command.keySequence];
 	if (_filter.length > 0) {
@@ -481,16 +481,11 @@ existingKeyManager:(ViKeyManager *)existingKeyManager
 		[self filterCompletions];
 	} else {
 		/* This backspace goes beyond the filter into the prefix. Dismiss the window. */
-		_terminatingKey = keyCode;
-		[window orderOut:nil];
-		[NSApp abortModal];
+		[self terminateWithKey:keyCode completion:nil];
 	}
 
 	if ([_filteredCompletions count] == 0) {
-		_terminatingKey = keyCode;
-		[window orderOut:nil];
-		[NSApp abortModal];
-		return YES;
+		[self terminateWithKey:keyCode completion:nil];
 	}
 	return YES;
 }

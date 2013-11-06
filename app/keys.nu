@@ -481,7 +481,7 @@
 (cmap setKey:"<ctrl-p>" toAction:"move_up:")
 (cmap setKey:"<down>" toAction:"move_down:")
 (cmap setKey:"<up>" toAction:"move_up:")
-(cmap setKey:"<bs>" toAction:"backspace:")
+(cmap setKey:"<bs>" toAction:"input_backspace:")
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 

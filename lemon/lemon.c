@@ -1633,13 +1633,13 @@ static char *msort(
     list = NEXT(list);
     NEXT(ep) = 0;
     for(i=0; i<LISTSIZE-1 && set[i]!=0; i++){
-      ep = (int)merge(ep,set[i],cmp,(int)offset);
+      ep = merge(ep,set[i],cmp,(int)offset);
       set[i] = 0;
     }
     set[i] = ep;
   }
   ep = 0;
-  for(i=0; i<LISTSIZE; i++) if( set[i] ) ep = (int)merge(ep,set[i],cmp,(int)offset);
+  for(i=0; i<LISTSIZE; i++) if( set[i] ) ep = merge(ep,set[i],cmp,(int)offset);
   return ep;
 }
 /************************ From the file "option.c" **************************/

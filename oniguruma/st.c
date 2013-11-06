@@ -118,7 +118,7 @@ new_size(size)
 	 i < (int )(sizeof(primes)/sizeof(primes[0]));
 	 i++, newsize <<= 1)
     {
-	if (newsize > size) return primes[i];
+	if (newsize > size) return (int)primes[i];
     }
     /* Ran out of polynomials */
     return -1;			/* should raise exception */
@@ -574,5 +574,5 @@ static int
 numhash(n)
     long n;
 {
-    return n;
+    return (int)n;
 }

@@ -281,11 +281,11 @@ typedef unsigned int  BitStatusType;
 
 #define INT_MAX_LIMIT           ((1UL << (SIZEOF_INT * 8 - 1)) - 1)
 
-#define DIGITVAL(code)    ((code) - '0')
+#define DIGITVAL(code)    (int)((code) - '0')
 #define ODIGITVAL(code)   DIGITVAL(code)
 #define XDIGITVAL(enc,code) \
   (ONIGENC_IS_CODE_DIGIT(enc,code) ? DIGITVAL(code) \
-   : (ONIGENC_IS_CODE_UPPER(enc,code) ? (code) - 'A' + 10 : (code) - 'a' + 10))
+   : (ONIGENC_IS_CODE_UPPER(enc,code) ? (int)((code) - 'A' + 10) : (int)((code) - 'a' + 10)))
 
 #define IS_SINGLELINE(option)     ((option) & ONIG_OPTION_SINGLELINE)
 #define IS_MULTILINE(option)      ((option) & ONIG_OPTION_MULTILINE)
@@ -576,7 +576,7 @@ typedef void* PointerType;
 #define GET_STATE_CHECK_NUM_INC(num,p)  PLATFORM_GET_INC(num, p, StateCheckNumType)
 
 /* code point's address must be aligned address. */
-#define GET_CODE_POINT(code,p)   code = *((OnigCodePoint* )(p))
+#define GET_CODE_POINT(code,p)   code = (int)*((OnigCodePoint* )(p))
 #define GET_BYTE_INC(byte,p) do{\
   byte = *(p);\
   (p)++;\

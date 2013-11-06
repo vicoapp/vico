@@ -405,7 +405,7 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
 #define STACK_SAVE do{\
   if (stk_base != stk_alloc) {\
     msa->stack_p = stk_base;\
-    msa->stack_n = stk_end - stk_base;\
+    msa->stack_n = (int)(stk_end - stk_base);\
   };\
 } while(0)
 
@@ -435,7 +435,7 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
   stk_end  = *arg_stk_end;
   stk      = *arg_stk;
 
-  n = stk_end - stk_base;
+  n = (int)(stk_end - stk_base);
   if (stk_base == stk_alloc && IS_NULL(msa->stack_p)) {
     x = (OnigStackType* )xmalloc(sizeof(OnigStackType) * n * 2);
     if (IS_NULL(x)) {
@@ -1314,7 +1314,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     sbegin = s;
     switch (*p++) {
     case OP_END:  MOP_IN(OP_END);
-      n = s - sstart;
+      n = (int)(s - sstart);
       if (n > best_len) {
 	OnigRegion* region;
 #ifdef USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
@@ -1334,18 +1334,18 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  if (IS_POSIX_REGION(msa->options)) {
 	    posix_regmatch_t* rmt = (posix_regmatch_t* )region;
 
-	    rmt[0].rm_so = sstart - str;
-	    rmt[0].rm_eo = s      - str;
+	    rmt[0].rm_so = (int)(sstart - str);
+	    rmt[0].rm_eo = (int)(s      - str);
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  rmt[i].rm_so = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
+		  rmt[i].rm_so = (int)(STACK_AT(mem_start_stk[i])->u.mem.pstr - str);
 		else
-		  rmt[i].rm_so = (UChar* )((void* )(mem_start_stk[i])) - str;
+		  rmt[i].rm_so = (int)((UChar* )((void* )(mem_start_stk[i])) - str);
 
-		rmt[i].rm_eo = (BIT_STATUS_AT(reg->bt_mem_end, i)
+		rmt[i].rm_eo = (int)((BIT_STATUS_AT(reg->bt_mem_end, i)
 				? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				: (UChar* )((void* )mem_end_stk[i])) - str;
+				: (UChar* )((void* )mem_end_stk[i])) - str);
 	      }
 	      else {
 		rmt[i].rm_so = rmt[i].rm_eo = ONIG_REGION_NOTPOS;
@@ -1354,18 +1354,18 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  }
 	  else {
 #endif /* USE_POSIX_API_REGION_OPTION */
-	    region->beg[0] = sstart - str;
-	    region->end[0] = s      - str;
+	    region->beg[0] = (int)(sstart - str);
+	    region->end[0] = (int)(s      - str);
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  region->beg[i] = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
+		  region->beg[i] = (int)(STACK_AT(mem_start_stk[i])->u.mem.pstr - str);
 		else
-		  region->beg[i] = (UChar* )((void* )mem_start_stk[i]) - str;
+		  region->beg[i] = (int)((UChar* )((void* )mem_start_stk[i]) - str);
 
-		region->end[i] = (BIT_STATUS_AT(reg->bt_mem_end, i)
+		region->end[i] = (int)((BIT_STATUS_AT(reg->bt_mem_end, i)
 				  ? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				  : (UChar* )((void* )mem_end_stk[i])) - str;
+				  : (UChar* )((void* )mem_end_stk[i])) - str);
 	      }
 	      else {
 		region->beg[i] = region->end[i] = ONIG_REGION_NOTPOS;
@@ -1387,8 +1387,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
               }
 
               node->group = 0;
-              node->beg   = sstart - str;
-              node->end   = s      - str;
+              node->beg   = (int)(sstart - str);
+              node->end   = (int)(s      - str);
 
               stkp = stk_base;
               r = make_capture_history_tree(region->history_root, &stkp,
@@ -2155,7 +2155,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	pend = (BIT_STATUS_AT(reg->bt_mem_end, mem)
 		? STACK_AT(mem_end_stk[mem])->u.mem.pstr
 		: (UChar* )((void* )mem_end_stk[mem]));
-	n = pend - pstart;
+	n = (int)(pend - pstart);
 	DATA_ENSURE(n);
 	sprev = s;
 	STRING_CMP(pstart, s, n);
@@ -2187,7 +2187,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	pend = (BIT_STATUS_AT(reg->bt_mem_end, mem)
 		? STACK_AT(mem_end_stk[mem])->u.mem.pstr
 		: (UChar* )((void* )mem_end_stk[mem]));
-	n = pend - pstart;
+	n = (int)(pend - pstart);
 	DATA_ENSURE(n);
 	sprev = s;
 	STRING_CMP_IC(case_fold_flag, pstart, &s, n);
@@ -2219,7 +2219,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  pend = (BIT_STATUS_AT(reg->bt_mem_end, mem)
 		  ? STACK_AT(mem_end_stk[mem])->u.mem.pstr
 		  : (UChar* )((void* )mem_end_stk[mem]));
-	  n = pend - pstart;
+	  n = (int)(pend - pstart);
 	  DATA_ENSURE(n);
 	  sprev = s;
 	  swork = s;
@@ -2258,7 +2258,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  pend = (BIT_STATUS_AT(reg->bt_mem_end, mem)
 		  ? STACK_AT(mem_end_stk[mem])->u.mem.pstr
 		  : (UChar* )((void* )mem_end_stk[mem]));
-	  n = pend - pstart;
+	  n = (int)(pend - pstart);
 	  DATA_ENSURE(n);
 	  sprev = s;
 	  swork = s;
@@ -2886,7 +2886,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
 #endif
 
   tail = target_end - 1;
-  tlen1 = tail - target;
+  tlen1 = (int)(tail - target);
   end = text_range;
   if (end + tlen1 > text_end)
     end = text_end - tlen1;
@@ -2977,7 +2977,7 @@ set_bm_backward_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
     if (IS_NULL(*skip)) return ONIGERR_MEMORY;
   }
 
-  len = end - s;
+  len = (int)(end - s);
   for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++)
     (*skip)[i] = len;
 
@@ -3745,7 +3745,7 @@ onig_search(regex_t* reg, const UChar* str, const UChar* end,
  match:
   ONIG_STATE_DEC_THREAD(reg);
   MATCH_ARG_FREE(msa);
-  return s - str;
+  return (int)(s - str);
 }
 
 extern OnigEncoding

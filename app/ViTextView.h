@@ -235,6 +235,11 @@
  */
 - (BOOL)input:(NSString *)inputString;
 
+/**
+ * Usually invoked by the keyManager, inputs a character via a ViCommand.
+ */
+- (BOOL)input_character:(ViCommand *)command;
+
 /** @name Caret handling */
 
 /** Set the location of the caret.

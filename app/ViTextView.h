@@ -479,7 +479,7 @@
 - (void)hideCompletionWindow;
 - (void)completionController:(ViCompletionController *)completionController
          didTerminateWithKey:(NSInteger)keyCode
-         selectedCompletions:(NSString *)selectedCompletion;
+          selectedCompletion:(ViCompletion *)selectedCompletion;
 - (BOOL)complete_keyword:(ViCommand *)command;
 - (BOOL)complete_path:(ViCommand *)command;
 - (BOOL)complete_buffer:(ViCommand *)command;

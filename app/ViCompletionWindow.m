@@ -33,6 +33,8 @@
 		[self setBecomesKeyOnlyIfNeeded:YES];
 		[self setFloatingPanel:YES];
 	}
+	
+	return self;
 }
 
 @end

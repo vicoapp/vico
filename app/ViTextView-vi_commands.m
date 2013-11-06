@@ -3178,7 +3178,11 @@ again:
 }
 - (BOOL)accept_completion_if_not_autocompleting:(ViCommand *)command
 {
-	return [[ViCompletionController sharedController] accept_if_not_autocompleting:command];
+	BOOL result = [[ViCompletionController sharedController] accept_if_not_autocompleting:command];
+
+	[self input_character:command];
+
+	return result;
 }
 
 - (void)hideCompletionPopup

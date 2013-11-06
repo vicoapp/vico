@@ -3185,7 +3185,7 @@ again:
 	return result;
 }
 
-- (void)hideCompletionPopup
+- (void)hideCompletionWindow
 {
 	[[ViCompletionController sharedController] cancel:nil];
 }

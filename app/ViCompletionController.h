@@ -70,7 +70,7 @@
 	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
 	NSInteger			 _terminatingKey;
 	NSRange				 _range;
-	NSRect				 _prefixScreenRect;
+	NSRect				 _prefixWindowRect;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
 	BOOL				 _autocompleting;
@@ -94,7 +94,8 @@
 - (BOOL)chooseFrom:(id<ViCompletionProvider>)aProvider
              range:(NSRange)aRange
             prefix:(NSString *)aPrefix
-  prefixScreenRect:(NSRect)prefixRect
+  prefixWindowRect:(NSRect)prefixRect
+         forWindow:(NSWindow *)parentWindow
           delegate:(id<ViCompletionDelegate>)aDelegate
            options:(NSString *)optionString
      initialFilter:(NSString *)initialFilter;

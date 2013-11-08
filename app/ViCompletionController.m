@@ -100,7 +100,7 @@
 	*/
 	NSUInteger maxNumberOfRows = (NSUInteger)((screenSize.height / 2)
 												- label.bounds.size.height
-												- _prefixScreenRect.size.height)
+												- _prefixWindowRect.size.height)
 											 / tableView.rowHeight;
 	NSUInteger numberOfRows = MIN([_filteredCompletions count], maxNumberOfRows);
 	winsz.height = numberOfRows * ([tableView rowHeight] + 2) + [label bounds].size.height;
@@ -181,7 +181,8 @@
 - (BOOL)chooseFrom:(id<ViCompletionProvider>)aProvider
              range:(NSRange)aRange
 		    prefix:(NSString *)aPrefix
-  prefixScreenRect:(NSRect)prefixRect
+  prefixWindowRect:(NSRect)prefixRect
+		 forWindow:(NSWindow *)parentWindow
 		  delegate:(id<ViCompletionDelegate>)aDelegate
 		   options:(NSString *)optionString
 	 initialFilter:(NSString *)initialFilter {
@@ -208,7 +209,9 @@
 	// Aggressive means we auto-select a unique suggestion.
 	_aggressive = [_options rangeOfString:@"?"].location == NSNotFound;
 	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
-	_prefixScreenRect = prefixRect;
+	_prefixWindowRect = prefixRect;
+
+	[parentWindow addChildWindow:window ordered:NSWindowAbove];
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);
@@ -358,6 +361,7 @@
 	[tableView reloadData];
 	NSInteger selectionRow = _positionCompletionsBelowPrefix ? 0 : _filteredCompletions.count - 1;
 	[self selectCompletionRowWithDelegateCalls:selectionRow];
+
 	[self updateBounds];
 }
 
@@ -642,7 +646,8 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 }
 
 - (NSPoint)computeWindowOriginForSize:(NSSize)winsz {
-	NSPoint origin = _prefixScreenRect.origin;
+	NSRect screenRect = [[self.window parentWindow] convertRectToScreen:_prefixWindowRect];
+	NSPoint origin = screenRect.origin;
 
 	NSScreen *screen = [NSScreen mainScreen];
 	NSSize screenSize = [window convertRectFromScreen:[screen visibleFrame]].size;
@@ -651,7 +656,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	the completions above or below. Default is below.
 	*/
 	if ([NSApp modalWindow] != window) {
-		if (winsz.height > _prefixScreenRect.origin.y) {
+		if (winsz.height > screenRect.origin.y) {
 			_positionCompletionsBelowPrefix = NO;
 		} else {
 			_positionCompletionsBelowPrefix = YES;
@@ -678,7 +683,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	if (_positionCompletionsBelowPrefix) {
 		origin.y -= winsz.height;
 	} else {
-		origin.y += _prefixScreenRect.size.height;
+		origin.y += screenRect.size.height;
 	}
 
 	return origin;

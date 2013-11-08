@@ -3145,13 +3145,13 @@ again:
 	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
 														  inTextContainer:[self textContainer]];
 	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
-	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
 	_showingCompletionWindow =
 	  [[ViCompletionController sharedController] chooseFrom:provider
 										  range:range
 										 prefix:fuzzyTrigger ? nil : string
-							   prefixScreenRect:prefixScreenRect
+							   prefixWindowRect:prefixWindowRect
+									  forWindow:[self window]
 									   delegate:self
 										options:options
 								  initialFilter:fuzzyTrigger ? string : nil];

@@ -212,6 +212,11 @@
 	_prefixWindowRect = prefixRect;
 
 	[parentWindow addChildWindow:window ordered:NSWindowAbove];
+	[[NSNotificationCenter defaultCenter]
+		addObserver:self
+		   selector:@selector(containingWindowDidResignMain:)
+			   name:NSWindowDidResignMainNotification
+			 object:nil];
 
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);
@@ -257,6 +262,11 @@
 	[window orderFront:nil];
 
 	return YES;
+}
+
+- (void)containingWindowDidResignMain:(NSNotification *)aNotification
+{
+	[self terminateWithKey:0 completion:nil];
 }
 
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions
@@ -417,6 +427,10 @@
 
 	[_delegate completionController:self didTerminateWithKey:_terminatingKey selectedCompletion:completion];
 
+	[[NSNotificationCenter defaultCenter]
+		removeObserver:self
+				  name:NSWindowDidResignMainNotification
+				object:nil];
 	[window orderOut:nil];
 
 	[self reset];

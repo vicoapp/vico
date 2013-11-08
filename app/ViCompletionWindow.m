@@ -31,7 +31,6 @@
 {
 	if (self = [super init]) {
 		[self setBecomesKeyOnlyIfNeeded:YES];
-		[self setFloatingPanel:YES];
 	}
 	
 	return self;

@@ -100,7 +100,6 @@
            options:(NSString *)optionString
      initialFilter:(NSString *)initialFilter;
 
-- (void)updateBounds;
 - (void)filterCompletions;
 - (BOOL)complete_partially:(ViCommand *)command;
 - (void)acceptByKey:(NSInteger)termKey;

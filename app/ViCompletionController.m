@@ -70,7 +70,7 @@
 	return self;
 }
 
-- (void)updateBounds
+- (void)updateBoundsWithPrefixWindow:(NSWindow *)prefixWindow
 {
 	NSSize winsz = NSMakeSize(0, 0);
 	for (ViCompletion *c in _filteredCompletions) {
@@ -108,11 +108,11 @@
 	/* Set the window size, which is independent of origin. */
 	NSRect windowFrame = [window frame];
 	windowFrame.size = winsz;
-	windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size];
-	
+	windowFrame.origin = [self computeWindowOriginForSize:windowFrame.size fromPrefixWindow:prefixWindow];
+
 	if (!NSEqualRects(windowFrame, [window frame])) {
 		DEBUG(@"setting frame %@", NSStringFromRect(frame));
-		[window setFrame:windowFrame display:YES];
+		[window setFrame:windowFrame display:[window isVisible]];
 	}
 }
 
@@ -211,13 +211,6 @@
 	_autocompleting = [_options rangeOfString:@"C"].location != NSNotFound;
 	_prefixWindowRect = prefixRect;
 
-	[parentWindow addChildWindow:window ordered:NSWindowAbove];
-	[[NSNotificationCenter defaultCenter]
-		addObserver:self
-		   selector:@selector(containingWindowDidResignMain:)
-			   name:NSWindowDidResignMainNotification
-			 object:nil];
-
 	DEBUG(@"range is %@, with prefix [%@] and [%@] as initial filter, w/options %@",
 	    NSStringFromRange(_range), _prefix, initialFilter, _options);
 
@@ -255,11 +248,16 @@
 		initialSelectionIndex = [self numberOfRowsInTableView:tableView] - 1;
 	}
 
-	[self selectCompletionRowWithDelegateCalls:initialSelectionIndex];
-	[tableView scrollRowToVisible:initialSelectionIndex];
+	[self updateUIForPrefixWindow:parentWindow];
 
-	DEBUG(@"showing window %@", window);
 	[window orderFront:nil];
+
+	[parentWindow addChildWindow:window ordered:NSWindowAbove];
+	[[NSNotificationCenter defaultCenter]
+		addObserver:self
+		   selector:@selector(containingWindowDidResignMain:)
+			   name:NSWindowDidResignMainNotification
+			 object:nil];
 
 	return YES;
 }
@@ -368,11 +366,25 @@
 			return (NSComparisonResult)NSOrderedSame;
 		}];
 
+	[self updateUI];
+}
+
+- (void)updateUI
+{
+	[self updateUIForPrefixWindow:nil];
+}
+
+- (void)updateUIForPrefixWindow:(NSWindow *)prefixWindow
+{
 	[tableView reloadData];
 	NSInteger selectionRow = _positionCompletionsBelowPrefix ? 0 : _filteredCompletions.count - 1;
 	[self selectCompletionRowWithDelegateCalls:selectionRow];
 
-	[self updateBounds];
+	[tableView scrollRowToVisible:selectionRow];
+
+	if (! prefixWindow)
+		prefixWindow = [window parentWindow];
+	[self updateBoundsWithPrefixWindow:prefixWindow];
 }
 
 - (void)setFilter:(NSString *)aString
@@ -659,8 +671,10 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 	return YES;
 }
 
-- (NSPoint)computeWindowOriginForSize:(NSSize)winsz {
-	NSRect screenRect = [[self.window parentWindow] convertRectToScreen:_prefixWindowRect];
+- (NSPoint)computeWindowOriginForSize:(NSSize)winsz fromPrefixWindow:(NSWindow *)prefixWindow
+{
+	NSLog(@"Dat %@ with %@", prefixWindow, [window parentWindow]);
+	NSRect screenRect = [prefixWindow convertRectToScreen:_prefixWindowRect];
 	NSPoint origin = screenRect.origin;
 
 	NSScreen *screen = [NSScreen mainScreen];

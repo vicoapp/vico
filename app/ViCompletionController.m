@@ -61,9 +61,6 @@
 		tableView.keyManager = [ViKeyManager keyManagerWithTarget:self
 							       defaultMap:[ViMap completionMap]];
 
-		[window setStyleMask:NSBorderlessWindowMask];
-		[window setHasShadow:YES];
-
 		// ViTheme *theme = [ViThemeStore defaultTheme];
 		// [tableView setBackgroundColor:[_theme backgroundColor]];
 
@@ -72,7 +69,6 @@
 	}
 	return self;
 }
-
 
 - (void)updateBounds
 {

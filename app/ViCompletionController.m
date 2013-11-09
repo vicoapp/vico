@@ -673,7 +673,6 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 
 - (NSPoint)computeWindowOriginForSize:(NSSize)winsz fromPrefixWindow:(NSWindow *)prefixWindow
 {
-	NSLog(@"Dat %@ with %@", prefixWindow, [window parentWindow]);
 	NSRect screenRect = [prefixWindow convertRectToScreen:_prefixWindowRect];
 	NSPoint origin = screenRect.origin;
 

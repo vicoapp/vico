@@ -28,6 +28,46 @@
 #import "ViError.h"
 #include "logging.h"
 
+// Returns a score based on the longest common subsequence between baseString
+// and comparisonString. Common substrings are given a point boost. Case
+// insensitive subsequences are not treated as substrings, but they do provide
+// points to the score.
+static NSUInteger longestCommonSubsequenceScore(NSString *baseString, NSString *comparisonString, bool previousMatched)
+{
+	NSUInteger baseLength = [baseString length],
+			   comparisonLength = [comparisonString length];
+
+	if (baseLength == 0 || comparisonLength == 0) {
+	  return 0;
+	}
+
+	unichar lastBaseChar = [baseString characterAtIndex:baseLength - 1],
+			lastComparisonChar = [comparisonString characterAtIndex:comparisonLength - 1];
+
+	if (lastBaseChar == lastComparisonChar) {
+	  NSUInteger charScore = previousMatched ? 3 : 2;
+
+	  return charScore +
+		  longestCommonSubsequenceScore([baseString substringWithRange:NSMakeRange(0, baseLength - 1)],
+										[comparisonString substringWithRange:NSMakeRange(0, comparisonLength - 1)],
+										true);
+	} else {
+	  NSUInteger remainingBaseScore = longestCommonSubsequenceScore([baseString substringWithRange:NSMakeRange(0, baseLength - 1)], comparisonString, false),
+				 remainingComparisonScore = longestCommonSubsequenceScore(baseString, [comparisonString substringWithRange:NSMakeRange(0, comparisonLength - 1)], false);
+
+	  NSUInteger remainingScore =
+		  MAX(
+			remainingBaseScore,
+			remainingComparisonScore
+		  );
+
+	  if (ABS((NSInteger)lastComparisonChar - lastBaseChar) == ((NSInteger)'A' - 'a'))
+		  return 1 + remainingScore;
+	  else
+		  return remainingScore;
+	}
+}
+
 @implementation ViWordCompletion
 
 - (NSArray *)completionsForString:(NSString *)word
@@ -94,23 +134,23 @@
 	}
 
 	BOOL sortDescending = ([options rangeOfString:@"d"].location != NSNotFound);
-	NSComparator sortByLocation = ^(id a, id b) {
-		ViCompletion *ca = a, *cb = b;
-		NSUInteger al = ca.location;
-		NSUInteger bl = cb.location;
-		if (al > bl) {
-			if (bl < currentLocation && al > currentLocation)
-				return (NSComparisonResult)(sortDescending ? NSOrderedDescending : NSOrderedAscending); // a < b
-			return (NSComparisonResult)(sortDescending ? NSOrderedAscending : NSOrderedDescending); // a > b
-		} else if (al < bl) {
-			if (al < currentLocation && bl > currentLocation)
-				return (NSComparisonResult)(sortDescending ? NSOrderedAscending : NSOrderedDescending); // a > b
-			return (NSComparisonResult)(sortDescending ? NSOrderedDescending : NSOrderedAscending); // a < b
+	NSComparator sortBySimilarityAndLocation = ^(ViCompletion *ca, ViCompletion *cb) {
+		NSUInteger subsequenceWeightA = longestCommonSubsequenceScore(word, ca.content, false),
+				   subsequenceWeightB = longestCommonSubsequenceScore(word, cb.content, false);
+
+		NSLog(@"Score based on %@ for %@: %lu, %@: %lu", word, ca.content, subsequenceWeightA, cb.content, subsequenceWeightB);
+		
+		if (subsequenceWeightA < subsequenceWeightB) {
+			return sortDescending ? NSOrderedAscending : NSOrderedDescending;
+		} else if (subsequenceWeightB < subsequenceWeightA) {
+			return sortDescending ? NSOrderedDescending : NSOrderedAscending;
 		}
+
+		// TODO need to find a way to sort by closeness to the cursor here.
 		return (NSComparisonResult)NSOrderedSame;
 	};
 
-	return [[uniq allObjects] sortedArrayUsingComparator:sortByLocation];
+	return [[uniq allObjects] sortedArrayUsingComparator:sortBySimilarityAndLocation];
 }
 
 @end

@@ -58,7 +58,7 @@
 /** A text edit view.
  *
  */
-@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
 {
 	ViDocument		*document;
 	// .busy
@@ -234,6 +234,11 @@
  * @returns YES if the macro evaluated successfully.
  */
 - (BOOL)input:(NSString *)inputString;
+
+/**
+ * Usually invoked by the keyManager, inputs a character via a ViCommand.
+ */
+- (BOOL)input_character:(ViCommand *)command;
 
 /** @name Caret handling */
 
@@ -450,7 +455,7 @@
 @interface ViTextView (syntax)
 @end
 
-@interface ViTextView (vi_commands)
+@interface ViTextView (vi_commands) <ViCompletionDelegate>
 - (BOOL)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand;
 - (BOOL)insert:(ViCommand *)command;
 - (BOOL)move_left:(ViCommand *)command;
@@ -471,6 +476,10 @@
 		fromProvider:(id<ViCompletionProvider>)provider
 		   fromRange:(NSRange)range
 		     options:(NSString *)options;
+- (void)hideCompletionWindow;
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(ViCompletion *)selectedCompletion;
 - (BOOL)complete_keyword:(ViCommand *)command;
 - (BOOL)complete_path:(ViCommand *)command;
 - (BOOL)complete_buffer:(ViCommand *)command;

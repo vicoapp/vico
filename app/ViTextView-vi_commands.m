@@ -3145,35 +3145,73 @@ again:
 	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
 														  inTextContainer:[self textContainer]];
 	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
-	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
-	_showingCompletionWindow = YES;
+	_showingCompletionWindow =
+	  [[ViCompletionController sharedController] chooseFrom:provider
+										  range:range
+										 prefix:fuzzyTrigger ? nil : string
+							   prefixWindowRect:prefixWindowRect
+									  forWindow:[self window]
+									   delegate:self
+										options:options
+								  initialFilter:fuzzyTrigger ? string : nil];
 
-	ViCompletionController *cc = [ViCompletionController sharedController];
-	ViCompletion *completion = [cc chooseFrom:provider
-										range:range
-									   prefix:fuzzyTrigger ? nil : string
-							 prefixScreenRect:prefixScreenRect
-									 delegate:self
-						   existingKeyManager:self.keyManager
-									  options:options
-								initialFilter:fuzzyTrigger ? string : nil];
+	if (_showingCompletionWindow) {
+		[_keyManager.parser setMap:[ViMap completionMap]];
+	}
 
+	return _showingCompletionWindow;
+}
+
+- (BOOL)cancel_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] cancel:command];
+}
+- (BOOL)accept_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept:command];
+}
+- (BOOL)accept_completion_or_complete_partially:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept_or_complete_partially:command];
+}
+- (BOOL)accept_completion_if_not_autocompleting:(ViCommand *)command
+{
+	BOOL result = [[ViCompletionController sharedController] accept_if_not_autocompleting:command];
+
+	[self input_character:command];
+
+	return result;
+}
+
+- (void)hideCompletionWindow
+{
+	[[ViCompletionController sharedController] cancel:nil];
+}
+
+
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(ViCompletion *)completion
+{
 	_showingCompletionWindow = NO;
 
-	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
+	if (mode == ViInsertMode) {
+		[_keyManager.parser setMap:[ViMap insertMap]];
+	}
+
+	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(completionController.range));
 	if (completion) {
-		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
+		NSRange completionRange = completionController.range;
+		// FIXME This should replace the entire completion range with the
+		// FIXME selected completion.
+		NSString *completingString = [completion.content substringWithRange:NSMakeRange(completionRange.length, completion.content.length - completionRange.length)];
 
 		// We are basically replaying input here, because this is in no way literal input.
 		virtualInput = YES;
-		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(completionRange)]];
 		virtualInput = NO;
 	}
-
-	if (completion == nil)
-		return NO;
-	return YES;
 }
 
 - (void)removeFromInputKeys:(ViCommand *)command

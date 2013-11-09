@@ -1505,9 +1505,8 @@ replaceCharactersInRange:(NSRange)aRange
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
 
-	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
-		ViCompletionController *controller = [ViCompletionController sharedController];
-		[controller cancel:nil];
+	if (delta > 1 && _showingCompletionWindow) {
+		[self hideCompletionWindow];
 	}
 }
 
@@ -1810,31 +1809,21 @@ replaceCharactersInRange:(NSRange)aRange
 			atLocation:start_location];
 
 		final_location = modify_start_location + 1;
+		DEBUG(@"setting final location to %lu", final_location);
 
-		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		if (! _showingCompletionWindow &&
+		    ! replayingInput && ! virtualInput &&
+		    ! [self isFieldEditor] &&
+		    [[self preference:@"autocomplete"] integerValue]) {
 		  NSRange wordRange;
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
-			  // Update the caret before we present the completion dialog.
-			  // Otherwise it won'tupdate until the first thing typed into the
-			  // completion dialog.
-			  [self setCaret:final_location];
-
-			  BOOL completed =
-				[self presentCompletionsOf:word
-					  fromProvider:[[ViWordCompletion alloc] init]
-						fromRange:wordRange
-						  options:@"C?"];
-
-			  final_location = [self caret];
-
-			  // If we didn't do anything further, no need to smartindent or
-			  // anything.
-			  if (! completed)
-				  return;
+			  [self presentCompletionsOf:word
+					fromProvider:[[ViWordCompletion alloc] init]
+					  fromRange:wordRange
+						options:@"C?"];
 		  }
 		}
-		DEBUG(@"setting final location to %lu", final_location);
 	}
 
 	if ([[self preference:@"smartindent" atLocation:start_location] integerValue]) {
@@ -2107,6 +2096,19 @@ replaceCharactersInRange:(NSRange)aRange
 	return YES;
 }
 
+- (id)targetForSelector:(SEL)action
+{
+	id target = [super targetForSelector:action];
+
+	// If the completion window is up and the text view couldn't handle this
+	// action, see if the completion window can.
+	if (! target && _showingCompletionWindow) {
+		target = [[ViCompletionController sharedController].completionView targetForSelector:action];
+	}
+
+	return target;
+}
+
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
@@ -2245,6 +2247,9 @@ replaceCharactersInRange:(NSRange)aRange
 		leaveVisualMode = YES;
 	}
 
+	// Need to know if the completion was showing *before* we ran the command.
+	BOOL completionWasShowing = _showingCompletionWindow;
+
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = [command performWithTarget:target];
@@ -2292,6 +2297,14 @@ replaceCharactersInRange:(NSRange)aRange
 			[self scrollToCaret];
 	} else
 		[self updateCaret];
+
+	// We still want to forward commands defined on ViTextView to the
+	// completion controller when it's up, but we don't want double handling
+	// when the ViTextView didn't handle the keystroke (say, as with backspace).
+	ViCompletionController *completionController = [ViCompletionController sharedController];
+	if (completionWasShowing && target != completionController) {
+		[completionController keyManager:keyManager evaluateCommand:command];
+	}
 
 	if (mode == ViVisualMode)
 		[self setVisualSelection];
@@ -2416,8 +2429,13 @@ replaceCharactersInRange:(NSRange)aRange
 
 		if (mode == ViVisualMode)
 			[_keyManager.parser setVisualMap];
-		else if (mode == ViInsertMode)
-			[_keyManager.parser setInsertMap];
+		else if (mode == ViInsertMode) {
+			if (_showingCompletionWindow) {
+				[_keyManager.parser setMap:[ViMap completionMap]];
+			} else {
+				[_keyManager.parser setInsertMap];
+			}
+		}
 	}
 
 	return [NSNumber numberWithBool:YES];

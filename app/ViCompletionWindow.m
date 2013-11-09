@@ -27,9 +27,13 @@
 
 @implementation ViCompletionWindow
 
-- (BOOL)canBecomeKeyWindow
+- (ViCompletionWindow *)init
 {
-	return YES;
+	if (self = [super init]) {
+		[self setBecomesKeyOnlyIfNeeded:YES];
+	}
+	
+	return self;
 }
 
 @end

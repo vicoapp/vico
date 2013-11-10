@@ -2540,6 +2540,33 @@ replaceCharactersInRange:(NSRange)aRange
 	[self setAutoresizingMask:(enabled ? NSViewWidthSizable : NSViewNotSizable)];
 }
 
+- (void)enableWrapping
+{
+	[self setWrapping:YES];
+}
+
+- (void)setWrapping:(BOOL)enabled duringInit:(BOOL)isDuringInit
+{
+	if (enabled && isDuringInit) {
+		// Wait until the next runloop cycle to enable wrapping. We do this to
+		// let the layout settle. Enabling the ruler on the scroll view will
+		// always set the layout in such a way as to let us get the clip view's
+		// size properly. However, if line numbers are off, the ruler is not
+		// enabled, and therefore the scroll view doesn't compute the clip
+		// view's size properly or something. So, we wait for the next cycle
+		// so all our numbers are correct.
+		//
+		// Observed issues when this isn't the case include the rendered text
+		// being truncated horizontally or vertically, even though the cursor
+		// can still move freely throughout the text. This only happens with
+		// word wrapping on and line numbers off. See issue #62
+		// (https://github.com/vicoapp/vico/issues/62).
+		[self performSelector:@selector(enableWrapping) withObject:nil afterDelay:0];
+	} else {
+		[self setWrapping:YES];
+	}
+}
+
 - (void)setTheme:(ViTheme *)aTheme
 {
 	[self setCaretColor:[aTheme caretColor]];

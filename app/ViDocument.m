@@ -567,7 +567,7 @@ DEBUG_FINALIZE();
 	               relative:[userDefaults boolForKey:@"relativenumber"]
 	          forScrollView:[textView enclosingScrollView]];
 	[self updatePageGuide];
-	[textView setWrapping:_wrap];
+	[textView setWrapping:_wrap duringInit:YES];
 
 	[[ViEventManager defaultManager] emit:ViEventDidMakeView for:self with:self, documentView, textView, nil];
 
@@ -1550,8 +1550,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];
-	} else
+	} else {
 		[aScrollView setRulersVisible:NO];
+	}
 }
 
 - (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative

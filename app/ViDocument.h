@@ -211,6 +211,9 @@
 - (void)registerMark:(ViMark *)mark;
 - (void)unregisterMark:(ViMark *)mark;
 
+/** @name Dealing with manual folds */
+- (void)createFoldForRange:(NSRange)range;
+
 - (void)associateView:(ViViewController *)viewController forKey:(NSString *)key;
 - (NSSet *)associatedViewsForKey:(NSString *)key;
 

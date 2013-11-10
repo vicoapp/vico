@@ -1934,6 +1934,21 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 }
 
 #pragma mark -
+#pragma mark Folding
+- (void)createFoldForRange:(NSRange)range
+{
+	NSNumber *folded = @(YES);
+
+	NSUInteger firstLineIndex = [self.textStorage lineIndexAtLocation:range.location];
+	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range)];
+
+	for (NSUInteger i = firstLineIndex; i < lastLineIndex; ++i)
+		[_manualFolds replaceObjectAtIndex:i withObject:folded];
+
+	NSLog(@"Folds are now %@", _manualFolds);
+}
+
+#pragma mark -
 
 - (NSString *)description
 {

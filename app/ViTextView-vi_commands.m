@@ -2527,6 +2527,19 @@
 }
 
 #pragma mark -
+#pragma mark Folding
+
+/* syntax: zf[motion] */
+/* syntax: [visual]zf */
+/* syntax: [count]zF */
+- (BOOL)fold_range:(ViCommand *)command
+{
+	final_location = start_location;
+
+	[document createFoldForRange:affectedRange];
+
+	return YES;
+}
 #pragma mark Text Objects
 
 /* If on a word (letters, numbers, underscore): select the word

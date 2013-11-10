@@ -293,13 +293,16 @@
 (nmap setKey:"gT" toAction:"previous_tab:")
 (nmap setKey:"gq" toOperator:"format:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gqgq" toEditAction:"format:" flags:ViMapLineMode parameter:nil scope:nil)
-;; z prefix
+;; z prefix, positioning
 (nmap setKey:"zt" toAction:"reposition_top:")
 (nmap setKey:"z<cr>" toAction:"reposition_top_bol:")
 (nmap setKey:"zb" toAction:"reposition_bottom:")
 (nmap setKey:"z-" toAction:"reposition_bottom_bol:")
 (nmap setKey:"zz" toAction:"reposition_middle:")
 (nmap setKey:"z." toAction:"reposition_middle_bol:")
+;; z prefix, folding
+(nmap setKey:"zf" toOperator:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
+(nmap setKey:"zF" toAction:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
 
 (nmap map:"ZZ" to:":xit<cr>")
 (nmap map:"ZQ" to:":q!<cr>")
@@ -360,6 +363,8 @@
 (vmap setKey:"<c-f>" toMotion:"forward_screen:")
 (vmap setKey:"<c-u>" toMotion:"scroll_upwards:")
 (vmap setKey:"<c-y>" toMotion:"scroll_up_by_line:")
+;; z prefix, folding
+(vmap setKey:"zf" toAction:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
 
 
 ;; command HTML output map

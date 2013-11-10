@@ -1948,6 +1948,40 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSLog(@"Folds are now %@", _manualFolds);
 }
 
+- (NSRange)foldRangeAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
+
+	id fold = [_manualFolds objectAtIndex:lineIndex];
+	if (fold == [NSNull null]) {
+		return NSMakeRange(NSNotFound, -1);
+	} else {
+		// Line range start/end are in terms of line numbers, not indices (i.e., 1-based).
+		NSUInteger lineRangeStart = lineIndex + 1, lineRangeEnd = lineIndex + 1;
+		NSNumber *folded = @(YES);
+
+		for (; lineRangeStart > 0 &&
+			     [folded isEqual:[_manualFolds objectAtIndex:lineRangeStart - 1]]
+			 ; --lineRangeStart);
+		for (; lineRangeEnd < [_manualFolds count] &&
+				 [folded isEqual:[_manualFolds objectAtIndex:lineRangeEnd - 1]]
+		     ; ++lineRangeEnd);
+
+		// Each of the above loops overshoots in the direction its searching so
+		// we adjust the line by 1 in the appropriate direction. We need to
+		// iterate that way so we don't miss the fold if it continues to the
+		// first or last character of the file.
+		NSUInteger rangeStart = [self.textStorage locationForStartOfLine:lineRangeStart + 1];
+		NSUInteger rangeEnd = [self.textStorage locationForStartOfLine:lineRangeEnd - 1];
+
+		return
+			NSMakeRange(
+				rangeStart,
+				rangeEnd - rangeStart
+			);
+	}
+}
+
 #pragma mark -
 
 - (NSString *)description

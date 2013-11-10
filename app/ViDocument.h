@@ -213,6 +213,15 @@
 
 /** @name Dealing with manual folds */
 - (void)createFoldForRange:(NSRange)range;
+/**
+ * Look up a fold range by location in the text.
+ *
+ * If the location has a fold, returns a range whose location is the
+ * first character of the first line of the fold and whose length is
+ * through the first character of the last line of the fold.
+ * Returns NSRange(NSNotFound,-1) if there is no fold at that location.
+ */
+- (NSRange)foldRangeAtLocation:(NSUInteger)aLocation;
 
 - (void)associateView:(ViViewController *)viewController forKey:(NSString *)key;
 - (NSSet *)associatedViewsForKey:(NSString *)key;

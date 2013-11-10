@@ -2540,6 +2540,33 @@
 
 	return YES;
 }
+
+- (BOOL)move_to_fold_start:(ViCommand *)command
+{
+	[self moveToFoldAtLocation:[self caret] start:YES];
+}
+
+- (BOOL)move_to_fold_end:(ViCommand *)command
+{
+	[self moveToFoldAtLocation:[self caret] start:NO];
+}
+
+- (BOOL)moveToFoldAtLocation:(NSUInteger)aLocation start:(BOOL)foldStart
+{
+	NSRange foldRange = [document foldRangeAtLocation:aLocation];
+
+	if (foldRange.location == NSNotFound) {
+		final_location = start_location;
+
+		return NO;
+	} else {
+		final_location = foldStart ? foldRange.location : NSMaxRange(foldRange);
+
+		return YES;
+	}
+}
+
+#pragma mark -
 #pragma mark Text Objects
 
 /* If on a word (letters, numbers, underscore): select the word

@@ -144,7 +144,8 @@
 (mmap setKey:"`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (mmap setKey:"g'" toMotion:"move_to_mark:" flags:(| ViMapNeedArgument ViMapLineMode) parameter:nil scope:nil)
 (mmap setKey:"g`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
-
+(mmap setKey:"[z" toMotion:"move_to_fold_start:" flags:ViMapLineMode parameter:nil scope:nil)
+(mmap setKey:"]z" toMotion:"move_to_fold_end:" flags:ViMapLineMode parameter:nil scope:nil)
 
 ;; text objects in operator and visual maps
 (tmap setKey:"iw" toMotion:"select_inner_word:")

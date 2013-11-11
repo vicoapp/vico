@@ -1,5 +1,22 @@
 #import "ViFold.h"
 
+inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
+{
+	parentFold.range = NSUnionRange(parentFold.range, childFold.range);
+	[parentFold addChild:childFold];
+	childFold.parent = parentFold;
+	childFold.depth += 1;
+}
+
+inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)
+{
+	ViFold *topmostFold = nestedChildFold;
+	while (topmostFold.parent)
+		topmostFold = topmostFold.parent;
+
+	addChildToFold(parentFold, topmostFold);
+}
+
 @implementation ViFold
 
 + (ViFold *)foldWithRange:(NSRange)aRange
@@ -12,6 +29,7 @@
 	if (self = [super init]) {
 		_range = aRange;
 		_isOpen = true;
+		_parent = nil;
 		_children = [NSMutableSet set];
 	}
 

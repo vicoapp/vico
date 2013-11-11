@@ -27,3 +27,16 @@
 - (void)removeChild:(ViFold *)childFold;
 
 @end
+
+/**
+ * Adds `childFold` to `parentFold` by updating both `childFold`'s parent
+ * pointer AND `parentFold`'s child set, and updating `parentFold`'s range
+ * to encompass `childFold`'s.
+ */
+void addChildToFold(ViFold *parentFold, ViFold *childFold);
+/**
+ * Finds the topmost parent of `nestedChildFold`, which may be that fold
+ * itself, and then adds it as a child to `parentFold`, as per
+ * `addChildToFold`.
+ */
+void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold);

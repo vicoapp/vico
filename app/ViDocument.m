@@ -1942,26 +1942,34 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range) - 1];
 	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex];
 	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex];
-	
+
 	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLocation, lastLocation - firstLocation)];
-	id possibleOverlappingFold = nil;
-	if ((possibleOverlappingFold = [_manualFolds objectAtIndex:firstLineIndex]) != [NSNull null]) {
-		ViFold *overlappingFold = (ViFold *)possibleOverlappingFold;
-		
-		((ViFold *)overlappingFold).range = NSUnionRange(overlappingFold.range, fold.range);
-		fold = overlappingFold;
-	}
-	if ((possibleOverlappingFold = [_manualFolds objectAtIndex:lastLineIndex]) != [NSNull null]) {
-		ViFold *overlappingFold = (ViFold *)possibleOverlappingFold;
+	id overlappingFold = [_manualFolds objectAtIndex:firstLineIndex];
+	if (overlappingFold != [NSNull null]) {
+		// If the range is longer than this one, then this one will be a child of it.
+		if (NSMaxRange(((ViFold *)overlappingFold).range) > lastLocation) {
+			addChildToFold((ViFold *)overlappingFold, fold);
+		} else {
+			addTopmostParentToFold(fold, (ViFold *)overlappingFold);
 
-		overlappingFold.range = NSUnionRange(overlappingFold.range, fold.range);
-		fold = overlappingFold;
+			firstLineIndex = [self.textStorage lineIndexAtLocation:fold.range.location];
+		}
 	}
 
-	NSUInteger finalFirstLineIndex = [self.textStorage lineIndexAtLocation:fold.range.location];
-	NSUInteger finalLastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(fold.range)];
-	for (NSUInteger i = finalFirstLineIndex; i <= finalLastLineIndex; ++i)
-		[_manualFolds replaceObjectAtIndex:i withObject:fold];
+	id lastOverlappingFold = nil;
+	for (NSUInteger i = firstLineIndex; i <= lastLineIndex; ++i) {
+		overlappingFold = [_manualFolds objectAtIndex:i];
+
+		if (overlappingFold != lastOverlappingFold && // we've already set up the overlapping fold as a child
+				overlappingFold != [NSNull null] && // there's no fold to work with
+				overlappingFold != fold.parent) { // we've already set up the new fold as this fold's child
+			addTopmostParentToFold(fold, (ViFold *)overlappingFold);
+
+			lastOverlappingFold = overlappingFold;
+		} else if (overlappingFold != lastOverlappingFold) {
+			[_manualFolds replaceObjectAtIndex:i withObject:fold];
+		}
+	}
 
 	NSLog(@"Folds are now %@", _manualFolds);
 }

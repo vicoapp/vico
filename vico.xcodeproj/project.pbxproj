@@ -16,6 +16,7 @@
 		1732DB00181EF0C800890055 /* Bundles in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D11331182E002B04DE /* Bundles */; };
 		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
+		177AC29518307E6C002C9647 /* ViFold.m in Sources */ = {isa = PBXBuildFile; fileRef = 177AC29418307E6C002C9647 /* ViFold.m */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
 		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
 		17D8A10517C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; };
@@ -451,6 +452,8 @@
 		1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCollection-enumeration.m"; sourceTree = "<group>"; };
 		1732DAF8181EEC3600890055 /* status.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = status.nu; sourceTree = "<group>"; };
 		1732DB02181EF25000890055 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = app/en.lproj/SFBCrashReporterWindow.xib; sourceTree = "<group>"; };
+		177AC29318307E6C002C9647 /* ViFold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFold.h; sourceTree = "<group>"; };
+		177AC29418307E6C002C9647 /* ViFold.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFold.m; sourceTree = "<group>"; };
 		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = json/SBJsonStreamParserAccumulator.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = json/SBJsonStreamParserAccumulator.m; sourceTree = SOURCE_ROOT; };
@@ -1326,6 +1329,8 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
+				177AC29318307E6C002C9647 /* ViFold.h */,
+				177AC29418307E6C002C9647 /* ViFold.m */,
 				17F2E3C715E0499800F81089 /* ViStatusView.h */,
 				17F2E3C815E0499800F81089 /* ViStatusView.m */,
 				9AA9272514D5B55900F0E02F /* Nu.h */,
@@ -2178,6 +2183,7 @@
 				9AF6A7031434ABB200FB373B /* NSWindow-additions.m in Sources */,
 				9AF6A7071435BAA300FB373B /* ViViewController.m in Sources */,
 				9AA9272714D5B55900F0E02F /* Nu.m in Sources */,
+				177AC29518307E6C002C9647 /* ViFold.m in Sources */,
 				17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */,
 				17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */,
 				17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */,

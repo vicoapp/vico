@@ -47,6 +47,7 @@
 #import "ViDocumentController.h"
 #import "NSURL-additions.h"
 #import "ViTextView.h"
+#import "ViFold.h"
 
 BOOL __makeNewWindowInsteadOfTab = NO;
 
@@ -1937,13 +1938,30 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark Folding
 - (void)createFoldForRange:(NSRange)range
 {
-	NSNumber *folded = @(YES);
-
 	NSUInteger firstLineIndex = [self.textStorage lineIndexAtLocation:range.location];
-	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range)];
+	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range) - 1];
+	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex];
+	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex];
+	
+	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLocation, lastLocation - firstLocation)];
+	id possibleOverlappingFold = nil;
+	if ((possibleOverlappingFold = [_manualFolds objectAtIndex:firstLineIndex]) != [NSNull null]) {
+		ViFold *overlappingFold = (ViFold *)possibleOverlappingFold;
+		
+		((ViFold *)overlappingFold).range = NSUnionRange(overlappingFold.range, fold.range);
+		fold = overlappingFold;
+	}
+	if ((possibleOverlappingFold = [_manualFolds objectAtIndex:lastLineIndex]) != [NSNull null]) {
+		ViFold *overlappingFold = (ViFold *)possibleOverlappingFold;
 
-	for (NSUInteger i = firstLineIndex; i < lastLineIndex; ++i)
-		[_manualFolds replaceObjectAtIndex:i withObject:folded];
+		overlappingFold.range = NSUnionRange(overlappingFold.range, fold.range);
+		fold = overlappingFold;
+	}
+
+	NSUInteger finalFirstLineIndex = [self.textStorage lineIndexAtLocation:fold.range.location];
+	NSUInteger finalLastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(fold.range)];
+	for (NSUInteger i = finalFirstLineIndex; i <= finalLastLineIndex; ++i)
+		[_manualFolds replaceObjectAtIndex:i withObject:fold];
 
 	NSLog(@"Folds are now %@", _manualFolds);
 }
@@ -1956,29 +1974,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (fold == [NSNull null]) {
 		return NSMakeRange(NSNotFound, -1);
 	} else {
-		// Line range start/end are in terms of line numbers, not indices (i.e., 1-based).
-		NSUInteger lineRangeStart = lineIndex + 1, lineRangeEnd = lineIndex + 1;
-		NSNumber *folded = @(YES);
-
-		for (; lineRangeStart > 0 &&
-			     [folded isEqual:[_manualFolds objectAtIndex:lineRangeStart - 1]]
-			 ; --lineRangeStart);
-		for (; lineRangeEnd < [_manualFolds count] &&
-				 [folded isEqual:[_manualFolds objectAtIndex:lineRangeEnd - 1]]
-		     ; ++lineRangeEnd);
-
-		// Each of the above loops overshoots in the direction its searching so
-		// we adjust the line by 1 in the appropriate direction. We need to
-		// iterate that way so we don't miss the fold if it continues to the
-		// first or last character of the file.
-		NSUInteger rangeStart = [self.textStorage locationForStartOfLine:lineRangeStart + 1];
-		NSUInteger rangeEnd = [self.textStorage locationForStartOfLine:lineRangeEnd - 1];
-
-		return
-			NSMakeRange(
-				rangeStart,
-				rangeEnd - rangeStart
-			);
+		return [(ViFold *)fold range];
 	}
 }
 

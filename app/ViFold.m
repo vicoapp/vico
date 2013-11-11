@@ -48,7 +48,15 @@ inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<ViFold %p: range %@>", self, NSStringFromRange(_range)];
+	if (_parent)
+		return [NSString stringWithFormat:@"<ViFold %p: range %@, parent %@>",
+										  self,
+										  NSStringFromRange(_range),
+										  _parent];
+	else
+		return [NSString stringWithFormat:@"<ViFold %p: range %@>",
+										  self,
+										  NSStringFromRange(_range)];
 }
 
 @end

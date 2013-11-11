@@ -12,6 +12,7 @@
 	if (self = [super init]) {
 		_range = aRange;
 		_isOpen = true;
+		_children = [NSMutableSet set];
 	}
 
 	return self;
@@ -19,12 +20,12 @@
 
 - (void)addChild:(ViFold *)childFold
 {
-	// noop for now
+	[_children addObject:childFold];
 }
 
 - (void)removeChild:(ViFold *)childFold
 {
-	// noop for now
+	[_children removeObject:childFold];
 }
 
 - (NSString *)description

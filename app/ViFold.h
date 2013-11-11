@@ -10,12 +10,13 @@
  */
 @interface ViFold : NSObject
 {
+	NSMutableSet *_children;
 }
 
 @property (nonatomic) NSRange range;
 @property (nonatomic) BOOL isOpen;
 @property (nonatomic) ViFold *parent;
-@property (nonatomic,readonly) NSArray *children;
+@property (nonatomic,readonly) NSSet *children;
 
 + (ViFold *)foldWithRange:(NSRange)range;
 - (ViFold *)initWithRange:(NSRange)range;

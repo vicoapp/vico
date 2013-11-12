@@ -2543,12 +2543,12 @@
 
 - (BOOL)move_to_fold_start:(ViCommand *)command
 {
-	[self moveToFoldAtLocation:[self caret] start:YES];
+	return [self moveToFoldAtLocation:[self caret] start:YES];
 }
 
 - (BOOL)move_to_fold_end:(ViCommand *)command
 {
-	[self moveToFoldAtLocation:[self caret] start:NO];
+	return [self moveToFoldAtLocation:[self caret] start:NO];
 }
 
 - (BOOL)moveToFoldAtLocation:(NSUInteger)aLocation start:(BOOL)foldStart

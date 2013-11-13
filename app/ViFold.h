@@ -15,7 +15,7 @@
 }
 
 @property (nonatomic) NSRange range;
-@property (nonatomic) BOOL isOpen;
+@property (nonatomic,getter=isOpen) BOOL open;
 @property (nonatomic) ViFold *parent;
 @property (nonatomic) NSUInteger depth;
 @property (nonatomic,readonly) NSSet *children;

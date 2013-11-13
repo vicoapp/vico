@@ -28,7 +28,7 @@ inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)
 {
 	if (self = [super init]) {
 		_range = aRange;
-		_isOpen = true;
+		_open = true;
 		_parent = nil;
 		_children = [NSMutableSet set];
 	}

@@ -1,3 +1,5 @@
+extern NSString *const ViFoldedAttributeName;
+
 /**
  * ViFold contains information about a given fold in a document. It's most
  * important information is the start and end of the fold, and the parent

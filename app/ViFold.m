@@ -1,5 +1,7 @@
 #import "ViFold.h"
 
+NSString *const ViFoldedAttributeName = @"ViFoldedAttribute";
+
 inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 {
 	parentFold.range = NSUnionRange(parentFold.range, childFold.range);

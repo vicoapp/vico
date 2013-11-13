@@ -2541,6 +2541,20 @@
 	return YES;
 }
 
+/* syntax: zc */
+- (BOOL)close_folds_in_range:(ViCommand *)command
+{
+	NSRange foldRange = [document closeFoldAtLocation:start_location];
+
+	if (foldRange.location != NSNotFound) {
+		final_location = foldRange.location;
+
+		return YES;
+	} else {
+		return NO;
+	}
+}
+
 - (BOOL)move_to_fold_start:(ViCommand *)command
 {
 	return [self moveToFoldAtLocation:[self caret] start:YES];

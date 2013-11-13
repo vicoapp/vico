@@ -851,5 +851,14 @@ skip_merge_left(struct skiplist *head, struct skip *from, struct skip *to, NSUIn
 	return r.location;
 }
 
+- (void)fixAttachmentAttributeInRange:(NSRange)aRange
+{
+	// Do nothing; we actually *want* to be able to do attachments on
+	// characters other than attachment characters, so we make this
+	// function a no-op. This lets us keep the same string but display
+	// a fold image.
+}
+
+
 @end
 

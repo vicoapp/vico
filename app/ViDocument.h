@@ -213,6 +213,11 @@
 
 /** @name Dealing with manual folds */
 - (void)createFoldForRange:(NSRange)range;
+/** Closes the deepest fold at the given location.
+ *
+ * @returns The range of the closed fold.
+ */
+- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation;
 /**
  * Look up a fold range by location in the text.
  *

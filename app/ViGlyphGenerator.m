@@ -42,10 +42,9 @@
 
 	// Fill in all folded characters with NSNullGlyphs.
 	if (foldedAttribute && [foldedAttribute boolValue]) {
-		NSInteger size = sizeof(NSGlyph) * incomingGlyphLength;
 		NSGlyph nullGlyph = NSNullGlyph;
 
-		buffer = malloc(size);
+		buffer = calloc(incomingGlyphLength, sizeof(NSGlyph));
 		memset_pattern4(buffer, &nullGlyph, effectiveRange.length);
 
 		for (NSUInteger i = effectiveRange.length; i < incomingGlyphLength; ++i) {

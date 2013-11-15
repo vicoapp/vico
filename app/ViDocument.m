@@ -2035,15 +2035,26 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
-- (NSRange)foldRangeAtLocation:(NSUInteger)aLocation
+- (ViFold *)foldAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
 
 	id fold = [_manualFolds objectAtIndex:lineIndex];
 	if (fold == [NSNull null]) {
-		return NSMakeRange(NSNotFound, -1);
+		return nil;
 	} else {
-		return [(ViFold *)fold range];
+		return (ViFold *)fold;
+	}
+}
+
+- (NSRange)foldRangeAtLocation:(NSUInteger)aLocation
+{
+	ViFold *fold = [self foldAtLocation:aLocation];
+
+	if (fold) {
+		return [fold range];
+	} else {
+		return NSMakeRange(NSNotFound, -1);
 	}
 }
 

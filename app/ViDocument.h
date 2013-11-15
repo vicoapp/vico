@@ -32,6 +32,7 @@
 
 @class ViTextView;
 @class ExCommand;
+@class ViFold;
 
 /** A document.
  */
@@ -223,6 +224,12 @@
  * @returns the range of the opened fold.
  */
 - (NSRange)openFoldAtLocation:(NSUInteger)aLocation;
+/**
+ * Look up a fold by location in the text.
+ *
+ * Returns nil if there is no fold at that location.
+ */
+- (ViFold *)foldAtLocation:(NSUInteger)aLocation;
 /**
  * Look up a fold range by location in the text.
  *

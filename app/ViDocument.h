@@ -218,6 +218,11 @@
  * @returns The range of the closed fold.
  */
 - (NSRange)closeFoldAtLocation:(NSUInteger)aLocation;
+/** Opens the deepest fold at the given location.
+ *
+ * @returns the range of the opened fold.
+ */
+- (NSRange)openFoldAtLocation:(NSUInteger)aLocation;
 /**
  * Look up a fold range by location in the text.
  *

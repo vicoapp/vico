@@ -2009,6 +2009,32 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
+- (NSRange)openFoldAtLocation:(NSUInteger)aLocation
+{
+	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
+
+	id fold = [_manualFolds objectAtIndex:lineIndex];
+	if (fold == [NSNull null]) {
+		return NSMakeRange(NSNotFound, -1);
+	} else {
+		ViFold *foldToOpen = (ViFold *)fold;
+
+		foldToOpen.open = true;
+
+		// See closeFoldAtLocation: for more on this.
+		NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToOpen.range)];
+		NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToOpen.range.location - 1;
+
+		[self.textStorage removeAttribute:NSAttachmentAttributeName
+									range:NSMakeRange(foldToOpen.range.location, 1)];
+		[self.textStorage removeAttribute:ViFoldedAttributeName
+									range:NSMakeRange(foldToOpen.range.location + 1,
+													  foldingLength)];
+
+		return foldToOpen.range;
+	}
+}
+
 - (NSRange)foldRangeAtLocation:(NSUInteger)aLocation
 {
 	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];

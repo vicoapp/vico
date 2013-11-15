@@ -2555,6 +2555,15 @@
 	}
 }
 
+/* syntax: zo */
+- (BOOL)open_fold:(ViCommand *)command
+{
+	NSRange foldRange = [document openFoldAtLocation:start_location];
+
+	return foldRange.location != NSNotFound;
+}
+
+/* syntax: [count][z */
 - (BOOL)move_to_fold_start:(ViCommand *)command
 {
 	return [self moveToFoldAtLocation:[self caret] start:YES];

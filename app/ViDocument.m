@@ -1973,8 +1973,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			[_manualFolds replaceObjectAtIndex:i withObject:fold];
 		}
 	}
-
-	NSLog(@"Folds are now %@", _manualFolds);
 }
 
 - (NSRange)closeFoldAtLocation:(NSUInteger)aLocation

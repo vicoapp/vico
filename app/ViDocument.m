@@ -1938,10 +1938,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark Folding
 - (void)createFoldForRange:(NSRange)range
 {
+	// A little care is needed here: we get the first and last line *indices*, but
+	// locationForStartOfLine: takes a line *number*. Similar details apply throughout.
+	// Naming matters, kids!
 	NSUInteger firstLineIndex = [self.textStorage lineIndexAtLocation:range.location];
 	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range) - 1];
-	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex];
-	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex];
+	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex + 1];
+	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex + 1];
 
 	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLocation, lastLocation - firstLocation)];
 	id overlappingFold = [_manualFolds objectAtIndex:firstLineIndex];

@@ -47,6 +47,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "ViRulerView.h"
+#include "ViFold.h"
 #import "ViTextView.h"
 #import "ViThemeStore.h"
 #import "NSObject+SPInvocationGrabbing.h"
@@ -88,6 +89,15 @@
 	}
 }
 
+- (void)drawString:(NSString *)string intoImage:(NSImage *)image
+{
+	[image lockFocusFlipped:NO];
+	[_backgroundColor set];
+	NSRectFill(NSMakeRect(0, 0, _digitSize.width, _digitSize.height));
+	[string drawAtPoint:NSMakePoint(0.5,0.5) withAttributes:_textAttributes];
+	[image unlockFocus];
+}
+
 - (void)resetTextAttributes
 {
 	_textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -102,15 +112,18 @@
 	[self setRuleThickness:[self requiredThickness]];
 
 	for (int i = 0; i < 10; i++) {
-		NSString *s = [NSString stringWithFormat:@"%i", i];
-		NSImage *img = [[NSImage alloc] initWithSize:_digitSize];
-		[img lockFocusFlipped:NO];
-		[_backgroundColor set];
-		NSRectFill(NSMakeRect(0, 0, _digitSize.width, _digitSize.height));
-		[s drawAtPoint:NSMakePoint(0.5,0.5) withAttributes:_textAttributes];
-		[img unlockFocus];
-		_digits[i] = img;
+		NSString *lineNumberString = [NSString stringWithFormat:@"%i", i];
+		_digits[i] = [[NSImage alloc] initWithSize:_digitSize];
+
+		[self drawString:lineNumberString intoImage:_digits[i]];
 	}
+
+	_closedFoldIndicator = [[NSImage alloc] initWithSize:_digitSize];
+	[self drawString:@"-" intoImage:_closedFoldIndicator];
+	_openFoldStartIndicator = [[NSImage alloc] initWithSize:_digitSize];
+	[self drawString:@"o" intoImage:_openFoldStartIndicator];
+	_openFoldBodyIndicator = [[NSImage alloc] initWithSize:_digitSize];
+	[self drawString:@"|" intoImage:_openFoldBodyIndicator];
 
 	[self setNeedsDisplay:YES];
 }
@@ -177,7 +190,7 @@
 	id view = [self clientView];
 	if ([view isKindOfClass:[ViTextView class]]) {
 		lineCount = [[(ViTextView *)view textStorage] lineCount];
-		digits = (unsigned)log10(lineCount) + 1;
+		digits = (unsigned)log10(lineCount) + 3;
 		return ceilf(MAX(DEFAULT_THICKNESS, _digitSize.width * digits + RULER_MARGIN * 2));
 	}
 
@@ -203,6 +216,16 @@
 	} while (absoluteLine > 0);
 }
 
+- (void)drawFoldIndicator:(NSImage *)indicator inRect:(NSRect)rect
+{
+	[indicator drawInRect:rect
+				 fromRect:NSZeroRect
+				operation:NSCompositeSourceOver
+				 fraction:1.0
+		   respectFlipped:YES
+					hints:nil];
+}
+
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect
 {
 	NSRect bounds = [self bounds];
@@ -219,6 +242,7 @@
 		return;
 
 	ViTextView              *textView = (ViTextView *)view;
+	ViDocument				*document = textView.document;
 	NSLayoutManager         *layoutManager;
 	NSTextContainer         *container;
 	ViTextStorage		*textStorage;
@@ -277,6 +301,24 @@
 		if (_relative)
 			numberToDraw -= currentLine;
 		[self drawLineNumber:numberToDraw inRect:r];
+
+		ViFold *fold = [document foldAtLocation:location];
+		if (fold) {
+			NSLog(@"Found a fold at %lu; it says it starts at %lu", location, fold.range.location);
+			NSImage *indicatorToDraw = _openFoldBodyIndicator;
+			if (! fold.isOpen) {
+			  indicatorToDraw = _closedFoldIndicator;
+			} else if (fold.range.location == location) {
+				indicatorToDraw = _openFoldStartIndicator;
+			}
+
+			NSRect indicatorRect;
+			indicatorRect.origin.x = ceil(RULER_MARGIN);
+			indicatorRect.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
+			indicatorRect.size = _digitSize;
+
+			[self drawFoldIndicator:indicatorToDraw inRect:indicatorRect];
+		}
 
                 /* Protect against an improbable (but possible due to
                  * preceeding exceptions in undo manager) out-of-bounds

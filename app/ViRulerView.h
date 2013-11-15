@@ -31,6 +31,10 @@
 	NSImage			*_digits[10];
 	NSSize			 _digitSize;
 
+    NSImage         *_closedFoldIndicator;
+    NSImage         *_openFoldStartIndicator;
+    NSImage         *_openFoldBodyIndicator;
+
 	BOOL				 _relative;
 }
 

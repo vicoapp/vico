@@ -13,7 +13,6 @@
 	if (foldedAttribute && [foldedAttribute boolValue]) {
 		return NSTypesetterZeroAdvancementAction;
 	} else {
-		NSLog(@"Got a yummy control character with no folded attribute at %lu!", characterIndex);
 		return [super actionForControlCharacterAtIndex:characterIndex];
 	}
 }

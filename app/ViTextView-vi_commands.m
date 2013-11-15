@@ -2542,7 +2542,7 @@
 }
 
 /* syntax: zc */
-- (BOOL)close_folds_in_range:(ViCommand *)command
+- (BOOL)close_fold:(ViCommand *)command
 {
 	NSRange foldRange = [document closeFoldAtLocation:start_location];
 

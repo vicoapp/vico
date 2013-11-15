@@ -304,7 +304,7 @@
 ;; z prefix, folding
 (nmap setKey:"zf" toOperator:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"zF" toAction:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
-(nmap setKey:"zc" toAction:"close_folds_in_range:")
+(nmap setKey:"zc" toAction:"close_fold:")
 (nmap setKey:"zo" toAction:"open_fold:")
 
 (nmap map:"ZZ" to:":xit<cr>")

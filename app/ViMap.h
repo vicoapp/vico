@@ -26,17 +26,13 @@
 #import "Nu.h"
 #import "ViScope.h"
 
-// TODO ViMapNeedArgumentBeforeToggle
-// TODO This means we need an argument for the first invocation
-// TODO but not the second, and then we need one again.
-// TODO This describes the way macro recording works as q<register>
-// TODO followed by just q to end recording.
 #define ViMapSetsDot			1ULL
 #define ViMapNeedMotion			2ULL
 #define ViMapIsMotion			4ULL
 #define ViMapLineMode			8ULL
 #define ViMapNeedArgument		16ULL
 #define ViMapNoArgumentOnToggle	32ULL
+#define ViMapExcludedFromDot    64ULL
 
 /** A mapping of a key sequence to an editor action, macro or Nu expression.
  *
@@ -51,6 +47,10 @@
  * - `ViMapIsMotion`: This is a motion command
  * - `ViMapLineMode`: This command operates on whole lines
  * - `ViMapNeedArgument`: This command needs a following character argument
+ * - `ViMapNoArgumentOnToggle`: This command needs a following character argument, but only every other time.
+ *                              This is how the q command for macro recording works.
+ * - `ViMapExcludedFromDot`: Explicitly indicates this command's keys should not be included in the record
+ *                           of keystrokes executed in a dot command. <cr> in completions, for example.
  */
 @interface ViMapping : NSObject
 {
@@ -122,6 +122,9 @@
 
 /** YES if the mapping is an editor action that does not need a character argument every other invocation, like the vim `q` command. */
 - (BOOL)noArgumentOnToggle;
+
+/** YES if the mapping's keys should not be included in the `.` command's record of keys pressed. */
+- (BOOL)isExcludedFromDot;
 
 - (BOOL)wantsKeys;
 

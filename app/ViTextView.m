@@ -2441,6 +2441,8 @@ replaceCharactersInRange:(NSRange)aRange
 				[_keyManager.parser setInsertMap];
 			}
 		}
+	} else if (! _keyManager.parser.partial && [self isFieldEditor] && _showingCompletionWindow) {
+		[_keyManager.parser setMap:[ViMap mapWithName:@"exCommandCompletionMap"]];
 	}
 
 	return [NSNumber numberWithBool:YES];

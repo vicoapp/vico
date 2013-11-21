@@ -2570,7 +2570,7 @@ replaceCharactersInRange:(NSRange)aRange
 		// (https://github.com/vicoapp/vico/issues/62).
 		[self performSelector:@selector(enableWrapping) withObject:nil afterDelay:0];
 	} else {
-		[self setWrapping:YES];
+		[self setWrapping:enabled];
 	}
 }
 

@@ -471,7 +471,7 @@
 (cmap include:imap)
 (cmap setKey:"<esc>" toAction:"cancel_completion:")
 (cmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
-(cmap setKey:"<cr>" toAction:"accept_completion:")
+(cmap setKey:"<cr>" toAction:"accept_completion:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
 (cmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
 (cmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
 (cmap setKey:"<ctrl-y>" toAction:"accept_completion:")

@@ -2078,11 +2078,6 @@ replaceCharactersInRange:(NSRange)aRange
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
-
-		// When leaving insert mode, if the completion window was up, close it.
-		ViCompletionController *completionController = [ViCompletionController sharedController];
-		if (completionController.delegate == self)
-			[completionController cancel:nil];
 	}
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];
@@ -2092,6 +2087,16 @@ replaceCharactersInRange:(NSRange)aRange
 	[self setNormalMode];
 	[self setCaret:final_location];
 	[self resetSelection];
+
+	// When leaving insert mode, if the completion window was up, close it.
+	// Note: we do this after we `setNormalMode`, because the act of detecting
+	// the <esc> key resets the parser into normal mode. If we cancel the
+	// completion window before the `mode` instance variable has been updated
+	// accordingly, completionController:didTerminateWithKey:completion: will
+	// try to reset the parser map to the insert map from the completion map,
+	// thus leaving the parser in insert mode instead of normal mode. Yikes!
+	if (_showingCompletionWindow)
+		[[ViCompletionController sharedController] cancel:nil];
 
 	return YES;
 }

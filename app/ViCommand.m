@@ -92,6 +92,11 @@
 	return [_mapping isMotion];
 }
 
+- (BOOL)isExcludedFromDot
+{
+	return [_mapping isExcludedFromDot];
+}
+
 - (BOOL)hasOperator
 {
 	return _operator != nil;

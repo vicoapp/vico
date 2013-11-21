@@ -62,6 +62,9 @@
 /** YES if the mapped action is a motion command. */
 @property(nonatomic,readonly) BOOL isMotion;
 
+/** YES if the command's keys should not be included in the `.` command's record of keys pressed. */
+@property(nonatomic,readonly) BOOL isExcludedFromDot;
+
 /** YES if the mapped action is a motion component for an operator. */
 @property(nonatomic,readonly) BOOL hasOperator;
 

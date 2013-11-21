@@ -2096,7 +2096,7 @@ replaceCharactersInRange:(NSRange)aRange
 	// try to reset the parser map to the insert map from the completion map,
 	// thus leaving the parser in insert mode instead of normal mode. Yikes!
 	if (_showingCompletionWindow)
-		[[ViCompletionController sharedController] cancel:nil];
+		[self hideCompletionWindow];
 
 	return YES;
 }

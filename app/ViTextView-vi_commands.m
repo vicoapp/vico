@@ -3196,7 +3196,7 @@ again:
 {
 	_showingCompletionWindow = NO;
 
-	if (mode == ViInsertMode) {
+	if (mode == ViInsertMode && ! [self isFieldEditor]) {
 		[_keyManager.parser setMap:[ViMap insertMap]];
 	}
 

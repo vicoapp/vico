@@ -427,9 +427,9 @@
 						 _map.name];
 			[self setMap:_map.operatorMap];
 			DEBUG(@"%@ is an operator, using operatorMap %@", mapping, _map);
-		} else if ([mapping needsArgument] && (! [mapping noArgumentOnToggle] || ! _lastToggleCommand || (! [[[_lastToggleCommand mapping] keySequence] isEqual:[mapping keySequence]])))
+		} else if ([mapping needsArgument] && (! [mapping noArgumentOnToggle] || ! _lastToggleCommand || (! [[[_lastToggleCommand mapping] keySequence] isEqual:[mapping keySequence]]))) {
 			_state = ViParserNeedChar;
-		else {
+		} else {
 			if (_remainingExcessKeysPtr)
 				*_remainingExcessKeysPtr = excessKeys;
 			return [self completeWithError:outError];

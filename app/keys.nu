@@ -79,8 +79,8 @@
 (imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"pf" scope:nil)
 (imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil) ; p parameter automatically inserts common prefix
 (imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"d" scope:nil)  ; d parameter sorts descending
-(imap setKey:"<Esc>" toAction:"normal_mode:")
-(imap setKey:"<ctrl-c>" toAction:"normal_mode:")
+(imap setKey:"<Esc>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(imap setKey:"<ctrl-c>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
 (imap map:"<cmd-z>" to:"<esc>u")

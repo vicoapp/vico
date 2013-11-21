@@ -2113,7 +2113,7 @@ replaceCharactersInRange:(NSRange)aRange
    evaluateCommand:(ViCommand *)command
 {
 	DEBUG(@"eval command %@ from key sequence %@", command, [NSString stringWithKeySequence:command.keySequence]);
-	if (mode == ViInsertMode && !replayingInput && command.action != @selector(normal_mode:)) {
+	if (mode == ViInsertMode && !replayingInput && ! command.isExcludedFromDot) {
 		/* Add the key to the input replay queue. */
 		[_inputKeys addObjectsFromArray:command.keySequence];
 	}

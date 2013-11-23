@@ -143,13 +143,6 @@
 		[self drawString:lineNumberString intoImage:_digits[i]];
 	}
 
-	_closedFoldIndicator = [[NSImage alloc] initWithSize:_digitSize];
-	[self drawString:@"-" intoImage:_closedFoldIndicator];
-	_openFoldStartIndicator = [[NSImage alloc] initWithSize:_digitSize];
-	[self drawString:@"o" intoImage:_openFoldStartIndicator];
-	_openFoldBodyIndicator = [[NSImage alloc] initWithSize:_digitSize];
-	[self drawString:@"|" intoImage:_openFoldBodyIndicator];
-
 	[self setNeedsDisplay:YES];
 }
 

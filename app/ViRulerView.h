@@ -32,10 +32,6 @@
 
     ViLineNumberView    *_lineNumberView;
     ViFoldMarginView    *_foldMarginView;
-
-    NSImage         *_closedFoldIndicator;
-    NSImage         *_openFoldStartIndicator;
-    NSImage         *_openFoldBodyIndicator;
 }
 
 - (void)setRelativeLineNumbers:(BOOL)flag;

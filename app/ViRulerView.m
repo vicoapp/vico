@@ -135,25 +135,6 @@
 
 	[_lineNumberView drawLineNumbersInRect:aRect visibleRect:visibleRect];
 	[_foldMarginView drawFoldsInRect:aRect visibleRect:visibleRect];
-
-	/*
-		ViFold *fold = [document foldAtLocation:location];
-		if (fold) {
-			NSImage *indicatorToDraw = _openFoldBodyIndicator;
-			if (! fold.isOpen) {
-			  indicatorToDraw = _closedFoldIndicator;
-			} else if (fold.range.location == location) {
-				indicatorToDraw = _openFoldStartIndicator;
-			}
-
-			NSRect indicatorRect;
-			indicatorRect.origin.x = ceil(RULER_MARGIN);
-			indicatorRect.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
-			indicatorRect.size = _digitSize;
-
-			[self drawFoldIndicator:indicatorToDraw inRect:indicatorRect];
-		}
-	*/
 }
 
 @end

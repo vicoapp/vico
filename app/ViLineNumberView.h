@@ -2,6 +2,9 @@
 
 /**
  * A view that presents line numbers in a ViRulerView.
+ *
+ * The line numbers can be clicked and dragged to select one or more lines
+ * in the text view.
  */
 @interface ViLineNumberView : NSView
 {

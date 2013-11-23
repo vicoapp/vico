@@ -33,6 +33,6 @@
 - (void)drawLineNumbersInRect:(NSRect)aRect visibleRect:(NSRect)visibleRect;
 
 - (void)lineNumberMouseDown:(NSEvent *)theEvent;
-- (void)lineNumberMouseDrag:(NSEvent *)theEvent;
+- (void)lineNumberMouseDragged:(NSEvent *)theEvent;
 
 @end

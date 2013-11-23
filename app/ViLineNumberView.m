@@ -278,7 +278,7 @@
 	[_textView rulerView:(NSRulerView *)[self superview] selectFromPoint:_fromPoint toPoint:_fromPoint];
 }
 
-- (void)lineNumberMouseDrag:(NSEvent *)theEvent
+- (void)lineNumberMouseDragged:(NSEvent *)theEvent
 {
 	NSPoint toPoint = [_textView convertPoint:[theEvent locationInWindow] fromView:nil];
 	toPoint.x = 0;

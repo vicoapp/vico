@@ -148,7 +148,6 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSPoint downPoint = [self convertPoint:theEvent.locationInWindow fromView:nil];
-	NSLog(@"Got point %@ with %@", NSStringFromPoint(downPoint), NSStringFromSize(_lineNumberView.frame.size));
 	if (downPoint.x <= _lineNumberView.frame.size.width) {
 		[_lineNumberView lineNumberMouseDown:theEvent];
 	}
@@ -158,7 +157,7 @@
 {
 	NSPoint dragPoint = [self convertPoint:theEvent.locationInWindow fromView:nil];
 	if (dragPoint.x <= _lineNumberView.frame.size.width) {
-		[_lineNumberView lineNumberMouseDown:theEvent];
+		[_lineNumberView lineNumberMouseDragged:theEvent];
 	}
 }
 

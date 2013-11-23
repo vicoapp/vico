@@ -2059,22 +2059,24 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	levels--;
 	__block NSUInteger lastFoldEnd = foldToOpen.range.location + 1;
 	[foldToOpen.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
-		if (levels > 0) {
-			[self closeFold:childFold levels:levels];
+		if (! childFold.isOpen) {
+			if (levels > 0) {
+				[self closeFold:childFold levels:levels];
+			}
+
+			// Note that we also remove the folded attribute from the first
+			// character of the child range here.
+			[self.textStorage removeAttribute:ViFoldedAttributeName
+										range:NSMakeRange(lastFoldEnd, childFold.range.location - lastFoldEnd + 1)];
+
+			NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(childFold.range)];
+			lastFoldEnd = NSMaxRange(endingLineRange);
 		}
-
-		// Note that we also remove the folded attribute from the first
-		// character of the child range here. This is because, if the fold
-		// wasn't expanded, we want the fold attachment to be visible.
-		[self.textStorage removeAttribute:ViFoldedAttributeName
-									range:NSMakeRange(lastFoldEnd, childFold.range.location - lastFoldEnd + 1)];
-
-		NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(childFold.range)];
-		lastFoldEnd = NSMaxRange(endingLineRange);
 	}];
 
-	// Finally, make sure the last line is unfolded. This also ensures if there
-	// are no children the whole range is unfolded.
+	// Finally, make sure the last line is unfolded. This also ensures, if there
+	// are no children, that the whole range is unfolded.
+	//
 	// Keep in mind that the fold's range only includes the first character of
 	// the last line of the fold.
 	NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToOpen.range)];

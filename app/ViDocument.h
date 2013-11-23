@@ -214,16 +214,16 @@
 
 /** @name Dealing with manual folds */
 - (void)createFoldForRange:(NSRange)range;
-/** Closes the deepest fold at the given location.
+/** Closes the deepest fold at the given location, and recursively up +levels+ parent folds.
  *
  * @returns The range of the closed fold.
  */
-- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation;
-/** Opens the deepest fold at the given location.
+- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels;
+/** Opens the deepest fold at the given location, and recursively up +levels+ parent folds.
  *
  * @returns the range of the opened fold.
  */
-- (NSRange)openFoldAtLocation:(NSUInteger)aLocation;
+- (NSRange)openFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels;
 /** Toggles the deepest fold at the given location, closing it if it is
  * open and opening it if it is closed.
  */

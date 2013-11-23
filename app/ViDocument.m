@@ -1975,7 +1975,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
-- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation
+- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
 {
 	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
 
@@ -1983,11 +1983,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (fold == [NSNull null]) {
 		return NSMakeRange(NSNotFound, -1);
 	} else {
-		return [self closeFold:(ViFold *)fold];
+		return [self closeFold:(ViFold *)fold levels:levels];
 	}
 }
 
-- (NSRange)openFoldAtLocation:(NSUInteger)aLocation
+- (NSRange)openFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
 {
 	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
 
@@ -1995,7 +1995,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (fold == [NSNull null]) {
 		return NSMakeRange(NSNotFound, -1);
 	} else {
-		return [self openFold:(ViFold *)fold];
+		return [self openFold:(ViFold *)fold levels:levels];
 	}
 }
 
@@ -2011,6 +2011,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 }
 
 - (NSRange)closeFold:(ViFold *)foldToClose
+{
+	return [self closeFold:foldToClose levels:1];
+}
+
+- (NSRange)closeFold:(ViFold *)foldToClose levels:(NSUInteger)levels
 {
 	foldToClose.open = false;
 		
@@ -2033,10 +2038,21 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 							  range:NSMakeRange(foldToClose.range.location + 1 /* exclude the first character */,
 												foldingLength)];
 
-	return foldToClose.range;
+	// Keep closing recursively if necessary, return this fold's range otherwise.
+	levels--;
+	if (levels > 0 && foldToClose.parent) {
+		NSRange range = [self closeFold:foldToClose.parent levels:levels];
+		return range;
+	} else
+		return foldToClose.range;
 }
 
 - (NSRange)openFold:(ViFold *)foldToOpen
+{
+	return [self openFold:foldToOpen levels:1];
+}
+
+- (NSRange)openFold:(ViFold *)foldToOpen levels:(NSUInteger)levels
 {
 	foldToOpen.open = true;
 

@@ -2544,7 +2544,9 @@
 /* syntax: zc */
 - (BOOL)close_fold:(ViCommand *)command
 {
-	NSRange foldRange = [document closeFoldAtLocation:start_location];
+	// If no count was provided by the user, we only close one level.
+	NSUInteger levelsToClose = command.count ? command.count : 1;
+	NSRange foldRange = [document closeFoldAtLocation:start_location levels:levelsToClose];
 
 	if (foldRange.location != NSNotFound) {
 		final_location = foldRange.location;
@@ -2555,10 +2557,12 @@
 	}
 }
 
-/* syntax: zo */
+/* syntax: [count]zo */
 - (BOOL)open_fold:(ViCommand *)command
 {
-	NSRange foldRange = [document openFoldAtLocation:start_location];
+	// If no count was provided by the user, we only open one level.
+	NSUInteger levelsToOpen = command.count ? command.count : 1;
+	NSRange foldRange = [document openFoldAtLocation:start_location levels:levelsToOpen];
 
 	return foldRange.location != NSNotFound;
 }

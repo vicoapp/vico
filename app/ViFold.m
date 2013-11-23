@@ -19,7 +19,22 @@ inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)
 	addChildToFold(parentFold, topmostFold);
 }
 
+static NSTextAttachment *foldAttachment = nil;
+
 @implementation ViFold
+
++ (NSTextAttachment *)foldAttachment
+{
+	if (! foldAttachment) {
+		NSURL *foldImageURL = [[NSBundle mainBundle] URLForResource:@"tag" withExtension:@"png"];
+		NSError *error = nil;
+		NSFileWrapper *foldImageFile = [[NSFileWrapper alloc] initWithURL:foldImageURL options:0 error:&error];
+		if (! error)
+			foldAttachment = [[NSTextAttachment alloc] initWithFileWrapper:foldImageFile];
+	}
+
+	return foldAttachment;
+}
 
 + (ViFold *)foldWithRange:(NSRange)aRange
 {

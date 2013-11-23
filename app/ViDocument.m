@@ -2018,12 +2018,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSRange)closeFold:(ViFold *)foldToClose levels:(NSUInteger)levels
 {
 	foldToClose.open = false;
-		
-	NSURL *foldImageURL = [[NSBundle mainBundle] URLForResource:@"tag" withExtension:@"png"];
-	NSError *error = nil;
-	NSFileWrapper *foldImageFile = [[NSFileWrapper alloc] initWithURL:foldImageURL options:0 error:&error];
-	if (error)
-		[self message:@"Got error %@", error ];
 
 	// The fold range extends to the first character of the last line of
 	// the fold, but when folding we need to extend the actual fold
@@ -2032,7 +2026,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// Adjust for the first character, which will show the fold.
 	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToClose.range.location - 1;
 
-	[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [[NSTextAttachment alloc] initWithFileWrapper:foldImageFile] }
+	[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
 							  range:NSMakeRange(foldToClose.range.location, 1)];
 	[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }
 							  range:NSMakeRange(foldToClose.range.location + 1 /* exclude the first character */,

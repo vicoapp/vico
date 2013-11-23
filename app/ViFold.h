@@ -22,6 +22,8 @@ extern NSString *const ViFoldedAttributeName;
 @property (nonatomic) NSUInteger depth;
 @property (nonatomic,readonly) NSSet *children;
 
++ (NSTextAttachment *)foldAttachment;
+
 + (ViFold *)foldWithRange:(NSRange)range;
 - (ViFold *)initWithRange:(NSRange)range;
 

@@ -7,7 +7,7 @@ inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 	parentFold.range = NSUnionRange(parentFold.range, childFold.range);
 	[parentFold addChild:childFold];
 	childFold.parent = parentFold;
-	childFold.depth += 1;
+	childFold.depth = parentFold.depth + 1;
 }
 
 inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)

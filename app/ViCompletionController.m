@@ -250,8 +250,6 @@
 
 	[self updateUIForPrefixWindow:parentWindow];
 
-	[window orderFront:nil];
-
 	[parentWindow addChildWindow:window ordered:NSWindowAbove];
 	[[NSNotificationCenter defaultCenter]
 		addObserver:self

@@ -13,7 +13,8 @@
       (emap (ViMap explorerMap))
       (smap (ViMap symbolMap))
       (xmap (ViMap mapWithName:"exCommandMap"))
-      (cmap (ViMap completionMap)))
+      (cmap (ViMap completionMap))
+      (xcmap (ViMap mapWithName:"exCommandCompletionMap")))
 
 ;; arrow motions, also valid in insert mode
 (amap setKey:"<right>" toMotion:"move_right_and_wrap:")
@@ -79,8 +80,8 @@
 (imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"pf" scope:nil)
 (imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil) ; p parameter automatically inserts common prefix
 (imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"d" scope:nil)  ; d parameter sorts descending
-(imap setKey:"<Esc>" toAction:"normal_mode:")
-(imap setKey:"<ctrl-c>" toAction:"normal_mode:")
+(imap setKey:"<Esc>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(imap setKey:"<ctrl-c>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
 (imap map:"<cmd-z>" to:"<esc>u")
@@ -477,9 +478,8 @@
 (cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
 (cmap setDefaultAction:"input_character:")
 (cmap include:imap)
-(cmap setKey:"<esc>" toAction:"cancel_completion:")
 (cmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
-(cmap setKey:"<cr>" toAction:"accept_completion:")
+(cmap setKey:"<cr>" toAction:"accept_completion:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
 (cmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
 (cmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
 (cmap setKey:"<ctrl-y>" toAction:"accept_completion:")
@@ -491,6 +491,24 @@
 (cmap setKey:"<up>" toAction:"select_previous_completion:")
 (cmap setKey:"<bs>" toAction:"input_backspace:")
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
+
+;; a map for the completion list when in the ex command editor
+(xcmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
+(xcmap setDefaultAction:"input_character:")
+(xcmap include:xmap)
+(xcmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
+(xcmap setKey:"<cr>" toAction:"accept_completion:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(xcmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
+(xcmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
+(xcmap setKey:"<ctrl-y>" toAction:"accept_completion:")
+(xcmap setKey:"<ctrl-n>" toAction:"select_next_completion:")
+(xcmap setKey:"<ctrl-j>" toAction:"select_next_completion:")
+(xcmap setKey:"<ctrl-k>" toAction:"select_previous_completion:")
+(xcmap setKey:"<ctrl-p>" toAction:"select_previous_completion:")
+(xcmap setKey:"<down>" toAction:"select_next_completion:")
+(xcmap setKey:"<up>" toAction:"select_previous_completion:")
+(xcmap setKey:"<bs>" toAction:"input_backspace:")
+(xcmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 
 ;; visual selection with shift + arrow keys

@@ -166,6 +166,11 @@
 	return has_flag(ViMapNoArgumentOnToggle);
 }
 
+- (BOOL)isExcludedFromDot
+{
+	return has_flag(ViMapExcludedFromDot);
+}
+
 - (BOOL)wantsKeys
 {
 	return [self isOperator] || [self needsArgument];

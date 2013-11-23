@@ -3220,7 +3220,10 @@ again:
 								  initialFilter:fuzzyTrigger ? string : nil];
 
 	if (_showingCompletionWindow) {
-		[_keyManager.parser setMap:[ViMap completionMap]];
+		if ([self isFieldEditor])
+			[_keyManager.parser setMap:[ViMap mapWithName:@"exCommandCompletionMap"]];
+		else
+			[_keyManager.parser setMap:[ViMap completionMap]];
 	}
 
 	return _showingCompletionWindow;
@@ -3259,7 +3262,7 @@ again:
 {
 	_showingCompletionWindow = NO;
 
-	if (mode == ViInsertMode) {
+	if (mode == ViInsertMode && ! [self isFieldEditor]) {
 		[_keyManager.parser setMap:[ViMap insertMap]];
 	}
 

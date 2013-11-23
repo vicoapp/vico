@@ -16,6 +16,7 @@
 (global ViMapLineMode 8)
 (global ViMapNeedArgument 16)
 (global ViMapNoArgumentOnToggle 32)
+(global ViMapExcludedFromDot 64)
 
 (global ViRegexpIgnoreCase 1)
 

@@ -271,14 +271,14 @@
 #pragma mark -
 #pragma mark Mouse handling
 
-- (void)mouseDown:(NSEvent *)theEvent
+- (void)lineNumberMouseDown:(NSEvent *)theEvent
 {
 	_fromPoint = [_textView convertPoint:[theEvent locationInWindow] fromView:nil];
 	_fromPoint.x = 0;
 	[_textView rulerView:(NSRulerView *)[self superview] selectFromPoint:_fromPoint toPoint:_fromPoint];
 }
 
-- (void)mouseDragged:(NSEvent *)theEvent
+- (void)lineNumberMouseDrag:(NSEvent *)theEvent
 {
 	NSPoint toPoint = [_textView convertPoint:[theEvent locationInWindow] fromView:nil];
 	toPoint.x = 0;

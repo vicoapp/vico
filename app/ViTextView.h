@@ -319,6 +319,7 @@
 - (void)rulerView:(NSRulerView *)aRulerView
   selectFromPoint:(NSPoint)fromPoint
           toPoint:(NSPoint)toPoint;
+- (void)toggleFoldAtPoint:(NSPoint)aPoint;
 
 - (NSRange)rangeOfPattern:(NSString *)pattern
 	     fromLocation:(NSUInteger)start

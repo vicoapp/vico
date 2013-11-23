@@ -136,4 +136,12 @@
 	}
 }
 
+- (void)foldMarginMouseUp:(NSEvent *)theEvent
+{
+	NSPoint upPoint = [_textView convertPoint:[theEvent locationInWindow] fromView:nil];
+	upPoint.x = 0;
+
+	[_textView toggleFoldAtPoint:upPoint];
+}
+
 @end

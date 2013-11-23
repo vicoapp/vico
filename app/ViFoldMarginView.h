@@ -18,4 +18,6 @@
 
 - (void)drawFoldsInRect:(NSRect)aRect visibleRect:(NSRect)visibleRect;
 
+- (void)foldMarginMouseUp:(NSEvent *)theEvent;
+
 @end

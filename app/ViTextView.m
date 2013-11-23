@@ -39,6 +39,7 @@
 #import "NSScanner-additions.h"
 #import "NSEvent-keyAdditions.h"
 #import "ViError.h"
+#import "ViFold.h"
 #import "ViRegisterManager.h"
 #import "ViLayoutManager.h"
 #import "NSView-additions.h"
@@ -408,6 +409,21 @@ DEBUG_FINALIZE();
 	[self setVisualMode];
 	[self setCaret:toIndex];
 	[self setVisualSelection];
+}
+
+- (void)toggleFoldAtPoint:(NSPoint)aPoint
+{
+	NSInteger index = [self characterIndexForInsertionAtPoint:aPoint];
+
+	if (index != NSNotFound) {
+		ViFold *fold = [document foldAtLocation:index];
+		if (fold) {
+			if (fold.open)
+				[document closeFoldAtLocation:index];
+			else
+				[document openFoldAtLocation:index];
+		}
+	}
 }
 
 - (void)copy:(id)sender

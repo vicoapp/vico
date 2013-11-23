@@ -137,4 +137,29 @@
 	[_foldMarginView drawFoldsInRect:aRect visibleRect:visibleRect];
 }
 
+#pragma mark -
+#pragma mark Mouse handling
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+	[_foldMarginView foldMarginMouseUp:theEvent];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	NSPoint downPoint = [self convertPoint:theEvent.locationInWindow fromView:nil];
+	NSLog(@"Got point %@ with %@", NSStringFromPoint(downPoint), NSStringFromSize(_lineNumberView.frame.size));
+	if (downPoint.x <= _lineNumberView.frame.size.width) {
+		[_lineNumberView lineNumberMouseDown:theEvent];
+	}
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	NSPoint dragPoint = [self convertPoint:theEvent.locationInWindow fromView:nil];
+	if (dragPoint.x <= _lineNumberView.frame.size.width) {
+		[_lineNumberView lineNumberMouseDown:theEvent];
+	}
+}
+
 @end

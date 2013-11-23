@@ -102,7 +102,7 @@
 	NSUInteger	 lineCount, digits;
 
 	lineCount = _textView.textStorage.lineCount;
-	digits = (unsigned)log10(lineCount) + 3;
+	digits = (unsigned)log10(lineCount) + 1;
 	return ceilf(MAX(DEFAULT_THICKNESS, _digitSize.width * digits + LINE_NUMBER_MARGIN * 2));
 }
 

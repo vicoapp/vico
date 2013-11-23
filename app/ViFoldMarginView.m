@@ -1,5 +1,6 @@
 #import "ViFoldMarginView.h"
 
+#import "ViFold.h"
 #import "ViTextView.h"
 
 #define FOLD_MARGIN_WIDTH 10
@@ -115,10 +116,10 @@
 			r.origin.y = ypos;
 			r.size = NSMakeSize(FOLD_MARGIN_WIDTH, rect.size.height);
 
-			NSLog(@"Drawing at %@ in %@ for %@", NSStringFromRect(r), NSStringFromRect(self.frame), NSStringFromRect(self.bounds));
-			NSColor *foldColor = [NSColor colorWithCalibratedWhite:0.42 alpha:0.5];
+			CGFloat alpha = 0.1 * (fold.depth + 1);
+			NSColor *foldColor = [NSColor colorWithCalibratedWhite:0.42 alpha:alpha];
 			[foldColor set];
-			NSRectFill(r);
+			NSRectFillUsingOperation(r, NSCompositeSourceOver);
 		}
 
 		/* Protect against an improbable (but possible due to

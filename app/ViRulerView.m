@@ -85,19 +85,17 @@
 														 backgroundColor:_backgroundColor];
 
 			[[NSNotificationCenter defaultCenter] addObserver:self
-													 selector:@selector(lineViewFrameDidChange:)
+													 selector:@selector(subviewFrameDidChange:)
 														 name:NSViewFrameDidChangeNotification
 													   object:_lineNumberView];
 
 			[self addSubview:_lineNumberView];
-
 			[_lineNumberView updateViewFrame];
-			[self setRuleThickness:[_lineNumberView requiredThickness]];
 		}
 	}
 }
 
-- (void)lineViewFrameDidChange:(NSNotification *)aNotification
+- (void)subviewFrameDidChange:(NSNotification *)aNotification
 {
 	[self updateRuleThickness];
 }

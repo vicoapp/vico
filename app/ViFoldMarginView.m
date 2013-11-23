@@ -141,6 +141,7 @@
 	NSPoint upPoint = [_textView convertPoint:[theEvent locationInWindow] fromView:nil];
 	upPoint.x = 0;
 
+	[self setNeedsDisplay:YES];
 	[_textView toggleFoldAtPoint:upPoint];
 }
 

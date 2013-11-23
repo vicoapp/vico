@@ -99,9 +99,12 @@
 
 - (void)lineViewFrameDidChange:(NSNotification *)aNotification
 {
-	NSLog(@"Updating to %.2f", [_lineNumberView requiredThickness]);
+	[self updateRuleThickness];
+}
+
+- (void)updateRuleThickness
+{
 	[self setRuleThickness:[_lineNumberView requiredThickness]];
-	NSLog(@"Got to %.2f", [self ruleThickness]);
 }
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect

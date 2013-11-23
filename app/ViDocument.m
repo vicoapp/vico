@@ -1999,6 +1999,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	}
 }
 
+- (void)toggleFoldAtLocation:(NSUInteger)aLocation
+{
+	ViFold *fold = [self foldAtLocation:aLocation];
+
+	if (fold && fold.open) {
+		[self closeFold:fold];
+	} else if (fold) {
+		[self openFold:fold];
+	}
+}
 
 - (NSRange)closeFold:(ViFold *)foldToClose
 {

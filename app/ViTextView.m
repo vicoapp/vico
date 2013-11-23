@@ -416,13 +416,7 @@ DEBUG_FINALIZE();
 	NSInteger index = [self characterIndexForInsertionAtPoint:aPoint];
 
 	if (index != NSNotFound) {
-		ViFold *fold = [document foldAtLocation:index];
-		if (fold) {
-			if (fold.open)
-				[document closeFoldAtLocation:index];
-			else
-				[document openFoldAtLocation:index];
-		}
+		[document toggleFoldAtLocation:index];
 	}
 }
 

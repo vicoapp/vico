@@ -224,6 +224,10 @@
  * @returns the range of the opened fold.
  */
 - (NSRange)openFoldAtLocation:(NSUInteger)aLocation;
+/** Toggles the deepest fold at the given location, closing it if it is
+ * open and opening it if it is closed.
+ */
+- (void)toggleFoldAtLocation:(NSUInteger)aLocation;
 /**
  * Look up a fold by location in the text.
  *

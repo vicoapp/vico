@@ -23,6 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ViFoldMarginView.h"
 #import "ViLineNumberView.h"
 
 @interface ViRulerView : NSRulerView
@@ -30,6 +31,7 @@
 	NSColor				*_backgroundColor;
 
     ViLineNumberView    *_lineNumberView;
+    ViFoldMarginView    *_foldMarginView;
 
     NSImage         *_closedFoldIndicator;
     NSImage         *_openFoldStartIndicator;

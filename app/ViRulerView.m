@@ -92,6 +92,22 @@
 			[self addSubview:_lineNumberView];
 			[_lineNumberView updateViewFrame];
 		}
+
+		if (_foldMarginView) {
+			[_foldMarginView setTextView:(ViTextView *)aView];
+		} else {
+			_foldMarginView = [[ViFoldMarginView alloc] initWithTextView:(ViTextView *)aView];
+
+			[[NSNotificationCenter defaultCenter] addObserver:self
+													 selector:@selector(subviewFrameDidChange:)
+														 name:NSViewFrameDidChangeNotification
+													   object:_foldMarginView];
+
+			[self addSubview:_foldMarginView];
+			[_foldMarginView updateViewFrame];
+		}
+
+		[self updateRuleThickness];
 	}
 }
 
@@ -102,7 +118,7 @@
 
 - (void)updateRuleThickness
 {
-	[self setRuleThickness:[_lineNumberView requiredThickness]];
+	[self setRuleThickness:_lineNumberView.frame.size.width + _foldMarginView.frame.size.width];
 }
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect
@@ -118,6 +134,7 @@
 				  toPoint:NSMakePoint(NSMaxX(bounds) - 0.5, NSMaxY(bounds))];
 
 	[_lineNumberView drawLineNumbersInRect:aRect visibleRect:visibleRect];
+	[_foldMarginView drawFoldsInRect:aRect visibleRect:visibleRect];
 
 	/*
 		ViFold *fold = [document foldAtLocation:location];

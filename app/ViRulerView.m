@@ -142,7 +142,10 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	[_foldMarginView foldMarginMouseUp:theEvent];
+	NSPoint upPoint = [self convertPoint:theEvent.locationInWindow fromView:nil];
+	if (upPoint.x > _lineNumberView.frame.size.width) {
+		[_foldMarginView foldMarginMouseUp:theEvent];
+	}
 }
 
 - (void)mouseDown:(NSEvent *)theEvent

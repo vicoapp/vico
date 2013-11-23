@@ -1983,30 +1983,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (fold == [NSNull null]) {
 		return NSMakeRange(NSNotFound, -1);
 	} else {
-		ViFold *foldToClose = (ViFold *)fold;
-
-		foldToClose.open = false;
-		
-		NSURL *foldImageURL = [[NSBundle mainBundle] URLForResource:@"tag" withExtension:@"png"];
-		NSError *error = nil;
-		NSFileWrapper *foldImageFile = [[NSFileWrapper alloc] initWithURL:foldImageURL options:0 error:&error];
-		if (error)
-			[self message:@"Got error %@", error ];
-
-		// The fold range extends to the first character of the last line of
-		// the fold, but when folding we need to extend the actual fold
-		// rendering to the last character of the last line.
-		NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToClose.range)];
-		// Adjust for the first character, which will show the fold.
-		NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToClose.range.location - 1;
-
-		[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [[NSTextAttachment alloc] initWithFileWrapper:foldImageFile] }
-								  range:NSMakeRange(foldToClose.range.location, 1)];
-		[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }
-								  range:NSMakeRange(foldToClose.range.location + 1 /* exclude the first character */,
-												    foldingLength)];
-
-		return foldToClose.range;
+		return [self closeFold:(ViFold *)fold];
 	}
 }
 
@@ -2018,22 +1995,52 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (fold == [NSNull null]) {
 		return NSMakeRange(NSNotFound, -1);
 	} else {
-		ViFold *foldToOpen = (ViFold *)fold;
-
-		foldToOpen.open = true;
-
-		// See closeFoldAtLocation: for more on this.
-		NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToOpen.range)];
-		NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToOpen.range.location - 1;
-
-		[self.textStorage removeAttribute:NSAttachmentAttributeName
-									range:NSMakeRange(foldToOpen.range.location, 1)];
-		[self.textStorage removeAttribute:ViFoldedAttributeName
-									range:NSMakeRange(foldToOpen.range.location + 1,
-													  foldingLength)];
-
-		return foldToOpen.range;
+		return [self openFold:(ViFold *)fold];
 	}
+}
+
+
+- (NSRange)closeFold:(ViFold *)foldToClose
+{
+	foldToClose.open = false;
+		
+	NSURL *foldImageURL = [[NSBundle mainBundle] URLForResource:@"tag" withExtension:@"png"];
+	NSError *error = nil;
+	NSFileWrapper *foldImageFile = [[NSFileWrapper alloc] initWithURL:foldImageURL options:0 error:&error];
+	if (error)
+		[self message:@"Got error %@", error ];
+
+	// The fold range extends to the first character of the last line of
+	// the fold, but when folding we need to extend the actual fold
+	// rendering to the last character of the last line.
+	NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToClose.range)];
+	// Adjust for the first character, which will show the fold.
+	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToClose.range.location - 1;
+
+	[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [[NSTextAttachment alloc] initWithFileWrapper:foldImageFile] }
+							  range:NSMakeRange(foldToClose.range.location, 1)];
+	[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }
+							  range:NSMakeRange(foldToClose.range.location + 1 /* exclude the first character */,
+												foldingLength)];
+
+	return foldToClose.range;
+}
+
+- (NSRange)openFold:(ViFold *)foldToOpen
+{
+	foldToOpen.open = true;
+
+	// See closeFoldAtLocation: for more on this.
+	NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToOpen.range)];
+	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToOpen.range.location - 1;
+
+	[self.textStorage removeAttribute:NSAttachmentAttributeName
+								range:NSMakeRange(foldToOpen.range.location, 1)];
+	[self.textStorage removeAttribute:ViFoldedAttributeName
+								range:NSMakeRange(foldToOpen.range.location + 1,
+												  foldingLength)];
+
+	return foldToOpen.range;
 }
 
 - (ViFold *)foldAtLocation:(NSUInteger)aLocation

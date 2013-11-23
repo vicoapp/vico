@@ -2061,7 +2061,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	[foldToOpen.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
 		if (! childFold.isOpen) {
 			if (levels > 0) {
-				[self closeFold:childFold levels:levels];
+				[self openFold:childFold levels:levels];
 			}
 
 			// Note that we also remove the folded attribute from the first

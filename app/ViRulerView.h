@@ -23,24 +23,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ViLineNumberView.h"
+
 @interface ViRulerView : NSRulerView
 {
-	NSDictionary		*_textAttributes;
-	NSColor			*_backgroundColor;
-	NSPoint			 _fromPoint;
-	NSImage			*_digits[10];
-	NSSize			 _digitSize;
+	NSColor				*_backgroundColor;
+
+    ViLineNumberView    *_lineNumberView;
 
     NSImage         *_closedFoldIndicator;
     NSImage         *_openFoldStartIndicator;
     NSImage         *_openFoldBodyIndicator;
-
-	BOOL				 _relative;
 }
 
-- (void)setRelative:(BOOL)flag;
+- (void)setRelativeLineNumbers:(BOOL)flag;
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;
+
 - (void)resetTextAttributes;
 
 @end

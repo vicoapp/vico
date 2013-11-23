@@ -1551,9 +1551,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (void)enableLineNumbers:(BOOL)flag relative:(BOOL)relative forScrollView:(NSScrollView *)aScrollView
 {
 	if (flag) {
-		ViRulerView *lineNumberView = [[ViRulerView alloc] initWithScrollView:aScrollView];
-		[aScrollView setVerticalRulerView:lineNumberView];
-		[lineNumberView setRelative:relative];
+		ViRulerView *rulerView = [[ViRulerView alloc] initWithScrollView:aScrollView];
+		[aScrollView setVerticalRulerView:rulerView];
+		[rulerView setRelativeLineNumbers:relative];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];

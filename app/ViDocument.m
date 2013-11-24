@@ -1946,11 +1946,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex + 1];
 	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex + 1];
 
-	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLocation, lastLocation - firstLocation)];
+	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLineIndex, lastLineIndex - firstLineIndex)];
 	id overlappingFold = [_manualFolds objectAtIndex:firstLineIndex];
 	if (overlappingFold != [NSNull null]) {
 		// If the range is longer than this one, then this one will be a child of it.
-		if (NSMaxRange(((ViFold *)overlappingFold).range) > lastLocation) {
+		if (NSMaxRange(((ViFold *)overlappingFold).range) > lastLineIndex) {
 			addChildToFold((ViFold *)overlappingFold, fold);
 		} else {
 			addTopmostParentToFold(fold, (ViFold *)overlappingFold);
@@ -1959,6 +1959,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}
 
+	// Update fold hierarchy.
 	id lastOverlappingFold = nil;
 	for (NSUInteger i = firstLineIndex; i <= lastLineIndex; ++i) {
 		overlappingFold = [_manualFolds objectAtIndex:i];
@@ -2019,25 +2020,27 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	foldToClose.open = false;
 
+	NSUInteger foldStartLocation = [self.textStorage locationForStartOfLine:foldToClose.range.location + 1];
 	// The fold range extends to the first character of the last line of
 	// the fold, but when folding we need to extend the actual fold
 	// rendering to the last character of the last line.
-	NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToClose.range)];
+	NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(foldToClose.range) + 1];
 	// Adjust for the first character, which will show the fold.
-	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldToClose.range.location - 1;
+	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldStartLocation - 1;
 
 	[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
-							  range:NSMakeRange(foldToClose.range.location, 1)];
+							  range:NSMakeRange(foldStartLocation, 1)];
 	[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }
-							  range:NSMakeRange(foldToClose.range.location + 1 /* exclude the first character */,
+							  range:NSMakeRange(foldStartLocation + 1 /* exclude the first character */,
 												foldingLength)];
 
 	// Keep closing recursively if necessary, return this fold's range otherwise.
 	levels--;
 	if (levels > 0 && foldToClose.parent) {
 		return [self closeFold:foldToClose.parent levels:levels];
-	} else
-		return foldToClose.range;
+	} else {
+		return NSMakeRange(foldStartLocation, endingLineRange.location - foldStartLocation);
+	}
 }
 
 - (NSRange)openFold:(ViFold *)foldToOpen
@@ -2049,27 +2052,31 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	foldToOpen.open = true;
 
+	NSUInteger foldStartLocation = [self.textStorage locationForStartOfLine:foldToOpen.range.location + 1];
+
 	// Remove the opening character's attachment attribute.
 	[self.textStorage removeAttribute:NSAttachmentAttributeName
-								range:NSMakeRange(foldToOpen.range.location, 1)];
+								range:NSMakeRange(foldStartLocation, 1)];
 
 	// Iterate through children:
 	//  - unfold them if needed (based on +levels+)
 	//  - remove folded attribute from characters *not* in child folds
 	levels--;
-	__block NSUInteger lastFoldEnd = foldToOpen.range.location + 1;
+	__block NSUInteger lastFoldEnd = foldStartLocation + 1;
 	[foldToOpen.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
 		if (! childFold.isOpen) {
 			if (levels > 0) {
 				[self openFold:childFold levels:levels];
 			}
 
+			NSUInteger childFoldStartLocation = [self.textStorage locationForStartOfLine:childFold.range.location + 1];
+
 			// Note that we also remove the folded attribute from the first
 			// character of the child range here.
 			[self.textStorage removeAttribute:ViFoldedAttributeName
-										range:NSMakeRange(lastFoldEnd, childFold.range.location - lastFoldEnd + 1)];
+										range:NSMakeRange(lastFoldEnd, childFoldStartLocation - lastFoldEnd + 1)];
 
-			NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(childFold.range)];
+			NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(childFold.range) + 1];
 			lastFoldEnd = NSMaxRange(endingLineRange);
 		}
 	}];
@@ -2079,13 +2086,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	//
 	// Keep in mind that the fold's range only includes the first character of
 	// the last line of the fold.
-	NSRange endingLineRange = [self.textStorage rangeOfLineAtLocation:NSMaxRange(foldToOpen.range)];
+	NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(foldToOpen.range) + 1];
 	NSUInteger foldingLength = NSMaxRange(endingLineRange) - lastFoldEnd;
 
 	[self.textStorage removeAttribute:ViFoldedAttributeName
 								range:NSMakeRange(lastFoldEnd, foldingLength)];
 
-	return foldToOpen.range;
+	return NSMakeRange(foldStartLocation, endingLineRange.location);
 }
 
 - (ViFold *)foldAtLocation:(NSUInteger)aLocation

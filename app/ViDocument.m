@@ -1474,11 +1474,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 {
 	NSDictionary *userInfo = [notification userInfo];
 
-	if (!_ignoreEditing) {
-		NSUInteger lineIndex = [[userInfo objectForKey:@"lineIndex"] unsignedIntegerValue];
-		NSUInteger linesRemoved = [[userInfo objectForKey:@"linesRemoved"] unsignedIntegerValue];
-		NSUInteger linesAdded = [[userInfo objectForKey:@"linesAdded"] unsignedIntegerValue];
+	NSUInteger lineIndex = [[userInfo objectForKey:@"lineIndex"] unsignedIntegerValue];
+	NSUInteger linesRemoved = [[userInfo objectForKey:@"linesRemoved"] unsignedIntegerValue];
+	NSUInteger linesAdded = [[userInfo objectForKey:@"linesAdded"] unsignedIntegerValue];
+	NSUInteger linesChanged = [[userInfo objectForKey:@"linesChanged"] unsignedIntegerValue];
 
+	if (!_ignoreEditing) {
 		NSInteger diff = linesAdded - linesRemoved;
 		if (diff == 0)
 			return;
@@ -1487,6 +1488,77 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			[_syntaxParser pushContinuations:diff fromLineNumber:lineIndex + 1];
 		else
 			[_syntaxParser pullContinuations:-diff fromLineNumber:lineIndex + 1];
+	}
+
+	NSLog(@"Got change at index %lu, removed %lu lines, added %lu lines, changed %lu lines", lineIndex, linesRemoved, linesAdded, linesChanged);
+
+	// Make sure to include the line that was changed but neither removed nor
+	// added, if needed, as it should be removed from the fold as well.
+	NSUInteger onlyChangedLines = (linesChanged - linesAdded - linesRemoved);
+	NSUInteger totalFoldLinesRemoved = linesRemoved + onlyChangedLines;
+
+	id foldAtChangeStart = nil;
+	ViFold *startingFold  = nil;
+	id foldForNewLines = [NSNull null];
+	if (lineIndex < [_manualFolds count]) {
+		foldAtChangeStart = _manualFolds[lineIndex];
+		// NOTE: Below isn't valid until you've checked for NSNull.
+		startingFold = (ViFold *)foldAtChangeStart;
+
+		if (foldAtChangeStart != [NSNull null] &&
+				lineIndex + 1 < NSMaxRange(startingFold.range)) {
+			foldForNewLines = foldAtChangeStart;
+		}
+	}
+
+	// TODO Update the end of any folds that ended within a removed line.
+	// If there was a line that was changed before added lines, it is also
+	// removed from the fold.
+	[_manualFolds removeObjectsInRange:NSMakeRange(lineIndex, totalFoldLinesRemoved)];
+	for (NSUInteger i = 0; i < (linesAdded + onlyChangedLines); ++i) {
+		[_manualFolds insertObject:foldForNewLines atIndex:lineIndex + i];
+	}
+
+	// When there was a fold at the beginning of our change that got shortened,
+	// update its range and that of its parents.
+	if (foldForNewLines == [NSNull null] && foldAtChangeStart != [NSNull null]) {
+		ViFold *currentFold = startingFold;
+		while (currentFold) {
+			currentFold.range = NSMakeRange(currentFold.range.location, currentFold.range.length - linesRemoved);
+
+			currentFold = currentFold.parent;
+		}
+	}
+
+	__block NSUInteger lineDiff = linesChanged - linesRemoved;
+	NSUInteger updateStartIndex = lineIndex + linesAdded + 1;
+
+	// If we had a fold at the start that participated in the change, we update
+	// its length to accommodate line changes.
+	if (foldForNewLines != [NSNull null]) {
+		startingFold.range = NSMakeRange(startingFold.range.location, startingFold.range.length + lineDiff);
+
+		updateStartIndex = NSMaxRange(startingFold.range) + 1;
+	}
+	for (NSUInteger i = updateStartIndex; i < [_manualFolds count]; ++i) {
+		id currentEntry = _manualFolds[i];
+		// NOTE: Below isn't valid until you've checked for NSNull.
+		ViFold *currentFold = (ViFold *)currentEntry;
+
+		if (currentEntry != [NSNull null]) {
+			// We're going to update the topmost parent and all its children,
+			// and then skip to the end of that parent.
+			currentFold = [currentFold topmostParent];
+
+			if (i < lineIndex + lineDiff)
+			currentFold.range = NSMakeRange(currentFold.range.location + lineDiff, currentFold.range.length);
+			[currentFold.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
+				childFold.range = NSMakeRange(childFold.range.location + lineDiff, childFold.range.length);
+			}];
+
+			// Move past this fold and its children, as they've been updated.
+			i = NSMaxRange(currentFold.range);
+		}
 	}
 }
 

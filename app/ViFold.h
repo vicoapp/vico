@@ -1,7 +1,7 @@
 extern NSString *const ViFoldedAttributeName;
 
 /**
- * ViFold contains information about a given fold in a document. It's most
+ * ViFold contains information about a given fold in a document. Its most
  * important information is the start and end of the fold, and the parent
  * fold (if any), as well as the child folds (if any). It also stores the
  * fold depth, which is a number indicating how many parents exist higher
@@ -29,6 +29,10 @@ extern NSString *const ViFoldedAttributeName;
 
 - (void)addChild:(ViFold *)childFold;
 - (void)removeChild:(ViFold *)childFold;
+
+- (BOOL)hasParent:(ViFold *)aFold;
+/** @return The topmost parent fold of this fold. If this fold has no parent, returns this fold. */
+- (ViFold *)topmostParent;
 
 @end
 

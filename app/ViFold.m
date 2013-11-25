@@ -63,6 +63,24 @@ static NSTextAttachment *foldAttachment = nil;
 	[_children removeObject:childFold];
 }
 
+- (BOOL)hasParent:(ViFold *)aFold
+{
+	ViFold *currentFold = _parent;
+	while (currentFold && currentFold != aFold)
+		currentFold = currentFold.parent;
+
+	return currentFold == aFold;
+}
+
+- (ViFold *)topmostParent
+{
+	ViFold *currentFold = self;
+	while (currentFold.parent)
+		currentFold = currentFold.parent;
+
+	return currentFold;
+}
+
 - (NSString *)description
 {
 	if (_parent)

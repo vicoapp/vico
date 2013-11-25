@@ -4,6 +4,9 @@ NSString *const ViFoldedAttributeName = @"ViFoldedAttribute";
 
 inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 {
+	if (parentFold == childFold)
+		return;
+
 	parentFold.range = NSUnionRange(parentFold.range, childFold.range);
 	[parentFold addChild:childFold];
 	childFold.parent = parentFold;

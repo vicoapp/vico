@@ -2,6 +2,20 @@
 
 NSString *const ViFoldedAttributeName = @"ViFoldedAttribute";
 
+inline ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold)
+{
+	if (firstFold == secondFold) {
+		return firstFold;
+	}
+
+	ViFold *currentFold = secondFold;
+	while (currentFold && ! [firstFold hasParent:currentFold]) {
+		currentFold = currentFold.parent;
+	}
+
+	return currentFold;
+}
+
 inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 {
 	if (parentFold == childFold)

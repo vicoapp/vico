@@ -37,6 +37,17 @@ extern NSString *const ViFoldedAttributeName;
 @end
 
 /**
+ * Checks `firstFold` and `secondFold` to find their closest common
+ * parent. Notably, this can return either of the two folds depending
+ * on how they related to each other. If they are equal, it will return
+ * the first fold. If the second is a parent of the first, it will return
+ * the second. If the first is a parent of the second, it will return the
+ * first.
+ *
+ * Returns nil if there is no common parent.
+ */
+ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold);
+/**
  * Adds `childFold` to `parentFold` by updating both `childFold`'s parent
  * pointer AND `parentFold`'s child set, and updating `parentFold`'s range
  * to encompass `childFold`'s.

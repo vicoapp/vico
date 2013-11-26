@@ -1495,7 +1495,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// Make sure to include the line that was changed but neither removed nor
 	// added, if needed, as it should be removed from the fold as well.
 	NSUInteger onlyChangedLines = (linesChanged - linesAdded - linesRemoved);
-	NSUInteger totalFoldLinesRemoved = linesRemoved + onlyChangedLines;
+	NSUInteger totalFoldLinesRemoved = linesRemoved;
 
 	id foldAtChangeStart = nil;
 	ViFold *startingFold  = nil;
@@ -1505,40 +1505,41 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		// NOTE: Below isn't valid until you've checked for NSNull.
 		startingFold = (ViFold *)foldAtChangeStart;
 
-		if (foldAtChangeStart != [NSNull null] &&
-				lineIndex + 1 < NSMaxRange(startingFold.range)) {
-			foldForNewLines = foldAtChangeStart;
+		if (foldAtChangeStart != [NSNull null]) {
+			NSUInteger lineIndexAtEnd = lineIndex + linesRemoved + onlyChangedLines;
+			if (lineIndexAtEnd <= NSMaxRange(startingFold.range)) {
+				foldForNewLines = foldAtChangeStart;
+			} else if (lineIndexAtEnd < [_manualFolds count] && _manualFolds[lineIndexAtEnd] != [NSNull null]) {
+				ViFold *endingFold = _manualFolds[lineIndexAtEnd];
+				ViFold *commonParent = closestCommonParentFold(startingFold, endingFold);
+
+				if (commonParent)
+					foldForNewLines = commonParent;
+			}
 		}
 	}
 
-	// TODO Update the end of any folds that ended within a removed line.
 	// If there was a line that was changed before added lines, it is also
 	// removed from the fold.
-	[_manualFolds removeObjectsInRange:NSMakeRange(lineIndex, totalFoldLinesRemoved)];
-	for (NSUInteger i = 0; i < (linesAdded + onlyChangedLines); ++i) {
+	[_manualFolds removeObjectsInRange:NSMakeRange(lineIndex + 1, totalFoldLinesRemoved)];
+	for (NSUInteger i = 1; i < (linesAdded + onlyChangedLines); ++i) {
 		[_manualFolds insertObject:foldForNewLines atIndex:lineIndex + i];
 	}
+	
+	__block NSUInteger lineDiff = linesAdded - linesRemoved;
+	NSUInteger updateStartIndex = lineIndex + linesAdded + 1;
 
 	// When there was a fold at the beginning of our change that got shortened,
 	// update its range and that of its parents.
-	if (foldForNewLines == [NSNull null] && foldAtChangeStart != [NSNull null]) {
+	if (foldAtChangeStart != [NSNull null]) {
 		ViFold *currentFold = startingFold;
 		while (currentFold) {
-			currentFold.range = NSMakeRange(currentFold.range.location, currentFold.range.length - linesRemoved);
+			currentFold.range = NSMakeRange(currentFold.range.location, currentFold.range.length + lineDiff);
 
 			currentFold = currentFold.parent;
 		}
-	}
 
-	__block NSUInteger lineDiff = linesChanged - linesRemoved;
-	NSUInteger updateStartIndex = lineIndex + linesAdded + 1;
-
-	// If we had a fold at the start that participated in the change, we update
-	// its length to accommodate line changes.
-	if (foldForNewLines != [NSNull null]) {
-		startingFold.range = NSMakeRange(startingFold.range.location, startingFold.range.length + lineDiff);
-
-		updateStartIndex = NSMaxRange(startingFold.range) + 1;
+		updateStartIndex = NSMaxRange(startingFold.range);
 	}
 	for (NSUInteger i = updateStartIndex; i < [_manualFolds count]; ++i) {
 		id currentEntry = _manualFolds[i];
@@ -1550,7 +1551,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			// and then skip to the end of that parent.
 			currentFold = [currentFold topmostParent];
 
-			if (i < lineIndex + lineDiff)
 			currentFold.range = NSMakeRange(currentFold.range.location + lineDiff, currentFold.range.length);
 			[currentFold.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
 				childFold.range = NSMakeRange(childFold.range.location + lineDiff, childFold.range.length);

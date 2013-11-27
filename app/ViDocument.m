@@ -2175,54 +2175,64 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSRange)openFold:(ViFold *)foldToOpen inRange:(NSRange)foldRange levels:(NSUInteger)levels
 {
-	foldToOpen.open = true;
+	__block NSUInteger maxOpenDepth = foldToOpen.depth + levels;
+	__block NSUInteger minOpenDepth = foldToOpen.depth;
+	NSUInteger foldStart = NSNotFound;
+	__block ViFold *currentFold = nil;
+	do {
+		foldStart = foldRange.location;
+		currentFold = [self.textStorage attribute:ViFoldAttributeName
+										   atIndex:foldStart - 1
+							 longestEffectiveRange:&foldRange
+										   inRange:NSMakeRange(0, foldStart)];
+	} while (currentFold &&
+			 (currentFold = closestCommonParentFold(currentFold, foldToOpen)) &&
+			 currentFold.depth > minOpenDepth);
 
-	NSUInteger foldStartLocation = [self.textStorage locationForStartOfLine:foldToOpen.range.location + 1];
+	currentFold = nil;
+	__block ViFold *lastFold = nil;
+	__block NSRange totalOpenedRange = NSMakeRange(foldStart, 0);
+	[self.textStorage enumerateAttribute:ViFoldAttributeName
+								 inRange:NSMakeRange(foldStart, [self.textStorage length] - foldStart)
+								 options:NULL
+							  usingBlock:^(ViFold *currentFold, NSRange currentFoldRange, BOOL *stop) {
+		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
+		BOOL openCurrentFold = currentFold.depth <= maxOpenDepth;
 
-	// Remove the opening character's attachment attribute.
-	[self.textStorage removeAttribute:NSAttachmentAttributeName
-								range:NSMakeRange(foldStartLocation, 1)];
+		// Stop if this isn't the first fold and the current fold isn't
+		// contiguous with the previous one, or if this isn't the first fold
+		// and the current fold doesn't share a parent of depth <= maxCloseDepth
+		// with the previous one.
+		if (lastFold &&
+				(currentFoldRange.location - 1 != NSMaxRange(totalOpenedRange) ||
+				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
+				  currentFold.depth > minCloseDepth))) {
+			*stop = YES;
 
-	// Iterate through children:
-	//  - unfold them if needed (based on +levels+)
-	//  - remove folded attribute from characters *not* in child folds
-	levels--;
-	__block NSUInteger lastFoldEnd = foldStartLocation + 1;
-	[foldToOpen.children enumerateObjectsUsingBlock:^(ViFold *childFold, BOOL *stop) {
-		if (! childFold.isOpen) {
-			if (levels > 0) {
-				[self openFold:childFold levels:levels];
-			}
-
-			NSUInteger childFoldStartLocation = [self.textStorage locationForStartOfLine:childFold.range.location + 1];
-
-			// Note that we also remove the folded attribute from the first
-			// character of the child range here.
-			[self.textStorage removeAttribute:ViFoldedAttributeName
-										range:NSMakeRange(lastFoldEnd, childFoldStartLocation - lastFoldEnd + 1)];
-
-			NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(childFold.range) + 1];
-			lastFoldEnd = NSMaxRange(endingLineRange);
+			return;
 		}
+
+		if (startOfCurrentFold && openCurrentFold) {
+			currentFold.open = true;
+
+			[self.textStorage removeAttribute:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
+									    range:NSMakeRange(currentFoldRange.location, 1)];
+		}
+
+		if (openCurrentFold) {
+			[self.textStorage removeAttributs:ViFoldedAttributeName
+									    range:currentFoldRange];
+		}
+
+		lastFold = currentFold;
+		totalOpenedRange = NSUnionRange(totalOpenedRange, currentFoldRange);
 	}];
-
-	// Finally, make sure the last line is unfolded. This also ensures, if there
-	// are no children, that the whole range is unfolded.
-	//
-	// Keep in mind that the fold's range only includes the first character of
-	// the last line of the fold.
-	NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(foldToOpen.range) + 1];
-	NSUInteger foldingLength = NSMaxRange(endingLineRange) - lastFoldEnd;
-
-	[self.textStorage removeAttribute:ViFoldedAttributeName
-								range:NSMakeRange(lastFoldEnd, foldingLength)];
-
-	return NSMakeRange(foldStartLocation, endingLineRange.location);
+	
+	return totalOpenedRange;
 }
 
 - (ViFold *)foldAtLocation:(NSUInteger)aLocation
 {
-
 	return [self.textStorage attribute:ViFoldAttributeName atIndex:aLocation effectiveRange:NULL];
 }
 

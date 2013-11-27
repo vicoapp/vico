@@ -53,7 +53,7 @@ static NSTextAttachment *foldAttachment = nil;
 	return foldAttachment;
 }
 
-+ (ViFold *)foldWithRange:(NSRange)aRange
++ (ViFold *)fold
 {
 	return [[super alloc] init];
 }
@@ -100,14 +100,12 @@ static NSTextAttachment *foldAttachment = nil;
 - (NSString *)description
 {
 	if (_parent)
-		return [NSString stringWithFormat:@"<ViFold %p: range %@, parent %@>",
+		return [NSString stringWithFormat:@"<ViFold %p: parent %@>",
 										  self,
-										  NSStringFromRange(_range),
 										  _parent];
 	else
-		return [NSString stringWithFormat:@"<ViFold %p: range %@>",
-										  self,
-										  NSStringFromRange(_range)];
+		return [NSString stringWithFormat:@"<ViFold %p>",
+										  self];
 }
 
 @end

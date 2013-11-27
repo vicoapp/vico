@@ -2034,9 +2034,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}];
 
-	NSUInteger currentStartOfFold = range.location;
-	NSUInteger currentEndOfFold = NSMaxRange(range);
-	[rangesWithOtherFolds enumerateObjectsUsingBlock:^(NSValue rangeValue, BOOL *stop) {
+	__block NSUInteger currentStartOfFold = range.location;
+	__block NSUInteger currentEndOfFold = NSMaxRange(range);
+	[rangesWithOtherFolds enumerateObjectsUsingBlock:^(NSValue *rangeValue, NSUInteger i, BOOL *stop) {
 		NSRange excludedRange = [rangeValue rangeValue];
 		currentEndOfFold = excludedRange.location;
 
@@ -2067,22 +2067,26 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSRange)closeFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
 {
-	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
+	NSRange foldRange;
+	ViFold *fold = [self.textStorage attribute:ViFoldAttributeName
+									   atIndex:aLocation
+						 longestEffectiveRange:&foldRange
+									   inRange:NSMakeRange(0, [self.textStorage length])];
 
-	id fold = [_manualFolds objectAtIndex:lineIndex];
-	if (fold == [NSNull null]) {
-		return NSMakeRange(NSNotFound, -1);
+	if (fold) {
+		return [self closeFold:fold inRange:foldRange levels:levels];
 	} else {
-		return [self closeFold:(ViFold *)fold levels:levels];
+		return NSMakeRange(NSNotFound, -1);
 	}
 }
 
 - (NSRange)openFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
 {
-	ViFold *fold = [self attribute:ViFoldAttributeName
-						   atIndex:aLocation
-			 longestEffectiveRange:&foldRange
-						   inRange:NSMakeRange(0, [self.textStorage length])];
+	NSRange foldRange;
+	ViFold *fold = [self.textStorage attribute:ViFoldAttributeName
+									   atIndex:aLocation
+						 longestEffectiveRange:&foldRange
+									   inRange:NSMakeRange(0, [self.textStorage length])];
 
 	if (fold) {
 		return [self openFold:fold inRange:foldRange levels:levels];
@@ -2094,7 +2098,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (void)toggleFoldAtLocation:(NSUInteger)aLocation
 {
 	NSRange foldRange;
-	ViFold *fold = [self attribute:ViFoldAttributeName
+	ViFold *fold = [self.textStorage attribute:ViFoldAttributeName
 						   atIndex:aLocation
 			 longestEffectiveRange:&foldRange
 						   inRange:NSMakeRange(0, [self.textStorage length])];
@@ -2207,7 +2211,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (lastFold &&
 				(currentFoldRange.location - 1 != NSMaxRange(totalOpenedRange) ||
 				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
-				  currentFold.depth > minCloseDepth))) {
+				  currentFold.depth > minOpenDepth))) {
 			*stop = YES;
 
 			return;
@@ -2216,13 +2220,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (startOfCurrentFold && openCurrentFold) {
 			currentFold.open = true;
 
-			[self.textStorage removeAttribute:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
+			[self.textStorage removeAttribute:NSAttachmentAttributeName
 									    range:NSMakeRange(currentFoldRange.location, 1)];
 		}
 
 		if (openCurrentFold) {
-			[self.textStorage removeAttributs:ViFoldedAttributeName
-									    range:currentFoldRange];
+			[self.textStorage removeAttribute:ViFoldedAttributeName
+										range:currentFoldRange];
 		}
 
 		lastFold = currentFold;
@@ -2250,7 +2254,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		// and the current fold doesn't share a parent with the previous one.
 		if (lastFold &&
 				(currentFoldRange.location - 1 != NSMaxRange(foldRange) ||
-				 ! closestCommonParentFold(lastFold, currentFold)) {
+				 ! closestCommonParentFold(lastFold, currentFold))) {
 			*stop = YES;
 
 			return;

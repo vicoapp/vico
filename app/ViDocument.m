@@ -1490,6 +1490,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			[_syntaxParser pullContinuations:-diff fromLineNumber:lineIndex + 1];
 	}
 
+	/*
 	NSLog(@"Got change at index %lu, removed %lu lines, added %lu lines, changed %lu lines", lineIndex, linesRemoved, linesAdded, linesChanged);
 
 	// Make sure to include the line that was changed but neither removed nor
@@ -1559,7 +1560,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			// Move past this fold and its children, as they've been updated.
 			i = NSMaxRange(currentFold.range);
 		}
-	}
+	}*/
 }
 
 - (void)textStorageDidProcessEditing:(NSNotification *)notification

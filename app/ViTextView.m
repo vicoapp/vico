@@ -1501,7 +1501,7 @@ replaceCharactersInRange:(NSRange)aRange
 	NSInteger lineDelta = lineIndexAtLocation - currentLineIndex;
 
 	ViFold *foldAtStart = [document foldAtLocation:caret];
-	if ([self.textStorage attribute:ViFoldedAttributeName atIndex:location effectiveRange:NULL] ||
+	/*if ([self.textStorage attribute:ViFoldedAttributeName atIndex:location effectiveRange:NULL] ||
 			[self.textStorage attribute:NSAttachmentAttributeName atIndex:location effectiveRange:NULL]) {
 		if (foldAtStart && lineDelta > 0) {
 			if (NSMaxRange(foldAtStart.range) < [self.textStorage lineCount]) {
@@ -1516,7 +1516,7 @@ replaceCharactersInRange:(NSRange)aRange
 				[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:foldAtLocation.range.location];
 			}
 		}
-	}
+	}*/
 
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)

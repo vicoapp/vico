@@ -2010,41 +2010,56 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark Folding
 - (void)createFoldForRange:(NSRange)range
 {
-	// A little care is needed here: we get the first and last line *indices*, but
-	// locationForStartOfLine: takes a line *number*. Similar details apply throughout.
-	// Naming matters, kids!
-	NSUInteger firstLineIndex = [self.textStorage lineIndexAtLocation:range.location];
-	NSUInteger lastLineIndex = [self.textStorage lineIndexAtLocation:NSMaxRange(range) - 1];
-	NSUInteger firstLocation = [self.textStorage locationForStartOfLine:firstLineIndex + 1];
-	NSUInteger lastLocation = [self.textStorage locationForStartOfLine:lastLineIndex + 1];
+	ViFold *newFold = [ViFold fold];
 
-	ViFold *fold = [ViFold foldWithRange:NSMakeRange(firstLineIndex, lastLineIndex - firstLineIndex)];
-	id overlappingFold = [_manualFolds objectAtIndex:firstLineIndex];
-	if (overlappingFold != [NSNull null]) {
-		// If the range is longer than this one, then this one will be a child of it.
-		if (NSMaxRange(((ViFold *)overlappingFold).range) > lastLineIndex) {
-			addChildToFold((ViFold *)overlappingFold, fold);
+	// The list of ranges that we won't be setting to have the new fold.
+	__block NSMutableArray *rangesWithOtherFolds = [NSMutableArray array];
+	[self.textStorage enumerateAttribute:ViFoldAttributeName
+								 inRange:range
+								 options:NULL
+							  usingBlock:^(ViFold *overlappingFold, NSRange overlappingFoldRange, BOOL *stop) {
+		if (NSMaxRange(overlappingFoldRange) > NSMaxRange(range)) {
+			// If the range for the new fold is within the range of the existing
+			// fold it overlaps, the new one becomes a child of the existing one.
+			addChildToFold(overlappingFold, newFold);
 		} else {
-			addTopmostParentToFold(fold, (ViFold *)overlappingFold);
+			// If the range for the new fold extends past the range of the
+			// existing fold it overlaps, the existing one will become a child
+			// of the new one, and the new one extends to subsume the old one.
+			addTopmostParentToFold(newFold, overlappingFold);
 
-			firstLineIndex = [self.textStorage lineIndexAtLocation:fold.range.location];
+			[rangesWithOtherFolds addObject:[NSValue valueWithRange:overlappingFoldRange]];
 		}
-	}
+	}];
 
-	// Update fold hierarchy.
-	id lastOverlappingFold = nil;
-	for (NSUInteger i = firstLineIndex; i <= lastLineIndex; ++i) {
-		overlappingFold = [_manualFolds objectAtIndex:i];
+	NSUInteger currentStartOfFold = range.location;
+	NSUInteger currentEndOfFold = NSMaxRange(range);
+	[rangesWithOtherFolds enumerateObjectsUsingBlock:^(NSValue rangeValue, BOOL *stop) {
+		NSRange excludedRange = [rangeValue rangeValue];
+		currentEndOfFold = excludedRange.location;
 
-		if (overlappingFold != lastOverlappingFold && // we've already set up the overlapping fold as a child
-				overlappingFold != [NSNull null] && // there's no fold to work with
-				overlappingFold != fold.parent) { // we've already set up the new fold as this fold's child
-			addTopmostParentToFold(fold, (ViFold *)overlappingFold);
+		NSRange rangeToMark =
+			NSMakeRange(
+				currentStartOfFold,
+				currentEndOfFold - currentStartOfFold
+			);
+		[self.textStorage addAttribute:ViFoldAttributeName
+								   value:newFold
+								   range:rangeToMark];
 
-			lastOverlappingFold = overlappingFold;
-		} else if (overlappingFold != lastOverlappingFold) {
-			[_manualFolds replaceObjectAtIndex:i withObject:fold];
-		}
+		currentStartOfFold = NSMaxRange(excludedRange) + 1;
+	}];
+
+	if (currentStartOfFold < currentEndOfFold && currentEndOfFold <= NSMaxRange(range)) {
+		NSRange rangeToMark =
+			NSMakeRange(
+				currentStartOfFold,
+				currentEndOfFold - currentStartOfFold
+			);
+
+		[self.textStorage addAttribute:ViFoldAttributeName
+								   value:newFold
+								   range:rangeToMark];
 	}
 }
 
@@ -2062,65 +2077,64 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (NSRange)openFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
 {
-	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
+	ViFold *fold = [self attribute:ViFoldAttributeName
+						   atIndex:aLocation
+			 longestEffectiveRange:&foldRange
+						   inRange:NSMakeRange(0, [self.textStorage length])];
 
-	id fold = [_manualFolds objectAtIndex:lineIndex];
-	if (fold == [NSNull null]) {
-		return NSMakeRange(NSNotFound, -1);
+	if (fold) {
+		return [self openFold:fold inRange:foldRange levels:levels];
 	} else {
-		return [self openFold:(ViFold *)fold levels:levels];
+		return NSMakeRange(NSNotFound, -1);
 	}
 }
 
 - (void)toggleFoldAtLocation:(NSUInteger)aLocation
 {
-	ViFold *fold = [self foldAtLocation:aLocation];
+	NSRange foldRange;
+	ViFold *fold = [self attribute:ViFoldAttributeName
+						   atIndex:aLocation
+			 longestEffectiveRange:&foldRange
+						   inRange:NSMakeRange(0, [self.textStorage length])];
 
-	if (fold && fold.open) {
-		[self closeFold:fold];
+	if (fold && fold.isOpen) {
+		[self closeFold:fold inRange:foldRange];
 	} else if (fold) {
-		[self openFold:fold];
+		[self openFold:fold inRange:foldRange];
 	}
 }
 
-- (NSRange)closeFold:(ViFold *)foldToClose
+- (NSRange)closeFold:(ViFold *)foldToClose inRange:(NSRange)foldRange
 {
-	return [self closeFold:foldToClose levels:1];
+	return [self closeFold:foldToClose inRange:foldRange levels:1];
 }
 
-- (NSRange)closeFold:(ViFold *)foldToClose levels:(NSUInteger)levels
+- (NSRange)closeFold:(ViFold *)foldToClose inRange:(NSRange)foldRange levels:(NSUInteger)levels
 {
 	foldToClose.open = false;
 
-	NSUInteger foldStartLocation = [self.textStorage locationForStartOfLine:foldToClose.range.location + 1];
-	// The fold range extends to the first character of the last line of
-	// the fold, but when folding we need to extend the actual fold
-	// rendering to the last character of the last line.
-	NSRange endingLineRange = [self.textStorage rangeOfLine:NSMaxRange(foldToClose.range) + 1];
-	// Adjust for the first character, which will show the fold.
-	NSUInteger foldingLength = NSMaxRange(endingLineRange) - foldStartLocation - 1;
-
 	[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
-							  range:NSMakeRange(foldStartLocation, 1)];
+							  range:NSMakeRange(range.location, 1)];
 	[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }
-							  range:NSMakeRange(foldStartLocation + 1 /* exclude the first character */,
-												foldingLength)];
+							  range:NSMakeRange(range.location + 1 /* exclude the first character */,
+												range.length - 1)];
 
 	// Keep closing recursively if necessary, return this fold's range otherwise.
 	levels--;
 	if (levels > 0 && foldToClose.parent) {
+		// TODO go through either side and find continguous ranges that have the parent fold.
 		return [self closeFold:foldToClose.parent levels:levels];
 	} else {
 		return NSMakeRange(foldStartLocation, endingLineRange.location - foldStartLocation);
 	}
 }
 
-- (NSRange)openFold:(ViFold *)foldToOpen
+- (NSRange)openFold:(ViFold *)foldToOpen inRange:(NSRange)foldRange
 {
-	return [self openFold:foldToOpen levels:1];
+	return [self openFold:foldToOpen inRange:foldRange levels:1];
 }
 
-- (NSRange)openFold:(ViFold *)foldToOpen levels:(NSUInteger)levels
+- (NSRange)openFold:(ViFold *)foldToOpen inRange:(NSRange)foldRange levels:(NSUInteger)levels
 {
 	foldToOpen.open = true;
 
@@ -2169,25 +2183,39 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (ViFold *)foldAtLocation:(NSUInteger)aLocation
 {
-	NSUInteger lineIndex = [self.textStorage lineIndexAtLocation:aLocation];
 
-	id fold = [_manualFolds objectAtIndex:lineIndex];
-	if (fold == [NSNull null]) {
-		return nil;
-	} else {
-		return (ViFold *)fold;
-	}
+	return [self.textStorage attribute:ViFoldAttributeName atIndex:aLocation effectiveRange:NULL];
 }
 
 - (NSRange)foldRangeAtLocation:(NSUInteger)aLocation
 {
-	ViFold *fold = [self foldAtLocation:aLocation];
+	__block NSRange foldRange = NSMakeRange(NSNotFound, -1);
+	__block ViFold *lastFold = nil;
+	[self.textStorage enumerateAttribute:ViFoldAttributeName
+								 inRange:NSMakeRange(aLocation, [self.textStorage length] - aLocation)
+								 options:NULL
+							  usingBlock:^(ViFold *currentFold, NSRange currentFoldRange, BOOL *stop) {
+		// Stop if this isn't the first fold and the current fold isn't
+		// contiguous with the previous one, or if this isn't the first fold
+		// and the current fold doesn't share a parent with the previous one.
+		if (lastFold &&
+				(currentFoldRange.location - 1 != NSMaxRange(foldRange) ||
+				 ! closestCommonParentFold(lastFold, currentFold)) {
+			*stop = YES;
 
-	if (fold) {
-		return [fold range];
-	} else {
-		return NSMakeRange(NSNotFound, -1);
-	}
+			return;
+		}
+
+		if (foldRange.location == NSNotFound) {
+			foldRange = currentFoldRange;
+		} else {
+			foldRange = NSUnionRange(foldRange, currentFoldRange);
+		}
+
+		lastFold = currentFold;
+	}];
+
+	return foldRange;
 }
 
 #pragma mark -

@@ -1,4 +1,5 @@
 extern NSString *const ViFoldedAttributeName;
+extern NSString *const ViFoldAttributeName;
 
 /**
  * ViFold contains information about a given fold in a document. Its most
@@ -16,7 +17,6 @@ extern NSString *const ViFoldedAttributeName;
 	NSMutableSet *_children;
 }
 
-@property (nonatomic) NSRange range;
 @property (nonatomic,getter=isOpen) BOOL open;
 @property (nonatomic) ViFold *parent;
 @property (nonatomic) NSUInteger depth;
@@ -24,8 +24,8 @@ extern NSString *const ViFoldedAttributeName;
 
 + (NSTextAttachment *)foldAttachment;
 
-+ (ViFold *)foldWithRange:(NSRange)range;
-- (ViFold *)initWithRange:(NSRange)range;
++ (ViFold *)fold;
+- (ViFold *)init;
 
 - (void)addChild:(ViFold *)childFold;
 - (void)removeChild:(ViFold *)childFold;
@@ -49,8 +49,7 @@ extern NSString *const ViFoldedAttributeName;
 ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold);
 /**
  * Adds `childFold` to `parentFold` by updating both `childFold`'s parent
- * pointer AND `parentFold`'s child set, and updating `parentFold`'s range
- * to encompass `childFold`'s.
+ * pointer AND `parentFold`'s child set.
  */
 void addChildToFold(ViFold *parentFold, ViFold *childFold);
 /**

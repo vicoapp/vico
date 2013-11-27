@@ -1,6 +1,7 @@
 #import "ViFold.h"
 
 NSString *const ViFoldedAttributeName = @"ViFoldedAttribute";
+NSString *const ViFoldAttributeName = @"ViFoldAttribute";
 
 inline ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold)
 {
@@ -21,7 +22,6 @@ inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 	if (parentFold == childFold)
 		return;
 
-	parentFold.range = NSUnionRange(parentFold.range, childFold.range);
 	[parentFold addChild:childFold];
 	childFold.parent = parentFold;
 	childFold.depth = parentFold.depth + 1;
@@ -55,13 +55,12 @@ static NSTextAttachment *foldAttachment = nil;
 
 + (ViFold *)foldWithRange:(NSRange)aRange
 {
-	return [[super alloc] initWithRange:aRange];
+	return [[super alloc] init];
 }
 
-- (ViFold *)initWithRange:(NSRange)aRange
+- (ViFold *)init
 {
 	if (self = [super init]) {
-		_range = aRange;
 		_open = true;
 		_parent = nil;
 		_children = [NSMutableSet set];

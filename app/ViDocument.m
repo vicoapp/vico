@@ -2128,9 +2128,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSRange)closeFold:(ViFold *)foldToClose inRange:(NSRange)foldRange levels:(NSUInteger)levels
 {
 	__block NSUInteger maxCloseDepth = foldToClose.depth;
-	__block NSUInteger minCloseDepth = foldToClose.depth - levels;
+	__block NSUInteger minCloseDepth = foldToClose.depth - (levels - 1);
 	NSUInteger foldStart = NSNotFound;
-	__block ViFold *currentFold = nil;
+	ViFold *currentFold = nil;
 	do {
 		foldStart = foldRange.location;
 		currentFold = [self.textStorage attribute:ViFoldAttributeName
@@ -2139,7 +2139,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 										   inRange:NSMakeRange(0, foldStart)];
 	} while (currentFold &&
 			 (currentFold = closestCommonParentFold(currentFold, foldToClose)) &&
-			 currentFold.depth > minCloseDepth);
+			 currentFold.depth >= minCloseDepth);
 
 	currentFold = nil;
 	__block ViFold *lastFold = nil;
@@ -2159,12 +2159,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 		// Stop if this isn't the first fold and the current fold isn't
 		// contiguous with the previous one, or if this isn't the first fold
-		// and the current fold doesn't share a parent of depth <= maxCloseDepth
+		// and the current fold doesn't share a parent of depth < maxCloseDepth
 		// with the previous one.
 		if (lastFold &&
 				(currentFoldRange.location - 1 != NSMaxRange(totalClosedRange) ||
 				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
-				  currentFold.depth > minCloseDepth))) {
+				  currentFold.depth >= minCloseDepth))) {
 			*stop = YES;
 
 			return;

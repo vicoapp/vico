@@ -2098,7 +2098,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 						 longestEffectiveRange:&foldRange
 									   inRange:NSMakeRange(0, [self.textStorage length])];
 
-	if (fold) {
+	if (fold && fold.isOpen) {
+		return foldRange;
+	} else if (fold) {
 		return [self openFold:fold inRange:foldRange levels:levels];
 	} else {
 		return NSMakeRange(NSNotFound, -1);

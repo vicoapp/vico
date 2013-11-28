@@ -2011,6 +2011,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 #pragma mark Folding
 - (void)createFoldForRange:(NSRange)range
 {
+	// The incoming range includes the last newline; however, we don't consider
+	// the last newline part of the fold, so we're not going to operate on it
+	// at all.
+	range = NSMakeRange(range.location, range.length - 1);
+
 	// TODO Let's disallow folds that match the range of an existing fold exactly.
 	ViFold *newFold = [ViFold fold];
 

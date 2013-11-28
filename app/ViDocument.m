@@ -2043,14 +2043,16 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		NSRange excludedRange = [rangeValue rangeValue];
 		currentEndOfFold = excludedRange.location;
 
-		NSRange rangeToMark =
-			NSMakeRange(
-				currentStartOfFold,
-				currentEndOfFold - currentStartOfFold
-			);
-		[self.textStorage addAttribute:ViFoldAttributeName
-								   value:newFold
-								   range:rangeToMark];
+		if (currentEndOfFold > currentStartOfFold) {
+			NSRange rangeToMark =
+				NSMakeRange(
+					currentStartOfFold,
+					currentEndOfFold - currentStartOfFold
+				);
+			[self.textStorage addAttribute:ViFoldAttributeName
+									   value:newFold
+									   range:rangeToMark];
+		}
 
 		currentStartOfFold = NSMaxRange(excludedRange) + 1;
 	}];

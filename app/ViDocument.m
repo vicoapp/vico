@@ -2161,7 +2161,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		// and the current fold doesn't share a parent of depth < maxCloseDepth
 		// with the previous one.
 		if (lastFold &&
-				(currentFoldRange.location - 1 != NSMaxRange(totalClosedRange) ||
+				(currentFoldRange.location != NSMaxRange([totalClosedRange rangeValue]) ||
 				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
 				  currentFold.depth >= minCloseDepth))) {
 			*stop = YES;

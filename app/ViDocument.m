@@ -2141,9 +2141,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			 (currentFold = closestCommonParentFold(currentFold, foldToClose)) &&
 			 currentFold.depth >= minCloseDepth);
 
-	currentFold = nil;
 	__block ViFold *lastFold = nil;
-	__block NSRange totalClosedRange = NSMakeRange(foldStart, 0);
+	__block NSValue *totalClosedRange = [NSValue valueWithRange:NSMakeRange(foldStart, 0)];
 	[self.textStorage enumerateAttribute:ViFoldAttributeName
 								 inRange:NSMakeRange(foldStart, [self.textStorage length] - foldStart)
 								 options:NULL
@@ -2183,10 +2182,10 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 								  range:currentFoldRange];
 
 		lastFold = currentFold;
-		totalClosedRange = NSUnionRange(totalClosedRange, currentFoldRange);
+		totalClosedRange = [NSValue valueWithRange:NSUnionRange([totalClosedRange rangeValue], currentFoldRange)];
 	}];
 	
-	return totalClosedRange;
+	return [totalClosedRange rangeValue];
 }
 
 - (NSRange)openFold:(ViFold *)foldToOpen inRange:(NSRange)foldRange

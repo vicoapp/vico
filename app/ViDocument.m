@@ -2215,7 +2215,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	currentFold = nil;
 	__block ViFold *lastFold = nil;
-	__block NSRange totalOpenedRange = NSMakeRange(foldStart, 0);
+	__block NSValue *totalOpenedRange = [NSValue valueWithRange:NSMakeRange(foldStart, 0)];
 	[self.textStorage enumerateAttribute:ViFoldAttributeName
 								 inRange:NSMakeRange(foldStart, [self.textStorage length] - foldStart)
 								 options:NULL
@@ -2234,9 +2234,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		// and the current fold doesn't share a parent of depth <= maxCloseDepth
 		// with the previous one.
 		if (lastFold &&
-				(currentFoldRange.location - 1 != NSMaxRange(totalOpenedRange) ||
 				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
 				  currentFold.depth > minOpenDepth))) {
+				(currentFoldRange.location - 1 != NSMaxRange([totalOpenedRange rangeValue]) ||
 			*stop = YES;
 
 			return;
@@ -2255,10 +2255,10 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 
 		lastFold = currentFold;
-		totalOpenedRange = NSUnionRange(totalOpenedRange, currentFoldRange);
+		totalOpenedRange = [NSValue valueWithRange:NSUnionRange([totalOpenedRange rangeValue], currentFoldRange)];
 	}];
 	
-	return totalOpenedRange;
+	return [totalOpenedRange rangeValue];
 }
 
 - (ViFold *)foldAtLocation:(NSUInteger)aLocation

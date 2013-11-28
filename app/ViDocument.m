@@ -2250,6 +2250,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 			[self.textStorage removeAttribute:NSAttachmentAttributeName
 									    range:NSMakeRange(currentFoldRange.location, 1)];
+		} else if (startOfCurrentFold && ! currentFold.isOpen) {
+			// If this is the start of the current fold and it's not a fold we're going to
+			// be opening, go ahead and mark its first character with the fold attachment.
+			[self.textStorage addAttribute:NSAttachmentAttributeName
+									 value:[ViFold foldAttachment]
+									 range:NSMakeRange(currentFoldRange.location, 1)];
 		}
 
 		if (openCurrentFold) {

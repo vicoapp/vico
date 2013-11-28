@@ -2023,7 +2023,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (! overlappingFold)
 			return;
 
-		if (NSMaxRange(overlappingFoldRange) > NSMaxRange(range)) {
+		if (NSMaxRange(overlappingFoldRange) == NSMaxRange(range)) {
 			// If the range for the new fold is within the range of the existing
 			// fold it overlaps, the new one becomes a child of the existing one.
 			addChildToFold(overlappingFold, newFold);

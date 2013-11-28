@@ -2156,14 +2156,15 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
 		BOOL closeCurrentFold = currentFold.depth <= maxCloseDepth;
 
+		ViFold *closestCommonParent = nil;
 		// Stop if this isn't the first fold and the current fold isn't
 		// contiguous with the previous one, or if this isn't the first fold
 		// and the current fold doesn't share a parent of depth < maxCloseDepth
 		// with the previous one.
 		if (lastFold &&
 				(currentFoldRange.location != NSMaxRange([totalClosedRange rangeValue]) ||
-				 ((currentFold = closestCommonParentFold(lastFold, currentFold)) &&
-				  currentFold.depth >= minCloseDepth))) {
+				 ((closestCommonParent = closestCommonParentFold(lastFold, currentFold)) &&
+				  closestCommonParent.depth > minCloseDepth))) {
 			*stop = YES;
 
 			return;
@@ -2172,10 +2173,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (startOfCurrentFold && closeCurrentFold) {
 			currentFold.open = false;
 
-			[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
-									  range:NSMakeRange(currentFoldRange.location, 1)];
 
-			currentFoldRange = NSMakeRange(currentFoldRange.location + 1, currentFoldRange.length - 1);
+			if (currentFold == foldToClose) {
+				[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
+										  range:NSMakeRange(currentFoldRange.location, 1)];
+
+				currentFoldRange = NSMakeRange(currentFoldRange.location + 1, currentFoldRange.length - 1);
+			}
 		}
 
 		[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }

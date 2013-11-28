@@ -2020,6 +2020,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 								 inRange:range
 								 options:NULL
 							  usingBlock:^(ViFold *overlappingFold, NSRange overlappingFoldRange, BOOL *stop) {
+		if (! overlappingFold)
+			return;
+
 		if (NSMaxRange(overlappingFoldRange) > NSMaxRange(range)) {
 			// If the range for the new fold is within the range of the existing
 			// fold it overlaps, the new one becomes a child of the existing one.
@@ -2138,6 +2141,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 								 inRange:NSMakeRange(foldStart, [self.textStorage length] - foldStart)
 								 options:NULL
 							  usingBlock:^(ViFold *currentFold, NSRange currentFoldRange, BOOL *stop) {
+		if (! currentFold) {
+			*stop = YES;
+
+			return;
+		}
+
 		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
 		BOOL closeCurrentFold = currentFold.depth <= maxCloseDepth;
 
@@ -2201,6 +2210,12 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 								 inRange:NSMakeRange(foldStart, [self.textStorage length] - foldStart)
 								 options:NULL
 							  usingBlock:^(ViFold *currentFold, NSRange currentFoldRange, BOOL *stop) {
+		if (! currentFold) {
+			*stop = YES;
+
+			return;
+		}
+
 		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
 		BOOL openCurrentFold = currentFold.depth <= maxOpenDepth;
 
@@ -2252,9 +2267,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		// Stop if this isn't the first fold and the current fold isn't
 		// contiguous with the previous one, or if this isn't the first fold
 		// and the current fold doesn't share a parent with the previous one.
-		if (lastFold &&
+		// We also stop if we've reached a point with no fold.
+		if (! currentFold ||
+			(lastFold &&
 				(currentFoldRange.location - 1 != NSMaxRange(foldRange) ||
-				 ! closestCommonParentFold(lastFold, currentFold))) {
+				 ! closestCommonParentFold(lastFold, currentFold)))) {
 			*stop = YES;
 
 			return;

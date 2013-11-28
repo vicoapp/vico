@@ -2050,11 +2050,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 					currentEndOfFold - currentStartOfFold
 				);
 			[self.textStorage addAttribute:ViFoldAttributeName
-									   value:newFold
-									   range:rangeToMark];
+									 value:newFold
+									 range:rangeToMark];
 		}
 
-		currentStartOfFold = NSMaxRange(excludedRange) + 1;
+		currentStartOfFold = NSMaxRange(excludedRange);
 	}];
 
 	if (currentStartOfFold < NSMaxRange(range)) {

@@ -2057,11 +2057,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		currentStartOfFold = NSMaxRange(excludedRange) + 1;
 	}];
 
-	if (currentStartOfFold < currentEndOfFold && currentEndOfFold <= NSMaxRange(range)) {
+	if (currentStartOfFold < NSMaxRange(range)) {
 		NSRange rangeToMark =
 			NSMakeRange(
 				currentStartOfFold,
-				currentEndOfFold - currentStartOfFold
+				NSMaxRange(range) - currentStartOfFold
 			);
 
 		[self.textStorage addAttribute:ViFoldAttributeName

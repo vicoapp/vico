@@ -14,6 +14,13 @@ inline ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold)
 		currentFold = currentFold.parent;
 	}
 
+	if (! currentFold) {
+		currentFold = firstFold;
+		while (currentFold && ![secondFold hasParent:currentFold]) {
+			currentFold = currentFold.parent;
+		}
+	}
+
 	return currentFold;
 }
 

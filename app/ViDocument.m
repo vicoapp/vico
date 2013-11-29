@@ -2239,7 +2239,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (lastFold &&
 				(currentFoldRange.location != NSMaxRange([totalOpenedRange rangeValue]) ||
 				 ((closestCommonParent = closestCommonParentFold(lastFold, currentFold)) &&
-				  closestCommonParent.depth > minOpenDepth))) {
+				  closestCommonParent.depth < minOpenDepth))) {
 			*stop = YES;
 
 			return;

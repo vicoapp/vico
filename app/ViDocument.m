@@ -2229,7 +2229,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 
 		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
-		BOOL openCurrentFold = currentFold.depth < maxOpenDepth;
+		BOOL openCurrentFold = currentFold.isOpen || currentFold.depth < maxOpenDepth;
 
 		ViFold *closestCommonParent = nil;
 		// Stop if this isn't the first fold and the current fold isn't

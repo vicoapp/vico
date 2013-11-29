@@ -7,7 +7,7 @@ extern NSString *const ViFoldAttributeName;
  * fold (if any), as well as the child folds (if any). It also stores the
  * fold depth, which is a number indicating how many parents exist higher
  * in the fold hierarchy above this fold. A top-level fold should have a
- * depth of 0.
+ * depth of 1.
  *
  * It also stores state information; specifically, whether the fold is open
  * or closed.

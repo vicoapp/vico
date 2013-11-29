@@ -68,6 +68,7 @@ static NSTextAttachment *foldAttachment = nil;
 - (ViFold *)init
 {
 	if (self = [super init]) {
+		_depth = 1;
 		_open = true;
 		_parent = nil;
 		_children = [NSMutableSet set];

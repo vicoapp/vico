@@ -259,11 +259,6 @@ DEBUG_FINALIZE();
 		[self setBusy:NO];
 		[self setLoader:nil];
 
-		// Initialize manual folds to an array of nulls.
-		_manualFolds = [NSMutableArray arrayWithCapacity:self.textStorage.lineCount];
-		for (int i = 0; i < self.textStorage.lineCount; ++i)
-		  [_manualFolds addObject:[NSNull null]];
-
 		if (error) {
 			/* If the file doesn't exist, treat it as an untitled file. */
 			if ([error isFileNotFoundError]) {

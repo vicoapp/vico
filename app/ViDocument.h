@@ -75,9 +75,6 @@
 	ViSyntaxParser		*_syntaxParser;
 	ViSyntaxContext		*_nextContext;
 
-    // Non-syntax-based folds, by line
-    NSMutableArray *_manualFolds;
-
 	// standard character marks
 	ViMarkStack		*_localMarks;
 	NSMutableSet		*_marks; // All marks associated with this document. XXX: don't retain!?

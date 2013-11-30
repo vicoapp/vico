@@ -608,12 +608,36 @@ DEBUG_FINALIZE();
 
 	if (undoGroup)
 		[self beginUndoGroup];
+	
+	ViFold *foldAtInsertion = nil;
+	ViFold *foldBeforeInsertion = nil;
+	if ([aString length] > 0 && aRange.location < [self.textStorage length]) {
+		foldAtInsertion = [document foldAtLocation:aRange.location];
+		if (aRange.location > 0) {
+			foldBeforeInsertion = [document foldAtLocation:aRange.location - 1];
+		} else {
+			foldBeforeInsertion = foldAtInsertion;
+		}
+	}
 
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
+
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
+
+	// In insert mode, we always use the fold before the insertion point. If we're
+	// in normal mode, meaning something like the o command or a paste using p
+	// or P, then we use the topmost fold between the fold before or after the
+	// insertion.
+	if (mode == ViInsertMode && foldBeforeInsertion) {
+		[self.textStorage addAttribute:ViFoldAttributeName value:foldBeforeInsertion range:r];
+	} else if (foldAtInsertion && foldBeforeInsertion) {
+		ViFold *foldToSet = closestCommonParentFold(foldAtInsertion, foldBeforeInsertion);
+		[self.textStorage addAttribute:ViFoldAttributeName value:foldToSet range:r];
+	}
+
 	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
 }

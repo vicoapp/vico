@@ -505,18 +505,13 @@ DEBUG_FINALIZE();
 		NSDictionary *attributesAtLocation =
 			[self.textStorage attributesAtIndex:aLocation effectiveRange:NULL];
 
-		ViFold *closedFold = nil;
 		NSRange closedRange = NSMakeRange(NSNotFound, 0);
 		if (attributesAtLocation[ViFoldedAttributeName]) {
-			closedFold = attributesAtLocation[ViFoldedAttributeName];
-
 			[self.textStorage attribute:ViFoldedAttributeName
 								atIndex:aLocation
 				  longestEffectiveRange:&closedRange
 								inRange:NSMakeRange(0, [self.textStorage length])];
 		} else if (attributesAtLocation[NSAttachmentAttributeName]) {
-			closedFold = attributesAtLocation[ViFoldAttributeName];
-
 			if (aLocation + 1 < [self.textStorage length]) {
 				[self.textStorage attribute:ViFoldedAttributeName
 									atIndex:aLocation + 1
@@ -1559,10 +1554,6 @@ replaceCharactersInRange:(NSRange)aRange
 {
 	if (location == NSNotFound)
 		return;
-
-	NSUInteger lineIndexAtLocation = [self.textStorage lineIndexAtLocation:location];
-	NSUInteger currentLineIndex = [self.textStorage lineIndexAtLocation:caret];
-	NSInteger lineDelta = lineIndexAtLocation - currentLineIndex;
 
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)

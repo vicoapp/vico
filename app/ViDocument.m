@@ -2136,7 +2136,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 										   inRange:NSMakeRange(0, foldStart)];
 	} while (currentFold &&
 			 (currentFold = closestCommonParentFold(currentFold, foldToOpen)) &&
-			 currentFold.depth > minOpenDepth);
+			 currentFold.depth >= minOpenDepth);
 
 	currentFold = nil;
 	__block ViFold *lastFold = nil;

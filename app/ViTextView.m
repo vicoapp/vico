@@ -611,10 +611,13 @@ DEBUG_FINALIZE();
 	
 	ViFold *foldAtInsertion = nil;
 	ViFold *foldBeforeInsertion = nil;
+	char characterBeforeInsertion = '\0';
 	if ([aString length] > 0 && aRange.location < [self.textStorage length]) {
 		foldAtInsertion = [document foldAtLocation:aRange.location];
+		
 		if (aRange.location > 0) {
 			foldBeforeInsertion = [document foldAtLocation:aRange.location - 1];
+			characterBeforeInsertion = [[self.textStorage string] characterAtIndex:aRange.location - 1];
 		} else {
 			foldBeforeInsertion = foldAtInsertion;
 		}
@@ -627,15 +630,13 @@ DEBUG_FINALIZE();
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
 
-	// In insert mode, we always use the fold before the insertion point. If we're
-	// in normal mode, meaning something like the o command or a paste using p
-	// or P, then we use the topmost fold between the fold before or after the
-	// insertion.
-	if (mode == ViInsertMode && foldBeforeInsertion) {
+	// We use the fold at the insertion point if we're inserting something other
+	// than a new line (or set of lines) after the end of an existing line. Otherwise,
+	// we use the fold before the insertion point.
+	if (characterBeforeInsertion == '\n' && [aString characterAtIndex:[aString length] - 1] != '\n' && foldAtInsertion) {
+		[self.textStorage addAttribute:ViFoldAttributeName value:foldAtInsertion range:r];
+	} else if (foldBeforeInsertion) {
 		[self.textStorage addAttribute:ViFoldAttributeName value:foldBeforeInsertion range:r];
-	} else if (foldAtInsertion && foldBeforeInsertion) {
-		ViFold *foldToSet = closestCommonParentFold(foldAtInsertion, foldBeforeInsertion);
-		[self.textStorage addAttribute:ViFoldAttributeName value:foldToSet range:r];
 	}
 
 	[[self document] setMark:'.' atLocation:aRange.location];

@@ -501,11 +501,50 @@ DEBUG_FINALIZE();
 			*end_ptr = 0;
 		if (eol_ptr != NULL)
 			*eol_ptr = 0;
-	} else
-		[[[self textStorage] string] getLineStart:bol_ptr
-		                                      end:end_ptr
-		                              contentsEnd:eol_ptr
-		                                 forRange:NSMakeRange(aLocation, 0)];
+	} else {
+		NSDictionary *attributesAtLocation =
+			[self.textStorage attributesAtIndex:aLocation effectiveRange:NULL];
+
+		ViFold *closedFold = nil;
+		NSRange closedRange = NSMakeRange(NSNotFound, 0);
+		if (attributesAtLocation[ViFoldedAttributeName]) {
+			closedFold = attributesAtLocation[ViFoldedAttributeName];
+
+			[self.textStorage attribute:ViFoldedAttributeName
+								atIndex:aLocation
+				  longestEffectiveRange:&closedRange
+								inRange:NSMakeRange(0, [self.textStorage length])];
+		} else if (attributesAtLocation[NSAttachmentAttributeName]) {
+			closedFold = attributesAtLocation[ViFoldAttributeName];
+
+			if (aLocation + 1 < [self.textStorage length]) {
+				[self.textStorage attribute:ViFoldedAttributeName
+									atIndex:aLocation + 1
+					  longestEffectiveRange:&closedRange
+									inRange:NSMakeRange(0, [self.textStorage length])];
+			}
+		}
+
+		if (closedRange.location != NSNotFound) {
+			// The folded range excludes the first character (which
+			// has NSAttachmentAttributeName instead) and the last
+			// newline in the fold.
+			if (bol_ptr) {
+				*bol_ptr = closedRange.location - 1;
+			}
+			if (end_ptr) {
+				*end_ptr = NSMaxRange(closedRange) + 1;
+			}
+			if (eol_ptr) {
+				*eol_ptr = NSMaxRange(closedRange);
+			}
+		} else {
+			[[[self textStorage] string] getLineStart:bol_ptr
+												  end:end_ptr
+										  contentsEnd:eol_ptr
+											 forRange:NSMakeRange(aLocation, 0)];
+		}
+	}
 }
 
 - (void)getLineStart:(NSUInteger *)bol_ptr

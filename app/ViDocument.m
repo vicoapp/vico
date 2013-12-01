@@ -2055,7 +2055,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	NSUInteger minCloseDepth = foldToClose.depth - (levels - 1);
 	NSUInteger foldStart = NSNotFound;
 	ViFold *currentFold = nil;
+	ViFold *firstFold;
 	do {
+		firstFold = currentFold;
 		foldStart = foldRange.location;
 		currentFold = [self.textStorage attribute:ViFoldAttributeName
 										   atIndex:foldStart - 1
@@ -2097,8 +2099,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (startOfCurrentFold && closeCurrentFold) {
 			currentFold.open = false;
 
-
-			if (currentFold == foldToClose) {
+			if (currentFold == firstFold) {
 				[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
 										  range:NSMakeRange(currentFoldRange.location, 1)];
 

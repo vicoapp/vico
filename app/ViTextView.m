@@ -1572,8 +1572,24 @@ replaceCharactersInRange:(NSRange)aRange
 
 	NSInteger delta = ABS(caret - location);
 
-	if (lineDelta == 0 && delta > 0) {
-		[document openFoldAtLocation:caret levels:foldAtStart.depth];
+	NSDictionary *attributesAtStart = 
+		[self.textStorage attributesAtIndex:caret effectiveRange:NULL];
+	NSDictionary *attributesAtEnd = 
+		[self.textStorage attributesAtIndex:location effectiveRange:NULL];
+
+	if (attributesAtStart[NSAttachmentAttributeName] &&
+			attributesAtEnd[ViFoldedAttributeName] &&
+			closestCommonParentFold(attributesAtStart[ViFoldAttributeName],
+									attributesAtEnd[ViFoldAttributeName])) {
+		ViFold *foldAtEnd = attributesAtEnd[ViFoldAttributeName];
+		// If there's any movement from the first character in the fold
+		// to another character in the fold, open the fold.
+		[document openFoldAtLocation:location
+							  levels:foldAtEnd.depth];
+	} else if (attributesAtEnd[ViFoldedAttributeName]) {
+		// If we're landing in a fold, the caret goes to the first character
+		// in the fold.
+		[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:location];
 	}
 
 	caret = location;

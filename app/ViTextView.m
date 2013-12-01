@@ -1564,24 +1564,6 @@ replaceCharactersInRange:(NSRange)aRange
 	NSUInteger currentLineIndex = [self.textStorage lineIndexAtLocation:caret];
 	NSInteger lineDelta = lineIndexAtLocation - currentLineIndex;
 
-	ViFold *foldAtStart = [document foldAtLocation:caret];
-	/*if ([self.textStorage attribute:ViFoldedAttributeName atIndex:location effectiveRange:NULL] ||
-			[self.textStorage attribute:NSAttachmentAttributeName atIndex:location effectiveRange:NULL]) {
-		if (foldAtStart && lineDelta > 0) {
-			if (NSMaxRange(foldAtStart.range) < [self.textStorage lineCount]) {
-				[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:NSMaxRange(foldAtStart.range)];
-			} else {
-				MESSAGE(@"Movement past end-of-file");
-				location = caret;
-			}
-		} else if (lineDelta < 0) {
-			ViFold *foldAtLocation = [document foldAtLocation:location];
-			if (foldAtLocation) {
-				[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:foldAtLocation.range.location];
-			}
-		}
-	}*/
-
 	NSInteger length = [[self textStorage] length];
 	if (mode != ViInsertMode)
 		length--;

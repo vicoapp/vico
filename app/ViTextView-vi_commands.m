@@ -1514,8 +1514,8 @@
 /* syntax: o */
 - (BOOL)open_line_below:(ViCommand *)command
 {
-	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
-	end_location = [self insertNewlineAtLocation:end_location indentForward:YES];
+	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
+	end_location = [self insertNewlineAtLocation:end_location indentForward:NO];
  	final_location = end_location;
 
 	[self setInsertMode:command];

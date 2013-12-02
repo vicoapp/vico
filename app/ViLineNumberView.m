@@ -93,6 +93,19 @@
 							   selector:@selector(caretDidChange:)
 								   name:ViCaretChangedNotification
 								 object:_textView];
+
+		[notificationCenter addObserver:self
+							   selector:@selector(foldsDidUpdate:)
+								   name:ViFoldsChangedNotification
+								 object:_textView.document];
+		[notificationCenter addObserver:self
+							   selector:@selector(foldsDidUpdate:)
+								   name:ViFoldOpenedNotification
+								 object:_textView.document];
+		[notificationCenter addObserver:self
+							   selector:@selector(foldsDidUpdate:)
+								   name:ViFoldClosedNotification
+								 object:_textView.document];
 	}
 
 	_textView = aTextView;
@@ -170,6 +183,11 @@
 {
 	if (_relative)
 		[self setNeedsDisplay:YES];
+}
+
+- (void)foldsDidUpdate:(NSNotification *)notification
+{
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -

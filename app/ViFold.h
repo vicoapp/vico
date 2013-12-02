@@ -1,6 +1,10 @@
 extern NSString *const ViFoldedAttributeName;
 extern NSString *const ViFoldAttributeName;
 
+#define ViFoldsChangedNotification @"ViFoldsChangedNotification"
+#define ViFoldOpenedNotification @"ViFoldOpenedNotification"
+#define ViFoldClosedNotification @"ViFoldClosedNotification"
+
 /**
  * ViFold contains information about a given fold in a document. Its most
  * important information is the start and end of the fold, and the parent

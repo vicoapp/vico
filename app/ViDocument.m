@@ -1995,6 +1995,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 								   value:newFold
 								   range:rangeToMark];
 	}
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldsChangedNotification object:self userInfo:nil];
 }
 
 - (NSRange)closeFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels
@@ -2112,7 +2114,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		lastFold = currentFold;
 		totalClosedRange = [NSValue valueWithRange:NSUnionRange([totalClosedRange rangeValue], currentFoldRange)];
 	}];
-	
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldClosedNotification object:self userInfo:nil];
+
 	return [totalClosedRange rangeValue];
 }
 
@@ -2195,6 +2199,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		lastFold = currentFold;
 		totalOpenedRange = [NSValue valueWithRange:NSUnionRange([totalOpenedRange rangeValue], currentFoldRange)];
 	}];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldOpenedNotification object:self userInfo:nil];
 	
 	return [totalOpenedRange rangeValue];
 }

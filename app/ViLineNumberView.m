@@ -1,5 +1,6 @@
 #import "ViLineNumberView.h"
 
+#import "ViFold.h"
 #import "ViTextView.h"
 #import "ViThemeStore.h"
 
@@ -193,6 +194,38 @@
 	} while (absoluteLine > 0);
 }
 
+- (NSInteger)logicalLineForLine:(NSUInteger)line location:(NSUInteger)location
+{
+	__block NSInteger logicalLine = line;
+	
+	if (location > 0) {
+		ViTextStorage *textStorage = _textView.textStorage;
+		[textStorage enumerateAttribute:ViFoldedAttributeName
+								inRange:NSMakeRange(0u, location)
+								options:NULL
+							 usingBlock:^(ViFold *fold, NSRange foldedRange, BOOL *s) {
+			 // Unfolded ranges don't affect the logical line.
+			 if (! fold) return;
+			 
+			 // We go through each line in the folded range except the first one
+			 // and subtract that line from the logical line. This makes each
+			 // folded range count for one line.
+			 NSUInteger currentLocation = NSMaxRange([textStorage rangeOfLineAtLocation:foldedRange.location]);
+			 while (currentLocation < NSMaxRange(foldedRange) &&
+					(currentLocation = NSMaxRange([textStorage rangeOfLineAtLocation:currentLocation + 1]))) {
+				 logicalLine--;
+			 }
+		 }];
+	}
+	
+	return logicalLine;
+}
+
+- (NSInteger)currentLogicalLine
+{
+	return [self logicalLineForLine:[_textView currentLine] location:[_textView caret]];
+}
+
 - (void)drawLineNumbersInRect:(NSRect)aRect visibleRect:(NSRect)visibleRect
 {
 	NSRect bounds = [self bounds];
@@ -234,25 +267,31 @@
 		return;
 	}
 
-	NSUInteger currentLine = _relative ? [_textView currentLine] : 0;
+	NSUInteger logicalLine = [self logicalLineForLine:line location:location];
+	NSInteger currentLogicalLine = _relative ? [self currentLogicalLine] : 0;
 	for (; location < NSMaxRange(range); line++) {
 		NSUInteger glyphIndex = [layoutManager glyphIndexForCharacterAtIndex:location];
 		NSRect rect = [layoutManager lineFragmentRectForGlyphAtIndex:glyphIndex effectiveRange:NULL];
 
-		// Note that the ruler view is only as tall as the visible
-		// portion. Need to compensate for the clipview's coordinates.
-		ypos = yinset + NSMinY(rect) - NSMinY(visibleRect);
+		NSDictionary *attributesAtLineStart = [textStorage attributesAtIndex:location effectiveRange:NULL];
 
-		// Draw digits flush right, centered vertically within the line
-		NSRect r;
-		r.origin.x = floor(NSWidth(bounds) - LINE_NUMBER_MARGIN);
-		r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
-		r.size = _digitSize;
+		if (! attributesAtLineStart[ViFoldedAttributeName]) {
+			// Note that the ruler view is only as tall as the visible
+			// portion. Need to compensate for the clipview's coordinates.
+			ypos = yinset + NSMinY(rect) - NSMinY(visibleRect);
 
-		NSUInteger numberToDraw = line;
-		if (_relative)
-			numberToDraw -= currentLine;
-		[self drawLineNumber:numberToDraw inRect:r];
+			// Draw digits flush right, centered vertically within the line
+			NSRect r;
+			r.origin.x = floor(NSWidth(bounds) - LINE_NUMBER_MARGIN);
+			r.origin.y = floor(ypos + (NSHeight(rect) - _digitSize.height) / 2.0 + 1.0);
+			r.size = _digitSize;
+
+			NSInteger numberToDraw = _relative ? logicalLine - currentLogicalLine : line;
+						
+			[self drawLineNumber:numberToDraw inRect:r];
+			
+			logicalLine++;
+		}
 
 		/* Protect against an improbable (but possible due to
 		 * preceeding exceptions in undo manager) out-of-bounds
@@ -261,10 +300,11 @@
 		if (location >= [textStorage length]) {
 			break;
 		}
-		[[textStorage string] getLineStart:NULL
-					       end:&location
-				       contentsEnd:NULL
-					  forRange:NSMakeRange(location, 0)];
+
+		[textStorage.string getLineStart:NULL
+									 end:&location
+							 contentsEnd:NULL
+								forRange:NSMakeRange(location, 0)];
 	}
 }
 

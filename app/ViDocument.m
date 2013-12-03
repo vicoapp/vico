@@ -1941,60 +1941,32 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// TODO Let's disallow folds that match the range of an existing fold exactly.
 	ViFold *newFold = [ViFold fold];
 
+	ViFold *foldAtStart = [self.textStorage attribute:ViFoldAttributeName atIndex:range.location effectiveRange:NULL];
+	ViFold *foldAtEnd = [self.textStorage attribute:ViFoldAttributeName atIndex:NSMaxRange(range) + 1 effectiveRange:NULL];
+
+	ViFold *newFoldParent = closestCommonParentFold(foldAtStart, foldAtEnd);
+	if (newFoldParent) {
+		addChildToFold(newFoldParent, newFold);
+	}
+
 	// The list of ranges that we won't be setting to have the new fold.
-	__block NSMutableArray *rangesWithOtherFolds = [NSMutableArray array];
 	[self.textStorage enumerateAttribute:ViFoldAttributeName
 								 inRange:range
 								 options:NULL
 							  usingBlock:^(ViFold *overlappingFold, NSRange overlappingFoldRange, BOOL *stop) {
-		if (! overlappingFold)
-			return;
-
-		if (NSMaxRange(overlappingFoldRange) == NSMaxRange(range)) {
-			// If the range for the new fold is within the range of the existing
-			// fold it overlaps, the new one becomes a child of the existing one.
-			addChildToFold(overlappingFold, newFold);
+		if (overlappingFold == newFold.parent) {
+			// If the overlapping fold is the same as the new fold's parent, then
+			// the fold at this location will be the new fold (note that this
+			// includes cases where the new fold is at the root level).
+			[self.textStorage addAttribute:ViFoldAttributeName value:newFold range:overlappingFoldRange];
 		} else {
-			// If the range for the new fold extends past the range of the
-			// existing fold it overlaps, the existing one will become a child
-			// of the new one, and the new one extends to subsume the old one.
-			addTopmostParentToFold(newFold, overlappingFold);
+			// Otherwise, the new fold becomes a parent to the overlapping fold's
+			// topmost parent that has the new fold's parent as its parent.
+			ViFold *candidateChildFold = [overlappingFold topmostParentWithParent:newFold.parent];
 
-			[rangesWithOtherFolds addObject:[NSValue valueWithRange:overlappingFoldRange]];
+			addChildToFold(newFold, candidateChildFold);
 		}
 	}];
-
-	__block NSUInteger currentStartOfFold = range.location;
-	__block NSUInteger currentEndOfFold = NSMaxRange(range);
-	[rangesWithOtherFolds enumerateObjectsUsingBlock:^(NSValue *rangeValue, NSUInteger i, BOOL *stop) {
-		NSRange excludedRange = [rangeValue rangeValue];
-		currentEndOfFold = excludedRange.location;
-
-		if (currentEndOfFold > currentStartOfFold) {
-			NSRange rangeToMark =
-				NSMakeRange(
-					currentStartOfFold,
-					currentEndOfFold - currentStartOfFold
-				);
-			[self.textStorage addAttribute:ViFoldAttributeName
-									 value:newFold
-									 range:rangeToMark];
-		}
-
-		currentStartOfFold = NSMaxRange(excludedRange);
-	}];
-
-	if (currentStartOfFold < NSMaxRange(range)) {
-		NSRange rangeToMark =
-			NSMakeRange(
-				currentStartOfFold,
-				NSMaxRange(range) - currentStartOfFold
-			);
-
-		[self.textStorage addAttribute:ViFoldAttributeName
-								   value:newFold
-								   range:rangeToMark];
-	}
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldsChangedNotification object:self userInfo:nil];
 }

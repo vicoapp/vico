@@ -118,7 +118,11 @@
 
 - (void)updateRuleThickness
 {
-	[self setRuleThickness:_lineNumberView.frame.size.width + _foldMarginView.frame.size.width];
+	CGFloat newThickness = _lineNumberView.frame.size.width + _foldMarginView.frame.size.width;
+	
+	if (newThickness != [self ruleThickness]) {
+		[[self nextRunloop] setRuleThickness:newThickness];
+	}
 }
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)aRect

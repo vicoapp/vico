@@ -37,6 +37,13 @@ extern NSString *const ViFoldAttributeName;
 - (BOOL)hasParent:(ViFold *)aFold;
 /** @return The topmost parent fold of this fold. If this fold has no parent, returns this fold. */
 - (ViFold *)topmostParent;
+/**
+ * Stops one step before a typical search for a parent, returning instead the
+ * last parent that *isn't* +markerParent+.
+ *
+ * @return The topmost parent fold of this fold whose parent is +markerParent+.
+ */
+- (ViFold *)topmostParentWithParent:(ViFold *)markerParent;
 
 @end
 

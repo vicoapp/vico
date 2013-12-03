@@ -105,6 +105,15 @@ static NSTextAttachment *foldAttachment = nil;
 	return currentFold;
 }
 
+- (ViFold *)topmostParentWithParent:(ViFold *)markerParent
+{
+	ViFold *currentFold = self;
+	while (currentFold && currentFold.parent != markerParent)
+		currentFold = currentFold.parent;
+
+	return currentFold;
+}
+
 - (NSString *)description
 {
 	if (_parent)

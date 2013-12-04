@@ -2070,8 +2070,27 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			return;
 		}
 
-		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
-		BOOL closeCurrentFold = currentFold.depth <= maxCloseDepth;
+		BOOL startOfCurrentFold = ! lastFold || lastFold.depth < currentFold.depth;
+		ViFold *foldToClose = nil;
+		if (startOfCurrentFold && currentFold.depth <= maxCloseDepth) {
+			foldToClose = currentFold;
+		} else if (currentFold.hasSameStartAsParent) {
+			foldToClose = currentFold;
+			do {
+				foldToClose.open = NO;
+				foldToClose = foldToClose.parent;
+			} while (foldToClose &&
+					 foldToClose.hasSameStartAsParent &&
+					 foldToClose.depth > maxCloseDepth);
+
+			if (foldToClose && foldToClose.depth > maxCloseDepth) {
+				foldToClose = nil;
+			}
+		}
+		ViFold *foldToMark = foldToClose;
+		do {
+			foldToMark.open = NO;
+		} while (foldToMark.hasSameStartAsParent && (foldToMark = foldToMark.parent) && foldToMark.depth >= minCloseDepth);
 
 		ViFold *closestCommonParent = nil;
 		// Stop if this isn't the first fold and the current fold isn't
@@ -2087,15 +2106,15 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			return;
 		}
 
-		if (startOfCurrentFold && closeCurrentFold) {
-			currentFold.open = false;
+		if (foldToClose && currentFold == firstFold) {
+			[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
+									  range:NSMakeRange(currentFoldRange.location, 1)];
 
-			if (currentFold == firstFold) {
-				[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
-										  range:NSMakeRange(currentFoldRange.location, 1)];
-
-				currentFoldRange = NSMakeRange(currentFoldRange.location + 1, currentFoldRange.length - 1);
-			}
+			currentFoldRange = NSMakeRange(currentFoldRange.location + 1, currentFoldRange.length - 1);
+		}
+		if (startOfCurrentFold && currentFold != firstFold) {
+			[self.textStorage removeAttribute:NSAttachmentAttributeName
+										range:NSMakeRange(currentFoldRange.location, 1)];
 		}
 
 		[self.textStorage addAttributes:@{ ViFoldedAttributeName: @YES }

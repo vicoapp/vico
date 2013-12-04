@@ -8,6 +8,12 @@ inline ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold)
 	if (firstFold == secondFold) {
 		return firstFold;
 	}
+	if ([firstFold hasParent:secondFold]) {
+		return secondFold;
+	}
+	if ([secondFold hasParent:firstFold]) {
+		return firstFold;
+	}
 
 	ViFold *currentFold = secondFold;
 	while (currentFold && ! [firstFold hasParent:currentFold]) {
@@ -16,7 +22,7 @@ inline ViFold *closestCommonParentFold(ViFold *firstFold, ViFold *secondFold)
 
 	if (! currentFold) {
 		currentFold = firstFold;
-		while (currentFold && ![secondFold hasParent:currentFold]) {
+		while (currentFold && ! [secondFold hasParent:currentFold]) {
 			currentFold = currentFold.parent;
 		}
 	}

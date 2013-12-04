@@ -2198,7 +2198,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 
 		if (openCurrentFold) {
-			currentFold.open = true;
+			currentFold.open = YES;
 
 			[self.textStorage removeAttribute:ViFoldedAttributeName
 										range:currentFoldRange];

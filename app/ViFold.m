@@ -75,7 +75,7 @@ static NSTextAttachment *foldAttachment = nil;
 {
 	if (self = [super init]) {
 		_depth = 1;
-		_open = true;
+		_open = YES;
 		_parent = nil;
 		_children = [NSMutableSet set];
 	}

@@ -2009,6 +2009,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	// Pop up the hierarchy to the topmost closed fold with the same start
 	// point, if any.
+	while (fold.hasSameStartAsParent && fold.isOpen)
+		fold = fold.parent;
 	while (fold.hasSameStartAsParent && ! fold.parent.isOpen)
 		fold = fold.parent;
 

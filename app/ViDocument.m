@@ -2144,8 +2144,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 
 		if (startOfCurrentFold && openCurrentFold) {
-			currentFold.open = true;
-
 			[self.textStorage removeAttribute:NSAttachmentAttributeName
 									    range:NSMakeRange(currentFoldRange.location, 1)];
 		} else if (startOfCurrentFold && ! currentFold.isOpen) {
@@ -2164,6 +2162,8 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 
 		if (openCurrentFold) {
+			currentFold.open = true;
+
 			[self.textStorage removeAttribute:ViFoldedAttributeName
 										range:currentFoldRange];
 		}

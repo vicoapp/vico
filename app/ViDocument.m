@@ -2163,7 +2163,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			return;
 		}
 
-		BOOL startOfCurrentFold = (! lastFold || lastFold.depth < currentFold.depth);
+		BOOL startOfCurrentFold = ! lastFold || lastFold.depth < currentFold.depth;
 		BOOL openCurrentFold = currentFold.isOpen || currentFold.depth < maxOpenDepth;
 
 		ViFold *closestCommonParent = nil;
@@ -2183,7 +2183,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		if (startOfCurrentFold && openCurrentFold) {
 			[self.textStorage removeAttribute:NSAttachmentAttributeName
 									    range:NSMakeRange(currentFoldRange.location, 1)];
-		} else if (startOfCurrentFold && ! currentFold.isOpen) {
+		} else if (startOfCurrentFold && lastFold.isOpen && ! currentFold.isOpen) {
 			NSRange attachmentRange = NSMakeRange(currentFoldRange.location, 1);
 
 			// If this is the start of the current fold and it's not a fold we're going to

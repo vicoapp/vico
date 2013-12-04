@@ -1987,6 +1987,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 						 longestEffectiveRange:&foldRange
 									   inRange:NSMakeRange(0, [self.textStorage length])];
 
+	// Pop up the hierarchy to the topmost open fold with the same start
+	// point, if any.
+	while (fold.hasSameStartAsParent && ! fold.isOpen)
+		fold = fold.parent;
+
 	if (fold) {
 		return [self closeFold:fold inRange:foldRange levels:levels];
 	} else {
@@ -2001,6 +2006,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 									   atIndex:aLocation
 						 longestEffectiveRange:&foldRange
 									   inRange:NSMakeRange(0, [self.textStorage length])];
+
+	// Pop up the hierarchy to the topmost closed fold with the same start
+	// point, if any.
+	while (fold.hasSameStartAsParent && ! fold.parent.isOpen)
+		fold = fold.parent;
 
 	if (fold && fold.isOpen) {
 		return foldRange;

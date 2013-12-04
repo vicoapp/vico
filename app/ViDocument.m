@@ -1968,6 +1968,14 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		}
 	}];
 
+	// If the fold at the start has the same start point as the new fold, mark
+	// it and all its parents as such until we hit the new fold we inserted.
+	if (foldAtStart && foldAtStart != newFoldParent) {
+		do {
+			foldAtStart.sameStartAsParent = YES;
+		} while ((foldAtStart = foldAtStart.parent) && foldAtStart != newFold);
+	}
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldsChangedNotification object:self userInfo:nil];
 }
 

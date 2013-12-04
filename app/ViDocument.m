@@ -2077,7 +2077,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		} else if (currentFold.hasSameStartAsParent) {
 			foldToClose = currentFold;
 			do {
-				foldToClose.open = NO;
 				foldToClose = foldToClose.parent;
 			} while (foldToClose &&
 					 foldToClose.hasSameStartAsParent &&

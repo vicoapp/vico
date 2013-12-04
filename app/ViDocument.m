@@ -1987,7 +1987,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 						 longestEffectiveRange:&foldRange
 									   inRange:NSMakeRange(0, [self.textStorage length])];
 
-	// Pop up the hierarchy to the topmost open fold with the same start
+	// Pop up the hierarchy to the bottommost open fold with the same start
 	// point, if any.
 	while (fold.hasSameStartAsParent && ! fold.isOpen)
 		fold = fold.parent;

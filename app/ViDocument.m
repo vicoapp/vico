@@ -1938,7 +1938,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// at all.
 	range = NSMakeRange(range.location, range.length - 1);
 
-	// TODO Let's disallow folds that match the range of an existing fold exactly.
 	ViFold *newFold = [ViFold fold];
 
 	ViFold *foldAtStart = [self.textStorage attribute:ViFoldAttributeName atIndex:range.location effectiveRange:NULL];
@@ -1975,6 +1974,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			foldAtStart.sameStartAsParent = YES;
 		} while ((foldAtStart = foldAtStart.parent) && foldAtStart != newFold);
 	}
+	// If the fold at the end has the same end point as the new fold, mark
+	// it and all its parents as such until we hit the new fold we inserted.
+	if (foldAtEnd && foldAtEnd != newFoldParent) {
+		do {
+			foldAtEnd.sameEndAsParent = YES;
+		} while ((foldAtEnd = foldAtEnd.parent) && foldAtEnd != newFold);
+	}
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ViFoldsChangedNotification object:self userInfo:nil];
 }
@@ -1990,6 +1996,9 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// Pop up the hierarchy to the bottommost open fold with the same start
 	// point, if any.
 	while (fold.hasSameStartAsParent && ! fold.isOpen)
+		fold = fold.parent;
+
+	while (fold.hasSameEndAsParent && ! fold.isOpen)
 		fold = fold.parent;
 
 	if (fold) {
@@ -2012,6 +2021,11 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	while (fold.hasSameStartAsParent && fold.isOpen)
 		fold = fold.parent;
 	while (fold.hasSameStartAsParent && ! fold.parent.isOpen)
+		fold = fold.parent;
+
+	while (fold.hasSameEndAsParent && fold.isOpen)
+		fold = fold.parent;
+	while (fold.hasSameEndAsParent && ! fold.parent.isOpen)
 		fold = fold.parent;
 
 	if (fold && fold.isOpen) {
@@ -2082,6 +2096,17 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 				foldToClose = foldToClose.parent;
 			} while (foldToClose &&
 					 foldToClose.hasSameStartAsParent &&
+					 foldToClose.depth > maxCloseDepth);
+
+			if (foldToClose && foldToClose.depth > maxCloseDepth) {
+				foldToClose = nil;
+			}
+		} else if (currentFold.hasSameEndAsParent && currentFold.depth > minCloseDepth) {
+			foldToClose = currentFold;
+			do {
+				foldToClose = foldToClose.parent;
+			} while (foldToClose &&
+					 foldToClose.hasSameEndAsParent &&
 					 foldToClose.depth > maxCloseDepth);
 
 			if (foldToClose && foldToClose.depth > maxCloseDepth) {

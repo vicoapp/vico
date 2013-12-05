@@ -23,6 +23,7 @@ extern NSString *const ViFoldAttributeName;
 
 @property (nonatomic,getter=isOpen) BOOL open;
 @property (nonatomic,getter=hasSameStartAsParent) BOOL sameStartAsParent;
+@property (nonatomic,getter=hasSameEndAsParent) BOOL sameEndAsParent;
 @property (nonatomic) ViFold *parent;
 @property (nonatomic) NSUInteger depth;
 @property (nonatomic,readonly) NSSet *children;

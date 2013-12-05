@@ -2046,7 +2046,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (NSRange)closeFold:(ViFold *)foldToClose inRange:(NSRange)foldRange levels:(NSUInteger)levels
 {
 	NSUInteger maxCloseDepth = foldToClose.depth;
-	NSUInteger minCloseDepth = foldToClose.depth - (levels - 1);
+	NSUInteger minCloseDepth = (levels - 1 > foldToClose.depth) ? 1 : foldToClose.depth - (levels - 1);
 	NSUInteger foldStart = NSNotFound;
 	ViFold *currentFold = nil;
 	do {

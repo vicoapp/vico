@@ -2076,7 +2076,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 		ViFold *foldToClose = nil;
 		if (startOfCurrentFold && currentFold.depth <= maxCloseDepth) {
 			foldToClose = currentFold;
-		} else if (currentFold.hasSameStartAsParent) {
+		} else if (currentFold.hasSameStartAsParent && currentFold.depth > minCloseDepth) {
 			foldToClose = currentFold;
 			do {
 				foldToClose = foldToClose.parent;

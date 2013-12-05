@@ -2132,13 +2132,13 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			return;
 		}
 
-		if (foldToClose && currentFold == firstFold) {
+		if (foldToClose && currentFoldRange.location == foldStart) {
 			[self.textStorage addAttributes:@{ NSAttachmentAttributeName: [ViFold foldAttachment] }
 									  range:NSMakeRange(currentFoldRange.location, 1)];
 
 			currentFoldRange = NSMakeRange(currentFoldRange.location + 1, currentFoldRange.length - 1);
 		}
-		if (startOfCurrentFold && currentFold != firstFold) {
+		if (startOfCurrentFold && currentFoldRange.location != foldStart) {
 			[self.textStorage removeAttribute:NSAttachmentAttributeName
 										range:NSMakeRange(currentFoldRange.location, 1)];
 		}

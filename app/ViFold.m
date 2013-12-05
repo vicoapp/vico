@@ -36,8 +36,6 @@ inline void addChildToFold(ViFold *parentFold, ViFold *childFold)
 		return;
 
 	[parentFold addChild:childFold];
-	childFold.parent = parentFold;
-	childFold.depth = parentFold.depth + 1;
 }
 
 inline void addTopmostParentToFold(ViFold *parentFold, ViFold *nestedChildFold)
@@ -86,11 +84,26 @@ static NSTextAttachment *foldAttachment = nil;
 - (void)addChild:(ViFold *)childFold
 {
 	[_children addObject:childFold];
+	
+	childFold.parent = self;
+	childFold.depth = self.depth + 1;
 }
 
 - (void)removeChild:(ViFold *)childFold
 {
 	[_children removeObject:childFold];
+	
+	childFold.parent = nil;
+	childFold.depth -= self.depth;
+}
+
+- (void)setDepth:(NSUInteger)depth
+{
+	_depth = depth;
+	
+	[_children enumerateObjectsUsingBlock:^(ViFold *child, BOOL *s) {
+		child.depth = _depth + 1;
+	}];
 }
 
 - (BOOL)hasParent:(ViFold *)aFold

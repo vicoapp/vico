@@ -24,9 +24,10 @@
  */
 
 @class ViDocument;
-@class ViTabController;
-@class ViViewController;
 @class ViDocumentView;
+@class ViTabController;
+@class ViTextView;
+@class ViViewController;
 
 typedef enum ViViewPosition ViViewPosition;
 typedef enum ViViewOrderingMode ViViewOrderingMode;
@@ -164,6 +165,7 @@ enum ViViewOrderingMode {
 
 - (ViViewController *)viewOfClass:(Class)class withRepresentedObject:(id)repObj;
 - (ViDocumentView *)viewWithDocument:(ViDocument *)document;
+- (ViDocumentView *)viewWithTextView:(ViTextView *)aTextView;
 
 - (ViViewController *)viewAtPosition:(ViViewOrderingMode)position
 			  relativeTo:(NSView *)aView;

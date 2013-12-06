@@ -1882,17 +1882,56 @@ extern BOOL __makeNewWindowInsteadOfTab;
 	[self moveCurrentViewToNewWindow];
 }
 
-- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViViewController *)viewController
 {
-	ViViewController *viewController, *otherViewController;
-	if ([aView respondsToSelector:@selector(tabController)])
-		viewController = aView;
-	else
-		viewController = [self viewControllerForView:aView];
-	otherViewController = [[viewController tabController] viewAtPosition:position
-								  relativeTo:[viewController view]];
+	ViTabController *tabController = viewController.tabController;
+	NSView *hitView = nil;
+
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *documentView = (ViDocumentView *)viewController;
+		ViTextView *currentView = [documentView textView];
+		NSLayoutManager *currentLayoutManager = currentView.layoutManager;
+		NSUInteger caret = [currentView caret];
+		NSUInteger glyphIndex = [currentLayoutManager glyphIndexForCharacterAtIndex:caret];
+		NSRect caretRect = [currentView.layoutManager lineFragmentRectForGlyphAtIndex:glyphIndex
+																	   effectiveRange:NULL];
+
+		CGSize currentViewSize = currentView.frame.size;
+
+		NSPoint referencePoint =
+		  NSMakePoint(
+			caretRect.origin.x + (caretRect.size.width / 1),
+			caretRect.origin.y + (caretRect.size.height / 1)
+		  );
+
+		if (position == ViViewUp) {
+			referencePoint.y = -40;
+		} else if (position == ViViewDown) {
+			referencePoint.y = currentViewSize.height + 40;
+		} else if (position == ViViewLeft) {
+			referencePoint.x = -80;
+		} else if (position == ViViewRight) {
+			referencePoint.x = currentViewSize.width + 80;
+		}
+
+		NSPoint splitViewReferencePoint = [tabController.view.superview convertPoint:referencePoint
+																			fromView:currentView];
+
+		hitView = [tabController.view hitTest:splitViewReferencePoint];
+	}
+
+	ViViewController *otherViewController = nil;
+	if ([hitView isKindOfClass:[ViTextView class]]) {
+		otherViewController = [viewController.tabController viewWithTextView:(ViTextView *)hitView];
+	}
+	if (otherViewController == nil) {
+		otherViewController = [[viewController tabController] viewAtPosition:position
+																  relativeTo:viewController.view];
+	}
+
 	if (otherViewController == nil)
 		return NO;
+
 	[self selectDocumentView:otherViewController];
 	return YES;
 }

@@ -2073,7 +2073,6 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 			 (currentFold = closestCommonParentFold(currentFold, foldToClose)) &&
 			 currentFold.depth >= minCloseDepth);
 
-	ViFold *firstFold = [self foldAtLocation:foldStart];
 	__block ViFold *lastFold = nil;
 	__block NSValue *totalClosedRange = [NSValue valueWithRange:NSMakeRange(foldStart, 0)];
 	[self.textStorage enumerateAttribute:ViFoldAttributeName

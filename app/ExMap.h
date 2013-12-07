@@ -90,14 +90,14 @@
 - (void)removeAlias:(NSString *)aName;
 
 - (ExMapping *)initWithNames:(NSArray *)nameArray
-		      syntax:(NSString *)aSyntax
-                 expression:(NuBlock *)anExpression
-                      scope:(NSString *)aScopeSelector;
+                      syntax:(NSString *)aSyntax
+                  expression:(NuBlock *)anExpression
+                       scope:(NSString *)aScopeSelector;
 
 - (ExMapping *)initWithNames:(NSArray *)nameArray
-		      syntax:(NSString *)aSyntax
-                     action:(SEL)anAction
-                      scope:(NSString *)aScopeSelector;
+                      syntax:(NSString *)aSyntax
+                      action:(SEL)anAction
+                       scope:(NSString *)aScopeSelector;
 @end
 
 
@@ -117,18 +117,22 @@
 + (ExMap *)defaultMap;
 
 - (ExMapping *)lookup:(NSString *)aString
-	    withScope:(ViScope *)scope;
+            withScope:(ViScope *)scope;
 
 /** Look up an ex command definition given the name.
  * @param aString the name of the command. May be abbreviated as long as it is not ambiguous.
+ * @param implementation Either an NSString instance naming a selector, or a NuBlock
+ * instance specifying a Nu function. The Nu function takes on optional parameter;
+ * an instance of ExCommand that describes the arguments.
+ *
  * @returns the defined ex command, or nil if not found.
  */
 - (ExMapping *)lookup:(NSString *)aString;
 
 - (ExMapping *)define:(id)aName
-	       syntax:(NSString *)aSyntax
-		   as:(id)implementation
-		scope:(NSString *)aScopeSelector;
+               syntax:(NSString *)aSyntax
+                   as:(id)implementation
+                scope:(NSString *)aScopeSelector;
 
 /** Add an ex command definition.
  *
@@ -146,7 +150,7 @@
  * @see [ExMapping syntax]
  */
 - (ExMapping *)define:(id)aName
-	       syntax:(NSString *)aSyntax
-		   as:(id)implementation;
+               syntax:(NSString *)aSyntax
+                   as:(id)implementation;
 @end
 

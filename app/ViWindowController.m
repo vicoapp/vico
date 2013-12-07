@@ -1890,17 +1890,26 @@ extern BOOL __makeNewWindowInsteadOfTab;
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocumentView *documentView = (ViDocumentView *)viewController;
 		ViTextView *currentView = [documentView textView];
+		NSScrollView *scrollView = [currentView enclosingScrollView];
 		NSUInteger caret = [currentView caret];
 		NSRect caretRect = [currentView firstRectForCharacterRange:NSMakeRange(caret, 1)
 													   actualRange:NULL];
 
-		CGSize currentViewSize = currentView.frame.size;
+		CGSize currentViewSize = scrollView.frame.size;
 
 		NSPoint referencePoint =
-		  NSMakePoint(
-			caretRect.origin.x + (caretRect.size.width / 1),
-			caretRect.origin.y + (caretRect.size.height / 1)
-		  );
+		  [scrollView convertPoint:NSMakePoint(
+									   caretRect.origin.x + (caretRect.size.width / 2),
+									   caretRect.origin.y + (caretRect.size.height / 2)
+								   )
+						  fromView:nil];
+
+		// Constrain the point to be within the visible area of the scroll view. We
+		// add a slight margin off of the edges so that we're landing on text views
+		// when we start shifting the reference points based on which direction we
+		// want to move.
+		referencePoint.x = MIN(MAX(referencePoint.x, 10), scrollView.frame.size.width - 10);
+		referencePoint.y = MIN(MAX(referencePoint.y, 10), scrollView.frame.size.height - 10);
 
 		if (position == ViViewUp) {
 			referencePoint.y = -40;

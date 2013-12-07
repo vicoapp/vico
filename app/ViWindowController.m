@@ -1911,20 +1911,29 @@ extern BOOL __makeNewWindowInsteadOfTab;
 		referencePoint.x = MIN(MAX(referencePoint.x, 10), scrollView.frame.size.width - 10);
 		referencePoint.y = MIN(MAX(referencePoint.y, 10), scrollView.frame.size.height - 10);
 
-		if (position == ViViewUp) {
-			referencePoint.y = -40;
-		} else if (position == ViViewDown) {
-			referencePoint.y = currentViewSize.height + 40;
-		} else if (position == ViViewLeft) {
-			referencePoint.x = -80;
-		} else if (position == ViViewRight) {
-			referencePoint.x = currentViewSize.width + 80;
-		}
+		NSInteger offsetStep = 40;
+		NSInteger offsetCount = 0;
 
-		NSPoint splitViewReferencePoint = [tabController.view.superview convertPoint:referencePoint
-																			fromView:currentView];
+		do {
+		  offsetCount++;
+		  NSInteger offset = offsetStep * offsetCount;
 
-		hitView = [tabController.view hitTest:splitViewReferencePoint];
+		  if (position == ViViewUp) {
+			  referencePoint.y = -1 * offset;
+		  } else if (position == ViViewDown) {
+			  referencePoint.y = currentViewSize.height + offset;
+		  } else if (position == ViViewLeft) {
+			  referencePoint.x = -1 * offset;
+		  } else if (position == ViViewRight) {
+			  referencePoint.x = currentViewSize.width + offset;
+		  }
+
+		  NSPoint splitViewReferencePoint =
+			[tabController.view.superview convertPoint:referencePoint
+											  fromView:scrollView];
+
+		  hitView = [tabController.view hitTest:splitViewReferencePoint];
+		} while (hitView && ! [hitView isKindOfClass:[ViTextView class]]);
 	}
 
 	ViViewController *otherViewController = nil;

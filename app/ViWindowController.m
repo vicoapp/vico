@@ -40,6 +40,7 @@
 #import "ViLayoutManager.h"
 #import "ExTextField.h"
 #import "ViEventManager.h"
+#import "ViRulerView.h"
 #import "NSURL-additions.h"
 #import "ExCommand.h"
 #import "ViError.h"
@@ -1933,6 +1934,20 @@ extern BOOL __makeNewWindowInsteadOfTab;
 											  fromView:scrollView];
 
 		  hitView = [tabController.view hitTest:splitViewReferencePoint];
+
+		  // If we landed on a split view, that means we're moving along a split
+		  // view divider. We add some jitter in the appropriate direction to shift
+		  // off of that divider.
+		  //
+		  // Additionally, if we're moving up or down and hit one of the ruler view
+		  // classes, we push the reference point's x coordinate right so that we end
+		  // up off of the ruler view and on the text view.
+		  if ([hitView isKindOfClass:[NSSplitView class]]) {
+			  if (position == ViViewUp || position == ViViewDown) {
+				  referencePoint.x += 10;
+			  } else if (position == ViViewLeft || position == ViViewRight) {
+				  referencePoint.y += 10;
+			  }
 		} while (hitView && ! [hitView isKindOfClass:[ViTextView class]]);
 	}
 

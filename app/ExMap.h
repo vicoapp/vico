@@ -33,7 +33,7 @@
 @interface ExMapping : NSObject
 {
 	NSMutableArray		*_names;
-	NSString		*__weak _scopeSelector;
+	NSString		    *_scopeSelector;
 
 	NSString		*_syntax;
 	NSUInteger		 _flags;
@@ -49,7 +49,7 @@
 }
 
 /** The primary name of this command. */
-@property(weak, nonatomic, readonly) NSString *name;
+@property(nonatomic, readonly) NSString *name;
 /** All names and aliases of this command. */
 @property(nonatomic, readonly) NSArray *names;
 /** Syntax string describing the format and arguments of the command.
@@ -74,7 +74,7 @@
  * - `m` -- command modifies document
  */
 @property(nonatomic, readonly) NSString *syntax;
-@property(weak, nonatomic, readonly) NSString *scopeSelector;
+@property(nonatomic, readonly) NSString *scopeSelector;
 @property(nonatomic, readonly) NuBlock *expression;
 @property(nonatomic, readonly) SEL action;
 @property(nonatomic, readwrite, strong) id<ViCompletionProvider> completion;

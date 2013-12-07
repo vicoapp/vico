@@ -1890,11 +1890,9 @@ extern BOOL __makeNewWindowInsteadOfTab;
 	if ([viewController isKindOfClass:[ViDocumentView class]]) {
 		ViDocumentView *documentView = (ViDocumentView *)viewController;
 		ViTextView *currentView = [documentView textView];
-		NSLayoutManager *currentLayoutManager = currentView.layoutManager;
 		NSUInteger caret = [currentView caret];
-		NSUInteger glyphIndex = [currentLayoutManager glyphIndexForCharacterAtIndex:caret];
-		NSRect caretRect = [currentView.layoutManager lineFragmentRectForGlyphAtIndex:glyphIndex
-																	   effectiveRange:NULL];
+		NSRect caretRect = [currentView firstRectForCharacterRange:NSMakeRange(caret, 1)
+													   actualRange:NULL];
 
 		CGSize currentViewSize = currentView.frame.size;
 

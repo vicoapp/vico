@@ -104,7 +104,7 @@ utf16be_code_to_mbc(OnigCodePoint code, UChar *buf)
   if (code > 0xffff) {
     unsigned int plane, high;
 
-    plane = (code >> 16) - 1;
+    plane = (unsigned int)((code >> 16) - 1);
     *p++ = (plane >> 2) + 0xd8;
     high = (code & 0xff00) >> 8;
     *p++ = ((plane & 0x03) << 6) + (high >> 2);

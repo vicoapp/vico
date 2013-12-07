@@ -49,7 +49,7 @@
 - (ViTaskRunner *)init
 {
 	if ((self = [super init]) != nil) {
-		if (![NSBundle loadNibNamed:@"WaitProgress" owner:self]) {
+		if (![[NSBundle mainBundle] loadNibNamed:@"WaitProgress" owner:self topLevelObjects:nil]) {
 			return nil;
 		}
 	}

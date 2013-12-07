@@ -52,7 +52,7 @@ static unsigned char PadBuf[WORD_ALIGNMENT_SIZE];
 static UChar*
 str_dup(UChar* s, UChar* end)
 {
-  int len = end - s;
+  int len = (int)(end - s);
 
   if (len > 0) {
     UChar* r = (UChar* )xmalloc(len + 1);
@@ -73,7 +73,7 @@ swap_node(Node* a, Node* b)
   if (NTYPE(a) == NT_STR) {
     StrNode* sn = NSTR(a);
     if (sn->capa == 0) {
-      int len = sn->end - sn->s;
+      int len = (int)(sn->end - sn->s);
       sn->s   = sn->buf;
       sn->end = sn->s + len;
     }
@@ -82,7 +82,7 @@ swap_node(Node* a, Node* b)
   if (NTYPE(b) == NT_STR) {
     StrNode* sn = NSTR(b);
     if (sn->capa == 0) {
-      int len = sn->end - sn->s;
+      int len = (int)(sn->end - sn->s);
       sn->s   = sn->buf;
       sn->end = sn->s + len;
     }
@@ -499,7 +499,7 @@ compile_length_string_raw_node(StrNode* sn, regex_t* reg)
   if (sn->end <= sn->s)
     return 0;
 
-  return add_compile_string_length(sn->s, 1 /* sb */, sn->end - sn->s, reg, 0);
+  return add_compile_string_length(sn->s, 1 /* sb */, (int)(sn->end - sn->s), reg, 0);
 }
 
 static int
@@ -547,7 +547,7 @@ compile_string_raw_node(StrNode* sn, regex_t* reg)
   if (sn->end <= sn->s)
     return 0;
 
-  return add_compile_string(sn->s, 1 /* sb */, sn->end - sn->s, reg, 0);
+  return add_compile_string(sn->s, 1 /* sb */, (int)(sn->end - sn->s), reg, 0);
 }
 
 static int
@@ -2085,7 +2085,7 @@ get_min_match_length(Node* node, OnigDistance *min, ScanEnv* env)
   case NT_STR:
     {
       StrNode* sn = NSTR(node);
-      *min = sn->end - sn->s;
+      *min = (int)(sn->end - sn->s);
     }
     break;
 
@@ -2169,7 +2169,7 @@ get_max_match_length(Node* node, OnigDistance *max, ScanEnv* env)
   case NT_STR:
     {
       StrNode* sn = NSTR(node);
-      *max = sn->end - sn->s;
+      *max = (int)(sn->end - sn->s);
     }
     break;
 
@@ -2542,8 +2542,8 @@ is_not_included(Node* x, Node* y, regex_t* reg)
 	{
 	  UChar *q;
 	  StrNode* ys = NSTR(y);
-	  len = NSTRING_LEN(x);
-	  if (len > NSTRING_LEN(y)) len = NSTRING_LEN(y);
+	  len = (int)NSTRING_LEN(x);
+	  if (len > NSTRING_LEN(y)) len = (int)NSTRING_LEN(y);
 	  if (NSTRING_IS_AMBIG(x) || NSTRING_IS_AMBIG(y)) {
             /* tiny version */
             return 0;
@@ -3195,7 +3195,7 @@ update_string_node_case_fold(regex_t* reg, Node *node)
   StrNode* sn = NSTR(node);
 
   end = sn->end;
-  sbuf_size = (end - sn->s) * 2;
+  sbuf_size = (int)((end - sn->s) * 2);
   sbuf = (UChar* )xmalloc(sbuf_size);
   CHECK_NULL_RETURN_MEMERR(sbuf);
   ebuf = sbuf + sbuf_size;
@@ -3765,7 +3765,7 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
       if (NTYPE(target) == NT_STR) {
 	if (!IS_REPEAT_INFINITE(qn->lower) && qn->lower == qn->upper &&
 	    qn->lower > 1 && qn->lower <= EXPAND_STRING_MAX_LENGTH) {
-	  int len = NSTRING_LEN(target);
+	  int len = (int)(NSTRING_LEN(target));
 	  StrNode* sn = NSTR(target);
 
 	  if (len * qn->lower <= EXPAND_STRING_MAX_LENGTH) {
@@ -3905,7 +3905,7 @@ set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
 {
   int i, len;
 
-  len = end - s;
+  len = (int)(end - s);
   if (len < ONIG_CHAR_TABLE_SIZE) {
     for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = len;
 
@@ -4581,7 +4581,7 @@ optimize_node_left(Node* node, NodeOptInfo* opt, OptEnv* env)
   case NT_STR:
     {
       StrNode* sn = NSTR(node);
-      int slen = sn->end - sn->s;
+      int slen = (int)(sn->end - sn->s);
       int is_raw = NSTRING_IS_RAW(node);
 
       if (! NSTRING_IS_AMBIG(node)) {
@@ -4920,7 +4920,7 @@ set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
   reg->dmax = e->mmd.max;
 
   if (reg->dmin != ONIG_INFINITE_DISTANCE) {
-    reg->threshold_len = reg->dmin + (reg->exact_end - reg->exact);
+    reg->threshold_len = (int)(reg->dmin + (reg->exact_end - reg->exact));
   }
 
   return 0;
@@ -5281,7 +5281,7 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 #endif
 
   if (reg->alloc == 0) {
-    init_size = (pattern_end - pattern) * 2;
+    init_size = (int)((pattern_end - pattern) * 2);
     if (init_size <= 0) init_size = COMPILE_INIT_SIZE;
     r = BBUF_INIT(reg, init_size);
     if (r != 0) goto end;

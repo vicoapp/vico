@@ -58,7 +58,7 @@
 /** A text edit view.
  *
  */
-@interface ViTextView : NSTextView <ViSnippetDelegate, ViCompletionDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
+@interface ViTextView : NSTextView <ViSnippetDelegate, ViKeyManagerTarget, ViTaskRunnerTarget, ViTextViewTaskRunnerHandlers>
 {
 	ViDocument		*document;
 	// .busy
@@ -235,6 +235,11 @@
  */
 - (BOOL)input:(NSString *)inputString;
 
+/**
+ * Usually invoked by the keyManager, inputs a character via a ViCommand.
+ */
+- (BOOL)input_character:(ViCommand *)command;
+
 /** @name Caret handling */
 
 /** Set the location of the caret.
@@ -307,12 +312,14 @@
 - (void)enclosingFrameDidChange:(NSNotification *)notification;
 - (NSFont *)font;
 - (void)setTheme:(ViTheme *)aTheme;
+- (void)setWrapping:(BOOL)flag duringInit:(BOOL)isDuringInit;
 - (void)setWrapping:(BOOL)flag;
 - (void)setPageGuide:(NSInteger)pageGuideValue;
 - (void)drawPageGuideInRect:(NSRect)rect;
 - (void)rulerView:(NSRulerView *)aRulerView
   selectFromPoint:(NSPoint)fromPoint
           toPoint:(NSPoint)toPoint;
+- (void)toggleFoldAtPoint:(NSPoint)aPoint;
 
 - (NSRange)rangeOfPattern:(NSString *)pattern
 	     fromLocation:(NSUInteger)start
@@ -450,7 +457,7 @@
 @interface ViTextView (syntax)
 @end
 
-@interface ViTextView (vi_commands)
+@interface ViTextView (vi_commands) <ViCompletionDelegate>
 - (BOOL)filterRange:(NSRange)range throughCommand:(NSString *)shellCommand;
 - (BOOL)insert:(ViCommand *)command;
 - (BOOL)move_left:(ViCommand *)command;
@@ -471,6 +478,10 @@
 		fromProvider:(id<ViCompletionProvider>)provider
 		   fromRange:(NSRange)range
 		     options:(NSString *)options;
+- (void)hideCompletionWindow;
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(ViCompletion *)selectedCompletion;
 - (BOOL)complete_keyword:(ViCommand *)command;
 - (BOOL)complete_path:(ViCommand *)command;
 - (BOOL)complete_buffer:(ViCommand *)command;

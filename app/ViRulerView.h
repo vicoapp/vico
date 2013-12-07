@@ -23,20 +23,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ViFoldMarginView.h"
+#import "ViLineNumberView.h"
+
 @interface ViRulerView : NSRulerView
 {
-	NSDictionary		*_textAttributes;
-	NSColor			*_backgroundColor;
-	NSPoint			 _fromPoint;
-	NSImage			*_digits[10];
-	NSSize			 _digitSize;
+	NSColor				*_backgroundColor;
 
-	BOOL				 _relative;
+    ViLineNumberView    *_lineNumberView;
+    ViFoldMarginView    *_foldMarginView;
 }
 
-- (void)setRelative:(BOOL)flag;
+- (void)setRelativeLineNumbers:(BOOL)flag;
 
 - (id)initWithScrollView:(NSScrollView *)aScrollView;
+
 - (void)resetTextAttributes;
 
 @end

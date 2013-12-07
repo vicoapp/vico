@@ -32,6 +32,7 @@
 
 @class ViTextView;
 @class ExCommand;
+@class ViFold;
 
 /** A document.
  */
@@ -207,6 +208,38 @@
 
 - (void)registerMark:(ViMark *)mark;
 - (void)unregisterMark:(ViMark *)mark;
+
+/** @name Dealing with manual folds */
+- (void)createFoldForRange:(NSRange)range;
+/** Closes the deepest fold at the given location, and recursively up +levels+ parent folds.
+ *
+ * @returns The range of the closed fold.
+ */
+- (NSRange)closeFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels;
+/** Opens the deepest fold at the given location, and recursively up +levels+ parent folds.
+ *
+ * @returns the range of the opened fold.
+ */
+- (NSRange)openFoldAtLocation:(NSUInteger)aLocation levels:(NSUInteger)levels;
+/** Toggles the deepest fold at the given location, closing it if it is
+ * open and opening it if it is closed.
+ */
+- (void)toggleFoldAtLocation:(NSUInteger)aLocation;
+/**
+ * Look up a fold by location in the text.
+ *
+ * Returns nil if there is no fold at that location.
+ */
+- (ViFold *)foldAtLocation:(NSUInteger)aLocation;
+/**
+ * Look up a fold range by location in the text.
+ *
+ * If the location has a fold, returns a range whose location is the
+ * first character of the first line of the fold and whose length is
+ * through the first character of the last line of the fold.
+ * Returns NSRange(NSNotFound,-1) if there is no fold at that location.
+ */
+- (NSRange)foldRangeAtLocation:(NSUInteger)aLocation;
 
 - (void)associateView:(ViViewController *)viewController forKey:(NSString *)key;
 - (NSSet *)associatedViewsForKey:(NSString *)key;

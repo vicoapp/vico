@@ -74,7 +74,7 @@ TAILQ_HEAD(skiplist, skip);
 }
 
 - (NSString *)string;
-- (NSDictionary *)attributesAtIndex:(unsigned)anIndex
+- (NSDictionary *)attributesAtIndex:(NSUInteger)anIndex
                      effectiveRange:(NSRangePointer)aRange;
 - (void)replaceCharactersInRange:(NSRange)aRange
                       withString:(NSString *)str;

@@ -333,7 +333,7 @@ wchar_t **reformat(
   dummy.next = dummy.prev = NULL;
   dummy.flags = 0;
   head = tail = &dummy;
-  numin = endline - inlines;
+  numin = (int)(endline - inlines);
   if (numin <= 0) {
     swprintf(errmsg,errmsg_size,impossibility,4);
     goto rfcleanup;
@@ -383,7 +383,7 @@ wchar_t **reformat(
       w1->prev = tail;
       tail = tail->next = w1;
       w1->chrs = p1;
-      w1->length = p2 - p1;
+      w1->length = (int)(p2 - p1);
       w1->width = getWidth(p1, p2);
       w1->flags = 0;
       p1 = p2;

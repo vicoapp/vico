@@ -24,12 +24,24 @@
  */
 
 #import "ViLayoutManager.h"
+#import "ViGlyphGenerator.h"
+#import "ViTypesetter.h"
 #import "ViThemeStore.h"
 #include "logging.h"
 
 @implementation ViLayoutManager
 
 @synthesize invisiblesAttributes = _invisiblesAttributes;
+
+- (ViLayoutManager *)init
+{
+	if (self = [super init]) {
+		self.glyphGenerator = [[ViGlyphGenerator alloc] init];
+		self.typesetter = [[ViTypesetter alloc] init];
+	}
+
+	return self;
+}
 
 - (void)setInvisiblesAttributes:(NSDictionary *)attributes
 {

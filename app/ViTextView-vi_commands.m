@@ -202,7 +202,6 @@
 - (BOOL)reposition:(ViCommand *)command anchor:(int)anchor keepColumn:(BOOL)keepColumn
 {
 	NSScrollView *scrollView = [self enclosingScrollView];
-	NSClipView *clipView = [scrollView contentView];
 
 	NSUInteger topLine;
 	if (command.count == 0) {
@@ -223,26 +222,26 @@
 
 	NSRange topLineGlyphRange = [[self layoutManager] glyphRangeForCharacterRange:NSMakeRange(topLineLocation, 1)
 								 actualCharacterRange:NULL];
-	NSRect rect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange
+	NSRect glyphRect = [[self layoutManager] boundingRectForGlyphRange:topLineGlyphRange
 						      inTextContainer:[self textContainer]];
-	NSRect bounds = [clipView bounds];
+	NSRect visibleRect = [self visibleRect];
+
 	NSPoint p;
-	p.x = bounds.origin.x;
+	p.x = glyphRect.origin.x;
 
 	if (anchor == 0) /* top */
-		p.y = rect.origin.y;
+		p.y = glyphRect.origin.y;
 	else if (anchor == 1) /* bottom */
-		p.y = NSMaxY(rect) - bounds.size.height;
+		p.y = NSMaxY(glyphRect) - visibleRect.size.height;
 	else if (anchor == 2) /* middle */
-		p.y = rect.origin.y + rect.size.height / 2.0 - bounds.size.height / 2.0;
+		p.y = glyphRect.origin.y + glyphRect.size.height / 2.0 - visibleRect.size.height / 2.0;
 	else
 		p.y = 0;
 
 	if (p.y < 0)
 		p.y = 0;
 
-	[clipView scrollToPoint:p];
-	[scrollView reflectScrolledClipView:clipView];
+	[self scrollPoint:p];
 
 	[[scrollView verticalRulerView] setNeedsDisplay:YES];
 
@@ -1515,8 +1514,8 @@
 /* syntax: o */
 - (BOOL)open_line_below:(ViCommand *)command
 {
-	[self getLineStart:NULL end:NULL contentsEnd:&end_location];
-	end_location = [self insertNewlineAtLocation:end_location indentForward:YES];
+	[self getLineStart:NULL end:&end_location contentsEnd:NULL];
+	end_location = [self insertNewlineAtLocation:end_location indentForward:NO];
  	final_location = end_location;
 
 	[self setInsertMode:command];
@@ -2528,6 +2527,73 @@
 }
 
 #pragma mark -
+#pragma mark Folding
+
+/* syntax: zf[motion] */
+/* syntax: [visual]zf */
+/* syntax: [count]zF */
+- (BOOL)fold_range:(ViCommand *)command
+{
+	final_location = start_location;
+
+	[document createFoldForRange:affectedRange];
+
+	return YES;
+}
+
+/* syntax: zc */
+- (BOOL)close_fold:(ViCommand *)command
+{
+	// If no count was provided by the user, we only close one level.
+	NSUInteger levelsToClose = command.count ? command.count : 1;
+	NSRange foldRange = [document closeFoldAtLocation:start_location levels:levelsToClose];
+
+	if (foldRange.location != NSNotFound) {
+		final_location = foldRange.location;
+
+		return YES;
+	} else {
+		return NO;
+	}
+}
+
+/* syntax: [count]zo */
+- (BOOL)open_fold:(ViCommand *)command
+{
+	// If no count was provided by the user, we only open one level.
+	NSUInteger levelsToOpen = command.count ? command.count : 1;
+	NSRange foldRange = [document openFoldAtLocation:start_location levels:levelsToOpen];
+
+	return foldRange.location != NSNotFound;
+}
+
+/* syntax: [count][z */
+- (BOOL)move_to_fold_start:(ViCommand *)command
+{
+	return [self moveToFoldAtLocation:[self caret] start:YES];
+}
+
+- (BOOL)move_to_fold_end:(ViCommand *)command
+{
+	return [self moveToFoldAtLocation:[self caret] start:NO];
+}
+
+- (BOOL)moveToFoldAtLocation:(NSUInteger)aLocation start:(BOOL)foldStart
+{
+	NSRange foldRange = [document foldRangeAtLocation:aLocation];
+
+	if (foldRange.location == NSNotFound) {
+		final_location = start_location;
+
+		return NO;
+	} else {
+		final_location = foldStart ? foldRange.location : NSMaxRange(foldRange);
+
+		return YES;
+	}
+}
+
+#pragma mark -
 #pragma mark Text Objects
 
 /* If on a word (letters, numbers, underscore): select the word
@@ -3142,41 +3208,80 @@ again:
 
 	BOOL fuzzyTrigger = ([options rangeOfString:@"F"].location != NSNotFound);
 
-	
-
 	/* Present a list to choose from. */
 	NSRect prefixBoundingRect = [[self layoutManager] boundingRectForGlyphRange:NSMakeRange([self caret] - string.length, 1) 
 														  inTextContainer:[self textContainer]];
 	NSRect prefixWindowRect = [self convertRect:prefixBoundingRect toView:nil];
-	NSRect prefixScreenRect = [self.window convertRectToScreen:prefixWindowRect];
 
-	_showingCompletionWindow = YES;
+	_showingCompletionWindow =
+	  [[ViCompletionController sharedController] chooseFrom:provider
+										  range:range
+										 prefix:fuzzyTrigger ? nil : string
+							   prefixWindowRect:prefixWindowRect
+									  forWindow:[self window]
+									   delegate:self
+										options:options
+								  initialFilter:fuzzyTrigger ? string : nil];
 
-	ViCompletionController *cc = [ViCompletionController sharedController];
-	ViCompletion *completion = [cc chooseFrom:provider
-										range:range
-									   prefix:fuzzyTrigger ? nil : string
-							 prefixScreenRect:prefixScreenRect
-									 delegate:self
-						   existingKeyManager:self.keyManager
-									  options:options
-								initialFilter:fuzzyTrigger ? string : nil];
+	if (_showingCompletionWindow) {
+		if ([self isFieldEditor])
+			[_keyManager.parser setMap:[ViMap mapWithName:@"exCommandCompletionMap"]];
+		else
+			[_keyManager.parser setMap:[ViMap completionMap]];
+	}
 
+	return _showingCompletionWindow;
+}
+
+- (BOOL)cancel_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] cancel:command];
+}
+- (BOOL)accept_completion:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept:command];
+}
+- (BOOL)accept_completion_or_complete_partially:(ViCommand *)command
+{
+	return [[ViCompletionController sharedController] accept_or_complete_partially:command];
+}
+- (BOOL)accept_completion_if_not_autocompleting:(ViCommand *)command
+{
+	BOOL result = [[ViCompletionController sharedController] accept_if_not_autocompleting:command];
+
+	[self input_character:command];
+
+	return result;
+}
+
+- (void)hideCompletionWindow
+{
+	[[ViCompletionController sharedController] cancel:nil];
+}
+
+
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(ViCompletion *)completion
+{
 	_showingCompletionWindow = NO;
 
-	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(cc.range));
+	if (mode == ViInsertMode && ! [self isFieldEditor]) {
+		[_keyManager.parser setMap:[ViMap insertMap]];
+	}
+
+	DEBUG(@"completion controller returned [%@] in range %@", completion, NSStringFromRange(completionController.range));
 	if (completion) {
-		NSString *completingString = [completion.content substringWithRange:NSMakeRange(cc.range.length, completion.content.length - cc.range.length)];
+		NSRange completionRange = completionController.range;
+		// FIXME This should replace the entire completion range with the
+		// FIXME selected completion.
+		NSString *completingString = [completion.content substringWithRange:NSMakeRange(completionRange.length, completion.content.length - completionRange.length)];
 
 		// We are basically replaying input here, because this is in no way literal input.
 		virtualInput = YES;
-		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(range)]];
+		[[self keyManager] handleKeys:[completingString keyCodes] inScope:[document scopeAtLocation:NSMaxRange(completionRange)]];
 		virtualInput = NO;
 	}
-
-	if (completion == nil)
-		return NO;
-	return YES;
 }
 
 - (void)removeFromInputKeys:(ViCommand *)command

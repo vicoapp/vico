@@ -39,6 +39,10 @@
 @class ViCompletionController;
 
 @protocol ViCompletionDelegate <NSObject>
+- (void)completionController:(ViCompletionController *)completionController
+         didTerminateWithKey:(NSInteger)keyCode
+          selectedCompletion:(ViCompletion *)selectedCompletion;
+
 @optional
 - (BOOL)completionController:(ViCompletionController *)completionController
        shouldTerminateForKey:(NSInteger)keyCode;
@@ -61,13 +65,12 @@
 	ViCompletion			*_onlyCompletion;
 	NSMutableArray			*_filteredCompletions;
 	ViCompletion			*_selection;
-	ViKeyManager		 	*_existingKeyManager;
 	NSMutableString			*_filter;
 	// NSMutableParagraphStyle	*_matchParagraphStyle;
 	id<ViCompletionDelegate>	 __unsafe_unretained _delegate;
 	NSInteger			 _terminatingKey;
 	NSRange				 _range;
-	NSRect				 _prefixScreenRect;
+	NSRect				 _prefixWindowRect;
 	BOOL				 _upwards;
 	BOOL				 _fuzzySearch;
 	BOOL				 _autocompleting;
@@ -76,31 +79,35 @@
 
 @property (unsafe_unretained, nonatomic, readonly) id<ViCompletionDelegate> delegate;
 @property (nonatomic, readonly) NSWindow *window;
+@property (nonatomic, readonly) ViCompletionView *completionView;
 @property (nonatomic, readwrite, strong) NSArray *completions;
 @property (nonatomic, readonly) NSInteger terminatingKey;
 @property (nonatomic, readonly) NSRange range;
 @property (nonatomic, readwrite, strong) NSString *filter;
 
-+ (id)sharedController;
++ (ViCompletionController *)sharedController;
 + (NSString *)commonPrefixInCompletions:(NSArray *)completions;
 + (void)appendFilter:(NSString *)string
            toPattern:(NSMutableString *)pattern
           fuzzyClass:(NSString *)fuzzyClass;
 
-- (ViCompletion *)chooseFrom:(id<ViCompletionProvider>)aProvider
-                       range:(NSRange)aRange
-                      prefix:(NSString *)aPrefix
-            prefixScreenRect:(NSRect)prefixRect
-                    delegate:(id<ViCompletionDelegate>)aDelegate
-          existingKeyManager:(ViKeyManager *)existingKeyManager
-                     options:(NSString *)optionString
-               initialFilter:(NSString *)initialFilter;
+- (BOOL)chooseFrom:(id<ViCompletionProvider>)aProvider
+             range:(NSRange)aRange
+            prefix:(NSString *)aPrefix
+  prefixWindowRect:(NSRect)prefixRect
+         forWindow:(NSWindow *)parentWindow
+          delegate:(id<ViCompletionDelegate>)aDelegate
+           options:(NSString *)optionString
+     initialFilter:(NSString *)initialFilter;
 
-- (void)updateBounds;
 - (void)filterCompletions;
 - (BOOL)complete_partially:(ViCommand *)command;
 - (void)acceptByKey:(NSInteger)termKey;
 - (BOOL)cancel:(ViCommand *)command;
+- (BOOL)accept:(ViCommand *)command;
+- (BOOL)accept_or_complete_partially:(ViCommand *)command;
+- (BOOL)accept_if_not_autocompleting:(ViCommand *)command;
+- (BOOL)accept_or_complete_partially:(ViCommand *)command;
 - (void)updateCompletions;
 - (void)reset;
 

@@ -44,7 +44,7 @@
 	else if (fuzzyTrigger)
 		[ViCompletionController appendFilter:word toPattern:pattern fuzzyClass:@"."];
 	else
-		pattern = [NSString stringWithFormat:@"^%@.*", word];
+		pattern = [NSMutableString stringWithFormat:@"^%@.*", word];
 
 	unsigned rx_options = ONIG_OPTION_IGNORECASE;
 	ViRegexp *rx = [ViRegexp regexpWithString:pattern options:rx_options];

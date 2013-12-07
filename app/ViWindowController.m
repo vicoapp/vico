@@ -40,6 +40,7 @@
 #import "ViLayoutManager.h"
 #import "ExTextField.h"
 #import "ViEventManager.h"
+#import "ViRulerView.h"
 #import "NSURL-additions.h"
 #import "ExCommand.h"
 #import "ViError.h"
@@ -1886,17 +1887,91 @@ extern BOOL __makeNewWindowInsteadOfTab;
 	[self moveCurrentViewToNewWindow];
 }
 
-- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(id)aView
+- (BOOL)selectViewAtPosition:(ViViewOrderingMode)position relativeTo:(ViViewController *)viewController
 {
-	ViViewController *viewController, *otherViewController;
-	if ([aView respondsToSelector:@selector(tabController)])
-		viewController = aView;
-	else
-		viewController = [self viewControllerForView:aView];
-	otherViewController = [[viewController tabController] viewAtPosition:position
-								  relativeTo:[viewController view]];
+	ViTabController *tabController = viewController.tabController;
+	NSView *hitView = nil;
+
+	if ([viewController isKindOfClass:[ViDocumentView class]]) {
+		ViDocumentView *documentView = (ViDocumentView *)viewController;
+		ViTextView *currentView = [documentView textView];
+		NSScrollView *scrollView = [currentView enclosingScrollView];
+		NSUInteger caret = [currentView caret];
+		NSRect caretRect = [currentView firstRectForCharacterRange:NSMakeRange(caret, 1)
+													   actualRange:NULL];
+
+		CGSize currentViewSize = scrollView.frame.size;
+
+		NSPoint referencePoint =
+		  [scrollView convertPoint:NSMakePoint(
+									   caretRect.origin.x + (caretRect.size.width / 2),
+									   caretRect.origin.y + (caretRect.size.height / 2)
+								   )
+						  fromView:nil];
+
+		// Constrain the point to be within the visible area of the scroll view. We
+		// add a slight margin off of the edges so that we're landing on text views
+		// when we start shifting the reference points based on which direction we
+		// want to move.
+		referencePoint.x = MIN(MAX(referencePoint.x, 10), scrollView.frame.size.width - 10);
+		referencePoint.y = MIN(MAX(referencePoint.y, 10), scrollView.frame.size.height - 10);
+
+		NSInteger offsetStep = 40;
+		NSInteger offsetCount = 0;
+
+		do {
+		  offsetCount++;
+		  NSInteger offset = offsetStep * offsetCount;
+
+		  if (position == ViViewUp) {
+			  referencePoint.y = -1 * offset;
+		  } else if (position == ViViewDown) {
+			  referencePoint.y = currentViewSize.height + offset;
+		  } else if (position == ViViewLeft) {
+			  referencePoint.x = -1 * offset;
+		  } else if (position == ViViewRight) {
+			  referencePoint.x = currentViewSize.width + offset;
+		  }
+
+		  NSPoint splitViewReferencePoint =
+			[tabController.view.superview convertPoint:referencePoint
+											  fromView:scrollView];
+
+		  hitView = [tabController.view hitTest:splitViewReferencePoint];
+
+		  // If we landed on a split view, that means we're moving along a split
+		  // view divider. We add some jitter in the appropriate direction to shift
+		  // off of that divider.
+		  //
+		  // Additionally, if we're moving up or down and hit one of the ruler view
+		  // classes, we push the reference point's x coordinate right so that we end
+		  // up off of the ruler view and on the text view.
+		  if ([hitView isKindOfClass:[NSSplitView class]]) {
+			  if (position == ViViewUp || position == ViViewDown) {
+				  referencePoint.x += 10;
+			  } else if (position == ViViewLeft || position == ViViewRight) {
+				  referencePoint.y += 10;
+			  }
+		  } else if ([hitView isKindOfClass:[ViRulerView class]]) {
+			  hitView = [[[(ViRulerView *)hitView scrollView] contentView] documentView];
+		  } else if ([[hitView superview] isKindOfClass:[ViRulerView class]]) {
+			  hitView = [[[(ViRulerView *)[hitView superview] scrollView] contentView] documentView];
+		  }
+		} while (hitView && ! [hitView isKindOfClass:[ViTextView class]]);
+	}
+
+	ViViewController *otherViewController = nil;
+	if ([hitView isKindOfClass:[ViTextView class]]) {
+		otherViewController = [viewController.tabController viewWithTextView:(ViTextView *)hitView];
+	}
+	if (otherViewController == nil) {
+		otherViewController = [[viewController tabController] viewAtPosition:position
+																  relativeTo:viewController.view];
+	}
+
 	if (otherViewController == nil)
 		return NO;
+
 	[self selectDocumentView:otherViewController];
 	return YES;
 }

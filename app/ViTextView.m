@@ -39,6 +39,7 @@
 #import "NSScanner-additions.h"
 #import "NSEvent-keyAdditions.h"
 #import "ViError.h"
+#import "ViFold.h"
 #import "ViRegisterManager.h"
 #import "ViLayoutManager.h"
 #import "NSView-additions.h"
@@ -410,6 +411,15 @@ DEBUG_FINALIZE();
 	[self setVisualSelection];
 }
 
+- (void)toggleFoldAtPoint:(NSPoint)aPoint
+{
+	NSInteger index = [self characterIndexForInsertionAtPoint:aPoint];
+
+	if (index != NSNotFound) {
+		[document toggleFoldAtLocation:index];
+	}
+}
+
 - (void)copy:(id)sender
 {
 	if ([self isFieldEditor]) {
@@ -491,11 +501,45 @@ DEBUG_FINALIZE();
 			*end_ptr = 0;
 		if (eol_ptr != NULL)
 			*eol_ptr = 0;
-	} else
-		[[[self textStorage] string] getLineStart:bol_ptr
-		                                      end:end_ptr
-		                              contentsEnd:eol_ptr
-		                                 forRange:NSMakeRange(aLocation, 0)];
+	} else {
+		NSDictionary *attributesAtLocation =
+			[self.textStorage attributesAtIndex:aLocation effectiveRange:NULL];
+
+		NSRange closedRange = NSMakeRange(NSNotFound, 0);
+		if (attributesAtLocation[ViFoldedAttributeName]) {
+			[self.textStorage attribute:ViFoldedAttributeName
+								atIndex:aLocation
+				  longestEffectiveRange:&closedRange
+								inRange:NSMakeRange(0, [self.textStorage length])];
+		} else if (attributesAtLocation[NSAttachmentAttributeName]) {
+			if (aLocation + 1 < [self.textStorage length]) {
+				[self.textStorage attribute:ViFoldedAttributeName
+									atIndex:aLocation + 1
+					  longestEffectiveRange:&closedRange
+									inRange:NSMakeRange(0, [self.textStorage length])];
+			}
+		}
+
+		if (closedRange.location != NSNotFound) {
+			// The folded range excludes the first character (which
+			// has NSAttachmentAttributeName instead) and the last
+			// newline in the fold.
+			if (bol_ptr) {
+				*bol_ptr = closedRange.location - 1;
+			}
+			if (end_ptr) {
+				*end_ptr = NSMaxRange(closedRange) + 1;
+			}
+			if (eol_ptr) {
+				*eol_ptr = NSMaxRange(closedRange);
+			}
+		} else {
+			[[[self textStorage] string] getLineStart:bol_ptr
+												  end:end_ptr
+										  contentsEnd:eol_ptr
+											 forRange:NSMakeRange(aLocation, 0)];
+		}
+	}
 }
 
 - (void)getLineStart:(NSUInteger *)bol_ptr
@@ -598,12 +642,37 @@ DEBUG_FINALIZE();
 
 	if (undoGroup)
 		[self beginUndoGroup];
+	
+	ViFold *foldAtInsertion = nil;
+	ViFold *foldBeforeInsertion = nil;
+	char characterBeforeInsertion = '\0';
+	if ([aString length] > 0 && aRange.location < [self.textStorage length]) {
+		foldAtInsertion = [document foldAtLocation:aRange.location];
+		
+		if (aRange.location > 0) {
+			foldBeforeInsertion = [document foldAtLocation:aRange.location - 1];
+			characterBeforeInsertion = [[self.textStorage string] characterAtIndex:aRange.location - 1];
+		} else {
+			foldBeforeInsertion = foldAtInsertion;
+		}
+	}
 
 	[self recordReplacementOfRange:aRange withLength:[aString length]];
 	[[self textStorage] replaceCharactersInRange:aRange withString:aString];
 	NSRange r = NSMakeRange(aRange.location, [aString length]);
+
 	[[self textStorage] setAttributes:[self typingAttributes]
 	                            range:r];
+
+	// We use the fold at the insertion point if we're inserting something other
+	// than a new line (or set of lines) after the end of an existing line. Otherwise,
+	// we use the fold before the insertion point.
+	if (characterBeforeInsertion == '\n' && [aString characterAtIndex:[aString length] - 1] != '\n' && foldAtInsertion) {
+		[self.textStorage addAttribute:ViFoldAttributeName value:foldAtInsertion range:r];
+	} else if (foldBeforeInsertion) {
+		[self.textStorage addAttribute:ViFoldAttributeName value:foldBeforeInsertion range:r];
+	}
+
 	[[self document] setMark:'.' atLocation:aRange.location];
 	[self autoNewline];
 }
@@ -1491,7 +1560,29 @@ replaceCharactersInRange:(NSRange)aRange
 		length--;
 	if (location > length)
 		location = IMAX(0, length);
+
 	NSInteger delta = ABS(caret - location);
+
+	NSDictionary *attributesAtStart = 
+		[self.textStorage attributesAtIndex:caret effectiveRange:NULL];
+	NSDictionary *attributesAtEnd = 
+		[self.textStorage attributesAtIndex:location effectiveRange:NULL];
+
+	if (attributesAtStart[NSAttachmentAttributeName] &&
+			attributesAtEnd[ViFoldedAttributeName] &&
+			closestCommonParentFold(attributesAtStart[ViFoldAttributeName],
+									attributesAtEnd[ViFoldAttributeName])) {
+		ViFold *foldAtEnd = attributesAtEnd[ViFoldAttributeName];
+		// If there's any movement from the first character in the fold
+		// to another character in the fold, open the fold.
+		[document openFoldAtLocation:location
+							  levels:foldAtEnd.depth];
+	} else if (attributesAtEnd[ViFoldedAttributeName]) {
+		// If we're landing in a fold, the caret goes to the first character
+		// in the fold.
+		[self getLineStart:&location end:NULL contentsEnd:NULL forLocation:location];
+	}
+
 	caret = location;
 	if (updateSelection && mode != ViVisualMode)
 		[self setSelectedRange:NSMakeRange(location, 0)];
@@ -1505,9 +1596,8 @@ replaceCharactersInRange:(NSRange)aRange
 	initial_line = -1;
 	[self setInitialFindPattern:nil];
 
-	if (delta > 1 && [[self preference:@"autocomplete"] integerValue]) {
-		ViCompletionController *controller = [ViCompletionController sharedController];
-		[controller cancel:nil];
+	if (delta > 1 && _showingCompletionWindow) {
+		[self hideCompletionWindow];
 	}
 }
 
@@ -1810,31 +1900,21 @@ replaceCharactersInRange:(NSRange)aRange
 			atLocation:start_location];
 
 		final_location = modify_start_location + 1;
+		DEBUG(@"setting final location to %lu", final_location);
 
-		if (! replayingInput && ! virtualInput && ! [self isFieldEditor] && [[self preference:@"autocomplete"] integerValue]) {
+		if (! _showingCompletionWindow &&
+		    ! replayingInput && ! virtualInput &&
+		    ! [self isFieldEditor] &&
+		    [[self preference:@"autocomplete"] integerValue]) {
 		  NSRange wordRange;
 		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
-			  // Update the caret before we present the completion dialog.
-			  // Otherwise it won'tupdate until the first thing typed into the
-			  // completion dialog.
-			  [self setCaret:final_location];
-
-			  BOOL completed =
-				[self presentCompletionsOf:word
-					  fromProvider:[[ViWordCompletion alloc] init]
-						fromRange:wordRange
-						  options:@"C?"];
-
-			  final_location = [self caret];
-
-			  // If we didn't do anything further, no need to smartindent or
-			  // anything.
-			  if (! completed)
-				  return;
+			  [self presentCompletionsOf:word
+					fromProvider:[[ViWordCompletion alloc] init]
+					  fromRange:wordRange
+						options:@"C?"];
 		  }
 		}
-		DEBUG(@"setting final location to %lu", final_location);
 	}
 
 	if ([[self preference:@"smartindent" atLocation:start_location] integerValue]) {
@@ -2089,11 +2169,6 @@ replaceCharactersInRange:(NSRange)aRange
 		start_location = end_location = [self caret];
 		[[self document] setMark:'^' atLocation:start_location];
 		[self move_left:nil];
-
-		// When leaving insert mode, if the completion window was up, close it.
-		ViCompletionController *completionController = [ViCompletionController sharedController];
-		if (completionController.delegate == self)
-			[completionController cancel:nil];
 	}
 
 	final_location = [self removeTrailingAutoIndentForLineAtLocation:end_location];
@@ -2104,14 +2179,37 @@ replaceCharactersInRange:(NSRange)aRange
 	[self setCaret:final_location];
 	[self resetSelection];
 
+	// When leaving insert mode, if the completion window was up, close it.
+	// Note: we do this after we `setNormalMode`, because the act of detecting
+	// the <esc> key resets the parser into normal mode. If we cancel the
+	// completion window before the `mode` instance variable has been updated
+	// accordingly, completionController:didTerminateWithKey:completion: will
+	// try to reset the parser map to the insert map from the completion map,
+	// thus leaving the parser in insert mode instead of normal mode. Yikes!
+	if (_showingCompletionWindow)
+		[self hideCompletionWindow];
+
 	return YES;
+}
+
+- (id)targetForSelector:(SEL)action
+{
+	id target = [super targetForSelector:action];
+
+	// If the completion window is up and the text view couldn't handle this
+	// action, see if the completion window can.
+	if (! target && _showingCompletionWindow) {
+		target = [[ViCompletionController sharedController].completionView targetForSelector:action];
+	}
+
+	return target;
 }
 
 - (BOOL)keyManager:(ViKeyManager *)keyManager
    evaluateCommand:(ViCommand *)command
 {
 	DEBUG(@"eval command %@ from key sequence %@", command, [NSString stringWithKeySequence:command.keySequence]);
-	if (mode == ViInsertMode && !replayingInput && command.action != @selector(normal_mode:)) {
+	if (mode == ViInsertMode && !replayingInput && ! command.isExcludedFromDot) {
 		/* Add the key to the input replay queue. */
 		[_inputKeys addObjectsFromArray:command.keySequence];
 	}
@@ -2245,6 +2343,9 @@ replaceCharactersInRange:(NSRange)aRange
 		leaveVisualMode = YES;
 	}
 
+	// Need to know if the completion was showing *before* we ran the command.
+	BOOL completionWasShowing = _showingCompletionWindow;
+
 	DEBUG(@"perform command %@", command);
 	DEBUG(@"start_location = %u", start_location);
 	BOOL ok = [command performWithTarget:target];
@@ -2292,6 +2393,14 @@ replaceCharactersInRange:(NSRange)aRange
 			[self scrollToCaret];
 	} else
 		[self updateCaret];
+
+	// We still want to forward commands defined on ViTextView to the
+	// completion controller when it's up, but we don't want double handling
+	// when the ViTextView didn't handle the keystroke (say, as with backspace).
+	ViCompletionController *completionController = [ViCompletionController sharedController];
+	if (completionWasShowing && target != completionController) {
+		[completionController keyManager:keyManager evaluateCommand:command];
+	}
 
 	if (mode == ViVisualMode)
 		[self setVisualSelection];
@@ -2416,8 +2525,15 @@ replaceCharactersInRange:(NSRange)aRange
 
 		if (mode == ViVisualMode)
 			[_keyManager.parser setVisualMap];
-		else if (mode == ViInsertMode)
-			[_keyManager.parser setInsertMap];
+		else if (mode == ViInsertMode) {
+			if (_showingCompletionWindow) {
+				[_keyManager.parser setMap:[ViMap completionMap]];
+			} else {
+				[_keyManager.parser setInsertMap];
+			}
+		}
+	} else if (! _keyManager.parser.partial && [self isFieldEditor] && _showingCompletionWindow) {
+		[_keyManager.parser setMap:[ViMap mapWithName:@"exCommandCompletionMap"]];
 	}
 
 	return [NSNumber numberWithBool:YES];
@@ -2520,6 +2636,33 @@ replaceCharactersInRange:(NSRange)aRange
 	[self setHorizontallyResizable:!enabled];
 	[self setVerticallyResizable:YES];
 	[self setAutoresizingMask:(enabled ? NSViewWidthSizable : NSViewNotSizable)];
+}
+
+- (void)enableWrapping
+{
+	[self setWrapping:YES];
+}
+
+- (void)setWrapping:(BOOL)enabled duringInit:(BOOL)isDuringInit
+{
+	if (enabled && isDuringInit) {
+		// Wait until the next runloop cycle to enable wrapping. We do this to
+		// let the layout settle. Enabling the ruler on the scroll view will
+		// always set the layout in such a way as to let us get the clip view's
+		// size properly. However, if line numbers are off, the ruler is not
+		// enabled, and therefore the scroll view doesn't compute the clip
+		// view's size properly or something. So, we wait for the next cycle
+		// so all our numbers are correct.
+		//
+		// Observed issues when this isn't the case include the rendered text
+		// being truncated horizontally or vertically, even though the cursor
+		// can still move freely throughout the text. This only happens with
+		// word wrapping on and line numbers off. See issue #62
+		// (https://github.com/vicoapp/vico/issues/62).
+		[self performSelector:@selector(enableWrapping) withObject:nil afterDelay:0];
+	} else {
+		[self setWrapping:enabled];
+	}
 }
 
 - (void)setTheme:(ViTheme *)aTheme

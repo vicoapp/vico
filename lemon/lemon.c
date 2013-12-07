@@ -1633,13 +1633,13 @@ static char *msort(
     list = NEXT(list);
     NEXT(ep) = 0;
     for(i=0; i<LISTSIZE-1 && set[i]!=0; i++){
-      ep = merge(ep,set[i],cmp,offset);
+      ep = merge(ep,set[i],cmp,(int)offset);
       set[i] = 0;
     }
     set[i] = ep;
   }
   ep = 0;
-  for(i=0; i<LISTSIZE; i++) if( set[i] ) ep = merge(ep,set[i],cmp,offset);
+  for(i=0; i<LISTSIZE; i++) if( set[i] ) ep = merge(ep,set[i],cmp,(int)offset);
   return ep;
 }
 /************************ From the file "option.c" **************************/
@@ -1776,18 +1776,18 @@ FILE *err;
         if( *end ){
           if( err ){
             fprintf(err,"%sillegal character in floating-point argument.\n",emsg);
-            errline(i,((unsigned long)end)-(unsigned long)argv[i],err);
+            errline(i,(int)(((unsigned long)end)-(unsigned long)argv[i]),err);
           }
           errcnt++;
         }
         break;
       case OPT_INT:
       case OPT_FINT:
-        lv = strtol(cp,&end,0);
+        lv = (int)strtol(cp,&end,0);
         if( *end ){
           if( err ){
             fprintf(err,"%sillegal character in integer argument.\n",emsg);
-            errline(i,((unsigned long)end)-(unsigned long)argv[i],err);
+            errline(i,(int)(((unsigned long)end)-(unsigned long)argv[i]),err);
           }
           errcnt++;
         }
@@ -2517,7 +2517,7 @@ struct lemon *gp;
     return;
   }
   fseek(fp,0,2);
-  filesize = ftell(fp);
+  filesize = (int)ftell(fp);
   rewind(fp);
   filebuf = (char *)malloc( filesize+1 );
   if( filebuf==0 ){

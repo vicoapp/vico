@@ -80,7 +80,7 @@ static int hexdigtoint(wchar_t c)
   if (!c) return -1;
   p = wcschr(hexdigits, c);
   if (!p) return -1;
-  n = p - hexdigits;
+  n = (int)(p - hexdigits);
   if (n >= 16) n -= 6;
   return n;
 

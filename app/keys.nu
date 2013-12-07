@@ -13,7 +13,8 @@
       (emap (ViMap explorerMap))
       (smap (ViMap symbolMap))
       (xmap (ViMap mapWithName:"exCommandMap"))
-      (cmap (ViMap completionMap)))
+      (cmap (ViMap completionMap))
+      (xcmap (ViMap mapWithName:"exCommandCompletionMap")))
 
 ;; arrow motions, also valid in insert mode
 (amap setKey:"<right>" toMotion:"move_right_and_wrap:")
@@ -79,8 +80,8 @@
 (imap setKey:"<c-x><c-n>" toAction:"complete_keyword:" flags:0 parameter:"pf" scope:nil)
 (imap setKey:"<c-x><c-f>" toAction:"complete_path:" flags:0 parameter:"p" scope:nil) ; p parameter automatically inserts common prefix
 (imap setKey:"<c-p>" toAction:"complete_keyword:" flags:0 parameter:"d" scope:nil)  ; d parameter sorts descending
-(imap setKey:"<Esc>" toAction:"normal_mode:")
-(imap setKey:"<ctrl-c>" toAction:"normal_mode:")
+(imap setKey:"<Esc>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(imap setKey:"<ctrl-c>" toAction:"normal_mode:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
 (imap setKey:"<Del>" toAction:"input_forward_delete:")
 (imap map:"<cmd-v>" to:"<ctrl-r>*")
 (imap map:"<cmd-z>" to:"<esc>u")
@@ -144,7 +145,8 @@
 (mmap setKey:"`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
 (mmap setKey:"g'" toMotion:"move_to_mark:" flags:(| ViMapNeedArgument ViMapLineMode) parameter:nil scope:nil)
 (mmap setKey:"g`" toMotion:"move_to_mark:" flags:ViMapNeedArgument parameter:nil scope:nil)
-
+(mmap setKey:"[z" toMotion:"move_to_fold_start:" flags:ViMapLineMode parameter:nil scope:nil)
+(mmap setKey:"]z" toMotion:"move_to_fold_end:" flags:ViMapLineMode parameter:nil scope:nil)
 
 ;; text objects in operator and visual maps
 (tmap setKey:"iw" toMotion:"select_inner_word:")
@@ -293,13 +295,18 @@
 (nmap setKey:"gT" toAction:"previous_tab:")
 (nmap setKey:"gq" toOperator:"format:" flags:ViMapLineMode parameter:nil scope:nil)
 (nmap setKey:"gqgq" toEditAction:"format:" flags:ViMapLineMode parameter:nil scope:nil)
-;; z prefix
+;; z prefix, positioning
 (nmap setKey:"zt" toAction:"reposition_top:")
 (nmap setKey:"z<cr>" toAction:"reposition_top_bol:")
 (nmap setKey:"zb" toAction:"reposition_bottom:")
 (nmap setKey:"z-" toAction:"reposition_bottom_bol:")
 (nmap setKey:"zz" toAction:"reposition_middle:")
 (nmap setKey:"z." toAction:"reposition_middle_bol:")
+;; z prefix, folding
+(nmap setKey:"zf" toOperator:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
+(nmap setKey:"zF" toAction:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
+(nmap setKey:"zc" toAction:"close_fold:")
+(nmap setKey:"zo" toAction:"open_fold:")
 
 (nmap map:"ZZ" to:":xit<cr>")
 (nmap map:"ZQ" to:":q!<cr>")
@@ -360,6 +367,8 @@
 (vmap setKey:"<c-f>" toMotion:"forward_screen:")
 (vmap setKey:"<c-u>" toMotion:"scroll_upwards:")
 (vmap setKey:"<c-y>" toMotion:"scroll_up_by_line:")
+;; z prefix, folding
+(vmap setKey:"zf" toAction:"fold_range:" flags:ViMapLineMode parameter:nil scope:nil)
 
 
 ;; command HTML output map
@@ -467,21 +476,39 @@
 
 ;; a map for the completion list, similar to vim's ctrl-x mode
 (cmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
-(cmap setDefaultCatchallAction:"filter:")
-(cmap setKey:"<esc>" toAction:"cancel:")
-(cmap setKey:"<ctrl-e>" toAction:"cancel:")
-(cmap setKey:"<cr>" toAction:"accept:")
-(cmap setKey:"<tab>" toAction:"accept_or_complete_partially:")
-(cmap setKey:"<space>" toAction:"accept_if_not_autocompleting:")
-(cmap setKey:"<ctrl-y>" toAction:"accept:")
-(cmap setKey:"<ctrl-n>" toAction:"move_down:")
-(cmap setKey:"<ctrl-j>" toAction:"move_down:")
-(cmap setKey:"<ctrl-k>" toAction:"move_up:")
-(cmap setKey:"<ctrl-p>" toAction:"move_up:")
-(cmap setKey:"<down>" toAction:"move_down:")
-(cmap setKey:"<up>" toAction:"move_up:")
-(cmap setKey:"<bs>" toAction:"backspace:")
+(cmap setDefaultAction:"input_character:")
+(cmap include:imap)
+(cmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
+(cmap setKey:"<cr>" toAction:"accept_completion:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(cmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
+(cmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
+(cmap setKey:"<ctrl-y>" toAction:"accept_completion:")
+(cmap setKey:"<ctrl-n>" toAction:"select_next_completion:")
+(cmap setKey:"<ctrl-j>" toAction:"select_next_completion:")
+(cmap setKey:"<ctrl-k>" toAction:"select_previous_completion:")
+(cmap setKey:"<ctrl-p>" toAction:"select_previous_completion:")
+(cmap setKey:"<down>" toAction:"select_next_completion:")
+(cmap setKey:"<up>" toAction:"select_previous_completion:")
+(cmap setKey:"<bs>" toAction:"input_backspace:")
 (cmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
+
+;; a map for the completion list when in the ex command editor
+(xcmap setAcceptsCounts:NO) ; Don't treat numbers as command counts
+(xcmap setDefaultAction:"input_character:")
+(xcmap include:xmap)
+(xcmap setKey:"<ctrl-e>" toAction:"cancel_completion:")
+(xcmap setKey:"<cr>" toAction:"accept_completion:" flags:ViMapExcludedFromDot parameter:nil scope:nil)
+(xcmap setKey:"<tab>" toAction:"accept_completion_or_complete_partially:")
+(xcmap setKey:"<space>" toAction:"accept_completion_if_not_autocompleting:")
+(xcmap setKey:"<ctrl-y>" toAction:"accept_completion:")
+(xcmap setKey:"<ctrl-n>" toAction:"select_next_completion:")
+(xcmap setKey:"<ctrl-j>" toAction:"select_next_completion:")
+(xcmap setKey:"<ctrl-k>" toAction:"select_previous_completion:")
+(xcmap setKey:"<ctrl-p>" toAction:"select_previous_completion:")
+(xcmap setKey:"<down>" toAction:"select_next_completion:")
+(xcmap setKey:"<up>" toAction:"select_previous_completion:")
+(xcmap setKey:"<bs>" toAction:"input_backspace:")
+(xcmap setKey:"<ctrl-f>" toAction:"toggle_fuzzy:")
 
 
 ;; visual selection with shift + arrow keys

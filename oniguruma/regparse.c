@@ -218,7 +218,7 @@ onig_strncmp(const UChar* s1, const UChar* s2, int n)
 extern void
 onig_strcpy(UChar* dest, const UChar* src, const UChar* end)
 {
-  int len = end - src;
+  int len = (int)(end - src);
   if (len > 0) {
     xmemcpy(dest, src, len);
     dest[len] = (UChar )0;
@@ -232,7 +232,7 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
   int slen, term_len, i;
   UChar *r;
 
-  slen = end - s;
+  slen = (int)(end - s);
   term_len = ONIGENC_MBC_MINLEN(enc);
 
   r = (UChar* )xmalloc(slen + term_len);
@@ -734,7 +734,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     onig_st_insert_strend(t, e->name, (e->name + (name_end - name)),
                           (HashDataType )e);
 
-    e->name_len   = name_end - name;
+    e->name_len   = (int)(name_end - name);
     e->back_num   = 0;
     e->back_alloc = 0;
     e->back_refs  = (int* )NULL;
@@ -1411,10 +1411,10 @@ node_new_option(OnigOptionType option)
 extern int
 onig_node_str_cat(Node* node, const UChar* s, const UChar* end)
 {
-  int addlen = end - s;
+  int addlen = (int)(end - s);
 
   if (addlen > 0) {
-    int len  = NSTR(node)->end - NSTR(node)->s;
+    int len  = (int)(NSTR(node)->end - NSTR(node)->s);
 
     if (NSTR(node)->capa > 0 || (len + addlen > NODE_STR_BUF_SIZE - 1)) {
       UChar* p;
@@ -1710,7 +1710,7 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
   data = (OnigCodePoint* )(bbuf->p);
   data++;
 
-  for (low = 0, bound = n; low < bound; ) {
+  for (low = 0, bound = (int)n; low < bound; ) {
     x = (low + bound) >> 1;
     if (from > data[x*2 + 1])
       low = x + 1;
@@ -1718,7 +1718,7 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
       bound = x;
   }
 
-  for (high = low, bound = n; high < bound; ) {
+  for (high = low, bound = (int)n; high < bound; ) {
     x = (high + bound) >> 1;
     if (to >= data[x*2] - 1)
       high = x + 1;
@@ -1740,7 +1740,7 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
   if (inc_n != 0 && (OnigCodePoint )high < n) {
     int from_pos = SIZE_CODE_POINT * (1 + high * 2);
     int to_pos   = SIZE_CODE_POINT * (1 + (low + 1) * 2);
-    int size = (n - high) * 2 * SIZE_CODE_POINT;
+    int size = (int)((n - high) * 2 * SIZE_CODE_POINT);
 
     if (inc_n > 0) {
       BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
@@ -1961,7 +1961,7 @@ and_code_range_buf(BBuf* bbuf1, int not1, BBuf* bbuf2, int not2, BBuf** pbuf)
     for (i = 0; i < n1; i++) {
       from1 = data1[i*2];
       to1   = data1[i*2+1];
-      r = and_code_range1(pbuf, from1, to1, data2, n2);
+      r = and_code_range1(pbuf, from1, to1, data2, (int)n2);
       if (r != 0) return r;
     }
   }
@@ -2461,13 +2461,13 @@ fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env)
   default:
     {
     backslash:
-      c = conv_backslash_value(c, env);
+      c = conv_backslash_value((int)c, env);
     }
     break;
   }
 
   *src = p;
-  return c;
+  return (int)c;
 }
 
 static int fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env);
@@ -2918,7 +2918,7 @@ fetch_token_in_cc(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
   PFETCH(c);
   tok->type = TK_CHAR;
   tok->base = 0;
-  tok->u.c  = c;
+  tok->u.c  = (int)c;
   tok->escaped = 0;
 
   if (c == ']') {
@@ -2935,7 +2935,7 @@ fetch_token_in_cc(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 
     PFETCH(c);
     tok->escaped = 1;
-    tok->u.c = c;
+    tok->u.c = (int)c;
     switch (c) {
     case 'w':
       tok->type = TK_CHAR_TYPE;
@@ -3145,7 +3145,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     tok->backp = p;
     PFETCH(c);
 
-    tok->u.c = c;
+    tok->u.c = (int)c;
     tok->escaped = 1;
     switch (c) {
     case '*':
@@ -3581,7 +3581,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     }
   }
   else {
-    tok->u.c = c;
+    tok->u.c = (int)c;
     tok->escaped = 0;
 
 #ifdef USE_VARIABLE_META_CHARS

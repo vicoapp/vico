@@ -144,6 +144,18 @@
 			     withRepresentedObject:document];
 }
 
+- (ViDocumentView *)viewWithTextView:(ViTextView *)aTextView;
+{
+	for (ViViewController *viewController in _views) {
+		if ([viewController isKindOfClass:[ViDocumentView class]] &&
+				[(ViDocumentView *)viewController textView] == aTextView) {
+			return (ViDocumentView *)viewController;
+		}
+	}
+
+	return nil;
+}
+
 - (NSView *)view
 {
 	return _splitView;
@@ -434,7 +446,7 @@
 }
 
 - (ViViewController *)viewAtPosition:(ViViewOrderingMode)position
-			  relativeTo:(NSView *)view
+						  relativeTo:(NSView *)view
 {
 	if (view == nil)
 		return nil;

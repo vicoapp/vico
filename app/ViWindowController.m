@@ -1948,6 +1948,11 @@ extern BOOL __makeNewWindowInsteadOfTab;
 			  } else if (position == ViViewLeft || position == ViViewRight) {
 				  referencePoint.y += 10;
 			  }
+		  } else if ([hitView isKindOfClass:[ViRulerView class]]) {
+			  hitView = [[[(ViRulerView *)hitView scrollView] contentView] documentView];
+		  } else if ([[hitView superview] isKindOfClass:[ViRulerView class]]) {
+			  hitView = [[[(ViRulerView *)[hitView superview] scrollView] contentView] documentView];
+		  }
 		} while (hitView && ! [hitView isKindOfClass:[ViTextView class]]);
 	}
 

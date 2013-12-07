@@ -37,8 +37,10 @@
 @synthesize completion = _completion;
 
 - (ExMapping *)initWithNames:(NSArray *)namesArray
-		      syntax:(NSString *)aSyntax
-		       scope:(NSString *)aScopeSelector
+					  syntax:(NSString *)aSyntax
+					   scope:(NSString *)aScopeSelector
+			  parameterNames:(NSArray *)aParameterNamesArray
+			   documentation:(NSString *)aDocumentationString
 {
 	if ((self = [super init]) != nil) {
 		if ([namesArray count] == 0) {
@@ -48,27 +50,33 @@
 		_names = [namesArray mutableCopy];
 		_syntax = [aSyntax copy];
 		_scopeSelector = [aScopeSelector copy] ?: @"";
+		_parameterNames = [aParameterNamesArray copy];
+		_documentation = [aDocumentationString copy];
 	}
 	return self;
 }
 
 - (ExMapping *)initWithNames:(NSArray *)namesArray
-		      syntax:(NSString *)aSyntax
+					  syntax:(NSString *)aSyntax
                   expression:(NuBlock *)anExpression
                        scope:(NSString *)aScopeSelector
+			  parameterNames:(NSArray *)aParameterNamesArray
+			   documentation:(NSString *)aDocumentationString
 {
-	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector]) != nil) {
+	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector parameterNames:aParameterNamesArray documentation:aDocumentationString]) != nil) {
 		_expression = anExpression;
 	}
 	return self;
 }
 
 - (ExMapping *)initWithNames:(NSArray *)namesArray
-		      syntax:(NSString *)aSyntax
+					  syntax:(NSString *)aSyntax
                       action:(SEL)anAction
                        scope:(NSString *)aScopeSelector
+			  parameterNames:(NSArray *)aParameterNamesArray
+			   documentation:(NSString *)aDocumentationString
 {
-	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector]) != nil) {
+	if ((self = [self initWithNames:namesArray syntax:aSyntax scope:aScopeSelector parameterNames:aParameterNamesArray documentation:aDocumentationString]) != nil) {
 		_action = anAction;
 	}
 	return self;
@@ -220,11 +228,23 @@
 }
 
 - (ExMapping *)define:(id)aName
-	       syntax:(NSString *)aSyntax
-		   as:(id)implementation
-		scope:(NSString *)aScopeSelector
+			   syntax:(NSString *)aSyntax
+				   as:(id)implementation
+				scope:(NSString *)aScopeSelector
+	   parameterNames:(id)aParameterNamesList
+		documentation:(NSString *)aDocumentationString
 {
 	ExMapping *m = nil;
+
+	NSArray *parameterNames = aParameterNamesList;
+	if ([aParameterNamesList isKindOfClass:[NuCell class]]) {
+		parameterNames = [aParameterNamesList array];
+	} else if (! aParameterNamesList || aParameterNamesList == [NSNull null]) {
+		parameterNames = [NSArray array];
+	} else if (! [aParameterNamesList isKindOfClass:[NSArray class]]) {
+		INFO(@"Invalid parameter names class %@", NSStringFromClass([aParameterNamesList class]));
+		return nil;
+	}
 
 	NSArray *names = aName;
 	if ([aName isKindOfClass:[NuCell class]])
@@ -238,14 +258,18 @@
 
 	if ([implementation isKindOfClass:[NSString class]])
 		m = [[ExMapping alloc] initWithNames:names
-					      syntax:aSyntax
-					      action:NSSelectorFromString(implementation)
-					       scope:aScopeSelector];
+									  syntax:aSyntax
+									  action:NSSelectorFromString(implementation)
+									   scope:aScopeSelector
+							  parameterNames:parameterNames
+							   documentation:aDocumentationString];
 	else if ([implementation isKindOfClass:[NuBlock class]])
 		m = [[ExMapping alloc] initWithNames:names
-					      syntax:aSyntax
-					  expression:implementation
-					       scope:aScopeSelector];
+									  syntax:aSyntax
+								  expression:implementation
+									   scope:aScopeSelector
+							  parameterNames:parameterNames
+							   documentation:aDocumentationString];
 	else {
 		INFO(@"Invalid mapping implementation class %@",
 			NSStringFromClass([implementation class]));
@@ -260,10 +284,17 @@
 }
 
 - (ExMapping *)define:(id)aName
-	       syntax:(NSString *)aSyntax
-		   as:(id)implementation
+			   syntax:(NSString *)aSyntax
+				   as:(id)implementation
+	   parameterNames:(id)aParameterNamesList
+		documentation:(NSString *)aDocumentationString
 {
-	return [self define:aName syntax:aSyntax as:implementation scope:nil];
+	return [self define:aName
+				 syntax:aSyntax
+					 as:implementation
+				  scope:nil
+		 parameterNames:aParameterNamesList
+		  documentation:aDocumentationString];
 }
 
 @end

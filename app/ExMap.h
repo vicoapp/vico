@@ -43,9 +43,6 @@
 
 	SEL			 _action;
 	NuBlock			*_expression;
-
-	NSString		*_usage;
-	NSString		*_help;
 }
 
 /** The primary name of this command. */
@@ -77,6 +74,8 @@
 @property(nonatomic, readonly) NSString *scopeSelector;
 @property(nonatomic, readonly) NuBlock *expression;
 @property(nonatomic, readonly) SEL action;
+@property(nonatomic, readonly) NSArray *parameterNames;
+@property(nonatomic, readonly) NSString *documentation;
 @property(nonatomic, readwrite, strong) id<ViCompletionProvider> completion;
 
 /** Add an alias to an ex comand.
@@ -92,12 +91,16 @@
 - (ExMapping *)initWithNames:(NSArray *)nameArray
                       syntax:(NSString *)aSyntax
                   expression:(NuBlock *)anExpression
-                       scope:(NSString *)aScopeSelector;
+                       scope:(NSString *)aScopeSelector
+              parameterNames:(NSArray *)parameterNames
+               documentation:(NSString *)documentation;
 
 - (ExMapping *)initWithNames:(NSArray *)nameArray
                       syntax:(NSString *)aSyntax
                       action:(SEL)anAction
-                       scope:(NSString *)aScopeSelector;
+                       scope:(NSString *)aScopeSelector
+              parameterNames:(NSArray *)parameterNames
+               documentation:(NSString *)documentation;
 @end
 
 
@@ -121,9 +124,6 @@
 
 /** Look up an ex command definition given the name.
  * @param aString the name of the command. May be abbreviated as long as it is not ambiguous.
- * @param implementation Either an NSString instance naming a selector, or a NuBlock
- * instance specifying a Nu function. The Nu function takes on optional parameter;
- * an instance of ExCommand that describes the arguments.
  *
  * @returns the defined ex command, or nil if not found.
  */
@@ -132,7 +132,9 @@
 - (ExMapping *)define:(id)aName
                syntax:(NSString *)aSyntax
                    as:(id)implementation
-                scope:(NSString *)aScopeSelector;
+                scope:(NSString *)aScopeSelector
+	   parameterNames:(id)aParameterNamesList
+		documentation:(NSString *)aDocumentationString;
 
 /** Add an ex command definition.
  *
@@ -145,12 +147,20 @@
  * @param implementation Either an NSString instance naming a selector, or a NuBlock
  * instance specifying a Nu function. The Nu function takes on optional parameter;
  * an instance of ExCommand that describes the arguments.
+ * @param aParameterNamesList A Nu list or NSArray of human-readable names to display
+ * in completion popups for the names of the parameters this command can take. By
+ * default, the register parameter is called +register+, the command parameter is
+ * called +command+, and the argument(s) parameter is called +argument+.
+ * @param aDocumentationString A string with documentation about this command.
+ * Parts enclosde between +es will be rendered as a parameter name.
  *
  * @returns the command definition, or nil on error.
  * @see [ExMapping syntax]
  */
 - (ExMapping *)define:(id)aName
                syntax:(NSString *)aSyntax
-                   as:(id)implementation;
+                   as:(id)implementation
+	   parameterNames:(id)aParameterNamesList
+		documentation:(NSString *)aDocumentationString;
 @end
 

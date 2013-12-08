@@ -284,21 +284,30 @@
 
 - (NSString *)syntaxHintFor:(ExMapping *)aMapping
 {
-	BOOL seen = NO;
+	__block BOOL exactMatch = NO;
 	NSString *name = aMapping.name;
 	NSMutableString *requiredPrefix = [NSMutableString stringWithString:[name substringToIndex:1]];
+	for (NSString *alias in aMapping.names) {
+		if (! [alias isEqualToString:name] && [name hasPrefix:alias] ) {
+			[requiredPrefix setString:alias];
+			exactMatch = YES;
+		}
+	}
 
 	[_mappings enumerateObjectsUsingBlock:^(ExMapping *mapping, NSUInteger i, BOOL *stop) {
-		if (mapping == aMapping)
-			return;
-	
-		for (NSString *possibleName in mapping.names) {
-			NSString *commonPrefix = [possibleName commonPrefixWithString:name options:0];
+		if (mapping != aMapping) {
+			for (NSString *possibleName in mapping.names) {
+				NSString *commonPrefix = [possibleName commonPrefixWithString:name options:0];
 
-			if (commonPrefix.length > requiredPrefix.length && [commonPrefix hasPrefix:requiredPrefix]) {
-				[requiredPrefix setString:commonPrefix];
-			} else if (commonPrefix.length == requiredPrefix.length) {
-				[requiredPrefix setString:[name substringToIndex:commonPrefix.length + 1]];
+				if (commonPrefix.length > requiredPrefix.length && [commonPrefix hasPrefix:requiredPrefix]) {
+					[requiredPrefix setString:commonPrefix];
+
+					exactMatch = [aMapping matchesName:requiredPrefix exactly:YES];
+				} else if (commonPrefix.length == requiredPrefix.length && ! exactMatch) {
+					[requiredPrefix setString:[name substringToIndex:commonPrefix.length + 1]];
+
+					exactMatch = [aMapping matchesName:requiredPrefix exactly:YES];
+				}
 			}
 		}
 	}];

@@ -284,11 +284,20 @@
 
 - (NSString *)syntaxHintFor:(ExMapping *)aMapping
 {
-	__block BOOL exactMatch = NO;
+	return [self syntaxHintFor:aMapping withPrefix:@""];
+}
+
+- (NSString *)syntaxHintFor:(ExMapping *)aMapping withPrefix:(NSString *)aPrefix
+{
 	NSString *name = aMapping.name;
 	NSMutableString *requiredPrefix = [NSMutableString stringWithString:[name substringToIndex:1]];
+	__block BOOL exactMatch = [requiredPrefix isEqualToString:name];
 	for (NSString *alias in aMapping.names) {
-		if (! [alias isEqualToString:name] && [name hasPrefix:alias] ) {
+		if ([alias hasPrefix:aPrefix] && ! [name hasPrefix:aPrefix]) {
+			name = alias;
+			
+			exactMatch = [requiredPrefix isEqualToString:name];
+		} else if (! [alias isEqualToString:name] && [name hasPrefix:alias] ) {
 			[requiredPrefix setString:alias];
 			exactMatch = YES;
 		}

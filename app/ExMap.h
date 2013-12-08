@@ -148,6 +148,13 @@
  */
 - (NSString *)syntaxHintFor:(ExMapping *)aMapping;
 
+/** As with syntaxHintFor:, generate syntax hint string for the given mapping.
+ * However, for mappings that have multiple aliases that are not prefixes to
+ * each other (for example, tabedit and tabnew), the prefix serves to choose
+ * one or the other alias.
+ */
+- (NSString *)syntaxHintFor:(ExMapping *)aMapping withPrefix:(NSString *)aPrefix;
+
 - (ExMapping *)define:(id)aName
                syntax:(NSString *)aSyntax
                    as:(id)implementation

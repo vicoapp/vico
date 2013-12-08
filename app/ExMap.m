@@ -282,6 +282,35 @@
 	return [self lookup:aString withScope:nil];
 }
 
+- (NSString *)syntaxHintFor:(ExMapping *)aMapping
+{
+	BOOL seen = NO;
+	NSString *name = aMapping.name;
+	NSMutableString *requiredPrefix = [NSMutableString stringWithString:[name substringToIndex:1]];
+
+	[_mappings enumerateObjectsUsingBlock:^(ExMapping *mapping, NSUInteger i, BOOL *stop) {
+		if (mapping == aMapping)
+			return;
+	
+		for (NSString *possibleName in mapping.names) {
+			NSString *commonPrefix = [possibleName commonPrefixWithString:name options:0];
+
+			if (commonPrefix.length > requiredPrefix.length && [commonPrefix hasPrefix:requiredPrefix]) {
+				[requiredPrefix setString:commonPrefix];
+			} else if (commonPrefix.length == requiredPrefix.length) {
+				[requiredPrefix setString:[name substringToIndex:commonPrefix.length + 1]];
+			}
+		}
+	}];
+	
+	NSString *commandHint =
+		(requiredPrefix.length < name.length) ?
+			[NSString stringWithFormat:@"%@[%@]", requiredPrefix, [name substringFromIndex:requiredPrefix.length], nil] :
+			requiredPrefix;
+
+	return [aMapping syntaxHintWithCommandHint:commandHint];
+}
+
 - (void)addMapping:(ExMapping *)mapping
 {
 	DEBUG(@"adding ex command %@", mapping);

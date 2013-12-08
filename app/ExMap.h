@@ -141,6 +141,13 @@
  */
 - (ExMapping *)lookup:(NSString *)aString;
 
+/** Generate the syntax hint string for the given mapping. The mapping must be
+ * in the ExMap, or nil will be returned.
+ *
+ * @returns A string that looks something like [range]w[rite][!] [filename].
+ */
+- (NSString *)syntaxHintFor:(ExMapping *)aMapping;
+
 - (ExMapping *)define:(id)aName
                syntax:(NSString *)aSyntax
                    as:(id)implementation

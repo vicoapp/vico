@@ -289,6 +289,7 @@
 
 - (NSString *)syntaxHintFor:(ExMapping *)aMapping withPrefix:(NSString *)aPrefix
 {
+	__block BOOL found = NO;
 	NSString *name = aMapping.name;
 	NSMutableString *requiredPrefix = [NSMutableString stringWithString:[name substringToIndex:1]];
 	__block BOOL exactMatch = [requiredPrefix isEqualToString:name];
@@ -318,15 +319,22 @@
 					exactMatch = [aMapping matchesName:requiredPrefix exactly:YES];
 				}
 			}
+		} else {
+			found = YES;
 		}
 	}];
-	
-	NSString *commandHint =
-		(requiredPrefix.length < name.length) ?
-			[NSString stringWithFormat:@"%@[%@]", requiredPrefix, [name substringFromIndex:requiredPrefix.length], nil] :
-			requiredPrefix;
 
-	return [aMapping syntaxHintWithCommandHint:commandHint];
+	if (! found) {
+		// This is all invalid if the passed mapping isn't in the map.
+		return nil;
+	} else {
+		NSString *commandHint =
+			(requiredPrefix.length < name.length) ?
+				[NSString stringWithFormat:@"%@[%@]", requiredPrefix, [name substringFromIndex:requiredPrefix.length], nil] :
+				requiredPrefix;
+
+		return [aMapping syntaxHintWithCommandHint:commandHint];
+	}
 }
 
 - (void)addMapping:(ExMapping *)mapping

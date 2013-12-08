@@ -88,6 +88,18 @@
  */
 - (void)removeAlias:(NSString *)aName;
 
+/** Return a hint describing the syntax of this mapping.
+ *
+ * The resulting string should look something like [range]w[rite][!] [filename],
+ * where the w[rite] is passed in by the caller (typically an ExMap instance).
+ *
+ * @param comandHint A string representing the hint for the actual command.
+ * This needs to be passed in because it relies on the full list of mappings,
+ * which is how we decide which initial characters are and aren't optional to
+ * properly identify this mapping by name.
+ */
+- (NSString *)syntaxHintWithCommandHint:(NSString *)commandHint;
+
 - (ExMapping *)initWithNames:(NSArray *)nameArray
                       syntax:(NSString *)aSyntax
                   expression:(NuBlock *)anExpression

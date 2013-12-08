@@ -24,6 +24,7 @@
  */
 
 #import "ExMap.h"
+#import "NSString-additions.h"
 #import "NSString-scopeSelector.h"
 #include "logging.h"
 
@@ -112,6 +113,84 @@
 		}
 	}
 	return match;
+}
+
+- (NSString *)syntaxHintWithCommandHint:(NSString *)commandHint
+{
+	__block NSUInteger currentParameterIndex = 0;
+	NSString * (^currentParameterOr)(NSString *) = ^NSString *(NSString *defaultName) {
+		return (currentParameterIndex < [_parameterNames count]) ?
+					_parameterNames[currentParameterIndex] :
+					defaultName;
+	};
+
+	NSMutableString *syntaxString = [NSMutableString string];
+	if ([_syntax occurrencesOfCharacter:'r'] > 0) {
+		[syntaxString appendFormat:@"[%@]", currentParameterOr(@"range"), nil];
+		currentParameterIndex++;
+	}
+
+	[syntaxString appendString:commandHint];
+
+	if ([_syntax occurrencesOfCharacter:'!'] > 0) {
+		[syntaxString appendString:@"[!]"];
+	}
+
+	if ([_syntax occurrencesOfCharacter:'+'] > 0) {
+		[syntaxString appendFormat:@" [+%@]", currentParameterOr(@"command"), nil];
+		currentParameterIndex++;
+	}
+
+	NSRange argumentRange = [_syntax rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"eE"]];
+	if (argumentRange.location != NSNotFound) {
+		unichar character = [_syntax characterAtIndex:argumentRange.location];
+
+		NSString *format = (character == 'e') ? @" [%@]" : @" {%@}";
+
+		if ([_syntax occurrencesOfCharacter:'1'] == 0) {
+			format = [format stringByAppendingString:@"+"];
+		}
+		[syntaxString appendFormat:format, currentParameterOr(@"argument"), nil];
+		currentParameterIndex++;
+	}
+
+	if ([_syntax occurrencesOfCharacter:'R'] > 0) {
+		[syntaxString appendFormat:@" [%@]", currentParameterOr(@"register"), nil];
+		currentParameterIndex++;
+	}
+
+	NSRange lineRange = [_syntax rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"lL"]];
+	if (lineRange.location != NSNotFound) {
+		unichar character = [_syntax characterAtIndex:lineRange.location];
+
+		NSString *format = (character == 'l') ? @" [%@]" : @" {%@}";
+
+		[syntaxString appendFormat:format, currentParameterOr(@"line"), nil];
+		currentParameterIndex++;
+	}
+
+	if ([_syntax occurrencesOfCharacter:'~'] > 0) {
+		[syntaxString appendFormat:@"/%@", currentParameterOr(@"regexp"), nil];
+		currentParameterIndex++;
+		[syntaxString appendFormat:@"/%@", currentParameterOr(@"replace"), nil];
+		currentParameterIndex++;
+		[syntaxString appendFormat:@"[/[%@]]", currentParameterOr(@"flags"), nil];
+		currentParameterIndex++;
+	}
+
+	if ([_syntax occurrencesOfCharacter:'/'] > 0) {
+		[syntaxString appendFormat:@"/%@", currentParameterOr(@"regexp"), nil];
+		currentParameterIndex++;
+		[syntaxString appendFormat:@"[/[%@]]", currentParameterOr(@"flags"), nil];
+		currentParameterIndex++;
+	}
+
+	if ([_syntax occurrencesOfCharacter:'c'] > 0) {
+		[syntaxString appendFormat:@" [%@]", currentParameterOr(@"count"), nil];
+		currentParameterIndex++;
+	}
+	
+	return [NSString stringWithString:syntaxString];
 }
 
 - (NSString *)description

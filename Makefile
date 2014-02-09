@@ -220,7 +220,7 @@ synchelp: help
 	rsync -avr $(HELP_RESDIR)/ www.vicoapp.com:/var/www/vicoapp.com/help
 
 clean:
-	rm -rf $(OBJDIR) $(APPDIR)
+	xcodebuild clean
 
 distclean:
 	rm -rf $(BUILDDIR)

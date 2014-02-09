@@ -51,7 +51,7 @@
 + (ViSyntaxParser *)syntaxParserWithLanguage:(ViLanguage *)aLanguage;
 
 - (ViSyntaxParser *)initWithLanguage:(ViLanguage *)aLanguage;
-- (void)parseContext:(ViSyntaxContext *)aContext;
+- (NSArray *)updatedScopeArrayWithContext:(ViSyntaxContext *)aContext;
 
 - (void)setContinuation:(NSArray *)continuationMatches forLine:(NSUInteger)lineno;
 
@@ -67,7 +67,5 @@
 - (void)pullScopes:(NSRange)affectedRange;
 
 - (void)updateScopeRangesInRange:(NSRange)updateRange;
-
-- (NSArray *)scopeArray;
 
 @end

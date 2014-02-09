@@ -86,6 +86,10 @@
 	NSDictionary		*_symbolTransforms;
 	NSDictionary		*_symbolIcons;
 
+    // We use the syntax parser to update our current scopes list as it
+    // completes its parsing.
+    NSArray *_currentScopes;
+
 	NSRange			 _matchingParenRange;
 	ViSnippet		*_snippet;
 

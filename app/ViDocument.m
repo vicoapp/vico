@@ -1145,7 +1145,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (!toScreen)
 		return nil;
 
-	NSArray *scopeArray = [_syntaxParser scopeArray];
+	NSArray *scopeArray = _currentScopes;
 	if (charIndex >= [scopeArray count]) {
 		*effectiveCharRange = NSMakeRange(charIndex, [_textStorage length] - charIndex);
 		return [self defaultAttributes];
@@ -1277,7 +1277,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	// unsigned endLine = [_textStorage lineNumberAtLocation:NSMaxRange(range) - 1];
 	// INFO(@"parsing line %u -> %u, range %@", startLine, endLine, NSStringFromRange(range));
 
-	[_syntaxParser parseContext:ctx];
+	_currentScopes = [_syntaxParser updatedScopeArrayWithContext:ctx];
 
 	// Invalidate the layout(s).
 	if (ctx.restarting) {
@@ -1628,7 +1628,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 	/* Reset the cached attributes.
 	 */
-	NSArray *scopeArray = [_syntaxParser scopeArray];
+	NSArray *scopeArray = _currentScopes;
 	for (NSUInteger i = 0; i < [scopeArray count];) {
 		[[scopeArray objectAtIndex:i] setAttributes:nil];
 		i += [[scopeArray objectAtIndex:i] range].length;
@@ -1681,7 +1681,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 - (void)invalidateSymbolsInRange:(NSRange)updateRange
 {
 	NSString *string = [_textStorage string];
-	NSArray *scopeArray = [_syntaxParser scopeArray];
+	NSArray *scopeArray = _currentScopes;
 	DEBUG(@"invalidate symbols in range %@", NSStringFromRange(updateRange));
 
 	NSString *lastSelector = nil;
@@ -2287,7 +2287,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 
 - (ViScope *)scopeAtLocation:(NSUInteger)aLocation
 {
-	NSArray *scopeArray = [_syntaxParser scopeArray];
+	NSArray *scopeArray = _currentScopes;
 	if ([scopeArray count] > aLocation) {
 		/* XXX: must retain + autorelease because the scopeArray may
 		 * be emptied or changed and the scope would be released.

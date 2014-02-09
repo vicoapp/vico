@@ -56,11 +56,6 @@
 	DEBUG_DEALLOC();
 }
 
-- (NSArray *)scopeArray
-{
-	return _scopeArray;
-}
-
 #pragma mark -
 #pragma mark Line Continuations
 
@@ -651,7 +646,7 @@
 	                reachedEOL:nil];
 }
 
-- (void)parseContext:(ViSyntaxContext *)aContext
+- (NSArray *)updatedScopeArrayWithContext:(ViSyntaxContext *)aContext
 {
 #ifdef STATISTICS
 	struct timeval start;
@@ -751,6 +746,8 @@
 
 	[self updateScopeRangesInRange:[_context range]];
 	_context = nil;
+
+	return [NSArray arrayWithArray:_scopeArray];
 }
 
 @end

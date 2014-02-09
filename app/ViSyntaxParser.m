@@ -747,7 +747,7 @@
 	[self updateScopeRangesInRange:[_context range]];
 	_context = nil;
 
-	return [NSArray arrayWithArray:_scopeArray];
+	return _scopeArray;
 }
 
 @end

@@ -56,6 +56,13 @@
 			return nil;
 		}
 
+		NSString *foldingStartMarker = [_language objectForKey:@"foldingStartMarker"];
+		NSString *foldingStopMarker = [_language objectForKey:@"foldingStopMarker"];
+		if (foldingStartMarker)
+			_foldingStartPattern = [ViRegexp regexpWithString:foldingStartMarker];
+		if (foldingStopMarker)
+			_foldingStopPattern = [ViRegexp regexpWithString:foldingStopMarker];
+
 		if ([[self name] length] > 0)
 			_scope = [[ViScope alloc] initWithScopes:[NSArray arrayWithObject:[self name]]
 							   range:NSMakeRange(0, 0)];

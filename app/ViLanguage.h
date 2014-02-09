@@ -49,6 +49,9 @@
 
 @property (weak, nonatomic, readonly) NSString *firstLineMatch;
 
+@property (nonatomic,readonly) ViRegexp *foldingStartPattern;
+@property (nonatomic,readonly) ViRegexp *foldingStopPattern;
+
 /**
  * @returns  The scope name of the language.
  */

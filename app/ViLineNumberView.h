@@ -18,9 +18,11 @@
 	ViTextView 		*_textView;
 }
 
-@property (nonatomic,readwrite) NSColor *backgroundColor;
+@property (nonatomic,readwrite,strong) NSColor *backgroundColor;
+@property (nonatomic,readwrite,strong) NSColor *foregroundColor;
+@property (nonatomic,readwrite,strong) NSColor *borderColor;
 
-- (ViLineNumberView *)initWithTextView:(ViTextView *)aTextView backgroundColor:(NSColor *)aColor;
+- (ViLineNumberView *)initWithTextView:(ViTextView *)aTextView;
 
 - (void)setRelative:(BOOL)flag;
 - (void)setTextView:(ViTextView *)aTextView;

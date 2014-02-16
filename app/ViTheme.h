@@ -52,6 +52,8 @@
 - (NSColor *)lineHighlightColor;
 - (NSColor *)selectionColor;
 - (NSColor *)invisiblesColor;
+- (NSColor *)lineNumberBackgroundColor;
+- (NSColor *)lineNumberForegroundColor;
 - (NSString *)description;
 - (BOOL)hasDarkBackground;
 

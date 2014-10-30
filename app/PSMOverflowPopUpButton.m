@@ -39,7 +39,7 @@
     if([self isFlipped]) {
         rect.origin.y += imageSize.height;
     }
-    [image compositeToPoint:rect.origin operation:NSCompositeSourceOver];
+	[image drawAtPoint:rect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 }
 
 - (void)mouseDown:(NSEvent *)event

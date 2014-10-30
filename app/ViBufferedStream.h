@@ -60,7 +60,7 @@
 	CFSocketContext		 _inputContext, _outputContext;
 }
 
-@property (nonatomic,readwrite,unsafe_unretained) id<NSStreamDelegate> delegate;
+@property (readwrite,unsafe_unretained) id<NSStreamDelegate> delegate;
 
 + (id)streamWithTask:(NSTask *)task;
 

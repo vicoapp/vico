@@ -17,7 +17,7 @@
 		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		1735A6B3183348370092E695 /* ViGlyphGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6B2183348370092E695 /* ViGlyphGenerator.m */; };
 		1735A6BB1833DB060092E695 /* ViTypesetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6BA1833DB060092E695 /* ViTypesetter.m */; };
-		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; };
+		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		177AC29518307E6C002C9647 /* ViFold.m in Sources */ = {isa = PBXBuildFile; fileRef = 177AC29418307E6C002C9647 /* ViFold.m */; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
@@ -51,7 +51,7 @@
 		9A288E331398EA9C00258451 /* errmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2C1398EA9C00258451 /* errmsg.c */; };
 		9A288E341398EA9C00258451 /* par.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2E1398EA9C00258451 /* par.c */; };
 		9A288E351398EA9C00258451 /* reformat.c in Sources */ = {isa = PBXBuildFile; fileRef = 9A288E2F1398EA9C00258451 /* reformat.c */; };
-		9A288E381398EAE400258451 /* par in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A288E1E1398EA6F00258451 /* par */; };
+		9A288E381398EAE400258451 /* par in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A288E1E1398EA6F00258451 /* par */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9A2EF294133109C20023C5B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2EF293133109C20023C5B7 /* Cocoa.framework */; };
 		9A2EF29E133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF29C133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2A1133109C20023C5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2A0133109C20023C5B7 /* main.m */; };
@@ -229,7 +229,7 @@
 		9A4346D81331239E002B04DE /* symbol-icons.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4346D71331239E002B04DE /* symbol-icons.plist */; };
 		9A4346E01331257A002B04DE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A4346DF1331257A002B04DE /* Foundation.framework */; };
 		9A4346EB13312710002B04DE /* vico.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346EA13312710002B04DE /* vico.m */; };
-		9A4346EF13312861002B04DE /* vicotool in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vicotool */; };
+		9A4346EF13312861002B04DE /* vicotool in Copy Executables */ = {isa = PBXBuildFile; fileRef = 9A4346DD1331257A002B04DE /* vicotool */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9A4347051331383C002B04DE /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F51331383C002B04DE /* SBJsonParser.m */; };
 		9A4347061331383C002B04DE /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F71331383C002B04DE /* SBJsonStreamParser.m */; };
 		9A4347071331383C002B04DE /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4346F91331383C002B04DE /* SBJsonStreamParserAdapter.m */; };
@@ -447,6 +447,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		170435C4199FEB490062E643 /* ViFileIndex Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "ViFileIndex Playground.playground"; sourceTree = "<group>"; };
 		1730CE0717CF058D00A1DA2C /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		1730CE0917CF05D100A1DA2C /* GenerateFormData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerateFormData.h; sourceTree = "<group>"; };
 		1730CE0A17CF05D100A1DA2C /* GenerateFormData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenerateFormData.m; sourceTree = "<group>"; };
@@ -977,6 +978,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		170435BE199FEB1E0062E643 /* File Indexing */ = {
+			isa = PBXGroup;
+			children = (
+				170435C4199FEB490062E643 /* ViFileIndex Playground.playground */,
+			);
+			name = "File Indexing";
+			sourceTree = "<group>";
+		};
 		1721D46B181F4AB000E7BA1D /* Crash Reporting */ = {
 			isa = PBXGroup;
 			children = (
@@ -1138,6 +1147,7 @@
 		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				170435BE199FEB1E0062E643 /* File Indexing */,
 				1732DB04181EF2C200890055 /* Cocoa Extensions */,
 				17D8A12117CF0330000C25C6 /* SFBCrash */,
 				9A2EF482133114DD0023C5B7 /* oniguruma */,
@@ -1733,7 +1743,7 @@
 			name = Tests;
 			productName = tests;
 			productReference = 9A2EF2B0133109C20023C5B7 /* Tests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		9A2EF40F13310F4D0023C5B7 /* lemon */ = {
 			isa = PBXNativeTarget;
@@ -1775,7 +1785,7 @@
 		9A2EF286133109C10023C5B7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0610;
 			};
 			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */;
 			compatibilityVersion = "Xcode 3.2";

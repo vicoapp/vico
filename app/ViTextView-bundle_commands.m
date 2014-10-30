@@ -63,7 +63,7 @@
 		*envRangePtr = *rangePtr;
 		inputText = [[[self textStorage] string] substringWithRange:*rangePtr];
 	} else if ([type isEqualToString:@"word"]) {
-		inputText = [[self textStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];
+		inputText = [[self viTextStorage] wordAtLocation:[self caret] range:rangePtr acceptAfter:YES];
 		*envRangePtr = *rangePtr;
 	} else if ([type isEqualToString:@"line"]) {
 		NSUInteger bol, eol;

@@ -45,7 +45,7 @@
 - (void)invalidateCaretRect
 {
 	NSLayoutManager *lm = [self layoutManager];
-	ViTextStorage *ts = [self textStorage];
+	ViTextStorage *ts = [self viTextStorage];
 	NSUInteger length = [ts length];
 	int len = 1;
 

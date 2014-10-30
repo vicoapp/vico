@@ -50,7 +50,7 @@
 	NSString *expandedSnippetString = snippetString;
 	if (indent) {
 		// prepend leading whitespace to all newlines in the snippet string
-		NSString *leadingWhiteSpace = [[self textStorage] leadingWhitespaceForLineAtLocation:aRange.location];
+		NSString *leadingWhiteSpace = [[self viTextStorage] leadingWhitespaceForLineAtLocation:aRange.location];
 		NSString *indentedNewline = [@"\n" stringByAppendingString:leadingWhiteSpace];
 		NSString *indentedSnippetString = [snippetString stringByReplacingOccurrencesOfString:@"\n"
 											   withString:indentedNewline

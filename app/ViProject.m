@@ -247,7 +247,7 @@
 				dimensionValue = [NSNumber numberWithFloat:[view bounds].size.height];
 			}
 
-			ViTextStorage *storage = [textView textStorage];
+			ViTextStorage *storage = [textView viTextStorage];
 			NSUInteger caret = [textView caret];
 			NSDictionary *viewProperties =
 				@{

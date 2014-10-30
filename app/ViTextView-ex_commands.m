@@ -38,7 +38,7 @@
 			error:(NSError **)outError
 {
 	ViMark *m = nil;
-	ViTextStorage *storage = [self textStorage];
+	ViTextStorage *storage = [self viTextStorage];
 	NSInteger line = -1;
 
 	switch (addr.type) {
@@ -167,7 +167,7 @@
 	if (lineRange.location == NSNotFound)
 		return lineRange;
 
-	ViTextStorage *storage = [self textStorage];
+	ViTextStorage *storage = [self viTextStorage];
 	NSUInteger beg = [storage locationForStartOfLine:lineRange.location];
 	NSUInteger end = [storage locationForStartOfLine:NSMaxRange(lineRange)];
 
@@ -206,7 +206,7 @@
 
 - (id)ex_eval:(ExCommand *)command
 {
-	NSString *script = [[[self textStorage] string] substringWithRange:command.range];
+	NSString *script = [[[self viTextStorage] string] substringWithRange:command.range];
 	NSError *error = nil;
 	[(ViAppController *)[NSApp delegate] eval:script
 		    withParser:nil
@@ -252,7 +252,7 @@
 
 	[[ViRegisterManager sharedManager] setContent:pattern ofRegister:'/'];
 
-	ViTextStorage *storage = [self textStorage];
+	ViTextStorage *storage = [self viTextStorage];
 	ViTransformer *transform = [[ViTransformer alloc] init];
 
 	NSInteger startLocation = [storage locationForStartOfLine:exRange.location];
@@ -308,7 +308,7 @@
 {
 	// XXX: What if two address given?
 	[self pushCurrentLocationOnJumpList];
-	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:command.range.location];
+	command.caret = [[self viTextStorage] firstNonBlankForLineAtLocation:command.range.location];
 	return nil;
 }
 
@@ -321,7 +321,7 @@
 - (id)ex_delete:(ExCommand *)command
 {
 	[self cutToRegister:command.reg range:command.range];
-	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:command.range.location];
+	command.caret = [[self viTextStorage] firstNonBlankForLineAtLocation:command.range.location];
 	return nil;
 }
 
@@ -331,13 +331,13 @@
 	if (destline > 0)
 		++destline;
 
-	NSString *content = [[[self textStorage] string] substringWithRange:command.range];
-	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
+	NSString *content = [[[self viTextStorage] string] substringWithRange:command.range];
+	NSInteger destloc = [[self viTextStorage] locationForStartOfLine:destline];
 	if (destloc == -1)
-		destloc = [[self textStorage] length];
+		destloc = [[self viTextStorage] length];
 	[self insertString:content atLocation:destloc];
 
-	command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc + [content length]];
+	command.caret = [[self viTextStorage] firstNonBlankForLineAtLocation:destloc + [content length]];
 	return nil;
 }
 
@@ -351,19 +351,19 @@
 	if (destline > 0)
 		++destline;
 
-	NSString *content = [[[self textStorage] string] substringWithRange:command.range];
-	NSInteger destloc = [[self textStorage] locationForStartOfLine:destline];
+	NSString *content = [[[self viTextStorage] string] substringWithRange:command.range];
+	NSInteger destloc = [[self viTextStorage] locationForStartOfLine:destline];
 	if (destloc == -1)
-		destloc = [[self textStorage] length];
+		destloc = [[self viTextStorage] length];
 
 	if (destloc > command.range.location) {
 		[self insertString:content atLocation:destloc];
 		[self deleteRange:command.range];
-		command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc - 1];
+		command.caret = [[self viTextStorage] firstNonBlankForLineAtLocation:destloc - 1];
 	} else {
 		[self deleteRange:command.range];
 		[self insertString:content atLocation:destloc];
-		command.caret = [[self textStorage] firstNonBlankForLineAtLocation:destloc + command.range.length - 1];
+		command.caret = [[self viTextStorage] firstNonBlankForLineAtLocation:destloc + command.range.length - 1];
 	}
 
 	return nil;

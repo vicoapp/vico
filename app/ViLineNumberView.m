@@ -115,7 +115,7 @@
 {
 	NSUInteger	 lineCount, digits;
 
-	lineCount = _textView.textStorage.lineCount;
+	lineCount = _textView.viTextStorage.lineCount;
 	digits = (unsigned)log10(lineCount) + 1;
 	return ceilf(MAX(DEFAULT_THICKNESS, _digitSize.width * digits + LINE_NUMBER_MARGIN * 2));
 }
@@ -217,7 +217,7 @@
 	__block NSInteger logicalLine = line;
 	
 	if (location > 0) {
-		ViTextStorage *textStorage = _textView.textStorage;
+		ViTextStorage *textStorage = _textView.viTextStorage;
 		[textStorage enumerateAttribute:ViFoldedAttributeName
 								inRange:NSMakeRange(0u, location)
 								options:NULL
@@ -256,7 +256,7 @@
 
 	layoutManager = _textView.layoutManager;
 	container = _textView.textContainer;
-	textStorage = _textView.textStorage;
+	textStorage = _textView.viTextStorage;
 	yinset = _textView.textContainerInset.height;
 
 	if (layoutManager == nil)

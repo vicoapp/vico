@@ -150,7 +150,7 @@ int logIndent = 0;
 	[self setDrawsBackground:YES];
 
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
-	if ([[self textStorage] lineCount] > 3000)
+	if ([[self viTextStorage] lineCount] > 3000)
 		[[self layoutManager] setAllowsNonContiguousLayout:YES];
 	else
 		[[self layoutManager] setAllowsNonContiguousLayout:NO];
@@ -327,7 +327,7 @@ DEBUG_FINALIZE();
 	[[self layoutManager] invalidateDisplayForCharacterRange:NSMakeRange([self caret], 1)];
 }
 
-- (ViTextStorage *)textStorage
+- (ViTextStorage *)viTextStorage
 {
 	return (ViTextStorage *)[super textStorage];
 }
@@ -379,7 +379,7 @@ DEBUG_FINALIZE();
 	DEBUG(@"got %lu lines", [[self textStorage] lineCount]);
 	if ([self isFieldEditor])
 		return;
-	if ([[self textStorage] lineCount] > 3000)
+	if ([[self viTextStorage] lineCount] > 3000)
 		[[self layoutManager] setAllowsNonContiguousLayout:YES];
 	else
 		[[self layoutManager] setAllowsNonContiguousLayout:NO];
@@ -758,7 +758,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (NSString *)line
 {
-	return [[self textStorage] lineAtLocation:[self caret]];
+	return [[self viTextStorage] lineAtLocation:[self caret]];
 }
 
 - (ViMark *)markAtLocation:(NSUInteger)location
@@ -826,7 +826,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (NSUInteger)lengthOfIndentAtLocation:(NSUInteger)aLocation
 {
-	return [self lengthOfIndentString:[[self textStorage] leadingWhitespaceForLineAtLocation:aLocation]];
+	return [self lengthOfIndentString:[[self viTextStorage] leadingWhitespaceForLineAtLocation:aLocation]];
 }
 
 - (BOOL)shouldIncreaseIndentAtLocation:(NSUInteger)aLocation
@@ -837,7 +837,7 @@ replaceCharactersInRange:(NSRange)aRange
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
+		NSString *checkLine = [[self viTextStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -854,7 +854,7 @@ replaceCharactersInRange:(NSRange)aRange
 	if (bestMatchingScope) {
 		NSString *pattern = [increaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
+		NSString *checkLine = [[self viTextStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -871,7 +871,7 @@ replaceCharactersInRange:(NSRange)aRange
 	if (bestMatchingScope) {
 		NSString *pattern = [decreaseIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
+		NSString *checkLine = [[self viTextStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -888,7 +888,7 @@ replaceCharactersInRange:(NSRange)aRange
 	if (bestMatchingScope) {
 		NSString *pattern = [unIndentPatterns objectForKey:bestMatchingScope];
 		ViRegexp *rx = [ViRegexp regexpWithString:pattern];
-		NSString *checkLine = [[self textStorage] lineAtLocation:aLocation];
+		NSString *checkLine = [[self viTextStorage] lineAtLocation:aLocation];
 
 		if ([rx matchInString:checkLine])
 			return YES;
@@ -949,7 +949,7 @@ replaceCharactersInRange:(NSRange)aRange
 		return 0;
 	for (; bol > 0;) {
 		[self getLineStart:&bol end:NULL contentsEnd:&end forLocation:bol - 1];
-		if (smartIndent && [[self textStorage] isBlankLineAtLocation:bol])
+		if (smartIndent && [[self viTextStorage] isBlankLineAtLocation:bol])
 			DEBUG(@"line %lu is blank", [[self textStorage] lineNumberAtLocation:bol]);
 		else if (smartIndent && [self shouldIgnoreIndentAtLocation:bol])
 			DEBUG(@"line %lu is ignored", [[self textStorage] lineNumberAtLocation:bol]);
@@ -1007,7 +1007,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (NSUInteger)insertNewlineAtLocation:(NSUInteger)aLocation indentForward:(BOOL)indentForward
 {
-	NSString *leading_whitespace = [[self textStorage] leadingWhitespaceForLineAtLocation:aLocation];
+	NSString *leading_whitespace = [[self viTextStorage] leadingWhitespaceForLineAtLocation:aLocation];
 
 	aLocation = [self removeTrailingAutoIndentForLineAtLocation:aLocation];
 
@@ -1028,7 +1028,7 @@ replaceCharactersInRange:(NSRange)aRange
 		[self setCaret:aLocation];
 		leading_whitespace = [self suggestedIndentAtLocation:aLocation];
 		if (leading_whitespace) {
-			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
+			NSRange curIndent = [[self viTextStorage] rangeOfLeadingWhitespaceForLineAtLocation:aLocation];
 			[self replaceCharactersInRange:curIndent withString:leading_whitespace];
 			NSRange autoIndentRange = NSMakeRange(curIndent.location, [leading_whitespace length]);
 			[[self textStorage] addAttribute:ViAutoIndentAttributeName
@@ -1061,7 +1061,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	[[self textStorage] beginEditing];
 	while (bol < NSMaxRange(aRange)) {
-		NSString *indent = [[self textStorage] leadingWhitespaceForLineAtLocation:bol];
+		NSString *indent = [[self viTextStorage] leadingWhitespaceForLineAtLocation:bol];
 		NSUInteger n = [self lengthOfIndentString:indent];
 		if (n % shiftWidth != 0 && alignToTabstop) {
 			/* ctrl-t / ctrl-d aligns to tabstop, but <> doesn't */
@@ -1071,7 +1071,7 @@ replaceCharactersInRange:(NSRange)aRange
 				n -= n % shiftWidth;
 		}
 		NSString *newIndent = [self indentStringOfLength:n + delta * shiftWidth];
-		if (!indentEmptyLines && [[self textStorage] isBlankLineAtLocation:bol])
+		if (!indentEmptyLines && [[self viTextStorage] isBlankLineAtLocation:bol])
 			/* should not indent empty lines when using the < or > operators. */
 			newIndent = indent;
 
@@ -1270,7 +1270,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (void)gotoColumn:(NSUInteger)column fromLocation:(NSUInteger)aLocation
 {
-	end_location = [[self textStorage] locationForColumn:column
+	end_location = [[self viTextStorage] locationForColumn:column
 	                                        fromLocation:aLocation
 	                                           acceptEOL:(mode == ViInsertMode)];
 	final_location = end_location;
@@ -1284,7 +1284,7 @@ replaceCharactersInRange:(NSRange)aRange
 		return YES;
 	}
 
-	NSInteger bol = [[self textStorage] locationForStartOfLine:line];
+	NSInteger bol = [[self viTextStorage] locationForStartOfLine:line];
 	if (bol == -1)
 		return NO;
 
@@ -1824,7 +1824,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	BOOL foundSmartTypingPair = NO;
 
-	ViTextStorage *ts = [self textStorage];
+	ViTextStorage *ts = [self viTextStorage];
 	NSString *string = [ts string];
 	NSUInteger length = [ts length];
 	NSArray *pair = nil;
@@ -1907,7 +1907,7 @@ replaceCharactersInRange:(NSRange)aRange
 		    ! [self isFieldEditor] &&
 		    [[self preference:@"autocomplete"] integerValue]) {
 		  NSRange wordRange;
-		  NSString *word = [[self textStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
+		  NSString *word = [[self viTextStorage] wordAtLocation:final_location range:&wordRange acceptAfter:YES];
 		  if ([word length] >= 2) {
 			  [self presentCompletionsOf:word
 					fromProvider:[[ViWordCompletion alloc] init]
@@ -1928,7 +1928,7 @@ replaceCharactersInRange:(NSRange)aRange
 			DEBUG(@"got auto-indent whitespace in range %@ for line between %lu and %lu",
 			    NSStringFromRange(r), bol, eol);
 			NSString *indent = [self suggestedIndentAtLocation:bol];
-			NSRange curIndent = [[self textStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
+			NSRange curIndent = [[self viTextStorage] rangeOfLeadingWhitespaceForLineAtLocation:bol];
 			if (curIndent.length != [indent length]) {
 				[[self textStorage] removeAttribute:ViAutoIndentAttributeName
 							      range:r];
@@ -2012,7 +2012,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	if ([[self preference:@"smarttab" atLocation:start_location] integerValue] == NSOnState) {
 		/* Check if we're in leading whitespace. */
-		NSUInteger firstNonBlank = [[self textStorage] firstNonBlankForLineAtLocation:start_location];
+		NSUInteger firstNonBlank = [[self viTextStorage] firstNonBlankForLineAtLocation:start_location];
 		if (firstNonBlank == NSNotFound || firstNonBlank >= start_location) {
 			/* Do smart tab, behaves as ctrl-t. */
 			return [self increase_indent:command];
@@ -2084,7 +2084,7 @@ replaceCharactersInRange:(NSRange)aRange
 		NSUInteger bol;
 		[self getLineStart:&bol end:NULL contentsEnd:NULL forLocation:start_location];
 		if (start_location > bol) {
-			NSUInteger firstNonBlank = [[self textStorage]
+			NSUInteger firstNonBlank = [[self viTextStorage]
 			    firstNonBlankForLineAtLocation:start_location];
 			if (firstNonBlank == NSNotFound || firstNonBlank >= start_location) {
 				/* Do smart backspace, behaves as ctrl-d. */
@@ -2332,7 +2332,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	int affected_lines = 0;
 	if (!command.isMotion && mode == ViVisualMode)
-		affected_lines = (int)([[self textStorage] lineNumberAtLocation:IMAX(l1,l2-1)] - [[self textStorage] lineNumberAtLocation:l1] + 1);
+		affected_lines = (int)([[self viTextStorage] lineNumberAtLocation:IMAX(l1,l2-1)] - [[self viTextStorage] lineNumberAtLocation:l1] + 1);
 
 	BOOL leaveVisualMode = NO;
 	if (mode == ViVisualMode && !command.isMotion &&
@@ -2361,7 +2361,7 @@ replaceCharactersInRange:(NSRange)aRange
 		/* ...and > */
 		/* ...and < */
 		// FIXME: this is not a generic case!
-		final_location = [[self textStorage] firstNonBlankForLineAtLocation:final_location];
+		final_location = [[self viTextStorage] firstNonBlankForLineAtLocation:final_location];
 	}
 
 	if (ok && command.isLineMode && !command.isMotion && mode == ViVisualMode) {
@@ -2428,7 +2428,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	if ([self hasMarkedText]) {
 		DEBUG(@"unmarking marked text in range %@", NSStringFromRange([self markedRange]));
-		[self setMarkedText:@"" selectedRange:NSMakeRange(0, 0)];
+		[self setMarkedText:@"" selectedRange:NSMakeRange(0, 0) replacementRange:NSMakeRange(0, 0)];
 	}
 
 	/*
@@ -2699,12 +2699,12 @@ replaceCharactersInRange:(NSRange)aRange
 
 - (NSUInteger)currentLine
 {
-	return [[self textStorage] lineNumberAtLocation:[self caret]];
+	return [[self viTextStorage] lineNumberAtLocation:[self caret]];
 }
 
 - (NSUInteger)currentColumn
 {
-	return [[self textStorage] columnAtLocation:[self caret]];
+	return [[self viTextStorage] columnAtLocation:[self caret]];
 }
 
 - (NSUInteger)currentScreenColumn
@@ -2759,7 +2759,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	if (_selection_affinity == 2) {
 		/* align to word boundaries */
-		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
+		NSRange wordRange = [[self viTextStorage] rangeOfWordAtLocation:visual_start_location
 								  acceptAfter:NO];
 		if (wordRange.location != NSNotFound) {
 			visual_start_location = wordRange.location;
@@ -2795,7 +2795,7 @@ replaceCharactersInRange:(NSRange)aRange
 
 	if (_selection_affinity == 2) {
 		/* align to word boundaries */
-		NSRange wordRange = [[self textStorage] rangeOfWordAtLocation:visual_start_location
+		NSRange wordRange = [[self viTextStorage] rangeOfWordAtLocation:visual_start_location
 								  acceptAfter:NO];
 		if (wordRange.location != NSNotFound) {
 			if (location > visual_start_location)
@@ -2804,7 +2804,7 @@ replaceCharactersInRange:(NSRange)aRange
 				visual_start_location = NSMaxRange(wordRange) - 1;
 		}
 
-		wordRange = [[self textStorage] rangeOfWordAtLocation:location
+		wordRange = [[self viTextStorage] rangeOfWordAtLocation:location
 							  acceptAfter:NO];
 		if (wordRange.location != NSNotFound) {
 			if (location > visual_start_location)

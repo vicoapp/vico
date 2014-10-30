@@ -182,7 +182,7 @@
 /**
  * @returns The associated ViTextStorage object.
  */
-- (ViTextStorage *)textStorage;
+- (ViTextStorage *)viTextStorage;
 
 - (void)prepareRevertDocument;
 - (void)documentDidLoad:(ViDocument *)aDocument;

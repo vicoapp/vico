@@ -243,7 +243,7 @@
 	/* Text-view related variables.
 	 */
 	if (textView) {
-		ViTextStorage *ts = [textView textStorage];
+		ViTextStorage *ts = [textView viTextStorage];
 
 		NSString *line = [ts lineAtLocation:[textView caret]];
 		if (line)

@@ -43,7 +43,7 @@
 
 	NSUInteger wordlen = [word length];
 
-	ViTextStorage *textStorage = [text textStorage];
+	ViTextStorage *textStorage = [text viTextStorage];
 	NSUInteger currentLocation = [text caret] - wordlen;
 
 	BOOL fuzzySearch = ([options rangeOfString:@"f"].location != NSNotFound);

@@ -84,7 +84,7 @@
 
 	layoutManager = _textView.layoutManager;
 	container = _textView.textContainer;
-	textStorage = _textView.textStorage;
+	textStorage = _textView.viTextStorage;
 	document = _textView.document;
 	yinset = _textView.textContainerInset.height;
 

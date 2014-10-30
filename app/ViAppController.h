@@ -63,7 +63,7 @@ additionalBindings:(NSDictionary *)bindings
 
 @end
 
-@interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate>
+@interface ViAppController : NSObject <ViShellCommandProtocol, NSTextViewDelegate, NSFileManagerDelegate>
 {
 	IBOutlet NSMenu		*__weak encodingMenu;
 	IBOutlet NSMenu		*viewMenu;

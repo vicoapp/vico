@@ -510,7 +510,7 @@
 				_path, @"bundlePath",
 				nil];
 			NSError *error = nil;
-			[[NSApp delegate] eval:script
+			[(ViAppController *)[NSApp delegate] eval:script
 				    withParser:_parser
 				      bindings:bindings
 					 error:&error];

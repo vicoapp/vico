@@ -277,7 +277,7 @@
 
 	[tabViewItems eachBlock:^(id obj, BOOL *stop) {
 		NSTabViewItem *item = (NSTabViewItem *)obj;
-		NSSplitView *split = [item view];
+		NSSplitView *split = (NSSplitView *)[item view];
 		ViTabController *tabController = (ViTabController *)[item identifier];
 		NSArray *viewControllers = [tabController views];
 

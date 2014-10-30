@@ -89,7 +89,7 @@
 	if ([[[self window] windowController] isKindOfClass:[ViWindowController class]])
 		exString = [[[self window] windowController] getExStringInteractivelyForCommand:command prefix:prefix];
 	else
-		exString = [[NSApp delegate] getExStringForCommand:command prefix:prefix];
+		exString = [(ViAppController *)[NSApp delegate] getExStringForCommand:command prefix:prefix];
 	return exString;
 }
 

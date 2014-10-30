@@ -121,7 +121,7 @@ int logIndent = 0;
 	saved_column = -1;
 	reverted_line = -1;
 	snippetMatchRange.location = NSNotFound;
-	original_insert_source = [[NSApp delegate] original_input_source];
+	original_insert_source = [((ViAppController*)[NSApp delegate]) original_input_source];
 	_taskRunner = [[ViTaskRunner alloc] init];
 
 	_wordSet = [NSMutableCharacterSet characterSetWithCharactersInString:@"_"];

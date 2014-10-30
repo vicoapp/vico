@@ -208,7 +208,7 @@
 {
 	NSString *script = [[[self textStorage] string] substringWithRange:command.range];
 	NSError *error = nil;
-	[[NSApp delegate] eval:script
+	[(ViAppController *)[NSApp delegate] eval:script
 		    withParser:nil
 		      bindings:nil
 			 error:&error];

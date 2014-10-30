@@ -296,7 +296,7 @@ DEBUG_FINALIZE();
 						   context:NULL];
 
 	// Set up default status bar.
-	NuBlock *statusSetupBlock = [[NSApp delegate] statusSetupBlock];
+	NuBlock *statusSetupBlock = [(ViAppController *)[NSApp delegate] statusSetupBlock];
 	if (statusSetupBlock) {
 		NuCell *argument = [[NSArray arrayWithObject:messageView] list];
 
@@ -1307,7 +1307,7 @@ DEBUG_FINALIZE();
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	NSWindow *keyWindow = [[NSApp delegate] keyWindowBeforeMainMenuTracking];
+	NSWindow *keyWindow = [(ViAppController *)[NSApp delegate] keyWindowBeforeMainMenuTracking];
 	BOOL isDocWindow = [[keyWindow windowController] isKindOfClass:[ViWindowController class]];
 
 	return isDocWindow;

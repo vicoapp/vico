@@ -20,6 +20,20 @@
                ReferencedContainer = "container:vico.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "175423591A059D7300927972"
+               BuildableName = "Vico Unit Tests.xctest"
+               BlueprintName = "Vico Unit Tests"
+               ReferencedContainer = "container:vico.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -35,6 +49,16 @@
                BlueprintIdentifier = "9A2EF2AF133109C20023C5B7"
                BuildableName = "Tests.octest"
                BlueprintName = "Tests"
+               ReferencedContainer = "container:vico.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "175423591A059D7300927972"
+               BuildableName = "Vico Unit Tests.xctest"
+               BlueprintName = "Vico Unit Tests"
                ReferencedContainer = "container:vico.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -76,6 +100,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "9A2EF28E133109C10023C5B7"
+            BuildableName = "Vico.app"
+            BlueprintName = "Vico"
+            ReferencedContainer = "container:vico.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -17,8 +17,12 @@
 		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		1735A6B3183348370092E695 /* ViGlyphGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6B2183348370092E695 /* ViGlyphGenerator.m */; };
 		1735A6BB1833DB060092E695 /* ViTypesetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6BA1833DB060092E695 /* ViTypesetter.m */; };
+		1754235F1A059D7300927972 /* Vico_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1754235E1A059D7300927972 /* Vico_Tests.swift */; };
+		1754236B1A059DE600927972 /* TestViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1791975B1A05958B00C192CB /* TestViRope.swift */; };
+		1754236C1A059ECC00927972 /* ViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179197551A05945500C192CB /* ViRope.swift */; };
 		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		177AC29518307E6C002C9647 /* ViFold.m in Sources */ = {isa = PBXBuildFile; fileRef = 177AC29418307E6C002C9647 /* ViFold.m */; };
+		179197561A05945500C192CB /* ViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179197551A05945500C192CB /* ViRope.swift */; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
@@ -31,6 +35,7 @@
 		17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
 		17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
 		17E66CAE17D12DAF006552F4 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
+		17ED35201A05703600E54649 /* IndentationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17ED351F1A05703600E54649 /* IndentationHelpers.swift */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
 		9A0831981418FE9D00D1805D /* ViMarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0831971418FE9D00D1805D /* ViMarkManager.m */; };
 		9A26065E134849CC002C86FB /* ExTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A26065D134849CC002C86FB /* ExTextField.m */; };
@@ -61,7 +66,6 @@
 		9A2EF2B9133109C20023C5B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EF2B7133109C20023C5B7 /* InfoPlist.strings */; };
 		9A2EF2CD13310AD70023C5B7 /* TestExCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2C713310AD70023C5B7 /* TestExCommand.m */; };
 		9A2EF2CE13310AD70023C5B7 /* TestScopeSelectors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2C813310AD70023C5B7 /* TestScopeSelectors.m */; };
-		9A2EF2CF13310AD70023C5B7 /* TestViParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2C913310AD70023C5B7 /* TestViParser.m */; };
 		9A2EF2D013310AD70023C5B7 /* TestViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CA13310AD70023C5B7 /* TestViSnippet.m */; };
 		9A2EF2D113310AD70023C5B7 /* TestViTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */; };
 		9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */; };
@@ -336,6 +340,13 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		175423601A059D7300927972 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A2EF286133109C10023C5B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A2EF28E133109C10023C5B7;
+			remoteInfo = Vico;
+		};
 		17E8AB4B181CCF9C00233393 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */;
@@ -461,8 +472,14 @@
 		1735A6B2183348370092E695 /* ViGlyphGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViGlyphGenerator.m; sourceTree = "<group>"; };
 		1735A6B91833DB060092E695 /* ViTypesetter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTypesetter.h; sourceTree = "<group>"; };
 		1735A6BA1833DB060092E695 /* ViTypesetter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTypesetter.m; sourceTree = "<group>"; };
+		1754235A1A059D7300927972 /* Vico Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "Vico Tests.xctest"; path = "Vico Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1754235D1A059D7300927972 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1754235E1A059D7300927972 /* Vico_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vico_Tests.swift; sourceTree = "<group>"; };
 		177AC29318307E6C002C9647 /* ViFold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFold.h; sourceTree = "<group>"; };
 		177AC29418307E6C002C9647 /* ViFold.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFold.m; sourceTree = "<group>"; };
+		179197551A05945500C192CB /* ViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRope.swift; path = "Text Storage/ViRope.swift"; sourceTree = "<group>"; };
+		1791975A1A05958B00C192CB /* Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		1791975B1A05958B00C192CB /* TestViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViRope.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
 		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
@@ -481,6 +498,8 @@
 		17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBSystemInformation.h; sourceTree = "<group>"; };
 		17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBSystemInformation.m; sourceTree = "<group>"; };
 		17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
+		17ED351E1A05703500E54649 /* Vico-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Bridging-Header.h"; sourceTree = "<group>"; };
+		17ED351F1A05703600E54649 /* IndentationHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndentationHelpers.swift; sourceTree = "<group>"; };
 		17F2E3C715E0499800F81089 /* ViStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViStatusView.h; sourceTree = "<group>"; };
 		17F2E3C815E0499800F81089 /* ViStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViStatusView.m; sourceTree = "<group>"; };
 		9A0831961418FE9D00D1805D /* ViMarkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViMarkManager.h; sourceTree = "<group>"; };
@@ -533,7 +552,6 @@
 		9A2EF2BA133109C20023C5B7 /* tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tests-Prefix.pch"; sourceTree = "<group>"; };
 		9A2EF2C713310AD70023C5B7 /* TestExCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestExCommand.m; sourceTree = "<group>"; };
 		9A2EF2C813310AD70023C5B7 /* TestScopeSelectors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestScopeSelectors.m; sourceTree = "<group>"; };
-		9A2EF2C913310AD70023C5B7 /* TestViParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViParser.m; sourceTree = "<group>"; };
 		9A2EF2CA13310AD70023C5B7 /* TestViSnippet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViSnippet.m; sourceTree = "<group>"; };
 		9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextStorage.m; sourceTree = "<group>"; };
 		9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViTextView.m; sourceTree = "<group>"; };
@@ -932,6 +950,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		175423571A059D7300927972 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A288E1B1398EA6F00258451 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1010,6 +1035,31 @@
 				1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */,
 			);
 			name = "Cocoa Extensions";
+			sourceTree = "<group>";
+		};
+		1754235B1A059D7300927972 /* Vico Tests */ = {
+			isa = PBXGroup;
+			children = (
+				1754235E1A059D7300927972 /* Vico_Tests.swift */,
+				1754235C1A059D7300927972 /* Supporting Files */,
+			);
+			path = "Vico Tests";
+			sourceTree = "<group>";
+		};
+		1754235C1A059D7300927972 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1754235D1A059D7300927972 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		179197541A05942E00C192CB /* Text Storage */ = {
+			isa = PBXGroup;
+			children = (
+				179197551A05945500C192CB /* ViRope.swift */,
+			);
+			name = "Text Storage";
 			sourceTree = "<group>";
 		};
 		17A37ED61826DD76007E40C9 /* Base Nu */ = {
@@ -1114,6 +1164,7 @@
 				9A2EF41213310F4D0023C5B7 /* lemon */,
 				9A4346E11331257A002B04DE /* shell tool */,
 				9A288E201398EA7000258451 /* par */,
+				1754235B1A059D7300927972 /* Vico Tests */,
 				9A2EF292133109C20023C5B7 /* Frameworks */,
 				9A2EF290133109C10023C5B7 /* Products */,
 				17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */,
@@ -1128,6 +1179,7 @@
 				9A2EF41013310F4D0023C5B7 /* lemon */,
 				9A4346DD1331257A002B04DE /* vicotool */,
 				9A288E1E1398EA6F00258451 /* par */,
+				1754235A1A059D7300927972 /* Vico Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1147,6 +1199,7 @@
 		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				179197541A05942E00C192CB /* Text Storage */,
 				170435BE199FEB1E0062E643 /* File Indexing */,
 				1732DB04181EF2C200890055 /* Cocoa Extensions */,
 				17D8A12117CF0330000C25C6 /* SFBCrash */,
@@ -1175,15 +1228,16 @@
 		9A2EF2B4133109C20023C5B7 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				1791975B1A05958B00C192CB /* TestViRope.swift */,
 				9A5DD69F13435F0D006981AE /* TestKeyCodes.m */,
 				9AB10BAD1340BAE700D81D33 /* TestViMap.m */,
 				9A2EF2C713310AD70023C5B7 /* TestExCommand.m */,
 				9A2EF2C813310AD70023C5B7 /* TestScopeSelectors.m */,
-				9A2EF2C913310AD70023C5B7 /* TestViParser.m */,
 				9A2EF2CA13310AD70023C5B7 /* TestViSnippet.m */,
 				9A2EF2CB13310AD70023C5B7 /* TestViTextStorage.m */,
 				9A2EF2CC13310AD70023C5B7 /* TestViTextView.m */,
 				9A2EF2B5133109C20023C5B7 /* Supporting Files */,
+				1791975A1A05958B00C192CB /* Tests-Bridging-Header.h */,
 			);
 			name = Tests;
 			path = tests;
@@ -1597,6 +1651,8 @@
 				9A2EF37213310CB30023C5B7 /* ViWindow.m */,
 				9A2EF37313310CB40023C5B7 /* ViWindowController.h */,
 				9A2EF37413310CB60023C5B7 /* ViWindowController.m */,
+				17ED351F1A05703600E54649 /* IndentationHelpers.swift */,
+				17ED351E1A05703500E54649 /* Vico-Bridging-Header.h */,
 			);
 			name = "More code";
 			sourceTree = "<group>";
@@ -1683,6 +1739,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		175423591A059D7300927972 /* Vico Unit Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1754236A1A059D7300927972 /* Build configuration list for PBXNativeTarget "Vico Unit Tests" */;
+			buildPhases = (
+				175423561A059D7300927972 /* Sources */,
+				175423571A059D7300927972 /* Frameworks */,
+				175423581A059D7300927972 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				175423611A059D7300927972 /* PBXTargetDependency */,
+			);
+			name = "Vico Unit Tests";
+			productName = "Vico Tests";
+			productReference = 1754235A1A059D7300927972 /* Vico Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		9A288E1D1398EA6F00258451 /* par */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */;
@@ -1786,6 +1860,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0610;
+				TargetAttributes = {
+					175423591A059D7300927972 = {
+						CreatedOnToolsVersion = 6.1;
+					};
+				};
 			};
 			buildConfigurationList = 9A2EF289133109C10023C5B7 /* Build configuration list for PBXProject "vico" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1810,6 +1889,7 @@
 				9A2EF40F13310F4D0023C5B7 /* lemon */,
 				9A4346DC1331257A002B04DE /* vicotool */,
 				9A288E1D1398EA6F00258451 /* par */,
+				175423591A059D7300927972 /* Vico Unit Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -1853,6 +1933,13 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		175423581A059D7300927972 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A2EF28D133109C10023C5B7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2013,6 +2100,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		175423561A059D7300927972 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1754236C1A059ECC00927972 /* ViRope.swift in Sources */,
+				1754236B1A059DE600927972 /* TestViRope.swift in Sources */,
+				1754235F1A059D7300927972 /* Vico_Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A288E1A1398EA6F00258451 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2058,6 +2155,7 @@
 				9A2EF39613310CB80023C5B7 /* ViBundleSnippet.m in Sources */,
 				9A2EF39713310CB80023C5B7 /* ViCharsetDetector.mm in Sources */,
 				9A2EF39813310CB80023C5B7 /* ViParser.m in Sources */,
+				179197561A05945500C192CB /* ViRope.swift in Sources */,
 				9A2EF39913310CB80023C5B7 /* ViCommandOutputController.m in Sources */,
 				9A2EF39A13310CB80023C5B7 /* ViDocument.m in Sources */,
 				9A2EF39B13310CB80023C5B7 /* ViDocumentController.m in Sources */,
@@ -2192,6 +2290,7 @@
 				9A2606AD135B1924002C86FB /* ViPreferencePaneGeneral.m in Sources */,
 				9A2606AE135B1924002C86FB /* ViPreferencePaneTheme.m in Sources */,
 				9A2606B1135B1C4F002C86FB /* ViPreferencePaneBundles.m in Sources */,
+				17ED35201A05703600E54649 /* IndentationHelpers.swift in Sources */,
 				9A665275135B22E300A2F93C /* ViPreferencePaneEdit.m in Sources */,
 				9AAF73FD13654C8600D75E1E /* ViFileURLHandler.m in Sources */,
 				9AAF73FE13654C8600D75E1E /* ViURLManager.m in Sources */,
@@ -2246,7 +2345,6 @@
 				9AB10BAF1340BB4C00D81D33 /* TestViMap.m in Sources */,
 				9A2EF2CD13310AD70023C5B7 /* TestExCommand.m in Sources */,
 				9A2EF2CE13310AD70023C5B7 /* TestScopeSelectors.m in Sources */,
-				9A2EF2CF13310AD70023C5B7 /* TestViParser.m in Sources */,
 				9A2EF2D013310AD70023C5B7 /* TestViSnippet.m in Sources */,
 				9A2EF2D113310AD70023C5B7 /* TestViTextStorage.m in Sources */,
 				9A2EF2D213310AD70023C5B7 /* TestViTextView.m in Sources */,
@@ -2285,6 +2383,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		175423611A059D7300927972 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A2EF28E133109C10023C5B7 /* Vico */;
+			targetProxy = 175423601A059D7300927972 /* PBXContainerItemProxy */;
+		};
 		9A288E371398EAD200258451 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9A288E1D1398EA6F00258451 /* par */;
@@ -2449,6 +2552,123 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		175423621A059D7300927972 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Vico Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		175423631A059D7300927972 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Vico Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		175423641A059D7300927972 /* Snapshot */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Vico Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Snapshot;
+		};
 		9A26068B135316F7002C86FB /* Snapshot */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2488,6 +2708,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2514,7 +2735,8 @@
 					Sparkle,
 				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2522,6 +2744,8 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "app/Vico-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2532,6 +2756,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2540,11 +2765,15 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
 				INFOPLIST_FILE = "tests/Tests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SenTestingKit,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "tests/Tests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -2689,6 +2918,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2709,13 +2939,16 @@
 					Sparkle,
 				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
 					"-lffi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "app/Vico-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2725,6 +2958,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2750,7 +2984,8 @@
 					Sparkle,
 				);
 				INFOPLIST_FILE = "app/Vico-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-lcrypto",
 					"-lresolv",
@@ -2758,6 +2993,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "app/Vico-Bridging-Header.h";
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2768,6 +3004,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
@@ -2776,11 +3013,15 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
 				INFOPLIST_FILE = "tests/Tests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SenTestingKit,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "tests/Tests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -2791,6 +3032,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vico.app/Contents/MacOS/Vico";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2799,11 +3041,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "tests/tests-Prefix.pch";
 				INFOPLIST_FILE = "tests/Tests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SenTestingKit,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "tests/Tests-Bridging-Header.h";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -2867,6 +3112,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1754236A1A059D7300927972 /* Build configuration list for PBXNativeTarget "Vico Unit Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				175423621A059D7300927972 /* Debug */,
+				175423631A059D7300927972 /* Release */,
+				175423641A059D7300927972 /* Snapshot */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Snapshot;
+		};
 		9A288E241398EA7000258451 /* Build configuration list for PBXNativeTarget "par" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

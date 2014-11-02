@@ -5,7 +5,7 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>5D95552E-01E6-46A2-976B-DB9CDFE459A7</string>
+	<string>D52DCC25-D17E-4E87-B5F5-DDE588DD29C0</string>
 	<key>IDESourceControlProjectName</key>
 	<string>vico</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
@@ -62,51 +62,51 @@
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>03FE9E4300610AE487B82ECFD3142E6BF43412AD</key>
-		<string>../..Bundles/vicoapp-diff.tmbundle/</string>
+		<string>../..Bundles/vicoapp-diff.tmbundle</string>
 		<key>040EBBE8DDE395AB5629251A6823D789C98D615E</key>
-		<string>../..Bundles/vicoapp-text.tmbundle/</string>
+		<string>../..Bundles/vicoapp-text.tmbundle</string>
 		<key>043B290F6FCF56E58216A9082ECC125C3A51BDA3</key>
-		<string>../..Bundles/vicoapp-lua.tmbundle/</string>
+		<string>../..Bundles/vicoapp-lua.tmbundle</string>
 		<key>0F9EC5F46758F7F817BC7E882A03384CC4471843</key>
-		<string>../..Bundles/vicoapp-java.tmbundle/</string>
+		<string>../..Bundles/vicoapp-java.tmbundle</string>
 		<key>2A1098D11F398854F6A2BE06C923E8A8E36D2FB6</key>
-		<string>../..Bundles/vicoapp-ack.vico-bundle/</string>
+		<string>../..Bundles/vicoapp-ack.vico-bundle</string>
 		<key>2C4B663BCADE37F9FCB94345628C63EF5F1BFFCD</key>
-		<string>../..Bundles/vicoapp-c.tmbundle/</string>
+		<string>../..Bundles/vicoapp-c.tmbundle</string>
 		<key>2DD61BF35B00AE8A13FB7B7C0BC0BB7116BE33C1</key>
-		<string>../..Bundles/vicoapp-objective-c.tmbundle/</string>
+		<string>../..Bundles/vicoapp-objective-c.tmbundle</string>
 		<key>34C0D0C317C76C7E2EC060D912C658155F3D50D6</key>
-		<string>../..Bundles/vicoapp-yaml.tmbundle/</string>
+		<string>../..Bundles/vicoapp-yaml.tmbundle</string>
 		<key>3E037BB51BA19CA1A47602CE14106B4115FAEEC3</key>
-		<string>../..Bundles/vicoapp-perl.tmbundle/</string>
+		<string>../..Bundles/vicoapp-perl.tmbundle</string>
 		<key>47B7786BDB0E22454114FB3C77929A58CA712E96</key>
-		<string>../..Bundles/vicoapp-ruby-on-rails.tmbundle/</string>
+		<string>../..Bundles/vicoapp-ruby-on-rails.tmbundle</string>
 		<key>516F7F0D086B4A557E6F345790CD6BBB789FD475</key>
-		<string>../..Bundles/vicoapp-shellscript.tmbundle/</string>
+		<string>../..Bundles/vicoapp-shellscript.tmbundle</string>
 		<key>55BFF3680D4361BB021E2CF34E059B5F3E899670</key>
-		<string>../..Bundles/vicoapp-xml.tmbundle/</string>
+		<string>../..Bundles/vicoapp-xml.tmbundle</string>
 		<key>798F4EDA95AF0757ADE99BFC8E70D3D649552BCD</key>
-		<string>../..Bundles/vicoapp-sql.tmbundle/</string>
+		<string>../..Bundles/vicoapp-sql.tmbundle</string>
 		<key>81E1EC7FD25F3A5A6980387A6F353812CA2E7878</key>
-		<string>../..Bundles/vicoapp-json.tmbundle/</string>
+		<string>../..Bundles/vicoapp-json.tmbundle</string>
 		<key>AFEF27B5C3ED54C5E97592B164CA7E9AF4E74258</key>
-		<string>../..Bundles/vicoapp-source.tmbundle/</string>
+		<string>../..Bundles/vicoapp-source.tmbundle</string>
 		<key>C857110F983E48EF9EE6E6F7A0E279E155703B34</key>
-		<string>../..Bundles/vicoapp-php.tmbundle/</string>
+		<string>../..Bundles/vicoapp-php.tmbundle</string>
 		<key>CCBB9F8C243DF12F218CE1A396D8EBDAC9A5DDC2</key>
-		<string>../..Bundles/vicoapp-css.tmbundle/</string>
+		<string>../..Bundles/vicoapp-css.tmbundle</string>
 		<key>D1D4A0A45FFB32DDF78BCD7C15AB47669DC1F832</key>
-		<string>../..Bundles/vicoapp-javascript.tmbundle/</string>
+		<string>../..Bundles/vicoapp-javascript.tmbundle</string>
 		<key>D3A582F1A82C36301A9A90E0EEF8568C5C93BE07</key>
 		<string>../..</string>
 		<key>D80F40F0B496121A9864A0EB57C49E74B0FB45B6</key>
-		<string>../..Bundles/vicoapp-python.tmbundle/</string>
+		<string>../..Bundles/vicoapp-python.tmbundle</string>
 		<key>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</key>
-		<string>../..sparkle/</string>
+		<string>../..sparkle</string>
 		<key>F152CE9007DD2679EFB29BDF61FDD8110EC02416</key>
-		<string>../..Bundles/vicoapp-ruby.tmbundle/</string>
+		<string>../..Bundles/vicoapp-ruby.tmbundle</string>
 		<key>F17D50F0ABAED2DCDE7E9E76CBDAC0D149092DE0</key>
-		<string>../..Bundles/vicoapp-html.tmbundle/</string>
+		<string>../..Bundles/vicoapp-html.tmbundle</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>github.com:vicoapp/vico.git</string>
@@ -116,14 +116,6 @@
 	<string>D3A582F1A82C36301A9A90E0EEF8568C5C93BE07</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
-		<dict>
-			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
-			<string>public.vcs.git</string>
-			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</string>
-			<key>IDESourceControlWCCName</key>
-			<string>sparkle</string>
-		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
@@ -299,6 +291,14 @@
 			<string>34C0D0C317C76C7E2EC060D912C658155F3D50D6</string>
 			<key>IDESourceControlWCCName</key>
 			<string>vicoapp-yaml.tmbundle</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</string>
+			<key>IDESourceControlWCCName</key>
+			<string>vicosparkle</string>
 		</dict>
 	</array>
 </dict>

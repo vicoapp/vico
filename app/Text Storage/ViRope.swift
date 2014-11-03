@@ -14,7 +14,7 @@ func <(lhs: ViRope.Index, rhs: ViRope.Index) -> Bool {
 }
 
 func ==(lhs: ViRope.Index, rhs: ViRope.Index) -> Bool {
-	return false
+	return lhs.nodeText == rhs.nodeText && lhs.nodeIndex == rhs.nodeIndex
 }
 
 class ViRope {

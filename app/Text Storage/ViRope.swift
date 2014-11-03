@@ -98,7 +98,13 @@ class ViRope {
 				println("fatal error: cannot increment end index")
 				abort()
 			} else if nextInText == nodeText?.endIndex {
-				return findNextNodeIndex()
+				let nextNodeIndex = findNextNodeIndex()
+				
+				if nextNodeIndex == self { // special marker, means nothing's next
+					return Index(nodePath: nodePath, nodeText: nodeText, nodeIndex: nextInText)
+				} else {
+					return nextNodeIndex
+				}
 			} else {
 				return Index(nodePath: nodePath, nodeText: nodeText, nodeIndex: nextInText)
 			}

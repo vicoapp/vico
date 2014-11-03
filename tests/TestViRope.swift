@@ -63,7 +63,7 @@ class TestViRope: XCTestCase {
 		var ropeIndex = rope.startIndex
 		
 		while (stringIndex != string.endIndex) {
-			XCTAssertEqual(rope[ropeIndex], string[stringIndex], "every string index should correspond to the appropriate rope index")
+			XCTAssertEqual(rope[ropeIndex]!, string[stringIndex], "every string index should correspond to the appropriate rope index")
 			
 			stringIndex = stringIndex.successor()
 			ropeIndex = ropeIndex.successor()

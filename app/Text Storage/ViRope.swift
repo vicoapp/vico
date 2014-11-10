@@ -63,11 +63,15 @@ class ViRope {
 					case .NodeIndex(let childIndex):
 						return updatedIndex
 					case .TextIndex(let textIndex):
-						if textIndex + 1 == node.childText.endIndex {
+						var updatedTextIndex = textIndex + 1
+						// Skip empty strings.
+						while (updatedTextIndex != node.childText.endIndex && node.childText[updatedTextIndex].startIndex == node.childText[updatedTextIndex].endIndex) {
+							updatedTextIndex += 1
+						}
+						
+						if updatedTextIndex == node.childText.endIndex {
 							return updatedIndex
 						} else {
-							let updatedTextIndex = textIndex + 1
-							
 							var seen = false
 							var updatedPath = updatedIndex.nodePath.filter({ (pathNode, nodeIndex) -> Bool in
 								if pathNode === node {
@@ -94,8 +98,8 @@ class ViRope {
 		func successor() -> Index {
 			let nextInText = nodeIndex?.successor()
 			
-			if nodeText == nil {
-				println("fatal error: cannot increment end index")
+			if nodeText == nil || nodeIndex == nil {
+				println("fatal error: can not increment end index")
 				abort()
 			} else if nextInText == nodeText?.endIndex {
 				let nextNodeIndex = findNextNodeIndex()
@@ -110,12 +114,69 @@ class ViRope {
 			}
 		}
 		
+		private func findPreviousNodeIndex() -> Index? {
+			// we already know we want the next available node
+			// for the last entry in the path, check if there is a next child text
+			return nodePath.reverse().reduce(self, combine: { (updatedIndex, nodeEntry) -> Index? in
+				if updatedIndex != self && updatedIndex != nil {
+					return updatedIndex
+				} else {
+					let (node, index) = nodeEntry
+					
+					switch index {
+					case .NodeIndex(let childIndex):
+						return nil
+					case .TextIndex(let textIndex):
+						if textIndex == node.childText.startIndex {
+							return nil
+						} else {
+							var updatedTextIndex = textIndex
+							// Skip empty strings.
+							do {
+								updatedTextIndex -= 1
+							} while (updatedTextIndex != node.childText.startIndex && node.childText[updatedTextIndex].startIndex == node.childText[updatedTextIndex].endIndex)
+							
+							var seen = false
+							var updatedPath = self.nodePath.filter({ (pathNode, nodeIndex) -> Bool in
+								if pathNode === node {
+									seen = true
+									return true
+								} else {
+									return !seen
+								}
+							})
+							updatedPath[updatedPath.endIndex - 1] =
+								(node, .TextIndex(item: updatedTextIndex))
+							let updatedText = node.childText[updatedTextIndex]
+							
+							return Index(nodePath: updatedPath, nodeText: updatedText, nodeIndex: updatedText.endIndex.predecessor())
+						}
+					}
+				}
+			})
+		}
+		
 		/// Returns the previous consecutive value before `self`.
 		///
 		/// Requires: the previous value is representable.
 		func predecessor() -> Index {
-			// if first index, fatal error
-			return self
+			if nodeText == nil || nodeIndex == nil {
+				println("fatal error: can not decrement start index")
+				abort()
+			} else if nodeIndex == nodeText?.startIndex {
+				let previousNodeIndex = findPreviousNodeIndex()
+				
+				if let previousIndex = previousNodeIndex {
+					return previousIndex
+				} else { // special marker, means nothing's before
+					println("fatal error: can not decrement start index")
+					abort()
+				}
+			} else {
+				let previousInText = nodeIndex?.predecessor()
+				
+				return Index(nodePath: nodePath, nodeText: nodeText, nodeIndex: previousInText)
+			}
 		}
 	}
 	

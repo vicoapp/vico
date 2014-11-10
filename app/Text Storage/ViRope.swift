@@ -35,6 +35,15 @@ class ViRope {
 	}
 	
 	private enum EitherIndex {
+		func toString() -> String {
+			switch(self) {
+			case .NodeIndex(let item):
+				return String(item)
+			case .TextIndex(let item):
+				return String(item)
+			}
+		}
+		
 		case NodeIndex(item: Array<ViRopeNode>.Index)
 		case TextIndex(item: Array<String>.Index)
 	}
@@ -43,7 +52,13 @@ class ViRope {
 	private let nodeIndices: [Range<Index>] = []
 	
 	/// A character position in a `ViRope`.
-	struct Index : BidirectionalIndexType, Comparable {
+	struct Index : BidirectionalIndexType, Comparable, Printable {
+		var description: String {
+			get {
+				return "ViRope.Index [path: \(nodePath)] [text: \(nodeText)] [index: \(nodeIndex)]"
+			}
+		}
+		
 		/// The path of nodes from root to the node that holds the string; the index is the index within the node's contents that the next node is at.
 		private let nodePath: [(ViRopeNode, EitherIndex)]
 		private let nodeText: String?
@@ -86,6 +101,7 @@ class ViRope {
 							let updatedText = node.childText[updatedTextIndex]
 
 							return Index(nodePath: updatedPath, nodeText: updatedText, nodeIndex: updatedText.startIndex)
+							
 						}
 					}
 				}
@@ -205,12 +221,14 @@ class ViRope {
 		}
 	}
 	
-	subscript(index: Index) -> Character? {
+	subscript(index: Index) -> Character {
 		get {
-			if let nodeIndex = index.nodeIndex {
-				return index.nodeText?[nodeIndex]
+			if index.nodeIndex != nil && index.nodeText != nil {
+				// oh for comprehension, where art thou
+				return index.nodeText![index.nodeIndex!]
 			} else {
-				return nil
+				println("fatal error: Can't form a Character from an empty String")
+				abort()
 			}
 		}
 	}

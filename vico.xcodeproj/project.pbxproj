@@ -17,7 +17,6 @@
 		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		1735A6B3183348370092E695 /* ViGlyphGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6B2183348370092E695 /* ViGlyphGenerator.m */; };
 		1735A6BB1833DB060092E695 /* ViTypesetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6BA1833DB060092E695 /* ViTypesetter.m */; };
-		1754235F1A059D7300927972 /* Vico_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1754235E1A059D7300927972 /* Vico_Tests.swift */; };
 		1754236B1A059DE600927972 /* TestViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1791975B1A05958B00C192CB /* TestViRope.swift */; };
 		1754236C1A059ECC00927972 /* ViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179197551A05945500C192CB /* ViRope.swift */; };
 		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -474,12 +473,11 @@
 		1735A6BA1833DB060092E695 /* ViTypesetter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTypesetter.m; sourceTree = "<group>"; };
 		1754235A1A059D7300927972 /* Vico Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "Vico Tests.xctest"; path = "Vico Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1754235D1A059D7300927972 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1754235E1A059D7300927972 /* Vico_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vico_Tests.swift; sourceTree = "<group>"; };
 		177AC29318307E6C002C9647 /* ViFold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFold.h; sourceTree = "<group>"; };
 		177AC29418307E6C002C9647 /* ViFold.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFold.m; sourceTree = "<group>"; };
 		179197551A05945500C192CB /* ViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRope.swift; path = "Text Storage/ViRope.swift"; sourceTree = "<group>"; };
 		1791975A1A05958B00C192CB /* Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Bridging-Header.h"; sourceTree = "<group>"; };
-		1791975B1A05958B00C192CB /* TestViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViRope.swift; sourceTree = "<group>"; };
+		1791975B1A05958B00C192CB /* TestViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestViRope.swift; path = ../tests/TestViRope.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
 		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
@@ -1040,7 +1038,7 @@
 		1754235B1A059D7300927972 /* Vico Tests */ = {
 			isa = PBXGroup;
 			children = (
-				1754235E1A059D7300927972 /* Vico_Tests.swift */,
+				1791975B1A05958B00C192CB /* TestViRope.swift */,
 				1754235C1A059D7300927972 /* Supporting Files */,
 			);
 			path = "Vico Tests";
@@ -1228,7 +1226,6 @@
 		9A2EF2B4133109C20023C5B7 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				1791975B1A05958B00C192CB /* TestViRope.swift */,
 				9A5DD69F13435F0D006981AE /* TestKeyCodes.m */,
 				9AB10BAD1340BAE700D81D33 /* TestViMap.m */,
 				9A2EF2C713310AD70023C5B7 /* TestExCommand.m */,
@@ -2106,7 +2103,6 @@
 			files = (
 				1754236C1A059ECC00927972 /* ViRope.swift in Sources */,
 				1754236B1A059DE600927972 /* TestViRope.swift in Sources */,
-				1754235F1A059D7300927972 /* Vico_Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

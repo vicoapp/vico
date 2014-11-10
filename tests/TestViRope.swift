@@ -172,7 +172,36 @@ class TestViRope: XCTestCase {
 		} while (stringIndex != string.startIndex)
 		
 		XCTAssertEqual(ropeIndex, rope.startIndex, "the final rope index must be the same as the rope's reported startIndex when moving backwards")
-		// TODO empty string up front
-		// TODO empty string at back
+	}
+	
+	func testRopeIndexWorksCorrectlyWithEmptyStringsOnEnds() {
+		let string = "This"
+		let ropeWithEmptyStart = ViRope("").append(string)
+		
+		var stringIndex = string.startIndex
+		var ropeIndex = ropeWithEmptyStart.startIndex
+		
+		while (stringIndex != string.endIndex) {
+			XCTAssertEqual(ropeWithEmptyStart[ropeIndex], string[stringIndex], "every string index should correspond to the appropriate rope index forwards")
+			
+			stringIndex = stringIndex.successor()
+			ropeIndex = ropeIndex.successor()
+		}
+		
+		XCTAssertEqual(ropeIndex, ropeWithEmptyStart.endIndex, "even with an empty start string, the final rope index must be the same as the rope's reported endIndex when moving forwards")
+		
+		let ropeWithEmptyEnd = ViRope(string).append("")
+		
+		stringIndex = string.startIndex
+		ropeIndex = ropeWithEmptyEnd.startIndex
+		
+		while (stringIndex != string.endIndex) {
+			XCTAssertEqual(ropeWithEmptyEnd[ropeIndex], string[stringIndex], "every string index should correspond to the appropriate rope index forwards")
+			
+			stringIndex = stringIndex.successor()
+			ropeIndex = ropeIndex.successor()
+		}
+		
+		XCTAssertEqual(ropeIndex, ropeWithEmptyEnd.endIndex, "even with an empty end string, the final rope index must be the same as the rope's reported endIndex when moving forwards")
 	}
 }

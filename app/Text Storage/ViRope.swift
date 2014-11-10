@@ -198,25 +198,54 @@ class ViRope {
 	
 	var startIndex: Index {
 		get {
-			if let firstText = root.childText.first {
-				return Index(
-					nodePath: [(root, .TextIndex(item: root.childText.startIndex))],
-					nodeText: firstText,
-					nodeIndex: firstText.startIndex)
-			} else {
+			if root.childText.isEmpty {
+				// We're an empty string because we have no children.
 				return Index(nodePath: [], nodeText: nil, nodeIndex: nil)
+			} else {
+				var nodeIndex = root.childText.startIndex
+				while nodeIndex != root.childText.endIndex &&
+					  root.childText[nodeIndex].startIndex == root.childText[nodeIndex].endIndex {
+					nodeIndex += 1
+				}
+				
+				if nodeIndex == root.childText.endIndex {
+					// We're an empty string because our children are empty, not because we have no children.
+					return Index(nodePath: [], nodeText: nil, nodeIndex: nil)
+				} else {
+					let firstText = root.childText[nodeIndex]
+					
+					return Index(
+						nodePath: [(root, .TextIndex(item: nodeIndex))],
+						nodeText: firstText,
+						nodeIndex: firstText.startIndex)
+				}
 			}
 		}
 	}
 	var endIndex: Index {
 		get {
-			if let lastText = root.childText.last {
-				return Index(
-					nodePath: [(root, .TextIndex(item: root.childText.endIndex))],
-					nodeText: lastText,
-					nodeIndex: lastText.endIndex)
-			} else {
+			if root.childText.isEmpty {
+				// We're an empty string because we have no children.
 				return Index(nodePath: [], nodeText: nil, nodeIndex: nil)
+			} else {
+				var nodeIndex = root.childText.endIndex
+				do {
+					nodeIndex -= 1
+				} while nodeIndex != root.childText.startIndex &&
+						root.childText[nodeIndex].startIndex == root.childText[nodeIndex].endIndex
+				
+				if (nodeIndex == root.childText.startIndex &&
+					root.childText[nodeIndex].startIndex == root.childText[nodeIndex].endIndex) {
+					// We're an empty string because our children are empty, not because we have no children.
+					return Index(nodePath: [], nodeText: nil, nodeIndex: nil)
+				} else {
+					let lastText = root.childText[nodeIndex]
+					
+					return Index(
+						nodePath: [(root, .TextIndex(item: nodeIndex))],
+						nodeText: lastText,
+						nodeIndex: lastText.endIndex)
+				}
 			}
 		}
 	}

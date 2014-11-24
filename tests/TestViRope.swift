@@ -175,7 +175,7 @@ class TestViRope: XCTestCase {
 	}
 	
 	func testRopeIndexWorksCorrectlyWithEmptyStringsOnEnds() {
-		let string = "This"
+		let string: String = "This"
 		let ropeWithEmptyStart = ViRope("").append(string)
 		
 		var stringIndex = string.startIndex

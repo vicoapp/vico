@@ -33,6 +33,9 @@
 		17D8A12817CF0354000C25C6 /* SFBCrashReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12317CF0354000C25C6 /* SFBCrashReporter.m */; };
 		17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */; };
 		17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */; };
+		17DCAA151A213C6400408B9D /* ViRopeUtf16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DCAA141A213C6400408B9D /* ViRopeUtf16.swift */; };
+		17DCAA161A213D1800408B9D /* TestViRopeUtf16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DCAA0D1A213BD500408B9D /* TestViRopeUtf16.swift */; };
+		17DCAA171A21438200408B9D /* ViRopeUtf16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DCAA141A213C6400408B9D /* ViRopeUtf16.swift */; };
 		17E66CAE17D12DAF006552F4 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1730CE0F17D1282800A1DA2C /* SBJsonUTF8Stream.m */; };
 		17ED35201A05703600E54649 /* IndentationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17ED351F1A05703600E54649 /* IndentationHelpers.swift */; };
 		17F2E3C915E0499800F81089 /* ViStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E3C815E0499800F81089 /* ViStatusView.m */; };
@@ -495,6 +498,8 @@
 		17D8A12517CF0354000C25C6 /* SFBCrashReporterWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBCrashReporterWindowController.m; sourceTree = "<group>"; };
 		17D8A12617CF0354000C25C6 /* SFBSystemInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFBSystemInformation.h; sourceTree = "<group>"; };
 		17D8A12717CF0354000C25C6 /* SFBSystemInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFBSystemInformation.m; sourceTree = "<group>"; };
+		17DCAA0D1A213BD500408B9D /* TestViRopeUtf16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestViRopeUtf16.swift; path = ../TestViRopeUtf16.swift; sourceTree = "<group>"; };
+		17DCAA141A213C6400408B9D /* ViRopeUtf16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRopeUtf16.swift; path = "Text Storage/ViRopeUtf16.swift"; sourceTree = "<group>"; };
 		17E8AB43181CCF9C00233393 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		17ED351E1A05703500E54649 /* Vico-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Vico-Bridging-Header.h"; sourceTree = "<group>"; };
 		17ED351F1A05703600E54649 /* IndentationHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndentationHelpers.swift; sourceTree = "<group>"; };
@@ -1038,6 +1043,7 @@
 		1754235B1A059D7300927972 /* Vico Tests */ = {
 			isa = PBXGroup;
 			children = (
+				17DCAA0D1A213BD500408B9D /* TestViRopeUtf16.swift */,
 				1791975B1A05958B00C192CB /* TestViRope.swift */,
 				1754235C1A059D7300927972 /* Supporting Files */,
 			);
@@ -1056,6 +1062,7 @@
 			isa = PBXGroup;
 			children = (
 				179197551A05945500C192CB /* ViRope.swift */,
+				17DCAA141A213C6400408B9D /* ViRopeUtf16.swift */,
 			);
 			name = "Text Storage";
 			sourceTree = "<group>";
@@ -2103,6 +2110,8 @@
 			files = (
 				1754236C1A059ECC00927972 /* ViRope.swift in Sources */,
 				1754236B1A059DE600927972 /* TestViRope.swift in Sources */,
+				17DCAA161A213D1800408B9D /* TestViRopeUtf16.swift in Sources */,
+				17DCAA171A21438200408B9D /* ViRopeUtf16.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2311,6 +2320,7 @@
 				9AF140A4140A8D0B0075677F /* ViPathComponentCell.m in Sources */,
 				9AF140A8140A9C110075677F /* ViPathCell.m in Sources */,
 				9A7B1CF914151B0F00252451 /* NSOutlineView-vimotions.m in Sources */,
+				17DCAA151A213C6400408B9D /* ViRopeUtf16.swift in Sources */,
 				9A7B1CFA14151B0F00252451 /* NSTableView-vimotions.m in Sources */,
 				9AB6F72B14153234000F3578 /* NSTask-streaming.m in Sources */,
 				9AB6F73214160F9B000F3578 /* ViTaskRunner.m in Sources */,

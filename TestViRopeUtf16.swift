@@ -32,8 +32,19 @@ class TestViRopeUtf16: XCTestCase {
 		
 		var index = 0
 		while (index < countElements(ropeString)) {
-			let thingie = utf16[index]
-			XCTAssertEqual(ropeString[index], thingie, "every rope UTF16 int index should correspond to the right string UTF16 int index")
+			XCTAssertEqual(ropeString[index], utf16[index], "every rope UTF16 int index should correspond to the right string UTF16 int index")
+			
+			index++
+		}
+	}
+	
+	func testRopeCharacterAtIndexBehavesLikeNSStrings() {
+		let rope = ViRope("bam😍🐻📼").append("chabooyan").append("swizzle")
+		let ropeString = rope.toString() as NSString
+		
+		var index = 0
+		while (index < ropeString.length) {
+			XCTAssertEqual(ropeString.characterAtIndex(index), rope.characterAtIndex(index), "every rope characterAtIndex should correspond to the right NSString characterAtIndex")
 			
 			index++
 		}

@@ -86,7 +86,7 @@ extension ViRope {
 		}
 	}
 	
-	/*func characterAtIndex(index: Int) -> unichar {
-	return utf16[index]
-	}*/
+	func characterAtIndex(index: Int) -> unichar {
+		return utf16[index]
+	}
 }

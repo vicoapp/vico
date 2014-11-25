@@ -1,5 +1,5 @@
 //
-//  TestViRope.swift
+//  TestViStringRope
 //  vico
 //
 //  Created by Antonio Salazar Cardozo on 11/1/14.
@@ -9,10 +9,10 @@
 import Foundation
 import XCTest
 
-class TestViRope: XCTestCase {
+class TestViStringRope: XCTestCase {
 	func testRopeCanBeCreated() {
-		let rope = ViRope()
-		let contentedRope = ViRope("boom")
+		let rope = ViStringRope()
+		let contentedRope = ViStringRope("boom")
 		
 		XCTAssertEqual(rope.length(), 0, "empty rope should have length 0")
 		
@@ -21,7 +21,7 @@ class TestViRope: XCTestCase {
 	}
 	
 	func testRopeIsImmutable() {
-		let initialRope = ViRope()
+		let initialRope = ViStringRope()
 		let appendedRope = initialRope.append("hello")
 		let insertedRope = appendedRope.insert("rm", atIndex: 2)
 		
@@ -40,7 +40,7 @@ class TestViRope: XCTestCase {
 	}
 	
 	func testRopeInsertionWorksCorrectly() {
-		let initialRope = ViRope("This is a man who is lucky")
+		let initialRope = ViStringRope("This is a man who is lucky")
 		
 		let insertedRope = initialRope.insert("un", atIndex: 21)
 		let insertedRope2 = insertedRope.insert("re", atIndex: 23)
@@ -56,14 +56,14 @@ class TestViRope: XCTestCase {
 	}
 	
 	func testRopeIndexWorksCorrectlyOnEmptyString() {
-		let rope = ViRope("")
+		let rope = ViStringRope("")
 		
 		XCTAssertEqual(rope.startIndex, rope.endIndex, "start and end indices should be equal in empty rope")
 	}
 	
 	func testRopeIndexWorksCorrectlyOnSingleString() {
 		let string = "This is a man who is lucky"
-		let rope = ViRope("This is a man who is lucky")
+		let rope = ViStringRope("This is a man who is lucky")
 		
 		var stringIndex = string.startIndex
 		var ropeIndex = rope.startIndex
@@ -91,7 +91,7 @@ class TestViRope: XCTestCase {
 	func testRopeIndexWorksCorrectlyOnMultiStrings() {
 		let string = "This is a man who is lucky"
 		let secondString = "that he is alive"
-		let rope = ViRope("This is a man who is lucky").append(secondString)
+		let rope = ViStringRope("This is a man who is lucky").append(secondString)
 		
 		var stringIndex = string.startIndex
 		var ropeIndex = rope.startIndex
@@ -134,7 +134,7 @@ class TestViRope: XCTestCase {
 	func testRopeIndexWorksCorrectlyWithEmptyStringInsertions() {
 		let string = "This"
 		let secondString = "is"
-		let rope = ViRope(string).append("").append(secondString)
+		let rope = ViStringRope(string).append("").append(secondString)
 		
 		var stringIndex = string.startIndex
 		var ropeIndex = rope.startIndex
@@ -176,7 +176,7 @@ class TestViRope: XCTestCase {
 	
 	func testRopeIndexWorksCorrectlyWithEmptyStringsOnEnds() {
 		let string: String = "This"
-		let ropeWithEmptyStart = ViRope("").append(string)
+		let ropeWithEmptyStart = ViStringRope("").append(string)
 		
 		var stringIndex = string.startIndex
 		var ropeIndex = ropeWithEmptyStart.startIndex
@@ -190,7 +190,7 @@ class TestViRope: XCTestCase {
 		
 		XCTAssertEqual(ropeIndex, ropeWithEmptyStart.endIndex, "even with an empty start string, the final rope index must be the same as the rope's reported endIndex when moving forwards")
 		
-		let ropeWithEmptyEnd = ViRope(string).append("")
+		let ropeWithEmptyEnd = ViStringRope(string).append("")
 		
 		stringIndex = string.startIndex
 		ropeIndex = ropeWithEmptyEnd.startIndex

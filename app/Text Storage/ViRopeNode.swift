@@ -16,7 +16,7 @@ internal class ViRopeNode<ContentType : CollectionType> {
 	private let childLengths: LazyRandomAccessCollection<[Int]>
 	private let childContentLengths: LazyRandomAccessCollection<[ContentType.Index.Distance]>
 	
-	private var length: Int {
+	internal var length: Int {
 		get {
 			if children.isEmpty {
 				return reduce(childContentLengths, 0, { (totalLength, contentLength) -> Int in
@@ -44,6 +44,24 @@ internal class ViRopeNode<ContentType : CollectionType> {
 		
 		childLengths = lazy([])
 		childContentLengths = lazy(childContent.map { countElements($0) })
+	}
+	
+	func getIndex(integerIndex: UInt, branchingFactorBits: UInt, leafLengthBits: UInt, depth: UInt) -> ContentType._Element {
+		if depth == 0 {
+			return getContentIndex(Int(integerIndex & branchingFactorBits),
+				contentIndex: Int(integerIndex >> branchingFactorBits & leafLengthBits))
+		} else {
+			let levelShifted = integerIndex >> (branchingFactorBits * depth)
+			let childIndex = levelShifted & branchingFactorBits
+			
+			return children[Int(childIndex)].getIndex(integerIndex, branchingFactorBits: branchingFactorBits, leafLengthBits: leafLengthBits, depth: depth)
+		}
+	}
+	
+	private func getContentIndex(childContentIndex: Int, contentIndex: Int) -> ContentType._Element {
+		let content = childContent[childContentIndex]
+	
+		return integerIndexIntoContent(content, contentIndex)
 	}
 }
 
@@ -76,16 +94,7 @@ private func helperContentForIntegerIndexInNodeContent<ContentType : CollectionT
 	let contentItem = leafNode.childContent[childContentIndex]
 	let remainingOffset = index - offsetAtIndex
 	
-	if contentItem.startIndex is Int {
-		return contentItem[remainingOffset as ContentType.Index]
-	} else {
-		var actualIndex = contentItem.startIndex
-		for _ in 0...remainingOffset {
-			actualIndex = actualIndex.successor()
-		}
-		
-		return contentItem[actualIndex]
-	}
+	return integerIndexIntoContent(contentItem, remainingOffset)
 }
 
 // Fetches the index of children at which the provided global rope index will be found, given a starting offset that tells us where the provided rootNode is within the broader rope.

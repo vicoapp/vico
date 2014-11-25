@@ -17,14 +17,14 @@
 		1732DB03181EF25000890055 /* SFBCrashReporterWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1732DB01181EF25000890055 /* SFBCrashReporterWindow.xib */; };
 		1735A6B3183348370092E695 /* ViGlyphGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6B2183348370092E695 /* ViGlyphGenerator.m */; };
 		1735A6BB1833DB060092E695 /* ViTypesetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1735A6BA1833DB060092E695 /* ViTypesetter.m */; };
-		1754236B1A059DE600927972 /* TestViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1791975B1A05958B00C192CB /* TestViRope.swift */; };
+		1754236B1A059DE600927972 /* TestViStringRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1791975B1A05958B00C192CB /* TestViStringRope.swift */; };
 		1754236C1A059ECC00927972 /* ViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179197551A05945500C192CB /* ViRope.swift */; };
 		17697C52181D9F3A0090ACBA /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 17E8AB4C181CCF9C00233393 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		177AC29518307E6C002C9647 /* ViFold.m in Sources */ = {isa = PBXBuildFile; fileRef = 177AC29418307E6C002C9647 /* ViFold.m */; };
 		179197561A05945500C192CB /* ViRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179197551A05945500C192CB /* ViRope.swift */; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
-		17AA2FC01A23D0FC007534F0 /* ViMutatingRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FBF1A23D0FC007534F0 /* ViMutatingRope.swift */; };
-		17AA2FC11A23D0FC007534F0 /* ViMutatingRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FBF1A23D0FC007534F0 /* ViMutatingRope.swift */; };
+		17AA2FC01A23D0FC007534F0 /* ViStringRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FBF1A23D0FC007534F0 /* ViStringRope.swift */; };
+		17AA2FC11A23D0FC007534F0 /* ViStringRope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FBF1A23D0FC007534F0 /* ViStringRope.swift */; };
 		17AA2FC81A23D51B007534F0 /* ViRopeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FC71A23D51B007534F0 /* ViRopeNode.swift */; };
 		17AA2FC91A23D51B007534F0 /* ViRopeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FC71A23D51B007534F0 /* ViRopeNode.swift */; };
 		17AA2FCB1A23D5A1007534F0 /* ViRopeIndexing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AA2FCA1A23D5A1007534F0 /* ViRopeIndexing.swift */; };
@@ -486,10 +486,10 @@
 		177AC29418307E6C002C9647 /* ViFold.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFold.m; sourceTree = "<group>"; };
 		179197551A05945500C192CB /* ViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRope.swift; path = "Text Storage/ViRope.swift"; sourceTree = "<group>"; };
 		1791975A1A05958B00C192CB /* Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Bridging-Header.h"; sourceTree = "<group>"; };
-		1791975B1A05958B00C192CB /* TestViRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestViRope.swift; path = ../tests/TestViRope.swift; sourceTree = "<group>"; };
+		1791975B1A05958B00C192CB /* TestViStringRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestViStringRope.swift; path = ../tests/TestViStringRope.swift; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
-		17AA2FBF1A23D0FC007534F0 /* ViMutatingRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViMutatingRope.swift; path = "Text Storage/ViMutatingRope.swift"; sourceTree = "<group>"; };
+		17AA2FBF1A23D0FC007534F0 /* ViStringRope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViStringRope.swift; path = "Text Storage/ViStringRope.swift"; sourceTree = "<group>"; };
 		17AA2FC71A23D51B007534F0 /* ViRopeNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRopeNode.swift; path = "Text Storage/ViRopeNode.swift"; sourceTree = "<group>"; };
 		17AA2FCA1A23D5A1007534F0 /* ViRopeIndexing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRopeIndexing.swift; path = "Text Storage/ViRopeIndexing.swift"; sourceTree = "<group>"; };
 		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
@@ -1053,7 +1053,7 @@
 			isa = PBXGroup;
 			children = (
 				17DCAA0D1A213BD500408B9D /* TestViRopeUtf16.swift */,
-				1791975B1A05958B00C192CB /* TestViRope.swift */,
+				1791975B1A05958B00C192CB /* TestViStringRope.swift */,
 				1754235C1A059D7300927972 /* Supporting Files */,
 			);
 			path = "Vico Tests";
@@ -1072,7 +1072,7 @@
 			children = (
 				179197551A05945500C192CB /* ViRope.swift */,
 				17DCAA141A213C6400408B9D /* ViRopeUtf16.swift */,
-				17AA2FBF1A23D0FC007534F0 /* ViMutatingRope.swift */,
+				17AA2FBF1A23D0FC007534F0 /* ViStringRope.swift */,
 				17AA2FC71A23D51B007534F0 /* ViRopeNode.swift */,
 				17AA2FCA1A23D5A1007534F0 /* ViRopeIndexing.swift */,
 			);
@@ -2122,11 +2122,11 @@
 			files = (
 				17AA2FC91A23D51B007534F0 /* ViRopeNode.swift in Sources */,
 				1754236C1A059ECC00927972 /* ViRope.swift in Sources */,
-				1754236B1A059DE600927972 /* TestViRope.swift in Sources */,
+				1754236B1A059DE600927972 /* TestViStringRope.swift in Sources */,
 				17DCAA161A213D1800408B9D /* TestViRopeUtf16.swift in Sources */,
 				17AA2FCC1A23D5A1007534F0 /* ViRopeIndexing.swift in Sources */,
 				17DCAA171A21438200408B9D /* ViRopeUtf16.swift in Sources */,
-				17AA2FC11A23D0FC007534F0 /* ViMutatingRope.swift in Sources */,
+				17AA2FC11A23D0FC007534F0 /* ViStringRope.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2277,7 +2277,7 @@
 				9A2EF4D6133115290023C5B7 /* iso8859_13.c in Sources */,
 				9A2EF4D7133115290023C5B7 /* iso8859_14.c in Sources */,
 				9A2EF4D8133115290023C5B7 /* iso8859_15.c in Sources */,
-				17AA2FC01A23D0FC007534F0 /* ViMutatingRope.swift in Sources */,
+				17AA2FC01A23D0FC007534F0 /* ViStringRope.swift in Sources */,
 				9A2EF4D9133115290023C5B7 /* iso8859_16.c in Sources */,
 				9A2EF4DA133115290023C5B7 /* koi8_r.c in Sources */,
 				9A2EF4DB133115290023C5B7 /* koi8.c in Sources */,

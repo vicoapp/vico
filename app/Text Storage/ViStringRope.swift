@@ -10,6 +10,7 @@ import Foundation
 
 // Convenience rope for dealing with Swift Strings.
 class ViStringRopeHelper<T> : ViRope<String> {
+	
 	init() {
 		super.init(updatedNodes: [],
 			emptyContent: { "" },

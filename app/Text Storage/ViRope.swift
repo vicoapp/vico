@@ -8,17 +8,20 @@
 
 import Foundation
 
-internal func integerIndexIntoContent<ContentType: CollectionType where ContentType.Index : ForwardIndexType>(content: ContentType, contentIndex: Int) -> ContentType._Element {
-	if content.startIndex is Int {
-		return content[contentIndex as ContentType.Index]
-	} else {
-		var index = content.startIndex
-		for _ in 0...contentIndex {
-			index = index.successor()
-		}
-		
-		return content[advance(content.startIndex, contentIndex)]
+internal func integerAdvance(index: Int, distance: Int) -> Int {
+	return index + distance
+}
+internal func integerAdvance<IndexType : ForwardIndexType>(startIndex: IndexType, distance: Int) -> IndexType {
+	var index = startIndex
+	for _ in 0..<distance {
+		index = index.successor()
 	}
+
+	return index
+}
+
+internal func integerIndexIntoContent<ContentType: CollectionType where ContentType.Index : ForwardIndexType>(content: ContentType, contentIndex: Int) -> ContentType._Element {
+	return content[integerAdvance(content.startIndex, contentIndex)]
 }
 
 internal let defaultRopeBranchingFactorBits: UInt = 5
@@ -43,7 +46,7 @@ internal let defaultRopeLeafLengthBits: UInt = 12
  * ViStringRope provides convenience constructors/helpers and String/NSString
  * API bridging for the String use case.
  */
-class ViRope<ContentType : ExtensibleCollectionType where ContentType : Equatable, ContentType.Index : BidirectionalIndexType> {
+class ViRope<ContentType : ExtensibleCollectionType where ContentType : Equatable, ContentType.Index : BidirectionalIndexType, ContentType : Sliceable, ContentType.SubSlice == ContentType> {
 	
 	private let emptyContent: ()->ContentType
 	private let contentLength: (ContentType)->Int
@@ -146,7 +149,7 @@ class ViRope<ContentType : ExtensibleCollectionType where ContentType : Equatabl
 		self.depth = depth
 	}
 	
-	internal func parallelTree<NewContentType : CollectionType where NewContentType : Equatable, NewContentType.Index : BidirectionalIndexType>(childTransformer: (String)->ContentType, newEmptyContent: ()->NewContentType, newContentLength: (NewContentType)->Int) -> ViRope<NewContentType> {
+	internal func parallelTree<NewContentType : CollectionType where NewContentType : Equatable, NewContentType.Index : BidirectionalIndexType, NewContentType : Sliceable, NewContentType.SubSlice == NewContentType>(childTransformer: (String)->ContentType, newEmptyContent: ()->NewContentType, newContentLength: (NewContentType)->Int) -> ViRope<NewContentType> {
 		return ViRope<NewContentType>(emptyContent: newEmptyContent, contentLength: newContentLength)
 	}
 	
@@ -203,18 +206,18 @@ class ViRope<ContentType : ExtensibleCollectionType where ContentType : Equatabl
 		}
 	}
 	
-	func replaceRange(range: Range<Int>, newContents withContents: ContentType) -> ViRope {
+	func replaceRange(range: Range<Int>, withContents newContents: ContentType) -> ViRope {
 		// possibilities:
 		//   start is in left root, end is in left root -> slice them out, update
 		//       edit offset, stick contents into edit buffer/replace edit buffer 
 		//       with contents, move things right of the edit into right tree,
 		//		 try to give the edit window some stuff from end of left and
 		//       beginning of right with new contents in the middle
-		
-		if range.startIndex > editOffset && range.endIndex < rightOffset {
+
+		if UInt(range.startIndex) >= editOffset && (isEmpty(editWindow) || UInt(range.endIndex) < rightOffset) {
 			// update edit buffer only
-			return updateEditBuffer(trueRange, newContents)
-		} else if trueRange.startIndex > rightOffset {
+			return updateEditBuffer(range, newContents: newContents)
+		} else if UInt(range.startIndex) > rightOffset {
 			// do crazy handling for everything being right of edit window
 			return self
 		} else { // if trueRange.startIndex {
@@ -231,55 +234,41 @@ class ViRope<ContentType : ExtensibleCollectionType where ContentType : Equatabl
 	
 	private func updateEditBuffer(bufferRange: Range<Int>, newContents: ContentType) -> ViRope {
 		
-		let leftEnd = advance(editBuffer.startIndex, bufferRange.startIndex)
-		let rightStart = advance(leftEnd, bufferRange.length)
-		let updatedEditBuffer =
-			editBuffer[editBuffer.startIndex...leftEnd] +
-				newContents +
-				editBuffer[rightEnd...editBuffer.endIndex]
+		let leftEnd = integerAdvance(editWindow.startIndex, bufferRange.startIndex)
+		let rightStart = integerAdvance(leftEnd, countElements(bufferRange))
+		let leftRange = Range(start: editWindow.startIndex, end: leftEnd)
+		let rightRange = Range(start: rightStart, end: editWindow.endIndex)
 		
-		ViRope(leftRoot: leftRoot, editOffset: editOffset, editWindow: updatedEditBuffer, rightOffset: rightOffset + bufferRange.length, rightRoot: rightRoot, emptyContent: emptyContent, contentLength: contentLength, branchingFactorBits: branchingFactorBits, leafLengthBits: leafLengthBits, depth: depth)
+		let updatedEditBuffer = editWindow[leftRange] + newContents + editWindow[rightRange]
+		
+		let lengthDelta = Int(countElements(newContents).toIntMax() - countElements(bufferRange).toIntMax())
+		
+		return ViRope(leftRoot: leftRoot, editOffset: editOffset,
+			editWindow: updatedEditBuffer,
+			rightOffset: rightOffset + lengthDelta,
+			rightRoot: rightRoot, emptyContent: emptyContent, contentLength: contentLength, branchingFactorBits: branchingFactorBits, leafLengthBits: leafLengthBits, depth: depth)
 	}
 	
 	func append(newContent: ContentType) -> ViRope {
-		if let lastNode = leftRoot.childContent.last {
-			let range = Range(start: startIndex, end: endIndex)
-			return ViRope(updatedNodes: leftRoot.childContent + [newContent], emptyContent: emptyContent, contentLength: contentLength, branchingFactorBits: branchingFactorBits, leafLengthBits: leafLengthBits, depth: depth)
-		} else {
-			return ViRope(updatedNodes: [newContent], emptyContent: emptyContent, contentLength: contentLength, branchingFactorBits: branchingFactorBits, leafLengthBits: leafLengthBits, depth: depth)
-		}
-	}
-	
-	func insert(string: String, atIndex: Int) -> ViRope {
-		/*let (_, updatedNodes) = leftRoot.childContent.reduce((0, []), combine: { (progressInfo, node) -> (Int,[String]) in
-			let (latestIndex, nodesSoFar) = progressInfo
-			let count = countElements(node)
-			let endIndex = incrementIndex(latestIndex + count)
-			
-			if endIndex == atIndex {
-				return (endIndex + 1, nodesSoFar + [node, string])
-			} else if endIndex > atIndex && atIndex > latestIndex {
-				let splitIndex = advance(node.startIndex, atIndex - latestIndex)
-				
-				return (endIndex,
-					nodesSoFar +
-						[node.substringWithRange(Range(start: node.startIndex, end: splitIndex)),
-						string,
-						node.substringWithRange(Range(start: splitIndex, end: node.endIndex))])
-			} else {
-				return (endIndex, nodesSoFar + [node])
-			}
-		})*/
+		let ropeEnd = max(contentLength(editWindow) - 1, 0)
 		
-		return self;
+		return replaceRange(
+			Range(start: ropeEnd, end: ropeEnd),
+			withContents: newContent)
 	}
 	
-	// FIXME make this use countElements instead
+	func insert(newContent: ContentType, atIndex: Int) -> ViRope {
+		
+		return replaceRange(
+			Range(start: atIndex, end: atIndex),
+			withContents: newContent)
+	}
+	
 	func length() -> ContentType.Index.Distance {
-		return leftRoot.childContent.reduce(0, combine: { $0 + countElements($1) })
+		return countElements(toContent())
 	}
 	
-	func toString() -> ContentType {
-		return join(emptyContent(), leftRoot.childContent)
+	func toContent() -> ContentType {
+		return join(emptyContent(), leftRoot.childContent + [editWindow] + rightRoot.childContent)
 	}
 }

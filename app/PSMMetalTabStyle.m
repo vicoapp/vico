@@ -385,9 +385,6 @@
 		}
 
 		closeButtonSize = [closeButton size];
-		if ([controlView isFlipped]) {
-			closeButtonRect.origin.y += closeButtonRect.size.height;
-		}
 
 		[closeButton drawAtPoint:closeButtonRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 
@@ -399,9 +396,6 @@
 	if([cell hasIcon]){
 		NSRect iconRect = [self iconRectForTabCell:cell];
 		NSImage *icon = [[[(NSTabViewItem *)[cell representedObject] identifier] content] icon];
-		if ([controlView isFlipped]) {
-			iconRect.origin.y = cellFrame.size.height - iconRect.origin.y;
-		}
 		[icon drawAtPoint:iconRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 
 		// scoot label over

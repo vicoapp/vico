@@ -31,7 +31,6 @@
 - (void)setImage:(NSImage *)anImage
 {
 	_image = anImage;
-	[_image setFlipped:YES];
 }
 
 

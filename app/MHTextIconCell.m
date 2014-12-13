@@ -115,11 +115,6 @@
 		imageFrame.origin.x += 3;
 		imageFrame.size = imageSize;
 
-		if ([controlView isFlipped])
-			imageFrame.origin.y += ceil((cellFrame.size.height + imageFrame.size.height) / 2);
-		else
-			imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
-
 		[_image drawAtPoint:imageFrame.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 	}
 

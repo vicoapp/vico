@@ -1,34 +1,6 @@
 import Foundation
 import Cocoa
 
-/**
- * Simple cache for images. Can take either a string to be drawn
- * in an image, or a string URL to an image. Only initializes the
- * image once.
- *
- * Currently there's no real cache expiration mechanism.
- */
-class ViImageCache {
-    private var cache = [NSAttributedString: NSImage]()
-    
-    func imageWithString(stringToDraw: NSAttributedString) -> NSImage {
-        if let existing = cache[stringToDraw] {
-            return existing
-        } else {
-            let size = stringToDraw.size
-            
-            let image = NSImage(size: size)
-            image.lockFocusFlipped(false)
-            stringToDraw.drawAtPoint(NSMakePoint(0,0))
-            image.unlockFocus()
-            
-            cache[stringToDraw] = image
-            
-            return image
-        }
-    }
-}
-
 class ViLayoutManager: NSLayoutManager {
     // We handle our own rendering of invisible characters.
     private var _showsInvisibleCharacters = false

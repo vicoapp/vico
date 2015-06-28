@@ -12,12 +12,11 @@ import Cocoa
  */
 class ViTypesetter: NSATSTypesetter {
     override func actionForControlCharacterAtIndex(characterIndex: Int) -> NSTypesetterControlCharacterAction {
-        let foundAttribute =
-            self.attributedString?.attribute(ViFoldedAttributeName, atIndex: characterIndex, effectiveRange: nil)
+        let folded: Bool? =
+            self.attributedString?.typedAttribute(ViTextAttribute.Folded, atIndex: characterIndex, effectiveRange: nil)
         
-        if let foldedAttribute: NSNumber = foundAttribute as? NSNumber where
-            foldedAttribute.boolValue {
-                return NSTypesetterControlCharacterAction.ZeroAdvancementAction;
+        if folded ?? false {
+            return NSTypesetterControlCharacterAction.ZeroAdvancementAction;
         } else {
             return super.actionForControlCharacterAtIndex(characterIndex);
         }

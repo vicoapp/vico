@@ -21,7 +21,7 @@
 		178EAF181B3F5434008C7BA1 /* NSString-range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF171B3F5434008C7BA1 /* NSString-range.swift */; };
 		178EAF1A1B3F544F008C7BA1 /* Dictionary-enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */; };
 		178EAF1F1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */; };
-		179D92691B2E712D00D6BC4E /* ViTextRenderingConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextRenderingConstants.swift */; };
+		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
@@ -465,7 +465,7 @@
 		178EAF171B3F5434008C7BA1 /* NSString-range.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSString-range.swift"; path = "Core Extensions/NSString-range.swift"; sourceTree = "<group>"; };
 		178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Dictionary-enumeration.swift"; path = "Core Extensions/Dictionary-enumeration.swift"; sourceTree = "<group>"; };
 		178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSAttributedString-typedAttributes.swift"; path = "Core Extensions/NSAttributedString-typedAttributes.swift"; sourceTree = "<group>"; };
-		179D92681B2E712D00D6BC4E /* ViTextRenderingConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextRenderingConstants.swift; sourceTree = "<group>"; };
+		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
 		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
@@ -1084,7 +1084,6 @@
 			isa = PBXGroup;
 			children = (
 				17DCE2A51B2E634E002C60C3 /* ViTypesetter.swift */,
-				179D92681B2E712D00D6BC4E /* ViTextRenderingConstants.swift */,
 				179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */,
 				178EAF131B3524EA008C7BA1 /* ViLayoutManager.swift */,
 			);
@@ -1162,6 +1161,7 @@
 		9A2EF299133109C20023C5B7 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */,
 				17DCE2A31B2E62EE002C60C3 /* Text Rendering */,
 				170435BE199FEB1E0062E643 /* File Indexing */,
 				1732DB04181EF2C200890055 /* Core Extensions */,
@@ -2157,7 +2157,7 @@
 				9A2EF4CE133115280023C5B7 /* iso8859_4.c in Sources */,
 				9A2EF4CF133115280023C5B7 /* iso8859_5.c in Sources */,
 				9A2EF4D0133115280023C5B7 /* iso8859_6.c in Sources */,
-				179D92691B2E712D00D6BC4E /* ViTextRenderingConstants.swift in Sources */,
+				179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */,
 				179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */,
 				9A2EF4D1133115280023C5B7 /* iso8859_7.c in Sources */,
 				9A2EF4D2133115280023C5B7 /* iso8859_8.c in Sources */,

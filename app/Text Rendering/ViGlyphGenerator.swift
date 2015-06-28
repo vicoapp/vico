@@ -27,11 +27,10 @@ class ViGlyphGenerator: NSGlyphGenerator, NSGlyphStorage {
     
     @objc func insertGlyphs(glyphs: UnsafePointer<NSGlyph>, length incomingGlyphLength: Int, forStartingGlyphAtIndex glyphIndex: Int, characterIndex: Int) {
         var effectiveRange: NSRange = NSMakeRange(0, 0)
-        let foundAttribute =
-            self.attributedString().attribute(ViFoldedAttributeName, atIndex: characterIndex, longestEffectiveRange: &effectiveRange, inRange:NSMakeRange(0, characterIndex + incomingGlyphLength))
+        let folded: Bool? =
+            self.attributedString().typedAttribute(ViTextAttribute.Folded, atIndex: characterIndex, longestEffectiveRange: &effectiveRange, inRange:NSMakeRange(0, characterIndex + incomingGlyphLength))
         
-        if let foldedAttribute: NSNumber = foundAttribute as? NSNumber where
-            foldedAttribute.boolValue {
+        if folded ?? false {
             var allGlyphs: [NSGlyph] = [],
                 controlGlyph = NSGlyph(NSControlGlyph),
                 nullGlyph = NSGlyph(NSNullGlyph)

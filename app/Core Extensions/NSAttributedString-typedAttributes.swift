@@ -15,7 +15,10 @@ extension NSAttributedString {
     func typedAttribute<T>(attrName: String, atIndex index: Int, effectiveRange: NSRangePointer) -> T? {
         return attribute(attrName, atIndex: index, effectiveRange: effectiveRange) as? T
     }
-    func typedAttribute(attrName: String, atIndex index: Int, effectiveRange: NSRangePointer) -> Bool? {
+    func typedAttribute<T>(attrName: ViTextAttribute, atIndex index: Int, effectiveRange: NSRangePointer) -> T? {
+        return attribute(attrName.rawValue, atIndex: index, effectiveRange: effectiveRange) as? T
+    }
+    func typedAttribute<AttributeType>(attrName: AttributeType, atIndex index: Int, effectiveRange: NSRangePointer) -> Bool? {
         let foundAttribute: NSNumber? = typedAttribute(attrName, atIndex: index, effectiveRange: effectiveRange)
         
         return foundAttribute?.boolValue
@@ -24,7 +27,10 @@ extension NSAttributedString {
     func typedAttribute<T>(attrName: String, atIndex index: Int, longestEffectiveRange: NSRangePointer, inRange rangeRestriction: NSRange) -> T? {
         return attribute(attrName, atIndex: index, longestEffectiveRange: longestEffectiveRange, inRange: rangeRestriction) as? T
     }
-    func typedAttribute(attrName: String, atIndex index: Int, longestEffectiveRange: NSRangePointer, inRange rangeRestriction: NSRange) -> Bool? {
+    func typedAttribute<T>(attrName: ViTextAttribute, atIndex index: Int, longestEffectiveRange: NSRangePointer, inRange rangeRestriction: NSRange) -> T? {
+        return attribute(attrName.rawValue, atIndex: index, longestEffectiveRange: longestEffectiveRange, inRange: rangeRestriction) as? T
+    }
+    func typedAttribute<AttributeType>(attrName: AttributeType, atIndex index: Int, longestEffectiveRange: NSRangePointer, inRange rangeRestriction: NSRange) -> Bool? {
         let foundAttribute: NSNumber? =  typedAttribute(attrName, atIndex: index, longestEffectiveRange: longestEffectiveRange, inRange: rangeRestriction)
         
         return foundAttribute?.boolValue

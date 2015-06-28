@@ -47,6 +47,8 @@
 #import "ViMark.h"
 #import "NSWindow-additions.h"
 
+#import "Vico-Swift.h"
+
 static NSMutableArray			*__windowControllers = nil;
 static __weak ViWindowController	*__currentWindowController = nil; // XXX: not retained!
 

@@ -31,6 +31,7 @@
 
 #include <CoreServices/CoreServices.h>
 
+@class ViToolbarPopUpButtonCell;
 @class ViWindowController;
 @class ViBgView;
 

@@ -35,6 +35,7 @@
 
 #define ViWindowDidLoad @"ViWindowDidLoad"
 
+@class ViToolbarPopUpButtonCell;
 @class PSMTabBarControl;
 @class ViDocument;
 @class ViDocumentView;

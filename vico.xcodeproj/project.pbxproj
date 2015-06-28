@@ -21,6 +21,7 @@
 		178EAF181B3F5434008C7BA1 /* NSString-range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF171B3F5434008C7BA1 /* NSString-range.swift */; };
 		178EAF1A1B3F544F008C7BA1 /* Dictionary-enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */; };
 		178EAF1F1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */; };
+		178EAF301B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */; };
 		178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */; };
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
@@ -131,7 +132,6 @@
 		9A2EF3BD13310CB80023C5B7 /* ViTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36613310CA00023C5B7 /* ViTextView.m */; };
 		9A2EF3BE13310CB80023C5B7 /* ViTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36813310CA30023C5B7 /* ViTheme.m */; };
 		9A2EF3BF13310CB80023C5B7 /* ViThemeStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36A13310CA60023C5B7 /* ViThemeStore.m */; };
-		9A2EF3C013310CB80023C5B7 /* ViToolbarPopUpButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36C13310CA90023C5B7 /* ViToolbarPopUpButtonCell.m */; };
 		9A2EF3C113310CB80023C5B7 /* ViTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF36E13310CAC0023C5B7 /* ViTransformer.m */; };
 		9A2EF3C213310CB80023C5B7 /* ViWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37013310CB00023C5B7 /* ViWebView.m */; };
 		9A2EF3C313310CB80023C5B7 /* ViWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF37213310CB30023C5B7 /* ViWindow.m */; };
@@ -466,6 +466,7 @@
 		178EAF171B3F5434008C7BA1 /* NSString-range.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSString-range.swift"; path = "Core Extensions/NSString-range.swift"; sourceTree = "<group>"; };
 		178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Dictionary-enumeration.swift"; path = "Core Extensions/Dictionary-enumeration.swift"; sourceTree = "<group>"; };
 		178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSAttributedString-typedAttributes.swift"; path = "Core Extensions/NSAttributedString-typedAttributes.swift"; sourceTree = "<group>"; };
+		178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViToolbarPopUpButtonCell.swift; path = "Graphical Components/ViToolbarPopUpButtonCell.swift"; sourceTree = "<group>"; };
 		178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSImage-dimensions.swift"; path = "Core Extensions/NSImage-dimensions.swift"; sourceTree = "<group>"; };
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
@@ -665,8 +666,6 @@
 		9A2EF36813310CA30023C5B7 /* ViTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTheme.m; sourceTree = "<group>"; };
 		9A2EF36913310CA40023C5B7 /* ViThemeStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViThemeStore.h; sourceTree = "<group>"; };
 		9A2EF36A13310CA60023C5B7 /* ViThemeStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViThemeStore.m; sourceTree = "<group>"; };
-		9A2EF36B13310CA80023C5B7 /* ViToolbarPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViToolbarPopUpButtonCell.h; sourceTree = "<group>"; };
-		9A2EF36C13310CA90023C5B7 /* ViToolbarPopUpButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViToolbarPopUpButtonCell.m; sourceTree = "<group>"; };
 		9A2EF36D13310CAB0023C5B7 /* ViTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViTransformer.h; sourceTree = "<group>"; };
 		9A2EF36E13310CAC0023C5B7 /* ViTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViTransformer.m; sourceTree = "<group>"; };
 		9A2EF36F13310CAE0023C5B7 /* ViWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViWebView.h; sourceTree = "<group>"; };
@@ -1019,6 +1018,14 @@
 			name = "Core Extensions";
 			sourceTree = "<group>";
 		};
+		178EAF271B3FAAA1008C7BA1 /* Graphical Components */ = {
+			isa = PBXGroup;
+			children = (
+				178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */,
+			);
+			name = "Graphical Components";
+			sourceTree = "<group>";
+		};
 		17A37ED61826DD76007E40C9 /* Base Nu */ = {
 			isa = PBXGroup;
 			children = (
@@ -1165,6 +1172,7 @@
 			isa = PBXGroup;
 			children = (
 				179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */,
+				178EAF271B3FAAA1008C7BA1 /* Graphical Components */,
 				17DCE2A31B2E62EE002C60C3 /* Text Rendering */,
 				170435BE199FEB1E0062E643 /* File Indexing */,
 				1732DB04181EF2C200890055 /* Core Extensions */,
@@ -1598,8 +1606,6 @@
 				9A2EF36813310CA30023C5B7 /* ViTheme.m */,
 				9A2EF36913310CA40023C5B7 /* ViThemeStore.h */,
 				9A2EF36A13310CA60023C5B7 /* ViThemeStore.m */,
-				9A2EF36B13310CA80023C5B7 /* ViToolbarPopUpButtonCell.h */,
-				9A2EF36C13310CA90023C5B7 /* ViToolbarPopUpButtonCell.m */,
 				9A2EF36D13310CAB0023C5B7 /* ViTransformer.h */,
 				9A2EF36E13310CAC0023C5B7 /* ViTransformer.m */,
 				9A2EF36F13310CAE0023C5B7 /* ViWebView.h */,
@@ -2106,7 +2112,6 @@
 				9A2EF3BD13310CB80023C5B7 /* ViTextView.m in Sources */,
 				9A2EF3BE13310CB80023C5B7 /* ViTheme.m in Sources */,
 				9A2EF3BF13310CB80023C5B7 /* ViThemeStore.m in Sources */,
-				9A2EF3C013310CB80023C5B7 /* ViToolbarPopUpButtonCell.m in Sources */,
 				9A2EF3C113310CB80023C5B7 /* ViTransformer.m in Sources */,
 				9A2EF3C213310CB80023C5B7 /* ViWebView.m in Sources */,
 				9A2EF3C313310CB80023C5B7 /* ViWindow.m in Sources */,
@@ -2249,6 +2254,7 @@
 				17D8A12817CF0354000C25C6 /* SFBCrashReporter.m in Sources */,
 				17D8A12917CF0354000C25C6 /* SFBCrashReporterWindowController.m in Sources */,
 				17D8A12A17CF0354000C25C6 /* SFBSystemInformation.m in Sources */,
+				178EAF301B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift in Sources */,
 				1730CE0B17CF05D100A1DA2C /* GenerateFormData.m in Sources */,
 				1730CE1117D1282900A1DA2C /* SBJsonUTF8Stream.m in Sources */,
 			);

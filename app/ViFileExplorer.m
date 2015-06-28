@@ -25,6 +25,8 @@
 
 #import <Quartz/Quartz.h>
 
+#import "Vico-Swift.h"
+
 #import "ViFileExplorer.h"
 #import "logging.h"
 #import "MHTextIconCell.h"

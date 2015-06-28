@@ -25,6 +25,8 @@
 
 #import <Quartz/Quartz.h>
 
+#include <Vico-Swift.h>
+
 #import "ViSymbolController.h"
 #import "MHTextIconCell.h"
 #import "ViSeparatorCell.h"
@@ -62,7 +64,7 @@
 	[symbolView setDoubleAction:@selector(gotoSymbolAction:)];
 	[symbolView setAction:@selector(gotoSymbolAction:)];
 
-	NSCell *cell = [[MHTextIconCell alloc] init];
+	NSCell *cell = [[ViTextIconCell alloc] init];
 	[[symbolView outlineTableColumn] setDataCell:cell];
 	[cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	[cell setWraps:NO];

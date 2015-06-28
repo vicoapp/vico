@@ -66,7 +66,6 @@ class ViLayoutManager: NSLayoutManager {
     var invisibleImageDictionary = [Character: NSImage]()
     
     override init() {
-        NSLog("OHAI")
         super.init()
         
         glyphGenerator = ViGlyphGenerator()

@@ -5,3 +5,5 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import "ViThemeStore.h"
+
+#import "MHTextIconCell.h"

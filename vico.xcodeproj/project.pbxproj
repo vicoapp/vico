@@ -21,6 +21,7 @@
 		178EAF181B3F5434008C7BA1 /* NSString-range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF171B3F5434008C7BA1 /* NSString-range.swift */; };
 		178EAF1A1B3F544F008C7BA1 /* Dictionary-enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */; };
 		178EAF1F1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */; };
+		178EAF2E1B3FAADB008C7BA1 /* ViTextIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF2D1B3FAADB008C7BA1 /* ViTextIconCell.swift */; };
 		178EAF301B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */; };
 		178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */; };
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
@@ -466,6 +467,7 @@
 		178EAF171B3F5434008C7BA1 /* NSString-range.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSString-range.swift"; path = "Core Extensions/NSString-range.swift"; sourceTree = "<group>"; };
 		178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Dictionary-enumeration.swift"; path = "Core Extensions/Dictionary-enumeration.swift"; sourceTree = "<group>"; };
 		178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSAttributedString-typedAttributes.swift"; path = "Core Extensions/NSAttributedString-typedAttributes.swift"; sourceTree = "<group>"; };
+		178EAF2D1B3FAADB008C7BA1 /* ViTextIconCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViTextIconCell.swift; path = "Graphical Components/ViTextIconCell.swift"; sourceTree = "<group>"; };
 		178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViToolbarPopUpButtonCell.swift; path = "Graphical Components/ViToolbarPopUpButtonCell.swift"; sourceTree = "<group>"; };
 		178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSImage-dimensions.swift"; path = "Core Extensions/NSImage-dimensions.swift"; sourceTree = "<group>"; };
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
@@ -1021,6 +1023,7 @@
 		178EAF271B3FAAA1008C7BA1 /* Graphical Components */ = {
 			isa = PBXGroup;
 			children = (
+				178EAF2D1B3FAADB008C7BA1 /* ViTextIconCell.swift */,
 				178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */,
 			);
 			name = "Graphical Components";
@@ -2205,6 +2208,7 @@
 				9A260668134A1704002C86FB /* ViCompletionController.m in Sources */,
 				9A26066B134A4F13002C86FB /* ViCompletionView.m in Sources */,
 				9A26066E134B0024002C86FB /* ViCompletionWindow.m in Sources */,
+				178EAF2E1B3FAADB008C7BA1 /* ViTextIconCell.swift in Sources */,
 				9A260674134DF8D7002C86FB /* ViCompletion.m in Sources */,
 				9A26067813505AEF002C86FB /* ViSymbolController.m in Sources */,
 				9A2606AC135B1924002C86FB /* ViPreferencePane.m in Sources */,

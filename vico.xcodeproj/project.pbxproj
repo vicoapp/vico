@@ -21,6 +21,7 @@
 		178EAF181B3F5434008C7BA1 /* NSString-range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF171B3F5434008C7BA1 /* NSString-range.swift */; };
 		178EAF1A1B3F544F008C7BA1 /* Dictionary-enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */; };
 		178EAF1F1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */; };
+		178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */; };
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
 		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
@@ -465,6 +466,7 @@
 		178EAF171B3F5434008C7BA1 /* NSString-range.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSString-range.swift"; path = "Core Extensions/NSString-range.swift"; sourceTree = "<group>"; };
 		178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Dictionary-enumeration.swift"; path = "Core Extensions/Dictionary-enumeration.swift"; sourceTree = "<group>"; };
 		178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSAttributedString-typedAttributes.swift"; path = "Core Extensions/NSAttributedString-typedAttributes.swift"; sourceTree = "<group>"; };
+		178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSImage-dimensions.swift"; path = "Core Extensions/NSImage-dimensions.swift"; sourceTree = "<group>"; };
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
 		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
@@ -1012,6 +1014,7 @@
 				1732DAF7181EEC3600890055 /* NSCollection-enumeration.m */,
 				178EAF191B3F544F008C7BA1 /* Dictionary-enumeration.swift */,
 				178EAF1E1B3FA00E008C7BA1 /* NSAttributedString-typedAttributes.swift */,
+				178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */,
 			);
 			name = "Core Extensions";
 			sourceTree = "<group>";
@@ -2043,6 +2046,7 @@
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
 				9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */,
+				178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */,
 				9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */,
 				9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */,
 				9A2EF37F13310CB80023C5B7 /* NSScanner-additions.m in Sources */,

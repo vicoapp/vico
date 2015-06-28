@@ -41,7 +41,7 @@ re_free_registers(OnigRegion* r)
 }
 
 extern int
-re_adjust_startpos(regex_t* reg, const char* string, int size,
+re_adjust_startpos(OnigRegexType* reg, const char* string, int size,
 		   int startpos, int range)
 {
   if (startpos > 0 && ONIGENC_MBC_MAXLEN(reg->enc) != 1 && startpos < size) {
@@ -61,7 +61,7 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
 }
 
 extern int
-re_match(regex_t* reg, const char* str, int size, int pos,
+re_match(OnigRegexType* reg, const char* str, int size, int pos,
 	 struct re_registers* regs)
 {
   return onig_match(reg, (UChar* )str, (UChar* )(str + size),
@@ -69,7 +69,7 @@ re_match(regex_t* reg, const char* str, int size, int pos,
 }
 
 extern int
-re_search(regex_t* bufp, const char* string, int size, int startpos, int range,
+re_search(OnigRegexType* bufp, const char* string, int size, int startpos, int range,
 	  struct re_registers* regs)
 {
   return onig_search(bufp, (UChar* )string, (UChar* )(string + size),
@@ -79,7 +79,7 @@ re_search(regex_t* bufp, const char* string, int size, int startpos, int range,
 }
 
 extern int
-re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
+re_compile_pattern(const char* pattern, int size, OnigRegexType* reg, char* ebuf)
 {
   int r;
   OnigErrorInfo einfo;
@@ -117,15 +117,15 @@ re_recompile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
 #endif
 
 extern void
-re_free_pattern(regex_t* reg)
+re_free_pattern(OnigRegexType* reg)
 {
   onig_free(reg);
 }
 
 extern int
-re_alloc_pattern(regex_t** reg)
+re_alloc_pattern(OnigRegexType** reg)
 {
-  *reg = (regex_t* )xmalloc(sizeof(regex_t));
+  *reg = (OnigRegexType* )xmalloc(sizeof(OnigRegexType));
   if (IS_NULL(*reg)) return ONIGERR_MEMORY;
 
   return onig_reg_init(*reg, ONIG_OPTION_DEFAULT,

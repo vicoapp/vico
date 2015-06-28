@@ -288,7 +288,7 @@ typedef struct {
   UChar*           pattern_end;
   UChar*           error;
   UChar*           error_end;
-  regex_t*         reg;       /* for reg->names only */
+  OnigRegexType*         reg;       /* for reg->names only */
   int              num_call;
 #ifdef USE_SUBEXP_CALL
   UnsetAddrList*   unset_addr_list;
@@ -318,7 +318,7 @@ typedef struct {
   int new_val;
 } GroupNumRemap;
 
-extern int    onig_renumber_name_table P_((regex_t* reg, GroupNumRemap* map));
+extern int    onig_renumber_name_table P_((OnigRegexType* reg, GroupNumRemap* map));
 #endif
 
 extern int    onig_strncmp P_((const UChar* s1, const UChar* s2, int n));
@@ -338,13 +338,13 @@ extern Node*  onig_node_list_add P_((Node* list, Node* x));
 extern Node*  onig_node_new_alt P_((Node* left, Node* right));
 extern void   onig_node_str_clear P_((Node* node));
 extern int    onig_free_node_list P_((void));
-extern int    onig_names_free P_((regex_t* reg));
-extern int    onig_parse_make_tree P_((Node** root, const UChar* pattern, const UChar* end, regex_t* reg, ScanEnv* env));
+extern int    onig_names_free P_((OnigRegexType* reg));
+extern int    onig_parse_make_tree P_((Node** root, const UChar* pattern, const UChar* end, OnigRegexType* reg, ScanEnv* env));
 extern int    onig_free_shared_cclass_table P_((void));
 
 #ifdef ONIG_DEBUG
 #ifdef USE_NAMED_GROUP
-extern int onig_print_names(FILE*, regex_t*);
+extern int onig_print_names(FILE*, OnigRegexType*);
 #endif
 #endif
 

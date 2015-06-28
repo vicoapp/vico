@@ -372,22 +372,29 @@
 	if ([cell hasCloseButton] && ![cell isCloseButtonSuppressed]) {
 		NSSize closeButtonSize = NSZeroSize;
 		NSRect closeButtonRect = [cell closeButtonRectForFrame:cellFrame];
-		NSImage * closeButton = nil;
+		NSImage* baseCloseButton = nil, *closeButton = nil;
 
 		if (cell.isModified) {
-			closeButton = _metalCloseModifiedButton;
-			if ([cell closeButtonOver]) closeButton = _metalCloseModifiedButtonOver;
-			if ([cell closeButtonPressed]) closeButton = _metalCloseModifiedButtonDown;
+			baseCloseButton = _metalCloseModifiedButton;
+			if ([cell closeButtonOver]) baseCloseButton = _metalCloseModifiedButtonOver;
+			if ([cell closeButtonPressed]) baseCloseButton = _metalCloseModifiedButtonDown;
 		} else {
-			closeButton = _metalCloseButton;
-			if ([cell closeButtonOver]) closeButton = _metalCloseButtonOver;
-			if ([cell closeButtonPressed]) closeButton = _metalCloseButtonDown;
+			baseCloseButton = _metalCloseButton;
+			if ([cell closeButtonOver]) baseCloseButton = _metalCloseButtonOver;
+			if ([cell closeButtonPressed]) baseCloseButton = _metalCloseButtonDown;
 		}
 
-		closeButtonSize = [closeButton size];
+		closeButtonSize = [baseCloseButton size];
+        
 		if ([controlView isFlipped]) {
-			closeButtonRect.origin.y += closeButtonRect.size.height;
-		}
+            closeButton = [[NSImage alloc] initWithSize:[baseCloseButton size]];
+            
+            [closeButton lockFocusFlipped:YES];
+            [baseCloseButton drawAtPoint:NSZeroPoint fromRect:NSMakeRect(0, 0, closeButtonSize.width, closeButtonSize.height) operation:NSCompositeSourceOver fraction:1.0];
+            [closeButton unlockFocus];
+        } else {
+            closeButton = baseCloseButton;
+        }
 
 		[closeButton drawAtPoint:closeButtonRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 
@@ -398,10 +405,18 @@
 	// icon
 	if([cell hasIcon]){
 		NSRect iconRect = [self iconRectForTabCell:cell];
-		NSImage *icon = [[[(NSTabViewItem *)[cell representedObject] identifier] content] icon];
+		NSImage *baseIcon = [[[(NSTabViewItem *)[cell representedObject] identifier] content] icon], *icon = nil;
+        
 		if ([controlView isFlipped]) {
-			iconRect.origin.y = cellFrame.size.height - iconRect.origin.y;
-		}
+            icon = [[NSImage alloc] initWithSize:[baseIcon size]];
+            
+            [icon lockFocusFlipped:YES];
+            [baseIcon drawAtPoint:NSZeroPoint fromRect:NSMakeRect(0, 0, baseIcon.size.width, baseIcon.size.height) operation:NSCompositeSourceOver fraction:1.0];
+            [icon unlockFocus];
+        } else {
+            baseIcon = icon;
+        }
+        
 		[icon drawAtPoint:iconRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 
 		// scoot label over

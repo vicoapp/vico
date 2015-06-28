@@ -32,13 +32,21 @@
         return;
     }
 
-    NSImage *image = (_down) ? _PSMTabBarOverflowDownPopUpImage : _PSMTabBarOverflowPopUpImage;
-	NSSize imageSize = [image size];
+    NSImage *baseImage = (_down) ? _PSMTabBarOverflowDownPopUpImage : _PSMTabBarOverflowPopUpImage, *image = nil;
+	NSSize imageSize = [baseImage size];
     rect.origin.x = NSMidX(rect) - (imageSize.width * 0.5);
     rect.origin.y = NSMidY(rect) - (imageSize.height * 0.5);
+    
     if([self isFlipped]) {
-        rect.origin.y += imageSize.height;
+        image = [[NSImage alloc] initWithSize:imageSize];
+        
+        [image lockFocusFlipped:YES];
+        [baseImage drawAtPoint:NSZeroPoint fromRect:NSMakeRect(0, 0, imageSize.width, imageSize.height) operation:NSCompositeSourceOver fraction:1.0];
+        [image unlockFocus];
+    } else {
+        image = baseImage;
     }
+    
 	[image drawAtPoint:rect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 }
 

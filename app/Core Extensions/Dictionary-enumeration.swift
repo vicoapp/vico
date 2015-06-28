@@ -8,6 +8,8 @@
 
 import Foundation
 
+// Extensions for better numeration over Dictionary content that preserves
+// Dictionary semantics on return values.
 extension Dictionary {
     func map<MappedKeyType: Hashable, MappedValueType>(mapper: (Key, Value) -> (MappedKeyType, MappedValueType?)) -> [MappedKeyType: MappedValueType] {
         var newMap = [MappedKeyType: MappedValueType]()

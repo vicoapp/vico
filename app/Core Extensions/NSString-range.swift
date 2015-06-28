@@ -8,7 +8,8 @@
 
 import Foundation
 
-extension NSAttributedString {
+// Additions for string ranges.
+extension NSString {
     func fullRange() -> NSRange {
         return NSMakeRange(0, length)
     }

@@ -25,6 +25,8 @@
 
 #include <sys/time.h>
 
+#import "Vico-Swift.h"
+
 #import "ViDocument.h"
 #import "ViDocumentView.h"
 #import "ViBundleStore.h"
@@ -38,7 +40,6 @@
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"
 #import "SFTPConnection.h" /* Only for SSH2_FX_NO_SUCH_FILE constant. */
-#import "ViLayoutManager.h"
 #import "ViError.h"
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ViAppController.h"
@@ -380,7 +381,7 @@ DEBUG_FINALIZE();
 		   [keyPath isEqualToString:@"linebreak"]) {
 		[self eachTextView:^(ViTextView *tv) {
 			ViLayoutManager *lm = (ViLayoutManager *)[tv layoutManager];
-			[lm setInvisiblesAttributes:[_theme invisiblesAttributes]];
+			[lm setAttributesForInvisibles:[_theme invisiblesAttributes]];
 			[lm invalidateDisplayForCharacterRange:NSMakeRange(0, [_textStorage length])];
 			[tv updateFont];
 		}];
@@ -551,7 +552,7 @@ DEBUG_FINALIZE();
 	[layoutManager setDelegate:self];
 	[layoutManager setShowsInvisibleCharacters:[userDefaults boolForKey:@"list"]];
 	[layoutManager setShowsControlCharacters:YES];
-	[layoutManager setInvisiblesAttributes:[_theme invisiblesAttributes]];
+	[layoutManager setAttributesForInvisibles:[_theme invisiblesAttributes]];
 
 	NSView *innerView = [documentView innerView];
 	NSRect frame = [innerView frame];

@@ -37,7 +37,6 @@
 #import "ViAppController.h"
 #import "ViTextStorage.h"
 #import "NSObject+SPInvocationGrabbing.h"
-#import "ViLayoutManager.h"
 #import "ExTextField.h"
 #import "ViEventManager.h"
 #import "ViRulerView.h"

@@ -1,0 +1,177 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "D3A582F1A82C36301A9A90E0EEF8568C5C93BE07",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F17D50F0ABAED2DCDE7E9E76CBDAC0D149092DE0" : 0,
+    "C857110F983E48EF9EE6E6F7A0E279E155703B34" : 0,
+    "81E1EC7FD25F3A5A6980387A6F353812CA2E7878" : 0,
+    "798F4EDA95AF0757ADE99BFC8E70D3D649552BCD" : 0,
+    "040EBBE8DDE395AB5629251A6823D789C98D615E" : 0,
+    "2A1098D11F398854F6A2BE06C923E8A8E36D2FB6" : 0,
+    "CCBB9F8C243DF12F218CE1A396D8EBDAC9A5DDC2" : 0,
+    "3E037BB51BA19CA1A47602CE14106B4115FAEEC3" : 0,
+    "043B290F6FCF56E58216A9082ECC125C3A51BDA3" : 0,
+    "03FE9E4300610AE487B82ECFD3142E6BF43412AD" : 0,
+    "47B7786BDB0E22454114FB3C77929A58CA712E96" : 0,
+    "AFEF27B5C3ED54C5E97592B164CA7E9AF4E74258" : 0,
+    "34C0D0C317C76C7E2EC060D912C658155F3D50D6" : 0,
+    "D3A582F1A82C36301A9A90E0EEF8568C5C93BE07" : 0,
+    "2C4B663BCADE37F9FCB94345628C63EF5F1BFFCD" : 0,
+    "516F7F0D086B4A557E6F345790CD6BBB789FD475" : 0,
+    "0F9EC5F46758F7F817BC7E882A03384CC4471843" : 0,
+    "D1D4A0A45FFB32DDF78BCD7C15AB47669DC1F832" : 0,
+    "F152CE9007DD2679EFB29BDF61FDD8110EC02416" : 0,
+    "2DD61BF35B00AE8A13FB7B7C0BC0BB7116BE33C1" : 0,
+    "D80F40F0B496121A9864A0EB57C49E74B0FB45B6" : 0,
+    "EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402" : 0,
+    "55BFF3680D4361BB021E2CF34E059B5F3E899670" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "5D95552E-01E6-46A2-976B-DB9CDFE459A7",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F17D50F0ABAED2DCDE7E9E76CBDAC0D149092DE0" : "vicoBundles\/vicoapp-html.tmbundle",
+    "C857110F983E48EF9EE6E6F7A0E279E155703B34" : "vicoBundles\/vicoapp-php.tmbundle",
+    "81E1EC7FD25F3A5A6980387A6F353812CA2E7878" : "vicoBundles\/vicoapp-json.tmbundle",
+    "798F4EDA95AF0757ADE99BFC8E70D3D649552BCD" : "vicoBundles\/vicoapp-sql.tmbundle",
+    "040EBBE8DDE395AB5629251A6823D789C98D615E" : "vicoBundles\/vicoapp-text.tmbundle",
+    "2A1098D11F398854F6A2BE06C923E8A8E36D2FB6" : "vicoBundles\/vicoapp-ack.vico-bundle",
+    "CCBB9F8C243DF12F218CE1A396D8EBDAC9A5DDC2" : "vicoBundles\/vicoapp-css.tmbundle",
+    "3E037BB51BA19CA1A47602CE14106B4115FAEEC3" : "vicoBundles\/vicoapp-perl.tmbundle",
+    "043B290F6FCF56E58216A9082ECC125C3A51BDA3" : "vicoBundles\/vicoapp-lua.tmbundle",
+    "03FE9E4300610AE487B82ECFD3142E6BF43412AD" : "vicoBundles\/vicoapp-diff.tmbundle",
+    "47B7786BDB0E22454114FB3C77929A58CA712E96" : "vicoBundles\/vicoapp-ruby-on-rails.tmbundle",
+    "AFEF27B5C3ED54C5E97592B164CA7E9AF4E74258" : "vicoBundles\/vicoapp-source.tmbundle",
+    "34C0D0C317C76C7E2EC060D912C658155F3D50D6" : "vicoBundles\/vicoapp-yaml.tmbundle",
+    "D3A582F1A82C36301A9A90E0EEF8568C5C93BE07" : "vico",
+    "2C4B663BCADE37F9FCB94345628C63EF5F1BFFCD" : "vicoBundles\/vicoapp-c.tmbundle",
+    "516F7F0D086B4A557E6F345790CD6BBB789FD475" : "vicoBundles\/vicoapp-shellscript.tmbundle",
+    "0F9EC5F46758F7F817BC7E882A03384CC4471843" : "vicoBundles\/vicoapp-java.tmbundle",
+    "D1D4A0A45FFB32DDF78BCD7C15AB47669DC1F832" : "vicoBundles\/vicoapp-javascript.tmbundle",
+    "F152CE9007DD2679EFB29BDF61FDD8110EC02416" : "vicoBundles\/vicoapp-ruby.tmbundle",
+    "2DD61BF35B00AE8A13FB7B7C0BC0BB7116BE33C1" : "vicoBundles\/vicoapp-objective-c.tmbundle",
+    "D80F40F0B496121A9864A0EB57C49E74B0FB45B6" : "vicoBundles\/vicoapp-python.tmbundle",
+    "EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402" : "vicosparkle",
+    "55BFF3680D4361BB021E2CF34E059B5F3E899670" : "vicoBundles\/vicoapp-xml.tmbundle"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "vico",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 203,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "vico.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/diff.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "03FE9E4300610AE487B82ECFD3142E6BF43412AD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/text.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "040EBBE8DDE395AB5629251A6823D789C98D615E"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/textmate\/lua.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "043B290F6FCF56E58216A9082ECC125C3A51BDA3"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/java.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "0F9EC5F46758F7F817BC7E882A03384CC4471843"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/ack.vico-bundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2A1098D11F398854F6A2BE06C923E8A8E36D2FB6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/c.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2C4B663BCADE37F9FCB94345628C63EF5F1BFFCD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/objective-c.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2DD61BF35B00AE8A13FB7B7C0BC0BB7116BE33C1"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/yaml.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "34C0D0C317C76C7E2EC060D912C658155F3D50D6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/perl.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3E037BB51BA19CA1A47602CE14106B4115FAEEC3"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/ruby-on-rails.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "47B7786BDB0E22454114FB3C77929A58CA712E96"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/shellscript.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "516F7F0D086B4A557E6F345790CD6BBB789FD475"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/xml.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "55BFF3680D4361BB021E2CF34E059B5F3E899670"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/sql.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "798F4EDA95AF0757ADE99BFC8E70D3D649552BCD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/json.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "81E1EC7FD25F3A5A6980387A6F353812CA2E7878"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/source.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "AFEF27B5C3ED54C5E97592B164CA7E9AF4E74258"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/php.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C857110F983E48EF9EE6E6F7A0E279E155703B34"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/css.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "CCBB9F8C243DF12F218CE1A396D8EBDAC9A5DDC2"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/javascript.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D1D4A0A45FFB32DDF78BCD7C15AB47669DC1F832"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:vicoapp\/vico.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D3A582F1A82C36301A9A90E0EEF8568C5C93BE07"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/python.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D80F40F0B496121A9864A0EB57C49E74B0FB45B6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/Sparkle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/ruby.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F152CE9007DD2679EFB29BDF61FDD8110EC02416"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/vicoapp\/html.tmbundle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F17D50F0ABAED2DCDE7E9E76CBDAC0D149092DE0"
+    }
+  ]
+}

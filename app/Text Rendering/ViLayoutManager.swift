@@ -13,8 +13,8 @@ class ViLayoutManager: NSLayoutManager {
         }
     }
     
-    private var _attributesForInvisibles = [NSObject: AnyObject]()
-    var attributesForInvisibles: [NSObject: AnyObject] {
+    private var _attributesForInvisibles = [String: AnyObject]()
+    var attributesForInvisibles: [String: AnyObject] {
         set {
             _attributesForInvisibles = newValue
             _attributesForInvisibles[NSFontAttributeName] = ViThemeStore.font()
@@ -44,7 +44,7 @@ class ViLayoutManager: NSLayoutManager {
         typesetter = ViTypesetter()
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         glyphGenerator = ViGlyphGenerator()

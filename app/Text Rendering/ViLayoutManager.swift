@@ -2,7 +2,9 @@ import Foundation
 import Cocoa
 
 class ViLayoutManager: NSLayoutManager {
-    // We handle our own rendering of invisible characters.
+    // We handle our own rendering of invisible characters, so intercept
+    // NSLayoutManager's showsInvisibleCharacters so that the super-implementation
+    // never draws them.
     private var _showsInvisibleCharacters = false
     override var showsInvisibleCharacters: Bool {
         get {
@@ -29,13 +31,13 @@ class ViLayoutManager: NSLayoutManager {
     }
     
     // TODO Make customizable?
-    let invisibleCharacterDictionary: [Character: String] =
+    private let invisibleCharacterDictionary: [Character: String] =
         [
             "\n": "↩",
             "\t": "⇥",
             " ": "･"
         ]
-    var invisibleImageDictionary = [Character: NSImage]()
+    private var invisibleImageDictionary = [Character: NSImage]()
     
     override init() {
         super.init()
@@ -51,6 +53,7 @@ class ViLayoutManager: NSLayoutManager {
         typesetter = ViTypesetter()
     }
 
+    // Draw standard glyphs, then our own invisibles if requested.
     override func drawGlyphsForGlyphRange(glyphsToShow: NSRange, atPoint origin: NSPoint) {
         super.drawGlyphsForGlyphRange(glyphsToShow, atPoint: origin)
         
@@ -78,7 +81,7 @@ class ViLayoutManager: NSLayoutManager {
         }
     }
     
-    
+    // Access already-computed image for the invisible, or compute lazily.
     private func imageForInvisible(invisible: Character) -> NSImage? {
 
         if let existing = invisibleImageDictionary[invisible] {

@@ -21,13 +21,13 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ *
 
 #import "ViRulerView.h"
 #include "ViFold.h"
 #import "ViTextView.h"
 #import "ViThemeStore.h"
-#import "NSObject+SPInvocationGrabbing.h"
+//#import "NSObect+SPInvocationGrabbing.h"
 #include "logging.h"
 
 #define DEFAULT_THICKNESS   22.0
@@ -169,3 +169,4 @@
 }
 
 @end
+ */

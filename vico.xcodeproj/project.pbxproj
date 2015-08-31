@@ -24,6 +24,9 @@
 		178EAF2E1B3FAADB008C7BA1 /* ViTextIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF2D1B3FAADB008C7BA1 /* ViTextIconCell.swift */; };
 		178EAF301B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */; };
 		178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */; };
+		178EAF341B407072008C7BA1 /* ViRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF331B407072008C7BA1 /* ViRulerView.swift */; };
+		178EAF361B407481008C7BA1 /* ViRulerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF351B407481008C7BA1 /* ViRulerHelper.swift */; };
+		178EAF381B4094B9008C7BA1 /* ViLineNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */; };
 		178EAF3A1B40A578008C7BA1 /* Dictionary-typedAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178EAF391B40A578008C7BA1 /* Dictionary-typedAccess.swift */; };
 		179D92691B2E712D00D6BC4E /* ViTextAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */; };
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
@@ -471,6 +474,9 @@
 		178EAF2D1B3FAADB008C7BA1 /* ViTextIconCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViTextIconCell.swift; path = "Graphical Components/ViTextIconCell.swift"; sourceTree = "<group>"; };
 		178EAF2F1B402BB1008C7BA1 /* ViToolbarPopUpButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViToolbarPopUpButtonCell.swift; path = "Graphical Components/ViToolbarPopUpButtonCell.swift"; sourceTree = "<group>"; };
 		178EAF311B402C25008C7BA1 /* NSImage-dimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSImage-dimensions.swift"; path = "Core Extensions/NSImage-dimensions.swift"; sourceTree = "<group>"; };
+		178EAF331B407072008C7BA1 /* ViRulerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerView.swift; path = Ruler/ViRulerView.swift; sourceTree = "<group>"; };
+		178EAF351B407481008C7BA1 /* ViRulerHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelper.swift; path = Ruler/ViRulerHelper.swift; sourceTree = "<group>"; };
+		178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViLineNumberView.swift; sourceTree = "<group>"; };
 		178EAF391B40A578008C7BA1 /* Dictionary-typedAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary-typedAccess.swift"; sourceTree = "<group>"; };
 		179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViTextAttribute.swift; sourceTree = "<group>"; };
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
@@ -1067,7 +1073,7 @@
 			name = "Vico Nu";
 			sourceTree = "<group>";
 		};
-		17BA92A5184043E100B1252E /* Ruler Views */ = {
+		17BA92A5184043E100B1252E /* Ruler */ = {
 			isa = PBXGroup;
 			children = (
 				17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */,
@@ -1076,8 +1082,11 @@
 				17BA92AC1840440000B1252E /* ViLineNumberView.m */,
 				9A2EF34313310C710023C5B7 /* ViRulerView.h */,
 				9A2EF34413310C720023C5B7 /* ViRulerView.m */,
+				178EAF331B407072008C7BA1 /* ViRulerView.swift */,
+				178EAF351B407481008C7BA1 /* ViRulerHelper.swift */,
+				178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */,
 			);
-			name = "Ruler Views";
+			name = Ruler;
 			sourceTree = "<group>";
 		};
 		17D8A12117CF0330000C25C6 /* SFBCrash */ = {
@@ -1180,6 +1189,7 @@
 				179D92681B2E712D00D6BC4E /* ViTextAttribute.swift */,
 				178EAF271B3FAAA1008C7BA1 /* Graphical Components */,
 				17DCE2A31B2E62EE002C60C3 /* Text Rendering */,
+				17BA92A5184043E100B1252E /* Ruler */,
 				170435BE199FEB1E0062E643 /* File Indexing */,
 				1732DB04181EF2C200890055 /* Core Extensions */,
 				17D8A12117CF0330000C25C6 /* SFBCrash */,
@@ -1395,7 +1405,6 @@
 		9A43469B133115D4002B04DE /* More code */ = {
 			isa = PBXGroup;
 			children = (
-				17BA92A5184043E100B1252E /* Ruler Views */,
 				177AC29318307E6C002C9647 /* ViFold.h */,
 				177AC29418307E6C002C9647 /* ViFold.m */,
 				17F2E3C715E0499800F81089 /* ViStatusView.h */,
@@ -2056,8 +2065,10 @@
 				1732DAF9181EEC3600890055 /* NSCollection-enumeration.m in Sources */,
 				9A2EF38B13310CB80023C5B7 /* scope_selector.lemon in Sources */,
 				9A2EF2A1133109C20023C5B7 /* main.m in Sources */,
+				178EAF361B407481008C7BA1 /* ViRulerHelper.swift in Sources */,
 				9A2EF37713310CB80023C5B7 /* ExCommand.m in Sources */,
 				9A2EF37C13310CB80023C5B7 /* MHTextIconCell.m in Sources */,
+				178EAF381B4094B9008C7BA1 /* ViLineNumberView.swift in Sources */,
 				178EAF321B402C25008C7BA1 /* NSImage-dimensions.swift in Sources */,
 				9A2EF37D13310CB80023C5B7 /* NSArray-patterns.m in Sources */,
 				9A2EF37E13310CB80023C5B7 /* NSObject+SPInvocationGrabbing.m in Sources */,
@@ -2150,6 +2161,7 @@
 				9A2EF481133114AF0023C5B7 /* nsUTF8Prober.cpp in Sources */,
 				9A2EF4971331150E0023C5B7 /* regcomp.c in Sources */,
 				9A2EF4981331150E0023C5B7 /* regenc.c in Sources */,
+				178EAF341B407072008C7BA1 /* ViRulerView.swift in Sources */,
 				9A2EF4991331150E0023C5B7 /* regerror.c in Sources */,
 				9A2EF49A1331150E0023C5B7 /* regexec.c in Sources */,
 				9A2EF49B1331150E0023C5B7 /* regext.c in Sources */,

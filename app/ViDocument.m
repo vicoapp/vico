@@ -1549,7 +1549,7 @@ didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer
 	if (flag) {
 		ViRulerView *rulerView = [[ViRulerView alloc] initWithScrollView:aScrollView];
 		[aScrollView setVerticalRulerView:rulerView];
-		[rulerView setRelativeLineNumbers:relative];
+		//[rulerView setRelativeLineNumbers:relative];
 		[aScrollView setHasHorizontalRuler:NO];
 		[aScrollView setHasVerticalRuler:YES];
 		[aScrollView setRulersVisible:YES];

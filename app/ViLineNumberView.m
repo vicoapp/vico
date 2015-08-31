@@ -30,7 +30,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-
+/*
 @implementation ViLineNumberView
 
 - (ViLineNumberView *)initWithTextView:(ViTextView *)aTextView backgroundColor:(NSColor *)aColor
@@ -314,7 +314,7 @@
 		/* Protect against an improbable (but possible due to
 		 * preceeding exceptions in undo manager) out-of-bounds
 		 * reference here.
-		 */
+		 *
 		if (location >= [textStorage length]) {
 			break;
 		}
@@ -344,3 +344,4 @@
 }
 
 @end
+*/

@@ -4,6 +4,12 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
-#import "ViThemeStore.h"
 
 #import "MHTextIconCell.h"
+
+#import "ViLineNumberView.h"
+#import "ViFoldMarginView.h"
+
+#import "ViFold.h"
+#import "ViTextView.h"
+#import "ViThemeStore.h"

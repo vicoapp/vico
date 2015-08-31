@@ -8,6 +8,33 @@
 
 import Foundation
 
+private struct DigitSettings {
+    private let attributes: [String: AnyObject]
+    private let digitView: ViLineNumberView
+    
+    init(digitView: ViLineNumberView, textAttributes: [String: AnyObject]) {
+        self.digitView = digitView
+        attributes = textAttributes
+    }
+    
+    
+    lazy var digitSize: NSSize = self.computeDigitSize()
+    
+    lazy var digits: [NSImage] = self.computeDigits()
+
+    private func computeDigitSize() -> NSSize {
+        return "8".sizeWithAttributes(attributes)
+    }
+    private mutating func computeDigits() -> [NSImage] {
+        return (0..<10).map { digit -> NSImage in
+            let digitString = String(digit)
+            
+            let digitImage = NSImage(size: digitSize)
+            return digitView.drawString(digitString, intoImage: digitImage)
+        }
+    }
+}
+
 /**
  * A helper view that provides line number rendering for `ViRulerView`.
  */
@@ -70,8 +97,11 @@ class ViLineNumberView: NSView {
         }
     }
     
+    private var digitSettings: DigitSettings? = nil
     var textAttributes = [String: AnyObject]() {
         didSet {
+            digitSettings = DigitSettings(digitView: self, textAttributes: textAttributes)
+            
             updateViewFrame()
             // TODO needsDisplayInRect
             needsDisplay = true
@@ -183,18 +213,13 @@ class ViLineNumberView: NSView {
     
     private var digitSize: NSSize {
         get {
-            return "8".sizeWithAttributes(textAttributes)
+            return digitSettings!.digitSize
         }
     }
     
     private var digits: [NSImage] {
         get {
-            return (0..<10).map { digit -> NSImage in
-                let digitString = String(digit)
-                
-                let digitImage = NSImage(size: digitSize)
-                return self.drawString(digitString, intoImage: digitImage)
-            }
+            return digitSettings!.digits
         }
     }
     

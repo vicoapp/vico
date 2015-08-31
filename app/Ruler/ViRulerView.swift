@@ -152,7 +152,7 @@ class ViRulerView: NSRulerView {
     }
     
     override func drawHashMarksAndLabelsInRect(rect: NSRect) {
-        if let visibleRect = clientView?.bounds {
+        if let visibleRect = scrollView?.contentView.bounds {
             fillBackground()
             drawMargin()
             

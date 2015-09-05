@@ -55,8 +55,10 @@ class ViLineNumberView: NSView {
             let notificationCenter = NSNotificationCenter.defaultCenter()
             
             if oldValue?.document !== newValue.document {
-                for notification in ViLineNumberView.rerenderingDocumentNotifications {
-                    notificationCenter.removeObserver(self, name: notification, object: textView.document)
+                if let oldDocument = oldValue?.document {
+                    for notification in ViLineNumberView.rerenderingDocumentNotifications {
+                        notificationCenter.removeObserver(self, name: notification, object: oldDocument)
+                    }
                 }
                 
                 let needsDisplayHandler: (NSNotification!)->Void = { [unowned self] (_) in
@@ -64,20 +66,22 @@ class ViLineNumberView: NSView {
                 }
                 
                 for notification in ViLineNumberView.rerenderingDocumentNotifications {
-                    notificationCenter.addObserverForName(notification, object: textView.document, queue: nil, usingBlock: needsDisplayHandler)
+                    notificationCenter.addObserverForName(notification, object: newValue.document, queue: nil, usingBlock: needsDisplayHandler)
                 }
             }
 
             if oldValue?.textStorage !== newValue.textStorage {
-                notificationCenter.removeObserver(self, name: ViTextStorageChangedLinesNotification, object: textView.textStorage)
+                if let oldTextStorage = oldValue?.textStorage {
+                    notificationCenter.removeObserver(self, name: ViTextStorageChangedLinesNotification, object: oldTextStorage)
+                }
                 
-                notificationCenter.addObserver(self, selector: "textStorageDidChangeLines:", name: ViTextStorageChangedLinesNotification, object: textView.textStorage)
+                notificationCenter.addObserver(self, selector: "textStorageDidChangeLines:", name: ViTextStorageChangedLinesNotification, object: newValue.textStorage)
             }
 
             if oldValue !== newValue {
-                notificationCenter.removeObserver(self, name: ViCaretChangedNotification, object: textView)
+                notificationCenter.removeObserver(self, name: ViCaretChangedNotification, object: oldValue)
 
-                notificationCenter.addObserverForName(ViCaretChangedNotification, object: textView, queue: nil) { [unowned self] (_) in
+                notificationCenter.addObserverForName(ViCaretChangedNotification, object: newValue, queue: nil) { [unowned self] (_) in
                     if self.relative {
                         self.needsDisplay = true
                     }
@@ -92,8 +96,16 @@ class ViLineNumberView: NSView {
     var relative: Bool = false {
         didSet {
             if relative != oldValue {
+                updateViewFrame()
+                
                 self.superview?.needsDisplay = true
             }
+        }
+    }
+    
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [NSObject : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+        if keyPath == "relativenumber" {
+            self.relative = NSUserDefaults.standardUserDefaults().boolForKey(keyPath!)
         }
     }
     
@@ -225,9 +237,13 @@ class ViLineNumberView: NSView {
     
     private var requiredThickness: CGFloat {
         get {
+            guard let textStorage = textView.textStorage as? ViTextStorage else {
+                return ViLineNumberView.defaultThickness
+            }
+            
             let digitWidth = digitSize.width
             
-            let lineCount = textView.viTextStorage().lineCount()
+            let lineCount = textStorage.lineCount()
             let maxLineDigits = log10(CGFloat(lineCount)) + 1
             
             return ceil(

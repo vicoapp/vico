@@ -239,7 +239,7 @@
             <rect key="contentRect" x="196" y="240" width="334" height="158"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
             <view key="contentView" id="38">
-                <rect key="frame" x="7" y="11" width="334" height="158"/>
+                <rect key="frame" x="0.0" y="0.0" width="334" height="158"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <popUpButton verticalHuggingPriority="750" id="46">
@@ -271,7 +271,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" id="45">
-                        <rect key="frame" x="40" y="51" width="46" height="17"/>
+                        <rect key="frame" x="38" y="51" width="48" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Scope:" id="54">
                             <font key="font" metaFont="system"/>

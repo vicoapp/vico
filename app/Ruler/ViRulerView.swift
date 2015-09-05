@@ -128,8 +128,8 @@ class ViRulerView: NSRulerView {
         let newThickness = helpers.reduce(0, combine: { $0 + $1.helperView.frame.width })
         
         if newThickness != ruleThickness {
-            NSOperationQueue.mainQueue().addOperationWithBlock({
-                self.ruleThickness = newThickness
+            NSOperationQueue.mainQueue().addOperationWithBlock({ [weak self] () -> Void in
+                self?.ruleThickness = newThickness
             })
         }
         

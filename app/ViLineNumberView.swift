@@ -81,9 +81,11 @@ class ViLineNumberView: ViRulerHelperView {
         }
     }
     
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [NSObject : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    @objc override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if keyPath == "relativenumber" {
             self.relative = NSUserDefaults.standardUserDefaults().boolForKey(keyPath!)
+        } else if keyPath == "fontsize" {
+            self.resetTextAttributes()
         }
     }
     
@@ -110,16 +112,14 @@ class ViLineNumberView: ViRulerHelperView {
         
         let userDefaults = NSUserDefaults.standardUserDefaults()
         
-        userDefaults.addObserver(self, forKeyPath: "number", options: NSKeyValueObservingOptions(), context: nil)
-        userDefaults.addObserver(self, forKeyPath:"relativenumber", options:NSKeyValueObservingOptions(), context: nil)
-        userDefaults.addObserver(self, forKeyPath:"fontsize", options:NSKeyValueObservingOptions(), context: nil)
+        userDefaults.addObserver(self, forKeyPath: "relativenumber", options: NSKeyValueObservingOptions(), context: nil)
+        userDefaults.addObserver(self, forKeyPath: "fontsize", options: NSKeyValueObservingOptions(), context: nil)
         
         self.relative = userDefaults.boolForKey("relativenumber")
     }
     
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self)
-        NSUserDefaults.standardUserDefaults().removeObserver(self, forKeyPath: "number")
         NSUserDefaults.standardUserDefaults().removeObserver(self, forKeyPath: "relativenumber")
         NSUserDefaults.standardUserDefaults().removeObserver(self, forKeyPath: "fontsize")
     }

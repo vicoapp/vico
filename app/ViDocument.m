@@ -35,7 +35,6 @@
 #import "NSString-additions.h"
 #import "NSString-scopeSelector.h"
 #import "NSArray-patterns.h"
-#import "ViRulerView.h"
 #import "ViScope.h"
 #import "ViSymbolTransform.h"
 #import "ViThemeStore.h"

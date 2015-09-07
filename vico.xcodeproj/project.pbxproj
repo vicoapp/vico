@@ -32,9 +32,7 @@
 		179D926B1B2E71E900D6BC4E /* ViGlyphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */; };
 		17A063871B9D287E0007AD5A /* ViRulerHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */; settings = {ASSET_TAGS = (); }; };
 		17A0638E1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A0638D1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift */; settings = {ASSET_TAGS = (); }; };
-		17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17A38DF018405E5200C44D50 /* ViFoldMarginView.m */; };
 		17B1FB9B1B9B8BC300477C92 /* ViFoldMarginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */; };
-		17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 17BA92AC1840440000B1252E /* ViLineNumberView.m */; };
 		17D8A10317C842B7000C25C6 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */; };
 		17D8A10417C842B7000C25C6 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10017C842B7000C25C6 /* SBJsonStreamTokeniser.m */; };
 		17D8A10517C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D8A10217C842B7000C25C6 /* SBJsonStreamWriterAccumulator.m */; };
@@ -122,7 +120,6 @@
 		9A2EF3A713310CB80023C5B7 /* ViPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF33E13310C6B0023C5B7 /* ViPreferencesController.m */; };
 		9A2EF3A813310CB80023C5B7 /* ViProject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34013310C6E0023C5B7 /* ViProject.m */; };
 		9A2EF3A913310CB80023C5B7 /* ViRegexp.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34213310C700023C5B7 /* ViRegexp.m */; };
-		9A2EF3AA13310CB80023C5B7 /* ViRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34413310C720023C5B7 /* ViRulerView.m */; };
 		9A2EF3AB13310CB80023C5B7 /* ViScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34613310C750023C5B7 /* ViScope.m */; };
 		9A2EF3AD13310CB80023C5B7 /* ViSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34A13310C790023C5B7 /* ViSeparatorCell.m */; };
 		9A2EF3AE13310CB80023C5B7 /* ViSnippet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A2EF34C13310C7C0023C5B7 /* ViSnippet.m */; };
@@ -485,11 +482,7 @@
 		179D926A1B2E71E900D6BC4E /* ViGlyphGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViGlyphGenerator.swift; path = "Text Rendering/ViGlyphGenerator.swift"; sourceTree = "<group>"; };
 		17A063861B9D287E0007AD5A /* ViRulerHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperView.swift; path = Ruler/ViRulerHelperView.swift; sourceTree = "<group>"; };
 		17A0638D1B9D2EAB0007AD5A /* ViRulerHelperConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViRulerHelperConfig.swift; path = Ruler/ViRulerHelperConfig.swift; sourceTree = "<group>"; };
-		17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViFoldMarginView.h; sourceTree = "<group>"; };
-		17A38DF018405E5200C44D50 /* ViFoldMarginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViFoldMarginView.m; sourceTree = "<group>"; };
 		17B1FB9A1B9B8BC300477C92 /* ViFoldMarginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViFoldMarginView.swift; path = Ruler/ViFoldMarginView.swift; sourceTree = "<group>"; };
-		17BA92AB1840440000B1252E /* ViLineNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViLineNumberView.h; sourceTree = "<group>"; };
-		17BA92AC1840440000B1252E /* ViLineNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViLineNumberView.m; sourceTree = "<group>"; };
 		17D8A0FC17C842B7000C25C6 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = json/SBJson.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FD17C842B7000C25C6 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = json/SBJsonStreamParserAccumulator.h; sourceTree = SOURCE_ROOT; };
 		17D8A0FE17C842B7000C25C6 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = json/SBJsonStreamParserAccumulator.m; sourceTree = SOURCE_ROOT; };
@@ -650,8 +643,6 @@
 		9A2EF34013310C6E0023C5B7 /* ViProject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViProject.m; sourceTree = "<group>"; };
 		9A2EF34113310C6F0023C5B7 /* ViRegexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViRegexp.h; sourceTree = "<group>"; };
 		9A2EF34213310C700023C5B7 /* ViRegexp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViRegexp.m; sourceTree = "<group>"; };
-		9A2EF34313310C710023C5B7 /* ViRulerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViRulerView.h; sourceTree = "<group>"; };
-		9A2EF34413310C720023C5B7 /* ViRulerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViRulerView.m; sourceTree = "<group>"; };
 		9A2EF34513310C730023C5B7 /* ViScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViScope.h; sourceTree = "<group>"; };
 		9A2EF34613310C750023C5B7 /* ViScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViScope.m; sourceTree = "<group>"; };
 		9A2EF34913310C780023C5B7 /* ViSeparatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViSeparatorCell.h; sourceTree = "<group>"; };
@@ -1082,12 +1073,6 @@
 		17BA92A5184043E100B1252E /* Ruler */ = {
 			isa = PBXGroup;
 			children = (
-				17A38DEF18405E5200C44D50 /* ViFoldMarginView.h */,
-				17A38DF018405E5200C44D50 /* ViFoldMarginView.m */,
-				17BA92AB1840440000B1252E /* ViLineNumberView.h */,
-				17BA92AC1840440000B1252E /* ViLineNumberView.m */,
-				9A2EF34313310C710023C5B7 /* ViRulerView.h */,
-				9A2EF34413310C720023C5B7 /* ViRulerView.m */,
 				178EAF331B407072008C7BA1 /* ViRulerView.swift */,
 				178EAF351B407481008C7BA1 /* ViRulerHelper.swift */,
 				178EAF371B4094B9008C7BA1 /* ViLineNumberView.swift */,
@@ -2120,13 +2105,11 @@
 				9A2EF3A713310CB80023C5B7 /* ViPreferencesController.m in Sources */,
 				9A2EF3A813310CB80023C5B7 /* ViProject.m in Sources */,
 				9A2EF3A913310CB80023C5B7 /* ViRegexp.m in Sources */,
-				9A2EF3AA13310CB80023C5B7 /* ViRulerView.m in Sources */,
 				9A2EF3AB13310CB80023C5B7 /* ViScope.m in Sources */,
 				9A2EF3AD13310CB80023C5B7 /* ViSeparatorCell.m in Sources */,
 				9A2EF3AE13310CB80023C5B7 /* ViSnippet.m in Sources */,
 				9A2EF3B113310CB80023C5B7 /* ViSymbolTransform.m in Sources */,
 				9A2EF3B213310CB80023C5B7 /* ViSyntaxContext.m in Sources */,
-				17BA92AD1840440000B1252E /* ViLineNumberView.m in Sources */,
 				9A2EF3B313310CB80023C5B7 /* ViSyntaxMatch.m in Sources */,
 				9A2EF3B413310CB80023C5B7 /* ViSyntaxParser.m in Sources */,
 				9A2EF3B513310CB80023C5B7 /* ViCommandMenuItemView.m in Sources */,
@@ -2259,7 +2242,6 @@
 				9AD68D4E13A3583100126E32 /* ViEventManager.m in Sources */,
 				9AD68D5013A4083A00126E32 /* ViTextView-ex_commands.m in Sources */,
 				9AA48E4F13A60C10009CC5D7 /* NSURL-additions.m in Sources */,
-				17A38DF118405E5200C44D50 /* ViFoldMarginView.m in Sources */,
 				9AA48E5013A60C10009CC5D7 /* NSView-additions.m in Sources */,
 				9A4DB02E13B898B400FAE096 /* ExAddress.m in Sources */,
 				9ACFF8E213EC341C0040DB4E /* ExMap.m in Sources */,

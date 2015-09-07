@@ -39,7 +39,6 @@
 #import "NSObject+SPInvocationGrabbing.h"
 #import "ExTextField.h"
 #import "ViEventManager.h"
-#import "ViRulerView.h"
 #import "NSURL-additions.h"
 #import "ExCommand.h"
 #import "ViError.h"
